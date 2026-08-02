@@ -210,23 +210,23 @@ flat. You didn't write a single line of cleanup code.
 <MultipleChoice
   markdown={`Which best describes the JVM's execution engine?
 
-- It always interprets bytecode, line by line
-  > It does interpret, but it also JIT-compiles hot methods.
-- It compiles everything to native code before running anything
-  > That's "ahead-of-time" compilation, not the standard JVM model.
 - [o] It interprets bytecode at first, and uses a Just-In-Time compiler to translate frequently-used methods into native CPU instructions for speed
   > The engine combines interpretation with JIT compilation of hot methods, getting both quick startup and native speed.
+- It compiles everything to native code before running anything
+  > That's "ahead-of-time" compilation, not the standard JVM model.
 - It runs Java code by translating it back to source first
-  > It does not.`}
+  > It does not.
+- It always interprets bytecode, line by line
+  > It does interpret, but it also JIT-compiles hot methods.`}
 />
 
 <MultipleChoice
   markdown={`Why does Java have a garbage collector?
 
-- To make the JVM smaller
-  > It actually makes the JVM larger and more complex.
 - [o] So programmers do not have to manually free memory; objects that become unreachable are reclaimed automatically
   > Automatic reclamation removes the manual free/delete step and the bugs that come with it.
+- To make the JVM smaller
+  > It actually makes the JVM larger and more complex.
 - To prevent the program from creating any objects
   > It does not prevent allocation; it manages reclamation.
 - Because the JVM cannot create memory itself
@@ -236,14 +236,14 @@ flat. You didn't write a single line of cleanup code.
 <MultipleChoice
   markdown={`Which JVM region holds objects you create with \`new\`?
 
-- The stack
-  > The stack holds method frames and local variables.
-- The method area
-  > That stores class definitions, not instances.
 - [o] The heap
   > Objects live in the shared heap.
 - The class loader
-  > A class loader loads classes; it isn't a memory region.`}
+  > A class loader loads classes; it isn't a memory region.
+- The stack
+  > The stack holds method frames and local variables.
+- The method area
+  > That stores class definitions, not instances.`}
 />
 
 You now have a working mental model of the JVM. The next page

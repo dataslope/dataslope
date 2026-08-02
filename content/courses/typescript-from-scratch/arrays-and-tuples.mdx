@@ -465,14 +465,14 @@ type, arrays do not.**
 <MultipleChoice
   markdown={`What is the type of the variable \`x\` after this declaration: \`const x = [1, "two", true];\`?
 
-- \`any[]\`
-  > TypeScript does not default to \`any[]\` when the element types can be inferred; it infers the specific union type instead.
-- \`Array<number | string | boolean>\`
-  > \`Array<number | string | boolean>\` and \`(number | string | boolean)[]\` are equivalent syntactically, but TypeScript's inference produces the \`T[]\` shorthand form.
 - [o] \`(number | string | boolean)[]\`
   > TypeScript infers a union array type because the elements have different types.
+- \`any[]\`
+  > TypeScript does not default to \`any[]\` when the element types can be inferred; it infers the specific union type instead.
 - \`[number, string, boolean]\` (tuple)
   > TypeScript does not infer a tuple type from an array literal; you must add an explicit annotation to get a tuple.
+- \`Array<number | string | boolean>\`
+  > \`Array<number | string | boolean>\` and \`(number | string | boolean)[]\` are equivalent syntactically, but TypeScript's inference produces the \`T[]\` shorthand form.
 
 TypeScript infers an array type, not a tuple, because the length is not encoded. If you want a tuple, you must annotate explicitly: \`const x: [number, string, boolean] = [1, "two", true];\``}
 />
@@ -480,14 +480,14 @@ TypeScript infers an array type, not a tuple, because the length is not encoded.
 <MultipleChoice
   markdown={`Which of the following correctly represents a tuple of a string and a number, in that order?
 
-- \`[number, string]\`
-  > The types are reversed: this tuple has a number first and a string second, which is the wrong order.
-- [o] \`[string, number]\`
-  > The order in a tuple type corresponds to the order of the elements.
-- \`{ 0: string, 1: number }\`
-  > An object with numeric keys is not a tuple; it lacks tuple semantics such as fixed length and array methods.
 - \`string | number\`
   > A union type means either a string or a number, not a two-element sequence of both.
+- \`{ 0: string, 1: number }\`
+  > An object with numeric keys is not a tuple; it lacks tuple semantics such as fixed length and array methods.
+- [o] \`[string, number]\`
+  > The order in a tuple type corresponds to the order of the elements.
+- \`[number, string]\`
+  > The types are reversed: this tuple has a number first and a string second, which is the wrong order.
 
 Tuples are written as comma-separated types in square brackets, and order matters.`}
 />

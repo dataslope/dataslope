@@ -185,12 +185,12 @@ everywhere.
 
 - Exactly 62% of all our customers prefer the new design
   > The 62% is exactly true only of the 500 people you surveyed. Extending it to all customers requires accounting for sampling uncertainty, a different 500 would give a different number.
+- 62% is meaningless because it's only 500 people
+  > 500 is actually a useful sample size. The number isn't meaningless, it just needs an honest uncertainty estimate attached, which is exactly what statistics provides.
 - [o] In this sample, 62% preferred it; the true population preference is probably near 62% but uncertain, and we'd want to quantify that uncertainty
   > This separates what the data literally says (a fact about the sample) from the claim about the population (an inference that carries uncertainty).
 - The survey proves the new design is better
   > "Proves" is far too strong, and "better" is a different question from "preferred." A single sample with no uncertainty estimate proves nothing.
-- 62% is meaningless because it's only 500 people
-  > 500 is actually a useful sample size. The number isn't meaningless, it just needs an honest uncertainty estimate attached, which is exactly what statistics provides.
 
 The whole course is about attaching honest uncertainty to numbers like this.`}
 />
@@ -198,14 +198,14 @@ The whole course is about attaching honest uncertainty to numbers like this.`}
 <MultipleChoice
   markdown={`Daily sales for an unchanged business are 95, 110, 88, 130, 102. A manager points at 88 and 130 and says "something happened mid-week!" What's the best statistical response?
 
-- They're right, a 42-unit swing must have a cause
-  > A swing existing doesn't mean a *cause* exists. Stable processes routinely produce swings this size purely from natural variation.
-- [o] That swing is well within the normal random variation of a stable process, so there's no reason to invent a cause yet
-  > Recognizing that ordinary processes have spread, and that picking the extremes exaggerates it, is the core instinct this page is building.
 - We should remove 88 and 130 as outliers
   > These aren't errors to delete; they're ordinary draws from a variable process. Deleting them would hide the real variability.
 - We can't say anything without more data
   > We can say something useful right now: a swing of this size is unremarkable for a process with this much natural spread.
+- [o] That swing is well within the normal random variation of a stable process, so there's no reason to invent a cause yet
+  > Recognizing that ordinary processes have spread, and that picking the extremes exaggerates it, is the core instinct this page is building.
+- They're right, a 42-unit swing must have a cause
+  > A swing existing doesn't mean a *cause* exists. Stable processes routinely produce swings this size purely from natural variation.
 
 Cherry-picking the highest and lowest points is how noise gets mistaken for signal.`}
 />
@@ -213,14 +213,14 @@ Cherry-picking the highest and lowest points is how noise gets mistaken for sign
 <MultipleChoice
   markdown={`Which of these is a question that *description alone* can answer, with no statistical inference needed?
 
-- Will next month's revenue beat this month's?
-  > This is about the future/unobserved, it requires inference and uncertainty, not just description.
-- Do our premium users churn less than free users in general?
-  > "In general" reaches beyond your data to the broader population, which is inference.
 - [o] How many orders are in this table that shipped yesterday?
   > This is a fact entirely contained in the data you already have, you just count it. No leap to a larger population is involved.
+- Will next month's revenue beat this month's?
+  > This is about the future/unobserved, it requires inference and uncertainty, not just description.
 - Is the new layout better than the old one?
   > Comparing "better" generalizes from a sample to future users, an inferential, statistical question.
+- Do our premium users churn less than free users in general?
+  > "In general" reaches beyond your data to the broader population, which is inference.
 
 Description is exact but limited to the rows you have; inference is uncertain but answers the questions you usually care about.`}
 />

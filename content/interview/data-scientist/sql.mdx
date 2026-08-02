@@ -265,27 +265,27 @@ WHERE b.user_id IS NULL;   -- active in Jan, gone in Feb
 <MultipleChoice
   markdown={`You compute \`conversions / sessions\` and some rows have \`sessions = 0\`. What is the safest fix?
 
-- Filter out the zero-session rows in \`WHERE\` before dividing.
-  > That silently drops groups you may want to report as "no data" rather than omit, and it is easy to forget.
 - [o] Divide by \`NULLIF(sessions, 0)\` so a zero denominator yields \`NULL\`.
   > \`NULLIF\` turns the zero into \`NULL\`, making the rate cleanly undefined instead of erroring or returning infinity.
-- Wrap the whole thing in \`COALESCE(..., 0)\`.
-  > That would report a *rate of 0* for zero-session groups, which is misleading, they have no rate at all, not a rate of zero.
+- Filter out the zero-session rows in \`WHERE\` before dividing.
+  > That silently drops groups you may want to report as "no data" rather than omit, and it is easy to forget.
 - Cast \`sessions\` to a float first.
-  > Casting fixes integer truncation but does nothing about dividing by zero.`}
+  > Casting fixes integer truncation but does nothing about dividing by zero.
+- Wrap the whole thing in \`COALESCE(..., 0)\`.
+  > That would report a *rate of 0* for zero-session groups, which is misleading, they have no rate at all, not a rate of zero.`}
 />
 
 <MultipleChoice
   markdown={`Why is a window function, not \`GROUP BY\`, the right tool for "rank each rep within their region"?
 
-- \`GROUP BY\` cannot sort rows.
-  > \`GROUP BY\` can order its output; the real issue is that it collapses rows.
-- [o] You need a value on every original row, and \`GROUP BY\` collapses each group to a single row.
-  > A window function keeps all rows while computing per-partition ranks; \`GROUP BY\` would leave one row per region.
 - Window functions run before \`WHERE\`.
   > They actually run after \`WHERE\` and \`GROUP BY\`, in the \`SELECT\` stage; that timing is unrelated to why you pick them here.
 - \`RANK\` is only available inside \`GROUP BY\`.
-  > \`RANK\` is a window function and requires an \`OVER\` clause, not \`GROUP BY\`.`}
+  > \`RANK\` is a window function and requires an \`OVER\` clause, not \`GROUP BY\`.
+- \`GROUP BY\` cannot sort rows.
+  > \`GROUP BY\` can order its output; the real issue is that it collapses rows.
+- [o] You need a value on every original row, and \`GROUP BY\` collapses each group to a single row.
+  > A window function keeps all rows while computing per-partition ranks; \`GROUP BY\` would leave one row per region.`}
 />
 
 ## Challenges

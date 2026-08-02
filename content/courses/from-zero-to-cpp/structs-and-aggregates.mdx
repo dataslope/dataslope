@@ -260,14 +260,14 @@ int main() {
 <MultipleChoice
   markdown={`In C++, what is the only language-level difference between \`struct\` and \`class\`?
 
-- \`struct\` cannot have methods.
-  > It can; both can have any kind of member.
-- \`class\` is allocated on the heap, \`struct\` on the stack.
-  > Storage location is independent of \`struct\` vs \`class\`.
 - [o] The default member access: \`struct\` members are public by default, \`class\` members are private by default.
   > Conventions add more meaning, but the language only distinguishes default access.
+- \`class\` is allocated on the heap, \`struct\` on the stack.
+  > Storage location is independent of \`struct\` vs \`class\`.
 - \`struct\` does not support inheritance.
-  > It does.`}
+  > It does.
+- \`struct\` cannot have methods.
+  > It can; both can have any kind of member.`}
 />
 
 <MultipleChoice
@@ -275,12 +275,12 @@ int main() {
 
 - It allocates memory on the heap.
   > It does not; \`p\` is a local on the stack.
+- It causes the compiler to emit a warning.
+  > Most compilers do not warn at this declaration alone.
 - [o] The fields hold whatever bytes were already in that memory, so reading them is undefined behavior until you assign meaningful values.
   > Prefer \`Point p{};\` or aggregate initialization with explicit values.
 - It is forbidden by the C++ standard.
-  > It is allowed; that's why it's a footgun.
-- It causes the compiler to emit a warning.
-  > Most compilers do not warn at this declaration alone.`}
+  > It is allowed; that's why it's a footgun.`}
 />
 
 Next: the leap from passive data bundles to active objects with

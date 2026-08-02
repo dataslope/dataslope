@@ -74,12 +74,12 @@ invoice, one enrollment, one saved address.
 <MultipleChoice
   markdown={`Why is a primary key a design decision, not just a SQL detail?
 
+- Because it makes every column in the table unique.
+  > A primary key applies to the key column or columns, not automatically to every column.
 - Because it decides which rows are shown first in query results.
   > Row order is controlled by \`ORDER BY\`; identity is a separate design concern.
 - [o] Because it defines how the table tells one real-world thing apart from another.
   > The chosen key becomes the dependable identity that other rows can reference.
-- Because it makes every column in the table unique.
-  > A primary key applies to the key column or columns, not automatically to every column.
 - Because it prevents anyone from updating non-key columns.
   > Non-key attributes can still change; the key is meant to keep identity stable.
 
@@ -185,14 +185,14 @@ changes.
 <MultipleChoice
   markdown={`In an \`enrollments\` table, why might \`(student_id, course_id)\` be a good composite primary key?
 
-- Because each student can only ever take one course.
-  > Composite keys are often useful precisely when each single column repeats.
 - Because each course can only ever have one student.
   > A course normally has many students; \`course_id\` alone would not identify one enrollment.
 - [o] Because the pair identifies one specific student-course enrollment.
   > The combination can be unique even when each individual column appears many times.
 - Because composite keys allow null values in the key columns.
   > Primary key columns are not null, whether the key is one column or many.
+- Because each student can only ever take one course.
+  > Composite keys are often useful precisely when each single column repeats.
 
 A composite key is useful when the identity of a row is a combination of facts.`}
 />
@@ -202,14 +202,14 @@ A composite key is useful when the identity of a row is a combination of facts.`
 <MultipleChoice
   markdown={`What problem does a primary key solve first?
 
-- It stores long text more efficiently.
-  > Storage format is not the main issue; the key is about identifying rows.
-- It automatically creates a report for each row.
-  > Reports are written with queries; primary keys provide reliable identity.
-- [o] It gives every row a stable way to be distinguished from every other row.
-  > A primary key removes ambiguity by assigning each row a unique, non-empty identity.
 - It makes duplicate names impossible in the table.
   > Duplicate names may be valid; duplicate primary key values are not.
+- It automatically creates a report for each row.
+  > Reports are written with queries; primary keys provide reliable identity.
+- It stores long text more efficiently.
+  > Storage format is not the main issue; the key is about identifying rows.
+- [o] It gives every row a stable way to be distinguished from every other row.
+  > A primary key removes ambiguity by assigning each row a unique, non-empty identity.
 
 Primary keys solve the identity problem before they solve anything else.`}
 />
@@ -217,14 +217,14 @@ Primary keys solve the identity problem before they solve anything else.`}
 <MultipleChoice
   markdown={`Which two guarantees does PostgreSQL enforce for a primary key?
 
-- The value must be short and lowercase.
-  > Text style is not a primary key rule.
 - [o] The value must be unique, and it must not be null.
   > These two guarantees make the key dependable as a row identity.
 - The value must be copied into every other table.
   > Other tables may reference the key, but copying it everywhere is not required.
 - The value must be visible to users.
   > Many primary keys are internal identifiers users never see.
+- The value must be short and lowercase.
+  > Text style is not a primary key rule.
 
 A primary key is trustworthy because it is both unique and always present.`}
 />
@@ -232,14 +232,14 @@ A primary key is trustworthy because it is both unique and always present.`}
 <MultipleChoice
   markdown={`Why is \`name\` usually a weak primary key for a \`customers\` table?
 
-- PostgreSQL cannot compare text values.
-  > PostgreSQL can compare text; the problem is the meaning of names.
-- Names are always private and cannot be stored.
-  > Names can be stored, but they are not reliable identifiers.
 - [o] Names can repeat, change, or be corrected over time.
   > A primary key should be stable and unique, while real-world names often are neither.
 - Names make joins impossible in SQL.
   > SQL can join on text, but doing so may create ambiguous or fragile references.
+- Names are always private and cannot be stored.
+  > Names can be stored, but they are not reliable identifiers.
+- PostgreSQL cannot compare text values.
+  > PostgreSQL can compare text; the problem is the meaning of names.
 
 A good key should remain reliable even when descriptive attributes change.`}
 />
@@ -247,12 +247,12 @@ A good key should remain reliable even when descriptive attributes change.`}
 <MultipleChoice
   markdown={`What does a composite primary key use to identify a row?
 
+- A hidden timestamp created by PostgreSQL.
+  > PostgreSQL does not silently make a timestamp into a primary key.
 - The first non-null column in the table.
   > A composite key is explicitly declared; it is not chosen automatically from any non-null column.
 - [o] Two or more columns considered together as the row's identity.
   > The combined values form one key, such as \`(student_id, course_id)\`.
-- A hidden timestamp created by PostgreSQL.
-  > PostgreSQL does not silently make a timestamp into a primary key.
 - Every text column in alphabetical order.
   > Column type and alphabetic order do not define a composite key.
 

@@ -148,14 +148,14 @@ though the pie itself is rarely the best display.
 <MultipleChoice
   markdown={`In ggplot2, how do you create a pie chart?
 
-- Call \`geom_pie()\` with the category mapped to fill.
-  > There is no \`geom_pie()\` in ggplot2; pies are made differently.
-- Use \`coord_cartesian()\` on a scatter plot.
-  > Cartesian coordinates produce flat plots, not pies.
-- [o] Draw a single stacked bar (count by fill) and apply \`coord_polar(theta = "y")\` so the bar's height becomes an angle.
-  > A pie is a stacked bar re-expressed in polar coordinates.
 - Pies are impossible in ggplot2.
   > They are possible, just built from a bar plus polar coordinates.
+- [o] Draw a single stacked bar (count by fill) and apply \`coord_polar(theta = "y")\` so the bar's height becomes an angle.
+  > A pie is a stacked bar re-expressed in polar coordinates.
+- Use \`coord_cartesian()\` on a scatter plot.
+  > Cartesian coordinates produce flat plots, not pies.
+- Call \`geom_pie()\` with the category mapped to fill.
+  > There is no \`geom_pie()\` in ggplot2; pies are made differently.
 
 The absence of \`geom_pie\` is intentional: the grammar shows a pie to be
 a stacked bar under a polar coordinate system.`}
@@ -164,14 +164,14 @@ a stacked bar under a polar coordinate system.`}
 <MultipleChoice
   markdown={`Converting a stacked bar to a pie with \`coord_polar()\` changes which grammar component, and what happens to the encoded count?
 
-- It changes the geom; the count becomes a color.
-  > The geom stays \`geom_bar\`; the count does not become color.
-- It changes the statistic; the count is recomputed.
-  > The stat (count) is unchanged; the same counts are reused.
 - [o] It changes only the coordinate system; the count that was a bar *height* in Cartesian space becomes a slice *angle* in polar space.
   > Same data, stat, and geom, the coordinate system re-expresses height as angle.
 - It changes the data; rows are aggregated differently.
   > The data and aggregation are identical; only the coordinate space differs.
+- It changes the geom; the count becomes a color.
+  > The geom stays \`geom_bar\`; the count does not become color.
+- It changes the statistic; the count is recomputed.
+  > The stat (count) is unchanged; the same counts are reused.
 
 This single-component swap (Cartesian → polar) is the clearest
 demonstration that charts are combinations of components, not fixed
@@ -181,14 +181,14 @@ types.`}
 <MultipleChoice
   markdown={`Why does ggplot2 deliberately make pie charts inconvenient to produce?
 
-- Pie charts are technically impossible to render in R.
-  > They render fine; the inconvenience is a design stance.
 - To force users to pay for a premium feature.
   > There is no such mechanism; it is about visualization quality.
-- [o] Because people judge lengths (bars) more accurately than angles (pie slices), so the design nudges users toward more readable charts.
-  > The friction encodes a perceptual best practice.
+- Pie charts are technically impossible to render in R.
+  > They render fine; the inconvenience is a design stance.
 - Because polar coordinates are not supported.
   > Polar coordinates are fully supported, that is how pies are made.
+- [o] Because people judge lengths (bars) more accurately than angles (pie slices), so the design nudges users toward more readable charts.
+  > The friction encodes a perceptual best practice.
 
 The design reflects a perceptual fact: angle is a weaker channel than
 length, so bars usually communicate better than pies.`}

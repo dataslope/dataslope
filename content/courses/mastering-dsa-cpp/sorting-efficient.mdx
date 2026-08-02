@@ -332,38 +332,38 @@ int main() {
 <MultipleChoice
   markdown={`Which statement best compares merge sort and naive quicksort worst-case time?
 
-- Merge sort can be O(n^2), while quicksort is always O(n log n).
-  > This reverses the usual guarantee.
 - [o] Merge sort guarantees O(n log n), while naive quicksort can be O(n^2).
   > Bad pivots make partitions unbalanced.
+- Both require O(n) extra arrays in standard forms.
+  > Merge sort usually does; quicksort is commonly in-place aside from recursion stack.
 - Both are always O(n^2).
   > Both are designed to be faster than quadratic on typical inputs.
-- Both require O(n) extra arrays in standard forms.
-  > Merge sort usually does; quicksort is commonly in-place aside from recursion stack.`}
+- Merge sort can be O(n^2), while quicksort is always O(n log n).
+  > This reverses the usual guarantee.`}
 />
 
 <MultipleChoice
   markdown={`What strategy does \`std::sort\` commonly use in modern C++ implementations?
 
-- Pure bubble sort
-  > Bubble sort is too slow for a library sort.
-- Pure merge sort only
-  > Merge-sort-like algorithms are more associated with stable sorting.
 - [o] Introsort: quicksort-style partitioning with safeguards and small-range optimizations
   > It combines speed with fallback protection.
 - Linear search followed by insertion
-  > Searching alone does not sort a range.`}
+  > Searching alone does not sort a range.
+- Pure bubble sort
+  > Bubble sort is too slow for a library sort.
+- Pure merge sort only
+  > Merge-sort-like algorithms are more associated with stable sorting.`}
 />
 
 <MultipleChoice
   markdown={`When does sort stability matter most?
 
-- When all elements are distinct integers.
-  > If no elements compare equal, equal-order is irrelevant.
-- When sorting descending instead of ascending.
-  > Direction does not determine stability.
 - [o] When equal keys should preserve their previous relative order.
   > This is common with records and multiple fields.
+- When sorting descending instead of ascending.
+  > Direction does not determine stability.
+- When all elements are distinct integers.
+  > If no elements compare equal, equal-order is irrelevant.
 - When the vector is stored contiguously.
   > Contiguous storage is unrelated to stability.`}
 />

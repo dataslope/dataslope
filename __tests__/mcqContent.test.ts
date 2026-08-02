@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import path from "node:path";
 // Shared linter implementation also used by `npm run check:mcq`.
 import {
+  POSITION_MAX_RATE,
+  correctPositionRate,
   findMcqFiles,
   interviewMcqBanks,
   lintFiles,
@@ -34,6 +36,38 @@ describe("content/courses + content/interview + content/fumadocs-dev <MultipleCh
       )
       .join("\n");
     expect(violations, `MCQ lint violations:\n${report}`).toEqual([]);
+  });
+});
+
+// Answer *position* must not give the answer away either. The corpus was
+// authored answer-first, which left the correct option sitting second in 61% of
+// questions (99% of the interview banks) until
+// `scripts/shuffle-mcq-options.mjs` redistributed them. See AGENTS.md,
+// "Answer position".
+describe("the MCQ corpus is not guessable by option position", () => {
+  const files = [
+    ...findMcqFiles(path.join(process.cwd(), "content", "courses")),
+    ...findMcqFiles(path.join(process.cwd(), "content", "interview")),
+    ...findMcqFiles(path.join(process.cwd(), "content", "fumadocs-dev")),
+  ];
+
+  it("spreads the correct option across the slots corpus-wide", () => {
+    const { total, slots, position, rate } = correctPositionRate(files);
+    expect(total).toBeGreaterThan(2000);
+    expect(
+      rate,
+      `the correct option is #${position + 1} in ${slots[position]}/${total} questions ` +
+        `(${slots.map((n, i) => `#${i + 1}: ${n}`).join(", ")})`,
+    ).toBeLessThan(POSITION_MAX_RATE);
+  });
+
+  it("spreads them within the interview banks too", () => {
+    const { total, slots, position, rate } = correctPositionRate(interviewMcqBanks());
+    expect(total).toBe(600);
+    expect(
+      rate,
+      `the correct option is #${position + 1} in ${slots[position]}/${total} bank questions`,
+    ).toBeLessThan(POSITION_MAX_RATE);
   });
 });
 

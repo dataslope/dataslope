@@ -120,14 +120,14 @@ deliberate slice of a table.
 <MultipleChoice
   markdown={`In a table called \`orders\`, what does a single **row** most naturally represent?
 
-- The word "amount" that labels one of the columns.
-  > A column label like "amount" names an attribute; a row is a full record, not a single heading.
 - [o] One specific order, with a value in each of the table's columns.
   > A row gathers all the attributes of one entity, here, one order, into a single record.
-- The list of types each column can hold.
-  > That describes the table's schema, not a row.
 - The total number of orders in the table.
   > A count summarizes the table; a row is one individual record within it.
+- The word "amount" that labels one of the columns.
+  > A column label like "amount" names an attribute; a row is a full record, not a single heading.
+- The list of types each column can hold.
+  > That describes the table's schema, not a row.
 
 A row is one record: a single order described across every column.`}
 />
@@ -135,14 +135,14 @@ A row is one record: a single order described across every column.`}
 <MultipleChoice
   markdown={`Which statement about the **order of rows** in a relational table is correct?
 
+- Row order is fixed forever once the table is created.
+  > Nothing fixes a permanent order; the database may return rows in any order unless you specify one.
 - Rows are always returned in the order they were inserted, automatically.
   > A table is an unordered set of rows; insertion order is not guaranteed to be preserved on retrieval.
 - Rows are always sorted alphabetically by default.
   > There is no automatic alphabetical sorting; without an explicit sort, no order is promised.
 - [o] Rows have no guaranteed order; if you need a specific order, you must ask for it with \`ORDER BY\`.
   > Because a table is conceptually an unordered bag of rows, you should always sort explicitly when order matters.
-- Row order is fixed forever once the table is created.
-  > Nothing fixes a permanent order; the database may return rows in any order unless you specify one.
 
 Never assume an order you did not request, use \`ORDER BY\` when it matters.`}
 />
@@ -150,12 +150,12 @@ Never assume an order you did not request, use \`ORDER BY\` when it matters.`}
 <MultipleChoice
   markdown={`A **column** in a relational table corresponds to which concept?
 
+- The grid as a whole.
+  > The whole grid is the table; a column is a single vertical slice of it.
 - One specific thing, such as one customer.
   > That is a row, one specific entity. A column is different.
 - [o] One attribute shared by every row, such as "name" or "price."
   > A column is a single attribute running down the table, with a name and a type, present for every row.
-- The grid as a whole.
-  > The whole grid is the table; a column is a single vertical slice of it.
 - A backup of the table.
   > A backup is a copy of data; a column is a structural part of the table.
 

@@ -167,14 +167,14 @@ the rules well once you understand them.
 <MultipleChoice
   markdown={`What is the main goal of normalization?
 
-- To make every query run as fast as possible.
-  > Normalization targets correctness and reduced duplication; it can even add joins. Speed is a separate concern.
-- [o] To store each fact once, eliminating the duplication that causes update, insertion, and deletion anomalies.
-  > Giving every fact a single home removes the inconsistencies that duplicated data creates.
-- To combine many tables into one big table.
-  > That is the opposite of normalization; combining tables reintroduces duplication.
 - To remove all relationships between tables.
   > Normalization relies on relationships (foreign keys) to link the split-out tables.
+- To make every query run as fast as possible.
+  > Normalization targets correctness and reduced duplication; it can even add joins. Speed is a separate concern.
+- To combine many tables into one big table.
+  > That is the opposite of normalization; combining tables reintroduces duplication.
+- [o] To store each fact once, eliminating the duplication that causes update, insertion, and deletion anomalies.
+  > Giving every fact a single home removes the inconsistencies that duplicated data creates.
 
 Normalization removes duplication so each fact lives in exactly one place.`}
 />
@@ -182,14 +182,14 @@ Normalization removes duplication so each fact lives in exactly one place.`}
 <MultipleChoice
   markdown={`A flat orders table repeats each customer's email on every order row. What problem does this most directly cause?
 
-- Queries become impossible to write.
-  > Queries still work; the issue is keeping the duplicated values consistent.
 - [o] An update anomaly: changing the email means updating every row that repeats it, risking inconsistency.
   > With the email duplicated, one missed row leaves the data disagreeing with itself.
-- The table can store only one customer.
-  > A flat table can store many customers; the problem is the repetition, not capacity.
+- Queries become impossible to write.
+  > Queries still work; the issue is keeping the duplicated values consistent.
 - Foreign keys stop working.
   > A flat table has no such foreign keys yet; the problem is duplication.
+- The table can store only one customer.
+  > A flat table can store many customers; the problem is the repetition, not capacity.
 
 Duplicated values force multi-row updates, which is the classic update anomaly.`}
 />
@@ -197,14 +197,14 @@ Duplicated values force multi-row updates, which is the classic update anomaly.`
 <MultipleChoice
   markdown={`After normalizing into \`customers\`, \`products\`, and \`orders\`, how do you reproduce the original flat, all-in-one-row view?
 
-- It is permanently lost once you split the tables.
-  > The information is preserved; it is simply recombined on demand.
-- [o] Join the tables back together on their keys whenever you need the combined view.
-  > A join recomputes the flat view from the single-source-of-truth tables.
 - Copy the columns back into the orders table.
   > Copying columns back would reintroduce the very duplication normalization removed.
+- It is permanently lost once you split the tables.
+  > The information is preserved; it is simply recombined on demand.
 - Delete the foreign keys.
   > Foreign keys are what make the join possible; removing them would break the link.
+- [o] Join the tables back together on their keys whenever you need the combined view.
+  > A join recomputes the flat view from the single-source-of-truth tables.
 
 A join rebuilds the combined view from the normalized tables without storing duplication.`}
 />
@@ -212,14 +212,14 @@ A join rebuilds the combined view from the normalized tables without storing dup
 <MultipleChoice
   markdown={`The phrase "the key, the whole key, and nothing but the key" summarizes which idea?
 
-- That a table may have only one column.
-  > Tables can have many columns; the phrase is about what those columns depend on.
 - That primary keys must be numbers.
   > Keys need not be numbers; the phrase concerns dependency, not data type.
-- [o] That every non-key column should depend on the table's key, the essence of reaching third normal form.
-  > Each non-key column should be a fact about the key itself, which is what 3NF requires.
 - That foreign keys are unnecessary.
   > Foreign keys remain essential for linking normalized tables.
+- That a table may have only one column.
+  > Tables can have many columns; the phrase is about what those columns depend on.
+- [o] That every non-key column should depend on the table's key, the essence of reaching third normal form.
+  > Each non-key column should be a fact about the key itself, which is what 3NF requires.
 
 The phrase captures 3NF: non-key columns depend on the key, the whole key, and nothing else.`}
 />

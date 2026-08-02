@@ -330,38 +330,38 @@ if (!all(need %in% names(monthly))) stop(sprintf("missing: %s", paste(setdiff(ne
 
 - Filter-arrange-join
   > Filter, arrange, and join are individual dplyr verbs, not a description of the group-and-summarise pattern.
-- [o] Split-apply-combine
-  > Split the data into groups, apply a computation to each, combine the results into a single table.
+- Sort-merge-deduplicate
+  > Sorting, merging, and deduplicating are separate data manipulation steps unrelated to the per-group aggregation pattern.
 - Map-reduce-filter
   > Map-reduce is a distributed computing pattern; the group-summarise workflow is more precisely called split-apply-combine.
-- Sort-merge-deduplicate
-  > Sorting, merging, and deduplicating are separate data manipulation steps unrelated to the per-group aggregation pattern.`}
+- [o] Split-apply-combine
+  > Split the data into groups, apply a computation to each, combine the results into a single table.`}
 />
 
 <MultipleChoice
   markdown={`In a dplyr pipeline, what does \`n()\` do?
 
-- Returns the number of columns.
-  > The number of columns is given by \`ncol()\`, not \`n()\`; \`n()\` counts rows in the current context.
-- [o] Returns the number of rows in the current (possibly grouped) data.
-  > Inside \`summarise()\` after a \`group_by()\`, \`n()\` gives the count per group.
 - Returns the mean of the data.
   > The mean is computed with \`mean()\`, not \`n()\`; \`n()\` returns a row count, not an average.
 - Returns the row name.
-  > Row names are accessed with \`rownames()\`; \`n()\` counts how many rows are in the current (possibly grouped) slice.`}
+  > Row names are accessed with \`rownames()\`; \`n()\` counts how many rows are in the current (possibly grouped) slice.
+- Returns the number of columns.
+  > The number of columns is given by \`ncol()\`, not \`n()\`; \`n()\` counts rows in the current context.
+- [o] Returns the number of rows in the current (possibly grouped) data.
+  > Inside \`summarise()\` after a \`group_by()\`, \`n()\` gives the count per group.`}
 />
 
 <MultipleChoice
   markdown={`What's the difference between \`group_by(cyl) |> summarise(avg = mean(mpg))\` and \`group_by(cyl) |> mutate(avg = mean(mpg))\`?
 
-- They're the same.
-  > The two produce different shapes: \`summarise\` collapses to one row per group, while \`mutate\` preserves all original rows.
 - \`summarise\` is slower than \`mutate\`.
   > Speed is not the distinction; the fundamental difference is that \`summarise\` collapses rows and \`mutate\` keeps them.
-- [o] \`summarise\` returns one row per group (collapses); \`mutate\` keeps every row and broadcasts the group statistic into each row.
-  > Use \`summarise\` for a compact group table, \`mutate\` when you want a per-row column that depends on the group.
+- They're the same.
+  > The two produce different shapes: \`summarise\` collapses to one row per group, while \`mutate\` preserves all original rows.
 - \`mutate\` cannot be used with \`group_by\`.
-  > \`mutate\` works perfectly well after \`group_by\`; it computes each new column value within the group context while retaining all rows.`}
+  > \`mutate\` works perfectly well after \`group_by\`; it computes each new column value within the group context while retaining all rows.
+- [o] \`summarise\` returns one row per group (collapses); \`mutate\` keeps every row and broadcasts the group statistic into each row.
+  > Use \`summarise\` for a compact group table, \`mutate\` when you want a per-row column that depends on the group.`}
 />
 
 The last page in this section covers *reshaping*, switching

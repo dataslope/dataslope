@@ -178,19 +178,19 @@ the presenter, which is exactly how charts travel through an organization.
   > For *bar* charts, length encodes the value, so a truncated baseline visually exaggerates a tiny ~2% difference into a dramatic one.
 - [o] The truncated baseline exaggerates the difference; bar charts should start at zero.
   > Because bar length is the encoding, a zero baseline keeps the visual proportional to the data. (A line chart could justifiably zoom in.)
-- The bars should be a pie chart instead.
-  > A pie chart wouldn't fix the distortion and is worse for reading two close values; the fix is the axis baseline.
 - The colors are the issue.
-  > Color isn't what's misleading here; the truncated length axis is.`}
+  > Color isn't what's misleading here; the truncated length axis is.
+- The bars should be a pie chart instead.
+  > A pie chart wouldn't fix the distortion and is worse for reading two close values; the fix is the axis baseline.`}
 />
 
 <MultipleChoice
   markdown={`You need to compare revenue across 12 product categories. Which chart reads most accurately?
 
-- A pie chart with 12 slices.
-  > Twelve slices force angle comparisons humans do poorly; small slices are indistinguishable.
 - [o] A bar chart sorted by revenue descending.
   > Bars share a common baseline, so lengths are easy to compare, and sorting makes the ranking obvious at a glance.
+- A pie chart with 12 slices.
+  > Twelve slices force angle comparisons humans do poorly; small slices are indistinguishable.
 - A single stacked bar with 12 segments.
   > One stacked bar makes it hard to compare segments that don't share a baseline; individual bars are clearer.
 - A line chart across the 12 categories.
@@ -200,14 +200,14 @@ the presenter, which is exactly how charts travel through an organization.
 <MultipleChoice
   markdown={`A dashboard encodes "pass" as green and "fail" as red, with no other cue. Why is this an accessibility problem?
 
-- Red and green are low-contrast on every screen.
-  > Contrast varies by shade; the core issue is relying on hue alone, not contrast per se.
 - [o] Red-green color vision deficiency is common, so meaning encoded by color alone is lost for those users.
   > Roughly 8% of men can't reliably distinguish red from green; add a label, icon, or position cue so color isn't the only signal.
+- Dashboards shouldn't use color at all.
+  > Color is fine and useful, it just shouldn't be the *only* channel carrying meaning.
 - Green and red can't appear in the same chart.
   > They can; the fix is a redundant non-color cue, not banning the colors.
-- Dashboards shouldn't use color at all.
-  > Color is fine and useful, it just shouldn't be the *only* channel carrying meaning.`}
+- Red and green are low-contrast on every screen.
+  > Contrast varies by shade; the core issue is relying on hue alone, not contrast per se.`}
 />
 
 ## Go deeper

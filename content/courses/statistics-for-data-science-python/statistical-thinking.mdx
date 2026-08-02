@@ -211,14 +211,14 @@ you have a hypothesis.
 <MultipleChoice
   markdown={`A dashboard shows a metric rising for the last 4 weeks. Before celebrating, what's the most statistically sound first move?
 
+- Remove the noisiest weeks so the trend is clearer
+  > Deleting inconvenient points manufactures a cleaner story rather than testing whether the story is true. The noise is information about how much the metric naturally moves.
 - Extrapolate the 4-week trend forward to forecast next quarter
   > Extrapolating assumes the pattern is real and will continue, but that's the very thing you haven't checked yet. A short rising stretch appears routinely in pure noise.
 - [o] Estimate how often a 4-week rise of this size shows up when nothing is actually changing, and compare
   > This pins the observed movement against the size of movement that randomness alone produces, which is exactly how you separate signal from noise.
 - Declare the increase real because four weeks in a row is unlikely to be coincidence
   > A 4-in-a-row rise is far more common than intuition suggests; with weekly noise it happens often. "Feels unlikely" is not a measurement of how unlikely.
-- Remove the noisiest weeks so the trend is clearer
-  > Deleting inconvenient points manufactures a cleaner story rather than testing whether the story is true. The noise is information about how much the metric naturally moves.
 
 The habit is to compare any pattern against a model of what pure chance produces.`}
 />
@@ -341,12 +341,12 @@ and become the actual answer.
 
 - Alice is more precise because she gives a single exact figure
   > A single figure looks precise but hides how much it would move on a new sample. Displayed exactness is not the same as knowing the value exactly.
+- Bob's answer is wrong because the revenue per user is a fixed number, not a range
+  > The true per-user revenue may be fixed, but Bob's *estimate* of it is uncertain. The range describes uncertainty about the estimate, not a belief that revenue itself is a range.
 - They convey the same information, just formatted differently
   > They genuinely differ: Bob communicates the *uncertainty* of the estimate, which is information Alice's number omits entirely.
 - [o] Bob's answer is more useful because it communicates the uncertainty around the estimate, not just a point
   > Reporting the range of plausible values reflects that the statistic is a draw from a distribution, which is what lets a reader judge how much to trust it.
-- Bob's answer is wrong because the revenue per user is a fixed number, not a range
-  > The true per-user revenue may be fixed, but Bob's *estimate* of it is uncertain. The range describes uncertainty about the estimate, not a belief that revenue itself is a range.
 
 Carrying uncertainty alongside an estimate is the practical payoff of thinking in distributions.`}
 />
@@ -565,14 +565,14 @@ this course is a faster, sharper version of exactly that move.
 <MultipleChoice
   markdown={`Which scenario genuinely calls for **statistical** thinking rather than plain deterministic counting?
 
-- Reporting exactly how many invoices were issued last month
-  > This is a fact about a fixed set of rows. You count it once and it's settled, no uncertainty, no generalization, so no statistics needed.
+- Looking up a specific customer's lifetime spend in the database
+  > Retrieving a stored value for one known entity is a lookup, not an inference about an unseen process.
 - Summing today's completed transactions for an end-of-day total
   > A sum over the exact rows you have is deterministic. Re-running it gives the same answer; there's nothing to infer.
 - [o] Deciding whether a new onboarding flow improves 30-day retention for future users
   > This generalizes from a noisy sample to a process that produces *future* users, where any observed difference could partly be chance, the defining situation for statistical reasoning.
-- Looking up a specific customer's lifetime spend in the database
-  > Retrieving a stored value for one known entity is a lookup, not an inference about an unseen process.
+- Reporting exactly how many invoices were issued last month
+  > This is a fact about a fixed set of rows. You count it once and it's settled, no uncertainty, no generalization, so no statistics needed.
 
 Statistical thinking is required precisely when the question reaches beyond the rows in front of you.`}
 />
@@ -584,10 +584,10 @@ Statistical thinking is required precisely when the question reaches beyond the 
   > Some noise is measurement error, but much of it is genuine run-to-run variation in the process itself, which no instrument removes. You estimate the signal through the noise; you don't eliminate it.
 - [o] The statistic you computed reflects the process's true structure blurred by run-to-run variation, so it's an estimate, not the exact truth
   > Treating the observed statistic as the stable signal contaminated by variation is what reminds you it's an estimate carrying uncertainty rather than the exact value.
-- Signal and noise are the same size in every dataset
-  > Their relative sizes vary enormously; a strong effect in low-variance data is nearly all signal, while a flat process is nearly all noise. The decomposition doesn't fix their ratio.
 - If you collect enough data, the signal disappears and only noise remains
   > More data does the opposite: it averages out noise so the signal becomes *clearer*. The signal is the stable part that persists.
+- Signal and noise are the same size in every dataset
+  > Their relative sizes vary enormously; a strong effect in low-variance data is nearly all signal, while a flat process is nearly all noise. The decomposition doesn't fix their ratio.
 
 The decomposition is why a single statistic is evidence about the process, not the final word on it.`}
 />
@@ -595,14 +595,14 @@ The decomposition is why a single statistic is evidence about the process, not t
 <MultipleChoice
   markdown={`You split one identical population in half 5,000 times and record the gap between the halves' means each time. Why is this "no-effect" distribution so useful?
 
-- It proves that two real groups are always identical
-  > The two halves are identical *by construction* in this simulation; it says nothing about whether two real-world groups are identical. That's the question you're trying to answer, not an assumption.
 - It tells you the exact true effect in your real experiment
   > It contains no information about any real effect, every split has zero true effect on purpose. It calibrates chance, not the effect.
-- [o] It shows how large a gap pure chance can produce, giving you a yardstick to judge whether a real observed gap is surprising
-  > Generating the spread of gaps under no effect provides the reference scale against which a real difference is measured, which is how you separate signal from noise.
 - It removes randomness from your real data
   > Nothing about a simulation alters the randomness already present in your collected data. It models the randomness so you can reason about it.
+- [o] It shows how large a gap pure chance can produce, giving you a yardstick to judge whether a real observed gap is surprising
+  > Generating the spread of gaps under no effect provides the reference scale against which a real difference is measured, which is how you separate signal from noise.
+- It proves that two real groups are always identical
+  > The two halves are identical *by construction* in this simulation; it says nothing about whether two real-world groups are identical. That's the question you're trying to answer, not an assumption.
 
 A model of "what chance alone does" is the benchmark every significance test compares against.`}
 />
@@ -610,14 +610,14 @@ A model of "what chance alone does" is the benchmark every significance test com
 <MultipleChoice
   markdown={`A colleague scans 25 customer segments, finds that one shows a "statistically surprising" jump, and writes it up as the headline result. What's the core problem?
 
-- Twenty-five segments is too few to find anything real
-  > The issue isn't too few comparisons, it's too *many*. Checking many segments makes a lucky-looking one almost guaranteed even when nothing is going on.
-- Segments should never be analyzed separately
-  > Segment analysis is perfectly legitimate. The problem is cherry-picking the most extreme result from many and presenting it as if it were the only thing tested.
 - [o] Testing many segments and reporting only the most extreme one lets random noise masquerade as a finding (a multiple-comparisons trap)
   > Searching across many comparisons and surfacing the luckiest one inflates the chance of a false positive, which is why the standalone "surprise" isn't trustworthy evidence.
 - The jump can't be real because it was found by scanning
   > Scanning doesn't make a real effect impossible; it makes a *spurious* one likely. The right move is to confirm the candidate on fresh data, not to dismiss it outright.
+- Twenty-five segments is too few to find anything real
+  > The issue isn't too few comparisons, it's too *many*. Checking many segments makes a lucky-looking one almost guaranteed even when nothing is going on.
+- Segments should never be analyzed separately
+  > Segment analysis is perfectly legitimate. The problem is cherry-picking the most extreme result from many and presenting it as if it were the only thing tested.
 
 The more things you check, the more noise dresses up as signal, adjust your skepticism accordingly.`}
 />
@@ -625,12 +625,12 @@ The more things you check, the more noise dresses up as signal, adjust your skep
 <MultipleChoice
   markdown={`Why is committing to your question *before* seeing the data (the pre-registration intuition) such a powerful safeguard?
 
+- [o] It stops you from drawing the target around wherever the data happened to land, so a "result" can't be reverse-engineered from noise
+  > Fixing the question in advance prevents tailoring the hypothesis to the observed bumps, which is what keeps you from confirming a story that noise wrote for you.
 - It makes your analysis run faster
   > Speed isn't the point and isn't affected. The safeguard is about the *validity* of the conclusion, not its runtime.
 - It guarantees your hypothesis will turn out to be true
   > Nothing guarantees a hypothesis is true; pre-committing can just as easily lead to a clean *negative* result. That honesty is the feature, not a bug.
-- [o] It stops you from drawing the target around wherever the data happened to land, so a "result" can't be reverse-engineered from noise
-  > Fixing the question in advance prevents tailoring the hypothesis to the observed bumps, which is what keeps you from confirming a story that noise wrote for you.
 - It eliminates randomness from the data-generating process
   > The process stays exactly as noisy as before. Pre-registration changes *your* behavior, not the data's variability.
 

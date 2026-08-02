@@ -274,14 +274,14 @@ more reliably, and on far bigger ledgers.*
 <MultipleChoice
   markdown={`Which of the following is **not** an example of a tabular dataset in the historical sense used in this chapter?
 
+- [o] A handwritten love poem on parchment
+  > A poem is unstructured prose, no repeated rows of similar things with aligned columns. Tabular data is defined by its row-and-column structure, where each row is one "thing" and each column one attribute of that thing.
+- An Excel sheet of weekly sales by region
+  > A sales sheet is rows of records (weeks) with columns of attributes (regions), squarely tabular.
 - A Sumerian clay tablet listing daily grain rations
   > A grain-ration ledger has repeated rows of transactions with aligned columns of item, quantity, and recipient, exactly the tabular shape the chapter describes.
 - A Roman census enumerating citizens by household
   > A census has repeated rows (one per household) with columns of attributes, a canonical tabular dataset.
-- An Excel sheet of weekly sales by region
-  > A sales sheet is rows of records (weeks) with columns of attributes (regions), squarely tabular.
-- [o] A handwritten love poem on parchment
-  > A poem is unstructured prose, no repeated rows of similar things with aligned columns. Tabular data is defined by its row-and-column structure, where each row is one "thing" and each column one attribute of that thing.
 
 Tabular structure, repeated rows of similar entities with aligned columns, is the defining shape of data analysis from clay tablets to Pandas.`}
 />
@@ -289,14 +289,14 @@ Tabular structure, repeated rows of similar entities with aligned columns, is th
 <MultipleChoice
   markdown={`Where does the name "pandas" come from?
 
-- The animal, because the logo is cute
-  > The panda branding is a later coincidence, not the origin.
-- A clever acronym for its features
-  > "Pandas" is not an acronym; it is a contraction of "panel data," the financial time-series data McKinney worked with at AQR.
-- [o] "Panel data", an econometrics term for multi-dimensional structured data, with a nod to "Python data analysis"
-  > McKinney built the library for panel data at a hedge fund; the name encodes that purpose. The bear coincidence helped it stick.
 - The initials of its first five contributors
   > The name predates a large contributor base and derives from "panel data," not anyone's initials.
+- The animal, because the logo is cute
+  > The panda branding is a later coincidence, not the origin.
+- [o] "Panel data", an econometrics term for multi-dimensional structured data, with a nod to "Python data analysis"
+  > McKinney built the library for panel data at a hedge fund; the name encodes that purpose. The bear coincidence helped it stick.
+- A clever acronym for its features
+  > "Pandas" is not an acronym; it is a contraction of "panel data," the financial time-series data McKinney worked with at AQR.
 
 Knowing the origin explains why pandas takes labeled, multi-dimensional data so seriously.`}
 />
@@ -304,12 +304,12 @@ Knowing the origin explains why pandas takes labeled, multi-dimensional data so 
 <MultipleChoice
   markdown={`Why is the relational model (Codd, 1970) relevant to a course about Pandas?
 
+- [o] Pandas borrows the same vocabulary, tables, rows, columns, joins, group-bys, and the same idea of operating on whole sets of rows at once
+  > Pandas's operations are deeply inspired by relational algebra. Learning "joins" and "group-bys" in Pandas means learning ideas that have worked for over fifty years.
 - Pandas is itself a relational database
   > Pandas is an in-memory analytical library, not a database; it provides no persistent storage or concurrent access.
 - Codd invented the CSV format
   > Codd's 1970 paper proposed the relational model and relational algebra; the CSV format is unrelated to that work.
-- [o] Pandas borrows the same vocabulary, tables, rows, columns, joins, group-bys, and the same idea of operating on whole sets of rows at once
-  > Pandas's operations are deeply inspired by relational algebra. Learning "joins" and "group-bys" in Pandas means learning ideas that have worked for over fifty years.
 - Pandas requires you to write SQL internally
   > Pandas uses Python method calls; the connection to Codd is conceptual (shared vocabulary), not syntactic.
 

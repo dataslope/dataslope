@@ -356,14 +356,14 @@ int main() {
 <MultipleChoice
   markdown={`You are storing a graph with one million vertices and only a few million edges. Which representation is usually best?
 
-- Adjacency matrix
-  > A matrix needs O(V²) space, which is enormous for one million vertices.
-- [o] Adjacency list
-  > It stores only existing edges and uses O(V + E) space.
-- A sorted array of vertices only
-  > Vertices alone do not store connectivity.
 - A single stack
   > A stack is a traversal helper, not a graph representation.
+- Adjacency matrix
+  > A matrix needs O(V²) space, which is enormous for one million vertices.
+- A sorted array of vertices only
+  > Vertices alone do not store connectivity.
+- [o] Adjacency list
+  > It stores only existing edges and uses O(V + E) space.
 
 Sparse graphs usually favor adjacency lists because they avoid storing absent edges.`}
 />
@@ -371,14 +371,14 @@ Sparse graphs usually favor adjacency lists because they avoid storing absent ed
 <MultipleChoice
   markdown={`What is a DAG?
 
-- A graph where every edge has the same weight
-  > Equal weights do not imply acyclicity or direction.
-- A dense adjacency graph
-  > Density describes how many edges exist, not whether cycles exist.
-- [o] A directed acyclic graph
-  > DAG stands for directed acyclic graph.
 - A graph represented only by a matrix
   > Representation does not define whether a graph is a DAG.
+- A graph where every edge has the same weight
+  > Equal weights do not imply acyclicity or direction.
+- [o] A directed acyclic graph
+  > DAG stands for directed acyclic graph.
+- A dense adjacency graph
+  > Density describes how many edges exist, not whether cycles exist.
 
 DAGs are common in dependency graphs, build systems, and scheduling.`}
 />
@@ -386,14 +386,14 @@ DAGs are common in dependency graphs, build systems, and scheduling.`}
 <MultipleChoice
   markdown={`How does edge lookup \`hasEdge(u, v)\` compare between an adjacency matrix and an unsorted adjacency list?
 
-- [o] Matrix is O(1); list is O(degree(u))
-  > A matrix indexes directly, while a list scans neighbors of u.
+- Both are always O(E)
+  > Neither needs to scan all edges for this basic lookup.
 - Matrix is O(V²); list is O(1)
   > Matrix construction is O(V²), but lookup is direct.
 - Both are always O(1)
   > Lists are not O(1) unless additional indexing is added.
-- Both are always O(E)
-  > Neither needs to scan all edges for this basic lookup.
+- [o] Matrix is O(1); list is O(degree(u))
+  > A matrix indexes directly, while a list scans neighbors of u.
 
 Choose representation based on the operations your algorithm performs most often.`}
 />

@@ -132,14 +132,14 @@ questions grow more complex.
 <MultipleChoice
   markdown={`What is a subquery?
 
-- A query that can only count rows.
-  > Subqueries can return values, lists, or whole tables, not only counts.
 - [o] A \`SELECT\` written inside another query, whose result is used by the outer query.
   > A subquery is nested inside another statement, and its output feeds the surrounding query.
-- A faster version of a regular query.
-  > Nesting is about expressing layered logic, not inherently about speed.
+- A query that can only count rows.
+  > Subqueries can return values, lists, or whole tables, not only counts.
 - A query that modifies the table structure.
   > Subqueries read data to feed another query; they do not alter structure.
+- A faster version of a regular query.
+  > Nesting is about expressing layered logic, not inherently about speed.
 
 A subquery is a nested SELECT whose result is consumed by the outer query.`}
 />
@@ -147,14 +147,14 @@ A subquery is a nested SELECT whose result is consumed by the outer query.`}
 <MultipleChoice
   markdown={`Why use \`WHERE amount > (SELECT AVG(amount) FROM orders)\` instead of typing the average as a fixed number?
 
-- Because PostgreSQL forbids numbers in WHERE clauses.
-  > Literal numbers are perfectly legal in WHERE; the issue is keeping them current.
-- [o] Because the subquery recomputes the average from current data, so the query stays correct as data changes.
-  > A hard-coded number goes stale, while the subquery is recalculated every time the query runs.
 - Because subqueries always run faster than arithmetic.
   > The benefit here is correctness and maintainability, not guaranteed speed.
 - Because you cannot use AVG outside a subquery.
   > AVG works in many contexts; the subquery is about feeding its result into the comparison.
+- [o] Because the subquery recomputes the average from current data, so the query stays correct as data changes.
+  > A hard-coded number goes stale, while the subquery is recalculated every time the query runs.
+- Because PostgreSQL forbids numbers in WHERE clauses.
+  > Literal numbers are perfectly legal in WHERE; the issue is keeping them current.
 
 The subquery recomputes the value each run, so the comparison never goes stale.`}
 />
@@ -162,12 +162,12 @@ The subquery recomputes the value each run, so the comparison never goes stale.`
 <MultipleChoice
   markdown={`A subquery used with \`IN\`, like \`WHERE id IN (SELECT customer_id FROM orders)\`, should return what shape of result?
 
-- A whole table with many columns.
-  > \`IN\` compares one value against a set of single values, not a multi-column table.
-- [o] A single column of values that the outer column is checked against.
-  > \`IN\` tests whether a value appears in the list of values the subquery returns.
 - Exactly one row and one column always.
   > A single value suits \`=\`, but \`IN\` is designed for a list of values, not just one.
+- [o] A single column of values that the outer column is checked against.
+  > \`IN\` tests whether a value appears in the list of values the subquery returns.
+- A whole table with many columns.
+  > \`IN\` compares one value against a set of single values, not a multi-column table.
 - No result; \`IN\` ignores the subquery.
   > \`IN\` depends entirely on the subquery's returned list of values.
 

@@ -81,14 +81,14 @@ become its own row.
 <MultipleChoice
   markdown={`Why can't \`students.course_id\` fully model students and courses when students take many courses and courses have many students?
 
-- Because foreign keys cannot reference tables named \`courses\`.
-  > Table names do not prevent foreign keys; the problem is the relationship shape.
-- [o] Because each student row would have only one \`course_id\` slot, but a student may need many course links.
-  > One foreign key column can store one referenced row per student row, not many pairings.
 - Because students and courses must always be stored in the same table.
   > They are separate entities and usually belong in separate tables.
 - Because PostgreSQL does not allow joins across three tables.
   > PostgreSQL can join many tables; the design still needs a table to store the pairings.
+- Because foreign keys cannot reference tables named \`courses\`.
+  > Table names do not prevent foreign keys; the problem is the relationship shape.
+- [o] Because each student row would have only one \`course_id\` slot, but a student may need many course links.
+  > One foreign key column can store one referenced row per student row, not many pairings.
 
 A single foreign key cannot store many pairings for both sides at once.`}
 />
@@ -206,12 +206,12 @@ flowchart TB
 <MultipleChoice
   markdown={`What makes a relationship many-to-many?
 
-- Each row on one side must connect to exactly one row on the other side.
-  > That describes a one-to-one or many-to-one shape, not many-to-many.
 - [o] Rows on both sides can each connect to multiple rows on the other side.
   > The defining feature is many possible links when viewed from either direction.
 - The two tables have the same number of columns.
   > Column counts do not determine relationship cardinality.
+- Each row on one side must connect to exactly one row on the other side.
+  > That describes a one-to-one or many-to-one shape, not many-to-many.
 - The tables cannot be joined.
   > Many-to-many relationships are joined through an intermediate table.
 
@@ -221,10 +221,10 @@ Many-to-many means both directions can produce multiple related rows.`}
 <MultipleChoice
   markdown={`In the resolved students-courses design, what does one row in \`enrollments\` represent?
 
-- One student, with all course details copied into it.
-  > The student row remains in \`students\`; the enrollment row is only the connection.
 - One course, with all student details copied into it.
   > The course row remains in \`courses\`; the enrollment row is only the connection.
+- One student, with all course details copied into it.
+  > The student row remains in \`students\`; the enrollment row is only the connection.
 - [o] One pairing between one student and one course.
   > Each row records that a specific student is connected to a specific course.
 - A summary count of all students in all courses.
@@ -236,14 +236,14 @@ The middle table turns each relationship instance into a row.`}
 <MultipleChoice
   markdown={`Why is the conceptual \`}o--o{\` diagram not enough by itself as a PostgreSQL schema?
 
-- Because ER diagrams are illegal in documentation.
-  > ER diagrams are useful; they just are not table definitions.
+- Because many-to-many relationships should always be ignored.
+  > They are common and important; they simply need the right structure.
 - Because PostgreSQL can store many-to-many links with invisible columns.
   > PostgreSQL stores relationships through explicit columns and constraints.
 - [o] Because the actual schema still needs a table to store each pairing as data.
   > The conceptual diagram explains cardinality, while the resolved schema supplies columns and rows.
-- Because many-to-many relationships should always be ignored.
-  > They are common and important; they simply need the right structure.
+- Because ER diagrams are illegal in documentation.
+  > ER diagrams are useful; they just are not table definitions.
 
 Conceptual modeling identifies the shape; physical schema design resolves it into tables and keys.`}
 />

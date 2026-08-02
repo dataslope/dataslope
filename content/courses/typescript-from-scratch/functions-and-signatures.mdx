@@ -518,14 +518,14 @@ signatures are machine-checked documentation.**
 <MultipleChoice
   markdown={`What is the difference between \`void\` and \`undefined\` as a return type?
 
-- They are identical
-  > They differ in meaning: a \`void\` return type signals that callers should not use the return value, while \`undefined\` makes the explicit absence of a value part of the function's contract.
 - \`void\` is for async functions, \`undefined\` is for sync functions
   > Neither \`void\` nor \`undefined\` is tied to synchronous or asynchronous execution; async functions return \`Promise<T>\` regardless of which you use.
-- [o] \`void\` means "don't care about the return value," \`undefined\` means "explicitly returns undefined"
-  > \`void\` is for side-effect functions; \`undefined\` is for functions that explicitly return \`undefined\`.
+- They are identical
+  > They differ in meaning: a \`void\` return type signals that callers should not use the return value, while \`undefined\` makes the explicit absence of a value part of the function's contract.
 - \`void\` is deprecated
   > \`void\` is a standard, actively used return type in TypeScript; it is the conventional annotation for side-effect functions and event handlers.
+- [o] \`void\` means "don't care about the return value," \`undefined\` means "explicitly returns undefined"
+  > \`void\` is for side-effect functions; \`undefined\` is for functions that explicitly return \`undefined\`.
 
 \`void\` is the conventional return type for side-effect functions like event handlers.`}
 />
@@ -533,14 +533,14 @@ signatures are machine-checked documentation.**
 <MultipleChoice
   markdown={`What does the \`...\` syntax mean in a function parameter like \`sum(...numbers: number[]): number\`?
 
-- It's a spread operator for objects
-  > The spread operator (\`...\`) is used at the call site to expand an array into individual arguments; in a parameter declaration, \`...\` creates a rest parameter that collects arguments into an array.
 - [o] It's a rest parameter that collects arguments into an array
   > The rest parameter collects all remaining arguments into a single array.
-- It's optional parameter syntax
-  > Optional parameters are written with \`?\` (e.g., \`name?: string\`), not \`...\`.
+- It's a spread operator for objects
+  > The spread operator (\`...\`) is used at the call site to expand an array into individual arguments; in a parameter declaration, \`...\` creates a rest parameter that collects arguments into an array.
 - It's an error
   > \`...name: T[]\` is valid TypeScript syntax for a rest parameter; it compiles without error.
+- It's optional parameter syntax
+  > Optional parameters are written with \`?\` (e.g., \`name?: string\`), not \`...\`.
 
 Rest parameters let you accept a variable number of arguments without requiring an explicit array at the call site.`}
 />

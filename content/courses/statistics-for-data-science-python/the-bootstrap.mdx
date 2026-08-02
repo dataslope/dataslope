@@ -467,14 +467,14 @@ usually plenty.
 <MultipleChoice
   markdown={`What is the defining mechanic of the bootstrap?
 
-- Drawing many fresh samples directly from the population
-  > That's the procedure you *wish* you could run but can't, the population is hidden and you can't redraw from it. The bootstrap's whole point is to substitute for this with the data you already have.
-- [o] Repeatedly resampling your observed data **with replacement** and recomputing the statistic on each resample
-  > Treating the sample as a stand-in for the population and resampling it with replacement reconstructs the statistic's sampling variability without any formula.
 - Fitting a normal distribution to the data and reading off percentiles
   > That's a parametric, assumption-heavy approach. The bootstrap is prized precisely because it avoids assuming a distributional shape.
+- [o] Repeatedly resampling your observed data **with replacement** and recomputing the statistic on each resample
+  > Treating the sample as a stand-in for the population and resampling it with replacement reconstructs the statistic's sampling variability without any formula.
 - Removing one observation at a time and refitting
   > That describes the jackknife, a different (leave-one-out) resampling method. The bootstrap draws full-size resamples with replacement instead.
+- Drawing many fresh samples directly from the population
+  > That's the procedure you *wish* you could run but can't, the population is hidden and you can't redraw from it. The bootstrap's whole point is to substitute for this with the data you already have.
 
 The engine is resampling-with-replacement plus recomputing the statistic each time.`}
 />
@@ -482,10 +482,10 @@ The engine is resampling-with-replacement plus recomputing the statistic each ti
 <MultipleChoice
   markdown={`Why must bootstrap resampling be done **with replacement** (at the original sample size)?
 
-- Because sampling without replacement would be too slow to compute
-  > Speed isn't the issue. The problem with sampling the full size *without* replacement is statistical, not computational.
 - [o] Without replacement at size $n$ you'd just reorder the same values and get the identical statistic every time, producing zero variability
   > Replacement lets observations repeat or drop out, so each resample differs, that variation is what recreates the sampling distribution.
+- Because sampling without replacement would be too slow to compute
+  > Speed isn't the issue. The problem with sampling the full size *without* replacement is statistical, not computational.
 - Because replacement guarantees each resample contains every original value
   > Replacement does the opposite: some values appear multiple times and others not at all. It doesn't guarantee full coverage of the original data.
 - Because it makes the resamples larger than the original sample
@@ -499,12 +499,12 @@ Replacement is what injects the variability that mimics drawing new samples.`}
 
 - The median is impossible to compute without resampling
   > The median itself is trivial to compute directly. What's hard is its *standard error* and confidence interval, that's where the bootstrap helps.
+- The bootstrap makes the median more accurate than the mean
+  > The bootstrap estimates the *uncertainty* of a statistic; it doesn't make one statistic more accurate than another. Accuracy depends on the data and which summary you need.
 - [o] The median has no simple standard-error formula, yet the bootstrap gives it a CI with the same procedure used for any other statistic
   > Statistics without clean variance formulas are exactly where the bootstrap shines, since you only swap the function computed on each resample.
 - The median is always normally distributed, so the formula is easy
   > The sampling distribution of the median is generally not normal, which is part of why a tidy formula is hard, the opposite of this claim.
-- The bootstrap makes the median more accurate than the mean
-  > The bootstrap estimates the *uncertainty* of a statistic; it doesn't make one statistic more accurate than another. Accuracy depends on the data and which summary you need.
 
 Awkward statistics with no easy formula are the bootstrap's home turf.`}
 />
@@ -514,12 +514,12 @@ Awkward statistics with no easy formula are the bootstrap's home turf.`}
 
 - The sample mean of 500 observations
   > With a healthy sample size, the bootstrap handles the mean very well, it closely matches the formula-based interval. This is a comfortable case, not a problem case.
-- The median of 200 observations
-  > The bootstrap handles the median well at this sample size; in fact it's a flagship use case. This isn't where it breaks down.
 - [o] The maximum of the sample
   > A resample can never exceed the largest observed value, so the bootstrap cannot reconstruct the distribution of the maximum, which lives in the extreme tail, it systematically misrepresents it.
 - A trimmed mean of 300 observations
   > Trimmed means are smooth, formula-resistant statistics that the bootstrap estimates well. They're a good fit, not a failure case.
+- The median of 200 observations
+  > The bootstrap handles the median well at this sample size; in fact it's a flagship use case. This isn't where it breaks down.
 
 Extreme-order statistics like the max (and heavy tails generally) are where plain bootstrapping fails.`}
 />
@@ -527,14 +527,14 @@ Extreme-order statistics like the max (and heavy tails generally) are where plai
 <MultipleChoice
   markdown={`Your sample of 40 sessions was accidentally drawn only from power users, so it's biased toward heavy usage. You bootstrap a 95% CI for mean session length. What does that interval tell you?
 
+- A larger number of resamples B would remove the bias
+  > Increasing $B$ only reduces the bootstrap's own simulation noise. Bias comes from how the original data were collected and is untouched by more resampling.
+- [o] It quantifies the **precision** of the mean for *this biased sample*, but it's centered on the wrong value, the bootstrap estimates wobble, not whether you're aimed at the truth
+  > Resampling captures sampling variability, not sampling bias, so a tight interval can sit confidently around a biased estimate; only better data fixes the aim.
 - The interval corrects for the sampling bias and recovers the true population mean
   > The bootstrap can't fix a biased sample. Every resample is drawn from the same skewed data, so the bias is baked into all of them and into the interval's center.
 - The interval is invalid and cannot be computed
   > It computes fine and is a valid interval *for the biased sampling process*. The issue isn't that it errors out; it's what the interval is centered on.
-- [o] It quantifies the **precision** of the mean for *this biased sample*, but it's centered on the wrong value, the bootstrap estimates wobble, not whether you're aimed at the truth
-  > Resampling captures sampling variability, not sampling bias, so a tight interval can sit confidently around a biased estimate; only better data fixes the aim.
-- A larger number of resamples B would remove the bias
-  > Increasing $B$ only reduces the bootstrap's own simulation noise. Bias comes from how the original data were collected and is untouched by more resampling.
 
 The bootstrap measures precision, not accuracy, it can't rescue a sample that was collected unfairly.`}
 />

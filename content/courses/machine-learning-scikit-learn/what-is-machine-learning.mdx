@@ -316,12 +316,12 @@ technique becomes a way to do one of those steps better.
 
 - Data and answers go in; rules come out
   > That is how machine learning works, not traditional programming. In traditional programming the rules are supplied by you, not learned from data.
+- A trained model goes in; predictions come out
+  > That describes the prediction step, not the traditional programming paradigm. In traditional programming, hand-written rules and data both go in, and answers come out.
 - [o] Rules and data go in; answers come out
   > In classic programming you write the rules (the code) and feed in data; the program executes the rules to produce answers.
 - Only data goes in; both rules and answers come out
   > Traditional programming requires both rules (the code you write) and data as inputs; the output is the answer, not new rules.
-- A trained model goes in; predictions come out
-  > That describes the prediction step, not the traditional programming paradigm. In traditional programming, hand-written rules and data both go in, and answers come out.
 
 Machine learning is the inversion of this: answers go in alongside the data, and the rules (the model) come out.`}
 />
@@ -331,12 +331,12 @@ Machine learning is the inversion of this: answers go in alongside the data, and
 
 - Agree, since machine learning is always more accurate than hand-written rules
   > Machine learning is not always more accurate; for problems with a simple, exact rule, hand-written logic is simpler, fully correct, and requires no data or training.
-- [o] Push back: this is a clear, stable rule that should just be written as a simple length check, machine learning would add cost and complexity for no benefit
-  > When a short, stable rule fully solves the problem, hand-writing it is simpler, faster, and more reliable than learning it from data. Machine learning is for patterns too complex to specify by hand.
-- Agree, because forms are exactly what machine learning is designed for
-  > Forms with clear, fixed constraints are the wrong target for machine learning; ML is for patterns too complex or changeable to express as a simple rule.
 - Suggest collecting a million example passwords first, then deciding
   > When a short, stable rule already solves the problem perfectly, no data collection or decision process is needed, the rule-first principle says to write the rule and move on.
+- Agree, because forms are exactly what machine learning is designed for
+  > Forms with clear, fixed constraints are the wrong target for machine learning; ML is for patterns too complex or changeable to express as a simple rule.
+- [o] Push back: this is a clear, stable rule that should just be written as a simple length check, machine learning would add cost and complexity for no benefit
+  > When a short, stable rule fully solves the problem, hand-writing it is simpler, faster, and more reliable than learning it from data. Machine learning is for patterns too complex to specify by hand.
 
 Reaching for machine learning where a one-line rule suffices is a classic case of using the wrong tool.`}
 />
@@ -493,14 +493,14 @@ assert 0.0 < accuracy <= 1.0, f"accuracy should be a fraction in (0, 1], got {ac
 <MultipleChoice
   markdown={`Which statement best captures the core idea of machine learning?
 
-- Writing more detailed and robust if/else rules than a human normally would
-  > Machine learning replaces the act of writing rules; it does not improve on hand-coding, it eliminates hand-coding by learning patterns from data instead.
-- [o] Learning the rules automatically from labeled examples, instead of having a human write the rules by hand
-  > Machine learning inverts traditional programming: rather than coding the logic, you supply examples paired with answers and let the algorithm derive the logic (the model).
-- Running ordinary programs on much faster hardware
-  > Hardware speed has nothing to do with machine learning; the defining change is replacing hand-written rules with rules derived from examples.
 - Storing data so it can be looked up quickly later
   > Data storage and retrieval is a database concern, not machine learning; ML specifically uses data to learn a predictive model.
+- Running ordinary programs on much faster hardware
+  > Hardware speed has nothing to do with machine learning; the defining change is replacing hand-written rules with rules derived from examples.
+- [o] Learning the rules automatically from labeled examples, instead of having a human write the rules by hand
+  > Machine learning inverts traditional programming: rather than coding the logic, you supply examples paired with answers and let the algorithm derive the logic (the model).
+- Writing more detailed and robust if/else rules than a human normally would
+  > Machine learning replaces the act of writing rules; it does not improve on hand-coding, it eliminates hand-coding by learning patterns from data instead.
 
 The defining move is replacing hand-written rules with rules learned from data.`}
 />
@@ -508,14 +508,14 @@ The defining move is replacing hand-written rules with rules learned from data.`
 <MultipleChoice
   markdown={`In scikit-learn, what does \`model.fit(X_train, y_train)\` do?
 
-- It makes predictions on new, unseen data
-  > Predictions on new data are made with \`model.predict(X_new)\`, not \`fit\`. The \`fit\` call adjusts the model's internal parameters using labeled training examples.
-- It measures the model's accuracy on a test set
-  > Measuring accuracy is done with \`model.score(X_test, y_test)\` after training. The \`fit\` method is the training step, not the evaluation step.
-- [o] It trains the model, adjusting its internal parameters so it captures the relationship between the features \`X_train\` and the answers \`y_train\`
-  > \`fit\` is the training step. It shows the model the examples and their answers and tunes the model's internal knobs to fit that relationship.
 - It splits the data into training and test sets
   > Splitting data is done with \`train_test_split\` before training begins. \`model.fit\` operates on the training portion that has already been separated.
+- It measures the model's accuracy on a test set
+  > Measuring accuracy is done with \`model.score(X_test, y_test)\` after training. The \`fit\` method is the training step, not the evaluation step.
+- It makes predictions on new, unseen data
+  > Predictions on new data are made with \`model.predict(X_new)\`, not \`fit\`. The \`fit\` call adjusts the model's internal parameters using labeled training examples.
+- [o] It trains the model, adjusting its internal parameters so it captures the relationship between the features \`X_train\` and the answers \`y_train\`
+  > \`fit\` is the training step. It shows the model the examples and their answers and tunes the model's internal knobs to fit that relationship.
 
 Training (fit) happens first; prediction and scoring come afterward, using the fitted model.`}
 />
@@ -523,14 +523,14 @@ Training (fit) happens first; prediction and scoring come afterward, using the f
 <MultipleChoice
   markdown={`A model is trained only on photos taken in bright daylight. In production it performs terribly on photos taken at night. What is the most likely explanation?
 
-- The model is broken and needs to be retrained with the exact same data
-  > Retraining on the same data will not fix the problem; the issue is that the training data lacked nighttime examples, so new training data representing those conditions is needed.
 - scikit-learn cannot handle image data
   > scikit-learn can work with image data represented as feature arrays; the problem here is missing training conditions, not a library limitation.
-- [o] A model only learns patterns present in its training data; it never saw nighttime photos, so it cannot be expected to handle them
-  > Models generalize from the examples they were given. If a condition is absent from training, performance on that condition is unpredictable. Representative training data is essential.
 - Night photos are mathematically impossible to classify
   > Night photos are perfectly classifiable once a model is trained on representative nighttime examples; the barrier is the absence of such examples in training, not any mathematical impossibility.
+- [o] A model only learns patterns present in its training data; it never saw nighttime photos, so it cannot be expected to handle them
+  > Models generalize from the examples they were given. If a condition is absent from training, performance on that condition is unpredictable. Representative training data is essential.
+- The model is broken and needs to be retrained with the exact same data
+  > Retraining on the same data will not fix the problem; the issue is that the training data lacked nighttime examples, so new training data representing those conditions is needed.
 
 This is the "garbage in, garbage out" principle: the data you train on bounds what the model can do.`}
 />
@@ -538,14 +538,14 @@ This is the "garbage in, garbage out" principle: the data you train on bounds wh
 <MultipleChoice
   markdown={`Which of these problems is the **weakest** candidate for machine learning?
 
-- Flagging fraudulent credit-card transactions from millions of labeled past transactions
-  > Fraud detection involves a subtle, shifting pattern across many signals that no hand-written rule list could fully capture, making it a strong ML candidate.
-- Recommending the next video to a user based on their viewing history
-  > Recommendation involves complex individual preferences that are effectively impossible to hand-code, so learning from behavioral data is the right approach.
-- [o] Computing the sales tax owed on an order, given the known tax rate and the order total
-  > Sales tax is a fixed, exact formula. A simple rule computes it perfectly every time; a learned model would only add complexity and introduce error where none need exist.
 - Recognizing spoken commands from audio recordings
   > Speech recognition maps messy, highly variable audio signals to words, exactly the kind of problem where human-authored rules fail and learning from labeled examples succeeds.
+- Recommending the next video to a user based on their viewing history
+  > Recommendation involves complex individual preferences that are effectively impossible to hand-code, so learning from behavioral data is the right approach.
+- Flagging fraudulent credit-card transactions from millions of labeled past transactions
+  > Fraud detection involves a subtle, shifting pattern across many signals that no hand-written rule list could fully capture, making it a strong ML candidate.
+- [o] Computing the sales tax owed on an order, given the known tax rate and the order total
+  > Sales tax is a fixed, exact formula. A simple rule computes it perfectly every time; a learned model would only add complexity and introduce error where none need exist.
 
 Machine learning shines when rules are too complex to write by hand, not when a clean, exact formula already exists.`}
 />
@@ -553,12 +553,12 @@ Machine learning shines when rules are too complex to write by hand, not when a 
 <MultipleChoice
   markdown={`What is a **model** in machine learning?
 
+- [o] The learned object, the set of rules or tuned parameters that the algorithm produced from the training data, used to turn new inputs into predictions
+  > The model is the *output* of training: a function-with-tuned-knobs that maps inputs to outputs. It is distinct from the data it learned from and from the library used to build it.
 - The raw dataset of examples used to train it
   > The dataset is the *input* to the training process, not its output. A model is what the algorithm produces by learning from that data.
 - The Python library, such as scikit-learn, that you import
   > scikit-learn is the tool you use to build and train models, not a model itself. A model is the learned object produced by calling \`fit\` on a particular algorithm.
-- [o] The learned object, the set of rules or tuned parameters that the algorithm produced from the training data, used to turn new inputs into predictions
-  > The model is the *output* of training: a function-with-tuned-knobs that maps inputs to outputs. It is distinct from the data it learned from and from the library used to build it.
 - The accuracy score the model achieves on the test set
   > Accuracy is a metric used to *evaluate* a model, not the model itself. A model is the learned function that produces predictions; the accuracy score is how well those predictions match the truth.
 
@@ -568,14 +568,14 @@ A model is what training produces; you then call \`predict\` on it to get answer
 <MultipleChoice
   markdown={`Why is the distinction between "performance on training data" and "performance on unseen data" emphasized so heavily?
 
-- They are always identical, so it does not really matter which you report
-  > In practice they are often different, sometimes by a large margin. A model that memorized its training data can score perfectly on it while failing on new examples, which is exactly why the distinction matters.
-- Training-data performance is the only number that matters in practice
-  > The goal of machine learning is performance on *new*, unseen data, not on the data used to train the model. Training-data performance can be inflated by memorization and tells you nothing about real-world usefulness.
-- [o] A model can score well on data it memorized while still failing on new data; the whole point of machine learning is to perform well on data it has never seen
-  > Useful models must generalize. A high training score can come from memorization, so honest evaluation always uses held-out data, the central habit established by the train/test split.
 - Unseen-data performance is impossible to measure
   > Unseen-data performance is measured routinely by holding out a test set before training and evaluating on it afterward. That held-out score is what the train/test split page is entirely about.
+- [o] A model can score well on data it memorized while still failing on new data; the whole point of machine learning is to perform well on data it has never seen
+  > Useful models must generalize. A high training score can come from memorization, so honest evaluation always uses held-out data, the central habit established by the train/test split.
+- Training-data performance is the only number that matters in practice
+  > The goal of machine learning is performance on *new*, unseen data, not on the data used to train the model. Training-data performance can be inflated by memorization and tells you nothing about real-world usefulness.
+- They are always identical, so it does not really matter which you report
+  > In practice they are often different, sometimes by a large margin. A model that memorized its training data can score perfectly on it while failing on new examples, which is exactly why the distinction matters.
 
 Generalization to new data is the actual goal; training-set performance can flatter a model that merely memorized.`}
 />

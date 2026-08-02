@@ -201,14 +201,14 @@ SUM(amount)  OVER ( PARTITION BY region  ORDER BY order_date )
 <MultipleChoice
   markdown={`What is the fundamental difference between a window function and \`GROUP BY\`?
 
-- Window functions can only count, while \`GROUP BY\` can sum.
-  > Both can use the same aggregates; the difference is whether rows are preserved.
 - [o] A window function keeps every original row and attaches a summary to each; \`GROUP BY\` collapses rows into one per group.
   > Windows summarize *alongside* the rows; \`GROUP BY\` summarizes *instead of* them.
-- \`GROUP BY\` keeps every row while window functions collapse them.
-  > It is the reverse: \`GROUP BY\` collapses; window functions preserve rows.
+- Window functions can only count, while \`GROUP BY\` can sum.
+  > Both can use the same aggregates; the difference is whether rows are preserved.
 - They always return identical results.
   > They return different shapes, one row per group vs one row per input row.
+- \`GROUP BY\` keeps every row while window functions collapse them.
+  > It is the reverse: \`GROUP BY\` collapses; window functions preserve rows.
 
 A window function preserves detail rows and adds a per-window summary;
 \`GROUP BY\` collapses detail into group summaries.`}
@@ -217,14 +217,14 @@ A window function preserves detail rows and adds a per-window summary;
 <MultipleChoice
   markdown={`What does the empty \`OVER ()\` clause mean in \`SUM(amount) OVER ()\`?
 
-- Compute the sum of just the current row.
-  > With no frame restriction, the window is the whole result set, not a single row.
+- Sort the rows ascending.
+  > \`OVER ()\` does not sort; it defines the window as all rows.
 - [o] Treat the entire result set as one window, so every row receives the grand total.
   > Empty parentheses mean "one window over all rows," attaching the overall sum to each row.
 - It is invalid syntax.
   > \`OVER ()\` is valid and means the full result set is the window.
-- Sort the rows ascending.
-  > \`OVER ()\` does not sort; it defines the window as all rows.
+- Compute the sum of just the current row.
+  > With no frame restriction, the window is the whole result set, not a single row.
 
 \`OVER ()\` makes the whole result a single window, the grand total lands
 on every row.`}
@@ -235,12 +235,12 @@ on every row.`}
 
 - It permanently splits the table into separate region tables.
   > It only defines per-region windows for the calculation; the table is unchanged.
+- It is required in every window function.
+  > \`PARTITION BY\` is optional; without it the window spans all rows.
 - [o] It divides the rows into one window per region, so each row's window calculation uses only its own region's rows.
   > \`PARTITION BY\` scopes the window to matching rows, like a per-group calculation that still returns every row.
 - It removes the region column from the output.
   > The region column remains; partitioning only scopes the window.
-- It is required in every window function.
-  > \`PARTITION BY\` is optional; without it the window spans all rows.
 
 \`PARTITION BY\` creates a separate window per group while preserving all
 rows.`}
@@ -249,14 +249,14 @@ rows.`}
 <MultipleChoice
   markdown={`Why is "each order's percentage of its region's total" hard with \`GROUP BY\` alone?
 
-- Because \`GROUP BY\` cannot compute a \`SUM\`.
-  > \`GROUP BY\` computes sums fine; the difficulty is combining the sum with each detail row.
-- [o] It needs the individual order **and** the region total in the same row, but \`GROUP BY\` collapses the orders away.
-  > The per-row share requires row-level detail beside the group total, exactly what windows provide and \`GROUP BY\` does not.
 - Because percentages are not allowed in SQL.
   > Percentages are ordinary arithmetic; SQL handles them.
 - Because regions cannot be grouped.
   > Regions group fine; the issue is keeping detail rows alongside the total.
+- [o] It needs the individual order **and** the region total in the same row, but \`GROUP BY\` collapses the orders away.
+  > The per-row share requires row-level detail beside the group total, exactly what windows provide and \`GROUP BY\` does not.
+- Because \`GROUP BY\` cannot compute a \`SUM\`.
+  > \`GROUP BY\` computes sums fine; the difficulty is combining the sum with each detail row.
 
 The calculation needs row and group-total together, which is the signature
 case for a window function.`}
@@ -265,14 +265,14 @@ case for a window function.`}
 <MultipleChoice
   markdown={`Which clause turns an ordinary aggregate like \`AVG(score)\` into a window function?
 
-- \`GROUP BY\`
-  > \`GROUP BY\` makes it collapse rows; it does not create a window.
-- \`HAVING\`
-  > \`HAVING\` filters groups; it has nothing to do with windows.
 - [o] \`OVER (...)\`
   > Adding an \`OVER\` clause turns any aggregate into a window function that preserves rows.
+- \`GROUP BY\`
+  > \`GROUP BY\` makes it collapse rows; it does not create a window.
 - \`DISTINCT\`
   > \`DISTINCT\` removes duplicates; it does not create a window.
+- \`HAVING\`
+  > \`HAVING\` filters groups; it has nothing to do with windows.
 
 The \`OVER\` clause is what makes an aggregate a window function.`}
 />

@@ -272,14 +272,14 @@ causes both.
 <MultipleChoice
   markdown={`A test returns \`p = 0.03\` at \`α = 0.05\`. Which statement is correct?
 
-- There is a 3% probability the null hypothesis is true.
-  > A p-value is not the probability the null is true; it's computed *assuming* the null holds.
+- The result is guaranteed not to be a false positive.
+  > A small p reduces but never eliminates the Type I error rate.
 - [o] If the null were true, there's a 3% chance of data this extreme or more, so at α = 0.05 you reject the null.
   > That's the definition; since 0.03 < 0.05, you reject.
 - There's a 97% probability the effect is real and important.
   > Significance isn't the probability the effect is real, and says nothing about effect size.
-- The result is guaranteed not to be a false positive.
-  > A small p reduces but never eliminates the Type I error rate.`}
+- There is a 3% probability the null hypothesis is true.
+  > A p-value is not the probability the null is true; it's computed *assuming* the null holds.`}
 />
 
 <MultipleChoice
@@ -287,23 +287,23 @@ causes both.
 
 - There's a 95% probability the true mean lies in this specific interval.
   > The parameter is fixed, not random; probability describes the *procedure*, not this one interval.
-- [o] If you repeated the experiment many times, about 95% of the intervals built this way would contain the true mean.
-  > That's the frequentist definition: coverage is a property of the long-run procedure.
+- The interval is wrong 5% of the time for this dataset.
+  > "This dataset" gives one interval that either contains the mean or not; 95% refers to repeated sampling.
 - 95% of the data falls inside the interval.
   > A CI is about the *mean's* uncertainty, not the spread of the raw data.
-- The interval is wrong 5% of the time for this dataset.
-  > "This dataset" gives one interval that either contains the mean or not; 95% refers to repeated sampling.`}
+- [o] If you repeated the experiment many times, about 95% of the intervals built this way would contain the true mean.
+  > That's the frequentist definition: coverage is a property of the long-run procedure.`}
 />
 
 <MultipleChoice
   markdown={`Ice-cream sales and drowning deaths are strongly correlated across the year. What's the sound conclusion?
 
+- The correlation must be a computational error.
+  > The correlation is real; the error would be inferring causation from it.
 - Buying ice cream causes drownings, so restrict sales.
   > Correlation alone can't establish causation; acting on it here would be absurd.
 - [o] A confounder (hot weather) drives both; correlation doesn't imply causation.
   > Temperature raises both ice-cream sales and swimming (hence drownings); it's a classic confounder.
-- The correlation must be a computational error.
-  > The correlation is real; the error would be inferring causation from it.
 - Drownings cause ice-cream sales.
   > Reversing the arrow is just as unjustified; a lurking variable explains both.`}
 />

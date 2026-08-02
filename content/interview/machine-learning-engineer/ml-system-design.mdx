@@ -344,25 +344,25 @@ replicas warm up.
 <MultipleChoice
   markdown={`A product-recommendation model must respond within ~50 ms to a live web request. Which serving pattern fits, and the trade-off?
 
-- Batch inference: precompute nothing and recompute per request offline.
-  > "Batch" means precomputing on a schedule, it can't answer a live 50 ms request on fresh inputs by itself.
 - [o] Online (real-time) inference behind a low-latency service; the trade-off is operational complexity vs batch's simplicity.
   > Sub-second per-request predictions require an online service, taking on latency/availability/scaling concerns.
-- It doesn't matter; latency is never a modeling concern.
-  > Latency budgets directly shape architecture, feature availability, and model choice.
+- Batch inference: precompute nothing and recompute per request offline.
+  > "Batch" means precomputing on a schedule, it can't answer a live 50 ms request on fresh inputs by itself.
 - Always precompute every possible recommendation in advance.
-  > Feasible only for tiny input spaces; large/contextual inputs need online inference.`}
+  > Feasible only for tiny input spaces; large/contextual inputs need online inference.
+- It doesn't matter; latency is never a modeling concern.
+  > Latency budgets directly shape architecture, feature availability, and model choice.`}
 />
 
 <MultipleChoice
   markdown={`A model evaluates well offline but underperforms in production. A feature is computed one way in training and another way in serving. What is this, and the fix?
 
+- Overfitting; fix with more regularization.
+  > Overfitting shows as a train/validation gap offline, not a train-vs-serve mismatch.
 - Concept drift; fix by retraining more often.
   > Drift is the world changing over time. Here the *feature computation* differs between train and serve.
 - [o] Training–serving skew; fix by sharing one feature-computation path (e.g. a feature store).
   > Identical features at train and serve time is the goal; a shared transform eliminates the discrepancy.
-- Overfitting; fix with more regularization.
-  > Overfitting shows as a train/validation gap offline, not a train-vs-serve mismatch.
 - Label leakage; fix by removing the label.
   > Leakage is using future/target info as a feature, a different failure.`}
 />
@@ -370,12 +370,12 @@ replicas warm up.
 <MultipleChoice
   markdown={`Months after deployment a model's accuracy slowly degrades though the code never changed. Most likely cause and response?
 
-- The model file became corrupted; redeploy the same model.
-  > Static artifacts don't rot; redeploying won't help if the input distribution shifted.
-- [o] Data/concept drift, the input distribution or input→label relationship shifted; monitor and retrain on recent data.
-  > Real-world distributions change, so a once-good model decays; production ML monitors and retrains/alerts on drift.
 - Nothing is wrong; model metrics never change in production.
   > Silent degradation from drift is one of the most common production failures.
 - The serving hardware is too slow.
-  > Latency affects speed, not predictive accuracy.`}
+  > Latency affects speed, not predictive accuracy.
+- [o] Data/concept drift, the input distribution or input→label relationship shifted; monitor and retrain on recent data.
+  > Real-world distributions change, so a once-good model decays; production ML monitors and retrains/alerts on drift.
+- The model file became corrupted; redeploy the same model.
+  > Static artifacts don't rot; redeploying won't help if the input distribution shifted.`}
 />

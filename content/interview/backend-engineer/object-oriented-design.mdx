@@ -250,14 +250,14 @@ choosing inheritance.
 <MultipleChoice
   markdown={`Which situation is the clearest reason to prefer **composition** over inheritance?
 
-- Two classes share a few utility methods.
-  > Shared helpers can live in a mixin or module; that alone does not decide inheritance vs composition.
 - [o] You want to swap a collaborator's behavior at runtime and combine behaviors freely.
   > Composition holds an object and delegates to it, so you can inject or replace the collaborator dynamically, which a fixed inheritance hierarchy cannot.
+- You need to call the parent's constructor.
+  > Needing the parent's setup is a sign of an is-a relationship, which suits inheritance.
 - The subclass is a genuine subtype that never violates the parent's contract.
   > That is exactly the case where inheritance is appropriate, not a reason to avoid it.
-- You need to call the parent's constructor.
-  > Needing the parent's setup is a sign of an is-a relationship, which suits inheritance.`}
+- Two classes share a few utility methods.
+  > Shared helpers can live in a mixin or module; that alone does not decide inheritance vs composition.`}
 />
 
 <MultipleChoice
@@ -265,10 +265,10 @@ choosing inheritance.
 
 - Editing an existing \`if/elif\` block each time a new payment type is added.
   > Modifying working code for every new case is exactly what OCP tries to avoid.
-- [o] Adding a new strategy class that implements the existing interface, with no change to the context.
-  > New behavior arrives as new code implementing the established contract; existing, tested classes stay untouched.
 - Adding a field to the base class that every subclass must now set.
   > Forcing all subclasses to change is a modification that ripples through the hierarchy.
+- [o] Adding a new strategy class that implements the existing interface, with no change to the context.
+  > New behavior arrives as new code implementing the established contract; existing, tested classes stay untouched.
 - Rewriting the base class to special-case the new subtype.
   > Editing the base to know about a subtype both breaks OCP and inverts the dependency direction.`}
 />
@@ -276,12 +276,12 @@ choosing inheritance.
 <MultipleChoice
   markdown={`Why is the **Singleton** pattern often criticized?
 
-- It uses too much memory by keeping one instance alive.
-  > One instance is minimal memory; that is not the objection.
 - [o] It introduces global mutable state, hiding dependencies and making tests leak state between each other.
   > Any code can reach a singleton, so dependencies become implicit and its state persists across tests unless carefully reset.
 - It cannot be implemented in most languages.
   > Singletons are easy to implement almost anywhere; the concern is design, not feasibility.
+- It uses too much memory by keeping one instance alive.
+  > One instance is minimal memory; that is not the objection.
 - It forces you to use inheritance.
   > A singleton is about instance count, not about inheritance.`}
 />

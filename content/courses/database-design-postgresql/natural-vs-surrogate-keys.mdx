@@ -112,14 +112,14 @@ organization you do not control will keep its promises forever.
 <MultipleChoice
   markdown={`Which value is the best candidate for a natural key?
 
+- A product description.
+  > Descriptions are editable text, not stable identifiers.
+- A user's current password.
+  > Passwords are sensitive and changeable; they should never be used as row identity.
 - A customer's display name.
   > Display names can repeat and change, so they are poor identifiers.
 - [o] A standardized country code such as \`US\` or \`JP\`.
   > Standardized codes are often unique, compact, and stable enough to identify countries.
-- A user's current password.
-  > Passwords are sensitive and changeable; they should never be used as row identity.
-- A product description.
-  > Descriptions are editable text, not stable identifiers.
 
 A natural key is strongest when the outside world already treats the value as stable identity.`}
 />
@@ -225,12 +225,12 @@ future relationships.
 <MultipleChoice
   markdown={`Why might \`email\` be better as \`UNIQUE\` than as the primary key of \`users\`?
 
-- Because PostgreSQL cannot enforce uniqueness on email addresses.
-  > PostgreSQL can enforce a \`UNIQUE\` constraint on an email column.
-- Because email values are never useful in queries.
-  > Email can be useful for lookup; that does not make it ideal as row identity.
 - [o] Because email may change or expose private information, while a surrogate id can stay stable.
   > A separate id lets references remain valid even when the email is corrected or replaced.
+- Because email values are never useful in queries.
+  > Email can be useful for lookup; that does not make it ideal as row identity.
+- Because PostgreSQL cannot enforce uniqueness on email addresses.
+  > PostgreSQL can enforce a \`UNIQUE\` constraint on an email column.
 - Because primary keys must always be named \`id\`.
   > Primary keys can have many names; the issue is stability, not naming.
 
@@ -272,14 +272,14 @@ related, but they are not the same design job.
 <MultipleChoice
   markdown={`What is a surrogate key?
 
-- A real-world value such as an ISBN.
-  > That is a natural key because it comes from the domain being modeled.
-- [o] An artificial value created only to identify a row.
-  > A generated id is a common surrogate key because it has no outside business meaning.
-- A column that is allowed to be null.
-  > Primary keys, including surrogate primary keys, are not null.
 - A copy of every descriptive column in the table.
   > A surrogate key is usually a single identifier, not duplicated descriptive data.
+- A column that is allowed to be null.
+  > Primary keys, including surrogate primary keys, are not null.
+- [o] An artificial value created only to identify a row.
+  > A generated id is a common surrogate key because it has no outside business meaning.
+- A real-world value such as an ISBN.
+  > That is a natural key because it comes from the domain being modeled.
 
 Surrogate keys are intentionally meaningless so they can stay stable.`}
 />
@@ -287,14 +287,14 @@ Surrogate keys are intentionally meaningless so they can stay stable.`}
 <MultipleChoice
   markdown={`What is the strongest reason to avoid a changeable natural key as a primary key?
 
-- Queries cannot filter by natural keys.
-  > Queries can filter by natural values; change over time is the design risk.
-- It prevents the table from having text columns.
-  > A table can still have text columns regardless of its primary key choice.
 - [o] Other tables may reference it, so changing it can force many references to change too.
   > Primary key values often become foreign key values elsewhere, making instability expensive.
 - PostgreSQL requires natural keys to be stored twice.
   > PostgreSQL has no such requirement.
+- Queries cannot filter by natural keys.
+  > Queries can filter by natural values; change over time is the design risk.
+- It prevents the table from having text columns.
+  > A table can still have text columns regardless of its primary key choice.
 
 The more tables reference a key, the more important key stability becomes.`}
 />
@@ -302,14 +302,14 @@ The more tables reference a key, the more important key stability becomes.`}
 <MultipleChoice
   markdown={`Which design is often appropriate for a \`customers\` table?
 
+- Use the order total as the customer key.
+  > Order totals describe transactions, not customers.
+- [o] Use a generated \`customer_id\` as the primary key and make \`email\` unique if duplicates are not allowed.
+  > This separates stable row identity from a real-world value that may still need uniqueness.
 - Use \`full_name\` as the primary key and allow duplicates.
   > A primary key cannot allow duplicates, and names are not reliable identities.
 - Use no primary key because customers have emails.
   > The table still needs a stable identity even if it stores unique attributes.
-- [o] Use a generated \`customer_id\` as the primary key and make \`email\` unique if duplicates are not allowed.
-  > This separates stable row identity from a real-world value that may still need uniqueness.
-- Use the order total as the customer key.
-  > Order totals describe transactions, not customers.
 
 Stable identity and real-world uniqueness can be modeled with different constraints.`}
 />
@@ -317,14 +317,14 @@ Stable identity and real-world uniqueness can be modeled with different constrai
 <MultipleChoice
   markdown={`When is a natural primary key most reasonable?
 
-- When the value is long, private, and frequently corrected.
-  > Those traits make a value risky to use as a key.
 - [o] When the domain already has a stable, public, unique code for the entity.
   > Stable codes such as country codes can make clear and compact natural keys.
-- When every row has the same value.
-  > A primary key must distinguish rows, so identical values cannot work.
+- When the value is long, private, and frequently corrected.
+  > Those traits make a value risky to use as a key.
 - When the value should be hidden from all queries.
   > A primary key is often referenced, so hidden or sensitive data is a poor fit.
+- When every row has the same value.
+  > A primary key must distinguish rows, so identical values cannot work.
 
 Natural keys work best when the real world provides identity that is genuinely stable.`}
 />

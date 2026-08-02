@@ -312,14 +312,14 @@ trade off, and one will not fix the other.
 <MultipleChoice
   markdown={`An online retailer estimates average customer satisfaction from an **opt-in pop-up survey** that 0.5% of visitors complete. They worry the estimate is too noisy, so they run the survey for a year and collect **800,000 responses**. What's the most likely outcome?
 
+- The extra data makes the estimate worse than a small sample would be in every respect
+  > The extra data genuinely reduces variance, so it's not worse in *every* respect, it's just that the dominant error (bias) is untouched, so the precision is misleading.
+- The estimate is both unbiased and precise, since a full year covers all customer types
+  > Running longer collects more *opt-in* responses, not a representative cross-section. Duration doesn't convert a self-selected sample into a random one.
 - The estimate is now accurate because 800,000 is an enormous sample
   > A large sample shrinks *variance*, but opt-in surveys suffer *self-selection bias*: people with strong opinions respond more. That bias is unaffected by sample size.
 - [o] The estimate is now very precise but still systematically biased, because opt-in respondents differ from typical customers
   > The large $n$ pins down the mean of *responders*, who are not representative of all customers; precision rose while the bias stayed, giving a confidently wrong number.
-- The estimate is both unbiased and precise, since a full year covers all customer types
-  > Running longer collects more *opt-in* responses, not a representative cross-section. Duration doesn't convert a self-selected sample into a random one.
-- The extra data makes the estimate worse than a small sample would be in every respect
-  > The extra data genuinely reduces variance, so it's not worse in *every* respect, it's just that the dominant error (bias) is untouched, so the precision is misleading.
 
 The fix for self-selection bias is a better sampling mechanism, not a bigger self-selected sample.`}
 />
@@ -435,12 +435,12 @@ data problem disguised as a sampling problem.
 
 - Nothing, long-term users are the most reliable evidence of effectiveness
   > Long-term users are exactly the ones for whom the app *worked*; people who saw no results tend to quit. Looking only at them is survivorship bias.
-- The sample is too small to generalize
-  > The issue isn't size. Even with millions of 2-year users, conditioning on "still active" filters out everyone the app didn't help.
 - [o] It's survivorship bias: people for whom the app didn't work mostly quit, so the surviving long-term users overstate the typical effect
   > Restricting to people who *stuck around* selects for success and silently drops the dropouts, inflating the apparent benefit relative to a typical new user.
 - The 18-pound figure must be a measurement error
   > The number can be perfectly measured among survivors and still mislead, because the survivors are a non-representative slice, the bias is in *who's counted*, not in the measurement.
+- The sample is too small to generalize
+  > The issue isn't size. Even with millions of 2-year users, conditioning on "still active" filters out everyone the app didn't help.
 
 To estimate the app's typical effect, you'd need everyone who started, including the people who left.`}
 />
@@ -670,12 +670,12 @@ rows?", it should be "*how was this sample selected, and who's missing?*"
 
 - A poll of 50 random voters gives a wide margin of error
   > A wide margin from a small *random* sample is variance, it shrinks as you add more randomly chosen voters. The estimate is still centered on the truth.
+- A sample mean happens to fall a bit above the population mean this time
+  > A single draw landing above the truth is ordinary random variation (variance). It would land below just as easily on another draw.
 - Two random samples from the same population give slightly different means
   > Sample-to-sample fluctuation around the true value is the definition of variance, not bias. Neither estimate is systematically off.
 - [o] An opt-in web survey consistently overestimates customer satisfaction no matter how many responses come in
   > A consistent miss in one direction that doesn't disappear with more data is bias, caused here by self-selection in the sampling method.
-- A sample mean happens to fall a bit above the population mean this time
-  > A single draw landing above the truth is ordinary random variation (variance). It would land below just as easily on another draw.
 
 Bias is a *systematic, directional* error tied to method; variance is *random scatter* tied to sample size.`}
 />
@@ -683,14 +683,14 @@ Bias is a *systematic, directional* error tied to method; variance is *random sc
 <MultipleChoice
   markdown={`A data scientist says: "Our sample of 5 million log events is so large that it's basically the whole population, so there's no sampling concern." When is this reasoning **most dangerous**?
 
+- When the events were collected over a full calendar year
+  > A full year is generally a *plus* for coverage. The danger is non-representativeness of *who/what* generates the events, not the time span.
+- [o] When the 5 million events come only from a non-representative subgroup (e.g., only logged-in power users)
+  > Size hides the real risk: if the events are a biased slice, the huge $n$ produces a precise estimate of the wrong population. Volume doesn't fix selection bias.
 - When the 5 million events are a true random draw from all events
   > A genuine random draw of 5 million is both large *and* unbiased, exactly the safe case. The reasoning isn't dangerous here.
 - When all events are identical
   > If events were identical there'd be no variability to worry about at all, so the reasoning, while odd, wouldn't mislead.
-- [o] When the 5 million events come only from a non-representative subgroup (e.g., only logged-in power users)
-  > Size hides the real risk: if the events are a biased slice, the huge $n$ produces a precise estimate of the wrong population. Volume doesn't fix selection bias.
-- When the events were collected over a full calendar year
-  > A full year is generally a *plus* for coverage. The danger is non-representativeness of *who/what* generates the events, not the time span.
 
 "Big data" removes variance, not bias, a non-representative billion is still non-representative.`}
 />
@@ -698,14 +698,14 @@ Bias is a *systematic, directional* error tied to method; variance is *random sc
 <MultipleChoice
   markdown={`You want to estimate average household income in a country with distinct regions of differing wealth, and you want to *guarantee* every region is represented in proportion to its population. Which method fits best?
 
-- Convenience sampling at the busiest train station
-  > A single location oversamples commuters from nearby (likely wealthier) areas and guarantees no representation, the opposite of what's wanted.
-- [o] Stratified sampling with regions as strata, sampling each in proportion to its size
-  > Defining regions as strata and sampling each proportionally guarantees representation and typically improves precision over a simple random sample.
 - Systematic sampling from an alphabetical list of surnames
   > Systematic sampling can work but doesn't *guarantee* proportional regional representation, and surname ordering may hide cultural or regional cycles.
+- Convenience sampling at the busiest train station
+  > A single location oversamples commuters from nearby (likely wealthier) areas and guarantees no representation, the opposite of what's wanted.
 - Cluster sampling that randomly keeps only 2 of the regions
   > Cluster sampling would *drop* most regions entirely, which directly violates the requirement that every region be represented.
+- [o] Stratified sampling with regions as strata, sampling each in proportion to its size
+  > Defining regions as strata and sampling each proportionally guarantees representation and typically improves precision over a simple random sample.
 
 When you must ensure subgroups appear in their true proportions, stratify on those subgroups.`}
 />
@@ -715,12 +715,12 @@ When you must ensure subgroups appear in their true proportions, stratify on tho
 
 - Nonresponse bias, fixable by following up with fund managers
   > Funds aren't *declining to respond*; the poor performers were closed and removed. That's survivorship, not nonresponse, and following up can't resurrect delisted funds.
-- Selection bias, fixable by sampling more current funds
-  > More *current* funds repeats the same filter, they're all survivors. Adding survivors can't represent the funds that already vanished.
-- [o] Survivorship bias, and a larger database of surviving funds cannot fix it because the failed funds are systematically absent
-  > The database only contains funds that lasted; the underperformers were delisted, so the missing data is outcome-dependent and no quantity of survivors recovers it.
 - Pure variance, fixable by averaging over more years
   > This is a systematic, directional inflation from missing failures, not random scatter. Averaging more years of *survivor* data won't remove it.
+- [o] Survivorship bias, and a larger database of surviving funds cannot fix it because the failed funds are systematically absent
+  > The database only contains funds that lasted; the underperformers were delisted, so the missing data is outcome-dependent and no quantity of survivors recovers it.
+- Selection bias, fixable by sampling more current funds
+  > More *current* funds repeats the same filter, they're all survivors. Adding survivors can't represent the funds that already vanished.
 
 Survivorship bias is missing data tied to the outcome, more of the same survivors won't undo it.`}
 />
@@ -728,14 +728,14 @@ Survivorship bias is missing data tied to the outcome, more of the same survivor
 <MultipleChoice
   markdown={`Why does **random** sampling (a deliberate chance mechanism) license statistical inference, while **haphazard** convenience sampling does not?
 
-- Because random samples are always larger than convenience samples
-  > Size isn't the distinction, a convenience sample can be huge and a random sample small. The difference is the *mechanism* of selection, not its size.
 - [o] Because a known random mechanism gives every unit a known selection probability, which is what the math of inference (margins of error, p-values) is built on
   > Inference theory assumes selection probabilities are known and unrelated to the measured outcome; a random mechanism provides exactly that, so the resulting error formulas are valid.
-- Because convenience samples always contain measurement errors
-  > Convenience samples can be measured perfectly accurately and still mislead; the problem is *who's in them*, not how the values were recorded.
 - Because random samples never contain bias of any kind
   > Random sampling controls *selection* bias, but other biases (e.g., a badly worded question, or nonresponse) can still intrude. Its key virtue is the known selection probability.
+- Because convenience samples always contain measurement errors
+  > Convenience samples can be measured perfectly accurately and still mislead; the problem is *who's in them*, not how the values were recorded.
+- Because random samples are always larger than convenience samples
+  > Size isn't the distinction, a convenience sample can be huge and a random sample small. The difference is the *mechanism* of selection, not its size.
 
 The chance mechanism, not effort or size, is what connects the sample to the population mathematically.`}
 />

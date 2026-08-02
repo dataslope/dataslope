@@ -363,12 +363,12 @@ console.log(total);
 <MultipleChoice
   markdown={`Which of the following declarations will TypeScript infer as the **literal type** \`42\` (not \`number\`)?
 
+- \`const x: number = 42;\`
+  > No. You've explicitly annotated it as \`number\`, overriding the literal inference.
 - \`let x = 42;\`
   > No. Because \`let\` allows reassignment, the compiler widens the type to \`number\`.
 - [o] \`const x = 42;\`
   > \`const\` prevents reassignment, so TypeScript locks the type to the literal \`42\`.
-- \`const x: number = 42;\`
-  > No. You've explicitly annotated it as \`number\`, overriding the literal inference.
 
 Literal types are inferred for \`const\` bindings unless you provide an explicit wider annotation. This precision is useful when building discriminated unions and modeling state with exact values.`}
 />

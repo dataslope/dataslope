@@ -294,12 +294,12 @@ public static class Checksum
 <MultipleChoice
   markdown={`What does \`new int[0].Min()\` do?
 
+- Returns \`null\`.
+  > Returning \`null\` isn't possible for a non-nullable \`int\`, and even for nullable types the empty behavior depends on the overload.
 - Returns 0.
   > It does not return any value; \`Min\` on an empty non-nullable sequence throws.
 - Returns \`int.MinValue\`.
   > Same, \`Min\` does not fabricate a value when the sequence is empty.
-- Returns \`null\`.
-  > Returning \`null\` isn't possible for a non-nullable \`int\`, and even for nullable types the empty behavior depends on the overload.
 - [o] Throws \`InvalidOperationException\` because the sequence is empty.
   > \`Min\` on an empty non-nullable \`IEnumerable<int>\` throws. Use \`DefaultIfEmpty\`, \`MinBy\`, or guard with \`Any()\` to handle the empty case.
 

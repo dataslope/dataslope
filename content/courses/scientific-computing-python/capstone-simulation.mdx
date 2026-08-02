@@ -334,14 +334,14 @@ together by reproducible code.
 <MultipleChoice
   markdown={`The capstone uses \`solve_ivp(..., events=extinct, dense_output=True, max_step=0.5)\`. Why \`max_step=0.5\` rather than letting the solver pick freely?
 
-- To slow down the simulation for visualization
-  > Visualization speed is controlled by the plotting code, not by ODE solver parameters; \`max_step\` has no effect on how quickly results are displayed.
-- [o] An adaptive solver may take huge steps over slow dynamics and *miss* short-lived events; capping the step size forces the solver to evaluate the event function frequently enough to detect a fast extinction transient
-  > The event detector only checks for a sign change *between* solver steps. If the predator crashes inside a single 5-second step, the event might be missed entirely. \`max_step\` bounds how aggressively the solver can grow its step, trading some performance for guaranteed event resolution.
 - It changes the order of the integrator
   > The order of an integrator (e.g. RK45 is 4th/5th order) is fixed by the method choice, not by \`max_step\`; the parameter only bounds the adaptive step size.
 - It enables GPU acceleration
   > \`solve_ivp\` runs on the CPU; no argument enables GPU execution.
+- [o] An adaptive solver may take huge steps over slow dynamics and *miss* short-lived events; capping the step size forces the solver to evaluate the event function frequently enough to detect a fast extinction transient
+  > The event detector only checks for a sign change *between* solver steps. If the predator crashes inside a single 5-second step, the event might be missed entirely. \`max_step\` bounds how aggressively the solver can grow its step, trading some performance for guaranteed event resolution.
+- To slow down the simulation for visualization
+  > Visualization speed is controlled by the plotting code, not by ODE solver parameters; \`max_step\` has no effect on how quickly results are displayed.
 
 \`max_step\` is the underrated knob you reach for whenever events or sharp transients matter.`}
 />
@@ -349,14 +349,14 @@ together by reproducible code.
 <MultipleChoice
   markdown={`Why does the capstone summary report **both** \`mean_peak_prey\` and \`p_extinction\` per parameter setting, rather than just the population trajectory of one representative run?
 
-- For aesthetic reasons
-  > Aesthetic preference is not a scientific justification; the page makes clear that the dual reporting serves a statistical purpose.
-- [o] A single trajectory hides stochastic variability. Aggregated quantities (means *and* probabilities) over many seeds report a property of the *parameter setting*, not of one lucky draw, and they come with quantifiable uncertainty
-  > Reporting per-replicate aggregates is the difference between an anecdote and an experimental result. The probability of extinction over 20 seeds is a real quantity you can attach uncertainty bars to; one trajectory is a single sample from a distribution.
-- It is required by the language
-  > Python imposes no requirement to report multiple statistics; the choice is driven by scientific methodology, not language rules.
 - The CPU is faster that way
   > Computing aggregate statistics does not change CPU speed; the motivation is scientific validity, not performance.
+- For aesthetic reasons
+  > Aesthetic preference is not a scientific justification; the page makes clear that the dual reporting serves a statistical purpose.
+- It is required by the language
+  > Python imposes no requirement to report multiple statistics; the choice is driven by scientific methodology, not language rules.
+- [o] A single trajectory hides stochastic variability. Aggregated quantities (means *and* probabilities) over many seeds report a property of the *parameter setting*, not of one lucky draw, and they come with quantifiable uncertainty
+  > Reporting per-replicate aggregates is the difference between an anecdote and an experimental result. The probability of extinction over 20 seeds is a real quantity you can attach uncertainty bars to; one trajectory is a single sample from a distribution.
 
 A computational experiment should always report aggregates and uncertainties, never a single representative run.`}
 />

@@ -144,14 +144,14 @@ filter, a plain query is fine, use CTEs where they earn their keep.
 <MultipleChoice
   markdown={`What does a common table expression (CTE) let you do?
 
-- Permanently create a new table in the database.
-  > A CTE is temporary to the statement; it does not create a stored table.
-- [o] Give a query a name with \`WITH\`, then reference that name in the rest of the statement.
-  > A CTE labels a query so the main query can read from it like a named, temporary result.
 - Run a query without a SELECT.
   > A CTE is itself written as a SELECT; it does not remove the need for one.
+- Permanently create a new table in the database.
+  > A CTE is temporary to the statement; it does not create a stored table.
 - Automatically index a table.
   > CTEs are about structuring queries, not creating indexes.
+- [o] Give a query a name with \`WITH\`, then reference that name in the rest of the statement.
+  > A CTE labels a query so the main query can read from it like a named, temporary result.
 
 A CTE names a query with \`WITH\` so later parts of the statement can use that name.`}
 />
@@ -159,12 +159,12 @@ A CTE names a query with \`WITH\` so later parts of the statement can use that n
 <MultipleChoice
   markdown={`Compared with a deeply nested subquery, the main advantage of a CTE is usually:
 
+- [o] Improved readability, because each step is named and written in order.
+  > Naming stages turns nested logic into a clear top-to-bottom sequence.
 - It always produces different results.
   > A CTE typically computes the same result; the difference is how the query reads.
 - It removes the need for joins.
   > CTEs and joins are independent; a CTE does not replace joins.
-- [o] Improved readability, because each step is named and written in order.
-  > Naming stages turns nested logic into a clear top-to-bottom sequence.
 - It runs without accessing any tables.
   > A CTE still reads from tables; it just organizes the query around them.
 

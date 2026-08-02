@@ -341,14 +341,14 @@ This is the kind of muscle that needs reps.
 <MultipleChoice
   markdown={`In the capstone solution, what makes \`Summarize.ByProduct\` so easy to test?
 
-- It uses \`async\` so the test runner can await it.
-  > \`Summarize.ByProduct\` is fully synchronous, there's nothing to await.
-- It writes test logs internally that the test framework reads.
-  > It has no logging or IO. That's the *point*.
 - [o] It is a pure function: it takes an \`IEnumerable<Txn>\` and returns \`IEnumerable<ProductSummary>\` with no IO or hidden state.
   > Pure functions are trivially testable: hand-craft a few \`Txn\` records, call the function, assert on the returned values. No mocks, no fakes, no setup, no teardown, and the same input always produces the same output.
+- It writes test logs internally that the test framework reads.
+  > It has no logging or IO. That's the *point*.
 - It uses inheritance to be mocked.
   > It is a plain \`static\` method. No mocking required *because* it is pure.
+- It uses \`async\` so the test runner can await it.
+  > \`Summarize.ByProduct\` is fully synchronous, there's nothing to await.
 
 The pure-core / imperative-shell discipline pays off most visibly at test time.`}
 />

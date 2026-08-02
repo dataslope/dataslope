@@ -381,14 +381,14 @@ export function run(userId: string): TaskResult<string, string> {
 <MultipleChoice
   markdown={`Why might you prefer \`Task<A> = () => Promise<A>\` over a bare \`Promise<A>\` in functional code?
 
-- Tasks are faster than Promises at runtime
-  > They wrap the same primitive, performance is essentially identical.
 - Tasks can hold synchronous values, Promises can't
   > Both can hold synchronous values; \`Promise.resolve(x)\` is fine.
 - [o] A \`Task\` is *lazy*, building one does no work, so you can compose, retry, parallelize, or substitute it without accidentally kicking off the computation
   > A \`Promise\` starts running the moment it's created; that's not always what you want when composing. A \`Task\` is a recipe you choose when to run.
 - Tasks cannot fail
   > They certainly can; you usually pair them with \`Result\` (as \`TaskResult<E, A>\`) for typed failure.
+- Tasks are faster than Promises at runtime
+  > They wrap the same primitive, performance is essentially identical.
 
 Laziness is the small structural difference that makes async values fit the rest of FP nicely.`}
 />

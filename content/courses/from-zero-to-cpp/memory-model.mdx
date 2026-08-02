@@ -301,27 +301,27 @@ container/pointer to do it for you.
 <MultipleChoice
   markdown={`Where does a \`static\` local variable inside a function live?
 
-- On the stack, in the function's frame.
-  > Normal locals live there; \`static\` locals do not.
 - On the heap, allocated by \`new\` each call.
   > They are allocated once for the whole program.
+- In CPU registers.
+  > Registers are too small and too temporary for this.
 - [o] In the data segment, alongside globals, its memory survives between calls.
   > A \`static\` local is essentially a hidden global with restricted scope.
-- In CPU registers.
-  > Registers are too small and too temporary for this.`}
+- On the stack, in the function's frame.
+  > Normal locals live there; \`static\` locals do not.`}
 />
 
 <MultipleChoice
   markdown={`When a function with a \`std::vector<int>\` local variable returns, what happens to the vector's elements on the heap?
 
-- They leak unless the user called \`delete\` first.
-  > That would be true for a raw \`new int[]\`, not for a vector.
-- The OS reclaims them at process exit.
-  > That would happen eventually, but it would be a leak in the meantime.
 - [o] The vector's destructor runs automatically when the local goes out of scope, and it frees the heap memory for you.
   > This is RAII: ownership is tied to a stack object.
 - The compiler issues a warning.
-  > No warning is needed because there is no leak.`}
+  > No warning is needed because there is no leak.
+- The OS reclaims them at process exit.
+  > That would happen eventually, but it would be a leak in the meantime.
+- They leak unless the user called \`delete\` first.
+  > That would be true for a raw \`new int[]\`, not for a vector.`}
 />
 
 <MultipleChoice
@@ -333,23 +333,23 @@ container/pointer to do it for you.
   > That allocates the vector handle on the heap AND the 1000-int buffer on the heap.
 - [o] \`int x = 0;\` inside a function.
   > A stack allocation is essentially "advance the stack pointer by 4 bytes," which the CPU can do in a single instruction.
-- \`int* p = new int[1000];\`
-  > Heap allocation requires bookkeeping in the allocator.
 - A \`std::string\` of length 1000 declared as a local.
-  > The string handle is on the stack, but the 1000 bytes are on the heap.`}
+  > The string handle is on the stack, but the 1000 bytes are on the heap.
+- \`int* p = new int[1000];\`
+  > Heap allocation requires bookkeeping in the allocator.`}
 />
 
 <MultipleChoice
   markdown={`What is the difference between **scope** and **storage duration**?
 
+- Storage duration only applies to heap allocations.
+  > It applies to every variable, in every region.
+- [o] Scope is the region of source code where a name is visible; storage duration is how long the underlying memory lives at runtime.
+  > A \`static\` local is the textbook example: small scope, but long storage duration.
 - They are two names for the same thing.
   > They are related but distinct.
 - Scope is runtime, storage duration is compile-time.
-  > It is the other way around in spirit: scope is a compile-time concept (about names), storage duration is a runtime concept (about memory).
-- [o] Scope is the region of source code where a name is visible; storage duration is how long the underlying memory lives at runtime.
-  > A \`static\` local is the textbook example: small scope, but long storage duration.
-- Storage duration only applies to heap allocations.
-  > It applies to every variable, in every region.`}
+  > It is the other way around in spirit: scope is a compile-time concept (about names), storage duration is a runtime concept (about memory).`}
 />
 
 Next: pointers and references, the language tools that let you

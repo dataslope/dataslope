@@ -268,14 +268,14 @@ compose into something powerful.
 <MultipleChoice
   markdown={`What does \`df.sort_values(["dept", "salary"], ascending=[True, False])\` do?
 
-- Sorts by salary first
-  > When a list of keys is passed, the first key (\`"dept"\`) is the primary sort; salary is only used to break ties within a department.
-- Sorts only by department
-  > Both keys are active; the second key (\`"salary"\`) determines the order of rows within each department group.
-- [o] Sorts by department ascending; within each department, sorts by salary descending
-  > The two lists are positional, the *n*-th element of \`ascending\` controls the *n*-th sort key.
 - Throws an error
   > Passing a list to \`ascending\` is documented behavior; Pandas requires both lists to have the same length, which they do here.
+- Sorts only by department
+  > Both keys are active; the second key (\`"salary"\`) determines the order of rows within each department group.
+- Sorts by salary first
+  > When a list of keys is passed, the first key (\`"dept"\`) is the primary sort; salary is only used to break ties within a department.
+- [o] Sorts by department ascending; within each department, sorts by salary descending
+  > The two lists are positional, the *n*-th element of \`ascending\` controls the *n*-th sort key.
 
 Multi-column sorts give you fine-grained control of tie-breaking.`}
 />
@@ -283,14 +283,14 @@ Multi-column sorts give you fine-grained control of tie-breaking.`}
 <MultipleChoice
   markdown={`What is the practical difference between \`df.sort_values("x").head(3)\` and \`df.nlargest(3, "x")\`?
 
-- They give different rows
-  > Both operations select the top 3 rows by the largest values of column \`"x"\`; the result set is identical (ties aside).
 - One returns a Series, one a DataFrame
   > Both \`sort_values(...).head(3)\` and \`nlargest(3, ...)\` return a DataFrame.
-- [o] They give the same rows, but \`nlargest\` is slightly faster and reads more directly
-  > For a top-N query, prefer \`nlargest\`/\`nsmallest\`, the intent is clearer than sort-then-head.
 - \`nlargest\` requires the data to be pre-sorted
   > \`nlargest\` finds the top N values from an unsorted Series or column internally; pre-sorting is not required.
+- They give different rows
+  > Both operations select the top 3 rows by the largest values of column \`"x"\`; the result set is identical (ties aside).
+- [o] They give the same rows, but \`nlargest\` is slightly faster and reads more directly
+  > For a top-N query, prefer \`nlargest\`/\`nsmallest\`, the intent is clearer than sort-then-head.
 
 Either works; \`nlargest\` is the idiomatic choice.`}
 />
@@ -298,14 +298,14 @@ Either works; \`nlargest\` is the idiomatic choice.`}
 <MultipleChoice
   markdown={`In \`rank(method="dense")\`, two tied rows are followed by a third rank value. What does "dense" mean?
 
-- It produces unique floating-point ranks
-  > \`method="average"\` produces fractional ranks for tied rows; \`"dense"\` always assigns whole-number ranks with no fractional values.
 - It removes ties
   > \`"dense"\` does not remove ties; it assigns them the same rank. What it removes is the *gap* in rank values that would otherwise follow a group of ties.
 - [o] Tied rows share a rank, and the *next distinct* rank value is one higher (no gaps), unlike \`"min"\` which leaves gaps
   > With values \`[100, 80, 100, 60]\` sorted descending: \`"min"\` gives \`[1, 3, 1, 4]\`; \`"dense"\` gives \`[1, 2, 1, 3]\`.
 - The result type is dense
   > "Dense" describes the property of the rank sequence (no gaps), not the data type; the values are still ordinary floats or integers.
+- It produces unique floating-point ranks
+  > \`method="average"\` produces fractional ranks for tied rows; \`"dense"\` always assigns whole-number ranks with no fractional values.
 
 Choose the tie-breaking method that matches your business rule (Olympic-style, leaderboard, etc.).`}
 />

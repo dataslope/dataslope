@@ -296,12 +296,12 @@ stationary, the correct `d` is **0**.
 
 - The series became more stationary; this is ideal
   > A jump in variance and a strong negative lag-1 autocorrelation are *warning signs*, not signs of success. A well-differenced series has lower or similar variance and near-zero short-lag autocorrelation.
-- [o] It was over-differenced, differencing an already-stationary series injected a spurious negative autocorrelation and inflated the variance
-  > Those two symptoms together are the classic over-differencing fingerprint. The fix is to step back to fewer differences (use the minimum \`d\` that reaches stationarity).
 - The seasonal period is wrong
   > A wrong seasonal period shows up as leftover seasonal spikes, not as a uniform +variance and -0.5 lag-1 autocorrelation. This pattern points specifically to over-differencing.
 - The data must be re-logged
   > A log addresses growing *variance from a multiplicative effect*, not the artifacts of over-differencing. The remedy here is fewer differences, not another transform.
+- [o] It was over-differenced, differencing an already-stationary series injected a spurious negative autocorrelation and inflated the variance
+  > Those two symptoms together are the classic over-differencing fingerprint. The fix is to step back to fewer differences (use the minimum \`d\` that reaches stationarity).
 
 Inflated variance plus a ~-0.5 lag-1 autocorrelation is the textbook signature of over-differencing; reduce \`d\`.`}
 />
@@ -547,10 +547,10 @@ assert pd.isna(co2_diff.iloc[0]), "The first differenced value must be NaN"`,
 <MultipleChoice
   markdown={`Why does taking the **first difference** of a series remove a *linear* trend?
 
-- Because it deletes the largest values
-  > Differencing doesn't delete values by size; it subtracts each value from the next. Magnitude isn't the mechanism.
 - [o] Because the difference of a straight line is a constant, so a steadily-rising level becomes a flat (trend-free) series of changes
   > A linear trend climbs by the same amount each step; those equal steps are a constant when you difference, leaving a series with no trend in its mean.
+- Because it deletes the largest values
+  > Differencing doesn't delete values by size; it subtracts each value from the next. Magnitude isn't the mechanism.
 - Because it converts the data to percentages
   > Differencing yields absolute changes, not percentages. (Percentage change is a *different* transform.) Either way, it's the constant-difference-of-a-line property that removes the trend.
 - Because it makes all values positive
@@ -562,14 +562,14 @@ The difference of a line is a constant, so first differencing turns a rising lev
 <MultipleChoice
   markdown={`Your monthly series has both a trend and a strong yearly cycle. First differencing removed the trend but a 12-month wobble remains. What should you do?
 
-- Difference again with \`diff()\` (a second regular difference)
-  > A second *regular* difference targets curvature in the trend, not seasonality. The yearly wobble would survive, and you'd risk over-differencing.
-- [o] Apply a *seasonal* difference, \`diff(12)\`, to subtract each month from the same month a year earlier
-  > Seasonal differencing at the cycle length cancels the repeating yearly pattern against its own prior-year copy, exactly the leftover structure here.
-- Increase the rolling-window size
-  > A larger rolling window smooths for *visualization* but doesn't remove seasonality from the series you'll model. Seasonal differencing is the targeted fix.
 - Re-run the ADF test until it passes
   > Re-running a test changes nothing about the data. You must transform the series (seasonal difference) to remove the cycle, then test.
+- Difference again with \`diff()\` (a second regular difference)
+  > A second *regular* difference targets curvature in the trend, not seasonality. The yearly wobble would survive, and you'd risk over-differencing.
+- Increase the rolling-window size
+  > A larger rolling window smooths for *visualization* but doesn't remove seasonality from the series you'll model. Seasonal differencing is the targeted fix.
+- [o] Apply a *seasonal* difference, \`diff(12)\`, to subtract each month from the same month a year earlier
+  > Seasonal differencing at the cycle length cancels the repeating yearly pattern against its own prior-year copy, exactly the leftover structure here.
 
 Leftover seasonality after a regular difference calls for a *seasonal* difference at the cycle length (\`diff(12)\` for monthly-yearly).`}
 />
@@ -577,14 +577,14 @@ Leftover seasonality after a regular difference calls for a *seasonal* differenc
 <MultipleChoice
   markdown={`A series tests stationary (ADF p = 0.01) with **no** differencing. What is the appropriate \`d\`?
 
-- [o] d = 0, it's already stationary, so differencing would only add noise
-  > A low ADF p-value with the raw series means stationarity is already satisfied. The correct number of differences is zero; differencing further would over-difference.
-- d = 1, because every series needs at least one difference
-  > Not every series needs differencing, only non-stationary ones. An already-stationary series should be left at d = 0.
 - d = 2, to be safe
   > "To be safe" is exactly the over-differencing mindset. Extra differences inject a spurious negative autocorrelation and inflate variance.
+- d = 1, because every series needs at least one difference
+  > Not every series needs differencing, only non-stationary ones. An already-stationary series should be left at d = 0.
 - Whatever gives the smallest p-value
   > Chasing the smallest p-value leads straight to over-differencing. The aim is the *minimum* d that achieves stationarity, which here is 0.
+- [o] d = 0, it's already stationary, so differencing would only add noise
+  > A low ADF p-value with the raw series means stationarity is already satisfied. The correct number of differences is zero; differencing further would over-difference.
 
 If the raw series is already stationary, the right choice is d = 0; more differencing only harms.`}
 />

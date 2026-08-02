@@ -523,38 +523,38 @@ int main(void) {
 <MultipleChoice
   markdown={`What is the safest way to handle a failed \`realloc\`?
 
+- Use \`free\` on the original block and then \`malloc\` a new one.
+  > That works but defeats the purpose of \`realloc\` (which can resize in place).
 - Assume it succeeded and keep using the same pointer.
   > A failed \`realloc\` returns \`NULL\`; using \`NULL\` as if it were the old block is UB.
-- [o] Assign the result to a temporary first; if \`NULL\`, free the old block (which is still valid) and bail out.
-  > \`p = realloc(p, n);\` leaks the original on failure; the temporary pattern avoids it.
 - Call \`realloc\` again immediately; the second call usually succeeds.
   > Failure usually means low memory; retrying without changes does not help.
-- Use \`free\` on the original block and then \`malloc\` a new one.
-  > That works but defeats the purpose of \`realloc\` (which can resize in place).`}
+- [o] Assign the result to a temporary first; if \`NULL\`, free the old block (which is still valid) and bail out.
+  > \`p = realloc(p, n);\` leaks the original on failure; the temporary pattern avoids it.`}
 />
 
 <MultipleChoice
   markdown={`Why does \`malloc\` not zero-initialize the memory it returns?
 
-- The standard requires that it does.
-  > It does not.
-- Zeroing is impossible without kernel support.
-  > The OS does sometimes pre-zero pages, but the standard library is allowed to skip it.
+- Because \`malloc\` always returns memory that was previously \`free\`d, which is already zeroed.
+  > Freed memory is **not** guaranteed to be zeroed; it contains the previous user's bytes.
 - [o] Zeroing has a cost; programs that are about to overwrite every byte anyway should not pay it. \`calloc\` exists for when you actually want zeros.
   > \`malloc\` is the bare-minimum allocator; \`calloc\` is the zeroing variant.
-- Because \`malloc\` always returns memory that was previously \`free\`d, which is already zeroed.
-  > Freed memory is **not** guaranteed to be zeroed; it contains the previous user's bytes.`}
+- Zeroing is impossible without kernel support.
+  > The OS does sometimes pre-zero pages, but the standard library is allowed to skip it.
+- The standard requires that it does.
+  > It does not.`}
 />
 
 <MultipleChoice
   markdown={`After \`free(p);\`, what should you do with \`p\`?
 
+- [o] Stop using it (and ideally set it to \`NULL\` so accidental later uses become immediate NULL-pointer crashes instead of silent corruption).
+  > \`free(p); p = NULL;\` is a well-known defensive pattern.
+- Print it to stdout for debugging.
+  > Even printing the value (as a pointer) is fine, but *dereferencing* it is UB. Most code should simply stop using it.
 - Read it once more to confirm the contents were cleared.
   > Reading freed memory is undefined behavior, use-after-free.
 - Pass it to \`free\` again to be safe.
-  > That is a *double-free*, which is also undefined and often crashes.
-- Print it to stdout for debugging.
-  > Even printing the value (as a pointer) is fine, but *dereferencing* it is UB. Most code should simply stop using it.
-- [o] Stop using it (and ideally set it to \`NULL\` so accidental later uses become immediate NULL-pointer crashes instead of silent corruption).
-  > \`free(p); p = NULL;\` is a well-known defensive pattern.`}
+  > That is a *double-free*, which is also undefined and often crashes.`}
 />

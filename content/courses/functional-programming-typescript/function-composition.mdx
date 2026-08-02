@@ -467,12 +467,12 @@ export const slug = (s: string): string =>
 
 - \`compose\` is for synchronous functions and \`pipe\` is for asynchronous functions
   > Both work for sync functions. Async variants exist but neither is fundamentally one or the other.
+- \`compose\` can only combine two functions; \`pipe\` works for any number
+  > Both can be variadic depending on the implementation.
 - \`compose\` curries its arguments; \`pipe\` does not
   > Currying is independent of composition direction.
 - [o] They express the same idea in different argument orders; \`compose(f, g)(x) = f(g(x))\`, while \`pipe(x, g, f)\` applies \`g\` first then \`f\`
   > \`compose\` reads right-to-left (the math convention); \`pipe\` reads left-to-right, which usually matches data flow more naturally in TypeScript.
-- \`compose\` can only combine two functions; \`pipe\` works for any number
-  > Both can be variadic depending on the implementation.
 
 The two operators are mirror images. Most TypeScript codebases prefer \`pipe\` for everyday use because the order reads top-to-bottom.`}
 />

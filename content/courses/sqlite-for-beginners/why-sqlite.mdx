@@ -76,10 +76,10 @@ spread everywhere.
 
 - SQLite must always run on a separate database server process
   > SQLite is commonly embedded directly into the application process.
-- [o] SQLite runs inside the application process instead of as a separate server
-  > The application uses the SQLite library directly, with no server to administer.
 - SQLite can only be used on paper
   > SQLite is software.
+- [o] SQLite runs inside the application process instead of as a separate server
+  > The application uses the SQLite library directly, with no server to administer.
 - SQL stops working
   > SQLite understands SQL.`}
 />
@@ -122,10 +122,10 @@ flowchart TB
 <MultipleChoice
   markdown={`What does SQLite's single-file design mean?
 
-- Every SQLite table must be stored in a separate cloud server
-  > SQLite does not require a separate server for each table.
 - [o] A SQLite database is commonly stored as one ordinary file on disk
   > The file can contain many tables, rows, and indexes.
+- Every SQLite table must be stored in a separate cloud server
+  > SQLite does not require a separate server for each table.
 - SQLite can only store one row
   > A SQLite database file can store many rows and tables.
 - SQLite requires a separate server for every table
@@ -183,53 +183,53 @@ right.
 <MultipleChoice
   markdown={`What problem pushed D. Richard Hipp to create SQLite?
 
-- He needed a database that could store images
-  > Image storage was not the motivation.
-- [o] His software depended on a separate database server, and when that server was down his application took the blame
-  > Building the database into the application as a library removed the server as a point of failure.
 - SQL did not exist yet
   > SQL had existed for decades; SQLite adopted it.
 - He wanted to sell an expensive commercial license
-  > SQLite was released into the public domain, free for any use.`}
+  > SQLite was released into the public domain, free for any use.
+- He needed a database that could store images
+  > Image storage was not the motivation.
+- [o] His software depended on a separate database server, and when that server was down his application took the blame
+  > Building the database into the application as a library removed the server as a point of failure.`}
 />
 
 <MultipleChoice
   markdown={`Which statement about SQLite's reach is accurate?
 
-- It is rarely used outside classrooms
-  > SQLite is the most widely deployed database engine in the world.
 - [o] It ships inside every major smartphone and web browser, with an estimated trillion-plus databases in use
   > Phones, browsers, and operating systems all bundle SQLite.
+- It was replaced by spreadsheets
+  > Spreadsheets and databases solve different problems, and SQLite remains everywhere.
 - It only runs on naval ships
   > It began on a Navy contract, but it now runs almost everywhere.
-- It was replaced by spreadsheets
-  > Spreadsheets and databases solve different problems, and SQLite remains everywhere.`}
+- It is rarely used outside classrooms
+  > SQLite is the most widely deployed database engine in the world.`}
 />
 
 <MultipleChoice
   markdown={`Why is SQLite's testing culture famous?
 
-- It has no tests, which makes it fast
-  > The opposite is true: its test suites are enormous.
+- Testing is only done once per decade
+  > Testing is continuous and central to the project.
 - [o] Its tests contain hundreds of times more code than the library and reach 100% branch coverage to an avionics-grade standard
   > The project deliberately simulates crashes, power loss, and corruption to earn trust.
+- It has no tests, which makes it fast
+  > The opposite is true: its test suites are enormous.
 - Its tests are written by users after bugs appear
-  > The project maintains its own exhaustive test harnesses.
-- Testing is only done once per decade
-  > Testing is continuous and central to the project.`}
+  > The project maintains its own exhaustive test harnesses.`}
 />
 
 <MultipleChoice
   markdown={`When might another database be a better fit than SQLite?
 
-- A tiny local notes app
-  > SQLite is often excellent for local app storage.
 - Learning SQL basics without server setup
   > SQLite is a friendly learning database.
+- A test database for a small project
+  > SQLite is commonly useful in tests.
 - [o] A large system with many users writing at the same time from different machines
   > Heavy multi-user write concurrency is the classic case for a client-server database.
-- A test database for a small project
-  > SQLite is commonly useful in tests.`}
+- A tiny local notes app
+  > SQLite is often excellent for local app storage.`}
 />
 
 You now know what a database is, why the relational model won,

@@ -471,12 +471,12 @@ function getValue<T, K extends keyof T>(obj: T, key: K): T[K] {
 
 If you call \`getValue({ x: 10, y: "hello" }, "y")\`, what is the return type?
 
-- \`string | number\`
-  > No. The compiler knows you passed \`"y"\`, so it narrows \`K\` to \`"y"\` specifically. The return type is \`T["y"]\`, which is \`string\`.
 - [o] \`string\`
   > \`K\` is inferred as \`"y"\`, and \`T["y"]\` is \`string\`, so the return type is \`string\`.
 - \`T[K]\`
   > Partially correct, the return type *is* \`T[K]\`, but the compiler simplifies it to \`string\` based on the specific call. The concrete return type is \`string\`.
+- \`string | number\`
+  > No. The compiler knows you passed \`"y"\`, so it narrows \`K\` to \`"y"\` specifically. The return type is \`T["y"]\`, which is \`string\`.
 
 The power of \`keyof\` and indexed access types is that the compiler tracks the specific key you passed and gives you the exact property type, not a union of all possible property types.`}
 />

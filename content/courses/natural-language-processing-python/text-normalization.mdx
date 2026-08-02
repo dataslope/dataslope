@@ -176,12 +176,12 @@ Tokenize, then clean.
 <MultipleChoice
   markdown={`Why is lowercasing described as a *lossy* operation?
 
+- Because it always introduces spelling errors
+  > Lowercasing does not introduce spelling errors; it changes case uniformly and preserves every character except its letter case.
 - Because it makes the text take up less memory
   > Lowercase characters take exactly the same amount of memory as uppercase ones; "lossy" here means information is permanently destroyed, not that storage is reduced.
 - [o] Because it permanently discards capitalization, which sometimes carries real meaning (e.g., "Apple" vs "apple", "US" vs "us"), and that information cannot be recovered afterward
   > Case folding throws away the distinction between upper and lower case. For word-counting that distinction is noise, but for names and acronyms it is signal, and once folded, it is gone for good.
-- Because it always introduces spelling errors
-  > Lowercasing does not introduce spelling errors; it changes case uniformly and preserves every character except its letter case.
 - Because it converts the text into a different language
   > Lowercasing operates only on the case of each character and does not change the language, vocabulary, or any other property of the text.
 
@@ -286,12 +286,12 @@ is lowercasing usually the right call?
 
 - It makes the article shorter
   > Lowercasing does not remove any words; the article has exactly the same number of tokens before and after, just with all letters in lowercase form.
+- It is required before any text can be stored
+  > Text can be stored and processed in any case; lowercasing is a normalization choice made to improve downstream counting or matching, not a prerequisite for storage.
 - [o] Different capitalizations of the same word ("The", "the", "THE") are the same word for counting purposes, so folding them together gives accurate totals
   > When the unit of interest is "how often does this word occur", casing is noise. Collapsing it prevents the same word from being split across several count buckets.
 - It translates the article into another language
   > Lowercasing is purely a character-case operation and does not translate, transliterate, or change the language of the text in any way.
-- It is required before any text can be stored
-  > Text can be stored and processed in any case; lowercasing is a normalization choice made to improve downstream counting or matching, not a prerequisite for storage.
 
 Word-frequency counting is the textbook case where case folding clearly helps.`}
 />
@@ -301,12 +301,12 @@ Word-frequency counting is the textbook case where case folding clearly helps.`}
 lowercases all text as the very first step and then complains the system
 confuses companies with common nouns. What went wrong?
 
-- Lowercasing is too slow for news text
-  > Lowercasing with \`str.lower()\` is extremely fast regardless of text volume; the problem is that it destroys the capitalization signal the entity recognizer relies on.
 - [o] Capitalization is a key signal for recognizing names, and lowercasing first destroyed it, for this task, case folding is harmful
   > Named-entity recognition leans heavily on capitalization to spot proper nouns. Folding case away up front removes the exact clue the task depends on. Some tasks should skip or delay normalization.
 - The system needed more punctuation, not less
   > The issue has nothing to do with punctuation; the problem is that lowercasing erased the capitalization pattern that distinguishes proper nouns like "Apple" from common nouns.
+- Lowercasing is too slow for news text
+  > Lowercasing with \`str.lower()\` is extremely fast regardless of text volume; the problem is that it destroys the capitalization signal the entity recognizer relies on.
 - News articles cannot be processed by computers
   > News articles are routinely processed by computers for information extraction; the issue is a specific bad pipeline choice (lowercasing before entity recognition), not a general limitation.
 
@@ -318,14 +318,14 @@ Whether to normalize is task-dependent; here the "harmless" step was actively de
 \`True\`. On the token \`"World!"\` what happens, and why might that surprise
 you?
 
-- "World!" becomes "World" with the "!" removed
-  > \`isalpha()\` tests the whole token, not individual characters; since "World!" contains a non-alphabetic character, the entire token is rejected, not just the punctuation.
 - [o] The entire token "World!" is dropped, because the whole string is not alphabetic, so you lose the word, not just the punctuation
   > \`"World!".isalpha()\` is \`False\` because of the "!", so the filter discards the whole token. To keep the word and only remove the mark, strip the punctuation characters (e.g., with \`str.translate\` or a regex) instead of filtering whole tokens.
 - It raises an error
   > \`isalpha()\` never raises an error; it simply returns \`False\` for any string containing a non-alphabetic character, causing the whole token to be filtered out by the list comprehension.
 - It splits into "World" and "!"
   > The \`isalpha()\` filter does not split tokens; it evaluates the token as a whole and either keeps it or drops it entirely, splitting is a job for a tokenizer, not a character filter.
+- "World!" becomes "World" with the "!" removed
+  > \`isalpha()\` tests the whole token, not individual characters; since "World!" contains a non-alphabetic character, the entire token is rejected, not just the punctuation.
 
 Knowing exactly what each stripping technique does, including what it deletes, is the difference between clean data and silent data loss.`}
 />
@@ -334,14 +334,14 @@ Knowing exactly what each stripping technique does, including what it deletes, i
   markdown={`Why should punctuation stripping generally come *after* sentence
 tokenization, not before?
 
-- Punctuation cannot be removed from a tokenized list
-  > Punctuation tokens are just strings in a list and can be filtered out like any other token; the point is to do that filtering after sentence boundaries have already been identified.
-- [o] Sentence tokenizers use periods, question marks, and exclamation points to find sentence boundaries; removing them first destroys those clues and can merge separate sentences
-  > The marks you want to strip are the same marks a sentence tokenizer relies on. Strip them up front and you blind the tokenizer. Tokenize into sentences first, then clean within them.
 - Stripping punctuation changes the language of the text
   > Removing punctuation characters does not alter the language or any word; it only removes non-alphabetic marks that are noise for most bag-of-words tasks.
+- [o] Sentence tokenizers use periods, question marks, and exclamation points to find sentence boundaries; removing them first destroys those clues and can merge separate sentences
+  > The marks you want to strip are the same marks a sentence tokenizer relies on. Strip them up front and you blind the tokenizer. Tokenize into sentences first, then clean within them.
 - It does not matter; order is irrelevant here
   > Order is specifically what matters here: the sentence tokenizer needs punctuation marks to detect boundaries, so stripping them before tokenization destroys the evidence the tokenizer depends on.
+- Punctuation cannot be removed from a tokenized list
+  > Punctuation tokens are just strings in a list and can be filtered out like any other token; the point is to do that filtering after sentence boundaries have already been identified.
 
 This is another instance of the recurring theme that *order matters* in a pipeline.`}
 />

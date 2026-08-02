@@ -156,14 +156,14 @@ without any change to the schema.
 <MultipleChoice
   markdown={`Why can't a single foreign key represent a many-to-many relationship like students and courses?
 
-- Because foreign keys are not allowed between unrelated tables.
-  > Foreign keys are exactly the tool for relating tables; the problem is the *cardinality*, not legality.
 - [o] Because a single column can hold only one value, so it can represent "many" on only one side, not both.
   > One foreign key forces one of the sides to be singular, which fails when both sides are "many."
-- Because foreign keys cannot reference primary keys.
-  > Foreign keys normally reference primary keys; that is their usual purpose.
+- Because foreign keys are not allowed between unrelated tables.
+  > Foreign keys are exactly the tool for relating tables; the problem is the *cardinality*, not legality.
 - Because PostgreSQL forbids more than two tables in a query.
   > Queries routinely span many tables; there is no such limit.
+- Because foreign keys cannot reference primary keys.
+  > Foreign keys normally reference primary keys; that is their usual purpose.
 
 A lone foreign key can express "many" on just one side, so many-to-many needs a third table.`}
 />
@@ -171,14 +171,14 @@ A lone foreign key can express "many" on just one side, so many-to-many needs a 
 <MultipleChoice
   markdown={`What is the role of a junction (bridge) table?
 
-- To store a backup copy of both tables.
-  > A junction table holds connections, not duplicated copies of the other tables' data.
-- [o] To store one row per connection, holding a foreign key to each of the two related tables.
-  > Each junction row links one row from each side, turning a many-to-many into two one-to-many links.
 - To replace the need for primary keys.
   > Junction tables rely on keys, often a composite primary key, rather than replacing them.
+- [o] To store one row per connection, holding a foreign key to each of the two related tables.
+  > Each junction row links one row from each side, turning a many-to-many into two one-to-many links.
 - To speed up queries by caching results.
   > A junction table models relationships; it is not a results cache.
+- To store a backup copy of both tables.
+  > A junction table holds connections, not duplicated copies of the other tables' data.
 
 A junction table records each pairing as a row with a foreign key to each side.`}
 />
@@ -186,14 +186,14 @@ A junction table records each pairing as a row with a foreign key to each side.`
 <MultipleChoice
   markdown={`In an \`enrollments\` junction table, where does a per-enrollment \`grade\` column most naturally belong?
 
-- In the \`students\` table.
-  > A grade depends on *which course*, so it cannot live on the student alone.
-- In the \`courses\` table.
-  > A grade depends on *which student*, so it cannot live on the course alone.
-- [o] In the \`enrollments\` table, because the grade describes the specific student-course pairing.
-  > A grade is a fact about the relationship itself, so the junction row is its natural home.
 - In a brand-new fourth table by itself.
   > The enrollment row already represents the pairing, so the grade belongs there rather than in a separate table.
+- In the \`courses\` table.
+  > A grade depends on *which student*, so it cannot live on the course alone.
+- In the \`students\` table.
+  > A grade depends on *which course*, so it cannot live on the student alone.
+- [o] In the \`enrollments\` table, because the grade describes the specific student-course pairing.
+  > A grade is a fact about the relationship itself, so the junction row is its natural home.
 
 A value that describes the pairing itself belongs on the junction row.`}
 />

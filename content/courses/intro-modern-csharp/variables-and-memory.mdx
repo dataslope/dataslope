@@ -337,21 +337,21 @@ Console.WriteLine($"b = {b}");
   > Every C# variable has a type.
 - It creates a variable whose type can change later
   > It cannot.
-- [o] It creates a statically typed \`int\` variable; the compiler infers the type from the literal \`42\`
-  > \`var\` is shorthand for "let the compiler write the type for me."
 - It creates a runtime-only variable
-  > That would be \`dynamic\`, which is a different feature.`}
+  > That would be \`dynamic\`, which is a different feature.
+- [o] It creates a statically typed \`int\` variable; the compiler infers the type from the literal \`42\`
+  > \`var\` is shorthand for "let the compiler write the type for me."`}
 />
 
 <MultipleChoice
   markdown={`Why prefer \`decimal\` over \`double\` for money?
 
-- \`decimal\` is faster
-  > It's actually slower than \`double\`.
 - \`decimal\` uses less memory
   > It uses more.
-- [o] \`double\` has small rounding errors for decimal fractions (e.g., \`0.1 + 0.2 != 0.3\`); \`decimal\` is exact for the decimal numbers humans care about
-  > \`decimal\` stores base-10 fractions precisely, so money amounts add up correctly.
 - They're the same, pick either one
-  > They behave differently for fractions, which is exactly why money needs \`decimal\`.`}
+  > They behave differently for fractions, which is exactly why money needs \`decimal\`.
+- \`decimal\` is faster
+  > It's actually slower than \`double\`.
+- [o] \`double\` has small rounding errors for decimal fractions (e.g., \`0.1 + 0.2 != 0.3\`); \`decimal\` is exact for the decimal numbers humans care about
+  > \`decimal\` stores base-10 fractions precisely, so money amounts add up correctly.`}
 />

@@ -285,14 +285,14 @@ The fix: every recursion must reach a base case.
 <MultipleChoice
   markdown={`What is stored in a stack frame for a method call?
 
-- All objects the method has ever created
-  > Objects live on the heap, not in stack frames.
+- The bytecode of the method
+  > Bytecode lives in the method area, not in a frame.
 - [o] The method's parameters and local variables, including primitives by value and references that point to heap objects
   > A frame holds just this call's locals; the objects themselves stay on the heap.
+- All objects the method has ever created
+  > Objects live on the heap, not in stack frames.
 - A copy of every object passed to the method
-  > Java does not deep-copy objects on call; it copies the reference.
-- The bytecode of the method
-  > Bytecode lives in the method area, not in a frame.`}
+  > Java does not deep-copy objects on call; it copies the reference.`}
 />
 
 <MultipleChoice
@@ -302,23 +302,23 @@ The fix: every recursion must reach a base case.
   > No, only one list exists.
 - Zero, Java doesn't allocate a list yet
   > One was already allocated when \`a\` was created.
-- [o] One, \`a\` and \`b\` are two references pointing to the *same* list
-  > That's aliasing.
 - One, but \`b\` is an immutable copy
-  > It's not a copy at all.`}
+  > It's not a copy at all.
+- [o] One, \`a\` and \`b\` are two references pointing to the *same* list
+  > That's aliasing.`}
 />
 
 <MultipleChoice
   markdown={`A method receives a parameter of type \`Order\` and then writes \`order = new Order();\` inside its body. What does the caller observe?
 
-- The caller's variable now points to the new Order
-  > No, the parameter was a *local* reference variable.
-- The original Order is silently destroyed
-  > Other references may still hold it.
 - [o] Nothing, Java is pass-by-value; reassigning the parameter only changes the local reference inside the method, not the caller's variable
   > The parameter is the method's own copy of the arrow; repointing it leaves the caller's arrow untouched.
 - A compile error
-  > It compiles fine.`}
+  > It compiles fine.
+- The original Order is silently destroyed
+  > Other references may still hold it.
+- The caller's variable now points to the new Order
+  > No, the parameter was a *local* reference variable.`}
 />
 
 You now have the mental model that unlocks everything else: stack

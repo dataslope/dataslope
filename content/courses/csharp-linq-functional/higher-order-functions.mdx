@@ -349,12 +349,12 @@ public static class Filters
 
 - \`Enumerable.Where\`, takes a \`Func<T, bool>\` predicate.
   > \`Where\` accepts a function as a parameter, so it *is* higher-order.
-- \`Enumerable.Select\`, takes a \`Func<TSource, TResult>\` selector.
-  > \`Select\` accepts a function, so it *is* higher-order.
-- A "Multiplier" method that returns \`Func<int, int>\` for a given factor.
-  > Returning a function makes a method higher-order, so this *is* higher-order.
 - [o] \`static int Add(int x, int y) => x + y;\`
   > \`Add\` neither takes a function as a parameter nor returns one, it only operates on values. It is a perfectly ordinary first-order function.
+- A "Multiplier" method that returns \`Func<int, int>\` for a given factor.
+  > Returning a function makes a method higher-order, so this *is* higher-order.
+- \`Enumerable.Select\`, takes a \`Func<TSource, TResult>\` selector.
+  > \`Select\` accepts a function, so it *is* higher-order.
 
 A higher-order function must either accept a function as an argument
 or return a function. Plain functions over plain values (like \`Add\`)

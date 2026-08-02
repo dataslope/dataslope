@@ -552,14 +552,14 @@ else:
     print("c")
 \`\`\`
 
+- \`c\`
+  > The \`else\` only runs if **no** branch matches.
 - [o] \`a\`
   > Only the **first** matching branch runs, even though \`x > 5\` is also true.
-- \`b\`
-  > The first branch matches, so the \`elif\` is never evaluated.
 - \`a\` then \`b\`
   > Only one branch runs in an \`if/elif/else\` chain.
-- \`c\`
-  > The \`else\` only runs if **no** branch matches.`}
+- \`b\`
+  > The first branch matches, so the \`elif\` is never evaluated.`}
 />
 
 <MultipleChoice
@@ -567,14 +567,14 @@ else:
 
 *Hint: a guard is an \`if\` condition written after the pattern.*
 
-- \`case (x, y):\`
-  > This matches **any** 2-tuple and binds \`x\` and \`y\`, but it has no condition, so it also matches \`(2, 7)\`.
 - [o] \`case (x, y) if x == y:\`
   > This matches a 2-tuple and the \`if x == y\` guard runs only when the two bound values are equal.
-- \`case x and y:\`
-  > \`and\` is not valid pattern syntax; a tuple pattern is written \`case (x, y):\`.
+- \`case (x, y):\`
+  > This matches **any** 2-tuple and binds \`x\` and \`y\`, but it has no condition, so it also matches \`(2, 7)\`.
 - \`case (x, x):\`
-  > A pattern cannot bind the same name twice; Python raises a \`SyntaxError\` for repeated capture names.`}
+  > A pattern cannot bind the same name twice; Python raises a \`SyntaxError\` for repeated capture names.
+- \`case x and y:\`
+  > \`and\` is not valid pattern syntax; a tuple pattern is written \`case (x, y):\`.`}
 />
 
 <MultipleChoice
@@ -585,27 +585,27 @@ x = 5
 result = "big" if x > 10 else "small"
 \`\`\`
 
-- \`"big"\`
-  > The condition \`x > 10\` is false.
-- [o] \`"small"\`
-  > When the condition is false, the \`else\` part is used.
 - \`None\`
   > The conditional expression always evaluates to one of the two values.
+- [o] \`"small"\`
+  > When the condition is false, the \`else\` part is used.
 - A \`SyntaxError\`
-  > This is valid syntax.`}
+  > This is valid syntax.
+- \`"big"\`
+  > The condition \`x > 10\` is false.`}
 />
 
 <MultipleChoice
   markdown={`Which expression is equivalent to \`0 < x < 10\`?
 
-- \`(0 < x) < 10\`
-  > This would compare a boolean to 10, which is not the same.
 - [o] \`0 < x and x < 10\`
   > Chained comparisons are equivalent to combining with \`and\`.
+- \`x in range(1, 10)\`
+  > This would only be true for integers, not all values.
 - \`0 < (x < 10)\`
   > Parentheses do not change the chaining behavior.
-- \`x in range(1, 10)\`
-  > This would only be true for integers, not all values.`}
+- \`(0 < x) < 10\`
+  > This would compare a boolean to 10, which is not the same.`}
 />
 
 Next: looping.

@@ -613,10 +613,10 @@ assert step_names == ["scaler", "model"], f"Expected steps ['scaler', 'model'], 
 <MultipleChoice
   markdown={`In the workflow, when should you perform the train/test split?
 
-- After scaling and encoding all the features
-  > Scaling or encoding before the split uses statistics from the whole dataset, leaking the test set into training; the split must come first.
 - [o] Right after inspecting the data, before any transformation that learns from the data
   > Splitting early, before scaling, encoding, or imputing, keeps the test set free of leakage so its final score is honest.
+- After scaling and encoding all the features
+  > Scaling or encoding before the split uses statistics from the whole dataset, leaking the test set into training; the split must come first.
 - Only at the very end, just before reporting results
   > The split must happen early so the test set can be sealed throughout; splitting at the end would leave no clean data for an honest final estimate.
 - It does not matter when you split, as long as you split eventually
@@ -630,12 +630,12 @@ Splitting first is the front-line defense against data leakage.`}
 
 - Because scikit-learn requires a baseline before fitting other models
   > No such requirement exists; the baseline is a methodological choice, not a technical prerequisite.
+- Because baselines are faster to interpret than real models
+  > Interpretation speed is not the point; the baseline exists to calibrate what a given score actually means.
 - Because the baseline usually outperforms real models
   > A deliberately trivial baseline rarely wins; its purpose is comparison, not performance.
 - [o] Because a raw score is meaningless without a reference point, and the baseline reveals whether the real model adds genuine skill
   > On imbalanced data a trivial model can score high by always predicting the majority class, so the baseline converts a bare number into a real judgment of whether the model is doing useful work.
-- Because baselines are faster to interpret than real models
-  > Interpretation speed is not the point; the baseline exists to calibrate what a given score actually means.
 
 Against a 0.90 baseline, a 0.91 model is unimpressive, the baseline is what tells you so.`}
 />
@@ -643,14 +643,14 @@ Against a 0.90 baseline, a 0.91 model is unimpressive, the baseline is what tell
 <MultipleChoice
   markdown={`What is the main reason to bundle preprocessing and the estimator into a single \`Pipeline\` before cross-validating?
 
-- It makes the code shorter to type
-  > Brevity is a minor side benefit; the essential reason concerns correctness of evaluation.
 - [o] So that each cross-validation fold refits the preprocessing on its own training portion only, preventing leakage from the validation fold
   > A pipeline ensures the scaler or encoder is fitted on each fold's training rows alone, so no statistics from the held-out fold leak into the fit.
-- Because pipelines train faster than separate steps
-  > Pipelines do not inherently train faster; their value is leak-free, correct refitting during cross-validation.
 - Because only pipelines can be tuned with \`GridSearchCV\`
   > Bare estimators can also be tuned; the pipeline's key benefit is preventing preprocessing leakage across folds.
+- It makes the code shorter to type
+  > Brevity is a minor side benefit; the essential reason concerns correctness of evaluation.
+- Because pipelines train faster than separate steps
+  > Pipelines do not inherently train faster; their value is leak-free, correct refitting during cross-validation.
 
 The pipeline makes leak-free cross-validation and tuning the automatic, default behavior.`}
 />

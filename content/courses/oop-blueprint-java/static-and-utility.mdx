@@ -352,38 +352,38 @@ sum=15
 <MultipleChoice
   markdown={`A field declared \`static\` belongs to...
 
+- The package that contains the class
+  > It belongs to the class specifically.
+- The first instance created
+  > Static state is independent of any instance.
 - Each instance, with one independent copy per instance
   > That describes *non-static* (instance) fields.
 - [o] The class itself; there is one copy shared by all instances
-  > \`static\` members belong to the class, not to any individual object.
-- The first instance created
-  > Static state is independent of any instance.
-- The package that contains the class
-  > It belongs to the class specifically.`}
+  > \`static\` members belong to the class, not to any individual object.`}
 />
 
 <MultipleChoice
   markdown={`What is the convention used in Java to define a constant?
 
+- \`private\` field with a getter
+  > That makes a constant-ish *instance* value, but the canonical Java idiom is \`public static final\`.
 - \`const\` keyword in front of the field
   > Java has no \`const\` keyword.
 - \`@Constant\` annotation
   > No such annotation.
 - [o] \`public static final\` field, written in \`UPPER_SNAKE_CASE\`
-  > This is the standard idiom, class-wide, immutable, and easy to spot.
-- \`private\` field with a getter
-  > That makes a constant-ish *instance* value, but the canonical Java idiom is \`public static final\`.`}
+  > This is the standard idiom, class-wide, immutable, and easy to spot.`}
 />
 
 <MultipleChoice
   markdown={`When is a *utility class* (only \`static\` members, private constructor) a reasonable choice?
 
-- Whenever you want to avoid writing constructors
-  > Avoidance isn't a design reason.
-- [o] When the methods are genuinely stateless and don't naturally belong to any particular object
-  > Pure functions on a shared theme (like \`Math\`) fit this nicely.
 - For all classes, it makes them easier to test
   > Heavy static use *hurts* testability and reuse. It also negates most OOP benefits.
 - For any class that has more than ten methods
-  > Method count is not a criterion.`}
+  > Method count is not a criterion.
+- [o] When the methods are genuinely stateless and don't naturally belong to any particular object
+  > Pure functions on a shared theme (like \`Math\`) fit this nicely.
+- Whenever you want to avoid writing constructors
+  > Avoidance isn't a design reason.`}
 />

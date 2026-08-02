@@ -342,23 +342,23 @@ catch (ArgumentException)
 <MultipleChoice
   markdown={`What is the *main* benefit of encapsulation?
 
-- It makes the code faster
-  > It doesn't significantly affect performance.
 - It reduces the number of lines of code
   > Often it adds a few lines (properties, validation).
-- [o] It localizes the rules that govern a piece of data, so the rest of the program can't accidentally violate them
-  > Invariants are enforced in one place.
 - It makes classes immutable
-  > Encapsulation does not require immutability.`}
+  > Encapsulation does not require immutability.
+- It makes the code faster
+  > It doesn't significantly affect performance.
+- [o] It localizes the rules that govern a piece of data, so the rest of the program can't accidentally violate them
+  > Invariants are enforced in one place.`}
 />
 
 <MultipleChoice
   markdown={`Which best captures "abstraction"?
 
-- A class with no fields
-  > That's just an empty class.
 - [o] Hiding *how* something works behind a stable interface that says *what* it does
   > Abstraction is about what callers see.
+- A class with no fields
+  > That's just an empty class.
 - Making all members \`public\`
   > That's the opposite of abstraction.
 - Replacing classes with structs

@@ -150,14 +150,14 @@ reason about the same structure.
 <MultipleChoice
   markdown={`In an ER diagram, what does FK usually mark?
 
-- A column that formats text for display.
-  > Display formatting is not what ER diagram key markers describe.
 - [o] A foreign key column that points to a row in another table.
   > A foreign key is how a relationship is usually realized in the relational schema.
-- A column that must be first alphabetically.
-  > Alphabetical order has no relationship to the FK marker.
+- A column that formats text for display.
+  > Display formatting is not what ER diagram key markers describe.
 - A table that cannot have relationships.
   > Foreign keys exist specifically to connect tables.
+- A column that must be first alphabetically.
+  > Alphabetical order has no relationship to the FK marker.
 
 Key markers connect the diagram to the constraints the database will enforce.`}
 />
@@ -258,14 +258,14 @@ flowchart TB
 <MultipleChoice
   markdown={`Why do database designers often draw an ER diagram before writing CREATE TABLE statements?
 
-- Because PostgreSQL requires a diagram file before tables can be created.
-  > PostgreSQL does not require diagrams; the benefit is design clarity.
-- [o] Because the diagram makes entities, attributes, keys, and relationships easier to discuss before implementation.
-  > Drawing first helps the team find modeling mistakes while changes are still cheap.
-- Because diagrams automatically generate perfect application code.
-  > Some tools generate SQL, but the main learning value is reasoning about the model.
 - Because tables cannot be changed after creation.
   > Tables can be changed, but changes are riskier once real data depends on them.
+- [o] Because the diagram makes entities, attributes, keys, and relationships easier to discuss before implementation.
+  > Drawing first helps the team find modeling mistakes while changes are still cheap.
+- Because PostgreSQL requires a diagram file before tables can be created.
+  > PostgreSQL does not require diagrams; the benefit is design clarity.
+- Because diagrams automatically generate perfect application code.
+  > Some tools generate SQL, but the main learning value is reasoning about the model.
 
 ER diagrams are thinking tools for schema design.`}
 />
@@ -273,14 +273,14 @@ ER diagrams are thinking tools for schema design.`}
 <MultipleChoice
   markdown={`In the customers/orders diagram, why does orders contain customer_id FK?
 
-- To copy the customer's name into every order.
-  > The foreign key stores the customer's identity, not a duplicate of all customer attributes.
-- [o] To connect each order row to the customer row that placed it.
-  > The foreign key realizes the relationship shown by the line in the ER diagram.
 - To make every customer have exactly one order.
   > A foreign key on orders allows many orders to point to the same customer.
 - To sort orders by customer name automatically.
   > Sorting requires ORDER BY; foreign keys express relationships.
+- [o] To connect each order row to the customer row that placed it.
+  > The foreign key realizes the relationship shown by the line in the ER diagram.
+- To copy the customer's name into every order.
+  > The foreign key stores the customer's identity, not a duplicate of all customer attributes.
 
 A foreign key column is the schema's link from one entity to another.`}
 />
@@ -288,12 +288,12 @@ A foreign key column is the schema's link from one entity to another.`}
 <MultipleChoice
   markdown={`What does the PK marker inside an ER diagram entity usually mean?
 
+- [o] The column is part of the primary key that identifies rows of that entity.
+  > Primary key columns give each row a reliable identity.
 - The column is optional.
   > Optionality is a participation/cardinality idea, not the meaning of PK.
 - The column stores a password key.
   > In this context, PK means primary key, not password key.
-- [o] The column is part of the primary key that identifies rows of that entity.
-  > Primary key columns give each row a reliable identity.
 - The column is hidden from all queries.
   > Primary key columns are ordinary columns with identity constraints.
 

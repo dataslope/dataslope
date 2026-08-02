@@ -150,14 +150,14 @@ is how we practice it.
 <MultipleChoice
   markdown={`What is the key conceptual shift introduced by the Grammar of Graphics?
 
-- It replaced bar charts with scatter plots as the default chart.
-  > The grammar does not favor any particular chart; it changes how *all* charts are described.
 - It made charts render faster on large data sets.
   > The grammar is about *description and structure*, not rendering speed.
 - [o] It reframed a chart as a structured combination of reusable components instead of a single named chart type chosen from a menu.
   > Components plus combination rules replace a fixed catalogue of chart types.
 - It is a list of every possible chart you are allowed to make.
   > It is the opposite of a fixed list, a generative system, like grammar in language.
+- It replaced bar charts with scatter plots as the default chart.
+  > The grammar does not favor any particular chart; it changes how *all* charts are described.
 
 Like words and grammar rules generating infinite sentences, graphical
 components and combination rules generate an open-ended space of
@@ -167,14 +167,14 @@ charts.`}
 <MultipleChoice
   markdown={`In grammar-of-graphics terms, how is a pie chart related to a stacked bar chart?
 
-- They are completely unrelated chart types.
-  > In a menu of chart types they look unrelated, but the grammar reveals a deep connection.
-- A pie chart uses points while a bar chart uses bars.
-  > Both use a bar geometry; the difference lies elsewhere.
 - [o] A pie chart is a stacked bar chart drawn in a polar coordinate system instead of a Cartesian one.
   > Same data, statistic, and geometry, only the coordinate system changes.
 - A pie chart requires a special "pie" statistic that bars do not use.
   > No special statistic is needed; the change is the coordinate system.
+- A pie chart uses points while a bar chart uses bars.
+  > Both use a bar geometry; the difference lies elsewhere.
+- They are completely unrelated chart types.
+  > In a menu of chart types they look unrelated, but the grammar reveals a deep connection.
 
 Decomposing both charts into components shows they share everything
 except the coordinate system, a perfect illustration of grammar
@@ -184,14 +184,14 @@ thinking.`}
 <MultipleChoice
   markdown={`In the colored scatter example, why did a correct legend appear without you writing any legend code?
 
-- ggplot2 randomly adds legends to most plots.
-  > Legends are not random; they are tied to mappings.
 - You secretly called a legend function.
   > No legend function was called anywhere in the snippet.
-- [o] You *mapped* the \`cyl\` variable to color inside \`aes()\`, and ggplot2 derives the legend automatically from that mapping.
-  > The legend is a consequence of the aesthetic mapping, so it stays consistent by construction.
 - Legends only appear when you use \`factor()\`.
   > \`factor()\` affects how the variable is treated, but the legend comes from the *mapping*, not from \`factor()\` alone.
+- [o] You *mapped* the \`cyl\` variable to color inside \`aes()\`, and ggplot2 derives the legend automatically from that mapping.
+  > The legend is a consequence of the aesthetic mapping, so it stays consistent by construction.
+- ggplot2 randomly adds legends to most plots.
+  > Legends are not random; they are tied to mappings.
 
 Because the legend is generated from the mapping rather than drawn by
 hand, it cannot drift out of sync with the data, the central advantage

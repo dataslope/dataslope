@@ -176,12 +176,12 @@ relationships pages, now drawn formally.
 <MultipleChoice
   markdown={`In an ER diagram, what does a box represent?
 
-- A single row of data.
-  > A row is one instance; the box represents the entity (table) as a whole.
-- [o] An entity, which typically becomes a table, with its attributes listed inside.
-  > Boxes are entities/tables, and the lines inside them are the attributes (columns).
 - A relationship between two tables.
   > Relationships are shown as lines between boxes, not the boxes themselves.
+- [o] An entity, which typically becomes a table, with its attributes listed inside.
+  > Boxes are entities/tables, and the lines inside them are the attributes (columns).
+- A single row of data.
+  > A row is one instance; the box represents the entity (table) as a whole.
 - A query.
   > ER diagrams describe structure, not queries.
 
@@ -193,10 +193,10 @@ A box is an entity (table); the lines connecting boxes are the relationships.`}
 
 - One customer relates to exactly one order.
   > The \`o{\` end means "zero or many," not exactly one.
-- [o] One customer relates to zero or many orders, and each order belongs to exactly one customer.
-  > \`||\` is "exactly one" on the customer side and \`o{\` is "zero or many" on the orders side.
 - Many customers relate to many orders.
   > The customer end is \`||\` (exactly one), so this is one-to-many, not many-to-many.
+- [o] One customer relates to zero or many orders, and each order belongs to exactly one customer.
+  > \`||\` is "exactly one" on the customer side and \`o{\` is "zero or many" on the orders side.
 - Customers and orders have no relationship.
   > The line itself indicates a relationship between the two entities.
 
@@ -208,14 +208,14 @@ A box is an entity (table); the lines connecting boxes are the relationships.`}
 
 *Hint: a foreign key can express "many" on only one side, so the database needs an extra table in the middle.*
 
-- By merging the two entities into one combined box.
-  > Merging would collapse two distinct entities into one and lose their independent rows, so it is not how many-to-many is built.
-- [o] As two one-to-many relationships pointing into a junction (middle) entity.
-  > A junction entity resolves the many-to-many into two one-to-many links, which is how the schema actually implements it.
-- By drawing a single line with no key columns on either entity.
-  > A line alone cannot store the pairings; the connections need a junction table holding a foreign key to each side.
 - By removing the relationship line entirely.
   > The relationship still exists and must be represented; it is expressed through the junction entity.
+- [o] As two one-to-many relationships pointing into a junction (middle) entity.
+  > A junction entity resolves the many-to-many into two one-to-many links, which is how the schema actually implements it.
+- By merging the two entities into one combined box.
+  > Merging would collapse two distinct entities into one and lose their independent rows, so it is not how many-to-many is built.
+- By drawing a single line with no key columns on either entity.
+  > A line alone cannot store the pairings; the connections need a junction table holding a foreign key to each side.
 
 A many-to-many is realized as two one-to-many links through a junction entity holding a foreign key to each side.`}
 />

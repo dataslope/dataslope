@@ -239,12 +239,12 @@ slicing is the single most convenient thing about a `DatetimeIndex`.
 <MultipleChoice
   markdown={`With a \`DatetimeIndex\`, what does \`air.loc["1955-06":"1955-09"]\` return?
 
-- The single value at 1955-06 only
-  > A colon makes it a *range*, not a single lookup. This selects every month in the span, not one point.
 - [o] Every monthly value from June 1955 through September 1955, inclusive of September
   > Partial-string slicing on a DatetimeIndex expands each endpoint to the period it names and includes the end, so June, July, August, and September 1955 all come back.
 - June through August 1955, excluding September (like normal Python slicing)
   > Label-based datetime slicing is *inclusive* of the stop, unlike positional Python slicing. September is included.
+- The single value at 1955-06 only
+  > A colon makes it a *range*, not a single lookup. This selects every month in the span, not one point.
 - An error, because those strings are not exact timestamps in the index
   > Partial strings are exactly what datetime slicing is built for; pandas resolves "1955-09" to that whole month. No exact-match is required.
 
@@ -359,12 +359,12 @@ print(
 <MultipleChoice
   markdown={`A dataset holds **total monthly electricity consumption**. Conceptually, is each value better described as a \`Timestamp\` or a \`Period\`?
 
-- A \`Timestamp\`, because every value needs an exact moment
-  > A monthly total isn't measured *at* one instant; it accumulates across the whole month. Forcing it to a single instant ("midnight on the 1st") misrepresents what the number means.
 - [o] A \`Period\`, because the value summarizes consumption over an entire month-long span, not at one instant
   > Totals and averages over a calendar month are spans by nature, exactly what a \`Period\` represents. (In practice we often still index by a \`Timestamp\` for convenience, while remembering it stands for the whole month.)
 - Neither, monthly data can't be represented in pandas
   > pandas represents monthly data comfortably with either type; the question is which one matches the *meaning*. A span-valued total maps most naturally to a \`Period\`.
+- A \`Timestamp\`, because every value needs an exact moment
+  > A monthly total isn't measured *at* one instant; it accumulates across the whole month. Forcing it to a single instant ("midnight on the 1st") misrepresents what the number means.
 - It must be a \`Timestamp\` or resampling won't work
   > Resampling works on a \`DatetimeIndex\` regardless of this conceptual point. The distinction here is about correctly interpreting what the value represents.
 
@@ -575,14 +575,14 @@ assert total.loc[pd.Timestamp("2014-03-04")] == 8`,
 <MultipleChoice
   markdown={`Why promote a date column to the **index** instead of leaving it as a regular column?
 
-- It saves memory
-  > Memory is not the motivation, and the savings are negligible. The point is unlocking behavior, not shrinking storage.
-- [o] A \`DatetimeIndex\` unlocks partial-string slicing, \`resample\`, \`rolling\`, and automatic alignment, features that don't work on a plain column
-  > pandas attaches its time-series machinery to the index. With dates in the index you can write \`df.loc["1955"]\`, \`df.resample("ME")\`, and rely on label alignment; with dates in a column you can't.
 - It automatically removes duplicate dates
   > Setting an index does not deduplicate; you can have repeated index labels. Deduplication is a separate, explicit step.
+- It saves memory
+  > Memory is not the motivation, and the savings are negligible. The point is unlocking behavior, not shrinking storage.
 - It converts the data to a NumPy array
   > Indexing has nothing to do with converting to NumPy, and you wouldn't want that, you'd lose the very label-awareness that makes the index useful.
+- [o] A \`DatetimeIndex\` unlocks partial-string slicing, \`resample\`, \`rolling\`, and automatic alignment, features that don't work on a plain column
+  > pandas attaches its time-series machinery to the index. With dates in the index you can write \`df.loc["1955"]\`, \`df.resample("ME")\`, and rely on label alignment; with dates in a column you can't.
 
 The index is where pandas keeps its time-series powers; a date in a column is inert by comparison.`}
 />
@@ -592,12 +592,12 @@ The index is where pandas keeps its time-series powers; a date in a column is in
 
 - \`"Month"\`
   > Frequency codes are short aliases, not English words. \`"Month"\` is not a valid alias.
-- [o] \`"ME"\` (month end), modern pandas renamed \`"M"\` to \`"ME"\` and \`"Y"\`/\`"A"\` to \`"YE"\`
-  > The deprecation is purely a rename: append \`E\` for the "end" anchored aliases. \`"M"\` becomes \`"ME"\`, \`"Q"\` becomes \`"QE"\`, \`"Y"\` becomes \`"YE"\`.
-- \`"MS"\`, which is identical to the old \`"M"\`
-  > \`"MS"\` is month *start* (labels on the 1st); the old \`"M"\` was month *end* (labels on the last day). They are not identical, the direct replacement for \`"M"\` is \`"ME"\`.
 - There is no replacement; monthly frequency was removed
   > Monthly frequency is alive and well, only its spelling changed. \`"ME"\` is the current month-end alias.
+- \`"MS"\`, which is identical to the old \`"M"\`
+  > \`"MS"\` is month *start* (labels on the 1st); the old \`"M"\` was month *end* (labels on the last day). They are not identical, the direct replacement for \`"M"\` is \`"ME"\`.
+- [o] \`"ME"\` (month end), modern pandas renamed \`"M"\` to \`"ME"\` and \`"Y"\`/\`"A"\` to \`"YE"\`
+  > The deprecation is purely a rename: append \`E\` for the "end" anchored aliases. \`"M"\` becomes \`"ME"\`, \`"Q"\` becomes \`"QE"\`, \`"Y"\` becomes \`"YE"\`.
 
 The \`'M'\` -> \`'ME'\` rename (and \`'Y'\` -> \`'YE'\`, \`'Q'\` -> \`'QE'\`) is a spelling change; the behavior is unchanged.`}
 />
@@ -605,12 +605,12 @@ The \`'M'\` -> \`'ME'\` rename (and \`'Y'\` -> \`'YE'\`, \`'Q'\` -> \`'QE'\`) is
 <MultipleChoice
   markdown={`Two Series indexed by date are added with \`a + b\`. \`a\` covers Jan 1-3 and \`b\` covers Jan 2-4. What happens on Jan 1 and Jan 4 in the result?
 
-- They're dropped from the output entirely
-  > Alignment uses the *union* of indices, so both dates appear in the result, they aren't silently dropped.
-- They're added to the nearest available date
-  > pandas never guesses by proximity. It matches labels exactly and refuses to invent a partner for an unmatched date.
 - [o] Both become \`NaN\`, because each date exists in only one of the two Series and there's nothing to add it to
   > Label alignment pairs identical dates; Jan 1 (only in \`a\`) and Jan 4 (only in \`b\`) have no counterpart, so the sum is undefined and pandas marks it \`NaN\`.
+- They're added to the nearest available date
+  > pandas never guesses by proximity. It matches labels exactly and refuses to invent a partner for an unmatched date.
+- They're dropped from the output entirely
+  > Alignment uses the *union* of indices, so both dates appear in the result, they aren't silently dropped.
 - They use 0 for the missing side automatically
   > Plain \`+\` does not assume 0 for missing labels, that would be a silent guess. You'd get \`NaN\`. To treat missing as 0 you must opt in with \`a.add(b, fill_value=0)\`.
 

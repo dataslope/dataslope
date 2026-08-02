@@ -508,14 +508,14 @@ cashing in the CLT. We'll do exactly that in *Standard Error* and
 <MultipleChoice
   markdown={`What does the Central Limit Theorem actually say becomes normal?
 
-- The raw data values, once you collect enough of them
-  > The CLT never claims your raw data becomes normal. Collecting more skewed data just gives you a clearer picture of the same skewed population.
-- [o] The sampling distribution of the sample mean, as n grows, for populations with finite variance
-  > The CLT is precisely a statement about the distribution of $\\bar{x}$ across repeated samples approaching normality, not about the data, and not about other statistics in general.
 - The population distribution itself
   > The population's shape is fixed and unaffected by sampling. The CLT describes the behavior of an *estimate* (the mean), not the population.
 - The distribution of the sample's standard deviation
   > The classic CLT is about the *mean*. While other statistics have their own limiting behavior, the CLT as usually stated concerns $\\bar{x}$, not $s$.
+- The raw data values, once you collect enough of them
+  > The CLT never claims your raw data becomes normal. Collecting more skewed data just gives you a clearer picture of the same skewed population.
+- [o] The sampling distribution of the sample mean, as n grows, for populations with finite variance
+  > The CLT is precisely a statement about the distribution of $\\bar{x}$ across repeated samples approaching normality, not about the data, and not about other statistics in general.
 
 The CLT is about the *mean's* sampling distribution becoming normal, not the data, the population, or arbitrary statistics.`}
 />
@@ -523,14 +523,14 @@ The CLT is about the *mean's* sampling distribution becoming normal, not the dat
 <MultipleChoice
   markdown={`Your raw data is strongly right-skewed. A colleague runs a normality test on the **raw values**, it fails, and they conclude "the CLT doesn't apply here." What's wrong with that reasoning?
 
+- The CLT only applies if the raw data is already approximately normal
+  > That would make the CLT pointless. Its entire value is delivering a normal sampling distribution of the mean *even from* non-normal data.
+- They should transform the data with a log first, then the CLT applies
+  > A transform isn't required for the CLT to operate on the mean. The mean's sampling distribution approaches normal for the original data too, given enough $n$.
 - Nothing, a failed normality test means the CLT can't be used
   > A normality test on *raw data* is irrelevant to the CLT. The CLT is about the sampling distribution of the *mean*, which can be normal even when the raw data clearly isn't.
 - [o] The CLT is about the mean's sampling distribution, not the raw data; raw data failing a normality test is expected and doesn't block the CLT
   > Testing the raw values checks the wrong thing. The CLT predicts that $\\bar{x}$ normalizes as $n$ grows regardless of the raw data's shape, so a skewed-data result is beside the point.
-- They should transform the data with a log first, then the CLT applies
-  > A transform isn't required for the CLT to operate on the mean. The mean's sampling distribution approaches normal for the original data too, given enough $n$.
-- The CLT only applies if the raw data is already approximately normal
-  > That would make the CLT pointless. Its entire value is delivering a normal sampling distribution of the mean *even from* non-normal data.
 
 The CLT governs $\\bar{x}$, so a normality test on individual data points doesn't tell you whether it applies.`}
 />
@@ -540,12 +540,12 @@ The CLT governs $\\bar{x}$, so a normality test on individual data points doesn'
 
 - A nearly symmetric, light-tailed population
   > Symmetric, light-tailed populations normalize at very small $n$, sometimes $n \\approx 5$. This needs the *least* data, not the most.
+- A uniform (flat) population
+  > A uniform population is symmetric and light-tailed, so its mean normalizes quickly, much faster than a skewed, heavy-tailed one.
 - A mildly right-skewed population
   > Mild skew is well-served by the classic $n \\approx 30$ guideline. It converges faster than a heavy-tailed case.
 - [o] A heavily right-skewed, heavy-tailed population (e.g., log-normal incomes)
   > Heavy skew and rare extreme values make the mean's distribution converge slowly, so it can take $n$ in the hundreds before the bell shape is trustworthy.
-- A uniform (flat) population
-  > A uniform population is symmetric and light-tailed, so its mean normalizes quickly, much faster than a skewed, heavy-tailed one.
 
 The heavier the skew/tails, the more averaging (larger $n$) it takes for the CLT's bell to emerge.`}
 />
@@ -553,14 +553,14 @@ The heavier the skew/tails, the more averaging (larger $n$) it takes for the CLT
 <MultipleChoice
   markdown={`As you increase the sample size $n$ (population fixed with sd $\\sigma$), the **spread** of the sampling distribution of the mean:
 
-- Stays the same, since the population's spread doesn't change
-  > The population's spread is fixed, but the *mean's* spread is $\\sigma/\\sqrt{n}$, which falls as $n$ grows. They are different quantities.
-- Grows like $\\sqrt{n}$
-  > It shrinks, not grows. More data makes the mean *more* stable, so its sampling distribution gets narrower.
 - [o] Shrinks like $\\sigma/\\sqrt{n}$, quadrupling $n$ halves the spread
   > The CLT gives the spread of $\\bar{x}$ as $\\sigma/\\sqrt{n}$; since the spread scales with $1/\\sqrt{n}$, a 4x larger sample halves it.
 - Shrinks like $\\sigma/n$, quadrupling $n$ quarters the spread
   > The denominator is $\\sqrt{n}$, not $n$. Quadrupling $n$ divides the spread by $\\sqrt{4}=2$, halving it, not quartering it.
+- Grows like $\\sqrt{n}$
+  > It shrinks, not grows. More data makes the mean *more* stable, so its sampling distribution gets narrower.
+- Stays the same, since the population's spread doesn't change
+  > The population's spread is fixed, but the *mean's* spread is $\\sigma/\\sqrt{n}$, which falls as $n$ grows. They are different quantities.
 
 The width of the mean's bell is $\\sigma/\\sqrt{n}$: precision improves with the *square root* of sample size.`}
 />
@@ -568,14 +568,14 @@ The width of the mean's bell is $\\sigma/\\sqrt{n}$: precision improves with the
 <MultipleChoice
   markdown={`Which condition is **required** for the classic CLT to guarantee normality of the sample mean?
 
-- The population must be symmetric
-  > Symmetry is not required, the whole point of the CLT is that it works for skewed populations too, given enough $n$.
-- The sample size must be exactly 30
-  > 30 is a loose rule of thumb, not a requirement. The needed $n$ depends on the population's shape; there's no exact magic number.
 - [o] The population must have a finite variance
   > Finite variance is the key condition; with it, the mean's sampling distribution converges to normal. Without it (e.g., Cauchy, certain fat tails), the CLT can fail.
+- The sample size must be exactly 30
+  > 30 is a loose rule of thumb, not a requirement. The needed $n$ depends on the population's shape; there's no exact magic number.
 - The data must be measured without error
   > Measurement error relates to bias and noise, not to the mathematical condition for the CLT. The requirement is finite variance, not perfect measurement.
+- The population must be symmetric
+  > Symmetry is not required, the whole point of the CLT is that it works for skewed populations too, given enough $n$.
 
 The CLT's core requirement is a finite population variance; shape and an exact $n$ are not requirements.`}
 />
@@ -583,14 +583,14 @@ The CLT's core requirement is a finite population variance; shape and an exact $
 <MultipleChoice
   markdown={`A risk analyst models loss sizes with a fat-tailed distribution that has **infinite variance**. They average 10,000 losses and assume the mean is normally distributed via the CLT. What's the risk?
 
-- No risk, 10,000 is plenty for the CLT
-  > Sample size can't rescue a distribution that violates the CLT's assumptions. With infinite variance the usual CLT simply doesn't apply, regardless of $n$.
 - [o] The classic CLT requires finite variance; with infinite variance the sample mean need not become normal (or even stabilize), so the normal approximation can be badly wrong
   > Infinite variance breaks the CLT's core condition, so the mean can keep lurching as data is added and the normal-based risk numbers can be severely misleading.
 - The mean will be normal but the median won't be
   > Normality of the mean is exactly what's *not* guaranteed here. Ironically, robust summaries like the median are often the *safer* choice for such heavy tails.
 - The only issue is that 10,000 is too small; 100,000 would fix it
   > More data doesn't fix a violated assumption. If the variance is infinite, even enormous $n$ won't make the sample mean normal.
+- No risk, 10,000 is plenty for the CLT
+  > Sample size can't rescue a distribution that violates the CLT's assumptions. With infinite variance the usual CLT simply doesn't apply, regardless of $n$.
 
 The CLT's finite-variance condition is not optional, fat tails with infinite variance can defeat it at any sample size.`}
 />

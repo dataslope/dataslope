@@ -133,14 +133,14 @@ flowchart TD
 <MultipleChoice
   markdown={`Which schema change is usually safest to introduce first?
 
+- Replacing a many-to-many table with a comma-separated text column.
+  > That change loses relational structure and makes rules harder to enforce.
+- [o] Adding a nullable column for a new optional fact.
+  > Additive changes usually let old data and old code keep working.
 - Dropping a table that application code still reads.
   > Removing a depended-on table is destructive and risky.
 - Renaming every primary key at once.
   > Broad changes to identifiers can break many references.
-- [o] Adding a nullable column for a new optional fact.
-  > Additive changes usually let old data and old code keep working.
-- Replacing a many-to-many table with a comma-separated text column.
-  > That change loses relational structure and makes rules harder to enforce.
 
 Additive changes are usually easier to roll out than destructive ones.`}
 />
@@ -247,14 +247,14 @@ a project.
 <MultipleChoice
   markdown={`Why do schemas change even when the original design was good?
 
+- Tables can store only a few rows.
+  > Row count is not the reason requirements evolve.
 - Good designs never need to change.
   > Real products learn new requirements over time.
 - [o] The schema models requirements, and requirements evolve.
   > When the product needs new facts or rules, the schema may need to represent them.
 - PostgreSQL randomly changes table definitions.
   > Schema changes are made deliberately by people or tools.
-- Tables can store only a few rows.
-  > Row count is not the reason requirements evolve.
 
 A schema is a model of a changing product domain.`}
 />
@@ -262,14 +262,14 @@ A schema is a model of a changing product domain.`}
 <MultipleChoice
   markdown={`What makes destructive changes risky?
 
+- They automatically create better normalization.
+  > Destruction does not guarantee a better model.
+- They only affect diagrams, not data.
+  > Destructive changes can remove data or columns.
 - They are always impossible in PostgreSQL.
   > PostgreSQL can perform destructive changes, but they may break dependencies.
 - [o] Existing data, code, and reports may depend on the old shape.
   > Removing or renaming schema objects can break anything that uses them.
-- They only affect diagrams, not data.
-  > Destructive changes can remove data or columns.
-- They automatically create better normalization.
-  > Destruction does not guarantee a better model.
 
 Risk comes from dependencies around the schema.`}
 />
@@ -277,12 +277,12 @@ Risk comes from dependencies around the schema.`}
 <MultipleChoice
   markdown={`When might a new table be better than adding more columns to an old table?
 
-- [o] When the new concept has its own identity, rules, and relationships.
-  > This is the kind of concept that often deserves its own entity table.
-- When the old table has a primary key.
-  > Having a primary key does not prevent adding related tables.
 - When SQL queries use \`SELECT\`.
   > Query syntax does not decide entity boundaries.
+- When the old table has a primary key.
+  > Having a primary key does not prevent adding related tables.
+- [o] When the new concept has its own identity, rules, and relationships.
+  > This is the kind of concept that often deserves its own entity table.
 - When every row has exactly the same value.
   > Repeated identical values may signal a design problem, but identity and rules matter most.
 

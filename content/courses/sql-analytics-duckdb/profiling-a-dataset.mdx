@@ -180,12 +180,12 @@ Or just run `SUMMARIZE` and read the lot at a glance.
 
 - The \`id\` column has 20 NULL values.
   > \`COUNT(DISTINCT id)\` already ignores NULLs; the gap here points to repeated id *values*, i.e. duplicates.
+- The table is sorted incorrectly.
+  > Sort order has no effect on these counts; the gap is about duplicate values.
 - [o] There are duplicate \`id\` values, 1000 rows but only 980 unique ids.
   > When distinct ids are fewer than total rows, some ids repeat, which usually signals duplicate rows worth investigating.
 - The query is invalid.
   > Both counts are valid; their difference is meaningful information.
-- The table is sorted incorrectly.
-  > Sort order has no effect on these counts; the gap is about duplicate values.
 
 Total rows exceeding distinct ids is the classic signature of duplicates.`}
 />
@@ -195,12 +195,12 @@ Total rows exceeding distinct ids is the classic signature of duplicates.`}
 
 - \`COUNT(email)\` gives the number of missing values directly.
   > \`COUNT(email)\` counts the *present* (non-NULL) values, not the missing ones.
-- [o] \`COUNT(*) - COUNT(email)\`, because \`COUNT(*)\` counts all rows and \`COUNT(email)\` skips NULLs.
-  > The difference between total rows and non-NULL emails is exactly the count of missing emails.
-- \`SUM(email)\`, which adds up the NULLs.
-  > You cannot \`SUM\` a text column, and NULLs are not summed; this does not count missing values.
 - It is impossible to count NULLs in SQL.
   > NULLs are easy to count via the \`COUNT(*) - COUNT(col)\` difference (or other null checks).
+- \`SUM(email)\`, which adds up the NULLs.
+  > You cannot \`SUM\` a text column, and NULLs are not summed; this does not count missing values.
+- [o] \`COUNT(*) - COUNT(email)\`, because \`COUNT(*)\` counts all rows and \`COUNT(email)\` skips NULLs.
+  > The difference between total rows and non-NULL emails is exactly the count of missing emails.
 
 \`COUNT(*)\` counts every row; \`COUNT(col)\` counts non-NULLs; their
 difference is the number of missing values.`}
@@ -211,12 +211,12 @@ difference is the number of missing values.`}
 
 - It deletes summary rows from a table.
   > \`SUMMARIZE\` produces a report; it changes nothing in the table.
-- [o] It returns a per-column profile, count, distinct values, null percentage, min, max, average, and quantiles, for a table or query.
-  > \`SUMMARIZE\` runs the whole profiling checklist at once, which is why analysts reach for it first on new data.
-- It permanently sorts the table by every column.
-  > It neither sorts nor modifies the table; it only reports statistics.
 - It is an alias for \`GROUP BY\`.
   > \`SUMMARIZE\` describes columns; \`GROUP BY\` groups rows for aggregation. They are unrelated.
+- It permanently sorts the table by every column.
+  > It neither sorts nor modifies the table; it only reports statistics.
+- [o] It returns a per-column profile, count, distinct values, null percentage, min, max, average, and quantiles, for a table or query.
+  > \`SUMMARIZE\` runs the whole profiling checklist at once, which is why analysts reach for it first on new data.
 
 \`SUMMARIZE\` is a one-keyword profile of every column in a dataset.`}
 />

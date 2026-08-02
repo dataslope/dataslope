@@ -404,14 +404,14 @@ for (int i = 0; i < 10; i += 2) {
 }
 \`\`\`
 
-- 10
-  > \`10\` would be the count if \`i\` increased by \`1\` each time. Here it increases by \`2\`, so there are half as many iterations.
 - [o] 5
   > \`i\` takes the values 0, 2, 4, 6, 8, five iterations. At \`i == 10\`, the condition is false and the loop exits.
 - 6
   > \`i == 10\` does *not* run the body, because the condition is \`i < 10\` (not \`i <= 10\`). The values are 0, 2, 4, 6, 8, five, not six.
 - Infinite, the loop never stops.
   > \`i\` keeps growing by \`2\` and eventually reaches \`10\`, where \`i < 10\` becomes false and the loop ends.
+- 10
+  > \`10\` would be the count if \`i\` increased by \`1\` each time. Here it increases by \`2\`, so there are half as many iterations.
 
 To count iterations of a \`for\` loop, list the values of the loop counter that satisfy the condition. Each one corresponds to one execution of the body.`}
 />
@@ -421,12 +421,12 @@ To count iterations of a \`for\` loop, list the values of the loop counter that 
 
 - [o] \`break\` exits the loop entirely; \`continue\` skips to the next iteration's condition check.
   > \`break\` jumps past the closing \`}\` of the loop; \`continue\` jumps back up to the loop's condition / increment.
-- \`break\` skips the next iteration; \`continue\` exits the loop.
-  > This is the two keywords swapped: \`continue\` is the one that skips ahead, and \`break\` is the one that exits.
-- They behave identically.
-  > They do different things: \`break\` leaves the loop, while \`continue\` stays in it and proceeds to the next iteration.
 - \`break\` works only in \`switch\`; \`continue\` works only in loops.
   > \`break\` works in *both* \`switch\` and loops; \`continue\` works in loops only.
+- They behave identically.
+  > They do different things: \`break\` leaves the loop, while \`continue\` stays in it and proceeds to the next iteration.
+- \`break\` skips the next iteration; \`continue\` exits the loop.
+  > This is the two keywords swapped: \`continue\` is the one that skips ahead, and \`break\` is the one that exits.
 
 A handy way to remember: \`break\` ends the conversation; \`continue\` says "next, please".`}
 />

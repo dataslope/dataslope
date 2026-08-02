@@ -139,12 +139,12 @@ something we can point Seaborn at.
 <MultipleChoice
   markdown={`In the melted \`long\` table above, what kind of thing is **city**?
 
-- A column header, exactly as it was before.
-  > In the wide table the cities *were* column headers. The whole point of melting was to stop that being true.
 - [o] A variable stored in its own column, with one value per row.
   > Melting moved the city names out of the headers and into a real \`city\` column, now each row records which city its \`temp\` belongs to.
 - An index that pandas hides from Seaborn.
   > \`melt\` does not move data into the index; it creates ordinary columns that Seaborn can map directly.
+- A column header, exactly as it was before.
+  > In the wide table the cities *were* column headers. The whole point of melting was to stop that being true.
 
 Tidying turns information that lived in *structure* (column names) into
 information that lives in *data* (cell values), which is the only kind
@@ -333,10 +333,10 @@ not a new keyword argument.
   > Tidiness is about *shape*, not completeness. A tidy table can still have NaNs.
 - A dataset stored as a wide matrix so it is easy for people to read.
   > That describes *wide* format. Tidy data favors a long layout that is easy to *plot*, even if it's less compact to read.
-- [o] A dataset where each variable is a column, each observation is a row, and each value is a single cell.
-  > These three rules are the definition of tidy data, and they are exactly the structure Seaborn's column-mapping interface expects.
 - A dataset that has been sorted alphabetically.
   > Sorting changes row order, not the variable/observation/value structure that defines tidiness.
+- [o] A dataset where each variable is a column, each observation is a row, and each value is a single cell.
+  > These three rules are the definition of tidy data, and they are exactly the structure Seaborn's column-mapping interface expects.
 
 Tidy data is defined by structure: one variable per column, one observation
 per row, one value per cell.`}
@@ -347,14 +347,14 @@ per row, one value per cell.`}
 \`month\`, \`North\`, \`South\`, \`East\`, \`West\`. You want a single line chart
 with one colored line per region. What should you do first?
 
-- Pass \`hue=["North", "South", "East", "West"]\` to \`relplot\`.
-  > \`hue\` takes a single column name, not a list of columns. The regions need to live in *one* column first.
 - [o] \`melt\` the four region columns into a \`region\` column and a \`sales\` column, then map \`hue="region"\`.
   > Melting moves the region names out of the headers into a real \`region\` column, which is exactly what \`hue\` needs.
 - Plot each region with four separate \`relplot\` calls.
   > That technically works but throws away everything Seaborn offers, one tidy call gives you all four lines, a shared scale, and a legend automatically.
 - Sort the DataFrame by \`month\` and call \`relplot\` on the wide table.
   > Sorting doesn't change the shape; \`relplot\` still has no single column to color by.
+- Pass \`hue=["North", "South", "East", "West"]\` to \`relplot\`.
+  > \`hue\` takes a single column name, not a list of columns. The regions need to live in *one* column first.
 
 Whenever group identity is spread across column *headers*, melting it into a
 column is the unlock for \`hue\`, \`col\`, and friends.`}
@@ -364,14 +364,14 @@ column is the unlock for \`hue\`, \`col\`, and friends.`}
   markdown={`Which of these is a legitimate reason to use a **wide** (matrix) layout
 instead of tidy/long?
 
-- You want to color a scatter plot by a categorical group.
-  > Coloring by a group needs that group in a single column, a tidy/long job.
-- You want one panel per category with \`col=\`.
-  > Faceting with \`col\` also reads a single column, so it wants tidy/long data.
 - [o] You are drawing a **heatmap**, where rows and columns are both axes and each cell is a value.
   > A heatmap is inherently a matrix view, so a wide row-by-column table (often made with \`pivot\`) is the natural input.
 - You want Seaborn to compute group means automatically.
   > Automatic grouping and aggregation operate over tidy columns, not wide matrices.
+- You want to color a scatter plot by a categorical group.
+  > Coloring by a group needs that group in a single column, a tidy/long job.
+- You want one panel per category with \`col=\`.
+  > Faceting with \`col\` also reads a single column, so it wants tidy/long data.
 
 Heatmaps and similar grid views are the main place wide/matrix data is the
 right choice; almost everything else wants tidy/long.`}
@@ -383,12 +383,12 @@ what does \`id_vars\` control?
 
 - The columns that get stacked into the new long columns.
   > That's the opposite, the columns *not* listed in \`id_vars\` are the ones that get stacked.
-- [o] The identifier column(s) to keep as-is, repeated alongside each stacked value.
-  > \`id_vars\` names the columns to preserve; every other column is melted into the \`metric\`/\`amount\` pair, with the id values repeated per row.
 - The new name for the column of values.
   > That is what \`value_name\` does (\`"amount"\` here).
 - The number of rows in the output.
   > Row count is a consequence of how many columns get stacked, not something \`id_vars\` sets directly.
+- [o] The identifier column(s) to keep as-is, repeated alongside each stacked value.
+  > \`id_vars\` names the columns to preserve; every other column is melted into the \`metric\`/\`amount\` pair, with the id values repeated per row.
 
 \`id_vars\` are the "keep these" columns; everything else is unpivoted into a
 name column (\`var_name\`) and a value column (\`value_name\`).`}

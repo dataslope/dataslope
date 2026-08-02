@@ -378,38 +378,38 @@ int main() {
 <MultipleChoice
   markdown={`What extra link does a doubly linked list node store compared with a singly linked list node?
 
-- A pointer to the head of the whole program
-  > Nodes do not point to the whole program.
-- [o] A pointer to the previous node
-  > The previous pointer enables backward traversal.
 - A copy of every earlier value
   > That would be wasteful and is not how lists work.
 - A random-access index table
-  > Standard doubly linked lists do not have index tables.`}
+  > Standard doubly linked lists do not have index tables.
+- [o] A pointer to the previous node
+  > The previous pointer enables backward traversal.
+- A pointer to the head of the whole program
+  > Nodes do not point to the whole program.`}
 />
 
 <MultipleChoice
   markdown={`Which statement about \`std::list\` is true?
 
-- [o] It has stable iterators for elements not erased, but it does not support random access.
-  > You can insert without invalidating other iterators, but you cannot use \`list[i]\`.
 - It is always faster than \`std::vector\` for iteration.
   > Usually the opposite is true because of cache locality.
 - It stores all values contiguously.
   > That describes vector-like storage, not a linked list.
 - It can only store integers.
-  > It is templated and can store many types.`}
+  > It is templated and can store many types.
+- [o] It has stable iterators for elements not erased, but it does not support random access.
+  > You can insert without invalidating other iterators, but you cannot use \`list[i]\`.`}
 />
 
 <MultipleChoice
   markdown={`When is \`std::list\` most defensible?
 
-- When you need millions of random index lookups
-  > Use a vector-like structure for random access.
-- When you want the best cache locality for scanning
-  > Vector is usually better for scanning.
 - [o] When you rely on splice operations or stable iterators.
   > These are the list's distinctive strengths.
 - When values must be sorted automatically
-  > A list does not automatically keep itself sorted.`}
+  > A list does not automatically keep itself sorted.
+- When you need millions of random index lookups
+  > Use a vector-like structure for random access.
+- When you want the best cache locality for scanning
+  > Vector is usually better for scanning.`}
 />

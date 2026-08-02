@@ -242,14 +242,14 @@ check is whether the data is sorted by x.
 <MultipleChoice
   markdown={`When is a **line chart** the right choice?
 
-- For comparing values across a handful of unrelated categories.
-  > Comparing values across unrelated categories is the job of a bar chart; a line between unrelated categories implies a connection or trend that does not exist.
-- For showing the distribution of one variable.
-  > Distributions are best shown with histograms or box plots; a line chart requires an ordered x-axis, not a distribution of values.
 - [o] For showing how a value changes over an ordered axis, most commonly time.
   > Lines visually encode *connection* between successive points, which only makes sense when the x-axis has a meaningful order. Time series is the most common case.
 - For showing a part-of-a-whole breakdown.
   > Part-of-a-whole breakdowns are shown with bar charts (stacked or grouped) or pie charts; a line chart's strength is tracking change along an ordered axis, not decomposing a total into parts.
+- For comparing values across a handful of unrelated categories.
+  > Comparing values across unrelated categories is the job of a bar chart; a line between unrelated categories implies a connection or trend that does not exist.
+- For showing the distribution of one variable.
+  > Distributions are best shown with histograms or box plots; a line chart requires an ordered x-axis, not a distribution of values.
 
 For unrelated categories use a bar chart; for distributions use a histogram or box plot.`}
 />
@@ -274,12 +274,12 @@ A common test: if reordering the x-axis would make the chart "say something diff
 
 - Filter to the top 5 most relevant countries.
   > Filtering is a legitimate fix, reducing 30 lines to 5 removes most of the overlap and makes individual trends readable.
-- Facet into one mini-chart per country.
-  > Faceting is another valid approach, 30 small charts with shared axes lets each country's trend read clearly without overlap.
-- Highlight 3 countries in color and gray out the rest.
-  > Selective highlighting works well when the reader's question is specifically about those 3 countries; the gray lines provide context without cluttering.
 - [o] Increase the line thickness for all 30 countries.
   > This is the odd one out. Thicker lines just make the tangle *more visible*. The other three fixes (filtering, faceting, selective highlighting) all *reduce the cognitive load* the chart asks of the reader. Spaghetti is a structural problem; styling cannot rescue it.
+- Highlight 3 countries in color and gray out the rest.
+  > Selective highlighting works well when the reader's question is specifically about those 3 countries; the gray lines provide context without cluttering.
+- Facet into one mini-chart per country.
+  > Faceting is another valid approach, 30 small charts with shared axes lets each country's trend read clearly without overlap.
 
 A good rule: ~7 lines is the practical max for a single chart. Past that, you need a different structure.`}
 />
@@ -289,10 +289,10 @@ A good rule: ~7 lines is the practical max for a single chart. Past that, you ne
 
 - When values are all between 0 and 1.
   > Values between 0 and 1 fit comfortably on a linear axis; a log scale of values in that range would actually compress them in a way that's harder to read, not easier.
-- When the chart only has one line.
-  > The number of lines in a chart has nothing to do with whether a log scale is appropriate; the relevant factor is the range of values and the kind of comparison being made.
 - [o] When values span many orders of magnitude (e.g., 100 vs 1,000,000) and you want to compare *rates of growth* across series.
   > A log scale converts multiplicative differences into additive distances, so a 10× change looks the same as another 10× change anywhere on the axis. This is invaluable for comparing relative growth rates of values that differ wildly in absolute size. Always label the axis as "log" so readers don't misread it.
+- When the chart only has one line.
+  > The number of lines in a chart has nothing to do with whether a log scale is appropriate; the relevant factor is the range of values and the kind of comparison being made.
 - When the data has fewer than 10 points.
   > The number of data points does not determine whether a log scale is appropriate; the relevant factors are the range of values and whether the comparison of interest is about absolute or relative differences.
 

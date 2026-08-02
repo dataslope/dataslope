@@ -444,33 +444,33 @@ int main() {
 
 <MultipleChoice markdown={`What is the classic backtracking pattern?
 
-- Sort -> scan -> stop.
-  > Greedy style.
-- [o] Choose -> explore -> un-choose.
-  > Make a choice, recurse on it, then undo it on the way back up, the backbone of backtracking.
 - Hash -> lookup -> return.
   > Not the core pattern.
+- [o] Choose -> explore -> un-choose.
+  > Make a choice, recurse on it, then undo it on the way back up, the backbone of backtracking.
 - Push all nodes into a queue.
-  > BFS style.`} />
+  > BFS style.
+- Sort -> scan -> stop.
+  > Greedy style.`} />
 
 <MultipleChoice markdown={`What is pruning?
 
-- [o] Rejecting a partial solution before exploring all descendants.
-  > Cutting off a branch that cannot lead to a valid answer skips exploring its whole subtree.
-- Printing every solution twice.
-  > No.
 - Removing all recursion.
   > No.
 - Sorting output only.
-  > Not pruning.`} />
+  > Not pruning.
+- Printing every solution twice.
+  > No.
+- [o] Rejecting a partial solution before exploring all descendants.
+  > Cutting off a branch that cannot lead to a valid answer skips exploring its whole subtree.`} />
 
 <MultipleChoice markdown={`Why unmark a grid cell in word search?
 
+- To avoid including headers.
+  > No.
 - [o] Other paths may need to use it later.
   > Un-marking restores the cell so a different path through the grid can reuse it.
-- To sort the board.
-  > No.
 - To make DFS iterative.
   > No.
-- To avoid including headers.
+- To sort the board.
   > No.`} />

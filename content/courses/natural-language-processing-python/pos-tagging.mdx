@@ -311,14 +311,14 @@ and punctuation as clues, another reason to tag relatively early.
   markdown={`Why can't part-of-speech tagging be done with a simple dictionary that maps
 each word to one fixed tag?
 
-- Dictionaries are too slow to look words up in
-  > Python dictionary lookups are constant-time and fast; the problem is not performance but accuracy, a fixed mapping cannot handle words whose category depends on context.
-- [o] A word's part of speech depends on context, "fish" is a noun in "I caught a fish" but a verb in "we fish on weekends", so the same word needs different tags in different sentences
-  > Many words are category-ambiguous. The correct tag depends on the surrounding words, which is why taggers read context (and why NLTK's tagger is a trained model, not a lookup table).
 - Every word in English has exactly one possible part of speech
   > Many English words are category-ambiguous, "book", "fish", "run", and "light" can each be a noun or a verb, which is precisely why a fixed dictionary cannot assign the right tag.
 - Tagging only works on numbers
   > POS tagging operates on text tokens, not numbers; its entire purpose is to analyze the grammatical role of words in a sentence.
+- [o] A word's part of speech depends on context, "fish" is a noun in "I caught a fish" but a verb in "we fish on weekends", so the same word needs different tags in different sentences
+  > Many words are category-ambiguous. The correct tag depends on the surrounding words, which is why taggers read context (and why NLTK's tagger is a trained model, not a lookup table).
+- Dictionaries are too slow to look words up in
+  > Python dictionary lookups are constant-time and fast; the problem is not performance but accuracy, a fixed mapping cannot handle words whose category depends on context.
 
 Context-dependence is the whole reason POS tagging is a prediction problem, not a lookup.`}
 />
@@ -433,12 +433,12 @@ for w in ["the", "chased", "hungry", "small", "a"]:
 <MultipleChoice
   markdown={`What does \`pos_tag\` return when given a list of tokens?
 
-- A single string naming the sentence's overall grammar
-  > \`pos_tag\` does not produce a description of the whole sentence's grammar; it returns a list of per-token \`(word, tag)\` tuples covering every token individually.
 - [o] A list of \`(word, tag)\` tuples, one per token, where the tag is the word's part of speech in context
   > \`pos_tag\` pairs each token with a Penn Treebank tag, producing tuples like \`("book", "NN")\`. You typically iterate over these pairs to filter by category or feed POS into lemmatization.
 - A list of only the nouns
   > \`pos_tag\` tags every token in the input, regardless of category; filtering to only nouns is a separate step you apply after receiving the full list of tuples.
+- A single string naming the sentence's overall grammar
+  > \`pos_tag\` does not produce a description of the whole sentence's grammar; it returns a list of per-token \`(word, tag)\` tuples covering every token individually.
 - The lemmatized form of each word
   > Lemmatization is a distinct operation performed by \`WordNetLemmatizer\`; \`pos_tag\` assigns grammatical category labels and does not alter the word forms.
 
@@ -449,12 +449,12 @@ It tags every token with its grammatical category, as (word, tag) pairs.`}
   markdown={`In the Penn Treebank tagset, which tags would the filter \`tag.startswith("NN")\`
 match?
 
-- Only \`NN\` (singular common nouns)
-  > \`startswith("NN")\` matches any tag that begins with the two characters "NN", which includes \`NNS\`, \`NNP\`, and \`NNPS\` as well, not just \`NN\` alone.
 - [o] \`NN\`, \`NNS\`, \`NNP\`, and \`NNPS\`, singular and plural common nouns *and* proper nouns
   > All noun tags begin with "NN": \`NN\`/\`NNS\` for common nouns and \`NNP\`/\`NNPS\` for proper nouns. The prefix test is a handy way to grab "all nouns" at once.
 - All verbs
   > Verb tags in the Penn Treebank set begin with "VB" (e.g., \`VBD\`, \`VBG\`), not "NN"; \`tag.startswith("NN")\` would not match any verb.
+- Only \`NN\` (singular common nouns)
+  > \`startswith("NN")\` matches any tag that begins with the two characters "NN", which includes \`NNS\`, \`NNP\`, and \`NNPS\` as well, not just \`NN\` alone.
 - Determiners and prepositions
   > Determiners use the tag \`DT\` and prepositions use \`IN\`; neither begins with "NN", so this filter would not select them.
 
@@ -467,12 +467,12 @@ alone?
 
 - Tagging makes the text shorter
   > POS tagging adds labels to tokens but does not remove or shorten them; reducing text length is not its function.
+- Tagging removes stopwords automatically
+  > POS tagging only assigns grammatical labels; it does not filter or remove any tokens from the list.
 - [o] The tag tells the lemmatizer each word's part of speech, so verbs lemmatize as verbs ("running" → "run") instead of being left unchanged under the default noun assumption
   > \`WordNetLemmatizer\` needs the POS to do its job; without it, verbs and adjectives often pass through unchanged. POS tagging supplies that information, enabling the accurate tag-then-lemmatize pipeline.
 - Lemmatizing first would delete all the verbs
   > Lemmatizing without a POS hint defaults to treating every word as a noun, leaving verbs unchanged rather than deleting them; no words are deleted.
-- Tagging removes stopwords automatically
-  > POS tagging only assigns grammatical labels; it does not filter or remove any tokens from the list.
 
 POS tags give the lemmatizer the context it needs to reduce non-nouns correctly.`}
 />
@@ -484,10 +484,10 @@ the most likely reason?
 
 - The tagger only works in the morning
   > The tagger's accuracy is not time-dependent; it is a statistical model that produces the same output regardless of when it is run.
-- [o] The tagger uses capitalization and punctuation as contextual clues; stripping them away beforehand removes signal the model relies on, lowering accuracy
-  > Aggressive normalization before tagging deletes cues (capital letters for proper nouns, sentence punctuation) that the tagger uses. Tag earlier, on text that still has its case and punctuation, then normalize.
 - POS tagging cannot be applied to product titles at all
   > The tagger can be applied to any English text, including product titles; the issue is reduced accuracy on pre-processed, lowercased, punctuation-stripped text, not an inability to run.
+- [o] The tagger uses capitalization and punctuation as contextual clues; stripping them away beforehand removes signal the model relies on, lowering accuracy
+  > Aggressive normalization before tagging deletes cues (capital letters for proper nouns, sentence punctuation) that the tagger uses. Tag earlier, on text that still has its case and punctuation, then normalize.
 - The titles need to be translated first
   > Translation is unrelated; the tagger works on English text directly, and the observed accuracy drop comes from stripping cues the model uses, not from the language.
 

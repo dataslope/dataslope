@@ -364,12 +364,12 @@ assert stable_err < naive_err, "stable should be at least as accurate as naive"`
 <MultipleChoice
   markdown={`What does the bit pattern $s=0$, $e=1023$, $m=0$ represent in IEEE 754 double precision?
 
+- $1023.0$
+  > The biased exponent field stores the integer 1023, but the IEEE 754 formula subtracts the bias of 1023 to get the unbiased exponent 0; the number represented is $1.0$, not $1023.0$.
 - $0.0$
   > $0.0$ has a special all-zero exponent field (biased exponent 0), not 1023; the given pattern has exponent 1023, which decodes to an unbiased exponent of 0 and value $1.0$.
 - [o] $1.0$
   > With sign 0, biased exponent 1023 (unbiased 0), and mantissa 0, the value is $(-1)^0 \\cdot (1 + 0) \\cdot 2^0 = 1$.
-- $1023.0$
-  > The biased exponent field stores the integer 1023, but the IEEE 754 formula subtracts the bias of 1023 to get the unbiased exponent 0; the number represented is $1.0$, not $1023.0$.
 - $-0.0$
   > A sign bit of $s=0$ indicates a positive value; $-0.0$ requires $s=1$.
 
@@ -379,14 +379,14 @@ The bias of 1023 means an "unbiased" exponent of 0, so the value is just $1 + m$
 <MultipleChoice
   markdown={`Why do experienced numerical programmers usually avoid \`a == b\` for floating-point comparison?
 
-- The \`==\` operator is slow
-  > The \`==\` operator on floats is implemented as a single CPU instruction and is not meaningfully slower than integer equality; the issue is correctness, not speed.
 - [o] Arithmetic that should produce equal values often differs by a few ULPs (units in the last place), so two values that are "morally" equal compare false
   > Operations are rounded, and algebraically equivalent expressions can land on *adjacent* floats. Tolerant comparisons (\`math.isclose\`, \`np.isclose\`) are almost always what you want.
-- \`==\` raises an exception on \`nan\`
-  > \`==\` does not raise an exception on \`nan\`; instead it silently returns \`False\` because NaN is defined to be not equal to anything, including itself.
+- The \`==\` operator is slow
+  > The \`==\` operator on floats is implemented as a single CPU instruction and is not meaningfully slower than integer equality; the issue is correctness, not speed.
 - Python compares floats by string representation
   > Python compares floats by their binary value, not by converting them to strings; the unreliability of \`==\` is a floating-point precision issue, not a string-conversion issue.
+- \`==\` raises an exception on \`nan\`
+  > \`==\` does not raise an exception on \`nan\`; instead it silently returns \`False\` because NaN is defined to be not equal to anything, including itself.
 
 Using a tolerance is part of writing robust numerical code.`}
 />

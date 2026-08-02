@@ -240,25 +240,25 @@ clearer place emerges.
 <MultipleChoice
   markdown={`What is a *namespace* in C#?
 
-- A folder on disk
-  > Folders and namespaces often mirror each other but they're different concepts.
-- [o] A logical label that groups types so they can be referenced without name collisions and organized by topic
-  > Namespaces partition type names, so two libraries can each define a \`Timer\` without clashing.
 - A separate executable
   > That would be a project.
+- A folder on disk
+  > Folders and namespaces often mirror each other but they're different concepts.
 - A reserved keyword for the main entry point
-  > It is a keyword, but its job is grouping types.`}
+  > It is a keyword, but its job is grouping types.
+- [o] A logical label that groups types so they can be referenced without name collisions and organized by topic
+  > Namespaces partition type names, so two libraries can each define a \`Timer\` without clashing.`}
 />
 
 <MultipleChoice
   markdown={`Why does it matter that "inner" layers (like the domain) don't depend on "outer" layers (like the UI)?
 
-- The compiler refuses to build the other way
-  > It will happily build either way.
 - The convention is purely aesthetic
   > The benefit is very concrete.
-- [o] Keeping dependencies pointing inward means the core business logic can be tested and reused without dragging the UI or database along
-  > This is the heart of "clean" architecture.
+- The compiler refuses to build the other way
+  > It will happily build either way.
 - It makes the program start faster
-  > Startup isn't really affected.`}
+  > Startup isn't really affected.
+- [o] Keeping dependencies pointing inward means the core business logic can be tested and reused without dragging the UI or database along
+  > This is the heart of "clean" architecture.`}
 />

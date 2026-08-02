@@ -562,10 +562,10 @@ understanding the causal structure.
 
 - There is a 3% probability that the null hypothesis is true.
   > A p-value is **not** the probability the null is true. It's computed *assuming* the null holds.
-- [o] If the null were true, there's a 3% chance of data this extreme (or more), so at α = 0.05 you reject the null.
-  > That's the definition; since 0.03 < 0.05, you reject.
 - There is a 97% probability the effect is real and important.
   > Significance isn't the probability the effect is real, and says nothing about effect size.
+- [o] If the null were true, there's a 3% chance of data this extreme (or more), so at α = 0.05 you reject the null.
+  > That's the definition; since 0.03 < 0.05, you reject.
 - The result is guaranteed not to be a fluke.
   > A small p reduces but never eliminates the chance of a false positive (the Type I error rate).`}
 />
@@ -573,12 +573,12 @@ understanding the causal structure.
 <MultipleChoice
   markdown={`Your A/B test concludes the new button "works" and you ship it, but in reality it has **no** effect. What kind of error is this?
 
-- [o] A Type I error (false positive), rejecting a true null hypothesis.
-  > Declaring an effect that isn't real is a false positive; its rate is controlled by α.
-- A Type II error (false negative), failing to detect a real effect.
-  > That's the opposite: missing an effect that *is* real.
 - Selection bias.
   > Selection bias is about how the sample was drawn, not which hypothesis-test error occurred.
+- A Type II error (false negative), failing to detect a real effect.
+  > That's the opposite: missing an effect that *is* real.
+- [o] A Type I error (false positive), rejecting a true null hypothesis.
+  > Declaring an effect that isn't real is a false positive; its rate is controlled by α.
 - No error, shipping is always safe.
   > Shipping a change that does nothing is precisely the cost of a Type I error.`}
 />
@@ -586,14 +586,14 @@ understanding the causal structure.
 <MultipleChoice
   markdown={`Why does the Central Limit Theorem matter when you compute a confidence interval for a **mean**?
 
-- It guarantees the underlying data is normally distributed.
-  > The CLT says nothing about the population's shape, that can be skewed.
-- [o] For a large enough sample, the distribution of the **sample mean** is approximately normal even if the data isn't.
-  > That's what enables normal-based intervals regardless of the population's shape.
 - It only applies when the sample size is below 30.
   > It's the reverse, the approximation improves as n grows; "n ≥ 30" is a rough adequacy rule of thumb.
+- It guarantees the underlying data is normally distributed.
+  > The CLT says nothing about the population's shape, that can be skewed.
 - It lets you skip estimating the standard error.
-  > You still need the standard error; the CLT tells you the *shape* to use, not that you can ignore variability.`}
+  > You still need the standard error; the CLT tells you the *shape* to use, not that you can ignore variability.
+- [o] For a large enough sample, the distribution of the **sample mean** is approximately normal even if the data isn't.
+  > That's what enables normal-based intervals regardless of the population's shape.`}
 />
 
 ## Go deeper

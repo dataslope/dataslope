@@ -467,10 +467,10 @@ function getFirst<T>(arr: T[]): T | undefined {
 
 What is the return type of \`getFirst([1, 2, 3])\`?
 
-- \`T\`
-  > No. \`T\` is inferred as \`number\`, but the return type is \`T | undefined\` to account for empty arrays. The answer is \`number | undefined\`.
 - [o] \`number | undefined\`
   > The compiler infers \`T = number\` from the array \`[1, 2, 3]\`, so the return type is \`number | undefined\`.
+- \`T\`
+  > No. \`T\` is inferred as \`number\`, but the return type is \`T | undefined\` to account for empty arrays. The answer is \`number | undefined\`.
 - \`number\`
   > No. The function returns \`T | undefined\` because \`arr[0]\` could be \`undefined\` if the array is empty. The return type is \`number | undefined\`, not just \`number\`.
 

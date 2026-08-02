@@ -435,14 +435,14 @@ assert abs(dominant_frequency(sig, fs) - 200.0) < 1.0`,
 <MultipleChoice
   markdown={`You sample a signal at $f_s = 1000$ Hz and want to detect a tone at $700$ Hz. What happens?
 
-- The FFT shows a peak at 700 Hz
-  > A tone at 700 Hz exceeds the Nyquist limit of 500 Hz for a 1000 Hz sample rate; the FFT cannot distinguish it from its alias at 300 Hz and will not show a correct 700 Hz peak.
+- The FFT returns NaN
+  > The FFT of a finite, well-defined sampled signal always returns finite complex numbers; NaN would only appear if the input contained NaN values.
 - [o] The 700 Hz tone is *aliased* to $|700 - 1000| = 300$ Hz because it lies above the Nyquist limit $f_s/2 = 500$ Hz
   > The Nyquist–Shannon theorem says you can only faithfully represent frequencies below $f_s/2$. A 700 Hz sinusoid sampled at 1000 Hz is indistinguishable from a 300 Hz sinusoid, they alias. To detect 700 Hz, raise the sample rate above 1400 Hz.
 - The FFT shows two peaks: one at 700 Hz and one at 300 Hz
   > Aliasing maps the 700 Hz tone to exactly 300 Hz; a single alias peak appears at 300 Hz, not two separate peaks at both frequencies.
-- The FFT returns NaN
-  > The FFT of a finite, well-defined sampled signal always returns finite complex numbers; NaN would only appear if the input contained NaN values.
+- The FFT shows a peak at 700 Hz
+  > A tone at 700 Hz exceeds the Nyquist limit of 500 Hz for a 1000 Hz sample rate; the FFT cannot distinguish it from its alias at 300 Hz and will not show a correct 700 Hz peak.
 
 Aliasing is irreversible once you've sampled. Anti-alias filter *before* the ADC, not after.`}
 />
@@ -450,14 +450,14 @@ Aliasing is irreversible once you've sampled. Anti-alias filter *before* the ADC
 <MultipleChoice
   markdown={`Why is \`scipy.signal.sosfiltfilt\` typically preferred over \`scipy.signal.lfilter\` for offline filtering?
 
-- It runs on the GPU
-  > \`scipy.signal.sosfiltfilt\` is a CPU-only routine; GPU execution requires a different library.
-- [o] It performs a forward-then-backward pass for zero phase distortion *and* uses the numerically stable second-order-sections form for higher-order filters
-  > \`lfilter\` is causal and introduces a frequency-dependent delay that smears features; \`filtfilt\` cancels that delay. The \`sos\` form avoids the catastrophic ill-conditioning of high-order transfer functions. Combined, \`sosfiltfilt\` is the safe default for offline analysis.
 - It always returns integer results
   > Digital filters return floating-point arrays; integer output is not a feature of any SciPy filter function.
 - It uses less memory
   > The forward-backward pass requires buffering the entire signal twice, so \`sosfiltfilt\` actually uses more memory than \`lfilter\`; it is preferred for accuracy, not memory efficiency.
+- It runs on the GPU
+  > \`scipy.signal.sosfiltfilt\` is a CPU-only routine; GPU execution requires a different library.
+- [o] It performs a forward-then-backward pass for zero phase distortion *and* uses the numerically stable second-order-sections form for higher-order filters
+  > \`lfilter\` is causal and introduces a frequency-dependent delay that smears features; \`filtfilt\` cancels that delay. The \`sos\` form avoids the catastrophic ill-conditioning of high-order transfer functions. Combined, \`sosfiltfilt\` is the safe default for offline analysis.
 
 For real-time / causal applications you do need \`lfilter\` (or \`sosfilt\`), but for offline analysis, \`sosfiltfilt\` should be your default.`}
 />

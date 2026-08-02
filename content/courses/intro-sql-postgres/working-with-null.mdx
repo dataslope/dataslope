@@ -165,14 +165,14 @@ flowchart TD
 <MultipleChoice
   markdown={`What does \`NULL\` mean in SQL?
 
-- The number zero.
-  > Zero is a known value; \`NULL\` means there is no known value at all.
-- An empty string of text.
-  > An empty string \`''\` is a known (if blank) text value; \`NULL\` is the absence of any value.
 - [o] That the value is unknown or missing, there is no value present.
   > \`NULL\` represents "we don't know," which is distinct from zero or an empty string.
+- The number zero.
+  > Zero is a known value; \`NULL\` means there is no known value at all.
 - A syntax error in the query.
   > \`NULL\` is a valid, intentional marker for missing data, not an error.
+- An empty string of text.
+  > An empty string \`''\` is a known (if blank) text value; \`NULL\` is the absence of any value.
 
 \`NULL\` represents a missing or unknown value, different from \`0\` or \`''\`.`}
 />
@@ -184,10 +184,10 @@ flowchart TD
   > Two unknowns are not provably equal; SQL cannot claim they are the same.
 - \`false\`, because \`NULL\` never equals anything.
   > It is not \`false\` either; the comparison simply has no known answer.
-- [o] \`NULL\` (unknown), because comparing two unknown values has no knowable answer.
-  > Since \`NULL\` means "unknown," asking whether one unknown equals another yields unknown, not true or false.
 - It causes the query to crash.
   > The expression is valid; it just produces \`NULL\` rather than crashing.
+- [o] \`NULL\` (unknown), because comparing two unknown values has no knowable answer.
+  > Since \`NULL\` means "unknown," asking whether one unknown equals another yields unknown, not true or false.
 
 Comparing \`NULL\` with \`=\` yields \`NULL\`, which is exactly why \`= NULL\` never matches rows.`}
 />
@@ -195,14 +195,14 @@ Comparing \`NULL\` with \`=\` yields \`NULL\`, which is exactly why \`= NULL\` n
 <MultipleChoice
   markdown={`How do you correctly select rows where the \`phone\` column has no value?
 
-- \`WHERE phone = NULL\`
-  > This silently matches no rows, because a comparison with \`NULL\` is never true.
-- \`WHERE phone = ''\`
-  > That matches an empty string, which is a *known* value, not the same as a missing \`NULL\`.
 - [o] \`WHERE phone IS NULL\`
   > \`IS NULL\` is the dedicated, correct test for missing values.
+- \`WHERE phone = NULL\`
+  > This silently matches no rows, because a comparison with \`NULL\` is never true.
 - \`WHERE phone = 'NULL'\`
   > That matches the literal text "NULL", not an actual missing value.
+- \`WHERE phone = ''\`
+  > That matches an empty string, which is a *known* value, not the same as a missing \`NULL\`.
 
 Use \`IS NULL\` (never \`= NULL\`) to test for missing values.`}
 />
@@ -210,14 +210,14 @@ Use \`IS NULL\` (never \`= NULL\`) to test for missing values.`}
 <MultipleChoice
   markdown={`What does \`COALESCE(phone, 'No phone')\` return for a row where \`phone\` is \`NULL\`?
 
-- \`NULL\`, because the first argument is \`NULL\`.
-  > \`COALESCE\` skips \`NULL\` arguments and moves on to the next one.
 - An error, because the arguments differ.
   > \`COALESCE\` is designed to take multiple arguments and pick the first non-NULL; differing arguments are fine.
 - [o] \`'No phone'\`, because \`COALESCE\` returns the first argument that is not \`NULL\`.
   > When \`phone\` is missing, \`COALESCE\` falls through to the provided fallback text.
 - The literal word "COALESCE".
   > \`COALESCE\` returns one of its argument values, not its own name.
+- \`NULL\`, because the first argument is \`NULL\`.
+  > \`COALESCE\` skips \`NULL\` arguments and moves on to the next one.
 
 \`COALESCE\` returns the first non-NULL argument, making it ideal for fallback values.`}
 />
@@ -225,12 +225,12 @@ Use \`IS NULL\` (never \`= NULL\`) to test for missing values.`}
 <MultipleChoice
   markdown={`Why does SQL bother having \`NULL\` instead of just storing \`0\` or \`''\` for missing data?
 
-- Because \`NULL\` saves disk space compared to other values.
-  > The motivation is meaning, not storage size.
-- [o] Because "unknown" is a genuinely different state from zero or empty, and \`NULL\` lets the data stay honest about what is truly missing.
-  > Substituting a real value like \`0\` would misrepresent the data; \`NULL\` faithfully records that a value is absent.
 - Because \`NULL\` makes queries run faster.
   > \`NULL\` is about representing missing data accurately, not performance.
+- [o] Because "unknown" is a genuinely different state from zero or empty, and \`NULL\` lets the data stay honest about what is truly missing.
+  > Substituting a real value like \`0\` would misrepresent the data; \`NULL\` faithfully records that a value is absent.
+- Because \`NULL\` saves disk space compared to other values.
+  > The motivation is meaning, not storage size.
 - Because every column is required to allow \`NULL\`.
   > Columns can forbid \`NULL\` with \`NOT NULL\`; \`NULL\` exists to honestly represent the unknown when allowed.
 

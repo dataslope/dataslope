@@ -170,14 +170,14 @@ belongs on `venues`, not repeated on every `events` row.
 <MultipleChoice
   markdown={`A requirement says, "A venue has a street address, and many events happen at the same venue." Where should the address usually live?
 
-- On every \`events\` row.
-  > Repeating the same address on many event rows makes updates harder and can create disagreement.
 - [o] On the \`venues\` table.
   > The address describes the venue itself, so one venue row can store the fact once.
-- On the \`organizers\` table.
-  > The address is not a fact about the organizer unless the requirement says organizers have addresses.
 - In the application only.
   > A fact that the system must remember usually belongs in the database design.
+- On every \`events\` row.
+  > Repeating the same address on many event rows makes updates harder and can create disagreement.
+- On the \`organizers\` table.
+  > The address is not a fact about the organizer unless the requirement says organizers have addresses.
 
 Attributes belong with the entity they describe.`}
 />
@@ -236,14 +236,14 @@ erDiagram
 <MultipleChoice
   markdown={`Why might a table use a generated \`id\` as the primary key and still make \`email\` unique?
 
-- Because primary keys and unique constraints do the same job.
-  > A primary key identifies rows for relationships, while a unique constraint protects a business rule.
 - [o] Because \`id\` is stable for references, while \`email\` still must not repeat.
   > The generated key supports foreign keys, and the unique email rule protects real-world meaning.
-- Because foreign keys cannot reference generated columns.
-  > Foreign keys commonly reference generated primary keys.
+- Because primary keys and unique constraints do the same job.
+  > A primary key identifies rows for relationships, while a unique constraint protects a business rule.
 - Because PostgreSQL requires every text column to be unique.
   > PostgreSQL only enforces uniqueness when the schema declares it.
+- Because foreign keys cannot reference generated columns.
+  > Foreign keys commonly reference generated primary keys.
 
 Keys identify rows and constraints protect additional rules.`}
 />
@@ -357,14 +357,14 @@ reject the examples that should be impossible.
 <MultipleChoice
   markdown={`Which step should usually happen before choosing columns and constraints?
 
-- Writing every \`CREATE TABLE\` statement.
-  > SQL syntax is easier to write after the model is clear.
-- [o] Understanding requirements and candidate entities.
-  > Tables and columns should come from the things the system must remember.
-- Adding indexes for every column.
-  > Indexing is not the first design question in this course.
 - Removing all foreign keys.
   > Foreign keys are often how relationships become enforceable.
+- Writing every \`CREATE TABLE\` statement.
+  > SQL syntax is easier to write after the model is clear.
+- Adding indexes for every column.
+  > Indexing is not the first design question in this course.
+- [o] Understanding requirements and candidate entities.
+  > Tables and columns should come from the things the system must remember.
 
 A good schema starts with meaning, not syntax.`}
 />
@@ -372,14 +372,14 @@ A good schema starts with meaning, not syntax.`}
 <MultipleChoice
   markdown={`What does cardinality help you decide?
 
-- Which SQL keyword starts a query.
-  > Cardinality is about relationships, not query syntax.
 - [o] Whether a relationship is one-to-one, one-to-many, or many-to-many.
   > Cardinality describes how many rows can connect in each direction.
-- Whether a column should be uppercase.
-  > Naming style is separate from relationship structure.
 - Whether a table needs sample data.
   > Sample data helps review a design, but cardinality answers a different question.
+- Whether a column should be uppercase.
+  > Naming style is separate from relationship structure.
+- Which SQL keyword starts a query.
+  > Cardinality is about relationships, not query syntax.
 
 Cardinality turns real-world rules into table structure.`}
 />
@@ -387,14 +387,14 @@ Cardinality turns real-world rules into table structure.`}
 <MultipleChoice
   markdown={`Why is reviewing with real examples part of the design process?
 
+- It makes every table have the same columns.
+  > Different entities usually need different attributes.
 - It replaces the need for constraints.
   > Examples reveal constraints; they do not enforce them by themselves.
 - It guarantees requirements will never change.
   > Requirements can still change after careful review.
 - [o] It exposes missing entities, relationships, and rules.
   > Concrete rows often reveal assumptions that abstract diagrams hide.
-- It makes every table have the same columns.
-  > Different entities usually need different attributes.
 
 Examples test whether the model matches the world it describes.`}
 />
@@ -402,14 +402,14 @@ Examples test whether the model matches the world it describes.`}
 <MultipleChoice
   markdown={`Which statement best describes the whole process?
 
-- Start with foreign keys, then invent requirements around them.
-  > Foreign keys should represent relationships found in the requirements.
-- [o] Move from requirements to entities, relationships, keys, constraints, normalization, and review.
-  > The process turns product meaning into enforceable schema structure.
-- Normalize first, before knowing what facts exist.
-  > Normalization needs candidate facts and dependencies to inspect.
 - Avoid revisiting earlier decisions.
   > Review often sends you back to improve earlier parts of the design.
+- [o] Move from requirements to entities, relationships, keys, constraints, normalization, and review.
+  > The process turns product meaning into enforceable schema structure.
+- Start with foreign keys, then invent requirements around them.
+  > Foreign keys should represent relationships found in the requirements.
+- Normalize first, before knowing what facts exist.
+  > Normalization needs candidate facts and dependencies to inspect.
 
 Database design is iterative, but the checklist keeps the iteration focused.`}
 />

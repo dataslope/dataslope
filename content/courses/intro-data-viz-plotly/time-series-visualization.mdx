@@ -255,12 +255,12 @@ group's *shape* clearly, and shared axes ensure honest comparison.
 <MultipleChoice
   markdown={`What is **.resample('D').mean()** on a pandas time-indexed DataFrame doing?
 
-- Sorting the data alphabetically.
-  > \`resample()\` groups rows by a time frequency, not by alphabetical order; sorting alphabetically on a datetime index would be unusual and is not what this method does.
 - Filling missing values.
   > Filling missing values is the job of methods like \`fillna()\` or \`interpolate()\`; \`resample()\` aggregates rows into time buckets, which may produce NaN for empty periods but does not fill them.
 - [o] Aggregating the data to **daily** frequency, computing the mean of all rows that fall in each day.
   > **.resample('D')** groups rows by calendar day. **.resample('W')** would be weekly, **.resample('M')** monthly. Combined with an aggregation like **.mean()**, **.sum()**, or **.last()**, this is the standard way to change the granularity of a time series.
+- Sorting the data alphabetically.
+  > \`resample()\` groups rows by a time frequency, not by alphabetical order; sorting alphabetically on a datetime index would be unusual and is not what this method does.
 - Duplicating each row.
   > \`resample()\` aggregates multiple rows per time bucket into a single summary value; it reduces the number of rows, not duplicates them.
 
@@ -270,14 +270,14 @@ Resampling is the time-series equivalent of **groupby**. Master it and time char
 <MultipleChoice
   markdown={`Why is a **moving average** often useful for noisy daily time-series data?
 
-- It increases the data resolution.
-  > A moving average *reduces* resolution by replacing individual data points with windowed averages; it is a smoothing technique, not an upsampling one.
-- It is required by Plotly.
-  > Plotly renders time-series line charts without any smoothing; a moving average is an optional preprocessing step the analyst adds, not a Plotly requirement.
 - [o] It smooths short-term noise so the underlying weekly or monthly trend becomes visible.
   > Real-world series (web traffic, sales, sensor readings) are noisy day-to-day but often have meaningful longer-term trends. A 7-day or 30-day moving average filters out the noise. Show the raw and the smoothed series together so readers can see both layers.
+- It is required by Plotly.
+  > Plotly renders time-series line charts without any smoothing; a moving average is an optional preprocessing step the analyst adds, not a Plotly requirement.
 - It removes outliers.
   > A moving average does not detect or remove outliers; extreme values are included in the window averages and still influence the smoothed line, just diluted by neighboring values.
+- It increases the data resolution.
+  > A moving average *reduces* resolution by replacing individual data points with windowed averages; it is a smoothing technique, not an upsampling one.
 
 Smoothing is *averaging*, not deleting. Outliers still affect a moving average; they're just averaged with their neighbors.`}
 />
@@ -285,14 +285,14 @@ Smoothing is *averaging*, not deleting. Outliers still affect a moving average; 
 <MultipleChoice
   markdown={`If your line chart's x-axis is a **date** and the line zigzags backward in time, what is the most likely cause?
 
-- The DataFrame contains negative values.
-  > Negative y-values do not affect the direction of the x-axis; backward zigzags on the time axis are caused by row ordering, not by the values being plotted.
 - The dates are in the wrong time zone.
   > A timezone mismatch might shift data points earlier or later, but would not cause the line to visibly zigzag *backward* through time; unsorted rows are the typical culprit.
-- [o] The DataFrame is not sorted by date, Plotly draws lines in DataFrame row order, not date order.
-  > Plotly Express connects points in the *order they appear in the DataFrame*. If your rows aren't sorted by the x-column, the line walks through time in whatever order the rows arrived. The fix is one line: **df = df.sort_values("date")**.
 - The y-axis is on a log scale.
   > The y-axis scale affects vertical rendering, not the horizontal progression of time; a log y-axis would not cause lines to move backward along the date axis.
+- The DataFrame contains negative values.
+  > Negative y-values do not affect the direction of the x-axis; backward zigzags on the time axis are caused by row ordering, not by the values being plotted.
+- [o] The DataFrame is not sorted by date, Plotly draws lines in DataFrame row order, not date order.
+  > Plotly Express connects points in the *order they appear in the DataFrame*. If your rows aren't sorted by the x-column, the line walks through time in whatever order the rows arrived. The fix is one line: **df = df.sort_values("date")**.
 
 This is one of those bugs that confuses everyone exactly once. After that, you sort first as a reflex.`}
 />
@@ -300,12 +300,12 @@ This is one of those bugs that confuses everyone exactly once. After that, you s
 <MultipleChoice
   markdown={`Which Plotly chart configuration **hides weekend gaps** in a stock-price line chart, so the x-axis only shows trading days?
 
-- Filtering the DataFrame to weekdays only.
-  > Dropping weekend rows removes the data, but the x-axis is still a continuous date axis, so Plotly leaves the empty Saturday-Sunday span and draws a straight line across it. The gap remains visible.
-- **fig.update_layout(weekends=False)**.
-  > There is no **weekends** option on **update_layout**. This looks plausible but isn't a real Plotly setting.
 - [o] **fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])**.
   > **rangebreaks** tells Plotly to *compress* certain ranges out of the x-axis. The **bounds** form hides the weekend gap; there are also **pattern** and **values** variants for holidays. Without this, weekend gaps appear as flat plateaus that misrepresent the data.
+- **fig.update_layout(weekends=False)**.
+  > There is no **weekends** option on **update_layout**. This looks plausible but isn't a real Plotly setting.
+- Filtering the DataFrame to weekdays only.
+  > Dropping weekend rows removes the data, but the x-axis is still a continuous date axis, so Plotly leaves the empty Saturday-Sunday span and draws a straight line across it. The gap remains visible.
 - This isn't possible in Plotly.
   > Plotly does support this directly through **rangebreaks**, so this option is incorrect.
 

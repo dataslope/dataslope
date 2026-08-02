@@ -264,12 +264,12 @@ flowchart TD
 <MultipleChoice
   markdown={`Why does \`ArrayList\` outperform \`LinkedList\` on iteration in practice, even though both are \`O(n)\`?
 
-- \`ArrayList.iterator()\` is \`O(log n)\`
-  > Both are \`O(n)\` per \`next()\`.
-- [o] \`ArrayList\` stores elements in a contiguous backing array, so a sequential walk is extremely cache-friendly; \`LinkedList\` follows pointers to scattered heap nodes
-  > Cache behavior dominates Big-O for in-memory walks at modern CPU speeds.
 - \`LinkedList.iterator()\` allocates per element
   > It does not.
+- [o] \`ArrayList\` stores elements in a contiguous backing array, so a sequential walk is extremely cache-friendly; \`LinkedList\` follows pointers to scattered heap nodes
+  > Cache behavior dominates Big-O for in-memory walks at modern CPU speeds.
+- \`ArrayList.iterator()\` is \`O(log n)\`
+  > Both are \`O(n)\` per \`next()\`.
 - \`ArrayList\` parallelizes by default
   > It does not.`}
 />
@@ -277,12 +277,12 @@ flowchart TD
 <MultipleChoice
   markdown={`What does the *load factor* of a \`HashMap\` control?
 
-- The number of threads allowed to read it
-  > It's not thread-related.
-- The maximum number of entries
-  > \`HashMap\` has no hard cap.
 - [o] The ratio of size to capacity at which the table doubles and rehashes
   > Default 0.75: a 16-bucket map rehashes when it reaches 12 entries.
+- The maximum number of entries
+  > \`HashMap\` has no hard cap.
+- The number of threads allowed to read it
+  > It's not thread-related.
 - The hash function used for keys
   > That's determined by the key type's \`hashCode\`.`}
 />
@@ -290,12 +290,12 @@ flowchart TD
 <MultipleChoice
   markdown={`You'll append about 50,000 elements to an \`ArrayList\`. Which construction is best?
 
-- \`new ArrayList<>()\`, then call \`add\` 50k times
-  > Works, but triggers ~17 grow-and-copy events.
 - \`new ArrayList<>(10)\`, then call \`add\` 50k times
   > Worse: even more resizes.
-- [o] \`new ArrayList<>(50_000)\`, then call \`add\` 50k times
-  > One allocation, zero resizes.
 - \`new LinkedList<>()\`
-  > More memory and slower iteration in almost every scenario.`}
+  > More memory and slower iteration in almost every scenario.
+- \`new ArrayList<>()\`, then call \`add\` 50k times
+  > Works, but triggers ~17 grow-and-copy events.
+- [o] \`new ArrayList<>(50_000)\`, then call \`add\` 50k times
+  > One allocation, zero resizes.`}
 />

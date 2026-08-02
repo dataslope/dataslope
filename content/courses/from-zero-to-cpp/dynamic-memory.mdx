@@ -333,23 +333,23 @@ int main() {
 
 - Reserves a slot on the stack.
   > \`new\` allocates on the heap, not the stack.
+- Frees existing memory and reallocates it.
+  > That would be \`realloc\`, which is a C concept and not what \`new\` does.
 - Returns a copy of \`T\`.
   > It returns a *pointer* to a newly constructed object.
 - [o] Allocates enough memory for one \`T\` on the heap, constructs a \`T\` in it, and returns a pointer to it.
-  > Allocation + construction in one step.
-- Frees existing memory and reallocates it.
-  > That would be \`realloc\`, which is a C concept and not what \`new\` does.`}
+  > Allocation + construction in one step.`}
 />
 
 <MultipleChoice
   markdown={`Why must \`new[]\` be paired with \`delete[]\` (not plain \`delete\`)?
 
-- The compiler will refuse to compile mismatched calls.
-  > It will not; mismatch is a runtime/UB problem, not a compile error.
-- The OS tracks them separately on disk.
-  > The OS is not involved at that level of detail.
 - [o] \`new[]\` may record an element count alongside the allocation, and \`delete[]\` knows how to invoke each destructor and release the whole block; \`delete\` does not.
   > Mixing them is undefined behavior.
+- The OS tracks them separately on disk.
+  > The OS is not involved at that level of detail.
+- The compiler will refuse to compile mismatched calls.
+  > It will not; mismatch is a runtime/UB problem, not a compile error.
 - They are interchangeable in modern C++.
   > They are not.`}
 />
@@ -357,27 +357,27 @@ int main() {
 <MultipleChoice
   markdown={`What is the primary danger of a memory leak?
 
-- The program will crash immediately.
-  > It usually does not crash immediately, which is part of why leaks are dangerous.
+- It triggers a compile-time error.
+  > Compilers don't track allocation/free pairs in general.
 - It causes data corruption in unrelated objects.
   > That is *use-after-free* or buffer overflow, not a leak.
 - [o] Memory is allocated but never freed, so a long-running program can exhaust available memory over time.
   > Leaks degrade reliability and performance of long-running services.
-- It triggers a compile-time error.
-  > Compilers don't track allocation/free pairs in general.`}
+- The program will crash immediately.
+  > It usually does not crash immediately, which is part of why leaks are dangerous.`}
 />
 
 <MultipleChoice
   markdown={`Which of the following is the *modern* way to manage a single heap-allocated object?
 
-- Call \`new\` and remember to \`delete\` it on every code path.
-  > That is the raw, error-prone style this chapter warns against.
 - Use \`malloc\`/\`free\`.
   > Those are C functions; they don't construct C++ objects.
-- [o] Use \`std::unique_ptr\` (often via \`std::make_unique\`); its destructor frees the object automatically.
-  > This applies the RAII pattern and removes the need for manual \`delete\`.
 - Allocate it on the stack with \`new\` followed by no \`delete\`.
-  > \`new\` does not allocate on the stack.`}
+  > \`new\` does not allocate on the stack.
+- Call \`new\` and remember to \`delete\` it on every code path.
+  > That is the raw, error-prone style this chapter warns against.
+- [o] Use \`std::unique_ptr\` (often via \`std::make_unique\`); its destructor frees the object automatically.
+  > This applies the RAII pattern and removes the need for manual \`delete\`.`}
 />
 
 Next: aggregates and strings, how to bundle data, and the tools

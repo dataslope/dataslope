@@ -201,10 +201,10 @@ you can.**
 
 - Rows where \`amount\` is strictly between 100 and 200, excluding both.
   > \`BETWEEN\` is inclusive, so 100 and 200 are kept, not excluded.
-- [o] Rows where \`amount\` is 100, 200, or anything in between (both endpoints included).
-  > \`BETWEEN\` includes both bounds; use explicit \`>\`/\`<\` if you need to exclude an endpoint.
 - Only rows where \`amount\` equals exactly 100 or exactly 200.
   > \`BETWEEN\` keeps the whole range, not just the endpoints.
+- [o] Rows where \`amount\` is 100, 200, or anything in between (both endpoints included).
+  > \`BETWEEN\` includes both bounds; use explicit \`>\`/\`<\` if you need to exclude an endpoint.
 - No rows, because \`BETWEEN\` needs three values.
   > \`BETWEEN low AND high\` is the correct two-bound form and returns the matching range.
 
@@ -214,14 +214,14 @@ you can.**
 <MultipleChoice
   markdown={`Why is \`region IN ('West', 'East')\` preferred over \`region = 'West' OR region = 'East'\` for longer lists?
 
+- \`OR\` cannot be used with text columns.
+  > \`OR\` works fine with text; the preference for \`IN\` is about readability at scale.
 - Because \`IN\` checks ranges while \`OR\` checks equality.
   > \`IN\` checks membership (equality against a set), not ranges; the advantage is readability, not different semantics.
 - [o] They are equivalent, but \`IN\` is more readable and scales cleanly as the list of values grows.
   > \`IN\` expresses "matches any of these" compactly, avoiding a long, error-prone chain of \`OR\`s.
 - \`IN\` is faster because it ignores NULLs differently and returns more rows.
   > The benefit is clarity; \`IN\` does not return more rows, and that NULL claim is not why analysts prefer it.
-- \`OR\` cannot be used with text columns.
-  > \`OR\` works fine with text; the preference for \`IN\` is about readability at scale.
 
 \`IN\` is a concise, readable membership test equivalent to a chain of \`OR\`s.`}
 />
@@ -229,14 +229,14 @@ you can.**
 <MultipleChoice
   markdown={`A query has \`WHERE amount > 100 AND region = 'West' OR region = 'East'\` with no parentheses. Why is this risky?
 
-- It is a syntax error and will not run.
-  > It runs fine; the danger is that it runs and returns the *wrong* rows.
 - [o] \`AND\` binds tighter than \`OR\`, so it returns big West orders **plus every East order**, which is probably not intended.
   > Without parentheses the engine reads it as \`(amount > 100 AND region = 'West') OR region = 'East'\`, pulling in all East rows regardless of amount.
-- It always returns zero rows.
-  > It returns rows; the problem is that it returns too many, not none.
 - \`OR\` is not allowed in a \`WHERE\` clause.
   > \`OR\` is perfectly valid; the issue is operator precedence without parentheses.
+- It always returns zero rows.
+  > It returns rows; the problem is that it returns too many, not none.
+- It is a syntax error and will not run.
+  > It runs fine; the danger is that it runs and returns the *wrong* rows.
 
 Because \`AND\` binds tighter than \`OR\`, mixing them without parentheses
 silently changes the meaning, always group explicitly.`}

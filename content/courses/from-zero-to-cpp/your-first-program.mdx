@@ -294,36 +294,36 @@ int main() {
 <MultipleChoice
   markdown={`What does the \`return 0;\` at the end of \`main\` mean?
 
-- It returns the number zero from the program to the caller of \`main\`.
-  > Technically true, but the meaning of that number matters more than the number itself.
-- [o] It signals to the operating system that the program completed successfully.
-  > By convention, \`0\` means success and any other value means a particular kind of failure.
+- It is required only in debug builds.
+  > A C++ \`main\` should always end by returning a value (though omitting it implicitly returns 0 in C++).
 - It frees all memory used by the program.
   > Memory cleanup is performed automatically by the OS when the process ends.
-- It is required only in debug builds.
-  > A C++ \`main\` should always end by returning a value (though omitting it implicitly returns 0 in C++).`}
+- [o] It signals to the operating system that the program completed successfully.
+  > By convention, \`0\` means success and any other value means a particular kind of failure.
+- It returns the number zero from the program to the caller of \`main\`.
+  > Technically true, but the meaning of that number matters more than the number itself.`}
 />
 
 <MultipleChoice
   markdown={`Why do we write \`std::cout\` instead of just \`cout\`?
 
-- Because \`cout\` is a typo.
-  > It is not; \`cout\` is the name. The prefix locates it.
-- Because C++ uses dollar signs to indicate variables.
-  > C++ does not use dollar signs for that.
 - [o] Because \`cout\` lives in the standard-library namespace \`std\`, and \`std::cout\` fully qualifies which \`cout\` we mean.
   > Namespaces prevent collisions between libraries that happen to share short names.
 - Because \`std\` makes the program run faster.
-  > Namespaces have no runtime cost.`}
+  > Namespaces have no runtime cost.
+- Because \`cout\` is a typo.
+  > It is not; \`cout\` is the name. The prefix locates it.
+- Because C++ uses dollar signs to indicate variables.
+  > C++ does not use dollar signs for that.`}
 />
 
 <MultipleChoice
   markdown={`What does the escape sequence \`\\n\` represent inside a string literal?
 
-- The two characters backslash and \`n\`.
-  > Only if it were written as \`\\\\n\`.
 - [o] A single newline character.
   > \`\\n\` is shorthand for the newline byte.
+- The two characters backslash and \`n\`.
+  > Only if it were written as \`\\\\n\`.
 - The end of the string.
   > Strings end with an implicit null byte in C++ string literals; \`\\n\` is just a newline.
 - A tab character.

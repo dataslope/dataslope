@@ -126,10 +126,10 @@ it exists, belongs to one employee.
 <MultipleChoice
   markdown={`In a one-to-many relationship between customers and orders, where does the foreign key usually go?
 
-- On the customers table, storing a list of order ids.
-  > A single customer row may relate to many orders, and a single cell should not store a list of ids.
 - [o] On the orders table, because each order points to one customer.
   > The many-side table can repeat the same customer id across many rows.
+- On the customers table, storing a list of order ids.
+  > A single customer row may relate to many orders, and a single cell should not store a list of ids.
 - On both tables, with each side copying all columns from the other.
   > Copying columns duplicates data and does not create a clean relationship.
 - On neither table, because one-to-many relationships cannot be stored.
@@ -226,10 +226,10 @@ or more order items. The `|{` end means "one or many."
   > Optional still matters; it only means a row can exist without a related row on that side.
 - [o] A row is allowed to have zero related rows on that side of the relationship.
   > Optional participation means the minimum cardinality is zero.
-- Every row must have at least two related rows.
-  > That describes a different minimum, not optional participation.
 - The foreign key must always be text.
   > Participation is about row counts, not data type.
+- Every row must have at least two related rows.
+  > That describes a different minimum, not optional participation.
 
 Optionality is the minimum side of cardinality: zero allowed or not.`}
 />
@@ -296,14 +296,14 @@ constraints or application rules.
 <MultipleChoice
   markdown={`What does **cardinality** describe?
 
-- The color used for a table in a diagram.
-  > Diagram styling is not the meaning of cardinality.
-- [o] How many rows on each side of a relationship may relate to rows on the other side.
-  > Cardinality is about counts: one, many, optional, and mandatory.
-- The exact order in which SQL statements must be typed.
-  > SQL order is separate from the modeling concept of cardinality.
 - Whether a column stores text or numbers.
   > Data type describes values inside a column, not relationship counts.
+- The color used for a table in a diagram.
+  > Diagram styling is not the meaning of cardinality.
+- The exact order in which SQL statements must be typed.
+  > SQL order is separate from the modeling concept of cardinality.
+- [o] How many rows on each side of a relationship may relate to rows on the other side.
+  > Cardinality is about counts: one, many, optional, and mandatory.
 
 Cardinality turns a vague relationship into a precise modeling rule.`}
 />
@@ -311,14 +311,14 @@ Cardinality turns a vague relationship into a precise modeling rule.`}
 <MultipleChoice
   markdown={`Which relationship is best described as many-to-many?
 
-- One order is placed by one customer, and a customer may place many orders.
-  > That is one-to-many from customers to orders.
-- One user has one required profile.
-  > That is one-to-one.
 - [o] A student can take many courses, and a course can contain many students.
   > Both sides can have many related rows, so the relationship is many-to-many.
+- One order is placed by one customer, and a customer may place many orders.
+  > That is one-to-many from customers to orders.
 - One parking pass belongs to one employee, and an employee may have no pass.
   > That is one-to-zero-or-one, not many-to-many.
+- One user has one required profile.
+  > That is one-to-one.
 
 Many-to-many means "many" is possible in both directions.`}
 />
@@ -326,14 +326,14 @@ Many-to-many means "many" is possible in both directions.`}
 <MultipleChoice
   markdown={`In Crow's-foot notation, what does o{ usually mean at one end of a relationship?
 
+- One or many, with zero forbidden.
+  > One or many is represented by |{.
 - Exactly one.
   > The two-bar symbol, ||, represents exactly one.
 - Zero or one.
   > Zero or one is represented by o|.
 - [o] Zero or many.
   > The circle means optional, and the crow's foot means many.
-- One or many, with zero forbidden.
-  > One or many is represented by |{.
 
 The two symbols together show minimum and maximum cardinality.`}
 />
@@ -341,14 +341,14 @@ The two symbols together show minimum and maximum cardinality.`}
 <MultipleChoice
   markdown={`Why does a one-to-zero-or-one relationship often need a UNIQUE constraint on the foreign key?
 
-- To make the foreign key store several ids in one cell.
-  > A unique foreign key still stores one value per row; it prevents repeats across rows.
 - [o] To prevent many rows from pointing to the same parent row.
   > Without uniqueness, the same parent id could appear on many child rows, making the relationship one-to-many.
-- To remove the need for a primary key on the parent table.
-  > The foreign key still needs a reliable target, usually the parent's primary key.
 - To make optional rows mandatory.
   > Uniqueness controls the maximum count; optionality controls the minimum count.
+- To remove the need for a primary key on the parent table.
+  > The foreign key still needs a reliable target, usually the parent's primary key.
+- To make the foreign key store several ids in one cell.
+  > A unique foreign key still stores one value per row; it prevents repeats across rows.
 
 Maximum cardinality often becomes a uniqueness rule in the schema.`}
 />

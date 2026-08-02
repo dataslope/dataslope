@@ -63,12 +63,12 @@ Those promises make the key safe to use when you need to point to a specific row
 <MultipleChoice
   markdown={`Why is a person's name usually a poor primary key?
 
+- Names are always longer than numbers.
+  > Length is less important than reliability as an identifier.
 - Names cannot be stored as text in SQLite.
   > SQLite can store names as text; storage is not the issue.
 - [o] Names can repeat, change, or be missing.
   > A primary key should be unique, stable, and present for every row.
-- Names are always longer than numbers.
-  > Length is less important than reliability as an identifier.
 - SQLite only allows primary keys on price columns.
   > A primary key can be declared on many kinds of columns; the design choice matters.`}
 />
@@ -169,10 +169,10 @@ The `orders.customer_id` value points to a customer's `id`. Without primary keys
 <MultipleChoice
   markdown={`What is the main purpose of a primary key?
 
-- To make a table display in rainbow colors.
-  > Display style is unrelated to primary keys.
 - [o] To uniquely identify each row in a table.
   > A primary key gives each row a dependable identity.
+- To make a table display in rainbow colors.
+  > Display style is unrelated to primary keys.
 - To force every value in the table to be text.
   > Primary keys identify rows; they do not make every column text.
 - To delete duplicate rows automatically.
@@ -184,21 +184,21 @@ The `orders.customer_id` value points to a customer's `id`. Without primary keys
 
 - \`id SERIAL PRIMARY KEY\`
   > \`SERIAL\` is a PostgreSQL pattern, not SQLite's usual syntax.
-- [o] \`id INTEGER PRIMARY KEY\`
-  > In SQLite, \`INTEGER PRIMARY KEY\` aliases the rowid and can auto-assign ids.
+- \`id BOOLEAN PRIMARY KEY\`
+  > SQLite does not have a separate boolean storage class, and true/false would not give many unique ids.
 - \`id TEXT ALWAYS NUMBER\`
   > This is not valid SQLite syntax.
-- \`id BOOLEAN PRIMARY KEY\`
-  > SQLite does not have a separate boolean storage class, and true/false would not give many unique ids.`}
+- [o] \`id INTEGER PRIMARY KEY\`
+  > In SQLite, \`INTEGER PRIMARY KEY\` aliases the rowid and can auto-assign ids.`}
 />
 
 <MultipleChoice
   markdown={`What two rules does a primary key provide?
 
-- It must be alphabetic and lowercase.
-  > Primary keys are often numbers, and letter case is not the key rule.
 - It must be sorted and visible.
   > Sorting is separate from identity.
+- It must be alphabetic and lowercase.
+  > Primary keys are often numbers, and letter case is not the key rule.
 - [o] It must be unique and not null.
   > These guarantees make each row's identity reliable.
 - It must contain the row's full description.
@@ -208,12 +208,12 @@ The `orders.customer_id` value points to a customer's `id`. Without primary keys
 <MultipleChoice
   markdown={`A surrogate key is best described as what?
 
-- A real-world value like a person's current phone number.
-  > That is closer to a natural value, and it may change.
-- [o] A made-up identifier, often an id number, created only to identify a row.
-  > Surrogate keys are artificial values used for stable row identity.
 - A column that stores several names in one cell.
   > That is not a key; it is a messy storage pattern.
 - A query that sorts a table.
-  > Sorting uses clauses such as \`ORDER BY\`, not surrogate keys.`}
+  > Sorting uses clauses such as \`ORDER BY\`, not surrogate keys.
+- [o] A made-up identifier, often an id number, created only to identify a row.
+  > Surrogate keys are artificial values used for stable row identity.
+- A real-world value like a person's current phone number.
+  > That is closer to a natural value, and it may change.`}
 />

@@ -134,14 +134,14 @@ A `NUMERIC` affinity column tries to store numeric-looking text as numbers. So `
 <MultipleChoice
   markdown={`In a regular SQLite table, what does a column's declared type mainly provide?
 
-- A paint color for the column.
-  > Declared types affect storage behavior, not display colors.
-- [o] A type affinity, which is SQLite's preferred way to store values in that column.
-  > Affinity guides conversions, but regular SQLite tables remain flexibly typed.
 - A guarantee that no other storage class can ever appear.
   > Regular SQLite typing is dynamic; mismatched values may still be stored.
+- A paint color for the column.
+  > Declared types affect storage behavior, not display colors.
 - A rule that every value becomes \`NULL\`.
-  > Values do not automatically become \`NULL\` just because a type is declared.`}
+  > Values do not automatically become \`NULL\` just because a type is declared.
+- [o] A type affinity, which is SQLite's preferred way to store values in that column.
+  > Affinity guides conversions, but regular SQLite tables remain flexibly typed.`}
 />
 
 ## SQLite compared with rigid type systems
@@ -287,12 +287,12 @@ SQLite's flexibility is friendly, but it will not always stop messy data. If a c
 <MultipleChoice
   markdown={`Which list contains SQLite's five storage classes?
 
-- \`INTEGER\`, \`TEXT\`, \`REAL\`, \`NUMERIC\`, \`BOOLEAN\`.
-  > \`NUMERIC\` is an affinity and SQLite has no separate boolean storage class.
-- [o] \`NULL\`, \`INTEGER\`, \`REAL\`, \`TEXT\`, \`BLOB\`.
-  > These are the five storage classes SQLite uses for values.
 - \`SERIAL\`, \`DATE\`, \`MONEY\`, \`TEXT\`, \`JSON\`.
   > These are not SQLite's five storage classes.
+- [o] \`NULL\`, \`INTEGER\`, \`REAL\`, \`TEXT\`, \`BLOB\`.
+  > These are the five storage classes SQLite uses for values.
+- \`INTEGER\`, \`TEXT\`, \`REAL\`, \`NUMERIC\`, \`BOOLEAN\`.
+  > \`NUMERIC\` is an affinity and SQLite has no separate boolean storage class.
 - \`ROW\`, \`COLUMN\`, \`TABLE\`, \`CELL\`, \`SCHEMA\`.
   > Those are table concepts, not value storage classes.`}
 />
@@ -302,10 +302,10 @@ SQLite's flexibility is friendly, but it will not always stop messy data. If a c
 
 - The name of the table that contains the value.
   > \`typeof()\` looks at a value, not the table name.
-- [o] The storage class of the value SQLite is actually holding.
-  > \`typeof()\` can return results such as \`integer\`, \`real\`, \`text\`, \`blob\`, or \`null\`.
 - The number of rows in the table.
   > Row counts use aggregate functions such as \`COUNT(*)\`.
+- [o] The storage class of the value SQLite is actually holding.
+  > \`typeof()\` can return results such as \`integer\`, \`real\`, \`text\`, \`blob\`, or \`null\`.
 - Whether the column is a primary key.
   > Primary key status is schema information, not what \`typeof()\` reports.`}
 />
@@ -313,38 +313,38 @@ SQLite's flexibility is friendly, but it will not always stop messy data. If a c
 <MultipleChoice
   markdown={`How should beginners usually store true/false values in SQLite?
 
-- As a separate \`BOOLEAN\` storage class.
-  > SQLite does not have a separate boolean storage class.
-- [o] As \`INTEGER\` values, commonly \`1\` for true and \`0\` for false.
-  > This is the common SQLite pattern for boolean-style data.
 - As table names.
   > Table names do not store per-row true/false values.
 - As random words like \`maybe\` and \`sometimes\`.
-  > Inconsistent text makes filtering unreliable.`}
+  > Inconsistent text makes filtering unreliable.
+- [o] As \`INTEGER\` values, commonly \`1\` for true and \`0\` for false.
+  > This is the common SQLite pattern for boolean-style data.
+- As a separate \`BOOLEAN\` storage class.
+  > SQLite does not have a separate boolean storage class.`}
 />
 
 <MultipleChoice
   markdown={`Which date storage choice is simplest for beginners in SQLite?
 
-- Store dates as many different text formats, such as \`March 14\` and \`14/03/26\`.
-  > Mixed formats are hard to sort and compare reliably.
-- [o] Store dates as \`TEXT\` using a consistent format like \`'2026-03-14'\`.
-  > ISO-style date text is readable and sorts well when consistently formatted.
 - Store dates as a primary key in every table.
   > A primary key identifies rows; it is not the general place to store all dates.
+- [o] Store dates as \`TEXT\` using a consistent format like \`'2026-03-14'\`.
+  > ISO-style date text is readable and sorts well when consistently formatted.
 - Store dates only as column names.
-  > Dates are usually values in rows, not column names.`}
+  > Dates are usually values in rows, not column names.
+- Store dates as many different text formats, such as \`March 14\` and \`14/03/26\`.
+  > Mixed formats are hard to sort and compare reliably.`}
 />
 
 <MultipleChoice
   markdown={`A \`NUMERIC\` affinity column receives the text value \`'42'\`. What is SQLite likely to do?
 
-- Delete the table immediately.
-  > SQLite does not delete a table because a value can be converted.
 - [o] Convert and store it as a numeric value, commonly an integer.
   > NUMERIC affinity tries to convert numeric-looking text into a numeric storage class.
-- Always store it as a BLOB.
-  > A plain numeric-looking text value is not automatically a BLOB.
+- Delete the table immediately.
+  > SQLite does not delete a table because a value can be converted.
 - Refuse every quoted value no matter what it contains.
-  > SQLite may convert quoted numeric-looking text when column affinity calls for it.`}
+  > SQLite may convert quoted numeric-looking text when column affinity calls for it.
+- Always store it as a BLOB.
+  > A plain numeric-looking text value is not automatically a BLOB.`}
 />

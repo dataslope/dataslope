@@ -563,10 +563,10 @@ assert deep_train_acc == 1.0, f"Expected the unlimited tree to reach 1.000 on tr
 
 - It picks a feature at random to keep the tree diverse
   > Random feature selection at each node is the approach used by *random forests*, not single decision trees. A decision tree exhaustively searches all features and thresholds to find the best split.
-- It always splits on the feature with the largest raw values
-  > The scale or magnitude of a feature's values does not determine how a tree splits. The tree evaluates every feature's ability to reduce impurity and picks the most informative one, regardless of value range.
 - [o] It searches over features and thresholds and chooses the split that makes the resulting groups as pure (homogeneous in the target) as possible
   > Trees use a criterion like Gini impurity or entropy (for classification) or variance/squared error (for regression) and greedily pick the split that reduces impurity the most.
+- It always splits on the feature with the largest raw values
+  > The scale or magnitude of a feature's values does not determine how a tree splits. The tree evaluates every feature's ability to reduce impurity and picks the most informative one, regardless of value range.
 - It uses the feature most correlated with the row index
   > Row index is not a feature and carries no predictive information. The tree evaluates features based on how well they separate the target labels, not their relationship to row ordering.
 
@@ -576,10 +576,10 @@ Splitting on purity is what lets a tree separate the classes one question at a t
 <MultipleChoice
   markdown={`A \`DecisionTreeClassifier()\` with no \`max_depth\` reaches 100% accuracy on the training set but only 84% on the test set. What is the most likely explanation?
 
-- The test set is mislabeled
-  > Mislabeled test data would depress the test score for unrelated reasons, but here the pattern, perfect training, lower test, is exactly what an unconstrained tree does by memorizing training rows. It is overfitting, not a data quality issue.
 - The tree is underfitting and needs to be shallower
   > Underfitting means the model is too simple even for the training data. A training accuracy of 100% is the opposite, the tree is too flexible and has memorized the data. Making it shallower would reduce overfitting, not add complexity.
+- The test set is mislabeled
+  > Mislabeled test data would depress the test score for unrelated reasons, but here the pattern, perfect training, lower test, is exactly what an unconstrained tree does by memorizing training rows. It is overfitting, not a data quality issue.
 - [o] The tree overfit, with no depth limit it grew until it memorized the training rows, so its training score is inflated and the test score is the honest estimate
   > An unconstrained tree can carve out a region for nearly every training point. The large train-minus-test gap is the classic signature of overfitting; limiting depth usually helps.
 - 100% training accuracy proves the model is excellent
@@ -591,14 +591,14 @@ A perfect training score next to a much lower test score signals memorization, n
 <MultipleChoice
   markdown={`Why do decision trees **not** require feature scaling (standardization), unlike K-nearest neighbors or many linear models?
 
+- Scaling would make trees overfit
+  > Scaling does not cause overfitting in decision trees, but it is simply unnecessary, because threshold-based splits are invariant to the scale of individual features.
+- Trees only work on data that is already normalized to [0, 1]
+  > Decision trees work on raw, unscaled data of any range. The penguins and diamonds examples on this page all use unscaled features with very different ranges.
 - Trees internally scale every feature before splitting
   > Decision trees do not scale features internally, they use the raw values directly. They simply do not *need* scaling because each split question uses a single feature's order, which is unaffected by scale.
 - [o] A tree asks threshold questions on one feature at a time ("is this value above x?"), and the answer to such a question does not change if you rescale that feature
   > Because each split compares a single feature to a threshold, the units or range of features are irrelevant, multiplying a column by 1000 does not change the order of its values or the chosen split point.
-- Trees only work on data that is already normalized to [0, 1]
-  > Decision trees work on raw, unscaled data of any range. The penguins and diamonds examples on this page all use unscaled features with very different ranges.
-- Scaling would make trees overfit
-  > Scaling does not cause overfitting in decision trees, but it is simply unnecessary, because threshold-based splits are invariant to the scale of individual features.
 
 Scale-invariance is one of the genuine conveniences of tree-based models.`}
 />
@@ -608,12 +608,12 @@ Scale-invariance is one of the genuine conveniences of tree-based models.`}
 
 - The leaf stores a regression coefficient that is multiplied by the input
   > Decision trees do not use linear coefficients at the leaves. A classification leaf stores the majority class, and a regression leaf stores the mean target value, both are constants, not formulas.
-- [o] The example is routed down the tree by answering each question; the leaf it lands in supplies the prediction (the majority class for classification, or the average target for regression)
-  > A prediction is just a path from root to leaf following yes/no answers. Classification leaves predict the most common class among their training examples; regression leaves predict those examples' mean.
 - Every leaf stores the entire training set and runs a distance search
   > Storing the entire dataset and running a distance search at prediction time is how K-nearest neighbors works, not decision trees. A leaf in a decision tree stores only the summary label (majority class or mean), not individual examples.
 - The leaf stores the probability output of a logistic regression
   > Logistic regression is a separate model that is not part of a decision tree's structure. A tree's leaves contain a simple class label or target mean derived from the training examples that reached them.
+- [o] The example is routed down the tree by answering each question; the leaf it lands in supplies the prediction (the majority class for classification, or the average target for regression)
+  > A prediction is just a path from root to leaf following yes/no answers. Classification leaves predict the most common class among their training examples; regression leaves predict those examples' mean.
 
 A tree's prediction is the value attached to whichever leaf the example reaches.`}
 />
@@ -621,14 +621,14 @@ A tree's prediction is the value attached to whichever leaf the example reaches.
 <MultipleChoice
   markdown={`Decision trees are described as "unstable" or "high variance." What does this mean in practice?
 
+- The accuracy randomly changes each epoch during training
+  > Decision trees do not train in epochs, they make a single greedy pass to build the tree, and the result is deterministic for a given training set. Accuracy instability refers to different trees built from different training samples, not repeated runs on the same data.
+- [o] A small change in the training data can produce a substantially different tree structure (e.g. a different feature chosen at the root), because each split is committed to greedily and everything below depends on it
+  > Instability refers to sensitivity of the learned *structure* to the training sample. This high variance is exactly what ensembles like random forests reduce by averaging many trees trained on resampled data.
 - They produce different predictions every time you call \`.predict\`, even on the same input
   > A fitted decision tree is deterministic: given the same input, it always returns the same prediction. Instability refers to sensitivity to the *training data*, a different training sample can produce a very different tree structure.
 - They require a GPU to train reliably
   > Decision trees are CPU-bound algorithms and train efficiently on CPU. GPU acceleration is associated with deep learning workloads, not tree-based models.
-- [o] A small change in the training data can produce a substantially different tree structure (e.g. a different feature chosen at the root), because each split is committed to greedily and everything below depends on it
-  > Instability refers to sensitivity of the learned *structure* to the training sample. This high variance is exactly what ensembles like random forests reduce by averaging many trees trained on resampled data.
-- The accuracy randomly changes each epoch during training
-  > Decision trees do not train in epochs, they make a single greedy pass to build the tree, and the result is deterministic for a given training set. Accuracy instability refers to different trees built from different training samples, not repeated runs on the same data.
 
 Instability is a property of the learning process, and it motivates the ensemble methods covered next.`}
 />

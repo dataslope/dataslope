@@ -207,23 +207,23 @@ needs no special members*.
 <MultipleChoice
   markdown={`What does \`std::move(x)\` actually do?
 
-- It moves \`x\` immediately and zeros it out.
-  > It does not move anything by itself.
 - [o] It is a cast that lets \`x\` bind to an rvalue reference, enabling a move constructor or move assignment to transfer ownership from \`x\`.
   > The actual move happens in the operation that consumes the rvalue.
-- It deletes \`x\`.
-  > It does not delete anything.
 - It marks \`x\` as \`const\`.
-  > Quite the opposite.`}
+  > Quite the opposite.
+- It moves \`x\` immediately and zeros it out.
+  > It does not move anything by itself.
+- It deletes \`x\`.
+  > It does not delete anything.`}
 />
 
 <MultipleChoice
   markdown={`Why is returning a large \`std::vector\` by value cheap in modern C++?
 
-- The compiler stores it in a register.
-  > Vectors don't fit in registers.
 - The standard library uses a global pool.
   > It does not.
+- The compiler stores it in a register.
+  > Vectors don't fit in registers.
 - [o] The vector is either constructed directly into the caller's location (copy elision) or its internal pointer is moved instead of copying the elements.
   > Both are pointer-level operations.
 - Because \`std::vector\` is small.

@@ -177,14 +177,14 @@ flowchart TD
 <MultipleChoice
   markdown={`What is the defining behavior of an **aggregate function**?
 
-- It returns one output row for each input row.
-  > That describes ordinary column selection; aggregates *collapse* many rows into one summary value.
 - [o] It reduces many rows to a single summary value, such as a total or an average.
   > "Many rows in, one number out" is exactly what \`SUM\`, \`AVG\`, \`COUNT\`, \`MIN\`, and \`MAX\` do.
 - It sorts rows into ascending order.
   > Sorting is \`ORDER BY\`; aggregation summarizes rather than orders.
 - It removes duplicate rows.
   > Removing duplicates is \`DISTINCT\`; aggregation computes a summary.
+- It returns one output row for each input row.
+  > That describes ordinary column selection; aggregates *collapse* many rows into one summary value.
 
 Aggregation collapses a set of rows into one summarizing number, the core
 analytical operation.`}
@@ -210,12 +210,12 @@ Aggregates skip NULLs, so \`AVG\` reflects only the present values.`}
 
 - \`COUNT(*)\`
   > That counts orders (rows), not distinct customers, a customer with three orders would count three times.
-- \`COUNT(customer_id)\`
-  > That counts non-NULL customer ids, still once per order, so repeat customers are over-counted.
 - [o] \`COUNT(DISTINCT customer_id)\`
   > \`DISTINCT\` collapses repeats, counting each customer once regardless of how many orders they placed.
 - \`SUM(customer_id)\`
   > Summing id numbers is meaningless and does not count customers.
+- \`COUNT(customer_id)\`
+  > That counts non-NULL customer ids, still once per order, so repeat customers are over-counted.
 
 "How many *different* X" almost always means \`COUNT(DISTINCT X)\`.`}
 />

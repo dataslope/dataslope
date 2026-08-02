@@ -614,14 +614,14 @@ int main() {
 <MultipleChoice
   markdown={`With path compression and union by rank or size, what is DSU's amortized complexity per operation?
 
-- O(n)
-  > Naive find can degrade to O(n), but the optimizations avoid that in amortized analysis.
-- O(log n) exactly
-  > The optimized bound is even tighter asymptotically.
 - [o] Near O(α(n)), practically constant
   > α(n) is the inverse Ackermann function.
+- O(log n) exactly
+  > The optimized bound is even tighter asymptotically.
 - O(n²)
   > DSU operations are much faster than quadratic.
+- O(n)
+  > Naive find can degrade to O(n), but the optimizations avoid that in amortized analysis.
 
 Tarjan's analysis gives the famous inverse-Ackermann amortized bound.`}
 />
@@ -629,14 +629,14 @@ Tarjan's analysis gives the famous inverse-Ackermann amortized bound.`}
 <MultipleChoice
   markdown={`What does path compression do during \`find(x)\`?
 
-- It sorts all elements in the set
-  > DSU does not maintain sorted set contents.
 - [o] It makes nodes on the search path point directly to the root
   > This flattens the tree for future finds.
-- It deletes the set containing x
-  > Find is a query/update optimization, not deletion.
+- It sorts all elements in the set
+  > DSU does not maintain sorted set contents.
 - It always chooses the larger root
   > Choosing roots is union by size or rank, not path compression.
+- It deletes the set containing x
+  > Find is a query/update optimization, not deletion.
 
 Path compression is why repeated finds become extremely fast.`}
 />
@@ -644,12 +644,12 @@ Path compression is why repeated finds become extremely fast.`}
 <MultipleChoice
   markdown={`Why is DSU often preferred over rerunning BFS for incremental connectivity queries where edges are only added?
 
-- [o] DSU updates connectivity with very fast unite operations
-  > Each added edge can be processed almost constantly.
-- BFS cannot traverse graphs
-  > BFS traverses graphs well, but rerunning it after every edge can be expensive.
 - DSU stores shortest paths
   > DSU only tracks components, not distances or paths.
+- BFS cannot traverse graphs
+  > BFS traverses graphs well, but rerunning it after every edge can be expensive.
+- [o] DSU updates connectivity with very fast unite operations
+  > Each added edge can be processed almost constantly.
 - DSU works only on directed graphs
   > Classic connectivity DSU is typically used for undirected graphs.
 

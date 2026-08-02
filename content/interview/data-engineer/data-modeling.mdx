@@ -377,27 +377,27 @@ GROUP BY p.promo_name;
 <MultipleChoice
   markdown={`An analytics table repeats the full customer name and address on **every** order row ("denormalized"). What's the main trade-off?
 
+- It only matters for OLTP systems, never analytics.
+  > Denormalization is *especially* common in analytics/warehouse modeling.
 - It saves storage at the cost of correctness.
   > Denormalization generally *increases* storage (repeated data), it isn't a storage win.
 - [o] Faster reads (no join needed) at the cost of redundancy and update anomalies.
   > It trades write-time/consistency concerns for read performance, common and often correct in analytics.
 - It guarantees the data is always consistent.
-  > The opposite: repeating data risks the copies disagreeing (update anomalies).
-- It only matters for OLTP systems, never analytics.
-  > Denormalization is *especially* common in analytics/warehouse modeling.`}
+  > The opposite: repeating data risks the copies disagreeing (update anomalies).`}
 />
 
 <MultipleChoice
   markdown={`A customer moves to a new city. You must keep historical orders attributed to the city they lived in **at the time**, while new orders use the new city. Which approach fits?
 
-- SCD Type 1 (overwrite the old value).
-  > Type 1 overwrites history, so past orders would all show the new city, losing the point-in-time truth.
-- [o] SCD Type 2 (new dimension row with effective-date ranges and a current flag).
-  > Type 2 versions the dimension so each fact joins to the row current when it occurred, the standard way to preserve history.
+- Store the city only on the fact table and drop the dimension.
+  > That denormalizes away the dimension and doesn't give you versioned history or a clean current view.
 - Delete the customer and re-insert them.
   > That breaks referential integrity with historical facts and still loses the time context.
-- Store the city only on the fact table and drop the dimension.
-  > That denormalizes away the dimension and doesn't give you versioned history or a clean current view.`}
+- [o] SCD Type 2 (new dimension row with effective-date ranges and a current flag).
+  > Type 2 versions the dimension so each fact joins to the row current when it occurred, the standard way to preserve history.
+- SCD Type 1 (overwrite the old value).
+  > Type 1 overwrites history, so past orders would all show the new city, losing the point-in-time truth.`}
 />
 
 ## Go deeper

@@ -283,38 +283,38 @@ int main() {
 <MultipleChoice
   markdown={`Which basic sort can run in O(n) on already sorted input with an early-exit flag?
 
-- [o] Bubble sort
-  > A pass with no swaps proves the array is sorted.
+- Quicksort
+  > Quicksort depends on partitions and pivots.
 - Selection sort
   > It still searches for a minimum each pass.
 - Merge sort
   > Merge sort is efficient, but not one of these basic slow sorts.
-- Quicksort
-  > Quicksort depends on partitions and pivots.`}
+- [o] Bubble sort
+  > A pass with no swaps proves the array is sorted.`}
 />
 
 <MultipleChoice
   markdown={`What does it mean for a sorting algorithm to be stable?
 
-- It never uses extra memory.
-  > Stability is about equal elements, not memory.
 - It always runs in O(n log n).
   > Runtime and stability are separate properties.
 - [o] Equal elements keep their original relative order.
   > This matters for records with multiple fields.
 - It never swaps elements.
-  > Stable algorithms can move elements while preserving equal-key order.`}
+  > Stable algorithms can move elements while preserving equal-key order.
+- It never uses extra memory.
+  > Stability is about equal elements, not memory.`}
 />
 
 <MultipleChoice
   markdown={`Which algorithm repeatedly selects the minimum element from the unsorted suffix and swaps it to the front?
 
-- Bubble sort
-  > Bubble sort swaps adjacent out-of-order pairs.
-- [o] Selection sort
-  > It selects the next minimum for the sorted prefix.
 - Insertion sort
   > It inserts a key into a sorted prefix.
+- [o] Selection sort
+  > It selects the next minimum for the sorted prefix.
+- Bubble sort
+  > Bubble sort swaps adjacent out-of-order pairs.
 - Binary search
   > Binary search searches; it does not sort.`}
 />

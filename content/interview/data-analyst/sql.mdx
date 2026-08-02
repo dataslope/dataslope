@@ -528,12 +528,12 @@ FROM transactions;`}
 
 - A \`WHERE revenue > 250\` clause.
   > \`WHERE\` filters individual rows *before* aggregation, so it can't reference the per-group \`SUM\`, and the alias \`revenue\` doesn't exist yet at that stage.
-- [o] A \`HAVING SUM(amount) > 250\` clause.
-  > \`HAVING\` is evaluated *after* \`GROUP BY\`, so it can filter on aggregates like \`SUM(amount)\`.
+- Neither; you must wrap the query in a subquery first.
+  > A subquery works but isn't required, \`HAVING\` filters grouped results directly.
 - Either one works; they're interchangeable.
   > They run at different stages: \`WHERE\` before grouping (row-level), \`HAVING\` after (group-level). Filtering an aggregate belongs in \`HAVING\`.
-- Neither; you must wrap the query in a subquery first.
-  > A subquery works but isn't required, \`HAVING\` filters grouped results directly.`}
+- [o] A \`HAVING SUM(amount) > 250\` clause.
+  > \`HAVING\` is evaluated *after* \`GROUP BY\`, so it can filter on aggregates like \`SUM(amount)\`.`}
 />
 
 <MultipleChoice

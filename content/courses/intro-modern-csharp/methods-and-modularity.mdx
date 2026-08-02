@@ -464,25 +464,25 @@ Console.WriteLine($"max={Stats.Max(data)}");
 <MultipleChoice
   markdown={`What does the keyword \`void\` mean in a method declaration?
 
-- The method never runs
-  > It runs normally.
-- The method has no parameters
-  > A method can have parameters regardless of return type.
 - [o] The method returns no value to the caller
   > You call it for its side effects, not for a returned value.
 - The method is private
-  > Visibility is controlled by separate keywords like \`public\` and \`private\`.`}
+  > Visibility is controlled by separate keywords like \`public\` and \`private\`.
+- The method never runs
+  > It runs normally.
+- The method has no parameters
+  > A method can have parameters regardless of return type.`}
 />
 
 <MultipleChoice
   markdown={`Why is "small methods doing one thing" a good habit?
 
-- Smaller methods compile faster
-  > The compile-time difference is negligible.
-- The language requires it
-  > It doesn't.
 - [o] Small focused methods are easier to name, test, reuse, and reason about, and changes stay localized
   > This is the central argument for modularity.
 - Smaller methods use less memory
-  > Method size has almost no impact on memory usage.`}
+  > Method size has almost no impact on memory usage.
+- The language requires it
+  > It doesn't.
+- Smaller methods compile faster
+  > The compile-time difference is negligible.`}
 />

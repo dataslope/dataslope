@@ -146,14 +146,14 @@ what that hides on the bar-and-count page.)
   markdown={`You drew the same \`tips\` data as a strip plot, a box plot, and a bar plot.
 What changed between the three figures?
 
-- The underlying data, which Seaborn re-sampled for each \`kind\`.
-  > Seaborn read the identical DataFrame all three times. Nothing about the data changed, only the way it was drawn.
 - [o] How much of each group's distribution was shown versus summarized.
   > The strip showed every point, the box summarized the spread into quartiles, and the bar collapsed each group to a single mean, same data, different levels of detail.
-- The number of categories on the x-axis.
-  > All three put the same four days on the x-axis; \`kind\` does not add or remove categories.
 - Whether the variables were numeric or categorical.
   > \`day\` stayed categorical and \`total_bill\` stayed numeric in every version; \`kind\` only changes the drawing, not the variable types.
+- The number of categories on the x-axis.
+  > All three put the same four days on the x-axis; \`kind\` does not add or remove categories.
+- The underlying data, which Seaborn re-sampled for each \`kind\`.
+  > Seaborn read the identical DataFrame all three times. Nothing about the data changed, only the way it was drawn.
 
 The \`kind\` argument is a dial from raw detail to compact summary, the data
 is constant; only the amount of it you see changes.`}
@@ -287,12 +287,12 @@ g = sns.catplot(data=tips, x="day", y="total_bill", kind="box", height=4)
 
 - The DataFrame that gets plotted.
   > The data comes from the \`data\` argument; \`kind\` does not choose or change the dataset.
+- The color palette used for the groups.
+  > Palette is set with \`palette=\`; \`kind\` selects the chart type, not its colors.
 - [o] Which categorical chart is drawn, how much of each group's distribution is shown or summarized.
   > \`catplot\` is one function that draws many chart types; \`kind\` selects among them, from raw points (\`strip\`) to a single estimate (\`bar\`).
 - Whether the x variable is treated as numeric or categorical.
   > Variable types come from the columns themselves; \`kind\` only changes how the groups are drawn, not their types.
-- The color palette used for the groups.
-  > Palette is set with \`palette=\`; \`kind\` selects the chart type, not its colors.
 
 \`catplot\` is a hub: the same call with a different \`kind\` gives you a strip,
 box, violin, bar, point, or count plot.`}
@@ -302,14 +302,14 @@ box, violin, bar, point, or count plot.`}
   markdown={`You want to know, for the \`titanic\` dataset, **how many passengers were in
 each travel class**, first, second, and third. Which \`kind\` fits, and why?
 
-- \`kind="bar"\`, because bars are for categories.
-  > A bar plot needs a numeric \`y\` to average and would show a *mean*, not a head-count. "How many passengers" is a frequency, not an average.
-- \`kind="box"\`, to summarize each class.
-  > A box plot summarizes the *spread* of a numeric variable within each group. With only the class label and no numeric measurement, there is nothing for it to summarize.
 - [o] \`kind="count"\`, because you are tallying rows per category and have no numeric variable.
   > "How many in each group?" is exactly a frequency count, and \`count\` is the one kind that needs only the categorical column.
+- \`kind="bar"\`, because bars are for categories.
+  > A bar plot needs a numeric \`y\` to average and would show a *mean*, not a head-count. "How many passengers" is a frequency, not an average.
 - \`kind="strip"\`, to show every passenger as a point.
   > A strip plot plots a numeric value for each row along the other axis; with only a category and no numeric variable, there is nothing to position the points against.
+- \`kind="box"\`, to summarize each class.
+  > A box plot summarizes the *spread* of a numeric variable within each group. With only the class label and no numeric measurement, there is nothing for it to summarize.
 
 When the question is a pure head-count and there is no numeric variable,
 \`count\` is the natural choice.`}
@@ -320,14 +320,14 @@ When the question is a pure head-count and there is no numeric variable,
 "Premium economy", ...) and on a vertical plot they overlap and tilt along
 the bottom. What is the simplest fix in Seaborn?
 
-- Map the long variable to \`hue\` instead of \`x\`.
-  > \`hue\` colors groups rather than placing them along an axis; it changes the encoding entirely and does not solve cramped axis labels.
+- Remove the categorical variable from the plot.
+  > Dropping the variable removes the very comparison you are trying to make.
 - [o] Put the categorical variable on \`y\` instead of \`x\` so the plot is horizontal.
   > With the category on \`y\`, each label gets its own horizontal row and reads cleanly left-to-right, the standard cure for long or numerous category names.
 - Switch to \`kind="count"\` so the labels shrink.
   > Changing the \`kind\` redraws the data but does nothing about where or how the category labels are placed.
-- Remove the categorical variable from the plot.
-  > Dropping the variable removes the very comparison you are trying to make.
+- Map the long variable to \`hue\` instead of \`x\`.
+  > \`hue\` colors groups rather than placing them along an axis; it changes the encoding entirely and does not solve cramped axis labels.
 
 Orientation is set by which axis holds the category: \`x\` for vertical, \`y\`
 for horizontal, and horizontal is the readable choice for long labels.`}

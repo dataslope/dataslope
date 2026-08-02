@@ -183,12 +183,12 @@ type fits?
 
 - Qualitative.
   > Qualitative palettes are for unordered categories; an anomaly is an ordered, signed quantity, not a category.
+- It doesn't matter; any palette works.
+  > The palette type carries meaning here, the wrong one would misrepresent the sign of the anomaly.
 - Sequential.
   > A single light-to-dark ramp would hide the all-important distinction between "above" and "below" the baseline.
 - [o] Diverging, centered at 0.
   > Anomalies fan out from a meaningful midpoint in two directions, so a diverging palette with the neutral color at 0 makes "warmer" and "cooler" instantly readable.
-- It doesn't matter; any palette works.
-  > The palette type carries meaning here, the wrong one would misrepresent the sign of the anomaly.
 
 Data with a meaningful center (anomalies, correlations, change vs. baseline)
 calls for a diverging palette centered on that midpoint.`}
@@ -327,14 +327,14 @@ g = sns.relplot(
   markdown={`Which kind of palette is appropriate for an **unordered categorical**
 variable like \`region\` (North, South, East, West)?
 
-- Sequential.
-  > A light-to-dark ramp implies an ordering, but the regions have none, readers would wrongly infer a ranking.
+- Any of them, since the data is categorical.
+  > Only a qualitative palette avoids implying an order; the other two would mislead.
 - [o] Qualitative.
   > Qualitative palettes give each category a distinct hue of equal weight, which is exactly right when there's no order among the groups.
 - Diverging.
   > Diverging palettes encode distance from a midpoint, which is meaningless for unordered labels.
-- Any of them, since the data is categorical.
-  > Only a qualitative palette avoids implying an order; the other two would mislead.
+- Sequential.
+  > A light-to-dark ramp implies an ordering, but the regions have none, readers would wrongly infer a ranking.
 
 Unordered categories → qualitative; the other types imply order or a center
 that the data doesn't have.`}
@@ -344,14 +344,14 @@ that the data doesn't have.`}
   markdown={`Why are palettes like \`viridis\`, \`rocket\`, and \`mako\` preferred over the
 old \`jet\`/rainbow colormap for continuous data?
 
+- They work only for categorical data.
+  > These are sequential maps for continuous amounts, the opposite of categorical use.
+- They are the only palettes Seaborn supports.
+  > Seaborn supports many palettes; these are recommended on perceptual grounds, not by exclusivity.
 - They use fewer colors, so they render faster.
   > Speed isn't the issue; the concern is faithful perception of the values.
 - [o] They are perceptually uniform, equal data steps look like equal color steps, and lightness increases steadily, so they don't invent false structure.
   > Rainbow maps have bright bands that read as features where the data is flat; perceptually uniform maps avoid that and stay readable even in grayscale.
-- They are the only palettes Seaborn supports.
-  > Seaborn supports many palettes; these are recommended on perceptual grounds, not by exclusivity.
-- They work only for categorical data.
-  > These are sequential maps for continuous amounts, the opposite of categorical use.
 
 Perceptually uniform sequential maps represent magnitude honestly; rainbow
 maps distort it.`}
@@ -361,12 +361,12 @@ maps distort it.`}
   markdown={`Beyond picking a colorblind-friendly palette, what's the most robust way to
 keep a grouped chart readable for someone with color-vision deficiency?
 
-- Increase the figure's resolution.
-  > Resolution doesn't help distinguish colors that look alike to a colorblind reader.
 - [o] Encode the group with a second channel too, e.g. marker \`style\` (shape), direct labels, or facets, so color isn't the only cue.
   > Redundant encoding means the grouping survives even if the colors are indistinguishable, which is the core accessibility principle.
 - Use a darker background.
   > Background tone doesn't solve the underlying problem of relying on color alone.
+- Increase the figure's resolution.
+  > Resolution doesn't help distinguish colors that look alike to a colorblind reader.
 - Add more colors so there's more variety.
   > More hues make groups *harder* to tell apart, not easier, and worsen the problem.
 
@@ -378,12 +378,12 @@ up without it.`}
   markdown={`You color a scatter's \`hue\` by a category that has **25 distinct values**.
 What's the likely problem?
 
+- The colors will automatically become a gradient.
+  > Seaborn keeps a categorical mapping; it doesn't silently switch to a gradient.
 - Seaborn will refuse to draw more than 10 colors.
   > It will draw them, but many hues will be near-duplicates.
 - [o] The hues become too similar to tell apart and to match against the legend, so the color encoding stops working.
   > Human color discrimination tops out at a handful of categorical hues; with 25 groups, colors blur together and the legend becomes unusable.
-- The colors will automatically become a gradient.
-  > Seaborn keeps a categorical mapping; it doesn't silently switch to a gradient.
 - Nothing, 25 categories color cleanly.
   > Far too many for distinct qualitative colors; readability collapses.
 

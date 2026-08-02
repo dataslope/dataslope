@@ -195,10 +195,10 @@ sharpened it, and a bivariate plot answered it. That arc is the loop.
 second peak, which led us to color a scatter plot by \`species\`. What does this
 sequence illustrate about EDA?
 
-- That a single histogram is always enough to fully understand a variable.
-  > The histogram *raised* a question (why the second bump?) rather than settling it. EDA rarely finishes in one plot.
 - [o] That EDA is iterative: one plot reveals something, which sharpens the next question and motivates the next plot.
   > The lopsided shape prompted a grouped scatter, which explained the bump as species. Each plot feeds the next, that loop is the heart of EDA.
+- That a single histogram is always enough to fully understand a variable.
+  > The histogram *raised* a question (why the second bump?) rather than settling it. EDA rarely finishes in one plot.
 - That you should always start with a scatter plot before anything else.
   > The example deliberately started with structure and a univariate view *before* the scatter. Order matters, and the scatter came later.
 - That coloring by a group is only ever decorative.
@@ -340,14 +340,14 @@ quiet, essential job before any chart is drawn.
   markdown={`Which phrase best describes the overall character of exploratory data
 analysis?
 
-- A one-time report you generate at the very end of a project.
-  > That describes *explanatory* output for an audience. EDA happens early and repeatedly, before you have conclusions to report.
+- The process of formally proving a hypothesis with a statistical test.
+  > Proving hypotheses is confirmatory analysis. EDA *generates* hypotheses to test later; it does not confirm them.
 - [o] An iterative loop of plotting, noticing something, asking a sharper question, and plotting again.
   > EDA cycles: each chart surfaces something that refines the next question, and you keep looping until the data stops surprising you.
 - A fixed checklist of plots you must produce in a strict order every time.
   > The 5-step loop is a starting groove, not a rigid script; real exploration jumps around as the data leads you.
-- The process of formally proving a hypothesis with a statistical test.
-  > Proving hypotheses is confirmatory analysis. EDA *generates* hypotheses to test later; it does not confirm them.
+- A one-time report you generate at the very end of a project.
+  > That describes *explanatory* output for an audience. EDA happens early and repeatedly, before you have conclusions to report.
 
 EDA is a loop, not a checklist or a final report: explore, notice, refine,
 repeat.`}
@@ -357,14 +357,14 @@ repeat.`}
   markdown={`You have just loaded a brand-new dataset you have never seen. According to the
 workflow on this page, which is the most sensible **first** move?
 
-- Build a polished, publication-ready multi-panel figure.
-  > Polish belongs to the final, communicate step. Starting there risks lavishing effort on a column you have misread.
 - Immediately run a formal statistical test on two columns.
   > Formal testing is confirmatory work that comes much later. You do not yet know the data well enough to choose a meaningful test.
-- [o] Inspect its structure, shape, a few rows, column types, and missing values, with tools like \`shape\`, \`head\`, \`info\`, and \`isna().sum()\`.
-  > Understanding size, types, and missingness first prevents you from analyzing the wrong thing and frames every plot that follows.
 - Drop every row that contains any missing value, then start plotting.
   > Blindly dropping rows can discard a lot of data before you understand it; first *measure* the missingness, then decide deliberately how to handle it.
+- [o] Inspect its structure, shape, a few rows, column types, and missing values, with tools like \`shape\`, \`head\`, \`info\`, and \`isna().sum()\`.
+  > Understanding size, types, and missingness first prevents you from analyzing the wrong thing and frames every plot that follows.
+- Build a polished, publication-ready multi-panel figure.
+  > Polish belongs to the final, communicate step. Starting there risks lavishing effort on a column you have misread.
 
 Step 1 is unglamorous structure-checking, and it protects every step that
 comes after it.`}
@@ -374,14 +374,14 @@ comes after it.`}
   markdown={`In the penguins walkthrough, what made the **grouped scatter plot** (colored by
 \`species\`) such a productive next step after the body-mass histogram?
 
-- It used a prettier color palette than the histogram.
-  > Aesthetics were not the point. The scatter advanced the analysis by *explaining* a pattern, not by looking nicer.
 - It proved beyond doubt that species causes body mass.
   > EDA surfaces relationships; it does not establish causation. The scatter revealed structure, it did not prove a cause.
 - [o] It tested the histogram's hint of hidden groups by relating two variables and splitting by \`species\`, which explained the second peak.
   > The univariate plot suggested multiple groups; adding a second variable and a \`hue\` confirmed the groups were species, exactly the loop turning one observation into the next plot.
 - It replaced the need to ever look at single variables again.
   > Univariate and bivariate views complement each other; the histogram was what *motivated* the scatter in the first place.
+- It used a prettier color palette than the histogram.
+  > Aesthetics were not the point. The scatter advanced the analysis by *explaining* a pattern, not by looking nicer.
 
 A good follow-up plot turns "something is going on" into "here is what is going
 on", that is the loop paying off.`}

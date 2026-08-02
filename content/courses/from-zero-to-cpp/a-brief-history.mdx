@@ -266,53 +266,53 @@ syntactic detail, is what this course will teach you.
 <MultipleChoice
   markdown={`Who designed C++, and what was its original name?
 
-- Dennis Ritchie, originally called "C2"
-  > Ritchie designed **C**, not C++.
+- Alan Kay, originally called "Smalltalk-C"
+  > Kay designed Smalltalk, which influenced object-oriented programming but is not C++.
 - Brian Kernighan, originally called "K&R++"
   > Kernighan co-wrote the famous C book but did not design C++.
 - [o] Bjarne Stroustrup, originally called "C with Classes"
   > Stroustrup began the project at Bell Labs in 1979 and renamed it C++ in 1983.
-- Alan Kay, originally called "Smalltalk-C"
-  > Kay designed Smalltalk, which influenced object-oriented programming but is not C++.`}
+- Dennis Ritchie, originally called "C2"
+  > Ritchie designed **C**, not C++.`}
 />
 
 <MultipleChoice
   markdown={`Which best describes the relationship between C and C++ today?
 
-- They are two names for the same language.
-  > They are different languages, even though they share a lot of syntax.
 - C++ is a strict subset of C, with fewer features.
   > It is the opposite, C++ adds many features on top of C.
-- [o] C++ began as an extension of C, and although most C programs still compile as C++, idiomatic modern C++ looks very different from idiomatic C.
-  > C++ grew classes, templates, RAII, and a large standard library on top of C's core model.
 - C and C++ are competitors with no shared history.
-  > They share decades of history and a great deal of syntax.`}
+  > They share decades of history and a great deal of syntax.
+- They are two names for the same language.
+  > They are different languages, even though they share a lot of syntax.
+- [o] C++ began as an extension of C, and although most C programs still compile as C++, idiomatic modern C++ looks very different from idiomatic C.
+  > C++ grew classes, templates, RAII, and a large standard library on top of C's core model.`}
 />
 
 <MultipleChoice
   markdown={`Why did C++ add features like classes and encapsulation?
 
+- Because the C standard required it.
+  > The C and C++ standards are independent of each other.
 - To make C++ run faster than C.
   > Classes are an organizational tool; they do not by themselves make programs faster.
 - To replace C entirely in operating-system kernels.
   > Most kernels are still written in C; C++ adoption in kernels is partial and recent.
 - [o] To help programmers manage growing software complexity by bundling data with the functions that operate on it.
-  > As programs grew to hundreds of thousands of lines, encapsulation became essential.
-- Because the C standard required it.
-  > The C and C++ standards are independent of each other.`}
+  > As programs grew to hundreds of thousands of lines, encapsulation became essential.`}
 />
 
 <MultipleChoice
   markdown={`Which of the following is **not** one of C++'s supported paradigms?
 
-- Object-oriented programming
-  > C++ supports OOP with classes, inheritance, and virtual functions.
 - Generic programming
   > C++ supports generic programming via templates.
+- [o] Pure functional programming with strict immutability enforced by the compiler
+  > C++ supports a functional *style* with lambdas and algorithms, but the language does not enforce immutability the way Haskell does.
 - Procedural programming
   > C++ supports plain functions and procedural style; in fact, much C++ code is mostly procedural.
-- [o] Pure functional programming with strict immutability enforced by the compiler
-  > C++ supports a functional *style* with lambdas and algorithms, but the language does not enforce immutability the way Haskell does.`}
+- Object-oriented programming
+  > C++ supports OOP with classes, inheritance, and virtual functions.`}
 />
 
 Next, we'll zoom in on the machine itself: what actually happens

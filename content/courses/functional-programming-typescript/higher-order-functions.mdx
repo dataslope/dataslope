@@ -473,14 +473,14 @@ export function mapInput<A, B>(f: (a: A) => B, v: Validator<B>): Validator<A> {
 <MultipleChoice
   markdown={`Which of the following best describes a *higher-order function*?
 
-- A function that runs faster than other functions
-  > Performance has nothing to do with the definition.
 - A function defined at the top level of a module
   > "Top-level" refers to scope, not behavior.
 - [o] A function that takes another function as an argument, returns a function, or both
   > This is the literal definition. It is what makes \`map\`, \`filter\`, \`reduce\`, decorators, factories, and most FP abstractions possible.
 - A function annotated with TypeScript generics
   > Generic and higher-order are different concepts. A function can be one without the other (though they often appear together).
+- A function that runs faster than other functions
+  > Performance has nothing to do with the definition.
 
 The defining feature is that *functions themselves flow through the function*, as inputs, outputs, or both.`}
 />

@@ -295,12 +295,12 @@ building it in the Python world.
 <MultipleChoice
   markdown={`Which of these is the chapter's stated **biggest practical reason** analysts move from spreadsheets to code?
 
+- [o] Code-based analyses are *reproducible*, re-running on next week's data gives the same results without manual effort
+  > Reproducibility is the single biggest selling point of moving from spreadsheets to code, even if you never touch a dataset larger than 1,000 rows.
 - Code is shorter
   > Code is often *more* verbose than a handful of spreadsheet clicks for a simple task; the chapter's argument is about reproducibility, not terseness.
 - Code is more fun
   > Enjoyment is subjective and not the chapter's stated reason; the practical case rests on reproducibility and auditability.
-- [o] Code-based analyses are *reproducible*, re-running on next week's data gives the same results without manual effort
-  > Reproducibility is the single biggest selling point of moving from spreadsheets to code, even if you never touch a dataset larger than 1,000 rows.
 - Code uses less memory
   > Memory efficiency is a secondary concern; a small CSV loaded into Excel and into Pandas uses comparable RAM.
 
@@ -310,14 +310,14 @@ Speed and scale matter too, but the everyday win is reproducibility.`}
 <MultipleChoice
   markdown={`In the chapter's "recurring test," what is the heuristic for choosing between a spreadsheet and Pandas?
 
-- [o] If you will do this analysis more than twice, write it in code
-  > The upfront cost of code pays off as soon as you have to repeat the work. One-off analyses are still fine in a spreadsheet.
-- If the dataset has more than 50 rows, use Pandas
-  > The chapter's heuristic is based on repetition frequency, not row count; a 50-row analysis done weekly still benefits from code.
 - If the analysis has more than 3 steps, use Excel
   > The chapter recommends the opposite: more steps favor code because each step is documented and re-runnable.
+- If the dataset has more than 50 rows, use Pandas
+  > The chapter's heuristic is based on repetition frequency, not row count; a 50-row analysis done weekly still benefits from code.
 - If you have meetings on Mondays, use Pandas
   > Meeting schedules have no bearing on the chapter's heuristic, which is purely about how often the analysis will be repeated.
+- [o] If you will do this analysis more than twice, write it in code
+  > The upfront cost of code pays off as soon as you have to repeat the work. One-off analyses are still fine in a spreadsheet.
 
 It is a rule of thumb, not a law, but a useful one.`}
 />
@@ -327,12 +327,12 @@ It is a rule of thumb, not a law, but a useful one.`}
 
 - Handling millions of rows
   > Handling large data is listed as an advantage of Pandas, not of spreadsheets; Excel struggles significantly past a few hundred thousand rows.
-- Reproducibility
-  > Reproducibility is explicitly cited as a strength of code-based analysis, not of spreadsheets.
-- Version control via git
-  > Git tracks code well but is awkward for binary spreadsheet files; the chapter lists git as a code advantage, not a spreadsheet one.
 - [o] Letting a non-technical stakeholder play with assumptions in a visual model
   > Spreadsheets are also user-interfaces. For a CFO who needs to tweak inputs and see outputs change live, Excel is still better than a Python script.
+- Version control via git
+  > Git tracks code well but is awkward for binary spreadsheet files; the chapter lists git as a code advantage, not a spreadsheet one.
+- Reproducibility
+  > Reproducibility is explicitly cited as a strength of code-based analysis, not of spreadsheets.
 
 The chapter argues for *both* tools, not against spreadsheets.`}
 />

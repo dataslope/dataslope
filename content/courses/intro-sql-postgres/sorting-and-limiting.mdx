@@ -162,14 +162,14 @@ follow this sequence. *Select* from a table, *filter*, *sort*, then
 <MultipleChoice
   markdown={`Which clause puts query results into a specific, deliberate order?
 
-- \`WHERE\`
-  > \`WHERE\` filters which rows appear; it does not arrange their order.
-- [o] \`ORDER BY\`
-  > \`ORDER BY\` sorts the result rows by one or more columns, ascending or descending.
 - \`LIMIT\`
   > \`LIMIT\` trims the number of rows but does not decide their order.
 - \`SELECT\`
   > \`SELECT\` chooses columns; ordering rows is a separate step.
+- \`WHERE\`
+  > \`WHERE\` filters which rows appear; it does not arrange their order.
+- [o] \`ORDER BY\`
+  > \`ORDER BY\` sorts the result rows by one or more columns, ascending or descending.
 
 \`ORDER BY\` is the clause that sorts results.`}
 />
@@ -177,14 +177,14 @@ follow this sequence. *Select* from a table, *filter*, *sort*, then
 <MultipleChoice
   markdown={`Why should \`LIMIT 5\` almost always be paired with an \`ORDER BY\`?
 
+- Because \`LIMIT\` only works on sorted tables.
+  > \`LIMIT\` works on any result; the point is that "which rows" is undefined without an order.
 - Because \`LIMIT\` will error without \`ORDER BY\`.
   > \`LIMIT\` runs fine alone; the issue is meaning, not a syntax error.
 - [o] Because rows have no inherent order, so without \`ORDER BY\` you get an unpredictable five rows rather than a meaningful "top five."
   > To get a definite "top" or "first" five, you must first impose an order; otherwise the choice is arbitrary.
 - Because \`ORDER BY\` makes \`LIMIT\` run faster.
   > Pairing them is about correctness of meaning, not speed.
-- Because \`LIMIT\` only works on sorted tables.
-  > \`LIMIT\` works on any result; the point is that "which rows" is undefined without an order.
 
 Without an \`ORDER BY\`, \`LIMIT\` returns an arbitrary subset, not a meaningful top-N.`}
 />
@@ -192,12 +192,12 @@ Without an \`ORDER BY\`, \`LIMIT\` returns an arbitrary subset, not a meaningful
 <MultipleChoice
   markdown={`You want the second page of results, showing rows 3 and 4 of an ordered list. Which clause combination does this?
 
-- \`LIMIT 4\`
-  > That returns the first four rows, not specifically the third and fourth.
 - [o] \`LIMIT 2 OFFSET 2\`
   > Skipping the first 2 rows with \`OFFSET 2\` and taking 2 with \`LIMIT 2\` yields exactly rows 3 and 4.
 - \`OFFSET 4\`
   > That skips the first four rows and returns everything after, not just two rows.
+- \`LIMIT 4\`
+  > That returns the first four rows, not specifically the third and fourth.
 - \`WHERE row = 2\`
   > There is no inherent row-number column to filter on; pagination uses \`LIMIT\` and \`OFFSET\`.
 
@@ -207,14 +207,14 @@ Without an \`ORDER BY\`, \`LIMIT\` returns an arbitrary subset, not a meaningful
 <MultipleChoice
   markdown={`In \`ORDER BY dept ASC, salary DESC\`, how are rows arranged?
 
-- Only by salary, ignoring department.
-  > Department is listed first, so it is the primary sort key; salary only breaks ties within a department.
+- By salary first, then department.
+  > The column order in \`ORDER BY\` sets priority, and department comes first here.
 - Randomly, because two columns conflict.
   > Multiple sort columns do not conflict; they act in priority order.
 - [o] First by department ascending; rows with the same department are then ordered by salary descending.
   > The first column is the primary sort, and later columns break ties, so salary orders rows within each department.
-- By salary first, then department.
-  > The column order in \`ORDER BY\` sets priority, and department comes first here.
+- Only by salary, ignoring department.
+  > Department is listed first, so it is the primary sort key; salary only breaks ties within a department.
 
 Earlier columns in \`ORDER BY\` take priority; later ones break ties.`}
 />

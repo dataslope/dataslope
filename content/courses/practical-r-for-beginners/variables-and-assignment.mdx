@@ -283,14 +283,14 @@ scripts it can be useful for cleaning up.
 <MultipleChoice
   markdown={`Which line of R **assigns** the value 7 to a variable called \`count\`?
 
-- \`count == 7\`
-  > That is a comparison, not an assignment. It returns \`TRUE\` or \`FALSE\`.
-- [o] \`count <- 7\`
-  > \`<-\` is R's assignment operator.
 - \`count ~ 7\`
   > \`~\` is used in model formulas, not for assignment.
+- [o] \`count <- 7\`
+  > \`<-\` is R's assignment operator.
 - \`count := 7\`
-  > \`:=\` is used in some packages (like data.table), but not in standard R assignment.`}
+  > \`:=\` is used in some packages (like data.table), but not in standard R assignment.
+- \`count == 7\`
+  > That is a comparison, not an assignment. It returns \`TRUE\` or \`FALSE\`.`}
 />
 
 <MultipleChoice
@@ -304,14 +304,14 @@ y <- y + 1
 
 What is the value of \`x\`?
 
+- An error
+  > The code is valid R and runs without error.
 - \`6\`
   > That would be true if R had reference semantics, but it doesn't here.
 - [o] \`5\`
   > When you wrote \`y <- x\`, R gave \`y\` its own independent copy. Modifying \`y\` leaves \`x\` alone.
 - \`NA\`
-  > \`x\` was assigned a concrete value (5) and never changed, so it is not missing.
-- An error
-  > The code is valid R and runs without error.`}
+  > \`x\` was assigned a concrete value (5) and never changed, so it is not missing.`}
 />
 
 <MultipleChoice
@@ -319,12 +319,12 @@ What is the value of \`x\`?
 
 - \`my_var\`
   > Letters, digits, underscores, and dots are allowed, and a name may start with a letter, this is valid.
+- \`.hidden\`
+  > A leading dot is allowed; such names are simply hidden from \`ls()\` by default, but they are still valid.
 - \`avg.price\`
   > Dots are allowed inside R names, this is valid (though somewhat dated style).
 - [o] \`2nd_quarter\`
-  > R variable names cannot start with a digit.
-- \`.hidden\`
-  > A leading dot is allowed; such names are simply hidden from \`ls()\` by default, but they are still valid.`}
+  > R variable names cannot start with a digit.`}
 />
 
 <MultipleChoice
@@ -332,12 +332,12 @@ What is the value of \`x\`?
 
 - \`=\` is forbidden in R.
   > It is not, \`=\` also works for assignment in most contexts.
+- Because R does not understand the \`=\` symbol.
+  > R uses \`=\` for named function arguments and supports it for assignment; the convention to prefer \`<-\` is stylistic, not a language limitation.
 - [o] To keep assignment visually distinct from comparison (\`==\`) and from named function arguments (\`mean(x = 1:10)\`).
   > The arrow leaves no doubt that what's happening is a write, not a read or a label.
 - Because \`=\` is reserved for SQL.
-  > R is an independent language with no special reservation of \`=\` for SQL; the preference for \`<-\` is about clarity within R itself.
-- Because R does not understand the \`=\` symbol.
-  > R uses \`=\` for named function arguments and supports it for assignment; the convention to prefer \`<-\` is stylistic, not a language limitation.`}
+  > R is an independent language with no special reservation of \`=\` for SQL; the preference for \`<-\` is about clarity within R itself.`}
 />
 
 ## Mini challenge: a running budget

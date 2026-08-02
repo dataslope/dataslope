@@ -215,12 +215,12 @@ work with them constantly.
 <MultipleChoice
   markdown={`What does \`mean(c(1, 2, 3, NA))\` return?
 
+- An error
+  > R does not throw an error when \`NA\` appears in a numeric vector; it returns \`NA\` to signal that the result is unknown.
 - \`2\`
   > The mean of just the numeric values (1, 2, 3) would be 2, but \`mean()\` does not silently ignore the \`NA\`; it propagates it.
 - [o] \`NA\`
   > By default, the presence of \`NA\` makes most summary functions return \`NA\`. Use \`na.rm = TRUE\` to ignore them.
-- An error
-  > R does not throw an error when \`NA\` appears in a numeric vector; it returns \`NA\` to signal that the result is unknown.
 - \`0\`
   > \`NA\` is "not available," not zero; replacing it with zero would be a meaningful imputation decision, not what R does by default.`}
 />
@@ -228,27 +228,27 @@ work with them constantly.
 <MultipleChoice
   markdown={`Which of these is the **correct** way to test whether \`x\` is missing?
 
-- \`x == NA\`
-  > This returns \`NA\`, not \`TRUE\` or \`FALSE\`, comparing to \`NA\` is always \`NA\`.
-- \`x = NA\`
-  > That's *assignment*, not a test.
 - [o] \`is.na(x)\`
   > \`is.na()\` is the only reliable way to check for missingness.
 - \`x !== NA\`
-  > \`!==\` is not a valid R operator (it belongs to JavaScript); even if rewritten as \`x != NA\`, the result would be \`NA\`, not \`TRUE\`.`}
+  > \`!==\` is not a valid R operator (it belongs to JavaScript); even if rewritten as \`x != NA\`, the result would be \`NA\`, not \`TRUE\`.
+- \`x = NA\`
+  > That's *assignment*, not a test.
+- \`x == NA\`
+  > This returns \`NA\`, not \`TRUE\` or \`FALSE\`, comparing to \`NA\` is always \`NA\`.`}
 />
 
 <MultipleChoice
   markdown={`What does \`sum(c(10, NA, 20), na.rm = TRUE)\` return?
 
-- \`NA\`
-  > \`NA\` would be the result without \`na.rm = TRUE\`; setting it to \`TRUE\` tells \`sum()\` to ignore the missing value before computing.
+- \`20\`
+  > 20 is just the last non-missing value; \`sum()\` adds all non-missing elements, so the result is 10 + 20 = 30.
 - [o] \`30\`
   > \`na.rm = TRUE\` removes the \`NA\` first, then sums the rest.
 - \`10\`
   > 10 is just the first non-missing value, not the sum; \`sum()\` adds all non-missing values together, giving 10 + 20 = 30.
-- \`20\`
-  > 20 is just the last non-missing value; \`sum()\` adds all non-missing elements, so the result is 10 + 20 = 30.`}
+- \`NA\`
+  > \`NA\` would be the result without \`na.rm = TRUE\`; setting it to \`TRUE\` tells \`sum()\` to ignore the missing value before computing.`}
 />
 
 ## Mini challenge: clean and summarize

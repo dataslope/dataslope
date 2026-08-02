@@ -166,14 +166,14 @@ generate data instead, but the **SQL you practice is identical**.
 <MultipleChoice
   markdown={`How many rows does \`range(1, 13)\` produce, and what are they?
 
-- 13 rows: 1 through 13.
-  > \`range\` excludes its end value, so 13 is not included.
 - [o] 12 rows: 1 through 12, because \`range\` excludes the end value.
   > \`range(start, stop)\` yields \`start\` up to but not including \`stop\`, so \`range(1, 13)\` gives 1..12.
-- 11 rows: 2 through 12.
-  > It starts *at* 1 (inclusive), so 1 is included; only the end is excluded.
 - 0 rows, because the arguments are invalid.
   > The arguments are valid; \`range(1, 13)\` is a normal call producing 12 rows.
+- 11 rows: 2 through 12.
+  > It starts *at* 1 (inclusive), so 1 is included; only the end is excluded.
+- 13 rows: 1 through 13.
+  > \`range\` excludes its end value, so 13 is not included.
 
 \`range\` is inclusive of the start and exclusive of the end: \`range(1, N+1)\`
 gives 1 through N.`}
@@ -182,14 +182,14 @@ gives 1 through N.`}
 <MultipleChoice
   markdown={`What does \`CREATE TABLE daily_sales AS SELECT ...\` do?
 
+- It exports the result to a CSV file.
+  > CTAS stores the result as a database table, not a file.
+- It deletes \`daily_sales\` if it already exists.
+  > CTAS creates and populates a table; it is not a delete operation.
 - It defines an empty table with columns but no rows.
   > CTAS both defines the table *and* fills it with the query's result rows.
 - [o] It runs the \`SELECT\` and stores its entire result as a new table named \`daily_sales\`.
   > CREATE TABLE AS SELECT (CTAS) captures a query result as a reusable table, an analyst staple.
-- It deletes \`daily_sales\` if it already exists.
-  > CTAS creates and populates a table; it is not a delete operation.
-- It exports the result to a CSV file.
-  > CTAS stores the result as a database table, not a file.
 
 CTAS is "run this query and freeze its result as a table", ideal for
 capturing a cleaned or generated dataset.`}
@@ -198,14 +198,14 @@ capturing a cleaned or generated dataset.`}
 <MultipleChoice
   markdown={`Why does this course **generate** data with \`range()\` instead of loading files?
 
-- Because DuckDB cannot read files.
-  > DuckDB reads CSV and Parquet directly; the sandbox simply has no file system, so we generate instead.
-- [o] So every example is self-contained and reproducible in the browser, while the SQL practiced stays identical to file-based work.
-  > Generated data needs no external files, runs anywhere, and the queries you learn transfer directly to real datasets.
-- Because generated data is more accurate than real data.
-  > Generated data is for practice; it is not inherently more accurate, and that is not the reason.
 - Because \`range()\` is the only data source DuckDB supports.
   > DuckDB supports many sources (VALUES, files, other tables); \`range()\` is just convenient here.
+- Because DuckDB cannot read files.
+  > DuckDB reads CSV and Parquet directly; the sandbox simply has no file system, so we generate instead.
+- Because generated data is more accurate than real data.
+  > Generated data is for practice; it is not inherently more accurate, and that is not the reason.
+- [o] So every example is self-contained and reproducible in the browser, while the SQL practiced stays identical to file-based work.
+  > Generated data needs no external files, runs anywhere, and the queries you learn transfer directly to real datasets.
 
 Generation keeps lessons reproducible in the browser; the SQL you learn
 applies unchanged to files and warehouse tables.`}

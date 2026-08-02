@@ -264,12 +264,12 @@ nearly every page.
 
 - Storing all data in one enormous single table.
   > Relational databases deliberately split data into multiple focused tables rather than one giant one.
-- Storing data only as plain paragraphs of text.
-  > Relational databases store data in structured tables of rows and columns, not free-form text.
-- [o] Organizing data into multiple tables that relate to one another through shared values.
-  > Separate, focused tables connected by shared values (like a customer id on each order) is exactly the relational model Codd proposed in 1970.
 - Avoiding tables entirely in favor of folders of files.
   > The table is the fundamental building block of the relational model, not folders of files.
+- [o] Organizing data into multiple tables that relate to one another through shared values.
+  > Separate, focused tables connected by shared values (like a customer id on each order) is exactly the relational model Codd proposed in 1970.
+- Storing data only as plain paragraphs of text.
+  > Relational databases store data in structured tables of rows and columns, not free-form text.
 
 Relational databases split data into focused tables and connect them through shared values.`}
 />
@@ -281,10 +281,10 @@ Relational databases split data into focused tables and connect them through sha
   > That describes an *imperative* style. SQL is the opposite: you leave the steps to the database.
 - [o] You describe the result you want, and the database figures out the steps to produce it.
   > Declaring the desired result and letting the system find an efficient path is exactly what makes SQL declarative.
-- It can only be used to delete data.
-  > SQL covers reading, inserting, updating, and deleting; "declarative" refers to its style, not a limitation to deletion.
 - It only works on a single brand of database.
   > SQL is a shared standard that works across many database systems; that is a separate strength from being declarative.
+- It can only be used to delete data.
+  > SQL covers reading, inserting, updating, and deleting; "declarative" refers to its style, not a limitation to deletion.
 
 Declarative means you state *what* you want; the database determines *how* to get it.`}
 />
@@ -292,14 +292,14 @@ Declarative means you state *what* you want; the database determines *how* to ge
 <MultipleChoice
   markdown={`Why is it valuable that SQL is a widely adopted **standard**?
 
+- It makes SQL run faster than any other language.
+  > Standardization is about portability of knowledge, not raw speed.
+- [o] The same core skills work across many database systems, so what you learn transfers broadly.
+  > Learning SELECT, WHERE, JOIN, and GROUP BY once lets you work with PostgreSQL, MySQL, SQLite, and more.
 - It guarantees every database is exactly identical with no differences.
   > Systems still have their own dialects and extra features; the standard ensures the *core* language is shared, not perfect uniformity.
 - It means SQL can never change or improve.
   > Being a standard does not freeze the language; it evolves while keeping a stable, shared core.
-- [o] The same core skills work across many database systems, so what you learn transfers broadly.
-  > Learning SELECT, WHERE, JOIN, and GROUP BY once lets you work with PostgreSQL, MySQL, SQLite, and more.
-- It makes SQL run faster than any other language.
-  > Standardization is about portability of knowledge, not raw speed.
 
 A shared standard means your SQL knowledge carries over from one relational database to the next.`}
 />
@@ -307,14 +307,14 @@ A shared standard means your SQL knowledge carries over from one relational data
 <MultipleChoice
   markdown={`What *is* PostgreSQL?
 
+- A cloud hosting provider.
+  > Cloud providers may *offer* PostgreSQL, but PostgreSQL itself is the database software, not a hosting company.
 - A spreadsheet program with extra formulas.
   > PostgreSQL is not a spreadsheet; it is a database management system that stores tables and runs SQL.
 - A programming language that competes with SQL.
   > PostgreSQL is a database system that *uses* SQL; it is not itself a programming language competing with SQL.
 - [o] A free, open-source relational database management system that stores tables and runs SQL queries.
   > That captures it: the software that manages relational data and answers SQL queries, available freely and openly, with a lineage going back to Berkeley's Ingres and Postgres projects.
-- A cloud hosting provider.
-  > Cloud providers may *offer* PostgreSQL, but PostgreSQL itself is the database software, not a hosting company.
 
 PostgreSQL is the relational database management system this course uses to store data and run SQL.`}
 />

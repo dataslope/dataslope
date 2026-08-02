@@ -133,14 +133,14 @@ DROP TABLE books;
 <MultipleChoice
   markdown={`What does \`CREATE TABLE\` do?
 
+- It runs a search over the data.
+  > Searching is done with \`SELECT\`; \`CREATE TABLE\` defines structure.
+- It permanently deletes a table.
+  > Deleting a table is \`DROP TABLE\`; \`CREATE TABLE\` does the opposite.
 - It inserts new rows into an existing table.
   > Inserting rows is done with \`INSERT\`; \`CREATE TABLE\` defines the table's structure, not its data.
 - [o] It defines a new table's structure, its name, columns, and their types and rules.
   > \`CREATE TABLE\` is how you declare the shape (schema) of a table before any rows go in.
-- It permanently deletes a table.
-  > Deleting a table is \`DROP TABLE\`; \`CREATE TABLE\` does the opposite.
-- It runs a search over the data.
-  > Searching is done with \`SELECT\`; \`CREATE TABLE\` defines structure.
 
 \`CREATE TABLE\` declares a table's columns, types, and constraints.`}
 />
@@ -150,12 +150,12 @@ DROP TABLE books;
 
 - The row is rejected because genre is missing.
   > A \`DEFAULT\` exists precisely so the row is *not* rejected; the default value is used instead.
-- An empty/null genre.
-  > Because a default is defined, the column is filled with that default rather than left empty.
-- [o] The value \`'Unknown'\`, because \`DEFAULT\` supplies it when no value is given.
-  > \`DEFAULT\` fills in the specified value whenever an insert omits that column.
 - A random genre chosen by the database.
   > Databases do not invent random values; they use the declared default.
+- [o] The value \`'Unknown'\`, because \`DEFAULT\` supplies it when no value is given.
+  > \`DEFAULT\` fills in the specified value whenever an insert omits that column.
+- An empty/null genre.
+  > Because a default is defined, the column is filled with that default rather than left empty.
 
 A \`DEFAULT\` constraint supplies a fallback value when an insert omits the column.`}
 />
@@ -163,14 +163,14 @@ A \`DEFAULT\` constraint supplies a fallback value when an insert omits the colu
 <MultipleChoice
   markdown={`Why is declaring a column as \`SERIAL PRIMARY KEY\` so common?
 
-- It encrypts the column for security.
-  > \`SERIAL\` does not encrypt anything; it auto-generates increasing numbers.
+- It allows the column to store text and numbers together.
+  > \`SERIAL\` is for auto-incrementing integers, not mixed types.
 - It sorts the table by that column automatically.
   > \`SERIAL\` does not sort the table; it just assigns the next number on insert.
 - [o] PostgreSQL automatically assigns the next unique number, giving each row a stable surrogate key without manual tracking.
   > It conveniently produces guaranteed-unique identifiers, which is exactly what a surrogate primary key needs.
-- It allows the column to store text and numbers together.
-  > \`SERIAL\` is for auto-incrementing integers, not mixed types.
+- It encrypts the column for security.
+  > \`SERIAL\` does not encrypt anything; it auto-generates increasing numbers.
 
 \`SERIAL PRIMARY KEY\` auto-generates unique ids, the standard way to create surrogate keys.`}
 />

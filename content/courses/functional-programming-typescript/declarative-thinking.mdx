@@ -400,14 +400,14 @@ export function avgPerCategory(
 <MultipleChoice
   markdown={`Which of these best captures the essence of *declarative* code?
 
-- Code that uses arrow functions instead of \`function\` keyword
-  > Syntax has nothing to do with it. You can write deeply imperative arrow-function code.
 - Code that has no \`if\` statements
   > Conditionals are fine in declarative code (often as ternaries, pattern matches, or \`filter\` predicates).
-- [o] Code that describes *what* you want as an expression over data, rather than *how* to compute it as a sequence of mutating steps
-  > The defining shift is from "step-by-step procedure mutating state" to "expression that names the answer". Operators like \`map\`, \`filter\`, \`reduce\` give you the vocabulary; immutability and purity make it sound.
 - Code that uses TypeScript classes
   > Classes are orthogonal to the imperative/declarative axis.
+- [o] Code that describes *what* you want as an expression over data, rather than *how* to compute it as a sequence of mutating steps
+  > The defining shift is from "step-by-step procedure mutating state" to "expression that names the answer". Operators like \`map\`, \`filter\`, \`reduce\` give you the vocabulary; immutability and purity make it sound.
+- Code that uses arrow functions instead of \`function\` keyword
+  > Syntax has nothing to do with it. You can write deeply imperative arrow-function code.
 
 Declarative code is recognizable because the *shape* of the code mirrors the *shape* of the answer, with no surrounding bookkeeping.`}
 />

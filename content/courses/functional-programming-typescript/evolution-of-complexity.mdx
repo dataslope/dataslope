@@ -274,14 +274,14 @@ lambda calculus through Lisp and Haskell to the modern ecosystem.
 <MultipleChoice
   markdown={`Why does mutable shared state make large programs hard to reason about?
 
-- It is always slower than immutable data
-  > Performance is not the core problem. Mutable code can be very fast. The problem is comprehension and correctness, not speed.
-- [o] The behavior of a function depends on the entire history of every other function that touched the same state
-  > With mutable shared state, a function's outputs depend not just on its inputs but on *when* it ran and *who* ran before it. That coupling grows quadratically with the size of the codebase.
-- TypeScript cannot type-check mutable variables
-  > TypeScript does type-check mutable variables. The issue is not typing but reasoning: types describe shape, not history.
 - It always causes the program to crash
   > Mutable state rarely crashes, that would be easier to debug. It usually produces *silently incorrect* results, which is much worse.
+- TypeScript cannot type-check mutable variables
+  > TypeScript does type-check mutable variables. The issue is not typing but reasoning: types describe shape, not history.
+- [o] The behavior of a function depends on the entire history of every other function that touched the same state
+  > With mutable shared state, a function's outputs depend not just on its inputs but on *when* it ran and *who* ran before it. That coupling grows quadratically with the size of the codebase.
+- It is always slower than immutable data
+  > Performance is not the core problem. Mutable code can be very fast. The problem is comprehension and correctness, not speed.
 
 Mutable shared state turns local code into globally entangled code, which is the single largest source of complexity in real systems.`}
 />

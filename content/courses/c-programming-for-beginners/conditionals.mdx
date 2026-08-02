@@ -396,14 +396,14 @@ int main(void) {
 
 *Hint: a single \`=\` is assignment, not comparison. An assignment expression evaluates to the value that was assigned.*
 
-- Nothing, because \`if (x = 10)\` is a compile error.
-  > A single \`=\` inside an \`if\` is legal C (it is an assignment, not a comparison), so this compiles and runs.
 - \`x = 5\`, because the assignment doesn't take effect.
   > The assignment does take effect: \`x = 10\` stores \`10\` into \`x\`, so the final value is \`10\`, not \`5\`.
-- [o] \`hello\` followed by \`x = 10\`.
-  > \`x = 10\` is an assignment expression whose value is \`10\` (non-zero, therefore true). The body of the \`if\` runs, and \`x\` is now \`10\`.
+- Nothing, because \`if (x = 10)\` is a compile error.
+  > A single \`=\` inside an \`if\` is legal C (it is an assignment, not a comparison), so this compiles and runs.
 - \`hello\` followed by \`x = 5\`.
   > The \`if\` body does run, but the same assignment that made the condition true also changed \`x\` to \`10\`, so \`x\` is no longer \`5\`.
+- [o] \`hello\` followed by \`x = 10\`.
+  > \`x = 10\` is an assignment expression whose value is \`10\` (non-zero, therefore true). The body of the \`if\` runs, and \`x\` is now \`10\`.
 
 A single \`=\` is assignment; a double \`==\` is comparison. Most modern compilers will warn you when an assignment appears as an \`if\` condition.`}
 />
@@ -421,10 +421,10 @@ switch (n) {
 
 What does the program print when \`n\` is \`1\`?
 
-- \`one \` only.
-  > Without an explicit \`break\` after case 1, execution **falls through** to the next case.
 - \`one other \`
   > Fall-through goes to the *next* case in order, which is \`case 2\`, not \`default\`. \`default\` only runs when no case matched.
+- \`one \` only.
+  > Without an explicit \`break\` after case 1, execution **falls through** to the next case.
 - [o] \`one two \`
   > Execution falls through into \`case 2\`, prints \`two\`, then hits \`break\` and exits the switch.
 - A compile-time error.

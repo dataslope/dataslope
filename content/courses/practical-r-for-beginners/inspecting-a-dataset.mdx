@@ -283,40 +283,40 @@ report("NAs per column", colSums(is.na(penguins)))
 <MultipleChoice
   markdown={`Which function gives you a compact view of a data frame's structure: number of rows, number of columns, every column's type, and a sample of its values?
 
-- \`summary()\`
-  > \`summary()\` gives per-column statistics (min, mean, quartiles), not the column *types* and structure.
 - \`head()\`
   > \`head()\` shows the first few rows, but not a one-line report of types and dimensions.
 - [o] \`str()\`
   > \`str()\` is the structural summary, types and a sample, in one screen.
 - \`dim()\`
-  > \`dim()\` returns just the row and column counts, with no type or value information.`}
+  > \`dim()\` returns just the row and column counts, with no type or value information.
+- \`summary()\`
+  > \`summary()\` gives per-column statistics (min, mean, quartiles), not the column *types* and structure.`}
 />
 
 <MultipleChoice
   markdown={`Why is it a bad idea to skip the "inspect the dataset" ritual?
 
-- It's required by R; the language won't compute without it.
-  > Not true, R will happily compute on a dataset you've never looked at.
-- [o] Because real datasets contain surprises (missing values, wrong types, implausible values) that can silently corrupt every downstream analysis.
-  > Five minutes of inspection saves hours of debugging later.
 - Because \`summary()\` is the only way to compute means.
   > \`mean()\` and other functions compute means directly; the ritual uses \`summary()\` as a broad overview tool, not because it is the only option.
 - Because it's a tradition.
-  > The inspection ritual has a practical purpose: catching data quality problems before they silently invalidate an analysis; following it only as tradition misses the point.`}
+  > The inspection ritual has a practical purpose: catching data quality problems before they silently invalidate an analysis; following it only as tradition misses the point.
+- It's required by R; the language won't compute without it.
+  > Not true, R will happily compute on a dataset you've never looked at.
+- [o] Because real datasets contain surprises (missing values, wrong types, implausible values) that can silently corrupt every downstream analysis.
+  > Five minutes of inspection saves hours of debugging later.`}
 />
 
 <MultipleChoice
   markdown={`If \`mean(airquality$Ozone)\` returns \`NA\`, the most likely reason is:
 
-- The \`mean\` function is broken.
-  > \`mean()\` is working correctly; returning \`NA\` when the input contains \`NA\` is its intended, documented behavior.
 - The dataset has fewer than 30 rows.
   > \`airquality\` has 153 rows; row count does not affect whether \`mean()\` returns \`NA\`, but missing values do.
 - [o] The \`Ozone\` column contains \`NA\` values, and \`mean()\` returns \`NA\` unless told otherwise.
   > Fix it with \`mean(airquality$Ozone, na.rm = TRUE)\`.
 - R refuses to compute means on built-in datasets.
-  > R treats built-in datasets like any other data frame; the \`NA\` propagation behavior applies to all numeric vectors, regardless of their source.`}
+  > R treats built-in datasets like any other data frame; the \`NA\` propagation behavior applies to all numeric vectors, regardless of their source.
+- The \`mean\` function is broken.
+  > \`mean()\` is working correctly; returning \`NA\` when the input contains \`NA\` is its intended, documented behavior.`}
 />
 
 Inspecting tells us *what's there*. The next page is about

@@ -401,10 +401,10 @@ export function map2<A, B, C>(
 <MultipleChoice
   markdown={`When should you reach for \`flatMap\` (monad) instead of \`map\` (functor)?
 
-- Whenever the operation might throw an error
-  > Errors alone don't decide it; it depends on whether the *next step* itself returns a container.
 - [o] When the function you want to apply returns another value of the same container type, for example \`(a: A) => Option<B>\`, and you want a flat \`Option<B>\` instead of \`Option<Option<B>>\`
   > \`flatMap\` is the operator that *flattens* one layer of container. \`map\` would leave you nested.
+- Whenever the operation might throw an error
+  > Errors alone don't decide it; it depends on whether the *next step* itself returns a container.
 - When you want to combine two independent containers
   > That's applicative (\`map2\`/\`ap\`), not monad.
 - When you want to discard the wrapper completely

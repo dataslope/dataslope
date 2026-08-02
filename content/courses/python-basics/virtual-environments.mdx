@@ -318,25 +318,25 @@ The `.venv/` directory is never committed. Your teammates and CI systems recreat
 <MultipleChoice
   markdown={`Why should you use a virtual environment for each Python project?
 
-- It makes \`import\` statements run faster.
-  > Virtual environments do not affect import speed.
 - [o] It isolates each project's dependencies so they do not conflict with each other or with the system Python.
   > Different projects can pin different versions of the same library safely.
-- It is the only way to use \`pip\`.
-  > You can use \`pip\` without a venv (not recommended), but venvs are the only safe way to manage dependencies.
+- It makes \`import\` statements run faster.
+  > Virtual environments do not affect import speed.
 - It compiles your code to a single executable.
-  > Virtual environments do not compile or bundle code. They isolate dependencies.`}
+  > Virtual environments do not compile or bundle code. They isolate dependencies.
+- It is the only way to use \`pip\`.
+  > You can use \`pip\` without a venv (not recommended), but venvs are the only safe way to manage dependencies.`}
 />
 
 <MultipleChoice
   markdown={`What does activating a virtual environment do?
 
-- [o] It modifies your shell's \`PATH\` so \`python\` and \`pip\` point to the venv's binaries.
-  > Activation is purely a shell trick, no system-wide changes are made.
 - It permanently changes the system Python installation.
   > Activation is temporary and local to the current shell session. Closing the terminal reverts it.
 - It installs all packages listed in \`requirements.txt\`.
   > Activation does not install anything. You must run \`pip install -r requirements.txt\` separately.
+- [o] It modifies your shell's \`PATH\` so \`python\` and \`pip\` point to the venv's binaries.
+  > Activation is purely a shell trick, no system-wide changes are made.
 - It compiles Python to bytecode for faster execution.
   > Activation does not affect bytecode compilation.`}
 />
@@ -344,14 +344,14 @@ The `.venv/` directory is never committed. Your teammates and CI systems recreat
 <MultipleChoice
   markdown={`What should you commit to version control?
 
-- The \`.venv/\` directory, so everyone has the same packages.
-  > Virtual environments are NOT portable. Commit a lockfile instead.
-- [o] \`requirements.txt\` or \`pyproject.toml\`, so teammates can recreate the environment.
-  > Lockfiles and metadata files are portable; the venv itself is not.
 - Nothing, each developer should figure out dependencies on their own.
   > Without a lockfile, your project is not reproducible.
 - Only the Python interpreter binary.
-  > You should never commit binaries. Commit dependency metadata instead.`}
+  > You should never commit binaries. Commit dependency metadata instead.
+- The \`.venv/\` directory, so everyone has the same packages.
+  > Virtual environments are NOT portable. Commit a lockfile instead.
+- [o] \`requirements.txt\` or \`pyproject.toml\`, so teammates can recreate the environment.
+  > Lockfiles and metadata files are portable; the venv itself is not.`}
 />
 
 <MultipleChoice

@@ -176,14 +176,14 @@ yourself. Faceting is the reason figure-level functions exist.
   markdown={`You want **one panel per category** (small multiples) using a single
 Seaborn call with \`col=\`. Which kind of function do you need?
 
-- An axes-level function like \`scatterplot\`.
-  > Axes-level functions draw on a single Axes and have no \`col\`/\`row\` faceting; you'd have to build the subplot grid yourself.
-- [o] A figure-level function like \`relplot\`.
-  > Figure-level functions own the whole figure, which is exactly what lets them split the data into a grid of panels via \`col\` and \`row\`.
 - Either one, \`col\` works on both.
   > \`col\`/\`row\` are figure-level features; axes-level functions don't accept them.
+- [o] A figure-level function like \`relplot\`.
+  > Figure-level functions own the whole figure, which is exactly what lets them split the data into a grid of panels via \`col\` and \`row\`.
 - Neither, Seaborn can't facet.
   > Faceting is a core Seaborn feature; it lives on the figure-level functions.
+- An axes-level function like \`scatterplot\`.
+  > Axes-level functions draw on a single Axes and have no \`col\`/\`row\` faceting; you'd have to build the subplot grid yourself.
 
 Faceting (\`col\`/\`row\`) requires control of the whole figure, so it's a
 figure-level capability.`}
@@ -278,14 +278,14 @@ g = sns.relplot(
 <MultipleChoice
   markdown={`What does an **axes-level** function (e.g. \`sns.boxplot\`) return?
 
-- A \`FacetGrid\` that manages the whole figure.
-  > That's what *figure-level* functions return. Axes-level functions don't create or manage a grid.
-- [o] A matplotlib \`Axes\` object that it drew on.
-  > Axes-level functions draw onto a single Axes (the one you pass via \`ax=\`, or the current one) and hand that Axes back.
-- The DataFrame, with a new column added.
-  > Seaborn never mutates or returns your data; it returns a plotting object.
 - Nothing, they only have side effects.
   > They do return the Axes, which is what lets you keep customizing it with matplotlib.
+- A \`FacetGrid\` that manages the whole figure.
+  > That's what *figure-level* functions return. Axes-level functions don't create or manage a grid.
+- The DataFrame, with a new column added.
+  > Seaborn never mutates or returns your data; it returns a plotting object.
+- [o] A matplotlib \`Axes\` object that it drew on.
+  > Axes-level functions draw onto a single Axes (the one you pass via \`ax=\`, or the current one) and hand that Axes back.
 
 Axes-level → returns an \`Axes\`; figure-level → returns a grid object.`}
 />
@@ -293,14 +293,14 @@ Axes-level → returns an \`Axes\`; figure-level → returns a grid object.`}
 <MultipleChoice
   markdown={`Which call will **fail or misbehave**?
 
-- \`sns.scatterplot(data=df, x="a", y="b", ax=my_ax)\`
-  > This is correct usage, axes-level functions accept \`ax=\`.
+- \`sns.boxplot(data=df, x="g", y="a")\`
+  > This is fine, a standard axes-level call that draws on the current Axes.
 - \`sns.relplot(data=df, x="a", y="b", col="g")\`
   > This is correct, \`relplot\` is figure-level and supports \`col\`.
 - [o] \`sns.relplot(data=df, x="a", y="b", ax=my_ax)\`
   > \`relplot\` is figure-level and creates its own figure, so it has no \`ax=\` parameter; passing one is an error.
-- \`sns.boxplot(data=df, x="g", y="a")\`
-  > This is fine, a standard axes-level call that draws on the current Axes.
+- \`sns.scatterplot(data=df, x="a", y="b", ax=my_ax)\`
+  > This is correct usage, axes-level functions accept \`ax=\`.
 
 Figure-level functions own their figure and therefore reject \`ax=\`; if you
 need an \`ax=\`, use the axes-level version.`}
@@ -310,14 +310,14 @@ need an \`ax=\`, use the axes-level version.`}
   markdown={`\`sns.catplot(data=tips, x="day", y="total_bill", kind="violin")\` produces a
 violin plot. Which axes-level function is doing the actual drawing underneath?
 
+- \`sns.relplot\`
+  > \`relplot\` is another figure-level function, not the axes-level drawer; \`catplot\` doesn't delegate to it.
 - \`sns.boxplot\`
   > \`kind="violin"\` selects the violin drawer, not the box drawer.
 - [o] \`sns.violinplot\`
   > A figure-level function dispatches to the matching axes-level function based on \`kind\`; \`kind="violin"\` calls \`violinplot\`.
 - \`sns.stripplot\`
   > That would be \`kind="strip"\`. Each \`kind\` maps to its own axes-level function.
-- \`sns.relplot\`
-  > \`relplot\` is another figure-level function, not the axes-level drawer; \`catplot\` doesn't delegate to it.
 
 Figure-level functions are wrappers: \`catplot(kind="violin")\` →
 \`violinplot\`, \`relplot(kind="line")\` → \`lineplot\`, and so on.`}
@@ -327,14 +327,14 @@ Figure-level functions are wrappers: \`catplot(kind="violin")\` →
   markdown={`You're sizing a \`relplot\` and it ignores \`figsize=(10, 4)\`. Why, and what
 should you use?
 
+- \`figsize\` only works in dark mode.
+  > Sizing has nothing to do with the theme or color mode.
+- You must call \`plt.figure(figsize=...)\` first.
+  > Pre-creating a figure doesn't help, because \`relplot\` builds its own figure and sizes it from \`height\`/\`aspect\`.
 - \`relplot\` has a bug; report it.
   > This is expected behavior, not a bug.
 - [o] Figure-level functions are sized with \`height\` and \`aspect\` (per facet), not \`figsize\`.
   > Because a figure-level function manages a grid of facets, it sizes each panel via \`height\` (inches) and \`aspect\` (width/height); \`figsize\` belongs to axes-level/matplotlib figures.
-- You must call \`plt.figure(figsize=...)\` first.
-  > Pre-creating a figure doesn't help, because \`relplot\` builds its own figure and sizes it from \`height\`/\`aspect\`.
-- \`figsize\` only works in dark mode.
-  > Sizing has nothing to do with the theme or color mode.
 
 Remember: figure-level → \`height\`/\`aspect\`; axes-level → \`figsize\`.`}
 />

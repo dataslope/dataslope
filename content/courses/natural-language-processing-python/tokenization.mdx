@@ -117,14 +117,14 @@ one-line `split()` cannot replace it.
 splitting the contraction this way valuable for something like sentiment
 analysis?
 
-- It makes the text shorter and therefore faster to process
-  > Splitting "don't" into two tokens actually makes the list longer, not shorter; the value is linguistic, not computational.
 - [o] It exposes the negation \`"n't"\` as its own token, so a later step can detect that the sentence is being negated
   > Negation flips sentiment ("good" vs. "not good"). If "don't" stays glued, a program never sees the negation. Splitting it out gives downstream steps a fighting chance to handle it correctly.
-- It converts the word into a number
-  > Tokenization produces string tokens, not numeric IDs; converting text to numbers is a separate step (feature extraction or embedding) that comes much later.
 - It removes the word entirely, which is what we want
   > Removing negations is exactly the wrong goal for sentiment analysis; preserving "n't" as a visible token is what makes negation detectable downstream.
+- It converts the word into a number
+  > Tokenization produces string tokens, not numeric IDs; converting text to numbers is a separate step (feature extraction or embedding) that comes much later.
+- It makes the text shorter and therefore faster to process
+  > Splitting "don't" into two tokens actually makes the list longer, not shorter; the value is linguistic, not computational.
 
 Surfacing hidden function words like negation is one of the quiet superpowers of real tokenization.`}
 />
@@ -274,14 +274,14 @@ choices are task-dependent.
   markdown={`Why does \`text.split(".")\` fail as a sentence splitter on the text
 "Dr. Lee earned 2.5 million."?
 
+- The sentence has no periods in it
+  > The text "Dr. Lee earned 2.5 million." clearly contains periods, the problem is that it has too many, and \`split(".")\` cannot tell which one ends the sentence.
+- \`split\` can only divide a string into two pieces
+  > \`split\` can divide a string into many pieces; with no argument it splits on every whitespace occurrence, and with a delimiter like \`"."\` it splits on every instance of that character.
 - Periods are invisible characters that \`split\` cannot see
   > Periods are perfectly visible to \`split\`; in fact, \`text.split(".")\` splits on every period it finds, which is exactly the problem, it splits too eagerly, not too little.
 - [o] The period is overloaded, it appears in abbreviations ("Dr.") and decimals ("2.5") as well as at sentence ends, so splitting on every period cuts in the wrong places
   > A sentence tokenizer must distinguish a period that ends a sentence from one that abbreviates a title or marks a decimal. \`split(".")\` treats them all the same and shatters "Dr." and "2.5".
-- \`split\` can only divide a string into two pieces
-  > \`split\` can divide a string into many pieces; with no argument it splits on every whitespace occurrence, and with a delimiter like \`"."\` it splits on every instance of that character.
-- The sentence has no periods in it
-  > The text "Dr. Lee earned 2.5 million." clearly contains periods, the problem is that it has too many, and \`split(".")\` cannot tell which one ends the sentence.
 
 Punkt exists precisely to tell sentence-ending periods apart from the other kinds.`}
 />
@@ -398,12 +398,12 @@ assert len(sentences) == 2, "Expected 2 sentences, got " + str(len(sentences)) +
 <MultipleChoice
   markdown={`What is a **token**, in the NLP sense?
 
-- Always exactly one English word
-  > A token can be a number, a punctuation mark, or a symbol, not just a dictionary word; tokenization creates any meaningful unit the pipeline needs to work with.
-- A single character of text
-  > Individual characters are not tokens in the NLP sense; tokenization groups characters into meaningful units like words, numbers, and punctuation marks.
 - [o] A single meaningful unit of text, typically a word, but also a number, punctuation mark, or symbol, produced by tokenization
   > Tokens are the atomic units a pipeline works with. Most are words, but punctuation marks, numbers, and symbols are tokens too. Tokenization is the step that decides where one token ends and the next begins.
+- A single character of text
+  > Individual characters are not tokens in the NLP sense; tokenization groups characters into meaningful units like words, numbers, and punctuation marks.
+- Always exactly one English word
+  > A token can be a number, a punctuation mark, or a symbol, not just a dictionary word; tokenization creates any meaningful unit the pipeline needs to work with.
 - The numeric ID a database assigns to a row
   > A database row ID is a concept from relational databases and has no role in NLP tokenization; tokens are textual units, not numeric identifiers.
 
@@ -414,14 +414,14 @@ Tokens are units of text, and they are not limited to dictionary words.`}
   markdown={`Which task most clearly calls for **sentence** tokenization (not just word
 tokenization)?
 
-- Counting how many times the word "data" appears in a document
-  > Word-frequency counting operates on individual tokens and does not require knowing where sentences start or end; word tokenization alone is sufficient.
-- Building a search index of all the words in a corpus
-  > A search index is built from individual words, so word tokenization is enough; sentence boundaries are irrelevant to matching query terms against indexed words.
-- [o] Summarizing a document by selecting its most important *sentences*
-  > Summarization that picks whole sentences obviously needs sentence boundaries first. Pure word-counting and search indexing operate on a flat bag of words and do not require knowing where sentences begin and end.
 - Lowercasing every word in a document
   > Lowercasing is a normalization step applied to individual tokens; it requires only word tokenization and has nothing to do with sentence boundaries.
+- [o] Summarizing a document by selecting its most important *sentences*
+  > Summarization that picks whole sentences obviously needs sentence boundaries first. Pure word-counting and search indexing operate on a flat bag of words and do not require knowing where sentences begin and end.
+- Building a search index of all the words in a corpus
+  > A search index is built from individual words, so word tokenization is enough; sentence boundaries are irrelevant to matching query terms against indexed words.
+- Counting how many times the word "data" appears in a document
+  > Word-frequency counting operates on individual tokens and does not require knowing where sentences start or end; word tokenization alone is sufficient.
 
 If your unit of analysis is the sentence, you need a sentence tokenizer; if it is the word, you may not.`}
 />
@@ -431,14 +431,14 @@ If your unit of analysis is the sentence, you need a sentence tokenizer; if it i
 surprised that "#MachineLearning" is split into "#" and "MachineLearning",
 losing the hashtag. What is the best fix?
 
-- Give up on tokenizing tweets; it is impossible
-  > Tokenizing social media text is entirely possible, the challenge is choosing a tokenizer designed for that domain rather than assuming no solution exists.
 - [o] Use a tokenizer suited to the domain, such as NLTK's \`TweetTokenizer\`, which keeps hashtags, mentions, and emoticons intact
   > There is no single correct tokenization, it depends on which units matter. For social media, a tweet-aware tokenizer preserves hashtags and handles emoji, which the general-purpose tokenizer is not designed to do.
-- Manually delete every "#" before tokenizing
-  > Deleting "#" characters discards the hashtag signal entirely, losing information the task may care about; the correct fix is a tokenizer that treats "#NLP" as a single meaningful unit.
+- Give up on tokenizing tweets; it is impossible
+  > Tokenizing social media text is entirely possible, the challenge is choosing a tokenizer designed for that domain rather than assuming no solution exists.
 - Switch from Python to a different programming language
   > The programming language is not the issue; NLTK itself ships \`TweetTokenizer\` in Python, so switching languages would not address the tokenization mismatch.
+- Manually delete every "#" before tokenizing
+  > Deleting "#" characters discards the hashtag signal entirely, losing information the task may care about; the correct fix is a tokenizer that treats "#NLP" as a single meaningful unit.
 
 Matching the tokenizer to the text is part of designing the pipeline well.`}
 />
@@ -446,14 +446,14 @@ Matching the tokenizer to the text is part of designing the pipeline well.`}
 <MultipleChoice
   markdown={`Why is "tokenization is just \`string.split()\`" a harmful misconception?
 
-- \`split()\` is actually slower than tokenization
-  > \`split()\` is a built-in string method and is very fast; speed is not the problem, the problem is that it produces linguistically incorrect tokens.
 - [o] \`split()\` only cuts on whitespace, so it leaves punctuation attached to words and never separates contractions, corrupting every count, match, and comparison built on the tokens
   > Whitespace splitting ignores all linguistic structure. "good." and "good" become different tokens, "don't" hides its negation, and downstream steps inherit all of these errors. Real tokenization makes informed cuts that \`split()\` cannot.
-- \`split()\` changes the language of the text
-  > \`split()\` simply divides a string by a delimiter and does not translate or alter the language of the tokens in any way.
 - There is no difference; they are the same thing
   > The difference is real and consequential: \`split()\` produces tokens with punctuation attached and contractions glued together, while a proper tokenizer separates them into the correct linguistic units.
+- \`split()\` changes the language of the text
+  > \`split()\` simply divides a string by a delimiter and does not translate or alter the language of the tokens in any way.
+- \`split()\` is actually slower than tokenization
+  > \`split()\` is a built-in string method and is very fast; speed is not the problem, the problem is that it produces linguistically incorrect tokens.
 
 Everything downstream depends on good tokens, which is why this misconception is so costly.`}
 />

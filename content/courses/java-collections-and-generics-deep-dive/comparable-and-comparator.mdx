@@ -352,34 +352,34 @@ public final class Leaderboard {
   > Many types have no single meaningful order.
 - [o] When there is **one** obvious natural order that is consistent with \`equals\` and serves most callers
   > Otherwise prefer a \`Comparator\`, which can have many flavors.
-- Only when the class will be stored in a \`TreeSet\`
-  > That's one consumer; \`Comparator\` works there too.
 - Whenever the class has numeric fields
-  > Numeric fields don't imply a single canonical ordering.`}
+  > Numeric fields don't imply a single canonical ordering.
+- Only when the class will be stored in a \`TreeSet\`
+  > That's one consumer; \`Comparator\` works there too.`}
 />
 
 <MultipleChoice
   markdown={`Why is \`return a - b;\` a bad implementation of \`compareTo\` for \`int\` values?
 
-- It is slower than \`Integer.compare\`
-  > Performance is not the concern; correctness is.
+- It returns a value outside \`{-1, 0, 1}\`
+  > Returning any negative or positive value is allowed by the contract.
 - [o] It can **overflow** when \`a\` and \`b\` are far apart in sign or magnitude, returning a wrong sign
   > Always use \`Integer.compare(a, b)\` for \`int\` and \`Long.compare\` for \`long\`.
+- It is slower than \`Integer.compare\`
+  > Performance is not the concern; correctness is.
 - It does not compile
-  > It compiles.
-- It returns a value outside \`{-1, 0, 1}\`
-  > Returning any negative or positive value is allowed by the contract.`}
+  > It compiles.`}
 />
 
 <MultipleChoice
   markdown={`What does \`Comparator.comparing(X::getA).thenComparing(X::getB)\` do?
 
-- Sorts by \`b\` and then by \`a\`
-  > Reversed.
-- [o] Sorts by \`a\` ascending; uses \`b\` to break ties
-  > \`thenComparing\` only kicks in when the primary comparison returns 0.
 - Sums the two comparison results
   > Comparators are not added.
+- Sorts by \`b\` and then by \`a\`
+  > Reversed.
 - Sorts only by \`a\`
-  > It also breaks ties by \`b\`.`}
+  > It also breaks ties by \`b\`.
+- [o] Sorts by \`a\` ascending; uses \`b\` to break ties
+  > \`thenComparing\` only kicks in when the primary comparison returns 0.`}
 />

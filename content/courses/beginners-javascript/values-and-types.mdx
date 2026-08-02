@@ -391,14 +391,14 @@ core mental model of programming.**
 <MultipleChoice
   markdown={`Which equality operator should you almost always use in JavaScript, and why?
 
-- \`==\` because it is more forgiving and converts types automatically
-  > The automatic type conversion done by \`==\` follows a long set of non-obvious rules, for example, \`0 == "0"\` is \`true\`, \`"" == false\` is \`true\`, and \`null == undefined\` is \`true\`, which makes code that uses \`==\` harder to reason about.
-- [o] \`===\` because it compares values *and* types, giving predictable behaviour without surprising conversions
-  > \`===\` (and \`!==\`) avoid the long list of historic, surprising rules built into \`==\`. They give you exactly what most programmers actually want: "true if these two values are the same kind of thing and equal in value".
 - \`=\` because it is the assignment operator and works for everything
   > \`=\` is used to *assign* a value to a variable, not to compare two values; using it in a conditional like \`if (x = 5)\` assigns \`5\` to \`x\` rather than checking equality.
+- [o] \`===\` because it compares values *and* types, giving predictable behaviour without surprising conversions
+  > \`===\` (and \`!==\`) avoid the long list of historic, surprising rules built into \`==\`. They give you exactly what most programmers actually want: "true if these two values are the same kind of thing and equal in value".
 - It doesn't matter, they behave identically
   > \`==\` and \`===\` produce different results whenever the operands are of different types; for example \`1 == "1"\` is \`true\` but \`1 === "1"\` is \`false\`.
+- \`==\` because it is more forgiving and converts types automatically
+  > The automatic type conversion done by \`==\` follows a long set of non-obvious rules, for example, \`0 == "0"\` is \`true\`, \`"" == false\` is \`true\`, and \`null == undefined\` is \`true\`, which makes code that uses \`==\` harder to reason about.
 
 In modern JavaScript, \`===\` is the standard. Reserve \`==\` for the very specific case of "I want to treat \`null\` and \`undefined\` as the same thing", and even then, prefer \`value == null\` deliberately.`}
 />

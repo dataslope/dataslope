@@ -210,25 +210,25 @@ real data, not just an offline benchmark, to take its place.
 <MultipleChoice
   markdown={`Your model scores well offline but underperforms in production. Investigation shows a feature is computed one way in the training pipeline and another way in the serving service. What is this, and the fix?
 
-- Concept drift; retrain more frequently.
-  > Drift is the world changing over time. Here the feature *computation* differs between train and serve, a static mismatch.
+- Data leakage; drop the leaking feature.
+  > Leakage is using future/target information as a feature, a different failure mode.
 - [o] Training–serving skew; unify the feature-computation path (e.g. a feature store or shared transform library).
   > Identical feature logic at train and serve time eliminates the discrepancy; a shared path is the standard fix.
+- Concept drift; retrain more frequently.
+  > Drift is the world changing over time. Here the feature *computation* differs between train and serve, a static mismatch.
 - Overfitting; add regularization.
-  > Overfitting shows as a train/validation gap offline, not a train-vs-serve mismatch.
-- Data leakage; drop the leaking feature.
-  > Leakage is using future/target information as a feature, a different failure mode.`}
+  > Overfitting shows as a train/validation gap offline, not a train-vs-serve mismatch.`}
 />
 
 <MultipleChoice
   markdown={`An automated retraining pipeline pushes a new model to production every week. What single safeguard best prevents it from silently shipping a worse model?
 
+- Deploy directly and rely on users to report problems.
+  > That exposes users to regressions and detects failures only after harm; a gate catches them pre-deploy.
 - Increase the training-data size each week.
   > More data may help quality but doesn't verify the new model is actually better before it ships.
 - [o] An evaluation gate: the candidate must beat the incumbent on a fixed holdout set before promotion.
   > The gate turns "is it better?" into a build-breaking test, blocking regressions from reaching users automatically.
-- Deploy directly and rely on users to report problems.
-  > That exposes users to regressions and detects failures only after harm; a gate catches them pre-deploy.
 - Retrain less often to reduce risk.
   > Slower cadence doesn't guarantee quality; you still need an objective check on each candidate.`}
 />
@@ -236,14 +236,14 @@ real data, not just an offline benchmark, to take its place.
 <MultipleChoice
   markdown={`You want to validate a new model on real production traffic with zero risk to users before exposing anyone to it. Which rollout step fits?
 
-- Full deployment, then monitor closely.
-  > That exposes 100% of users immediately, the opposite of zero-risk validation.
 - [o] Shadow deployment, mirror live traffic to the challenger and log its predictions without returning them.
   > Users only see the champion; you compare the challenger's outputs, latency, and errors under real load risk-free.
 - Canary at 50% of traffic.
   > A 50% canary already exposes half your users; canary is a later, gradual step after shadow validation.
 - A/B test tied to revenue.
-  > An A/B test shows real users the challenger's predictions, which isn't zero user exposure.`}
+  > An A/B test shows real users the challenger's predictions, which isn't zero user exposure.
+- Full deployment, then monitor closely.
+  > That exposes 100% of users immediately, the opposite of zero-risk validation.`}
 />
 
 ## Go deeper

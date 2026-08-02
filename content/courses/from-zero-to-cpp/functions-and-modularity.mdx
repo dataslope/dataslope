@@ -520,25 +520,25 @@ int gcd(int a, int b) {
 <MultipleChoice
   markdown={`A function takes a parameter as \`const std::string&\`. What does that mean?
 
-- The function gets a copy of the string that it cannot modify.
-  > It does not get a copy, \`&\` means *reference*, not value.
 - The function gets a pointer to the caller's string.
   > It gets a *reference*, which is similar in spirit but different in syntax and safety.
-- [o] The function gets an alias for the caller's string, with a promise not to modify it.
-  > This is the standard way to accept large read-only inputs without copying.
+- The function gets a copy of the string that it cannot modify.
+  > It does not get a copy, \`&\` means *reference*, not value.
 - The function will compile only if the string is a literal.
-  > Any string can be passed.`}
+  > Any string can be passed.
+- [o] The function gets an alias for the caller's string, with a promise not to modify it.
+  > This is the standard way to accept large read-only inputs without copying.`}
 />
 
 <MultipleChoice
   markdown={`What is required for every recursive function to terminate?
 
-- A loop inside the function.
-  > A pure recursive function has no loop; the recursion *is* the repetition.
 - [o] A base case that returns without making another recursive call, and a recursive case that progresses toward the base case.
   > Without both, you'll either never recurse or recurse forever.
 - A maximum-depth guard set by the compiler.
   > The compiler does not insert such guards; you must design termination yourself.
+- A loop inside the function.
+  > A pure recursive function has no loop; the recursion *is* the repetition.
 - A pointer parameter.
   > Pointers are unrelated to recursion termination.`}
 />
@@ -546,14 +546,14 @@ int gcd(int a, int b) {
 <MultipleChoice
   markdown={`When you write \`int square(int n);\` near the top of a file (no body), what is that?
 
+- A way to make the function virtual.
+  > That would require the \`virtual\` keyword inside a class.
 - A function call.
   > A call would have parentheses with arguments and no return type.
-- [o] A function **declaration**: it tells the compiler the signature without providing the body.
-  > The body (the *definition*) can appear later, or in another file.
 - A typo, function bodies are mandatory.
   > Declarations without bodies are valid and common.
-- A way to make the function virtual.
-  > That would require the \`virtual\` keyword inside a class.`}
+- [o] A function **declaration**: it tells the compiler the signature without providing the body.
+  > The body (the *definition*) can appear later, or in another file.`}
 />
 
 <MultipleChoice
@@ -561,10 +561,10 @@ int gcd(int a, int b) {
 
 *Hint: think about what information is available at the call site when the compiler decides which overload to use.*
 
-- [o] The compiler chooses the overload by looking at the arguments you pass, and the arguments don't tell it what return type you expected.
-  > Parameter types are visible at the call; the expected return type is not, so return type alone can't disambiguate.
 - Two functions with the same name are forbidden by the standard.
   > They are allowed, as long as their parameter lists differ.
+- [o] The compiler chooses the overload by looking at the arguments you pass, and the arguments don't tell it what return type you expected.
+  > Parameter types are visible at the call; the expected return type is not, so return type alone can't disambiguate.
 - Overloading only works for functions that return \`void\`.
   > Overloads can return any type; the return type simply isn't what selects them.
 - C++ inherited the rule unchanged from C.

@@ -160,14 +160,14 @@ in three different clauses.
 <MultipleChoice
   markdown={`In \`SELECT price * qty AS line_total\`, where is the value \`line_total\` stored?
 
-- It is permanently saved as a new column in the table.
-  > Computed columns are not written back to the table; they exist only in the query's result.
-- [o] Nowhere permanently, it is computed for each row and returned only in the result.
-  > Expressions are evaluated on the fly per row, producing values that appear in the result but do not change storage.
-- In a separate table created automatically.
-  > No new table is created; the value lives only in the returned result set.
 - It replaces the \`price\` column in storage.
   > The stored \`price\` column is untouched; the expression simply adds a computed column to the output.
+- It is permanently saved as a new column in the table.
+  > Computed columns are not written back to the table; they exist only in the query's result.
+- In a separate table created automatically.
+  > No new table is created; the value lives only in the returned result set.
+- [o] Nowhere permanently, it is computed for each row and returned only in the result.
+  > Expressions are evaluated on the fly per row, producing values that appear in the result but do not change storage.
 
 A computed column is produced per row in the result and is not stored in the table.`}
 />
@@ -177,10 +177,10 @@ A computed column is produced per row in the result and is not stored in the tab
 
 - It adds two numbers together.
   > Numeric addition uses \`+\`; \`||\` is for text.
-- It compares two values for equality.
-  > Equality uses \`=\`; \`||\` does something different.
 - [o] It concatenates (joins) text values into one string.
   > \`||\` glues text together, so \`first || ' ' || last\` builds a full name.
+- It compares two values for equality.
+  > Equality uses \`=\`; \`||\` does something different.
 - It selects every column.
   > Selecting all columns is \`*\`; \`||\` joins text.
 
@@ -190,14 +190,14 @@ A computed column is produced per row in the result and is not stored in the tab
 <MultipleChoice
   markdown={`What is the purpose of an **alias** (the \`AS name\` part)?
 
+- It permanently renames the column in the table.
+  > An alias affects only the query's result, not the stored table's column name.
 - It changes the value being computed.
   > An alias only labels the result; it does not alter the computation.
 - [o] It gives a result column a clear, readable name in the output.
   > Aliases make output self-explanatory and let other parts of a query refer to the value by name.
 - It is required for every column or the query fails.
   > Aliases are optional; plain columns keep their own names without one.
-- It permanently renames the column in the table.
-  > An alias affects only the query's result, not the stored table's column name.
 
 An alias names a result column for readability without changing stored data.`}
 />

@@ -267,14 +267,14 @@ But this table covers an *astonishing* fraction of day-to-day code.
 <MultipleChoice
   markdown={`Why does binary search require a sorted input?
 
-- Sorting makes elements take less memory
-  > It does not.
-- The algorithm uses the index parity
-  > It does not.
 - [o] Each step compares the target to the middle element and then *discards an entire half* of the remaining range based on the ordering; without an ordering, you cannot rule out a half
   > Ruling out a half only works if the data is ordered so "too big" and "too small" mean something.
 - Java's binary search throws an exception on unsorted input
-  > Behavior is *undefined*, but it doesn't necessarily throw, it can simply return wrong answers.`}
+  > Behavior is *undefined*, but it doesn't necessarily throw, it can simply return wrong answers.
+- The algorithm uses the index parity
+  > It does not.
+- Sorting makes elements take less memory
+  > It does not.`}
 />
 
 <MultipleChoice
@@ -293,14 +293,14 @@ But this table covers an *astonishing* fraction of day-to-day code.
 <MultipleChoice
   markdown={`A program calls \`list.contains(x)\` inside a tight loop 1,000,000 times on a 1,000,000-element ArrayList. Which change is most likely to fix the resulting slowness?
 
-- Replace the loop with recursion
-  > Won't help and may overflow the stack.
-- Sort the list first and keep using \`contains\`
-  > \`contains\` does not benefit from sorting.
 - [o] Replace the ArrayList with a HashSet so each \`contains\` call runs in roughly constant time
   > A set looks up by hash instead of scanning, turning each \`contains\` from linear to near-constant.
 - Re-create the list with a smaller capacity
-  > Does not change \`contains\`'s linear cost.`}
+  > Does not change \`contains\`'s linear cost.
+- Replace the loop with recursion
+  > Won't help and may overflow the stack.
+- Sort the list first and keep using \`contains\`
+  > \`contains\` does not benefit from sorting.`}
 />
 
 ## A challenge

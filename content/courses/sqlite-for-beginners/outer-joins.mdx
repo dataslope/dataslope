@@ -72,14 +72,14 @@ Linus appears even though he has no order. His order columns are `NULL`, which m
 <MultipleChoice
   markdown={`In the LEFT JOIN above, why does Linus appear?
 
+- Because \`ORDER BY\` adds missing rows.
+  > \`ORDER BY\` only sorts rows already in the result.
+- Because NULL means zero dollars.
+  > NULL means missing or absent, not zero.
 - Because every customer automatically gets a fake order.
   > SQLite does not create fake order rows.
 - [o] Because \`customers\` is the left table, and \`LEFT JOIN\` keeps all left-table rows.
   > Unmatched left rows stay in the result with NULLs for right-side columns.
-- Because NULL means zero dollars.
-  > NULL means missing or absent, not zero.
-- Because \`ORDER BY\` adds missing rows.
-  > \`ORDER BY\` only sorts rows already in the result.
 
 A left join preserves the left side even when the right side has no match.`}
 />
@@ -292,12 +292,12 @@ ORDER BY
 <MultipleChoice
   markdown={`What does a LEFT JOIN keep?
 
-- Only rows that match in both tables.
-  > That is the rule for an inner join.
-- [o] Every row from the left table, with NULLs for right-side columns when no match exists.
-  > A left join preserves the first table named in the join.
 - Every row from the right table only.
   > That describes a right join idea, not a left join.
+- [o] Every row from the left table, with NULLs for right-side columns when no match exists.
+  > A left join preserves the first table named in the join.
+- Only rows that match in both tables.
+  > That is the rule for an inner join.
 - No rows with NULLs.
   > Left joins often produce NULLs for missing right-side data.
 
@@ -307,12 +307,12 @@ A left join keeps the left table's rows safe from disappearing.`}
 <MultipleChoice
   markdown={`What do right-side NULLs mean in a LEFT JOIN result?
 
-- The matching row exists but all values are zero.
-  > NULL means missing, not zero.
-- [o] No matching right-side row was found for that left-side row.
-  > SQLite fills the missing side with NULLs.
 - The query sorted the row incorrectly.
   > Sorting does not create NULL matches.
+- [o] No matching right-side row was found for that left-side row.
+  > SQLite fills the missing side with NULLs.
+- The matching row exists but all values are zero.
+  > NULL means missing, not zero.
 - The table was deleted.
   > A SELECT join does not delete source tables.
 
@@ -322,14 +322,14 @@ NULLs are how an outer join represents absent related data.`}
 <MultipleChoice
   markdown={`Which pattern finds customers who have never ordered?
 
+- Select only from the orders table.
+  > Customers with no orders do not appear in the orders table.
+- \`LEFT JOIN\` orders, then \`WHERE o.id IS NOT NULL\`.
+  > That keeps customers who do have orders.
 - \`INNER JOIN\` customers to orders.
   > Inner joins drop customers without orders.
 - [o] \`LEFT JOIN\` orders, then \`WHERE o.id IS NULL\`.
   > Keep all customers first, then filter to the ones with no matching order.
-- \`LEFT JOIN\` orders, then \`WHERE o.id IS NOT NULL\`.
-  > That keeps customers who do have orders.
-- Select only from the orders table.
-  > Customers with no orders do not appear in the orders table.
 
 The unmatched pattern is left join plus an IS NULL test on the right side.`}
 />
@@ -339,12 +339,12 @@ The unmatched pattern is left join plus an IS NULL test on the right side.`}
 
 - It is the only join SQLite can ever run.
   > Recent SQLite supports other outer joins too, but left join remains the everyday tool.
-- [o] It clearly expresses "keep this table's rows even when related rows are missing."
-  > Put the must-keep table on the left and preserve it with \`LEFT JOIN\`.
 - It never returns NULL.
   > Left joins commonly return NULLs for the missing side.
 - It changes the database structure.
   > Joins read data; they do not alter table definitions.
+- [o] It clearly expresses "keep this table's rows even when related rows are missing."
+  > Put the must-keep table on the left and preserve it with \`LEFT JOIN\`.
 
 LEFT JOIN gives you a simple way to keep one side and reveal missing matches.`}
 />

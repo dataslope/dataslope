@@ -175,14 +175,14 @@ A good rule: **compute in long, present in wide.**
 <MultipleChoice
   markdown={`What distinguishes **wide** data from **long** data?
 
-- Wide data has more rows; long data has more columns.
-  > It is the opposite emphasis: wide spreads categories across *columns*; long stacks them as *rows*.
 - [o] In wide data a category is spread across columns (e.g. one column per quarter); in long data each category value is its own row.
   > Wide is a cross-tab for reading; long has one measurement per row, ideal for computation.
-- Long data cannot be aggregated.
-  > Long data is in fact the easiest shape to aggregate; that is a main reason analysts compute in long form.
+- Wide data has more rows; long data has more columns.
+  > It is the opposite emphasis: wide spreads categories across *columns*; long stacks them as *rows*.
 - They store fundamentally different information.
   > They are two layouts of the *same* information, interchangeable via PIVOT/UNPIVOT.
+- Long data cannot be aggregated.
+  > Long data is in fact the easiest shape to aggregate; that is a main reason analysts compute in long form.
 
 Wide spreads a category into columns; long keeps one value per row, same
 data, different layout.`}
@@ -207,14 +207,14 @@ into wide columns.`}
 <MultipleChoice
   markdown={`You receive a spreadsheet with one column per month and need to compute a monthly trend. What is the natural first step?
 
-- \`PIVOT\` it into even more columns.
-  > It is already wide; pivoting further does not help you compute a trend.
+- Nothing, wide data is already ideal for computing trends.
+  > Wide data is good for reading, but computing trends is far easier in long form.
 - [o] \`UNPIVOT\` the month columns into rows, producing long data you can group and aggregate.
   > Collapsing the month columns to rows yields tidy long data, the ideal shape for trend computation.
 - Delete all but one month column.
   > Discarding data destroys the trend you are trying to compute.
-- Nothing, wide data is already ideal for computing trends.
-  > Wide data is good for reading, but computing trends is far easier in long form.
+- \`PIVOT\` it into even more columns.
+  > It is already wide; pivoting further does not help you compute a trend.
 
 "Compute in long, present in wide": unpivot the wide spreadsheet first.`}
 />

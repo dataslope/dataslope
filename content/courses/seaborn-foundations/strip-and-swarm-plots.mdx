@@ -189,12 +189,12 @@ colors. Try setting `dodge=False` to see why the separation helps.
 <MultipleChoice
   markdown={`What is the purpose of **jitter** in a strip plot?
 
+- It computes a smoothed density curve for each group.
+  > A smoothed density is what a KDE or violin draws; jitter just nudges discrete points sideways, it does not estimate a curve.
 - It adds random noise to the numeric measurement to anonymize the data.
   > Jitter never changes the measured value (the position along the numeric axis); altering the data would misrepresent it.
 - [o] It spreads points apart along the category axis so overlapping observations become visible.
   > Without jitter, every point in a group lands on the same line and dense regions look like a single mark; the small random offset separates them so you can see how many there are.
-- It computes a smoothed density curve for each group.
-  > A smoothed density is what a KDE or violin draws; jitter just nudges discrete points sideways, it does not estimate a curve.
 - It sorts the points from smallest to largest within each category.
   > Jitter is a random horizontal offset, not a sort; it does not reorder points by value.
 
@@ -257,14 +257,14 @@ g = sns.catplot(data=penguins, x="species", y="body_mass_g", kind="swarm", heigh
 <MultipleChoice
   markdown={`What does a **swarm** plot do that a **strip** plot does not?
 
-- It summarizes each group with quartiles and whiskers.
-  > Quartiles and whiskers describe a box plot; a swarm still draws every individual point, not a summary.
-- [o] It nudges points so none overlap, making the width of each group reflect its density.
-  > A strip uses random jitter (points can still overlap), while a swarm deliberately places points side by side with no overlap, so the resulting shape reveals where values pile up.
 - It plots fewer points to avoid clutter.
   > A swarm tries to plot *every* point; it draws the same observations as a strip, just arranged so they do not collide.
 - It changes the numeric values to spread them out.
   > Neither plot alters the measured values; the swarm only adjusts each point's position along the category axis.
+- It summarizes each group with quartiles and whiskers.
+  > Quartiles and whiskers describe a box plot; a swarm still draws every individual point, not a summary.
+- [o] It nudges points so none overlap, making the width of each group reflect its density.
+  > A strip uses random jitter (points can still overlap), while a swarm deliberately places points side by side with no overlap, so the resulting shape reveals where values pile up.
 
 A swarm trades speed and scalability for a guarantee of no overlap, turning
 the cloud's width into a readable density.`}
@@ -275,14 +275,14 @@ the cloud's width into a readable density.`}
 with about 2,000 points. Seaborn prints a warning that it could not place all
 the points, and they overlap anyway. What is the best response?
 
-- Ignore the warning, since the plot still rendered.
-  > The warning means the swarm's defining promise, no overlapping points, has broken, so the density it appears to show is no longer trustworthy.
-- Increase the figure height so all points fit.
-  > A taller figure adds vertical room, but swarm crowding is about horizontal width within each category; it will not make thousands of points per group fit without overlap.
 - [o] Switch to a strip plot with a low \`alpha\`, or summarize with a box or violin plot.
   > At thousands of points per category a swarm cannot keep points separated; a low-opacity strip lets density show through overlap, and a box or violin summarizes cleanly at any scale.
 - Remove two of the three categories so only one remains.
   > Dropping categories throws away the comparison you set out to make; the readable fix is to change the chart type, not the data.
+- Ignore the warning, since the plot still rendered.
+  > The warning means the swarm's defining promise, no overlapping points, has broken, so the density it appears to show is no longer trustworthy.
+- Increase the figure height so all points fit.
+  > A taller figure adds vertical room, but swarm crowding is about horizontal width within each category; it will not make thousands of points per group fit without overlap.
 
 When a swarm can no longer separate its points, change the encoding, a
 low-\`alpha\` strip or a distribution summary handles large groups gracefully.`}

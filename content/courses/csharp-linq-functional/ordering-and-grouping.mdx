@@ -313,14 +313,14 @@ public static class SalesReport
 <MultipleChoice
   markdown={`What does \`xs.OrderBy(x => x.A).OrderBy(x => x.B)\` produce?
 
-- A sequence sorted by A, with ties in A broken by B.
-  > That's what \`ThenBy\` does. Two consecutive \`OrderBy\` calls behave differently.
 - [o] A sequence sorted by B, with ties in B broken by A.
   > The *second* \`OrderBy\` re-sorts everything by B; the first \`OrderBy\`'s ordering survives only within tied B values (because the sort is stable).
-- A compile error, because you can't apply \`OrderBy\` twice.
-  > It compiles fine, every \`IEnumerable<T>\` has \`OrderBy\` available as an extension. But the *behavior* is usually not what people want.
+- A sequence sorted by A, with ties in A broken by B.
+  > That's what \`ThenBy\` does. Two consecutive \`OrderBy\` calls behave differently.
 - A sequence in undefined order.
   > The order is well-defined: by B primarily, then by A within equal B's.
+- A compile error, because you can't apply \`OrderBy\` twice.
+  > It compiles fine, every \`IEnumerable<T>\` has \`OrderBy\` available as an extension. But the *behavior* is usually not what people want.
 
 To sort by multiple keys, you must use \`ThenBy\`/\`ThenByDescending\`
 after the first \`OrderBy\`. Stacking \`OrderBy\` calls accidentally

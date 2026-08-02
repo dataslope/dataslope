@@ -139,14 +139,14 @@ ones.
 <MultipleChoice
   markdown={`You write \`ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point() + geom_smooth(method = "lm")\`. How many trend lines appear, and why?
 
-- One line, because \`geom_smooth\` ignores color.
-  > \`geom_smooth\` does respect an inherited \`color\` grouping.
-- [o] Three lines, one per drivetrain, because \`color = drv\` is declared in \`ggplot()\` and therefore inherited by the smoother, which groups by it.
-  > Mappings in \`ggplot()\` reach every layer, so the smoother fits one line per \`drv\` group.
 - No lines, because \`geom_smooth\` needs its own \`aes()\`.
   > \`geom_smooth\` inherits the base \`aes()\`; no separate \`aes()\` is required.
 - Two lines, one for points and one for smooth.
   > The number of smoother lines equals the number of \`drv\` groups, which is three.
+- One line, because \`geom_smooth\` ignores color.
+  > \`geom_smooth\` does respect an inherited \`color\` grouping.
+- [o] Three lines, one per drivetrain, because \`color = drv\` is declared in \`ggplot()\` and therefore inherited by the smoother, which groups by it.
+  > Mappings in \`ggplot()\` reach every layer, so the smoother fits one line per \`drv\` group.
 
 A \`color\` mapping in \`ggplot()\` groups *every* layer that understands
 it, including the smoother.`}
@@ -155,12 +155,12 @@ it, including the smoother.`}
 <MultipleChoice
   markdown={`You want points colored by \`drv\` but only **one** overall trend line. What is the correct change?
 
-- Add \`color = "black"\` inside \`ggplot(aes(...))\`.
-  > Putting color in \`ggplot()\` affects all layers and still would not give per-point drivetrain colors.
 - [o] Move the color mapping into the point layer: \`geom_point(aes(color = drv))\`, and leave \`color\` out of \`ggplot()\` so the smoother fits all data together.
   > Scoping \`color = drv\` to the point layer keeps the smoother ungrouped.
 - Delete the \`geom_smooth\` layer.
   > That removes the trend line entirely rather than making it a single line.
+- Add \`color = "black"\` inside \`ggplot(aes(...))\`.
+  > Putting color in \`ggplot()\` affects all layers and still would not give per-point drivetrain colors.
 - Use \`inherit.aes = FALSE\` on \`geom_point\`.
   > That would strip the points of x/y too; the fix is *where* the color mapping lives.
 

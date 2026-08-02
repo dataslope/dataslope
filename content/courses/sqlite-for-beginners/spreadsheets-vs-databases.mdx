@@ -85,14 +85,14 @@ flowchart LR
 <MultipleChoice
   markdown={`Why can spreadsheet flexibility become risky for application data?
 
-- Because flexible cells make every spreadsheet empty
-  > Flexibility does not make spreadsheets empty; it can make values less consistent.
-- [o] Because flexible cells can allow inconsistent values in places where software expects consistency
-  > If one row says '$12', another says 'twelve', and another is blank, software has a harder time trusting the column.
 - Because spreadsheets cannot contain numbers
   > Spreadsheets can contain numbers.
+- Because flexible cells make every spreadsheet empty
+  > Flexibility does not make spreadsheets empty; it can make values less consistent.
 - Because charts are illegal
-  > Charts are a normal spreadsheet feature.`}
+  > Charts are a normal spreadsheet feature.
+- [o] Because flexible cells can allow inconsistent values in places where software expects consistency
+  > If one row says '$12', another says 'twelve', and another is blank, software has a harder time trusting the column.`}
 />
 
 ## Where spreadsheets break down
@@ -241,10 +241,10 @@ Neither tool is "better" for every job. The better question is: which tool match
 <MultipleChoice
   markdown={`When is a spreadsheet often the better choice?
 
-- Storing millions of related rows for a busy application
-  > That kind of dependable application storage is usually database work.
 - [o] Quick manual exploration of a small dataset
   > Spreadsheets are excellent for quick visual work.
+- Storing millions of related rows for a busy application
+  > That kind of dependable application storage is usually database work.
 - Enforcing many application rules for thousands of users
   > A database is usually a better fit for strict application data.
 - Safely managing complex related records for software
@@ -254,25 +254,25 @@ Neither tool is "better" for every job. The better question is: which tool match
 <MultipleChoice
   markdown={`When is a database often the better choice?
 
+- When the data should disappear after closing the app
+  > Databases help data persist.
 - When the only goal is coloring a few cells by hand
   > Visual formatting is usually spreadsheet work, not a reason to choose a database.
 - [o] When reliable structured storage matters
   > Databases are built for dependable structured facts.
 - When you only want to color a few cells
-  > Visual formatting is more naturally spreadsheet work.
-- When the data should disappear after closing the app
-  > Databases help data persist.`}
+  > Visual formatting is more naturally spreadsheet work.`}
 />
 
 <MultipleChoice
   markdown={`Why are relationships important in databases?
 
-- They make every table unrelated to every other table
-  > Relationships do the opposite: they connect related rows across tables.
-- [o] They connect related facts without repeating everything everywhere
-  > Relationships let one order point to one customer, instead of copying all customer details into every order.
 - They prevent all tables from having names
   > Tables still need names.
+- [o] They connect related facts without repeating everything everywhere
+  > Relationships let one order point to one customer, instead of copying all customer details into every order.
+- They make every table unrelated to every other table
+  > Relationships do the opposite: they connect related rows across tables.
 - They turn every row into an image
   > Relationships connect rows; they do not turn rows into images.`}
 />

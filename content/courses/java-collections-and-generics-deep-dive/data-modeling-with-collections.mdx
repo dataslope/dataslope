@@ -325,23 +325,23 @@ public final class OrderIndex {
 <MultipleChoice
   markdown={`You need to answer "all messages from a given user" instantly, where messages arrive over time and the per-user list grows. What is the natural shape?
 
-- A flat \`List<Message>\` that you scan each time
-  > Works, but every query is \`O(n)\`. Fine for small data, wrong shape for the question.
 - A \`Set<Message>\`
   > Loses order; doesn't index by user.
-- [o] A \`Map<UserId, List<Message>>\` updated on every arrival
-  > Lookup becomes \`O(1)\` and per-user order is preserved.
 - A \`Map<UserId, Set<Message>>\`
-  > Wrong if order matters; messages aren't naturally unique either.`}
+  > Wrong if order matters; messages aren't naturally unique either.
+- A flat \`List<Message>\` that you scan each time
+  > Works, but every query is \`O(n)\`. Fine for small data, wrong shape for the question.
+- [o] A \`Map<UserId, List<Message>>\` updated on every arrival
+  > Lookup becomes \`O(1)\` and per-user order is preserved.`}
 />
 
 <MultipleChoice
   markdown={`You're modeling a tagging system: each post has many tags, each tag belongs to many posts. Which is a *good* design?
 
-- One \`Map<PostId, List<TagId>>\`
-  > Fine for "tags of a post"; "posts of a tag" becomes \`O(n)\`.
 - One \`Map<TagId, List<PostId>>\`
   > Symmetric problem.
+- One \`Map<PostId, List<TagId>>\`
+  > Fine for "tags of a post"; "posts of a tag" becomes \`O(n)\`.
 - [o] Two indices: \`Map<PostId, Set<TagId>>\` and \`Map<TagId, Set<PostId>>\`, kept in sync on every change
   > Each direction is \`O(1)\`; updates do a tiny bit more work.
 - A \`List<Pair<PostId, TagId>>\`
@@ -351,12 +351,12 @@ public final class OrderIndex {
 <MultipleChoice
   markdown={`Why prefer \`record CustomerId(String value) {}\` over a bare \`String\` for keys?
 
-- It uses less memory
-  > It uses slightly *more* memory.
-- It's faster
-  > It is comparable.
 - [o] The compiler now refuses to mix up customer ids with other strings (order ids, emails, etc.), and you can put validation in the record's constructor
   > Type-driven modeling shifts entire categories of bugs from runtime to compile time.
 - It's required by the Collections API
-  > It is not.`}
+  > It is not.
+- It's faster
+  > It is comparable.
+- It uses less memory
+  > It uses slightly *more* memory.`}
 />

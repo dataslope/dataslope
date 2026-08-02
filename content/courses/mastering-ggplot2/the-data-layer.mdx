@@ -174,10 +174,10 @@ does my plot look wrong?" moments.
 
 - ggplot2 cannot plot numbers larger than 2018.
   > Year values are fine; the issue is structural, not numeric.
-- ggplot2 requires every data frame to have exactly three columns.
-  > There is no column-count requirement.
 - [o] Mappings refer to *columns*, and "year" currently lives in the column *names* rather than in a single column of values.
   > To map year to x, year must be one column; reshaping to long form creates it.
+- ggplot2 requires every data frame to have exactly three columns.
+  > There is no column-count requirement.
 - You must convert all the values to characters first.
   > Type conversion is unrelated; the problem is the wide layout.
 
@@ -188,12 +188,12 @@ mapped. This is the most common data-prep step before plotting.`}
 <MultipleChoice
   markdown={`In \`mpg\`, \`cyl\` is stored as a number. Mapping \`color = cyl\` gives a smooth color gradient, but \`color = factor(cyl)\` gives distinct colors per value. Why?
 
+- [o] A numeric column is treated as **continuous** (gradient scale), while a factor is treated as **discrete** (one color per category).
+  > The column's type decides whether ggplot2 uses a continuous or discrete color scale.
 - \`factor()\` changes the data values themselves.
   > \`factor()\` changes how the column is *typed and treated*, not the underlying values.
 - ggplot2 picks colors at random each run.
   > Colors are determined by the scale, which depends on the variable's type.
-- [o] A numeric column is treated as **continuous** (gradient scale), while a factor is treated as **discrete** (one color per category).
-  > The column's type decides whether ggplot2 uses a continuous or discrete color scale.
 - Gradients are only allowed for the x-axis.
   > Gradients apply to any continuous aesthetic, including color.
 

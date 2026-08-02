@@ -189,14 +189,14 @@ painful mistakes for the rest of your data career.
 <MultipleChoice
   markdown={`What happens if you run \`DELETE FROM tasks;\` with no \`WHERE\` clause?
 
-- It deletes only the most recently added row.
-  > Without a \`WHERE\`, \`DELETE\` does not single out one row; it applies to all of them.
-- It does nothing because a \`WHERE\` is required.
-  > A \`WHERE\` is *not* required, which is exactly why this is dangerous; the statement runs and affects everything.
 - [o] It deletes every row in the \`tasks\` table.
   > With no \`WHERE\` to limit it, the deletion applies to all rows, a common and costly beginner mistake.
+- It does nothing because a \`WHERE\` is required.
+  > A \`WHERE\` is *not* required, which is exactly why this is dangerous; the statement runs and affects everything.
 - It deletes the table's structure as well as its rows.
   > Removing the table itself is \`DROP TABLE\`; \`DELETE\` removes rows but leaves the (now empty) table.
+- It deletes only the most recently added row.
+  > Without a \`WHERE\`, \`DELETE\` does not single out one row; it applies to all of them.
 
 Without \`WHERE\`, \`DELETE\` and \`UPDATE\` apply to every row, always scope them deliberately.`}
 />
@@ -204,14 +204,14 @@ Without \`WHERE\`, \`DELETE\` and \`UPDATE\` apply to every row, always scope th
 <MultipleChoice
   markdown={`Which clause determines *which* rows an \`UPDATE\` or \`DELETE\` affects?
 
-- \`SET\`
-  > \`SET\` specifies the new values for an \`UPDATE\`; it does not choose which rows are affected.
-- [o] \`WHERE\`
-  > \`WHERE\` is the condition that selects exactly the rows to update or delete.
-- \`VALUES\`
-  > \`VALUES\` supplies data for an \`INSERT\`; it does not filter rows for updates or deletes.
 - \`FROM\`
   > \`FROM\` names the table; the row selection is done by \`WHERE\`.
+- \`SET\`
+  > \`SET\` specifies the new values for an \`UPDATE\`; it does not choose which rows are affected.
+- \`VALUES\`
+  > \`VALUES\` supplies data for an \`INSERT\`; it does not filter rows for updates or deletes.
+- [o] \`WHERE\`
+  > \`WHERE\` is the condition that selects exactly the rows to update or delete.
 
 \`WHERE\` is what limits an \`UPDATE\` or \`DELETE\` to the intended rows.`}
 />

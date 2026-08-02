@@ -566,10 +566,10 @@ Assume all values are numbers.`}
 
 - \`"hello"\`
   > Strings are hashable, so yes.
-- \`[1, 2, 3]\`
-  > Lists are mutable and not hashable, so no.
 - [o] \`(1, 2, 3)\`
   > Tuples of hashables are hashable.
+- \`[1, 2, 3]\`
+  > Lists are mutable and not hashable, so no.
 - \`{"a": 1}\`
   > Dicts are mutable and not hashable, so no.`}
 />
@@ -584,12 +584,12 @@ d.setdefault("c", 3)
 print(d)
 \`\`\`
 
-- \`{"a": 99, "b": 2, "c": 3}\`
-  > \`setdefault\` only writes when the key is missing.
 - [o] \`{"a": 1, "b": 2, "c": 3}\`
   > \`a\` already exists so it is untouched; \`c\` is added.
 - \`{"a": 1, "b": 2}\`
   > \`c\` is missing, so it is added.
+- \`{"a": 99, "b": 2, "c": 3}\`
+  > \`setdefault\` only writes when the key is missing.
 - A \`KeyError\`
   > \`setdefault\` never raises KeyError.`}
 />
@@ -597,14 +597,14 @@ print(d)
 <MultipleChoice
   markdown={`What is the time complexity of \`key in d\` where \`d\` is a dict?
 
-- [o] O(1) average case
-  > Dicts use hash tables, giving O(1) average-case lookup.
+- O(n²)
+  > Dict lookup is much faster than quadratic.
 - O(n)
   > That would be true for a list, not a dict.
 - O(log n)
   > Dicts are not sorted; they use hashing, not binary search.
-- O(n²)
-  > Dict lookup is much faster than quadratic.`}
+- [o] O(1) average case
+  > Dicts use hash tables, giving O(1) average-case lookup.`}
 />
 
 <MultipleChoice

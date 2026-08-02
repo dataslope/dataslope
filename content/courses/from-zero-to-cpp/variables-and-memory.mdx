@@ -379,12 +379,12 @@ int main() {
 
 - A label attached to a function.
   > Functions and variables are different kinds of named entities.
-- A copy of data stored in the CPU's registers permanently.
-  > Variables can be cached in registers temporarily but they live in memory.
+- A pointer to a row in a database table.
+  > That is not what the C++ language means by "variable".
 - [o] A name bound to a region of memory of a known type and size.
   > The compiler tracks the binding; the OS and CPU manage the memory.
-- A pointer to a row in a database table.
-  > That is not what the C++ language means by "variable".`}
+- A copy of data stored in the CPU's registers permanently.
+  > Variables can be cached in registers temporarily but they live in memory.`}
 />
 
 <MultipleChoice
@@ -392,10 +392,10 @@ int main() {
 
 - It is always zero.
   > Global variables are zero-initialized, but local variables are not.
-- The compiler refuses to compile the program.
-  > Compilers warn about this in many cases, but the standard does not require an error.
 - [o] You get **undefined behavior**: the bytes in that memory are whatever happened to be there, and any code that uses them may misbehave.
   > Always initialize, ideally with \`int x{};\` or an explicit value.
+- The compiler refuses to compile the program.
+  > Compilers warn about this in many cases, but the standard does not require an error.
 - The runtime throws a NullVariableException.
   > C++ does not throw exceptions for uninitialized variables.`}
 />
@@ -407,23 +407,23 @@ int main() {
   > \`const\` is unrelated to where the variable lives.
 - It guarantees the variable will be optimized away.
   > Optimization is the compiler's choice; \`const\` is a *contract*.
-- [o] It tells the compiler that this variable's value must not change after initialization, and prevents any code that tries to.
-  > \`const\` is one of the simplest ways to make code safer to read.
 - It exports the variable to other source files.
-  > That role is filled by \`extern\`, not \`const\`.`}
+  > That role is filled by \`extern\`, not \`const\`.
+- [o] It tells the compiler that this variable's value must not change after initialization, and prevents any code that tries to.
+  > \`const\` is one of the simplest ways to make code safer to read.`}
 />
 
 <MultipleChoice
   markdown={`Why is \`auto\` not a violation of static typing?
 
-- Because \`auto\` makes the variable dynamically typed.
-  > C++ remains statically typed; \`auto\` does not change that.
+- Because the type is decided at runtime based on what you assign first.
+  > Types in C++ never change at runtime.
 - [o] Because the compiler still determines a single concrete type at compile time and locks it in; \`auto\` only saves you from spelling the type out.
   > \`auto x = 42;\` makes \`x\` exactly an \`int\` and nothing else.
+- Because \`auto\` makes the variable dynamically typed.
+  > C++ remains statically typed; \`auto\` does not change that.
 - Because \`auto\` only works in templates.
-  > \`auto\` works in many places, including ordinary local variables.
-- Because the type is decided at runtime based on what you assign first.
-  > Types in C++ never change at runtime.`}
+  > \`auto\` works in many places, including ordinary local variables.`}
 />
 
 Next: a closer look at types themselves, what kinds C++ has, and

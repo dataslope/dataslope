@@ -275,14 +275,14 @@ Memorize this once and you will stop being surprised.
 <MultipleChoice
   markdown={`Calling \`df["salary"]\` returns:
 
-- A NumPy array
-  > \`series.values\` returns a NumPy array, but \`df["salary"]\` itself returns a Series, a labeled 1-D structure with an index, not a raw array.
-- A list
-  > A list is a plain Python data structure with no index or dtype; \`df["salary"]\` returns a Pandas Series with full label-awareness.
 - [o] A Series
   > Single bracket → single thing → Series. Double brackets always give a DataFrame.
 - A new DataFrame
   > \`df[["salary"]]\` with double brackets returns a one-column DataFrame, but \`df["salary"]\` with a single bracket returns a Series.
+- A NumPy array
+  > \`series.values\` returns a NumPy array, but \`df["salary"]\` itself returns a Series, a labeled 1-D structure with an index, not a raw array.
+- A list
+  > A list is a plain Python data structure with no index or dtype; \`df["salary"]\` returns a Pandas Series with full label-awareness.
 
 Single-bracket vs double-bracket is one of the most common surprises in Pandas.`}
 />
@@ -290,10 +290,10 @@ Single-bracket vs double-bracket is one of the most common surprises in Pandas.`
 <MultipleChoice
   markdown={`When you add two Series with different indexes, what happens?
 
-- It throws an error
-  > Pandas does not raise an error when adding Series with different indexes; it silently produces NaN for non-matching labels, which can itself be a silent bug if unexpected.
 - The values are added position by position
   > Position-based addition is what NumPy arrays do, not Pandas Series; Pandas's distinctive behavior is to align by index *label* before operating.
+- It throws an error
+  > Pandas does not raise an error when adding Series with different indexes; it silently produces NaN for non-matching labels, which can itself be a silent bug if unexpected.
 - [o] Pandas aligns the two Series by index label, then adds the matching values; non-matching labels produce NaN
   > This *alignment* behavior is the heart of what makes Pandas distinctive. Adding by label, not by position, is the default.
 - The shorter Series is zero-padded
@@ -307,12 +307,12 @@ Once you have used alignment in anger, you will not want to go back.`}
 
 - A single float
   > A single float would result from calling \`.mean()\` on a single-column Series; a DataFrame with 4 columns produces one mean per column.
-- A DataFrame of means
-  > A reduction like \`.mean()\` collapses one axis into a scalar per column, returning a Series, not a DataFrame.
-- [o] A Series with one entry per column
-  > A DataFrame reduction (\`mean\`, \`sum\`, \`std\`, ...) collapses one axis. Default \`axis=0\` collapses rows → Series indexed by column name.
 - A NumPy array
   > \`df.mean().values\` would give a NumPy array, but \`df.mean()\` itself returns a Pandas Series with the column names as the index.
+- [o] A Series with one entry per column
+  > A DataFrame reduction (\`mean\`, \`sum\`, \`std\`, ...) collapses one axis. Default \`axis=0\` collapses rows → Series indexed by column name.
+- A DataFrame of means
+  > A reduction like \`.mean()\` collapses one axis into a scalar per column, returning a Series, not a DataFrame.
 
 Knowing the shape of every operation's output is half the battle.`}
 />

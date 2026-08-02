@@ -140,12 +140,12 @@ marks rather than the data feeding the stats.`}
 
 - To filter out cars with low MPG.
   > \`coord_fixed\` changes the aspect ratio, not the data.
+- To add a confidence band to the points.
+  > Bands come from \`geom_smooth\`, not from coordinates.
 - To convert the axes to a log scale.
   > That is a scale transformation, unrelated to \`coord_fixed\`.
 - [o] Because both axes are in the same units, so equal data distances should look equal, making a \`y = x\` reference line a true 45-degree diagonal.
   > Fixing the ratio keeps same-unit comparisons visually honest.
-- To add a confidence band to the points.
-  > Bands come from \`geom_smooth\`, not from coordinates.
 
 When x and y share units, a fixed coordinate ratio prevents the panel
 from distorting the comparison between them.`}

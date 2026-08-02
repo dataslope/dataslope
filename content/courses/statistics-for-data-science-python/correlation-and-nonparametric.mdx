@@ -349,10 +349,10 @@ effect sizes, see *Effect Sizes*.
 <MultipleChoice
   markdown={`A scatterplot shows a clear inverted-U: \`y\` rises with \`x\`, peaks, then falls. Pearson r comes out near 0. What's the correct read?
 
-- The two variables are unrelated
-  > The plot shows a strong dependence, so "unrelated" contradicts the visible pattern. Pearson r near 0 does not mean independence.
 - [o] There's no *linear* relationship, but a strong *non-linear* one; Pearson only captures straight-line association
   > Pearson measures linear association, and a symmetric rise-then-fall cancels out to roughly zero even though y clearly depends on x.
+- The two variables are unrelated
+  > The plot shows a strong dependence, so "unrelated" contradicts the visible pattern. Pearson r near 0 does not mean independence.
 - Pearson must have been computed incorrectly
   > A near-zero Pearson r is the *expected* result for a symmetric curved relationship, not a computational error.
 - Switching to Spearman would give r near 1
@@ -501,14 +501,14 @@ data. They also have their own conditions (e.g. similar distribution
 <MultipleChoice
   markdown={`You compare resolution times for two independent support queues. The data has several extreme outliers and the samples are small. Which test is the most appropriate?
 
-- A two-sample t-test, because it's the standard way to compare two groups
-  > With small samples and heavy outliers, the t-test's reliance on the mean and its standard error becomes shaky, so it is not the safest choice here.
+- The Wilcoxon signed-rank test, because it handles outliers
+  > Wilcoxon signed-rank is for paired data; these are independent queues, so it is the wrong design even though it is also rank-based.
 - A paired t-test, since both are support times
   > The two queues are independent groups, not matched pairs, so a paired test does not apply regardless of robustness concerns.
 - [o] The Mann-Whitney U test, a rank-based test robust to outliers for two independent groups
   > Working on ranks rather than raw magnitudes makes it shrug off extreme values, which is exactly what small, outlier-heavy independent samples need.
-- The Wilcoxon signed-rank test, because it handles outliers
-  > Wilcoxon signed-rank is for paired data; these are independent queues, so it is the wrong design even though it is also rank-based.
+- A two-sample t-test, because it's the standard way to compare two groups
+  > With small samples and heavy outliers, the t-test's reliance on the mean and its standard error becomes shaky, so it is not the safest choice here.
 
 For independent groups with outliers or small samples, Mann-Whitney U is the robust counterpart to the independent t-test.`}
 />
@@ -679,12 +679,12 @@ assert differ == bool(p_value <= alpha)`,
 <MultipleChoice
   markdown={`Pearson r between two variables is **0.02**, but a scatterplot shows a tight parabola (U-shape). Which statement is correct?
 
-- The variables are statistically independent
-  > A tight U-shape is a strong dependence, so independence is wrong. A near-zero Pearson r does not imply independence.
 - [o] There is essentially no *linear* association, but there is a strong non-linear one; Pearson only captures straight-line relationships
   > Pearson measures linear association, and a symmetric U-shape averages out to near zero even though y is tightly determined by x.
 - The correlation was calculated on the wrong columns
   > A near-zero r is exactly what a symmetric parabola produces, so there is no reason to suspect a calculation error.
+- The variables are statistically independent
+  > A tight U-shape is a strong dependence, so independence is wrong. A near-zero Pearson r does not imply independence.
 - Spearman would also be near 1 because the relationship is strong
   > Spearman detects monotonic trends; a U-shape rises then falls, so it is not monotonic and Spearman would also be far from 1.
 
@@ -694,14 +694,14 @@ A coefficient near 0 only rules out a straight-line trend, which is why visualiz
 <MultipleChoice
   markdown={`When should you prefer **Spearman** over **Pearson**?
 
-- Always, because Spearman is more accurate
-  > Neither is universally better; Pearson is preferable when you specifically care about linear strength and the data is well-behaved. Spearman is not a blanket upgrade.
-- [o] When the relationship is monotonic but curved, the data is ordinal, or outliers would distort Pearson
-  > Because Spearman works on ranks, it captures any consistent up-or-down trend and resists outliers, which is exactly when Pearson struggles.
 - Only when the two variables are perfectly linear
   > A perfectly linear relationship is the ideal case for Pearson; Spearman offers no advantage there and would simply agree.
+- [o] When the relationship is monotonic but curved, the data is ordinal, or outliers would distort Pearson
+  > Because Spearman works on ranks, it captures any consistent up-or-down trend and resists outliers, which is exactly when Pearson struggles.
 - When the data is categorical, like colors or brands
   > Unordered categorical data has no meaningful ranks for a correlation; an association there is a job for chi-square, not Spearman.
+- Always, because Spearman is more accurate
+  > Neither is universally better; Pearson is preferable when you specifically care about linear strength and the data is well-behaved. Spearman is not a blanket upgrade.
 
 Spearman shines for monotonic-but-curved relationships, ordinal data, and outlier-prone samples.`}
 />
@@ -713,10 +713,10 @@ Spearman shines for monotonic-but-curved relationships, ordinal data, and outlie
   > An r of 0.85 is a strong correlation, so weakness is not the flaw. The problem is the leap to causation.
 - The p-value should be larger for a real effect
   > A tiny p-value indicates the association is unlikely to be zero; it does not justify a causal claim. The error is interpretive, not about the p-value's size.
-- [o] Correlation does not imply causation, a confounder (hot weather) plausibly drives both, so the causal claim is unsupported
-  > A strong, significant association can arise from a third variable influencing both, so concluding that one causes the other ignores confounding.
 - Spearman should have been used instead of Pearson
   > Switching correlation methods would not address the issue; no correlation coefficient, by itself, can establish causation.
+- [o] Correlation does not imply causation, a confounder (hot weather) plausibly drives both, so the causal claim is unsupported
+  > A strong, significant association can arise from a third variable influencing both, so concluding that one causes the other ignores confounding.
 
 A correlation establishes association only; causal claims require ruling out confounders, typically via an experiment.`}
 />
@@ -724,14 +724,14 @@ A correlation establishes association only; causal claims require ruling out con
 <MultipleChoice
   markdown={`Which statement about **nonparametric** tests like Mann-Whitney U and Wilcoxon is accurate?
 
-- They make no assumptions at all about the data
-  > They still require independent observations (and Wilcoxon requires paired data), so they are not assumption-free. They relax normality, not independence.
 - They always have more power than the matching t-test
   > When the data really is normal, the corresponding t-test typically has slightly *more* power because it uses magnitudes, not just ranks. The advantage runs the other way.
 - [o] They drop the normality assumption by working with ranks, making them robust to outliers and suitable for ordinal data, but they still require independence
   > Ranking discards raw magnitudes so extreme values lose their pull, which is what makes these tests robust, yet the independence requirement remains in force.
 - They can only be used on categorical data
   > These tests apply to ordinal and continuous data via ranks; categorical association is the domain of chi-square, not Mann-Whitney or Wilcoxon.
+- They make no assumptions at all about the data
+  > They still require independent observations (and Wilcoxon requires paired data), so they are not assumption-free. They relax normality, not independence.
 
 Nonparametric tests trade the normality assumption for robustness, but independence is non-negotiable.`}
 />
@@ -741,12 +741,12 @@ Nonparametric tests trade the normality assumption for robustness, but independe
 
 - A slope of 3.0 means 40% of sales are explained by ad spend
   > The slope and R² describe different things; the 40% figure is R², not the slope. Mixing them up conflates two separate quantities.
-- [o] Each extra unit of ad spend is associated with about 3.0 more units of sales, and ad spend explains roughly 40% of the variation in sales
-  > The slope is the predicted change in y per one-unit increase in x, while R² is the share of y's variance the line accounts for.
 - R² of 0.40 means the slope is statistically significant
   > R² measures variance explained, not significance; the slope's p-value (not R²) speaks to whether it differs from zero.
 - The slope being positive proves ad spend causes sales
   > Regression on observational data shows association, not causation; a positive slope alone cannot establish that ad spend causes sales.
+- [o] Each extra unit of ad spend is associated with about 3.0 more units of sales, and ad spend explains roughly 40% of the variation in sales
+  > The slope is the predicted change in y per one-unit increase in x, while R² is the share of y's variance the line accounts for.
 
 Slope is the effect per unit (in real units); R² is the fraction of variance the line explains.`}
 />

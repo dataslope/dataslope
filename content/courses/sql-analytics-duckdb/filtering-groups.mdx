@@ -154,14 +154,14 @@ Ask: *does my condition mention an aggregate?*
 <MultipleChoice
   markdown={`What is the key difference between \`WHERE\` and \`HAVING\`?
 
-- \`WHERE\` is for numbers and \`HAVING\` is for text.
-  > Both work with any data type; the difference is *when* they run, not what type they filter.
 - [o] \`WHERE\` filters individual rows before grouping; \`HAVING\` filters groups after aggregates are computed.
   > \`WHERE\` runs upstream of \`GROUP BY\` (raw rows), while \`HAVING\` runs downstream (group summaries).
-- \`HAVING\` runs before \`WHERE\`.
-  > The order is \`WHERE\` then \`GROUP BY\` then \`HAVING\`; \`HAVING\` runs later, not earlier.
+- \`WHERE\` is for numbers and \`HAVING\` is for text.
+  > Both work with any data type; the difference is *when* they run, not what type they filter.
 - They are interchangeable synonyms.
   > They filter at different stages and can see different things, so they are not interchangeable.
+- \`HAVING\` runs before \`WHERE\`.
+  > The order is \`WHERE\` then \`GROUP BY\` then \`HAVING\`; \`HAVING\` runs later, not earlier.
 
 \`WHERE\` filters rows pre-grouping; \`HAVING\` filters groups post-aggregation.`}
 />
@@ -169,14 +169,14 @@ Ask: *does my condition mention an aggregate?*
 <MultipleChoice
   markdown={`Why does \`WHERE SUM(amount) > 150\` fail?
 
-- \`SUM\` is not a valid function.
-  > \`SUM\` is valid; the problem is *where* it is used.
-- [o] \`WHERE\` runs before grouping, so per-group sums do not exist yet, aggregate conditions belong in \`HAVING\`.
-  > At \`WHERE\` time there are only individual rows, no group totals, so \`SUM(amount)\` cannot be evaluated there.
 - \`WHERE\` cannot compare numbers with \`>\`.
   > \`WHERE\` compares numbers fine; the issue is the aggregate, not the operator.
 - You must always use \`SUM\` in \`WHERE\`.
   > You must *never* use an aggregate in \`WHERE\`; it goes in \`HAVING\`.
+- \`SUM\` is not a valid function.
+  > \`SUM\` is valid; the problem is *where* it is used.
+- [o] \`WHERE\` runs before grouping, so per-group sums do not exist yet, aggregate conditions belong in \`HAVING\`.
+  > At \`WHERE\` time there are only individual rows, no group totals, so \`SUM(amount)\` cannot be evaluated there.
 
 Aggregate conditions must go in \`HAVING\` because aggregates are computed
 after \`WHERE\`.`}
@@ -185,14 +185,14 @@ after \`WHERE\`.`}
 <MultipleChoice
   markdown={`A query keeps only **paid** orders, groups by region, and keeps regions with revenue over \$1000. Where does each condition go?
 
-- Both conditions go in \`HAVING\`.
-  > \`status = 'paid'\` is a per-row condition and should filter rows in \`WHERE\`, before grouping.
+- The query is impossible in SQL.
+  > Combining \`WHERE\` and \`HAVING\` in one query is common and fully valid.
 - Both conditions go in \`WHERE\`.
   > \`revenue > 1000\` uses \`SUM\`, an aggregate, which \`WHERE\` cannot evaluate; it must go in \`HAVING\`.
 - [o] \`status = 'paid'\` goes in \`WHERE\`; \`SUM(amount) > 1000\` goes in \`HAVING\`.
   > The row-level condition filters rows before grouping; the aggregate condition filters groups after summing.
-- The query is impossible in SQL.
-  > Combining \`WHERE\` and \`HAVING\` in one query is common and fully valid.
+- Both conditions go in \`HAVING\`.
+  > \`status = 'paid'\` is a per-row condition and should filter rows in \`WHERE\`, before grouping.
 
 Row conditions → \`WHERE\`; aggregate conditions → \`HAVING\`.`}
 />

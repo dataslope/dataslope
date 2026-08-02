@@ -382,38 +382,38 @@ Pride and Prejudice by Jane Austen
 <MultipleChoice
   markdown={`Which of these is the clearest example of **composition**?
 
-- A \`Dog\` *is a* \`Mammal\`
-  > That is *inheritance* (is-a).
+- A \`Library\` keeps references to \`Book\`s borrowed from a national archive
+  > Books that live outside the library are more like *aggregation* (weak has-a).
 - A \`PrintService\` *uses* a \`Logger\` it was handed temporarily
   > That is closer to *dependency* (uses).
+- A \`Dog\` *is a* \`Mammal\`
+  > That is *inheritance* (is-a).
 - [o] A \`House\` *has* \`Room\`s that are created and destroyed with the house
-  > Strong ownership of parts whose lifetime is bound to the whole.
-- A \`Library\` keeps references to \`Book\`s borrowed from a national archive
-  > Books that live outside the library are more like *aggregation* (weak has-a).`}
+  > Strong ownership of parts whose lifetime is bound to the whole.`}
 />
 
 <MultipleChoice
   markdown={`When \`Car\` exposes \`start()\` and internally calls \`engine.ignite()\`, what is that pattern called?
 
-- Inheritance
-  > No subclassing is happening.
 - Polymorphism
   > No method overriding is happening here.
 - [o] Delegation, the \`Car\` asks its part (the engine) to do the work
   > Composition + delegation is the workhorse of OOP.
 - Abstraction leak
-  > It's the opposite, the engine details are hidden from callers.`}
+  > It's the opposite, the engine details are hidden from callers.
+- Inheritance
+  > No subclassing is happening.`}
 />
 
 <MultipleChoice
   markdown={`Why is composition often preferred over inheritance when both are possible?
 
-- Composition is required by the Java compiler
-  > It is not.
 - Inheritance was deprecated in Java 17
   > It was not.
+- Composition methods always run faster
+  > Speed is not the criterion.
 - [o] Composition assembles small, swappable pieces, while inheritance locks classes into a rigid tree that's hard to change later
   > The GoF principle "favor object composition over class inheritance" captures this.
-- Composition methods always run faster
-  > Speed is not the criterion.`}
+- Composition is required by the Java compiler
+  > It is not.`}
 />

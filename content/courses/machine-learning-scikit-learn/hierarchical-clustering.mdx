@@ -648,12 +648,12 @@ assert 0 < largest_cluster <= len(X), f"Largest cluster out of range: {largest_c
 
 - With \`k\` randomly placed cluster centers
   > Randomly placed cluster centers are the starting point for K-means, not agglomerative clustering. Agglomerative clustering begins with no centers at all, every individual point is its own cluster.
+- With the two farthest points forming the first cluster
+  > Agglomerative clustering merges the *closest* pair of clusters at each step, not the farthest. Starting with the farthest points would be counter-intuitive and is not how any standard hierarchical method works.
 - With every point already assigned to one of \`k\` groups
   > Pre-assigning points to k groups and iterating is how K-means works. Agglomerative clustering starts with no groups at all, then builds structure bottom-up by repeatedly merging the two closest clusters.
 - [o] With every individual point as its own separate cluster, which are then merged two at a time
   > Agglomerative means bottom-up: each point starts alone, and the two closest clusters are repeatedly fused until one cluster remains. No centers and no preset \`k\` are involved at the start.
-- With the two farthest points forming the first cluster
-  > Agglomerative clustering merges the *closest* pair of clusters at each step, not the farthest. Starting with the farthest points would be counter-intuitive and is not how any standard hierarchical method works.
 
 The method builds upward from singletons by merging, recording the full tree along the way.`}
 />
@@ -661,14 +661,14 @@ The method builds upward from singletons by merging, recording the full tree alo
 <MultipleChoice
   markdown={`In a dendrogram, what does the **height** at which two branches merge represent?
 
-- The number of points in the resulting cluster
-  > The width or bar length in a dendrogram relates to cluster membership, but the *height* of a merge specifically encodes the distance between the two clusters that fused there, not their combined size.
-- [o] The distance between the two clusters at the moment they were merged, higher means they were more different
-  > The y-axis is the merge distance. Short, low merges join very similar clusters; tall merges join clusters that were far apart, which is why a large gap before the top suggests a natural number of clusters.
-- The order in which the points were loaded
-  > The horizontal order of leaves in a dendrogram is partly cosmetic (arranged to minimize crossing branches) and does not reflect loading order. The height encodes distance, not sequence.
 - The variance of a single point
   > A single point has no internal variance and its leaf sits at the bottom of the dendrogram at height zero. The height of a merge involves two clusters, not one point's variance.
+- The order in which the points were loaded
+  > The horizontal order of leaves in a dendrogram is partly cosmetic (arranged to minimize crossing branches) and does not reflect loading order. The height encodes distance, not sequence.
+- [o] The distance between the two clusters at the moment they were merged, higher means they were more different
+  > The y-axis is the merge distance. Short, low merges join very similar clusters; tall merges join clusters that were far apart, which is why a large gap before the top suggests a natural number of clusters.
+- The number of points in the resulting cluster
+  > The width or bar length in a dendrogram relates to cluster membership, but the *height* of a merge specifically encodes the distance between the two clusters that fused there, not their combined size.
 
 Reading the vertical heights is how you interpret similarity and decide where to cut the tree.`}
 />
@@ -676,14 +676,14 @@ Reading the vertical heights is how you interpret similarity and decide where to
 <MultipleChoice
   markdown={`What is a genuine advantage of hierarchical clustering over k-means?
 
-- It always runs faster on very large datasets
-  > Hierarchical clustering is significantly *slower* than K-means on large datasets because its cost grows roughly quadratically with the number of points. Speed is actually one of its main disadvantages.
-- It guarantees spherical clusters
-  > Neither hierarchical clustering nor K-means guarantees spherical clusters; both are distance-based and tend to find round-ish shapes by default. Ward linkage produces compact clusters, but not a guarantee of perfect spheres.
-- [o] You do not have to commit to the number of clusters before fitting, one tree can be cut at any level to yield different numbers of clusters
-  > Building the tree once lets you explore every \`k\` by sliding the cut, and it is deterministic with no random restarts. K-means, by contrast, fixes \`k\` upfront and must be rerun for each new value.
 - It can label brand-new points instantly without refitting
   > Assigning a new point to a cluster is actually a weakness of agglomerative clustering, it has no centroids and no natural way to place a new point without refitting. K-means, with its centroids, handles this straightforwardly.
+- It guarantees spherical clusters
+  > Neither hierarchical clustering nor K-means guarantees spherical clusters; both are distance-based and tend to find round-ish shapes by default. Ward linkage produces compact clusters, but not a guarantee of perfect spheres.
+- It always runs faster on very large datasets
+  > Hierarchical clustering is significantly *slower* than K-means on large datasets because its cost grows roughly quadratically with the number of points. Speed is actually one of its main disadvantages.
+- [o] You do not have to commit to the number of clusters before fitting, one tree can be cut at any level to yield different numbers of clusters
+  > Building the tree once lets you explore every \`k\` by sliding the cut, and it is deterministic with no random restarts. K-means, by contrast, fixes \`k\` upfront and must be rerun for each new value.
 
 Its flexibility about \`k\` and its deterministic tree are the real selling points; speed is not one of them.`}
 />
@@ -691,10 +691,10 @@ Its flexibility about \`k\` and its deterministic tree are the real selling poin
 <MultipleChoice
   markdown={`Your dataset has roughly 500,000 points. Why is plain agglomerative hierarchical clustering usually a poor choice here?
 
-- It cannot handle numeric features
-  > Hierarchical clustering is designed for numeric features and uses distance calculations on them. It is actually categorical or mixed-type data that requires more care.
 - It requires labels to run
   > Hierarchical clustering is unsupervised, it requires no labels. It discovers structure purely from the distances between unlabeled data points.
+- It cannot handle numeric features
+  > Hierarchical clustering is designed for numeric features and uses distance calculations on them. It is actually categorical or mixed-type data that requires more care.
 - [o] Its time and memory cost grows roughly with the square of the number of points, so hundreds of thousands of points become impractically slow and memory-hungry
   > Comparing all pairs of clusters scales quadratically (or worse), which is fine for a few thousand points but prohibitive at half a million. K-means scales far better; you can still dendrogram a representative sample.
 - Dendrograms can only display exactly 10 points
@@ -706,14 +706,14 @@ Hierarchical clustering trades scalability for structure, so very large data cal
 <MultipleChoice
   markdown={`Before running hierarchical clustering on features measured in different units (e.g. age in years and income in dollars), why should you standardize them first?
 
-- Standardizing is only needed for k-means, not hierarchical clustering
-  > Both K-means and hierarchical clustering are distance-based and suffer equally from unscaled features. Hierarchical clustering has no centroids, but it still computes distances between points, so the same scaling requirement applies.
 - It converts the labels into numbers
   > Hierarchical clustering has no labels to convert, it is unsupervised. Standardizing numeric features adjusts their scale so that all features contribute comparably to distance calculations.
-- [o] Hierarchical clustering merges clusters based on distance, and without standardizing, the feature with the largest numeric range dominates every distance, so you scale to give each feature an equal say
-  > Like k-means, agglomerative clustering is distance-based even though it has no centroids. Unscaled features let the biggest-magnitude column drive the merges, so standardizing first keeps the comparison fair.
 - Standardizing guarantees the clusters will be perfectly spherical
   > Standardizing adjusts the scale of features but does not constrain cluster shape. The shape of resulting clusters depends on the data structure and the linkage method, not on whether features were standardized.
+- [o] Hierarchical clustering merges clusters based on distance, and without standardizing, the feature with the largest numeric range dominates every distance, so you scale to give each feature an equal say
+  > Like k-means, agglomerative clustering is distance-based even though it has no centroids. Unscaled features let the biggest-magnitude column drive the merges, so standardizing first keeps the comparison fair.
+- Standardizing is only needed for k-means, not hierarchical clustering
+  > Both K-means and hierarchical clustering are distance-based and suffer equally from unscaled features. Hierarchical clustering has no centroids, but it still computes distances between points, so the same scaling requirement applies.
 
 Any distance-based clustering method needs comparably scaled features, which is why standardizing comes first.`}
 />

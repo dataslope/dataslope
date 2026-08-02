@@ -415,12 +415,12 @@ Use the `generate_schema_name` macro (customizable) and the `schema` config. In 
 
 - \`view\`
   > A view re-runs the SQL on every query, pushing the expensive computation onto every dashboard load.
+- It doesn't matter; they perform identically.
+  > Materializations have very different read/compute trade-offs.
 - [o] \`table\`
   > Compute once per nightly run, serve fast reads all day, the right trade-off for an expensive, frequently-read, slowly-changing model.
 - \`ephemeral\`
-  > Ephemeral models are inlined as CTEs and aren't queryable on their own, so dashboards can't read them.
-- It doesn't matter; they perform identically.
-  > Materializations have very different read/compute trade-offs.`}
+  > Ephemeral models are inlined as CTEs and aren't queryable on their own, so dashboards can't read them.`}
 />
 
 <MultipleChoice
@@ -428,12 +428,12 @@ Use the `generate_schema_name` macro (customizable) and the `schema` config. In 
 
 - It runs the query faster.
   > \`ref\` doesn't change runtime performance; it changes how dbt builds the project.
-- [o] dbt builds the dependency graph from \`ref\`/\`source\`, so it knows build order and can manage dev/prod environments.
-  > \`ref\` is how dbt learns dependencies, enabling correct run ordering, lineage, and schema swapping.
+- It converts the model to a view automatically.
+  > \`ref\` has nothing to do with materialization choice.
 - It lets you skip writing tests.
   > Testing is orthogonal to \`ref\`.
-- It converts the model to a view automatically.
-  > \`ref\` has nothing to do with materialization choice.`}
+- [o] dbt builds the dependency graph from \`ref\`/\`source\`, so it knows build order and can manage dev/prod environments.
+  > \`ref\` is how dbt learns dependencies, enabling correct run ordering, lineage, and schema swapping.`}
 />
 
 <MultipleChoice
@@ -441,10 +441,10 @@ Use the `generate_schema_name` macro (customizable) and the `schema` config. In 
 
 - It deduplicates the column automatically during the run.
   > dbt tests **assert**; they don't modify data. A failure surfaces the problem to fix upstream.
-- [o] A check that fails the run if \`id\` has duplicates or nulls, guarding the model's grain and key integrity.
-  > These schema tests validate that \`id\` is a valid primary key and fail loudly when violated.
 - A guarantee the source system can never produce bad data.
   > Tests catch bad data after the fact; they can't constrain the source.
 - A performance index on \`id\`.
-  > Tests aren't indexes; they don't change physical storage.`}
+  > Tests aren't indexes; they don't change physical storage.
+- [o] A check that fails the run if \`id\` has duplicates or nulls, guarding the model's grain and key integrity.
+  > These schema tests validate that \`id\` is a valid primary key and fail loudly when violated.`}
 />

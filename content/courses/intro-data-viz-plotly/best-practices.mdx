@@ -131,10 +131,10 @@ them well enough to break them deliberately.
   > Color count is unrelated to the principle; a chart can use multiple colors and still communicate one focused message, or use one color and still be hopelessly overloaded.
 - Every chart should fit on one slide.
   > Physical size has nothing to do with the principle; the concern is how many *ideas* the chart tries to express, not its dimensions.
-- [o] A chart should answer a single, clear question; if you're trying to convey multiple ideas, split them into multiple charts.
-  > Overloaded charts, with three color encodings, faceting, and a second y-axis all at once, usually hide their message. A reader should be able to state the takeaway in one sentence after 5 seconds.
 - Every chart should have one data point.
   > Having one data point would make a chart meaningless; the principle is about communicating one *message* or answering one *question*, not about restricting the amount of data plotted.
+- [o] A chart should answer a single, clear question; if you're trying to convey multiple ideas, split them into multiple charts.
+  > Overloaded charts, with three color encodings, faceting, and a second y-axis all at once, usually hide their message. A reader should be able to state the takeaway in one sentence after 5 seconds.
 
 Clear communication usually means doing less, not more.`}
 />
@@ -142,14 +142,14 @@ Clear communication usually means doing less, not more.`}
 <MultipleChoice
   markdown={`According to the chart-type quick reference, the safest default for showing **the relationship between two numeric variables** is:
 
-- A pie chart.
-  > Pie charts encode values as angles or arc areas, which are harder to compare than lengths, and they show composition (parts of a whole), not the relationship between two numeric variables.
-- A heatmap.
-  > A heatmap shows a value at the intersection of two categorical axes; it is not designed to reveal the relationship between two continuous numeric variables.
-- [o] A scatter plot.
-  > Scatter plots are the canonical tool for relationships between two numeric variables, they reveal correlation, clusters, outliers, and the shape of the relationship without making assumptions.
 - A bar chart.
   > Bar charts compare values across discrete categories; they are the right choice for "which category is biggest?" not for revealing how two continuous variables relate to each other.
+- [o] A scatter plot.
+  > Scatter plots are the canonical tool for relationships between two numeric variables, they reveal correlation, clusters, outliers, and the shape of the relationship without making assumptions.
+- A heatmap.
+  > A heatmap shows a value at the intersection of two categorical axes; it is not designed to reveal the relationship between two continuous numeric variables.
+- A pie chart.
+  > Pie charts encode values as angles or arc areas, which are harder to compare than lengths, and they show composition (parts of a whole), not the relationship between two numeric variables.
 
 When in doubt about a "X vs Y" question with both numeric, reach for a scatter.`}
 />
@@ -172,14 +172,14 @@ Use color only when it encodes meaningful information.`}
 <MultipleChoice
   markdown={`What does "iterate, don't perfect" mean in visualization practice?
 
+- Use only one chart type forever.
+  > Using only one chart type would force every question into an inappropriate format; the principle is about iterating through many quick charts, not restricting the palette of chart types.
+- [o] Make many quick, imperfect charts during exploration; polish only the ones that turn out to communicate something important.
+  > During exploration, you don't know yet which chart will matter. Iterating rapidly through many ugly charts is faster than perfecting each one. Save polish for the publishable few. This is one of the most important habits of experienced analysts.
 - Always polish your first chart before moving on.
   > Polishing early is the opposite of what the principle recommends; you don't yet know whether the first chart will matter, so investing heavily in it wastes time.
 - Never look at a chart twice.
   > The principle says nothing about how often you look at a chart; it is about *when* you invest polish effort, not how many times you review a chart.
-- [o] Make many quick, imperfect charts during exploration; polish only the ones that turn out to communicate something important.
-  > During exploration, you don't know yet which chart will matter. Iterating rapidly through many ugly charts is faster than perfecting each one. Save polish for the publishable few. This is one of the most important habits of experienced analysts.
-- Use only one chart type forever.
-  > Using only one chart type would force every question into an inappropriate format; the principle is about iterating through many quick charts, not restricting the palette of chart types.
 
 Volume of iteration beats per-chart polish during exploration.`}
 />

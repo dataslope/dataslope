@@ -321,12 +321,12 @@ when you really need it.
 
 - All 16
   > Retaining all 16 digits would require the condition number to be near 1; with $\\kappa \\approx 10^{12}$ the condition number itself erases roughly 12 digits.
-- About 12
-  > Twelve correct digits would remain if only 4 digits were lost, but the condition number $\\kappa \\approx 10^{12}$ consumes 12 of the 16 available digits, leaving about 4.
 - [o] About 4
   > The truth ceiling is roughly $\\kappa \\cdot \\epsilon \\approx 10^\{12\} \\cdot 10^\{-16\} = 10^\{-4\}$, i.e. $\\sim 4$ correct digits. A *stable* algorithm achieves this; an *unstable* one would get fewer.
 - Zero, the problem is unsolvable
   > With $\\kappa \\approx 10^{12}$ the problem still has roughly 4 correct digits available; only when $\\kappa \\gtrsim 10^{16}$ does the problem become hopeless at double precision.
+- About 12
+  > Twelve correct digits would remain if only 4 digits were lost, but the condition number $\\kappa \\approx 10^{12}$ consumes 12 of the 16 available digits, leaving about 4.
 
 The condition number tells you the **best** an algorithm can hope to achieve.`}
 />
@@ -334,12 +334,12 @@ The condition number tells you the **best** an algorithm can hope to achieve.`}
 <MultipleChoice
   markdown={`Which statement most cleanly distinguishes *conditioning* from *stability*?
 
-- They mean the same thing
-  > The page opens by explicitly defining these as two independent properties: conditioning belongs to the problem, stability belongs to the algorithm.
-- [o] Conditioning is a property of the **problem**; stability is a property of the **algorithm**. An ill-conditioned problem cannot be saved by a clever algorithm; an unstable algorithm can ruin a perfectly well-conditioned problem
-  > This is the central distinction in numerical analysis. Always ask both questions: "Is this problem well-conditioned?" and "Is this algorithm stable?"
 - Conditioning is about speed and stability is about accuracy
   > Neither concept is about speed; both are about accuracy, but conditioning characterizes how much accuracy the problem itself allows, while stability describes how well the algorithm preserves that accuracy.
+- [o] Conditioning is a property of the **problem**; stability is a property of the **algorithm**. An ill-conditioned problem cannot be saved by a clever algorithm; an unstable algorithm can ruin a perfectly well-conditioned problem
+  > This is the central distinction in numerical analysis. Always ask both questions: "Is this problem well-conditioned?" and "Is this algorithm stable?"
+- They mean the same thing
+  > The page opens by explicitly defining these as two independent properties: conditioning belongs to the problem, stability belongs to the algorithm.
 - Both are properties of the algorithm
   > Stability is a property of the algorithm, but conditioning is a property of the *problem*; the distinction is central to numerical analysis.
 

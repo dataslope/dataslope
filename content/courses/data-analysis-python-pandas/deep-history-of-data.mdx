@@ -154,10 +154,10 @@ it is the floor we have been standing on the whole time.
 <MultipleChoice
   markdown={`A teammate says "we have big data, about 40,000 rows." What is the most accurate response?
 
-- They are right; 40,000 rows needs a distributed system
-  > 40,000 rows loads in milliseconds on any laptop and sits firmly in the "fits in memory" tier; no distributed system is warranted.
 - [o] 40,000 rows fits comfortably in memory; Pandas handles it instantly, and "big data" usually means data that no longer fits in memory or on one machine
   > Calling small tabular data "big" tends to make teams over-engineer with tools meant for a different scale, adding cost and latency without adding insight.
+- They are right; 40,000 rows needs a distributed system
+  > 40,000 rows loads in milliseconds on any laptop and sits firmly in the "fits in memory" tier; no distributed system is warranted.
 - Big data is anything with more than 1,000 rows
   > A thousand rows is tiny; no working definition places the "big data" threshold that low.
 - It depends on the day of the week
@@ -171,12 +171,12 @@ The diamonds dataset (~54,000 rows) in this course is itself comfortably in the 
 
 - It is a coincidence of unrelated technologies
   > The lineage is direct: the punch-card column became the database field, which became the DataFrame column.
-- [o] The concept passed down a continuous lineage, punch-card column to database field to DataFrame column, over more than a century
-  > Vocabulary in data work is unusually stable because the underlying idea (a vertical slice of one attribute across records) never changed.
 - Pandas borrowed the term from spreadsheets only
   > Spreadsheets inherited the term too, but the lineage runs all the way back through databases to Hollerith's punch cards.
 - Codd coined the word "column" in 1970
   > "Column" predates Codd by decades; the 1890 census machinery already organized data into columns.
+- [o] The concept passed down a continuous lineage, punch-card column to database field to DataFrame column, over more than a century
+  > Vocabulary in data work is unusually stable because the underlying idea (a vertical slice of one attribute across records) never changed.
 
 Stable vocabulary is part of why learning Pandas indirectly teaches you about databases.`}
 />

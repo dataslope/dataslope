@@ -432,14 +432,14 @@ int main(void) {
 <MultipleChoice
   markdown={`What is the *length* of the C string literal \`"hello"\` in memory (in bytes)?
 
-- 4 bytes
-  > Too few, even the visible characters are 5.
-- 5 bytes
-  > Close, but it forgets the terminator.
+- It depends on the encoding; cannot be determined.
+  > Plain string literals are bytes; the null terminator is always counted.
 - [o] 6 bytes (5 characters + the trailing \`'\\0'\`)
   > Every string literal has an implicit null terminator.
-- It depends on the encoding; cannot be determined.
-  > Plain string literals are bytes; the null terminator is always counted.`}
+- 5 bytes
+  > Close, but it forgets the terminator.
+- 4 bytes
+  > Too few, even the visible characters are 5.`}
 />
 
 <MultipleChoice
@@ -447,23 +447,23 @@ int main(void) {
 
 - It overflows the buffer.
   > It writes within the literal's bounds; the problem is not overflow.
+- It corrupts the system clock.
+  > That is not how memory works.
 - It always crashes the program in a controlled way.
   > It is undefined behavior; the crash is *possible* but not guaranteed.
 - [o] String literals may live in read-only memory; writing through a non-\`const\` pointer to a literal is undefined behavior.
-  > Use \`char s[] = "hello";\` to get a writable copy.
-- It corrupts the system clock.
-  > That is not how memory works.`}
+  > Use \`char s[] = "hello";\` to get a writable copy.`}
 />
 
 <MultipleChoice
   markdown={`Which is the safest way to copy a string into a fixed-size buffer?
 
+- \`memcpy(dst, src, strlen(src));\`
+  > Also unsafe (no terminator) and does not check destination size.
 - \`strcpy(dst, src);\`
   > No length check, overflows silently if \`src\` is longer than \`dst\`.
 - \`strncpy(dst, src, sizeof dst);\`
   > Subtle bug: if \`src\` is too long, \`dst\` will not be null-terminated.
 - [o] \`snprintf(dst, sizeof dst, "%s", src);\`
-  > \`snprintf\` always writes a terminator and tells you how many bytes it would have written.
-- \`memcpy(dst, src, strlen(src));\`
-  > Also unsafe (no terminator) and does not check destination size.`}
+  > \`snprintf\` always writes a terminator and tells you how many bytes it would have written.`}
 />

@@ -166,14 +166,14 @@ flowchart TD
 <MultipleChoice
   markdown={`What does the Java compiler (\`javac\`) produce?
 
+- Machine code that only runs on the developer's CPU
+  > Bytecode is not tied to a specific CPU.
+- A new \`.java\` file
+  > It reads \`.java\` and produces \`.class\`.
 - A native executable for your operating system
   > That's what C/C++ compilers produce, not \`javac\`.
 - [o] One or more \`.class\` files containing platform-independent bytecode
-  > Bytecode is the input to the JVM.
-- A new \`.java\` file
-  > It reads \`.java\` and produces \`.class\`.
-- Machine code that only runs on the developer's CPU
-  > Bytecode is not tied to a specific CPU.`}
+  > Bytecode is the input to the JVM.`}
 />
 
 <MultipleChoice
@@ -192,12 +192,12 @@ flowchart TD
 <MultipleChoice
   markdown={`Which of these is decided at *compile time* rather than at run time?
 
+- Which override of a method is dispatched to
+  > That's a runtime decision (dynamic dispatch).
 - The actual numeric value of an int variable
   > That depends on input or computation at run time.
 - [o] Whether a particular field is accessible from a particular call site, based on its access modifier
   > Access checks are done by the compiler.
-- Which override of a method is dispatched to
-  > That's a runtime decision (dynamic dispatch).
 - Whether a file actually exists on disk
   > That's a runtime decision (and may change over time).`}
 />

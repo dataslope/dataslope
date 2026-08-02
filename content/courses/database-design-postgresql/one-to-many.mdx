@@ -86,14 +86,14 @@ not a duplication problem; it is the relationship itself.
 <MultipleChoice
   markdown={`In a one-to-many relationship between \`customers\` and \`orders\`, where should the foreign key usually go?
 
-- On \`customers\`, as a comma-separated list of order ids.
-  > A list inside one cell is difficult to validate and violates the relational table shape.
-- [o] On \`orders\`, as a \`customer_id\` column pointing to \`customers.id\`.
-  > Each order belongs to one customer, so each order row can store exactly one parent id.
 - On both tables, with each row copying all columns from the other.
   > Copying both directions creates duplication and still does not define the relationship cleanly.
 - On neither table, because joins can guess the relationship.
   > Joins need matching key values; the database cannot reliably guess which rows belong together.
+- On \`customers\`, as a comma-separated list of order ids.
+  > A list inside one cell is difficult to validate and violates the relational table shape.
+- [o] On \`orders\`, as a \`customer_id\` column pointing to \`customers.id\`.
+  > Each order belongs to one customer, so each order row can store exactly one parent id.
 
 The foreign key goes on the many side because each child row points to one parent row.`}
 />
@@ -170,14 +170,14 @@ broken design.
 <MultipleChoice
   markdown={`What does \`customers ||--o{ orders\` mean in an ER diagram?
 
-- Each customer must have exactly one order.
-  > The \`o{\` side means zero or many, so a customer may have no orders or many orders.
-- [o] One customer can be related to zero, one, or many orders.
-  > The customer side is one, and the order side is optional many.
 - One order can belong to many customers.
   > The diagram places the many marker on orders, not on customers.
 - Customers and orders are unrelated tables.
   > The line between the entities states that a relationship exists.
+- [o] One customer can be related to zero, one, or many orders.
+  > The customer side is one, and the order side is optional many.
+- Each customer must have exactly one order.
+  > The \`o{\` side means zero or many, so a customer may have no orders or many orders.
 
 A one-to-many relationship has one parent row on one side and many possible child rows on the other.`}
 />
@@ -185,10 +185,10 @@ A one-to-many relationship has one parent row on one side and many possible chil
 <MultipleChoice
   markdown={`Why is \`customers.order_ids\` a poor way to store a customer's orders?
 
-- Because PostgreSQL cannot store text values.
-  > PostgreSQL can store text; the issue is storing multiple ids in one cell.
 - [o] Because one cell would contain a list of many values, making the relationship hard to validate and query.
   > Relational tables work best when each row stores one fact and child rows carry the reference.
+- Because PostgreSQL cannot store text values.
+  > PostgreSQL can store text; the issue is storing multiple ids in one cell.
 - Because primary keys are optional in parent tables.
   > Primary keys are still essential; the problem is where the foreign key should live.
 - Because order ids should be random words instead of numbers.
@@ -200,14 +200,14 @@ Put the foreign key on the child table instead of storing a list on the parent.`
 <MultipleChoice
   markdown={`In an authors-and-books design, which column most likely represents the one-to-many relationship?
 
-- \`authors.book_titles\`
-  > Book titles copied into the author row would duplicate data and fail for many books.
 - [o] \`books.author_id\`
   > Each book row can point to the one author row it belongs to.
 - \`authors.author_id\`
   > A column pointing from a table to itself would not connect books to authors.
 - \`books.all_author_names\`
   > A list of names is not a reliable foreign key to author identity.
+- \`authors.book_titles\`
+  > Book titles copied into the author row would duplicate data and fail for many books.
 
 The child table usually stores the parent table's primary key as its foreign key.`}
 />

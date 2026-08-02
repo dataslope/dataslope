@@ -90,14 +90,14 @@ The key question is: can one row on the left match many rows on the right? If ye
 <MultipleChoice
   markdown={`Which example is a one-to-many relationship?
 
-- One passport belongs to one person, and one person has one passport.
-  > That is one-to-one.
 - [o] One customer can place many orders, and each order belongs to one customer.
   > One row on the customer side can connect to many rows on the order side.
 - Many students can take many courses.
   > That is many-to-many because both sides can have many.
 - One table has one column.
-  > Table shape is not the same as a relationship between rows in two tables.`}
+  > Table shape is not the same as a relationship between rows in two tables.
+- One passport belongs to one person, and one person has one passport.
+  > That is one-to-one.`}
 />
 
 ## Relationship shape 2: one-to-one
@@ -226,51 +226,51 @@ This two-sentence habit helps you choose the correct relationship shape.
 <MultipleChoice
   markdown={`Why do relational databases often split data across multiple tables?
 
-- To make the same fact appear in as many places as possible.
-  > Repeating facts is exactly what good relational design tries to avoid.
 - [o] To store each kind of thing once and connect related facts with keys.
   > Separate tables reduce duplication while relationships keep the data connected.
-- Because SQLite cannot store more than one table.
-  > A SQLite database can contain many tables.
 - Because queries are not allowed to combine tables.
-  > Queries can combine related tables with joins.`}
+  > Queries can combine related tables with joins.
+- To make the same fact appear in as many places as possible.
+  > Repeating facts is exactly what good relational design tries to avoid.
+- Because SQLite cannot store more than one table.
+  > A SQLite database can contain many tables.`}
 />
 
 <MultipleChoice
   markdown={`In an \`orders\` table, what does \`customer_id\` usually do?
 
+- It sorts orders by total automatically.
+  > Sorting requires \`ORDER BY\`.
 - It stores the customer's entire phone history.
   > A key column stores an identifier, not every customer detail.
 - [o] It points to the matching customer's primary key value.
   > This is how an order can be connected to the customer who placed it.
 - It forces all customers to have the same name.
-  > A key relationship does not change customer names.
-- It sorts orders by total automatically.
-  > Sorting requires \`ORDER BY\`.`}
+  > A key relationship does not change customer names.`}
 />
 
 <MultipleChoice
   markdown={`A student can take many courses, and a course can have many students. What shape is this?
 
-- One-to-one.
-  > One-to-one would allow only one match on each side.
-- One-to-many.
-  > One-to-many has many on only one side.
 - [o] Many-to-many.
   > Both sides can connect to many rows on the other side.
 - No relationship.
-  > Students and courses are related through enrollment.`}
+  > Students and courses are related through enrollment.
+- One-to-one.
+  > One-to-one would allow only one match on each side.
+- One-to-many.
+  > One-to-many has many on only one side.`}
 />
 
 <MultipleChoice
   markdown={`Why does a many-to-many relationship usually need a helper table?
 
-- To store the database password.
-  > Helper tables model relationships; they do not store passwords.
 - [o] To store each pairing between one row on the first side and one row on the second side.
   > For students and courses, the helper table can store one student-course enrollment per row.
-- To prevent primary keys from existing.
-  > Helper tables often use keys to connect rows.
 - To make all rows identical.
-  > The helper table records meaningful pairs, not identical rows.`}
+  > The helper table records meaningful pairs, not identical rows.
+- To store the database password.
+  > Helper tables model relationships; they do not store passwords.
+- To prevent primary keys from existing.
+  > Helper tables often use keys to connect rows.`}
 />

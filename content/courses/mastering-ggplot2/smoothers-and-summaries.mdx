@@ -152,14 +152,14 @@ layer and the summary layer are just two geoms stacked with `+`.
 <MultipleChoice
   markdown={`What does \`geom_smooth(method = "lm")\` draw, and what is the grey ribbon around it?
 
-- The raw data points connected in order, with a shadow.
-  > \`geom_smooth\` does not connect raw points; it draws a *fitted* line.
-- [o] A straight line fitted by a linear model, surrounded by a confidence band computed by the layer's statistic.
-  > The stat fits the model and computes the interval; the geom draws the line and ribbon.
 - A random trend line with a decorative border.
   > The line is a deterministic model fit, and the ribbon is a meaningful confidence interval.
 - The median of y at each x value.
   > That is closer to a summary stat; \`method = "lm"\` fits a regression line.
+- [o] A straight line fitted by a linear model, surrounded by a confidence band computed by the layer's statistic.
+  > The stat fits the model and computes the interval; the geom draws the line and ribbon.
+- The raw data points connected in order, with a shadow.
+  > \`geom_smooth\` does not connect raw points; it draws a *fitted* line.
 
 \`geom_smooth\` exposes a fitted model plus its uncertainty, a
 computation over the data, not the raw data itself.`}
@@ -168,14 +168,14 @@ computation over the data, not the raw data itself.`}
 <MultipleChoice
   markdown={`In \`stat_summary(fun = mean, geom = "point")\`, why can you specify a \`geom =\` argument inside a *stat* function?
 
+- Because \`mean\` requires a point geom.
+  > The mean could be drawn by other geoms too (e.g. a line or bar); \`point\` is just one choice.
 - It is a quirk that only works for \`stat_summary\`.
   > It reflects a general design, not a special case.
 - Because stats secretly are geoms.
   > They are distinct components; the point is that they *pair* and are interchangeable.
 - [o] Because every layer is a stat paired with a geom, so a stat function lets you choose which geom draws its computed output.
   > Stats compute; geoms draw; specifying \`geom =\` picks the partner for the stat's results.
-- Because \`mean\` requires a point geom.
-  > The mean could be drawn by other geoms too (e.g. a line or bar); \`point\` is just one choice.
 
 The stat computes the summary and the chosen geom renders it, the same
 separable stat/geom relationship seen with bars and histograms.`}
@@ -184,14 +184,14 @@ separable stat/geom relationship seen with bars and histograms.`}
 <MultipleChoice
   markdown={`Why is it good practice to plot raw points *and* a smoother together rather than the smoother alone?
 
-- The smoother will not render without points.
-  > \`geom_smooth\` renders fine on its own; the reason is interpretive.
-- It makes the plot more colorful.
-  > Aesthetics aside, the real benefit is trustworthiness.
 - [o] A smoother encodes a model's *assumptions*; showing the raw data lets the reader judge whether that model actually fits.
   > Raw + summary together present both the evidence and the claim.
+- The smoother will not render without points.
+  > \`geom_smooth\` renders fine on its own; the reason is interpretive.
 - Points make the confidence band wider.
   > Showing points does not change the band; it changes what the reader can verify.
+- It makes the plot more colorful.
+  > Aesthetics aside, the real benefit is trustworthiness.
 
 A smoother is a claim about the data. Layering it over the raw points
 keeps the graphic honest, easy to do because both are just layers.`}

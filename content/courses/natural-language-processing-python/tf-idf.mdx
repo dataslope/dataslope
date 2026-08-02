@@ -203,14 +203,14 @@ upgrade to the bag-of-words model you just built.
 "photosynthesis" appears in just 5. Using $\\text{idf}(w) = \\log(N/\\text{df}(w))$,
 what happens to their IDF values, and why does that help?
 
-- Both get the same IDF, because IDF ignores how many documents a word is in
-  > IDF depends directly on document frequency: "the" with df=1000 and "photosynthesis" with df=5 get very different values, which is the entire point of the measure.
 - [o] "the" gets IDF = log(1000/1000) = 0 and "photosynthesis" gets IDF = log(1000/5) ≈ 5.3, so ubiquitous words are suppressed and rare, distinctive words are amplified
   > A word in every document has IDF zero and contributes nothing to any TF-IDF score, while a word in only a few documents gets a large IDF. This automatically down-weights stopword-like words and up-weights topical ones, no stoplist needed.
-- "photosynthesis" gets a lower IDF than "the" because it is rarer
-  > The relationship is inverse: rarer words get *higher* IDF, not lower. "photosynthesis" (df=5) gets a much larger IDF than "the" (df=1000).
 - IDF is undefined whenever a word appears in more than one document
   > IDF is well-defined for any word that appears in at least one document; it only risks division by zero when df is zero, which smoothing handles.
+- Both get the same IDF, because IDF ignores how many documents a word is in
+  > IDF depends directly on document frequency: "the" with df=1000 and "photosynthesis" with df=5 get very different values, which is the entire point of the measure.
+- "photosynthesis" gets a lower IDF than "the" because it is rarer
+  > The relationship is inverse: rarer words get *higher* IDF, not lower. "photosynthesis" (df=5) gets a much larger IDF than "the" (df=1000).
 
 Rare words earn high IDF and common words earn near-zero IDF, that asymmetry is what makes TF-IDF work.`}
 />
@@ -324,14 +324,14 @@ assert math.isclose(idf("cat"), math.log(3 / 1)), "Got: " + repr(idf("cat"))`,
 <MultipleChoice
   markdown={`What does the **TF** (term frequency) part of TF-IDF measure?
 
-- How many documents in the corpus contain the word
-  > That is document frequency, which feeds into IDF, not TF. Term frequency is about a single document, not the whole corpus.
 - [o] How often the word appears within a single document (usually as a fraction of that document's length)
   > TF is local to one document: the count of the word, typically divided by the document length so documents of different sizes are comparable. It rewards a word for being prominent *here*.
-- The logarithm of the total corpus size
-  > The logarithm of a corpus-level ratio belongs to IDF; TF is a simple within-document frequency with no corpus-wide log.
 - Whether the word is a stopword
   > TF does not classify words as stopwords; it just counts occurrences. The stopword-suppressing behavior comes from IDF, not TF.
+- The logarithm of the total corpus size
+  > The logarithm of a corpus-level ratio belongs to IDF; TF is a simple within-document frequency with no corpus-wide log.
+- How many documents in the corpus contain the word
+  > That is document frequency, which feeds into IDF, not TF. Term frequency is about a single document, not the whole corpus.
 
 TF is a within-document measure of how prominent a word is in that one document.`}
 />
@@ -340,14 +340,14 @@ TF is a within-document measure of how prominent a word is in that one document.
   markdown={`Why is TF-IDF often described as a more graceful alternative to maintaining a
 stopword list?
 
-- Because it removes the need to tokenize the text first
-  > TF-IDF still requires tokenized text, it operates on word counts. It does not replace tokenization; it replaces the stoplist step.
-- [o] Because IDF automatically drives the weight of words that appear in every document toward zero, so ubiquitous "stopword-like" words are suppressed without anyone hand-maintaining a list
-  > A word in all documents gets IDF zero and vanishes from the scores on its own. The corpus decides what is generic, so you avoid the brittleness and domain-blindness of a fixed stoplist.
 - Because it translates every document into the same language
   > TF-IDF performs no translation; it weights words within their original language by frequency and rarity.
+- [o] Because IDF automatically drives the weight of words that appear in every document toward zero, so ubiquitous "stopword-like" words are suppressed without anyone hand-maintaining a list
+  > A word in all documents gets IDF zero and vanishes from the scores on its own. The corpus decides what is generic, so you avoid the brittleness and domain-blindness of a fixed stoplist.
 - Because it guarantees every document has the same most-important word
   > TF-IDF surfaces *different* distinctive words per document; that is precisely its value. It does not force a shared top word.
+- Because it removes the need to tokenize the text first
+  > TF-IDF still requires tokenized text, it operates on word counts. It does not replace tokenization; it replaces the stoplist step.
 
 The corpus itself, through IDF, decides which words are generic, no hand-maintained list required.`}
 />
@@ -359,10 +359,10 @@ TF-IDF (using $\\text{idf} = \\log(N/\\text{df})$), and what does that imply?
 
 - About 0.1, because TF is 10/100
   > TF alone is 0.1, but TF-IDF multiplies TF by IDF. Since the word is in every document, its IDF is zero, which drags the product to zero regardless of TF.
-- [o] About 0, because the word is in all 50 documents so its IDF is log(50/50) = 0, and TF-IDF = TF × 0 = 0
-  > No matter how frequent a word is within a document, if it appears in every document its IDF is zero and its TF-IDF is zero. High raw frequency does not rescue a word that is everywhere.
 - Very high, because the word appears 10 times
   > Raw frequency does not determine TF-IDF on its own; a word in every document is multiplied by an IDF of zero, so its score is zero despite the high count.
+- [o] About 0, because the word is in all 50 documents so its IDF is log(50/50) = 0, and TF-IDF = TF × 0 = 0
+  > No matter how frequent a word is within a document, if it appears in every document its IDF is zero and its TF-IDF is zero. High raw frequency does not rescue a word that is everywhere.
 - Undefined, because you cannot divide 50 by 50
   > 50/50 = 1 is perfectly defined, and log(1) = 0; there is no division-by-zero problem here.
 

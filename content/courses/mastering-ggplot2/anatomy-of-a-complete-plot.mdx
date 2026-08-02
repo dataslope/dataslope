@@ -141,12 +141,12 @@ Graphics.
 
 - The theme and the labels.
   > Neither styling nor labels affect how many smoother lines appear.
-- The data and the coordinate system.
-  > The coordinate system is the default Cartesian and is not what splits the lines.
 - [o] The \`color = drv\` mapping (inherited from \`ggplot()\`, so the smoother groups by drivetrain) and \`facet_wrap(~ class)\` (which splits the data into per-class panels).
   > Inherited color grouping multiplies lines by drivetrain; faceting multiplies panels by class.
 - \`scale_color_brewer\` and \`alpha = 0.7\`.
   > The scale only recolors, and alpha only sets transparency; neither creates groups or panels.
+- The data and the coordinate system.
+  > The coordinate system is the default Cartesian and is not what splits the lines.
 
 Lines-per-drivetrain comes from the inherited color mapping; panels
 come from faceting. Reading the interaction of components is the whole
@@ -156,14 +156,14 @@ skill.`}
 <MultipleChoice
   markdown={`Why do experienced users build a complex ggplot incrementally (add a layer, view, add another) rather than writing it all at once?
 
+- Because incremental plots use less memory.
+  > Memory is not the motivation; verifiability and debugging are.
 - Because ggplot2 cannot parse long expressions.
   > ggplot2 handles long \`+\` chains fine; the reason is workflow, not a parser limit.
 - Because each layer must be saved to disk before the next.
   > No saving is required between layers.
 - [o] Because plots are built by addition, so adding one component at a time makes each step easy to verify and any breakage easy to localize to the last component added.
   > Incremental construction matches the grammar and simplifies debugging.
-- Because incremental plots use less memory.
-  > Memory is not the motivation; verifiability and debugging are.
 
 The additive grammar invites an additive workflow: grow the plot
 component by component and check as you go.`}

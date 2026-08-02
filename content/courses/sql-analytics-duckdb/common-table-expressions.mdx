@@ -201,14 +201,14 @@ CTEs restructure a query into readable, named, sequential steps.`}
 <MultipleChoice
   markdown={`In a \`WITH a AS (...), b AS (...) SELECT ...\` query, what can \`b\` reference?
 
-- Only the original tables, never \`a\`.
-  > A later CTE can build on an earlier one; that chaining is the whole point.
 - [o] The CTE \`a\` defined above it, as well as base tables, CTEs can build on earlier CTEs.
   > Each CTE may reference any CTE defined before it, forming a pipeline.
 - Only \`b\` itself.
   > A non-recursive CTE does not reference itself; it can reference earlier CTEs.
 - The final \`SELECT\`'s result.
   > The final \`SELECT\` is downstream; a CTE cannot reference something defined after it.
+- Only the original tables, never \`a\`.
+  > A later CTE can build on an earlier one; that chaining is the whole point.
 
 Later CTEs can reference earlier ones, which is how a pipeline is built.`}
 />

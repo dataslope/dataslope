@@ -272,12 +272,12 @@ int main(void) {
 
 - \`p\` is \`NULL\`.
   > Dereferencing \`NULL\` is the most common cause of a segmentation fault; the OS refuses the access and the program is killed.
+- [o] The variable \`p\` is misspelled.
+  > A misspelling would be caught by the compiler, not produce a runtime segfault. Segfaults are runtime memory access errors and almost always come from one of the other three causes.
 - \`p\` points to memory that has already been \`free\`'d.
   > Writing through a freed pointer is a use-after-free bug; the memory no longer belongs to the program and the access typically causes a segfault.
 - \`p\` was never initialized and points at a random address.
   > An uninitialized pointer holds whatever bits happened to be in that memory location, so \`*p = 5\` writes to some arbitrary address, almost certainly triggering a segfault.
-- [o] The variable \`p\` is misspelled.
-  > A misspelling would be caught by the compiler, not produce a runtime segfault. Segfaults are runtime memory access errors and almost always come from one of the other three causes.
 
 The first instinct on a segfault should be: "I'm dereferencing a pointer that doesn't point at anything I own." Then ask: NULL? freed? uninitialized? out-of-bounds?`}
 />
@@ -285,14 +285,14 @@ The first instinct on a segfault should be: "I'm dereferencing a pointer that do
 <MultipleChoice
   markdown={`You're asked to debug a program you didn't write. It produces wrong output on a 50MB input file but you don't know which part of the file triggers it. What should you do **first**?
 
+- [o] Try to reproduce the bug on a much smaller input, half the file, then half of that, etc.
+  > Minimizing the input is the single highest-leverage debugging move. A bug you can reproduce in 5 lines of input is many times easier to find than the same bug in 50MB.
 - Read all 50,000 lines of the program looking for the bug.
   > Without knowing which input triggers the bug, reading all the code is searching an enormous space with no guide; input minimization gives you a target first.
 - Rewrite the program from scratch.
   > Rewriting transfers the same bug into a new file unless you first understand what the bug is; it also destroys the original for comparison.
 - Add \`printf\` statements throughout the code, then re-run with the full input.
   > Printing debug output during a 50MB run generates an overwhelming flood of lines; it only becomes useful once you have a small, focused reproducer.
-- [o] Try to reproduce the bug on a much smaller input, half the file, then half of that, etc.
-  > Minimizing the input is the single highest-leverage debugging move. A bug you can reproduce in 5 lines of input is many times easier to find than the same bug in 50MB.
 
 Once you have a tiny failing input, *then* it's worth reading the code carefully or adding prints. Trying to debug with the full input is like trying to find a needle in 50MB of hay.`}
 />

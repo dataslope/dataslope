@@ -145,14 +145,14 @@ You must use `HAVING`. Once again, the order is the reason.
 <MultipleChoice
   markdown={`Which clause is evaluated **first** in a SQL query's logical execution order?
 
-- \`SELECT\`, because it is written first.
-  > Written order is not execution order; \`SELECT\` actually runs near the end.
-- [o] \`FROM\` (and its joins), which gathers the source rows before anything else.
-  > Execution begins by assembling the tables in \`FROM\`, then filtering and shaping them.
 - \`ORDER BY\`, because sorting must happen up front.
   > Sorting happens late, after the rows and columns are determined.
 - \`WHERE\`, before the tables are even chosen.
   > \`WHERE\` filters rows, but only after \`FROM\` has produced them.
+- \`SELECT\`, because it is written first.
+  > Written order is not execution order; \`SELECT\` actually runs near the end.
+- [o] \`FROM\` (and its joins), which gathers the source rows before anything else.
+  > Execution begins by assembling the tables in \`FROM\`, then filtering and shaping them.
 
 Execution starts with \`FROM\`; \`SELECT\` and \`ORDER BY\` come much later.`}
 />
@@ -160,10 +160,10 @@ Execution starts with \`FROM\`; \`SELECT\` and \`ORDER BY\` come much later.`}
 <MultipleChoice
   markdown={`Why can a column alias defined in \`SELECT\` be used in \`ORDER BY\` but **not** in \`WHERE\`?
 
-- Because \`ORDER BY\` is optional and \`WHERE\` is required.
-  > Being optional or not has nothing to do with alias visibility.
 - [o] Because \`WHERE\` runs before \`SELECT\` (so the alias does not exist yet), while \`ORDER BY\` runs after \`SELECT\`.
   > Aliases are created at the \`SELECT\` step, so only clauses that run after it can see them.
+- Because \`ORDER BY\` is optional and \`WHERE\` is required.
+  > Being optional or not has nothing to do with alias visibility.
 - Because aliases only work with numbers.
   > Alias visibility depends on execution order, not on data type.
 - Because \`WHERE\` cannot reference any columns at all.
@@ -175,14 +175,14 @@ Execution starts with \`FROM\`; \`SELECT\` and \`ORDER BY\` come much later.`}
 <MultipleChoice
   markdown={`Why must you filter on \`SUM(amount) > 50\` using \`HAVING\` rather than \`WHERE\`?
 
-- Because \`WHERE\` cannot contain numbers.
-  > \`WHERE\` handles numeric comparisons fine; the issue is when the sum is computed.
-- [o] Because the group's \`SUM\` is only formed at the \`GROUP BY\` step, which runs after \`WHERE\`; \`HAVING\` runs after grouping.
-  > \`WHERE\` acts before groups exist, so it cannot see a group total; \`HAVING\` filters after grouping.
 - Because \`HAVING\` is just a faster version of \`WHERE\`.
   > They filter at different stages, rows vs. groups, not at different speeds.
 - Because \`SUM\` cannot be used anywhere except \`HAVING\`.
   > \`SUM\` also appears in \`SELECT\`; the point is that group filtering happens in \`HAVING\`.
+- Because \`WHERE\` cannot contain numbers.
+  > \`WHERE\` handles numeric comparisons fine; the issue is when the sum is computed.
+- [o] Because the group's \`SUM\` is only formed at the \`GROUP BY\` step, which runs after \`WHERE\`; \`HAVING\` runs after grouping.
+  > \`WHERE\` acts before groups exist, so it cannot see a group total; \`HAVING\` filters after grouping.
 
 Group aggregates exist only after \`GROUP BY\`, so filtering on them belongs in \`HAVING\`, not \`WHERE\`.`}
 />
@@ -190,14 +190,14 @@ Group aggregates exist only after \`GROUP BY\`, so filtering on them belongs in 
 <MultipleChoice
   markdown={`In the execution order, where does \`LIMIT\` fall?
 
-- First, to reduce work before anything else.
-  > \`LIMIT\` cannot run first because it needs the final, sorted rows to choose from.
 - Right after \`FROM\`.
   > Immediately after \`FROM\` the rows are neither filtered nor sorted, so limiting then would be meaningless.
-- [o] Last, after \`ORDER BY\`, keeping the first N of the final sorted rows.
-  > \`LIMIT\` acts at the very end, trimming the already-sorted result to N rows.
 - Before \`WHERE\`.
   > Limiting before filtering would keep the wrong rows; \`LIMIT\` is the final step.
+- [o] Last, after \`ORDER BY\`, keeping the first N of the final sorted rows.
+  > \`LIMIT\` acts at the very end, trimming the already-sorted result to N rows.
+- First, to reduce work before anything else.
+  > \`LIMIT\` cannot run first because it needs the final, sorted rows to choose from.
 
 \`LIMIT\` runs last, after sorting, to keep the first N rows of the final result.`}
 />

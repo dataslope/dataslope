@@ -278,10 +278,10 @@ this?" 95% of the time, there is.
 
 - Because \`for\` loops are forbidden in R.
   > \`for\` loops are valid R syntax; they are just rarely the most concise or efficient way to process a vector when a vectorized alternative exists.
-- [o] Because operations and most built-in functions are *vectorized*, they automatically apply to every element.
-  > This is R's signature design choice and is the reason R code for data work is so compact.
 - Because R secretly rewrites loops as parallel code.
   > R does not automatically parallelize loops; vectorized operations are fast because they are implemented as optimized C routines, not because of hidden parallelism.
+- [o] Because operations and most built-in functions are *vectorized*, they automatically apply to every element.
+  > This is R's signature design choice and is the reason R code for data work is so compact.
 - Because R cannot iterate over vectors.
   > R can iterate over vectors with \`for\`, \`while\`, and \`lapply\`; the reason to prefer vectorization is clarity and performance, not an inability to iterate.`}
 />

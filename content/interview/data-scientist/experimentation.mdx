@@ -361,14 +361,14 @@ ATT is appropriate when you only care about the effect on the group that would a
 <MultipleChoice
   markdown={`An analyst checks the running p-value every hour and plans to stop the test "as soon as it's significant." Why is this a problem?
 
-- It's fine, stopping early just saves traffic.
-  > Stopping the moment p < 0.05 is exactly the issue: it doesn't preserve the error rate.
-- [o] Repeated "peeking" inflates the false-positive rate far above 5%, you'll eventually cross the threshold by chance.
-  > Each look is another chance to get a fluke significant result; fix n in advance or use sequential/always-valid methods.
 - It reduces the test's statistical power to zero.
   > Peeking inflates Type I error; it doesn't zero out power.
 - It only matters if the sample size is small.
-  > The inflation happens regardless of sample size whenever you stop adaptively on significance.`}
+  > The inflation happens regardless of sample size whenever you stop adaptively on significance.
+- [o] Repeated "peeking" inflates the false-positive rate far above 5%, you'll eventually cross the threshold by chance.
+  > Each look is another chance to get a fluke significant result; fix n in advance or use sequential/always-valid methods.
+- It's fine, stopping early just saves traffic.
+  > Stopping the moment p < 0.05 is exactly the issue: it doesn't preserve the error rate.`}
 />
 
 ## Go deeper

@@ -253,14 +253,14 @@ month the marketing team says "make shipping free above $40" or
 <MultipleChoice
   markdown={`Why are small, well-named methods generally easier to maintain than large ones?
 
-- They use less memory
-  > Method size has no meaningful memory impact.
 - The compiler inlines them automatically
   > It may, but that's not the maintainability reason.
-- [o] Each method reads like a sentence, can be understood in isolation, and can be changed without affecting unrelated logic
-  > Small named methods lower the amount a reader must hold in their head at once.
+- They use less memory
+  > Method size has no meaningful memory impact.
 - The JIT runs faster on small methods
-  > That's a tiny detail at best, not the point.`}
+  > That's a tiny detail at best, not the point.
+- [o] Each method reads like a sentence, can be understood in isolation, and can be changed without affecting unrelated logic
+  > Small named methods lower the amount a reader must hold in their head at once.`}
 />
 
 <MultipleChoice
@@ -268,25 +268,25 @@ month the marketing team says "make shipping free above $40" or
 
 - The literal \`0\` used to start a loop
   > Usually fine as a literal.
+- The literal \`"\\n"\` used in a print statement
+  > Often fine inline.
 - The literal \`1\` used to add one to a counter
   > Usually fine.
 - [o] The literal \`0.07\` used to multiply a price for tax
-  > Its meaning ("tax rate") is not obvious from the digits.
-- The literal \`"\\n"\` used in a print statement
-  > Often fine inline.`}
+  > Its meaning ("tax rate") is not obvious from the digits.`}
 />
 
 <MultipleChoice
   markdown={`A class describes itself as "the OrderManager: it parses orders, validates them, saves them, and emails the customer." What's the most accurate critique?
 
-- The name should be longer
-  > Naming is a side effect.
+- It should be made \`abstract\`
+  > Abstractness doesn't address the responsibility problem.
 - It needs more methods
   > It needs fewer responsibilities, not more methods.
+- The name should be longer
+  > Naming is a side effect.
 - [o] It is doing too many unrelated things, the word "and" in its description hints that it should be split into several focused classes
-  > Each responsibility (parse, validate, save, email) belongs in its own focused class.
-- It should be made \`abstract\`
-  > Abstractness doesn't address the responsibility problem.`}
+  > Each responsibility (parse, validate, save, email) belongs in its own focused class.`}
 />
 
 Writing software that other people (including yourself in six

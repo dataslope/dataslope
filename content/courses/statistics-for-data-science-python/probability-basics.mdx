@@ -285,14 +285,14 @@ swamped by the sheer volume of future trials.
 <MultipleChoice
   markdown={`A fair roulette wheel has landed on red 8 times in a row. A gambler reasons: "black is overdue, so I should bet black." What's wrong with this?
 
-- Nothing, after 8 reds, black really is more likely on the next spin
-  > Each spin is independent and has no memory of past spins. The probability of black is unchanged by the streak; the wheel cannot "owe" an outcome.
-- [o] Spins are independent, so the next spin's probability is unchanged by the streak, this is the gambler's fallacy
-  > The streak feels meaningful, but independence means past results carry no information about the next spin. The probability is the same as it was on spin one.
 - The streak proves the wheel is biased toward red, so he should bet red
   > An 8-red streak is unusual but not strong evidence of bias on a fair wheel, and in any case it wouldn't justify the "overdue" reasoning, which is the actual error here.
 - The Law of Large Numbers guarantees black will come up soon to balance the reds
   > The LLN is about long-run proportions over many thousands of spins, not short-run "balancing." It never promises a specific outcome is coming soon.
+- [o] Spins are independent, so the next spin's probability is unchanged by the streak, this is the gambler's fallacy
+  > The streak feels meaningful, but independence means past results carry no information about the next spin. The probability is the same as it was on spin one.
+- Nothing, after 8 reds, black really is more likely on the next spin
+  > Each spin is independent and has no memory of past spins. The probability of black is unchanged by the streak; the wheel cannot "owe" an outcome.
 
 Independent events don't self-correct; the gambler's fallacy mistakes long-run stability for short-run memory.`}
 />
@@ -486,10 +486,10 @@ print("exact:", p_exact, "sim:", p_sim)
 <MultipleChoice
   markdown={`You flip a fair coin 4 times. What is the probability of getting **4 heads in a row**, and which rule did you use?
 
-- 0.5, because each flip is 50/50
-  > 0.5 is the probability of heads on a *single* flip. The question asks about all four flips happening together.
 - [o] 0.0625, by the multiplication rule for independent events: 0.5 × 0.5 × 0.5 × 0.5
   > The four flips are independent, so the probability they all come up heads is the product of the individual probabilities, which is 0.5 to the 4th power.
+- 0.5, because each flip is 50/50
+  > 0.5 is the probability of heads on a *single* flip. The question asks about all four flips happening together.
 - 0.25, by the addition rule
   > The addition rule is for "either/or" with mutually exclusive events. "All four heads" is an "and" question, which calls for multiplication.
 - 2.0, by adding 0.5 four times
@@ -501,12 +501,12 @@ For independent "and" questions, multiply; the result shrinks fast as you add ev
 <MultipleChoice
   markdown={`Which pair of events is **mutually exclusive** (cannot both happen on a single trial)?
 
-- Drawing a card that is a King, and drawing a card that is a Heart
-  > The King of Hearts is both at once, so these events overlap, they are not mutually exclusive.
-- Rolling an even number, and rolling a number greater than 3
-  > A roll of 4 or 6 satisfies both, so they can co-occur. Not mutually exclusive.
 - [o] Rolling a 2, and rolling a 5, on the same single die roll
   > A single die roll cannot be both a 2 and a 5, so these events can never happen together, that is exactly what mutually exclusive means.
+- Rolling an even number, and rolling a number greater than 3
+  > A roll of 4 or 6 satisfies both, so they can co-occur. Not mutually exclusive.
+- Drawing a card that is a King, and drawing a card that is a Heart
+  > The King of Hearts is both at once, so these events overlap, they are not mutually exclusive.
 - A user being on mobile, and that user converting
   > A mobile user can certainly convert, so these events can both be true at once.
 
@@ -518,12 +518,12 @@ Mutually exclusive means zero overlap on a single trial, that is the condition t
 
 - The simulation code must have a bug, since it didn't return 0.25
   > A simulation almost never returns the exact true value. A gap with only 50 trials is expected, not a sign of a bug.
-- [o] 50 trials is too few; by the Law of Large Numbers, more trials would pull the estimate closer to 0.25
-  > Small samples produce noisy estimates. The LLN says the estimate converges to the true value as trials increase, so adding trials is the fix.
 - Probabilities can't be estimated by simulation at all
   > Estimating probabilities by simulation (Monte Carlo) is a standard, valid technique, it just needs enough trials to be precise.
 - The true value must actually be 0.31
   > The estimate is an approximation from limited data; it doesn't override a known true value. The discrepancy reflects sampling noise.
+- [o] 50 trials is too few; by the Law of Large Numbers, more trials would pull the estimate closer to 0.25
+  > Small samples produce noisy estimates. The LLN says the estimate converges to the true value as trials increase, so adding trials is the fix.
 
 More trials shrink simulation noise, the estimate's wobble is a feature of the method, not a defect.`}
 />
@@ -531,10 +531,10 @@ More trials shrink simulation noise, the estimate's wobble is a feature of the m
 <MultipleChoice
   markdown={`A treatment is described as having "**4 to 1 odds in favor** of success." What is the probability of success?
 
-- 0.25, because 1 in 4
-  > That reading uses the wrong direction and treats odds as a part-to-whole fraction. "4 to 1 in favor" is 4 favorable per 1 unfavorable.
 - [o] 0.8, because 4 favorable out of 5 total equally weighted parts
   > Odds of 4 to 1 in favor mean 4 favorable for every 1 unfavorable, so 4 out of 5 parts, which is a probability of 0.8.
+- 0.25, because 1 in 4
+  > That reading uses the wrong direction and treats odds as a part-to-whole fraction. "4 to 1 in favor" is 4 favorable per 1 unfavorable.
 - 4.0, because the odds are 4
   > 4.0 is not a valid probability, no probability exceeds 1. Odds and probability are on different scales and must be converted.
 - 0.5, because odds always mean a coin flip
@@ -546,14 +546,14 @@ Odds are part-to-part; probability is part-to-whole, convert with P = odds / (1 
 <MultipleChoice
   markdown={`Which statement best captures the **frequentist meaning** of "P(heads) = 0.5" for a fair coin?
 
-- The next flip is guaranteed to alternate heads and tails over time
-  > Outcomes don't alternate on a schedule; flips are independent. Probability says nothing about the order of results.
+- There is a physical force making the coin fair on each individual flip
+  > Probability is a description of long-run frequencies, not a force acting on a single flip. Each flip is just heads or tails.
 - Exactly half of any small batch of flips will be heads
   > Small batches are noisy, 10 flips might give 7 heads. The 0.5 is about the long run, not any particular small batch.
 - [o] Over a very large number of flips, the fraction that come up heads approaches 0.5
   > The frequentist view defines probability as the long-run relative frequency, which the Law of Large Numbers shows converges to 0.5.
-- There is a physical force making the coin fair on each individual flip
-  > Probability is a description of long-run frequencies, not a force acting on a single flip. Each flip is just heads or tails.
+- The next flip is guaranteed to alternate heads and tails over time
+  > Outcomes don't alternate on a schedule; flips are independent. Probability says nothing about the order of results.
 
 Frequentist probability is a long-run-frequency statement, which is exactly why simulation can estimate it.`}
 />

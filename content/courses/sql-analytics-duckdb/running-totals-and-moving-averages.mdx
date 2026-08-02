@@ -210,14 +210,14 @@ combination of them.
 <MultipleChoice
   markdown={`What turns \`SUM(revenue) OVER ()\` (a constant grand total on every row) into a **running total**?
 
-- Adding \`PARTITION BY\`.
-  > Partitioning scopes the window to groups, but a running total specifically needs the rows *ordered*.
 - [o] Adding \`ORDER BY\` inside the \`OVER\` clause, so the sum accumulates row by row.
   > An ordered window sums from the start up to the current row by default, producing a cumulative total.
 - Adding \`DISTINCT\`.
   > \`DISTINCT\` removes duplicates; it does not create accumulation.
 - Adding \`GROUP BY\`.
   > \`GROUP BY\` collapses rows; the running total needs an ordered window that preserves rows.
+- Adding \`PARTITION BY\`.
+  > Partitioning scopes the window to groups, but a running total specifically needs the rows *ordered*.
 
 Ordering an aggregate window makes it accumulate, that is a running
 total.`}
@@ -226,14 +226,14 @@ total.`}
 <MultipleChoice
   markdown={`What does \`LAG(revenue) OVER (ORDER BY day)\` return for the **first** row?
 
-- The grand total of revenue.
-  > \`LAG\` looks at a single previous row, not a total.
-- 0, as a default.
-  > By default \`LAG\` returns NULL (not 0) when there is no previous row.
 - [o] \`NULL\`, because there is no previous row to look back to.
   > The earliest row has no predecessor in the window, so \`LAG\` yields NULL there.
+- 0, as a default.
+  > By default \`LAG\` returns NULL (not 0) when there is no previous row.
 - The same row's own revenue.
   > \`LAG\` returns the *previous* row's value, not the current row's.
+- The grand total of revenue.
+  > \`LAG\` looks at a single previous row, not a total.
 
 \`LAG\` returns NULL at the first row because there is nothing before it.`}
 />
@@ -241,14 +241,14 @@ total.`}
 <MultipleChoice
   markdown={`What does the frame \`ROWS BETWEEN 2 PRECEDING AND CURRENT ROW\` compute when paired with \`AVG\`?
 
-- The average of the entire column, ignoring order.
-  > That is an unframed/empty-window average; this frame restricts to a sliding band.
 - [o] A moving average of the current row and the two rows immediately before it.
   > The frame defines a sliding 3-row window, so the average smooths over those rows as it moves.
-- The average of the two rows after the current one.
-  > "PRECEDING" means before the current row, not after; "FOLLOWING" would look ahead.
 - The single current row's value.
   > The frame spans three rows (2 preceding + current), not one.
+- The average of the entire column, ignoring order.
+  > That is an unframed/empty-window average; this frame restricts to a sliding band.
+- The average of the two rows after the current one.
+  > "PRECEDING" means before the current row, not after; "FOLLOWING" would look ahead.
 
 This frame is the classic 3-row moving average: current row plus the two
 before it.`}
@@ -259,12 +259,12 @@ before it.`}
 
 - One running total across all regions combined.
   > \`PARTITION BY region\` keeps each region's running total separate, not combined.
-- [o] A running total that accumulates within each region and **restarts** when the region changes.
-  > Partitioning scopes the accumulation per region; ordering drives it within each.
 - The grand total of revenue on every row.
   > An ordered window produces a running total, not a constant grand total.
 - An error, because you cannot combine \`PARTITION BY\` and \`ORDER BY\`.
   > Combining them is standard and produces a per-group running total.
+- [o] A running total that accumulates within each region and **restarts** when the region changes.
+  > Partitioning scopes the accumulation per region; ordering drives it within each.
 
 \`PARTITION BY\` resets the running total per group; \`ORDER BY\` accumulates
 it within each.`}

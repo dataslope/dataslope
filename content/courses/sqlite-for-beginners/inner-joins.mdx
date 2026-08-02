@@ -82,14 +82,14 @@ flowchart LR
 <MultipleChoice
   markdown={`What happens to Linus in the query above?
 
-- He appears with zero for the order amount.
-  > An inner join does not invent a zero-valued order.
-- [o] He is left out because he has no matching order.
-  > Inner joins keep only rows with matching partners.
-- He appears with the last order in the table.
-  > Joins never borrow another row's values.
 - The query fails because one customer has no order.
   > Unmatched rows are normal; they are simply omitted by an inner join.
+- [o] He is left out because he has no matching order.
+  > Inner joins keep only rows with matching partners.
+- He appears with zero for the order amount.
+  > An inner join does not invent a zero-valued order.
+- He appears with the last order in the table.
+  > Joins never borrow another row's values.
 
 An inner join drops rows that do not satisfy the matching condition.`}
 />
@@ -334,14 +334,14 @@ An inner join is the "only matching pairs" join.`}
 <MultipleChoice
   markdown={`Which two SQLite keywords are equivalent here for a normal matching join?
 
-- \`LEFT JOIN\` and \`INNER JOIN\`
-  > A left join keeps unmatched left rows, so it is different.
 - [o] \`JOIN\` and \`INNER JOIN\`
   > In SQLite, plain \`JOIN\` means an inner join.
-- \`WHERE\` and \`JOIN\`
-  > \`WHERE\` filters rows; it is not the join keyword.
 - \`ORDER BY\` and \`INNER JOIN\`
   > \`ORDER BY\` sorts the result.
+- \`LEFT JOIN\` and \`INNER JOIN\`
+  > A left join keeps unmatched left rows, so it is different.
+- \`WHERE\` and \`JOIN\`
+  > \`WHERE\` filters rows; it is not the join keyword.
 
 Plain \`JOIN\` is shorthand for \`INNER JOIN\`.`}
 />
@@ -366,12 +366,12 @@ Use an inner join when the question requires existing matches.`}
 
 - SQLite refuses all unprefixed columns.
   > Unambiguous unprefixed columns can work, but prefixes are clearer.
+- Prefixes sort the output.
+  > Sorting is controlled by \`ORDER BY\`.
 - [o] Prefixes tell SQLite and the reader which table's column you mean.
   > Joined tables often share column names such as \`id\`.
 - Prefixes turn ids into foreign keys.
   > Foreign keys are part of table design, not alias syntax.
-- Prefixes sort the output.
-  > Sorting is controlled by \`ORDER BY\`.
 
 Aliases and prefixes keep joined queries understandable.`}
 />

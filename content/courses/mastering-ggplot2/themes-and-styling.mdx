@@ -189,14 +189,14 @@ clean data/style separation at the core of the theme system.`}
 <MultipleChoice
   markdown={`You set \`theme(text = element_text(color = "navy"))\` and *all* text, titles, axis labels, legend, turns navy. Why does one setting affect so many elements?
 
-- Because \`text\` is a special keyword that recolors the whole image.
-  > It is not a global recolor; it is the *root* of the text hierarchy.
-- Because ggplot2 ignores element-specific settings.
-  > Element-specific settings still work and can override the root.
-- [o] Theme elements inherit from more general ones, and \`text\` is the root text element, so every specific text element inherits its color unless it overrides it.
-  > Inheritance propagates root settings down to all descendants.
 - Because \`element_text\` always applies to every element type.
   > \`element_text\` applies to text elements; the breadth here comes from inheritance, not from the helper.
+- Because \`text\` is a special keyword that recolors the whole image.
+  > It is not a global recolor; it is the *root* of the text hierarchy.
+- [o] Theme elements inherit from more general ones, and \`text\` is the root text element, so every specific text element inherits its color unless it overrides it.
+  > Inheritance propagates root settings down to all descendants.
+- Because ggplot2 ignores element-specific settings.
+  > Element-specific settings still work and can override the root.
 
 The theme system is hierarchical: setting a parent element cascades to
 its children, which is why one root tweak restyles everything.`}
@@ -205,14 +205,14 @@ its children, which is why one root tweak restyles everything.`}
 <MultipleChoice
   markdown={`How do you completely *remove* the minor gridlines from a plot?
 
-- \`theme(panel.grid.minor = "none")\`.
-  > Theme elements are set with \`element_*()\` helpers, not the string \`"none"\`.
-- \`scale_y_continuous(minor_breaks = element_blank())\`.
-  > That mixes up scales and theme elements; removal is a theme job.
 - [o] \`theme(panel.grid.minor = element_blank())\`.
   > \`element_blank()\` is the helper that deletes a theme element entirely.
+- \`scale_y_continuous(minor_breaks = element_blank())\`.
+  > That mixes up scales and theme elements; removal is a theme job.
 - \`geom_blank()\`.
   > \`geom_blank\` adds an empty layer; it does not remove gridlines.
+- \`theme(panel.grid.minor = "none")\`.
+  > Theme elements are set with \`element_*()\` helpers, not the string \`"none"\`.
 
 \`element_blank()\` is the dedicated way to erase any non-data element
 from the theme.`}

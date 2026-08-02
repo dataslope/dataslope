@@ -89,12 +89,12 @@ flowchart TD
 
 - SQLite does not store ids.
   > SQLite stores the id; the point is that it can assign one for you.
+- The row is inserted without any columns.
+  > The row still has columns; omitted columns may be assigned or defaulted.
 - [o] SQLite can automatically assign the id value.
   > An \`INTEGER PRIMARY KEY\` column is the usual SQLite pattern for auto-assigned ids.
 - The id column becomes text instead.
   > The column is still an integer primary key.
-- The row is inserted without any columns.
-  > The row still has columns; omitted columns may be assigned or defaulted.
 
 Leaving out an auto id keeps inserts shorter and avoids manual numbering mistakes.`}
 />
@@ -182,12 +182,12 @@ Each named column lines up with a value in the same position:
 
 - Into \`name\`
   > \`name\` gets the first value, \`'Maya'\`.
-- Into \`email\`
-  > \`email\` gets the second value, \`'maya@example.com'\`.
-- [o] Into \`age\`
-  > \`age\` is the third named column, and \`31\` is the third value.
 - Into \`id\`
   > \`id\` is not listed in the column list, so SQLite assigns it separately.
+- [o] Into \`age\`
+  > \`age\` is the third named column, and \`31\` is the third value.
+- Into \`email\`
+  > \`email\` gets the second value, \`'maya@example.com'\`.
 
 Values line up with columns from left to right.`}
 />
@@ -268,14 +268,14 @@ ORDER BY
 <MultipleChoice
   markdown={`What does \`INSERT INTO\` do?
 
-- It reads rows from a table.
-  > Reading rows is done with \`SELECT\`.
-- [o] It adds new rows to a table.
-  > \`INSERT INTO\` is the statement for putting new data into a table.
 - It deletes a table's structure.
   > Removing a table uses \`DROP TABLE\`.
+- It reads rows from a table.
+  > Reading rows is done with \`SELECT\`.
 - It renames every column.
   > Renaming columns is a different kind of table change.
+- [o] It adds new rows to a table.
+  > \`INSERT INTO\` is the statement for putting new data into a table.
 
 \`INSERT\` is how rows get into a table.`}
 />
@@ -283,14 +283,14 @@ ORDER BY
 <MultipleChoice
   markdown={`How do you insert multiple rows in one \`INSERT\` statement?
 
-- Write several table names after \`INSERT INTO\`.
-  > One \`INSERT\` targets one table.
 - Put every value in one long quoted string.
   > Quoted strings are text values, not row separators.
-- [o] Add several parenthesized value groups separated by commas.
-  > Each \`(...)\` group supplies one row.
 - Use \`SELECT *\` before \`VALUES\`.
   > \`SELECT\` reads data; it is not how multiple value groups are listed.
+- [o] Add several parenthesized value groups separated by commas.
+  > Each \`(...)\` group supplies one row.
+- Write several table names after \`INSERT INTO\`.
+  > One \`INSERT\` targets one table.
 
 Multiple value groups make bulk inserts easier to read and write.`}
 />
@@ -298,14 +298,14 @@ Multiple value groups make bulk inserts easier to read and write.`}
 <MultipleChoice
   markdown={`In this course's SQLite examples, what do \`0\` and \`1\` often represent in yes/no columns?
 
+- Primary keys only.
+  > Primary keys can be integers, but 0 and 1 are also commonly used for yes/no flags.
 - Table names and column names.
   > Names are written as identifiers, not usually as 0 and 1 values.
 - [o] False/no and true/yes values.
   > SQLite has no separate boolean storage class, so 0 and 1 are common for yes/no data.
 - Text and dates.
   > Text is written in quotes, and dates are often stored as text strings.
-- Primary keys only.
-  > Primary keys can be integers, but 0 and 1 are also commonly used for yes/no flags.
 
 Using 0 and 1 is a simple SQLite-friendly way to represent boolean-like data.`}
 />

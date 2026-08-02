@@ -477,14 +477,14 @@ for (let i = 0; i < expected.length; i++) {
 <MultipleChoice
   markdown={`Which loop is the *cleanest* way to do something for every element of an array, when you don't need the index?
 
-- A \`while\` loop with a manual counter
-  > A \`while\` loop with a counter works but requires you to initialise the counter, manage the condition, and increment manually, three things that can each go wrong when all you want is "do this for every element".
+- [o] A \`for...of\` loop: \`for (const item of arr) { ... }\`
+  > \`for...of\` walks each element directly, with no index arithmetic to get wrong. Use it whenever you don't need the index. If you do need the index, either fall back to the classic \`for (let i ...)\` loop or use \`arr.entries()\` for destructured \`[index, item]\` pairs.
 - A \`for (let i = 0; i < arr.length; i++)\` loop
   > The index-based \`for\` loop is the right choice when you need the index, but when you only need the elements it forces you to write index arithmetic that doesn't add any meaning.
 - A \`for...in\` loop
   > \`for...in\` iterates over an object's enumerable *property keys*, not array elements; on an array it yields string indices like \`"0"\`, \`"1"\` and may also visit any enumerable properties added to \`Array.prototype\`, making it unreliable for arrays.
-- [o] A \`for...of\` loop: \`for (const item of arr) { ... }\`
-  > \`for...of\` walks each element directly, with no index arithmetic to get wrong. Use it whenever you don't need the index. If you do need the index, either fall back to the classic \`for (let i ...)\` loop or use \`arr.entries()\` for destructured \`[index, item]\` pairs.
+- A \`while\` loop with a manual counter
+  > A \`while\` loop with a counter works but requires you to initialise the counter, manage the condition, and increment manually, three things that can each go wrong when all you want is "do this for every element".
 
 The other forms work, but \`for...of\` expresses the intent most clearly. (And \`for...in\` is for object keys, not array elements, using it on arrays is a common bug.)`}
 />

@@ -252,12 +252,12 @@ compiler can see and check it.
 <MultipleChoice
   markdown={`Why does Java check types at *compile* time?
 
+- [o] To catch type mistakes before the program runs, so an entire category of bugs is impossible in production
+  > Static typing trades upfront strictness for runtime safety.
 - To make the source files smaller
   > Type checks do not change file size.
 - To prevent the JVM from running too slowly
   > Type checks help safety, not raw speed.
-- [o] To catch type mistakes before the program runs, so an entire category of bugs is impossible in production
-  > Static typing trades upfront strictness for runtime safety.
 - Because Java was designed before runtime type checking existed
   > Runtime type checking has existed forever; Java's choice is intentional.`}
 />
@@ -265,14 +265,14 @@ compiler can see and check it.
 <MultipleChoice
   markdown={`Which of these comparisons of two \`String\` values is *correct* for checking that their contents are the same?
 
-- \`a == b\`
-  > That compares references, not contents.
-- \`a.compareTo(b) == 1\`
-  > That is true only for a specific ordering, not equality.
 - [o] \`a.equals(b)\`
   > \`equals\` on String compares the actual character contents.
+- \`a.compareTo(b) == 1\`
+  > That is true only for a specific ordering, not equality.
 - \`a + b\`
-  > That concatenates, it doesn't compare.`}
+  > That concatenates, it doesn't compare.
+- \`a == b\`
+  > That compares references, not contents.`}
 />
 
 ## A small challenge

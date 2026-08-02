@@ -771,25 +771,25 @@ print("cycle?" , len(order) < 4)     # False`,
 
 - It can't; comparing all pairs is fundamentally O(n²).
   > A hash map avoids comparing all pairs by checking each number once against what you've already seen.
-- [o] As you scan, store each value's index in a dict and check whether \`target - num\` is already in it.
-  > Each lookup/insert is O(1) average, so one pass over n elements is O(n) time (O(n) space), the standard optimal Two Sum.
 - Sort the array first, then binary search for each complement.
   > Sorting is O(n log n) and loses the original indices the question asks for, slower and more bookkeeping.
 - Use recursion to divide the array in half.
-  > Divide-and-conquer doesn't apply cleanly and wouldn't beat the O(n) hash-map scan.`}
+  > Divide-and-conquer doesn't apply cleanly and wouldn't beat the O(n) hash-map scan.
+- [o] As you scan, store each value's index in a dict and check whether \`target - num\` is already in it.
+  > Each lookup/insert is O(1) average, so one pass over n elements is O(n) time (O(n) space), the standard optimal Two Sum.`}
 />
 
 <MultipleChoice
   markdown={`Why is a **stack** the right structure for Valid Parentheses, rather than counting brackets?
 
-- Counting is fine; the bracket counts just have to be equal.
-  > Equal counts aren't enough: \`"([)]"\` has matching counts but is invalid because the nesting order is wrong.
-- [o] A stack enforces ordering, each closer must match the **most recently opened** bracket (LIFO).
-  > LIFO matching catches interleaved brackets like \`"([)]"\` that a counter would wrongly accept.
 - A queue (FIFO) would work just as well.
   > FIFO matches the *oldest* open bracket, the opposite of nesting; \`"([)]"\` would be accepted incorrectly.
 - You need a hash map, not a stack.
-  > A map helps look up the matching pair, but the stack enforces correct nesting order.`}
+  > A map helps look up the matching pair, but the stack enforces correct nesting order.
+- [o] A stack enforces ordering, each closer must match the **most recently opened** bracket (LIFO).
+  > LIFO matching catches interleaved brackets like \`"([)]"\` that a counter would wrongly accept.
+- Counting is fine; the bracket counts just have to be equal.
+  > Equal counts aren't enough: \`"([)]"\` has matching counts but is invalid because the nesting order is wrong.`}
 />
 
 ## Challenges

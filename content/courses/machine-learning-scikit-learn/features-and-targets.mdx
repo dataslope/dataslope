@@ -521,12 +521,12 @@ print("n_features:", n_features)
 <MultipleChoice
   markdown={`You have a table where each row is a customer and one column, \`churned\`, marks whether they left (1) or stayed (0). You want to predict churn from the other columns. How should \`X\` and \`y\` be built?
 
-- \`X\` is the \`churned\` column; \`y\` is everything else
-  > The target (what you want to predict) goes into \`y\`, and the features (inputs used to make the prediction) go into \`X\`. Here \`churned\` is the target, so it belongs in \`y\`.
-- \`X\` and \`y\` both include the \`churned\` column
-  > The target column must be removed from \`X\`. Leaving it in allows the model to trivially copy it during training, producing falsely perfect performance and a model that is useless at prediction time.
 - [o] \`y\` is the \`churned\` column; \`X\` is all the other columns, with \`churned\` removed
   > The target is what you predict (\`churned\`), so it becomes \`y\`. The features are the remaining columns, and the target must be dropped from \`X\` so the model cannot trivially copy it.
+- \`X\` and \`y\` both include the \`churned\` column
+  > The target column must be removed from \`X\`. Leaving it in allows the model to trivially copy it during training, producing falsely perfect performance and a model that is useless at prediction time.
+- \`X\` is the \`churned\` column; \`y\` is everything else
+  > The target (what you want to predict) goes into \`y\`, and the features (inputs used to make the prediction) go into \`X\`. Here \`churned\` is the target, so it belongs in \`y\`.
 - \`X\` is the first column only; \`y\` is the last column only
   > The target is identified by meaning (what you want to predict), not by its position in the table. Using positional assumptions will silently break whenever columns are reordered.
 
@@ -536,14 +536,14 @@ The target goes into \`y\`; all other columns form \`X\`, and the target is neve
 <MultipleChoice
   markdown={`\`neighborhood\` takes the values "downtown", "suburb", and "rural". Why is encoding it as downtown=1, suburb=2, rural=3 a mistake?
 
-- Because scikit-learn cannot store integers
-  > scikit-learn works with integer-encoded data all the time. The problem is not the data type but the meaning those integers imply, a false ordering of categories that have no natural order.
 - Because the numbers are too large for the model
   > The magnitude of the numbers (1, 2, 3) is not the issue. The problem is that any integer encoding of nominal categories secretly introduces a false ordering relationship between them.
 - [o] Because it invents a false order and spacing, implying rural (3) is "greater than" downtown (1) and that suburb is exactly halfway, none of which is true for an unordered category
   > These are nominal categories with no natural ranking. Integer-coding them fabricates an order the model will act on. An order-free encoding such as one-hot is needed.
 - Because categorical features should be deleted, not encoded
   > Deleting categorical features throws away potentially useful information. The correct approach is to encode them in a way that does not introduce a false ordering, such as one-hot encoding.
+- Because scikit-learn cannot store integers
+  > scikit-learn works with integer-encoded data all the time. The problem is not the data type but the meaning those integers imply, a false ordering of categories that have no natural order.
 
 Nominal categories must be encoded without introducing a fake ordering.`}
 />
@@ -551,14 +551,14 @@ Nominal categories must be encoded without introducing a fake ordering.`}
 <MultipleChoice
   markdown={`A model's target \`y\` is a column of house prices in dollars (continuous numbers). What type of machine learning task is this?
 
-- Classification, because houses come in categories
-  > Houses themselves may be thought of informally as "types," but the target here is a continuous dollar amount, not a category label. A continuous numeric target indicates regression.
-- Clustering, because we are grouping houses
-  > Clustering is an unsupervised task with no target \`y\`. Here a labeled numeric target (price) is provided, making this a supervised regression problem.
 - [o] Regression, because the target is a continuous numeric quantity
   > A continuous numeric target means the model predicts a number on a scale, that is regression. A categorical target would mean classification instead.
 - Unsupervised learning, because prices vary
   > Unsupervised learning is used when there is no target column at all. Here a labeled numeric target (price) is provided, which makes this supervised regression, not unsupervised learning.
+- Classification, because houses come in categories
+  > Houses themselves may be thought of informally as "types," but the target here is a continuous dollar amount, not a category label. A continuous numeric target indicates regression.
+- Clustering, because we are grouping houses
+  > Clustering is an unsupervised task with no target \`y\`. Here a labeled numeric target (price) is provided, making this a supervised regression problem.
 
 The *type of the target* tells you the task: continuous number means regression.`}
 />
@@ -566,14 +566,14 @@ The *type of the target* tells you the task: continuous number means regression.
 <MultipleChoice
   markdown={`What does \`X.shape\` of \`(342, 4)\` tell you?
 
-- 342 features describing 4 samples
-  > In scikit-learn, the shape convention is \`(n_samples, n_features)\`: the first number is the number of rows (samples), the second is the number of columns (features). So 342 is the sample count, not the feature count.
+- A 342-by-4 image
+  > An image would require additional context about pixel layout and color channels. \`X.shape = (342, 4)\` describes a tabular feature matrix with 342 rows and 4 feature columns.
 - 342 target values and 4 predictions
   > Target values belong in the separate vector \`y\`, not in \`X\`. \`X.shape = (342, 4)\` tells you there are 342 samples and 4 features, with no information about predictions.
 - [o] 342 samples (rows), each described by 4 features (columns)
   > \`shape\` is always \`(n_samples, n_features)\`: the first number is how many examples you have, the second is how many features describe each one.
-- A 342-by-4 image
-  > An image would require additional context about pixel layout and color channels. \`X.shape = (342, 4)\` describes a tabular feature matrix with 342 rows and 4 feature columns.
+- 342 features describing 4 samples
+  > In scikit-learn, the shape convention is \`(n_samples, n_features)\`: the first number is the number of rows (samples), the second is the number of columns (features). So 342 is the sample count, not the feature count.
 
 Shape is read rows-first: 342 examples, 4 features each.`}
 />
@@ -581,14 +581,14 @@ Shape is read rows-first: 342 examples, 4 features each.`}
 <MultipleChoice
   markdown={`Which statement about features is correct?
 
-- Adding more feature columns always improves the model
-  > Irrelevant or redundant features add noise and can degrade a model's performance, a phenomenon sometimes called the "curse of dimensionality." More features is only beneficial when those features carry genuine signal.
-- The target must always be the final column of the table
-  > The target is identified by name and meaning, not by its position. You select it explicitly (e.g., \`df["target_col"]\`), so it can reside anywhere in the table.
-- [o] Irrelevant or redundant features can add noise and hurt performance, so relevance matters more than sheer count
-  > Quality beats quantity. Useless features dilute the signal and can degrade a model, selecting good features is its own skill, covered in the feature engineering chapter.
 - A pandas DataFrame cannot be used as \`X\`; only NumPy arrays work
   > scikit-learn accepts both pandas DataFrames and NumPy arrays as input for \`X\`. DataFrames are often preferred because their column names make encoding and interpretation easier.
+- The target must always be the final column of the table
+  > The target is identified by name and meaning, not by its position. You select it explicitly (e.g., \`df["target_col"]\`), so it can reside anywhere in the table.
+- Adding more feature columns always improves the model
+  > Irrelevant or redundant features add noise and can degrade a model's performance, a phenomenon sometimes called the "curse of dimensionality." More features is only beneficial when those features carry genuine signal.
+- [o] Irrelevant or redundant features can add noise and hurt performance, so relevance matters more than sheer count
+  > Quality beats quantity. Useless features dilute the signal and can degrade a model, selecting good features is its own skill, covered in the feature engineering chapter.
 
 More features is not automatically better, and \`X\` may be a DataFrame or an array.`}
 />

@@ -316,14 +316,14 @@ assert "amount" in xt.lower() or any("amount" in (tr.hovertemplate or "") for tr
 <MultipleChoice
   markdown={`Why is a histogram more revealing than just reporting the mean?
 
-- Histograms are always required
-  > Histograms are a strong recommendation, not a requirement; the point is that they reveal distributional shape that a mean alone cannot capture.
 - Means are slow to compute
   > Computing a mean is fast; the chapter's argument for histograms is about informational richness, not speed.
-- [o] A histogram shows the full shape, skew, multiple modes, gaps, outliers, that a single mean entirely hides
-  > Anscombe's quartet is the canonical demonstration.
+- Histograms are always required
+  > Histograms are a strong recommendation, not a requirement; the point is that they reveal distributional shape that a mean alone cannot capture.
 - Histograms always look better
   > Visual appeal is subjective and irrelevant here; the argument for histograms is that they convey distributional information a mean cannot.
+- [o] A histogram shows the full shape, skew, multiple modes, gaps, outliers, that a single mean entirely hides
+  > Anscombe's quartet is the canonical demonstration.
 
 You should plot your data before summarizing it.`}
 />
@@ -331,14 +331,14 @@ You should plot your data before summarizing it.`}
 <MultipleChoice
   markdown={`Your chart shows a small change exaggerated dramatically. The most likely cause is:
 
+- A bug in Plotly
+  > Plotly faithfully renders the data and axis range you provide; if the range starts above zero, that is the analyst's configuration, not a library defect.
+- [o] A truncated y-axis (the axis does not start at zero) makes small differences look large
+  > Truncated axes are one of the most common, and abused, chart tricks.
 - Wrong chart type
   > A wrong chart type can mislead, but exaggeration of a small absolute change most commonly comes from truncating the y-axis.
 - Too much color
   > Color overload affects clarity and aesthetics, but it does not exaggerate the apparent magnitude of changes on an axis.
-- [o] A truncated y-axis (the axis does not start at zero) makes small differences look large
-  > Truncated axes are one of the most common, and abused, chart tricks.
-- A bug in Plotly
-  > Plotly faithfully renders the data and axis range you provide; if the range starts above zero, that is the analyst's configuration, not a library defect.
 
 Be deliberate about axis ranges.`}
 />
@@ -346,14 +346,14 @@ Be deliberate about axis ranges.`}
 <MultipleChoice
   markdown={`When comparing a numeric metric across many categories at once, which is generally clearest?
 
-- Many overlapping line charts
-  > Overlapping lines for many categories become an unreadable spaghetti plot; they work for a small number of series tracked over time, not for cross-category comparison at a point in time.
-- A pie chart
-  > Pie charts are hard to read when there are more than a handful of categories and rely on angle perception, which humans perform poorly; the chapter explicitly recommends against them.
-- [o] A bar chart, or a faceted small-multiples histogram if you need the distribution
-  > Bars use the strongest perceptual cue (length) and small multiples avoid clutter.
 - A 3D surface plot
   > A 3D surface plot requires two continuous numeric axes defining a surface; it is suited to showing a function of two variables, not a metric compared across discrete categories.
+- [o] A bar chart, or a faceted small-multiples histogram if you need the distribution
+  > Bars use the strongest perceptual cue (length) and small multiples avoid clutter.
+- A pie chart
+  > Pie charts are hard to read when there are more than a handful of categories and rely on angle perception, which humans perform poorly; the chapter explicitly recommends against them.
+- Many overlapping line charts
+  > Overlapping lines for many categories become an unreadable spaghetti plot; they work for a small number of series tracked over time, not for cross-category comparison at a point in time.
 
 Simple, well-chosen charts beat fancy ones almost every time.`}
 />

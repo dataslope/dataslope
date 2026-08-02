@@ -145,14 +145,14 @@ center they computed and whether the data is skewed.
 <MultipleChoice
   markdown={`A dataset of home prices in a neighborhood is strongly right-skewed: most homes are modest, but a few mansions sell for 10x the rest. A realtor wants to advertise the "typical" price. Which measure is the most honest summary?
 
-- The mean, because it uses every value in the data
-  > Using every value is exactly why the mean gets dragged upward here, the few mansions pull it above what most homes cost, so it overstates the "typical" price.
-- [o] The median, because half the homes are above it and half below, unaffected by the extreme high sales
-  > On right-skewed price data the median reflects the middle home and ignores how extreme the top sales are, so it matches what a typical buyer would actually pay.
 - The mode, because it's the single most common price
   > Continuous prices rarely repeat exactly, so a mode is unstable and often meaningless for home prices unless values are heavily rounded.
 - The mean, because medians throw away information
   > The median does ignore the magnitude of the extremes, but on skewed data that is a feature, not a flaw, it is what keeps the summary representative.
+- The mean, because it uses every value in the data
+  > Using every value is exactly why the mean gets dragged upward here, the few mansions pull it above what most homes cost, so it overstates the "typical" price.
+- [o] The median, because half the homes are above it and half below, unaffected by the extreme high sales
+  > On right-skewed price data the median reflects the middle home and ignores how extreme the top sales are, so it matches what a typical buyer would actually pay.
 
 The gap between mean and median here is itself a signal that the data is skewed.`}
 />
@@ -396,14 +396,14 @@ assert report_median == (result["skew_gap"] > 0)`,
 <MultipleChoice
   markdown={`You compute the mean monthly spend of your users as \\$84 and the median as \\$41. What is the most defensible reading of this gap?
 
+- Half of all users spend exactly \\$84
+  > The mean is a balance point, not a value that half the users hit. It is the *median* (\\$41) that has half the users below and half above.
+- The mean must be wrong because it should be close to the median
+  > Nothing is wrong with the computation, a large mean–median gap is the normal, expected signature of skewed data, not an error.
 - The data is left-skewed, so a few very low spenders pull the mean down
   > A mean far *above* the median indicates the opposite, a right skew with a tail of high values. Left skew would put the mean *below* the median.
 - [o] The data is right-skewed; a minority of high spenders inflate the mean, so the median (\\$41) better reflects a typical user
   > When the mean sits well above the median, a long upper tail is dragging the mean up, so the median is the more representative "typical" value here.
-- The mean must be wrong because it should be close to the median
-  > Nothing is wrong with the computation, a large mean–median gap is the normal, expected signature of skewed data, not an error.
-- Half of all users spend exactly \\$84
-  > The mean is a balance point, not a value that half the users hit. It is the *median* (\\$41) that has half the users below and half above.
 
 A mean far above the median is one of the most common skew signals in real spend data.`}
 />
@@ -411,14 +411,14 @@ A mean far above the median is one of the most common skew signals in real spend
 <MultipleChoice
   markdown={`A survey asks for respondents' favorite payment method (cash, credit, debit, mobile). Which measure of center even *makes sense* for this column?
 
-- The mean of the four options
-  > You cannot average category labels, there is no arithmetic meaning to "the average of cash and credit," so a mean is undefined here.
-- The median payment method
-  > A median requires the values to be ordered from low to high; unordered categories like payment methods have no meaningful middle.
-- [o] The mode, the most frequently chosen payment method
-  > For unordered categorical data the mode is the only valid center, since it simply reports which category occurs most often.
 - None of them; categorical data has no center
   > Categorical data does have a usable center, the mode, which answers "what is the most common category?"
+- The mean of the four options
+  > You cannot average category labels, there is no arithmetic meaning to "the average of cash and credit," so a mean is undefined here.
+- [o] The mode, the most frequently chosen payment method
+  > For unordered categorical data the mode is the only valid center, since it simply reports which category occurs most often.
+- The median payment method
+  > A median requires the values to be ordered from low to high; unordered categories like payment methods have no meaningful middle.
 
 Mode is the go-to center whenever the values are labels rather than numbers.`}
 />
@@ -426,12 +426,12 @@ Mode is the go-to center whenever the values are labels rather than numbers.`}
 <MultipleChoice
   markdown={`An investment returns +50% one year and −50% the next. Someone reports the "average annual return" as 0% using the arithmetic mean. Why is the geometric mean the better tool here?
 
-- The arithmetic mean of percentages is always undefined
-  > The arithmetic mean is perfectly defined; the issue is that it is the *wrong* average for quantities that compound multiplicatively.
 - [o] Returns compound multiplicatively, and \\$100 → \\$150 → \\$75 is a real *loss*; the geometric mean of the growth factors (1.5 and 0.5) captures that, while the arithmetic mean hides it
   > Because the money multiplies year over year, the correct "typical factor" comes from multiplying 1.5 and 0.5 and taking the square root (≈0.866), revealing the roughly 13% annual loss that 0% conceals.
 - The geometric mean is just a more precise version of the arithmetic mean
   > They answer different questions; the geometric mean is not "more precise," it is the appropriate average specifically for rates and growth factors.
+- The arithmetic mean of percentages is always undefined
+  > The arithmetic mean is perfectly defined; the issue is that it is the *wrong* average for quantities that compound multiplicatively.
 - Because percentages can be negative
   > Negative percentages are fine for the arithmetic mean; the real reason is that returns *compound*, so factors should be multiplied, not added.
 
@@ -441,10 +441,10 @@ Whenever quantities multiply to combine, the geometric mean, not the arithmetic 
 <MultipleChoice
   markdown={`Which statement about the **trimmed mean** is accurate?
 
-- It is identical to the median
-  > A trimmed mean drops a fraction from each end and averages the rest; the median is the extreme case of trimming nearly everything, but a 10% trimmed mean still uses 80% of the data.
 - It is more sensitive to outliers than the ordinary mean
   > Trimming removes the most extreme values before averaging, which makes it *less* sensitive to outliers than the ordinary mean, not more.
+- It is identical to the median
+  > A trimmed mean drops a fraction from each end and averages the rest; the median is the extreme case of trimming nearly everything, but a 10% trimmed mean still uses 80% of the data.
 - [o] It discards a fixed percentage of the smallest and largest values, then averages what remains, a middle ground between mean and median in robustness
   > By cutting off both tails before averaging, it keeps much of the mean's efficiency while gaining resistance to extreme values, sitting between the two.
 - It can only be used on symmetric data

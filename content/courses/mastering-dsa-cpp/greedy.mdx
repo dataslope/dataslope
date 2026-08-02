@@ -393,19 +393,19 @@ int main() {
 
 - Try all answers.
   > Exhaustive search.
-- [o] Make the locally best choice repeatedly.
-  > At each step it takes the option that looks best right now and never reconsiders it.
+- Always use recursion.
+  > Not required.
 - Cache subproblems.
   > Dynamic programming.
-- Always use recursion.
-  > Not required.`} />
+- [o] Make the locally best choice repeatedly.
+  > At each step it takes the option that looks best right now and never reconsiders it.`} />
 
 <MultipleChoice markdown={`Why does {1,3,4} fail for amount 6?
 
-- [o] Greedy takes 4+1+1, but 3+3 is better.
-  > Taking the largest coin first spends three coins (4+1+1), while 3+3 reaches 6 with only two.
 - There is no 1 coin.
   > There is.
+- [o] Greedy takes 4+1+1, but 3+3 is better.
+  > Taking the largest coin first spends three coins (4+1+1), while 3+3 reaches 6 with only two.
 - 6 is impossible.
   > It is possible.
 - Greedy never works.
@@ -413,11 +413,11 @@ int main() {
 
 <MultipleChoice markdown={`What does an exchange argument show?
 
+- The algorithm is recursive.
+  > Not necessarily.
+- The input is sorted.
+  > Sorting may be a step.
 - [o] An optimal solution can be transformed to include the greedy choice.
   > It proves correctness by showing any optimal solution can be reshaped to use the greedy choice without getting worse.
 - The code has no bugs.
-  > No.
-- The input is sorted.
-  > Sorting may be a step.
-- The algorithm is recursive.
-  > Not necessarily.`} />
+  > No.`} />

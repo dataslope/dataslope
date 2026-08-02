@@ -441,12 +441,12 @@ For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2
 <MultipleChoice
   markdown={`What does \`[x * 2 for x in range(4) if x % 2]\` evaluate to?
 
-- \`[0, 2, 4, 6]\`
-  > That would be without the \`if\`.
-- [o] \`[2, 6]\`
-  > \`x % 2\` is truthy for odd \`x\` (1, 3), so we keep \`2*1\` and \`2*3\`.
 - \`[1, 3]\`
   > The expression is \`x * 2\`, not \`x\`.
+- [o] \`[2, 6]\`
+  > \`x % 2\` is truthy for odd \`x\` (1, 3), so we keep \`2*1\` and \`2*3\`.
+- \`[0, 2, 4, 6]\`
+  > That would be without the \`if\`.
 - \`[0, 4]\`
   > The \`if x % 2\` filters for odd numbers, not even.`}
 />
@@ -454,27 +454,27 @@ For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2
 <MultipleChoice
   markdown={`Which of the following produces the same result as \`[x*x for x in range(5)]\`?
 
-- \`(x*x for x in range(5))\`
-  > That is a generator expression, not a list.
-- \`{x*x for x in range(5)}\`
-  > That is a set comprehension, not a list.
 - [o] \`list(x*x for x in range(5))\`
   > Converting the generator to a list gives the same result.
 - \`{x: x*x for x in range(5)}\`
-  > That is a dict comprehension, not a list.`}
+  > That is a dict comprehension, not a list.
+- \`{x*x for x in range(5)}\`
+  > That is a set comprehension, not a list.
+- \`(x*x for x in range(5))\`
+  > That is a generator expression, not a list.`}
 />
 
 <MultipleChoice
   markdown={`What is the key advantage of a generator expression over a list comprehension?
 
-- Generators are always faster.
-  > Not always, list access is O(1), generator iteration has per-item overhead.
 - [o] Generators use O(1) memory regardless of input size.
   > Generators produce items lazily, one at a time.
-- Generators support slicing.
-  > Generators do **not** support slicing; lists do.
 - Generators automatically deduplicate.
-  > Generators do not deduplicate; that is what sets do.`}
+  > Generators do not deduplicate; that is what sets do.
+- Generators are always faster.
+  > Not always, list access is O(1), generator iteration has per-item overhead.
+- Generators support slicing.
+  > Generators do **not** support slicing; lists do.`}
 />
 
 <MultipleChoice
@@ -486,10 +486,10 @@ For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2
 
 - \`[11, 22]\`
   > That would pair the lists element-wise (like \`zip\`), not form every combination.
-- [o] \`[11, 21, 12, 22]\`
-  > The outer loop is \`x\`, the inner loop is \`y\`.
 - \`[11, 12, 21, 22]\`
   > That would be if \`y\` were the outer loop.
+- [o] \`[11, 21, 12, 22]\`
+  > The outer loop is \`x\`, the inner loop is \`y\`.
 - \`[30, 40]\`
   > That would be summing the lists, not the Cartesian product.`}
 />

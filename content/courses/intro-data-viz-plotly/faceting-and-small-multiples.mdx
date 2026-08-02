@@ -182,10 +182,10 @@ sophisticated information graphic in major newspapers uses them.
   > Faceting does not filter or remove any rows; every subset is shown in its own panel, so all data remains visible.
 - Make the chart 3-D.
   > Faceting adds a spatial grid dimension by splitting panels, not a depth dimension; the individual charts remain 2-D.
-- [o] Split the chart into multiple small panels, one per value of a categorical column, usually with shared axes.
-  > Faceting is the implementation of *small multiples*: replace one busy chart with many small, comparable ones. Each panel shows the same encoding for a different slice of the data, and shared axes let the reader compare them directly.
 - Add a third color to the legend.
   > Faceting affects the spatial layout of the chart, creating separate panels, not the legend or its color count.
+- [o] Split the chart into multiple small panels, one per value of a categorical column, usually with shared axes.
+  > Faceting is the implementation of *small multiples*: replace one busy chart with many small, comparable ones. Each panel shows the same encoding for a different slice of the data, and shared axes let the reader compare them directly.
 
 **facet_col=...** and **facet_row=...** are the two arguments that turn one chart into a grid.`}
 />
@@ -197,10 +197,10 @@ sophisticated information graphic in major newspapers uses them.
   > Ink usage is not the key advantage; in fact, small multiples often use more total ink than a single chart because axes and labels are repeated across panels.
 - They render faster.
   > Rendering speed depends on data volume and browser performance, not on whether axes are shared; this is not a meaningful advantage of small multiples.
-- [o] Any difference between panels reflects a real difference in the **data**, not a difference in scale, making comparison fast and honest.
-  > Shared axes are the secret to small multiples. With a shared y range, a taller bar in one panel really means a bigger value than a shorter bar in another panel. With independent axes, the same visual height could mean different things.
 - They never need labels.
   > Small multiples still require axis labels, panel titles (usually the category value), and a legend where applicable; shared axes reduce label repetition but do not eliminate the need for labels entirely.
+- [o] Any difference between panels reflects a real difference in the **data**, not a difference in scale, making comparison fast and honest.
+  > Shared axes are the secret to small multiples. With a shared y range, a taller bar in one panel really means a bigger value than a shorter bar in another panel. With independent axes, the same visual height could mean different things.
 
 Default to shared axes. Use independent axes only when you have a specific reason, and label them clearly.`}
 />

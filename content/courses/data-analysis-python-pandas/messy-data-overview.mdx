@@ -257,14 +257,14 @@ Three principles to internalize:
 <MultipleChoice
   markdown={`Why does the chapter recommend **never** overwriting your raw data file with the cleaned version?
 
-- It is a Pandas requirement
-  > Pandas imposes no constraint on whether you overwrite files; the recommendation is an analytical best practice, not a library rule.
 - Raw files are bigger
   > File size is not the reason; the issue is reversibility, you cannot re-derive the raw data from the cleaned version.
-- [o] If your cleaning is wrong, you can re-run from the untouched raw input; if you overwrote it, you cannot recover the original
-  > Raw input is sacred; cleaning is code; the clean version is derived. This is the foundation of reproducible analysis.
+- It is a Pandas requirement
+  > Pandas imposes no constraint on whether you overwrite files; the recommendation is an analytical best practice, not a library rule.
 - Raw files are encrypted
   > Encryption is unrelated to this recommendation; the rationale is reproducibility and recoverability, not security.
+- [o] If your cleaning is wrong, you can re-run from the untouched raw input; if you overwrote it, you cannot recover the original
+  > Raw input is sacred; cleaning is code; the clean version is derived. This is the foundation of reproducible analysis.
 
 This is among the most important professional habits in data work.`}
 />
@@ -272,12 +272,12 @@ This is among the most important professional habits in data work.`}
 <MultipleChoice
   markdown={`A column contains \`"USA"\`, \`"U.S.A."\`, \`"United States"\`, and \`"U.S."\`, all meaning the same country. What is the best one-word description?
 
-- Duplicate values
-  > Duplicate values are repeated rows; here the values are not repeated, each variant appears in a different row and means the same thing under different spellings.
 - Missing values
   > No values are absent; every row has a country entry. The problem is that the same country is spelled four different ways.
 - [o] Inconsistent categories
   > The values are *semantically* the same but *syntactically* different. This is one of the most common forms of mess and almost always requires explicit cleanup.
+- Duplicate values
+  > Duplicate values are repeated rows; here the values are not repeated, each variant appears in a different row and means the same thing under different spellings.
 - Wrong types
   > The column is correctly typed as \`object\` (string); the issue is semantic inconsistency within the strings, not a dtype problem.
 
@@ -287,14 +287,14 @@ A canonical mapping (\`"U.S."\` → \`"USA"\`, etc.) is the typical fix.`}
 <MultipleChoice
   markdown={`What does the chapter mean by the "flag" approach to suspect data?
 
-- Removing the rows
-  > Removing rows discards data that might be valid; the flag approach retains all information and lets the reviewer decide later.
-- Replacing the values with NaN
-  > Replacing with NaN loses the original value permanently; flagging preserves it while marking the suspicion.
 - [o] Keeping the original values but adding a boolean column that marks them as suspicious, so reviewers can see your judgment without losing information
   > Flagging is the least-destructive option, perfect when you are not 100% sure whether a value is wrong.
+- Replacing the values with NaN
+  > Replacing with NaN loses the original value permanently; flagging preserves it while marking the suspicion.
 - Coloring the cells
   > Cell color is a visual formatting trick that does not persist in a CSV or DataFrame and cannot be queried programmatically.
+- Removing the rows
+  > Removing rows discards data that might be valid; the flag approach retains all information and lets the reviewer decide later.
 
 Flagging preserves information while making your suspicions explicit and testable.`}
 />

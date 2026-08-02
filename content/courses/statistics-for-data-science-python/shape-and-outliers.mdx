@@ -341,14 +341,14 @@ flowchart TD
 <MultipleChoice
   markdown={`A column of purchase amounts has a few values near \\$50,000 while most are under \\$200. Investigation shows these are real bulk orders from genuine wholesale customers. What's the appropriate action?
 
+- Assume they are data-entry errors because they are so large
+  > "Large" is not evidence of an error, and the investigation already confirmed they are legitimate, so treating them as errors would be wrong.
 - Delete them so they don't distort the average purchase amount
   > These are real, important customers, not errors, deleting them discards genuine revenue signal and biases your summaries downward.
 - [o] Keep them, and report robust summaries (median, IQR) alongside the mean so the bulk orders don't dominate the headline number
   > Since the values are genuine, the right move is to retain them and lean on outlier-resistant statistics so a few large orders don't distort the typical-customer picture.
 - Replace them with the mean of the other values
   > Overwriting real measurements with the mean fabricates data and erases the very wholesale behavior you'd want to understand.
-- Assume they are data-entry errors because they are so large
-  > "Large" is not evidence of an error, and the investigation already confirmed they are legitimate, so treating them as errors would be wrong.
 
 Genuine extremes are kept; you change the *statistics* you report, not the data.`}
 />
@@ -485,14 +485,14 @@ assert sorted(outliers) == sorted(_expected)`,
 <MultipleChoice
   markdown={`A distribution has a long tail stretching toward *high* values and most of its mass on the left. How is it described, and how do the mean and median compare?
 
-- Left-skewed, with the mean below the median
-  > A tail toward high values is a *right* skew, and it pulls the mean above the median, this option has both the name and the direction reversed.
-- [o] Right-skewed, with the mean above the median
-  > The long tail points toward the high values, which defines a right (positive) skew and drags the mean above the median.
-- Symmetric, since the peak is on one side
-  > A peak on one side with a long tail on the other is the definition of skew, not symmetry; symmetric data has mirror-image tails.
 - Bimodal, because the mass and the tail are separated
   > A single peak with one stretched tail is unimodal and skewed; bimodality means two distinct peaks, which isn't described here.
+- [o] Right-skewed, with the mean above the median
+  > The long tail points toward the high values, which defines a right (positive) skew and drags the mean above the median.
+- Left-skewed, with the mean below the median
+  > A tail toward high values is a *right* skew, and it pulls the mean above the median, this option has both the name and the direction reversed.
+- Symmetric, since the peak is on one side
+  > A peak on one side with a long tail on the other is the definition of skew, not symmetry; symmetric data has mirror-image tails.
 
 Skew is named for the tail's direction, and the mean always gets dragged toward that tail.`}
 />
@@ -500,14 +500,14 @@ Skew is named for the tail's direction, and the mean always gets dragged toward 
 <MultipleChoice
   markdown={`On strongly right-skewed data, the **z-score rule** (|z| > 3) flags *fewer* points than the **1.5×IQR rule**. Why?
 
+- The IQR rule ignores the median, making it flag more points
+  > The IQR rule is built on the quartiles (Q1 and Q3); the explanation is the std-inflation affecting the z-rule, not anything about the median.
+- The z-score rule only works on integer data
+  > The z-score is defined for any numeric data regardless of whether it's integer or continuous; data type isn't the issue.
 - The IQR rule is simply more sensitive by design and always flags more
   > It isn't a fixed "always more" relationship; the difference here comes specifically from how skew affects each rule's inputs.
 - [o] The extreme high values inflate the mean and standard deviation that the z-score uses, raising the |z| > 3 threshold so those very points fall short of it
   > Because the outliers pull up the std the z-rule depends on, the cutoff stretches outward and can fail to flag the points that created the stretch, while the quartile-based IQR fences stay put.
-- The z-score rule only works on integer data
-  > The z-score is defined for any numeric data regardless of whether it's integer or continuous; data type isn't the issue.
-- The IQR rule ignores the median, making it flag more points
-  > The IQR rule is built on the quartiles (Q1 and Q3); the explanation is the std-inflation affecting the z-rule, not anything about the median.
 
 This is why the robust, quartile-based fences are preferred for skewed data.`}
 />
@@ -517,12 +517,12 @@ This is why the robust, quartile-based fences are preferred for skewed data.`}
 
 - They are genuine record-cold readings worth keeping
   > A clean, repeated \`-999\` far outside the plausible range is the classic signature of a placeholder, not three identical real measurements.
+- They prove the sensor is broken and the whole column should be discarded
+  > A few placeholder rows don't invalidate the thousands of valid readings; you handle the sentinels as missing and keep the real data.
 - [o] They are almost certainly a sentinel value for "missing," and should be treated as missing data rather than as real temperatures
   > A repeated, implausible round number like \`-999\` is a standard "no reading" placeholder, so converting these to missing prevents them from corrupting every summary.
 - They are random outliers to flag with the z-score rule and keep
   > These aren't random extremes from the process; they're an encoded "missing" marker, so flag-and-keep would feed garbage into your statistics.
-- They prove the sensor is broken and the whole column should be discarded
-  > A few placeholder rows don't invalidate the thousands of valid readings; you handle the sentinels as missing and keep the real data.
 
 Sentinel codes masquerade as outliers; recognizing them as "missing" is part of basic data hygiene.`}
 />
@@ -530,14 +530,14 @@ Sentinel codes masquerade as outliers; recognizing them as "missing" is part of 
 <MultipleChoice
   markdown={`Which statement about **kurtosis** is accurate?
 
-- High (positive excess) kurtosis means the data is strongly skewed
-  > Kurtosis is about *tail heaviness*, not asymmetry; a perfectly symmetric distribution can still have very heavy tails. Skew is a separate measure.
 - It measures how many peaks (modes) a distribution has
   > Counting peaks is *modality*; kurtosis instead describes how often values land far out in the tails.
-- [o] Positive excess kurtosis indicates heavier tails than a normal distribution, extreme values occur more often than a normal model predicts
-  > Heavy tails mean "rare" large deviations show up more frequently than the normal distribution would suggest, which is exactly what positive excess kurtosis flags.
 - A normal distribution has an excess kurtosis of 3
   > By the excess-kurtosis convention (\`scipy.stats.kurtosis\` default), a normal distribution reads ~0; the value 3 is the *raw* kurtosis before subtracting 3.
+- High (positive excess) kurtosis means the data is strongly skewed
+  > Kurtosis is about *tail heaviness*, not asymmetry; a perfectly symmetric distribution can still have very heavy tails. Skew is a separate measure.
+- [o] Positive excess kurtosis indicates heavier tails than a normal distribution, extreme values occur more often than a normal model predicts
+  > Heavy tails mean "rare" large deviations show up more frequently than the normal distribution would suggest, which is exactly what positive excess kurtosis flags.
 
 Kurtosis is about the tails; skew is about asymmetry, don't conflate them.`}
 />

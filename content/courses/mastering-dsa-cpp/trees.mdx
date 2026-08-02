@@ -608,33 +608,33 @@ int main() {
 
 <MultipleChoice markdown={`Which statement best defines a leaf in a rooted tree?
 
-- The node with the largest value
-  > Values do not determine whether a node is a leaf.
 - The root node only
   > The root can be a leaf only when the tree has one node.
 - [o] A node with no children
   > Leaves are endpoints in the rooted structure.
 - Any node at depth one
-  > Depth one nodes may have children.`} />
+  > Depth one nodes may have children.
+- The node with the largest value
+  > Values do not determine whether a node is a leaf.`} />
 
 <MultipleChoice markdown={`For a binary tree with root 1, left child 2, and right child 3, what is pre-order traversal?
 
-- 2 1 3
-  > That is in-order for this small tree.
-- [o] 1 2 3
-  > Pre-order visits root before subtrees.
 - 2 3 1
   > That resembles post-order.
 - 3 1 2
-  > Right child is not visited first in normal pre-order.`} />
+  > Right child is not visited first in normal pre-order.
+- 2 1 3
+  > That is in-order for this small tree.
+- [o] 1 2 3
+  > Pre-order visits root before subtrees.`} />
 
 <MultipleChoice markdown={`When is array representation usually better than linked nodes for a binary tree?
 
-- When the tree is very sparse
-  > Sparse trees waste many array slots.
-- [o] When the tree is complete or nearly complete
-  > Complete trees map cleanly to parent and child formulas.
 - When every node needs a parent pointer
   > Arrays can compute parents, but that is not the main reason.
+- [o] When the tree is complete or nearly complete
+  > Complete trees map cleanly to parent and child formulas.
+- When the tree is very sparse
+  > Sparse trees waste many array slots.
 - When traversal must be recursive
   > Both representations can be traversed recursively.`} />

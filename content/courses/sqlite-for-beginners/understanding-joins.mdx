@@ -131,10 +131,10 @@ Each pairing is tested against `o.customer_id = c.id`, and only the matches surv
 <MultipleChoice
   markdown={`What is the job of the \`ON\` clause in a join?
 
-- It chooses the final column names only.
-  > Column names are chosen in the \`SELECT\` list.
 - [o] It states the condition for deciding which rows from the tables match.
   > The \`ON\` clause is the matching rule for row pairings.
+- It chooses the final column names only.
+  > Column names are chosen in the \`SELECT\` list.
 - It permanently connects the two tables.
   > A join result is produced by one query; it does not change the table definitions.
 - It sorts the final result.
@@ -214,14 +214,14 @@ flowchart LR
 <MultipleChoice
   markdown={`A join query returns a combined result. What happens to the original tables?
 
-- They are merged permanently.
-  > A \`SELECT\` join does not rewrite your stored tables.
 - [o] They stay separate; the join result exists as the query's answer.
   > Joins combine data for the result without changing the source tables.
 - The right table is deleted.
   > A join reads tables; it does not delete them.
 - The primary keys are removed.
   > Keys in the source tables remain as defined.
+- They are merged permanently.
+  > A \`SELECT\` join does not rewrite your stored tables.
 
 A join is a way to read related data, not a table-merging operation.`}
 />
@@ -231,14 +231,14 @@ A join is a way to read related data, not a table-merging operation.`}
 <MultipleChoice
   markdown={`What does a join do?
 
+- It creates a primary key automatically.
+  > Primary keys are defined in table structure, not by ordinary join queries.
 - It stacks two tables vertically even when their columns are unrelated.
   > Stacking rows is a different idea; joins match rows side by side.
 - [o] It combines rows from tables by matching them with a condition.
   > A join uses a condition such as \`orders.customer_id = customers.id\` to form result rows.
 - It turns every text value into a number.
   > Joins are about relationships between rows, not type conversion.
-- It creates a primary key automatically.
-  > Primary keys are defined in table structure, not by ordinary join queries.
 
 Joins let normalized tables be recombined for questions.`}
 />
@@ -246,14 +246,14 @@ Joins let normalized tables be recombined for questions.`}
 <MultipleChoice
   markdown={`In \`FROM orders o JOIN customers c ON o.customer_id = c.id\`, what are \`o\` and \`c\`?
 
+- Required SQLite keywords.
+  > You choose alias names yourself.
+- Column values copied from the database.
+  > They are names used in the SQL text, not stored values.
 - Permanent new table names.
   > Aliases last only for this query.
 - [o] Short aliases for the two tables inside this query.
   > Aliases make column references shorter and clearer.
-- Column values copied from the database.
-  > They are names used in the SQL text, not stored values.
-- Required SQLite keywords.
-  > You choose alias names yourself.
 
 Aliases are temporary nicknames for tables in a query.`}
 />
@@ -263,12 +263,12 @@ Aliases are temporary nicknames for tables in a query.`}
 
 - \`orders.id = customers.id\`
   > The order's id identifies the order, not the customer it belongs to.
+- \`orders.customer_id = customers.name\`
+  > The foreign key stores an id value, not the customer's name.
 - [o] \`orders.customer_id = customers.id\`
   > The foreign key in orders should match the primary key in customers.
 - \`orders.amount = customers.id\`
   > An order amount is not a customer identity.
-- \`orders.customer_id = customers.name\`
-  > The foreign key stores an id value, not the customer's name.
 
 The usual match is foreign key equals primary key.`}
 />
@@ -276,14 +276,14 @@ The usual match is foreign key equals primary key.`}
 <MultipleChoice
   markdown={`Why is "cartesian then filter" a helpful mental model?
 
-- It means you should always write \`CROSS JOIN\` in real queries.
-  > It is a teaching picture; normal joins usually write the match directly with \`ON\`.
+- It replaces the need for foreign keys.
+  > Foreign keys describe relationships; joins query through them.
 - [o] It shows that SQLite considers possible row pairings and keeps the ones where the \`ON\` condition is true.
   > The model makes the matching process visible.
 - It proves joins can only use two-row tables.
   > Joins work on tables of many sizes.
-- It replaces the need for foreign keys.
-  > Foreign keys describe relationships; joins query through them.
+- It means you should always write \`CROSS JOIN\` in real queries.
+  > It is a teaching picture; normal joins usually write the match directly with \`ON\`.
 
 The mental model helps you predict which pairings become result rows.`}
 />

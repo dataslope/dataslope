@@ -296,14 +296,14 @@ assert students["gpa"].between(0, 4).all(), "gpa out of [0,4]"`,
 <MultipleChoice
   markdown={`In a DataFrame of retail orders where each row represents one order line, which of these is most appropriate as a column?
 
-- The store address
-  > A store address could be a column if it varies per row, but it is a property of the store, not of the individual order line; it would typically come from a separate stores lookup table.
-- A pie chart of the orders
-  > A chart is a visualization of data, not a value that can be stored in a cell of a DataFrame column.
-- [o] The quantity of items in that order line
-  > Columns are *attributes of each row*. Quantity is a property of a single order line. Store address could also be a column, but only if it varies by row.
 - A spreadsheet formula
   > A formula is a computation instruction in a spreadsheet UI; a DataFrame column stores the computed values, not formulas.
+- [o] The quantity of items in that order line
+  > Columns are *attributes of each row*. Quantity is a property of a single order line. Store address could also be a column, but only if it varies by row.
+- A pie chart of the orders
+  > A chart is a visualization of data, not a value that can be stored in a cell of a DataFrame column.
+- The store address
+  > A store address could be a column if it varies per row, but it is a property of the store, not of the individual order line; it would typically come from a separate stores lookup table.
 
 A column is an attribute that applies to every row of the dataset.`}
 />
@@ -311,14 +311,14 @@ A column is an attribute that applies to every row of the dataset.`}
 <MultipleChoice
   markdown={`What does the term *grain* mean in the context of a tabular dataset?
 
-- The font used to display the data
-  > Font is a display property of a UI, not a concept in tabular data semantics.
-- The total size of the dataset in bytes
-  > Dataset size in bytes is a storage metric; grain is a semantic concept about what each row represents.
-- [o] The level of detail each row represents, for example "one row per customer" versus "one row per customer-month"
-  > Grain is one of the most under-discussed concepts in data work; getting it wrong leads to double-counting in joins and aggregations.
 - The color scheme of the table
   > Color scheme is a display concern; grain refers to the conceptual unit of each row in the data.
+- The font used to display the data
+  > Font is a display property of a UI, not a concept in tabular data semantics.
+- [o] The level of detail each row represents, for example "one row per customer" versus "one row per customer-month"
+  > Grain is one of the most under-discussed concepts in data work; getting it wrong leads to double-counting in joins and aggregations.
+- The total size of the dataset in bytes
+  > Dataset size in bytes is a storage metric; grain is a semantic concept about what each row represents.
 
 Always state the grain of a dataset before joining or aggregating it.`}
 />
@@ -326,14 +326,14 @@ Always state the grain of a dataset before joining or aggregating it.`}
 <MultipleChoice
   markdown={`Long form versus wide form: which one is generally easier for Pandas to filter, group, and plot?
 
+- Neither
+  > Both forms have their place, but the chapter makes a clear recommendation: long form for manipulation, wide form for display.
 - Wide
   > Wide form puts each time period or category in its own column, making it hard to use a single groupby or filter across periods.
 - They are equivalent
   > The two forms store the same information but are not equivalent for Pandas operations; long form maps cleanly onto groupby, filter, and plot calls.
 - [o] Long
   > In long form, each row is a single observation, which makes group-by, filter, and plot operations straightforward. Wide form is often nicer for *humans* to read, but harder to manipulate programmatically.
-- Neither
-  > Both forms have their place, but the chapter makes a clear recommendation: long form for manipulation, wide form for display.
 
 The standard workflow is "keep it long while working, pivot to wide for display."`}
 />

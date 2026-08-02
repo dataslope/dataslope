@@ -372,14 +372,14 @@ real analysis is a longer, deeper version of the same loop.
 <MultipleChoice
   markdown={`What's the *very first thing* you should do after loading any new dataset?
 
-- Run a regression.
-  > A regression before inspection can produce results that look plausible but are driven by data-quality problems you never noticed.
+- Compute the mean of every column.
+  > Computing means before inspection misses structural problems like wrong types, missing values, or unexpected scales that would make the means meaningless.
 - Make a plot.
   > Plotting before inspection is premature, you won't know which variables matter, which have NAs, or what type they are.
+- Run a regression.
+  > A regression before inspection can produce results that look plausible but are driven by data-quality problems you never noticed.
 - [o] Inspect it, \`dim()\`, \`head()\`, \`str()\`, \`summary()\`, so you understand what's actually there before assuming anything.
-  > Skipping inspection is the #1 cause of confidently-wrong analyses.
-- Compute the mean of every column.
-  > Computing means before inspection misses structural problems like wrong types, missing values, or unexpected scales that would make the means meaningless.`}
+  > Skipping inspection is the #1 cause of confidently-wrong analyses.`}
 />
 
 <MultipleChoice
@@ -387,25 +387,25 @@ real analysis is a longer, deeper version of the same loop.
 
 - Temperature causes ozone.
   > A correlation tells you two variables move together, not that one drives the other; many factors (sunlight, precursor emissions, mixing) could be responsible.
-- [o] The two vary together strongly in this dataset, a real association, but correlation alone doesn't prove causation; other plausible factors (sunlight, emissions, weather patterns) are not ruled out.
-  > Stating associations carefully, and not over-claiming, is core craft.
 - The model is broken.
   > A strong correlation (≈ 0.7) with a tiny p-value is exactly what a well-fitting model looks like, not a sign of failure.
 - Ozone causes temperature.
-  > Ozone is a trace gas produced partly by photochemical reactions, it does not heat the air enough to raise ambient temperature.`}
+  > Ozone is a trace gas produced partly by photochemical reactions, it does not heat the air enough to raise ambient temperature.
+- [o] The two vary together strongly in this dataset, a real association, but correlation alone doesn't prove causation; other plausible factors (sunlight, emissions, weather patterns) are not ruled out.
+  > Stating associations carefully, and not over-claiming, is core craft.`}
 />
 
 <MultipleChoice
   markdown={`What's the actual *deliverable* of an analysis like this one?
 
-- The raw data.
-  > Raw data is the input to the analysis, not the output, a stakeholder cannot make a decision from an uninterpreted CSV.
-- The R code.
-  > The code is the scaffolding that makes results trustworthy and reproducible, but it is not the finding itself.
 - [o] A clearly-written, honest interpretation of what was found, backed up by reproducible code and clear visualizations.
   > Code and plots are means; communicating an honest finding is the end.
+- The R code.
+  > The code is the scaffolding that makes results trustworthy and reproducible, but it is not the finding itself.
 - A p-value.
-  > A p-value is one number from one test, without context, an interpretation, and an understanding of effect size, it tells the reader almost nothing on its own.`}
+  > A p-value is one number from one test, without context, an interpretation, and an understanding of effect size, it tells the reader almost nothing on its own.
+- The raw data.
+  > Raw data is the input to the analysis, not the output, a stakeholder cannot make a decision from an uninterpreted CSV.`}
 />
 
 You've reached the last hands-on page of the course. What follows

@@ -233,25 +233,25 @@ chapter.
 
 - Because they return \`void\`
   > They don't even return \`void\`, the return type is omitted entirely.
+- Because they always return \`null\`
+  > They do not return \`null\`; they return the new object.
 - [o] Because their "return value" is the newly created object, handed back by \`new\`, not by the constructor itself
   > The constructor's job is to initialize, not to return.
 - Because Java's syntax does not allow return types in any method
-  > Methods do have return types; constructors are the exception.
-- Because they always return \`null\`
-  > They do not return \`null\`; they return the new object.`}
+  > Methods do have return types; constructors are the exception.`}
 />
 
 <MultipleChoice
   markdown={`What is the *main* purpose of a constructor?
 
-- To free memory when an object dies
-  > Java reclaims memory automatically.
-- [o] To run code that brings a new object into a valid initial state
-  > Construction = initialization + invariant enforcement.
 - To replace one object with another
   > It builds; it does not replace.
+- [o] To run code that brings a new object into a valid initial state
+  > Construction = initialization + invariant enforcement.
 - To print debug information
-  > Not the central purpose.`}
+  > Not the central purpose.
+- To free memory when an object dies
+  > Java reclaims memory automatically.`}
 />
 
 ## A small challenge

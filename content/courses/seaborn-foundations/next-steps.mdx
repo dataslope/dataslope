@@ -124,14 +124,14 @@ sentence you assemble from grammar, not a template you pick off a shelf.
   markdown={`Across this whole course, what most reliably determines which chart you
 should reach for?
 
-- The number of lines of code each chart takes to draw.
-  > Brevity is a nice side effect of tidy data, but it is not how you *choose* a chart. The choice follows from the data and the question, not the keystroke count.
-- [o] The kinds of variables you have (numeric vs categorical, and how many of each) together with the question you are asking.
-  > One numeric column suggests a distribution plot; two suggest a scatter; a category plus a number suggests the categorical family. The data types and the question drive the choice.
-- Whichever chart has the most visually impressive default styling.
-  > Styling serves communication once you have the right chart; it never decides *which* chart answers your question.
 - The alphabetical order of the Seaborn function names.
   > Function names are just lookup. What matters is matching the chart to the variable types and the question being asked.
+- [o] The kinds of variables you have (numeric vs categorical, and how many of each) together with the question you are asking.
+  > One numeric column suggests a distribution plot; two suggest a scatter; a category plus a number suggests the categorical family. The data types and the question drive the choice.
+- The number of lines of code each chart takes to draw.
+  > Brevity is a nice side effect of tidy data, but it is not how you *choose* a chart. The choice follows from the data and the question, not the keystroke count.
+- Whichever chart has the most visually impressive default styling.
+  > Styling serves communication once you have the right chart; it never decides *which* chart answers your question.
 
 Chart choice flows from the variable types you have and the question you are
 asking, the through-line of the entire course.`}
@@ -142,12 +142,12 @@ asking, the through-line of the entire course.`}
 in spirit from the function interface (\`relplot\`, \`catplot\`, ...) you used
 throughout this course?
 
-- It abandons tidy data, so you no longer need a long-format table.
-  > The objects interface expects the same tidy/long input. Tidy data remains the foundation regardless of which interface draws the plot.
-- [o] You start a \`Plot\` describing the data and roles, then compose the figure by adding layers with \`.add(...)\`, rather than picking one function up front.
-  > It expresses a chart as a composable grammar of layers, \`so.Plot(...).add(...)\`, instead of selecting a single ready-made function, while relying on the same statistical thinking.
 - It removes the need to think about what a chart reveals or hides.
   > The interface changes how you *spell* a plot, not the judgment behind it. The reveal/hide/break questions apply just as much.
+- [o] You start a \`Plot\` describing the data and roles, then compose the figure by adding layers with \`.add(...)\`, rather than picking one function up front.
+  > It expresses a chart as a composable grammar of layers, \`so.Plot(...).add(...)\`, instead of selecting a single ready-made function, while relying on the same statistical thinking.
+- It abandons tidy data, so you no longer need a long-format table.
+  > The objects interface expects the same tidy/long input. Tidy data remains the foundation regardless of which interface draws the plot.
 - It only works for interactive web dashboards, not static figures.
   > The objects interface produces ordinary Seaborn/matplotlib figures; it is about composability, not a different output medium.
 

@@ -38,12 +38,12 @@ flowchart TB
 
 - SQLite does not allow integer columns.
   > SQLite commonly uses integer id columns.
-- [o] One column value can point to only one course for each student row.
-  > A student who takes Math and History needs two separate links.
-- Course names are too long.
-  > The problem is relationship shape, not text length.
 - Primary keys cannot be joined.
   > Primary keys are often joined to foreign keys.
+- Course names are too long.
+  > The problem is relationship shape, not text length.
+- [o] One column value can point to only one course for each student row.
+  > A student who takes Math and History needs two separate links.
 
 Many-to-many means both sides need multiple links, so one pointer column is not enough.`}
 />
@@ -292,14 +292,14 @@ A junction table turns a many-to-many relationship into stored link rows.`}
 <MultipleChoice
   markdown={`In \`enrollments(student_id, course_id)\`, what does one row represent?
 
-- One student by themselves.
-  > Student details live in the students table.
-- One course by itself.
-  > Course details live in the courses table.
 - [o] One student-course connection.
   > The two ids together say that a specific student is enrolled in a specific course.
+- One student by themselves.
+  > Student details live in the students table.
 - Every student in every course.
   > One row represents one connection, not all connections.
+- One course by itself.
+  > Course details live in the courses table.
 
 The junction row is the relationship instance.`}
 />
@@ -307,14 +307,14 @@ The junction row is the relationship instance.`}
 <MultipleChoice
   markdown={`Why use \`PRIMARY KEY (student_id, course_id)\` on enrollments?
 
-- It makes every student take exactly one course.
-  > Students can still appear in many rows with different courses.
-- [o] It prevents the exact same student-course pair from being inserted twice.
-  > The pair must be unique, while each individual id can repeat.
 - It prevents a course from having many students.
   > A course id can still appear in many enrollment rows.
 - It hides the table from joins.
   > Primary keys do not hide tables.
+- It makes every student take exactly one course.
+  > Students can still appear in many rows with different courses.
+- [o] It prevents the exact same student-course pair from being inserted twice.
+  > The pair must be unique, while each individual id can repeat.
 
 The composite primary key protects the uniqueness of each link.`}
 />
@@ -322,12 +322,12 @@ The composite primary key protects the uniqueness of each link.`}
 <MultipleChoice
   markdown={`Where should a \`grade\` for Ada in Math be stored?
 
-- On Ada's student row only.
-  > Ada may have different grades in different courses.
-- On the Math course row only.
-  > Each student may have a different grade in Math.
 - [o] On the enrollment row connecting Ada to Math.
   > The grade describes that specific relationship.
+- On the Math course row only.
+  > Each student may have a different grade in Math.
+- On Ada's student row only.
+  > Ada may have different grades in different courses.
 - In both students and courses as copied text.
   > Copying the same fact into multiple places creates inconsistency.
 

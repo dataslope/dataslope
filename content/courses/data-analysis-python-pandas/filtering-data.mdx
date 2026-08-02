@@ -362,14 +362,14 @@ assert isinstance(light_females, pd.DataFrame)`,
 <MultipleChoice
   markdown={`Why must you use \`&\` instead of \`and\` when combining two boolean Series?
 
-- \`and\` does not exist in Python
-  > \`and\` is a standard Python keyword; it exists but operates on single boolean scalars, not on entire Series of booleans.
 - It is shorter
   > \`&\` is one character while \`and\` is three; brevity is not the reason, the difference is that \`&\` performs element-wise boolean logic on Series.
 - [o] \`and\` operates on single boolean values and tries to coerce a whole Series into one, which is ambiguous, while \`&\` is element-wise on Series
   > \`a and b\` requires \`a\` to be a single True/False, but a Series of length > 1 cannot be reduced to one. Pandas raises the "ambiguous truth value" error.
 - \`&\` is faster
   > Speed is not the reason to prefer \`&\`; the reason is correctness, \`and\` raises a ValueError on Series, while \`&\` applies the boolean operation element-wise.
+- \`and\` does not exist in Python
+  > \`and\` is a standard Python keyword; it exists but operates on single boolean scalars, not on entire Series of booleans.
 - Pandas hates English
   > This is a humorous distractor; the restriction exists because Python's \`and\` keyword is semantically defined to work on scalar booleans, not vectorized collections.
 
@@ -379,14 +379,14 @@ Train your fingers: \`&\`, \`|\`, \`~\`, and parentheses around each condition.`
 <MultipleChoice
   markdown={`Which of these is the cleanest way to filter for rows whose \`dept\` column is one of "Eng", "Sales", or "Ops"?
 
-- \`df[df["dept"] == "Eng" or df["dept"] == "Sales" or df["dept"] == "Ops"]\`
-  > Using Python's \`or\` keyword with two Series raises the "ambiguous truth value" error; you must use \`|\` for element-wise boolean OR, but \`isin\` is still cleaner for multiple values.
-- \`df[df["dept"] == ["Eng", "Sales", "Ops"]]\`
-  > Comparing a Series to a list with \`==\` does an element-wise equality check between the Series and the list by position, not a membership test, producing a different (usually wrong) result.
 - [o] \`df[df["dept"].isin(["Eng", "Sales", "Ops"])]\`
   > \`isin\` is the idiomatic Pandas way to express set membership across many values.
 - \`df.dept = "Eng" | "Sales" | "Ops"\`
   > This attempts to assign a value to the \`dept\` column rather than filter on it, and \`"Eng" | "Sales"\` is not valid Python for string values.
+- \`df[df["dept"] == "Eng" or df["dept"] == "Sales" or df["dept"] == "Ops"]\`
+  > Using Python's \`or\` keyword with two Series raises the "ambiguous truth value" error; you must use \`|\` for element-wise boolean OR, but \`isin\` is still cleaner for multiple values.
+- \`df[df["dept"] == ["Eng", "Sales", "Ops"]]\`
+  > Comparing a Series to a list with \`==\` does an element-wise equality check between the Series and the list by position, not a membership test, producing a different (usually wrong) result.
 
 \`isin\` scales cleanly to long lists and is faster than chaining ORs.`}
 />
@@ -394,14 +394,14 @@ Train your fingers: \`&\`, \`|\`, \`~\`, and parentheses around each condition.`
 <MultipleChoice
   markdown={`Why is \`df.loc[mask, "col"] = value\` preferred over \`df[mask]["col"] = value\` when modifying data?
 
-- The two are equivalent
-  > The chained form \`df[mask]["col"] = value\` may operate on a temporary copy rather than the original DataFrame, meaning the assignment silently has no effect, so they are not equivalent.
-- The second is shorter
-  > Brevity is not the issue; the chained assignment form is shorter but may silently fail to modify the original DataFrame due to copy-on-write semantics.
-- [o] The chained form may silently operate on a *copy* and fail to update the original (the SettingWithCopyWarning); \`loc\` guarantees in-place update
-  > This is one of the most common silent bugs in Pandas. \`loc\` is the safe way.
 - The second is faster
   > The chained form is not faster; it creates an intermediate copy, which is both slower and potentially wrong.
+- [o] The chained form may silently operate on a *copy* and fail to update the original (the SettingWithCopyWarning); \`loc\` guarantees in-place update
+  > This is one of the most common silent bugs in Pandas. \`loc\` is the safe way.
+- The second is shorter
+  > Brevity is not the issue; the chained assignment form is shorter but may silently fail to modify the original DataFrame due to copy-on-write semantics.
+- The two are equivalent
+  > The chained form \`df[mask]["col"] = value\` may operate on a temporary copy rather than the original DataFrame, meaning the assignment silently has no effect, so they are not equivalent.
 
 When in doubt, use \`loc\` for assignments.`}
 />

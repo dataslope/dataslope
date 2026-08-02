@@ -480,12 +480,12 @@ if (r[0].score !== 90) throw new Error("should not change unrelated entries");`,
 
 - always returns the same type
   > Consistent return types are good practice, but purity is about consistent *values* for the same inputs and the absence of side effects, not about type consistency.
+- doesn't use any \`if\` statements
+  > Control flow structures like \`if\` say nothing about purity; a function with many \`if\` branches can still be pure, and a function with no \`if\` statements can still read global state or mutate its argument.
 - uses arrow-function syntax
   > Arrow functions are just a syntax shorthand; purity is a behavioural property that applies equally to regular \`function\` declarations and arrow functions.
 - [o] returns the same output for the same input and has no side effects
   > Purity is about *behavior*, not syntax: a pure function depends only on its arguments and changes nothing outside itself (no I/O, no mutation of inputs, no reliance on hidden state).
-- doesn't use any \`if\` statements
-  > Control flow structures like \`if\` say nothing about purity; a function with many \`if\` branches can still be pure, and a function with no \`if\` statements can still read global state or mutate its argument.
 
 Purity is what makes functions easy to test, easy to combine, and easy to reason about. It's a property of *what* a function does, not *how* it's written.`}
 />

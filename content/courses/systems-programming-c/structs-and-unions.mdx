@@ -651,14 +651,14 @@ int main(void) {
 <MultipleChoice
   markdown={`What is the key property of a \`union\`?
 
-- All members live at consecutive offsets, like a struct.
-  > That is how a struct works, not a union.
 - The union always uses the sum of its members' sizes.
   > A union uses the size of its *largest* member.
 - [o] All members share the same storage; the union holds at most one of them at a time, and its size is the size of the largest member (plus padding).
   > Writing one member overwrites the others.
 - Unions are always initialized to zero on declaration.
-  > Initialization rules are the same as for any other variable.`}
+  > Initialization rules are the same as for any other variable.
+- All members live at consecutive offsets, like a struct.
+  > That is how a struct works, not a union.`}
 />
 
 <MultipleChoice
@@ -666,10 +666,10 @@ int main(void) {
 
 - A \`void *data\` member that you malloc separately.
   > That works but requires *two* allocations.
+- A bitfield.
+  > Bitfields pack small integers, not variable-length data.
 - A nested struct.
   > Nested structs do not change allocation count.
 - [o] A flexible array member declared as the last field, e.g. \`char data[];\`, allocated via \`malloc(sizeof *s + n)\`.
-  > One allocation holds the header and the payload contiguously.
-- A bitfield.
-  > Bitfields pack small integers, not variable-length data.`}
+  > One allocation holds the header and the payload contiguously.`}
 />

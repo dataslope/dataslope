@@ -570,12 +570,12 @@ effective in high dimensions but slow on large datasets.
 <MultipleChoice
   markdown={`You replace a linear model with a very deep decision tree. Training error drops to near zero but validation error rises. In bias–variance terms, what happened?
 
-- You increased bias.
-  > A more flexible model has *lower* bias; near-zero train error reflects low bias.
-- [o] You decreased bias but increased variance, the flexible model now overfits.
-  > More capacity reduces bias but raises variance; the widening train/validation gap is the variance cost.
 - Both bias and variance decreased.
   > If both fell, validation error would improve, not rise.
+- [o] You decreased bias but increased variance, the flexible model now overfits.
+  > More capacity reduces bias but raises variance; the widening train/validation gap is the variance cost.
+- You increased bias.
+  > A more flexible model has *lower* bias; near-zero train error reflects low bias.
 - Bias and variance are unrelated to model flexibility.
   > Model flexibility is precisely the knob that trades one for the other.`}
 />
@@ -583,12 +583,12 @@ effective in high dimensions but slow on large datasets.
 <MultipleChoice
   markdown={`You want regularization that can drive some coefficients exactly to **zero**, effectively selecting features. Which penalty does that?
 
-- L2 (ridge).
-  > L2 shrinks coefficients toward zero but rarely exactly to zero.
-- [o] L1 (lasso).
-  > The L1 penalty's geometry produces sparse solutions, some coefficients become exactly zero (feature selection).
 - Neither can zero out coefficients.
   > L1 specifically can; that's its defining property versus L2.
+- [o] L1 (lasso).
+  > The L1 penalty's geometry produces sparse solutions, some coefficients become exactly zero (feature selection).
+- L2 (ridge).
+  > L2 shrinks coefficients toward zero but rarely exactly to zero.
 - Both zero out coefficients equally.
   > Only L1 reliably produces exact zeros; L2 keeps them small but nonzero.`}
 />

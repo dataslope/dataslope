@@ -419,14 +419,14 @@ with pure functions.
 <MultipleChoice
   markdown={`Which language feature, introduced in C# 3.0 alongside LINQ, allows methods like \`Where\` and \`Select\` to *appear* to be members of \`IEnumerable<T>\` without actually modifying that interface?
 
+- Expression trees
+  > Expression trees are what let LINQ to Providers translate lambdas into SQL, they are not how \`Where\` is attached to a collection.
 - Generics
   > Generics shipped in C# 2.0 and let \`IEnumerable<T>\` exist, but they don't add \`Where\` to it as a callable method.
 - Anonymous types
   > Anonymous types let you build ad-hoc shapes mid-pipeline, but they have nothing to do with how \`Where\` attaches to \`IEnumerable<T>\`.
 - [o] Extension methods
   > Extension methods let \`Enumerable.Where(this IEnumerable<T> source, …)\` be invoked as if \`Where\` were a member of \`IEnumerable<T>\`, even though the interface itself is untouched.
-- Expression trees
-  > Expression trees are what let LINQ to Providers translate lambdas into SQL, they are not how \`Where\` is attached to a collection.
 
 Extension methods are the trick. \`Enumerable.Where\` is a static method
 on the \`Enumerable\` class; the \`this\` modifier on its first parameter
@@ -437,14 +437,14 @@ had grown a new method.`}
 <MultipleChoice
   markdown={`Which of the following best describes how this course recommends adopting functional patterns in an existing C# codebase?
 
-- Rewrite all classes as static functions and remove inheritance entirely.
-  > That is a common caricature of functional programming, but it is not what this course teaches. Modern C# functional style is additive, not a rewrite.
-- Use functional patterns only in greenfield F# projects.
-  > Functional patterns belong in normal C# code, in normal OO codebases. This course is specifically about applying them in C#.
-- [o] Apply functional patterns, immutability, pure functions, pipelines, primarily to the data-processing layers, while keeping the rest of the OO design.
-  > The functional renaissance was additive: functional ideas mostly attack the place most bugs live (data transformation and state mutation), and coexist with OO services, interfaces, and classes.
 - Avoid LINQ in production code because it is slower than imperative loops.
   > LINQ to Objects is competitive with hand loops in the vast majority of code paths, and the readability benefit is usually decisive.
+- [o] Apply functional patterns, immutability, pure functions, pipelines, primarily to the data-processing layers, while keeping the rest of the OO design.
+  > The functional renaissance was additive: functional ideas mostly attack the place most bugs live (data transformation and state mutation), and coexist with OO services, interfaces, and classes.
+- Use functional patterns only in greenfield F# projects.
+  > Functional patterns belong in normal C# code, in normal OO codebases. This course is specifically about applying them in C#.
+- Rewrite all classes as static functions and remove inheritance entirely.
+  > That is a common caricature of functional programming, but it is not what this course teaches. Modern C# functional style is additive, not a rewrite.
 
 Functional patterns in C# are a *layer*, not a *replacement*. The
 biggest wins come from applying immutability and pipelines to the

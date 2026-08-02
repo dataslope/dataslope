@@ -147,14 +147,14 @@ the *engine* you ask them on, are tuned for analysis.
 <MultipleChoice
   markdown={`Which question is **analytical** (OLAP) rather than application-oriented (OLTP)?
 
-- Save a new order to the database.
-  > Writing a single new record is classic transactional (OLTP) work, not analysis.
-- Show the details of order #4821 on a confirmation page.
-  > Fetching one specific row to display is an OLTP read, not an analytical summary.
 - [o] Compare average order value between first-time and returning customers across the last year.
   > This scans many rows to produce a small comparison, the essence of analytical (OLAP) SQL.
+- Show the details of order #4821 on a confirmation page.
+  > Fetching one specific row to display is an OLTP read, not an analytical summary.
 - Update the shipping status of order #91 to "shipped".
   > Updating one row's state is transactional application work.
+- Save a new order to the database.
+  > Writing a single new record is classic transactional (OLTP) work, not analysis.
 
 Analytical questions sweep across many rows to produce a summary or
 comparison; transactional questions read or change a few specific rows.`}
@@ -165,12 +165,12 @@ comparison; transactional questions read or change a few specific rows.`}
 
 - It compresses rows so transactions commit faster.
   > Faster commits help OLTP writes, not the analytical reads in question; this also misstates how column stores help.
-- [o] A query that needs only a few columns can read just those columns and skip the rest of each row.
-  > Storing each column together lets the engine read \`price\` alone instead of every value in every row, a huge saving on wide tables.
 - It guarantees every query touches every column.
   > That is the opposite of the benefit; column stores let queries *avoid* unneeded columns.
 - It removes the need to write \`GROUP BY\`.
   > Storage layout does not change the SQL you write; you still use \`GROUP BY\`.
+- [o] A query that needs only a few columns can read just those columns and skip the rest of each row.
+  > Storing each column together lets the engine read \`price\` alone instead of every value in every row, a huge saving on wide tables.
 
 Column stores shine when a query reads a few columns across many rows,
 the typical analytical pattern.`}
@@ -179,14 +179,14 @@ the typical analytical pattern.`}
 <MultipleChoice
   markdown={`What is **vectorized execution**, and why does it suit OLAP?
 
-- Running each query on a separate CPU core.
-  > That describes parallelism across cores; vectorization is about processing batches of values per operation, regardless of core count.
 - [o] Processing a batch of column values at a time in a tight loop, instead of evaluating the whole query one row at a time.
   > Batching values cuts per-row overhead, and column storage lines the values up ready to stream, together they make scans fast.
-- Storing each row as a single vector on disk.
-  > That is closer to row storage; vectorized execution is about *processing* batches, and pairs with column storage.
 - Converting SQL into spreadsheet formulas.
   > Vectorization is an engine technique for fast batch processing, unrelated to spreadsheets.
+- Running each query on a separate CPU core.
+  > That describes parallelism across cores; vectorization is about processing batches of values per operation, regardless of core count.
+- Storing each row as a single vector on disk.
+  > That is closer to row storage; vectorized execution is about *processing* batches, and pairs with column storage.
 
 Vectorized execution processes columns in batches, which is why analytical
 engines fly through large scans.`}

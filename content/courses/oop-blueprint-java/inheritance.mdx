@@ -362,14 +362,14 @@ public class Main {
 <MultipleChoice
   markdown={`What does \`super(name)\` do inside a subclass constructor?
 
-- Calls a static method on the parent class
-  > It calls the parent's *constructor*, not a static method.
 - [o] Invokes the parent class's constructor with the given arguments to initialize the parent part of the new object
   > It must be the first statement of the subclass constructor.
-- Creates an entirely separate parent object
-  > No second object is created, the subclass instance *is* also an instance of the parent.
+- Calls a static method on the parent class
+  > It calls the parent's *constructor*, not a static method.
 - Marks the constructor as overriding
-  > Constructors aren't overridden; \`@Override\` is for methods.`}
+  > Constructors aren't overridden; \`@Override\` is for methods.
+- Creates an entirely separate parent object
+  > No second object is created, the subclass instance *is* also an instance of the parent.`}
 />
 
 <MultipleChoice
@@ -377,10 +377,10 @@ public class Main {
 
 - It is required for the override to take effect at runtime
   > It is not required for the override to work; the compiler does still call the subclass version without it.
-- It tells the JVM to skip the parent method entirely
-  > That is what overriding does in general, regardless of the annotation.
 - [o] It asks the compiler to verify that you really are overriding an inherited method, catching typos and signature mismatches at compile time
   > It's a cheap, valuable form of static checking.
+- It tells the JVM to skip the parent method entirely
+  > That is what overriding does in general, regardless of the annotation.
 - It improves runtime performance of the method
   > It has no effect on performance.`}
 />
@@ -388,12 +388,12 @@ public class Main {
 <MultipleChoice
   markdown={`Which is the *best* reason to choose inheritance over composition?
 
-- You want to reuse code from another class
-  > Composition can do that too, and usually more safely.
 - The other class has many methods
   > Method count is not a design criterion.
 - [o] The new class is genuinely a *kind of* the other class, and the parent was designed for extension
   > True "is-a" relationships with extension-ready base classes are where inheritance shines.
+- You want to reuse code from another class
+  > Composition can do that too, and usually more safely.
 - You want to avoid creating new files
   > File hygiene is not a design criterion.`}
 />

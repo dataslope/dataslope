@@ -325,14 +325,14 @@ at the period, conceptually just "do the AR/I/MA trick at lag 12 too."
 <MultipleChoice
   markdown={`A teammate says, "I'll use an MA(2) model, that's just a 2-period moving average of the data, right?" What's the correction?
 
-- They're right; MA(2) is a 2-period rolling mean
-  > These are different objects that unfortunately share a name. A rolling mean averages past *values*; an MA(2) *model* is built from past *shocks*.
 - [o] No, an MA(q) *model* expresses each value as a function of past *shocks* (forecast errors), which is unrelated to a rolling average of past values
   > The MA in "MA model" refers to a moving average *of the error terms*, a forecasting construct. The \`rolling(2).mean()\` smoother averages observed values. Confusing them is a classic trap.
-- They're right, but only if the window is centered
-  > Centering is a property of a rolling-mean smoother and irrelevant to an MA model. The two aren't the same thing under any windowing choice.
+- They're right; MA(2) is a 2-period rolling mean
+  > These are different objects that unfortunately share a name. A rolling mean averages past *values*; an MA(2) *model* is built from past *shocks*.
 - MA(2) means two differences
   > Differences are the "I"/\`d\` part of ARIMA, not the MA part. MA(2) means two moving-average (shock) terms.
+- They're right, but only if the window is centered
+  > Centering is a property of a rolling-mean smoother and irrelevant to an MA model. The two aren't the same thing under any windowing choice.
 
 An MA(q) model is built from past shocks/errors; it is not a rolling average of the observed values despite the shared name.`}
 />
@@ -340,14 +340,14 @@ An MA(q) model is built from past shocks/errors; it is not a rolling average of 
 <MultipleChoice
   markdown={`In \`ARIMA(p, d, q)\`, which parameter do you read from the **PACF**, and which from the **ACF**?
 
-- \`p\` from the ACF, \`q\` from the PACF
-  > This is reversed. The PACF cut-off gives the AR order \`p\`; the ACF cut-off gives the MA order \`q\`.
 - [o] \`p\` (AR order) from the PACF cut-off; \`q\` (MA order) from the ACF cut-off; \`d\` from how many differences achieve stationarity
   > PACF -> AR order \`p\`, ACF -> MA order \`q\`, and \`d\` is the number of differences needed for stationarity. That mapping is the heart of order identification.
 - Both \`p\` and \`q\` from the ACF
   > The ACF alone can't separate AR from MA order; that's exactly why the PACF exists. \`p\` comes from the PACF, \`q\` from the ACF.
 - \`d\` from the ACF and \`p\`, \`q\` from AIC only
   > \`d\` comes from stationarity testing (differencing), not the ACF shape directly; and \`p\`/\`q\` are identified from PACF/ACF (with AIC as a tie-breaker), not AIC alone.
+- \`p\` from the ACF, \`q\` from the PACF
+  > This is reversed. The PACF cut-off gives the AR order \`p\`; the ACF cut-off gives the MA order \`q\`.
 
 PACF cut-off -> \`p\`, ACF cut-off -> \`q\`, and the number of differences for stationarity -> \`d\`.`}
 />
@@ -487,12 +487,12 @@ assert pick["best_order"] == lower, "best_order must be the lower-AIC model"`,
 <MultipleChoice
   markdown={`What does the **AR** part of an ARIMA model use to predict the next value?
 
-- The next few future values
-  > Using future values would be leakage and is impossible at prediction time. AR uses only the *past*.
-- [o] A weighted sum of the series' own recent past *values*
-  > "Autoregressive" means regressing the series on its own lagged values, each prediction is a weighted combination of recent observations plus a shock.
 - A weighted sum of recent forecast *errors*
   > That describes the *MA* part (past shocks), not the AR part. AR uses past values; MA uses past errors.
+- [o] A weighted sum of the series' own recent past *values*
+  > "Autoregressive" means regressing the series on its own lagged values, each prediction is a weighted combination of recent observations plus a shock.
+- The next few future values
+  > Using future values would be leakage and is impossible at prediction time. AR uses only the *past*.
 - A rolling average of the data
   > A rolling average is a smoother, not the AR component. AR estimates specific coefficients on lagged values, not a simple window mean.
 
@@ -504,12 +504,12 @@ The AR component predicts from a weighted sum of recent past *values* (the MA co
 
 - Because the model gets lazier over time
   > Models don't fatigue. The widening reflects genuinely growing uncertainty, not a defect in effort.
-- [o] Because each step ahead builds on the uncertain steps before it, so prediction errors accumulate with distance
-  > Forecasting many steps out chains predictions on top of predictions, compounding uncertainty. The interval must widen to honestly represent how much less is known further ahead.
-- Because the training data runs out
-  > The training data is fixed; that's not what drives the widening. It's the *compounding* of forecast uncertainty step by step.
 - Because of a plotting artifact
   > The widening is a real statistical property of multi-step forecasts, computed from the model, not a quirk of the chart.
+- Because the training data runs out
+  > The training data is fixed; that's not what drives the widening. It's the *compounding* of forecast uncertainty step by step.
+- [o] Because each step ahead builds on the uncertain steps before it, so prediction errors accumulate with distance
+  > Forecasting many steps out chains predictions on top of predictions, compounding uncertainty. The interval must widen to honestly represent how much less is known further ahead.
 
 Multi-step forecasts compound uncertainty, so intervals must widen the further ahead you predict.`}
 />
@@ -517,14 +517,14 @@ Multi-step forecasts compound uncertainty, so intervals must widen the further a
 <MultipleChoice
   markdown={`A model has the **lowest AIC** among your candidates. Can you conclude it will forecast the future most accurately?
 
+- No, because AIC can't be computed for ARIMA
+  > AIC is routinely reported for ARIMA fits. The issue isn't computability, it's that in-sample AIC isn't the same as out-of-sample accuracy.
 - Yes, lowest AIC always means best forecasts
   > AIC measures *in-sample* fit with a complexity penalty, not out-of-sample accuracy. The lowest-AIC model can still forecast worse on unseen data.
 - [o] No, AIC is an in-sample criterion; the only way to judge forecast accuracy is to test on held-out future data
   > AIC is a useful shortlisting tool, but it rewards fitting the training data. Genuine forecast skill must be measured out-of-sample, on data the model never saw.
 - Yes, as long as the AIC is negative
   > The sign of AIC is meaningless on its own (it depends on scale); negativity says nothing about forecast accuracy. Only out-of-sample testing settles that.
-- No, because AIC can't be computed for ARIMA
-  > AIC is routinely reported for ARIMA fits. The issue isn't computability, it's that in-sample AIC isn't the same as out-of-sample accuracy.
 
 AIC compares in-sample fit-vs-complexity; forecast accuracy requires out-of-sample validation, which AIC cannot replace.`}
 />

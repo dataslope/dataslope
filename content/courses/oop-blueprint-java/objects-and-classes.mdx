@@ -355,10 +355,10 @@ a=3, b=1
   > They are different in a very specific way.
 - An object is a description; a class is built from it
   > That's backwards.
-- [o] A class is a blueprint that describes structure and behavior; an object (instance) is an individual thing created from that blueprint
-  > You can have many objects of the same class, each with its own field values.
 - A class can have state but an object cannot
-  > Objects are the things that *carry* state; classes are descriptions.`}
+  > Objects are the things that *carry* state; classes are descriptions.
+- [o] A class is a blueprint that describes structure and behavior; an object (instance) is an individual thing created from that blueprint
+  > You can have many objects of the same class, each with its own field values.`}
 />
 
 <MultipleChoice
@@ -366,12 +366,12 @@ a=3, b=1
 
 - It is also incremented because all dogs share the field
   > Each instance has its own copy of the fields.
-- It is set to 0
-  > Not modified at all.
 - [o] It stays the same, each object has its own copy of the fields
   > \`age\` belongs to each instance individually.
 - The program raises an error
-  > No error; instance fields are independent.`}
+  > No error; instance fields are independent.
+- It is set to 0
+  > Not modified at all.`}
 />
 
 <MultipleChoice
@@ -379,10 +379,10 @@ a=3, b=1
 
 - The class itself (the blueprint)
   > That's closer to what static members operate on.
+- A field automatically named \`this\`
+  > \`this\` is a keyword, not a user-defined field.
 - A copy of every other object of the same class
   > No, \`this\` is a single reference.
 - [o] The specific object the method was called on
-  > If you call \`rex.describe()\`, then inside \`describe\`, \`this\` is \`rex\`.
-- A field automatically named \`this\`
-  > \`this\` is a keyword, not a user-defined field.`}
+  > If you call \`rex.describe()\`, then inside \`describe\`, \`this\` is \`rex\`.`}
 />

@@ -111,14 +111,14 @@ flowchart TB
 <MultipleChoice
   markdown={`In a typical app, where does the real, long-lived data actually live?
 
-- Inside the buttons and screens of the application itself.
-  > The visible part of an app builds screens, but it does not durably store the underlying data; it asks the database for it.
 - [o] In the database, which the application queries whenever it needs to store or retrieve information.
   > The application is a face on top of the data; the database is the system that durably remembers everything.
-- Only in the user's memory.
-  > People forget; the whole point of a database is durable, reliable storage independent of any person.
 - Nowhere, apps recalculate everything each time.
   > Apps must remember orders, messages, and accounts between sessions, which is exactly why they rely on a database.
+- Inside the buttons and screens of the application itself.
+  > The visible part of an app builds screens, but it does not durably store the underlying data; it asks the database for it.
+- Only in the user's memory.
+  > People forget; the whole point of a database is durable, reliable storage independent of any person.
 
 The application handles interaction; the database handles durable storage, and the two communicate through queries.`}
 />
@@ -126,14 +126,14 @@ The application handles interaction; the database handles durable storage, and t
 <MultipleChoice
   markdown={`What is a SQL **query**, in plain terms?
 
-- A type of button inside an application.
-  > Buttons are part of the application's interface; a query is the request the app sends to the database when a button is used.
+- The physical disk where data is stored.
+  > Storage hardware holds the data; a query is the request that asks the database to read or change that data.
 - A backup copy of the database.
   > A backup is a safety copy of data; a query is an instruction or question sent to the database.
 - [o] A precise request, a question or an instruction, sent to the database, written in SQL.
   > Whether it reads data or changes it, a query is the message that tells the database exactly what to do.
-- The physical disk where data is stored.
-  > Storage hardware holds the data; a query is the request that asks the database to read or change that data.
+- A type of button inside an application.
+  > Buttons are part of the application's interface; a query is the request the app sends to the database when a button is used.
 
 A query is how you ask a database a question or tell it to make a change.`}
 />

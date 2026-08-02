@@ -70,14 +70,14 @@ no binning required.
   markdown={`On an ECDF of \`flipper_length_mm\`, you find the x-value where the curve
 crosses **y = 0.5**. What have you just read off?
 
-- The mean flipper length.
-  > The ECDF reads *percentiles* by proportion below a value. The point at y = 0.5 is the median, which equals the mean only for symmetric data.
 - [o] The median flipper length, the value with half the observations at or below it.
   > By definition the ECDF's height is the proportion of observations $\\le$ x, so y = 0.5 marks the value where half the data lies at or below: the median.
-- The most common flipper length.
-  > The most common value is the mode, which corresponds to the *steepest* part of the ECDF, not the crossing at y = 0.5.
 - The total number of penguins.
   > The y-axis is a proportion from 0 to 1, not a count; the sample size is not read off the curve's height.
+- The most common flipper length.
+  > The most common value is the mode, which corresponds to the *steepest* part of the ECDF, not the crossing at y = 0.5.
+- The mean flipper length.
+  > The ECDF reads *percentiles* by proportion below a value. The point at y = 0.5 is the median, which equals the mean only for symmetric data.
 
 The ECDF's y-axis is the cumulative proportion, so reading across at any
 height gives you that percentile's value, y = 0.5 is the median.`}
@@ -289,14 +289,14 @@ g = sns.displot(penguins, x="flipper_length_mm", hue="species", kind="ecdf")
 <MultipleChoice
   markdown={`What does the height of an ECDF curve at a given x-value represent?
 
-- The count of observations equal to that x-value.
-  > The ECDF tracks a cumulative *proportion*, not a count at a single value, and its y-axis runs from 0 to 1.
-- [o] The proportion of observations less than or equal to that x-value.
-  > By definition the ECDF's height is the fraction of the data at or below x, so it rises monotonically from 0 to 1.
 - The probability density at that x-value.
   > Density at a point is what a KDE estimates; the ECDF gives the *cumulative* proportion up to and including that point, not the density at it.
+- [o] The proportion of observations less than or equal to that x-value.
+  > By definition the ECDF's height is the fraction of the data at or below x, so it rises monotonically from 0 to 1.
 - The number of bins covering that x-value.
   > The ECDF uses no bins at all, that is one of its main advantages over a histogram.
+- The count of observations equal to that x-value.
+  > The ECDF tracks a cumulative *proportion*, not a count at a single value, and its y-axis runs from 0 to 1.
 
 An ECDF reads off cumulative proportions: at x, the curve's height is the
 share of observations $\\le$ x.`}
@@ -306,14 +306,14 @@ share of observations $\\le$ x.`}
   markdown={`Why is an ECDF often a better choice than overlapping histograms for
 comparing **several** groups on one axis?
 
-- ECDFs use more bins, so they capture finer detail.
-  > ECDFs use *no* bins; the advantage is about occlusion, not bin resolution.
 - [o] Each group is a single line, so multiple curves can cross and overlap without hiding one another.
   > Filled histogram bars occlude the groups behind them, but thin monotonic ECDF curves stay readable even when several overlap.
-- ECDFs show the mode of each group more clearly than a histogram.
-  > Modes (peaks) are read more easily from a histogram's humps; the ECDF's strength is exact percentiles and clean group comparison, not modality.
 - ECDFs automatically remove outliers.
   > An ECDF plots every observation, including outliers; it does not discard any data.
+- ECDFs use more bins, so they capture finer detail.
+  > ECDFs use *no* bins; the advantage is about occlusion, not bin resolution.
+- ECDFs show the mode of each group more clearly than a histogram.
+  > Modes (peaks) are read more easily from a histogram's humps; the ECDF's strength is exact percentiles and clean group comparison, not modality.
 
 Because each distribution becomes one thin monotonic line, ECDFs compare
 many groups without the occlusion that plagues overlapping filled
@@ -323,14 +323,14 @@ histograms.`}
 <MultipleChoice
   markdown={`When is a **rug plot** the right tool?
 
-- As the main view for a column with tens of thousands of observations.
-  > With that many points the ticks merge into a solid bar and stop being informative; a histogram or ECDF summarizes density better at scale.
 - [o] As an add-on to another plot, showing the raw individual positions when points are sparse enough to distinguish.
   > A rug layered under a histogram or beside a scatter marks where the actual observations sit, which is most useful when the points are few enough to tell apart.
 - To display the relationship between two numeric variables.
   > Two-variable relationships are a scatter plot's job; a rug marks 1-D positions along an axis.
 - To compute and display group means.
   > A rug plots individual observations, not aggregates; it does no summarizing or averaging.
+- As the main view for a column with tens of thousands of observations.
+  > With that many points the ticks merge into a solid bar and stop being informative; a histogram or ECDF summarizes density better at scale.
 
 A rug adds the raw 1-D positions to a plot and is most useful as a sparse
 companion to another view, not as a standalone chart for large data.`}

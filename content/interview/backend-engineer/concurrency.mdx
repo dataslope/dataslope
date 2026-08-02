@@ -232,14 +232,14 @@ around the whole operation so it appears atomic to other threads.
 <MultipleChoice
   markdown={`You have a **CPU-bound** function and want it to run faster on a multi-core machine using Python. What should you reach for?
 
-- \`threading\` with one thread per core.
-  > CPython's GIL serializes bytecode execution, so threads give no parallel speedup for CPU-bound work.
 - [o] \`multiprocessing\`, one process per core.
   > Separate processes each have their own interpreter and GIL, so they run Python bytecode truly in parallel across cores.
 - \`asyncio\` with many coroutines.
   > Async is single-threaded cooperative concurrency for I/O; a CPU-bound coroutine just blocks the event loop.
 - A larger thread pool.
-  > More threads do not bypass the GIL; the CPU work is still serialized.`}
+  > More threads do not bypass the GIL; the CPU work is still serialized.
+- \`threading\` with one thread per core.
+  > CPython's GIL serializes bytecode execution, so threads give no parallel speedup for CPU-bound work.`}
 />
 
 <MultipleChoice
@@ -249,23 +249,23 @@ around the whole operation so it appears atomic to other threads.
   > Python ints are arbitrary precision; there is no overflow. The loss is a concurrency bug.
 - [o] \`+= 1\` is read-modify-write, not atomic, so interleaving causes lost updates (a race condition).
   > Both threads can read the same value, increment, and write back, discarding one increment. A lock around the update fixes it.
-- The GIL guarantees only one increment ever runs.
-  > The GIL serializes *bytecode*, but a single \`+=\` spans multiple bytecodes, so a thread switch mid-operation still loses updates.
 - Threads silently drop iterations under load.
-  > The iterations all run; the increments collide on shared state without mutual exclusion.`}
+  > The iterations all run; the increments collide on shared state without mutual exclusion.
+- The GIL guarantees only one increment ever runs.
+  > The GIL serializes *bytecode*, but a single \`+=\` spans multiple bytecodes, so a thread switch mid-operation still loses updates.`}
 />
 
 <MultipleChoice
   markdown={`Which change is the standard way to **prevent** a deadlock caused by two threads acquiring locks A and B in opposite orders?
 
+- Remove all locks so nothing can block.
+  > That reintroduces race conditions on the shared state the locks were protecting.
 - Give each thread its own copy of both locks.
   > Separate locks would not protect the shared resource they guard; the point of a lock is to be shared.
-- [o] Make every thread acquire the locks in the same global order (always A before B).
-  > A consistent lock ordering eliminates the circular-wait condition, one of Coffman's four necessary conditions for deadlock.
 - Increase the thread pool size so more threads are available.
   > More threads worsen contention; they do not remove the circular wait.
-- Remove all locks so nothing can block.
-  > That reintroduces race conditions on the shared state the locks were protecting.`}
+- [o] Make every thread acquire the locks in the same global order (always A before B).
+  > A consistent lock ordering eliminates the circular-wait condition, one of Coffman's four necessary conditions for deadlock.`}
 />
 
 ## Go deeper

@@ -76,14 +76,14 @@ this rule."
 <MultipleChoice
   markdown={`Why is it valuable to put an important business rule in the **schema**?
 
-- It makes the rule apply only to the main web application.
-  > A schema constraint applies inside the database, so it covers every writer, not only one application.
-- [o] It makes the database enforce the rule for every write, no matter where the write came from.
-  > A constraint is checked by PostgreSQL itself, which makes it the shared last line of defense.
 - It lets invalid data in faster.
   > Constraints reject invalid data; they are about integrity, not accepting mistakes quickly.
+- It makes the rule apply only to the main web application.
+  > A schema constraint applies inside the database, so it covers every writer, not only one application.
 - It replaces the need to design tables carefully.
   > Constraints are part of table design, not a substitute for design.
+- [o] It makes the database enforce the rule for every write, no matter where the write came from.
+  > A constraint is checked by PostgreSQL itself, which makes it the shared last line of defense.
 
 Schema constraints protect the database even when many programs write to it.`}
 />
@@ -160,14 +160,14 @@ belongs in the schema.
 <MultipleChoice
   markdown={`Which rule is best enforced with a database constraint rather than only with a comment in documentation?
 
-- A style preference for how a button should look.
-  > Button styling is an interface concern, not a rule about valid rows in the database.
-- [o] An order total must never be negative.
-  > A negative order total would make the stored data invalid, so the schema should reject it.
-- A team's preferred meeting time.
-  > Meeting preferences are not part of the database's row validity.
 - The color of the company logo.
   > Logo color is not a data-integrity rule for table writes.
+- [o] An order total must never be negative.
+  > A negative order total would make the stored data invalid, so the schema should reject it.
+- A style preference for how a button should look.
+  > Button styling is an interface concern, not a rule about valid rows in the database.
+- A team's preferred meeting time.
+  > Meeting preferences are not part of the database's row validity.
 
 Constraints are for rules that determine whether stored data is valid.`}
 />
@@ -192,12 +192,12 @@ keeps its promises.
 
 - A query that sorts rows for display.
   > Sorting affects how results are returned; it does not decide whether a write is allowed.
+- A backup copy of a table.
+  > Backups preserve data; constraints protect whether new data is valid.
 - [o] A rule PostgreSQL enforces on writes so invalid data is rejected.
   > Constraints are checked by the database whenever data is inserted or changed.
 - A note for developers to read later.
   > Documentation can explain a rule, but a constraint actively enforces it.
-- A backup copy of a table.
-  > Backups preserve data; constraints protect whether new data is valid.
 
 A constraint is an enforced rule, not merely a suggestion.`}
 />
@@ -205,12 +205,12 @@ A constraint is an enforced rule, not merely a suggestion.`}
 <MultipleChoice
   markdown={`Why is the database often called the **last line of defense** for data integrity?
 
-- It is the only place users can see error messages.
-  > Applications can show errors too; the point is where the final write is accepted or rejected.
 - It runs after every report is generated.
   > Constraints run when data is written, not after reports.
 - [o] Every application and import path ultimately writes to the database, so schema rules protect all of them.
   > A database constraint applies regardless of which program attempted the write.
+- It is the only place users can see error messages.
+  > Applications can show errors too; the point is where the final write is accepted or rejected.
 - It automatically knows every business rule without being told.
   > The database enforces rules that the schema designer explicitly declares.
 
@@ -224,10 +224,10 @@ The schema is the shared enforcement point for all writers.`}
   > NOT NULL requires a value, but it does not prevent duplicates.
 - DEFAULT.
   > DEFAULT fills in a missing value; it does not make values distinct.
-- [o] UNIQUE.
-  > UNIQUE tells PostgreSQL that no two rows may share the constrained value.
 - FOREIGN KEY.
   > A foreign key checks that a referenced row exists; it is not the duplicate-prevention rule.
+- [o] UNIQUE.
+  > UNIQUE tells PostgreSQL that no two rows may share the constrained value.
 
 UNIQUE constraints protect values that must not repeat.`}
 />

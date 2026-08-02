@@ -320,10 +320,10 @@ assert isinstance(report, pd.DataFrame)`,
 <MultipleChoice
   markdown={`What is the key advantage of \`pivot_table\` over plain \`pivot\`?
 
-- It is newer
-  > Both \`pivot\` and \`pivot_table\` have been in Pandas for many years; novelty is not the distinction, and \`pivot\` is still perfectly valid when there are no duplicates.
 - [o] It accepts an aggregation function, so it works even when \`(index, columns)\` combinations have duplicate rows
   > \`pivot\` errors on duplicates; \`pivot_table\` aggregates them.
+- It is newer
+  > Both \`pivot\` and \`pivot_table\` have been in Pandas for many years; novelty is not the distinction, and \`pivot\` is still perfectly valid when there are no duplicates.
 - It is faster
   > \`pivot_table\` performs aggregation in addition to reshaping, which typically makes it slightly slower than plain \`pivot\` on clean data; the advantage is robustness, not speed.
 - It supports CSV
@@ -335,14 +335,14 @@ That's why \`pivot_table\` is the workhorse in practice.`}
 <MultipleChoice
   markdown={`What does \`margins=True\` add to a pivot table?
 
-- Padding around the result
-  > \`margins=True\` adds summary rows and columns with aggregated values, not visual whitespace or layout padding.
-- Borders
-  > \`margins=True\` is a data operation that adds a "Total" row and column; it does not add any visual formatting or borders to the output.
-- [o] A "Total" row and column that contain the aggregation applied to the entire row/column slice (typically grand totals)
-  > Just like the totals row in an Excel pivot.
 - Markdown formatting
   > Markdown formatting is not produced by Pandas DataFrames; \`margins=True\` adds data rows and columns to the pivot result.
+- Borders
+  > \`margins=True\` is a data operation that adds a "Total" row and column; it does not add any visual formatting or borders to the output.
+- Padding around the result
+  > \`margins=True\` adds summary rows and columns with aggregated values, not visual whitespace or layout padding.
+- [o] A "Total" row and column that contain the aggregation applied to the entire row/column slice (typically grand totals)
+  > Just like the totals row in an Excel pivot.
 
 Margins are a small but valuable feature when producing reports.`}
 />
@@ -350,14 +350,14 @@ Margins are a small but valuable feature when producing reports.`}
 <MultipleChoice
   markdown={`After pivoting, you want to write the result to CSV without weird "product" header rows. What's the right cleanup?
 
-- Convert to JSON instead
-  > Converting to JSON does not resolve the "product" header row issue in CSV; the problem is the MultiIndex structure on the column axis, which persists in any format until flattened.
 - Delete the index manually
   > Manually deleting index entries would corrupt the DataFrame; the correct approach is to call \`.reset_index()\` to promote index levels into regular columns.
-- [o] Call \`.reset_index()\` (and optionally clear \`columns.name\`) to flatten the pivot back into a regular DataFrame
-  > CSV exports work best on flat, name-free DataFrames.
 - Use \`pivot\` instead of \`pivot_table\`
   > Switching to \`pivot\` does not remove the hierarchical column name (\`columns.name = "product"\`); the flattening issue is independent of which pivot function you use.
+- [o] Call \`.reset_index()\` (and optionally clear \`columns.name\`) to flatten the pivot back into a regular DataFrame
+  > CSV exports work best on flat, name-free DataFrames.
+- Convert to JSON instead
+  > Converting to JSON does not resolve the "product" header row issue in CSV; the problem is the MultiIndex structure on the column axis, which persists in any format until flattened.
 
 Pivots are great for presentation but often need flattening before export or further joins.`}
 />

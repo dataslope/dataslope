@@ -182,12 +182,12 @@ Tests*).
 
 - Channel A has the highest conversion rate
   > ANOVA does not single out any group. Identifying which channel is best requires post-hoc pairwise comparisons, not the omnibus test.
+- The differences are large and important
+  > F and p speak to whether differences are distinguishable from noise, not to their magnitude or business importance. Effect size addresses that separately.
 - All four channels have different conversion rates from each other
   > A significant ANOVA only implies *at least one* group differs, not that *all* pairs differ. Some channels could still be equal.
 - [o] At least one channel's mean conversion rate differs from the others, but ANOVA alone doesn't say which
   > The omnibus test detects that the group means are spread further apart than within-group noise explains, without identifying the specific group(s) responsible.
-- The differences are large and important
-  > F and p speak to whether differences are distinguishable from noise, not to their magnitude or business importance. Effect size addresses that separately.
 
 ANOVA is the smoke alarm: it signals a difference exists somewhere, then post-hoc tests locate it.`}
 />
@@ -369,12 +369,12 @@ counts, not observed ones.
 <MultipleChoice
   markdown={`You have a table showing the **percentage** of users in each subscription tier who churned. You want a chi-square test of independence between tier and churn. What must you do first?
 
-- Nothing, chi-square works directly on percentages
-  > Chi-square's logic depends on the number of observations per cell, so percentages alone are not valid input. Sample size information is lost when you only have percentages.
 - [o] Convert back to raw counts per cell, because chi-square requires counts, not percentages
   > The test weighs evidence by how many observations fall in each cell, so you must reconstruct the actual counts (e.g. via a crosstab) before running it.
 - Multiply each percentage by 100 to get whole numbers
   > Scaling percentages by 100 does not recover the true counts and does not encode the sample size, so the test would still be meaningless.
+- Nothing, chi-square works directly on percentages
+  > Chi-square's logic depends on the number of observations per cell, so percentages alone are not valid input. Sample size information is lost when you only have percentages.
 - Use a t-test instead, since percentages are numeric
   > A churn percentage by tier is summarizing categorical outcomes; the right tool is chi-square on the underlying counts, not a t-test on percentages.
 
@@ -547,14 +547,14 @@ assert associated == bool(p_value <= alpha)`,
 <MultipleChoice
   markdown={`Why prefer a single one-way ANOVA over running every pairwise t-test among five groups?
 
-- ANOVA is more powerful for every individual pair than a t-test
-  > ANOVA answers a different, global question; it is not simply a stronger per-pair test. Pairwise power is what post-hoc tests address.
-- t-tests cannot be applied to more than two groups at once
-  > A t-test can be applied to any single pair; the issue is not capability but the cumulative error from doing it many times.
 - [o] Running many pairwise tests inflates the overall false-positive rate above alpha, while one ANOVA tests the global question at the chosen alpha
   > Each test carries its own chance of a false alarm, so many tests make at least one spurious "significant" result likely; the omnibus ANOVA keeps the overall error rate controlled.
 - ANOVA never requires any assumptions
   > ANOVA assumes independence, approximate normality, and roughly equal variances, so it is not assumption-free. The advantage is about multiplicity, not freedom from assumptions.
+- t-tests cannot be applied to more than two groups at once
+  > A t-test can be applied to any single pair; the issue is not capability but the cumulative error from doing it many times.
+- ANOVA is more powerful for every individual pair than a t-test
+  > ANOVA answers a different, global question; it is not simply a stronger per-pair test. Pairwise power is what post-hoc tests address.
 
 The motivation is controlling the family-wise false-positive rate, which many separate t-tests quietly inflate.`}
 />
@@ -562,14 +562,14 @@ The motivation is controlling the family-wise false-positive rate, which many se
 <MultipleChoice
   markdown={`The F-statistic in one-way ANOVA is essentially which ratio?
 
-- [o] Variance between the group means divided by variance within the groups
-  > When groups truly share a mean, the between-group spread matches what within-group noise predicts, so F is near 1; genuine differences push the between-group term up and F above 1.
-- The largest group mean divided by the smallest group mean
-  > A ratio of extreme means ignores the spread inside groups and the number of groups, which the F-statistic accounts for. This is not how F is built.
 - The total sample size divided by the number of groups
   > That ratio is roughly the average group size, not a measure of how separated the means are relative to noise.
 - The p-value divided by the significance level
   > The p-value is derived from F via the F-distribution; it is an output, not an input to the statistic.
+- [o] Variance between the group means divided by variance within the groups
+  > When groups truly share a mean, the between-group spread matches what within-group noise predicts, so F is near 1; genuine differences push the between-group term up and F above 1.
+- The largest group mean divided by the smallest group mean
+  > A ratio of extreme means ignores the spread inside groups and the number of groups, which the F-statistic accounts for. This is not how F is built.
 
 F contrasts how far apart the group means sit against the noise inside the groups, signal over noise, again.`}
 />
@@ -579,12 +579,12 @@ F contrasts how far apart the group means sit against the noise inside the group
 
 - Region strongly determines product preference
   > A small p-value with a very large sample signals that *some* association exists, not that it is strong. Strength needs an effect size like Cramér's V.
+- Region and preference are independent
+  > A significant result is evidence *against* independence, so concluding independence reverses the finding.
 - [o] There is evidence that region and preference are associated, but the test says nothing about how strong that association is
   > Chi-square detects departure from independence; with 50,000 observations even a tiny association is detectable, so existence is established while magnitude remains unknown.
 - The association is definitely large because the sample is large
   > Large samples make even negligible associations significant, so sample size cannot be used to infer that the association is large.
-- Region and preference are independent
-  > A significant result is evidence *against* independence, so concluding independence reverses the finding.
 
 Chi-square confirms an association exists; quantifying its strength requires a separate effect-size measure.`}
 />
@@ -592,14 +592,14 @@ Chi-square confirms an association exists; quantifying its strength requires a s
 <MultipleChoice
   markdown={`Which scenario calls for a chi-square **goodness-of-fit** test (rather than a test of independence)?
 
+- Measuring the correlation between height and weight
+  > A relationship between two numeric variables is measured with correlation, not a chi-square test.
+- Testing whether browser type is related to whether a user converts
+  > Two categorical variables and their relationship call for the test of *independence*, not goodness-of-fit.
 - Comparing average revenue across four store locations
   > Comparing several means is a job for one-way ANOVA, not chi-square. The outcome here is numeric, not categorical counts.
 - [o] Checking whether observed counts of dice rolls (1 through 6) match the equal proportions of a fair die
   > A single categorical variable compared against a set of expected proportions is exactly the goodness-of-fit setup.
-- Testing whether browser type is related to whether a user converts
-  > Two categorical variables and their relationship call for the test of *independence*, not goodness-of-fit.
-- Measuring the correlation between height and weight
-  > A relationship between two numeric variables is measured with correlation, not a chi-square test.
 
 Goodness-of-fit compares one variable's observed counts to an expected distribution; independence compares two variables to each other.`}
 />
@@ -607,14 +607,14 @@ Goodness-of-fit compares one variable's observed counts to an expected distribut
 <MultipleChoice
   markdown={`A one-way ANOVA on three groups is significant. A colleague concludes "so group C is the best." What's the issue?
 
+- The colleague should have used a chi-square test
+  > Chi-square is for categorical data; comparing three numeric group means is ANOVA territory. The fix is post-hoc tests, not switching to chi-square.
 - Nothing is wrong; a significant ANOVA identifies the top group
   > ANOVA is an omnibus test and never names a specific group. Concluding which is best from ANOVA alone is unsupported.
 - [o] ANOVA only signals that at least one group differs; identifying which group(s) requires post-hoc pairwise comparisons
   > The significant omnibus result establishes that the means are not all equal, but pinpointing the responsible group needs follow-up tests that correct for multiplicity.
 - ANOVA requires exactly two groups, so the test was invalid
   > ANOVA is specifically designed for three or more groups, so the test itself is appropriate here. The error is in over-interpreting it.
-- The colleague should have used a chi-square test
-  > Chi-square is for categorical data; comparing three numeric group means is ANOVA territory. The fix is post-hoc tests, not switching to chi-square.
 
 A significant ANOVA is the start of the investigation, not the end; post-hoc comparisons locate the difference.`}
 />

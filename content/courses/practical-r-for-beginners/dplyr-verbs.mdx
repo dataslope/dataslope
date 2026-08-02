@@ -304,14 +304,14 @@ verbs, one sentence.
 <MultipleChoice
   markdown={`Which dplyr verb would you use to **keep only rows where \`age >= 18\`**?
 
-- \`select()\`
-  > \`select()\` is for columns, not rows.
 - [o] \`filter()\`
   > \`filter()\` keeps rows matching a condition.
-- \`arrange()\`
-  > \`arrange()\` reorders rows; it does not drop any.
+- \`select()\`
+  > \`select()\` is for columns, not rows.
 - \`mutate()\`
-  > \`mutate()\` adds or changes columns; it does not select rows.`}
+  > \`mutate()\` adds or changes columns; it does not select rows.
+- \`arrange()\`
+  > \`arrange()\` reorders rows; it does not drop any.`}
 />
 
 <MultipleChoice
@@ -319,10 +319,10 @@ verbs, one sentence.
 
 - It runs two commands in parallel.
   > The pipe runs steps in sequence, feeding the output of one into the next, not in parallel.
-- [o] It passes the value on the left as the first argument to the function on the right, letting you chain operations in reading order.
-  > \`x |> f()\` is the same as \`f(x)\`, but reads top to bottom when chained.
 - It compares two values for equality.
   > Equality comparison is \`==\`; \`|>\` does not compare anything.
+- [o] It passes the value on the left as the first argument to the function on the right, letting you chain operations in reading order.
+  > \`x |> f()\` is the same as \`f(x)\`, but reads top to bottom when chained.
 - It declares a function.
   > A function is declared with \`function(...)\`, not with the pipe.`}
 />
@@ -332,12 +332,12 @@ verbs, one sentence.
 
 - \`select()\`
   > \`select()\` chooses which existing columns to keep; it does not create new ones.
-- \`summarise()\`
-  > \`summarise()\` *collapses* rows; you want to add a derived column.
+- [o] \`mutate()\`
+  > \`mutate()\` adds or changes columns based on other columns.
 - \`filter()\`
   > \`filter()\` keeps or drops rows; it does not add a column.
-- [o] \`mutate()\`
-  > \`mutate()\` adds or changes columns based on other columns.`}
+- \`summarise()\`
+  > \`summarise()\` *collapses* rows; you want to add a derived column.`}
 />
 
 ## Mini challenge: top efficient cars

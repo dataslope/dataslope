@@ -59,14 +59,14 @@ variable become obvious without leaving the figure. Reach for a joint plot
 <MultipleChoice
   markdown={`In a \`jointplot\`, what is shown in the **top and right margins**?
 
-- Zoomed-in copies of the central scatter plot.
-  > The margins aren't copies of the center; they summarize each variable separately.
-- [o] The univariate distribution of each variable, \`x\` along the top, \`y\` down the right.
-  > The center shows the joint relationship, while each margin shows one variable's own distribution, so you read the relationship and both marginals together.
-- The x-axis and y-axis labels, enlarged.
-  > Those are just labels; the margins hold actual distribution plots (histograms or densities), not text.
 - The residuals from a regression line.
   > Margins always show the marginal distributions; residuals are not what a joint plot puts there.
+- Zoomed-in copies of the central scatter plot.
+  > The margins aren't copies of the center; they summarize each variable separately.
+- The x-axis and y-axis labels, enlarged.
+  > Those are just labels; the margins hold actual distribution plots (histograms or densities), not text.
+- [o] The univariate distribution of each variable, \`x\` along the top, \`y\` down the right.
+  > The center shows the joint relationship, while each margin shows one variable's own distribution, so you read the relationship and both marginals together.
 
 The defining feature of a joint plot is the pairing of a central bivariate
 view with each variable's marginal distribution.`}
@@ -157,12 +157,12 @@ dots hide. Lowering `alpha` helps a little; binning or density helps a lot.
   markdown={`You plot 50,000 rows with \`jointplot(..., kind="scatter")\` and the center
 is one solid dark mass. Which \`kind\` most directly fixes the overplotting?
 
+- \`kind="scatter"\` with a larger marker size.
+  > Bigger markers overlap *more*, making the blob worse, not better.
 - \`kind="reg"\`
   > Adding a regression line doesn't un-pile the points; the underlying scatter is still a solid blob.
 - [o] \`kind="hex"\`
   > Hexbin divides the plane into bins and colors each by its point count, so dense regions are revealed by color instead of being hidden behind overlapping dots.
-- \`kind="scatter"\` with a larger marker size.
-  > Bigger markers overlap *more*, making the blob worse, not better.
 - There is no way to show dense data in a joint plot.
   > Both \`kind="hex"\` and \`kind="kde"\` are built precisely for dense data.
 
@@ -288,14 +288,14 @@ g = sns.jointplot(
 <MultipleChoice
   markdown={`What does \`sns.jointplot\` add compared with a plain scatter plot?
 
-- It facets the data into one panel per category.
-  > That's faceting with \`col\`/\`row\` on a figure-level function; a joint plot keeps a single pair in one center plot.
-- [o] It draws each variable's marginal distribution along the top and right of the central plot.
-  > A joint plot pairs the central bivariate view with each variable's univariate distribution in the margins, so you read the relationship and both marginals together.
-- It computes a correlation matrix across all numeric columns.
-  > That's closer to a pair plot or a correlation heatmap; a joint plot focuses on exactly two variables.
 - It always fits and reports a regression model.
   > A regression line appears only with \`kind="reg"\`; the default joint plot does not fit one.
+- It computes a correlation matrix across all numeric columns.
+  > That's closer to a pair plot or a correlation heatmap; a joint plot focuses on exactly two variables.
+- [o] It draws each variable's marginal distribution along the top and right of the central plot.
+  > A joint plot pairs the central bivariate view with each variable's univariate distribution in the margins, so you read the relationship and both marginals together.
+- It facets the data into one panel per category.
+  > That's faceting with \`col\`/\`row\` on a figure-level function; a joint plot keeps a single pair in one center plot.
 
 The marginal distributions flanking the center are what distinguish a joint
 plot from an ordinary scatter.`}
@@ -305,14 +305,14 @@ plot from an ordinary scatter.`}
   markdown={`Which \`kind\` turns the center of a joint plot into smooth density
 **contours**?
 
-- \`kind="hist"\`
-  > That produces a 2-D histogram of binned rectangles, not smooth contours.
-- \`kind="hex"\`
-  > Hexbin colors hexagonal bins by point count, discrete bins, not continuous contours.
 - [o] \`kind="kde"\`
   > A kernel density estimate draws smooth contour lines showing where point density is highest, like a topographic map of the data.
+- \`kind="hex"\`
+  > Hexbin colors hexagonal bins by point count, discrete bins, not continuous contours.
 - \`kind="reg"\`
   > That overlays a regression line on a scatter; it doesn't render density contours.
+- \`kind="hist"\`
+  > That produces a 2-D histogram of binned rectangles, not smooth contours.
 
 \`kind="kde"\` replaces individual points with a smooth estimate of where the
 data concentrates.`}
@@ -321,14 +321,14 @@ data concentrates.`}
 <MultipleChoice
   markdown={`When is a joint plot a better choice than a plain \`scatterplot\`?
 
-- Always, a joint plot is strictly superior and should replace every scatter.
-  > It's not free: the margins add space and complexity, and a plain scatter composes more flexibly (facets, shared Axes). Use the joint plot when the marginals actually earn their keep.
-- When you need to place the chart on a specific matplotlib Axes alongside other plots.
-  > A joint plot manages its *own* multi-Axes figure, so it's the *harder* choice for composing onto an Axes you control, that favors \`scatterplot\`.
-- [o] When the marginal distributions of each variable matter, or you want a quick density view of a single pair.
-  > The joint plot's whole value-add is showing each variable's distribution alongside the relationship, so it shines exactly when those marginals (or a density center like hex/kde) are worth seeing.
 - When you want one panel per category.
   > Splitting into panels per category is faceting (\`col\`/\`row\`), not what a joint plot does.
+- [o] When the marginal distributions of each variable matter, or you want a quick density view of a single pair.
+  > The joint plot's whole value-add is showing each variable's distribution alongside the relationship, so it shines exactly when those marginals (or a density center like hex/kde) are worth seeing.
+- When you need to place the chart on a specific matplotlib Axes alongside other plots.
+  > A joint plot manages its *own* multi-Axes figure, so it's the *harder* choice for composing onto an Axes you control, that favors \`scatterplot\`.
+- Always, a joint plot is strictly superior and should replace every scatter.
+  > It's not free: the margins add space and complexity, and a plain scatter composes more flexibly (facets, shared Axes). Use the joint plot when the marginals actually earn their keep.
 
 Choose a joint plot when a single pair's marginals or density add real
 insight; otherwise a plain scatter is simpler and more composable.`}

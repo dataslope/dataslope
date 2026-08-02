@@ -88,10 +88,10 @@ of the customer's email; it needs a reliable reference to the customer.
 
 - Because names and emails cannot be queried with SQL.
   > SQL can query those values; duplication and identity are the design issues.
-- [o] Because the customer row stays the single source of truth while orders keep a stable reference.
-  > A foreign key avoids repeated customer details and keeps orders connected when attributes change.
 - Because every order must have a different customer.
   > Many orders can share the same \`customer_id\`; that is the point of a one-to-many relationship.
+- [o] Because the customer row stays the single source of truth while orders keep a stable reference.
+  > A foreign key avoids repeated customer details and keeps orders connected when attributes change.
 - Because PostgreSQL refuses to store text in an orders table.
   > PostgreSQL can store text; the question is whether duplicated text is a good design.
 
@@ -175,14 +175,14 @@ does not exist.
 <MultipleChoice
   markdown={`What does a foreign key constraint add beyond simply naming a column \`customer_id\`?
 
-- It makes the column display with a special color in SQL results.
-  > Column names do not enforce data integrity by themselves.
 - It causes all customers to have exactly one order.
   > A foreign key from orders to customers allows many orders per customer unless other constraints say otherwise.
 - [o] It makes PostgreSQL verify that each stored id points to an existing parent row.
   > The constraint turns the relationship into an enforced rule, not just a naming convention.
 - It copies the customer's name into the order automatically.
   > A foreign key stores a reference; it does not duplicate parent attributes.
+- It makes the column display with a special color in SQL results.
+  > Column names do not enforce data integrity by themselves.
 
 A foreign key makes the relationship checkable by the database.`}
 />
@@ -233,12 +233,12 @@ A foreign key is how one row points to a related row.`}
 
 - \`customers\`, because customers have names.
   > Having descriptive attributes does not make a table the child.
+- Neither table, because parent and child only apply to file systems.
+  > Parent and child are common terms for referenced and referencing tables.
 - [o] \`orders\`, because each order stores \`customer_id\` and depends on a customer.
   > The table containing the foreign key is the child in this relationship.
 - Both tables, because every table must have the same columns.
   > Related tables usually have different columns and roles.
-- Neither table, because parent and child only apply to file systems.
-  > Parent and child are common terms for referenced and referencing tables.
 
 The child table contains the foreign key that points to the parent.`}
 />
@@ -246,14 +246,14 @@ The child table contains the foreign key that points to the parent.`}
 <MultipleChoice
   markdown={`What happens when a foreign key blocks \`customer_id = 99\` in \`orders\`?
 
-- PostgreSQL creates customer 99 automatically.
-  > The database does not invent parent rows to satisfy a reference.
-- PostgreSQL changes 99 to null silently.
-  > A constraint failure is not silently rewritten into a different value.
 - [o] The insert is rejected because no referenced customer row exists.
   > Rejecting the row prevents an orphan order.
 - The whole database is deleted.
   > A failed insert affects the attempted statement, not the database itself.
+- PostgreSQL creates customer 99 automatically.
+  > The database does not invent parent rows to satisfy a reference.
+- PostgreSQL changes 99 to null silently.
+  > A constraint failure is not silently rewritten into a different value.
 
 Foreign keys protect referential integrity by refusing dangling references.`}
 />
@@ -261,14 +261,14 @@ Foreign keys protect referential integrity by refusing dangling references.`}
 <MultipleChoice
   markdown={`Where does the foreign key usually live in a one-to-many relationship?
 
-- On the one side, because it has fewer rows.
-  > The one side is usually the referenced parent table.
-- [o] On the many side, because each child row points to the one parent row it belongs to.
-  > Many orders can each store the same \`customer_id\` to point to one customer.
 - In a separate database that stores only keys.
   > Foreign keys are columns in the child table, not a separate database requirement.
 - In every column of both tables.
   > Only the referencing column or columns form the foreign key.
+- On the one side, because it has fewer rows.
+  > The one side is usually the referenced parent table.
+- [o] On the many side, because each child row points to the one parent row it belongs to.
+  > Many orders can each store the same \`customer_id\` to point to one customer.
 
 The many-side rows carry references back to the one-side row.`}
 />

@@ -354,25 +354,25 @@ also_nums.append(4)
 print(nums)
 \`\`\`
 
-- \`[1, 2, 3]\`
-  > Assignment binds \`also_nums\` to the same list object that \`nums\` references. Both names point to the same list in memory.
-- [o] \`[1, 2, 3, 4]\`
-  > \`nums\` and \`also_nums\` are two names for the same list. Mutating through one name is visible through the other.
 - A \`NameError\`
   > No error, \`nums\` is defined before \`also_nums\` references it.
 - \`[4]\`
-  > \`append\` adds to the list; it doesn't replace it.`}
+  > \`append\` adds to the list; it doesn't replace it.
+- [o] \`[1, 2, 3, 4]\`
+  > \`nums\` and \`also_nums\` are two names for the same list. Mutating through one name is visible through the other.
+- \`[1, 2, 3]\`
+  > Assignment binds \`also_nums\` to the same list object that \`nums\` references. Both names point to the same list in memory.`}
 />
 
 <MultipleChoice
   markdown={`Which of the following is **not** a valid Python identifier?
 
-- \`user_count\`
-  > Valid. Starts with a letter, contains letters and underscores.
-- \`_private\`
-  > Valid. Leading underscores are allowed.
 - [o] \`2nd_place\`
   > Identifiers cannot start with a digit.
+- \`_private\`
+  > Valid. Leading underscores are allowed.
+- \`user_count\`
+  > Valid. Starts with a letter, contains letters and underscores.
 - \`café\`
   > Valid. Python 3 allows Unicode letters in identifiers.`}
 />
@@ -386,14 +386,14 @@ y = x
 y = y + [30]
 \`\`\`
 
-- \`[10, 20, 30, 30]\`
-  > \`y + [30]\` creates a new list; it doesn't mutate the original.
+- An error
+  > No error-concatenating lists with \`+\` is perfectly legal.
 - [o] \`[10, 20]\`
   > The line \`y = y + [30]\` creates a new list and rebinds \`y\` to it. The original list \`x\` references is unchanged.
+- \`[10, 20, 30, 30]\`
+  > \`y + [30]\` creates a new list; it doesn't mutate the original.
 - \`[10, 20, 30]\`
-  > That's the value of \`y\` after the reassignment, not \`x\`.
-- An error
-  > No error-concatenating lists with \`+\` is perfectly legal.`}
+  > That's the value of \`y\` after the reassignment, not \`x\`.`}
 />
 
 Next: a tour of Python's built-in data types.

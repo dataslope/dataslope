@@ -160,10 +160,10 @@ publication-ready.
 <MultipleChoice
   markdown={`In an exploratory data analysis, why start with a bare \`geom_point()\` (no titles, colors, or theme)?
 
-- Because adding color before a theme causes errors.
-  > Order does not cause errors; the reason is about speed and purpose.
 - Because exploratory plots cannot have titles.
   > They can; you simply defer them until the chart is worth polishing.
+- Because adding color before a theme causes errors.
+  > Order does not cause errors; the reason is about speed and purpose.
 - [o] Because exploration prioritizes speed of insight, a minimal data + mapping + geom answers "is there anything here?" before any effort goes into polish.
   > You refine only the charts that prove worth communicating.
 - Because \`geom_point\` is the only geom allowed during exploration.
@@ -176,10 +176,10 @@ plots that will be shared.`}
 <MultipleChoice
   markdown={`During refinement, the final figure sets \`legend.position = "none"\`. Why is dropping the legend reasonable here?
 
-- Legends always clutter plots and should be removed.
-  > Legends are often essential; removal is justified only when the information is shown elsewhere.
 - The color mapping was deleted, so no legend is needed.
   > The color mapping remains; the legend is redundant for a different reason.
+- Legends always clutter plots and should be removed.
+  > Legends are often essential; removal is justified only when the information is shown elsewhere.
 - [o] The plot is faceted by drivetrain, so each panel's strip label already identifies the group the legend would describe.
   > With the grouping shown by facet strips, the legend is redundant.
 - Themes cannot display legends.

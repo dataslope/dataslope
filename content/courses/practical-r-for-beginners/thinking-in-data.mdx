@@ -283,36 +283,36 @@ expression first.**
 <MultipleChoice
   markdown={`Which statement best captures the **shift** from hand arithmetic to computational thinking?
 
-- "Computers are faster, but the way you think about a problem stays exactly the same."
-  > The shift to computation is not just about speed; it requires a fundamentally different mental model, thinking in collections rather than individual values.
-- "Computers think in numbers; humans think in patterns."
-  > This is a vague contrast that does not capture the actual shift described in the lesson, which is about operating on whole collections versus one value at a time.
+- "Computational thinking means avoiding statistics."
+  > Computational thinking and statistics are complementary, not mutually exclusive; the course explicitly combines both throughout.
 - [o] "Hand arithmetic operates one number at a time; computational thinking operates on whole collections at a time."
   > This is the central idea. The size of the data stops being a bottleneck because each *line of code* applies to as much data as you give it.
-- "Computational thinking means avoiding statistics."
-  > Computational thinking and statistics are complementary, not mutually exclusive; the course explicitly combines both throughout.`}
+- "Computers think in numbers; humans think in patterns."
+  > This is a vague contrast that does not capture the actual shift described in the lesson, which is about operating on whole collections versus one value at a time.
+- "Computers are faster, but the way you think about a problem stays exactly the same."
+  > The shift to computation is not just about speed; it requires a fundamentally different mental model, thinking in collections rather than individual values.`}
 />
 
 <MultipleChoice
   markdown={`Which of the following best describes what happens when you write \`widths * heights\` in R, where each is a vector of length 3?
 
-- R multiplies the lengths together to get 9.
-  > R does not multiply the *lengths* of the vectors; it multiplies their *elements* pairwise, returning a vector of the same length.
 - [o] R multiplies the two vectors *elementwise* and returns a new vector of length 3.
   > This is vectorization in action: matching positions are multiplied, and you get back a vector of the same length.
-- R picks the first element of each and multiplies those.
-  > R operates on all matched pairs, not just the first elements; every position is multiplied, producing a full-length result vector.
+- R multiplies the lengths together to get 9.
+  > R does not multiply the *lengths* of the vectors; it multiplies their *elements* pairwise, returning a vector of the same length.
 - R raises an error because you can't multiply two vectors.
-  > Multiplying two equal-length vectors element-by-element is exactly what the \`*\` operator is designed to do in R; no error occurs.`}
+  > Multiplying two equal-length vectors element-by-element is exactly what the \`*\` operator is designed to do in R; no error occurs.
+- R picks the first element of each and multiplies those.
+  > R operates on all matched pairs, not just the first elements; every position is multiplied, producing a full-length result vector.`}
 />
 
 <MultipleChoice
   markdown={`In R, why is writing a \`for\` loop over a column of data often considered non-idiomatic?
 
-- Because R does not support loops.
-  > R does support loops; it just rarely needs them for data analysis.
 - Because loops always crash.
   > Loops in R are syntactically valid and do not crash; the reason to prefer vectorized expressions is clarity and conciseness, not stability.
+- Because R does not support loops.
+  > R does support loops; it just rarely needs them for data analysis.
 - [o] Because most operations can be expressed more clearly and concisely with vectorized expressions on whole columns.
   > Vectorization is shorter, easier to read, often faster, and matches the way R was designed to be used.
 - Because loops are illegal in statistical analysis.

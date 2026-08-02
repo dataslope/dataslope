@@ -385,23 +385,23 @@ int main() {
 
 - [o] The vector stores elements contiguously, which improves cache locality.
   > Nearby values are likely loaded into CPU cache together.
+- A vector never reallocates memory.
+  > Vectors can reallocate when they grow beyond capacity.
 - A vector changes every operation to O(log n).
   > Vector iteration is O(n), but constants are often smaller.
 - A linked list cannot store integers.
-  > Linked lists can store integers; their node layout is the issue.
-- A vector never reallocates memory.
-  > Vectors can reallocate when they grow beyond capacity.`}
+  > Linked lists can store integers; their node layout is the issue.`}
 />
 
 <MultipleChoice
   markdown={`For most DSA problems, why should you usually try \`std::vector\` before \`std::list\`?
 
-- \`std::list\` has O(1) random access.
-  > It does not. Random access in a list requires walking nodes.
-- [o] \`std::vector\` has compact storage, O(1) indexing, and excellent iteration performance.
-  > These properties make it the default sequence container.
 - \`std::vector\` can only store primitive types.
   > It can store objects too.
+- [o] \`std::vector\` has compact storage, O(1) indexing, and excellent iteration performance.
+  > These properties make it the default sequence container.
+- \`std::list\` has O(1) random access.
+  > It does not. Random access in a list requires walking nodes.
 - \`std::list\` is always asymptotically slower for every operation.
   > Some list operations are O(1), but they are less commonly the bottleneck.`}
 />
@@ -409,12 +409,12 @@ int main() {
 <MultipleChoice
   markdown={`What is the main behavioral difference between \`v.at(i)\` and \`v[i]\` for a \`std::vector\`?
 
-- \`v.at(i)\` is always O(n), while \`v[i]\` is O(1).
-  > Both are constant-time access in normal use.
 - \`v[i]\` checks bounds and throws if invalid.
   > That describes \`at\`, not \`operator[]\`.
 - [o] \`v.at(i)\` performs bounds checking and throws an exception when \`i\` is invalid.
   > \`operator[]\` has undefined behavior for an invalid index.
+- \`v.at(i)\` is always O(n), while \`v[i]\` is O(1).
+  > Both are constant-time access in normal use.
 - \`v.at(i)\` inserts a new element if \`i\` is too large.
   > It does not insert; it reports an error.`}
 />

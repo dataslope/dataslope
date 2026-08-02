@@ -352,14 +352,14 @@ balance=20
 <MultipleChoice
   markdown={`Why is it a bad idea to make a field \`public\`?
 
-- Public fields take up more memory
-  > Access modifiers do not change storage size.
 - Public fields cannot be read
   > They can be read and written from anywhere, that's the problem.
 - [o] Any code anywhere can modify the field, so the class cannot enforce its own invariants
   > Encapsulation exists precisely so the *class* owns the rules about its data.
 - The compiler refuses to compile a class with public fields
-  > It compiles fine; the issue is design.`}
+  > It compiles fine; the issue is design.
+- Public fields take up more memory
+  > Access modifiers do not change storage size.`}
 />
 
 <MultipleChoice
@@ -367,23 +367,23 @@ balance=20
 
 - It has a getter and setter for every field
   > That is often a sign of *bad* encapsulation, the API mirrors the storage instead of the behavior.
+- It uses the keyword \`final\` somewhere
+  > \`final\` helps but is not the central criterion.
 - Its constructors throw exceptions on invalid input
   > Helpful, but only part of the picture.
 - [o] Its public methods are named for behaviors callers actually need, and its fields are \`private\`
-  > Encapsulation is about exposing *behavior*, not storage.
-- It uses the keyword \`final\` somewhere
-  > \`final\` helps but is not the central criterion.`}
+  > Encapsulation is about exposing *behavior*, not storage.`}
 />
 
 <MultipleChoice
   markdown={`In the \`Thermostat\` example, why is \`clamp\` declared \`private\`?
 
-- Because Java requires helper methods to be private
-  > It does not.
-- Because \`private\` methods run faster
-  > Performance is not why.
 - [o] Because it is internal plumbing that callers never need to see, and hiding it keeps the public API small and intentional
   > Keeping helpers private prevents accidental coupling to internal details.
+- Because \`private\` methods run faster
+  > Performance is not why.
 - Because \`public\` methods cannot call \`private\` ones
-  > Public methods *can* call private methods of the same class, that is normal.`}
+  > Public methods *can* call private methods of the same class, that is normal.
+- Because Java requires helper methods to be private
+  > It does not.`}
 />

@@ -404,25 +404,25 @@ int main() {
 
 - The CPU does not support double equality at all.
   > It does; the issue is that the values being compared may not be exactly equal due to rounding.
-- The compiler always emits a warning, so the operation is forbidden.
-  > It is not forbidden, but the result is often surprising.
 - [o] Floating-point arithmetic is approximate; many decimal values cannot be represented exactly in binary, so the comparison may fail even for inputs that look mathematically equal.
   > Use a tolerance (\`std::abs(a-b) < eps\`) for floating-point equality.
 - It is dangerous only on 32-bit systems.
-  > It is true everywhere; IEEE-754 behaves the same way on all platforms.`}
+  > It is true everywhere; IEEE-754 behaves the same way on all platforms.
+- The compiler always emits a warning, so the operation is forbidden.
+  > It is not forbidden, but the result is often surprising.`}
 />
 
 <MultipleChoice
   markdown={`What's the safer modern alternative to a C-style cast like \`(int)3.9\`?
 
-- A reinterpret_cast.
-  > That is for low-level pointer reinterpretation; using it for arithmetic is dangerous.
 - [o] A static_cast, e.g. \`static_cast<int>(3.9)\`.
   > \`static_cast\` is the right tool for ordinary numeric conversions.
-- A const_cast.
-  > That is for removing \`const\`, not for type changes.
 - A dynamic_cast.
-  > That is for safely casting between related class types at runtime.`}
+  > That is for safely casting between related class types at runtime.
+- A reinterpret_cast.
+  > That is for low-level pointer reinterpretation; using it for arithmetic is dangerous.
+- A const_cast.
+  > That is for removing \`const\`, not for type changes.`}
 />
 
 <MultipleChoice
@@ -443,12 +443,12 @@ int main() {
 
 - Never; \`const\` is always better.
   > \`constexpr\` has a different purpose.
+- Only inside template metaprogramming code.
+  > \`constexpr\` is useful in everyday code too.
 - Whenever you want a variable that might change later.
   > Both \`const\` and \`constexpr\` forbid changes after initialization.
 - [o] When the value is genuinely known at compile time and you may need it in a context that requires a compile-time constant (array sizes, template arguments, etc.).
-  > \`constexpr\` is a compile-time promise; \`const\` is only a runtime "do not modify" promise.
-- Only inside template metaprogramming code.
-  > \`constexpr\` is useful in everyday code too.`}
+  > \`constexpr\` is a compile-time promise; \`const\` is only a runtime "do not modify" promise.`}
 />
 
 Next: how to control the flow of a program, `if`, `while`, `for`,

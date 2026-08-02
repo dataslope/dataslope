@@ -205,14 +205,14 @@ that idea. That happens in the next page.
 <MultipleChoice
   markdown={`In a procedural system that uses lots of global variables, why are bugs especially hard to track down?
 
-- Because the compiler refuses to type-check global state
-  > Most compilers happily check globals; the issue is not type-checking.
-- [o] Because *any* function in the program can modify the data, so the culprit could be anywhere
-  > With no ownership, every read and write site is a suspect, which makes debugging slow and frustrating.
 - Because global variables are stored on the heap instead of the stack
   > The storage location of a variable doesn't make a bug harder to find.
+- [o] Because *any* function in the program can modify the data, so the culprit could be anywhere
+  > With no ownership, every read and write site is a suspect, which makes debugging slow and frustrating.
 - Because procedural languages have no \`if\` statements
-  > Procedural languages have full control flow; this is unrelated.`}
+  > Procedural languages have full control flow; this is unrelated.
+- Because the compiler refuses to type-check global state
+  > Most compilers happily check globals; the issue is not type-checking.`}
 />
 
 <MultipleChoice
@@ -220,23 +220,23 @@ that idea. That happens in the next page.
 
 - A shortage of computers in industry
   > Hardware was actually becoming more abundant.
+- The first appearance of open-source licensing disputes
+  > Open-source licensing debates came much later and are unrelated.
 - A specific virus that destroyed mainframe systems
   > It was not a literal attack; it was a structural problem.
 - [o] A pattern of large software projects being late, over budget, buggy, and hard to change
-  > The crisis was about the difficulty of building and maintaining big systems with the tools of the time.
-- The first appearance of open-source licensing disputes
-  > Open-source licensing debates came much later and are unrelated.`}
+  > The crisis was about the difficulty of building and maintaining big systems with the tools of the time.`}
 />
 
 <MultipleChoice
   markdown={`Which property would a *solution* to the software crisis most need?
 
-- Faster CPUs so procedural code runs quickly
-  > Speed doesn't fix maintainability.
 - A single global database that all functions share
   > That is closer to the problem than the solution.
+- More clever \`GOTO\` statements
+  > \`GOTO\`-heavy code was part of what made systems unmaintainable.
 - [o] Units of code that own their data, enforce their own rules, and can be composed into larger systems
   > This is essentially the definition of an object, which is where OOP enters the story.
-- More clever \`GOTO\` statements
-  > \`GOTO\`-heavy code was part of what made systems unmaintainable.`}
+- Faster CPUs so procedural code runs quickly
+  > Speed doesn't fix maintainability.`}
 />

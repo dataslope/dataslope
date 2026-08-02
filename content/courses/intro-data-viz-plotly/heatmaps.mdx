@@ -180,10 +180,10 @@ This is the single most important decision when making a heatmap.
   > A single variable's distribution is best shown with a histogram or box plot; a heatmap requires values at the intersection of two categorical or binned axes.
 - A trend over time.
   > Trends over time are best shown with a line chart; a heatmap has no inherent x-axis ordering and is not designed to reveal directional change.
-- [o] A 2-D table of numeric values, rows × columns, where you want to spot patterns or hotspots.
-  > Each cell's color encodes the numeric value at that row/column intersection. The eye perceives the dense, hot, or cold regions instantly, which makes heatmaps excellent for correlation matrices, calendar data, and any cross-tabulation.
 - A part-of-a-whole composition.
   > Part-of-a-whole compositions are shown with pie charts or stacked bar charts; a heatmap's cells encode values at row-column intersections, not shares of a total.
+- [o] A 2-D table of numeric values, rows × columns, where you want to spot patterns or hotspots.
+  > Each cell's color encodes the numeric value at that row/column intersection. The eye perceives the dense, hot, or cold regions instantly, which makes heatmaps excellent for correlation matrices, calendar data, and any cross-tabulation.
 
 For distributions use a histogram; for trends use a line chart; for compositions use a sorted bar chart.`}
 />
@@ -191,14 +191,14 @@ For distributions use a histogram; for trends use a line chart; for compositions
 <MultipleChoice
   markdown={`For a **correlation matrix** heatmap (values from -1 to +1), which color palette is most appropriate?
 
-- A sequential palette like **Viridis**.
-  > A sequential palette goes from low to high without a midpoint, so a correlation of -0.9 and one of 0.0 would look equally "different" from +0.9, the negative side's meaning would be obscured.
-- A categorical palette like **Plotly**.
-  > Categorical palettes use distinct hues for unordered groups; they have no intensity gradient and cannot encode the magnitude or sign of a numeric value like a correlation coefficient.
-- [o] A **diverging** palette like **RdBu** or **RdBu_r**, centered at zero.
-  > Correlations have a meaningful midpoint (0 = no correlation). A diverging palette uses two distinct hues for positive vs negative and intensity for magnitude, so viewers can read sign and strength simultaneously. Always center the palette midpoint at zero (**color_continuous_midpoint=0**).
 - A grayscale ramp.
   > A grayscale ramp is a sequential (one-directional) palette and cannot distinguish between negative and positive correlations; a correlation of -0.8 and +0.8 would look similar at the dark end, losing the critical sign information.
+- A sequential palette like **Viridis**.
+  > A sequential palette goes from low to high without a midpoint, so a correlation of -0.9 and one of 0.0 would look equally "different" from +0.9, the negative side's meaning would be obscured.
+- [o] A **diverging** palette like **RdBu** or **RdBu_r**, centered at zero.
+  > Correlations have a meaningful midpoint (0 = no correlation). A diverging palette uses two distinct hues for positive vs negative and intensity for magnitude, so viewers can read sign and strength simultaneously. Always center the palette midpoint at zero (**color_continuous_midpoint=0**).
+- A categorical palette like **Plotly**.
+  > Categorical palettes use distinct hues for unordered groups; they have no intensity gradient and cannot encode the magnitude or sign of a numeric value like a correlation coefficient.
 
 Diverging data deserves a diverging palette. Mixing it up is a common mistake.`}
 />
@@ -206,14 +206,14 @@ Diverging data deserves a diverging palette. Mixing it up is a common mistake.`}
 <MultipleChoice
   markdown={`Why should you **avoid** the **Jet** (rainbow) colormap for heatmaps?
 
-- It is copyrighted.
-  > Jet/rainbow colormaps are freely available and widely distributed; copyright is not a reason to avoid them, perceptual distortion is.
-- It is only available on Windows.
-  > Jet is available in matplotlib, Plotly, and virtually every other visualization library on all platforms; platform availability is not the issue.
-- [o] It is **perceptually non-uniform**, bright cyan and yellow bands appear as visual "ridges" even where data is flat, leading viewers to see structure that isn't there.
-  > Jet was popular in the 1990s but is now known to introduce false features. Modern perceptually uniform palettes (Viridis, Cividis, Magma) increase smoothly in luminance and reveal the actual structure of the data without visual artifacts.
 - It uses too many colors.
   > The number of distinct colors in a palette is not inherently a problem; the actual issue with Jet is that its color transitions are perceptually non-uniform, creating false visual structure.
+- [o] It is **perceptually non-uniform**, bright cyan and yellow bands appear as visual "ridges" even where data is flat, leading viewers to see structure that isn't there.
+  > Jet was popular in the 1990s but is now known to introduce false features. Modern perceptually uniform palettes (Viridis, Cividis, Magma) increase smoothly in luminance and reveal the actual structure of the data without visual artifacts.
+- It is only available on Windows.
+  > Jet is available in matplotlib, Plotly, and virtually every other visualization library on all platforms; platform availability is not the issue.
+- It is copyrighted.
+  > Jet/rainbow colormaps are freely available and widely distributed; copyright is not a reason to avoid them, perceptual distortion is.
 
 This is one of the genuinely settled debates in modern visualization. Just don't use rainbow palettes for quantitative data.`}
 />

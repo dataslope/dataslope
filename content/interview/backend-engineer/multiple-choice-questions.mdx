@@ -21,103 +21,103 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What does Big-O notation describe?
 
-- The exact number of operations an algorithm performs.
-  > Constants and lower-order terms are deliberately discarded.
-- [o] How the cost grows as the input grows.
-  > Constants and lower-order terms are ignored. It answers "what happens at 10x the data", which is why an O(n log n) algorithm can lose to an O(n²) one on small inputs and still be the right choice.
+- The memory an algorithm uses.
+  > It describes whichever resource is being analyzed; time is just the most common.
 - The best case running time.
   > Big-O is normally used for the upper bound; best case is usually written with Ω.
-- The memory an algorithm uses.
-  > It describes whichever resource is being analyzed; time is just the most common.`}
+- [o] How the cost grows as the input grows.
+  > Constants and lower-order terms are ignored. It answers "what happens at 10x the data", which is why an O(n log n) algorithm can lose to an O(n²) one on small inputs and still be the right choice.
+- The exact number of operations an algorithm performs.
+  > Constants and lower-order terms are deliberately discarded.`}
 />
 
 <MultipleChoice
   markdown={`What is the average and worst-case lookup cost of a hash map?
 
-- O(1) in both cases.
-  > Worst case degrades when many keys collide into one bucket.
 - [o] O(1) on average, O(n) in the worst case.
   > The worst case is every key hashing to the same bucket. Java's HashMap mitigates this by converting a long collision chain into a balanced tree, giving O(log n) instead.
-- O(log n) in both the average and worst cases.
-  > That is a balanced tree, not a hash table.
 - O(n) on average.
-  > Average O(n) would make hash maps useless.`}
+  > Average O(n) would make hash maps useless.
+- O(1) in both cases.
+  > Worst case degrades when many keys collide into one bucket.
+- O(log n) in both the average and worst cases.
+  > That is a balanced tree, not a hash table.`}
 />
 
 <MultipleChoice
   markdown={`When is a linked list genuinely preferable to a dynamic array?
 
-- When you need fast lookup by index.
-  > Indexing a linked list is O(n); an array is O(1).
 - [o] When you already hold a reference to the node you are splicing.
   > The splice is then O(1) with no shifting. Without that reference you pay O(n) to find the node first, which is why arrays win in practice more often than the textbook suggests.
-- When memory is tight.
-  > Each node carries pointer overhead and destroys cache locality.
 - When you need to sort the whole collection frequently.
-  > Sorting a linked list is generally slower than sorting an array.`}
+  > Sorting a linked list is generally slower than sorting an array.
+- When you need fast lookup by index.
+  > Indexing a linked list is O(n); an array is O(1).
+- When memory is tight.
+  > Each node carries pointer overhead and destroys cache locality.`}
 />
 
 <MultipleChoice
   markdown={`What does "amortized O(1)" mean for appending to a dynamic array?
 
+- It is only O(1) when the capacity has been preallocated.
+  > Preallocating removes the resizes entirely; amortization is what makes it O(1) without doing so.
 - Every append takes constant time.
   > The append that triggers a resize copies every element.
-- [o] Most appends are O(1) and the occasional resize is O(n).
-  > Doubling the capacity spreads that cost so the average over many appends stays constant. Growing by a constant amount instead of doubling would make the amortized cost O(n).
 - The first append is slow and the rest are fast.
   > Resizes recur as the array grows, not just at the start.
-- It is only O(1) when the capacity has been preallocated.
-  > Preallocating removes the resizes entirely; amortization is what makes it O(1) without doing so.`}
+- [o] Most appends are O(1) and the occasional resize is O(n).
+  > Doubling the capacity spreads that cost so the average over many appends stays constant. Growing by a constant amount instead of doubling would make the amortized cost O(n).`}
 />
 
 <MultipleChoice
   markdown={`What are the time complexities of a binary heap's push and pop-min?
 
-- O(1) and O(1).
-  > Maintaining the heap property costs a sift.
-- [o] O(log n) for both, with O(1) to peek at the minimum.
-  > Building a heap from n items in one pass is O(n), which is better than n separate pushes.
 - O(log n) and O(n).
   > Popping sifts down through the height of the tree, which is O(log n).
 - O(n log n) for both the push and the pop-min.
-  > That is the cost of a full heapsort, not a single operation.`}
+  > That is the cost of a full heapsort, not a single operation.
+- O(1) and O(1).
+  > Maintaining the heap property costs a sift.
+- [o] O(log n) for both, with O(1) to peek at the minimum.
+  > Building a heap from n items in one pass is O(n), which is better than n separate pushes.`}
 />
 
 <MultipleChoice
   markdown={`Which traversal should you use to find the shortest path in an *unweighted* graph?
 
-- Depth-first search.
-  > DFS finds *a* path, with no guarantee it is the shortest.
+- Topological sort.
+  > Topological sort orders a DAG; it does not compute distances.
 - [o] Breadth-first search.
   > BFS explores by distance, so the first time it reaches a node it has done so via the fewest edges.
 - Dijkstra's algorithm only.
   > Dijkstra works but is heavier than needed; with uniform weights it degenerates to BFS.
-- Topological sort.
-  > Topological sort orders a DAG; it does not compute distances.`}
+- Depth-first search.
+  > DFS finds *a* path, with no guarantee it is the shortest.`}
 />
 
 <MultipleChoice
   markdown={`How do you detect a cycle in a *directed* graph with DFS?
 
-- Track whether each node has already been visited before.
-  > A revisited node may simply be reachable by two different paths, which is not a cycle.
-- [o] Track the nodes currently on the recursion stack.
-  > An edge back to one of those is a back edge, and therefore a cycle. Three colors (unvisited, in-progress, done) is the standard encoding. Kahn's algorithm is the iterative alternative.
 - Count edges and compare to nodes minus one.
   > That test applies to undirected trees only.
 - Run BFS from every node.
-  > Reachability alone does not identify a cycle in a directed graph.`}
+  > Reachability alone does not identify a cycle in a directed graph.
+- [o] Track the nodes currently on the recursion stack.
+  > An edge back to one of those is a back edge, and therefore a cycle. Three colors (unvisited, in-progress, done) is the standard encoding. Kahn's algorithm is the iterative alternative.
+- Track whether each node has already been visited before.
+  > A revisited node may simply be reachable by two different paths, which is not a cycle.`}
 />
 
 <MultipleChoice
   markdown={`What does Kahn's algorithm produce, and what does its failure tell you?
 
+- A minimum spanning tree; failure means negative weights.
+  > That is Kruskal's or Prim's territory.
 - A shortest-path tree; failure means the graph is disconnected.
   > Kahn's does not compute distances.
 - [o] A topological ordering, or proof of a cycle.
   > If it cannot place every node, the remainder contains one. It repeatedly removes nodes with in-degree zero, so a leftover set with no zero-in-degree node is exactly a cycle.
-- A minimum spanning tree; failure means negative weights.
-  > That is Kruskal's or Prim's territory.
 - A strongly connected component decomposition.
   > That is Tarjan's or Kosaraju's.`}
 />
@@ -125,23 +125,23 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What is the complexity of Dijkstra's algorithm with a binary heap, and what breaks it?
 
-- O(V²), and it breaks on graphs that are not connected.
-  > O(V²) is the array implementation; disconnection is handled fine.
-- [o] O((V + E) log V), and it breaks on negative edge weights.
-  > Once a node is finalized Dijkstra never revisits it, which a negative edge could invalidate. Bellman-Ford handles negatives at O(VE).
 - O(E log E), and it breaks on dense graphs.
   > Density affects the constant, not correctness.
 - O(V + E), and it breaks on weighted graphs.
-  > Weights are exactly what it is for; O(V + E) is BFS.`}
+  > Weights are exactly what it is for; O(V + E) is BFS.
+- [o] O((V + E) log V), and it breaks on negative edge weights.
+  > Once a node is finalized Dijkstra never revisits it, which a negative edge could invalidate. Bellman-Ford handles negatives at O(VE).
+- O(V²), and it breaks on graphs that are not connected.
+  > O(V²) is the array implementation; disconnection is handled fine.`}
 />
 
 <MultipleChoice
   markdown={`What are the average and worst-case complexities of search in an unbalanced BST?
 
-- O(log n) in both the average and the worst case.
-  > Only a balanced tree guarantees the worst case.
 - [o] O(log n) average and O(n) in the worst case.
   > Sorted insertion degenerates the tree into a linked list. Self-balancing variants (red-black, AVL) restore the O(log n) guarantee.
+- O(log n) in both the average and the worst case.
+  > Only a balanced tree guarantees the worst case.
 - O(1) and O(log n).
   > Constant-time search would require hashing.
 - O(n) and O(n log n).
@@ -151,23 +151,23 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Which DFS traversal of a BST yields the keys in sorted order?
 
+- Level-order.
+  > Level-order is BFS, yielding keys by depth.
 - Pre-order.
   > Pre-order visits the node before its left subtree, so it yields the root first.
-- [o] In-order.
-  > Left, node, right. That is exactly ascending key order for a BST, and the reason in-order traversal is the standard way to validate one.
 - Post-order.
   > Post-order visits both subtrees before the node, useful for deletion and expression evaluation.
-- Level-order.
-  > Level-order is BFS, yielding keys by depth.`}
+- [o] In-order.
+  > Left, node, right. That is exactly ascending key order for a BST, and the reason in-order traversal is the standard way to validate one.`}
 />
 
 <MultipleChoice
   markdown={`What problem is a trie especially good at?
 
-- Finding the k largest elements.
-  > That is a heap's job.
 - [o] Prefix queries, in time proportional to the key length.
   > Autocomplete, longest-common-prefix, and dictionary matching all qualify, and the set size does not matter. The trade is memory: a node per character can dwarf a hash set unless the keys share prefixes heavily.
+- Finding the k largest elements.
+  > That is a heap's job.
 - Range queries over numbers.
   > A balanced BST or a sorted array serves ranges better.
 - Detecting duplicate entries using O(1) space.
@@ -177,79 +177,79 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`\`mid = (lo + hi) / 2\` is a classic binary search bug in fixed-width integer languages. Why?
 
-- Integer division truncates, skipping elements.
-  > Truncation is expected and correct here.
+- It requires the array to be sorted descending.
+  > Sort order is a precondition of the algorithm, not of this expression.
 - [o] \`lo + hi\` can overflow the integer type.
   > \`lo + (hi - lo) / 2\` cannot, which is the standard fix. It is the bug that sat in the JDK's binary search for nine years. The other classic is a loop condition that never terminates.
+- Integer division truncates, skipping elements.
+  > Truncation is expected and correct here.
 - It selects the wrong midpoint when the array length is even.
-  > Either midpoint is fine on an even length.
-- It requires the array to be sorted descending.
-  > Sort order is a precondition of the algorithm, not of this expression.`}
+  > Either midpoint is fine on an even length.`}
 />
 
 <MultipleChoice
   markdown={`What does the sliding-window technique optimize?
 
+- Balancing a binary tree.
+  > Unrelated to tree structure.
 - Sorting an array that happens to be nearly sorted.
   > That calls for insertion sort or a heap.
-- [o] Problems over contiguous subarrays or substrings.
-  > Extending and shrinking a window beats re-examining every subarray, turning O(n²) into O(n). "Longest substring without repeating characters" is the canonical case, usually paired with a hash map of last-seen positions.
 - Searching an unsorted array.
   > A window offers nothing over a linear scan there.
-- Balancing a binary tree.
-  > Unrelated to tree structure.`}
+- [o] Problems over contiguous subarrays or substrings.
+  > Extending and shrinking a window beats re-examining every subarray, turning O(n²) into O(n). "Longest substring without repeating characters" is the canonical case, usually paired with a hash map of last-seen positions.`}
 />
 
 <MultipleChoice
   markdown={`Quicksort's worst case is O(n²). When does it occur, and what mitigates it?
 
+- When the array is too large for memory; mitigated by merge sort.
+  > External sorting is a different problem.
 - On reverse-sorted input; nothing can be done.
   > Pivot choice can be fixed.
-- [o] When the pivot consistently splits off a single element.
-  > Sorted input with a first-element pivot is the classic trigger. A random or median-of-three pivot mitigates it. Introsort goes further, switching to heapsort once recursion gets too deep, which is what most standard libraries ship.
 - On input with many duplicates; mitigated by using a stable sort.
   > Duplicates hurt naive partitioning, but three-way partitioning fixes that specifically.
-- When the array is too large for memory; mitigated by merge sort.
-  > External sorting is a different problem.`}
+- [o] When the pivot consistently splits off a single element.
+  > Sorted input with a first-element pivot is the classic trigger. A random or median-of-three pivot mitigates it. Introsort goes further, switching to heapsort once recursion gets too deep, which is what most standard libraries ship.`}
 />
 
 <MultipleChoice
   markdown={`What makes a sort "stable", and when does it matter?
 
-- It never crashes on malformed input.
-  > Stability is about ordering, not robustness.
-- [o] Equal elements keep their original relative order.
-  > It matters when sorting by several keys in sequence. Sort by name, then stably by department, and within each department the names remain sorted. Quicksort is not stable; merge sort and Timsort are.
 - It always runs in the same time regardless of input.
   > That is a consistency property, not stability.
 - It uses O(1) extra space.
-  > That is being in-place, which is often at odds with stability.`}
+  > That is being in-place, which is often at odds with stability.
+- [o] Equal elements keep their original relative order.
+  > It matters when sorting by several keys in sequence. Sort by name, then stably by department, and within each department the names remain sorted. Quicksort is not stable; merge sort and Timsort are.
+- It never crashes on malformed input.
+  > Stability is about ordering, not robustness.`}
 />
 
 <MultipleChoice
   markdown={`What is the difference between memoization and tabulation?
 
-- Memoization is faster in every case.
-  > Tabulation usually has lower constant overhead by avoiding recursion.
 - [o] One is top-down and cached, the other bottom-up.
   > Memoization caches as the recursion goes; tabulation fills a table iteratively in dependency order. Memoization only computes the subproblems it needs; tabulation avoids recursion depth limits and is easier to space-optimize.
+- They produce different answers.
+  > Both solve the same recurrence.
 - Tabulation applies only to one-dimensional problems.
   > Multi-dimensional tables are routine.
-- They produce different answers.
-  > Both solve the same recurrence.`}
+- Memoization is faster in every case.
+  > Tabulation usually has lower constant overhead by avoiding recursion.`}
 />
 
 <MultipleChoice
   markdown={`When is a greedy algorithm guaranteed to be optimal?
 
-- Whenever the problem involves maximizing a value.
-  > Plenty of maximization problems defeat greedy approaches.
+- Whenever it produces the same answer as brute force on small inputs.
+  > Small-input agreement is evidence, not proof.
 - [o] With optimal substructure and the greedy-choice property.
   > A locally best choice then belongs to some global optimum. Activity selection and Huffman coding qualify; 0/1 knapsack does not, which is why it needs dynamic programming.
+- Whenever the problem involves maximizing a value.
+  > Plenty of maximization problems defeat greedy approaches.
 - When the input is sorted.
-  > Sorting often enables a greedy algorithm but does not justify one.
-- Whenever it produces the same answer as brute force on small inputs.
-  > Small-input agreement is evidence, not proof.`}
+  > Sorting often enables a greedy algorithm but does not justify one.`}
 />
 
 <MultipleChoice
@@ -257,23 +257,23 @@ reasoning and runnable code.
 
 - Always, on the grounds that a matrix is simpler to work with.
   > Simplicity costs O(V²) memory regardless of edge count.
-- [o] When the graph is dense, or edge checks must be O(1).
-  > A sparse graph with a million nodes would need a terabyte-scale matrix, which is why lists are the default.
 - When the graph is a tree.
   > A tree is maximally sparse, the worst case for a matrix.
 - When edges are weighted.
-  > Both representations carry weights fine.`}
+  > Both representations carry weights fine.
+- [o] When the graph is dense, or edge checks must be O(1).
+  > A sparse graph with a million nodes would need a terabyte-scale matrix, which is why lists are the default.`}
 />
 
 <MultipleChoice
   markdown={`What does the two-pointer technique typically require of the input?
 
+- That the input contains no duplicate values.
+  > Duplicates are usually handled with a small skip step.
 - That it fits in memory.
   > True but not the distinguishing requirement.
 - [o] Some exploitable order, usually sortedness.
   > Moving a pointer then rules out a whole range of possibilities. "Find two numbers summing to a target in a sorted array" is O(n) with two pointers and O(n log n) if you have to sort first.
-- That the input contains no duplicate values.
-  > Duplicates are usually handled with a small skip step.
 - That it is a linked list.
   > Arrays are the more common setting, though fast/slow pointers on a linked list are a well-known variant.`}
 />
@@ -283,25 +283,25 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Which of these is closest to the actual constraint that makes an API RESTful?
 
-- Returning JSON.
-  > Representation format is unconstrained; REST predates JSON's dominance.
-- [o] A uniform interface over resources, with stateless requests.
-  > Each request carries everything needed to be understood on its own, which is what lets any server instance handle any request. Statelessness is what lets any server instance handle any request, which is why it matters far beyond style.
 - Restricting yourself to just \`GET\` and \`POST\`.
   > Restricting the verb set works against the uniform interface.
+- Returning JSON.
+  > Representation format is unconstrained; REST predates JSON's dominance.
 - Versioning the URL.
-  > Versioning is a practical necessity, not part of the architectural style.`}
+  > Versioning is a practical necessity, not part of the architectural style.
+- [o] A uniform interface over resources, with stateless requests.
+  > Each request carries everything needed to be understood on its own, which is what lets any server instance handle any request. Statelessness is what lets any server instance handle any request, which is why it matters far beyond style.`}
 />
 
 <MultipleChoice
   markdown={`Which URL best follows REST resource naming conventions?
 
+- \`GET /users/delete/42\`
+  > \`GET\` must not have side effects, and the action is again in the path.
 - \`POST /createNewUser\`
   > The verb belongs in the HTTP method, not the path.
 - [o] \`POST /users\`
   > Plural nouns identify collections; the method supplies the action. The created resource then lives at \`/users/{id}\`.
-- \`GET /users/delete/42\`
-  > \`GET\` must not have side effects, and the action is again in the path.
 - \`POST /user/new/create\`
   > Redundant path segments, and a singular collection name.`}
 />
@@ -309,51 +309,51 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Which HTTP methods are idempotent?
 
+- \`POST\` and \`PUT\`.
+  > \`POST\` creating a new resource each time is the standard non-idempotent case.
 - Only \`GET\`.
   > Several others are too.
 - [o] \`GET\`, \`PUT\`, \`DELETE\`, and \`HEAD\`.
   > Repeating any of them leaves the server in the same state. \`DELETE\` is idempotent even though the second call returns 404: the *state* is the same. \`POST\` and \`PATCH\` generally are not.
 - All of them, since HTTP is stateless.
-  > Statelessness of the protocol says nothing about the effect of a request.
-- \`POST\` and \`PUT\`.
-  > \`POST\` creating a new resource each time is the standard non-idempotent case.`}
+  > Statelessness of the protocol says nothing about the effect of a request.`}
 />
 
 <MultipleChoice
   markdown={`A payment client times out and retries. How do you stop a double charge?
 
-- Deduplicate by comparing amount and timestamp.
-  > Two genuine identical payments seconds apart would be wrongly collapsed.
+- Reject any second request within 30 seconds.
+  > A time window blocks legitimate requests and still lets late retries through.
 - [o] Require a client-generated idempotency key.
   > Store the first result against it and return that for any repeat. It makes retrying safe without the client having to know whether the first attempt landed.
 - Make the endpoint a \`PUT\`.
   > \`PUT\` is idempotent by convention only if the handler actually implements it that way.
-- Reject any second request within 30 seconds.
-  > A time window blocks legitimate requests and still lets late retries through.`}
+- Deduplicate by comparing amount and timestamp.
+  > Two genuine identical payments seconds apart would be wrongly collapsed.`}
 />
 
 <MultipleChoice
   markdown={`What is the difference between 401 and 403?
 
-- 401 means the resource does not exist; 403 means it does but is private.
-  > A hidden resource is usually 404 on purpose.
+- They are interchangeable.
+  > Clients react differently: 401 usually triggers a re-auth flow, 403 should not.
 - [o] One means unauthenticated, the other unauthorized.
   > 401 says the request lacks valid credentials; 403 says the caller is known and still not permitted. "Who are you?" versus "I know who you are and the answer is still no."
 - 401 is for expired tokens only.
   > An absent token is 401 too.
-- They are interchangeable.
-  > Clients react differently: 401 usually triggers a re-auth flow, 403 should not.`}
+- 401 means the resource does not exist; 403 means it does but is private.
+  > A hidden resource is usually 404 on purpose.`}
 />
 
 <MultipleChoice
   markdown={`Which status code fits a request that is syntactically valid but semantically wrong, such as an end date before its start date?
 
-- A 500 Internal Server Error response code, since it failed.
-  > 5xx says the server failed; this is the client's input.
 - [o] 400 Bad Request, or 422 Unprocessable Entity where that distinction is used.
   > 422 signals "I parsed it, but it does not make sense", which is more informative for validation failures.
 - 404 Not Found.
   > Nothing is missing.
+- A 500 Internal Server Error response code, since it failed.
+  > 5xx says the server failed; this is the client's input.
 - 204 No Content.
   > 204 reports success with no body.`}
 />
@@ -361,10 +361,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Why is offset pagination a poor fit for a large, frequently-changing collection?
 
-- Offsets are hard-limited to around 10,000 rows.
-  > No such universal limit exists, though some engines impose one.
 - [o] Deep offsets scan and discard everything before them.
   > Rows inserted mid-pagination also shift the window, so items get skipped or repeated. Cursor (keyset) pagination, meaning "everything after this sorted key", avoids both problems.
+- Offsets are hard-limited to around 10,000 rows.
+  > No such universal limit exists, though some engines impose one.
 - It cannot be combined with sorting.
   > It requires sorting to be meaningful at all.
 - It requires a stateful server.
@@ -376,38 +376,38 @@ reasoning and runnable code.
 
 - Breaking changes with a migration guide, no version.
   > This shifts the whole cost onto every consumer at once.
+- Deploying each version to a separate domain.
+  > Workable but heavy, and it breaks relative links and cookie scoping.
 - [o] A version in the URL path, such as \`/v1/users\`.
   > It is visible, cacheable, and trivial to route. Header-based versioning is cleaner in theory and harder to debug in practice, since you cannot see the version in a log line or paste it into a browser.
 - Query parameter versioning, such as \`?version=1\`.
-  > It works, but it mixes an API-wide concern into per-request parameters and complicates caching.
-- Deploying each version to a separate domain.
-  > Workable but heavy, and it breaks relative links and cookie scoping.`}
+  > It works, but it mixes an API-wide concern into per-request parameters and complicates caching.`}
 />
 
 <MultipleChoice
   markdown={`How should a client learn its rate limit?
 
-- By observing when requests start failing.
-  > Discovering a limit by tripping it is what the headers exist to avoid.
 - [o] From response headers, plus \`Retry-After\` on a 429.
   > They give the limit, the remaining quota, and the reset time. Well-behaved clients then back off proactively rather than hammering until they are throttled.
-- From the API documentation only.
-  > Documentation cannot report the client's *current* remaining quota.
+- By observing when requests start failing.
+  > Discovering a limit by tripping it is what the headers exist to avoid.
 - From a dedicated endpoint, polled once every minute.
-  > Polling for quota spends quota.`}
+  > Polling for quota spends quota.
+- From the API documentation only.
+  > Documentation cannot report the client's *current* remaining quota.`}
 />
 
 <MultipleChoice
   markdown={`When does GraphQL fit better than REST?
 
+- When strong typing across the wire is a requirement.
+  > REST can be strongly typed with OpenAPI.
 - Whenever the API is public.
   > Public APIs benefit from REST's cacheability and predictability.
 - [o] When varied clients need different subsets of a graph.
   > They would otherwise over-fetch or make many round trips. The cost is caching complexity, query-depth abuse, and N+1 resolution that needs batching.
 - When the payloads are large.
-  > Payload size alone does not favor either.
-- When strong typing across the wire is a requirement.
-  > REST can be strongly typed with OpenAPI.`}
+  > Payload size alone does not favor either.`}
 />
 
 <MultipleChoice
@@ -415,12 +415,12 @@ reasoning and runnable code.
 
 - Human-readable payloads.
   > Protobuf is binary, which is the trade.
+- Freedom from having to define any schema at all.
+  > It requires a \`.proto\` schema; that requirement is the source of its benefits.
 - [o] A compact binary format with generated clients.
   > The schema drives them, and streaming over HTTP/2 comes free. It is why gRPC dominates internal service-to-service traffic and is rare on public browser-facing APIs.
 - Automatic authentication.
-  > Auth is layered on either way.
-- Freedom from having to define any schema at all.
-  > It requires a \`.proto\` schema; that requirement is the source of its benefits.`}
+  > Auth is layered on either way.`}
 />
 
 <MultipleChoice
@@ -439,10 +439,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What does content negotiation let a client do?
 
-- Choose which of the fields come back in the response.
-  > Field selection is done with query parameters or GraphQL.
 - [o] Ask for a format or language via the \`Accept\` headers.
   > The server answers in \`Content-Type\`. It is also how API versioning by media type works, when that approach is chosen.
+- Choose which of the fields come back in the response.
+  > Field selection is done with query parameters or GraphQL.
 - Negotiate a rate limit.
   > Limits are server policy.
 - Compress the request body.
@@ -452,12 +452,12 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`When is a stateful session preferable to a stateless JWT?
 
-- When the API is serving mobile clients.
-  > Client type does not decide this.
 - [o] When you need immediate revocation.
   > A session can be deleted server-side; a signed token stays valid until it expires. The workarounds (very short expiry plus refresh tokens, or a revocation list) reintroduce the server-side state JWTs were meant to avoid.
 - When the payload is large.
   > A large payload argues *for* a session, since the token travels on every request, but revocation is the decisive point.
+- When the API is serving mobile clients.
+  > Client type does not decide this.
 - When you have multiple servers.
   > Multiple servers is the classic argument *for* stateless tokens.`}
 />
@@ -465,14 +465,14 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Is HATEOAS required for an API to be useful?
 
+- It applies only to GraphQL.
+  > GraphQL has its own introspection mechanism instead.
 - Yes; without it the API is not REST.
   > Strictly, Fielding's model does require it, which is why almost no popular "REST" API is fully RESTful.
 - [o] It is a formal constraint that most successful APIs omit.
   > They are perfectly usable with documentation and stable URLs. Knowing both the definition and the industry reality is the answer an interviewer is looking for.
 - No, it was removed from the REST specification later.
-  > REST is a dissertation, not a spec, and nothing was removed.
-- It applies only to GraphQL.
-  > GraphQL has its own introspection mechanism instead.`}
+  > REST is a dissertation, not a spec, and nothing was removed.`}
 />
 
 ## Concurrency
@@ -480,14 +480,14 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What is the difference between concurrency and parallelism?
 
-- They are the same thing.
-  > A single-core machine can be concurrent without ever being parallel.
 - [o] One is about structure, the other about simultaneity.
   > Concurrency lets tasks make progress independently; parallelism executes them at the same instant on multiple cores. Concurrency is about dealing with many things at once; parallelism is about doing many things at once.
-- Concurrency requires multiple processes and parallelism multiple threads.
-  > Both can be built from either.
 - Parallelism is concurrency with locks.
-  > Locks are a coordination mechanism, not a definition.`}
+  > Locks are a coordination mechanism, not a definition.
+- They are the same thing.
+  > A single-core machine can be concurrent without ever being parallel.
+- Concurrency requires multiple processes and parallelism multiple threads.
+  > Both can be built from either.`}
 />
 
 <MultipleChoice
@@ -506,27 +506,27 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What is a race condition?
 
-- Two threads competing over one and the same lock.
-  > Lock contention is expected behavior, not a bug.
-- [o] Behavior that depends on the interleaving of operations.
-  > The result then varies between runs. \`x = x + 1\` is three operations (read, add, write), and two threads can interleave them to lose an update.
 - A thread that runs faster than expected.
   > Speed alone is not a correctness problem.
+- Two threads competing over one and the same lock.
+  > Lock contention is expected behavior, not a bug.
 - A deadlock that resolves itself.
-  > A resolved deadlock is a livelock, which is different again.`}
+  > A resolved deadlock is a livelock, which is different again.
+- [o] Behavior that depends on the interleaving of operations.
+  > The result then varies between runs. \`x = x + 1\` is three operations (read, add, write), and two threads can interleave them to lose an update.`}
 />
 
 <MultipleChoice
   markdown={`What are the four conditions that must all hold for a deadlock?
 
-- Two threads, two locks, one CPU, and no timeout.
-  > These are incidental to one example rather than the general conditions.
+- Shared memory, threads, locks, and recursion.
+  > Deadlock needs none of these specifically.
 - [o] Mutual exclusion, hold-and-wait, no preemption, and circular wait.
   > Breaking any one prevents deadlock, which is why a global lock ordering, breaking circular wait, is the usual practical fix.
 - Starvation, livelock, priority inversion, and lock contention.
   > These are other concurrency pathologies.
-- Shared memory, threads, locks, and recursion.
-  > Deadlock needs none of these specifically.`}
+- Two threads, two locks, one CPU, and no timeout.
+  > These are incidental to one example rather than the general conditions.`}
 />
 
 <MultipleChoice
@@ -534,10 +534,10 @@ reasoning and runnable code.
 
 - A livelock always resolves eventually.
   > It can persist indefinitely; that is what makes it a bug.
-- [o] In one the threads are idle, in the other they are busy.
-  > Deadlocked threads are blocked; livelocked ones keep changing state in response to each other and still make no progress. Two people stepping aside for each other in a corridor, forever. Randomized backoff is the classic fix.
 - A livelock involves only one thread.
   > It requires at least two interacting.
+- [o] In one the threads are idle, in the other they are busy.
+  > Deadlocked threads are blocked; livelocked ones keep changing state in response to each other and still make no progress. Two people stepping aside for each other in a corridor, forever. Randomized backoff is the classic fix.
 - A livelock is caused by starvation of the CPU itself.
   > Starvation is a separate condition.`}
 />
@@ -545,25 +545,25 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What is the difference between a mutex and a semaphore?
 
+- A mutex cannot be released by the thread that acquired it.
+  > That is exactly the thread that should release it.
 - A mutex is faster.
   > Relative cost depends on the implementation.
 - [o] One holder with ownership, against N holders without.
   > A mutex is typically owned by the thread that locked it; a counting semaphore admits up to N and has no ownership. A semaphore initialized to 1 behaves like a lock but without the ownership check, so it can legitimately be released by a different thread.
 - A semaphore can only be used across processes.
-  > Both come in intra- and inter-process forms.
-- A mutex cannot be released by the thread that acquired it.
-  > That is exactly the thread that should release it.`}
+  > Both come in intra- and inter-process forms.`}
 />
 
 <MultipleChoice
   markdown={`Why does Python's GIL exist, and when does it actually hurt?
 
-- It prevents deadlocks, and it hurts when using locks.
-  > It does not prevent deadlocks in user code.
-- [o] It serializes bytecode, hurting CPU-bound threading.
-  > Simplifying memory management is the reason it exists; I/O-bound work is largely unaffected because threads release it during I/O. Threads release the GIL during I/O, which is why threading still helps a network-bound workload. CPU-bound work needs \`multiprocessing\` or a native extension that releases it.
 - It makes all Python code thread-safe.
   > It guarantees only that a single bytecode instruction is atomic; \`x += 1\` still races.
+- [o] It serializes bytecode, hurting CPU-bound threading.
+  > Simplifying memory management is the reason it exists; I/O-bound work is largely unaffected because threads release it during I/O. Threads release the GIL during I/O, which is why threading still helps a network-bound workload. CPU-bound work needs \`multiprocessing\` or a native extension that releases it.
+- It prevents deadlocks, and it hurts when using locks.
+  > It does not prevent deadlocks in user code.
 - It only affects Python 2.
   > It is present in CPython 3 as well, though free-threaded builds are now available.`}
 />
@@ -573,10 +573,10 @@ reasoning and runnable code.
 
 - The runtime moves it to a background thread.
   > No automatic offloading happens.
-- [o] It blocks the entire event loop until it returns.
-  > Every other coroutine stalls in the meantime. The fix is an async-native library, or \`run_in_executor\` / \`asyncio.to_thread\` to push the blocking call onto a thread pool.
 - It raises an exception.
   > It runs perfectly, which is what makes the bug hard to spot.
+- [o] It blocks the entire event loop until it returns.
+  > Every other coroutine stalls in the meantime. The fix is an async-native library, or \`run_in_executor\` / \`asyncio.to_thread\` to push the blocking call onto a thread pool.
 - It runs concurrently anyway, since coroutines are threads.
   > Coroutines are not threads; a single-threaded loop interleaves them cooperatively.`}
 />
@@ -584,36 +584,36 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Which workload is the best fit for \`multiprocessing\` over threads in Python?
 
-- Fetching 500 URLs.
-  > Network waiting is I/O-bound; threads or async are lighter.
 - [o] A numerical transform over a large array in pure Python.
   > CPU-bound work needs separate interpreters to use multiple cores. The cost is process startup and pickling data across the boundary.
 - Reading many small files.
   > File I/O releases the GIL, so threads suffice.
 - Waiting on a long series of slow database queries.
-  > Another I/O-bound case.`}
+  > Another I/O-bound case.
+- Fetching 500 URLs.
+  > Network waiting is I/O-bound; threads or async are lighter.`}
 />
 
 <MultipleChoice
   markdown={`What does a thread pool buy you over creating a thread per task?
 
-- It removes the need for locks.
-  > Shared state still needs protection.
+- It makes tasks run faster individually.
+  > Per-task speed is unchanged, and pooling adds a small queueing overhead.
 - [o] It bounds concurrency and amortizes thread creation.
   > A burst of 10,000 tasks does not then spawn 10,000 threads. The bound is the important half: unbounded thread creation exhausts memory and thrashes the scheduler.
 - It guarantees the tasks run in submission order.
   > Ordering is not guaranteed unless the pool has a single worker.
-- It makes tasks run faster individually.
-  > Per-task speed is unchanged, and pooling adds a small queueing overhead.`}
+- It removes the need for locks.
+  > Shared state still needs protection.`}
 />
 
 <MultipleChoice
   markdown={`What is an atomic operation?
 
-- Any operation completing within a single CPU cycle.
-  > Cycle count is unrelated; many atomics take several.
 - [o] One that appears either fully done or not started.
   > No intermediate state is observable to other threads. Compare-and-swap is the primitive most lock-free structures build on.
+- Any operation completing within a single CPU cycle.
+  > Cycle count is unrelated; many atomics take several.
 - An operation guarded by a lock.
   > Locking is one way to *achieve* atomicity, not what it means.
 - An operation on a single variable.
@@ -623,53 +623,53 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What does a future (or promise) represent?
 
-- A thread that has not been started.
-  > It is a value, not a thread.
-- [o] A placeholder for a result that is not available yet.
-  > It can be waited on, chained, or checked for completion. It decouples "start this work" from "I need the answer now", which is what makes pipelining possible.
+- A callback that is registered with the event loop.
+  > Callbacks are one way to consume a future.
 - A queue of pending tasks.
   > A queue holds many items; a future holds one eventual result.
-- A callback that is registered with the event loop.
-  > Callbacks are one way to consume a future.`}
+- [o] A placeholder for a result that is not available yet.
+  > It can be waited on, chained, or checked for completion. It decouples "start this work" from "I need the answer now", which is what makes pipelining possible.
+- A thread that has not been started.
+  > It is a value, not a thread.`}
 />
 
 <MultipleChoice
   markdown={`What is the most robust way to make a class thread-safe?
 
-- Mark every single method as \`synchronized\`.
-  > This serializes everything, killing throughput, and still allows check-then-act races across two calls.
+- Use atomic types for every field.
+  > Individually atomic fields do not make a multi-field invariant atomic.
 - [o] Make the state immutable wherever that is possible.
   > Otherwise confine mutable state behind a single lock with a clearly documented invariant. Immutability removes the problem rather than managing it, which is why functional-style value objects are so common in concurrent code.
 - Use only local variables.
   > Helpful, but a class with state cannot avoid fields entirely.
-- Use atomic types for every field.
-  > Individually atomic fields do not make a multi-field invariant atomic.`}
+- Mark every single method as \`synchronized\`.
+  > This serializes everything, killing throughput, and still allows check-then-act races across two calls.`}
 />
 
 <MultipleChoice
   markdown={`Two threads each increment a shared counter a million times, and the total comes out below two million. Why?
 
-- The CPU dropped instructions under load.
-  > Hardware does not lose instructions.
+- One thread finished early.
+  > Both complete their loops; the updates are lost, not skipped.
 - [o] The increment is read-modify-write, so updates are lost.
   > Interleaving lets both threads read the same value and write back the same result. An atomic increment or a lock fixes it; so does giving each thread its own counter and summing at the end.
+- The CPU dropped instructions under load.
+  > Hardware does not lose instructions.
 - The threads ran on different cores with their own memory.
-  > Cores share memory, though caching does make the visibility problem worse.
-- One thread finished early.
-  > Both complete their loops; the updates are lost, not skipped.`}
+  > Cores share memory, though caching does make the visibility problem worse.`}
 />
 
 <MultipleChoice
   markdown={`What is starvation, and what typically causes it?
 
+- Two threads waiting on each other.
+  > That is deadlock.
 - A thread blocked on a lock it will eventually get.
   > Ordinary blocking is not starvation.
-- [o] A thread perpetually denied a resource it needs.
-  > Unfair scheduling, or a stream of higher-priority threads jumping ahead, is the usual cause. Fair locks and priority inheritance are the standard mitigations, both trading throughput for predictability.
 - A thread with too little memory allocated.
   > Memory pressure is a separate failure.
-- Two threads waiting on each other.
-  > That is deadlock.`}
+- [o] A thread perpetually denied a resource it needs.
+  > Unfair scheduling, or a stream of higher-priority threads jumping ahead, is the usual cause. Fair locks and priority inheritance are the standard mitigations, both trading throughput for predictability.`}
 />
 
 ## Databases
@@ -677,14 +677,14 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`When does an index *hurt* rather than help?
 
-- On tables with more than a million rows.
-  > Large tables are where indexes help most.
+- When the table is being joined to another table.
+  > Joins are a prime beneficiary.
 - [o] On write-heavy tables and low-cardinality columns.
   > Every insert and update has to maintain the index, and a scan is cheaper on a column matching half the table. An index on a boolean column matching half the table is usually ignored by the planner, so it costs writes and returns nothing.
+- On tables with more than a million rows.
+  > Large tables are where indexes help most.
 - On columns used in \`WHERE\` clauses.
-  > That is the case an index is for.
-- When the table is being joined to another table.
-  > Joins are a prime beneficiary.`}
+  > That is the case an index is for.`}
 />
 
 <MultipleChoice
@@ -694,23 +694,23 @@ reasoning and runnable code.
   > The physical sort order is fixed at creation.
 - [o] It is sorted by \`a\` first, so \`b\` alone cannot use it.
   > The leftmost-prefix rule: it serves filters on \`a\`, or on \`a\` and \`b\` together. It is the leftmost-prefix rule, and it is why an index on \`(a, b)\` often makes a separate index on \`a\` redundant.
-- Only the first column is actually indexed.
-  > Both are stored; the second refines the ordering within each \`a\`.
 - The order affects storage size, but never query plans.
-  > It affects which queries can use the index at all.`}
+  > It affects which queries can use the index at all.
+- Only the first column is actually indexed.
+  > Both are stored; the second refines the ordering within each \`a\`.`}
 />
 
 <MultipleChoice
   markdown={`What is a covering index?
 
+- An index maintained automatically by the database.
+  > Automatic maintenance applies to all indexes.
+- An index that prevents duplicate values.
+  > That is a unique index.
 - An index that covers every column in the table.
   > That would be a duplicate of the table.
 - [o] One containing every column the query needs.
-  > The query is answered from the index alone, without visiting the table rows. This is an "index-only scan". Adding included columns to widen the index is the usual way to reach it.
-- An index that prevents duplicate values.
-  > That is a unique index.
-- An index maintained automatically by the database.
-  > Automatic maintenance applies to all indexes.`}
+  > The query is answered from the index alone, without visiting the table rows. This is an "index-only scan". Adding included columns to widen the index is the usual way to reach it.`}
 />
 
 <MultipleChoice
@@ -718,10 +718,10 @@ reasoning and runnable code.
 
 - That each transaction runs on its own connection.
   > Connection topology is unrelated.
-- [o] That transactions do not see each other's partial state.
-  > To a degree determined by the isolation level, which is the important qualifier. "To a degree" is the important qualifier: only \`SERIALIZABLE\` gives the full guarantee, and most databases default to something weaker.
 - That the database is isolated from network failures.
   > Durability and replication cover failure scenarios.
+- [o] That transactions do not see each other's partial state.
+  > To a degree determined by the isolation level, which is the important qualifier. "To a degree" is the important qualifier: only \`SERIALIZABLE\` gives the full guarantee, and most databases default to something weaker.
 - That each transaction sees a completely private copy of the data.
   > That describes snapshot isolation specifically, not isolation in general.`}
 />
@@ -729,14 +729,14 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Which anomaly does \`READ COMMITTED\` still permit?
 
-- Dirty reads.
-  > \`READ COMMITTED\` exists precisely to prevent those.
 - [o] Non-repeatable reads, where a row changes mid-transaction.
   > Another transaction committed in between the two reads. \`REPEATABLE READ\` closes that; phantom rows may still appear depending on the engine.
-- Nothing at all, since it is the strictest level.
-  > \`SERIALIZABLE\` is the strictest.
 - Lost updates only.
-  > Lost updates are possible, but the level's defining permitted anomaly is the non-repeatable read.`}
+  > Lost updates are possible, but the level's defining permitted anomaly is the non-repeatable read.
+- Dirty reads.
+  > \`READ COMMITTED\` exists precisely to prevent those.
+- Nothing at all, since it is the strictest level.
+  > \`SERIALIZABLE\` is the strictest.`}
 />
 
 <MultipleChoice
@@ -744,36 +744,36 @@ reasoning and runnable code.
 
 - Reading a row that was never written.
   > Nothing appears from nowhere.
+- A read that unexpectedly returns \`NULL\`.
+  > Unrelated to isolation.
 - [o] A range query returning extra rows on a second run.
   > Another transaction inserted rows matching the predicate. It is about set membership rather than a single row's value, which is why preventing it needs predicate or range locking.
 - Reading uncommitted data.
-  > That is a dirty read.
-- A read that unexpectedly returns \`NULL\`.
-  > Unrelated to isolation.`}
+  > That is a dirty read.`}
 />
 
 <MultipleChoice
   markdown={`When is optimistic locking the better choice?
 
-- When conflicts are frequent.
-  > Frequent conflicts mean constant retries; pessimistic locking wins there.
 - [o] When conflicts are rare.
   > Detecting a stale version at write time then costs less than holding a lock through every read. The usual implementation is a version column checked in the \`UPDATE\`'s \`WHERE\` clause, with a retry on zero rows affected.
 - When the transaction is long-running.
   > A long transaction raises the chance of a conflict, which argues against optimism.
 - When the database does not support transactions.
-  > Optimistic locking relies on an atomic conditional update.`}
+  > Optimistic locking relies on an atomic conditional update.
+- When conflicts are frequent.
+  > Frequent conflicts mean constant retries; pessimistic locking wins there.`}
 />
 
 <MultipleChoice
   markdown={`A query is slow. What does the plan's "Seq Scan on a large table" line most likely tell you?
 
-- The table needs to be vacuumed.
-  > Bloat can contribute, but it is not what the line says.
 - [o] No usable index exists, or the planner judged a scan cheaper.
   > A non-sargable filter is a common cause: \`WHERE DATE(created_at) = ...\` defeats an index on \`created_at\`. \`WHERE DATE(created_at) = '2026-01-01'\` defeats an index on \`created_at\`; a range predicate on the bare column does not.
 - The query is returning far too many columns.
   > Column count affects width, not scan choice.
+- The table needs to be vacuumed.
+  > Bloat can contribute, but it is not what the line says.
 - The table has too many indexes.
   > Extra indexes slow writes; they do not force a sequential scan.`}
 />
@@ -781,38 +781,38 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Why can a join inflate a \`SUM\`, and what is the fix?
 
+- Because \`INNER JOIN\` was used instead of \`LEFT JOIN\`.
+  > Join type controls which unmatched rows survive, not duplication.
+- Because the join key is not indexed.
+  > Indexing changes speed, not results.
 - Because \`SUM\` counts \`NULL\`s as zero after a join.
   > \`SUM\` skips \`NULL\`s regardless.
 - [o] The join repeats each left row once per match.
-  > Its measure is then added once per match. Aggregate the many-side to the left grain first, then join. It is the single most common source of an overstated dashboard number.
-- Because the join key is not indexed.
-  > Indexing changes speed, not results.
-- Because \`INNER JOIN\` was used instead of \`LEFT JOIN\`.
-  > Join type controls which unmatched rows survive, not duplication.`}
+  > Its measure is then added once per match. Aggregate the many-side to the left grain first, then join. It is the single most common source of an overstated dashboard number.`}
 />
 
 <MultipleChoice
   markdown={`When should you reach for a document store over a relational database?
 
-- Whenever the data volume grows past a terabyte.
-  > Relational systems handle far more than that.
-- [o] When you mostly fetch a whole aggregate by key.
-  > Particularly if the schema varies per document in ways a table would express poorly. The trade is giving up joins and multi-document transactional guarantees, which many document stores now partially offer back.
+- When the data has no relationships.
+  > Almost all data has relationships; the question is where you resolve them.
 - Whenever you need horizontal scaling.
   > Relational databases shard too; the modelling fit is the real question.
-- When the data has no relationships.
-  > Almost all data has relationships; the question is where you resolve them.`}
+- [o] When you mostly fetch a whole aggregate by key.
+  > Particularly if the schema varies per document in ways a table would express poorly. The trade is giving up joins and multi-document transactional guarantees, which many document stores now partially offer back.
+- Whenever the data volume grows past a terabyte.
+  > Relational systems handle far more than that.`}
 />
 
 <MultipleChoice
   markdown={`What is the difference between a primary key and a unique constraint?
 
-- Nothing; they are synonyms.
-  > They differ in nullability and in how many can exist.
 - [o] One per table and never \`NULL\`, against many that allow it.
   > A table has at most one primary key; unique constraints can be numerous and typically permit \`NULL\`. The primary key also usually determines the physical clustering in engines that cluster on it.
 - A unique constraint cannot be indexed at all.
   > It is enforced *by* an index.
+- Nothing; they are synonyms.
+  > They differ in nullability and in how many can exist.
 - A primary key must be a single column.
   > Composite primary keys are common.`}
 />
@@ -820,14 +820,14 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Two transactions update the same two rows in opposite order and both hang. What happened, and what is the fix?
 
-- A lock timeout; increase the timeout.
-  > A longer timeout makes the hang last longer.
+- An isolation level that is too low; raise it.
+  > Raising isolation generally increases locking and makes deadlocks more likely.
 - [o] A deadlock from circular waiting.
   > Establish a consistent lock ordering so every transaction takes the rows in the same sequence. Most databases detect the cycle and abort one transaction, so the application must also be prepared to retry.
+- A lock timeout; increase the timeout.
+  > A longer timeout makes the hang last longer.
 - A network partition; add a retry.
-  > Nothing is partitioned; both transactions are alive and waiting.
-- An isolation level that is too low; raise it.
-  > Raising isolation generally increases locking and makes deadlocks more likely.`}
+  > Nothing is partitioned; both transactions are alive and waiting.`}
 />
 
 <MultipleChoice
@@ -835,10 +835,10 @@ reasoning and runnable code.
 
 - Whenever queries feel slow.
   > Slowness is usually an indexing or query problem first.
-- [o] When a read-heavy path repeatedly pays for the same joins.
-  > You accept the write-side cost of keeping the redundant copy consistent. The cost is real: every duplicated value is a place the data can disagree with itself.
 - Whenever the schema grows beyond about ten tables.
   > Table count says nothing about the right shape.
+- [o] When a read-heavy path repeatedly pays for the same joins.
+  > You accept the write-side cost of keeping the redundant copy consistent. The cost is real: every duplicated value is a place the data can disagree with itself.
 - Never; normalization is always correct.
   > Warehouses denormalize deliberately and correctly.`}
 />
@@ -846,27 +846,27 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What does a \`FULL OUTER JOIN\` return that a \`LEFT JOIN\` does not?
 
-- Duplicate rows from the right table.
-  > Duplication comes from key cardinality, not join type.
 - [o] The unmatched rows from the *right* table as well.
   > They arrive padded with \`NULL\`s on the left. It is the union of what a \`LEFT\` and a \`RIGHT\` join would each return.
+- Rows in a different order.
+  > Order is undefined without \`ORDER BY\` in either case.
 - Only the rows that match in both of the tables.
   > That is an \`INNER JOIN\`.
-- Rows in a different order.
-  > Order is undefined without \`ORDER BY\` in either case.`}
+- Duplicate rows from the right table.
+  > Duplication comes from key cardinality, not join type.`}
 />
 
 <MultipleChoice
   markdown={`What is the practical purpose of wrapping several statements in a transaction?
 
+- To bypass constraint checking until the commit.
+  > Some constraints can be deferred, but that is an option rather than the purpose.
+- To lock the whole database.
+  > Locking is at row or page granularity, not the whole database.
 - To make them run faster.
   > Batching can help throughput, but that is a side effect.
 - [o] To make them succeed or fail as a single unit.
-  > A failure partway through then leaves no half-applied state. Transferring money between accounts is the canonical case: two updates that must not be separable.
-- To lock the whole database.
-  > Locking is at row or page granularity, not the whole database.
-- To bypass constraint checking until the commit.
-  > Some constraints can be deferred, but that is an option rather than the purpose.`}
+  > A failure partway through then leaves no half-applied state. Transferring money between accounts is the canonical case: two updates that must not be separable.`}
 />
 
 ## Object-oriented design & Python
@@ -874,27 +874,27 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What does encapsulation actually buy you?
 
-- It hides the source code from other developers.
-  > Visibility modifiers are not a secrecy mechanism.
 - [o] It confines the invariants to one place.
   > State can only change through methods that keep it valid, and the internals can be rewritten without touching callers. A class exposing public mutable fields has no way to enforce anything about them.
-- It makes objects immutable.
-  > Immutability is a related but separate design choice.
 - It improves performance through inlining.
-  > Any performance effect is incidental.`}
+  > Any performance effect is incidental.
+- It hides the source code from other developers.
+  > Visibility modifiers are not a secrecy mechanism.
+- It makes objects immutable.
+  > Immutability is a related but separate design choice.`}
 />
 
 <MultipleChoice
   markdown={`Why favour composition over inheritance?
 
-- Inheritance is slower at runtime.
-  > Dispatch costs are negligible either way.
-- [o] Composition lets behavior be swapped at runtime.
-  > Inheritance binds a subclass to its parent's implementation permanently. A deep hierarchy also forces every change through a base class that was designed before the requirements were known.
 - Composition requires less code.
   > It often requires more, in exchange for flexibility.
+- Inheritance is slower at runtime.
+  > Dispatch costs are negligible either way.
 - Inheritance is unable to express "is-a" relationships.
-  > "Is-a" is exactly what it expresses well; the trouble is that most relationships are not actually "is-a".`}
+  > "Is-a" is exactly what it expresses well; the trouble is that most relationships are not actually "is-a".
+- [o] Composition lets behavior be swapped at runtime.
+  > Inheritance binds a subclass to its parent's implementation permanently. A deep hierarchy also forces every change through a base class that was designed before the requirements were known.`}
 />
 
 <MultipleChoice
@@ -902,23 +902,23 @@ reasoning and runnable code.
 
 - That every subclass implements every parent method.
   > Implementing them is not enough if the behavior differs.
-- [o] That a subclass can stand in for its parent safely.
-  > No strengthened preconditions and no weakened postconditions, so no caller's expectations break. A \`Square\` extending \`Rectangle\` violates it: code that sets width and height independently breaks.
 - That every class have exactly one parent.
   > Single inheritance is a language rule in some languages, not this principle.
 - That subclasses never override methods.
-  > Overriding is the point; the constraint is on what the override may do.`}
+  > Overriding is the point; the constraint is on what the override may do.
+- [o] That a subclass can stand in for its parent safely.
+  > No strengthened preconditions and no weakened postconditions, so no caller's expectations break. A \`Square\` extending \`Rectangle\` violates it: code that sets width and height independently breaks.`}
 />
 
 <MultipleChoice
   markdown={`What does the Dependency Inversion Principle say?
 
+- Dependencies should be injected through constructors only.
+  > Constructor injection is one technique for applying it.
 - High-level modules should not depend on anything.
   > They must depend on something; the question is what.
 - [o] Both high- and low-level modules depend on abstractions.
   > The policy then does not hard-code which implementation it uses. An order service depending on a \`PaymentGateway\` interface can be tested with a fake and re-pointed at a new provider without changing.
-- Dependencies should be injected through constructors only.
-  > Constructor injection is one technique for applying it.
 - Low-level modules should define the interfaces.
   > The consumer usually owns the interface, which is what makes the inversion an inversion.`}
 />
@@ -926,25 +926,25 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`When is the Strategy pattern the right tool?
 
-- When you need exactly one instance of a class.
-  > That is Singleton.
+- When many objects have to be notified of a change.
+  > That is Observer.
 - [o] When interchangeable algorithms are chosen at runtime.
   > It replaces a growing conditional. Pricing rules, sort orders, and retry policies are typical. Pricing rules, sorting orders, and retry policies are typical. In languages with first-class functions, a function parameter often suffices.
 - When object creation is expensive.
   > That points at a factory, a pool, or lazy initialization.
-- When many objects have to be notified of a change.
-  > That is Observer.`}
+- When you need exactly one instance of a class.
+  > That is Singleton.`}
 />
 
 <MultipleChoice
   markdown={`Why is the Singleton pattern controversial?
 
+- It cannot be made thread-safe.
+  > It can, with care; that is a separate problem.
 - It is measurably slower than a normal class.
   > Performance is not the objection.
 - [o] It introduces hidden global state.
   > Tests become order-dependent and hard to isolate, and dependencies are concealed rather than declared. A single instance managed by a dependency-injection container gives the same lifetime without the global reach.
-- It cannot be made thread-safe.
-  > It can, with care; that is a separate problem.
 - It requires inheritance.
   > It does not.`}
 />
@@ -952,105 +952,105 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What is the difference between an abstract class and an interface?
 
+- Interfaces are faster.
+  > Dispatch cost is not a meaningful difference.
 - An interface can have no methods.
   > Both can be empty; that is not the distinction.
 - [o] One carries state and implementation, the other a contract.
   > An abstract class is normally singly inherited; a class can satisfy several interfaces. "Is-a with shared machinery" versus "can-do capability" is the usual way to choose.
 - Abstract classes cannot be instantiated, but interfaces can.
-  > Neither can be instantiated directly.
-- Interfaces are faster.
-  > Dispatch cost is not a meaningful difference.`}
+  > Neither can be instantiated directly.`}
 />
 
 <MultipleChoice
   markdown={`What is the mutable-default-argument trap in Python?
 
-- Default arguments cannot be mutable types.
-  > They can, which is the problem.
 - [o] The default is evaluated once, at function definition.
   > A mutable default is therefore shared across every call and accumulates changes. Use \`None\` as the default and create the list or dict inside the body.
+- The default is re-evaluated on every call.
+  > If it were, the trap would not exist.
 - Mutable defaults are copied on each call, which is slow.
   > No copy is made; the same object is reused.
-- The default is re-evaluated on every call.
-  > If it were, the trap would not exist.`}
+- Default arguments cannot be mutable types.
+  > They can, which is the problem.`}
 />
 
 <MultipleChoice
   markdown={`What distinguishes \`is\` from \`==\` in Python?
 
-- \`is\` compares values and \`==\` compares types.
-  > Neither is right.
-- [o] One tests identity, the other tests value.
-  > \`is\` asks whether two names refer to the same object; \`==\` calls \`__eq__\`. Small integers and short strings are interned, so \`is\` sometimes appears to work on values, which is precisely what makes the bug intermittent.
 - They are equivalent for immutable types.
   > Interning makes them *appear* equivalent, which is not the same as being so.
 - \`is\` is faster and otherwise identical.
-  > It is faster because it asks a different question.`}
+  > It is faster because it asks a different question.
+- [o] One tests identity, the other tests value.
+  > \`is\` asks whether two names refer to the same object; \`==\` calls \`__eq__\`. Small integers and short strings are interned, so \`is\` sometimes appears to work on values, which is precisely what makes the bug intermittent.
+- \`is\` compares values and \`==\` compares types.
+  > Neither is right.`}
 />
 
 <MultipleChoice
   markdown={`Why use a generator instead of building a list?
 
-- Generators are always faster.
-  > Per-item overhead can be slightly higher; the win is in memory.
 - [o] It yields items lazily, so peak memory stays constant.
   > However many items pass through, and work stops early if the consumer does. The trade is that a generator is single-pass and has no length.
-- Generators can be indexed.
-  > They cannot; that is one of the trade-offs.
+- Generators are always faster.
+  > Per-item overhead can be slightly higher; the win is in memory.
 - Generators automatically parallelize the work.
-  > No concurrency is implied.`}
+  > No concurrency is implied.
+- Generators can be indexed.
+  > They cannot; that is one of the trade-offs.`}
 />
 
 <MultipleChoice
   markdown={`What is a closure, and what makes one?
 
-- Any function that is defined inside another function.
-  > Nesting alone is not enough; the inner function must capture something.
-- [o] A nested function that captures an enclosing variable.
-  > The reference keeps it alive after the outer call returns. Rebinding such a variable from the inner function needs \`nonlocal\`, otherwise Python treats the assignment as creating a new local.
 - A function with no arguments.
   > Arity is unrelated.
+- [o] A nested function that captures an enclosing variable.
+  > The reference keeps it alive after the outer call returns. Rebinding such a variable from the inner function needs \`nonlocal\`, otherwise Python treats the assignment as creating a new local.
 - A function that has been decorated.
-  > Decorators frequently *use* closures but are not the definition.`}
+  > Decorators frequently *use* closures but are not the definition.
+- Any function that is defined inside another function.
+  > Nesting alone is not enough; the inner function must capture something.`}
 />
 
 <MultipleChoice
   markdown={`What is the difference between \`__repr__\` and \`__str__\`?
 
+- Only \`__str__\` is called by \`print\`.
+  > \`print\` calls \`__str__\`, which falls back to \`__repr__\`.
 - \`__str__\` is for developers and \`__repr__\` for end users.
   > It is the other way round.
-- [o] One is unambiguous for developers, the other readable.
-  > \`__repr__\` ideally reconstructs the object; \`__str__\` falls back to it when undefined. Defining only \`__repr__\` is usually the right default, since it covers both and is what shows up in logs and debuggers.
 - \`__repr__\` must return bytes.
   > Both return \`str\`.
-- Only \`__str__\` is called by \`print\`.
-  > \`print\` calls \`__str__\`, which falls back to \`__repr__\`.`}
+- [o] One is unambiguous for developers, the other readable.
+  > \`__repr__\` ideally reconstructs the object; \`__str__\` falls back to it when undefined. Defining only \`__repr__\` is usually the right default, since it covers both and is what shows up in logs and debuggers.`}
 />
 
 <MultipleChoice
   markdown={`What does a context manager guarantee?
 
-- That the block runs without raising.
-  > Exceptions still propagate unless \`__exit__\` suppresses them.
+- That the block is thread-safe.
+  > Thread safety is unrelated.
 - [o] That the cleanup in \`__exit__\` always runs.
   > Normal completion, an early return, and an exception all reach it. It is why \`with open(...)\` is the correct way to handle files, and \`contextlib.contextmanager\` makes writing one a matter of \`try\`/\`finally\` around a \`yield\`.
+- That the block runs without raising.
+  > Exceptions still propagate unless \`__exit__\` suppresses them.
 - That the resource is released immediately after acquisition.
-  > It is released at the end of the block.
-- That the block is thread-safe.
-  > Thread safety is unrelated.`}
+  > It is released at the end of the block.`}
 />
 
 <MultipleChoice
   markdown={`What is the difference between \`@staticmethod\` and \`@classmethod\`?
 
+- \`@classmethod\` methods cannot be overridden.
+  > They can.
 - \`@staticmethod\` receives the instance; \`@classmethod\` does not.
   > Neither receives the instance.
 - [o] One receives the class, the other receives nothing.
   > \`@classmethod\` gets \`cls\`, which makes it the natural choice for alternative constructors. Because \`@classmethod\` gets \`cls\`, a subclass calling it constructs the subclass rather than the base.
 - \`@staticmethod\` cannot be called on an instance.
-  > It can be called on either.
-- \`@classmethod\` methods cannot be overridden.
-  > They can.`}
+  > It can be called on either.`}
 />
 
 <MultipleChoice
@@ -1058,10 +1058,10 @@ reasoning and runnable code.
 
 - Restricting which methods a class chooses to expose.
   > Methods are unaffected.
-- [o] Declaring a fixed set of attributes up front.
-  > Instances then skip the per-instance \`__dict__\`, which cuts memory noticeably at high instance counts. The costs are losing dynamic attribute assignment and complicating multiple inheritance, so it is an optimization rather than a default.
 - Making attributes read-only.
   > Attributes stay writable.
+- [o] Declaring a fixed set of attributes up front.
+  > Instances then skip the per-instance \`__dict__\`, which cuts memory noticeably at high instance counts. The costs are losing dynamic attribute assignment and complicating multiple inheritance, so it is an optimization rather than a default.
 - Speeding up method dispatch.
   > Attribute access gets slightly faster; dispatch does not change.`}
 />
@@ -1073,23 +1073,23 @@ reasoning and runnable code.
   > It runs in either case; that is the point.
 - [o] That its block runs on the way out of the \`try\`.
   > Normal completion, an exception, and a \`return\` all count. A \`return\` inside \`finally\` will even override one from the \`try\` block. That is legal, and a reliable way to confuse the next reader.
-- That exceptions in the \`try\` block are suppressed.
-  > Suppression requires an \`except\` clause.
 - That the code runs in a separate thread.
-  > No concurrency is involved.`}
+  > No concurrency is involved.
+- That exceptions in the \`try\` block are suppressed.
+  > Suppression requires an \`except\` clause.`}
 />
 
 <MultipleChoice
   markdown={`What is the difference between a shallow and a deep copy?
 
-- A shallow copy copies nothing.
-  > It creates a new outer container.
-- [o] One shares the nested objects, the other duplicates them.
-  > A shallow copy duplicates only the outer container; a deep copy recurses all the way down. It is why mutating a nested list in a shallowly-copied structure changes both copies.
 - A deep copy is just a shallow copy applied twice.
   > It recurses to arbitrary depth, not two levels.
+- [o] One shares the nested objects, the other duplicates them.
+  > A shallow copy duplicates only the outer container; a deep copy recurses all the way down. It is why mutating a nested list in a shallowly-copied structure changes both copies.
 - They differ only for immutable types.
-  > For immutable types the distinction barely matters; it is mutable nesting that exposes it.`}
+  > For immutable types the distinction barely matters; it is mutable nesting that exposes it.
+- A shallow copy copies nothing.
+  > It creates a new outer container.`}
 />
 
 <MultipleChoice
@@ -1097,12 +1097,12 @@ reasoning and runnable code.
 
 - Yes; they enforce types on assignment.
   > No checking happens at assignment.
-- [o] No, they are metadata for static checkers and editors.
-  > Libraries can opt into reading them, but passing the wrong type still runs. Libraries such as Pydantic and FastAPI do read them at runtime to validate, which is opt-in behavior rather than the language enforcing anything.
 - Yes, they make attribute access measurably faster.
   > No performance change.
 - Only inside dataclasses.
-  > Dataclasses read annotations to generate methods, but still do not enforce types.`}
+  > Dataclasses read annotations to generate methods, but still do not enforce types.
+- [o] No, they are metadata for static checkers and editors.
+  > Libraries can opt into reading them, but passing the wrong type still runs. Libraries such as Pydantic and FastAPI do read them at runtime to validate, which is opt-in behavior rather than the language enforcing anything.`}
 />
 
 <MultipleChoice
@@ -1110,10 +1110,10 @@ reasoning and runnable code.
 
 - Both should be high.
   > High coupling is what makes a change in one module ripple through five others.
-- [o] Cohesion should be high and coupling should be low.
-  > Cohesion is how related a module's responsibilities are; coupling is how much modules depend on each other. A class that parses config, sends email, and computes tax has low cohesion; one that reaches into another's fields has high coupling. Both make change expensive.
 - Both should be low.
   > Low cohesion means a module has no coherent reason to exist.
+- [o] Cohesion should be high and coupling should be low.
+  > Cohesion is how related a module's responsibilities are; coupling is how much modules depend on each other. A class that parses config, sends email, and computes tax has low cohesion; one that reaches into another's fields has high coupling. Both make change expensive.
 - Cohesion should be low, so that modules stay small.
   > Small is good; incoherent is not. Splitting on responsibility keeps both.`}
 />
@@ -1121,12 +1121,12 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What are the average time complexities of Python's \`dict\` operations, and what makes them possible?
 
+- O(1) for lookup but O(n) for insert.
+  > Insertion is amortized O(1); the occasional resize is what "amortized" absorbs.
 - O(log n), because a \`dict\` is a balanced tree.
   > Python's \`dict\` is a hash table, not a tree.
 - [o] O(1) average for lookup, insert, and delete.
   > Keys are hashed to a slot, which is also why they must be hashable and therefore effectively immutable. Worst case degrades to O(n) under heavy collisions, and since 3.7 insertion order is part of the language guarantee.
-- O(1) for lookup but O(n) for insert.
-  > Insertion is amortized O(1); the occasional resize is what "amortized" absorbs.
 - O(n) for all three on large dictionaries.
   > That would defeat the point of the structure.`}
 />
@@ -1136,12 +1136,12 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What should you do first in an open-ended system design question?
 
-- Sketch the database schema.
-  > Schema follows from requirements not yet established.
-- [o] Clarify the requirements, then estimate the scale.
-  > Every later decision then has a stated justification to rest on. Designing for a million users when the answer is a thousand, or the reverse, is the most common way these interviews go wrong.
 - Name the technologies you would use.
   > Technology choice without requirements is guessing.
+- [o] Clarify the requirements, then estimate the scale.
+  > Every later decision then has a stated justification to rest on. Designing for a million users when the answer is a thousand, or the reverse, is the most common way these interviews go wrong.
+- Sketch the database schema.
+  > Schema follows from requirements not yet established.
 - Draw out the full architecture straight away.
   > A diagram before requirements bakes in assumptions nobody agreed to.`}
 />
@@ -1149,14 +1149,14 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What does horizontal scaling give you that vertical scaling does not?
 
-- Lower operational complexity.
-  > It is considerably more complex.
-- [o] Headroom past the largest machine, plus redundancy.
-  > Losing one node degrades capacity instead of causing an outage. It requires stateless services or a way to route state, which is the real cost.
+- Freedom from load balancing.
+  > It requires load balancing.
 - Noticeably better single-request latency.
   > Latency per request generally does not improve, and cross-node coordination can worsen it.
-- Freedom from load balancing.
-  > It requires load balancing.`}
+- [o] Headroom past the largest machine, plus redundancy.
+  > Losing one node degrades capacity instead of causing an outage. It requires stateless services or a way to route state, which is the real cost.
+- Lower operational complexity.
+  > It is considerably more complex.`}
 />
 
 <MultipleChoice
@@ -1175,14 +1175,14 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Why is cache invalidation hard?
 
-- Caches do not support deletion.
-  > Deletion is trivial; knowing when is not.
+- Invalidation always requires a distributed transaction.
+  > Some designs use one; most accept eventual consistency instead.
 - [o] The source can change through paths the cache never sees.
   > Correctness then depends on every writer knowing what to invalidate. TTLs bound staleness without needing that knowledge, which is why they are so common despite being imprecise.
 - Cache keys must be unique across the cluster.
   > Namespacing solves that easily.
-- Invalidation always requires a distributed transaction.
-  > Some designs use one; most accept eventual consistency instead.`}
+- Caches do not support deletion.
+  > Deletion is trivial; knowing when is not.`}
 />
 
 <MultipleChoice
@@ -1190,64 +1190,64 @@ reasoning and runnable code.
 
 - FIFO.
   > FIFO ignores access, so it evicts a hot entry simply because it arrived first.
-- [o] LRU.
-  > Least-recently-used keeps whatever was touched most recently, which matches recency-skewed access. LFU is better when popularity is stable but old.
+- TTL-only.
+  > A TTL bounds staleness rather than managing capacity.
 - Random.
   > Random is cheap and surprisingly decent, but it exploits no pattern.
-- TTL-only.
-  > A TTL bounds staleness rather than managing capacity.`}
+- [o] LRU.
+  > Least-recently-used keeps whatever was touched most recently, which matches recency-skewed access. LFU is better when popularity is stable but old.`}
 />
 
 <MultipleChoice
   markdown={`What does read-replica database replication give you, and what does it cost?
 
-- Substantially higher write throughput.
-  > Writes still go to the primary.
 - [o] Read scaling and a failover candidate, at the cost of lag.
   > A read straight after a write may not see it. "Read your own writes" usually needs pinning that user's reads to the primary for a short window.
 - Stronger consistency.
   > Asynchronous replication weakens it.
 - Automatic sharding.
-  > Replicas hold full copies; sharding splits the data.`}
+  > Replicas hold full copies; sharding splits the data.
+- Substantially higher write throughput.
+  > Writes still go to the primary.`}
 />
 
 <MultipleChoice
   markdown={`How does sharding differ from partitioning?
 
+- Partitioning requires a shard key.
+  > Both need a key; only sharding turns that choice into a routing decision.
+- Sharding applies only to NoSQL databases.
+  > Relational systems shard too.
 - They are the same operation going by two names.
   > The distinction is where the pieces live.
 - [o] Sharding puts the pieces on separate machines.
-  > Partitioning splits a table within one database; sharding distributes those pieces, each with its own resources. Sharding is what forces the hard parts: cross-shard joins, distributed transactions, and rebalancing a hot shard.
-- Sharding applies only to NoSQL databases.
-  > Relational systems shard too.
-- Partitioning requires a shard key.
-  > Both need a key; only sharding turns that choice into a routing decision.`}
+  > Partitioning splits a table within one database; sharding distributes those pieces, each with its own resources. Sharding is what forces the hard parts: cross-shard joins, distributed transactions, and rebalancing a hot shard.`}
 />
 
 <MultipleChoice
   markdown={`What does the CAP theorem actually force you to choose between?
 
-- Consistency, availability, and performance.
-  > Performance is not one of the three.
-- [o] Consistency and availability, during a partition.
-  > Partition tolerance is not optional in a distributed system, so the choice only arises when one happens. The everyday version, PACELC, adds the point that even without a partition you trade latency against consistency.
 - Two of consistency, availability, and partition tolerance, freely.
   > The popular "pick two" framing is misleading: partitions occur whether or not you pick them.
 - Read and write throughput.
-  > Throughput is a capacity concern.`}
+  > Throughput is a capacity concern.
+- [o] Consistency and availability, during a partition.
+  > Partition tolerance is not optional in a distributed system, so the choice only arises when one happens. The everyday version, PACELC, adds the point that even without a partition you trade latency against consistency.
+- Consistency, availability, and performance.
+  > Performance is not one of the three.`}
 />
 
 <MultipleChoice
   markdown={`When does introducing a message queue help?
 
-- Whenever two services need to communicate.
-  > Synchronous calls are simpler when the caller needs an answer now.
-- [o] When work is asynchronous or spikes need absorbing.
-  > Producers and consumers can then also scale and fail independently. The cost is eventual consistency, duplicate delivery, and ordering that is only guaranteed within a partition.
 - When you need lower latency for the end user overall.
   > Perceived latency can improve, but the total work takes longer.
 - When the database is slow.
-  > A queue defers load; it does not make a slow query fast.`}
+  > A queue defers load; it does not make a slow query fast.
+- Whenever two services need to communicate.
+  > Synchronous calls are simpler when the caller needs an answer now.
+- [o] When work is asynchronous or spikes need absorbing.
+  > Producers and consumers can then also scale and fail independently. The cost is eventual consistency, duplicate delivery, and ordering that is only guaranteed within a partition.`}
 />
 
 <MultipleChoice
@@ -1266,14 +1266,14 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`In a URL shortener, why is a hash of the long URL a problematic id scheme on its own?
 
-- Hashes are too long to be useful.
-  > They can be truncated, which is where the problem starts.
-- [o] Truncating to a short code creates collisions.
-  > You still need a uniqueness check and a resolution strategy on write. A counter encoded in base62, or a pre-generated key pool, avoids collisions by construction.
 - Hashing is too slow at scale.
   > Hashing is trivially fast.
+- Hashes are too long to be useful.
+  > They can be truncated, which is where the problem starts.
 - Hashes cannot be stored in a database column.
-  > They store as ordinary strings.`}
+  > They store as ordinary strings.
+- [o] Truncating to a short code creates collisions.
+  > You still need a uniqueness check and a resolution strategy on write. A counter encoded in base62, or a pre-generated key pool, avoids collisions by construction.`}
 />
 
 <MultipleChoice
@@ -1281,10 +1281,10 @@ reasoning and runnable code.
 
 - When most users have few followers.
   > That is the case it handles best.
-- [o] For accounts whose one post triggers millions of writes.
-  > The usual answer is a hybrid, pulling celebrity posts at read time. Fan-out on write optimizes reads at the cost of write amplification; the tail of the follower distribution is what breaks it.
 - When the feed has to stay strictly chronological.
   > Ordering works under either strategy.
+- [o] For accounts whose one post triggers millions of writes.
+  > The usual answer is a hybrid, pulling celebrity posts at read time. Fan-out on write optimizes reads at the cost of write amplification; the tail of the follower distribution is what breaks it.
 - When reads outnumber writes.
   > A read-heavy workload is exactly what fan-out on write is for.`}
 />
@@ -1292,40 +1292,40 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What does a CDN actually improve?
 
-- Database query time.
-  > A CDN never touches the database.
-- [o] Latency and origin load, for cacheable content.
-  > It is served from a point of presence near the user. It also absorbs traffic spikes and offloads bandwidth cost, which is often the larger saving.
 - Application correctness when under heavy load.
   > Correctness is unaffected.
 - Write throughput.
-  > CDNs cache reads.`}
+  > CDNs cache reads.
+- Database query time.
+  > A CDN never touches the database.
+- [o] Latency and origin load, for cacheable content.
+  > It is served from a point of presence near the user. It also absorbs traffic spikes and offloads bandwidth cost, which is often the larger saving.`}
 />
 
 <MultipleChoice
   markdown={`How do you remove a single point of failure?
 
-- Add monitoring so that you know when it fails.
-  > Monitoring shortens the outage; it does not prevent one.
-- [o] Add redundancy, and exercise the failover path.
-  > An untested standby is a single point of failure with extra steps. An untested standby is a single point of failure with extra steps.
 - Scale the component vertically.
   > A bigger single machine is still single.
 - Document a manual recovery procedure.
-  > Useful, but it leaves the outage lasting as long as a human takes.`}
+  > Useful, but it leaves the outage lasting as long as a human takes.
+- [o] Add redundancy, and exercise the failover path.
+  > An untested standby is a single point of failure with extra steps. An untested standby is a single point of failure with extra steps.
+- Add monitoring so that you know when it fails.
+  > Monitoring shortens the outage; it does not prevent one.`}
 />
 
 <MultipleChoice
   markdown={`Which back-of-the-envelope figures are worth having memorized for a design interview?
 
-- The exact price of each cloud instance type.
-  > Pricing changes constantly and is rarely the crux.
-- [o] Rough orders of magnitude for memory, disk, and network.
-  > Memory reads in nanoseconds, SSD in tens of microseconds, a cross-region round trip in the tens or hundreds of milliseconds, and how those turn into QPS and storage per day. The numbers only need to be right to an order of magnitude, enough to say whether something fits in memory or needs a different design.
 - The number of cores in the latest server CPUs.
   > Occasionally useful, rarely decisive.
+- The exact price of each cloud instance type.
+  > Pricing changes constantly and is rarely the crux.
 - The default configuration values your database ships with.
-  > Worth knowing on the job, not for sizing a design.`}
+  > Worth knowing on the job, not for sizing a design.
+- [o] Rough orders of magnitude for memory, disk, and network.
+  > Memory reads in nanoseconds, SSD in tens of microseconds, a cross-region round trip in the tens or hundreds of milliseconds, and how those turn into QPS and storage per day. The numbers only need to be right to an order of magnitude, enough to say whether something fits in memory or needs a different design.`}
 />
 
 ## Keep practicing

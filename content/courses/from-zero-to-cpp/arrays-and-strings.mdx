@@ -336,10 +336,10 @@ int main() {
 <MultipleChoice
   markdown={`What is the main difference between a raw \`int[10]\` and \`std::array<int, 10>\`?
 
-- Raw arrays are faster at runtime.
-  > They are typically the same speed; \`std::array\` is a zero-cost wrapper.
 - [o] \`std::array\` knows its size, can be copied and returned by value, and works with standard algorithms, while raw arrays decay to pointers and forget their length.
   > \`std::array\` removes most of the footguns without any runtime cost.
+- Raw arrays are faster at runtime.
+  > They are typically the same speed; \`std::array\` is a zero-cost wrapper.
 - They are interchangeable; the names are just different.
   > They differ in how they propagate type information.
 - Raw arrays live on the heap.
@@ -349,27 +349,27 @@ int main() {
 <MultipleChoice
   markdown={`Why is \`push_back\` on a \`std::vector\` considered O(1) *amortized*?
 
+- It is O(log n).
+  > Logarithmic growth would make growth too slow; vectors double (or similar).
 - It is always O(1).
   > Occasionally it triggers a reallocation and copy, which is O(n).
-- It is O(n) every time.
-  > That would make any vector-based algorithm slow; this isn't the case.
 - [o] Most pushes are O(1); when capacity is exceeded the vector reallocates and copies, but it grows geometrically, so the *average* cost per push is constant.
   > This is the classic amortized-analysis argument.
-- It is O(log n).
-  > Logarithmic growth would make growth too slow; vectors double (or similar).`}
+- It is O(n) every time.
+  > That would make any vector-based algorithm slow; this isn't the case.`}
 />
 
 <MultipleChoice
   markdown={`What does \`v.at(i)\` do that \`v[i]\` does not?
 
-- It allocates new storage.
-  > Neither does.
 - [o] It checks the index against the vector's size and throws \`std::out_of_range\` if it is invalid; \`[]\` performs no such check.
   > Use \`at\` when handling unvalidated input.
-- It returns a copy instead of a reference.
-  > Both return references.
+- It allocates new storage.
+  > Neither does.
 - It is significantly faster.
-  > It is slightly *slower* because of the check.`}
+  > It is slightly *slower* because of the check.
+- It returns a copy instead of a reference.
+  > Both return references.`}
 />
 
 Next: how to bundle multiple values together into a single named

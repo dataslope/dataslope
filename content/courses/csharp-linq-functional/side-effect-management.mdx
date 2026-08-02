@@ -345,14 +345,14 @@ can adopt.
 <MultipleChoice
   markdown={`Why do experienced functional-style C# programmers pass values like \`DateTime now\` or \`Random rng\` as arguments instead of calling \`DateTime.UtcNow\` / \`new Random()\` inside the function?
 
-- Because \`DateTime.UtcNow\` is slow.
-  > It is essentially free. Performance is not the reason.
 - Because static calls are forbidden inside LINQ lambdas.
   > Not true, you can call any method inside a lambda. The objection is about *purity*, not legality.
 - [o] To make the function deterministic and testable, the same inputs always produce the same output, and tests can supply any time/seed they want.
   > Hidden environmental reads (clock, RNG, environment variables) make a function impure and untestable. Lifting those reads to parameters turns the function into a pure, predictable building block; the shell stays responsible for sourcing the real values.
 - To improve thread safety.
   > A side benefit in some cases (avoiding shared \`Random\` instances, for example), but the primary motivation is testability and reasoning.
+- Because \`DateTime.UtcNow\` is slow.
+  > It is essentially free. Performance is not the reason.
 
 This single discipline, *push reads out, return data in*, is the
 core habit behind "functional core, imperative shell".`}

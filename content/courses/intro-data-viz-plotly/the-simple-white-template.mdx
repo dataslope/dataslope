@@ -183,10 +183,10 @@ and dashboards.
 <MultipleChoice
   markdown={`What does a Plotly **template** control?
 
-- The numeric data plotted.
-  > Templates have no access to the data in a chart, they only control visual appearance. The data is determined by the DataFrame and the encoding arguments (**x=**, **y=**, etc.) passed to the Plotly Express function.
 - Which chart type is used.
   > Chart type is determined by which Plotly Express function you call (**px.bar**, **px.scatter**, **px.line**, etc.). A template cannot change a bar chart into a scatter plot, it only changes how any given chart looks.
+- The numeric data plotted.
+  > Templates have no access to the data in a chart, they only control visual appearance. The data is determined by the DataFrame and the encoding arguments (**x=**, **y=**, etc.) passed to the Plotly Express function.
 - [o] The visual styling: background, gridlines, default colors, fonts, and other purely cosmetic settings.
   > A template is a named bundle of styling defaults. It does not change any analytical content, only how the chart *looks*. Templates are layered on top of whatever encodings you've already chosen.
 - Whether the chart is interactive.
@@ -200,10 +200,10 @@ Templates are pure cosmetics. Your encoding choices (**x**, **y**, **color**, ..
 
 - It is the only template that supports interactive charts.
   > Every Plotly Express template supports the full set of interactive behaviors, hover, zoom, pan, and legend-click. Interactivity is a property of the Plotly rendering engine, not of any particular template.
-- It is required by Plotly Express.
-  > **template="simple_white"** is entirely optional. Plotly Express has its own default template (called **plotly**) that applies automatically when no template argument is provided.
 - [o] It removes visual noise (no gray background, minimal gridlines), letting the data stand out, and it prints / renders cleanly on most surfaces.
   > **simple_white** is a deliberately minimal style: light background, light gridlines, clean fonts. It works well for both screen and print, and lets the encoded data be the most prominent element. Other templates (e.g., **plotly_dark**) are perfectly valid for other contexts.
+- It is required by Plotly Express.
+  > **template="simple_white"** is entirely optional. Plotly Express has its own default template (called **plotly**) that applies automatically when no template argument is provided.
 - **simple_white** makes charts render faster.
   > Template selection has no meaningful effect on rendering speed. Charts render quickly or slowly based on the number of data points and the complexity of the figure, not the visual theme applied.
 
@@ -213,14 +213,14 @@ Other templates are equally valid; **simple_white** was chosen here for consiste
 <MultipleChoice
   markdown={`How can you set **simple_white** as the **default template for an entire session**, so you don't have to type **template="simple_white"** on every chart?
 
-- Pass **default=True** to your first chart.
-  > There is no **default=True** argument in the Plotly Express API. Setting a session-wide default template is done through **plotly.io.templates.default**, not through arguments on individual chart calls.
 - Rename the package.
   > Renaming the package would have no effect on template defaults and would break all imports. Session defaults are configured through **plotly.io.templates.default**, a dedicated API for this purpose.
-- [o] Set **plotly.io.templates.default = "simple_white"** once near your imports.
-  > **plotly.io.templates.default = "..."** configures the default template for all subsequent Plotly figures in the session. You can still override it on individual charts by passing an explicit **template=**.
 - Edit the Plotly source code.
   > Editing library source code is fragile, unsupported, and reverted whenever you update the package. Plotly provides **plotly.io.templates.default** precisely so users can set session defaults without touching source files.
+- [o] Set **plotly.io.templates.default = "simple_white"** once near your imports.
+  > **plotly.io.templates.default = "..."** configures the default template for all subsequent Plotly figures in the session. You can still override it on individual charts by passing an explicit **template=**.
+- Pass **default=True** to your first chart.
+  > There is no **default=True** argument in the Plotly Express API. Setting a session-wide default template is done through **plotly.io.templates.default**, not through arguments on individual chart calls.
 
 In a notebook, this one line near the top saves you a lot of repetition.`}
 />

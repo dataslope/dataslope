@@ -238,10 +238,10 @@ Print it. Tape it to your wall. Use it on every new dataset.
   > Answering before inspecting the data risks returning a number that is silently wrong due to missing values, duplicate rows, or mistyped regions.
 - Refuse, too vague
   > The question is straightforward enough to answer once you understand the data; refusing skips the real work of an analyst.
-- [o] Run an EDA pass, check shape, types, missing values, distinct regions, *then* compute the answer with confidence
-  > Skipping EDA means you might compute the "average" while ignoring duplicates, missing rows, or merged customer records.
 - Switch to SQL
   > The tool is irrelevant here; EDA is a habit, not a technology, and skipping it in SQL is just as risky as skipping it in Pandas.
+- [o] Run an EDA pass, check shape, types, missing values, distinct regions, *then* compute the answer with confidence
+  > Skipping EDA means you might compute the "average" while ignoring duplicates, missing rows, or merged customer records.
 
 EDA is what separates a credible analyst from a calculator.`}
 />
@@ -249,14 +249,14 @@ EDA is what separates a credible analyst from a calculator.`}
 <MultipleChoice
   markdown={`Why look at \`df.sample(5)\` instead of just \`df.head()\`?
 
-- It is faster
-  > \`df.sample\` and \`df.head\` are both near-instant on most datasets; speed is not a meaningful distinction between them.
-- It uses less memory
-  > Both calls return a small slice of the DataFrame; neither significantly reduces memory use during an EDA session.
 - [o] head shows only the top rows, random sampling reveals issues that may only occur in middle or end of the file
   > Time-series files in particular often have format drift over time.
 - It returns sorted rows
   > \`df.sample\` returns rows in an unpredictable order by design; \`df.head\` returns rows in their original order. Neither sorts.
+- It uses less memory
+  > Both calls return a small slice of the DataFrame; neither significantly reduces memory use during an EDA session.
+- It is faster
+  > \`df.sample\` and \`df.head\` are both near-instant on most datasets; speed is not a meaningful distinction between them.
 
 A random peek at the data is a small habit with outsized payoff.`}
 />
@@ -264,14 +264,14 @@ A random peek at the data is a small habit with outsized payoff.`}
 <MultipleChoice
   markdown={`Two columns have a correlation of 0.98. What's the most likely interpretation?
 
-- They cause each other
-  > Correlation measures co-movement, not causation; a 0.98 correlation is consistent with many causal structures or with both columns reflecting a third variable.
 - They are independent
   > A correlation of 0.98 is almost as high as possible (maximum is 1.0), two independent variables would have a correlation near 0.
-- [o] They are measuring something very similar, worth investigating whether one is derived from the other, or whether keeping both adds any information
-  > High correlation is a flag, not a conclusion. Investigate before either dropping or using both as separate inputs.
 - It is a bug
   > High correlation is not evidence of a code error; many legitimate column pairs (e.g., salary and annual income) are nearly perfectly correlated by design.
+- [o] They are measuring something very similar, worth investigating whether one is derived from the other, or whether keeping both adds any information
+  > High correlation is a flag, not a conclusion. Investigate before either dropping or using both as separate inputs.
+- They cause each other
+  > Correlation measures co-movement, not causation; a 0.98 correlation is consistent with many causal structures or with both columns reflecting a third variable.
 
 Correlation is a signpost, not an answer.`}
 />
@@ -279,14 +279,14 @@ Correlation is a signpost, not an answer.`}
 <MultipleChoice
   markdown={`What's the value of *writing down* what you learned during EDA?
 
-- It is required by Pandas
-  > Pandas has no concept of written notes; the library executes code, not documentation decisions.
+- It speeds up the kernel
+  > Writing notes in Markdown cells or comments does not affect kernel performance; it is a documentation practice, not a computational one.
 - It is for your manager
   > EDA notes serve the analyst first, they capture observations that shape every subsequent decision, including ones your manager never sees.
 - [o] The next person to read your notebook (often future-you, six weeks later) will not remember the dataset's quirks, written notes preserve hard-won knowledge
   > Undocumented EDA insights vanish the moment you close the notebook.
-- It speeds up the kernel
-  > Writing notes in Markdown cells or comments does not affect kernel performance; it is a documentation practice, not a computational one.
+- It is required by Pandas
+  > Pandas has no concept of written notes; the library executes code, not documentation decisions.
 
 EDA notes are part of the deliverable, not throwaway scratch.`}
 />

@@ -211,12 +211,12 @@ the story instant.
 
 - Trends over time.
   > Trends over time are best shown with a line chart; a choropleth has no time axis and shows a single snapshot of regional values.
-- Two-variable correlation.
-  > Two-variable correlation is the domain of scatter plots; a choropleth uses one data value per region as a fill color and cannot directly show the relationship between two variables.
-- [o] A numeric value per **region** (country, state, county), encoded as the region's fill color.
-  > Choropleths shine when you have one row per region and a numeric value to color them by. The reader's existing knowledge of geography does the layout work, so all your visual encoding can focus on the data.
 - A part-of-a-whole composition.
   > Part-of-a-whole compositions are shown with bar charts or pie charts; a choropleth colors regions by absolute or normalized values, not by the share they contribute to a total.
+- [o] A numeric value per **region** (country, state, county), encoded as the region's fill color.
+  > Choropleths shine when you have one row per region and a numeric value to color them by. The reader's existing knowledge of geography does the layout work, so all your visual encoding can focus on the data.
+- Two-variable correlation.
+  > Two-variable correlation is the domain of scatter plots; a choropleth uses one data value per region as a fill color and cannot directly show the relationship between two variables.
 
 For points (cities, lat/lon observations) use **scatter_geo** or **scatter_mapbox** instead.`}
 />
@@ -224,14 +224,14 @@ For points (cities, lat/lon observations) use **scatter_geo** or **scatter_mapbo
 <MultipleChoice
   markdown={`Why is a **choropleth of raw counts** (e.g., "total COVID cases by country") often misleading?
 
-- It uses too much color.
-  > Color usage is not the issue; the problem is what the color encodes, raw counts confound population size with the underlying phenomenon being studied.
 - It compresses the data.
   > A choropleth of raw counts does not compress or lose data; the problem is that the values it displays are confounded by population, not that information is hidden.
-- [o] The map ends up looking like a population map, big, populous countries always look "darkest" regardless of the per-capita reality.
-  > Raw counts confound population with the phenomenon you're trying to show. Almost always, you want to normalize: cases *per 100,000*, or *per capita*, or *per square kilometer*. This is one of the most common mistakes in journalism dataviz.
 - Choropleths don't support hover.
   > Plotly choropleths fully support hover tooltips; \`hover_name\` and \`hover_data\` work the same way as in scatter plots, this is not a limitation of the chart type.
+- It uses too much color.
+  > Color usage is not the issue; the problem is what the color encodes, raw counts confound population size with the underlying phenomenon being studied.
+- [o] The map ends up looking like a population map, big, populous countries always look "darkest" regardless of the per-capita reality.
+  > Raw counts confound population with the phenomenon you're trying to show. Almost always, you want to normalize: cases *per 100,000*, or *per capita*, or *per square kilometer*. This is one of the most common mistakes in journalism dataviz.
 
 Normalize before you map. Almost always.`}
 />
@@ -239,12 +239,12 @@ Normalize before you map. Almost always.`}
 <MultipleChoice
   markdown={`The **Mercator** projection famously makes which continent appear roughly the same size as Africa, even though Africa is ~14× larger?
 
-- Antarctica.
-  > Antarctica is also massively inflated by Mercator, but it is not the canonical example used to illustrate the distortion; it is also rarely shown in full on standard maps.
-- South America.
-  > South America is actually shown closer to its true size on Mercator maps because it sits near the equator, where Mercator distortion is minimal.
 - [o] Greenland.
   > Mercator preserves angles (useful for navigation) but massively inflates regions near the poles. Greenland is the canonical example because it sits very far north. If your map's story depends on *area comparison across latitudes*, avoid Mercator, use "natural earth" or "equal-earth" instead.
+- South America.
+  > South America is actually shown closer to its true size on Mercator maps because it sits near the equator, where Mercator distortion is minimal.
+- Antarctica.
+  > Antarctica is also massively inflated by Mercator, but it is not the canonical example used to illustrate the distortion; it is also rarely shown in full on standard maps.
 - Australia.
   > Australia is located in the Southern Hemisphere at mid-latitudes where Mercator distortion is moderate; it does not exhibit the dramatic size inflation that Greenland does near the poles.
 
@@ -258,10 +258,10 @@ Every projection distorts something. Choose the projection that distorts what do
   > Qualitative palettes use distinct hues for unordered categories; they do not encode magnitude or sign and cannot represent whether a change is positive or negative.
 - A sequential palette like **Viridis**.
   > Sequential palettes run from low to high with no midpoint, making negative values visually indistinguishable from slightly-less-positive ones, they cannot represent two-sided change data honestly.
-- [o] A **diverging** palette centered at 0, such as **RdBu** with **color_continuous_midpoint=0**.
-  > Two-sided data (positive vs negative change) deserves a two-sided color palette, anchored at the meaningful midpoint (0 = no change). Without centering, "neutral" colors drift and the map's coloring misleads.
 - A grayscale ramp.
   > A grayscale ramp goes from light to dark in a single direction and cannot distinguish between negative and positive values; a reader cannot tell from the shade alone whether a country's value is above or below zero.
+- [o] A **diverging** palette centered at 0, such as **RdBu** with **color_continuous_midpoint=0**.
+  > Two-sided data (positive vs negative change) deserves a two-sided color palette, anchored at the meaningful midpoint (0 = no change). Without centering, "neutral" colors drift and the map's coloring misleads.
 
 Diverging palette + meaningful midpoint = honest visualization of change data.`}
 />

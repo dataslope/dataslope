@@ -351,10 +351,10 @@ foreach (var s in shapes)
 <MultipleChoice
   markdown={`Why is polymorphism useful?
 
-- It eliminates the need for classes
-  > It depends on classes.
 - [o] One call site (\`shape.Area()\`) automatically does the right thing for every subclass, so new subclasses don't require changes to existing code
   > This is the "open for extension, closed for modification" idea.
+- It eliminates the need for classes
+  > It depends on classes.
 - It makes programs run faster
   > Performance is neutral to slightly worse than direct calls.
 - It allows multiple inheritance
@@ -364,12 +364,12 @@ foreach (var s in shapes)
 <MultipleChoice
   markdown={`When should you use inheritance vs composition?
 
-- Always prefer inheritance
-  > A common over-use that produces brittle hierarchies.
-- Always prefer composition
-  > Too absolute, sometimes "is-a" really is the right model.
 - Inheritance for unrelated types, composition for related types
   > That's backwards.
+- Always prefer composition
+  > Too absolute, sometimes "is-a" really is the right model.
 - [o] Use inheritance for genuine "is-a" relationships; use composition for "has-a" relationships
-  > Many design problems get simpler when you reach for composition first.`}
+  > Many design problems get simpler when you reach for composition first.
+- Always prefer inheritance
+  > A common over-use that produces brittle hierarchies.`}
 />

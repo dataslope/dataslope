@@ -474,12 +474,12 @@ balance: 60
 <MultipleChoice
   markdown={`Which best describes responsibility-driven design?
 
-- Each class should have exactly one method
-  > Method count isn't the criterion; coherence of responsibility is.
-- [o] Each class should have a small, coherent set of responsibilities, and those determine its behavior and its collaborators
-  > This is essentially the Wirfs-Brock formulation.
 - All classes should inherit from a shared base class
   > Inheritance is unrelated to responsibility-driven design.
+- [o] Each class should have a small, coherent set of responsibilities, and those determine its behavior and its collaborators
+  > This is essentially the Wirfs-Brock formulation.
+- Each class should have exactly one method
+  > Method count isn't the criterion; coherence of responsibility is.
 - Behaviour should be split across as many classes as possible
   > Excess fragmentation is its own problem.`}
 />
@@ -487,25 +487,25 @@ balance: 60
 <MultipleChoice
   markdown={`A method on class \`Foo\` does almost nothing except read fields of a passed-in \`Bar\`. This is the smell called:
 
-- God class
-  > That's when one class does too much in total.
-- Long parameter list
-  > That's specifically about too many parameters of primitive types.
 - [o] Feature envy
   > The method *envies* Bar's data; it likely belongs on Bar.
 - Anemic model
-  > That describes a *class* with only data and no behavior, not a single method.`}
+  > That describes a *class* with only data and no behavior, not a single method.
+- Long parameter list
+  > That's specifically about too many parameters of primitive types.
+- God class
+  > That's when one class does too much in total.`}
 />
 
 <MultipleChoice
   markdown={`What does the "tell, don't ask" guideline mean?
 
-- Always print debug messages
-  > Unrelated to logging.
-- Always pass parameters by value
-  > Java has its own parameter-passing rules independent of this guideline.
+- Don't write public methods at all
+  > You absolutely need public methods to expose behavior.
 - [o] Send the object a command to do the thing, rather than pulling out its data and doing the thing yourself
   > This keeps the object in control of its own rules.
-- Don't write public methods at all
-  > You absolutely need public methods to expose behavior.`}
+- Always pass parameters by value
+  > Java has its own parameter-passing rules independent of this guideline.
+- Always print debug messages
+  > Unrelated to logging.`}
 />

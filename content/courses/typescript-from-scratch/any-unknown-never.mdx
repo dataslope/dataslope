@@ -516,12 +516,12 @@ try {
 <MultipleChoice
   markdown={`What is the key difference between \`any\` and \`unknown\`?
 
+- [o] \`any\` bypasses type checking, \`unknown\` forces narrowing
+  > \`unknown\` is the type-safe alternative to \`any\`.
 - \`unknown\` is deprecated, use \`any\`
   > \`unknown\` is a first-class type introduced in TypeScript 3.0 as the safe counterpart to \`any\`; it is not deprecated.
 - \`any\` is type-safe, \`unknown\` is not
   > It is the opposite: \`any\` disables type checking entirely, while \`unknown\` requires you to narrow before use.
-- [o] \`any\` bypasses type checking, \`unknown\` forces narrowing
-  > \`unknown\` is the type-safe alternative to \`any\`.
 - They are identical
   > They differ fundamentally: \`any\` lets you call any method or access any property without checks, while \`unknown\` blocks all such operations until the type is narrowed.
 
@@ -531,14 +531,14 @@ try {
 <MultipleChoice
   markdown={`What does the \`never\` type represent?
 
-- A function that returns nothing (\`void\`)
-  > That describes \`void\`, not \`never\`. A \`void\` function returns normally but produces no useful value, whereas a \`never\` function never returns at all.
 - A value that is \`null\` or \`undefined\`
   > \`null\` and \`undefined\` are their own distinct types; \`never\` is the empty type that contains no values at all.
-- [o] A type with no values (the empty set)
-  > \`never\` is the bottom type, no value can inhabit it.
 - A value that is both \`string\` and \`number\`
   > An intersection of disjoint primitives like \`string & number\` does resolve to \`never\`, but \`never\` itself represents the empty set, not a combined value.
+- [o] A type with no values (the empty set)
+  > \`never\` is the bottom type, no value can inhabit it.
+- A function that returns nothing (\`void\`)
+  > That describes \`void\`, not \`never\`. A \`void\` function returns normally but produces no useful value, whereas a \`never\` function never returns at all.
 
 \`never\` appears in unreachable code paths, functions that never return, and impossible type intersections.`}
 />

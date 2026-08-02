@@ -296,14 +296,14 @@ foreach (var x in q) { ... }
 
 …and assuming \`numbers\` is the result of an expensive method call like \`LoadFromDatabase()\`, what is the consequence?
 
-- Nothing notable, \`q\` is cached after the first iteration.
-  > LINQ operators do not cache results; \`q\` is a re-runnable recipe, not a memoized value.
-- A compile error, because you can't iterate a deferred sequence twice.
-  > It compiles and runs fine, but it re-executes the pipeline on each iteration.
-- [o] The pipeline (and the underlying \`LoadFromDatabase\` call) runs *twice*, once per \`foreach\`.
-  > Deferred operators define a recipe, not a stored result. Each \`foreach\` walks the source again, re-running any side-effectful or expensive source method.
 - The second \`foreach\` produces no output, because the enumerator is already at the end.
   > Each \`foreach\` calls \`GetEnumerator\` again, so it starts from the beginning each time.
+- A compile error, because you can't iterate a deferred sequence twice.
+  > It compiles and runs fine, but it re-executes the pipeline on each iteration.
+- Nothing notable, \`q\` is cached after the first iteration.
+  > LINQ operators do not cache results; \`q\` is a re-runnable recipe, not a memoized value.
+- [o] The pipeline (and the underlying \`LoadFromDatabase\` call) runs *twice*, once per \`foreach\`.
+  > Deferred operators define a recipe, not a stored result. Each \`foreach\` walks the source again, re-running any side-effectful or expensive source method.
 
 If you want to iterate twice without re-running the source, materialize
 once with \`ToList()\` or \`ToArray()\`. *This is one of the most common

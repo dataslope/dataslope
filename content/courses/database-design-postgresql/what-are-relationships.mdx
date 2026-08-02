@@ -82,14 +82,14 @@ shows how the relationship will be stored.
 <MultipleChoice
   markdown={`In the sentence "A customer places an order," what does "places" most likely reveal?
 
-- A column data type.
-  > A verb does not usually tell you the SQL type of a column.
 - [o] A relationship between the customer entity and the order entity.
   > The verb describes how the two entities are associated.
-- A primary key value.
-  > Primary key values identify rows; the verb explains a connection.
 - A table that should store every possible noun.
   > The verb points to a relationship, not a catch-all table.
+- A primary key value.
+  > Primary key values identify rows; the verb explains a connection.
+- A column data type.
+  > A verb does not usually tell you the SQL type of a column.
 
 Verbs often reveal how entity types connect.`}
 />
@@ -184,14 +184,14 @@ clearer than "customer has order."
 <MultipleChoice
   markdown={`What is a relationship in database design?
 
-- A rule that every table must have the same columns.
-  > Tables usually have different columns because they model different entities.
-- [o] An association between entities, such as a customer placing an order.
-  > Relationships describe how entity rows connect to each other.
 - A backup copy of a table.
   > Backups are operational; relationships are part of the logical model.
+- [o] An association between entities, such as a customer placing an order.
+  > Relationships describe how entity rows connect to each other.
 - A column that always stores text.
   > Relationships may be stored with key columns, but they are broader than a text column.
+- A rule that every table must have the same columns.
+  > Tables usually have different columns because they model different entities.
 
 Relationships turn separate entity tables into a connected model.`}
 />
@@ -201,12 +201,12 @@ Relationships turn separate entity tables into a connected model.`}
 
 - By giving both tables exactly the same name.
   > Table names do not create enforced links between rows.
+- By deleting the primary keys.
+  > Relationships depend on reliable row identities, so primary keys are essential.
 - By storing all rows from both entities in one cell.
   > Packing data into one cell destroys structure rather than modeling a relationship.
 - [o] By using a foreign key that points to a primary key.
   > The foreign key stores the link and lets the database enforce that the target row exists.
-- By deleting the primary keys.
-  > Relationships depend on reliable row identities, so primary keys are essential.
 
 The relationship is the meaning; keys are the usual database mechanism.`}
 />
@@ -214,14 +214,14 @@ The relationship is the meaning; keys are the usual database mechanism.`}
 <MultipleChoice
   markdown={`Why might an enrollment between a student and a course become its own table?
 
-- Because every verb must become a table.
-  > Some verbs are simple relationships and do not need their own table.
-- Because students and courses cannot be queried together.
-  > They can be queried together; the issue is how to represent many pairings and facts about them.
-- [o] Because the association may have its own attributes, such as enrolled date or grade.
-  > Facts about the pairing belong naturally on a row that represents that pairing.
 - Because PostgreSQL does not allow course tables.
   > PostgreSQL allows ordinary tables for courses and many other entities.
+- Because students and courses cannot be queried together.
+  > They can be queried together; the issue is how to represent many pairings and facts about them.
+- Because every verb must become a table.
+  > Some verbs are simple relationships and do not need their own table.
+- [o] Because the association may have its own attributes, such as enrolled date or grade.
+  > Facts about the pairing belong naturally on a row that represents that pairing.
 
 When a relationship has its own facts, modeling it as an entity can be clearer.`}
 />

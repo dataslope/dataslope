@@ -194,12 +194,12 @@ partition indefinitely or cause an infinite retry loop.
 <MultipleChoice
   markdown={`A Kafka topic has 3 partitions. Your consumer group has 5 consumers. What happens?
 
-- All 5 consumers read all partitions, so each message is processed 5 times.
-  > Within one group each partition goes to exactly one consumer; messages aren't duplicated across the group.
 - [o] 3 consumers each own one partition; the other 2 sit idle.
   > Parallelism is capped by partition count, so extra consumers in the same group get no partitions.
 - Kafka automatically splits each partition to use all 5 consumers.
   > Partitions aren't subdivided among consumers in a group; one partition maps to one consumer.
+- All 5 consumers read all partitions, so each message is processed 5 times.
+  > Within one group each partition goes to exactly one consumer; messages aren't duplicated across the group.
 - The group fails to start because consumers outnumber partitions.
   > It starts fine; the surplus consumers are simply unassigned and act as standby capacity.`}
 />
@@ -207,14 +207,14 @@ partition indefinitely or cause an infinite retry loop.
 <MultipleChoice
   markdown={`Your pipeline delivers at-least-once, so a record can be replayed after a crash. What's the standard way to keep results correct anyway?
 
-- Switch every sink to at-most-once so nothing is duplicated.
-  > At-most-once avoids duplicates by risking **data loss**, usually worse than the duplicates you're trying to handle.
+- Increase the consumer's memory.
+  > Memory doesn't change delivery semantics; duplicates still corrupt the result without idempotency.
 - [o] Make the consumer idempotent, upsert by key or dedup on an idempotency key so a replay converges to the same state.
   > Idempotent writes make reprocessing safe, giving effectively-once results without distributed transactions.
+- Switch every sink to at-most-once so nothing is duplicated.
+  > At-most-once avoids duplicates by risking **data loss**, usually worse than the duplicates you're trying to handle.
 - Add more partitions to the topic.
-  > Partitioning affects parallelism and ordering, not whether a replayed message double-counts.
-- Increase the consumer's memory.
-  > Memory doesn't change delivery semantics; duplicates still corrupt the result without idempotency.`}
+  > Partitioning affects parallelism and ordering, not whether a replayed message double-counts.`}
 />
 
 <MultipleChoice

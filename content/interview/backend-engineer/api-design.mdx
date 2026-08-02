@@ -203,25 +203,25 @@ representations of a resource.
 <MultipleChoice
   markdown={`A payment client sends \`POST /payments\`, times out, and retries. What prevents a **double charge**?
 
-- Switching the method to \`GET\`, which is idempotent.
-  > \`GET\` must not create resources; you cannot make a payment with a safe read method.
-- [o] Accepting a client-supplied **idempotency key** and deduplicating retries server-side.
-  > The server records the key on first use and returns the original result on any retry, so repeated requests charge once.
 - Returning \`200 OK\` faster so the client never times out.
   > You cannot guarantee timing over an unreliable network; correctness must not depend on it.
 - Making the endpoint \`PUT\` instead of \`POST\`.
-  > \`PUT\` is idempotent for *replacing a known resource* by ID, but creating a payment has no client-known ID; an idempotency key is the right tool.`}
+  > \`PUT\` is idempotent for *replacing a known resource* by ID, but creating a payment has no client-known ID; an idempotency key is the right tool.
+- Switching the method to \`GET\`, which is idempotent.
+  > \`GET\` must not create resources; you cannot make a payment with a safe read method.
+- [o] Accepting a client-supplied **idempotency key** and deduplicating retries server-side.
+  > The server records the key on first use and returns the original result on any retry, so repeated requests charge once.`}
 />
 
 <MultipleChoice
   markdown={`An authenticated user requests a resource they are **not permitted** to see. Which status code is correct?
 
+- \`404 Not Found\`
+  > 404 can hide a resource's existence, but the semantically correct answer for a known-but-forbidden action is 403 (some APIs use 404 deliberately to avoid leaking existence).
 - \`401 Unauthorized\`
   > 401 means the request lacks valid authentication; here the user *is* authenticated, so it is misleading.
 - [o] \`403 Forbidden\`
   > 403 means "authenticated but not allowed", exactly the case where identity is known but permission is denied.
-- \`404 Not Found\`
-  > 404 can hide a resource's existence, but the semantically correct answer for a known-but-forbidden action is 403 (some APIs use 404 deliberately to avoid leaking existence).
 - \`400 Bad Request\`
   > 400 signals a malformed request; a well-formed but unauthorized request is not a syntax problem.`}
 />
@@ -231,12 +231,12 @@ representations of a resource.
 
 - Offset pagination cannot return JSON.
   > Both return JSON; the difference is how they locate the next page.
+- Offset pagination is not supported over HTTPS.
+  > Transport security is unrelated to the pagination strategy.
 - [o] A cursor is stable under inserts and efficient at any depth, whereas large offsets are slow and can skip or repeat rows.
   > Keyset/cursor pagination seeks from the last seen item, so new inserts do not shift the window and there is no growing offset scan.
 - Cursors let the client jump to any arbitrary page instantly.
-  > That is an advantage of *offset* pagination; cursors trade random access for stability and speed.
-- Offset pagination is not supported over HTTPS.
-  > Transport security is unrelated to the pagination strategy.`}
+  > That is an advantage of *offset* pagination; cursors trade random access for stability and speed.`}
 />
 
 ## Go deeper

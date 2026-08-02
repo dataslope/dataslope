@@ -236,14 +236,14 @@ clear rule often beats a model.
   markdown={`The naive word-counting classifier labels "It is not good" as positive. Which
 earlier lesson explains this failure most directly?
 
-- Stemming should have been applied first
-  > Stemming normalizes word forms but has no effect on word order; "not good" would still be read as positive after stemming.
 - [o] Counting positive/negative words independently ignores word order, so "not good" looks positive because of "good", the same order-blindness as bag-of-words, fixable with negation/local-order handling
   > Independent word counting is a bag-of-words model and shares its blindness to order. "not good" must be read as a unit (or via a negation flag) for the negative meaning to register.
-- The text was not lowercased
-  > The code already lowercases tokens before lookup, so casing is not the issue here.
+- Stemming should have been applied first
+  > Stemming normalizes word forms but has no effect on word order; "not good" would still be read as positive after stemming.
 - "good" is a stopword and should have been removed
   > "good" is not a stopword; it is a sentiment word. Removing it would discard the very signal the classifier relies on.
+- The text was not lowercased
+  > The code already lowercases tokens before lookup, so casing is not the issue here.
 
 Order-blindness is the culprit; negation handling (a touch of local order) is the fix.`}
 />
@@ -398,14 +398,14 @@ for review in ["I love it", "This is not good", "Not bad at all"]:
   markdown={`What is the core idea of a **lexicon-based** (rule-based) sentiment
 classifier?
 
-- It learns word sentiment from thousands of labeled training examples
-  > Learning from labeled examples describes machine learning, not the lexicon-based approach, which requires no training data at all.
-- [o] It scores text by looking each word up in hand-made lists of positive and negative words and summing the polarities
-  > Lexicon-based sentiment uses curated word lists rather than learned parameters. It is transparent and needs no training data, you can read exactly why it produced a given score.
-- It translates the text and counts the characters
-  > Character counting has nothing to do with sentiment analysis; this describes neither the lexicon-based nor any other real sentiment approach.
 - It uses a neural network to predict sentiment
   > Neural networks are a machine-learning technique; they learn from training data rather than using hand-built word lists.
+- It translates the text and counts the characters
+  > Character counting has nothing to do with sentiment analysis; this describes neither the lexicon-based nor any other real sentiment approach.
+- [o] It scores text by looking each word up in hand-made lists of positive and negative words and summing the polarities
+  > Lexicon-based sentiment uses curated word lists rather than learned parameters. It is transparent and needs no training data, you can read exactly why it produced a given score.
+- It learns word sentiment from thousands of labeled training examples
+  > Learning from labeled examples describes machine learning, not the lexicon-based approach, which requires no training data at all.
 
 A hand-built lexicon plus a scoring rule, with no training data, defines the lexicon-based approach.`}
 />
@@ -416,12 +416,12 @@ removing them?
 
 - Because removing stopwords is computationally expensive
   > Stopword removal is a fast filter; computational cost is not the reason to keep negations in a sentiment pipeline.
-- [o] Because "not" is a negation that reverses sentiment; removing it (it is on the standard stopword list) would turn "not good" into "good" and flip the result
-  > This is the payoff of the stopwords lesson. Negations carry the meaning in opinionated text, so a sentiment pipeline keeps them. Stripping them would silently invert the classifier's verdict.
-- Because stopwords are the most positive words
-  > Stopwords are high-frequency function words; they carry no inherent positive polarity and are not in the sentiment lexicon.
 - Because NLTK forbids removing stopwords
   > NLTK places no such restriction; removing stopwords is a common operation and is entirely up to the programmer.
+- Because stopwords are the most positive words
+  > Stopwords are high-frequency function words; they carry no inherent positive polarity and are not in the sentiment lexicon.
+- [o] Because "not" is a negation that reverses sentiment; removing it (it is on the standard stopword list) would turn "not good" into "good" and flip the result
+  > This is the payoff of the stopwords lesson. Negations carry the meaning in opinionated text, so a sentiment pipeline keeps them. Stripping them would silently invert the classifier's verdict.
 
 Keeping negation is a deliberate, task-driven choice, exactly the judgment this course builds.`}
 />
@@ -430,14 +430,14 @@ Keeping negation is a deliberate, task-driven choice, exactly the judgment this 
   markdown={`Which of these is a genuine limitation of rule-based sentiment that motivates
 machine-learning approaches?
 
-- It is unable to lowercase text
-  > Lowercasing is trivial with Python's \`.lower()\` and has nothing to do with the conceptual limits of rule-based sentiment.
-- [o] It cannot detect sarcasm ("Oh great, another delay"), handle domain-specific meanings, or score words missing from its lexicon
-  > Fixed word lists miss sarcasm, context-dependent meaning, and any vocabulary they do not contain. Learning-based models infer these from labeled data, though they still rely on the same preprocessing you practiced.
 - It runs only on Tuesdays
   > There is no such restriction; this is a fictional claim.
+- It is unable to lowercase text
+  > Lowercasing is trivial with Python's \`.lower()\` and has nothing to do with the conceptual limits of rule-based sentiment.
 - It cannot process more than one sentence
   > The classifier can be applied to any number of sentences; processing length is not a limitation of rule-based sentiment.
+- [o] It cannot detect sarcasm ("Oh great, another delay"), handle domain-specific meanings, or score words missing from its lexicon
+  > Fixed word lists miss sarcasm, context-dependent meaning, and any vocabulary they do not contain. Learning-based models infer these from labeled data, though they still rely on the same preprocessing you practiced.
 
 Sarcasm, context, and coverage gaps are the real ceilings of a hand-built lexicon.`}
 />
@@ -448,12 +448,12 @@ Sarcasm, context, and coverage gaps are the real ceilings of a hand-built lexico
 
 - To delete those tokens from the text
   > The \`RESET\` tokens are not removed from the text; they are used as signals to clear the negation flag and then skipped in scoring.
+- To convert the text to uppercase
+  > Case conversion happens in the tokenization step, not through the \`RESET\` set.
 - [o] To clear the negation flag at clause boundaries so a negation does not incorrectly carry over and flip a word in a later clause
   > Negation should affect only the nearby word, not everything after it. Resetting at punctuation and "but" stops "not great, but terrible" from having the "not" wrongly flip "terrible". It scopes the negation to its clause.
 - To add extra weight to positive words
   > The \`RESET\` set has no role in weighting; all sentiment words contribute equally (±1) to the score.
-- To convert the text to uppercase
-  > Case conversion happens in the tokenization step, not through the \`RESET\` set.
 
 Resetting negation at boundaries keeps its effect local, which is what makes the heuristic work.`}
 />
@@ -462,12 +462,12 @@ Resetting negation at boundaries keeps its effect local, which is what makes the
   markdown={`Even when you plan to use machine learning later, why is building a
 rule-based baseline first a good idea?
 
+- It guarantees higher accuracy than any model
+  > A rule-based baseline is a starting point, not an upper bound; machine-learning models routinely surpass it on complex tasks.
 - It is required before any model can be trained
   > Machine-learning models can be trained without any rule-based baseline; starting with one is good practice, not a requirement.
 - [o] It is fast, transparent, needs no labeled data, and gives a concrete score to beat, and sometimes it already solves the problem well enough
   > A simple, explainable baseline sets a bar and may suffice on its own. It also sanity-checks your data and preprocessing. Reaching for a heavier model makes sense only once the baseline proves inadequate.
-- It guarantees higher accuracy than any model
-  > A rule-based baseline is a starting point, not an upper bound; machine-learning models routinely surpass it on complex tasks.
 - It removes the need to tokenize text
   > Tokenization is required regardless of the approach; a rule-based classifier still needs text split into tokens before any word lookup can happen.
 

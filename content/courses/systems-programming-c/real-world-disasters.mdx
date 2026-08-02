@@ -374,27 +374,27 @@ already absorbed the most important lesson of this chapter.
 <MultipleChoice
   markdown={`Heartbleed (2014) allowed attackers to read large slices of OpenSSL server memory without authentication. What bug class did it exploit?
 
+- A stack overflow during certificate parsing.
+  > Heartbleed was a *read* past a heap buffer; no stack frame was overwritten.
+- [o] A buffer **over-read**: the server trusted an attacker-supplied length field and \`memcpy\`'d that many bytes out of its own memory back to the attacker.
+  > The defensive lesson is "never trust a length field from the network without checking it against what you actually received."
 - A use-after-free in the TLS session cache.
   > That would be a different bug class; Heartbleed was a length-trust problem.
 - A double-free during certificate rotation.
-  > Not Heartbleed.
-- [o] A buffer **over-read**: the server trusted an attacker-supplied length field and \`memcpy\`'d that many bytes out of its own memory back to the attacker.
-  > The defensive lesson is "never trust a length field from the network without checking it against what you actually received."
-- A stack overflow during certificate parsing.
-  > Heartbleed was a *read* past a heap buffer; no stack frame was overwritten.`}
+  > Not Heartbleed.`}
 />
 
 <MultipleChoice
   markdown={`The 1988 Morris Worm propagated in part by exploiting a stack buffer overflow in the BSD \`fingerd\` daemon. Which single C standard library function is most directly responsible?
 
+- \`strncpy\`
+  > \`strncpy\` has its own footguns but did not cause this incident.
 - \`printf\`
   > \`printf\` formatting bugs are dangerous but were not the Morris Worm vector.
 - \`malloc\`
   > \`malloc\` itself was not the issue.
 - [o] \`gets\`, which reads input into a buffer with no length check at all.
-  > \`gets\` is so dangerous it was deprecated in C99 and removed in C11.
-- \`strncpy\`
-  > \`strncpy\` has its own footguns but did not cause this incident.`}
+  > \`gets\` is so dangerous it was deprecated in C99 and removed in C11.`}
 />
 
 <MultipleChoice
@@ -402,12 +402,12 @@ already absorbed the most important lesson of this chapter.
 
 - Use-after-free.
   > Cloudbleed did not free memory and then reuse it.
+- An integer overflow during certificate signing.
+  > Cloudbleed was an HTML-rewriting parser bug, unrelated to certificates.
 - Double-free.
   > Same, no double free was involved.
 - [o] An *off-by-one* error (the end-of-buffer test used \`==\` instead of \`>=\`), causing a buffer over-read.
-  > A one-character fix; weeks of cache purging to clean up.
-- An integer overflow during certificate signing.
-  > Cloudbleed was an HTML-rewriting parser bug, unrelated to certificates.`}
+  > A one-character fix; weeks of cache purging to clean up.`}
 />
 
 <MultipleChoice
@@ -415,12 +415,12 @@ already absorbed the most important lesson of this chapter.
 
 - Always free pointers immediately after allocating them.
   > That would just guarantee use-after-free bugs.
-- Always cast \`size_t\` to \`int\` to keep types simple.
-  > The opposite, that is a common source of integer-truncation bugs.
+- Always use \`gets()\` because it is the simplest input function.
+  > Never use \`gets()\`, it is the canonical example of *what not to do*.
 - [o] Cross-check every length that comes from outside the program (network, file, user) against the size of the buffer it will be written to or read from.
   > Almost every catastrophe on the page reduces to "trusted a length field that should have been validated."
-- Always use \`gets()\` because it is the simplest input function.
-  > Never use \`gets()\`, it is the canonical example of *what not to do*.`}
+- Always cast \`size_t\` to \`int\` to keep types simple.
+  > The opposite, that is a common source of integer-truncation bugs.`}
 />
 
 <Callout type="success" title="The most important takeaway">

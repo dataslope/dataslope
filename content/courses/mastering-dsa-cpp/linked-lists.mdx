@@ -406,14 +406,14 @@ int main() {
 <MultipleChoice
   markdown={`Which operation is O(1) on a singly linked list when you have the head pointer?
 
-- Accessing the element at index 900
-  > You must walk node by node from the head.
-- [o] Prepending a new node to the front
-  > The new node points to the old head, then head changes.
+- Sorting the list
+  > Sorting is not a constant-time operation.
 - Searching for a value
   > Search may inspect every node.
-- Sorting the list
-  > Sorting is not a constant-time operation.`}
+- [o] Prepending a new node to the front
+  > The new node points to the old head, then head changes.
+- Accessing the element at index 900
+  > You must walk node by node from the head.`}
 />
 
 <MultipleChoice
@@ -423,21 +423,21 @@ int main() {
   > There is no direct address calculation for an arbitrary index.
 - Each node stores too many integers.
   > A node can store one integer and still lack random access.
-- The compiler forbids indexing syntax for structs.
-  > Syntax is not the real limitation; memory layout is.
 - A linked list is always sorted.
-  > Lists can be in any order.`}
+  > Lists can be in any order.
+- The compiler forbids indexing syntax for structs.
+  > Syntax is not the real limitation; memory layout is.`}
 />
 
 <MultipleChoice
   markdown={`What must you avoid when manually deleting nodes allocated with \`new\`?
 
-- Updating the head pointer
-  > Updating head is often required after deleting the first node.
+- Comparing node values
+  > Comparisons are fine and often needed.
 - [o] Losing the only pointer to a node before calling \`delete\`
   > That leaks memory because the allocation can no longer be freed.
 - Traversing with a temporary pointer
   > Temporary traversal pointers are normal.
-- Comparing node values
-  > Comparisons are fine and often needed.`}
+- Updating the head pointer
+  > Updating head is often required after deleting the first node.`}
 />

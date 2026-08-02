@@ -191,14 +191,14 @@ Welcome to the craft. There is a lot of code waiting for you.
 <MultipleChoice
   markdown={`Which of the following is the **single most useful** tool to add to your workflow once you start writing non-trivial C?
 
+- A heavier build system.
+  > A build system manages compilation steps but does not help detect memory errors or undefined behavior at runtime.
 - A new IDE with prettier syntax highlighting.
   > Syntax highlighting improves readability but does nothing to find the memory bugs, undefined behavior, and use-after-free errors that make C programs hard to debug.
 - A web search engine.
   > Web search is always available and useful, but it does not automatically detect bugs in your running program the way a sanitizer does.
 - [o] AddressSanitizer (\`-fsanitize=address\`) or Valgrind, to catch memory bugs at the moment they happen.
   > Memory bugs in C are infamous for crashing the program far from where the actual bug is. Sanitizers turn "mysterious crash an hour later" into "precise error message at the offending line". Nothing else comes close in productivity gain.
-- A heavier build system.
-  > A build system manages compilation steps but does not help detect memory errors or undefined behavior at runtime.
 
 A close runner-up is the debugger (\`gdb\` / \`lldb\`), but sanitizers tend to win on raw bug-finding power, especially for beginners.`}
 />
@@ -206,14 +206,14 @@ A close runner-up is the debugger (\`gdb\` / \`lldb\`), but sanitizers tend to w
 <MultipleChoice
   markdown={`You finish this course and want to keep growing as a programmer. The advice from this chapter is best summarized as:
 
-- Read every recommended book before writing more code.
-  > Books are valuable references, but the skill of programming develops from writing, debugging, and finishing programs, not from reading alone.
 - Switch immediately to Rust or C++ to avoid C's pitfalls.
   > Switching languages before understanding the underlying concepts (ownership, memory, pointers) just moves the confusion to a new setting without resolving it.
 - [o] Write more complete programs in C, end-to-end, and use tools (debugger, sanitizers) to deepen your understanding before chasing new languages.
   > Skill comes from writing and finishing programs, not from collecting languages. C is an unusually honest place to practice computational thinking; staying with it for a while pays off no matter what you write next.
 - Memorize the entire C standard library.
   > The standard library is large and best treated as a reference to look up when needed; memorizing it is neither practical nor the bottleneck for improvement.
+- Read every recommended book before writing more code.
+  > Books are valuable references, but the skill of programming develops from writing, debugging, and finishing programs, not from reading alone.
 
 There is nothing wrong with learning a new language soon, but the foundation you've built is the part that's hardest to acquire, and the most valuable to deepen first.`}
 />

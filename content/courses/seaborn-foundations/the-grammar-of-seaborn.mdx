@@ -134,14 +134,14 @@ column-to-role assignments, is what "thinking in Seaborn" means.
 main thing the Seaborn version did *for* you that you had to do by hand in
 matplotlib?
 
-- It computed more accurate point positions.
-  > Both versions plot the same points at the same positions; accuracy is identical. The difference is who manages the grouping and legend.
 - [o] It split the data into species groups, assigned colors, and built the legend automatically from the \`hue\` column.
   > Mapping a column to \`hue\` told Seaborn to group, color, and legend by that column, replacing the manual loop, color list, and \`ax.legend\` call.
 - It made the figure render faster.
   > Speed is not the point and is roughly the same. The win is that declarative role-assignment removes the manual bookkeeping.
 - It used a completely different drawing engine instead of matplotlib.
   > Seaborn still draws with matplotlib underneath. It adds a declarative layer on top rather than replacing the engine.
+- It computed more accurate point positions.
+  > Both versions plot the same points at the same positions; accuracy is identical. The difference is who manages the grouping and legend.
 
 Declarative means you describe the chart in terms of your data; the library
 translates that into the imperative drawing steps.`}
@@ -371,12 +371,12 @@ approach?
 
 - You issue low-level drawing commands (move here, draw a point, draw a line) one at a time.
   > That is the *imperative* style, which is how raw matplotlib works. Seaborn sits a declarative layer above it.
-- [o] You pass a tidy DataFrame and assign its columns to visual roles (\`x\`, \`y\`, \`hue\`, \`col\`, ...), and Seaborn handles the grouping, statistics, and legend.
-  > Declarative means you describe the desired result in terms of your data's columns and let the library translate that into drawing steps.
 - You must reshape every dataset into a NumPy array before plotting.
   > Seaborn is built around labeled DataFrame columns, not raw arrays. You name columns; you do not hand it bare arrays.
 - You write the legend and color assignments yourself for full control.
   > Writing those by hand is the matplotlib approach. Seaborn derives them from your role assignments automatically.
+- [o] You pass a tidy DataFrame and assign its columns to visual roles (\`x\`, \`y\`, \`hue\`, \`col\`, ...), and Seaborn handles the grouping, statistics, and legend.
+  > Declarative means you describe the desired result in terms of your data's columns and let the library translate that into drawing steps.
 
 You describe *what* you want to see in terms of columns and roles; Seaborn
 works out *how* to draw it.`}
@@ -387,14 +387,14 @@ works out *how* to draw it.`}
 colorbar** instead of a set of distinct colors with a category legend. What
 does that tell you about the column?
 
+- Seaborn could not find the column and fell back to a default.
+  > If the column were missing you would get an error, not a colorbar. The colorbar is a deliberate choice for numeric data.
 - The column has too many categories for a legend.
   > A column with many *categories* still gets discrete colors (and a possibly long legend), not a continuous gradient. The gradient signals a different data type.
 - [o] The column is **numeric (continuous)**, so Seaborn maps it to a continuous color scale.
   > Seaborn inspects the column's type: numeric \`hue\` becomes a gradient with a colorbar, while categorical \`hue\` becomes distinct colors with a legend.
 - You accidentally passed a list to \`hue\` instead of a column name.
   > Passing a column name is exactly right; the gradient is the normal behavior for a numeric column, not a sign of a mistake.
-- Seaborn could not find the column and fell back to a default.
-  > If the column were missing you would get an error, not a colorbar. The colorbar is a deliberate choice for numeric data.
 
 The *same* \`hue\` parameter behaves two ways, discrete for categorical
 columns, continuous for numeric ones, chosen automatically from the column's

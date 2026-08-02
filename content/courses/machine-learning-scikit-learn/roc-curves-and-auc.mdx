@@ -377,12 +377,12 @@ assert better == expected, f"Expected {expected}, got {better}"`,
 
 - Precision against recall
   > A precision-recall curve plots precision against recall, that is a different tool. The ROC curve specifically uses False Positive Rate on the x-axis and True Positive Rate (recall) on the y-axis.
-- Accuracy against threshold
-  > Accuracy against threshold would be a different diagnostic plot. The ROC curve plots TPR vs FPR, not overall accuracy, so it separates the positive-class detection rate from the false-alarm rate.
-- [o] True Positive Rate against False Positive Rate as the decision threshold varies
-  > Each point on an ROC curve is the (FPR, TPR) pair at one threshold; sweeping the threshold traces the curve.
 - Training error against test error
   > A training-vs-test error plot is the complexity curve used to diagnose overfitting. An ROC curve is an evaluation tool for classifiers that shows the TPR/FPR tradeoff across all thresholds.
+- [o] True Positive Rate against False Positive Rate as the decision threshold varies
+  > Each point on an ROC curve is the (FPR, TPR) pair at one threshold; sweeping the threshold traces the curve.
+- Accuracy against threshold
+  > Accuracy against threshold would be a different diagnostic plot. The ROC curve plots TPR vs FPR, not overall accuracy, so it separates the positive-class detection rate from the false-alarm rate.
 
 ROC is the TPR-vs-FPR tradeoff swept across all thresholds.`}
 />
@@ -390,14 +390,14 @@ ROC is the TPR-vs-FPR tradeoff swept across all thresholds.`}
 <MultipleChoice
   markdown={`Which interpretation of **AUC** is correct?
 
-- The percentage of predictions that are correct
-  > That would be accuracy, which depends on a specific threshold. AUC is threshold-free and measures how well the model ranks positives above negatives across all thresholds.
-- The model's accuracy at threshold 0.5
-  > Accuracy at threshold 0.5 is a single point on the ROC curve, not the area under it. AUC aggregates performance across every possible threshold, not just the default one.
-- [o] The probability that the model scores a randomly chosen positive higher than a randomly chosen negative
-  > AUC is a threshold-free measure of ranking quality, equivalently, the area under the ROC curve. It is not an accuracy rate.
 - The fraction of variance explained
   > Fraction of variance explained (R-squared) is a metric for regression models. AUC is specific to classifiers and measures ranking quality, not explained variance.
+- [o] The probability that the model scores a randomly chosen positive higher than a randomly chosen negative
+  > AUC is a threshold-free measure of ranking quality, equivalently, the area under the ROC curve. It is not an accuracy rate.
+- The model's accuracy at threshold 0.5
+  > Accuracy at threshold 0.5 is a single point on the ROC curve, not the area under it. AUC aggregates performance across every possible threshold, not just the default one.
+- The percentage of predictions that are correct
+  > That would be accuracy, which depends on a specific threshold. AUC is threshold-free and measures how well the model ranks positives above negatives across all thresholds.
 
 AUC measures how well a model orders positives above negatives, regardless of threshold.`}
 />
@@ -405,14 +405,14 @@ AUC measures how well a model orders positives above negatives, regardless of th
 <MultipleChoice
   markdown={`A model has an ROC AUC of exactly 0.5. What does this indicate?
 
-- Perfect classification
-  > A perfect classifier has AUC = 1.0, meaning it always ranks every positive above every negative. AUC = 0.5 is the opposite, no better than random guessing.
 - The threshold is set too high
   > AUC is threshold-free; it summarizes performance across all thresholds, so a single threshold setting cannot cause AUC = 0.5. A value of 0.5 means the model's scores have no useful ordering of positives vs. negatives.
-- [o] The model ranks positives and negatives no better than random guessing
-  > An AUC of 0.5 corresponds to the diagonal of the ROC plot, the scores carry no useful ordering information.
 - The classes are perfectly balanced
   > Class balance is a property of the dataset, not of AUC. AUC = 0.5 means the model's scores are uninformative regardless of class proportions.
+- Perfect classification
+  > A perfect classifier has AUC = 1.0, meaning it always ranks every positive above every negative. AUC = 0.5 is the opposite, no better than random guessing.
+- [o] The model ranks positives and negatives no better than random guessing
+  > An AUC of 0.5 corresponds to the diagonal of the ROC plot, the scores carry no useful ordering information.
 
 AUC of 0.5 is the "coin flip" baseline; useful models sit well above it.`}
 />
@@ -420,14 +420,14 @@ AUC of 0.5 is the "coin flip" baseline; useful models sit well above it.`}
 <MultipleChoice
   markdown={`Why can you **not** compute an ROC curve from a model's hard 0/1 predictions alone?
 
+- scikit-learn forbids it
+  > scikit-learn does not forbid it, but \`roc_curve\` expects scores or probabilities, not hard 0/1 predictions. Passing hard labels simply gives a single (FPR, TPR) point, not a curve.
+- ROC curves only work for balanced data
+  > ROC curves can be computed regardless of class balance, though on heavily imbalanced data the precision-recall curve is often more informative. The technical requirement is scores, not balanced classes.
 - ROC curves require regression outputs
   > ROC curves are specifically designed for classifiers, not regression models. They need the classifier's probability scores or decision function values, not regression predictions.
 - [o] Hard predictions have already fixed a single threshold; ROC needs the underlying scores or probabilities to re-threshold at many cutoffs
   > A single set of 0/1 labels gives just one (FPR, TPR) point. The curve requires \`predict_proba\` or \`decision_function\` so the threshold can be swept.
-- ROC curves only work for balanced data
-  > ROC curves can be computed regardless of class balance, though on heavily imbalanced data the precision-recall curve is often more informative. The technical requirement is scores, not balanced classes.
-- scikit-learn forbids it
-  > scikit-learn does not forbid it, but \`roc_curve\` expects scores or probabilities, not hard 0/1 predictions. Passing hard labels simply gives a single (FPR, TPR) point, not a curve.
 
 ROC analysis is inherently about varying the threshold, which needs continuous scores.`}
 />
@@ -435,14 +435,14 @@ ROC analysis is inherently about varying the threshold, which needs continuous s
 <MultipleChoice
   markdown={`On a dataset where only 1% of cases are positive, a model shows ROC AUC = 0.95 but its precision is poor. What is the most likely explanation?
 
-- The AUC must be a bug
-  > An AUC of 0.95 on an imbalanced dataset is not a bug, it is a real but potentially misleading result. The mismatch with low precision is an expected consequence of FPR using the large negative class as its denominator.
-- [o] With a huge negative class, many false positives barely move the FPR, so ROC AUC can look excellent while precision (which depends on FP relative to predicted positives) stays low
-  > Heavy imbalance lets ROC AUC stay rosy because FPR's denominator is dominated by negatives. A precision–recall curve gives a more honest read on rare positives.
 - High AUC guarantees high precision
   > AUC and precision measure different things. AUC measures ranking quality (does the model score positives above negatives?), while precision measures what fraction of flagged cases are truly positive. On rare positives, these can diverge sharply.
 - Precision and AUC always agree
   > Precision and AUC can disagree substantially, especially with heavy class imbalance. AUC rewards ranking quality across all thresholds; precision at any given threshold is heavily influenced by how many false positives the model produces relative to the rare positive class.
+- [o] With a huge negative class, many false positives barely move the FPR, so ROC AUC can look excellent while precision (which depends on FP relative to predicted positives) stays low
+  > Heavy imbalance lets ROC AUC stay rosy because FPR's denominator is dominated by negatives. A precision–recall curve gives a more honest read on rare positives.
+- The AUC must be a bug
+  > An AUC of 0.95 on an imbalanced dataset is not a bug, it is a real but potentially misleading result. The mismatch with low precision is an expected consequence of FPR using the large negative class as its denominator.
 
 On rare-positive problems, prefer the precision–recall curve; ROC AUC can be optimistic.`}
 />
@@ -450,14 +450,14 @@ On rare-positive problems, prefer the precision–recall curve; ROC AUC can be o
 <MultipleChoice
   markdown={`A teammate reports "AUC = 0.92, so we're done." What important thing does AUC **not** tell them?
 
-- How well the model ranks cases
-  > AUC is precisely a measure of ranking quality, whether the model scores positives above negatives. That is one of the things it *does* tell you, so it is not the missing piece.
-- Whether the model beats random
-  > A model with AUC above 0.5 already beats random, and AUC = 0.92 clearly does. That is already known from the AUC value, so it is not what is missing.
-- [o] The precision and recall at the specific threshold they will actually deploy, AUC aggregates over all thresholds and ignores any single operating point
-  > A strong AUC means a good threshold exists, not that any particular cutoff is good. You must still pick and report an operating point's precision/recall.
 - Whether one model outranks another
   > AUC is commonly used to compare models, a higher AUC means better ranking. That is one thing AUC *does* tell you, so it is not the gap being pointed out here.
+- How well the model ranks cases
+  > AUC is precisely a measure of ranking quality, whether the model scores positives above negatives. That is one of the things it *does* tell you, so it is not the missing piece.
+- [o] The precision and recall at the specific threshold they will actually deploy, AUC aggregates over all thresholds and ignores any single operating point
+  > A strong AUC means a good threshold exists, not that any particular cutoff is good. You must still pick and report an operating point's precision/recall.
+- Whether the model beats random
+  > A model with AUC above 0.5 already beats random, and AUC = 0.92 clearly does. That is already known from the AUC value, so it is not what is missing.
 
 AUC judges ranking across thresholds; the deployed threshold still needs its own evaluation.`}
 />

@@ -257,10 +257,10 @@ ORDER BY
   > \`CASE\` does not compare result values; it returns the first matching condition's value.
 - [o] The first \`WHEN\` whose condition is true, evaluated top to bottom.
   > \`CASE\` tests conditions in order and stops at the first match, so branch order matters.
-- All matching branches, concatenated.
-  > Only one value is returned, that of the first matching branch.
 - A random matching branch.
   > Evaluation is deterministic: the first true condition wins.
+- All matching branches, concatenated.
+  > Only one value is returned, that of the first matching branch.
 
 \`CASE\` returns the first matching branch, so order conditions from
 specific to general.`}
@@ -269,14 +269,14 @@ specific to general.`}
 <MultipleChoice
   markdown={`What does \`SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END)\` compute per group?
 
-- The total amount of all rows regardless of status.
-  > The \`CASE\` contributes 0 for non-paid rows, so only paid amounts are summed.
-- [o] The total \`amount\` of only the \`paid\` rows, because non-paid rows contribute 0.
-  > The inner \`CASE\` zeroes out non-matching rows, so \`SUM\` effectively totals just the paid amounts.
-- The count of paid rows.
-  > It sums \`amount\`, not a count; a count would use \`COUNT(...)\`.
 - NULL, because of the \`ELSE\`.
   > The \`ELSE 0\` ensures a numeric contribution; the result is a real sum, not NULL.
+- The total amount of all rows regardless of status.
+  > The \`CASE\` contributes 0 for non-paid rows, so only paid amounts are summed.
+- The count of paid rows.
+  > It sums \`amount\`, not a count; a count would use \`COUNT(...)\`.
+- [o] The total \`amount\` of only the \`paid\` rows, because non-paid rows contribute 0.
+  > The inner \`CASE\` zeroes out non-matching rows, so \`SUM\` effectively totals just the paid amounts.
 
 Conditional aggregation sums only the rows matching the inner condition,
 producing a filtered total in its own column.`}
@@ -287,12 +287,12 @@ producing a filtered total in its own column.`}
 
 - It rounds the result automatically.
   > \`NULLIF\` does not round; it guards against a specific divisor value.
-- [o] When \`quantity\` is 0, \`NULLIF\` turns it into \`NULL\`, so the division yields \`NULL\` instead of a divide-by-zero error.
-  > Dividing by NULL produces NULL rather than failing, which keeps the query running on bad rows.
-- It makes the division faster.
-  > The benefit is safety, not speed.
 - It converts the result to text.
   > The result stays numeric (or NULL); no type change occurs.
+- It makes the division faster.
+  > The benefit is safety, not speed.
+- [o] When \`quantity\` is 0, \`NULLIF\` turns it into \`NULL\`, so the division yields \`NULL\` instead of a divide-by-zero error.
+  > Dividing by NULL produces NULL rather than failing, which keeps the query running on bad rows.
 
 \`NULLIF(quantity, 0)\` converts a zero divisor to NULL, avoiding
 divide-by-zero.`}

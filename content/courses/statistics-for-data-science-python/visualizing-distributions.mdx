@@ -160,12 +160,12 @@ anything about shape.
 <MultipleChoice
   markdown={`You plot a histogram of session durations with 6 bins and see a single smooth hump. A colleague plots the *same data* with 60 bins and sees two clear peaks. Who is right?
 
+- [o] Neither bin count is automatically authoritative; you should view several and likely confirm the two peaks with an ECDF or by checking for two subgroups
+  > Because bin count is a tunable choice that changes the picture, the responsible move is to look across bin counts and corroborate with a bin-free view before concluding.
 - The 6-bin version, because fewer bins is less noisy
   > Fewer bins can smooth genuine structure away, merging two real peaks into one, "less noisy" can also mean "hiding the signal."
 - The 60-bin version, because more bins always shows more truth
   > More bins can also manufacture spurious spikiness from random sampling, so "more bins = more truth" isn't a reliable rule either.
-- [o] Neither bin count is automatically authoritative; you should view several and likely confirm the two peaks with an ECDF or by checking for two subgroups
-  > Because bin count is a tunable choice that changes the picture, the responsible move is to look across bin counts and corroborate with a bin-free view before concluding.
 - They cannot both be looking at the same data
   > They can: identical data routinely yields different-looking histograms purely from the bin-count setting, which is the whole point of the bin trap.
 
@@ -525,14 +525,14 @@ assert 0.0 <= prop_at_threshold <= 1.0`,
 <MultipleChoice
   markdown={`Two distributions have the same mean and the same standard deviation. What can you conclude about their shapes?
 
-- They must have the same shape, since mean and SD define a distribution
-  > Mean and SD pin down only center and spread; many different shapes (bell, bimodal, uniform, skewed) share the same pair of values.
+- One must be the other shifted left or right
+  > A shift would change the mean; identical means rule that out, and equal SDs still permit completely different shapes.
 - [o] Almost nothing, they could differ in skew, number of peaks, tail heaviness, and outliers, so you must plot them to compare shapes
   > Because those two numbers omit skew, modality, tails, and outliers, distributions with matching mean and SD can look entirely different, which is exactly why plotting comes first.
 - They must both be approximately normal
   > Sharing a mean and SD says nothing about normality; uniform, bimodal, and heavily skewed data can all share the same mean and SD.
-- One must be the other shifted left or right
-  > A shift would change the mean; identical means rule that out, and equal SDs still permit completely different shapes.
+- They must have the same shape, since mean and SD define a distribution
+  > Mean and SD pin down only center and spread; many different shapes (bell, bimodal, uniform, skewed) share the same pair of values.
 
 Equal summaries do not imply equal shapes, the plot is where the differences live.`}
 />
@@ -540,12 +540,12 @@ Equal summaries do not imply equal shapes, the plot is where the differences liv
 <MultipleChoice
   markdown={`Which plot is the best choice when you specifically want to check whether a single variable is **bimodal** (has two peaks)?
 
+- A single reported median
+  > A median is one number describing the middle; it carries no information about how many peaks the distribution has.
 - A box plot
   > A box plot is built from quartiles only, so a two-humped distribution and a single broad hump can produce the identical box, it cannot reveal modality.
 - [o] A histogram (viewed at a sensible bin count) or a violin plot
   > Both display the density across the range, so a second peak shows up as a second bump, unlike a box plot, which hides it.
-- A single reported median
-  > A median is one number describing the middle; it carries no information about how many peaks the distribution has.
 - A bar chart of the mean
   > A bar of the mean shows one summarized height and reveals nothing about the distribution's peaks.
 
@@ -555,14 +555,14 @@ To see peaks, you need a plot that shows density across the range, a histogram o
 <MultipleChoice
   markdown={`A key advantage of the **ECDF** over a histogram is that it:
 
-- Looks more intuitive to non-technical audiences
-  > Histograms are usually the *more* intuitive choice for general audiences; the ECDF's edge is technical, not about intuitiveness.
 - [o] Has no bin-count or bandwidth to tune, so it shows every data point without smoothing-driven artifacts and lets you read percentiles directly
   > Since it plots cumulative proportion against sorted values with nothing to set, the ECDF can't hide or invent structure the way bin or bandwidth choices can, and its height is a percentile.
-- Automatically removes outliers from the display
-  > The ECDF shows every point, including outliers, it doesn't remove anything; that's part of why it's considered honest.
 - Always reveals bimodality more clearly than a histogram
   > Two peaks read as changes in *slope* on an ECDF, which is often *subtler* than the obvious double hump of a histogram, so "always more clearly" is false.
+- Automatically removes outliers from the display
+  > The ECDF shows every point, including outliers, it doesn't remove anything; that's part of why it's considered honest.
+- Looks more intuitive to non-technical audiences
+  > Histograms are usually the *more* intuitive choice for general audiences; the ECDF's edge is technical, not about intuitiveness.
 
 The ECDF's strength is being knob-free and exact, which makes percentiles trivial to read.`}
 />
@@ -572,10 +572,10 @@ The ECDF's strength is being knob-free and exact, which makes percentiles trivia
 
 - The data changed, so you should recollect it
   > The underlying data is identical; only the binning changed, so there's nothing to recollect.
-- The 50-bin version is correct because higher resolution is always better
-  > Higher bin counts can fracture a smooth distribution into noisy spikes from random sampling, so more bins isn't automatically more correct.
 - [o] Bin count is a display choice that shapes the impression; you should view several bin counts and cross-check with a bin-free view like an ECDF before trusting any single shape
   > Because the picture depends on a tunable setting, the disciplined response is to look across settings and corroborate with a method that has no bins, rather than trusting one histogram.
+- The 50-bin version is correct because higher resolution is always better
+  > Higher bin counts can fracture a smooth distribution into noisy spikes from random sampling, so more bins isn't automatically more correct.
 - Histograms are useless and should be avoided
   > Histograms are valuable for reading shape; you just have to remember the bin count is a knob and confirm features across settings.
 

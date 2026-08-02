@@ -85,12 +85,12 @@ columns you need is usually clearer.
 <MultipleChoice
   markdown={`If you write \`SELECT title, price FROM books;\`, which columns appear in the result?
 
-- Every column in the table.
-  > Listing column names is more specific than \`*\`; it returns only the columns you named.
 - [o] Only \`title\` and \`price\`.
   > The \`SELECT\` list controls the columns in the result.
 - Only rows where the title has a price.
   > Choosing rows is the job of \`WHERE\`, not the basic \`SELECT\` list.
+- Every column in the table.
+  > Listing column names is more specific than \`*\`; it returns only the columns you named.
 - A count of books.
   > Counting rows uses an aggregate function such as \`COUNT(*)\`.`}
 />
@@ -217,27 +217,27 @@ FROM
 <MultipleChoice
   markdown={`What does \`SELECT * FROM books;\` return?
 
-- Only the first column.
-  > The asterisk means all columns, not one column.
+- No rows, only column names.
+  > \`SELECT *\` returns data rows as well as column names.
 - [o] Every column from \`books\`.
   > \`*\` is shorthand for all columns in the table.
+- Only the first column.
+  > The asterisk means all columns, not one column.
 - Only unique rows.
-  > Removing duplicates requires \`DISTINCT\`.
-- No rows, only column names.
-  > \`SELECT *\` returns data rows as well as column names.`}
+  > Removing duplicates requires \`DISTINCT\`.`}
 />
 
 <MultipleChoice
   markdown={`Does a \`SELECT\` query change the stored table?
 
-- Yes, it deletes columns you did not select.
-  > Unselected columns simply do not appear in the result; they remain stored.
-- Yes, it permanently rearranges the columns.
-  > Column order in the result does not change the table definition.
 - [o] No, it reads data and returns a temporary result.
   > A basic \`SELECT\` is safe because it does not modify stored data.
 - Only when you use \`DISTINCT\`.
-  > \`DISTINCT\` changes the result, not the stored table.`}
+  > \`DISTINCT\` changes the result, not the stored table.
+- Yes, it deletes columns you did not select.
+  > Unselected columns simply do not appear in the result; they remain stored.
+- Yes, it permanently rearranges the columns.
+  > Column order in the result does not change the table definition.`}
 />
 
 <MultipleChoice
@@ -245,10 +245,10 @@ FROM
 
 - Four rows, including both \`Fiction\` values.
   > \`DISTINCT\` removes repeated result rows.
-- [o] Three rows, one for each different genre.
-  > Each unique genre appears once.
+- Nothing, because one value repeats.
+  > Repeated values are allowed; duplicates are simply collapsed.
 - Only \`Fiction\`, because it appears most often.
   > \`DISTINCT\` does not choose the most common value; it keeps every unique value.
-- Nothing, because one value repeats.
-  > Repeated values are allowed; duplicates are simply collapsed.`}
+- [o] Three rows, one for each different genre.
+  > Each unique genre appears once.`}
 />

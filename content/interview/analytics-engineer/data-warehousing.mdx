@@ -249,40 +249,40 @@ models upstream as the maintainable source.
 <MultipleChoice
   markdown={`A dashboard query filters a 5-year event table to the last 7 days but is slow and expensive. The table is not partitioned. Best first fix?
 
-- Switch the warehouse to a bigger compute size.
-  > More compute reads the same five years faster but still scans it all; you pay more, not less.
-- [o] Partition (or cluster) the table by event date so the filter prunes to recent segments.
-  > With date partitioning, a 7-day filter reads only those partitions instead of the entire history, cutting both time and cost.
 - Add more columns to the \`SELECT\`.
   > Reading more columns increases scan cost in a columnar store; it never helps.
+- [o] Partition (or cluster) the table by event date so the filter prunes to recent segments.
+  > With date partitioning, a 7-day filter reads only those partitions instead of the entire history, cutting both time and cost.
 - Convert the table to a view.
-  > A view recomputes on every read and still scans the full table; it doesn't prune anything.`}
+  > A view recomputes on every read and still scans the full table; it doesn't prune anything.
+- Switch the warehouse to a bigger compute size.
+  > More compute reads the same five years faster but still scans it all; you pay more, not less.`}
 />
 
 <MultipleChoice
   markdown={`A pipeline retries a load after a mid-run crash and ends up with duplicate rows. Which design prevents this?
 
-- \`INSERT\` all source rows every run.
-  > Blind inserts on retry are exactly what creates duplicates.
-- [o] \`MERGE\` on a unique key (or \`CREATE OR REPLACE\` from source) so reruns are idempotent.
-  > Keying the load so matched rows update in place makes a rerun produce the same table, no duplicates.
 - Run the job less often.
   > Frequency doesn't matter; a single retried non-idempotent load still duplicates.
 - Delete the target table's indexes.
-  > Indexes are unrelated to duplicate rows from re-inserts.`}
+  > Indexes are unrelated to duplicate rows from re-inserts.
+- \`INSERT\` all source rows every run.
+  > Blind inserts on retry are exactly what creates duplicates.
+- [o] \`MERGE\` on a unique key (or \`CREATE OR REPLACE\` from source) so reruns are idempotent.
+  > Keying the load so matched rows update in place makes a rerun produce the same table, no duplicates.`}
 />
 
 <MultipleChoice
   markdown={`Which statement about "separation of storage and compute" is correct?
 
-- It means data is stored twice for redundancy.
-  > That's replication, a different concept; separation is about decoupling the compute layer from storage.
-- [o] Compute clusters can scale independently and read the same stored data without moving it.
-  > Decoupling lets you resize or run multiple isolated compute engines over one storage copy.
 - It forces every query to rebuild the table first.
   > Nothing about the architecture requires rebuilding tables per query.
+- [o] Compute clusters can scale independently and read the same stored data without moving it.
+  > Decoupling lets you resize or run multiple isolated compute engines over one storage copy.
 - It only applies to OLTP databases.
-  > It's a hallmark of modern OLAP cloud warehouses, not OLTP systems.`}
+  > It's a hallmark of modern OLAP cloud warehouses, not OLTP systems.
+- It means data is stored twice for redundancy.
+  > That's replication, a different concept; separation is about decoupling the compute layer from storage.`}
 />
 
 ## Challenges

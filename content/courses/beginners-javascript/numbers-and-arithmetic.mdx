@@ -442,14 +442,14 @@ if (typeof toFahrenheit(50) !== "number") throw new Error("toFahrenheit must ret
 <MultipleChoice
   markdown={`Why does \`0.1 + 0.2 === 0.3\` evaluate to \`false\` in JavaScript?
 
+- Because \`===\` always returns false for decimals
+  > \`===\` compares floating-point values correctly and returns \`true\` for equal ones (e.g. \`0.5 + 0.5 === 1\` is \`true\`); the problem is specific to values that cannot be represented exactly in binary.
+- Because \`0.3\` is actually \`null\` under the hood
+  > \`0.3\` is a perfectly valid number literal, not \`null\`; the issue is that its binary floating-point representation differs very slightly from the result of adding \`0.1\` and \`0.2\`.
 - Because JavaScript has a bug in its addition operator
   > The addition operator works correctly; the unexpected result comes from the IEEE 754 floating-point representation, which is the same standard used by virtually every other programming language.
 - [o] Because JavaScript numbers are 64-bit floating-point, and decimals like 0.1 cannot be represented exactly in binary, tiny rounding errors are unavoidable
   > This behaviour is built into the IEEE 754 floating-point standard used by almost every modern language. When you need to compare decimals, compare with a small tolerance (\`Math.abs(a - b) < 1e-9\`), or for money, work in integer cents and only format for display.
-- Because \`0.3\` is actually \`null\` under the hood
-  > \`0.3\` is a perfectly valid number literal, not \`null\`; the issue is that its binary floating-point representation differs very slightly from the result of adding \`0.1\` and \`0.2\`.
-- Because \`===\` always returns false for decimals
-  > \`===\` compares floating-point values correctly and returns \`true\` for equal ones (e.g. \`0.5 + 0.5 === 1\` is \`true\`); the problem is specific to values that cannot be represented exactly in binary.
 
 This is one of the most surprising things in early programming, and it's universal, Python, Java, C, and Rust all produce essentially the same result. It's a property of floating-point arithmetic, not of any specific language.`}
 />

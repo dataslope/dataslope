@@ -707,14 +707,14 @@ int main() {
 <MultipleChoice
   markdown={`Which data structure is the usual core of BFS?
 
-- [o] Queue
-  > BFS processes vertices in first-in, first-out order.
 - Stack
   > A stack is the usual core of iterative DFS.
 - Binary search tree
   > A BST stores ordered keys, not BFS frontier order.
 - Heap
   > A heap is used by algorithms like Dijkstra, not ordinary BFS.
+- [o] Queue
+  > BFS processes vertices in first-in, first-out order.
 
 BFS uses a queue so all vertices at distance k are processed before distance k + 1.`}
 />
@@ -722,14 +722,14 @@ BFS uses a queue so all vertices at distance k are processed before distance k +
 <MultipleChoice
   markdown={`Which mechanism naturally supports DFS?
 
+- Hash table only
+  > A hash table can store visited vertices but does not drive DFS order.
+- Priority queue only
+  > Priority queues order by priority, not depth.
 - Queue only
   > A queue creates breadth-first behavior.
 - [o] Recursion or an explicit stack
   > DFS follows one path deeply, which matches the call stack or a stack container.
-- Priority queue only
-  > Priority queues order by priority, not depth.
-- Hash table only
-  > A hash table can store visited vertices but does not drive DFS order.
 
 Recursive DFS is concise; iterative DFS avoids recursion-depth limits.`}
 />
@@ -737,14 +737,14 @@ Recursive DFS is concise; iterative DFS avoids recursion-depth limits.`}
 <MultipleChoice
   markdown={`When does BFS find shortest paths from a source?
 
-- In every weighted graph
-  > Weighted costs can make a path with fewer edges more expensive.
-- Only in complete graphs
-  > Completeness is not required.
-- [o] In unweighted graphs, where every edge has equal cost
-  > BFS minimizes number of edges.
 - Only in directed acyclic graphs
   > DAGs can be weighted; BFS is not generally enough there.
+- [o] In unweighted graphs, where every edge has equal cost
+  > BFS minimizes number of edges.
+- Only in complete graphs
+  > Completeness is not required.
+- In every weighted graph
+  > Weighted costs can make a path with fewer edges more expensive.
 
 Use Dijkstra for non-negative weighted graphs.`}
 />

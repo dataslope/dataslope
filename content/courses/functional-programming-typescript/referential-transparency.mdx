@@ -345,14 +345,14 @@ edge, exactly the same pattern as in [Pure Functions](./pure-functions).
 <MultipleChoice
   markdown={`Why is referential transparency such a powerful property in practice?
 
-- It speeds up TypeScript compilation
-  > The compiler itself doesn't care. The benefit is to *programmers* and *runtime optimizations*, not type-checking speed.
-- It eliminates the need for unit tests
-  > It makes tests easier and more reliable, but you still write them.
-- [o] It lets you replace an expression with its value anywhere it appears, enabling caching, parallelism, inlining, reordering, and equational reasoning
-  > The single property "this expression equals this value, everywhere" unlocks essentially every classical compiler optimization *and* every refactoring you'd want to do by hand.
 - It makes pointer aliasing safe
   > Aliasing is mostly a non-issue in TypeScript, and it's not what referential transparency is about.
+- It speeds up TypeScript compilation
+  > The compiler itself doesn't care. The benefit is to *programmers* and *runtime optimizations*, not type-checking speed.
+- [o] It lets you replace an expression with its value anywhere it appears, enabling caching, parallelism, inlining, reordering, and equational reasoning
+  > The single property "this expression equals this value, everywhere" unlocks essentially every classical compiler optimization *and* every refactoring you'd want to do by hand.
+- It eliminates the need for unit tests
+  > It makes tests easier and more reliable, but you still write them.
 
 If \`f(x)\` can be replaced by its value, you can move it, cache it, inline it, parallelize it, and prove things about it without rerunning anything.`}
 />

@@ -394,14 +394,14 @@ careful."
 <MultipleChoice
   markdown={`Static typing means:
 
-- The values of variables can't change
-  > That's "constant," a different idea.
 - The runtime checks types as the program runs
   > That's dynamic typing.
-- [o] The compiler knows the type of every variable and refuses to compile code that uses values in a way that doesn't match their type
-  > Type mismatches are caught at compile time, before the program ever runs.
+- The values of variables can't change
+  > That's "constant," a different idea.
 - C# uses no types at all
-  > C# is one of the most strongly typed mainstream languages.`}
+  > C# is one of the most strongly typed mainstream languages.
+- [o] The compiler knows the type of every variable and refuses to compile code that uses values in a way that doesn't match their type
+  > Type mismatches are caught at compile time, before the program ever runs.`}
 />
 
 <MultipleChoice
@@ -419,23 +419,23 @@ What is in \`a\`?
 
 - \`[1, 2]\`
   > Both variables point to the same list, \`b.Add(3)\` affects what \`a\` sees.
-- \`[3]\`
-  > The original items are still there.
 - [o] \`[1, 2, 3]\`
   > \`a\` and \`b\` reference the *same* list on the heap.
 - Compile error
-  > It compiles fine.`}
+  > It compiles fine.
+- \`[3]\`
+  > The original items are still there.`}
 />
 
 <MultipleChoice
   markdown={`What's the safest way to convert a user-supplied string to an integer?
 
-- \`(int)userInput\`
-  > That's a cast, not a parse; it won't compile for strings.
 - \`int.Parse(userInput)\` and ignore the result
   > It throws on bad input, your program will crash.
+- Convert it to \`double\` first and then to \`int\`
+  > Doesn't solve the "what if it's not a number?" problem.
 - [o] \`int.TryParse(userInput, out int n)\` and handle the \`false\` case
   > \`TryParse\` returns \`false\` instead of throwing, so you can react gracefully.
-- Convert it to \`double\` first and then to \`int\`
-  > Doesn't solve the "what if it's not a number?" problem.`}
+- \`(int)userInput\`
+  > That's a cast, not a parse; it won't compile for strings.`}
 />

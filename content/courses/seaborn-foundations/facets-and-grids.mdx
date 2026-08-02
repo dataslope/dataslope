@@ -153,14 +153,14 @@ similar when they aren't.
 <MultipleChoice
   markdown={`Why does Seaborn make facets **share the same axis limits** by default?
 
-- To make the figure render faster.
-  > Shared limits are about interpretation, not performance.
-- [o] So panels are directly comparable, a position in one panel means the same as the same position in another.
-  > A common scale is what lets the eye compare small multiples honestly; otherwise two panels could look alike while representing very different ranges.
 - Because Seaborn cannot compute separate limits per panel.
   > It can, \`sharey=False\`/\`sharex=False\` do exactly that; shared limits are a deliberate default.
+- [o] So panels are directly comparable, a position in one panel means the same as the same position in another.
+  > A common scale is what lets the eye compare small multiples honestly; otherwise two panels could look alike while representing very different ranges.
 - To save vertical space.
   > Any space difference is incidental; the real reason is comparability across panels.
+- To make the figure render faster.
+  > Shared limits are about interpretation, not performance.
 
 Shared scales keep small multiples comparable; only un-share them
 deliberately, and flag it for the reader.`}
@@ -248,14 +248,14 @@ g = sns.relplot(
 <MultipleChoice
   markdown={`What is "faceting" (drawing small multiples) in Seaborn?
 
-- Overlaying every group's data in a single set of axes using different colors.
-  > That's what \`hue\` does. Faceting gives each group its *own* panel rather than overlaying them.
-- [o] Splitting the data by one or two categorical variables and drawing the same plot once per group, arranged in a grid.
-  > Faceting (\`col\`/\`row\`) repeats one chart across panels, one per category (combination), so groups can be compared side by side.
-- Computing summary statistics for each group.
-  > Faceting is about layout, not aggregation; the per-panel plot may or may not aggregate.
 - Changing the color palette across the figure.
   > Palettes are cosmetic; faceting changes how many panels there are and what data each shows.
+- Computing summary statistics for each group.
+  > Faceting is about layout, not aggregation; the per-panel plot may or may not aggregate.
+- [o] Splitting the data by one or two categorical variables and drawing the same plot once per group, arranged in a grid.
+  > Faceting (\`col\`/\`row\`) repeats one chart across panels, one per category (combination), so groups can be compared side by side.
+- Overlaying every group's data in a single set of axes using different colors.
+  > That's what \`hue\` does. Faceting gives each group its *own* panel rather than overlaying them.
 
 Faceting = the same chart repeated across a grid of category panels (small
 multiples).`}
@@ -265,14 +265,14 @@ multiples).`}
   markdown={`You facet with \`col\` (3 levels) **and** \`row\` (4 levels). How many panels
 do you get?
 
-- 7, one per category level.
-  > Faceting isn't additive across the two dimensions.
 - [o] 12, the product of the levels (3 × 4).
   > A 2-D facet grid has one panel for every *combination* of col and row levels, so 3 × 4 = 12.
-- 1, with all groups overlaid.
-  > Overlaying is \`hue\`; \`col\`/\`row\` produce separate panels.
 - 3, ignoring the row variable.
   > Both faceting variables apply; the row variable multiplies the panel count.
+- 7, one per category level.
+  > Faceting isn't additive across the two dimensions.
+- 1, with all groups overlaid.
+  > Overlaying is \`hue\`; \`col\`/\`row\` produce separate panels.
 
 The grid size is \`col\` levels × \`row\` levels, which is exactly why grids
 can explode if you're not careful.`}
@@ -282,14 +282,14 @@ can explode if you're not careful.`}
   markdown={`In the explicit \`FacetGrid\` workflow, what does the \`map\` (or
 \`map_dataframe\`) step do?
 
-- It creates the grid of empty axes.
-  > That happens when you construct the \`FacetGrid\` object; \`map\` comes afterward.
+- It melts the data into long form.
+  > Reshaping is a pandas concern done before plotting; \`map\` only draws.
 - [o] It applies a plotting function to each data subset, drawing the same plot in every panel.
   > After the grid is set up, \`map\`/\`map_dataframe\` runs your chosen plotting function on each facet's slice of the data.
 - It adds the legend to the figure.
   > That's \`add_legend()\`, a separate final step.
-- It melts the data into long form.
-  > Reshaping is a pandas concern done before plotting; \`map\` only draws.
+- It creates the grid of empty axes.
+  > That happens when you construct the \`FacetGrid\` object; \`map\` comes afterward.
 
 The workflow is: construct the grid, \`map\` a plot onto each subset, then
 \`add_legend()\`, which is precisely what \`relplot\` automates.`}
@@ -299,10 +299,10 @@ The workflow is: construct the grid, \`map\` a plot onto each subset, then
   markdown={`You facet a plot on a column that has 60 distinct values. What's the likely
 result, and a better approach?
 
-- A single clear chart; no problem at all.
-  > Faceting on 60 levels makes 60 panels, which is the opposite of clear.
 - [o] About 60 tiny, unreadable panels, better to filter to a few categories of interest or group the rare ones.
   > Each level becomes its own panel, so high-cardinality faceting produces a wall of thumbnails; reducing the number of facets restores readability.
+- A single clear chart; no problem at all.
+  > Faceting on 60 levels makes 60 panels, which is the opposite of clear.
 - Seaborn automatically picks the 5 most important categories.
   > Seaborn faithfully facets every level; it won't silently drop categories for you.
 - The panels will overlap into one.

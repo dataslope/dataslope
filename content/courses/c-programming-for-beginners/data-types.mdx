@@ -332,12 +332,12 @@ int main(void) {
 }
 \`\`\`
 
-- 3.5
-  > C's \`/\` between two \`int\`s does **integer** division, the result is itself an \`int\`, so there is no \`.5\`.
-- 4
-  > Rounding to the nearest integer would give 4, but C integer division truncates toward zero, dropping the fractional part entirely.
 - [o] 3
   > Integer division truncates toward zero: \`7 / 2\` yields \`3\`.
+- 4
+  > Rounding to the nearest integer would give 4, but C integer division truncates toward zero, dropping the fractional part entirely.
+- 3.5
+  > C's \`/\` between two \`int\`s does **integer** division, the result is itself an \`int\`, so there is no \`.5\`.
 - A compile-time error.
   > Dividing two \`int\`s is perfectly legal C; no error is produced at any stage.
 
@@ -347,14 +347,14 @@ To get a fractional result, at least one of the operands must be a floating-poin
 <MultipleChoice
   markdown={`Which type would you choose to store the temperature of a refrigerator in degrees Celsius with one digit of precision (e.g. \`4.0\`, \`-1.5\`)?
 
-- \`int\`, temperatures are whole numbers.
-  > A refrigerator can be \`-1.5\`, which an \`int\` cannot represent.
-- \`char\`, temperatures fit in one byte.
-  > \`char\` can only hold whole integers in a small range; the fractional part would be lost.
 - [o] \`double\`, for accurate fractional values.
   > \`double\` is the standard choice for general-purpose fractional numbers in C.
 - \`unsigned int\`, temperatures are always positive.
   > Temperatures can be negative; \`unsigned\` types cannot hold negative values.
+- \`char\`, temperatures fit in one byte.
+  > \`char\` can only hold whole integers in a small range; the fractional part would be lost.
+- \`int\`, temperatures are whole numbers.
+  > A refrigerator can be \`-1.5\`, which an \`int\` cannot represent.
 
 Integer types are great for counts and identifiers; for any quantity that can be fractional, use a floating-point type, typically \`double\` unless you have a specific reason to use \`float\`.`}
 />

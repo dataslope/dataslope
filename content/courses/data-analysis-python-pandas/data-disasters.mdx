@@ -121,14 +121,14 @@ of what "being good at this" means.
 <MultipleChoice
   markdown={`The Vancouver Stock Exchange index drifted from 1000 down to about 520 over 22 months. What caused it?
 
-- The stocks genuinely lost half their value
-  > The underlying market rose over the period; the index alone fell, which is what flagged the bug.
-- A single mistyped starting value
-  > The index started correctly at 1000.00; the error accumulated over time rather than starting wrong.
 - [o] Each recalculation truncated (rather than rounded) the result, and the tiny one-directional bias accumulated over thousands of recalculations
   > Truncation always discards the fraction the same way, so the error never cancels, it compounds. Rounding would have been roughly unbiased.
+- The stocks genuinely lost half their value
+  > The underlying market rose over the period; the index alone fell, which is what flagged the bug.
 - A network outage corrupted the data feed
   > The failure was a systematic arithmetic bias in the index calculation, not a transmission problem.
+- A single mistyped starting value
+  > The index started correctly at 1000.00; the error accumulated over time rather than starting wrong.
 
 A "negligible" per-operation error stops being negligible when you repeat it a few million times.`}
 />
@@ -136,14 +136,14 @@ A "negligible" per-operation error stops being negligible when you repeat it a f
 <MultipleChoice
   markdown={`What is the analyst's takeaway from the Mars Climate Orbiter loss?
 
-- Never use the metric system
-  > The metric/imperial choice was not the problem; the problem was that two systems assumed *different* units with no conversion or labeling.
 - [o] A number without an explicit unit is unsafe; units belong in column names and documentation
   > The two teams' numbers were individually correct but unitless. Naming columns like \`mass_g\` or \`price_usd\` makes the unit travel with the data.
-- Spacecraft should not use software
-  > All modern spacecraft rely on software; the lesson is about unit discipline, not avoiding code.
+- Never use the metric system
+  > The metric/imperial choice was not the problem; the problem was that two systems assumed *different* units with no conversion or labeling.
 - Imperial units are always wrong
   > Either unit system works fine on its own; the failure was the silent mismatch between two systems.
+- Spacecraft should not use software
+  > All modern spacecraft rely on software; the lesson is about unit discipline, not avoiding code.
 
 Penguins' \`body_mass_g\` and \`flipper_length_mm\` are good examples of units traveling with the data.`}
 />

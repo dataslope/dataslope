@@ -376,12 +376,12 @@ function getLength(s: string | null): number {
 \`\`\`
 Why does \`s.length\` compile without error in the second \`return\`?
 
+- Because of a type cast
+  > There's no cast here. The compiler infers the narrowing automatically.
 - Because \`.length\` is always safe
   > \`.length\` is not safe on \`null\`. The compiler needs to narrow the type.
 - [o] Because the compiler narrows \`s\` to \`string\` after the \`null\` check
   > Control flow analysis tracks the \`if (s === null)\` check and infers that \`s\` is \`string\` (not \`null\`) in the else branch.
-- Because of a type cast
-  > There's no cast here. The compiler infers the narrowing automatically.
 
 Control flow analysis is one of TypeScript's most powerful features, eliminating null-reference errors.`}
 />

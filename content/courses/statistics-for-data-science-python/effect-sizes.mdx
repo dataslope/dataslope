@@ -619,14 +619,14 @@ print(f"p = {p:.2e},  d = {d:.4f}")
 <MultipleChoice
   markdown={`A study with 2 million users finds that a new font color increases time-on-page by 0.3 seconds, with a p-value of 0.000001. What is the most reasonable conclusion?
 
-- The effect is large and important because the p-value is extremely small
-  > A tiny p-value reflects strong evidence the effect is nonzero, plus a very large sample, it says nothing about magnitude. 0.3 seconds may be trivial.
-- [o] The effect is almost certainly real but probably too small to matter; you should check the effect size before acting
-  > A huge sample makes even microscopic effects significant, so the next question is how big 0.3 seconds is relative to what matters for the business.
-- The result is invalid because the p-value is suspiciously small
-  > Extremely small p-values are exactly what you expect from a large sample combined with a genuine (if tiny) effect; there is nothing invalid about it.
 - There is no effect because 0.3 seconds is small
   > The data does show an effect; it is just small. "Small" is not the same as "zero", the right move is to weigh whether small is worth acting on.
+- The result is invalid because the p-value is suspiciously small
+  > Extremely small p-values are exactly what you expect from a large sample combined with a genuine (if tiny) effect; there is nothing invalid about it.
+- [o] The effect is almost certainly real but probably too small to matter; you should check the effect size before acting
+  > A huge sample makes even microscopic effects significant, so the next question is how big 0.3 seconds is relative to what matters for the business.
+- The effect is large and important because the p-value is extremely small
+  > A tiny p-value reflects strong evidence the effect is nonzero, plus a very large sample, it says nothing about magnitude. 0.3 seconds may be trivial.
 
 The lesson: significance confirms existence; effect size judges importance.`}
 />
@@ -634,10 +634,10 @@ The lesson: significance confirms existence; effect size judges importance.`}
 <MultipleChoice
   markdown={`You compute Cohen's d on a sample of 30 and again on a sample of 30,000 drawn from the **same** population. How do you expect the two estimates of d to compare?
 
-- The d from the larger sample will be substantially bigger
-  > Effect size measures magnitude in the population; collecting more data does not inflate it. More data sharpens the estimate, it does not enlarge the effect.
 - The d from the larger sample will be substantially smaller
   > Larger samples do not shrink the effect either; the true magnitude is a property of the population, not of how much you sampled.
+- The d from the larger sample will be substantially bigger
+  > Effect size measures magnitude in the population; collecting more data does not inflate it. More data sharpens the estimate, it does not enlarge the effect.
 - [o] Both should be near the same true value, but the larger sample's estimate will be more precise
   > Effect size, unlike the p-value, does not systematically move with sample size; the extra data mainly tightens the confidence interval around the same magnitude.
 - They are unrelated because d depends entirely on sample size
@@ -649,14 +649,14 @@ This independence from n is what makes effect sizes worth reporting.`}
 <MultipleChoice
   markdown={`A press release says a supplement makes an adverse event "50% more likely." Which question most directly checks whether this matters?
 
-- What was the p-value of the comparison?
-  > The p-value addresses whether the increase is distinguishable from chance, not whether a 50% relative increase is practically large.
 - [o] What is the absolute risk difference, 50% more likely than what baseline rate?
   > A relative increase is meaningless without the baseline: 50% more than 0.001% is negligible in absolute terms, while 50% more than 10% is substantial.
-- How large was the sample?
-  > Sample size affects precision and significance, but the practical importance hinges on the absolute change, not on n.
 - What is the correlation coefficient?
   > Correlation is for the strength of a linear relationship between continuous variables, not the right tool for comparing two event rates.
+- What was the p-value of the comparison?
+  > The p-value addresses whether the increase is distinguishable from chance, not whether a 50% relative increase is practically large.
+- How large was the sample?
+  > Sample size affects precision and significance, but the practical importance hinges on the absolute change, not on n.
 
 Always pair relative risk with the absolute risk difference.`}
 />
@@ -666,12 +666,12 @@ Always pair relative risk with the absolute risk difference.`}
 
 - About 20%
   > That confuses r with the variance explained. The strength on the variance scale is r-squared, not r itself.
-- [o] About 4%
-  > The proportion of variance explained is r-squared = 0.2 squared = 0.04, so only about 4% of the variation is accounted for.
-- About 40%
-  > That would correspond to r near 0.63 (since 0.63 squared is about 0.40), far stronger than the reported r of 0.2.
 - About 80%
   > Explaining 80% of variance would require r near 0.9; an r of 0.2 is a weak relationship.
+- About 40%
+  > That would correspond to r near 0.63 (since 0.63 squared is about 0.40), far stronger than the reported r of 0.2.
+- [o] About 4%
+  > The proportion of variance explained is r-squared = 0.2 squared = 0.04, so only about 4% of the variation is accounted for.
 
 Squaring r to get the variance explained is a quick reality check on impressive-sounding correlations.`}
 />
@@ -679,14 +679,14 @@ Squaring r to get the variance explained is a quick reality check on impressive-
 <MultipleChoice
   markdown={`Why is it good practice to report an effect size **with a confidence interval** rather than the effect size alone?
 
-- Because the confidence interval replaces the need for an effect size
-  > The interval surrounds the effect size; it complements it rather than replacing it. You report both together.
-- Because a confidence interval makes the p-value unnecessary to compute
-  > While a CI that excludes zero conveys significance too, the point of pairing them is to convey precision of the magnitude, not to eliminate any single number.
 - [o] Because the effect size is estimated from a noisy sample, and the interval shows how precisely the magnitude is pinned down
   > An effect size is a point estimate with its own uncertainty; the interval reveals whether the magnitude is tightly estimated or could plausibly range from trivial to large.
 - Because confidence intervals are always narrower than effect sizes
   > A confidence interval and an effect size are not comparable widths; the interval is a range around the estimate, expressing its uncertainty.
+- Because a confidence interval makes the p-value unnecessary to compute
+  > While a CI that excludes zero conveys significance too, the point of pairing them is to convey precision of the magnitude, not to eliminate any single number.
+- Because the confidence interval replaces the need for an effect size
+  > The interval surrounds the effect size; it complements it rather than replacing it. You report both together.
 
 A bare effect size repeats the mistake of reporting a point estimate with no measure of precision.`}
 />

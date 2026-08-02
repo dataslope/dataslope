@@ -177,14 +177,14 @@ away.
 <MultipleChoice
   markdown={`What does \`GROUP BY region\` do to a table of orders?
 
-- It deletes all but one row per region.
-  > Grouping does not delete data; it organizes rows into bins to summarize, leaving the table unchanged.
 - [o] It forms one bin per region and computes the aggregates once per bin, yielding one result row per region.
   > \`GROUP BY\` partitions rows by the key and produces a single summarized row for each distinct group.
-- It sorts the orders by region without summarizing.
-  > Sorting alone is \`ORDER BY\`; \`GROUP BY\` exists to aggregate per group.
+- It deletes all but one row per region.
+  > Grouping does not delete data; it organizes rows into bins to summarize, leaving the table unchanged.
 - It returns every order with the region repeated.
   > That is ungrouped selection; grouping collapses each region's orders into one summary row.
+- It sorts the orders by region without summarizing.
+  > Sorting alone is \`ORDER BY\`; \`GROUP BY\` exists to aggregate per group.
 
 \`GROUP BY\` produces one summarized row per distinct group key.`}
 />
@@ -192,14 +192,14 @@ away.
 <MultipleChoice
   markdown={`In \`SELECT region, id, SUM(amount) FROM orders GROUP BY region\`, why is \`id\` a problem?
 
-- \`id\` is a reserved word.
-  > \`id\` is a normal column name; the issue is grouping semantics, not reserved words.
-- [o] Each result row represents a whole group of orders, so a single \`id\` is ambiguous, it is neither grouped nor aggregated.
-  > Every selected column must be in the \`GROUP BY\` or inside an aggregate; a bare \`id\` has no single value per group.
-- \`SUM(amount)\` is invalid when other columns are present.
-  > \`SUM(amount)\` is fine; the problem is specifically the unaggregated, ungrouped \`id\`.
 - You can never select more than two columns with \`GROUP BY\`.
   > You can select many columns, as long as each is grouped or aggregated.
+- [o] Each result row represents a whole group of orders, so a single \`id\` is ambiguous, it is neither grouped nor aggregated.
+  > Every selected column must be in the \`GROUP BY\` or inside an aggregate; a bare \`id\` has no single value per group.
+- \`id\` is a reserved word.
+  > \`id\` is a normal column name; the issue is grouping semantics, not reserved words.
+- \`SUM(amount)\` is invalid when other columns are present.
+  > \`SUM(amount)\` is fine; the problem is specifically the unaggregated, ungrouped \`id\`.
 
 The golden rule: every selected column must be grouped or aggregated.`}
 />
@@ -207,14 +207,14 @@ The golden rule: every selected column must be grouped or aggregated.`}
 <MultipleChoice
   markdown={`What does grouping by \`region, product\` (two columns) produce?
 
-- One row per region only, ignoring product.
-  > Adding \`product\` makes the groups finer; the result is per combination, not per region alone.
-- [o] One row per distinct \`(region, product)\` combination that appears in the data.
-  > Multi-column grouping bins rows by the combination of values, giving a finer breakdown.
 - One row per product only, ignoring region.
   > Both columns participate; neither is ignored.
+- [o] One row per distinct \`(region, product)\` combination that appears in the data.
+  > Multi-column grouping bins rows by the combination of values, giving a finer breakdown.
 - A syntax error, because \`GROUP BY\` allows only one column.
   > \`GROUP BY\` accepts multiple columns; combining them is a normal drill-down.
+- One row per region only, ignoring product.
+  > Adding \`product\` makes the groups finer; the result is per combination, not per region alone.
 
 Grouping by multiple columns yields one summary row per combination of
 their values.`}

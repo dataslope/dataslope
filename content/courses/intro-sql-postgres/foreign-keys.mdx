@@ -140,10 +140,10 @@ the subject of the next page.
 
 - A second primary key that identifies the same row.
   > A table has one primary key for identity; a foreign key is different, it points to another table's row.
-- [o] A column that stores the primary key value of a row in another table, creating a reference between them.
-  > A foreign key links tables by holding the identifying value of a related row elsewhere.
 - A password that locks a table.
   > "Key" here means an identifying reference, not a security credential.
+- [o] A column that stores the primary key value of a row in another table, creating a reference between them.
+  > A foreign key links tables by holding the identifying value of a related row elsewhere.
 - A column that must always be unique within its own table.
   > Uniqueness describes a primary key or a unique constraint; a foreign key value can repeat (many orders share one customer).
 
@@ -155,12 +155,12 @@ A foreign key holds another table's primary key value, linking the two tables.`}
 
 - Because names cannot be stored in PostgreSQL.
   > Names can certainly be stored; the point is that ids make better, stabler references.
-- [o] Because the id is stable and unique, so the customer's details stay in one place and references remain correct even if the name changes.
-  > Referencing by id keeps a single source of truth and avoids duplication and ambiguity.
 - Because an id takes exactly one byte and a name does not.
   > The benefit is reliability of reference, not a specific storage size.
 - Because foreign keys are not allowed to be text.
   > Foreign keys can reference text keys too; ids are preferred for stability and uniqueness, not a type restriction.
+- [o] Because the id is stable and unique, so the customer's details stay in one place and references remain correct even if the name changes.
+  > Referencing by id keeps a single source of truth and avoids duplication and ambiguity.
 
 Referencing by a stable, unique id keeps customer data in one place and references valid over time.`}
 />
@@ -168,14 +168,14 @@ Referencing by a stable, unique id keeps customer data in one place and referenc
 <MultipleChoice
   markdown={`A foreign key from \`orders.customer_id\` to \`customers.id\` is declared. What does PostgreSQL do if you try to insert an order with \`customer_id = 99\` when no customer 99 exists?
 
-- It creates a placeholder customer 99 automatically.
-  > The database does not invent missing rows; it rejects the reference instead.
 - It inserts the order with a NULL customer.
   > It does not silently alter your value; it refuses the insert to preserve integrity.
-- [o] It rejects the insert, because the foreign key requires the referenced customer to exist (referential integrity).
-  > Enforcing referential integrity prevents orphaned rows that point to nonexistent records.
 - It deletes the orders table to stay safe.
   > Rejecting one bad insert never destroys the table; only that insert fails.
+- It creates a placeholder customer 99 automatically.
+  > The database does not invent missing rows; it rejects the reference instead.
+- [o] It rejects the insert, because the foreign key requires the referenced customer to exist (referential integrity).
+  > Enforcing referential integrity prevents orphaned rows that point to nonexistent records.
 
 A foreign key enforces referential integrity by rejecting references to rows that do not exist.`}
 />

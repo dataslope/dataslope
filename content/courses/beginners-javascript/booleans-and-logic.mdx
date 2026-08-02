@@ -440,12 +440,12 @@ console.log(isLeapYear(2023));
 <MultipleChoice
   markdown={`What does "short-circuit evaluation" mean for the \`&&\` operator?
 
-- Both sides are always evaluated, but only the first matters
-  > Both sides are always evaluated when the left is truthy, but when the left is falsy the right side is never reached, the whole point of short-circuiting is that the right-hand side may not be evaluated at all.
-- [o] The right side is evaluated **only** if the left side is truthy; otherwise the left side is returned without ever touching the right
-  > \`a && b\` first looks at \`a\`. If \`a\` is falsy, the whole expression is \`a\`, \`b\` is not evaluated at all. This is how patterns like \`user && user.notify()\` safely call a method only when the object exists.
 - It produces a shorter machine-code instruction
   > Short-circuit evaluation is a runtime behaviour, not a machine-code optimisation; it has nothing to do with instruction size.
+- [o] The right side is evaluated **only** if the left side is truthy; otherwise the left side is returned without ever touching the right
+  > \`a && b\` first looks at \`a\`. If \`a\` is falsy, the whole expression is \`a\`, \`b\` is not evaluated at all. This is how patterns like \`user && user.notify()\` safely call a method only when the object exists.
+- Both sides are always evaluated, but only the first matters
+  > Both sides are always evaluated when the left is truthy, but when the left is falsy the right side is never reached, the whole point of short-circuiting is that the right-hand side may not be evaluated at all.
 - It only works for boolean values, not truthy/falsy ones
   > Short-circuit evaluation applies to all values using their truthy/falsy interpretation, not just the literals \`true\` and \`false\`.
 

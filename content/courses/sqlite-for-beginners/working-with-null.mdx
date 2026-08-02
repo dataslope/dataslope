@@ -61,14 +61,14 @@ means SQLite does not have a known value for that cell.
 <MultipleChoice
   markdown={`What does NULL mean in SQL?
 
-- The number zero.
-  > Zero is a known number.
+- The word NULL stored as text.
+  > Text would be written as a quoted string, not the NULL marker.
 - An empty string.
   > Empty text is known text with no characters.
+- The number zero.
+  > Zero is a known number.
 - [o] A missing or unknown value.
-  > NULL records that no known value is present.
-- The word NULL stored as text.
-  > Text would be written as a quoted string, not the NULL marker.`}
+  > NULL records that no known value is present.`}
 />
 
 ## Use IS NULL and IS NOT NULL
@@ -179,12 +179,12 @@ produce `NULL`, often displayed as a blank cell.
 <MultipleChoice
   markdown={`Why does WHERE phone = NULL fail to find missing phone numbers?
 
-- NULL is the same as an empty string.
-  > NULL and empty text have different meanings.
 - [o] Comparing with NULL gives unknown, not true.
   > WHERE keeps only rows where the condition is true.
 - SQLite does not allow NULL in tables.
   > SQLite tables can store NULL unless a column prevents it.
+- NULL is the same as an empty string.
+  > NULL and empty text have different meanings.
 - The phone column must be numeric.
   > The issue is NULL comparison logic, not the column type.`}
 />
@@ -336,10 +336,10 @@ flowchart TD
 <MultipleChoice
   markdown={`Which condition correctly finds rows where phone is missing?
 
-- phone = NULL
-  > Equality comparison with NULL is unknown, not true.
 - phone = ''
   > Empty text is a known value, not NULL.
+- phone = NULL
+  > Equality comparison with NULL is unknown, not true.
 - [o] phone IS NULL
   > IS NULL is the special test for missing values.
 - phone LIKE NULL
@@ -349,14 +349,14 @@ flowchart TD
 <MultipleChoice
   markdown={`What does NULL = NULL evaluate to?
 
+- The number zero
+  > SQLite may display false as 0, but this expression is NULL, not false.
 - true
   > SQL cannot prove that one unknown equals another unknown.
-- false
-  > The result is unknown rather than false.
 - [o] NULL, meaning unknown
   > Comparing unknown values with equality produces an unknown result.
-- The number zero
-  > SQLite may display false as 0, but this expression is NULL, not false.`}
+- false
+  > The result is unknown rather than false.`}
 />
 
 <MultipleChoice
@@ -366,10 +366,10 @@ flowchart TD
   > SQLite does not silently treat NULL as zero in arithmetic.
 - It returns 0.
   > NULL is not the same as zero.
-- [o] It returns NULL.
-  > A calculation with an unknown value usually has an unknown result.
 - It causes the table to be deleted.
-  > The expression is safe; it just produces NULL.`}
+  > The expression is safe; it just produces NULL.
+- [o] It returns NULL.
+  > A calculation with an unknown value usually has an unknown result.`}
 />
 
 <MultipleChoice
@@ -377,23 +377,23 @@ flowchart TD
 
 - NULL
   > COALESCE skips NULL values and looks for a fallback.
-- [o] 'No phone'
-  > COALESCE returns the first non-NULL value in its list.
+- An empty string every time
+  > It returns the fallback you provide, not automatically an empty string.
 - The text COALESCE
   > A function returns a value, not its own name.
-- An empty string every time
-  > It returns the fallback you provide, not automatically an empty string.`}
+- [o] 'No phone'
+  > COALESCE returns the first non-NULL value in its list.`}
 />
 
 <MultipleChoice
   markdown={`How is IFNULL(value, fallback) different from COALESCE(value, fallback, another_fallback)?
 
+- IFNULL changes NULLs stored in the table permanently.
+  > IFNULL affects the query result, not stored data.
 - IFNULL can take many fallback choices.
   > IFNULL is the two-argument form.
-- [o] IFNULL takes exactly two arguments, while COALESCE can check two or more.
-  > COALESCE is more flexible when several possible values are available.
 - COALESCE only works with numbers.
   > COALESCE works with text, numbers, and other values.
-- IFNULL changes NULLs stored in the table permanently.
-  > IFNULL affects the query result, not stored data.`}
+- [o] IFNULL takes exactly two arguments, while COALESCE can check two or more.
+  > COALESCE is more flexible when several possible values are available.`}
 />

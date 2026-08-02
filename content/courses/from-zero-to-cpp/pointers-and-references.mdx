@@ -449,36 +449,36 @@ int main() {
 <MultipleChoice
   markdown={`Which of the following is **not** true of references?
 
-- They must be initialized when declared.
-  > True; you cannot create an uninitialized reference.
 - [o] You can later make a reference refer to a different object by assigning to it.
   > References cannot be rebound; assigning to a reference modifies the *referent*.
-- They cannot be null.
-  > True; the language guarantees a reference refers to a real object.
 - They are usually compiled to a hidden pointer.
-  > True; the implementation is typically a pointer, even though the language model is an alias.`}
+  > True; the implementation is typically a pointer, even though the language model is an alias.
+- They must be initialized when declared.
+  > True; you cannot create an uninitialized reference.
+- They cannot be null.
+  > True; the language guarantees a reference refers to a real object.`}
 />
 
 <MultipleChoice
   markdown={`Why is dereferencing a \`nullptr\` undefined behavior?
 
-- The C++ standard requires it to throw an exception.
-  > The standard does not require an exception.
-- The OS will always send SIGSEGV.
-  > Most modern OSes do, but the standard does not require any particular signal.
 - [o] Because \`nullptr\` does not point to any valid object, the language places no restrictions on what happens; the compiler is allowed to do anything.
   > Always check or guarantee non-null before dereferencing.
 - It is well-defined; it always returns 0.
-  > It does not; that is a common myth.`}
+  > It does not; that is a common myth.
+- The C++ standard requires it to throw an exception.
+  > The standard does not require an exception.
+- The OS will always send SIGSEGV.
+  > Most modern OSes do, but the standard does not require any particular signal.`}
 />
 
 <MultipleChoice
   markdown={`What does \`p->x\` mean, given a pointer \`p\` to a struct with member \`x\`?
 
-- It is the same as \`p.x\`.
-  > That syntax is for *objects*, not pointers.
 - It allocates a new field \`x\` on \`p\`.
   > Members cannot be added at runtime in C++.
+- It is the same as \`p.x\`.
+  > That syntax is for *objects*, not pointers.
 - [o] It is shorthand for \`(*p).x\`: dereference the pointer, then access member \`x\`.
   > The arrow is purely a convenience.
 - It is undefined behavior.

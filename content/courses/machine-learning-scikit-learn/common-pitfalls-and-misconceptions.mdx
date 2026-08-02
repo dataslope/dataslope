@@ -636,14 +636,14 @@ print("recall on defaults:", rare_recall)
 <MultipleChoice
   markdown={`You scale your entire dataset with \`StandardScaler().fit_transform(X)\` and *then* split into train and test. Why is this data leakage?
 
-- Because scaling changes the labels \`y\`
-  > Scaling transforms features, not labels, so the labels are untouched; the leak is about information, not corrupted targets.
+- Because scaling makes the model train more slowly
+  > Training speed is irrelevant here; the issue is leakage of test-set statistics into preprocessing.
 - [o] Because the scaler's mean and standard deviation were computed using the test rows, so test-set information has entered the training transformation
   > Fitting the scaler on the full dataset lets statistics from the test rows shape the scaling applied during training, leaking the test set into the fit.
 - Because \`StandardScaler\` should never be used before splitting any data
   > \`StandardScaler\` is fine; the problem is *fitting* it on the full dataset rather than on the training portion alone.
-- Because scaling makes the model train more slowly
-  > Training speed is irrelevant here; the issue is leakage of test-set statistics into preprocessing.
+- Because scaling changes the labels \`y\`
+  > Scaling transforms features, not labels, so the labels are untouched; the leak is about information, not corrupted targets.
 
 Fitting any learned transformation must happen on the training data only, which a \`Pipeline\` enforces automatically.`}
 />
@@ -653,12 +653,12 @@ Fitting any learned transformation must happen on the training data only, which 
 
 - Celebrate, the model is perfect and ready to deploy
   > A perfect training score reflects memorization, not generalization, and says nothing about performance on new data.
+- Retrain on even more of the same data to lock in the perfect score
+  > Adding more of the same data does not address the real question of generalization, which only held-out evaluation answers.
 - [o] Treat it as a red flag and check performance on held-out data, since a perfect training score usually signals memorization
   > A flexible model can memorize its training rows, so a perfect training score is a warning to evaluate on data the model never saw.
 - Conclude the data must be corrupted
   > Corruption is not implied; a perfect training score is the expected result of an unrestricted, overfitting model.
-- Retrain on even more of the same data to lock in the perfect score
-  > Adding more of the same data does not address the real question of generalization, which only held-out evaluation answers.
 
 The training score measures memory; the held-out score measures skill.`}
 />
@@ -668,12 +668,12 @@ The training score measures memory; the held-out score measures skill.`}
 
 - The model is excellent and needs no further checks
   > A model that ignores the rare class entirely is not excellent; the high accuracy is an artifact of the imbalance.
+- The rare class should simply be deleted from the dataset
+  > Deleting the rare class discards exactly the cases you care about; the fix is better metrics and handling, not removing the minority.
 - The accuracy metric must be miscalculated
   > The accuracy is computed correctly; the issue is that accuracy is a misleading metric under heavy imbalance.
 - [o] Accuracy can be high while the model ignores the rare class, so on imbalanced data you must also check recall, precision, and the confusion matrix
   > A trivial majority-class predictor scores high accuracy yet catches none of the rare class, so metrics that focus on the minority are needed to see the truth.
-- The rare class should simply be deleted from the dataset
-  > Deleting the rare class discards exactly the cases you care about; the fix is better metrics and handling, not removing the minority.
 
 When a trivial predictor already scores well, accuracy cannot distinguish skill from doing nothing.`}
 />
@@ -681,14 +681,14 @@ When a trivial predictor already scores well, accuracy cannot distinguish skill 
 <MultipleChoice
   markdown={`Why is leaving \`random_state\` unset across your split, model, and search a problem, even when nothing crashes?
 
-- It makes models slower because randomness adds computation
-  > Unseeded randomness does not meaningfully slow training; the harm is to reproducibility and comparison.
-- [o] Every run can give different numbers, so you cannot tell whether a change helped or you simply got a luckier random draw
-  > Without fixed seeds, two runs differ for reasons unrelated to your change, making honest before-and-after comparison impossible.
-- It forces the model to overfit the training data
-  > Seeds do not control overfitting; they control reproducibility of the random steps.
 - It changes which metric scikit-learn uses
   > The choice of metric is independent of random seeds; seeds only fix the random components.
+- [o] Every run can give different numbers, so you cannot tell whether a change helped or you simply got a luckier random draw
+  > Without fixed seeds, two runs differ for reasons unrelated to your change, making honest before-and-after comparison impossible.
+- It makes models slower because randomness adds computation
+  > Unseeded randomness does not meaningfully slow training; the harm is to reproducibility and comparison.
+- It forces the model to overfit the training data
+  > Seeds do not control overfitting; they control reproducibility of the random steps.
 
 Fixed seeds make results reproducible, which is the basis of trustworthy comparison.`}
 />
@@ -696,14 +696,14 @@ Fixed seeds make results reproducible, which is the basis of trustworthy compari
 <MultipleChoice
   markdown={`You repeatedly check the **test** score while deciding which model and hyperparameters to keep, then report that test score. What have you actually done?
 
-- Nothing wrong, since you never explicitly trained on the test set
-  > You did not call \`.fit()\` on the test set, but selecting choices by their test score leaks the test set through your decisions all the same.
 - [o] Leaked the test set through your choices, so its reported score is now optimistic rather than an honest estimate of unseen performance
   > Every decision guided by the test score uses the test set, so across many peeks the model is effectively tuned to it and the final number is no longer honest.
 - Made the test set more reliable by checking it often
   > Repeated checking does the opposite: it spends the test set's honesty, because its value depends on influencing none of your choices.
 - Guaranteed the model will generalize, since the test score was high
   > A test score inflated by repeated peeking does not guarantee generalization; it is precisely the false confidence this pitfall produces.
+- Nothing wrong, since you never explicitly trained on the test set
+  > You did not call \`.fit()\` on the test set, but selecting choices by their test score leaks the test set through your decisions all the same.
 
 Decisions belong to cross-validation or a validation set; the test set is opened once, at the end.`}
 />
@@ -711,14 +711,14 @@ Decisions belong to cross-validation or a validation set; the test set is opened
 <MultipleChoice
   markdown={`A random forest is trained only on small diamonds (carat up to 0.7). You ask it to predict the price of a 3-carat stone. What should you expect?
 
-- It will accurately extrapolate the trend out to 3 carats
-  > Tree-based models cannot output values beyond the targets seen in training, so they do not extrapolate a trend the way a line would.
-- It will raise an error because the input is out of range
-  > The model accepts the input without error; it simply produces an unreliable prediction.
 - [o] Its prediction will be roughly flat near the edge of the training range, because a forest cannot output values beyond what it saw in training
   > A forest predicts by averaging training targets, so far outside the training range it effectively returns a constant near the boundary, not a continued trend.
 - It will predict exactly the true value, whatever the relationship
   > A model only learns within the range it saw; outside it there is no basis for an exact answer, regardless of the underlying relationship.
+- It will raise an error because the input is out of range
+  > The model accepts the input without error; it simply produces an unreliable prediction.
+- It will accurately extrapolate the trend out to 3 carats
+  > Tree-based models cannot output values beyond the targets seen in training, so they do not extrapolate a trend the way a line would.
 
 Predictions far outside the training range are guesses, and different model families guess very differently.`}
 />
@@ -726,14 +726,14 @@ Predictions far outside the training range are guesses, and different model fami
 <MultipleChoice
   markdown={`A model finds that "number of umbrellas sold" strongly predicts "number of car accidents." A planner proposes banning umbrella sales to reduce accidents. What is the flaw?
 
-- The model used the wrong features and should be retrained
-  > The features are fine for prediction; the flaw is interpreting a predictive association as a causal lever.
-- Predicting accidents is impossible, so the model must be wrong
-  > Accidents can be predicted from correlated signals; the error is in the causal conclusion, not the prediction itself.
 - [o] Umbrella sales predict accidents only because rain drives both; the association is not causal, so banning umbrellas would not reduce accidents
   > Rain is a common cause of both umbrella sales and accidents, so the correlation reflects a shared driver rather than umbrellas causing crashes.
 - The model needs more umbrella-related features to be accurate
   > Adding features does not turn a correlation into a cause; no amount of predictive accuracy justifies the causal claim.
+- The model used the wrong features and should be retrained
+  > The features are fine for prediction; the flaw is interpreting a predictive association as a causal lever.
+- Predicting accidents is impossible, so the model must be wrong
+  > Accidents can be predicted from correlated signals; the error is in the causal conclusion, not the prediction itself.
 
 Prediction reflects association; only an experiment or careful causal reasoning supports a claim about intervention.`}
 />
@@ -743,12 +743,12 @@ Prediction reflects association; only an experiment or careful causal reasoning 
 
 - Never, additional features can only add information and improve a model
   > Irrelevant or redundant features add noise the model can overfit and can even mislead importance measures, so more features can certainly hurt.
-- Only when the features are perfectly correlated with the target
-  > Features correlated with the target are useful; the harm comes from *irrelevant* or noisy features, not from informative ones.
 - [o] When the added features are irrelevant or noisy, giving a flexible model extra opportunities to overfit and obscuring the real signal
   > Noise columns carry no signal but can be latched onto during training, raising variance and degrading generalization, as the noise-column demo showed.
 - Adding features always helps as long as you have enough rows
   > Even with many rows, irrelevant features can hurt by adding dimensions of pure noise; quantity of rows does not neutralize bad features.
+- Only when the features are perfectly correlated with the target
+  > Features correlated with the target are useful; the harm comes from *irrelevant* or noisy features, not from informative ones.
 
 Quality and relevance of features beat sheer quantity; let evidence decide what stays.`}
 />

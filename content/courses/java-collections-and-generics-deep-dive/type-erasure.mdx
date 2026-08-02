@@ -286,38 +286,38 @@ and many reflective APIs.
 <MultipleChoice
   markdown={`What does \`new ArrayList<String>().getClass() == new ArrayList<Integer>().getClass()\` return at runtime?
 
-- \`false\`, they are different parameterized types
-  > That would be true if Java kept type parameters at runtime, but it doesn't.
 - [o] \`true\`, both share the same erasure (\`ArrayList\`)
   > Generics are erased; the runtime class is the same regardless of the type parameter.
+- \`null\`
+  > \`getClass()\` is never \`null\`.
 - A compile error
   > It compiles.
-- \`null\`
-  > \`getClass()\` is never \`null\`.`}
+- \`false\`, they are different parameterized types
+  > That would be true if Java kept type parameters at runtime, but it doesn't.`}
 />
 
 <MultipleChoice
   markdown={`Why is \`new T[10]\` illegal inside a generic class?
 
-- Arrays don't allow size 10
-  > Arrays allow any non-negative size.
-- [o] Arrays carry their element type at runtime, but \`T\` is erased, the JVM can't enforce the element type, so the language forbids the construction
-  > Use \`List<T>\` (or a \`Class<T>\` token plus \`Array.newInstance\`) instead.
 - It would always throw \`ClassCastException\`
   > It would create *unsafe* arrays, which is precisely why it's banned at compile time.
+- Arrays don't allow size 10
+  > Arrays allow any non-negative size.
 - The JVM only supports primitive arrays
-  > It supports object arrays too.`}
+  > It supports object arrays too.
+- [o] Arrays carry their element type at runtime, but \`T\` is erased, the JVM can't enforce the element type, so the language forbids the construction
+  > Use \`List<T>\` (or a \`Class<T>\` token plus \`Array.newInstance\`) instead.`}
 />
 
 <MultipleChoice
   markdown={`If you absolutely need to know the element type of a generic structure at runtime, what's the standard workaround?
 
+- Switch to a different language
+  > Unnecessary; the \`Class<T>\` idiom handles essentially every case.
+- [o] Accept a \`Class<T>\` token as a constructor or method parameter and use it for \`isInstance\`, \`cast\`, or array creation
+  > This is the pattern used by \`Collections.checkedList\`, many reflective APIs, and most JSON libraries.
 - Read a private field with reflection
   > Reflection can't recover what was never stored.
 - Use \`instanceof List<X>\` checks
-  > Such checks are forbidden by the language.
-- [o] Accept a \`Class<T>\` token as a constructor or method parameter and use it for \`isInstance\`, \`cast\`, or array creation
-  > This is the pattern used by \`Collections.checkedList\`, many reflective APIs, and most JSON libraries.
-- Switch to a different language
-  > Unnecessary; the \`Class<T>\` idiom handles essentially every case.`}
+  > Such checks are forbidden by the language.`}
 />

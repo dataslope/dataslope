@@ -481,27 +481,27 @@ public class Countdown implements Iterable<Integer> {
 <MultipleChoice
   markdown={`Why is the cursor state stored in the \`Iterator\`, not in the \`Iterable\`?
 
-- Because iterators are smaller in memory
-  > Size isn't the design driver.
 - [o] So multiple independent walks of the same container can happen at once, each with its own cursor
   > Nested loops over the same collection rely on each walk having its own state.
+- Because the JVM forbids state in interfaces
+  > Interfaces can carry state via objects that implement them; that's irrelevant here.
 - Because \`Iterator\` is older than \`Iterable\`
   > Iterable was added in Java 5 specifically to support \`for-each\` over \`Iterator\`-producing types.
-- Because the JVM forbids state in interfaces
-  > Interfaces can carry state via objects that implement them; that's irrelevant here.`}
+- Because iterators are smaller in memory
+  > Size isn't the design driver.`}
 />
 
 <MultipleChoice
   markdown={`What exception do JCF iterators throw when the underlying collection is structurally modified during a walk (other than via the iterator itself)?
 
-- \`IllegalStateException\`
-  > That is what \`remove()\` throws when called before \`next()\`.
+- \`UnsupportedOperationException\`
+  > That is what an immutable collection throws on a mutating call.
 - \`NoSuchElementException\`
   > That is what \`next()\` throws past the end.
+- \`IllegalStateException\`
+  > That is what \`remove()\` throws when called before \`next()\`.
 - [o] \`ConcurrentModificationException\`
-  > JCF iterators are fail-fast: they detect concurrent mutation and throw immediately.
-- \`UnsupportedOperationException\`
-  > That is what an immutable collection throws on a mutating call.`}
+  > JCF iterators are fail-fast: they detect concurrent mutation and throw immediately.`}
 />
 
 <MultipleChoice
@@ -509,10 +509,10 @@ public class Countdown implements Iterable<Integer> {
 
 - Iterate \`keySet()\` and call \`get(key)\` for each
   > That walks the map twice, once for keys, once for the lookups.
-- Iterate \`values()\`
-  > That gives you values without keys.
+- Convert the map to a \`List\` and iterate that
+  > Unnecessary copying; \`entrySet()\` already does what you need.
 - [o] Iterate \`entrySet()\` and read \`getKey()\` / \`getValue()\` on each entry
   > A single walk over the entry view yields both halves of each pair.
-- Convert the map to a \`List\` and iterate that
-  > Unnecessary copying; \`entrySet()\` already does what you need.`}
+- Iterate \`values()\`
+  > That gives you values without keys.`}
 />

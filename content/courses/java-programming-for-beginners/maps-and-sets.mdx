@@ -226,25 +226,25 @@ genuinely don't know in advance.
 <MultipleChoice
   markdown={`What happens if you add the same string twice to a HashSet?
 
-- The second add throws an exception
-  > It doesn't throw.
 - [o] The second add is silently ignored, the set still contains exactly one copy
   > A \`Set\` stores each element at most once, so a duplicate \`add\` is a no-op.
-- The set now contains two copies
-  > Sets enforce uniqueness.
 - The first copy is removed
-  > It is not removed.`}
+  > It is not removed.
+- The second add throws an exception
+  > It doesn't throw.
+- The set now contains two copies
+  > Sets enforce uniqueness.`}
 />
 
 <MultipleChoice
   markdown={`Why does \`HashMap.get(key)\` typically run in roughly constant time, no matter how large the map is?
 
+- [o] It computes the key's hash code, picks a bucket directly, and looks only in that bucket
+  > Hashing jumps straight to where the value would be, instead of scanning entries.
 - It linearly scans every entry, but very quickly
   > That would be O(n).
 - It keeps the map sorted by key
   > It does not sort.
-- [o] It computes the key's hash code, picks a bucket directly, and looks only in that bucket
-  > Hashing jumps straight to where the value would be, instead of scanning entries.
 - It uses a binary search across the keys
   > That's a TreeMap (and it's O(log n), not O(1)).`}
 />
@@ -252,14 +252,14 @@ genuinely don't know in advance.
 <MultipleChoice
   markdown={`What is the **best** collection for the question *"have I already processed this ID?"*
 
+- A plain array
+  > Same problem as ArrayList: linear search.
+- [o] HashSet of IDs
+  > A set answers "seen before?" in constant time on average, which is exactly the question.
 - ArrayList
   > \`contains\` on a list is linear time.
 - HashMap with the ID as the value
-  > Keys go in maps, not values.
-- [o] HashSet of IDs
-  > A set answers "seen before?" in constant time on average, which is exactly the question.
-- A plain array
-  > Same problem as ArrayList: linear search.`}
+  > Keys go in maps, not values.`}
 />
 
 ## A challenge

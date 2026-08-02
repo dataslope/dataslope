@@ -525,14 +525,14 @@ like the Mann–Whitney U or Wilcoxon signed-rank test, covered in
 <MultipleChoice
   markdown={`A fitness study records each participant's resting heart rate **before** and **after** an 8-week program, the same people both times. Which t-test fits, and why?
 
-- A two-sample independent t-test, because there are two columns of numbers
-  > Two columns does not mean two independent groups. Here each row is the *same person* measured twice, so the columns are matched, not independent.
-- [o] A paired t-test, because each participant is measured under both conditions, so the before/after values are matched row by row
-  > Matched measurements on the same units call for a paired test, which analyzes each person's own change and removes person-to-person variation from the noise.
-- A one-sample t-test on the "after" column against 0
-  > Testing "after" against 0 ignores each person's baseline entirely; the relevant quantity is the *change*, which the paired test captures.
 - It doesn't matter; paired and unpaired give the same answer
   > They generally do not. Ignoring the pairing usually loses power and can hide a real effect, so the choice matters.
+- A two-sample independent t-test, because there are two columns of numbers
+  > Two columns does not mean two independent groups. Here each row is the *same person* measured twice, so the columns are matched, not independent.
+- A one-sample t-test on the "after" column against 0
+  > Testing "after" against 0 ignores each person's baseline entirely; the relevant quantity is the *change*, which the paired test captures.
+- [o] A paired t-test, because each participant is measured under both conditions, so the before/after values are matched row by row
+  > Matched measurements on the same units call for a paired test, which analyzes each person's own change and removes person-to-person variation from the noise.
 
 When the same units are measured twice, pair the test to harness each unit as its own control.`}
 />
@@ -696,14 +696,14 @@ assert verdict == expected`,
 <MultipleChoice
   markdown={`The t-statistic in a two-sample t-test is best described as which ratio?
 
-- The difference in means divided by the total sample size
-  > Sample size enters through the standard error, but the statistic is not "difference over n." Dividing by n directly is not what the t-statistic does.
+- The variance of group A divided by the variance of group B
+  > That ratio is the F-statistic used to compare variances, not the t-statistic used to compare means.
 - [o] The observed difference in means divided by the standard error of that difference (signal divided by noise)
   > The numerator is the signal (how far apart the means are) and the denominator is the noise (the typical random wobble), so a large |t| means the gap exceeds ordinary noise.
 - The p-value divided by the significance level
   > The p-value is computed *from* the t-statistic via the t-distribution; it is not an input to it. This reverses the relationship.
-- The variance of group A divided by the variance of group B
-  > That ratio is the F-statistic used to compare variances, not the t-statistic used to compare means.
+- The difference in means divided by the total sample size
+  > Sample size enters through the standard error, but the statistic is not "difference over n." Dividing by n directly is not what the t-statistic does.
 
 Think "signal over noise": how big is the difference relative to the wobble you'd expect by chance?`}
 />
@@ -711,14 +711,14 @@ Think "signal over noise": how big is the difference relative to the wobble you'
 <MultipleChoice
   markdown={`Why is **Welch's** t-test (\`equal_var=False\`) the recommended default for two independent samples?
 
-- It always produces a smaller p-value, making effects easier to detect
-  > Welch's does not systematically shrink p-values; depending on the data its p-value can be larger or smaller than Student's. Ease of "winning" is not the rationale.
+- It works even when the data is categorical
+  > Categorical outcomes call for a chi-square test, not any version of the t-test. Welch's is still a test about means of numeric data.
 - It removes the need for the independence assumption
   > No two-sample t-test removes independence; that assumption is still required. Welch's only relaxes the *equal-variance* assumption.
 - [o] It does not assume the two groups have equal variances, so it stays well-calibrated when spreads differ while costing little when they don't
   > Because real groups rarely share a variance, allowing unequal spreads keeps the error rate honest, and the penalty when variances happen to be equal is negligible.
-- It works even when the data is categorical
-  > Categorical outcomes call for a chi-square test, not any version of the t-test. Welch's is still a test about means of numeric data.
+- It always produces a smaller p-value, making effects easier to detect
+  > Welch's does not systematically shrink p-values; depending on the data its p-value can be larger or smaller than Student's. Ease of "winning" is not the rationale.
 
 Welch's is the safe default precisely because it drops a fragile assumption at almost no cost.`}
 />
@@ -726,14 +726,14 @@ Welch's is the safe default precisely because it drops a fragile assumption at a
 <MultipleChoice
   markdown={`Your raw measurements are clearly right-skewed (a long tail), but you have n = 500 observations. Can you still use a t-test on the mean?
 
-- No, the t-test requires the raw data itself to be normally distributed
-  > The t-test does not require the raw data to be normal. This is the most common misconception about its assumptions.
-- [o] Yes, with a large sample the central limit theorem makes the sampling distribution of the mean approximately normal, which is what the test actually needs
-  > The relevant quantity is the sampling distribution of the *mean*, not the raw values, and the CLT makes that approximately normal for large n even when the data is skewed.
-- No, skewed data always requires a nonparametric test regardless of sample size
-  > Skew matters mainly for *small* samples; with large n the CLT rescues the mean, so a nonparametric test is not mandatory here.
 - Only if you first delete the long tail as outliers
   > Deleting the tail would distort the very quantity you're estimating. Legitimate skew is not the same as bad data points to remove.
+- No, skewed data always requires a nonparametric test regardless of sample size
+  > Skew matters mainly for *small* samples; with large n the CLT rescues the mean, so a nonparametric test is not mandatory here.
+- [o] Yes, with a large sample the central limit theorem makes the sampling distribution of the mean approximately normal, which is what the test actually needs
+  > The relevant quantity is the sampling distribution of the *mean*, not the raw values, and the CLT makes that approximately normal for large n even when the data is skewed.
+- No, the t-test requires the raw data itself to be normally distributed
+  > The t-test does not require the raw data to be normal. This is the most common misconception about its assumptions.
 
 The t-test cares about the sampling distribution of the mean, and the CLT delivers approximate normality there for large samples.`}
 />
@@ -741,10 +741,10 @@ The t-test cares about the sampling distribution of the mean, and the CLT delive
 <MultipleChoice
   markdown={`A nutrition trial weighs the same 40 people before and after a diet. An analyst runs an **independent** two-sample t-test on the before and after columns and finds no significant difference. What's the most likely problem?
 
-- The sample is too small for any t-test
-  > Forty paired observations is a perfectly workable size; the issue is the *type* of test, not the amount of data.
 - [o] An independent test ignores the pairing, dumping large person-to-person variation into the noise and likely hiding a real effect
   > Each person is their own baseline, so the matched design should be analyzed with a paired test; ignoring the pairing inflates the noise term and can mask a genuine change.
+- The sample is too small for any t-test
+  > Forty paired observations is a perfectly workable size; the issue is the *type* of test, not the amount of data.
 - Independent t-tests can never detect weight change
   > Independent t-tests are valid for genuinely independent groups; they are simply the wrong tool when the data is matched. They are not inherently incapable.
 - The p-value should have been doubled
@@ -756,14 +756,14 @@ Matched data demands a paired test; using an unpaired test throws away the power
 <MultipleChoice
   markdown={`A two-sample t-test on 2 million users returns p < 0.0001 for a difference in average session length of **0.4 seconds**. What is the right interpretation?
 
-- The effect is large because the p-value is so small
-  > A tiny p-value reflects how *confidently* the difference is distinguishable from zero, not how *big* it is. Massive samples make minuscule effects highly significant.
-- The result must be a mistake because nothing changes session length by under a second
-  > A sub-second average change is entirely plausible and the analysis can be perfectly valid; the question is whether such a change *matters*, not whether it exists.
 - [o] The difference is almost certainly real but probably too small to matter; report an effect size and a confidence interval to judge importance
   > Significance and practical importance are different questions, so pairing the test with an effect size and an interval is what reveals whether a real difference is worth acting on.
+- The effect is large because the p-value is so small
+  > A tiny p-value reflects how *confidently* the difference is distinguishable from zero, not how *big* it is. Massive samples make minuscule effects highly significant.
 - We should rerun with fewer users so the result becomes non-significant
   > Deliberately shrinking the sample to erase a real effect weakens the analysis on purpose, which is not a legitimate response.
+- The result must be a mistake because nothing changes session length by under a second
+  > A sub-second average change is entirely plausible and the analysis can be perfectly valid; the question is whether such a change *matters*, not whether it exists.
 
 A p-value tells you whether a difference is distinguishable from zero, never whether it is big enough to act on.`}
 />

@@ -480,14 +480,14 @@ assert get2() == 1`,
 <MultipleChoice
   markdown={`Which order does Python use to resolve a name?
 
-- Global, Local, Enclosing, Built-in
-  > No, Python starts with the innermost scope (Local), not Global.
 - Built-in, Enclosing, Local, Global
   > No, this is the reverse of the correct order.
+- Local, Global only
+  > No, Python also checks Enclosing and Built-in scopes.
 - [o] Local, Enclosing, Global, Built-in (LEGB)
   > Local first, then any enclosing functions, then the module's globals, then the built-ins.
-- Local, Global only
-  > No, Python also checks Enclosing and Built-in scopes.`}
+- Global, Local, Enclosing, Built-in
+  > No, Python starts with the innermost scope (Local), not Global.`}
 />
 
 <MultipleChoice
@@ -506,14 +506,14 @@ outer()
 print("module:", x)
 \`\`\`
 
-- \`outer: 2\\nmodule: 3\`
-  > \`nonlocal\` binds to the **nearest enclosing** function scope, not the module scope.
-- [o] \`outer: 3\\nmodule: 1\`
-  > \`inner\` rebinds \`outer\`'s \`x\` to 3; the module-level \`x\` is untouched.
 - \`outer: 3\\nmodule: 3\`
   > The module-level \`x\` is never modified. \`nonlocal\` only affects the nearest enclosing function scope.
+- \`outer: 2\\nmodule: 3\`
+  > \`nonlocal\` binds to the **nearest enclosing** function scope, not the module scope.
 - A \`SyntaxError\`
-  > No syntax error occurs; this is valid Python.`}
+  > No syntax error occurs; this is valid Python.
+- [o] \`outer: 3\\nmodule: 1\`
+  > \`inner\` rebinds \`outer\`'s \`x\` to 3; the module-level \`x\` is untouched.`}
 />
 
 <MultipleChoice
@@ -526,14 +526,14 @@ def increment():
 increment()
 \`\`\`
 
-- Because \`count\` is a reserved keyword.
-  > No, \`count\` is a valid variable name.
-- [o] Because \`count += 1\` creates a local variable, which is read before it's assigned.
-  > Python sees an assignment to \`count\` and makes it local. Then it tries to read \`count\` for the \`+=\`, but there's no local value yet.
 - Because global variables are read-only.
   > No, you can read global variables from inside functions without any keyword. The problem is the assignment.
+- [o] Because \`count += 1\` creates a local variable, which is read before it's assigned.
+  > Python sees an assignment to \`count\` and makes it local. Then it tries to read \`count\` for the \`+=\`, but there's no local value yet.
 - Because \`+=\` is not allowed inside functions.
-  > No, \`+=\` is allowed; the issue is scope.`}
+  > No, \`+=\` is allowed; the issue is scope.
+- Because \`count\` is a reserved keyword.
+  > No, \`count\` is a valid variable name.`}
 />
 
 <MultipleChoice
@@ -543,23 +543,23 @@ increment()
   > No, that is a method. A closure is about variable capture, not class membership.
 - [o] A function that captures variables from its enclosing scope.
   > A closure remembers variables from the scope in which it was created, even after that scope exits.
-- A function that takes another function as an argument.
-  > No, that is a higher-order function. Closures are about capturing enclosing variables.
 - A function that has no return value.
-  > No, the return value is unrelated to whether a function is a closure.`}
+  > No, the return value is unrelated to whether a function is a closure.
+- A function that takes another function as an argument.
+  > No, that is a higher-order function. Closures are about capturing enclosing variables.`}
 />
 
 <MultipleChoice
   markdown={`How do you rebind a variable from an enclosing function scope (not global)?
 
-- Use the \`global\` keyword.
-  > \`global\` is for module-level variables, not enclosing function scopes.
-- [o] Use the \`nonlocal\` keyword.
-  > \`nonlocal\` tells Python to rebind a variable in the nearest enclosing function scope.
 - Use the \`enclosing\` keyword.
   > No such keyword exists in Python.
+- Use the \`global\` keyword.
+  > \`global\` is for module-level variables, not enclosing function scopes.
 - You cannot; enclosing variables are read-only.
-  > No, \`nonlocal\` allows you to modify them.`}
+  > No, \`nonlocal\` allows you to modify them.
+- [o] Use the \`nonlocal\` keyword.
+  > \`nonlocal\` tells Python to rebind a variable in the nearest enclosing function scope.`}
 />
 
 Now that scope is clear, we can split code across files: modules.

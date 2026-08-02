@@ -551,12 +551,12 @@ convenience.
 <MultipleChoice
   markdown={`Heights are normal with mean 170 cm and standard deviation 10 cm. Roughly what fraction of people are between **150 cm and 190 cm**?
 
-- About 68%
-  > 68% corresponds to ±1σ (160–180 cm); 150–190 cm is a wider band.
-- [o] About 95%
-  > The interval 150–190 cm is exactly the mean ± 2σ (170 ± 20), and the empirical rule puts about 95% of a normal distribution within two standard deviations.
 - About 99.7%
   > 99.7% corresponds to ±3σ (140–200 cm), which is wider than the band given.
+- [o] About 95%
+  > The interval 150–190 cm is exactly the mean ± 2σ (170 ± 20), and the empirical rule puts about 95% of a normal distribution within two standard deviations.
+- About 68%
+  > 68% corresponds to ±1σ (160–180 cm); 150–190 cm is a wider band.
 - About 50%
   > 50% would be everything on one side of the mean, not a symmetric ±2σ band.
 
@@ -566,14 +566,14 @@ convenience.
 <MultipleChoice
   markdown={`A value has a z-score of **2.0**. Which statement is correct?
 
-- There is a 2% chance of observing this value
-  > A z-score is a position in standard-deviation units, not a probability; it doesn't translate to "2%."
-- The value equals twice the mean
-  > A z of 2 means two *standard deviations* above the mean, not twice the mean's magnitude.
-- [o] The value sits two standard deviations above the mean, and about 97.7% of a normal distribution lies below it
-  > Standardizing gives the distance in SDs (here +2), and passing that through the normal CDF (\`norm.cdf(2) ≈ 0.977\`) shows roughly 97.7% of values fall below it.
 - About 95% of values are above this point
   > Only about 2.3% lie above z = 2; the ~95% figure refers to the band within ±2σ, not the area above +2σ.
+- The value equals twice the mean
+  > A z of 2 means two *standard deviations* above the mean, not twice the mean's magnitude.
+- There is a 2% chance of observing this value
+  > A z-score is a position in standard-deviation units, not a probability; it doesn't translate to "2%."
+- [o] The value sits two standard deviations above the mean, and about 97.7% of a normal distribution lies below it
+  > Standardizing gives the distance in SDs (here +2), and passing that through the normal CDF (\`norm.cdf(2) ≈ 0.977\`) shows roughly 97.7% of values fall below it.
 
 A z-score locates the value; the CDF converts that location into a probability.`}
 />
@@ -581,12 +581,12 @@ A z-score locates the value; the CDF converts that location into a probability.`
 <MultipleChoice
   markdown={`You have **right-skewed income** data and a colleague applies the 68–95–99.7 rule, reporting "95% of incomes fall within mean ± 2 standard deviations." Why is this unreliable here?
 
+- The rule requires the data to be in dollars
+  > Units are irrelevant; the rule's validity depends on the distribution being approximately normal.
 - The rule only works for small samples
   > Sample size isn't the issue; the empirical rule is about the *shape* of the distribution, not how much data you have.
 - [o] The empirical rule holds for the normal distribution, and skewed income data violates that assumption, the actual coverage will differ and mean − 2σ may even be negative
   > Because the rule is a property of the symmetric normal curve, applying it to a long-tailed, strictly positive variable misstates the tail coverage and can produce an impossible (negative) lower bound.
-- The rule requires the data to be in dollars
-  > Units are irrelevant; the rule's validity depends on the distribution being approximately normal.
 - The standard deviation can't be computed for skewed data
   > A standard deviation is perfectly computable for skewed data; the problem is that the 68–95–99.7 *coverage* no longer applies.
 
@@ -596,12 +596,12 @@ The empirical rule is a normal-distribution fact, not a universal one.`}
 <MultipleChoice
   markdown={`To convert a raw value \`x\` from a \`Normal(mu, sigma)\` into the **percentile** of scores at or below it, what's the correct computation?
 
+- \`stats.norm(loc=mu, scale=sigma).ppf(x)\`
+  > \`ppf\` expects a probability (0 to 1), so feeding it a raw score is invalid and would not return a percentile.
 - \`(x - mu) / sigma\`, and that is the percentile
   > That formula gives the *z-score* (a position), not a percentile; you still need to pass it through the CDF.
 - [o] Compute \`z = (x - mu) / sigma\`, then \`stats.norm().cdf(z)\` (equivalently \`stats.norm(loc=mu, scale=sigma).cdf(x)\`)
   > Standardizing locates the value in SD units and the standard-normal CDF turns that location into the fraction below, and applying the CDF to the original distribution directly gives the identical result.
-- \`stats.norm(loc=mu, scale=sigma).ppf(x)\`
-  > \`ppf\` expects a probability (0 to 1), so feeding it a raw score is invalid and would not return a percentile.
 - \`stats.norm().pdf((x - mu) / sigma)\`
   > The PDF returns a density height at that z-score, not the cumulative fraction below it.
 
@@ -611,14 +611,14 @@ Value to z (subtract mean, divide by σ), then z to percentile (CDF), that's the
 <MultipleChoice
   markdown={`Why does assuming a normal distribution tend to **underestimate the risk** of extreme events in finance?
 
-- Because the normal has no mean
-  > The normal has a well-defined mean; that's not the issue.
-- Because financial returns are always perfectly normal
-  > They are typically *heavy-tailed*, not normal, which is precisely the source of the problem.
 - [o] Real returns are heavy-tailed, so extreme moves occur far more often than a normal predicts, the normal assigns near-zero probability to events that actually recur
   > A normal's tails fall off extremely fast, so a "many-sigma" move it deems essentially impossible shows up in markets every few years, leaving a normal-based model under-prepared for crashes.
 - Because the standard deviation of returns is always zero
   > Returns have substantial, nonzero variability; a zero standard deviation would be the opposite problem.
+- Because financial returns are always perfectly normal
+  > They are typically *heavy-tailed*, not normal, which is precisely the source of the problem.
+- Because the normal has no mean
+  > The normal has a well-defined mean; that's not the issue.
 
 Light normal tails systematically understate the frequency of the rare, costly events that matter most.`}
 />

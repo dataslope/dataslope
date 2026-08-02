@@ -173,14 +173,14 @@ to carry for now.
 <MultipleChoice
   markdown={`What is the role of a \`WHERE\` clause?
 
-- It chooses which columns appear in the result.
-  > Choosing columns is the job of \`SELECT\`; \`WHERE\` decides which *rows* are kept.
-- [o] It keeps only the rows for which its condition is true.
-  > \`WHERE\` is a per-row true/false test; rows that fail the test are dropped from the result.
 - It sorts the rows into order.
   > Sorting is done by \`ORDER BY\`; \`WHERE\` filters rather than orders.
 - It permanently deletes rows that don't match.
   > In a \`SELECT\`, \`WHERE\` only filters the result; it does not delete stored rows.
+- [o] It keeps only the rows for which its condition is true.
+  > \`WHERE\` is a per-row true/false test; rows that fail the test are dropped from the result.
+- It chooses which columns appear in the result.
+  > Choosing columns is the job of \`SELECT\`; \`WHERE\` decides which *rows* are kept.
 
 \`WHERE\` filters rows, keeping those whose condition evaluates to true.`}
 />
@@ -188,10 +188,10 @@ to carry for now.
 <MultipleChoice
   markdown={`Which condition keeps employees whose salary is **at least** 80000?
 
-- \`WHERE salary > 80000\`
-  > \`>\` excludes exactly 80000, so "at least 80000" is not fully captured.
 - [o] \`WHERE salary >= 80000\`
   > \`>=\` means "greater than or equal to," which correctly includes 80000 and everything above it.
+- \`WHERE salary > 80000\`
+  > \`>\` excludes exactly 80000, so "at least 80000" is not fully captured.
 - \`WHERE salary < 80000\`
   > \`<\` keeps salaries *below* 80000, the opposite of what is asked.
 - \`WHERE salary = 80000\`
@@ -205,10 +205,10 @@ to carry for now.
 
 - Exactly one character.
   > That is the \`_\` wildcard. \`%\` is broader.
-- [o] Any number of characters, including none.
-  > \`%\` stands in for any sequence of characters, which is why \`'A%'\` matches anything starting with A.
 - Only digits.
   > \`%\` is not limited to digits; it matches any characters.
+- [o] Any number of characters, including none.
+  > \`%\` stands in for any sequence of characters, which is why \`'A%'\` matches anything starting with A.
 - The literal percent sign only.
   > \`%\` is a wildcard, not a literal percent; it matches arbitrary characters.
 
@@ -218,14 +218,14 @@ to carry for now.
 <MultipleChoice
   markdown={`Which combination keeps rows where the department is Engineering **and** the salary is above 100000?
 
-- \`WHERE dept = 'Engineering' OR salary > 100000\`
-  > \`OR\` keeps rows meeting *either* condition, which is broader than the "both must hold" requirement.
-- [o] \`WHERE dept = 'Engineering' AND salary > 100000\`
-  > \`AND\` requires both conditions to be true, exactly matching "Engineering and over 100000."
 - \`WHERE dept = 'Engineering' NOT salary > 100000\`
   > That is not valid syntax for combining two conditions; \`AND\` is needed to require both.
 - \`WHERE dept = 'Engineering', salary > 100000\`
   > A comma does not combine conditions in a \`WHERE\` clause; use \`AND\`.
+- [o] \`WHERE dept = 'Engineering' AND salary > 100000\`
+  > \`AND\` requires both conditions to be true, exactly matching "Engineering and over 100000."
+- \`WHERE dept = 'Engineering' OR salary > 100000\`
+  > \`OR\` keeps rows meeting *either* condition, which is broader than the "both must hold" requirement.
 
 Requiring both conditions calls for \`AND\`.`}
 />

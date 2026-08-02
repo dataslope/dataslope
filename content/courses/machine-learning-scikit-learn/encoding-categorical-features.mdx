@@ -585,14 +585,14 @@ assert len(columns) == encoded.shape[1], f"Expected {encoded.shape[1]} names, go
 <MultipleChoice
   markdown={`Why is encoding the **nominal** feature \`color\` as red=0, green=1, blue=2 a modeling mistake?
 
-- It uses too much memory compared to one-hot encoding
-  > A single integer column actually uses *less* memory than one-hot; the problem is meaning, not memory.
-- [o] It invents a false ordering and false distances, the model treats blue (2) as "greater than" red (0) and green as the midpoint, relationships that do not exist among colors
-  > A single integer column imposes order and spacing on categories that have neither, so the model learns relationships the data does not contain.
-- It will raise an error when the model is trained
-  > Integer-labeled categories train without error; the harm is a silently weaker model, which is why the bug is easy to miss.
 - It removes the color information entirely
   > The information is still present (as an integer); the issue is that the encoding adds a false order on top of it.
+- It will raise an error when the model is trained
+  > Integer-labeled categories train without error; the harm is a silently weaker model, which is why the bug is easy to miss.
+- [o] It invents a false ordering and false distances, the model treats blue (2) as "greater than" red (0) and green as the midpoint, relationships that do not exist among colors
+  > A single integer column imposes order and spacing on categories that have neither, so the model learns relationships the data does not contain.
+- It uses too much memory compared to one-hot encoding
+  > A single integer column actually uses *less* memory than one-hot; the problem is meaning, not memory.
 
 Colors have no natural order, so any integer assignment fabricates an ordering the model will believe.`}
 />
@@ -600,14 +600,14 @@ Colors have no natural order, so any integer assignment fabricates an ordering t
 <MultipleChoice
   markdown={`For which feature is a single integer encoding (0, 1, 2, ...) genuinely appropriate?
 
-- City: New York=0, London=1, Tokyo=2
-  > Cities have no natural order, so an integer encoding would invent a false ranking; this is a nominal feature.
 - Color: red=0, green=1, blue=2
   > Colors are unordered, so integer labels fabricate an ordering, the classic nominal-encoding mistake.
 - [o] T-shirt size: S=0, M=1, L=2
   > Size has a real order (S < M < L) with meaningful spacing, so an integer encoding preserves genuine information rather than inventing it.
 - Payment method: cash=0, card=1, crypto=2
   > Payment methods have no inherent order, so this is nominal and an integer encoding would assert a false ranking.
+- City: New York=0, London=1, Tokyo=2
+  > Cities have no natural order, so an integer encoding would invent a false ranking; this is a nominal feature.
 
 Integer encoding is right exactly when the categories have a true, meaningful order, that is, when they are ordinal.`}
 />
@@ -615,12 +615,12 @@ Integer encoding is right exactly when the categories have a true, meaningful or
 <MultipleChoice
   markdown={`What does one-hot encoding produce from a single column of three distinct categories?
 
+- A single column scaled to the range [0, 1]
+  > That describes \`MinMaxScaler\` on a numeric column, not categorical encoding.
 - A single integer column with values 0, 1, 2
   > That is *label/integer* encoding, which imposes an order; one-hot avoids exactly that by using separate columns.
 - [o] Three new columns, each 0 or 1, where each row has a single 1 marking its category
   > One column per category, with a lone 1 indicating membership, lets the model treat the categories as unordered, independent alternatives.
-- A single column scaled to the range [0, 1]
-  > That describes \`MinMaxScaler\` on a numeric column, not categorical encoding.
 - One column containing the category name as text
   > Text cannot be fed to the model directly; one-hot produces numeric 0/1 columns precisely to avoid that.
 
@@ -632,10 +632,10 @@ By giving each category its own 0/1 column, one-hot encoding represents categori
 
 - It raises an error because there is no column for the new category
   > That is the *default* behavior; \`handle_unknown="ignore"\` is specifically what prevents the error.
-- It adds a brand-new column for the unseen category
-  > The set of output columns is fixed at \`fit\` time and never grows, so the model always receives the same columns.
 - [o] It sets all of that feature's one-hot columns to 0 for the unknown value, keeping the output shape fixed
   > Representing the unknown as all-zeros means "none of the known categories" and preserves the exact column layout the model expects.
+- It adds a brand-new column for the unseen category
+  > The set of output columns is fixed at \`fit\` time and never grows, so the model always receives the same columns.
 - It replaces the unknown value with the most common category from training
   > It does not guess a substitute category; it marks the value as none-of-the-known via all-zero columns.
 
@@ -645,12 +645,12 @@ By giving each category its own 0/1 column, one-hot encoding represents categori
 <MultipleChoice
   markdown={`When is one-hot encoding a **poor** choice?
 
-- When the categorical feature has only three or four distinct values
-  > A handful of categories is the ideal case for one-hot; it expands to just a few columns.
 - When the model is a regularized logistic regression
   > Regularized linear models handle one-hot columns well, including the redundant column; this is a fine use case.
 - [o] When the feature has very high cardinality, such as thousands of distinct zip codes or user IDs
   > Thousands of categories explode into thousands of sparse columns, which is wide, slow, and prone to overfitting; other encodings suit high cardinality better.
+- When the categorical feature has only three or four distinct values
+  > A handful of categories is the ideal case for one-hot; it expands to just a few columns.
 - When the feature is nominal (unordered)
   > Nominal features are exactly what one-hot encoding is *for*, since it avoids imposing a false order.
 

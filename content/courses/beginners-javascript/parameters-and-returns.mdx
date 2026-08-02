@@ -437,14 +437,14 @@ if (JSON.stringify(r) !== "[2,5]") throw new Error("expected [2,5], got " + JSON
 <MultipleChoice
   markdown={`What happens if you call a JavaScript function with fewer arguments than it has parameters?
 
-- A \`TypeError\` is thrown immediately
-  > JavaScript does not throw for too few arguments; the missing parameters silently become \`undefined\` and the function continues running. A \`TypeError\` only occurs later if the code tries to do something with \`undefined\` that doesn't work.
 - The missing arguments are filled in with \`null\`
   > Missing arguments become \`undefined\`, not \`null\`; these are two distinct values in JavaScript, and confusing them is a common source of subtle bugs.
 - [o] The missing parameters are bound to \`undefined\`; the call still proceeds. (If you want a different default, use \`= defaultValue\` in the parameter list.)
   > JavaScript is forgiving about argument counts, missing parameters become \`undefined\` and the function runs anyway. This is why default parameter values (\`function f(x = 10)\`) are so useful: they make missing arguments behave the way you actually want.
 - The first argument is duplicated to fill the slots
   > JavaScript has no argument-duplication behaviour; each missing parameter independently receives \`undefined\`.
+- A \`TypeError\` is thrown immediately
+  > JavaScript does not throw for too few arguments; the missing parameters silently become \`undefined\` and the function continues running. A \`TypeError\` only occurs later if the code tries to do something with \`undefined\` that doesn't work.
 
 JavaScript's tolerance of mismatched argument counts is convenient but can hide bugs. Default values make your intent explicit.`}
 />

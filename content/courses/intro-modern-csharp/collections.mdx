@@ -323,12 +323,12 @@ public static class WordCounter
 <MultipleChoice
   markdown={`You want to remember every URL the crawler has visited and quickly check whether a given URL has already been seen. Which collection fits best?
 
-- \`List<string>\`
-  > Scanning a list for membership becomes slow as it grows.
-- \`string[]\`
-  > Same problem, and arrays don't grow.
 - [o] \`HashSet<string>\`
   > Sets are designed for fast membership tests and automatic de-duplication.
+- \`string[]\`
+  > Same problem, and arrays don't grow.
+- \`List<string>\`
+  > Scanning a list for membership becomes slow as it grows.
 - \`Dictionary<string, string>\`
   > Possible, but wasteful: there's no value to associate with each key.`}
 />
@@ -336,12 +336,12 @@ public static class WordCounter
 <MultipleChoice
   markdown={`What happens if you read \`dict[key]\` for a key that doesn't exist in a \`Dictionary\`?
 
-- It returns \`null\`
-  > The indexer doesn't return \`null\` for a missing key, it throws instead.
+- It adds the key with a default value
+  > That would be surprising; the indexer doesn't do that on read.
 - It returns a default value silently
   > It doesn't, \`TryGetValue\` is the safe alternative.
 - [o] It throws a \`KeyNotFoundException\`
   > Use \`ContainsKey\` or \`TryGetValue\` to look up safely.
-- It adds the key with a default value
-  > That would be surprising; the indexer doesn't do that on read.`}
+- It returns \`null\`
+  > The indexer doesn't return \`null\` for a missing key, it throws instead.`}
 />

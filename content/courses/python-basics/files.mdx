@@ -703,14 +703,14 @@ assert count_lines("cl1.txt") == 1`,
 <MultipleChoice
   markdown={`Which of the following is the **primary** reason to use a \`with\` block when opening files?
 
+- It speeds up file I/O by buffering writes.
+  > Buffering happens regardless of \`with\`. This is about resource cleanup.
 - It is required syntax in Python 3.
   > No, \`open(...)\` without \`with\` is still legal, just fragile.
-- It makes the file read-only.
-  > No, \`with\` works with any mode (\`"r"\`, \`"w"\`, etc.).
 - [o] It automatically closes the file when the block exits, even if an exception is raised.
   > The context manager protocol guarantees cleanup.
-- It speeds up file I/O by buffering writes.
-  > Buffering happens regardless of \`with\`. This is about resource cleanup.`}
+- It makes the file read-only.
+  > No, \`with\` works with any mode (\`"r"\`, \`"w"\`, etc.).`}
 />
 
 <MultipleChoice
@@ -720,36 +720,36 @@ assert count_lines("cl1.txt") == 1`,
   > Close, but it returns a \`Path\` object, not a plain string.
 - [o] A \`Path\` object representing \`logs/2024/jan.log\`
   > \`Path\` overloads \`/\` for path joining.
-- A \`TypeError\` because you cannot divide a path.
-  > No, \`Path.__truediv__\` is defined to handle \`/\`.
 - A list of three path components.
-  > No, it is a single \`Path\` object. Use \`.parts\` to get components.`}
+  > No, it is a single \`Path\` object. Use \`.parts\` to get components.
+- A \`TypeError\` because you cannot divide a path.
+  > No, \`Path.__truediv__\` is defined to handle \`/\`.`}
 />
 
 <MultipleChoice
   markdown={`When should you open a file in binary mode (\`"rb"\` or \`"wb"\`)?
 
-- [o] When working with non-text files like images, executables, or pickle files.
-  > Binary mode gives you raw bytes without text encoding.
 - When you want to read a text file faster.
   > No, binary mode does not speed up text reading; it just skips encoding.
+- When you need to append to a file.
+  > Append mode is \`"a"\` or \`"ab"\`; binary vs text is orthogonal.
 - When the file is very large.
   > File size does not determine text vs binary mode; content type does.
-- When you need to append to a file.
-  > Append mode is \`"a"\` or \`"ab"\`; binary vs text is orthogonal.`}
+- [o] When working with non-text files like images, executables, or pickle files.
+  > Binary mode gives you raw bytes without text encoding.`}
 />
 
 <MultipleChoice
   markdown={`Why should you explicitly pass \`encoding="utf-8"\` when opening text files?
 
-- UTF-8 is faster than the default encoding.
-  > No, performance is not the reason.
 - [o] The default encoding is platform-dependent, which can cause bugs on different systems.
   > macOS/Linux default to UTF-8; Windows often defaults to CP1252. Explicit is better than implicit.
-- Python 3 does not have a default encoding.
-  > Python 3 has a default (from \`locale.getpreferredencoding()\`), but it varies by platform.
+- UTF-8 is faster than the default encoding.
+  > No, performance is not the reason.
 - \`encoding="utf-8"\` is required for \`with\` blocks.
-  > No, \`encoding\` is optional; the issue is portability, not syntax.`}
+  > No, \`encoding\` is optional; the issue is portability, not syntax.
+- Python 3 does not have a default encoding.
+  > Python 3 has a default (from \`locale.getpreferredencoding()\`), but it varies by platform.`}
 />
 
 <MultipleChoice
@@ -757,25 +757,25 @@ assert count_lines("cl1.txt") == 1`,
 
 - They are aliases; both do the same thing.
   > No, one writes to a file, the other returns a string.
-- [o] \`json.dumps\` returns a JSON string; \`json.dump\` writes directly to a file object.
-  > The \`s\` suffix conventionally means "string" in Python APIs.
 - \`json.dump\` is deprecated in Python 3.
   > No, both are current and widely used.
 - \`json.dumps\` is for serializing; \`json.dump\` is for deserializing.
-  > Both are for serializing (Python → JSON). Deserializing is \`json.load\` / \`json.loads\`.`}
+  > Both are for serializing (Python → JSON). Deserializing is \`json.load\` / \`json.loads\`.
+- [o] \`json.dumps\` returns a JSON string; \`json.dump\` writes directly to a file object.
+  > The \`s\` suffix conventionally means "string" in Python APIs.`}
 />
 
 <MultipleChoice
   markdown={`When reading a CSV file for writing with the \`csv\` module, why should you pass \`newline=""\` to \`open()\`?
 
+- It prevents Unicode errors.
+  > No, \`newline=""\` is about line-ending translation, not encoding.
 - It is required by the CSV spec.
   > Not by the spec, but by Python's CSV module on Windows.
-- [o] On Windows, the default text mode translates \`\\n\` to \`\\r\\n\`, doubling line endings. \`newline=""\` disables this.
-  > The CSV module handles line endings itself; you must disable the OS translation.
 - It makes the CSV parser faster.
   > No, it is about correctness, not performance.
-- It prevents Unicode errors.
-  > No, \`newline=""\` is about line-ending translation, not encoding.`}
+- [o] On Windows, the default text mode translates \`\\n\` to \`\\r\\n\`, doubling line endings. \`newline=""\` disables this.
+  > The CSV module handles line endings itself; you must disable the OS translation.`}
 />
 
 We have collections, control flow, functions, modules, and I/O. The next chunk is about packaging *behavior with data*, which means classes.

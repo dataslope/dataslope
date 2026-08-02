@@ -216,27 +216,27 @@ is finding them.
 <MultipleChoice
   markdown={`Fundamentally, what is a data frame in R?
 
-- A single multi-dimensional array
-  > A multi-dimensional array requires all elements to share the same type; a data frame allows each column to have a different type.
 - An Excel file
   > An Excel file is a file format, not an in-memory data structure; R reads Excel files with packages like \`readxl\`, producing a data frame.
-- [o] A list of equal-length vectors (one per column), displayed as a table
-  > Each column is a vector, possibly of a different type, and they all share the same length.
+- A single multi-dimensional array
+  > A multi-dimensional array requires all elements to share the same type; a data frame allows each column to have a different type.
 - A SQL table
-  > A SQL table is a database object stored in a relational database engine; a data frame is an in-memory R object with a similar tabular shape but without database semantics.`}
+  > A SQL table is a database object stored in a relational database engine; a data frame is an in-memory R object with a similar tabular shape but without database semantics.
+- [o] A list of equal-length vectors (one per column), displayed as a table
+  > Each column is a vector, possibly of a different type, and they all share the same length.`}
 />
 
 <MultipleChoice
   markdown={`Which expression returns the \`mpg\` column of \`mtcars\` as a vector?
 
+- \`mtcars(mpg)\`
+  > Parentheses call a function; \`mtcars\` is a data frame, not a function, so this produces an error.
 - \`mtcars[mpg]\`
   > Single brackets with a bare name (no quotes) will error; you need either \`$\` with a name or double brackets with a quoted string.
-- [o] \`mtcars$mpg\`
-  > \`$\` extracts a single column by name and returns it as a vector. \`mtcars[["mpg"]]\` works too.
 - \`mtcars.mpg\`
   > Dot notation for attribute access is Python syntax, not R; R uses \`$\` or double brackets for column access.
-- \`mtcars(mpg)\`
-  > Parentheses call a function; \`mtcars\` is a data frame, not a function, so this produces an error.`}
+- [o] \`mtcars$mpg\`
+  > \`$\` extracts a single column by name and returns it as a vector. \`mtcars[["mpg"]]\` works too.`}
 />
 
 <MultipleChoice
@@ -244,10 +244,10 @@ is finding them.
 
 - The single value of \`mpg\` greater than 25
   > The logical vector \`mtcars$mpg > 25\` typically matches multiple rows, so the result is a data frame of those rows, not a single value.
-- The column \`mpg\` filtered
-  > Because the empty slot after the comma means "all columns," the result keeps every column of \`mtcars\`, not just \`mpg\`.
 - [o] All rows of \`mtcars\` where \`mpg > 25\`, with all columns kept
   > The logical vector \`mtcars$mpg > 25\` selects rows; the empty slot after the comma keeps all columns.
+- The column \`mpg\` filtered
+  > Because the empty slot after the comma means "all columns," the result keeps every column of \`mtcars\`, not just \`mpg\`.
 - An error
   > This is valid R syntax; logical indexing on a data frame with a row condition and empty column slot returns a filtered data frame without error.`}
 />

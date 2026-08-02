@@ -327,14 +327,14 @@ you've locked your caller into one concrete type for no reason.
 <MultipleChoice
   markdown={`A method has the signature \`IEnumerable<int> GetTemperatures()\`. Which assumption about the returned value is **safe**?
 
-- The returned sequence has a known \`Count\` property you can read cheaply.
-  > \`IEnumerable<T>\` does not expose \`Count\`; calling \`.Count()\` may walk the entire sequence (potentially expensive).
 - You can iterate the returned sequence multiple times and always get the same results.
   > The sequence might be backed by a \`yield\` method, a network stream, or a one-shot reader. Iterating twice can re-run the source, or fail.
-- [o] You can call \`foreach\` over the result and read elements one at a time.
-  > That is exactly what \`IEnumerable<T>\` promises: it gives you an enumerator that produces elements until it signals the end.
 - The results are already in memory and indexing is O(1).
   > Indexing isn't part of \`IEnumerable<T>\` at all, that's \`IList<T>\` or arrays. And the elements may be computed on demand rather than stored.
+- [o] You can call \`foreach\` over the result and read elements one at a time.
+  > That is exactly what \`IEnumerable<T>\` promises: it gives you an enumerator that produces elements until it signals the end.
+- The returned sequence has a known \`Count\` property you can read cheaply.
+  > \`IEnumerable<T>\` does not expose \`Count\`; calling \`.Count()\` may walk the entire sequence (potentially expensive).
 
 \`IEnumerable<T>\` is intentionally minimal: *"you can ask me for the
 next element until I say I'm done."* Anything beyond that, counting,

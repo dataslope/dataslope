@@ -95,10 +95,10 @@ FROM
   > \`INTEGER\` is best for whole numbers, not names.
 - [o] \`TEXT\`
   > \`TEXT\` is the natural choice for words such as names and titles.
-- \`REAL\`
-  > \`REAL\` is best for decimal numbers.
 - \`NUMERIC\`
   > \`NUMERIC\` is for number-like values, not ordinary words.
+- \`REAL\`
+  > \`REAL\` is best for decimal numbers.
 
 Column types are a promise to readers about what kind of values belong in each column.`}
 />
@@ -211,14 +211,14 @@ flowchart TB
 <MultipleChoice
   markdown={`A column is declared \`times_done INTEGER DEFAULT 0\`. What happens when an insert omits \`times_done\`?
 
-- The table is deleted.
-  > Omitting one column during insert does not delete a table.
-- The row is always rejected.
-  > A default exists so SQLite has a value to use.
-- [o] SQLite stores \`0\` for that column.
-  > \`DEFAULT 0\` supplies the value when the insert leaves the column out.
 - SQLite stores the table name there.
   > Defaults use the value you wrote, not the table name.
+- The table is deleted.
+  > Omitting one column during insert does not delete a table.
+- [o] SQLite stores \`0\` for that column.
+  > \`DEFAULT 0\` supplies the value when the insert leaves the column out.
+- The row is always rejected.
+  > A default exists so SQLite has a value to use.
 
 A default is a fallback value for missing input.`}
 />
@@ -259,14 +259,14 @@ FROM
 <MultipleChoice
   markdown={`What does \`CREATE TABLE\` define?
 
-- The order in which every query must run.
-  > Query order is not controlled by \`CREATE TABLE\`.
+- A backup copy of the database.
+  > Backups are separate from table creation.
 - [o] A table's name, columns, types, and simple rules.
   > \`CREATE TABLE\` describes the structure that rows will follow.
 - The exact rows that must always be returned.
   > Rows are added with \`INSERT\` and read with \`SELECT\`.
-- A backup copy of the database.
-  > Backups are separate from table creation.
+- The order in which every query must run.
+  > Query order is not controlled by \`CREATE TABLE\`.
 
 A table definition is the shape of future data.`}
 />
@@ -274,14 +274,14 @@ A table definition is the shape of future data.`}
 <MultipleChoice
   markdown={`Why is \`id INTEGER PRIMARY KEY\` useful in SQLite?
 
-- It stores long paragraphs better than \`TEXT\`.
-  > Paragraphs belong in \`TEXT\` columns.
 - It prevents the table from having any rows.
   > A primary key helps identify rows; it does not block all rows.
-- [o] It gives each row a unique identifier and can be auto-assigned when omitted.
-  > In SQLite, an \`INTEGER PRIMARY KEY\` column is the standard simple id column.
 - It makes every column use decimal numbers.
   > The primary key rule applies to that id column, not every column.
+- [o] It gives each row a unique identifier and can be auto-assigned when omitted.
+  > In SQLite, an \`INTEGER PRIMARY KEY\` column is the standard simple id column.
+- It stores long paragraphs better than \`TEXT\`.
+  > Paragraphs belong in \`TEXT\` columns.
 
 A stable id lets you point to one exact row.`}
 />
@@ -289,12 +289,12 @@ A stable id lets you point to one exact row.`}
 <MultipleChoice
   markdown={`What does SQLite's dynamic typing mean for beginners?
 
-- Column types are useless and should never be written.
-  > Types still communicate intent and guide SQLite's affinity behavior.
 - SQLite has the same strict type behavior as every other database.
   > SQLite is more flexible than many server databases.
 - [o] SQLite is flexible about stored values, but you should still choose clear column types.
   > Clear types make your table understandable and help SQLite handle values sensibly.
+- Column types are useless and should never be written.
+  > Types still communicate intent and guide SQLite's affinity behavior.
 - \`TEXT\` columns automatically become primary keys.
   > Primary keys are declared separately.
 

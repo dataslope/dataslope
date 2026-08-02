@@ -104,14 +104,14 @@ wrong to the business, the diagram needs work.
 <MultipleChoice
   markdown={`In the shop diagram, which entity acts as the line between orders and products?
 
-- customers.
-  > Customers place orders, but they do not represent individual product lines inside an order.
 - [o] order_items.
   > Each order item connects one order to one product and stores facts about that line.
-- products.
-  > Products are the things being purchased, not the per-order line rows.
 - email.
   > Email is an attribute of customers, not an entity connecting orders and products.
+- products.
+  > Products are the things being purchased, not the per-order line rows.
+- customers.
+  > Customers place orders, but they do not represent individual product lines inside an order.
 
 Order items turn the order-product association into rows that can store quantity and line number.`}
 />
@@ -346,12 +346,12 @@ erDiagram
 <MultipleChoice
   markdown={`According to the diagram, how many books can one author write?
 
-- Exactly one book.
-  > The books side shows o{, which allows zero or many books for one author.
-- [o] Zero or many books.
-  > The circle plus crow's foot on the books side means an author may have no books or many books.
 - Exactly two books.
   > Crow's-foot notation does not express a fixed count of two here.
+- [o] Zero or many books.
+  > The circle plus crow's foot on the books side means an author may have no books or many books.
+- Exactly one book.
+  > The books side shows o{, which allows zero or many books for one author.
 - No books, because authors and books are separate entities.
   > Separate entities can still be related through foreign keys.
 
@@ -361,12 +361,12 @@ The symbol at the far side tells how many rows can connect to one row on the nea
 <MultipleChoice
   markdown={`Which column in books stores the relationship to publishers?
 
-- books.id.
-  > The book id identifies the book row itself.
 - books.title.
   > The title describes the book but does not point to a publisher row.
 - [o] books.publisher_id.
   > The FK marker shows this column points to publishers.id.
+- books.id.
+  > The book id identifies the book row itself.
 - authors.name.
   > The author's name belongs to the authors entity, not the books-to-publishers relationship.
 
@@ -378,10 +378,10 @@ Foreign key attributes are the stored links between entities.`}
 
 - name.
   > The diagram does not mark name as the primary key.
-- [o] id.
-  > The PK marker beside id identifies it as the primary key.
 - book_id.
   > No book_id attribute appears inside authors.
+- [o] id.
+  > The PK marker beside id identifies it as the primary key.
 - publisher_id.
   > Publisher ids appear in the books table, not as the authors primary key.
 

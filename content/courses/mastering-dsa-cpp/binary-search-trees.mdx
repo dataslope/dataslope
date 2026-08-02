@@ -593,31 +593,31 @@ int main() {
 
 - All descendants are greater than the node
   > Left descendants should be smaller.
+- Every node has exactly two children
+  > BST nodes can have zero, one, or two children.
 - [o] Values in the left subtree are smaller and values in the right subtree are larger.
   > The rule applies recursively.
 - Only immediate children must be sorted alphabetically
-  > The invariant must hold through entire subtrees.
-- Every node has exactly two children
-  > BST nodes can have zero, one, or two children.`} />
+  > The invariant must hold through entire subtrees.`} />
 
 <MultipleChoice markdown={`What is the cost of search in a BST of height h?
 
+- O(n squared)
+  > A badly skewed tree can be O(n), not usually O(n squared).
 - [o] O(h)
   > Search follows one path from the root.
-- O(1) always
-  > Only the root can be checked in constant time.
 - O(n log n)
   > That is too high for a single search.
-- O(n squared)
-  > A badly skewed tree can be O(n), not usually O(n squared).`} />
+- O(1) always
+  > Only the root can be checked in constant time.`} />
 
 <MultipleChoice markdown={`Why must BST validation track lower and upper bounds?
 
-- To count the number of nodes
-  > Counting is unrelated to ordering validity.
+- Because leaf nodes are always invalid
+  > Leaves can be perfectly valid.
 - To make recursion iterative
   > Bounds work in either recursive or iterative validation.
+- To count the number of nodes
+  > Counting is unrelated to ordering validity.
 - [o] A node can satisfy its parent but violate an ancestor.
-  > Ancestor constraints must be carried downward.
-- Because leaf nodes are always invalid
-  > Leaves can be perfectly valid.`} />
+  > Ancestor constraints must be carried downward.`} />

@@ -178,12 +178,12 @@ conclude?
 
 - The two groups have the same distribution.
   > Box plots only match on quartiles; the groups can still differ dramatically in shape (for example, one bimodal and one not).
-- [o] They have similar quartiles, but could still have very different *shapes* (e.g. one bimodal).
-  > A box plot summarizes only the five-number summary, so matching boxes guarantee similar quartiles, nothing about modality or the shape between them.
 - One group must contain outliers and the other must not.
   > Outliers are shown separately and aren't implied by matching boxes; both or neither could have them.
 - The medians are different.
   > Identical-looking boxes would have *similar* medians, not different ones.
+- [o] They have similar quartiles, but could still have very different *shapes* (e.g. one bimodal).
+  > A box plot summarizes only the five-number summary, so matching boxes guarantee similar quartiles, nothing about modality or the shape between them.
 
 Matching boxes mean matching quartiles, not matching distributions, switch
 to a violin (or a strip/swarm) when shape matters.`}
@@ -404,14 +404,14 @@ print("median:", adelie_median, "| IQR:", adelie_iqr)
   markdown={`In a standard box plot, what does the **box itself** (from one edge to the
 other) represent?
 
+- The 95% confidence interval of the mean.
+  > That's what an error bar on a bar/point plot shows; a box plot's box is the IQR.
 - The full range from the minimum to the maximum value.
   > That's closer to what the whiskers-plus-outliers cover; the box is narrower.
 - [o] The interquartile range, from Q1 (25th percentile) to Q3 (75th percentile), i.e. the middle 50% of the data.
   > The box spans Q1 to Q3, so its length is the IQR and it contains the central half of the observations.
 - One standard deviation on either side of the mean.
   > Box plots are built from quartiles (a median-based summary), not from the mean and standard deviation.
-- The 95% confidence interval of the mean.
-  > That's what an error bar on a bar/point plot shows; a box plot's box is the IQR.
 
 The box is the IQR (Q1 to Q3); the line inside it is the median.`}
 />
@@ -420,14 +420,14 @@ The box is the IQR (Q1 to Q3); the line inside it is the median.`}
   markdown={`A point is drawn **beyond the whisker** of a box plot. By the usual rule,
 what does that mean?
 
+- It is a data-entry error.
+  > An outlier may be perfectly valid data; the plot only flags its position, not its correctness.
 - It is the maximum value, which is always drawn separately.
   > The maximum is only drawn separately if it falls beyond the whisker; otherwise the whisker reaches it.
 - [o] It lies more than 1.5 × IQR beyond the nearer quartile, so it's flagged as an outlier.
   > Whiskers stop at the furthest point within 1.5 IQR of the box; anything past that is marked as an individual outlier.
 - It is any value above the median.
   > Roughly half the data sits above the median and stays inside the box/whiskers; being above the median doesn't make a point an outlier.
-- It is a data-entry error.
-  > An outlier may be perfectly valid data; the plot only flags its position, not its correctness.
 
 The 1.5 × IQR rule defines the whiskers; points beyond them are shown as
 outliers (which may still be genuine values).`}
@@ -437,10 +437,10 @@ outliers (which may still be genuine values).`}
   markdown={`When is a **violin plot** a poor choice compared with a box plot or a
 strip/swarm plot?
 
-- When you have many categories to compare.
-  > Having many categories isn't the violin's core problem; its reliability problem is about how much data each group has.
 - [o] When each group has very few observations, so its smoothed density is largely invented.
   > A violin is a KDE, and a KDE over a handful of points produces a smooth shape that the data can't actually support.
+- When you have many categories to compare.
+  > Having many categories isn't the violin's core problem; its reliability problem is about how much data each group has.
 - When the variable on the y-axis is numeric.
   > A numeric y is exactly what violins (and box plots) expect; that's normal usage.
 - When you want to compare medians.
@@ -454,14 +454,14 @@ just show the raw points.`}
   markdown={`You have a **large** dataset and care specifically about how the
 *tails* behave across categories. Which plot is designed for that?
 
-- A standard box plot.
-  > A box plot collapses each tail into a single whisker and a scatter of outliers, so it shows little tail detail.
 - [o] A boxen (letter-value) plot.
   > Boxen plots draw extra, progressively smaller boxes for further-out quantiles, which reveals tail structure that a single whisker can't.
-- A count plot.
-  > A count plot tallies category frequencies and says nothing about a numeric variable's tails.
 - A bar plot of means.
   > A bar of means shows one summary number per group and hides the tails entirely.
+- A standard box plot.
+  > A box plot collapses each tail into a single whisker and a scatter of outliers, so it shows little tail detail.
+- A count plot.
+  > A count plot tallies category frequencies and says nothing about a numeric variable's tails.
 
 Boxen plots extend the box idea to expose tail quantiles, which is most
 useful when you have lots of data.`}

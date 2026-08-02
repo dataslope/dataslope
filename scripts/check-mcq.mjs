@@ -185,6 +185,42 @@ export function lintLengthBias(src, file) {
   return violations;
 }
 
+// --- position bias --------------------------------------------------------
+
+// The other free giveaway: where the correct option sits. The corpus was once
+// written top-down ("state the answer, then pad three distractors around it"),
+// which parked the answer in slot 2 for 61% of questions overall and 99% of the
+// interview banks. A learner who notices picks second and passes without
+// reading. `scripts/shuffle-mcq-options.mjs` spreads the answers across the
+// slots; this is the guard that keeps them spread.
+//
+// The threshold is corpus-level on purpose: a single question has to put its
+// answer *somewhere*, and a page with six of them can land four in one slot by
+// chance. Only across hundreds of questions does a concentration mean the
+// habit is back.
+export const POSITION_MAX_RATE = 0.35;
+
+/** Distribution of the correct option's slot across a set of files. `rate` is
+ *  the share held by the most common slot, which is 25% for four options when
+ *  position carries no signal. */
+export function correctPositionRate(files) {
+  const counts = [];
+  let total = 0;
+  for (const file of files) {
+    for (const md of extractMcqBlocks(readFileSync(file, "utf8"))) {
+      const { choices } = parseChoices(md);
+      if (choices.length < 2) continue;
+      const index = choices.findIndex((c) => c.correct);
+      if (index < 0) continue;
+      total++;
+      counts[index] = (counts[index] ?? 0) + 1;
+    }
+  }
+  const slots = Array.from({ length: counts.length }, (_, i) => counts[i] ?? 0);
+  const max = slots.length ? Math.max(...slots) : 0;
+  return { total, slots, position: slots.indexOf(max), rate: total ? max / total : 0 };
+}
+
 /** Share of questions whose correct option is the single longest, which is 25%
  *  for four options if length carries no signal. Used as a corpus-level check
  *  alongside the per-question rule. */
@@ -244,7 +280,19 @@ if (isMain) {
   const banks = args.length
     ? files.filter((f) => path.basename(f) === "multiple-choice-questions.mdx")
     : interviewMcqBanks();
+  const position = correctPositionRate(files);
   const violations = [...lintFiles(files), ...lintLengthBiasFiles(banks)];
+  if (position.rate > POSITION_MAX_RATE) {
+    violations.push({
+      file: "content",
+      rule: "position-bias",
+      detail:
+        `the correct option is #${position.position + 1} in ` +
+        `${position.slots[position.position]}/${position.total} questions ` +
+        `(${(100 * position.rate).toFixed(1)}%, limit ${(100 * POSITION_MAX_RATE).toFixed(0)}%). ` +
+        `Run \`node scripts/shuffle-mcq-options.mjs\` to redistribute them.`,
+    });
+  }
   if (violations.length) {
     const byRule = {};
     for (const v of violations) (byRule[v.rule] ??= []).push(v);
@@ -260,6 +308,13 @@ if (isMain) {
   console.log(
     `✓ all MCQ blocks in ${files.length} file(s) pass (exactly one correct answer, ≥2 distinct choices, neutral explanations)`,
   );
+  if (position.total) {
+    console.log(
+      `✓ no position bias across ${position.total} question(s): the correct option lands ` +
+        `${position.slots.map((n, i) => `#${i + 1} ${((100 * n) / position.total).toFixed(1)}%`).join(", ")} ` +
+        `(chance is 25% with four options)`,
+    );
+  }
   if (total) {
     console.log(
       `✓ no length bias in ${banks.length} question bank(s): the correct option is the single longest in ` +

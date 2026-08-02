@@ -84,14 +84,14 @@ flowchart TB
 <MultipleChoice
   markdown={`What does \`HAVING COUNT(*) > 2\` filter?
 
-- Individual employee rows before grouping.
-  > Individual row filters belong in \`WHERE\`.
-- [o] Completed groups whose row count is greater than 2.
-  > \`HAVING\` runs after grouping, so it can keep or drop whole groups.
-- Table columns before the query starts.
-  > \`HAVING\` does not change the table structure.
 - The order of rows in the final result.
   > \`ORDER BY\` controls result order.
+- Individual employee rows before grouping.
+  > Individual row filters belong in \`WHERE\`.
+- Table columns before the query starts.
+  > \`HAVING\` does not change the table structure.
+- [o] Completed groups whose row count is greater than 2.
+  > \`HAVING\` runs after grouping, so it can keep or drop whole groups.
 
 \`HAVING\` is a filter for grouped summaries.`}
 />
@@ -280,14 +280,14 @@ This returns customers who have at least two orders, even though the count is no
 <MultipleChoice
   markdown={`Why can't \`WHERE COUNT(*) > 2\` filter groups with more than two rows?
 
-- Because \`COUNT(*)\` is not allowed in SQLite.
-  > \`COUNT(*)\` is a normal SQLite aggregate function.
 - [o] Because \`WHERE\` runs before groups and counts exist.
   > The row filter stage happens before \`GROUP BY\`, so aggregate results are not available yet.
-- Because \`WHERE\` can only be used with text columns.
-  > \`WHERE\` works with many kinds of row-level conditions.
 - Because numbers cannot be compared with \`>\`.
   > Numeric comparisons like \`>\` are common in SQL.
+- Because \`WHERE\` can only be used with text columns.
+  > \`WHERE\` works with many kinds of row-level conditions.
+- Because \`COUNT(*)\` is not allowed in SQLite.
+  > \`COUNT(*)\` is a normal SQLite aggregate function.
 
 Aggregate conditions belong in \`HAVING\` because \`HAVING\` runs after aggregation.`}
 />
@@ -295,14 +295,14 @@ Aggregate conditions belong in \`HAVING\` because \`HAVING\` runs after aggregat
 <MultipleChoice
   markdown={`You want only orders from 2025, then only customers whose total spending is over 100. Where should the conditions go?
 
-- Put both conditions in \`WHERE\`.
-  > Total spending uses \`SUM\`, which is not available during \`WHERE\`.
-- Put both conditions in \`HAVING\`.
-  > The year condition is a row-level filter that should happen before grouping.
 - [o] Put the 2025 row filter in \`WHERE\` and the total-spending filter in \`HAVING\`.
   > \`WHERE\` filters individual rows; \`HAVING\` filters grouped totals.
+- Put both conditions in \`WHERE\`.
+  > Total spending uses \`SUM\`, which is not available during \`WHERE\`.
 - Put neither condition in SQL.
   > SQL can express both conditions clearly.
+- Put both conditions in \`HAVING\`.
+  > The year condition is a row-level filter that should happen before grouping.
 
 Use \`WHERE\` before grouping and \`HAVING\` after grouping.`}
 />
@@ -314,10 +314,10 @@ Use \`WHERE\` before grouping and \`HAVING\` after grouping.`}
   > This checks a value on individual rows, so it usually belongs in \`WHERE\`.
 - \`order_date = '2025-01-01'\`
   > This is a row-level date condition, so it usually belongs in \`WHERE\`.
-- [o] \`SUM(amount) > 500\`
-  > This condition depends on a grouped total, so it belongs after aggregation in \`HAVING\`.
 - \`channel = 'Online'\`
   > This checks individual sales rows before grouping.
+- [o] \`SUM(amount) > 500\`
+  > This condition depends on a grouped total, so it belongs after aggregation in \`HAVING\`.
 
 Conditions involving aggregate results usually belong in \`HAVING\`.`}
 />
@@ -325,14 +325,14 @@ Conditions involving aggregate results usually belong in \`HAVING\`.`}
 <MultipleChoice
   markdown={`In the logical query flow, which order is right for these three steps?
 
-- \`HAVING\` → \`WHERE\` → \`GROUP BY\`
-  > A group filter cannot happen before row filtering and grouping.
 - \`GROUP BY\` → \`WHERE\` → \`HAVING\`
   > \`WHERE\` must filter rows before they are grouped.
 - [o] \`WHERE\` → \`GROUP BY\` → \`HAVING\`
   > Rows are filtered first, then grouped, then groups are filtered.
 - \`WHERE\` → \`HAVING\` → \`GROUP BY\`
   > \`HAVING\` needs groups to exist first.
+- \`HAVING\` → \`WHERE\` → \`GROUP BY\`
+  > A group filter cannot happen before row filtering and grouping.
 
 Remember the core order: row filter, grouping, group filter.`}
 />

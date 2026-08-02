@@ -499,14 +499,14 @@ Knowing what your library is actually doing lets you predict its runtime and sta
 <MultipleChoice
   markdown={`A symmetric positive-definite matrix admits a **Cholesky factorization** $A = L L^T$. Why is Cholesky preferred over general LU when applicable?
 
-- It is the only factorization that exists for SPD matrices
-  > LU and QR also exist for SPD matrices; Cholesky is preferred because it is faster and more stable, not because it is the only option.
-- [o] It requires roughly half the operations of LU, needs no pivoting (because it is unconditionally stable for SPD inputs), and uses half the storage
-  > SPD structure unlocks a factorization that is both faster and more stable. Any time you can prove your matrix is SPD, covariance matrices, mass matrices, Laplacians, switch to Cholesky.
-- It allows complex eigenvalues
-  > SPD matrices have strictly real positive eigenvalues by definition; complex eigenvalues are not a feature of Cholesky.
 - It is required to compute inverses
   > Matrix inversion can be computed from any factorization (LU, QR, etc.); Cholesky is not required for it, and computing inverses explicitly is generally discouraged.
+- It allows complex eigenvalues
+  > SPD matrices have strictly real positive eigenvalues by definition; complex eigenvalues are not a feature of Cholesky.
+- [o] It requires roughly half the operations of LU, needs no pivoting (because it is unconditionally stable for SPD inputs), and uses half the storage
+  > SPD structure unlocks a factorization that is both faster and more stable. Any time you can prove your matrix is SPD, covariance matrices, mass matrices, Laplacians, switch to Cholesky.
+- It is the only factorization that exists for SPD matrices
+  > LU and QR also exist for SPD matrices; Cholesky is preferred because it is faster and more stable, not because it is the only option.
 
 This is a recurring theme: **let structure dictate the algorithm**.`}
 />

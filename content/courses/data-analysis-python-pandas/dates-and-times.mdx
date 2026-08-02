@@ -371,14 +371,14 @@ assert dates == sorted(dates)`,
 <MultipleChoice
   markdown={`When parsing a date column where some values are unparseable, what is the safe option?
 
-- Drop the whole column
-  > Dropping the column discards all the valid dates alongside the unparseable ones; coercing lets you keep the parseable values.
-- Convert to integer
-  > Converting to integer turns dates into meaningless numbers and does not handle unparseable values gracefully.
-- [o] Use \`pd.to_datetime(s, errors="coerce")\` so bad values become NaT and the column still has datetime dtype
-  > \`errors="coerce"\` is the cleanest way to keep your column typed correctly while tolerating bad rows.
 - Use \`errors="ignore"\`
   > With \`errors="ignore"\`, unparseable values are silently left as strings, which means the column reverts to \`object\` dtype, you lose the datetime type for the whole column.
+- Convert to integer
+  > Converting to integer turns dates into meaningless numbers and does not handle unparseable values gracefully.
+- Drop the whole column
+  > Dropping the column discards all the valid dates alongside the unparseable ones; coercing lets you keep the parseable values.
+- [o] Use \`pd.to_datetime(s, errors="coerce")\` so bad values become NaT and the column still has datetime dtype
+  > \`errors="coerce"\` is the cleanest way to keep your column typed correctly while tolerating bad rows.
 
 The \`coerce\` flag is to dates what \`pd.to_numeric(..., errors="coerce")\` is to numbers.`}
 />
@@ -386,14 +386,14 @@ The \`coerce\` flag is to dates what \`pd.to_numeric(..., errors="coerce")\` is 
 <MultipleChoice
   markdown={`What is the practical advantage of having your DataFrame indexed by a \`DatetimeIndex\`?
 
-- It looks prettier
-  > The visual representation of a DatetimeIndex is similar to a regular index; the advantage is functional, not cosmetic.
-- It auto-removes weekends
-  > A DatetimeIndex does not remove any rows automatically; weekday filtering requires explicit code such as \`df[df.index.weekday < 5]\`.
 - [o] It unlocks string-based date slicing (\`df.loc["2024-02"]\`), resampling (\`df.resample("W").sum()\`), and rolling windows, none of which work on a plain RangeIndex
   > A DatetimeIndex is the gateway to most of Pandas's time-series features.
+- It auto-removes weekends
+  > A DatetimeIndex does not remove any rows automatically; weekday filtering requires explicit code such as \`df[df.index.weekday < 5]\`.
 - It speeds up CSV parsing
   > CSV parsing speed depends on file size and encoding; the index type has no effect on how fast \`pd.read_csv\` reads from disk.
+- It looks prettier
+  > The visual representation of a DatetimeIndex is similar to a regular index; the advantage is functional, not cosmetic.
 
 When you have time-series data, almost always promote the timestamp to the index.`}
 />
@@ -403,12 +403,12 @@ When you have time-series data, almost always promote the timestamp to the index
 
 - A datetime
   > Subtracting two datetimes does not produce another point in time, it produces a *duration* (Timedelta), which is a fundamentally different type.
-- A float (days)
-  > The result is a \`Timedelta\` object, not a plain float; you must explicitly call \`.dt.days\` or \`.dt.total_seconds()\` to extract a numeric value in a specific unit.
 - [o] A \`Timedelta\`, a duration value that you can convert to days, seconds, etc. via \`.dt.days\`, \`.dt.total_seconds()\`, etc.
   > Always be explicit about the unit when converting Timedeltas to floats.
 - An integer
   > The result is a \`Timedelta\` type, not a plain integer; integers have no inherent time unit, so Pandas preserves the duration type until you explicitly extract a unit.
+- A float (days)
+  > The result is a \`Timedelta\` object, not a plain float; you must explicitly call \`.dt.days\` or \`.dt.total_seconds()\` to extract a numeric value in a specific unit.
 
 The Timedelta type keeps you safe, it would be much worse if Pandas guessed at days vs hours vs seconds.`}
 />

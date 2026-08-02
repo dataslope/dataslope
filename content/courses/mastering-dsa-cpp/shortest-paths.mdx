@@ -493,14 +493,14 @@ int main() {
 <MultipleChoice
   markdown={`Why does Dijkstra's algorithm require non-negative edge weights?
 
-- It uses recursion, which cannot handle negative numbers
-  > Dijkstra is usually iterative, and C++ can store negative integers.
+- Weighted graphs are always acyclic
+  > Weighted graphs may contain cycles.
 - [o] A finalized smallest distance could later be improved by a negative edge
   > Negative edges break the greedy guarantee.
 - Priority queues cannot store negative values
   > Priority queues can store negative values just fine.
-- Weighted graphs are always acyclic
-  > Weighted graphs may contain cycles.
+- It uses recursion, which cannot handle negative numbers
+  > Dijkstra is usually iterative, and C++ can store negative integers.
 
 Use Bellman-Ford when negative edges are allowed.`}
 />
@@ -508,12 +508,12 @@ Use Bellman-Ford when negative edges are allowed.`}
 <MultipleChoice
   markdown={`What is the usual time complexity of Dijkstra with an adjacency list and binary heap?
 
-- O(V²E)
-  > This is far larger than the standard heap implementation.
-- O(log V)
-  > A single heap operation is logarithmic, but the whole algorithm processes vertices and edges.
 - [o] O((V + E) log V)
   > Heap operations occur as distances are pushed and popped while edges are scanned.
+- O(log V)
+  > A single heap operation is logarithmic, but the whole algorithm processes vertices and edges.
+- O(V²E)
+  > This is far larger than the standard heap implementation.
 - O(1)
   > Shortest paths require examining graph structure.
 
@@ -523,14 +523,14 @@ The exact bound is often written O(E log V) for connected sparse graphs, but O((
 <MultipleChoice
   markdown={`Why do we use a min-heap for Dijkstra instead of a max-heap?
 
+- To store the graph itself
+  > The graph is stored in an adjacency list; the heap stores frontier states.
 - To process the largest vertex id first
   > Vertex id is not the priority.
 - [o] To always expand the currently smallest known distance
   > That is Dijkstra's greedy step.
 - To make all edges positive
   > A heap does not change edge weights.
-- To store the graph itself
-  > The graph is stored in an adjacency list; the heap stores frontier states.
 
 C++ \`priority_queue\` is a max-heap by default, so use \`greater<>\` for a min-heap.`}
 />

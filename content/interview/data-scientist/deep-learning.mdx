@@ -253,10 +253,10 @@ optimizer.step()                 # gradient-descent update
   > Speed is not the issue; the model's *expressiveness* is fundamentally limited.
 - [o] A composition of linear maps is itself linear, so the whole stack collapses to a single linear layer.
   > Without a non-linearity between them, N linear layers equal one linear layer and can only model linear relationships.
-- Because gradients would always explode.
-  > Gradient issues are separate; the core problem is that no non-linearity means no added expressive power.
 - It would work fine and is common practice.
-  > It is not, precisely because the network would have no more capacity than linear regression.`}
+  > It is not, precisely because the network would have no more capacity than linear regression.
+- Because gradients would always explode.
+  > Gradient issues are separate; the core problem is that no non-linearity means no added expressive power.`}
 />
 
 <MultipleChoice
@@ -264,10 +264,10 @@ optimizer.step()                 # gradient-descent update
 
 - Exploding gradients, because sigmoid outputs are unbounded.
   > Sigmoid outputs are bounded in (0, 1); it is associated with the opposite problem.
-- [o] Vanishing gradients, because the sigmoid saturates and its derivative shrinks toward zero in the tails.
-  > The sigmoid derivative peaks at 0.25 and approaches 0 at the tails, so gradients shrink multiplicatively through deep stacks.
 - Overfitting, because sigmoids memorize the training set.
   > Overfitting is about capacity and regularization, not the activation's saturation behavior.
+- [o] Vanishing gradients, because the sigmoid saturates and its derivative shrinks toward zero in the tails.
+  > The sigmoid derivative peaks at 0.25 and approaches 0 at the tails, so gradients shrink multiplicatively through deep stacks.
 - Nothing; sigmoid is the preferred hidden activation for deep nets.
   > ReLU-family activations are preferred for hidden layers precisely to avoid sigmoid's vanishing gradients.`}
 />
@@ -275,14 +275,14 @@ optimizer.step()                 # gradient-descent update
 <MultipleChoice
   markdown={`You are choosing an architecture to model long-range dependencies in text and want efficient parallel training. Which fits best?
 
-- A plain RNN, because it processes sequences.
-  > RNNs are sequential (hard to parallelize) and struggle to retain long-range context.
+- Logistic regression, because it is simplest.
+  > A linear model cannot capture the sequential, contextual structure of language at all.
 - A CNN, because convolutions are fast.
   > CNNs excel at local grid patterns; their receptive field for long-range text dependencies is limited without many layers.
+- A plain RNN, because it processes sequences.
+  > RNNs are sequential (hard to parallelize) and struggle to retain long-range context.
 - [o] A transformer, because self-attention relates all positions in parallel and captures long-range dependencies.
-  > Self-attention computes pairwise interactions across the whole sequence at once, ideal for long-range context and parallel hardware.
-- Logistic regression, because it is simplest.
-  > A linear model cannot capture the sequential, contextual structure of language at all.`}
+  > Self-attention computes pairwise interactions across the whole sequence at once, ideal for long-range context and parallel hardware.`}
 />
 
 ## Go deeper

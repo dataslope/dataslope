@@ -336,14 +336,14 @@ int main() {
 <MultipleChoice
   markdown={`What does the \`virtual\` keyword on a member function do?
 
-- It marks the function as faster to call.
-  > Virtual functions are slightly *slower* due to the indirect call.
-- [o] It makes the function dispatched at runtime through the vtable, so calls via a base pointer/reference run the most-derived override.
-  > This is the mechanism for runtime polymorphism.
+- It is required for any inherited function.
+  > Inherited non-virtual functions work fine; they just don't dispatch dynamically.
 - It hides the function from derived classes.
   > That is what \`private\` does.
-- It is required for any inherited function.
-  > Inherited non-virtual functions work fine; they just don't dispatch dynamically.`}
+- [o] It makes the function dispatched at runtime through the vtable, so calls via a base pointer/reference run the most-derived override.
+  > This is the mechanism for runtime polymorphism.
+- It marks the function as faster to call.
+  > Virtual functions are slightly *slower* due to the indirect call.`}
 />
 
 <MultipleChoice
@@ -351,12 +351,12 @@ int main() {
 
 - The compiler refuses to compile otherwise.
   > It only warns in some configurations.
-- It makes destruction faster.
-  > It is slightly slower.
+- It is purely stylistic.
+  > It has real semantic consequences.
 - [o] So that \`delete\` through a base-class pointer also calls the derived destructor and releases derived-class resources; otherwise you get a partial cleanup which is undefined behavior.
   > The virtual destructor ensures the full chain of destructors runs.
-- It is purely stylistic.
-  > It has real semantic consequences.`}
+- It makes destruction faster.
+  > It is slightly slower.`}
 />
 
 Next: how to *own* resources properly, the RAII pattern that

@@ -144,14 +144,14 @@ decided by looking at the row being written.
 <MultipleChoice
   markdown={`Which business rule is a natural fit for a \`CHECK\` constraint?
 
-- Every order must reference an existing customer.
-  > That is a foreign key rule because it depends on another table.
-- [o] A product price must be greater than or equal to zero.
-  > This rule can be checked from the product row itself, so CHECK is a good fit.
-- Every email must be different from every other email.
-  > That is a uniqueness rule, handled by UNIQUE.
 - Every row must have a primary key.
   > Primary key constraints provide row identity.
+- Every email must be different from every other email.
+  > That is a uniqueness rule, handled by UNIQUE.
+- [o] A product price must be greater than or equal to zero.
+  > This rule can be checked from the product row itself, so CHECK is a good fit.
+- Every order must reference an existing customer.
+  > That is a foreign key rule because it depends on another table.
 
 CHECK is best for row-level domain rules that evaluate to true or false.`}
 />
@@ -251,10 +251,10 @@ instead of accepting the defaults.
   > CHECK does not fill in values; DEFAULT handles omitted values.
 - [o] NOT NULL requires the value to exist, and CHECK requires the existing value to be valid.
   > The two constraints protect different parts of the rule: presence and allowed range.
-- NOT NULL prevents duplicate prices.
-  > Duplicate prevention is handled by UNIQUE.
 - CHECK makes the column a primary key.
   > CHECK does not identify rows; it only tests a condition.
+- NOT NULL prevents duplicate prices.
+  > Duplicate prevention is handled by UNIQUE.
 
 Required domain values often need both presence and validity rules.`}
 />
@@ -264,14 +264,14 @@ Required domain values often need both presence and validity rules.`}
 <MultipleChoice
   markdown={`What does a \`CHECK\` constraint do?
 
-- It checks whether a query returned at least one row.
-  > CHECK constraints are part of table definitions and run during writes.
+- It checks whether the database has a backup.
+  > Backups are operational; CHECK constraints protect row validity.
 - [o] It requires a boolean expression to be true for each row being inserted or updated.
   > PostgreSQL rejects the write when the CHECK expression fails.
 - It checks spelling in text columns.
   > CHECK evaluates SQL expressions; it is not a spellchecker.
-- It checks whether the database has a backup.
-  > Backups are operational; CHECK constraints protect row validity.
+- It checks whether a query returned at least one row.
+  > CHECK constraints are part of table definitions and run during writes.
 
 CHECK constraints enforce row-level expressions in the schema.`}
 />
@@ -279,14 +279,14 @@ CHECK constraints enforce row-level expressions in the schema.`}
 <MultipleChoice
   markdown={`Which SQL fragment best enforces that \`status\` is one of three allowed values?
 
+- \`status TEXT REFERENCES status\`
+  > This is not a complete foreign key definition and is not the simplest form for this small fixed list.
 - \`status TEXT UNIQUE\`
   > UNIQUE would prevent two rows from sharing the same status, which is not the goal.
 - \`status TEXT DEFAULT 'draft'\`
   > DEFAULT supplies an omitted value but does not reject other bad statuses.
 - [o] \`status TEXT CHECK (status IN ('draft', 'active', 'archived'))\`
   > The CHECK expression limits the column to the allowed set.
-- \`status TEXT REFERENCES status\`
-  > This is not a complete foreign key definition and is not the simplest form for this small fixed list.
 
 A CHECK with IN is a common way to encode a small allowed set.`}
 />
@@ -294,14 +294,14 @@ A CHECK with IN is a common way to encode a small allowed set.`}
 <MultipleChoice
   markdown={`A rule says \`end_date\` must be after \`start_date\` in the same row. Which constraint type fits best?
 
-- DEFAULT.
-  > DEFAULT chooses omitted values; it does not compare dates.
-- UNIQUE.
-  > UNIQUE prevents duplicates, not backwards date ranges.
 - [o] CHECK.
   > CHECK can compare columns in the same row with an expression like \`end_date > start_date\`.
 - FOREIGN KEY.
   > A foreign key checks references between tables, not two columns in one row.
+- DEFAULT.
+  > DEFAULT chooses omitted values; it does not compare dates.
+- UNIQUE.
+  > UNIQUE prevents duplicates, not backwards date ranges.
 
 CHECK is the row-level expression constraint.`}
 />

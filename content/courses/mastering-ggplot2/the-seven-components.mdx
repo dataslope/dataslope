@@ -131,14 +131,14 @@ practice. Take your time with these.
 <MultipleChoice
   markdown={`Which component decides *that one column controls the color of the marks* (as opposed to deciding *which actual colors are used*)?
 
-- The geometry.
-  > The geometry chooses the *kind of mark* (point, line, bar), not which variable controls color.
 - [o] The aesthetic mapping.
   > A mapping connects a column (e.g. \`drv\`) to a visual property (e.g. color). *Which* colors result is then handled by a scale.
 - The theme.
   > The theme styles non-data elements; it does not bind variables to visual properties.
 - The coordinate system.
   > Coordinates place marks in space; they do not assign variables to color.
+- The geometry.
+  > The geometry chooses the *kind of mark* (point, line, bar), not which variable controls color.
 
 The *mapping* says "this column controls color." The *scale* later
 decides which specific colors that becomes, two different components
@@ -148,14 +148,14 @@ working together.`}
 <MultipleChoice
   markdown={`A histogram needs to **bin** a continuous variable and **count** how many values fall in each bin before any bars can be drawn. Which component is responsible for that binning-and-counting step?
 
-- The geometry.
-  > The geometry draws the bars, but the binning and counting happen in a separate step.
-- The scale.
-  > Scales translate data values to visual values; they do not bin or count.
 - [o] The statistic.
   > A statistic transforms the data before drawing, here, binning the values and counting them per bin.
+- The scale.
+  > Scales translate data values to visual values; they do not bin or count.
 - The facet.
   > Facets split data into panels; they do not summarize values within a panel.
+- The geometry.
+  > The geometry draws the bars, but the binning and counting happen in a separate step.
 
 This separation is why ggplot2 is powerful: the same bar *geometry*
 can be paired with a counting *statistic* (histogram) or with raw
@@ -165,14 +165,14 @@ values (a plain bar chart of given heights).`}
 <MultipleChoice
   markdown={`Why can a minimal ggplot often be written as just data + one mapping + one geometry, with nothing else specified?
 
-- ggplot2 cannot use scales, coordinates, or themes unless you import extra packages.
-  > Those components are always available; they are just optional to write.
-- Those other components do nothing useful.
-  > They are essential, they are simply applied *by default* when unspecified.
-- [o] ggplot2 supplies sensible defaults for the unspecified components (a default scale, Cartesian coordinates, a default theme).
-  > You only write the components you want to change; the rest take defaults.
 - Minimal plots secretly disable the other components.
   > The components are still active; they just use their default settings.
+- Those other components do nothing useful.
+  > They are essential, they are simply applied *by default* when unspecified.
+- ggplot2 cannot use scales, coordinates, or themes unless you import extra packages.
+  > Those components are always available; they are just optional to write.
+- [o] ggplot2 supplies sensible defaults for the unspecified components (a default scale, Cartesian coordinates, a default theme).
+  > You only write the components you want to change; the rest take defaults.
 
 Defaults are why the grammar feels light in practice: you describe
 only the parts that differ from the defaults.`}

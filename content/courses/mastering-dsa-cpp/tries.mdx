@@ -532,21 +532,21 @@ int main() {
 
 <MultipleChoice markdown={`What is the time complexity of searching for a word of length L in a trie?
 
-- O(1) always
-  > Each character must be followed.
 - [o] O(L)
   > One edge is followed per character.
 - O(n log n)
   > The number of stored words is not directly multiplied this way.
+- O(1) always
+  > Each character must be followed.
 - O(26 to the power L)
   > Search follows one path, not all possible paths.`} />
 
 <MultipleChoice markdown={`When can a trie beat a hash set of strings?
 
-- [o] When many prefix queries such as starts-with or autocomplete are needed.
-  > Prefix navigation is the trie specialty.
 - When memory must always be minimized.
   > Tries often use more memory because of child links.
+- [o] When many prefix queries such as starts-with or autocomplete are needed.
+  > Prefix navigation is the trie specialty.
 - When only exact membership is needed and no prefixes matter.
   > A hash set is usually simpler for exact membership only.
 - When strings cannot share prefixes.
@@ -554,11 +554,11 @@ int main() {
 
 <MultipleChoice markdown={`What does a node in a trie represent?
 
+- Always exactly one complete word
+  > Internal nodes can be prefixes for many words and may or may not end a word.
 - A whole independent hash table of all words
   > A node may store child links, but it represents a prefix position.
 - [o] A prefix formed by the path from the root to that node
   > The end flag says whether that prefix is also a complete word.
-- Always exactly one complete word
-  > Internal nodes can be prefixes for many words and may or may not end a word.
 - The sorted rank of a string
   > Tries are organized by characters, not by sorted rank.`} />

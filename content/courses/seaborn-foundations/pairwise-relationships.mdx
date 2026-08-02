@@ -109,14 +109,14 @@ This is exploratory data analysis at its most efficient.
 <MultipleChoice
   markdown={`In a \`pairplot\`, what is drawn on the **diagonal** of the grid?
 
+- Nothing, the diagonal cells are left blank.
+  > The diagonal is used, just not for a scatter. It carries each variable's univariate distribution.
 - A bivariate scatter of two different numeric columns.
   > The *off-diagonal* cells are the bivariate scatters. The diagonal compares a column with itself.
 - [o] Each variable's own univariate distribution (a histogram by default).
   > A variable plotted against itself would be a useless straight line, so Seaborn shows that variable's distribution instead, and with \`hue\`, one distribution per group.
 - A correlation coefficient printed as a number.
   > \`pairplot\` draws plots, not annotated correlation values; a numeric correlation grid is the job of a heatmap of \`df.corr()\`.
-- Nothing, the diagonal cells are left blank.
-  > The diagonal is used, just not for a scatter. It carries each variable's univariate distribution.
 
 The diagonal is where a scatter would be meaningless, so it's repurposed to
 show how each single variable is distributed.`}
@@ -220,14 +220,14 @@ Two failure modes, two fixes:
   markdown={`You call \`pairplot\` on a DataFrame with **12 numeric columns** and the
 result is an unreadable wall of tiny panels. What is the most direct fix?
 
-- Increase the figure \`height\` so each panel is bigger.
-  > A bigger figure still contains 12×12 = 144 panels; it just makes a larger wall. You need *fewer* panels, not a bigger canvas.
 - [o] Pass \`vars=[...]\` with the handful of columns you actually care about.
   > A pair plot grows as the square of the column count, so restricting to a few columns with \`vars=\` is the direct way to cut the panel count down to something readable.
-- Map every column to \`hue\` at once.
-  > \`hue\` takes a single categorical column and adds color; it does nothing to reduce the number of panels.
 - Set \`kind="line"\`.
   > \`pairplot\` shows pairwise scatters and diagonal distributions; there's no line mode that would help here, and lines wouldn't make 144 panels readable.
+- Map every column to \`hue\` at once.
+  > \`hue\` takes a single categorical column and adds color; it does nothing to reduce the number of panels.
+- Increase the figure \`height\` so each panel is bigger.
+  > A bigger figure still contains 12×12 = 144 panels; it just makes a larger wall. You need *fewer* panels, not a bigger canvas.
 
 Because the grid is \`n × n\`, the lever that matters most for readability is
 reducing \`n\`, that's exactly what \`vars=\` does.`}
@@ -344,12 +344,12 @@ g = sns.pairplot(
 
 - A single scatter plot of the two most correlated columns.
   > A pair plot is a whole *matrix* of scatters, not one auto-selected pair.
-- [o] A scatterplot matrix, every numeric column against every other, with each variable's distribution on the diagonal.
-  > Off-diagonal cells are bivariate scatters of every column pair, and the diagonal carries each variable's univariate distribution; together they give an at-a-glance view of the whole dataset.
-- A correlation heatmap of the numeric columns.
-  > A heatmap shows correlation *values* as colored cells; a pair plot shows the actual scattered points, which reveal shape, clusters, and outliers a single number can't.
 - A bar chart of each column's mean.
   > Pair plots compare pairs of variables and show distributions, not category means.
+- A correlation heatmap of the numeric columns.
+  > A heatmap shows correlation *values* as colored cells; a pair plot shows the actual scattered points, which reveal shape, clusters, and outliers a single number can't.
+- [o] A scatterplot matrix, every numeric column against every other, with each variable's distribution on the diagonal.
+  > Off-diagonal cells are bivariate scatters of every column pair, and the diagonal carries each variable's univariate distribution; together they give an at-a-glance view of the whole dataset.
 
 The pair plot's identity is the scatterplot matrix plus diagonal
 distributions, the fastest broad look at a numeric table.`}
@@ -359,12 +359,12 @@ distributions, the fastest broad look at a numeric table.`}
   markdown={`Adding \`hue="species"\` to \`sns.pairplot(penguins, ...)\` changes the plot
 how?
 
+- [o] It colors every scatter point by its group and splits each diagonal into one distribution per group.
+  > Mapping a categorical column to \`hue\` recolors all panels by group and turns each diagonal into per-group distributions, so cluster separation and group spreads become visible at once.
 - It removes the diagonal distributions to make room for a legend.
   > The diagonal stays; it actually becomes *more* informative, splitting into one distribution per group.
 - It restricts the grid to only the \`species\` column.
   > \`hue\` adds color information; it does not choose which columns appear (that's \`vars=\`).
-- [o] It colors every scatter point by its group and splits each diagonal into one distribution per group.
-  > Mapping a categorical column to \`hue\` recolors all panels by group and turns each diagonal into per-group distributions, so cluster separation and group spreads become visible at once.
 - It converts the scatter panels into line plots.
   > \`hue\` only controls color grouping; the off-diagonal panels remain scatter plots.
 
@@ -375,14 +375,14 @@ seeing how groups separate.`}
 <MultipleChoice
   markdown={`What is the practical difference between \`pairplot\` and \`PairGrid\`?
 
-- They are identical; \`PairGrid\` is just an alias.
-  > They're related but not the same, one is a ready-made wrapper, the other a build-it-yourself engine.
-- \`PairGrid\` only works for two columns at a time.
-  > \`PairGrid\` handles the full square grid just like \`pairplot\`; it simply leaves the drawing up to you.
-- [o] \`pairplot\` is a high-level wrapper with sensible defaults; \`PairGrid\` is the lower-level engine where you map your own functions onto the diagonal and off-diagonal cells.
-  > \`pairplot\` decides what to draw for you, while \`PairGrid\` sets up the empty grid and lets you call \`map_diag\`, \`map_offdiag\` (or \`map_upper\`/\`map_lower\`) with any plotting function for full control.
 - \`pairplot\` cannot show \`hue\`, but \`PairGrid\` can.
   > \`pairplot\` supports \`hue\` directly; the real distinction is the level of control, not whether color grouping is available.
+- \`PairGrid\` only works for two columns at a time.
+  > \`PairGrid\` handles the full square grid just like \`pairplot\`; it simply leaves the drawing up to you.
+- They are identical; \`PairGrid\` is just an alias.
+  > They're related but not the same, one is a ready-made wrapper, the other a build-it-yourself engine.
+- [o] \`pairplot\` is a high-level wrapper with sensible defaults; \`PairGrid\` is the lower-level engine where you map your own functions onto the diagonal and off-diagonal cells.
+  > \`pairplot\` decides what to draw for you, while \`PairGrid\` sets up the empty grid and lets you call \`map_diag\`, \`map_offdiag\` (or \`map_upper\`/\`map_lower\`) with any plotting function for full control.
 
 Use \`pairplot\` for a fast default and \`PairGrid\` when you need to customize
 what each region of the matrix draws.`}

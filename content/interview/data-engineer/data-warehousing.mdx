@@ -209,40 +209,40 @@ warehouse reliability on lake-cost open storage.
 <MultipleChoice
   markdown={`A 5 TB table has 60 columns. A dashboard query reads just 3 of them and aggregates. Why is a columnar format like Parquet so much cheaper here than CSV?
 
-- Parquet stores fewer rows than CSV.
-  > It stores the same rows; the win is which **columns** get read, not the row count.
+- Parquet keeps the whole table in memory.
+  > Neither format requires that; the advantage is reduced I/O from columnar reads, not caching.
 - [o] Columnar storage reads only the 3 referenced columns and skips the other 57, and compresses them better.
   > Column pruning plus per-column compression means the query scans a tiny fraction of the bytes CSV would.
 - CSV can't store 60 columns.
   > CSV handles any number of columns; it's just row-oriented and untyped, so it must scan everything.
-- Parquet keeps the whole table in memory.
-  > Neither format requires that; the advantage is reduced I/O from columnar reads, not caching.`}
+- Parquet stores fewer rows than CSV.
+  > It stores the same rows; the win is which **columns** get read, not the row count.`}
 />
 
 <MultipleChoice
   markdown={`Your team streams messages through Kafka and also runs nightly analytical scans over the archived data. Which storage choice fits each?
 
-- Parquet for the Kafka messages, Avro for the analytics.
-  > Backwards: row-based Avro suits streaming records, columnar Parquet suits analytical scans.
+- ORC for the Kafka messages, CSV for the analytics.
+  > ORC is columnar (wrong for per-record streaming) and CSV is a poor analytical format.
 - [o] Avro (row-based) for the Kafka messages, Parquet (columnar) for the analytical scans.
   > Avro's self-describing rows and schema evolution fit streaming; Parquet's columnar layout fits large scans.
 - CSV for both, for simplicity.
   > CSV is untyped, uncompressed, and row-oriented, poor for both high-throughput streaming and analytical scans.
-- ORC for the Kafka messages, CSV for the analytics.
-  > ORC is columnar (wrong for per-record streaming) and CSV is a poor analytical format.`}
+- Parquet for the Kafka messages, Avro for the analytics.
+  > Backwards: row-based Avro suits streaming records, columnar Parquet suits analytical scans.`}
 />
 
 <MultipleChoice
   markdown={`A table is partitioned by \`event_date\`, but queries filtering \`WHERE YEAR(event_date) = 2024\` still scan every partition. Why?
 
-- Partition pruning only works on integer columns.
-  > Date partition keys prune fine; the problem is how the filter is written.
-- [o] Wrapping the partition column in a function (\`YEAR(...)\`) prevents the engine from matching the filter to partitions.
-  > The optimizer can't map \`YEAR(event_date)\` back to raw partition values, so it can't prune; filter on the raw column with a range instead.
 - The table has too few partitions to prune.
   > Pruning works regardless of count; the function on the column is what defeats it.
+- Partition pruning only works on integer columns.
+  > Date partition keys prune fine; the problem is how the filter is written.
 - \`YEAR()\` is not a valid SQL function.
-  > It's valid; the issue is that applying it to the partition key blocks pruning.`}
+  > It's valid; the issue is that applying it to the partition key blocks pruning.
+- [o] Wrapping the partition column in a function (\`YEAR(...)\`) prevents the engine from matching the filter to partitions.
+  > The optimizer can't map \`YEAR(event_date)\` back to raw partition values, so it can't prune; filter on the raw column with a range instead.`}
 />
 
 ## Challenges

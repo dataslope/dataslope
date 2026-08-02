@@ -567,70 +567,70 @@ export const CONCEPT_QUESTIONS: string[] = [
   // SQL, WHERE vs HAVING
   `In SQL, which clause filters rows **after** aggregation, so it can use the result of a function like \`COUNT()\` or \`SUM()\`?
 
-- The \`WHERE\` clause
-  > \`WHERE\` filters individual rows *before* they are grouped, so it cannot reference an aggregate such as \`COUNT(*)\`.
 - [o] The \`HAVING\` clause
   > \`HAVING\` runs after \`GROUP BY\` collapses rows into groups, so a condition like \`HAVING COUNT(*) > 5\` works on the aggregated results.
-- The \`GROUP BY\` clause
-  > \`GROUP BY\` defines how rows are collected into groups; it does not filter them.
 - The \`ORDER BY\` clause
   > \`ORDER BY\` only sorts the final result set and plays no part in filtering.
+- The \`GROUP BY\` clause
+  > \`GROUP BY\` defines how rows are collected into groups; it does not filter them.
+- The \`WHERE\` clause
+  > \`WHERE\` filters individual rows *before* they are grouped, so it cannot reference an aggregate such as \`COUNT(*)\`.
 
 \`WHERE\` filters raw rows before grouping, while \`HAVING\` filters the grouped results afterward. That ordering is why an aggregate condition like \`COUNT(*) > 5\` has to live in \`HAVING\`, not \`WHERE\`.`,
 
   // Python / pandas, column selection returns a Series
   `In pandas, what does selecting a single column with \`df["age"]\` return?
 
-- [o] A \`Series\`
-  > A single-column selection returns a one-dimensional \`Series\` whose index matches the DataFrame's rows.
 - A \`DataFrame\`
   > Passing a *list* of columns, like \`df[["age"]]\`, returns a DataFrame; a bare string returns a Series.
-- A plain Python \`list\`
-  > pandas keeps the data in its own labelled structure, so you still get index labels and vectorized operations, not a built-in list.
+- [o] A \`Series\`
+  > A single-column selection returns a one-dimensional \`Series\` whose index matches the DataFrame's rows.
 - A NumPy \`ndarray\`
   > The values are backed by NumPy, but the object handed back is a \`Series\`; call \`.to_numpy()\` to drop down to a raw array.
+- A plain Python \`list\`
+  > pandas keeps the data in its own labelled structure, so you still get index labels and vectorized operations, not a built-in list.
 
 Indexing a DataFrame with a single column name gives a \`Series\`; indexing with a list of names gives a \`DataFrame\`. Keeping that distinction straight avoids a lot of shape-related bugs.`,
 
   // Machine learning, purpose of a train/test split
   `Why split a dataset into separate **training** and **test** sets before fitting a model?
 
+- To remove the need to tune the model
+  > A test set measures performance; it does not replace choosing hyperparameters or features.
 - To give the model more data to memorize
   > Holding data back *reduces* the training set; the aim is honest evaluation, not memorization.
 - [o] To estimate how well the model generalizes to unseen data
   > Scoring on data the model never trained on approximates its performance in production, where every input is new.
 - To make training run faster
   > Any speedup is incidental and is not the reason to hold out a test set.
-- To remove the need to tune the model
-  > A test set measures performance; it does not replace choosing hyperparameters or features.
 
 A held-out test set stands in for future, unseen inputs, so its score estimates real-world performance and exposes overfitting when training accuracy is high but test accuracy is low.`,
 
   // Web development, the CSS box model
   `In the CSS box model, which property adds space **inside** an element, between its content and its border?
 
+- \`gap\`
+  > \`gap\` sets spacing *between* flex or grid children, not inside a single element.
 - \`margin\`
   > \`margin\` adds space *outside* the border, pushing neighbouring elements away.
 - [o] \`padding\`
   > \`padding\` is the space between the content and the border, inside the element's own box.
 - \`border\`
   > \`border\` is the line drawn at the edge itself, not the space around the content.
-- \`gap\`
-  > \`gap\` sets spacing *between* flex or grid children, not inside a single element.
 
 Padding sits inside the border; margin sits outside it. A quick mnemonic: padding pads the content within the box, while margin marks the distance to everything else.`,
 
   // NLP, tokenization
   `In natural language processing, what does **tokenization** do?
 
-- [o] Splits text into smaller units such as words or subwords
-  > Tokenization breaks a raw string into the discrete pieces (tokens) that later steps like counting, embedding, or tagging operate on.
 - Reduces every word to its dictionary root
   > That describes stemming or lemmatization, which runs *after* the text has been tokenized.
 - Removes common words like "the" and "is"
   > Dropping high-frequency words is stop-word removal, a separate optional cleaning step.
 - Converts characters to lowercase
   > Lowercasing is a normalization step; it changes casing but does not divide the text into units.
+- [o] Splits text into smaller units such as words or subwords
+  > Tokenization breaks a raw string into the discrete pieces (tokens) that later steps like counting, embedding, or tagging operate on.
 
 Tokenization is usually the first step in an NLP pipeline: it turns a continuous string into a sequence of tokens that models and counting methods can work with.`,
 ];
