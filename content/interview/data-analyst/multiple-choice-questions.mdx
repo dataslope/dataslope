@@ -23,7 +23,7 @@ says otherwise.
 <MultipleChoice
   markdown={`A query uses \`WHERE\`, \`GROUP BY\`, \`HAVING\`, \`SELECT\`, and \`ORDER BY\`. Which clause is evaluated **last**?
 
-- \`SELECT\`
+- \`SELECT\`, which names the output columns.
   > \`SELECT\` is evaluated after \`HAVING\` but before the result set is sorted, which is why a column alias defined in \`SELECT\` is usable in \`ORDER BY\` but not in \`WHERE\`.
 - [o] \`ORDER BY\`
   > Sorting happens once the rows to return are known: \`FROM\` → \`WHERE\` → \`GROUP BY\` → \`HAVING\` → \`SELECT\` → \`ORDER BY\` → \`LIMIT\`.
@@ -79,7 +79,7 @@ says otherwise.
   > \`UNION\` deduplicates, which costs a sort or hash pass over the combined result.
 - [o] \`UNION ALL\`
   > \`UNION ALL\` concatenates both inputs untouched, which also makes it the faster of the two because it skips deduplication.
-- \`INTERSECT\`
+- \`INTERSECT\`, which keeps rows found in both.
   > \`INTERSECT\` returns the distinct rows present in both inputs, so duplicates are collapsed.
 - \`EXCEPT\`
   > \`EXCEPT\` returns the distinct rows of the first input that are absent from the second.`}
@@ -94,7 +94,7 @@ says otherwise.
   > Each output row represents one region, which may span many categories, so the engine has no single \`category\` value to show. Group by it as well, or aggregate it (\`MIN(category)\`, \`STRING_AGG(...)\`).
 - \`GROUP BY\` requires at least two columns.
   > Grouping by a single column is perfectly valid.
-- \`amount\` must be listed in the \`GROUP BY\` too.
+- \`amount\` has to be listed in the \`GROUP BY\` as well.
   > \`amount\` is inside an aggregate, which is exactly how a measure should be handled.`}
 />
 
@@ -105,7 +105,7 @@ says otherwise.
   > A one-to-many join adds *rows*: the left row is repeated once per match, and each repeat contributes its \`amount\` again.
 - [o] It is inflated, because each order's \`amount\` is repeated once per item.
   > This is join fan-out. Aggregate the many-side back to the order grain first, in a CTE or subquery, and only then join. (\`SUM(DISTINCT o.amount)\` looks like a shortcut and is not one: it also collapses two genuinely different orders that happen to share an amount.)
-- It is understated, because unmatched orders are dropped.
+- It is understated, since unmatched orders get dropped.
   > An \`INNER JOIN\` does drop orders with no items, but the dominant and more dangerous effect here is duplication of the matched ones.
 - It returns \`NULL\`.
   > \`SUM\` skips \`NULL\`s and returns a number whenever at least one non-\`NULL\` value exists.`}
@@ -116,8 +116,8 @@ says otherwise.
 
 - The \`LEFT JOIN\` was silently rewritten as a \`RIGHT JOIN\`.
   > Engines do not swap join direction; the filter is what changed the result.
-- [o] The \`WHERE\` filter on the right table discards the \`NULL\`-padded rows, turning the \`LEFT JOIN\` into an inner join.
-  > Non-buyers arrive with \`o.status\` as \`NULL\`, and \`NULL = 'shipped'\` is not true. Move the condition into the \`ON\` clause to keep them.
+- [o] The \`WHERE\` filter discards the \`NULL\`-padded rows.
+  > That turns the \`LEFT JOIN\` into an inner join. Non-buyers arrive with \`o.status\` as \`NULL\`, and \`NULL = 'shipped'\` is not true. Move the condition into the \`ON\` clause to keep them.
 - \`LEFT JOIN\` cannot be used with a \`WHERE\` clause.
   > The combination is legal and common; the subtlety is only *which* table the filtered column belongs to.
 - The join key has duplicates.
@@ -129,9 +129,9 @@ says otherwise.
 
 - The sum of the three arguments.
   > Adding the arguments is what \`+\` does; \`COALESCE\` selects rather than combines.
-- [o] The first argument that is not \`NULL\`, reading left to right, or \`0\` if both columns are \`NULL\`.
-  > \`COALESCE\` walks its arguments in order and returns the first non-\`NULL\` one, which is the standard way to supply a fallback.
-- \`NULL\` whenever any argument is \`NULL\`.
+- [o] The first argument that is not \`NULL\`, left to right.
+  > So \`0\` if both columns are \`NULL\`. \`COALESCE\` walks its arguments in order and returns the first non-\`NULL\` one, which is the standard way to supply a fallback.
+- \`NULL\`, whenever any one argument is \`NULL\`.
   > That is the behavior of ordinary arithmetic on \`NULL\`, and the reason \`COALESCE\` exists.
 - The last argument, always.
   > The last argument acts as the default and is only reached when everything before it is \`NULL\`.`}
@@ -157,7 +157,7 @@ says otherwise.
   > That is \`COUNT(*)\`, which counts orders rather than customers.
 - [o] The number of different non-\`NULL\` customer ids that appear.
   > \`DISTINCT\` collapses repeats, and \`COUNT\` still ignores \`NULL\`, so a customer with 40 orders contributes exactly 1.
-- The number of orders that have a non-\`NULL\` customer id.
+- The number of orders carrying a non-\`NULL\` customer id.
   > That is \`COUNT(customer_id)\` without \`DISTINCT\`.
 - The number of customers in the \`customers\` table.
   > It can only see ids that actually appear in \`orders\`, so customers who never ordered are invisible to it.`}
@@ -166,7 +166,7 @@ says otherwise.
 <MultipleChoice
   markdown={`Which expression counts only the orders from the North region, in a query that is already grouped by month?
 
-- \`COUNT(region = 'North')\`
+- \`COUNT(region = 'North')\` over each group.
   > \`COUNT\` counts every non-\`NULL\` argument, and a boolean is non-\`NULL\` whether it is true or false, so this counts every row.
 - [o] \`SUM(CASE WHEN region = 'North' THEN 1 ELSE 0 END)\`
   > Conditional aggregation: the \`CASE\` contributes 1 for matching rows and 0 otherwise. \`COUNT(CASE WHEN region = 'North' THEN 1 END)\` works too, because the implicit \`ELSE NULL\` is skipped.
@@ -181,11 +181,11 @@ says otherwise.
 
 - The 10 rows that were inserted first.
   > Insertion order is not preserved or promised by the relational model.
-- [o] An arbitrary 10 rows, which may differ between runs of the same query.
+- [o] An arbitrary 10 rows, which may differ between runs.
   > Without \`ORDER BY\` there is no defined order, so the engine is free to return whichever 10 rows are cheapest. "Top 10" always needs an explicit sort.
 - The 10 rows with the smallest primary key.
   > Primary-key order is a plausible physical outcome on some engines, never a guarantee.
-- An error, because \`LIMIT\` requires \`ORDER BY\`.
+- An error, since \`LIMIT\` requires an \`ORDER BY\` to be present.
   > The combination is legal, which is exactly why the bug ships.`}
 />
 
@@ -194,8 +194,8 @@ says otherwise.
 
 - Nothing; the range covers all of January.
   > It covers the days but not the hours inside the last one.
-- [o] Everything after midnight on 31 January, because the bare date is read as \`2026-01-31 00:00:00\`.
-  > A whole final day is silently dropped. The safe pattern is a half-open range: \`>= '2026-01-01' AND < '2026-02-01'\`.
+- [o] Everything after midnight on 31 January.
+  > The bare date is read as \`2026-01-31 00:00:00\`. A whole final day is silently dropped. The safe pattern is a half-open range: \`>= '2026-01-01' AND < '2026-02-01'\`.
 - Rows from 1 January, because the lower bound is exclusive.
   > \`>=\` includes the boundary, so the first day is fine.
 - Rows where \`created_at\` is \`NULL\`, which should have been included.
@@ -209,7 +209,7 @@ says otherwise.
   > An empty string is a known value that happens to be empty, which is a different state from unknown.
 - [o] \`WHERE name IS NULL\`
   > \`IS NULL\` is the only predicate that tests for the unknown marker. If the source can produce both, \`name IS NULL OR name = ''\` covers them.
-- \`WHERE name = NULL\`
+- \`WHERE name = NULL\`, comparing against null.
   > This evaluates to \`NULL\` for every row and therefore matches nothing.
 - \`WHERE NOT name\`
   > Applying \`NOT\` to a text column is a type error on most engines.`}
@@ -220,8 +220,8 @@ says otherwise.
 
 - It materializes a permanent table you can query later.
   > A CTE lives only for the duration of the statement; a permanent table needs \`CREATE TABLE\`.
-- [o] A named, inline result set defined with \`WITH\`, which reads top-to-bottom and can be referenced more than once in the same query.
-  > The gain is readability and reuse. Whether it is materialized or inlined is an optimizer decision that varies by engine.
+- [o] A named, inline result set defined with \`WITH\`.
+  > It reads top-to-bottom and can be referenced more than once in the same query. The gain is readability and reuse. Whether it is materialized or inlined is an optimizer decision that varies by engine.
 - It always runs faster than the equivalent subquery.
   > Most engines treat the two the same, and a materialized CTE can occasionally be slower.
 - It lets you skip the \`GROUP BY\` clause.
@@ -233,8 +233,8 @@ says otherwise.
 
 - \`AVG\` rounds to the nearest whole number by design.
   > \`AVG\` returns the true mean; the rounding comes from the type it was given.
-- [o] \`rating\` is an integer column, so the division is integer division on some engines.
-  > Cast first: \`AVG(rating * 1.0)\` or \`AVG(CAST(rating AS DECIMAL))\`. The same trap turns a conversion rate into \`0\`.
+- [o] \`rating\` is an integer column.
+  > The division is therefore integer division on some engines. Cast first: \`AVG(rating * 1.0)\` or \`AVG(CAST(rating AS DECIMAL))\`. The same trap turns a conversion rate into \`0\`.
 - The column contains \`NULL\`s, which \`AVG\` counts as zero.
   > \`AVG\` skips \`NULL\`s entirely rather than treating them as zero.
 - \`AVG\` requires an \`ORDER BY\` to be accurate.
@@ -259,7 +259,7 @@ says otherwise.
 <MultipleChoice
   markdown={`What is the default window frame when \`OVER\` includes an \`ORDER BY\` but no explicit frame clause?
 
-- \`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\`
+- \`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\`.
   > Close, but the default is \`RANGE\`, not \`ROWS\`, and the difference shows up whenever the ordering column has ties.
 - [o] \`RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\`
   > With \`RANGE\`, "current row" means every peer sharing the same \`ORDER BY\` value, so tied rows all see the same running total.
@@ -272,7 +272,7 @@ says otherwise.
 <MultipleChoice
   markdown={`In \`LAG(revenue, 1) OVER (PARTITION BY region ORDER BY day)\`, what does the **first** row of each region return?
 
-- The last row's value, wrapping around the partition.
+- The last row's value, wrapping around to the partition start.
   > Window functions do not wrap; there is simply no preceding row.
 - [o] \`NULL\`, because there is no previous row in that partition.
   > Supply a third argument to substitute a default, e.g. \`LAG(revenue, 1, 0)\`.
@@ -298,7 +298,7 @@ says otherwise.
 <MultipleChoice
   markdown={`\`LAST_VALUE(price) OVER (PARTITION BY sku ORDER BY day)\` keeps returning the current row's price instead of the final one. What fixes it?
 
-- Swap \`ORDER BY day\` for \`ORDER BY day DESC\`.
+- Swap the \`ORDER BY day\` for \`ORDER BY day DESC\` instead.
   > Reversing the order makes it return the *earliest* price instead, trading one wrong answer for another.
 - [o] Add \`ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING\`.
   > The default frame ends at the current row, so "last value so far" is the current row. Widening the frame to the whole partition makes \`LAST_VALUE\` mean what it looks like it means.
@@ -311,7 +311,7 @@ says otherwise.
 <MultipleChoice
   markdown={`Which clause lets you filter directly on a window function's result, without wrapping the query in a subquery?
 
-- \`HAVING\`
+- \`HAVING\`, filtering after the grouping.
   > \`HAVING\` filters \`GROUP BY\` aggregates, and it runs before window functions are computed.
 - [o] \`QUALIFY\`
   > \`QUALIFY\` runs after window functions, so \`QUALIFY ROW_NUMBER() OVER (...) = 1\` works directly. It is available in DuckDB, Snowflake, BigQuery, and Teradata, though not in Postgres or MySQL.
@@ -328,7 +328,7 @@ says otherwise.
   > That spans 8 rows: the 7 preceding ones plus the current one.
 - [o] \`ROWS BETWEEN 6 PRECEDING AND CURRENT ROW\`
   > Six preceding rows plus the current row is a 7-row window, which is a 7-day average when the data has exactly one row per day.
-- \`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\`
+- \`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\`.
   > An unbounded start gives a cumulative average over all history rather than a fixed 7-day window.
 - \`ROWS BETWEEN 3 PRECEDING AND 3 FOLLOWING\`
   > This is a 7-row *centered* window, which peeks at future days. It smooths well for a retrospective chart but is not the trailing average usually meant.`}
@@ -339,9 +339,9 @@ says otherwise.
 
 - A \`GROUP BY\` and a \`HAVING\` clause.
   > Grouping is unrelated to recursion; a recursive CTE is defined by its self-reference.
-- [o] An anchor member that seeds the result, and a recursive member that references the CTE, combined with \`UNION ALL\`.
-  > The anchor runs once, then the recursive member re-runs against the previous iteration's rows until it returns none. A termination condition is what keeps it finite.
-- A window function and a frame clause.
+- [o] An anchor member and a recursive member, joined by \`UNION ALL\`.
+  > The anchor seeds the result; the recursive member references the CTE. The anchor runs once, then the recursive member re-runs against the previous iteration's rows until it returns none. A termination condition is what keeps it finite.
+- A window function together with a frame clause.
   > Window functions walk one result set; they cannot feed their own output back in.
 - Two separate CTEs joined together.
   > Joining two ordinary CTEs traverses exactly one level, which is what recursion exists to avoid hard-coding.`}
@@ -350,7 +350,7 @@ says otherwise.
 <MultipleChoice
   markdown={`What does \`SUM(amount) OVER (PARTITION BY region)\` return, with no \`ORDER BY\` inside the \`OVER\`?
 
-- A running total that resets at each region.
+- A running total that resets at every region boundary.
   > A running total requires an \`ORDER BY\`, which is what narrows the default frame to "up to the current row".
 - [o] The region's grand total, repeated on every row of that region.
   > With no \`ORDER BY\` the frame is the entire partition, which makes this the standard way to put a group total beside each row without a join.
@@ -365,11 +365,11 @@ says otherwise.
 
 - \`ORDER BY category, sales DESC LIMIT 3\`
   > \`LIMIT\` applies to the whole result, so this returns 3 rows in total rather than 3 per category.
-- [o] \`ROW_NUMBER() OVER (PARTITION BY category ORDER BY sales DESC)\` in a subquery, filtered to \`<= 3\` outside it.
-  > Numbering restarts inside each category, and the filter has to sit outside the window's own \`SELECT\` (or in \`QUALIFY\`, where it exists).
+- [o] \`ROW_NUMBER()\` partitioned by category, filtered to \`<= 3\`.
+  > The filter has to sit outside the window's own \`SELECT\`, or in \`QUALIFY\` where it exists. Numbering restarts inside each category, and the filter has to sit outside the window's own \`SELECT\` (or in \`QUALIFY\`, where it exists).
 - \`GROUP BY category HAVING COUNT(*) <= 3\`
   > This filters categories by how many products they have, and returns no product rows at all.
-- \`SELECT DISTINCT TOP 3 category, product\`
+- \`SELECT DISTINCT TOP 3 category, product\` from the table.
   > \`DISTINCT\` deduplicates; it has no notion of a per-group limit.`}
 />
 
@@ -378,8 +378,8 @@ says otherwise.
 
 - \`ROWS\` works only on integers; \`RANGE\` works on any type.
   > Both accept the same ordering types; the difference is in what a frame boundary means.
-- [o] \`ROWS\` counts physical rows; \`RANGE\` includes every row whose \`ORDER BY\` value ties with the boundary.
-  > On a column with duplicates the two give different answers, which is why an explicit \`ROWS\` frame is the safer default for a running total.
+- [o] \`ROWS\` counts rows; \`RANGE\` includes tied peers.
+  > Any row whose \`ORDER BY\` value ties with the boundary is in the \`RANGE\` frame. On a column with duplicates the two give different answers, which is why an explicit \`ROWS\` frame is the safer default for a running total.
 - \`RANGE\` is always faster because it scans fewer rows.
   > \`RANGE\` often costs more, since it has to identify the full set of peers.
 - They are synonyms kept for backwards compatibility.
@@ -404,8 +404,8 @@ says otherwise.
 
 - \`LAG\` cannot be used in an arithmetic expression.
   > It returns an ordinary value and composes freely.
-- [o] Those days have a \`NULL\` \`revenue\`, and any arithmetic involving \`NULL\` yields \`NULL\`.
-  > \`LAG\` returns the previous row's value faithfully, including when that value is missing. Wrap the operands in \`COALESCE\` if a gap should read as zero.
+- [o] Those days have a \`NULL\` \`revenue\`.
+  > Any arithmetic involving \`NULL\` yields \`NULL\`. \`LAG\` returns the previous row's value faithfully, including when that value is missing. Wrap the operands in \`COALESCE\` if a gap should read as zero.
 - The \`ORDER BY\` inside \`OVER\` is being ignored.
   > If it were, the differences would be wrong rather than missing.
 - \`LAG\` skips rows it has already returned.
@@ -415,9 +415,9 @@ says otherwise.
 <MultipleChoice
   markdown={`Which query keeps only the most recent row per \`customer_id\`?
 
-- \`SELECT DISTINCT customer_id, MAX(updated_at) FROM events\`
+- \`SELECT DISTINCT customer_id, MAX(updated_at) FROM events\`.
   > This returns the timestamp but discards every other column of the winning row.
-- [o] \`ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY updated_at DESC)\`, filtered to \`= 1\`.
+- [o] \`ROW_NUMBER()\` per customer, newest first, filtered to \`= 1\`.
   > The whole winning row survives intact. \`RANK\` would be the wrong choice here: ties would return several rows per customer.
 - \`GROUP BY customer_id ORDER BY updated_at DESC LIMIT 1\`
   > \`LIMIT 1\` applies to the entire result, leaving one row overall.
@@ -430,7 +430,7 @@ says otherwise.
 <MultipleChoice
   markdown={`A DataFrame has a default integer index \`0..9\`. How many rows do \`df.loc[0:2]\` and \`df.iloc[0:2]\` return, respectively?
 
-- 2 and 2.
+- 2 rows and 2 rows respectively.
   > \`iloc\` returns 2, but \`loc\` slices by *label* and includes the endpoint.
 - [o] 3 and 2.
   > \`loc[0:2]\` is label-based and inclusive on both ends, returning rows \`0, 1, 2\`; \`iloc[0:2]\` is positional and half-open like ordinary Python slicing, returning rows \`0, 1\`.
@@ -447,7 +447,7 @@ says otherwise.
   > \`agg\` collapses each group to one row, so it would have to be merged back on the key afterwards.
 - [o] \`transform\`
   > \`transform\` broadcasts the group result back to every original row, so \`df.groupby("region")["amount"].transform("mean")\` aligns directly as a new column.
-- \`filter\`
+- \`filter\`, applied to the groupby.
   > \`filter\` keeps or drops entire groups by a predicate; it computes no per-row value.
 - \`apply\`
   > \`apply\` can be coerced into doing it, but it is slower and its output shape depends on what the function returns.`}
@@ -458,8 +458,8 @@ says otherwise.
 
 - Only the \`customer_id\` values present in both frames.
   > That describes \`how="inner"\`, which is also the pandas default.
-- [o] Every row of \`orders\`, with \`NaN\` in the customer columns where no match exists.
-  > A left merge preserves the left frame's rows and cardinality, padding unmatched right-side columns with \`NaN\`.
+- [o] Every row of \`orders\`, matched or not.
+  > Unmatched customer columns come back as \`NaN\`. A left merge preserves the left frame's rows and cardinality, padding unmatched right-side columns with \`NaN\`.
 - Every row of \`customers\`, matched or not.
   > Keeping all of the right frame is \`how="right"\`.
 - Every row of both frames.
@@ -471,11 +471,11 @@ says otherwise.
 
 - Joins them side by side on the index.
   > Concatenating along the columns needs \`axis=1\`.
-- [o] Stacks them vertically, aligning on column names and keeping the original index values.
-  > The default is \`axis=0\`. Duplicate index labels are preserved, so \`ignore_index=True\` is usually wanted after a vertical stack.
+- [o] Stacks them vertically, aligning on column names.
+  > The original index values are kept, so \`ignore_index=True\` is usually wanted. The default is \`axis=0\`. Duplicate index labels are preserved, so \`ignore_index=True\` is usually wanted after a vertical stack.
 - Merges them on a shared key column.
   > Key-based joining is \`merge\`; \`concat\` glues frames together along an axis without matching keys.
-- Removes duplicate rows across the two frames.
+- Removes any duplicate rows across the two frames.
   > \`concat\` performs no deduplication; \`drop_duplicates\` is a separate step.`}
 />
 
@@ -484,8 +484,8 @@ says otherwise.
 
 - The comparison operator should be \`is\` rather than \`==\`.
   > \`is\` tests object identity and would not produce an element-wise boolean mask at all.
-- [o] Chained indexing may produce a copy, so the assignment can land on a temporary rather than on \`df\`.
-  > Write it as a single indexing operation: \`df.loc[df["region"] == "North", "amount"] = 0\`.
+- [o] Chained indexing may produce a copy, not a view.
+  > The assignment can then land on a temporary rather than on \`df\`. Write it as a single indexing operation: \`df.loc[df["region"] == "North", "amount"] = 0\`.
 - \`amount\` has the wrong dtype for assignment.
   > The warning is about *what object* is being written to, not about the column's type.
 - Boolean masks are read-only in pandas.
@@ -495,7 +495,7 @@ says otherwise.
 <MultipleChoice
   markdown={`What does a bare \`df.dropna()\` remove?
 
-- Every column that contains at least one \`NaN\`.
+- Every column containing at least one \`NaN\` value.
   > Dropping columns requires \`axis=1\`; the default axis is rows.
 - [o] Every row that contains at least one \`NaN\`, in any column.
   > The defaults are \`axis=0\` and \`how="any"\`. Use \`how="all"\` for rows that are entirely missing, or \`subset=[...]\` to restrict which columns count.
@@ -534,10 +534,10 @@ says otherwise.
 <MultipleChoice
   markdown={`\`df.pivot(index="store", columns="month", values="revenue")\` raises \`ValueError: Index contains duplicate entries\`. What is the pragmatic fix?
 
-- Sort the DataFrame before pivoting.
+- Sort the DataFrame before doing the pivot.
   > Ordering has no effect on whether a store-month pair appears more than once.
-- [o] Use \`pivot_table\`, which aggregates duplicates with a function such as \`sum\` or \`mean\`.
-  > \`pivot\` reshapes only when each index/column pair is unique. \`pivot_table\` accepts an \`aggfunc\`, which is what the duplicate rows need.
+- [o] Use \`pivot_table\`, which aggregates the duplicates.
+  > It takes an \`aggfunc\` such as \`sum\` or \`mean\`. \`pivot\` reshapes only when each index/column pair is unique. \`pivot_table\` accepts an \`aggfunc\`, which is what the duplicate rows need.
 - Drop the \`columns\` argument.
   > Without it there is nothing to spread across the columns, so the reshape no longer happens.
 - Reset the index first.
@@ -549,11 +549,11 @@ says otherwise.
 
 - Looping produces a different numerical result.
   > Both compute the same numbers; the difference is how long it takes.
-- [o] The vectorized form runs the loop in compiled C over a contiguous array instead of in the Python interpreter, typically 10–100x faster.
-  > It is also shorter and harder to get wrong. \`iterrows\` in particular also copies each row into a new Series.
+- [o] The loop runs in compiled C rather than the interpreter.
+  > Over a contiguous array, typically 10–100x faster, and \`iterrows\` also copies each row into a new Series. It is also shorter and harder to get wrong. \`iterrows\` in particular also copies each row into a new Series.
 - Looping is unavailable on a DataFrame.
   > \`iterrows\` and \`itertuples\` both exist; they are just the slow path.
-- Vectorized operations skip missing values automatically.
+- Vectorized operations skip the missing values automatically.
   > \`NaN\` propagates through arithmetic in both approaches.`}
 />
 
@@ -575,8 +575,8 @@ says otherwise.
 
 - The merge dropped unmatched orders.
   > A left merge never drops left rows, and dropping could not raise the count.
-- [o] The right frame has duplicate \`customer_id\` values, so some orders matched more than one row.
-  > A left merge preserves *rows*, not row count. Check with \`customers["customer_id"].duplicated().any()\`, or pass \`validate="m:1"\` to make pandas raise instead.
+- [o] The right frame has duplicate \`customer_id\` values.
+  > Some orders therefore matched more than one row. A left merge preserves *rows*, not row count. Check with \`customers["customer_id"].duplicated().any()\`, or pass \`validate="m:1"\` to make pandas raise instead.
 - The join key has a different dtype on each side.
   > A dtype mismatch causes rows to fail to match, which would leave the count unchanged with \`NaN\` columns.
 - \`how="left"\` was ignored because the key is not the index.
@@ -586,7 +586,7 @@ says otherwise.
 <MultipleChoice
   markdown={`Which is the idiomatic way to express a SQL \`CASE WHEN\` across a whole column?
 
-- A Python \`for\` loop appending to a list.
+- A Python \`for\` loop that appends to a list.
   > It produces the right answer at interpreted-loop speed and reads worse.
 - [o] \`np.select([cond1, cond2], ["high", "mid"], default="low")\`
   > \`np.select\` handles several conditions in order, vectorized. For a single either/or, \`np.where(cond, a, b)\` is the simpler form.
@@ -601,8 +601,8 @@ says otherwise.
 
 - It converts the values to integers, losing the original text.
   > The labels are preserved; only their storage changes.
-- [o] It stores the column as integer codes plus a lookup of distinct values, cutting memory and speeding up grouping on low-cardinality text.
-  > The win grows with repetition. On a column where almost every value is unique, the category dtype costs more than it saves.
+- [o] It stores integer codes plus a lookup of distinct values.
+  > Memory falls and grouping speeds up, as long as the text is low-cardinality. The win grows with repetition. On a column where almost every value is unique, the category dtype costs more than it saves.
 - It sorts the column alphabetically.
   > Categories carry an order only if one is set explicitly with \`CategoricalDtype(ordered=True)\`.
 - It removes rows with missing values.
@@ -614,8 +614,8 @@ says otherwise.
 
 - It returns the month number for each row.
   > It would, once the column is a datetime, which is the missing step.
-- [o] It raises an \`AttributeError\`, because the \`.dt\` accessor requires a datetime dtype.
-  > Convert first with \`pd.to_datetime(df["ts"])\`. Pass \`errors="coerce"\` to turn unparseable values into \`NaT\` instead of raising.
+- [o] It raises an \`AttributeError\` on the \`.dt\` accessor.
+  > That accessor requires a datetime dtype. Convert first with \`pd.to_datetime(df["ts"])\`. Pass \`errors="coerce"\` to turn unparseable values into \`NaT\` instead of raising.
 - It parses the strings automatically and returns the month.
   > pandas does not infer datetimes on attribute access; parsing is always explicit.
 - It returns the string \`"03"\` for each row.
@@ -631,7 +631,7 @@ says otherwise.
   > The standard deviation is, but variance is the average *squared* deviation.
 - [o] Variance is in dollars squared; standard deviation is in dollars.
   > Taking the square root returns variance to the original units, which is why the standard deviation is the one worth quoting to a stakeholder.
-- Variance is in dollars; standard deviation is in dollars squared.
+- Variance is in dollars, and standard deviation in dollars squared.
   > The squaring happens on the way *in* to variance, and the square root undoes it.
 - Both are unitless.
   > Only a normalized measure such as the coefficient of variation is unitless.`}
@@ -644,7 +644,7 @@ says otherwise.
   > A sample is a subset drawn from a larger group; nothing here was left out.
 - [o] The population for that quarter, since it is every unit of interest.
   > Population versus sample depends on the question being asked: every transaction in the quarter is the whole population if the claim is about that quarter, and a sample if the claim is about the business in general.
-- A convenience sample, because the data was easy to obtain.
+- A convenience sample, since the data was easy to obtain.
   > Convenience sampling means taking whichever units are easy to reach *instead of* the full group.
 - Neither, because 4,300 is too small to be a population.
   > Population size is defined by the question, not by a minimum count.`}
@@ -653,7 +653,7 @@ says otherwise.
 <MultipleChoice
   markdown={`A response time of 900 ms sits at the 90th percentile. What does that mean?
 
-- 90% of requests are slower than 900 ms.
+- 90% of the requests are slower than 900 ms.
   > That inverts the definition; only about 10% are slower.
 - [o] About 90% of requests completed in 900 ms or less.
   > A percentile is a cut point below which that share of observations falls, which is why latency is reported as p50/p90/p99 rather than as a mean.
@@ -666,7 +666,7 @@ says otherwise.
 <MultipleChoice
   markdown={`Under the common IQR rule, which values are flagged as outliers?
 
-- Anything more than one standard deviation from the mean.
+- Anything further than one standard deviation from the mean.
   > That is a different (and far more aggressive) rule, and it uses the mean rather than the quartiles.
 - [o] Anything below \`Q1 - 1.5 × IQR\` or above \`Q3 + 1.5 × IQR\`.
   > The interquartile range is \`Q3 - Q1\`, and the fences sit 1.5 IQRs outside the box. This is exactly what a box plot's whiskers and dots show.
@@ -681,9 +681,9 @@ says otherwise.
 
 - Simpson's paradox.
   > Simpson's paradox is about a trend reversing when data is split by a subgroup, not about who was surveyed.
-- [o] Sampling bias: churned and dormant users, whose scores are likely lowest, cannot be sampled at all.
-  > The sampling frame excludes exactly the users whose experience the survey most needs, so the average is biased upward however many responses arrive.
-- Regression to the mean.
+- [o] Sampling bias, since dormant users are never reached.
+  > Churned and dormant users have the lowest scores and cannot be sampled at all. The sampling frame excludes exactly the users whose experience the survey most needs, so the average is biased upward however many responses arrive.
+- Regression to the mean over repeated draws.
   > Regression to the mean concerns extreme measurements drifting toward the average on re-measurement.
 - Multiple comparisons.
   > That risk comes from testing many hypotheses at once, not from how respondents were reached.`}
@@ -707,9 +707,9 @@ says otherwise.
 
 - The two variables are independent.
   > Independence is stronger than zero correlation; a perfect U-shaped relationship can correlate at \`0\` while being entirely predictable.
-- [o] There is no strong **linear** relationship, though a non-linear one may still exist.
-  > Pearson's coefficient only measures straight-line association, which is why plotting the data matters as much as computing the number.
-- One variable causes no change in the other.
+- [o] There is no strong **linear** relationship.
+  > A non-linear one may still exist, which is why plotting the data matters as much as the number. Pearson's coefficient only measures straight-line association, which is why plotting the data matters as much as computing the number.
+- One variable causes no change at all in the other.
   > Correlation says nothing about causation in either direction.
 - The data contains an error.
   > A near-zero correlation is an ordinary, informative result.`}
@@ -722,7 +722,7 @@ says otherwise.
   > A left-skewed distribution pulls the mean below the median; income skews the other way.
 - [o] The mean is above the median, pulled up by the long tail of high earners.
   > The mean weighs every value by its magnitude, so a few extreme values move it while the median barely shifts.
-- They are equal, since both describe the center.
+- They are equal, since both of them describe the centre.
   > They coincide only in a symmetric distribution.
 - The relationship depends on the sample size.
   > The gap is driven by the shape of the distribution, and it does not close as more data arrives.`}
@@ -733,8 +733,8 @@ says otherwise.
 
 - Another name for the standard deviation.
   > They answer different questions: one about individuals, one about the estimate.
-- [o] The standard deviation of the *sample mean* across repeated samples, which shrinks as the sample grows.
-  > It is roughly the standard deviation divided by the square root of the sample size, and it is what confidence intervals are built from.
+- [o] The standard deviation of the *sample mean* itself.
+  > Measured across repeated samples, and it shrinks as the sample grows. It is roughly the standard deviation divided by the square root of the sample size, and it is what confidence intervals are built from.
 - The average size of the measurement errors in the data.
   > Instrument error is a separate concern from sampling variability.
 - The difference between the sample mean and the true mean.
@@ -757,10 +757,10 @@ says otherwise.
 <MultipleChoice
   markdown={`Weekly conversion has been unusually low for one segment, and next week it rises with no change shipped. What is the most parsimonious explanation?
 
-- The segment responded to a competitor's change.
+- The segment was responding to a competitor's change.
   > Possible, but it invents an external cause for a pattern that noise alone produces.
-- [o] Regression to the mean: an extreme reading tends to be followed by one closer to the average.
-  > Any metric selected *because* it was extreme is partly extreme by luck, and the luck does not repeat. It is why "worst performers improved after the intervention" is such a weak claim.
+- [o] Regression to the mean, on a reading selected for being extreme.
+  > Any metric picked *because* it was extreme is partly extreme by luck, and the luck does not repeat. Any metric selected *because* it was extreme is partly extreme by luck, and the luck does not repeat. It is why "worst performers improved after the intervention" is such a weak claim.
 - The metric definition changed.
   > A definition change would usually shift the whole series rather than let one segment drift back.
 - Seasonality.
@@ -772,8 +772,8 @@ says otherwise.
 
 - Bin width has no effect once the sample is large enough.
   > The choice matters at any sample size; large samples just make each bin less noisy.
-- [o] Too-wide bins hide structure such as bimodality; too-narrow bins turn sampling noise into apparent structure.
-  > Trying two or three widths before settling is standard practice, and a density plot is a useful cross-check.
+- [o] Too wide hides structure; too narrow invents it.
+  > Bimodality disappears under wide bins, and sampling noise looks like signal under narrow ones. Trying two or three widths before settling is standard practice, and a density plot is a useful cross-check.
 - Bins must always be equal width.
   > Unequal bins are legitimate as long as the bar area, not its height, encodes frequency.
 - The number of bins should equal the number of distinct values.
@@ -785,8 +785,8 @@ says otherwise.
 
 - Changing one will move the other by 90%.
   > The coefficient is not a rate of change; that would be a regression slope.
-- [o] They move together closely in a linear sense, which is consistent with causation in either direction, a common cause, or coincidence.
-  > A strong correlation narrows the hypotheses worth testing; it does not select one.
+- [o] They move together closely, in a linear sense.
+  > That is consistent with causation in either direction, a common cause, or coincidence. A strong correlation narrows the hypotheses worth testing; it does not select one.
 - 90% of the variation in one is explained by the other.
   > That figure is the square of the coefficient, so about 81%.
 - The relationship will hold outside the observed range.
@@ -815,7 +815,7 @@ says otherwise.
   > The median moves by at most one position when a single value changes; the mean absorbs the full magnitude. That contrast is the quickest outlier check there is.
 - Median 5, mean 23: the middle value is 5.
   > With five sorted values the middle position is the third, which is 4.
-- Median 100, because the median is the largest value.
+- Median 100, on the basis that the median is the largest.
   > The largest value is the maximum; the median is the middle one.`}
 />
 
@@ -826,7 +826,7 @@ says otherwise.
 
 - The probability that the null hypothesis is true.
   > This is the most common misreading. The p-value is computed *assuming* the null holds, so it cannot also be the probability that it holds.
-- [o] The probability of observing a result at least this extreme, assuming the null hypothesis is true.
+- [o] The chance of a result this extreme under the null.
   > Small p-values mean the data would be surprising under "no effect", which is evidence against the null and not a measurement of effect size.
 - The probability that the observed lift will replicate.
   > Replication depends on the true effect and on the next experiment's power, neither of which the p-value reports.
@@ -839,8 +839,8 @@ says otherwise.
 
 - Nothing, as long as the final sample size is large.
   > The damage is done by the stopping *rule*, not by the final count.
-- [o] It inflates the false positive rate well above the nominal 5%, because each look is another chance to cross the threshold on noise alone.
-  > Fix the sample size in advance, or use a method built for it, such as sequential testing or always-valid confidence intervals.
+- [o] It inflates the false positive rate well above 5%.
+  > Each look is another chance to cross the threshold on noise alone. Fix the sample size in advance, or use a method built for it, such as sequential testing or always-valid confidence intervals.
 - It reduces the false positive rate by adding evidence.
   > Repeated looks add opportunities to be fooled, not protection from it.
 - It only matters for one-sided tests.
@@ -852,8 +852,8 @@ says otherwise.
 
 - To replace the primary metric when the primary metric is noisy.
   > Guardrails sit alongside the primary metric; they do not stand in for it.
-- [o] To catch collateral damage: something the change must not harm, even if the primary metric improves.
-  > Latency, refund rate, unsubscribe rate, and support contacts are typical guardrails. A win on the primary metric with a guardrail regression is not a win.
+- [o] To catch collateral damage the change must not cause.
+  > Latency, refund rate, and support contacts are typical, and a primary-metric win with a guardrail regression is not a win. Latency, refund rate, unsubscribe rate, and support contacts are typical guardrails. A win on the primary metric with a guardrail regression is not a win.
 - To measure how much revenue the experiment produced.
   > That is the job of a primary or secondary business metric.
 - To confirm that randomization worked.
@@ -865,9 +865,9 @@ says otherwise.
 
 - It halves it.
   > Sample size does not scale linearly with the effect you want to detect.
-- [o] It roughly quadruples it, since required sample size scales with roughly one over the effect squared.
-  > Detecting smaller effects gets expensive fast, which is why agreeing on an MDE before launch is what makes an experiment feasible or not.
-- It leaves it unchanged.
+- [o] It roughly quadruples the required sample size.
+  > Sample size scales with roughly one over the effect squared. Detecting smaller effects gets expensive fast, which is why agreeing on an MDE before launch is what makes an experiment feasible or not.
+- It leaves the required sample unchanged.
   > The target effect size is one of the main inputs to a power calculation.
 - It doubles it.
   > Doubling would be a linear relationship; the inverse-square relationship is steeper.`}
@@ -878,8 +878,8 @@ says otherwise.
 
 - The randomization broke partway through.
   > A broken assignment usually shows up as imbalanced group sizes or skewed pre-experiment metrics, not as a clean decay.
-- [o] A novelty effect: existing users engaged with the change because it was new, and reverted once it stopped being novel.
-  > Run long enough to cover the decay, and check whether new users, who have no old version to react to, show the same pattern.
+- [o] A novelty effect that has since worn off.
+  > Existing users engaged because the change was new, then reverted. Run long enough to cover the decay, and check whether new users, who have no old version to react to, show the same pattern.
 - Regression to the mean in the control group.
   > That would move the control, whereas here it is the treatment's advantage that erodes.
 - The metric was mis-instrumented in week one only.
@@ -891,8 +891,8 @@ says otherwise.
 
 - Weekly active users for a product measured on weekly engagement.
   > This is a defensible primary metric when weekly engagement is the goal.
-- [o] Cumulative registered accounts since launch, quoted as evidence that the product is healthy.
-  > A cumulative total can only go up, so it looks good regardless of what is actually happening and cannot distinguish a good week from a bad one.
+- [o] Cumulative registered accounts since launch.
+  > A cumulative total can only go up, so it looks good regardless. A cumulative total can only go up, so it looks good regardless of what is actually happening and cannot distinguish a good week from a bad one.
 - Seven-day retention, split by acquisition channel.
   > Retention by cohort is one of the more decision-relevant metrics available.
 - Checkout conversion rate.
@@ -902,7 +902,7 @@ says otherwise.
 <MultipleChoice
   markdown={`A funnel has 10,000 views → 4,000 add-to-cart → 1,000 purchases. What is the **step-to-step** conversion from add-to-cart to purchase?
 
-- 10%
+- 10%, the end-to-end rate.
   > 10% is the end-to-end conversion from views to purchases, not the step between cart and purchase.
 - [o] 25%
   > Step conversion divides each step by the step immediately before it: 1,000 / 4,000 = 25%. The 40% and 25% step rates multiply to the 10% overall rate.
@@ -917,8 +917,8 @@ says otherwise.
 
 - The change definitely works, since the point estimate is positive.
   > A single point estimate ignores the uncertainty the interval was computed to express.
-- [o] The result is consistent with anything from a small loss to a solid gain, so it is not yet conclusive.
-  > An interval spanning zero means the data cannot rule out no effect. The useful follow-up is whether the plausible range is worth the cost of a longer test.
+- [o] Anything from a small loss to a solid gain is consistent.
+  > The result is not yet conclusive. An interval spanning zero means the data cannot rule out no effect. The useful follow-up is whether the plausible range is worth the cost of a longer test.
 - The change has no effect.
   > Failing to detect an effect is not the same as demonstrating there is none; a 4.5% gain is equally inside the interval.
 - There is a 95% probability the true lift is 2.1%.
@@ -930,11 +930,11 @@ says otherwise.
 
 - Reweight the groups and read the result.
   > Reweighting papers over a defect whose cause is still unknown, and the cause usually biases the metric too.
-- [o] Treat it as a sample ratio mismatch and investigate the assignment before trusting any result.
-  > At realistic sample sizes a 52/48 split is far outside chance. Bot filtering, redirect failures, and logging that fires only on one variant all produce it, and all of them skew the metric.
+- [o] Treat it as a sample ratio mismatch and investigate.
+  > Bot filtering, redirect failures, and one-sided logging all produce it, and all skew the metric. At realistic sample sizes a 52/48 split is far outside chance. Bot filtering, redirect failures, and logging that fires only on one variant all produce it, and all of them skew the metric.
 - Nothing; small imbalances are expected.
   > Small *absolute* imbalance is not the test. What matters is how improbable the split is given the sample size.
-- Stop the experiment and declare the result null.
+- Stop the experiment and declare the result a null.
   > Diagnosing the cause usually salvages the experiment; discarding it loses the information.`}
 />
 
@@ -943,8 +943,8 @@ says otherwise.
 
 - Ratios cannot be averaged at all.
   > They can; the care is in what the denominator does between groups.
-- [o] The denominator can shift between variants, so the ratio can move without the numerator changing at all.
-  > A change that quietly suppresses low-value sessions raises revenue-per-session while total revenue falls. Reporting numerator and denominator alongside the ratio makes that visible.
+- [o] The denominator can shift between the variants.
+  > The ratio then moves without the numerator changing at all. A change that quietly suppresses low-value sessions raises revenue-per-session while total revenue falls. Reporting numerator and denominator alongside the ratio makes that visible.
 - Ratios always have larger sample-size requirements.
   > Variance depends on the specific metric, not on it being a ratio.
 - Ratio metrics cannot have confidence intervals.
@@ -956,8 +956,8 @@ says otherwise.
 
 - To confirm the new feature has no effect.
   > No feature is shipped in an A/A test; both arms are identical.
-- [o] To validate the experiment platform: with no real difference, roughly the expected share of A/A tests should still show "significant" results, and the assignment should split as configured.
-  > A pipeline that returns significance far more often than its false-positive rate has a bug in randomization, logging, or the analysis itself.
+- [o] To validate the experiment platform itself.
+  > With no real difference, only the expected share of A/A tests should show "significant" results, and the assignment should split as configured. A pipeline that returns significance far more often than its false-positive rate has a bug in randomization, logging, or the analysis itself.
 - To measure the metric's absolute level before launch.
   > A single query answers that; it needs no experiment.
 - To double the sample size available for the real test.
@@ -969,9 +969,9 @@ says otherwise.
 
 - Retention is collapsing and the product is failing.
   > A steep early drop followed by flattening is the normal shape for almost every product.
-- [o] The curve is flattening, which suggests a retained core; the day-1 to day-7 drop is where the biggest opportunity sits.
-  > A curve that flattens implies a stable base. One that keeps sloping toward zero is the alarming shape.
-- The day-30 number is wrong, since retention cannot rise.
+- [o] The curve is flattening, which suggests a retained core.
+  > The day-1 to day-7 drop is where the biggest opportunity sits. A curve that flattens implies a stable base. One that keeps sloping toward zero is the alarming shape.
+- The day-30 number must be wrong, since retention cannot rise.
   > It did not rise; 24% is below 25%, and small non-monotonic wobbles happen with cohort noise anyway.
 - Nothing can be said without a control group.
   > A control is needed for causal claims, not for reading the shape of a retention curve.`}
@@ -982,8 +982,8 @@ says otherwise.
 
 - The total size of the user base.
   > A headline count shows that directly.
-- [o] Whether behavior differs by when users joined, so a mix shift between cohorts is not mistaken for a change in behavior.
-  > A flat overall retention number can hide steadily worsening new-user retention, masked by a growing share of long-tenured users.
+- [o] Whether behavior differs by when users joined.
+  > A mix shift between cohorts is then not mistaken for a change in behavior. A flat overall retention number can hide steadily worsening new-user retention, masked by a growing share of long-tenured users.
 - Which individual users are most valuable.
   > That is user-level scoring, not cohorting.
 - Whether the metric is statistically significant.
@@ -995,9 +995,9 @@ says otherwise.
 
 - Run it anyway and read the direction of the result.
   > An underpowered test mostly returns noise, and any "significant" result it does produce is inflated in magnitude.
-- [o] Say up front that the test can only detect a much larger effect, then either run longer, pick a more sensitive metric, or accept that a small effect will be undetectable.
-  > Stating the detectable effect before launch is what stops an inconclusive result from being read as "no effect".
-- Lower the significance threshold to 0.10 to compensate.
+- [o] Say up front which effect sizes it can actually detect.
+  > Then run longer, pick a more sensitive metric, or accept that a small effect will be undetectable. Stating the detectable effect before launch is what stops an inconclusive result from being read as "no effect".
+- Lower the significance threshold to 0.10 to compensate for it.
   > Loosening the threshold buys power by accepting more false positives; it does not add information.
 - Split the traffic 90/10 to concentrate the sample.
   > An unbalanced split lowers power for a fixed total, though it is useful when exposure risk matters more than power.`}
@@ -1010,8 +1010,8 @@ says otherwise.
 
 - A histogram is drawn horizontally; a bar chart is drawn vertically.
   > Orientation is a styling choice available to both.
-- [o] A histogram bins one continuous variable to show its distribution, so its bars are adjacent; a bar chart compares discrete categories, so its bars are separated.
-  > The gap between bars is a real signal: it says the x-axis is categorical, and that reordering the bars loses no information.
+- [o] One bins a continuous variable, the other compares categories.
+  > A histogram's bars are adjacent; a bar chart's are separated, and that gap is a real signal. The gap between bars is a real signal: it says the x-axis is categorical, and that reordering the bars loses no information.
 - A histogram can only display counts, while a bar chart can display any measure.
   > A histogram can show density or relative frequency as well as raw counts.
 - They are the same chart under two names.
@@ -1036,9 +1036,9 @@ says otherwise.
 
 - Whenever the values are percentages.
   > Percentages alone do not make a pie readable; the number of slices and the size differences do.
-- [o] For a part-to-whole breakdown with only a few slices whose sizes differ clearly.
-  > Angles are hard to compare precisely, so a pie survives two or three obviously different parts and fails once slices are numerous or similar.
-- For comparing the same category across several time periods.
+- [o] For a part-to-whole split with few, clearly different slices.
+  > Angles are hard to compare, so a pie fails once slices are numerous or similar. Angles are hard to compare precisely, so a pie survives two or three obviously different parts and fails once slices are numerous or similar.
+- For comparing one single category across several time periods.
   > Change over time belongs on a line or a grouped bar chart.
 - For showing the distribution of a continuous variable.
   > Distributions call for a histogram, a box plot, or a density plot.`}
@@ -1049,8 +1049,8 @@ says otherwise.
 
 - Dual axes cannot be rendered by most BI tools.
   > Nearly every tool supports them; the problem is interpretive rather than technical.
-- [o] The two axis ranges are chosen independently, so the apparent relationship between the series can be manufactured by rescaling.
-  > Two lines can be made to cross, converge, or diverge purely by moving an axis. Small multiples or an indexed view make the comparison honest.
+- [o] The two axis ranges are chosen independently.
+  > The apparent relationship can be manufactured by rescaling either one. Two lines can be made to cross, converge, or diverge purely by moving an axis. Small multiples or an indexed view make the comparison honest.
 - The chart can only show two series.
   > Series count is a readability limit, not the specific hazard of dual axes.
 - Dual axes always require a logarithmic scale.
@@ -1062,8 +1062,8 @@ says otherwise.
 
 - Using the brightest colors available so the data stands out.
   > Saturated color everywhere adds ink without adding information, and it makes real highlights harder to see.
-- [o] Removing decoration that carries no information, such as heavy gridlines, 3-D effects, and background fills, so the remaining ink encodes data.
-  > Tufte's principle: every mark should earn its place. Careful subtraction usually makes a chart more legible, not less.
+- [o] Removing decoration that carries no information.
+  > Heavy gridlines, 3-D effects, and background fills all go, so the remaining ink encodes data. Tufte's principle: every mark should earn its place. Careful subtraction usually makes a chart more legible, not less.
 - Printing at the highest resolution the display allows.
   > Resolution is a rendering concern, unrelated to how much of the ink is data.
 - Packing as many series onto one chart as will fit.
@@ -1075,8 +1075,8 @@ says otherwise.
 
 - A dashboard is interactive; a report is always static.
   > Interactivity is common in dashboards but is not what separates them; plenty of reports are interactive.
-- [o] A dashboard monitors a small set of metrics continuously and prompts a question; a report answers one specific question at a point in time, with narrative and caveats.
-  > This is why a dashboard is refreshed and a report is dated: one is for noticing that something changed, the other for explaining why.
+- [o] One prompts a question, the other answers one.
+  > A dashboard monitors a few metrics continuously; a report answers a specific question at a point in time, with narrative and caveats. This is why a dashboard is refreshed and a report is dated: one is for noticing that something changed, the other for explaining why.
 - A dashboard is built by engineers; a report is written by analysts.
   > Both are ordinary analyst deliverables.
 - A report can contain charts, while a dashboard shows only numbers.
@@ -1086,7 +1086,7 @@ says otherwise.
 <MultipleChoice
   markdown={`You are shading a map by average order value per region. Which palette fits?
 
-- A categorical palette with one distinct hue per region.
+- A categorical palette using one distinct hue per region.
   > Distinct hues imply unordered categories and hide the fact that the values run low to high.
 - [o] A sequential palette running light to dark in a single hue.
   > A sequential ramp encodes magnitude with lightness, which is the ordering the reader needs to see.
@@ -1112,10 +1112,10 @@ says otherwise.
 <MultipleChoice
   markdown={`When are small multiples the better choice over one chart with many overlaid lines?
 
-- Never; a single chart is always more compact.
+- Never, since a single chart is always more compact.
   > Compactness stops helping once the lines are indistinguishable.
-- [o] When several series overlap enough that individual lines cannot be traced, and the reader mainly needs each series' shape.
-  > A grid of small panels on a shared scale trades precise cross-series comparison for readability. Overlay stays better when the comparison *is* the point and there are only a few series.
+- [o] When overlapping lines can no longer be traced individually.
+  > Small multiples suit a reader who mainly needs each series' shape. A grid of small panels on a shared scale trades precise cross-series comparison for readability. Overlay stays better when the comparison *is* the point and there are only a few series.
 - Whenever the data is time-based.
   > Two or three time series overlay perfectly well.
 - Only when the series have different units.
@@ -1127,8 +1127,8 @@ says otherwise.
 
 - Alphabetical order is harder for readers to scan.
   > Alphabetical helps for lookup; the problem is what it costs elsewhere.
-- [o] It scatters the ranking, so the reader has to compare bar lengths manually instead of reading the order off the chart.
-  > Sorting by value makes the largest and smallest obvious instantly. Keep a fixed order only when the categories have an inherent one, or when several charts must stay comparable.
+- [o] It scatters the ranking across the chart.
+  > The reader then compares bar lengths manually instead of reading the order off. Sorting by value makes the largest and smallest obvious instantly. Keep a fixed order only when the categories have an inherent one, or when several charts must stay comparable.
 - Bar charts cannot be sorted.
   > Sorting is a standard operation in every charting library.
 - It requires a categorical color palette.
@@ -1140,9 +1140,9 @@ says otherwise.
 
 - Legends are not supported on mobile.
   > Legends render fine; they just cost more effort to use.
-- [o] It removes the back-and-forth of matching a color swatch to a line, putting the name where the reader's eye already is.
-  > It also survives readers who cannot distinguish the palette's colors, which a color-only legend does not.
-- Direct labels let you fit more series on one chart.
+- [o] It puts the name where the reader's eye already is.
+  > No back-and-forth matching a colour swatch to a line, and it survives readers who cannot distinguish the palette. It also survives readers who cannot distinguish the palette's colors, which a color-only legend does not.
+- Direct labels let you fit more series onto one chart.
   > More series makes labelling harder, not easier; labels start colliding.
 - Legends are only for bar charts.
   > Legends are used across every chart type.`}
@@ -1153,8 +1153,8 @@ says otherwise.
 
 - Build it as asked; more information is strictly better.
   > Past a point, more panels lower the chance any single one gets read.
-- [o] Ask what decisions the dashboard should support, then build for those and link the rest as detail.
-  > A dashboard's job is to make a small number of things impossible to miss. "Everything" guarantees nothing stands out.
+- [o] Ask which decisions the dashboard should support.
+  > Build for those, and link the rest as detail. A dashboard's job is to make a small number of things impossible to miss. "Everything" guarantees nothing stands out.
 - Refuse, since dashboards should never exceed five charts.
   > A fixed cap is arbitrary; the right number follows from the decisions being supported.
 - Build two dashboards, one for each audience, without asking.
@@ -1168,8 +1168,8 @@ says otherwise.
 
 - It is the only one of the three that can search a sorted range.
   > All three support sorted-range lookups; \`VLOOKUP\` has done so since the beginning.
-- [o] It takes the lookup and return ranges directly, searches in either direction, defaults to an exact match, and has a built-in "if not found" argument.
-  > It removes the column-offset counting that makes \`VLOOKUP\` fragile, and the two-function pairing that makes \`INDEX\`/\`MATCH\` verbose.
+- [o] It takes the ranges directly and defaults to exact match.
+  > It also searches in either direction and has a built-in "if not found" argument. It removes the column-offset counting that makes \`VLOOKUP\` fragile, and the two-function pairing that makes \`INDEX\`/\`MATCH\` verbose.
 - It recalculates faster on very large workbooks.
   > Performance is broadly comparable; the gain is in correctness and readability.
 - It can return several columns at once, which the others cannot.
@@ -1194,8 +1194,8 @@ says otherwise.
 
 - \`IFERROR\` slows recalculation noticeably.
   > Any cost is negligible next to the correctness problem.
-- [o] It hides genuine problems: a broken reference, a typo in a key, or a missing row all silently become \`0\`.
-  > Totals stay plausible while quietly under-counting. Prefer \`IFNA\`, which catches only "not found", and leave real errors visible.
+- [o] It hides genuine problems behind a plausible \`0\`.
+  > A broken reference, a typo in a key, and a missing row all look the same. Totals stay plausible while quietly under-counting. Prefer \`IFNA\`, which catches only "not found", and leave real errors visible.
 - \`IFERROR\` cannot be nested inside other functions.
   > It nests freely; that is part of how it spreads through a workbook.
 - It converts numbers to text.
@@ -1205,7 +1205,7 @@ says otherwise.
 <MultipleChoice
   markdown={`A formula in \`C2\` contains \`B$2\`. It is copied down to \`C3\` and right to \`D2\`. What does the reference become in each copy?
 
-- \`B$3\` in \`C3\`, and \`B$2\` in \`D2\`.
+- \`B$3\` in \`C3\`, and \`B$2\` over in \`D2\`.
   > The dollar sign is on the row, so it is the *row* that is pinned; the column is free to move.
 - [o] \`B$2\` in \`C3\`, and \`C$2\` in \`D2\`.
   > \`$\` locks whatever immediately follows it. In \`B$2\` the row is locked and the column is relative, so copying down changes nothing and copying right advances the column.
@@ -1220,8 +1220,8 @@ says otherwise.
 
 - It performs an exact match, which is the default.
   > The default is the other way around, which is why the omission is dangerous.
-- [o] It defaults to approximate match, which requires the lookup column to be sorted ascending and otherwise returns a wrong value silently.
-  > Always pass \`FALSE\` (or \`0\`) for exact matching. An approximate match on unsorted data returns a neighbouring row's value instead of an error.
+- [o] It defaults to approximate match.
+  > That requires the lookup column to be sorted ascending, and otherwise returns a wrong value silently. Always pass \`FALSE\` (or \`0\`) for exact matching. An approximate match on unsorted data returns a neighbouring row's value instead of an error.
 - It raises \`#N/A\` because the argument is required.
   > The argument is optional, so nothing signals that it was left out.
 - It returns the first row of the range.
@@ -1233,11 +1233,11 @@ says otherwise.
 
 - The date was corrupted by an import.
   > The underlying value is intact; only its display changed.
-- [o] Spreadsheets store dates as serial numbers counting days from a fixed epoch, and the visible date is a display format over that number.
-  > Because dates are numbers, arithmetic works directly: subtracting two dates gives a day count, and adding \`7\` moves forward a week.
+- [o] Dates are stored as serial numbers counting from an epoch.
+  > The visible date is only a display format over that number. Because dates are numbers, arithmetic works directly: subtracting two dates gives a day count, and adding \`7\` moves forward a week.
 - The cell holds text that happens to look numeric.
   > Text would stay left-aligned as typed rather than becoming a number.
-- Dates are stored as seconds, so the value is a timestamp.
+- Dates are stored as seconds, so this value is a timestamp.
   > The unit is days; the fractional part carries the time of day.`}
 />
 
@@ -1246,21 +1246,21 @@ says otherwise.
 
 - Whether the workbook needs a full recalculation.
   > Recalculation would resolve stale results, not values that look right and still fail to match.
-- [o] Trailing or leading whitespace and non-breaking spaces in the keys, which \`TRIM\` and \`CLEAN\` remove.
-  > \`"ACME "\` and \`"ACME"\` are different strings, and the difference is invisible. A mismatched type, text \`"1001"\` versus the number \`1001\`, causes the same symptom.
+- [o] Stray whitespace in the keys, which \`TRIM\` and \`CLEAN\` remove.
+  > Non-breaking spaces do it too, and so does text \`"1001"\` against the number \`1001\`. \`"ACME "\` and \`"ACME"\` are different strings, and the difference is invisible. A mismatched type, text \`"1001"\` versus the number \`1001\`, causes the same symptom.
 - Whether the lookup range is sorted.
   > Sorting matters only for approximate match, and it would return a wrong value rather than \`#N/A\`.
-- Whether the two lists have the same number of rows.
+- Whether the two lists hold the same number of rows.
   > Row counts do not have to match for a lookup to find its key.`}
 />
 
 <MultipleChoice
   markdown={`What does a pivot table's "Values" area do with a text field dropped into it?
 
-- It concatenates the text values.
+- It concatenates all of the text values it finds.
   > Spreadsheets offer no concatenating aggregation in a pivot's Values area.
-- [o] It falls back to \`Count\`, because the other aggregations need numbers.
-  > This is why a pivot that should show revenue sometimes shows a row count instead: the underlying column is text, usually because of a stray currency symbol or a thousands separator.
+- [o] It falls back to \`Count\`, since the rest need numbers.
+  > This is why a pivot that should show revenue sometimes shows a row count instead. This is why a pivot that should show revenue sometimes shows a row count instead: the underlying column is text, usually because of a stray currency symbol or a thousands separator.
 - It raises an error.
   > It silently picks \`Count\`, which is what makes the mistake easy to ship.
 - It shows the first value found.
@@ -1272,9 +1272,9 @@ says otherwise.
 
 - Pivot tables cap out at 40,000 rows.
   > No such limit exists at that size.
-- [o] The pivot's source range is a fixed range that never grew with the data, so it needs refreshing over a table or a dynamic range.
-  > Basing the pivot on a named table means new rows are picked up on refresh instead of silently excluded.
-- The extra rows contain errors and were skipped.
+- [o] The pivot's source range never grew with the data.
+  > Basing it on a named table means new rows are picked up on refresh. Basing the pivot on a named table means new rows are picked up on refresh instead of silently excluded.
+- The extra rows contain errors and so were skipped.
   > Error values would show up as their own category rather than vanish.
 - The pivot is filtered to the current month.
   > A filter is possible, but a stale source range is by far the more common cause of a round shortfall.`}
@@ -1285,11 +1285,11 @@ says otherwise.
 
 - Nothing; they are aliases.
   > They differ precisely in which cell contents qualify.
-- [o] Any non-empty cell, including text and error values, whereas \`COUNT\` counts numbers only.
-  > \`COUNTBLANK\` is the complement. A gap between the two is a fast way to spot numbers stored as text.
+- [o] Any non-empty cell, including text and error values.
+  > \`COUNT\` counts numbers only, so a gap between the two flags numbers stored as text. \`COUNTBLANK\` is the complement. A gap between the two is a fast way to spot numbers stored as text.
 - Only cells containing formulas.
   > Neither function distinguishes a formula from a typed value; only the result matters.
-- Cells with conditional formatting applied.
+- Cells that have conditional formatting applied.
   > Formatting is invisible to both.`}
 />
 
@@ -1298,9 +1298,9 @@ says otherwise.
 
 - The file has more than ten sheets.
   > Sheet count alone says little about whether the work belongs in a database.
-- [o] The same manual refresh steps are repeated on a schedule against data that already lives in a database.
-  > Repeated manual steps against a queryable source is the case where a spreadsheet costs the most: every refresh is a chance to make a new mistake, and none of it is reviewable.
-- Someone asked for a chart the spreadsheet cannot draw.
+- [o] The same manual steps repeat against a queryable source.
+  > Every refresh is a chance to make a new mistake, and none of it is reviewable. Repeated manual steps against a queryable source is the case where a spreadsheet costs the most: every refresh is a chance to make a new mistake, and none of it is reviewable.
+- Someone asked for a chart the spreadsheet cannot produce.
   > A charting gap is usually solved by a BI tool rather than by moving the data.
 - The workbook contains \`VLOOKUP\` formulas.
   > Lookups are ordinary spreadsheet work and fine at small scale.`}
@@ -1309,10 +1309,10 @@ says otherwise.
 <MultipleChoice
   markdown={`A shared workbook's numbers differ depending on who opens it. What should you suspect first?
 
-- Different Excel versions round differently.
+- Different Excel versions round numbers differently.
   > Arithmetic is consistent across supported versions.
-- [o] Volatile or environment-dependent functions such as \`TODAY\`, \`NOW\`, \`RAND\`, or a locale-sensitive date parse.
-  > These recalculate per session and per locale, so "as of today" logic quietly shifts under each reader. Pinning the reporting date in a cell makes the workbook reproducible.
+- [o] Volatile functions such as \`TODAY\`, \`NOW\`, or \`RAND\`.
+  > A locale-sensitive date parse does it too. These recalculate per session and per locale, so "as of today" logic quietly shifts under each reader. Pinning the reporting date in a cell makes the workbook reproducible.
 - The file is corrupt.
   > Corruption usually fails loudly rather than yielding two plausible sets of numbers.
 - Someone left a filter applied.
@@ -1324,8 +1324,8 @@ says otherwise.
 
 - \`SUMPRODUCT\` is faster on large ranges.
   > It usually costs more, since it evaluates arrays element by element.
-- [o] \`SUMPRODUCT\` multiplies corresponding elements of several ranges before summing, which also makes it a way to sum under multiple conditions.
-  > \`SUMPRODUCT((region="North")*(qty>10)*amount)\` predates \`SUMIFS\` and still handles conditions \`SUMIFS\` cannot express.
+- [o] It multiplies corresponding elements before summing.
+  > That also makes it a way to sum under multiple conditions. \`SUMPRODUCT((region="North")*(qty>10)*amount)\` predates \`SUMIFS\` and still handles conditions \`SUMIFS\` cannot express.
 - \`SUMPRODUCT\` ignores text values while \`SUM\` errors on them.
   > \`SUM\` skips text in a range too.
 - They differ only in argument order.

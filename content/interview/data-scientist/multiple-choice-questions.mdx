@@ -23,8 +23,8 @@ reasoning and runnable examples.
 
 - A parameter is numeric; a statistic can be categorical.
   > Both are numeric summaries.
-- [o] A parameter describes a population and is usually unknown; a statistic is computed from a sample and is used to estimate it.
-  > The Greek-versus-Latin notation convention (μ and σ against x̄ and s) exists to keep the two visually distinct.
+- [o] A parameter describes a population, a statistic a sample.
+  > The parameter is usually unknown and the statistic estimates it. The Greek-versus-Latin notation convention (μ and σ against x̄ and s) exists to keep the two visually distinct.
 - A parameter is estimated and a statistic is known exactly.
   > It is the other way round.
 - They are the same quantity at different sample sizes.
@@ -36,11 +36,11 @@ reasoning and runnable examples.
 
 - They are the same, computed differently.
   > They describe different things.
-- [o] The standard deviation describes the spread of individual observations; the standard error describes the spread of a *sample statistic* across repeated samples, and shrinks as n grows.
-  > It is why a confidence interval narrows with more data while the underlying distribution's spread stays put.
+- [o] One describes observations, the other describes an estimate.
+  > The standard deviation is the spread of individual values; the standard error is the spread of a *sample statistic* across repeated samples, and it shrinks as n grows. It is why a confidence interval narrows with more data while the underlying distribution's spread stays put.
 - The standard error applies only to proportions.
   > It applies to any estimator.
-- The standard deviation shrinks as the sample grows.
+- The standard deviation shrinks steadily as the sample size grows.
   > It converges to the population value; it does not shrink toward zero.`}
 />
 
@@ -49,9 +49,9 @@ reasoning and runnable examples.
 
 - That large samples are normally distributed.
   > The *data* need not be; the theorem is about the sampling distribution of the mean.
-- [o] That the sampling distribution of the mean approaches normality as n grows, regardless of the population's shape, but it says nothing about the shape of the data itself.
-  > It is why a t-test on skewed data is often still fine at a reasonable sample size.
-- That any dataset becomes normal with enough observations.
+- [o] The sampling distribution of the mean approaches normality.
+  > That holds as n grows, whatever the population's shape, and it says nothing about the shape of the data itself. It is why a t-test on skewed data is often still fine at a reasonable sample size.
+- That any dataset becomes normal given a large enough number of observations.
   > Income data stays skewed no matter how much you collect.
 - That the sample mean converges to the population mean.
   > That is the Law of Large Numbers.`}
@@ -62,9 +62,9 @@ reasoning and runnable examples.
 
 - They are equivalent statements.
   > They make different claims.
-- [o] The LLN says the sample mean converges to the true mean as n grows; the CLT describes the *shape* of the sample mean's distribution around it.
-  > One promises accuracy, the other characterizes the remaining uncertainty.
-- The LLN applies to proportions and the CLT to means.
+- [o] One promises accuracy, the other describes the uncertainty.
+  > The LLN says the sample mean converges to the true mean; the CLT describes the *shape* of its distribution around that value. One promises accuracy, the other characterizes the remaining uncertainty.
+- The LLN applies to proportions and the CLT applies to means.
   > Both apply to either.
 - The LLN requires normality.
   > It requires a finite mean, not a distributional shape.`}
@@ -88,8 +88,8 @@ reasoning and runnable examples.
 
 - There is a 95% probability the true value lies in this interval.
   > Under the frequentist reading the true value is fixed; it is the interval that is random.
-- [o] If the experiment were repeated many times, about 95% of the intervals built this way would contain the true value.
-  > The Bayesian credible interval is the one that supports the "95% probability" phrasing, and it requires a prior.
+- [o] About 95% of intervals built this way capture the truth.
+  > That is a statement about the long-run behavior of the procedure, not about this one interval. The Bayesian credible interval is the one that supports the "95% probability" phrasing, and it requires a prior.
 - 95% of the data lies within the interval.
   > That would be a prediction or tolerance interval.
 - The estimate is accurate to within 5%.
@@ -101,9 +101,9 @@ reasoning and runnable examples.
 
 - Whenever the sample is smaller than 100.
   > Sample size is a rough proxy, not the criterion.
-- [o] When the population standard deviation is unknown and estimated from the sample, which is nearly always in practice.
-  > The t-distribution's heavier tails account for that extra uncertainty, and converge to the normal as n grows.
-- When the data is not normally distributed.
+- [o] When the population standard deviation has to be estimated.
+  > Which is nearly always, in practice. The t-distribution's heavier tails account for that extra uncertainty, and converge to the normal as n grows.
+- When the underlying data is not remotely normally distributed.
   > Non-normality calls for a non-parametric test or a transformation.
 - When comparing more than two groups.
   > That is ANOVA.`}
@@ -114,9 +114,9 @@ reasoning and runnable examples.
 
 - Comparing two means.
   > That is a t-test.
-- [o] Testing whether two categorical variables are associated, by comparing observed cell counts to those expected under independence.
-  > The usual caution is small expected counts, where Fisher's exact test is more appropriate.
-- Testing whether a sample is normally distributed.
+- [o] Testing whether two categorical variables are associated.
+  > It compares observed cell counts against those expected under independence. The usual caution is small expected counts, where Fisher's exact test is more appropriate.
+- Testing whether a sample is drawn from a normal distribution.
   > A goodness-of-fit variant can, but the independence test is the standard use.
 - Measuring the strength of a linear relationship.
   > That is correlation.`}
@@ -127,20 +127,20 @@ reasoning and runnable examples.
 
 - Whether two variances are equal.
   > That is an F-test of variances, related but different.
-- [o] Whether the means of three or more groups are all equal, by comparing between-group to within-group variability.
-  > A significant result says at least one group differs, without saying which; that needs a post-hoc test with a multiplicity correction.
+- [o] Whether the means of three or more groups are all equal.
+  > It works by comparing between-group with within-group variability. A significant result says at least one group differs, without saying which; that needs a post-hoc test with a multiplicity correction.
 - Whether a regression coefficient is zero.
   > That is a t-test on the coefficient.
-- Whether residuals are normally distributed.
+- Whether the model residuals follow a normal distribution.
   > That is a diagnostic, not what ANOVA tests.`}
 />
 
 <MultipleChoice
   markdown={`What exactly is a p-value?
 
-- The probability the null hypothesis is true.
+- The probability that the null hypothesis is actually true.
   > It is computed *assuming* the null, so it cannot also measure its truth.
-- [o] The probability of observing data at least as extreme as this, if the null hypothesis were true.
+- [o] The chance of data this extreme if the null were true.
   > It says nothing about effect size, and a very small p-value on a huge sample can accompany a trivially small effect.
 - The probability the result will replicate.
   > Replication depends on the true effect and the next study's power.
@@ -153,9 +153,9 @@ reasoning and runnable examples.
 
 - The probability of a Type I error.
   > That is α.
-- [o] The probability of detecting a real effect when one exists, raised by a larger sample, a larger true effect, lower variance, or a higher α.
-  > Power is the quantity that determines whether "no significant difference" is informative or meaningless.
-- The magnitude of the observed effect.
+- [o] The chance of detecting a real effect when one exists.
+  > A larger sample, a larger true effect, lower variance, or a higher α all raise it. Power is the quantity that determines whether "no significant difference" is informative or meaningless.
+- The magnitude of whatever effect happened to be observed.
   > That is effect size.
 - The width of the confidence interval.
   > Width reflects precision; power is a probability about the test's behavior.`}
@@ -166,8 +166,8 @@ reasoning and runnable examples.
 
 - Type I is a measurement error; Type II is a sampling error.
   > Both are inferential errors, not data errors.
-- [o] Type I rejects a true null (a false positive, rate α); Type II fails to reject a false null (a false negative, rate β, with power = 1 − β).
-  > Lowering α without raising the sample size trades false positives for false negatives.
+- [o] One is a false positive, the other a false negative.
+  > Type I rejects a true null at rate α; Type II fails to reject a false null at rate β, and power is 1 − β. Lowering α without raising the sample size trades false positives for false negatives.
 - Type I is always more serious.
   > Which is worse depends entirely on the decision at stake.
 - Type II occurs only in one-sided tests.
@@ -179,11 +179,11 @@ reasoning and runnable examples.
 
 - Because each test uses the same data.
   > Reuse is a related concern, but the mechanism is the number of chances.
-- [o] Testing 20 hypotheses at α = 0.05 gives roughly a 64% chance of at least one false positive, so the family-wise error rate needs controlling.
-  > Bonferroni is the blunt, conservative option; Benjamini-Hochberg controls the false discovery rate and retains far more power.
+- [o] Twenty tests at α = 0.05 give a 64% chance of a false positive.
+  > The family-wise error rate needs controlling once you are running many tests. Bonferroni is the blunt, conservative option; Benjamini-Hochberg controls the false discovery rate and retains far more power.
 - Because p-values are biased upward.
   > Individual p-values remain valid; it is the selection among them that misleads.
-- Because it makes results more significant.
+- Because the correction makes the results look more significant.
   > Corrections make results *less* likely to be declared significant.`}
 />
 
@@ -192,11 +192,11 @@ reasoning and runnable examples.
 
 - Computing a p-value incorrectly.
   > A calculation error is a different mistake.
-- [o] Trying variations (extra covariates, different subgroups, more data collection) until something crosses 0.05, then reporting only that.
-  > The published p-value is then uninterpretable, because the search that produced it is invisible. Pre-registration is the structural fix.
+- [o] Trying variations until something crosses 0.05, then reporting it.
+  > Extra covariates, different subgroups, and more data collection are all ways in. The published p-value is then uninterpretable, because the search that produced it is invisible. Pre-registration is the structural fix.
 - Using a one-sided test.
   > A one-sided test chosen in advance for a directional hypothesis is legitimate.
-- Reporting a p-value without a confidence interval.
+- Reporting a p-value without an accompanying confidence interval.
   > Incomplete reporting, but not p-hacking.`}
 />
 
@@ -205,11 +205,11 @@ reasoning and runnable examples.
 
 - Bayesian methods do not use probability.
   > They are built on it.
-- [o] Bayesians treat parameters as random variables with a prior updated by data into a posterior; frequentists treat parameters as fixed and the data as random.
-  > It is why only the Bayesian framework licenses "there is a 95% probability the effect is between x and y".
+- [o] Whether the parameter or the data is treated as random.
+  > Bayesians put a prior on the parameter and update it into a posterior; frequentists hold the parameter fixed and treat the data as random. It is why only the Bayesian framework licenses "there is a 95% probability the effect is between x and y".
 - Frequentist methods require larger samples.
   > Sample requirements depend on the question, not the philosophy.
-- Bayesian methods cannot produce point estimates.
+- Bayesian methods are simply unable to produce point estimates.
   > Posterior mean, median, and mode are all point estimates.`}
 />
 
@@ -218,9 +218,9 @@ reasoning and runnable examples.
 
 - Whenever the sample is small.
   > Small samples matter, but the assumption is what decides.
-- [o] When the distributional assumptions of the parametric alternative are badly violated and cannot be fixed, or when the data is ordinal.
-  > Mann-Whitney for two groups, Kruskal-Wallis for several. The cost is less power when the parametric assumptions would have held.
-- When the data has missing values.
+- [o] When the parametric assumptions are badly violated.
+  > Or when the data is ordinal to begin with. Mann-Whitney for two groups, Kruskal-Wallis for several. The cost is less power when the parametric assumptions would have held.
+- When the dataset happens to contain some missing values.
   > Missingness is handled separately.
 - When you want a smaller p-value.
   > Choosing a test by the p-value it produces is p-hacking.`}
@@ -231,8 +231,8 @@ reasoning and runnable examples.
 
 - Choosing the parameter with the highest prior probability.
   > That is a Bayesian MAP estimate with no data.
-- [o] Choosing the parameter values that make the observed data most probable under the assumed model.
-  > For linear regression with normal errors, MLE and ordinary least squares give the same answer, which is a useful anchor.
+- [o] Choosing the parameters that make the data most probable.
+  > Under the assumed model, that is. For linear regression with normal errors, MLE and ordinary least squares give the same answer, which is a useful anchor.
 - Maximizing the correlation between predictions and outcomes.
   > That is a different objective.
 - Minimizing the number of parameters.
@@ -242,10 +242,10 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`What is Simpson's paradox?
 
-- A correlation that disappears with more data.
+- A correlation that disappears once more data arrives.
   > That is usually just noise resolving.
-- [o] A trend present in aggregate that reverses within every subgroup, because an unbalanced confounder is mixed into the totals.
-  > The famous Berkeley admissions case is the standard example. Which view is correct depends on the causal structure, not on which one is larger.
+- [o] A trend that reverses once you split by subgroup.
+  > It happens when an unbalanced confounder is mixed into the totals. The famous Berkeley admissions case is the standard example. Which view is correct depends on the causal structure, not on which one is larger.
 - A correlation without causation.
   > Related, but the paradox is specifically a reversal under stratification.
 - An effect that is significant but small.
@@ -257,7 +257,7 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`What does \`P(A | B)\` mean?
 
-- The probability of A and B both occurring.
+- The probability of A and B both occurring at the same time.
   > That is the joint probability.
 - [o] The probability of A given that B has occurred, computed as \`P(A ∩ B) / P(B)\`.
   > Conditioning restricts the sample space to B, which is why the denominator is \`P(B)\` rather than 1.
@@ -272,9 +272,9 @@ reasoning and runnable examples.
 
 - They are the same property.
   > They are nearly opposites for events with non-zero probability.
-- [o] Independent means one occurring tells you nothing about the other; mutually exclusive means they cannot both occur, so one occurring tells you the other definitely did not.
-  > Two mutually exclusive events with non-zero probability are therefore necessarily dependent.
-- Mutually exclusive events are always independent.
+- [o] Independence tells you nothing; exclusivity tells you a lot.
+  > If one of two mutually exclusive events occurs, the other definitely did not, which is maximal dependence rather than independence. Two mutually exclusive events with non-zero probability are therefore necessarily dependent.
+- Mutually exclusive events are always independent of each other.
   > Knowing one occurred forces the other's probability to zero, which is maximal dependence.
 - Independence requires equal probabilities.
   > Probabilities are unconstrained.`}
@@ -283,10 +283,10 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`Why is linearity of expectation so useful?
 
-- It only holds for independent variables.
+- It only ever holds for genuinely independent variables.
   > It holds regardless of dependence, which is precisely why it is useful.
-- [o] \`E[X + Y] = E[X] + E[Y]\` holds whether or not X and Y are independent, so problems with messy dependence often become trivial.
-  > The classic use is counting expected matches by summing indicator variables that are heavily dependent on each other.
+- [o] \`E[X + Y] = E[X] + E[Y]\` holds even under dependence.
+  > Problems with messy dependence often become trivial as a result. The classic use is counting expected matches by summing indicator variables that are heavily dependent on each other.
 - It lets you multiply expectations.
   > \`E[XY] = E[X]E[Y]\` requires independence.
 - It applies only to discrete variables.
@@ -311,11 +311,11 @@ reasoning and runnable examples.
 
 - Its expected value is zero.
   > Its mean is 1/λ.
-- [o] The probability of waiting another t units is the same regardless of how long you have already waited.
+- [o] The remaining wait does not depend on the wait so far.
   > It is why exponential inter-arrival times pair with a Poisson count, and why "the bus is overdue so it must be due soon" is wrong under this model.
 - It has no variance.
   > It has a well-defined variance.
-- Past events do not affect its parameters.
+- Past events have no bearing on the distribution's parameters.
   > Parameters are fixed by definition; memorylessness is about the conditional distribution.`}
 />
 
@@ -324,11 +324,11 @@ reasoning and runnable examples.
 
 - No; both remaining doors are equally likely.
   > This ignores that the host's choice is constrained by knowledge.
-- [o] Yes; your original door keeps its 1/3 probability, and the host's informed reveal concentrates the remaining 2/3 on the other door.
-  > If the host opened a door at random and it happened to be empty, the intuition would change; the host's knowledge is the load-bearing assumption.
+- [o] Yes, because your original door keeps its 1/3 probability.
+  > The host's informed reveal concentrates the remaining 2/3 on the other door. If the host opened a door at random and it happened to be empty, the intuition would change; the host's knowledge is the load-bearing assumption.
 - Yes, because the probability becomes 1/2.
   > Switching wins 2/3 of the time, not 1/2.
-- It makes no difference to the long-run outcome.
+- Switching makes no difference at all to the long-run outcome.
   > Switching doubles the win rate.`}
 />
 
@@ -339,7 +339,7 @@ reasoning and runnable examples.
   > That is closer to the chance someone shares *your* birthday.
 - [o] About 50%.
   > There are 253 pairs, not 23 comparisons, which is why the answer feels far too high.
-- About 23%.
+- About 23%, matching the number of people.
   > This mistakes the count of people for a probability.
 - About 99%.
   > That takes around 57 people.`}
@@ -350,8 +350,8 @@ reasoning and runnable examples.
 
 - Covariance is always positive.
   > It takes either sign.
-- [o] Covariance measures joint variability in the product of the original units; correlation standardizes it to a unitless value between −1 and 1.
-  > It is why covariance values cannot be compared across variable pairs and correlations can.
+- [o] Correlation is covariance standardized to a unitless scale.
+  > Covariance is in the product of the original units; correlation runs between −1 and 1. It is why covariance values cannot be compared across variable pairs and correlations can.
 - Correlation captures non-linear relationships and covariance does not.
   > Both are linear measures.
 - They differ only in sign convention.
@@ -363,8 +363,8 @@ reasoning and runnable examples.
 
 - Less than 1/2, since tails is due.
   > That is the gambler's fallacy.
-- [o] 1/2, since the coin is stated to be fair and flips are independent, though 10 heads is itself weak evidence to re-examine that assumption.
-  > Both halves matter: independence given fairness, and the sensible instinct to question fairness after an unlikely run.
+- [o] 1/2, since the coin is stated to be fair.
+  > Flips are independent. That said, 10 heads is itself weak evidence to re-examine the fairness assumption. Both halves matter: independence given fairness, and the sensible instinct to question fairness after an unlikely run.
 - More than 1/2, since the coin is clearly biased.
   > Under the stated assumption of fairness it is exactly 1/2; suspecting bias is a separate, Bayesian, question.
 - It cannot be determined.
@@ -380,17 +380,17 @@ reasoning and runnable examples.
   > An expectation need not be an attainable value, which is often the point of the question.
 - 6, the maximum.
   > That is the maximum, not the mean.
-- 1, since each face has probability 1/6.
+- 1, on the grounds that each face has probability 1/6.
   > That confuses a probability with an outcome.`}
 />
 
 <MultipleChoice
   markdown={`State Bayes' theorem and say when you would reach for it.
 
-- \`P(A|B) = P(A)P(B)\`, used when events are independent.
+- \`P(A|B) = P(A)P(B)\`, which is used whenever two events are independent of one another.
   > That is the definition of independence, not Bayes' theorem.
-- [o] \`P(A|B) = P(B|A)P(A) / P(B)\`, used to invert a conditional, turning "probability of the evidence given the hypothesis" into "probability of the hypothesis given the evidence".
-  > Diagnostic testing, spam filtering, and any question where the base rate matters more than the test's accuracy.
+- [o] \`P(A|B) = P(B|A)P(A) / P(B)\`, used to invert a conditional.
+  > It turns "probability of the evidence given the hypothesis" into "probability of the hypothesis given the evidence". Diagnostic testing, spam filtering, and any question where the base rate matters more than the test's accuracy.
 - \`P(A|B) = P(A ∩ B)\`, used for joint distributions.
   > The joint probability is the numerator before dividing by \`P(B)\`.
 - \`P(A|B) = 1 − P(B|A)\`, used for complements.
@@ -400,10 +400,10 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`When would you model something as Poisson rather than Binomial?
 
-- When the probability of success is above 0.5.
+- When the probability of any individual success exceeds 0.5.
   > The success probability is not the criterion.
-- [o] When events occur at some average rate over an interval and there is no fixed number of trials: support tickets per hour, defects per metre.
-  > Binomial converges to Poisson when n is large and p is small, which is why the two so often approximate each other.
+- [o] When events arrive at a rate with no fixed number of trials.
+  > Support tickets per hour and defects per metre both fit. Binomial converges to Poisson when n is large and p is small, which is why the two so often approximate each other.
 - When trials are dependent.
   > Both assume independence.
 - When the outcome is continuous.
@@ -415,8 +415,8 @@ reasoning and runnable examples.
 
 - Expectation is the most likely value; variance is the range.
   > The most likely value is the mode, and range is max minus min.
-- [o] Expectation is the probability-weighted average of the outcomes; variance is the expected squared deviation from that average.
-  > Variance being in squared units is exactly why the standard deviation is what gets reported.
+- [o] A probability-weighted average, and the spread around it.
+  > Expectation is the weighted average of the outcomes; variance is the expected squared deviation from it. Variance being in squared units is exactly why the standard deviation is what gets reported.
 - Expectation is the median; variance is the interquartile range.
   > Those are robust alternatives, not definitions.
 - Expectation is the sum of outcomes; variance is their product.
@@ -426,7 +426,7 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`Two dice are rolled. What is the probability the sum is 7?
 
-- 1/12.
+- 1/12, one for each ordered pair.
   > This undercounts the ways to make 7.
 - [o] 6/36 = 1/6.
   > Six of the 36 equally likely ordered pairs sum to 7, which is more than any other total, the reason 7 is the modal sum.
@@ -441,8 +441,8 @@ reasoning and runnable examples.
 
 - No; you lose more often than you win.
   > Frequency of winning alone does not determine the expected value.
-- [o] Yes on expectation: \`0.3 × 100 − 0.7 × 40 = +2\`, though variance and how many times you can repeat it matter for whether it is actually a good idea.
-  > A positive expectation with a bankroll too small to survive the variance is still a bad bet.
+- [o] Yes on expectation, since it works out at +2 per trial.
+  > \`0.3 × 100 − 0.7 × 40 = +2\`. Variance and how often you can repeat it decide whether it is actually a good idea. A positive expectation with a bankroll too small to survive the variance is still a bad bet.
 - No; the expected value is negative.
   > It is positive by 2.
 - It cannot be evaluated without knowing the number of trials.
@@ -454,10 +454,10 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`What does the bias–variance trade-off describe?
 
-- The trade between training time and accuracy.
+- The trade-off between total training time and final accuracy.
   > Compute cost is a separate axis.
-- [o] Simple models underfit with high bias and low variance; flexible models fit the training data closely with low bias and high variance, and total error balances the two.
-  > More data reduces variance without reducing bias, which is why a badly underfit model does not improve with a larger sample.
+- [o] Model flexibility trades one source of error for the other.
+  > Simple models underfit with high bias and low variance; flexible ones do the reverse, and total error balances the two. More data reduces variance without reducing bias, which is why a badly underfit model does not improve with a larger sample.
 - The trade between precision and recall.
   > That is a threshold trade-off on a single model.
 - The trade between features and observations.
@@ -471,7 +471,7 @@ reasoning and runnable examples.
   > High training accuracy is fine if validation matches it.
 - [o] A large and growing gap between training and validation performance.
   > The gap is the signal; the absolute level is not. Regularization, more data, or a simpler model closes it.
-- Validation loss lower than training loss.
+- A validation loss that sits below the training loss throughout.
   > That usually indicates regularization such as dropout being active only at training time.
 - A large number of features.
   > Many features raise the risk without demonstrating it.`}
@@ -482,8 +482,8 @@ reasoning and runnable examples.
 
 - L1 penalizes large weights and L2 penalizes small ones.
   > Both penalize magnitude; the shape of the penalty differs.
-- [o] L1 (lasso) drives some coefficients to exactly zero, performing feature selection; L2 (ridge) shrinks all coefficients smoothly toward zero without eliminating them.
-  > L2 handles correlated predictors more gracefully; L1 picks one somewhat arbitrarily. Elastic net blends both.
+- [o] L1 zeroes coefficients outright; L2 only shrinks them.
+  > So lasso performs feature selection and ridge does not. L2 handles correlated predictors more gracefully; L1 picks one somewhat arbitrarily. Elastic net blends both.
 - L2 is used for classification and L1 for regression.
   > Both apply to either.
 - L1 is always preferable with many features.
@@ -493,10 +493,10 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`When do you favour recall over precision?
 
-- When false positives are expensive.
+- When a false positive is by far the more expensive error.
   > That argues for precision.
-- [o] When missing a positive case is costly (disease screening, fraud detection, safety alerts), and a follow-up step can filter false alarms.
-  > The threshold is a business decision, which is why reporting the full precision-recall curve is more useful than a single F1 number.
+- [o] When missing a positive case is the expensive error.
+  > Disease screening, fraud detection, and safety alerts all qualify, especially when a follow-up step can filter false alarms. The threshold is a business decision, which is why reporting the full precision-recall curve is more useful than a single F1 number.
 - When the classes are balanced.
   > Balance does not determine which error matters more.
 - When the model is a tree ensemble.
@@ -508,9 +508,9 @@ reasoning and runnable examples.
 
 - When the classes are balanced.
   > ROC-AUC is perfectly informative there.
-- [o] Under heavy class imbalance, where a large number of true negatives keeps the false-positive rate low and ROC-AUC optimistically high.
-  > At 1% positives, a model flagging 100 cases to find 5 can still show an impressive ROC curve; the precision-recall view exposes it.
-- When the model outputs hard labels.
+- [o] Under heavy class imbalance, where ROC-AUC flatters.
+  > A large number of true negatives keeps the false-positive rate low and the ROC curve optimistic. At 1% positives, a model flagging 100 cases to find 5 can still show an impressive ROC curve; the precision-recall view exposes it.
+- When the model emits hard labels rather than probability scores.
   > Both require scores.
 - When the dataset is small.
   > Size affects variance of both.`}
@@ -521,9 +521,9 @@ reasoning and runnable examples.
 
 - A larger training set.
   > Each fold trains on slightly less than the full data.
-- [o] A performance estimate averaged over k train/test splits, which is far less sensitive to one unlucky split, plus a sense of its variability.
-  > For time series, ordinary k-fold leaks the future into the past; a rolling-origin split is the correct variant.
-- Protection against overfitting during training.
+- [o] An estimate averaged over k splits, plus its variability.
+  > That is far less sensitive to one unlucky split than a single hold-out. For time series, ordinary k-fold leaks the future into the past; a rolling-origin split is the correct variant.
+- Protection against overfitting during the training run itself.
   > It measures generalization; it does not prevent overfitting.
 - A guarantee the model will generalize.
   > It estimates generalization on data resembling the sample.`}
@@ -534,9 +534,9 @@ reasoning and runnable examples.
 
 - Using too many features.
   > Feature count alone does not leak.
-- [o] Fitting a scaler, imputer, or feature selector on the full dataset before splitting, or including a feature that encodes the outcome.
-  > A pipeline that fits every transform inside the training fold is the structural defence.
-- Using a random train/test split.
+- [o] Fitting a transform on all the data before splitting.
+  > A scaler, imputer, or feature selector will all do it, as will a feature that encodes the outcome. A pipeline that fits every transform inside the training fold is the structural defence.
+- Using a randomly drawn train and test split of the data.
   > A random split is standard for i.i.d. data; it leaks for time series.
 - Training for too many epochs.
   > That is overfitting, not leakage.`}
@@ -547,11 +547,11 @@ reasoning and runnable examples.
 
 - Bagging is sequential and boosting is parallel.
   > This has them the wrong way round.
-- [o] Bagging trains models independently on bootstrap samples and averages them to cut variance; boosting trains them sequentially, each correcting its predecessor's errors, mainly cutting bias.
-  > Boosting reaches higher accuracy more often and is far easier to overfit, which is why its learning rate and depth need care.
+- [o] One averages independent models, the other corrects in sequence.
+  > Bagging trains on bootstrap samples and averages to cut variance; boosting trains sequentially, each model correcting its predecessor, mainly cutting bias. Boosting reaches higher accuracy more often and is far easier to overfit, which is why its learning rate and depth need care.
 - Bagging applies only to trees.
   > It applies to any base learner.
-- Boosting requires the base learners to be strong.
+- Boosting requires each of its base learners to be a strong one.
   > It deliberately uses weak learners.`}
 />
 
@@ -560,11 +560,11 @@ reasoning and runnable examples.
 
 - It boosts the trees sequentially.
   > It does not boost at all.
-- [o] It also samples a random subset of features at each split, which decorrelates the trees so averaging them reduces variance more effectively.
-  > Without that, bootstrap samples alone produce trees that all latch onto the same dominant feature.
+- [o] It samples a random subset of features at every split.
+  > That decorrelates the trees, so averaging them cuts variance more effectively. Without that, bootstrap samples alone produce trees that all latch onto the same dominant feature.
 - It prunes each tree aggressively.
   > Individual trees are typically grown deep.
-- It uses a different splitting criterion.
+- It relies on an entirely different splitting criterion.
   > The criterion is the same.`}
 />
 
@@ -573,11 +573,11 @@ reasoning and runnable examples.
 
 - For every model.
   > Trees are scale-invariant.
-- [o] For distance-based and gradient-based methods (kNN, SVM, k-means, PCA, regularized linear models, neural networks), where feature magnitude affects the objective or the geometry.
-  > Regularization is easy to forget here: an unscaled feature is penalized differently purely because of its units.
+- [o] For distance-based and gradient-based methods.
+  > kNN, SVM, k-means, PCA, regularized linear models, and neural networks all qualify, because feature magnitude affects the objective or the geometry. Regularization is easy to forget here: an unscaled feature is penalized differently purely because of its units.
 - Only for classification problems.
   > It applies to regression too.
-- Only when features are correlated.
+- Only when the features are correlated with each other.
   > Correlation is a separate issue.`}
 />
 
@@ -586,11 +586,11 @@ reasoning and runnable examples.
 
 - Always oversample the minority class to 50/50.
   > Forcing balance distorts the base rate and can hurt calibration.
-- [o] Pick a metric that survives imbalance, then consider class weights, resampling, or threshold tuning, validating each against the actual decision cost.
-  > Often the most useful move is adjusting the decision threshold on a well-calibrated model rather than touching the training data.
+- [o] Pick a metric that survives imbalance, then tune from there.
+  > Class weights, resampling, and threshold tuning are all options, each validated against the actual decision cost. Often the most useful move is adjusting the decision threshold on a well-calibrated model rather than touching the training data.
 - Drop the minority class.
   > That removes the thing being predicted.
-- Use accuracy as the metric to keep evaluation simple.
+- Use plain accuracy as the metric, so evaluation stays simple.
   > Accuracy is the metric imbalance breaks most thoroughly.`}
 />
 
@@ -599,9 +599,9 @@ reasoning and runnable examples.
 
 - One-hot encoding, always.
   > Thousands of columns makes the matrix sparse and unwieldy.
-- [o] Target or frequency encoding computed inside the cross-validation folds, or an embedding, with care, since target encoding leaks if fitted on all the data.
-  > Grouping rare levels into an "other" bucket is often the simplest effective step.
-- Label encoding with arbitrary integers.
+- [o] Target or frequency encoding fitted inside the folds.
+  > An embedding is the other option. Target encoding leaks if it is fitted on all the data. Grouping rare levels into an "other" bucket is often the simplest effective step.
+- Label encoding using integers assigned arbitrarily.
   > It imposes a false ordering that linear models and distance metrics will act on.
 - Dropping the feature.
   > Geography is usually informative; the issue is representation.`}
@@ -612,11 +612,11 @@ reasoning and runnable examples.
 
 - Selects the most predictive original features.
   > It creates new features rather than selecting existing ones.
-- [o] Projects the data onto orthogonal directions of maximum variance, reducing dimensionality at the cost of interpretability.
-  > It is unsupervised, so a low-variance direction it discards may be exactly the one that predicts the target.
+- [o] Projects onto orthogonal directions of maximum variance.
+  > Dimensionality falls at the cost of interpretability. It is unsupervised, so a low-variance direction it discards may be exactly the one that predicts the target.
 - Removes correlated features.
   > It transforms correlation into orthogonal components rather than deleting features.
-- Normalizes the features to zero mean and unit variance.
+- Normalizes every input feature to zero mean and unit variance.
   > That is a preprocessing step PCA requires, not what it does.`}
 />
 
@@ -625,8 +625,8 @@ reasoning and runnable examples.
 
 - By fitting a straight line and clipping it to [0, 1].
   > Clipping would produce flat regions and a discontinuous gradient.
-- [o] By passing a linear combination of the features through the logistic function, which maps any real number to (0, 1).
-  > The coefficients are therefore log-odds: a one-unit change multiplies the odds by e raised to the coefficient.
+- [o] By squashing a linear combination through the logistic function.
+  > It maps any real number into (0, 1). The coefficients are therefore log-odds: a one-unit change multiplies the odds by e raised to the coefficient.
 - By counting the proportion of positives among similar training rows.
   > That is closer to kNN.
 - By normalizing the output across classes.
@@ -640,7 +640,7 @@ reasoning and runnable examples.
   > Accuracy says nothing about probability quality.
 - [o] Among cases it assigns a 70% probability, about 70% are actually positive.
   > It matters whenever the score feeds a downstream decision with a cost: expected-value ranking, pricing, triage. Platt scaling and isotonic regression are the usual fixes.
-- Its predictions are evenly spread across [0, 1].
+- Its predictions are spread evenly across the [0, 1] range.
   > A well-calibrated model can concentrate its predictions anywhere.
 - It has been trained on balanced classes.
   > Rebalancing usually *decalibrates* a model.`}
@@ -651,9 +651,9 @@ reasoning and runnable examples.
 
 - Randomly, then prunes the bad ones.
   > Random splits belong to extremely randomized trees.
-- [o] By searching candidate feature-threshold pairs for the one that most reduces impurity: Gini or entropy for classification, variance for regression.
-  > The search is greedy and local, which is why a single tree is unstable and ensembles help so much.
-- By maximizing accuracy on a validation set at each node.
+- [o] By searching feature-threshold pairs for the biggest impurity drop.
+  > Gini or entropy for classification, variance for regression. The search is greedy and local, which is why a single tree is unstable and ensembles help so much.
+- By maximizing accuracy on a validation set at every single node.
   > Splits are chosen on training impurity, not a validation set.
 - By ordering features by correlation with the target.
   > Correlation ranking is a filter feature-selection method.`}
@@ -664,8 +664,8 @@ reasoning and runnable examples.
 
 - k is learned automatically; the weakness is speed.
   > k must be chosen; speed is rarely the issue.
-- [o] k is chosen by the practitioner using the elbow method, silhouette scores, or domain knowledge; the algorithm assumes roughly spherical, similar-sized clusters and is sensitive to initialization.
-  > k-means++ addresses the initialization part; the shape assumption needs a different algorithm such as DBSCAN.
+- [o] You choose k; the weakness is the shape it assumes.
+  > The elbow method, silhouette scores, or domain knowledge set k. The algorithm assumes roughly spherical, similar-sized clusters and is sensitive to initialization. k-means++ addresses the initialization part; the shape assumption needs a different algorithm such as DBSCAN.
 - k is the number of features; the weakness is dimensionality.
   > k is the number of clusters.
 - k is set to the square root of n; the weakness is imbalance.
@@ -677,11 +677,11 @@ reasoning and runnable examples.
 
 - It is faster to compute.
   > Compute cost is comparable.
-- [o] It penalizes confident wrong predictions far more sharply and, paired with a sigmoid or softmax, yields well-behaved gradients where MSE's nearly vanish.
-  > MSE on a saturated sigmoid produces a tiny gradient exactly when the model is most wrong, which stalls learning.
+- [o] It punishes confident wrong predictions far more sharply.
+  > Paired with a sigmoid or softmax it also yields well-behaved gradients where MSE's nearly vanish. MSE on a saturated sigmoid produces a tiny gradient exactly when the model is most wrong, which stalls learning.
 - MSE cannot be used with probabilities.
   > It can; it just optimizes the wrong thing badly.
-- Cross-entropy guarantees calibrated outputs.
+- Cross-entropy guarantees perfectly calibrated probabilities.
   > It encourages calibration without guaranteeing it.`}
 />
 
@@ -690,8 +690,8 @@ reasoning and runnable examples.
 
 - Pick the one with the higher training accuracy.
   > Training accuracy rewards overfitting.
-- [o] Compare on the metric matching the decision cost, check calibration and error distribution across segments, and weigh interpretability, latency, and maintenance.
-  > Two models with equal accuracy can fail on completely different populations, which is usually the deciding factor.
+- [o] Compare on the metric that matches the decision cost.
+  > Then check calibration and error distribution across segments, and weigh interpretability, latency, and maintenance. Two models with equal accuracy can fail on completely different populations, which is usually the deciding factor.
 - Pick the more complex one, since it captures more signal.
   > Complexity without a measured gain is cost.
 - Pick whichever trains faster.
@@ -703,9 +703,9 @@ reasoning and runnable examples.
 
 - The optimal learning rate.
   > That is a different diagnostic.
-- [o] By plotting training and validation error against training-set size, whether the model is limited by bias (both plateau high, converged) or variance (a persistent gap that more data would narrow).
-  > It answers "would collecting more data help?" before anyone spends a quarter collecting it.
-- Which features matter most.
+- [o] Whether the model is limited by bias or by variance.
+  > Plot training and validation error against training-set size: both plateauing high means bias, a persistent gap means variance that more data would narrow. It answers "would collecting more data help?" before anyone spends a quarter collecting it.
+- Which of the input features matter the most.
   > That is feature importance.
 - When to stop training.
   > That is an epoch-wise validation curve, a different plot.`}
@@ -716,10 +716,10 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`Why do neural networks need non-linear activation functions?
 
-- To keep the outputs bounded.
+- To keep every one of the layer outputs bounded.
   > Some do, but ReLU is unbounded above.
-- [o] Without them, stacking linear layers collapses to a single linear transformation, so depth would add no expressive power.
-  > It is the reason the activation is the load-bearing part of a layer, not an implementation detail.
+- [o] Without them, stacked linear layers collapse into one.
+  > Depth would add no expressive power at all. It is the reason the activation is the load-bearing part of a layer, not an implementation detail.
 - To speed up convergence.
   > Choice of activation affects convergence, but expressiveness is the reason for having one.
 - To normalize the gradients.
@@ -731,11 +731,11 @@ reasoning and runnable examples.
 
 - Too large a learning rate; lower it.
   > That causes divergence, the opposite problem.
-- [o] Repeatedly multiplying small derivatives through deep networks (sigmoid and tanh saturate), mitigated by ReLU-family activations, residual connections, and careful initialization.
-  > Residual connections are the biggest single reason very deep networks became trainable.
+- [o] Repeatedly multiplying small derivatives through depth.
+  > Sigmoid and tanh saturate, which is where the small derivatives come from. ReLU-family activations, residual connections, and careful initialization all mitigate it. Residual connections are the biggest single reason very deep networks became trainable.
 - Too few parameters; add layers.
   > More layers deepen the problem.
-- Unnormalized inputs only; scale them.
+- Unnormalized inputs alone, so simply rescaling them fixes it.
   > Scaling helps but does not address depth.`}
 />
 
@@ -744,21 +744,21 @@ reasoning and runnable examples.
 
 - It removes unhelpful neurons permanently.
   > Nothing is removed permanently.
-- [o] It randomly zeroes a fraction of activations during training, forcing redundant representations; at inference it is disabled and activations are scaled accordingly.
-  > Forgetting to switch to evaluation mode is the classic bug; the model then makes stochastic predictions.
-- It drops training examples with high loss.
+- [o] It randomly zeroes activations during training only.
+  > That forces redundant representations. At inference it is disabled and activations are scaled accordingly. Forgetting to switch to evaluation mode is the classic bug; the model then makes stochastic predictions.
+- It drops the training examples with the highest loss.
   > Examples are not dropped.
-- It reduces the learning rate over time.
+- It reduces the learning rate gradually over time.
   > That is a scheduler.`}
 />
 
 <MultipleChoice
   markdown={`How does Adam differ from plain SGD?
 
-- Adam uses a fixed learning rate for all parameters.
+- Adam applies one fixed learning rate to all parameters.
   > It adapts per parameter, which is the point.
-- [o] It keeps running estimates of the first and second moments of the gradient, giving each parameter its own effective step size, with bias correction early in training.
-  > It converges quickly and is the usual default, though well-tuned SGD with momentum still generalizes better on some vision tasks.
+- [o] It gives every parameter its own effective step size.
+  > Running estimates of the gradient's first and second moments drive it, with bias correction early in training. It converges quickly and is the usual default, though well-tuned SGD with momentum still generalizes better on some vision tasks.
 - Adam guarantees convergence to a global minimum.
   > No optimizer guarantees that on a non-convex loss.
 - Adam does not require a learning rate.
@@ -770,9 +770,9 @@ reasoning and runnable examples.
 
 - Normalizes the input dataset before training.
   > That is preprocessing, done once.
-- [o] Normalizes each layer's pre-activations across the batch during training, which stabilizes and accelerates optimization and adds mild regularization.
-  > Its dependence on batch statistics is why layer norm, which normalizes across features per sample, took over in transformers.
-- Ensures every batch has the same class distribution.
+- [o] Normalizes each layer's pre-activations across the batch.
+  > It stabilizes and accelerates optimization, and adds mild regularization. Its dependence on batch statistics is why layer norm, which normalizes across features per sample, took over in transformers.
+- Ensures that every batch shares the same class distribution.
   > That is stratified sampling.
 - Reduces the batch size adaptively.
   > Batch size is a hyperparameter.`}
@@ -781,7 +781,7 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`Which loss and output activation pair with multi-class single-label classification?
 
-- Sigmoid with binary cross-entropy.
+- Sigmoid paired with binary cross-entropy.
   > That is the multi-*label* setup, where classes are independent.
 - [o] Softmax with categorical cross-entropy.
   > Softmax makes the outputs a probability distribution summing to one, which encodes "exactly one class".
@@ -796,8 +796,8 @@ reasoning and runnable examples.
 
 - A weighted average of the previous layer's outputs with learned fixed weights.
   > The weights are computed from the input, not fixed.
-- [o] For each position, a weighted sum of all positions' values, where the weights come from the compatibility of that position's query with every key.
-  > Because every position attends to every other, cost grows quadratically with sequence length, the bottleneck long-context work keeps attacking.
+- [o] A weighted sum over every position's value vector.
+  > The weights come from the compatibility of that position's query with every key. Because every position attends to every other, cost grows quadratically with sequence length, the bottleneck long-context work keeps attacking.
 - The correlation between adjacent tokens.
   > It is not restricted to adjacency; that is a convolution.
 - A recurrent update over the sequence.
@@ -807,10 +807,10 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`Why does weight initialization matter?
 
-- It determines the final accuracy exactly.
+- It determines the final accuracy exactly, all on its own.
   > It influences the trajectory, not the outcome deterministically.
-- [o] Poor scaling makes activations and gradients grow or shrink through depth, so training either explodes or stalls; Xavier and He initialization keep the variance roughly constant per layer.
-  > Initializing every weight to zero is the degenerate case: every neuron in a layer computes the same thing forever.
+- [o] Poor scaling makes signals grow or shrink through depth.
+  > Training then either explodes or stalls. Xavier and He initialization keep the variance roughly constant per layer. Initializing every weight to zero is the degenerate case: every neuron in a layer computes the same thing forever.
 - It only affects the first epoch.
   > A bad start can prevent training from ever recovering.
 - Modern optimizers make it irrelevant.
@@ -822,8 +822,8 @@ reasoning and runnable examples.
 
 - They are three names for one pass over the data.
   > They are nested quantities.
-- [o] An epoch is one full pass over the training set; a batch is the subset of examples in one gradient update; an iteration is one such update.
-  > Iterations per epoch is therefore dataset size divided by batch size, which is why halving the batch size doubles the updates per epoch.
+- [o] A full pass, a subset of examples, and one update.
+  > An epoch is the pass over the training set, a batch is the subset in one gradient update, and an iteration is that update. Iterations per epoch is therefore dataset size divided by batch size, which is why halving the batch size doubles the updates per epoch.
 - An iteration is a full pass and an epoch is one update.
   > The two are swapped.
 - A batch is a full pass and an epoch is a subset.
@@ -835,21 +835,21 @@ reasoning and runnable examples.
 
 - Never; transformers are strictly better.
   > CNNs remain strong and far cheaper on many vision tasks.
-- [o] When the data has strong local spatial structure and the dataset is modest, since convolution's locality and weight sharing are a useful prior that transformers must learn from data.
-  > Vision transformers overtake CNNs mostly at large data scale or with heavy augmentation and pretraining.
+- [o] When spatial structure is strong and the dataset modest.
+  > Convolution's locality and weight sharing are a useful prior that a transformer has to learn from data instead. Vision transformers overtake CNNs mostly at large data scale or with heavy augmentation and pretraining.
 - When the input is a sequence.
   > Sequences are where transformers excel.
-- When you need attention weights for interpretability.
+- When you need the attention weights for interpretability.
   > That is an argument for a transformer.`}
 />
 
 <MultipleChoice
   markdown={`What does backpropagation actually compute?
 
-- The forward pass through the network.
+- The forward pass of activations through the network.
   > That is the forward pass, which happens first.
-- [o] The gradient of the loss with respect to every parameter, by applying the chain rule backwards through the computation graph and reusing intermediate results.
-  > It is an efficient way of computing derivatives, not a learning rule; the optimizer decides what to do with them.
+- [o] The gradient of the loss for every parameter.
+  > It applies the chain rule backwards through the computation graph, reusing intermediate results. It is an efficient way of computing derivatives, not a learning rule; the optimizer decides what to do with them.
 - The updated weights directly.
   > It supplies the gradients; the optimizer produces the update.
 - The optimal learning rate.
@@ -861,8 +861,8 @@ reasoning and runnable examples.
 
 - It sets how many epochs are needed, and nothing else.
   > It changes whether training converges at all.
-- [o] Too small and convergence crawls or stalls in a poor region; too large and updates overshoot, oscillate, or diverge.
-  > A warmup followed by decay is the common schedule, and a learning-rate range test is the standard way to find the band.
+- [o] Too small stalls; too large overshoots or diverges.
+  > A crawling run can also settle in a poor region rather than converging. A warmup followed by decay is the common schedule, and a learning-rate range test is the standard way to find the band.
 - It controls the batch size.
   > Batch size is separate, though the two interact.
 - It only matters for the first layer.
@@ -872,10 +872,10 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`What does weight decay do, and how does it relate to L2?
 
-- It reduces the learning rate over time.
+- It reduces the learning rate gradually over time.
   > That is a scheduler.
-- [o] It shrinks weights toward zero each step, which for plain SGD is equivalent to adding an L2 penalty to the loss.
-  > The equivalence breaks under adaptive optimizers, which is why AdamW decouples decay from the gradient update.
+- [o] It shrinks weights toward zero on every step.
+  > For plain SGD that is equivalent to adding an L2 penalty to the loss. The equivalence breaks under adaptive optimizers, which is why AdamW decouples decay from the gradient update.
 - It removes weights below a threshold.
   > That is pruning.
 - It normalizes weights to unit norm.
@@ -885,10 +885,10 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`Why does an RNN struggle with long sequences, and what addresses it?
 
-- It runs out of memory; use a smaller batch.
+- It runs out of memory, so a smaller batch size fixes it.
   > Memory is a practical limit, not the modelling one.
-- [o] Gradients vanish or explode across many time steps, so distant dependencies are not learned; gating in LSTMs and GRUs, and ultimately attention, address it.
-  > Attention removes the sequential path entirely, which is why transformers displaced RNNs for most sequence work.
+- [o] Gradients vanish or explode across many time steps.
+  > Distant dependencies never get learned. Gating in LSTMs and GRUs, and ultimately attention, address it. Attention removes the sequential path entirely, which is why transformers displaced RNNs for most sequence work.
 - It cannot process variable-length input.
   > Variable length is what it handles naturally.
 - Its parameters grow with sequence length.
@@ -900,9 +900,9 @@ reasoning and runnable examples.
 
 - It reduces the parameter count.
   > Parameters are roughly comparable, since each head is narrower.
-- [o] Each head attends in a different learned subspace, so the layer can track several kinds of relationship (syntactic, positional, semantic) at once.
-  > The heads run in parallel and are concatenated, so the cost is largely unchanged.
-- It makes attention linear in sequence length.
+- [o] Each head attends in a different learned subspace.
+  > The layer can then track syntactic, positional, and semantic relationships at once. The heads run in parallel and are concatenated, so the cost is largely unchanged.
+- It makes attention cost linear in the sequence length.
   > Cost stays quadratic; that is a separate research direction.
 - It removes the need for positional encoding.
   > Attention is permutation-invariant with or without multiple heads, so position must still be injected.`}
@@ -915,8 +915,8 @@ reasoning and runnable examples.
 
 - Ship to half the users and compare the two groups afterwards.
   > Without a pre-declared metric and sample size, the analysis is unconstrained.
-- [o] Define the hypothesis and primary metric, choose the minimum detectable effect, compute the required sample and duration, pre-register guardrails, then randomize at the right unit.
-  > Fixing the sample size in advance is what makes the resulting p-value interpretable.
+- [o] Fix the metric and the sample size before launching.
+  > Define the hypothesis and primary metric, choose the minimum detectable effect, compute the required sample and duration, pre-register guardrails, then randomize at the right unit. Fixing the sample size in advance is what makes the resulting p-value interpretable.
 - Run it until the result is significant.
   > That is peeking, which inflates the false-positive rate.
 - Compare this week's treatment users to last week's users.
@@ -926,10 +926,10 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`What is a sample ratio mismatch, and what causes it?
 
-- A difference in metric values between arms.
+- A difference in the metric values between the two arms.
   > That is the effect being measured.
-- [o] The observed split deviating from the configured one by more than chance allows, usually from a bug in assignment, logging, redirects, or bot filtering.
-  > It invalidates the experiment, because whatever caused the imbalance is usually correlated with the metric too.
+- [o] The observed split deviates further than chance allows.
+  > A bug in assignment, logging, redirects, or bot filtering is the usual cause. It invalidates the experiment, because whatever caused the imbalance is usually correlated with the metric too.
 - Unequal variance between arms.
   > Unequal variance is handled by the test.
 - Too few users in the experiment.
@@ -939,10 +939,10 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`What does CUPED do?
 
-- Increases the sample size by reusing historical users.
+- Increases the effective sample size by reusing historical users.
   > No users are added.
-- [o] Uses a pre-experiment covariate correlated with the metric to remove predictable variance, tightening the confidence interval without biasing the estimate.
-  > A user's pre-period value of the same metric is the usual covariate, and it can cut required runtime substantially.
+- [o] Removes predictable variance using a pre-experiment covariate.
+  > The confidence interval tightens without the estimate being biased. A user's pre-period value of the same metric is the usual covariate, and it can cut required runtime substantially.
 - Corrects for multiple comparisons.
   > That is a different adjustment.
 - Adjusts for a sample ratio mismatch.
@@ -954,9 +954,9 @@ reasoning and runnable examples.
 
 - Proving two variants are identical.
   > Exact equality cannot be established statistically.
-- [o] Showing a change is not worse than the control by more than a pre-specified margin, the right frame for a migration or simplification that is expected to be neutral.
-  > A standard test failing to reject the null does not demonstrate equivalence, which is the gap this fills.
-- Testing more than two variants at once.
+- [o] Showing a change is no worse than control by some margin.
+  > It is the right frame for a migration or simplification that is expected to be neutral. A standard test failing to reject the null does not demonstrate equivalence, which is the gap this fills.
+- Testing more than two variants at the same time.
   > That is a multi-arm test.
 - Testing a one-sided hypothesis.
   > It is one-sided in form, but the margin is what defines it.`}
@@ -967,11 +967,11 @@ reasoning and runnable examples.
 
 - They increase variance.
   > Variance is a symptom, not the violation.
-- [o] They violate the assumption that one user's treatment does not affect another's outcome, so control users are partly exposed and the effect is understated.
-  > Cluster randomization by network community, or switchback designs in marketplaces, are the usual mitigations.
+- [o] One user's treatment leaks into another user's outcome.
+  > Control users end up partly exposed, so the measured effect is understated. Cluster randomization by network community, or switchback designs in marketplaces, are the usual mitigations.
 - They cause a sample ratio mismatch.
   > Assignment stays balanced.
-- They only matter for social products.
+- They only ever matter for social products.
   > Marketplaces, multiplayer features, and shared inventory hit the same problem.`}
 />
 
@@ -980,8 +980,8 @@ reasoning and runnable examples.
 
 - When the sample is small; run it longer.
   > Duration is a fix, not an alternative method.
-- [o] When randomization is impossible or unethical (a pricing change across a whole market, a legally mandated feature), where difference-in-differences, synthetic control, or an interrupted time series substitute.
-  > These are weaker causally and demand explicit assumptions about what the counterfactual would have done.
+- [o] When randomization is impossible or unethical.
+  > A pricing change across a whole market or a legally mandated feature both qualify. Difference-in-differences, synthetic control, or an interrupted time series substitute. These are weaker causally and demand explicit assumptions about what the counterfactual would have done.
 - When the metric is a ratio; use a proportion test.
   > Ratio metrics are testable with care.
 - When there are several variants; test them sequentially.
@@ -993,9 +993,9 @@ reasoning and runnable examples.
 
 - Reverting a launch when metrics drop.
   > That is a rollback.
-- [o] Alternating the whole system between treatment and control over time windows, used where interference makes user-level randomization invalid, as in marketplaces.
-  > It trades statistical efficiency for validity, and needs care with time-of-day and day-of-week effects.
-- Switching users between arms to double the sample.
+- [o] Alternating the whole system between arms over time windows.
+  > It is used where interference makes user-level randomization invalid, as in marketplaces. It trades statistical efficiency for validity, and needs care with time-of-day and day-of-week effects.
+- Switching users between arms in order to double the sample.
   > Reassigning users mid-experiment contaminates both arms.
 - Testing the reverse of a hypothesis.
   > Not a recognized design.`}
@@ -1006,11 +1006,11 @@ reasoning and runnable examples.
 
 - It does not require randomization.
   > Randomization is required for causal inference either way.
-- [o] It reports a posterior over the effect, supporting statements like "an 87% probability that B beats A" and expected loss, rather than a p-value against a null.
-  > It is not immune to peeking either: decision rules still need calibrating, and the prior is a real choice.
+- [o] It reports a posterior over the effect, not a p-value.
+  > That supports statements like "an 87% probability that B beats A", and expected-loss framing. It is not immune to peeking either: decision rules still need calibrating, and the prior is a real choice.
 - It always needs less data.
   > Data requirements are comparable for similar confidence.
-- It cannot produce an interval estimate.
+- It is unable to produce any interval estimate.
   > The credible interval is one of its main outputs.`}
 />
 
@@ -1019,8 +1019,8 @@ reasoning and runnable examples.
 
 - They are the same when the sample is random.
   > Under full randomization they coincide, but the distinction is definitional.
-- [o] The ATE is the average effect across the whole population; the ATT is the average effect among those who actually received treatment.
-  > They diverge whenever treatment is not randomly assigned, which is exactly when observational methods are being used.
+- [o] One averages over everyone, the other over the treated.
+  > The ATE covers the whole population; the ATT covers only those who actually received treatment. They diverge whenever treatment is not randomly assigned, which is exactly when observational methods are being used.
 - The ATT applies only to A/B tests.
   > It is most relevant in observational settings.
 - The ATE requires a control group and the ATT does not.
@@ -1032,8 +1032,8 @@ reasoning and runnable examples.
 
 - Running an experiment without a control group.
   > A control is still required.
-- [o] Monitoring results continuously and stopping as soon as evidence is decisive, with the error rate controlled by design rather than violated by peeking.
-  > It is the principled answer to "can we look early?", and it costs a somewhat larger sample when the effect turns out to be small.
+- [o] Stopping as soon as the evidence is decisive.
+  > The error rate is controlled by design rather than violated, which is what ordinary peeking does. It is the principled answer to "can we look early?", and it costs a somewhat larger sample when the effect turns out to be small.
 - Testing many metrics without correction.
   > Multiplicity still needs handling.
 - Reducing the required sample size unconditionally.
@@ -1045,8 +1045,8 @@ reasoning and runnable examples.
 
 - Fixed sample sizes are easier to explain.
   > Convenience is not the reason.
-- [o] Each look is another chance to cross the threshold on noise, so an optional-stopping rule pushes the false-positive rate far above the nominal 5%.
-  > Sequential designs and always-valid intervals exist precisely to make early stopping legitimate.
+- [o] Every extra look is another chance to cross on noise.
+  > An optional-stopping rule pushes the false-positive rate far above the nominal 5%. Sequential designs and always-valid intervals exist precisely to make early stopping legitimate.
 - Because the effect size changes over time.
   > Novelty effects exist, but they are a separate problem.
 - Because significance is unreliable on small samples.
@@ -1058,8 +1058,8 @@ reasoning and runnable examples.
 
 - Two names for the same short-term distortion.
   > They pull in opposite directions.
-- [o] Novelty is a temporary lift because the change is new; primacy is a temporary drop because existing users are disrupted before they adapt. Both decay.
-  > Running long enough to see the decay, and checking new users who have no prior version to react to, separates them from a real effect.
+- [o] One is a temporary lift, the other a temporary drop.
+  > Novelty lifts because the change is new; primacy drops because existing users are disrupted before they adapt. Both decay. Running long enough to see the decay, and checking new users who have no prior version to react to, separates them from a real effect.
 - Novelty affects new users and primacy affects returning users.
   > Both are driven by *existing* users' reaction to change; new users show neither.
 - They only occur in visual redesigns.
@@ -1071,8 +1071,8 @@ reasoning and runnable examples.
 
 - Analyze it weekly and stop at the first significant week.
   > That is peeking, with the error rate to match.
-- [o] Watch for assignment drift and dilution, keep the analysis population fixed, be alert to seasonality and competing launches, and consider a long-term holdback.
-  > Long experiments accumulate confounds, and the biggest is usually other teams shipping into the same surface.
+- [o] Guard against drift, dilution, and competing launches.
+  > Keep the analysis population fixed, stay alert to seasonality, and consider a long-term holdback. Long experiments accumulate confounds, and the biggest is usually other teams shipping into the same surface.
 - Restart it monthly with fresh users.
   > Restarting throws away accumulated power and introduces cohort differences.
 - Reduce the sample size to speed it up.
@@ -1084,8 +1084,8 @@ reasoning and runnable examples.
 
 - Holding back a feature from users who did not consent.
   > Consent is a separate concern.
-- [o] Keeping a small group on the old experience after launch, to measure the cumulative long-run effect that a short test cannot see.
-  > It is how you detect an effect that decays, or one that only compounds after weeks.
+- [o] Keeping a small group on the old experience after launch.
+  > It measures the cumulative long-run effect that a short test cannot see. It is how you detect an effect that decays, or one that only compounds after weeks.
 - Delaying a launch until the metrics improve.
   > That is a launch decision, not a design.
 - Reserving traffic for a future experiment.
@@ -1097,9 +1097,9 @@ reasoning and runnable examples.
 
 - It increases the sample size.
   > The sample is unchanged.
-- [o] Balancing arms on a covariate strongly related to the metric removes a source of chance imbalance, tightening the estimate.
-  > It is most valuable at smaller sample sizes, where simple randomization can easily leave the arms unbalanced on something that matters.
-- It removes the need for a control group.
+- [o] It removes a source of chance imbalance between the arms.
+  > Balancing on a covariate strongly related to the metric tightens the estimate. It is most valuable at smaller sample sizes, where simple randomization can easily leave the arms unbalanced on something that matters.
+- It removes the need to run a control group at all.
   > A control is still required.
 - It corrects for a sample ratio mismatch.
   > SRM is a bug in assignment; stratification does not fix it.`}
@@ -1112,9 +1112,9 @@ reasoning and runnable examples.
 
 - It always increases.
   > A metric that only goes up carries no information.
-- [o] It reflects the value users actually receive, moves in response to the team's work, and is hard to game in isolation.
-  > "Nights booked" beats "searches performed" on all three counts, which is why the classic examples look like usage of the core value rather than activity around it.
-- It is easy to compute from existing tables.
+- [o] It tracks real user value and responds to the team's work.
+  > It should also be hard to game in isolation. "Nights booked" beats "searches performed" on all three counts, which is why the classic examples look like usage of the core value rather than activity around it.
+- It is easy to compute from the tables you already have.
   > Convenience is a tiebreaker, not a criterion.
 - It is a revenue figure.
   > Revenue lags and is influenced by much that the team does not control.`}
@@ -1125,11 +1125,11 @@ reasoning and runnable examples.
 
 - Whether a competitor launched something.
   > External causes rarely produce a clean overnight step.
-- [o] Whether the metric itself broke (a logging change, a failed pipeline, a client release that stopped firing an event), before investigating user behavior.
-  > A sharp discontinuity is far more often an instrumentation change than a real behavioral one. After that: segment by platform, geography, version, and cohort.
+- [o] Whether the metric itself broke, before anything else.
+  > A logging change, a failed pipeline, or a client release that stopped firing an event are the usual suspects. A sharp discontinuity is far more often an instrumentation change than a real behavioral one. After that: segment by platform, geography, version, and cohort.
 - Whether to roll back the most recent release.
   > Rolling back before diagnosing may remove the evidence.
-- Whether the drop is statistically significant.
+- Whether the observed drop is statistically significant.
   > An 8% overnight move on a large user base is not a noise question.`}
 />
 
@@ -1138,8 +1138,8 @@ reasoning and runnable examples.
 
 - Metrics degrade over time as data quality falls.
   > Data decay is a separate problem.
-- [o] When a measure becomes a target it stops being a good measure; teams optimize the proxy in ways that leave the underlying goal untouched or worse.
-  > Optimizing "tickets closed" produces fast closures rather than resolved problems. Guardrails and paired counter-metrics are the practical defence.
+- [o] A measure that becomes a target stops being a good measure.
+  > Teams optimize the proxy in ways that leave the underlying goal untouched, or worse. Optimizing "tickets closed" produces fast closures rather than resolved problems. Guardrails and paired counter-metrics are the practical defence.
 - Correlated metrics eventually diverge.
   > Divergence is not the mechanism.
 - Metrics chosen by committee are always vanity metrics.
@@ -1151,8 +1151,8 @@ reasoning and runnable examples.
 
 - Leading indicators are more accurate.
   > They are noisier, which is the trade.
-- [o] Leading indicators move first and are actionable but noisy; lagging indicators confirm the outcome but arrive too late to steer by.
-  > Activation rate in week one leads twelve-month retention: you can act on the first and only verify with the second.
+- [o] One moves early and noisily, the other late and reliably.
+  > Leading indicators are actionable but noisy; lagging ones confirm the outcome too late to steer by. Activation rate in week one leads twelve-month retention: you can act on the first and only verify with the second.
 - Lagging indicators are always financial.
   > Retention and churn lag without being financial.
 - Only lagging indicators can be used in experiments.
@@ -1164,8 +1164,8 @@ reasoning and runnable examples.
 
 - Wait until it is built and measure it.
   > That defeats the purpose of prioritization.
-- [o] Decompose it into a funnel (reachable population × expected adoption × effect per user), anchored on comparable past launches, and state the assumptions as a range.
-  > The value is in exposing which assumption the estimate hinges on, which is usually adoption rather than effect size.
+- [o] Decompose it into a funnel and state a range.
+  > Reachable population × expected adoption × effect per user, anchored on comparable past launches. The value is in exposing which assumption the estimate hinges on, which is usually adoption rather than effect size.
 - Use the largest plausible number to justify the work.
   > An estimate designed to persuade stops being an estimate.
 - Ask the engineers how long it will take.
@@ -1177,8 +1177,8 @@ reasoning and runnable examples.
 
 - \`INNER JOIN\`, to keep only users active in both periods.
   > That drops the churned users, who are exactly the ones retention is about.
-- [o] \`LEFT JOIN\` from the earlier cohort to later activity, so users with no later activity survive as \`NULL\` and count in the denominator.
-  > An inner join here produces a retention rate that is always 100%, which is the tell.
+- [o] \`LEFT JOIN\` from the earlier cohort to later activity.
+  > Users with no later activity survive as \`NULL\` and stay in the denominator. An inner join here produces a retention rate that is always 100%, which is the tell.
 - \`FULL OUTER JOIN\`, to include users from both periods.
   > This adds later-period users who were never in the cohort.
 - \`CROSS JOIN\`, to build every user-period pair.
@@ -1190,11 +1190,11 @@ reasoning and runnable examples.
 
 - Group events by user and day.
   > A calendar day is not a session; one user can have several, and a session can cross midnight.
-- [o] Order events per user, flag each one whose gap from the previous exceeds the timeout, and take a running sum of those flags as the session id.
-  > \`LAG\` supplies the gap and \`SUM(...) OVER (ORDER BY ...)\` accumulates the boundary flags, the gaps-and-islands pattern.
+- [o] Flag every gap over the timeout, then take a running sum.
+  > Order events per user first; the running sum of boundary flags becomes the session id. \`LAG\` supplies the gap and \`SUM(...) OVER (ORDER BY ...)\` accumulates the boundary flags, the gaps-and-islands pattern.
 - Use \`DISTINCT\` on user and timestamp.
   > That deduplicates rather than grouping into sessions.
-- Join the events table to itself on user id.
+- Join the events table to itself on the user id.
   > A self-join can be made to work and is far more expensive than the window approach.`}
 />
 
@@ -1203,9 +1203,9 @@ reasoning and runnable examples.
 
 - \`AVG\` of the minimum and maximum.
   > That is the midrange, which any outlier destroys.
-- [o] \`PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY x)\`, or the engine's \`MEDIAN\` where offered.
-  > \`PERCENTILE_DISC\` returns an actual value from the data; \`PERCENTILE_CONT\` interpolates between the two middle values.
-- \`AVG(x)\` with outliers filtered out.
+- [o] \`PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY x)\`.
+  > Or the engine's own \`MEDIAN\` where one is offered. \`PERCENTILE_DISC\` returns an actual value from the data; \`PERCENTILE_CONT\` interpolates between the two middle values.
+- \`AVG(x)\` with the outliers filtered out first.
   > A trimmed mean is a different statistic.
 - \`MODE(x)\`.
   > The mode is the most frequent value.`}
@@ -1216,9 +1216,9 @@ reasoning and runnable examples.
 
 - When you want one row per group.
   > That is \`agg\`.
-- [o] When you need the group-level result broadcast back to every original row, so it can be assigned as a new column.
-  > Computing each row's share of its group total is the canonical case: \`df["amount"] / df.groupby("g")["amount"].transform("sum")\`.
-- When the aggregation is a custom function.
+- [o] When the group result must line up with every original row.
+  > That is what lets it be assigned straight back as a new column. Computing each row's share of its group total is the canonical case: \`df["amount"] / df.groupby("g")["amount"].transform("sum")\`.
+- When the aggregation happens to be a custom function.
   > Both accept custom functions.
 - When the data contains missing values.
   > Missing-value handling is the same for both.`}
@@ -1229,9 +1229,9 @@ reasoning and runnable examples.
 
 - The join type was wrong; switch to inner.
   > An inner join does not prevent one-to-many duplication.
-- [o] The right frame has duplicate keys; pass \`validate="m:1"\` so pandas raises instead of silently fanning out.
-  > Checking \`df.duplicated(subset=key).sum()\` on both sides before merging catches it just as well, and earlier.
-- The keys have different dtypes; cast them.
+- [o] The right frame has duplicate keys, so pass \`validate="m:1"\`.
+  > pandas then raises instead of silently fanning out. Checking \`df.duplicated(subset=key).sum()\` on both sides before merging catches it just as well, and earlier.
+- The keys have different dtypes, so casting fixes it.
   > A dtype mismatch causes rows to fail to match, which does not inflate the count.
 - The index was not reset; reset it.
   > The index does not affect a column merge's cardinality.`}
@@ -1242,9 +1242,9 @@ reasoning and runnable examples.
 
 - Any metric that is not revenue.
   > Plenty of non-financial metrics drive good decisions.
-- [o] One that reliably looks good without informing a decision: a cumulative total, or a count that cannot go down. Ask what action a change in it would trigger.
-  > If no plausible movement in the metric would change what the team does next, it is decoration.
-- A metric that is hard to compute.
+- [o] One that reliably looks good without informing a decision.
+  > A cumulative total, or any count that cannot go down. Ask what action a change in it would trigger. If no plausible movement in the metric would change what the team does next, it is decoration.
+- A metric that is genuinely hard to compute.
   > Difficulty is unrelated.
 - A metric that moves slowly.
   > Slow-moving lagging indicators can still be decisive.`}
@@ -1255,11 +1255,11 @@ reasoning and runnable examples.
 
 - They cannot be computed in SQL.
   > They are straightforward to compute.
-- [o] Both parts can move independently, so the ratio can improve while the numerator falls, and averaging per-unit ratios weights small denominators equally with large ones.
-  > Reporting numerator, denominator, and ratio together is what keeps the movement interpretable.
+- [o] The numerator and denominator can move independently.
+  > The ratio can improve while the numerator falls, and averaging per-unit ratios weights small denominators equally with large ones. Reporting numerator, denominator, and ratio together is what keeps the movement interpretable.
 - They are always non-additive across time.
   > Non-additivity is real and is a consequence of the denominator, not a separate property.
-- They require a larger sample by definition.
+- They require a larger sample size by definition.
   > Sample requirements depend on variance, not on being a ratio.`}
 />
 
@@ -1268,9 +1268,9 @@ reasoning and runnable examples.
 
 - Compare it to last week's value.
   > A single comparison cannot separate the two.
-- [o] Judge it against the metric's historical variability, check whether the move is concentrated in one segment or broad, and confirm the instrumentation did not change.
-  > A move inside the normal week-to-week band needs no explanation; a move outside it needs one, and it is often instrumentation.
-- Run a significance test on the two values.
+- [o] Judge it against the metric's historical variability.
+  > Check whether the move is concentrated in one segment or broad, and confirm the instrumentation did not change. A move inside the normal week-to-week band needs no explanation; a move outside it needs one, and it is often instrumentation.
+- Run a significance test across the two values.
   > Observational period-over-period comparisons violate most test assumptions.
 - Wait a month and see if it persists.
   > Sometimes correct, but it is not a method for deciding now.`}
@@ -1281,11 +1281,11 @@ reasoning and runnable examples.
 
 - Recall a published figure.
   > Interviewers are testing the reasoning, not recall.
-- [o] Build it up from population, narrow by the fraction plausibly in the segment, apply a usage rate and a price, and state each assumption so it can be challenged.
-  > Being roughly right and explicit beats a precise number nobody can interrogate. Sanity-check the total against something known.
+- [o] Build it up from population and state every assumption.
+  > Narrow by the fraction plausibly in the segment, then apply a usage rate and a price. Being roughly right and explicit beats a precise number nobody can interrogate. Sanity-check the total against something known.
 - Multiply the current user base by ten.
   > An arbitrary multiplier is not an estimate.
-- State that it cannot be estimated without data.
+- Say that it cannot be estimated without more data.
   > Estimating under uncertainty is the skill being assessed.`}
 />
 
@@ -1294,8 +1294,8 @@ reasoning and runnable examples.
 
 - \`df.groupby("g")["x"].sum() / df["x"].sum()\`
   > This works for a per-group result, but it does not align back to the original rows.
-- [o] \`df["x"] / df.groupby("g")["x"].transform("sum")\` for a within-group share, or divide by \`df["x"].sum()\` for a share of the overall total.
-  > \`transform\` is what broadcasts the group total back to each row so the division aligns.
+- [o] Divide by \`df.groupby("g")["x"].transform("sum")\`.
+  > That gives a within-group share; divide by \`df["x"].sum()\` for a share of the overall total. \`transform\` is what broadcasts the group total back to each row so the division aligns.
 - \`df.groupby("g")["x"].apply(lambda s: s / s.sum())\`
   > It produces the right numbers with a multi-level index that usually needs untangling afterwards.
 - \`df["x"].pct_change()\`
@@ -1307,8 +1307,8 @@ reasoning and runnable examples.
 
 - Calling several methods on different objects in sequence.
   > The chain operates on one flowing result.
-- [o] Expressing a transformation as one pipeline of calls, which avoids naming a dozen intermediate frames and makes the sequence of operations readable top to bottom.
-  > \`assign\`, \`pipe\`, and \`query\` exist largely to keep operations chainable; the cost is that debugging a long chain is harder.
+- [o] Expressing a transformation as one pipeline of calls.
+  > It avoids naming a dozen intermediate frames and reads top to bottom. \`assign\`, \`pipe\`, and \`query\` exist largely to keep operations chainable; the cost is that debugging a long chain is harder.
 - A way of parallelizing pandas operations.
   > No concurrency is involved.
 - Chaining indexers such as \`df[...][...]\`.
@@ -1320,9 +1320,9 @@ reasoning and runnable examples.
 
 - \`INNER JOIN\` the two periods.
   > An inner join keeps exactly the users active in both.
-- [o] \`LEFT JOIN\` the earlier period to the later one and keep rows where the later side is \`NULL\`, or use \`NOT EXISTS\`.
-  > It is the anti-join pattern, and it is the basis of any churn definition.
-- \`UNION\` the two periods and count duplicates.
+- [o] \`LEFT JOIN\` and keep rows where the later side is \`NULL\`.
+  > \`NOT EXISTS\` expresses the same anti-join. It is the anti-join pattern, and it is the basis of any churn definition.
+- \`UNION\` the two periods together and count duplicates.
   > This identifies overlap rather than the difference.
 - \`FULL OUTER JOIN\` with no filter.
   > That returns everyone from both periods.`}

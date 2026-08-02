@@ -24,11 +24,11 @@ this track do, and is standard except where a question says otherwise.
 
 - It can only be used on numeric columns.
   > Ranking and offset functions work on any orderable type.
-- [o] It computes a value per row while leaving every input row in the result, where \`GROUP BY\` collapses each group to one row.
-  > That is why a window can put a group total beside each detail row without a self-join.
+- [o] It computes per row without collapsing the rows.
+  > \`GROUP BY\` collapses each group to one row; a window leaves every input row in place. That is why a window can put a group total beside each detail row without a self-join.
 - It always runs faster.
   > Windows often cost more, since they sort or hash-partition the input.
-- It replaces the need for a \`WHERE\` clause.
+- It removes any need for a \`WHERE\` clause in the query.
   > Row filtering is unrelated and still happens before windows are computed.`}
 />
 
@@ -37,18 +37,18 @@ this track do, and is standard except where a question says otherwise.
 
 - \`SELECT\`, \`FROM\`, and \`WHERE\`.
   > Those are query clauses, not components of a window specification.
-- [o] \`PARTITION BY\` (which rows share a window), \`ORDER BY\` (their order inside it), and the frame (which of them the function sees).
-  > All three are optional. Omitting them all gives one window over the entire result set.
+- [o] \`PARTITION BY\`, \`ORDER BY\`, and the frame clause.
+  > They set which rows share a window, their order inside it, and which of them the function sees. All three are optional. Omitting them all gives one window over the entire result set.
 - \`PARTITION BY\`, \`GROUP BY\`, and \`HAVING\`.
   > \`GROUP BY\` and \`HAVING\` belong to aggregation, and cannot appear inside \`OVER\`.
-- The function name, the column, and the alias.
+- The function name, the column it reads, and the output alias.
   > Those sit outside the \`OVER\` clause.`}
 />
 
 <MultipleChoice
   markdown={`Values ordered descending are \`100, 90, 90, 80\`. What do \`ROW_NUMBER\`, \`RANK\`, and \`DENSE_RANK\` return for the \`80\`?
 
-- \`4\`, \`4\`, \`4\`.
+- \`4\`, \`4\`, and \`4\`, all three agreeing.
   > Only \`ROW_NUMBER\` and \`RANK\` agree here; \`DENSE_RANK\` does not skip.
 - [o] \`4\`, \`4\`, \`3\`.
   > \`ROW_NUMBER\` numbers rows \`1,2,3,4\`; \`RANK\` gives \`1,2,2,4\`, skipping past the tie; \`DENSE_RANK\` gives \`1,2,2,3\`.
@@ -61,7 +61,7 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`Which pattern deduplicates to the latest record per key, keeping the whole row?
 
-- \`SELECT DISTINCT key, MAX(updated_at) ... GROUP BY key\`
+- \`SELECT DISTINCT key, MAX(updated_at) ... GROUP BY key\`, taking the newest timestamp.
   > This returns the key and timestamp but loses the rest of the winning row's columns.
 - [o] \`ROW_NUMBER() OVER (PARTITION BY key ORDER BY updated_at DESC)\` filtered to \`= 1\`.
   > The full row survives. \`RANK\` would return several rows per key whenever timestamps tie, which is why \`ROW_NUMBER\` is the safe choice.
@@ -76,8 +76,8 @@ this track do, and is standard except where a question says otherwise.
 
 - It qualifies a column reference with its table alias.
   > Qualification in that sense is just dotted naming, not a clause.
-- [o] It filters rows on the result of a window function, after \`SELECT\` has computed them.
-  > \`WHERE\` runs before windows exist and \`HAVING\` filters group aggregates, so \`QUALIFY\` fills the gap. DuckDB, Snowflake, BigQuery, and Teradata support it; Postgres and MySQL do not.
+- [o] It filters on the result of a window function.
+  > That happens after \`SELECT\` has computed them. \`WHERE\` runs before windows exist and \`HAVING\` filters group aggregates, so \`QUALIFY\` fills the gap. DuckDB, Snowflake, BigQuery, and Teradata support it; Postgres and MySQL do not.
 - It enforces a column's data type.
   > Type enforcement is done by the schema or a cast.
 - It is a synonym for \`HAVING\`.
@@ -89,9 +89,9 @@ this track do, and is standard except where a question says otherwise.
 
 - CTEs always execute faster.
   > Most engines optimize both similarly, and a materialized CTE can be slower.
-- [o] A CTE is named and reads top-to-bottom, and it can be referenced more than once in the same statement.
-  > Readability is the real argument, and it matters when the model is going to be reviewed and maintained.
-- CTEs can reference tables that subqueries cannot.
+- [o] It is named, reads top-to-bottom, and can be reused.
+  > Referencing it more than once in the same statement is the part a subquery cannot match. Readability is the real argument, and it matters when the model is going to be reviewed and maintained.
+- CTEs can reference tables that plain subqueries cannot.
   > Both see the same objects.
 - Only CTEs can be used with window functions.
   > Window functions work in either.`}
@@ -106,17 +106,17 @@ this track do, and is standard except where a question says otherwise.
   > The anchor seeds the result and the recursive member runs against the previous iteration until it yields nothing. A hierarchy with a cycle will loop forever without a visited-path guard or a depth cap.
 - A \`GROUP BY\` on the recursive member.
   > Grouping is unrelated to termination.
-- An explicit \`MAXRECURSION\` hint, on all engines.
+- An explicit \`MAXRECURSION\` hint, available on every engine.
   > Some engines offer such a setting, but the general answer is a filter that runs dry.`}
 />
 
 <MultipleChoice
   markdown={`\`SUM(revenue) OVER (PARTITION BY region ORDER BY day)\` gives a climbing number, but you wanted the region total on every row. What is the fix?
 
-- Add \`ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING\`.
+- Add \`ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING\` to the frame.
   > A three-row window is narrower still, not wider.
-- [o] Drop the \`ORDER BY\`, or widen the frame to \`ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING\`.
-  > Adding \`ORDER BY\` sets the default frame to "start of partition through current row", which is the definition of a running total.
+- [o] Drop the \`ORDER BY\`, or widen the frame explicitly.
+  > \`ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING\` covers the whole partition. Adding \`ORDER BY\` sets the default frame to "start of partition through current row", which is the definition of a running total.
 - Replace \`SUM\` with \`TOTAL\`.
   > No such standard function exists.
 - Move the expression into a \`HAVING\` clause.
@@ -128,11 +128,11 @@ this track do, and is standard except where a question says otherwise.
 
 - They give identical results in every case.
   > They coincide only when the ordering column has no ties.
-- [o] \`ROWS\` counts physical rows, so tied rows get different running totals; \`RANGE\` includes all peers, so tied rows share one.
-  > \`RANGE\` is the default when an \`ORDER BY\` is present, which is why an unexplained plateau in a running total usually traces back to ties.
+- [o] \`ROWS\` counts rows; \`RANGE\` includes every tied peer.
+  > So tied rows get different running totals under \`ROWS\` and share one under \`RANGE\`. \`RANGE\` is the default when an \`ORDER BY\` is present, which is why an unexplained plateau in a running total usually traces back to ties.
 - \`RANGE\` cannot be used with \`SUM\`.
   > \`RANGE\` works with any window aggregate.
-- \`ROWS\` requires an integer ordering column.
+- \`ROWS\` requires an integer column to order the rows by.
   > \`ROWS\` counts positions and is indifferent to the column's type.`}
 />
 
@@ -152,10 +152,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`An incremental model filters with \`WHERE updated_at > (SELECT MAX(updated_at) FROM this_model)\`. What can it silently miss?
 
-- Rows whose \`updated_at\` is in the future.
+- Rows whose \`updated_at\` timestamp sits in the future.
   > Future timestamps would be picked up, not missed.
-- [o] Late-arriving rows whose \`updated_at\` predates the high-water mark set by the last run.
-  > A lookback window (\`> max - interval '3 days'\`) plus a \`unique_key\` merge is the standard mitigation, alongside a periodic full refresh.
+- [o] Late-arriving rows that predate the high-water mark.
+  > The last run set that mark from \`updated_at\`. A lookback window (\`> max - interval '3 days'\`) plus a \`unique_key\` merge is the standard mitigation, alongside a periodic full refresh.
 - Rows that were deleted at source.
   > Hard deletes are missed too, but they escape any append-style filter; the high-water mark is specifically about late arrivals.
 - Nothing; the pattern is exact.
@@ -167,9 +167,9 @@ this track do, and is standard except where a question says otherwise.
 
 - A clustered index on a date column.
   > That is a physical storage choice, not a modelling one.
-- [o] A complete, gapless list of dates, joined to the facts so days with no activity appear as zero rather than vanishing.
-  > Without one, a chart of daily orders skips quiet days and a running average silently shifts.
-- A dimension that stores only the current date.
+- [o] A complete, gapless list of dates to join facts against.
+  > Days with no activity then appear as zero rather than vanishing. Without one, a chart of daily orders skips quiet days and a running average silently shifts.
+- A dimension table that stores only the current date.
   > A single-row table cannot fill gaps.
 - A partition key derived from a date.
   > Partitioning organizes storage; it does not create missing rows.`}
@@ -182,7 +182,7 @@ this track do, and is standard except where a question says otherwise.
   > This computes a single date, not a series.
 - [o] \`SELECT unnest(generate_series(DATE '2026-01-01', DATE '2026-01-31', INTERVAL 1 DAY))\`
   > \`generate_series\` returns the list and \`unnest\` expands it into rows. Postgres offers \`generate_series\` returning rows directly; BigQuery uses \`GENERATE_DATE_ARRAY\`.
-- \`SELECT * FROM dates WHERE month = 1\`
+- \`SELECT * FROM dates WHERE month = 1\`, against an existing dates table.
   > This assumes a dates table already exists, which is the thing being built.
 - \`SELECT RANGE(31)\`
   > \`range\` yields integers, which still need converting into dates.`}
@@ -191,10 +191,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`How do you pivot rows into columns in portable SQL?
 
-- With a \`PIVOT\` keyword, which is in the SQL standard.
+- With the \`PIVOT\` keyword, which is part of standard SQL.
   > \`PIVOT\` exists in DuckDB, Snowflake, and SQL Server, but it is not portable.
-- [o] Conditional aggregation: one \`SUM(CASE WHEN month = 'Jan' THEN amount END)\` per output column.
-  > Verbose but it runs everywhere, and it makes the grain of each output column explicit.
+- [o] Conditional aggregation, one \`SUM(CASE WHEN ...)\` per column.
+  > Verbose, and it runs everywhere. Verbose but it runs everywhere, and it makes the grain of each output column explicit.
 - With \`GROUP BY\` alone.
   > Grouping collapses rows; it cannot create new columns.
 - With \`UNPIVOT\`.
@@ -206,8 +206,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Filter out rows where the denominator is zero.
   > This removes real rows from the result, which changes the answer rather than protecting it.
-- [o] \`NULLIF(denominator, 0)\` in the divisor, which turns the zero into \`NULL\` and makes the whole ratio \`NULL\`.
-  > A \`NULL\` ratio is honest: the rate is undefined when nothing happened. Wrap in \`COALESCE\` only when zero is genuinely the right display value.
+- [o] \`NULLIF(denominator, 0)\` in the divisor.
+  > The zero becomes \`NULL\`, so the whole ratio is \`NULL\`. A \`NULL\` ratio is honest: the rate is undefined when nothing happened. Wrap in \`COALESCE\` only when zero is genuinely the right display value.
 - \`CASE WHEN denominator = 0 THEN 0 ELSE n / d END\`
   > This runs, but reporting a rate of 0% when there were no trials states something the data does not support.
 - Cast both sides to float.
@@ -219,9 +219,9 @@ this track do, and is standard except where a question says otherwise.
 
 - The two are algebraically identical.
   > They agree only when every row has the same denominator.
-- [o] Averaging per-row rates weights a row with 2 sessions the same as one with 2,000, which is Simpson's paradox waiting to happen.
-  > Summing the components first produces the correctly weighted rate. This is also why ratio metrics cannot be pre-aggregated safely.
-- \`AVG\` cannot be applied to a computed column.
+- [o] Averaging per-row rates weights every row equally.
+  > A row with 2 sessions counts the same as one with 2,000, which is Simpson's paradox waiting to happen. Summing the components first produces the correctly weighted rate. This is also why ratio metrics cannot be pre-aggregated safely.
+- \`AVG\` cannot be applied to a computed column at all.
   > It can; the problem is what the result means.
 - \`SUM\` is faster than \`AVG\`.
   > Any speed difference is irrelevant next to the correctness one.`}
@@ -232,9 +232,9 @@ this track do, and is standard except where a question says otherwise.
 
 - It is not supported by most warehouses.
   > Every major warehouse supports it.
-- [o] Distinct counts are not additive, so daily distinct users cannot be summed into a monthly figure.
-  > A user active on ten days would be counted ten times. The options are recomputing from detail, or an approximate sketch such as HyperLogLog that *can* be merged.
-- It always returns an approximate answer.
+- [o] Distinct counts are not additive across periods.
+  > Daily distinct users cannot be summed into a monthly figure. A user active on ten days would be counted ten times. The options are recomputing from detail, or an approximate sketch such as HyperLogLog that *can* be merged.
+- It always returns an approximate answer rather than exact.
   > It is exact unless an approximate function is chosen explicitly.
 - It requires an index on the column.
   > Columnar warehouses do not use indexes for this at all.`}
@@ -245,10 +245,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`What most distinguishes a modern cloud warehouse from a traditional one?
 
-- It uses SQL instead of a proprietary query language.
+- It uses plain SQL rather than a proprietary query language.
   > Traditional warehouses were SQL systems too.
-- [o] Storage and compute scale independently, so compute can be resized or paused without touching the data.
-  > It is what makes elastic, pay-per-query pricing possible, and why cost control becomes a modelling concern.
+- [o] Storage and compute scale independently of each other.
+  > Compute can be resized or paused without touching the data. It is what makes elastic, pay-per-query pricing possible, and why cost control becomes a modelling concern.
 - It stores data as rows rather than columns.
   > Cloud warehouses are columnar; that is the direction of travel, not away from it.
 - It removes the need for data modelling.
@@ -258,10 +258,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`Why does \`SELECT *\` cost more in a columnar warehouse than in a row store?
 
-- Columnar engines cannot use \`*\` at all.
+- Columnar engines cannot handle \`*\` in a query whatsoever.
   > It is valid; it is just expensive.
-- [o] Columnar storage lets a query read only the columns it names, and \`*\` forfeits that by reading every one.
-  > On a 200-column table, selecting four columns can scan a small fraction of the bytes. \`*\` also defeats projection pushdown into the file format.
+- [o] \`*\` forfeits the ability to read only the named columns.
+  > Every column is read, including the large rarely-used ones. On a 200-column table, selecting four columns can scan a small fraction of the bytes. \`*\` also defeats projection pushdown into the file format.
 - \`*\` disables the result cache.
   > Caching keys on the query text; the column list is not what invalidates it.
 - \`*\` forces a full sort of the table.
@@ -271,10 +271,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`What makes partition pruning save money?
 
-- It compresses the partitions more aggressively.
+- It compresses each of the partitions more aggressively.
   > Compression is independent of pruning.
-- [o] A filter on the partition key lets the engine skip whole partitions without reading them, so billed bytes drop.
-  > The saving only materializes if queries actually filter on that key, which is why the partition column should be the one people filter by, usually a date.
+- [o] Whole partitions are skipped without ever being read.
+  > A filter on the partition key is what enables it, and billed bytes drop. The saving only materializes if queries actually filter on that key, which is why the partition column should be the one people filter by, usually a date.
 - It rewrites the query to use fewer joins.
   > Pruning affects what is scanned, not the join plan.
 - It caches each partition in memory.
@@ -286,21 +286,21 @@ this track do, and is standard except where a question says otherwise.
 
 - They are two names for the same mechanism.
   > They operate at different granularities and are often used together.
-- [o] Partitioning splits a table into separate physical units the engine can skip wholesale; clustering sorts or co-locates rows *within* those units so blocks can be skipped too.
-  > Partition on a low-cardinality column such as date; cluster on the high-cardinality columns queries filter on next.
+- [o] One skips whole units, the other skips blocks inside them.
+  > Partitioning splits the table into physical units; clustering sorts or co-locates rows within them. Partition on a low-cardinality column such as date; cluster on the high-cardinality columns queries filter on next.
 - Clustering applies only to streaming tables.
   > It applies to ordinary tables.
-- Partitioning is automatic and clustering is manual.
+- Partitioning is automatic, while clustering has to be manual.
   > Both are configured deliberately, though some engines offer automatic clustering maintenance.`}
 />
 
 <MultipleChoice
   markdown={`A dashboard query is slow and the model is rebuilt hourly from a large source. Which materialization fits?
 
-- A view, because it is always fresh.
+- A view, on the grounds that it is always fresh.
   > A view re-runs the whole computation on every dashboard load, which is the slowness being described.
-- [o] A table, rebuilt on the model's schedule so readers hit precomputed results.
-  > Freshness is bounded by the schedule, which the hourly rebuild already accepts.
+- [o] A table, rebuilt on the model's own schedule.
+  > Readers then hit precomputed results. Freshness is bounded by the schedule, which the hourly rebuild already accepts.
 - An ephemeral model.
   > Ephemeral models are inlined into their consumers as CTEs and materialize nothing, so the work still happens per query.
 - A snapshot.
@@ -310,10 +310,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`When is incremental preferable to a full rebuild?
 
-- Whenever the model has more than a million rows.
+- Whenever the model grows past a million rows or thereabouts.
   > Row count alone is a poor trigger; a million-row rebuild can be trivially cheap.
-- [o] When the source is large, new rows are identifiable, and a full rebuild costs more than the complexity of maintaining the incremental logic.
-  > Incremental buys runtime and cost at the price of an extra failure mode: silently missing late or restated rows.
+- [o] When a full rebuild costs more than the added complexity.
+  > The source has to be large and the new rows identifiable. Incremental buys runtime and cost at the price of an extra failure mode: silently missing late or restated rows.
 - Whenever the model is used by a dashboard.
   > Who consumes the model does not determine how it is built.
 - Always, since it is strictly cheaper.
@@ -325,9 +325,9 @@ this track do, and is standard except where a question says otherwise.
 
 - It runs in under a minute.
   > Speed and idempotency are unrelated.
-- [o] Running it twice for the same window produces the same result as running it once.
+- [o] Running it twice gives the same result as running it once.
   > It is what makes retries and backfills safe. Insert-only logic without a key breaks it; \`MERGE\` on a unique key or delete-then-insert per partition preserves it.
-- It writes to a new table each time.
+- It writes out to a brand new table on every run.
   > New output each run is the opposite: it leaves the consumer to work out which one is current.
 - It never fails.
   > Idempotency is about what happens when you *do* re-run after a failure.`}
@@ -338,9 +338,9 @@ this track do, and is standard except where a question says otherwise.
 
 - It appends rows and deduplicates them later.
   > Deferred deduplication leaves a window in which the table is wrong.
-- [o] It matches incoming rows to existing ones on a key, updating on a match and inserting otherwise, so re-running the same batch converges to the same state.
-  > The key has to be genuinely unique in the source, or a single incoming row can match several targets and the behavior becomes engine-specific.
-- It locks the table for the duration of the load.
+- [o] It matches on a key, updating on a match and inserting otherwise.
+  > Re-running the same batch therefore converges to the same state. The key has to be genuinely unique in the source, or a single incoming row can match several targets and the behavior becomes engine-specific.
+- It locks the whole table for the duration of the load.
   > Locking is an implementation detail, not the source of idempotency.
 - It only works on partitioned tables.
   > Partitioning is not required.`}
@@ -351,9 +351,9 @@ this track do, and is standard except where a question says otherwise.
 
 - To defragment the underlying storage.
   > Compaction is a real concern but a separate one.
-- [o] To repair drift from late-arriving rows, restated source records, and logic changes that the incremental filter never revisited.
-  > A weekly or monthly full refresh bounds how long an error can survive undetected.
-- Because incremental models expire after a fixed period.
+- [o] To repair drift the incremental filter never revisited.
+  > Late-arriving rows, restated source records, and logic changes all cause it. A weekly or monthly full refresh bounds how long an error can survive undetected.
+- Because incremental models expire after some fixed period.
   > Nothing expires on its own.
 - To refresh the documentation.
   > Docs are generated separately from model runs.`}
@@ -362,10 +362,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`What is the core difference between OLTP and OLAP workloads?
 
-- OLTP uses SQL and OLAP uses a query builder.
+- OLTP uses SQL, while OLAP uses a visual query builder.
   > Both are SQL systems.
-- [o] OLTP handles many small reads and writes of individual rows; OLAP scans large numbers of rows over few columns to aggregate them.
-  > It is why one is row-oriented and normalized, and the other columnar and denormalized.
+- [o] Many small row operations against wide aggregate scans.
+  > OLTP reads and writes individual rows; OLAP scans many rows over few columns. It is why one is row-oriented and normalized, and the other columnar and denormalized.
 - OLAP systems cannot handle writes.
   > They handle bulk loads and, increasingly, updates.
 - OLTP systems cannot run joins.
@@ -377,8 +377,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Switching to a smaller compute size for every workload.
   > Undersizing can make a query run so much longer that total cost rises.
-- [o] Reducing bytes scanned: partitioning and clustering on filtered columns, selecting fewer columns, and materializing repeated heavy transformations once.
-  > Most warehouses bill on scanned data or on compute-seconds, and both track the volume read.
+- [o] Reducing the number of bytes each query scans.
+  > Partition and cluster on filtered columns, select fewer columns, and materialize repeated heavy transformations once. Most warehouses bill on scanned data or on compute-seconds, and both track the volume read.
 - Adding more indexes.
   > Columnar warehouses generally do not offer secondary indexes at all.
 - Running everything in one large virtual warehouse.
@@ -388,10 +388,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`What does a result cache do?
 
-- It stores the physical table in memory permanently.
+- It stores the whole physical table in memory permanently.
   > That is a different mechanism, closer to caching or persistence of data.
-- [o] It returns the stored result of a previously executed identical query, without recomputing, as long as the underlying data has not changed.
-  > It is why re-running a dashboard query is instant and free, and why a small change in query text can suddenly cost money again.
+- [o] It returns a stored result for an identical earlier query.
+  > Nothing is recomputed, as long as the underlying data has not changed. It is why re-running a dashboard query is instant and free, and why a small change in query text can suddenly cost money again.
 - It caches the query plan but re-executes the scan.
   > Plan caching exists separately and does not avoid the scan.
 - It applies only to views.
@@ -403,9 +403,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Which users can read which columns.
   > Access control is unrelated.
-- [o] The distribution key decides which node a row lands on, and the sort key decides row order within each slice, so together they govern shuffle and scan cost.
-  > A distribution key matching the join key keeps joins local; a sort key matching the filter column enables zone-map skipping.
-- The compression codec applied to each column.
+- [o] One decides the node, the other the order within a slice.
+  > Together they govern shuffle and scan cost. A distribution key matching the join key keeps joins local; a sort key matching the filter column enables zone-map skipping.
+- The compression codec that gets applied to every column.
   > Encoding is configured separately per column.
 - The order in which columns are returned.
   > Output column order comes from the \`SELECT\` list.`}
@@ -416,8 +416,8 @@ this track do, and is standard except where a question says otherwise.
 
 - When the table is queried frequently.
   > Frequent querying is an argument for partitioning, not against it.
-- [o] When the key has very high cardinality, producing many tiny partitions whose per-file overhead outweighs the pruning benefit.
-  > Partitioning by user id or timestamp-to-the-second is the classic version of this. Date, or date plus one coarse dimension, is usually the sweet spot.
+- [o] When the key has very high cardinality.
+  > Many tiny partitions result, and their per-file overhead outweighs the pruning benefit. Partitioning by user id or timestamp-to-the-second is the classic version of this. Date, or date plus one coarse dimension, is usually the sweet spot.
 - When the table has more than 100 columns.
   > Column count is unrelated to partition strategy.
 - When the data is compressed.
@@ -429,8 +429,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Warehouses cannot perform joins.
   > They can, and do, constantly.
-- [o] Columnar storage means unused columns cost nothing to read, and avoiding joins removes both runtime cost and a class of fan-out mistakes.
-  > The trade is storage and update complexity, which matters far less in an append-mostly analytical store than in a transactional one.
+- [o] Unused columns cost nothing, and joins are avoided entirely.
+  > Columnar storage is what makes the first true; the second removes a class of fan-out mistakes. The trade is storage and update complexity, which matters far less in an append-mostly analytical store than in a transactional one.
 - Denormalized tables are always smaller.
   > They are usually larger; compression narrows the gap but does not close it.
 - Normalization is a rule that applies only to relational databases.
@@ -442,8 +442,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Files under 1 KB are rejected by object storage.
   > No such limit exists.
-- [o] Thousands of tiny files make the engine pay per-file open and metadata overhead that dwarfs the time spent reading the data.
-  > Compaction into files of roughly 128 MB to 1 GB is the usual remedy; streaming writes and over-partitioning are the usual causes.
+- [o] Per-file open and metadata overhead dwarfs the read.
+  > Thousands of tiny files are what cause it. Compaction into files of roughly 128 MB to 1 GB is the usual remedy; streaming writes and over-partitioning are the usual causes.
 - Small files compress better and waste CPU on decompression.
   > Small files compress *worse*, since each has less context.
 - It only affects streaming systems.
@@ -455,8 +455,8 @@ this track do, and is standard except where a question says otherwise.
 
 - A warehouse that has been moved into object storage, with no other change.
   > Storage location alone is not the distinction.
-- [o] Open table formats over object storage that add warehouse features (ACID transactions, schema enforcement, and time travel) to lake-scale files.
-  > Delta Lake, Iceberg, and Hudi are the common implementations, and they are what let one copy of the data serve both SQL and non-SQL engines.
+- [o] Open table formats layered over object storage.
+  > Delta, Iceberg, and Hudi add ACID transactions, schema enforcement, and time travel to lake-scale files. Delta Lake, Iceberg, and Hudi are the common implementations, and they are what let one copy of the data serve both SQL and non-SQL engines.
 - A data lake with a BI tool connected to it.
   > A BI connection does not add transactions or schema guarantees.
 - A warehouse that only stores unstructured data.
@@ -470,8 +470,8 @@ this track do, and is standard except where a question says otherwise.
 
 - It moves data between systems.
   > Extraction and loading are someone else's job; dbt is the T in ELT.
-- [o] It compiles the model's SQL and runs it inside your warehouse as a \`CREATE TABLE AS\` or \`CREATE VIEW AS\`.
-  > The data never leaves the warehouse, which is why dbt has no processing engine of its own.
+- [o] It compiles SQL and runs it inside your warehouse.
+  > The result is a \`CREATE TABLE AS\` or \`CREATE VIEW AS\`. The data never leaves the warehouse, which is why dbt has no processing engine of its own.
 - It executes the transformation on dbt's own compute.
   > dbt Cloud runs the orchestration, never the query.
 - It generates Python and runs it.
@@ -483,11 +483,11 @@ this track do, and is standard except where a question says otherwise.
 
 - Nothing; it is a style preference.
   > It is what makes the whole project work as a graph.
-- [o] It resolves to the right object for the current environment *and* registers a dependency edge, which is how dbt builds the DAG and orders runs.
-  > Hard-coded names build in the wrong order and silently point at production from a dev run.
+- [o] It resolves per environment and registers a dependency.
+  > That edge is how dbt builds the DAG and orders runs. Hard-coded names build in the wrong order and silently point at production from a dev run.
 - It caches the referenced table.
   > No caching is involved.
-- It enforces the referenced model's schema.
+- It enforces the schema of whichever model is referenced.
   > That is what contracts and tests do.`}
 />
 
@@ -496,9 +496,9 @@ this track do, and is standard except where a question says otherwise.
 
 - \`source()\` is for other dbt projects.
   > Cross-project references use a different mechanism.
-- [o] \`ref()\` points at another model dbt builds; \`source()\` points at raw tables loaded by something else, declared in YAML.
-  > Declaring sources is also what enables freshness checks and lineage back to the loader.
-- \`source()\` is the deprecated form of \`ref()\`.
+- [o] One points at a dbt model, the other at a raw table.
+  > \`source()\` covers tables loaded by something else, declared in YAML. Declaring sources is also what enables freshness checks and lineage back to the loader.
+- \`source()\` is simply the deprecated spelling of \`ref()\`.
   > Both are current and mean different things.
 - \`ref()\` works only in incremental models.
   > It works in every model.`}
@@ -507,10 +507,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`What is an ephemeral model?
 
-- A model that is dropped after each run.
+- A model that gets dropped again after each run.
   > Nothing is created to drop.
-- [o] A model that is never built in the warehouse; its SQL is inlined as a CTE into every model that \`ref\`s it.
-  > Useful for small, reused logic. It stops being useful once several models inline the same heavy computation, since the work is then repeated.
+- [o] A model never built in the warehouse at all.
+  > Its SQL is inlined as a CTE into every model that \`ref\`s it. Useful for small, reused logic. It stops being useful once several models inline the same heavy computation, since the work is then repeated.
 - A model materialized in memory.
   > There is no in-memory materialization; the warehouse does all execution.
 - A model with a short retention policy.
@@ -522,9 +522,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Nothing; they are aliases.
   > They differ in scope.
-- [o] It interleaves models, tests, seeds, and snapshots in DAG order, so a model's tests run before its downstream models are built.
-  > That is the important part: a failing test stops the bad data from propagating, where \`run\` then \`test\` would have already built everything downstream.
-- It rebuilds every model from scratch.
+- [o] It interleaves models, tests, seeds, and snapshots.
+  > Running in DAG order means a model's tests run before its downstream models are built. That is the important part: a failing test stops the bad data from propagating, where \`run\` then \`test\` would have already built everything downstream.
+- It rebuilds every model in the project from scratch.
   > Full rebuilds come from \`--full-refresh\`.
 - It compiles without executing.
   > That is \`dbt compile\`.`}
@@ -548,8 +548,8 @@ this track do, and is standard except where a question says otherwise.
 
 - It compares the output to a stored fixture.
   > That is closer to how dbt *unit* tests work.
-- [o] The test passes when the query returns zero rows; every returned row is a failing record.
-  > It is why writing a custom test means writing a query that selects the violations.
+- [o] It passes when the query returns zero rows.
+  > Every returned row is a failing record. It is why writing a custom test means writing a query that selects the violations.
 - It checks that the query returns at least one row.
   > That would invert every test.
 - It compares row counts before and after the run.
@@ -561,8 +561,8 @@ this track do, and is standard except where a question says otherwise.
 
 - A test that can only be applied to one column.
   > Column scope is not the distinction.
-- [o] A one-off assertion written as a \`.sql\` file in the \`tests/\` directory, returning failing rows.
-  > Generic tests are the parameterized, reusable kind declared in YAML; singular tests cover the specific thing that only matters here.
+- [o] A one-off assertion written as a \`.sql\` file.
+  > It lives in the \`tests/\` directory and returns failing rows. Generic tests are the parameterized, reusable kind declared in YAML; singular tests cover the specific thing that only matters here.
 - A test that runs once and is then cached.
   > Tests run every time they are invoked.
 - A test with a single \`WHERE\` clause.
@@ -574,11 +574,11 @@ this track do, and is standard except where a question says otherwise.
 
 - Which column the table is partitioned by.
   > Partitioning is configured separately.
-- [o] Which key dbt matches on to update existing rows rather than appending duplicates.
-  > Without it, an incremental run appends, so a restated source row appears twice. With it, dbt issues a merge or delete-then-insert.
+- [o] Which key dbt matches on when updating existing rows.
+  > Without it, an incremental run appends duplicates. Without it, an incremental run appends, so a restated source row appears twice. With it, dbt issues a merge or delete-then-insert.
 - The order in which rows are inserted.
   > Insert order is not configurable and would not matter.
-- Which column the model's tests run against.
+- Which column each of the model's tests is run against.
   > Tests are declared independently.`}
 />
 
@@ -587,8 +587,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Backing up a model before a schema change, with no SCD type.
   > It is a modelling tool, not a backup.
-- [o] Capturing how a mutable source row changes over time, implemented as SCD Type 2 with validity ranges and a current-row flag.
-  > It is the answer to "the source overwrites the record, but we need to know what it said last quarter".
+- [o] Capturing how a mutable source row changes over time.
+  > It is SCD Type 2, with validity ranges and a current-row flag. It is the answer to "the source overwrites the record, but we need to know what it said last quarter".
 - Materializing a point-in-time copy, SCD Type 1.
   > Type 1 overwrites and keeps no history, which is the opposite of what a snapshot does.
 - Recording a model's row count over time.
@@ -600,11 +600,11 @@ this track do, and is standard except where a question says otherwise.
 
 - Sample rows generated for testing.
   > No data is generated.
-- [o] Small CSV files in the repo that dbt loads into the warehouse as tables, for static reference data such as country-code or category mappings.
-  > They are version controlled, which is the point. They are the wrong tool for anything large or frequently changing.
+- [o] Small CSV files in the repo, loaded in as tables.
+  > They suit static reference data such as country-code or category mappings, and they are version controlled. They are version controlled, which is the point. They are the wrong tool for anything large or frequently changing.
 - The first models built in a run.
   > Build order comes from the DAG.
-- Randomization values used by tests.
+- The randomization values that the tests make use of.
   > dbt tests are deterministic.`}
 />
 
@@ -613,11 +613,11 @@ this track do, and is standard except where a question says otherwise.
 
 - The current model's source table.
   > Sources are referenced with \`source()\`.
-- [o] The relation being built by the current model, which is how an incremental model queries its own existing rows.
-  > The typical use is \`WHERE updated_at > (SELECT MAX(updated_at) FROM {{ this }})\` inside an \`is_incremental()\` block.
+- [o] The relation the current model is building.
+  > It is how an incremental model queries its own existing rows. The typical use is \`WHERE updated_at > (SELECT MAX(updated_at) FROM {{ this }})\` inside an \`is_incremental()\` block.
 - The current dbt project.
   > The project is available through other variables.
-- The row currently being processed.
+- The row that is currently being processed.
   > dbt compiles SQL; it has no row-level iteration.`}
 />
 
@@ -639,8 +639,8 @@ this track do, and is standard except where a question says otherwise.
 
 - It checks that the model's SQL has changed recently.
   > Code changes are a git concern.
-- [o] It checks how old the newest row in a *source* is against warn and error thresholds, catching a stalled loader before downstream models are even built.
-  > A test asserts a property of the data's content; freshness asserts a property of its arrival time.
+- [o] It checks how old a source's newest row is.
+  > Warn and error thresholds catch a stalled loader before downstream models are even built. A test asserts a property of the data's content; freshness asserts a property of its arrival time.
 - It verifies that a source's schema matches the YAML.
   > Schema drift is caught by contracts or tests.
 - It compares row counts between runs.
@@ -652,8 +652,8 @@ this track do, and is standard except where a question says otherwise.
 
 - That downstream consumers acknowledge changes before they ship.
   > Social process is not what the feature does.
-- [o] That the built model matches a declared column list, data types, and any specified constraints, failing the build if it does not.
-  > It converts a silent schema change into a build failure at the boundary where other teams depend on the model.
+- [o] That the built model matches its declared column list.
+  > Data types and any specified constraints too, failing the build if it does not. It converts a silent schema change into a build failure at the boundary where other teams depend on the model.
 - That the model's tests all pass.
   > Tests are enforced by running them.
 - That the model is materialized as a table.
@@ -665,8 +665,8 @@ this track do, and is standard except where a question says otherwise.
 
 - It runs \`dbt build\` against production on every pull request.
   > Running against production risks breaking live tables from an unreviewed branch.
-- [o] It builds the changed models and their descendants into a temporary schema, runs their tests there, and tears it down afterwards.
-  > Slim CI narrows this further using the production manifest via \`state:modified+\`, so only what actually changed gets built.
+- [o] It builds the changed models into a temporary schema.
+  > Their descendants come too, tests run there, and it is torn down afterwards. Slim CI narrows this further using the production manifest via \`state:modified+\`, so only what actually changed gets built.
 - It only lints the SQL.
   > Linting catches style, not broken logic or contract violations.
 - It runs the full project nightly instead.
@@ -676,10 +676,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`What is the practical value of exposures in dbt?
 
-- They export models to a BI tool automatically.
+- They export the models to a BI tool automatically.
   > No data is exported; exposures are metadata.
-- [o] They declare which dashboards, apps, or reports depend on which models, so lineage extends past the warehouse and impact analysis includes downstream consumers.
-  > It answers "what breaks if I change this model?" for things dbt cannot otherwise see.
+- [o] They declare which dashboards depend on which models.
+  > Apps and reports too, so lineage extends past the warehouse and impact analysis includes downstream consumers. It answers "what breaks if I change this model?" for things dbt cannot otherwise see.
 - They expose models over an API.
   > No serving layer is created.
 - They mark models as public for other projects.
@@ -689,10 +689,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`Where does dbt's lineage DAG come from?
 
-- A YAML file listing each model's dependencies.
+- A YAML file that lists each model's dependencies.
   > Nobody maintains that by hand.
-- [o] The \`ref()\` and \`source()\` calls in the compiled SQL, parsed into a dependency graph.
-  > It is why bypassing \`ref()\` breaks ordering silently: the edge simply never exists.
+- [o] The \`ref()\` and \`source()\` calls in the compiled SQL.
+  > They are parsed into a dependency graph. It is why bypassing \`ref()\` breaks ordering silently: the edge simply never exists.
 - The order models appear in \`dbt_project.yml\`.
   > That file configures behavior, not ordering.
 - The alphabetical order of the model files.
@@ -704,10 +704,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`What distinguishes a fact table from a dimension table?
 
-- Facts hold text and dimensions hold numbers.
+- Fact tables hold text and dimensions hold numbers.
   > It is nearly the reverse: measures are numeric, descriptive attributes are usually text.
-- [o] A fact table records measurable events at a defined grain; a dimension table holds the descriptive attributes you filter and group those events by.
-  > Facts are long and narrow and grow with activity; dimensions are wide and comparatively short.
+- [o] One records events, the other describes them.
+  > A fact table holds measurable events at a defined grain; a dimension holds the attributes you filter and group by. Facts are long and narrow and grow with activity; dimensions are wide and comparatively short.
 - Facts are indexed and dimensions are not.
   > Indexing is a physical choice unrelated to the classification.
 - Dimensions are always smaller than facts.
@@ -719,9 +719,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Because the grain determines the table name.
   > Naming follows the grain but is not why it matters.
-- [o] Every later decision (which dimensions apply, which measures are additive, whether a join fans out) follows from what one row represents.
-  > "One row per order line per day" is a testable statement; a table without an agreed grain quietly accumulates double counting.
-- Because the warehouse needs it to allocate storage.
+- [o] Every later decision follows from what one row represents.
+  > Which dimensions apply, which measures are additive, and whether a join fans out all depend on it. "One row per order line per day" is a testable statement; a table without an agreed grain quietly accumulates double counting.
+- Because the warehouse needs it in order to allocate storage.
   > Storage is allocated regardless.
 - Because tests cannot run without it.
   > Tests run either way; they are just far less meaningful.`}
@@ -732,8 +732,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Surrogate keys are shorter to type.
   > Brevity is not the argument.
-- [o] It insulates the warehouse from source key changes and reuse, and it is what makes SCD Type 2 possible, since one natural key needs several rows.
-  > A natural key cannot identify "the version of this customer that was current last March".
+- [o] It insulates the warehouse from source key changes.
+  > It is also what makes SCD Type 2 possible, since one natural key then needs several rows. A natural key cannot identify "the version of this customer that was current last March".
 - Natural keys cannot be indexed.
   > They index perfectly well.
 - Surrogate keys enforce referential integrity automatically.
@@ -743,10 +743,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`What belongs in the staging layer?
 
-- The business logic that defines each metric.
+- The business logic that defines each reported metric.
   > Metric logic belongs further downstream, in intermediate or mart models.
-- [o] One model per source table doing light, non-destructive work: renaming, casting, and basic cleaning, with no joins to other sources.
-  > Keeping staging one-to-one with sources makes it obvious where a column came from, and gives every downstream model one place to start.
+- [o] One model per source table, doing light cleaning only.
+  > Renaming, casting, and basic cleaning, with no joins to other sources. Keeping staging one-to-one with sources makes it obvious where a column came from, and gives every downstream model one place to start.
 - Joined and aggregated tables ready for BI.
   > That is the mart layer.
 - Raw data exactly as loaded, untouched.
@@ -760,7 +760,7 @@ this track do, and is standard except where a question says otherwise.
   > Those are schema shapes, not fact types.
 - [o] Transaction, periodic snapshot, and accumulating snapshot.
   > Transaction records one event; periodic snapshot samples state on a schedule; accumulating snapshot has one row per process instance whose milestone columns fill in over time.
-- Additive, semi-additive, and non-additive.
+- Additive, semi-additive, and non-additive fact tables.
   > Those describe measures, not the tables holding them.
 - Fact, factless, and bridge.
   > Factless is a variant and bridge is a different construct entirely.`}
@@ -771,21 +771,21 @@ this track do, and is standard except where a question says otherwise.
 
 - Additive.
   > Summing balances across days gives a number that means nothing.
-- [o] Semi-additive: it can be summed across accounts but not across time, where an average or period-end value is what you want.
-  > Inventory levels and headcount behave the same way, and it is one of the most common sources of a wrong dashboard number.
+- [o] Semi-additive, so it sums across accounts but not time.
+  > An average or a period-end value is what you want across time. Inventory levels and headcount behave the same way, and it is one of the most common sources of a wrong dashboard number.
 - Non-additive.
   > Non-additive measures such as ratios cannot be summed across *any* dimension.
-- It depends on the warehouse.
+- It depends entirely on the warehouse in use.
   > The behavior follows from the measure's semantics.`}
 />
 
 <MultipleChoice
   markdown={`What does SCD Type 1 do, and what is the cost?
 
-- It adds a new row for each change, preserving history.
+- It adds a new row for every change, preserving the history.
   > That is Type 2.
-- [o] It overwrites the attribute in place, which is simple and keeps one row per entity, but destroys the ability to report on how things looked in the past.
-  > Fine for correcting a typo in a name; wrong for a customer's region, where historical reporting would silently shift.
+- [o] It overwrites the attribute in place, losing the history.
+  > One row per entity is simple, but past reporting silently changes. Fine for correcting a typo in a name; wrong for a customer's region, where historical reporting would silently shift.
 - It adds a previous-value column.
   > That is Type 3, which keeps only one prior value.
 - It refuses the change and raises an error.
@@ -795,10 +795,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`How is SCD Type 2 implemented?
 
-- One column per historical value, added as needed.
+- One extra column per historical value, added as needed.
   > Growing the schema per change is unworkable, and closer to Type 3.
-- [o] A new row per version, with validity dates, a current flag, and a new surrogate key, while the natural key stays constant.
-  > Facts join to the surrogate key that was current at the time of the event, which is what makes historically accurate reporting work.
+- [o] A new row per version, keyed by a new surrogate key.
+  > Validity dates and a current flag come with it, while the natural key stays constant. Facts join to the surrogate key that was current at the time of the event, which is what makes historically accurate reporting work.
 - A separate history table queried by union.
   > Type 4 does use a separate history table; Type 2 keeps versions in the dimension itself.
 - A JSON column holding all past values.
@@ -810,11 +810,11 @@ this track do, and is standard except where a question says otherwise.
 
 - A dimension that has been normalized to 3NF.
   > Normalization is unrelated to conformance.
-- [o] A dimension shared across several fact tables with identical keys and meaning, so metrics from different processes can be compared side by side.
-  > Without one, "revenue by region" and "support tickets by region" cannot be trusted to mean the same regions.
+- [o] A dimension shared across facts with identical meaning.
+  > The keys match too, so metrics from different processes compare side by side. Without one, "revenue by region" and "support tickets by region" cannot be trusted to mean the same regions.
 - A dimension with no missing values.
   > Completeness is a data-quality property.
-- A dimension generated from a source system's API.
+- A dimension generated straight from a source system's API.
   > Provenance does not make a dimension conformed.`}
 />
 
@@ -823,11 +823,11 @@ this track do, and is standard except where a question says otherwise.
 
 - A dimension whose rows have gone stale.
   > Staleness is a freshness problem.
-- [o] A dimensional attribute (typically an identifier such as an order number) that lives on the fact table because it has no other attributes worth a table of its own.
-  > It still supports grouping and drill-through; it just does not justify a join.
+- [o] An attribute living on the fact for want of a table.
+  > Typically an identifier such as an order number, with no other attributes worth a dimension of its own. It still supports grouping and drill-through; it just does not justify a join.
 - A dimension with only one row.
   > A single-row dimension is unusual but not degenerate in this sense.
-- A dimension that has lost its surrogate key.
+- A dimension that has somehow lost its surrogate key.
   > A missing key is a modelling error, not a pattern.`}
 />
 
@@ -836,11 +836,11 @@ this track do, and is standard except where a question says otherwise.
 
 - A dimension whose meaning changes per user.
   > Meaning is fixed; only the relationship varies.
-- [o] One physical dimension joined several times to the same fact in different roles, such as a date dimension used as order date, ship date, and delivery date.
-  > Each join is usually exposed as a view or alias so reports can say "ship month" without ambiguity.
+- [o] One physical dimension joined several times in different roles.
+  > A date dimension used as order date, ship date, and delivery date is the classic case. Each join is usually exposed as a view or alias so reports can say "ship month" without ambiguity.
 - A dimension that is both a fact and a dimension.
   > That describes a fact table used as a dimension, which is a different pattern.
-- A dimension populated by a role-based access rule.
+- A dimension that is populated by a role-based access rule.
   > Access control has nothing to do with it.`}
 />
 
@@ -849,9 +849,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Storing data of unknown quality.
   > Quality is not what the name refers to.
-- [o] It collapses several low-cardinality flags and indicators into one dimension of their distinct combinations, instead of leaving a scatter of boolean columns on the fact.
-  > It keeps the fact table narrow and gives those flags one place to be described.
-- It archives dimension rows no longer in use.
+- [o] It collapses scattered low-cardinality flags into one dimension.
+  > The dimension holds their distinct combinations, keeping the fact table narrow. It keeps the fact table narrow and gives those flags one place to be described.
+- It archives the dimension rows that are no longer in use.
   > Retired rows stay in place, usually marked inactive.
 - It holds rows that failed a quality test.
   > Failed rows are typically quarantined, not modelled as a dimension.`}
@@ -860,10 +860,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`What is a factless fact table?
 
-- A fact table whose measures are all zero.
+- A fact table in which every measure is zero.
   > Zeros are still measures.
-- [o] A table recording that an event or a relationship occurred, with no numeric measure; the count of rows is the measure.
-  > Student attendance and promotion eligibility are the classic examples: the useful questions are "how many" and, harder, "which ones did *not* happen".
+- [o] A table recording that something occurred, with no measure.
+  > The count of rows is the measure. Attendance and promotion eligibility are the classic examples. Student attendance and promotion eligibility are the classic examples: the useful questions are "how many" and, harder, "which ones did *not* happen".
 - A dimension misclassified as a fact.
   > It is a genuine fact table by grain and purpose.
 - A fact table with no foreign keys.
@@ -873,10 +873,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`When do you need a bridge table?
 
-- When two fact tables share a dimension.
+- When two separate fact tables share one dimension.
   > Shared dimensions need conformance, not a bridge.
-- [o] When a many-to-many relationship exists between a fact and a dimension, such as a bank account held by several customers.
-  > The bridge carries the pair, often with an allocation weight so the measure can be split rather than double counted.
+- [o] When a fact and a dimension are many-to-many.
+  > A bank account held by several customers is the standard example. The bridge carries the pair, often with an allocation weight so the measure can be split rather than double counted.
 - When a dimension changes slowly.
   > Slow change is handled by SCD types.
 - When a fact table grows too large.
@@ -888,8 +888,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Kimball normalizes first; Inmon starts with marts.
   > This has the two the wrong way round.
-- [o] Kimball builds conformed dimensional marts bottom-up around business processes; Inmon builds a normalized enterprise warehouse first, then derives marts from it.
-  > Kimball reaches usable output sooner; Inmon front-loads integration. Most real projects land somewhere between.
+- [o] One builds marts bottom-up, the other top-down.
+  > Kimball starts with conformed dimensional marts around business processes; Inmon builds a normalized enterprise warehouse first and derives marts from it. Kimball reaches usable output sooner; Inmon front-loads integration. Most real projects land somewhere between.
 - Kimball is for cloud warehouses and Inmon for on-premises.
   > Both predate and outlive any particular platform.
 - They differ only in terminology.
@@ -901,9 +901,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Because 3NF is incorrect.
   > 3NF is correct and appropriate for transactional systems.
-- [o] Splitting a dimension into normalized parts adds joins that cost query time and comprehension, and the update anomalies 3NF prevents barely arise in an append-mostly warehouse.
-  > A flat, wide dimension is the deliberate trade: some redundancy for far simpler and faster queries.
-- Because warehouses cannot enforce foreign keys.
+- [o] The joins it adds cost more than the anomalies it prevents.
+  > Update anomalies barely arise in an append-mostly warehouse, and the extra joins cost query time and comprehension. A flat, wide dimension is the deliberate trade: some redundancy for far simpler and faster queries.
+- Because warehouses are unable to enforce foreign keys.
   > Many cannot, but that is not the reason for denormalizing.
 - Because 3NF requires surrogate keys.
   > Key choice is independent of normal form.`}
@@ -914,9 +914,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Drop the fact and reload it later.
   > Dropping loses data and hopes someone notices.
-- [o] Point it at a placeholder "unknown" dimension member, then repair the key once the real row lands.
-  > Every dimension having an explicit unknown row is what keeps inner joins from silently deleting facts.
-- Insert the dimension row with \`NULL\` attributes.
+- [o] Point it at a placeholder "unknown" member for now.
+  > Repair the key once the real row lands. Every dimension having an explicit unknown row is what keeps inner joins from silently deleting facts.
+- Insert the dimension row with \`NULL\` for its attributes.
   > This creates a real-looking member that will later collide with the genuine record.
 - Change the join to a cross join.
   > A cross join multiplies rows and destroys the grain.`}
@@ -927,8 +927,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Percentages take more storage than integers.
   > Storage is not the concern.
-- [o] Percentages are non-additive: summing or averaging them across rows gives the wrong answer, because each carries a different denominator.
-  > Store the numerator and denominator as additive measures and compute the ratio at query time, where the correct weighting is applied.
+- [o] Percentages are non-additive across rows.
+  > Each carries a different denominator, so summing or averaging them gives the wrong answer. Store the numerator and denominator as additive measures and compute the ratio at query time, where the correct weighting is applied.
 - Percentages cannot be indexed.
   > Indexing is irrelevant here.
 - BI tools cannot format them.
@@ -942,9 +942,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Caching query results for dashboards.
   > Caching is a performance feature that can exist with or without one.
-- [o] Defining metrics, dimensions, and entities once, centrally, so every tool computes the same number the same way.
-  > It moves metric logic out of a dozen dashboards and into version-controlled definitions.
-- Translating SQL between warehouse dialects.
+- [o] Defining metrics once, centrally, for every tool.
+  > Dimensions and entities too, so every tool computes the same number the same way. It moves metric logic out of a dozen dashboards and into version-controlled definitions.
+- Translating SQL between different warehouse dialects.
   > Dialect translation is a separate concern.
 - Enforcing row-level access control.
   > Governance often lives alongside it, but that is not its purpose.`}
@@ -955,9 +955,9 @@ this track do, and is standard except where a question says otherwise.
 
 - A metric's value trending over time.
   > A trending metric is often exactly what you want to see.
-- [o] The same named metric being defined slightly differently in different places, so its meaning diverges even though the label stays the same.
-  > One dashboard excludes refunds, another does not, and the two "revenue" figures stop matching. Central definition is the fix.
-- A metric whose source table changes schema.
+- [o] One named metric defined differently in different places.
+  > Its meaning diverges even though the label stays the same. One dashboard excludes refunds, another does not, and the two "revenue" figures stop matching. Central definition is the fix.
+- A metric whose source table has changed schema.
   > Schema change is caught by contracts and tests.
 - A metric that becomes slow to compute.
   > Performance is a separate concern.`}
@@ -968,8 +968,8 @@ this track do, and is standard except where a question says otherwise.
 
 - They are synonyms.
   > The distinction matters once definitions are centralized.
-- [o] A measure is a raw aggregatable column such as \`order_amount\`; a metric is a defined business calculation built from measures, with its own filters and grain.
-  > "Sum of order amount" is a measure aggregation; "net revenue, excluding refunds and internal accounts" is a metric.
+- [o] One is a raw column, the other a defined calculation.
+  > \`order_amount\` is a measure; net revenue excluding refunds is a metric, with its own filters and grain. "Sum of order amount" is a measure aggregation; "net revenue, excluding refunds and internal accounts" is a metric.
 - A measure is computed at query time and a metric is materialized.
   > Either can be materialized.
 - A metric is always a ratio.
@@ -981,8 +981,8 @@ this track do, and is standard except where a question says otherwise.
 
 - A query returning fewer rows than expected.
   > Fan-out inflates rather than reduces.
-- [o] Joining a one-to-many relationship duplicates the one-side rows, so summing its measure counts the same value repeatedly.
-  > Joining an order header to its line items and summing the header total is the canonical case. Aggregate the many-side to the header grain first.
+- [o] A one-to-many join duplicates the one-side rows.
+  > Summing its measure then counts the same value repeatedly. Joining an order header to its line items and summing the header total is the canonical case. Aggregate the many-side to the header grain first.
 - A dashboard fanning one query out to many warehouses.
   > Query routing is unrelated.
 - A dimension with too many members.
@@ -994,11 +994,11 @@ this track do, and is standard except where a question says otherwise.
 
 - They are the same thing under two names.
   > They arise from different join shapes.
-- [o] A chasm trap comes from joining two unrelated one-to-many branches off the same dimension, producing a cross product of the two, worse than a fan trap's single inflation.
-  > Splitting into separate queries per branch, or aggregating each branch before joining, avoids it.
+- [o] A chasm trap crosses two unrelated one-to-many branches.
+  > The cross product it produces is worse than a fan trap's single inflation. Splitting into separate queries per branch, or aggregating each branch before joining, avoids it.
 - A chasm trap only occurs in NoSQL databases.
   > It is a relational join problem.
-- A chasm trap under-counts rather than over-counts.
+- A chasm trap under-counts rather than over-counting.
   > It over-counts, and typically by more.`}
 />
 
@@ -1007,8 +1007,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Because it is too slow to compute.
   > Speed is not the obstacle.
-- [o] Distinct counts are not additive: summing daily distinct users double counts anyone active on more than one day.
-  > The workarounds are recomputing from detail at the required grain, or a mergeable sketch such as HyperLogLog with a small accuracy cost.
+- [o] Distinct counts are not additive across days.
+  > Summing daily distinct users double counts anyone active on more than one. The workarounds are recomputing from detail at the required grain, or a mergeable sketch such as HyperLogLog with a small accuracy cost.
 - Because \`DISTINCT\` cannot be used in a materialized view.
   > It can, at whatever grain the view defines.
 - Because the result depends on row order.
@@ -1020,11 +1020,11 @@ this track do, and is standard except where a question says otherwise.
 
 - Average the ratios of the underlying rows.
   > This weights every row equally regardless of its denominator, which is how Simpson's paradox gets into a dashboard.
-- [o] Aggregate numerator and denominator separately to the requested grain, then divide.
-  > It is why ratio metrics are defined in terms of their components rather than as a stored column.
+- [o] Aggregate both parts to the grain, then divide.
+  > Numerator and denominator separately, then the division. It is why ratio metrics are defined in terms of their components rather than as a stored column.
 - Take the ratio of the maximum values.
   > Extremes are not what a rate summarizes.
-- Store the ratio at the finest grain and sum it.
+- Store the ratio at the finest grain and then sum it.
   > Summing rates produces a number with no meaning.`}
 />
 
@@ -1033,11 +1033,11 @@ this track do, and is standard except where a question says otherwise.
 
 - One of the warehouses is stale.
   > Possible, but the numbers would usually differ by a smaller, time-shaped amount.
-- [o] The two encode different definitions (a different activity window, different exclusions, or a different grain) because the logic lives in each dashboard rather than in one shared definition.
-  > This is exactly the problem a semantic layer exists to remove.
+- [o] The two encode different definitions of the same name.
+  > A different activity window, different exclusions, or a different grain, because the logic lives in each dashboard rather than one shared definition. This is exactly the problem a semantic layer exists to remove.
 - One dashboard uses a different chart type.
   > Presentation does not change the underlying number.
-- One is querying a view and the other a table.
+- One is querying a view and the other is querying a table.
   > Materialization affects freshness and speed, not definition.`}
 />
 
@@ -1046,9 +1046,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Tables, columns, and rows respectively.
   > These are semantic concepts, not physical ones.
-- [o] Entities are the joinable business objects and their keys; dimensions are the attributes you slice by; measures are the aggregatable numeric columns metrics are built from.
-  > Declaring entities is what lets the layer work out valid join paths rather than having each analyst rediscover them.
-- Three names for the same concept at different layers.
+- [o] Joinable objects, the attributes you slice by, and numbers.
+  > Entities carry the keys, dimensions the attributes, and measures the aggregatable columns metrics are built from. Declaring entities is what lets the layer work out valid join paths rather than having each analyst rediscover them.
+- Three names for one concept at three different layers.
   > They play distinct roles in the model.
 - Fact tables, dimension tables, and bridge tables.
   > Those are physical modelling constructs the semantic model sits above.`}
@@ -1059,9 +1059,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Because window functions are slow.
   > Performance is not the argument.
-- [o] Because the window's exact boundaries (inclusive or exclusive, calendar or rolling, how gaps are treated) are easy to implement differently, and each variant produces a plausible but different number.
-  > A trailing-28-day metric that silently means "last 4 calendar weeks" in one place is the sort of divergence nobody catches for months.
-- Because dashboards cannot express window functions.
+- [o] The window's boundaries are easy to implement differently.
+  > Inclusive or exclusive, calendar or rolling, how gaps are treated: each variant produces a plausible but different number. A trailing-28-day metric that silently means "last 4 calendar weeks" in one place is the sort of divergence nobody catches for months.
+- Because dashboards are unable to express window functions.
   > Most BI tools can.
 - Because cumulative metrics must be materialized.
   > Materialization is a separate decision.`}
@@ -1072,8 +1072,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Always; semantic layers add unnecessary indirection.
   > That trade discards the single-definition guarantee, which is the whole point.
-- [o] When one well-understood grain serves the consumers, query latency matters, and the tool consuming it cannot speak to a semantic layer.
-  > The two also coexist happily: the mart is the physical model, the semantic layer defines what the numbers mean.
+- [o] When one grain serves everyone and latency matters.
+  > Particularly if the consuming tool cannot speak to a semantic layer at all. The two also coexist happily: the mart is the physical model, the semantic layer defines what the numbers mean.
 - When the data contains sensitive columns.
   > Sensitivity argues for governance, which a semantic layer can help with.
 - When the team has fewer than five analysts.
@@ -1085,9 +1085,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Restricting who can query the warehouse.
   > Access control is adjacent but different.
-- [o] Owning definitions: who can change a metric, how a change is reviewed and versioned, and how consumers learn it changed.
-  > Without it, a central definition just moves the drift into one file that anyone can edit unnoticed.
-- Running more tests on the underlying models.
+- [o] Owning the definitions, and the process around changing them.
+  > Who can change a metric, how the change is reviewed and versioned, and how consumers learn it changed. Without it, a central definition just moves the drift into one file that anyone can edit unnoticed.
+- Running a great many more tests on the underlying models.
   > Testing raises quality; it does not settle who decides what a metric means.
 - Publishing a data dictionary once a quarter.
   > A stale document is not governance.`}
@@ -1096,10 +1096,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`What does LookML let you define?
 
-- The physical storage layout of the warehouse tables.
+- The physical storage layout of each warehouse table.
   > Storage is the warehouse's concern.
-- [o] Views, dimensions, measures, and the join relationships between them, from which Looker generates SQL on demand.
-  > It is one of the earliest widely-used semantic layers, and it is code, which is what makes it reviewable.
+- [o] Views, dimensions, measures, and their join relationships.
+  > Looker generates SQL from them on demand. It is one of the earliest widely-used semantic layers, and it is code, which is what makes it reviewable.
 - Dashboard layouts only.
   > Layout is defined separately from the model.
 - ETL schedules.
@@ -1111,9 +1111,9 @@ this track do, and is standard except where a question says otherwise.
 
 - A SQL query and nothing else.
   > A raw query loses the parts that make the metric composable.
-- [o] The measure and its aggregation, the model it comes from, any filters, the valid dimensions to slice by, and the time grain it is defined at.
-  > Naming the valid dimensions is what stops a metric being sliced in a way that produces a fan-out.
-- The chart type it should be shown as.
+- [o] The measure, its aggregation, filters, and valid dimensions.
+  > The source model and the time grain too. Naming the valid dimensions is what stops a fan-out. Naming the valid dimensions is what stops a metric being sliced in a way that produces a fan-out.
+- The chart type the metric should be displayed as.
   > Presentation is a consumer concern.
 - The owner's name and a description.
   > Useful metadata, but not the computation.`}
@@ -1124,9 +1124,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Because warehouses get slower with more users.
   > Concurrency is a capacity issue, not a definitional one.
-- [o] The number of places a definition can diverge grows with the number of teams and tools, and every divergence costs a meeting to reconcile.
-  > The cost is rarely the wrong number itself; it is the trust lost when two credible reports disagree.
-- Because larger companies have stricter regulations.
+- [o] The number of places a definition can diverge keeps growing.
+  > Every divergence costs a meeting to reconcile. The cost is rarely the wrong number itself; it is the trust lost when two credible reports disagree.
+- Because larger companies face stricter regulation.
   > Compliance is a separate driver, though it benefits too.
 - Because dashboards become harder to build.
   > Building is not what gets harder; agreeing does.`}
@@ -1137,10 +1137,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`A \`unique\` test on \`order_id\` fails. What does that actually tell you?
 
-- The column has \`NULL\` values.
+- The column contains some \`NULL\` values.
   > That is what \`not_null\` catches; \`unique\` ignores \`NULL\`s on most adapters.
-- [o] The model's stated grain is wrong: either a join fanned out, the source has genuine duplicates, or an incremental run appended rows it should have merged.
-  > A failing uniqueness test is nearly always a grain problem, which is why it is the highest-signal test in the suite.
+- [o] The model's stated grain is wrong.
+  > A join fanned out, the source has genuine duplicates, or an incremental run appended rows it should have merged. A failing uniqueness test is nearly always a grain problem, which is why it is the highest-signal test in the suite.
 - The column needs an index.
   > Warehouses generally have no such index, and it would not change the data.
 - The test is misconfigured.
@@ -1152,9 +1152,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Whenever it fails intermittently.
   > Downgrading a flaky test hides a real problem instead of fixing it.
-- [o] When the condition is worth surfacing but should not block the build: a known upstream imperfection, or a threshold being tuned.
-  > \`warn\` is a deliberate, temporary state. A suite of permanent warnings is indistinguishable from no tests at all.
-- On every test in production, to avoid pipeline failures.
+- [o] When it is worth surfacing but should not block the build.
+  > A known upstream imperfection, or a threshold still being tuned. \`warn\` is a deliberate, temporary state. A suite of permanent warnings is indistinguishable from no tests at all.
+- On every test in production, so as to avoid pipeline failures.
   > That trades pipeline uptime for silently wrong data, which is the worse failure.
 - Only on source tests.
   > Severity is available on any test and the choice is about consequence, not location.`}
@@ -1165,9 +1165,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Add a \`unique\` test to each column separately.
   > Each column individually may legitimately repeat; only the combination should not.
-- [o] Test uniqueness of a concatenated surrogate key, or use \`dbt_utils.unique_combination_of_columns\`.
-  > If concatenating, use a separator that cannot appear in the values, or \`'a' || 'bc'\` and \`'ab' || 'c'\` collide.
-- Use a \`relationships\` test between the two columns.
+- [o] Test a concatenated surrogate key, or use \`dbt_utils\`.
+  > \`dbt_utils.unique_combination_of_columns\` does it directly. If concatenating, use a separator that cannot appear in the values, or \`'a' || 'bc'\` and \`'ab' || 'c'\` collide.
+- Use a \`relationships\` test across the two columns.
   > \`relationships\` checks referential integrity, not uniqueness.
 - Rely on the warehouse's primary key constraint.
   > Most cloud warehouses declare constraints without enforcing them.`}
@@ -1178,8 +1178,8 @@ this track do, and is standard except where a question says otherwise.
 
 - It retries the failing test.
   > No retry occurs.
-- [o] It writes the failing rows to a table, so you can inspect exactly which records broke the assertion instead of only seeing a count.
-  > It turns "37 rows failed" into a debuggable list, which usually saves the first twenty minutes of every investigation.
+- [o] It writes the failing rows out to a table.
+  > You can then see exactly which records broke the assertion instead of only a count. It turns "37 rows failed" into a debuggable list, which usually saves the first twenty minutes of every investigation.
 - It stops the run at the first failure.
   > Fail-fast behavior is controlled separately.
 - It records the failure in the documentation site.
@@ -1191,8 +1191,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Entirely in marts, since that is what people read.
   > Testing only at the end tells you something broke, not where.
-- [o] Both, with different intent: staging tests assert source assumptions such as key uniqueness and non-null; mart tests assert business rules such as reconciliation and accepted values.
-  > A staging failure localizes the problem immediately; a mart failure catches logic errors introduced downstream.
+- [o] Both, but with quite different intent.
+  > Staging tests assert source assumptions such as key uniqueness and non-null; mart tests assert business rules such as reconciliation. A staging failure localizes the problem immediately; a mart failure catches logic errors introduced downstream.
 - Entirely in staging, so problems are caught early.
   > Early testing cannot catch a bug introduced by a mart's own join.
 - In a separate test-only project.
@@ -1204,11 +1204,11 @@ this track do, and is standard except where a question says otherwise.
 
 - They run faster on the same data.
   > They run on different data entirely.
-- [o] A unit test runs the model's logic against fixed input fixtures and asserts an expected output, so it validates the transformation itself rather than today's data.
-  > It is the right tool for tricky logic (a window function, a date-boundary rule), where you want the edge case pinned regardless of what the warehouse currently holds.
+- [o] It runs the logic against fixed fixtures, not today's data.
+  > An expected output is asserted, so it validates the transformation itself. It is the right tool for tricky logic (a window function, a date-boundary rule), where you want the edge case pinned regardless of what the warehouse currently holds.
 - Unit tests only apply to macros.
   > They apply to models.
-- Unit tests replace the need for data tests.
+- Unit tests remove the need for data tests entirely.
   > They are complementary: one checks the logic, the other checks reality.`}
 />
 
@@ -1217,8 +1217,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Identically; a failure is a failure.
   > The blast radius and the available actions differ.
-- [o] In CI it blocks the merge and is fixed before shipping; in production it means bad data may already be visible, so it needs triage, communication to consumers, and only then a fix.
-  > The production case has a stakeholder dimension the CI case does not.
+- [o] One blocks a merge; the other means bad data is already out.
+  > In CI it is fixed before shipping. In production it needs triage, communication to consumers, and only then a fix. The production case has a stakeholder dimension the CI case does not.
 - CI failures should be ignored if the branch is urgent.
   > Urgency is precisely when the gate is most valuable.
 - Production failures should always trigger an immediate rollback.
@@ -1230,9 +1230,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Too few tests, fixed by adding more.
   > Adding tests indiscriminately is how fatigue starts.
-- [o] Tests that fire on known, tolerated conditions train people to ignore the channel; fixing it means tightening thresholds, routing by severity, and deleting tests nobody acts on.
-  > A test whose failure produces no action is not a test, it is noise.
-- Slow tests, fixed by running them less often.
+- [o] Tests firing on known, tolerated conditions cause it.
+  > People learn to ignore the channel. Tighten thresholds, route by severity, and delete tests nobody acts on. A test whose failure produces no action is not a test, it is noise.
+- Slow tests, which is fixed by running them less often.
   > Running less often delays detection without improving signal.
 - Tests written by too many authors.
   > Authorship is not the problem; actionability is.`}
@@ -1243,11 +1243,11 @@ this track do, and is standard except where a question says otherwise.
 
 - Observability is testing with better dashboards.
   > It is a different detection model, not a presentation of the same one.
-- [o] Testing asserts conditions you thought to specify; observability monitors volume, freshness, schema, and distribution for anomalies you did not anticipate.
-  > They cover different gaps: one catches known failure modes precisely, the other catches unknown ones approximately.
+- [o] One checks what you specified, the other what you did not.
+  > Testing asserts conditions you thought of; observability monitors volume, freshness, schema, and distribution for anomalies you did not anticipate. They cover different gaps: one catches known failure modes precisely, the other catches unknown ones approximately.
 - Observability replaces the need for tests.
   > Anomaly detection is far noisier than an explicit assertion and cannot express business rules.
-- Testing is for sources and observability for marts.
+- Testing is for sources and observability is for marts.
   > Both apply throughout.`}
 />
 
@@ -1256,8 +1256,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Add a \`not_null\` and a \`unique\` test to the metric column.
   > These catch structural problems and say nothing about the value.
-- [o] Reconcile it against an independent calculation (the source system's own total, a known period's published figure, or a differently-derived model), and assert the difference is within tolerance.
-  > It is the only class of test that catches logic that is confidently, consistently wrong.
+- [o] Reconcile it against an independent calculation.
+  > The source system's own total, a published figure, or a differently-derived model, asserting the difference is within tolerance. It is the only class of test that catches logic that is confidently, consistently wrong.
 - Check that it is greater than zero.
   > A sign check catches gross failures and little else.
 - Compare it to yesterday's value and alert on any change.
@@ -1269,9 +1269,9 @@ this track do, and is standard except where a question says otherwise.
 
 - Downstream fixes are harder to write.
   > They are usually easier, which is the temptation.
-- [o] A downstream patch fixes one consumer while every other consumer of the same source keeps the bug, and the patch quietly becomes permanent.
-  > Patching downstream is sometimes the right emergency action; it should come with a ticket for the real fix.
-- Upstream systems are always owned by the same team.
+- [o] A patch fixes one consumer and leaves the rest broken.
+  > It also quietly becomes permanent. Patching downstream is sometimes the right emergency action; it should come with a ticket for the real fix.
+- Upstream systems are always owned by that same team.
   > They frequently are not, which is what makes the upstream fix slower.
 - Warehouses cannot express the fix downstream.
   > They usually can, which is exactly the problem.`}
@@ -1280,10 +1280,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`What extra tests do \`dbt_utils\` and \`dbt_expectations\` add?
 
-- Nothing beyond the four built-ins, repackaged.
+- Nothing beyond the four built-in tests, repackaged.
   > Both add substantial new assertions.
-- [o] Things like \`equal_rowcount\`, \`expression_is_true\`, \`unique_combination_of_columns\`, and distributional checks such as value ranges and column-type expectations.
-  > \`dbt_expectations\` in particular ports the Great Expectations vocabulary into dbt's test framework.
+- [o] Row-count, expression, and distributional assertions.
+  > \`equal_rowcount\`, \`expression_is_true\`, \`unique_combination_of_columns\`, plus value ranges and column-type expectations. \`dbt_expectations\` in particular ports the Great Expectations vocabulary into dbt's test framework.
 - Only performance benchmarks.
   > Neither package benchmarks queries.
 - Tests that run outside the warehouse.
@@ -1295,8 +1295,8 @@ this track do, and is standard except where a question says otherwise.
 
 - Source tests run first and model tests run last, but they assert the same things.
   > They assert different classes of thing.
-- [o] A source test asserts an assumption about data you do not control, so a failure points at the loader or the upstream system; a model test asserts something about your own transformation.
-  > The distinction matters for who gets paged.
+- [o] One covers data you do not control, the other your own.
+  > A source test failing points at the loader or the upstream system; a model test points at your transformation. The distinction matters for who gets paged.
 - Source tests cannot be generic tests.
   > The same generic tests apply to both.
 - Model tests cannot be configured with severity.
@@ -1306,10 +1306,10 @@ this track do, and is standard except where a question says otherwise.
 <MultipleChoice
   markdown={`An \`accepted_values\` test starts failing after a source added a new status code. What is the right first move?
 
-- Delete the test, since the values are evidently not fixed.
+- Delete the test, since the value set is evidently not fixed.
   > Deleting it removes the only mechanism that noticed the change.
-- [o] Confirm the new value is legitimate, work out what downstream logic assumes about statuses, then update both the logic and the test together.
-  > The test did its job: it surfaced a source change before a \`CASE\` statement silently bucketed the new status as "other".
+- [o] Confirm it is legitimate, then update logic and test together.
+  > Work out what downstream logic assumes about statuses first. The test did its job: it surfaced a source change before a \`CASE\` statement silently bucketed the new status as "other".
 - Add the value to the test and move on.
   > Half the fix. The downstream \`CASE\` expressions that never heard of the new status are the actual risk.
 - Set the test to \`warn\` permanently.
@@ -1321,11 +1321,11 @@ this track do, and is standard except where a question says otherwise.
 
 - The model will be rebuilt every 12 hours.
   > Freshness checks state; it does not schedule builds.
-- [o] Data older than 12 hours is worth flagging, and older than 24 hours is bad enough to fail the pipeline rather than build on it.
-  > Setting the thresholds from what consumers actually need is what keeps the warning meaningful.
+- [o] Flag at 12 hours old, and fail the pipeline at 24.
+  > Building on data that stale is worse than stopping. Setting the thresholds from what consumers actually need is what keeps the warning meaningful.
 - Rows older than 24 hours will be deleted.
   > Nothing is deleted.
-- Tests will be skipped for 12 hours after a load.
+- Tests will be skipped for 12 hours following a load.
   > No skipping is implied.`}
 />
 

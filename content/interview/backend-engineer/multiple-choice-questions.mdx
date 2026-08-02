@@ -23,8 +23,8 @@ reasoning and runnable code.
 
 - The exact number of operations an algorithm performs.
   > Constants and lower-order terms are deliberately discarded.
-- [o] How the cost grows as the input grows, ignoring constants and lower-order terms.
-  > It answers "what happens at 10x the data", which is why an O(n log n) algorithm can lose to an O(n²) one on small inputs and still be the right choice.
+- [o] How the cost grows as the input grows.
+  > Constants and lower-order terms are ignored. It answers "what happens at 10x the data", which is why an O(n log n) algorithm can lose to an O(n²) one on small inputs and still be the right choice.
 - The best case running time.
   > Big-O is normally used for the upper bound; best case is usually written with Ω.
 - The memory an algorithm uses.
@@ -36,9 +36,9 @@ reasoning and runnable code.
 
 - O(1) in both cases.
   > Worst case degrades when many keys collide into one bucket.
-- [o] O(1) on average, O(n) in the worst case when every key hashes to the same bucket.
-  > Java's HashMap mitigates this by converting a long collision chain into a balanced tree, giving O(log n) instead.
-- O(log n) in both cases.
+- [o] O(1) on average, O(n) in the worst case.
+  > The worst case is every key hashing to the same bucket. Java's HashMap mitigates this by converting a long collision chain into a balanced tree, giving O(log n) instead.
+- O(log n) in both the average and worst cases.
   > That is a balanced tree, not a hash table.
 - O(n) on average.
   > Average O(n) would make hash maps useless.`}
@@ -49,11 +49,11 @@ reasoning and runnable code.
 
 - When you need fast lookup by index.
   > Indexing a linked list is O(n); an array is O(1).
-- [o] When you insert or remove in the middle frequently *and already hold a reference to the node*, since the splice is O(1) with no shifting.
-  > Without that reference you pay O(n) to find the node first, which is why arrays win in practice more often than the textbook suggests.
+- [o] When you already hold a reference to the node you are splicing.
+  > The splice is then O(1) with no shifting. Without that reference you pay O(n) to find the node first, which is why arrays win in practice more often than the textbook suggests.
 - When memory is tight.
   > Each node carries pointer overhead and destroys cache locality.
-- When you need to sort the data often.
+- When you need to sort the whole collection frequently.
   > Sorting a linked list is generally slower than sorting an array.`}
 />
 
@@ -62,11 +62,11 @@ reasoning and runnable code.
 
 - Every append takes constant time.
   > The append that triggers a resize copies every element.
-- [o] Most appends are O(1); the occasional resize is O(n), but doubling the capacity spreads that cost so the average over many appends stays constant.
-  > Growing by a constant amount instead of doubling would make the amortized cost O(n).
+- [o] Most appends are O(1) and the occasional resize is O(n).
+  > Doubling the capacity spreads that cost so the average over many appends stays constant. Growing by a constant amount instead of doubling would make the amortized cost O(n).
 - The first append is slow and the rest are fast.
   > Resizes recur as the array grows, not just at the start.
-- It is O(1) only if the capacity is preallocated.
+- It is only O(1) when the capacity has been preallocated.
   > Preallocating removes the resizes entirely; amortization is what makes it O(1) without doing so.`}
 />
 
@@ -79,7 +79,7 @@ reasoning and runnable code.
   > Building a heap from n items in one pass is O(n), which is better than n separate pushes.
 - O(log n) and O(n).
   > Popping sifts down through the height of the tree, which is O(log n).
-- O(n log n) for both.
+- O(n log n) for both the push and the pop-min.
   > That is the cost of a full heapsort, not a single operation.`}
 />
 
@@ -99,10 +99,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`How do you detect a cycle in a *directed* graph with DFS?
 
-- Track whether each node has been visited before.
+- Track whether each node has already been visited before.
   > A revisited node may simply be reachable by two different paths, which is not a cycle.
-- [o] Track nodes currently on the recursion stack; an edge back to one of those is a back edge and therefore a cycle.
-  > Three colors (unvisited, in-progress, done) is the standard encoding. Kahn's algorithm is the iterative alternative.
+- [o] Track the nodes currently on the recursion stack.
+  > An edge back to one of those is a back edge, and therefore a cycle. Three colors (unvisited, in-progress, done) is the standard encoding. Kahn's algorithm is the iterative alternative.
 - Count edges and compare to nodes minus one.
   > That test applies to undirected trees only.
 - Run BFS from every node.
@@ -114,8 +114,8 @@ reasoning and runnable code.
 
 - A shortest-path tree; failure means the graph is disconnected.
   > Kahn's does not compute distances.
-- [o] A topological ordering; if it cannot place every node, the remaining nodes contain a cycle.
-  > It repeatedly removes nodes with in-degree zero, so a leftover set with no zero-in-degree node is exactly a cycle.
+- [o] A topological ordering, or proof of a cycle.
+  > If it cannot place every node, the remainder contains one. It repeatedly removes nodes with in-degree zero, so a leftover set with no zero-in-degree node is exactly a cycle.
 - A minimum spanning tree; failure means negative weights.
   > That is Kruskal's or Prim's territory.
 - A strongly connected component decomposition.
@@ -125,7 +125,7 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What is the complexity of Dijkstra's algorithm with a binary heap, and what breaks it?
 
-- O(V²), and it breaks on disconnected graphs.
+- O(V²), and it breaks on graphs that are not connected.
   > O(V²) is the array implementation; disconnection is handled fine.
 - [o] O((V + E) log V), and it breaks on negative edge weights.
   > Once a node is finalized Dijkstra never revisits it, which a negative edge could invalidate. Bellman-Ford handles negatives at O(VE).
@@ -138,10 +138,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What are the average and worst-case complexities of search in an unbalanced BST?
 
-- O(log n) and O(log n).
+- O(log n) in both the average and the worst case.
   > Only a balanced tree guarantees the worst case.
-- [o] O(log n) average, O(n) worst case when inserted in sorted order and the tree degenerates into a linked list.
-  > Self-balancing variants (red-black, AVL) restore the O(log n) guarantee.
+- [o] O(log n) average and O(n) in the worst case.
+  > Sorted insertion degenerates the tree into a linked list. Self-balancing variants (red-black, AVL) restore the O(log n) guarantee.
 - O(1) and O(log n).
   > Constant-time search would require hashing.
 - O(n) and O(n log n).
@@ -166,11 +166,11 @@ reasoning and runnable code.
 
 - Finding the k largest elements.
   > That is a heap's job.
-- [o] Prefix queries over a set of strings (autocomplete, longest-common-prefix, dictionary matching) in time proportional to the key length rather than the set size.
-  > The trade is memory: a node per character can dwarf a hash set unless the keys share prefixes heavily.
+- [o] Prefix queries, in time proportional to the key length.
+  > Autocomplete, longest-common-prefix, and dictionary matching all qualify, and the set size does not matter. The trade is memory: a node per character can dwarf a hash set unless the keys share prefixes heavily.
 - Range queries over numbers.
   > A balanced BST or a sorted array serves ranges better.
-- Detecting duplicates in O(1) space.
+- Detecting duplicate entries using O(1) space.
   > A trie's whole cost is space.`}
 />
 
@@ -179,8 +179,8 @@ reasoning and runnable code.
 
 - Integer division truncates, skipping elements.
   > Truncation is expected and correct here.
-- [o] \`lo + hi\` can overflow the integer type on a large array; \`lo + (hi - lo) / 2\` cannot.
-  > It is the bug that sat in the JDK's binary search for nine years. The other classic is a loop condition that never terminates.
+- [o] \`lo + hi\` can overflow the integer type.
+  > \`lo + (hi - lo) / 2\` cannot, which is the standard fix. It is the bug that sat in the JDK's binary search for nine years. The other classic is a loop condition that never terminates.
 - It selects the wrong midpoint when the array length is even.
   > Either midpoint is fine on an even length.
 - It requires the array to be sorted descending.
@@ -190,10 +190,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What does the sliding-window technique optimize?
 
-- Sorting a nearly-sorted array.
+- Sorting an array that happens to be nearly sorted.
   > That calls for insertion sort or a heap.
-- [o] Problems over contiguous subarrays or substrings, by extending and shrinking a window instead of re-examining every subarray, turning O(n²) into O(n).
-  > "Longest substring without repeating characters" is the canonical case, usually paired with a hash map of last-seen positions.
+- [o] Problems over contiguous subarrays or substrings.
+  > Extending and shrinking a window beats re-examining every subarray, turning O(n²) into O(n). "Longest substring without repeating characters" is the canonical case, usually paired with a hash map of last-seen positions.
 - Searching an unsorted array.
   > A window offers nothing over a linear scan there.
 - Balancing a binary tree.
@@ -205,8 +205,8 @@ reasoning and runnable code.
 
 - On reverse-sorted input; nothing can be done.
   > Pivot choice can be fixed.
-- [o] When the pivot consistently splits off one element (sorted input with a first-element pivot is the classic trigger), mitigated by a random or median-of-three pivot.
-  > Introsort goes further, switching to heapsort once recursion gets too deep, which is what most standard libraries ship.
+- [o] When the pivot consistently splits off a single element.
+  > Sorted input with a first-element pivot is the classic trigger. A random or median-of-three pivot mitigates it. Introsort goes further, switching to heapsort once recursion gets too deep, which is what most standard libraries ship.
 - On input with many duplicates; mitigated by using a stable sort.
   > Duplicates hurt naive partitioning, but three-way partitioning fixes that specifically.
 - When the array is too large for memory; mitigated by merge sort.
@@ -218,8 +218,8 @@ reasoning and runnable code.
 
 - It never crashes on malformed input.
   > Stability is about ordering, not robustness.
-- [o] Equal elements keep their original relative order, which matters when sorting by several keys in sequence.
-  > Sort by name, then stably by department, and within each department the names remain sorted. Quicksort is not stable; merge sort and Timsort are.
+- [o] Equal elements keep their original relative order.
+  > It matters when sorting by several keys in sequence. Sort by name, then stably by department, and within each department the names remain sorted. Quicksort is not stable; merge sort and Timsort are.
 - It always runs in the same time regardless of input.
   > That is a consistency property, not stability.
 - It uses O(1) extra space.
@@ -231,8 +231,8 @@ reasoning and runnable code.
 
 - Memoization is faster in every case.
   > Tabulation usually has lower constant overhead by avoiding recursion.
-- [o] Memoization is top-down recursion caching results as it goes; tabulation is bottom-up, filling a table iteratively in dependency order.
-  > Memoization only computes the subproblems it needs; tabulation avoids recursion depth limits and is easier to space-optimize.
+- [o] One is top-down and cached, the other bottom-up.
+  > Memoization caches as the recursion goes; tabulation fills a table iteratively in dependency order. Memoization only computes the subproblems it needs; tabulation avoids recursion depth limits and is easier to space-optimize.
 - Tabulation applies only to one-dimensional problems.
   > Multi-dimensional tables are routine.
 - They produce different answers.
@@ -244,8 +244,8 @@ reasoning and runnable code.
 
 - Whenever the problem involves maximizing a value.
   > Plenty of maximization problems defeat greedy approaches.
-- [o] When the problem has optimal substructure *and* the greedy-choice property, so a locally best choice is part of some global optimum.
-  > Activity selection and Huffman coding qualify; 0/1 knapsack does not, which is why it needs dynamic programming.
+- [o] With optimal substructure and the greedy-choice property.
+  > A locally best choice then belongs to some global optimum. Activity selection and Huffman coding qualify; 0/1 knapsack does not, which is why it needs dynamic programming.
 - When the input is sorted.
   > Sorting often enables a greedy algorithm but does not justify one.
 - Whenever it produces the same answer as brute force on small inputs.
@@ -255,9 +255,9 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`When should you represent a graph as an adjacency matrix rather than an adjacency list?
 
-- Always; matrices are simpler.
+- Always, on the grounds that a matrix is simpler to work with.
   > Simplicity costs O(V²) memory regardless of edge count.
-- [o] When the graph is dense, or when you need O(1) edge-existence checks.
+- [o] When the graph is dense, or edge checks must be O(1).
   > A sparse graph with a million nodes would need a terabyte-scale matrix, which is why lists are the default.
 - When the graph is a tree.
   > A tree is maximally sparse, the worst case for a matrix.
@@ -270,9 +270,9 @@ reasoning and runnable code.
 
 - That it fits in memory.
   > True but not the distinguishing requirement.
-- [o] Some exploitable order or structure (usually sortedness), so moving a pointer lets you rule out a whole range of possibilities.
-  > "Find two numbers summing to a target in a sorted array" is O(n) with two pointers and O(n log n) if you have to sort first.
-- That it contains no duplicates.
+- [o] Some exploitable order, usually sortedness.
+  > Moving a pointer then rules out a whole range of possibilities. "Find two numbers summing to a target in a sorted array" is O(n) with two pointers and O(n log n) if you have to sort first.
+- That the input contains no duplicate values.
   > Duplicates are usually handled with a small skip step.
 - That it is a linked list.
   > Arrays are the more common setting, though fast/slow pointers on a linked list are a well-known variant.`}
@@ -285,9 +285,9 @@ reasoning and runnable code.
 
 - Returning JSON.
   > Representation format is unconstrained; REST predates JSON's dominance.
-- [o] A uniform interface over identified resources, with stateless requests that carry everything needed to be understood on their own.
-  > Statelessness is what lets any server instance handle any request, which is why it matters far beyond style.
-- Using only \`GET\` and \`POST\`.
+- [o] A uniform interface over resources, with stateless requests.
+  > Each request carries everything needed to be understood on its own, which is what lets any server instance handle any request. Statelessness is what lets any server instance handle any request, which is why it matters far beyond style.
+- Restricting yourself to just \`GET\` and \`POST\`.
   > Restricting the verb set works against the uniform interface.
 - Versioning the URL.
   > Versioning is a practical necessity, not part of the architectural style.`}
@@ -311,8 +311,8 @@ reasoning and runnable code.
 
 - Only \`GET\`.
   > Several others are too.
-- [o] \`GET\`, \`PUT\`, \`DELETE\`, and \`HEAD\`: repeating the request leaves the server in the same state.
-  > \`DELETE\` is idempotent even though the second call returns 404: the *state* is the same. \`POST\` and \`PATCH\` generally are not.
+- [o] \`GET\`, \`PUT\`, \`DELETE\`, and \`HEAD\`.
+  > Repeating any of them leaves the server in the same state. \`DELETE\` is idempotent even though the second call returns 404: the *state* is the same. \`POST\` and \`PATCH\` generally are not.
 - All of them, since HTTP is stateless.
   > Statelessness of the protocol says nothing about the effect of a request.
 - \`POST\` and \`PUT\`.
@@ -324,8 +324,8 @@ reasoning and runnable code.
 
 - Deduplicate by comparing amount and timestamp.
   > Two genuine identical payments seconds apart would be wrongly collapsed.
-- [o] Require a client-generated idempotency key, store the first result against it, and return that stored result for any repeat.
-  > It makes retrying safe without the client having to know whether the first attempt landed.
+- [o] Require a client-generated idempotency key.
+  > Store the first result against it and return that for any repeat. It makes retrying safe without the client having to know whether the first attempt landed.
 - Make the endpoint a \`PUT\`.
   > \`PUT\` is idempotent by convention only if the handler actually implements it that way.
 - Reject any second request within 30 seconds.
@@ -337,8 +337,8 @@ reasoning and runnable code.
 
 - 401 means the resource does not exist; 403 means it does but is private.
   > A hidden resource is usually 404 on purpose.
-- [o] 401 means unauthenticated, the request lacks valid credentials; 403 means authenticated but not permitted.
-  > "Who are you?" versus "I know who you are and the answer is still no."
+- [o] One means unauthenticated, the other unauthorized.
+  > 401 says the request lacks valid credentials; 403 says the caller is known and still not permitted. "Who are you?" versus "I know who you are and the answer is still no."
 - 401 is for expired tokens only.
   > An absent token is 401 too.
 - They are interchangeable.
@@ -348,7 +348,7 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Which status code fits a request that is syntactically valid but semantically wrong, such as an end date before its start date?
 
-- 500 Internal Server Error.
+- A 500 Internal Server Error response code, since it failed.
   > 5xx says the server failed; this is the client's input.
 - [o] 400 Bad Request, or 422 Unprocessable Entity where that distinction is used.
   > 422 signals "I parsed it, but it does not make sense", which is more informative for validation failures.
@@ -361,10 +361,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`Why is offset pagination a poor fit for a large, frequently-changing collection?
 
-- Offsets are limited to 10,000 rows.
+- Offsets are hard-limited to around 10,000 rows.
   > No such universal limit exists, though some engines impose one.
-- [o] Deep offsets force the database to scan and discard everything before them, and rows inserted mid-pagination shift the window so items are skipped or repeated.
-  > Cursor (keyset) pagination, meaning "everything after this sorted key", avoids both problems.
+- [o] Deep offsets scan and discard everything before them.
+  > Rows inserted mid-pagination also shift the window, so items get skipped or repeated. Cursor (keyset) pagination, meaning "everything after this sorted key", avoids both problems.
 - It cannot be combined with sorting.
   > It requires sorting to be meaningful at all.
 - It requires a stateful server.
@@ -376,8 +376,8 @@ reasoning and runnable code.
 
 - Breaking changes with a migration guide, no version.
   > This shifts the whole cost onto every consumer at once.
-- [o] A version in the URL path, such as \`/v1/users\`, which is visible, cacheable, and trivial to route.
-  > Header-based versioning is cleaner in theory and harder to debug in practice, since you cannot see the version in a log line or paste it into a browser.
+- [o] A version in the URL path, such as \`/v1/users\`.
+  > It is visible, cacheable, and trivial to route. Header-based versioning is cleaner in theory and harder to debug in practice, since you cannot see the version in a log line or paste it into a browser.
 - Query parameter versioning, such as \`?version=1\`.
   > It works, but it mixes an API-wide concern into per-request parameters and complicates caching.
 - Deploying each version to a separate domain.
@@ -389,11 +389,11 @@ reasoning and runnable code.
 
 - By observing when requests start failing.
   > Discovering a limit by tripping it is what the headers exist to avoid.
-- [o] From response headers giving the limit, remaining quota, and reset time, plus \`Retry-After\` on a 429.
-  > Well-behaved clients then back off proactively rather than hammering until they are throttled.
+- [o] From response headers, plus \`Retry-After\` on a 429.
+  > They give the limit, the remaining quota, and the reset time. Well-behaved clients then back off proactively rather than hammering until they are throttled.
 - From the API documentation only.
   > Documentation cannot report the client's *current* remaining quota.
-- From a dedicated endpoint polled every minute.
+- From a dedicated endpoint, polled once every minute.
   > Polling for quota spends quota.`}
 />
 
@@ -402,11 +402,11 @@ reasoning and runnable code.
 
 - Whenever the API is public.
   > Public APIs benefit from REST's cacheability and predictability.
-- [o] When varied clients need different subsets of a graph-shaped domain and would otherwise over-fetch or make many round trips.
-  > The cost is caching complexity, query-depth abuse, and N+1 resolution that needs batching.
+- [o] When varied clients need different subsets of a graph.
+  > They would otherwise over-fetch or make many round trips. The cost is caching complexity, query-depth abuse, and N+1 resolution that needs batching.
 - When the payloads are large.
   > Payload size alone does not favor either.
-- When strong typing is required.
+- When strong typing across the wire is a requirement.
   > REST can be strongly typed with OpenAPI.`}
 />
 
@@ -415,11 +415,11 @@ reasoning and runnable code.
 
 - Human-readable payloads.
   > Protobuf is binary, which is the trade.
-- [o] A compact binary format with generated clients from a schema, plus first-class streaming over HTTP/2.
-  > It is why gRPC dominates internal service-to-service traffic and is rare on public browser-facing APIs.
+- [o] A compact binary format with generated clients.
+  > The schema drives them, and streaming over HTTP/2 comes free. It is why gRPC dominates internal service-to-service traffic and is rare on public browser-facing APIs.
 - Automatic authentication.
   > Auth is layered on either way.
-- Freedom from schema definitions.
+- Freedom from having to define any schema at all.
   > It requires a \`.proto\` schema; that requirement is the source of its benefits.`}
 />
 
@@ -428,9 +428,9 @@ reasoning and runnable code.
 
 - Return the first error and stop.
   > This forces the client through one round trip per mistake.
-- [o] Return a structured body listing each field, an error code, and a human-readable message, under a consistent envelope.
-  > A machine-readable \`code\` lets clients localize and branch; a message alone forces string matching.
-- Return a 200 with an \`error\` field.
+- [o] A structured body listing each field and an error code.
+  > A human-readable message too, under a consistent envelope. A machine-readable \`code\` lets clients localize and branch; a message alone forces string matching.
+- Return a 200 response carrying an \`error\` field.
   > A success status for a failed request breaks every generic client and proxy.
 - Return a plain-text description.
   > Unparseable by clients, and it forces string matching for behavior.`}
@@ -439,10 +439,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What does content negotiation let a client do?
 
-- Choose which fields are returned.
+- Choose which of the fields come back in the response.
   > Field selection is done with query parameters or GraphQL.
-- [o] Ask for a representation in a particular format or language via \`Accept\` and \`Accept-Language\`, with the server responding in \`Content-Type\`.
-  > It is also how API versioning by media type works, when that approach is chosen.
+- [o] Ask for a format or language via the \`Accept\` headers.
+  > The server answers in \`Content-Type\`. It is also how API versioning by media type works, when that approach is chosen.
 - Negotiate a rate limit.
   > Limits are server policy.
 - Compress the request body.
@@ -452,10 +452,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`When is a stateful session preferable to a stateless JWT?
 
-- When the API serves mobile clients.
+- When the API is serving mobile clients.
   > Client type does not decide this.
-- [o] When you need immediate revocation, since a session can be deleted server-side while a signed token stays valid until it expires.
-  > The workarounds (very short expiry plus refresh tokens, or a revocation list) reintroduce the server-side state JWTs were meant to avoid.
+- [o] When you need immediate revocation.
+  > A session can be deleted server-side; a signed token stays valid until it expires. The workarounds (very short expiry plus refresh tokens, or a revocation list) reintroduce the server-side state JWTs were meant to avoid.
 - When the payload is large.
   > A large payload argues *for* a session, since the token travels on every request, but revocation is the decisive point.
 - When you have multiple servers.
@@ -467,9 +467,9 @@ reasoning and runnable code.
 
 - Yes; without it the API is not REST.
   > Strictly, Fielding's model does require it, which is why almost no popular "REST" API is fully RESTful.
-- [o] It is a formal REST constraint, but most successful HTTP APIs omit it and are perfectly usable with documentation and stable URLs.
-  > Knowing both the definition and the industry reality is the answer an interviewer is looking for.
-- No; it was removed from the REST specification.
+- [o] It is a formal constraint that most successful APIs omit.
+  > They are perfectly usable with documentation and stable URLs. Knowing both the definition and the industry reality is the answer an interviewer is looking for.
+- No, it was removed from the REST specification later.
   > REST is a dissertation, not a spec, and nothing was removed.
 - It applies only to GraphQL.
   > GraphQL has its own introspection mechanism instead.`}
@@ -482,8 +482,8 @@ reasoning and runnable code.
 
 - They are the same thing.
   > A single-core machine can be concurrent without ever being parallel.
-- [o] Concurrency is structuring work so tasks can make progress independently; parallelism is actually executing them at the same instant on multiple cores.
-  > Concurrency is about dealing with many things at once; parallelism is about doing many things at once.
+- [o] One is about structure, the other about simultaneity.
+  > Concurrency lets tasks make progress independently; parallelism executes them at the same instant on multiple cores. Concurrency is about dealing with many things at once; parallelism is about doing many things at once.
 - Concurrency requires multiple processes and parallelism multiple threads.
   > Both can be built from either.
 - Parallelism is concurrency with locks.
@@ -495,8 +495,8 @@ reasoning and runnable code.
 
 - Threads are faster because they skip the scheduler.
   > Both are scheduled by the OS.
-- [o] Threads share a memory space within one process, making communication cheap and data races possible; processes are isolated and must communicate through IPC.
-  > Isolation is why a crashing process cannot corrupt its siblings, and why process pools are used to sidestep Python's GIL.
+- [o] Threads share memory; processes are isolated.
+  > Sharing makes communication cheap and data races possible; isolation forces IPC. Isolation is why a crashing process cannot corrupt its siblings, and why process pools are used to sidestep Python's GIL.
 - Processes cannot run in parallel.
   > Processes are the classic route to true parallelism.
 - Threads have their own address space.
@@ -506,10 +506,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What is a race condition?
 
-- Two threads competing for the same lock.
+- Two threads competing over one and the same lock.
   > Lock contention is expected behavior, not a bug.
-- [o] Behavior that depends on the unpredictable interleaving of operations, so the result varies between runs.
-  > \`x = x + 1\` is three operations (read, add, write), and two threads can interleave them to lose an update.
+- [o] Behavior that depends on the interleaving of operations.
+  > The result then varies between runs. \`x = x + 1\` is three operations (read, add, write), and two threads can interleave them to lose an update.
 - A thread that runs faster than expected.
   > Speed alone is not a correctness problem.
 - A deadlock that resolves itself.
@@ -523,7 +523,7 @@ reasoning and runnable code.
   > These are incidental to one example rather than the general conditions.
 - [o] Mutual exclusion, hold-and-wait, no preemption, and circular wait.
   > Breaking any one prevents deadlock, which is why a global lock ordering, breaking circular wait, is the usual practical fix.
-- Starvation, livelock, priority inversion, and contention.
+- Starvation, livelock, priority inversion, and lock contention.
   > These are other concurrency pathologies.
 - Shared memory, threads, locks, and recursion.
   > Deadlock needs none of these specifically.`}
@@ -534,11 +534,11 @@ reasoning and runnable code.
 
 - A livelock always resolves eventually.
   > It can persist indefinitely; that is what makes it a bug.
-- [o] In a deadlock threads are blocked and idle; in a livelock they keep changing state in response to each other and still make no progress.
-  > Two people stepping aside for each other in a corridor, forever. Randomized backoff is the classic fix.
+- [o] In one the threads are idle, in the other they are busy.
+  > Deadlocked threads are blocked; livelocked ones keep changing state in response to each other and still make no progress. Two people stepping aside for each other in a corridor, forever. Randomized backoff is the classic fix.
 - A livelock involves only one thread.
   > It requires at least two interacting.
-- A livelock is caused by CPU starvation.
+- A livelock is caused by starvation of the CPU itself.
   > Starvation is a separate condition.`}
 />
 
@@ -547,8 +547,8 @@ reasoning and runnable code.
 
 - A mutex is faster.
   > Relative cost depends on the implementation.
-- [o] A mutex allows exactly one holder and is typically owned by the thread that locked it; a counting semaphore admits up to N holders and has no ownership.
-  > A semaphore initialized to 1 behaves like a lock but without the ownership check, so it can legitimately be released by a different thread.
+- [o] One holder with ownership, against N holders without.
+  > A mutex is typically owned by the thread that locked it; a counting semaphore admits up to N and has no ownership. A semaphore initialized to 1 behaves like a lock but without the ownership check, so it can legitimately be released by a different thread.
 - A semaphore can only be used across processes.
   > Both come in intra- and inter-process forms.
 - A mutex cannot be released by the thread that acquired it.
@@ -560,8 +560,8 @@ reasoning and runnable code.
 
 - It prevents deadlocks, and it hurts when using locks.
   > It does not prevent deadlocks in user code.
-- [o] It simplifies memory management by serializing bytecode execution, and it hurts CPU-bound multithreaded work while leaving I/O-bound work largely unaffected.
-  > Threads release the GIL during I/O, which is why threading still helps a network-bound workload. CPU-bound work needs \`multiprocessing\` or a native extension that releases it.
+- [o] It serializes bytecode, hurting CPU-bound threading.
+  > Simplifying memory management is the reason it exists; I/O-bound work is largely unaffected because threads release it during I/O. Threads release the GIL during I/O, which is why threading still helps a network-bound workload. CPU-bound work needs \`multiprocessing\` or a native extension that releases it.
 - It makes all Python code thread-safe.
   > It guarantees only that a single bytecode instruction is atomic; \`x += 1\` still races.
 - It only affects Python 2.
@@ -573,8 +573,8 @@ reasoning and runnable code.
 
 - The runtime moves it to a background thread.
   > No automatic offloading happens.
-- [o] It blocks the entire event loop, so every other coroutine stalls until it returns.
-  > The fix is an async-native library, or \`run_in_executor\` / \`asyncio.to_thread\` to push the blocking call onto a thread pool.
+- [o] It blocks the entire event loop until it returns.
+  > Every other coroutine stalls in the meantime. The fix is an async-native library, or \`run_in_executor\` / \`asyncio.to_thread\` to push the blocking call onto a thread pool.
 - It raises an exception.
   > It runs perfectly, which is what makes the bug hard to spot.
 - It runs concurrently anyway, since coroutines are threads.
@@ -586,11 +586,11 @@ reasoning and runnable code.
 
 - Fetching 500 URLs.
   > Network waiting is I/O-bound; threads or async are lighter.
-- [o] Computing a numerical transform over a large array in pure Python.
+- [o] A numerical transform over a large array in pure Python.
   > CPU-bound work needs separate interpreters to use multiple cores. The cost is process startup and pickling data across the boundary.
 - Reading many small files.
   > File I/O releases the GIL, so threads suffice.
-- Waiting on database queries.
+- Waiting on a long series of slow database queries.
   > Another I/O-bound case.`}
 />
 
@@ -599,9 +599,9 @@ reasoning and runnable code.
 
 - It removes the need for locks.
   > Shared state still needs protection.
-- [o] It bounds concurrency and amortizes thread creation, so a burst of 10,000 tasks does not spawn 10,000 threads.
-  > The bound is the important half: unbounded thread creation exhausts memory and thrashes the scheduler.
-- It guarantees tasks run in submission order.
+- [o] It bounds concurrency and amortizes thread creation.
+  > A burst of 10,000 tasks does not then spawn 10,000 threads. The bound is the important half: unbounded thread creation exhausts memory and thrashes the scheduler.
+- It guarantees the tasks run in submission order.
   > Ordering is not guaranteed unless the pool has a single worker.
 - It makes tasks run faster individually.
   > Per-task speed is unchanged, and pooling adds a small queueing overhead.`}
@@ -610,10 +610,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What is an atomic operation?
 
-- Any operation that completes in one CPU cycle.
+- Any operation completing within a single CPU cycle.
   > Cycle count is unrelated; many atomics take several.
-- [o] One that appears to other threads as either fully done or not started, with no observable intermediate state.
-  > Compare-and-swap is the primitive most lock-free structures build on.
+- [o] One that appears either fully done or not started.
+  > No intermediate state is observable to other threads. Compare-and-swap is the primitive most lock-free structures build on.
 - An operation guarded by a lock.
   > Locking is one way to *achieve* atomicity, not what it means.
 - An operation on a single variable.
@@ -625,21 +625,21 @@ reasoning and runnable code.
 
 - A thread that has not been started.
   > It is a value, not a thread.
-- [o] A placeholder for a result that is not available yet, which can be waited on, chained, or checked for completion.
-  > It decouples "start this work" from "I need the answer now", which is what makes pipelining possible.
+- [o] A placeholder for a result that is not available yet.
+  > It can be waited on, chained, or checked for completion. It decouples "start this work" from "I need the answer now", which is what makes pipelining possible.
 - A queue of pending tasks.
   > A queue holds many items; a future holds one eventual result.
-- A callback registered with the event loop.
+- A callback that is registered with the event loop.
   > Callbacks are one way to consume a future.`}
 />
 
 <MultipleChoice
   markdown={`What is the most robust way to make a class thread-safe?
 
-- Mark every method \`synchronized\`.
+- Mark every single method as \`synchronized\`.
   > This serializes everything, killing throughput, and still allows check-then-act races across two calls.
-- [o] Make the state immutable where possible, and otherwise confine mutable state behind a single lock with a clearly documented invariant.
-  > Immutability removes the problem rather than managing it, which is why functional-style value objects are so common in concurrent code.
+- [o] Make the state immutable wherever that is possible.
+  > Otherwise confine mutable state behind a single lock with a clearly documented invariant. Immutability removes the problem rather than managing it, which is why functional-style value objects are so common in concurrent code.
 - Use only local variables.
   > Helpful, but a class with state cannot avoid fields entirely.
 - Use atomic types for every field.
@@ -651,9 +651,9 @@ reasoning and runnable code.
 
 - The CPU dropped instructions under load.
   > Hardware does not lose instructions.
-- [o] The increment is read-modify-write, and interleaving lets both threads read the same value and write back the same result, losing one update.
-  > An atomic increment or a lock fixes it; so does giving each thread its own counter and summing at the end.
-- The threads ran on different cores with separate memory.
+- [o] The increment is read-modify-write, so updates are lost.
+  > Interleaving lets both threads read the same value and write back the same result. An atomic increment or a lock fixes it; so does giving each thread its own counter and summing at the end.
+- The threads ran on different cores with their own memory.
   > Cores share memory, though caching does make the visibility problem worse.
 - One thread finished early.
   > Both complete their loops; the updates are lost, not skipped.`}
@@ -664,8 +664,8 @@ reasoning and runnable code.
 
 - A thread blocked on a lock it will eventually get.
   > Ordinary blocking is not starvation.
-- [o] A thread that is perpetually denied a resource it needs, usually because of unfair scheduling or a stream of higher-priority threads jumping ahead.
-  > Fair locks and priority inheritance are the standard mitigations, both trading throughput for predictability.
+- [o] A thread perpetually denied a resource it needs.
+  > Unfair scheduling, or a stream of higher-priority threads jumping ahead, is the usual cause. Fair locks and priority inheritance are the standard mitigations, both trading throughput for predictability.
 - A thread with too little memory allocated.
   > Memory pressure is a separate failure.
 - Two threads waiting on each other.
@@ -679,11 +679,11 @@ reasoning and runnable code.
 
 - On tables with more than a million rows.
   > Large tables are where indexes help most.
-- [o] On write-heavy tables, where every insert and update must also maintain the index, and on low-cardinality columns where a scan is cheaper anyway.
-  > An index on a boolean column matching half the table is usually ignored by the planner, so it costs writes and returns nothing.
+- [o] On write-heavy tables and low-cardinality columns.
+  > Every insert and update has to maintain the index, and a scan is cheaper on a column matching half the table. An index on a boolean column matching half the table is usually ignored by the planner, so it costs writes and returns nothing.
 - On columns used in \`WHERE\` clauses.
   > That is the case an index is for.
-- When the table is joined to another table.
+- When the table is being joined to another table.
   > Joins are a prime beneficiary.`}
 />
 
@@ -692,11 +692,11 @@ reasoning and runnable code.
 
 - It does not; the planner reorders as needed.
   > The physical sort order is fixed at creation.
-- [o] The index is sorted by \`a\` first, so it serves queries filtering on \`a\`, or on \`a\` and \`b\`, but generally not one filtering on \`b\` alone.
-  > It is the leftmost-prefix rule, and it is why an index on \`(a, b)\` often makes a separate index on \`a\` redundant.
+- [o] It is sorted by \`a\` first, so \`b\` alone cannot use it.
+  > The leftmost-prefix rule: it serves filters on \`a\`, or on \`a\` and \`b\` together. It is the leftmost-prefix rule, and it is why an index on \`(a, b)\` often makes a separate index on \`a\` redundant.
 - Only the first column is actually indexed.
   > Both are stored; the second refines the ordering within each \`a\`.
-- The order affects storage size but not query plans.
+- The order affects storage size, but never query plans.
   > It affects which queries can use the index at all.`}
 />
 
@@ -705,8 +705,8 @@ reasoning and runnable code.
 
 - An index that covers every column in the table.
   > That would be a duplicate of the table.
-- [o] One that contains every column a query needs, so the query is answered from the index alone without visiting the table rows.
-  > This is an "index-only scan". Adding included columns to widen the index is the usual way to reach it.
+- [o] One containing every column the query needs.
+  > The query is answered from the index alone, without visiting the table rows. This is an "index-only scan". Adding included columns to widen the index is the usual way to reach it.
 - An index that prevents duplicate values.
   > That is a unique index.
 - An index maintained automatically by the database.
@@ -718,8 +718,8 @@ reasoning and runnable code.
 
 - That each transaction runs on its own connection.
   > Connection topology is unrelated.
-- [o] That concurrent transactions do not observe each other's partial state, to a degree determined by the isolation level.
-  > "To a degree" is the important qualifier: only \`SERIALIZABLE\` gives the full guarantee, and most databases default to something weaker.
+- [o] That transactions do not see each other's partial state.
+  > To a degree determined by the isolation level, which is the important qualifier. "To a degree" is the important qualifier: only \`SERIALIZABLE\` gives the full guarantee, and most databases default to something weaker.
 - That the database is isolated from network failures.
   > Durability and replication cover failure scenarios.
 - That each transaction sees a completely private copy of the data.
@@ -731,9 +731,9 @@ reasoning and runnable code.
 
 - Dirty reads.
   > \`READ COMMITTED\` exists precisely to prevent those.
-- [o] Non-repeatable reads: the same row read twice in one transaction can differ, because another transaction committed in between.
-  > \`REPEATABLE READ\` closes that; phantom rows may still appear depending on the engine.
-- Nothing; it is the strictest level.
+- [o] Non-repeatable reads, where a row changes mid-transaction.
+  > Another transaction committed in between the two reads. \`REPEATABLE READ\` closes that; phantom rows may still appear depending on the engine.
+- Nothing at all, since it is the strictest level.
   > \`SERIALIZABLE\` is the strictest.
 - Lost updates only.
   > Lost updates are possible, but the level's defining permitted anomaly is the non-repeatable read.`}
@@ -744,11 +744,11 @@ reasoning and runnable code.
 
 - Reading a row that was never written.
   > Nothing appears from nowhere.
-- [o] Re-running the same range query inside one transaction and getting *additional* rows, because another transaction inserted rows matching the predicate.
-  > It is about set membership rather than a single row's value, which is why preventing it needs predicate or range locking.
+- [o] A range query returning extra rows on a second run.
+  > Another transaction inserted rows matching the predicate. It is about set membership rather than a single row's value, which is why preventing it needs predicate or range locking.
 - Reading uncommitted data.
   > That is a dirty read.
-- A read that returns \`NULL\` unexpectedly.
+- A read that unexpectedly returns \`NULL\`.
   > Unrelated to isolation.`}
 />
 
@@ -757,8 +757,8 @@ reasoning and runnable code.
 
 - When conflicts are frequent.
   > Frequent conflicts mean constant retries; pessimistic locking wins there.
-- [o] When conflicts are rare, so it is cheaper to detect a stale version at write time than to hold a lock through every read.
-  > The usual implementation is a version column checked in the \`UPDATE\`'s \`WHERE\` clause, with a retry on zero rows affected.
+- [o] When conflicts are rare.
+  > Detecting a stale version at write time then costs less than holding a lock through every read. The usual implementation is a version column checked in the \`UPDATE\`'s \`WHERE\` clause, with a retry on zero rows affected.
 - When the transaction is long-running.
   > A long transaction raises the chance of a conflict, which argues against optimism.
 - When the database does not support transactions.
@@ -770,9 +770,9 @@ reasoning and runnable code.
 
 - The table needs to be vacuumed.
   > Bloat can contribute, but it is not what the line says.
-- [o] No usable index exists for the predicate, or the planner judged a scan cheaper, often because the filter is not sargable, as with a function applied to the column.
-  > \`WHERE DATE(created_at) = '2026-01-01'\` defeats an index on \`created_at\`; a range predicate on the bare column does not.
-- The query returns too many columns.
+- [o] No usable index exists, or the planner judged a scan cheaper.
+  > A non-sargable filter is a common cause: \`WHERE DATE(created_at) = ...\` defeats an index on \`created_at\`. \`WHERE DATE(created_at) = '2026-01-01'\` defeats an index on \`created_at\`; a range predicate on the bare column does not.
+- The query is returning far too many columns.
   > Column count affects width, not scan choice.
 - The table has too many indexes.
   > Extra indexes slow writes; they do not force a sequential scan.`}
@@ -783,8 +783,8 @@ reasoning and runnable code.
 
 - Because \`SUM\` counts \`NULL\`s as zero after a join.
   > \`SUM\` skips \`NULL\`s regardless.
-- [o] A one-to-many join repeats each left row per match, so its measure is added once per match; aggregate the many-side to the left grain first, then join.
-  > It is the single most common source of an overstated dashboard number.
+- [o] The join repeats each left row once per match.
+  > Its measure is then added once per match. Aggregate the many-side to the left grain first, then join. It is the single most common source of an overstated dashboard number.
 - Because the join key is not indexed.
   > Indexing changes speed, not results.
 - Because \`INNER JOIN\` was used instead of \`LEFT JOIN\`.
@@ -794,10 +794,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`When should you reach for a document store over a relational database?
 
-- Whenever the data volume exceeds a terabyte.
+- Whenever the data volume grows past a terabyte.
   > Relational systems handle far more than that.
-- [o] When the access pattern is dominated by fetching a whole aggregate by key, and the schema varies per document in ways a table would express poorly.
-  > The trade is giving up joins and multi-document transactional guarantees, which many document stores now partially offer back.
+- [o] When you mostly fetch a whole aggregate by key.
+  > Particularly if the schema varies per document in ways a table would express poorly. The trade is giving up joins and multi-document transactional guarantees, which many document stores now partially offer back.
 - Whenever you need horizontal scaling.
   > Relational databases shard too; the modelling fit is the real question.
 - When the data has no relationships.
@@ -809,9 +809,9 @@ reasoning and runnable code.
 
 - Nothing; they are synonyms.
   > They differ in nullability and in how many can exist.
-- [o] A table has at most one primary key and it cannot be \`NULL\`; it can have many unique constraints, and those typically allow \`NULL\`s.
-  > The primary key also usually determines the physical clustering in engines that cluster on it.
-- A unique constraint cannot be indexed.
+- [o] One per table and never \`NULL\`, against many that allow it.
+  > A table has at most one primary key; unique constraints can be numerous and typically permit \`NULL\`. The primary key also usually determines the physical clustering in engines that cluster on it.
+- A unique constraint cannot be indexed at all.
   > It is enforced *by* an index.
 - A primary key must be a single column.
   > Composite primary keys are common.`}
@@ -822,8 +822,8 @@ reasoning and runnable code.
 
 - A lock timeout; increase the timeout.
   > A longer timeout makes the hang last longer.
-- [o] A deadlock from circular waiting; establish a consistent lock ordering so every transaction takes the rows in the same sequence.
-  > Most databases detect the cycle and abort one transaction, so the application must also be prepared to retry.
+- [o] A deadlock from circular waiting.
+  > Establish a consistent lock ordering so every transaction takes the rows in the same sequence. Most databases detect the cycle and abort one transaction, so the application must also be prepared to retry.
 - A network partition; add a retry.
   > Nothing is partitioned; both transactions are alive and waiting.
 - An isolation level that is too low; raise it.
@@ -835,9 +835,9 @@ reasoning and runnable code.
 
 - Whenever queries feel slow.
   > Slowness is usually an indexing or query problem first.
-- [o] When a read-heavy access path repeatedly pays for the same joins, and you accept the write-side cost of keeping the redundant copy consistent.
-  > The cost is real: every duplicated value is a place the data can disagree with itself.
-- Whenever the schema exceeds ten tables.
+- [o] When a read-heavy path repeatedly pays for the same joins.
+  > You accept the write-side cost of keeping the redundant copy consistent. The cost is real: every duplicated value is a place the data can disagree with itself.
+- Whenever the schema grows beyond about ten tables.
   > Table count says nothing about the right shape.
 - Never; normalization is always correct.
   > Warehouses denormalize deliberately and correctly.`}
@@ -848,9 +848,9 @@ reasoning and runnable code.
 
 - Duplicate rows from the right table.
   > Duplication comes from key cardinality, not join type.
-- [o] The unmatched rows from the *right* table as well, padded with \`NULL\`s on the left.
-  > It is the union of what a \`LEFT\` and a \`RIGHT\` join would each return.
-- Only the rows matching in both tables.
+- [o] The unmatched rows from the *right* table as well.
+  > They arrive padded with \`NULL\`s on the left. It is the union of what a \`LEFT\` and a \`RIGHT\` join would each return.
+- Only the rows that match in both of the tables.
   > That is an \`INNER JOIN\`.
 - Rows in a different order.
   > Order is undefined without \`ORDER BY\` in either case.`}
@@ -861,11 +861,11 @@ reasoning and runnable code.
 
 - To make them run faster.
   > Batching can help throughput, but that is a side effect.
-- [o] To make them succeed or fail as a unit, so a failure partway through leaves no half-applied state.
-  > Transferring money between accounts is the canonical case: two updates that must not be separable.
+- [o] To make them succeed or fail as a single unit.
+  > A failure partway through then leaves no half-applied state. Transferring money between accounts is the canonical case: two updates that must not be separable.
 - To lock the whole database.
   > Locking is at row or page granularity, not the whole database.
-- To bypass constraint checking until commit.
+- To bypass constraint checking until the commit.
   > Some constraints can be deferred, but that is an option rather than the purpose.`}
 />
 
@@ -876,8 +876,8 @@ reasoning and runnable code.
 
 - It hides the source code from other developers.
   > Visibility modifiers are not a secrecy mechanism.
-- [o] It confines invariants to one place, so state can only change through methods that keep it valid, and the internals can be rewritten without touching callers.
-  > A class exposing public mutable fields has no way to enforce anything about them.
+- [o] It confines the invariants to one place.
+  > State can only change through methods that keep it valid, and the internals can be rewritten without touching callers. A class exposing public mutable fields has no way to enforce anything about them.
 - It makes objects immutable.
   > Immutability is a related but separate design choice.
 - It improves performance through inlining.
@@ -889,21 +889,21 @@ reasoning and runnable code.
 
 - Inheritance is slower at runtime.
   > Dispatch costs are negligible either way.
-- [o] Inheritance binds a subclass to its parent's implementation permanently, while composition lets behavior be swapped and combined at runtime.
-  > A deep hierarchy also forces every change through a base class that was designed before the requirements were known.
+- [o] Composition lets behavior be swapped at runtime.
+  > Inheritance binds a subclass to its parent's implementation permanently. A deep hierarchy also forces every change through a base class that was designed before the requirements were known.
 - Composition requires less code.
   > It often requires more, in exchange for flexibility.
-- Inheritance cannot express "is-a" relationships.
+- Inheritance is unable to express "is-a" relationships.
   > "Is-a" is exactly what it expresses well; the trouble is that most relationships are not actually "is-a".`}
 />
 
 <MultipleChoice
   markdown={`What does the Liskov Substitution Principle require?
 
-- That subclasses implement every parent method.
+- That every subclass implements every parent method.
   > Implementing them is not enough if the behavior differs.
-- [o] That a subclass can stand in for its parent without breaking any caller's expectations: no strengthened preconditions, no weakened postconditions.
-  > A \`Square\` extending \`Rectangle\` violates it: code that sets width and height independently breaks.
+- [o] That a subclass can stand in for its parent safely.
+  > No strengthened preconditions and no weakened postconditions, so no caller's expectations break. A \`Square\` extending \`Rectangle\` violates it: code that sets width and height independently breaks.
 - That every class have exactly one parent.
   > Single inheritance is a language rule in some languages, not this principle.
 - That subclasses never override methods.
@@ -915,8 +915,8 @@ reasoning and runnable code.
 
 - High-level modules should not depend on anything.
   > They must depend on something; the question is what.
-- [o] Both high- and low-level modules should depend on abstractions, so the policy does not hard-code which implementation it uses.
-  > An order service depending on a \`PaymentGateway\` interface can be tested with a fake and re-pointed at a new provider without changing.
+- [o] Both high- and low-level modules depend on abstractions.
+  > The policy then does not hard-code which implementation it uses. An order service depending on a \`PaymentGateway\` interface can be tested with a fake and re-pointed at a new provider without changing.
 - Dependencies should be injected through constructors only.
   > Constructor injection is one technique for applying it.
 - Low-level modules should define the interfaces.
@@ -928,21 +928,21 @@ reasoning and runnable code.
 
 - When you need exactly one instance of a class.
   > That is Singleton.
-- [o] When several interchangeable algorithms exist for one job and the choice should be made at runtime, replacing a growing conditional.
-  > Pricing rules, sorting orders, and retry policies are typical. In languages with first-class functions, a function parameter often suffices.
+- [o] When interchangeable algorithms are chosen at runtime.
+  > It replaces a growing conditional. Pricing rules, sort orders, and retry policies are typical. Pricing rules, sorting orders, and retry policies are typical. In languages with first-class functions, a function parameter often suffices.
 - When object creation is expensive.
   > That points at a factory, a pool, or lazy initialization.
-- When many objects must be notified of a change.
+- When many objects have to be notified of a change.
   > That is Observer.`}
 />
 
 <MultipleChoice
   markdown={`Why is the Singleton pattern controversial?
 
-- It is slower than a normal class.
+- It is measurably slower than a normal class.
   > Performance is not the objection.
-- [o] It introduces hidden global state, which makes tests order-dependent and hard to isolate, and it conceals dependencies rather than declaring them.
-  > A single instance managed by a dependency-injection container gives the same lifetime without the global reach.
+- [o] It introduces hidden global state.
+  > Tests become order-dependent and hard to isolate, and dependencies are concealed rather than declared. A single instance managed by a dependency-injection container gives the same lifetime without the global reach.
 - It cannot be made thread-safe.
   > It can, with care; that is a separate problem.
 - It requires inheritance.
@@ -954,9 +954,9 @@ reasoning and runnable code.
 
 - An interface can have no methods.
   > Both can be empty; that is not the distinction.
-- [o] An abstract class can carry state and shared implementation and is normally singly inherited; an interface declares a contract and a class can satisfy several.
-  > "Is-a with shared machinery" versus "can-do capability" is the usual way to choose.
-- Abstract classes cannot be instantiated but interfaces can.
+- [o] One carries state and implementation, the other a contract.
+  > An abstract class is normally singly inherited; a class can satisfy several interfaces. "Is-a with shared machinery" versus "can-do capability" is the usual way to choose.
+- Abstract classes cannot be instantiated, but interfaces can.
   > Neither can be instantiated directly.
 - Interfaces are faster.
   > Dispatch cost is not a meaningful difference.`}
@@ -967,8 +967,8 @@ reasoning and runnable code.
 
 - Default arguments cannot be mutable types.
   > They can, which is the problem.
-- [o] The default is evaluated once at function definition, so a mutable default is shared across every call and accumulates changes.
-  > Use \`None\` as the default and create the list or dict inside the body.
+- [o] The default is evaluated once, at function definition.
+  > A mutable default is therefore shared across every call and accumulates changes. Use \`None\` as the default and create the list or dict inside the body.
 - Mutable defaults are copied on each call, which is slow.
   > No copy is made; the same object is reused.
 - The default is re-evaluated on every call.
@@ -980,8 +980,8 @@ reasoning and runnable code.
 
 - \`is\` compares values and \`==\` compares types.
   > Neither is right.
-- [o] \`is\` tests whether two names refer to the same object; \`==\` calls \`__eq__\` to test equality of value.
-  > Small integers and short strings are interned, so \`is\` sometimes appears to work on values, which is precisely what makes the bug intermittent.
+- [o] One tests identity, the other tests value.
+  > \`is\` asks whether two names refer to the same object; \`==\` calls \`__eq__\`. Small integers and short strings are interned, so \`is\` sometimes appears to work on values, which is precisely what makes the bug intermittent.
 - They are equivalent for immutable types.
   > Interning makes them *appear* equivalent, which is not the same as being so.
 - \`is\` is faster and otherwise identical.
@@ -993,21 +993,21 @@ reasoning and runnable code.
 
 - Generators are always faster.
   > Per-item overhead can be slightly higher; the win is in memory.
-- [o] A generator yields items lazily, so peak memory stays constant regardless of how many items pass through, and work stops early if the consumer does.
-  > The trade is that a generator is single-pass and has no length.
+- [o] It yields items lazily, so peak memory stays constant.
+  > However many items pass through, and work stops early if the consumer does. The trade is that a generator is single-pass and has no length.
 - Generators can be indexed.
   > They cannot; that is one of the trade-offs.
-- Generators automatically parallelize.
+- Generators automatically parallelize the work.
   > No concurrency is implied.`}
 />
 
 <MultipleChoice
   markdown={`What is a closure, and what makes one?
 
-- Any function defined inside another function.
+- Any function that is defined inside another function.
   > Nesting alone is not enough; the inner function must capture something.
-- [o] A nested function that captures and retains a reference to a variable from its enclosing scope, keeping it alive after the outer call returns.
-  > Rebinding such a variable from the inner function needs \`nonlocal\`, otherwise Python treats the assignment as creating a new local.
+- [o] A nested function that captures an enclosing variable.
+  > The reference keeps it alive after the outer call returns. Rebinding such a variable from the inner function needs \`nonlocal\`, otherwise Python treats the assignment as creating a new local.
 - A function with no arguments.
   > Arity is unrelated.
 - A function that has been decorated.
@@ -1019,8 +1019,8 @@ reasoning and runnable code.
 
 - \`__str__\` is for developers and \`__repr__\` for end users.
   > It is the other way round.
-- [o] \`__repr__\` is the unambiguous developer-facing form, ideally reconstructing the object; \`__str__\` is the readable form, falling back to \`__repr__\` when undefined.
-  > Defining only \`__repr__\` is usually the right default, since it covers both and is what shows up in logs and debuggers.
+- [o] One is unambiguous for developers, the other readable.
+  > \`__repr__\` ideally reconstructs the object; \`__str__\` falls back to it when undefined. Defining only \`__repr__\` is usually the right default, since it covers both and is what shows up in logs and debuggers.
 - \`__repr__\` must return bytes.
   > Both return \`str\`.
 - Only \`__str__\` is called by \`print\`.
@@ -1032,8 +1032,8 @@ reasoning and runnable code.
 
 - That the block runs without raising.
   > Exceptions still propagate unless \`__exit__\` suppresses them.
-- [o] That the cleanup in \`__exit__\` runs whether the block completes normally, returns early, or raises.
-  > It is why \`with open(...)\` is the correct way to handle files, and \`contextlib.contextmanager\` makes writing one a matter of \`try\`/\`finally\` around a \`yield\`.
+- [o] That the cleanup in \`__exit__\` always runs.
+  > Normal completion, an early return, and an exception all reach it. It is why \`with open(...)\` is the correct way to handle files, and \`contextlib.contextmanager\` makes writing one a matter of \`try\`/\`finally\` around a \`yield\`.
 - That the resource is released immediately after acquisition.
   > It is released at the end of the block.
 - That the block is thread-safe.
@@ -1045,8 +1045,8 @@ reasoning and runnable code.
 
 - \`@staticmethod\` receives the instance; \`@classmethod\` does not.
   > Neither receives the instance.
-- [o] \`@classmethod\` receives the class as its first argument, which makes it the natural choice for alternative constructors; \`@staticmethod\` receives nothing implicit.
-  > Because \`@classmethod\` gets \`cls\`, a subclass calling it constructs the subclass rather than the base.
+- [o] One receives the class, the other receives nothing.
+  > \`@classmethod\` gets \`cls\`, which makes it the natural choice for alternative constructors. Because \`@classmethod\` gets \`cls\`, a subclass calling it constructs the subclass rather than the base.
 - \`@staticmethod\` cannot be called on an instance.
   > It can be called on either.
 - \`@classmethod\` methods cannot be overridden.
@@ -1056,10 +1056,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What are \`__slots__\` for?
 
-- Restricting which methods a class exposes.
+- Restricting which methods a class chooses to expose.
   > Methods are unaffected.
-- [o] Declaring a fixed set of attributes so instances skip the per-instance \`__dict__\`, cutting memory noticeably when there are very many instances.
-  > The costs are losing dynamic attribute assignment and complicating multiple inheritance, so it is an optimization rather than a default.
+- [o] Declaring a fixed set of attributes up front.
+  > Instances then skip the per-instance \`__dict__\`, which cuts memory noticeably at high instance counts. The costs are losing dynamic attribute assignment and complicating multiple inheritance, so it is an optimization rather than a default.
 - Making attributes read-only.
   > Attributes stay writable.
 - Speeding up method dispatch.
@@ -1071,8 +1071,8 @@ reasoning and runnable code.
 
 - That its block runs only when no exception was raised.
   > It runs in either case; that is the point.
-- [o] That its block runs on the way out of the \`try\`, whether that exit is normal completion, an exception, or a \`return\`.
-  > A \`return\` inside \`finally\` will even override one from the \`try\` block. That is legal, and a reliable way to confuse the next reader.
+- [o] That its block runs on the way out of the \`try\`.
+  > Normal completion, an exception, and a \`return\` all count. A \`return\` inside \`finally\` will even override one from the \`try\` block. That is legal, and a reliable way to confuse the next reader.
 - That exceptions in the \`try\` block are suppressed.
   > Suppression requires an \`except\` clause.
 - That the code runs in a separate thread.
@@ -1084,9 +1084,9 @@ reasoning and runnable code.
 
 - A shallow copy copies nothing.
   > It creates a new outer container.
-- [o] A shallow copy duplicates the outer container but shares the nested objects; a deep copy recursively duplicates everything.
-  > It is why mutating a nested list in a shallowly-copied structure changes both copies.
-- A deep copy is a shallow copy applied twice.
+- [o] One shares the nested objects, the other duplicates them.
+  > A shallow copy duplicates only the outer container; a deep copy recurses all the way down. It is why mutating a nested list in a shallowly-copied structure changes both copies.
+- A deep copy is just a shallow copy applied twice.
   > It recurses to arbitrary depth, not two levels.
 - They differ only for immutable types.
   > For immutable types the distinction barely matters; it is mutable nesting that exposes it.`}
@@ -1097,9 +1097,9 @@ reasoning and runnable code.
 
 - Yes; they enforce types on assignment.
   > No checking happens at assignment.
-- [o] No; they are metadata for static checkers, editors, and libraries that opt into reading them, and passing the wrong type still runs.
-  > Libraries such as Pydantic and FastAPI do read them at runtime to validate, which is opt-in behavior rather than the language enforcing anything.
-- Yes; they make attribute access faster.
+- [o] No, they are metadata for static checkers and editors.
+  > Libraries can opt into reading them, but passing the wrong type still runs. Libraries such as Pydantic and FastAPI do read them at runtime to validate, which is opt-in behavior rather than the language enforcing anything.
+- Yes, they make attribute access measurably faster.
   > No performance change.
 - Only inside dataclasses.
   > Dataclasses read annotations to generate methods, but still do not enforce types.`}
@@ -1110,11 +1110,11 @@ reasoning and runnable code.
 
 - Both should be high.
   > High coupling is what makes a change in one module ripple through five others.
-- [o] Cohesion is how related a module's responsibilities are and should be high; coupling is how much modules depend on each other and should be low.
-  > A class that parses config, sends email, and computes tax has low cohesion; one that reaches into another's fields has high coupling. Both make change expensive.
+- [o] Cohesion should be high and coupling should be low.
+  > Cohesion is how related a module's responsibilities are; coupling is how much modules depend on each other. A class that parses config, sends email, and computes tax has low cohesion; one that reaches into another's fields has high coupling. Both make change expensive.
 - Both should be low.
   > Low cohesion means a module has no coherent reason to exist.
-- Cohesion should be low so modules stay small.
+- Cohesion should be low, so that modules stay small.
   > Small is good; incoherent is not. Splitting on responsibility keeps both.`}
 />
 
@@ -1123,8 +1123,8 @@ reasoning and runnable code.
 
 - O(log n), because a \`dict\` is a balanced tree.
   > Python's \`dict\` is a hash table, not a tree.
-- [o] O(1) average for lookup, insert, and delete, because keys are hashed to a slot, which is also why keys must be hashable and therefore effectively immutable.
-  > Worst case degrades to O(n) under heavy collisions, and since 3.7 insertion order is part of the language guarantee.
+- [o] O(1) average for lookup, insert, and delete.
+  > Keys are hashed to a slot, which is also why they must be hashable and therefore effectively immutable. Worst case degrades to O(n) under heavy collisions, and since 3.7 insertion order is part of the language guarantee.
 - O(1) for lookup but O(n) for insert.
   > Insertion is amortized O(1); the occasional resize is what "amortized" absorbs.
 - O(n) for all three on large dictionaries.
@@ -1138,11 +1138,11 @@ reasoning and runnable code.
 
 - Sketch the database schema.
   > Schema follows from requirements not yet established.
-- [o] Clarify functional and non-functional requirements, then estimate scale, so every later decision has a stated justification.
-  > Designing for a million users when the answer is a thousand, or the reverse, is the most common way these interviews go wrong.
+- [o] Clarify the requirements, then estimate the scale.
+  > Every later decision then has a stated justification to rest on. Designing for a million users when the answer is a thousand, or the reverse, is the most common way these interviews go wrong.
 - Name the technologies you would use.
   > Technology choice without requirements is guessing.
-- Draw the full architecture immediately.
+- Draw out the full architecture straight away.
   > A diagram before requirements bakes in assumptions nobody agreed to.`}
 />
 
@@ -1151,9 +1151,9 @@ reasoning and runnable code.
 
 - Lower operational complexity.
   > It is considerably more complex.
-- [o] Headroom past the largest available machine, plus redundancy; losing one node degrades capacity instead of causing an outage.
-  > It requires stateless services or a way to route state, which is the real cost.
-- Better single-request latency.
+- [o] Headroom past the largest machine, plus redundancy.
+  > Losing one node degrades capacity instead of causing an outage. It requires stateless services or a way to route state, which is the real cost.
+- Noticeably better single-request latency.
   > Latency per request generally does not improve, and cross-node coordination can worsen it.
 - Freedom from load balancing.
   > It requires load balancing.`}
@@ -1164,8 +1164,8 @@ reasoning and runnable code.
 
 - The cache reads through to the database on a miss and populates itself.
   > That is read-through, where the cache owns the loading.
-- [o] The application checks the cache, and on a miss reads the database and writes the result into the cache itself.
-  > It keeps the cache optional (the system still works if it is down), which is why it is the most common pattern.
+- [o] The application checks the cache and populates it on a miss.
+  > It reads the database and writes the result back itself. It keeps the cache optional (the system still works if it is down), which is why it is the most common pattern.
 - Writes go to the cache and are flushed to the database later.
   > That is write-behind, with a durability risk on cache failure.
 - The cache is populated by a background job only.
@@ -1177,11 +1177,11 @@ reasoning and runnable code.
 
 - Caches do not support deletion.
   > Deletion is trivial; knowing when is not.
-- [o] The cache holds a copy whose source can change through paths the cache never sees, so correctness depends on every writer knowing what to invalidate.
-  > TTLs bound staleness without needing that knowledge, which is why they are so common despite being imprecise.
+- [o] The source can change through paths the cache never sees.
+  > Correctness then depends on every writer knowing what to invalidate. TTLs bound staleness without needing that knowledge, which is why they are so common despite being imprecise.
 - Cache keys must be unique across the cluster.
   > Namespacing solves that easily.
-- Invalidation requires a distributed transaction.
+- Invalidation always requires a distributed transaction.
   > Some designs use one; most accept eventual consistency instead.`}
 />
 
@@ -1201,10 +1201,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What does read-replica database replication give you, and what does it cost?
 
-- Higher write throughput.
+- Substantially higher write throughput.
   > Writes still go to the primary.
-- [o] Read scaling and a failover candidate, at the cost of replication lag, so a read straight after a write may not see it.
-  > "Read your own writes" usually needs pinning that user's reads to the primary for a short window.
+- [o] Read scaling and a failover candidate, at the cost of lag.
+  > A read straight after a write may not see it. "Read your own writes" usually needs pinning that user's reads to the primary for a short window.
 - Stronger consistency.
   > Asynchronous replication weakens it.
 - Automatic sharding.
@@ -1214,10 +1214,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`How does sharding differ from partitioning?
 
-- They are the same operation under two names.
+- They are the same operation going by two names.
   > The distinction is where the pieces live.
-- [o] Partitioning splits a table into pieces, usually within one database; sharding distributes those pieces across separate machines, each with its own resources.
-  > Sharding is what forces the hard parts: cross-shard joins, distributed transactions, and rebalancing a hot shard.
+- [o] Sharding puts the pieces on separate machines.
+  > Partitioning splits a table within one database; sharding distributes those pieces, each with its own resources. Sharding is what forces the hard parts: cross-shard joins, distributed transactions, and rebalancing a hot shard.
 - Sharding applies only to NoSQL databases.
   > Relational systems shard too.
 - Partitioning requires a shard key.
@@ -1229,8 +1229,8 @@ reasoning and runnable code.
 
 - Consistency, availability, and performance.
   > Performance is not one of the three.
-- [o] Consistency and availability, but only when a network partition is happening, since partition tolerance is not optional in a distributed system.
-  > The everyday version, PACELC, adds the point that even without a partition you trade latency against consistency.
+- [o] Consistency and availability, during a partition.
+  > Partition tolerance is not optional in a distributed system, so the choice only arises when one happens. The everyday version, PACELC, adds the point that even without a partition you trade latency against consistency.
 - Two of consistency, availability, and partition tolerance, freely.
   > The popular "pick two" framing is misleading: partitions occur whether or not you pick them.
 - Read and write throughput.
@@ -1242,9 +1242,9 @@ reasoning and runnable code.
 
 - Whenever two services need to communicate.
   > Synchronous calls are simpler when the caller needs an answer now.
-- [o] When work can be done asynchronously, when you need to absorb traffic spikes, or when producers and consumers should scale and fail independently.
-  > The cost is eventual consistency, duplicate delivery, and ordering that is only guaranteed within a partition.
-- When you need lower latency for the end user.
+- [o] When work is asynchronous or spikes need absorbing.
+  > Producers and consumers can then also scale and fail independently. The cost is eventual consistency, duplicate delivery, and ordering that is only guaranteed within a partition.
+- When you need lower latency for the end user overall.
   > Perceived latency can improve, but the total work takes longer.
 - When the database is slow.
   > A queue defers load; it does not make a slow query fast.`}
@@ -1268,11 +1268,11 @@ reasoning and runnable code.
 
 - Hashes are too long to be useful.
   > They can be truncated, which is where the problem starts.
-- [o] Truncating to a short code creates collisions, so you still need a uniqueness check and a resolution strategy on write.
-  > A counter encoded in base62, or a pre-generated key pool, avoids collisions by construction.
+- [o] Truncating to a short code creates collisions.
+  > You still need a uniqueness check and a resolution strategy on write. A counter encoded in base62, or a pre-generated key pool, avoids collisions by construction.
 - Hashing is too slow at scale.
   > Hashing is trivially fast.
-- Hashes cannot be stored in a database.
+- Hashes cannot be stored in a database column.
   > They store as ordinary strings.`}
 />
 
@@ -1281,9 +1281,9 @@ reasoning and runnable code.
 
 - When most users have few followers.
   > That is the case it handles best.
-- [o] For accounts with millions of followers, where one post triggers millions of writes; the usual answer is a hybrid, pulling celebrity posts at read time.
-  > Fan-out on write optimizes reads at the cost of write amplification; the tail of the follower distribution is what breaks it.
-- When the feed must be chronological.
+- [o] For accounts whose one post triggers millions of writes.
+  > The usual answer is a hybrid, pulling celebrity posts at read time. Fan-out on write optimizes reads at the cost of write amplification; the tail of the follower distribution is what breaks it.
+- When the feed has to stay strictly chronological.
   > Ordering works under either strategy.
 - When reads outnumber writes.
   > A read-heavy workload is exactly what fan-out on write is for.`}
@@ -1294,9 +1294,9 @@ reasoning and runnable code.
 
 - Database query time.
   > A CDN never touches the database.
-- [o] Latency and origin load for cacheable content, by serving it from a point of presence near the user.
-  > It also absorbs traffic spikes and offloads bandwidth cost, which is often the larger saving.
-- Application correctness under load.
+- [o] Latency and origin load, for cacheable content.
+  > It is served from a point of presence near the user. It also absorbs traffic spikes and offloads bandwidth cost, which is often the larger saving.
+- Application correctness when under heavy load.
   > Correctness is unaffected.
 - Write throughput.
   > CDNs cache reads.`}
@@ -1305,10 +1305,10 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`How do you remove a single point of failure?
 
-- Add monitoring so you know when it fails.
+- Add monitoring so that you know when it fails.
   > Monitoring shortens the outage; it does not prevent one.
-- [o] Add redundancy with automatic failover, and make sure the failover path is exercised rather than assumed to work.
-  > An untested standby is a single point of failure with extra steps.
+- [o] Add redundancy, and exercise the failover path.
+  > An untested standby is a single point of failure with extra steps. An untested standby is a single point of failure with extra steps.
 - Scale the component vertically.
   > A bigger single machine is still single.
 - Document a manual recovery procedure.
@@ -1320,11 +1320,11 @@ reasoning and runnable code.
 
 - The exact price of each cloud instance type.
   > Pricing changes constantly and is rarely the crux.
-- [o] Rough orders of magnitude: memory reads in nanoseconds, SSD in tens of microseconds, a cross-region round trip in the tens or hundreds of milliseconds, and how those turn into QPS and storage per day.
-  > The numbers only need to be right to an order of magnitude, enough to say whether something fits in memory or needs a different design.
+- [o] Rough orders of magnitude for memory, disk, and network.
+  > Memory reads in nanoseconds, SSD in tens of microseconds, a cross-region round trip in the tens or hundreds of milliseconds, and how those turn into QPS and storage per day. The numbers only need to be right to an order of magnitude, enough to say whether something fits in memory or needs a different design.
 - The number of cores in the latest server CPUs.
   > Occasionally useful, rarely decisive.
-- The default configuration values of your database.
+- The default configuration values your database ships with.
   > Worth knowing on the job, not for sizing a design.`}
 />
 

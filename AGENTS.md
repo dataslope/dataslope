@@ -388,6 +388,46 @@ Choice explanations in `<MultipleChoice>` blocks are shown to **all** learners a
 
 Write the explanation as a neutral statement that stands on its own.
 
+### Option length
+
+**The correct option must not be the longest one.** It is the easiest way to
+make a question guessable without reading it: the writer packs the reasoning
+into the right answer and leaves the distractors as stubs. The interview
+question banks were once 94% guessable this way.
+
+The reasoning belongs in the explanation, which every learner sees after
+submitting. Keep the option to the claim itself and let the `>` line carry the
+justification:
+
+```markdown
+<!-- Bad: the answer is obvious from the shape alone -->
+- Only in the learning rate used.
+- [o] Batch uses the whole dataset per update (stable, slow); SGD uses one example
+      (noisy, fast, can escape shallow minima); mini-batch uses a subset and is the
+      practical default.
+- SGD is deterministic and batch is not.
+
+<!-- Good -->
+- Only in the learning rate each one uses.
+- [o] In how many examples each parameter update is computed from.
+  > Batch uses the whole dataset (stable, slow), SGD one example (noisy, fast),
+  > mini-batch a subset. Mini-batch dominates because it keeps a GPU busy.
+- SGD is fully deterministic while batch gradient descent is not.
+```
+
+Lengthening the distractors is the other half, and it makes them better
+distractors: a one-line stub next to three real sentences is not plausible.
+
+`scripts/check-mcq.mjs` enforces two rules over `content/interview/*/
+multiple-choice-questions.mdx`: no single question where the correct option
+exceeds the longest distractor by both 1.4x and 20 characters, and a
+corpus-wide rate below 40% for "correct option is the single longest" (chance
+is 25% with four options; the banks currently sit at 31.5%).
+
+**The course concept-checks are not covered yet** and roughly half of them
+still fail the per-question rule. Extending the guard to them means rewriting
+about 1,400 questions; it has not been done.
+
 ```markdown
 <!-- Bad -->
 - [o] Tableau
