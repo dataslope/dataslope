@@ -38,6 +38,10 @@ export const TAG_LABELS: Record<string, string> = {
   scipy: "SciPy",
   seaborn: "seaborn",
   statsmodels: "statsmodels",
+  // AI domains and tools
+  "ai-tools": "AI Tools",
+  chatgpt: "ChatGPT",
+  "llm-internals": "LLM Internals",
   // Skills with acronyms that plain title-casing would get wrong
   "css-layout": "CSS Layout",
   "semantic-html": "Semantic HTML",

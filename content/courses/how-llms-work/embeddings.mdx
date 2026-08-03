@@ -1,0 +1,257 @@
+---
+title: Embeddings
+description: Every token becomes a vector, and meaning becomes geometry. This is the idea that makes everything else possible.
+---
+
+A token id is a number, but it is a meaningless one. Token 11241
+(`" token"`) is not 11 times more of anything than token 1001. Ids are
+labels, and labels support no arithmetic.
+
+<Figure
+  slug="llm-embeddings-cutout"
+  alt="A three-dimensional lattice of floating labelled spheres where similar spheres cluster tightly together and one unrelated sphere sits far away across the grid"
+/>
+
+So the first thing the model does is replace each id with a **vector**:
+a list of a few thousand numbers. This is the **embedding**, and it is
+looked up from a table that was learned during training.
+
+## Why a vector helps
+
+Because vectors have geometry. Two vectors can be close together or
+far apart, and training arranges the table so that **tokens used in
+similar contexts end up close together**.
+
+That single arrangement gives the model something ids never could: the
+ability to generalize. It has seen "the cat sat on the mat". If "dog"
+sits near "cat" in the space, then "the dog sat on the mat" is
+partially handled already, without ever having been observed.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+# A tiny hand-built embedding space. Real ones have thousands of
+# dimensions; here we use three so they can be read directly.
+#            [ animal, size, domestic ]
+embeddings = {
+    "cat":    np.array([0.9, 0.2, 0.9]),
+    "dog":    np.array([0.9, 0.4, 0.9]),
+    "wolf":   np.array([0.9, 0.5, 0.1]),
+    "kitten": np.array([0.9, 0.1, 0.9]),
+    "truck":  np.array([0.0, 0.9, 0.2]),
+}
+
+for word, vec in embeddings.items():
+    print(f"{word:>7}: {vec}")
+
+print()
+print("Distance from 'cat':")
+for word, vec in embeddings.items():
+    d = np.linalg.norm(embeddings["cat"] - vec)
+    print(f"  {word:>7}: {d:.3f}")
+`,
+    },
+  ]}
+/>
+
+`kitten` is nearest, `dog` next, `truck` furthest. Nobody wrote those
+relationships down; in a real model they fall out of the training
+objective, because words used in similar sentences get pushed toward
+similar vectors.
+
+## The dimensions are not interpretable
+
+The example above labels its three dimensions "animal", "size",
+"domestic" for readability. **Real embedding dimensions have no such
+labels.** Dimension 1,847 of a real model does not mean anything you
+can name. The meaning lives in the overall arrangement, not in
+individual axes.
+
+This matters when you read popular explanations claiming a model
+"has a dimension for gender". It does not, in any clean sense. What
+exists are directions in the space along which certain contrasts vary,
+and those directions are combinations of many dimensions.
+
+## Position has to be added
+
+Embeddings alone are unordered. The vectors for "dog bites man" and
+"man bites dog" are the same three vectors, and any operation that
+treats them as a set gives both the same answer.
+
+So position information is added, either by adding a
+position-dependent vector to each embedding or by encoding relative
+positions in the attention step. Either way, **the model does not get
+order for free**, and everything about word order in its behavior
+comes from this addition.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+emb = {"dog": np.array([0.9, 0.2]), "bites": np.array([0.1, 0.8]),
+       "man": np.array([0.5, 0.5])}
+
+s1 = ["dog", "bites", "man"]
+s2 = ["man", "bites", "dog"]
+
+# Without position: sum the vectors (order-blind).
+print("Order-blind representation:")
+print("  'dog bites man':", sum(emb[w] for w in s1))
+print("  'man bites dog':", sum(emb[w] for w in s2))
+print("  Identical, so the model could not tell them apart.")
+
+# With a simple position signal added:
+def positioned(words):
+    return sum(emb[w] + np.array([0.0, 0.1 * i]) for i, w in enumerate(words))
+
+print()
+print("With position added:")
+print("  'dog bites man':", positioned(s1).round(3))
+print("  'man bites dog':", positioned(s2).round(3))
+`,
+    },
+  ]}
+/>
+
+<Callout type="info" title="Embeddings you can use directly">
+Embedding models are also sold as a product in their own right, for
+search and retrieval. You embed your documents once, embed the user's
+query, and return the nearest documents. That is the core of
+retrieval-augmented generation, and it is built entirely on the
+geometry in this chapter.
+</Callout>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Why are token ids replaced with vectors?
+
+- [o] Because ids support no meaningful arithmetic, while vectors have geometry.
+  > Distance between vectors can encode similarity, which is what lets the model generalize between related words.
+- Because ids are not unique across the vocabulary.
+  > Ids are unique by construction.
+- Because ids exceed the numeric range the model can process.
+  > Any integer range can be handled; the problem is meaning rather than magnitude.
+- Because vectors compress the input to fewer values.
+  > A vector of thousands of numbers is far larger than a single id.
+
+Ids are arbitrary labels. Vectors are positions in a space where
+closeness means something.`}
+/>
+
+<MultipleChoice
+  markdown={`What arranges related words near each other in embedding space?
+
+- A hand-curated dictionary of synonyms supplied during training.
+  > No synonym list is used.
+- The alphabetical ordering of the vocabulary.
+  > Alphabetical adjacency has no relationship to meaning.
+- [o] Training, which pushes words used in similar contexts toward similar vectors.
+  > The prediction objective rewards representing interchangeable words similarly, and proximity is the result.
+- A clustering step applied after the model is trained.
+  > No post-hoc clustering is involved.
+
+Distributional similarity in the training text becomes geometric
+proximity in the space.`}
+/>
+
+<MultipleChoice
+  markdown={`What does dimension 1,847 of a real embedding mean?
+
+- [o] Nothing nameable; meaning lives in the arrangement rather than individual axes.
+  > Interpretable contrasts correspond to directions that combine many dimensions, not to single coordinates.
+- The grammatical role of the token.
+  > No dimension is dedicated to grammatical role.
+- The token's position in the vocabulary.
+  > Vocabulary position is the id, which the embedding replaces.
+- The token's frequency in training data.
+  > Frequency is not encoded in a single dimension.
+
+Individual axes are not the unit of meaning, which is why "the model
+has a dimension for X" claims are usually wrong.`}
+/>
+
+<MultipleChoice
+  markdown={`Why must position information be added separately?
+
+- Because positions change between training and inference.
+  > Positions are handled the same way in both.
+- [o] Because embeddings alone are unordered, so word order would be invisible.
+  > "Dog bites man" and "man bites dog" contain identical vectors, and without positional information the model could not distinguish them.
+- Because tokenizers discard whitespace that would indicate order.
+  > Whitespace is preserved inside tokens and is unrelated to sequence order.
+- Because embeddings are too large to encode position.
+  > Size is not the constraint.
+
+Order is not intrinsic to a set of vectors, so it has to be injected.`}
+/>
+
+<MultipleChoice
+  markdown={`How does embedding geometry enable generalization?
+
+- By reducing the number of parameters needed.
+  > Parameter efficiency is a separate concern.
+- By allowing the model to look up unseen words in a dictionary.
+  > No dictionary lookup occurs.
+- [o] By placing an unseen word near seen ones, so patterns partly transfer.
+  > A sentence pattern learned with "cat" applies partially to "dog" when the two sit close together in the space.
+- By storing every sentence the model has seen.
+  > Sentences are not stored.
+
+Proximity in the space is what lets knowledge about one word apply to
+another.`}
+/>
+
+<MultipleChoice
+  markdown={`What is a retrieval system built on embeddings actually doing?
+
+- Asking the model to recall documents from its training data.
+  > Training data is not retrievable.
+- [o] Embedding documents and the query, then returning the nearest documents.
+  > Similarity search over vectors is the entire retrieval step, with the model used afterwards to read what was retrieved.
+- Fine-tuning the model on each document as it arrives.
+  > No training occurs at query time.
+- Compressing documents into the model's context window.
+  > Compression is not the mechanism.
+
+Retrieval is geometry: embed everything, then find what is close.`}
+/>
+
+<MultipleChoice
+  markdown={`In the toy example, why is \`kitten\` closer to \`cat\` than \`wolf\` is?
+
+- Because \`wolf\` was added to the table later.
+  > Insertion order is irrelevant to distance.
+- Because \`kitten\` appears more often in the corpus.
+  > Frequency does not determine position.
+- Because the words share more letters.
+  > Embeddings are not built from spelling.
+- [o] Because its vector differs from \`cat\` on fewer and smaller dimensions.
+  > Distance is computed from the coordinates, and \`kitten\` shares the domestic and animal values while \`wolf\` does not.
+
+Distance is arithmetic on coordinates, which is exactly why the vector
+representation is useful.`}
+/>
+
+<MultipleChoice
+  markdown={`A real embedding vector has roughly how many dimensions?
+
+- [o] Hundreds to thousands.
+  > Production models typically use somewhere in the range of 768 to several thousand dimensions per token.
+- Three, as in the example.
+  > Three was chosen only so the numbers could be read on the page.
+- Around twenty.
+  > Far too few to represent the distinctions a large vocabulary requires.
+- One per token in the vocabulary.
+  > That would be a one-hot encoding, which is exactly what embeddings replace.
+
+The dimensionality is large enough to encode many overlapping
+distinctions and small enough to compute with.`}
+/>

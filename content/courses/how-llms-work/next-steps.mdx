@@ -1,0 +1,148 @@
+---
+title: Next Steps
+description: The mechanisms in one page, the behaviors they explain, and where to go next.
+---
+
+You opened the box. Here is what was inside, compressed.
+
+<Figure
+  slug="llm-next-steps-cutout"
+  alt="An open transparent machine casing with its internal stages now clearly labelled by simple icons, and a signposted path leading away from it toward further course platforms"
+/>
+
+## The mechanisms
+
+1. **Tokens.** Text becomes chunks, learned by frequency through
+   byte-pair encoding. Common text is one token, rare text shatters.
+2. **Embeddings.** Each token becomes a vector, and meaning becomes
+   geometry. Position must be added separately.
+3. **Attention.** Every token compares against every other, and each
+   builds an updated representation from a weighted blend. Cost is
+   quadratic in length.
+4. **Layers.** Attention and feed-forward, stacked dozens deep, with
+   most parameters in the feed-forward halves.
+5. **Softmax and sampling.** Scores become a distribution, and a
+   configurable draw picks one token. Then the whole thing repeats.
+
+## What they explain
+
+| Behavior | Mechanism |
+| --- | --- |
+| Cannot count letters in a word | It receives tokens, not characters |
+| Non-English text costs more | The tokenizer was fitted mostly to English |
+| Output costs 5 to 6x input | Input is parallel, output is sequential |
+| Cached input costs a tenth | Stored state is retrieved, not recomputed |
+| Same prompt, different answers | Sampling draws from a distribution |
+| Confident hallucinations | Plausible continuation is the only objective |
+| Facts in mid-context get missed | Recall is U-shaped across position |
+| Long conversations cost more than they look | Every turn resends the whole history |
+| Reasoning helps math and not recall | Extra compute restructures, it does not retrieve |
+| Leaderboard rank misses your task | Benchmarks measure benchmarks |
+
+## Three things to actually do
+
+**Estimate before you build.** Take the cost calculator from
+*Estimating Cost*, put your real workload into it, and look at which
+line dominates. It is rarely the one you expect.
+
+**Build the harness.** Thirty examples of your own task with known
+answers. It takes an afternoon and it outlives every model you will
+evaluate with it.
+
+**Put stable content first.** Volatile content (timestamps, ids, the
+user's question) goes at the end of the prompt. This one habit is
+worth a large fraction of your caching discount.
+
+## Where to go next
+
+* **[AI-Assisted Data Analysis](/courses/ai-tools-for-data-analysis)**
+  is the companion course. This one explained why the failure modes
+  exist; that one is the working discipline for catching them before
+  they reach a decision.
+* **[Machine Learning with scikit-learn](/courses/machine-learning-scikit-learn)**
+  covers the training side this course deliberately skipped: loss
+  functions, gradients, and fitting models to data.
+* **[Natural Language Processing with Python](/courses/natural-language-processing-python)**
+  covers the text-processing techniques that preceded transformers and
+  are still the right tool for plenty of jobs.
+* **[Statistics for Data Science with Python](/courses/statistics-for-data-science-python)**
+  if the evaluation chapter left you wanting to know how many examples
+  you actually need.
+
+## Final concept check
+
+<MultipleChoice
+  markdown={`Which single mechanism explains both hallucination and the ability to generalize?
+
+- Attention comparing every token against every other.
+  > Attention enables long-range dependencies rather than generation of novel content.
+- Tokenization chunking text by frequency.
+  > Tokenization explains character-level failures, not invention.
+- Sampling drawing from a probability distribution.
+  > Sampling introduces variability, not the underlying tendency to produce plausible content.
+- [o] Producing plausible continuations rather than retrieving stored answers.
+  > The same capacity to produce text it never saw verbatim is what makes it useful and what lets it invent.
+
+The useful behavior and the dangerous one are the same behavior.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is cached input roughly a tenth the price of fresh input?
+
+- [o] The processed internal state is retrieved rather than recomputed.
+  > Retrieval is roughly a tenth of the work of running the prefix through the model again.
+- Providers subsidize caching to encourage adoption.
+  > The discount reflects cost, not a subsidy.
+- Cached requests are processed at lower priority.
+  > Priority is unchanged.
+- Cached tokens skip the tokenization step.
+  > Tokenization is a negligible part of the cost.
+
+The discount tracks the computation avoided.`}
+/>
+
+<MultipleChoice
+  markdown={`You need to place one critical fact in a 400,000-token context. Where does it go?
+
+- Exactly in the middle, for balanced attention.
+  > The middle is where recall is weakest.
+- Repeated every 50,000 tokens throughout.
+  > Repetition is a workaround that multiplies cost and is not the primary answer.
+- [o] At the beginning or the end.
+  > Recall is U-shaped, strong at both extremes and weakest in the middle.
+- Anywhere, since attention covers the full window uniformly.
+  > Recall varies substantially by position.
+
+Position matters, and the ends are where recall holds up.`}
+/>
+
+<MultipleChoice
+  markdown={`Which action would most improve a team's model-selection decisions?
+
+- [o] Building a thirty-example evaluation set for their own task.
+  > It gives a direct answer about their workload and can be rerun against every future release.
+- Tracking public leaderboard rankings weekly.
+  > Rankings average over tasks that are not theirs.
+- Reading every model launch announcement carefully.
+  > Announcements are selectively reported and measure tasks unlike yours.
+- Always upgrading to the newest frontier model.
+  > Newest is not automatically better for a specific task, and it costs more.
+
+Measuring your own task beats reading about someone else's.`}
+/>
+
+<MultipleChoice
+  markdown={`What does this course's material suggest about the durability of specific model names and prices?
+
+- [o] They change quickly, while the structural ratios behind them do not.
+  > The output multiple, the caching discount, and the batch discount have held across multiple rounds of price cuts.
+- They are irrelevant, since only architecture matters.
+  > Prices and capabilities matter a great deal for practical decisions.
+- They change only when a new architecture is introduced.
+  > Prices change without architectural change.
+- They are stable enough to plan around for several years.
+  > Prices fell roughly 80% in a single year and names change faster.
+
+Learn the ratios and the mechanisms, and re-check the numbers when they
+matter.`}
+/>

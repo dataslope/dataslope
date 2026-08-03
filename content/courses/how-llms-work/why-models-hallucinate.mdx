@@ -1,0 +1,269 @@
+---
+title: Why Models Hallucinate
+description: Hallucination is not a bug in the system. It is the system working correctly on a task where correctness was never the objective.
+---
+
+You now have every piece needed to explain the behavior that causes
+the most trouble.
+
+<Figure
+  slug="llm-hallucination-cutout"
+  alt="Two identical ornate picture frames side by side on a wall, one containing a solid detailed object and the other containing an equally polished but hollow transparent outline"
+/>
+
+## The one-sentence explanation
+
+> The model produces plausible continuations. A plausible continuation
+> of a question is an answer. Whether an answer is *available* is not
+> something the mechanism can check.
+
+Everything else follows.
+
+## Why there is no "I do not know" signal
+
+Consider what the model does when asked for a citation supporting a
+claim.
+
+Its training contains millions of citations. The pattern is
+overwhelmingly clear: author names, a year, a plausible title, a
+journal. Producing something with that shape is exactly what it is good
+at, and the shape is right.
+
+What it does not have is a mechanism that distinguishes "this specific
+paper exists in my parameters" from "I am generating something with the
+right shape". There is no confidence tag attached to a fact. **The
+generation process is identical either way.**
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Two continuations, one grounded and one invented.
+# From the mechanism's point of view they are indistinguishable:
+# both are high-probability completions of the prompt.
+
+prompt = "The capital of France is"
+well_attested = " Paris"     # appeared millions of times in training
+
+prompt2 = "A 2019 study on this by"
+invented = " Chen et al. found a 23% improvement"  # shape is right, fact is not
+
+print(f"{prompt}{well_attested}")
+print("  -> reliably correct: the pattern was reinforced enormously often")
+print()
+print(f"{prompt2}{invented}")
+print("  -> confidently wrong: the SHAPE was reinforced enormously often,")
+print("     while this particular citation was not in the data at all")
+print()
+print("Same mechanism. Same fluency. No internal flag separates them.")
+`,
+    },
+  ]}
+/>
+
+## Where the risk concentrates
+
+Hallucination is not uniformly distributed. It rises sharply where:
+
+* **The fact is rare.** Something mentioned once has a weak trace.
+  Something mentioned a million times has a strong one.
+* **The fact is specific.** Numbers, dates, page references, version
+  numbers, exact quotes. The shape is easy and the content is not.
+* **The fact is composite.** "The paper by X about Y published in Z"
+  requires three things to be simultaneously right, and each is an
+  opportunity.
+* **The fact is recent.** Past the training cutoff, nothing is
+  attested, but the pattern of talking about recent events is.
+* **You asked leadingly.** "What was the name of the study that proved
+  this?" presupposes such a study, and the most plausible continuation
+  is a name.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A rough risk score, to make the pattern concrete.
+def risk(rare, specific, composite, recent, leading):
+    factors = {
+        "rarely attested": rare, "highly specific": specific,
+        "composite claim": composite, "after cutoff": recent,
+        "leading question": leading,
+    }
+    hits = [name for name, on in factors.items() if on]
+    return len(hits), hits
+
+cases = {
+    "Capital of France":              (0, 0, 0, 0, 0),
+    "Population of a small town":     (1, 1, 0, 0, 0),
+    "Page number of a quotation":     (1, 1, 1, 0, 0),
+    "Name of the study that proved X": (1, 1, 1, 0, 1),
+}
+
+for label, flags in cases.items():
+    n, hits = risk(*flags)
+    print(f"{label:<32} risk {n}/5  {hits if hits else ''}")
+`,
+    },
+  ]}
+/>
+
+## Why "just tell me if you don't know" fails
+
+Because it asks the model to report on a property it cannot observe.
+
+The instruction does have a real effect: it shifts the distribution
+toward hedged phrasing, so you get more sentences containing "I am not
+certain". But that shift is stylistic, not diagnostic. The hedges do
+not land preferentially on the wrong answers, because nothing inside
+the process knows which answers are wrong.
+
+## What actually reduces it
+
+* **Ground it.** Supply the source text and ask for answers drawn from
+  it. Retrieval works because the fact is now in the context rather
+  than in the weights.
+* **Ask for verifiable outputs.** A query you can run beats a number
+  you must trust.
+* **Constrain the shape.** Structured output with a schema removes the
+  freedom to invent a field.
+* **Give it an exit.** "If the document does not contain this, reply
+  NOT_FOUND" works better than "do not make things up", because it
+  provides a specific alternative continuation that is easy to produce.
+
+<Callout type="warn" title="The uncomfortable implication">
+Hallucination cannot be fully solved at the model level, because it is
+the same capability as generalization. A model that only ever produced
+strings it had seen verbatim would be useless. The industry's answer
+has been to add grounding, tools, and verification *around* the model
+rather than to expect the model to stop doing what it does.
+</Callout>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Why does a model invent citations so fluently?
+
+- Because it confuses similar papers it has memorized.
+  > Confusion between real papers is a different and rarer failure.
+- [o] Because the *shape* of a citation is heavily attested even when the specific one is not.
+  > Producing something with the right structure is exactly what the model is good at, and structure is separable from content.
+- Because citation formats are ambiguous in training data.
+  > Formats are highly consistent, which is part of the problem.
+- Because it is designed to fill gaps in incomplete answers.
+  > No gap-filling component exists; the behavior emerges from next-token prediction.
+
+The form was learned thoroughly. The specific content was never there.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does "tell me if you are not sure" have limited effect?
+
+- [o] It shifts phrasing toward hedges without those hedges landing on the wrong answers.
+  > Nothing in the process observes which answers are unreliable, so the added caution is distributed by style rather than by correctness.
+- It only works on models with retrieval enabled.
+  > Retrieval helps for a different reason, and the instruction's weakness is unrelated to it.
+- It increases hallucination by drawing attention to uncertainty.
+  > It does not make the problem worse.
+- Models are instructed to ignore such requests.
+  > No such instruction exists.
+
+You get more hedging, not better-targeted hedging.`}
+/>
+
+<MultipleChoice
+  markdown={`Which question carries the highest hallucination risk?
+
+- "Write a Python function that reverses a list."
+  > A common task with a directly checkable answer.
+- "Explain what a join does in SQL."
+  > A common concept explained countless times in training data.
+- "What is the capital of France?"
+  > Overwhelmingly attested and reliably correct.
+- [o] "What was the name of the 2019 study that proved this?"
+  > It is rare, specific, composite, and leading all at once, and the presupposition makes producing a name the most plausible continuation.
+
+Risk stacks: each of rarity, specificity, compositeness, and leading
+framing adds to it.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does retrieval reduce hallucination?
+
+- Because it lets the model verify its answer before responding.
+  > No verification step is added by retrieval alone.
+- [o] Because the fact is now in the context rather than in the weights.
+  > Reading from supplied text is a far more reliable operation than reconstructing from parameters.
+- Because retrieved documents are always accurate.
+  > Source quality varies; that is not the mechanism.
+- Because it lowers the sampling temperature automatically.
+  > Retrieval does not alter sampling settings.
+
+Moving the fact from parameters to context changes the task from recall
+to reading.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does "reply NOT_FOUND if the document lacks this" outperform "do not make things up"?
+
+- [o] Because it supplies a specific, easy-to-produce alternative continuation.
+  > The model is choosing a continuation either way, so offering a concrete option competes directly with inventing one.
+- Because NOT_FOUND is easier to parse programmatically.
+  > Parseability is a benefit and not the reason it works better.
+- Because it disables generation when the answer is absent.
+  > Generation is never disabled.
+- Because negative instructions are always ignored by models.
+  > Negative instructions do have effects, just weaker ones here.
+
+Giving the mechanism something else to produce works better than asking
+it not to produce.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is hallucination described as inseparable from generalization?
+
+- Because both depend on the retrieval system being disabled.
+  > Neither requires retrieval to be off.
+- Because generalization is only possible at high temperature.
+  > Generalization occurs at any sampling setting.
+- Because both are caused by insufficient training data.
+  > More data reduces both somewhat and eliminates neither.
+- [o] Because producing text beyond what was seen verbatim is the same capability.
+  > A model that emitted only memorized strings could not compose novel correct answers either, so the useful and the harmful behavior share one mechanism.
+
+The capacity to produce something new is what makes the model useful
+and what lets it produce something wrong.`}
+/>
+
+<MultipleChoice
+  markdown={`How does structured output with a schema reduce invented content?
+
+- It lowers the probability of rare tokens across the board.
+  > It constrains structure rather than reweighting the vocabulary generally.
+- It causes the model to verify each field against a database.
+  > No database check occurs.
+- [o] It removes the freedom to invent fields that were not requested.
+  > Constraining the output shape eliminates a whole category of embellishment, though values within fields can still be wrong.
+- It forces the model to return null when uncertain.
+  > Nulls are returned only if the schema and prompt provide for it.
+
+Schemas constrain the form, which helps. They do not validate the
+content.`}
+/>
+
+<MultipleChoice
+  markdown={`Information after the training cutoff is a high-risk area because:
+
+- The model knows its cutoff and extrapolates carefully.
+  > Cutoff self-knowledge is unreliable and does not produce careful extrapolation.
+- [o] Nothing specific is attested, but the pattern of discussing recent events is.
+  > It can produce fluent text about a period it has no information on, because fluency comes from the pattern rather than the content.
+- Recent text is weighted lower during training.
+  > Content after the cutoff was not in training at all.
+- The model refuses to discuss it.
+  > It discusses recent topics readily.
+
+The form is available and the substance is not, which is the recurring
+shape of every hallucination.`}
+/>

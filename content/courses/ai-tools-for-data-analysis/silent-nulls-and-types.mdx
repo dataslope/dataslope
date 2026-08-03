@@ -1,0 +1,220 @@
+---
+title: Failure Mode 4, Silent Nulls and Types
+description: Missing data and quiet type coercion change results without changing anything you can see.
+---
+
+The previous three failure modes are about structure. This one is
+about the values themselves, and it is the hardest to catch by reading
+code, because the defect is not in the code at all. The code is
+correct. The data is shaped differently than the code assumes.
+
+<Figure
+  slug="aida-silent-nulls-cutout"
+  alt="A conveyor of data tiles where several transparent empty tiles slip silently through a gap in the floor, unnoticed, while the visible tiles continue on to a totalling machine"
+/>
+
+## Nulls disappear differently everywhere
+
+The single most confusing thing about missing data is that every
+operation treats it differently, and none of them announce it.
+
+| Operation | Null behavior |
+| --- | --- |
+| SQL `SUM`, `AVG`, `COUNT(col)` | Skips nulls silently |
+| SQL `COUNT(*)` | Counts the row anyway |
+| SQL `GROUP BY` | Nulls form their own group, or vanish from output |
+| SQL `WHERE col != 'x'` | Excludes nulls, which surprises everyone |
+| Pandas `sum()`, `mean()` | Skips nulls by default |
+| Pandas `groupby()` | Drops null keys by default |
+| Pandas `merge` | Nulls do not match each other |
+
+Look at row four. `WHERE status != 'cancelled'` does **not** return
+rows with a null status, because `NULL != 'cancelled'` evaluates to
+unknown rather than true. Analysts expect "everything that is not
+cancelled" and receive "everything that is known and not cancelled".
+If 4% of rows have a null status, 4% of your data just left without
+comment.
+
+<Callout type="warn" title="Two different meanings of missing">
+Null can mean "we do not know" or it can mean "not applicable". These
+require opposite handling. A null `discount` that means "no discount"
+should become 0. A null `income` that means "not disclosed" must not
+become 0, because that would drag the average down with fabricated
+poverty. No tool can tell these apart. Only you can.
+</Callout>
+
+## Pandas drops null group keys by default
+
+This one deserves its own mention because it is so quiet:
+
+```python
+df.groupby("region")["revenue"].sum()
+```
+
+Rows where `region` is null are **excluded from the result entirely**.
+Not shown as a null group, not raised as a warning. They are simply
+absent, and the total of the output is less than the total of the
+column. This is the mechanism behind the "parts do not sum to the
+whole" discrepancy from the verification chapter.
+
+Passing `dropna=False` includes them as a null group.
+
+## Type coercion
+
+Types cause a smaller number of bugs but sharper ones:
+
+* **Numbers stored as text.** `"1,200"` and `"$45.00"` do not sum;
+  they concatenate or error. Worse, a column that is mostly numeric
+  with a few text entries reads as `object` dtype and sorts
+  lexicographically, so `"9"` comes after `"10"`.
+* **Dates as strings.** String dates sort correctly only in ISO
+  format. `"03/04/2025"` is ambiguous across locales and a wrong
+  parse shifts data by months.
+* **Integer division.** In some contexts `7 / 2` is 3, silently
+  truncating.
+* **Floating point.** Summing money as floats accumulates error.
+  Comparing a float total for exact equality against an expected value
+  fails for reasons that have nothing to do with your data.
+
+## What to ask for
+
+Two additions to any generated cleaning step:
+
+```text
+Report the null count for every column before and after
+cleaning, and state what you assumed each null means.
+Show the dtype of every column after loading.
+```
+
+The dtype list catches numbers-as-text immediately. The null counts
+catch every silent drop.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`In SQL, which rows does \`WHERE status != 'cancelled'\` return?
+
+- [o] Only rows with a known status that is not 'cancelled'.
+  > Comparing null to a value yields unknown rather than true, so null-status rows fail the condition and disappear.
+- Only rows where status is null.
+  > Nulls are excluded rather than selected.
+- All rows whose status differs from 'cancelled', including nulls.
+  > This is the common expectation and it is not what happens.
+- All rows, since the comparison is always true for non-matching values.
+  > Rows with status 'cancelled' are correctly excluded, so it is not all rows.
+
+Three-valued logic means "not equal" quietly also means "and not
+missing".`}
+/>
+
+<MultipleChoice
+  markdown={`\`df.groupby("region")["revenue"].sum()\` produces a total lower than \`df["revenue"].sum()\`. Why?
+
+- Grouped sums are computed on a sample for performance.
+  > No sampling occurs.
+- \`groupby\` applies a default row limit.
+  > No such limit exists.
+- \`sum()\` behaves differently inside a groupby.
+  > The summation behavior is the same.
+- [o] Rows with a null \`region\` were excluded from the grouped result.
+  > Pandas drops null group keys by default, so those rows contribute to the column total but to no group.
+
+The default \`dropna=True\` on groupby is the single most common cause
+of a grouped total falling short.`}
+/>
+
+<MultipleChoice
+  markdown={`A \`discount\` column has nulls meaning "no discount applied". An \`income\` column has nulls meaning "declined to answer". How should they be handled?
+
+- Both should be replaced with the column mean.
+  > Mean-filling the discount invents discounts that were never given.
+- [o] \`discount\` can become 0; \`income\` must stay missing.
+  > "Not applicable" has a genuine zero value, while "unknown" does not and must not be invented.
+- Both should be dropped, since nulls are unreliable.
+  > Dropping income respondents biases the sample; dropping the discount rows removes most of your data.
+- Both should be filled with 0 for consistency.
+  > Filling income with 0 fabricates data and biases the average downward.
+
+Identical null representations can carry opposite meanings, and only
+domain knowledge separates them.`}
+/>
+
+<MultipleChoice
+  markdown={`A numeric-looking column sorts with "9" after "10". What is the cause?
+
+- [o] The column is text, so it sorts lexicographically.
+  > Character-by-character comparison puts "10" before "9" because "1" precedes "9".
+- The values are stored in descending order in the source file.
+  > Source ordering does not affect an explicit sort.
+- The sort used an unstable algorithm.
+  > Stability affects ties among equal values, not ordering of distinct ones.
+- Nulls in the column disrupted the comparison.
+  > Nulls sort to one end and do not reorder the other values.
+
+A single non-numeric entry is enough to make the whole column text,
+after which every numeric operation misbehaves.`}
+/>
+
+<MultipleChoice
+  markdown={`Which addition to a cleaning request most reliably surfaces type problems?
+
+- "Sort the output by the first column."
+  > Sorting may hint at a problem but does not report types.
+- "Use descriptive variable names throughout."
+  > Naming does not expose dtypes.
+- [o] "Show the dtype of every column after loading."
+  > A column that should be numeric appearing as \`object\` is immediately visible, which is the earliest possible catch.
+- "Add comments explaining each transformation."
+  > Comments describe intent rather than reveal actual types.
+
+The dtype listing turns an invisible property into a visible one at
+almost no cost.`}
+/>
+
+<MultipleChoice
+  markdown={`Why do nulls fail to match each other in a join?
+
+- Because nulls are stored as empty strings internally.
+  > Nulls and empty strings are distinct, and empty strings do match each other.
+- [o] Because comparing two unknowns yields unknown, not true.
+  > Equality between nulls is not true under three-valued logic, so no match is produced.
+- Because most engines strip null keys before joining.
+  > Rows are not removed prior to matching; the comparison simply fails.
+- Because join keys must be indexed and nulls cannot be indexed.
+  > Nulls can be indexed in most engines.
+
+Two missing values are not evidence of being the same value, which is
+exactly what the logic encodes.`}
+/>
+
+<MultipleChoice
+  markdown={`Summing a money column stored as floats and comparing the total to an expected value with \`==\` fails. Why?
+
+- Money columns are always stored as strings.
+  > They are commonly stored as floats, which is what creates this problem.
+- The expected value was computed with a different filter.
+  > Possible in general, but there is a well-known numeric cause here.
+- [o] Floating-point addition accumulates small representation errors.
+  > Values like 0.1 have no exact binary representation, so a long sum drifts slightly from the exact decimal result.
+- The data contains hidden null values.
+  > Nulls would be skipped rather than cause an exact-comparison failure.
+
+This is a property of binary floating point, not of your data, and it
+is why money is often stored in integer cents.`}
+/>
+
+<MultipleChoice
+  markdown={`Which null-handling defect is hardest to catch by reading the generated code?
+
+- An explicit \`dropna()\` call on the full DataFrame.
+  > It is a visible line that says exactly what it does.
+- A \`fillna(0)\` applied to an income column.
+  > Also visible, and questionable on sight once you know the column.
+- [o] A \`groupby\` that silently omits null keys by default.
+  > There is nothing in the code to read; the omission comes from a default, so the line looks entirely ordinary.
+- A \`WHERE col IS NOT NULL\` clause.
+  > This states its intent directly in the text.
+
+Defaults are the hardest defects to review, because the problematic
+behavior leaves no trace in the source.`}
+/>

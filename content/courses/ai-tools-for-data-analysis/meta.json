@@ -1,0 +1,58 @@
+{
+    "title": "AI-Assisted Data Analysis",
+    "description": "Use ChatGPT, Claude, and Gemini for real analysis work, and build the verification habit that keeps their mistakes out of your results.",
+    "root": true,
+    "tags": {
+        "language": [],
+        "libraries": [],
+        "domain": [
+            "data-analysis",
+            "ai-tools"
+        ],
+        "skills": [
+            "prompt-engineering",
+            "data-quality",
+            "code-review",
+            "critical-evaluation"
+        ],
+        "tools": [
+            "chatgpt",
+            "claude",
+            "gemini"
+        ],
+        "level": [
+            "beginner"
+        ]
+    },
+    "pages": [
+        "index",
+        "---",
+        "what-changed",
+        "the-tool-landscape",
+        "how-tools-see-data",
+        "---",
+        "describing-your-data",
+        "asking-for-code",
+        "asking-for-analysis",
+        "---",
+        "the-verification-habit",
+        "invented-columns",
+        "broken-joins",
+        "aggregation-traps",
+        "silent-nulls-and-types",
+        "confidence-and-accuracy",
+        "---",
+        "reviewing-generated-pandas",
+        "reviewing-generated-sql",
+        "cross-checking",
+        "---",
+        "where-ai-wins",
+        "where-ai-is-risky",
+        "---",
+        "context-cost-and-drift",
+        "privacy-and-governance",
+        "agents-and-connected-data",
+        "---",
+        "next-steps"
+    ]
+}

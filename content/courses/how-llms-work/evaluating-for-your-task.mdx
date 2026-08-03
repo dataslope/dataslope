@@ -1,0 +1,305 @@
+---
+title: Evaluating for Your Task
+description: Build a small evaluation harness. Thirty examples from your own data beat every public leaderboard.
+---
+
+The argument of the last two chapters leads somewhere practical: stop
+reading leaderboards and measure your own task. This chapter builds
+the harness.
+
+<Figure
+  slug="llm-evaluating-task-cutout"
+  alt="A small custom test bench holding a tray of thirty labelled sample cards, with two candidate machines plugged into it and a simple side-by-side result readout between them"
+/>
+
+## The whole idea in one paragraph
+
+Collect examples of your actual task with known correct answers. Run
+each candidate configuration over them. Score automatically. Compare.
+
+That is it. The reason it is worth doing is not that it is clever, it
+is that almost nobody does it, and the teams that do consistently make
+better model choices than the teams reading benchmark tables.
+
+## How many examples
+
+Fewer than you think. **Twenty to fifty** is enough to distinguish
+configurations that differ meaningfully, and it is few enough to build
+in an afternoon.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# How reliably does a small evaluation set rank two options?
+# Simple simulation: model A is genuinely 15 points better.
+import numpy as np
+
+rng = np.random.default_rng(7)
+true_a, true_b = 0.80, 0.65
+
+for n in [5, 10, 20, 50, 100]:
+    correct_ranking = 0
+    for _ in range(2000):
+        a = rng.binomial(n, true_a) / n
+        b = rng.binomial(n, true_b) / n
+        if a > b:
+            correct_ranking += 1
+    print(f"n={n:>3}: ranks them correctly {correct_ranking / 2000:.1%} of the time")
+
+print()
+print("Twenty examples already identify a 15-point gap almost always.")
+print("Try changing true_b to 0.78 and see how the picture changes.")
+`,
+    },
+  ]}
+/>
+
+Change `true_b` to 0.78 and rerun. Small gaps need far more examples,
+which is itself a useful lesson: if two configurations look close on
+thirty examples, they probably are close, and you should pick on cost.
+
+## Building the harness
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# Stand-in for real API calls, so this runs offline. Each "model"
+# is a function from input to output with different characteristics.
+def model_cheap(text):
+    if "refund" in text: return "billing"
+    if "password" in text: return "account"
+    return "other"
+
+def model_good(text):
+    t = text.lower()
+    if any(w in t for w in ("refund", "charge", "invoice", "billing")): return "billing"
+    if any(w in t for w in ("password", "login", "sign in", "locked")): return "account"
+    if any(w in t for w in ("crash", "error", "broken", "bug")): return "technical"
+    return "other"
+
+CASES = [
+    ("I want a refund for last month", "billing"),
+    ("My card was charged twice", "billing"),
+    ("Cannot reset my password", "account"),
+    ("I am locked out of my account", "account"),
+    ("The app crashes on startup", "technical"),
+    ("Getting a 500 error on upload", "technical"),
+    ("Where do I find the invoice?", "billing"),
+    ("How do I change my sign in email?", "account"),
+    ("Something is broken in the export", "technical"),
+    ("Do you have an office in Berlin?", "other"),
+]`,
+      starterCode: `def evaluate(fn, cases):
+    results = []
+    for text, expected in cases:
+        got = fn(text)
+        results.append((text, expected, got, got == expected))
+    accuracy = sum(r[3] for r in results) / len(results)
+    return accuracy, results
+
+for name, fn in [("cheap", model_cheap), ("good", model_good)]:
+    acc, results = evaluate(fn, CASES)
+    print(f"{name}: {acc:.0%}")
+    for text, expected, got, ok in results:
+        if not ok:
+            print(f"    MISS {text[:34]:<36} expected={expected:<10} got={got}")
+    print()
+`,
+    },
+  ]}
+/>
+
+Look at the failure list, not just the accuracy. It tells you *how*
+the cheaper option fails, which determines whether the failures matter.
+A model that misroutes 20% of tickets into a queue that gets triaged
+anyway is very different from one that misroutes 20% into a queue
+nobody reads.
+
+## Scoring things without an exact answer
+
+Classification is easy to score. Summaries and free text are not. Three
+approaches, in order of preference:
+
+1. **Make it checkable.** Ask for structured output with fields, then
+   score the fields. This is worth restructuring the task for.
+2. **Score properties rather than text.** Does the summary mention the
+   three required facts? Is it under the length limit? Does it avoid
+   claims absent from the source?
+3. **Model-as-judge.** Have a strong model score outputs against a
+   rubric. It correlates reasonably with human judgment and inherits
+   the judge's biases, including a well-documented preference for
+   longer answers.
+
+## Comparing on cost as well as accuracy
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Accuracy alone does not choose a model. Cost per correct answer does.
+options = {
+    "lite":   {"accuracy": 0.86, "in": 0.25, "out": 1.50},
+    "haiku":  {"accuracy": 0.91, "in": 1.00, "out": 5.00},
+    "sonnet": {"accuracy": 0.94, "in": 3.00, "out": 15.00},
+    "opus":   {"accuracy": 0.95, "in": 5.00, "out": 25.00},
+}
+IN_TOK, OUT_TOK, VOLUME = 700, 25, 1_000_000
+
+print(f"{'model':<8}{'acc':>6}{'monthly':>12}{'per correct':>14}")
+for name, o in options.items():
+    per_req = IN_TOK / 1e6 * o["in"] + OUT_TOK / 1e6 * o["out"]
+    monthly = per_req * VOLUME
+    per_correct = monthly / (VOLUME * o["accuracy"])
+    print(f"{name:<8}{o['accuracy']:>6.0%}\${monthly:>11,.0f}\${per_correct:>13.6f}")
+
+print()
+print("Opus buys 1 extra point over sonnet for 67% more money.")
+print("Whether that is worth it depends on what an error costs you.")
+`,
+    },
+  ]}
+/>
+
+That last question is the one to answer before choosing. If a
+misclassified ticket costs a minute of human triage, the cheap model
+wins easily. If it costs a lost customer, it does not.
+
+<Callout type="info" title="Build it once, use it forever">
+The harness outlives every model in it. When a new model launches, you
+do not read its announcement, you run your evaluation and get an answer
+about *your* task in an hour. That is a permanent advantage over
+deciding from leaderboards.
+</Callout>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`How many examples does a useful first evaluation set need?
+
+- [o] Twenty to fifty, enough to detect a meaningful gap.
+  > A 15-point difference is identified almost every time at twenty examples, and that size is buildable in an afternoon.
+- At least 1,000, for statistical significance.
+  > Far more than needed to separate configurations that differ meaningfully.
+- Exactly 100, the standard evaluation size.
+  > There is no such standard.
+- Five, since models are consistent across inputs.
+  > Five is too few to rank options reliably.
+
+The barrier is usually building any set at all, not building a large
+one.`}
+/>
+
+<MultipleChoice
+  markdown={`Two configurations score within two points on thirty examples. What should you do?
+
+- [o] Treat them as equivalent and choose on cost.
+  > If the difference is not detectable at your sample size, it is probably small enough that cost should decide.
+- Choose the one with the higher score.
+  > A two-point gap at that sample size is not distinguishable from noise.
+- Switch to a public benchmark to break the tie.
+  > Public benchmarks are less relevant to your task, not more.
+- Collect 500 more examples to resolve the difference.
+  > Possible, and rarely worth it given what the answer would change.
+
+An indistinguishable difference is a signal to optimize the other
+axis.`}
+/>
+
+<MultipleChoice
+  markdown={`Why examine the failure list rather than only the accuracy?
+
+- Because failures indicate contamination in the test set.
+  > Failures do not signal contamination.
+- Because failure counts are more precise than percentages.
+  > They are the same information expressed differently.
+- Because accuracy is often computed incorrectly.
+  > Accuracy is straightforward to compute.
+- [o] Because how it fails determines whether the failures matter.
+  > Misrouting into a queue that gets triaged anyway is very different from misrouting into one nobody reads.
+
+Two configurations with identical accuracy can have very different
+consequences.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the preferred way to score free-text outputs?
+
+- Compare against a reference answer with exact string matching.
+  > Valid answers vary in wording, so exact matching rejects correct outputs.
+- [o] Restructure the task to produce checkable structured output.
+  > Scoring fields is objective and fast, and the restructuring usually improves the task anyway.
+- Have a human read every output.
+  > Reliable and too slow to run on every model release.
+- Measure the length of the output against a target.
+  > Length is a weak proxy for quality.
+
+Making the output checkable is worth changing the task design for.`}
+/>
+
+<MultipleChoice
+  markdown={`What bias is documented in model-as-judge scoring?
+
+- [o] A preference for longer answers.
+  > Verbosity correlates with higher judged scores independently of quality, which distorts comparisons between concise and expansive models.
+- A tendency to score all outputs near the middle of the scale.
+  > Judges use the full range readily.
+- An inability to apply a rubric consistently.
+  > Rubric application is reasonably consistent.
+- A preference for outputs from the same model family.
+  > Self-preference is discussed and is not the best-documented effect here.
+
+Knowing the bias lets you control for it, usually by constraining
+length across all candidates.`}
+/>
+
+<MultipleChoice
+  markdown={`Why compute cost per *correct* answer rather than cost per request?
+
+- Because it eliminates the need to measure accuracy.
+  > It requires an accuracy measurement as an input.
+- Because incorrect answers are refunded by the provider.
+  > No refunds exist for incorrect output.
+- [o] Because it combines accuracy and price into one comparable number.
+  > A cheaper model producing more errors may cost more per usable result, which per-request cost hides.
+- Because providers bill per successful response.
+  > Billing is per token regardless of correctness.
+
+It is the metric that makes an accuracy-versus-price tradeoff
+comparable.`}
+/>
+
+<MultipleChoice
+  markdown={`What question decides whether a one-point accuracy gain is worth 67% more cost?
+
+- Whether your budget has room for the increase.
+  > Affordability is a constraint rather than a justification.
+- Whether the more expensive model has a larger context window.
+  > Window size is a separate consideration.
+- Which model scores higher on public benchmarks.
+  > Public rank is irrelevant to your cost-benefit calculation.
+- [o] What a single error actually costs you.
+  > A minute of human triage and a lost customer imply completely different answers.
+
+The value of avoided errors is what makes the comparison decidable.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does an evaluation harness outlive the models in it?
+
+- Because it caches results from previous model versions.
+  > Caching old results is not what makes it durable.
+- Because model APIs never change their interfaces.
+  > Interfaces do change and require occasional maintenance.
+- [o] Because a new release can be assessed on your task in an hour rather than from its announcement.
+  > The task and the correct answers stay constant, so every future candidate is measured against the same standard.
+- Because benchmark scores can be imported into it directly.
+  > Public scores are exactly what the harness replaces.
+
+The examples encode your requirements, and requirements outlast
+models.`}
+/>

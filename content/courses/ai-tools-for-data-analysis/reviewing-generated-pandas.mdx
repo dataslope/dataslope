@@ -1,0 +1,226 @@
+---
+title: Reviewing Generated Pandas
+description: A concrete read-through order for Pandas code, built around the operations that fail quietly.
+---
+
+You have thirty lines of generated Pandas. Here is the order to read
+it in, chosen so the highest-risk operations get your attention first
+rather than whichever happens to be at the top.
+
+<Figure
+  slug="aida-reviewing-pandas-cutout"
+  alt="A checklist clipboard floating beside a vertical stack of code blocks, with a magnifying glass hovering over specific highlighted blocks rather than scanning top to bottom"
+/>
+
+## The read-through order
+
+<Steps>
+
+<Step>
+### Find every filter, and ask what it removes
+
+Look for boolean masks, `query()`, `isin()`, `dropna()`, `head()`.
+
+For each one: what fraction of rows does this remove, and is that
+fraction what you expect? A filter that removes 98% or 0% of rows is
+suspicious in both directions.
+
+The dangerous one is `dropna()` with no `subset` argument, which drops
+a row if *any* column is null. On a wide table this can silently
+remove most of your data.
+</Step>
+
+<Step>
+### Find every merge, and check the grain
+
+For each `merge` or `join`: what is one row on the left, one row on
+the right, and one row in the result? Check `how=`. The default is
+`how="inner"`, which is often not what was wanted.
+
+Check for a `validate=` argument. Its absence is normal; its presence
+(`validate="one_to_one"`, `"one_to_many"`) is a good sign, because it
+makes Pandas raise if the relationship is not what was claimed.
+</Step>
+
+<Step>
+### Find every groupby, and check the key and the nulls
+
+Confirm the grouping key is an identifier rather than a display label.
+Confirm `dropna=False` if null keys are meaningful. Then ask whether
+the aggregation function is right: `sum` versus `nunique` versus
+`count` versus `size`.
+
+`count()` counts non-null values per column. `size()` counts rows.
+They differ exactly when nulls exist, which is when it matters.
+</Step>
+
+<Step>
+### Find every assignment that creates a metric
+
+`df["rate"] = df["a"] / df["b"]` is where denominators go wrong. Check
+that `b` is the population you meant, and check what happens when `b`
+is zero (you get `inf`, which then poisons any mean computed over the
+column).
+</Step>
+
+<Step>
+### Check for chained assignment
+
+`df[df.x > 0]["y"] = 5` does not do what it looks like. It operates on
+a copy and the original is unchanged, often with a warning that is
+easy to miss in a long output. Modern Pandas has tightened this, but
+generated code still produces the pattern.
+</Step>
+
+</Steps>
+
+## Six things that should catch your eye immediately
+
+| Pattern | Why it matters |
+| --- | --- |
+| `dropna()` with no `subset` | Drops rows for a null in *any* column |
+| `merge` with no `how=` | Silently defaults to inner |
+| `groupby` without `dropna=False` | Null keys vanish from the result |
+| `fillna(0)` on a measured quantity | Invents zeros where data is unknown |
+| `astype(int)` on a float | Truncates rather than rounds |
+| `.head()` left in from exploration | Analysis runs on the first five rows |
+
+That last one sounds silly and is genuinely common: a `head()` added
+while exploring survives into the final cell, and every number is
+computed from five rows.
+
+<Callout type="info" title="Ask for the counts and this gets much faster">
+If you asked for row counts after each filter (from *Asking for Code
+You Can Check*), most of this review becomes reading a column of
+numbers rather than tracing logic. The review order above is what to
+do when you did not.
+</Callout>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`What does \`df.dropna()\` with no arguments do?
+
+- Replaces null values with the column mean.
+  > Replacement is \`fillna\`; \`dropna\` only removes.
+- Removes columns that contain any null values.
+  > Column-wise removal requires \`axis=1\`.
+- [o] Removes any row that has a null in any column.
+  > The default is \`how="any"\` across all columns, so on a wide table one sparsely populated column can eliminate most rows.
+- Removes rows where every column is null.
+  > That is \`how="all"\`, which is not the default.
+
+On a table with twenty columns, a single mostly-null column can take
+your dataset down to a handful of rows.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the default \`how\` for \`pd.merge\`?
+
+- There is no default; \`how\` is a required argument.
+  > It is optional, which is precisely why the default matters.
+- \`"outer"\`, preserving rows from both frames.
+  > Outer must be requested explicitly.
+- \`"left"\`, preserving all rows from the first frame.
+  > This is frequently what the author intended and is not the default.
+- [o] \`"inner"\`, keeping only rows that match on both sides.
+  > Unmatched rows on either side are dropped silently, which is a common source of a shrinking row count.
+
+A merge with no \`how=\` is a decision made by omission, and it is
+usually not the decision the analyst wanted.`}
+/>
+
+<MultipleChoice
+  markdown={`How do \`groupby(...).count()\` and \`groupby(...).size()\` differ?
+
+- [o] \`count()\` counts non-null values per column; \`size()\` counts rows.
+  > They agree only when there are no nulls, and diverge exactly when null handling matters.
+- They are aliases and behave identically.
+  > They differ whenever nulls are present.
+- \`size()\` excludes null values while \`count()\` includes them.
+  > This is backwards.
+- \`count()\` returns a scalar and \`size()\` returns a Series.
+  > Both return per-group results.
+
+Choosing the wrong one produces group totals that are quietly short.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`df["rate"] = df["a"] / df["b"]\` worth pausing on?
+
+- The result must be explicitly cast to float.
+  > The result is float automatically.
+- Division is not vectorized in Pandas and will be slow.
+  > Division is fully vectorized.
+- [o] A zero in \`b\` produces \`inf\`, which corrupts any later mean.
+  > Infinities propagate through aggregations and turn a whole summary statistic into \`inf\` or \`nan\`.
+- Assigning a new column requires \`assign()\` in modern Pandas.
+  > Direct assignment remains valid.
+
+Zero denominators are common in real data and their effect surfaces
+far from where they were introduced.`}
+/>
+
+<MultipleChoice
+  markdown={`Which leftover from exploratory work is most likely to invalidate a final result?
+
+- A \`print()\` statement left in the middle of the pipeline.
+  > Printing is harmless noise.
+- A variable named \`temp\` that was never renamed.
+  > Naming does not change behavior.
+- An unused import at the top of the file.
+  > Unused imports have no effect on results.
+- [o] A \`.head()\` call left in the loading step.
+  > Every downstream number is then computed from five rows, and the output looks entirely normal.
+
+An exploratory truncation that survives into the final pipeline is
+invisible in the output and fatal to the result.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the \`validate=\` argument on \`merge\` provide?
+
+- [o] It raises an error if the key relationship is not what you declared.
+  > Declaring \`one_to_many\` and getting many-to-many raises immediately, turning a silent fan-out into a loud failure.
+- It removes duplicate rows from the result automatically.
+  > It performs no deduplication.
+- It validates that no nulls are present in the join keys.
+  > Null checking is not its purpose.
+- It checks that the joined columns have compatible data types.
+  > Type compatibility is not what it verifies.
+
+It converts an assumption about the relationship into an enforced
+check, which is exactly what you want on a join.`}
+/>
+
+<MultipleChoice
+  markdown={`\`df["count"] = df["count"].astype(int)\` is applied to a float column containing 2.7. What is the result?
+
+- 2.7 preserved, since the column already held numbers.
+  > The dtype change discards the fractional part.
+- [o] 2, since conversion truncates toward zero.
+  > Every fractional value loses its remainder, which can shift totals substantially across many rows.
+- An error, since floats cannot be cast to integers.
+  > The cast succeeds.
+- 3, since conversion rounds to nearest.
+  > \`astype(int)\` does not round.
+
+Truncation across a whole column is a systematic downward bias, not a
+rounding wobble.`}
+/>
+
+<MultipleChoice
+  markdown={`In what order should you review generated Pandas, and why?
+
+- [o] Filters, merges, groupbys, then metric assignments.
+  > This orders the review by how quietly each operation can go wrong, so attention lands where the silent failures live.
+- Bottom to top, starting from the final result.
+  > Working backwards helps trace a known defect but is not the best sweep for finding unknown ones.
+- Top to bottom, since that is execution order.
+  > Execution order does not match risk order, so the highest-risk lines get whatever attention is left.
+- Alphabetically by variable name.
+  > Naming has no relationship to risk.
+
+Read in risk order, because attention is the scarce resource in any
+review.`}
+/>

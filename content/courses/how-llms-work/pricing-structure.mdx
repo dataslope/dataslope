@@ -1,0 +1,244 @@
+---
+title: Pricing Structure
+description: Five numbers determine what a request costs. The specific prices change constantly; the structure has not changed in years.
+---
+
+Every major provider prices the same way. Learn the structure and you
+can read any price list, including ones published after this course
+was written.
+
+<Figure
+  slug="llm-pricing-structure-cutout"
+  alt="A set of five price tags of visibly different sizes hanging in a row from a rail, the output tag several times larger than the input tag and the cached tag tiny"
+/>
+
+## The five numbers
+
+Per **million tokens** (MTok), the standard unit:
+
+| Number | What it is | Typical relationship |
+| --- | --- | --- |
+| **Input** | Tokens you send | The baseline |
+| **Output** | Tokens generated | **5 to 6 times input** |
+| **Cached input** | Repeated prefix, already processed | **About 10% of input** |
+| **Cache write** | Storing a prefix for reuse | Slightly above input |
+| **Batch** | Asynchronous, hours not seconds | **About 50% off** |
+
+Those relationships are remarkably stable across vendors and across
+years, even as the absolute prices fall.
+
+## Why output costs more than input
+
+This is not a pricing policy, it reflects the computation.
+
+**Input** is processed in parallel. All your tokens go through the
+model together in one pass, and the hardware is fully occupied.
+
+**Output** is generated one token at a time. Each token requires its
+own forward pass through the entire model, and each pass depends on the
+previous token, so none of it can be parallelized within a single
+response. The hardware spends most of its time moving weights around
+rather than computing.
+
+A five-to-six-fold price difference is the market's reflection of a
+real efficiency gap.
+
+## Why cached input is so cheap
+
+If you send the same 50,000-token prefix on every turn, the provider
+can store its processed internal state and skip recomputing it. What
+you pay for is retrieving that state rather than producing it, which
+is roughly a tenth of the work.
+
+Caches expire quickly (minutes, by default, on most providers) and
+match on an **exact prefix**. A single changed byte anywhere in the
+prefix invalidates everything after it, which is why putting a
+timestamp at the top of a system prompt quietly costs a fortune.
+
+## The landscape, August 2026
+
+Illustrative published rates, USD per million tokens. Treat these as a
+snapshot of *shape*, not as current figures.
+
+| Model | Input | Output | Ratio |
+| --- | --- | --- | --- |
+| Claude Opus 5 | $5.00 | $25.00 | 5x |
+| Claude Sonnet 5 | $3.00 | $15.00 | 5x |
+| Claude Haiku 4.5 | $1.00 | $5.00 | 5x |
+| GPT-5.6 (frontier tier) | $5.00 | $30.00 | 6x |
+| GPT-5.6 (mid tier) | $2.00 | $12.00 | 6x |
+| GPT-5.6 (small tier) | $0.20 | $1.20 | 6x |
+| Gemini 3.5 Flash | $1.50 | $9.00 | 6x |
+| Gemini 3.1 Flash-Lite | $0.25 | $1.50 | 6x |
+
+Two things to notice. The output-to-input ratio is 5x or 6x in every
+single row, across three vendors. And the spread from cheapest to most
+expensive is a factor of about 25, which means **model selection is
+usually a bigger cost lever than prompt optimization**.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Published rates, USD per million tokens (August 2026 snapshot).
+MODELS = {
+    "opus-tier":     {"in": 5.00, "out": 25.00},
+    "frontier-gpt":  {"in": 5.00, "out": 30.00},
+    "sonnet-tier":   {"in": 3.00, "out": 15.00},
+    "flash-tier":    {"in": 1.50, "out": 9.00},
+    "haiku-tier":    {"in": 1.00, "out": 5.00},
+    "lite-tier":     {"in": 0.25, "out": 1.50},
+}
+
+# A typical request: long prompt, short answer.
+in_tok, out_tok = 8_000, 500
+
+print(f"{'model':<15} {'input':>8} {'output':>8} {'total':>9}  ratio")
+for name, p in MODELS.items():
+    ci = in_tok / 1e6 * p["in"]
+    co = out_tok / 1e6 * p["out"]
+    print(f"{name:<15} {ci:>8.5f} {co:>8.5f} {ci + co:>9.5f}  {p['out']/p['in']:.0f}x")
+
+cheapest = min(MODELS.values(), key=lambda p: p["in"] * 8 + p["out"] * 0.5)
+dearest = max(MODELS.values(), key=lambda p: p["in"] * 8 + p["out"] * 0.5)
+spread = (dearest["in"] * 8 + dearest["out"] * 0.5) / (cheapest["in"] * 8 + cheapest["out"] * 0.5)
+print()
+print(f"Spread across tiers: {spread:.0f}x for the same request.")
+`,
+    },
+  ]}
+/>
+
+<Callout type="info" title="Prices fall, structure does not">
+Per-token prices dropped by roughly 80% between early 2025 and early
+2026, and comparable falls happened in the years before. What did not
+move: the output multiple, the caching discount, and the batch
+discount. Build your cost model on the structure and it will survive
+the next price cut.
+</Callout>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Why do output tokens cost several times more than input tokens?
+
+- Because output tokens are longer on average.
+  > Token length is unrelated to which side it is on.
+- Because providers charge a margin on generation.
+  > The gap reflects a real efficiency difference rather than a policy choice.
+- [o] Because input is processed in parallel while output is generated one token at a time.
+  > Each output token requires its own full forward pass that depends on the previous one, so it cannot be parallelized within a response.
+- Because output tokens are stored for longer.
+  > Nothing is retained after the request.
+
+The pricing mirrors the hardware utilization, which is very different
+between the two phases.`}
+/>
+
+<MultipleChoice
+  markdown={`Cached input typically costs what fraction of normal input?
+
+- About half.
+  > The discount is considerably deeper than this.
+- About a quarter.
+  > Still short of the usual figure.
+- It is free once cached.
+  > Retrieval has a real cost, just a small one.
+- [o] About a tenth.
+  > Retrieving stored internal state is roughly a tenth of the work of computing it.
+
+A tenth is the number to remember, and it is consistent across
+providers.`}
+/>
+
+<MultipleChoice
+  markdown={`What invalidates a prompt cache?
+
+- Waiting more than 24 hours between requests.
+  > Default expiry is typically minutes rather than a day.
+- [o] Any change to the prefix, including a single character.
+  > Matching is on the exact prefix, so a timestamp at the top of a system prompt invalidates everything after it on every request.
+- Any change to the output length requested.
+  > Output settings do not affect the input prefix.
+- Switching from streaming to non-streaming.
+  > Transport mode does not affect caching.
+
+Exact-prefix matching is what makes a variable header so expensive.`}
+/>
+
+<MultipleChoice
+  markdown={`In the August 2026 snapshot, what was true of every model listed?
+
+- All had the same input price.
+  > Input prices ranged over a factor of twenty.
+- All offered a one-million-token context window.
+  > Window sizes varied by model.
+- [o] All had output priced at 5x or 6x their input.
+  > The ratio held across three vendors and every tier, which is why it is the structural fact worth learning.
+- All were priced above $1 per million input tokens.
+  > The lite tier was $0.25.
+
+Absolute prices vary widely; the output multiple barely varies at all.`}
+/>
+
+<MultipleChoice
+  markdown={`Which lever usually reduces cost most?
+
+- [o] Moving suitable traffic to a cheaper model tier.
+  > The spread between tiers is roughly 25x, which dwarfs what prompt trimming can achieve.
+- Rewriting the prompt to be 20% shorter.
+  > Worthwhile, and a modest saving compared with the alternative.
+- Reducing the requested output length by 20%.
+  > Also worthwhile and also modest.
+- Switching from streaming to batch delivery for interactive requests.
+  > Batch is not usable for interactive traffic.
+
+Optimize the model choice first, then the prompt.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the batch discount typically require in exchange?
+
+- A minimum monthly spend commitment.
+  > No spend commitment is involved.
+- [o] Tolerating asynchronous processing measured in hours.
+  > Requests are queued and returned later, which suits bulk jobs and not interactive use.
+- Using a less capable model.
+  > The same models are available through batch endpoints.
+- Accepting a smaller context window.
+  > Window size is unchanged.
+
+You trade latency for roughly half the price.`}
+/>
+
+<MultipleChoice
+  markdown={`Per-token prices fell about 80% between early 2025 and early 2026. What did not change?
+
+- [o] The output multiple, the caching discount, and the batch discount.
+  > These structural ratios have held steady across several rounds of price cuts.
+- The context window sizes on offer.
+  > Windows grew substantially over the same period.
+- The absolute cost of a typical request.
+  > That fell along with the per-token prices.
+- The set of vendors in the market.
+  > The competitive landscape shifted.
+
+Building your cost model on ratios rather than absolute prices makes it
+durable.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does putting a timestamp at the top of a system prompt cost so much?
+
+- [o] It changes the prefix on every request, so nothing can be cached.
+  > A single varying character at the start means the entire subsequent prompt is billed at full input price every time.
+- Timestamps are tokenized inefficiently.
+  > Their token cost is trivial.
+- Timestamps trigger a separate metering path.
+  > No special metering exists.
+- It causes the model to reason about the current date.
+  > Any reasoning effect is minor next to the real problem.
+
+Put volatile content at the end of the prompt, never at the beginning.`}
+/>

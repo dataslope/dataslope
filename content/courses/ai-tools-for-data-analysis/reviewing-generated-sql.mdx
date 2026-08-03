@@ -1,0 +1,202 @@
+---
+title: Reviewing Generated SQL
+description: "A clause-by-clause read order for generated SQL, built around the same principle: read in risk order, not in written order."
+---
+
+SQL is written in an order that has almost nothing to do with the
+order it executes in, and neither order matches the order you should
+review it in. Here is the review order.
+
+<Figure
+  slug="aida-reviewing-sql-cutout"
+  alt="A query rendered as a set of stacked platforms in execution order, with an inspection route numbered out of order, starting at the bottom foundation platform and working upward"
+/>
+
+## Read the FROM and JOIN clauses first
+
+Everything else operates on whatever row set these produce, so a
+defect here corrupts every clause below it.
+
+* **What is the grain of each table?** One row per what?
+* **Is each join key unique on at least one side?** If neither, you
+  have a many-to-many join.
+* **Is the join type right?** `JOIN` means `INNER JOIN`. Every row on
+  the left with no match disappears without comment.
+* **Are there filters hidden in the `ON` clause?** `ON a.id = b.id AND
+  b.status = 'x'` behaves very differently from the same condition in
+  `WHERE`, specifically for outer joins, where an `ON` condition
+  preserves the unmatched rows and a `WHERE` condition removes them.
+
+## Then the WHERE clause
+
+* Does every literal value actually exist in the column? This is where
+  value hallucination lives.
+* Does any condition on a nullable column silently exclude nulls?
+  `!=`, `NOT IN`, and `<>` all do.
+* `NOT IN` with a subquery that returns any null returns **no rows at
+  all**. This is a genuine trap and it is not intuitive.
+* Are date boundaries inclusive on the correct end? `BETWEEN
+  '2025-01-01' AND '2025-12-31'` on a timestamp column excludes almost
+  all of December 31st, because timestamps after midnight exceed the
+  boundary.
+
+## Then GROUP BY
+
+* Is the grouping key an identifier or a display label? Grouping on
+  `name` merges distinct entities that share a name.
+* Is every non-aggregated select column in the `GROUP BY`? Some
+  engines require it; others (older MySQL configurations) pick an
+  arbitrary row, which produces a plausible and meaningless result.
+
+## Then the SELECT list and HAVING
+
+* `COUNT(*)`, `COUNT(col)`, and `COUNT(DISTINCT col)` are three
+  different questions. Confirm you got the one you asked for.
+* Is `HAVING` filtering groups (correct) or being used for a row-level
+  condition that belongs in `WHERE` (wrong, and it changes which rows
+  contributed to the aggregate)?
+* Integer division: in several engines `SUM(a) / COUNT(*)` on integers
+  returns an integer, silently truncating a rate to 0.
+
+## The five-line checklist
+
+```text
+1. Grain of each joined table, and of the result
+2. Join type, and unmatched-row behavior
+3. Every literal in WHERE exists in the data
+4. Nulls: excluded by !=, NOT IN, or dropped by GROUP BY?
+5. COUNT variant, and integer division
+```
+
+<Callout type="warn" title="The NOT IN trap, stated plainly">
+`WHERE id NOT IN (SELECT customer_id FROM blocked)` returns zero rows
+if `blocked.customer_id` contains a single null. Not fewer rows. Zero.
+Use `NOT EXISTS` or add `WHERE customer_id IS NOT NULL` to the
+subquery.
+</Callout>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Why review \`FROM\` and \`JOIN\` before \`WHERE\`?
+
+- Because they execute last and therefore dominate the result.
+  > They execute first, not last.
+- Because syntax errors are most common in join clauses.
+  > Syntax errors surface at parse time regardless of review order.
+- Because \`WHERE\` clauses are usually written by the analyst rather than generated.
+  > Both are generated together.
+- [o] Because every later clause operates on the row set they produce.
+  > A defect in the row set corrupts every filter and aggregate applied to it, so it has to be checked first.
+
+Errors compound downstream, so review upstream first.`}
+/>
+
+<MultipleChoice
+  markdown={`\`WHERE id NOT IN (SELECT customer_id FROM blocked)\` returns zero rows unexpectedly. What is the likely cause?
+
+- The \`blocked\` table is empty.
+  > An empty subquery makes the condition true for every row, returning all rows rather than none.
+- The two columns have incompatible data types.
+  > A type mismatch would typically raise an error rather than return zero rows.
+- The subquery returns duplicate values.
+  > Duplicates in the subquery are harmless here.
+- [o] \`blocked.customer_id\` contains at least one null.
+  > Comparison against null yields unknown, so \`NOT IN\` can never be satisfied and every row is excluded.
+
+A single null anywhere in the subquery result eliminates the entire
+outer result, silently.`}
+/>
+
+<MultipleChoice
+  markdown={`\`WHERE order_ts BETWEEN '2025-01-01' AND '2025-12-31'\` on a timestamp column. What is wrong?
+
+- The range should use \`>=\` and \`<=\` explicitly to be valid.
+  > \`BETWEEN\` is equivalent to those operators, so rewriting alone does not fix it.
+- [o] Almost all of December 31st is excluded.
+  > The literal becomes midnight, so any timestamp later that day exceeds the upper bound and is dropped.
+- \`BETWEEN\` is exclusive on both ends in standard SQL.
+  > \`BETWEEN\` is inclusive on both ends.
+- Timestamps cannot be compared against date literals.
+  > The comparison works through implicit conversion.
+
+The fix is a half-open range ending at \`'2026-01-01'\` with a strict
+less-than.`}
+/>
+
+<MultipleChoice
+  markdown={`How does a condition in \`ON\` differ from the same condition in \`WHERE\` for a \`LEFT JOIN\`?
+
+- The \`ON\` version runs faster because it filters earlier.
+  > Performance is not the semantic difference.
+- [o] In \`ON\`, unmatched left rows are kept with nulls; in \`WHERE\`, they are removed.
+  > A \`WHERE\` condition on a right-table column filters out the null-padded rows, effectively converting the outer join to an inner one.
+- The \`WHERE\` version cannot reference the right-hand table.
+  > It can reference it, which is exactly what causes the problem.
+- They are equivalent; placement is a style choice.
+  > They are equivalent for inner joins only.
+
+Placement decides whether your left join stays a left join.`}
+/>
+
+<MultipleChoice
+  markdown={`A query groups by \`customer_name\` and the result has fewer rows than there are customers. What happened?
+
+- The \`GROUP BY\` clause deduplicated the customer table.
+  > Grouping collapses by key value rather than deduplicating a table.
+- [o] Customers sharing a name were merged into one group.
+  > Grouping on a display label collapses distinct entities that happen to share it, and their values are combined.
+- The query was missing an \`ORDER BY\` clause.
+  > Ordering does not change the number of groups.
+- Customers with null names were counted twice.
+  > Nulls form a single group and do not duplicate.
+
+Names are not keys, and grouping treats them as though they were.`}
+/>
+
+<MultipleChoice
+  markdown={`\`SELECT SUM(converted) / COUNT(*) AS rate\` on integer columns returns 0. Why?
+
+- \`SUM\` on an integer column is not permitted.
+  > Summing integers is standard.
+- The \`AS rate\` alias conflicts with a reserved word.
+  > Aliasing does not affect the computed value.
+- \`COUNT(*)\` returns zero, causing division by zero.
+  > Division by zero raises or returns null rather than 0.
+- [o] Integer division truncates the fractional result.
+  > A rate like 0.037 truncates to 0 in engines that keep integer semantics for integer operands.
+
+Casting one operand to a decimal type restores the fraction.`}
+/>
+
+<MultipleChoice
+  markdown={`Which \`COUNT\` variant answers "how many orders have a recorded discount code"?
+
+- \`COUNT(1)\`
+  > This is equivalent to \`COUNT(*)\` and ignores nulls in the column.
+- \`COUNT(DISTINCT discount_code)\`
+  > This counts how many different codes were used, not how many orders used one.
+- \`COUNT(*)\`
+  > This counts all orders regardless of whether a code is present.
+- [o] \`COUNT(discount_code)\`
+  > Counting a nullable column counts exactly the rows where the value is present.
+
+The three variants answer three genuinely different questions, and the
+labels people give them rarely disambiguate.`}
+/>
+
+<MultipleChoice
+  markdown={`In which clause does value hallucination most often hide?
+
+- \`SELECT\`, because that is where column names appear.
+  > Wrong names there usually raise an error.
+- [o] \`WHERE\`, because a literal that matches nothing returns an empty result.
+  > An invented status string or category label silently matches zero rows, and an empty or zero result reads as a genuine finding.
+- \`ORDER BY\`, because sort keys are easy to get wrong.
+  > A wrong sort key produces visibly odd ordering rather than a silent error.
+- \`FROM\`, because table names are guessed.
+  > A wrong table name raises immediately.
+
+Invented literals fail quietly, which is why the \`WHERE\` clause
+deserves a line-by-line check against the real values.`}
+/>

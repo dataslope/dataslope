@@ -1,0 +1,235 @@
+---
+title: What Benchmarks Measure
+description: The standard evaluations, what each actually tests, and how to read a score you see quoted.
+---
+
+Every model launch comes with a table of benchmark scores. This
+chapter explains what those tests are, so the next chapter can explain
+why the table tells you less than it appears to.
+
+<Figure
+  slug="llm-benchmarks-measure-cutout"
+  alt="A row of measuring gauges of different heights, three with their needles pinned at the very top against a ceiling bar and one with plenty of empty scale remaining above its needle"
+/>
+
+## The main families
+
+### Knowledge and reasoning
+
+**MMLU** (Massive Multitask Language Understanding) is 57 subjects of
+multiple-choice questions, from elementary mathematics to professional
+law. It was the standard general-knowledge benchmark for years.
+
+By 2026 it is **saturated**. Every frontier system scores above 92%,
+and documented label errors in the dataset cap the achievable score
+near 95%. A benchmark where everyone scores within a few points of
+each other and of the ceiling cannot distinguish anything.
+
+**GPQA Diamond** is the successor for hard reasoning: graduate-level
+biology, chemistry, and physics questions written so that non-expert
+PhD holders with web access score only around 34%. It still separates
+models across the 60% to 90% range, though the top of the frontier is
+approaching saturation here too.
+
+### Coding
+
+**SWE-bench Verified** is the important one. It presents real GitHub
+issues from real repositories and requires a patch that makes the
+repository's own tests pass. It is hard to contaminate at scale,
+because solutions are repository-specific and are verified by actually
+running code rather than by matching text.
+
+This is the benchmark that best predicts agentic coding ability,
+because the task shape matches the real one: read a codebase, make a
+multi-file change, verify it.
+
+### Abstract reasoning
+
+**ARC-AGI-2** presents grid puzzles where you infer a transformation
+rule from a few examples and apply it to a new case. Tasks are
+adversarially filtered so that memorized pattern-matching does not
+solve them, and the evaluation set is kept private. It retains real
+headroom above current models, which makes it one of the few
+benchmarks still measuring something with room to grow.
+
+### Contamination-resistant suites
+
+Because the older benchmarks leak into training data, several
+evaluations are designed to resist it:
+
+* **LiveBench** refreshes with new problems monthly.
+* **LiveCodeBench** filters problems by submission date, so only
+  problems published after a model's cutoff count.
+* **Humanity's Last Exam (HLE)** keeps a private holdout set.
+* **FrontierMath** uses expert-authored problems that are never
+  published.
+
+The shared design principle: **the answers must not be findable in the
+training corpus.**
+
+## How to read a score
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Whether a gap is meaningful depends on the ceiling and the spread.
+benchmarks = {
+    "MMLU":         {"model_a": 0.923, "model_b": 0.917, "ceiling": 0.95},
+    "GPQA Diamond": {"model_a": 0.784, "model_b": 0.742, "ceiling": 1.00},
+    "SWE-bench V":  {"model_a": 0.671, "model_b": 0.598, "ceiling": 1.00},
+}
+
+for name, r in benchmarks.items():
+    gap = r["model_a"] - r["model_b"]
+    headroom = r["ceiling"] - r["model_a"]
+    share = gap / headroom if headroom > 0.001 else float("inf")
+    print(f"{name:<14} gap {gap:+.3f}  headroom {headroom:.3f}  "
+          f"gap is {share:.0%} of remaining headroom")
+
+print()
+print("The same 0.6 point gap means very different things depending")
+print("on how much room is left above it.")
+`,
+    },
+  ]}
+/>
+
+A one-point gap near a ceiling is noise. The same gap in the middle of
+a wide range is a real difference. Always look at where on the scale
+the comparison sits.
+
+<Callout type="info" title="What the numbers do not include">
+Benchmarks measure capability under ideal conditions: a clean prompt, a
+well-formed problem, no adversarial input, no ambiguity about what
+counts as success. Your production traffic has none of those
+properties, which is why benchmark rank and production performance
+correlate loosely at best.
+</Callout>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`What does it mean that MMLU is "saturated"?
+
+- It only measures knowledge from before 2023.
+  > Knowledge recency is not what saturation refers to.
+- [o] Top models cluster near the achievable ceiling, so it no longer distinguishes them.
+  > Every frontier system scores above 92% against a ceiling near 95%, leaving no room to separate them.
+- Models have memorized the entire test set.
+  > Contamination is a separate concern from saturation.
+- The benchmark has been withdrawn by its authors.
+  > It remains published and widely reported.
+
+A test everyone passes tells you nothing about who is better.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is SWE-bench Verified hard to contaminate?
+
+- It changes its problem set every week.
+  > That describes LiveBench rather than SWE-bench.
+- Its problems are generated synthetically at evaluation time.
+  > They are drawn from real repository history.
+- Its answers are encrypted in the published dataset.
+  > The dataset is openly available.
+- [o] Solutions are repository-specific and verified by running tests.
+  > A memorized patch does not transfer, and success requires code that actually passes the project's own test suite.
+
+Execution-based verification against specific repositories is what
+resists memorization.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the design principle shared by LiveBench, LiveCodeBench, HLE, and FrontierMath?
+
+- All are maintained by the same organization.
+  > They come from different groups.
+- [o] Their answers are not findable in the training corpus.
+  > Monthly refreshes, date filtering, private holdouts, and unpublished problems are four routes to the same goal.
+- All focus exclusively on mathematics.
+  > Only FrontierMath is mathematics-specific.
+- All use multiple-choice questions for objective scoring.
+  > Several use open-ended answers.
+
+Keeping answers out of training data is the one thing they all do.`}
+/>
+
+<MultipleChoice
+  markdown={`A model scores 92.3% on MMLU and a competitor scores 91.7%. What should you conclude?
+
+- The first model has memorized more of the test set.
+  > Contamination might be present in either and is not demonstrated by this gap.
+- The second model is undertrained.
+  > A 0.6 point difference supports no such claim.
+- The first model is meaningfully better at general knowledge.
+  > Near a ceiling, a gap this size is within noise.
+- [o] Very little, since both are near the benchmark's effective ceiling.
+  > With documented label errors capping the achievable score near 95%, the remaining headroom is smaller than the measurement error.
+
+Read the gap relative to the remaining headroom, not in absolute
+points.`}
+/>
+
+<MultipleChoice
+  markdown={`What makes ARC-AGI-2 unusual among current benchmarks?
+
+- It is the only benchmark using multiple-choice format.
+  > It uses grid transformations rather than multiple choice.
+- It tests knowledge of recent events.
+  > It tests abstract reasoning with no knowledge component.
+- [o] It retains substantial headroom above current model performance.
+  > Adversarial filtering and a private evaluation set keep it from being solved by pattern matching, so there is still room to improve.
+- It is scored by human judges rather than automatically.
+  > Grid answers are checked automatically.
+
+Most benchmarks are running out of room. This one still has some.`}
+/>
+
+<MultipleChoice
+  markdown={`Why do non-expert PhD holders score only about 34% on GPQA Diamond?
+
+- The scoring penalizes incorrect answers heavily.
+  > Scoring is straightforward accuracy.
+- [o] The questions require expertise in the specific subfield, even with web access.
+  > They were constructed so that general scientific training plus search is insufficient, which is what makes the benchmark discriminating.
+- The time limit is too short to answer carefully.
+  > The difficulty is not a timing artifact.
+- The questions are deliberately ambiguous.
+  > They have definite correct answers.
+
+The 34% figure is the design target that establishes the difficulty
+level.`}
+/>
+
+<MultipleChoice
+  markdown={`Which benchmark best predicts agentic coding performance?
+
+- [o] SWE-bench Verified, since its task shape matches the real one.
+  > Reading a codebase, making a multi-file change, and passing the project's tests is what the work actually involves.
+- ARC-AGI-2, since it measures abstract problem solving.
+  > Grid puzzles share little structure with codebase work.
+- GPQA Diamond, since it measures hard reasoning.
+  > It measures scientific reasoning rather than software work.
+- MMLU, since it covers computer science topics.
+  > Multiple-choice knowledge questions do not resemble the task.
+
+Predictive validity comes from the task resembling the job.`}
+/>
+
+<MultipleChoice
+  markdown={`What conditions do benchmarks assume that production traffic lacks?
+
+- [o] Clean prompts, well-formed problems, and unambiguous success criteria.
+  > Real traffic is ambiguous, messy, and often lacks a definite right answer, which is why benchmark rank transfers poorly.
+- Access to the internet during evaluation.
+  > Some benchmarks permit search and others do not.
+- Unlimited token budgets.
+  > Budgets vary by evaluation protocol.
+- A single attempt per problem with no retries.
+  > Retry policies differ across benchmarks.
+
+Ideal conditions are what makes a benchmark measurable and what makes
+it unrepresentative.`}
+/>

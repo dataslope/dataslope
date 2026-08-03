@@ -1,0 +1,266 @@
+---
+title: Token Counts in Practice
+description: Measuring what your real text costs, and the three places token counts bite in production.
+---
+
+Now that you know what a token is, here is where the count actually
+matters.
+
+<Figure
+  slug="llm-token-counts-cutout"
+  alt="Three transparent measuring cylinders of the same physical text volume filling to three very different heights, with a small counter dial at the base of each"
+/>
+
+## Three places it bites
+
+1. **Cost.** Every token in and out is billed. This is the obvious one
+   and the one people plan for.
+2. **The context limit.** A request that exceeds the window fails, or
+   silently loses its earliest content depending on the system around
+   it.
+3. **Latency.** Output tokens are produced one at a time, so response
+   time is roughly proportional to output length. Input is processed
+   in parallel and contributes far less.
+
+That third point has a practical consequence people miss: **asking for
+a shorter answer makes it arrive faster**, while shortening the prompt
+mostly saves money rather than time.
+
+## Measuring compression across text types
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Characters-per-token varies a lot by content type. These
+# multipliers are approximations of measured behavior.
+RATIOS = {
+    "english prose": 4.0,
+    "python code":   3.0,
+    "json data":     2.5,
+    "base64 blob":   1.5,
+    "non-latin script": 1.5,
+}
+
+sample = "The model reads the text. " * 40
+n_chars = len(sample)
+
+print(f"{n_chars} characters, encoded as:")
+print()
+for kind, ratio in RATIOS.items():
+    tokens = round(n_chars / ratio)
+    print(f"  {kind:<20} ~{tokens:5d} tokens  ({ratio} chars/token)")
+
+print()
+print("Same information, up to 2.7x the cost, depending on encoding.")
+`,
+    },
+  ]}
+/>
+
+The JSON row is worth dwelling on. Wrapping data in JSON roughly
+doubles its token cost compared with a compact tabular format, because
+every key is repeated on every record and every brace and quote is a
+token. If you are sending many records to a model, CSV is markedly
+cheaper than JSON for identical content.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import json
+
+records = [
+    {"customer_id": 1001, "region": "north", "amount": 249.99},
+    {"customer_id": 1002, "region": "south", "amount": 89.50},
+    {"customer_id": 1003, "region": "north", "amount": 512.00},
+]
+
+as_json = json.dumps(records, indent=2)
+as_csv = "customer_id,region,amount\\n" + "\\n".join(
+    f"{r['customer_id']},{r['region']},{r['amount']}" for r in records
+)
+
+print("JSON:", len(as_json), "chars ~", round(len(as_json) / 2.5), "tokens")
+print("CSV: ", len(as_csv), "chars ~", round(len(as_csv) / 3.5), "tokens")
+print()
+print("--- CSV ---")
+print(as_csv)
+print()
+print("Ratio:", round((len(as_json) / 2.5) / (len(as_csv) / 3.5), 1), "x")
+`,
+    },
+  ]}
+/>
+
+Scale that to ten thousand records and the format choice is a real
+budget line.
+
+## Estimating a conversation
+
+Remember from the previous course: **the entire history is resent on
+every turn.** So the total tokens billed across a conversation is not
+the length of the conversation, it is the sum of every prefix.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Total input tokens billed across a multi-turn conversation.
+system_prompt = 2000       # a schema, pasted once
+per_user_turn = 100
+per_reply     = 400
+
+total_input = 0
+history = system_prompt
+
+for turn in range(1, 11):
+    history += per_user_turn          # your message joins the history
+    total_input += history            # the WHOLE history is sent
+    history += per_reply              # the reply joins it too
+    if turn in (1, 5, 10):
+        print(f"turn {turn:2d}: context={history:6d}  cumulative input={total_input:7d}")
+
+print()
+print(f"Conversation is {history} tokens long.")
+print(f"You were billed for {total_input} input tokens, "
+      f"{round(total_input / history, 1)}x that.")
+`,
+    },
+  ]}
+/>
+
+Ten turns, and you paid for roughly five times the conversation's
+length. Twenty turns and the multiplier keeps climbing. This quadratic
+growth is why prompt caching exists, and why starting a fresh
+conversation is a cost decision as well as an accuracy one.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Which change most reduces the *latency* of a response?
+
+- Using a larger context window.
+  > Window size does not affect generation speed.
+- Shortening the system prompt.
+  > Input is processed in parallel, so this saves money more than time.
+- [o] Asking for a shorter answer.
+  > Output tokens are generated sequentially, so response time is roughly proportional to how many are produced.
+- Removing older turns from the conversation.
+  > Also mostly a cost saving rather than a latency one.
+
+Input is parallel and output is sequential, which is why output length
+dominates latency.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does JSON cost roughly twice as many tokens as CSV for the same records?
+
+- [o] Every key is repeated on every record, along with braces and quotes.
+  > CSV states each field name once in a header, while JSON restates the full key set for each row.
+- JSON uses a less efficient character encoding.
+  > Both are ordinary text in the same encoding.
+- Tokenizers deliberately penalize structured formats.
+  > No penalty exists; the difference is the character count.
+- JSON values are stored with higher numeric precision.
+  > Precision is the same in both.
+
+The overhead is structural repetition, and it scales linearly with
+record count.`}
+/>
+
+<MultipleChoice
+  markdown={`Across a ten-turn conversation, the total input tokens billed are:
+
+- [o] Several times the final conversation length.
+  > Every turn resends the whole history, so the bill is the sum of all prefixes and grows quadratically.
+- Slightly more than the final conversation length.
+  > The gap is much larger than "slightly".
+- Independent of conversation length, since only the last message is sent.
+  > The full history must be sent for the model to have any memory of it.
+- Equal to the final conversation length.
+  > That would be true only if the history were sent once.
+
+Statelessness means you pay for the conversation repeatedly, once per
+turn.`}
+/>
+
+<MultipleChoice
+  markdown={`A request exceeds the model's context window. What happens?
+
+- [o] The request fails, or the surrounding system drops earlier content.
+  > The raw API rejects it, while chat products typically trim history to fit, which loses information silently.
+- The provider automatically summarizes the oldest content.
+  > Some application layers do this; the API itself does not.
+- The excess tokens are billed but ignored.
+  > Rejected requests are not billed for content that was never processed.
+- The model processes it and returns a lower-quality answer.
+  > Content beyond the window cannot be processed at all.
+
+Whether it fails loudly or degrades quietly depends on what sits
+between you and the model.`}
+/>
+
+<MultipleChoice
+  markdown={`Which text type has the *worst* compression ratio?
+
+- JSON at about 2.5 characters per token.
+  > Structural overhead is real, but JSON still contains repeated words that compress.
+- English prose at about four characters per token.
+  > This is the best of the listed cases.
+- Python code at about three characters per token.
+  > Denser than prose, still far better than the worst case.
+- [o] A base64 blob at about 1.5 characters per token.
+  > Random-looking character sequences match no learned merges, so they encode near character level.
+
+Anything the tokenizer has not seen patterns in fragments toward one
+token per character.`}
+/>
+
+<MultipleChoice
+  markdown={`You need to send 10,000 rows of tabular data to a model. What is the cheapest reasonable format?
+
+- Pretty-printed JSON, for readability.
+  > Indentation adds whitespace tokens on every line for no model benefit.
+- One JSON object per line.
+  > Better than indented JSON, and still repeats every key on every row.
+- [o] CSV with a single header row.
+  > Field names appear once instead of 10,000 times, which is the dominant saving at this scale.
+- An HTML table.
+  > Tag overhead per cell is worse than JSON's key repetition.
+
+State the schema once, then send only values.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is quadratic token growth in conversations a practical concern rather than a theoretical one?
+
+- [o] Because a long conversation with a large pasted schema can cost many times its apparent length.
+  > A 2,000-token schema resent across twenty turns is 40,000 billed tokens for content you supplied once.
+- Because providers cap the number of turns permitted.
+  > No such cap exists.
+- Because conversations rarely exceed five turns.
+  > Long conversations are common, which is what makes it matter.
+- Because the model slows down proportionally to the square of the input.
+  > Cost grows quadratically across the conversation; per-request processing does not behave this way.
+
+The pasted-once, billed-repeatedly asymmetry is what makes it bite.`}
+/>
+
+<MultipleChoice
+  markdown={`Estimating tokens by dividing characters by four is appropriate when?
+
+- Only for code, where the ratio is most stable.
+  > Code is closer to three characters per token.
+- [o] For rough planning on English prose, but not for hard limits or budgets.
+  > It is close enough to size a request and too imprecise where exceeding a limit or a budget has consequences.
+- Always, since it is the standard conversion.
+  > It is tuned for English prose and drifts badly elsewhere.
+- Never, since only exact counting is meaningful.
+  > Estimates are perfectly adequate for planning.
+
+Estimate to plan, measure to commit.`}
+/>

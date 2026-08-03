@@ -1,0 +1,250 @@
+---
+title: What a Language Model Is
+description: One sentence describes the whole system. Everything else in the course is detail on that sentence.
+---
+
+Here is the entire thing:
+
+<Figure
+  slug="llm-what-is-a-model-cutout"
+  alt="A machine with a single output chute producing one token chip at a time, each new chip being fed back into the input hopper by a looping conveyor belt"
+/>
+
+> **A language model takes a sequence of tokens and produces a
+> probability distribution over which token comes next.**
+
+That is it. Everything else, the chat interface, the tool use, the
+reasoning, the refusals, is built on top of that one operation,
+applied repeatedly.
+
+## Repeated application is where the magic is
+
+The model produces one token. That token is appended to the input. The
+model runs again on the longer input and produces the next one. Repeat
+until it produces a token meaning "done".
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# The generation loop, with a fake model. The structure below is
+# exactly what a real system does; only \`predict_next\` is different.
+
+def predict_next(context):
+    """A toy 'model': looks up what usually follows."""
+    table = {
+        ("the",): "cat",
+        ("the", "cat"): "sat",
+        ("the", "cat", "sat"): "on",
+        ("the", "cat", "sat", "on"): "the",
+        ("the", "cat", "sat", "on", "the"): "mat",
+    }
+    return table.get(tuple(context), "<end>")
+
+context = ["the"]
+for step in range(6):
+    nxt = predict_next(context)
+    print(f"step {step}: context={context} -> {nxt!r}")
+    if nxt == "<end>":
+        break
+    context.append(nxt)
+
+print()
+print("Final:", " ".join(context))
+`,
+    },
+  ]}
+/>
+
+Notice what this loop does *not* contain: any plan, any goal, any
+representation of the finished sentence. The sentence appears because
+each local step was reasonable, not because anything decided in
+advance what the sentence would be.
+
+Hold onto that. It explains a great deal of behavior later.
+
+## A distribution, not a word
+
+The real model does not return `"cat"`. It returns a score for
+**every token in its vocabulary**, typically 50,000 to 200,000 of
+them. Something like:
+
+| Token | Probability |
+| --- | --- |
+| ` cat` | 0.31 |
+| ` dog` | 0.14 |
+| ` man` | 0.09 |
+| ` first` | 0.04 |
+| ... | ... |
+
+A separate step, covered in *Sampling*, picks one. That separation
+matters: the model's job ends at the distribution, and the choice of
+how to draw from it is a knob you control.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# What the model actually returns: a score for every token.
+scores = {" cat": 0.31, " dog": 0.14, " man": 0.09, " first": 0.04}
+
+print("Distribution over next tokens:")
+for token, p in scores.items():
+    bar = "#" * int(p * 60)
+    print(f"  {token:>8}  {p:.2f}  {bar}")
+
+print()
+print("Sum of the four shown:", round(sum(scores.values()), 2))
+print("(The rest of the vocabulary shares the remaining probability.)")
+`,
+    },
+  ]}
+/>
+
+## Where the knowledge lives
+
+The model has no database. There is no lookup table of facts, and no
+retrieval step unless one was explicitly added by the surrounding
+system.
+
+What it has is a large number of parameters, adjusted during training
+so that its predictions matched real text. Facts that appeared often
+and consistently in training are encoded in those parameters strongly
+enough to be reproduced reliably. Facts that appeared once are not.
+
+This is why a model can tell you the capital of France with complete
+reliability and invent a plausible-sounding citation with equal
+fluency. Both come out of the same mechanism, and the mechanism does
+not distinguish "I have this stored well" from "I am producing
+something shaped like an answer".
+
+## Concept check
+
+<MultipleChoice
+  markdown={`What does a language model produce in a single forward pass?
+
+- A ranked list of the top ten continuations.
+  > Truncation to a top-k list is an optional sampling strategy, not what the model returns.
+- The single most likely next word.
+  > It produces scores for all candidates; selecting one is a separate step.
+- The complete response to your prompt.
+  > A full response requires many passes, one per token.
+- [o] A probability distribution over every token in its vocabulary.
+  > Every token gets a score, and the choice among them happens afterwards in the sampling step.
+
+The model's output is the distribution. Choosing from it is somebody
+else's job.`}
+/>
+
+<MultipleChoice
+  markdown={`In the generation loop, what happens to each token after it is produced?
+
+- It is discarded once written to the screen.
+  > Discarding it would make each token independent of the last.
+- [o] It is appended to the input, and the model runs again on the longer sequence.
+  > This is what makes the output coherent: every prediction conditions on everything generated so far.
+- It is stored in a separate output buffer and not reused.
+  > It must re-enter the input, or the next prediction would have no knowledge of it.
+- It is compared against the expected token to compute an error.
+  > Error computation happens during training, not during generation.
+
+Generation is the same operation applied repeatedly to a growing
+input.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does the phrase "the model has no plan" matter?
+
+- Because it means output is random rather than structured.
+  > Output is highly structured; the structure emerges locally.
+- [o] Because coherence emerges from local choices rather than a stored intention.
+  > Nothing represents the finished text in advance, which explains why a generation can drift or paint itself into a corner.
+- Because it means the model cannot follow instructions.
+  > Instruction following works well and is compatible with local generation.
+- Because it means the model cannot produce long documents.
+  > It produces long documents routinely.
+
+The absence of a plan explains both the fluency and several of the
+characteristic failures.`}
+/>
+
+<MultipleChoice
+  markdown={`Where are the facts a model "knows" stored?
+
+- In the context window, loaded at the start of each session.
+  > The context window holds only the current conversation.
+- In a compressed copy of its training corpus.
+  > The corpus is not retained; it is far larger than the model.
+- [o] In its parameters, as patterns fitted during training.
+  > Weights were adjusted so predictions matched real text, so frequently-attested facts are encoded strongly and rare ones weakly.
+- In an external database queried at generation time.
+  > No such query happens unless a retrieval system was added around the model.
+
+There is no retrieval step by default, which is exactly why reliability
+tracks how often something appeared in training.`}
+/>
+
+<MultipleChoice
+  markdown={`Why can a model state a well-known fact reliably and invent a citation just as fluently?
+
+- Because citations are deliberately excluded from training data.
+  > Citations appear abundantly in training data.
+- [o] Because both are produced by the same mechanism, which does not distinguish them.
+  > Generating a plausible continuation is the only operation available, and a well-encoded fact and a well-shaped invention are both plausible continuations.
+- Because citation formats change too frequently to memorize.
+  > Format stability is not the issue; the specific reference is what gets invented.
+- Because it applies lower standards to bibliographic content.
+  > There is no per-domain standard being applied.
+
+There is no internal flag separating "recalled" from "constructed".`}
+/>
+
+<MultipleChoice
+  markdown={`A vocabulary typically contains how many tokens?
+
+- Around 1,000.
+  > Too small to cover common words efficiently.
+- Around 26, one per letter.
+  > Character-level vocabularies exist but are not what production models use.
+- [o] Roughly 50,000 to 200,000.
+  > This range balances covering common words as single tokens against the cost of a very wide output layer.
+- Several million, one per word in every language.
+  > A per-word vocabulary is impractically large and still fails on unseen words.
+
+The size is a compromise between sequence length and output-layer
+cost, which the tokenization chapters explore.`}
+/>
+
+<MultipleChoice
+  markdown={`If the model returns a distribution, what determines the actual token you see?
+
+- A random token, weighted equally across the vocabulary.
+  > Sampling is weighted by the distribution, not uniform.
+- The token that appeared most often in training.
+  > Training frequency shapes the distribution but does not select from it.
+- [o] A separate sampling step, configurable by the caller.
+  > Temperature, top-p, and related settings control how the draw is made, which is why the same prompt can produce different outputs.
+- The token with the highest probability, always.
+  > Always taking the maximum is one option among several and is not the usual default.
+
+The split between "produce a distribution" and "draw from it" is where
+your control over randomness lives.`}
+/>
+
+<MultipleChoice
+  markdown={`Which statement about the toy loop in this chapter is accurate?
+
+- It cannot produce more than one token.
+  > It loops and produces several.
+- [o] Only \`predict_next\` differs from a real system.
+  > The append-and-repeat loop around it is exactly what a production system does.
+- It requires the full output to be known in advance.
+  > It builds the output one step at a time from a lookup.
+- It differs from real generation in its overall structure.
+  > The structure is the same; only the prediction function differs.
+
+The loop is the real thing. What a frontier model brings is a vastly
+better \`predict_next\`.`}
+/>

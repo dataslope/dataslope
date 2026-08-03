@@ -1,0 +1,321 @@
+---
+title: Sampling
+description: Softmax, temperature, and top-p. The step where randomness enters, and the one you control.
+---
+
+The model hands you a distribution. Something has to pick a token from
+it, and that something is not the model. It is a small piece of code
+with a few settings, and understanding it explains why the same prompt
+gives different answers.
+
+<Figure
+  slug="llm-sampling-cutout"
+  alt="A weighted spinner or roulette wheel where the segments are sized by different probabilities, shown twice side by side, once with sharply uneven segments and once nearly even"
+/>
+
+## Softmax turns scores into probabilities
+
+The raw output is a list of unbounded scores called **logits**. They
+can be negative, they do not sum to anything in particular. Softmax
+converts them:
+
+$$p_i = \frac{e^{z_i}}{\sum_j e^{z_j}}$$
+
+Exponentiate every score, then divide by the total. The exponential is
+what makes the result *peaked*: a small lead in logits becomes a large
+lead in probability.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+tokens = [" cat", " dog", " bird", " rock"]
+logits = np.array([3.2, 2.1, 1.5, -0.4])
+
+def softmax(x):
+    e = np.exp(x - np.max(x))   # subtract max for numerical stability
+    return e / e.sum()
+
+probs = softmax(logits)
+
+print(f"{'token':>7} {'logit':>7} {'prob':>7}")
+for t, l, p in zip(tokens, logits, probs):
+    print(f"{t:>7} {l:>7.1f} {p:>7.3f}  {'#' * int(p * 40)}")
+
+print()
+print("A 1.1 logit gap became a", round(float(probs[0] / probs[1]), 1),
+      "x probability ratio.")
+`,
+    },
+  ]}
+/>
+
+The `- np.max(x)` is not cosmetic. Exponentiating a large logit
+directly overflows to infinity; subtracting the maximum first shifts
+everything into a safe range and leaves the result unchanged.
+
+## Temperature reshapes the distribution
+
+Temperature divides the logits before the softmax.
+
+* **Low temperature** (below 1) spreads the logits apart, making the
+  distribution peakier and the output more deterministic.
+* **High temperature** (above 1) compresses them, flattening the
+  distribution and making unlikely tokens more reachable.
+* **Temperature 0** means "always take the maximum", which removes
+  randomness entirely.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+
+def softmax(x):
+    e = np.exp(x - np.max(x))
+    return e / e.sum()`,
+      starterCode: `import numpy as np
+
+tokens = [" cat", " dog", " bird", " rock"]
+logits = np.array([3.2, 2.1, 1.5, -0.4])
+
+for temp in [0.2, 0.7, 1.0, 2.0]:
+    probs = softmax(logits / temp)
+    row = "  ".join(f"{t.strip()}={p:.3f}" for t, p in zip(tokens, probs))
+    print(f"T={temp:<4} {row}")
+
+print()
+print("Low T concentrates probability on the leader.")
+print("High T gives the long tail a real chance.")
+`,
+    },
+  ]}
+/>
+
+## Top-p (nucleus) sampling
+
+Temperature alone has a problem: at high temperature, genuinely absurd
+tokens become reachable. Top-p fixes this by truncating the tail first.
+
+Sort tokens by probability, accumulate until the total reaches *p*
+(commonly 0.9), discard everything else, renormalize, then sample.
+
+The nucleus is **adaptive**: where the model is confident it might
+contain two tokens, and where the model is genuinely uncertain it might
+contain fifty. That is why it works better than a fixed top-k.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+
+def softmax(x):
+    e = np.exp(x - np.max(x))
+    return e / e.sum()`,
+      starterCode: `import numpy as np
+
+def top_p(probs, tokens, p=0.9):
+    order = np.argsort(probs)[::-1]
+    cumulative = 0.0
+    kept = []
+    for i in order:
+        kept.append(i)
+        cumulative += probs[i]
+        if cumulative >= p:
+            break
+    mask = np.zeros_like(probs)
+    mask[kept] = probs[kept]
+    return mask / mask.sum(), [tokens[i] for i in kept]
+
+tokens = [" cat", " dog", " bird", " rock", " idea", " seven"]
+
+print("CONFIDENT context (one strong candidate):")
+probs = softmax(np.array([5.0, 1.0, 0.5, 0.1, 0.0, -1.0]))
+_, kept = top_p(probs, tokens, p=0.9)
+print(f"  nucleus holds {len(kept)} token(s): {kept}")
+
+print()
+print("UNCERTAIN context (many similar candidates):")
+probs = softmax(np.array([1.2, 1.1, 1.0, 0.9, 0.8, 0.7]))
+_, kept = top_p(probs, tokens, p=0.9)
+print(f"  nucleus holds {len(kept)} token(s): {kept}")
+`,
+    },
+  ]}
+/>
+
+## Watch randomness accumulate
+
+One sampled token changes the context for the next prediction, so
+small divergences compound. This is why two runs of the same prompt
+can agree for a sentence and then separate completely.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+
+def softmax(x):
+    e = np.exp(x - np.max(x))
+    return e / e.sum()`,
+      starterCode: `import numpy as np
+
+rng = np.random.default_rng(0)
+tokens = ["a", "b", "c"]
+logits = np.array([1.0, 0.9, 0.8])   # deliberately close together
+
+for run in range(5):
+    probs = softmax(logits / 1.0)
+    seq = [tokens[rng.choice(len(tokens), p=probs)] for _ in range(8)]
+    print(f"run {run + 1}: {''.join(seq)}")
+
+print()
+print("Same distribution every step, five different outputs.")
+print("Set temperature to 0 (take the argmax) and all five would match.")
+`,
+    },
+  ]}
+/>
+
+<Callout type="info" title="Choosing settings">
+For analysis, extraction, and code, use low temperature: you want the
+most likely continuation, not a creative one. For brainstorming and
+drafting, higher temperature genuinely helps. Most APIs default around
+1.0, which is tuned for conversation rather than for precision work.
+</Callout>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`What does softmax convert?
+
+- Probabilities into logits.
+  > It runs in the opposite direction.
+- Embeddings into attention weights.
+  > Attention weights come from query-key comparisons, though softmax is used there too.
+- [o] Unbounded logits into probabilities that sum to 1.
+  > Exponentiating and normalizing produces a valid distribution from arbitrary real-valued scores.
+- Token ids into embedding vectors.
+  > That is the embedding lookup.
+
+Softmax is the standard way to turn scores into a distribution, and it
+appears in both attention and the output layer.`}
+/>
+
+<MultipleChoice
+  markdown={`Why subtract the maximum logit before exponentiating?
+
+- To make the largest probability exactly 1.
+  > The largest probability is still less than 1 after normalization.
+- To speed up the computation.
+  > The performance difference is negligible.
+- To ensure all probabilities are positive.
+  > Exponentials are always positive regardless.
+- [o] To avoid numerical overflow, without changing the result.
+  > Exponentiating a large value overflows to infinity, while the shift cancels in the normalization.
+
+It is a numerical stability trick that leaves the mathematics
+unchanged.`}
+/>
+
+<MultipleChoice
+  markdown={`What does lowering the temperature do?
+
+- [o] Sharpens the distribution toward the highest-scoring tokens.
+  > Dividing logits by a value below 1 spreads them apart, concentrating probability on the leader.
+- Reduces the number of tokens in the vocabulary.
+  > Vocabulary size is fixed.
+- Flattens the distribution so unlikely tokens are reachable.
+  > That is what raising the temperature does.
+- Reduces the total number of tokens generated.
+  > Output length is controlled separately.
+
+Low temperature means more deterministic, higher temperature means more
+varied.`}
+/>
+
+<MultipleChoice
+  markdown={`What makes top-p sampling adaptive?
+
+- It changes the value of p as generation proceeds.
+  > The threshold stays fixed.
+- It samples more tokens when the output is longer.
+  > Output length does not affect the nucleus.
+- [o] The number of tokens kept varies with the model's confidence.
+  > A confident distribution reaches the threshold in two tokens while an uncertain one may need fifty.
+- It adjusts the temperature based on the context.
+  > Temperature is a separate, independent setting.
+
+A fixed probability mass gives a variable candidate count, which is
+exactly the desirable behavior.`}
+/>
+
+<MultipleChoice
+  markdown={`Why do two runs of the same prompt diverge completely after agreeing for a sentence?
+
+- [o] Because each sampled token changes the context for every prediction after it.
+  > One different choice conditions all subsequent predictions, so small divergences compound.
+- Because temperature increases as generation continues.
+  > Temperature is constant unless explicitly varied.
+- Because the model's weights change between requests.
+  > Weights are fixed at inference time.
+- Because the context window shifts as text is generated.
+  > Window shifting does not occur within a short generation.
+
+Sampling errors do not stay local; they redirect everything downstream.`}
+/>
+
+<MultipleChoice
+  markdown={`What setting removes randomness entirely?
+
+- Top-p set to 0.0.
+  > This is degenerate and not the standard way to express determinism.
+- Top-p set to 1.0.
+  > This keeps the whole distribution and still samples from it.
+- Temperature set to 1.0.
+  > This is the neutral setting, which still samples.
+- [o] Temperature set to 0, which always takes the highest-scoring token.
+  > With no randomness in the draw, the same input yields the same output.
+
+Temperature 0 is implemented as argmax rather than as a division.`}
+/>
+
+<MultipleChoice
+  markdown={`For extracting structured data from documents, which settings suit best?
+
+- [o] Low temperature, so the most likely continuation is chosen.
+  > Extraction has a correct answer, and creative variation can only hurt.
+- High temperature with a low top-p.
+  > High temperature is the opposite of what precision work wants.
+- Temperature scaled to the length of the document.
+  > Document length has no bearing on the appropriate setting.
+- Default temperature with top-p disabled.
+  > Defaults are tuned for conversational variety.
+
+Match the setting to whether the task has one right answer or many
+acceptable ones.`}
+/>
+
+<MultipleChoice
+  markdown={`A 1.1 gap in logits becomes a roughly 3x probability ratio. Why is the effect so large?
+
+- Because softmax normalizes by the number of tokens.
+  > Normalization is by the sum of exponentials, not by the count.
+- [o] Because softmax exponentiates the scores before normalizing.
+  > Exponentiation turns additive gaps into multiplicative ones, so a modest lead becomes a large probability advantage.
+- Because the other tokens had negative logits.
+  > The effect holds regardless of the sign of the others.
+- Because logits are measured on a logarithmic scale.
+  > Logits are raw scores, and the exponential is applied afterwards.
+
+Small differences in logits translate into large differences in
+probability, which is why the distribution is usually quite peaked.`}
+/>

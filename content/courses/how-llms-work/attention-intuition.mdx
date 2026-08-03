@@ -1,0 +1,287 @@
+---
+title: Attention
+description: The mechanism that lets each token look at every other token, explained without the matrix algebra.
+---
+
+Embeddings give every token a meaning. Attention is what lets those
+meanings **interact**, and it is the component that made modern
+language models work.
+
+<Figure
+  slug="llm-attention-cutout"
+  alt="A row of small pillars each connected to every other pillar by threads of varying thickness, with the thickest threads converging on one particular pillar"
+/>
+
+## The problem it solves
+
+Consider:
+
+> The trophy did not fit in the suitcase because **it** was too big.
+
+What does "it" refer to? The trophy. Change one word:
+
+> The trophy did not fit in the suitcase because **it** was too small.
+
+Now "it" is the suitcase. Nothing about the token "it" changed. The
+resolution depends on a relationship between "it", "big"/"small",
+"trophy", and "suitcase" all at once.
+
+A model that processed tokens independently could never do this. It
+needs a way for each token's representation to be **updated using
+information from the other tokens**, weighted by how relevant each one
+is. That is attention.
+
+## Query, key, value
+
+Each token produces three vectors from its embedding:
+
+* A **query**: what am I looking for?
+* A **key**: what do I offer to others looking?
+* A **value**: what I actually contribute when attended to.
+
+For each token, the model compares its query against every key,
+producing a relevance score per token. Those scores are turned into
+weights that sum to 1, and the token's new representation becomes a
+weighted sum of all the values.
+
+The mental image: every token asks a question, every token advertises
+what it knows, and each token builds an updated version of itself out
+of whatever answered its question best.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+
+def softmax(x):
+    e = np.exp(x - np.max(x))
+    return e / e.sum()`,
+      starterCode: `import numpy as np
+
+tokens = ["the", "trophy", "did", "not", "fit", "because", "it"]
+
+# Hand-set relevance scores: how much does "it" care about each token?
+# In a real model these come from query-key dot products.
+raw_scores = np.array([0.1, 3.2, 0.1, 0.2, 1.1, 0.3, 0.5])
+
+weights = softmax(raw_scores)
+
+print('Attention from "it" to each token:')
+for tok, w in zip(tokens, weights):
+    bar = "#" * int(w * 50)
+    print(f"  {tok:>8}  {w:.3f}  {bar}")
+
+print()
+print("Weights sum to:", round(float(weights.sum()), 6))
+print('Most attention goes to "trophy", which is what "it" refers to.')
+`,
+    },
+  ]}
+/>
+
+## Doing it properly, with real vectors
+
+Here is the actual computation, on toy vectors, with nothing hidden.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+
+def softmax(x):
+    e = np.exp(x - np.max(x))
+    return e / e.sum()`,
+      starterCode: `import numpy as np
+
+tokens = ["trophy", "suitcase", "it"]
+
+# Each token's key and value vectors (2-dimensional, for readability).
+keys = np.array([[1.0, 0.2],    # trophy
+                 [0.3, 1.0],    # suitcase
+                 [0.1, 0.1]])   # it
+values = np.array([[10.0, 0.0], # trophy contributes this
+                   [0.0, 10.0], # suitcase contributes this
+                   [1.0, 1.0]]) # it contributes this
+
+# The query from "it". Pointing toward 'trophy'-like keys.
+query = np.array([1.0, 0.1])
+
+scores = keys @ query               # relevance of each token to the query
+scores = scores / np.sqrt(keys.shape[1])   # scale, keeps softmax stable
+weights = softmax(scores)
+output = weights @ values           # weighted blend of the values
+
+print("raw scores:  ", scores.round(3))
+print("weights:     ", weights.round(3))
+print()
+for tok, w in zip(tokens, weights):
+    print(f"  {tok:>9}: {w:.3f}")
+print()
+print("new representation for 'it':", output.round(3))
+print("(dominated by trophy's value vector)")
+`,
+    },
+  ]}
+/>
+
+Change `query` to `[0.2, 1.0]` and the weights shift toward
+`suitcase`, and so does the output. That is the whole mechanism: a
+different question retrieves a different blend.
+
+## Many heads, many layers
+
+Two multipliers turn this into something powerful:
+
+* **Multiple heads.** The same operation runs many times in parallel
+  with different learned query/key/value projections. One head might
+  track syntactic agreement, another long-range references, another
+  something with no human name. Their outputs are concatenated.
+* **Multiple layers.** The output of one attention block feeds the
+  next. Early layers resolve local structure, later layers assemble
+  meaning across the whole input. A large model stacks dozens of these.
+
+<Callout type="info" title="Why this was the breakthrough">
+Earlier architectures processed text sequentially, so information from
+token 1 reached token 500 only by passing through 499 intermediate
+steps, degrading along the way. Attention connects every token to
+every other token directly, in one step. That is both why long-range
+dependencies work and why training could be parallelized across a
+whole sequence at once, which is what made models this large trainable.
+</Callout>
+
+## The cost
+
+Every token attends to every other token, so an input of *n* tokens
+requires roughly *n²* comparisons. Doubling the input quadruples the
+attention work. This is the fundamental reason long context windows
+were hard to build and remain expensive to use, and why a great deal of
+research goes into approximations that avoid the full quadratic cost.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`What problem does attention solve?
+
+- Choosing which token to output next.
+  > Selection happens in the sampling step, after the model's computation.
+- Converting token ids into vectors.
+  > That is the embedding step, which happens before attention.
+- [o] Letting each token's representation incorporate information from other tokens.
+  > Resolving a pronoun, or any relationship between distant words, requires representations that depend on each other.
+- Compressing the input to fit the context window.
+  > Attention performs no compression.
+
+Independent token representations cannot capture relationships;
+attention is what makes them interact.`}
+/>
+
+<MultipleChoice
+  markdown={`In query-key-value terms, what does the *key* represent?
+
+- The token's final output contribution.
+  > That is the value vector.
+- What the token is searching for in other tokens.
+  > That is the query vector.
+- [o] What the token advertises to others that are searching.
+  > Queries are matched against keys to produce relevance scores.
+- The token's position in the sequence.
+  > Position is handled separately.
+
+Query asks, key advertises, value delivers.`}
+/>
+
+<MultipleChoice
+  markdown={`Why are attention scores passed through a softmax?
+
+- To remove negative values from the computation.
+  > Removing negatives is incidental, not the purpose.
+- [o] To turn arbitrary scores into weights that sum to 1.
+  > A weighted average requires weights forming a proper distribution, which is exactly what softmax produces.
+- To make the largest score equal to 1.
+  > Softmax does not force the maximum to 1.
+- To reduce the number of tokens attended to.
+  > All tokens retain some weight, however small.
+
+The output is a weighted blend, so the weights must be a distribution.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does attention cost grow quadratically with input length?
+
+- Because each layer processes the input twice.
+  > Layer count is a separate multiplier and is not quadratic.
+- Because the softmax operation is quadratic in its input size.
+  > Softmax is linear in the number of scores.
+- Because embeddings double in size as sequences grow.
+  > Embedding dimensionality is fixed.
+- [o] Because every token computes a score against every other token.
+  > With n tokens there are roughly n² pairs, so doubling the input quadruples the comparisons.
+
+All-pairs comparison is the source of both attention's power and its
+cost.`}
+/>
+
+<MultipleChoice
+  markdown={`What do multiple attention heads provide?
+
+- Faster computation through parallel execution.
+  > They do run in parallel, but the purpose is representational diversity.
+- [o] Several different relationship patterns learned in parallel.
+  > Different learned projections let one head track agreement, another long-range reference, and so on, with the results concatenated.
+- A way to process longer inputs than a single head could.
+  > Heads do not extend the sequence length.
+- Redundancy, so the model still works if one head fails.
+  > There is no failure mode being guarded against.
+
+Each head learns its own notion of what is relevant to what.`}
+/>
+
+<MultipleChoice
+  markdown={`Why was attention a breakthrough compared with sequential architectures?
+
+- [o] It connects distant tokens directly and allows parallel training.
+  > Sequential models degraded information across many intermediate steps and could not be parallelized across a sequence, which capped how large they could get.
+- It requires fewer parameters for the same capability.
+  > Attention-based models are typically larger, not smaller.
+- It eliminates the need for embeddings.
+  > Embeddings remain essential.
+- It removes the need for positional information.
+  > Attention is order-blind by itself, so position must still be supplied.
+
+Direct long-range connections plus parallelism is what made models at
+this scale trainable.`}
+/>
+
+<MultipleChoice
+  markdown={`In the trophy and suitcase example, what makes "it" resolve differently between the two sentences?
+
+- The position of "it" changes between them.
+  > It sits in the same position in both.
+- The model retrieves the answer from training data.
+  > No retrieval occurs; the resolution is computed from this sentence.
+- The tokenizer produces different ids for "it".
+  > The token is identical in both sentences.
+- [o] The attention weights shift because a different adjective is present.
+  > "Big" and "small" change the query-key relationships, so a different token receives the most attention.
+
+One word changes the pattern of relevance, and the pronoun follows it.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the role of stacking many attention layers?
+
+- Each layer handles a different portion of the input sequence.
+  > Every layer sees the whole sequence.
+- [o] Early layers resolve local structure while later ones assemble broader meaning.
+  > Each layer operates on the previous layer's output, so representations grow progressively more abstract.
+- Layers provide backup in case earlier ones produce errors.
+  > There is no error-correction relationship between layers.
+- Additional layers increase the context window size.
+  > Window size is independent of depth.
+
+Depth builds abstraction, one attention block at a time.`}
+/>

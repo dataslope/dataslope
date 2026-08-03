@@ -16,7 +16,9 @@ import {
   Atom,
   Binary,
   Blocks,
+  Bot,
   Braces,
+  BrainCircuit,
   ChartArea,
   ChartCandlestick,
   ChartColumn,
@@ -107,6 +109,8 @@ export const COURSE_MOTIFS: Record<string, string> = {
   "intro-web-development": "browser",
   "modern-css-layout": "grid",
   "react-from-the-ground-up": "atom",
+  "ai-tools-for-data-analysis": "assistant",
+  "how-llms-work": "neurons",
 };
 
 /** Each motif kind maps to a distinct lucide icon, so every course still gets
@@ -142,6 +146,8 @@ const KIND_ICONS: Record<string, LucideIcon> = {
   browser: AppWindow,
   grid: LayoutGrid,
   atom: Atom,
+  assistant: Bot,
+  neurons: BrainCircuit,
   stairs: TrendingUp,
 };
 
