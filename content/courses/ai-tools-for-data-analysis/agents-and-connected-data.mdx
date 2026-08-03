@@ -1,0 +1,210 @@
+---
+title: Agents and Connected Data
+description: What changes when an assistant can take actions rather than only produce text, and what the analyst's job becomes.
+---
+
+Everything so far has assumed a conversation: you ask, it answers, you
+decide what to do. The direction of travel in 2026 is toward
+assistants that **act**, running queries, reading files, and executing
+multi-step plans without a human between each step.
+
+## What makes something an agent
+
+The distinction is not intelligence, it is the loop.
+
+A chat assistant produces text and stops. An agent produces an action,
+observes the result, and decides what to do next, repeatedly, until it
+judges the task done. Concretely:
+
+```text
+1. Read the schema for the orders table
+2. (sees the schema)
+3. Run a query counting rows by status
+4. (sees the counts, notices an unexpected status value)
+5. Run a query investigating that value
+6. (sees the result)
+7. Report back
+```
+
+Steps 2, 4, and 6 are the difference. The agent is reacting to what it
+found rather than executing a plan fixed in advance.
+
+## The plumbing: MCP
+
+The **Model Context Protocol** is the open standard that connects
+assistants to tools and data. Anthropic introduced it in late 2024 and
+by 2026 it had been adopted across OpenAI, Google, and Microsoft,
+along with a large ecosystem of servers for databases, file stores,
+issue trackers, and internal APIs.
+
+For an analyst, the practical significance is narrow and real: an MCP
+connection to your warehouse means the assistant can **look up your
+schema instead of guessing it**, which removes the single most common
+defect covered in this course.
+
+## What gets better
+
+* **No more invented columns.** It can list tables and describe them.
+* **Self-correction on real errors.** A failing query produces a real
+  error message it can act on.
+* **Multi-step investigation.** Following an anomaly across three
+  tables is the kind of task where the loop genuinely pays.
+
+## What gets harder
+
+* **Verification surface grows.** Instead of one query to review, you
+  have a sequence of eight, plus the reasoning that connected them.
+  Reviewing a trajectory is meaningfully harder than reviewing a
+  query.
+* **Errors compound.** A wrong conclusion at step 3 shapes steps 4
+  through 8. The final answer can be confidently wrong in a way that
+  is much more work to unpick than a single bad query.
+* **Actions are not always reversible.** A read-only agent is safe in
+  the way a chat assistant is safe. An agent with write access is a
+  different category of thing entirely.
+* **Cost becomes less predictable.** A loop decides how many steps to
+  take, and a wide `SELECT` against a large table can be expensive in
+  a way a chat message never is.
+
+<Callout type="warn" title="The verification principle, restated for agents">
+The rule does not change: never accept a number you have not checked.
+What changes is that the checking now has to cover the *path*, not
+just the final query. Ask the agent to show every query it ran, and
+review the sequence.
+</Callout>
+
+## What the analyst's job becomes
+
+Less writing queries, more **specifying tasks precisely and auditing
+trajectories**. That is a genuine shift in the work, and it rewards
+exactly the skills this course has been drilling: knowing what correct
+looks like before you see the answer, and having a routine for
+checking it.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`What distinguishes an agent from a chat assistant?
+
+- The agent has a larger context window.
+  > Window size is unrelated to the distinction.
+- The agent uses a more capable underlying model.
+  > The same models power both; the difference is architectural.
+- [o] The agent observes the result of each action and decides the next one.
+  > A feedback loop between action and observation is what allows it to react to what it finds rather than follow a fixed plan.
+- The agent produces longer and more detailed responses.
+  > Response length is not the distinguishing property.
+
+The loop, not the model, is what makes something an agent.`}
+/>
+
+<MultipleChoice
+  markdown={`Which failure mode from this course does an MCP connection to your warehouse most directly remove?
+
+- Averaging averages without weighting.
+  > This is a reasoning error unaffected by schema access.
+- Causal claims made from correlational data.
+  > Access to data does not license causal inference.
+- Aggregation over the wrong denominator.
+  > Denominator choice is a definitional question that schema access does not settle.
+- [o] Invented column names.
+  > The assistant can introspect real tables, so it no longer needs to guess names from convention.
+
+Schema access replaces guessing with looking, which eliminates exactly
+one class of error.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is reviewing an agent's work harder than reviewing a single generated query?
+
+- Because agent output is not available for inspection.
+  > Trajectories can and should be inspected.
+- Because agent-generated queries use more advanced SQL features.
+  > Query complexity is not systematically higher.
+- [o] Because you must review a sequence of steps and the reasoning connecting them.
+  > A defect can sit in any step or in the inference between two steps, so the surface to check is much larger.
+- Because agents do not report the queries they ran.
+  > Good agent interfaces do report them, and you should ask if yours does not.
+
+More steps means more places for a defect to hide, and the connections
+between steps are themselves reviewable claims.`}
+/>
+
+<MultipleChoice
+  markdown={`Why do errors compound in an agent loop?
+
+- [o] Because a wrong conclusion at one step becomes the premise for the next.
+  > Later steps build on earlier findings, so an early misreading propagates through everything after it.
+- Because each step is executed with less care than the last.
+  > Execution quality does not degrade step by step.
+- Because agents run steps in parallel and merge conflicting results.
+  > Steps are typically sequential.
+- Because context is discarded between steps.
+  > Context is retained across the loop.
+
+The loop's strength, using what it found to decide what to do next, is
+also what makes an early error expensive.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the appropriate default access level for an analysis agent?
+
+- Full administrative access, so it is never blocked mid-task.
+  > This maximizes blast radius for no analytical benefit.
+- Read and write, so it can correct data quality problems it finds.
+  > Correcting data is a separate, human-approved process, and write access makes destructive errors possible.
+- No access, since agents cannot be trusted with real data.
+  > This forgoes the main benefit, which is schema access that removes invented columns.
+- [o] Read-only, scoped to the schemas the task requires.
+  > Analysis never requires writes, and scoping limits what a mistaken query can reach.
+
+Grant the minimum the task needs, which for analysis is scoped
+reading.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is agent cost less predictable than chat cost?
+
+- Because agent providers use variable pricing tiers.
+  > Token pricing is the same.
+- Because agents cannot use prompt caching.
+  > Caching applies to agent loops as well.
+- Because agents always use the most expensive available model.
+  > Model selection is configurable and not inherently maximal.
+- [o] Because the loop decides its own number of steps and query sizes.
+  > Neither the step count nor the volume scanned by each query is fixed in advance, so a single task can vary widely in cost.
+
+You are buying an open-ended process rather than a single exchange.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the Model Context Protocol's practical significance for an analyst?
+
+- It certifies that generated queries are correct before execution.
+  > No verification is performed by the protocol.
+- [o] It is the standard way to give the assistant access to your schema and data.
+  > A standardized connector layer is what lets an assistant introspect real tables rather than infer them.
+- It reduces the cost of long conversations.
+  > Cost reduction comes from caching, not from MCP.
+- It improves the model's statistical reasoning.
+  > It is a connection standard and does not change reasoning ability.
+
+MCP is plumbing. What it carries is schema access, and that is the part
+that matters for correctness.`}
+/>
+
+<MultipleChoice
+  markdown={`How does the analyst's role change as agents take over query writing?
+
+- It shifts toward writing more complex queries by hand.
+  > Hand-written query volume falls rather than rises.
+- It becomes primarily about choosing between assistant vendors.
+  > Vendor selection is a minor, occasional decision.
+- It disappears, since the agent handles the full workflow.
+  > Task specification and auditing remain, and both are demanding.
+- [o] It shifts toward specifying tasks precisely and auditing trajectories.
+  > Both are the same underlying skill: knowing what correct looks like in advance and having a routine to confirm it.
+
+The work moves up a level, from producing the steps to defining the
+goal and checking the path.`}
+/>

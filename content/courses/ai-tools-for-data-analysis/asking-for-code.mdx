@@ -1,0 +1,223 @@
+---
+title: Asking for Code You Can Check
+description: How you phrase a code request determines how hard the result is to review. Ask for reviewable code, not clever code.
+---
+
+Once the data is described, the request itself has one job: produce
+something you can **check quickly**. A dense one-liner and a
+seven-step pipeline can compute the same number, but only one of them
+can be reviewed in thirty seconds.
+
+## Ask for steps, not one-liners
+
+Models will happily produce a single chained expression:
+
+```python
+result = (df[df.status.isin(["shipped","delivered"])]
+          .assign(rev=lambda d: d.qty*d.price)
+          .groupby(df.region.fillna("unknown"))
+          .rev.sum().sort_values(ascending=False))
+```
+
+That is correct-looking and genuinely hard to audit. There is a
+`fillna` buried in a `groupby` argument, and a filter whose effect on
+row count you cannot see. Compare:
+
+```python
+shipped = df[df["status"].isin(["shipped", "delivered"])]
+print("rows after status filter:", len(shipped))
+
+shipped = shipped.assign(revenue=shipped["qty"] * shipped["price"])
+shipped["region"] = shipped["region"].fillna("unknown")
+
+by_region = shipped.groupby("region")["revenue"].sum()
+print(by_region.sort_values(ascending=False))
+```
+
+Same answer. Every intermediate step is inspectable, and the row count
+after the filter is printed, which is the number most likely to reveal
+a mistake.
+
+So: **ask for it that way.**
+
+```text
+Write this as separate steps with intermediate variables.
+Print the row count after each filter. No method chaining
+longer than two calls.
+```
+
+## Ask for the assumptions to be stated
+
+This one is underused and unusually effective:
+
+```text
+After the code, list every assumption you made about the
+data that you could not verify from what I gave you.
+```
+
+The list you get back is a ready-made checklist of exactly the things
+that could be wrong. Models are generally good at this, because
+identifying gaps in a specification is a different task from resisting
+the urge to fill them.
+
+A typical response might include: "I assumed `status` values are
+lowercase", "I assumed one row per order", "I assumed refunds are
+excluded from `amount`". Each of those is a question you can go answer
+in your warehouse in about a minute.
+
+## Ask for the sanity checks
+
+```text
+Also write the checks you would run to confirm this is right.
+```
+
+You will typically get row counts before and after each filter, a
+check that group totals sum to the ungrouped total, a null count on
+the key columns, and a look at the min and max of the date range.
+These are the checks an experienced analyst runs by reflex, and having
+them written out means you actually run them.
+
+<Callout type="info" title="The three-part request">
+Schema and grain, then: **steps not one-liners**, **state your
+assumptions**, **write the sanity checks**. Those three phrases
+convert an unreviewable answer into a reviewable one, and they work
+identically across every assistant.
+</Callout>
+
+## Ask it to do less
+
+A request that spans loading, cleaning, joining, aggregating, and
+plotting produces a long block in which one wrong line is easy to miss.
+Split it. Get the load and clean step, check it, then ask for the join.
+
+This is slower per step and much faster overall, because you localize
+any defect to the step you just added rather than hunting through
+forty lines.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Why is a long method chain a poor thing to request, even when it is correct?
+
+- [o] Intermediate results are invisible, so a defect has nowhere to show itself.
+  > You cannot see the row count after a filter or the shape after a join, which are the observations that catch mistakes.
+- Chains cannot include \`groupby\` operations.
+  > \`groupby\` chains fine; that is not a limitation.
+- Chained expressions run more slowly than step-by-step equivalents.
+  > Performance is essentially identical, and this is not the concern.
+- Method chaining is not idiomatic Pandas.
+  > Chaining is perfectly idiomatic; readability for review is the issue.
+
+Reviewability, not correctness or speed, is what a chain costs you.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the main value of asking the model to list its unverifiable assumptions?
+
+- [o] It produces a checklist of the specific things that could be wrong.
+  > Each stated assumption is a concrete claim you can go verify against your actual data.
+- It causes the model to refuse questions it cannot answer.
+  > It does not gate the answer; you still get the code.
+- It reduces the number of tokens in the response.
+  > It adds output, which increases cost slightly.
+- It guarantees the generated code contains no errors.
+  > Listing assumptions does not certify the code; it only surfaces what was assumed.
+
+The assumption list converts vague unease into a short list of
+verifiable questions.`}
+/>
+
+<MultipleChoice
+  markdown={`Which instruction most improves your ability to catch a filter that removed too many rows?
+
+- "Include a docstring explaining the approach."
+  > A docstring restates intent rather than measuring what happened.
+- [o] "Print the row count after each filter."
+  > A dropped-too-many-rows bug is visible immediately as an unexpectedly small count and invisible otherwise.
+- "Use descriptive variable names."
+  > Naming helps readability but reveals nothing about row counts.
+- "Add type hints to all functions."
+  > Type hints describe interfaces, not data volume.
+
+Row counts after filters are the cheapest diagnostic in analysis work
+and the one most likely to expose an over-aggressive filter.`}
+/>
+
+<MultipleChoice
+  markdown={`You ask for a full pipeline (load, clean, join, aggregate, plot) in one request and get 60 lines. What is the practical problem?
+
+- Long responses are truncated before the plotting step.
+  > Sixty lines fits comfortably within output limits.
+- The code will exceed the sandbox memory limit.
+  > Sixty lines of ordinary Pandas has no memory implications.
+- [o] A single wrong line is hard to localize among five stages.
+  > Every stage is a candidate, so debugging means auditing the whole block rather than the piece you just added.
+- The model cannot maintain variable names across that many lines.
+  > Name consistency across sixty lines is not a problem in practice.
+
+Requesting one stage at a time means any defect belongs to the stage
+you just added.`}
+/>
+
+<MultipleChoice
+  markdown={`Which sanity check most directly catches a join that accidentally duplicated rows?
+
+- [o] Comparing the row count before and after the join.
+  > A fan-out join inflates the row count, which is immediately visible in a before-and-after comparison.
+- Verifying the date column parses as a datetime.
+  > Type correctness says nothing about row counts.
+- Confirming the output is sorted correctly.
+  > Sort order is unaffected by duplication.
+- Checking that all column names are lowercase.
+  > Naming conventions are unrelated to row multiplication.
+
+If a join multiplied your rows, the row count says so straight away.`}
+/>
+
+<MultipleChoice
+  markdown={`An assistant returns code plus the note "I assumed \`status\` values are lowercase." What should you do with that?
+
+- Ignore it, since the code ran without error.
+  > Running proves nothing here; a case mismatch silently matches zero rows.
+- [o] Check the distinct values of \`status\` in your data.
+  > It is a one-line query, and if the values are capitalized the filter silently returns an empty result.
+- Rewrite the code to avoid using \`status\` entirely.
+  > Avoiding the column does not answer the question you asked.
+- Ask the model to verify the assumption itself.
+  > In plain chat it has no way to check your data.
+
+A stated assumption is an invitation to spend sixty seconds confirming
+it, which is almost always worth taking.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does splitting a request into stages usually finish *faster* overall, despite more round trips?
+
+- [o] Because a defect is localized to the stage you just added.
+  > Debugging a known five-line addition is far quicker than auditing sixty lines with an unknown fault somewhere inside.
+- Because each stage is billed at a lower rate.
+  > Billing is per token and is not discounted for shorter requests.
+- Because models produce higher quality output early in a conversation.
+  > Quality does not degrade meaningfully over a handful of turns.
+- Because shorter prompts are processed at higher priority.
+  > There is no priority difference based on prompt length.
+
+Incremental work trades a little latency for a large reduction in
+debugging surface.`}
+/>
+
+<MultipleChoice
+  markdown={`Which request produces the most reviewable output for a revenue-by-region calculation?
+
+- "Write this in the most Pythonic style you can."
+  > Style preference does not surface intermediate values.
+- "Write it as a single reusable function with full type hints."
+  > A typed function is good engineering and still hides every intermediate result.
+- "Give me the most concise Pandas code possible."
+  > Conciseness directly works against reviewability.
+- [o] "Use separate steps with intermediate variables, and print the row count after each filter."
+  > This makes every stage inspectable and surfaces the number most likely to reveal a mistake.
+
+Ask for the shape that lets you see what happened, not the shape that
+looks most professional.`}
+/>

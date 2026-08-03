@@ -1,0 +1,257 @@
+---
+title: Tokens
+description: Models do not read characters or words. They read tokens, and almost every strange behavior you have noticed traces back to that.
+---
+
+A model cannot process text. It processes numbers. **Tokenization** is
+the step that turns one into the other, and it is responsible for more
+surprising behavior than any other single component.
+
+## What a token is
+
+A token is a chunk of text that the vocabulary assigns a single id to.
+Not a character, not a word, something in between:
+
+* Common words are usually one token: `the`, `data`, `model`.
+* Uncommon words split: `tokenization` might be `token` + `ization`.
+* Rare words shatter: a surname might become four or five pieces.
+* **Leading spaces belong to the token.** `" the"` and `"the"` are
+  different tokens with different ids.
+* Numbers split unpredictably. `2026` might be one token or two.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A hand-built vocabulary, to show how ids and text relate.
+# Real vocabularies are learned from data (next chapter).
+vocab = {
+    "the": 464, " the": 262, " model": 2746, " reads": 9743,
+    " token": 11241, "ization": 1634, ".": 13,
+}
+
+text_pieces = [" the", " model", " reads", " token", "ization", "."]
+ids = [vocab[p] for p in text_pieces]
+
+print("Text: ", "".join(text_pieces))
+print("Pieces:", text_pieces)
+print("Ids:   ", ids)
+print()
+print("Characters:", len("".join(text_pieces)))
+print("Tokens:    ", len(ids))
+`,
+    },
+  ]}
+/>
+
+Note the two entries for `the`. The leading space is part of the
+token, which is why prompts sometimes behave differently depending on
+whether they end with a space.
+
+## What this explains
+
+### Counting letters
+
+Ask a model how many `r`s are in "strawberry" and it may get it wrong.
+Not because it cannot count to three, but because it never received
+the letters. It received two opaque ids. Answering requires it to
+recall facts *about* the spelling, which is a different and less
+reliable operation than looking.
+
+### Arithmetic being uneven
+
+`2 + 2` is reliable. Multiplying two six-digit numbers is not. Digit
+grouping in the tokenizer means the model does not see clean columns
+of digits, so column-wise arithmetic has to be reconstructed from
+patterns rather than performed.
+
+### Non-English text costing more
+
+Tokenizers are trained on corpora that are mostly English, so English
+compresses well. Other languages, particularly those not using Latin
+script, fragment into many more tokens for the same meaning. The same
+sentence in Japanese or Thai can take two to three times as many
+tokens as in English, and you pay per token.
+
+### Reversal and anagrams being hard
+
+Reversing a string requires character access. The model has chunks.
+
+<Callout type="info" title="A useful mental image">
+Imagine reading a language written entirely in words you recognize by
+overall shape, never by letter. You could read fluently, discuss the
+content, and write convincingly. You could not reliably say how many
+times the letter "e" appears on the page. That is roughly the model's
+relationship to text.
+</Callout>
+
+## The rough conversion rate
+
+For English prose, one token is about four characters or about 0.75
+words. So:
+
+* 1,000 tokens is roughly 750 words, or about 1.5 pages.
+* 100,000 tokens is roughly a 300-page book.
+* 1,000,000 tokens is a small library.
+
+Code is denser in tokens than prose, because whitespace, punctuation,
+and identifiers fragment. Estimate code at about three characters per
+token.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Rough token estimation, useful for capacity and cost planning.
+def estimate_tokens(text, kind="prose"):
+    chars_per_token = 4.0 if kind == "prose" else 3.0
+    return round(len(text) / chars_per_token)
+
+prose = "The quick brown fox jumps over the lazy dog. " * 20
+code = "def f(x):\\n    return [i ** 2 for i in range(x) if i % 3 == 0]\\n" * 20
+
+print(f"prose: {len(prose):5d} chars -> ~{estimate_tokens(prose):4d} tokens")
+print(f"code:  {len(code):5d} chars -> ~{estimate_tokens(code, 'code'):4d} tokens")
+print()
+
+# Try your own text:
+mine = "Paste something here and see roughly how many tokens it is."
+print(f"yours: {len(mine):5d} chars -> ~{estimate_tokens(mine):4d} tokens")
+`,
+    },
+  ]}
+/>
+
+These estimates are approximations. For anything where the number
+matters (a budget, a context-limit check) use the provider's own token
+counting endpoint, which is exact and usually free.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Why do models struggle to count the letters in a word?
+
+- Because letter counting is deliberately disabled for safety.
+  > No such restriction exists.
+- Because the answer is rarely present in training data.
+  > Spelling discussions are abundant in training data.
+- Because counting is a mathematical operation they cannot perform.
+  > They perform small counting tasks reliably in other contexts.
+- [o] Because they receive tokens, not characters, so the letters are not visible.
+  > The word arrives as one or two opaque ids, so answering requires recalling facts about the spelling rather than inspecting it.
+
+The information needed to answer directly is destroyed before the model
+sees anything.`}
+/>
+
+<MultipleChoice
+  markdown={`Are \`"the"\` and \`" the"\` the same token?
+
+- [o] No, the leading space is part of the token and yields a different id.
+  > This is why a prompt ending in a trailing space can behave differently from one that does not.
+- Yes, but they map to different ids for formatting reasons.
+  > Different ids means they are different tokens by definition.
+- Yes, whitespace is stripped before tokenization.
+  > Leading whitespace is preserved and is part of the token.
+- No, but they always produce identical model behavior.
+  > Different ids can and do produce different continuations.
+
+Whitespace handling inside tokens is a small detail with occasionally
+large effects.`}
+/>
+
+<MultipleChoice
+  markdown={`Roughly how many tokens is 750 words of English prose?
+
+- About 10,000.
+  > This is off by an order of magnitude for ordinary prose.
+- [o] About 1,000.
+  > The standard rule of thumb is around 0.75 words per token for English.
+- About 3,000.
+  > That would imply four tokens per word, which is closer to rare-word or non-Latin-script behavior.
+- About 200.
+  > That would imply nearly four words per token, far denser than real tokenizers achieve.
+
+Four characters or three-quarters of a word per token is the estimate to
+carry around.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does the same sentence cost more in Japanese than in English?
+
+- Japanese text is longer in characters for the same meaning.
+  > Japanese is often *more* compact in characters, which makes the effect more striking.
+- [o] Tokenizers are trained mostly on English, so other scripts fragment into more tokens.
+  > Compression quality depends on what the vocabulary was fitted to, and less-represented scripts split into many more pieces.
+- Japanese requires a separate model with higher pricing.
+  > The same model and the same per-token price apply.
+- Non-English text is billed at a premium rate by providers.
+  > Providers charge the same rate per token regardless of language.
+
+You pay per token, and the tokenizer is much less efficient outside its
+dominant training language.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is code denser in tokens than prose?
+
+- Code is stored in a different character encoding.
+  > Encoding is the same.
+- Code contains more unique words than prose.
+  > Vocabulary diversity is a factor, but fragmentation of syntax dominates.
+- [o] Whitespace, punctuation, and identifiers fragment into many small tokens.
+  > Indentation, brackets, and camelCase identifiers rarely correspond to single vocabulary entries the way common English words do.
+- Code files are usually longer than prose documents.
+  > Length is not what the density measure compares.
+
+Roughly three characters per token for code, versus four for prose.`}
+/>
+
+<MultipleChoice
+  markdown={`Which task is hardest for a model because of tokenization specifically?
+
+- [o] Reversing the characters of a word.
+  > Reversal requires character-level access, and the model holds multi-character chunks it cannot decompose.
+- Summarizing a long article.
+  > Summarization operates at the level of meaning, which tokens preserve well.
+- Translating between two well-represented languages.
+  > Translation works on semantics and is handled well.
+- Answering a factual question about history.
+  > Factual recall is unaffected by chunking.
+
+Anything requiring operations *below* the token boundary is structurally
+difficult.`}
+/>
+
+<MultipleChoice
+  markdown={`When precision matters, how should you count tokens?
+
+- [o] Use the provider's token counting endpoint.
+  > It applies the actual tokenizer, and is exact and typically free.
+- Multiply word count by 1.33.
+  > A useful estimate, but an estimate.
+- Count them manually from the vocabulary file.
+  > Impractical, and tokenization involves merge rules rather than simple lookup.
+- Divide character count by four.
+  > Also an estimate, and it drifts badly on code and non-English text.
+
+Estimate for planning. Measure when the number has consequences.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`2 + 2\` reliable while multiplying six-digit numbers is not?
+
+- Small numbers appear more often in training data.
+  > Frequency contributes, and there is a more specific structural reason.
+- [o] Digits group unpredictably into tokens, so column-wise arithmetic is not visible.
+  > The model cannot line up digits in columns because it does not receive them as separate units.
+- Multiplication is not represented in the training corpus.
+  > Multiplication appears extensively.
+- Larger numbers exceed the model's numeric range.
+  > There is no numeric range; these are text tokens.
+
+The algorithm requires access to individual digits, and tokenization
+does not guarantee it.`}
+/>

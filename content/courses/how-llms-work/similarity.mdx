@@ -1,0 +1,255 @@
+---
+title: Measuring Similarity
+description: Cosine similarity, why it beats plain distance, and a working semantic search in twenty lines.
+---
+
+If meaning is geometry, then comparing meanings is measuring distance.
+There is a standard way to do it, and a reason it is not the obvious
+one.
+
+## Why not straight-line distance
+
+Euclidean distance measures how far apart two points are. That
+includes how far each is from the origin, which for embeddings is
+mostly noise: vector *magnitude* tends to track things like token
+frequency rather than meaning.
+
+**Cosine similarity** measures the angle between two vectors and
+ignores their lengths entirely. Two vectors pointing the same
+direction score 1.0 regardless of how long either is.
+
+$$\cos(a, b) = \frac{a \cdot b}{\lVert a \rVert \lVert b \rVert}$$
+
+The numerator is the dot product; the denominator divides out both
+magnitudes. Values run from 1.0 (identical direction) through 0.0
+(unrelated) to -1.0 (opposite).
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+def cosine(a, b):
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+short = np.array([1.0, 1.0])
+long = np.array([5.0, 5.0])   # same direction, five times the length
+other = np.array([1.0, -1.0]) # perpendicular
+
+print("Euclidean distance short<->long:", round(float(np.linalg.norm(short - long)), 3))
+print("Cosine similarity short<->long: ", round(cosine(short, long), 3))
+print()
+print("Cosine similarity short<->other:", round(cosine(short, other), 3))
+print()
+print("Same direction scores 1.0 no matter the magnitude,")
+print("which is what we want when magnitude is not about meaning.")
+`,
+    },
+  ]}
+/>
+
+## A working semantic search
+
+This is the whole of retrieval, minus a real embedding model. Note
+that the query shares no words with the best match, which is the point:
+the search is over meaning rather than text.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+
+def cosine(a, b):
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+# Stand-in "embeddings" over four hand-chosen semantic axes:
+#   [finance, weather, sport, cooking]
+DOCS = {
+    "Quarterly revenue rose twelve percent":      np.array([0.9, 0.0, 0.1, 0.0]),
+    "Heavy rain expected across the region":      np.array([0.0, 0.9, 0.1, 0.0]),
+    "The match finished two goals to one":        np.array([0.0, 0.1, 0.9, 0.0]),
+    "Simmer the sauce for twenty minutes":        np.array([0.0, 0.0, 0.0, 0.9]),
+    "Earnings beat analyst expectations":         np.array([0.85, 0.0, 0.0, 0.1]),
+}
+
+def search(query_vec, k=3):
+    scored = [(cosine(query_vec, v), text) for text, v in DOCS.items()]
+    scored.sort(reverse=True)
+    return scored[:k]`,
+      starterCode: `import numpy as np
+
+# "How did the company perform financially?"
+query = np.array([0.95, 0.0, 0.0, 0.05])
+
+print("Query is about: finance")
+print()
+for score, text in search(query):
+    print(f"  {score:.3f}  {text}")
+
+print()
+print("Note the top hit shares no words with the query.")
+print("Matching happens in vector space, not on text.")
+
+# Try a different query direction:
+weather_query = np.array([0.0, 1.0, 0.0, 0.0])
+print()
+print("Query is about: weather")
+for score, text in search(weather_query, k=2):
+    print(f"  {score:.3f}  {text}")
+`,
+    },
+  ]}
+/>
+
+## Where this breaks
+
+Two failure modes are worth knowing, because they explain a lot of
+disappointing retrieval systems:
+
+* **Cosine similarity has no notion of truth.** "The drug is
+  effective" and "the drug is not effective" are extremely close in
+  embedding space, because negation is a small perturbation to a
+  sentence's overall direction. A retrieval system will happily return
+  the opposite of what you asked for.
+* **Similar is not relevant.** A document about your topic can be
+  close in the space and still useless for the specific question. This
+  is why production systems add a reranking step that reads candidates
+  more carefully rather than trusting the geometry alone.
+
+<Callout type="warn" title="The negation problem, concretely">
+If you build a search over policy documents, a query for "cases where
+approval is required" will surface "cases where approval is not
+required" near the top. Similarity is not a proxy for entailment, and
+no amount of tuning the embedding model fixes that.
+</Callout>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Why is cosine similarity preferred over Euclidean distance for embeddings?
+
+- [o] Because it ignores vector magnitude, which mostly encodes noise rather than meaning.
+  > Length tends to track properties like token frequency, so dividing it out isolates the directional information that carries meaning.
+- Because Euclidean distance is undefined in high dimensions.
+  > It is well defined at any dimensionality.
+- Because it always produces values between 0 and 1.
+  > It ranges from -1 to 1, and the range is not the reason.
+- Because it is faster to compute on large vectors.
+  > Both are inexpensive, and cosine requires slightly more arithmetic.
+
+Angle carries the semantic signal; magnitude largely does not.`}
+/>
+
+<MultipleChoice
+  markdown={`Two vectors point in the same direction, one five times longer. What is their cosine similarity?
+
+- [o] 1.0, since direction is identical.
+  > Both magnitudes are divided out, so only the shared direction remains.
+- 0.2, reflecting the length ratio.
+  > Cosine does not incorporate the ratio of lengths.
+- 5.0, reflecting the scaling factor.
+  > Cosine similarity never exceeds 1.
+- 0.0, since the vectors are not identical.
+  > Zero indicates perpendicularity, not inequality.
+
+Scaling a vector does not change where it points, and pointing is all
+cosine measures.`}
+/>
+
+<MultipleChoice
+  markdown={`In the search example, the best match shares no words with the query. Why does it rank first?
+
+- Because it appeared earliest in the document list.
+  > Ordering does not affect scores.
+- [o] Because its vector points in nearly the same direction as the query's.
+  > Comparison happens entirely between vectors, so shared vocabulary is irrelevant to the score.
+- Because it is the shortest document in the collection.
+  > Length plays no part in the scoring.
+- Because the search performs stemming and synonym expansion.
+  > No text processing occurs during the comparison at all.
+
+Semantic search compares meaning representations, which is exactly why
+it beats keyword matching.`}
+/>
+
+<MultipleChoice
+  markdown={`Why do "the drug is effective" and "the drug is not effective" score as highly similar?
+
+- Because "not" is removed as a stop word before embedding.
+  > Stop word removal is not part of modern embedding pipelines.
+- Because the embedding model was trained on medical text.
+  > Domain training does not create the effect.
+- Because cosine similarity takes the absolute value of the result.
+  > No absolute value is applied; opposite directions score negative.
+- [o] Because negation is a small perturbation to a sentence's overall direction.
+  > The two sentences share nearly all their content, so the vectors stay close even though the meanings are opposite.
+
+Similarity is not entailment, and this gap is structural rather than a
+tuning problem.`}
+/>
+
+<MultipleChoice
+  markdown={`Why do production retrieval systems add a reranking step?
+
+- To reduce the number of documents that must be embedded.
+  > All documents are embedded regardless.
+- To remove documents whose embeddings have low magnitude.
+  > Magnitude is already ignored by cosine similarity.
+- To convert cosine scores into probabilities.
+  > Calibration is not the purpose.
+- [o] Because similar is not the same as relevant to the specific question.
+  > A second, more careful pass reads the top candidates rather than trusting geometric proximity alone.
+
+Retrieval finds candidates cheaply; reranking decides which actually
+answer the question.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a cosine similarity of 0.0 indicate?
+
+- [o] The vectors are perpendicular, indicating no shared direction.
+  > Zero means the dot product vanished, so the vectors carry no common directional component.
+- The two texts are opposites in meaning.
+  > Opposite direction gives -1.0, not 0.0.
+- One of the vectors has zero magnitude.
+  > A zero vector makes the similarity undefined rather than zero.
+- The two texts are identical.
+  > Identical direction gives 1.0.
+
+Zero is the "unrelated" case, sitting between identical and opposite.`}
+/>
+
+<MultipleChoice
+  markdown={`You build a search over policy documents. A query for "cases where approval is required" returns "cases where approval is not required" in the top results. What should you do?
+
+- Increase the similarity threshold to filter weak matches.
+  > The problematic match scores highly, so a threshold does not exclude it.
+- [o] Add a reranking or filtering step that reads the candidates.
+  > A step that actually evaluates the retrieved text can distinguish the two, which pure geometry cannot.
+- Retrain the embedding model on more policy documents.
+  > Domain adaptation does not solve negation sensitivity.
+- Switch from cosine similarity to Euclidean distance.
+  > Both metrics place the two sentences close together.
+
+The fix is a second stage, not a better first stage.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the denominator in the cosine similarity formula doing?
+
+- Normalizing the result into a probability.
+  > The output is not a probability.
+- Preventing division by zero in the dot product.
+  > It introduces the possibility of division by zero rather than preventing it.
+- [o] Dividing out both vectors' magnitudes so only direction remains.
+  > Each norm cancels its vector's length, leaving the angle between them.
+- Correcting for the number of dimensions.
+  > Dimensionality is not adjusted for.
+
+Dividing by both norms is precisely what converts a dot product into a
+length-independent measure.`}
+/>

@@ -1,0 +1,256 @@
+---
+title: Benchmark Pitfalls
+description: Saturation, contamination, selective reporting, and the reason leaderboard rank keeps failing to predict your results.
+---
+
+Benchmarks are useful. Benchmark *tables in launch announcements* are
+a different thing, and reading them well requires knowing four failure
+modes.
+
+## 1. Saturation
+
+Covered already, and worth restating as a rule: **a benchmark stops
+being informative once everyone scores near its ceiling.** MMLU is the
+canonical case. The frontier moved past what the test can measure, and
+the reported numbers now differ by less than the measurement error.
+
+The tell is easy to spot. If every model in the table is within three
+points of every other, the benchmark is not distinguishing them.
+
+## 2. Contamination
+
+Benchmark questions and answers get published. Published text gets
+crawled. Crawled text becomes training data. A model that saw the test
+answers during training scores well without having the capability the
+test was designed to measure.
+
+This is rarely deliberate and is very hard to rule out, because
+nobody can fully audit a multi-trillion-token corpus for overlap with
+every benchmark.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A contaminated benchmark and a clean one can look identical
+# from the outside. What separates them is not visible in the score.
+def looks_capable(memorized_answers, genuine_capability):
+    return "high score" if (memorized_answers or genuine_capability) else "low score"
+
+cases = [
+    ("memorized the test set", True, False),
+    ("genuinely capable",      False, True),
+    ("both",                   True, True),
+    ("neither",                False, False),
+]
+
+print(f"{'situation':<26}{'reported result':>16}")
+for label, mem, cap in cases:
+    print(f"{label:<26}{looks_capable(mem, cap):>16}")
+
+print()
+print("Rows 1 and 2 are indistinguishable from the score alone.")
+print("Only a held-out or post-cutoff test can separate them.")
+`,
+    },
+  ]}
+/>
+
+The defenses are the contamination-resistant suites from the previous
+chapter: private holdouts, date filtering, monthly refreshes,
+unpublished problems.
+
+## 3. Selective reporting
+
+A launch announcement chooses which benchmarks to show. Nobody is
+obliged to publish the ones where they placed third.
+
+The diagnostic questions:
+
+* Are the *standard* benchmarks for this capability present, or an
+  unfamiliar selection?
+* Are the comparison models current, or an older version of a
+  competitor?
+* Is the evaluation configuration disclosed? The same model at
+  different reasoning-effort settings can differ by many points, and
+  a comparison that runs one model at maximum effort against another
+  at default is not a comparison of models.
+
+That last one matters more since reasoning effort became tunable. Two
+numbers produced under different budgets are not measuring the same
+thing.
+
+## 4. Construct mismatch
+
+The deepest problem, and the least discussed. A benchmark measures
+performance on the benchmark. Whether that transfers to your task
+depends entirely on whether your task resembles it.
+
+SWE-bench predicts agentic coding reasonably well because the task
+shapes match. It predicts almost nothing about how well the model will
+extract fields from your invoices, because nothing about that
+resembles fixing a GitHub issue.
+
+<Callout type="warn" title="The practical consequence">
+A model that ranks third on every public leaderboard can be the best
+model for your specific task, and you will never learn that from the
+leaderboards. The only way to find out is to test on your own data,
+which is the next chapter.
+</Callout>
+
+## Reading a launch table well
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `checks = [
+    ("Is every model within ~3 points?", "saturated, ignore this row"),
+    ("Is the benchmark contamination-resistant?", "if not, discount the score"),
+    ("Are the standard benchmarks present?", "if not, ask what is missing"),
+    ("Are competitor versions current?", "stale comparisons inflate the gap"),
+    ("Is the effort or config disclosed?", "undisclosed means not comparable"),
+    ("Does the task resemble yours?", "if not, the score does not transfer"),
+]
+
+print("Reading a benchmark table:")
+print()
+for i, (question, implication) in enumerate(checks, 1):
+    print(f"{i}. {question}")
+    print(f"   -> {implication}")
+    print()
+
+print("If four or more raise concerns, the table is marketing, not evidence.")
+`,
+    },
+  ]}
+/>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`What is benchmark contamination?
+
+- Errors in the benchmark's answer key.
+  > Label errors are a real problem and a different one.
+- Models being evaluated on the wrong benchmark version.
+  > Version confusion is a procedural error rather than contamination.
+- [o] Test questions and answers appearing in the model's training data.
+  > A model that saw the answers scores well without having the capability the test measures.
+- Multiple models being tested on the same hardware.
+  > Shared infrastructure does not affect scores.
+
+Published benchmarks get crawled, and crawled text becomes training
+data.`}
+/>
+
+<MultipleChoice
+  markdown={`How can you tell a contaminated result from a genuinely capable one?
+
+- Contaminated models answer faster.
+  > Response speed carries no signal about contamination.
+- Contaminated models score suspiciously close to 100%.
+  > Contaminated scores can sit anywhere.
+- [o] You cannot, from the score alone; it requires a held-out or post-cutoff test.
+  > Both situations produce a high number, so separating them needs data the model could not have seen.
+- Contaminated models fail on rephrased versions of the same question.
+  > This is suggestive evidence and not reliable on its own.
+
+The whole point of the contamination-resistant suites is that scores
+alone cannot distinguish the two cases.`}
+/>
+
+<MultipleChoice
+  markdown={`Every model in a published table is within two points on a benchmark. What does this indicate?
+
+- The benchmark is measuring with unusual precision.
+  > Clustering indicates the opposite of discriminating power.
+- The models are all equally capable in general.
+  > It says nothing about capability beyond this test.
+- [o] The benchmark is saturated and not distinguishing them.
+  > When the spread is smaller than the measurement error, the row carries no information.
+- The benchmark was administered incorrectly.
+  > Correct administration produces this pattern once a test is saturated.
+
+Tight clustering near a ceiling is the signature of a benchmark that
+has outlived its usefulness.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does undisclosed evaluation configuration undermine a comparison?
+
+- Configuration affects only latency, not accuracy.
+  > Reasoning effort affects accuracy substantially.
+- Providers are required to disclose configuration by regulation.
+  > No such requirement exists.
+- [o] The same model at different reasoning efforts can differ by many points.
+  > Running one model at maximum effort against another at default compares budgets rather than models.
+- Different configurations use different benchmark versions.
+  > Version and configuration are separate things.
+
+Two numbers produced under different budgets are not measuring the same
+quantity.`}
+/>
+
+<MultipleChoice
+  markdown={`What is construct mismatch?
+
+- [o] A benchmark measuring something that does not resemble your task.
+  > A high SWE-bench score predicts agentic coding and says almost nothing about extracting fields from invoices.
+- Using a benchmark whose questions contain factual errors.
+  > That is a label-quality problem.
+- Comparing models trained on different data distributions.
+  > Training differences are expected and are not the issue.
+- Running a benchmark on hardware it was not designed for.
+  > Hardware does not affect what a benchmark measures.
+
+The score is real; its relevance to your work is the open question.`}
+/>
+
+<MultipleChoice
+  markdown={`A model ranks third on every public leaderboard. What follows about your use case?
+
+- [o] Nothing; it could still be the best choice for your specific task.
+  > Aggregate rank averages across tasks unlike yours, so only testing on your own data can settle it.
+- It is likely contaminated on the benchmarks it leads.
+  > Rank position is not evidence about contamination.
+- It is unsuitable for production use.
+  > Rank does not determine suitability.
+- It will rank third for your task as well.
+  > Leaderboard rank transfers poorly to specific tasks.
+
+Public rank is an average over tasks that are not yours.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is contamination difficult to rule out?
+
+- Benchmarks change their questions too frequently.
+  > Most benchmarks are stable, which is part of the problem.
+- [o] Auditing a multi-trillion-token corpus against every benchmark is impractical.
+  > The scale makes exhaustive overlap detection infeasible even with full access.
+- Contamination only appears after a model is deployed.
+  > It is introduced during training.
+- Providers refuse to disclose their training data.
+  > Disclosure would help and is not the only obstacle.
+
+Scale, not secrecy, is the primary barrier.`}
+/>
+
+<MultipleChoice
+  markdown={`Which question most directly tests whether a benchmark score matters to you?
+
+- How many models have been evaluated on it?
+  > Popularity does not establish relevance to your task.
+- Was the benchmark published in a peer-reviewed venue?
+  > Publication venue speaks to rigor rather than relevance.
+- [o] Does the benchmark's task resemble what you actually need done?
+  > Transfer depends on task-shape similarity, which is the construct-validity question.
+- Was the benchmark released after the model's training cutoff?
+  > Important for contamination, and it does not address relevance.
+
+Relevance is about similarity of task, and it is the question people
+skip.`}
+/>

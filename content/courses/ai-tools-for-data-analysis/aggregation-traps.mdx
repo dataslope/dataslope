@@ -1,0 +1,224 @@
+---
+title: Failure Mode 3, Aggregation Traps
+description: Wrong denominators, double counting, averages of averages, and the WHERE versus HAVING confusion.
+---
+
+Aggregation is where a correct row set becomes a wrong number. These
+defects are subtle because the code is short, the syntax is valid, and
+the result is a single plausible figure with nothing to compare it
+against.
+
+## The wrong denominator
+
+"Conversion rate" is a ratio, and the numerator is rarely the problem.
+The denominator is.
+
+Conversions divided by *what*? Sessions, visitors, unique visitors,
+eligible visitors, visitors who reached the checkout page? Each gives
+a different number, all of them are called "conversion rate", and the
+model will pick whichever one the surrounding text suggests.
+
+The same applies to "average revenue per user" (all users, or active
+users?), "churn rate" (of accounts at the start of the period, or of
+accounts ever?), and nearly every rate metric in business analytics.
+
+<Callout type="warn" title="The definition lives in your company">
+There is a right answer to "which denominator", and it is a fact about
+your organization's reporting conventions. It is not recoverable from
+the data, and it is not in the model's training corpus. If you do not
+specify it, you get a guess with the same name as the metric you
+wanted.
+</Callout>
+
+## Average of averages
+
+You have average order value per region. You want the overall average
+order value. The model writes:
+
+```python
+overall = by_region["avg_order_value"].mean()
+```
+
+This is wrong unless every region has exactly the same number of
+orders. A region with 12 orders counts as much as a region with
+40,000. The correct calculation weights by count, or better, goes back
+to the raw rows and averages those.
+
+This error is extremely common because the incorrect version reads
+like the obviously right thing to do.
+
+## Double counting
+
+Any time an entity can appear more than once, an aggregate over it
+overcounts:
+
+* A customer in two segments counted once per segment, then summed to
+  a "total customers" that exceeds the real headcount.
+* An order with three lines counted three times (the fan-out from the
+  previous chapter, arriving here as a wrong total).
+* A user with two devices counted as two users in a "daily active
+  users" metric.
+
+The signature is a total that is larger than a number you know cannot
+be exceeded. Total customers greater than total accounts. Segment
+percentages summing above 100%.
+
+## WHERE versus HAVING
+
+`WHERE` filters rows before grouping. `HAVING` filters groups after.
+They are not interchangeable and the model sometimes swaps them.
+
+```sql
+-- Regions whose completed orders total over 100k
+SELECT region, SUM(amount) AS total
+FROM orders
+WHERE status = 'completed'      -- filters rows first: correct
+GROUP BY region
+HAVING SUM(amount) > 100000;    -- filters groups after: correct
+```
+
+Move `status = 'completed'` into `HAVING` and it either errors or, in
+permissive engines, silently changes which rows contributed to the sum.
+Move the total condition into `WHERE` and it errors, since the
+aggregate does not exist yet.
+
+## Count star, count column, count distinct
+
+Three different questions:
+
+* `COUNT(*)` counts rows.
+* `COUNT(col)` counts rows where `col` is not null.
+* `COUNT(DISTINCT col)` counts distinct non-null values.
+
+"How many customers ordered?" is `COUNT(DISTINCT customer_id)`. Using
+`COUNT(*)` answers "how many orders", which is a different and larger
+number wearing the same label.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Why is averaging the per-region average order values usually wrong?
+
+- Because averages cannot be combined mathematically.
+  > They can be combined; the combination just has to be weighted.
+- Because regional averages are stored with insufficient precision.
+  > Precision is not the source of the error.
+- Because \`mean()\` ignores null values in the input.
+  > Null handling is a separate concern and not what makes this wrong.
+- [o] Because it weights every region equally regardless of order volume.
+  > A region with 12 orders influences the result as much as one with 40,000, which is not what an overall average means.
+
+An unweighted average of averages answers "the average region" rather
+than "the average order".`}
+/>
+
+<MultipleChoice
+  markdown={`You need the number of customers who placed at least one order. Which is correct?
+
+- [o] \`COUNT(DISTINCT customer_id)\` on the orders table.
+  > Collapsing repeats counts each ordering customer exactly once.
+- \`COUNT(*)\` on the orders table.
+  > This counts orders, so a customer with five orders contributes five.
+- \`COUNT(customer_id)\` on the orders table.
+  > This counts non-null customer ids, still once per order.
+- \`COUNT(*)\` on the customers table.
+  > This counts all customers, including those who never ordered.
+
+The word "customers" in the question and the word "orders" in the table
+are doing different work, and the aggregate has to respect that.`}
+/>
+
+<MultipleChoice
+  markdown={`A segment breakdown shows percentages summing to 118%. What is the most likely cause?
+
+- A rounding error in the percentage calculation.
+  > Rounding cannot account for 18 percentage points.
+- The percentages were computed as ratios rather than proportions.
+  > Ratios and proportions differ by a factor of 100, not by 18%.
+- The denominator was computed on a filtered subset.
+  > This would shift the total but is a less common cause of this specific pattern.
+- [o] Entities belong to more than one segment and are counted in each.
+  > Overlapping membership inflates the sum above 100% and is the standard explanation.
+
+Percentages above 100% almost always mean the categories are not
+mutually exclusive.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`WHERE\` do that \`HAVING\` does not?
+
+- Apply only to the first table in a join.
+  > \`WHERE\` applies to the whole joined row set.
+- Filter using aggregate functions such as \`SUM\`.
+  > That is what \`HAVING\` does; \`WHERE\` cannot reference aggregates.
+- [o] Remove rows before grouping, so they never enter any aggregate.
+  > \`WHERE\` runs first, so excluded rows contribute nothing to sums or counts, while \`HAVING\` filters the groups afterwards.
+- Guarantee that no null values reach the result.
+  > Neither clause has any special null behavior of that kind.
+
+The distinction is timing: before grouping versus after.`}
+/>
+
+<MultipleChoice
+  markdown={`Which "conversion rate" denominator should you use?
+
+- Visitors who reached the checkout page, since it is the most precise.
+  > This is one reasonable definition among several, and precision does not make it the agreed one.
+- Unique visitors, since it avoids double counting.
+  > Avoiding duplication is desirable but does not settle which population belongs in the denominator.
+- Total sessions, since that is the standard definition.
+  > There is no single standard; different teams use different bases.
+- [o] Whichever one your organization's reporting convention specifies.
+  > The metric definition is an organizational fact that the data cannot supply and the model cannot know.
+
+Every candidate is defensible, which is exactly why the definition has
+to come from you.`}
+/>
+
+<MultipleChoice
+  markdown={`A "total customers" figure exceeds the number of rows in the customers table. What does this prove?
+
+- That the customers table is missing rows.
+  > A missing-rows explanation would make the table smaller than reality, not the aggregate larger than the table.
+- That null customer ids are being counted.
+  > Counting nulls would not push the total above the table's row count.
+- That new customers were added between the two queries.
+  > Possible in principle, but it cannot explain a sizeable gap.
+- [o] That something in the pipeline is counting at least one customer more than once.
+  > The count cannot legitimately exceed the population, so duplication has been introduced somewhere upstream.
+
+A count above a known ceiling is proof of duplication, not evidence
+about where it happened.`}
+/>
+
+<MultipleChoice
+  markdown={`Given \`SUM(amount)\` over a joined result, which upstream defect is invisible in the aggregation code itself?
+
+- [o] A fan-out that duplicated rows before the aggregation ran.
+  > The \`SUM\` is written correctly and operates on an already-corrupted row set, so reviewing it in isolation reveals nothing.
+- Filtering on the wrong status value.
+  > The filter appears in the same statement and can be inspected.
+- Grouping by the wrong column.
+  > The grouping key is right there in the same statement.
+- Using \`SUM\` where \`AVG\` was intended.
+  > This is visible in the aggregation code.
+
+Reviewing an aggregate in isolation cannot detect a problem created
+before the rows reached it.`}
+/>
+
+<MultipleChoice
+  markdown={`Your metric is "average revenue per user" and the model computed total revenue divided by users who made a purchase. What has changed?
+
+- The metric now measures median rather than mean behavior.
+  > No median is involved.
+- The metric becomes undefined when revenue is zero.
+  > Zero revenue divides fine; the denominator is what changed.
+- [o] It now measures revenue per *paying* user, a systematically higher number.
+  > Removing non-paying users from the denominator raises the result, often by a large factor.
+- Nothing; that is the standard definition.
+  > It is one definition, and it differs materially from the other common one.
+
+Two well-known metrics share almost the same name and differ only in
+who is in the denominator.`}
+/>

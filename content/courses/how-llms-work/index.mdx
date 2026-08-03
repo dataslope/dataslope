@@ -1,0 +1,114 @@
+---
+title: Welcome
+description: A hands-on tour of what a large language model actually does, built out of small programs you run in your browser.
+---
+
+Welcome to **How Large Language Models Work**. This course opens the
+box.
+
+Not all the way. Nobody can hand you a frontier model to inspect, and
+the parts that matter most are billions of numbers that resist
+explanation. But the *mechanisms* are learnable, and most of them can
+be built in twenty lines of Python. That is what we are going to do.
+
+## Why bother
+
+You can use these tools without knowing how they work, in the same way
+you can drive without knowing what a differential does. The reason to
+learn anyway is that the mechanisms explain the behavior you are
+already puzzled by:
+
+* **Why does it hallucinate?** Because it is optimizing for plausible
+  continuations, and a plausible continuation of a question is an
+  answer, whether or not one is available.
+* **Why does it fail at counting letters?** Because it never sees
+  letters. It sees tokens, and "strawberry" may be two of them.
+* **Why does output cost five times as much as input?** Because
+  producing tokens and reading tokens are computationally different
+  operations.
+* **Why does the same prompt give different answers?** Because the
+  final step samples from a distribution rather than picking a maximum.
+* **Why do benchmark numbers keep not predicting my results?** Because
+  most of them are saturated, contaminated, or measuring something
+  other than your task.
+
+Each of those has a mechanical explanation you can hold in your head,
+and by the end of this course you will hold all of them.
+
+## Try it right now
+
+Here is a real one. Language models do not see characters, so
+character-level questions are hard for them in a way that has nothing
+to do with intelligence. Run this to see the same effect from the
+other side:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A crude stand-in for how a tokenizer chops text into pieces.
+# Real vocabularies are learned; this one is hand-written to show
+# the shape of the problem.
+vocab = ["straw", "berry", "straw berry", " the", "count", "ing", " r"]
+
+text = "strawberry"
+pieces = ["straw", "berry"]
+
+print("What you see:  ", list(text))
+print("What it sees:  ", pieces)
+print()
+print("Number of 'r' characters you can count:", text.count("r"))
+print("Number of pieces the model can count: ", len(pieces))
+`,
+    },
+  ]}
+/>
+
+The model is asked "how many r's are in strawberry" and is looking at
+two opaque symbols. It answers from what it has read *about* the word,
+not from inspecting it, because inspecting it is not an operation
+available to it.
+
+## What you will build
+
+Everything in this course runs in your browser. No API key, no
+account, no cost.
+
+* A **byte-pair encoding tokenizer** from scratch, trained on text you
+  provide.
+* An **embedding similarity** search, to see what "meaning as
+  geometry" actually means.
+* A **sampler** with temperature and top-p, so you can watch
+  randomness enter the system.
+* A **cost calculator** that prices a real conversation, including
+  what caching and batching do to the bill.
+* A small **evaluation harness**, because the last chapter's argument
+  is that you should stop reading leaderboards and measure your own
+  task.
+
+## What you need
+
+Comfort reading basic Python: loops, dictionaries, functions. No
+machine learning background, no linear algebra beyond "a vector is a
+list of numbers", and no calculus at all.
+
+<Callout type="info" title="What this course deliberately skips">
+There is no backpropagation, no training loop, and no gradient
+descent. This is a course about what a *trained* model does when you
+send it a prompt, which is the part that affects your daily work. If
+you want the training side afterwards,
+[Machine Learning with scikit-learn](/courses/machine-learning-scikit-learn)
+is the natural next step.
+</Callout>
+
+## A note on numbers
+
+Prices, model names, context sizes, and benchmark scores in this
+course are marked with **August 2026** where they appear. They will
+age. The *structure* around them (output costing several times input,
+cached input costing about a tenth, benchmarks saturating and being
+replaced) has held for years and is what the exercises actually teach.
+
+Let us start with the single sentence that describes what the whole
+system does.

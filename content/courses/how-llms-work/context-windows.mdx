@@ -1,0 +1,245 @@
+---
+title: Context Windows
+description: What fits, what falls out, and why a million-token window does not mean a million tokens of attention.
+---
+
+The **context window** is the maximum number of tokens the model can
+process in one request: your prompt, the conversation history, any
+documents, and the output, all counted together.
+
+As of August 2026, frontier models advertise windows around one
+million tokens, with output capped separately at a much lower figure
+(commonly around 128,000). Those are two distinct limits and it is
+worth keeping them apart.
+
+## The window is a hard boundary
+
+Content outside it does not degrade. It is not there. Whatever the
+system around the model does about that (reject the request, drop the
+oldest turns, summarize) happens outside the model, and the model has
+no way to know something was removed.
+
+This is why a long chat can quietly forget its own beginning. The
+interface trimmed the history to fit, and no signal about the
+trimming reaches the model or you.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `WINDOW = 200_000     # tokens the model can process at once
+MAX_OUTPUT = 128_000 # separate cap on generated tokens
+
+system = 1_500
+document = 180_000
+history = 12_000
+question = 200
+
+used = system + document + history + question
+available_for_output = min(WINDOW - used, MAX_OUTPUT)
+
+print(f"system prompt : {system:>8,}")
+print(f"document      : {document:>8,}")
+print(f"history       : {history:>8,}")
+print(f"question      : {question:>8,}")
+print(f"{'-' * 26}")
+print(f"input total   : {used:>8,} / {WINDOW:,}")
+print(f"room for output: {available_for_output:>7,}")
+
+if available_for_output < 2000:
+    print()
+    print("Not enough room for a useful answer. Shrink the input.")
+`,
+    },
+  ]}
+/>
+
+## Filling the window is not free
+
+Two costs, both real.
+
+**Money.** You pay for every input token on every turn. A 500,000-token
+document in a ten-turn conversation is five million billed input
+tokens unless caching intervenes.
+
+**Attention quality.** This is the one people underestimate.
+Performance on retrieving a specific fact is not uniform across
+position. The well-documented pattern is often called
+**"lost in the middle"**: information at the very start and the very
+end of a long context is recalled reliably, while information buried
+in the middle is recalled noticeably less well.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Illustrative shape of the "lost in the middle" effect.
+# Numbers are stylized; the U-shape is the well-replicated finding.
+positions = ["start", "10%", "25%", "50%", "75%", "90%", "end"]
+recall    = [0.97,    0.92,  0.81,  0.68,  0.79,  0.90,  0.96]
+
+print("Fact recall by position in a long context:")
+for pos, r in zip(positions, recall):
+    print(f"  {pos:>6}  {r:.2f}  {'#' * int(r * 40)}")
+
+print()
+print("Practical rule: put the important material at the beginning")
+print("or the end, never buried in the middle.")
+`,
+    },
+  ]}
+/>
+
+The practical consequence: **a bigger window is permission, not a
+recommendation.** Pasting an entire 800-page manual because it fits is
+usually worse than pasting the three relevant chapters, on both cost
+and accuracy.
+
+## Why long context was hard to build
+
+Recall from the attention chapter that every token attends to every
+other token, so cost scales with the square of the length. Going from
+8,000 to 1,000,000 tokens is a 125-fold increase in length and roughly
+15,000-fold in naive attention work.
+
+Getting there required a stack of engineering (attention
+approximations, better memory layouts, positional schemes that
+extrapolate) rather than one idea. That history is why context length
+was the headline capability metric for several years.
+
+<Callout type="info" title="Retrieval versus long context">
+With million-token windows available, why bother with retrieval? Cost
+and accuracy. Retrieving the five relevant pages and sending 3,000
+tokens is cheaper than sending 500,000, and the model attends better to
+a short, relevant context than to a long one containing the same facts.
+Long context does not make retrieval obsolete; it makes it less
+mandatory.
+</Callout>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`What counts toward the context window?
+
+- Only the user's most recent message.
+  > History must be included for the model to have any continuity.
+- [o] The system prompt, history, documents, question, and generated output together.
+  > Everything the model processes in one request shares the same budget.
+- Only the input, with output counted separately and without limit.
+  > Output has its own cap and also occupies the window.
+- Only tokens from the current session, excluding pasted documents.
+  > Pasted documents are among the largest contributors.
+
+One shared budget covers everything in the request.`}
+/>
+
+<MultipleChoice
+  markdown={`A chat conversation "forgets" its opening after many turns. What happened?
+
+- The model's memory decayed over time.
+  > The model has no memory that could decay.
+- [o] The interface trimmed the earliest history to fit the window.
+  > Content removed before the request never reaches the model, and nothing signals the removal.
+- The oldest tokens were compressed into a summary by the model.
+  > Any summarization is done by the surrounding application, not the model.
+- The model chose to deprioritize older content.
+  > No prioritization decision is made by the model.
+
+Trimming happens outside the model, silently, which is why it is so
+disorienting.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the "lost in the middle" effect?
+
+- The model processes the middle of the context last.
+  > Processing is not sequential in that way.
+- [o] Facts placed mid-context are recalled less reliably than those at either end.
+  > Recall follows a U-shape across position, strong at the start and end and weaker in between.
+- Tokens in the middle of the window are dropped to save computation.
+  > No tokens are dropped.
+- Attention weights are zero for middle positions.
+  > Weights are non-zero throughout; the effect is a degradation rather than an absence.
+
+The practical response is to place important material at the beginning
+or the end.`}
+/>
+
+<MultipleChoice
+  markdown={`Why prefer retrieval over pasting an entire document, when both fit?
+
+- Because pasted documents are not tokenized correctly.
+  > Tokenization is the same either way.
+- [o] Because a short relevant context is cheaper and better attended to.
+  > You pay for fewer tokens and avoid burying the relevant passage in irrelevant material.
+- Because long documents exceed the output token limit.
+  > The output limit applies to generated text, not to input.
+- Because retrieval guarantees the correct passage is found.
+  > Retrieval can miss, which is one of its weaknesses.
+
+Long context removes the necessity of retrieval without removing its
+advantages.`}
+/>
+
+<MultipleChoice
+  markdown={`Why were long context windows technically difficult?
+
+- Because embeddings grow with sequence length.
+  > Embedding size per token is fixed.
+- [o] Because attention cost grows with the square of the sequence length.
+  > All-pairs comparison means a 125-fold length increase implies roughly 15,000 times the naive attention work.
+- Because tokenizers cannot handle long inputs.
+  > Tokenization scales linearly and is not the bottleneck.
+- Because vocabulary size must grow with context length.
+  > The two are unrelated.
+
+The quadratic term is what had to be engineered around.`}
+/>
+
+<MultipleChoice
+  markdown={`Are the context window and the output limit the same number?
+
+- Yes, output is simply the second half of the window.
+  > No such partition exists.
+- Yes, both refer to the total tokens processed.
+  > They are separate limits with different values.
+- No, the output limit is always larger than the window.
+  > Output is the smaller of the two.
+- [o] No, output has its own cap well below the total window size.
+  > A model may accept a million input tokens while capping generation at a much lower figure.
+
+Confusing them leads to requests that fit the window but cannot produce
+the answer length you expected.`}
+/>
+
+<MultipleChoice
+  markdown={`Your input uses 198,000 of a 200,000-token window. What is the problem?
+
+- Attention quality collapses above 90% utilization.
+  > There is no such threshold effect.
+- [o] There is almost no room left for the model to generate an answer.
+  > Output shares the same budget, so a 2,000-token allowance truncates any substantial response.
+- The tokenizer will re-encode the input at a lower resolution.
+  > No such re-encoding exists.
+- The request will be rejected for exceeding the limit.
+  > It is under the limit and will be accepted.
+
+Leaving room for the answer is part of budgeting the window.`}
+/>
+
+<MultipleChoice
+  markdown={`"A bigger window is permission, not a recommendation." What does this mean?
+
+- Larger windows require explicit permission from the provider.
+  > No permission process is involved.
+- [o] The ability to send more does not mean sending more improves results.
+  > Filling the window costs money on every turn and dilutes attention across irrelevant material.
+- Larger windows are only available on higher pricing tiers.
+  > Tier availability is a separate commercial question.
+- Larger windows should always be filled to maximize context.
+  > This is the belief the phrase is arguing against.
+
+Capacity is an option to use judiciously, not a target to hit.`}
+/>

@@ -1,0 +1,254 @@
+---
+title: Controlling Cost
+description: Six levers, ordered by how much they typically save, with the mechanism behind each one.
+---
+
+Now that you can measure cost, here is what to do about it. The levers
+are ordered by typical impact, which is not the order people usually
+try them in.
+
+## 1. Route to the cheapest model that passes
+
+The spread between tiers is roughly 25x. No amount of prompt trimming
+competes with that.
+
+The mistake is choosing one model for everything, usually the best one,
+because it is the one that passed the hardest test case. Most
+production traffic is not the hardest test case.
+
+**Route by task.** Classification, extraction, formatting, and
+routing itself go to a small model. Reserve the expensive tier for
+work that genuinely needs it, and measure which is which rather than
+guessing.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `PRICE = {"lite": (0.25, 1.50), "haiku": (1.00, 5.00),
+         "sonnet": (3.00, 15.00), "opus": (5.00, 25.00)}
+
+def month(model, in_tok, out_tok, per_day):
+    pin, pout = PRICE[model]
+    return (in_tok / 1e6 * pin + out_tok / 1e6 * pout) * per_day * 30
+
+# 50,000 classifications a day, 600 tokens in, 15 out.
+print("Same classification workload on each tier:")
+for m in PRICE:
+    print(f"  {m:>7}: \${month(m, 600, 15, 50_000):>9,.2f} / month")
+
+everything_on_opus = month("opus", 600, 15, 50_000)
+routed = month("lite", 600, 15, 50_000)
+print()
+print(f"Saving from routing this one workload: \${everything_on_opus - routed:,.2f}/month")
+`,
+    },
+  ]}
+/>
+
+## 2. Cache the stable prefix
+
+If a long system prompt, schema, or document repeats across requests,
+caching cuts it to about a tenth.
+
+The requirement is that the prefix be **byte-identical**. That means:
+
+* Put stable content first, volatile content last.
+* No timestamps, request ids, or user names near the top.
+* Serialize any structured content deterministically. An unsorted
+  dictionary is a different prefix every time.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import json
+
+config = {"role": "analyst", "dataset": "orders", "version": 3}
+
+# Unsorted serialization: key order can vary between runs and
+# between processes, which silently breaks the cache.
+unstable = json.dumps(config)
+
+# Deterministic: same bytes every time.
+stable = json.dumps(config, sort_keys=True)
+
+print("unstable:", unstable)
+print("stable:  ", stable)
+print()
+print("Same content, and only one of them reliably produces")
+print("an identical prefix on every request.")
+print()
+
+bad_prompt = f"Session started 2026-08-03T14:22:01Z\\n\\n{'SCHEMA ' * 10}"
+good_prompt = f"{'SCHEMA ' * 10}\\n\\nSession started 2026-08-03T14:22:01Z"
+print("Timestamp first  -> nothing after it can be cached")
+print("Timestamp last   -> everything before it can be cached")
+`,
+    },
+  ]}
+/>
+
+## 3. Cut output, not input
+
+Output costs 5 to 6 times more per token, so a token saved on the
+output side is worth five or six saved on the input side.
+
+* Ask for the answer only, not the explanation, when you do not need
+  the explanation.
+* Use structured output so the model returns fields rather than prose
+  wrapping fields.
+* Cap `max_tokens` at what you actually need. This also bounds the
+  worst case when something goes wrong.
+
+## 4. Lower the reasoning effort
+
+Thinking tokens are output tokens. If your task does not have
+verifiable intermediate structure, reasoning effort is pure cost. Set
+it to the lowest level that passes your evaluation.
+
+## 5. Batch anything not interactive
+
+Roughly 50% off for accepting asynchronous processing. Nightly
+classification, backfills, bulk enrichment, and evaluation runs are all
+natural fits. Interactive traffic is not.
+
+## 6. Then optimize the prompt
+
+Worth doing, and last on the list because it usually saves the least.
+An exception: if you are pasting a large document on every turn when
+three paragraphs would do, that is a retrieval problem rather than a
+prompt-length problem, and it belongs at the top of this list.
+
+<Callout type="info" title="Measure before optimizing">
+Instrument token counts per workload before changing anything. The
+monthly-estimate exercise in the previous chapter usually surprises
+people: the line dominating the bill is rarely the one that felt
+expensive.
+</Callout>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Which lever typically saves the most?
+
+- [o] Routing suitable traffic to a cheaper model tier.
+  > The roughly 25x spread between tiers dominates every other adjustment.
+- Shortening prompts by removing redundant instructions.
+  > Real but small next to the alternatives.
+- Switching from streaming to non-streaming responses.
+  > Delivery mode does not change token pricing.
+- Reducing the number of conversation turns.
+  > Helpful for long threads, and it applies to fewer workloads.
+
+Model selection is the first question, not the last.`}
+/>
+
+<MultipleChoice
+  markdown={`Why must a cached prefix be byte-identical?
+
+- Because tokenization is non-deterministic for varying text.
+  > Tokenization is deterministic.
+- Because the cache stores a hash of the full request.
+  > It matches on the prefix rather than the whole request.
+- [o] Because matching is on the exact prefix, so any change invalidates it.
+  > A single differing character means the stored processed state cannot be reused from that point onward.
+- Because providers charge per unique cache entry.
+  > Entries are not billed individually.
+
+Exact matching is what makes deterministic serialization a cost issue.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is a token saved on output worth more than one saved on input?
+
+- Input tokens are often cached and therefore already discounted.
+  > Caching applies only to repeated prefixes and does not explain the general rule.
+- Output tokens are counted twice by most providers.
+  > They are counted once.
+- [o] Output is priced at 5 to 6 times the input rate.
+  > The ratio means one output token saved equals five or six input tokens saved.
+- Output tokens are larger on average.
+  > Token size does not differ by side.
+
+The pricing ratio directly sets the relative value of each saving.`}
+/>
+
+<MultipleChoice
+  markdown={`Which workload is a poor fit for batch processing?
+
+- Running an evaluation suite over 10,000 test cases.
+  > Evaluation runs are asynchronous by nature.
+- [o] A chat assistant responding to a user in real time.
+  > Batch processing is measured in hours, which is incompatible with an interactive response.
+- Nightly classification of the day's support tickets.
+  > Latency-tolerant and high volume, an ideal fit.
+- Backfilling summaries for an archive of documents.
+  > No user is waiting, so batch suits it well.
+
+Batch trades latency for price, so it works wherever nobody is waiting.`}
+/>
+
+<MultipleChoice
+  markdown={`\`json.dumps(config)\` without \`sort_keys=True\` can break caching. Why?
+
+- It produces invalid JSON in some Python versions.
+  > The output is valid JSON either way.
+- [o] Key order can vary, producing different bytes for identical content.
+  > Different bytes mean a different prefix, so the cache misses despite the content being unchanged.
+- It escapes unicode characters inconsistently.
+  > Escaping behavior is consistent for a given call.
+- It adds a timestamp to the serialized output.
+  > No timestamp is added.
+
+Deterministic serialization is a cost optimization as well as a
+correctness one.`}
+/>
+
+<MultipleChoice
+  markdown={`When is reasoning effort pure cost?
+
+- [o] When the task has no verifiable intermediate structure to check.
+  > Without checkable intermediate steps, additional thinking tokens buy nothing and are billed at the output rate.
+- When the model is running on a cheaper tier.
+  > Tier does not determine whether reasoning helps.
+- When the output is shorter than the input.
+  > Relative lengths are irrelevant.
+- When caching is enabled for the request.
+  > Caching affects input, not thinking output.
+
+Reasoning pays where self-checking is meaningful and nowhere else.`}
+/>
+
+<MultipleChoice
+  markdown={`You paste an entire 200-page manual on every request when three paragraphs would do. What kind of problem is this?
+
+- A caching problem, solved by making the prefix stable.
+  > Caching helps if the manual is identical every time, and it is still paying for content you do not need.
+- A prompt-length problem, solved by more concise instructions.
+  > The instructions are not the bulk.
+- A model selection problem, solved by a larger context window.
+  > A larger window lets you keep making the same mistake more cheaply per token.
+- [o] A retrieval problem, and it belongs near the top of the priority list.
+  > Sending only the relevant passages cuts input by orders of magnitude, which outranks ordinary prompt trimming.
+
+Sending less of the right thing beats sending all of it efficiently.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does capping \`max_tokens\` help beyond the average case?
+
+- It enables caching of the response.
+  > Response caching is unrelated to the cap.
+- It causes the model to write more concisely.
+  > It truncates rather than improving concision.
+- It reduces the input token count proportionally.
+  > Input is unaffected.
+- [o] It bounds the worst case when generation goes wrong.
+  > A runaway or repetitive generation is capped rather than running to the model's full output limit at the output rate.
+
+The average saving is modest; the tail-risk protection is the real
+benefit.`}
+/>

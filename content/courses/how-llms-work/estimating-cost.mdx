@@ -1,0 +1,307 @@
+---
+title: Estimating Cost
+description: Build a calculator that prices a real workload, including the quadratic growth that makes conversations expensive.
+---
+
+Cost surprises come almost entirely from two places: the conversation
+resend, and forgetting that thinking tokens are output tokens. Both are
+easy to model.
+
+## A single request
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `PRICES = {
+    "opus":   {"in": 5.00, "out": 25.00, "cached": 0.50},
+    "sonnet": {"in": 3.00, "out": 15.00, "cached": 0.30},
+    "haiku":  {"in": 1.00, "out":  5.00, "cached": 0.10},
+    "lite":   {"in": 0.25, "out":  1.50, "cached": 0.025},
+}
+
+def cost(model, input_tokens=0, output_tokens=0, cached_tokens=0):
+    """USD for one request. Cached tokens are billed instead of, not
+    in addition to, the same tokens at the input rate."""
+    p = PRICES[model]
+    return (input_tokens / 1e6 * p["in"]
+            + output_tokens / 1e6 * p["out"]
+            + cached_tokens / 1e6 * p["cached"])`,
+      starterCode: `# 'cost' and 'PRICES' come from the initialization code above.
+
+# One support-bot request: 1,200-token prompt, 300-token answer.
+for model in PRICES:
+    c = cost(model, input_tokens=1200, output_tokens=300)
+    print(f"{model:>7}: \${c:.6f} per request  "
+          f"= \${c * 100_000:,.2f} per 100k requests")
+
+print()
+print("Same task, same tokens, 20x cost spread across tiers.")
+`,
+    },
+  ]}
+/>
+
+Note the second column. Per-request costs look negligible until you
+multiply by production volume, at which point the tier choice becomes a
+budget decision rather than a technical one.
+
+## A conversation, with the resend
+
+This is where estimates go wrong. Every turn resends everything.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `PRICES = {
+    "opus":   {"in": 5.00, "out": 25.00, "cached": 0.50},
+    "sonnet": {"in": 3.00, "out": 15.00, "cached": 0.30},
+    "haiku":  {"in": 1.00, "out":  5.00, "cached": 0.10},
+    "lite":   {"in": 0.25, "out":  1.50, "cached": 0.025},
+}
+
+def conversation_cost(model, turns, system=2000, user=150, reply=400, cached=False):
+    p = PRICES[model]
+    total, history = 0.0, system
+    for _ in range(turns):
+        history += user
+        if cached:
+            # The stable system prefix is cached; the rest is fresh.
+            total += (system / 1e6 * p["cached"]
+                      + (history - system) / 1e6 * p["in"])
+        else:
+            total += history / 1e6 * p["in"]
+        total += reply / 1e6 * p["out"]
+        history += reply
+    return total`,
+      starterCode: `# 'conversation_cost' is defined above.
+print(f"{'turns':>6} {'no cache':>10} {'cached':>10} {'saved':>8}")
+for turns in [1, 5, 10, 20, 40]:
+    plain = conversation_cost("sonnet", turns)
+    cached = conversation_cost("sonnet", turns, cached=True)
+    print(f"{turns:>6} \${plain:>9.4f} \${cached:>9.4f} {1 - cached/plain:>7.0%}")
+
+print()
+print("Cost grows faster than turn count, because each turn")
+print("resends everything before it.")
+`,
+    },
+  ]}
+/>
+
+Doubling the turns more than doubles the cost. That is the quadratic
+term, and it is why a 40-turn conversation can cost more than eight
+separate 5-turn ones covering the same ground.
+
+## Thinking tokens
+
+Reasoning output is billed as output, at the output rate, and it is
+usually several times longer than the visible answer.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `PRICES = {"opus": {"in": 5.00, "out": 25.00}, "sonnet": {"in": 3.00, "out": 15.00}}
+
+def request_cost(model, in_tok, visible_out, thinking_out=0):
+    p = PRICES[model]
+    return in_tok / 1e6 * p["in"] + (visible_out + thinking_out) / 1e6 * p["out"]`,
+      starterCode: `IN, VISIBLE = 2000, 400
+
+print(f"{'thinking':>9} {'cost':>10} {'vs none':>9}")
+base = request_cost("sonnet", IN, VISIBLE, 0)
+for thinking in [0, 500, 2000, 8000, 20000]:
+    c = request_cost("sonnet", IN, VISIBLE, thinking)
+    print(f"{thinking:>9} \${c:>9.5f} {c / base:>8.1f}x")
+
+print()
+print("The visible answer never changed length.")
+print("Reasoning effort is the whole difference.")
+`,
+    },
+  ]}
+/>
+
+## Putting it together: a monthly estimate
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `PRICES = {
+    "opus":   {"in": 5.00, "out": 25.00, "cached": 0.50},
+    "sonnet": {"in": 3.00, "out": 15.00, "cached": 0.30},
+    "haiku":  {"in": 1.00, "out":  5.00, "cached": 0.10},
+    "lite":   {"in": 0.25, "out":  1.50, "cached": 0.025},
+}
+
+def monthly(workloads):
+    total = 0.0
+    rows = []
+    for name, w in workloads.items():
+        p = PRICES[w["model"]]
+        per = (w["in"] / 1e6 * p["in"] + w["out"] / 1e6 * p["out"])
+        month = per * w["per_day"] * 30
+        rows.append((name, w["model"], per, month))
+        total += month
+    return rows, total`,
+      starterCode: `workloads = {
+    "ticket classification": {"model": "lite",   "in": 800,   "out": 20,   "per_day": 40_000},
+    "support replies":       {"model": "haiku",  "in": 2_000, "out": 350,  "per_day": 6_000},
+    "document summaries":    {"model": "sonnet", "in": 12_000,"out": 800,  "per_day": 900},
+    "code review":           {"model": "opus",   "in": 20_000,"out": 2_000,"per_day": 200},
+}
+
+rows, total = monthly(workloads)
+print(f"{'workload':<24}{'model':<9}{'per req':>10}{'per month':>13}")
+for name, model, per, month in rows:
+    print(f"{name:<24}{model:<9}\${per:>9.5f}\${month:>12,.2f}")
+print(f"{'-' * 56}")
+print(f"{'TOTAL':<33}\${total:>12,.2f} / month")
+
+print()
+print("Try moving 'document summaries' to haiku, or 'code review' to sonnet,")
+print("and watch which line actually moves the total.")
+`,
+    },
+  ]}
+/>
+
+Run it, then change one model assignment. The exercise teaches
+something no price list does: which workload dominates your bill is
+usually not the one you would guess, because volume and token count
+multiply.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Why does doubling conversation turns more than double the cost?
+
+- Because caching is disabled after a certain number of turns.
+  > Caching remains available throughout.
+- [o] Because each turn resends the entire preceding history.
+  > The bill is the sum of all prefixes, which grows quadratically with turn count.
+- Because later turns produce longer replies.
+  > Reply length does not systematically grow.
+- Because per-token prices rise with conversation length.
+  > Pricing is flat per token.
+
+Statelessness makes the total the sum of every prefix rather than the
+final length.`}
+/>
+
+<MultipleChoice
+  markdown={`In the thinking-token exercise, what changed as the budget rose?
+
+- The per-token output rate increased.
+  > The rate stayed fixed.
+- [o] Only the billed output volume, since thinking tokens are output.
+  > The user-visible result was identical while the cost multiplied several times over.
+- The visible answer got longer and more detailed.
+  > The visible output was held constant at 400 tokens throughout.
+- The input cost rose in proportion.
+  > Input was unchanged.
+
+Reasoning effort is invisible in the response and very visible on the
+invoice.`}
+/>
+
+<MultipleChoice
+  markdown={`A workload sends 40,000 requests per day at 800 input tokens each, on a $0.25/MTok tier. Roughly what is the monthly input cost?
+
+- [o] About $240.
+  > 40,000 times 800 is 32 million tokens per day, or 960 million per month, which at $0.25 per million is around $240.
+- About $2.
+  > This is off by roughly two orders of magnitude.
+- About $24.
+  > Closer, and still an order of magnitude low.
+- About $2,400.
+  > This would require ten times the volume or ten times the rate.
+
+High volume at a low rate still adds up, which is why the cheap tier
+line often dominates a bill.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does caching save less on turn 1 than on turn 20?
+
+- Because early turns use fewer output tokens.
+  > Output volume is roughly constant per turn.
+- [o] Because the cached prefix is a larger share of a long context.
+  > At turn 1 the system prompt is most of the request and the write costs slightly more than input; by turn 20 there is far more repeated content to discount.
+- Because cache discounts increase with usage volume.
+  > The discount rate is fixed.
+- Because caches take several turns to warm up.
+  > The cache is written on the first request.
+
+Caching pays off in proportion to how much content is being repeated.`}
+/>
+
+<MultipleChoice
+  markdown={`In the monthly estimate, which workload is most likely to dominate?
+
+- [o] Whichever has the largest product of volume, tokens, and rate.
+  > Cost is the multiplication of all three, so no single factor determines the answer on its own.
+- The one with the most output tokens per request.
+  > Output rate is higher per token, but a low-volume workload can still be a small line.
+- The one using the most expensive model.
+  > Model tier matters, and volume can easily outweigh it.
+- The one with the longest prompts.
+  > Prompt length matters, and again volume can outweigh it.
+
+The whole point of the exercise is that the dominant line is rarely the
+one intuition picks.`}
+/>
+
+<MultipleChoice
+  markdown={`Why are cached tokens billed *instead of* rather than *in addition to* input tokens?
+
+- Because caching is a separate subscription product.
+  > It is metered per request rather than subscribed to.
+- Because cached tokens are not processed at all.
+  > They are processed; the stored state is retrieved rather than recomputed.
+- Because the cache rate includes the input rate already.
+  > The cache rate is roughly a tenth of input, not a superset of it.
+- [o] Because they represent the same tokens at a discounted rate.
+  > A cached prefix token is charged once, at the cache rate, not at both rates.
+
+Cached input is a price for the same tokens, not an extra line item.`}
+/>
+
+<MultipleChoice
+  markdown={`Your per-request cost is $0.00004 and you serve 2 million requests a month. What is the monthly cost?
+
+- [o] About $80.
+  > Two million multiplied by $0.00004 is $80.
+- About $800.
+  > This would need ten times the volume.
+- About $8,000.
+  > This is off by two orders of magnitude.
+- About $8.
+  > This underestimates by an order of magnitude.
+
+Negligible-looking per-request costs become real budget lines at
+production volume, which is why the multiplication has to be done
+explicitly.`}
+/>
+
+<MultipleChoice
+  markdown={`Which estimate error is most common in practice?
+
+- Overestimating the number of output tokens.
+  > Output is usually estimated reasonably well.
+- Forgetting that input tokens are billed at all.
+  > Input billing is well known.
+- [o] Pricing a conversation as its final length rather than the sum of its prefixes.
+  > This understates a long conversation by a factor of several, and it is the single most frequent mistake.
+- Using the wrong currency conversion.
+  > Rarely the source of a material error.
+
+The resend is invisible in the interface and dominant in the arithmetic.`}
+/>

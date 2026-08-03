@@ -1,0 +1,154 @@
+---
+title: Next Steps
+description: The one-page summary of everything in this course, and where to go from here.
+---
+
+You now have the pieces. This page compresses them into something you
+can keep next to your keyboard, and points at what to learn next.
+
+## The whole course on one page
+
+**Before you ask**
+
+1. Paste the schema: column names and types.
+2. State the grain: what one row represents.
+3. State the quirks: test accounts, backfills, units, what null means.
+4. State what a correct answer must contain.
+
+**When you ask**
+
+5. Request steps with intermediate variables, not one-liners.
+6. Request row counts printed after each filter.
+7. Request the assumptions it could not verify.
+8. Ask for one stage at a time.
+
+**When you get an answer**
+
+9. Check the shape: is the row count what you expected?
+10. Check the magnitude against your prior.
+11. Check that the parts sum to the whole.
+12. Spot-check one row by hand from the raw data.
+
+**Before it leaves your screen**
+
+13. Every identifier exists and means what you think.
+14. Every literal in a filter exists in the data.
+15. Joins: grain checked, type checked, row count explained.
+16. Aggregates: right denominator, right `COUNT` variant, no double counting.
+
+## The five failure modes
+
+| Mode | Signature |
+| --- | --- |
+| Invented columns | Empty result, zero total, or a column you do not recognize |
+| Broken joins | Row count changed unexpectedly across a join |
+| Aggregation traps | Parts do not sum to the whole, percentages above 100% |
+| Silent nulls and types | Grouped total below column total, text sorting as "10" then "9" |
+| Confidence without accuracy | A simple-looking answer nobody checked |
+
+## The one idea to keep
+
+If you remember nothing else:
+
+> **Delegate the tasks you can check faster than you could do them.
+> Do the rest yourself.**
+
+Every recommendation in this course follows from that. It is also the
+rule that will still apply when the model names on the tool-landscape
+page look quaint.
+
+## Where to go next
+
+* **[How Large Language Models Work](/courses/how-llms-work)** is the
+  companion to this course. It explains *why* these failure modes
+  exist rather than just cataloguing them, and covers tokens, context,
+  pricing, and benchmarks with runnable code.
+* **[Data Analysis with Python Pandas](/courses/data-analysis-python-pandas)**
+  if the Pandas review chapter felt like it was moving quickly.
+* **[SQL for Data Analysis with DuckDB](/courses/sql-analytics-duckdb)**
+  if the SQL review chapter did.
+* **[Statistics for Data Science with Python](/courses/statistics-for-data-science-python)**
+  is the direct answer to the statistical-inference risk: the way to
+  stop delegating a judgment you cannot check is to be able to make it
+  yourself.
+
+## Final concept check
+
+<MultipleChoice
+  markdown={`Which single principle generates most of this course's advice?
+
+- Always use the most capable available model.
+  > Model capability barely features in the recommendations here.
+- Never use AI assistance for production analysis.
+  > The course recommends assistance for a large category of work.
+- Always request code rather than explanations.
+  > Explanations are useful for orientation and hypothesis generation.
+- [o] Delegate what you can check faster than you could produce it.
+  > The verification-to-production cost ratio determines both what to delegate and how much checking each delegation needs.
+
+Nearly every specific recommendation is a consequence of this one
+ratio.`}
+/>
+
+<MultipleChoice
+  markdown={`A grouped total is lower than the ungrouped total of the same column. Which failure mode is this?
+
+- [o] Silent null handling in the grouping key.
+  > Rows with a null key are dropped from grouped output while still counting toward the column total.
+- Broken joins.
+  > A join defect usually inflates rather than reduces the total.
+- Confidence without accuracy.
+  > That describes why the discrepancy goes unnoticed, not what caused it.
+- Invented columns.
+  > A wrong column name produces an error or an unrelated number, not a shortfall.
+
+The shortfall is the diagnostic signature of dropped null keys.`}
+/>
+
+<MultipleChoice
+  markdown={`You have thirty seconds to check one generated result. What do you do?
+
+- [o] Check the row count and the order of magnitude.
+  > These two are the fastest checks available and catch the largest, most consequential errors.
+- Run the query a second time to confirm it is stable.
+  > Reproducibility is not correctness.
+- Ask the model whether it is confident.
+  > Self-assessment is uncalibrated and returns nothing checkable.
+- Reread the code carefully from top to bottom.
+  > Rereading uses the same assumptions that produced the code.
+
+Shape and magnitude cost seconds and catch the errors big enough to
+matter.`}
+/>
+
+<MultipleChoice
+  markdown={`Why will this course's advice outlast the specific tools it names?
+
+- Because the vendors have committed to a stable feature set.
+  > No such commitment exists, and features change constantly.
+- [o] Because it is built on the verification economics rather than on tool behavior.
+  > The cost ratio between checking and producing determines the right approach regardless of which model is current.
+- Because the failure modes are permanent properties of all software.
+  > They are properties of generative systems specifically, not of software generally.
+- Because model capabilities have stopped improving.
+  > Capabilities continue to advance.
+
+Tools change. The question of whether you can afford to check the
+answer does not.`}
+/>
+
+<MultipleChoice
+  markdown={`Which next course most directly addresses the statistical-inference risk raised earlier?
+
+- Data Analysis with Python Pandas.
+  > It covers manipulation and cleaning rather than inference.
+- [o] Statistics for Data Science with Python.
+  > The way to stop delegating a judgment you cannot verify is to become able to make it yourself.
+- SQL for Data Analysis with DuckDB.
+  > It covers querying rather than statistical judgment.
+- How Large Language Models Work.
+  > It explains model behavior, which is a different gap.
+
+The risk came from not being able to check the choice of test, and the
+fix is being able to make that choice.`}
+/>

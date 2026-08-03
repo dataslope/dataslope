@@ -1,0 +1,339 @@
+---
+title: Building a Tokenizer
+description: Byte-pair encoding, implemented from scratch in about forty lines, trained on text you supply.
+---
+
+The vocabulary in the previous chapter was hand-written. Real ones are
+*learned*, by an algorithm called **byte-pair encoding** (BPE) that is
+simple enough to build here in full.
+
+## The algorithm
+
+Start with every word split into individual characters. Then repeat:
+
+1. Count every adjacent pair of symbols across the whole corpus.
+2. Find the most frequent pair.
+3. Merge it into a single new symbol everywhere it appears.
+4. Record the merge.
+
+Stop when you have as many merges as you want vocabulary entries. The
+list of merges *is* the tokenizer: to tokenize new text, split it into
+characters and replay the merges in order.
+
+The elegance is that frequency does all the work. Common sequences get
+merged early and become single tokens; rare ones never merge and stay
+fragmented. That is exactly the behavior we observed in the previous
+chapter, and nobody designed it.
+
+## Counting the pairs
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from collections import Counter
+
+corpus = "low low low low low lower lower newest newest newest widest widest"
+
+# Step 0: word frequencies, and each word split into characters.
+# "</w>" marks a word boundary, so "low" at the end of a word can
+# merge differently from "low" inside "lower".
+freqs = Counter(corpus.split())
+splits = {word: list(word) + ["</w>"] for word in freqs}
+
+for word, syms in splits.items():
+    print(f"{word:>8} (x{freqs[word]}) -> {syms}")
+
+# Step 1: count adjacent pairs, weighted by word frequency.
+pairs = Counter()
+for word, syms in splits.items():
+    for i in range(len(syms) - 1):
+        pairs[(syms[i], syms[i + 1])] += freqs[word]
+
+print()
+print("Most common adjacent pairs:")
+for pair, n in pairs.most_common(5):
+    print(f"  {pair} seen {n}x")
+`,
+    },
+  ]}
+/>
+
+## The full training loop
+
+Now the merges. Watch the order they come out in.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from collections import Counter
+
+corpus = "low low low low low lower lower newest newest newest widest widest"
+
+def pair_counts(splits, freqs):
+    pairs = Counter()
+    for word, syms in splits.items():
+        for i in range(len(syms) - 1):
+            pairs[(syms[i], syms[i + 1])] += freqs[word]
+    return pairs
+
+def merge_pair(pair, splits):
+    a, b = pair
+    out = {}
+    for word, syms in splits.items():
+        new, i = [], 0
+        while i < len(syms):
+            if i < len(syms) - 1 and syms[i] == a and syms[i + 1] == b:
+                new.append(a + b)
+                i += 2
+            else:
+                new.append(syms[i])
+                i += 1
+        out[word] = new
+    return out
+
+freqs = Counter(corpus.split())
+splits = {w: list(w) + ["</w>"] for w in freqs}
+merges = []
+
+for step in range(10):
+    pairs = pair_counts(splits, freqs)
+    if not pairs:
+        break
+    best, count = pairs.most_common(1)[0]
+    if count < 2:
+        break
+    splits = merge_pair(best, splits)
+    merges.append(best)
+    print(f"merge {step + 1}: {best} seen {count}x -> {best[0] + best[1]!r}")
+
+print()
+print("Final tokenization:")
+for word, syms in splits.items():
+    print(f"  {word:>8} -> {syms}")
+`,
+    },
+  ]}
+/>
+
+Read the output carefully, because it demonstrates the whole point:
+
+* `low` appears seven times, so `l`+`o`+`w` merges almost immediately
+  and becomes **one token**.
+* `est</w>` merges early too, because it ends both `newest` and
+  `widest`. The algorithm discovered a suffix without being told
+  suffixes exist.
+* `widest` ends up as `w`, `i`, `d`, `est</w>`: four tokens, because
+  `wid` was not frequent enough to earn a merge.
+
+That last line is the mechanism behind everything in the previous
+chapter. Frequent text is cheap and atomic. Rare text is expensive and
+fragmented.
+
+<Callout type="info" title="Why the word-boundary marker matters">
+Without `</w>`, the tokenizer could not tell `low` at the end of a word
+from `low` inside `lower`, and merges would leak across boundaries.
+Real implementations use a similar device, often by attaching the
+leading space to the token instead, which is why `" the"` is its own
+entry.
+</Callout>
+
+## Train it on your own text
+
+Change the corpus and watch the vocabulary change with it. Try a
+paragraph of English, then the same volume of Python code.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from collections import Counter
+
+def pair_counts(splits, freqs):
+    pairs = Counter()
+    for word, syms in splits.items():
+        for i in range(len(syms) - 1):
+            pairs[(syms[i], syms[i + 1])] += freqs[word]
+    return pairs
+
+def merge_pair(pair, splits):
+    a, b = pair
+    out = {}
+    for word, syms in splits.items():
+        new, i = [], 0
+        while i < len(syms):
+            if i < len(syms) - 1 and syms[i] == a and syms[i + 1] == b:
+                new.append(a + b); i += 2
+            else:
+                new.append(syms[i]); i += 1
+        out[word] = new
+    return out
+
+def train_bpe(corpus, n_merges):
+    freqs = Counter(corpus.split())
+    splits = {w: list(w) + ["</w>"] for w in freqs}
+    merges = []
+    for _ in range(n_merges):
+        pairs = pair_counts(splits, freqs)
+        if not pairs: break
+        best, count = pairs.most_common(1)[0]
+        if count < 2: break
+        splits = merge_pair(best, splits)
+        merges.append(best)
+    return merges, splits`,
+      starterCode: `# 'train_bpe' is defined in the initialization code above.
+text = """
+the model reads the text and the model predicts the next token
+the text is split into tokens and the tokens become numbers
+"""
+
+merges, splits = train_bpe(text, n_merges=15)
+
+print("Merges learned, in order:")
+for i, m in enumerate(merges, 1):
+    print(f"  {i:2d}. {m[0]!r} + {m[1]!r} -> {m[0] + m[1]!r}")
+
+print()
+print("Resulting token counts per word:")
+for word, syms in sorted(splits.items(), key=lambda kv: len(kv[1])):
+    print(f"  {word:>10} -> {len(syms)} token(s): {syms}")
+`,
+    },
+  ]}
+/>
+
+Words you repeated became single tokens. Words you used once did not.
+Now try adding a long rare word to the text and see where it lands.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`What does the BPE training algorithm merge at each step?
+
+- The pair that appears in the most distinct words.
+  > It is total occurrences weighted by word frequency, not the count of distinct words.
+- The pair that produces the shortest resulting vocabulary.
+  > No lookahead over vocabulary size is performed.
+- A randomly selected pair of adjacent symbols.
+  > Selection is by frequency, not at random.
+- [o] The most frequent adjacent pair across the corpus.
+  > Frequency alone drives the choice, which is what makes common sequences become single tokens.
+
+Greedy frequency-based merging is the entire algorithm.`}
+/>
+
+<MultipleChoice
+  markdown={`After training on the example corpus, why does \`widest\` remain four tokens while \`newest\` becomes one?
+
+- Because merges stop after a fixed number of steps.
+  > The merge budget was not exhausted at the point the difference appeared.
+- [o] Because \`wid\` was not frequent enough to earn a merge.
+  > \`newest\` appears three times so its full form merges, while \`widest\` appears twice and only its shared \`est\` suffix merges.
+- Because \`widest\` is a longer word.
+  > Both are six letters.
+- Because \`widest\` contains characters absent from the rest of the corpus.
+  > Its characters all appear elsewhere.
+
+The vocabulary reflects frequency in the training corpus and nothing
+else.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the trained tokenizer, concretely?
+
+- A dictionary mapping every possible word to an id.
+  > Unseen words could not be handled by such a mapping.
+- [o] An ordered list of merge rules, replayed on new text.
+  > New text is split into characters and the merges are applied in the order they were learned.
+- A neural network that predicts token boundaries.
+  > BPE involves no learned network.
+- A compressed copy of the training corpus.
+  > The corpus is not retained.
+
+The ordering matters: merges must be replayed in the sequence they were
+discovered.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does the algorithm append a \`</w>\` marker to each word?
+
+- To reduce the total vocabulary size.
+  > It slightly increases the number of distinct symbols.
+- To mark where the model should stop generating.
+  > Generation stopping uses a separate end-of-sequence token.
+- To let the tokenizer handle punctuation.
+  > Punctuation is handled by ordinary character splitting.
+- [o] To distinguish a sequence at a word's end from the same sequence inside a word.
+  > Without it, \`low\` as a complete word and \`low\` inside \`lower\` would merge identically and boundaries would leak.
+
+The marker encodes word-boundary information that would otherwise be
+lost at the character split.`}
+/>
+
+<MultipleChoice
+  markdown={`The algorithm discovers \`est</w>\` as a unit without being told about suffixes. Why?
+
+- Because the corpus was preprocessed to mark morpheme boundaries.
+  > No such preprocessing occurs.
+- Because English suffix rules are encoded in the implementation.
+  > The implementation contains no linguistic knowledge whatsoever.
+- [o] Because it appears frequently across multiple words, so it merges early.
+  > Statistical recurrence is indistinguishable from linguistic structure as far as the algorithm is concerned.
+- Because suffixes are always the most frequent character sequences.
+  > They are frequent here, but nothing guarantees this in general.
+
+Morphology emerges from frequency, which is why BPE works across
+languages with no per-language rules.`}
+/>
+
+<MultipleChoice
+  markdown={`You train BPE on Python code instead of English prose. What changes?
+
+- The algorithm requires modification to handle indentation.
+  > No modification is needed.
+- The vocabulary size becomes fixed rather than configurable.
+  > The merge budget remains whatever you set.
+- Nothing, since BPE is language-independent.
+  > It is language-independent as an algorithm and highly corpus-dependent in its output.
+- [o] The learned merges reflect code patterns rather than English words.
+  > Sequences like \`def\`, \`return\`, and four-space indents become frequent pairs and merge into single tokens.
+
+The algorithm is fixed; the vocabulary is entirely a product of what you
+trained it on.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does a production tokenizer trained mostly on English fragment Japanese text heavily?
+
+- Because Japanese has no word boundaries to mark.
+  > Boundary handling is a complication and not the main cost.
+- [o] Because Japanese sequences were too rare in training to earn merges.
+  > With few occurrences in the corpus, those sequences never become frequent pairs, so they stay near character level.
+- Because Japanese requires a larger vocabulary than the format allows.
+  > Vocabulary size is a design choice, not a format limit.
+- Because Japanese characters fall outside the supported character set.
+  > Byte-level fallbacks handle any character.
+
+Whatever the corpus under-represents stays fragmented, and fragmented
+means expensive.`}
+/>
+
+<MultipleChoice
+  markdown={`Increasing the merge budget from 15 to 5,000 has what effect?
+
+- The word boundary marker becomes unnecessary.
+  > The marker remains necessary regardless of budget.
+- The tokenizer becomes slower at encoding new text.
+  > Encoding cost is roughly proportional to text length rather than vocabulary size.
+- [o] More sequences become single tokens, so text encodes into fewer tokens.
+  > Additional merges capture progressively less frequent sequences, shortening the encoded length.
+- Words become fragmented into more pieces.
+  > More merges means fewer, larger pieces.
+
+Larger vocabularies trade a wider output layer for shorter sequences,
+which is the central design tension.`}
+/>

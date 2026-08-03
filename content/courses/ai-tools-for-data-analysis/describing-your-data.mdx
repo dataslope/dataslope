@@ -1,0 +1,242 @@
+---
+title: Describing Your Data
+description: The highest-return habit in AI-assisted analysis is telling the model what it is looking at. Here is the four-part description that does it.
+---
+
+Most bad answers are bad because of a bad question, and most bad
+questions are bad because they omitted the data. The model is not
+guessing out of carelessness. It is guessing because guessing is the
+only option you left it.
+
+## The four-part description
+
+Before asking for anything, supply these four things. Together they
+take about thirty seconds to assemble and they remove the majority of
+schema-related errors.
+
+<Steps>
+
+<Step>
+### The schema
+
+Column names and types. The literal output of `df.dtypes`, or a
+`CREATE TABLE` statement, or even a hand-typed list. Names matter most,
+because inventing names is the model's single most common failure.
+</Step>
+
+<Step>
+### The grain
+
+**What does one row represent?** One order? One order line? One
+customer-month? This one sentence prevents more aggregation errors
+than any other input, because almost every double-counting bug traces
+back to a misunderstood grain.
+</Step>
+
+<Step>
+### The quirks
+
+The things only you know. Test accounts are still in the table. `status`
+was backfilled in March 2024 and is unreliable before then. `amount` is
+in cents. Refunds appear as negative rows. Nulls in `region` mean
+"unknown", not "none".
+</Step>
+
+<Step>
+### The question, with its success criterion
+
+Not "analyze this" but "I want one row per region with total revenue
+for calendar year 2025, excluding refunds and test accounts."
+</Step>
+
+</Steps>
+
+## A worked comparison
+
+Here is a weak prompt:
+
+```text
+I have some sales data. What were our best regions last year?
+```
+
+And a strong one:
+
+```text
+Table: sales_lines
+One row per line item on an order (an order with 3 products
+is 3 rows).
+
+Columns:
+  order_id      INTEGER
+  line_id       INTEGER
+  customer_id   INTEGER
+  region        TEXT     -- NULL means unknown, ~4% of rows
+  order_date    DATE
+  quantity      INTEGER
+  unit_price_cents INTEGER  -- cents, not dollars
+  is_refund     BOOLEAN
+
+Quirks: refunds appear as separate rows with is_refund = true
+and positive quantity. Test accounts have customer_id < 1000.
+
+Question: total net revenue per region for calendar 2025,
+excluding refunds and test accounts, sorted descending.
+Net revenue = quantity * unit_price_cents / 100.
+```
+
+The second one takes a minute to write and the answer is far more
+likely to be usable. More importantly, the second one is *checkable*:
+you have written down what correct means, so you can tell whether the
+answer meets it.
+
+<Callout type="info" title="Why writing the prompt is itself useful">
+Analysts routinely discover, while writing the strong version, that
+they did not actually know the grain, or had forgotten about refunds.
+The prompt is a specification, and writing a specification finds holes
+in your own understanding. That benefit accrues even if you never send
+the message.
+</Callout>
+
+## What not to bother with
+
+A few things people add that do not help much:
+
+* **"You are an expert data analyst."** Role preambles have a small
+  effect at best on current models. The schema is worth a hundred of
+  them.
+* **"Think step by step."** Current models already reason before
+  answering when the task calls for it. Explicit instructions to think
+  are largely redundant.
+* **Politeness and threats alike.** Neither "please" nor "this is very
+  important to my career" reliably changes correctness.
+
+Spend the effort on the schema, the grain, and the quirks instead.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Which single sentence prevents the most aggregation errors?
+
+- A note about how many rows the table contains.
+  > Row count tells the model about scale, not about structure.
+- [o] A statement of what one row represents.
+  > Grain determines whether summing a column double-counts, and most double-counting bugs trace directly to a misunderstood grain.
+- A description of your preferred output formatting.
+  > Formatting has no bearing on correctness of the computation.
+- A statement of which SQL dialect you are using.
+  > Dialect affects syntax rather than whether the aggregation logic is right.
+
+Grain is the fact that determines whether an aggregate means anything.`}
+/>
+
+<MultipleChoice
+  markdown={`Your \`sales_lines\` table has one row per line item. You ask for "total revenue per order" and the model writes \`SUM(unit_price_cents)\` grouped by \`order_id\`. What is wrong?
+
+- \`SUM\` cannot be used with \`GROUP BY order_id\`.
+  > That combination is standard and correct.
+- The result should be divided by the number of line items.
+  > Averaging is not what "total revenue" means.
+- Grouping by \`order_id\` produces one row per customer.
+  > It produces one row per order, which is what was asked for.
+- [o] It ignores \`quantity\`, so it sums unit prices rather than line totals.
+  > Revenue for a line is quantity times unit price; summing the unit price alone undercounts every line with quantity above one.
+
+The model used a plausible-looking column and skipped the one that
+makes the arithmetic correct.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these belongs in the "quirks" part of a data description?
+
+- [o] That \`amount\` is stored in cents rather than dollars.
+  > This is invisible from the schema, silently produces answers off by a factor of 100, and is exactly the kind of fact only you know.
+- The name of the database engine hosting the table.
+  > Engine affects syntax, not the meaning of the data.
+- That you would like the results sorted descending.
+  > Sort order is part of the request, not a property of the data.
+- The number of columns in the table.
+  > Column count is visible from the schema itself.
+
+Quirks are the facts that are true of your data and recoverable from
+nowhere else.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does writing a detailed prompt have value even before you send it?
+
+- Because the assistant stores your description for future sessions.
+  > Ordinary chat sessions do not persist a schema for later reuse.
+- Because longer prompts are billed at a lower rate per token.
+  > Longer prompts cost more, not less.
+- Because models refuse to answer prompts under a certain length.
+  > There is no minimum length requirement.
+- [o] Because specifying the task precisely exposes gaps in your own understanding.
+  > Analysts regularly discover while writing that they did not know the grain, or had forgotten refunds existed.
+
+A specification is a thinking tool. Writing one finds the questions you
+had not asked yourself.`}
+/>
+
+<MultipleChoice
+  markdown={`You write "NULL in \`region\` means unknown, about 4% of rows". Which downstream error does this most directly prevent?
+
+- The model using an inner join instead of a left join.
+  > Join type is a separate decision about table relationships.
+- The model choosing the wrong SQL dialect.
+  > Null semantics carry no information about dialect.
+- [o] The model silently dropping those rows and reporting a total that is 4% short.
+  > Knowing nulls are meaningful prompts an explicit decision about them instead of an unexamined filter.
+- The model sorting the output incorrectly.
+  > Sort direction is unaffected by null semantics.
+
+Telling the model that missing data is *meaningful* changes whether it
+gets quietly discarded.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these prompt additions has the *least* effect on answer correctness?
+
+- [o] Opening with "You are a world-class data scientist."
+  > Role preambles have small and inconsistent effects on current models, well below what supplying the schema achieves.
+- Stating that refunds appear as negative amounts.
+  > This directly changes whether totals are computed correctly.
+- Defining what counts as an active customer.
+  > Definitional clarity is often the difference between a right and a wrong answer.
+- Pasting the output of \`df.dtypes\`.
+  > Types prevent a range of real errors, particularly around dates and numeric strings.
+
+Persona framing is cheap and mostly decorative. Schema and definitions
+are where the leverage is.`}
+/>
+
+<MultipleChoice
+  markdown={`What makes a prompt *checkable*?
+
+- Requesting that the answer be formatted as a table.
+  > Presentation does not define correctness.
+- Keeping it under 200 words so it is easy to reread.
+  > Brevity aids reading but does not establish what correct means.
+- [o] Stating in advance what a correct answer must contain.
+  > Writing down the expected shape, filters, and definition gives you a standard to compare the output against.
+- Asking the model to rate its own confidence at the end.
+  > Self-reported confidence is poorly calibrated and adds no external standard.
+
+If you cannot say what correct looks like before you see the answer,
+you cannot evaluate the answer you get.`}
+/>
+
+<MultipleChoice
+  markdown={`An analyst supplies a perfect schema but omits the grain. Which answer is most likely to come back wrong?
+
+- "Rename these columns to snake_case."
+  > A purely syntactic transformation that grain does not affect.
+- [o] "What is our average order value?"
+  > At line-item grain the model may average line amounts rather than order totals, producing a number that is plausible and wrong.
+- "What data type is \`order_date\`?"
+  > Types are given directly in the schema.
+- "How many distinct columns are in this table?"
+  > This is answerable from the schema alone.
+
+Grain matters exactly when the question aggregates across rows, which
+is most interesting questions.`}
+/>

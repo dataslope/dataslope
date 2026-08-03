@@ -1,0 +1,55 @@
+{
+    "title": "How Large Language Models Work",
+    "description": "A hands-on tour of what an LLM actually does: tokens, embeddings, attention, sampling, what a request costs, and what benchmark numbers really mean.",
+    "root": true,
+    "tags": {
+        "language": [
+            "python"
+        ],
+        "libraries": [
+            "numpy"
+        ],
+        "domain": [
+            "machine-learning",
+            "ai-tools"
+        ],
+        "skills": [
+            "llm-internals",
+            "tokenization",
+            "cost-estimation",
+            "model-evaluation"
+        ],
+        "tools": [],
+        "level": [
+            "beginner"
+        ]
+    },
+    "pages": [
+        "index",
+        "---",
+        "what-a-language-model-is",
+        "tokens",
+        "building-a-tokenizer",
+        "token-counts-in-practice",
+        "---",
+        "embeddings",
+        "similarity",
+        "attention-intuition",
+        "the-shape-of-a-transformer",
+        "---",
+        "sampling",
+        "why-models-hallucinate",
+        "context-windows",
+        "reasoning-models",
+        "---",
+        "pricing-structure",
+        "estimating-cost",
+        "controlling-cost",
+        "---",
+        "what-benchmarks-measure",
+        "benchmark-pitfalls",
+        "evaluating-for-your-task",
+        "---",
+        "next-steps"
+    ]
+}
