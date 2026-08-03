@@ -172,8 +172,12 @@ export function buildPrompt(spec, colors) {
   // Mirror of DEFAULT_STYLE in lib/illustrationPrompt.ts (pinned by a parity test).
   const style = (spec.style && spec.style.trim()) || "isometric illustration";
   const article = /^[aeiou]/i.test(style) ? "An" : "A";
+  // Mirror of GLOBAL_CONSTRAINTS in lib/illustrationPrompt.ts (same parity test).
+  const constraints =
+    "No text. Draw dots, markers, and nodes as flat 2D circles, never as " +
+    "glossy 3D spheres or balls.";
   return (
-    `${article} ${style} of ${spec.subject}. No text.\n\n` +
+    `${article} ${style} of ${spec.subject}. ${constraints}\n\n` +
     `Blue: ${colors.blue}\n` +
     `Green: ${colors.green}\n` +
     `Red: ${colors.red}\n` +

@@ -301,6 +301,14 @@ Default to it — it is also the literal default (`DEFAULT_STYLE` in
 `lib/illustrationPrompt.ts` and `meta.defaultStyle` in the JSON), so a prompt
 that omits `style` gets it automatically.
 
+**No sphere-like dot groups.** Repeated round elements (scatter dots, chart
+markers, tokens in a tray, tree nodes) draw as **flat 2D circles**, never glossy
+3D balls, which read as a bag of marbles instead of as data.
+`buildIllustrationPrompt` appends that rule to every prompt next to "No text.",
+so a subject never has to state it — but a subject that asks for "spheres",
+"balls" or "beads" fights it, so write "flat discs" or "flat counters" instead.
+A single large round object (a globe, one marble on a track) is unaffected.
+
 **Every other style is retired.** Risograph, flat geometric vector, line art,
 blueprint schematic and cut-paper collage were all tried and dropped: the
 monochrome ones (line art, blueprint) only read against one page background

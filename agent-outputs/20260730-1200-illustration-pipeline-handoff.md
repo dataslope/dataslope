@@ -56,6 +56,12 @@ Violating any of these has already been tried and rejected. Don't re-litigate.
   yellow `#ffdd6c`. `"No text."` is appended automatically by
   `lib/illustrationPrompt.ts` — **never ask for lettering**, the model bakes in garbled
   text.
+- **No sphere-like dot groups.** Repeated round elements — scatter dots, chart markers,
+  tokens in a tray, the nodes of a tree — draw as **flat 2D circles**, never glossy 3D
+  balls. `lib/illustrationPrompt.ts` appends that rule to every prompt alongside
+  `"No text."`, so a subject never has to say it; what a subject must not do is *ask*
+  for spheres or beads and fight it. A single large round object (a globe, one marble
+  running a track) is fine, which is why the rule names repeated elements only.
 - Promotion writes **straight to `public/images/`**. Never add a copy under
   `assets/images/` — that is the double-encode this branch removed (cost ~1.8 dB PSNR).
 - Exactly **one `<Figure>` per page**, referencing the **`-cutout`** slug.
@@ -128,6 +134,9 @@ set that shipped:
   "gate" recur because they cut out cleanly and read at small sizes.
 - **No text, ever.** If a label seems needed, use "blank name plate", "blank banner",
   "blank paper tag".
+- **Flat discs, not spheres.** Say "flat circles", "flat discs", "flat counters" when a
+  subject needs many small round things. Writing "spheres", "balls", or "beads" asks the
+  model for glossy 3D marbles, which is the look the global rule exists to stop.
 - **Contrast pairs work well** for before/after lessons: "a messy heap of irregular
   tiles on one platform beside the same tiles arranged into a perfect rectangular grid".
 - **Keep it simple.** The user's explicit feedback: complex compositions failed
