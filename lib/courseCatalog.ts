@@ -29,7 +29,6 @@ export interface CatalogCourse {
 const POPULARITY_ORDER: string[] = [
   "python-basics",
   "data-analysis-python-pandas",
-  "ai-tools-for-data-analysis",
   "intro-sql-postgres",
   "beginners-javascript",
   "intro-web-development",

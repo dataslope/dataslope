@@ -117,7 +117,8 @@ Key files:
 | `lib/auth/client.ts` | Browser client + `useSession` / `signIn` / `signOut`. |
 | `app/sign-in/`, `app/account/` | Sign-in screen (Google/GitHub) and a gated account area. |
 | `app/admin/` | Gated admin dashboard (list / remove / ban users), built on the shadcn UI primitives in `components/ui`. See [Admin dashboard](#admin-dashboard). |
-| `migrations/` | D1 schema (Better Auth core tables + the admin plugin's `role`/`ban` fields), applied with `wrangler d1 migrations apply`. |
+| `migrations/` | D1 schema for `dataslope-auth` (Better Auth core tables + the admin plugin's `role`/`ban` fields), applied with `wrangler d1 migrations apply`. |
+| `migrations-illustrations/` | D1 schema for `dataslope-illustrations`, a second database holding the illustration regeneration queue written from the admin-only `/illustration-prompts` gallery. Applied with `npm run db:migrate:illustrations[:remote]`; see `agent-outputs/20260803-0900-illustration-regeneration-queue.md`. |
 
 > Auth is deliberately kept **out of `middleware.ts`**, `cookies()`/middleware sessions have rough edges on the Workers runtime (a known OpenNext limitation). All auth work happens in route handlers and client components instead.
 

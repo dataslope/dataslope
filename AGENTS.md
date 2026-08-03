@@ -134,6 +134,28 @@ node scripts/remove-background-kie.mjs                 # adds <id>-cutout.png
 node scripts/promote-illustrations.mjs python-basics-loops python-basics-sets
 ```
 
+### Reviewing, and the regeneration queue
+
+`/illustration-prompts` is the review surface and is **admin-only**: the page is
+a static shell that fetches everything from `GET
+/api/admin/illustration-prompts` behind `requireAdmin`, so a non-admin gets an
+access-denied notice rather than the prompt corpus. The footer link stays
+public; following it just shows the notice.
+
+It renders a grid of the **background-removed WebP only** (the file the site
+serves), each over the live page background so the theme pill is the judgement
+tool, and a click opens the raw image in a new tab. Every card can be marked
+"redraw this" with a one-line note ("use a simpler illustration"), stored in D1
+database `dataslope-illustrations`, table `illustration_regen_marks` (binding
+`ILLUSTRATIONS_DB`, schema in `migrations-illustrations/`).
+
+> **Regenerating what is marked:**
+> `agent-outputs/20260803-0900-illustration-regeneration-queue.md` is the
+> runbook. Short version: read `WHERE marked = 1`, fold each note into that
+> prompt's `subject` in the JSON (do not append it to the built prompt),
+> generate → remove background → promote as usual, then set `marked = 0` and
+> stamp `regenerated_at` for exactly the ids you redrew.
+
 All four API keys are already environment variables in Claude Code sessions:
 `OPENAI_API_KEY` and `KIE_API_KEY`. The R2 variables
 (`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`,
@@ -323,7 +345,8 @@ colours, never in black, white, or a single hue.** Polychrome subjects survive
 both themes; monochrome ones do not.
 
 Check both themes with the toggle on `/illustration-prompts`, which renders
-each cut-out over the live page background for exactly this reason.
+each cut-out over the live page background for exactly this reason. A cut-out
+that fails one theme is what the "mark for regeneration" button is for.
 
 ---
 

@@ -16,7 +16,6 @@ import {
   Atom,
   Binary,
   Blocks,
-  Bot,
   Braces,
   BrainCircuit,
   ChartArea,
@@ -109,7 +108,6 @@ export const COURSE_MOTIFS: Record<string, string> = {
   "intro-web-development": "browser",
   "modern-css-layout": "grid",
   "react-from-the-ground-up": "atom",
-  "ai-tools-for-data-analysis": "assistant",
   "how-llms-work": "neurons",
 };
 
@@ -146,7 +144,6 @@ const KIND_ICONS: Record<string, LucideIcon> = {
   browser: AppWindow,
   grid: LayoutGrid,
   atom: Atom,
-  assistant: Bot,
   neurons: BrainCircuit,
   stairs: TrendingUp,
 };

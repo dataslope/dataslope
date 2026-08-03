@@ -53,6 +53,20 @@
       "database_name": "dataslope-auth",
       "database_id": "827500a4-7853-4da0-98dd-70ffe6473d41",
       "migrations_dir": "migrations"
+    },
+    // Illustration review state: which generated images an admin marked for
+    // regeneration and the extra prompt guidance to redraw them with, written
+    // from /illustration-prompts via /api/admin/illustration-marks. Deliberately
+    // NOT in dataslope-auth: this is authoring data, so a coding agent can read
+    // and wipe the whole queue without touching accounts or sessions. Schema in
+    // migrations-illustrations/, applied with
+    // `npx wrangler d1 migrations apply dataslope-illustrations [--remote]`.
+    // Created once with: `npx wrangler d1 create dataslope-illustrations`.
+    {
+      "binding": "ILLUSTRATIONS_DB",
+      "database_name": "dataslope-illustrations",
+      "database_id": "0ab9f248-58dc-4e0a-a17e-f41badf9f6c0",
+      "migrations_dir": "migrations-illustrations"
     }
   ],
   // Non-secret auth config. The OAuth client secrets and BETTER_AUTH_SECRET are

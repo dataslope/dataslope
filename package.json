@@ -20,6 +20,8 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv .wrangler/types.d.ts",
     "db:migrate": "wrangler d1 migrations apply dataslope-auth",
     "db:migrate:remote": "wrangler d1 migrations apply dataslope-auth --remote",
+    "db:migrate:illustrations": "wrangler d1 migrations apply dataslope-illustrations",
+    "db:migrate:illustrations:remote": "wrangler d1 migrations apply dataslope-illustrations --remote",
     "lint": "eslint .",
     "check:mcq": "node scripts/check-mcq.mjs",
     "check:prose": "node scripts/check-prose.mjs",
