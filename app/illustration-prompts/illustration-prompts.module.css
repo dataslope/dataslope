@@ -17,8 +17,6 @@
   --card-bg: #fcfcfd;
   --btn-bg: #ffffff;
   --btn-hover: #f3f4f6;
-  --badge-bg: #eef2ff;
-  --badge-fg: #4338ca;
   --badge-muted-bg: #f3f4f6;
   --badge-muted-fg: #6b7280;
 
@@ -40,17 +38,17 @@
   --card-bg: #181818;
   --btn-bg: #1c1c1c;
   --btn-hover: #262626;
-  --badge-bg: #1e1b4b;
-  --badge-fg: #c7d2fe;
   --badge-muted-bg: #242424;
   --badge-muted-fg: #9ca3af;
 }
 
+/* Wide: the cards are a grid of artwork now, not a single column of stacked
+   full-width images, so the page wants room for three or four per row. */
 .inner {
   box-sizing: border-box;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 5rem;
-  max-width: 860px;
+  max-width: 1440px;
 }
 
 .header {
@@ -146,54 +144,74 @@
   color: var(--faint);
 }
 
-.list {
-  display: flex;
-  flex-direction: column;
+/* Column grid: as many cards per row as fit, each at least 300px so a
+   1536x1024 cut-out is still large enough to judge. Cards stretch to the row
+   height so the mark controls line up along the bottom of each row. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
+  align-items: stretch;
 }
 
 /* ── Prompt card ────────────────────────────────────────────────────────── */
 .card {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.6rem;
   margin: 0;
-  padding: 1rem 1.1rem 1.1rem;
+  padding: 0.85rem 0.9rem 0.9rem;
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   background: var(--card-bg);
   scroll-margin-top: 1.5rem;
 }
 
+/* A queued card is tinted and outlined so a marked one is obvious while
+   scanning a dense grid; the button label says the same thing in words. */
+.cardMarked {
+  border-color: var(--ds-red-400, #ff807f);
+  background: color-mix(in srgb, var(--ds-red-500, #ff4f59) 7%, var(--card-bg));
+}
+
+/* Redrawn since anyone last signed it off: green until Approve is pressed,
+   which is what makes a batch of regenerated art findable in the grid. Never
+   applied at the same time as .cardMarked (see `tint` at the call site), so
+   the two tints cannot mix. */
+.cardRegenerated {
+  border-color: var(--ds-green-400, #66d361);
+  background: color-mix(in srgb, var(--ds-green-500, #20c621) 8%, var(--card-bg));
+}
+
+/* Says in words what the tint says in colour, and carries the date. */
+.regenBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ds-green-ink, #006f01);
+}
+
+:global(html.dark) .regenBanner {
+  color: var(--ds-green-300, #93e08e);
+}
+
 .cardTop {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.fileWrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-width: 0;
+  gap: 0.5rem;
 }
 
 .file {
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--fg);
   word-break: break-all;
   user-select: all;
-}
-
-.badges {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.35rem;
-  min-width: 0;
 }
 
 .badge {
@@ -208,41 +226,27 @@
   font-family: var(--font-mono, ui-monospace, monospace);
 }
 
-.badgeAccent {
-  background: var(--badge-bg);
-  color: var(--badge-fg);
-}
-
 .badgeMuted {
   background: var(--badge-muted-bg);
   color: var(--badge-muted-fg);
 }
 
-/* The generated artwork, shown above its prompt, with the background-removed
-   variant stacked underneath for comparison. */
-.imageStack {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.imagePane {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.image {
+/* The artwork links to itself, so a click opens the raw WebP in a new tab at
+   full size — the closest look available without leaving the review. */
+.imageLink {
   display: block;
-  width: 100%;
-  height: auto;
   border-radius: 0.5rem;
-  border: 1px solid var(--border-soft);
 }
 
-/* The cut-out gets no backdrop of its own — the page colour shows through its
+.imageLink:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+/* The cut-out gets no backdrop of its own: the page colour shows through its
    alpha, so the theme toggle is what reveals a halo or a background that never
-   actually came off. */
+   actually came off. It is also the only image shown here, because it is the
+   one the site serves. */
 .imageCutout {
   display: block;
   width: 100%;
@@ -252,28 +256,25 @@
   background: transparent;
 }
 
-.imageLabel {
-  font-size: 0.7rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--faint);
-}
-
 .imagePending {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
+  /* Roughly the 3:2 the illustrations are drawn at, so a missing image leaves
+     a hole the same shape as the art and the grid rows stay even. */
+  aspect-ratio: 3 / 2;
   padding: 1.5rem 1rem;
   border: 1px dashed var(--border);
   border-radius: 0.5rem;
   font-size: 0.8rem;
+  text-align: center;
   color: var(--muted);
 }
 
 .cardTitle {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--fg);
@@ -282,19 +283,38 @@
 .prompt {
   margin: 0;
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.8rem;
-  line-height: 1.6;
+  font-size: 0.72rem;
+  line-height: 1.55;
   color: var(--muted);
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-.cardBottom {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+/* The full prompt is several hundred characters, which would dominate a grid
+   card; it collapses to four lines with a toggle for the rest. */
+.promptClamped {
+  composes: prompt;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+/* Text-only affordance (expand the prompt), styled as a link rather than a
+   button so it doesn't compete with the card's real actions. */
+.linkBtn {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--link);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.linkBtn:hover {
+  text-decoration: underline;
 }
 
 .usages {
@@ -302,7 +322,8 @@
   flex-direction: column;
   gap: 0.2rem;
   min-width: 0;
-  font-size: 0.8rem;
+  margin-top: auto;
+  font-size: 0.75rem;
 }
 
 .usagesLabel {
@@ -325,45 +346,264 @@
   color: var(--muted);
 }
 
-/* Icon-only button (copy file name). */
-.iconBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 1.6rem;
-  height: 1.6rem;
-  border: 1px solid var(--border);
-  border-radius: 0.4rem;
-  background: var(--btn-bg);
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.iconBtn:hover {
-  background: var(--btn-hover);
-  color: var(--fg);
-}
-
 /* Labelled button (copy prompt). */
 .copyPrompt {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   flex-shrink: 0;
-  align-self: flex-end;
-  margin-left: auto;
-  padding: 0.4rem 0.7rem;
+  padding: 0.35rem 0.6rem;
   border: 1px solid var(--border);
   border-radius: 0.5rem;
   background: var(--btn-bg);
   color: var(--fg);
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
 }
 
 .copyPrompt:hover {
+  background: var(--btn-hover);
+}
+
+/* ── Regeneration queue controls ─────────────────────────────────────────── */
+/* The mark + note pair writes to D1 `dataslope-illustrations` →
+   `illustration_regen_marks`; a later regeneration run reads that table. */
+.regen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border-soft);
+}
+
+.regenRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.markBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.markBtn:hover:not(:disabled) {
+  background: var(--btn-hover);
+}
+
+.markBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.markBtnOn {
+  border-color: transparent;
+  background: var(--ds-red-500, #ff4f59);
+  color: #ffffff;
+}
+
+.markBtnOn:hover:not(:disabled) {
+  background: var(--ds-red-600, #dc3f49);
+}
+
+/* Full-width and green: on a card awaiting approval this is the one action the
+   reviewer is there to take, so it sits above the mark/copy row rather than
+   competing inside it. */
+.approveBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: var(--ds-green-600, #0aa80f);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.approveBtn:hover:not(:disabled) {
+  background: var(--ds-green-700, #008b03);
+}
+
+.approveBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.noteInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 0.75rem;
+}
+
+.noteInput::placeholder {
+  color: var(--faint);
+}
+
+.noteInput:disabled {
+  opacity: 0.5;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Toolbar + gating notices ────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.filterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.filterBtn:hover {
+  background: var(--btn-hover);
+}
+
+.filterBtnOn {
+  border-color: transparent;
+  background: var(--ds-red-500, #ff4f59);
+  color: #ffffff;
+}
+
+/* Must restate the hover: `.filterBtn:hover` above carries a pseudo-class and
+   would otherwise outrank the plain `.filterBtnOn`, painting the active pill
+   with the neutral hover fill and leaving white text on near-white. Same for
+   the green variant below. */
+.filterBtnOn:hover {
+  background: var(--ds-red-600, #dc3f49);
+}
+
+/* The "awaiting approval" chip, matching the tint of the cards it selects. */
+.filterBtnGreenOn {
+  border-color: transparent;
+  background: var(--ds-green-600, #0aa80f);
+  color: #ffffff;
+}
+
+.filterBtnGreenOn:hover {
+  background: var(--ds-green-700, #008b03);
+}
+
+.filterCount {
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: var(--badge-muted-bg);
+  color: var(--badge-muted-fg);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.filterBtnOn .filterCount,
+.filterBtnGreenOn .filterCount {
+  background: rgb(255 255 255 / 0.25);
+  color: #ffffff;
+}
+
+.toolbarNote {
+  font-size: 0.75rem;
+  color: var(--faint);
+}
+
+.toolbarNote code,
+.warn code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.warn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.75rem 0 0;
+  font-size: 0.82rem;
+  color: var(--ds-red-ink, #ba303a);
+}
+
+:global(html.dark) .warn {
+  color: var(--ds-red-300, #ffa6a3);
+}
+
+/* Sign-in / access-denied / loading states. The page's content IS what admin
+   gates here, so these replace the whole gallery rather than sitting inside
+   it. */
+.notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 6rem 1.5rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.notice p {
+  margin: 0;
+}
+
+.noticeMuted {
+  font-size: 0.85rem;
+  color: var(--faint);
+}
+
+.noticeCta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.noticeCta:hover {
   background: var(--btn-hover);
 }
 
@@ -373,9 +613,8 @@
 }
 
 /* ── Pagination ──────────────────────────────────────────────────────────── */
-/* Every card carries two full-width 1536x1024 images, so the full set is both a
-   very long scroll and a lot of bytes; the list is paged rather than infinite so
-   a reader can hold a position and come back to it. */
+/* Even one image per card, the full set is a lot of bytes; the grid is paged
+   rather than infinite so a reader can hold a position and come back to it. */
 .pager {
   display: flex;
   align-items: center;

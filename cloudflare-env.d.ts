@@ -26,6 +26,11 @@ declare global {
     WORKSPACES_BUCKET?: R2Bucket;
     // D1 database for Better Auth (users + sessions). See migrations/.
     DB: D1Database;
+    // D1 database for illustration review state (the regeneration queue behind
+    // /illustration-prompts). Optional so the rest of the app keeps working on
+    // a deployment that hasn't created it yet: the marks API answers 503 and
+    // the gallery renders read-only. See migrations-illustrations/.
+    ILLUSTRATIONS_DB?: D1Database;
     // Static-assets binding (prerendered pages + /_next/static).
     ASSETS: Fetcher;
     // Service binding back to this worker (OpenNext cache/revalidation).
