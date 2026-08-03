@@ -115,9 +115,12 @@ that only reads on one background is the thing this page exists to catch.
 Clicking an image opens the raw file in a new tab at full size.
 
 Each card carries the prompt, a copy button, the lesson it renders on, a
-**Mark for regeneration** toggle, and a note input. Toggling the mark saves
-immediately; the note saves on blur (or Enter) and always travels with the
-mark, so typing a note then hitting the button persists both. A card that has
+**Mark for regeneration** toggle, and a note input. The two are one control in
+practice: **typing in the note marks the illustration**, because nobody writes
+"the star points are mushed" about a picture they are happy with. The card tints
+on the first keystroke and the row is written once typing pauses (or on blur or
+Enter, whichever comes first), so a note is never lost to walking away without
+blurring. Unmarking through the button keeps the note. A card that has
 been redrawn since it was last signed off turns green and grows an **Approve**
 button, which is the whole of the sign-off: press it and the card goes back to
 looking like every other one.

@@ -147,9 +147,10 @@ serves), each over the live page background so the theme pill is the judgement
 tool, and a click opens the raw image in a new tab. Every card can be marked
 "redraw this" with a one-line note, stored in D1 database
 `dataslope-illustrations`, table `illustration_regen_marks` (binding
-`ILLUSTRATIONS_DB`, schema in `migrations-illustrations/`). Marking with the
-note blank stores `DEFAULT_REGEN_NOTE` ("use a simpler illustration with fewer,
-larger shapes…"), which is the usual reason to redraw.
+`ILLUSTRATIONS_DB`, schema in `migrations-illustrations/`). Typing in the note
+marks the illustration by itself; marking with the note blank stores
+`DEFAULT_REGEN_NOTE` ("use a simpler illustration with fewer, larger shapes…"),
+which is the usual reason to redraw.
 
 A card moves through three states: normal, red once queued, then **green with an
 Approve button** once redrawn and not yet signed off. Approve is the human's

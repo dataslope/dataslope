@@ -17,8 +17,6 @@
   --card-bg: #fcfcfd;
   --btn-bg: #ffffff;
   --btn-hover: #f3f4f6;
-  --badge-bg: #eef2ff;
-  --badge-fg: #4338ca;
   --badge-muted-bg: #f3f4f6;
   --badge-muted-fg: #6b7280;
 
@@ -40,8 +38,6 @@
   --card-bg: #181818;
   --btn-bg: #1c1c1c;
   --btn-hover: #262626;
-  --badge-bg: #1e1b4b;
-  --badge-fg: #c7d2fe;
   --badge-muted-bg: #242424;
   --badge-muted-fg: #9ca3af;
 }
@@ -218,14 +214,6 @@
   user-select: all;
 }
 
-.badges {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.35rem;
-  min-width: 0;
-}
-
 .badge {
   flex-shrink: 0;
   padding: 0.15rem 0.5rem;
@@ -236,11 +224,6 @@
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   font-family: var(--font-mono, ui-monospace, monospace);
-}
-
-.badgeAccent {
-  background: var(--badge-bg);
-  color: var(--badge-fg);
 }
 
 .badgeMuted {

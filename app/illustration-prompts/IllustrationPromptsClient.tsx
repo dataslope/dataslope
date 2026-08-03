@@ -54,6 +54,11 @@ import styles from "./illustration-prompts.module.css";
  *  bounded number of bytes. */
 const PAGE_SIZE = 36;
 
+/** How long typing has to pause before the note is written. Long enough that a
+ *  sentence is one request, short enough that walking away mid-review still
+ *  leaves the note stored. */
+const NOTE_SAVE_DELAY = 700;
+
 /** Local, possibly-unsaved state for one card's queue entry. */
 interface MarkState {
   marked: boolean;
@@ -188,7 +193,8 @@ function PromptCard({
   copiedKey,
   onCopy,
   onNoteChange,
-  onSave,
+  onNoteCommit,
+  onToggleMark,
   onApprove,
 }: {
   entry: GalleryEntry;
@@ -199,13 +205,12 @@ function PromptCard({
   copiedKey: string | null;
   onCopy: (key: string, text: string) => void;
   onNoteChange: (id: string, note: string) => void;
-  onSave: (id: string, marked: boolean) => void;
+  onNoteCommit: (id: string) => void;
+  onToggleMark: (id: string, marked: boolean) => void;
   onApprove: (id: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const promptKey = `${entry.id}:prompt`;
-  // Trim the generic tail ("… illustration"/"… schematic") for a tidy badge.
-  const styleLabel = entry.style.replace(/ (illustration|schematic)$/i, "");
 
   // A fresh mark outranks a pending approval: if the redraw is still wrong and
   // it has been queued again, "waiting to be looked at" is no longer the state
@@ -227,14 +232,13 @@ function PromptCard({
 
       <CutoutImage entry={entry} />
 
+      {/* No style badge: every prompt in the set is isometric (the house
+          default), so it labelled nothing and only crowded the card. */}
       <div className={styles.cardTop}>
         <code className={styles.file}>{entry.file}</code>
-        <span className={styles.badges}>
-          <span className={`${styles.badge} ${styles.badgeAccent}`}>{styleLabel}</span>
-          {entry.mascot ? (
-            <span className={`${styles.badge} ${styles.badgeMuted}`}>marmot</span>
-          ) : null}
-        </span>
+        {entry.mascot ? (
+          <span className={`${styles.badge} ${styles.badgeMuted}`}>marmot</span>
+        ) : null}
       </div>
 
       <p className={styles.cardTitle}>{entry.title}</p>
@@ -280,7 +284,7 @@ function PromptCard({
           <button
             type="button"
             className={`${styles.markBtn} ${mark.marked ? styles.markBtnOn : ""}`}
-            onClick={() => onSave(entry.id, !mark.marked)}
+            onClick={() => onToggleMark(entry.id, !mark.marked)}
             disabled={!marksAvailable || mark.saving}
             aria-pressed={mark.marked}
             title={
@@ -317,12 +321,10 @@ function PromptCard({
           // The placeholder is the default the server will store if this is
           // left blank, so what happens on an empty note is visible up front.
           placeholder={`Extra prompt for the redraw. Blank: "${defaultNote}"`}
-          title={`Left blank, marking stores: "${defaultNote}"`}
+          title={`Typing here also marks this illustration. Left blank, marking stores: "${defaultNote}"`}
           aria-label={`Regeneration note for ${entry.title}`}
           onChange={(e) => onNoteChange(entry.id, e.target.value)}
-          onBlur={() => {
-            if (mark.note !== mark.savedNote) onSave(entry.id, mark.marked);
-          }}
+          onBlur={() => onNoteCommit(entry.id)}
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
           }}
@@ -352,15 +354,34 @@ export function IllustrationPromptsClient() {
   // 0-based internally, 1-based in the URL (`?page=3`).
   const [page, setPage] = useState(0);
 
+  // The saved state, mirrored for callbacks that outlive the render that
+  // created them (the debounced note save, the mark button's read of the
+  // input). Kept in an effect so it tracks what was actually committed.
+  const marksRef = useRef(marks);
+  useEffect(() => {
+    marksRef.current = marks;
+  }, [marks]);
+
+  // Per-card debounce timers for the note autosave.
+  const noteTimers = useRef<Map<string, number>>(new Map());
+  const cancelNoteSave = useCallback((id: string) => {
+    const pending = noteTimers.current.get(id);
+    if (pending === undefined) return;
+    window.clearTimeout(pending);
+    noteTimers.current.delete(id);
+  }, []);
+
   // Timers that clear the transient "copied"/"saved" flashes, cancelled on
   // unmount so a state update can't land on a gone component.
   const timers = useRef<number[]>([]);
-  useEffect(
-    () => () => {
-      for (const t of timers.current) window.clearTimeout(t);
-    },
-    [],
-  );
+  useEffect(() => {
+    const flashes = timers.current;
+    const notes = noteTimers.current;
+    return () => {
+      for (const t of flashes) window.clearTimeout(t);
+      for (const t of notes.values()) window.clearTimeout(t);
+    };
+  }, []);
   const later = useCallback((fn: () => void, ms: number) => {
     timers.current.push(window.setTimeout(fn, ms));
   }, []);
@@ -423,18 +444,19 @@ export function IllustrationPromptsClient() {
     [later],
   );
 
-  const onNoteChange = useCallback((id: string, note: string) => {
-    setMarks((prev) => ({ ...prev, [id]: { ...(prev[id] ?? EMPTY_MARK), note } }));
-  }, []);
-
-  /** Persist one card's queue row. The note always travels with the mark, so
-   *  toggling the button also saves whatever was typed but not yet blurred. */
-  const onSave = useCallback(
-    async (id: string, marked: boolean) => {
-      const note = marks[id]?.note ?? "";
+  /**
+   * Persist one card's queue row. The note travels with the mark on every
+   * write, so whichever control the reviewer touched, both end up stored.
+   *
+   * Both values are passed in rather than read from `marks`: the debounced
+   * note save fires after the state that scheduled it has moved on, and a
+   * closure over `marks` would write whatever was there a keystroke ago.
+   */
+  const save = useCallback(
+    async (id: string, marked: boolean, note: string) => {
       setMarks((prev) => ({
         ...prev,
-        [id]: { ...(prev[id] ?? EMPTY_MARK), marked, saving: true },
+        [id]: { ...(prev[id] ?? EMPTY_MARK), marked, note, saving: true },
       }));
       try {
         const res = await fetch("/api/admin/illustration-prompts", {
@@ -444,10 +466,14 @@ export function IllustrationPromptsClient() {
         });
         if (!res.ok) throw new Error(String(res.status));
         const { mark } = (await res.json()) as { mark: RegenMark };
-        setMarks((prev) => ({
-          ...prev,
-          [id]: { ...markStateFrom(mark), justSaved: true },
-        }));
+        setMarks((prev) => {
+          const cur = prev[id];
+          const next = { ...markStateFrom(mark), justSaved: true };
+          // Keep what is in the input if the reviewer kept typing while this
+          // request was in flight; the next save will carry it.
+          if (cur && cur.note !== note) next.note = cur.note;
+          return { ...prev, [id]: next };
+        });
         later(
           () =>
             setMarks((prev) =>
@@ -465,7 +491,53 @@ export function IllustrationPromptsClient() {
         setError("Couldn't save that mark. Please try again.");
       }
     },
-    [marks, later],
+    [later],
+  );
+
+  /** Toggle from the mark button, carrying whatever is in the note input. */
+  const onToggleMark = useCallback(
+    (id: string, marked: boolean) => {
+      cancelNoteSave(id);
+      void save(id, marked, marksRef.current[id]?.note ?? "");
+    },
+    [save, cancelNoteSave],
+  );
+
+  /**
+   * Typing guidance about an illustration IS marking it: nobody writes "the
+   * star points are mushed" about a picture they are happy with. The card
+   * flips to marked on the first keystroke (so the tint confirms it landed),
+   * and the row is written once typing pauses, without waiting for a blur that
+   * may never come.
+   */
+  const onNoteChange = useCallback(
+    (id: string, note: string) => {
+      const marked = note.trim().length > 0 || (marksRef.current[id]?.marked ?? false);
+      setMarks((prev) => ({
+        ...prev,
+        [id]: { ...(prev[id] ?? EMPTY_MARK), note, marked },
+      }));
+      cancelNoteSave(id);
+      noteTimers.current.set(
+        id,
+        window.setTimeout(() => {
+          noteTimers.current.delete(id);
+          void save(id, marked, note);
+        }, NOTE_SAVE_DELAY),
+      );
+    },
+    [save, cancelNoteSave],
+  );
+
+  /** Blur (or Enter) writes immediately instead of waiting out the debounce. */
+  const onNoteCommit = useCallback(
+    (id: string) => {
+      const cur = marksRef.current[id];
+      if (!cur || (!noteTimers.current.has(id) && cur.note === cur.savedNote)) return;
+      cancelNoteSave(id);
+      void save(id, cur.marked, cur.note);
+    },
+    [save, cancelNoteSave],
   );
 
   /** Sign off a redraw: the card loses its tint and goes back to normal. */
@@ -706,7 +778,8 @@ export function IllustrationPromptsClient() {
                     copiedKey={copiedKey}
                     onCopy={onCopy}
                     onNoteChange={onNoteChange}
-                    onSave={(id, marked) => void onSave(id, marked)}
+                    onNoteCommit={onNoteCommit}
+                    onToggleMark={onToggleMark}
                     onApprove={(id) => void onApprove(id)}
                   />
                 ))}
