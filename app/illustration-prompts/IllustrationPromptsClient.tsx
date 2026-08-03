@@ -57,6 +57,26 @@ interface MarkState {
   justSaved: boolean;
 }
 
+/** Query parameter carrying the 1-based page number. */
+const PAGE_PARAM = "page";
+
+/** The page (0-based) named by a URL's `?page=`, or 0 when absent/invalid. */
+function pageFromSearch(search: string): number {
+  const raw = new URLSearchParams(search).get(PAGE_PARAM);
+  const n = Number(raw);
+  return Number.isInteger(n) && n > 1 ? n - 1 : 0;
+}
+
+/** The current URL with `?page=` set to a 1-based page, dropped on page 1 so
+ *  the first page keeps a clean canonical URL. Hash is preserved: card ids are
+ *  anchors on this page. */
+function urlForPage(page: number): string {
+  const url = new URL(window.location.href);
+  if (page > 0) url.searchParams.set(PAGE_PARAM, String(page + 1));
+  else url.searchParams.delete(PAGE_PARAM);
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+
 const EMPTY_MARK: MarkState = {
   marked: false,
   note: "",
@@ -255,6 +275,7 @@ export function IllustrationPromptsClient() {
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [markedOnly, setMarkedOnly] = useState(false);
+  // 0-based internally, 1-based in the URL (`?page=3`).
   const [page, setPage] = useState(0);
 
   // Timers that clear the transient "copied"/"saved" flashes, cancelled on
@@ -294,9 +315,23 @@ export function IllustrationPromptsClient() {
     setLoading(false);
   }, []);
 
+  // Load once per signed-in user, NOT once per `session` object.
+  // `useSession` re-resolves when the tab regains focus (coming back from an
+  // image opened in a new tab, for one), handing back a fresh object every
+  // time; keying the effect off that identity re-ran the whole fetch, threw
+  // the rendered grid away for a "Loading illustrations…" notice, and lost the
+  // scroll position. Keying off the user id makes those refreshes inert.
+  const loadedForUser = useRef<string | null>(null);
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load on mount; the fetch's setState is intentional
-    if (!sessionPending && session) void load();
+    if (sessionPending) return;
+    const userId = session?.user.id ?? null;
+    if (!userId) {
+      loadedForUser.current = null; // signed out: allow a reload on next sign-in
+      return;
+    }
+    if (loadedForUser.current === userId) return;
+    loadedForUser.current = userId;
+    void load();
   }, [sessionPending, session, load]);
 
   const onCopy = useCallback(
@@ -385,14 +420,53 @@ export function IllustrationPromptsClient() {
     return [...byLabel.entries()];
   }, [visible, current]);
 
+  // The page lives in the URL (`?page=3`), so it survives a reload, can be
+  // bookmarked, and comes back with the Back button.
+  //
+  // Read on mount rather than through `useSearchParams`: this page is
+  // prerendered (`force-static`), where that hook forces a Suspense boundary
+  // and reads empty params at build time anyway. Parsing `window.location`
+  // after hydration sidesteps both, at the cost of one extra render.
+  useEffect(() => {
+    const fromUrl = pageFromSearch(window.location.search);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- adopting the URL's page on mount, once
+    if (fromUrl > 0) setPage(fromUrl);
+    const onPop = () => setPage(pageFromSearch(window.location.search));
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  // A URL can name a page past the end (`?page=99`, or a filter that shrank the
+  // list). Rendering already clamps; this settles the state and the URL onto
+  // the page actually being shown, so a reload or a share is honest.
+  useEffect(() => {
+    if (!gallery || page <= pageCount - 1) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- clamping to the real page count, which is only known after the data loads
+    setPage(pageCount - 1);
+    window.history.replaceState(null, "", urlForPage(pageCount - 1));
+  }, [gallery, page, pageCount]);
+
   const goTo = useCallback((next: number) => {
     setPage(next);
+    // pushState, so Back walks the pages a reviewer actually visited; the
+    // popstate listener above puts the state back in step.
+    window.history.pushState(null, "", urlForPage(next));
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  /** Jump to page 1 without adding a history entry (used when a filter change
+   *  invalidates the current page rather than the reader navigating). */
+  const resetPage = useCallback(() => {
+    setPage(0);
+    window.history.replaceState(null, "", urlForPage(0));
+  }, []);
+
   const body = () => {
-    if (sessionPending) return <Notice>Loading…</Notice>;
-    if (!session) {
+    // Order matters: a *settled* signed-out or denied session replaces the
+    // gallery, but a pending one never does. `useSession` goes pending again
+    // whenever the tab regains focus, and swapping the grid for a spinner on
+    // that would throw away the reader's scroll position for nothing.
+    if (!sessionPending && !session) {
       return (
         <Notice>
           <p>This page is for site admins.</p>
@@ -407,14 +481,14 @@ export function IllustrationPromptsClient() {
         <Notice>
           <p>You don&apos;t have admin access.</p>
           <p className={styles.noticeMuted}>
-            Signed in as {session.user.email}. Ask an existing admin to grant you
-            access.
+            {session ? `Signed in as ${session.user.email}. ` : ""}Ask an existing
+            admin to grant you access.
           </p>
         </Notice>
       );
     }
-    if (loading) return <Notice>Loading illustrations…</Notice>;
     if (!gallery) {
+      if (sessionPending || loading) return <Notice>Loading illustrations…</Notice>;
       return (
         <Notice>
           <p>{error ?? "Couldn't load the illustrations."}</p>
@@ -457,7 +531,7 @@ export function IllustrationPromptsClient() {
             className={`${styles.filterBtn} ${markedOnly ? styles.filterBtnOn : ""}`}
             onClick={() => {
               setMarkedOnly((v) => !v);
-              setPage(0);
+              resetPage();
             }}
             aria-pressed={markedOnly}
           >
