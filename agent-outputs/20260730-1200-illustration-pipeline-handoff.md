@@ -308,8 +308,16 @@ The handle printed under every figure on the site **is** the prompt id, and is e
 what `--only` takes. That is what it is for — a user reporting "regenerate `css-grid`"
 gives you everything you need.
 
+A redraw means a **new `subject`, written from scratch** — not the old string with
+clauses trimmed off it, which is how the composition that failed comes back thinner.
+Read whatever was said about the image first (the reviewer's words, or the note on its
+row in the regeneration queue), treat that as the brief, and keep only two things from
+the old subject: any **creature** in it, unchanged, and the idea the lesson needs
+illustrated. `agent-outputs/20260803-0900-illustration-regeneration-queue.md` step 2
+has the long version.
+
 ```bash
-# 1. edit that prompt's "subject" in data/illustration-prompts.json, then:
+# 1. rewrite that prompt's "subject" in data/illustration-prompts.json, then:
 node scripts/generate-illustrations.mjs submit --only css-grid --sink r2 --run 2026-08-fix
 node scripts/generate-illustrations.mjs status
 node scripts/generate-illustrations.mjs download --sink r2 --run 2026-08-fix

@@ -173,6 +173,14 @@ describe("the regeneration queue", () => {
     const mark = await upsertRegenMark(db, { promptId: "a", marked: false, note: "" });
     expect(mark.note).toBe("");
   });
+
+  // The default is substituted *after* normalizeNote, so it is the one note
+  // that reaches SQL unchecked: it has to already be the single bounded line
+  // every other note is reduced to.
+  it("stores a default note that is already normalized and within the cap", () => {
+    expect(normalizeNote(DEFAULT_REGEN_NOTE)).toBe(DEFAULT_REGEN_NOTE);
+    expect(DEFAULT_REGEN_NOTE.length).toBeLessThanOrEqual(MAX_NOTE_LENGTH);
+  });
 });
 
 describe("approval", () => {

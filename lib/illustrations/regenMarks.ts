@@ -1,6 +1,6 @@
 /**
  * The illustration regeneration queue: which generated images an admin wants
- * redrawn, and the extra prompt guidance to redraw them with.
+ * redrawn, and the brief to write each replacement prompt from.
  *
  * Storage is D1 database **`dataslope-illustrations`**, table
  * **`illustration_regen_marks`**, reached through the `ILLUSTRATIONS_DB`
@@ -20,9 +20,9 @@
  */
 import type { D1Database } from "@cloudflare/workers-types";
 
-/** Longest note stored. Notes are a sentence of guidance ("use a simpler
- *  illustration"), not a replacement prompt, and the cap keeps a row small
- *  enough that the whole queue stays one cheap read. */
+/** Longest note stored. A note is the brief for a prompt written from scratch
+ *  (see the runbook), not the replacement prompt itself, so a sentence is
+ *  always enough and the cap keeps the whole queue one cheap read. */
 export const MAX_NOTE_LENGTH = 500;
 
 /**
@@ -30,13 +30,19 @@ export const MAX_NOTE_LENGTH = 500;
  *
  * Empty was the wrong default. The usual reason to redraw is that the fine
  * detail came out malformed (mushed star points, broken little characters,
- * lettering-shaped smears), and the fix for that is always the same: ask for
- * fewer, larger shapes. A blank note left that unsaid and invited the model to
- * redraw the same busy composition.
+ * lettering-shaped smears), and the fix for that is always the same: fewer,
+ * larger shapes. A blank note left that unsaid and invited the model to redraw
+ * the same busy composition.
+ *
+ * It asks for a redraw *from scratch* rather than a simpler illustration,
+ * because "simpler" was read as an edit to the old prompt: clauses came off the
+ * end of the existing `subject` and the same picture came back with fewer
+ * objects in it. The composition is what failed, so the composition is what a
+ * redraw has to replace.
  */
 export const DEFAULT_REGEN_NOTE =
-  "use a simpler illustration with fewer, larger shapes and less fine detail: " +
-  "the small details came out malformed";
+  "redraw this from scratch with a different composition: fewer, larger shapes " +
+  "and less fine detail, since the small details came out malformed";
 
 /** One row of the queue, as the API and the gallery exchange it. */
 export interface RegenMark {
@@ -44,7 +50,7 @@ export interface RegenMark {
   promptId: string;
   /** Whether this illustration is currently queued for regeneration. */
   marked: boolean;
-  /** Extra guidance to apply when redrawing, "" when none was given. */
+  /** The brief for the redraw's new prompt, "" when none was given. */
   note: string;
   /** ISO-8601 UTC of the last change to this row. */
   updatedAt: string;
@@ -88,8 +94,8 @@ export function isAwaitingApproval(mark: RegenMark): boolean {
 }
 
 /** Clean a note as typed: control characters (newlines included) collapse to a
- *  space, then trim and cap. A note is one line of guidance appended to a
- *  generation prompt, so it never needs to carry line structure. */
+ *  space, then trim and cap. A note is one line of guidance read by whoever
+ *  writes the next prompt, so it never needs to carry line structure. */
 export function normalizeNote(raw: unknown): string {
   if (typeof raw !== "string") return "";
   let out = "";

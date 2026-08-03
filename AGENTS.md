@@ -149,8 +149,8 @@ tool, and a click opens the raw image in a new tab. Every card can be marked
 `dataslope-illustrations`, table `illustration_regen_marks` (binding
 `ILLUSTRATIONS_DB`, schema in `migrations-illustrations/`). Typing in the note
 marks the illustration by itself; marking with the note blank stores
-`DEFAULT_REGEN_NOTE` ("use a simpler illustration with fewer, larger shapes…"),
-which is the usual reason to redraw.
+`DEFAULT_REGEN_NOTE` ("redraw this from scratch with a different composition:
+fewer, larger shapes…"), which is the usual reason to redraw.
 
 A card moves through three states: normal, red once queued, then **green with an
 Approve button** once redrawn and not yet signed off. Approve is the human's
@@ -158,9 +158,13 @@ half of the loop and returns the card to normal.
 
 > **Regenerating what is marked:**
 > `agent-outputs/20260803-0900-illustration-regeneration-queue.md` is the
-> runbook. Short version: read `WHERE marked = 1`, fold each note into that
-> prompt's `subject` in the JSON (do not append it to the built prompt),
-> generate → remove background → promote as usual, then set `marked = 0` and
+> runbook. Short version: read `WHERE marked = 1`, then for each id **read the
+> note first and write that prompt's `subject` again from scratch** — the note
+> is the brief for a new illustration, not a suffix on the built prompt and not
+> an edit to the old subject (trimming clauses off the old one just brings the
+> failed composition back). Carry over any creature the old subject had (marmot,
+> elephant, panda, penguin, duck) and the idea the lesson needs; invent the rest.
+> Then generate → remove background → promote as usual, and set `marked = 0` and
 > stamp `regenerated_at` for exactly the ids you redrew, so they come back for
 > approval. Never stamp `approved_at` yourself.
 

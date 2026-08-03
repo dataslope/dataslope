@@ -5,7 +5,7 @@
 The `/illustration-prompts` gallery is where generated art gets judged. This
 document covers the half that outlives the review session: the **regeneration
 queue**, a D1 table recording which illustrations were marked "redraw this" and
-what extra guidance to redraw them with.
+the brief to write each replacement prompt from.
 
 If you are an agent who has been asked to *"regenerate the images marked in the
 database"*, you want [The regeneration loop](#the-regeneration-loop).
@@ -50,7 +50,7 @@ recorded a migration for this database).
 | --- | --- | --- |
 | `prompt_id` | TEXT PK | Illustration id from `data/illustration-prompts.json`. Also the file stem: `public/images/<prompt_id>.webp` and `<prompt_id>-cutout.webp`. |
 | `marked` | INTEGER | `1` = redraw this one, `0` = cleared. |
-| `note` | TEXT | Extra guidance for the redraw, e.g. "use a simpler illustration". Never empty on a marked row (see the default below). Capped at 500 chars, single line. |
+| `note` | TEXT | The brief the redraw's new prompt is written from, e.g. "too busy, the small parcels came out as smears". Never empty on a marked row (see the default below). Capped at 500 chars, single line. |
 | `marked_by` | TEXT | User id of the admin who last wrote the row. |
 | `created_at` | TEXT | ISO-8601 UTC. |
 | `updated_at` | TEXT | ISO-8601 UTC of the last write. |
@@ -89,11 +89,14 @@ shared by the API and the gallery.
 Marking an illustration with the note field left blank does **not** store an
 empty note. `DEFAULT_REGEN_NOTE` goes in instead:
 
-> use a simpler illustration with fewer, larger shapes and less fine detail:
-> the small details came out malformed
+> redraw this from scratch with a different composition: fewer, larger shapes
+> and less fine detail, since the small details came out malformed
 
 That is the common case by a wide margin (mushed star points, broken little
-characters, lettering-shaped smears), and the fix is always the same. The
+characters, lettering-shaped smears), and the fix is always the same. It asks
+for a redraw *from scratch* rather than "a simpler illustration" because the
+older wording was read as an edit to the existing prompt: clauses came off the
+end of the old `subject` and the same composition came back, thinner. The
 gallery shows the default as the input's placeholder, so what will be stored is
 visible before the button is pressed. Type anything and that wins.
 
@@ -160,8 +163,9 @@ SELECT group_concat(prompt_id) FROM illustration_regen_marks WHERE marked = 1;
 
 ## The regeneration loop
 
-Work one batch at a time. Every step below is the standard pipeline; the only
-new parts are step 1 (read the queue) and step 6 (stamp it).
+Work one batch at a time. Steps 3–5 and 7 are the standard pipeline; the parts
+that only exist here are step 1 (read the queue), step 2 (rewrite the prompt),
+and step 6 (stamp it).
 
 **1. Read the queue.**
 
@@ -169,18 +173,52 @@ new parts are step 1 (read the queue) and step 6 (stamp it).
 SELECT prompt_id, note FROM illustration_regen_marks WHERE marked = 1 ORDER BY updated_at;
 ```
 
-**2. Apply each note to the prompt, in `data/illustration-prompts.json`.**
+**2. Rewrite each prompt from scratch, in `data/illustration-prompts.json`.**
 
-The note is an instruction about the prompt, not a suffix to paste onto it. Do
-not bolt "use a simpler illustration" onto the end of the generated prompt
-string: edit the entry's `subject` (occasionally its `style`) so the change is
-versioned in git and every future regeneration inherits it. `subject` is the
-only free text in the prompt; `buildIllustrationPrompt` supplies the article,
-the style, "No text.", and the brand colors around it
-(`lib/illustrationPrompt.ts`).
+A redraw replaces the prompt. It does not append the note to it, and it does
+not edit the old `subject` down. The image that got marked is the one the old
+subject produced, so keeping that wording keeps the composition that failed —
+which is how a note like "too busy" comes back as the same picture with two
+objects missing.
 
-A note like "use a simpler illustration" usually means cutting clauses out of
-the subject, not adding the word "simple" to it.
+Work in this order. The order is the point:
+
+1. **Read the note first.** It is the brief for the new illustration. Do not
+   look at the old subject until you have it, so you are not editing when you
+   should be writing.
+2. **Then read the old `subject`, for the two things that must carry over.**
+   - **The creatures.** Any animal in the old subject stays, and stays the
+     *same* animal: the Dataslope marmot, the PostgreSQL elephant, the pandas
+     panda, the seaborn penguin, the DuckDB duck. A creature is the page's
+     character, not fine detail to be simplified away, and swapping or dropping
+     one changes what the illustration is. `mascot` must still match the new
+     subject (the audit in the pipeline handoff's Verification section catches
+     it if it doesn't).
+   - **The idea the lesson needs illustrated.** The prompt still has to belong
+     to that page.
+3. **Write a new `subject` from scratch** against the brief: new objects, new
+   arrangement, new framing. Reuse nothing from the old wording except the
+   creatures. Follow "Writing a good `subject`" in
+   `agent-outputs/20260730-1200-illustration-pipeline-handoff.md`.
+4. **Replace the string** in the JSON (occasionally `style` too). Git keeps the
+   previous subject, so nothing is lost by overwriting it.
+
+`subject` is the only free text in the prompt; `buildIllustrationPrompt`
+supplies the article, the style, "No text.", and the brand colors around it
+(`lib/illustrationPrompt.ts`). Editing the JSON — rather than passing anything
+extra to the generator — is what versions the change in git and makes every
+future regeneration inherit it.
+
+A worked example, for a note reading *"too busy, the small parcels came out as
+smears"*:
+
+| | |
+| --- | --- |
+| **Old subject** | the Dataslope marmot mascot perched on a stack of tiny labelled crates, sorting a swarm of small parcels into six narrow chutes, a clipboard and a scanner floating beside it |
+| **Rewrite** | the Dataslope marmot mascot pushing one large parcel into the mouth of a wide chute on a plain platform |
+| **Not this** | ~~the Dataslope marmot mascot sorting small parcels into three chutes~~ — the old subject with clauses deleted, so the same crowded scene comes back |
+
+The marmot survives because it is a creature. Everything else is new.
 
 **3. Generate, always via the Batch API, quality `low`.**
 
@@ -235,7 +273,9 @@ The note stays either way. If the redraw did not fix it, the reviewer re-marks
 the row and the previous guidance is still there to build on.
 
 **7. Commit** the JSON edits, the new WebP files, and the manifest, then say in
-the PR which ids were redrawn and what each note asked for. Point the reviewer
+the PR which ids were redrawn, what each note asked for, and the subject you
+wrote from it — the old one is a `git show` away if anyone wants the
+before/after. Point the reviewer
 at `/illustration-prompts?filter=regenerated`, which is exactly the batch you
 just landed.
 
@@ -251,12 +291,18 @@ just landed.
   not a drawing problem. Re-run step 4 for that run; regenerating the image is
   wasted money.
 - **Notes are single-line and capped at 500 characters** (`MAX_NOTE_LENGTH` in
-  `lib/illustrations/regenMarks.ts`). They are guidance, not replacement
-  prompts. A full rewrite belongs in `subject`.
+  `lib/illustrations/regenMarks.ts`). A note is the *brief* for the new prompt,
+  never the prompt itself — the prompt is what you write from it, into
+  `subject`.
 - **A note reading exactly `DEFAULT_REGEN_NOTE` means nothing was typed.** It is
-  still a real instruction (simplify, fewer and larger shapes) and should be
-  acted on, but there is no illustration-specific observation behind it, so look
-  at the image before deciding what to cut.
+  still a real instruction (a fresh composition, fewer and larger shapes) and
+  should be acted on, but there is no illustration-specific observation behind
+  it, so look at the image before deciding what the new scene should be.
+- **A rewrite that keeps the old creature is correct; one that drops it is a
+  bug.** Losing the marmot (or the elephant, panda, penguin, duck) is the one
+  way a from-scratch rewrite goes wrong that the pipeline will not catch for
+  you — except through the `mascot`-flag audit, which is worth running after a
+  batch.
 - **Never stamp `approved_at` from a script.** Approval is the human's
   confirmation that a redraw worked; an agent setting it erases the only signal
   that anyone looked.
