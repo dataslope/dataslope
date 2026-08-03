@@ -12,7 +12,8 @@
  *          WebP (the only image the gallery shows), and the current
  *          regeneration marks.
  *   PUT  → set or clear one illustration's regeneration mark, with an optional
- *          note ("use a simpler illustration").
+ *          note ("use a simpler illustration"), or, with `approve: true`, sign
+ *          off a redraw so it stops showing as waiting to be looked at.
  *
  * Marks live in D1 `dataslope-illustrations`, table `illustration_regen_marks`
  * (binding `ILLUSTRATIONS_DB`; see lib/illustrations/regenMarks.ts and
@@ -30,8 +31,10 @@ import {
   type IllustrationPromptEntry,
 } from "@/lib/illustrationPromptsGallery";
 import {
+  approveRegenMark,
   listRegenMarks,
   upsertRegenMark,
+  DEFAULT_REGEN_NOTE,
   MAX_NOTE_LENGTH,
   type RegenMark,
 } from "@/lib/illustrations/regenMarks";
@@ -61,6 +64,10 @@ export interface IllustrationGallery {
   /** False when ILLUSTRATIONS_DB isn't bound: the gallery renders read-only. */
   marksAvailable: boolean;
   maxNoteLength: number;
+  /** Guidance stored when an illustration is marked with no note of its own.
+   *  Sent so the gallery can show it as the input's placeholder, rather than
+   *  keeping a second copy of the wording in the client. */
+  defaultNote: string;
 }
 
 function json(data: unknown, status = 200): Response {
@@ -114,6 +121,7 @@ export async function GET(request: Request): Promise<Response> {
     marks,
     marksAvailable,
     maxNoteLength: MAX_NOTE_LENGTH,
+    defaultNote: DEFAULT_REGEN_NOTE,
   };
   return json(payload);
 }
@@ -131,7 +139,12 @@ export async function PUT(request: Request): Promise<Response> {
     );
   }
 
-  let body: { id?: unknown; marked?: unknown; note?: unknown };
+  let body: {
+    id?: unknown;
+    marked?: unknown;
+    note?: unknown;
+    approve?: unknown;
+  };
   try {
     body = (await request.json()) as typeof body;
   } catch {
@@ -146,12 +159,16 @@ export async function PUT(request: Request): Promise<Response> {
   }
 
   try {
-    const mark = await upsertRegenMark(db, {
-      promptId: id,
-      marked: body.marked === true,
-      note: typeof body.note === "string" ? body.note : "",
-      markedBy: gate.user.id,
-    });
+    // Two writes share this endpoint because they are two halves of one round
+    // trip: `approve: true` signs off a redraw, anything else sets the mark.
+    const mark = body.approve
+      ? await approveRegenMark(db, { promptId: id, approvedBy: gate.user.id })
+      : await upsertRegenMark(db, {
+          promptId: id,
+          marked: body.marked === true,
+          note: typeof body.note === "string" ? body.note : "",
+          markedBy: gate.user.id,
+        });
     return json({ mark });
   } catch (err) {
     console.error("illustration mark write failed", err);

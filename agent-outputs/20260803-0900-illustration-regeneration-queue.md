@@ -24,7 +24,7 @@ and the "Illustrations" section of `AGENTS.md`. This document assumes both.
 | **Database id** | `0ab9f248-58dc-4e0a-a17e-f41badf9f6c0` |
 | **Worker binding** | `ILLUSTRATIONS_DB` (`wrangler.jsonc` → `d1_databases`) |
 | **Table** | `illustration_regen_marks` |
-| **Schema** | `migrations-illustrations/0001_create_illustration_regen_marks.sql` |
+| **Schema** | `migrations-illustrations/0001_…`, `0002_add_approval_tracking.sql` |
 | **Access layer** | `lib/illustrations/regenMarks.ts` |
 | **API** | `app/api/admin/illustration-prompts/route.ts` (`GET` gallery, `PUT` mark) |
 | **UI** | `app/illustration-prompts/` |
@@ -50,13 +50,15 @@ recorded a migration for this database).
 | --- | --- | --- |
 | `prompt_id` | TEXT PK | Illustration id from `data/illustration-prompts.json`. Also the file stem: `public/images/<prompt_id>.webp` and `<prompt_id>-cutout.webp`. |
 | `marked` | INTEGER | `1` = redraw this one, `0` = cleared. |
-| `note` | TEXT | Extra guidance for the redraw, e.g. "use a simpler illustration". `''` when none. Capped at 500 chars, single line. |
+| `note` | TEXT | Extra guidance for the redraw, e.g. "use a simpler illustration". Never empty on a marked row (see the default below). Capped at 500 chars, single line. |
 | `marked_by` | TEXT | User id of the admin who last wrote the row. |
 | `created_at` | TEXT | ISO-8601 UTC. |
 | `updated_at` | TEXT | ISO-8601 UTC of the last write. |
-| `regenerated_at` | TEXT | ISO-8601 UTC, stamped by whoever redraws the art. NULL until then. |
+| `regenerated_at` | TEXT | ISO-8601 UTC, **stamped by whoever redraws the art**. NULL until then. |
+| `approved_at` | TEXT | ISO-8601 UTC, stamped when an admin presses Approve. NULL until then. |
+| `approved_by` | TEXT | User id of the admin who signed the redraw off. |
 
-Two deliberate choices:
+Three deliberate choices:
 
 - **No foreign key to anything.** The prompt list lives in git, not in this
   database. A row must survive a prompt being renamed for long enough that
@@ -64,6 +66,36 @@ Two deliberate choices:
 - **Unmarking keeps the row.** Clearing a mark sets `marked = 0` and leaves the
   note, so the next review round starts from what was already observed. "What
   needs regenerating" is therefore `WHERE marked = 1`, never "every row".
+- **Approval is a timestamp, not a flag.** "Waiting to be looked at" is derived
+  by comparing the two dates, which is what makes a *second* redraw of an
+  already-approved illustration come back for review: the fresh
+  `regenerated_at` simply overtakes the stale `approved_at`.
+
+### The three states
+
+| State | Row | Card in the gallery |
+| --- | --- | --- |
+| Idle | `marked = 0`, and approved (or never redrawn) | Normal |
+| Queued | `marked = 1` | Red tint, "Marked for regeneration" |
+| Redrawn, unreviewed | `regenerated_at IS NOT NULL AND (approved_at IS NULL OR approved_at < regenerated_at)` | Green tint, banner with the date, **Approve** button |
+
+A queued row outranks an unreviewed one visually: if the redraw was still wrong
+and the admin marked it again, red is the state that matters. `isAwaitingApproval`
+in `lib/illustrations/regenMarks.ts` is the one definition of that middle state,
+shared by the API and the gallery.
+
+### The default note
+
+Marking an illustration with the note field left blank does **not** store an
+empty note. `DEFAULT_REGEN_NOTE` goes in instead:
+
+> use a simpler illustration with fewer, larger shapes and less fine detail:
+> the small details came out malformed
+
+That is the common case by a wide margin (mushed star points, broken little
+characters, lettering-shaped smears), and the fix is always the same. The
+gallery shows the default as the input's placeholder, so what will be stored is
+visible before the button is pressed. Type anything and that wins.
 
 ---
 
@@ -85,8 +117,15 @@ Clicking an image opens the raw file in a new tab at full size.
 Each card carries the prompt, a copy button, the lesson it renders on, a
 **Mark for regeneration** toggle, and a note input. Toggling the mark saves
 immediately; the note saves on blur (or Enter) and always travels with the
-mark, so typing a note then hitting the button persists both. A "Marked for
-regeneration" filter at the top collapses the grid to the queue.
+mark, so typing a note then hitting the button persists both. A card that has
+been redrawn since it was last signed off turns green and grows an **Approve**
+button, which is the whole of the sign-off: press it and the card goes back to
+looking like every other one.
+
+Two filter chips at the top narrow the grid, to what is queued and to what is
+waiting for approval. Both the filter and the page are in the URL
+(`?page=2&filter=regenerated`), so a view can be reloaded, bookmarked, or
+shared.
 
 Marking is disabled with a visible warning when `ILLUSTRATIONS_DB` is not
 bound; reviewing still works.
@@ -172,8 +211,10 @@ This writes `public/images/<id>.webp` + `<id>-cutout.webp` and refreshes
 did not change, so the `<Figure>` in each lesson already points at the new
 bytes.
 
-**6. Clear the marks you actually redrew.** Not the whole table: a mark added
-while you were working is not one you have handled.
+**6. Hand the ids you redrew back for review.** Clear the mark and stamp
+`regenerated_at`, which is what turns those cards green with an Approve button.
+Do it for the ids you actually redrew, not the whole table: a mark added while
+you were working is not one you have handled.
 
 ```sql
 UPDATE illustration_regen_marks
@@ -183,11 +224,17 @@ UPDATE illustration_regen_marks
  WHERE prompt_id IN ('aida-broken-joins', 'python-basics-loops');
 ```
 
-The note stays. If the redraw did not fix it, the next reviewer re-marks the
-row and the previous guidance is still there to build on.
+Do **not** touch `approved_at`. Approving is the human's half of the round trip
+(the Approve button on the card, or the `?filter=regenerated` view for the whole
+batch); an agent stamping it would sign off its own work.
+
+The note stays either way. If the redraw did not fix it, the reviewer re-marks
+the row and the previous guidance is still there to build on.
 
 **7. Commit** the JSON edits, the new WebP files, and the manifest, then say in
-the PR which ids were redrawn and what each note asked for.
+the PR which ids were redrawn and what each note asked for. Point the reviewer
+at `/illustration-prompts?filter=regenerated`, which is exactly the batch you
+just landed.
 
 ---
 
@@ -203,6 +250,13 @@ the PR which ids were redrawn and what each note asked for.
 - **Notes are single-line and capped at 500 characters** (`MAX_NOTE_LENGTH` in
   `lib/illustrations/regenMarks.ts`). They are guidance, not replacement
   prompts. A full rewrite belongs in `subject`.
+- **A note reading exactly `DEFAULT_REGEN_NOTE` means nothing was typed.** It is
+  still a real instruction (simplify, fewer and larger shapes) and should be
+  acted on, but there is no illustration-specific observation behind it, so look
+  at the image before deciding what to cut.
+- **Never stamp `approved_at` from a script.** Approval is the human's
+  confirmation that a redraw worked; an agent setting it erases the only signal
+  that anyone looked.
 - **Deleting a course does not clear its marks.** Rows for removed prompt ids
   linger harmlessly (the gallery only renders ids that still exist). Clean them
   up with a `DELETE ... WHERE prompt_id LIKE '<prefix>%'` if they get noisy.

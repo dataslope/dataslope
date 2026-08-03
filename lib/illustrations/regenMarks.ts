@@ -25,6 +25,19 @@ import type { D1Database } from "@cloudflare/workers-types";
  *  enough that the whole queue stays one cheap read. */
 export const MAX_NOTE_LENGTH = 500;
 
+/**
+ * Guidance applied when an illustration is marked with no note of its own.
+ *
+ * Empty was the wrong default. The usual reason to redraw is that the fine
+ * detail came out malformed (mushed star points, broken little characters,
+ * lettering-shaped smears), and the fix for that is always the same: ask for
+ * fewer, larger shapes. A blank note left that unsaid and invited the model to
+ * redraw the same busy composition.
+ */
+export const DEFAULT_REGEN_NOTE =
+  "use a simpler illustration with fewer, larger shapes and less fine detail: " +
+  "the small details came out malformed";
+
 /** One row of the queue, as the API and the gallery exchange it. */
 export interface RegenMark {
   /** Illustration id (= prompt id = file stem). */
@@ -37,6 +50,8 @@ export interface RegenMark {
   updatedAt: string;
   /** ISO-8601 UTC stamped when the art was last redrawn, null if never. */
   regeneratedAt: string | null;
+  /** ISO-8601 UTC stamped when a redraw was last signed off, null if never. */
+  approvedAt: string | null;
 }
 
 interface MarkRow {
@@ -45,6 +60,7 @@ interface MarkRow {
   note: string | null;
   updated_at: string;
   regenerated_at: string | null;
+  approved_at: string | null;
 }
 
 function toMark(row: MarkRow): RegenMark {
@@ -54,7 +70,21 @@ function toMark(row: MarkRow): RegenMark {
     note: row.note ?? "",
     updatedAt: row.updated_at,
     regeneratedAt: row.regenerated_at,
+    approvedAt: row.approved_at,
   };
+}
+
+/**
+ * Whether this illustration has been redrawn since anyone last signed it off,
+ * so the gallery should surface it for a look.
+ *
+ * Comparing the timestamps (rather than treating approval as a flag) is what
+ * makes a *second* redraw of an already-approved illustration come back: the
+ * fresh `regeneratedAt` overtakes the stale `approvedAt`.
+ */
+export function isAwaitingApproval(mark: RegenMark): boolean {
+  if (!mark.regeneratedAt) return false;
+  return !mark.approvedAt || mark.approvedAt < mark.regeneratedAt;
 }
 
 /** Clean a note as typed: control characters (newlines included) collapse to a
@@ -81,7 +111,7 @@ export function normalizeNote(raw: unknown): string {
 export async function listRegenMarks(db: D1Database): Promise<RegenMark[]> {
   const { results } = await db
     .prepare(
-      `SELECT prompt_id, marked, note, updated_at, regenerated_at
+      `SELECT prompt_id, marked, note, updated_at, regenerated_at, approved_at
          FROM illustration_regen_marks
         ORDER BY marked DESC, updated_at ASC`,
     )
@@ -106,7 +136,10 @@ export async function upsertRegenMark(
   },
 ): Promise<RegenMark> {
   const now = new Date().toISOString();
-  const note = normalizeNote(input.note);
+  // Marking with nothing typed means "the usual problem", so store the usual
+  // instruction rather than an empty note. Clearing a mark keeps whatever is
+  // there, including nothing.
+  const note = normalizeNote(input.note) || (input.marked ? DEFAULT_REGEN_NOTE : "");
   await db
     .prepare(
       `INSERT INTO illustration_regen_marks
@@ -121,23 +154,58 @@ export async function upsertRegenMark(
     .bind(input.promptId, input.marked ? 1 : 0, note, input.markedBy ?? null, now, now)
     .run();
 
-  const row = await db
-    .prepare(
-      `SELECT prompt_id, marked, note, updated_at, regenerated_at
-         FROM illustration_regen_marks WHERE prompt_id = ?`,
-    )
-    .bind(input.promptId)
-    .first<MarkRow>();
+  const row = await readMark(db, input.promptId);
 
   // The read-back can only be null if the row vanished between the two
   // statements; fall back to what was just written rather than throwing.
-  return row
-    ? toMark(row)
-    : {
-        promptId: input.promptId,
-        marked: input.marked,
-        note,
-        updatedAt: now,
-        regeneratedAt: null,
-      };
+  return (
+    row ?? {
+      promptId: input.promptId,
+      marked: input.marked,
+      note,
+      updatedAt: now,
+      regeneratedAt: null,
+      approvedAt: null,
+    }
+  );
+}
+
+/** One row by id, or null when the illustration has never been marked. */
+export async function readMark(
+  db: D1Database,
+  promptId: string,
+): Promise<RegenMark | null> {
+  const row = await db
+    .prepare(
+      `SELECT prompt_id, marked, note, updated_at, regenerated_at, approved_at
+         FROM illustration_regen_marks WHERE prompt_id = ?`,
+    )
+    .bind(promptId)
+    .first<MarkRow>();
+  return row ? toMark(row) : null;
+}
+
+/**
+ * Sign off a redraw: stamp `approved_at` so the illustration stops showing as
+ * "regenerated, waiting to be looked at" and the card goes back to normal.
+ *
+ * A no-op on an illustration that was never regenerated (nothing to approve),
+ * which is why this returns the row rather than assuming a state change.
+ * Approval deliberately does not touch `marked`: an admin who wants another
+ * pass marks it again, and that mark outranks the approval visually.
+ */
+export async function approveRegenMark(
+  db: D1Database,
+  input: { promptId: string; approvedBy?: string | null },
+): Promise<RegenMark | null> {
+  const now = new Date().toISOString();
+  await db
+    .prepare(
+      `UPDATE illustration_regen_marks
+          SET approved_at = ?, approved_by = ?, updated_at = ?
+        WHERE prompt_id = ? AND regenerated_at IS NOT NULL`,
+    )
+    .bind(now, input.approvedBy ?? null, now, input.promptId)
+    .run();
+  return readMark(db, input.promptId);
 }

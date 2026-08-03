@@ -178,6 +178,30 @@
   background: color-mix(in srgb, var(--ds-red-500, #ff4f59) 7%, var(--card-bg));
 }
 
+/* Redrawn since anyone last signed it off: green until Approve is pressed,
+   which is what makes a batch of regenerated art findable in the grid. Never
+   applied at the same time as .cardMarked (see `tint` at the call site), so
+   the two tints cannot mix. */
+.cardRegenerated {
+  border-color: var(--ds-green-400, #66d361);
+  background: color-mix(in srgb, var(--ds-green-500, #20c621) 8%, var(--card-bg));
+}
+
+/* Says in words what the tint says in colour, and carries the date. */
+.regenBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ds-green-ink, #006f01);
+}
+
+:global(html.dark) .regenBanner {
+  color: var(--ds-green-300, #93e08e);
+}
+
 .cardTop {
   display: flex;
   align-items: center;
@@ -411,6 +435,34 @@
   background: var(--ds-red-600, #dc3f49);
 }
 
+/* Full-width and green: on a card awaiting approval this is the one action the
+   reviewer is there to take, so it sits above the mark/copy row rather than
+   competing inside it. */
+.approveBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: var(--ds-green-600, #0aa80f);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.approveBtn:hover:not(:disabled) {
+  background: var(--ds-green-700, #008b03);
+}
+
+.approveBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .noteInput {
   width: 100%;
   box-sizing: border-box;
@@ -476,9 +528,21 @@
 
 /* Must restate the hover: `.filterBtn:hover` above carries a pseudo-class and
    would otherwise outrank the plain `.filterBtnOn`, painting the active pill
-   with the neutral hover fill and leaving white text on near-white. */
+   with the neutral hover fill and leaving white text on near-white. Same for
+   the green variant below. */
 .filterBtnOn:hover {
   background: var(--ds-red-600, #dc3f49);
+}
+
+/* The "awaiting approval" chip, matching the tint of the cards it selects. */
+.filterBtnGreenOn {
+  border-color: transparent;
+  background: var(--ds-green-600, #0aa80f);
+  color: #ffffff;
+}
+
+.filterBtnGreenOn:hover {
+  background: var(--ds-green-700, #008b03);
 }
 
 .filterCount {
@@ -490,7 +554,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-.filterBtnOn .filterCount {
+.filterBtnOn .filterCount,
+.filterBtnGreenOn .filterCount {
   background: rgb(255 255 255 / 0.25);
   color: #ffffff;
 }

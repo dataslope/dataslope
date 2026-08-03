@@ -29,7 +29,16 @@
  * and survives a reload.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, ImageIcon, Loader2, RefreshCw, TriangleAlert } from "lucide-react";
+import {
+  Check,
+  Copy,
+  ImageIcon,
+  Loader2,
+  RefreshCw,
+  Sparkles,
+  ThumbsUp,
+  TriangleAlert,
+} from "lucide-react";
 import Link from "@/app/_components/Link";
 import { ThemePillToggle } from "@/app/_components/ThemePillToggle";
 import { useSession } from "@/lib/auth/client";
@@ -37,7 +46,7 @@ import type {
   GalleryEntry,
   IllustrationGallery,
 } from "@/app/api/admin/illustration-prompts/route";
-import type { RegenMark } from "@/lib/illustrations/regenMarks";
+import { isAwaitingApproval, type RegenMark } from "@/lib/illustrations/regenMarks";
 import styles from "./illustration-prompts.module.css";
 
 /** Cards per page. One image per card now (the cut-out), laid out in a grid,
@@ -52,13 +61,21 @@ interface MarkState {
   note: string;
   /** What the server last confirmed, so blur can skip a no-op write. */
   savedNote: string;
+  /** Redrawn since anyone last signed it off: the card wants a look. */
+  awaitingApproval: boolean;
+  /** When the art was last redrawn (ISO-8601 UTC), null if never. */
+  regeneratedAt: string | null;
   saving: boolean;
   /** Set briefly after a successful write, to flash a tick. */
   justSaved: boolean;
 }
 
-/** Query parameter carrying the 1-based page number. */
+/** Which subset of the gallery is shown. `regenerated` is the review queue for
+ *  redraws that have landed but nobody has looked at yet. */
+type Filter = "all" | "marked" | "regenerated";
+
 const PAGE_PARAM = "page";
+const FILTER_PARAM = "filter";
 
 /** The page (0-based) named by a URL's `?page=`, or 0 when absent/invalid. */
 function pageFromSearch(search: string): number {
@@ -67,13 +84,21 @@ function pageFromSearch(search: string): number {
   return Number.isInteger(n) && n > 1 ? n - 1 : 0;
 }
 
-/** The current URL with `?page=` set to a 1-based page, dropped on page 1 so
- *  the first page keeps a clean canonical URL. Hash is preserved: card ids are
- *  anchors on this page. */
-function urlForPage(page: number): string {
+/** The filter named by a URL's `?filter=`, defaulting to the whole gallery. */
+function filterFromSearch(search: string): Filter {
+  const raw = new URLSearchParams(search).get(FILTER_PARAM);
+  return raw === "marked" || raw === "regenerated" ? raw : "all";
+}
+
+/** The current URL carrying a page (1-based) and filter, each dropped at its
+ *  default so the plain gallery keeps a clean canonical URL. Hash is
+ *  preserved: card ids are anchors on this page. */
+function urlFor(page: number, filter: Filter): string {
   const url = new URL(window.location.href);
   if (page > 0) url.searchParams.set(PAGE_PARAM, String(page + 1));
   else url.searchParams.delete(PAGE_PARAM);
+  if (filter !== "all") url.searchParams.set(FILTER_PARAM, filter);
+  else url.searchParams.delete(FILTER_PARAM);
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
@@ -81,6 +106,8 @@ const EMPTY_MARK: MarkState = {
   marked: false,
   note: "",
   savedNote: "",
+  awaitingApproval: false,
+  regeneratedAt: null,
   saving: false,
   justSaved: false,
 };
@@ -90,9 +117,20 @@ function markStateFrom(mark: RegenMark): MarkState {
     marked: mark.marked,
     note: mark.note,
     savedNote: mark.note,
+    awaitingApproval: isAwaitingApproval(mark),
+    regeneratedAt: mark.regeneratedAt,
     saving: false,
     justSaved: false,
   };
+}
+
+/** "Aug 3", for the "regenerated <when>" line on a card awaiting approval. */
+function shortDate(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 // ─── Card ──────────────────────────────────────────────────────────────────
@@ -145,31 +183,48 @@ function PromptCard({
   entry,
   mark,
   maxNoteLength,
+  defaultNote,
   marksAvailable,
   copiedKey,
   onCopy,
   onNoteChange,
   onSave,
+  onApprove,
 }: {
   entry: GalleryEntry;
   mark: MarkState;
   maxNoteLength: number;
+  defaultNote: string;
   marksAvailable: boolean;
   copiedKey: string | null;
   onCopy: (key: string, text: string) => void;
   onNoteChange: (id: string, note: string) => void;
   onSave: (id: string, marked: boolean) => void;
+  onApprove: (id: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const promptKey = `${entry.id}:prompt`;
   // Trim the generic tail ("… illustration"/"… schematic") for a tidy badge.
   const styleLabel = entry.style.replace(/ (illustration|schematic)$/i, "");
 
+  // A fresh mark outranks a pending approval: if the redraw is still wrong and
+  // it has been queued again, "waiting to be looked at" is no longer the state
+  // worth showing.
+  const tint = mark.marked
+    ? styles.cardMarked
+    : mark.awaitingApproval
+      ? styles.cardRegenerated
+      : "";
+
   return (
-    <figure
-      id={entry.id}
-      className={`${styles.card} ${mark.marked ? styles.cardMarked : ""}`}
-    >
+    <figure id={entry.id} className={`${styles.card} ${tint}`}>
+      {mark.awaitingApproval && !mark.marked ? (
+        <p className={styles.regenBanner}>
+          <Sparkles size={13} aria-hidden="true" />
+          Regenerated {shortDate(mark.regeneratedAt)}, not yet approved
+        </p>
+      ) : null}
+
       <CutoutImage entry={entry} />
 
       <div className={styles.cardTop}>
@@ -205,6 +260,22 @@ function PromptCard({
       {/* The regeneration queue controls. Disabled wholesale when the D1
           binding is missing, so the gallery still reviews fine read-only. */}
       <div className={styles.regen}>
+        {mark.awaitingApproval && !mark.marked ? (
+          <button
+            type="button"
+            className={styles.approveBtn}
+            onClick={() => onApprove(entry.id)}
+            disabled={!marksAvailable || mark.saving}
+            title="The redraw is good: put this card back to normal"
+          >
+            {mark.saving ? (
+              <Loader2 size={13} className={styles.spin} />
+            ) : (
+              <ThumbsUp size={13} />
+            )}
+            Approve
+          </button>
+        ) : null}
         <div className={styles.regenRow}>
           <button
             type="button"
@@ -243,7 +314,10 @@ function PromptCard({
           value={mark.note}
           maxLength={maxNoteLength}
           disabled={!marksAvailable}
-          placeholder="Extra prompt for the redraw, e.g. use a simpler illustration"
+          // The placeholder is the default the server will store if this is
+          // left blank, so what happens on an empty note is visible up front.
+          placeholder={`Extra prompt for the redraw. Blank: "${defaultNote}"`}
+          title={`Left blank, marking stores: "${defaultNote}"`}
           aria-label={`Regeneration note for ${entry.title}`}
           onChange={(e) => onNoteChange(entry.id, e.target.value)}
           onBlur={() => {
@@ -274,7 +348,7 @@ export function IllustrationPromptsClient() {
   const [error, setError] = useState<string | null>(null);
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  const [markedOnly, setMarkedOnly] = useState(false);
+  const [filter, setFilter] = useState<Filter>("all");
   // 0-based internally, 1-based in the URL (`?page=3`).
   const [page, setPage] = useState(0);
 
@@ -394,15 +468,56 @@ export function IllustrationPromptsClient() {
     [marks, later],
   );
 
-  const markedCount = useMemo(
-    () => Object.values(marks).filter((m) => m.marked).length,
-    [marks],
+  /** Sign off a redraw: the card loses its tint and goes back to normal. */
+  const onApprove = useCallback(
+    async (id: string) => {
+      setMarks((prev) => ({
+        ...prev,
+        [id]: { ...(prev[id] ?? EMPTY_MARK), saving: true },
+      }));
+      try {
+        const res = await fetch("/api/admin/illustration-prompts", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, approve: true }),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        const { mark } = (await res.json()) as { mark: RegenMark | null };
+        setMarks((prev) => ({
+          ...prev,
+          [id]: mark
+            ? markStateFrom(mark)
+            : { ...(prev[id] ?? EMPTY_MARK), saving: false },
+        }));
+      } catch {
+        setMarks((prev) => ({
+          ...prev,
+          [id]: { ...(prev[id] ?? EMPTY_MARK), saving: false },
+        }));
+        setError("Couldn't approve that image. Please try again.");
+      }
+    },
+    [],
   );
+
+  const counts = useMemo(() => {
+    const all = Object.values(marks);
+    return {
+      marked: all.filter((m) => m.marked).length,
+      // A card queued again is counted as queued, not as waiting for a look,
+      // matching how the card itself is tinted.
+      regenerated: all.filter((m) => m.awaitingApproval && !m.marked).length,
+    };
+  }, [marks]);
 
   const visible = useMemo(() => {
     const all = gallery?.entries ?? [];
-    return markedOnly ? all.filter((e) => marks[e.id]?.marked) : all;
-  }, [gallery, marks, markedOnly]);
+    if (filter === "marked") return all.filter((e) => marks[e.id]?.marked);
+    if (filter === "regenerated") {
+      return all.filter((e) => marks[e.id]?.awaitingApproval && !marks[e.id]?.marked);
+    }
+    return all;
+  }, [gallery, marks, filter]);
 
   const pageCount = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
   const current = Math.min(page, pageCount - 1);
@@ -420,20 +535,22 @@ export function IllustrationPromptsClient() {
     return [...byLabel.entries()];
   }, [visible, current]);
 
-  // The page lives in the URL (`?page=3`), so it survives a reload, can be
-  // bookmarked, and comes back with the Back button.
+  // The page and filter live in the URL (`?page=3&filter=regenerated`), so the
+  // view survives a reload, can be bookmarked or shared ("here are the ones
+  // waiting on you"), and comes back with the Back button.
   //
   // Read on mount rather than through `useSearchParams`: this page is
   // prerendered (`force-static`), where that hook forces a Suspense boundary
   // and reads empty params at build time anyway. Parsing `window.location`
   // after hydration sidesteps both, at the cost of one extra render.
   useEffect(() => {
-    const fromUrl = pageFromSearch(window.location.search);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- adopting the URL's page on mount, once
-    if (fromUrl > 0) setPage(fromUrl);
-    const onPop = () => setPage(pageFromSearch(window.location.search));
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
+    const adopt = () => {
+      setPage(pageFromSearch(window.location.search));
+      setFilter(filterFromSearch(window.location.search));
+    };
+    adopt();
+    window.addEventListener("popstate", adopt);
+    return () => window.removeEventListener("popstate", adopt);
   }, []);
 
   // A URL can name a page past the end (`?page=99`, or a filter that shrank the
@@ -443,22 +560,27 @@ export function IllustrationPromptsClient() {
     if (!gallery || page <= pageCount - 1) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- clamping to the real page count, which is only known after the data loads
     setPage(pageCount - 1);
-    window.history.replaceState(null, "", urlForPage(pageCount - 1));
-  }, [gallery, page, pageCount]);
+    window.history.replaceState(null, "", urlFor(pageCount - 1, filter));
+  }, [gallery, page, pageCount, filter]);
 
-  const goTo = useCallback((next: number) => {
-    setPage(next);
-    // pushState, so Back walks the pages a reviewer actually visited; the
-    // popstate listener above puts the state back in step.
-    window.history.pushState(null, "", urlForPage(next));
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  const goTo = useCallback(
+    (next: number) => {
+      setPage(next);
+      // pushState, so Back walks the pages a reviewer actually visited; the
+      // popstate listener above puts the state back in step.
+      window.history.pushState(null, "", urlFor(next, filter));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [filter],
+  );
 
-  /** Jump to page 1 without adding a history entry (used when a filter change
-   *  invalidates the current page rather than the reader navigating). */
-  const resetPage = useCallback(() => {
+  /** Switch filters, back to page 1. replaceState rather than pushState: this
+   *  is narrowing the view, not navigating within it, and Back should leave the
+   *  gallery rather than undo a chip. */
+  const selectFilter = useCallback((next: Filter) => {
+    setFilter(next);
     setPage(0);
-    window.history.replaceState(null, "", urlForPage(0));
+    window.history.replaceState(null, "", urlFor(0, next));
   }, []);
 
   const body = () => {
@@ -525,18 +647,28 @@ export function IllustrationPromptsClient() {
           {error ? <p className={styles.warn}>{error}</p> : null}
         </header>
 
+        {/* Clicking the active chip clears it, so each is a toggle even though
+            the three states are exclusive. */}
         <div className={styles.toolbar}>
           <button
             type="button"
-            className={`${styles.filterBtn} ${markedOnly ? styles.filterBtnOn : ""}`}
-            onClick={() => {
-              setMarkedOnly((v) => !v);
-              resetPage();
-            }}
-            aria-pressed={markedOnly}
+            className={`${styles.filterBtn} ${filter === "marked" ? styles.filterBtnOn : ""}`}
+            onClick={() => selectFilter(filter === "marked" ? "all" : "marked")}
+            aria-pressed={filter === "marked"}
           >
             Marked for regeneration
-            <span className={styles.filterCount}>{markedCount}</span>
+            <span className={styles.filterCount}>{counts.marked}</span>
+          </button>
+          <button
+            type="button"
+            className={`${styles.filterBtn} ${filter === "regenerated" ? styles.filterBtnGreenOn : ""}`}
+            onClick={() =>
+              selectFilter(filter === "regenerated" ? "all" : "regenerated")
+            }
+            aria-pressed={filter === "regenerated"}
+          >
+            Regenerated, awaiting approval
+            <span className={styles.filterCount}>{counts.regenerated}</span>
           </button>
           <span className={styles.toolbarNote}>
             Marks are stored in D1 <code>dataslope-illustrations</code> ·{" "}
@@ -546,9 +678,11 @@ export function IllustrationPromptsClient() {
 
         {visible.length === 0 ? (
           <p className={styles.empty}>
-            {markedOnly
+            {filter === "marked"
               ? "Nothing is marked for regeneration."
-              : "No illustration prompts found."}
+              : filter === "regenerated"
+                ? "Nothing is waiting for approval."
+                : "No illustration prompts found."}
           </p>
         ) : (
           groups.map(([label, groupEntries]) => (
@@ -567,11 +701,13 @@ export function IllustrationPromptsClient() {
                     entry={entry}
                     mark={marks[entry.id] ?? EMPTY_MARK}
                     maxNoteLength={gallery.maxNoteLength}
+                    defaultNote={gallery.defaultNote}
                     marksAvailable={gallery.marksAvailable}
                     copiedKey={copiedKey}
                     onCopy={onCopy}
                     onNoteChange={onNoteChange}
                     onSave={(id, marked) => void onSave(id, marked)}
+                    onApprove={(id) => void onApprove(id)}
                   />
                 ))}
               </div>

@@ -145,16 +145,23 @@ public; following it just shows the notice.
 It renders a grid of the **background-removed WebP only** (the file the site
 serves), each over the live page background so the theme pill is the judgement
 tool, and a click opens the raw image in a new tab. Every card can be marked
-"redraw this" with a one-line note ("use a simpler illustration"), stored in D1
-database `dataslope-illustrations`, table `illustration_regen_marks` (binding
-`ILLUSTRATIONS_DB`, schema in `migrations-illustrations/`).
+"redraw this" with a one-line note, stored in D1 database
+`dataslope-illustrations`, table `illustration_regen_marks` (binding
+`ILLUSTRATIONS_DB`, schema in `migrations-illustrations/`). Marking with the
+note blank stores `DEFAULT_REGEN_NOTE` ("use a simpler illustration with fewer,
+larger shapes…"), which is the usual reason to redraw.
+
+A card moves through three states: normal, red once queued, then **green with an
+Approve button** once redrawn and not yet signed off. Approve is the human's
+half of the loop and returns the card to normal.
 
 > **Regenerating what is marked:**
 > `agent-outputs/20260803-0900-illustration-regeneration-queue.md` is the
 > runbook. Short version: read `WHERE marked = 1`, fold each note into that
 > prompt's `subject` in the JSON (do not append it to the built prompt),
 > generate → remove background → promote as usual, then set `marked = 0` and
-> stamp `regenerated_at` for exactly the ids you redrew.
+> stamp `regenerated_at` for exactly the ids you redrew, so they come back for
+> approval. Never stamp `approved_at` yourself.
 
 All four API keys are already environment variables in Claude Code sessions:
 `OPENAI_API_KEY` and `KIE_API_KEY`. The R2 variables
