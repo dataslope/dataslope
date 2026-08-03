@@ -428,6 +428,43 @@ is 25% with four options; the banks currently sit at 31.5%).
 still fail the per-question rule. Extending the guard to them means rewriting
 about 1,400 questions; it has not been done.
 
+### Answer position
+
+**Do not leave the correct option in the same slot question after question.**
+Writing a question answer-first (state the answer, then pad distractors around
+it) parks it in slot 2, and the corpus had drifted there badly: 61% of all
+questions and 99% of the interview banks. That is more guessable than any
+length tell, because it needs no reading at all.
+
+`scripts/shuffle-mcq-options.mjs` redistributes them. It permutes the choice
+blocks in place, moving each option's `[o]` marker, continuation lines and `>`
+explanation together, so only the order on the page changes:
+
+```bash
+node scripts/shuffle-mcq-options.mjs --dry-run --verbose   # report, write nothing
+node scripts/shuffle-mcq-options.mjs                       # rewrite in place
+```
+
+The permutation is content-addressed (hashed from the question body plus its
+choice texts, sorted), so a rerun is a no-op and a question keeps its layout
+until someone edits it. Questions whose options are genuinely order-dependent
+are left alone and listed under `--dry-run`: "all of the above" style options,
+text pointing at another option by position ("the first choice"), and answer
+sets that read as a sorted numeric sequence. Every rewrite is verified by
+re-parsing the block, so a question that cannot be permuted safely is skipped
+rather than mangled.
+
+Two corpora are out of scope. `content/fumadocs-dev/multiple-choice.mdx`
+documents the authoring syntax by pairing each rendered question with a
+````markdown fence showing its source, and only the rendered half is a template
+literal, so a rewrite would leave the two disagreeing. Custom content authored
+in the dashboard MCQ builder is user data and is never rewritten.
+
+`scripts/check-mcq.mjs` guards the result: across the whole corpus, no slot may
+hold more than 35% of the correct answers (chance is 25% with four options; it
+currently sits at 25.6%). The threshold is corpus-level on purpose, since a
+single page with six questions can land four of them in one slot by chance.
+
 ```markdown
 <!-- Bad -->
 - [o] Tableau

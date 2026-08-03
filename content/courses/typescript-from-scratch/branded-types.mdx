@@ -436,10 +436,10 @@ export function sendEmail(to: Email, message: string): string {
 <MultipleChoice
   markdown={`What makes branded types incompatible with their underlying primitives?
 
-- The smart constructor function
-  > The smart constructor creates the brand, but it's the intersection type that enforces incompatibility.
 - [o] The intersection with a phantom property
   > The intersection \`T & { readonly __brand: ... }\` adds a type-level property that makes the branded type structurally distinct from the base type.
+- The smart constructor function
+  > The smart constructor creates the brand, but it's the intersection type that enforces incompatibility.
 - The \`as\` cast inside the constructor
   > The cast is necessary to create the value, but it doesn't enforce safety. The type itself does.
 
@@ -453,12 +453,12 @@ The phantom property exists only in the type system, adding a "tag" that prevent
 <MultipleChoice
   markdown={`Why prefer \`unique symbol\` over string literals for brands?
 
-- String brands are less type-safe
-  > Both are equally type-safe. The difference is in collision risk.
-- [o] \`unique symbol\` prevents accidental collisions across modules
-  > Each \`unique symbol\` declaration creates a distinct type, even if named the same. String literals can collide.
 - \`unique symbol\` has better runtime performance
   > Brands are purely compile-time constructs; there's no runtime difference.
+- [o] \`unique symbol\` prevents accidental collisions across modules
+  > Each \`unique symbol\` declaration creates a distinct type, even if named the same. String literals can collide.
+- String brands are less type-safe
+  > Both are equally type-safe. The difference is in collision risk.
 
 Use \`unique symbol\` when building libraries or working in large codebases where naming collisions are a risk.`}
 />

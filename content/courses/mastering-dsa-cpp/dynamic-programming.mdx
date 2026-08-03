@@ -483,10 +483,10 @@ int main() {
   > It solves the problem with ordinary recursion but memoizes each subproblem the first time it is computed.
 - Iteration without storage.
   > Usually bottom-up uses iteration.
-- Sorting by value.
-  > That sounds greedy.
 - A binary search tree.
-  > Not related.`} />
+  > Not related.
+- Sorting by value.
+  > That sounds greedy.`} />
 
 <MultipleChoice markdown={`The standard LCS table for lengths n and m costs:
 
@@ -494,18 +494,18 @@ int main() {
   > It checks pairs of prefixes.
 - [o] O(nm)
   > The table has n × m cells and each one is filled in constant time.
-- O(log n)
-  > No halving.
 - O(2^n)
-  > DP avoids the exponential recursion.`} />
+  > DP avoids the exponential recursion.
+- O(log n)
+  > No halving.`} />
 
 <MultipleChoice markdown={`Why can Fibonacci use O(1) extra space?
 
+- [o] Each state needs only the previous two values.
+  > Keeping just the last two results lets each new value be computed in place, so no full array is needed.
 - It has no base case.
   > It has base cases.
 - C++ memoizes automatically.
   > It does not.
-- [o] Each state needs only the previous two values.
-  > Keeping just the last two results lets each new value be computed in place, so no full array is needed.
 - It only works for n=10.
   > The dependency pattern is general.`} />

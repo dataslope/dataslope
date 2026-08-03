@@ -182,14 +182,14 @@ titles use `g.set_titles(...)`. The same caution applies to `plt.xlabel` /
 and want **one** overall title centered above both panels. Which call is
 right?
 
-- \`plt.title("Tips by service time")\`
-  > \`plt.title\` titles matplotlib's current axes, the last panel drawn, so the text lands on one panel instead of above the whole figure.
-- [o] \`g.figure.suptitle("Tips by service time")\`
-  > \`suptitle\` places a single title over the entire figure; pairing it with \`g.figure.subplots_adjust(top=0.9)\` leaves room so it doesn't overlap the panels.
-- \`g.set_xlabel("Tips by service time")\`
-  > \`FacetGrid\` has no \`set_xlabel\`, and an x-label is not a figure title anyway; use \`g.set_axis_labels(...)\` for axis text.
 - \`ax.set_title("Tips by service time")\`
   > A figure-level call returns a grid \`g\`, not an \`ax\`, so there is no \`ax\` variable to title here.
+- \`plt.title("Tips by service time")\`
+  > \`plt.title\` titles matplotlib's current axes, the last panel drawn, so the text lands on one panel instead of above the whole figure.
+- \`g.set_xlabel("Tips by service time")\`
+  > \`FacetGrid\` has no \`set_xlabel\`, and an x-label is not a figure title anyway; use \`g.set_axis_labels(...)\` for axis text.
+- [o] \`g.figure.suptitle("Tips by service time")\`
+  > \`suptitle\` places a single title over the entire figure; pairing it with \`g.figure.subplots_adjust(top=0.9)\` leaves room so it doesn't overlap the panels.
 
 On a figure-level grid, the whole-figure title is \`g.figure.suptitle(...)\`,
 not \`plt.title(...)\`.`}
@@ -328,12 +328,12 @@ ax.set_xlabel("Total bill (USD)")
   markdown={`You call \`ax = sns.boxplot(data=tips, x="day", y="total_bill")\`. What is
 \`ax\`, and how do you give the chart a title?
 
+- A pandas DataFrame; add a title by adding a column.
+  > A plotting call returns a plot object, not data; titles are not DataFrame columns.
 - A Seaborn \`FacetGrid\`; title it with \`ax.set_titles(...)\`.
   > \`boxplot\` is axes-level and returns a matplotlib \`Axes\`, not a \`FacetGrid\`; there is no \`set_titles\` on an \`Axes\`.
 - [o] A matplotlib \`Axes\`; title it with \`ax.set_title("...")\`.
   > Axes-level functions like \`boxplot\` return the \`Axes\` they drew on, and \`set_title\` is the \`Axes\` method for a title.
-- A pandas DataFrame; add a title by adding a column.
-  > A plotting call returns a plot object, not data; titles are not DataFrame columns.
 - A figure-level grid; title it with \`g.figure.suptitle(...)\`.
   > \`suptitle\` is for figure-level grids; \`boxplot\` is axes-level and returns an \`Axes\`.
 
@@ -346,14 +346,14 @@ Axes-level functions hand back a matplotlib \`Axes\`, which you customize with
 \`sns.scatterplot(..., ax=ax)\`, but the same trick does **not** work with
 \`sns.relplot\`?
 
-- Because \`relplot\` cannot draw scatter plots.
-  > \`relplot\` draws scatter and line plots; the difference is about figure management, not chart type.
 - Because \`scatterplot\` does not accept an \`ax\` argument.
   > It is precisely \`scatterplot\` (axes-level) that *does* accept \`ax=\`; the figure-level \`relplot\` is the one that ignores it.
-- [o] Because \`scatterplot\` is axes-level and draws on the \`Axes\` you pass, while \`relplot\` is figure-level and builds its own figure.
-  > Axes-level functions accept \`ax=\` and draw there; figure-level functions manage their own figure and ignore any \`ax=\`, so passing one would just leave your \`plt.subplots\` figure empty.
 - Because \`plt.subplots\` only works after \`set_theme\`.
   > \`plt.subplots\` works regardless of theme; the real distinction is axes-level versus figure-level.
+- Because \`relplot\` cannot draw scatter plots.
+  > \`relplot\` draws scatter and line plots; the difference is about figure management, not chart type.
+- [o] Because \`scatterplot\` is axes-level and draws on the \`Axes\` you pass, while \`relplot\` is figure-level and builds its own figure.
+  > Axes-level functions accept \`ax=\` and draw there; figure-level functions manage their own figure and ignore any \`ax=\`, so passing one would just leave your \`plt.subplots\` figure empty.
 
 To control size with \`plt.subplots\` and \`ax=\`, use an axes-level function;
 figure-level functions size themselves with \`height\` and \`aspect\`.`}
@@ -365,10 +365,10 @@ kind="box")\`, how do you label the shared x and y axes across both panels?
 
 - \`plt.xlabel("Day"); plt.ylabel("Tip")\`
   > \`plt.xlabel\`/\`plt.ylabel\` target the current axes, the last panel, so only one panel gets labeled.
-- [o] \`g.set_axis_labels("Day", "Tip")\`
-  > \`set_axis_labels\` sets the shared x and y labels for every panel of the grid in one call.
 - \`g.set_title("Day", "Tip")\`
   > \`set_title\` is not a \`FacetGrid\` method, and axis labels are not titles; use \`set_axis_labels\` for axis text.
+- [o] \`g.set_axis_labels("Day", "Tip")\`
+  > \`set_axis_labels\` sets the shared x and y labels for every panel of the grid in one call.
 - \`ax.set_xlabel("Day"); ax.set_ylabel("Tip")\`
   > A figure-level call returns a grid \`g\`, not an \`ax\`; the grid-wide method is \`g.set_axis_labels(...)\`.
 

@@ -173,12 +173,12 @@ just the pooled average) guards against shipping a fad.
 <MultipleChoice
   markdown={`A team picks "total cumulative signups" as its north-star metric. What is the main problem?
 
-- It is too hard to measure accurately.
-  > Cumulative signups is trivially easy to measure; ease is not the issue.
-- [o] It only ever goes up and reflects one-time curiosity, not retained value, so it can't guide decisions.
-  > A number that can never fall gives no feedback on whether the product is getting better; a retention- or engagement-based metric would.
 - It is a guardrail metric, not a north-star.
   > It is a vanity metric; guardrails are health limits like latency or churn, which this is not.
+- [o] It only ever goes up and reflects one-time curiosity, not retained value, so it can't guide decisions.
+  > A number that can never fall gives no feedback on whether the product is getting better; a retention- or engagement-based metric would.
+- It is too hard to measure accurately.
+  > Cumulative signups is trivially easy to measure; ease is not the issue.
 - It cannot be moved by the team.
   > The team can move it (spend on acquisition); the problem is that moving it does not signal durable value.`}
 />
@@ -186,27 +186,27 @@ just the pooled average) guards against shipping a fad.
 <MultipleChoice
   markdown={`Daily active users dropped 8% overnight. What should you check **first**?
 
-- Ship a fix for whichever feature you suspect.
-  > Acting before confirming the drop is real risks fixing a phantom; instrumentation bugs cause many "drops."
-- [o] Whether the drop is real, ruling out logging changes, ETL failures, and seasonality.
-  > Confirming the number is genuine comes before diagnosing a cause; a broken tracking pipeline mimics a real drop.
 - Whether a competitor launched something.
   > External causes are worth checking, but only after you have confirmed the drop is real and segmented it.
 - Rerun the marketing campaign to bring users back.
-  > That treats a symptom before you know the cause, and the cause may not be acquisition at all.`}
+  > That treats a symptom before you know the cause, and the cause may not be acquisition at all.
+- Ship a fix for whichever feature you suspect.
+  > Acting before confirming the drop is real risks fixing a phantom; instrumentation bugs cause many "drops."
+- [o] Whether the drop is real, ruling out logging changes, ETL failures, and seasonality.
+  > Confirming the number is genuine comes before diagnosing a cause; a broken tracking pipeline mimics a real drop.`}
 />
 
 <MultipleChoice
   markdown={`An experiment lifts sessions but the effect shrinks steadily over three weeks toward zero. What is the most likely explanation?
 
-- The sample size was too small.
-  > Sample size affects noise, not a systematic decay of the effect over time.
-- [o] A novelty effect: users engaged because the feature was new, and the boost faded.
-  > A treatment effect that decays toward zero over time is the signature of novelty, not durable value.
+- The guardrail metrics were violated.
+  > Guardrails are separate health checks; they do not explain why the primary effect faded.
 - The randomization was broken.
   > Broken randomization biases the effect but would not produce a clean decay toward zero over weeks.
-- The guardrail metrics were violated.
-  > Guardrails are separate health checks; they do not explain why the primary effect faded.`}
+- [o] A novelty effect: users engaged because the feature was new, and the boost faded.
+  > A treatment effect that decays toward zero over time is the signature of novelty, not durable value.
+- The sample size was too small.
+  > Sample size affects noise, not a systematic decay of the effect over time.`}
 />
 
 ## Go deeper

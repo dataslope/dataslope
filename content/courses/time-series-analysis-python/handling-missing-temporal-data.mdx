@@ -204,14 +204,14 @@ only ever looks backward.
 <MultipleChoice
   markdown={`You're building features to forecast tomorrow's value and need to fill an occasional missing sensor reading *as the data streams in*. Which fill method is safe to use, and why?
 
-- Linear interpolation, because it's the most accurate
-  > Interpolation reads the value *after* the gap to draw its straight line. At the moment of the gap that future value doesn't exist yet, so using it leaks future information into a live feature.
-- Backward-fill, because it carries the correct next value
-  > The "next value" is in the future relative to the gap. Pulling it backward into a forecasting feature is leakage, you couldn't actually know it at prediction time.
 - [o] Forward-fill, because it uses only the last known (past) value and never reads anything after the gap
   > \`ffill\` is past-only: it carries the most recent observation forward. That's computable in real time without peeking ahead, which is exactly what an online forecasting feature requires.
+- Linear interpolation, because it's the most accurate
+  > Interpolation reads the value *after* the gap to draw its straight line. At the moment of the gap that future value doesn't exist yet, so using it leaks future information into a live feature.
 - It doesn't matter; all fills use the same information
   > They use very different information: \`ffill\` looks back, \`bfill\` looks forward, and interpolation looks both ways. Only the backward-looking one is leakage-free for live features.
+- Backward-fill, because it carries the correct next value
+  > The "next value" is in the future relative to the gap. Pulling it backward into a forecasting feature is leakage, you couldn't actually know it at prediction time.
 
 Online/forecasting features must be computable from the past alone, so \`ffill\` is the safe choice; \`bfill\` and interpolation read the future.`}
 />
@@ -267,14 +267,14 @@ most models, fill rather than drop, so the calendar stays intact.
 <MultipleChoice
   markdown={`Why is deleting rows with \`dropna()\` often a poor choice for time series, even though it's common for cross-sectional data?
 
-- It always changes the column dtypes
-  > Dropping rows doesn't alter dtypes. The real issue is structural, not about types.
+- pandas forbids dropping rows from a time series
+  > pandas allows it; it's just usually unwise. Sometimes (rare, scattered gaps) dropping is fine, but it's a judgment call, not a prohibition.
 - [o] It breaks the regular time spacing the series depends on, so resampling, rolling windows, and models that assume evenly spaced observations misbehave
   > Removing a timestamp leaves an uneven gap. A 7-day rolling window or a model expecting monthly steps will now silently span the wrong real-world interval, corrupting results.
 - It's computationally too expensive
   > \`dropna\` is cheap. Cost isn't the concern, preserving the timeline is.
-- pandas forbids dropping rows from a time series
-  > pandas allows it; it's just usually unwise. Sometimes (rare, scattered gaps) dropping is fine, but it's a judgment call, not a prohibition.
+- It always changes the column dtypes
+  > Dropping rows doesn't alter dtypes. The real issue is structural, not about types.
 
 Dropping rows punctures the even spacing that time-series tooling assumes, which is why filling (preserving the calendar) is usually preferred.`}
 />
@@ -397,12 +397,12 @@ assert smooth.loc[pd.Timestamp("2014-05-05")] == 24.0`,
 
 - ffill -> 120/140, bfill -> 100/100, interpolate -> 160/160
   > These are scrambled. Forward-fill copies the *past* (100), not a glide; interpolation produces the in-between glide (120/140); back-fill copies the *future* (160).
-- [o] ffill -> 100/100, bfill -> 160/160, interpolate -> 120/140
-  > Forward-fill carries Monday's 100 forward; back-fill pulls Thursday's 160 backward; linear interpolation steps evenly from 100 to 160 (120 then 140).
 - ffill -> 160/160, bfill -> 100/100, interpolate -> 130/130
   > Forward-fill uses the *last* value (100), not the next; back-fill uses the *next* (160), not the previous; and interpolation gives a rising 120/140, not a flat 130/130.
 - All three give 130/130
   > Only a midpoint-constant scheme would give 130/130. The three real methods give distinctly different shapes: flat-back, flat-forward, and a rising line.
+- [o] ffill -> 100/100, bfill -> 160/160, interpolate -> 120/140
+  > Forward-fill carries Monday's 100 forward; back-fill pulls Thursday's 160 backward; linear interpolation steps evenly from 100 to 160 (120 then 140).
 
 Forward-fill copies the prior value, back-fill copies the next, and linear interpolation walks a straight line between them.`}
 />
@@ -410,14 +410,14 @@ Forward-fill copies the prior value, back-fill copies the next, and linear inter
 <MultipleChoice
   markdown={`A store is **closed on public holidays**, so those days have no sales rows. What's the right way to handle them before computing monthly totals?
 
-- Linearly interpolate the holiday sales from the surrounding open days
-  > Interpolation would invent sales on days the store was shut, inflating the monthly total with revenue that never happened.
-- Forward-fill the previous day's sales onto the holiday
-  > Forward-fill would also fabricate sales for a closed day. The shop sold nothing; carrying yesterday's figure forward overstates the total.
-- [o] Fill those days with 0, because "closed" means genuinely zero sales, not unknown sales
-  > The gap here encodes a real zero, not a missing measurement. Filling with 0 records the truth; any interpolation or carry-forward would invent phantom revenue.
 - Drop the holidays and ignore them
   > Dropping is defensible for a *mean*, but for a monthly *total* you want the holiday counted as the zero it truly was, so the month's sum is correct and the calendar stays intact.
+- Forward-fill the previous day's sales onto the holiday
+  > Forward-fill would also fabricate sales for a closed day. The shop sold nothing; carrying yesterday's figure forward overstates the total.
+- Linearly interpolate the holiday sales from the surrounding open days
+  > Interpolation would invent sales on days the store was shut, inflating the monthly total with revenue that never happened.
+- [o] Fill those days with 0, because "closed" means genuinely zero sales, not unknown sales
+  > The gap here encodes a real zero, not a missing measurement. Filling with 0 records the truth; any interpolation or carry-forward would invent phantom revenue.
 
 When a gap means "nothing happened" (a closed store), the correct fill is 0, fill methods that infer a value fabricate data.`}
 />
@@ -425,12 +425,12 @@ When a gap means "nothing happened" (a closed store), the correct fill is 0, fil
 <MultipleChoice
   markdown={`For *historical analysis of an already-complete dataset* (not a live forecast), is it acceptable to use linear interpolation to fill interior gaps in a continuously varying sensor signal?
 
+- Only if you also shuffle the series first
+  > Shuffling would destroy the temporal order entirely and is never appropriate for a time series. It has nothing to do with whether interpolation is acceptable.
 - No, interpolation is never allowed
   > Interpolation is a standard, sensible choice for continuous quantities. The only context where it's off-limits is a *live forecasting feature*, where reading the future value is leakage.
 - [o] Yes, on a complete historical series, using both neighbours is legitimate, and interpolation suits a continuously varying quantity
   > When the whole series already exists and you're analysing the past, reading the point after the gap isn't leakage; it's just using available data. For smooth physical signals, interpolation is often the most faithful fill.
-- Only if you also shuffle the series first
-  > Shuffling would destroy the temporal order entirely and is never appropriate for a time series. It has nothing to do with whether interpolation is acceptable.
 - Only for categorical data
   > Interpolation is for *numeric*, continuous data; it's meaningless for categories. Categorical gaps are better handled with forward-fill or an explicit "unknown" label.
 

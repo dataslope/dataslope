@@ -154,14 +154,14 @@ perfect for answering "what are the possible values here?"
 <MultipleChoice
   markdown={`What does \`SELECT *\` return?
 
-- Only the first column of the table.
-  > \`*\` is the opposite of "one column"; it means all of them.
-- [o] Every column of the table, in their defined order.
-  > The asterisk is shorthand for all columns, which is why it is handy for quickly exploring a table.
-- A count of how many rows exist.
-  > Counting rows uses \`COUNT(*)\`, which is different from selecting all columns.
 - The table's structure but none of its data.
   > \`SELECT *\` returns actual rows of data, not just the structure.
+- [o] Every column of the table, in their defined order.
+  > The asterisk is shorthand for all columns, which is why it is handy for quickly exploring a table.
+- Only the first column of the table.
+  > \`*\` is the opposite of "one column"; it means all of them.
+- A count of how many rows exist.
+  > Counting rows uses \`COUNT(*)\`, which is different from selecting all columns.
 
 \`SELECT *\` retrieves all columns for the matching rows.`}
 />
@@ -169,12 +169,12 @@ perfect for answering "what are the possible values here?"
 <MultipleChoice
   markdown={`Running a \`SELECT\` query on a table does what to the stored data?
 
-- It permanently sorts the table.
-  > A \`SELECT\` may sort its *result*, but it does not reorder or change the stored table.
 - It deletes the columns you did not select.
   > Unselected columns are simply not returned; they remain safely in the table.
 - [o] Nothing, \`SELECT\` reads the data and returns a new result set, leaving the stored table unchanged.
   > Because reads do not modify storage, you can run any number of \`SELECT\`s freely without risk.
+- It permanently sorts the table.
+  > A \`SELECT\` may sort its *result*, but it does not reorder or change the stored table.
 - It locks the table so no one else can read it.
   > A basic \`SELECT\` does not lock others out; reading data is a safe, non-destructive operation.
 
@@ -184,14 +184,14 @@ A \`SELECT\` produces a fresh result and never alters the underlying table.`}
 <MultipleChoice
   markdown={`A \`dept\` column contains "Sales" three times and "Eng" twice. What does \`SELECT DISTINCT dept\` return?
 
-- All five values, including the repeats.
-  > \`DISTINCT\` exists precisely to remove repeats, so it would not return all five.
-- [o] Two rows: "Sales" and "Eng", each distinct value once.
-  > \`DISTINCT\` collapses duplicate values so each unique value appears a single time.
 - The single most common value only.
   > \`DISTINCT\` keeps every unique value, not just the most frequent one.
 - Nothing, because the values repeat.
   > Repeated values do not cause an empty result; \`DISTINCT\` simply de-duplicates them.
+- All five values, including the repeats.
+  > \`DISTINCT\` exists precisely to remove repeats, so it would not return all five.
+- [o] Two rows: "Sales" and "Eng", each distinct value once.
+  > \`DISTINCT\` collapses duplicate values so each unique value appears a single time.
 
 \`DISTINCT\` returns each unique value once, which is ideal for listing the possible values in a column.`}
 />

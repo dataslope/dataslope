@@ -272,12 +272,12 @@ Recognizing this pattern is most of the battle.`}
 <MultipleChoice
   markdown={`Which operation reshapes wide → long?
 
-- pivot
-  > \`pivot\` (and \`pivot_table\`) reshapes in the opposite direction, from long to wide; it takes values from rows and spreads them across new columns.
 - merge
   > \`merge\` joins two DataFrames together on a common key; it does not reshape a single DataFrame from wide to long.
 - [o] melt
   > Think "melt the wide table down into a tall one".
+- pivot
+  > \`pivot\` (and \`pivot_table\`) reshapes in the opposite direction, from long to wide; it takes values from rows and spreads them across new columns.
 - concat
   > \`concat\` stacks DataFrames vertically or horizontally; it does not convert column names into row values the way \`melt\` does.
 
@@ -287,14 +287,14 @@ melt unpivots; pivot pivots.`}
 <MultipleChoice
   markdown={`Why do plotting libraries usually prefer long format?
 
-- They reject wide DataFrames
-  > Plotting libraries can accept wide DataFrames for some chart types, but they require more manual configuration; they prefer long format because column-to-aesthetic mapping is cleaner.
 - It uses less memory
   > Long format typically uses *more* memory than wide format for the same data because it repeats identifier columns (like \`person\`) once per observation row.
-- [o] They map columns to plot aesthetics (x, y, color, facet), a single tidy column for each variable plugs straight in
-  > Once you internalize the "one column per variable" rule, plotting becomes mechanical.
 - Wide format is deprecated
   > Wide format is not deprecated; it remains the preferred form for human-readable reports and spreadsheet exports, the choice depends on the use case.
+- [o] They map columns to plot aesthetics (x, y, color, facet), a single tidy column for each variable plugs straight in
+  > Once you internalize the "one column per variable" rule, plotting becomes mechanical.
+- They reject wide DataFrames
+  > Plotting libraries can accept wide DataFrames for some chart types, but they require more manual configuration; they prefer long format because column-to-aesthetic mapping is cleaner.
 
 The same principle underlies Seaborn, Plotly Express, and ggplot2.`}
 />

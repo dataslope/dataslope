@@ -91,12 +91,12 @@ allowed states, the schema can enforce them.
 <MultipleChoice
   markdown={`Which design choice best prevents random task statuses such as \`maybe\` or \`almost done\`?
 
-- A longer column name.
-  > Naming can improve clarity, but it does not restrict values.
-- [o] A \`CHECK\` constraint listing allowed statuses.
-  > The database can reject values outside the allowed set.
 - Removing the primary key.
   > Primary keys protect identity, not allowed status values.
+- [o] A \`CHECK\` constraint listing allowed statuses.
+  > The database can reject values outside the allowed set.
+- A longer column name.
+  > Naming can improve clarity, but it does not restrict values.
 - Storing every task in one text column.
   > Combining facts in one text column makes validation harder.
 
@@ -188,14 +188,14 @@ classes of mistakes from the system.
 <MultipleChoice
   markdown={`What does a foreign key do for data quality?
 
-- It makes a text value uppercase.
-  > Text formatting is not the job of a foreign key.
-- [o] It prevents relationships from pointing to missing rows.
-  > A foreign key requires the referenced row to exist.
-- It allows duplicate primary keys.
-  > Primary keys remain unique.
 - It stores every related row in one column.
   > A foreign key stores a reference, not a nested table.
+- [o] It prevents relationships from pointing to missing rows.
+  > A foreign key requires the referenced row to exist.
+- It makes a text value uppercase.
+  > Text formatting is not the job of a foreign key.
+- It allows duplicate primary keys.
+  > Primary keys remain unique.
 
 Foreign keys protect relational consistency.`}
 />
@@ -203,12 +203,12 @@ Foreign keys protect relational consistency.`}
 <MultipleChoice
   markdown={`Why does normalization improve consistency?
 
-- It stores the same fact in many places.
-  > Repetition is what normalization tries to reduce.
 - [o] It gives each fact one proper home, reducing disagreement between copies.
   > When a fact is stored once, updates are less likely to leave conflicting values.
 - It removes every constraint.
   > Normalized designs still need constraints.
+- It stores the same fact in many places.
+  > Repetition is what normalization tries to reduce.
 - It avoids all relationships.
   > Normalization often uses relationships and foreign keys.
 
@@ -218,14 +218,14 @@ Consistency improves when one fact has one source of truth.`}
 <MultipleChoice
   markdown={`Which design most directly protects completeness for a required email?
 
-- [o] \`email TEXT NOT NULL\`
-  > The \`NOT NULL\` rule prevents the required fact from being missing.
-- \`email TEXT\` with no constraint.
-  > This allows missing email values.
 - A separate unrelated \`orders\` table.
   > Orders do not make customer email required.
 - A comment in the application code.
   > Comments do not enforce database rules.
+- [o] \`email TEXT NOT NULL\`
+  > The \`NOT NULL\` rule prevents the required fact from being missing.
+- \`email TEXT\` with no constraint.
+  > This allows missing email values.
 
 Required facts should be required in the schema.`}
 />

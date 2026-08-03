@@ -196,12 +196,12 @@ got once, it is a repeatable, explainable process.
 <MultipleChoice
   markdown={`Why add a tiebreaker like \`ORDER BY sales DESC, id ASC\` to a top-N query?
 
-- It makes the query run faster.
-  > The benefit is determinism, not speed.
 - [o] Without it, rows tied on \`sales\` can appear in any order, so the top-N (and thus the result) may change between runs.
   > A tiebreaker gives a total, stable ordering, making the result reproducible even when the main sort key ties.
 - It removes duplicate rows.
   > A tiebreaker orders rows; it does not deduplicate them.
+- It makes the query run faster.
+  > The benefit is determinism, not speed.
 - It converts \`sales\` to a percentage.
   > Ordering has nothing to do with computing percentages.
 
@@ -212,14 +212,14 @@ every run.`}
 <MultipleChoice
   markdown={`What does it mean for a setup step to be **idempotent**, and how does \`CREATE OR REPLACE TABLE\` help?
 
-- It means the step runs only once and then locks the table.
-  > Idempotent means *safe to run repeatedly*, not run-once; the table is not locked.
-- [o] Running it multiple times has the same effect as running it once; \`CREATE OR REPLACE\` rebuilds the table cleanly without "already exists" errors.
-  > Idempotent setup can be re-run safely, which \`CREATE OR REPLACE\` enables by replacing rather than failing.
 - It means the table can never be changed again.
   > Idempotency is about repeatable setup, not immutability.
+- It means the step runs only once and then locks the table.
+  > Idempotent means *safe to run repeatedly*, not run-once; the table is not locked.
 - It deletes the database after running.
   > It does no such thing; it simply makes re-creation safe.
+- [o] Running it multiple times has the same effect as running it once; \`CREATE OR REPLACE\` rebuilds the table cleanly without "already exists" errors.
+  > Idempotent setup can be re-run safely, which \`CREATE OR REPLACE\` enables by replacing rather than failing.
 
 Idempotent setup is safe to re-run, and \`CREATE OR REPLACE\` provides that
 for tables.`}
@@ -228,14 +228,14 @@ for tables.`}
 <MultipleChoice
   markdown={`How does defining a metric as a **view** support reproducibility across a team?
 
-- It makes the metric impossible to change.
-  > A view can be updated; the point is a single source of truth, not immutability.
-- [o] Everyone queries the same named definition, so the metric's logic lives in one place instead of being copy-pasted and drifting out of sync.
-  > A view centralizes the definition; updating it updates every consumer consistently.
 - It caches the result so it never recomputes.
   > A standard view recomputes on query; its value is shared definition, not caching.
 - It hides the SQL from analysts.
   > A view's defining SQL is inspectable; it shares logic rather than hiding it.
+- It makes the metric impossible to change.
+  > A view can be updated; the point is a single source of truth, not immutability.
+- [o] Everyone queries the same named definition, so the metric's logic lives in one place instead of being copy-pasted and drifting out of sync.
+  > A view centralizes the definition; updating it updates every consumer consistently.
 
 A view centralizes a metric's definition so everyone computes it the same
 way.`}

@@ -140,12 +140,12 @@ compositional nature: plots are *built up*, not declared whole.
 
 - It replaces the points with a smooth line.
   > Adding a layer does not remove earlier layers; both are drawn.
+- It changes the points into a different color.
+  > It draws a new layer; it does not recolor the existing one.
 - It throws an error because a plot can only have one geom.
   > A plot can have many layers; that is the entire point of layering.
 - [o] It adds a second layer that is drawn on top of the points, so both the points and the trend line appear.
   > Layers composite together in the order added.
-- It changes the points into a different color.
-  > It draws a new layer; it does not recolor the existing one.
 
 Each \`+ geom_*()\` appends an independent layer; they stack rather than
 replace.`}
@@ -156,12 +156,12 @@ replace.`}
 
 - You cannot; all layers must use the same data.
   > Layers may each carry their own data and mappings, a key source of ggplot2's flexibility.
-- Because \`data =\` in a geom deletes the base data.
-  > It does not delete anything; it simply overrides the data *for that one layer*.
-- [o] Because each layer is independent and may override the base data and mappings, letting one layer draw a different subset on top of the rest.
-  > Per-layer data is exactly how highlight-a-subset plots are built.
 - Because \`geom_point\` is the only geom that allows it.
   > Per-layer data works for any geom, not just points.
+- [o] Because each layer is independent and may override the base data and mappings, letting one layer draw a different subset on top of the rest.
+  > Per-layer data is exactly how highlight-a-subset plots are built.
+- Because \`data =\` in a geom deletes the base data.
+  > It does not delete anything; it simply overrides the data *for that one layer*.
 
 Per-layer data and mappings are what let you composite, for example, a
 grey "all points" layer with a red "highlighted subset" layer.`}
@@ -174,10 +174,10 @@ grey "all points" layer with a red "highlighted subset" layer.`}
   > Order is not ignored; later layers are drawn over earlier ones.
 - The axes flip.
   > Axis orientation is unrelated to layer order.
-- [o] Whichever layer is added later is drawn on top, so the points may sit over the line or the line over the points where they overlap.
-  > Compositing order determines what covers what in overlapping regions.
 - One version will fail to render.
   > Both render fine; they only differ in stacking.
+- [o] Whichever layer is added later is drawn on top, so the points may sit over the line or the line over the points where they overlap.
+  > Compositing order determines what covers what in overlapping regions.
 
 Layer order controls compositing, a small but real design lever for
 emphasis and readability.`}

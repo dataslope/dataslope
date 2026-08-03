@@ -263,25 +263,25 @@ simulated in a Norwegian harbor sixty years ago.
 <MultipleChoice
   markdown={`What is the single most important idea introduced by object-oriented programming?
 
-- Programs run faster
-  > OOP doesn't fundamentally change how fast code runs.
 - Computers can be replaced more often
   > Unrelated.
+- Programs no longer need variables
+  > They very much do; OOP is about organizing them, not removing them.
 - [o] Data and the operations that act on it are bundled together, with a boundary that prevents outsiders from changing the data directly
   > That is the seed idea, every other OOP concept is built on top of it.
-- Programs no longer need variables
-  > They very much do; OOP is about organizing them, not removing them.`}
+- Programs run faster
+  > OOP doesn't fundamentally change how fast code runs.`}
 />
 
 <MultipleChoice
   markdown={`In the \`BankAccount\` example, why is \`balance\` declared \`private\`?
 
-- The compiler is faster on private fields
-  > Performance is not the reason.
-- Private fields take less memory
-  > Visibility doesn't change memory size.
 - [o] So no code outside \`BankAccount\` can bypass the rules in \`Deposit\` and \`Withdraw\` and corrupt the balance
   > \`private\` is what gives the class authority to enforce its own invariants.
 - C# requires every field to be private
-  > It doesn't, \`public\` and other modifiers are also allowed; you choose deliberately.`}
+  > It doesn't, \`public\` and other modifiers are also allowed; you choose deliberately.
+- Private fields take less memory
+  > Visibility doesn't change memory size.
+- The compiler is faster on private fields
+  > Performance is not the reason.`}
 />

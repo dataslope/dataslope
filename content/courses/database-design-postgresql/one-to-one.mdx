@@ -89,14 +89,14 @@ details without filling the main table with null columns.
 <MultipleChoice
   markdown={`What enforces that each user can have at most one profile row?
 
-- A foreign key from \`user_profiles.user_id\` to \`users.id\` by itself.
-  > The foreign key proves the user exists, but repeated \`user_id\` values would still be allowed without uniqueness.
 - [o] A foreign key plus \`UNIQUE (user_id)\` on the profile table.
   > The foreign key links to a real user, and the unique constraint prevents two profiles for the same user.
-- A \`CHECK (display_name IS NOT NULL)\` constraint.
-  > That can require a value, but it does not limit how many profile rows point to one user.
 - Putting \`profile_ids\` as a list on \`users\`.
   > A list of ids would not enforce one-to-one and would complicate the design.
+- A foreign key from \`user_profiles.user_id\` to \`users.id\` by itself.
+  > The foreign key proves the user exists, but repeated \`user_id\` values would still be allowed without uniqueness.
+- A \`CHECK (display_name IS NOT NULL)\` constraint.
+  > That can require a value, but it does not limit how many profile rows point to one user.
 
 One-to-one needs both a reference and a uniqueness rule on that reference.`}
 />
@@ -168,14 +168,14 @@ strong reason not to.
 <MultipleChoice
   markdown={`Why are one-to-one relationships rarer than one-to-many relationships?
 
-- Because PostgreSQL does not support unique constraints.
-  > PostgreSQL supports unique constraints; rarity comes from modeling needs, not missing features.
-- [o] Because most real-world relationships naturally involve multiple related rows, while strict one-to-one splits solve narrower design problems.
-  > One-to-one is useful, but many common relationships involve repeated children.
 - Because one-to-one relationships cannot be queried.
   > They can be queried with ordinary joins.
 - Because every one-to-one should be converted into many-to-many.
   > Many-to-many represents a different cardinality and would be incorrect here.
+- [o] Because most real-world relationships naturally involve multiple related rows, while strict one-to-one splits solve narrower design problems.
+  > One-to-one is useful, but many common relationships involve repeated children.
+- Because PostgreSQL does not support unique constraints.
+  > PostgreSQL supports unique constraints; rarity comes from modeling needs, not missing features.
 
 Use one-to-one when the split has a design reason, not just because two tables can be joined.`}
 />
@@ -183,14 +183,14 @@ Use one-to-one when the split has a design reason, not just because two tables c
 <MultipleChoice
   markdown={`In \`users ||--o| user_profiles\`, what does the profile side mean?
 
-- Every user must have many profiles.
-  > The \`o|\` marker means optional single, not many.
+- Users and profiles cannot be joined.
+  > The foreign key is what makes the join possible.
 - [o] A user may have zero or one profile.
   > Optional one means the related row may be absent, but cannot appear multiple times.
 - A profile may belong to many users.
   > The diagram shows a profile connected to one user.
-- Users and profiles cannot be joined.
-  > The foreign key is what makes the join possible.
+- Every user must have many profiles.
+  > The \`o|\` marker means optional single, not many.
 
 Optional one-to-one means the detail row may be missing, but duplicates are still forbidden.`}
 />
@@ -198,14 +198,14 @@ Optional one-to-one means the detail row may be missing, but duplicates are stil
 <MultipleChoice
   markdown={`Why might \`user_profiles\` be separated from \`users\`?
 
-- To make every query slower on purpose.
-  > The purpose is clearer modeling and optional data separation, not slowing queries.
-- [o] To keep optional or separate-concern profile details out of the core identity table.
-  > Splitting can keep the main table focused while giving optional details their own home.
-- To allow two profiles for the same user.
-  > The one-to-one design specifically prevents duplicate profiles.
 - To avoid using primary keys.
   > The split still relies on primary keys and a unique foreign key.
+- [o] To keep optional or separate-concern profile details out of the core identity table.
+  > Splitting can keep the main table focused while giving optional details their own home.
+- To make every query slower on purpose.
+  > The purpose is clearer modeling and optional data separation, not slowing queries.
+- To allow two profiles for the same user.
+  > The one-to-one design specifically prevents duplicate profiles.
 
 A one-to-one split is a modeling choice for optional, large, or separate-concern data.`}
 />

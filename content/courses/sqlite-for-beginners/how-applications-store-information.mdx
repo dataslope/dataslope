@@ -114,14 +114,14 @@ flowchart TB
 <MultipleChoice
   markdown={`In the basic application-database loop, what usually happens after SQLite reads or changes stored data?
 
+- SQLite turns into a spreadsheet
+  > SQLite remains a database engine.
+- The application forgets the result immediately
+  > Applications usually use the result to update the screen or continue work.
 - The user manually edits the database file
   > In normal applications, users interact with the app, not raw database bytes.
 - [o] SQLite sends a result back to the application
-  > The application uses that result to decide what to show next.
-- The application forgets the result immediately
-  > Applications usually use the result to update the screen or continue work.
-- SQLite turns into a spreadsheet
-  > SQLite remains a database engine.`}
+  > The application uses that result to decide what to show next.`}
 />
 
 ## Changing information
@@ -230,12 +230,12 @@ The user clicks, types, searches, or pays. The application turns that action int
 <MultipleChoice
   markdown={`What is the application's job in a typical database-backed app?
 
-- To store raw disk pages without showing anything to the user
-  > The database handles low-level storage; the application handles the user-facing screens.
 - [o] To show screens and send database requests when needed
   > The application handles user interaction and asks the database to store or find facts.
 - To replace all stored data with colors
   > Colors may be part of the screen, but they are not the database's stored facts.
+- To store raw disk pages without showing anything to the user
+  > The database handles low-level storage; the application handles the user-facing screens.
 - To make saved data disappear when the app closes
   > The database helps information survive beyond one app session.`}
 />
@@ -247,10 +247,10 @@ The user clicks, types, searches, or pays. The application turns that action int
   > The application draws the interface.
 - Decide what the user wants without a request
   > The application sends requests; SQLite does not read minds.
-- [o] Store, read, and change facts safely
-  > SQLite manages stored information for the application.
 - Replace the user's device
-  > SQLite is software, not a device replacement.`}
+  > SQLite is software, not a device replacement.
+- [o] Store, read, and change facts safely
+  > SQLite manages stored information for the application.`}
 />
 
 <MultipleChoice
@@ -258,23 +258,23 @@ The user clicks, types, searches, or pays. The application turns that action int
 
 - Every table must be a separate server computer
   > SQLite does not require a separate database server.
+- Users must edit the file bytes by hand
+  > Applications use SQLite rather than hand-editing the database file.
 - [o] An entire SQLite database is commonly stored in one ordinary file on disk
   > SQLite manages tables and rows inside a single database file.
 - SQLite can only store data in memory
-  > SQLite can store durable data on disk.
-- Users must edit the file bytes by hand
-  > Applications use SQLite rather than hand-editing the database file.`}
+  > SQLite can store durable data on disk.`}
 />
 
 <MultipleChoice
   markdown={`Why do applications usually ask for a small slice of data?
 
-- Because databases cannot store more than one row
-  > Databases can store many rows.
-- [o] Because one screen or action usually needs only specific facts
-  > Asking for relevant data keeps applications focused and efficient.
+- Because SQL forbids questions
+  > SQL is a language for asking database questions.
 - Because users must write every database file by hand
   > Users normally interact with the application, not database files.
-- Because SQL forbids questions
-  > SQL is a language for asking database questions.`}
+- [o] Because one screen or action usually needs only specific facts
+  > Asking for relevant data keeps applications focused and efficient.
+- Because databases cannot store more than one row
+  > Databases can store many rows.`}
 />

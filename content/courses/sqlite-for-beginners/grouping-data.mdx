@@ -128,14 +128,14 @@ confusion almost always dissolves.
 <MultipleChoice
   markdown={`What does \`GROUP BY priority\` do before \`COUNT(*)\` runs?
 
-- It deletes duplicate priorities from the table.
-  > The table is not changed; grouping only affects the query result.
 - [o] It puts rows with the same \`priority\` value into the same group.
   > The aggregate then runs once for each priority group.
-- It sorts the table permanently by priority.
-  > \`ORDER BY\` controls result order; \`GROUP BY\` forms groups.
+- It deletes duplicate priorities from the table.
+  > The table is not changed; grouping only affects the query result.
 - It changes all priorities to the same value.
   > Grouping does not edit values.
+- It sorts the table permanently by priority.
+  > \`ORDER BY\` controls result order; \`GROUP BY\` forms groups.
 
 \`GROUP BY\` creates buckets of rows that can be summarized separately.`}
 />
@@ -410,14 +410,14 @@ ORDER BY
 <MultipleChoice
   markdown={`What is the main purpose of \`GROUP BY\`?
 
-- To permanently rearrange rows in a table.
-  > Query results can be ordered with \`ORDER BY\`, but \`GROUP BY\` does not rearrange the stored table.
 - [o] To split rows into groups so aggregates can be calculated separately for each group.
   > \`GROUP BY\` turns one grand summary into one summary per category.
 - To remove all \`NULL\` values from a table.
   > \`GROUP BY\` does not clean or delete table data.
 - To create a new table automatically.
   > A normal grouped \`SELECT\` returns a result; it does not create a stored table.
+- To permanently rearrange rows in a table.
+  > Query results can be ordered with \`ORDER BY\`, but \`GROUP BY\` does not rearrange the stored table.
 
 Use \`GROUP BY\` when the words "per" or "for each" appear in your question.`}
 />
@@ -425,14 +425,14 @@ Use \`GROUP BY\` when the words "per" or "for each" appear in your question.`}
 <MultipleChoice
   markdown={`In \`SELECT dept, COUNT(*) FROM employees GROUP BY dept;\`, why is \`dept\` allowed in \`SELECT\`?
 
-- Because text columns are always allowed in grouped queries.
-  > The data type is not the reason.
 - [o] Because \`dept\` is the grouped column, so each output row has one department value.
   > The department value labels the group represented by that result row.
 - Because \`COUNT(*)\` changes \`dept\` into a number.
   > \`COUNT(*)\` counts rows; it does not convert the department column.
 - Because \`dept\` is the first column in the table.
   > Column position in the table is not what matters.
+- Because text columns are always allowed in grouped queries.
+  > The data type is not the reason.
 
 Grouped columns can appear as labels for the grouped result rows.`}
 />
@@ -440,12 +440,12 @@ Grouped columns can appear as labels for the grouped result rows.`}
 <MultipleChoice
   markdown={`Which query best answers "How many orders did each customer place?"?
 
-- \`SELECT COUNT(*) FROM orders;\`
-  > This gives one count for all orders, not one count per customer.
-- [o] \`SELECT customer, COUNT(*) FROM orders GROUP BY customer;\`
-  > This groups orders by customer and counts each customer's rows.
 - \`SELECT customer FROM orders;\`
   > This lists customer values but does not count orders.
+- [o] \`SELECT customer, COUNT(*) FROM orders GROUP BY customer;\`
+  > This groups orders by customer and counts each customer's rows.
+- \`SELECT COUNT(*) FROM orders;\`
+  > This gives one count for all orders, not one count per customer.
 - \`SELECT customer, amount FROM orders ORDER BY amount;\`
   > This shows detail rows sorted by amount, not grouped counts.
 
@@ -457,12 +457,12 @@ The phrase "each customer" is a clue to group by customer.`}
 
 - \`GROUP BY\` forms groups first, then \`WHERE\` filters those groups.
   > Group filters use \`HAVING\`; \`WHERE\` acts earlier on individual rows.
+- They happen in random order.
+  > SQL has a logical processing order; row filtering comes before grouping.
 - [o] \`WHERE\` filters individual rows first, then \`GROUP BY\` groups the remaining rows.
   > Only rows that pass \`WHERE\` are included in the groups.
 - \`SELECT\` creates aliases first, then \`WHERE\` and \`GROUP BY\` run.
   > Aliases are not the first step in this query flow.
-- They happen in random order.
-  > SQL has a logical processing order; row filtering comes before grouping.
 
 \`WHERE\` controls which raw rows enter the grouped summary.`}
 />

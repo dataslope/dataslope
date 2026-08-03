@@ -364,12 +364,12 @@ SUNDAY weekend? true
 <MultipleChoice
   markdown={`Which is the strongest reason to prefer an enum over a \`String\` for a fixed set of values like traffic-light colors?
 
-- Enums use less memory than strings
-  > Memory difference is negligible and not the point.
 - [o] The compiler can guarantee at compile time that only valid values are passed; typos and made-up values are rejected
   > Type safety is the headline win.
 - Strings cannot be \`switch\`-ed on
   > They can, since Java 7.
+- Enums use less memory than strings
+  > Memory difference is negligible and not the point.
 - Enums automatically log their values to disk
   > They do nothing of the sort.`}
 />
@@ -379,12 +379,12 @@ SUNDAY weekend? true
 
 - Each enum constant is just an integer with a label
   > Each constant is a full object.
+- [o] Each enum constant is an object, and the enum type may have its own fields, constructor, and methods
+  > Enums are essentially classes with a closed list of instances.
 - You can create new enum instances with \`new\` at runtime
   > You cannot. Enum instances are fixed at declaration.
 - Enums cannot have fields or methods
-  > They can, they are a kind of class.
-- [o] Each enum constant is an object, and the enum type may have its own fields, constructor, and methods
-  > Enums are essentially classes with a closed list of instances.`}
+  > They can, they are a kind of class.`}
 />
 
 <MultipleChoice
@@ -392,10 +392,10 @@ SUNDAY weekend? true
 
 - A single random constant
   > No randomness involved.
+- The number of constants in the enum
+  > That would be \`Operation.values().length\`.
 - A \`Set\` of constants
   > It returns an array, not a set.
 - [o] An array containing every declared constant, in the order they were declared
-  > This is the standard way to iterate over an enum's constants.
-- The number of constants in the enum
-  > That would be \`Operation.values().length\`.`}
+  > This is the standard way to iterate over an enum's constants.`}
 />

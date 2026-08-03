@@ -217,14 +217,14 @@ print("Great for a smooth trend line; FORBIDDEN as a forecasting feature.")
 <MultipleChoice
   markdown={`You're engineering features to **forecast** tomorrow's demand and add a 7-day moving average computed with \`rolling(7, center=True)\`. Why is this a problem?
 
+- It only matters if the window is larger than 7
+  > Any centered window of size > 1 reaches into the future. The leakage exists at window 3 just as at window 70.
 - Centered windows are slower to compute
   > Performance is irrelevant. The issue is *what information* the feature contains, not how fast it's produced.
 - [o] A centered window at day t averages in days *after* t, so the feature secretly contains future values, data leakage that inflates accuracy and can't be reproduced at prediction time
   > To center a 7-day window on day t you need days t+1, t+2, t+3, which don't exist yet when you're forecasting. The feature smuggles the future into the present; in production those days are unknown, so the model collapses.
 - Nothing is wrong; centering is more accurate
   > It *looks* more accurate precisely because it cheated. The apparent accuracy evaporates in production, where future days aren't available to center on.
-- It only matters if the window is larger than 7
-  > Any centered window of size > 1 reaches into the future. The leakage exists at window 3 just as at window 70.
 
 Centered rolling features include future observations, which is leakage; forecasting features must use trailing windows only.`}
 />
@@ -562,14 +562,14 @@ assert not pd.isna(trend.iloc[11]), "The 12th value should be defined"`,
 <MultipleChoice
   markdown={`What is the primary purpose of a moving (rolling) average?
 
-- To forecast future values of the series
-  > A moving average can't step beyond the last data point, it only summarizes data you already have. Forecasting needs a model, not a backward-looking average.
-- [o] To smooth out short-term noise so longer-term structure (trend, seasonal shape) becomes visible
-  > Averaging a sliding window cancels random jitter while preserving slow movements, which is exactly what makes the trend easier to see.
 - To remove all the data points and replace them with one number
   > It produces one smoothed value *per position*, not a single number. The series keeps its length (minus the leading window).
 - To convert the series to a different frequency
   > Changing frequency is resampling. A rolling mean keeps the original frequency and just smooths it.
+- [o] To smooth out short-term noise so longer-term structure (trend, seasonal shape) becomes visible
+  > Averaging a sliding window cancels random jitter while preserving slow movements, which is exactly what makes the trend easier to see.
+- To forecast future values of the series
+  > A moving average can't step beyond the last data point, it only summarizes data you already have. Forecasting needs a model, not a backward-looking average.
 
 A rolling average is a noise filter that reveals slow structure, it is not a forecaster and doesn't change frequency.`}
 />
@@ -577,14 +577,14 @@ A rolling average is a noise filter that reveals slow structure, it is not a for
 <MultipleChoice
   markdown={`You apply \`rolling(30).mean()\` and the line becomes very smooth but reacts slowly, trailing well behind sharp turns in the data. To make it track turning points more responsively, you should:
 
+- Use \`expanding().mean()\` instead
+  > An expanding window includes *all* history, so it reacts even more sluggishly than a 30-day window, not less.
 - Increase the window to 60
   > A larger window smooths *more* and lags *more*, making the trailing problem worse, not better.
 - [o] Decrease the window (e.g., to 7), accepting more noise in exchange for faster responsiveness
   > Smaller windows hug the data and react quickly. The cost is less smoothing, the responsiveness-vs-smoothness trade-off in action.
 - Switch to \`center=True\`
   > Centering shifts *when* the average is plotted (and leaks the future), but it doesn't fundamentally make a 30-wide window more responsive. It would also be unsafe for forecasting.
-- Use \`expanding().mean()\` instead
-  > An expanding window includes *all* history, so it reacts even more sluggishly than a 30-day window, not less.
 
 Responsiveness comes from a smaller window; smoothness comes from a larger one, you trade one for the other.`}
 />
@@ -594,12 +594,12 @@ Responsiveness comes from a smaller window; smoothness comes from a larger one, 
 
 - \`rolling(10)\`
   > A rolling window of size 10 forgets anything older than 10 steps; it does not span the whole history.
-- [o] \`expanding()\`
-  > An expanding window grows from the first observation, so at each point it summarizes every value seen so far, the running/cumulative view.
-- \`shift(1)\`
-  > \`shift\` just lags the series by one step; it computes no window statistic at all.
 - \`rolling(1)\`
   > A window of 1 contains only the current point, the opposite of "all history."
+- \`shift(1)\`
+  > \`shift\` just lags the series by one step; it computes no window statistic at all.
+- [o] \`expanding()\`
+  > An expanding window grows from the first observation, so at each point it summarizes every value seen so far, the running/cumulative view.
 
 \`expanding()\` accumulates the entire past; \`rolling(N)\` keeps only the most recent \`N\`.`}
 />

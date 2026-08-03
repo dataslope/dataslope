@@ -293,14 +293,14 @@ assert "mass" in (fig.layout.yaxis.title.text or "").lower() or "body" in (fig.l
 <MultipleChoice
   markdown={`What is a scatter plot best at showing?
 
+- The composition of categorical groups.
+  > Composition of categorical groups, how a total breaks down into named parts, is the job of bar charts, stacked bars, or pie charts. A scatter plot requires at least one quantitative axis and is not designed to show how groups sum to a whole.
+- [o] The relationship between two quantitative variables, correlation, clusters, and outliers.
+  > Scatter plots use position on both axes, the most accurate visual encoding. They reveal the *shape* of a two-variable relationship, linear? non-linear? clustered?, at a glance.
 - A part-of-a-whole breakdown.
   > Part-of-a-whole breakdowns are the domain of pie charts, stacked bar charts, or treemaps, charts that show how individual components sum to a total. A scatter plot places individual observations in a 2-D space to reveal relationships, not compositions.
 - A trend across regular time intervals.
   > Time-series trends with regular intervals are best shown with a line chart, which connects ordered time points with a continuous line to emphasize flow and direction. A scatter plot does not connect points and is suited to unordered x-y relationships.
-- [o] The relationship between two quantitative variables, correlation, clusters, and outliers.
-  > Scatter plots use position on both axes, the most accurate visual encoding. They reveal the *shape* of a two-variable relationship, linear? non-linear? clustered?, at a glance.
-- The composition of categorical groups.
-  > Composition of categorical groups, how a total breaks down into named parts, is the job of bar charts, stacked bars, or pie charts. A scatter plot requires at least one quantitative axis and is not designed to show how groups sum to a whole.
 
 Scatter plots are the workhorse of exploratory analysis. When in doubt about how two numeric variables relate, scatter them.`}
 />
@@ -308,14 +308,14 @@ Scatter plots are the workhorse of exploratory analysis. When in doubt about how
 <MultipleChoice
   markdown={`You have a scatter plot of 50,000 data points and everything looks like a black blob. What is a sensible fix?
 
-- Switch to a pie chart.
-  > Pie charts show parts of a whole for a small number of categories. A 50,000-row dataset with two quantitative variables is not suitable for a pie chart at all, it has no concept of individual observations in a 2-D space.
-- Increase the marker size.
-  > Increasing marker size makes overplotting worse: larger dots overlap even more, obscuring even more of the underlying data structure. The opposite, smaller, more transparent dots, helps with dense data.
 - [o] Lower the marker opacity (e.g., **opacity=0.3**) or switch to a 2-D density heatmap.
   > Overplotting hides structure. Lowering opacity lets dense regions render darker, revealing where the points pile up. For very dense data, a **density_heatmap** or **density_contour** chart represents counts rather than individual points.
 - Hide the axis labels.
   > Axis labels tell the viewer what each axis represents. Removing them makes the chart harder to interpret, not easier. The overplotting problem is in the data layer, not the labeling layer.
+- Increase the marker size.
+  > Increasing marker size makes overplotting worse: larger dots overlap even more, obscuring even more of the underlying data structure. The opposite, smaller, more transparent dots, helps with dense data.
+- Switch to a pie chart.
+  > Pie charts show parts of a whole for a small number of categories. A 50,000-row dataset with two quantitative variables is not suitable for a pie chart at all, it has no concept of individual observations in a 2-D space.
 
 Visualization is the art of *seeing structure*. When the chart hides it, change the encoding.`}
 />
@@ -323,14 +323,14 @@ Visualization is the art of *seeing structure*. When the chart hides it, change 
 <MultipleChoice
   markdown={`What is a **trendline** on a scatter plot useful for?
 
-- It changes the underlying data.
-  > A trendline is a visual overlay, it does not modify the DataFrame or the underlying data in any way. The original points remain unchanged; the line is a computed summary drawn on top of them.
-- It applies a database join.
-  > Database joins combine rows from different tables based on matching keys. A trendline is a statistical model fitted to the existing x-y data in the chart; it has nothing to do with database operations.
 - [o] It summarizes the central tendency of the relationship between x and y, making it easier to see direction (positive, negative, none) and to compare it across groups.
   > A noisy cloud of points can hide the underlying trend. A regression trendline (**trendline="ols"** for linear, **trendline="lowess"** for smoothed) extracts the central tendency. Just be sure to ask whether a *linear* line is appropriate before claiming the relationship is linear.
+- It changes the underlying data.
+  > A trendline is a visual overlay, it does not modify the DataFrame or the underlying data in any way. The original points remain unchanged; the line is a computed summary drawn on top of them.
 - It removes outliers.
   > A trendline is fitted to all the data, including outliers, in fact, outliers can strongly influence the slope of an OLS line. Removing outliers is a separate data-cleaning step that must be done deliberately, not a side effect of adding a trendline.
+- It applies a database join.
+  > Database joins combine rows from different tables based on matching keys. A trendline is a statistical model fitted to the existing x-y data in the chart; it has nothing to do with database operations.
 
 Trendlines are a *summary* layered on top of the data. Always show the underlying points too, the dispersion of the data is part of the story.`}
 />

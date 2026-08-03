@@ -142,14 +142,14 @@ takeaway.
 <MultipleChoice
   markdown={`What does \`HAVING\` filter?
 
-- Individual rows before they are grouped.
-  > That is the role of \`WHERE\`; \`HAVING\` acts later, on groups.
+- The order of the result rows.
+  > Ordering is \`ORDER BY\`; \`HAVING\` is a filter on groups.
 - [o] Groups, after their aggregates have been computed.
   > \`HAVING\` keeps or drops whole groups based on aggregate conditions like \`COUNT(*) > 2\`.
 - The columns shown in the output.
   > Column selection is done by \`SELECT\`; \`HAVING\` filters groups.
-- The order of the result rows.
-  > Ordering is \`ORDER BY\`; \`HAVING\` is a filter on groups.
+- Individual rows before they are grouped.
+  > That is the role of \`WHERE\`; \`HAVING\` acts later, on groups.
 
 \`HAVING\` is a post-aggregation filter on groups.`}
 />
@@ -157,14 +157,14 @@ takeaway.
 <MultipleChoice
   markdown={`You want to summarize only full-time staff, then keep only departments whose average salary exceeds 80000. Where does each condition go?
 
-- Both conditions go in \`WHERE\`.
-  > The average-salary condition uses an aggregate, which \`WHERE\` cannot evaluate; it must go in \`HAVING\`.
+- Neither can be expressed in SQL.
+  > Both are easily expressed, one in \`WHERE\`, the other in \`HAVING\`.
 - Both conditions go in \`HAVING\`.
   > The full-time filter is a per-row condition best applied in \`WHERE\` before grouping, not in \`HAVING\`.
 - [o] The full-time filter goes in \`WHERE\`; the average-salary condition goes in \`HAVING\`.
   > Row-level filters belong in \`WHERE\`, and conditions on aggregates belong in \`HAVING\`.
-- Neither can be expressed in SQL.
-  > Both are easily expressed, one in \`WHERE\`, the other in \`HAVING\`.
+- Both conditions go in \`WHERE\`.
+  > The average-salary condition uses an aggregate, which \`WHERE\` cannot evaluate; it must go in \`HAVING\`.
 
 Per-row conditions go in \`WHERE\`; conditions on aggregated values go in \`HAVING\`.`}
 />

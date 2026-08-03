@@ -84,14 +84,14 @@ Notebook, many rows must be updated.
 <MultipleChoice
   markdown={`When does 2NF become relevant?
 
-- Whenever a table has any text column.
-  > Text columns do not determine whether 2NF is relevant.
 - [o] When a table has a composite key and a non-key column may depend on only part of it.
   > 2NF is about removing partial dependencies from composite-key tables.
-- Only when a table has no primary key at all.
-  > 2NF assumes you can reason about a key and how columns depend on it.
 - Only after denormalizing a reporting table.
   > Denormalization is a later deliberate trade-off, not the condition for 2NF.
+- Whenever a table has any text column.
+  > Text columns do not determine whether 2NF is relevant.
+- Only when a table has no primary key at all.
+  > 2NF assumes you can reason about a key and how columns depend on it.
 
 2NF is narrow but important: composite key, whole-key dependency.`}
 />
@@ -234,12 +234,12 @@ columns depend on other non-key columns.
 
 - Quantity, because it is numeric.
   > Numeric values can be valid whole-key facts.
+- Order_id, because it repeats across rows.
+  > Repetition of a key value across different line items is expected.
 - [o] Product name, because it depends only on product_id.
   > Product name is determined by one part of the composite key, not by the whole pair.
 - Product_id, because it is part of the key.
   > Key columns are not the non-key columns tested for partial dependency.
-- Order_id, because it repeats across rows.
-  > Repetition of a key value across different line items is expected.
 
 A 2NF violation is a non-key column depending on part of a composite key.`}
 />
@@ -247,14 +247,14 @@ A 2NF violation is a non-key column depending on part of a composite key.`}
 <MultipleChoice
   markdown={`Where should product_name go when fixing the order_items example?
 
-- In every order_items row for readability.
-  > Repeating the name in order_items keeps the partial dependency.
-- [o] In a products table keyed by product_id.
-  > Product name is a fact about the product, so product_id should determine it once.
 - In the orders table keyed by order_id.
   > Product name does not depend on the order alone.
 - In no table at all.
   > The fact still matters; it just needs the correct home.
+- [o] In a products table keyed by product_id.
+  > Product name is a fact about the product, so product_id should determine it once.
+- In every order_items row for readability.
+  > Repeating the name in order_items keeps the partial dependency.
 
 Move a partial dependency to the table keyed by the determinant.`}
 />
@@ -262,12 +262,12 @@ Move a partial dependency to the table keyed by the determinant.`}
 <MultipleChoice
   markdown={`Which statement best describes a column that is safe to keep in a 2NF order_items table?
 
-- It depends only on order_id.
-  > A column depending only on order_id belongs in orders.
 - It depends only on product_id.
   > A column depending only on product_id belongs in products.
 - [o] It depends on the specific combination of order_id and product_id.
   > A line-item fact needs the whole composite key.
+- It depends only on order_id.
+  > A column depending only on order_id belongs in orders.
 - It is repeated in many rows.
   > Repetition alone does not prove the dependency is correct.
 
@@ -279,12 +279,12 @@ In 2NF, non-key columns must describe the whole composite-key row.`}
 
 - It must be checked for partial dependencies in the same way as a composite-key table.
   > Partial dependency means depending on part of a composite key, so a one-column key changes the question.
-- [o] It automatically has no possible partial dependency on part of a composite key.
-  > With a one-column key, there is no separate key part for a non-key column to depend on.
 - Every non-key column must be deleted.
   > Single-key tables can have many valid non-key columns.
 - It must be converted to a composite key before it can be normalized.
   > Composite keys are not required for normalization.
+- [o] It automatically has no possible partial dependency on part of a composite key.
+  > With a one-column key, there is no separate key part for a non-key column to depend on.
 
 2NF is only a separate concern when a key has multiple columns.`}
 />

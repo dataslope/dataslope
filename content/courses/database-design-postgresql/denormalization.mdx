@@ -80,14 +80,14 @@ sync plan is part of the design.
 <MultipleChoice
   markdown={`What makes denormalization different from an accidental messy table?
 
-- It never duplicates data.
-  > Denormalization often stores duplicated or derived data by design.
-- [o] It is a deliberate trade-off with a known reason and a sync plan.
-  > The designer can explain why the copy exists and how it stays trustworthy.
 - It removes the need for normalized source tables.
   > Denormalized data usually depends on normalized source-of-truth tables.
+- [o] It is a deliberate trade-off with a known reason and a sync plan.
+  > The designer can explain why the copy exists and how it stays trustworthy.
 - It is required before using foreign keys.
   > Foreign keys belong naturally in normalized designs.
+- It never duplicates data.
+  > Denormalization often stores duplicated or derived data by design.
 
 Denormalization should be intentional, measured, and maintained.`}
 />
@@ -274,14 +274,14 @@ Normalize first; then decide whether a controlled read copy is worth it.`}
 <MultipleChoice
   markdown={`What is the main cost of denormalization?
 
-- It makes all reads impossible.
-  > Denormalization is usually chosen to simplify or speed specific reads.
 - It prevents using PostgreSQL.
   > PostgreSQL can store normalized and denormalized structures.
 - [o] Duplicated or derived data must be kept in sync with the source of truth.
   > The copy can become stale or inconsistent unless the design maintains it.
 - It requires every table to have a composite key.
   > Composite keys are unrelated to the basic denormalization trade-off.
+- It makes all reads impossible.
+  > Denormalization is usually chosen to simplify or speed specific reads.
 
 The maintenance cost is the price paid for the simpler read shape.`}
 />
@@ -289,14 +289,14 @@ The maintenance cost is the price paid for the simpler read shape.`}
 <MultipleChoice
   markdown={`Which statement best summarizes the rule for denormalization?
 
-- Denormalize first, then discover the entities later.
-  > Starting with copies makes it harder to know which facts are authoritative.
-- Never denormalize under any circumstances.
-  > Controlled denormalization can be useful for reporting or cached read models.
-- [o] Normalize first, denormalize on purpose, and keep the duplicated data in sync.
-  > This keeps correctness as the default while allowing measured exceptions.
 - Denormalize whenever a table has more than three columns.
   > Column count is not the decision rule.
+- Denormalize first, then discover the entities later.
+  > Starting with copies makes it harder to know which facts are authoritative.
+- [o] Normalize first, denormalize on purpose, and keep the duplicated data in sync.
+  > This keeps correctness as the default while allowing measured exceptions.
+- Never denormalize under any circumstances.
+  > Controlled denormalization can be useful for reporting or cached read models.
 
 Denormalization is a deliberate exception, not the default design style.`}
 />
@@ -306,10 +306,10 @@ Denormalization is a deliberate exception, not the default design style.`}
 
 - The database has too many foreign keys.
   > Foreign keys do not cause a cached count to become stale.
-- [o] The denormalized copy was not kept in sync with the source data.
-  > The count is a maintained copy of facts stored in the comments table.
 - The table is in 1NF.
   > Atomic values do not guarantee derived copies stay synchronized.
+- [o] The denormalized copy was not kept in sync with the source data.
+  > The count is a maintained copy of facts stored in the comments table.
 - The query used a SELECT statement.
   > Reading the data did not create the inconsistency.
 

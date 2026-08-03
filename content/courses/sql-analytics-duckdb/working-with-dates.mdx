@@ -178,12 +178,12 @@ flowchart TD
 
 - Because \`order_date\` cannot be used in \`GROUP BY\`.
   > It can be grouped; the problem is that grouping by the raw date gives one group per *day*, not per month.
-- [o] Grouping by the raw date makes one group per day; truncating to the month collapses all of a month's days into one group.
-  > \`date_trunc('month', ...)\` maps every day of a month to the same value, producing one row per month.
-- \`date_trunc\` sorts the rows.
-  > It buckets dates to a period start; sorting is still done by \`ORDER BY\`.
 - \`date_trunc\` deletes days with no orders.
   > It does not delete anything; gap-filling is a separate concern handled by a date spine.
+- \`date_trunc\` sorts the rows.
+  > It buckets dates to a period start; sorting is still done by \`ORDER BY\`.
+- [o] Grouping by the raw date makes one group per day; truncating to the month collapses all of a month's days into one group.
+  > \`date_trunc('month', ...)\` maps every day of a month to the same value, producing one row per month.
 
 Truncating dates to the month is what makes per-month grouping work.`}
 />
@@ -191,14 +191,14 @@ Truncating dates to the month is what makes per-month grouping work.`}
 <MultipleChoice
   markdown={`When would you use \`EXTRACT(dow FROM d)\` (day of week) rather than \`date_trunc\`?
 
-- To produce a continuous monthly trend line.
-  > A trend over time uses \`date_trunc\`; extracting the weekday compares *across* time instead.
-- [o] To compare activity **across** periods, e.g. which weekday is busiest, pooling all weeks together.
-  > \`EXTRACT\` pulls a component so you can group all Mondays, all Tuesdays, etc., regardless of week.
-- To keep each date unique.
-  > \`EXTRACT(dow ...)\` collapses many dates to the same weekday number; it does not keep them unique.
 - To add 7 days to a date.
   > Adding days uses interval arithmetic, not \`EXTRACT\`.
+- [o] To compare activity **across** periods, e.g. which weekday is busiest, pooling all weeks together.
+  > \`EXTRACT\` pulls a component so you can group all Mondays, all Tuesdays, etc., regardless of week.
+- To produce a continuous monthly trend line.
+  > A trend over time uses \`date_trunc\`; extracting the weekday compares *across* time instead.
+- To keep each date unique.
+  > \`EXTRACT(dow ...)\` collapses many dates to the same weekday number; it does not keep them unique.
 
 Extract pulls a component (like weekday) to compare across periods;
 truncate flattens dates for trends over time.`}
@@ -207,14 +207,14 @@ truncate flattens dates for trends over time.`}
 <MultipleChoice
   markdown={`A daily revenue chart skips days that had no sales. What is the standard fix?
 
-- Insert fake orders into the table.
-  > You should not corrupt the data; generate a date spine at query time instead.
-- [o] Generate a complete series of dates and \`LEFT JOIN\` the data onto it, using \`COALESCE\` to show 0 for empty days.
-  > A date spine guarantees every period appears; the left join attaches revenue and missing days become 0.
 - Use \`date_trunc\` to fill the gaps automatically.
   > \`date_trunc\` buckets existing rows; it cannot invent rows for days that have no data.
+- Insert fake orders into the table.
+  > You should not corrupt the data; generate a date spine at query time instead.
 - Switch from \`SUM\` to \`AVG\`.
   > Changing the aggregate does not create the missing days; the gap remains.
+- [o] Generate a complete series of dates and \`LEFT JOIN\` the data onto it, using \`COALESCE\` to show 0 for empty days.
+  > A date spine guarantees every period appears; the left join attaches revenue and missing days become 0.
 
 A generated date spine plus a left join produces a gap-free time series.`}
 />

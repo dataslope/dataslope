@@ -596,25 +596,25 @@ for i in range(3):
 
 - \`0\\n1\\n2\`
   > \`continue\` skips the rest of the iteration, so 1 is never printed.
-- [o] \`0\\n2\`
-  > \`continue\` skips the \`print\` when \`i == 1\`, so only 0 and 2 print.
+- \`2\`
+  > The loop starts at 0, not 2.
 - \`0\\n1\`
   > The loop does not break; it continues to \`i == 2\`.
-- \`2\`
-  > The loop starts at 0, not 2.`}
+- [o] \`0\\n2\`
+  > \`continue\` skips the \`print\` when \`i == 1\`, so only 0 and 2 print.`}
 />
 
 <MultipleChoice
   markdown={`When does a \`for ... else\` clause execute?
 
-- Always, after the loop body finishes
-  > No, it only runs if the loop **completes** without a break.
 - When the loop body raises an exception
   > No, exceptions skip the else clause.
-- [o] Only when the loop finishes without hitting \`break\`
-  > That is what makes it useful for search loops.
+- Always, after the loop body finishes
+  > No, it only runs if the loop **completes** without a break.
 - Only when the iterable is empty
-  > No, it runs after a **successful** completion, not an empty iterable.`}
+  > No, it runs after a **successful** completion, not an empty iterable.
+- [o] Only when the loop finishes without hitting \`break\`
+  > That is what makes it useful for search loops.`}
 />
 
 <MultipleChoice
@@ -627,14 +627,14 @@ for i in range(5):
 print(i)
 \`\`\`
 
-- \`0\`
-  > The loop runs multiple times before breaking.
-- \`4\`
-  > Without the \`break\`, the loop's last value would be \`4\`; the \`break\` stops it at \`3\`.
+- A \`NameError\`
+  > \`i\` is still in scope after the loop.
 - [o] \`3\`
   > The loop breaks when \`i == 3\`, and \`i\` retains that value.
-- A \`NameError\`
-  > \`i\` is still in scope after the loop.`}
+- \`4\`
+  > Without the \`break\`, the loop's last value would be \`4\`; the \`break\` stops it at \`3\`.
+- \`0\`
+  > The loop runs multiple times before breaking.`}
 />
 
 <MultipleChoice
@@ -644,10 +644,10 @@ print(i)
   > That would be the default \`start=0\`.
 - [o] \`(1, "a"), (2, "b"), (3, "c")\`
   > \`start=1\` shifts the index to 1-based.
-- \`("a", 1), ("b", 2), ("c", 3)\`
-  > The order is (index, value), not (value, index).
 - \`["a", "b", "c"]\`
-  > \`enumerate\` returns tuples, not the original list.`}
+  > \`enumerate\` returns tuples, not the original list.
+- \`("a", 1), ("b", 2), ("c", 3)\`
+  > The order is (index, value), not (value, index).`}
 />
 
 Loops naturally lead into a tighter syntactic form: comprehensions.

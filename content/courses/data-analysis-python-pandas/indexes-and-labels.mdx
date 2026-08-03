@@ -255,10 +255,10 @@ and demoting via `set_index` / `reset_index` is cheap.
 <MultipleChoice
   markdown={`What is the *default* row index of a DataFrame you create from a dict?
 
-- A copy of the first column
-  > The default index is a \`RangeIndex\` of sequential integers, not a copy of any data column.
 - All NaN
   > An all-NaN index would only occur if you explicitly constructed one that way; the default is a \`RangeIndex\` of sequential integers.
+- A copy of the first column
+  > The default index is a \`RangeIndex\` of sequential integers, not a copy of any data column.
 - [o] A \`RangeIndex\`, integers 0, 1, 2, ... corresponding to row positions
   > Unless you specify \`index=\`, Pandas gives you boring sequential integers.
 - A timestamp
@@ -270,14 +270,14 @@ You can replace the default later with anything meaningful.`}
 <MultipleChoice
   markdown={`Why is having a \`DatetimeIndex\` so valuable for time-series work?
 
-- It looks pretty
-  > The value of a \`DatetimeIndex\` is its analytical capabilities, not its visual appearance in output.
 - It is required by Pandas
   > Pandas works with any index type; a \`DatetimeIndex\` is optional but unlocks a rich set of time-series operations.
-- [o] It enables date-range slicing, rolling windows, resampling, and label-based time lookups, operations that are awkward with plain integer indexes
-  > A DatetimeIndex is the gateway to most of Pandas's time-series features.
+- It looks pretty
+  > The value of a \`DatetimeIndex\` is its analytical capabilities, not its visual appearance in output.
 - It makes the data sorted automatically
   > A \`DatetimeIndex\` does not sort data automatically; you still need to call \`sort_index()\` if you need chronological order.
+- [o] It enables date-range slicing, rolling windows, resampling, and label-based time lookups, operations that are awkward with plain integer indexes
+  > A DatetimeIndex is the gateway to most of Pandas's time-series features.
 
 Time-series indexing is a great example of the value of *labeled* axes.`}
 />
@@ -285,12 +285,12 @@ Time-series indexing is a great example of the value of *labeled* axes.`}
 <MultipleChoice
   markdown={`What does \`reset_index()\` do?
 
+- [o] Promotes the current index back to one or more regular columns and replaces the index with a default RangeIndex
+  > It is the inverse of \`set_index\`. You will use it constantly after groupby.
 - Sorts the index
   > \`sort_index()\` sorts by the index; \`reset_index()\` demotes the index to a column and replaces it with a \`RangeIndex\`.
 - Removes all rows
   > \`reset_index()\` preserves all rows; it only changes where the current index values live (promoted to a column).
-- [o] Promotes the current index back to one or more regular columns and replaces the index with a default RangeIndex
-  > It is the inverse of \`set_index\`. You will use it constantly after groupby.
 - Renames the columns
   > Column renaming is done with \`rename(columns=...)\`; \`reset_index()\` moves the *row* index to a column, leaving column names otherwise unchanged.
 

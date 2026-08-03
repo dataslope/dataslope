@@ -167,10 +167,10 @@ and correlation. What does plotting them reveal that those statistics hide?
 
 - That the datasets actually have different means once you look closely.
   > The means really are (essentially) equal, that is the whole setup. Plotting does not contradict the summary numbers; it adds information they never carried.
-- [o] That the *shape* of each relationship is completely different, one linear, one curved, one outlier-driven, one leverage-driven.
-  > Summary statistics compress away shape, clustering, and outliers. The four panels expose structure (a curve, a rogue point, a single high-leverage point) that identical numbers simply cannot encode.
 - That the correlation coefficient was computed incorrectly.
   > The correlations are correct; each is about 0.82. The lesson is that a correct correlation can still describe four very different pictures.
+- [o] That the *shape* of each relationship is completely different, one linear, one curved, one outlier-driven, one leverage-driven.
+  > Summary statistics compress away shape, clustering, and outliers. The four panels expose structure (a curve, a rogue point, a single high-leverage point) that identical numbers simply cannot encode.
 - That three of the four datasets are too small to analyze.
   > All four have the same number of points (11). Size is not the issue, the issue is that equal summaries can hide unequal shapes.
 
@@ -393,12 +393,12 @@ whole point of this page.
   markdown={`Why is a summary statistic like the mean described as a "compression" of a
 dataset?
 
-- Because it makes the file smaller on disk.
-  > "Compression" here is about information, not storage. The point is conceptual, not about bytes.
-- [o] Because it represents many data points with a single number, discarding the detail of how those points are arranged.
-  > A mean keeps one fact (the center) and throws away shape, spread, clustering, and outliers, which is exactly why different datasets can share a mean.
 - Because it always underestimates the true value.
   > A mean is not biased low by nature; it is simply a summary. The issue is lost detail, not a systematic error.
+- [o] Because it represents many data points with a single number, discarding the detail of how those points are arranged.
+  > A mean keeps one fact (the center) and throws away shape, spread, clustering, and outliers, which is exactly why different datasets can share a mean.
+- Because it makes the file smaller on disk.
+  > "Compression" here is about information, not storage. The point is conceptual, not about bytes.
 - Because it can only be computed on small datasets.
   > Means are computed on datasets of any size. The lesson is about what summaries omit, not about dataset size.
 
@@ -410,14 +410,14 @@ inspect what was discarded.`}
   markdown={`Which task is a **scatter plot** of two numeric variables clearly better at
 than reading their correlation coefficient?
 
-- Reporting a single number you can paste into a sentence.
-  > A coefficient wins on conciseness, that is a point *for* the statistic, not the plot.
-- [o] Revealing whether the relationship is straight, curved, clustered, or driven by an outlier.
-  > Correlation collapses a relationship to one number about straight-line association; the scatter shows the actual shape, including curves and rogue points it cannot capture.
-- Storing the relationship compactly for later computation.
-  > A coefficient is the compact form; the plot is the expansive one. Compactness favors the statistic.
 - Guaranteeing the relationship is causal.
   > Neither a plot nor a correlation establishes causation. The advantage of the plot is showing *shape*, not proving cause.
+- Storing the relationship compactly for later computation.
+  > A coefficient is the compact form; the plot is the expansive one. Compactness favors the statistic.
+- [o] Revealing whether the relationship is straight, curved, clustered, or driven by an outlier.
+  > Correlation collapses a relationship to one number about straight-line association; the scatter shows the actual shape, including curves and rogue points it cannot capture.
+- Reporting a single number you can paste into a sentence.
+  > A coefficient wins on conciseness, that is a point *for* the statistic, not the plot.
 
 A coefficient summarizes; a scatter plot shows. Anscombe's quartet is the
 classic demonstration of the difference.`}
@@ -445,14 +445,14 @@ catch one in the act.`}
   markdown={`What is the central lesson shared by **Anscombe's quartet** and the
 **Datasaurus dozen**?
 
-- Correlation always equals 0.82 for real datasets.
-  > 0.82 is just the value Anscombe chose; it is not a universal constant. The lesson is about the limits of summaries generally.
 - Larger datasets are always more trustworthy than smaller ones.
   > Both examples use small datasets and say nothing about size being a remedy. More rows would not have revealed these shapes, only plotting does.
 - [o] Many different datasets can share identical summary statistics, so you must visualize the data to know its true shape.
   > Both are explicitly constructed so the means, spreads, and correlations coincide while the shapes differ wildly, proving that summaries alone cannot identify a dataset.
 - Standard deviation is a more reliable summary than the mean.
   > Both examples hold the standard deviation constant *too*; no single summary escapes the problem. The fix is a picture, not a different statistic.
+- Correlation always equals 0.82 for real datasets.
+  > 0.82 is just the value Anscombe chose; it is not a universal constant. The lesson is about the limits of summaries generally.
 
 Equal summaries, unequal shapes: always plot before you trust the numbers.`}
 />

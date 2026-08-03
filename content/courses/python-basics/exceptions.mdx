@@ -614,14 +614,14 @@ else:
 <MultipleChoice
   markdown={`Which block runs **only** when the \`try\` block raises no exception?
 
-- \`except\`
-  > No, \`except\` runs when an exception **is** raised.
-- [o] \`else\`
-  > \`else\` is for code that should run on success (no exception).
 - \`finally\`
   > No, \`finally\` **always** runs, whether there's an exception or not.
+- [o] \`else\`
+  > \`else\` is for code that should run on success (no exception).
 - The block after the \`try\` statement entirely
-  > No, code after the entire \`try/except/else/finally\` runs regardless, but \`else\` is specifically for success.`}
+  > No, code after the entire \`try/except/else/finally\` runs regardless, but \`else\` is specifically for success.
+- \`except\`
+  > No, \`except\` runs when an exception **is** raised.`}
 />
 
 <MultipleChoice
@@ -629,10 +629,10 @@ else:
 
 - It is invalid syntax.
   > No, it is valid Python, but it is an anti-pattern.
-- [o] It catches \`KeyboardInterrupt\` and \`SystemExit\`, making the program hard to kill.
-  > Bare \`except:\` catches **everything**, including signals you want to let through.
 - It only catches \`Exception\`, which is too broad.
   > No, it catches **BaseException**, which is even broader than \`Exception\`.
+- [o] It catches \`KeyboardInterrupt\` and \`SystemExit\`, making the program hard to kill.
+  > Bare \`except:\` catches **everything**, including signals you want to let through.
 - It requires an \`as e\` clause.
   > No, \`as e\` is optional.`}
 />
@@ -640,10 +640,10 @@ else:
 <MultipleChoice
   markdown={`When should you use \`raise ... from e\`?
 
-- When you want to suppress the original exception.
-  > No, \`raise ... from None\` suppresses context, not \`raise ... from e\`.
 - [o] When wrapping a lower-level exception in a higher-level one, to preserve the cause.
   > \`raise ConfigError(...) from e\` shows both the \`ConfigError\` and the underlying \`ValueError\`, with a causal link.
+- When you want to suppress the original exception.
+  > No, \`raise ... from None\` suppresses context, not \`raise ... from e\`.
 - When re-raising the same exception.
   > No, just write \`raise\` with no arguments to re-raise.
 - When you want to catch multiple exception types.
@@ -653,14 +653,14 @@ else:
 <MultipleChoice
   markdown={`What does \`finally\` do?
 
-- Runs only if an exception is raised.
-  > No, that is what \`except\` does.
-- Runs only if no exception is raised.
-  > No, that is what \`else\` does.
 - [o] Runs no matter what: success, exception, return, or even sys.exit().
   > \`finally\` is guaranteed cleanup. Use it for closing files, releasing locks, etc.
 - Suppresses the exception.
-  > No, \`finally\` does not suppress exceptions; it just runs before the exception propagates.`}
+  > No, \`finally\` does not suppress exceptions; it just runs before the exception propagates.
+- Runs only if an exception is raised.
+  > No, that is what \`except\` does.
+- Runs only if no exception is raised.
+  > No, that is what \`else\` does.`}
 />
 
 <MultipleChoice
@@ -679,14 +679,14 @@ else:
 <MultipleChoice
   markdown={`What happens if an exception is raised and not caught?
 
-- The exception is silently ignored.
-  > No, unhandled exceptions are never ignored.
-- [o] Python prints a traceback and exits with a non-zero exit code.
-  > Unhandled exceptions terminate the program (or return 500 in a web context).
 - The exception is logged but the program continues.
   > No, the program exits unless the exception is caught.
 - The exception is converted to a warning.
-  > No, exceptions and warnings are separate systems.`}
+  > No, exceptions and warnings are separate systems.
+- [o] Python prints a traceback and exits with a non-zero exit code.
+  > Unhandled exceptions terminate the program (or return 500 in a web context).
+- The exception is silently ignored.
+  > No, unhandled exceptions are never ignored.`}
 />
 
 Many exceptions come from I/O. Files are next.

@@ -131,14 +131,14 @@ the mapping, or the geom.* Each component stays independent.
 <MultipleChoice
   markdown={`What is the role of a *scale* in ggplot2, as distinct from a *mapping*?
 
-- The mapping draws the marks; the scale chooses the geom.
-  > Drawing marks is the geom's job, and the geom is chosen directly, not by a scale.
-- They are two words for the same thing.
-  > They are distinct components with a clear division of labor.
-- [o] The mapping says which column controls an aesthetic; the scale translates those data values into actual visual values and provides the matching axis or legend.
-  > Mapping = intent, scale = execution plus the guide (axis/legend).
 - The scale loads the data into ggplot2.
   > Loading data is the data component; scales translate values to visuals.
+- The mapping draws the marks; the scale chooses the geom.
+  > Drawing marks is the geom's job, and the geom is chosen directly, not by a scale.
+- [o] The mapping says which column controls an aesthetic; the scale translates those data values into actual visual values and provides the matching axis or legend.
+  > Mapping = intent, scale = execution plus the guide (axis/legend).
+- They are two words for the same thing.
+  > They are distinct components with a clear division of labor.
 
 Mapping declares intent; the scale carries it out and produces the
 visible axis or legend.`}
@@ -147,14 +147,14 @@ visible axis or legend.`}
 <MultipleChoice
   markdown={`Adding \`scale_x_continuous()\` explicitly to a plot that already had a continuous x changes nothing visually. Why?
 
-- Because \`scale_x_continuous()\` is broken.
-  > It works; it simply matches what was already happening.
 - Because scales only affect color, never position.
   > Position aesthetics (x, y) have scales too, that is exactly what this is.
-- [o] Because ggplot2 was already adding that scale by default; writing it out just makes the implicit default explicit.
-  > Every aesthetic gets a default scale; stating it changes nothing until you alter its settings.
 - Because the data has no continuous columns.
   > \`displ\` is continuous; the scale applies to it.
+- Because \`scale_x_continuous()\` is broken.
+  > It works; it simply matches what was already happening.
+- [o] Because ggplot2 was already adding that scale by default; writing it out just makes the implicit default explicit.
+  > Every aesthetic gets a default scale; stating it changes nothing until you alter its settings.
 
 Default scales are added for every aesthetic. You only write a scale to
 *change* its behavior (limits, breaks, labels, transform, palette).`}

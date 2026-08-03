@@ -376,21 +376,21 @@ int main(void) {
 
 - It is always exactly 32 bits.
   > That is a common configuration, but not required.
-- It is always exactly 16 bits.
-  > 16 bits is the standard's *minimum*, not a requirement.
+- It is whatever the operating system kernel decides at runtime.
+  > Sizes are baked in at compile time, not selected at runtime.
 - [o] It is at least 16 bits; the actual size depends on the target platform.
   > Use the fixed-width types in \`<stdint.h>\` when you need exact widths.
-- It is whatever the operating system kernel decides at runtime.
-  > Sizes are baked in at compile time, not selected at runtime.`}
+- It is always exactly 16 bits.
+  > 16 bits is the standard's *minimum*, not a requirement.`}
 />
 
 <MultipleChoice
   markdown={`Which type should you use when you need a guaranteed 32-bit unsigned integer for a binary file format?
 
-- \`int\`
-  > \`int\` may be 16 or 64 bits on some targets.
 - \`unsigned int\`
   > Same problem, not guaranteed to be exactly 32 bits.
+- \`int\`
+  > \`int\` may be 16 or 64 bits on some targets.
 - \`size_t\`
   > \`size_t\` is pointer-sized (32 or 64 bits depending on the platform).
 - [o] \`uint32_t\` (from \`<stdint.h>\`)
@@ -402,10 +402,10 @@ int main(void) {
 
 - \`0xAA\`
   > That would be the big-endian order.
-- [o] \`0xDD\`
-  > Little-endian places the *least* significant byte first.
 - \`0xCC\`
   > \`0xCC\` is one of the middle bytes.
+- [o] \`0xDD\`
+  > Little-endian places the *least* significant byte first.
 - It is unpredictable.
   > It is fully predictable once you know the endianness.`}
 />

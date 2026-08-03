@@ -247,14 +247,14 @@ assert abs(d - exp) < 1e-9`,
 <MultipleChoice
   markdown={`Looking back, what was the single most important conceptual shift this course aimed for?
 
-- Memorizing which scipy.stats function to call for each test
-  > Knowing the functions is useful, but the course's aim was a way of thinking, not a lookup table; the functions serve the reasoning, not the other way around.
-- [o] Seeing every number as an uncertain estimate from a noisy sample, and quantifying that uncertainty
-  > The recurring theme from the first page to the last was crossing from "the data says X" to "the data suggests X, this precisely," which is the core of statistical reasoning.
 - Learning to always reject the null hypothesis
   > Rejecting the null is neither a goal nor always appropriate; failing to reject is often the honest outcome, and the aim was sound reasoning, not a particular verdict.
 - Proving results with mathematical derivations
   > The course was deliberately intuition-first and avoided proofs; the goal was reasoning under uncertainty, not formal derivation.
+- Memorizing which scipy.stats function to call for each test
+  > Knowing the functions is useful, but the course's aim was a way of thinking, not a lookup table; the functions serve the reasoning, not the other way around.
+- [o] Seeing every number as an uncertain estimate from a noisy sample, and quantifying that uncertainty
+  > The recurring theme from the first page to the last was crossing from "the data says X" to "the data suggests X, this precisely," which is the core of statistical reasoning.
 
 The durable takeaway is treating numbers as estimates with quantified uncertainty.`}
 />
@@ -262,14 +262,14 @@ The durable takeaway is treating numbers as estimates with quantified uncertaint
 <MultipleChoice
   markdown={`How does machine learning relate to the statistics you just learned?
 
-- They are unrelated fields with nothing in common
-  > They share deep foundations: sampling, overfitting, resampling, and the bias-variance trade-off are all statistical ideas at ML's core.
+- Machine learning only uses Bayesian methods, which weren't covered
+  > ML draws on both frequentist and Bayesian ideas, and far more than Bayesian methods; the foundations here underpin much of it regardless of philosophy.
 - Machine learning replaces statistics, making it obsolete
   > ML builds on statistical thinking rather than replacing it; concepts like train/test splits and cross-validation are statistics applied to prediction.
 - [o] Machine learning is largely statistics scaled up and pointed at prediction, so this foundation directly strengthens it
   > Train/test splits are sampling, overfitting echoes the garden of forking paths, and regularization is a bias-variance trade-off, each has a statistical ancestor you now recognize.
-- Machine learning only uses Bayesian methods, which weren't covered
-  > ML draws on both frequentist and Bayesian ideas, and far more than Bayesian methods; the foundations here underpin much of it regardless of philosophy.
+- They are unrelated fields with nothing in common
+  > They share deep foundations: sampling, overfitting, resampling, and the bias-variance trade-off are all statistical ideas at ML's core.
 
 A solid statistics foundation makes you a more careful ML practitioner, not just a button-pusher.`}
 />
@@ -279,12 +279,12 @@ A solid statistics foundation makes you a more careful ML practitioner, not just
 
 - Always collect as much data as possible before doing anything
   > More data helps precision, but the central discipline is about *how you reason* with whatever data you have, not simply gathering more.
+- Reject the null whenever the p-value is below 0.05 and move on
+  > Mechanically thresholding the p-value ignores effect size, confidence intervals, and the fallacies; the course argued strongly against exactly this reflex.
 - Report a single best-guess number so stakeholders aren't confused by ranges
   > Hiding uncertainty behind a single number is the opposite of the lesson; reporting the range honestly is the habit to keep.
 - [o] Quantify uncertainty, separate signal from noise, prefer effect sizes with CIs, and stay humble about what data can prove
   > These reflexes, uncertainty, signal-versus-noise, magnitude over mere significance, and humility about inference, are the durable core of statistical thinking.
-- Reject the null whenever the p-value is below 0.05 and move on
-  > Mechanically thresholding the p-value ignores effect size, confidence intervals, and the fallacies; the course argued strongly against exactly this reflex.
 
 Habits outlast formulas, these four are the ones to carry into every analysis.`}
 />

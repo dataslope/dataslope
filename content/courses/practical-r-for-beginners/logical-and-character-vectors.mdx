@@ -299,12 +299,12 @@ vectors will do.
 
 *Hint: \`x > 15\` is a logical vector, and \`sum()\` adds up \`TRUE\` (1) and \`FALSE\` (0), it never sees the original numbers.*
 
+- \`TRUE\`
+  > \`sum()\` returns a number, not a single logical value.
 - \`90\` (the sum of values greater than 15)
   > \`sum()\` is applied to \`x > 15\`, not to \`x\` itself, so it adds the \`TRUE\`/\`FALSE\` values rather than 20 + 30 + 40.
 - [o] \`3\`
   > \`x > 15\` is \`c(FALSE, TRUE, TRUE, TRUE)\`. \`sum()\` treats \`TRUE\` as 1, so the count is 3.
-- \`TRUE\`
-  > \`sum()\` returns a number, not a single logical value.
 - \`0.75\`
   > That would be \`mean(x > 15)\`, the *proportion* of \`TRUE\` values, not the count.`}
 />
@@ -312,27 +312,27 @@ vectors will do.
 <MultipleChoice
   markdown={`What does \`mean(c(TRUE, TRUE, FALSE, TRUE))\` evaluate to?
 
-- \`3\`
-  > \`sum()\` of this logical vector would return 3 (three \`TRUE\` values), but \`mean()\` divides by the count, giving 3/4 = 0.75.
+- An error
+  > \`mean()\` accepts logical vectors and silently coerces \`TRUE\`/\`FALSE\` to 1/0 before averaging, no error occurs.
 - [o] \`0.75\`
   > \`mean()\` treats \`TRUE\` as 1 and \`FALSE\` as 0, so the mean is \`(1+1+0+1)/4 = 0.75\`, the *proportion* of \`TRUE\` values.
+- \`3\`
+  > \`sum()\` of this logical vector would return 3 (three \`TRUE\` values), but \`mean()\` divides by the count, giving 3/4 = 0.75.
 - \`TRUE\`
-  > \`mean()\` returns a numeric value, not a logical one; the result 0.75 is not coerced back to \`TRUE\`.
-- An error
-  > \`mean()\` accepts logical vectors and silently coerces \`TRUE\`/\`FALSE\` to 1/0 before averaging, no error occurs.`}
+  > \`mean()\` returns a numeric value, not a logical one; the result 0.75 is not coerced back to \`TRUE\`.`}
 />
 
 <MultipleChoice
   markdown={`Given \`names <- c("Ana", "Bo", "Cara")\` and \`ages <- c(40, 25, 33)\`, what does \`names[ages > 30]\` return?
 
+- An error
+  > Logical indexing of a character vector is valid R, so no error occurs.
 - \`c(40, 33)\`
   > Those are the *ages* over 30, but the expression indexes into \`names\`, so it returns names rather than ages.
 - \`c(TRUE, FALSE, TRUE)\`
   > That is the value of \`ages > 30\` itself, before it is used to subset \`names\`.
 - [o] \`c("Ana", "Cara")\`
-  > The logical \`ages > 30\` is \`c(TRUE, FALSE, TRUE)\`, used as an index into \`names\`, keeping positions 1 and 3.
-- An error
-  > Logical indexing of a character vector is valid R, so no error occurs.`}
+  > The logical \`ages > 30\` is \`c(TRUE, FALSE, TRUE)\`, used as an index into \`names\`, keeping positions 1 and 3.`}
 />
 
 ## Mini challenge: who passed?

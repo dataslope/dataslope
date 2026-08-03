@@ -385,12 +385,12 @@ Which statement is **true** in TypeScript's structural type system?
 
 - Both \`Dog\` and \`Pet\` are assignable to each other because they share the \`name\` property.
   > Sharing one property isn't enough for mutual assignability, \`Pet\` has no \`breed\`, so it can't be used where a \`Dog\` is required.
+- Neither is assignable to the other because they have different names.
+  > No. TypeScript uses structural typing, not nominal typing. Names don't matter, only the shape (properties and their types).
 - [o] \`Dog\` is assignable to \`Pet\` because it has all required properties (and more).
   > A \`Dog\` has everything a \`Pet\` needs (\`name\`), plus extra (\`breed\`). Structural typing allows extra properties.
 - \`Pet\` is assignable to \`Dog\` because \`Dog\` is more specific.
   > No. A \`Pet\` doesn't have a \`breed\` property, so it can't satisfy \`Dog\`. Structural typing requires *at least* the declared properties.
-- Neither is assignable to the other because they have different names.
-  > No. TypeScript uses structural typing, not nominal typing. Names don't matter, only the shape (properties and their types).
 
 In structural typing, type \`A\` is assignable to type \`B\` if \`A\` has *at least* all the properties of \`B\` with compatible types. Extra properties on \`A\` are fine. This is why \`Dog\` (which has \`name\` and \`breed\`) can be used anywhere a \`Pet\` (which only needs \`name\`) is expected.`}
 />

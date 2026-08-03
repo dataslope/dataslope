@@ -167,14 +167,14 @@ without an extra subquery.
 <MultipleChoice
   markdown={`What is the most analytical reason to use \`ORDER BY ... DESC LIMIT 10\`?
 
-- To permanently store the table in sorted order.
-  > \`ORDER BY\` sorts the query result, not the stored table.
-- [o] To surface the ten largest values, answering a "top 10" question.
-  > Sorting descending and limiting is exactly how analysts find the biggest or worst rows.
 - To delete all but ten rows.
   > \`LIMIT\` restricts what the query returns; it deletes nothing.
+- [o] To surface the ten largest values, answering a "top 10" question.
+  > Sorting descending and limiting is exactly how analysts find the biggest or worst rows.
 - To shuffle rows randomly before display.
   > \`ORDER BY\` is deterministic sorting, not shuffling.
+- To permanently store the table in sorted order.
+  > \`ORDER BY\` sorts the query result, not the stored table.
 
 "Sort descending, take the top N" is the canonical top-N pattern.`}
 />
@@ -182,12 +182,12 @@ without an extra subquery.
 <MultipleChoice
   markdown={`Why can a tie in the sort column make \`ORDER BY amount DESC LIMIT 5\` give **unstable** results?
 
-- Because \`LIMIT\` randomly deletes rows from the table.
-  > \`LIMIT\` does not delete table rows; the instability comes from undecided ordering among tied rows.
 - [o] When several rows share the same \`amount\`, their relative order is undefined, so which five appear can vary unless you add a tiebreaker.
   > Without a secondary sort key, tied rows have no guaranteed order, making the top-5 non-reproducible.
 - Because DuckDB cannot sort decimal columns.
   > DuckDB sorts decimals fine; the issue is ties, not the data type.
+- Because \`LIMIT\` randomly deletes rows from the table.
+  > \`LIMIT\` does not delete table rows; the instability comes from undecided ordering among tied rows.
 - Because \`DESC\` is not a valid keyword.
   > \`DESC\` is valid; the instability is purely about unbroken ties.
 
@@ -202,10 +202,10 @@ reproducible.`}
   > It does not: \`LIMIT 2\` caps the *entire* result at two rows, not two per region.
 - [o] \`LIMIT\` restricts the whole result to 2 rows total, not 2 per group; you need per-group ranking (e.g. \`ROW_NUMBER\` + \`QUALIFY\`).
   > Per-group top-N requires ranking within each partition and filtering on that rank, which \`LIMIT\` alone cannot express.
-- Because \`ORDER BY\` cannot be combined with \`LIMIT\`.
-  > They combine fine; the limitation is that \`LIMIT\` is global, not per-group.
 - Because regions cannot be sorted.
   > Regions sort fine; the problem is the global nature of \`LIMIT\`.
+- Because \`ORDER BY\` cannot be combined with \`LIMIT\`.
+  > They combine fine; the limitation is that \`LIMIT\` is global, not per-group.
 
 Per-group top-N needs a window-function rank filtered with \`QUALIFY\`, not a
 global \`LIMIT\`.`}

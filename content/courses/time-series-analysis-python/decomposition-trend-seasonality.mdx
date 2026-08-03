@@ -214,12 +214,12 @@ different answers: always let the data tell you which model it wants.
 
 - Additive, because the peaks are always above the trend
   > "Above the trend" doesn't decide it; the *size* of the swing does. Here the swing grows from ~20 to ~100, which an additive model (fixed-size season) can't represent.
-- [o] Multiplicative, because the seasonal swing grows in proportion to the level (~10% of the level in both eras)
-  > +20 on 200 and +100 on 1000 are both about 10%, a constant *percentage*, which is exactly multiplicative seasonality. The swing scales with the level.
-- Neither; the series has no seasonality
-  > It clearly has a repeating summer peak, that's seasonality. The only question is whether its size is constant (additive) or proportional (multiplicative).
 - It doesn't matter which you pick
   > It matters a lot: an additive fit here leaves a funnel-shaped residual (visible misfit), while multiplicative leaves clean noise. The wrong choice corrupts every downstream component.
+- Neither; the series has no seasonality
+  > It clearly has a repeating summer peak, that's seasonality. The only question is whether its size is constant (additive) or proportional (multiplicative).
+- [o] Multiplicative, because the seasonal swing grows in proportion to the level (~10% of the level in both eras)
+  > +20 on 200 and +100 on 1000 are both about 10%, a constant *percentage*, which is exactly multiplicative seasonality. The swing scales with the level.
 
 When the seasonal swing scales with the level (constant percentage), the model is multiplicative; constant absolute swing means additive.`}
 />
@@ -487,14 +487,14 @@ assert len(yearly_mean) == 12 and len(yearly_range) == 12`,
 <MultipleChoice
   markdown={`In the equation \`Observed = Trend + Seasonal + Residual\`, what should the **residual** ideally look like?
 
-- A clean repeating wave
-  > A repeating wave in the residual means *leftover seasonality*, the seasonal component was under-estimated. A good residual has no such pattern.
-- A steady upward slope
-  > A slope in the residual means *leftover trend*. The trend component should have absorbed it; its presence signals a misfit.
 - [o] Structureless noise with no visible trend, cycle, or funnel
   > The residual is what's left after the structured parts are removed, so ideally it's pure randomness. Any remaining pattern indicates a component was mis-estimated or the wrong model was used.
 - Exactly zero everywhere
   > Real data has genuine randomness, so a perfectly flat-zero residual would be suspicious (or overfit). "Boring noise," not "nothing," is the goal.
+- A steady upward slope
+  > A slope in the residual means *leftover trend*. The trend component should have absorbed it; its presence signals a misfit.
+- A clean repeating wave
+  > A repeating wave in the residual means *leftover seasonality*, the seasonal component was under-estimated. A good residual has no such pattern.
 
 A well-specified decomposition leaves only patternless noise in the residual; any structure is a red flag.`}
 />
@@ -502,14 +502,14 @@ A well-specified decomposition leaves only patternless noise in the residual; an
 <MultipleChoice
   markdown={`Why does the classical \`seasonal_decompose\` **trend** component have \`NaN\` values at the very start and end of the series?
 
-- Because the data is missing there
-  > The observed data exists at the ends; it's the *trend estimate* that's undefined there, not the raw data.
-- [o] Because the trend is a centered moving average over the seasonal period, and a full window isn't available at the edges
-  > Estimating the trend needs a full-period window centered on each point. Near the boundaries there aren't enough neighbours on one side, so the moving average, and thus the trend, is undefined.
-- Because seasonality cannot be computed at the edges
-  > The *seasonal* component is defined everywhere (it's a repeated average shape). It's specifically the moving-average *trend* that runs out of window at the ends.
 - Because of a bug in statsmodels
   > It's expected behavior, not a bug: a centered moving average mathematically cannot reach the edges. (STL and model-based methods handle ends differently.)
+- Because seasonality cannot be computed at the edges
+  > The *seasonal* component is defined everywhere (it's a repeated average shape). It's specifically the moving-average *trend* that runs out of window at the ends.
+- [o] Because the trend is a centered moving average over the seasonal period, and a full window isn't available at the edges
+  > Estimating the trend needs a full-period window centered on each point. Near the boundaries there aren't enough neighbours on one side, so the moving average, and thus the trend, is undefined.
+- Because the data is missing there
+  > The observed data exists at the ends; it's the *trend estimate* that's undefined there, not the raw data.
 
 The trend is a centered moving average, which has no full window at the boundaries, leaving \`NaN\`s there.`}
 />
@@ -517,14 +517,14 @@ The trend is a centered moving average, which has no full window at the boundari
 <MultipleChoice
   markdown={`Taking \`log\` of a series before an **additive** decomposition is equivalent to what?
 
+- Making the series perfectly stationary
+  > A log stabilizes growing *variance* but does nothing about trend or seasonality, so the result is generally still non-stationary. Differencing handles those, as we'll see next.
 - Removing the trend entirely
   > A log doesn't remove the trend; it rescales the values. The trend remains (now on a log scale).
 - [o] A **multiplicative** decomposition of the original series, because \`log(T x S x R) = log T + log S + log R\`
   > The logarithm turns products into sums, so additive structure on the log scale corresponds to multiplicative structure on the original scale. That's why a log + additive fit handles growing seasonal swings.
 - Converting the data to percentages
   > A log is not a percentage transform. It does compress proportional changes, but the result is log-units, not percents.
-- Making the series perfectly stationary
-  > A log stabilizes growing *variance* but does nothing about trend or seasonality, so the result is generally still non-stationary. Differencing handles those, as we'll see next.
 
 Because logs turn multiplication into addition, an additive decomposition of \`log(y)\` is a multiplicative decomposition of \`y\`.`}
 />

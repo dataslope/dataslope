@@ -501,10 +501,10 @@ export function totalQty(cart: Cart): number {
 
 - It always makes programs faster
   > It often makes them somewhat slower in micro-benchmarks. The benefit isn't speed; it's reasoning.
-- It removes the need for unit tests
-  > It makes unit tests easier, but you still write them. Immutability isn't a replacement for testing.
 - [o] You can pass a value across modules and be certain nobody can change it behind your back
   > The contract "this value will not change" is the single most useful guarantee for reasoning about cross-module behavior. It eliminates an entire class of bug ("who mutated my data?") without any runtime cost.
+- It removes the need for unit tests
+  > It makes unit tests easier, but you still write them. Immutability isn't a replacement for testing.
 - It makes \`==\` always work correctly
   > Equality in JavaScript is reference-based by default for objects, regardless of mutability. Immutability doesn't change that.
 

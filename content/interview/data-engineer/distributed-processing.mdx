@@ -218,27 +218,27 @@ to prefer DataFrames over RDDs and Parquet over CSV.
 <MultipleChoice
   markdown={`You run a series of \`filter\` and \`select\` transformations on a Spark DataFrame, but the Spark UI shows no job running. Why?
 
-- Spark is broken or the cluster is down.
-  > Nothing is wrong: transformations don't trigger execution on their own.
-- [o] Transformations are lazy; no job runs until an **action** (like \`count\` or \`write\`) is called.
-  > Spark only builds a logical plan for transformations and executes it when an action forces materialization.
 - \`filter\` and \`select\` run only on the driver, so the UI shows nothing.
   > They run distributed across executors, but only after an action triggers the plan.
 - You must call \`cache()\` before any transformation executes.
-  > Caching is optional and also lazy; it's the action, not caching, that starts execution.`}
+  > Caching is optional and also lazy; it's the action, not caching, that starts execution.
+- [o] Transformations are lazy; no job runs until an **action** (like \`count\` or \`write\`) is called.
+  > Spark only builds a logical plan for transformations and executes it when an action forces materialization.
+- Spark is broken or the cluster is down.
+  > Nothing is wrong: transformations don't trigger execution on their own.`}
 />
 
 <MultipleChoice
   markdown={`A job joins a 2 TB fact table with a 20 MB country lookup table and is dominated by shuffle time. What's the highest-impact fix?
 
-- Repartition the fact table into more partitions.
-  > More partitions may help parallelism but doesn't remove the shuffle caused by the join itself.
-- [o] Broadcast the 20 MB lookup table so the join happens locally with no shuffle.
-  > A broadcast join replicates the small side to every executor, eliminating the shuffle of the 2 TB table.
 - Cache both tables in memory before joining.
   > Caching doesn't avoid the shuffle; you'd still shuffle 2 TB on the join key.
 - Convert the DataFrames to RDDs and use \`groupByKey\`.
-  > That drops the Catalyst optimizer and \`groupByKey\` shuffles even more, the opposite of what's needed.`}
+  > That drops the Catalyst optimizer and \`groupByKey\` shuffles even more, the opposite of what's needed.
+- Repartition the fact table into more partitions.
+  > More partitions may help parallelism but doesn't remove the shuffle caused by the join itself.
+- [o] Broadcast the 20 MB lookup table so the join happens locally with no shuffle.
+  > A broadcast join replicates the small side to every executor, eliminating the shuffle of the 2 TB table.`}
 />
 
 <MultipleChoice
@@ -246,10 +246,10 @@ to prefer DataFrames over RDDs and Parquet over CSV.
 
 - The cluster has too few cores.
   > Too few cores would slow tasks uniformly, not create one 40-minute straggler among fast tasks.
-- [o] Data skew: one \`user_id\` (e.g. a null or a huge account) holds most of the rows, so its partition is enormous.
-  > A hot key concentrates data into a single partition, making one task do most of the work while others idle.
 - The DataFrame wasn't cached.
   > Caching affects re-use across actions, not the imbalance within a single shuffle stage.
+- [o] Data skew: one \`user_id\` (e.g. a null or a huge account) holds most of the rows, so its partition is enormous.
+  > A hot key concentrates data into a single partition, making one task do most of the work while others idle.
 - Lazy evaluation is delaying the other tasks.
   > Laziness governs when the plan runs, not how work is distributed once a stage executes.`}
 />

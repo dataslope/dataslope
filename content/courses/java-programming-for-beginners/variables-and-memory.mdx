@@ -202,27 +202,27 @@ other across different parts of the program.
 <MultipleChoice
   markdown={`What does \`int x = 5;\` *do*, mechanically?
 
-- It checks whether x is mathematically equal to 5
-  > That would be a comparison, written \`x == 5\`.
-- It creates a permanent constant called x
-  > That would require \`final\`.
 - [o] It declares a variable x of type int and stores the value 5 in it
   > Declaration + initial assignment.
 - It defines a function called x
-  > No, this is a variable declaration, not a function.`}
+  > No, this is a variable declaration, not a function.
+- It creates a permanent constant called x
+  > That would require \`final\`.
+- It checks whether x is mathematically equal to 5
+  > That would be a comparison, written \`x == 5\`.`}
 />
 
 <MultipleChoice
   markdown={`How is a \`String\` variable in Java different from an \`int\` variable?
 
-- A String can hold more characters than an int
-  > That's about *what they hold*, not the mechanism.
-- They are stored identically
-  > They are not.
+- A String cannot be declared without \`final\`
+  > It can.
 - [o] An int holds its value directly; a String variable holds a reference to a String object stored elsewhere in memory
   > Primitives are inlined; reference types hold pointers.
-- A String cannot be declared without \`final\`
-  > It can.`}
+- They are stored identically
+  > They are not.
+- A String can hold more characters than an int
+  > That's about *what they hold*, not the mechanism.`}
 />
 
 ## A small challenge

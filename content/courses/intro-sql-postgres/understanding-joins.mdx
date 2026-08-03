@@ -140,10 +140,10 @@ Joins** and **Outer Joins**, are about.
 <MultipleChoice
   markdown={`What does a **join** do?
 
-- It deletes rows that appear in two tables.
-  > Joins combine data; they do not delete rows from your tables.
 - [o] It combines rows from two tables into one result by matching them on a condition.
   > A join pairs rows that satisfy its \`ON\` condition and merges their columns into single result rows.
+- It deletes rows that appear in two tables.
+  > Joins combine data; they do not delete rows from your tables.
 - It sorts a single table by two columns.
   > Sorting is \`ORDER BY\`; a join is about combining tables.
 - It copies one table on top of another.
@@ -155,14 +155,14 @@ A join merges related rows from two tables based on a matching condition.`}
 <MultipleChoice
   markdown={`In \`JOIN customers c ON o.customer_id = c.id\`, what is the role of the \`ON\` clause?
 
-- It chooses which columns appear in the output.
-  > Choosing output columns is the job of \`SELECT\`; \`ON\` specifies how rows are matched.
 - [o] It states the condition for matching rows between the two tables.
   > \`ON\` defines which order pairs with which customer, here, equal \`customer_id\` and \`id\`.
-- It sorts the combined result.
-  > Sorting is \`ORDER BY\`; \`ON\` defines the match.
 - It limits how many rows are returned.
   > Limiting rows is \`LIMIT\`; \`ON\` is the matching condition.
+- It sorts the combined result.
+  > Sorting is \`ORDER BY\`; \`ON\` defines the match.
+- It chooses which columns appear in the output.
+  > Choosing output columns is the job of \`SELECT\`; \`ON\` specifies how rows are matched.
 
 The \`ON\` clause defines how rows from the two tables are matched.`}
 />
@@ -170,12 +170,12 @@ The \`ON\` clause defines how rows from the two tables are matched.`}
 <MultipleChoice
   markdown={`Why are table aliases like \`orders o\` and \`customers c\` commonly used in joins?
 
-- They make the query run on more tables at once.
-  > Aliases do not change how many tables are involved; they are a readability convenience.
 - [o] They give each table a short prefix, making column references shorter and removing ambiguity when both tables share a column name.
   > Aliases let you write \`o.id\` versus \`c.id\` clearly and concisely, which matters as joins grow.
 - They permanently rename the tables in the database.
   > An alias applies only within that query; the table keeps its real name.
+- They make the query run on more tables at once.
+  > Aliases do not change how many tables are involved; they are a readability convenience.
 - They are required for every single query.
   > Aliases are optional; they are simply very helpful in joins.
 

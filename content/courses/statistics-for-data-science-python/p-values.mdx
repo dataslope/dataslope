@@ -224,12 +224,12 @@ just means "the null distribution rarely reaches this far."*
 
 - Because the observed difference happened to be small
   > The centering does not depend on the observed difference at all; the null distribution is built before looking at any single observed value.
-- [o] Because under $H_0$ the two groups come from the same process, so most random differences are near zero
-  > When there is genuinely no effect, the typical gap between two samples is around nothing, with symmetric noise on either side, so the distribution piles up at zero.
 - Because differences in means are always zero on average in any dataset
   > Real samples with a true effect produce differences centered on that effect, not on zero. The zero center is specific to the *null* world.
 - Because we subtracted the mean from the data first
   > No mean-subtraction was applied to the raw groups; the zero center comes from the two groups sharing an identical underlying distribution under $H_0$.
+- [o] Because under $H_0$ the two groups come from the same process, so most random differences are near zero
+  > When there is genuinely no effect, the typical gap between two samples is around nothing, with symmetric noise on either side, so the distribution piles up at zero.
 
 The null distribution shows what "pure noise" looks like, and pure noise averages out to no difference.`}
 />
@@ -379,14 +379,14 @@ quantify exactly when real effects go undetected in *Errors and Power*.
 <MultipleChoice
   markdown={`A study reports p = 0.03. A colleague says: "So there's a 97% chance the effect is real." What is wrong with that?
 
-- Nothing, that is a fine way to read a p-value
-  > That reading is the prosecutor's fallacy. A p-value is not the probability that an effect is real.
-- The percentage should be 3%, not 97%
-  > Neither 3% nor 97% is the probability the effect is real; the p-value is not a probability about the hypothesis in either direction.
-- [o] A p-value is $P(\text{data} \mid H_0)$, not $P(\text{effect is real} \mid \text{data})$, the two require different information and are not interchangeable
-  > Getting the probability that the effect is real would require the prior plausibility of the hypotheses, which the p-value never uses; the p-value only describes how extreme the data is under the null.
 - The colleague forgot to multiply by the sample size
   > Sample size does not convert a p-value into a probability that the effect is real; the objection is conceptual, not a missing arithmetic step.
+- The percentage should be 3%, not 97%
+  > Neither 3% nor 97% is the probability the effect is real; the p-value is not a probability about the hypothesis in either direction.
+- Nothing, that is a fine way to read a p-value
+  > That reading is the prosecutor's fallacy. A p-value is not the probability that an effect is real.
+- [o] A p-value is $P(\text{data} \mid H_0)$, not $P(\text{effect is real} \mid \text{data})$, the two require different information and are not interchangeable
+  > Getting the probability that the effect is real would require the prior plausibility of the hypotheses, which the p-value never uses; the p-value only describes how extreme the data is under the null.
 
 $P(\text{data} \mid H_0)$ and $P(H_0 \mid \text{data})$ are different quantities, never swap them.`}
 />
@@ -610,14 +610,14 @@ assert abs(p_two_sided - 2 * one) < 0.02`,
 <MultipleChoice
   markdown={`Which statement is the **correct** definition of a p-value?
 
-- The probability that the null hypothesis is true given the data
-  > That is $P(H_0 \mid \text{data})$, which the p-value is not. The p-value assumes $H_0$ rather than reporting its probability.
-- [o] The probability of obtaining data at least as extreme as observed, assuming the null hypothesis is true
-  > This matches the formal definition: it conditions on $H_0$ and measures how far into the tail the observed (or more extreme) data falls.
 - The probability that the observed result was caused by random chance
   > The calculation already assumes chance is the only mechanism, so it cannot also be the probability that chance was responsible; that reading is circular.
 - The probability that the study will replicate
   > Replication depends on the true effect and the study's power, neither of which the p-value reports.
+- The probability that the null hypothesis is true given the data
+  > That is $P(H_0 \mid \text{data})$, which the p-value is not. The p-value assumes $H_0$ rather than reporting its probability.
+- [o] The probability of obtaining data at least as extreme as observed, assuming the null hypothesis is true
+  > This matches the formal definition: it conditions on $H_0$ and measures how far into the tail the observed (or more extreme) data falls.
 
 The defining feature is the condition "assuming $H_0$ is true."`}
 />
@@ -627,12 +627,12 @@ The defining feature is the condition "assuming $H_0$ is true."`}
 
 - There is a 2% chance the result is a fluke
   > This is the circular "probability of chance" reading; the p-value assumes chance and so cannot quantify the chance that chance was at play.
-- There is a 98% chance the alternative hypothesis is true
-  > That is $P(H_1 \mid \text{data})$, which the p-value does not provide; obtaining it would require prior information the p-value never uses.
-- [o] If $H_0$ were true, data this extreme or more would occur about 2% of the time
-  > This restates the definition correctly: it is a statement about how often the null world produces results as extreme as the one seen.
 - The effect is large because the p-value is small
   > A small p-value reflects how surprising the data is under $H_0$, not the magnitude of the effect; small p-values can accompany tiny effects.
+- [o] If $H_0$ were true, data this extreme or more would occur about 2% of the time
+  > This restates the definition correctly: it is a statement about how often the null world produces results as extreme as the one seen.
+- There is a 98% chance the alternative hypothesis is true
+  > That is $P(H_1 \mid \text{data})$, which the p-value does not provide; obtaining it would require prior information the p-value never uses.
 
 Always phrase it as "if $H_0$ were true, then...".`}
 />
@@ -640,12 +640,12 @@ Always phrase it as "if $H_0$ were true, then...".`}
 <MultipleChoice
   markdown={`Why is a p-value **not** equal to the probability that $H_0$ is true?
 
-- Because $H_0$ is never true in real data
-  > Whether $H_0$ is ever exactly true is a separate debate; the reason the p-value is not $P(H_0)$ is structural, not about realism.
 - Because p-values are always biased upward
   > P-values are not systematically biased upward; under $H_0$ they are uniform. The mismatch is about which conditional probability is being computed.
 - [o] Because the p-value is computed *assuming* $H_0$, so it is $P(\text{data} \mid H_0)$, and reversing the condition to $P(H_0 \mid \text{data})$ requires extra information it never uses
   > A calculation that takes $H_0$ as given cannot output the probability of $H_0$; converting between the two conditionals needs the prior plausibility of the hypotheses.
+- Because $H_0$ is never true in real data
+  > Whether $H_0$ is ever exactly true is a separate debate; the reason the p-value is not $P(H_0)$ is structural, not about realism.
 - Because the sample size is usually too small
   > Sample size affects power and precision, not the conceptual fact that conditioning on $H_0$ cannot yield the probability of $H_0$.
 
@@ -655,14 +655,14 @@ This is the prosecutor's fallacy: $P(\text{data} \mid H_0) \neq P(H_0 \mid \text
 <MultipleChoice
   markdown={`You hold the true effect fixed and tiny, then increase the sample size from 50 to 50,000. The p-value drops from 0.30 to 0.0001. What does this demonstrate?
 
+- Larger samples always make effects more important
+  > Detectability is not importance; a larger sample can make a trivial effect highly significant without making it matter.
+- [o] The p-value reflects evidence against $H_0$, which grows with sample size even for a fixed small effect, so a p-value is not a measure of effect size
+  > Larger samples make even a tiny true effect easier to distinguish from zero, shrinking the p-value while the effect itself is unchanged; magnitude must be judged separately.
 - The effect got bigger as you collected more data
   > The true effect was held constant; only the sample size changed. The data did not alter the underlying effect.
 - The p-value is unreliable and should be ignored
   > The behavior is exactly what theory predicts, not a malfunction; the lesson is about what the p-value measures, not that it is broken.
-- [o] The p-value reflects evidence against $H_0$, which grows with sample size even for a fixed small effect, so a p-value is not a measure of effect size
-  > Larger samples make even a tiny true effect easier to distinguish from zero, shrinking the p-value while the effect itself is unchanged; magnitude must be judged separately.
-- Larger samples always make effects more important
-  > Detectability is not importance; a larger sample can make a trivial effect highly significant without making it matter.
 
 To learn how big an effect is, use an effect size and a confidence interval, not the p-value.`}
 />
@@ -670,14 +670,14 @@ To learn how big an effect is, use an effect size and a confidence interval, not
 <MultipleChoice
   markdown={`A test gives p = 0.45. Which conclusion is the most defensible?
 
-- There is definitely no effect
-  > A non-significant p-value does not establish the absence of an effect; a real effect can produce a large p-value when power is low.
-- [o] The data did not provide significant evidence against $H_0$; a real effect may still exist but went undetected
-  > Failing to reach significance means the evidence was insufficient to distinguish the data from the null, which leaves open an undetected real effect.
-- The probability the null is true is 0.45
-  > The p-value assumes the null and is not the probability the null is true; 0.45 is a tail-area statement, not a posterior probability.
 - The effect size is 0.45
   > A p-value is not an effect size; the two are different quantities measured on different scales.
+- The probability the null is true is 0.45
+  > The p-value assumes the null and is not the probability the null is true; 0.45 is a tail-area statement, not a posterior probability.
+- [o] The data did not provide significant evidence against $H_0$; a real effect may still exist but went undetected
+  > Failing to reach significance means the evidence was insufficient to distinguish the data from the null, which leaves open an undetected real effect.
+- There is definitely no effect
+  > A non-significant p-value does not establish the absence of an effect; a real effect can produce a large p-value when power is low.
 
 "Not significant" means undetected, not absent.`}
 />
@@ -685,12 +685,12 @@ To learn how big an effect is, use an effect size and a confidence interval, not
 <MultipleChoice
   markdown={`A data scientist runs 40 independent A/B comparisons on metrics that truly have no effect, using $\alpha = 0.05$. About how many "significant" results should they expect, and why?
 
-- Zero, because none of the effects are real
-  > Even when no effect is real, p-values under $H_0$ are uniform, so some will fall below 0.05 by chance; expecting zero ignores random variation.
 - [o] About 2, because each truly-null test has a 5% chance of a false positive, and 5% of 40 is 2
   > With every null comparison carrying an independent 5% false-positive risk, roughly 5% of 40 tests cross the threshold purely by luck.
 - All 40, because the tests are being misused
   > Running many tests does not make every one significant; it makes a *small expected fraction* significant by chance, not all of them.
+- Zero, because none of the effects are real
+  > Even when no effect is real, p-values under $H_0$ are uniform, so some will fall below 0.05 by chance; expecting zero ignores random variation.
 - Exactly 1, because only one result can be significant at a time
   > Multiple comparisons can each independently reach significance; there is no rule limiting it to one, and the expected count here is about two.
 
@@ -700,14 +700,14 @@ Testing many true nulls guarantees occasional false positives, the multiple-comp
 <MultipleChoice
   markdown={`Which practice **inflates** the real false-positive rate above the stated $\alpha$?
 
-- Fixing the sample size and the hypothesis before collecting data
-  > Pre-specifying the design is exactly what keeps the false-positive rate at its stated level, not what inflates it.
+- Using a two-sided test instead of a one-sided test
+  > A two-sided test is generally more conservative about reaching significance, not a source of inflated false positives.
 - Reporting the effect size alongside the p-value
   > Adding an effect size gives more information and does not change the error rate of the test.
 - [o] Repeatedly peeking at a running experiment and stopping as soon as p dips below 0.05
   > Each peek is another opportunity for noise to cross the threshold, so the chance of *some* look being significant rises well above the nominal level.
-- Using a two-sided test instead of a one-sided test
-  > A two-sided test is generally more conservative about reaching significance, not a source of inflated false positives.
+- Fixing the sample size and the hypothesis before collecting data
+  > Pre-specifying the design is exactly what keeps the false-positive rate at its stated level, not what inflates it.
 
 Every extra look or extra test is another chance for chance to fool you.`}
 />

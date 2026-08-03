@@ -135,12 +135,12 @@ the entire subject of the next page, mapping versus setting.
 
 - The overall visual style or theme of the plot.
   > That is closer to the *theme*. An aesthetic is more specific.
+- The data frame passed to \`ggplot()\`.
+  > That is the data; aesthetics are what data columns get mapped *to*.
 - A synonym for "geometry."
   > Geometries are the marks; aesthetics are visual *properties* of those marks.
 - [o] A visual property of a mark, such as x/y position, color, size, or shape, that a data column can be mapped to.
   > Aesthetics are the information-carrying channels (position, color, size, shape, ...).
-- The data frame passed to \`ggplot()\`.
-  > That is the data; aesthetics are what data columns get mapped *to*.
 
 Aesthetics are the visual channels; \`aes()\` maps columns onto them.`}
 />
@@ -148,14 +148,14 @@ Aesthetics are the visual channels; \`aes()\` maps columns onto them.`}
 <MultipleChoice
   markdown={`You map \`aes(x = displ, y = hwy, color = class, size = cty)\`. How many variables does the resulting scatter plot encode, and through what?
 
+- Four variables, but only if you add a legend manually.
+  > The legends/guides are generated automatically from the mappings.
+- [o] Four variables, \`displ\` via x, \`hwy\` via y, \`class\` via color, and \`cty\` via size.
+  > Each aesthetic is an independent channel encoding one column.
 - Two variables, through x and y only.
   > Color and size are also mappings, each carrying a variable.
 - One variable, repeated four times.
   > Four *different* columns are mapped, so four variables are shown.
-- [o] Four variables, \`displ\` via x, \`hwy\` via y, \`class\` via color, and \`cty\` via size.
-  > Each aesthetic is an independent channel encoding one column.
-- Four variables, but only if you add a legend manually.
-  > The legends/guides are generated automatically from the mappings.
 
 Aesthetics are independent information channels; mapping more columns
 lets a single chart show more variables (within reason).`}
@@ -164,12 +164,12 @@ lets a single chart show more variables (within reason).`}
 <MultipleChoice
   markdown={`Why does \`geom_bar()\` use \`fill\` rather than \`color\` to encode a grouping variable across the body of each bar?
 
+- [o] For area-based marks like bars, \`fill\` controls the interior while \`color\` controls only the border, so \`fill\` is what shades the bar body.
+  > The right aesthetic follows from the kind of mark: areas are shaded with \`fill\`.
 - \`color\` does not exist for bars.
   > \`color\` exists for bars, but it controls only the *outline*.
 - ggplot2 forbids \`color\` on any area geom.
   > It is allowed; it just affects the border, not the interior.
-- [o] For area-based marks like bars, \`fill\` controls the interior while \`color\` controls only the border, so \`fill\` is what shades the bar body.
-  > The right aesthetic follows from the kind of mark: areas are shaded with \`fill\`.
 - Bars can only ever be one color.
   > Bars can encode a variable; the correct interior aesthetic is \`fill\`.
 

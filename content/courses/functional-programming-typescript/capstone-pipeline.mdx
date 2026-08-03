@@ -254,14 +254,14 @@ of building this way.
 <MultipleChoice
   markdown={`Looking at the capstone, what makes the program *as a whole* easy to test and evolve?
 
-- It uses ES modules
-  > Modules help with organization, but the deeper property is something else.
-- Every \`.ts\` file is small
-  > Helpful, but not the structural reason.
 - [o] All business logic lives in pure functions that take data and return data, with side effects confined to a tiny shell, so each piece can be tested with plain inputs, and the parts you'll want to change live where you expect them
   > The architectural choice of "pure core, imperative shell" is what turns a *style* (FP) into a *system property* (maintainability).
 - The program is short
   > Toy programs are easy to test for many reasons; the *real* benefit scales to large programs.
+- Every \`.ts\` file is small
+  > Helpful, but not the structural reason.
+- It uses ES modules
+  > Modules help with organization, but the deeper property is something else.
 
 When you scale this same pattern from one screen of code to a hundred thousand lines, the property does not break, the codebase still consists of pure transforms plus thin adapters.`}
 />

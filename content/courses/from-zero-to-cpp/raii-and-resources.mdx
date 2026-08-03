@@ -285,25 +285,25 @@ int main() {
 <MultipleChoice
   markdown={`What does RAII stand for, and what is its core idea?
 
+- Read-After-Initialize Idiom; read fields after constructing.
+  > That is not what RAII means.
 - Run-time Allocation In Iterations; allocate inside loops.
   > That is not a real term.
-- Recursive Algorithm Implementation Interface.
-  > Also not a real term.
 - [o] *Resource Acquisition Is Initialization*: acquire resources in constructors and release them in destructors, so that scope exit always cleans up correctly.
   > It is the foundation of modern C++ resource management.
-- Read-After-Initialize Idiom; read fields after constructing.
-  > That is not what RAII means.`}
+- Recursive Algorithm Implementation Interface.
+  > Also not a real term.`}
 />
 
 <MultipleChoice
   markdown={`Why does RAII still work correctly when an exception is thrown?
 
+- [o] During stack unwinding, the destructors of every fully-constructed object in scope run automatically, releasing their resources.
+  > This is why RAII makes exception safety practical.
 - Exceptions disable the destructor calls along the unwound path.
   > The opposite: exceptions *trigger* destructors for objects whose scopes are unwound.
 - The runtime keeps a list of every \`new\` and calls \`delete\` for each.
   > It does not; you must arrange ownership yourself.
-- [o] During stack unwinding, the destructors of every fully-constructed object in scope run automatically, releasing their resources.
-  > This is why RAII makes exception safety practical.
 - It does not; exceptions are unsafe and you should disable them.
   > Modern C++ relies on exception-safe RAII.`}
 />

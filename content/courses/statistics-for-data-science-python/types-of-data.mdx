@@ -239,14 +239,14 @@ computer can't tell a quantity from a code, that judgment is yours.
 <MultipleChoice
   markdown={`A \`postal_code\` column is stored as integers. A teammate computes its mean to "find the typical region." What's the problem?
 
-- The mean is fine; it gives the geographic center
-  > A postal code's digits are an arbitrary label, not a coordinate, so their average doesn't correspond to any location or "center." The numeric storage is incidental.
-- Postal codes should be floats, not integers
-  > Changing the numeric subtype wouldn't help, the issue isn't precision, it's that arithmetic on a nominal label is meaningless regardless of how it's stored.
 - [o] Postal code is nominal (a label that happens to look numeric), so averaging it is meaningless; count or mode is appropriate
   > Recognizing the column as a nominal identifier, where addition and division carry no meaning, leads to the right summaries: distinct counts or the most common code.
+- The mean is fine; it gives the geographic center
+  > A postal code's digits are an arbitrary label, not a coordinate, so their average doesn't correspond to any location or "center." The numeric storage is incidental.
 - The mean is only valid if the codes are sorted first
   > Sorting changes nothing about whether the values are quantities. They're labels, so no ordering or arrangement makes their mean meaningful.
+- Postal codes should be floats, not integers
+  > Changing the numeric subtype wouldn't help, the issue isn't precision, it's that arithmetic on a nominal label is meaningless regardless of how it's stored.
 
 Numeric-looking IDs are nominal; treat them as categories, not quantities.`}
 />
@@ -505,14 +505,14 @@ before any p-value appears.
 <MultipleChoice
   markdown={`Which variable is **ordinal** (ordered categories with possibly uneven gaps), rather than nominal or numerical?
 
+- A randomly assigned account number
+  > An account number is a nominal label; its numeric appearance doesn't give it a meaningful order.
+- The exact price paid in dollars
+  > Price is a continuous ratio quantity with equal gaps and a true zero, fully numerical, not ordinal.
 - A user's country of residence
   > Countries have no inherent order, so this is nominal, you can't say one country is "greater than" another.
 - [o] T-shirt size recorded as S, M, L, XL
   > Sizes have a clear order (S < M < L < XL) but the gaps between them aren't guaranteed equal, which is exactly the ordinal case.
-- The exact price paid in dollars
-  > Price is a continuous ratio quantity with equal gaps and a true zero, fully numerical, not ordinal.
-- A randomly assigned account number
-  > An account number is a nominal label; its numeric appearance doesn't give it a meaningful order.
 
 Ordinal data can be ranked but its spacing is unknown, so it sits between nominal and numerical.`}
 />
@@ -520,14 +520,14 @@ Ordinal data can be ranked but its spacing is unknown, so it sits between nomina
 <MultipleChoice
   markdown={`Why is "20 °C is twice as warm as 10 °C" an incorrect statement, statistically speaking?
 
-- Because temperature is nominal and can't be compared at all
-  > Temperature can certainly be ordered and its differences are meaningful, so it isn't nominal. The issue is specifically about ratios, not comparison.
 - Because the values should be averaged first
   > Averaging is unrelated to whether a ratio statement is valid. The problem is the scale, not a missing calculation.
-- [o] Because Celsius is an interval scale with an arbitrary zero, so ratios like "twice as warm" aren't meaningful
-  > Recognizing that the Celsius zero is a convention (not an absence of heat) is why differences are valid but ratios are not, the defining limitation of an interval scale.
 - Because 10 and 20 are too close together to compare
   > The numeric closeness is irrelevant; the same ratio claim fails for 10 °C and 40 °C too. The reason is the missing true zero, not the gap size.
+- [o] Because Celsius is an interval scale with an arbitrary zero, so ratios like "twice as warm" aren't meaningful
+  > Recognizing that the Celsius zero is a convention (not an absence of heat) is why differences are valid but ratios are not, the defining limitation of an interval scale.
+- Because temperature is nominal and can't be compared at all
+  > Temperature can certainly be ordered and its differences are meaningful, so it isn't nominal. The issue is specifically about ratios, not comparison.
 
 Interval scales support differences but not ratios; only ratio scales (with a true zero) support "twice as much."`}
 />
@@ -535,14 +535,14 @@ Interval scales support differences but not ratios; only ratio scales (with a tr
 <MultipleChoice
   markdown={`A dataset codes survey answers as \`1=Disagree, 2=Neutral, 3=Agree\`. Someone reports the **mean** of this column as the headline summary. What's the most accurate critique?
 
+- Nothing is wrong as long as the sample is large
+  > Sample size doesn't repair an ordinal-as-interval assumption; a large sample just gives a precise estimate of a quantity whose meaning is already shaky.
+- [o] The codes are ordinal, so the gaps between them may not be equal; the median or the distribution of responses is a more defensible summary than the mean
+  > Treating the codes as ordinal, where the mean rests on an unverified equal-spacing assumption, points to the median and the response counts as the safer summaries.
 - The mean is perfectly valid because the codes are numbers
   > The values being stored as numbers doesn't make them quantities. They're ordered labels, so the equal-spacing the mean assumes isn't justified.
 - The column should have been continuous
   > The underlying construct is inherently an ordered category, not a measured quantity; it can't simply be redefined as continuous. The fix is the summary, not the data type.
-- [o] The codes are ordinal, so the gaps between them may not be equal; the median or the distribution of responses is a more defensible summary than the mean
-  > Treating the codes as ordinal, where the mean rests on an unverified equal-spacing assumption, points to the median and the response counts as the safer summaries.
-- Nothing is wrong as long as the sample is large
-  > Sample size doesn't repair an ordinal-as-interval assumption; a large sample just gives a precise estimate of a quantity whose meaning is already shaky.
 
 Averaging ordinal codes silently assumes equal spacing; medians and count distributions avoid that assumption.`}
 />
@@ -550,12 +550,12 @@ Averaging ordinal codes silently assumes equal spacing; medians and count distri
 <MultipleChoice
   markdown={`A column \`store_id\` has dtype \`int64\` in pandas. What does that tell you about its statistical type?
 
-- It confirms the column is numerical and can be averaged
-  > A dtype describes storage, not meaning. An \`int64\` column can easily be a nominal label, in which case averaging it is meaningless.
 - It means the column is ordinal
   > Nothing about the \`int64\` dtype implies an order among store IDs. They're labels; the dtype is silent on statistical type.
 - [o] Almost nothing, dtype is about storage, and an integer column can be a nominal ID where arithmetic is meaningless
   > Separating the storage dtype from the statistical type is the key insight: a numeric dtype doesn't license a mean, and IDs are nominal despite looking numeric.
+- It confirms the column is numerical and can be averaged
+  > A dtype describes storage, not meaning. An \`int64\` column can easily be a nominal label, in which case averaging it is meaningless.
 - It guarantees there are no missing values
   > The dtype says nothing about completeness, and historically integer columns couldn't even hold missing values cleanly. It's unrelated to the statistical type.
 

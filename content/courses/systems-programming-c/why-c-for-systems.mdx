@@ -213,38 +213,38 @@ constantly.
 <MultipleChoice
   markdown={`Which of the following is **not** a typical reason to choose C over a higher-level language like Python or Java?
 
-- Predictable execution with no garbage collector pauses
-  > That is a real C advantage, especially for embedded and real-time work.
 - Ability to run on a microcontroller with kilobytes of memory
   > That is also a real C advantage; C is the dominant embedded language.
-- Direct access to hardware addresses and registers
-  > That is a real C advantage; volatile pointers map to MMIO.
+- Predictable execution with no garbage collector pauses
+  > That is a real C advantage, especially for embedded and real-time work.
 - [o] Built-in safety against out-of-bounds memory access
-  > C deliberately does **not** check array bounds; that's why memory bugs are such a recurring theme in this course.`}
+  > C deliberately does **not** check array bounds; that's why memory bugs are such a recurring theme in this course.
+- Direct access to hardware addresses and registers
+  > That is a real C advantage; volatile pointers map to MMIO.`}
 />
 
 <MultipleChoice
   markdown={`What does "undefined behavior" (UB) mean in the C standard?
 
-- The behavior is platform-specific but always well defined per platform.
-  > That describes *implementation-defined* behavior, not undefined behavior.
-- The program will reliably crash with a clear error message.
-  > UB has no required behavior; "appears to work" is a frequent and dangerous outcome.
 - [o] The standard imposes no requirements: the compiler may produce any code at all, including code that appears to work in testing.
   > UB is the root cause of many silent C bugs.
+- The program will reliably crash with a clear error message.
+  > UB has no required behavior; "appears to work" is a frequent and dangerous outcome.
 - It is only a problem in debug builds; optimizers ignore it.
-  > Optimizers actively assume UB never happens, which can make the symptoms worse, not better.`}
+  > Optimizers actively assume UB never happens, which can make the symptoms worse, not better.
+- The behavior is platform-specific but always well defined per platform.
+  > That describes *implementation-defined* behavior, not undefined behavior.`}
 />
 
 <MultipleChoice
   markdown={`Why is C often called "portable assembly"?
 
-- Because every C compiler emits the same assembly language.
-  > Different targets emit completely different assembly.
-- [o] Because C exposes the underlying machine model, flat addressable memory, fixed-size values, and direct pointer arithmetic, while still letting you retarget the compiler to many CPUs.
-  > C is high enough to be portable but low enough to map closely to hardware.
 - Because C programs are written in mnemonics like \`MOV\` and \`ADD\`.
   > Those are assembly mnemonics; C is a higher-level language than assembly.
+- [o] Because C exposes the underlying machine model, flat addressable memory, fixed-size values, and direct pointer arithmetic, while still letting you retarget the compiler to many CPUs.
+  > C is high enough to be portable but low enough to map closely to hardware.
+- Because every C compiler emits the same assembly language.
+  > Different targets emit completely different assembly.
 - Because every C statement maps to exactly one CPU instruction.
   > Many C statements compile to several instructions, and the optimizer can collapse or reorder them.`}
 />

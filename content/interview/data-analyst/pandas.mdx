@@ -644,14 +644,14 @@ print(df[["q1", "q2"]].map(lambda x: round(x, 2)))`,
 <MultipleChoice
   markdown={`In \`df.groupby("region")["amount"].sum()\`, what is the **index** of the resulting Series?
 
-- The original DataFrame's row numbers (0, 1, 2, …).
-  > Aggregating collapses each group to one value; the original row positions are gone.
-- [o] The distinct \`region\` values (the grouping keys).
-  > \`groupby\` uses the group keys as the index of the aggregated result, here, one entry per region.
 - A default \`RangeIndex\` with no labels.
   > Only if you call \`.reset_index()\`; the grouped result is labeled by the group keys by default.
 - The \`amount\` values.
-  > \`amount\` becomes the Series *values* (the per-group sums), not the index.`}
+  > \`amount\` becomes the Series *values* (the per-group sums), not the index.
+- [o] The distinct \`region\` values (the grouping keys).
+  > \`groupby\` uses the group keys as the index of the aggregated result, here, one entry per region.
+- The original DataFrame's row numbers (0, 1, 2, …).
+  > Aggregating collapses each group to one value; the original row positions are gone.`}
 />
 
 ## Challenges

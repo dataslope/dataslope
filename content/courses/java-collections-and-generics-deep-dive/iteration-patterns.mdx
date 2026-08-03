@@ -407,38 +407,38 @@ public final class Pruner {
 for (Integer n : list) if (n % 2 == 0) list.remove(n);
 \`\`\`
 
-- Because \`list.remove(Object)\` is \`O(n)\`
-  > That's a performance issue, not a correctness one.
+- Because integers are autoboxed
+  > Autoboxing is unrelated.
 - [o] Because the enhanced-for uses an \`Iterator\`, and modifying the underlying list via \`list.remove\` invalidates the iterator's internal modCount
   > Either use \`Iterator.remove()\` directly or call \`list.removeIf(...)\`.
 - Because \`list\` is unmodifiable
   > It need not be; the exception fires on a mutable list too.
-- Because integers are autoboxed
-  > Autoboxing is unrelated.`}
+- Because \`list.remove(Object)\` is \`O(n)\`
+  > That's a performance issue, not a correctness one.`}
 />
 
 <MultipleChoice
   markdown={`Which iteration form lets you **insert** new elements at the cursor while walking a \`List\`?
 
-- Enhanced for-each
-  > Cannot mutate.
-- \`forEach(Consumer)\`
-  > Cannot mutate.
+- [o] \`ListIterator\`
+  > \`ListIterator.add(e)\` inserts at the current cursor position.
 - Plain \`Iterator\`
   > Plain \`Iterator\` only supports \`remove\`, not \`add\`.
-- [o] \`ListIterator\`
-  > \`ListIterator.add(e)\` inserts at the current cursor position.`}
+- \`forEach(Consumer)\`
+  > Cannot mutate.
+- Enhanced for-each
+  > Cannot mutate.`}
 />
 
 <MultipleChoice
   markdown={`When is a stream pipeline the better choice over an explicit loop?
 
-- Always, because streams are faster
-  > They are often comparable, sometimes slower.
 - When the body needs \`break\` or \`return\`
   > Streams don't have \`break\`; a \`for\` loop is cleaner there.
-- [o] When the body is a straightforward pipeline of filter / transform / collect with no early exit
-  > Streams trade flexibility for declarative clarity in exactly that case.
+- Always, because streams are faster
+  > They are often comparable, sometimes slower.
 - When you need to mutate the source collection
-  > Streams must not mutate their source.`}
+  > Streams must not mutate their source.
+- [o] When the body is a straightforward pipeline of filter / transform / collect with no early exit
+  > Streams trade flexibility for declarative clarity in exactly that case.`}
 />

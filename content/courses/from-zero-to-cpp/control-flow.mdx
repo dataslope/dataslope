@@ -524,12 +524,12 @@ int main() {
 <MultipleChoice
   markdown={`What is the difference between \`==\` and \`=\` in a condition?
 
-- They are interchangeable.
-  > They are very different.
 - [o] \`==\` compares two values; \`=\` assigns the right-hand side to the left-hand side.
   > \`if (x = 5)\` is almost certainly a bug.
 - \`=\` compares; \`==\` assigns.
   > It is the other way around.
+- They are interchangeable.
+  > They are very different.
 - Both compare values, but \`==\` is faster.
   > They do completely different things.`}
 />
@@ -537,40 +537,40 @@ int main() {
 <MultipleChoice
   markdown={`Why does C++ short-circuit \`&&\` and \`||\`?
 
+- It is a quirk inherited from C with no real benefit.
+  > It has a clear and intentional benefit.
+- To make code run faster on multi-core CPUs.
+  > Short-circuiting is unrelated to multi-core execution.
 - For backwards compatibility with Fortran.
   > That is not the reason.
 - [o] So the right-hand side is only evaluated when needed, which lets you write safe guards like \`p != nullptr && p->value > 0\`.
-  > Short-circuiting is essential for safe pointer access.
-- To make code run faster on multi-core CPUs.
-  > Short-circuiting is unrelated to multi-core execution.
-- It is a quirk inherited from C with no real benefit.
-  > It has a clear and intentional benefit.`}
+  > Short-circuiting is essential for safe pointer access.`}
 />
 
 <MultipleChoice
   markdown={`In a \`switch\` statement, what does it mean to "fall through" a case?
 
-- The switch matched no case and fell through to \`default\`.
-  > That is just \`default\` doing its job.
+- The compiler emitted a warning that the user can ignore.
+  > Fall-through is a runtime behavior, not just a warning.
 - The case threw an exception that fell through to a handler.
   > \`switch\` is unrelated to exceptions.
 - [o] Without \`break\`, execution continues into the next case's body, running its code as well.
   > Fall-through is occasionally useful but usually a bug; modern compilers warn about it.
-- The compiler emitted a warning that the user can ignore.
-  > Fall-through is a runtime behavior, not just a warning.`}
+- The switch matched no case and fell through to \`default\`.
+  > That is just \`default\` doing its job.`}
 />
 
 <MultipleChoice
   markdown={`What is the scope of \`i\` in \`for (int i = 0; i < 10; ++i) { ... }\`?
 
-- The entire \`main\` function.
-  > That would be too wide a scope.
-- The current file.
-  > Definitely not.
 - [o] Only inside the loop header and body; \`i\` ceases to exist after the loop ends.
   > This is exactly the smallest-scope principle from the previous chapter.
+- The current file.
+  > Definitely not.
 - All functions called from inside the loop.
-  > A called function cannot see the caller's local variables.`}
+  > A called function cannot see the caller's local variables.
+- The entire \`main\` function.
+  > That would be too wide a scope.`}
 />
 
 Next: how to package code into reusable units, *functions*.

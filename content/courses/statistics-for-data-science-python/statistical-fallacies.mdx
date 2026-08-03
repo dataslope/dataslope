@@ -123,14 +123,14 @@ moves, glance at the segment breakdown before you celebrate or panic.
 <MultipleChoice
   markdown={`A hospital reports a **higher** overall death rate than its rival, yet has a **lower** death rate for both "low-risk" and "high-risk" patients separately. What is the most likely explanation?
 
-- The hospital's data is wrong, since the numbers contradict each other
-  > The numbers do not contradict each other; an aggregate and its subgroups can legitimately point in opposite directions. This is Simpson's paradox, not an error.
-- [o] The hospital treats a larger share of high-risk patients, dragging up its overall rate despite better performance within each risk group
-  > An uneven mix of the lurking variable (patient risk) across hospitals produces exactly this reversal; the better-within-each-group hospital can still have a worse pooled rate.
 - The hospital is genuinely worse, because the overall rate is what matters
   > The overall rate is confounded by case mix here; the within-risk-group comparison is the fairer measure of the hospital's actual performance.
+- [o] The hospital treats a larger share of high-risk patients, dragging up its overall rate despite better performance within each risk group
+  > An uneven mix of the lurking variable (patient risk) across hospitals produces exactly this reversal; the better-within-each-group hospital can still have a worse pooled rate.
 - Risk level is irrelevant to death rates
   > Risk level is precisely the lurking variable driving the reversal, so it is highly relevant rather than irrelevant.
+- The hospital's data is wrong, since the numbers contradict each other
+  > The numbers do not contradict each other; an aggregate and its subgroups can legitimately point in opposite directions. This is Simpson's paradox, not an error.
 
 Always check whether a lurking variable's distribution differs across the groups you compare.`}
 />
@@ -295,14 +295,14 @@ weak evidence, confirm with a second, independent test.
 <MultipleChoice
   markdown={`A fraud detector flags 2% of all transactions and is "95% accurate." Most transactions are legitimate. A flagged transaction is most likely to be:
 
-- Definitely fraud, since the detector is 95% accurate
-  > "95% accurate" does not equal "95% of flags are fraud." When the base rate of fraud is low, most flags are false positives despite high accuracy.
-- [o] More likely legitimate than fraudulent, because fraud is rare and false positives pile up
-  > With a low base rate, the large pool of legitimate transactions generates many false positives that can outnumber the genuine catches.
-- Impossible to assess without knowing the time of day
-  > The missing ingredient is the base rate of fraud, not the time of day; prevalence is what determines how to read a positive flag.
 - Equally likely to be fraud or legitimate
   > Whether it is 50/50 depends entirely on the base rate and error rates; with rare fraud it skews heavily toward false positive, not an even split.
+- [o] More likely legitimate than fraudulent, because fraud is rare and false positives pile up
+  > With a low base rate, the large pool of legitimate transactions generates many false positives that can outnumber the genuine catches.
+- Definitely fraud, since the detector is 95% accurate
+  > "95% accurate" does not equal "95% of flags are fraud." When the base rate of fraud is low, most flags are false positives despite high accuracy.
+- Impossible to assess without knowing the time of day
+  > The missing ingredient is the base rate of fraud, not the time of day; prevalence is what determines how to read a positive flag.
 
 For rare events, even accurate detectors produce mostly false alarms, that's base-rate neglect.`}
 />
@@ -686,12 +686,12 @@ print("False positives out of 100:", false_positives)
 
 - The aggregate number is wrong and should be ignored
   > Both the aggregate and the per-channel numbers can be correct simultaneously; their disagreement is Simpson's paradox, not a computational error.
-- [o] The mix of traffic shifted toward higher-converting channels, lifting the overall rate even as each channel declined
-  > A change in the weighting of channels (the lurking variable) can raise the pooled rate while every channel individually drops.
 - Conversion genuinely improved, so the channel breakdown is misleading
   > The channel breakdown is the more diagnostic view here; the aggregate is flattered by the shift in traffic mix and can hide a real per-channel decline.
 - This is impossible without a bug
   > It is a well-known and entirely possible pattern (Simpson's paradox) that arises from an uneven shift in the underlying groups.
+- [o] The mix of traffic shifted toward higher-converting channels, lifting the overall rate even as each channel declined
+  > A change in the weighting of channels (the lurking variable) can raise the pooled rate while every channel individually drops.
 
 When an aggregate and its segments disagree, suspect a shift in the segment mix.`}
 />
@@ -701,12 +701,12 @@ When an aggregate and its segments disagree, suspect a shift in the segment mix.
 
 - Survivorship bias
   > Survivorship bias is about analyzing only cases that passed a selection filter; nothing here is being filtered out of the data.
-- [o] A confounder (city size / population density) drives both police numbers and crime, creating a non-causal correlation
-  > Larger, denser cities tend to have both more police and more crime, so a third variable produces the correlation without police causing crime.
-- Regression to the mean
-  > Regression to the mean concerns extreme measurements drifting back over time, not a third variable linking two quantities.
 - Base-rate neglect
   > Base-rate neglect is about ignoring prevalence when reading a test result, which is not the issue in this correlation-versus-causation example.
+- Regression to the mean
+  > Regression to the mean concerns extreme measurements drifting back over time, not a third variable linking two quantities.
+- [o] A confounder (city size / population density) drives both police numbers and crime, creating a non-causal correlation
+  > Larger, denser cities tend to have both more police and more crime, so a third variable produces the correlation without police causing crime.
 
 A confounder can manufacture a correlation with no causal arrow between the two variables.`}
 />
@@ -714,14 +714,14 @@ A confounder can manufacture a correlation with no causal arrow between the two 
 <MultipleChoice
   markdown={`A team tests 40 features for an effect on retention at alpha = 0.05, finds 3 with p < 0.05, and reports those 3 as discoveries. What's the danger?
 
-- Nothing; p < 0.05 means each is a real effect
-  > A single p < 0.05 has a 5% false-positive rate; across 40 tests you expect about 2 false positives, so some "discoveries" are likely noise.
 - [o] With 40 tests, about 2 false positives are expected by chance, so the 3 "hits" may be noise unless corrected and confirmed
   > Running many tests inflates the family-wise error rate; without a multiple-comparison correction or confirmation on fresh data, the hits are not trustworthy.
-- The sample was too small
-  > The issue is the number of simultaneous tests, not the per-test sample size; even large samples suffer this if you run enough tests.
+- Nothing; p < 0.05 means each is a real effect
+  > A single p < 0.05 has a 5% false-positive rate; across 40 tests you expect about 2 false positives, so some "discoveries" are likely noise.
 - They should have used a one-sided test
   > Test sidedness does not address the multiple-comparisons problem; the false-positive inflation comes from the number of tests, not their direction.
+- The sample was too small
+  > The issue is the number of simultaneous tests, not the per-test sample size; even large samples suffer this if you run enough tests.
 
 Correct for multiple comparisons (e.g., Bonferroni) and confirm discoveries on new data.`}
 />
@@ -729,12 +729,12 @@ Correct for multiple comparisons (e.g., Bonferroni) and confirm discoveries on n
 <MultipleChoice
   markdown={`A study of successful entrepreneurs finds most dropped out of college, and concludes dropping out boosts success. The fatal flaw is:
 
+- Simpson's paradox
+  > Simpson's paradox is about an aggregate trend reversing across subgroups; this error is about analyzing only the survivors of a selection.
 - [o] Survivorship bias, it only looks at successful people and ignores the far larger number of dropouts who failed
   > Sampling only on the outcome (success) hides the dropouts who did not succeed, so the "pattern" reflects the selection filter, not a real advantage.
 - Regression to the mean
   > Regression to the mean involves extreme values drifting toward average on re-measurement, which is not what is happening in this selected sample.
-- Simpson's paradox
-  > Simpson's paradox is about an aggregate trend reversing across subgroups; this error is about analyzing only the survivors of a selection.
 - P-hacking
   > P-hacking is about running many tests and reporting the lucky ones; the flaw here is the biased sample of only-successful people.
 
@@ -746,12 +746,12 @@ To judge dropping out, you must compare success rates among dropouts AND non-dro
 
 - Base-rate neglect
   > Base-rate neglect concerns the prevalence of a condition when reading a test, not the re-measurement of an extreme group.
-- [o] Regression to the mean, the most extreme readings tend to fall toward average on re-measurement even with no treatment
-  > Selecting the highest values captures people whose reading was partly unlucky-high; on re-measurement those readings drift down regardless of treatment.
-- Survivorship bias
-  > No cases are being filtered out by survival here; everyone enrolled is re-measured, so the issue is the extreme-selection rebound, not survivorship.
 - Cherry-picking the data
   > The clinic measured everyone it enrolled rather than selectively reporting points; the concern is the statistical tendency of extremes to regress.
+- Survivorship bias
+  > No cases are being filtered out by survival here; everyone enrolled is re-measured, so the issue is the extreme-selection rebound, not survivorship.
+- [o] Regression to the mean, the most extreme readings tend to fall toward average on re-measurement even with no treatment
+  > Selecting the highest values captures people whose reading was partly unlucky-high; on re-measurement those readings drift down regardless of treatment.
 
 A control group that was equally extreme but untreated is what isolates the treatment's real effect.`}
 />
@@ -761,12 +761,12 @@ A control group that was equally extreme but untreated is what isolates the trea
 
 - Confounding
   > Confounding involves a third variable driving two others; here the problem is constructing the hypothesis after seeing where the pattern landed.
-- Base-rate neglect
-  > Base-rate neglect is about ignoring prevalence when interpreting a positive result, not about drawing a hypothesis around a found pattern.
 - [o] The Texas sharpshooter fallacy, drawing the target around the cluster after seeing where the shots landed
   > Forming the hypothesis to fit a pattern discovered in the data, then presenting it as a prediction, treats a postdiction as if it were a forecast.
 - Regression to the mean
   > Regression to the mean is about extremes drifting back on re-measurement, unrelated to retrofitting a hypothesis to a discovered cluster.
+- Base-rate neglect
+  > Base-rate neglect is about ignoring prevalence when interpreting a positive result, not about drawing a hypothesis around a found pattern.
 
 Patterns found by searching must be confirmed on fresh, independent data before they count.`}
 />

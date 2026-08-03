@@ -411,25 +411,25 @@ Hello, Eve!
 <MultipleChoice
   markdown={`In the call \`receipt.addLine(item)\`, which part is the *receiver*?
 
-- \`addLine\`
-  > That is the message (method name).
-- \`item\`
-  > That is the argument.
 - [o] \`receipt\`
   > The receiver is the object the message is sent to.
 - The return value
-  > The return value is the *response*, not the receiver.`}
+  > The return value is the *response*, not the receiver.
+- \`item\`
+  > That is the argument.
+- \`addLine\`
+  > That is the message (method name).`}
 />
 
 <MultipleChoice
   markdown={`Which pair of methods is a valid example of *method overloading*?
 
-- \`int compute()\` and \`double compute()\`
-  > Return type alone does not differentiate overloads. This won't compile.
-- [o] \`void print(String s)\` and \`void print(int n)\`
-  > Different parameter types yield different signatures.
 - \`public void run()\` and \`private void run()\`
   > Access modifiers don't differentiate overloads either.
+- [o] \`void print(String s)\` and \`void print(int n)\`
+  > Different parameter types yield different signatures.
+- \`int compute()\` and \`double compute()\`
+  > Return type alone does not differentiate overloads. This won't compile.
 - \`void log(String s)\` and \`void log(String s)\`
   > Identical signatures, duplicate method, won't compile.`}
 />
@@ -437,12 +437,12 @@ Hello, Eve!
 <MultipleChoice
   markdown={`In OOP, what is the practical advantage of thinking of method calls as *messages sent to a receiver* rather than just "function calls"?
 
-- The JVM dispatches messages faster than function calls
-  > It's the same dispatch underneath.
-- It makes the program use less memory
-  > Memory use is unrelated.
 - [o] It reminds you that the *receiver* decides how to respond, so you focus on what each object should do rather than how callers should reach into it
   > The "messaging" mindset is what produces well-encapsulated, swappable objects.
 - It removes the need for return values
-  > Methods can still return values.`}
+  > Methods can still return values.
+- It makes the program use less memory
+  > Memory use is unrelated.
+- The JVM dispatches messages faster than function calls
+  > It's the same dispatch underneath.`}
 />

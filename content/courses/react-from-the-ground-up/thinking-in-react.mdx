@@ -114,11 +114,11 @@ of a React app.
 <MultipleChoice
   markdown={`In React, what does it mean that "the UI is a function of state"?
 
-- You must call a function every time you want to change the DOM.
+- Components must avoid using functions.
 - [o] For a given state, React produces a predictable UI, and re-renders it whenever the state changes.
   > The rendered output is determined by the current state, so you describe the result and let React sync the DOM.
 - State can only be changed by directly editing the DOM.
-- Components must avoid using functions.
+- You must call a function every time you want to change the DOM.
 
 Because the output is derived from state, you never manually keep the DOM and your data in sync, changing state is enough.`}
 />

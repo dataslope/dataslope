@@ -247,38 +247,38 @@ recompute from the base grain rather than rolling up.
 <MultipleChoice
   markdown={`You need the single most recent row per \`user_id\` from an event log. Which is the most direct?
 
-- \`GROUP BY user_id\` and \`MAX(updated_at)\`, then select the other columns.
-  > \`MAX(updated_at)\` gives the latest timestamp but drops the rest of that row; you'd need another join to recover \`email\` etc.
-- [o] \`QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY updated_at DESC) = 1\`.
-  > Numbering per user by recency and keeping row 1 returns exactly one complete row per key in a single pass.
 - \`SELECT DISTINCT user_id\`.
   > \`DISTINCT\` dedupes identical rows; it can't pick the latest record when other columns differ.
 - \`WHERE updated_at = MAX(updated_at)\`.
-  > You can't use a bare aggregate in \`WHERE\`, and a global max wouldn't be per-user anyway.`}
+  > You can't use a bare aggregate in \`WHERE\`, and a global max wouldn't be per-user anyway.
+- [o] \`QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY updated_at DESC) = 1\`.
+  > Numbering per user by recency and keeping row 1 returns exactly one complete row per key in a single pass.
+- \`GROUP BY user_id\` and \`MAX(updated_at)\`, then select the other columns.
+  > \`MAX(updated_at)\` gives the latest timestamp but drops the rest of that row; you'd need another join to recover \`email\` etc.`}
 />
 
 <MultipleChoice
   markdown={`Why \`LEFT JOIN\` a metric onto a generated date spine?
 
-- To make the query run faster.
-  > A spine adds a join; it doesn't speed anything up. Its purpose is completeness.
+- To convert timestamps to dates automatically.
+  > Casting is separate; the spine's job is filling gaps in the date range.
 - [o] So dates with zero activity still appear as rows instead of being missing.
   > The spine supplies every calendar date; the \`LEFT JOIN\` keeps days with no matching data, which then show as zero.
 - To deduplicate the metric table.
   > A date spine has nothing to do with deduplication.
-- To convert timestamps to dates automatically.
-  > Casting is separate; the spine's job is filling gaps in the date range.`}
+- To make the query run faster.
+  > A spine adds a join; it doesn't speed anything up. Its purpose is completeness.`}
 />
 
 <MultipleChoice
   markdown={`\`revenue / order_count\` occasionally errors on days with no orders. Best fix?
 
-- Add \`WHERE order_count > 0\`.
-  > That silently drops zero-order days from the report, changing the result set rather than handling the division.
 - [o] Use \`revenue / NULLIF(order_count, 0)\`.
   > \`NULLIF\` turns a 0 denominator into \`NULL\`, so the row survives and the ratio is \`NULL\` instead of erroring.
 - Cast both columns to \`FLOAT\`.
   > Float division by zero still errors or yields infinity; casting doesn't address the zero denominator.
+- Add \`WHERE order_count > 0\`.
+  > That silently drops zero-order days from the report, changing the result set rather than handling the division.
 - Wrap it in \`COALESCE(revenue, 0)\`.
   > That guards the numerator, not the zero denominator that causes the error.`}
 />

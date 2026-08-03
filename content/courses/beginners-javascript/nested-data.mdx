@@ -488,14 +488,14 @@ console.log(getPath({}, "x", "n/a"));
 <MultipleChoice
   markdown={`Why is optional chaining (\`a?.b?.c\`) so useful when reading deeply nested data?
 
-- It runs faster than ordinary property access
-  > Optional chaining is slightly slower than ordinary property access because the runtime must check for \`null\`/\`undefined\` at each step; its value is safety, not speed.
-- It automatically creates missing properties
-  > Optional chaining does *not* create properties; it short-circuits to \`undefined\` when a link is missing. Creating a missing property requires an explicit assignment.
 - [o] It safely returns \`undefined\` if any link in the chain is \`null\` or \`undefined\`, instead of throwing a \`TypeError\` and crashing the program
   > Real-world data is often partial, some fields are missing, optional, or not yet loaded. \`?.\` lets you write \`user?.address?.city\` and get back \`undefined\` for any missing link, instead of an exception. Combined with \`??\` for defaults, it replaces many lines of defensive \`if\` checks.
 - It is a faster form of array indexing
   > \`?.\` can be used with bracket notation (\`arr?.[0]\`) but it is not an indexing optimisation; it adds a null check, which is the opposite of a speed-up.
+- It automatically creates missing properties
+  > Optional chaining does *not* create properties; it short-circuits to \`undefined\` when a link is missing. Creating a missing property requires an explicit assignment.
+- It runs faster than ordinary property access
+  > Optional chaining is slightly slower than ordinary property access because the runtime must check for \`null\`/\`undefined\` at each step; its value is safety, not speed.
 
 Optional chaining is one of the most quietly useful additions to modern JavaScript. Once you've used it, going back to nested \`&&\` checks feels archaic.`}
 />

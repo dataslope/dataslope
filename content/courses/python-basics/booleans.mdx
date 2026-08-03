@@ -504,12 +504,12 @@ assert all_truthy(["a", "", "c"]) is False`,
 
 - \`0\`
   > Zero is falsy.
+- [o] \`[0]\`
+  > A list containing the number 0 is **non-empty**, so it is truthy. Only the empty list \`[]\` is falsy.
 - \`{}\`
   > An empty dict is falsy.
 - \`None\`
-  > \`None\` is falsy.
-- [o] \`[0]\`
-  > A list containing the number 0 is **non-empty**, so it is truthy. Only the empty list \`[]\` is falsy.`}
+  > \`None\` is falsy.`}
 />
 
 <MultipleChoice
@@ -530,25 +530,25 @@ assert all_truthy(["a", "", "c"]) is False`,
 
 - \`True\`
   > \`and\` returns an operand, not necessarily \`True\` or \`False\`.
+- \`"hello"\`
+  > \`and\` would return \`"hello"\` only if the first operand were truthy.
 - \`False\`
   > Close, but \`and\` returns the first falsy operand or the last operand, not necessarily \`False\`.
 - [o] \`[]\`
-  > \`and\` returns the first falsy operand. \`[]\` is falsy, so that's what it returns.
-- \`"hello"\`
-  > \`and\` would return \`"hello"\` only if the first operand were truthy.`}
+  > \`and\` returns the first falsy operand. \`[]\` is falsy, so that's what it returns.`}
 />
 
 <MultipleChoice
   markdown={`What is the idiomatic way to check if a list is non-empty?
 
-- \`if len(items) > 0:\`
-  > This is functionally correct but verbose; Pythonic code uses truthiness.
+- \`if items == True:\`
+  > This is almost never what you want. A non-empty list doesn't equal \`True\`.
 - [o] \`if items:\`
   > This is the idiomatic Pythonic way-concise and readable.
 - \`if items is not None:\`
   > This checks whether \`items\` is \`None\`, not whether it's empty. An empty list \`[]\` would pass this check.
-- \`if items == True:\`
-  > This is almost never what you want. A non-empty list doesn't equal \`True\`.`}
+- \`if len(items) > 0:\`
+  > This is functionally correct but verbose; Pythonic code uses truthiness.`}
 />
 
 Booleans tie directly into control flow. Before we get there, let's look at Python's main sequence type: the list.

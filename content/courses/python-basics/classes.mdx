@@ -723,14 +723,14 @@ assert c.value == 0`,
 <MultipleChoice
   markdown={`What is the role of \`self\` in instance methods?
 
-- It is a keyword that Python requires in method definitions.
-  > No, \`self\` is just a convention; the name is not special.
-- [o] It is the conventional name for the first parameter, which receives the instance.
-  > Python passes the instance automatically; we name it \`self\` by convention.
 - It refers to the class, not the instance.
   > No, \`self\` is the instance. The class is \`cls\` in \`@classmethod\`.
 - It is automatically defined; you do not need to include it in method signatures.
-  > No, you must explicitly list it as the first parameter.`}
+  > No, you must explicitly list it as the first parameter.
+- [o] It is the conventional name for the first parameter, which receives the instance.
+  > Python passes the instance automatically; we name it \`self\` by convention.
+- It is a keyword that Python requires in method definitions.
+  > No, \`self\` is just a convention; the name is not special.`}
 />
 
 <MultipleChoice
@@ -749,53 +749,53 @@ assert c.value == 0`,
 <MultipleChoice
   markdown={`What is the difference between \`__repr__\` and \`__str__\`?
 
+- \`__str__\` is automatically generated; \`__repr__\` must be written by hand.
+  > No, neither is auto-generated unless you use \`@dataclass\`.
 - They are synonyms; Python 3 renamed \`__str__\` to \`__repr__\`.
   > No, both exist and serve different purposes.
-- [o] \`__repr__\` is unambiguous for developers; \`__str__\` is user-friendly.
-  > \`__repr__\` should ideally let you reconstruct the object; \`__str__\` is what \`print()\` uses.
 - \`__repr__\` is for built-in types; \`__str__\` is for user classes.
   > No, both can be defined on any class.
-- \`__str__\` is automatically generated; \`__repr__\` must be written by hand.
-  > No, neither is auto-generated unless you use \`@dataclass\`.`}
+- [o] \`__repr__\` is unambiguous for developers; \`__str__\` is user-friendly.
+  > \`__repr__\` should ideally let you reconstruct the object; \`__str__\` is what \`print()\` uses.`}
 />
 
 <MultipleChoice
   markdown={`When should you use \`@classmethod\` instead of a regular method?
 
-- When the method does not need access to \`self\`.
-  > That is \`@staticmethod\`. \`@classmethod\` receives \`cls\`.
 - [o] When the method needs to access the class itself, often for alternative constructors.
   > \`@classmethod\` is commonly used for factory methods that return \`cls(...)\`.
-- When the method modifies a class attribute.
-  > You can do that with \`@classmethod\`, but it is not the primary reason to use it.
+- When the method does not need access to \`self\`.
+  > That is \`@staticmethod\`. \`@classmethod\` receives \`cls\`.
 - When the method is private.
-  > Method privacy (by convention, leading \`_\`) is orthogonal to \`@classmethod\`.`}
+  > Method privacy (by convention, leading \`_\`) is orthogonal to \`@classmethod\`.
+- When the method modifies a class attribute.
+  > You can do that with \`@classmethod\`, but it is not the primary reason to use it.`}
 />
 
 <MultipleChoice
   markdown={`Why is defining \`__eq__\` without \`__hash__\` a problem?
 
+- The class becomes abstract and cannot be instantiated.
+  > No, this has nothing to do with abstract base classes.
 - Python will raise a \`SyntaxError\`.
   > No, it is legal; Python just sets \`__hash__ = None\`.
 - [o] Instances become unhashable and cannot be used as dict keys or in sets.
   > If \`__eq__\` is defined but \`__hash__\` is not, \`__hash__\` is set to \`None\`, making instances unhashable.
 - \`__eq__\` comparisons will always return \`False\`.
-  > No, \`__eq__\` works fine; the issue is hashing.
-- The class becomes abstract and cannot be instantiated.
-  > No, this has nothing to do with abstract base classes.`}
+  > No, \`__eq__\` works fine; the issue is hashing.`}
 />
 
 <MultipleChoice
   markdown={`What happens if a class attribute is a mutable object (e.g., a list) and you modify it in one instance?
 
-- Each instance gets its own copy of the list.
-  > No, class attributes are shared by all instances.
-- [o] The change is visible in all instances because they share the same list object.
-  > Mutable class attributes are a common gotcha. Always initialize mutable per-instance data in \`__init__\`.
+- The class attribute becomes an instance attribute.
+  > No, unless you reassign it (e.g., \`self.items = []\`), it remains a class attribute.
 - Python raises a \`TypeError\`.
   > No, it is legal; just usually not what you want.
-- The class attribute becomes an instance attribute.
-  > No, unless you reassign it (e.g., \`self.items = []\`), it remains a class attribute.`}
+- [o] The change is visible in all instances because they share the same list object.
+  > Mutable class attributes are a common gotcha. Always initialize mutable per-instance data in \`__init__\`.
+- Each instance gets its own copy of the list.
+  > No, class attributes are shared by all instances.`}
 />
 
 Inheritance lets one class build on another. That is next.

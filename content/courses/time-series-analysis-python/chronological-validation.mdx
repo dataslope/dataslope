@@ -105,14 +105,14 @@ split didn't measure forecasting; it measured interpolation.**
 <MultipleChoice
   markdown={`Why is k-fold cross-validation with random folds, the standard for ordinary tabular data, the *wrong* choice for time series?
 
-- It's too slow for large time series
-  > Speed isn't the problem. The flaw is that random folds destroy the temporal ordering that the evaluation must respect.
-- [o] Random folds put future observations in the training set for some folds, leaking future information into predictions about the past and inflating the score
-  > In a random fold, training rows can come from *after* a test row in time. The model effectively sees the future, so its measured accuracy is optimistic and unattainable in production.
 - It can only be used for classification
   > k-fold works for regression too; the issue is specifically temporal leakage, not the task type.
 - It requires shuffling, which pandas can't do
   > pandas shuffles fine. The point is that shuffling a time series is exactly what *causes* the leakage, it's a correctness problem, not a tooling one.
+- It's too slow for large time series
+  > Speed isn't the problem. The flaw is that random folds destroy the temporal ordering that the evaluation must respect.
+- [o] Random folds put future observations in the training set for some folds, leaking future information into predictions about the past and inflating the score
+  > In a random fold, training rows can come from *after* a test row in time. The model effectively sees the future, so its measured accuracy is optimistic and unattainable in production.
 
 Random folds mix future into training, leaking information; time series needs splits that keep train strictly before test.`}
 />
@@ -265,14 +265,14 @@ honest test?**"
 <MultipleChoice
   markdown={`What is the defining property that every fold of a *time-series* backtest must satisfy?
 
-- Each fold must contain the same number of points
-  > Equal sizes are convenient but not the defining requirement. In expanding-window backtesting the training set deliberately grows each fold.
-- [o] In every fold, all training timestamps come strictly *before* all test timestamps, the model only ever learns from the past
-  > Keeping train entirely before test in every fold is exactly what prevents future leakage and mirrors real forecasting. It's the non-negotiable property.
-- The folds must be chosen randomly for fairness
-  > Random folds are precisely what breaks time-series validation by leaking the future. Fairness here means temporal order, not randomness.
 - Each test point must appear in the training set of another fold
   > A test point appearing in any fold's *training* set means the model trained on data it's later tested on, leakage. Test points must stay out of all training sets that precede them in time.
+- Each fold must contain the same number of points
+  > Equal sizes are convenient but not the defining requirement. In expanding-window backtesting the training set deliberately grows each fold.
+- The folds must be chosen randomly for fairness
+  > Random folds are precisely what breaks time-series validation by leaking the future. Fairness here means temporal order, not randomness.
+- [o] In every fold, all training timestamps come strictly *before* all test timestamps, the model only ever learns from the past
+  > Keeping train entirely before test in every fold is exactly what prevents future leakage and mirrors real forecasting. It's the non-negotiable property.
 
 The essential property is temporal: train strictly precedes test in every fold, so the model never sees the future.`}
 />
@@ -590,14 +590,14 @@ print(
 <MultipleChoice
   markdown={`A model scores 2% error on a *random* 80/20 split but 18% error in production. What's the most likely explanation?
 
-- The production data is fundamentally different
-  > A 9x degradation that appears only after deployment is the classic fingerprint of evaluation leakage, not of the world suddenly changing.
-- [o] The random split leaked future information into training, so the 2% was optimistic; the honest, leakage-free error is closer to the 18% seen in production
-  > Random splitting let test points be time-surrounded by training points, measuring interpolation rather than forecasting. Production has no such future context, so the true error surfaces.
-- The model needs more training epochs
-  > Classical models like ARIMA aren't trained in "epochs," and more training wouldn't close a gap caused by a leaky *evaluation*. The fix is an honest chronological split.
 - 2% and 18% are both correct and unrelated
   > They measure the same model's accuracy and should roughly agree under honest evaluation. The large discrepancy is the symptom that the 2% came from a leaky split.
+- The production data is fundamentally different
+  > A 9x degradation that appears only after deployment is the classic fingerprint of evaluation leakage, not of the world suddenly changing.
+- The model needs more training epochs
+  > Classical models like ARIMA aren't trained in "epochs," and more training wouldn't close a gap caused by a leaky *evaluation*. The fix is an honest chronological split.
+- [o] The random split leaked future information into training, so the 2% was optimistic; the honest, leakage-free error is closer to the 18% seen in production
+  > Random splitting let test points be time-surrounded by training points, measuring interpolation rather than forecasting. Production has no such future context, so the true error surfaces.
 
 A great-in-testing, bad-in-production gap on temporal data points to leakage from a random split; the production figure is the honest one.`}
 />
@@ -605,14 +605,14 @@ A great-in-testing, bad-in-production gap on temporal data points to leakage fro
 <MultipleChoice
   markdown={`You standardize your features using the mean and standard deviation computed over the **entire** dataset, then do a chronological train/test split. Is this safe?
 
-- Yes, a chronological split is all you need
-  > A chronological split fixes the *split*, but the scaler already peeked. Computing global statistics over all data lets the test period's distribution leak into training.
 - [o] No, the scaler's statistics include the test period, leaking future information; fit the scaler on the training data only
   > Any transform whose parameters are learned from the whole series (mean, std, min/max, imputation values) leaks the future. Scalers must be fit on train and merely *applied* to test.
-- Yes, as long as you don't shuffle
-  > Not shuffling preserves order, but the global scaler still saw the test distribution. Order and preprocessing are two separate leakage channels.
 - It only matters for classification problems
   > Scaling leakage affects forecasting and regression just as much. The principle, derive all transforms from training data only, is universal.
+- Yes, as long as you don't shuffle
+  > Not shuffling preserves order, but the global scaler still saw the test distribution. Order and preprocessing are two separate leakage channels.
+- Yes, a chronological split is all you need
+  > A chronological split fixes the *split*, but the scaler already peeked. Computing global statistics over all data lets the test period's distribution leak into training.
 
 Even with a chronological split, fitting a scaler (or imputer) on the full series leaks the future; learn such parameters from training data alone.`}
 />
@@ -624,10 +624,10 @@ Even with a chronological split, fitting a scaler (or imputer) on the full serie
   > A single chronological split is perfectly valid; it's just *noisy*. Backtesting improves the estimate rather than fixing an invalidity.
 - [o] One split gives a single, noisy estimate that may have landed on an unusually easy or hard period; averaging several folds yields a more stable, trustworthy measure of skill
   > Different tails of history vary in difficulty. Multiple folds average over that luck, so the reported skill is less dependent on which single window you happened to hold out.
-- Backtesting lets you train on the test set
-  > Backtesting does the opposite, it rigorously keeps train before test in every fold. It never trains on test data.
 - It makes the model itself more accurate
   > Backtesting is an *evaluation* procedure; it measures skill, it doesn't change the model's accuracy. Its value is a more reliable estimate.
+- Backtesting lets you train on the test set
+  > Backtesting does the opposite, it rigorously keeps train before test in every fold. It never trains on test data.
 
 Multiple folds average away the luck of a single holdout, giving a steadier estimate of true out-of-sample skill.`}
 />
@@ -635,14 +635,14 @@ Multiple folds average away the luck of a single holdout, giving a steadier esti
 <MultipleChoice
   markdown={`Which metric would be the **most problematic** choice for evaluating forecasts of a series whose values regularly pass through and near **zero** (e.g., net hourly energy flow that can be positive, negative, or zero)?
 
-- MAE
-  > MAE just averages absolute misses in the data's units; zeros cause it no trouble at all.
 - RMSE
   > RMSE squares errors but never divides by the actual value, so values near zero don't destabilize it.
-- [o] MAPE
-  > MAPE divides each error by the actual value, so it explodes as the truth approaches zero and is undefined at exactly zero, exactly the situation described.
 - They are all equally appropriate here
   > They are not: only MAPE involves dividing by the (near-zero) actual, which makes it blow up. MAE and RMSE are fine here.
+- [o] MAPE
+  > MAPE divides each error by the actual value, so it explodes as the truth approaches zero and is undefined at exactly zero, exactly the situation described.
+- MAE
+  > MAE just averages absolute misses in the data's units; zeros cause it no trouble at all.
 
 MAPE divides by the actual value, so series that pass through zero make it unstable or undefined; prefer MAE/RMSE there.`}
 />
@@ -650,14 +650,14 @@ MAPE divides by the actual value, so series that pass through zero make it unsta
 <MultipleChoice
   markdown={`You try 30 different \`(p, d, q)\` combinations and keep the one with the lowest error **on your test set**. What's the hidden problem?
 
-- Nothing, picking the best test score is the goal
-  > If the *test* set chose your model, it's no longer an untouched measure of generalization. You've let it train your decision, so its score is optimistic.
-- [o] The test set has now influenced model selection, so its score is optimistic; you need a separate validation set (or nested CV), and the final test set should be evaluated only once
-  > Selecting among many models by test performance is a form of leakage, the test set tuned your choice. Hold out a separate validation set for tuning and reserve the test set for a single, final, honest estimate.
-- 30 combinations is too few to be reliable
-  > The count isn't the issue; even choosing among two by test score leaks. The problem is *using the test set to choose at all*.
 - ARIMA orders should never be compared
   > Comparing orders is normal and useful, just not on the final test set. Use a validation split or information criteria for selection.
+- 30 combinations is too few to be reliable
+  > The count isn't the issue; even choosing among two by test score leaks. The problem is *using the test set to choose at all*.
+- [o] The test set has now influenced model selection, so its score is optimistic; you need a separate validation set (or nested CV), and the final test set should be evaluated only once
+  > Selecting among many models by test performance is a form of leakage, the test set tuned your choice. Hold out a separate validation set for tuning and reserve the test set for a single, final, honest estimate.
+- Nothing, picking the best test score is the goal
+  > If the *test* set chose your model, it's no longer an untouched measure of generalization. You've let it train your decision, so its score is optimistic.
 
 Choosing a model by its test-set score lets the test set tune you; use a separate validation set and touch the test set only once.`}
 />

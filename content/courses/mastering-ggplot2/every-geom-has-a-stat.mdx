@@ -135,14 +135,14 @@ ggplot2 generalizes so far beyond a fixed menu.
 <MultipleChoice
   markdown={`\`geom_bar()\` is given only an x aesthetic, yet it draws bars with heights. Where do the heights come from?
 
-- ggplot2 picks random heights.
-  > Heights are computed deterministically, not random.
 - You must have secretly mapped y.
   > No y is mapped; the height is *computed*.
-- [o] \`geom_bar()\`'s default statistic, \`stat_count\`, counts the rows in each x category and supplies that count as the bar height.
-  > The stat computes a new \`count\` variable that becomes y.
+- ggplot2 picks random heights.
+  > Heights are computed deterministically, not random.
 - The heights are always 1.
   > Heights equal the per-category counts, which generally differ.
+- [o] \`geom_bar()\`'s default statistic, \`stat_count\`, counts the rows in each x category and supplies that count as the bar height.
+  > The stat computes a new \`count\` variable that becomes y.
 
 Every layer runs a stat before drawing. For \`geom_bar\` that stat is a
 count, which manufactures the y-values.`}
@@ -169,12 +169,12 @@ Because stat and geom are separable, overriding \`geom_bar\`'s stat to
 
 - To make plots render more slowly but more accurately.
   > Speed is not the motivation, and the separation is about flexibility.
+- Purely for historical reasons with no practical effect.
+  > The separation has real, practical power, e.g. \`after_stat\` and stat overrides.
 - Because each geom can only ever use one specific stat.
   > The opposite: separation lets stats and geoms recombine.
 - [o] So the computation (e.g. counting, binning, smoothing) is independent of the drawing (bars, points, lines), letting any stat pair with different geoms.
   > Decoupling computation from drawing makes the system combinatorial and general.
-- Purely for historical reasons with no practical effect.
-  > The separation has real, practical power, e.g. \`after_stat\` and stat overrides.
 
 Separating *what is computed* from *how it is drawn* mirrors the
 mapping/scale split and is a key reason ggplot2 generalizes so well.`}

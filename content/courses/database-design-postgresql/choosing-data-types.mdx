@@ -158,14 +158,14 @@ for values that accumulate is a design decision, not a nicety.
 <MultipleChoice
   markdown={`Why is \`NUMERIC\` usually a better choice than floating point for money?
 
-- NUMERIC stores only whole numbers.
-  > NUMERIC can store decimals; that is why it is useful for money.
 - [o] NUMERIC stores exact decimal values, while floating point is approximate.
   > Financial values usually need exact decimal arithmetic rather than tiny representation errors.
-- Floating point cannot store numbers less than one.
-  > Floating-point types can store small fractions; the issue is approximation.
+- NUMERIC stores only whole numbers.
+  > NUMERIC can store decimals; that is why it is useful for money.
 - NUMERIC automatically creates invoices.
   > A data type controls stored values, not application behavior.
+- Floating point cannot store numbers less than one.
+  > Floating-point types can store small fractions; the issue is approximation.
 
 Money needs exact decimal semantics, so NUMERIC is the safer design choice.`}
 />
@@ -228,14 +228,14 @@ for exact decimals, `NOT NULL` because every product needs a price, and
 <MultipleChoice
   markdown={`A column stores whether an account is active or inactive. Which type usually best expresses that domain?
 
-- TEXT.
-  > Text could store many unrelated strings such as \`'maybe'\` or \`'banana'\` unless extra constraints are added.
 - INTEGER.
   > Integers make readers remember what 0 and 1 mean; the domain is really true/false.
-- [o] BOOLEAN.
-  > BOOLEAN directly represents a true/false fact.
 - DATE.
   > A date represents a calendar day, not a yes/no state.
+- [o] BOOLEAN.
+  > BOOLEAN directly represents a true/false fact.
+- TEXT.
+  > Text could store many unrelated strings such as \`'maybe'\` or \`'banana'\` unless extra constraints are added.
 
 Choose the type that matches the meaning of the value.`}
 />
@@ -249,10 +249,10 @@ Choose the type that matches the meaning of the value.`}
   > Types are part of the column definition and restrict values before more specific rules matter.
 - [o] They define the broad set of values a column can store before other constraints narrow it further.
   > Choosing INTEGER, DATE, TEXT, or NUMERIC already determines which kinds of values are possible.
-- They replace primary keys and foreign keys.
-  > Types do not replace relationship and identity constraints.
 - They are optional labels for documentation.
   > PostgreSQL enforces column types; they are not merely comments.
+- They replace primary keys and foreign keys.
+  > Types do not replace relationship and identity constraints.
 
 A column's type defines its broad domain of allowed values.`}
 />
@@ -260,14 +260,14 @@ A column's type defines its broad domain of allowed values.`}
 <MultipleChoice
   markdown={`Which type is usually appropriate for a product quantity that must be a whole number?
 
-- TEXT.
-  > Text would allow values like \`'many'\`, which are not quantities PostgreSQL can reason about numerically.
-- NUMERIC with many decimal places.
-  > Decimal fractions are unnecessary if only whole counts make sense.
 - [o] INTEGER.
   > INTEGER represents whole numbers and fits ordinary counts.
 - BOOLEAN.
   > BOOLEAN represents true or false, not a count.
+- NUMERIC with many decimal places.
+  > Decimal fractions are unnecessary if only whole counts make sense.
+- TEXT.
+  > Text would allow values like \`'many'\`, which are not quantities PostgreSQL can reason about numerically.
 
 Use a whole-number type for whole-number facts.`}
 />
@@ -277,10 +277,10 @@ Use a whole-number type for whole-number facts.`}
 
 - DATE.
   > DATE loses the time of day, so it does not store the exact moment.
-- TEXT.
-  > Text accepts many invalid date strings and makes time logic unreliable.
 - [o] TIMESTAMPTZ.
   > TIMESTAMPTZ represents a timestamped moment consistently across time zones.
+- TEXT.
+  > Text accepts many invalid date strings and makes time logic unreliable.
 - BOOLEAN.
   > BOOLEAN cannot represent dates or times.
 
@@ -290,14 +290,14 @@ Use a timestamp type when the time of day and actual moment matter.`}
 <MultipleChoice
   markdown={`Which design best represents an order status with a small allowed set such as draft, paid, and shipped?
 
-- \`status TEXT\` with no other rule.
-  > Plain text allows any string, including invalid statuses.
-- [o] \`status TEXT CHECK (status IN ('draft', 'paid', 'shipped'))\`.
-  > The type stores text, and the CHECK narrows it to the allowed set.
 - \`status INTEGER\` with no explanation.
   > Numeric codes hide meaning and still need constraints or documentation.
 - \`status BOOLEAN\`.
   > A boolean has only true or false, but order status has more than two states.
+- [o] \`status TEXT CHECK (status IN ('draft', 'paid', 'shipped'))\`.
+  > The type stores text, and the CHECK narrows it to the allowed set.
+- \`status TEXT\` with no other rule.
+  > Plain text allows any string, including invalid statuses.
 
 Small controlled vocabularies need a type plus an allowed-value rule.`}
 />

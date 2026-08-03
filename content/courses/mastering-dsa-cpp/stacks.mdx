@@ -383,38 +383,38 @@ int main() {
 <MultipleChoice
   markdown={`What does LIFO mean?
 
-- Lowest input, first output
-  > LIFO is about insertion order, not numeric value.
-- [o] Last in, first out
-  > The newest pushed element is removed first.
 - Linear index, fast offset
   > That is not a stack term.
 - Linked item, fixed order
-  > A stack can be implemented with different containers.`}
+  > A stack can be implemented with different containers.
+- [o] Last in, first out
+  > The newest pushed element is removed first.
+- Lowest input, first output
+  > LIFO is about insertion order, not numeric value.`}
 />
 
 <MultipleChoice
   markdown={`What is the usual time complexity of \`push\` and \`pop\` on \`std::stack\`?
 
+- O(n^2)
+  > That would be far too expensive for a stack adapter.
 - [o] O(1)
   > The default deque-backed stack pushes and pops at one end in constant time.
-- O(log n)
-  > No tree operation is required.
 - O(n)
   > Stack operations touch only one end.
-- O(n^2)
-  > That would be far too expensive for a stack adapter.`}
+- O(log n)
+  > No tree operation is required.`}
 />
 
 <MultipleChoice
   markdown={`Why is \`std::deque\` a good default underlying container for \`std::stack\`?
 
-- [o] It supports efficient insertion and removal at the back without requiring contiguous reallocation like a vector.
-  > It gives stable, efficient end operations.
+- It forbids storing characters.
+  > A deque can store many element types.
 - It sorts stack values automatically.
   > A stack preserves LIFO order; it does not sort.
 - It makes \`top\` O(n).
   > \`top\` remains constant time.
-- It forbids storing characters.
-  > A deque can store many element types.`}
+- [o] It supports efficient insertion and removal at the back without requiring contiguous reallocation like a vector.
+  > It gives stable, efficient end operations.`}
 />

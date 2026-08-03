@@ -281,10 +281,10 @@ frequentist framework can't deliver.
 
 - There is a 95% probability that the true average order value is between \\$31 and \\$37
   > This is the most common error. Once computed, the interval either contains the fixed true mean or it doesn't; the 95% refers to the long-run success rate of the *procedure*, not the probability for this one realized interval.
-- 95% of all orders have a value between \\$31 and \\$37
-  > A confidence interval bounds the *mean*, not individual orders. The spread of individual orders is described by the standard deviation, not by a CI for the mean, these are different ranges entirely.
 - [o] If we repeated this sampling-and-interval procedure many times, about 95% of the resulting intervals would contain the true mean
   > This frames the 95% as a property of the repeatable method, its long-run coverage rate, which is what a confidence level actually quantifies.
+- 95% of all orders have a value between \\$31 and \\$37
+  > A confidence interval bounds the *mean*, not individual orders. The spread of individual orders is described by the standard deviation, not by a CI for the mean, these are different ranges entirely.
 - We are 95% sure the sample mean is between \\$31 and \\$37
   > The sample mean is known exactly and sits at the center of the interval, so there's no uncertainty about *it*. The uncertainty is about the unknown population mean.
 
@@ -396,14 +396,14 @@ expensive fast.
 <MultipleChoice
   markdown={`Your 95% CI for a conversion-rate lift is too wide to be useful. Which change will *narrow* it without lowering your confidence level?
 
-- Switch from a 95% to a 99% confidence level
-  > Raising the confidence level widens the interval, because a larger critical value is needed to catch the parameter more often. This is the opposite of what's wanted.
-- [o] Collect a substantially larger sample
-  > A larger $n$ shrinks the standard error ($s/\\sqrt{n}$), which directly narrows the interval while keeping the confidence level fixed, the standard way to gain precision.
-- Report the interval to more decimal places
-  > Formatting changes the display, not the statistical width. The interval is exactly as wide as before; you've only printed more digits.
 - Remove the most extreme data points to reduce the spread
   > Deleting inconvenient observations is data manipulation that biases the estimate. Any apparent narrowing is artificial and the resulting interval no longer has valid coverage.
+- Switch from a 95% to a 99% confidence level
+  > Raising the confidence level widens the interval, because a larger critical value is needed to catch the parameter more often. This is the opposite of what's wanted.
+- Report the interval to more decimal places
+  > Formatting changes the display, not the statistical width. The interval is exactly as wide as before; you've only printed more digits.
+- [o] Collect a substantially larger sample
+  > A larger $n$ shrinks the standard error ($s/\\sqrt{n}$), which directly narrows the interval while keeping the confidence level fixed, the standard way to gain precision.
 
 Width scales with $1/\\sqrt{n}$, so more data is the honest lever for a tighter interval.`}
 />
@@ -708,14 +708,14 @@ is not evidence of absence (a tight interval hugging 0).
 <MultipleChoice
   markdown={`A pollster reports "52% support, 95% CI 49% to 55%." A reader says "so there's a 95% chance the true support is between 49% and 55%." Why is this not the technically correct frequentist interpretation?
 
-- Because the sample was too small to make any probability claim
-  > Sample size isn't the issue; the interpretation would be flawed for the same reason at any $n$. The problem is assigning a probability to a fixed parameter after the interval is set.
-- [o] Because the true support is a fixed number that is either inside or outside this particular interval; the 95% describes the long-run hit rate of the procedure, not the chance for this one interval
-  > Once the interval is computed, nothing is random, so no probability attaches to it; the 95% lives in the repeatable method's success rate across many samples.
 - Because confidence intervals only apply to means, never to proportions
   > Confidence intervals apply to proportions, means, differences, medians, and many other parameters. The interpretation issue has nothing to do with which parameter is being estimated.
 - Because the interval should have been centered on 50%, not 52%
   > A CI is centered on the point estimate (52% here), which is correct. The centering isn't the problem; the probabilistic phrasing about a fixed parameter is.
+- Because the sample was too small to make any probability claim
+  > Sample size isn't the issue; the interpretation would be flawed for the same reason at any $n$. The problem is assigning a probability to a fixed parameter after the interval is set.
+- [o] Because the true support is a fixed number that is either inside or outside this particular interval; the 95% describes the long-run hit rate of the procedure, not the chance for this one interval
+  > Once the interval is computed, nothing is random, so no probability attaches to it; the 95% lives in the repeatable method's success rate across many samples.
 
 The parameter is fixed and the interval is the random object, that's the heart of why "95% chance this interval" is the wrong phrasing.`}
 />
@@ -723,12 +723,12 @@ The parameter is fixed and the interval is the random object, that's the heart o
 <MultipleChoice
   markdown={`You build a 95% CI for the **mean** weekly spend from 50,000 customers and get \\$(61.40, 61.80)\\$, a very narrow interval. A colleague concludes "so 95% of customers spend between \\$61.40 and \\$61.80." What's wrong?
 
+- [o] The CI bounds the *mean*, using the standard error ($s/\\sqrt{n}$); individual spending varies far more and is described by the standard deviation, not this interval
+  > A CI for the mean shrinks with $n$ and pins down the average, whereas the spread of individual values (standard deviation) does not shrink, these are different ranges.
 - Nothing is wrong; that's exactly what the interval says
   > A confidence interval for the mean does not describe individual customers. Treating it as a range for raw values is a fundamental category error.
 - The interval is too narrow to be trustworthy
   > The narrowness is legitimate: with 50,000 customers the mean is estimated very precisely. The error is interpreting a precise estimate of the *mean* as a range for *individuals*.
-- [o] The CI bounds the *mean*, using the standard error ($s/\\sqrt{n}$); individual spending varies far more and is described by the standard deviation, not this interval
-  > A CI for the mean shrinks with $n$ and pins down the average, whereas the spread of individual values (standard deviation) does not shrink, these are different ranges.
 - The colleague should have used a 99% interval instead
   > Changing the confidence level only adjusts the width slightly; it would not turn a CI for the mean into a statement about individual customers. The category error remains.
 
@@ -738,12 +738,12 @@ A tiny CI for the mean of a huge sample says the average is known precisely, not
 <MultipleChoice
   markdown={`Why does a 99% confidence interval come out **wider** than a 95% one built from the same sample?
 
-- Because a 99% interval uses a smaller standard error
-  > The standard error depends on the data ($s$ and $n$), not on the confidence level, so it's identical for both intervals. Only the critical value differs.
-- [o] Because catching the parameter a larger fraction of the time requires a larger critical value, which multiplies the same standard error into a wider band
-  > Higher confidence demands more standard errors of margin, so the critical value grows and the interval widens, confidence and precision trade off.
 - Because 99% intervals automatically use a larger sample
   > The sample is the same in this comparison. Raising the confidence level does not change $n$; it changes only how many standard errors wide the interval is.
+- [o] Because catching the parameter a larger fraction of the time requires a larger critical value, which multiplies the same standard error into a wider band
+  > Higher confidence demands more standard errors of margin, so the critical value grows and the interval widens, confidence and precision trade off.
+- Because a 99% interval uses a smaller standard error
+  > The standard error depends on the data ($s$ and $n$), not on the confidence level, so it's identical for both intervals. Only the critical value differs.
 - Because the true mean moves further away at 99% confidence
   > The true mean is fixed and unaffected by your chosen confidence level. What changes is the width of the interval you draw around your estimate.
 
@@ -753,14 +753,14 @@ More confidence buys coverage at the price of precision: a wider net catches the
 <MultipleChoice
   markdown={`In the coverage simulation, 100 separate 95% CIs were built from a known population and about 5 missed the true $\\mu$. What do the ~5 misses represent?
 
-- A bug in the interval formula that should be fixed
-  > Every interval, including the misses, used the same correct procedure. The misses are an expected feature of 95% confidence, not an error.
-- Samples where the population mean happened to change
-  > The population mean was fixed at one value the entire time. It never changed; the *samples* varied, producing different intervals.
 - [o] Unlucky samples whose intervals failed to capture the fixed $\\mu$, exactly the ~5% the 95% confidence level allows
   > A 95% level means the method misses about 5% of the time by design; those red intervals are that expected miss rate made visible.
 - Proof that 95% confidence intervals are unreliable
   > A ~5% miss rate is precisely what "95% confidence" promises, so the simulation confirms the method works as advertised rather than undermining it.
+- Samples where the population mean happened to change
+  > The population mean was fixed at one value the entire time. It never changed; the *samples* varied, producing different intervals.
+- A bug in the interval formula that should be fixed
+  > Every interval, including the misses, used the same correct procedure. The misses are an expected feature of 95% confidence, not an error.
 
 The misses are the built-in 5% failure rate of a 95% procedure, visible only because we could see the true mean.`}
 />
@@ -770,12 +770,12 @@ The misses are the built-in 5% failure rate of a 95% procedure, visible only bec
 
 - Only when the sample size is above 1,000
   > Large samples are where t and z nearly coincide, so the distinction barely matters there. The t is most needed for *small* samples, not large ones.
+- Never; the normal distribution is always correct for means
+  > Using z when $\\sigma$ is estimated understates uncertainty, especially for small samples. The t-interval corrects for that, so z is not always appropriate.
 - [o] When the population standard deviation is unknown and estimated from the sample, which is essentially always in practice
   > Estimating $\\sigma$ from the same data adds uncertainty that the t-distribution's heavier tails account for, making t the safe default for real data.
 - Only when the data are not normally distributed
   > The t-vs-z choice is about whether $\\sigma$ is known, not about the data's exact shape. (Severe non-normality is a separate concern addressed by larger $n$ or the bootstrap.)
-- Never; the normal distribution is always correct for means
-  > Using z when $\\sigma$ is estimated understates uncertainty, especially for small samples. The t-interval corrects for that, so z is not always appropriate.
 
 Use t whenever you plug in a sample standard deviation, it pays for the extra guesswork with slightly wider intervals.`}
 />
@@ -783,14 +783,14 @@ Use t whenever you plug in a sample standard deviation, it pays for the extra gu
 <MultipleChoice
   markdown={`An A/B test gives a 95% CI for the lift in conversion of $(-0.4\\%, +3.1\\%)$. Your PM asks: "Did the treatment work?" What's the most accurate answer?
 
-- Yes, the interval reaches +3.1%, so the treatment increased conversion
-  > Reporting only the optimistic end ignores that the interval also includes 0 and negative values. You cannot claim a positive effect when no-effect is inside the interval.
 - No, the treatment had no effect
   > Including 0 means you can't *rule out* zero, but the interval also includes +3.1%, a meaningful gain. "Can't rule out zero" is not the same as "proven to have no effect."
 - [o] We can't conclude a significant effect: the interval includes 0, so the data are consistent with anything from a slight decrease to a sizable increase, we likely need more data
   > Because the interval straddles 0, it is consistent with no effect *and* with a real effect, which is the honest "inconclusive, gather more data" reading.
 - The test is invalid because the lower bound is negative
   > A negative lower bound for a difference is perfectly valid, it simply means a decrease can't be ruled out. Nothing about the test is invalid.
+- Yes, the interval reaches +3.1%, so the treatment increased conversion
+  > Reporting only the optimistic end ignores that the interval also includes 0 and negative values. You cannot claim a positive effect when no-effect is inside the interval.
 
 A difference CI that includes 0 is inconclusive, not proof of no effect, it just hasn't separated signal from noise yet.`}
 />
@@ -798,14 +798,14 @@ A difference CI that includes 0 is inconclusive, not proof of no effect, it just
 <MultipleChoice
   markdown={`Which action genuinely **narrows** a confidence interval for a mean while keeping its confidence level and validity intact?
 
-- Lowering the confidence level from 95% to 90%
-  > This does narrow the interval, but it changes the confidence level, exactly what the question rules out. You'd be buying precision by accepting more frequent misses.
-- Dropping the largest and smallest observations to shrink the spread
-  > Selectively deleting data biases the estimate and destroys the interval's coverage guarantee. Any narrowing is illegitimate.
 - [o] Increasing the sample size $n$
   > A larger $n$ reduces the standard error ($s/\\sqrt{n}$), narrowing the interval without touching the confidence level or compromising validity, the principled lever.
 - Reporting the bounds with fewer significant figures
   > Rounding the display doesn't change the underlying width at all; the interval is exactly as wide, just printed more coarsely.
+- Lowering the confidence level from 95% to 90%
+  > This does narrow the interval, but it changes the confidence level, exactly what the question rules out. You'd be buying precision by accepting more frequent misses.
+- Dropping the largest and smallest observations to shrink the spread
+  > Selectively deleting data biases the estimate and destroys the interval's coverage guarantee. Any narrowing is illegitimate.
 
 The legitimate route to a tighter interval at the same confidence is more data, width falls like $1/\\sqrt{n}$.`}
 />

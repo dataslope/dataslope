@@ -457,36 +457,36 @@ public class Roster {
 
 - Faster sorting algorithms
   > Sorting got faster eventually, but speed wasn't the design idea.
-- [o] Separating *interfaces* that describe container shapes from *implementations* that realize them
-  > That separation is what lets one method body work for every present and future implementation.
+- Adding network synchronization to data structures
+  > It did not.
 - Replacing arrays as the JVM's underlying storage
   > Arrays are still the substrate of most collections.
-- Adding network synchronization to data structures
-  > It did not.`}
+- [o] Separating *interfaces* that describe container shapes from *implementations* that realize them
+  > That separation is what lets one method body work for every present and future implementation.`}
 />
 
 <MultipleChoice
   markdown={`Why is \`Map\` *not* a subtype of \`Collection\`?
 
-- Because maps don't store data
-  > Maps very much store data.
 - [o] Because maps fundamentally hold (key, value) pairs, not single elements, so the \`Collection\` operations (\`add(E)\`, \`contains(E)\`) don't fit
   > The shape of a map is different enough that putting it under \`Collection\` would have meant either weaker types or awkward method signatures.
 - Because \`Map\` is older than \`Collection\`
   > Both arrived together in Java 1.2.
 - Because maps cannot be iterated
-  > Maps can be iterated (via \`keySet\`, \`values\`, or \`entrySet\`).`}
+  > Maps can be iterated (via \`keySet\`, \`values\`, or \`entrySet\`).
+- Because maps don't store data
+  > Maps very much store data.`}
 />
 
 <MultipleChoice
   markdown={`Why is it a good habit to write \`List<String> names = new ArrayList<>();\` rather than \`ArrayList<String> names = new ArrayList<>();\`?
 
-- It compiles faster
-  > Compile time is unaffected.
-- [o] The variable is typed by what it represents (a list of strings), so the implementation can be swapped without touching the rest of the code
-  > Programming to the interface is what makes JCF code so refactor-friendly.
 - \`ArrayList\` does not exist in modern Java
   > It does and is widely used.
 - The garbage collector treats interfaces and classes differently
-  > It does not.`}
+  > It does not.
+- [o] The variable is typed by what it represents (a list of strings), so the implementation can be swapped without touching the rest of the code
+  > Programming to the interface is what makes JCF code so refactor-friendly.
+- It compiles faster
+  > Compile time is unaffected.`}
 />

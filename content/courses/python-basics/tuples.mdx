@@ -438,14 +438,14 @@ Named tuples are immutable. For mutable record types with methods, reach for `@d
 <MultipleChoice
   markdown={`Which of the following creates a valid one-element tuple?
 
-- \`(1)\`
-  > This is just the integer \`1\` in parentheses, not a tuple.
+- \`{1}\`
+  > This is a set, not a tuple.
 - [o] \`(1,)\`
   > The trailing comma is what makes it a tuple.
 - \`[1]\`
   > This is a list, not a tuple.
-- \`{1}\`
-  > This is a set, not a tuple.`}
+- \`(1)\`
+  > This is just the integer \`1\` in parentheses, not a tuple.`}
 />
 
 <MultipleChoice
@@ -453,10 +453,10 @@ Named tuples are immutable. For mutable record types with methods, reach for `@d
 
 - Tuples are faster to iterate than lists.
   > The performance difference is negligible and not the right reason.
-- [o] Tuples are immutable and hashable, so they can be used as dict keys.
-  > Immutability also signals that the pair is a fixed-size record.
 - Lists cannot contain floats.
   > Lists can absolutely contain floats.
+- [o] Tuples are immutable and hashable, so they can be used as dict keys.
+  > Immutability also signals that the pair is a fixed-size record.
 - Tuples support more methods than lists.
   > It is the other way around; tuples have very few methods because they are immutable.`}
 />
@@ -469,14 +469,14 @@ first, *rest = (1, 2, 3, 4)
 print(rest)
 \`\`\`
 
-- \`(2, 3, 4)\`
-  > The \`*rest\` catches items as a **list**, not a tuple.
+- A \`ValueError\`
+  > Starred unpacking accepts any number of leftover items, so no error is raised here.
 - [o] \`[2, 3, 4]\`
   > The star unpacking always produces a list.
 - \`2\`
   > \`*rest\` catches **all** remaining items, not just one.
-- A \`ValueError\`
-  > Starred unpacking accepts any number of leftover items, so no error is raised here.`}
+- \`(2, 3, 4)\`
+  > The \`*rest\` catches items as a **list**, not a tuple.`}
 />
 
 Next: dictionaries, Python's most-used data structure.

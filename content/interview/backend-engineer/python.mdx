@@ -634,25 +634,25 @@ print(add(1))
 print(add(2))
 \`\`\`
 
+- It raises an error on the second call.
+  > It runs fine, that's exactly why the shared-state bug is so easy to miss.
+- \`[1]\` then \`[1]\`
+  > The list persists *and* keeps growing across calls; the second call sees the first call's element.
 - \`[1]\` then \`[2]\`
   > That's what you'd get with a fresh list each call, but a default argument is created only once.
 - [o] \`[1]\` then \`[1, 2]\`
-  > The default list is evaluated once at definition time and **shared** across calls, so the second call appends to the same list.
-- \`[1]\` then \`[1]\`
-  > The list persists *and* keeps growing across calls; the second call sees the first call's element.
-- It raises an error on the second call.
-  > It runs fine, that's exactly why the shared-state bug is so easy to miss.`}
+  > The default list is evaluated once at definition time and **shared** across calls, so the second call appends to the same list.`}
 />
 
 <MultipleChoice
   markdown={`When should you use \`is\` instead of \`==\`?
 
-- Always, \`is\` is just a faster \`==\`.
-  > They mean different things: \`is\` tests object **identity**, not value equality, so swapping them changes behavior.
-- [o] For comparing against singletons like \`None\` (\`if x is None\`).
-  > \`is\` checks identity, which is exactly right for the unique \`None\` object; value comparisons should use \`==\`.
 - For comparing two strings' contents.
   > Use \`==\` for content; \`is\` may appear to work due to interning but isn't guaranteed.
+- [o] For comparing against singletons like \`None\` (\`if x is None\`).
+  > \`is\` checks identity, which is exactly right for the unique \`None\` object; value comparisons should use \`==\`.
+- Always, \`is\` is just a faster \`==\`.
+  > They mean different things: \`is\` tests object **identity**, not value equality, so swapping them changes behavior.
 - For comparing two lists' contents.
   > Two distinct lists with equal contents are \`==\` but never \`is\`; use \`==\`.`}
 />

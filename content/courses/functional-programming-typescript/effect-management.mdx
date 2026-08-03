@@ -355,14 +355,14 @@ export function chain<A, B>(io: IO<A>, f: (a: A) => IO<B>): IO<B> {
 <MultipleChoice
   markdown={`What's the main benefit of representing a side effect as a value (an \`IO<A>\` thunk or similar) instead of just running it inline?
 
-- It eliminates the need for \`async\`/\`await\`
-  > Unrelated, effects can still be synchronous or asynchronous.
-- It hides the side effect from the rest of the program
-  > Actually, it makes it *visible* in the type signature.
 - [o] It separates *describing* an effect from *running* it, so descriptions can be composed, tested, retried, swapped, or interpreted differently without changing the rest of the code
   > The pure core builds recipes; a small interpreter at the edge executes them. Tests can substitute a different interpreter.
 - It guarantees the effect will only run once
   > That's an idempotency guarantee, not what effect-as-value gives you.
+- It hides the side effect from the rest of the program
+  > Actually, it makes it *visible* in the type signature.
+- It eliminates the need for \`async\`/\`await\`
+  > Unrelated, effects can still be synchronous or asynchronous.
 
 This separation is the foundation of every "functional effect system" from \`IO\` in Haskell to \`Effect\` in TypeScript.`}
 />

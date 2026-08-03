@@ -137,23 +137,23 @@ the error message**. Java's compiler is wordy but rarely cryptic.
 <MultipleChoice
   markdown={`What is the role of the \`main\` method in a Java program?
 
-- It is the only method that may print to the screen
-  > Any method can print.
 - [o] It is the method called automatically by the JVM when the program starts
   > \`main\` is the agreed-upon entry point.
+- It is optional, Java programs without a \`main\` method still run
+  > A program with no \`main\` cannot start.
 - It is required to be called \`Main\` like the class
   > It must be called \`main\` (lowercase), regardless of the class name.
-- It is optional, Java programs without a \`main\` method still run
-  > A program with no \`main\` cannot start.`}
+- It is the only method that may print to the screen
+  > Any method can print.`}
 />
 
 <MultipleChoice
   markdown={`Why does \`main\` have to be declared \`static\`?
 
-- Because static methods are faster
-  > Static-vs-instance has nothing to do with speed here.
 - Because \`static\` means the same as \`public\`
   > They mean different things.
+- Because static methods are faster
+  > Static-vs-instance has nothing to do with speed here.
 - [o] Because the JVM needs to call \`main\` before any object of the class has been constructed
   > \`static\` means "belongs to the class itself," so it can be called without an instance.
 - Because \`static\` is required for every method in Java

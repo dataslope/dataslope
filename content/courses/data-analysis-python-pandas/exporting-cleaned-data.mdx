@@ -322,10 +322,10 @@ assert list(back.columns) == list(clean.columns)`,
   > Writing performance is unaffected by whether the index is included; the difference is in what gets written to the file, not how fast.
 - It hides PII
   > The DataFrame's index is typically a numeric RangeIndex with no sensitive data; \`index=False\` avoids an unwanted extra column, not a privacy concern.
-- [o] Otherwise the DataFrame's index becomes a mystery first column ("Unnamed: 0") when someone reads the file back
-  > \`index=False\` is the right default unless the index is meaningful (e.g., dates).
 - It is required
   > \`index=True\` is actually the default; passing \`index=False\` is optional but strongly recommended to avoid the spurious unnamed column on re-read.
+- [o] Otherwise the DataFrame's index becomes a mystery first column ("Unnamed: 0") when someone reads the file back
+  > \`index=False\` is the right default unless the index is meaningful (e.g., dates).
 
 A small habit that saves a lot of confusion downstream.`}
 />
@@ -333,12 +333,12 @@ A small habit that saves a lot of confusion downstream.`}
 <MultipleChoice
   markdown={`Which format would you choose for an intermediate file that another Pandas script will load tomorrow?
 
-- CSV
-  > CSV does not preserve dtypes, datetimes become strings and categories become plain strings on re-read, requiring extra parsing work each time the file is loaded.
-- Excel
-  > Excel files are larger than Parquet, slower to read and write, and do not faithfully preserve all Pandas dtypes such as \`category\`.
 - [o] Parquet, preserves dtypes (datetimes, categories), is smaller, and reads faster
   > Parquet is the modern default for analyst-to-analyst handoffs.
+- Excel
+  > Excel files are larger than Parquet, slower to read and write, and do not faithfully preserve all Pandas dtypes such as \`category\`.
+- CSV
+  > CSV does not preserve dtypes, datetimes become strings and categories become plain strings on re-read, requiring extra parsing work each time the file is loaded.
 - JSON
   > JSON is verbose, slow to parse at scale, and does not preserve typed columns reliably; it is suited for hierarchical data, not flat tabular exchanges.
 
@@ -348,10 +348,10 @@ Parquet has become the standard for analytical data exchange.`}
 <MultipleChoice
   markdown={`A stakeholder asks for the cleaned dataset to drop into their pivot table. Best format?
 
-- Parquet
-  > A non-technical stakeholder cannot open a \`.parquet\` file in Excel or any standard spreadsheet tool without additional software.
 - Pickle
   > Pickle is a Python-only binary format; a stakeholder who wants to open the data in Excel cannot use it, and Pickle files carry security risks when shared.
+- Parquet
+  > A non-technical stakeholder cannot open a \`.parquet\` file in Excel or any standard spreadsheet tool without additional software.
 - [o] Excel (.xlsx) or CSV, formats they can open without code
   > Match the format to the consumer.
 - HDF5

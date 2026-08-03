@@ -60,14 +60,14 @@ that one post can have many tags and one tag can appear on many posts.
 <MultipleChoice
   markdown={`Why does the blog need a \`post_tags\` table?
 
-- Because every blog table must have a junction table.
-  > Junction tables are used when the relationship needs them, not automatically.
-- [o] Because posts and tags have a many-to-many relationship.
-  > One post can have many tags, and one tag can label many posts.
 - Because tags cannot have primary keys.
   > Tags can and should have primary keys like other entities.
 - Because comments are optional.
   > Optional comments do not explain the post-tag relationship.
+- [o] Because posts and tags have a many-to-many relationship.
+  > One post can have many tags, and one tag can label many posts.
+- Because every blog table must have a junction table.
+  > Junction tables are used when the relationship needs them, not automatically.
 
 Many-to-many relationships become their own table in a relational design.`}
 />
@@ -386,14 +386,14 @@ already answered those questions.
 <MultipleChoice
   markdown={`In the blog design, why does \`posts\` store \`author_id\` instead of \`author_email\`?
 
+- The post title already identifies the author.
+  > A title is not a reliable identifier for a user.
 - Email addresses cannot be stored in PostgreSQL.
   > Text values such as email addresses can be stored, but that is not the design reason.
 - [o] The post should reference the user row, while user facts stay in \`users\`.
   > A foreign key connects the post to its author without duplicating author details.
 - The author is a many-to-many relationship.
   > This design says each post has one author.
-- The post title already identifies the author.
-  > A title is not a reliable identifier for a user.
 
 Foreign keys connect entities without repeating their attributes.`}
 />
@@ -401,14 +401,14 @@ Foreign keys connect entities without repeating their attributes.`}
 <MultipleChoice
   markdown={`What does nullable \`comments.parent_comment_id\` allow?
 
+- A comment can have many authors.
+  > Authorship is represented by \`user_id\`, not the parent comment column.
+- Comments can belong to no post.
+  > The separate \`post_id\` column is still required.
 - Every comment must be a reply.
   > A nullable column allows no parent for top-level comments.
 - [o] Some comments can be top-level, while others can reply to a comment.
   > Null means no parent comment; a value means this comment replies to another one.
-- Comments can belong to no post.
-  > The separate \`post_id\` column is still required.
-- A comment can have many authors.
-  > Authorship is represented by \`user_id\`, not the parent comment column.
 
 Self-references can model simple hierarchies inside one table.`}
 />
@@ -420,10 +420,10 @@ Self-references can model simple hierarchies inside one table.`}
   > That constraint protects post authorship, not tag pairs.
 - \`tags.name UNIQUE\`
   > That constraint prevents duplicate tag names, not duplicate post-tag pairs.
-- [o] \`PRIMARY KEY (post_id, tag_id)\` on \`post_tags\`.
-  > The pair itself is unique, so the same relationship cannot be inserted twice.
 - \`comments.parent_comment_id REFERENCES comments(id)\`
   > That constraint protects comment replies.
+- [o] \`PRIMARY KEY (post_id, tag_id)\` on \`post_tags\`.
+  > The pair itself is unique, so the same relationship cannot be inserted twice.
 
 A junction table often uses the pair of foreign keys as its identity.`}
 />

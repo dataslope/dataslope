@@ -470,14 +470,14 @@ assert 0.8 < r2 < 0.92, f"Expected 0.8 < R2 < 0.92 on diamonds, got {r2}"`,
 <MultipleChoice
   markdown={`What is the key practical advantage of **RMSE** over **MSE** for reporting results?
 
-- RMSE is always smaller, so it looks better
-  > RMSE is always larger than or equal to MSE when MSE is less than 1 but larger when MSE exceeds 1, so the claim about direction is not universally true. The actual advantage is that RMSE restores interpretable units by taking the square root.
 - RMSE ignores outliers entirely
   > RMSE does not ignore outliers; it is more sensitive to them than MAE because it inherits MSE's squaring of residuals. The advantage over MSE is interpretable units, not outlier robustness.
-- [o] RMSE is in the same units as the target, making it interpretable, while MSE is in squared units that no one can read
-  > Taking the square root returns the metric to the target's units (e.g. dollars instead of dollars-squared) while preserving the heavy penalty on large errors.
 - RMSE cannot be computed for held-out data
   > RMSE can be computed on any set of actual and predicted values, including held-out test data. There is no restriction on which split it is applied to.
+- [o] RMSE is in the same units as the target, making it interpretable, while MSE is in squared units that no one can read
+  > Taking the square root returns the metric to the target's units (e.g. dollars instead of dollars-squared) while preserving the heavy penalty on large errors.
+- RMSE is always smaller, so it looks better
+  > RMSE is always larger than or equal to MSE when MSE is less than 1 but larger when MSE exceeds 1, so the claim about direction is not universally true. The actual advantage is that RMSE restores interpretable units by taking the square root.
 
 Both react the same way to errors; RMSE just restores interpretable units.`}
 />
@@ -485,12 +485,12 @@ Both react the same way to errors; RMSE just restores interpretable units.`}
 <MultipleChoice
   markdown={`You compare two models. Model A has MAE 5, RMSE 6. Model B has MAE 5, RMSE 15. What does the difference most likely indicate?
 
-- Model B is better because RMSE is higher
-  > A higher RMSE indicates larger errors, not better performance. Since RMSE heavily penalizes large misses (through squaring), a much higher RMSE means Model B has worse outlier predictions.
 - The models are identical
   > The identical MAE means their typical error size is the same, but the dramatically different RMSE values reveal that Model B has much larger individual errors, the models are not equivalent.
 - [o] Model B has a few large outlier errors; its typical error is the same, but big misses inflate its RMSE far above its MAE
   > A large RMSE-to-MAE gap signals that a handful of big errors dominate the squared term. If large misses are costly, prefer Model A.
+- Model B is better because RMSE is higher
+  > A higher RMSE indicates larger errors, not better performance. Since RMSE heavily penalizes large misses (through squaring), a much higher RMSE means Model B has worse outlier predictions.
 - Model B has lower variance
   > A much larger RMSE relative to MAE is the signature of high variance in the errors, a few very large misses, not lower variance. Model B has more unevenly distributed errors.
 
@@ -500,14 +500,14 @@ Equal MAE but much larger RMSE points straight at outlier predictions.`}
 <MultipleChoice
   markdown={`A regression model reports R² = 0.85. Which interpretation is correct?
 
-- The model is correct on 85% of predictions
-  > R² does not count correct predictions; it is not an accuracy rate. It measures the fraction of the target's variance the model accounts for, relative to a mean baseline.
-- Predictions are within 85% of the true values
-  > R² does not describe how close individual predictions are to the true values in percentage terms. It is a scale-free ratio of explained variance to total variance.
-- [o] The model explains about 85% of the variance in the target, relative to a baseline that always predicts the mean
-  > R² is explained variance versus a mean baseline, not an accuracy rate and not a percentage error on individual predictions.
 - The model has 85% precision
   > Precision is a classification metric (TP / (TP + FP)); it does not apply to regression. R² is a regression metric measuring explained variance relative to a mean baseline.
+- Predictions are within 85% of the true values
+  > R² does not describe how close individual predictions are to the true values in percentage terms. It is a scale-free ratio of explained variance to total variance.
+- The model is correct on 85% of predictions
+  > R² does not count correct predictions; it is not an accuracy rate. It measures the fraction of the target's variance the model accounts for, relative to a mean baseline.
+- [o] The model explains about 85% of the variance in the target, relative to a baseline that always predicts the mean
+  > R² is explained variance versus a mean baseline, not an accuracy rate and not a percentage error on individual predictions.
 
 R² is a scale-free measure of variance explained, not a count of correct answers.`}
 />
@@ -517,12 +517,12 @@ R² is a scale-free measure of variance explained, not a count of correct answer
 
 - The calculation is invalid; R² cannot be negative
   > R² can be negative. When a model's squared error on the test set exceeds that of the constant-mean baseline, R² is negative, a legitimate and informative result, not a calculation error.
+- The model explains 20% of the variance
+  > A negative R² does not mean the model explains 20% of the variance; it means the model's errors are worse than the trivial mean-prediction baseline. Explaining 20% of variance would give R² = 0.20, not -0.20.
 - The model is 20% accurate
   > R² is not an accuracy percentage and a value of -0.20 does not mean 20% accuracy. It means the model's squared error is 20% worse than just always predicting the mean.
 - [o] The model performs worse than simply predicting the mean of the target, a red flag, often from overfitting or a mismatched model
   > R² below 0 means the model's squared error exceeds that of the mean baseline. It is a legitimate, informative warning, not a bug.
-- The model explains 20% of the variance
-  > A negative R² does not mean the model explains 20% of the variance; it means the model's errors are worse than the trivial mean-prediction baseline. Explaining 20% of variance would give R² = 0.20, not -0.20.
 
 A negative R² is a meaningful signal that the model is actively unhelpful.`}
 />
@@ -530,14 +530,14 @@ A negative R² is a meaningful signal that the model is actively unhelpful.`}
 <MultipleChoice
   markdown={`Why should you report an absolute metric (MAE or RMSE) **alongside** R² rather than R² alone?
 
-- Because R² is always wrong
-  > R² is a valid and useful metric, it is not always wrong. The reason to pair it with an absolute metric is that R² is scale-free and hides the actual magnitude of errors.
-- [o] Because R² is scale-free and says nothing about the actual size of the errors; the same R² can correspond to tiny or huge errors depending on the target's spread
-  > R² gives context relative to a baseline but hides the magnitude of mistakes. Pairing it with MAE or RMSE reports both "how good relative to baseline" and "how large in real units."
-- Because MAE and R² are identical
-  > MAE and R² measure different things: MAE is an absolute error in target units, while R² is a dimensionless ratio comparing model error to a mean baseline. They are not the same.
 - Because R² cannot be computed without RMSE
   > R² is computed directly from the actual and predicted values using their squared differences; it does not require RMSE as an intermediate step.
+- Because R² is always wrong
+  > R² is a valid and useful metric, it is not always wrong. The reason to pair it with an absolute metric is that R² is scale-free and hides the actual magnitude of errors.
+- Because MAE and R² are identical
+  > MAE and R² measure different things: MAE is an absolute error in target units, while R² is a dimensionless ratio comparing model error to a mean baseline. They are not the same.
+- [o] Because R² is scale-free and says nothing about the actual size of the errors; the same R² can correspond to tiny or huge errors depending on the target's spread
+  > R² gives context relative to a baseline but hides the magnitude of mistakes. Pairing it with MAE or RMSE reports both "how good relative to baseline" and "how large in real units."
 
 R² answers "better than baseline?" while MAE/RMSE answer "how big are the errors?", you usually want both.`}
 />
@@ -545,14 +545,14 @@ R² answers "better than baseline?" while MAE/RMSE answer "how big are the error
 <MultipleChoice
   markdown={`When is **MAE** generally preferable to **RMSE** as your error metric?
 
-- When you want big mistakes to dominate the score
-  > Wanting large errors to dominate is exactly the argument for RMSE, not MAE. RMSE's squaring amplifies big misses, while MAE treats each error in proportion to its size.
-- When the target has no units
-  > Both MAE and RMSE are in the same units as the target; neither applies specially to unitless targets. The choice between them is about how you want to weight large versus small errors.
 - [o] When all errors should count in proportion to their size and you do not want a few outliers to dominate the metric
   > MAE weights every error linearly, so rare huge misses do not overwhelm it. Choose MAE when outliers should not single-handedly drive your evaluation.
 - When you are minimizing squared error during training
   > Training optimization and evaluation metrics are independent choices. Minimizing squared error during training is common (it is what \`LinearRegression\` does), but you can still report MAE for evaluation regardless of the training objective.
+- When you want big mistakes to dominate the score
+  > Wanting large errors to dominate is exactly the argument for RMSE, not MAE. RMSE's squaring amplifies big misses, while MAE treats each error in proportion to its size.
+- When the target has no units
+  > Both MAE and RMSE are in the same units as the target; neither applies specially to unitless targets. The choice between them is about how you want to weight large versus small errors.
 
 MAE is the robust, proportional choice; RMSE is the choice when large errors are especially costly.`}
 />

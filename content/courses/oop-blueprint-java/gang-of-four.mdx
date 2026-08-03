@@ -260,27 +260,27 @@ We will return to this exercise more formally later in the course.
 <MultipleChoice
   markdown={`Who are the *Gang of Four*?
 
-- Four early Smalltalk designers at Xerox PARC
-  > That team includes Kay, Ingalls, and Goldberg, but is not the Gang of Four.
 - [o] Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides, authors of *Design Patterns* (1994)
   > They are the four authors of the book that named and cataloged the classic OOP design patterns.
-- Four students who founded a software consultancy in the 1970s
-  > No, the term refers specifically to the authors of *Design Patterns*.
 - Four engineers credited with creating the Java language
-  > Java was led by James Gosling at Sun Microsystems, that team is not the GoF.`}
+  > Java was led by James Gosling at Sun Microsystems, that team is not the GoF.
+- Four early Smalltalk designers at Xerox PARC
+  > That team includes Kay, Ingalls, and Goldberg, but is not the Gang of Four.
+- Four students who founded a software consultancy in the 1970s
+  > No, the term refers specifically to the authors of *Design Patterns*.`}
 />
 
 <MultipleChoice
   markdown={`Which design principle is most strongly associated with the GoF book?
 
-- "Always inherit from a base class instead of composing"
-  > The GoF actually argue the opposite.
 - [o] "Favor object composition over class inheritance"
   > This is one of the book's most famous and frequently cited principles.
-- "Avoid interfaces, they add too much indirection"
-  > GoF heavily favor programming to interfaces.
 - "Make every method static so it is easier to call"
-  > Static-heavy designs run *against* OOP, which is about objects with state and behavior.`}
+  > Static-heavy designs run *against* OOP, which is about objects with state and behavior.
+- "Always inherit from a base class instead of composing"
+  > The GoF actually argue the opposite.
+- "Avoid interfaces, they add too much indirection"
+  > GoF heavily favor programming to interfaces.`}
 />
 
 <MultipleChoice
@@ -288,10 +288,10 @@ We will return to this exercise more formally later in the course.
 
 - Because the JVM cannot compile \`switch\` statements
   > It can.
-- Because a new class always runs faster than a \`switch\`
-  > Performance is not the point here; clarity and change-safety are.
 - [o] Because the new scheme is added by *creating a new class*, leaving the existing \`Checkout\` and other pricing classes untouched and re-testable
   > This is the open–closed idea in practice: open for extension, closed for modification.
 - Because \`switch\` is not allowed in object-oriented languages
-  > It is fully allowed; the issue is design quality at scale.`}
+  > It is fully allowed; the issue is design quality at scale.
+- Because a new class always runs faster than a \`switch\`
+  > Performance is not the point here; clarity and change-safety are.`}
 />

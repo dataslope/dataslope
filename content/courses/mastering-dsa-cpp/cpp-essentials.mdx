@@ -321,12 +321,12 @@ int main() {
 
 - When the argument may be missing and represented as null
   > That is a reason to use a pointer or another optional type.
+- When you want to store an address in a container
+  > Pointers, iterators, or smart pointers are better suited for storing address-like values.
 - [o] When the function requires a valid object and may modify it
   > A non-const reference clearly means a valid object is required and can be changed.
 - When you need to allocate memory manually
-  > References do not allocate memory.
-- When you want to store an address in a container
-  > Pointers, iterators, or smart pointers are better suited for storing address-like values.`}
+  > References do not allocate memory.`}
 />
 
 <MultipleChoice
@@ -334,23 +334,23 @@ int main() {
 
 - It makes the vector sorted automatically
   > Passing by const reference does not change the data.
-- It allows the function to delete elements faster
-  > \`const\` prevents modification.
+- It converts the vector into an array
+  > No conversion happens.
 - [o] It avoids copying the whole vector while preventing modification
   > This is the standard pattern for read-only access to large objects.
-- It converts the vector into an array
-  > No conversion happens.`}
+- It allows the function to delete elements faster
+  > \`const\` prevents modification.`}
 />
 
 <MultipleChoice
   markdown={`Which header provides \`std::sort\`?
 
-- \`<iostream>\`
-  > This provides standard input and output streams.
 - \`<vector>\`
   > This provides \`std::vector\`, not sorting algorithms.
 - [o] \`<algorithm>\`
   > Many general-purpose STL algorithms live in \`<algorithm>\`.
+- \`<iostream>\`
+  > This provides standard input and output streams.
 - \`<queue>\`
   > This provides queue adapters such as \`std::queue\` and \`std::priority_queue\`.`}
 />

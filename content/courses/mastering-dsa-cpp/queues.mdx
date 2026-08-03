@@ -346,27 +346,27 @@ int main() {
 <MultipleChoice
   markdown={`Which phrase describes a queue?
 
-- Last in, first out
-  > That describes a stack.
+- Random element, first out
+  > A queue has deterministic front/back order.
 - [o] First in, first out
   > The oldest enqueued element is served first.
+- Last in, first out
+  > That describes a stack.
 - Highest value, first out
-  > That describes a priority queue pattern, not a normal queue.
-- Random element, first out
-  > A queue has deterministic front/back order.`}
+  > That describes a priority queue pattern, not a normal queue.`}
 />
 
 <MultipleChoice
   markdown={`Why is \`std::deque\` often preferred over \`std::list\` for queue-like work?
 
-- [o] It supports efficient end operations with better locality and fewer per-element allocations.
-  > Deque storage is usually friendlier to caches than linked nodes.
-- It makes every operation O(log n).
-  > Queue end operations are constant time.
 - It automatically removes duplicates.
   > Deque does not enforce uniqueness.
 - It cannot grow dynamically.
-  > A deque grows dynamically.`}
+  > A deque grows dynamically.
+- [o] It supports efficient end operations with better locality and fewer per-element allocations.
+  > Deque storage is usually friendlier to caches than linked nodes.
+- It makes every operation O(log n).
+  > Queue end operations are constant time.`}
 />
 
 <MultipleChoice
@@ -374,10 +374,10 @@ int main() {
 
 - Both are always O(1).
   > Vector must shift remaining elements.
-- [o] Vector front erase is O(n), while deque pop_front is O(1).
-  > This is why deque is a natural queue backing container.
 - Vector front erase is O(log n), while deque pop_front is O(n).
   > These are not the usual complexities.
 - Both are O(n^2).
-  > Removing one element is not quadratic here.`}
+  > Removing one element is not quadratic here.
+- [o] Vector front erase is O(n), while deque pop_front is O(1).
+  > This is why deque is a natural queue backing container.`}
 />

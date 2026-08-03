@@ -660,12 +660,12 @@ if (x !== "b") throw new Error("Exclude failed");`,
 type Mystery<T> = { [K in keyof T]-?: T[K] };
 \`\`\`
 
-- \`Partial<T>\`
-  > \`Partial\` adds \`?\`, not removes it.
-- [o] \`Required<T>\`
-  > The \`-?\` modifier removes optionality, making all properties required.
 - \`Readonly<T>\`
   > \`Readonly\` uses \`readonly\`, not \`-?\`.
+- [o] \`Required<T>\`
+  > The \`-?\` modifier removes optionality, making all properties required.
+- \`Partial<T>\`
+  > \`Partial\` adds \`?\`, not removes it.
 
 The \`-?\` modifier is the key: it removes the optional modifier from each property.`}
 />
@@ -684,12 +684,12 @@ type Result = ReturnType<typeof fetchUser>;
 \`\`\`
 What is \`Result\`?
 
-- \`{ id: number; name: string }\`
-  > \`ReturnType\` extracts the return type *as-is*, which is the Promise, not the resolved value.
-- [o] \`Promise<{ id: number; name: string }>\`
-  > \`ReturnType\` captures the function's return type exactly.
 - \`string\`
   > The function doesn't return a string.
+- [o] \`Promise<{ id: number; name: string }>\`
+  > \`ReturnType\` captures the function's return type exactly.
+- \`{ id: number; name: string }\`
+  > \`ReturnType\` extracts the return type *as-is*, which is the Promise, not the resolved value.
 
 If you want the resolved value, use \`Awaited<ReturnType<typeof fetchUser>>\`.`}
 />

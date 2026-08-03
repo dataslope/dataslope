@@ -574,62 +574,62 @@ Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\
 
 - The body runs immediately and returns the first value.
   > Calling a generator function runs none of the body; it just builds the generator object.
+- It returns a list of every value the function yields.
+  > Generators do not build lists. They yield one item at a time.
 - [o] No code in the body runs; you get back a generator object, and the body runs lazily as you iterate.
   > \`yield\` makes the function lazy, nothing runs until you call \`next()\` or loop over it.
 - It raises \`StopIteration\` if the body is empty.
-  > \`StopIteration\` is raised when iteration is exhausted, not when the generator is created.
-- It returns a list of every value the function yields.
-  > Generators do not build lists. They yield one item at a time.`}
+  > \`StopIteration\` is raised when iteration is exhausted, not when the generator is created.`}
 />
 
 <MultipleChoice
   markdown={`Why are generators more memory-efficient than lists for large datasets?
 
-- Generators are stored in compressed form.
-  > No compression happens. Generators simply don't store items.
-- [o] Generators produce items one at a time, never holding the entire sequence in memory.
-  > Only the current item and the generator's local state exist in memory.
 - Generators use a special Python data structure that is smaller.
   > Generators don't store data at all, so no special structure is needed.
 - Python automatically writes generator output to disk.
-  > No disk I/O is involved unless you explicitly write code to do so.`}
+  > No disk I/O is involved unless you explicitly write code to do so.
+- [o] Generators produce items one at a time, never holding the entire sequence in memory.
+  > Only the current item and the generator's local state exist in memory.
+- Generators are stored in compressed form.
+  > No compression happens. Generators simply don't store items.`}
 />
 
 <MultipleChoice
   markdown={`What does \`yield from iterable\` do?
 
-- [o] It yields every item from \`iterable\`, delegating iteration to that iterable.
-  > It's shorthand for \`for x in iterable: yield x\` and correctly delegates sub-generator methods.
-- It returns \`iterable\` as a single yielded value.
-  > That would be \`yield iterable\`. \`yield from\` unpacks the iterable.
 - It imports all items from \`iterable\` into the current scope.
   > \`yield from\` is not an import statement.
+- It returns \`iterable\` as a single yielded value.
+  > That would be \`yield iterable\`. \`yield from\` unpacks the iterable.
 - It raises \`StopIteration\` immediately.
-  > \`yield from\` forwards items until the sub-iterable is exhausted, then continues.`}
+  > \`yield from\` forwards items until the sub-iterable is exhausted, then continues.
+- [o] It yields every item from \`iterable\`, delegating iteration to that iterable.
+  > It's shorthand for \`for x in iterable: yield x\` and correctly delegates sub-generator methods.`}
 />
 
 <MultipleChoice
   markdown={`Which statement about generators is true?
 
+- \`list(infinite_generator())\` is safe because Python auto-detects infinite loops.
+  > Python does NOT detect infinite loops. Materializing an infinite generator hangs forever.
 - You can restart a generator after it is exhausted by calling \`reset()\`.
   > Generators cannot be reset. Once exhausted, they stay exhausted.
-- [o] Once a generator is exhausted, iterating over it again yields nothing.
-  > Generators are single-pass. To iterate again, call the generator function again.
 - Generators store all yielded values in a hidden list.
   > Generators do not store previous values. They are purely lazy.
-- \`list(infinite_generator())\` is safe because Python auto-detects infinite loops.
-  > Python does NOT detect infinite loops. Materializing an infinite generator hangs forever.`}
+- [o] Once a generator is exhausted, iterating over it again yields nothing.
+  > Generators are single-pass. To iterate again, call the generator function again.`}
 />
 
 <MultipleChoice
   markdown={`What does \`iter(iterator)\` return?
 
-- A new, independent iterator starting from the beginning.
-  > \`iter(iterator)\` does NOT reset or clone the iterator.
-- [o] The same iterator object (iterator.__iter__ returns self).
-  > Iterators return themselves from \`__iter__\`, so they are their own iterables.
 - A list of all remaining items.
   > \`iter()\` does not consume or materialize items.
+- [o] The same iterator object (iterator.__iter__ returns self).
+  > Iterators return themselves from \`__iter__\`, so they are their own iterables.
+- A new, independent iterator starting from the beginning.
+  > \`iter(iterator)\` does NOT reset or clone the iterator.
 - It raises \`TypeError\` because you cannot call \`iter()\` on an iterator.
   > Iterators implement \`__iter__\`, so \`iter(iterator)\` is valid (and returns \`self\`).`}
 />
@@ -637,14 +637,14 @@ Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\
 <MultipleChoice
   markdown={`Which of these is a valid use case for an infinite generator?
 
-- Pre-computing every prime number up to infinity and storing them in RAM.
-  > Infinity cannot be stored. Infinite generators are for lazy, on-demand production.
 - [o] Modeling a stream of events that never ends, consuming only what is needed.
   > Infinite generators are perfect for unbounded streams where you pull items as needed.
-- Building a complete list of all natural numbers.
-  > Infinite sequences cannot be fully materialized.
 - Raising \`StopIteration\` after the first item.
-  > An infinite generator never raises \`StopIteration\` (unless you explicitly break out of the loop).`}
+  > An infinite generator never raises \`StopIteration\` (unless you explicitly break out of the loop).
+- Pre-computing every prime number up to infinity and storing them in RAM.
+  > Infinity cannot be stored. Infinite generators are for lazy, on-demand production.
+- Building a complete list of all natural numbers.
+  > Infinite sequences cannot be fully materialized.`}
 />
 
 Functions that decorate other functions are next.

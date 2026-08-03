@@ -192,12 +192,12 @@ print("and the PACF is the one that tails off. One ACF spike => MA order q = 1."
 <MultipleChoice
   markdown={`The ACF of a stationary series **tails off** gradually, while the PACF shows two strong spikes (lags 1 and 2) and then drops inside the bands. Which model does the cheat-sheet suggest?
 
+- ARMA(2,2)
+  > ARMA shows *both* plots tailing off with no clean cut. Here the PACF clearly cuts off at 2, pointing to a pure AR(2).
 - MA(2)
   > For an MA(q), the *ACF* cuts off and the PACF tails off, the reverse of what's described. Here the PACF cuts off, so it isn't MA.
 - [o] AR(2)
   > A PACF that cuts off after lag 2 (with the ACF tailing off) is the signature of an autoregressive process of order 2, two direct lag dependencies.
-- ARMA(2,2)
-  > ARMA shows *both* plots tailing off with no clean cut. Here the PACF clearly cuts off at 2, pointing to a pure AR(2).
 - White noise
   > White noise has no significant spikes in either plot. Two clear PACF spikes rule that out.
 
@@ -290,10 +290,10 @@ fingerprint of seasonality you'd address with a seasonal term.
 
 - The series is an AR(30) process
   > A genuine AR(30) would show a *PACF* cutting off at 30, not an ACF that lingers near 1 for dozens of lags. A slow ACF decay is a different message.
-- [o] The series is non-stationary; you should difference it before interpreting ACF/PACF
-  > A very slowly decaying ACF that stays high across many lags is the classic signature of a trend (non-stationarity). The fix is to difference to stationarity and re-plot.
 - The series is white noise
   > White noise has an ACF near zero at every lag except 0. Large, persistent autocorrelations are the opposite of white noise.
+- [o] The series is non-stationary; you should difference it before interpreting ACF/PACF
+  > A very slowly decaying ACF that stays high across many lags is the classic signature of a trend (non-stationarity). The fix is to difference to stationarity and re-plot.
 - The data has been over-differenced
   > Over-differencing produces a strong *negative* lag-1 autocorrelation, not many large *positive* ones. This pattern points to *under*-differencing (still non-stationary).
 
@@ -443,14 +443,14 @@ assert len(beyond) <= 1, f"Expected the PACF to cut off after lag 2, but found s
 <MultipleChoice
   markdown={`What does the **partial** autocorrelation at lag \`k\` measure that the ordinary autocorrelation does not?
 
-- The correlation including seasonal effects only
-  > PACF isn't about seasonality specifically. It's about isolating the *direct* relationship at a lag from the indirect ones.
-- [o] The *direct* correlation at lag \`k\` with the influence of the intermediate lags (1..k-1) removed
-  > PACF controls for the shorter lags, exposing only the direct dependence at lag k. The ACF, by contrast, includes indirect correlations that pass through the in-between lags.
 - The correlation after differencing the series
   > Differencing is a separate transform. PACF is computed on whatever (ideally stationary) series you give it and concerns direct vs indirect correlation, not differencing.
+- The correlation including seasonal effects only
+  > PACF isn't about seasonality specifically. It's about isolating the *direct* relationship at a lag from the indirect ones.
 - The average of all autocorrelations up to lag k
   > PACF is not an average of ACF values. It's the partial correlation at a specific lag, holding the intermediate lags fixed.
+- [o] The *direct* correlation at lag \`k\` with the influence of the intermediate lags (1..k-1) removed
+  > PACF controls for the shorter lags, exposing only the direct dependence at lag k. The ACF, by contrast, includes indirect correlations that pass through the in-between lags.
 
 PACF strips out the chain-of-middlemen (indirect) correlations, leaving only the direct dependence at lag k.`}
 />
@@ -458,14 +458,14 @@ PACF strips out the chain-of-middlemen (indirect) correlations, leaving only the
 <MultipleChoice
   markdown={`For an **MA(q)** process, what do the ACF and PACF look like?
 
-- ACF tails off; PACF cuts off after lag q
-  > That's the *AR* signature, reversed. For MA the ACF cuts off and the PACF tails off.
-- [o] ACF cuts off after lag q; PACF tails off
-  > A moving-average process correlates only with the most recent \`q\` shocks, so the ACF drops to ~0 past lag q, while the PACF decays gradually, the mirror image of an AR process.
 - Both cut off after lag q
   > If both cut off cleanly you wouldn't have a pure MA; that pattern doesn't match any standard single-order process. MA cuts the ACF and tails the PACF.
+- [o] ACF cuts off after lag q; PACF tails off
+  > A moving-average process correlates only with the most recent \`q\` shocks, so the ACF drops to ~0 past lag q, while the PACF decays gradually, the mirror image of an AR process.
 - Both tail off
   > Both tailing off is the *ARMA* signature, not pure MA. For MA, the ACF specifically cuts off.
+- ACF tails off; PACF cuts off after lag q
+  > That's the *AR* signature, reversed. For MA the ACF cuts off and the PACF tails off.
 
 MA(q): the ACF cuts off after lag q and the PACF tails off, the reverse of AR(p).`}
 />
@@ -473,14 +473,14 @@ MA(q): the ACF cuts off after lag q and the PACF tails off, the reverse of AR(p)
 <MultipleChoice
   markdown={`Why must you difference a trending series to stationarity *before* reading its ACF/PACF for model orders?
 
-- Because statsmodels refuses to plot non-stationary data
-  > statsmodels will happily plot it; the problem is *interpretation*, not a software restriction.
 - [o] On a non-stationary series the ACF decays very slowly and stays high across many lags, masking the real short-lag structure the cheat-sheet relies on
   > A trend makes nearly every lag look strongly correlated, so the clean cut-off / tail-off patterns are buried. Only after differencing do the spikes carry the AR/MA meaning the cheat-sheet assumes.
 - Because differencing always improves forecast accuracy
   > Differencing isn't universally beneficial (over-differencing hurts). The specific reason to difference *here* is to make the ACF/PACF interpretable.
 - Because the PACF cannot be computed otherwise
   > The PACF can be computed on non-stationary data; it just won't mean what the cheat-sheet says. Stationarity is about valid interpretation, not computability.
+- Because statsmodels refuses to plot non-stationary data
+  > statsmodels will happily plot it; the problem is *interpretation*, not a software restriction.
 
 A non-stationary ACF lingers near 1 and hides the short-lag pattern, so the cheat-sheet only applies after differencing to stationarity.`}
 />

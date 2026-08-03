@@ -138,14 +138,14 @@ types. Queries can combine them later when a question needs both.
 <MultipleChoice
   markdown={`In the sentence "Students borrow books from a library," which pair is most likely to be modeled as entity types?
 
-- Borrow and from.
-  > Verbs and prepositions usually describe actions or connections, not the main kinds of things being tracked.
-- [o] Students and books.
-  > Students and books are distinct kinds of things the system may need to store as rows in tables.
 - Library and from.
   > A library might be an entity in a multi-branch system, but "from" is not a thing worth storing.
 - Students and borrow.
   > Students are likely an entity; borrow is an action that hints at a relationship or event.
+- [o] Students and books.
+  > Students and books are distinct kinds of things the system may need to store as rows in tables.
+- Borrow and from.
+  > Verbs and prepositions usually describe actions or connections, not the main kinds of things being tracked.
 
 Nouns give you candidate entities, while verbs often hint at relationships.`}
 />
@@ -189,14 +189,14 @@ explain what belongs in a table, the entity is probably not clear yet.
 <MultipleChoice
   markdown={`What is an **entity** in database design?
 
-- A single SQL query that returns rows.
-  > A query asks a question of the database; an entity is a kind of thing the database stores.
-- [o] A distinct kind of thing worth tracking, such as a customer, order, or product.
-  > An entity type names the real-world category that usually becomes a table.
 - Any word that appears in a user interface.
   > Interface words can be clues, but not every label is a stored thing.
+- A single SQL query that returns rows.
+  > A query asks a question of the database; an entity is a kind of thing the database stores.
 - A column that stores a number.
   > Columns are attributes; entities are the larger things those attributes describe.
+- [o] A distinct kind of thing worth tracking, such as a customer, order, or product.
+  > An entity type names the real-world category that usually becomes a table.
 
 Entities are the main real-world things your schema is about.`}
 />
@@ -208,10 +208,10 @@ Entities are the main real-world things your schema is about.`}
   > Columns describe properties of an entity; they do not represent the whole entity type.
 - One entity type becomes one database server.
   > Server setup is unrelated to logical modeling.
-- [o] One entity type becomes one table, and each real thing becomes one row.
-  > A customers table stores many individual customer rows.
 - Every entity type must be stored in the same table.
   > Mixing unrelated entity types in one table usually creates unclear and fragile designs.
+- [o] One entity type becomes one table, and each real thing becomes one row.
+  > A customers table stores many individual customer rows.
 
 A table is the collection; a row is one specific member of that collection.`}
 />
@@ -219,14 +219,14 @@ A table is the collection; a row is one specific member of that collection.`}
 <MultipleChoice
   markdown={`Why is "circle the nouns" a useful early modeling habit?
 
-- Because every noun must become a table.
-  > Nouns are candidates, but some become attributes or are not stored at all.
-- [o] Because nouns often reveal the things, people, places, or events the system cares about.
-  > Candidate entities usually appear as nouns in a plain-English description of the domain.
-- Because verbs are never useful in database design.
-  > Verbs are useful too; they often reveal relationships between entities.
 - Because SQL table names are required to match every noun exactly.
   > Table names should be clear, but they do not have to copy every word from the description.
+- [o] Because nouns often reveal the things, people, places, or events the system cares about.
+  > Candidate entities usually appear as nouns in a plain-English description of the domain.
+- Because every noun must become a table.
+  > Nouns are candidates, but some become attributes or are not stored at all.
+- Because verbs are never useful in database design.
+  > Verbs are useful too; they often reveal relationships between entities.
 
 Nouns start the conversation; design judgment decides what becomes a table.`}
 />

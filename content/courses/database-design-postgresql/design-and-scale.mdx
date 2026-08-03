@@ -79,14 +79,14 @@ Each table can grow according to its own rules.
 <MultipleChoice
   markdown={`Why does a wide god-table usually scale poorly as a design?
 
-- It has a primary key.
-  > A primary key is useful; the problem is mixing unrelated meanings.
-- [o] It mixes several entity types, creating unclear columns and rules.
-  > Different kinds of facts need different constraints and relationships.
-- It uses too many foreign keys to separate entities.
-  > Separating entities with foreign keys is usually the cleaner design.
 - It has rows.
   > All relational tables have rows.
+- [o] It mixes several entity types, creating unclear columns and rules.
+  > Different kinds of facts need different constraints and relationships.
+- It has a primary key.
+  > A primary key is useful; the problem is mixing unrelated meanings.
+- It uses too many foreign keys to separate entities.
+  > Separating entities with foreign keys is usually the cleaner design.
 
 A table should represent one kind of thing with coherent rules.`}
 />
@@ -192,14 +192,14 @@ Clear structure gives future features a reliable foundation.`}
 <MultipleChoice
   markdown={`Why are comma-separated lists in a column a poor fit for scalable relational design?
 
-- They are too normalized.
-  > A comma-separated list is not normalized relational structure.
-- [o] The database cannot easily enforce relationships for each listed value.
-  > Individual relationships should be rows that can use keys and constraints.
 - They create too many tables by themselves.
   > The list is inside one column, which hides structure rather than creating tables.
+- They are too normalized.
+  > A comma-separated list is not normalized relational structure.
 - They automatically preserve history.
   > A list of IDs does not explain historical meaning.
+- [o] The database cannot easily enforce relationships for each listed value.
+  > Individual relationships should be rows that can use keys and constraints.
 
 Relationships should be represented as relationships, not packed text.`}
 />
@@ -207,14 +207,14 @@ Relationships should be represented as relationships, not packed text.`}
 <MultipleChoice
   markdown={`What is the design-level benefit of clean primary and foreign keys?
 
-- They remove the need to understand requirements.
-  > Keys should come from a clear understanding of the model.
 - [o] They make identity and relationship paths explicit.
   > Software can follow reliable references between tables.
-- They force every query to be fast in every situation.
-  > Performance depends on more than the existence of keys.
+- They remove the need to understand requirements.
+  > Keys should come from a clear understanding of the model.
 - They require all tables to have the same columns.
   > Different entities need different attributes.
+- They force every query to be fast in every situation.
+  > Performance depends on more than the existence of keys.
 
 Keys are the backbone of a schema that can grow coherently.`}
 />

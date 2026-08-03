@@ -239,14 +239,14 @@ and *Standard Error*.
 <MultipleChoice
   markdown={`You compute the mean salary of a random sample of 200 employees and get \\$72,400. A teammate says "so the average salary at the company is \\$72,400." What's the precise issue?
 
-- Nothing, the sample mean *is* the company average
-  > The sample mean equals the average *of those 200 people*, not of the whole company. Treating $\\bar{x}$ as $\\mu$ skips over sampling error.
-- The sample is too small for any conclusion
-  > 200 is a respectable sample. The problem isn't the size; it's stating a sample statistic as if it were the population parameter, with no uncertainty attached.
 - [o] \\$72,400 is the sample statistic $\\bar{x}$, an estimate of the unknown population parameter $\\mu$; the company's true average is near it but uncertain
   > Naming \\$72,400 as the estimate and the company mean as the uncertain target keeps the statistic and the parameter distinct, which is the core of honest inference.
+- Nothing, the sample mean *is* the company average
+  > The sample mean equals the average *of those 200 people*, not of the whole company. Treating $\\bar{x}$ as $\\mu$ skips over sampling error.
 - The number is wrong because salaries aren't normally distributed
   > $\\bar{x}$ is a valid estimate regardless of the salary distribution's shape. The issue is conflating the estimate with the parameter, not the distribution's form.
+- The sample is too small for any conclusion
+  > 200 is a respectable sample. The problem isn't the size; it's stating a sample statistic as if it were the population parameter, with no uncertainty attached.
 
 The sample mean estimates the population mean; it doesn't equal it.`}
 />
@@ -312,14 +312,14 @@ your estimate**: x̄ clusters more tightly around the unchanged
 <MultipleChoice
   markdown={`You increase your survey from 500 to 5,000 respondents. Which statement is correct?
 
-- The population proportion $p$ will move closer to your estimate
-  > $p$ is a fixed property of the population; it doesn't move toward anything you do. It's your *estimate* $\\hat{p}$ that gets closer to $p$, not the reverse.
-- [o] The population proportion $p$ is unchanged; your estimate $\\hat{p}$ becomes more precise (less sample-to-sample variability)
-  > Increasing $n$ tightens the distribution of $\\hat{p}$ around the fixed $p$, improving precision without altering the population itself.
-- Both $p$ and $\\hat{p}$ stay exactly the same
-  > $p$ stays the same, but $\\hat{p}$ generally changes (and on average becomes more accurate) with a larger, freshly drawn sample. It doesn't stay fixed.
 - The estimate's precision improves 10x because the sample grew 10x
   > Precision scales with $\\sqrt{n}$, so a 10x larger sample improves precision by about $\\sqrt{10} \\approx 3.2$x, not 10x.
+- [o] The population proportion $p$ is unchanged; your estimate $\\hat{p}$ becomes more precise (less sample-to-sample variability)
+  > Increasing $n$ tightens the distribution of $\\hat{p}$ around the fixed $p$, improving precision without altering the population itself.
+- The population proportion $p$ will move closer to your estimate
+  > $p$ is a fixed property of the population; it doesn't move toward anything you do. It's your *estimate* $\\hat{p}$ that gets closer to $p$, not the reverse.
+- Both $p$ and $\\hat{p}$ stay exactly the same
+  > $p$ stays the same, but $\\hat{p}$ generally changes (and on average becomes more accurate) with a larger, freshly drawn sample. It doesn't stay fixed.
 
 More data sharpens the estimate of a fixed parameter, it doesn't change the parameter.`}
 />
@@ -476,14 +476,14 @@ confidence interval. That's the leap we make in *Standard Error* and
 <MultipleChoice
   markdown={`Which of these is a **parameter** (as opposed to a statistic)?
 
-- The mean of the 1,200 rows in your loaded DataFrame
-  > That's a value you computed from a sample, which makes it a statistic ($\\bar{x}$), not a parameter.
-- [o] The true average lifetime of *every* battery this factory will ever produce
-  > A property of the entire (here, conceptual and infinite) population is a parameter, fixed but unobservable, exactly the thing a sample statistic estimates.
 - The proportion of survey respondents who answered "yes"
   > Computed from the respondents you sampled, this is a statistic ($\\hat{p}$). Respondents are a sample, not the whole population.
+- [o] The true average lifetime of *every* battery this factory will ever produce
+  > A property of the entire (here, conceptual and infinite) population is a parameter, fixed but unobservable, exactly the thing a sample statistic estimates.
 - The standard deviation of last week's recorded sensor readings
   > Those readings are a sample of the sensor's output, so their standard deviation is a statistic ($s$), not the population $\\sigma$.
+- The mean of the 1,200 rows in your loaded DataFrame
+  > That's a value you computed from a sample, which makes it a statistic ($\\bar{x}$), not a parameter.
 
 Parameters describe the whole population and are unknown; statistics are computed from a sample.`}
 />
@@ -491,14 +491,14 @@ Parameters describe the whole population and are unknown; statistics are compute
 <MultipleChoice
   markdown={`Why is it usually impossible, even in principle, to compute a population parameter directly for a data-science question like "does this checkout flow convert well"?
 
-- Because parameters are always irrational numbers
-  > The numeric type of a parameter is irrelevant. The obstacle is access to the population, not arithmetic.
+- Because measurement always changes the parameter's value
+  > Observing data doesn't generally alter the underlying parameter. The reason you can't compute it directly is that you can't observe the whole population, not that you disturb it.
 - Because Pandas can't hold that many rows
   > Tooling limits aren't the fundamental issue; even with unlimited compute you couldn't observe the population here. The population is conceptual.
 - [o] Because the population is conceptual and partly in the future, it includes all sessions the flow *could* generate, most of which haven't happened
   > Recognizing that the population is an unbounded, future-facing process explains why you can only ever sample from it and must estimate its parameters.
-- Because measurement always changes the parameter's value
-  > Observing data doesn't generally alter the underlying parameter. The reason you can't compute it directly is that you can't observe the whole population, not that you disturb it.
+- Because parameters are always irrational numbers
+  > The numeric type of a parameter is irrelevant. The obstacle is access to the population, not arithmetic.
 
 Many populations are processes, not finite lists, so their parameters can only be estimated from samples.`}
 />
@@ -506,14 +506,14 @@ Many populations are processes, not finite lists, so their parameters can only b
 <MultipleChoice
   markdown={`A statistic like the sample mean is best described as:
 
-- A fixed constant that's the same for any sample from the population
-  > If it were the same for every sample, it would carry no sampling variability, but a different sample gives a different mean. That variability is the whole reason inference is uncertain.
+- A value that only exists once you've measured the entire population
+  > You compute a statistic precisely *because* you can't measure the whole population; it's calculated from the sample you do have.
 - [o] A random variable: its value depends on which sample you drew, so it has a distribution across possible samples
   > Treating the statistic as a quantity that varies sample-to-sample, with its own spread (the sampling distribution), is what underlies standard errors and confidence intervals.
 - An exact copy of the population parameter it estimates
   > It's an *estimate* of the parameter, generally close but not exactly equal. The gap is estimation error.
-- A value that only exists once you've measured the entire population
-  > You compute a statistic precisely *because* you can't measure the whole population; it's calculated from the sample you do have.
+- A fixed constant that's the same for any sample from the population
+  > If it were the same for every sample, it would carry no sampling variability, but a different sample gives a different mean. That variability is the whole reason inference is uncertain.
 
 Seeing statistics as random variables is the foundation for everything in the sampling and inference chapters.`}
 />
@@ -523,12 +523,12 @@ Seeing statistics as random variables is the foundation for everything in the sa
 
 - It shrinks to zero, because 1,000 is large enough to equal the population
   > A finite sample never eliminates error entirely, and 1,000 is still a sample, not the population. Error shrinks but doesn't vanish.
-- It shrinks by a factor of 4, in proportion to the sample size
-  > Precision improves with $\\sqrt{n}$, not $n$, so a 4x larger sample doesn't give a 4x reduction in error. That overstates the gain.
-- [o] It shrinks by about a factor of 2, because precision scales with $\\sqrt{n}$ and $\\sqrt{4} = 2$
-  > Tying the error reduction to $\\sqrt{n}$ captures the diminishing returns of more data, quadrupling $n$ only halves the typical error.
 - It doesn't change, because the population mean is fixed
   > The population mean being fixed is true but unrelated; the *estimate's* precision still improves as $n$ grows. The fixed target is what you're getting better at hitting.
+- [o] It shrinks by about a factor of 2, because precision scales with $\\sqrt{n}$ and $\\sqrt{4} = 2$
+  > Tying the error reduction to $\\sqrt{n}$ captures the diminishing returns of more data, quadrupling $n$ only halves the typical error.
+- It shrinks by a factor of 4, in proportion to the sample size
+  > Precision improves with $\\sqrt{n}$, not $n$, so a 4x larger sample doesn't give a 4x reduction in error. That overstates the gain.
 
 The $\\sqrt{n}$ rule is why huge samples bring only modest extra precision.`}
 />

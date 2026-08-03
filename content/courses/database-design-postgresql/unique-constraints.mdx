@@ -156,12 +156,12 @@ FROM
 
 - A student from taking more than one course.
   > The student_id may repeat with a different course_id.
+- Any NULL values in the table.
+  > NOT NULL controls missing values; UNIQUE controls duplication.
 - A course from having more than one student.
   > The course_id may repeat with a different student_id.
 - [o] The exact same student-course pair from appearing more than once.
   > The combination of both values must be unique, even though each value may repeat separately.
-- Any NULL values in the table.
-  > NOT NULL controls missing values; UNIQUE controls duplication.
 
 Composite uniqueness protects a repeated combination, not each column by itself.`}
 />
@@ -220,14 +220,14 @@ business rule.
 <MultipleChoice
   markdown={`Why might a table have both \`id PRIMARY KEY\` and \`email UNIQUE\`?
 
-- Because a table must have two primary keys.
-  > A table has one primary key; UNIQUE is a separate constraint type.
-- [o] The id gives stable row identity, while the email rule prevents duplicate account emails.
-  > The two constraints protect different meanings: identity and a business rule.
-- Because UNIQUE makes the id auto-increment.
-  > Automatic id generation is separate from uniqueness.
 - Because primary keys cannot be referenced by foreign keys.
   > Primary keys are commonly referenced by foreign keys.
+- Because UNIQUE makes the id auto-increment.
+  > Automatic id generation is separate from uniqueness.
+- [o] The id gives stable row identity, while the email rule prevents duplicate account emails.
+  > The two constraints protect different meanings: identity and a business rule.
+- Because a table must have two primary keys.
+  > A table has one primary key; UNIQUE is a separate constraint type.
 
 Primary keys identify rows; unique constraints protect other no-duplicate rules.`}
 />
@@ -237,14 +237,14 @@ Primary keys identify rows; unique constraints protect other no-duplicate rules.
 <MultipleChoice
   markdown={`What is the main purpose of a \`UNIQUE\` constraint?
 
-- To require every column in a table to have a value.
-  > NOT NULL controls whether values may be missing.
-- [o] To prevent duplicate values, or duplicate combinations of values, for a declared rule.
-  > UNIQUE makes PostgreSQL reject rows that would repeat the constrained value or value set.
-- To connect a row to another table.
-  > Foreign keys create references between tables.
 - To choose a default value when one is omitted.
   > DEFAULT supplies omitted values; it does not check duplicates.
+- To require every column in a table to have a value.
+  > NOT NULL controls whether values may be missing.
+- To connect a row to another table.
+  > Foreign keys create references between tables.
+- [o] To prevent duplicate values, or duplicate combinations of values, for a declared rule.
+  > UNIQUE makes PostgreSQL reject rows that would repeat the constrained value or value set.
 
 UNIQUE constraints enforce no-duplicate business rules.`}
 />
@@ -267,14 +267,14 @@ Good UNIQUE candidates are values the business expects not to repeat.`}
 <MultipleChoice
   markdown={`How is a \`UNIQUE\` constraint different from a \`PRIMARY KEY\`?
 
-- UNIQUE can only be used on primary key columns.
-  > UNIQUE is often used on non-primary-key columns such as email or username.
 - UNIQUE allows duplicates, but PRIMARY KEY does not.
   > Both prevent duplicates for the constrained values.
-- [o] A primary key is the table's official row identity; UNIQUE enforces additional no-duplicate rules.
-  > A table can have one primary key and many unique constraints.
 - PRIMARY KEY is only documentation, while UNIQUE is enforced.
   > Both are enforced by PostgreSQL.
+- [o] A primary key is the table's official row identity; UNIQUE enforces additional no-duplicate rules.
+  > A table can have one primary key and many unique constraints.
+- UNIQUE can only be used on primary key columns.
+  > UNIQUE is often used on non-primary-key columns such as email or username.
 
 Primary keys and unique constraints both protect uniqueness, but they serve different design roles.`}
 />

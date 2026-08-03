@@ -355,12 +355,12 @@ near zero or the data can go negative, like temperatures in Celsius.)
 <MultipleChoice
   markdown={`Stock A has a mean daily price of \\$500 with a standard deviation of \\$20. Stock B has a mean price of \\$10 with a standard deviation of \\$3. Which stock is *relatively* more volatile, and what should you compute to decide?
 
-- Stock A, because its standard deviation (\\$20) is larger
-  > A larger raw standard deviation reflects the larger price level, not greater relative volatility, \\$20 on a \\$500 stock is a small percentage move.
-- [o] Stock B, because its coefficient of variation (3/10 = 0.30) is far higher than A's (20/500 = 0.04)
-  > Dividing each standard deviation by its mean puts both on a comparable, unitless footing, and B's spread is 30% of its price versus 4% for A.
 - They are equally volatile because volatility is absolute
   > Volatility experienced by an investor is relative to the price level, which is exactly why a unitless measure like the CV is needed to compare them.
+- [o] Stock B, because its coefficient of variation (3/10 = 0.30) is far higher than A's (20/500 = 0.04)
+  > Dividing each standard deviation by its mean puts both on a comparable, unitless footing, and B's spread is 30% of its price versus 4% for A.
+- Stock A, because its standard deviation (\\$20) is larger
+  > A larger raw standard deviation reflects the larger price level, not greater relative volatility, \\$20 on a \\$500 stock is a small percentage move.
 - You cannot compare them without the raw price histories
   > The means and standard deviations are sufficient to compute each CV, which is all you need for a relative-volatility comparison.
 
@@ -529,10 +529,10 @@ assert more_variable == expected`,
   > Both results are correct; they simply use different default divisors, which is expected behavior, not a bug.
 - [o] NumPy's default uses \`ddof=0\` (divide by n) while pandas defaults to \`ddof=1\` (divide by n−1), so the pandas value is slightly larger
   > The \`n−1\` divisor produces a marginally larger estimate, and matching them just means passing \`ddof=1\` to NumPy or \`ddof=0\` to pandas.
-- The data must contain missing values that pandas dropped
-  > Dropping values would change the result unpredictably; this specific, small gap is the signature of the differing default \`ddof\`.
 - pandas rounds and NumPy does not
   > Neither silently rounds; the gap comes from the divisor (\`n\` vs \`n−1\`), not from rounding.
+- The data must contain missing values that pandas dropped
+  > Dropping values would change the result unpredictably; this specific, small gap is the signature of the differing default \`ddof\`.
 
 Whenever two "standard deviations" differ slightly on identical data, suspect the \`ddof\` first.`}
 />
@@ -542,10 +542,10 @@ Whenever two "standard deviations" differ slightly on identical data, suspect th
 
 - To make the standard deviation smaller and more conservative
   > Dividing by the smaller \`n−1\` makes the estimate *larger*, not smaller, the opposite of this claim.
-- Because the population is always smaller than the sample
-  > The population is the larger thing we're estimating; the \`n−1\` correction has nothing to do with population size.
 - [o] Deviations are measured from the sample mean, which hugs the sample too tightly, so dividing by \`n\` would underestimate the true spread; \`n−1\` corrects for that
   > Because the sample mean sits closer to the sample's own points than the true mean does, the squared deviations run small, and the smaller divisor compensates.
+- Because the population is always smaller than the sample
+  > The population is the larger thing we're estimating; the \`n−1\` correction has nothing to do with population size.
 - It is an arbitrary convention with no real justification
   > There is a concrete reason: it removes the systematic downward bias that arises from estimating deviations around the sample's own mean.
 
@@ -555,14 +555,14 @@ The phrase "one degree of freedom is used up by estimating the mean" is shorthan
 <MultipleChoice
   markdown={`A dataset of file sizes is strongly right-skewed with a few enormous files. You want a spread measure that the giant files won't dominate. Which is the best choice?
 
-- The range (max − min)
-  > The range is defined by the two most extreme points, so the giant files would dominate it completely, the worst choice here.
 - The standard deviation
   > Squaring deviations makes the standard deviation especially sensitive to extreme values, so the giant files would inflate it heavily.
-- [o] The interquartile range (IQR)
-  > Spanning only the middle 50% of the data, the IQR ignores the extreme files entirely and reflects the spread of the bulk of the distribution.
+- The range (max − min)
+  > The range is defined by the two most extreme points, so the giant files would dominate it completely, the worst choice here.
 - The variance
   > The variance is just the squared standard deviation, so it is even more sensitive to the extreme files, not less.
+- [o] The interquartile range (IQR)
+  > Spanning only the middle 50% of the data, the IQR ignores the extreme files entirely and reflects the spread of the bulk of the distribution.
 
 For skewed, outlier-prone data, the IQR (and MAD) give a spread that the tail can't hijack.`}
 />
@@ -570,14 +570,14 @@ For skewed, outlier-prone data, the IQR (and MAD) give a spread that the tail ca
 <MultipleChoice
   markdown={`The standard deviation is preferred over the variance for *reporting* spread mainly because:
 
+- The variance can be negative but the standard deviation cannot
+  > The variance is an average of squared numbers and so is never negative; that is not the reason the SD is preferred.
+- [o] It is expressed in the same units as the data, whereas the variance is in squared units that are hard to interpret
+  > Taking the square root returns the measure to the original units (dollars, minutes), so "give or take one SD" is directly meaningful in a way "give or take 144 square dollars" is not.
 - It is always smaller than the variance
   > It is only smaller when the variance exceeds 1, and "smaller" isn't the reason anyway; interpretability is.
 - It is more robust to outliers than the variance
   > Both are driven by squared deviations and are similarly sensitive to outliers; robustness isn't the distinction.
-- [o] It is expressed in the same units as the data, whereas the variance is in squared units that are hard to interpret
-  > Taking the square root returns the measure to the original units (dollars, minutes), so "give or take one SD" is directly meaningful in a way "give or take 144 square dollars" is not.
-- The variance can be negative but the standard deviation cannot
-  > The variance is an average of squared numbers and so is never negative; that is not the reason the SD is preferred.
 
 Variance and SD carry the same information; the SD is just in human-readable units.`}
 />

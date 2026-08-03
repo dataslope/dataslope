@@ -489,14 +489,14 @@ heavy-tailed model).
 <MultipleChoice
   markdown={`You want the value with only **5%** of the distribution **above** it (the upper-tail threshold). Which single method gives it most directly?
 
-- \`.cdf(0.05)\`
-  > \`cdf\` maps a value to a left-tail probability; passing 0.05 treats it as a value, not a tail level.
-- \`.ppf(0.05)\`
-  > \`ppf(0.05)\` returns the value with 5% *below* it (lower tail), the opposite end from what's asked.
 - [o] \`.isf(0.05)\`
   > The inverse-survival function returns the value whose upper-tail probability equals 0.05, exactly the threshold with 5% of the distribution above it (equivalently \`ppf(0.95)\`).
 - \`.sf(0.05)\`
   > \`sf\` takes a value and returns its upper-tail probability, not a value at a given tail level.
+- \`.cdf(0.05)\`
+  > \`cdf\` maps a value to a left-tail probability; passing 0.05 treats it as a value, not a tail level.
+- \`.ppf(0.05)\`
+  > \`ppf(0.05)\` returns the value with 5% *below* it (lower tail), the opposite end from what's asked.
 
 \`isf(p)\` and \`sf(x)\` are the upper-tail twins of \`ppf(p)\` and \`cdf(x)\`.`}
 />
@@ -504,14 +504,14 @@ heavy-tailed model).
 <MultipleChoice
   markdown={`You run \`stats.norm.fit(data)\` on a strongly right-skewed dataset and get back \`(loc, scale)\`. What can you conclude?
 
-- The data follows a normal distribution, since the fit succeeded
-  > \`.fit\` always returns parameters regardless of fit quality; a successful call says nothing about whether the model is appropriate.
-- The fit failed because the data is skewed
-  > The fit doesn't "fail" on skewed data, it silently returns the best-matching normal, which simply won't describe the data well.
-- [o] You have the best-fitting *normal* parameters, but you must still check (overlay/Q-Q) whether a normal is appropriate, and for skewed data it likely isn't
-  > Fitting only estimates parameters for the distribution you chose; verifying the shape actually matches is a separate, required step, and skew is a sign a normal is the wrong family.
 - The skew will be automatically corrected by the fit
   > Fitting a normal cannot remove skew; it just centers and scales a symmetric bell that ignores the data's asymmetry.
+- The data follows a normal distribution, since the fit succeeded
+  > \`.fit\` always returns parameters regardless of fit quality; a successful call says nothing about whether the model is appropriate.
+- [o] You have the best-fitting *normal* parameters, but you must still check (overlay/Q-Q) whether a normal is appropriate, and for skewed data it likely isn't
+  > Fitting only estimates parameters for the distribution you chose; verifying the shape actually matches is a separate, required step, and skew is a sign a normal is the wrong family.
+- The fit failed because the data is skewed
+  > The fit doesn't "fail" on skewed data, it silently returns the best-matching normal, which simply won't describe the data well.
 
 Fitting estimates parameters; it never validates the choice of distribution.`}
 />
@@ -519,12 +519,12 @@ Fitting estimates parameters; it never validates the choice of distribution.`}
 <MultipleChoice
   markdown={`In a **Q–Q plot** comparing your data to a fitted distribution, the points follow the diagonal line in the middle but **curve upward sharply at the right end**. What does this indicate?
 
-- The fit is perfect
-  > A perfect fit keeps points on the line throughout; a systematic departure at one end signals a specific mismatch.
-- [o] The data has a heavier right tail than the fitted distribution, extreme high values occur more often than the model predicts
-  > Points peeling above the line at the upper end mean the sample's large quantiles exceed what the model expects, the signature of a heavier-than-modeled right tail.
 - The data has fewer values than the model assumes
   > A Q–Q plot compares quantile *positions*, not counts; sample size isn't what the bend reveals.
+- [o] The data has a heavier right tail than the fitted distribution, extreme high values occur more often than the model predicts
+  > Points peeling above the line at the upper end mean the sample's large quantiles exceed what the model expects, the signature of a heavier-than-modeled right tail.
+- The fit is perfect
+  > A perfect fit keeps points on the line throughout; a systematic departure at one end signals a specific mismatch.
 - The loc parameter was estimated incorrectly
   > A wrong center would shift the whole line, not bend only the upper tail; tail curvature is about shape, not location.
 
@@ -536,12 +536,12 @@ Where and how the points leave the line tells you exactly how the model misfits,
 
 - Because \`sf\` is inaccurate for large values
   > \`sf\` is actually the numerically *preferred* way to compute far-tail probabilities; precision isn't the issue.
-- Because the normal can't produce values above its mean
-  > A normal extends infinitely in both directions, so it certainly can produce values above the mean; that's not the concern.
 - [o] Because 400 is far outside the observed data range, so that probability is an extrapolation governed entirely by the assumed normal shape, not by any observations
   > With no data anywhere near 400, the reported probability rests solely on the assumption that the true distribution is normal in a region you never measured, making it unreliable.
 - Because fitted models can only answer questions about the mean
   > Fitted models answer probability and quantile questions across their range; the problem is specifically reasoning *outside* the observed range.
+- Because the normal can't produce values above its mean
+  > A normal extends infinitely in both directions, so it certainly can produce values above the mean; that's not the concern.
 
 A fitted model is trustworthy within the data's range; its far tails are assumption, not evidence.`}
 />

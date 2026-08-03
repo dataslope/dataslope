@@ -165,12 +165,12 @@ generalizes: **always eyeball the scatter first.** If it bends, a straight
 line clearly sits *above* the points at both ends and *below* them in the
 middle. What is the right conclusion?
 
-- Horsepower and mpg are unrelated, so the line is flat noise.
-  > The points show a strong, clear relationship, it is just *curved*. "Unrelated" would look like a shapeless cloud with a roughly flat fit.
-- [o] The relationship is curved, so a straight-line fit is the wrong model; use \`order=2\` or \`lowess=True\`.
-  > A systematic over/under/over pattern is the signature of fitting a line to a curve. Letting the fit bend, a polynomial or a LOWESS smoother, matches the data's actual shape.
 - The confidence band is too narrow and should be widened.
   > The band describes uncertainty in the fitted line; it cannot rescue a fit whose *shape* is wrong. The fix is a better curve, not a wider band.
+- [o] The relationship is curved, so a straight-line fit is the wrong model; use \`order=2\` or \`lowess=True\`.
+  > A systematic over/under/over pattern is the signature of fitting a line to a curve. Letting the fit bend, a polynomial or a LOWESS smoother, matches the data's actual shape.
+- Horsepower and mpg are unrelated, so the line is flat noise.
+  > The points show a strong, clear relationship, it is just *curved*. "Unrelated" would look like a shapeless cloud with a roughly flat fit.
 - You should remove the points and keep only the line for clarity.
   > The mismatch is only visible *because* the points are shown. Hiding them would conceal exactly the problem you need to see.
 
@@ -330,14 +330,14 @@ g = sns.lmplot(
 <MultipleChoice
   markdown={`What does the line drawn by \`regplot\` / \`lmplot\` represent?
 
-- The path connecting every data point in order.
-  > That describes a line *plot* of ordered data. A regression line is a single fitted summary, not a connect-the-dots path.
 - [o] An estimate of the average value of y for each value of x.
   > The fit summarizes the central tendency of y given x, your best single guess for y at a given x, drawn over the scatter of individual points.
 - The boundary that separates outliers from normal points.
   > Regression does not classify points as in/out; it summarizes the overall trend, and outliers still influence (and appear on) the plot.
 - The 95% range that contains most of the data.
   > That confuses the line with its band, and even the band is a CI for the *line*, not a range covering most points.
+- The path connecting every data point in order.
+  > That describes a line *plot* of ordered data. A regression line is a single fitted summary, not a connect-the-dots path.
 
 The fitted line estimates the conditional average of y as x varies.`}
 />
@@ -345,10 +345,10 @@ The fitted line estimates the conditional average of y as x varies.`}
 <MultipleChoice
   markdown={`The translucent band around an \`lmplot\` line is best described as:
 
-- A region guaranteed to contain 95% of the data points.
-  > Many points routinely fall outside the band. It quantifies uncertainty in the *line*, not the spread of observations.
 - The range of a future single prediction.
   > That is a prediction interval, which is wider. The default band is about the fitted line, not individual new points.
+- A region guaranteed to contain 95% of the data points.
+  > Many points routinely fall outside the band. It quantifies uncertainty in the *line*, not the spread of observations.
 - [o] A 95% confidence interval for the fitted line itself.
   > It expresses how well the sample pins down the line's position, narrow where data is dense, wider where it is sparse.
 - The standard deviation of x.
@@ -364,10 +364,10 @@ gives an honest trend?
 
 - Keep the straight fit but widen the confidence band.
   > A wider band cannot fix a fit whose *shape* is wrong; it would still run above the data at the ends and below it in the middle.
-- Drop the points so only the straight line shows.
-  > Hiding the points conceals the mismatch instead of addressing it, the opposite of honest.
 - [o] Use \`order=2\` for a polynomial fit, or \`lowess=True\` to follow the local trend.
   > Both let the fit *bend* to match the data's real shape rather than forcing a straight line through a curve.
+- Drop the points so only the straight line shows.
+  > Hiding the points conceals the mismatch instead of addressing it, the opposite of honest.
 - Swap to \`regplot\`; it automatically detects curvature.
   > \`regplot\` fits a straight line by default just like \`lmplot\`; you must explicitly ask for \`order=\` or \`lowess=\`.
 
@@ -379,14 +379,14 @@ polynomial order or a LOWESS smoother.`}
   markdown={`A regression of ice-cream sales on drowning incidents shows a strong upward
 line. What can you correctly conclude?
 
-- Buying ice cream causes drownings.
-  > A line shows association, not causation. Inventing a causal arrow from a slope is precisely the mistake to avoid.
-- Drownings cause people to buy ice cream.
-  > Reversing the causal arrow is no more justified, the fit is symmetric about which variable "causes" the other.
-- [o] The two variables are associated in this data; a lurking factor (like hot weather) may drive both.
-  > A slope establishes that the variables move together; an unmeasured common cause such as summer heat can produce that association with no direct link between them.
 - Nothing, a positive slope carries no information at all.
   > It does carry information: the variables co-vary. The error is leaping from co-variation to causation, not the existence of the association.
+- Buying ice cream causes drownings.
+  > A line shows association, not causation. Inventing a causal arrow from a slope is precisely the mistake to avoid.
+- [o] The two variables are associated in this data; a lurking factor (like hot weather) may drive both.
+  > A slope establishes that the variables move together; an unmeasured common cause such as summer heat can produce that association with no direct link between them.
+- Drownings cause people to buy ice cream.
+  > Reversing the causal arrow is no more justified, the fit is symmetric about which variable "causes" the other.
 
 A trend line measures association; attributing cause requires reasoning and
 design beyond the plot itself.`}

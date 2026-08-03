@@ -636,14 +636,14 @@ if (!output.includes("alice") || !output.includes("dark")) {
 <MultipleChoice
   markdown={`What does the \`?\` mean in an interface property like \`age?: number;\`?
 
-- The property is required but can be \`null\`
-  > A property that can be \`null\` is annotated as \`prop: T | null\`, not with \`?\`. The \`?\` means the property may be omitted entirely, not that it can hold \`null\`.
-- [o] The property is optional and may be absent
-  > The \`?\` marks a property as optional, so it may be present or missing entirely.
 - The property is readonly
   > Readonly properties are marked with the \`readonly\` keyword before the property name, not with \`?\`.
 - The property is deprecated
   > TypeScript has no built-in syntax for marking properties as deprecated; that is handled by JSDoc comments or linting rules, not by \`?\`.
+- The property is required but can be \`null\`
+  > A property that can be \`null\` is annotated as \`prop: T | null\`, not with \`?\`. The \`?\` means the property may be omitted entirely, not that it can hold \`null\`.
+- [o] The property is optional and may be absent
+  > The \`?\` marks a property as optional, so it may be present or missing entirely.
 
 An optional property has type \`T | undefined\`, and you must handle both cases when accessing it.`}
 />
@@ -651,12 +651,12 @@ An optional property has type \`T | undefined\`, and you must handle both cases 
 <MultipleChoice
   markdown={`Given two interfaces with identical properties but different names, can you assign a value of one type to a variable of the other type?
 
-- No, TypeScript uses nominal typing
-  > TypeScript uses structural typing, not nominal typing. Nominal typing (as in Java or C#) requires an explicit inheritance relationship, but TypeScript only requires matching shapes.
 - [o] Yes, TypeScript uses structural typing
   > Types are compatible if they have the same shape, regardless of their name.
 - Only if one explicitly extends the other
   > Explicit \`extends\` is not required for compatibility in TypeScript; two unrelated interfaces with identical properties are fully assignable to each other.
+- No, TypeScript uses nominal typing
+  > TypeScript uses structural typing, not nominal typing. Nominal typing (as in Java or C#) requires an explicit inheritance relationship, but TypeScript only requires matching shapes.
 - Only if both are declared as \`type\` aliases
   > The \`interface\` vs \`type\` distinction does not affect structural compatibility; shape alone determines assignability.
 

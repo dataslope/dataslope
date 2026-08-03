@@ -205,14 +205,14 @@ Express is the right tool to start with.
 <MultipleChoice
   markdown={`Which Python library introduced the **DataFrame**, a labeled, spreadsheet-like table that has become the central object of Python data analysis?
 
-- NumPy
-  > NumPy (2005) introduced efficient numerical arrays, but its primary structure is a homogeneous multidimensional array, not a labeled table with named columns. The DataFrame came later, with pandas.
 - Matplotlib
   > Matplotlib (2003) is a plotting library built on NumPy. Its focus is rendering charts, not storing tabular data with named columns.
 - [o] pandas
   > pandas (2008, by Wes McKinney) brought the DataFrame to Python, building on NumPy's arrays. Plotly Express expects DataFrames as input, so pandas is the workhorse you'll use throughout this course.
 - Jupyter
   > Jupyter is a notebook environment for writing code and prose side by side. It provides an interactive interface but did not introduce the DataFrame data structure.
+- NumPy
+  > NumPy (2005) introduced efficient numerical arrays, but its primary structure is a homogeneous multidimensional array, not a labeled table with named columns. The DataFrame came later, with pandas.
 
 Almost every page of this course starts by loading data into a pandas DataFrame.`}
 />
@@ -222,12 +222,12 @@ Almost every page of this course starts by loading data into a pandas DataFrame.
 
 - They are two unrelated libraries that happen to share a name.
   > They are directly related: Plotly Express was built by the same organization as Plotly.js, and every chart Plotly Express produces is ultimately rendered by the Plotly.js engine.
+- Plotly.js is a fork of Plotly Express.
+  > The dependency runs the other way: Plotly Express (2019) was built on top of plotly.py and Plotly.js (2015). Plotly.js is not derived from Plotly Express.
 - Plotly Express is a different programming language.
   > Plotly Express is a Python library; it builds objects that are serialized and passed to Plotly.js for rendering in the browser.
 - [o] Plotly Express is a high-level Python API on top of plotly.py, which wraps the Plotly.js JavaScript library.
   > When you call **px.bar(...)**, Plotly Express builds a configuration object, plotly.py serializes it, and Plotly.js renders the interactive chart in the browser. You write Python; the browser executes JavaScript, invisibly.
-- Plotly.js is a fork of Plotly Express.
-  > The dependency runs the other way: Plotly Express (2019) was built on top of plotly.py and Plotly.js (2015). Plotly.js is not derived from Plotly Express.
 
 This three-layer stack is invisible most of the time. You'll only notice it when something breaks.`}
 />
@@ -237,12 +237,12 @@ This three-layer stack is invisible most of the time. You'll only notice it when
 
 - It makes charts look more professional.
   > Professionalism is a side effect; a static chart can look just as polished but cannot support the interactive exploration loop that changes how analysis is done.
+- It is required by web browsers.
+  > Browsers have no such requirement; static images display perfectly. Interactivity is a deliberate enhancement, not a prerequisite.
 - It allows charts to animate.
   > Animation is one specific form of interactivity, not the core benefit. The fundamental value is that the viewer can explore the data themselves rather than being limited to what the author anticipated.
 - [o] It lets the *viewer* ask follow-up questions, hover for detail, filter to subsets, zoom into regions, without re-running code.
   > Interactivity changes the *cognitive workload* of analysis. A static chart answers only the questions the author anticipated; an interactive chart answers questions the viewer discovers on the spot, and helps you catch bugs and outliers as you build.
-- It is required by web browsers.
-  > Browsers have no such requirement; static images display perfectly. Interactivity is a deliberate enhancement, not a prerequisite.
 
 The exploratory loop "overview → zoom → filter → detail" is dramatically faster with interactive charts than with static ones.`}
 />
@@ -250,14 +250,14 @@ The exploratory loop "overview → zoom → filter → detail" is dramatically f
 <MultipleChoice
   markdown={`What is the **distinguishing design idea** of Plotly Express compared to the older **plotly.graph_objects** API?
 
+- It requires a paid Plotly subscription.
+  > Both Plotly Express and \`graph_objects\` are free, open-source libraries under the MIT license; no subscription is required.
 - It is faster than plotly.graph_objects.
   > Both APIs produce the same Plotly.js output; rendering speed is identical. Plotly Express trades fine-grained control for brevity, not performance.
 - It produces static images.
   > Plotly Express charts are fully interactive by default, pannable, zoomable, hoverable, just like charts made with \`graph_objects\`.
 - [o] It is a high-level wrapper that takes a DataFrame and column names, producing a complete chart in essentially one function call.
   > One line of **px.bar(df, x=..., y=...)** replaces about nine lines of **graph_objects** code, and the chart is just as interactive. When you outgrow Plotly Express, you can drop down to **graph_objects** for fine control.
-- It requires a paid Plotly subscription.
-  > Both Plotly Express and \`graph_objects\` are free, open-source libraries under the MIT license; no subscription is required.
 
 Both are free and open source. Plotly Express is simply the easier front door.`}
 />

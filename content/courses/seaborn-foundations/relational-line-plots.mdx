@@ -255,12 +255,12 @@ categories?
 
 - A line plot cannot display categorical data at all; Seaborn will error.
   > Seaborn will happily draw it, the problem is that the result *misleads*, not that it fails.
+- A line plot would hide the individual tip amounts.
+  > Summarizing is true of line plots generally, but it is not what makes them *wrong* for unordered categories, the false implied path is.
 - [o] The connecting segments imply a continuous progression *between* categories that has no real meaning.
   > A line asserts that the space between points is a path. Between unordered categories there is no "between," so the slopes invent a trend that does not exist.
 - Lines can only be drawn for numeric x-values, never for dates.
   > Lines work for dates and other ordered axes; the issue here is that the categories are *unordered*, not that they are non-numeric.
-- A line plot would hide the individual tip amounts.
-  > Summarizing is true of line plots generally, but it is not what makes them *wrong* for unordered categories, the false implied path is.
 
 A line earns its connecting segments only when x is genuinely ordered; for
 unordered categories, a bar or point plot tells the truth.`}
@@ -335,14 +335,14 @@ g = sns.relplot(
   markdown={`What single property of the x-variable most justifies using a **line** plot
 instead of a scatter plot?
 
-- The x-variable is stored as a string rather than a number.
-  > Storage type is not the deciding factor, an ordered string axis can suit a line, and a numeric but unordered axis can ruin one.
+- The x-variable contains no missing values.
+  > Completeness does not determine whether a connecting line is appropriate; order does.
 - [o] The x-variable is **ordered**, so the segment connecting two points represents a meaningful progression.
   > A line plot's connecting segments encode "what happens between these x-values," which is only honest when x has a real order, like time or a sequence.
 - The x-variable has more unique values than the y-variable.
   > The count of unique values says nothing about whether connecting points is meaningful.
-- The x-variable contains no missing values.
-  > Completeness does not determine whether a connecting line is appropriate; order does.
+- The x-variable is stored as a string rather than a number.
+  > Storage type is not the deciding factor, an ordered string axis can suit a line, and a numeric but unordered axis can ruin one.
 
 The connecting line is a claim about the space *between* points, so it is
 only appropriate when x is genuinely ordered.`}
@@ -357,10 +357,10 @@ draw by default?
   > That would produce a dense tangle; Seaborn instead summarizes the repeated values into one line.
 - One line connecting the *maximum* signal at each timepoint.
   > The default aggregate is the mean, not the maximum.
-- [o] A single line of the **mean** signal at each timepoint, surrounded by a translucent confidence band.
-  > With multiple y-values per x, Seaborn aggregates to the mean and shades a 95% confidence interval around it by default.
 - Nothing, it raises an error because there are duplicate x-values.
   > Duplicate x-values are exactly the case line plots handle by aggregating; no error occurs.
+- [o] A single line of the **mean** signal at each timepoint, surrounded by a translucent confidence band.
+  > With multiple y-values per x, Seaborn aggregates to the mean and shades a 95% confidence interval around it by default.
 
 Repeated y-values at the same x trigger Seaborn's default aggregation: a
 mean line plus a confidence band.`}
@@ -371,14 +371,14 @@ mean line plus a confidence band.`}
 observations are**, rather than how uncertain the mean is. Which argument do
 you set?
 
-- \`errorbar=("ci", 95)\`
-  > A confidence interval describes uncertainty about the *mean*, which is the opposite of what you want here.
 - [o] \`errorbar="sd"\`
   > \`"sd"\` draws a band of one standard deviation, which reflects the spread of the underlying data points.
-- \`errorbar=None\`
-  > That removes the band entirely, showing no spread information at all.
+- \`errorbar=("ci", 95)\`
+  > A confidence interval describes uncertainty about the *mean*, which is the opposite of what you want here.
 - \`hue="sd"\`
   > \`hue\` maps a column to color; it has nothing to do with what the band represents, and there is no \`sd\` column.
+- \`errorbar=None\`
+  > That removes the band entirely, showing no spread information at all.
 
 \`errorbar="sd"\` shows the data's spread; \`("ci", 95)\` shows uncertainty of
 the mean; \`None\` shows neither.`}
@@ -389,14 +389,14 @@ the mean; \`None\` shows neither.`}
 one chart, and it becomes an unreadable tangle. What is the most useful
 description and fix?
 
+- It means the x-axis is unordered and should be melted.
+  > Time is already ordered here; the trouble is the *number of lines*, not the shape or order of x.
+- [o] It is a **spaghetti plot**; fix it by showing fewer lines, faceting with \`col=\`, or highlighting only the series that matter.
+  > Too many lines exceed what color can separate; reducing the series, splitting them across panels, or emphasizing a chosen few restores readability.
 - It is **overplotting**, fixed by lowering \`alpha\` until the lines fade.
   > Lowering opacity on 30 overlapping lines still leaves 30 crossing paths; the core problem is too many *series*, not pixel density.
 - It is fine as-is; readers can trace 30 colors with effort.
   > Color stops distinguishing series after a handful, so a 30-line chart is genuinely unreadable, not merely effortful.
-- [o] It is a **spaghetti plot**; fix it by showing fewer lines, faceting with \`col=\`, or highlighting only the series that matter.
-  > Too many lines exceed what color can separate; reducing the series, splitting them across panels, or emphasizing a chosen few restores readability.
-- It means the x-axis is unordered and should be melted.
-  > Time is already ordered here; the trouble is the *number of lines*, not the shape or order of x.
 
 When line count outruns what color can separate, the cure is fewer lines or
 small multiples, not transparency.`}

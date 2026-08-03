@@ -215,40 +215,40 @@ prompt.
 <MultipleChoice
   markdown={`Why do modern LLMs use subword tokenization (BPE, WordPiece) instead of splitting on whole words?
 
-- Subword tokens make the sequences shorter than word tokens.
-  > Subword sequences are usually *longer* than word-level; length isn't the motivation.
 - [o] It represents any string, including rare and unseen words, with a fixed vocabulary by decomposing them into known pieces.
   > Whole-word vocabularies can't handle out-of-vocabulary words; subwords keep the vocab bounded while covering everything.
-- It removes the need for embeddings.
-  > Tokens are still mapped to embeddings; tokenization only decides the units.
+- Subword tokens make the sequences shorter than word tokens.
+  > Subword sequences are usually *longer* than word-level; length isn't the motivation.
 - It makes the model case-insensitive.
-  > Casing is a separate preprocessing choice, unrelated to subword splitting.`}
+  > Casing is a separate preprocessing choice, unrelated to subword splitting.
+- It removes the need for embeddings.
+  > Tokens are still mapped to embeddings; tokenization only decides the units.`}
 />
 
 <MultipleChoice
   markdown={`Your assistant must answer questions about your company's constantly-changing internal docs and cite sources. What's the most appropriate approach?
 
-- Fine-tune the base model nightly on the latest docs.
-  > Retraining daily is costly, slow to update, and still doesn't produce citations for retrieved facts.
+- Raise the temperature so the model is more creative.
+  > Higher temperature increases randomness and hallucination, the opposite of grounded, sourced answers.
 - [o] Retrieval-augmented generation: embed the query, retrieve relevant passages, and put them in the prompt.
   > RAG injects fresh, private knowledge at query time without retraining and lets you cite the retrieved sources.
 - Increase the context window and paste the entire document store into every prompt.
   > That's expensive (attention is quadratic) and often exceeds the window; retrieval selects only what's relevant.
-- Raise the temperature so the model is more creative.
-  > Higher temperature increases randomness and hallucination, the opposite of grounded, sourced answers.`}
+- Fine-tune the base model nightly on the latest docs.
+  > Retraining daily is costly, slow to update, and still doesn't produce citations for retrieved facts.`}
 />
 
 <MultipleChoice
   markdown={`Why does doubling an LLM's context length more than double the attention compute?
 
-- Because the vocabulary size doubles with the context.
-  > Vocabulary is fixed and independent of sequence length.
 - [o] Self-attention compares every token with every other, so cost grows quadratically, roughly 4x for 2x the length.
   > Each of n tokens attends to all n tokens, giving O(n^2) compute and memory in sequence length.
-- Because the model adds more layers for longer inputs.
-  > Layer count is fixed by the architecture, not by the input length.
+- Because the vocabulary size doubles with the context.
+  > Vocabulary is fixed and independent of sequence length.
 - It doesn't; attention cost is linear in length.
-  > Standard self-attention is quadratic; that quadratic cost is exactly the long-context bottleneck.`}
+  > Standard self-attention is quadratic; that quadratic cost is exactly the long-context bottleneck.
+- Because the model adds more layers for longer inputs.
+  > Layer count is fixed by the architecture, not by the input length.`}
 />
 
 ## Go deeper

@@ -365,23 +365,23 @@ package. The domain doesn't move.
 
 - Make every class \`public\` so nothing is hidden by accident
   > That's the opposite of useful, it locks you into a public API everywhere.
+- Always use \`package-private\` for everything
+  > Sometimes you genuinely need \`public\` (the API) or \`private\` (internals).
 - Make every member \`protected\` because it's "in the middle"
   > Protected is more permissive than you usually want.
 - [o] Make everything as restrictive as possible (\`private\` by default, package-private when needed) and widen only when there's a real reason
-  > Narrow visibility keeps refactoring safe.
-- Always use \`package-private\` for everything
-  > Sometimes you genuinely need \`public\` (the API) or \`private\` (internals).`}
+  > Narrow visibility keeps refactoring safe.`}
 />
 
 <MultipleChoice
   markdown={`In a layered architecture, which way should dependencies point?
 
-- From the domain inward to the database
-  > Domain shouldn't depend on infrastructure.
 - Domain should depend on the presentation layer
   > Definitely not; the domain is the most independent piece.
 - [o] From the outer layers (presentation, infrastructure) toward the inner core (application, domain), the domain depends on nothing else of yours
   > This is the "dependencies point inward" rule that keeps the core swappable.
+- From the domain inward to the database
+  > Domain shouldn't depend on infrastructure.
 - All layers should depend on every other layer equally
   > That recreates the spaghetti you're trying to avoid.`}
 />
@@ -389,10 +389,10 @@ package. The domain doesn't move.
 <MultipleChoice
   markdown={`What is the goal expressed by "high cohesion, low coupling"?
 
-- Maximize the number of imports across packages
-  > That maximizes coupling, the opposite.
 - Combine all classes into one giant package so nothing has to import anything
   > That maximizes coupling and destroys cohesion.
+- Maximize the number of imports across packages
+  > That maximizes coupling, the opposite.
 - [o] Classes within a package should belong together; packages should depend on each other as little as possible
   > This is the classic measure of a healthy modular design.
 - Use the keyword \`public\` on as many members as possible

@@ -354,12 +354,12 @@ export function meanOfSquares(xs: readonly number[]): number {
 <MultipleChoice
   markdown={`Which of these TypeScript functions is **pure**?
 
-- \`const roll = (): number => Math.floor(Math.random() * 6) + 1;\`
-  > Not pure, it reads from a random number generator, so two calls with no arguments can give different results.
-- [o] \`const triple = (x: number): number => x * 3;\`
-  > Output depends only on the input, and the function has no side effects.
 - \`const logAndReturn = (x: number): number => { console.log(x); return x; };\`
   > Not pure, it has the side effect of writing to standard output, even though the return value depends only on \`x\`.
+- [o] \`const triple = (x: number): number => x * 3;\`
+  > Output depends only on the input, and the function has no side effects.
+- \`const roll = (): number => Math.floor(Math.random() * 6) + 1;\`
+  > Not pure, it reads from a random number generator, so two calls with no arguments can give different results.
 - \`const push = (xs: number[], x: number): void => { xs.push(x); };\`
   > Not pure, it mutates its argument and returns void.
 

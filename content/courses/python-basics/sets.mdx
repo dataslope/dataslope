@@ -423,38 +423,38 @@ print(set_of_sets)
 
 - \`{1, 2, 3, 4}\`
   > That would be the union (\`|\`), not intersection.
-- [o] \`{2, 3}\`
-  > \`&\` is set intersection, returning items in both.
+- \`{1}\`
+  > That would be \`{1, 2, 3} - {2, 3, 4}\`.
 - \`{1, 4}\`
   > That would be symmetric difference (\`^\`).
-- \`{1}\`
-  > That would be \`{1, 2, 3} - {2, 3, 4}\`.`}
+- [o] \`{2, 3}\`
+  > \`&\` is set intersection, returning items in both.`}
 />
 
 <MultipleChoice
   markdown={`Which of these creates an **empty set**?
 
-- \`{}\`
-  > That is an empty **dict**.
-- [o] \`set()\`
-  > \`set()\` is the only way to create an empty set.
 - \`[]\`
   > That is an empty list.
 - \`()\`
-  > That is an empty tuple.`}
+  > That is an empty tuple.
+- [o] \`set()\`
+  > \`set()\` is the only way to create an empty set.
+- \`{}\`
+  > That is an empty **dict**.`}
 />
 
 <MultipleChoice
   markdown={`What is the time complexity of \`item in s\` where \`s\` is a set?
 
-- [o] O(1) average case
-  > Sets use hash tables, giving O(1) average-case lookup.
-- O(n)
-  > That would be true for a list, not a set.
 - O(log n)
   > Sets use hashing, not binary search.
+- O(n)
+  > That would be true for a list, not a set.
 - O(n²)
-  > Set lookup is much faster than quadratic.`}
+  > Set lookup is much faster than quadratic.
+- [o] O(1) average case
+  > Sets use hash tables, giving O(1) average-case lookup.`}
 />
 
 We have now seen every major collection. Next: how to direct flow through them with conditionals and loops.

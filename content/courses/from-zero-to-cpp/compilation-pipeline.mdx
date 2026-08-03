@@ -365,25 +365,25 @@ void greet(const std::string &name) { std::cout << "Hello, " << name << "!\\n"; 
 <MultipleChoice
   markdown={`Which stage of the pipeline expands \`#include\` directives?
 
+- The linker.
+  > The linker resolves references between object files; it has nothing to do with \`#include\`.
+- The assembler.
+  > The assembler turns assembly text into machine code; it does not handle includes.
 - [o] The preprocessor.
   > The preprocessor pastes the entire contents of the included file before the compiler sees anything.
 - The compiler.
-  > By the time the compiler runs, includes have already been expanded.
-- The assembler.
-  > The assembler turns assembly text into machine code; it does not handle includes.
-- The linker.
-  > The linker resolves references between object files; it has nothing to do with \`#include\`.`}
+  > By the time the compiler runs, includes have already been expanded.`}
 />
 
 <MultipleChoice
   markdown={`You see the error \`undefined reference to 'foo()'\`. Where did it come from?
 
+- [o] The linker.
+  > The linker tried to match a *use* of \`foo\` to a *definition* and could not find one.
 - The preprocessor.
   > The preprocessor does not check whether functions exist.
 - The compiler.
   > The compiler accepts a declaration of \`foo\`; it does not need a body.
-- [o] The linker.
-  > The linker tried to match a *use* of \`foo\` to a *definition* and could not find one.
 - The operating system at runtime.
   > By the time the OS runs the program, all references must already be resolved.`}
 />
@@ -391,14 +391,14 @@ void greet(const std::string &name) { std::cout << "Hello, " << name << "!\\n"; 
 <MultipleChoice
   markdown={`Why do C++ projects typically put declarations in \`.h\` files and definitions in \`.cpp\` files?
 
+- Because headers run faster than source files.
+  > Headers and source files do not "run"; they are just compiled.
 - To save typing.
   > That's a side benefit, not the main reason.
 - Because compilers cannot read \`.cpp\` files.
   > Compilers absolutely can read \`.cpp\` files.
 - [o] To obey the One-Definition Rule: many \`.cpp\` files can share the same *declarations* (via \`#include\`) but the function must be *defined* in exactly one place.
-  > Putting definitions in headers would cause linker errors when the header is included by more than one source file.
-- Because headers run faster than source files.
-  > Headers and source files do not "run"; they are just compiled.`}
+  > Putting definitions in headers would cause linker errors when the header is included by more than one source file.`}
 />
 
 <MultipleChoice
@@ -406,12 +406,12 @@ void greet(const std::string &name) { std::cout << "Hello, " << name << "!\\n"; 
 
 - The final executable.
   > That is produced by the linker, not the compiler.
-- A source file with macros expanded.
-  > That is the output of the preprocessor.
+- An interpreter bytecode file.
+  > C++ is not interpreted; it produces native machine code.
 - [o] An object file containing machine code plus tables of defined and required symbols.
   > Object files are the puzzle pieces the linker assembles.
-- An interpreter bytecode file.
-  > C++ is not interpreted; it produces native machine code.`}
+- A source file with macros expanded.
+  > That is the output of the preprocessor.`}
 />
 
 Next: let's actually look at "Hello, World!" line by line, and see

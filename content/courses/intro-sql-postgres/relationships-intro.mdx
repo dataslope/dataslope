@@ -160,14 +160,14 @@ gets its own deep dive soon.
 <MultipleChoice
   markdown={`Why do relational databases split data into multiple related tables instead of one giant table?
 
-- Because a database can only hold a limited number of columns per table.
-  > Tables can have many columns; the reason for splitting is about avoiding duplication, not a column limit.
 - [o] To avoid duplicating the same facts; each kind of thing is stored once in its own table and linked by shared values.
   > Separating entities and linking them keeps each fact in one place, which prevents inconsistency and repeated data.
-- Because SQL cannot read a table with more than 100 rows.
-  > SQL handles enormous tables; row count is not the reason for splitting data.
+- Because a database can only hold a limited number of columns per table.
+  > Tables can have many columns; the reason for splitting is about avoiding duplication, not a column limit.
 - To make every table look identical.
   > Tables hold different kinds of things; uniform appearance is not the goal.
+- Because SQL cannot read a table with more than 100 rows.
+  > SQL handles enormous tables; row count is not the reason for splitting data.
 
 Splitting data into related tables stores each fact once and connects the pieces through shared values.`}
 />
@@ -175,14 +175,14 @@ Splitting data into related tables stores each fact once and connects the pieces
 <MultipleChoice
   markdown={`"One customer has many orders, and each order belongs to one customer." What relationship shape is this?
 
-- One-to-one.
-  > One-to-one would mean each side has exactly one of the other, like a person and a single passport.
+- No relationship at all.
+  > There is clearly a relationship, orders reference customers, so "none" is incorrect.
 - [o] One-to-many.
   > One customer relating to many orders, with each order tied back to a single customer, is the classic one-to-many shape.
 - Many-to-many.
   > Many-to-many would require each order to belong to several customers as well, which is not the case here.
-- No relationship at all.
-  > There is clearly a relationship, orders reference customers, so "none" is incorrect.
+- One-to-one.
+  > One-to-one would mean each side has exactly one of the other, like a person and a single passport.
 
 A customer having many orders, each tied to one customer, is one-to-many.`}
 />

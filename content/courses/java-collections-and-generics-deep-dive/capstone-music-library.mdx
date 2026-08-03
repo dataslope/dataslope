@@ -230,25 +230,25 @@ That single class touches every major idea in the course:
 <MultipleChoice
   markdown={`Why \`LinkedHashSet<String>\` for \`genres()\` rather than \`HashSet<String>\`?
 
-- It's faster
-  > It's the same average complexity, with slightly more memory.
 - It allows duplicates
   > It does not.
+- It supports concurrent reads
+  > It does not (no built-in synchronization).
 - [o] It keeps insertion order, which makes the printed output deterministic and matches the user-visible "as encountered" order
   > Determinism matters as soon as a human or a test reads the output.
-- It supports concurrent reads
-  > It does not (no built-in synchronization).`}
+- It's faster
+  > It's the same average complexity, with slightly more memory.`}
 />
 
 <MultipleChoice
   markdown={`In \`topRated\`, why sort a **copy** of the tracks list?
 
-- It is faster
-  > It is not.
-- [o] Because sorting in place would permanently reorder the library, making "insertion order" queries (like \`byArtist\`) wrong on subsequent calls
-  > Never mutate state to compute a query result.
+- The original list is unmodifiable
+  > It is mutable inside the class.
 - The \`Comparator\` requires a fresh list
   > It does not.
-- The original list is unmodifiable
-  > It is mutable inside the class.`}
+- [o] Because sorting in place would permanently reorder the library, making "insertion order" queries (like \`byArtist\`) wrong on subsequent calls
+  > Never mutate state to compute a query result.
+- It is faster
+  > It is not.`}
 />

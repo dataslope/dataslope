@@ -610,12 +610,12 @@ print(slugify("Python 3.12 Released"))
 <MultipleChoice
   markdown={`What does \`"abcdef"[1:5:2]\` evaluate to?
 
+- \`"ace"\`
+  > That would be \`"abcdef"[0:5:2]\`.
 - \`"bcd"\`
   > The third number is the step, not the stop. Step of 2 means every other character.
 - [o] \`"bd"\`
   > Start at index 1 (\`"b"\`), stop before index 5 (\`"e"\`), step by 2: indices 1 and 3.
-- \`"ace"\`
-  > That would be \`"abcdef"[0:5:2]\`.
 - An \`IndexError\`
   > Slicing never raises \`IndexError\`, it returns whatever overlaps.`}
 />
@@ -625,12 +625,12 @@ print(slugify("Python 3.12 Released"))
 
 - \`s.upper()\` changes \`s\` to uppercase.
   > \`s.upper()\` returns a new string; \`s\` is unchanged.
-- You can mutate a string by assigning to an index: \`s[0] = "H"\`.
-  > This raises a \`TypeError\`. Strings are immutable.
 - [o] To "change" a string, you must rebind the variable to a new string.
   > \`s = s.upper()\` creates a new string and rebinds \`s\` to it.
 - Immutability means you can't create new strings.
-  > You can create as many new strings as you want; you just can't change existing ones.`}
+  > You can create as many new strings as you want; you just can't change existing ones.
+- You can mutate a string by assigning to an index: \`s[0] = "H"\`.
+  > This raises a \`TypeError\`. Strings are immutable.`}
 />
 
 <MultipleChoice
@@ -638,10 +638,10 @@ print(slugify("Python 3.12 Released"))
 
 - \`"123"\`
   > The format spec \`05d\` means zero-pad to width 5.
-- [o] \`"00123"\`
-  > \`05d\` means "decimal integer, width 5, zero-padded".
 - \`"123.00"\`
   > That would require \`f\` (float) or \`.2f\` (two decimal places).
+- [o] \`"00123"\`
+  > \`05d\` means "decimal integer, width 5, zero-padded".
 - An error
   > This is valid f-string syntax.`}
 />
@@ -649,14 +649,14 @@ print(slugify("Python 3.12 Released"))
 <MultipleChoice
   markdown={`Which approach builds a string from a list of 1000 items **without** the O(n²) cost of repeated concatenation?
 
+- \`result = "".add(str(x) for x in items)\`
+  > \`str\` has no \`.add\` method, so this raises an \`AttributeError\`.
 - \`result = ""; for x in items: result += str(x)\`
   > This is the O(n²) approach: strings are immutable, so each \`+=\` creates and copies a new string.
-- \`result = sum(str(x) for x in items)\`
-  > \`sum\` defaults to starting from the integer \`0\`, so adding strings raises a \`TypeError\`.
 - [o] \`result = "".join(str(x) for x in items)\`
   > \`str.join\` builds the result in a single pass and one allocation, avoiding the repeated copying that \`+=\` causes.
-- \`result = "".add(str(x) for x in items)\`
-  > \`str\` has no \`.add\` method, so this raises an \`AttributeError\`.`}
+- \`result = sum(str(x) for x in items)\`
+  > \`sum\` defaults to starting from the integer \`0\`, so adding strings raises a \`TypeError\`.`}
 />
 
 Next: booleans, comparisons, and Python's short-circuiting logical operators.

@@ -148,14 +148,14 @@ this course teaches.
 <MultipleChoice
   markdown={`Which question is most clearly a database design question?
 
-- What color should the checkout button be?
-  > Button color is a user-interface decision, not a schema modeling decision.
+- Which font should reports use?
+  > Report styling does not decide tables, relationships, or constraints.
 - Which cloud region should host the server?
   > Hosting location is an operations decision, not logical database design.
 - [o] Should library loans point to book titles or physical book copies?
   > This decides what real-world thing a relationship represents in the schema.
-- Which font should reports use?
-  > Report styling does not decide tables, relationships, or constraints.
+- What color should the checkout button be?
+  > Button color is a user-interface decision, not a schema modeling decision.
 
 Database design is about the meaning and protection of stored facts.`}
 />
@@ -163,14 +163,14 @@ Database design is about the meaning and protection of stored facts.`}
 <MultipleChoice
   markdown={`Why can a schema that "works on day one" still be a poor design?
 
-- Day-one schemas are never allowed in PostgreSQL.
-  > PostgreSQL will store many weak designs if the SQL is valid.
-- [o] Early data may be too small to reveal duplication, missing keys, and vague meanings.
-  > Many design problems become visible only after data grows and requirements change.
 - A first feature cannot read from a database table.
   > A first feature can work while still depending on fragile structure.
+- [o] Early data may be too small to reveal duplication, missing keys, and vague meanings.
+  > Many design problems become visible only after data grows and requirements change.
 - Poor design always causes an immediate syntax error.
   > Schema design problems are often logical, not syntax errors.
+- Day-one schemas are never allowed in PostgreSQL.
+  > PostgreSQL will store many weak designs if the SQL is valid.
 
 A schema can pass the first demo and still create long-term cost.`}
 />
@@ -308,10 +308,10 @@ building.
   > Sentence parsing makes the answer depend on wording and cleanup.
 - A spreadsheet exported once per month.
   > Exports may help analysis, but they are not a reliable live schema for application features.
-- [o] Related \`customers\`, \`orders\`, \`order_items\`, and \`products\` tables.
-  > This model gives the query a clear relationship path from customers to products.
 - A table with no product identity and only customer names.
   > Without product identity, the database cannot reliably connect purchases to products.
+- [o] Related \`customers\`, \`orders\`, \`order_items\`, and \`products\` tables.
+  > This model gives the query a clear relationship path from customers to products.
 
 Feature questions become simpler when the schema already models the relationships they need.`}
 />
@@ -319,14 +319,14 @@ Feature questions become simpler when the schema already models the relationship
 <MultipleChoice
   markdown={`Why are database constraints useful even when applications also validate input?
 
-- Constraints make user-friendly error messages unnecessary in every case.
-  > Applications still often validate for helpful messages before data reaches the database.
 - [o] Constraints protect the data no matter which program writes to the table.
   > A database rule is shared by apps, scripts, imports, and admin tools.
-- Constraints allow invalid rows to be stored for later cleanup.
-  > Constraints reject invalid rows according to the rule.
 - Constraints replace the need to choose tables and relationships.
   > Constraints protect a design; they do not decide the whole model by themselves.
+- Constraints make user-friendly error messages unnecessary in every case.
+  > Applications still often validate for helpful messages before data reaches the database.
+- Constraints allow invalid rows to be stored for later cleanup.
+  > Constraints reject invalid rows according to the rule.
 
 Application validation helps users, while database constraints protect shared truth.`}
 />
@@ -338,10 +338,10 @@ Application validation helps users, while database constraints protect shared tr
   > Hardware choices are operational, not the core modeling work of design.
 - Writing queries after all tables already exist.
   > Querying uses a design; it does not decide the schema shape by itself.
-- [o] Deciding what tables, relationships, and rules should represent the system's facts.
-  > Design shapes how facts are stored, related, and protected before code depends on them.
 - Picking random column names and fixing them later.
   > Careless naming and delayed modeling often create ambiguity and migration cost.
+- [o] Deciding what tables, relationships, and rules should represent the system's facts.
+  > Design shapes how facts are stored, related, and protected before code depends on them.
 
 Database design is the intentional modeling of stored facts.`}
 />

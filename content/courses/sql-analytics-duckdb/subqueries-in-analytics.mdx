@@ -241,12 +241,12 @@ reads better.
 <MultipleChoice
   markdown={`What does a **scalar** subquery return?
 
+- A list of values for an \`IN\` filter.
+  > A single-column list is what an \`IN\` subquery returns; a scalar returns one value.
 - A whole table of rows and columns.
   > That is a table subquery; a scalar subquery returns just one value.
 - [o] Exactly one row and one column, a single value usable in \`SELECT\` or \`WHERE\`.
   > A scalar subquery yields one value, ideal for comparing each row to a global summary.
-- A list of values for an \`IN\` filter.
-  > A single-column list is what an \`IN\` subquery returns; a scalar returns one value.
 - Nothing; it only filters.
   > A scalar subquery produces a value that the outer query uses.
 
@@ -257,12 +257,12 @@ against.`}
 <MultipleChoice
   markdown={`What makes a subquery **correlated**?
 
+- It is written using a \`WITH\` clause.
+  > A \`WITH\` clause defines a CTE, which is a different construct from a correlated subquery.
 - It returns more than one column.
   > Column count does not define correlation; referencing the outer query does.
 - [o] It references a column from the outer query, so it conceptually re-runs for each outer row.
   > The dependency on an outer-row value (e.g. \`o.region\`) is exactly what correlation means.
-- It is written using a \`WITH\` clause.
-  > A \`WITH\` clause defines a CTE, which is a different construct from a correlated subquery.
 - It always uses \`EXISTS\`.
   > \`EXISTS\` is one correlated form, but correlation is about referencing the outer row, not a specific keyword.
 

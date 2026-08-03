@@ -304,12 +304,12 @@ hunting is rare.
 
 - The test is poorly designed and should be discarded
   > 99% sensitivity and specificity is an excellent test. The low PPV comes from the rare disease, not from a flaw in the test.
-- [o] The disease is rare, so the small false-positive rate applied to the large healthy group produces more false positives than true positives
-  > With a 0.1% base rate, the healthy group is enormous; 1% of it (false positives) outnumbers the few true positives from the tiny sick group.
-- A 99% accurate test always means 99% of positives are correct
-  > That conflates accuracy with PPV. "99% of sick test positive" is a different conditional from "99% of positives are sick." The base rate decides PPV.
 - The simulation must be buggy because the answer is so low
   > The simulation matches the exact Bayes' rule calculation. The surprising-but-correct answer is the whole lesson, not a bug.
+- A 99% accurate test always means 99% of positives are correct
+  > That conflates accuracy with PPV. "99% of sick test positive" is a different conditional from "99% of positives are sick." The base rate decides PPV.
+- [o] The disease is rare, so the small false-positive rate applied to the large healthy group produces more false positives than true positives
+  > With a 0.1% base rate, the healthy group is enormous; 1% of it (false positives) outnumbers the few true positives from the tiny sick group.
 
 Low base rate plus a nonzero false-positive rate yields mostly false alarms, accuracy alone never tells you the PPV.`}
 />
@@ -554,12 +554,12 @@ assert abs(ppv - expected_ppv) < 1e-9`,
 <MultipleChoice
   markdown={`"95% of patients with the flu have a fever." A patient walks in **with a fever**. Which probability does the 95% figure give you?
 
-- [o] P(fever | flu), the chance of fever among flu patients, which is *not* the same as the chance of flu given a fever
-  > The statement conditions on having the flu and reports the fever rate. The patient's question (flu given fever) is the reverse conditional, which also depends on how common flu and fever are.
 - P(flu | fever), the chance this feverish patient has the flu
   > That is the reverse of what's stated. Fever has many causes, so P(flu | fever) can be much lower than 95% even when P(fever | flu) is 95%.
 - P(flu and fever), the chance of having both
   > A joint probability would have to be smaller than either piece and isn't what a "95% of flu patients" statement reports; that statement is a conditional.
+- [o] P(fever | flu), the chance of fever among flu patients, which is *not* the same as the chance of flu given a fever
+  > The statement conditions on having the flu and reports the fever rate. The patient's question (flu given fever) is the reverse conditional, which also depends on how common flu and fever are.
 - P(fever), the overall chance of a fever
   > The overall fever rate ignores the flu condition entirely, whereas the statement is explicitly about flu patients.
 
@@ -569,14 +569,14 @@ Confusing P(fever | flu) with P(flu | fever) is the confusion of the inverse, th
 <MultipleChoice
   markdown={`A disease has a base rate of 1 in 10,000. A test has 99% sensitivity and a 1% false-positive rate. Roughly what is P(disease | positive)?
 
+- Exactly 1 in 10,000, unchanged by the test
+  > A positive result *does* raise the probability above the base rate, just not to 99%. Ignoring the evidence entirely is the opposite error.
 - About 99%, since the test is 99% accurate
   > That equates accuracy with PPV. With an extremely rare disease, false positives swamp true positives, so PPV is far below 99%.
 - About 50%, a coin flip
   > There's no reason the answer lands at 50%; the exact Bayes calculation with this tiny base rate gives a much smaller number.
 - [o] About 1%, because false positives from the huge healthy group vastly outnumber the rare true positives
   > Out of 10,000 people, roughly 1 is sick (and tests positive) while about 100 healthy people falsely test positive, giving roughly 1 / 101 ≈ 1%.
-- Exactly 1 in 10,000, unchanged by the test
-  > A positive result *does* raise the probability above the base rate, just not to 99%. Ignoring the evidence entirely is the opposite error.
 
 The rarer the condition, the lower the PPV, a positive on a rare-disease screen is usually a false alarm.`}
 />
@@ -586,10 +586,10 @@ The rarer the condition, the lower the PPV, a positive on a rare-disease screen 
 
 - The test's sensitivity, P(positive | disease)
   > Sensitivity describes the test's behavior on sick people, not how common the disease is. It's a different input to Bayes' rule.
-- [o] The prior prevalence P(disease) before any test, it heavily shapes P(disease | positive)
-  > The base rate is how common the condition is before evidence. When it's very low, even an accurate test yields a low post-test probability.
 - The false-positive rate, P(positive | healthy)
   > The false-positive rate is about the test's behavior on healthy people. It interacts with the base rate but is not itself the base rate.
+- [o] The prior prevalence P(disease) before any test, it heavily shapes P(disease | positive)
+  > The base rate is how common the condition is before evidence. When it's very low, even an accurate test yields a low post-test probability.
 - The overall probability of a positive test, P(positive)
   > P(positive) is the normalizing denominator in Bayes' rule, computed *from* the base rate and the test rates, it isn't the base rate itself.
 
@@ -601,10 +601,10 @@ Neglecting the base rate is the classic error; it's the single input that most o
 
 - P(A and B) = P(A) + P(B)
   > Adding probabilities is for mutually exclusive "either/or" events, not for the joint probability of independent events.
-- [o] P(A | B) = P(A): knowing B occurred doesn't change A's probability
-  > Independence is *defined* by the condition leaving the probability unchanged, which is equivalent to P(A and B) = P(A)·P(B).
 - A and B cannot both occur
   > That describes mutually exclusive events. Independent events can co-occur; in fact independence is about information, not exclusion.
+- [o] P(A | B) = P(A): knowing B occurred doesn't change A's probability
+  > Independence is *defined* by the condition leaving the probability unchanged, which is equivalent to P(A and B) = P(A)·P(B).
 - P(A | B) is always larger than P(A)
   > Under independence the conditional equals the unconditional probability, neither larger nor smaller.
 
@@ -614,12 +614,12 @@ Independence means the condition is uninformative: P(A | B) = P(A), which is exa
 <MultipleChoice
   markdown={`A contingency table shows 200 paid users (40 churned) and 800 free users (240 churned). What is P(churned | free)?
 
+- 240 / 280 ≈ 0.857
+  > 280 is the total number of churned users across both segments, using it as the denominator answers P(free | churned), a different conditional.
 - 240 / 1000 = 0.24
   > Dividing by the grand total gives the overall churn rate, not the rate *within* the free segment. Conditioning on "free" means dividing by the free total only.
 - [o] 240 / 800 = 0.30
   > Conditioning on "free" restricts to the 800 free users, of whom 240 churned, giving 0.30.
-- 240 / 280 ≈ 0.857
-  > 280 is the total number of churned users across both segments, using it as the denominator answers P(free | churned), a different conditional.
 - 40 / 200 = 0.20
   > That's P(churned | paid), computed in the wrong row. The question asks about the free segment.
 
@@ -629,14 +629,14 @@ To condition on a category, divide within that category's row, restricting the w
 <MultipleChoice
   markdown={`A spam filter: 30% of mail is spam; a phrase appears in 80% of spam and 5% of real mail. After seeing the phrase, how should your belief that the email is spam change, and via what rule?
 
-- It stays at 30%, because the base rate doesn't change
-  > Observing informative evidence *should* update the probability. A phrase that's far more common in spam raises the probability above the base rate.
-- It jumps to 80%, the rate at which spam contains the phrase
-  > 80% is P(phrase | spam), the reverse conditional. The quantity you want, P(spam | phrase), requires combining it with the base rate via Bayes' rule.
 - [o] It rises above 30%, Bayes' rule combines the 30% base rate with how much more often the phrase appears in spam
   > Bayes' rule updates the prior using the evidence's likelihood under each hypothesis; because the phrase is much more common in spam, the updated probability climbs above 30% (here to about 87%).
 - It drops below 30%, since most mail is legitimate
   > The evidence points *toward* spam, so the probability should increase, not decrease. Most-mail-is-legit is already captured by the 30% prior.
+- It jumps to 80%, the rate at which spam contains the phrase
+  > 80% is P(phrase | spam), the reverse conditional. The quantity you want, P(spam | phrase), requires combining it with the base rate via Bayes' rule.
+- It stays at 30%, because the base rate doesn't change
+  > Observing informative evidence *should* update the probability. A phrase that's far more common in spam raises the probability above the base rate.
 
 Bayes' rule formalizes updating: prior 30% plus phrase evidence yields a higher posterior, the everyday "update on evidence" reflex.`}
 />

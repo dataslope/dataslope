@@ -580,10 +580,10 @@ We won't dive into monorepo tooling here, but know that TypeScript's type system
 
 - The application layer
   > The domain is the *innermost* layer; it depends on nothing outside itself.
-- [o] Nothing (it's pure)
-  > The domain layer contains pure business logic and types. It has no dependencies on infrastructure or application layers.
 - The infrastructure layer
   > Infrastructure depends on domain, not the other way around.
+- [o] Nothing (it's pure)
+  > The domain layer contains pure business logic and types. It has no dependencies on infrastructure or application layers.
 
 Keeping the domain pure makes it testable, reusable, and easy to reason about.`}
 />
@@ -597,10 +597,10 @@ Keeping the domain pure makes it testable, reusable, and easy to reason about.`}
 
 - The application layer is at the bottom
   > The physical layer order doesn't matter. Dependency *direction* matters.
-- [o] The application depends on an interface, not a concrete implementation
-  > Dependency inversion means high-level modules (application) depend on abstractions (interfaces), not low-level modules (infrastructure). This allows swapping implementations.
 - The domain depends on the infrastructure
   > That would violate layering. The domain should never depend on infrastructure.
+- [o] The application depends on an interface, not a concrete implementation
+  > Dependency inversion means high-level modules (application) depend on abstractions (interfaces), not low-level modules (infrastructure). This allows swapping implementations.
 
 Dependency inversion decouples layers, making the system flexible and testable.`}
 />

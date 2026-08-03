@@ -506,23 +506,23 @@ print(compound_interest(1000, 0.05, 10))
   > C-style integer division would truncate toward zero, giving \`-3\`. Python does not do that.
 - [o] \`-4\`
   > Floor division rounds toward negative infinity, so \`7 // -2\` is \`-4\`.
-- \`3\`
-  > That's the absolute value of \`7 // 2\`, but we're dividing by a negative number.
 - An error
-  > Floor division with a negative divisor is perfectly legal.`}
+  > Floor division with a negative divisor is perfectly legal.
+- \`3\`
+  > That's the absolute value of \`7 // 2\`, but we're dividing by a negative number.`}
 />
 
 <MultipleChoice
   markdown={`Why does \`0.1 + 0.2 == 0.3\` evaluate to \`False\`?
 
-- It is a bug in Python that has not been fixed yet.
-  > It is not a bug; it is how all IEEE 754 floating-point arithmetic works across all languages.
+- Python rounds floats to two decimal places.
+  > Python does not automatically round floats.
 - [o] Floats are stored in binary and cannot represent these decimals exactly.
   > \`0.1\` and \`0.2\` are infinitely repeating in binary, so their sum is very slightly off from \`0.3\`.
+- It is a bug in Python that has not been fixed yet.
+  > It is not a bug; it is how all IEEE 754 floating-point arithmetic works across all languages.
 - The \`==\` operator does not work for floats.
-  > \`==\` works fine; the issue is that the values are not exactly equal due to precision limits.
-- Python rounds floats to two decimal places.
-  > Python does not automatically round floats.`}
+  > \`==\` works fine; the issue is that the values are not exactly equal due to precision limits.`}
 />
 
 <MultipleChoice
@@ -530,10 +530,10 @@ print(compound_interest(1000, 0.05, 10))
 
 - \`math\`
   > \`math\` provides functions but still uses \`float\` types.
-- \`fractions\`
-  > \`fractions\` is for exact rational numbers, but \`decimal\` is more commonly used for currency.
 - [o] \`decimal\`
   > \`decimal.Decimal\` provides exact decimal arithmetic suitable for financial calculations.
+- \`fractions\`
+  > \`fractions\` is for exact rational numbers, but \`decimal\` is more commonly used for currency.
 - \`random\`
   > \`random\` is for generating random numbers, not exact arithmetic.`}
 />

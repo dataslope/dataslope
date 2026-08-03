@@ -133,12 +133,12 @@ So the reading rules for a correlation heatmap are:
   markdown={`You are drawing a heatmap of a correlation matrix (values from −1 to +1).
 Which colormap is the right choice, and why?
 
-- A sequential map like \`"viridis"\`, because it looks modern and is easy to read.
-  > A sequential ramp encodes a single low-to-high direction, so it would place −0.9 and +0.9 at opposite ends as if one were merely "less" than the other, erasing the sign.
-- [o] A diverging map like \`"vlag"\` centered at 0, because correlation is signed with a meaningful zero midpoint.
-  > Diverging maps use two hues meeting at a neutral middle, so positive and negative correlations read as genuinely different directions and zero is visibly neutral.
 - Any colormap works; the annotations carry the meaning, so color is just decoration.
   > Color *is* the encoding in a heatmap, it is what lets you scan the whole grid at a glance. If you only trust the numbers, you have given up the heatmap's main advantage.
+- [o] A diverging map like \`"vlag"\` centered at 0, because correlation is signed with a meaningful zero midpoint.
+  > Diverging maps use two hues meeting at a neutral middle, so positive and negative correlations read as genuinely different directions and zero is visibly neutral.
+- A sequential map like \`"viridis"\`, because it looks modern and is easy to read.
+  > A sequential ramp encodes a single low-to-high direction, so it would place −0.9 and +0.9 at opposite ends as if one were merely "less" than the other, erasing the sign.
 - A reversed sequential map, so high values are dark.
   > Reversing direction still leaves a single-direction ramp; it cannot represent a midpoint or distinguish the two signs the way a diverging map does.
 
@@ -306,14 +306,14 @@ ax = sns.heatmap(corr, annot=True, cmap="vlag", center=0, vmin=-1, vmax=1)
   markdown={`Why is a **diverging** colormap (centered at 0) the right choice for a
 correlation heatmap?
 
-- Because diverging colormaps have more colors, so they show more detail.
-  > It is not about the *number* of colors. It is that two hues meeting at a neutral midpoint match data that has a meaningful center and runs in two directions.
 - [o] Because correlation is signed (−1 to +1) with 0 as a meaningful midpoint, and a diverging map represents both direction and the neutral center.
   > Centering a two-hue map at zero makes positive and negative correlations read as opposite directions, with pale neutral marking "no linear relationship."
-- Because diverging colormaps are colorblind-safe and sequential ones never are.
-  > Colorblind-safety depends on the specific palette, not on whether it is diverging or sequential; that is a separate concern from matching signed data.
 - Because Seaborn refuses to draw a correlation matrix with a sequential map.
   > Seaborn will happily use a sequential map, it just *misleads*, collapsing the sign distinction. The choice is yours to make correctly.
+- Because diverging colormaps have more colors, so they show more detail.
+  > It is not about the *number* of colors. It is that two hues meeting at a neutral midpoint match data that has a meaningful center and runs in two directions.
+- Because diverging colormaps are colorblind-safe and sequential ones never are.
+  > Colorblind-safety depends on the specific palette, not on whether it is diverging or sequential; that is a separate concern from matching signed data.
 
 A diverging, zero-centered map encodes both the sign and the strength of
 correlation faithfully.`}
@@ -323,14 +323,14 @@ correlation faithfully.`}
   markdown={`A cell in your correlation heatmap is pale and shows *r* ≈ 0.02. What is the
 safest interpretation?
 
+- The colormap is wrong and is hiding the true value.
+  > The annotation already shows the value; a pale cell faithfully represents *r* near zero. The limitation is what *r* measures, not how it is colored.
+- The data must contain an error, because real variables are always correlated.
+  > Genuinely unrelated variables exist, and so do nonlinear ones; a near-zero coefficient is not evidence of a data error.
 - The two variables are completely unrelated.
   > Pearson's *r* only sees *linear* association. A strong curved relationship (such as a U-shape) can produce *r* ≈ 0 while the variables are tightly related.
 - [o] There is little *linear* relationship; a curved relationship could still exist, so check a scatter plot.
   > Near-zero *r* rules out a straight-line trend, not every relationship. A scatter plot reveals curvature that correlation cannot.
-- The data must contain an error, because real variables are always correlated.
-  > Genuinely unrelated variables exist, and so do nonlinear ones; a near-zero coefficient is not evidence of a data error.
-- The colormap is wrong and is hiding the true value.
-  > The annotation already shows the value; a pale cell faithfully represents *r* near zero. The limitation is what *r* measures, not how it is colored.
 
 Correlation captures only straight-line association, so a near-zero cell
 warrants a look at the actual scatter.`}
@@ -342,12 +342,12 @@ illegible wall of tiny cells. What is a reasonable fix?
 
 - Make the figure smaller so it all fits on screen at once.
   > Shrinking the figure makes each cell *smaller*, worsening the legibility problem rather than relieving it.
+- Switch to a sequential colormap to compress the range.
+  > A colormap change affects how values are *colored*, not how many cells there are; the matrix is still 25×25 and unreadable.
 - [o] Select the variables you actually care about before computing \`.corr()\`, and/or mask the redundant upper triangle.
   > Fewer, chosen variables yield a smaller grid, and masking the mirror-image half removes duplicated cells, both make a dense matrix readable.
 - Turn off \`annot\` and rely on guessing the values from color.
   > Removing the numbers may de-clutter slightly, but 625 cells are still too many to scan; the grid is too large regardless of annotations.
-- Switch to a sequential colormap to compress the range.
-  > A colormap change affects how values are *colored*, not how many cells there are; the matrix is still 25×25 and unreadable.
 
 For an overcrowded matrix, reduce what you plot, pick variables and/or mask
 the symmetric half.`}

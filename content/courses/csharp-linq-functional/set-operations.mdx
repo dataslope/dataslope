@@ -364,12 +364,12 @@ public static class Roster
 
 - \`Concat\` only works on arrays; \`Union\` works on any \`IEnumerable<T>\`.
   > Both work on any \`IEnumerable<T>\`; that is not the difference.
-- \`Union\` always produces a longer sequence than \`Concat\`.
-  > The opposite is often true, \`Union\` deduplicates and can be shorter than \`Concat\`.
-- [o] \`Concat\` preserves every element including duplicates between the two sequences; \`Union\` deduplicates so each value appears at most once.
-  > \`Concat\` is purely "append" semantics; \`Union\` is set semantics that removes duplicates across (and within) the inputs.
 - \`Concat\` requires both sequences to have the same element type; \`Union\` does not.
   > Both require compatible element types (typically the same type or a common base type).
+- [o] \`Concat\` preserves every element including duplicates between the two sequences; \`Union\` deduplicates so each value appears at most once.
+  > \`Concat\` is purely "append" semantics; \`Union\` is set semantics that removes duplicates across (and within) the inputs.
+- \`Union\` always produces a longer sequence than \`Concat\`.
+  > The opposite is often true, \`Union\` deduplicates and can be shorter than \`Concat\`.
 
 Use \`Concat\` when you want a stitched-together list and duplicates are
 fine. Use \`Union\` when you want set semantics, each value at most

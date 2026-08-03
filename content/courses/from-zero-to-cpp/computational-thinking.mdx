@@ -376,27 +376,27 @@ int main() {
 <MultipleChoice
   markdown={`Which of the following best describes "decomposition" in computational thinking?
 
-- Writing the answer in as few lines of code as possible.
-  > Code golf is not decomposition.
-- [o] Breaking a large problem into smaller, more manageable sub-problems.
-  > Decomposition is the first step in turning a vague task into something programmable.
 - Memorizing the syntax of the language you are using.
   > Syntax knowledge is useful but unrelated to decomposition.
+- [o] Breaking a large problem into smaller, more manageable sub-problems.
+  > Decomposition is the first step in turning a vague task into something programmable.
 - Deleting unnecessary features from a finished program.
-  > That is refactoring, not decomposition.`}
+  > That is refactoring, not decomposition.
+- Writing the answer in as few lines of code as possible.
+  > Code golf is not decomposition.`}
 />
 
 <MultipleChoice
   markdown={`Pattern recognition is most useful for identifying...
 
+- Which programming language to use.
+  > That is a different kind of decision.
+- The fastest possible algorithm for a problem.
+  > Selecting algorithms is more about analysis than pattern matching.
 - Bugs in your code.
   > Debugging is its own skill.
 - [o] Repetition that could be replaced by a single function or loop.
-  > Spotting repeated structure is the cue to abstract it.
-- The fastest possible algorithm for a problem.
-  > Selecting algorithms is more about analysis than pattern matching.
-- Which programming language to use.
-  > That is a different kind of decision.`}
+  > Spotting repeated structure is the cue to abstract it.`}
 />
 
 <MultipleChoice
@@ -404,23 +404,23 @@ int main() {
 
 - Pseudocode is faster to compile than C++.
   > Pseudocode is not compiled at all.
+- Pseudocode automatically handles all edge cases.
+  > Pseudocode only captures whatever you bother to write.
 - [o] It lets you reason about the algorithm without being distracted by syntax, and exposes flaws before you've committed to code.
   > Many beginner bugs come from rushing into syntax before the algorithm is clear.
 - The compiler will refuse C++ that wasn't preceded by pseudocode.
-  > It will happily compile any valid C++.
-- Pseudocode automatically handles all edge cases.
-  > Pseudocode only captures whatever you bother to write.`}
+  > It will happily compile any valid C++.`}
 />
 
 <MultipleChoice
   markdown={`Which is **not** a good edge case to consider for a function that takes a list of integers?
 
-- The empty list.
-  > Always worth considering.
-- A list of one element.
-  > Always worth considering.
 - A list of all-equal elements.
   > Often a useful edge case.
+- A list of one element.
+  > Always worth considering.
+- The empty list.
+  > Always worth considering.
 - [o] The exact list the interviewer happens to have in mind.
   > Real programs do not know in advance what input they'll get; you must reason about *categories* of input, not specific cases.`}
 />

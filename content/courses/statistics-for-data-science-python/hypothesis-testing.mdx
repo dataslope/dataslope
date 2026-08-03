@@ -346,12 +346,12 @@ print("chosen for a reason, not chosen to shrink the p-value.")
 
 - One-sided tests are never valid and should not be used
   > One-sided tests are perfectly valid when the direction is chosen in advance for a substantive reason. The issue here is the *timing*, not the test itself.
+- The p-value should be multiplied by two when going one-sided
+  > Mechanically a one-sided p is often about half the two-sided p, not double. The objection is about choosing the direction after peeking, not about arithmetic.
 - [o] The direction was chosen *after* seeing the data, which inflates the false-positive rate beyond the stated alpha
   > Letting the observed result pick the test direction means the procedure no longer controls the error rate it claims to. The hypothesis and its direction must be fixed before looking.
 - Two-sided tests are always more powerful, so switching loses information
   > A one-sided test actually has *more* power in its chosen direction; power is not the concern here. The concern is choosing that direction post hoc.
-- The p-value should be multiplied by two when going one-sided
-  > Mechanically a one-sided p is often about half the two-sided p, not double. The objection is about choosing the direction after peeking, not about arithmetic.
 
 Set the hypothesis and its direction before collecting or inspecting data.`}
 />
@@ -531,12 +531,12 @@ assert significant == bool(p_value <= alpha)`,
 <MultipleChoice
   markdown={`What is the null hypothesis $H_0$ in a typical A/B test comparing conversion rates?
 
+- The experiment was run correctly
+  > Whether the experiment was run correctly is an assumption behind the test, not the statistical hypothesis being evaluated.
 - The new variant has a higher conversion rate than the control
   > This is a directional *alternative* hypothesis, not the null. The null is the skeptical "no difference" baseline.
 - [o] The two variants have the same conversion rate, any observed difference is just chance
   > The null is the skeptical default that nothing is going on, stated specifically enough to compute what "pure noise" would look like.
-- The experiment was run correctly
-  > Whether the experiment was run correctly is an assumption behind the test, not the statistical hypothesis being evaluated.
 - The sample size is large enough to detect an effect
   > Sample-size adequacy relates to power, not to the null hypothesis being tested.
 
@@ -546,14 +546,14 @@ The null is always the "no effect / status quo" claim you try to contradict.`}
 <MultipleChoice
   markdown={`A test yields p = 0.42 at $\alpha = 0.05$. Which statement is the most accurate conclusion?
 
-- We have proven there is no effect
-  > A non-significant result never proves the null. It means the data is compatible with $H_0$, not that $H_0$ is established as true.
+- We should accept $H_0$ as true
+  > Careful practice says "fail to reject," never "accept." Accepting $H_0$ overstates what the test can show.
 - [o] We failed to reject $H_0$; the data did not provide significant evidence of an effect, but an effect could still exist undetected
   > Failing to reject is the "not guilty" verdict, the evidence did not clear the bar, which leaves open the possibility of a real but undetected effect.
 - The probability the null is true is 0.42
   > The p-value is computed *assuming* the null is true; it is not the probability that the null is true.
-- We should accept $H_0$ as true
-  > Careful practice says "fail to reject," never "accept." Accepting $H_0$ overstates what the test can show.
+- We have proven there is no effect
+  > A non-significant result never proves the null. It means the data is compatible with $H_0$, not that $H_0$ is established as true.
 
 "Fail to reject" is an absence of evidence, not evidence of absence.`}
 />
@@ -561,14 +561,14 @@ The null is always the "no effect / status quo" claim you try to contradict.`}
 <MultipleChoice
   markdown={`Why do we fix the significance level $\alpha$ *before* collecting data?
 
-- Because $\alpha$ must always equal 0.05 by law
-  > 0.05 is a common convention, not a requirement; fields use 0.01, 0.10, and others. The reason for fixing it early is about avoiding bias, not a mandated value.
-- Because the p-value cannot be computed otherwise
-  > The p-value can be computed regardless of $\alpha$; $\alpha$ is only the threshold you compare it against.
 - [o] Because choosing the threshold after seeing the data lets you tune it to get the verdict you want, which destroys the error guarantee
   > Fixing the decision rule in advance is what keeps the false-positive rate at the level you claim; setting it afterward is a form of cheating.
 - Because a smaller $\alpha$ always gives a better test
   > A smaller $\alpha$ reduces false positives but increases false negatives, it is a tradeoff, not a strict improvement, and it is unrelated to the timing question.
+- Because the p-value cannot be computed otherwise
+  > The p-value can be computed regardless of $\alpha$; $\alpha$ is only the threshold you compare it against.
+- Because $\alpha$ must always equal 0.05 by law
+  > 0.05 is a common convention, not a requirement; fields use 0.01, 0.10, and others. The reason for fixing it early is about avoiding bias, not a mandated value.
 
 Decide the rules of the game before you play.`}
 />
@@ -576,14 +576,14 @@ Decide the rules of the game before you play.`}
 <MultipleChoice
   markdown={`A study on 4 million users finds the new homepage increases time-on-site by 0.3 seconds, p < 0.0001. What is the right takeaway?
 
+- We should reject the result and gather a smaller sample
+  > Shrinking the sample to make a real effect "disappear" would be deliberately weakening the analysis, which is not a sound reason.
 - The effect is enormous because the p-value is so tiny
   > A tiny p-value reflects strong evidence the effect is *nonzero*, not that it is large. With millions of users, even trivial effects produce minuscule p-values.
 - The result is invalid because the sample is too big
   > A large sample is a strength for precision, not a flaw. The issue is interpreting significance as importance.
 - [o] The effect is almost certainly real but likely too small to matter; significance and practical importance are different questions
   > Huge samples make tiny effects detectable, so a microscopic p-value can accompany a negligible real-world change. Judge importance with effect sizes, not p-values.
-- We should reject the result and gather a smaller sample
-  > Shrinking the sample to make a real effect "disappear" would be deliberately weakening the analysis, which is not a sound reason.
 
 A test tells you whether an effect is distinguishable from zero, never whether it is big enough to act on.`}
 />
@@ -591,14 +591,14 @@ A test tells you whether an effect is distinguishable from zero, never whether i
 <MultipleChoice
   markdown={`In the courtroom analogy, what does "fail to reject $H_0$" correspond to, and what does it mean?
 
-- A "guilty" verdict, the defendant definitely did it
-  > "Guilty" corresponds to *rejecting* $H_0$, the opposite outcome.
-- [o] A "not guilty" verdict, the evidence did not meet the bar, which is not the same as declaring innocence
-  > A not-guilty verdict says the prosecution fell short of the standard of proof, leaving open that the defendant is guilty; likewise, failing to reject leaves open that a real effect exists.
 - A mistrial, the test could not be run
   > Failing to reject is a definite outcome of a completed test, not a breakdown of the procedure.
 - Proof of innocence, $H_0$ is established as true
   > Acquittal does not prove innocence, and failing to reject does not prove $H_0$. Both simply mean the evidence was insufficient.
+- [o] A "not guilty" verdict, the evidence did not meet the bar, which is not the same as declaring innocence
+  > A not-guilty verdict says the prosecution fell short of the standard of proof, leaving open that the defendant is guilty; likewise, failing to reject leaves open that a real effect exists.
+- A "guilty" verdict, the defendant definitely did it
+  > "Guilty" corresponds to *rejecting* $H_0$, the opposite outcome.
 
 The asymmetry of the verdict is the whole point: you can reject $H_0$, but you can never confirm it.`}
 />
@@ -606,14 +606,14 @@ The asymmetry of the verdict is the whole point: you can reject $H_0$, but you c
 <MultipleChoice
   markdown={`You want to test whether a new fertilizer changes crop yield (it could plausibly help *or* hurt). Which test setup is appropriate?
 
-- A one-sided test with $H_1: \mu > \mu_0$, because you hope it helps
-  > Choosing a direction based on hope rather than a constraint is not justified, and it would miss a harmful effect entirely.
-- [o] A two-sided test with $H_1: \mu \neq \mu_0$, because the effect could go in either direction
-  > When either direction is of interest and neither is ruled out in advance, a two-sided alternative is the appropriate, unbiased default.
 - No test is needed; just compare the two averages
   > Comparing raw averages ignores whether the difference exceeds ordinary noise, which is exactly what the test evaluates.
+- A one-sided test with $H_1: \mu > \mu_0$, because you hope it helps
+  > Choosing a direction based on hope rather than a constraint is not justified, and it would miss a harmful effect entirely.
 - A one-sided test with $H_1: \mu < \mu_0$, to be conservative
   > A left-sided test would be blind to a beneficial effect; "conservative" is not a reason to pick a direction that ignores half the possibilities.
+- [o] A two-sided test with $H_1: \mu \neq \mu_0$, because the effect could go in either direction
+  > When either direction is of interest and neither is ruled out in advance, a two-sided alternative is the appropriate, unbiased default.
 
 Use two-sided unless a substantive constraint genuinely rules out one direction beforehand.`}
 />

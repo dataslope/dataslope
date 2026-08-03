@@ -341,14 +341,14 @@ assert test_score > 0.9, f"Expected strong held-out accuracy, got {test_score}"`
 <MultipleChoice
   markdown={`Looking back across the whole course, which idea was positioned as the single most important, the one nearly every other topic refines?
 
-- That random forests are the best model for most problems
-  > No single model is universally best; the course repeatedly stressed matching the tool to the problem, not crowning a favorite.
+- That accuracy is the right metric for every problem
+  > The course showed accuracy misleads under imbalance and that metrics must match real costs, so it was never held up as universal.
 - [o] That a model must be judged on data it has never seen, the principle of generalization
   > Generalization was placed right after the foundations and revisited on nearly every page, because honest evaluation on unseen data underpins everything else.
 - That more data and more features always improve a model
   > The pitfalls chapter showed this is false; irrelevant features and unrepresentative data can hurt, so this was a misconception to correct, not a central principle.
-- That accuracy is the right metric for every problem
-  > The course showed accuracy misleads under imbalance and that metrics must match real costs, so it was never held up as universal.
+- That random forests are the best model for most problems
+  > No single model is universally best; the course repeatedly stressed matching the tool to the problem, not crowning a favorite.
 
 Generalization is the compass the entire course kept returning to.`}
 />
@@ -356,14 +356,14 @@ Generalization is the compass the entire course kept returning to.`}
 <MultipleChoice
   markdown={`You are about to learn gradient boosting, a model the course did not cover. What is the most realistic expectation about how it fits your existing knowledge?
 
-- It requires abandoning the train/test discipline you learned
-  > Honest evaluation applies to every supervised model, including gradient boosting; nothing about it suspends the need for a sealed test set.
-- [o] It plugs into the same \`fit\`/\`predict\` shape and the same split-baseline-pipeline-cross-validate-test workflow you already know
-  > New classical models share scikit-learn's interface and obey the same evaluation discipline, so learning one is mostly slotting a new estimator into familiar machinery.
-- It makes baselines and cross-validation unnecessary because it is more advanced
-  > A more powerful model does not remove the need for a baseline or cross-validation; those remain essential for judging whether it actually helps.
 - It cannot overfit, so the bias-variance tradeoff no longer applies
   > Every flexible model can overfit, and gradient boosting very much can, so the bias-variance tradeoff still applies.
+- It makes baselines and cross-validation unnecessary because it is more advanced
+  > A more powerful model does not remove the need for a baseline or cross-validation; those remain essential for judging whether it actually helps.
+- [o] It plugs into the same \`fit\`/\`predict\` shape and the same split-baseline-pipeline-cross-validate-test workflow you already know
+  > New classical models share scikit-learn's interface and obey the same evaluation discipline, so learning one is mostly slotting a new estimator into familiar machinery.
+- It requires abandoning the train/test discipline you learned
+  > Honest evaluation applies to every supervised model, including gradient boosting; nothing about it suspends the need for a sealed test set.
 
 The whole point of learning foundations first is that new algorithms slot into machinery you already have.`}
 />
@@ -388,12 +388,12 @@ The practitioners who struggle most with deep learning are usually the ones who 
 
 - Always choosing the most complex model available
   > Complexity invites overfitting and is not a safeguard; the course repeatedly warned against reaching for flexibility without evidence.
+- Adding as many features as possible to give the model more information
+  > Piling on features can add noise and leakage; more features is not a protective habit and can actively harm the model.
 - Reporting the training-set score, since it is the easiest to obtain
   > The training score reflects memory rather than generalization, so relying on it is itself one of the disasters to avoid.
 - [o] Evaluating honestly: split before learning anything from the data, keep a sealed test set, open it once, and cross-validate for decisions
   > Honest evaluation prevents leakage, overfitting confusion, and over-tuning, which together account for most preventable failures in applied machine learning.
-- Adding as many features as possible to give the model more information
-  > Piling on features can add noise and leakage; more features is not a protective habit and can actively harm the model.
 
 Honest evaluation is the durable discipline that outlasts any particular algorithm or library.`}
 />

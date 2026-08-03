@@ -297,25 +297,25 @@ int main() {
 <MultipleChoice
   markdown={`Which complexity grows more slowly for large \`n\`: O(n log n) or O(n^2)?
 
-- [o] O(n log n) grows more slowly
-  > \`n log n\` grows more slowly than \`n^2\` as \`n\` becomes large.
-- O(n^2) is asymptotically faster
-  > Quadratic growth eventually dominates \`n log n\`.
+- It depends only on the programming language
+  > Language affects constants, not the asymptotic comparison.
 - They are the same because both contain \`n\`
   > The extra factors matter.
-- It depends only on the programming language
-  > Language affects constants, not the asymptotic comparison.`}
+- O(n^2) is asymptotically faster
+  > Quadratic growth eventually dominates \`n log n\`.
+- [o] O(n log n) grows more slowly
+  > \`n log n\` grows more slowly than \`n^2\` as \`n\` becomes large.`}
 />
 
 <MultipleChoice
   markdown={`What is the time complexity of binary search on a sorted array of length \`n\`?
 
+- O(n)
+  > That describes a linear scan.
 - O(1)
   > It usually takes more than one comparison.
 - [o] O(log n)
   > Each comparison halves the remaining search space.
-- O(n)
-  > That describes a linear scan.
 - O(n^2)
   > Binary search has no nested scan over pairs.`}
 />
@@ -323,14 +323,14 @@ int main() {
 <MultipleChoice
   markdown={`What does amortized O(1) mean for \`std::vector::push_back\`?
 
-- Every single call always performs exactly one machine instruction
-  > Individual calls vary, and complexity is not measured in exact instructions.
 - Every call is worst-case O(1), even when the vector reallocates
   > Reallocation can move existing elements, so one call can be O(n).
-- [o] A sequence of many pushes has constant average cost per push, even though occasional pushes are expensive
-  > Reallocations are spread across many cheap insertions.
+- Every single call always performs exactly one machine instruction
+  > Individual calls vary, and complexity is not measured in exact instructions.
 - It means pushing is O(log n) but written differently
-  > Amortized O(1) and O(log n) are different claims.`}
+  > Amortized O(1) and O(log n) are different claims.
+- [o] A sequence of many pushes has constant average cost per push, even though occasional pushes are expensive
+  > Reallocations are spread across many cheap insertions.`}
 />
 
 <MultipleChoice
@@ -338,11 +338,11 @@ int main() {
 
 - [o] No; asymptotic notation describes growth, and constants/implementation details can dominate at one fixed input size
   > O(n!) grows faster eventually, but Big-O alone does not guarantee runtime for one fixed small input.
-- Yes; Big-O gives exact runtimes for every \`n\`
-  > Big-O is not an exact stopwatch.
 - Yes; Big-O rankings give exact runtime order at \`n = 10\`
   > Big-O rankings describe eventual growth, not exact runtime order for one fixed input size.
 - No; O(n!) is always faster than O(2^n)
-  > Factorial growth eventually exceeds exponential growth.`}
+  > Factorial growth eventually exceeds exponential growth.
+- Yes; Big-O gives exact runtimes for every \`n\`
+  > Big-O is not an exact stopwatch.`}
 />
 <Callout type="success" title="Key idea">Complexity analysis helps you predict scalability before you write thousands of lines of code.</Callout>

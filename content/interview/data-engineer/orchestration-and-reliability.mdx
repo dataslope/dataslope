@@ -220,23 +220,23 @@ underpins every reliability feature.
 
 - Higher throughput.
   > Delete-then-insert isn't about speed; it's about correctness when the task runs more than once.
-- [o] Idempotency, re-running produces the same final state instead of duplicating rows.
-  > Overwriting the partition means a retry converges to the correct result rather than appending duplicates.
 - Exactly-once delivery from the source.
   > That concerns upstream messaging semantics; this only controls how *your* write behaves on re-run.
 - It removes the need for scheduling.
-  > You still schedule it; idempotency just makes the retries and backfills the scheduler triggers safe.`}
+  > You still schedule it; idempotency just makes the retries and backfills the scheduler triggers safe.
+- [o] Idempotency, re-running produces the same final state instead of duplicating rows.
+  > Overwriting the partition means a retry converges to the correct result rather than appending duplicates.`}
 />
 
 <MultipleChoice
   markdown={`An Airflow DAG finished green, but a downstream dashboard shows yesterday's numbers. The load task "succeeded" yet wrote no new rows because the source was empty. Which check would have caught this?
 
-- More task retries.
-  > Retrying a task that succeeds (just with no data) changes nothing; it isn't a transient failure.
-- [o] A freshness/row-count check that fails when \`MAX(updated_at)\` is stale or the row count is abnormally low.
-  > Freshness and volume checks catch "succeeded but stale/empty," the silent failures a green run hides.
 - A larger worker pool.
   > Compute capacity has nothing to do with detecting stale or missing data.
+- [o] A freshness/row-count check that fails when \`MAX(updated_at)\` is stale or the row count is abnormally low.
+  > Freshness and volume checks catch "succeeded but stale/empty," the silent failures a green run hides.
+- More task retries.
+  > Retrying a task that succeeds (just with no data) changes nothing; it isn't a transient failure.
 - Switching the schedule from daily to hourly.
   > Running more often just reproduces the same silent success more frequently; it doesn't detect it.`}
 />
@@ -244,14 +244,14 @@ underpins every reliability feature.
 <MultipleChoice
   markdown={`A batch of 1M records contains ~50 malformed rows that throw on parse. What's the most reliable design?
 
-- Let the task crash on the first bad row so nothing bad gets through.
-  > That blocks the entire batch on a handful of bad rows and can wedge the pipeline on a poison record.
-- [o] Route the malformed rows to a dead-letter destination and process the rest, then inspect and replay the dead-letters.
-  > Dead-lettering isolates the bad rows so the good 999,950 flow through, while preserving the failures for debugging.
 - Silently drop any row that fails to parse.
   > Dropping loses the records with no record of what failed, making data loss invisible and undebuggable.
 - Retry the whole batch repeatedly until it passes.
-  > Deterministic parse failures won't pass on retry; you'd loop forever without handling the bad rows.`}
+  > Deterministic parse failures won't pass on retry; you'd loop forever without handling the bad rows.
+- Let the task crash on the first bad row so nothing bad gets through.
+  > That blocks the entire batch on a handful of bad rows and can wedge the pipeline on a poison record.
+- [o] Route the malformed rows to a dead-letter destination and process the rest, then inspect and replay the dead-letters.
+  > Dead-lettering isolates the bad rows so the good 999,950 flow through, while preserving the failures for debugging.`}
 />
 
 ## Go deeper

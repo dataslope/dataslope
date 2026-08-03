@@ -350,25 +350,25 @@ simple: **always provide the type argument.**
 
 - They made collections faster
   > Performance is largely unchanged by generics.
-- [o] They moved type checking of element types from runtime (\`ClassCastException\`) to compile time
-  > With generics, the compiler proves that a \`List<String>\` can only contain \`String\`s, so the cast in \`String s = list.get(0)\` cannot fail.
+- They eliminated the need for the \`Collection\` interface
+  > \`Collection\` is still central.
 - They allowed multiple threads to share a \`List\` safely
   > Generics are unrelated to thread safety.
-- They eliminated the need for the \`Collection\` interface
-  > \`Collection\` is still central.`}
+- [o] They moved type checking of element types from runtime (\`ClassCastException\`) to compile time
+  > With generics, the compiler proves that a \`List<String>\` can only contain \`String\`s, so the cast in \`String s = list.get(0)\` cannot fail.`}
 />
 
 <MultipleChoice
   markdown={`In \`Map<String, Customer>\`, what does the compiler know about \`map.get("ada")\`?
 
-- Only that it returns some \`Object\`
-  > That was the pre-generics behaviour.
+- That it will throw if the key is missing
+  > \`HashMap.get\` returns \`null\` for a missing key.
 - [o] That it returns a \`Customer\` (or \`null\`)
   > The second type parameter tells the compiler the value type, so no cast is needed at the call site.
+- Only that it returns some \`Object\`
+  > That was the pre-generics behaviour.
 - That it returns a \`String\`
-  > The first parameter is the *key* type, not the return type.
-- That it will throw if the key is missing
-  > \`HashMap.get\` returns \`null\` for a missing key.`}
+  > The first parameter is the *key* type, not the return type.`}
 />
 
 <MultipleChoice
@@ -376,10 +376,10 @@ simple: **always provide the type argument.**
 
 - It does not compile
   > It does compile (with a warning).
-- It is slower than \`List<String> list = new ArrayList<>();\`
-  > Speed is unchanged.
 - [o] It uses a raw type, throwing away the compile-time guarantees generics give you
   > Raw types exist only for backwards compatibility; using one effectively turns off generic type-checking for that variable.
 - The JVM forbids it at runtime
-  > It runs fine; the cost is in correctness, not compilation.`}
+  > It runs fine; the cost is in correctness, not compilation.
+- It is slower than \`List<String> list = new ArrayList<>();\`
+  > Speed is unchanged.`}
 />

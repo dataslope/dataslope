@@ -516,14 +516,14 @@ print("\\nClose agreement = the model is set up correctly.")
 <MultipleChoice
   markdown={`You record the number of customers who walk into a store **each hour**. Arrivals are independent and the average rate is steady at about 12 per hour. Which distribution best models the hourly count?
 
-- Bernoulli, because each customer either arrives or doesn't
-  > Bernoulli models a single yes/no trial, not a count of many arrivals over an interval.
-- Binomial, because you're counting arrivals
-  > A binomial needs a fixed number of trials \`n\` and a per-trial probability \`p\`; here there is no fixed \`n\`, just a rate over time.
-- [o] Poisson, because it counts independent events occurring at a constant rate over a fixed interval
-  > Counting independent events arriving at a steady average rate in a fixed window is exactly the situation the Poisson is built for, with mean equal to the rate.
 - Geometric, because you're waiting for customers
   > The geometric counts trials until the *first* success, not the total number of arrivals in an interval.
+- [o] Poisson, because it counts independent events occurring at a constant rate over a fixed interval
+  > Counting independent events arriving at a steady average rate in a fixed window is exactly the situation the Poisson is built for, with mean equal to the rate.
+- Binomial, because you're counting arrivals
+  > A binomial needs a fixed number of trials \`n\` and a per-trial probability \`p\`; here there is no fixed \`n\`, just a rate over time.
+- Bernoulli, because each customer either arrives or doesn't
+  > Bernoulli models a single yes/no trial, not a count of many arrivals over an interval.
 
 No fixed \`n\`, just a rate over an interval, points squarely at the Poisson.`}
 />
@@ -531,14 +531,14 @@ No fixed \`n\`, just a rate over an interval, points squarely at the Poisson.`}
 <MultipleChoice
   markdown={`For \`stats.binom(n=100, p=0.2)\`, which expression gives \`P(X >= 30)\` (30 or more successes)?
 
-- \`d.cdf(30)\`
-  > \`cdf(30)\` is \`P(X <= 30)\`, the lower tail, the opposite of what's asked.
 - \`d.sf(30)\`
   > \`sf(30)\` is \`P(X > 30)\` = \`P(X >= 31)\`, which excludes the value 30 and is off by one.
-- [o] \`d.sf(29)\`
-  > Since \`sf(k)\` is \`P(X > k)\`, evaluating it at 29 gives \`P(X > 29)\` = \`P(X >= 30)\`, the inclusive upper tail.
 - \`1 - d.sf(30)\`
   > This equals \`cdf(30)\` = \`P(X <= 30)\`, again the lower tail rather than \`P(X >= 30)\`.
+- [o] \`d.sf(29)\`
+  > Since \`sf(k)\` is \`P(X > k)\`, evaluating it at 29 gives \`P(X > 29)\` = \`P(X >= 30)\`, the inclusive upper tail.
+- \`d.cdf(30)\`
+  > \`cdf(30)\` is \`P(X <= 30)\`, the lower tail, the opposite of what's asked.
 
 For discrete distributions, translate the inequality first: \`P(X >= k)\` is \`sf(k-1)\`.`}
 />
@@ -546,14 +546,14 @@ For discrete distributions, translate the inequality first: \`P(X >= k)\` is \`s
 <MultipleChoice
   markdown={`A binomial model assumes a *constant* success probability \`p\` across trials. In which scenario is that assumption most clearly **violated**?
 
-- Flipping the same fair coin 50 times
-  > Each flip is independent with the same \`p = 0.5\`, so the constant-probability assumption holds well.
-- Testing 1,000 manufactured chips that come off an identical, stable process
-  > A stable process gives each chip the same defect probability, satisfying the assumption.
 - [o] Tracking conversions over a day where mobile users (low \`p\`) dominate mornings and desktop users (high \`p\`) dominate evenings
   > Because the per-visitor conversion probability shifts with the changing user mix, \`p\` is not constant across trials, breaking a core binomial assumption.
+- Testing 1,000 manufactured chips that come off an identical, stable process
+  > A stable process gives each chip the same defect probability, satisfying the assumption.
 - Surveying 500 randomly selected voters with a fixed yes/no question
   > Random selection with the same question gives each respondent the same probability of "yes," consistent with the assumption.
+- Flipping the same fair coin 50 times
+  > Each flip is independent with the same \`p = 0.5\`, so the constant-probability assumption holds well.
 
 When \`p\` drifts across trials, a single binomial with one \`p\` misrepresents the process.`}
 />
@@ -563,12 +563,12 @@ When \`p\` drifts across trials, a single binomial with one \`p\` misrepresents 
 
 - The sample mean of the counts is far below \`lambda\`
   > A low mean would suggest you over-estimated the rate, not that independence is violated.
-- The counts are never exactly zero
-  > Frequent nonzero counts is normal for a busy service and says nothing about independence.
-- [o] The sample variance of the counts is much larger than the mean (over-dispersion)
-  > A Poisson forces mean equal to variance, so clustered, correlated events that inflate the variance well beyond the mean signal that the independence assumption is broken.
 - The PMF bars don't sum to 1
   > A valid PMF always sums to 1 by construction; that can't be the diagnostic.
+- [o] The sample variance of the counts is much larger than the mean (over-dispersion)
+  > A Poisson forces mean equal to variance, so clustered, correlated events that inflate the variance well beyond the mean signal that the independence assumption is broken.
+- The counts are never exactly zero
+  > Frequent nonzero counts is normal for a busy service and says nothing about independence.
 
 Variance far exceeding the mean is the classic fingerprint of clustered, non-independent events.`}
 />

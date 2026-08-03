@@ -224,12 +224,12 @@ For an analyst, \`WHERE\` chooses which slice of the data to look at.`}
 <MultipleChoice
   markdown={`Why do analysts pair \`ORDER BY\` with \`LIMIT\` so often during exploration?
 
-- Because DuckDB requires \`LIMIT\` on every query.
-  > \`LIMIT\` is optional; this pairing is a deliberate exploration technique, not a requirement.
-- [o] To surface the most extreme rows (largest, smallest) and peek at just the top without pulling everything.
-  > Sorting brings the extremes to the top, and \`LIMIT\` lets you glance at them cheaply.
 - To randomly shuffle the rows.
   > \`ORDER BY\` sorts deterministically; it does not shuffle.
+- [o] To surface the most extreme rows (largest, smallest) and peek at just the top without pulling everything.
+  > Sorting brings the extremes to the top, and \`LIMIT\` lets you glance at them cheaply.
+- Because DuckDB requires \`LIMIT\` on every query.
+  > \`LIMIT\` is optional; this pairing is a deliberate exploration technique, not a requirement.
 - To permanently sort the stored table.
   > \`ORDER BY\` affects the query result, not how the table is stored.
 
@@ -239,14 +239,14 @@ For an analyst, \`WHERE\` chooses which slice of the data to look at.`}
 <MultipleChoice
   markdown={`A query includes \`ROUND(fare / minutes, 2) AS fare_per_min\`. What is \`fare_per_min\`?
 
-- A column physically stored in the \`trips\` table.
-  > It is computed in the query; nothing about it is stored in the table.
-- [o] A derived column that exists only in this query's result, a measure the analyst invented.
-  > Analysts routinely compute new measures on the fly; \`fare_per_min\` lives only in the result set.
-- A new permanent table.
-  > It is a single column in a result, not a table.
 - An error, because you cannot divide two columns.
   > Dividing columns is perfectly valid; this produces a useful per-row measure.
+- A column physically stored in the \`trips\` table.
+  > It is computed in the query; nothing about it is stored in the table.
+- A new permanent table.
+  > It is a single column in a result, not a table.
+- [o] A derived column that exists only in this query's result, a measure the analyst invented.
+  > Analysts routinely compute new measures on the fly; \`fare_per_min\` lives only in the result set.
 
 Derived columns let analysts ask new questions of each row without
 changing the stored data.`}

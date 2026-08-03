@@ -476,14 +476,14 @@ name: 1
 <MultipleChoice
   markdown={`In Java, a single class may...
 
-- Implement at most one interface and extend at most one class
-  > The first half is wrong.
-- Implement many classes and extend many interfaces
-  > The wording is reversed and both halves are inaccurate.
+- Implement many interfaces and extend many classes
+  > Java does not allow multiple class inheritance.
 - [o] Implement *many* interfaces but extend *at most one* class
   > This is one of Java's defining design decisions.
-- Implement many interfaces and extend many classes
-  > Java does not allow multiple class inheritance.`}
+- Implement many classes and extend many interfaces
+  > The wording is reversed and both halves are inaccurate.
+- Implement at most one interface and extend at most one class
+  > The first half is wrong.`}
 />
 
 <MultipleChoice
@@ -491,10 +491,10 @@ name: 1
 
 - Always write \`interface\` for every class
   > Not every class needs an interface; the principle is about *types in signatures*.
-- Never use concrete classes
-  > Concrete classes are required to actually have an instance, somebody must implement the interface.
 - [o] When declaring variables, parameters, and return types, prefer the more general interface type so callers aren't locked to a specific implementation
   > This is how interfaces unlock loose coupling.
+- Never use concrete classes
+  > Concrete classes are required to actually have an instance, somebody must implement the interface.
 - Use only abstract classes
   > That's a separate idea and not the same principle.`}
 />
@@ -502,12 +502,12 @@ name: 1
 <MultipleChoice
   markdown={`What is the main difference between an interface and an abstract class in Java?
 
-- An interface can have a constructor; an abstract class cannot
-  > Reversed.
-- [o] An interface has no instance state; an abstract class may have fields, a constructor, and concrete methods
-  > Interfaces describe capabilities; abstract classes can also carry shared state.
 - An interface can extend many other interfaces; an abstract class cannot extend anything
   > Abstract classes can extend a class and implement interfaces.
 - They are exactly the same since Java 8 added default methods
-  > Default methods narrow the gap a little, but they remain distinct concepts.`}
+  > Default methods narrow the gap a little, but they remain distinct concepts.
+- [o] An interface has no instance state; an abstract class may have fields, a constructor, and concrete methods
+  > Interfaces describe capabilities; abstract classes can also carry shared state.
+- An interface can have a constructor; an abstract class cannot
+  > Reversed.`}
 />

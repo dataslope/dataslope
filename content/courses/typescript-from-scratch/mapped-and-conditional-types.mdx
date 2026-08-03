@@ -466,12 +466,12 @@ type Result = Wrap<"a" | "b">;
 \`\`\`
 What is \`Result\`?
 
-- \`{ value: "a" | "b" }\`
-  > This would be true if the conditional didn't distribute. But it does.
 - [o] \`{ value: "a" } | { value: "b" }\`
   > The conditional distributes over the union, producing two separate object types, then unioning them.
 - \`never\`
   > The condition \`T extends any\` is always true, so we always get the true branch.
+- \`{ value: "a" | "b" }\`
+  > This would be true if the conditional didn't distribute. But it does.
 
 Conditional types distribute over naked type parameters when given a union, applying the logic to each member separately.`}
 />
@@ -488,12 +488,12 @@ type Result = Test<{ a: number; 0: string }>;
 \`\`\`
 What properties does \`Result\` have?
 
-- Both \`a\` and \`0\`
-  > Remapping with \`never\` filters out that key. Since \`0\` is a number key, it's excluded.
-- [o] Only \`a\`
-  > The remapping \`K extends string ? K : never\` keeps only string keys. The numeric key \`0\` is mapped to \`never\` and omitted.
 - Neither (empty object)
   > \`a\` is a string key, so it passes the filter.
+- [o] Only \`a\`
+  > The remapping \`K extends string ? K : never\` keeps only string keys. The numeric key \`0\` is mapped to \`never\` and omitted.
+- Both \`a\` and \`0\`
+  > Remapping with \`never\` filters out that key. Since \`0\` is a number key, it's excluded.
 
 Key remapping with \`never\` is a powerful technique for filtering properties.`}
 />

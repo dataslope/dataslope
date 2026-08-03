@@ -562,44 +562,44 @@ int main() {
 
 <MultipleChoice markdown={`What is the average-case time complexity for lookup in a well-sized hash table?
 
-- O(n)
-  > This is possible in the worst case, but not the expected average for a healthy table.
-- [o] O(1)
-  > A good hash function and controlled load factor make lookup constant on average.
 - O(log n)
   > This is typical of balanced binary search trees.
 - O(n log n)
-  > Sorting complexity is not the lookup cost here.`} />
+  > Sorting complexity is not the lookup cost here.
+- O(n)
+  > This is possible in the worst case, but not the expected average for a healthy table.
+- [o] O(1)
+  > A good hash function and controlled load factor make lookup constant on average.`} />
 
 <MultipleChoice markdown={`What does std::unordered_map use internally in the standard library model?
 
-- A sorted dynamic array
-  > That would preserve order, which unordered_map does not guarantee.
 - A stack
   > A stack only exposes the top element.
-- [o] A hash table with buckets
-  > Keys are hashed to choose buckets.
 - A linked list only
-  > Some implementations use nodes, but the core idea is bucketed hashing.`} />
+  > Some implementations use nodes, but the core idea is bucketed hashing.
+- A sorted dynamic array
+  > That would preserve order, which unordered_map does not guarantee.
+- [o] A hash table with buckets
+  > Keys are hashed to choose buckets.`} />
 
 <MultipleChoice markdown={`Why might std::map be preferred over std::unordered_map?
 
 - [o] It iterates keys in sorted order and supports ordered operations.
   > The tree structure keeps keys ordered.
-- It always has O(1) lookup.
-  > std::map lookup is O(log n), not O(1).
 - It uses no comparisons.
   > std::map relies on key comparison.
 - It cannot be modified after construction.
-  > std::map is mutable like other standard containers.`} />
+  > std::map is mutable like other standard containers.
+- It always has O(1) lookup.
+  > std::map lookup is O(log n), not O(1).`} />
 
 <MultipleChoice markdown={`What happens when two different keys hash to the same bucket?
 
+- The keys become equal.
+  > Equal hash values do not imply equal keys.
+- [o] The table resolves the collision with chaining or probing.
+  > Collision resolution is part of hash-table design.
 - The program must crash.
   > Collisions are normal and expected.
 - One key is silently deleted.
-  > Correct implementations preserve both keys.
-- [o] The table resolves the collision with chaining or probing.
-  > Collision resolution is part of hash-table design.
-- The keys become equal.
-  > Equal hash values do not imply equal keys.`} />
+  > Correct implementations preserve both keys.`} />

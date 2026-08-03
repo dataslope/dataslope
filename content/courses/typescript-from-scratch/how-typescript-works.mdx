@@ -363,14 +363,14 @@ The types never reach production. They're a *compile-time tool* for correctness 
 <MultipleChoice
   markdown={`What happens to TypeScript's type annotations at runtime?
 
-- They are checked by the JavaScript engine for validation
-  > JavaScript engines have no knowledge of TypeScript annotations; they only understand plain JavaScript.
-- They are converted into runtime type guards
-  > TypeScript does not generate any runtime checking code from annotations; type erasure removes them entirely.
 - [o] They are erased during compilation and do not exist in the emitted JavaScript
   > TypeScript performs type checking at *compile time*, then removes all type annotations before emitting JavaScript. The runtime behavior is identical to plain JS, there's no runtime type enforcement unless you add it yourself.
+- They are checked by the JavaScript engine for validation
+  > JavaScript engines have no knowledge of TypeScript annotations; they only understand plain JavaScript.
 - They are kept as comments in the JavaScript output
   > The emitter strips type annotations completely; they do not appear as comments or in any other form in the JavaScript output.
+- They are converted into runtime type guards
+  > TypeScript does not generate any runtime checking code from annotations; type erasure removes them entirely.
 
 This is why TypeScript is so fast and lightweight: it adds zero runtime overhead. The tradeoff is that you can't rely on TypeScript to validate data from external sources (like APIs), you need runtime validation for that.`}
 />

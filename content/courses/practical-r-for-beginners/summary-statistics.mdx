@@ -244,12 +244,12 @@ a plot.
 <MultipleChoice
   markdown={`Which measure of center is **robust to outliers**?
 
-- mean
-  > The mean is a measure of center, but it uses every value's magnitude, so one outlier can pull it far from the typical value.
 - variance
   > Variance measures *spread*, not center, and it is highly sensitive to outliers because it squares distances from the mean.
 - [o] median
   > The median only depends on the *position* of values, not their magnitude. A single extreme value can pull the mean a lot but barely move the median.
+- mean
+  > The mean is a measure of center, but it uses every value's magnitude, so one outlier can pull it far from the typical value.
 - range
   > Range measures *spread*, not center, and it is the most outlier-sensitive of all, it is defined entirely by the two most extreme values.`}
 />
@@ -259,10 +259,10 @@ a plot.
 
 - has more values
   > Standard deviation describes how spread out values are, not how many there are; the number of observations is captured by \`length()\` or \`n()\`, not by sd.
-- has higher values
-  > Both columns have the same mean (50), so neither has systematically higher values; the difference is in variability, not location.
 - [o] has values that are more spread out around 50
   > Standard deviation measures typical distance from the mean, bigger sd means values are scattered farther from the center.
+- has higher values
+  > Both columns have the same mean (50), so neither has systematically higher values; the difference is in variability, not location.
 - has fewer NAs
   > Missing values are tracked separately (e.g., with \`is.na()\`) and have no systematic relationship to the standard deviation.`}
 />
@@ -270,14 +270,14 @@ a plot.
 <MultipleChoice
   markdown={`Anscombe's quartet is famous because it shows:
 
-- That R has poor numerical precision.
-  > Anscombe's quartet was constructed by hand in 1973, long before R existed, specifically to demonstrate the limits of summary statistics, not any computing platform's precision.
-- [o] Four very different datasets can share nearly identical summary statistics, proving you must visualize, not just summarize.
-  > It's the canonical reminder that summaries compress; plots reveal.
 - That correlation always implies causation.
   > The quartet demonstrates that identical statistics can mask completely different relationships, correlation vs. causation is a separate (though related) lesson.
 - That outliers should be removed.
-  > One of the four datasets does contain an influential point, but the quartet's lesson is about visualizing data, not a prescription to remove outliers.`}
+  > One of the four datasets does contain an influential point, but the quartet's lesson is about visualizing data, not a prescription to remove outliers.
+- That R has poor numerical precision.
+  > Anscombe's quartet was constructed by hand in 1973, long before R existed, specifically to demonstrate the limits of summary statistics, not any computing platform's precision.
+- [o] Four very different datasets can share nearly identical summary statistics, proving you must visualize, not just summarize.
+  > It's the canonical reminder that summaries compress; plots reveal.`}
 />
 
 ## Mini challenge: describe a column

@@ -415,14 +415,14 @@ print("\\nHeight can exceed 1; AREA never does.")
 <MultipleChoice
   markdown={`For a continuous random variable \`X\`, what is \`P(X = 7.0)\`, the probability it equals exactly 7.0?
 
-- It equals the height of the PDF at 7.0
-  > The PDF height is a density, not a probability; a single point still has zero width and so zero area.
-- [o] It is 0, because a single exact point has zero width and therefore zero area under the PDF
-  > With infinitely many possible values, all probability lives in intervals (areas); any individual point contributes zero, so we ask about ranges instead.
 - It is small but positive, roughly the PDF height times a tiny number
   > For a truly continuous variable the probability of an exact value is exactly zero, not merely small.
+- It equals the height of the PDF at 7.0
+  > The PDF height is a density, not a probability; a single point still has zero width and so zero area.
 - It cannot be computed without more information
   > It can be stated immediately: for any continuous distribution the probability of an exact point is zero.
+- [o] It is 0, because a single exact point has zero width and therefore zero area under the PDF
+  > With infinitely many possible values, all probability lives in intervals (areas); any individual point contributes zero, so we ask about ranges instead.
 
 For continuous variables, always ask about an interval, never an exact value.`}
 />
@@ -430,14 +430,14 @@ For continuous variables, always ask about an interval, never an exact value.`}
 <MultipleChoice
   markdown={`You plot the PDF of a \`Uniform(0, 0.5)\` distribution and notice the density is **2** across the whole interval. What does this tell you?
 
-- The plot is wrong, because a probability can never exceed 1
-  > A *probability* can't exceed 1, but this is a *density* (a height), and densities can exceed 1; nothing is wrong.
-- The probability of landing in that interval is 2
-  > Probability is the area, here \`2 × 0.5 = 1\`, not the height of 2.
 - [o] The density height (2) is fine because what must equal 1 is the area: 2 × 0.5 = 1
   > Over a narrow interval the curve must rise above 1 so that its total area still integrates to exactly 1, which is the only constraint on a PDF.
 - The distribution is invalid and should be renormalized
   > It is already a valid, normalized PDF; its area is exactly 1, so no renormalization is needed.
+- The probability of landing in that interval is 2
+  > Probability is the area, here \`2 × 0.5 = 1\`, not the height of 2.
+- The plot is wrong, because a probability can never exceed 1
+  > A *probability* can't exceed 1, but this is a *density* (a height), and densities can exceed 1; nothing is wrong.
 
 A skinny interval forces a tall density so the total area stays at 1, height is not probability.`}
 />
@@ -445,14 +445,14 @@ A skinny interval forces a tall density so the total area stays at 1, height is 
 <MultipleChoice
   markdown={`Wait times are \`Exponential\` with mean 5 minutes (\`d = stats.expon(scale=5)\`). Which expression gives the probability the wait is **between 2 and 8 minutes**?
 
-- \`d.pdf(8) - d.pdf(2)\`
-  > Subtracting PDF heights is meaningless; interval probability comes from the CDF (areas), not the PDF.
-- [o] \`d.cdf(8) - d.cdf(2)\`
-  > The CDF gives the area to the left of a value, so the difference \`cdf(8) - cdf(2)\` is exactly the area between 2 and 8, the interval probability.
 - \`d.cdf(8) + d.cdf(2)\`
   > Adding the two left-tail areas double-counts the region below 2 and overshoots; you need the difference.
 - \`d.ppf(8) - d.ppf(2)\`
   > \`ppf\` takes probabilities (between 0 and 1), so feeding it 2 and 8 is invalid; it returns values, not probabilities.
+- [o] \`d.cdf(8) - d.cdf(2)\`
+  > The CDF gives the area to the left of a value, so the difference \`cdf(8) - cdf(2)\` is exactly the area between 2 and 8, the interval probability.
+- \`d.pdf(8) - d.pdf(2)\`
+  > Subtracting PDF heights is meaningless; interval probability comes from the CDF (areas), not the PDF.
 
 \`cdf(b) - cdf(a)\` is the universal recipe for \`P(a < X < b)\`.`}
 />
@@ -460,12 +460,12 @@ A skinny interval forces a tall density so the total area stays at 1, height is 
 <MultipleChoice
   markdown={`You need the value below which **95%** of a normal variable's outcomes fall (the 95th percentile). Which scipy method do you use?
 
-- \`d.cdf(0.95)\`
-  > \`cdf\` maps a *value* to a probability; passing 0.95 treats it as a value, giving the area below 0.95, not a percentile.
 - [o] \`d.ppf(0.95)\`
   > The percent-point function is the inverse of the CDF: given the probability 0.95 it returns the value with 95% of outcomes below it, exactly the 95th percentile.
 - \`d.sf(0.95)\`
   > \`sf\` is the right-tail probability for a *value* (1 − cdf), not a way to recover a percentile from a probability.
+- \`d.cdf(0.95)\`
+  > \`cdf\` maps a *value* to a probability; passing 0.95 treats it as a value, giving the area below 0.95, not a percentile.
 - \`d.pdf(0.95)\`
   > \`pdf\` returns a density height at the value 0.95 and has nothing to do with percentiles.
 
@@ -475,14 +475,14 @@ A skinny interval forces a tall density so the total area stays at 1, height is 
 <MultipleChoice
   markdown={`A teammate looks at a density plot, sees the curve peak at a height of 0.6 over the value 50, and concludes "there's a 60% chance the value is 50." What's the precise problem?
 
-- They should have read 50, not 0.6, as the probability
-  > Neither axis gives a point probability; the x-value 50 isn't a probability either.
-- Nothing, that's a correct reading of a density plot
-  > It is incorrect: a density height is not a probability, and a single point has zero probability.
 - The height should have been read off the x-axis instead
   > The error isn't which axis; it's treating a density (height) as a probability at all.
 - [o] A PDF height is a density, not a probability, and the chance of any single exact value is 0; probability is the area over an interval
   > The y-axis shows density, so its height can't be read as the chance of an exact value (which is zero for a continuous variable); only the area over a range is a probability.
+- They should have read 50, not 0.6, as the probability
+  > Neither axis gives a point probability; the x-value 50 isn't a probability either.
+- Nothing, that's a correct reading of a density plot
+  > It is incorrect: a density height is not a probability, and a single point has zero probability.
 
 Reading density heights as probabilities is the single most common error with continuous distributions.`}
 />

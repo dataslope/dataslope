@@ -96,12 +96,12 @@ warning sign that the table has lost track of what it is about.
 
 - A column heading like \`title\`.
   > A heading names an attribute; it is not a complete record.
-- [o] One specific book, with values such as title, author, and page count.
-  > A row is one complete record about the kind of thing the table stores.
+- The database file itself.
+  > The database can contain many tables; a row is much smaller than the whole database.
 - Every book title joined into one long piece of text.
   > A table stores separate records, not one giant combined value.
-- The database file itself.
-  > The database can contain many tables; a row is much smaller than the whole database.`}
+- [o] One specific book, with values such as title, author, and page count.
+  > A row is one complete record about the kind of thing the table stores.`}
 />
 
 ## The grain: what does one row mean?
@@ -149,12 +149,12 @@ flowchart LR
 <MultipleChoice
   markdown={`What does the **grain** of a table describe?
 
-- The color used to display the table.
-  > Grain is about meaning, not visual style.
 - [o] What one row in the table represents.
   > Grain answers the question, "Each row is one what?"
 - The number of columns in the table.
   > Column count is part of structure, but grain is the row-level meaning.
+- The color used to display the table.
+  > Grain is about meaning, not visual style.
 - Whether the table is stored on disk or in memory.
   > Storage location is separate from the table's grain.`}
 />
@@ -245,10 +245,10 @@ at.
 
 - A single value, like \`'Mochi'\`.
   > A single value is a cell, not a whole table.
-- [o] A named grid of rows and columns that stores facts about one kind of thing.
-  > A table organizes related records using a shared structure.
 - A command that always changes data.
   > SQL commands can read or change data, but a table is where data is stored.
+- [o] A named grid of rows and columns that stores facts about one kind of thing.
+  > A table organizes related records using a shared structure.
 - A guarantee that rows are sorted alphabetically.
   > Tables do not guarantee row order by themselves.`}
 />
@@ -258,23 +258,23 @@ at.
 
 - The schema is the first row, and the data is every row after it.
   > Column headings are not stored as the first data row.
-- [o] The schema is the structure; the data is the actual stored values.
-  > Schema describes columns and declared types, while data is the rows inside that structure.
+- There is no difference in SQLite.
+  > SQLite tables still have structure and contents, even though SQLite has flexible typing.
 - The schema is only for text values, and the data is only for numbers.
   > Both text and numbers can appear in data, and schema can describe many kinds of columns.
-- There is no difference in SQLite.
-  > SQLite tables still have structure and contents, even though SQLite has flexible typing.`}
+- [o] The schema is the structure; the data is the actual stored values.
+  > Schema describes columns and declared types, while data is the rows inside that structure.`}
 />
 
 <MultipleChoice
   markdown={`A table named \`orders\` turns out to have one row for each order *item*, not each order. What should you notice first?
 
-- The table automatically becomes invalid SQLite.
-  > SQLite can store the table; the issue is whether people understand what one row means.
-- [o] The table's grain is different from what its name suggests, and queries must account for that.
-  > Knowing what one row represents prevents wrong assumptions and wrong counts.
 - The table cannot contain numbers.
   > Row grain does not determine whether numbers can be stored.
+- [o] The table's grain is different from what its name suggests, and queries must account for that.
+  > Knowing what one row represents prevents wrong assumptions and wrong counts.
+- The table automatically becomes invalid SQLite.
+  > SQLite can store the table; the issue is whether people understand what one row means.
 - Every row must be deleted.
   > The data may be useful; the issue is understanding or redesigning the structure.`}
 />
@@ -284,10 +284,10 @@ at.
 
 - Every row has the same columns.
   > Shared columns are normal for a table.
-- [o] The same customer phone number is copied into many order rows.
-  > Repeated facts often belong in their own table and should be referenced instead of copied.
 - The table has a primary key.
   > A primary key is usually a good thing.
+- [o] The same customer phone number is copied into many order rows.
+  > Repeated facts often belong in their own table and should be referenced instead of copied.
 - The table stores one kind of thing.
   > One kind of thing is the goal, not a warning sign.`}
 />

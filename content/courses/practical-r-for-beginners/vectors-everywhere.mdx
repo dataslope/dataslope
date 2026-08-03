@@ -260,27 +260,27 @@ really starts to shine.
 <MultipleChoice
   markdown={`What does \`length(c("a", "b", "c"))\` return?
 
-- \`1\`
-  > \`length()\` counts the number of elements in the vector, not the number of characters; a three-element vector has length 3, not 1.
-- \`2\`
-  > The vector \`c("a", "b", "c")\` has three elements; there is no reason to expect 2.
 - [o] \`3\`
   > The vector has three character elements.
+- \`1\`
+  > \`length()\` counts the number of elements in the vector, not the number of characters; a three-element vector has length 3, not 1.
 - \`"abc"\`
-  > \`length()\` returns an integer count of elements; to concatenate elements into a single string, you would use \`paste(c("a","b","c"), collapse = "")\`.`}
+  > \`length()\` returns an integer count of elements; to concatenate elements into a single string, you would use \`paste(c("a","b","c"), collapse = "")\`.
+- \`2\`
+  > The vector \`c("a", "b", "c")\` has three elements; there is no reason to expect 2.`}
 />
 
 <MultipleChoice
   markdown={`What is the value of \`c(1, "two", TRUE)\`?
 
-- A list with three different types
-  > That would be \`list(1, "two", TRUE)\`, not \`c(...)\`.
+- A numeric vector: \`1 2 1\`
+  > The presence of the character \`"two"\` forces coercion all the way to character, not just numeric; \`TRUE\` becomes \`"TRUE"\` and 1 becomes \`"1"\`.
 - An error
   > R does not error on mixed-type \`c()\` calls; it silently coerces all elements to the most general type present.
+- A list with three different types
+  > That would be \`list(1, "two", TRUE)\`, not \`c(...)\`.
 - [o] A character vector: \`"1" "two" "TRUE"\`
-  > Mixing types with \`c()\` coerces everything to the most general type, in this case, character.
-- A numeric vector: \`1 2 1\`
-  > The presence of the character \`"two"\` forces coercion all the way to character, not just numeric; \`TRUE\` becomes \`"TRUE"\` and 1 becomes \`"1"\`.`}
+  > Mixing types with \`c()\` coerces everything to the most general type, in this case, character.`}
 />
 
 <MultipleChoice
@@ -288,14 +288,14 @@ really starts to shine.
 
 *Hint: in R a negative index does not count from the end (as in some languages), it drops that position.*
 
-- \`20\`
-  > That is \`x[2]\`. A negative index does not select the second element; it removes it.
-- \`40\`
-  > A negative index in R does not mean "second from the end" the way it does in some other languages.
+- \`50 40 30 10\` (reversed without the second)
+  > Negative indexing removes a position but does not reverse the remaining order.
 - [o] \`10 30 40 50\`
   > Negative indices in R mean *exclude this position*. \`x[-2]\` returns everything except the second element.
-- \`50 40 30 10\` (reversed without the second)
-  > Negative indexing removes a position but does not reverse the remaining order.`}
+- \`40\`
+  > A negative index in R does not mean "second from the end" the way it does in some other languages.
+- \`20\`
+  > That is \`x[2]\`. A negative index does not select the second element; it removes it.`}
 />
 
 ## Mini challenge: pick out the weekdays

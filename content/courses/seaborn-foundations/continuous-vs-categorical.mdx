@@ -131,14 +131,14 @@ measurement. You did not ask for either; the data's nature decided.
 instead of a discrete legend with separate swatches. What does that tell you
 about the column?
 
-- It is an ordinal categorical variable.
-  > Ordinal categories are still categories, Seaborn would give them distinct, ordered swatches, not a smooth colorbar.
-- [o] Seaborn is treating it as a continuous (numeric) variable.
-  > A colorbar is Seaborn's signal that it read the column as a number on a scale and mapped it to a smooth gradient rather than to distinct groups.
 - The column contains missing values.
   > Missing values don't switch Seaborn between a legend and a colorbar; the variable's type does.
 - You forgot to call \`set_theme\`.
   > The theme controls styling, not whether a variable is treated as continuous or categorical.
+- [o] Seaborn is treating it as a continuous (numeric) variable.
+  > A colorbar is Seaborn's signal that it read the column as a number on a scale and mapped it to a smooth gradient rather than to distinct groups.
+- It is an ordinal categorical variable.
+  > Ordinal categories are still categories, Seaborn would give them distinct, ordered swatches, not a smooth colorbar.
 
 A colorbar means "continuous gradient"; a set of discrete swatches means
 "categorical groups."`}
@@ -286,14 +286,14 @@ g = sns.catplot(
 <MultipleChoice
   markdown={`Which list contains **only continuous** variables?
 
-- \`species\`, \`island\`, \`sex\`
-  > These are all categorical labels (groups), not measured quantities.
 - [o] \`body_mass_g\`, \`flipper_length_mm\`, \`bill_length_mm\`
   > Each is a physical measurement on a scale where spacing and averages are meaningful, the definition of continuous.
-- \`day\`, \`time\`, \`smoker\`
-  > These name groups; \`day\` and \`time\` are even ordinal categories, but none is a measured quantity.
 - \`species\`, \`body_mass_g\`, \`day\`
   > This mixes a category (\`species\`), a continuous variable (\`body_mass_g\`), and another category (\`day\`).
+- \`species\`, \`island\`, \`sex\`
+  > These are all categorical labels (groups), not measured quantities.
+- \`day\`, \`time\`, \`smoker\`
+  > These name groups; \`day\` and \`time\` are even ordinal categories, but none is a measured quantity.
 
 Continuous variables are measurements on a scale; you can meaningfully
 average them.`}
@@ -303,14 +303,14 @@ average them.`}
   markdown={`Why can't you take the **mean** of a nominal categorical variable like
 \`species\`?
 
-- Because pandas stores it as text, which is slow to average.
-  > Storage format isn't the reason, even if it were numeric codes, averaging the *labels* would be meaningless.
 - [o] Because its values are labels for groups, not quantities, so arithmetic on them has no meaning.
   > A "mean species" is undefined: the categories name groups, and there's no scale on which to add or divide them. You count or split by them instead.
-- Because Seaborn forbids it.
-  > This is a property of the data, not a Seaborn restriction.
+- Because pandas stores it as text, which is slow to average.
+  > Storage format isn't the reason, even if it were numeric codes, averaging the *labels* would be meaningless.
 - Because it has fewer than ten unique values.
   > The number of unique values doesn't determine whether averaging is meaningful, the variable's *type* does.
+- Because Seaborn forbids it.
+  > This is a property of the data, not a Seaborn restriction.
 
 For categorical variables you count occurrences or group the data; you don't
 average the labels.`}
@@ -321,14 +321,14 @@ average the labels.`}
 plot and Seaborn spreads it along a smooth continuous axis, but you wanted
 twelve discrete month slots. What's the cleanest fix?
 
-- Re-download the data in a different format.
-  > The data is fine; the issue is only how its *type* is interpreted.
-- Map \`month\` to \`hue\` instead of \`x\`.
-  > That changes what the chart shows and, since \`month\` is numeric, would give a gradient, not the discrete months you want.
 - [o] Use a categorical plot (\`catplot\`), pass an explicit \`order=\`, or convert the column with \`astype("category")\`.
   > Each of these tells Seaborn to treat \`month\` as discrete groups rather than a continuous measurement, which is the meaning you intended.
 - Sort the DataFrame by \`month\`.
   > Sorting changes row order, not whether \`month\` is treated as continuous or categorical.
+- Re-download the data in a different format.
+  > The data is fine; the issue is only how its *type* is interpreted.
+- Map \`month\` to \`hue\` instead of \`x\`.
+  > That changes what the chart shows and, since \`month\` is numeric, would give a gradient, not the discrete months you want.
 
 Seaborn reads the dtype, so when a numeric code is really a category you have
 to signal that, via \`catplot\`, \`order=\`, or \`astype("category")\`.`}
@@ -338,14 +338,14 @@ to signal that, via \`catplot\`, \`order=\`, or \`astype("category")\`.`}
   markdown={`You give \`hue\` a column with three text labels (\`"low"\`, \`"med"\`,
 \`"high"\`). How will Seaborn encode it?
 
-- As a continuous gradient with a colorbar.
-  > Gradients and colorbars are for continuous numeric columns; text labels are categorical.
-- [o] As three distinct colors with a category legend.
-  > Text labels are categorical, so Seaborn assigns each group its own color and builds a discrete legend.
-- It will raise an error because \`hue\` requires numbers.
-  > \`hue\` accepts categorical columns happily, that's one of its main uses.
 - It will average the three groups into one color.
   > Seaborn keeps the groups distinct; it never averages categories into a single color.
+- [o] As three distinct colors with a category legend.
+  > Text labels are categorical, so Seaborn assigns each group its own color and builds a discrete legend.
+- As a continuous gradient with a colorbar.
+  > Gradients and colorbars are for continuous numeric columns; text labels are categorical.
+- It will raise an error because \`hue\` requires numbers.
+  > \`hue\` accepts categorical columns happily, that's one of its main uses.
 
 Categorical \`hue\` → distinct colors + legend; continuous \`hue\` → gradient +
 colorbar.`}

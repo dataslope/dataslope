@@ -213,25 +213,25 @@ does not become another drift point.
 
 - The \`amount\` column has duplicate values stored in it.
   > The stored data is fine; the join is what duplicates it.
-- [o] The join fans out: each order's row repeats once per item, so its amount is summed multiple times.
-  > This is the classic fan trap, aggregating a "one"-side measure across a "many"-side join double counts it.
 - \`SUM\` can't be used with a \`JOIN\`.
   > \`SUM\` works over joins; the problem is the inflated row count, not the function.
 - The tables need an index.
-  > Indexes affect speed, not the arithmetic inflation from a one-to-many join.`}
+  > Indexes affect speed, not the arithmetic inflation from a one-to-many join.
+- [o] The join fans out: each order's row repeats once per item, so its amount is summed multiple times.
+  > This is the classic fan trap, aggregating a "one"-side measure across a "many"-side join double counts it.`}
 />
 
 <MultipleChoice
   markdown={`Which metric is **non-additive** across time?
 
-- Total revenue (\`SUM(amount)\`).
-  > Revenue sums correctly across days, months, and any dimension; it's additive.
+- Number of orders (\`COUNT(*)\`).
+  > A plain row count is additive across time.
 - Units sold (\`SUM(quantity)\`).
   > Counts of units add up across periods; additive.
 - [o] Monthly active users (\`COUNT(DISTINCT user_id)\`).
   > Distinct counts can't be summed across periods, a user active in two months would be double counted, so they must be recomputed per grain.
-- Number of orders (\`COUNT(*)\`).
-  > A plain row count is additive across time.`}
+- Total revenue (\`SUM(amount)\`).
+  > Revenue sums correctly across days, months, and any dimension; it's additive.`}
 />
 
 <MultipleChoice
@@ -239,12 +239,12 @@ does not become another drift point.
 
 - Give each team its own copy of the revenue SQL to maintain.
   > Independent copies are exactly how definitions drift apart; this makes it worse.
+- Refresh the dashboards more often.
+  > Frequency doesn't reconcile two different definitions; they'll still disagree.
 - [o] Define revenue once in a semantic layer / certified mart and have both dashboards query that definition.
   > A single governed definition means both tools compute revenue identically, eliminating drift.
 - Round both numbers to the nearest thousand.
-  > Rounding hides small gaps but not real definitional differences, and misleads.
-- Refresh the dashboards more often.
-  > Frequency doesn't reconcile two different definitions; they'll still disagree.`}
+  > Rounding hides small gaps but not real definitional differences, and misleads.`}
 />
 
 ## Go deeper

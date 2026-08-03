@@ -165,14 +165,14 @@ ggplot(mpg, aes(x = drv, y = class)) +
 <MultipleChoice
   markdown={`In a histogram, what does the bin width control, and why does it matter?
 
-- The color of the bars.
-  > Bin width has nothing to do with color.
-- The number of rows in the data set.
-  > The data is fixed; bin width only changes how it is grouped for display.
 - [o] How finely the continuous range is sliced before counting, too wide hides structure, too narrow makes the histogram noisy.
   > Bin width is the central choice; it can make one data set look smooth or spiky.
+- The number of rows in the data set.
+  > The data is fixed; bin width only changes how it is grouped for display.
 - Whether the x-axis is continuous or discrete.
   > The x variable is continuous regardless; bin width affects the grouping, not the type.
+- The color of the bars.
+  > Bin width has nothing to do with color.
 
 Because the histogram's stat bins then counts, the bin width is the
 knob that shapes the entire picture. Always set it deliberately.`}

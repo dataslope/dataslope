@@ -83,12 +83,12 @@ is still simple: the *combination* must be unique and not null.
 
 - One student from taking more than one course.
   > The same \`student_id\` can appear many times with different courses.
-- One course from having more than one student.
-  > The same \`course_id\` can appear many times with different students.
 - [o] The exact same student-course pairing from being inserted twice.
   > The combination of both values must be unique, so duplicates of the pair are rejected.
 - Students and courses from being joined in a query.
   > The key helps joins by making pairings reliable.
+- One course from having more than one student.
+  > The same \`course_id\` can appear many times with different students.
 
 The composite key protects the uniqueness of each relationship instance.`}
 />
@@ -259,14 +259,14 @@ page promised.
 <MultipleChoice
   markdown={`Which statement best describes a junction table?
 
-- A table that stores a copy of every column from two parent tables.
-  > Copying parent data would create duplication; the junction stores links.
-- [o] A table that stores one row per relationship instance, usually with foreign keys to both related tables.
-  > Each row represents one pairing between rows from the two sides.
-- A table that can never have its own columns beyond foreign keys.
-  > Junction tables often have attributes that describe the relationship itself.
 - A table used only for speeding up reports.
   > The purpose is modeling relationships and protecting integrity, not caching report output.
+- [o] A table that stores one row per relationship instance, usually with foreign keys to both related tables.
+  > Each row represents one pairing between rows from the two sides.
+- A table that stores a copy of every column from two parent tables.
+  > Copying parent data would create duplication; the junction stores links.
+- A table that can never have its own columns beyond foreign keys.
+  > Junction tables often have attributes that describe the relationship itself.
 
 A junction table makes each many-to-many pairing an ordinary row.`}
 />
@@ -291,10 +291,10 @@ Relationship attributes belong with the row that represents the relationship.`}
 
 - \`CHECK (id > 1000)\`
   > That checks the id value but says nothing about duplicate pairings.
-- [o] \`UNIQUE (student_id, course_id)\`
-  > The unique constraint keeps the same pair from appearing twice even when the primary key is a separate id.
 - \`UNIQUE (grade)\`
   > Many students can receive the same grade, so that uniqueness would be wrong.
+- [o] \`UNIQUE (student_id, course_id)\`
+  > The unique constraint keeps the same pair from appearing twice even when the primary key is a separate id.
 - \`CHECK (student_id = course_id)\`
   > Student ids and course ids identify different tables and should not be forced to match.
 

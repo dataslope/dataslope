@@ -171,14 +171,14 @@ separately, then divide.
 <MultipleChoice
   markdown={`An A/B test on 2 million users shows a **0.05%** lift in clicks with a p-value of \`0.001\`. What's the right read?
 
-- Ship it, a tiny p-value means a big, reliable win.
-  > A small p-value only says the effect is unlikely to be pure noise; it says nothing about the effect's *size*.
 - [o] It's statistically significant but likely not practically significant; weigh the 0.05% against costs.
   > Huge samples make trivial effects significant. Report the effect size and decide whether 0.05% is worth shipping.
 - The test is broken because the lift is so small.
   > A small effect isn't a bug; with enough data it can be measured precisely yet still be too small to matter.
 - A p-value of 0.001 means there's a 0.1% chance the null is true.
-  > The p-value is computed *assuming* the null; it isn't the probability that the null is true.`}
+  > The p-value is computed *assuming* the null; it isn't the probability that the null is true.
+- Ship it, a tiny p-value means a big, reliable win.
+  > A small p-value only says the effect is unlikely to be pure noise; it says nothing about the effect's *size*.`}
 />
 
 <MultipleChoice
@@ -199,12 +199,12 @@ separately, then divide.
 
 - Nothing; more add-to-cart clicks is always good.
   > Optimizing a single metric without protection let a harmful side effect (refunds) slip through.
-- [o] A guardrail metric like refund rate that must not degrade while the primary metric improves.
-  > Guardrails are defined up front to catch exactly this: a primary-metric win that damages the business elsewhere.
 - A larger sample size.
   > More data wouldn't have surfaced the refund problem; watching the right *metric* would.
 - A different chart type.
-  > Visualization isn't the gap; the missing piece is a guardrail metric on the experiment.`}
+  > Visualization isn't the gap; the missing piece is a guardrail metric on the experiment.
+- [o] A guardrail metric like refund rate that must not degrade while the primary metric improves.
+  > Guardrails are defined up front to catch exactly this: a primary-metric win that damages the business elsewhere.`}
 />
 
 ## Challenges

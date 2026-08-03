@@ -139,12 +139,12 @@ information that the missing side could not supply.
 
 - Nothing; they are identical.
   > They differ precisely on unmatched rows, so they are not identical.
-- [o] Every row from the left table, even those with no match in the right table (filling NULLs for the missing side).
-  > A left join preserves all left-table rows and supplies NULLs where the right table has no match.
-- Only rows that match in both tables.
-  > That is what an inner join keeps; a left join additionally keeps unmatched left rows.
 - Every row from the right table only.
   > Preserving all right-table rows describes a right join, not a left join.
+- Only rows that match in both tables.
+  > That is what an inner join keeps; a left join additionally keeps unmatched left rows.
+- [o] Every row from the left table, even those with no match in the right table (filling NULLs for the missing side).
+  > A left join preserves all left-table rows and supplies NULLs where the right table has no match.
 
 A left join preserves all left-table rows, using NULLs where the right side has no match.`}
 />
@@ -152,14 +152,14 @@ A left join preserves all left-table rows, using NULLs where the right side has 
 <MultipleChoice
   markdown={`In a \`LEFT JOIN\` of customers to orders, a customer with no orders appears with what in the order columns?
 
-- Zeros.
-  > A missing match is not represented as zero; zero would falsely imply a real \$0 order.
-- Empty strings.
-  > Numeric and id columns are not blanked to empty strings; the absence is marked differently.
-- [o] NULLs, marking that there was no matching order to supply those values.
-  > Outer joins fill unmatched columns with NULL, honestly signaling missing data.
 - The previous customer's order values.
   > Joins never borrow another row's values; unmatched columns become NULL.
+- Zeros.
+  > A missing match is not represented as zero; zero would falsely imply a real \$0 order.
+- [o] NULLs, marking that there was no matching order to supply those values.
+  > Outer joins fill unmatched columns with NULL, honestly signaling missing data.
+- Empty strings.
+  > Numeric and id columns are not blanked to empty strings; the absence is marked differently.
 
 Unmatched columns in an outer join are filled with NULL, the marker for absent values.`}
 />
@@ -169,12 +169,12 @@ Unmatched columns in an outer join are filled with NULL, the marker for absent v
 
 - An inner join between customers and orders.
   > An inner join drops order-less customers, so it can never reveal them.
-- [o] A \`LEFT JOIN\` from customers to orders, then \`WHERE o.id IS NULL\`.
-  > Keeping all customers and then filtering for the NULL (unmatched) side isolates those with no orders.
-- A \`LEFT JOIN\` then \`WHERE o.id IS NOT NULL\`.
-  > Testing \`IS NOT NULL\` keeps the matched customers, the opposite of who you want.
 - \`SELECT DISTINCT\` on the orders table.
   > The orders table only contains customers who *did* order, so it cannot list those who never did.
+- A \`LEFT JOIN\` then \`WHERE o.id IS NOT NULL\`.
+  > Testing \`IS NOT NULL\` keeps the matched customers, the opposite of who you want.
+- [o] A \`LEFT JOIN\` from customers to orders, then \`WHERE o.id IS NULL\`.
+  > Keeping all customers and then filtering for the NULL (unmatched) side isolates those with no orders.
 
 Outer-join everyone, then keep the rows whose match is NULL to find the unmatched customers.`}
 />
@@ -182,14 +182,14 @@ Outer-join everyone, then keep the rows whose match is NULL to find the unmatche
 <MultipleChoice
   markdown={`A \`FULL JOIN\` between two tables returns which rows?
 
-- Only the rows that match in both tables.
-  > That is an inner join; a full join is the most inclusive kind.
-- Only the left table's rows.
-  > Keeping just the left side is a left join; a full join keeps both sides.
 - [o] Every row from both tables, with NULLs wherever a row on one side has no match on the other.
   > A full join preserves unmatched rows from both tables, filling NULLs for the absent side.
 - No rows, because both sides must match.
   > A full join does not require matches; it includes everything from both tables.
+- Only the rows that match in both tables.
+  > That is an inner join; a full join is the most inclusive kind.
+- Only the left table's rows.
+  > Keeping just the left side is a left join; a full join keeps both sides.
 
 A full join keeps all rows from both tables, using NULLs where either side is unmatched.`}
 />

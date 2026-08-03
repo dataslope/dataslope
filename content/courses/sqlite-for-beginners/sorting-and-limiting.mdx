@@ -356,12 +356,12 @@ LIMIT
 
 - WHERE
   > WHERE filters rows; it does not sort them.
+- SELECT
+  > SELECT chooses columns, not row order.
 - [o] ORDER BY
   > ORDER BY arranges result rows by one or more columns.
 - LIMIT
-  > LIMIT controls how many rows are returned.
-- SELECT
-  > SELECT chooses columns, not row order.`}
+  > LIMIT controls how many rows are returned.`}
 />
 
 <MultipleChoice
@@ -369,10 +369,10 @@ LIMIT
 
 - LIMIT cannot run without ORDER BY.
   > SQLite allows LIMIT without ORDER BY, but the meaning is weak.
-- [o] Rows have no reliable natural order, so sorting makes the chosen rows meaningful.
-  > ORDER BY defines which rows count as first, cheapest, newest, or top.
 - ORDER BY deletes extra rows.
   > LIMIT trims the result; ORDER BY only sorts it.
+- [o] Rows have no reliable natural order, so sorting makes the chosen rows meaningful.
+  > ORDER BY defines which rows count as first, cheapest, newest, or top.
 - LIMIT changes ascending order into descending order.
   > ASC and DESC control sort direction.`}
 />
@@ -384,21 +384,21 @@ LIMIT
   > LIMIT 2 returns only two rows.
 - [o] Skips the first two rows and returns the next two.
   > OFFSET skips rows before LIMIT takes rows.
-- Skips the first four rows.
-  > OFFSET 2 skips two, not four.
 - Returns every row except the first two.
-  > LIMIT 2 still caps the result at two rows.`}
+  > LIMIT 2 still caps the result at two rows.
+- Skips the first four rows.
+  > OFFSET 2 skips two, not four.`}
 />
 
 <MultipleChoice
   markdown={`In ORDER BY genre ASC, price DESC, what is the first priority?
 
-- price descending
-  > Price is the second key, so it breaks ties within a genre.
-- [o] genre ascending
-  > The first expression in ORDER BY is the primary sort key.
 - title alphabetical
   > Title is not listed in the ORDER BY clause.
 - row insertion order
-  > ORDER BY replaces any reliance on insertion order.`}
+  > ORDER BY replaces any reliance on insertion order.
+- [o] genre ascending
+  > The first expression in ORDER BY is the primary sort key.
+- price descending
+  > Price is the second key, so it breaks ties within a genre.`}
 />

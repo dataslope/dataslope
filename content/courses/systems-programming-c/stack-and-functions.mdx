@@ -415,14 +415,14 @@ int main(void) {
 <MultipleChoice
   markdown={`A function declares \`char buf[8 * 1024 * 1024];\` as a local variable on a platform with a 1 MB stack. What is the most likely outcome?
 
-- The compiler silently moves the array to the heap.
-  > Compilers do not silently change storage class.
-- The OS automatically grows the stack to fit.
-  > Most OSes have a fixed stack limit per thread.
 - The variable is allocated successfully but slowly.
   > The allocation is just a stack-pointer adjustment; size, not speed, is the issue.
+- The OS automatically grows the stack to fit.
+  > Most OSes have a fixed stack limit per thread.
 - [o] The program runs out of stack and crashes (stack overflow).
-  > Large buffers belong on the heap (\`malloc\`), not on the stack.`}
+  > Large buffers belong on the heap (\`malloc\`), not on the stack.
+- The compiler silently moves the array to the heap.
+  > Compilers do not silently change storage class.`}
 />
 
 <MultipleChoice
@@ -435,25 +435,25 @@ char *greeting(void) {
 }
 \`\`\`
 
-- It allocates too few bytes for "Hello".
-  > 16 bytes is plenty.
-- It returns a string in the wrong encoding.
-  > Encoding is unrelated.
 - It forgets to null-terminate.
   > The literal "Hello" is already null-terminated.
+- It returns a string in the wrong encoding.
+  > Encoding is unrelated.
 - [o] It returns a pointer to a local array whose stack frame is destroyed the moment the function returns; the caller dereferences a dangling pointer.
-  > Either let the caller pass in a buffer or allocate on the heap and document the ownership.`}
+  > Either let the caller pass in a buffer or allocate on the heap and document the ownership.
+- It allocates too few bytes for "Hello".
+  > 16 bytes is plenty.`}
 />
 
 <MultipleChoice
   markdown={`Compared to the recursive \`fact_rec(n)\`, why is \`fact_iter(n)\` usually preferred in C?
 
-- It computes a different value (the iterative version is more accurate).
-  > Both compute the same value.
-- The compiler can vectorize iteration but never recursion.
-  > Vectorization is unrelated.
 - [o] It uses a constant number of stack frames regardless of \`n\`, eliminating the risk of stack overflow for large inputs.
   > Without guaranteed tail-call optimization, deep recursion is a real risk in C.
 - The recursive version is undefined behavior in standard C.
-  > It is perfectly well-defined.`}
+  > It is perfectly well-defined.
+- It computes a different value (the iterative version is more accurate).
+  > Both compute the same value.
+- The compiler can vectorize iteration but never recursion.
+  > Vectorization is unrelated.`}
 />

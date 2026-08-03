@@ -707,10 +707,10 @@ assert list(cs) == sorted(cs.tolist()), f"Sizes should be sorted ascending, got 
 
 - Each point is reassigned to its nearest center
   > Reassigning points to their nearest center is the *assign* step, not the *update* step. The two steps alternate: assign first, then update by moving each center to the mean of its assigned points.
-- [o] Each center is moved to the mean (average position) of the points currently assigned to it
-  > The update step recomputes every centroid as the mean of its members, which is why the method is called "k-means." The reassignment of points is the separate *assign* step.
 - A new random center is added to split the largest cluster
   > K-means never adds centers during iteration. The number of centers is fixed at \`k\` from the start; the algorithm only moves existing centers, it does not create new ones.
+- [o] Each center is moved to the mean (average position) of the points currently assigned to it
+  > The update step recomputes every centroid as the mean of its members, which is why the method is called "k-means." The reassignment of points is the separate *assign* step.
 - The number of clusters \`k\` is recalculated from the data
   > K-means requires the user to specify \`k\` before running; it does not determine the number of clusters automatically. The update step only repositions existing centers.
 
@@ -720,14 +720,14 @@ The loop alternates: assign points to nearest centers, then move centers to the 
 <MultipleChoice
   markdown={`Why does \`KMeans\` use \`n_init=10\` by recommendation rather than running just once?
 
-- It makes the clusters perfectly spherical
-  > Running multiple initializations does not change the shape of clusters. K-means always produces roughly spherical clusters due to its "nearest center" rule; multiple starts only help find a better local optimum.
 - It is required to compute inertia
   > Inertia is simply the sum of squared distances from each point to its assigned center; it can be computed after a single run. Multiple initializations are not required to calculate it.
-- [o] A single random start can settle into a poor local optimum, so k-means runs several times from different starts and keeps the lowest-inertia result
-  > The loop only finds a local optimum that depends on where the centers started. Multiple restarts make a bad outcome far less likely, and the best (tightest) run is returned.
 - It automatically determines the correct number of clusters
   > K-means never determines the number of clusters; that is always specified by the user via the \`n_clusters\` parameter. Multiple initializations improve convergence to a good solution for a given \`k\`, not the choice of \`k\` itself.
+- [o] A single random start can settle into a poor local optimum, so k-means runs several times from different starts and keeps the lowest-inertia result
+  > The loop only finds a local optimum that depends on where the centers started. Multiple restarts make a bad outcome far less likely, and the best (tightest) run is returned.
+- It makes the clusters perfectly spherical
+  > Running multiple initializations does not change the shape of clusters. K-means always produces roughly spherical clusters due to its "nearest center" rule; multiple starts only help find a better local optimum.
 
 Multiple initializations are cheap insurance against an unlucky starting configuration.`}
 />
@@ -735,10 +735,10 @@ Multiple initializations are cheap insurance against an unlucky starting configu
 <MultipleChoice
   markdown={`You compute inertia for \`k = 1, 2, ..., 10\` and notice it keeps decreasing as \`k\` grows. Can you choose the best \`k\` by simply picking the one with the lowest inertia?
 
-- Yes, lowest inertia is always the best clustering
-  > Minimizing inertia across different values of \`k\` always points to the highest \`k\` tried, because adding more centers always reduces inertia. The minimum is only meaningful at a fixed \`k\`.
 - [o] No, inertia always decreases as \`k\` increases (reaching zero when every point is its own cluster), so you look for the "elbow" where the decrease sharply slows instead
   > Minimizing inertia alone always pushes \`k\` toward the number of points, which is useless. The elbow, the bend after which extra clusters barely help, is the informative signal.
+- Yes, lowest inertia is always the best clustering
+  > Minimizing inertia across different values of \`k\` always points to the highest \`k\` tried, because adding more centers always reduces inertia. The minimum is only meaningful at a fixed \`k\`.
 - No, inertia is meaningless and should never be used
   > Inertia is a useful diagnostic, it measures how tightly points cluster around their centers. The issue is not that inertia is meaningless but that comparing raw inertia across different values of \`k\` does not identify the best number of clusters.
 - Yes, but only if you also standardize the features
@@ -750,14 +750,14 @@ Inertia is useful for finding the elbow, not for being minimized across differen
 <MultipleChoice
   markdown={`You run k-means on \`make_moons\` (two interleaving crescents) with \`k=2\` and the result splits each crescent in half rather than separating the two moons. What is the best explanation?
 
-- The data needs more samples
-  > The number of samples does not change the fundamental limitation. K-means uses "nearest center" assignments, which always produce convex, approximately spherical regions regardless of how much data is provided.
-- You forgot to set \`random_state\`
-  > Setting \`random_state\` only makes results reproducible; it does not change the type of clusters k-means can find. The failure on crescent shapes occurs regardless of the random seed.
 - [o] K-means assigns points to the nearest center, so its clusters are effectively round regions, it cannot capture crescent shapes no matter how it is tuned
   > The "nearest center" rule carves space into convex, roughly spherical regions. Non-spherical shapes like crescents violate that assumption, so k-means mixes the true groups. A connectivity- or density-based method is appropriate instead.
+- The data needs more samples
+  > The number of samples does not change the fundamental limitation. K-means uses "nearest center" assignments, which always produce convex, approximately spherical regions regardless of how much data is provided.
 - The inertia was too low
   > Low inertia means points are close to their centers, which sounds desirable. But on crescent-shaped data the problem is not inertia, it is that "nearest center" can only produce spherical regions that are the wrong shape for these clusters.
+- You forgot to set \`random_state\`
+  > Setting \`random_state\` only makes results reproducible; it does not change the type of clusters k-means can find. The failure on crescent shapes occurs regardless of the random seed.
 
 This failure is structural, not a tuning problem, it reflects k-means's spherical-cluster assumption.`}
 />
@@ -765,10 +765,10 @@ This failure is structural, not a tuning problem, it reflects k-means's spherica
 <MultipleChoice
   markdown={`You cluster customers using \`age\` (roughly 18–80) and \`annual_income\` (roughly 20,000–200,000) without scaling. What is the likely consequence?
 
-- Age will dominate because it has fewer digits
-  > K-means uses Euclidean distance, which is driven by the absolute magnitude of differences, not the number of digits. Income's values are thousands of times larger than age values, so income, not age, dominates the distances.
 - The clustering will be unaffected by feature scale
   > K-means distance calculations are directly affected by feature scale. A feature with values in the tens of thousands contributes far more to Euclidean distance than one with values in the tens, even if both are equally informative.
+- Age will dominate because it has fewer digits
+  > K-means uses Euclidean distance, which is driven by the absolute magnitude of differences, not the number of digits. Income's values are thousands of times larger than age values, so income, not age, dominates the distances.
 - [o] Income will dominate the distance calculations because its values are far larger, so the clusters form almost entirely along income and age is effectively ignored
   > Euclidean distance is driven by the feature with the largest numeric spread. Without standardizing, income's tens-of-thousands range swamps age's tens-range, so age barely influences the result.
 - K-means will raise an error about unscaled features

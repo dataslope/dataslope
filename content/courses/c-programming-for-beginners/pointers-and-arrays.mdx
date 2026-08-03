@@ -348,12 +348,12 @@ int main(void) {
 
 *Hint: \`a[3]\` is a value. Which option gives you an address instead?*
 
-- \`p[3]\`
-  > Since \`p\` points at \`a\`'s first element, \`p[3]\` indexes the same element as \`a[3]\` and yields its value.
-- \`*(p + 3)\`
-  > \`p + 3\` is the address of the fourth element; the leading \`*\` dereferences it, giving the same value as \`a[3]\`.
 - \`*(a + 3)\`
   > This is the definition the compiler uses for \`a[3]\` itself: add \`3\`, then dereference. Same value.
+- \`*(p + 3)\`
+  > \`p + 3\` is the address of the fourth element; the leading \`*\` dereferences it, giving the same value as \`a[3]\`.
+- \`p[3]\`
+  > Since \`p\` points at \`a\`'s first element, \`p[3]\` indexes the same element as \`a[3]\` and yields its value.
 - [o] \`a + 3\`
   > \`a + 3\` is the **address** of the fourth element, not its value. It has no dereference (\`*\`), so it is the one option that differs from \`a[3]\`.
 
@@ -370,14 +370,14 @@ void show(int arr[]) {
 }
 \`\`\`
 
+- C functions cannot compute the length of an array under any circumstances.
+  > Functions can, but only if the caller passes the length explicitly.
 - The compiler can't compute \`sizeof\` at runtime.
   > \`sizeof\` is evaluated at compile time, not runtime. The real issue is that the compile-time type of \`arr\` inside the function is already a pointer, so \`sizeof\` returns the pointer's size, not the array's.
 - The function should declare \`arr\` as \`int *arr\` instead.
   > Actually \`int arr[]\` and \`int *arr\` mean exactly the same thing in a function parameter.
 - [o] Inside the function, \`arr\` is a pointer, not an array. \`sizeof(arr)\` is the size of a pointer (typically 8), not the array's total size.
   > When an array is passed to a function, it decays to a pointer to its first element, and the size information is lost.
-- C functions cannot compute the length of an array under any circumstances.
-  > Functions can, but only if the caller passes the length explicitly.
 
 This is why nearly every C function that takes an array also takes a length parameter, and why \`strlen\` is implemented by *scanning for \`\\0\`* rather than by reading a stored length.`}
 />

@@ -342,14 +342,14 @@ assert variance([3, 3, 3]) == 0`,
 <MultipleChoice
   markdown={`What is the purpose of \`if __name__ == "__main__":\` at the bottom of a module?
 
-- It prevents the file from being imported at all.
-  > No, it is the opposite: it lets the file be safely imported **without** running the script code.
-- [o] It runs the indented block only when the file is executed directly, not when it is imported.
-  > When imported, \`__name__\` is the module name, not \`"__main__"\`, so the block is skipped.
 - It is required syntax in every Python script.
   > No, it is a convention, not a requirement. But it is a **very strong** convention.
+- [o] It runs the indented block only when the file is executed directly, not when it is imported.
+  > When imported, \`__name__\` is the module name, not \`"__main__"\`, so the block is skipped.
 - It is the entry point recognized by Python's package installer.
-  > No, package installers look for entry points in \`setup.py\` or \`pyproject.toml\`, not this idiom.`}
+  > No, package installers look for entry points in \`setup.py\` or \`pyproject.toml\`, not this idiom.
+- It prevents the file from being imported at all.
+  > No, it is the opposite: it lets the file be safely imported **without** running the script code.`}
 />
 
 <MultipleChoice
@@ -357,10 +357,10 @@ assert variance([3, 3, 3]) == 0`,
 
 - The module is re-executed from scratch.
   > No, modules are only executed once.
-- [o] Python returns the cached module from \`sys.modules\`.
-  > Modules are cached after the first import. Subsequent imports are nearly free.
 - A \`ImportError\` is raised (duplicate import).
   > No, importing the same module multiple times is perfectly fine.
+- [o] Python returns the cached module from \`sys.modules\`.
+  > Modules are cached after the first import. Subsequent imports are nearly free.
 - The module is reloaded from disk with the latest changes.
   > No, you must use \`importlib.reload(foo)\` to reload a module.`}
 />
@@ -368,27 +368,27 @@ assert variance([3, 3, 3]) == 0`,
 <MultipleChoice
   markdown={`Which import style is generally preferred for readability?
 
+- All three are equally good.
+  > No, \`from math import *\` is widely considered an anti-pattern.
 - \`from math import *\`
   > No, this is considered bad practice because it pollutes the namespace and hides where names come from.
 - \`from math import sqrt, cos, sin, tan, log, exp, pi, e\`
   > This can be okay, but if you're importing many names, \`import math\` is clearer.
 - [o] \`import math\` (then call \`math.sqrt(...)\`)
-  > This is the clearest: every call to \`math.sqrt\` tells the reader exactly where it comes from.
-- All three are equally good.
-  > No, \`from math import *\` is widely considered an anti-pattern.`}
+  > This is the clearest: every call to \`math.sqrt\` tells the reader exactly where it comes from.`}
 />
 
 <MultipleChoice
   markdown={`Where does Python search for modules when you \`import foo\`?
 
-- Only the current directory.
-  > No, Python searches all directories in \`sys.path\`, not just the current one.
+- Only installed packages from \`pip install\`.
+  > No, \`sys.path\` also includes the current directory and \`PYTHONPATH\`.
 - [o] All directories in \`sys.path\`, which includes the current directory, \`PYTHONPATH\`, and \`site-packages\`.
   > \`sys.path\` is a list of directories Python searches in order.
+- Only the current directory.
+  > No, Python searches all directories in \`sys.path\`, not just the current one.
 - Only the standard library.
-  > No, \`sys.path\` includes third-party packages and the current directory.
-- Only installed packages from \`pip install\`.
-  > No, \`sys.path\` also includes the current directory and \`PYTHONPATH\`.`}
+  > No, \`sys.path\` includes third-party packages and the current directory.`}
 />
 
 When something goes wrong inside that imported module, you need a way to handle the failure. That is what exceptions are for.

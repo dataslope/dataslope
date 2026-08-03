@@ -99,12 +99,12 @@ time. Either kind of drift breaks stationarity.
 
 - A stock's daily *price*, which wanders up over years
   > A price that drifts has a time-dependent mean (and often growing variance), the hallmark of non-stationarity. Prices are the classic non-stationary ("random walk") example.
-- Monthly *retail sales* with a rising trend and a December spike every year
-  > A rising trend means a drifting mean and the yearly spike means the distribution depends on the season, two violations at once. Clearly non-stationary.
 - [o] Daily *changes* in a stock's price, hovering around zero with a roughly constant spread
   > Differencing a price into day-to-day changes typically yields a series with a fixed (near-zero) mean and stable variance, approximately stationary. This is exactly why we model *returns* rather than *prices*.
 - A sensor reading whose fluctuations grow larger every year
   > Growing fluctuations are a time-dependent variance, which violates stationarity even if the mean stays flat.
+- Monthly *retail sales* with a rising trend and a December spike every year
+  > A rising trend means a drifting mean and the yearly spike means the distribution depends on the season, two violations at once. Clearly non-stationary.
 
 A flat mean *and* a stable variance (like price *changes*) is stationary; trends, seasonal spikes, and growing variance are not.`}
 />
@@ -290,14 +290,14 @@ test, same logic, different answers, because the data is different.
 <MultipleChoice
   markdown={`You run \`adfuller\` on a series and get a p-value of **0.78**. What do you conclude?
 
+- The series is definitely a random walk
+  > High p is *consistent* with a random walk but doesn't prove that specific model, only that stationarity couldn't be established. "Non-stationary" is the right, careful conclusion.
 - The series is stationary, because the p-value is high
   > This reverses the ADF logic. A *high* p-value means you could *not* reject the non-stationary null, it points to non-stationarity, not stationarity.
 - [o] You cannot reject the unit-root null, so you treat the series as non-stationary
   > With p = 0.78 there's no evidence against the null (which *is* non-stationarity), so the series is treated as non-stationary and likely needs differencing.
 - The test failed and the result is unusable
   > A p-value of 0.78 is a perfectly valid result; it simply indicates non-stationarity. Nothing failed.
-- The series is definitely a random walk
-  > High p is *consistent* with a random walk but doesn't prove that specific model, only that stationarity couldn't be established. "Non-stationary" is the right, careful conclusion.
 
 In the ADF test the null is non-stationarity, so a high p-value (here 0.78) means you can't reject it, treat the series as non-stationary.`}
 />
@@ -305,10 +305,10 @@ In the ADF test the null is non-stationarity, so a high p-value (here 0.78) mean
 <MultipleChoice
   markdown={`A colleague says: "My ADF p-value is 0.001, so I should difference the series to make it stationary." What's wrong?
 
-- Nothing, differencing is always a good idea
-  > Differencing a series that's *already* stationary ("over-differencing") adds noise and can hurt your model. It isn't free or always beneficial.
 - [o] A p-value of 0.001 already indicates the series IS stationary, so no differencing is needed, differencing it would over-difference
   > Low p means reject the non-stationary null: the series is stationary as-is. Differencing it anyway introduces artifacts (often a strong negative lag-1 autocorrelation) and is a mistake.
+- Nothing, differencing is always a good idea
+  > Differencing a series that's *already* stationary ("over-differencing") adds noise and can hurt your model. It isn't free or always beneficial.
 - The p-value should be compared to 0.5, not 0.05
   > The conventional threshold is 0.05 (sometimes 0.01), not 0.5. But the deeper error is the direction: p = 0.001 means *stop*, you're already stationary.
 - ADF p-values can't be that small
@@ -496,12 +496,12 @@ print("p_raw:", round(p_raw, 4), " p_stationary:", round(p_stationary, 4))
 <MultipleChoice
   markdown={`In plain terms, a series is **stationary** when:
 
-- Its values never change
-  > Stationary series fluctuate freely, often a lot. What stays fixed is the *statistical behavior* (mean, variance, autocorrelation), not the individual values.
 - It is always increasing at a steady rate
   > A steady increase is a *trend*, a drifting mean, which is the opposite of stationary.
 - [o] Its statistical properties (mean, variance, autocorrelation) stay constant over time, the rules generating it don't change
   > Constant mean and variance plus a lag-only autocorrelation structure is exactly stationarity: the data-generating "rules" hold still, so the past is representative of the future.
+- Its values never change
+  > Stationary series fluctuate freely, often a lot. What stays fixed is the *statistical behavior* (mean, variance, autocorrelation), not the individual values.
 - It has no random component at all
   > Stationary series are typically *full* of randomness (white noise is the purest example). Stationarity constrains how that randomness behaves over time, not whether it exists.
 
@@ -511,14 +511,14 @@ Stationarity is about constant statistical behavior over time, not constant valu
 <MultipleChoice
   markdown={`Why do classical models like AR and ARIMA *require* (approximate) stationarity?
 
+- Because non-stationary data cannot be stored in pandas
+  > pandas stores any series fine. The constraint is statistical, fixed-coefficient models need stable generating rules, not a storage limitation.
 - Because they run faster on stationary data
   > Speed isn't the reason. The requirement is about validity: the model's assumptions, not its runtime.
 - [o] They estimate fixed coefficients describing how a value relates to its past; those constants are only meaningful if that relationship doesn't drift over time
   > A fixed rule ("each value is ~0.7 of the previous plus a shock") can only be correct if the rule holds throughout. A trending mean or growing variance makes the "constant" relationship a moving target the coefficients can't capture.
 - Because stationary data has no noise to model
   > Stationary data is typically *mostly* noise; the models exist precisely to describe that noise's structure. Stationarity is about constancy, not the absence of noise.
-- Because non-stationary data cannot be stored in pandas
-  > pandas stores any series fine. The constraint is statistical, fixed-coefficient models need stable generating rules, not a storage limitation.
 
 Fixed-coefficient models assume a stable relationship through time, which is exactly what stationarity provides.`}
 />
@@ -526,14 +526,14 @@ Fixed-coefficient models assume a stable relationship through time, which is exa
 <MultipleChoice
   markdown={`Which is the correct ADF decision rule at the 5% level?
 
-- p-value > 0.05 -> stationary; p-value < 0.05 -> non-stationary
-  > This is backwards. The ADF *null* is non-stationarity, so a *small* p rejects it (stationary) and a *large* p fails to reject it (non-stationary).
-- [o] p-value < 0.05 -> reject the unit-root null -> stationary; p-value >= 0.05 -> fail to reject -> non-stationary
-  > Because the null is "has a unit root (non-stationary)," a small p-value is evidence *for* stationarity, and a large one leaves you treating the series as non-stationary.
-- Any p-value means the series is stationary
-  > The p-value's *magnitude* is the whole point; it discriminates between the two conclusions rather than always pointing one way.
 - The ADF test ignores p-values and uses only the mean
   > ADF produces a test statistic and p-value (and critical values). It does not decide based on the raw mean.
+- p-value > 0.05 -> stationary; p-value < 0.05 -> non-stationary
+  > This is backwards. The ADF *null* is non-stationarity, so a *small* p rejects it (stationary) and a *large* p fails to reject it (non-stationary).
+- Any p-value means the series is stationary
+  > The p-value's *magnitude* is the whole point; it discriminates between the two conclusions rather than always pointing one way.
+- [o] p-value < 0.05 -> reject the unit-root null -> stationary; p-value >= 0.05 -> fail to reject -> non-stationary
+  > Because the null is "has a unit root (non-stationary)," a small p-value is evidence *for* stationarity, and a large one leaves you treating the series as non-stationary.
 
 Low p rejects the non-stationary null (stationary); high p fails to reject it (non-stationary).`}
 />
@@ -541,14 +541,14 @@ Low p rejects the non-stationary null (stationary); high p fails to reject it (n
 <MultipleChoice
   markdown={`You fail to reject the ADF null (p = 0.30) on a short series of 24 points. Which statement is most accurate?
 
-- This proves the series is non-stationary
-  > "Fail to reject" is not "prove." On a short series the test may simply lack the *power* to detect stationarity; absence of evidence isn't proof of the null.
-- [o] You couldn't establish stationarity; treat it as non-stationary, but note that on only 24 points the test has low power, so confirm with plots and rolling statistics
-  > A high p-value means no evidence against non-stationarity, so you act as if non-stationary, while remembering that short series make the test weak, so corroborating with eyes and rolling stats is essential.
-- The series must be differenced exactly twice
-  > Nothing in a single p-value prescribes a specific number of differences. You'd test after each difference, and often one (or zero) is right.
 - The test is invalid below 30 points
   > There's no hard cutoff that invalidates ADF; rather, *power* degrades on short series, making conclusions less reliable, a reason for caution, not invalidity.
+- The series must be differenced exactly twice
+  > Nothing in a single p-value prescribes a specific number of differences. You'd test after each difference, and often one (or zero) is right.
+- [o] You couldn't establish stationarity; treat it as non-stationary, but note that on only 24 points the test has low power, so confirm with plots and rolling statistics
+  > A high p-value means no evidence against non-stationarity, so you act as if non-stationary, while remembering that short series make the test weak, so corroborating with eyes and rolling stats is essential.
+- This proves the series is non-stationary
+  > "Fail to reject" is not "prove." On a short series the test may simply lack the *power* to detect stationarity; absence of evidence isn't proof of the null.
 
 Failing to reject means stationarity wasn't established (act as non-stationary), but low power on short series demands corroboration.`}
 />

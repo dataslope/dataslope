@@ -190,12 +190,12 @@ example, one red line and one green line with no other difference)?
 
 - Seaborn cannot draw two colors on the same axes.
   > Seaborn draws multiple colors easily; the concern is whether every reader can *tell them apart*.
+- It forces the chart to use a sequential palette.
+  > Palette type is an independent choice; relying on color alone is about redundancy of encoding, not which palette you picked.
 - [o] Readers with color-vision deficiency, or anyone viewing it in grayscale, may not be able to tell the groups apart.
   > Color alone fails for colorblind readers and in black-and-white printouts; a second channel like marker shape or a direct label keeps the distinction readable.
 - Colored lines are always less accurate than black lines.
   > Accuracy comes from the data and encoding, not the line color; the issue is perceptual distinguishability.
-- It forces the chart to use a sequential palette.
-  > Palette type is an independent choice; relying on color alone is about redundancy of encoding, not which palette you picked.
 
 Encode group identity with more than one channel so the message does not
 depend on a reader perceiving specific colors.`}
@@ -345,14 +345,14 @@ ax.set_title("Heavier penguins have longer flippers")
   markdown={`What best captures the difference between an **exploratory** and an
 **explanatory** chart?
 
-- Exploratory charts use Seaborn; explanatory charts use matplotlib.
-  > Both can be built with Seaborn plus light matplotlib polish; the difference is purpose, not library.
 - [o] Exploratory charts are for *you* to find what's interesting; explanatory charts are edited to deliver one takeaway to an audience.
   > Exploration is fast and disposable and answers "what's here?"; explanation is edited down to communicate a single point to someone else.
-- Exploratory charts must be black and white; explanatory charts must be colorful.
-  > Color is a design choice in both; it does not define the distinction.
 - Explanatory charts always contain more data than exploratory ones.
   > Explanatory charts usually contain *less*, they remove everything that isn't carrying the message.
+- Exploratory charts use Seaborn; explanatory charts use matplotlib.
+  > Both can be built with Seaborn plus light matplotlib polish; the difference is purpose, not library.
+- Exploratory charts must be black and white; explanatory charts must be colorful.
+  > Color is a design choice in both; it does not define the distinction.
 
 The split is about audience and intent: discovering for yourself versus
 communicating to others.`}
@@ -362,12 +362,12 @@ communicating to others.`}
   markdown={`On an explanatory chart, what is the most effective way to direct the
 reader's attention to the single most important group?
 
+- Add gridlines and a heavy border to frame the chart.
+  > Extra frame and gridlines are chartjunk that add ink without pointing the reader anywhere.
 - Give every group its own bright, distinct color.
   > Coloring everything makes all groups compete equally, so nothing stands out, the opposite of guiding attention.
 - [o] Use one accent color (or a short annotation) for that group and gray out the rest.
   > A single point of contrast against neutral context makes the eye land on the important element immediately while the rest still provides background.
-- Add gridlines and a heavy border to frame the chart.
-  > Extra frame and gridlines are chartjunk that add ink without pointing the reader anywhere.
 - Increase the figure size as much as possible.
   > A bigger canvas does not create focus; without contrast the reader still has nowhere in particular to look.
 
@@ -380,14 +380,14 @@ message and let everything else recede.`}
 the y-axis at 95 (the values are around 98 to 102) so the differences "look
 clearer." Why is this a problem?
 
-- Bar charts cannot have a numeric y-axis.
-  > Bar charts routinely use a numeric y-axis; the issue is *where* it starts.
-- Seaborn refuses to draw bars unless the axis starts at zero.
-  > Seaborn will draw whatever range you set; honesty here is your responsibility, not an enforced rule.
 - [o] A bar encodes value by length, so truncating the axis exaggerates small differences and misleads the reader.
   > Because the eye compares bar *lengths*, cutting off the bottom turns a few-percent gap into a dramatic-looking one; bars should start at zero.
+- Seaborn refuses to draw bars unless the axis starts at zero.
+  > Seaborn will draw whatever range you set; honesty here is your responsibility, not an enforced rule.
 - Truncating the axis is fine for bars but not for line plots.
   > It is the reverse: truncation can be a legitimate zoom on a *position*-based line plot, but it distorts length-based bars.
+- Bar charts cannot have a numeric y-axis.
+  > Bar charts routinely use a numeric y-axis; the issue is *where* it starts.
 
 Bars compare lengths, so a non-zero baseline inflates differences, keep bar
 axes anchored at zero.`}
@@ -398,14 +398,14 @@ axes anchored at zero.`}
 line, with no other difference between them. What is the best single
 improvement for accessibility?
 
-- Make both lines thicker.
-  > Thicker lines do not help a reader who cannot distinguish red from green; the groups still differ only by color.
-- Switch the background to dark.
-  > A dark background changes the look but does not add a non-color way to tell the two lines apart.
 - [o] Add a second distinguishing channel, different line styles or direct labels, and use a colorblind-friendly palette.
   > Encoding the difference with more than color (a dashed vs. solid line, or labeling each line) keeps the groups distinguishable for colorblind readers and in grayscale.
 - Remove the legend so readers focus on the lines.
   > Removing the legend makes the colors *harder* to interpret, not easier, and still leaves color as the only cue.
+- Switch the background to dark.
+  > A dark background changes the look but does not add a non-color way to tell the two lines apart.
+- Make both lines thicker.
+  > Thicker lines do not help a reader who cannot distinguish red from green; the groups still differ only by color.
 
 Never let color be the sole carrier of meaning; reinforce it with shape,
 labels, or facets, and prefer a colorblind-safe palette.`}

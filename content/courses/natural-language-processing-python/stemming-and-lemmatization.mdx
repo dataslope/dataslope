@@ -241,12 +241,12 @@ unchanged, while \`lemmatize("running", pos="v")\` returns "run"?
 
 - Because "running" has no lemma
   > "Running" does have a lemma, it is "run" as a verb, but the lemmatizer defaults to the noun part of speech, under which "running" is already a dictionary form and needs no reduction.
-- [o] The lemmatizer defaults to treating the word as a *noun*, and "running" is a valid noun, so it is left as-is; supplying \`pos="v"\` tells it to treat the word as a verb, whose lemma is "run"
-  > Lemmatization is part-of-speech sensitive. With the default noun assumption, "running" (a gerund/noun) is already a lemma. Only by specifying the verb reading does it reduce to "run". This is why POS tagging pairs naturally with lemmatization.
 - It is a bug in NLTK
   > The behavior is intentional, not a bug: without knowing the part of speech, the lemmatizer conservatively treats the word as a noun, and "running" is a valid English noun.
 - "running" and "run" are unrelated words
   > "Running" and "run" are different grammatical forms of the same verb; the lemmatizer correctly links them once told the word is a verb by passing \`pos="v"\`.
+- [o] The lemmatizer defaults to treating the word as a *noun*, and "running" is a valid noun, so it is left as-is; supplying \`pos="v"\` tells it to treat the word as a verb, whose lemma is "run"
+  > Lemmatization is part-of-speech sensitive. With the default noun assumption, "running" (a gerund/noun) is already a lemma. Only by specifying the verb reading does it reduce to "run". This is why POS tagging pairs naturally with lemmatization.
 
 The default-noun behavior trips up nearly everyone the first time; the fix is to pass the correct POS.`}
 />
@@ -387,14 +387,14 @@ assert isinstance(out, list) and len(out) == 3, "Got: " + repr(out)`,
 <MultipleChoice
   markdown={`Which statement correctly contrasts stemming and lemmatization?
 
-- Stemming uses a dictionary; lemmatization uses suffix rules
-  > The description is reversed: stemming applies suffix-stripping rules and needs no dictionary, while lemmatization looks words up in a lexical database (such as WordNet) to find the canonical form.
+- Lemmatization is always faster than stemming
+  > Stemming is generally faster because it only applies rule-based suffix stripping with no database lookup; lemmatization requires consulting a lexical resource like WordNet, making it slower.
 - [o] Stemming chops suffixes with fixed rules and may output non-words; lemmatization looks words up in a vocabulary and returns real dictionary forms (and benefits from knowing the part of speech)
   > That is the core distinction: rule-based chopping (fast, approximate, possibly non-words) versus dictionary lookup (slower, principled, real words, POS-aware). Reversing them is a common mix-up.
 - They are identical and interchangeable
   > They differ in mechanism (rules vs. dictionary), output (possibly non-words vs. always real words), speed, and accuracy on irregular forms, choosing between them is a real design decision.
-- Lemmatization is always faster than stemming
-  > Stemming is generally faster because it only applies rule-based suffix stripping with no database lookup; lemmatization requires consulting a lexical resource like WordNet, making it slower.
+- Stemming uses a dictionary; lemmatization uses suffix rules
+  > The description is reversed: stemming applies suffix-stripping rules and needs no dictionary, while lemmatization looks words up in a lexical database (such as WordNet) to find the canonical form.
 
 Mechanism, output, and cost all differ, and that difference drives the choice.`}
 />
@@ -408,10 +408,10 @@ is never shown to users. Which technique fits best?
   > Search/IR is the textbook case for stemming: huge volume, only stem-to-stem comparison, and no need for human-readable output. Lemmatization's accuracy is not worth its extra cost here.
 - Lemmatization, because real words are required for matching
   > Search matching only requires that the query and document forms reduce to the same key; the key never needs to be a real word, so the extra cost of lemmatization is not justified here.
-- Neither; search cannot use root reduction
-  > Root reduction is a standard and effective technique in search engines, where stemming both the query and the indexed documents lets variant forms of a word match each other.
 - Both must always be applied together
   > Stemming and lemmatization perform the same role, reducing words to a root, so applying both is redundant; the task calls for one or the other, not both.
+- Neither; search cannot use root reduction
+  > Root reduction is a standard and effective technique in search engines, where stemming both the query and the indexed documents lets variant forms of a word match each other.
 
 When the root is an internal key and scale matters, stemming is the pragmatic choice.`}
 />
@@ -419,14 +419,14 @@ When the root is an internal key and scale matters, stemming is the pragmatic ch
 <MultipleChoice
   markdown={`Why can a lemmatizer turn "was" into "be" while a stemmer cannot?
 
-- The stemmer is broken
-  > The stemmer is working exactly as designed: it strips suffixes and "was" has no suffix to strip that would produce "be", so it correctly leaves "was" largely unchanged.
 - [o] "was" → "be" is an irregular mapping that requires *knowing* the word (a dictionary lookup), not stripping a suffix; stemmers only remove endings
   > Lemmatization consults a lexical database that records irregular forms, so it can map "was/is/were/been" to "be" and "better" to "good". Stemming has no such knowledge, it only chops suffixes, which cannot transform "was" into "be".
-- Stemmers only work on nouns
-  > Stemmers process words of any part of speech; the limitation is not which parts of speech they accept but that they can only apply suffix-stripping rules, which fail on irregular forms.
 - "was" and "be" are unrelated
   > "Was" is the simple past tense of the verb "to be"; they are the same word in different tenses, and a lemmatizer with a lexical database correctly recognizes this relationship.
+- Stemmers only work on nouns
+  > Stemmers process words of any part of speech; the limitation is not which parts of speech they accept but that they can only apply suffix-stripping rules, which fail on irregular forms.
+- The stemmer is broken
+  > The stemmer is working exactly as designed: it strips suffixes and "was" has no suffix to strip that would produce "be", so it correctly leaves "was" largely unchanged.
 
 Dictionary knowledge is exactly what lets lemmatization handle irregulars that defeat suffix rules.`}
 />
@@ -434,14 +434,14 @@ Dictionary knowledge is exactly what lets lemmatization handle irregulars that d
 <MultipleChoice
   markdown={`What is **over-stemming**?
 
-- Running the stemmer more than once
-  > Running a stemmer repeatedly is an unusual practice but is not called over-stemming; over-stemming refers specifically to collapsing distinct words into the same stem.
-- [o] When the stemmer reduces *distinct* words (like "organ" and "organization") to the same stem, wrongly merging different meanings
-  > Over-stemming is excessive collapsing: unrelated words share a stem and become indistinguishable. It is one of the quality costs of crude rule-based stemming, and a reason lemmatization is preferred when meaning matters.
-- When a stem is longer than the original word
-  > A stem is always the same length as or shorter than the original word, since stemming works by removing endings; a stem that is longer than the input word cannot occur.
 - When lemmatization fails to change a word
   > A lemmatizer returning a word unchanged is its intended behavior for words already in base form; this is distinct from over-stemming, which is a property of stemmers, not lemmatizers.
+- Running the stemmer more than once
+  > Running a stemmer repeatedly is an unusual practice but is not called over-stemming; over-stemming refers specifically to collapsing distinct words into the same stem.
+- When a stem is longer than the original word
+  > A stem is always the same length as or shorter than the original word, since stemming works by removing endings; a stem that is longer than the input word cannot occur.
+- [o] When the stemmer reduces *distinct* words (like "organ" and "organization") to the same stem, wrongly merging different meanings
+  > Over-stemming is excessive collapsing: unrelated words share a stem and become indistinguishable. It is one of the quality costs of crude rule-based stemming, and a reason lemmatization is preferred when meaning matters.
 
 Aggressive suffix stripping sometimes glues together words that should stay separate.`}
 />

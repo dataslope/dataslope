@@ -80,10 +80,10 @@ The phrase `REFERENCES customers(id)` declares the relationship: each `orders.cu
   > The order has its own primary key in the \`id\` column.
 - [o] The order points to the customer whose \`id\` is 1.
   > The foreign key stores the related customer's primary key value.
-- The customer table has exactly one row.
-  > A foreign key value points to one customer row, but the table can contain many rows.
 - The order amount is 1.
   > The amount is stored in a separate column.
+- The customer table has exactly one row.
+  > A foreign key value points to one customer row, but the table can contain many rows.
 
 A foreign key value is a reference to a row in another table.`}
 />
@@ -202,14 +202,14 @@ flowchart TB
 <MultipleChoice
   markdown={`What is a foreign key?
 
-- A column that must contain a different value in every row of its own table.
-  > That describes uniqueness, often used by primary keys.
-- [o] A column that stores the primary key value of a related row in another table.
-  > A foreign key creates a reference from one table to another.
 - A special password for opening a table.
   > In databases, "key" means an identifying value or reference.
 - A column that stores all rows from another table.
   > A foreign key stores one value per row, not a whole table.
+- A column that must contain a different value in every row of its own table.
+  > That describes uniqueness, often used by primary keys.
+- [o] A column that stores the primary key value of a related row in another table.
+  > A foreign key creates a reference from one table to another.
 
 A foreign key links rows by storing another table's identifying value.`}
 />
@@ -217,14 +217,14 @@ A foreign key links rows by storing another table's identifying value.`}
 <MultipleChoice
   markdown={`In SQLite, what must you do if you want foreign-key constraints to be enforced?
 
-- Rename every foreign-key column to \`id\`.
-  > Column names do not turn enforcement on.
 - [o] Run \`PRAGMA foreign_keys = ON;\` for the connection.
   > SQLite enforces foreign keys only when this setting is enabled.
-- Use only text primary keys.
-  > Foreign keys can reference integer or text keys; the pragma controls enforcement.
 - Avoid primary keys completely.
   > Foreign keys normally point to primary keys or unique keys.
+- Rename every foreign-key column to \`id\`.
+  > Column names do not turn enforcement on.
+- Use only text primary keys.
+  > Foreign keys can reference integer or text keys; the pragma controls enforcement.
 
 SQLite needs foreign-key enforcement enabled before it will reject broken references.`}
 />
@@ -232,10 +232,10 @@ SQLite needs foreign-key enforcement enabled before it will reject broken refere
 <MultipleChoice
   markdown={`Why is \`customer_id\` better than copying \`customer_name\` into every order?
 
-- Customer names cannot be stored in SQLite.
-  > SQLite can store names as text.
 - [o] The id is stable and unique, while the customer's details can stay in one row.
   > Storing the id avoids duplicated customer data and keeps references reliable.
+- Customer names cannot be stored in SQLite.
+  > SQLite can store names as text.
 - Foreign keys make every query shorter.
   > Foreign keys help structure data, but queries still need clear joins.
 - It prevents a customer from having more than one order.
@@ -247,12 +247,12 @@ A stable id is a safer reference than repeated descriptive text.`}
 <MultipleChoice
   markdown={`What is an orphan order?
 
-- An order with two valid customers.
-  > A basic order usually points to one customer.
-- An order with a high amount.
-  > The amount does not determine whether a reference is valid.
 - [o] An order whose \`customer_id\` points to a customer row that does not exist.
   > The order's reference is dangling, so referential integrity is broken.
+- An order with a high amount.
+  > The amount does not determine whether a reference is valid.
+- An order with two valid customers.
+  > A basic order usually points to one customer.
 - A customer with no orders.
   > That customer may be valid; the missing reference is the problem for an orphan order.
 

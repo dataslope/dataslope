@@ -283,14 +283,14 @@ could plausibly be larger or smaller.
 
 *Hint: the true mean is a fixed (if unknown) number; what changes from study to study is the interval you compute.*
 
-- There is a 95% chance the true mean is between 45 and 55.
-  > A common misreading. The true mean is fixed, so it is either in this interval or not, the "95%" describes the long-run behavior of the procedure, not this one interval.
-- 95% of the data falls between 45 and 55.
-  > This describes the spread of individual data points, not the uncertainty about the mean. A CI is about the parameter, not the raw values.
 - [o] If we repeated the study many times and built CIs the same way each time, about 95% of those intervals would contain the true mean.
   > The interval is what varies across hypothetical repetitions, the true value is fixed.
 - The mean is exactly 50.
-  > A CI gives a range of plausible values; it does not pin the mean to the midpoint.`}
+  > A CI gives a range of plausible values; it does not pin the mean to the midpoint.
+- There is a 95% chance the true mean is between 45 and 55.
+  > A common misreading. The true mean is fixed, so it is either in this interval or not, the "95%" describes the long-run behavior of the procedure, not this one interval.
+- 95% of the data falls between 45 and 55.
+  > This describes the spread of individual data points, not the uncertainty about the mean. A CI is about the parameter, not the raw values.`}
 />
 
 <MultipleChoice
@@ -298,12 +298,12 @@ could plausibly be larger or smaller.
 
 *Hint: a p-value assumes the null hypothesis is true and asks how surprising the data would be under it, not how likely the null itself is.*
 
-- The probability the null hypothesis is true is 0.001.
-  > A p-value is computed *assuming* the null is true; it cannot also be the probability that the null is true.
-- The probability the finding is a fluke is 0.001.
-  > "Chance the finding is a fluke" is a probability about the hypothesis, which a p-value does not give. It is a probability about the data under the null.
 - [o] If there were no real difference between the groups, the chance of seeing a difference at least this extreme would be about 0.001.
   > That's the actual definition of a p-value.
+- The probability the finding is a fluke is 0.001.
+  > "Chance the finding is a fluke" is a probability about the hypothesis, which a p-value does not give. It is a probability about the data under the null.
+- The probability the null hypothesis is true is 0.001.
+  > A p-value is computed *assuming* the null is true; it cannot also be the probability that the null is true.
 - The difference is definitely large.
   > A small p-value speaks to evidence against the null, not to the size of the effect, that's what effect size measures.`}
 />
@@ -311,12 +311,12 @@ could plausibly be larger or smaller.
 <MultipleChoice
   markdown={`Why is it important to report effect size in addition to a p-value?
 
+- [o] A result can be statistically significant (especially with large n) yet practically meaningless, effect size tells you whether it matters in the real world.
+  > Significance and importance are different questions.
 - p-values are unreliable.
   > p-values are well-defined and consistent when used correctly; the issue is not unreliability but that they measure *evidence against the null*, not the size or importance of an effect.
 - Effect size determines the p-value entirely.
   > The p-value depends on both the effect size and the sample size; two studies can show different p-values for the same true effect if their sample sizes differ.
-- [o] A result can be statistically significant (especially with large n) yet practically meaningless, effect size tells you whether it matters in the real world.
-  > Significance and importance are different questions.
 - Confidence intervals are not used in practice.
   > Confidence intervals are widely used in applied research, clinical trials, and reporting precisely because they convey both direction and magnitude of an effect.`}
 />

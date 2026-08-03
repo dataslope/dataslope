@@ -221,10 +221,10 @@ a preprocessing step?
 
 - "Is this step in the most popular tutorial?"
   > Popularity of a tutorial has nothing to do with whether a step suits your data or task; copying pipelines blindly is the cardinal sin this page warns against.
-- [o] "Does the information this step adds or destroys matter to my specific task?"
-  > Every step changes the data, lowercasing destroys case, stopword removal destroys function words. The decision reduces to whether that changed information is noise or signal *for your task*. That question resolves most pipeline choices.
 - "Is this step the fastest to run?"
   > Speed is a secondary concern; a fast step that destroys signal you need is worse than a slower step that preserves it.
+- [o] "Does the information this step adds or destroys matter to my specific task?"
+  > Every step changes the data, lowercasing destroys case, stopword removal destroys function words. The decision reduces to whether that changed information is noise or signal *for your task*. That question resolves most pipeline choices.
 - "Does this step reduce the number of tokens?"
   > Reducing token count is a side effect, not a goal, some reductions help (stopword removal for topics) and some hurt (removing negations for sentiment).
 
@@ -347,14 +347,14 @@ assert isinstance(preprocess("hello world", False), list)`,
   markdown={`Why is the "standard" recipe *lowercase → remove stopwords → stem* a poor
 default for **sentiment analysis**?
 
+- Lowercasing is never allowed
+  > Lowercasing is generally fine for sentiment; the real problem is stopword removal stripping negations and aggressive cleaning eroding phrase-level signals.
+- Stemming is not available in NLTK
+  > Stemming is fully available in NLTK via \`PorterStemmer\` and others; this choice is factually wrong and unrelated to why the recipe fails for sentiment.
 - It is too slow for product reviews
   > Speed is not the issue; the problem is that the recipe destroys linguistic information sentiment analysis depends on, regardless of the size of the dataset.
 - [o] Stopword removal deletes negations like "not", and stemming/over-cleaning erodes the phrase-level cues sentiment depends on, so a negative review can look positive
   > Sentiment lives in negation, contrast, and short phrases, exactly what that recipe destroys. The recipe suits search/topic tasks; for sentiment, keep negation and prefer bigrams over aggressive cleaning.
-- Stemming is not available in NLTK
-  > Stemming is fully available in NLTK via \`PorterStemmer\` and others; this choice is factually wrong and unrelated to why the recipe fails for sentiment.
-- Lowercasing is never allowed
-  > Lowercasing is generally fine for sentiment; the real problem is stopword removal stripping negations and aggressive cleaning eroding phrase-level signals.
 
 The classic recipe optimizes for the wrong information when the task is sentiment.`}
 />
@@ -365,12 +365,12 @@ should you treat stopwords, and why?
 
 - Remove them, because they never carry useful information
   > Stopwords carry no content for topic analysis, but for authorship attribution they are the primary signal, an author's unconscious usage rates of function words is a fingerprint that is hard to fake.
+- Lowercase them but keep everything else uppercase
+  > Selectively lowercasing stopwords while uppercasing other words is not meaningful for authorship attribution, and the question is about whether to keep or remove stopwords, not about casing them.
 - [o] Keep them, an author's habitual use of function words ("the", "of", "that") is a distinctive fingerprint, so here the stopwords are the signal and content words are closer to noise
   > Authorship attribution famously relies on stopword usage patterns, which are stable and hard to fake. This is the inverse of topic analysis, and a vivid example of why pipeline choices are task-specific.
 - Replace each stopword with a random word
   > Replacing stopwords with random words destroys both content and the stylistic signal that makes authorship attribution work; it is not a recognized NLP technique.
-- Lowercase them but keep everything else uppercase
-  > Selectively lowercasing stopwords while uppercasing other words is not meaningful for authorship attribution, and the question is about whether to keep or remove stopwords, not about casing them.
 
 What is noise for one task can be the entire signal for another.`}
 />
@@ -379,12 +379,12 @@ What is noise for one task can be the entire signal for another.`}
   markdown={`You want to know empirically whether removing stopwords helps your classifier.
 What is the disciplined way to find out?
 
-- Flip stopword removal, lemmatization, and n-grams all at once and see if the score changes
-  > Changing multiple steps simultaneously makes it impossible to know which change caused any improvement or degradation; the ablation principle requires isolating one variable at a time.
-- [o] Run an ablation: hold everything else fixed, toggle *only* stopword removal, and compare your task metric with vs. without, so any change is attributable to that one step
-  > Changing one step at a time (an ablation) isolates its effect. If you change several options simultaneously and the score moves, you cannot tell which step caused it. One-at-a-time evaluation turns guessing into measurement.
 - Ask which option is most popular online and use that
   > Popularity online reflects common use cases, not your specific task; what works for someone else's data may not work for yours.
+- [o] Run an ablation: hold everything else fixed, toggle *only* stopword removal, and compare your task metric with vs. without, so any change is attributable to that one step
+  > Changing one step at a time (an ablation) isolates its effect. If you change several options simultaneously and the score moves, you cannot tell which step caused it. One-at-a-time evaluation turns guessing into measurement.
+- Flip stopword removal, lemmatization, and n-grams all at once and see if the score changes
+  > Changing multiple steps simultaneously makes it impossible to know which change caused any improvement or degradation; the ablation principle requires isolating one variable at a time.
 - Always remove stopwords; measuring is unnecessary
   > Stopword removal is a choice, not a universal rule, it helps for topic analysis but can hurt sentiment or authorship attribution, so measuring on your own task is the only reliable guide.
 
@@ -395,12 +395,12 @@ Isolating one variable at a time is how you actually learn what helps.`}
   markdown={`A reasonable *conservative default* for a brand-new task you do not yet
 understand is to:
 
+- Skip tokenization to save time
+  > Tokenization is the step that creates the units everything else operates on; skipping it leaves a single raw string that cannot be lowercased, filtered, or counted word by word.
 - Apply every preprocessing step as aggressively as possible
   > Aggressive preprocessing is the risky direction, it destroys information, and once destroyed it cannot be recovered; starting conservative and adding steps only when they help is safer.
 - [o] Tokenize, lowercase, and keep stopwords (avoid the information-destroying steps) until evaluation shows a step earns its place
   > Removing information is the risky, irreversible move. Starting conservative, minimal destruction, and adding steps only when they measurably help is safer than starting aggressive and hoping nothing important was thrown away.
-- Skip tokenization to save time
-  > Tokenization is the step that creates the units everything else operates on; skipping it leaves a single raw string that cannot be lowercased, filtered, or counted word by word.
 - Remove all words and keep only punctuation
   > Keeping only punctuation would discard all lexical content; punctuation alone carries no semantic meaning useful for most NLP tasks.
 
@@ -410,14 +410,14 @@ Start by destroying as little as possible, then add aggression only when it prov
 <MultipleChoice
   markdown={`Which statement is the truest summary of preprocessing design?
 
-- There is one correct pipeline that works for every NLP task
-  > No universal pipeline exists, the same steps that help topic analysis (removing stopwords, stemming) actively hurt sentiment analysis and authorship attribution.
-- [o] The right pipeline depends on the downstream task; each step trades information away or adds it, and good design matches those trades to what the task needs
-  > "It depends on the task" is not a cop-out, it is the core skill. Each step is a deliberate trade, and matching trades to task requirements is what designing a pipeline *means*.
-- Preprocessing never affects results, so any pipeline is fine
-  > Preprocessing has significant effects, the same text processed differently can produce completely different classification results, as the sentiment vs. topic example demonstrates.
 - More preprocessing always produces better results
   > More preprocessing destroys more information; for tasks that need that information (negation for sentiment, function words for authorship, capitalization for entities), more is strictly worse.
+- Preprocessing never affects results, so any pipeline is fine
+  > Preprocessing has significant effects, the same text processed differently can produce completely different classification results, as the sentiment vs. topic example demonstrates.
+- [o] The right pipeline depends on the downstream task; each step trades information away or adds it, and good design matches those trades to what the task needs
+  > "It depends on the task" is not a cop-out, it is the core skill. Each step is a deliberate trade, and matching trades to task requirements is what designing a pipeline *means*.
+- There is one correct pipeline that works for every NLP task
+  > No universal pipeline exists, the same steps that help topic analysis (removing stopwords, stemming) actively hurt sentiment analysis and authorship attribution.
 
 No universal recipe exists; deliberate, task-driven choices do.`}
 />

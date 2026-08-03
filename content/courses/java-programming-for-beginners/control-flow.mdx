@@ -280,25 +280,25 @@ beginner milestones.
 <MultipleChoice
   markdown={`What's the difference between \`while\` and \`do-while\`?
 
-- They are the same
-  > They are not.
-- \`while\` is faster than \`do-while\`
-  > Speed is not the distinction.
 - [o] \`while\` checks the condition before the first iteration; \`do-while\` checks after, so its body always runs at least once
   > The difference is purely *when* the condition is tested: before vs after the body.
+- They are the same
+  > They are not.
 - \`do-while\` cannot have a condition
-  > It must have one, it's the trailing condition.`}
+  > It must have one, it's the trailing condition.
+- \`while\` is faster than \`do-while\`
+  > Speed is not the distinction.`}
 />
 
 <MultipleChoice
   markdown={`What does \`for (int x : arr)\` do?
 
+- [o] Iterates over each element of \`arr\` in order, binding the current element to \`x\`
+  > \`x\` is the *element*, not the index.
 - Loops the index from \`x\` to \`arr.length\`
   > That's a classic indexed \`for\`, not the enhanced form.
 - Creates a new array \`x\` with the same contents as \`arr\`
   > It does not create an array.
-- [o] Iterates over each element of \`arr\` in order, binding the current element to \`x\`
-  > \`x\` is the *element*, not the index.
 - Sorts the array
   > It does not sort.`}
 />

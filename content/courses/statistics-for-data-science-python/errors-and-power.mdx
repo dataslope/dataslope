@@ -339,14 +339,14 @@ p-value in *P-values*.
 <MultipleChoice
   markdown={`In the simulation above, both groups were drawn from the *same* distribution, yet the test rejected $H_0$ about 5% of the time. What does that 5% represent?
 
-- The power of the test
-  > Power is the rejection rate when $H_0$ is *false*. Here $H_0$ is true, so these rejections are errors, not detections.
-- [o] The Type I error rate, which equals the chosen $\alpha$
-  > Rejecting a true null is a Type I error by definition, and a valid test produces them at the rate $\alpha$ you selected.
 - The probability that $H_0$ is true
   > $\alpha$ is a long-run error rate conditional on $H_0$ being true; it is not the probability that $H_0$ is true.
+- The power of the test
+  > Power is the rejection rate when $H_0$ is *false*. Here $H_0$ is true, so these rejections are errors, not detections.
 - A sign the test is broken
   > Producing false positives at rate $\alpha$ is the test working exactly as designed, not a malfunction.
+- [o] The Type I error rate, which equals the chosen $\alpha$
+  > Rejecting a true null is a Type I error by definition, and a valid test produces them at the rate $\alpha$ you selected.
 
 Setting $\alpha = 0.05$ is agreeing to a 5% false-positive rate whenever the null holds.`}
 />
@@ -589,12 +589,12 @@ Missing a real effect is a Type II error, made more likely by low power.`}
 <MultipleChoice
   markdown={`Statistical power is best defined as:
 
-- The probability of making a Type I error
-  > The probability of a Type I error is $\alpha$, a false-positive rate. Power concerns correctly detecting real effects, not false alarms.
-- The probability that $H_0$ is false
-  > Whether $H_0$ is false is a fact about the world, not a probability the test outputs; power is about detecting that falsity when it holds.
 - [o] The probability of correctly rejecting $H_0$ when $H_0$ is actually false (that is, $1 - \beta$)
   > Power is the chance the test catches a real effect, equal to one minus the Type II error rate $\beta$.
+- The probability that $H_0$ is false
+  > Whether $H_0$ is false is a fact about the world, not a probability the test outputs; power is about detecting that falsity when it holds.
+- The probability of making a Type I error
+  > The probability of a Type I error is $\alpha$, a false-positive rate. Power concerns correctly detecting real effects, not false alarms.
 - 1 minus the p-value
   > The p-value is a single study's tail-area result; power is a design property averaged over many hypothetical studies, unrelated to $1 -$ p.
 
@@ -604,14 +604,14 @@ Power = the chance you catch a real effect when there is one.`}
 <MultipleChoice
   markdown={`Which change will **decrease** the power of a two-sample t-test, all else equal?
 
-- Increasing the sample size
-  > A larger sample reduces noise in the estimate and *raises* power, the opposite of what is asked.
-- Studying a larger true effect
-  > Bigger effects are easier to detect, so power goes *up*, not down.
-- [o] Reducing $\alpha$ from 0.05 to 0.01
-  > A stricter threshold makes the test reject less often overall, which lowers the chance of rejecting even when the null is false, reducing power.
 - Reducing the variability (noise) in the measurements
   > Cleaner, less variable data sharpens the test and *increases* power.
+- [o] Reducing $\alpha$ from 0.05 to 0.01
+  > A stricter threshold makes the test reject less often overall, which lowers the chance of rejecting even when the null is false, reducing power.
+- Studying a larger true effect
+  > Bigger effects are easier to detect, so power goes *up*, not down.
+- Increasing the sample size
+  > A larger sample reduces noise in the estimate and *raises* power, the opposite of what is asked.
 
 A stricter $\alpha$ buys fewer false positives at the cost of power; the other levers raise power.`}
 />
@@ -619,14 +619,14 @@ A stricter $\alpha$ buys fewer false positives at the cost of power; the other l
 <MultipleChoice
   markdown={`Why is reporting power especially important after a **non-significant** result?
 
-- Because a non-significant result is always wrong
-  > Non-significant results are not inherently wrong; the point is that their meaning depends on how much power the study had.
-- [o] Because with low power, a real effect is frequently missed, so "not significant" may mean "undetected" rather than "absent"
-  > When power is low, even a genuine effect fails to reach significance much of the time, so a null result cannot be read as evidence of no effect.
 - Because power changes the p-value after the fact
   > Power does not retroactively alter the p-value you obtained; it informs how to *interpret* a non-significant outcome.
 - Because high power guarantees the null is true
   > High power makes a null result more informative about absence, but nothing guarantees the null is true; power is about detection, not proof.
+- [o] Because with low power, a real effect is frequently missed, so "not significant" may mean "undetected" rather than "absent"
+  > When power is low, even a genuine effect fails to reach significance much of the time, so a null result cannot be read as evidence of no effect.
+- Because a non-significant result is always wrong
+  > Non-significant results are not inherently wrong; the point is that their meaning depends on how much power the study had.
 
 Absence of evidence is only evidence of absence when power was high enough to detect the effect.`}
 />
@@ -634,14 +634,14 @@ Absence of evidence is only evidence of absence when power was high enough to de
 <MultipleChoice
   markdown={`A team brags that they got p < 0.05 from a tiny pilot study, and says power "doesn't matter now that it's significant." What is the flaw?
 
-- They are right; once significant, power is irrelevant
-  > Significance does not make power irrelevant; underpowered significant results are exactly the ones prone to being unreliable.
-- [o] Low power makes a significant result less trustworthy and inflates the apparent effect size, so it often fails to replicate
-  > In low-power studies, an effect clears the bar mainly on runs where noise exaggerated it, so the reported effect is biased upward and replication is shaky.
 - Power only matters for Bayesian analyses
   > Power is a property of frequentist hypothesis tests and is directly relevant here; it is not confined to any one school of analysis.
 - A significant p-value from a small sample is impossible
   > Small samples can and do produce significant p-values; the problem is the reliability of those results, not their possibility.
+- [o] Low power makes a significant result less trustworthy and inflates the apparent effect size, so it often fails to replicate
+  > In low-power studies, an effect clears the bar mainly on runs where noise exaggerated it, so the reported effect is biased upward and replication is shaky.
+- They are right; once significant, power is irrelevant
+  > Significance does not make power irrelevant; underpowered significant results are exactly the ones prone to being unreliable.
 
 The "winner's curse": underpowered significant findings overstate effects and replicate poorly.`}
 />
@@ -649,14 +649,14 @@ The "winner's curse": underpowered significant findings overstate effects and re
 <MultipleChoice
   markdown={`You want at least an 80% chance of detecting a difference in conversion of 1 percentage point, if it exists. What should you do **before** launching the A/B test?
 
-- Launch immediately and check power afterward if the result is null
-  > Computing power after the fact does not fix an undersized study; the sample size must be planned in advance to guarantee adequate power.
 - [o] Run a power analysis to find the sample size that yields power >= 0.80 for that effect size, then collect that much data
   > Choosing the smallest effect worth detecting and solving for the required $n$ ensures the experiment can actually catch the effect at the desired power.
-- Pick whatever sample size is convenient; power takes care of itself
-  > Power does not take care of itself; too small an $n$ leaves the study likely to miss a real one-point difference.
 - Lower $\alpha$ to 0.001 to be safe
   > Tightening $\alpha$ reduces false positives but *lowers* power, making it harder to detect the effect you care about, the opposite of the goal.
+- Launch immediately and check power afterward if the result is null
+  > Computing power after the fact does not fix an undersized study; the sample size must be planned in advance to guarantee adequate power.
+- Pick whatever sample size is convenient; power takes care of itself
+  > Power does not take care of itself; too small an $n$ leaves the study likely to miss a real one-point difference.
 
 Power analysis turns "how many samples do I need?" into a number you compute before collecting data.`}
 />

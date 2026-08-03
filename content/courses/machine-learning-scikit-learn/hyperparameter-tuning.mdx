@@ -648,14 +648,14 @@ assert 0.8 < test_score <= 1.0, f"test_score {test_score} is not a valid, strong
 <MultipleChoice
   markdown={`Which of the following is a **hyperparameter** rather than a parameter?
 
-- The slope coefficient that \`LinearRegression\` computes from the data
-  > A learned slope is found by \`.fit()\` from the training rows, which makes it a parameter, not a hyperparameter.
-- [o] The \`n_neighbors\` value you pass to \`KNeighborsClassifier\`
-  > \`n_neighbors\` is set by you before training and is never learned from the data, which is exactly what makes it a hyperparameter.
 - The split thresholds a decision tree learns at each node
   > Those thresholds are chosen by \`.fit()\` from the data, so they are parameters the model learns.
 - The coefficients a logistic regression fits to each feature
   > Fitted coefficients are learned from data during training, which makes them parameters, not hyperparameters.
+- [o] The \`n_neighbors\` value you pass to \`KNeighborsClassifier\`
+  > \`n_neighbors\` is set by you before training and is never learned from the data, which is exactly what makes it a hyperparameter.
+- The slope coefficient that \`LinearRegression\` computes from the data
+  > A learned slope is found by \`.fit()\` from the training rows, which makes it a parameter, not a hyperparameter.
 
 The test is always "who set this value?", you (hyperparameter) or \`.fit()\` (parameter).`}
 />
@@ -663,12 +663,12 @@ The test is always "who set this value?", you (hyperparameter) or \`.fit()\` (pa
 <MultipleChoice
   markdown={`Why can a model not simply learn its own best hyperparameters from the training data during \`.fit()\`?
 
-- Because scikit-learn forbids it for licensing reasons
-  > There is no licensing issue; the limitation is statistical, not legal.
 - Because hyperparameters must always be integers, which cannot be optimized
   > Many hyperparameters are continuous (such as \`C\`), so the integer claim is simply false.
 - [o] Because a hyperparameter like flexibility, chosen to maximize the training score, would always pick maximum complexity and overfit
   > The training score always rewards more flexibility, so choosing hyperparameters on it would drive straight to an overfit model; you need held-out data to judge them.
+- Because scikit-learn forbids it for licensing reasons
+  > There is no licensing issue; the limitation is statistical, not legal.
 - Because hyperparameters have no effect on the trained model
   > Hyperparameters strongly shape the model, as the \`n_neighbors\` sweep showed, so this is the opposite of the truth.
 
@@ -682,10 +682,10 @@ Hyperparameters must be judged on data the model did not train on, which is why 
   > The test set is never given to \`GridSearchCV\`, so \`best_score_\` cannot be a test-set number.
 - The training accuracy of the best model
   > \`best_score_\` is a cross-validated score on held-out folds, not the optimistic training-set accuracy.
-- [o] The mean cross-validated score of the winning hyperparameter setting on the training data
-  > \`best_score_\` averages the cross-validation fold scores for the setting that won, computed entirely within the training data.
 - A random number used to seed the search
   > \`best_score_\` is a measured performance score, not a seed.
+- [o] The mean cross-validated score of the winning hyperparameter setting on the training data
+  > \`best_score_\` averages the cross-validation fold scores for the setting that won, computed entirely within the training data.
 
 Because that setting was chosen to maximize this very number, it is slightly optimistic, the untouched test set gives the honest estimate.`}
 />
@@ -693,14 +693,14 @@ Because that setting was chosen to maximize this very number, it is slightly opt
 <MultipleChoice
   markdown={`You tune a \`Pipeline\` whose steps are named \`"scaler"\` and \`"model"\`, and you want to search the \`C\` of the logistic regression in the \`"model"\` step. Which grid key is correct?
 
-- \`"C"\`
-  > A bare \`"C"\` is ambiguous inside a pipeline; \`GridSearchCV\` needs to know which step the parameter belongs to.
-- \`"model.C"\`
-  > The pipeline convention uses a double underscore, not a dot, to join the step name and the parameter.
-- [o] \`"model__C"\`
-  > The convention is step name, double underscore, parameter name, so \`"model__C"\` targets \`C\` inside the \`"model"\` step.
 - \`"scaler__C"\`
   > That would aim \`C\` at the scaler, which has no such hyperparameter; \`C\` lives in the \`"model"\` step.
+- \`"C"\`
+  > A bare \`"C"\` is ambiguous inside a pipeline; \`GridSearchCV\` needs to know which step the parameter belongs to.
+- [o] \`"model__C"\`
+  > The convention is step name, double underscore, parameter name, so \`"model__C"\` targets \`C\` inside the \`"model"\` step.
+- \`"model.C"\`
+  > The pipeline convention uses a double underscore, not a dot, to join the step name and the parameter.
 
 The double-underscore syntax is how scikit-learn reaches a hyperparameter inside a named pipeline step.`}
 />
@@ -708,14 +708,14 @@ The double-underscore syntax is how scikit-learn reaches a hyperparameter inside
 <MultipleChoice
   markdown={`You keep expanding your grid and re-running the search, and \`best_score_\` slowly climbs. Why is it still essential to keep a final untouched test set?
 
-- Because \`best_score_\` is always exactly equal to the test score
-  > They are usually close but not equal, and treating them as identical is precisely the mistake this guards against.
-- [o] Because optimizing hard against the validation signal can overfit it, making \`best_score_\` optimistic; only a test set used in no decision reveals true performance
-  > The more settings you try, the more you risk fitting validation-set noise, so an untouched test set is the only honest check on how much of the gain was real.
 - Because the test set trains the final model
   > The test set is never used for training or tuning; its sole job is the final, once-only estimate.
+- [o] Because optimizing hard against the validation signal can overfit it, making \`best_score_\` optimistic; only a test set used in no decision reveals true performance
+  > The more settings you try, the more you risk fitting validation-set noise, so an untouched test set is the only honest check on how much of the gain was real.
 - Because grids must contain a prime number of values
   > Grid size has no such requirement; the size of the grid is unrelated to why a test set is needed.
+- Because \`best_score_\` is always exactly equal to the test score
+  > They are usually close but not equal, and treating them as identical is precisely the mistake this guards against.
 
 A rising validation score is partly signal and partly luck, and a sealed test set is what tells you the difference.`}
 />

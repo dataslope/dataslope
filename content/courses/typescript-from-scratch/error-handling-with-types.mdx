@@ -493,10 +493,10 @@ TypeScript doesn't have special syntax, but discriminated unions and type narrow
 <MultipleChoice
   markdown={`What's the main advantage of \`Result<T, E>\` over exceptions?
 
-- Faster runtime performance
-  > \`Result\` has similar performance to exceptions; the benefit is static safety, not speed.
 - [o] Errors are visible in the type signature and must be handled
   > The return type \`Result<T, E>\` documents that the function can fail, and the compiler forces you to check \`.ok\` before accessing the value.
+- Faster runtime performance
+  > \`Result\` has similar performance to exceptions; the benefit is static safety, not speed.
 - Easier to write
   > \`Result\` requires more boilerplate (but combinators help). The payoff is correctness.
 
@@ -515,10 +515,10 @@ const sqrtResult = andThen(result, sqrt);
 \`\`\`
 What happens if \`parseNumber\` returns an error?
 
-- \`sqrt\` is called with the error
-  > \`andThen\` only calls \`fn\` if the result is \`ok\`. Errors short-circuit.
 - [o] \`sqrt\` is not called; the error propagates
   > \`andThen\` checks \`result.ok\`. If false, it returns the error immediately without calling \`sqrt\`.
+- \`sqrt\` is called with the error
+  > \`andThen\` only calls \`fn\` if the result is \`ok\`. Errors short-circuit.
 - The program throws an exception
   > \`Result\` doesn't throw. Errors are returned as values.
 

@@ -50,12 +50,12 @@ Read that statement as: *select four computed values, and label the output colum
 <MultipleChoice
   markdown={`In \`SELECT 2 + 2 AS sum;\`, what does \`AS sum\` do?
 
-- It changes the arithmetic answer.
-  > \`AS\` does not change the value; \`2 + 2\` still evaluates to 4.
-- [o] It gives the result column a friendly name.
-  > \`AS sum\` labels the output column so the result is easier to read.
 - It creates a table named \`sum\`.
   > Creating a table uses \`CREATE TABLE\`, not \`AS\` in this query.
+- [o] It gives the result column a friendly name.
+  > \`AS sum\` labels the output column so the result is easier to read.
+- It changes the arithmetic answer.
+  > \`AS\` does not change the value; \`2 + 2\` still evaluates to 4.
 
 Column aliases name what you see in the result table; they do not store data anywhere.`}
 />
@@ -170,10 +170,10 @@ FROM
   > \`SELECT\` names the columns you want back.
 - [o] \`FROM snacks\`
   > \`FROM snacks\` tells SQLite that the rows come from the \`snacks\` table.
-- \`name, calories\`
-  > Those are column names, not the source table.
 - The semicolon
   > The semicolon ends the statement; it does not choose a table.
+- \`name, calories\`
+  > Those are column names, not the source table.
 
 \`FROM\` is the "where should SQLite read from?" part of a query.`}
 />
@@ -185,12 +185,12 @@ FROM
 
 - It permanently saves new rows.
   > Saving new rows is done with \`INSERT\`.
+- It turns text into numbers automatically.
+  > SQLite may convert values in some situations, but that is not what \`SELECT\` means.
 - [o] It asks SQLite to return values, calculations, or columns.
   > \`SELECT\` is the part of SQL that says what you want to see in the result.
 - It deletes a table.
   > Deleting a table uses \`DROP TABLE\`.
-- It turns text into numbers automatically.
-  > SQLite may convert values in some situations, but that is not what \`SELECT\` means.
 
 \`SELECT\` is your main tool for reading and computing results.`}
 />
@@ -202,10 +202,10 @@ FROM
   > Sorting requires \`ORDER BY\`, not a semicolon.
 - It changes text into a column name.
   > Column names and aliases are separate from the semicolon.
-- [o] It marks the end of one complete instruction.
-  > The semicolon tells SQLite where the statement stops.
 - It is only used in one database system.
   > SQLite accepts semicolons too, and they are a good habit.
+- [o] It marks the end of one complete instruction.
+  > The semicolon tells SQLite where the statement stops.
 
 A semicolon is like a period at the end of a SQL sentence.`}
 />
@@ -213,14 +213,14 @@ A semicolon is like a period at the end of a SQL sentence.`}
 <MultipleChoice
   markdown={`In this course, why can one runnable block not rely on a table created in a previous block?
 
-- [o] Each block runs independently with its own fresh setup.
-  > A later block starts from its own SQL setup, so it does not remember earlier blocks.
 - SQLite does not support tables.
   > SQLite absolutely supports tables; the independence is a course feature.
-- \`SELECT\` removes tables after it runs.
-  > \`SELECT\` only reads or computes data.
 - Text values prevent tables from being reused.
   > Text values are normal table data and are not the reason blocks are separate.
+- [o] Each block runs independently with its own fresh setup.
+  > A later block starts from its own SQL setup, so it does not remember earlier blocks.
+- \`SELECT\` removes tables after it runs.
+  > \`SELECT\` only reads or computes data.
 
 Independent blocks let you experiment freely without breaking later examples.`}
 />

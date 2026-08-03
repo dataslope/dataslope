@@ -123,14 +123,14 @@ Data** section expands on this.
 <MultipleChoice
   markdown={`What does the \`SELECT\` keyword do in a query?
 
+- It sorts the table alphabetically.
+  > Sorting is the job of \`ORDER BY\`; \`SELECT\` chooses what to return, not the order.
+- It creates a brand-new table.
+  > Creating tables is done with \`CREATE TABLE\`, not \`SELECT\`.
 - It permanently deletes the chosen columns.
   > Deleting data is done with other statements; \`SELECT\` only reads or computes values.
 - [o] It specifies which columns or computed values you want the database to return.
   > \`SELECT\` is the "what do I want back" part of a query, whether reading columns or computing values.
-- It creates a brand-new table.
-  > Creating tables is done with \`CREATE TABLE\`, not \`SELECT\`.
-- It sorts the table alphabetically.
-  > Sorting is the job of \`ORDER BY\`; \`SELECT\` chooses what to return, not the order.
 
 \`SELECT\` declares the columns or values you want the query to produce.`}
 />
@@ -138,14 +138,14 @@ Data** section expands on this.
 <MultipleChoice
   markdown={`In the query \`SELECT 5 * 3 AS total;\`, what is the role of \`AS total\`?
 
-- It multiplies the result by a value called total.
-  > \`AS\` does no arithmetic; the multiplication is done by \`5 * 3\`. \`AS\` only labels the result.
 - It stores the result permanently in a table named total.
   > \`AS\` does not store anything; it just names the column in the returned result.
-- [o] It gives the resulting column the friendly name "total" in the output.
-  > \`AS\` assigns a readable label to a result column, which makes output easier to understand.
+- It multiplies the result by a value called total.
+  > \`AS\` does no arithmetic; the multiplication is done by \`5 * 3\`. \`AS\` only labels the result.
 - It is required or the query will fail.
   > \`AS\` is optional; without it the column simply gets an auto-generated name.
+- [o] It gives the resulting column the friendly name "total" in the output.
+  > \`AS\` assigns a readable label to a result column, which makes output easier to understand.
 
 \`AS\` provides a readable alias for a result column; it changes only the label, not the data.`}
 />
@@ -155,12 +155,12 @@ Data** section expands on this.
 
 - \`SELECT\`
   > \`SELECT\` lists the columns or values you want; it does not name the source table.
-- [o] \`FROM\`
-  > \`FROM table_name\` is exactly how you tell the database which table to pull rows from.
-- \`AS\`
-  > \`AS\` labels a result column; it does not choose the source table.
 - The semicolon
   > The semicolon ends the statement; it does not identify a table.
+- \`AS\`
+  > \`AS\` labels a result column; it does not choose the source table.
+- [o] \`FROM\`
+  > \`FROM table_name\` is exactly how you tell the database which table to pull rows from.
 
 \`FROM\` specifies the table that supplies the rows for a query.`}
 />

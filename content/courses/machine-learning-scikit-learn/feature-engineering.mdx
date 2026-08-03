@@ -531,14 +531,14 @@ assert 0.0 <= corr_volume <= 1.0, f"corr_volume out of range: {corr_volume}"`,
 <MultipleChoice
   markdown={`What is the central reason feature engineering matters for classical scikit-learn models?
 
-- It makes the model train faster on large datasets
-  > Engineering can change training cost, but its purpose is to expose signal, not to speed up training.
 - [o] A model can only learn patterns that are visible in the features it is given, so reshaping raw data into the right representation can reveal signal the raw columns only implied
   > Because these models see exactly the columns you provide and infer nothing extra, making the relevant concept an explicit feature is often what makes the pattern learnable.
-- It replaces the need to evaluate the model on held-out data
-  > Evaluation is still essential, in fact you must check every engineered feature on held-out data, since flexibility can overfit.
 - It guarantees the model will not overfit
   > Engineering can *increase* overfitting risk (e.g., high-degree polynomials or chance correlations); it offers no such guarantee.
+- It replaces the need to evaluate the model on held-out data
+  > Evaluation is still essential, in fact you must check every engineered feature on held-out data, since flexibility can overfit.
+- It makes the model train faster on large datasets
+  > Engineering can change training cost, but its purpose is to expose signal, not to speed up training.
 
 The recurring idea is that the representation of the data, not just the algorithm, determines what can be learned.`}
 />
@@ -546,14 +546,14 @@ The recurring idea is that the representation of the data, not just the algorith
 <MultipleChoice
   markdown={`A plain linear model scores near chance on an XOR-like pattern, but jumps to high accuracy once you add the product of the two features. What does this illustrate?
 
+- Polynomial features always improve accuracy
+  > They help only when the added terms expose real structure; in other cases they add noise and can overfit.
 - The linear model was buggy and needed retraining
   > The model was fine; what changed was the features it received, not the training procedure.
 - [o] The signal lived in an *interaction* between the features that a linear model cannot express from the raw columns, but can once the interaction term is provided
   > Supplying the product term exposes the "effect of A depends on B" structure, which an additive linear model cannot represent from the originals alone.
 - The dataset was too small to learn from
   > Dataset size is not the issue; the same data became learnable purely by adding the interaction feature.
-- Polynomial features always improve accuracy
-  > They help only when the added terms expose real structure; in other cases they add noise and can overfit.
 
 Interaction features let additive models capture "the effect of one feature depends on another."`}
 />
@@ -561,14 +561,14 @@ Interaction features let additive models capture "the effect of one feature depe
 <MultipleChoice
   markdown={`You replace a precise \`age\` column with an \`age_group\` bucket (minor / adult / senior). What is the main tradeoff?
 
-- It always improves accuracy because categories are easier to model
-  > Binning is not universally better; whether it helps depends on whether the *range*, not the exact value, carries the signal.
-- [o] You gain a representation focused on meaningful ranges, but you discard the fine-grained differences within each bucket
-  > Bucketing exposes range-based effects (like thresholds) while deliberately throwing away within-bucket variation, which is a loss when the exact value matters.
-- It converts the numeric column into a leakage feature
-  > Binning a legitimately available column does not create leakage; leakage is about using information unavailable at prediction time.
 - It guarantees the model will no longer overfit
   > Binning changes the representation but offers no guarantee against overfitting.
+- It always improves accuracy because categories are easier to model
+  > Binning is not universally better; whether it helps depends on whether the *range*, not the exact value, carries the signal.
+- It converts the numeric column into a leakage feature
+  > Binning a legitimately available column does not create leakage; leakage is about using information unavailable at prediction time.
+- [o] You gain a representation focused on meaningful ranges, but you discard the fine-grained differences within each bucket
+  > Bucketing exposes range-based effects (like thresholds) while deliberately throwing away within-bucket variation, which is a loss when the exact value matters.
 
 Binning trades precise magnitude for range-based structure, which helps only when the range is what matters.`}
 />
@@ -578,10 +578,10 @@ Binning trades precise magnitude for range-based structure, which helps only whe
 
 - Because timestamps cannot be stored in a DataFrame
   > Timestamps store fine; the issue is that as a single large number a raw date hides the recurring structure.
-- Because the model runs faster with integer columns
-  > Speed is not the point; the extracted parts expose patterns the raw value conceals.
 - [o] Because the raw date is essentially one large, ever-increasing number, while the extracted parts expose the *recurring* structure of time (seasonality, weekly patterns) that the model can actually use
   > Seasonality and weekday/weekend effects are periodic, and a monotonic timestamp cannot express them, whereas month and day-of-week make those cycles explicit.
+- Because the model runs faster with integer columns
+  > Speed is not the point; the extracted parts expose patterns the raw value conceals.
 - Because dates must always be one-hot encoded before modeling
   > There is no such requirement; the value comes from extracting meaningful periodic parts, however they are then encoded.
 
@@ -591,14 +591,14 @@ A raw timestamp marches forward forever; its informative content is in periodic 
 <MultipleChoice
   markdown={`Which situation describes feature engineering that **hurts** rather than helps?
 
-- Computing debt-to-income ratio because lenders know it predicts default
-  > That encodes a genuine domain concept from available data, which is exactly when engineering helps.
-- Adding \`is_weekend\` because sales are known to spike on weekends
-  > That exposes real recurring structure from domain knowledge, a textbook helpful feature.
-- [o] Generating hundreds of features by brute force and keeping whichever happen to correlate with the target in your sample
-  > Some of those correlations are due to chance in the sample, so keeping them fits luck rather than signal and overfits, especially without held-out validation.
 - Squaring a feature (degree 2) so a linear model can fit a known curved relationship
   > Adding a low-degree term to capture a genuine curve is a helpful, controlled use of engineering.
+- Computing debt-to-income ratio because lenders know it predicts default
+  > That encodes a genuine domain concept from available data, which is exactly when engineering helps.
+- [o] Generating hundreds of features by brute force and keeping whichever happen to correlate with the target in your sample
+  > Some of those correlations are due to chance in the sample, so keeping them fits luck rather than signal and overfits, especially without held-out validation.
+- Adding \`is_weekend\` because sales are known to spike on weekends
+  > That exposes real recurring structure from domain knowledge, a textbook helpful feature.
 
 Brute-forcing many features and selecting on in-sample correlation invites overfitting to chance patterns.`}
 />

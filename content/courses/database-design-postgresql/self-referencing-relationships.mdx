@@ -188,10 +188,10 @@ key points back to the same table's primary key.
 
 - Because aliases create temporary copies of the table on disk.
   > Aliases are just query names for roles; they do not copy the table.
-- [o] Because the same table is playing two roles in the query, employee and manager.
-  > Aliases let SQL distinguish which role each column reference belongs to.
 - Because foreign keys require aliases in table definitions.
   > Aliases are used in queries, not in the foreign key definition itself.
+- [o] Because the same table is playing two roles in the query, employee and manager.
+  > Aliases let SQL distinguish which role each column reference belongs to.
 - Because \`employees\` is too long for PostgreSQL to parse.
   > PostgreSQL can parse long names; aliases clarify roles.
 
@@ -207,10 +207,10 @@ Aliases make one table readable when it appears more than once in a query.`}
   > That uses two different entity tables, not one table pointing to itself.
 - [o] Categories where each category may have a parent category.
   > Parent and child categories are rows in the same table, so a self-reference fits.
-- Students taking courses.
-  > That is many-to-many between two different entity types.
 - Users having one profile.
   > That is usually a one-to-one relationship between two tables.
+- Students taking courses.
+  > That is many-to-many between two different entity types.
 
 Self-references fit hierarchies or threads where parent and child are the same kind of thing.`}
 />
@@ -218,10 +218,10 @@ Self-references fit hierarchies or threads where parent and child are the same k
 <MultipleChoice
   markdown={`Why is \`manager_id\` often nullable in an \`employees\` table?
 
-- Because foreign keys only work when columns are nullable.
-  > Foreign keys can be nullable or not nullable; nullability is a design choice.
 - [o] Because the top employee in the hierarchy may have no manager.
   > A null parent represents the root of the hierarchy.
+- Because foreign keys only work when columns are nullable.
+  > Foreign keys can be nullable or not nullable; nullability is a design choice.
 - Because every employee must have two managers.
   > Null does not mean two managers; it means no referenced manager row.
 - Because primary keys are nullable too.
@@ -233,14 +233,14 @@ A nullable self-reference can represent the root row of a tree.`}
 <MultipleChoice
   markdown={`What does a basic self-referencing foreign key guarantee?
 
-- That the hierarchy can never contain a cycle.
-  > Cycle prevention requires additional logic beyond a basic foreign key.
-- That every row has at least three children.
-  > A foreign key does not require child rows to exist.
-- [o] That any non-null parent id points to an existing row in the same table.
-  > The foreign key enforces referential integrity within the table.
 - That rows are displayed in tree order automatically.
   > Display order is controlled by queries, not by the foreign key itself.
+- [o] That any non-null parent id points to an existing row in the same table.
+  > The foreign key enforces referential integrity within the table.
+- That every row has at least three children.
+  > A foreign key does not require child rows to exist.
+- That the hierarchy can never contain a cycle.
+  > Cycle prevention requires additional logic beyond a basic foreign key.
 
 The self foreign key protects references, while stricter hierarchy rules may need extra constraints or application logic.`}
 />
@@ -248,10 +248,10 @@ The self foreign key protects references, while stricter hierarchy rules may nee
 <MultipleChoice
   markdown={`In the employee-manager query, why use a \`LEFT JOIN\` from employees to managers?
 
-- To duplicate every employee row twice.
-  > A left join keeps unmatched employees, but it does not intentionally duplicate every row.
 - [o] To keep employees who have no manager, such as the top-level CEO.
   > The root row has \`manager_id = NULL\`, so a left join preserves it with a null manager name.
+- To duplicate every employee row twice.
+  > A left join keeps unmatched employees, but it does not intentionally duplicate every row.
 - To prevent the foreign key from being checked.
   > Joins do not disable constraints.
 - To require every manager to have the same title.

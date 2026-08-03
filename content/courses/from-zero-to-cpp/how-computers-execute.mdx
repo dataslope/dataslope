@@ -245,27 +245,27 @@ detail to keep in mind for the next several chapters.
 <MultipleChoice
   markdown={`What is the smallest individually-addressable unit of memory in this model?
 
-- A bit
-  > Bits are smaller, but most CPUs address memory in bytes, not bits.
-- [o] A byte
-  > Each byte has its own numeric address.
+- A page (typically 4096 bytes)
+  > Pages matter for virtual memory, but each byte inside still has its own address.
 - A word (4 or 8 bytes)
   > Words are read or written in groups, but the underlying addressing is by byte.
-- A page (typically 4096 bytes)
-  > Pages matter for virtual memory, but each byte inside still has its own address.`}
+- [o] A byte
+  > Each byte has its own numeric address.
+- A bit
+  > Bits are smaller, but most CPUs address memory in bytes, not bits.`}
 />
 
 <MultipleChoice
   markdown={`What does the CPU's instruction pointer do?
 
-- It points to the start of the program file on disk.
-  > Programs are loaded into memory before execution; the IP points within memory, not disk.
 - [o] It holds the memory address of the next instruction to execute.
   > After each instruction it advances, except when a jump changes it.
-- It tells the operating system which process to schedule next.
-  > Scheduling is done by the OS, not by the instruction pointer.
+- It points to the start of the program file on disk.
+  > Programs are loaded into memory before execution; the IP points within memory, not disk.
 - It stores the result of the most recent arithmetic operation.
-  > That role is played by registers and flags, not the IP.`}
+  > That role is played by registers and flags, not the IP.
+- It tells the operating system which process to schedule next.
+  > Scheduling is done by the OS, not by the instruction pointer.`}
 />
 
 <MultipleChoice
@@ -273,10 +273,10 @@ detail to keep in mind for the next several chapters.
 
 - In CPU registers exclusively.
   > Some small variables may live in registers, but the model and the language describe them as living on the stack.
-- [o] In a new frame on the call stack.
-  > Each function call grows the stack; returning pops the frame.
 - On the heap, allocated by \`new\`.
   > Only variables explicitly allocated with \`new\` go on the heap.
+- [o] In a new frame on the call stack.
+  > Each function call grows the stack; returning pops the frame.
 - In the data segment, alongside global variables.
   > The data segment is for globals and statics, not local variables.`}
 />
@@ -284,12 +284,12 @@ detail to keep in mind for the next several chapters.
 <MultipleChoice
   markdown={`Why does C++ care so much about *where* memory comes from (stack vs heap)?
 
-- It does not, they are interchangeable.
-  > They are not. The lifetime, cost, and management rules differ.
 - The stack is faster to read than the heap.
   > Allocation on the stack is much faster, but reads from either can be cached and equally fast.
 - [o] Because the lifetime, allocation cost, and management rules of stack and heap memory are different, and C++ exposes those differences so you can reason about them.
   > C++ trades convenience for control on purpose.
+- It does not, they are interchangeable.
+  > They are not. The lifetime, cost, and management rules differ.
 - Only the heap can be freed; the stack lives forever.
   > It is the other way around, stack frames are freed automatically when functions return.`}
 />

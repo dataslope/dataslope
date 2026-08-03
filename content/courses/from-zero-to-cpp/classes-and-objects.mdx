@@ -260,23 +260,23 @@ int main() {
 <MultipleChoice
   markdown={`What is the difference between a class and an object?
 
-- They are the same thing.
-  > They are distinct concepts.
 - [o] A class is a type, a blueprint describing data and operations. An object is an *instance* of that type, with its own copy of the data.
   > Code creates many objects from one class.
-- An object is a class with no methods.
-  > That is incorrect.
 - A class can only exist once per program.
-  > Classes are types; you can create as many objects as you like.`}
+  > Classes are types; you can create as many objects as you like.
+- They are the same thing.
+  > They are distinct concepts.
+- An object is a class with no methods.
+  > That is incorrect.`}
 />
 
 <MultipleChoice
   markdown={`Why mark a method \`const\`?
 
-- It makes the method run faster.
-  > Performance is not the main reason; the compiler can optimize either way.
 - It is required by the compiler.
   > It is optional.
+- It makes the method run faster.
+  > Performance is not the main reason; the compiler can optimize either way.
 - [o] It documents and enforces that the method does not modify the object, allowing it to be called on \`const\` instances and helping readers reason about behaviour.
   > Mark every observer method \`const\`.
 - It hides the method from outside code.

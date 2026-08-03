@@ -542,14 +542,14 @@ console.log(enrollStudent(null));
 <MultipleChoice
   markdown={`Which of these is the strongest sign that a function is doing too much?
 
+- It uses arrow function syntax
+  > Arrow function syntax is a style choice with no bearing on how much a function is doing; an arrow function can be tiny and focused or large and sprawling just like any other function.
+- [o] You can't describe its purpose in a single short sentence without using the word "and"
+  > Length is a rough proxy, not the real signal. The real signal is *cohesion*: a function should do one thing. If you need an "and" to describe it ("fetches data AND formats AND sends an email"), that's two or three functions packed into one. Splitting them makes each piece testable, nameable, and reusable.
 - It is more than 10 lines long
   > Line count is a noisy heuristic; a ten-line function can be perfectly cohesive, and a five-line function can be doing three unrelated things, the true signal is whether the function has a single, clear purpose.
 - It uses both \`if\` and \`for\`
   > Using multiple control flow constructs is completely normal and says nothing about whether a function is doing too much; many single-purpose functions naturally contain both conditions and loops.
-- [o] You can't describe its purpose in a single short sentence without using the word "and"
-  > Length is a rough proxy, not the real signal. The real signal is *cohesion*: a function should do one thing. If you need an "and" to describe it ("fetches data AND formats AND sends an email"), that's two or three functions packed into one. Splitting them makes each piece testable, nameable, and reusable.
-- It uses arrow function syntax
-  > Arrow function syntax is a style choice with no bearing on how much a function is doing; an arrow function can be tiny and focused or large and sprawling just like any other function.
 
 A clear, single-sentence purpose is the gold standard for whether a function is the right size.`}
 />

@@ -99,12 +99,12 @@ ORDER BY
 
 - customer_city is a text column.
   > Text columns can be valid; the issue is what determines the value.
-- [o] customer_city depends on customer_id, a non-key column, rather than directly on order_id.
-  > That non-key-to-non-key dependency is transitive.
 - order_id is too short.
   > Key length is not the issue in this design.
 - The table contains more than one row.
   > Multiple rows are normal; the problem is the dependency path.
+- [o] customer_city depends on customer_id, a non-key column, rather than directly on order_id.
+  > That non-key-to-non-key dependency is transitive.
 
 3NF asks whether non-key columns depend on the key and nothing else.`}
 />
@@ -116,10 +116,10 @@ ORDER BY
   > That phrase is closest to the intuition for 1NF.
 - The left key joins the right key.
   > Joins matter, but this is not the 3NF memory aid.
-- [o] The key, the whole key, and nothing but the key.
-  > The phrase captures direct dependency on the key rather than other non-key columns.
 - Denormalize early and often.
   > Denormalization is deliberate and later, not the 3NF rule.
+- [o] The key, the whole key, and nothing but the key.
+  > The phrase captures direct dependency on the key rather than other non-key columns.
 
 3NF keeps each non-key column loyal to the table's key.`}
 />
@@ -270,14 +270,14 @@ Revolution](/courses/database-design-postgresql/the-relational-revolution).)
 <MultipleChoice
   markdown={`What is a transitive dependency?
 
+- A primary key references a foreign key.
+  > Foreign keys reference primary keys, but that is not the definition here.
+- [o] A non-key column depends on another non-key column.
+  > This dependency path is what 3NF removes.
 - A column contains a comma-separated list.
   > That is a 1NF problem, not a transitive dependency.
 - A non-key column depends on part of a composite key.
   > That is a 2NF partial dependency.
-- [o] A non-key column depends on another non-key column.
-  > This dependency path is what 3NF removes.
-- A primary key references a foreign key.
-  > Foreign keys reference primary keys, but that is not the definition here.
 
 Transitive dependencies are the central problem 3NF addresses.`}
 />
@@ -285,14 +285,14 @@ Transitive dependencies are the central problem 3NF addresses.`}
 <MultipleChoice
   markdown={`In an orders table, customer_city depends on customer_id. Where should customer_city usually be stored?
 
-- In every order row for that customer.
-  > Repeating the city across orders creates update anomalies.
-- [o] In the customers table.
-  > City is a customer fact, so it belongs with the customer key.
-- In a table with no key.
-  > The extracted table still needs a key so rows can be identified and referenced.
 - In the order_items table.
   > Order items describe products on an order, not the customer's city.
+- [o] In the customers table.
+  > City is a customer fact, so it belongs with the customer key.
+- In every order row for that customer.
+  > Repeating the city across orders creates update anomalies.
+- In a table with no key.
+  > The extracted table still needs a key so rows can be identified and referenced.
 
 A column belongs where its determining key lives.`}
 />
@@ -300,10 +300,10 @@ A column belongs where its determining key lives.`}
 <MultipleChoice
   markdown={`Which design best matches 3NF for orders and customers?
 
-- orders(order_id, customer_id, customer_name, customer_city)
-  > Customer name and city are customer facts copied into orders.
 - orders(order_id, customer_city) only
   > The order no longer references a clear customer record.
+- orders(order_id, customer_id, customer_name, customer_city)
+  > Customer name and city are customer facts copied into orders.
 - [o] customers(customer_id, name, city) and orders(order_id, customer_id, order_date)
   > Customer facts live once, and orders reference the customer.
 - customers(order_id, name, city)
@@ -315,12 +315,12 @@ A column belongs where its determining key lives.`}
 <MultipleChoice
   markdown={`Why does 3NF still allow joins?
 
-- Joins are a sign that normalization failed.
-  > Joins are how normalized facts are recombined for reading.
-- [o] Tables store facts once, and joins rebuild the combined view when needed.
-  > The joined result can be wide without storing duplicated customer facts.
 - 3NF requires every query to join every table.
   > Queries join only the tables needed for the question.
+- [o] Tables store facts once, and joins rebuild the combined view when needed.
+  > The joined result can be wide without storing duplicated customer facts.
+- Joins are a sign that normalization failed.
+  > Joins are how normalized facts are recombined for reading.
 - Joins replace the need for primary keys.
   > Joins rely on keys to connect related rows correctly.
 

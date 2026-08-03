@@ -661,14 +661,14 @@ assert test_acc > 0.85, f"Expected a strong accuracy on penguins, got {test_acc}
 <MultipleChoice
   markdown={`What does a \`Pipeline\` chain together?
 
-- Only several preprocessing transformers, with no model
-  > A pipeline *can* end in a model; its defining shape is zero or more transformers followed by a final estimator.
-- [o] A sequence of transformers followed by a final estimator (a model), exposed as a single object with one \`.fit\` and one \`.predict\`
-  > Bundling preprocessing steps and the model into one estimator is exactly what lets you fit and predict in a single call without touching the steps individually.
 - Two separate models whose predictions are averaged
   > Averaging models is ensembling; a pipeline composes steps in sequence, it does not combine model predictions.
 - Multiple datasets concatenated into one
   > A pipeline composes processing steps, not datasets; concatenating columns is what \`ColumnTransformer\` does internally.
+- [o] A sequence of transformers followed by a final estimator (a model), exposed as a single object with one \`.fit\` and one \`.predict\`
+  > Bundling preprocessing steps and the model into one estimator is exactly what lets you fit and predict in a single call without touching the steps individually.
+- Only several preprocessing transformers, with no model
+  > A pipeline *can* end in a model; its defining shape is zero or more transformers followed by a final estimator.
 
 The point of the single-object design is that the whole recipe behaves like one model everywhere scikit-learn expects a model.`}
 />
@@ -676,12 +676,12 @@ The point of the single-object design is that the whole recipe behaves like one 
 <MultipleChoice
   markdown={`Why does wrapping preprocessing and a model in a \`Pipeline\` prevent data leakage during cross-validation?
 
-- It shuffles the data more thoroughly before each fold
-  > Shuffling is unrelated to leakage; the issue is *which data* the preprocessing is fit on.
 - It scales the entire dataset once before any splitting
   > Scaling the entire dataset up front is exactly the leak a pipeline avoids, the held-out rows would influence the scaling.
 - [o] It re-fits every preprocessing step inside each fold using only that fold's training portion, so the held-out rows never influence the preprocessing
   > Because the whole pipeline is re-fit per fold on training data only, each fold's validation rows stay genuinely unseen until scoring.
+- It shuffles the data more thoroughly before each fold
+  > Shuffling is unrelated to leakage; the issue is *which data* the preprocessing is fit on.
 - It removes the test set from cross-validation entirely
   > Cross-validation still evaluates on held-out portions; the pipeline just ensures those portions did not leak into preprocessing.
 
@@ -691,14 +691,14 @@ Re-fitting preprocessing fresh in each fold is the mechanism that keeps the vali
 <MultipleChoice
   markdown={`What problem does \`ColumnTransformer\` solve that a single \`Pipeline\` step cannot?
 
-- It makes the model train faster
-  > Routing columns does not speed up training; it is about applying *different* transforms to *different* columns.
-- It removes the need to split the data
-  > Splitting is still required; \`ColumnTransformer\` only handles applying transforms to column subsets.
-- [o] It applies different transformers to different columns, for example, scaling numeric columns while one-hot encoding categorical columns in the same dataset
-  > A single pipeline step transforms all columns the same way, whereas mixed data needs distinct transforms per column type, which is exactly what \`ColumnTransformer\` routes.
 - It guarantees the model reaches 100% accuracy
   > No transformer can guarantee perfect accuracy; \`ColumnTransformer\` only organizes preprocessing by column.
+- [o] It applies different transformers to different columns, for example, scaling numeric columns while one-hot encoding categorical columns in the same dataset
+  > A single pipeline step transforms all columns the same way, whereas mixed data needs distinct transforms per column type, which is exactly what \`ColumnTransformer\` routes.
+- It removes the need to split the data
+  > Splitting is still required; \`ColumnTransformer\` only handles applying transforms to column subsets.
+- It makes the model train faster
+  > Routing columns does not speed up training; it is about applying *different* transforms to *different* columns.
 
 Mixed numeric-and-categorical data is the canonical case: numbers get scaled, categories get encoded, side by side.`}
 />
@@ -708,12 +708,12 @@ Mixed numeric-and-categorical data is the canonical case: numbers get scaled, ca
 
 - It re-fits on \`X_new\` to compute fresh statistics
   > Re-fitting on new data at predict time would leak and would change the scaling the model was trained for; the scaler must reuse its training statistics.
-- [o] It transforms \`X_new\` using the mean and standard deviation it learned during \`fit\`, without re-fitting
-  > Reusing the statistics learned at training time is what keeps prediction consistent with training and free of leakage.
 - It is skipped entirely at predict time
   > The scaler is essential at predict time, the model expects scaled inputs, so \`X_new\` must be transformed the same way as the training data.
 - It returns the raw \`X_new\` unchanged
   > Returning raw values would feed the model unscaled inputs, breaking the consistency between training and prediction.
+- [o] It transforms \`X_new\` using the mean and standard deviation it learned during \`fit\`, without re-fitting
+  > Reusing the statistics learned at training time is what keeps prediction consistent with training and free of leakage.
 
 During prediction the scaler only transforms; it fits only once, during training.`}
 />
@@ -740,10 +740,10 @@ To keep unlisted columns, set \`remainder="passthrough"\`; otherwise they are dr
   > \`cross_val_score\` accepts a bare model and pre-transformed data; it runs fine, which is what makes the leak easy to miss.
 - Nothing, preprocessing the whole dataset first is the recommended approach
   > Preprocessing the whole dataset first is precisely the leak; the recommended approach is to wrap preprocessing and model in a pipeline and cross-validate that.
-- [o] Each fold's validation rows already influenced the scaling and encoding, so the reported cross-validation score is optimistically biased
-  > Because the preprocessing saw every row before folding, the held-out rows in each fold were not truly unseen, inflating the average score.
 - The model will underfit and score near zero
   > Leakage inflates scores rather than deflating them; the result looks too good, not too bad.
+- [o] Each fold's validation rows already influenced the scaling and encoding, so the reported cross-validation score is optimistically biased
+  > Because the preprocessing saw every row before folding, the held-out rows in each fold were not truly unseen, inflating the average score.
 
 Fitting preprocessing once on all the data leaks the validation rows into every fold; the fix is to cross-validate the whole pipeline instead.`}
 />

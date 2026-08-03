@@ -211,14 +211,14 @@ Happy querying.
 <MultipleChoice
   markdown={`Which statement best describes the relationship between \`IEnumerable<T>\` and \`IQueryable<T>\`?
 
-- They are unrelated, \`IQueryable<T>\` is a database-only type with its own API.
-  > \`IQueryable<T>\` inherits from \`IEnumerable<T>\`. They share the LINQ method surface.
-- [o] \`IQueryable<T>\` captures a query as an *expression tree* that a provider (like EF Core) can translate, instead of executing the LINQ in process.
-  > The same \`.Where(...).Select(...)\` syntax that runs in-memory against \`IEnumerable<T>\` becomes a reified expression tree against \`IQueryable<T>\`, which providers translate (typically to SQL). This is the trick behind EF Core, LINQ to XML, LINQ to remote services, and more.
-- They are the same interface with different names for historical reasons.
-  > They have different semantics: \`IEnumerable<T>\` runs delegates in-process; \`IQueryable<T>\` captures expressions for a provider.
 - \`IQueryable<T>\` is always faster because it runs on a server.
   > Sometimes faster, sometimes much slower, and if the provider can't translate a clause, it may silently fall back to fetching everything and filtering client-side.
+- They are unrelated, \`IQueryable<T>\` is a database-only type with its own API.
+  > \`IQueryable<T>\` inherits from \`IEnumerable<T>\`. They share the LINQ method surface.
+- They are the same interface with different names for historical reasons.
+  > They have different semantics: \`IEnumerable<T>\` runs delegates in-process; \`IQueryable<T>\` captures expressions for a provider.
+- [o] \`IQueryable<T>\` captures a query as an *expression tree* that a provider (like EF Core) can translate, instead of executing the LINQ in process.
+  > The same \`.Where(...).Select(...)\` syntax that runs in-memory against \`IEnumerable<T>\` becomes a reified expression tree against \`IQueryable<T>\`, which providers translate (typically to SQL). This is the trick behind EF Core, LINQ to XML, LINQ to remote services, and more.
 
 Understanding this distinction is essential before you write LINQ against EF Core or any remote data source.`}
 />

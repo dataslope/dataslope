@@ -208,27 +208,27 @@ non-destructively before deciding what to drop.
 <MultipleChoice
   markdown={`A colleague's report uses \`=VLOOKUP(id, A:D, 3, FALSE)\`. Someone inserts a new column between B and C, and the results silently go wrong. What's the most robust fix?
 
-- Wrap the whole thing in \`IFERROR\`.
-  > \`IFERROR\` only hides errors; here the formula returns the *wrong* value, not an error, so it stays hidden and wrong.
-- [o] Use \`INDEX/MATCH\` (or \`XLOOKUP\`), which reference ranges by name instead of a fixed column number.
-  > Because they don't hard-code \`col_index_num\`, inserting or moving columns doesn't shift what they return.
 - Change the last argument to \`TRUE\`.
   > \`TRUE\` switches to approximate match on sorted data, unrelated to the column-shift bug and likely to introduce new errors.
+- Wrap the whole thing in \`IFERROR\`.
+  > \`IFERROR\` only hides errors; here the formula returns the *wrong* value, not an error, so it stays hidden and wrong.
 - Sort the table by \`id\`.
-  > Sorting doesn't fix a hard-coded column offset; the third column is still the wrong one after the insert.`}
+  > Sorting doesn't fix a hard-coded column offset; the third column is still the wrong one after the insert.
+- [o] Use \`INDEX/MATCH\` (or \`XLOOKUP\`), which reference ranges by name instead of a fixed column number.
+  > Because they don't hard-code \`col_index_num\`, inserting or moving columns doesn't shift what they return.`}
 />
 
 <MultipleChoice
   markdown={`Cell \`F1\` holds a tax rate. You write \`=B2*F1\` in \`C2\` and fill it down the column. The first row is right; lower rows are wrong. Why?
 
+- You need to format the cells as currency.
+  > Formatting changes display, not the computed value; the wrong numbers come from the drifting reference.
+- \`B2\` should be absolute instead.
+  > \`B2\` *should* move with each row, that part is correct; it's the rate cell that must stay fixed.
 - Excel can't multiply a column by a single cell.
   > It can; the issue is how the reference to \`F1\` changes as you fill down.
 - [o] \`F1\` is a relative reference, so filling down shifts it to \`F2\`, \`F3\`, … (empty cells). It should be \`$F$1\`.
-  > Absolute-anchoring the rate with \`$F$1\` keeps every row pointing at the tax rate.
-- \`B2\` should be absolute instead.
-  > \`B2\` *should* move with each row, that part is correct; it's the rate cell that must stay fixed.
-- You need to format the cells as currency.
-  > Formatting changes display, not the computed value; the wrong numbers come from the drifting reference.`}
+  > Absolute-anchoring the rate with \`$F$1\` keeps every row pointing at the tax rate.`}
 />
 
 <MultipleChoice
@@ -236,12 +236,12 @@ non-destructively before deciding what to drop.
 
 - Split it across several spreadsheet tabs.
   > That adds complexity and fragility without fixing the manual, non-reproducible, memory-bound workflow.
-- [o] Move the data and transformations into SQL / a database and schedule the query.
-  > SQL handles the scale, makes the steps reproducible and auditable, and removes the manual refresh, exactly the spreadsheet-to-database threshold.
 - Buy a machine with more RAM.
   > It might delay crashes but leaves the manual, error-prone, unversioned process intact.
 - Delete older rows to shrink the file.
-  > Discarding data to fit a tool is backwards; the tool should fit the data.`}
+  > Discarding data to fit a tool is backwards; the tool should fit the data.
+- [o] Move the data and transformations into SQL / a database and schedule the query.
+  > SQL handles the scale, makes the steps reproducible and auditable, and removes the manual refresh, exactly the spreadsheet-to-database threshold.`}
 />
 
 ## Go deeper

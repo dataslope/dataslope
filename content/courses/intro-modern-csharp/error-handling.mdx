@@ -400,23 +400,23 @@ Console.WriteLine(SafeMath.SumNumbers(data));
 
 - For every possible error
   > That overloads the exception system and harms performance and clarity.
+- Whenever your method touches a file
+  > Reaching for exceptions reflexively misses the real distinction.
 - Only when you want to crash the program
   > Exceptions are designed to be *caught*, not just to crash.
 - [o] When the failure is unusual or unexpected, and forcing every call site to check for it would be noisy
-  > Ordinary, expected failures should use return values like \`TryParse\`.
-- Whenever your method touches a file
-  > Reaching for exceptions reflexively misses the real distinction.`}
+  > Ordinary, expected failures should use return values like \`TryParse\`.`}
 />
 
 <MultipleChoice
   markdown={`Why is a silent \`catch { }\` block dangerous?
 
-- It's slower than a specific catch
-  > Performance isn't the issue.
 - The compiler removes it
   > It doesn't.
-- [o] It hides bugs by swallowing every exception, even ones you never anticipated
-  > The program continues with corrupt state and you have no idea anything went wrong.
 - It uses too much memory
-  > Memory isn't the issue.`}
+  > Memory isn't the issue.
+- It's slower than a specific catch
+  > Performance isn't the issue.
+- [o] It hides bugs by swallowing every exception, even ones you never anticipated
+  > The program continues with corrupt state and you have no idea anything went wrong.`}
 />

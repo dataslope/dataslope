@@ -154,27 +154,27 @@ write your first R the page after that.
 <MultipleChoice
   markdown={`Which of the following best describes how the **bottleneck** in data analysis has shifted over the past 50 years?
 
-- The bottleneck has stayed the same: people still mostly run out of data.
-  > Data scarcity was the bottleneck for most of history, but the text describes how the world has shifted from data-scarce to data-abundant, making *understanding* the new limiting factor.
-- [o] The bottleneck has shifted from *collecting* data to *understanding* it.
-  > For most of history, gathering data was the hard part. Today, data is generated in huge volumes automatically; the challenge is interpreting it, separating signal from noise, and making decisions that are not fooled by spurious patterns.
 - The bottleneck is now purely hardware, we need faster computers.
   > Hardware matters, but the bigger constraint is human: turning data into reliable insight.
 - There is no longer any bottleneck because AI handles everything.
-  > AI tools help, but they still require thoughtful humans to choose questions, evaluate results, and avoid garbage-in/garbage-out problems.`}
+  > AI tools help, but they still require thoughtful humans to choose questions, evaluate results, and avoid garbage-in/garbage-out problems.
+- [o] The bottleneck has shifted from *collecting* data to *understanding* it.
+  > For most of history, gathering data was the hard part. Today, data is generated in huge volumes automatically; the challenge is interpreting it, separating signal from noise, and making decisions that are not fooled by spurious patterns.
+- The bottleneck has stayed the same: people still mostly run out of data.
+  > Data scarcity was the bottleneck for most of history, but the text describes how the world has shifted from data-scarce to data-abundant, making *understanding* the new limiting factor.`}
 />
 
 <MultipleChoice
   markdown={`Why does *spurious patterns* become a more dangerous problem as datasets grow larger?
 
-- Computers introduce rounding errors at scale.
-  > Floating-point rounding errors are a real concern in numerical computing but are not the primary reason large datasets produce spurious patterns; multiple-comparison inflation is.
-- Large datasets are always biased.
-  > Bias is a potential problem with large datasets, but it is a separate issue from spurious patterns; here the concern is false positives due to testing many hypotheses.
 - [o] When you test many hypotheses against a large dataset, some will look "statistically interesting" purely by chance.
   > This is sometimes called the *multiple comparisons problem*, and it is one of the main reasons data analysts need disciplined statistical tools, not just spreadsheets.
+- Large datasets are always biased.
+  > Bias is a potential problem with large datasets, but it is a separate issue from spurious patterns; here the concern is false positives due to testing many hypotheses.
 - Larger datasets cannot be visualized.
-  > Large datasets can absolutely be visualized (with sampling, aggregation, or appropriate tools); the spurious-patterns problem is a statistical phenomenon, not a visualization limitation.`}
+  > Large datasets can absolutely be visualized (with sampling, aggregation, or appropriate tools); the spurious-patterns problem is a statistical phenomenon, not a visualization limitation.
+- Computers introduce rounding errors at scale.
+  > Floating-point rounding errors are a real concern in numerical computing but are not the primary reason large datasets produce spurious patterns; multiple-comparison inflation is.`}
 />
 
 <MultipleChoice

@@ -162,14 +162,14 @@ throws an error.
 <MultipleChoice
   markdown={`Running \`ggplot(mpg, aes(x = displ, y = hwy))\` with no geom produces axes but no points. Why?
 
+- ggplot always requires \`color\` to be mapped before drawing.
+  > Color is optional; the missing piece is a geometry, not a color mapping.
+- [o] Data and mappings define the coordinate space and scales, but *marks* are only drawn by a geometry, which has not been added yet.
+  > Without a geom there is nothing to draw, even though the axes are ready.
 - It is an error that happens to render.
   > It renders intentionally, no error occurred.
 - The data failed to load.
   > The data loaded fine; the axes were scaled from it.
-- [o] Data and mappings define the coordinate space and scales, but *marks* are only drawn by a geometry, which has not been added yet.
-  > Without a geom there is nothing to draw, even though the axes are ready.
-- ggplot always requires \`color\` to be mapped before drawing.
-  > Color is optional; the missing piece is a geometry, not a color mapping.
 
 The blank panel demonstrates that *data + mappings* is a genuine,
 separate stage from *drawing marks*.`}
@@ -178,14 +178,14 @@ separate stage from *drawing marks*.`}
 <MultipleChoice
   markdown={`You want a scatter plot where x and y are shared by all layers but a \`geom_point\` layer is colored by \`drv\` and a \`geom_smooth\` layer is **not**. Where should \`color = drv\` go?
 
-- In \`ggplot(aes(...))\`, so every layer shares it.
-  > That would color the smoother too, fitting a separate line per drivetrain, not what we asked for.
+- In the \`theme()\`.
+  > Themes style non-data elements; they cannot map a variable to color.
 - Nowhere; you cannot do this in ggplot2.
   > You can, by scoping the mapping to a single layer.
 - [o] Inside \`geom_point(aes(color = drv))\`, so only that layer uses the color mapping.
   > Layer-level mappings apply to just that geom, leaving the smoother uncolored.
-- In the \`theme()\`.
-  > Themes style non-data elements; they cannot map a variable to color.
+- In \`ggplot(aes(...))\`, so every layer shares it.
+  > That would color the smoother too, fitting a separate line per drivetrain, not what we asked for.
 
 Shared mappings go in \`ggplot()\`; layer-specific mappings go in that
 layer's \`aes()\`. This control is central to building multi-layer plots.`}

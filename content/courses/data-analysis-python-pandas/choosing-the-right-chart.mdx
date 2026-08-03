@@ -144,12 +144,12 @@ points**.
 <MultipleChoice
   markdown={`You want to show how monthly active users changed over the last 12 months. Best chart?
 
-- Pie chart
-  > A pie chart shows parts of a whole at one point in time, it cannot display change across twelve months.
-- Stacked bar
-  > A stacked bar is for composition across categories, not for showing how a single metric moves over time.
 - [o] Line chart, time is continuous and a line emphasizes the trend
   > Lines are the default for time-series.
+- Stacked bar
+  > A stacked bar is for composition across categories, not for showing how a single metric moves over time.
+- Pie chart
+  > A pie chart shows parts of a whole at one point in time, it cannot display change across twelve months.
 - Box plot
   > A box plot summarizes a distribution (median, quartiles, outliers), it is designed for comparing groups, not for showing change over time.
 
@@ -159,14 +159,14 @@ Lines and time go together.`}
 <MultipleChoice
   markdown={`Top 5 product categories by revenue. Best chart?
 
-- Pie chart
-  > Comparing five slices by angle is much harder than comparing five bars by length; a bar chart is almost always clearer.
-- 3D bar chart
-  > 3D perspective distorts bar heights, making accurate comparisons across categories impossible.
-- [o] Horizontal bar chart sorted by value
-  > Bars rank cleanly by length; horizontal accommodates long category names.
 - Histogram
   > A histogram shows the distribution of a continuous numeric variable, it is not designed for comparing named categories.
+- [o] Horizontal bar chart sorted by value
+  > Bars rank cleanly by length; horizontal accommodates long category names.
+- 3D bar chart
+  > 3D perspective distorts bar heights, making accurate comparisons across categories impossible.
+- Pie chart
+  > Comparing five slices by angle is much harder than comparing five bars by length; a bar chart is almost always clearer.
 
 Bars and categories go together.`}
 />
@@ -176,12 +176,12 @@ Bars and categories go together.`}
 
 - Increase the figure size
   > A larger canvas does not reduce the density of overlapping points, 100,000 dots still cover the same relative area regardless of figure size.
-- Plot fewer columns
-  > Plotting fewer columns addresses a different problem (too many variables); it does nothing about the overplotting caused by having 100,000 observations in a single scatter.
-- [o] Lower the opacity (or use a 2D density / hexbin plot) so the structure becomes visible
-  > Overplotting is a perceptual problem, transparency and density plots are the standard fixes.
 - Change the color palette
   > Changing the palette rearranges which colors overlap, but the fundamental overplotting problem, too many points in the same screen space, remains.
+- [o] Lower the opacity (or use a 2D density / hexbin plot) so the structure becomes visible
+  > Overplotting is a perceptual problem, transparency and density plots are the standard fixes.
+- Plot fewer columns
+  > Plotting fewer columns addresses a different problem (too many variables); it does nothing about the overplotting caused by having 100,000 observations in a single scatter.
 
 Density is information; "ink" alone is not.`}
 />
@@ -189,14 +189,14 @@ Density is information; "ink" alone is not.`}
 <MultipleChoice
   markdown={`A reporter shows two bar charts. The first starts the y-axis at 80; the second starts at 0. Both use the same data. Which is more *honest*?
 
-- The y=80 chart, it shows detail
-  > Showing detail by truncating the axis distorts the visual ratio between bars, a 5% difference can look like a 200% difference when the axis starts at 80 instead of 0.
-- Both are equally honest
-  > The two charts encode the same numbers but produce different visual impressions; starting at 80 inflates the apparent magnitude of differences, so they are not equally honest.
 - [o] The y=0 chart, in most cases, starting at zero preserves correct visual proportions, especially for additive quantities. A truncated axis can dramatically exaggerate small changes.
   > There are rare cases (e.g., temperature with a meaningful baseline) where truncation is fine, but the *default* is to start at zero.
+- The y=80 chart, it shows detail
+  > Showing detail by truncating the axis distorts the visual ratio between bars, a 5% difference can look like a 200% difference when the axis starts at 80 instead of 0.
 - The y=80 chart, it is more zoomed in
   > "Zoomed in" is a misleading framing, a truncated baseline is not the same as zooming, and for bar charts specifically it distorts the visual message about relative magnitudes.
+- Both are equally honest
+  > The two charts encode the same numbers but produce different visual impressions; starting at 80 inflates the apparent magnitude of differences, so they are not equally honest.
 
 Axis choices are editorial choices.`}
 />

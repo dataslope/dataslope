@@ -160,10 +160,10 @@ table.
 
 - A single column in a table.
   > A column is an attribute of an entity, not the entity itself.
-- [o] A distinct real-world "thing" the data is about, which usually becomes a table.
-  > Entities are the core nouns of a system (customer, order, book) and typically map to tables.
 - A connection between two tables.
   > A connection is a relationship; an entity is the thing being connected.
+- [o] A distinct real-world "thing" the data is about, which usually becomes a table.
+  > Entities are the core nouns of a system (customer, order, book) and typically map to tables.
 - A query that summarizes data.
   > A query reads data; an entity is part of the data's structure.
 
@@ -173,14 +173,14 @@ An entity is a real-world thing the data describes, usually realized as a table.
 <MultipleChoice
   markdown={`When turning a plain-English description into a model, which words are the best clues to **entities**?
 
-- The adjectives.
-  > Adjectives tend to describe attributes' qualities, not the core things themselves.
-- [o] The nouns.
-  > Nouns name the things a system tracks, which become candidate entities.
-- The verbs.
-  > Verbs hint at relationships between entities, not the entities themselves.
 - The numbers.
   > Numbers are usually attribute values, not entities.
+- The verbs.
+  > Verbs hint at relationships between entities, not the entities themselves.
+- [o] The nouns.
+  > Nouns name the things a system tracks, which become candidate entities.
+- The adjectives.
+  > Adjectives tend to describe attributes' qualities, not the core things themselves.
 
 Nouns in a description point to the entities; verbs point to relationships.`}
 />
@@ -188,14 +188,14 @@ Nouns in a description point to the entities; verbs point to relationships.`}
 <MultipleChoice
   markdown={`A customer can have many orders. How should "the customer's orders" be modeled?
 
-- As a single column on the customers table listing all order ids.
-  > Stuffing many values into one column breaks the one-value-per-cell idea and is hard to query.
 - [o] As a relationship to a separate \`orders\` entity, linked by a foreign key.
   > "Many orders" is a relationship to another entity, expressed with a foreign key, not an attribute.
-- As an attribute, since every fact about a customer is an attribute.
-  > A fact that has *many* values per row signals a relationship, not a single-valued attribute.
 - It cannot be modeled in a relational database.
   > One-to-many relationships are a core, well-supported relational pattern.
+- As an attribute, since every fact about a customer is an attribute.
+  > A fact that has *many* values per row signals a relationship, not a single-valued attribute.
+- As a single column on the customers table listing all order ids.
+  > Stuffing many values into one column breaks the one-value-per-cell idea and is hard to query.
 
 "Many of something" per row is a relationship to another entity, modeled with a foreign key.`}
 />

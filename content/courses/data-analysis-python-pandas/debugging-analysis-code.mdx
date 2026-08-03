@@ -269,14 +269,14 @@ Before you change any code, run through:
 <MultipleChoice
   markdown={`Your sum of "price" is 6 digits long even though only a handful of rows exist. Most likely cause:
 
-- A floating-point bug
-  > Floating-point errors produce tiny rounding discrepancies, not a result six digits long from a handful of rows.
-- The data is corrupt
-  > Corrupt data would more likely cause an error or NaN, not a suspiciously long but coherent string-like result.
 - [o] The column is a string, and \`.sum()\` concatenated the values instead of adding them, check \`df.dtypes\`
   > String-vs-number is the most common silent bug in Pandas.
 - Pandas needs an upgrade
   > A Pandas version issue would not selectively cause string concatenation on a single column; the bug is in the data type, not the library.
+- A floating-point bug
+  > Floating-point errors produce tiny rounding discrepancies, not a result six digits long from a handful of rows.
+- The data is corrupt
+  > Corrupt data would more likely cause an error or NaN, not a suspiciously long but coherent string-like result.
 
 Always check dtypes after loading.`}
 />
@@ -284,10 +284,10 @@ Always check dtypes after loading.`}
 <MultipleChoice
   markdown={`A merge unexpectedly multiplied your row count by 3. Best diagnostic step?
 
-- Add more print statements throughout
-  > Scattering prints everywhere is unfocused; the chapter recommends diagnosing the specific cause, key duplication, rather than adding noise.
 - Re-run with a different package version
   > A cardinality blow-up is almost never a Pandas bug; it is a data problem that any version would reproduce.
+- Add more print statements throughout
+  > Scattering prints everywhere is unfocused; the chapter recommends diagnosing the specific cause, key duplication, rather than adding noise.
 - [o] Check whether the join key is duplicated on the right-hand table (\`df.duplicated(subset=...).sum()\`), and/or re-run the merge with \`validate="one_to_many"\` or similar
   > Cardinality blow-ups have a clear root cause that the \`validate\` flag would have caught.
 - Drop duplicates blindly
@@ -299,12 +299,12 @@ Encode assumptions; let Pandas tell you when reality breaks them.`}
 <MultipleChoice
   markdown={`A 30-step pipeline produces a wrong answer. What's the most efficient debugging approach?
 
-- Re-read every step
-  > Re-reading all 30 steps is O(n) search; bisection reduces the problem to O(log n) by splitting the problem in half each time.
 - Rewrite the pipeline
   > Rewriting discards working code and adds new bugs; the problem needs to be located first, not replaced.
 - [o] Bisect, check the intermediate output halfway through; whichever half is wrong, bisect again
   > Logarithmic search through your pipeline beats linear search.
+- Re-read every step
+  > Re-reading all 30 steps is O(n) search; bisection reduces the problem to O(log n) by splitting the problem in half each time.
 - Add more comments
   > Comments explain intent but do not execute or reveal the intermediate state that would expose where the wrong answer originates.
 

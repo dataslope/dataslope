@@ -135,14 +135,14 @@ different fact.
 <MultipleChoice
   markdown={`In the flat \`orders_flat\` table, Ada's email appears on every order row. What makes that dangerous?
 
+- It means every product must have the same price.
+  > Product prices can vary; the issue is that any repeated price must be kept consistent.
+- It means Ada can place only one order.
+  > The table can store many orders; the problem is duplicated customer facts.
 - It prevents SQL from filtering rows.
   > Filtering still works; the risk is that repeated copies can drift apart.
 - [o] A single real-world fact must be changed in several stored places.
   > When one fact has many stored copies, one missed update can create disagreement.
-- It means Ada can place only one order.
-  > The table can store many orders; the problem is duplicated customer facts.
-- It means every product must have the same price.
-  > Product prices can vary; the issue is that any repeated price must be kept consistent.
 
 Duplication turns one real-world change into many database updates.`}
 />
@@ -150,12 +150,12 @@ Duplication turns one real-world change into many database updates.`}
 <MultipleChoice
   markdown={`Which situation is the clearest deletion anomaly?
 
+- [o] Deleting a customer's last order also removes the only record of the customer's email.
+  > The delete removed an order fact and accidentally erased a customer fact.
 - A query returns no rows because the \`WHERE\` clause is too strict.
   > That is a query issue, not a table-design anomaly.
 - A customer changes email and one old row is missed.
   > That is an update anomaly because stored copies no longer match.
-- [o] Deleting a customer's last order also removes the only record of the customer's email.
-  > The delete removed an order fact and accidentally erased a customer fact.
 - A table has a primary key column.
   > A primary key helps identify rows; it is not a deletion anomaly.
 
@@ -227,14 +227,14 @@ walk through the cure one stage at a time.
 <MultipleChoice
   markdown={`What is the main design goal behind normalization?
 
-- To make every table contain every fact needed by the application.
-  > Putting every fact in every convenient place creates the duplication normalization avoids.
 - [o] To store each fact in one place so the database has a single source of truth.
   > A single home for each fact prevents stored copies from disagreeing.
-- To avoid all joins forever.
-  > Normalized designs often use joins to recombine related facts when reading.
+- To make every table contain every fact needed by the application.
+  > Putting every fact in every convenient place creates the duplication normalization avoids.
 - To remove primary keys from tables.
   > Keys become more important because they connect the split tables.
+- To avoid all joins forever.
+  > Normalized designs often use joins to recombine related facts when reading.
 
 Normalization protects correctness by controlling where facts live.`}
 />
@@ -242,14 +242,14 @@ Normalization protects correctness by controlling where facts live.`}
 <MultipleChoice
   markdown={`A shop cannot add a new product until someone buys it because products are stored only inside order rows. Which anomaly is this?
 
+- Join anomaly.
+  > This course is discussing update, insertion, and deletion anomalies caused by duplication.
+- Deletion anomaly.
+  > A deletion anomaly happens when deleting one fact erases another fact accidentally.
 - Update anomaly.
   > An update anomaly happens when changing a fact requires changing many stored copies.
 - [o] Insertion anomaly.
   > The design blocks inserting a product fact unless an order fact exists too.
-- Deletion anomaly.
-  > A deletion anomaly happens when deleting one fact erases another fact accidentally.
-- Join anomaly.
-  > This course is discussing update, insertion, and deletion anomalies caused by duplication.
 
 Insertion anomalies appear when unrelated facts are forced into the same row.`}
 />
@@ -257,14 +257,14 @@ Insertion anomalies appear when unrelated facts are forced into the same row.`}
 <MultipleChoice
   markdown={`After splitting customers, products, and orders into separate tables, how can you show the familiar all-in-one order report?
 
-- Store the customer email again in \`orders\` for convenience.
-  > Copying the email back into orders recreates the original duplication risk.
+- Put all columns into the primary key.
+  > Keys identify rows; they do not by themselves rebuild a report.
 - [o] Join the related tables when reading the report.
   > Joins rebuild the combined view from facts stored once in their proper tables.
 - Delete the product table after orders are inserted.
   > Deleting the product table would remove the source of product facts.
-- Put all columns into the primary key.
-  > Keys identify rows; they do not by themselves rebuild a report.
+- Store the customer email again in \`orders\` for convenience.
+  > Copying the email back into orders recreates the original duplication risk.
 
 A normalized schema stores clean facts; queries can still present a wide view.`}
 />
@@ -272,12 +272,12 @@ A normalized schema stores clean facts; queries can still present a wide view.`}
 <MultipleChoice
   markdown={`Which statement best describes an update anomaly?
 
-- A new row cannot be inserted because another fact is missing.
-  > That describes an insertion anomaly.
 - A row deletion accidentally removes another kind of fact.
   > That describes a deletion anomaly.
 - [o] A fact changes, but the database stores several copies that must all be updated.
   > Multiple stored copies make it easy for one update to miss a row.
+- A new row cannot be inserted because another fact is missing.
+  > That describes an insertion anomaly.
 - A foreign key points to an existing primary key.
   > That is normal referential integrity, not an anomaly.
 

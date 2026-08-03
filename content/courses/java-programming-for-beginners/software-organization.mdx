@@ -187,40 +187,40 @@ That is the entire game.
 <MultipleChoice
   markdown={`Which is the single best summary of "good architecture"?
 
-- "Use the latest frameworks"
-  > Not architecture.
 - "Write the fewest possible classes"
   > Smallness isn't the same as good structure.
-- [o] "When something needs to change, only a small, predictable part of the system needs to change"
-  > Sometimes called the "locality of change" principle.
+- "Use the latest frameworks"
+  > Not architecture.
 - "Make every class depend on every other class for flexibility"
-  > That's the opposite of low coupling.`}
+  > That's the opposite of low coupling.
+- [o] "When something needs to change, only a small, predictable part of the system needs to change"
+  > Sometimes called the "locality of change" principle.`}
 />
 
 <MultipleChoice
   markdown={`Why is it a problem when the *domain* layer depends on the *infrastructure* layer (e.g., on database classes)?
 
-- It makes the program faster
-  > It does not make it faster.
-- The compiler refuses to allow it
-  > It allows it; this is a design rule, not a compiler rule.
 - [o] It couples the core business rules to a specific technology choice, making the domain hard to test, hard to reuse, and hard to evolve as the infrastructure changes
   > The domain should stay independent of databases and frameworks so it can be tested and reused freely.
 - It causes a stack overflow
-  > It does not.`}
+  > It does not.
+- The compiler refuses to allow it
+  > It allows it; this is a design rule, not a compiler rule.
+- It makes the program faster
+  > It does not make it faster.`}
 />
 
 <MultipleChoice
   markdown={`The two-word summary of every architectural principle you'll ever read is:
 
-- "Fast code"
-  > Not the summary.
 - "Many classes"
   > Not the summary.
-- [o] "High cohesion, low coupling"
-  > Keep related things together and minimize how much one module must know about another.
 - "Latest framework"
-  > Not the summary.`}
+  > Not the summary.
+- "Fast code"
+  > Not the summary.
+- [o] "High cohesion, low coupling"
+  > Keep related things together and minimize how much one module must know about another.`}
 />
 
 You have now seen the conceptual machinery of organizing software

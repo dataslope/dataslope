@@ -328,12 +328,12 @@ print(long_sum(1, 2, 3, 4, 5))
 <MultipleChoice
   markdown={`What delimiter does Python use to mark code blocks?
 
-- Curly braces \`{ ... }\`
-  > That is the C/JavaScript/Java style. Python does not use braces.
 - Keywords \`begin ... end\`
   > That is the Pascal/Ruby style. Python does not use those keywords.
 - [o] Indentation
   > A colon starts a block, and indentation defines its scope.
+- Curly braces \`{ ... }\`
+  > That is the C/JavaScript/Java style. Python does not use braces.
 - Parentheses \`( ... )\`
   > Parentheses group expressions, not blocks.`}
 />
@@ -341,10 +341,10 @@ print(long_sum(1, 2, 3, 4, 5))
 <MultipleChoice
   markdown={`What does PEP 8 recommend for indentation?
 
-- A single tab character
-  > Tabs are permitted only for compatibility with already-tab-indented code.
 - Two spaces
   > Two-space indentation is common in JavaScript and Ruby, but PEP 8 prefers four for Python.
+- A single tab character
+  > Tabs are permitted only for compatibility with already-tab-indented code.
 - [o] Four spaces
   > PEP 8 mandates four spaces per indentation level.
 - Eight spaces
@@ -354,27 +354,27 @@ print(long_sum(1, 2, 3, 4, 5))
 <MultipleChoice
   markdown={`What error does Python 3 raise if you mix tabs and spaces in the same block?
 
-- SyntaxError
-  > Syntax errors are for invalid Python code. Mixing tabs and spaces is a specific case.
 - IndentationError
   > This is raised when indentation is missing or inconsistent, but mixing tabs and spaces has its own error.
-- [o] TabError
-  > Python 3 raises a \`TabError\` if a single block mixes tabs and spaces.
 - RuntimeError
-  > Runtime errors occur during execution, not parsing.`}
+  > Runtime errors occur during execution, not parsing.
+- SyntaxError
+  > Syntax errors are for invalid Python code. Mixing tabs and spaces is a specific case.
+- [o] TabError
+  > Python 3 raises a \`TabError\` if a single block mixes tabs and spaces.`}
 />
 
 <MultipleChoice
   markdown={`Which tool is the most popular Python code formatter?
 
-- pylint
-  > pylint is a linter (it finds bugs and style issues) but does not reformat code.
+- mypy
+  > mypy is a type checker, not a formatter.
 - flake8
   > flake8 is also a linter, not a formatter.
 - [o] black
   > black is the most popular Python formatter and enforces a consistent style with almost no configuration.
-- mypy
-  > mypy is a type checker, not a formatter.`}
+- pylint
+  > pylint is a linter (it finds bugs and style issues) but does not reformat code.`}
 />
 
 Now that the rules of the road are clear, we will start using them to

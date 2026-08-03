@@ -140,10 +140,10 @@ label, or delete one phone number, the design fights you.
 <MultipleChoice
   markdown={`What does a column's **domain** describe?
 
-- The table where the column appears.
-  > The table gives context, but the domain is about which values are allowed.
 - [o] The set of valid values for that attribute, often enforced by types and constraints.
   > A domain combines data type and rules, such as allowed statuses or nonnegative amounts.
+- The table where the column appears.
+  > The table gives context, but the domain is about which values are allowed.
 - The number of rows currently in the table.
   > Row count changes over time and is not the domain of a column.
 - The order in which columns are displayed.
@@ -207,10 +207,10 @@ harder to misunderstand.
 
 - A database backup of that entity.
   > Backups are operational copies, not properties of an entity.
-- [o] A property or fact about the entity, such as a customer's email address.
-  > Attributes describe the entity and usually become columns.
 - A relationship between two unrelated tables.
   > Relationships connect entities; attributes describe one entity.
+- [o] A property or fact about the entity, such as a customer's email address.
+  > Attributes describe the entity and usually become columns.
 - The SQL command used to query the table.
   > SQL commands operate on data but are not attributes of the modeled thing.
 
@@ -220,12 +220,12 @@ Attributes are the facts stored about each row of an entity table.`}
 <MultipleChoice
   markdown={`Why is storing red, blue, green in one colors cell usually a design smell?
 
-- Because text columns cannot store commas.
-  > Text can store commas; the problem is mixing multiple values into one cell.
 - [o] Because the cell contains a list instead of one atomic value.
   > Non-atomic values are hard to validate, search, join, or update individually.
 - Because colors must always be stored as numbers.
   > Colors may be text or codes; the issue is one value versus many values.
+- Because text columns cannot store commas.
+  > Text can store commas; the problem is mixing multiple values into one cell.
 - Because PostgreSQL cannot read strings with spaces.
   > PostgreSQL handles strings with spaces normally.
 
@@ -235,10 +235,10 @@ Atomic cells keep each stored fact clear and manageable.`}
 <MultipleChoice
   markdown={`When is a concept more likely to become its own entity instead of just an attribute?
 
-- When it is spelled with more than five letters.
-  > Spelling length has no relationship to data modeling.
 - When it appears near the top of a form.
   > Interface position is not a reliable modeling rule.
+- When it is spelled with more than five letters.
+  > Spelling length has no relationship to data modeling.
 - [o] When it has its own details, repeated instances, or relationships to other entities.
   > Independent meaning and connections are signs that a separate table may be useful.
 - Whenever it is stored as text.

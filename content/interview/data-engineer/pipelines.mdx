@@ -328,27 +328,27 @@ An **SLA (Service Level Agreement)** in pipeline context is a commitment that a 
 <MultipleChoice
   markdown={`A nightly job sometimes gets re-run after a partial failure. Why make it **idempotent** (e.g. overwrite the partition / \`MERGE\` by key)?
 
-- It makes the job run faster.
-  > Idempotency is about correctness on re-runs, not speed.
+- It guarantees the upstream data is correct.
+  > It only controls *your* write behavior on re-run; upstream quality is separate.
 - [o] Re-running produces the same final result instead of duplicating or double-counting rows.
   > An idempotent write means a retry converges to the correct state rather than appending duplicates.
+- It makes the job run faster.
+  > Idempotency is about correctness on re-runs, not speed.
 - It removes the need for any scheduling.
-  > You still schedule it; idempotency just makes retries and backfills safe.
-- It guarantees the upstream data is correct.
-  > It only controls *your* write behavior on re-run; upstream quality is separate.`}
+  > You still schedule it; idempotency just makes retries and backfills safe.`}
 />
 
 <MultipleChoice
   markdown={`A 2 TB events table is almost always queried with \`WHERE event_date = '…'\`. What's the highest-impact change?
 
-- Convert it to CSV for portability.
-  > CSV is row-oriented and untyped, it would *increase* scan cost, the opposite of what's needed.
+- Store it as one giant file.
+  > A single file prevents pruning and parallelism; you want partitioned, reasonably-sized files.
 - [o] Partition (and/or order) the table by \`event_date\` so queries prune to one day's files.
   > Partitioning on the common filter lets the engine skip the other ~99.9% of data, a massive I/O win.
+- Convert it to CSV for portability.
+  > CSV is row-oriented and untyped, it would *increase* scan cost, the opposite of what's needed.
 - Add every column to a single composite index.
-  > Warehouse scan cost is dominated by data read; partition pruning + columnar format matter far more than a wide index.
-- Store it as one giant file.
-  > A single file prevents pruning and parallelism; you want partitioned, reasonably-sized files.`}
+  > Warehouse scan cost is dominated by data read; partition pruning + columnar format matter far more than a wide index.`}
 />
 
 ## Go deeper

@@ -283,12 +283,12 @@ gridlines and small tick marks on the axes?
 
 - \`"whitegrid"\`
   > That is a white background *with* light gridlines, not tick marks.
-- \`"darkgrid"\`
-  > That is the default: a gray background with white gridlines.
 - [o] \`"ticks"\`
   > \`"ticks"\` removes the grid and adds short tick marks on the axes, a minimal look common in publications.
 - \`"dark"\`
   > \`"dark"\` is a gray background with no grid and no tick marks.
+- \`"darkgrid"\`
+  > That is the default: a gray background with white gridlines.
 
 The five styles are \`darkgrid\`, \`whitegrid\`, \`dark\`, \`white\`, and \`ticks\`;
 only \`ticks\` adds axis tick marks to an otherwise grid-free canvas.`}
@@ -418,14 +418,14 @@ mean_mpg = round(mpg["mpg"].mean(), 1)
 <MultipleChoice
   markdown={`What does \`sns.load_dataset("penguins")\` return?
 
-- A Seaborn-specific chart object that you then display.
-  > \`load_dataset\` loads *data*, not a chart. Nothing is plotted by this call.
 - [o] An ordinary pandas \`DataFrame\` containing the penguins data.
   > It hands back a normal DataFrame, so all your pandas tools, \`.head()\`, \`.groupby()\`, filtering, work on it directly.
 - A NumPy array of raw values with no column names.
   > The result is a labeled DataFrame with named columns, not a bare array.
 - A file path string pointing to a CSV on disk.
   > You get the loaded table itself, ready to use, there is no file to open.
+- A Seaborn-specific chart object that you then display.
+  > \`load_dataset\` loads *data*, not a chart. Nothing is plotted by this call.
 
 \`load_dataset\` is just a convenient way to get a clean, tidy pandas
 DataFrame to practice on.`}
@@ -435,14 +435,14 @@ DataFrame to practice on.`}
   markdown={`You run \`sns.set_theme(context="poster")\` once and then draw three charts.
 Which statement is true?
 
-- Only the first chart after the call is affected; later charts revert to the default.
-  > The change is persistent, not one-shot, it stays in effect until you call \`set_theme\` again.
 - Nothing changes until you also pass a \`style\` argument.
   > \`context\` works on its own; \`style\` and \`palette\` are independent, optional settings.
 - [o] All three charts use the larger \`poster\` sizing, because \`set_theme\` changes the global defaults for the rest of the session.
   > \`set_theme\` mutates matplotlib's global defaults, so every plot drawn afterward inherits the new context until it is changed again.
 - The call resizes charts you already drew before it.
   > The effect is forward-looking only; plots created before the call keep their previous appearance.
+- Only the first chart after the call is affected; later charts revert to the default.
+  > The change is persistent, not one-shot, it stays in effect until you call \`set_theme\` again.
 
 \`set_theme\` is global and sticky: set it once, and it shapes every
 *subsequent* plot in the session.`}
@@ -455,12 +455,12 @@ look. Which argument should you reach for?
 
 - \`style="darkgrid"\`
   > \`style\` controls the background and gridlines, not how large the text and markers are.
+- \`height=8\`
+  > \`height\` enlarges the figure canvas for figure-level functions, but it does not scale the fonts and line weights the way \`context\` does.
 - [o] \`context="talk"\`
   > \`context\` scales fonts, lines, and markers for the medium; \`"talk"\` (or \`"poster"\`) sizes things up for presentation.
 - \`palette="deep"\`
   > \`palette\` only changes the colors used, not the sizing of elements.
-- \`height=8\`
-  > \`height\` enlarges the figure canvas for figure-level functions, but it does not scale the fonts and line weights the way \`context\` does.
 
 \`context\` (\`paper\` → \`notebook\` → \`talk\` → \`poster\`) is the dial for
 matching element sizes to where the chart will be seen.`}

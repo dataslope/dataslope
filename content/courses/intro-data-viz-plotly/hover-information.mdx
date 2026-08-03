@@ -202,14 +202,14 @@ seconds.
 <MultipleChoice
   markdown={`What does **hover_name="country"** do in a Plotly Express call?
 
+- Forces the chart to use country as the color.
+  > Color encoding is controlled by the \`color=\` parameter; \`hover_name\` only affects the tooltip's headline text and does not change any visual encoding in the chart.
+- [o] Sets the value of that column as a bold headline at the top of the hover tooltip for each data point.
+  > **hover_name** is for the "title" of the tooltip, usually a unique identifier like a name, ID, or label. Combined with **hover_data** for extra fields, you can turn each hover into a small information panel about a single data point.
 - Renames the country column.
   > \`hover_name\` controls only how the column appears in the tooltip header; it does not rename the column in the DataFrame or change how it is used in other encodings.
 - Hides the country column from the data.
   > \`hover_name\` displays the column's values more prominently, not less; it adds the value as a bold title at the top of the hover box.
-- [o] Sets the value of that column as a bold headline at the top of the hover tooltip for each data point.
-  > **hover_name** is for the "title" of the tooltip, usually a unique identifier like a name, ID, or label. Combined with **hover_data** for extra fields, you can turn each hover into a small information panel about a single data point.
-- Forces the chart to use country as the color.
-  > Color encoding is controlled by the \`color=\` parameter; \`hover_name\` only affects the tooltip's headline text and does not change any visual encoding in the chart.
 
 Adding **hover_name** is often the single biggest improvement you can make to an analytical scatter plot.`}
 />
@@ -217,14 +217,14 @@ Adding **hover_name** is often the single biggest improvement you can make to an
 <MultipleChoice
   markdown={`Which **hover_data** value would format a population of **1234567** as **"1,234,567"**?
 
-- **True**
-  > **True** just turns the field on with default formatting, it does not add thousands separators, so the number would still read as **1234567**.
-- **":.2f"**
-  > **":.2f"** formats with two decimal places (1234567.00) but adds no thousands separators. The comma in the spec is what inserts the separators.
-- [o] **":,"**
-  > The **","** format spec inserts thousands separators. For more control, combine: **":,.0f"** gives 1,234,567 (no decimals) and **":,.2f"** gives 1,234,567.00 (two decimals). The syntax is the same as Python's f-strings.
 - **"%population%"**
   > This isn't a valid Plotly format spec, hover formats follow the D3 / Python mini-format-language (a string like **":,"**), not **%name%** placeholders.
+- **True**
+  > **True** just turns the field on with default formatting, it does not add thousands separators, so the number would still read as **1234567**.
+- [o] **":,"**
+  > The **","** format spec inserts thousands separators. For more control, combine: **":,.0f"** gives 1,234,567 (no decimals) and **":,.2f"** gives 1,234,567.00 (two decimals). The syntax is the same as Python's f-strings.
+- **":.2f"**
+  > **":.2f"** formats with two decimal places (1234567.00) but adds no thousands separators. The comma in the spec is what inserts the separators.
 
 Plotly's hover format strings mostly follow Python's mini-format-language, which is convenient if you already know f-strings.
 
@@ -234,14 +234,14 @@ Plotly's hover format strings mostly follow Python's mini-format-language, which
 <MultipleChoice
   markdown={`Why is a **well-crafted hover tooltip** valuable for analytical charts?
 
-- It makes the chart look more colorful.
-  > Hover tooltips are invisible until the user moves the cursor over a point; they do not add color or change the visual appearance of the chart itself.
-- It speeds up rendering.
-  > A richer tooltip adds slightly more configuration to the chart object but has no noticeable effect on rendering speed; the tooltip appears lazily on hover, not at render time.
-- [o] It provides "details on demand", the reader can investigate any individual data point without leaving the chart or consulting a separate table.
-  > The hover is the chart's *detail layer*. The default chart shows overall structure; the hover answers "what *is* this particular point?" Combined, they form a complete analytical experience inside a single interactive chart.
 - It is required for the chart to be interactive.
   > Plotly charts are interactive (zoomable, pannable, legend-clickable) regardless of how the hover is configured; a default tooltip is added automatically and a custom tooltip is an enhancement, not a prerequisite.
+- It speeds up rendering.
+  > A richer tooltip adds slightly more configuration to the chart object but has no noticeable effect on rendering speed; the tooltip appears lazily on hover, not at render time.
+- It makes the chart look more colorful.
+  > Hover tooltips are invisible until the user moves the cursor over a point; they do not add color or change the visual appearance of the chart itself.
+- [o] It provides "details on demand", the reader can investigate any individual data point without leaving the chart or consulting a separate table.
+  > The hover is the chart's *detail layer*. The default chart shows overall structure; the hover answers "what *is* this particular point?" Combined, they form a complete analytical experience inside a single interactive chart.
 
 A great hover is the difference between a chart that's "pretty" and a chart that's a *tool*.`}
 />

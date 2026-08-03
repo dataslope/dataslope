@@ -260,27 +260,27 @@ int main() {
 <MultipleChoice
   markdown={`What is an *invariant* of a class?
 
-- A method that never changes.
-  > That would be a constant method.
 - A field whose value is fixed.
   > That would be a \`const\` member.
 - [o] A property of the object's state that must always hold whenever no method is in progress.
   > The class's public methods are responsible for maintaining it.
 - A type alias used by the class.
-  > That is not the meaning here.`}
+  > That is not the meaning here.
+- A method that never changes.
+  > That would be a constant method.`}
 />
 
 <MultipleChoice
   markdown={`What is the main reason to make fields \`private\`?
 
-- The compiler runs faster.
-  > Access level doesn't affect runtime performance.
-- It hides the field from the debugger.
-  > It does not; debuggers can see private members.
 - [o] It prevents outside code from putting the object in an invalid state, letting the class defend its invariants.
   > It also lets you change the storage without breaking callers.
 - It is required for inheritance.
-  > It isn't.`}
+  > It isn't.
+- It hides the field from the debugger.
+  > It does not; debuggers can see private members.
+- The compiler runs faster.
+  > Access level doesn't affect runtime performance.`}
 />
 
 Next: how objects come to life and how they clean up after

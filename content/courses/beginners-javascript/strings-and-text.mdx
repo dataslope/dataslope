@@ -407,10 +407,10 @@ console.log(titleCase(""));
 <MultipleChoice
   markdown={`Which string syntax should you reach for when you need to embed a variable inside a piece of text?
 
-- Single quotes with string concatenation: \`'Hello, ' + name + '!'\`
-  > String concatenation with \`+\` works but becomes hard to read as more values are inserted, requires careful spacing around the operator, and doesn't support multiline strings without escape sequences.
 - Double quotes with string concatenation: \`"Hello, " + name + "!"\`
   > Double quotes behave identically to single quotes for concatenation; both suffer the same readability and multiline limitations compared to template literals.
+- Single quotes with string concatenation: \`'Hello, ' + name + '!'\`
+  > String concatenation with \`+\` works but becomes hard to read as more values are inserted, requires careful spacing around the operator, and doesn't support multiline strings without escape sequences.
 - [o] Backticks (template literals): \`\` \`Hello, \${name}!\` \`\`
   > Template literals (\`\`backticks\`\`) let you interpolate variables directly with \`\${...}\`, and also span multiple lines without escape characters. They're the modern default for any non-trivial string.
 - Triple quotes: \`'''Hello, name!'''\`

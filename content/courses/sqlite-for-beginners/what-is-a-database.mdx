@@ -107,14 +107,14 @@ handed to you for free.
 <MultipleChoice
   markdown={`What is a transaction?
 
-- A picture stored in a folder
-  > A picture may be data, but it is not a transaction.
+- A username only
+  > A username is one piece of data, not a group of changes.
 - A random spreadsheet color
   > Formatting is unrelated to transactions.
+- A picture stored in a folder
+  > A picture may be data, but it is not a transaction.
 - [o] A group of database changes treated as one unit
-  > A transaction helps related changes succeed or fail together.
-- A username only
-  > A username is one piece of data, not a group of changes.`}
+  > A transaction helps related changes succeed or fail together.`}
 />
 
 ## Structure: facts a computer can actually use
@@ -235,10 +235,10 @@ good questions is most of the work, but you will meet all four.
 
 - You must describe every byte SQLite should read from disk
   > SQL hides low-level storage steps from the query.
-- [o] You describe the result you want, not every low-level step
-  > SQL lets you ask for matching rows without describing the internal storage work.
 - You must draw every database page by hand
   > The database manages storage details.
+- [o] You describe the result you want, not every low-level step
+  > SQL lets you ask for matching rows without describing the internal storage work.
 - SQL can only delete data
   > SQL can read, add, change, and delete data.`}
 />
@@ -280,10 +280,10 @@ or save them for later, the main path continues without them.
 
 - A programming language for drawing screens
   > A database stores information; it does not draw the user interface.
-- [o] An organized place to store information so it can be found, changed, and trusted later
-  > A database keeps information organized for later use.
 - A password manager only
   > A database may store protected information, but it is not only a password manager.
+- [o] An organized place to store information so it can be found, changed, and trusted later
+  > A database keeps information organized for later use.
 - A replacement for every file on your computer
   > Plain files are still right for photos, documents, and configs; databases are for structured facts that change and matter.`}
 />
@@ -291,27 +291,27 @@ or save them for later, the main path continues without them.
 <MultipleChoice
   markdown={`What did Codd's 1970 relational model propose?
 
-- Storing all data as one long sentence
-  > The relational model is built on structured tables, not prose.
-- [o] Storing data in tables and connecting facts by values instead of physical pointers
-  > Hiding the physical layout behind simple tables is the core relational idea.
 - Deleting data that is older than ten years
   > The model is about organization, not retention policies.
+- Storing all data as one long sentence
+  > The relational model is built on structured tables, not prose.
 - Requiring every program to know the storage layout
-  > It proposed the opposite: programs describe what they want and never touch the layout.`}
+  > It proposed the opposite: programs describe what they want and never touch the layout.
+- [o] Storing data in tables and connecting facts by values instead of physical pointers
+  > Hiding the physical layout behind simple tables is the core relational idea.`}
 />
 
 <MultipleChoice
   markdown={`Why was SQL originally called SEQUEL?
 
-- It was the second query language ever invented
-  > The name was not about being second; it was an acronym.
-- [o] It stood for Structured English Query Language, reflecting its English-like queries
-  > The name was shortened to SQL after a trademark conflict over "SEQUEL."
+- It was named after its inventor
+  > It was designed by Chamberlin and Boyce, but named for its style, not for them.
 - It could only run queries in sequence
   > SQL describes results; the name was not about execution order.
-- It was named after its inventor
-  > It was designed by Chamberlin and Boyce, but named for its style, not for them.`}
+- [o] It stood for Structured English Query Language, reflecting its English-like queries
+  > The name was shortened to SQL after a trademark conflict over "SEQUEL."
+- It was the second query language ever invented
+  > The name was not about being second; it was an acronym.`}
 />
 
 <MultipleChoice
@@ -319,10 +319,10 @@ or save them for later, the main path continues without them.
 
 - A row inside a table
   > A row is one stored record, not the software that manages records.
-- [o] Software that manages databases
-  > A database management system creates, reads, changes, and protects stored data.
 - A chart type
   > A DBMS is not a chart.
+- [o] Software that manages databases
+  > A database management system creates, reads, changes, and protects stored data.
 - A file extension
   > Some database files have extensions, but a DBMS is software.`}
 />

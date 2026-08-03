@@ -478,10 +478,10 @@ The compiler ensures you check `resp.type` before accessing `results`. If you ad
 <MultipleChoice
   markdown={`What's the main benefit of placing types in a shared module (\`types.ts\`) that both client and server import?
 
-- Reduces code duplication
-  > That's a benefit, but not the main one. The key is *synchronization*.
 - [o] Ensures both sides agree on the contract at compile time
   > If the server changes a type, the client gets a compile error immediately. The contract is enforced by the compiler.
+- Reduces code duplication
+  > That's a benefit, but not the main one. The key is *synchronization*.
 - Improves runtime performance
   > Types are erased at runtime; there's no performance impact.
 
@@ -503,12 +503,12 @@ function getUser(id: string): ApiResponse<User> { ... }
 \`\`\`
 What must the caller do to access \`data\`?
 
-- Check \`data !== undefined\`
-  > The type system guarantees \`data\` is present when \`status === "ok"\`, but you still need to narrow.
 - [o] Check \`status === "ok"\` to narrow the discriminated union
   > Once you check \`status\`, TypeScript narrows to the \`ok\` branch, where \`data\` is guaranteed.
 - Cast \`response.data as User\`
   > Casting is unsafe and defeats the purpose of the discriminated union.
+- Check \`data !== undefined\`
+  > The type system guarantees \`data\` is present when \`status === "ok"\`, but you still need to narrow.
 
 Discriminated unions force you to check the tag before accessing variant-specific fields.`}
 />

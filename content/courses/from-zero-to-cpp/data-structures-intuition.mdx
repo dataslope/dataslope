@@ -232,12 +232,12 @@ int main() {
 <MultipleChoice
   markdown={`Which container should you default to for a sequence of values you'll iterate over?
 
-- \`std::list\`
-  > Linked lists are cache-hostile and rarely the right default.
-- \`std::deque\`
-  > Use it only when you really need double-ended push/pop.
 - [o] \`std::vector\`
   > Contiguous storage is fast for iteration and most operations.
+- \`std::deque\`
+  > Use it only when you really need double-ended push/pop.
+- \`std::list\`
+  > Linked lists are cache-hostile and rarely the right default.
 - \`std::map\`
   > That is a key/value container, not a plain sequence.`}
 />
@@ -245,12 +245,12 @@ int main() {
 <MultipleChoice
   markdown={`When would you choose \`std::map\` over \`std::unordered_map\`?
 
-- When you want average O(1) lookup.
-  > That's the hashed container's selling point.
-- When the data fits in cache.
-  > Both can.
 - [o] When you need to iterate keys in sorted order, or want bounded worst-case complexity instead of average-case.
   > Otherwise \`unordered_map\` is usually faster.
+- When the data fits in cache.
+  > Both can.
+- When you want average O(1) lookup.
+  > That's the hashed container's selling point.
 - Whenever performance matters.
   > \`unordered_map\` is generally faster for plain lookup.`}
 />

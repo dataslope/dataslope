@@ -344,12 +344,12 @@ unordered set, it's gone.
 
 - It makes training slower because the data is out of order
   > Speed is irrelevant. The problem is statistical, not computational: a random split corrupts what the evaluation *means*.
-- It throws away too much data for testing
-  > The proportion of held-out data isn't the issue. Even a 99/1 random split leaks, because the single test point is still surrounded in time by training points.
 - [o] It leaks future information into training: test points end up time-surrounded by training points, so the model "sees" the future and reports accuracy it can never achieve in production
   > A randomly chosen test point from March is flanked in the training set by February and April. The model effectively interpolates between known future and past values, information it will never have when forecasting for real.
 - It only works if the series is stationary
   > Stationarity is a separate concern. A random split leaks regardless of stationarity; the leakage comes from interleaving time, not from the series' statistical properties.
+- It throws away too much data for testing
+  > The proportion of held-out data isn't the issue. Even a 99/1 random split leaks, because the single test point is still surrounded in time by training points.
 
 The defining sin is leakage of future information into the past, which makes evaluation optimistic and irreproducible.`}
 />
@@ -618,12 +618,12 @@ print(
 <MultipleChoice
   markdown={`Which property is the *defining* feature that separates a time series from a cross-sectional dataset?
 
-- It has more rows
-  > Size is irrelevant. A three-row monthly series is a time series; a million-row customer table is not.
-- It contains a date column somewhere
-  > Merely having a date *column* doesn't make data a time series, the patient table earlier had a collection date but was cross-sectional. What matters is dependence and meaningful order.
 - [o] Its observations are ordered in time and each value is statistically dependent on nearby values
   > Temporal ordering *plus* dependence between neighboring values is exactly what makes the sequence a time series and what lets us forecast at all.
+- It contains a date column somewhere
+  > Merely having a date *column* doesn't make data a time series, the patient table earlier had a collection date but was cross-sectional. What matters is dependence and meaningful order.
+- It has more rows
+  > Size is irrelevant. A three-row monthly series is a time series; a million-row customer table is not.
 - Its values are always increasing
   > Time series can trend up, down, oscillate, or wander. Monotonic growth is neither required nor common.
 
@@ -633,14 +633,14 @@ The essence is an ordered sequence with dependence between neighbors, not size, 
 <MultipleChoice
   markdown={`A series of daily temperatures has high lag-1 autocorrelation. What does that practically mean?
 
-- Tomorrow's temperature is completely random
-  > High autocorrelation means the opposite of random: today is a strong clue about tomorrow.
-- [o] Today's temperature is a strong predictor of tomorrow's, consecutive values tend to be close
-  > Lag-1 autocorrelation measures how tightly each value tracks the one before it. High values mean "tomorrow looks a lot like today," which is what makes a naive forecast competitive.
 - The temperatures have no trend
   > Autocorrelation and trend are different things; a series can have strong lag-1 autocorrelation with or without a trend.
 - The data must be stationary
   > High autocorrelation says nothing on its own about stationarity. Strongly trending (non-stationary) series often have *very* high lag-1 autocorrelation.
+- Tomorrow's temperature is completely random
+  > High autocorrelation means the opposite of random: today is a strong clue about tomorrow.
+- [o] Today's temperature is a strong predictor of tomorrow's, consecutive values tend to be close
+  > Lag-1 autocorrelation measures how tightly each value tracks the one before it. High values mean "tomorrow looks a lot like today," which is what makes a naive forecast competitive.
 
 Lag-1 autocorrelation quantifies how much each value resembles its immediate predecessor.`}
 />
@@ -648,14 +648,14 @@ Lag-1 autocorrelation quantifies how much each value resembles its immediate pre
 <MultipleChoice
   markdown={`You build a model, evaluate it with a random 80/20 split, and get a stunning 2% error. In production it gets 15% error. What is the most likely cause?
 
-- The production data is simply harder
-  > A 7x degradation that appears only in production is the classic signature of leakage in evaluation, not of the world suddenly getting harder.
+- You used too few features
+  > More features wouldn't close a gap that exists *because* the evaluation was leaky. The fix is an honest chronological split, not a richer model.
 - The model is too simple
   > A too-simple model would look bad in *both* testing and production. The tell here is that testing looked great and only production was bad.
 - [o] Data leakage from the random split: in testing the model saw future-adjacent points, an advantage it loses in production
   > The random split let test points be time-surrounded by training points, so evaluation measured interpolation, not true forecasting. Production has no such future context, so the honest error is far higher.
-- You used too few features
-  > More features wouldn't close a gap that exists *because* the evaluation was leaky. The fix is an honest chronological split, not a richer model.
+- The production data is simply harder
+  > A 7x degradation that appears only in production is the classic signature of leakage in evaluation, not of the world suddenly getting harder.
 
 A great-in-testing, terrible-in-production gap on temporal data almost always traces back to a leaky (random) split.`}
 />
@@ -663,14 +663,14 @@ A great-in-testing, terrible-in-production gap on temporal data almost always tr
 <MultipleChoice
   markdown={`A retailer's sales rise every November-December without fail, peaking the same weeks each year. The economy also pushes sales up and down over multi-year booms and busts that don't follow a calendar. Which labels fit?
 
-- Both effects are "seasonal"
-  > The calendar-locked holiday spike is seasonal, but multi-year booms with no fixed period are *cyclic*, not seasonal. Lumping them together hides that one is far more predictable than the other.
-- Both effects are "trend"
-  > Trend is the slow one-directional drift. Neither a repeating December spike nor up-and-down booms is a single-direction trend.
-- [o] The November-December spike is seasonal (fixed calendar period); the multi-year booms and busts are cyclic (no fixed period)
-  > Seasonality has a fixed, known period locked to the calendar; cyclic swings have a variable period and are much harder to forecast. Naming them correctly tells you which is predictable.
 - The holiday spike is cyclic; the booms are seasonal
   > This reverses the definitions. Fixed calendar period = seasonal; variable period = cyclic.
+- Both effects are "trend"
+  > Trend is the slow one-directional drift. Neither a repeating December spike nor up-and-down booms is a single-direction trend.
+- Both effects are "seasonal"
+  > The calendar-locked holiday spike is seasonal, but multi-year booms with no fixed period are *cyclic*, not seasonal. Lumping them together hides that one is far more predictable than the other.
+- [o] The November-December spike is seasonal (fixed calendar period); the multi-year booms and busts are cyclic (no fixed period)
+  > Seasonality has a fixed, known period locked to the calendar; cyclic swings have a variable period and are much harder to forecast. Naming them correctly tells you which is predictable.
 
 Fixed, calendar-locked period means seasonal; variable-length swings mean cyclic, and the distinction predicts how forecastable each is.`}
 />
@@ -678,14 +678,14 @@ Fixed, calendar-locked period means seasonal; variable-length swings mean cyclic
 <MultipleChoice
   markdown={`Why do we insist on computing a **seasonal naive** baseline (this month = same month last year) before fitting any sophisticated model?
 
-- Because sophisticated models are always worse
-  > Sophisticated models are often better, but not always, and not for free. The baseline is how you *find out* whether the complexity earned anything.
-- [o] Because a model that can't beat a trivial baseline isn't adding value, and the baseline tells us how much real skill any model contributes
-  > Baselines convert "the error is 30" into "the error is 30, versus 35 for doing nothing", that comparison is what makes an accuracy number meaningful. If ARIMA can't beat "same as last year," it's not worth its complexity.
 - Because seasonal naive is always the most accurate forecast
   > It frequently isn't, good models beat it. Its job is to be a cheap, honest yardstick, not to win.
 - Because it makes the data stationary
   > Computing a baseline forecast does nothing to the series' stationarity. The baseline is an evaluation reference, not a transformation.
+- [o] Because a model that can't beat a trivial baseline isn't adding value, and the baseline tells us how much real skill any model contributes
+  > Baselines convert "the error is 30" into "the error is 30, versus 35 for doing nothing", that comparison is what makes an accuracy number meaningful. If ARIMA can't beat "same as last year," it's not worth its complexity.
+- Because sophisticated models are always worse
+  > Sophisticated models are often better, but not always, and not for free. The baseline is how you *find out* whether the complexity earned anything.
 
 Baselines turn raw error numbers into meaningful comparisons and guard against shipping complexity that adds nothing.`}
 />

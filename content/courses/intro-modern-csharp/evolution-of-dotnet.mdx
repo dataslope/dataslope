@@ -223,23 +223,23 @@ runtime, so every example you see should run in your browser.
 <MultipleChoice
   markdown={`What is the difference between ".NET Framework" and "modern .NET"?
 
-- They are the same thing with different marketing
-  > Not quite, they're separate codebases with different capabilities.
-- [o] .NET Framework is the original Windows-only, closed-source product (still maintained). Modern .NET (formerly .NET Core, now .NET 5/6/7/8+) is cross-platform, open-source, and where all new development happens.
-  > New projects target modern .NET; .NET Framework lives on mainly to keep existing Windows applications running.
+- Modern .NET only runs on Linux
+  > Modern .NET runs on Windows, Linux, and macOS.
 - .NET Framework is faster than modern .NET
   > In fact, modern .NET has had major performance improvements every release.
-- Modern .NET only runs on Linux
-  > Modern .NET runs on Windows, Linux, and macOS.`}
+- [o] .NET Framework is the original Windows-only, closed-source product (still maintained). Modern .NET (formerly .NET Core, now .NET 5/6/7/8+) is cross-platform, open-source, and where all new development happens.
+  > New projects target modern .NET; .NET Framework lives on mainly to keep existing Windows applications running.
+- They are the same thing with different marketing
+  > Not quite, they're separate codebases with different capabilities.`}
 />
 
 <MultipleChoice
   markdown={`Which of the following best describes the design direction of recent C# versions (C# 7 onward)?
 
-- Removing features to make the language smaller
-  > C# has been *adding* features, not removing them.
 - [o] Adding ergonomic features that let you express the same ideas with less ceremony (top-level statements, records, pattern matching, etc.)
   > The language has grown, but each addition is meant to *reduce* boilerplate around something you were already doing.
+- Removing features to make the language smaller
+  > C# has been *adding* features, not removing them.
 - Replacing the runtime with the JVM
   > That has not happened and would not make sense.
 - Making C# look more like assembly

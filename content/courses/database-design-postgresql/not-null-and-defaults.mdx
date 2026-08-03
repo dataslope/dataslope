@@ -78,14 +78,14 @@ still allow someone to explicitly insert NULL unless you also declare
 <MultipleChoice
   markdown={`What does \`NULL\` mean in SQL?
 
-- The number zero.
-  > Zero is a known numeric value; NULL means there is no value.
 - An empty string.
   > An empty string is still a text value; NULL means missing or unknown.
-- [o] A missing, unknown, or absent value.
-  > NULL represents the lack of a value, which is different from ordinary values like zero or false.
+- The number zero.
+  > Zero is a known numeric value; NULL means there is no value.
 - The word "null" stored as text.
   > Text containing those letters is a value; SQL NULL is a special marker for absence.
+- [o] A missing, unknown, or absent value.
+  > NULL represents the lack of a value, which is different from ordinary values like zero or false.
 
 NULL means the column does not currently hold a known value.`}
 />
@@ -233,14 +233,14 @@ database will use a standard one.
 <MultipleChoice
   markdown={`A column has \`status TEXT DEFAULT 'draft'\` but does **not** have \`NOT NULL\`. What can happen?
 
-- The column can never contain NULL.
-  > DEFAULT alone does not forbid someone from explicitly inserting NULL.
-- [o] Omitted status values become \`'draft'\`, but an explicit NULL may still be stored.
-  > DEFAULT handles omitted values; NOT NULL is the rule that blocks NULL.
 - PostgreSQL rejects every insert that omits status.
   > The default exists specifically so omitted values can be filled in.
 - The default value must be unique.
   > Defaults do not imply uniqueness; many rows can receive the same default.
+- [o] Omitted status values become \`'draft'\`, but an explicit NULL may still be stored.
+  > DEFAULT handles omitted values; NOT NULL is the rule that blocks NULL.
+- The column can never contain NULL.
+  > DEFAULT alone does not forbid someone from explicitly inserting NULL.
 
 DEFAULT and NOT NULL solve different problems and are often used together.`}
 />
@@ -250,14 +250,14 @@ DEFAULT and NOT NULL solve different problems and are often used together.`}
 <MultipleChoice
   markdown={`When should a column usually be declared \`NOT NULL\`?
 
-- Whenever the column stores text.
-  > Text columns can be required or optional; the type alone does not decide nullability.
+- Whenever you want the column to sort faster.
+  > NOT NULL is about integrity, not sorting speed.
 - Whenever the value might be unknown at first.
   > Values that may be unknown are often nullable unless the row cannot exist without them.
 - [o] When every valid row must have that value for the row to make sense.
   > NOT NULL encodes that the value is required for all rows.
-- Whenever you want the column to sort faster.
-  > NOT NULL is about integrity, not sorting speed.
+- Whenever the column stores text.
+  > Text columns can be required or optional; the type alone does not decide nullability.
 
 Use NOT NULL when missing the value would make the row invalid.`}
 />
@@ -265,14 +265,14 @@ Use NOT NULL when missing the value would make the row invalid.`}
 <MultipleChoice
   markdown={`What is the role of a \`DEFAULT\` value?
 
-- To reject duplicate values.
-  > Duplicate prevention is handled by UNIQUE, not DEFAULT.
 - [o] To supply a value when an insert omits the column.
   > PostgreSQL uses the default only when the writer does not provide a value.
-- To make a column optional in every query.
-  > Query behavior is separate; DEFAULT affects inserted rows.
 - To turn NULL into zero in comparisons.
   > DEFAULT does not change SQL's NULL comparison rules.
+- To make a column optional in every query.
+  > Query behavior is separate; DEFAULT affects inserted rows.
+- To reject duplicate values.
+  > Duplicate prevention is handled by UNIQUE, not DEFAULT.
 
 A default is the schema's standard answer when a write leaves a value out.`}
 />
@@ -280,12 +280,12 @@ A default is the schema's standard answer when a write leaves a value out.`}
 <MultipleChoice
   markdown={`Which condition correctly finds rows where \`nickname\` is missing?
 
-- \`nickname = NULL\`
-  > Ordinary equality with NULL evaluates to unknown, not true.
-- \`nickname = ''\`
-  > An empty string is a present text value, not SQL NULL.
 - [o] \`nickname IS NULL\`
   > IS NULL is the SQL operator designed to test for missing values.
+- \`nickname = ''\`
+  > An empty string is a present text value, not SQL NULL.
+- \`nickname = NULL\`
+  > Ordinary equality with NULL evaluates to unknown, not true.
 - \`nickname DEFAULT NULL\`
   > DEFAULT belongs in table definitions, not in a WHERE condition.
 

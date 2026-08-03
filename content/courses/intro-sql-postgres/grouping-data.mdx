@@ -166,14 +166,14 @@ is the next page.
 <MultipleChoice
   markdown={`What does \`GROUP BY dept\` do to the rows before aggregating?
 
-- It deletes all but one row per department.
-  > No rows are deleted; they are organized into groups so each group can be summarized.
-- [o] It splits the rows into groups that share the same \`dept\` value, so an aggregate is computed once per group.
-  > Grouping buckets rows by the column's value, then each bucket gets its own aggregate result.
-- It sorts the rows by department.
-  > Grouping is not sorting; you would still add \`ORDER BY\` for a guaranteed order.
 - It renames the \`dept\` column.
   > \`GROUP BY\` organizes rows; it does not rename columns.
+- It sorts the rows by department.
+  > Grouping is not sorting; you would still add \`ORDER BY\` for a guaranteed order.
+- [o] It splits the rows into groups that share the same \`dept\` value, so an aggregate is computed once per group.
+  > Grouping buckets rows by the column's value, then each bucket gets its own aggregate result.
+- It deletes all but one row per department.
+  > No rows are deleted; they are organized into groups so each group can be summarized.
 
 \`GROUP BY\` buckets rows by a shared value so each bucket is summarized separately.`}
 />
@@ -181,14 +181,14 @@ is the next page.
 <MultipleChoice
   markdown={`This query fails: \`SELECT dept, name, COUNT(*) FROM employees GROUP BY dept;\`. Why?
 
-- Because \`COUNT(*)\` cannot be used with \`GROUP BY\`.
-  > \`COUNT(*)\` is exactly what you use with \`GROUP BY\`; it is not the problem.
-- [o] Because \`name\` is neither in the \`GROUP BY\` nor wrapped in an aggregate, so there is no single \`name\` for each department group.
-  > Each output row stands for a whole department, but a department has many names, so the database cannot choose one.
 - Because you cannot select more than one column at a time.
   > Selecting multiple columns is fine; the issue is specifically the ungrouped, unaggregated \`name\`.
 - Because \`dept\` must be aggregated.
   > \`dept\` is the grouping column, so it is correctly allowed as-is; \`name\` is the offender.
+- [o] Because \`name\` is neither in the \`GROUP BY\` nor wrapped in an aggregate, so there is no single \`name\` for each department group.
+  > Each output row stands for a whole department, but a department has many names, so the database cannot choose one.
+- Because \`COUNT(*)\` cannot be used with \`GROUP BY\`.
+  > \`COUNT(*)\` is exactly what you use with \`GROUP BY\`; it is not the problem.
 
 Every selected column must be grouped or aggregated, and \`name\` is neither.`}
 />
@@ -200,10 +200,10 @@ Every selected column must be grouped or aggregated, and \`name\` is neither.`}
   > Both columns participate, so year is not ignored; groups are formed from the pair.
 - [o] One row per unique combination of region and year.
   > Grouping by several columns forms a group for each distinct combination of their values.
-- One row per individual sale.
-  > Grouping collapses individual sales into summaries per combination, not per sale.
 - A single grand-total row.
   > A single total would be a query with no \`GROUP BY\`; here the totals are split per combination.
+- One row per individual sale.
+  > Grouping collapses individual sales into summaries per combination, not per sale.
 
 Grouping by multiple columns produces one summary row per distinct combination of those columns.`}
 />
@@ -211,14 +211,14 @@ Grouping by multiple columns produces one summary row per distinct combination o
 <MultipleChoice
   markdown={`In a query with both \`WHERE\` and \`GROUP BY\`, which happens first?
 
-- \`GROUP BY\` runs first, then \`WHERE\` filters the groups.
-  > Filtering individual rows happens before they are gathered into groups; filtering groups is a different clause (\`HAVING\`).
-- [o] \`WHERE\` filters individual rows first, then the surviving rows are grouped.
-  > \`WHERE\` thins the raw rows, and only those that remain are organized into groups and aggregated.
 - They run at the same time with no defined order.
   > There is a definite order: row filtering precedes grouping.
+- [o] \`WHERE\` filters individual rows first, then the surviving rows are grouped.
+  > \`WHERE\` thins the raw rows, and only those that remain are organized into groups and aggregated.
 - \`WHERE\` cannot be used together with \`GROUP BY\`.
   > \`WHERE\` and \`GROUP BY\` are frequently combined; \`WHERE\` simply applies first.
+- \`GROUP BY\` runs first, then \`WHERE\` filters the groups.
+  > Filtering individual rows happens before they are gathered into groups; filtering groups is a different clause (\`HAVING\`).
 
 \`WHERE\` filters rows before grouping; to filter the groups themselves you use \`HAVING\`.`}
 />

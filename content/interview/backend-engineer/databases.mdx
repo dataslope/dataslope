@@ -201,25 +201,25 @@ optimization for hot read paths, at the cost of a wider index to maintain.
 <MultipleChoice
   markdown={`A transaction reads a row, and a **second** transaction commits an update to that same row before the first transaction reads it **again**, seeing a different value. Which anomaly is this?
 
-- A dirty read.
-  > A dirty read is seeing another transaction's *uncommitted* change; here the other transaction committed.
-- [o] A non-repeatable read.
-  > Re-reading the same row yields a different committed value, which Repeatable Read isolation prevents.
 - A phantom read.
   > A phantom is *new rows* appearing on re-running a query, not a changed value in an existing row.
+- A dirty read.
+  > A dirty read is seeing another transaction's *uncommitted* change; here the other transaction committed.
 - A lost update.
-  > A lost update is two writes clobbering each other; here the first transaction only reads.`}
+  > A lost update is two writes clobbering each other; here the first transaction only reads.
+- [o] A non-repeatable read.
+  > Re-reading the same row yields a different committed value, which Repeatable Read isolation prevents.`}
 />
 
 <MultipleChoice
   markdown={`You have a composite index on \`(last_name, first_name)\`. Which query can use it efficiently?
 
+- \`WHERE email = 'ada@example.com'\`
+  > \`email\` is not in the index at all, so this needs a separate index or a scan.
 - \`WHERE first_name = 'Ada'\`
   > The index is ordered by \`last_name\` first, so a filter on \`first_name\` alone cannot use it (leftmost-prefix rule).
 - [o] \`WHERE last_name = 'Lovelace' AND first_name = 'Ada'\`
   > This matches the full index prefix in order, so the B-tree narrows on both columns.
-- \`WHERE email = 'ada@example.com'\`
-  > \`email\` is not in the index at all, so this needs a separate index or a scan.
 - Any query on the table, since the table is now indexed.
   > An index helps only queries whose predicates match its leading columns; it is not a blanket speedup.`}
 />
@@ -227,14 +227,14 @@ optimization for hot read paths, at the cost of a wider index to maintain.
 <MultipleChoice
   markdown={`Why might adding an index **slow down** an application overall?
 
-- Indexes make \`SELECT\` queries slower by adding a lookup step.
-  > A well-matched index speeds selective reads; it does not slow them.
-- [o] Every \`INSERT\`, \`UPDATE\`, and \`DELETE\` must also update the index, adding write cost and storage.
-  > On write-heavy tables the maintenance cost of many indexes can outweigh the read benefit.
 - Indexes prevent the database from using transactions.
   > Indexing is orthogonal to transactions; both coexist fine.
 - The database can only have one index, so adding one removes another.
-  > A table can have many indexes; the real cost is maintaining each on writes.`}
+  > A table can have many indexes; the real cost is maintaining each on writes.
+- Indexes make \`SELECT\` queries slower by adding a lookup step.
+  > A well-matched index speeds selective reads; it does not slow them.
+- [o] Every \`INSERT\`, \`UPDATE\`, and \`DELETE\` must also update the index, adding write cost and storage.
+  > On write-heavy tables the maintenance cost of many indexes can outweigh the read benefit.`}
 />
 
 ## Challenges

@@ -181,14 +181,14 @@ music app.
 <MultipleChoice
   markdown={`What rows does an **inner join** include in its result?
 
-- Every row from both tables, matched or not.
-  > Including all unmatched rows describes an outer join; an inner join is stricter.
 - [o] Only rows that have a matching row in both tables.
   > An inner join keeps a row only when the \`ON\` condition finds a partner on the other side.
-- Only rows from the left table.
-  > An inner join is symmetric and based on matches, not on one chosen side.
 - Only rows where both tables are empty.
   > Empty tables would produce no rows at all; an inner join returns matched pairs.
+- Only rows from the left table.
+  > An inner join is symmetric and based on matches, not on one chosen side.
+- Every row from both tables, matched or not.
+  > Including all unmatched rows describes an outer join; an inner join is stricter.
 
 An inner join returns only the matched rows present in both tables.`}
 />
@@ -196,14 +196,14 @@ An inner join returns only the matched rows present in both tables.`}
 <MultipleChoice
   markdown={`A customer named Linus has no orders. In an \`INNER JOIN\` between customers and orders, does Linus appear?
 
+- It causes an error.
+  > Unmatched rows are normal and simply omitted; they do not cause an error.
+- Yes, but only if the orders table is empty.
+  > An empty orders table would simply produce no matches for anyone, still excluding Linus.
 - Yes, with all his order columns shown.
   > He has no orders, so there is nothing to show; an inner join cannot include an unmatched customer.
 - [o] No, with no matching order, an inner join drops him entirely.
   > An inner join keeps a customer only if at least one order matches, so Linus is excluded.
-- Yes, but only if the orders table is empty.
-  > An empty orders table would simply produce no matches for anyone, still excluding Linus.
-- It causes an error.
-  > Unmatched rows are normal and simply omitted; they do not cause an error.
 
 With no matching order, an inner join leaves an order-less customer out of the result.`}
 />
@@ -211,12 +211,12 @@ With no matching order, an inner join leaves an order-less customer out of the r
 <MultipleChoice
   markdown={`You want "all products that have actually been sold." Which join expresses this best?
 
-- An outer join that keeps unsold products too.
-  > Keeping unsold products contradicts "that have actually been sold"; you want only matched products.
-- [o] An inner join between products and orders, keeping only products with a matching order.
-  > "That have been sold" means you want only products with at least one order, exactly an inner join.
 - No join at all; just select from products.
   > Selecting from products alone cannot tell which were sold; you need to match against orders.
+- [o] An inner join between products and orders, keeping only products with a matching order.
+  > "That have been sold" means you want only products with at least one order, exactly an inner join.
+- An outer join that keeps unsold products too.
+  > Keeping unsold products contradicts "that have actually been sold"; you want only matched products.
 - A join with no \`ON\` condition.
   > Omitting \`ON\` does not express "has a matching sale"; you need the match condition of an inner join.
 

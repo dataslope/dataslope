@@ -556,14 +556,14 @@ assert list(top3) == expected, f"Expected top3 {expected}, got {top3}"`,
 <MultipleChoice
   markdown={`Why must you standardize features before comparing the raw coefficients of a linear or logistic regression as "importances"?
 
-- Because unstandardized features crash \`LogisticRegression\`
-  > The model fits fine on unstandardized data; the issue is interpretation of the coefficients, not a crash.
-- [o] Because a coefficient's magnitude depends on its feature's units, so unscaled coefficients compare quantities measured on different scales
-  > A feature in millimeters earns a far larger coefficient than the same feature in meters with no real change, so only after scaling are coefficient magnitudes comparable across features.
 - Because standardizing makes all coefficients exactly equal
   > Standardizing makes the scale comparable, but the coefficients remain different because the features genuinely differ in influence.
 - Because coefficients are otherwise always negative
   > Coefficient signs depend on the data and can be positive or negative regardless of scaling.
+- [o] Because a coefficient's magnitude depends on its feature's units, so unscaled coefficients compare quantities measured on different scales
+  > A feature in millimeters earns a far larger coefficient than the same feature in meters with no real change, so only after scaling are coefficient magnitudes comparable across features.
+- Because unstandardized features crash \`LogisticRegression\`
+  > The model fits fine on unstandardized data; the issue is interpretation of the coefficients, not a crash.
 
 Coefficient magnitude is entangled with feature units, so ranking raw coefficients across differently-scaled features is meaningless.`}
 />
@@ -571,14 +571,14 @@ Coefficient magnitude is entangled with feature units, so ranking raw coefficien
 <MultipleChoice
   markdown={`A colleague adds a column of pure random noise (with many unique values) to the training data and is alarmed that the random forest's impurity-based \`feature_importances_\` gives it a non-trivial score. What is going on?
 
-- The forest is broken and should be reinstalled
-  > Nothing is broken; this is a known property of impurity-based importance, not a software fault.
-- The noise column genuinely causes the target
-  > Pure random noise cannot cause the target; the importance is an artifact of how impurity importance is computed.
 - [o] Impurity-based importance is biased toward high-cardinality features, which offer many split points and can reduce training impurity by chance
   > Features with many distinct values give the tree more places to split and can lower impurity on the training data almost accidentally, inflating their impurity importance.
+- The forest is broken and should be reinstalled
+  > Nothing is broken; this is a known property of impurity-based importance, not a software fault.
 - Random forests cannot handle continuous features
   > Random forests handle continuous features routinely; the issue is the bias of the importance measure, not the model's capability.
+- The noise column genuinely causes the target
+  > Pure random noise cannot cause the target; the importance is an artifact of how impurity importance is computed.
 
 This bias is exactly why permutation importance on held-out data is a useful cross-check.`}
 />
@@ -588,12 +588,12 @@ This bias is exactly why permutation importance on held-out data is a useful cro
 
 - The coefficient the model assigns to that feature
   > Permutation importance works on any model, including those without coefficients, so it is not reading a coefficient.
-- How many times the feature appears in the training data
-  > It does not count occurrences; it measures the effect of destroying the feature's information.
-- [o] How much the model's score drops when that feature's values are randomly shuffled, breaking its link to the target
-  > Shuffling a column scrambles the feature-target relationship while keeping the feature's distribution, so the resulting drop in score reflects how much the model relied on it.
 - The correlation between that feature and every other feature
   > Permutation importance does not compute inter-feature correlation; it measures a change in model performance.
+- [o] How much the model's score drops when that feature's values are randomly shuffled, breaking its link to the target
+  > Shuffling a column scrambles the feature-target relationship while keeping the feature's distribution, so the resulting drop in score reflects how much the model relied on it.
+- How many times the feature appears in the training data
+  > It does not count occurrences; it measures the effect of destroying the feature's information.
 
 Because it only needs \`.predict()\`, permutation importance is model-agnostic and ties importance to real predictive performance.`}
 />
@@ -601,14 +601,14 @@ Because it only needs \`.predict()\`, permutation importance is model-agnostic a
 <MultipleChoice
   markdown={`Why is it better to compute permutation importance on a held-out set rather than on the training data?
 
-- Held-out data is always larger than training data
-  > Held-out sets are usually smaller, not larger; size is not the reason.
-- It is the only set permutation importance can run on
-  > Permutation importance can technically run on either set; the recommendation is about what the result means.
 - [o] On the training set an overfit model can look dependent on features it merely memorized, while held-out data measures what actually helps it generalize
   > Measuring the score drop on unseen data reveals which features support real generalization, not which ones the model memorized during training.
+- Held-out data is always larger than training data
+  > Held-out sets are usually smaller, not larger; size is not the reason.
 - Training data has no labels to shuffle
   > Training data has labels; permutation shuffles a feature column, not the labels, and works on either set.
+- It is the only set permutation importance can run on
+  > Permutation importance can technically run on either set; the recommendation is about what the result means.
 
 The held-out measurement answers the question you usually care about: what helps on new data.`}
 />
@@ -616,12 +616,12 @@ The held-out measurement answers the question you usually care about: what helps
 <MultipleChoice
   markdown={`A churn model ranks "number of support tickets" as its most important feature. A manager concludes: "Let us reduce support tickets and customers will stop churning." Why is this reasoning flawed?
 
-- Because permutation importance is more accurate than impurity importance
-  > Which importance method was used is beside the point; the flaw is interpreting any importance score as causal.
 - Because the feature should have been scaled first
   > Scaling concerns comparing coefficients, not the logic error of reading importance as causation.
 - [o] Because high importance means the feature predicts churn, not that it causes churn, tickets may be a symptom of an underlying problem, and suppressing them would not fix the cause
   > Importance describes prediction given the data, not intervention; the tickets likely signal a deeper dissatisfaction, so hiding the symptom would not address the actual driver of churn.
+- Because permutation importance is more accurate than impurity importance
+  > Which importance method was used is beside the point; the flaw is interpreting any importance score as causal.
 - Because random forests cannot be used for churn prediction
   > Random forests are perfectly suitable for churn prediction; the error is in the causal interpretation of importance.
 

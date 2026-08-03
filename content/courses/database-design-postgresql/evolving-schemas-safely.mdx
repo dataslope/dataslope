@@ -66,14 +66,14 @@ flowchart TD
 <MultipleChoice
   markdown={`Why are additive schema changes usually safer than destructive ones?
 
+- Additive changes automatically normalize every table.
+  > Adding structure does not guarantee a normalized model.
+- PostgreSQL refuses to run destructive changes.
+  > PostgreSQL can run destructive changes, but they may remove data or break code.
 - They never require design thinking.
   > Additive changes still need clear modeling decisions.
 - [o] Existing data and code can often keep using the old shape while the new shape is introduced.
   > Adding compatible structure reduces the chance of breaking current dependencies immediately.
-- PostgreSQL refuses to run destructive changes.
-  > PostgreSQL can run destructive changes, but they may remove data or break code.
-- Additive changes automatically normalize every table.
-  > Adding structure does not guarantee a normalized model.
 
 Safe evolution often introduces the new design before removing the old one.`}
 />
@@ -161,14 +161,14 @@ Backfills should be explicit. If every old task should start as
 <MultipleChoice
   markdown={`In the safe \`NOT NULL\` pattern, why do you backfill before setting \`NOT NULL\`?
 
+- It makes the column disappear from queries.
+  > Backfilling changes data values, not column visibility.
+- PostgreSQL requires every nullable column to be backfilled daily.
+  > Backfilling is a design step for this change, not a daily requirement.
 - Backfilling deletes rows with missing values.
   > A backfill supplies values; it should not delete rows by default.
 - [o] Existing rows need valid values before the database can enforce the required rule.
   > A required column cannot contain nulls once the constraint is tightened.
-- PostgreSQL requires every nullable column to be backfilled daily.
-  > Backfilling is a design step for this change, not a daily requirement.
-- It makes the column disappear from queries.
-  > Backfilling changes data values, not column visibility.
 
 Tighten constraints after the data satisfies them.`}
 />
@@ -320,14 +320,14 @@ what you just wrote.
 <MultipleChoice
   markdown={`What is the safest order for adding a required column to a table with existing rows?
 
+- Add a foreign key to an unrelated table first.
+  > An unrelated foreign key does not solve missing values.
+- Drop the table and recreate it from memory.
+  > Dropping the table is destructive and can lose data.
 - Add it as \`NOT NULL\`, then decide values later.
   > Existing rows would immediately violate the requirement unless a valid default exists.
 - [o] Add nullable, backfill, verify, then set \`NOT NULL\`.
   > This order lets existing data satisfy the rule before the rule is enforced.
-- Drop the table and recreate it from memory.
-  > Dropping the table is destructive and can lose data.
-- Add a foreign key to an unrelated table first.
-  > An unrelated foreign key does not solve missing values.
 
 Safe migrations make invalid intermediate states unlikely.`}
 />
@@ -352,12 +352,12 @@ Expand first, contract only after the new design is in use.`}
 
 - [o] It chooses what old rows mean in the new schema.
   > The value assigned to existing rows should reflect product meaning, not guesswork.
-- It only changes table names.
-  > A backfill writes data into new or changed structure.
-- It is required only for empty tables.
-  > Empty tables usually do not need old rows filled.
 - It replaces primary keys.
   > Backfilling does not generally change row identity.
+- It is required only for empty tables.
+  > Empty tables usually do not need old rows filled.
+- It only changes table names.
+  > A backfill writes data into new or changed structure.
 
 Data migration should preserve meaning, not just satisfy syntax.`}
 />
@@ -365,12 +365,12 @@ Data migration should preserve meaning, not just satisfy syntax.`}
 <MultipleChoice
   markdown={`When should the old column usually be removed in a parallel change?
 
-- Before the new table exists.
-  > Removing first creates a gap where the new design cannot yet represent the data.
-- Immediately after writing the first diagram.
-  > Diagrams do not prove that data and code have moved.
 - [o] After data and dependent code have moved to the new structure.
   > The contract phase should happen only when the old shape is no longer needed.
+- Immediately after writing the first diagram.
+  > Diagrams do not prove that data and code have moved.
+- Before the new table exists.
+  > Removing first creates a gap where the new design cannot yet represent the data.
 - Never, even if nothing depends on it.
   > Keeping unused structure forever can confuse future design.
 

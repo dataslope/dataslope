@@ -566,14 +566,14 @@ assert np.allclose(stds, 1.0, atol=1e-6), f"Training column stds should be ~1, g
 <MultipleChoice
   markdown={`What does \`StandardScaler\` do to each feature?
 
-- It maps every value into the fixed range [0, 1]
-  > That describes \`MinMaxScaler\`, which subtracts the minimum and divides by the range. \`StandardScaler\` does not produce a bounded range.
 - [o] It subtracts the feature's mean and divides by its standard deviation, so the feature ends up with mean ~0 and standard deviation ~1
   > This is the z-score transform applied per column, which puts features on a comparable scale without bounding them.
 - It removes outliers from the feature
   > Scaling rescales every value, including outliers; it does not detect or delete them.
 - It converts categorical text into numbers
   > That is the job of an encoder such as \`OneHotEncoder\`. \`StandardScaler\` operates on numeric columns.
+- It maps every value into the fixed range [0, 1]
+  > That describes \`MinMaxScaler\`, which subtracts the minimum and divides by the range. \`StandardScaler\` does not produce a bounded range.
 
 The z-score is the same transform you use in hypothesis testing, applied independently to each column.`}
 />
@@ -581,14 +581,14 @@ The z-score is the same transform you use in hypothesis testing, applied indepen
 <MultipleChoice
   markdown={`You scale the entire dataset with \`fit_transform\`, *then* call \`train_test_split\`. What is wrong with this?
 
-- Nothing, scaling order does not matter
-  > Order matters precisely because \`fit\` learns statistics from the data it sees. Fitting before the split lets those statistics see the test rows.
+- It will raise an error at fit time
+  > It runs without error, which is exactly why the bug is easy to miss.
 - The features will not be centered correctly
   > The features are centered fine; the problem is *which rows* informed the centering, not whether centering happened.
 - [o] The scaler's mean and standard deviation are computed using the test rows too, so information from the test set leaks into training and inflates the test score
   > Because the test rows helped compute the scaling statistics, the test set is no longer truly unseen, and its score becomes optimistic.
-- It will raise an error at fit time
-  > It runs without error, which is exactly why the bug is easy to miss.
+- Nothing, scaling order does not matter
+  > Order matters precisely because \`fit\` learns statistics from the data it sees. Fitting before the split lets those statistics see the test rows.
 
 The correct order is split first, fit the scaler on the training set, then transform both halves.`}
 />
@@ -596,14 +596,14 @@ The correct order is split first, fit the scaler on the training set, then trans
 <MultipleChoice
   markdown={`Which model is essentially **unaffected** by whether you scale the features first?
 
-- k-nearest neighbors
-  > KNN measures distances between points, so a large-magnitude feature dominates unless features are scaled.
-- Logistic regression with regularization
-  > Its penalty on the weights is only fair across features when they share a scale, so it is scale-sensitive.
 - [o] A random forest
   > Tree-based models split on thresholds and depend only on the *ordering* of feature values, which monotonic scaling does not change.
+- k-nearest neighbors
+  > KNN measures distances between points, so a large-magnitude feature dominates unless features are scaled.
 - A support vector machine with an RBF kernel
   > Like KNN, it relies on distances between points and is highly sensitive to feature scale.
+- Logistic regression with regularization
+  > Its penalty on the weights is only fair across features when they share a scale, so it is scale-sensitive.
 
 Trees ask "is this feature above a threshold?", and rescaling just moves the threshold without changing any split.`}
 />
@@ -611,14 +611,14 @@ Trees ask "is this feature above a threshold?", and rescaling just moves the thr
 <MultipleChoice
   markdown={`After correctly scaling (fit on train, transform both), you check the means. What should you expect?
 
-- Both the training and test means are exactly 0
-  > A test mean of exactly 0 would mean the scaler was fit on the test data, the leakage bug we are trying to avoid.
 - [o] The training mean is ~0, while the test mean is close to but not exactly 0
   > Subtracting the training mean centers the training data at 0; the test set, scaled with those same training statistics, lands nearby but not exactly at 0.
-- Both means are far from 0
-  > A training set scaled with its own mean is centered at 0, so a training mean far from 0 would indicate a mistake.
 - The test mean is exactly 0 but the training mean is not
   > This is backwards: it is the training set, scaled with its own statistics, that centers at exactly 0.
+- Both the training and test means are exactly 0
+  > A test mean of exactly 0 would mean the scaler was fit on the test data, the leakage bug we are trying to avoid.
+- Both means are far from 0
+  > A training set scaled with its own mean is centered at 0, so a training mean far from 0 would indicate a mistake.
 
 A test set that is *near* but not *exactly* centered is evidence you scaled it correctly with training statistics.`}
 />
@@ -626,14 +626,14 @@ A test set that is *near* but not *exactly* centered is evidence you scaled it c
 <MultipleChoice
   markdown={`When would you prefer \`MinMaxScaler\` over \`StandardScaler\`?
 
-- When the data contains extreme outliers you want to keep
-  > \`MinMaxScaler\` is *more* sensitive to outliers, since one extreme value stretches the range and compresses everything else.
-- When the model is a decision tree
-  > Trees are scale-invariant, so neither scaler changes their behavior; choosing between them is moot there.
-- [o] When you need every feature bounded to a fixed interval such as [0, 1]
-  > \`MinMaxScaler\` maps each feature to a fixed range, which is useful when downstream code expects bounded, non-negative inputs.
 - When you want to remove the mean from each feature
   > Removing the mean (centering) is what \`StandardScaler\` does; \`MinMaxScaler\` subtracts the minimum, not the mean.
+- When the model is a decision tree
+  > Trees are scale-invariant, so neither scaler changes their behavior; choosing between them is moot there.
+- When the data contains extreme outliers you want to keep
+  > \`MinMaxScaler\` is *more* sensitive to outliers, since one extreme value stretches the range and compresses everything else.
+- [o] When you need every feature bounded to a fixed interval such as [0, 1]
+  > \`MinMaxScaler\` maps each feature to a fixed range, which is useful when downstream code expects bounded, non-negative inputs.
 
 \`MinMaxScaler\` is the tool when a bounded range matters; \`StandardScaler\` is the steadier general-purpose default.`}
 />

@@ -373,12 +373,12 @@ print(safe_int("", -1))
 
 - \`list\`
   > Lists are mutable: \`l.append(x)\` changes them in place.
-- \`dict\`
-  > Dicts are mutable: \`d["key"] = value\` changes them in place.
+- \`set\`
+  > Sets are mutable: \`s.add(x)\` changes them in place.
 - [o] \`tuple\`
   > Tuples are immutable sequences-you can't change their contents after creation.
-- \`set\`
-  > Sets are mutable: \`s.add(x)\` changes them in place.`}
+- \`dict\`
+  > Dicts are mutable: \`d["key"] = value\` changes them in place.`}
 />
 
 <MultipleChoice
@@ -386,12 +386,12 @@ print(safe_int("", -1))
 
 - \`False\`
   > \`bool\` is a subclass of \`int\`, so \`isinstance\` returns \`True\`.
+- \`None\`
+  > \`isinstance\` returns a boolean, not \`None\`.
 - [o] \`True\`
   > \`bool\` inherits from \`int\`, so \`isinstance(True, int)\` is \`True\`.
 - A \`TypeError\`
-  > \`isinstance\` is perfectly legal with \`int\` and \`bool\`.
-- \`None\`
-  > \`isinstance\` returns a boolean, not \`None\`.`}
+  > \`isinstance\` is perfectly legal with \`int\` and \`bool\`.`}
 />
 
 <MultipleChoice
@@ -402,12 +402,12 @@ x = "42"
 x = int(x)
 \`\`\`
 
-- \`str\`
-  > The second line rebinds \`x\` to an integer.
-- [o] \`int\`
-  > \`int("42")\` converts the string to the integer \`42\`, and the assignment rebinds \`x\` to that integer.
 - \`float\`
   > We called \`int(x)\`, not \`float(x)\`.
+- [o] \`int\`
+  > \`int("42")\` converts the string to the integer \`42\`, and the assignment rebinds \`x\` to that integer.
+- \`str\`
+  > The second line rebinds \`x\` to an integer.
 - A \`TypeError\`
   > \`int("42")\` is perfectly valid.`}
 />
@@ -417,12 +417,12 @@ x = int(x)
 
 - \`None\` is the only value of type \`NoneType\`.
   > True. \`None\` is a singleton.
-- You should use \`is None\` to check for \`None\`.
-  > True. \`is\` checks object identity, which is what you want for singletons.
+- \`None\` represents the absence of a value.
+  > True. That's its purpose.
 - [o] A function that doesn't return anything raises an error.
   > False. A function with no \`return\` statement returns \`None\` implicitly.
-- \`None\` represents the absence of a value.
-  > True. That's its purpose.`}
+- You should use \`is None\` to check for \`None\`.
+  > True. \`is\` checks object identity, which is what you want for singletons.`}
 />
 
 The next pages drill into each type, starting with numbers.

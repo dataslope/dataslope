@@ -119,14 +119,14 @@ swapping one component.
 <MultipleChoice
   markdown={`What does a *geom* determine in a ggplot?
 
+- The fonts and background styling of the plot.
+  > That is the *theme*.
+- [o] The kind of mark used to represent the data, points, lines, bars, boxes, and so on.
+  > The geom chooses *how* the mapped data is drawn.
 - Which data frame is plotted.
   > That is the *data* component, set in \`ggplot()\`.
 - Which columns map to x, y, and color.
   > Those are *aesthetic mappings*, set in \`aes()\`.
-- [o] The kind of mark used to represent the data, points, lines, bars, boxes, and so on.
-  > The geom chooses *how* the mapped data is drawn.
-- The fonts and background styling of the plot.
-  > That is the *theme*.
 
 The geom is the visible mark. Keeping data and mappings fixed while
 swapping the geom yields different charts from one description.`}
@@ -137,12 +137,12 @@ swapping the geom yields different charts from one description.`}
 
 - \`geom_line()\` only works on data sets with more than 400 rows.
   > Row count is irrelevant; the issue is ordering.
+- Lines cannot be colored, so they are unsuitable for \`mpg\`.
+  > Lines can be colored; suitability is about ordering, not color.
 - \`mpg\` has missing values that break lines.
   > That is not the reason; the reason is the absence of a meaningful order.
 - [o] A line connects points in x order, which is meaningful for an ordered variable like \`date\` but produces meaningless zig-zags for an unordered variable like \`displ\`.
   > Lines encode sequence; only ordered x-values justify them.
-- Lines cannot be colored, so they are unsuitable for \`mpg\`.
-  > Lines can be colored; suitability is about ordering, not color.
 
 A geom carries assumptions. Choosing \`geom_line\` asserts that the
 x-values form a meaningful sequence.`}

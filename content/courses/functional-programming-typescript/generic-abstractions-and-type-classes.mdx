@@ -336,10 +336,10 @@ export function combineAll<A>(
 <MultipleChoice
   markdown={`What does it mean for a TypeScript function to be *parametrically polymorphic* over type \`A\`?
 
-- It accepts any argument and uses \`typeof\` to dispatch
-  > That's the opposite, that's *runtime* dispatch on a single, untyped argument.
 - It must work for some specific union of concrete types
   > Closer, but parametric means *every* type, not a chosen list.
+- It accepts any argument and uses \`typeof\` to dispatch
+  > That's the opposite, that's *runtime* dispatch on a single, untyped argument.
 - [o] It works uniformly for every choice of \`A\` and makes no assumptions about \`A\`'s structure
   > Parametric polymorphism gives the strongest guarantees: because the function knows *nothing* about \`A\`, very few behaviors are compatible with its type.
 - It uses \`unknown\` everywhere and casts at the boundary

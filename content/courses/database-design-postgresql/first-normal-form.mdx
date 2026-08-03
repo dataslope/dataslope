@@ -82,10 +82,10 @@ column.
   > Each listed column stores one value about one student.
 - [o] \`students(student_id, name, phones)\` where \`phones\` contains \`555-1000, 555-2000\`.
   > The phones cell contains multiple values hidden inside one string.
-- \`student_phones(student_id, phone_number)\` with one row per phone number.
-  > Separate rows are the usual 1NF-friendly way to store multiple values.
 - \`products(product_id, name, price)\` with one price per product.
   > One price value per row does not create a repeating group.
+- \`student_phones(student_id, phone_number)\` with one row per phone number.
+  > Separate rows are the usual 1NF-friendly way to store multiple values.
 
 1NF asks whether each cell holds one value of the right kind.`}
 />
@@ -95,12 +95,12 @@ column.
 
 - They use text instead of numbers.
   > The problem is not the data type; phone numbers are often stored as text.
-- They prevent the table from having a primary key.
-  > A table could still have a primary key while using a poor repeating-column design.
 - [o] They are a repeating group that should usually become rows in a child table.
   > Repeating columns are multiple slots for the same kind of fact.
 - They make every phone number required.
   > Some columns may be nullable, but the repeating-group problem remains.
+- They prevent the table from having a primary key.
+  > A table could still have a primary key while using a poor repeating-column design.
 
 When the same attribute name needs a number suffix, look for a child table.`}
 />
@@ -203,14 +203,14 @@ atomic, do the columns depend on the right key?
 <MultipleChoice
   markdown={`What does first normal form require?
 
-- Every table must have exactly one column.
-  > 1NF says cells should hold single values; it does not limit a table to one column.
-- [o] Each cell should hold one value, with no repeating groups such as lists or numbered columns.
-  > Atomic cells and no repeating groups are the core 1NF idea.
 - Every table must avoid foreign keys.
   > Foreign keys often appear in the child tables that fix 1NF violations.
+- [o] Each cell should hold one value, with no repeating groups such as lists or numbered columns.
+  > Atomic cells and no repeating groups are the core 1NF idea.
 - Every text column must be replaced with an integer.
   > Text can be perfectly valid in 1NF when each cell holds one value.
+- Every table must have exactly one column.
+  > 1NF says cells should hold single values; it does not limit a table to one column.
 
 1NF is about the shape of values inside rows and columns.`}
 />
@@ -218,14 +218,14 @@ atomic, do the columns depend on the right key?
 <MultipleChoice
   markdown={`A row stores \`items = 'Book, Pen, Mug'\`. What is the best 1NF-friendly fix?
 
-- Keep the list and search it with string matching.
-  > String matching hides separate values inside one cell and keeps the 1NF problem.
-- Add more commas so the format is consistent.
-  > A consistently formatted list is still a multi-value cell.
 - [o] Store each item as its own row, usually in an order-items child table.
   > Separate rows let SQL treat each item as a real value.
 - Store the list in the primary key.
   > A primary key should identify a row, not pack repeated values into one field.
+- Keep the list and search it with string matching.
+  > String matching hides separate values inside one cell and keeps the 1NF problem.
+- Add more commas so the format is consistent.
+  > A consistently formatted list is still a multi-value cell.
 
 When a cell contains a list, the list usually wants to become rows.`}
 />
@@ -235,12 +235,12 @@ When a cell contains a list, the list usually wants to become rows.`}
 
 - It limits each student to exactly one phone number.
   > A child table allows many phone rows per student.
-- [o] It stores one phone number per row while linking each number back to its student.
-  > The foreign key keeps the relationship, and each value gets its own row.
-- It removes the need for a student table.
-  > The child table depends on the parent student table.
 - It makes phone numbers impossible to query.
   > Separate rows make phone numbers easier to filter, count, and constrain.
+- It removes the need for a student table.
+  > The child table depends on the parent student table.
+- [o] It stores one phone number per row while linking each number back to its student.
+  > The foreign key keeps the relationship, and each value gets its own row.
 
 Child tables are the standard way to model repeated facts without repeated columns.`}
 />
@@ -248,14 +248,14 @@ Child tables are the standard way to model repeated facts without repeated colum
 <MultipleChoice
   markdown={`After a table reaches 1NF, what question do later normal forms ask next?
 
-- Whether all values have been converted to uppercase.
-  > Case formatting is not the purpose of later normal forms.
 - Whether every query can avoid joins.
   > Later normal forms often introduce clean joins between related tables.
 - [o] Whether non-key columns depend on the right key and only that key.
   > 2NF and 3NF focus on dependencies between keys and non-key columns.
 - Whether the database has only one table.
   > Normalization usually splits facts across several related tables.
+- Whether all values have been converted to uppercase.
+  > Case formatting is not the purpose of later normal forms.
 
 1NF fixes repeated values; 2NF and 3NF examine dependencies.`}
 />

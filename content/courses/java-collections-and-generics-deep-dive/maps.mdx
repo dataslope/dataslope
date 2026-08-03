@@ -411,34 +411,34 @@ public class Grouper {
   > That overwrites; it doesn't help with the "list of values per key" pattern.
 - \`merge\`
   > Useful, but a bit awkward for the "map of lists" case.
-- [o] \`computeIfAbsent(key, k -> new ArrayList<>()).add(value)\`
-  > \`computeIfAbsent\` returns the (newly or previously) inserted list, on which you can immediately call \`add\`.
 - \`putIfAbsent\`
-  > It returns the *previous* value (or null), so chaining \`.add\` on it fails on first insertion.`}
+  > It returns the *previous* value (or null), so chaining \`.add\` on it fails on first insertion.
+- [o] \`computeIfAbsent(key, k -> new ArrayList<>()).add(value)\`
+  > \`computeIfAbsent\` returns the (newly or previously) inserted list, on which you can immediately call \`add\`.`}
 />
 
 <MultipleChoice
   markdown={`When should you reach for \`TreeMap\` over \`HashMap\`?
 
-- When you need higher throughput
-  > \`HashMap\` is faster on average.
-- [o] When you need keys iterated in sorted order, range queries (\`subMap\`), or "next key after \`x\`" (\`ceilingKey\`, \`floorKey\`)
-  > The \`O(log n)\` price buys real ordering operations a hash table cannot provide.
 - When the keys are strings
   > Both maps handle string keys; ordering is the deciding factor.
 - When values can be null
-  > Both support null values.`}
+  > Both support null values.
+- When you need higher throughput
+  > \`HashMap\` is faster on average.
+- [o] When you need keys iterated in sorted order, range queries (\`subMap\`), or "next key after \`x\`" (\`ceilingKey\`, \`floorKey\`)
+  > The \`O(log n)\` price buys real ordering operations a hash table cannot provide.`}
 />
 
 <MultipleChoice
   markdown={`Why is \`EnumMap\` preferred over \`HashMap\` when keys are enum constants?
 
+- It is automatically thread-safe
+  > It is not.
 - \`HashMap\` is forbidden for enum keys
   > It works fine.
 - [o] \`EnumMap\` is backed by a plain array indexed by the enum's \`ordinal\`, so it's faster and far more compact than a hash table
   > When the key space is a fixed small enum, a direct-indexed array is unbeatable.
 - It throws on a missing key, which is desirable
-  > It returns \`null\` like other maps.
-- It is automatically thread-safe
-  > It is not.`}
+  > It returns \`null\` like other maps.`}
 />

@@ -516,12 +516,12 @@ assert excludes_zero == (ci[0] > 0)`,
 <MultipleChoice
   markdown={`Why does randomly assigning users to A and B let an A/B test support a *causal* claim, when ordinary observational data usually can't?
 
-- Because randomization guarantees the two groups have identical sample sizes
-  > Equal sizes are not the point, and randomization only balances sizes on average. The benefit is balancing *characteristics*, not counts.
 - [o] Because randomization balances confounders, known and unknown, across the two groups, so the treatment is the only systematic difference
   > With confounders evenly split between arms, any difference beyond chance can be attributed to the treatment rather than a lurking variable.
 - Because randomization increases the sample size
   > Randomization is about *how* users are assigned, not how many there are; it does not change the sample size.
+- Because randomization guarantees the two groups have identical sample sizes
+  > Equal sizes are not the point, and randomization only balances sizes on average. The benefit is balancing *characteristics*, not counts.
 - Because randomized tests never produce false positives
   > Randomized tests still have a false-positive rate of alpha; randomization addresses confounding, not the existence of chance results.
 
@@ -531,14 +531,14 @@ Randomization is the mechanism that turns a correlation into a credible cause.`}
 <MultipleChoice
   markdown={`A test reaches p = 0.04 after 3 days. Your teammate wants to stop and ship immediately. What's the statistical problem with stopping the moment it crosses 0.05?
 
-- Nothing, once p < 0.05 the result is locked in and valid
-  > The p-value fluctuates as data accrues; a single crossing is not a permanent verdict, and stopping on it inflates the false-positive rate.
 - [o] Peeking and stopping at the first significant moment inflates the false-positive rate well above the stated alpha
   > Because the p-value wanders over time, repeatedly checking and stopping on the first dip below 0.05 makes spurious "wins" far more likely than 5%.
-- The p-value is too high to stop
-  > A p-value of 0.04 is below 0.05; the concern is not its level but the act of stopping early based on a moving number.
+- Nothing, once p < 0.05 the result is locked in and valid
+  > The p-value fluctuates as data accrues; a single crossing is not a permanent verdict, and stopping on it inflates the false-positive rate.
 - You should switch to a one-sided test to justify stopping
   > Changing the test's sidedness does not address optional stopping; the inflation comes from the repeated peeking, not the test direction.
+- The p-value is too high to stop
+  > A p-value of 0.04 is below 0.05; the concern is not its level but the act of stopping early based on a moving number.
 
 Pre-commit to a sample size or use a method designed for continuous monitoring.`}
 />
@@ -546,14 +546,14 @@ Pre-commit to a sample size or use a method designed for continuous monitoring.`
 <MultipleChoice
   markdown={`With 5 million users, a new layout shows a statistically significant lift in conversion of 0.02 percentage points (from 8.00% to 8.02%). The 95% CI is [0.005pp, 0.035pp]. Should you ship?
 
+- No, because the result must be a false positive
+  > With 5 million users a 0.02pp effect can be entirely real; it is just too small to matter, which is different from being a false positive.
 - Yes, it's statistically significant, and significance means ship
   > Significance only certifies the effect is distinguishable from zero. The magnitude here is tiny, and significance alone is not a shipping criterion.
 - [o] Probably not on this alone, the effect is real but so small it likely isn't worth the cost; weigh the tiny effect size against the rollout cost
   > A huge sample makes microscopic effects significant; the CI confirms the lift is real but trivially small, so practical importance should drive the decision.
 - Yes, because the confidence interval excludes zero
   > Excluding zero confirms significance, but the entire interval sits at a trivially small magnitude, so it does not justify shipping by itself.
-- No, because the result must be a false positive
-  > With 5 million users a 0.02pp effect can be entirely real; it is just too small to matter, which is different from being a false positive.
 
 Significant is not the same as worth shipping, read the effect size and CI.`}
 />
@@ -561,14 +561,14 @@ Significant is not the same as worth shipping, read the effect size and CI.`}
 <MultipleChoice
   markdown={`Your team's experiment tracks 12 metrics and declares victory because *one* of them improved with p = 0.03. What's the flaw?
 
-- A t-test was the wrong choice for 12 metrics
-  > The flaw is not the specific test; it is testing many metrics and celebrating whichever crosses significance.
-- [o] Testing 12 metrics multiplies the chance that at least one looks significant by luck; without correction or a pre-declared primary metric, the "win" may be noise
-  > Each metric is another shot at a false positive, so finding one significant result among twelve is expected even when nothing truly changed.
-- p = 0.03 is not significant enough
-  > A p-value of 0.03 is below the usual 0.05 threshold; the issue is the number of metrics tested, not the value of this one p-value.
 - They should have used a larger sample
   > Sample size does not fix the multiple-comparisons problem; testing many metrics inflates false positives regardless of n.
+- p = 0.03 is not significant enough
+  > A p-value of 0.03 is below the usual 0.05 threshold; the issue is the number of metrics tested, not the value of this one p-value.
+- [o] Testing 12 metrics multiplies the chance that at least one looks significant by luck; without correction or a pre-declared primary metric, the "win" may be noise
+  > Each metric is another shot at a false positive, so finding one significant result among twelve is expected even when nothing truly changed.
+- A t-test was the wrong choice for 12 metrics
+  > The flaw is not the specific test; it is testing many metrics and celebrating whichever crosses significance.
 
 Pre-commit to one primary metric, or correct for the number of comparisons.`}
 />
@@ -576,14 +576,14 @@ Pre-commit to one primary metric, or correct for the number of comparisons.`}
 <MultipleChoice
   markdown={`An A/B test shows the treatment winning overall, but when you split by device, the treatment *loses* on both mobile and desktop. What's the most likely culprit?
 
-- The treatment is genuinely better, so ignore the segments
-  > When every segment disagrees with the aggregate, the aggregate is suspect; this is a textbook Simpson's-paradox warning sign, not something to ignore.
-- The test had too few users
-  > Sample size does not produce a sign reversal between aggregate and every subgroup; an uneven mix across segments does.
 - [o] Simpson's paradox, the traffic mix differs between arms, so the pooled result reverses what happens within each device
   > A difference in how device traffic is distributed across arms can flip the aggregate relative to the within-segment results, even with a correct calculation.
 - The metric was continuous instead of binary
   > The metric's type is irrelevant to a sign reversal across segments; the cause is the segment-mix imbalance between the two arms.
+- The test had too few users
+  > Sample size does not produce a sign reversal between aggregate and every subgroup; an uneven mix across segments does.
+- The treatment is genuinely better, so ignore the segments
+  > When every segment disagrees with the aggregate, the aggregate is suspect; this is a textbook Simpson's-paradox warning sign, not something to ignore.
 
 When the aggregate and every segment disagree, suspect a shift in segment mix (and check your randomization).`}
 />

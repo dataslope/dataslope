@@ -471,10 +471,10 @@ A `CROSS JOIN` produces the **Cartesian product** of two tables (every row from 
 <MultipleChoice
   markdown={`Two orders in the same region are tied on \`amount\`. You need both to get the **same** rank, and the next distinct amount to skip a number (1, 2, 2, 4). Which function do you want?
 
-- \`ROW_NUMBER()\`
-  > \`ROW_NUMBER()\` assigns a distinct number to every row even on ties (1, 2, 3, 4), breaking ties arbitrarily, it never repeats a value.
 - [o] \`RANK()\`
   > \`RANK()\` gives tied rows the same rank and then skips, producing 1, 2, 2, 4, exactly the pattern described.
+- \`ROW_NUMBER()\`
+  > \`ROW_NUMBER()\` assigns a distinct number to every row even on ties (1, 2, 3, 4), breaking ties arbitrarily, it never repeats a value.
 - \`DENSE_RANK()\`
   > \`DENSE_RANK()\` also ties rows together but does *not* skip, it yields 1, 2, 2, 3.
 - \`NTILE(4)\`
@@ -484,14 +484,14 @@ A `CROSS JOIN` produces the **Cartesian product** of two tables (every row from 
 <MultipleChoice
   markdown={`Why \`ROW_NUMBER()\` rather than \`RANK()\` for "keep one row per user"?
 
-- They're interchangeable for deduplication.
-  > They differ on ties: two rows with the *same* \`event_time\` would both get rank 1 under \`RANK\`, so you'd keep both.
 - [o] \`ROW_NUMBER()\` guarantees a single row per partition even on ties, so filtering to \`= 1\` keeps exactly one.
   > It assigns distinct numbers within each partition no matter what, exactly what "one row per user" needs.
+- \`ROW_NUMBER()\` sorts the whole table, which is required.
+  > Ordering happens within each partition for ranking, not as a global sort requirement.
 - \`RANK()\` can't be used in a window at all.
   > \`RANK()\` is a valid window function; it's just the wrong tie behavior for dedup.
-- \`ROW_NUMBER()\` sorts the whole table, which is required.
-  > Ordering happens within each partition for ranking, not as a global sort requirement.`}
+- They're interchangeable for deduplication.
+  > They differ on ties: two rows with the *same* \`event_time\` would both get rank 1 under \`RANK\`, so you'd keep both.`}
 />
 
 ## Challenges

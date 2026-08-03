@@ -305,25 +305,25 @@ int main() {
 <MultipleChoice
   markdown={`What is the worst-case time complexity of linear search over \`n\` elements?
 
-- [o] O(n)
-  > It may inspect every element.
+- O(n log n)
+  > That is common for efficient sorting, not linear search.
 - O(log n)
   > That is binary search on sorted data.
+- [o] O(n)
+  > It may inspect every element.
 - O(1)
-  > Linear search is not constant time in the worst case.
-- O(n log n)
-  > That is common for efficient sorting, not linear search.`}
+  > Linear search is not constant time in the worst case.`}
 />
 
 <MultipleChoice
   markdown={`What must be true before using binary search on a vector?
 
+- The vector must contain only positive integers.
+  > It works for any comparable values.
 - The vector must have no duplicates.
   > Duplicates are allowed.
 - [o] The vector must be sorted according to the search comparison.
   > Binary search relies on sorted order.
-- The vector must contain only positive integers.
-  > It works for any comparable values.
 - The vector must be stored on the heap.
   > Storage location is irrelevant.`}
 />
@@ -335,21 +335,21 @@ int main() {
   > That is \`std::upper_bound\`.
 - A boolean indicating whether \`x\` exists.
   > That is \`std::binary_search\`.
-- [o] An iterator to the first element not less than \`x\`.
-  > It finds the first value \`>= x\`.
 - The last occurrence of \`x\`.
-  > It returns the insertion position before equal values.`}
+  > It returns the insertion position before equal values.
+- [o] An iterator to the first element not less than \`x\`.
+  > It finds the first value \`>= x\`.`}
 />
 
 <MultipleChoice
   markdown={`In an inclusive binary search loop, which update is correct after \`v[mid] < target\`?
 
-- \`high = mid - 1\`
-  > That searches left, but the target must be to the right.
 - \`low = mid\`
   > This can repeat the same middle index forever.
 - [o] \`low = mid + 1\`
   > Exclude the too-small middle value.
+- \`high = mid - 1\`
+  > That searches left, but the target must be to the right.
 - \`high = mid\`
   > This keeps the too-small middle in the interval.`}
 />

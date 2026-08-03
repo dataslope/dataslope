@@ -439,38 +439,38 @@ int main(void) {
 <MultipleChoice
   markdown={`What does the expression \`*p\` do when \`p\` is an \`int *\`?
 
-- It computes the product of \`p\` with itself.
-  > That would only be true if \`p\` were a number being multiplied.
+- It marks \`p\` as a pointer in the declaration.
+  > That meaning of \`*\` only applies in declarations, not in expressions.
 - It takes the address of \`p\`.
   > That is the unary \`&\` operator.
+- It computes the product of \`p\` with itself.
+  > That would only be true if \`p\` were a number being multiplied.
 - [o] It reads (or assigns to) the \`int\` value stored at the address \`p\` holds.
-  > \`*\` is the *dereference* operator.
-- It marks \`p\` as a pointer in the declaration.
-  > That meaning of \`*\` only applies in declarations, not in expressions.`}
+  > \`*\` is the *dereference* operator.`}
 />
 
 <MultipleChoice
   markdown={`Why does the function \`void try_to_swap(int a, int b)\` fail to actually swap the caller's variables?
 
-- Because C does not support swapping at all.
-  > C absolutely supports swapping; you just need pointers.
-- Because the compiler optimizes the swap away.
-  > Even with optimization disabled, the function still cannot affect the caller's variables.
 - [o] Because C passes arguments **by value**, the function gets copies of the caller's ints, and modifying the copies leaves the originals untouched.
   > To modify the caller's variables you must pass *pointers* to them.
+- Because C does not support swapping at all.
+  > C absolutely supports swapping; you just need pointers.
 - Because \`int\` is not large enough to be swapped on this machine.
-  > Size has nothing to do with it.`}
+  > Size has nothing to do with it.
+- Because the compiler optimizes the swap away.
+  > Even with optimization disabled, the function still cannot affect the caller's variables.`}
 />
 
 <MultipleChoice
   markdown={`Given \`const int *p\`, which statement is true?
 
-- You cannot change \`p\` to point at a different \`int\`.
-  > That would require \`int *const p\` (a const *pointer*, not a pointer to const).
-- [o] You cannot modify the \`int\` that \`p\` currently points at through \`p\`.
-  > \`const int *p\` is a pointer to a *const* int; the pointer itself can be reassigned, but writes through it are forbidden.
 - The pointer is automatically initialized to \`NULL\`.
   > Initialization is unrelated to \`const\`.
+- [o] You cannot modify the \`int\` that \`p\` currently points at through \`p\`.
+  > \`const int *p\` is a pointer to a *const* int; the pointer itself can be reassigned, but writes through it are forbidden.
 - The compiler stores the int in read-only memory.
-  > \`const\` is a promise about access through this pointer, not a statement about where the int lives.`}
+  > \`const\` is a promise about access through this pointer, not a statement about where the int lives.
+- You cannot change \`p\` to point at a different \`int\`.
+  > That would require \`int *const p\` (a const *pointer*, not a pointer to const).`}
 />

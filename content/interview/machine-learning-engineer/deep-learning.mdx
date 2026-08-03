@@ -283,14 +283,14 @@ whose gradient can vanish. Combined libraries fuse the two
 <MultipleChoice
   markdown={`A deep network with sigmoid activations trains extremely slowly, its early layers barely change. What's the most likely cause and a standard fix?
 
-- The learning rate is too high; lower it.
-  > A too-high rate causes divergence or oscillation, not layers that barely move; the symptom points elsewhere.
 - [o] Vanishing gradients from saturating sigmoids; switch to ReLU-family activations (and add residual connections / normalization).
   > Sigmoid derivatives max out at 0.25 and shrink at the tails, so gradients decay through depth; ReLU and skip connections keep them flowing.
-- The model has too few parameters; add layers.
-  > Adding more sigmoid layers deepens the product of small derivatives and makes vanishing worse.
+- The learning rate is too high; lower it.
+  > A too-high rate causes divergence or oscillation, not layers that barely move; the symptom points elsewhere.
 - The dataset is too large; subsample it.
-  > Data size doesn't explain early layers failing to learn; the gradient signal is the issue.`}
+  > Data size doesn't explain early layers failing to learn; the gradient signal is the issue.
+- The model has too few parameters; add layers.
+  > Adding more sigmoid layers deepens the product of small derivatives and makes vanishing worse.`}
 />
 
 <MultipleChoice
@@ -309,14 +309,14 @@ whose gradient can vanish. Combined libraries fuse the two
 <MultipleChoice
   markdown={`What does the \`1/sqrt(d_k)\` scaling factor do in scaled dot-product attention?
 
-- It normalizes the attention weights so they sum to 1.
-  > The softmax is what makes the weights sum to 1; the scaling happens before softmax.
-- [o] It keeps the dot products from growing large with dimension, preventing softmax from saturating into near-one-hot weights with tiny gradients.
-  > Large dot products push softmax into flat regions where gradients vanish; dividing by sqrt(d_k) keeps them well-scaled.
 - It reduces the number of attention heads.
   > Head count is a separate architectural choice, unrelated to this scalar.
 - It converts the queries and keys into probabilities.
-  > Q and K stay as vectors; only the post-softmax weights are a distribution.`}
+  > Q and K stay as vectors; only the post-softmax weights are a distribution.
+- [o] It keeps the dot products from growing large with dimension, preventing softmax from saturating into near-one-hot weights with tiny gradients.
+  > Large dot products push softmax into flat regions where gradients vanish; dividing by sqrt(d_k) keeps them well-scaled.
+- It normalizes the attention weights so they sum to 1.
+  > The softmax is what makes the weights sum to 1; the scaling happens before softmax.`}
 />
 
 ## Go deeper

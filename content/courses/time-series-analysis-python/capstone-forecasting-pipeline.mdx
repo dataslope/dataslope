@@ -706,14 +706,14 @@ assert evaluation["mean_rmse"] >= evaluation["mean_mae"] - 1e-9`,
 <MultipleChoice
   markdown={`In the pipeline, **why fit the model on \`log(train)\` and exponentiate the forecasts** rather than modeling the raw passengers directly?
 
+- Because the log removes the trend
+  > A log does not remove a trend (differencing does). It specifically stabilizes the *variance*; the trend is handled separately by the differencing term.
+- Because ARIMA cannot accept positive numbers
+  > ARIMA handles positive data fine. The log is about taming *growing variance*, not a restriction on sign or magnitude.
 - Because logs make the numbers smaller and faster to compute
   > Speed isn't the reason, and the magnitude of the numbers is irrelevant to the model. The log addresses a statistical property.
 - [o] The log stabilizes the series' variance, which grows with the level (multiplicative seasonality), making it suitable for the additive, constant-variance assumptions of ARIMA
   > The airline series' swings widen as the level rises. A log compresses that growing variance into a roughly constant one, matching what ARIMA expects; exponentiating returns forecasts to the original scale.
-- Because ARIMA cannot accept positive numbers
-  > ARIMA handles positive data fine. The log is about taming *growing variance*, not a restriction on sign or magnitude.
-- Because the log removes the trend
-  > A log does not remove a trend (differencing does). It specifically stabilizes the *variance*; the trend is handled separately by the differencing term.
 
 Logging stabilizes the variance that grows with the level, aligning the series with ARIMA's constant-variance assumptions; exponentiating undoes it.`}
 />
@@ -721,14 +721,14 @@ Logging stabilizes the variance that grows with the level, aligning the series w
 <MultipleChoice
   markdown={`The seasonal model scored the lowest error on the held-out months. What single comparison makes that result *meaningful* rather than just a number?
 
-- That its AIC was the lowest
-  > AIC is an in-sample criterion and wasn't even computed here. What makes the out-of-sample number meaningful is beating a baseline on that same held-out data.
-- [o] That it beat the seasonal-naive **baseline** on the same honest, held-out test
-  > An error figure only has meaning relative to a reference. Beating "same as last year" on data the model never saw is what proves the model added real skill.
-- That it used more parameters than the alternatives
-  > More parameters is a cost, not evidence of value, it raises overfitting risk. Skill is shown by out-of-sample performance versus a baseline, not by complexity.
 - That its forecast line looked smooth
   > Visual smoothness says nothing about accuracy. A smooth, confident, wrong forecast is still wrong; the baseline comparison on held-out data is the real test.
+- That its AIC was the lowest
+  > AIC is an in-sample criterion and wasn't even computed here. What makes the out-of-sample number meaningful is beating a baseline on that same held-out data.
+- That it used more parameters than the alternatives
+  > More parameters is a cost, not evidence of value, it raises overfitting risk. Skill is shown by out-of-sample performance versus a baseline, not by complexity.
+- [o] That it beat the seasonal-naive **baseline** on the same honest, held-out test
+  > An error figure only has meaning relative to a reference. Beating "same as last year" on data the model never saw is what proves the model added real skill.
 
 An out-of-sample error is meaningful only against a baseline on the same honest test, beating seasonal-naive is the proof of added skill.`}
 />
@@ -738,10 +738,10 @@ An out-of-sample error is meaningful only against a baseline on the same honest 
 
 - Fit model -> check stationarity -> split chronologically -> evaluate
   > Fitting before checking stationarity or splitting risks modeling a non-stationary series and leaking the future. Diagnosis and the split must come first.
-- [o] Explore -> stabilize/difference to stationarity -> identify orders -> split chronologically -> fit on train -> forecast -> compare to baseline
-  > You diagnose and prepare the series, identify orders, hold out the future, fit only on the past, forecast, and finally judge against a baseline. Each step depends on the ones before it.
 - Split randomly -> fit -> exponentiate -> done
   > A random split leaks the future, and "done" skips stationarity, order identification, uncertainty, and the baseline comparison that make a forecast trustworthy.
+- [o] Explore -> stabilize/difference to stationarity -> identify orders -> split chronologically -> fit on train -> forecast -> compare to baseline
+  > You diagnose and prepare the series, identify orders, hold out the future, fit only on the past, forecast, and finally judge against a baseline. Each step depends on the ones before it.
 - Decompose -> forecast the trend component -> stop
   > The decomposition trend is a backward-looking smoother, not a forecast, and this skips stationarity, fitting, the chronological split, and validation entirely.
 

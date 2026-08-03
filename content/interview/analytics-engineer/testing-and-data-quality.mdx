@@ -259,25 +259,25 @@ to push fixes upstream, not to normalize working around bad data.
 <MultipleChoice
   markdown={`A dbt \`unique\` test on \`order_id\` fails. What has dbt done?
 
+- It converted \`order_id\` to a primary key column.
+  > Tests validate assumptions; they don't change the schema.
+- It added a unique index on \`order_id\`.
+  > Tests don't alter physical storage or add indexes.
 - It removed the duplicate rows so the model is now clean.
   > dbt tests assert; they never modify data. The duplicates remain until you fix the source.
 - [o] It returned the offending rows and failed the run so the pipeline stops on bad data.
-  > A generic test compiles to a query expected to return zero rows; the duplicate keys it returns are the failure, and the run fails.
-- It added a unique index on \`order_id\`.
-  > Tests don't alter physical storage or add indexes.
-- It converted \`order_id\` to a primary key column.
-  > Tests validate assumptions; they don't change the schema.`}
+  > A generic test compiles to a query expected to return zero rows; the duplicate keys it returns are the failure, and the run fails.`}
 />
 
 <MultipleChoice
   markdown={`Upstream data sometimes lands hours late, and stale numbers reach dashboards before anyone notices. Which dbt feature addresses this directly?
 
-- A \`not_null\` test on the timestamp column.
-  > That checks the column has values, not whether the data arrived on time.
 - [o] \`dbt source freshness\` with \`warn_after\`/\`error_after\` thresholds.
   > Freshness measures the lag on a \`loaded_at_field\` and alerts when raw data is too old, before transformation runs.
 - An \`accepted_values\` test.
   > That constrains which values are allowed, not timeliness.
+- A \`not_null\` test on the timestamp column.
+  > That checks the column has values, not whether the data arrived on time.
 - A larger warehouse.
   > Compute size doesn't detect or prevent late-arriving source data.`}
 />
@@ -285,12 +285,12 @@ to push fixes upstream, not to normalize working around bad data.
 <MultipleChoice
   markdown={`Your key is a combination of \`order_id\` and \`line_number\`. Which test guards that grain?
 
+- [o] \`dbt_utils.unique_combination_of_columns\` on \`[order_id, line_number]\`.
+  > This asserts the pair is unique together, which is exactly the compound-key grain.
 - A \`unique\` test on \`order_id\` alone.
   > An order with several lines legitimately repeats \`order_id\`; this test would falsely fail.
 - A \`not_null\` test on both columns.
   > That only ensures neither is null; two identical (order_id, line_number) pairs still slip through.
-- [o] \`dbt_utils.unique_combination_of_columns\` on \`[order_id, line_number]\`.
-  > This asserts the pair is unique together, which is exactly the compound-key grain.
 - An \`accepted_values\` test on \`line_number\`.
   > That restricts allowed values, not the uniqueness of the pair.`}
 />

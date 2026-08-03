@@ -183,25 +183,25 @@ that lasts from code that gets rewritten every two years.
 
 - The compiler inlines them better.
   > Modern compilers inline freely; this isn't the main point.
-- It reduces the executable size.
-  > Often the opposite, very slightly.
 - [o] Small functions with one responsibility are easier to read, name accurately, test in isolation, and reuse, which compounds into a much more maintainable codebase.
   > Readability and testability are the lasting payoff, not any micro-optimization.
 - It is required by the C++ standard.
-  > It is not.`}
+  > It is not.
+- It reduces the executable size.
+  > Often the opposite, very slightly.`}
 />
 
 <MultipleChoice
   markdown={`Which kind of comment is most valuable?
 
+- A comment marking the end of every block.
+  > Indentation already conveys that.
+- A header banner of equal signs.
+  > Decoration is not insight.
 - A comment that restates the next line of code in English.
   > Those tend to drift out of sync and add noise.
 - [o] A comment that captures *why* a non-obvious decision was made, context the reader cannot reconstruct from the code alone.
-  > The code already shows *what* it does; the *why* is the part a comment can add.
-- A header banner of equal signs.
-  > Decoration is not insight.
-- A comment marking the end of every block.
-  > Indentation already conveys that.`}
+  > The code already shows *what* it does; the *why* is the part a comment can add.`}
 />
 
 Next: where to go from here.

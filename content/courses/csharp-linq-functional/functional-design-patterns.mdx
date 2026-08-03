@@ -345,14 +345,14 @@ expressive *without* abandoning the strengths of the OO model.
 <MultipleChoice
   markdown={`In railway-oriented programming, what is the central role of \`Bind\` (also called \`FlatMap\` or \`SelectMany\`)?
 
-- It runs all steps in parallel and collects every error at once.
-  > That's *applicative* composition, a different combinator. \`Bind\` is sequential.
+- It converts a synchronous result into an async one.
+  > That's a separate concern (lifting into a \`Task\` / \`ValueTask\`), not the purpose of \`Bind\`.
 - It catches exceptions inside each step and converts them to errors.
   > A useful helper, but not what \`Bind\` itself does, it just propagates the existing \`Err\` value.
 - [o] It chains an operation that *returns* a \`Result\` onto a previous \`Result\`, automatically short-circuiting on the first error.
   > \`Bind\` lets you write \`a.Bind(Step2).Bind(Step3)\` where each step may fail. As soon as one step returns \`Err\`, every subsequent \`Bind\` skips its function and threads the error to the end of the pipeline.
-- It converts a synchronous result into an async one.
-  > That's a separate concern (lifting into a \`Task\` / \`ValueTask\`), not the purpose of \`Bind\`.
+- It runs all steps in parallel and collects every error at once.
+  > That's *applicative* composition, a different combinator. \`Bind\` is sequential.
 
 \`Bind\` is the switch operator that defines the success/failure track topology of a pipeline.`}
 />

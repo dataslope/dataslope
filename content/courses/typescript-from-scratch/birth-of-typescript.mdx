@@ -235,14 +235,14 @@ One of TypeScript's most distinctive features is its **structural type system** 
 <MultipleChoice
   markdown={`What was the key design constraint that made TypeScript different from previous attempts to add types to JavaScript?
 
-- TypeScript used a faster compiler than Flow or Closure Compiler
-  > Compiler speed was not the defining constraint; the key decision was to make TypeScript a strict superset of JavaScript so existing code required no rewrites.
-- [o] TypeScript had to be a strict superset of JavaScript, so any valid JS is valid TS
-  > This "JavaScript-plus-types" philosophy meant developers could rename \`.js\` to \`.ts\` and gradually add annotations. Older tools like Closure Compiler required extensive rewrites or non-standard syntax.
-- TypeScript was the first language to add type annotations to JavaScript
-  > Both Closure Compiler (2009) and Flow (2014) added type annotations to JavaScript before or alongside TypeScript's public launch in 2012.
 - TypeScript only worked with Microsoft's Visual Studio editor
   > TypeScript's compiler exposed a language service API that any editor could use, which allowed Atom, Vim, WebStorm, and others to gain rich TypeScript support early on.
+- TypeScript used a faster compiler than Flow or Closure Compiler
+  > Compiler speed was not the defining constraint; the key decision was to make TypeScript a strict superset of JavaScript so existing code required no rewrites.
+- TypeScript was the first language to add type annotations to JavaScript
+  > Both Closure Compiler (2009) and Flow (2014) added type annotations to JavaScript before or alongside TypeScript's public launch in 2012.
+- [o] TypeScript had to be a strict superset of JavaScript, so any valid JS is valid TS
+  > This "JavaScript-plus-types" philosophy meant developers could rename \`.js\` to \`.ts\` and gradually add annotations. Older tools like Closure Compiler required extensive rewrites or non-standard syntax.
 
 The superset constraint, combined with clean compilation to readable JavaScript, structural typing, and excellent tooling, made TypeScript feel like a natural extension of JavaScript, not a replacement.`}
 />

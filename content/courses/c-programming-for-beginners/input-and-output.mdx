@@ -308,10 +308,10 @@ int main(void) {
   > \`%d\` is for integers.
 - \`%f\`
   > Close, but \`%f\` defaults to **6** digits.
-- \`%s\`
-  > \`%s\` is for strings (\`char *\`), not for printing a \`double\`.
 - [o] \`%.3f\`
   > The \`.3\` between \`%\` and \`f\` specifies the number of digits after the decimal point.
+- \`%s\`
+  > \`%s\` is for strings (\`char *\`), not for printing a \`double\`.
 
 \`printf\`'s format mini-language is small but expressive: you can control width, precision, padding, sign, and base all with a few characters between \`%\` and the conversion letter.`}
 />
@@ -319,14 +319,14 @@ int main(void) {
 <MultipleChoice
   markdown={`Why does \`scanf\` require the \`&\` operator in front of integer variables, as in \`scanf("%d", &n);\`?
 
-- Because the C standard forbids passing values directly to \`scanf\`.
-  > The C standard imposes no such rule. The real reason is that passing a plain value gives \`scanf\` no way to write the result back to your variable.
-- [o] Because \`scanf\` needs the *address* of \`n\` to write the parsed value back into it.
-  > C passes arguments by value. To modify the caller's variable, \`scanf\` needs a pointer (an address) so it can write the result into the right memory location.
-- Because \`&\` converts \`n\` to a string suitable for parsing.
-  > \`&\` produces a pointer (a memory address), not a string. Parsing is handled by \`scanf\` itself using the \`%d\` specifier.
 - Because \`%d\` requires a special pointer type.
   > \`%d\` expects a plain \`int *\`, a pointer to an \`int\`, which is exactly what \`&n\` produces. There is no special pointer type involved.
+- [o] Because \`scanf\` needs the *address* of \`n\` to write the parsed value back into it.
+  > C passes arguments by value. To modify the caller's variable, \`scanf\` needs a pointer (an address) so it can write the result into the right memory location.
+- Because the C standard forbids passing values directly to \`scanf\`.
+  > The C standard imposes no such rule. The real reason is that passing a plain value gives \`scanf\` no way to write the result back to your variable.
+- Because \`&\` converts \`n\` to a string suitable for parsing.
+  > \`&\` produces a pointer (a memory address), not a string. Parsing is handled by \`scanf\` itself using the \`%d\` specifier.
 
 When you write \`&n\`, you're saying "here is the address of the box called \`n\`, please put the answer in it". This is one of the most common uses of the \`&\` (address-of) operator in C.`}
 />

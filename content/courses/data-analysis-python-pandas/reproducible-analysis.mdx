@@ -189,14 +189,14 @@ Without reproducibility, automation is impossible.
 <MultipleChoice
   markdown={`The single most important habit for reproducible analyses is:
 
-- Using emoji in chart titles
-  > Chart formatting is a presentation concern; it has no bearing on whether the analysis can be re-run and verified by someone else.
 - Writing many comments
   > Comments improve readability but do not make an analysis reproducible on their own, the code still needs to produce the same output from a clean start.
-- [o] Treating the raw data as immutable and capturing every transformation in code that can be re-run from scratch
-  > If raw data is untouched and all steps are in code, the analysis can always be regenerated.
+- Using emoji in chart titles
+  > Chart formatting is a presentation concern; it has no bearing on whether the analysis can be re-run and verified by someone else.
 - Saving to xlsx instead of csv
   > The output format does not determine reproducibility; an xlsx saved from a manually-edited spreadsheet is no more reproducible than a CSV.
+- [o] Treating the raw data as immutable and capturing every transformation in code that can be re-run from scratch
+  > If raw data is untouched and all steps are in code, the analysis can always be regenerated.
 
 Immutability of inputs is the bedrock.`}
 />
@@ -204,14 +204,14 @@ Immutability of inputs is the bedrock.`}
 <MultipleChoice
   markdown={`Why is "restart kernel and run all" a useful regular practice?
 
-- It saves memory
-  > Restarting the kernel does clear variables from memory, but that is a side effect; the purpose of the practice is to verify that the notebook runs correctly from a clean state.
 - It triggers garbage collection
   > Python's garbage collector runs automatically; restarting the kernel is not the mechanism for triggering it, and memory management is not why analysts do this.
-- [o] It guarantees the notebook actually produces its results from a clean state, otherwise hidden side effects from out-of-order cells can give false confidence
-  > The only test that matters is whether the notebook works from scratch.
+- It saves memory
+  > Restarting the kernel does clear variables from memory, but that is a side effect; the purpose of the practice is to verify that the notebook runs correctly from a clean state.
 - It speeds up Pandas
   > Pandas performance depends on data size and code, not on whether the kernel was recently restarted.
+- [o] It guarantees the notebook actually produces its results from a clean state, otherwise hidden side effects from out-of-order cells can give false confidence
+  > The only test that matters is whether the notebook works from scratch.
 
 Restart-and-run-all is the cheapest reproducibility test you can run.`}
 />
@@ -219,14 +219,14 @@ Restart-and-run-all is the cheapest reproducibility test you can run.`}
 <MultipleChoice
   markdown={`You're tweaking an analysis that uses random sampling. Each run gives slightly different numbers. What's the fix?
 
-- Increase the sample size
-  > A larger sample reduces variance but does not eliminate run-to-run differences, without a fixed seed, the random selections still change each execution.
-- Decrease the sample size
-  > A smaller sample has higher variance, making run-to-run differences worse, not better.
 - [o] Set a random seed (e.g. \`np.random.RandomState(42)\`) so the "random" choices are deterministic across runs
   > Set a seed and the same input always gives the same output, even when randomness is involved.
 - Disable random sampling
   > Removing randomness entirely may change the analysis's statistical validity; fixing the seed preserves the sampling approach while making it reproducible.
+- Increase the sample size
+  > A larger sample reduces variance but does not eliminate run-to-run differences, without a fixed seed, the random selections still change each execution.
+- Decrease the sample size
+  > A smaller sample has higher variance, making run-to-run differences worse, not better.
 
 Seeded randomness is one of the simplest reproducibility wins.`}
 />
@@ -238,10 +238,10 @@ Seeded randomness is one of the simplest reproducibility wins.`}
   > Pinning specific versions does not reduce the number of packages installed; it only ensures the versions are consistent across machines and over time.
 - Required by Python
   > Python itself has no requirement for a \`requirements.txt\`; it is a convention for package management tools like pip.
-- [o] Pandas (and other libraries) evolve, methods get renamed or removed. Pinning protects your notebook from breaking when versions change.
-  > Pinning trades fresh-features for *stability*. For analyses, stability usually wins.
 - Faster execution
   > Pinning package versions does not affect how fast the code runs; execution speed depends on the code and data, not which specific version is installed.
+- [o] Pandas (and other libraries) evolve, methods get renamed or removed. Pinning protects your notebook from breaking when versions change.
+  > Pinning trades fresh-features for *stability*. For analyses, stability usually wins.
 
 Pinning is the difference between "works today" and "works in two years".`}
 />

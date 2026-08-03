@@ -254,14 +254,14 @@ more often than bare arrays.
 <MultipleChoice
   markdown={`What happens if you try \`scores[scores.length]\` on a Java array?
 
-- Returns 0
-  > No, Java does not silently return defaults for out-of-bounds access.
-- Returns null
-  > No.
 - [o] Throws \`ArrayIndexOutOfBoundsException\` at runtime
   > Valid indices are 0..length-1.
+- Returns null
+  > No.
 - Grows the array by one
-  > Arrays cannot grow; ArrayList can.`}
+  > Arrays cannot grow; ArrayList can.
+- Returns 0
+  > No, Java does not silently return defaults for out-of-bounds access.`}
 />
 
 <MultipleChoice
@@ -271,10 +271,10 @@ more often than bare arrays.
   > Arrays are slightly faster for primitives.
 - [o] It can grow and shrink, has a richer API, and integrates with the rest of the collections framework
   > Flexibility and the collections API matter more than raw speed in most everyday code.
-- It uses less memory
-  > It actually uses more (boxing overhead).
 - The compiler refuses to use \`int[]\`
-  > It does not.`}
+  > It does not.
+- It uses less memory
+  > It actually uses more (boxing overhead).`}
 />
 
 <MultipleChoice

@@ -224,12 +224,12 @@ then use those positions as row indices.
 <MultipleChoice
   markdown={`Which expression filters \`penguins\` to rows where the species is either "Adelie" or "Gentoo"?
 
-- \`penguins[penguins$species == "Adelie" == "Gentoo", ]\`
-  > Chaining \`==\` like this does not test membership; it compares the first result to \`"Gentoo"\` and gives nonsense.
-- [o] \`penguins[penguins$species %in% c("Adelie", "Gentoo"), ]\`
-  > \`%in%\` is the idiomatic way to match against a set of values.
 - \`penguins[penguins$species = "Adelie" | "Gentoo", ]\`
   > A single \`=\` is assignment, not comparison, and \`| "Gentoo"\` is not a valid condition.
+- [o] \`penguins[penguins$species %in% c("Adelie", "Gentoo"), ]\`
+  > \`%in%\` is the idiomatic way to match against a set of values.
+- \`penguins[penguins$species == "Adelie" == "Gentoo", ]\`
+  > Chaining \`==\` like this does not test membership; it compares the first result to \`"Gentoo"\` and gives nonsense.
 - \`penguins[in(penguins$species, "Adelie", "Gentoo"), ]\`
   > There is no \`in()\` function in R; the membership operator is \`%in%\`.`}
 />
@@ -237,14 +237,14 @@ then use those positions as row indices.
 <MultipleChoice
   markdown={`Why is \`airquality[airquality$Ozone > 100, ]\` potentially dangerous?
 
+- \`Ozone\` is character, so the comparison errors.
+  > \`Ozone\` is numeric in \`airquality\`; the problem is not a type error but the propagation of \`NA\` through the comparison.
+- It sorts the data instead of filtering it.
+  > Logical indexing selects rows, not sorts them; sorting requires \`order()\`.
 - It's not, it works perfectly.
   > The expression silently includes rows where \`Ozone\` is \`NA\` as rows of all-\`NA\` values rather than excluding them, which corrupts downstream analyses.
 - [o] \`Ozone\` contains NAs, and \`NA > 100\` evaluates to NA, which produces rows of all NAs in the result.
-  > Always guard with \`!is.na(col) & ...\` (or use \`dplyr::filter()\`, which handles this for you).
-- It sorts the data instead of filtering it.
-  > Logical indexing selects rows, not sorts them; sorting requires \`order()\`.
-- \`Ozone\` is character, so the comparison errors.
-  > \`Ozone\` is numeric in \`airquality\`; the problem is not a type error but the propagation of \`NA\` through the comparison.`}
+  > Always guard with \`!is.na(col) & ...\` (or use \`dplyr::filter()\`, which handles this for you).`}
 />
 
 ## Mini challenge: heavy cars with poor fuel economy

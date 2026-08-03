@@ -60,14 +60,14 @@ That rule is not just a DBA setting. It expresses what the relationship
 <MultipleChoice
   markdown={`What does referential integrity guarantee?
 
-- Every table has the same number of rows.
-  > Related tables usually have different row counts.
-- [o] Every foreign key value points to an existing referenced row.
-  > Referential integrity keeps child references from dangling.
 - Every text value is spelled correctly.
   > Spelling is a data quality issue, but not the meaning of referential integrity.
 - Every primary key starts at 1.
   > Key numbering is unrelated; the guarantee is about valid references.
+- [o] Every foreign key value points to an existing referenced row.
+  > Referential integrity keeps child references from dangling.
+- Every table has the same number of rows.
+  > Related tables usually have different row counts.
 
 Referential integrity means references remain real, not imaginary.`}
 />
@@ -137,14 +137,14 @@ flowchart TD
 <MultipleChoice
   markdown={`Which delete behavior best matches "a task should disappear when its temporary project is deleted"?
 
-- RESTRICT.
-  > RESTRICT would block deleting the project while tasks exist.
 - [o] CASCADE.
   > CASCADE matches dependent child rows that should be removed with their parent.
 - SET NULL on a NOT NULL column.
   > SET NULL requires the foreign key column to allow nulls.
 - No foreign key.
   > Removing the constraint would allow broken references instead of defining the intended behavior.
+- RESTRICT.
+  > RESTRICT would block deleting the project while tasks exist.
 
 Delete behavior should match the real meaning of the parent-child relationship.`}
 />
@@ -327,14 +327,14 @@ be writing the delete.
 <MultipleChoice
   markdown={`What is an orphan row?
 
-- A parent row with many children.
-  > Having many children is a normal one-to-many relationship.
 - [o] A child row whose foreign key points to a parent row that does not exist.
   > Orphans are exactly the broken references referential integrity prevents.
 - A row with a primary key.
   > Primary keys identify rows; they do not make rows orphaned.
 - A row that appears at the top of a result set.
   > Result order is unrelated to parent-child validity.
+- A parent row with many children.
+  > Having many children is a normal one-to-many relationship.
 
 Orphan rows are broken links in the data model.`}
 />
@@ -344,12 +344,12 @@ Orphan rows are broken links in the data model.`}
 
 - When children should always be deleted automatically with the parent.
   > That meaning is modeled by \`CASCADE\`, not \`RESTRICT\`.
-- [o] When child rows must not lose their parent, so deleting the parent should be blocked.
-  > RESTRICT protects child rows by refusing a parent delete that would orphan them.
 - When the foreign key should become null every time.
   > That meaning is modeled by \`SET NULL\` when the column allows nulls.
 - When there is no relationship between the tables.
   > Delete behavior only matters because a relationship exists.
+- [o] When child rows must not lose their parent, so deleting the parent should be blocked.
+  > RESTRICT protects child rows by refusing a parent delete that would orphan them.
 
 RESTRICT is the "do not break this relationship" option.`}
 />
@@ -357,14 +357,14 @@ RESTRICT is the "do not break this relationship" option.`}
 <MultipleChoice
   markdown={`What does \`ON DELETE CASCADE\` mean?
 
-- Deleting a child row deletes the whole database.
-  > Cascade applies to related rows through the declared foreign key, not to the entire database.
-- Deleting a parent sets every child foreign key to zero.
-  > Cascade deletes child rows; it does not invent a replacement value.
 - [o] Deleting a parent row automatically deletes child rows that reference it.
   > CASCADE is useful for dependent data that should not outlive its parent.
 - Deleting a parent is always blocked.
   > Blocking the delete is the role of RESTRICT.
+- Deleting a child row deletes the whole database.
+  > Cascade applies to related rows through the declared foreign key, not to the entire database.
+- Deleting a parent sets every child foreign key to zero.
+  > Cascade deletes child rows; it does not invent a replacement value.
 
 CASCADE treats child rows as dependent parts of the parent.`}
 />
@@ -372,14 +372,14 @@ CASCADE treats child rows as dependent parts of the parent.`}
 <MultipleChoice
   markdown={`What must be true for \`ON DELETE SET NULL\` to work?
 
-- The child foreign key column must be \`NOT NULL\`.
-  > A NOT NULL column cannot be set to null, so this would conflict with SET NULL.
-- [o] The child foreign key column must allow \`NULL\`.
-  > SET NULL needs somewhere to put the cleared reference, so the column cannot be \`NOT NULL\`.
-- The parent table must have no primary key.
-  > A referenced parent key is still required.
 - The child row must be deleted first.
   > SET NULL keeps the child row instead of requiring its deletion.
+- The parent table must have no primary key.
+  > A referenced parent key is still required.
+- [o] The child foreign key column must allow \`NULL\`.
+  > SET NULL needs somewhere to put the cleared reference, so the column cannot be \`NOT NULL\`.
+- The child foreign key column must be \`NOT NULL\`.
+  > A NOT NULL column cannot be set to null, so this would conflict with SET NULL.
 
 SET NULL models an optional relationship where the child can survive unattached.`}
 />
@@ -387,12 +387,12 @@ SET NULL models an optional relationship where the child can survive unattached.
 <MultipleChoice
   markdown={`Why are \`ON DELETE\` and \`ON UPDATE\` actions design choices?
 
+- [o] Because they define what the relationship means when referenced rows change or disappear.
+  > The action encodes whether children are dependent, historical, optional, or protected.
 - Because they change the font used in ER diagrams.
   > They affect data behavior, not diagram appearance.
 - Because they decide whether SQL keywords are uppercase.
   > Keyword style is unrelated to relationship meaning.
-- [o] Because they define what the relationship means when referenced rows change or disappear.
-  > The action encodes whether children are dependent, historical, optional, or protected.
 - Because PostgreSQL chooses a random behavior unless you draw a diagram.
   > PostgreSQL follows declared constraints and defaults; designers should choose intentionally.
 

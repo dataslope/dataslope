@@ -400,14 +400,14 @@ This is a vocabulary check: the correct term is **conformed** dimension (consist
 <MultipleChoice
   markdown={`A mart has **one row per category** (revenue per category). In dimensional terms, what's the "grain" of this table?
 
-- One row per order.
-  > That's the grain of the *source* fact table; the mart aggregates orders away.
-- [o] One row per category.
-  > Grain is the level of detail one row represents. After \`GROUP BY category\`, each row is exactly one category.
 - One row per product.
   > Products are rolled up into categories here, so product isn't the grain.
+- [o] One row per category.
+  > Grain is the level of detail one row represents. After \`GROUP BY category\`, each row is exactly one category.
 - Grain doesn't apply to aggregated tables.
-  > Every table has a grain, defining it (here, per category) is the first modeling step.`}
+  > Every table has a grain, defining it (here, per category) is the first modeling step.
+- One row per order.
+  > That's the grain of the *source* fact table; the mart aggregates orders away.`}
 />
 
 ## Challenges

@@ -320,12 +320,12 @@ not to abstract for abstraction's sake.
 
 - The \`yield\` version uses less heap memory because lists are reference types.
   > Both allocate; the real difference is *when* and *how much*. List-based operators allocate the entire list up front.
-- The compiler refuses to chain List-returning operators in LINQ.
-  > Any \`IEnumerable<T>\`-returning method (including those returning \`List<T>\`) chains fine in LINQ.
-- [o] The \`yield\` version preserves laziness, downstream operators like \`Take(5)\` can stop the source early.
-  > With \`yield\`, elements flow one at a time and short-circuit operators terminate the source mid-stream. A list-based version forces the entire upstream to materialize before any downstream operator sees an element.
 - Lists cannot store generic types.
   > \`List<T>\` is generic by definition. This is simply false.
+- [o] The \`yield\` version preserves laziness, downstream operators like \`Take(5)\` can stop the source early.
+  > With \`yield\`, elements flow one at a time and short-circuit operators terminate the source mid-stream. A list-based version forces the entire upstream to materialize before any downstream operator sees an element.
+- The compiler refuses to chain List-returning operators in LINQ.
+  > Any \`IEnumerable<T>\`-returning method (including those returning \`List<T>\`) chains fine in LINQ.
 
 Lazy custom operators are the secret to composable, scalable pipelines.`}
 />

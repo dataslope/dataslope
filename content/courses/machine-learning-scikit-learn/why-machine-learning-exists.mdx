@@ -323,12 +323,12 @@ is built in, rather than requiring a human to re-derive the logic.
 
 - The dataset is small and the answer is an exact formula
   > Small datasets with exact formulas are precisely the cases where a hand-written rule wins. Machine learning is for patterns that are too complex or dynamic to express as a simple rule.
-- The problem is simple and never changes over time
-  > Simple, static problems are the canonical case for a hand-written rule, not machine learning. Spam filtering is the opposite: complex and constantly evolving.
 - [o] The pattern is too complex to enumerate as rules (the rule list explodes), and it keeps changing, so a model that generalizes from data and can be retrained fits better
   > Rule explosion (combinatorial growth) plus a shifting, adversarial pattern are exactly the conditions where learning from data beats hand-authored rules.
 - Machine learning is newer, so it must be the better choice here
   > Novelty is not a reason to prefer machine learning; the decision should be based on whether the pattern is too complex or dynamic to hand-code. Newer is not better by default, simpler is often better.
+- The problem is simple and never changes over time
+  > Simple, static problems are the canonical case for a hand-written rule, not machine learning. Spam filtering is the opposite: complex and constantly evolving.
 
 Complexity that defeats enumeration, combined with a changing pattern, is the classic case for ML over rules.`}
 />
@@ -338,14 +338,14 @@ Complexity that defeats enumeration, combined with a changing pattern, is the cl
 <MultipleChoice
   markdown={`What do spam filtering, handwriting recognition, and fraud detection have in common that makes them good fits for machine learning?
 
+- They all have a single, exact mathematical formula as the answer
+  > The opposite is true: none of these problems has a known exact formula. The pattern is real but too intricate to express analytically, which is exactly why learning from data is the right approach.
 - They all involve very small datasets
   > These domains produce some of the largest labeled datasets in existence, billions of emails, millions of handwriting samples, countless transactions. Small data is actually a reason to be more cautious about ML, not a feature of these problems.
 - They can each be solved perfectly by a short list of if/else rules
   > All three defeated rule-based approaches precisely because the rules needed grew without bound and could not keep up with the variety and evolution of real examples.
 - [o] In each, the input-to-output relationship is real but too complex (and often too changeable) to specify by hand, while labeled examples are available to learn from
   > These are textbook ML problems precisely because the pattern exists yet defies hand-coding, and there is plenty of labeled data to learn it from.
-- They all have a single, exact mathematical formula as the answer
-  > The opposite is true: none of these problems has a known exact formula. The pattern is real but too intricate to express analytically, which is exactly why learning from data is the right approach.
 
 The signature of an ML problem is a pattern that is real, complex, and often shifting, exactly where rules break down.`}
 />
@@ -544,12 +544,12 @@ print(choices)
 <MultipleChoice
   markdown={`According to the decision process on this page, what should you try **first** for a new problem?
 
-- The most powerful machine learning model available
-  > Reaching for the most powerful tool first is the opposite of the rule-first principle. Powerful models add cost, complexity, and maintenance burden; they are justified only when a simpler approach genuinely cannot capture the pattern.
-- A deep neural network, then simplify if it is too slow
-  > Starting with the heaviest model and simplifying downward is backwards. The sound approach is to start simple, understand whether ML is even needed, and only escalate complexity when the simpler option falls short.
 - [o] The simplest thing that could work, a hand-written rule, if one can solve the problem
   > The guiding heuristic is to prefer the simplest correct solution and escalate to ML only when a rule genuinely cannot capture the pattern. Simplicity is an engineering virtue.
+- A deep neural network, then simplify if it is too slow
+  > Starting with the heaviest model and simplifying downward is backwards. The sound approach is to start simple, understand whether ML is even needed, and only escalate complexity when the simpler option falls short.
+- The most powerful machine learning model available
+  > Reaching for the most powerful tool first is the opposite of the rule-first principle. Powerful models add cost, complexity, and maintenance burden; they are justified only when a simpler approach genuinely cannot capture the pattern.
 - Whatever approach is currently most popular
   > Popularity is not a technical criterion. The decision process on this page is based on the structure of the problem, whether a rule can handle it, not on what is fashionable in the field.
 
@@ -559,14 +559,14 @@ Reaching for the heaviest tool first is the opposite of the rule-first principle
 <MultipleChoice
   markdown={`A team wants to compute shipping cost as a fixed table: a known rate per weight bracket and destination zone. Should they use machine learning?
 
-- Yes, any business logic benefits from a learned model
-  > Not all business logic is a good fit for machine learning. When the answer is a fixed, exact formula, a lookup table of rates by weight and zone, a simple rule is simpler, error-free, and needs no data.
 - Yes, but only after collecting millions of past shipments
   > No amount of data changes the fact that the answer is a known formula. Collecting data and training a model when an exact rule exists is wasteful and introduces avoidable complexity and error.
 - [o] No, this is an exact, known formula; a lookup rule computes it perfectly, and a model would add cost, error, and complexity for no benefit
   > When the answer is a fixed, exact formula, a rule is simpler and always correct. ML would only introduce avoidable error and maintenance burden.
 - It cannot be decided without training a model first
   > The rule-first decision process does not require training a model to decide. When a simple, stable rule can solve the problem exactly, the answer is clear without any modeling.
+- Yes, any business logic benefits from a learned model
+  > Not all business logic is a good fit for machine learning. When the answer is a fixed, exact formula, a lookup table of rates by weight and zone, a simple rule is simpler, error-free, and needs no data.
 
 Exact, deterministic logic is the canonical case where rules beat models.`}
 />
@@ -574,14 +574,14 @@ Exact, deterministic logic is the canonical case where rules beat models.`}
 <MultipleChoice
   markdown={`Which of the following is a genuine **cost** of choosing machine learning over a hand-written rule?
 
-- It is impossible to make any predictions until the model is 100% accurate
-  > Models are deployed and used before they reach perfect accuracy; the goal is "good enough" on held-out data, not perfection. Waiting for 100% accuracy before making any predictions is not how ML systems work.
 - It requires no data at all, unlike rules
   > The opposite is true: machine learning requires labeled example data, which is often the most expensive and time-consuming part of the project. A hand-written rule needs no data at all.
-- [o] It needs labeled example data, it will sometimes be wrong, and it must be monitored and retrained as the world drifts
-  > ML brings real burdens, data collection and labeling, tolerance for occasional errors, and ongoing maintenance against drift. These are the costs you weigh against the benefit.
+- It is impossible to make any predictions until the model is 100% accurate
+  > Models are deployed and used before they reach perfect accuracy; the goal is "good enough" on held-out data, not perfection. Waiting for 100% accuracy before making any predictions is not how ML systems work.
 - It always runs faster than the equivalent rule
   > Models are often slower to serve predictions than a simple lookup rule, and they carry far more infrastructure overhead. Speed is generally an argument *for* rules, not for ML.
+- [o] It needs labeled example data, it will sometimes be wrong, and it must be monitored and retrained as the world drifts
+  > ML brings real burdens, data collection and labeling, tolerance for occasional errors, and ongoing maintenance against drift. These are the costs you weigh against the benefit.
 
 These ongoing costs are exactly why ML should be a deliberate choice, not a default.`}
 />
@@ -589,14 +589,14 @@ These ongoing costs are exactly why ML should be a deliberate choice, not a defa
 <MultipleChoice
   markdown={`Why is "the model fails silently" considered an especially dangerous cost of machine learning?
 
-- Because models always crash loudly, making bugs obvious
-  > Models rarely crash, that is precisely the problem. A drifting model continues to return confident predictions without any error signal, making the failure silent and hard to detect.
-- Because silent failures only happen during training, never in production
-  > The danger is the reverse: silent failures are most harmful in production, where a stale model keeps serving wrong predictions to real users without any obvious indication that something is wrong.
 - [o] Because a drifting model can keep returning confident, plausible-looking predictions that are quietly wrong, so the problem may go unnoticed without monitoring
   > Unlike a buggy rule that errors out, a stale model can look fine while being wrong. That is why ongoing evaluation and monitoring are essential, not optional.
 - Because silent failures are easy to ignore since they never affect users
   > Silent failures can have serious consequences for users, they receive wrong decisions without knowing it. The silence is what makes them dangerous, not harmless.
+- Because models always crash loudly, making bugs obvious
+  > Models rarely crash, that is precisely the problem. A drifting model continues to return confident predictions without any error signal, making the failure silent and hard to detect.
+- Because silent failures only happen during training, never in production
+  > The danger is the reverse: silent failures are most harmful in production, where a stale model keeps serving wrong predictions to real users without any obvious indication that something is wrong.
 
 Silent, confident wrongness is hard to detect, which is what makes drift monitoring necessary.`}
 />
@@ -604,14 +604,14 @@ Silent, confident wrongness is hard to detect, which is what makes drift monitor
 <MultipleChoice
   markdown={`You try to predict a fair coin's outcome from the time of day, and your model scores well on the training data. What is the right conclusion?
 
-- The model has discovered a genuine pattern linking time of day to coin flips
-  > A fair coin's outcome is independent of the time of day, there is no genuine pattern to discover. Any apparent pattern in training data is accidental noise, not signal, and it will not hold on new flips.
-- Coins must be biased by the time of day after all
-  > A fair coin's probability is exactly 0.5 on every flip, regardless of when it is flipped. A model scoring well on training data from a coin provides no evidence that the coin is biased.
 - [o] There is no real relationship; the model has merely fit accidental noise in the training data, and it will not generalize to new flips
   > Random noise always contains accidental-looking structure, so a model can "fit" it on the training set. With no true pattern to learn, that apparent success collapses on new data, a preview of overfitting.
 - The test set must be broken
   > A low test score when the training score is high is the *expected* outcome when there is no real signal, the model overfitted noise, not a pattern. That is not a broken test set; it is an honest evaluation revealing the training score was illusory.
+- Coins must be biased by the time of day after all
+  > A fair coin's probability is exactly 0.5 on every flip, regardless of when it is flipped. A model scoring well on training data from a coin provides no evidence that the coin is biased.
+- The model has discovered a genuine pattern linking time of day to coin flips
+  > A fair coin's outcome is independent of the time of day, there is no genuine pattern to discover. Any apparent pattern in training data is accidental noise, not signal, and it will not hold on new flips.
 
 When there is no real signal, training-set "success" is just the model memorizing noise.`}
 />

@@ -127,14 +127,14 @@ set out to avoid.
 <MultipleChoice
   markdown={`What is the purpose of a **primary key**?
 
-- To sort the rows of a table alphabetically.
-  > Sorting is done with \`ORDER BY\`; a primary key is about identity, not ordering.
-- [o] To uniquely identify each row, so any row can be told apart from every other.
-  > A primary key gives every row a unique, non-empty identity, which is essential for distinguishing rows and linking tables.
-- To store the largest value in the table.
-  > A primary key identifies rows; it has nothing to do with which value is largest.
 - To describe the colors of the table.
   > Appearance is unrelated; a primary key is about uniquely identifying rows.
+- [o] To uniquely identify each row, so any row can be told apart from every other.
+  > A primary key gives every row a unique, non-empty identity, which is essential for distinguishing rows and linking tables.
+- To sort the rows of a table alphabetically.
+  > Sorting is done with \`ORDER BY\`; a primary key is about identity, not ordering.
+- To store the largest value in the table.
+  > A primary key identifies rows; it has nothing to do with which value is largest.
 
 A primary key gives each row a unique, reliable identity within its table.`}
 />
@@ -157,14 +157,14 @@ A primary key must be unique and never null, the two guarantees that make it tru
 <MultipleChoice
   markdown={`Why is an auto-generated numeric \`id\` (a *surrogate key*) often preferred over using a person's name as the primary key?
 
-- Because numbers always take less storage than any name.
-  > Storage size is a minor concern; the real issue is reliability of identity.
+- Because a numeric id automatically sorts the table.
+  > A primary key does not sort the table; it identifies rows.
 - [o] Because names can repeat, change, or be missing, while a dedicated id stays unique and stable.
   > A surrogate key sidesteps the problems of real-world values changing or colliding, giving a permanent, guaranteed-unique identity.
 - Because names cannot be stored in a database.
   > Names absolutely can be stored; they just make poor identifiers.
-- Because a numeric id automatically sorts the table.
-  > A primary key does not sort the table; it identifies rows.
+- Because numbers always take less storage than any name.
+  > Storage size is a minor concern; the real issue is reliability of identity.
 
 Surrogate keys avoid the instability and duplication that plague real-world values like names.`}
 />

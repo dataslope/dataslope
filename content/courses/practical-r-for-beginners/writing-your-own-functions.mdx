@@ -292,40 +292,40 @@ stays local.
 <MultipleChoice
   markdown={`A function in R returns:
 
+- A list of all its expressions.
+  > Only one value is returned; to return multiple values you must explicitly pack them into a list and return that list.
+- The first expression.
+  > R evaluates all expressions in the function body in order and returns the *last* one, not the first.
 - Nothing, only \`return()\` returns.
   > \`return()\` is optional in R; a function automatically returns the value of its last evaluated expression even without an explicit \`return()\` call.
 - [o] The value of its last expression by default, or an explicit \`return()\` value if you use one.
-  > Many idiomatic R functions just end with the value to return.
-- The first expression.
-  > R evaluates all expressions in the function body in order and returns the *last* one, not the first.
-- A list of all its expressions.
-  > Only one value is returned; to return multiple values you must explicitly pack them into a list and return that list.`}
+  > Many idiomatic R functions just end with the value to return.`}
 />
 
 <MultipleChoice
   markdown={`Why is the DRY ("Don't Repeat Yourself") principle especially valuable in analysis code?
 
-- It saves typing.
-  > Saving keystrokes is a side effect, not the core reason; the real value is that a single change in one function propagates correctly everywhere it is called.
-- [o] Every duplication is a place a bug can hide and a place you'll have to remember to update, lifting repeated logic into a function gives you one place to fix it and one place to test.
-  > Fewer redundant lines = fewer ways for the code to drift out of sync with itself.
 - Functions run faster than inline code.
   > In R, calling a function does not inherently make code faster than equivalent inline expressions; performance depends on what the code does, not whether it is wrapped in a function.
+- It saves typing.
+  > Saving keystrokes is a side effect, not the core reason; the real value is that a single change in one function propagates correctly everywhere it is called.
 - It makes scripts shorter.
-  > Shorter code is a byproduct, not the primary motivation; the main gain is that there is only one place to change and verify when requirements evolve.`}
+  > Shorter code is a byproduct, not the primary motivation; the main gain is that there is only one place to change and verify when requirements evolve.
+- [o] Every duplication is a place a bug can hide and a place you'll have to remember to update, lifting repeated logic into a function gives you one place to fix it and one place to test.
+  > Fewer redundant lines = fewer ways for the code to drift out of sync with itself.`}
 />
 
 <MultipleChoice
   markdown={`Which is the best name for a function that computes a standardized z-score from a numeric vector?
 
-- \`f\`
-  > Single-letter names convey no meaning; a reader cannot tell what the function does from its name alone.
 - \`do_thing\`
   > Vague verb names like \`do_thing\` describe the fact that *something* happens but give no information about what it computes.
+- \`x_value\`
+  > \`x_value\` sounds like a variable holding a value, not a function that performs a transformation; noun-style names mislead the reader.
 - [o] \`standardize\`
   > Function names should be verbs that describe what the function *does*.
-- \`x_value\`
-  > \`x_value\` sounds like a variable holding a value, not a function that performs a transformation; noun-style names mislead the reader.`}
+- \`f\`
+  > Single-letter names convey no meaning; a reader cannot tell what the function does from its name alone.`}
 />
 
 ## Mini challenge: write a `summarize_group` function

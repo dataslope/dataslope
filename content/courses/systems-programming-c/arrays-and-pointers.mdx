@@ -421,25 +421,25 @@ int main(void) {
 <MultipleChoice
   markdown={`Inside \`void f(int a[], size_t n)\`, what does \`sizeof(a)\` give you?
 
-- The total number of bytes in the original array.
-  > That information is lost on the way in, the array has decayed.
-- [o] The size of a pointer (because \`a\` has decayed to \`int *\`).
-  > This is why you must pass the length as a separate parameter.
 - The number of elements in the array.
   > That would be \`n\` (which you must pass in), not \`sizeof(a)\`.
 - Always zero.
-  > Pointers are never zero-sized.`}
+  > Pointers are never zero-sized.
+- [o] The size of a pointer (because \`a\` has decayed to \`int *\`).
+  > This is why you must pass the length as a separate parameter.
+- The total number of bytes in the original array.
+  > That information is lost on the way in, the array has decayed.`}
 />
 
 <MultipleChoice
   markdown={`Given \`int a[10];\` and \`int *p = a + 3;\`, what is \`p - a\`?
 
-- 3 bytes
-  > Pointer subtraction is measured in *elements*, not bytes.
-- \`3 * sizeof(int)\`
-  > Same, that would be the byte distance, not the element count.
 - [o] 3 elements
   > \`p\` points three ints past the start of \`a\`.
+- \`3 * sizeof(int)\`
+  > Same, that would be the byte distance, not the element count.
+- 3 bytes
+  > Pointer subtraction is measured in *elements*, not bytes.
 - Undefined behavior
   > Subtracting two pointers into the same array (within bounds) is well-defined.`}
 />
@@ -447,12 +447,12 @@ int main(void) {
 <MultipleChoice
   markdown={`What happens if you write past the end of a C array, e.g. \`a[100] = 0\` for an array of length 10?
 
-- The compiler refuses to build the program.
-  > C compilers do not check this; the program will compile.
 - The runtime throws an \`ArrayIndexOutOfBoundsException\`.
   > There is no such exception in C; that is a Java behavior.
-- The write silently fails and leaves memory unchanged.
-  > The write goes through; what it stomps on depends on the layout.
 - [o] It is undefined behavior, it may crash, may overwrite unrelated data, or may appear to work.
-  > Out-of-bounds memory access is one of the most dangerous C bugs.`}
+  > Out-of-bounds memory access is one of the most dangerous C bugs.
+- The compiler refuses to build the program.
+  > C compilers do not check this; the program will compile.
+- The write silently fails and leaves memory unchanged.
+  > The write goes through; what it stomps on depends on the layout.`}
 />

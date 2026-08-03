@@ -102,14 +102,14 @@ threw the difference away.
   markdown={`Group A is \`[50, 50, 50, 50]\` and Group B is \`[0, 0, 100, 100]\`. You draw a
 bar plot of the mean of each group. What do the two bars look like?
 
-- Group B's bar is taller, because its values reach 100.
-  > The bar height is the *mean*, not the maximum. Both groups average to 50, so the value B reaches doesn't make its bar taller.
-- [o] The two bars are the same height, because both groups have a mean of 50.
-  > A bar shows only the mean (50 for both), so identical-mean groups produce identical bars, even though B is split at the extremes and A is perfectly uniform.
 - Group A's bar is taller, because its values are more consistent.
   > Consistency affects the *spread*, which a bar does not draw; it does not change the mean or the bar height.
 - Seaborn will refuse to draw because the spreads differ.
   > Seaborn computes and draws the means without complaint; that is precisely why the hidden difference is a trap.
+- Group B's bar is taller, because its values reach 100.
+  > The bar height is the *mean*, not the maximum. Both groups average to 50, so the value B reaches doesn't make its bar taller.
+- [o] The two bars are the same height, because both groups have a mean of 50.
+  > A bar shows only the mean (50 for both), so identical-mean groups produce identical bars, even though B is split at the extremes and A is perfectly uniform.
 
 Equal means give equal bars regardless of spread, the bar discards exactly
 the information (the distribution) that distinguishes these two groups.`}
@@ -403,12 +403,12 @@ Seaborn?
 
 - A count plot uses vertical bars and a bar plot uses horizontal bars.
   > Orientation is independent of the chart type, either plot can be vertical or horizontal depending on which axis holds the category.
-- [o] A count plot tallies how many rows are in each category; a bar plot aggregates a numeric variable (the mean by default) per category.
-  > Count needs only a categorical variable and reports frequencies; bar needs a categorical *and* a numeric variable and reports an aggregate of the numbers.
-- A count plot shows the mean and a bar plot shows the median.
-  > A count plot shows a frequency, not a mean; a bar plot defaults to the mean (and can be switched to the median with \`estimator=\`).
 - They are identical; \`count\` is just an alias for \`bar\`.
   > They answer different questions and require different inputs, \`count\` needs no numeric variable, while \`bar\` requires one to aggregate.
+- A count plot shows the mean and a bar plot shows the median.
+  > A count plot shows a frequency, not a mean; a bar plot defaults to the mean (and can be switched to the median with \`estimator=\`).
+- [o] A count plot tallies how many rows are in each category; a bar plot aggregates a numeric variable (the mean by default) per category.
+  > Count needs only a categorical variable and reports frequencies; bar needs a categorical *and* a numeric variable and reports an aggregate of the numbers.
 
 Count answers "how many?"; bar answers "what is a typical value?", and only
 bar consumes a numeric variable.`}
@@ -419,14 +419,14 @@ bar consumes a numeric variable.`}
 concludes the groups are "basically the same" because the bars are nearly
 equal height. What is the most important caveat?
 
-- Bar plots are always misleading and should never be used.
-  > Bars are a legitimate summary when you care about the average; the issue is treating the mean as the *whole* story, not the chart existing at all.
-- The bars should have been sorted by value first.
-  > Sorting affects readability, not the conclusion; equal-height bars stay equal whatever order they sit in.
 - [o] Equal means can hide very different spreads or shapes, so "same bars" does not mean "same distributions."
   > A bar shows only the mean; groups with identical means can differ wildly in spread, skew, or modality, so a distribution plot is needed before concluding they are alike.
+- The bars should have been sorted by value first.
+  > Sorting affects readability, not the conclusion; equal-height bars stay equal whatever order they sit in.
 - Confidence intervals are never trustworthy.
   > Confidence intervals are useful; the real gap is that even with them, a bar still summarizes the mean and omits the full shape of each group.
+- Bar plots are always misleading and should never be used.
+  > Bars are a legitimate summary when you care about the average; the issue is treating the mean as the *whole* story, not the chart existing at all.
 
 The bar-of-means trap: matching means do not imply matching distributions,
 check the spread with a box, violin, or strip plot.`}
@@ -454,14 +454,14 @@ bar, hinting at each group's spread.`}
 names, and it is an unreadable mess of tilted labels. What is the most
 effective fix?
 
-- Add a \`hue\` variable to break up the bars.
-  > Adding \`hue\` multiplies the bars into clusters, making an already crowded chart busier, not clearer.
-- [o] Put the categories on \`y\` for horizontal bars and pass \`order=\` to sort them meaningfully.
-  > Horizontal bars give each long label its own readable row, and ordering (often by value) lets the eye scan the ranking instead of fighting an arbitrary sequence.
 - Remove the error bars with \`errorbar=None\`.
   > Dropping error bars declutters slightly but does nothing about 22 cramped, tilted category labels.
 - Switch to \`kind="count"\`.
   > \`count\` answers a different question (frequencies, not mean price) and still has to place all 22 labels somewhere.
+- [o] Put the categories on \`y\` for horizontal bars and pass \`order=\` to sort them meaningfully.
+  > Horizontal bars give each long label its own readable row, and ordering (often by value) lets the eye scan the ranking instead of fighting an arbitrary sequence.
+- Add a \`hue\` variable to break up the bars.
+  > Adding \`hue\` multiplies the bars into clusters, making an already crowded chart busier, not clearer.
 
 Long or numerous categories read best as ordered, horizontal bars, flip the
 axis and pass \`order=\`.`}

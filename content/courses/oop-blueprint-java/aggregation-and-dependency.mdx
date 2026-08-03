@@ -383,36 +383,36 @@ public class Classroom {
 
 - Composition
   > That implies the members would cease to exist with the library.
+- Inheritance
+  > No "is-a" relationship is implied between Library and Member.
 - [o] Aggregation
   > The library holds references to things that live independently.
 - Dependency
-  > Dependency is briefer, a method-scope collaborator.
-- Inheritance
-  > No "is-a" relationship is implied between Library and Member.`}
+  > Dependency is briefer, a method-scope collaborator.`}
 />
 
 <MultipleChoice
   markdown={`A method \`OrderPrinter.print(Order o, Printer p)\` takes its collaborators as parameters and doesn't hold them as fields. What kind of relationship is this?
 
-- Composition
-  > No ownership, no field.
 - Aggregation
   > Aggregation implies a held reference (a field).
-- [o] Dependency (uses-a)
-  > The collaborators are only used for the duration of the call.
+- Composition
+  > No ownership, no field.
 - Inheritance
-  > No subclassing involved.`}
+  > No subclassing involved.
+- [o] Dependency (uses-a)
+  > The collaborators are only used for the duration of the call.`}
 />
 
 <MultipleChoice
   markdown={`Why is "passing collaborators in" (rather than constructing them inside the class) usually a better design?
 
-- It runs faster because there are fewer \`new\` calls
-  > Speed isn't the point.
-- It saves typing
-  > Often it adds typing, not removes it.
+- It is required for the class to compile
+  > It is not required by the compiler.
 - [o] It keeps the class loosely coupled, the same class can work with different implementations or test stand-ins
   > This is the heart of dependency injection and a major source of OOP flexibility.
-- It is required for the class to compile
-  > It is not required by the compiler.`}
+- It saves typing
+  > Often it adds typing, not removes it.
+- It runs faster because there are fewer \`new\` calls
+  > Speed isn't the point.`}
 />

@@ -180,12 +180,12 @@ ggplot(mpg, aes(x = drv)) +
 <MultipleChoice
   markdown={`Why prefer \`scale_x_log10()\` over creating a \`log10(x)\` column and plotting that?
 
+- [o] Transforming the scale keeps the axis labeled in the original units (1, 100, 10000) while only changing the spacing, whereas a log column would label the axis 0–5 and confuse readers.
+  > Let the scale transform so the axis stays interpretable.
 - Creating a new column is impossible in R.
   > It is possible; it is just a worse choice here.
 - The two approaches give different point positions.
   > The point *positions* are the same; the difference is the axis labels.
-- [o] Transforming the scale keeps the axis labeled in the original units (1, 100, 10000) while only changing the spacing, whereas a log column would label the axis 0–5 and confuse readers.
-  > Let the scale transform so the axis stays interpretable.
 - \`scale_x_log10()\` also changes the y-axis automatically.
   > It only affects the x scale.
 
@@ -198,12 +198,12 @@ the data and its natural units remain intact.`}
 
 - They are identical in every way.
   > They differ crucially in how they treat out-of-range data.
+- Only \`coord_cartesian\` works on the x-axis.
+  > Both can affect x; the difference is filtering vs. zooming.
 - The scale version zooms; the coord version deletes data.
   > It is the reverse, the scale version is the one that deletes data.
 - [o] The scale version *removes* data outside the range before stats are computed (so a smoother changes), while the coord version *zooms* the view and keeps all data in the calculations.
   > Scale limits filter; coordinate limits zoom.
-- Only \`coord_cartesian\` works on the x-axis.
-  > Both can affect x; the difference is filtering vs. zooming.
 
 Confusing these is a common source of "why did my trend line change
 when I zoomed?" bugs. Scale limits filter; coordinate limits zoom.`}

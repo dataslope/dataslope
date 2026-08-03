@@ -291,14 +291,14 @@ int main(void) {
 <MultipleChoice
   markdown={`What value does \`strlen("hello")\` return?
 
-- 4
-  > That undercounts by one, \`"hello"\` has five letters (h-e-l-l-o), and \`strlen\` counts all of them.
-- [o] 5
-  > \`strlen\` counts the visible characters, **not** the trailing \`\\0\`.
 - 6
   > That would be the array's **storage size** (5 letters + 1 null). \`strlen\` excludes the terminator.
+- [o] 5
+  > \`strlen\` counts the visible characters, **not** the trailing \`\\0\`.
 - It depends on the system.
   > \`strlen\` always counts the characters before the \`\\0\`, which is \`5\` for \`"hello"\` on every system.
+- 4
+  > That undercounts by one, \`"hello"\` has five letters (h-e-l-l-o), and \`strlen\` counts all of them.
 
 \`strlen\` walks the string from the start until it finds the null terminator, counting characters along the way. The terminator itself is not counted.`}
 />
@@ -311,14 +311,14 @@ char buf[10];
 strcpy(buf, "This message is much longer than ten bytes.");
 \`\`\`
 
-- \`strcpy\` is deprecated and the program won't compile.
-  > Old C functions are still available in standard C; most compilers compile this without error (sometimes with a warning).
-- It runs but \`buf\` will silently be truncated to 10 bytes.
-  > \`strcpy\` does **not** truncate. It just keeps writing.
 - [o] \`strcpy\` doesn't check the destination size, so it writes far past the end of \`buf\`, corrupting other memory.
   > This is the classic *buffer overflow*. The runtime behavior is undefined: the program may crash, silently corrupt unrelated variables, or be exploitable by an attacker.
 - The compiler will refuse to copy a string longer than \`buf\`.
   > The compiler does not track how big \`buf\` is at the \`strcpy\` call, so it cannot refuse; the overflow happens at runtime.
+- \`strcpy\` is deprecated and the program won't compile.
+  > Old C functions are still available in standard C; most compilers compile this without error (sometimes with a warning).
+- It runs but \`buf\` will silently be truncated to 10 bytes.
+  > \`strcpy\` does **not** truncate. It just keeps writing.
 
 Safer alternatives: \`strncpy\` (with explicit size, but always null-terminate yourself), or \`snprintf\` (with size limit and truncation reporting). Or use a bigger buffer that you've sized to your data.`}
 />

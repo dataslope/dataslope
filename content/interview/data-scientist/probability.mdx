@@ -281,12 +281,12 @@ negative-EV proposition.
 <MultipleChoice
   markdown={`A disease affects 1 in 1,000 people. A test has 100% sensitivity and a 5% false-positive rate. A random person tests positive. Roughly how likely are they to have the disease?
 
-- About 95%.
-  > That confuses the true-positive rate with the posterior; it ignores the tiny base rate.
-- About 50%.
-  > A plausible-sounding guess, but the math lands far lower once the base rate is included.
 - [o] About 2%.
   > True positives are 1/1000; false positives are about 5% of the other 999/1000, roughly 0.05. So the posterior is about 0.001 / (0.001 + 0.05) which is near 2%.
+- About 50%.
+  > A plausible-sounding guess, but the math lands far lower once the base rate is included.
+- About 95%.
+  > That confuses the true-positive rate with the posterior; it ignores the tiny base rate.
 - Exactly 5%.
   > 5% is the false-positive *rate*, not the posterior probability of disease given a positive.`}
 />
@@ -294,25 +294,25 @@ negative-EV proposition.
 <MultipleChoice
   markdown={`Which statement about the Central Limit Theorem is correct?
 
-- It guarantees the raw population data is normally distributed.
-  > The CLT says nothing about the population's shape; that can be arbitrarily skewed.
+- It says the sample mean converges to the true mean.
+  > That is the Law of Large Numbers. The CLT describes the shape of the sample mean's distribution, not just its center.
 - [o] For large enough n, the distribution of the sample mean is approximately normal regardless of the population's shape.
   > That is exactly the CLT, and it is what justifies normal-based intervals for means even on skewed data.
+- It guarantees the raw population data is normally distributed.
+  > The CLT says nothing about the population's shape; that can be arbitrarily skewed.
 - It only applies to samples smaller than 30.
-  > It is the reverse: the approximation improves as n grows; "n at least 30" is a rough adequacy rule.
-- It says the sample mean converges to the true mean.
-  > That is the Law of Large Numbers. The CLT describes the shape of the sample mean's distribution, not just its center.`}
+  > It is the reverse: the approximation improves as n grows; "n at least 30" is a rough adequacy rule.`}
 />
 
 <MultipleChoice
   markdown={`In the Monty Hall problem, after the host reveals a goat, why does switching win 2/3 of the time?
 
-- Because with two doors left, each is equally likely, so it does not matter.
-  > The two remaining doors are *not* equally likely; the host's informed reveal breaks the symmetry.
 - [o] Because your original door was right only 1/3 of the time, so the other 2/3 concentrates on the single unopened door.
   > The host never opens the car, so all of the remaining 2/3 probability shifts to the door you can switch to.
 - Because the host might accidentally reveal the car.
   > The host knows the layout and always reveals a goat; that is precisely what makes switching favorable.
+- Because with two doors left, each is equally likely, so it does not matter.
+  > The two remaining doors are *not* equally likely; the host's informed reveal breaks the symmetry.
 - Switching and staying are actually equal at 1/2 each.
   > Simulation and exact calculation both give 2/3 for switching versus 1/3 for staying.`}
 />

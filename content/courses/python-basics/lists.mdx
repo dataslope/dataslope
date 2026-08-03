@@ -743,53 +743,53 @@ xs = [1, 2, 3, 4, 5]
 xs[1:4] = [9]
 \`\`\`
 
-- \`[1, 9, 4, 5]\`
-  > Slice assignment replaces the entire slice, not item-by-item.
 - [o] \`[1, 9, 5]\`
   > The slice \`xs[1:4]\` (items 2, 3, 4) is replaced by the single element \`9\`.
 - \`[1, 9, 2, 3, 4, 5]\`
   > That would be insertion, not slice assignment.
 - A \`ValueError\` because lengths differ
-  > Slice assignment works with any length; no error is raised.`}
+  > Slice assignment works with any length; no error is raised.
+- \`[1, 9, 4, 5]\`
+  > Slice assignment replaces the entire slice, not item-by-item.`}
 />
 
 <MultipleChoice
   markdown={`Which operation modifies the list in place?
 
-- \`sorted(xs)\`
-  > \`sorted\` returns a new list and leaves \`xs\` untouched.
-- [o] \`xs.sort()\`
-  > \`.sort()\` modifies \`xs\` directly and returns \`None\`.
 - \`xs + [9]\`
   > \`+\` returns a new list; it does not modify either operand.
 - \`list(xs)\`
-  > \`list(xs)\` creates a new list copy.`}
+  > \`list(xs)\` creates a new list copy.
+- \`sorted(xs)\`
+  > \`sorted\` returns a new list and leaves \`xs\` untouched.
+- [o] \`xs.sort()\`
+  > \`.sort()\` modifies \`xs\` directly and returns \`None\`.`}
 />
 
 <MultipleChoice
   markdown={`What does \`xs.pop()\` return if \`xs = [1, 2, 3]\`?
 
-- \`[1, 2]\`
-  > \`pop\` returns the removed item, not the remaining list.
 - \`1\`
   > \`pop()\` with no argument removes the **last** item, not the first.
-- [o] \`3\`
-  > \`pop()\` removes and returns the last item.
 - \`None\`
-  > \`pop\` returns the removed item, not \`None\`.`}
+  > \`pop\` returns the removed item, not \`None\`.
+- \`[1, 2]\`
+  > \`pop\` returns the removed item, not the remaining list.
+- [o] \`3\`
+  > \`pop()\` removes and returns the last item.`}
 />
 
 <MultipleChoice
   markdown={`What is the time complexity of \`item in xs\` where \`xs\` is a list?
 
-- O(1)
-  > That would be true for a set or dict, not a list.
+- O(n²)
+  > Membership testing is linear, not quadratic.
 - [o] O(n)
   > Python scans the list from start to finish in the worst case.
+- O(1)
+  > That would be true for a set or dict, not a list.
 - O(log n)
-  > Lists are not sorted by default, so binary search does not apply.
-- O(n²)
-  > Membership testing is linear, not quadratic.`}
+  > Lists are not sorted by default, so binary search does not apply.`}
 />
 
 Lists are mutable. Their immutable cousin, the tuple, is next.

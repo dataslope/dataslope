@@ -424,12 +424,12 @@ Console.WriteLine($"vowels = {count}");
 
 - \`do-while\`
   > Possible, but clumsier than needed.
-- \`while\` with a manual index
-  > Possible, but more error-prone than needed.
 - \`for\` with a counter
   > Possible, but \`foreach\` makes intent clearer for "every element."
 - [o] \`foreach\`
-  > \`foreach\` says "for every element" directly and avoids off-by-one errors.`}
+  > \`foreach\` says "for every element" directly and avoids off-by-one errors.
+- \`while\` with a manual index
+  > Possible, but more error-prone than needed.`}
 />
 
 <MultipleChoice
@@ -437,10 +437,10 @@ Console.WriteLine($"vowels = {count}");
 
 - Exits the entire loop
   > That's \`break\`.
-- Restarts the entire loop from the beginning
-  > It doesn't reset the loop variable; it just moves on to the next iteration.
 - [o] Skips the rest of the current iteration's body and goes on to the next iteration
   > Execution jumps straight to the next pass of the loop, leaving the remaining statements in the body unrun.
 - Ends the program
-  > It does not.`}
+  > It does not.
+- Restarts the entire loop from the beginning
+  > It doesn't reset the loop variable; it just moves on to the next iteration.`}
 />

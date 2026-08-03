@@ -156,14 +156,14 @@ width let it speak.
 hump. A colleague redraws it with \`bins=20\` and now sees **two** clear
 peaks. What is the most reasonable conclusion?
 
-- The \`bins=20\` version invented peaks that aren't really in the data.
-  > More bins can add *noise*, but two well-separated peaks that appear at a moderate bin count usually reflect real structure, here, two penguin groups. Five bins were too coarse to resolve them.
-- [o] Five bins were too coarse and merged real structure; the finer view reveals genuine bimodality.
-  > Wide bins average nearby values together, which can smear two close peaks into one. A moderate bin count resolved a real two-group pattern that the coarse view hid.
 - Histograms are unreliable, so neither picture means anything.
   > Histograms are sensitive to bin width, but that is a reason to *vary* the width and interpret carefully, not to distrust the tool entirely.
+- The \`bins=20\` version invented peaks that aren't really in the data.
+  > More bins can add *noise*, but two well-separated peaks that appear at a moderate bin count usually reflect real structure, here, two penguin groups. Five bins were too coarse to resolve them.
 - The data must have changed between the two plots.
   > Both plots use the same column; only the bin count differs. The change in appearance comes from binning, not from the data.
+- [o] Five bins were too coarse and merged real structure; the finer view reveals genuine bimodality.
+  > Wide bins average nearby values together, which can smear two close peaks into one. A moderate bin count resolved a real two-group pattern that the coarse view hid.
 
 Bin width sets the resolution of a histogram: too coarse hides structure,
 too fine adds noise. Vary it deliberately and look for the picture that is
@@ -459,14 +459,14 @@ g = sns.displot(tips, x="total_bill", kind="hist", bins=20)
 <MultipleChoice
   markdown={`What does a histogram fundamentally display?
 
-- The relationship between two numeric variables.
-  > That is a scatter plot. A histogram summarizes a *single* numeric variable.
 - [o] The distribution of one numeric variable, by binning its values and counting how many fall in each bin.
   > A histogram chops one numeric column into equal-width bins and shows the count per bin, revealing the variable's shape.
-- A ranking of categories from largest to smallest.
-  > Ranking categories is a bar-chart task; a histogram bins a continuous variable rather than ordering categories.
+- The relationship between two numeric variables.
+  > That is a scatter plot. A histogram summarizes a *single* numeric variable.
 - The proportion of a whole made up by each category.
   > Part-to-whole composition is a pie or stacked-bar idea; a histogram describes how one numeric variable is spread out.
+- A ranking of categories from largest to smallest.
+  > Ranking categories is a bar-chart task; a histogram bins a continuous variable rather than ordering categories.
 
 A histogram answers "how is this one column of numbers distributed?", its
 peaks, spread, skew, and outliers.`}
@@ -476,14 +476,14 @@ peaks, spread, skew, and outliers.`}
   markdown={`What is the practical difference between \`bins=20\` and \`binwidth=2\` in
 \`sns.displot(..., kind="hist")\`?
 
-- They are interchangeable aliases for the same setting.
-  > They control resolution differently: one fixes the *number* of bars, the other fixes each bar's *width*.
 - [o] \`bins=20\` fixes the number of bars; \`binwidth=2\` fixes each bar's width in the data's units.
   > With \`bins\`, the width is derived from the data range to give 20 bars; with \`binwidth\`, each bar spans exactly 2 units and the count follows from the range.
-- \`bins\` works only for integers, \`binwidth\` only for decimals.
-  > Both accept ordinary numbers; the distinction is *count of bars* versus *width per bar*, not integer versus decimal.
 - \`binwidth\` changes the data, while \`bins\` only changes the display.
   > Neither alters the data; both only change how the same values are grouped for display.
+- \`bins\` works only for integers, \`binwidth\` only for decimals.
+  > Both accept ordinary numbers; the distinction is *count of bars* versus *width per bar*, not integer versus decimal.
+- They are interchangeable aliases for the same setting.
+  > They control resolution differently: one fixes the *number* of bars, the other fixes each bar's *width*.
 
 Use \`binwidth\` when the width itself is meaningful or must match across
 charts; use \`bins\` for a quick "more or fewer bars."`}
@@ -494,12 +494,12 @@ charts; use \`bins\` for a quick "more or fewer bars."`}
 penguin-like groups on one axis. A layered (overlapping) histogram is
 unreadable. What is the better move?
 
+- [o] Use \`element="step"\` outlines, or give each group its own panel with \`col=\`.
+  > Step outlines let the curves cross without hiding one another, and faceting with \`col\` gives each group its own space, both stay readable with many groups.
 - Keep layering but pick brighter colors.
   > Brighter colors don't fix occlusion, five translucent fills still cover one another. The problem is the overlap itself.
 - Map all five groups to \`size\` instead of \`hue\`.
   > \`size\` is not a channel histograms use to separate groups, and size is read imprecisely anyway. It would not make the comparison clearer.
-- [o] Use \`element="step"\` outlines, or give each group its own panel with \`col=\`.
-  > Step outlines let the curves cross without hiding one another, and faceting with \`col\` gives each group its own space, both stay readable with many groups.
 - Reduce the number of bins to 2.
   > Two bins would destroy the very shape you want to compare; it sacrifices the distribution to avoid overlap.
 
@@ -514,12 +514,12 @@ most appropriate?
 
 - \`stat="count"\`, the default.
   > Counts make the larger group's bars taller everywhere simply because it has more observations, which obscures a fair shape comparison.
+- There is no way to compare groups of different sizes.
+  > Normalizing with \`density\` or \`probability\` is exactly the standard way to put unequal-sized groups on a comparable footing.
 - [o] \`stat="density"\` (or \`"probability"\`), which normalizes each group.
   > Normalizing rescales each group to the same total area (or probability), so you compare distribution *shape* rather than group size.
 - \`stat="count"\` with more bins.
   > Adding bins changes resolution but still leaves the unequal totals, so the bigger group's bars stay systematically taller.
-- There is no way to compare groups of different sizes.
-  > Normalizing with \`density\` or \`probability\` is exactly the standard way to put unequal-sized groups on a comparable footing.
 
 Normalizing with \`density\` or \`probability\` puts unequal-sized groups on the
 same footing so their shapes can be compared directly.`}

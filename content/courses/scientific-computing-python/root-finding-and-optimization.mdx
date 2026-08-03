@@ -448,10 +448,10 @@ Test cases use $f(x) = x^2 - 2$ and $f(x) = \\cos x - x$, both with known good i
 
 - \`scipy.optimize.newton\` because it converges quadratically
   > Newton's method requires the derivative and a good initial guess; without one it can diverge, and there is no guarantee it finds the root in $[0, 5]$. When a bracket is available, a bracketing method is always the safer choice.
-- [o] \`scipy.optimize.brentq\` because the sign change guarantees a bracketed root and Brent's method is unconditionally convergent
-  > With a guaranteed sign change you should always prefer a bracketing solver. Brent's method never leaves the bracket, doesn't need a derivative, and converges super-linearly. Newton needs a derivative and can wander off.
 - \`scipy.optimize.differential_evolution\`
   > Differential evolution is a global optimizer for multi-dimensional problems; using it for a simple bracketed 1-D root is far more expensive than necessary.
+- [o] \`scipy.optimize.brentq\` because the sign change guarantees a bracketed root and Brent's method is unconditionally convergent
+  > With a guaranteed sign change you should always prefer a bracketing solver. Brent's method never leaves the bracket, doesn't need a derivative, and converges super-linearly. Newton needs a derivative and can wander off.
 - \`scipy.optimize.minimize\` on $f^2$
   > Minimizing $f^2$ turns a root-finding problem into an optimization problem; this works in principle but can converge to a local minimum of $f^2$ that is not a root, and is slower than a direct bracketing solver.
 
@@ -461,12 +461,12 @@ When a bracket exists, bracketing methods are virtually always the right choice.
 <MultipleChoice
   markdown={`You have a least-squares fitting problem: minimize $\\sum_i (y_i - m(x_i;\\theta))^2$. Why is \`scipy.optimize.curve_fit\` (or \`least_squares\`) a better default than passing the sum-of-squares objective into generic \`minimize\`?
 
-- It uses less memory
-  > Both \`curve_fit\` and generic \`minimize\` work with dense parameter vectors of the same size; memory usage is not the distinguishing factor.
-- [o] It exploits the sum-of-squares structure (Jacobian of residuals via the Levenberg–Marquardt algorithm) for faster, more reliable convergence, and returns parameter covariances for free
-  > The residual Jacobian is far more informative than the gradient of the squared loss; LM combines Gauss–Newton with trust-region damping to get robust quadratic-ish convergence. Plus \`curve_fit\` returns the covariance matrix you need for uncertainty bars, which generic \`minimize\` would not give you.
 - It always finds the global minimum
   > Like all gradient-based methods, \`curve_fit\` finds a local minimum; it can get stuck in a wrong local minimum if the initial parameter guess is poor.
+- [o] It exploits the sum-of-squares structure (Jacobian of residuals via the Levenberg–Marquardt algorithm) for faster, more reliable convergence, and returns parameter covariances for free
+  > The residual Jacobian is far more informative than the gradient of the squared loss; LM combines Gauss–Newton with trust-region damping to get robust quadratic-ish convergence. Plus \`curve_fit\` returns the covariance matrix you need for uncertainty bars, which generic \`minimize\` would not give you.
+- It uses less memory
+  > Both \`curve_fit\` and generic \`minimize\` work with dense parameter vectors of the same size; memory usage is not the distinguishing factor.
 - It only works for linear models
   > \`curve_fit\` is specifically designed for nonlinear models; for purely linear models, \`np.linalg.lstsq\` would be the more direct choice.
 

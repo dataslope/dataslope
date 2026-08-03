@@ -156,10 +156,10 @@ another. Use free scales sparingly and label them clearly.
   > By default panels *share* scales; that shared frame is the source of the power.
 - The panels are randomly ordered to reduce bias.
   > Panels follow the faceting variable's order, not randomness.
-- [o] All panels share the same axes by default, so any visible difference between panels reflects a real difference in the data rather than a scaling artifact.
-  > Shared scales turn the comparison into an honest, like-with-like one.
 - Faceting adds a trend line to every panel automatically.
   > Trend lines come from a geom you add; faceting just splits the panels.
+- [o] All panels share the same axes by default, so any visible difference between panels reflects a real difference in the data rather than a scaling artifact.
+  > Shared scales turn the comparison into an honest, like-with-like one.
 
 Holding the scales constant across panels is exactly what lets the eye
 compare them quickly and fairly.`}
@@ -170,10 +170,10 @@ compare them quickly and fairly.`}
 
 - \`facet_wrap(~ drv + cyl)\`.
   > \`facet_wrap\` wraps panels to fit and does not cleanly assign one variable to rows and another to columns.
-- [o] \`facet_grid(drv ~ cyl)\`, which places drivetrain on the rows and cylinders on the columns as a true matrix.
-  > \`facet_grid(rows ~ cols)\` is designed for crossing two variables.
 - \`facet_grid(~ drv)\`.
   > That uses only one variable and would not cross drivetrain with cylinders.
+- [o] \`facet_grid(drv ~ cyl)\`, which places drivetrain on the rows and cylinders on the columns as a true matrix.
+  > \`facet_grid(rows ~ cols)\` is designed for crossing two variables.
 - You cannot facet by two variables.
   > You can; \`facet_grid\` is built for exactly this.
 
@@ -188,10 +188,10 @@ choice for two crossed variables.`}
   > It is valid and renders fine; the risk is interpretive.
 - It hides some of the data points.
   > It does not hide data; it rescales each panel.
-- [o] Each panel gets its own y-axis range, so panels are no longer directly comparable, equal-looking marks can represent different values.
-  > Free scales sacrifice the cross-panel comparability that small multiples rely on.
 - It changes the faceting variable.
   > The faceting variable is unchanged; only the scaling differs.
+- [o] Each panel gets its own y-axis range, so panels are no longer directly comparable, equal-looking marks can represent different values.
+  > Free scales sacrifice the cross-panel comparability that small multiples rely on.
 
 Free scales improve within-panel readability at the cost of the honest
 cross-panel comparison that is the whole point of faceting.`}

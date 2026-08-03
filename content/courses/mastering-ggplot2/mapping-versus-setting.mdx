@@ -167,14 +167,14 @@ ggplot(mpg, aes(displ, hwy, size = cty)) + # mapping
 <MultipleChoice
   markdown={`What is the difference between \`geom_point(color = "red")\` and \`geom_point(aes(color = "red"))\`?
 
+- The second is the correct way to make points red.
+  > It will not reliably produce red; the scale chooses the color and adds a legend.
 - They are identical; \`aes()\` makes no difference here.
   > The placement relative to \`aes()\` changes the meaning entirely.
 - The first throws an error.
   > Setting a constant outside \`aes()\` is the correct, error-free way to fix a color.
 - [o] The first *sets* every point to the literal color red; the second *maps* a constant variable \`"red"\` to color, producing scale-chosen colors and a spurious legend.
   > Inside \`aes()\`, \`"red"\` is treated as data; outside, it is a literal color.
-- The second is the correct way to make points red.
-  > It will not reliably produce red; the scale chooses the color and adds a legend.
 
 Inside \`aes()\` everything is data to be mapped; outside it, values are
 literal. This is the root of the classic "wrong color" bug.`}
@@ -183,14 +183,14 @@ literal. This is the root of the classic "wrong color" bug.`}
 <MultipleChoice
   markdown={`You want every point in your plot to be exactly the same shade of dark green. Where does \`color = "darkgreen"\` belong?
 
+- It cannot be done; ggplot2 always chooses colors itself.
+  > ggplot2 chooses colors only when you *map*; setting a constant gives you full control.
 - Inside \`aes()\`, as \`aes(color = "darkgreen")\`.
   > That maps a constant variable and lets the scale override your color, adding a legend.
 - [o] Outside \`aes()\`, as an argument to the geom: \`geom_point(color = "darkgreen")\`.
   > Setting a constant outside \`aes()\` applies it literally to every mark, with no legend.
 - In a \`theme()\` call.
   > Themes style non-data elements; per-mark color belongs on the geom.
-- It cannot be done; ggplot2 always chooses colors itself.
-  > ggplot2 chooses colors only when you *map*; setting a constant gives you full control.
 
 A fixed, data-independent property is *set* outside \`aes()\`. ggplot2
 only takes over color selection when you *map* a variable.`}
@@ -199,14 +199,14 @@ only takes over color selection when you *map* a variable.`}
 <MultipleChoice
   markdown={`A learner's plot shows reddish points and a legend titled with the literal text \`"blue"\`. What almost certainly happened?
 
-- The data has a column literally named \`blue\`.
-  > Possible in theory, but the tell-tale sign here is a *constant* string in \`aes()\`.
-- ggplot2 is broken.
-  > The behavior is correct and well-defined given the code.
 - [o] They wrote \`aes(color = "blue")\`, so the constant \`"blue"\` was treated as a one-category variable and mapped through the color scale.
   > Inside \`aes()\`, \`"blue"\` becomes data; the scale assigns a default color and builds a legend.
+- ggplot2 is broken.
+  > The behavior is correct and well-defined given the code.
 - They forgot to call \`library(ggplot2)\`.
   > Without the library the plot would not render at all.
+- The data has a column literally named \`blue\`.
+  > Possible in theory, but the tell-tale sign here is a *constant* string in \`aes()\`.
 
 A legend labeled with a literal color name is the signature of setting
 a constant inside \`aes()\` by mistake.`}

@@ -505,10 +505,10 @@ assert abs(ev - expected) < 1e-9`,
 
 - On any given set of 3 flips, you'll most likely see 1.5 heads
   > You can never observe 1.5 heads in 3 flips, it's not an attainable outcome. Expectation isn't a prediction for a single trial.
-- [o] Averaged over very many sets of 3 flips, the mean number of heads per set approaches 1.5
-  > Expectation is the long-run average. Individual results are whole numbers, but their average across many repetitions converges to 1.5.
 - 1.5 is the most likely number of heads
   > The most likely value is the mode (here 1 or 2, tied), not the expectation. Expected value need not be the most probable outcome.
+- [o] Averaged over very many sets of 3 flips, the mean number of heads per set approaches 1.5
+  > Expectation is the long-run average. Individual results are whole numbers, but their average across many repetitions converges to 1.5.
 - The coin is unfair, since a fair coin can't give 1.5
   > A fair coin is exactly what produces an expectation of 1.5 heads in 3 flips. A non-integer expectation is normal and expected.
 
@@ -518,14 +518,14 @@ Expectation is a long-run balance point, not a value any single trial must hit.`
 <MultipleChoice
   markdown={`A random variable measures order value in dollars and has variance 64. A teammate writes "typical orders vary by about \\$64 from the mean." What's wrong?
 
-- Nothing, variance directly gives the typical spread in dollars
-  > Variance is in *squared* dollars, not dollars. Quoting it as a dollar spread mixes up the units.
+- Variance and standard deviation are the same thing
+  > They're related but distinct: standard deviation is the square root of variance, and only the SD shares the variable's units.
 - [o] Variance is in squared dollars; the typical spread is the standard deviation, √64 = \\$8
   > To express spread in the original units, take the square root of the variance. Here that's \\$8, not \\$64.
 - The variance should be negative for dollar amounts
   > Variance can never be negative, it's an average of squared deviations. The sign isn't the issue; the units are.
-- Variance and standard deviation are the same thing
-  > They're related but distinct: standard deviation is the square root of variance, and only the SD shares the variable's units.
+- Nothing, variance directly gives the typical spread in dollars
+  > Variance is in *squared* dollars, not dollars. Quoting it as a dollar spread mixes up the units.
 
 Variance lives in squared units; convert to standard deviation before describing spread in plain language.`}
 />
@@ -533,14 +533,14 @@ Variance lives in squared units; convert to standard deviation before describing
 <MultipleChoice
   markdown={`For a **continuous** random variable like response time, what is $P(X = 2.000\ldots\text{ seconds exactly})$?
 
-- A small positive number you read off the pdf's height at 2
-  > The pdf's height is a *density*, not a probability, and can even exceed 1. The probability of an exact point is not its density.
 - [o] Exactly 0, for a continuous variable, any single precise value has probability 0; probability lives in intervals (area under the pdf)
   > With infinitely many possible values, no single exact value carries positive probability. Only ranges (areas under the curve) do.
 - Exactly 1, since the time must be something
   > The time being *some* value has probability 1, but that mass is spread across the whole continuum, not concentrated on 2.0.
 - Undefined, because continuous variables have no probabilities
   > Continuous variables absolutely have probabilities, for *intervals*. It's only single exact points that have probability 0.
+- A small positive number you read off the pdf's height at 2
+  > The pdf's height is a *density*, not a probability, and can even exceed 1. The probability of an exact point is not its density.
 
 For continuous variables, probability is area over an interval; the chance of any exact value is 0.`}
 />
@@ -548,12 +548,12 @@ For continuous variables, probability is area over an interval; the chance of an
 <MultipleChoice
   markdown={`A game has expected net payoff **−\\$0.50** per play. Which conclusion is best supported?
 
-- You are guaranteed to lose \\$0.50 every time you play
-  > Any single play could win or lose; −\\$0.50 is the *average* outcome over many plays, not a guaranteed per-play result.
-- [o] Over many plays, you'd lose about \\$0.50 per play on average, so the game is unfavorable in the long run
-  > A negative expected value means the long-run average is a loss. Played repeatedly, you'd bleed roughly \\$0.50 per play.
 - The game is favorable because you might still win big
   > A possible big win is already accounted for in the expectation. A negative EV means those wins don't offset the losses on average.
+- [o] Over many plays, you'd lose about \\$0.50 per play on average, so the game is unfavorable in the long run
+  > A negative expected value means the long-run average is a loss. Played repeatedly, you'd bleed roughly \\$0.50 per play.
+- You are guaranteed to lose \\$0.50 every time you play
+  > Any single play could win or lose; −\\$0.50 is the *average* outcome over many plays, not a guaranteed per-play result.
 - Expected value can't be negative, so this is a mistake
   > Expected value can certainly be negative, that's exactly how you flag an unfavorable bet. There's no error here.
 

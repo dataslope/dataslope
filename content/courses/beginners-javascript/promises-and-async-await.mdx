@@ -598,10 +598,10 @@ retry(flaky, 5)
 
 - 
   \`\`\`javascript
-  const a = await fetchA();
-  const b = await fetchB();
+  await fetchA();
+  await fetchB();
   \`\`\`
-  > The \`await\` on the first line pauses until \`fetchA()\` fully settles, and only then does \`fetchB()\` even start. The two never overlap, so this is sequential.
+  > Same problem as the first snippet: the \`await\` in front of \`fetchA()\` blocks until it finishes before \`fetchB()\` starts. The results are discarded, but the timing is still one-after-the-other.
 - [o] 
   \`\`\`javascript
   const pa = fetchA();
@@ -611,15 +611,15 @@ retry(flaky, 5)
   > Both \`fetchA()\` and \`fetchB()\` are *called* before any \`await\` runs, so the host kicks off both right away. \`Promise.all\` then waits for both to settle. The first snippet, by contrast, only starts \`fetchB()\` after \`fetchA()\` has fully fulfilled, that's sequential, not concurrent.
 - 
   \`\`\`javascript
-  await fetchA();
-  await fetchB();
-  \`\`\`
-  > Same problem as the first snippet: the \`await\` in front of \`fetchA()\` blocks until it finishes before \`fetchB()\` starts. The results are discarded, but the timing is still one-after-the-other.
-- 
-  \`\`\`javascript
   fetchA().then((a) => fetchB().then((b) => ...));
   \`\`\`
   > Nesting \`fetchB()\` inside \`fetchA()\`'s \`.then\` means \`fetchB()\` is only started once \`fetchA()\` has resolved. The promises run in sequence, not concurrently.
+- 
+  \`\`\`javascript
+  const a = await fetchA();
+  const b = await fetchB();
+  \`\`\`
+  > The \`await\` on the first line pauses until \`fetchA()\` fully settles, and only then does \`fetchB()\` even start. The two never overlap, so this is sequential.
 
 The trick to concurrent awaits: *start* all the promises first, *then* await them together. If you write \`await\` in front of each call, you've serialised them.`}
 />

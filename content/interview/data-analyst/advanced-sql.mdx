@@ -304,38 +304,38 @@ SELECT * FROM ranked WHERE rn = 1;
 <MultipleChoice
   markdown={`Scores are \`90, 85, 85, 80\` ordered descending. What does \`DENSE_RANK()\` return for the \`80\`?
 
+- \`5\`, because ties each consume a rank.
+  > No function double-counts ties like that; ties share one rank value.
+- \`2\`, the same as the tied rows.
+  > The tied \`85\`s share rank 2; the \`80\` is strictly lower, so it advances to the next dense rank, 3.
 - \`4\`, because there are three rows above it.
   > That's what \`RANK()\` returns, it skips a number after the tie at 85.
 - [o] \`3\`, because \`DENSE_RANK\` doesn't skip after ties.
-  > \`DENSE_RANK\` gives 1, 2, 2, 3, consecutive ranks with no gap after the tie.
-- \`2\`, the same as the tied rows.
-  > The tied \`85\`s share rank 2; the \`80\` is strictly lower, so it advances to the next dense rank, 3.
-- \`5\`, because ties each consume a rank.
-  > No function double-counts ties like that; ties share one rank value.`}
+  > \`DENSE_RANK\` gives 1, 2, 2, 3, consecutive ranks with no gap after the tie.`}
 />
 
 <MultipleChoice
   markdown={`You want only the top-selling product per category, but \`WHERE ROW_NUMBER() OVER (...) = 1\` throws an error. Why?
 
+- \`ROW_NUMBER\` needs a \`PARTITION BY\` to work.
+  > \`PARTITION BY\` is optional; the error is about clause evaluation order, not partitioning.
 - \`ROW_NUMBER\` isn't a real function.
   > It's a standard window function; the problem is *where* you used it.
-- [o] Window functions are computed after \`WHERE\`, so they can't be referenced in it.
-  > \`WHERE\` runs before the \`SELECT\`-stage window evaluation. Filter in an outer query/CTE or use \`QUALIFY\`.
 - You must add \`GROUP BY category\`.
   > Grouping would collapse rows and still wouldn't let \`WHERE\` see the window value.
-- \`ROW_NUMBER\` needs a \`PARTITION BY\` to work.
-  > \`PARTITION BY\` is optional; the error is about clause evaluation order, not partitioning.`}
+- [o] Window functions are computed after \`WHERE\`, so they can't be referenced in it.
+  > \`WHERE\` runs before the \`SELECT\`-stage window evaluation. Filter in an outer query/CTE or use \`QUALIFY\`.`}
 />
 
 <MultipleChoice
   markdown={`You wrote \`SUM(amount) OVER (PARTITION BY region ORDER BY day)\` expecting each region's grand total on every row, but the numbers climb down the rows. What happened?
 
-- The \`PARTITION BY\` is being ignored.
-  > It isn't; each region still resets. The issue is the frame the \`ORDER BY\` implies.
-- [o] Adding \`ORDER BY\` set the default frame to \`UNBOUNDED PRECEDING\` to \`CURRENT ROW\`, making it a running total.
-  > Drop the \`ORDER BY\` or use \`ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING\` for the full-partition total.
 - \`SUM\` can't be used as a window function.
   > It can; aggregate functions become window functions with an \`OVER\` clause.
+- [o] Adding \`ORDER BY\` set the default frame to \`UNBOUNDED PRECEDING\` to \`CURRENT ROW\`, making it a running total.
+  > Drop the \`ORDER BY\` or use \`ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING\` for the full-partition total.
+- The \`PARTITION BY\` is being ignored.
+  > It isn't; each region still resets. The issue is the frame the \`ORDER BY\` implies.
 - You need \`GROUP BY region\` instead.
   > That collapses rows; the goal here is to keep every row with the total attached, which the corrected frame does.`}
 />

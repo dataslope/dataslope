@@ -258,25 +258,25 @@ only cares that it can call `List` methods on the parameter.
 
 - Abstract classes are faster
   > Speed is unrelated.
-- [o] A class can implement many interfaces but extend only one class, so interfaces are the right way to mix in multiple independent capabilities
-  > Single inheritance limits you to one parent class, but a class can promise many interface contracts at once.
 - Interfaces support fields, abstract classes don't
   > It's the other way around.
 - Interfaces don't allow \`@Override\`
-  > They do.`}
+  > They do.
+- [o] A class can implement many interfaces but extend only one class, so interfaces are the right way to mix in multiple independent capabilities
+  > Single inheritance limits you to one parent class, but a class can promise many interface contracts at once.`}
 />
 
 <MultipleChoice
   markdown={`Why is it good practice to declare a parameter type as \`List<T>\` rather than \`ArrayList<T>\`?
 
-- It's shorter to type
-  > Not the real reason.
 - ArrayList is deprecated
   > It is not.
-- [o] You ask only for the capability you actually need, so callers can pass any List implementation and you can change your own storage later
-  > Depending on the interface keeps both the caller and your implementation free to vary.
 - The compiler refuses concrete types in parameters
-  > It accepts them just fine.`}
+  > It accepts them just fine.
+- It's shorter to type
+  > Not the real reason.
+- [o] You ask only for the capability you actually need, so callers can pass any List implementation and you can change your own storage later
+  > Depending on the interface keeps both the caller and your implementation free to vary.`}
 />
 
 ## A small challenge

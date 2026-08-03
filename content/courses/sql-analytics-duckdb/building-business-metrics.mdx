@@ -233,14 +233,14 @@ flowchart TD
 <MultipleChoice
   markdown={`Why does a conversion-rate query use \`COUNT(DISTINCT user_id)\` rather than \`COUNT(*)\`?
 
-- Because \`COUNT(*)\` is not allowed with \`FILTER\`.
-  > \`COUNT(*)\` works with \`FILTER\`; the issue is what you intend to count.
-- [o] Conversion is about *people*, so you must count distinct users, not raw events (a user with three visits should count once).
-  > Counting events would inflate both numerator and denominator; distinct users measures the actual people converting.
 - \`DISTINCT\` makes the query run faster.
   > The reason is correctness of the unit, not speed.
 - \`COUNT(*)\` returns NULL for missing rows.
   > \`COUNT(*)\` does not return NULL; the distinct count is about measuring people, not nulls.
+- Because \`COUNT(*)\` is not allowed with \`FILTER\`.
+  > \`COUNT(*)\` works with \`FILTER\`; the issue is what you intend to count.
+- [o] Conversion is about *people*, so you must count distinct users, not raw events (a user with three visits should count once).
+  > Counting events would inflate both numerator and denominator; distinct users measures the actual people converting.
 
 Conversion measures people, so count distinct users to avoid
 double-counting repeat events.`}
@@ -249,14 +249,14 @@ double-counting repeat events.`}
 <MultipleChoice
   markdown={`Revenue is \$1,000. Ten users exist; only four paid. What are ARPU and ARPPU?
 
+- ARPU = \$250; ARPPU = \$100.
+  > The denominators are swapped: ARPU is per *all* users (larger denominator, smaller value).
+- Both are \$250 (1000 / 4).
+  > Only ARPPU divides by 4; ARPU divides by all 10 users.
 - Both are \$100 (1000 / 10).
   > ARPU divides by all users (\$100), but ARPPU divides by paying users, giving a different figure.
 - [o] ARPU = \$100 (1000 / 10 users); ARPPU = \$250 (1000 / 4 paying users).
   > ARPU uses all users as the denominator; ARPPU uses only payers, so the two correctly differ.
-- Both are \$250 (1000 / 4).
-  > Only ARPPU divides by 4; ARPU divides by all 10 users.
-- ARPU = \$250; ARPPU = \$100.
-  > The denominators are swapped: ARPU is per *all* users (larger denominator, smaller value).
 
 ARPU and ARPPU differ only in the denominator, all users vs. paying
 users, and answer different questions.`}
@@ -265,14 +265,14 @@ users, and answer different questions.`}
 <MultipleChoice
   markdown={`Why wrap the previous-period value in \`NULLIF(..., 0)\` when computing growth percent?
 
+- To fill missing months with zero.
+  > Filling gaps is a date-spine concern; \`NULLIF\` only handles the zero-divisor case.
 - To round the growth to one decimal.
   > Rounding is done by \`ROUND\`; \`NULLIF\` guards the division.
 - [o] To avoid dividing by zero when the previous period's value is 0, returning NULL instead of an error.
   > If a prior period had zero revenue, dividing by it would fail; \`NULLIF\` turns the 0 into NULL so the query survives.
 - To convert the result to a percentage.
   > Multiplying by 100 makes it a percentage; \`NULLIF\` only guards the divisor.
-- To fill missing months with zero.
-  > Filling gaps is a date-spine concern; \`NULLIF\` only handles the zero-divisor case.
 
 \`NULLIF\` on the divisor prevents divide-by-zero in period-over-period
 calculations.`}

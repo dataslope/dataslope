@@ -319,27 +319,27 @@ weekly = df.set_index("date")["amount"].resample("W").sum()
 <MultipleChoice
   markdown={`You call \`df.groupby("region")["amount"].transform("sum")\`. What is the length of the result?
 
-- One value per region (the number of distinct groups).
-  > That describes \`agg\`/\`sum\`, which reduces each group to a scalar. \`transform\` does not collapse rows.
 - [o] The same length as \`df\` (one value per original row).
   > \`transform\` broadcasts each group's aggregate back to every member row, preserving the original index.
-- Always a single scalar.
-  > A scalar is what a plain \`.sum()\` on a Series returns, not a grouped \`transform\`.
 - It raises, because \`sum\` is not a valid transform.
-  > \`sum\` is a perfectly valid transform function; it returns the group total repeated across the group.`}
+  > \`sum\` is a perfectly valid transform function; it returns the group total repeated across the group.
+- One value per region (the number of distinct groups).
+  > That describes \`agg\`/\`sum\`, which reduces each group to a scalar. \`transform\` does not collapse rows.
+- Always a single scalar.
+  > A scalar is what a plain \`.sum()\` on a Series returns, not a grouped \`transform\`.`}
 />
 
 <MultipleChoice
   markdown={`A \`merge\` on \`customer_id\` returns **more** rows than the left frame. What is the most likely cause?
 
-- The join dropped unmatched rows.
-  > Dropping rows would make the result *smaller*, not larger.
-- [o] The key is not unique on the right side, so left rows fan out across multiple matches.
-  > A one-to-many key duplicates each left row per match; \`validate="many_to_one"\` would have caught it.
 - \`how="left"\` always duplicates rows.
   > \`how="left"\` keeps every left row once *per match*; duplication comes from non-unique keys, not the join type itself.
+- The join dropped unmatched rows.
+  > Dropping rows would make the result *smaller*, not larger.
 - Pandas merges never change row counts.
-  > Row counts routinely change with joins; that is exactly why you sanity-check them.`}
+  > Row counts routinely change with joins; that is exactly why you sanity-check them.
+- [o] The key is not unique on the right side, so left rows fan out across multiple matches.
+  > A one-to-many key duplicates each left row per match; \`validate="many_to_one"\` would have caught it.`}
 />
 
 ## Challenges

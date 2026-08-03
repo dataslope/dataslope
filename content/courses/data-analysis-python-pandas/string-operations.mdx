@@ -385,14 +385,14 @@ assert pd.isna(clean.iloc[5])`,
 <MultipleChoice
   markdown={`Why use the \`.str\` accessor at all?
 
-- Pandas requires it
-  > Pandas does not require the \`.str\` accessor; you can call \`.apply(str.upper)\` instead, but \`.str\` is the idiomatic, more readable approach.
 - It is faster than Python loops
   > Speed is a benefit, but the primary reason to use \`.str\` is that it exposes Python's string methods as vectorized column operations with clean, readable syntax.
 - [o] It provides vectorized string operations on whole columns of text, clean syntax and far faster than writing a Python for-loop over each value
   > \`.str.upper()\` on a million-row column is one call, not a million.
 - It works only on integers
   > The \`.str\` accessor is specifically for string (object or StringDtype) columns; it does not work on integer columns.
+- Pandas requires it
+  > Pandas does not require the \`.str\` accessor; you can call \`.apply(str.upper)\` instead, but \`.str\` is the idiomatic, more readable approach.
 
 The \`.str\` accessor is one of Pandas's most quietly powerful features.`}
 />
@@ -400,12 +400,12 @@ The \`.str\` accessor is one of Pandas's most quietly powerful features.`}
 <MultipleChoice
   markdown={`Calling \`s.str.contains("foo")\` on a column with a NaN value will:
 
-- Return True everywhere
-  > Returning True for a NaN value would silently include rows with missing data in a filter, which is rarely the intended behavior.
 - Return False everywhere
   > Returning False would silently exclude NaN rows from a filter; the actual default behavior is to propagate the NaN, making the missing position visible.
 - [o] Propagate the NaN, the result has NaN at that position by default
   > Use \`na=False\` (or \`na=True\`) to coerce the NaN to a definite boolean, required if you want to use the result as a filter mask.
+- Return True everywhere
+  > Returning True for a NaN value would silently include rows with missing data in a filter, which is rarely the intended behavior.
 - Throw an error
   > \`str.contains\` does not raise an error when it encounters NaN; it returns NaN at that position by default, which only becomes a problem if you try to use the result as a boolean filter.
 
@@ -417,12 +417,12 @@ Forgetting \`na=False\` is a classic gotcha when filtering string columns that c
 
 - It is faster than not expanding
   > Performance is similar either way; the difference is in the return type, not speed.
-- It returns a Series of lists
-  > Without \`expand=True\`, the result is a Series of lists (one list per row), \`expand=True\` is what converts it into a DataFrame.
 - [o] It returns a DataFrame, one column per split piece, perfect for splitting one column into many
   > Useful for emails, names, addresses, anything with predictable delimiters.
 - It removes the @ sign
   > The split delimiter is used as the splitting boundary and does not appear in the resulting pieces, but the motivation for \`expand=True\` is the DataFrame output, not delimiter removal.
+- It returns a Series of lists
+  > Without \`expand=True\`, the result is a Series of lists (one list per row), \`expand=True\` is what converts it into a DataFrame.
 
 The \`expand=True\` flag is the difference between a hard-to-use Series-of-lists and a friendly DataFrame.`}
 />

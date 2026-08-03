@@ -304,27 +304,27 @@ int square(int x) { return x * x; }
 <MultipleChoice
   markdown={`Which build stage replaces \`#include <stdio.h>\` with the actual contents of \`stdio.h\`?
 
-- [o] The preprocessor
-  > \`#include\` is a textual directive handled before the compiler ever parses C.
+- The linker
+  > The linker resolves symbols across object files; it does not handle \`#include\`.
 - The compiler
   > By the time the compiler runs, the include has already been expanded into the translation unit.
+- [o] The preprocessor
+  > \`#include\` is a textual directive handled before the compiler ever parses C.
 - The assembler
-  > The assembler turns assembly text into machine code; it does not know about C headers.
-- The linker
-  > The linker resolves symbols across object files; it does not handle \`#include\`.`}
+  > The assembler turns assembly text into machine code; it does not know about C headers.`}
 />
 
 <MultipleChoice
   markdown={`You see the error \`undefined reference to 'strdup'\` when linking. Which is the most likely cause?
 
+- The CPU does not support the \`strdup\` instruction.
+  > CPUs do not have function-specific instructions for libc functions.
 - A syntax error in \`strdup\`'s declaration.
   > A syntax error would have stopped compilation long before linking.
 - A missing semicolon in your code.
   > That would also be a compile-time error, not a link-time error.
 - [o] The function was declared (via a header) but the library that defines it was not passed to the linker, or the object file containing it was not compiled in.
-  > "Undefined reference" is the linker's way of saying it cannot find a body for a name.
-- The CPU does not support the \`strdup\` instruction.
-  > CPUs do not have function-specific instructions for libc functions.`}
+  > "Undefined reference" is the linker's way of saying it cannot find a body for a name.`}
 />
 
 <MultipleChoice
@@ -332,10 +332,10 @@ int square(int x) { return x * x; }
 
 - To make the compiler optimize the header more aggressively.
   > Include guards do not affect optimization.
+- Because the C standard library requires it.
+  > It is a convention, not a standard library requirement.
 - To hide the contents of the header from other developers.
   > Include guards do not hide anything; the file is still plain text.
 - [o] To prevent the same header from being textually included more than once in a single translation unit, which would re-declare types and functions.
-  > Without guards, transitive includes can re-declare the same names and break compilation.
-- Because the C standard library requires it.
-  > It is a convention, not a standard library requirement.`}
+  > Without guards, transitive includes can re-declare the same names and break compilation.`}
 />

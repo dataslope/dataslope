@@ -142,14 +142,14 @@ DuckDB pleasant for the rapid question-query-look loop.
 <MultipleChoice
   markdown={`DuckDB is often described as **"SQLite for analytics."** What does that capture?
 
-- DuckDB is a fork of SQLite that adds a web server.
-  > DuckDB is not a SQLite fork, and it adds no server; the analogy is about *style*, not lineage.
 - [o] Like SQLite, it is a tiny, embedded, zero-setup database, but tuned for analytical (OLAP) work instead of transactions.
   > Both run in-process with no server; SQLite targets transactional use, DuckDB targets analytical scans.
 - It can only store the same amount of data as SQLite.
   > The analogy is about embedding and ease of use, not a storage-size limit.
 - It requires the same cloud account as a data warehouse.
   > DuckDB needs no account or cloud setup at all; that is part of its appeal.
+- DuckDB is a fork of SQLite that adds a web server.
+  > DuckDB is not a SQLite fork, and it adds no server; the analogy is about *style*, not lineage.
 
 The analogy means "embedded and frictionless like SQLite, but built for
 analytics rather than transactions."`}
@@ -160,12 +160,12 @@ analytics rather than transactions."`}
 
 - It stores data row-by-row to speed up single-row lookups.
   > Row storage favors transactional point lookups; DuckDB is column-oriented, which favors analytical scans.
-- [o] It is column-oriented and vectorized, so summary queries over many rows read only the needed columns, in batches.
-  > Column storage plus batch processing is precisely what accelerates "scan many rows, summarize a few columns" workloads.
 - It refuses to run aggregate queries.
   > Aggregates are central to what DuckDB does well, not something it refuses.
 - It requires a dedicated server cluster.
   > DuckDB runs in-process with no server; needing a cluster would be the opposite of its design.
+- [o] It is column-oriented and vectorized, so summary queries over many rows read only the needed columns, in batches.
+  > Column storage plus batch processing is precisely what accelerates "scan many rows, summarize a few columns" workloads.
 
 Column-oriented, vectorized execution is the engine behind DuckDB's
 analytical speed.`}
@@ -174,14 +174,14 @@ analytical speed.`}
 <MultipleChoice
   markdown={`In a modern data workflow, DuckDB most often serves as...
 
-- A replacement for every cloud data warehouse in production.
-  > DuckDB usually complements warehouses rather than replacing large-scale production systems.
-- [o] A fast, local scratchpad for exploring samples and prototyping analytical queries with zero setup.
-  > Its in-process, file-reading design makes it ideal for quick local exploration alongside heavier systems.
-- The transactional database behind a high-traffic web application.
-  > High-concurrency transactional serving is an OLTP job; DuckDB targets analytical workloads.
 - A tool exclusively for database administration tasks like replication.
   > Administration and replication are outside DuckDB's analytical focus.
+- A replacement for every cloud data warehouse in production.
+  > DuckDB usually complements warehouses rather than replacing large-scale production systems.
+- The transactional database behind a high-traffic web application.
+  > High-concurrency transactional serving is an OLTP job; DuckDB targets analytical workloads.
+- [o] A fast, local scratchpad for exploring samples and prototyping analytical queries with zero setup.
+  > Its in-process, file-reading design makes it ideal for quick local exploration alongside heavier systems.
 
 DuckDB shines as the analyst's frictionless local engine for exploration
 and prototyping.`}

@@ -439,14 +439,14 @@ doesn't match.
 <MultipleChoice
   markdown={`Inside a loop over millions of orders you check \`if order_id in seen\` to skip duplicates. \`seen\` is currently a \`list\`. Why is this slow?
 
-- \`list\` can't store integers.
-  > It can; the problem is lookup cost, not the element type.
 - [o] Membership in a \`list\` is $O(n)$, so the loop is $O(n^2)$ overall; a \`set\` makes each check $O(1)$.
   > Each \`in\` scans the list linearly; switching \`seen\` to a \`set\` (hash table) makes membership average $O(1)$.
-- A \`list\` deduplicates automatically, so the check is redundant.
-  > Lists keep duplicates; nothing is automatic. The check is needed, it just belongs against a \`set\`.
 - The loop is fine; \`in\` on a list is $O(1)$.
-  > \`in\` on a list is $O(n)$. On a \`set\` or \`dict\` it's average $O(1)$.`}
+  > \`in\` on a list is $O(n)$. On a \`set\` or \`dict\` it's average $O(1)$.
+- \`list\` can't store integers.
+  > It can; the problem is lookup cost, not the element type.
+- A \`list\` deduplicates automatically, so the check is redundant.
+  > Lists keep duplicates; nothing is automatic. The check is needed, it just belongs against a \`set\`.`}
 />
 
 ## Challenges

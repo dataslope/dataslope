@@ -41,14 +41,14 @@ For more coding/DSA practice, see the **[Backend track](/interview-prep/backend-
 <MultipleChoice
   markdown={`You scale features using statistics computed over the **entire** dataset, then split into train and test sets. Why is this a problem?
 
+- Scaling is never needed, so the order is irrelevant.
+  > Many models (SVMs, k-NN, neural nets, regularized linear models) genuinely need scaling; the order relative to the split is what matters.
 - It isn't a problem, scaling before splitting is the recommended order.
   > It's the reverse: fitting any transformation on all the data before splitting leaks information from test into training.
 - [o] It causes data leakage: the scaler "saw" the test set, so test performance is optimistically biased.
   > Fit transformations (scalers, encoders, imputers) on the **training** split only, then apply them to the test split, otherwise test estimates are inflated.
 - It makes training slower but doesn't affect correctness.
-  > The issue is correctness of your evaluation, not speed, your reported metrics become untrustworthy.
-- Scaling is never needed, so the order is irrelevant.
-  > Many models (SVMs, k-NN, neural nets, regularized linear models) genuinely need scaling; the order relative to the split is what matters.`}
+  > The issue is correctness of your evaluation, not speed, your reported metrics become untrustworthy.`}
 />
 
 ## Go deeper

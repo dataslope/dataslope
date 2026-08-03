@@ -272,14 +272,14 @@ g = sns.relplot(
 <MultipleChoice
   markdown={`What is a scatter plot fundamentally best at revealing?
 
-- The composition of a whole into parts.
-  > That's a job for a bar or stacked chart, not a scatter plot.
 - A single variable's frequency distribution.
   > One variable's distribution is what histograms, KDEs, and ECDFs are for. A scatter plot needs *two* numeric variables.
-- [o] The relationship between two numeric variables, its direction, shape, clustering, and outliers.
-  > A scatter maps both variables to position (the most precise encoding), so the eye reads correlation, curvature, clusters, and outliers directly.
 - A ranking of categories from largest to smallest.
   > Ranking categories is a bar-chart task; a scatter plot compares two continuous measurements.
+- [o] The relationship between two numeric variables, its direction, shape, clustering, and outliers.
+  > A scatter maps both variables to position (the most precise encoding), so the eye reads correlation, curvature, clusters, and outliers directly.
+- The composition of a whole into parts.
+  > That's a job for a bar or stacked chart, not a scatter plot.
 
 When the question is "how do these two numbers move together?", the scatter
 plot is the default answer.`}
@@ -289,14 +289,14 @@ plot is the default answer.`}
   markdown={`Your scatter plot of 40,000 points looks like one solid dark blob. Which
 fix most directly addresses the problem?
 
-- Increase the marker size so the points are easier to see.
-  > Bigger markers overlap *more*, making the blob worse.
-- [o] Lower the opacity with \`alpha\` (e.g. \`alpha=0.2\`), or switch to a density-style plot.
-  > Semi-transparent points let overlapping dots accumulate into visibly darker regions, so density becomes readable again; for extreme density a 2-D histogram/density plot is even better.
 - Remove the axis gridlines.
   > Gridlines aren't the issue, overlapping points are hiding the structure.
+- [o] Lower the opacity with \`alpha\` (e.g. \`alpha=0.2\`), or switch to a density-style plot.
+  > Semi-transparent points let overlapping dots accumulate into visibly darker regions, so density becomes readable again; for extreme density a 2-D histogram/density plot is even better.
 - Sort the data before plotting.
   > Row order doesn't change where dots land, so sorting can't relieve overplotting.
+- Increase the marker size so the points are easier to see.
+  > Bigger markers overlap *more*, making the blob worse.
 
 Overplotting hides structure; the cure is to change the *encoding* (opacity
 or a density representation), not the cosmetics.`}
@@ -306,14 +306,14 @@ or a density representation), not the cosmetics.`}
   markdown={`You map \`hue\`, \`style\`, AND \`size\` to three different variables on one
 scatter plot. What is the main risk?
 
-- Seaborn will raise an error because only one extra channel is allowed.
-  > Seaborn happily accepts all three; the problem is perceptual, not technical.
 - The plot will be statistically incorrect.
   > The numbers are fine, nothing is miscomputed. The issue is whether a human can *read* it.
-- [o] Shape and size are read imprecisely, so the extra channels add clutter faster than insight.
-  > Position and (a few) colors are read well; marker shape and size are read poorly, so overloading channels usually costs clarity more than it adds information.
 - The legend will be hidden automatically.
   > Seaborn will show legends for each channel, arguably part of the clutter problem.
+- [o] Shape and size are read imprecisely, so the extra channels add clutter faster than insight.
+  > Position and (a few) colors are read well; marker shape and size are read poorly, so overloading channels usually costs clarity more than it adds information.
+- Seaborn will raise an error because only one extra channel is allowed.
+  > Seaborn happily accepts all three; the problem is perceptual, not technical.
 
 Every visual channel has a perceptual cost. Map extra variables only when a
 *rough* reading is genuinely useful.`}

@@ -112,14 +112,14 @@ type system quietly steering you toward correct, meaningful queries.
 <MultipleChoice
   markdown={`What is the main job of a column's **data type**?
 
-- To decide the column's position in the table.
-  > Column position is unrelated to type; a type defines what kind of value the column holds.
 - [o] To declare what kind of value the column holds and let the database reject values that don't fit.
   > A type both describes the allowed values and enables the database to refuse invalid ones early.
 - To automatically translate values into other languages.
   > Types do not translate languages; they constrain the kind of value stored.
 - To make the column appear bold when displayed.
   > Display styling is not a function of data types.
+- To decide the column's position in the table.
+  > Column position is unrelated to type; a type defines what kind of value the column holds.
 
 A data type defines the allowed kind of value and lets the database enforce it.`}
 />
@@ -127,14 +127,14 @@ A data type defines the allowed kind of value and lets the database enforce it.`
 <MultipleChoice
   markdown={`Which PostgreSQL type is the best choice for storing a price like \`19.99\`?
 
-- \`INTEGER\`, because prices are basically numbers.
-  > \`INTEGER\` holds only whole numbers, so it cannot represent the cents in \`19.99\`.
 - \`TEXT\`, so you can store the dollar sign too.
   > Storing money as text prevents arithmetic like summing prices and invites inconsistent formatting.
 - [o] \`NUMERIC\`, because it stores exact decimal values, which is important for money.
   > \`NUMERIC\` represents decimals exactly, avoiding the rounding errors that make floating-point unsuitable for money.
 - \`BOOLEAN\`, because a price is either present or not.
   > \`BOOLEAN\` stores only true/false; it cannot hold a numeric amount.
+- \`INTEGER\`, because prices are basically numbers.
+  > \`INTEGER\` holds only whole numbers, so it cannot represent the cents in \`19.99\`.
 
 Use \`NUMERIC\` for money so decimal amounts are stored and calculated exactly.`}
 />
@@ -142,14 +142,14 @@ Use \`NUMERIC\` for money so decimal amounts are stored and calculated exactly.`
 <MultipleChoice
   markdown={`You declare a column as \`DATE\` and try to insert the value \`'someday'\`. What happens, and why is that good?
 
-- It is stored as-is, because databases accept any text.
-  > A typed column does not accept arbitrary text; that strictness is exactly the point.
-- The whole table is deleted to protect it.
-  > Rejecting one bad value never destroys the table; the database simply refuses that value.
-- [o] The database rejects the value because it is not a valid date, catching the error early.
-  > Enforcing the \`DATE\` type stops invalid data from entering, protecting later queries and reports.
 - It is silently converted to today's date.
   > The database does not guess a replacement; it refuses values that do not fit the declared type.
+- The whole table is deleted to protect it.
+  > Rejecting one bad value never destroys the table; the database simply refuses that value.
+- It is stored as-is, because databases accept any text.
+  > A typed column does not accept arbitrary text; that strictness is exactly the point.
+- [o] The database rejects the value because it is not a valid date, catching the error early.
+  > Enforcing the \`DATE\` type stops invalid data from entering, protecting later queries and reports.
 
 Type enforcement rejects invalid values at entry, which keeps the stored data trustworthy.`}
 />

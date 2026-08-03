@@ -530,14 +530,14 @@ export function area(s: Shape): number {
 <MultipleChoice
   markdown={`Why is a discriminated union ("sum type") often a better model than a record with several optional fields?
 
-- Unions compile faster
-  > Compilation speed is unaffected.
-- Unions use less memory at runtime
-  > Memory layout is essentially the same, both are plain objects.
 - [o] A discriminated union ties each piece of data to the variant that needs it, so impossible combinations of fields cannot exist
   > With optional fields, the type permits nonsense like "active AND suspended". A union forbids that statically: each variant carries exactly the data it needs, no more.
 - Unions don't need a "kind" tag
   > They do, the tag is what makes the union *discriminated* and what TypeScript narrows on.
+- Unions compile faster
+  > Compilation speed is unaffected.
+- Unions use less memory at runtime
+  > Memory layout is essentially the same, both are plain objects.
 
 Sums forbid illegal combinations *by construction*, eliminating a class of runtime checks entirely.`}
 />

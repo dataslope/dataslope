@@ -190,14 +190,14 @@ That ordering matches the variables' importance for the story.
 <MultipleChoice
   markdown={`What does it mean for a visual property to be **pre-attentive**?
 
-- It can only be seen with conscious effort.
-  > A property that requires conscious effort is the opposite of pre-attentive. Pre-attentive features are detected *before* focused attention is engaged, with no effort required.
-- It requires special training to notice.
-  > Pre-attentive features are part of the built-in visual system and require no training, any sighted person detects them automatically in about 200 milliseconds.
 - [o] The visual system detects it *before* conscious attention is engaged, in roughly 200 milliseconds, regardless of how many other items are on screen.
   > Pre-attentive features (color hue, position, length, motion, ...) "pop out", you spot a red dot among a thousand gray dots as fast as among ten. Good charts use pre-attentive features to surface the most important information.
 - It must be in the foreground of the chart.
   > Pre-attentive processing is independent of foreground/background arrangement, a distinct color or shape "pops out" even when it is not drawn on top of other elements.
+- It can only be seen with conscious effort.
+  > A property that requires conscious effort is the opposite of pre-attentive. Pre-attentive features are detected *before* focused attention is engaged, with no effort required.
+- It requires special training to notice.
+  > Pre-attentive features are part of the built-in visual system and require no training, any sighted person detects them automatically in about 200 milliseconds.
 
 If something is important, encode it with a pre-attentive feature so it pops out instantly.`}
 />
@@ -207,12 +207,12 @@ If something is important, encode it with a pre-attentive feature so it pops out
 
 - Color intensity (shading).
   > Color intensity sits at the *bottom* of the Cleveland-McGill ranking, it is among the least accurate channels for quantitative comparison. The eye can tell "darker" from "lighter" but not judge precise magnitudes.
+- [o] Position along a common scale.
+  > Position along a shared axis (the x or y axis of a chart) is the most accurate visual encoding for quantitative comparison. This is why bar charts and scatter plots are so powerful, they use position for the things you want to compare precisely.
 - Area.
   > Area is ranked below length and angle in the Cleveland-McGill experiments. People perceive area differences less accurately than differences in length or position, which is why bubble charts are used for secondary variables only.
 - Angle.
   > Angle is ranked below length in the Cleveland-McGill hierarchy. It is more accurate than area or color intensity, but still significantly less precise than position, which is the core reason pie charts are weaker than bar charts for comparison.
-- [o] Position along a common scale.
-  > Position along a shared axis (the x or y axis of a chart) is the most accurate visual encoding for quantitative comparison. This is why bar charts and scatter plots are so powerful, they use position for the things you want to compare precisely.
 
 Length is second. Color and area are far down the list. Plan your charts accordingly.`}
 />
@@ -222,12 +222,12 @@ Length is second. Color and area are far down the list. Plan your charts accordi
 
 - Pie charts are an outdated format.
   > The criticism of pie charts is perceptual, not historical. They remain widely used; the problem is that angle and area are weak encodings for comparison, making them harder to read than bar charts regardless of how modern or old the format is.
-- Pie charts can only show two values.
-  > Pie charts can show any number of slices. The real limitation is that as the number of slices grows beyond 3-4, the similar angles become impossible to rank visually, the issue is accuracy, not an arbitrary limit on slice count.
-- [o] Pie charts encode quantity using **angle / area**, which the visual system judges much less accurately than the **length / position** used by bar charts.
-  > The Cleveland-McGill experiments showed angles and areas are among the *worst* encodings for quantitative comparison. With more than 3-4 slices, viewers can no longer reliably rank them. Bar charts use length along a common scale, much easier on the eye.
 - Pie charts don't support color.
   > Pie charts rely heavily on color to distinguish slices; color is a core part of how they work. The weakness of pie charts is the angle/area encoding, not any lack of color support.
+- [o] Pie charts encode quantity using **angle / area**, which the visual system judges much less accurately than the **length / position** used by bar charts.
+  > The Cleveland-McGill experiments showed angles and areas are among the *worst* encodings for quantitative comparison. With more than 3-4 slices, viewers can no longer reliably rank them. Bar charts use length along a common scale, much easier on the eye.
+- Pie charts can only show two values.
+  > Pie charts can show any number of slices. The real limitation is that as the number of slices grows beyond 3-4, the similar angles become impossible to rank visually, the issue is accuracy, not an arbitrary limit on slice count.
 
 Pie charts have a few legitimate uses (we'll cover them in their own chapter), but they're rarely the right answer.`}
 />
@@ -235,14 +235,14 @@ Pie charts have a few legitimate uses (we'll cover them in their own chapter), b
 <MultipleChoice
   markdown={`Which is a **good** use of color in a chart?
 
-- Showing precise dollar amounts using shades of red.
-  > Color intensity is near the bottom of the Cleveland-McGill ranking, the eye cannot reliably distinguish precise magnitudes from shades alone. Position or length should carry any variable where exact comparison matters.
-- Distinguishing 25 different product categories.
-  > After about 7 distinct hues, viewers start confusing similar shades, making categorical color useless for a large number of groups. For 25 categories, use position, faceting, or a filter to show fewer categories at once.
-- [o] Showing a categorical grouping (e.g., continent) with 5-7 distinct hues.
-  > Color excels at *categorical* distinctions when the number of categories is small (≈5-7 max). For more than that, viewers start confusing similar shades. For precise quantitative values, use position or length instead.
 - Indicating the chart's title.
   > Title text is not a data encoding and does not need a color channel. Using a color encoding for the title would waste one of the most powerful categorical channels on non-data content.
+- Distinguishing 25 different product categories.
+  > After about 7 distinct hues, viewers start confusing similar shades, making categorical color useless for a large number of groups. For 25 categories, use position, faceting, or a filter to show fewer categories at once.
+- Showing precise dollar amounts using shades of red.
+  > Color intensity is near the bottom of the Cleveland-McGill ranking, the eye cannot reliably distinguish precise magnitudes from shades alone. Position or length should carry any variable where exact comparison matters.
+- [o] Showing a categorical grouping (e.g., continent) with 5-7 distinct hues.
+  > Color excels at *categorical* distinctions when the number of categories is small (≈5-7 max). For more than that, viewers start confusing similar shades. For precise quantitative values, use position or length instead.
 
 Color is one of the most over-used encodings. Use it deliberately.`}
 />
@@ -250,14 +250,14 @@ Color is one of the most over-used encodings. Use it deliberately.`}
 <MultipleChoice
   markdown={`Why does using **only red vs green** to encode "bad" vs "good" create an accessibility problem?
 
-- Red and green look identical on phone screens.
-  > Phone screens do not alter color perception in the general population; the accessibility problem comes from human color vision deficiency, not screen technology.
-- Red and green are banned by the WCAG specification.
-  > WCAG (Web Content Accessibility Guidelines) focuses on contrast ratios and does not specifically ban the red-green combination. The real issue is that roughly 8% of men cannot reliably distinguish those two hues regardless of contrast.
-- [o] About 8% of men have red-green color vision deficiency and cannot reliably distinguish the two colors.
-  > Red-green color blindness is the most common form of color vision deficiency. Charts that rely *only* on red vs green to convey meaning exclude a significant slice of the audience. The fix is to double-encode (color + shape, color + label) or to use a colorblind-safe palette.
 - Red and green are culturally inappropriate.
   > Cultural associations with red and green (stop/go, danger/safe) vary by region but are not the core accessibility problem. The issue is biological: a significant fraction of the population cannot distinguish those hues regardless of cultural context.
+- [o] About 8% of men have red-green color vision deficiency and cannot reliably distinguish the two colors.
+  > Red-green color blindness is the most common form of color vision deficiency. Charts that rely *only* on red vs green to convey meaning exclude a significant slice of the audience. The fix is to double-encode (color + shape, color + label) or to use a colorblind-safe palette.
+- Red and green are banned by the WCAG specification.
+  > WCAG (Web Content Accessibility Guidelines) focuses on contrast ratios and does not specifically ban the red-green combination. The real issue is that roughly 8% of men cannot reliably distinguish those two hues regardless of contrast.
+- Red and green look identical on phone screens.
+  > Phone screens do not alter color perception in the general population; the accessibility problem comes from human color vision deficiency, not screen technology.
 
 Free, modern palettes (Viridis, Cividis, ColorBrewer) are designed to remain distinguishable for color-blind viewers. Use them.`}
 />
@@ -265,14 +265,14 @@ Free, modern palettes (Viridis, Cividis, ColorBrewer) are designed to remain dis
 <MultipleChoice
   markdown={`A chart shows **size="population"** and **color="continent"** in a scatter plot of **x="gdp"**, **y="lifeExp"**. Which variables can the viewer compare **most precisely**?
 
-- Population (via size).
-  > Size encodes area, which the Cleveland-McGill ranking places far below position for quantitative precision. Viewers can perceive "big" vs "small" but cannot reliably compare exact population values from bubble size.
 - Continent (via color).
   > Color hue is excellent for categorical grouping (telling continents apart), but it conveys no quantitative information at all, it is not on the Cleveland-McGill accuracy scale for magnitudes.
-- [o] GDP and life expectancy (via x and y position).
-  > Position along an axis is the most accurate encoding. Size and color are excellent for *categorical noticing*, "ah, that's a big country" or "those are the African nations", but not for precise comparison. Always put your most important quantitative variables on x and y.
 - All variables are equally precise to compare.
   > Different visual channels differ greatly in how accurately viewers can compare values. Position (x, y) is far more precise than area (size) or hue (color), so the four variables in this chart are not equally readable.
+- [o] GDP and life expectancy (via x and y position).
+  > Position along an axis is the most accurate encoding. Size and color are excellent for *categorical noticing*, "ah, that's a big country" or "those are the African nations", but not for precise comparison. Always put your most important quantitative variables on x and y.
+- Population (via size).
+  > Size encodes area, which the Cleveland-McGill ranking places far below position for quantitative precision. Viewers can perceive "big" vs "small" but cannot reliably compare exact population values from bubble size.
 
 Encoding choice = importance ordering. Use the strongest channels for the variables that matter most.`}
 />

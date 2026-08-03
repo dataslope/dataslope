@@ -411,10 +411,10 @@ ada / 36
 
 - After the method name
   > That's where regular parameters go.
-- In the class header
-  > That introduces type parameters scoped to the entire class, not just one method.
 - [o] Immediately before the return type, e.g. \`public static <T> T identity(T x)\`
   > A method-scoped type parameter list goes right before the return type.
+- In the class header
+  > That introduces type parameters scoped to the entire class, not just one method.
 - In the calling code only
   > The declaration must appear on the method itself.`}
 />
@@ -422,25 +422,25 @@ ada / 36
 <MultipleChoice
   markdown={`What does the bound \`<T extends Number>\` allow the method body to do that \`<T>\` would not?
 
-- Call any method of \`Object\` on \`T\`
-  > Both forms allow that, every type is an \`Object\`.
-- [o] Call methods defined on \`Number\` (such as \`intValue()\`, \`doubleValue()\`) on any value of type \`T\`
-  > The bound is a *contract* telling the compiler what \`T\` is guaranteed to support.
 - Compare \`T\` values with \`<\` and \`>\`
   > Java does not overload \`<\` for objects, regardless of generics.
 - Construct new instances of \`T\`
-  > Generic type parameters cannot be directly instantiated.`}
+  > Generic type parameters cannot be directly instantiated.
+- Call any method of \`Object\` on \`T\`
+  > Both forms allow that, every type is an \`Object\`.
+- [o] Call methods defined on \`Number\` (such as \`intValue()\`, \`doubleValue()\`) on any value of type \`T\`
+  > The bound is a *contract* telling the compiler what \`T\` is guaranteed to support.`}
 />
 
 <MultipleChoice
   markdown={`Why is \`class Stack<E> { private final List<E> data = new ArrayList<>(); … }\` a better design than the legacy \`java.util.Stack\`?
 
+- The legacy \`Stack\` does not compile in modern Java
+  > It still compiles; it is just considered legacy.
+- It is faster on every operation
+  > Performance is comparable; the win is API hygiene.
 - It uses less memory
   > Memory use is similar.
 - [o] It composes a \`List\` instead of extending \`Vector\`, so its public API contains only the stack operations, not random list methods
-  > Composition contains the abstraction; inheritance would leak parent methods into the stack's surface.
-- It is faster on every operation
-  > Performance is comparable; the win is API hygiene.
-- The legacy \`Stack\` does not compile in modern Java
-  > It still compiles; it is just considered legacy.`}
+  > Composition contains the abstraction; inheritance would leak parent methods into the stack's surface.`}
 />

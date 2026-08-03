@@ -303,38 +303,38 @@ Collections Framework.
 <MultipleChoice
   markdown={`Why does \`Vector.get(...)\` return \`Object\` and force a cast in pre-Java-5 code?
 
-- Because \`Object\` is faster than other types
-  > Speed is unrelated.
 - [o] Because \`Vector\` had no element-type parameter, the same class held any kind of element
   > Without generics, a container had to be defined in terms of \`Object\`, and the cast was the price of mixing types.
-- Because \`Vector\` is an interface, not a class
-  > \`Vector\` is a class.
+- Because \`Object\` is faster than other types
+  > Speed is unrelated.
 - Because Java compiles all collections to \`Object[]\` at runtime
-  > That's an oversimplification of erasure; the cast issue predates generics entirely.`}
+  > That's an oversimplification of erasure; the cast issue predates generics entirely.
+- Because \`Vector\` is an interface, not a class
+  > \`Vector\` is a class.`}
 />
 
 <MultipleChoice
   markdown={`What is wrong with \`Stack extends Vector\`?
 
+- It prevents Stack from being iterated
+  > Stack inherits Vector's iteration just fine.
 - It's not allowed by the compiler
   > It is allowed.
-- [o] It exposes Vector's index-based methods, breaking the LIFO abstraction a stack is supposed to provide
-  > Inheritance gives users of Stack access to the parent's API, so a "stack" suddenly supports indexing into the middle of itself.
 - It causes a stack overflow at runtime
   > It does not.
-- It prevents Stack from being iterated
-  > Stack inherits Vector's iteration just fine.`}
+- [o] It exposes Vector's index-based methods, breaking the LIFO abstraction a stack is supposed to provide
+  > Inheritance gives users of Stack access to the parent's API, so a "stack" suddenly supports indexing into the middle of itself.`}
 />
 
 <MultipleChoice
   markdown={`Beyond type safety, what's a second major reason \`Hashtable\` is considered legacy?
 
-- It only supports \`Integer\` keys
-  > It accepts any \`Object\` as a key.
-- [o] Every method is synchronized, so it pays a locking cost even in single-threaded code
-  > The original design baked thread-safety in unconditionally; modern code uses \`HashMap\` and adds synchronization only where needed.
+- It was removed in Java 9
+  > It still exists; it's just considered legacy.
 - It cannot store more than 16 entries
   > It can grow arbitrarily.
-- It was removed in Java 9
-  > It still exists; it's just considered legacy.`}
+- [o] Every method is synchronized, so it pays a locking cost even in single-threaded code
+  > The original design baked thread-safety in unconditionally; modern code uses \`HashMap\` and adds synchronization only where needed.
+- It only supports \`Integer\` keys
+  > It accepts any \`Object\` as a key.`}
 />

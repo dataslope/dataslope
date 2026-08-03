@@ -234,10 +234,10 @@ complexity, but they're often worth it.
   > The full range (min to max) is shown by the whiskers and outlier dots, not by the box itself. The box covers only the middle 50% of the data, from Q1 to Q3.
 - The mean ± one standard deviation.
   > Mean ± one standard deviation is a different summary that assumes a roughly normal distribution. The box plot is non-parametric: its box always spans the central 50% of the actual data, regardless of the distribution's shape.
-- [o] The interquartile range, from Q1 (25th percentile) to Q3 (75th percentile), with the median line inside.
-  > The box covers the middle 50% of the data; the line inside is the median. The whiskers extend to the most extreme non-outlier values (typically within 1.5×IQR), and individual dots beyond the whiskers represent outliers.
 - The standard error of the mean.
   > Standard error measures how precisely the sample mean estimates the population mean. It is not part of a box plot's anatomy, the box plot shows percentiles (Q1, median, Q3), not any measure of estimation precision.
+- [o] The interquartile range, from Q1 (25th percentile) to Q3 (75th percentile), with the median line inside.
+  > The box covers the middle 50% of the data; the line inside is the median. The whiskers extend to the most extreme non-outlier values (typically within 1.5×IQR), and individual dots beyond the whiskers represent outliers.
 
 Box plots are pure descriptive statistics, they don't make assumptions about the distribution.`}
 />
@@ -245,14 +245,14 @@ Box plots are pure descriptive statistics, they don't make assumptions about the
 <MultipleChoice
   markdown={`What is a key **strength** of box plots over histograms?
 
-- Box plots show more detail about distribution shape.
-  > Histograms actually show more distributional detail, they reveal bimodality, skew shape, and exact bin counts that a box plot's five-number summary cannot capture. Hiding shape detail is a trade-off box plots make in exchange for compactness.
-- Box plots always look prettier.
-  > Aesthetic preference is subjective and not a principled criterion for choosing a chart type. The real strength of box plots is their compactness, which allows many distributions to be compared side by side.
-- [o] Box plots are compact enough to compare *many* distributions side by side without visual overload.
-  > A histogram for each of 10 groups takes 10 panels. Ten box plots fit easily on one chart, letting you compare medians, spreads, and outliers across groups instantly. The tradeoff is that box plots *hide the shape* of each distribution.
 - Box plots are always more accurate.
   > No chart type is inherently "more accurate" than another in an absolute sense. Both histograms and box plots summarize the same underlying data, but box plots deliberately sacrifice shape detail to gain compactness for multi-group comparison.
+- Box plots show more detail about distribution shape.
+  > Histograms actually show more distributional detail, they reveal bimodality, skew shape, and exact bin counts that a box plot's five-number summary cannot capture. Hiding shape detail is a trade-off box plots make in exchange for compactness.
+- [o] Box plots are compact enough to compare *many* distributions side by side without visual overload.
+  > A histogram for each of 10 groups takes 10 panels. Ten box plots fit easily on one chart, letting you compare medians, spreads, and outliers across groups instantly. The tradeoff is that box plots *hide the shape* of each distribution.
+- Box plots always look prettier.
+  > Aesthetic preference is subjective and not a principled criterion for choosing a chart type. The real strength of box plots is their compactness, which allows many distributions to be compared side by side.
 
 Compactness + side-by-side comparison is the box plot's superpower. Just remember it summarizes, it doesn't show every detail.`}
 />
@@ -260,14 +260,14 @@ Compactness + side-by-side comparison is the box plot's superpower. Just remembe
 <MultipleChoice
   markdown={`A distribution is **bimodal** (two peaks). How might it look on a **box plot** vs a **violin plot**?
 
-- Identical on both.
-  > Box plots and violin plots are not equivalent representations. A box plot condenses the distribution into five summary numbers and cannot reveal shape features like bimodality, while a violin plot's density curve can.
 - A clear bimodal shape on the box; flat on the violin.
   > The descriptions are reversed. It is the violin plot that reveals shape (including two peaks) through its density curve. A box plot can only show a single median line, it has no way to display two peaks.
-- [o] Featureless on the box plot (the box can't show two peaks), but clearly bimodal on the violin plot.
-  > This is exactly why violin plots exist. Box plots reduce a distribution to 5 summary numbers, so two very different shapes (bimodal vs unimodal with the same median and IQR) look identical as boxes. Violin plots add the density curve, revealing the shape.
 - The box would have two medians.
   > A box plot always has exactly one median line, it is the value that splits the data in half. There is no mechanism in a box plot to represent two separate peaks.
+- [o] Featureless on the box plot (the box can't show two peaks), but clearly bimodal on the violin plot.
+  > This is exactly why violin plots exist. Box plots reduce a distribution to 5 summary numbers, so two very different shapes (bimodal vs unimodal with the same median and IQR) look identical as boxes. Violin plots add the density curve, revealing the shape.
+- Identical on both.
+  > Box plots and violin plots are not equivalent representations. A box plot condenses the distribution into five summary numbers and cannot reveal shape features like bimodality, while a violin plot's density curve can.
 
 If you ever feel "this box is suspicious," reach for a violin or a histogram.`}
 />
@@ -275,14 +275,14 @@ If you ever feel "this box is suspicious," reach for a violin or a histogram.`}
 <MultipleChoice
   markdown={`The dots beyond a box plot's whiskers are commonly called **outliers**. Are they always errors in the data?
 
-- Yes, always.
-  > Labeling every point beyond the whiskers as an error would be incorrect. Box plot outlier dots mark values that are far from the bulk of the distribution, but they are just data points, they may be perfectly real measurements.
-- Yes, unless the chart says otherwise.
-  > There is no standard notation on a box plot that signals whether an outlier dot is an error or a real value. The only reliable way to determine that is to inspect the actual data, not the chart.
 - [o] No, a dot beyond the whiskers is simply a value more than ~1.5×IQR from the box. It may be a real, legitimate observation.
   > "Outlier" is a *statistical* term meaning "far from the bulk of the distribution," not a value judgment. The dot might be a typo, or it might be a real Mt. Everest in a chart of mountain heights. Always investigate outliers, don't reflexively delete them.
+- Yes, unless the chart says otherwise.
+  > There is no standard notation on a box plot that signals whether an outlier dot is an error or a real value. The only reliable way to determine that is to inspect the actual data, not the chart.
 - No, only if the chart is wrong.
   > A box plot accurately reflects the data given to it. The outlier dots are not a symptom of a broken chart, they are a faithful representation of values that fall beyond the whisker thresholds in the data.
+- Yes, always.
+  > Labeling every point beyond the whiskers as an error would be incorrect. Box plot outlier dots mark values that are far from the bulk of the distribution, but they are just data points, they may be perfectly real measurements.
 
 Box-plot outliers are an *invitation to investigate*, not a verdict.`}
 />

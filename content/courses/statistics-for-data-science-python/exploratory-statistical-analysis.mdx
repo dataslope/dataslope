@@ -455,14 +455,14 @@ flowchart TD
 <MultipleChoice
   markdown={`During EDA you notice that, in your dataset, customers who used coupon "SAVE10" churned 12% less. What is the correct status of this finding?
 
-- A confirmed result you can report: coupons reduce churn by 12%
-  > A pattern spotted during exploration is a candidate hypothesis, not a confirmed result. Reporting it as established skips the confirmatory step entirely.
-- [o] A hypothesis to test later on fresh or held-out data, since exploration generated it
-  > Exploration surfaces leads; turning a lead into a claim requires testing it on data that did not suggest it, to avoid inflated false positives.
 - Proof that coupons cause lower churn
   > Beyond being unconfirmed, this is observational data, so even a confirmed correlation would not establish causation without randomization.
+- A confirmed result you can report: coupons reduce churn by 12%
+  > A pattern spotted during exploration is a candidate hypothesis, not a confirmed result. Reporting it as established skips the confirmatory step entirely.
 - Meaningless, because EDA findings are always noise
   > EDA findings are not worthless; they are exactly how good hypotheses are born. They simply must be confirmed before they count as conclusions.
+- [o] A hypothesis to test later on fresh or held-out data, since exploration generated it
+  > Exploration surfaces leads; turning a lead into a claim requires testing it on data that did not suggest it, to avoid inflated false positives.
 
 EDA generates hypotheses; confirmation tests them, on different data.`}
 />
@@ -611,14 +611,14 @@ assert abs(best_r - corr.max()) < 1e-9`,
 <MultipleChoice
   markdown={`What is the defining purpose of *exploratory* data analysis (as opposed to confirmatory)?
 
-- To produce final p-values and decisions
-  > Producing tested claims with p-values is the role of confirmatory analysis. Exploration comes earlier and yields questions, not verdicts.
-- [o] To understand the data and generate candidate hypotheses, without treating any finding as confirmed
-  > Exploration is open-ended hypothesis generation; its outputs are leads to be tested later, not conclusions.
 - To prove your hypothesis is correct using the data you have
   > Using your data to "prove" the hypothesis it suggested is precisely the trap EDA must avoid; proof requires a separate confirmatory test.
 - To clean the data only, with no analysis
   > Cleaning is part of it, but EDA also examines distributions, relationships, and outliers to surface hypotheses, far more than cleaning alone.
+- [o] To understand the data and generate candidate hypotheses, without treating any finding as confirmed
+  > Exploration is open-ended hypothesis generation; its outputs are leads to be tested later, not conclusions.
+- To produce final p-values and decisions
+  > Producing tested claims with p-values is the role of confirmatory analysis. Exploration comes earlier and yields questions, not verdicts.
 
 Exploration generates; confirmation tests. Keep the two separate.`}
 />
@@ -626,14 +626,14 @@ Exploration generates; confirmation tests. Keep the two separate.`}
 <MultipleChoice
   markdown={`You explore a dataset, spot that "users from Region X spend more," and immediately run a t-test on that *same* dataset comparing Region X to others. Why is the resulting p-value untrustworthy?
 
-- Because t-tests can't be used on spending data
-  > A t-test is perfectly appropriate for comparing two groups' means; the problem is not the choice of test.
-- Because the sample is always too small for a t-test
-  > Sample size is a separate concern; even with a large sample, testing the hypothesis on the data that suggested it inflates false positives.
-- [o] Because the hypothesis was chosen *because* it stood out in this data, so testing it on the same data inflates the false-positive rate
-  > Selecting a pattern by eye and then testing it on the same data is the garden of forking paths, you implicitly ran many comparisons and reported the winner.
 - Because p-values are never trustworthy
   > P-values are trustworthy when the hypothesis is pre-specified and tested on independent data; the issue here is the circular reuse of one dataset.
+- Because t-tests can't be used on spending data
+  > A t-test is perfectly appropriate for comparing two groups' means; the problem is not the choice of test.
+- [o] Because the hypothesis was chosen *because* it stood out in this data, so testing it on the same data inflates the false-positive rate
+  > Selecting a pattern by eye and then testing it on the same data is the garden of forking paths, you implicitly ran many comparisons and reported the winner.
+- Because the sample is always too small for a t-test
+  > Sample size is a separate concern; even with a large sample, testing the hypothesis on the data that suggested it inflates false positives.
 
 Confirm a data-suggested hypothesis on fresh or held-out data.`}
 />
@@ -641,14 +641,14 @@ Confirm a data-suggested hypothesis on fresh or held-out data.`}
 <MultipleChoice
   markdown={`During EDA you find 6% of rows are missing the income field. What's the most responsible next step?
 
-- Immediately drop those rows and proceed
-  > Dropping is only safe if data is missing completely at random; doing it reflexively can bias results if missingness relates to income itself.
-- Fill them all with zero so the column is complete
-  > Filling with zero invents data and can severely distort summaries; it treats "unknown" as "none," which is usually false.
 - [o] Investigate *why* income is missing and whether the missingness relates to other variables before choosing how to handle it
   > The mechanism behind missingness determines whether dropping or imputing is safe; understanding it comes before any fix.
 - Ignore it, since 6% is small
   > Even a small fraction can bias conclusions if it is missing non-randomly (e.g., high earners declining to report); the pattern matters more than the size.
+- Fill them all with zero so the column is complete
+  > Filling with zero invents data and can severely distort summaries; it treats "unknown" as "none," which is usually false.
+- Immediately drop those rows and proceed
+  > Dropping is only safe if data is missing completely at random; doing it reflexively can bias results if missingness relates to income itself.
 
 How you handle missing data depends on *why* it's missing.`}
 />
@@ -658,10 +658,10 @@ How you handle missing data depends on *why* it's missing.`}
 
 - Age causes higher income; report it
   > Correlation never establishes causation, and a single matrix cell from exploration is not a confirmed finding in any case.
-- The relationship is definitely real and strong
-  > A correlation spotted while scanning many pairs may be partly chance, and 0.45 is moderate; it is a lead to verify, not an established fact.
 - [o] There's a moderate positive association in this sample worth forming into a hypothesis and testing properly later
   > A matrix surfaces candidate relationships; the responsible step is to treat 0.45 as a hypothesis to confirm, mindful that it is observational and exploratory.
+- The relationship is definitely real and strong
+  > A correlation spotted while scanning many pairs may be partly chance, and 0.45 is moderate; it is a lead to verify, not an established fact.
 - The correlation proves nothing and should be discarded
   > Exploratory correlations are valuable as hypotheses; discarding them wastes the very leads EDA exists to produce.
 

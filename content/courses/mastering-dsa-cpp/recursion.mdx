@@ -319,12 +319,12 @@ A base case is the smallest input that can be answered directly.`}
 <MultipleChoice
   markdown={`What is the time complexity of naive recursive Fibonacci?
 
+- [o] Exponential, often written as O(2^n)
+  > Each call branches and repeats work.
 - O(n)
   > This fits iterative or memoized Fibonacci, not the naive recursive version.
 - O(n log n)
   > The branching recurrence is larger than this.
-- [o] Exponential, often written as O(2^n)
-  > Each call branches and repeats work.
 - O(log n)
   > O(log n) fits fast exponentiation, not naive Fibonacci.
 
@@ -334,14 +334,14 @@ Repeated subproblems are what dynamic programming fixes.`}
 <MultipleChoice
   markdown={`What does recursion use under the hood to remember unfinished calls?
 
-- A priority queue
-  > A priority queue orders values by priority, not function calls.
-- A hash table
-  > Hash tables help memoization but are not required for recursion itself.
-- [o] The call stack
-  > Each active call has its own stack frame.
 - A sorted vector
   > Sorting is unrelated to tracking recursive calls.
+- [o] The call stack
+  > Each active call has its own stack frame.
+- A hash table
+  > Hash tables help memoization but are not required for recursion itself.
+- A priority queue
+  > A priority queue orders values by priority, not function calls.
 
 The call stack explains returns and stack overflow.`}
 />

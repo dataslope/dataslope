@@ -172,12 +172,12 @@ best way to make sure the chart matches your intention.
 
 - Color.
   > Color hue is effective for encoding categorical distinctions but is a weak channel for precise quantitative judgment; the eye cannot reliably rank subtle color differences the way it can compare bar lengths.
+- Shape.
+  > Shape is a categorical encoding that can distinguish groups but conveys no quantitative information; the eye cannot judge "more" or "less" from different marker symbols.
 - Size (area).
   > Area judgments are less precise than length judgments; humans systematically underestimate larger areas relative to smaller ones, making size a poor channel for fine quantitative comparison.
 - [o] Position along an axis.
   > Position is the most accurate visual encoding (Cleveland-McGill ranking). Reserve x and y for the variables you want the reader to compare carefully. Use color and size for variables where "roughly bigger / smaller" is enough.
-- Shape.
-  > Shape is a categorical encoding that can distinguish groups but conveys no quantitative information; the eye cannot judge "more" or "less" from different marker symbols.
 
 Always start your design by asking *which variable matters most*, and give it position.`}
 />
@@ -185,14 +185,14 @@ Always start your design by asking *which variable matters most*, and give it po
 <MultipleChoice
   markdown={`When is using **symbol** as a redundant encoding with **color** for the same column **legitimate**?
 
-- Never; it's always wasteful.
-  > Redundant encoding is a deliberate accessibility technique when the chart must work in grayscale or for colorblind viewers; it is wasteful only when there is no such reason.
 - Always; redundancy is good.
   > Automatically making every encoding redundant wastes a visual channel that could encode an additional variable, and can add clutter without benefit when accessibility is not a concern.
-- [o] When you need the chart to remain readable in **grayscale** or for **colorblind viewers**, the shape carries the categorical info even if color fails.
-  > Redundant encoding sounds wasteful in a vacuum but is a deliberate accessibility move when the chart will be printed in B&W or viewed by users with color vision deficiency. Otherwise it can be a wasted channel you could have given to a different variable.
+- Never; it's always wasteful.
+  > Redundant encoding is a deliberate accessibility technique when the chart must work in grayscale or for colorblind viewers; it is wasteful only when there is no such reason.
 - Only when you have exactly two categories.
   > The accessibility rationale for redundant encoding, making the chart work without color, applies to any number of categories, not just two.
+- [o] When you need the chart to remain readable in **grayscale** or for **colorblind viewers**, the shape carries the categorical info even if color fails.
+  > Redundant encoding sounds wasteful in a vacuum but is a deliberate accessibility move when the chart will be printed in B&W or viewed by users with color vision deficiency. Otherwise it can be a wasted channel you could have given to a different variable.
 
 Use redundancy as a tool, not a habit.`}
 />
@@ -200,12 +200,12 @@ Use redundancy as a tool, not a habit.`}
 <MultipleChoice
   markdown={`Roughly how many distinct **shapes** can the eye reliably distinguish in a crowded scatter plot?
 
-- 20+
-  > At 20+ shapes, the viewer would need to memorize a legend of highly similar symbols; in practice the eye can only distinguish a handful of marker types reliably in a crowded plot.
 - 12-15
   > This overestimates the eye's ability to distinguish shapes in a dense scatter plot; empirical research on preattentive processing places the reliable limit much lower.
 - [o] About 6 or fewer.
   > Past about 6 shapes, viewers start confusing similar ones (●  ●  ■  ▲ ▼ ◆ ★ ✦). For more than a handful of categories, shape becomes ineffective. Use facets or filter the data instead.
+- 20+
+  > At 20+ shapes, the viewer would need to memorize a legend of highly similar symbols; in practice the eye can only distinguish a handful of marker types reliably in a crowded plot.
 - 2 only.
   > Two shapes are trivially distinguishable, but the practical limit is higher than two; up to about 6 distinct shapes can be reliably told apart before confusion sets in.
 

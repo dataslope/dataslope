@@ -299,12 +299,12 @@ Pass three separate arguments to \`print\` (not one pre-joined string) and use t
 print("a", "b", "c", sep="-", end="!")
 \`\`\`
 
+- [o] \`a-b-c!\`
+  > Items are joined by \`sep\` and \`end\` is appended after them.
 - \`a b c\`
   > The default \`sep\` is a single space, but here it has been overridden to \`"-"\`.
 - \`a-b-c\\n\`
   > \`end\` was overridden too, so there is no trailing newline.
-- [o] \`a-b-c!\`
-  > Items are joined by \`sep\` and \`end\` is appended after them.
 - \`a-b-c!\\n\`
   > The default \`end\` is \`"\\n"\`, but it was overridden to \`"!"\`.`}
 />
@@ -312,25 +312,25 @@ print("a", "b", "c", sep="-", end="!")
 <MultipleChoice
   markdown={`What is a docstring?
 
-- A comment that starts with \`#\`
-  > That is a regular comment, not a docstring.
-- Any triple-quoted string in the code
-  > Not quite. It must be the first statement in a module, function, or class.
 - [o] A string literal at the top of a module, function, or class, used for documentation
   > Docstrings are stored in \`__doc__\` and read by \`help()\` and documentation tools.
+- Any triple-quoted string in the code
+  > Not quite. It must be the first statement in a module, function, or class.
 - A string that is never executed
-  > All string literals are evaluated, but docstrings are retained for introspection.`}
+  > All string literals are evaluated, but docstrings are retained for introspection.
+- A comment that starts with \`#\`
+  > That is a regular comment, not a docstring.`}
 />
 
 <MultipleChoice
   markdown={`Which of the following prints "Hello" with no trailing newline?
 
+- [o] \`print("Hello", end="")\`
+  > Setting \`end=""\` removes the newline.
 - \`print("Hello", newline=False)\`
   > The parameter is named \`end\`, not \`newline\`.
 - \`print("Hello", end="\\n")\`
   > \`end="\\n"\` is already the default, so this still prints a trailing newline.
-- [o] \`print("Hello", end="")\`
-  > Setting \`end=""\` removes the newline.
 - \`print("Hello", sep="")\`
   > \`sep\` controls how multiple arguments are joined, not the ending.`}
 />

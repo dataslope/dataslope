@@ -129,14 +129,14 @@ would both count as matches.
 <MultipleChoice
   markdown={`Which clause keeps only rows that pass a test?
 
-- SELECT
-  > SELECT chooses which columns appear.
-- [o] WHERE
-  > WHERE applies a condition to each row and keeps only true matches.
 - ORDER BY
   > ORDER BY changes row order after rows have been chosen.
+- SELECT
+  > SELECT chooses which columns appear.
 - LIMIT
-  > LIMIT trims how many rows are returned.`}
+  > LIMIT trims how many rows are returned.
+- [o] WHERE
+  > WHERE applies a condition to each row and keeps only true matches.`}
 />
 
 ## Combine conditions with AND, OR, and NOT
@@ -408,21 +408,21 @@ ORDER BY
 
 - More than 10 and less than 20, excluding both ends.
   > BETWEEN includes its boundary values.
-- [o] From 10 through 20, including 10 and 20.
-  > SQLite treats BETWEEN as an inclusive range test.
 - Exactly 10 or exactly 20 only.
   > Values between the two ends also match.
 - Any price except 10 through 20.
-  > That would need NOT BETWEEN.`}
+  > That would need NOT BETWEEN.
+- [o] From 10 through 20, including 10 and 20.
+  > SQLite treats BETWEEN as an inclusive range test.`}
 />
 
 <MultipleChoice
   markdown={`Which condition keeps books that are either Fiction or Travel?
 
-- genre = 'Fiction' AND genre = 'Travel'
-  > One row cannot have both different genre values at the same time.
 - [o] genre IN ('Fiction', 'Travel')
   > IN checks whether the value is any item in the list.
+- genre = 'Fiction' AND genre = 'Travel'
+  > One row cannot have both different genre values at the same time.
 - genre NOT IN ('Fiction', 'Travel')
   > NOT IN keeps everything outside the list.
 - genre LIKE 'Fiction Travel'
@@ -432,12 +432,12 @@ ORDER BY
 <MultipleChoice
   markdown={`In SQLite, what does the LIKE pattern 'Data%' match?
 
-- Only the exact text Data%.
-  > The percent sign is a wildcard in a LIKE pattern.
-- [o] Text that starts with Data, followed by any characters.
-  > Percent means any number of characters after Data.
 - Text that ends with Data.
   > A pattern for ending with Data would be '%Data'.
 - Only text with exactly one character after Data.
-  > The underscore wildcard matches one character; percent matches any number.`}
+  > The underscore wildcard matches one character; percent matches any number.
+- [o] Text that starts with Data, followed by any characters.
+  > Percent means any number of characters after Data.
+- Only the exact text Data%.
+  > The percent sign is a wildcard in a LIKE pattern.`}
 />

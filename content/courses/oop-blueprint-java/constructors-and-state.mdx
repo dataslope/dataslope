@@ -356,38 +356,38 @@ bad: invalid email
 <MultipleChoice
   markdown={`What is the single most important job of a constructor?
 
-- To call all the other methods in the class
-  > Constructors typically don't call public methods at all.
 - [o] To bring an object into existence in a valid state, enforcing its invariants
   > After a constructor returns, every other method should be able to assume the object is valid.
-- To print a debug message describing the new object
-  > Side effects like logging don't belong in constructors.
 - To allocate memory for the object
-  > Allocation is the JVM's job; the constructor *initializes* an already-allocated object.`}
+  > Allocation is the JVM's job; the constructor *initializes* an already-allocated object.
+- To call all the other methods in the class
+  > Constructors typically don't call public methods at all.
+- To print a debug message describing the new object
+  > Side effects like logging don't belong in constructors.`}
 />
 
 <MultipleChoice
   markdown={`If a class declares the constructor \`public Person(String name, int age)\` and *no* no-argument constructor, what happens when you write \`new Person()\`?
 
-- It runs Java's default no-arg constructor
-  > That freebie is only generated when no other constructor is declared.
 - It runs the two-argument constructor with \`null\` and \`0\`
   > Java does not invent argument values.
-- [o] It fails to compile, there is no matching constructor
-  > Once you declare any constructor, the implicit no-arg one disappears.
 - It produces a \`NullPointerException\` at runtime
-  > The problem is detected at compile time, not runtime.`}
+  > The problem is detected at compile time, not runtime.
+- It runs Java's default no-arg constructor
+  > That freebie is only generated when no other constructor is declared.
+- [o] It fails to compile, there is no matching constructor
+  > Once you declare any constructor, the implicit no-arg one disappears.`}
 />
 
 <MultipleChoice
   markdown={`Why is it useful for a class like \`Money\` to be immutable (all fields \`final\`, operations like \`add\` return new instances)?
 
+- [o] They cannot accidentally change underneath you, so they can be passed and shared freely without surprising mutations
+  > Immutability eliminates an entire class of bug.
 - Immutable objects are slightly larger in memory and that helps caching
   > Size is unrelated to the benefits of immutability.
 - The JVM can compile them down to machine code more easily
   > That's not the design motivation.
-- [o] They cannot accidentally change underneath you, so they can be passed and shared freely without surprising mutations
-  > Immutability eliminates an entire class of bug.
 - They automatically run faster than mutable objects
   > Performance is not guaranteed; safety is the real benefit.`}
 />

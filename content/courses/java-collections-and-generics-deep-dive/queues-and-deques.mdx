@@ -404,23 +404,23 @@ public class SlidingWindow<E> {
 <MultipleChoice
   markdown={`Which is the modern recommended implementation when you want a plain FIFO \`Queue<E>\`?
 
-- \`LinkedList\`
-  > It works, but \`ArrayDeque\` is faster and uses less memory.
+- \`Vector\`
+  > Legacy and synchronized.
 - [o] \`ArrayDeque\`
   > Circular array, both ends \`O(1)\`, far better cache behavior than a linked list.
+- \`LinkedList\`
+  > It works, but \`ArrayDeque\` is faster and uses less memory.
 - \`PriorityQueue\`
-  > That gives you priority order, not FIFO.
-- \`Vector\`
-  > Legacy and synchronized.`}
+  > That gives you priority order, not FIFO.`}
 />
 
 <MultipleChoice
   markdown={`What does \`pq.poll()\` return on a non-empty \`PriorityQueue<Integer>\` built with default ordering?
 
-- The most recently inserted element
-  > That would be LIFO, not priority.
 - The first inserted element
   > That would be FIFO, not priority.
+- The most recently inserted element
+  > That would be LIFO, not priority.
 - [o] The smallest element according to natural order
   > The heap is a min-heap by default; use \`Comparator.reverseOrder()\` for a max-heap.
 - A random element
@@ -430,12 +430,12 @@ public class SlidingWindow<E> {
 <MultipleChoice
   markdown={`What's wrong with iterating a \`PriorityQueue\` to get sorted output?
 
-- Iteration throws \`UnsupportedOperationException\`
-  > It does not.
 - [o] Iteration walks the underlying heap array, which is *not* in sorted order, drain via \`poll()\` if you need sorted order
   > Heap order only guarantees the *root* is the smallest; the rest is partially ordered.
-- It is \`O(n²)\`
-  > Iteration is \`O(n)\`.
+- Iteration throws \`UnsupportedOperationException\`
+  > It does not.
 - It mutates the queue
-  > Iteration alone doesn't mutate; only \`poll()\` removes.`}
+  > Iteration alone doesn't mutate; only \`poll()\` removes.
+- It is \`O(n²)\`
+  > Iteration is \`O(n)\`.`}
 />

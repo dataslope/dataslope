@@ -156,14 +156,14 @@ well once you understand them.
 <MultipleChoice
   markdown={`What is the main goal of organizing data into multiple related tables?
 
-- To make every query run as fast as possible.
-  > Splitting targets correctness and reduced duplication; it can even add joins. Speed is a separate concern.
 - [o] To store each fact once, removing the duplication that causes update, insertion, and deletion problems.
   > Giving every fact a single home removes the inconsistencies duplicated data creates.
-- To combine many tables into one big table.
-  > That is the opposite; combining tables reintroduces duplication.
+- To make every query run as fast as possible.
+  > Splitting targets correctness and reduced duplication; it can even add joins. Speed is a separate concern.
 - To remove all relationships between tables.
   > Good organization relies on relationships (foreign keys) to link the split-out tables.
+- To combine many tables into one big table.
+  > That is the opposite; combining tables reintroduces duplication.
 
 Splitting data removes duplication so each fact lives in exactly one place.`}
 />
@@ -171,12 +171,12 @@ Splitting data removes duplication so each fact lives in exactly one place.`}
 <MultipleChoice
   markdown={`A flat orders table repeats each customer's email on every order row. What problem does this most directly cause?
 
-- Queries become impossible to write.
-  > Queries still work; the issue is keeping the duplicated values consistent.
-- [o] An update problem: changing the email means updating every row that repeats it, risking inconsistency.
-  > With the email duplicated, one missed row leaves the data disagreeing with itself.
 - The table can store only one customer.
   > A flat table can store many customers; the problem is the repetition, not capacity.
+- [o] An update problem: changing the email means updating every row that repeats it, risking inconsistency.
+  > With the email duplicated, one missed row leaves the data disagreeing with itself.
+- Queries become impossible to write.
+  > Queries still work; the issue is keeping the duplicated values consistent.
 - Foreign keys stop working.
   > A flat table has no such foreign keys yet; the problem is duplication.
 
@@ -186,14 +186,14 @@ Duplicated values force multi-row updates, the classic update problem.`}
 <MultipleChoice
   markdown={`After splitting into \`customers\`, \`products\`, and \`orders\`, how do you reproduce the original flat, all-in-one-row view?
 
-- It is permanently lost once you split the tables.
-  > The information is preserved; it is simply recombined on demand.
 - [o] Join the tables back together on their keys whenever you need the combined view.
   > A join recomputes the flat view from the single-source-of-truth tables.
 - Copy the columns back into the orders table.
   > Copying columns back would reintroduce the very duplication you removed.
 - Delete the foreign keys.
   > Foreign keys are what make the join possible; removing them would break the link.
+- It is permanently lost once you split the tables.
+  > The information is preserved; it is simply recombined on demand.
 
 A join rebuilds the combined view from the organized tables without storing duplication.`}
 />
@@ -201,14 +201,14 @@ A join rebuilds the combined view from the organized tables without storing dupl
 <MultipleChoice
   markdown={`The phrase "the key, the whole key, and nothing but the key" is a reminder that…
 
-- a table may have only one column.
-  > Tables can have many columns; the phrase is about what those columns depend on.
-- primary keys must be numbers.
-  > Keys need not be numbers; the phrase concerns dependency, not data type.
 - [o] every non-key column should be a fact about that row's key, and nothing else.
   > Each column should describe the key itself; unrelated facts belong in their own table.
+- a table may have only one column.
+  > Tables can have many columns; the phrase is about what those columns depend on.
 - foreign keys are unnecessary.
   > Foreign keys remain essential for linking the split-out tables.
+- primary keys must be numbers.
+  > Keys need not be numbers; the phrase concerns dependency, not data type.
 
 The phrase captures the goal: non-key columns describe the key, the whole key, and nothing else.`}
 />

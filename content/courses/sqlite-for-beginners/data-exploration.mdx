@@ -268,14 +268,14 @@ two minutes ago, you have the skill this page set out to teach.
 <MultipleChoice
   markdown={`You open an unfamiliar SQLite database and want a list of its tables. Which is the most reliable first step?
 
-- Guess common table names like \`users\` and \`data\` and \`SELECT\` from them.
-  > Guessing wastes time and fails on databases with unusual names.
-- [o] Query \`sqlite_master\` (or \`sqlite_schema\`) where \`type = 'table'\`.
-  > SQLite stores a catalog of itself there, so this lists every table reliably.
-- Run \`SELECT * \` with no \`FROM\` clause.
-  > That does not enumerate tables; it would just error or return a single computed row.
 - Delete a table to see what happens.
   > Never explore by destroying data; you want to *read* the catalog, not change it.
+- [o] Query \`sqlite_master\` (or \`sqlite_schema\`) where \`type = 'table'\`.
+  > SQLite stores a catalog of itself there, so this lists every table reliably.
+- Guess common table names like \`users\` and \`data\` and \`SELECT\` from them.
+  > Guessing wastes time and fails on databases with unusual names.
+- Run \`SELECT * \` with no \`FROM\` clause.
+  > That does not enumerate tables; it would just error or return a single computed row.
 
 \`sqlite_master\` is SQLite's built-in catalog of its own tables, indexes, and views.`}
 />
@@ -283,14 +283,14 @@ two minutes ago, you have the skill this page set out to teach.
 <MultipleChoice
   markdown={`Why add \`LIMIT 5\` when peeking at rows from a table you don't know?
 
+- Because without it the query would be invalid.
+  > The query is valid without \`LIMIT\`; the limit is purely for a manageable sample.
 - Because \`SELECT\` requires a \`LIMIT\`.
   > \`LIMIT\` is optional; \`SELECT\` works without it.
 - [o] To see a small sample quickly without pulling back a potentially huge table.
   > A small peek is fast and enough to learn the column shapes and value formats.
 - Because \`LIMIT\` sorts the rows for you.
   > \`LIMIT\` does not sort; only \`ORDER BY\` does. \`LIMIT\` just caps the row count.
-- Because without it the query would be invalid.
-  > The query is valid without \`LIMIT\`; the limit is purely for a manageable sample.
 
 A small \`LIMIT\` gives a quick, cheap look at representative rows.`}
 />
@@ -300,12 +300,12 @@ A small \`LIMIT\` gives a quick, cheap look at representative rows.`}
 
 *Hint: \`COUNT(*)\` counts all rows, while \`COUNT(amount)\` counts only rows where \`amount\` is present.*
 
-- The table has 388 rows.
-  > These are two counts of the same 200 rows, not two separate tables to add together.
 - Nothing, the two counts should always match.
   > They differ precisely because \`COUNT(amount)\` ignores \`NULL\`s while \`COUNT(*)\` does not.
 - [o] 12 rows have a \`NULL\` (missing) \`amount\`.
   > \`COUNT(*)\` counts all rows; \`COUNT(amount)\` skips \`NULL\`s, so the gap of 12 is the missing values.
+- The table has 388 rows.
+  > These are two counts of the same 200 rows, not two separate tables to add together.
 - The \`amount\` column is the primary key.
   > Primary keys cannot be \`NULL\`, so this pattern would be impossible for one.
 
@@ -315,10 +315,10 @@ A small \`LIMIT\` gives a quick, cheap look at representative rows.`}
 <MultipleChoice
   markdown={`Which query best reveals how a category column \`status\` is distributed?
 
-- \`SELECT * FROM tickets;\`
-  > Dumping every row makes you eyeball distribution by hand, slow and error-prone.
 - [o] \`SELECT status, COUNT(*) FROM tickets GROUP BY status ORDER BY COUNT(*) DESC;\`
   > Grouping and counting builds a frequency table that shows each value and how often it occurs.
+- \`SELECT * FROM tickets;\`
+  > Dumping every row makes you eyeball distribution by hand, slow and error-prone.
 - \`SELECT MAX(status) FROM tickets;\`
   > A single max value says nothing about how the categories are distributed.
 - \`SELECT DISTINCT status FROM tickets LIMIT 1;\`

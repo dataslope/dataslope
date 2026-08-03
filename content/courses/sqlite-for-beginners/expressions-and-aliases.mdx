@@ -95,12 +95,12 @@ examples, though real financial systems need more careful rules.
 
 - It saves line_total as a permanent table column.
   > The expression appears only in the query result.
-- [o] It names the computed result column line_total.
-  > An alias gives the output column a readable name.
 - It changes multiplication into addition.
   > The alias does not change the calculation.
 - It filters rows where line_total is missing.
-  > Filtering rows is done with WHERE.`}
+  > Filtering rows is done with WHERE.
+- [o] It names the computed result column line_total.
+  > An alias gives the output column a readable name.`}
 />
 
 ## AS aliases make results readable
@@ -271,12 +271,12 @@ the sorted result.
 
 - A value that must already be stored in the table.
   > Stored columns can be selected, but computed columns are calculated by the query.
+- A filter that removes rows.
+  > Filtering rows is the role of WHERE.
 - [o] A value calculated by an expression for each row.
   > Expressions such as price times quantity create new result values.
 - A column that always changes the table structure.
-  > A SELECT expression does not alter the table.
-- A filter that removes rows.
-  > Filtering rows is the role of WHERE.`}
+  > A SELECT expression does not alter the table.`}
 />
 
 <MultipleChoice
@@ -295,25 +295,25 @@ the sorted result.
 <MultipleChoice
   markdown={`Which function would you use to count the characters in a text value?
 
+- substr
+  > substr returns part of a text value.
 - ROUND
   > ROUND changes a number, not text length.
 - UPPER
   > UPPER changes letters to uppercase.
 - [o] LENGTH
-  > LENGTH returns the number of characters in a text value.
-- substr
-  > substr returns part of a text value.`}
+  > LENGTH returns the number of characters in a text value.`}
 />
 
 <MultipleChoice
   markdown={`Why use AS total_price after an expression?
 
-- To permanently rename a table column.
-  > Aliases apply only to the query result.
-- To make SQLite store the expression for later automatically.
-  > A normal SELECT expression is calculated only for the result.
 - [o] To give the result column a clear name.
   > AS creates a readable heading for the output column.
+- To permanently rename a table column.
+  > Aliases apply only to the query result.
 - To force the result to sort by that column.
-  > Sorting requires ORDER BY.`}
+  > Sorting requires ORDER BY.
+- To make SQLite store the expression for later automatically.
+  > A normal SELECT expression is calculated only for the result.`}
 />

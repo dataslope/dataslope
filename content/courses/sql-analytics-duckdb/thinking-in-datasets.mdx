@@ -138,14 +138,14 @@ ever reading a single individual diamond. That is thinking in datasets.
 <MultipleChoice
   markdown={`Why do analysts rely on **summaries** when working with large datasets?
 
-- Because SQL is unable to return individual rows.
-  > SQL can return individual rows; analysts choose summaries because raw rows are too numerous to comprehend.
 - [o] Because a dataset of millions of rows is too large to read directly, so summaries reveal its shape.
   > Counts, ranges, and averages compress an unreadable table into a few numbers a human can reason about.
-- Because summaries are the only queries databases can run quickly.
-  > Databases run many kinds of queries; summarizing is a choice driven by human comprehension, not the only fast option.
 - Because individual rows are always inaccurate.
   > Individual rows are not inherently inaccurate; they are simply too many to inspect one by one.
+- Because SQL is unable to return individual rows.
+  > SQL can return individual rows; analysts choose summaries because raw rows are too numerous to comprehend.
+- Because summaries are the only queries databases can run quickly.
+  > Databases run many kinds of queries; summarizing is a choice driven by human comprehension, not the only fast option.
 
 You summarize because you cannot see a million rows at once, the summary
 *is* how you "see" the data.`}
@@ -154,14 +154,14 @@ You summarize because you cannot see a million rows at once, the summary
 <MultipleChoice
   markdown={`Which best describes the **exploratory analysis loop**?
 
-- Write one perfect query at the start and never change it.
-  > Analysis is iterative; you rarely know the final query up front. A single fixed query is more typical of application code.
-- [o] Ask a question, run a query, inspect the result, and let what you find shape the next question.
-  > This question to query to look to next-question cycle is the heart of exploratory data analysis.
-- Insert data, then immediately delete it.
-  > That is not analysis at all; it describes data manipulation with no insight produced.
 - Export everything to a spreadsheet and scroll through it.
   > Scrolling through millions of rows is exactly what the loop avoids by summarizing instead.
+- Insert data, then immediately delete it.
+  > That is not analysis at all; it describes data manipulation with no insight produced.
+- [o] Ask a question, run a query, inspect the result, and let what you find shape the next question.
+  > This question to query to look to next-question cycle is the heart of exploratory data analysis.
+- Write one perfect query at the start and never change it.
+  > Analysis is iterative; you rarely know the final query up front. A single fixed query is more typical of application code.
 
 Exploration is a loop: each result suggests the next, sharper question.`}
 />
@@ -169,14 +169,14 @@ Exploration is a loop: each result suggests the next, sharper question.`}
 <MultipleChoice
   markdown={`What is **drill-down** in analysis?
 
+- Joining every table in the database at once.
+  > Joining everything indiscriminately is not drill-down; drill-down is a measured, one-dimension-at-a-time refinement.
+- Running the same query repeatedly until it gets faster.
+  > Repetition does not add analytical detail; drill-down is about adding dimensions, not speed.
 - Deleting rows until the table is small enough to read.
   > Drill-down adds detail to summaries; it does not delete data.
 - [o] Starting from a coarse summary and progressively adding detail where something looks interesting.
   > You begin with the big picture (e.g. total revenue), then add dimensions like region, then month, following the surprises.
-- Running the same query repeatedly until it gets faster.
-  > Repetition does not add analytical detail; drill-down is about adding dimensions, not speed.
-- Joining every table in the database at once.
-  > Joining everything indiscriminately is not drill-down; drill-down is a measured, one-dimension-at-a-time refinement.
 
 Drill-down means going from coarse to fine, one dimension at a time,
 guided by what looks worth investigating.`}

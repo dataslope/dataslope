@@ -202,40 +202,40 @@ logs, sessions, or feeds.
 <MultipleChoice
   markdown={`Under the **cache-aside** pattern, what happens on a cache **miss**?
 
-- The request fails and the client must retry against the database directly.
-  > A miss is normal, not an error; the app transparently falls back to the database.
-- [o] The app reads from the database, writes the value back into the cache, then returns it.
-  > That is exactly cache-aside (lazy loading): only requested keys get cached, and the next read for that key is a hit.
+- The database write is skipped to save latency.
+  > On a miss there is no write to skip; the app reads the DB and populates the cache.
 - The cache automatically fetches the value from the database on its own.
   > That describes read-through caching, where the cache library loads on miss. Cache-aside puts that logic in the application.
-- The database write is skipped to save latency.
-  > On a miss there is no write to skip; the app reads the DB and populates the cache.`}
+- [o] The app reads from the database, writes the value back into the cache, then returns it.
+  > That is exactly cache-aside (lazy loading): only requested keys get cached, and the next read for that key is a hit.
+- The request fails and the client must retry against the database directly.
+  > A miss is normal, not an error; the app transparently falls back to the database.`}
 />
 
 <MultipleChoice
   markdown={`During a network **partition**, the CAP theorem says a distributed system must sacrifice one of two guarantees. Which two?
 
-- Latency and throughput.
-  > Those are performance properties, not the CAP trade-off, which is about correctness during a partition.
 - Durability and availability.
   > Durability is not one of CAP's three letters; the theorem is about consistency, availability, and partition tolerance.
-- [o] Consistency and availability.
-  > With a partition unavoidable (the P), you must choose: stay consistent and reject some requests (CP), or stay available and risk stale reads (AP).
+- Latency and throughput.
+  > Those are performance properties, not the CAP trade-off, which is about correctness during a partition.
 - Consistency and partition tolerance.
-  > Partition tolerance is not optional in a real network; the forced choice during a partition is between consistency and availability.`}
+  > Partition tolerance is not optional in a real network; the forced choice during a partition is between consistency and availability.
+- [o] Consistency and availability.
+  > With a partition unavoidable (the P), you must choose: stay consistent and reject some requests (CP), or stay available and risk stale reads (AP).`}
 />
 
 <MultipleChoice
   markdown={`A celebrity with 50 million followers posts. Why does pure **fan-out on write** struggle here?
 
-- Reads become too slow because each follower must query the celebrity live.
-  > That is the fan-out-on-read problem; fan-out on write makes reads cheap, not slow.
 - [o] A single post triggers writes into 50 million follower feeds, a write storm.
   > Push fan-out does work proportional to follower count per post, which is why celebrities are handled with pull (fan-out on read) in a hybrid design.
+- Follower feeds would show the post out of order.
+  > Ordering is solvable; the real problem is the sheer number of writes one post generates.
 - The post cannot be stored because it exceeds the database row limit.
   > Post size is unrelated; the issue is the volume of feed-insert writes.
-- Follower feeds would show the post out of order.
-  > Ordering is solvable; the real problem is the sheer number of writes one post generates.`}
+- Reads become too slow because each follower must query the celebrity live.
+  > That is the fan-out-on-read problem; fan-out on write makes reads cheap, not slow.`}
 />
 
 ## Go deeper

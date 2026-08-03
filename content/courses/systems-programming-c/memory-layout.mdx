@@ -293,12 +293,12 @@ int main(void) {
 <MultipleChoice
   markdown={`In which segment does a large zero-initialized global like \`int big[100000];\` live, and what does that mean for the executable file size?
 
+- The heap, \`malloc\` is called implicitly at program start.
+  > Globals are not heap-allocated; they have static storage duration.
 - \`.data\`, the binary grows by ~400 KB to store the zeros.
   > That would be true if the array were *non-zero* initialized.
 - [o] \`.bss\`, only metadata is stored; the OS zeroes the region at load time, so the binary stays small.
   > BSS exists precisely so zero-initialized globals do not bloat your binary.
-- The heap, \`malloc\` is called implicitly at program start.
-  > Globals are not heap-allocated; they have static storage duration.
 - The stack, the runtime pushes the array on entry to \`main\`.
   > The stack is for function locals, not globals.`}
 />
@@ -306,12 +306,12 @@ int main(void) {
 <MultipleChoice
   markdown={`Why is it dangerous to return \`&local_variable\` from a function?
 
-- Because the address may be the same as another local on the heap.
-  > Locals do not live on the heap.
 - [o] The local lives in the function's stack frame, which is destroyed when the function returns; the returned address is now dangling.
   > Reading or writing through that pointer is undefined behavior.
 - Because the compiler aliases it to \`NULL\` automatically.
   > It does not.
+- Because the address may be the same as another local on the heap.
+  > Locals do not live on the heap.
 - Because the OS swaps the variable out of memory to disk.
   > That would just be paging; the address would still be valid.`}
 />
@@ -323,8 +323,8 @@ int main(void) {
   > It does not, unless you add synchronization yourself.
 - It becomes \`const\` and cannot be modified.
   > \`static\` does not imply \`const\`.
-- [o] Its storage class changes from automatic (stack) to static (BSS/.data); it is initialized once and keeps its value across calls.
-  > The variable's *visibility* stays local to the function, but its *lifetime* becomes the whole program.
 - The variable is moved to the heap.
-  > Static variables live in BSS or .data, not on the heap.`}
+  > Static variables live in BSS or .data, not on the heap.
+- [o] Its storage class changes from automatic (stack) to static (BSS/.data); it is initialized once and keeps its value across calls.
+  > The variable's *visibility* stays local to the function, but its *lifetime* becomes the whole program.`}
 />

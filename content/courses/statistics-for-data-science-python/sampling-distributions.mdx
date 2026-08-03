@@ -209,14 +209,14 @@ over the place.
 <MultipleChoice
   markdown={`You collect one sample of \`n = 100\` reaction times and make a histogram of those 100 values. It's right-skewed with a long tail. Which distribution have you just drawn?
 
+- The standard error distribution
+  > "Standard error" is a single number (the sd of the sampling distribution), not a distribution of raw data values. A histogram of 100 raw times isn't this.
 - The sampling distribution of the mean
   > The sampling distribution of the mean is a histogram of many *sample means*, not of raw values. A histogram of your 100 data points shows raw values, so it's not this.
 - [o] The distribution of one sample (a noisy snapshot of the population distribution)
   > Plotting the raw values of a single collected sample shows distribution (b): it mirrors the population's shape, complete with the skew and tail.
 - The population distribution exactly
   > It *resembles* the population distribution but isn't exactly it, it's a finite, noisy sample. With only 100 points it will differ from the true population shape by chance.
-- The standard error distribution
-  > "Standard error" is a single number (the sd of the sampling distribution), not a distribution of raw data values. A histogram of 100 raw times isn't this.
 
 A histogram of your collected data points is *one sample*, distribution (b), no matter how many points it has.`}
 />
@@ -346,14 +346,14 @@ actually control.
 <MultipleChoice
   markdown={`In a simulation building a sampling distribution of the mean, a student wants their *real-world* estimate of $\\mu$ to be more precise. They consider two changes. Which one actually helps?
 
+- Neither change affects precision; precision is fixed by the population
+  > Precision is not fixed by the population alone, it depends on $n$ through $\\sigma/\\sqrt{n}$. A larger sample demonstrably tightens the estimate.
 - Increase \`n_samples\` (draw 50,000 samples instead of 5,000)
   > Drawing more samples only renders the simulated sampling distribution more smoothly. It doesn't narrow it, and in real life you only ever collect one sample, so this changes nothing about real precision.
 - [o] Increase \`n\` (make each sample 4x larger)
   > A larger sample size narrows the sampling distribution (its sd is $\\sigma/\\sqrt{n}$), so each individual estimate is more precise, the lever that genuinely improves real-world precision.
 - Keep \`n\` the same but average the 5,000 sample means together
   > Averaging all 5,000 means is a simulation artifact you could never do with one real sample; it estimates $\\mu$ well only because you secretly collected $5000 \\times n$ data points.
-- Neither change affects precision; precision is fixed by the population
-  > Precision is not fixed by the population alone, it depends on $n$ through $\\sigma/\\sqrt{n}$. A larger sample demonstrably tightens the estimate.
 
 The size of each sample drives precision; the number of samples is just how clearly you can *see* the sampling distribution in a simulation.`}
 />
@@ -596,14 +596,14 @@ print(result)
 <MultipleChoice
   markdown={`In one sentence, what *is* a sampling distribution?
 
+- The distribution you'd get by collecting one enormous sample
+  > One enormous sample gives you a better picture of the *population* distribution, not a sampling distribution. The sampling distribution requires imagining *many* samples and one statistic each.
+- [o] The distribution of a statistic (e.g., the mean) computed over many repeated samples of size n
+  > Defining it as the spread of a *statistic* across many size-$n$ samples is exactly right and is what every margin of error and p-value is built on.
 - The histogram of the raw values in the sample you collected
   > That's the distribution of *one sample*, a picture of raw data values. A sampling distribution is about a *statistic*, not raw values.
 - The distribution of all the values in the population
   > That's the *population* distribution. A sampling distribution describes a computed statistic across repeated samples, not the population's raw values.
-- [o] The distribution of a statistic (e.g., the mean) computed over many repeated samples of size n
-  > Defining it as the spread of a *statistic* across many size-$n$ samples is exactly right and is what every margin of error and p-value is built on.
-- The distribution you'd get by collecting one enormous sample
-  > One enormous sample gives you a better picture of the *population* distribution, not a sampling distribution. The sampling distribution requires imagining *many* samples and one statistic each.
 
 It's the distribution of an *estimate* across hypothetical repeated samples, the foundation of all inference.`}
 />
@@ -611,14 +611,14 @@ It's the distribution of an *estimate* across hypothetical repeated samples, the
 <MultipleChoice
   markdown={`Your population of incomes is heavily right-skewed with sd \`sigma = 30000\`. You take samples of \`n = 100\`. Compared to the population distribution, the **sampling distribution of the mean** will be:
 
-- About the same width (sd ≈ 30000) and same skew
-  > The sampling distribution of the mean is far narrower than the population, averaging cancels noise. Its sd is roughly $\\sigma/\\sqrt{n} = 30000/10 = 3000$, not 30000.
-- [o] Much narrower (sd ≈ 3000, i.e., $\\sigma/\\sqrt{n}$) and centered on the true mean
-  > The mean's sampling distribution has spread $\\sigma/\\sqrt{n}$, here $30000/\\sqrt{100}=3000$, and sits on $\\mu$, far tighter than the raw-income spread.
-- Wider than the population, because skew adds uncertainty
-  > Averaging reduces, not increases, spread. The sampling distribution of the mean is always narrower than the population for $n>1$, regardless of skew.
 - Identical to the distribution of one sample of 100 incomes
   > One sample of 100 incomes is raw data (~$\\sigma$ wide). The sampling distribution of the *mean* is the distribution of the *average* of such samples, about $\\sqrt{100}=10$ times narrower.
+- About the same width (sd ≈ 30000) and same skew
+  > The sampling distribution of the mean is far narrower than the population, averaging cancels noise. Its sd is roughly $\\sigma/\\sqrt{n} = 30000/10 = 3000$, not 30000.
+- Wider than the population, because skew adds uncertainty
+  > Averaging reduces, not increases, spread. The sampling distribution of the mean is always narrower than the population for $n>1$, regardless of skew.
+- [o] Much narrower (sd ≈ 3000, i.e., $\\sigma/\\sqrt{n}$) and centered on the true mean
+  > The mean's sampling distribution has spread $\\sigma/\\sqrt{n}$, here $30000/\\sqrt{100}=3000$, and sits on $\\mu$, far tighter than the raw-income spread.
 
 The mean's sampling distribution is centered on $\\mu$ with spread $\\sigma/\\sqrt{n}$, much tighter than the raw data.`}
 />
@@ -626,14 +626,14 @@ The mean's sampling distribution is centered on $\\mu$ with spread $\\sigma/\\sq
 <MultipleChoice
   markdown={`A teammate says: "I plotted my 500 data points and they're clearly not normal, so I can't trust the sample mean." What's the most accurate response?
 
-- They're right; non-normal data makes the sample mean untrustworthy
-  > The trustworthiness of the *mean* depends on the *sampling distribution* of the mean, not on the shape of the raw data. Non-normal raw data is fine for estimating a mean.
 - [o] The shape of the raw data (one sample) is a different thing from the sampling distribution of the mean, which is what governs the mean's reliability
   > Distinguishing the distribution of *raw values* from the sampling distribution of the *statistic* is the key point: the mean's reliability is about the latter, which is much narrower and (for large $n$) bell-shaped.
 - They should normalize the data first so the mean becomes valid
   > Transforming raw data isn't required to estimate a mean. The mean's sampling distribution behaves well for reasonable $n$ even when the raw data is skewed.
 - The sample mean is only valid if all 500 points are normal
   > Individual data points needn't be normal for the sample mean to be a good estimate. Confusing the raw-data shape with the estimate's behavior is the underlying error.
+- They're right; non-normal data makes the sample mean untrustworthy
+  > The trustworthiness of the *mean* depends on the *sampling distribution* of the mean, not on the shape of the raw data. Non-normal raw data is fine for estimating a mean.
 
 Judging an estimate by the raw-data histogram confuses distribution (b) with distribution (c).`}
 />
@@ -641,14 +641,14 @@ Judging an estimate by the raw-data histogram confuses distribution (b) with dis
 <MultipleChoice
   markdown={`Which change makes the sampling distribution of the mean **narrower**?
 
-- Drawing 10x as many samples in your simulation
-  > More simulated samples only render the sampling distribution more smoothly; its width is unchanged. (In real life you collect just one sample anyway.)
-- [o] Increasing the size n of each sample
-  > The sampling distribution's spread is $\\sigma/\\sqrt{n}$, so a larger $n$ directly narrows it, this is the lever that improves estimate precision.
 - Choosing a statistic with a higher value, like the max instead of the mean
   > Switching statistics changes the sampling distribution's center and shape, but a "higher value" doesn't make it narrower, the max's sampling distribution is actually quite wide and skewed.
 - Recentering the data to have mean zero
   > Shifting all values by a constant moves the center but leaves every spread unchanged. It doesn't narrow the sampling distribution.
+- [o] Increasing the size n of each sample
+  > The sampling distribution's spread is $\\sigma/\\sqrt{n}$, so a larger $n$ directly narrows it, this is the lever that improves estimate precision.
+- Drawing 10x as many samples in your simulation
+  > More simulated samples only render the sampling distribution more smoothly; its width is unchanged. (In real life you collect just one sample anyway.)
 
 Only a larger sample size shrinks the spread of the sampling distribution.`}
 />
@@ -656,14 +656,14 @@ Only a larger sample size shrinks the spread of the sampling distribution.`}
 <MultipleChoice
   markdown={`Does the **median** have a sampling distribution?
 
+- Only for samples larger than 30
+  > There's no size threshold for *having* a sampling distribution. Any $n \\ge 1$ statistic has one; sample size affects its spread, not its existence.
 - No; only the mean has a sampling distribution
   > Every statistic computed from a sample has a sampling distribution. The mean is just the most common example, not the only one.
 - [o] Yes; any statistic computed from a sample (median, max, sd, proportion, …) has its own sampling distribution
   > Recognizing that the concept applies to *any* statistic, each with its own center, spread, and shape, is what lets us attach uncertainty to medians, proportions, slopes, and more.
 - Only if the data is normally distributed
   > The existence of a sampling distribution doesn't depend on the data being normal. The median's sampling distribution exists for any population; its shape just varies.
-- Only for samples larger than 30
-  > There's no size threshold for *having* a sampling distribution. Any $n \\ge 1$ statistic has one; sample size affects its spread, not its existence.
 
 "Sampling distribution" is a property of *any* statistic, not a special feature of the mean.`}
 />
@@ -671,14 +671,14 @@ Only a larger sample size shrinks the spread of the sampling distribution.`}
 <MultipleChoice
   markdown={`Why can a poll of 1,500 people report a small "margin of error" for an entire country?
 
+- Because more people would not change the result at all
+  > More people *would* tighten the estimate somewhat (precision $\\propto \\sqrt{n}$). The point is that even 1,500 already gives a narrow sampling distribution, not that $n$ is irrelevant.
 - Because 1,500 is close to the size of the population
   > 1,500 is a tiny fraction of a national population; the precision doesn't come from covering most people. It comes from the narrowness of the sampling distribution.
 - [o] Because the sampling distribution of the estimate is narrow (its spread is governed by $\\sigma/\\sqrt{n}$), so the estimate barely moves from sample to sample
   > The margin of error is read off the sampling distribution, whose spread scales as $1/\\sqrt{n}$ and is independent of how large the *population* is, so a modest $n$ already yields a tight estimate.
 - Because everyone in the country answers roughly the same way
   > Respondents differ a lot; the population can be highly variable. The estimate is still precise because *averaging* a random sample yields a tight sampling distribution.
-- Because more people would not change the result at all
-  > More people *would* tighten the estimate somewhat (precision $\\propto \\sqrt{n}$). The point is that even 1,500 already gives a narrow sampling distribution, not that $n$ is irrelevant.
 
 A small margin of error reflects a narrow *sampling distribution*, which depends on $n$, not on the population's size.`}
 />

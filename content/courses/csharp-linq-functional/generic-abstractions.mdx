@@ -329,14 +329,14 @@ single ten-line interface.
 <MultipleChoice
   markdown={`When you call \`new[] { "a", "b", "c" }.MyWhere(s => s.Length == 1)\`, where does the type \`T\` come from?
 
-- It defaults to \`object\` and gets cast back to \`string\` later.
-  > That would be the pre-generics approach. Generic type inference avoids casts and boxing entirely.
-- The lambda parameter \`s\` is declared as \`string\`, which is how \`T\` is decided.
-  > Close, but inverted. The compiler first infers \`T\` from the *source*, then types the lambda accordingly.
 - [o] The compiler infers \`T = string\` from the source array's element type, then specializes \`MyWhere\` for \`string\`.
   > C# infers generic type arguments by looking at the call site, most importantly the type of the source expression, and then synthesizes a strongly typed specialization. No casting, no boxing, full IntelliSense.
 - \`T\` is resolved at runtime by reflection.
   > No, generic type resolution happens at compile time in C#. Reflection is not involved at the call site.
+- The lambda parameter \`s\` is declared as \`string\`, which is how \`T\` is decided.
+  > Close, but inverted. The compiler first infers \`T\` from the *source*, then types the lambda accordingly.
+- It defaults to \`object\` and gets cast back to \`string\` later.
+  > That would be the pre-generics approach. Generic type inference avoids casts and boxing entirely.
 
 This is why writing one generic method buys you type-safe behavior across every element type.`}
 />

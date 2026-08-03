@@ -321,14 +321,14 @@ public class Inbox {
 <MultipleChoice
   markdown={`A method accepts a collection of strings and only needs to iterate it once. Which parameter type is the *best* practice?
 
-- \`ArrayList<String>\`
-  > Too narrow; rejects \`HashSet\`, \`LinkedList\`, \`List.of(...)\`.
+- \`Object\`
+  > Too wide; loses static type information.
 - \`HashMap<String,?>\`
   > Wrong kind altogether.
+- \`ArrayList<String>\`
+  > Too narrow; rejects \`HashSet\`, \`LinkedList\`, \`List.of(...)\`.
 - [o] \`Iterable<String>\` (or \`Collection<String>\` if you also need \`size()\`)
-  > Accept the widest interface that satisfies your needs.
-- \`Object\`
-  > Too wide; loses static type information.`}
+  > Accept the widest interface that satisfies your needs.`}
 />
 
 <MultipleChoice
@@ -336,23 +336,23 @@ public class Inbox {
 
 - \`final\` is wrong here
   > \`final\` is fine; it refers to the reference, not the contents.
-- [o] The caller receives a reference to your live mutable state and can \`add\`, \`remove\`, or \`clear\` it, corrupting your invariants
-  > Return an unmodifiable view or an immutable copy instead.
 - It throws \`ConcurrentModificationException\`
   > Not by itself.
 - It causes a memory leak
-  > It does not.`}
+  > It does not.
+- [o] The caller receives a reference to your live mutable state and can \`add\`, \`remove\`, or \`clear\` it, corrupting your invariants
+  > Return an unmodifiable view or an immutable copy instead.`}
 />
 
 <MultipleChoice
   markdown={`A repository for a 50-million-row table is asked "give me all items as a \`List\`." What is the *architecturally* better return type?
 
+- \`Set<Item>\` for "uniqueness"
+  > Same memory problem and the wrong shape.
+- [o] \`Stream<Item>\` (or a paged result type), so the caller composes filters before materializing, and the repository can lazily fetch in batches
+  > Lazy, composable, and never materializes the whole set if the caller filters first.
 - \`List<Item>\`, load them all into memory
   > That guarantees an \`OutOfMemoryError\`.
 - \`Iterator<Item>\` exposed directly
-  > Iterators are poor public API; they support \`remove\` and have no good way to be closed.
-- [o] \`Stream<Item>\` (or a paged result type), so the caller composes filters before materializing, and the repository can lazily fetch in batches
-  > Lazy, composable, and never materializes the whole set if the caller filters first.
-- \`Set<Item>\` for "uniqueness"
-  > Same memory problem and the wrong shape.`}
+  > Iterators are poor public API; they support \`remove\` and have no good way to be closed.`}
 />

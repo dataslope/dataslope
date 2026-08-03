@@ -292,14 +292,14 @@ void say_goodbye(const char *name) { printf("Goodbye, %s!\\n", name); }
 <MultipleChoice
   markdown={`Which stage of the C toolchain replaces \`#include\` directives with the contents of header files?
 
-- [o] The preprocessor.
-  > \`#include\` is handled before the compiler proper ever sees your code.
-- The compiler.
-  > The compiler only sees the already-expanded source; by the time it runs, all \`#include\` directives have been replaced.
 - The assembler.
   > The assembler translates assembly text into machine code and never processes \`#include\` directives.
 - The linker.
   > The linker resolves symbol references between object files; it does not process source-level directives like \`#include\`.
+- The compiler.
+  > The compiler only sees the already-expanded source; by the time it runs, all \`#include\` directives have been replaced.
+- [o] The preprocessor.
+  > \`#include\` is handled before the compiler proper ever sees your code.
 
 The preprocessor is a text-only stage. It handles \`#include\`, \`#define\`, conditional compilation, and comment stripping.`}
 />
@@ -307,14 +307,14 @@ The preprocessor is a text-only stage. It handles \`#include\`, \`#define\`, con
 <MultipleChoice
   markdown={`You compile a project with two files, \`main.c\` and \`util.c\`. \`main.c\` calls a function \`compute()\` declared in \`util.h\`, but you forget to pass \`util.c\` to the compiler. Which error are you most likely to see?
 
-- A preprocessor error about a missing header.
-  > \`util.h\` is still included and processed normally; the missing file is \`util.c\`, which is a source file, not a header.
-- A compiler error about an unknown function.
-  > The compiler is happy: it has the declaration from \`util.h\`. The problem appears later.
 - [o] A linker error: \`undefined reference to \`compute'\`.
   > The header gave the compiler the declaration, so the call type-checks. But the linker has no \`.o\` file containing the definition of \`compute\`, so it can't resolve the symbol.
+- A compiler error about an unknown function.
+  > The compiler is happy: it has the declaration from \`util.h\`. The problem appears later.
 - A runtime error when \`compute()\` is first called.
   > Linker errors are reported before the executable is even created, so the program never gets to run.
+- A preprocessor error about a missing header.
+  > \`util.h\` is still included and processed normally; the missing file is \`util.c\`, which is a source file, not a header.
 
 Remember: declarations satisfy the compiler; *definitions* are what the linker needs.`}
 />

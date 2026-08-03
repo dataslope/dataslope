@@ -123,14 +123,14 @@ The `2` in `ROUND(..., 2)` means "show two digits after the decimal point."
 <MultipleChoice
   markdown={`What does an aggregate function do?
 
-- It shows every row exactly as it appears in the table.
-  > That is a regular query without aggregation.
-- [o] It combines many rows into a smaller summary, often one value.
-  > Aggregate functions summarize rows into values like counts, totals, and averages.
 - It changes the table's column names permanently.
   > Aliases can rename output columns temporarily, but aggregates do not change the table definition.
 - It always sorts rows alphabetically.
   > Sorting is handled by \`ORDER BY\`, not by aggregate functions.
+- [o] It combines many rows into a smaller summary, often one value.
+  > Aggregate functions summarize rows into values like counts, totals, and averages.
+- It shows every row exactly as it appears in the table.
+  > That is a regular query without aggregation.
 
 Aggregates are for summary questions, not row-by-row detail questions.`}
 />
@@ -308,12 +308,12 @@ Use `COUNT(*)` when you mean "How many rows?" Use `COUNT(column)` when you mean 
 
 - [o] \`COUNT(*)\`
   > \`COUNT(*)\` counts rows, including rows that contain missing values.
-- \`SUM(*)\`
-  > \`SUM\` adds values from a specific column; \`SUM(*)\` is not the row-counting pattern.
-- \`AVG(*)\`
-  > \`AVG\` averages values from a column, not whole rows.
 - \`MAX(*)\`
   > \`MAX\` finds the largest value in a column.
+- \`AVG(*)\`
+  > \`AVG\` averages values from a column, not whole rows.
+- \`SUM(*)\`
+  > \`SUM\` adds values from a specific column; \`SUM(*)\` is not the row-counting pattern.
 
 Use \`COUNT(*)\` for row counts.`}
 />
@@ -336,14 +336,14 @@ Use \`COUNT(*)\` for row counts.`}
 <MultipleChoice
   markdown={`Why does \`AVG(rating)\` skip \`NULL\` ratings?
 
+- Because \`NULL\` is always the same as zero.
+  > \`NULL\` means missing or unknown; it is not the same as zero.
 - Because SQLite cannot store missing values.
   > SQLite can store \`NULL\`; aggregate functions simply treat it as missing information.
 - [o] Because \`NULL\` means unknown, and unknown values should not be averaged as if they were real numbers.
   > Skipping missing ratings keeps the average based on ratings that actually exist.
 - Because \`AVG\` only works on text.
   > \`AVG\` is for numeric values.
-- Because \`NULL\` is always the same as zero.
-  > \`NULL\` means missing or unknown; it is not the same as zero.
 
 Most aggregates skip \`NULL\` so missing data does not distort the summary.`}
 />
@@ -351,14 +351,14 @@ Most aggregates skip \`NULL\` so missing data does not distort the summary.`}
 <MultipleChoice
   markdown={`What does this query return: \`SELECT MIN(price), MAX(price) FROM products;\`?
 
-- One row for every product.
-  > Aggregate functions collapse many rows into summary values.
 - [o] One row containing the smallest price and the largest price.
   > \`MIN\` and \`MAX\` each produce one summary value over the table.
-- A sorted list of all prices.
-  > Sorting requires \`ORDER BY\`; \`MIN\` and \`MAX\` summarize.
+- One row for every product.
+  > Aggregate functions collapse many rows into summary values.
 - Only products with missing prices.
   > \`MIN\` and \`MAX\` skip \`NULL\` values and report extremes among known values.
+- A sorted list of all prices.
+  > Sorting requires \`ORDER BY\`; \`MIN\` and \`MAX\` summarize.
 
 \`MIN\` and \`MAX\` are aggregate functions for finding extremes.`}
 />

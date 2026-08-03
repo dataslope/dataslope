@@ -301,14 +301,14 @@ public static class PeopleFilter
 <MultipleChoice
   markdown={`Given \`var result = nums.Where(n => n > 10).Select(n => n * 2);\`, which statement is correct?
 
-- The pipeline runs immediately and \`result\` is a \`List<int>\`.
-  > LINQ operators are deferred, nothing has been enumerated yet. \`result\` is an \`IEnumerable<int>\`, not a list.
 - The \`Select\` lambda runs for every element of \`nums\`, regardless of the filter.
   > Pipelined operators only invoke later steps for elements that survive earlier steps; \`Select\` does not run for elements that \`Where\` rejected.
-- [o] \`result\` is a deferred \`IEnumerable<int>\`, neither \`Where\` nor \`Select\` runs until something enumerates it (e.g. \`foreach\`, \`ToList\`, \`Sum\`).
-  > LINQ is *pull-based*: the lambdas execute only when a consumer asks for elements.
+- The pipeline runs immediately and \`result\` is a \`List<int>\`.
+  > LINQ operators are deferred, nothing has been enumerated yet. \`result\` is an \`IEnumerable<int>\`, not a list.
 - \`Where\` and \`Select\` can only be used on \`List<T>\` and arrays.
   > They are extension methods on \`IEnumerable<T>\`, which is implemented by virtually every collection in .NET and by hand-written iterators.
+- [o] \`result\` is a deferred \`IEnumerable<int>\`, neither \`Where\` nor \`Select\` runs until something enumerates it (e.g. \`foreach\`, \`ToList\`, \`Sum\`).
+  > LINQ is *pull-based*: the lambdas execute only when a consumer asks for elements.
 
 LINQ operators describe *what* you want; they don't perform the work
 until something downstream actually consumes the sequence. We'll

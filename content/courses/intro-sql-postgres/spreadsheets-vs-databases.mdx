@@ -153,14 +153,14 @@ spreadsheet fundamentally cannot give you.
 <MultipleChoice
   markdown={`Which situation most strongly suggests reaching for a relational database instead of a spreadsheet?
 
-- You need to add up a short column of numbers for a one-time report.
-  > A spreadsheet is perfect for quick, small, personal calculations like this; a database would be overkill.
-- You want to sketch a rough budget that only you will ever see.
-  > Personal, small, throwaway work is exactly where spreadsheets shine.
-- [o] Many people must edit shared data that contains millions of rows and connected datasets that must stay consistent.
-  > Scale, simultaneous editors, and relationships that must stay in sync are precisely the conditions databases are built for.
 - You need to color-code ten cells for a presentation.
   > Visual formatting of a tiny amount of data is a spreadsheet strength, not a reason to adopt a database.
+- You need to add up a short column of numbers for a one-time report.
+  > A spreadsheet is perfect for quick, small, personal calculations like this; a database would be overkill.
+- [o] Many people must edit shared data that contains millions of rows and connected datasets that must stay consistent.
+  > Scale, simultaneous editors, and relationships that must stay in sync are precisely the conditions databases are built for.
+- You want to sketch a rough budget that only you will ever see.
+  > Personal, small, throwaway work is exactly where spreadsheets shine.
 
 Databases earn their value with large, shared, connected, long-lived data, not tiny personal tasks.`}
 />
@@ -168,14 +168,14 @@ Databases earn their value with large, shared, connected, long-lived data, not t
 <MultipleChoice
   markdown={`In a spreadsheet, the same customer name is typed as "Acme", "ACME", and "Acme Inc." across many rows. How does a relational database help avoid this?
 
-- It automatically corrects spelling mistakes in any cell.
-  > A database does not guess intended spellings; it avoids the problem by structure, not by autocorrect.
-- It makes the spreadsheet open faster.
-  > Open speed is unrelated; the issue here is the same fact being entered inconsistently many times.
 - [o] It lets you store each customer once and refer to that single record everywhere, creating one source of truth.
   > Storing a fact once and pointing to it removes the chance for inconsistent duplicate copies entirely.
 - It hides the duplicate rows from view.
   > Hiding rows would not fix the underlying inconsistency; storing the customer once does.
+- It makes the spreadsheet open faster.
+  > Open speed is unrelated; the issue here is the same fact being entered inconsistently many times.
+- It automatically corrects spelling mistakes in any cell.
+  > A database does not guess intended spellings; it avoids the problem by structure, not by autocorrect.
 
 The relational answer to inconsistent duplicates is to store each entity once and reference it everywhere.`}
 />

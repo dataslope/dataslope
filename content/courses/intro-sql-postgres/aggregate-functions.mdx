@@ -176,10 +176,10 @@ two missing values at a glance.
 
 - It returns one result row for each row in the table.
   > That describes ordinary column selection; aggregates collapse many rows into a summary.
-- [o] It combines many rows into a single summary value, such as a total or an average.
-  > Aggregates reduce a set of rows down to one number, which is the basis of reporting.
 - It deletes rows that match a condition.
   > Deleting rows is \`DELETE\`; aggregates only read and summarize.
+- [o] It combines many rows into a single summary value, such as a total or an average.
+  > Aggregates reduce a set of rows down to one number, which is the basis of reporting.
 - It sorts the rows.
   > Sorting is \`ORDER BY\`; aggregation summarizes rather than orders.
 
@@ -189,14 +189,14 @@ Aggregate functions reduce many rows to a single summarizing value.`}
 <MultipleChoice
   markdown={`A table has 4 rows; the \`phone\` column is \`NULL\` in 2 of them. What do \`COUNT(*)\` and \`COUNT(phone)\` return?
 
+- \`COUNT(*)\` returns 2; \`COUNT(phone)\` returns 4.
+  > It is the reverse: counting all rows gives the larger number, and counting present phones gives the smaller.
 - Both return 4.
   > \`COUNT(phone)\` skips NULLs, so it cannot also be 4 when two phones are missing.
 - Both return 2.
   > \`COUNT(*)\` counts every row regardless of NULLs, so it is 4, not 2.
 - [o] \`COUNT(*)\` returns 4 (all rows); \`COUNT(phone)\` returns 2 (only non-NULL phones).
   > \`COUNT(*)\` counts rows, while \`COUNT(column)\` counts only rows where that column has a value.
-- \`COUNT(*)\` returns 2; \`COUNT(phone)\` returns 4.
-  > It is the reverse: counting all rows gives the larger number, and counting present phones gives the smaller.
 
 \`COUNT(*)\` counts all rows; \`COUNT(column)\` counts only non-NULL values in that column.`}
 />
@@ -204,14 +204,14 @@ Aggregate functions reduce many rows to a single summarizing value.`}
 <MultipleChoice
   markdown={`How does \`AVG(salary)\` treat rows where \`salary\` is \`NULL\`?
 
+- It returns NULL for the whole query.
+  > A single NULL salary does not nullify the result; only the NULL rows are skipped.
+- It raises an error.
+  > NULLs do not cause an error in \`AVG\`; they are simply excluded.
 - It counts them as 0, lowering the average.
   > Treating unknown as zero would distort the average; SQL avoids that by ignoring NULLs.
 - [o] It ignores those rows, averaging only the rows that have a salary value.
   > Aggregates like \`AVG\` skip NULLs, so the average reflects only known salaries.
-- It raises an error.
-  > NULLs do not cause an error in \`AVG\`; they are simply excluded.
-- It returns NULL for the whole query.
-  > A single NULL salary does not nullify the result; only the NULL rows are skipped.
 
 \`AVG\` (like \`SUM\`, \`MIN\`, \`MAX\`) ignores NULLs and summarizes only the present values.`}
 />

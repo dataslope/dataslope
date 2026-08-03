@@ -625,10 +625,10 @@ print(f(2))
 
 - \`[1]\\n[2]\`
   > A new \`[]\` is **not** created on each call when the default is a literal. The default is evaluated once at function definition time.
-- [o] \`[1]\\n[1, 2]\`
-  > The default list is evaluated once at \`def\` time and shared across calls. This is the classic mutable-default footgun.
 - \`[1, 2]\\n[1, 2]\`
   > The second call does not create a new list; it appends to the same one from the first call.
+- [o] \`[1]\\n[1, 2]\`
+  > The default list is evaluated once at \`def\` time and shared across calls. This is the classic mutable-default footgun.
 - A \`TypeError\`
   > No type error occurs; the code runs, but with surprising behavior.`}
 />
@@ -638,23 +638,23 @@ print(f(2))
 
 - [o] \`f(1, 2, 3, d=4)\`
   > \`a\` and \`b\` are positional-only, \`c\` can be positional or keyword, \`d\` must be keyword.
+- \`f(1, b=2, c=3, d=4)\`
+  > \`b\` is positional-only, so it cannot be passed by name.
 - \`f(a=1, b=2, c=3, d=4)\`
   > \`a\` and \`b\` are positional-only (left of \`/\`), so they cannot be passed by name.
 - \`f(1, 2, 3, 4)\`
-  > \`d\` is keyword-only (right of \`*\`), so it must be passed as \`d=4\`.
-- \`f(1, b=2, c=3, d=4)\`
-  > \`b\` is positional-only, so it cannot be passed by name.`}
+  > \`d\` is keyword-only (right of \`*\`), so it must be passed as \`d=4\`.`}
 />
 
 <MultipleChoice
   markdown={`What is the return value of a function that has no \`return\` statement?
 
-- \`0\`
-  > No, the default return value is not zero.
-- [o] \`None\`
-  > A function without an explicit \`return\` returns \`None\`.
 - An empty string \`""\`
   > No, the default return value is not an empty string.
+- [o] \`None\`
+  > A function without an explicit \`return\` returns \`None\`.
+- \`0\`
+  > No, the default return value is not zero.
 - It raises a \`SyntaxError\`
   > No error is raised; the function simply returns \`None\`.`}
 />
@@ -662,27 +662,27 @@ print(f(2))
 <MultipleChoice
   markdown={`Which statement about \`lambda\` is true?
 
-- \`lambda\` functions can contain multiple statements.
-  > No, a \`lambda\` is limited to a single expression.
-- [o] \`lambda\` functions are anonymous and show up as \`<lambda>\` in tracebacks.
-  > Unlike \`def\`, a \`lambda\` has no name and appears as \`<lambda>\` in error messages.
 - \`lambda\` functions are faster than \`def\` functions.
   > No, there is no performance difference.
+- \`lambda\` functions can contain multiple statements.
+  > No, a \`lambda\` is limited to a single expression.
 - \`lambda\` functions cannot take arguments.
-  > No, \`lambda x, y: x + y\` is perfectly valid.`}
+  > No, \`lambda x, y: x + y\` is perfectly valid.
+- [o] \`lambda\` functions are anonymous and show up as \`<lambda>\` in tracebacks.
+  > Unlike \`def\`, a \`lambda\` has no name and appears as \`<lambda>\` in error messages.`}
 />
 
 <MultipleChoice
   markdown={`What does unpacking with \`*\` do when calling a function?
 
+- It creates a pointer to the iterable.
+  > No, it unpacks the iterable into separate arguments.
+- It makes the argument keyword-only.
+  > No, that is what \`*\` does in the function signature when placed before parameter names.
 - It captures extra positional arguments into a tuple.
   > That is what \`*args\` does in the **function definition**. In a **function call**, \`*\` does the opposite.
 - [o] It expands an iterable into separate positional arguments.
-  > \`func(*[1, 2, 3])\` is equivalent to \`func(1, 2, 3)\`.
-- It makes the argument keyword-only.
-  > No, that is what \`*\` does in the function signature when placed before parameter names.
-- It creates a pointer to the iterable.
-  > No, it unpacks the iterable into separate arguments.`}
+  > \`func(*[1, 2, 3])\` is equivalent to \`func(1, 2, 3)\`.`}
 />
 
 <MultipleChoice

@@ -257,12 +257,12 @@ wrong, and good science means controlling the wrongness.
 
 - Because NumPy was written by the FORTRAN community
   > NumPy was written primarily in C and Python; the FORTRAN connection is about the numerical libraries it calls, not who authored it.
-- Because Python compiles to FORTRAN at runtime
-  > Python is interpreted and never compiled to FORTRAN; the connection is that NumPy's inner loops call pre-compiled FORTRAN library routines at the C level.
 - [o] Because NumPy's heaviest routines dispatch to BLAS, LAPACK, and related libraries, most of which are FORTRAN code that has been hand-tuned for decades
   > NumPy is Python at the interface and FORTRAN/C at the core. \`A @ B\` invokes a BLAS routine like DGEMM written in FORTRAN. This layering, interpreted glue on compiled kernels, is the secret to scientific Python's performance.
 - Because FORTRAN syntax is hidden inside Python source files
   > Python source files contain only Python; there is no FORTRAN syntax inside them.
+- Because Python compiles to FORTRAN at runtime
+  > Python is interpreted and never compiled to FORTRAN; the connection is that NumPy's inner loops call pre-compiled FORTRAN library routines at the C level.
 
 Interpreted glue on top of compiled numerical kernels is what makes scientific Python both pleasant and fast.`}
 />
@@ -272,10 +272,10 @@ Interpreted glue on top of compiled numerical kernels is what makes scientific P
 
 - Python's interpreter is secretly very fast
   > CPython is a slow interpreter compared with compiled languages; Python's success comes from calling fast C and FORTRAN code, not from a fast interpreter.
-- The Python community rewrote FORTRAN in pure Python
-  > FORTRAN was not rewritten in Python; the scientific stack *wraps* existing FORTRAN libraries (BLAS, LAPACK, ODEPACK) via C extensions.
 - [o] Python is an excellent *glue language*: heavy numerical work runs in compiled BLAS/LAPACK/C/FORTRAN code, while Python provides a friendly interactive interface, a general-purpose environment, and a massive ecosystem on top
   > When 99% of compute time is inside a BLAS call, the slowness of the interpreter is irrelevant. Python adds the interactive workflow, the general-purpose language, and the ecosystem.
+- The Python community rewrote FORTRAN in pure Python
+  > FORTRAN was not rewritten in Python; the scientific stack *wraps* existing FORTRAN libraries (BLAS, LAPACK, ODEPACK) via C extensions.
 - The Python language was redesigned in 2005 to add fast arrays
   > The language itself was not redesigned; Travis Oliphant wrote NumPy as a third-party library, unifying Numeric and Numarray without changing Python's core.
 

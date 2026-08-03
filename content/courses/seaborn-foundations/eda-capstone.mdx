@@ -601,14 +601,14 @@ reader what to take away before they finish reading the axes.
   markdown={`You open a brand-new dataset you have never seen. Which step makes the most
 sense **first**, before drawing any chart?
 
+- Pick a color palette so your charts look polished from the start.
+  > Aesthetics matter when you *communicate*, but they reveal nothing about the data. Understanding the table comes well before styling it.
+- Immediately draw a pair plot of every column against every other.
+  > A pair plot is a great *overview*, but on an unknown table it can be huge or fail on non-numeric columns; a quick look at the table's shape and types should come first.
 - Fit a regression line to the two columns whose names sound related.
   > Fitting a model before you know the data's shape, types, and missing values risks modeling noise or a column that is half empty. Looking comes before fitting.
 - [o] Inspect \`.shape\`, \`.head()\`, and \`.isna().sum()\` to learn the size, the columns, and where values are missing.
   > These three checks tell you how big the data is, which columns are numeric versus categorical, and where the holes are, the facts that decide which charts are even possible.
-- Immediately draw a pair plot of every column against every other.
-  > A pair plot is a great *overview*, but on an unknown table it can be huge or fail on non-numeric columns; a quick look at the table's shape and types should come first.
-- Pick a color palette so your charts look polished from the start.
-  > Aesthetics matter when you *communicate*, but they reveal nothing about the data. Understanding the table comes well before styling it.
 
 The first move in EDA is always to understand the table itself: its size,
 its column types, and its missing values.`}
@@ -619,14 +619,14 @@ its column types, and its missing values.`}
 **species** and read each group's median and spread at a glance. Which chart
 fits the question best?
 
-- A scatter plot of \`body_mass_g\` against \`flipper_length_mm\`.
-  > A scatter relates two *numeric* variables. The question compares one numeric variable across a *category*, which a scatter does not address directly.
-- A single histogram of \`body_mass_g\` with no grouping.
-  > One pooled histogram blends all three species together, so you cannot read each group's center and spread separately.
 - [o] A box (or violin) plot with \`species\` on one axis and \`body_mass_g\` on the other.
   > A box plot lines the groups up side by side and shows each one's median and spread, which is exactly the per-group comparison the question asks for.
 - A correlation heatmap of the numeric columns.
   > A heatmap summarizes pairwise correlations between *numeric* columns; it says nothing about how one measurement differs across a categorical group.
+- A single histogram of \`body_mass_g\` with no grouping.
+  > One pooled histogram blends all three species together, so you cannot read each group's center and spread separately.
+- A scatter plot of \`body_mass_g\` against \`flipper_length_mm\`.
+  > A scatter relates two *numeric* variables. The question compares one numeric variable across a *category*, which a scatter does not address directly.
 
 When one axis is a category and you want per-group center and spread, the
 box/violin family is the direct answer.`}
@@ -636,14 +636,14 @@ box/violin family is the direct answer.`}
   markdown={`On a correlation **heatmap**, why is it important to use a *diverging*
 palette with \`center=0\` (for example \`cmap="vlag", center=0\`)?
 
+- It hides the diagonal automatically.
+  > The palette does not remove the diagonal. The diagonal is always \`1\` and you simply learn to look past it; that is unrelated to centering the colors.
+- It forces every correlation to fall between 0 and 1.
+  > Correlations already range from \`-1\` to \`+1\` regardless of palette; the colormap only controls how those values are *shown*, not their range.
 - It makes the figure load faster.
   > The palette choice is about *meaning*, not performance; rendering speed is unaffected.
 - [o] It pins a neutral color to zero so positive and negative correlations read as opposite hues, with strength shown by intensity.
   > Centering a diverging scale at 0 makes \`+0.6\` and \`-0.6\` appear as opposite colors of equal intensity, so the sign and strength of each correlation are read honestly.
-- It forces every correlation to fall between 0 and 1.
-  > Correlations already range from \`-1\` to \`+1\` regardless of palette; the colormap only controls how those values are *shown*, not their range.
-- It hides the diagonal automatically.
-  > The palette does not remove the diagonal. The diagonal is always \`1\` and you simply learn to look past it; that is unrelated to centering the colors.
 
 A diverging palette centered at zero encodes the *sign* of a correlation in
 the hue and its *strength* in the intensity, the honest way to color a

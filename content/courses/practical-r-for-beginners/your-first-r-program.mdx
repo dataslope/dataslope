@@ -301,40 +301,40 @@ per-element behavior.
 <MultipleChoice
   markdown={`Which of these lines shows output by **auto-printing**, i.e. without an explicit print call?
 
-- \`x <- 5\`
-  > Assignment produces no automatic output, the result is stored, not printed.
-- [o] \`5 + 3\`
-  > An unassigned expression auto-prints its result.
 - \`# print("hello")\`
   > That is a comment, everything after \`#\` is ignored.
+- [o] \`5 + 3\`
+  > An unassigned expression auto-prints its result.
 - \`print(5)\`
-  > This does show output, but through an explicit \`print()\` call rather than auto-printing.`}
+  > This does show output, but through an explicit \`print()\` call rather than auto-printing.
+- \`x <- 5\`
+  > Assignment produces no automatic output, the result is stored, not printed.`}
 />
 
 <MultipleChoice
   markdown={`Which of these lines shows output through an **explicit** print call?
 
-- \`x <- 5\`
-  > Assignment produces no automatic output, the result is stored, not printed.
-- \`5 + 3\`
-  > This does show output, but by auto-printing an unassigned expression, there is no explicit call.
 - \`# print("hello")\`
   > That is a comment, everything after \`#\` is ignored.
+- \`x <- 5\`
+  > Assignment produces no automatic output, the result is stored, not printed.
 - [o] \`print(5)\`
-  > \`print()\` explicitly outputs its argument.`}
+  > \`print()\` explicitly outputs its argument.
+- \`5 + 3\`
+  > This does show output, but by auto-printing an unassigned expression, there is no explicit call.`}
 />
 
 <MultipleChoice
   markdown={`What is the difference between \`print()\` and \`cat()\`?
 
-- They are identical.
-  > \`print()\` adds R-style formatting (e.g., \`[1]\` index hints and quotes around strings), while \`cat()\` outputs its arguments as plain text with no decorations.
-- [o] \`print()\` formats values in R-style for inspection; \`cat()\` concatenates arguments into a plain string for building human-readable messages.
-  > Use \`print()\` to inspect a value, \`cat()\` to compose a sentence.
 - \`print()\` writes to a file; \`cat()\` writes to the screen.
   > Both \`print()\` and \`cat()\` write to the console by default; to write to a file, \`cat()\` accepts a \`file =\` argument, and \`sink()\` can redirect \`print()\` output.
+- They are identical.
+  > \`print()\` adds R-style formatting (e.g., \`[1]\` index hints and quotes around strings), while \`cat()\` outputs its arguments as plain text with no decorations.
 - \`cat()\` is the modern replacement for \`print()\`.
-  > Neither function is deprecated; they serve different purposes and both remain in active use.`}
+  > Neither function is deprecated; they serve different purposes and both remain in active use.
+- [o] \`print()\` formats values in R-style for inspection; \`cat()\` concatenates arguments into a plain string for building human-readable messages.
+  > Use \`print()\` to inspect a value, \`cat()\` to compose a sentence.`}
 />
 
 <MultipleChoice
@@ -344,14 +344,14 @@ per-element behavior.
 result <- 2 + 2
 \`\`\`
 
-- Because R does not handle integer arithmetic.
-  > R handles integer and floating-point arithmetic without issue; \`2 + 2\` evaluates to \`4\` correctly, the result is simply stored silently.
-- [o] Because the result of the expression was assigned to the variable \`result\` instead of being printed.
-  > Assignment is silent. To see the value, add a separate line: \`print(result)\` or just \`result\`.
+- Because R only prints character strings.
+  > R auto-prints numeric values just as readily as character ones; the reason there is no output here is the assignment, not the type.
 - Because of a parsing error.
   > \`result <- 2 + 2\` is syntactically valid R; it assigns 4 to \`result\` without producing any output.
-- Because R only prints character strings.
-  > R auto-prints numeric values just as readily as character ones; the reason there is no output here is the assignment, not the type.`}
+- [o] Because the result of the expression was assigned to the variable \`result\` instead of being printed.
+  > Assignment is silent. To see the value, add a separate line: \`print(result)\` or just \`result\`.
+- Because R does not handle integer arithmetic.
+  > R handles integer and floating-point arithmetic without issue; \`2 + 2\` evaluates to \`4\` correctly, the result is simply stored silently.`}
 />
 
 ## Mini challenge: write a tiny program

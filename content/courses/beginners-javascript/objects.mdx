@@ -531,14 +531,14 @@ if (JSON.stringify(updates) !== '{"age":29}') throw new Error("updates was mutat
 <MultipleChoice
   markdown={`What does \`{ ...base, ...updates }\` do in modern JavaScript?
 
-- It creates a deep clone of \`base\` and \`updates\`
-  > Object spread performs a *shallow* copy: nested objects inside \`base\` or \`updates\` are shared by reference in the resulting object, not recursively cloned.
 - It throws an error because objects can't be spread
   > Object spread (\`{...obj}\`) has been valid JavaScript since ES2018; it is one of the most widely used features of modern JS and works on any plain object.
-- [o] It creates a new object combining the properties of \`base\` and \`updates\`. Where both objects have the same key, the later one (\`updates\`) wins.
-  > Object spread is one of the most useful features of modern JavaScript: it makes "produce a new object based on an existing one" a one-liner. Note that the merge is *shallow*, nested objects and arrays are still shared by reference.
 - It modifies \`base\` in place by adding the properties of \`updates\`
   > The spread syntax inside \`{ }\` creates a new object literal; neither \`base\` nor \`updates\` is mutated, which is exactly what makes this pattern useful for immutable-style updates.
+- It creates a deep clone of \`base\` and \`updates\`
+  > Object spread performs a *shallow* copy: nested objects inside \`base\` or \`updates\` are shared by reference in the resulting object, not recursively cloned.
+- [o] It creates a new object combining the properties of \`base\` and \`updates\`. Where both objects have the same key, the later one (\`updates\`) wins.
+  > Object spread is one of the most useful features of modern JavaScript: it makes "produce a new object based on an existing one" a one-liner. Note that the merge is *shallow*, nested objects and arrays are still shared by reference.
 
 This pattern is the foundation of immutable-update code style: produce new objects instead of mutating existing ones.`}
 />

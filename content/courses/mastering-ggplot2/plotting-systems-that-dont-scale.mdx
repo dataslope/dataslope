@@ -107,14 +107,14 @@ system work out the drawing? That is exactly the promise of a
 <MultipleChoice
   markdown={`In the base R example above, why did we have to build a legend manually with the same colors and shapes as the points?
 
-- Base R cannot draw legends at all.
-  > Base R can draw legends; the problem is that it does not build them *automatically* from the data.
-- [o] In a command-by-command system the legend is a separate drawing step with no automatic link to the data mapping, so it must be kept in sync by hand.
-  > Because meaning (cyl controls color) and drawing (this legend swatch is "tomato") are not connected, you maintain the legend yourself.
 - Legends are only needed for line charts.
   > Legends are needed whenever a visual property encodes a variable, regardless of chart type.
 - The legend updates itself whenever the colors change.
   > That is precisely what does *not* happen here, changing the colors would silently desync the legend.
+- [o] In a command-by-command system the legend is a separate drawing step with no automatic link to the data mapping, so it must be kept in sync by hand.
+  > Because meaning (cyl controls color) and drawing (this legend swatch is "tomato") are not connected, you maintain the legend yourself.
+- Base R cannot draw legends at all.
+  > Base R can draw legends; the problem is that it does not build them *automatically* from the data.
 
 In traditional plotting APIs, the legend is just more ink on the
 canvas. Nothing ties it to the fact that color *means* cylinder count,
@@ -135,12 +135,12 @@ so you become responsible for keeping it consistent.`}
 <MultipleChoice
   markdown={`Which statement best captures *why* command-by-command plotting code becomes hard to scale?
 
-- Computers are too slow to redraw large charts.
-  > Performance is not the issue here; the issue is how the code is structured.
-- R is a poorly designed language for graphics.
-  > The limitation is the *imperative model*, not the language; the same problem appears in matplotlib and spreadsheet tools.
 - [o] The chart's meaning and its drawing instructions are fused, so every new requirement forces manual edits to low-level drawing steps.
   > With no separation between meaning and rendering, complexity compounds as the chart grows.
+- R is a poorly designed language for graphics.
+  > The limitation is the *imperative model*, not the language; the same problem appears in matplotlib and spreadsheet tools.
+- Computers are too slow to redraw large charts.
+  > Performance is not the issue here; the issue is how the code is structured.
 - Scatter plots specifically cannot show more than two variables.
   > Scatter plots can encode more variables via color, size, and shape; the difficulty is *managing* that encoding by hand.
 

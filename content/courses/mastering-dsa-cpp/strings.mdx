@@ -378,38 +378,38 @@ int main() {
 <MultipleChoice
   markdown={`What is the time complexity of indexing a valid position in a \`std::string\` with \`s[i]\`?
 
-- [o] O(1)
-  > A string stores characters contiguously and computes the address directly.
+- O(n log n)
+  > Sorting-like complexity is not involved.
 - O(log n)
   > There is no tree search involved.
+- [o] O(1)
+  > A string stores characters contiguously and computes the address directly.
 - O(n)
-  > Linear scans are used for operations like searching, not direct indexing.
-- O(n log n)
-  > Sorting-like complexity is not involved.`}
+  > Linear scans are used for operations like searching, not direct indexing.`}
 />
 
 <MultipleChoice
   markdown={`Why might a function take \`std::string_view\` instead of \`const std::string&\`?
 
-- [o] It can accept strings, literals, and slices without owning or copying the characters.
-  > A view is just a pointer and a length.
+- It stores characters more compactly than char.
+  > It does not store the characters at all.
 - It always extends the lifetime of temporary character data.
   > It does not own data, so lifetime must still be valid.
+- [o] It can accept strings, literals, and slices without owning or copying the characters.
+  > A view is just a pointer and a length.
 - It allows mutation of the original string.
-  > A plain string_view is read-only access to characters.
-- It stores characters more compactly than char.
-  > It does not store the characters at all.`}
+  > A plain string_view is read-only access to characters.`}
 />
 
 <MultipleChoice
   markdown={`What does \`s.substr(pos, count)\` return for a \`std::string s\`?
 
-- A pointer into the original string that can mutate it.
-  > \`substr\` returns a string object, not a mutable pointer.
 - [o] A new string containing up to \`count\` characters starting at \`pos\`.
   > The result owns its copied characters.
 - The number of characters after \`pos\`.
   > That would be a length calculation, not \`substr\`.
+- A pointer into the original string that can mutate it.
+  > \`substr\` returns a string object, not a mutable pointer.
 - A boolean indicating whether the substring exists.
   > Search functions such as \`find\` are used for that.`}
 />

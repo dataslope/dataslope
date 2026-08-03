@@ -207,10 +207,10 @@ us there in one line.
 <MultipleChoice
   markdown={`Why is Michael van Langren's 1644 longitude chart historically important?
 
-- It was the first map of the world.
-  > The earliest geographic maps predate van Langren by thousands of years, Babylonian clay tablets and Ptolemy's *Geographia* are among many examples. His 1644 chart was not a map of the world.
 - [o] It was an early statistical graphic that revealed disagreement among measurements by plotting them visually.
   > By plotting each astronomer's estimate as a dot on a line, van Langren let the *eye* notice that the values clustered far from the conventional answer. A picture of disagreement turned out to be more honest than any single number.
+- It was the first map of the world.
+  > The earliest geographic maps predate van Langren by thousands of years, Babylonian clay tablets and Ptolemy's *Geographia* are among many examples. His 1644 chart was not a map of the world.
 - It proved that Toledo and Rome were 17° apart.
   > The actual longitude difference is approximately 14.5°. More importantly, van Langren's chart showed the *range of uncertainty* across twelve estimates, it did not prove any single value.
 - It was the first chart drawn with a computer.
@@ -222,14 +222,14 @@ Van Langren's insight, that a picture of data can reveal a story numbers alone c
 <MultipleChoice
   markdown={`Which chart types is **William Playfair** credited with inventing or popularizing?
 
+- Histogram and box plot.
+  > Histograms are attributed to Karl Pearson in the 1890s, and box plots to John Tukey in the 1970s. Both post-date Playfair by at least a century.
+- 3-D surface plot and treemap.
+  > 3-D surface plots emerged with computational graphics, and treemaps were invented by Ben Shneiderman in 1991. Neither connects to Playfair in the 18th century.
 - [o] Line chart, bar chart, and pie chart.
   > Playfair introduced the line and bar charts in his 1786 *Commercial and Political Atlas* and the pie chart around 1801. All three are still among the most-used chart types on Earth.
 - Scatter plot and heatmap.
   > Scatter plots are credited to later contributors (Francis Galton used them in the 1880s), and heatmaps became common in 20th-century scientific visualization. Neither is associated with Playfair.
-- 3-D surface plot and treemap.
-  > 3-D surface plots emerged with computational graphics, and treemaps were invented by Ben Shneiderman in 1991. Neither connects to Playfair in the 18th century.
-- Histogram and box plot.
-  > Histograms are attributed to Karl Pearson in the 1890s, and box plots to John Tukey in the 1970s. Both post-date Playfair by at least a century.
 
 These chart types feel "natural" today only because Playfair won the argument. In 1786 they were strange new objects.`}
 />
@@ -237,14 +237,14 @@ These chart types feel "natural" today only because Playfair won the argument. I
 <MultipleChoice
   markdown={`What was the *primary point* of Nightingale's rose diagram?
 
-- That war is dangerous.
-  > The Crimean War was obviously dangerous, but Nightingale's specific argument was about *preventable* mortality inside the hospitals, a distinct and actionable claim.
-- [o] That far more soldiers were dying of preventable infections than of battlefield wounds.
-  > The blue wedges (disease) dwarfed the red wedges (wounds), making it instantly visible that *sanitation*, not enemy fire, was the deadlier threat, and turning a statistical argument into something a non-statistician could see at a glance.
-- That Crimea was colder in winter than in summer.
-  > Temperature appears nowhere in the rose diagram; the wedge areas encode deaths by cause, not weather.
 - That nurses were better than doctors.
   > The diagram does not compare professional roles; its argument is about preventable disease versus wounds, pointing to sanitation failures.
+- That war is dangerous.
+  > The Crimean War was obviously dangerous, but Nightingale's specific argument was about *preventable* mortality inside the hospitals, a distinct and actionable claim.
+- That Crimea was colder in winter than in summer.
+  > Temperature appears nowhere in the rose diagram; the wedge areas encode deaths by cause, not weather.
+- [o] That far more soldiers were dying of preventable infections than of battlefield wounds.
+  > The blue wedges (disease) dwarfed the red wedges (wounds), making it instantly visible that *sanitation*, not enemy fire, was the deadlier threat, and turning a statistical argument into something a non-statistician could see at a glance.
 
 The chart's purpose was to provoke a specific *action*: clean up the hospitals. It did.`}
 />
@@ -252,14 +252,14 @@ The chart's purpose was to provoke a specific *action*: clean up the hospitals. 
 <MultipleChoice
   markdown={`What does Ben Shneiderman's mantra "overview first, zoom and filter, then details on demand" describe?
 
-- A SQL query optimization strategy.
-  > That phrase describes a human-facing workflow for exploring data through an interactive interface, not a database performance technique.
-- [o] A foundational rhythm for interactive data exploration, first see the whole, then narrow down, then inspect specifics.
-  > This 1996 phrase captures how an analyst uses an interactive chart: get the gestalt, drill into the interesting subset, then read exact values. Plotly Express supports every step of this loop out of the box.
 - A type of Plotly chart.
   > It is a design philosophy about how users interact with *any* chart, not a specific chart type.
+- A SQL query optimization strategy.
+  > That phrase describes a human-facing workflow for exploring data through an interactive interface, not a database performance technique.
 - A type of database index.
   > Database indexes speed up retrieval inside a database engine; the mantra is a user-interface and visualization principle, unrelated to database internals.
+- [o] A foundational rhythm for interactive data exploration, first see the whole, then narrow down, then inspect specifics.
+  > This 1996 phrase captures how an analyst uses an interactive chart: get the gestalt, drill into the interesting subset, then read exact values. Plotly Express supports every step of this loop out of the box.
 
 If you remember one rule about interactive design, make it this one.`}
 />

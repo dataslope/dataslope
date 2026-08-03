@@ -254,12 +254,12 @@ Common red flags that you should *not* be using inheritance:
 <MultipleChoice
   markdown={`What does polymorphism let you do?
 
-- Convert one type into another at compile time
-  > That's casting, not polymorphism.
 - Allocate less memory for subclasses
   > Memory layout is unrelated.
 - [o] Call the same method on different objects and have each respond in its own way, decided at runtime
   > That's exactly dynamic dispatch.
+- Convert one type into another at compile time
+  > That's casting, not polymorphism.
 - Write a class without any methods
   > Not what polymorphism means.`}
 />
@@ -267,27 +267,27 @@ Common red flags that you should *not* be using inheritance:
 <MultipleChoice
   markdown={`Which is the *best* signal that inheritance is appropriate between two classes?
 
-- They share a few fields
-  > Sharing fields can also be done via composition.
-- They sound related in English
-  > Too loose a criterion.
+- The child wants to reuse one helper method from the parent
+  > Reuse alone is not enough, use composition instead.
 - [o] Every instance of the child class genuinely *is a* legitimate instance of the parent and can be used wherever the parent is expected
   > This is the Liskov substitution intuition.
-- The child wants to reuse one helper method from the parent
-  > Reuse alone is not enough, use composition instead.`}
+- They sound related in English
+  > Too loose a criterion.
+- They share a few fields
+  > Sharing fields can also be done via composition.`}
 />
 
 <MultipleChoice
   markdown={`Why is the \`@Override\` annotation valuable?
 
-- It makes the override happen
-  > The override happens whether or not you annotate it.
+- It improves runtime performance
+  > It has no runtime effect.
 - [o] It tells the compiler "this method is supposed to override a parent's method," so a typo or signature mismatch becomes a compile error instead of a silently-new method
   > The annotation is a compile-time check; it catches mistakes that would otherwise create an unrelated new method.
 - It marks the method as final
   > That's \`final\`, not \`@Override\`.
-- It improves runtime performance
-  > It has no runtime effect.`}
+- It makes the override happen
+  > The override happens whether or not you annotate it.`}
 />
 
 ## A small polymorphism challenge

@@ -360,14 +360,14 @@ print(summary)
 <MultipleChoice
   markdown={`Reporting income data for a country, which is usually the more representative single number?
 
+- std
+  > Standard deviation measures spread, not a central tendency; it tells you how dispersed incomes are, not what a typical income is.
 - mean
   > The mean is pulled upward by very high earners, making it higher than what most people actually earn, a misleading summary for a right-skewed distribution.
 - [o] median, incomes are right-skewed and median is robust to the few very high earners
   > Mean income is dragged upward by a small number of very large values.
 - mode
   > The mode reports the most frequent value, which for continuous income data may not even be near the typical earner and is not the summary the question asks for.
-- std
-  > Standard deviation measures spread, not a central tendency; it tells you how dispersed incomes are, not what a typical income is.
 
 This is among the most common real-world stats mistakes.`}
 />
@@ -375,14 +375,14 @@ This is among the most common real-world stats mistakes.`}
 <MultipleChoice
   markdown={`What does \`value_counts(normalize=True)\` return?
 
-- Sorted values
-  > \`value_counts()\` does return values sorted by count by default, but \`normalize=True\` specifically changes counts to proportions, sorting is orthogonal to normalization.
-- Z-scores
-  > Z-scores standardize values relative to the mean and standard deviation; \`normalize=True\` divides counts by the total to get relative frequencies.
-- [o] Proportions (relative frequencies) instead of raw counts, perfect for "what share of rows fall into each category"
-  > Multiply by 100 for percentages.
 - A heatmap
   > A heatmap is a 2-D visualization of a matrix; \`value_counts(normalize=True)\` returns a 1-D Series of proportions, not a chart.
+- [o] Proportions (relative frequencies) instead of raw counts, perfect for "what share of rows fall into each category"
+  > Multiply by 100 for percentages.
+- Z-scores
+  > Z-scores standardize values relative to the mean and standard deviation; \`normalize=True\` divides counts by the total to get relative frequencies.
+- Sorted values
+  > \`value_counts()\` does return values sorted by count by default, but \`normalize=True\` specifically changes counts to proportions, sorting is orthogonal to normalization.
 
 A small but frequently used flag.`}
 />
@@ -390,14 +390,14 @@ A small but frequently used flag.`}
 <MultipleChoice
   markdown={`Two columns have a correlation of -0.95. The correct interpretation is:
 
-- One causes the other
-  > Correlation measures the strength of linear co-movement; it provides no information about which variable, if either, causes changes in the other.
-- They are unrelated
-  > A correlation of -0.95 is near the maximum magnitude of -1.0, indicating a very strong relationship, the opposite of unrelated.
-- [o] They have a very strong **inverse** linear relationship, when one goes up, the other tends to go down. (No claim about cause.)
-  > Strong correlation, negative direction, but causation is a separate investigation.
 - It is a bug
   > A correlation of -0.95 is a valid, meaningful result from Pandas; it is not an error.
+- One causes the other
+  > Correlation measures the strength of linear co-movement; it provides no information about which variable, if either, causes changes in the other.
+- [o] They have a very strong **inverse** linear relationship, when one goes up, the other tends to go down. (No claim about cause.)
+  > Strong correlation, negative direction, but causation is a separate investigation.
+- They are unrelated
+  > A correlation of -0.95 is near the maximum magnitude of -1.0, indicating a very strong relationship, the opposite of unrelated.
 
 Sign matters as much as magnitude.`}
 />
@@ -405,12 +405,12 @@ Sign matters as much as magnitude.`}
 <MultipleChoice
   markdown={`The 1.5×IQR rule flags a few "outliers" in your data. What is the correct next step?
 
-- Delete them immediately
-  > Deleting without investigation risks removing real, important data points, the 1.5×IQR rule is a heuristic that flags candidates, not a verdict.
-- Ignore them
-  > Ignoring flagged values is as risky as deleting them; an outlier could be a data-entry error that would corrupt every downstream calculation.
 - [o] Investigate, they might be data errors, sentinel values, or genuinely important edge cases. The decision to drop, cap, or keep depends on context.
   > The rule highlights candidates; you make the judgement.
+- Ignore them
+  > Ignoring flagged values is as risky as deleting them; an outlier could be a data-entry error that would corrupt every downstream calculation.
+- Delete them immediately
+  > Deleting without investigation risks removing real, important data points, the 1.5×IQR rule is a heuristic that flags candidates, not a verdict.
 - Replace them with the mean
   > Mean imputation is one possible strategy, but applying it before investigating can mask real errors or distort the distribution.
 
