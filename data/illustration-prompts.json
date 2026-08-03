@@ -6270,7 +6270,7 @@
       "title": "What is natural language processing?",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tangled ribbon of loose blank word tiles on one platform beside the same tiles arranged into a tidy structured lattice"
+      "subject": "one loose tangle of thick ribbon on one half of a platform beside a tidy stack of three big plain tiles on the other"
     },
     {
       "id": "nlp-pipeline",
@@ -6282,7 +6282,7 @@
       "title": "The anatomy of an NLP pipeline",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a straight conveyor line passing through five distinct processing stations, the material growing tidier at each stop"
+      "subject": "one straight thick pipe crossing a platform through three large plain collars, a big tile entering rough and leaving smooth"
     },
     {
       "id": "nlp-tokenization",
@@ -6318,7 +6318,7 @@
       "title": "Identifying and removing stopwords",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a sieve on a platform catching a pile of tiny featureless pebbles while larger distinctive shapes pass through into a tray"
+      "subject": "one wide grate on a platform with three large plain shapes resting on top of it and a drift of small flat chips fallen through underneath"
     },
     {
       "id": "nlp-stemming",
@@ -6330,7 +6330,7 @@
       "title": "Stemming vs. lemmatization",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "four branching stalks of different lengths converging down into one shared root block on a platform"
+      "subject": "three thick stalks of different heights on a platform curving down into one shared plain root block"
     },
     {
       "id": "nlp-frequencies",
@@ -6354,7 +6354,7 @@
       "title": "N-grams: bigrams and trigrams",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a sliding viewing frame two tiles wide travelling along a row of blank tiles, capturing overlapping adjacent pairs"
+      "subject": "one wide open frame two cells across sliding along a row of five big blank tiles on a rail"
     },
     {
       "id": "nlp-pos-tagging",
@@ -6366,7 +6366,7 @@
       "title": "Part-of-speech tagging",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a row of blank word tiles on a track, each receiving a small differently shaped coloured cap from an overhead sorter"
+      "subject": "four big blank tiles standing in a row on a track, each wearing a large differently shaped coloured cap"
     },
     {
       "id": "nlp-bag-of-words",
@@ -6378,7 +6378,7 @@
       "title": "From text to features: bag-of-words",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an open sack tipping loose tiles onto a counting grid that fills into a sparse matrix of small numeric blocks"
+      "subject": "one wide open sack tipping large plain tiles onto a broad tray of nine big cells, three cells already stacked higher than the rest"
     },
     {
       "id": "nlp-tf-idf",
@@ -6390,7 +6390,7 @@
       "title": "TF-IDF: weighting words by how telling they are",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a balance beam on a platform where a common repeated tile sits light and a rare distinctive tile weighs the pan down"
+      "subject": "one wide seesaw beam on a platform with a stack of three identical plain tiles riding high on one end and a single large tile holding the other end down"
     },
     {
       "id": "nlp-sentiment",
@@ -6414,7 +6414,7 @@
       "title": "Designing the right preprocessing pipeline",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a modular conveyor with interchangeable station blocks, two stations lifted out and set aside on the platform"
+      "subject": "three large plain station blocks bolted along one straight rail on a platform, a fourth block resting unattached beside the rail"
     },
     {
       "id": "nlp-discussions",
@@ -6426,7 +6426,7 @@
       "title": "Interesting discussions: how NLP got here",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a row of six small commemorative platform plinths of increasing height, each carrying a different simple machine"
+      "subject": "three plain plinths of rising height on one platform, each carrying a single large simple machine part"
     },
     {
       "id": "nlp-next-steps",
@@ -6438,7 +6438,7 @@
       "title": "Where to go next",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot beside a finished pipeline platform, a signpost pointing toward larger floating structures"
+      "subject": "the Dataslope marmot mascot on a wide platform beside one big plain signpost, a single large structure floating in the distance"
     },
     {
       "id": "oopj-software-crisis",
@@ -6450,7 +6450,7 @@
       "title": "The software crisis",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a precarious leaning tower of mismatched blocks on a platform, loose cables spilling out of its sides"
+      "subject": "one tall leaning tower of mismatched plain blocks on a platform with a single thick cable spilling from its side"
     },
     {
       "id": "oopj-birth-of-oop",
@@ -6486,7 +6486,7 @@
       "title": "Constructors and state",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an assembly cradle on a platform releasing one fully formed sealed object, a rejected half-built shell set aside"
+      "subject": "one wide cradle on a platform holding a single large sealed block, an open half-shell lying beside it"
     },
     {
       "id": "oopj-encapsulation",
@@ -6570,7 +6570,7 @@
       "title": "Abstract classes",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a partly built frame on a platform with most panels fitted and one empty socket left open, two finished variants standing beside it"
+      "subject": "one large plain frame on a platform with a single empty socket in its face, two finished blocks standing beside it"
     },
     {
       "id": "oopj-interfaces",
@@ -6642,7 +6642,7 @@
       "title": "The Gang of Four",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a shelf of four bound volumes on a platform with repeating identical structural motifs lifting out of them into the air"
+      "subject": "one large closed book lying flat on a plinth with three identical plain shapes rising out of its cover"
     },
     {
       "id": "oopj-packages",
@@ -6690,7 +6690,7 @@
       "title": "The age of data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a single precious ledger book on a small plinth beside a towering cascade of identical data tiles pouring off a platform"
+      "subject": "one small closed ledger on a low plinth beside a tall cascade of plain tiles pouring off a high platform"
     },
     {
       "id": "rlang-stats-before-computers",
@@ -6702,7 +6702,7 @@
       "title": "Statistics before computers",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a long shared desk with three hand-crank calculating machines and neat columns of paper sheets stacked between them"
+      "subject": "one long plain desk on a platform carrying a single large hand-crank machine and one neat stack of blank sheets"
     },
     {
       "id": "rlang-rise-of-computing",
@@ -6714,7 +6714,7 @@
       "title": "The rise of statistical computing",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a room-sized mainframe cabinet with a tape reel spinning, a small punched-card tray feeding into its front slot"
+      "subject": "one large plain cabinet on a platform with a single big tape reel turning on its front"
     },
     {
       "id": "rlang-from-s-to-r",
@@ -6726,7 +6726,7 @@
       "title": "From S to R",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two connected workbenches on stepped platforms, a small teaching bench feeding a larger open one built from the same parts"
+      "subject": "one small plain bench on a low platform joined by a single thick ramp to a much larger bench on a high one"
     },
     {
       "id": "rlang-why-r-matters",
@@ -6738,7 +6738,7 @@
       "title": "Why R matters today",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a specialised precision instrument standing on a platform beside three bulkier general-purpose machines"
+      "subject": "one slim precise instrument standing on a tall plinth beside two bulky plain machines on a lower platform"
     },
     {
       "id": "rlang-thinking-in-data",
@@ -6786,7 +6786,7 @@
       "title": "Variables and assignment",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a labelled storage jar on a platform with a left-pointing arrow feeding a value block into its open mouth"
+      "subject": "one large plain jar standing open on a platform with a single big block being lowered into its mouth"
     },
     {
       "id": "rlang-vectors",
@@ -6858,7 +6858,7 @@
       "title": "Data frames",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a rectangular grid platform of tiles with one full column lifted straight up as a separate tray"
+      "subject": "one wide plain grid on a platform with a single full column lifted straight out of it as a separate tray"
     },
     {
       "id": "rlang-inspecting",
@@ -6870,7 +6870,7 @@
       "title": "Inspecting a dataset",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a magnifying lens on an arm hovering over a grid platform, a small checklist of five ticked marks beside it"
+      "subject": "one big round lens on a tall arm hovering over a wide plain grid on a platform"
     },
     {
       "id": "rlang-subsetting",
@@ -6882,7 +6882,7 @@
       "title": "Subsetting and filtering",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform with a rectangular selection frame lifting out one block of rows and columns"
+      "subject": "one wide plain grid on a platform with a big open frame lifting a single square block of it clear"
     },
     {
       "id": "rlang-summary-stats",
@@ -6894,7 +6894,7 @@
       "title": "Summary statistics",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a column of tiles funnelling down into three small dials showing centre, spread and range"
+      "subject": "one tall stack of plain tiles on a platform funnelling down into a single large round dial"
     },
     {
       "id": "rlang-tidy-data",
@@ -6906,7 +6906,7 @@
       "title": "Tidy data principles",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a messy heap of irregular tiles on one platform beside the same tiles arranged into a perfect rectangular grid"
+      "subject": "one loose heap of irregular plain tiles on a platform beside the same tiles laid into a neat rectangular block"
     },
     {
       "id": "rlang-reshaping",
@@ -6930,7 +6930,7 @@
       "title": "The dplyr verbs",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "five distinct station blocks chained along a pipe on a platform, a grid of tiles flowing through them in sequence"
+      "subject": "three large plain station blocks threaded on one straight pipe across a platform, a single big tile passing through them"
     },
     {
       "id": "rlang-grouped-analysis",
@@ -6942,7 +6942,7 @@
       "title": "Grouped analysis",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid of tiles splitting into three coloured piles, each pile compressing into one summary block, then combining into a small result tray"
+      "subject": "nine large plain tiles on a wide platform gathered into three coloured piles, each pile capped by one flat summary slab"
     },
     {
       "id": "rlang-scripts-projects",
@@ -6954,7 +6954,7 @@
       "title": "Scripts and projects",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an open folder platform holding three tidy labelled sub-trays for code, data and outputs, connected by short arrows"
+      "subject": "one large open folder lying on a platform holding three big plain trays side by side"
     },
     {
       "id": "rlang-reproducible",
@@ -6966,7 +6966,7 @@
       "title": "Reproducible analysis",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one script block feeding a machine that stamps three identical output sheets on a platform"
+      "subject": "one plain block on a platform feeding a wide press that stamps three identical flat sheets into a stack"
     },
     {
       "id": "rlang-viz-principles",
@@ -6978,7 +6978,7 @@
       "title": "Principles of visualization",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a cluttered chart panel on one platform beside a stripped-back version of the same chart, only its data marks remaining"
+      "subject": "one wide chart panel on a platform with its frame, gridlines and backing peeled away and stacked to one side, a single curve left on the bare panel"
     },
     {
       "id": "rlang-ggplot-grammar",
@@ -7014,7 +7014,7 @@
       "title": "Relationships between variables",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a scatter of dots rising across a plane with a straight trend ribbon threading through them, a small cross-tab grid beside it"
+      "subject": "one wide plate with a scatter of flat circles rising across it and a single straight ribbon laid through them"
     },
     {
       "id": "rlang-interpreting-plots",
@@ -7050,7 +7050,7 @@
       "title": "Sampling and distributions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a large bin of mixed flat discs with a small scoop lifting out a handful, the scoop's contents forming a small pile on a tray"
+      "subject": "one wide bin of flat discs on a platform with a big scoop lifted clear of it, a small pile of discs on a tray below"
     },
     {
       "id": "rlang-inference",
@@ -7062,7 +7062,7 @@
       "title": "Intuition for inference",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a horizontal range bar on a platform with a bracketed interval marked on it and a single point estimate pin inside"
+      "subject": "one long plain rail on a platform with a wide bracket clamped across its middle and a single tall pin standing inside the bracket"
     },
     {
       "id": "rlang-mini-project",
@@ -7074,7 +7074,7 @@
       "title": "Mini project walkthrough",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "six stepped platforms rising in sequence from a raw grid to a finished chart, the Dataslope marmot mascot standing at the summit"
+      "subject": "the Dataslope marmot mascot at the top of three broad steps, one finished chart panel standing beside it"
     },
     {
       "id": "rlang-next-steps",
