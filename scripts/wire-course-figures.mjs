@@ -231,7 +231,13 @@ function main() {
     return;
   }
   const { dir } = COLLECTIONS[collection];
-  const positional = argv.filter((a, i) => !a.startsWith("-") && i !== flag + 1);
+  // Skip the value that follows `--collection`, but only when the flag is
+  // actually present: with `flag === -1`, `flag + 1` is 0, which would drop
+  // the first positional argument and make the documented
+  // `wire-course-figures.mjs <course> --dry-run` form print help instead.
+  const positional = argv.filter(
+    (a, i) => !a.startsWith("-") && !(flag !== -1 && i === flag + 1),
+  );
   const courses = argv.includes("--all")
     ? readdirSync(dir).filter((d) => statSync(join(dir, d)).isDirectory())
     : positional;

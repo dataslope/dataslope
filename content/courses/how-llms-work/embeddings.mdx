@@ -7,6 +7,11 @@ A token id is a number, but it is a meaningless one. Token 11241
 (`" token"`) is not 11 times more of anything than token 1001. Ids are
 labels, and labels support no arithmetic.
 
+<Figure
+  slug="llm-embeddings-cutout"
+  alt="A three-dimensional lattice of floating labelled spheres where similar spheres cluster tightly together and one unrelated sphere sits far away across the grid"
+/>
+
 So the first thing the model does is replace each id with a **vector**:
 a list of a few thousand numbers. This is the **embedding**, and it is
 looked up from a table that was learned during training.

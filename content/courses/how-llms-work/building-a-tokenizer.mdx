@@ -7,6 +7,11 @@ The vocabulary in the previous chapter was hand-written. Real ones are
 *learned*, by an algorithm called **byte-pair encoding** (BPE) that is
 simple enough to build here in full.
 
+<Figure
+  slug="llm-building-tokenizer-cutout"
+  alt="A workbench where pairs of adjacent letter blocks are being fused into single larger blocks by a press, with a numbered stack of completed merge rules accumulating beside it"
+/>
+
 ## The algorithm
 
 Start with every word split into individual characters. Then repeat:

@@ -7,6 +7,11 @@ Joins are where generated code goes wrong most expensively, because a
 join defect does not corrupt one value. It corrupts the row set, and
 every aggregate computed afterwards inherits the damage.
 
+<Figure
+  slug="aida-broken-joins-cutout"
+  alt="Two rows of blocks being zipped together, where one block on the left splits into three duplicate copies as it passes the join point, the resulting pile visibly taller than it should be"
+/>
+
 ## Fan-out: the expensive one
 
 You join `orders` to `order_lines` on `order_id`. Orders is one row
