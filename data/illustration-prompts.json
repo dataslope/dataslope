@@ -377,8 +377,8 @@
       "category": "course-thumbnail",
       "title": "C# LINQ and Functional Patterns: course thumbnail",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a conveyor pipeline where shapes pass through three filter gates and emerge sorted into a tray"
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot standing beside a short conveyor, three large cubes passing through a single wide gate into a shallow tray"
     },
     {
       "id": "data-analysis-python-pandas-thumbnail",
@@ -438,7 +438,7 @@
       "title": "Introduction to Data Visualization with Plotly: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a raised chart platform with bars, a line ribbon and a scatter of dots, one bar lifted slightly above the rest"
+      "subject": "a raised chart platform with four bars and a smooth line ribbon, one bar lifted slightly above the rest"
     },
     {
       "id": "intro-modern-csharp-thumbnail",
@@ -485,8 +485,8 @@
       "category": "course-thumbnail",
       "title": "Java Collections and Generics Deep Dive: course thumbnail",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a rack of differently shaped containers, each holding matching coloured tokens, one drawer pulled open"
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot pulling open one drawer of a small rack of three large containers, each holding a few big coloured tokens"
     },
     {
       "id": "java-programming-for-beginners-thumbnail",
@@ -509,8 +509,8 @@
       "category": "course-thumbnail",
       "title": "Machine Learning with scikit-learn: course thumbnail",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a scatter of coloured dots on a raised plane with a smooth curve fitted through them and a small dial beside it"
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot beside a raised plane holding a few large coloured spheres with one smooth curve fitted through them"
     },
     {
       "id": "mastering-dsa-cpp-thumbnail",
@@ -522,7 +522,7 @@
       "title": "Mastering Data Structures and Algorithms in C++: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a branching tree of connected nodes rising from a platform beside a short row of linked boxes"
+      "subject": "a small tree of five large connected nodes rising from a platform beside a short row of three linked boxes"
     },
     {
       "id": "mastering-ggplot2-thumbnail",
@@ -618,7 +618,7 @@
       "title": "Seaborn Foundations: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a raised platform holding a box plot, a scatter cloud and a smooth distribution curve side by side"
+      "subject": "a raised platform holding a box plot, a rising line chart and a smooth distribution curve side by side"
     },
     {
       "id": "sql-analytics-duckdb-thumbnail",
@@ -810,7 +810,7 @@
       "title": "How computers see data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a cutaway showing a row of small bit switches feeding into a byte block and then into a labelled file card"
+      "subject": "three large toggle switches feeding into one big block and then into a single blank card"
     },
     {
       "id": "pandas-spreadsheets-vs-code",
@@ -846,7 +846,7 @@
       "title": "Notebooks and environments",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an open notebook panel on a platform beside three sealed environment containers"
+      "subject": "one open blank notebook panel on a platform beside two large sealed containers"
     },
     {
       "id": "pandas-reproducible-analysis",
@@ -906,7 +906,7 @@
       "title": "Rows and columns",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform with one row band and one column band raised and picked out from the rest"
+      "subject": "a coarse grid platform with one row band and one column band raised above the rest"
     },
     {
       "id": "pandas-indexes-and-labels",
@@ -918,7 +918,7 @@
       "title": "Indexes and labels",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform with a labelled tab strip running down its left edge, one tab pulled out"
+      "subject": "a coarse grid platform with three large blank tabs down its left edge, one tab pulled out"
     },
     {
       "id": "pandas-loading-datasets",
@@ -942,7 +942,7 @@
       "title": "First look at a dataset",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot peering over the edge of a large grid platform through a magnifying lens"
+      "subject": "the Dataslope marmot mascot peering over the edge of a large coarse grid platform through a big magnifying lens"
     },
     {
       "id": "pandas-eda-workflow",
@@ -954,7 +954,7 @@
       "title": "The EDA workflow",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a looping track of five small numbered stations circling a central grid platform"
+      "subject": "a simple loop track circling a central grid platform with three large blank stations spaced around it"
     },
     {
       "id": "pandas-selecting-data",
@@ -978,7 +978,7 @@
       "title": "loc vs iloc",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two side-by-side grid platforms, one addressed by lettered edge tabs and the other by numbered edge tabs"
+      "subject": "two side-by-side coarse grid platforms, one addressed by three large square edge tabs and the other by three large round edge tabs"
     },
     {
       "id": "pandas-filtering-data",
@@ -990,7 +990,7 @@
       "title": "Filtering data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform passing through a sieve gate, only some of its rows continuing through to the far side"
+      "subject": "a coarse grid platform passing through one wide sieve gate, two of its rows continuing through to the far side"
     },
     {
       "id": "pandas-sorting-and-ranking",
@@ -1050,7 +1050,7 @@
       "title": "Messy data",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a giant panda tidying a jumbled heap of mismatched tiles into one neat stack"
+      "subject": "a giant panda tidying a loose heap of six large mismatched tiles into one neat stack"
     },
     {
       "id": "pandas-string-operations",
@@ -1098,7 +1098,7 @@
       "title": "Aggregation basics",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a funnel gathering many small cubes into a single larger cube on a platform"
+      "subject": "a large funnel gathering five big cubes into a single larger cube on a platform"
     },
     {
       "id": "pandas-groupby",
@@ -1110,7 +1110,7 @@
       "title": "GroupBy operations",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a giant panda directing a stream of mixed cubes into three coloured lanes, each lane merging into one block"
+      "subject": "a giant panda directing six large cubes into three coloured lanes, each lane merging into one block"
     },
     {
       "id": "pandas-pivot-tables",
@@ -1206,7 +1206,7 @@
       "title": "Hypothesis intuition",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two clustered groups of dots on a platform with a balance beam weighing one against the other"
+      "subject": "a balance beam on a platform weighing one large blue sphere against one large green sphere"
     },
     {
       "id": "pandas-debugging",
@@ -1230,7 +1230,7 @@
       "title": "Famous data disasters",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a toppled stack of tiles spilling across a platform beside a small warning marker"
+      "subject": "a toppled stack of six large tiles spilling across a platform beside one big warning cone"
     },
     {
       "id": "pandas-next-steps",
@@ -1362,7 +1362,7 @@
       "title": "Numbers and arithmetic",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a rail of sliding counters beside a small calculating machine on a platform"
+      "subject": "a platform holding a rail of six large sliding counter beads beside one simple boxy adding machine"
     },
     {
       "id": "js-strings-and-text",
@@ -1506,7 +1506,7 @@
       "title": "Map, filter, and reduce",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three chained stations on a track, a shaper then a sieve then a funnel, shapes passing through all three"
+      "subject": "three large stations in a row on a single track, a shaper then a sieve then a funnel, three big cubes passing along"
     },
     {
       "id": "js-functional-intuition",
@@ -1530,7 +1530,7 @@
       "title": "Problem solving with code",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a workbench breaking a puzzle into a numbered row of ordered steps"
+      "subject": "the Dataslope marmot mascot at a plain workbench fitting four large puzzle pieces into a single row"
     },
     {
       "id": "js-debugging-and-reasoning",
@@ -1614,7 +1614,7 @@
       "title": "From counting machines to C",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a stepped platform rising from a mechanical counting machine on the lowest step to a small terminal on the highest"
+      "subject": "three large steps rising from a simple gear box on the lowest step to a plain boxy computer on the highest"
     },
     {
       "id": "c-computational-thinking",
@@ -1806,7 +1806,7 @@
       "title": "Dynamic memory",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a small crane lifting a fresh block out of a large heap platform and setting it on a shelf"
+      "subject": "a small crane lifting one large block from a low heap of a few big blocks onto a simple two-shelf rack"
     },
     {
       "id": "c-linked-lists",
@@ -1890,7 +1890,7 @@
       "title": "Why LINQ exists",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tangle of loose wires on one side being replaced by a single clean pipeline segment on the other"
+      "subject": "a loose knot of three thick wires on one side replaced by a single clean pipe segment on the other"
     },
     {
       "id": "cs-modern-functional",
@@ -1902,7 +1902,7 @@
       "title": "Modern C# as a functional language",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a workbench swapping bulky imperative blocks for slim pipe segments"
+      "subject": "the Dataslope marmot mascot at a plain workbench swapping one bulky block for one slim pipe segment"
     },
     {
       "id": "cs-lambdas-and-delegates",
@@ -1938,7 +1938,7 @@
       "title": "Filtering and projection",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a sieve station followed by a shaping station on a single track, shapes passing through both"
+      "subject": "one large sieve station followed by one large shaping station on a single track, three big cubes passing through both"
     },
     {
       "id": "cs-ordering-and-grouping",
@@ -1950,7 +1950,7 @@
       "title": "Ordering and grouping",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "mixed cubes sorting into ordered rows and then clustering into three labelled bins"
+      "subject": "a loose heap of eight large cubes sorting into two ordered rows and then into two open bins"
     },
     {
       "id": "cs-aggregations",
@@ -1962,7 +1962,7 @@
       "title": "Aggregations",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a funnel collapsing many small cubes into one larger cube on a platform"
+      "subject": "a large funnel collapsing five big cubes into one larger cube on a platform"
     },
     {
       "id": "cs-set-operations",
@@ -1998,7 +1998,7 @@
       "title": "Deferred execution",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot resting a paw on a lever, a fully loaded conveyor held still at a closed gate"
+      "subject": "the Dataslope marmot mascot resting a paw on a large lever, a conveyor of four big cubes held still at a closed gate"
     },
     {
       "id": "cs-ienumerable-iteration",
@@ -2094,7 +2094,7 @@
       "title": "Functional design patterns",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a rack of interchangeable pipe modules resting on labelled shelves"
+      "subject": "a simple two-shelf rack holding six large interchangeable pipe modules"
     },
     {
       "id": "cs-capstone-pipeline",
@@ -2106,7 +2106,7 @@
       "title": "A functional data pipeline",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at the controls of a full multi-stage pipeline running end to end"
+      "subject": "the Dataslope marmot mascot at a plain control desk beside a pipeline of three large stages running end to end"
     },
     {
       "id": "cs-next-steps",
@@ -2142,7 +2142,7 @@
       "title": "How design drives data quality",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a crisply formed table block beside a warped one, a gauge standing between them"
+      "subject": "one crisp table block beside one warped table block with a large round gauge standing between them"
     },
     {
       "id": "db-design-and-scale",
@@ -2166,7 +2166,7 @@
       "title": "The relational revolution",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a stepped platform rising from loose ledgers to neatly linked table blocks, a friendly blue elephant (the PostgreSQL mascot) at the summit"
+      "subject": "a stepped platform rising from a few loose blank ledgers to three neatly linked table blocks, a friendly blue elephant (the PostgreSQL mascot) at the summit"
     },
     {
       "id": "db-ingres-to-postgresql",
@@ -2202,7 +2202,7 @@
       "title": "Attributes and their domains",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a labelled column slot accepting tokens of one shape and turning away the others"
+      "subject": "one wide column slot accepting three large round tokens and turning away one square token"
     },
     {
       "id": "db-choosing-data-types",
@@ -2238,7 +2238,7 @@
       "title": "Reading an ER diagram",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot tracing a connector rod between two entity boxes with a pointer"
+      "subject": "the Dataslope marmot mascot tracing a thick connector rod between two large entity boxes"
     },
     {
       "id": "db-what-are-relationships",
@@ -2310,7 +2310,7 @@
       "title": "Cardinality",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a connector rod with numbered end markers showing the count permitted at each end"
+      "subject": "a thick connector rod between two large blocks, one big round marker at one end and two at the other"
     },
     {
       "id": "db-self-referencing",
@@ -2334,7 +2334,7 @@
       "title": "Primary keys",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a table block with one column slot holding a single distinct key token"
+      "subject": "a coarse table block with one slot holding a single large distinct key token"
     },
     {
       "id": "db-natural-vs-surrogate",
@@ -2430,7 +2430,7 @@
       "title": "Why normalization exists",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) splitting one bloated table block into three tidy linked blocks"
+      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) splitting one large bloated table block into three tidy linked blocks"
     },
     {
       "id": "db-first-normal-form",
@@ -2490,7 +2490,7 @@
       "title": "A repeatable design process",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) walking a looping track of numbered design stations around a schema platform"
+      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) walking a simple loop track around a schema platform with three large blank station markers"
     },
     {
       "id": "db-case-study-blog",
@@ -2514,7 +2514,7 @@
       "title": "Designing an online store",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a friendly blue elephant (the PostgreSQL mascot) beside a schema of linked blocks for products, orders and customers laid out on a platform"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) beside three large linked blocks laid out on a platform"
     },
     {
       "id": "db-why-schemas-change",
@@ -2538,7 +2538,7 @@
       "title": "Evolving a schema safely",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot swapping a schema block while a bypass rod keeps the connection flowing"
+      "subject": "the Dataslope marmot mascot swapping one large schema block while a single bypass rod keeps the connection flowing"
     },
     {
       "id": "db-next-steps",
@@ -10338,7 +10338,7 @@
       "title": "How Large Language Models Work: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a transparent cutaway machine showing an open interior of layered stages, small text tiles entering one end, becoming glowing numbered chips, passing through stacked layers, and one chip emerging at the far end"
+      "subject": "a simple cutaway machine on a platform, three large blank chips entering one end and one larger glowing chip emerging at the far end"
     },
     {
       "id": "llm-what-is-a-model",
