@@ -1098,7 +1098,7 @@
       "title": "Aggregation basics",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a large funnel gathering five big cubes into a single larger cube on a platform"
+      "subject": "a large funnel gathering five big cubes into a single larger blue cube on a platform"
     },
     {
       "id": "pandas-groupby",
@@ -2526,7 +2526,7 @@
       "title": "Why schemas change",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a schema platform with one block being lifted out and a larger one lowered into its place"
+      "subject": "a platform with one large block lifted out and a larger block lowered into its place"
     },
     {
       "id": "db-evolving-schemas-safely",
@@ -2574,7 +2574,7 @@
       "title": "Computational thinking",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a workbench breaking one large block into a row of smaller labelled blocks"
+      "subject": "the Dataslope marmot mascot at a plain workbench breaking one large block into a row of three smaller blocks"
     },
     {
       "id": "cpp-how-computers-execute",
@@ -2610,7 +2610,7 @@
       "title": "The compilation pipeline",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a source card passing through a multi-stage press and emerging as a sealed binary brick"
+      "subject": "one large card passing through a single press and emerging as a sealed brick"
     },
     {
       "id": "cpp-types-and-values",
@@ -2658,7 +2658,7 @@
       "title": "Functions and modularity",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a machine with an input hopper and output chute, built from separate labelled bays"
+      "subject": "a simple machine with one input hopper and one output chute, built from three large separate bays"
     },
     {
       "id": "cpp-the-call-stack",
@@ -2742,7 +2742,7 @@
       "title": "Constructors and destructors",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a machine assembling an object at one end and dismantling it at the other"
+      "subject": "a simple machine assembling one large block at one end and taking it apart at the other"
     },
     {
       "id": "cpp-encapsulation",
@@ -2766,7 +2766,7 @@
       "title": "Inheritance and polymorphism",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a base object with two variants built on top of it, all three fitting the same socket"
+      "subject": "one large base block with two variants built on top of it, all three fitting the same socket"
     },
     {
       "id": "cpp-raii-and-resources",
@@ -2814,7 +2814,7 @@
       "title": "Dynamic memory",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a small crane lifting a fresh block out of a large heap platform and setting it on a shelf"
+      "subject": "a small crane lifting one large block from a low heap of a few big blocks onto a simple shelf"
     },
     {
       "id": "cpp-data-structures",
@@ -2862,7 +2862,7 @@
       "title": "Building maintainable software",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tidy assembled structure with labelled removable panels, one lifted clear"
+      "subject": "a tidy assembled box with three large removable panels, one lifted clear"
     },
     {
       "id": "cpp-next-steps",
@@ -2886,7 +2886,7 @@
       "title": "The evolution of software complexity",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tangle of loose wires on one side of a platform beside a clean modular assembly on the other"
+      "subject": "a loose knot of three thick wires on one side of a platform beside one clean modular assembly on the other"
     },
     {
       "id": "fp-roots-of-fp",
@@ -2898,7 +2898,7 @@
       "title": "The roots of functional thinking",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a stepped platform rising from a hand-cranked calculating machine to a clean pipeline"
+      "subject": "three large steps rising from a simple hand-cranked machine to a clean pipe segment"
     },
     {
       "id": "fp-typescript-meets-fp",
@@ -2982,7 +2982,7 @@
       "title": "Higher-order functions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a machine taking a smaller machine as one of its interchangeable parts"
+      "subject": "one large machine holding a smaller machine as an interchangeable part"
     },
     {
       "id": "fp-option-and-result",
@@ -3018,7 +3018,7 @@
       "title": "Algebraic data types",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "shapes combining into one labelled composite on one side and splitting into alternatives on the other"
+      "subject": "three large shapes combining into one composite block on one side and splitting into two alternatives on the other"
     },
     {
       "id": "fp-type-driven-design",
@@ -3042,7 +3042,7 @@
       "title": "Generic abstractions and type classes",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one socket accepting three differently shaped tokens through matching adapters"
+      "subject": "one socket accepting three large tokens, one round, one square and one triangular, through matching adapters"
     },
     {
       "id": "fp-effect-management",
@@ -3090,7 +3090,7 @@
       "title": "Composable architecture",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot assembling interchangeable pipe modules into one larger working system"
+      "subject": "the Dataslope marmot mascot fitting three large pipe modules into one working system"
     },
     {
       "id": "fp-category-theory",
@@ -3102,7 +3102,7 @@
       "title": "Category theory intuitions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two labelled shapes joined by an arrow, with a single composed arrow drawn beneath them"
+      "subject": "two large shapes joined by one arrow, with a single composed arrow beneath them"
     },
     {
       "id": "fp-capstone-pipeline",
@@ -3114,7 +3114,7 @@
       "title": "A functional data pipeline",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at the controls of a full multi-stage pipeline running end to end"
+      "subject": "the Dataslope marmot mascot at a simple control panel beside three large pipeline stages linked end to end"
     },
     {
       "id": "fp-next-steps",
@@ -10350,7 +10350,7 @@
       "title": "What a language model is",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a machine with a single output chute producing one token chip at a time, each new chip being fed back into the input hopper by a looping conveyor belt"
+      "subject": "a machine with one output chute producing a single large chip, a looping belt carrying it back into the input hopper"
     },
     {
       "id": "llm-tokens",
@@ -10374,7 +10374,7 @@
       "title": "Building a tokenizer",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a workbench where pairs of adjacent letter blocks are being fused into single larger blocks by a press, with a numbered stack of completed merge rules accumulating beside it"
+      "subject": "a press on a workbench fusing two large blank blocks into one bigger block, with three completed blocks stacked beside it"
     },
     {
       "id": "llm-token-counts",
@@ -10398,7 +10398,7 @@
       "title": "Embeddings",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a three-dimensional lattice of floating labelled spheres where similar spheres cluster tightly together and one unrelated sphere sits far away across the grid"
+      "subject": "a few large spheres floating over a coarse grid, three clustered close together and one sitting far away"
     },
     {
       "id": "llm-similarity",
@@ -10434,7 +10434,7 @@
       "title": "The shape of a transformer",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tall stack of identical paired layers rendered as a cutaway tower, each floor showing a mixing chamber beside a larger processing chamber, with a bypass channel running up the outside"
+      "subject": "a short cutaway tower of three identical stacked floors, each floor showing one small chamber beside one larger chamber, with a bypass channel running up the outside"
     },
     {
       "id": "llm-sampling",
@@ -10482,7 +10482,7 @@
       "title": "Reasoning models",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a machine with a large enclosed working chamber full of crossed-out draft attempts and one corrected path, feeding a single small clean output tray outside it"
+      "subject": "a machine with one large enclosed chamber holding a single winding path, feeding one small clean output tray outside it"
     },
     {
       "id": "llm-pricing-structure",
@@ -10518,7 +10518,7 @@
       "title": "Controlling cost",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a control panel of six levers of descending size, the largest lever at the front already pulled and diverting a flow of coins away into a savings container"
+      "subject": "a panel of three large levers, the front one pulled and diverting a flow of coins into a container"
     },
     {
       "id": "llm-benchmarks-measure",
@@ -10554,7 +10554,7 @@
       "title": "Evaluating for your task",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a small custom test bench holding a tray of thirty labelled sample cards, with two candidate machines plugged into it and a simple side-by-side result readout between them"
+      "subject": "a simple test bench holding a tray of four large blank cards, with two machines plugged into it"
     },
     {
       "id": "llm-next-steps",
@@ -10566,7 +10566,7 @@
       "title": "Next steps",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an open transparent machine casing with its internal stages now clearly labelled by simple icons, and a signposted path leading away from it toward further course platforms"
+      "subject": "an open machine casing on a platform beside a simple path leading away toward two further platforms"
     }
   ]
 }
