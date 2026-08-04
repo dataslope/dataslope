@@ -29,8 +29,10 @@ const CONSTRAINTS =
   "single solid piece in one flat brand color: never build one object out of " +
   "many small blocks or cubelets, never pack a container with a heap of little " +
   "pieces, and never blend, mix, or bleed two colors into each other. Animals " +
-  "are the exception: give each one its own natural fur, feather, or skin " +
-  "color, never a flat brand color.";
+  "are the exception and the focal point: draw each one as a rounded, " +
+  "realistic creature with soft fur or feather texture and its own natural " +
+  "coloring and markings, never a flat brand color and never a flat " +
+  "silhouette.";
 
 describe("buildIllustrationPrompt", () => {
   it("defaults to the isometric house style, with brand colors and the constraints", () => {
