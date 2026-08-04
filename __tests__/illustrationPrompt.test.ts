@@ -22,8 +22,10 @@ const CONSTRAINTS =
   "No text. Draw only the objects described — nothing scattered over, around, " +
   "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
   "Render each object as a solid three-dimensional form with real thickness, " +
-  "flat matte shading, and clean edges; draw any repeated round elements the " +
-  "subject calls for as low solid discs, never as glossy spheres or balls.";
+  "smooth matte shading, and clean edges; draw any repeated round elements the " +
+  "subject calls for as low solid discs, never as glossy spheres or balls. " +
+  "Stage everything light and airy on a white background: pale grey and white " +
+  "platforms, bright brand colors, no dark or black bases.";
 
 describe("buildIllustrationPrompt", () => {
   it("defaults to the isometric house style, with brand colors and the constraints", () => {

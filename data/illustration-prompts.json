@@ -918,7 +918,7 @@
       "title": "Indexes and labels",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "four thick upright dividers standing in one deep open box on a heavy base, a single divider lifted clear and held above the others"
+      "subject": "four thick upright dividers standing in one deep open box on a pale grey platform, a single divider lifted clear and held above the others"
     },
     {
       "id": "pandas-loading-datasets",
@@ -1086,7 +1086,7 @@
       "title": "Statistical summaries",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tall stack of thick round discs on a heavy press base, one broad piston head pressing the stack down into a single deep puck"
+      "subject": "a tall stack of thick round discs on a pale grey press platform, one broad piston head pressing the stack down into a single deep puck"
     },
     {
       "id": "pandas-aggregation-basics",
@@ -2430,7 +2430,7 @@
       "title": "Why normalization exists",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) standing on a heavy round plinth, together sliding one oversized solid block apart into three equal solid blocks along a thick rail"
+      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) standing on a pale grey round platform, together sliding one oversized solid block apart into three equal solid blocks along a thick rail"
     },
     {
       "id": "db-first-normal-form",
@@ -3150,7 +3150,7 @@
       "title": "Why charts exist",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one tall stack of thick blank cards standing at one end of a heavy base beside three solid columns of rising height at the other"
+      "subject": "one tall stack of thick blank cards standing at one end of a pale grey platform beside three solid columns of rising height at the other"
     },
     {
       "id": "viz-history-of-data-pictures",
@@ -3534,7 +3534,7 @@
       "title": "Interesting discussions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two solid domes of different colours standing well apart on one long heavy base, a wide empty trough running between them"
+      "subject": "two solid domes of different colours standing well apart on one long pale grey platform, a wide empty trough running between them"
     },
     {
       "id": "viz-next-steps",
@@ -3690,7 +3690,7 @@
       "title": "Methods and modularity",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one heavy solid cabinet on a base holding three thick drawers, a single drawer pulled fully out and resting on its own low stand"
+      "subject": "one solid cabinet on a pale grey platform holding three thick drawers, a single drawer pulled fully out and resting on its own low stand"
     },
     {
       "id": "mcs-collections",
@@ -3858,7 +3858,7 @@
       "title": "Why SQL and why PostgreSQL",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a friendly blue elephant (the PostgreSQL mascot) standing on a heavy round plinth beside one tall solid cabinet, its trunk lifting a single thick drawer clear of the cabinet"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) standing on a pale grey round platform beside one tall solid cabinet, its trunk lifting a single thick drawer clear of the cabinet"
     },
     {
       "id": "sql-how-apps-use-databases",
@@ -5082,7 +5082,7 @@
       "title": "Supervised vs unsupervised learning",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two deep trays on a heavy base, the first holding three solid cubes each capped with a bright coloured lid and the second holding three plain uncapped cubes pushed into two loose heaps"
+      "subject": "two deep trays on a pale grey platform, the first holding three solid cubes each capped with a bright coloured lid and the second holding three plain uncapped cubes pushed into two loose heaps"
     },
     {
       "id": "ml-three-task-types",
@@ -5382,7 +5382,7 @@
       "title": "Evaluating clusters",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two deep open bowls on one heavy base, the first holding three solid coloured blocks standing well apart in their own compartments and the second holding three blocks crowded together against one another"
+      "subject": "two deep open bowls on one pale grey platform, the first holding three solid coloured blocks standing well apart in their own compartments and the second holding three blocks crowded together against one another"
     },
     {
       "id": "ml-model-interpretation",
@@ -5814,7 +5814,7 @@
       "title": "Mapping vs. setting",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two chunky three-step staircases side by side on a heavy base, every step of the first the same blue and the three steps of the second in blue, green, and red"
+      "subject": "two thick three-step staircases side by side on a pale grey platform, every step of the first the same blue and the three steps of the second in blue, green, and red"
     },
     {
       "id": "gg-thinking-in-layers",
@@ -5862,7 +5862,7 @@
       "title": "Layering multiple geoms",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three thick square boards stacked with open gaps between them on four corner posts above a heavy base, each board carrying one bold raised shape"
+      "subject": "three thick square boards stacked with open gaps between them on four corner posts above a pale grey platform, each board carrying one bold raised shape"
     },
     {
       "id": "gg-geom-has-a-stat",
@@ -5898,7 +5898,7 @@
       "title": "Smoothers and summaries",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one heavy base carrying a thick S-curved rail on tall posts, a broad solid band of the same curve hanging just beneath it"
+      "subject": "one pale grey platform carrying a thick S-curved rail on tall posts, a broad solid band of the same curve hanging just beneath it"
     },
     {
       "id": "gg-what-scales-do",
@@ -5946,7 +5946,7 @@
       "title": "Cartesian and beyond",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one thick square block with two raised rails meeting at one corner, beside one thick round disc with a single raised spoke, both standing on a heavy base"
+      "subject": "one thick square block with two raised rails meeting at one corner, beside one thick round disc with a single raised spoke, both standing on a pale grey platform"
     },
     {
       "id": "gg-polar-coordinates",
@@ -7062,7 +7062,7 @@
       "title": "Intuition for inference",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one small solid cube on a low plinth beside one much larger cube of the same colour on a taller plinth, a thick curved arm arching from the small cube across to the large one"
+      "subject": "one small solid cube on a low pale grey pedestal beside one much larger cube of the same colour on a taller pedestal, a thick curved arm arching from the small cube across to the large one"
     },
     {
       "id": "rlang-mini-project",
@@ -7122,7 +7122,7 @@
       "title": "Props",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one wide block raised on two thick posts above a heavy base, a solid chute dropping one large cube into each of the two open boxes standing below it"
+      "subject": "one wide block raised on two thick posts above a pale grey platform, a solid chute dropping one large cube into each of the two open boxes standing below it"
     },
     {
       "id": "rx-usestate",
@@ -7146,7 +7146,7 @@
       "title": "State and immutability",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one solid cube lifted clear of a deep square socket on a heavy base while an identical cube lowers into the same socket"
+      "subject": "one solid cube lifted clear of a deep square socket on a pale grey platform while an identical cube lowers into the same socket"
     },
     {
       "id": "rx-events",
@@ -7722,7 +7722,7 @@
       "title": "Joint plots",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one thick square block standing upright on a heavy base, three chunky bars rising in a row along its top edge and three more stepping outward from its right edge"
+      "subject": "one thick square block standing upright on a pale grey platform, three thick bars rising in a row along its top edge and three more stepping outward from its right edge"
     },
     {
       "id": "sns-heatmaps",
@@ -7854,7 +7854,7 @@
       "title": "OLAP vs. OLTP: a needle and a net",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a slim rod lifting a single small cube out of a deep stack of cubes on one end of a heavy base, and a broad claw lifting one whole tall column of cubes out of a second stack"
+      "subject": "a slim rod lifting a single small cube out of a deep stack of cubes on one end of a pale grey platform, and a broad claw lifting one whole tall column of cubes out of a second stack"
     },
     {
       "id": "duck-why-duckdb",
@@ -7902,7 +7902,7 @@
       "title": "Loading and generating data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two broad chutes on a heavy base feeding one deep open crate, the first chute carrying a large solid cube and the second a thick rolled scroll"
+      "subject": "two broad chutes on a pale grey platform feeding one deep open crate, the first chute carrying a large solid cube and the second a thick rolled scroll"
     },
     {
       "id": "duck-profiling",
@@ -7926,7 +7926,7 @@
       "title": "Filtering and slicing",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one deep stack of thick coloured blocks on a heavy base, a broad clamp drawing a single block out from the middle of the stack"
+      "subject": "one deep stack of thick coloured blocks on a pale grey platform, a broad clamp drawing a single block out from the middle of the stack"
     },
     {
       "id": "duck-sorting-top-n",
@@ -8142,7 +8142,7 @@
       "title": "Spreadsheets vs. databases",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one thin tray sagging over the edge of a heavy base beside one sturdy steel cabinet with three deep drawers"
+      "subject": "one thin tray sagging over the edge of a pale grey platform beside one sturdy steel cabinet with three deep drawers"
     },
     {
       "id": "lite-why-sqlite",
@@ -8238,7 +8238,7 @@
       "title": "SELECT basics",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one deep box on a heavy base holding three thick upright panels, two of them lifted out and standing together on a smaller box beside it"
+      "subject": "one deep box on a pale grey platform holding three thick upright panels, two of them lifted out and standing together on a smaller box beside it"
     },
     {
       "id": "lite-expressions-aliases",
@@ -8310,7 +8310,7 @@
       "title": "Grouping data with GROUP BY",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a heap of solid cubes on a heavy base running down two broad chutes into two deep bins, one tall summary column standing on each bin"
+      "subject": "a heap of solid cubes on a pale grey platform running down two broad chutes into two deep bins, one tall summary column standing on each bin"
     },
     {
       "id": "lite-having",
@@ -8346,7 +8346,7 @@
       "title": "Organizing data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one oversized lumpy crate on a heavy base beside two neat boxes of equal height, a thick solid arrow pointing from the crate to the boxes"
+      "subject": "one oversized lumpy crate on a pale grey platform beside two neat boxes of equal height, a thick solid arrow pointing from the crate to the boxes"
     },
     {
       "id": "lite-relationships-intro",
@@ -8394,7 +8394,7 @@
       "title": "Understanding joins",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two thick blocks sliding together along a rail on a heavy base and meeting as one taller combined block"
+      "subject": "two thick blocks sliding together along a rail on a pale grey platform and meeting as one taller combined block"
     },
     {
       "id": "lite-inner-joins",
@@ -8418,7 +8418,7 @@
       "title": "Outer joins",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two thick blocks pushed together on a heavy base into one longer block, a single deep empty notch left unfilled in its top"
+      "subject": "two thick blocks pushed together on a pale grey platform into one longer block, a single deep empty notch left unfilled in its top"
     },
     {
       "id": "lite-many-to-many",
@@ -8634,7 +8634,7 @@
       "title": "Populations and samples",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one large solid dome filling most of a heavy base, a deep scoop lifting a single small cube clear of its surface"
+      "subject": "one large solid dome filling most of a pale grey platform, a deep scoop lifting a single small cube clear of its surface"
     },
     {
       "id": "stat-sampling-bias",
@@ -8706,7 +8706,7 @@
       "title": "The bootstrap",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one deep barrel on a heavy base with a scoop lifting a single cube out of it and a thick chute returning the cube to the same barrel, three shorter barrels standing beside it"
+      "subject": "one deep barrel on a pale grey platform with a scoop lifting a single cube out of it and a thick chute returning the cube to the same barrel, three shorter barrels standing beside it"
     },
     {
       "id": "stat-hypothesis-testing",
@@ -8778,7 +8778,7 @@
       "title": "ANOVA and chi-square",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three solid columns of different heights standing in a row on a heavy base beside one deep open box divided into four chunky compartments"
+      "subject": "three solid columns of different heights standing in a row on a pale grey platform beside one deep open box divided into four thick compartments"
     },
     {
       "id": "stat-correlation",
@@ -8826,7 +8826,7 @@
       "title": "A/B testing",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one chunky splitter block on a heavy base feeding two deep bins, a tall blue column standing in one bin and a shorter red column in the other"
+      "subject": "one thick splitter block on a pale grey platform feeding two deep bins, a tall blue column standing in one bin and a shorter red column in the other"
     },
     {
       "id": "stat-next-steps",

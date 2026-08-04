@@ -85,13 +85,22 @@ function article(style: string): string {
  * a treatment for round elements *the subject already calls for*, not as an
  * instruction to include any, and "low solid discs" keeps them three-
  * dimensional instead of trading marbles for stickers.
+ *
+ * **Light staging** because asking for solid form on its own overshot: the
+ * first run under this rule came back as glossy plastic toys on heavy charcoal
+ * plinths. The house look has always been bright colours on pale grey and white
+ * platforms (see any illustration predating the regeneration rounds), so the
+ * background and the plinths are pinned here rather than left to each subject
+ * to remember — "heavy base" in a subject is otherwise taken literally.
  */
 const GLOBAL_CONSTRAINTS =
   "No text. Draw only the objects described — nothing scattered over, around, " +
   "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
   "Render each object as a solid three-dimensional form with real thickness, " +
-  "flat matte shading, and clean edges; draw any repeated round elements the " +
-  "subject calls for as low solid discs, never as glossy spheres or balls.";
+  "smooth matte shading, and clean edges; draw any repeated round elements the " +
+  "subject calls for as low solid discs, never as glossy spheres or balls. " +
+  "Stage everything light and airy on a white background: pale grey and white " +
+  "platforms, bright brand colors, no dark or black bases.";
 
 /**
  * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.
