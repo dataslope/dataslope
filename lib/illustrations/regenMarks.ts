@@ -28,21 +28,27 @@ export const MAX_NOTE_LENGTH = 500;
 /**
  * Guidance applied when an illustration is marked with no note of its own.
  *
- * Empty was the wrong default. The usual reason to redraw is that the fine
- * detail came out malformed (mushed star points, broken little characters,
- * lettering-shaped smears), and the fix for that is always the same: fewer,
- * larger shapes. A blank note left that unsaid and invited the model to redraw
- * the same busy composition.
+ * Empty was the wrong default. The usual reason to redraw is that the picture
+ * came back cluttered — decorative dots strewn over the objects, faint lines
+ * webbing them together, speckles in the background — and the fix for that is
+ * always the same: keep the scene, lose the debris.
  *
  * It asks for a redraw *from scratch* rather than a simpler illustration,
  * because "simpler" was read as an edit to the old prompt: clauses came off the
  * end of the existing `subject` and the same picture came back with fewer
  * objects in it. The composition is what failed, so the composition is what a
  * redraw has to replace.
+ *
+ * It no longer says "fewer, larger shapes". That phrasing was read as *flatten*
+ * — the redraws it produced traded the house 3D isometric style for flat slabs
+ * and discs, which is a different illustration, not a cleaner one. "Simplify"
+ * here has only ever meant removing decoration, so the note says that and says
+ * to keep the solid isometric rendering while doing it.
  */
 export const DEFAULT_REGEN_NOTE =
-  "redraw this from scratch with a different composition: fewer, larger shapes " +
-  "and less fine detail, since the small details came out malformed";
+  "redraw this from scratch as a solid 3D isometric scene built from a few " +
+  "large objects, dropping the decorative dots, speckles, and connecting lines " +
+  "that cluttered it; simplify by removing decoration, not by flattening it";
 
 /** One row of the queue, as the API and the gallery exchange it. */
 export interface RegenMark {

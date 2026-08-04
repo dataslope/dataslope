@@ -66,23 +66,42 @@ function article(style: string): string {
  * **No text** because none of the illustrations should carry lettering (the
  * model bakes in garbled text otherwise).
  *
- * **Flat circles, not spheres**, because repeated round elements were the
- * house failure mode: scatter dots, chart markers, tokens in a tray, and the
- * nodes of a tree all came back as glossy 3D balls, which read as a bag of
- * marbles rather than as data. It is scoped to *repeated* round elements on
- * purpose, so a single large round object (a globe, one marble on a track)
- * still draws as itself.
+ * **Nothing beyond the objects described**, because the previous wording of
+ * this rule — "draw dots, markers, and nodes as flat 2D circles" — named three
+ * things to draw in all 879 prompts, including the ones with no dot, marker, or
+ * node anywhere in the subject. An image model reads a named noun as content,
+ * so it supplied them: a chest of drawers came back with a coloured dot on
+ * every corner, a folder wore a constellation of dots joined by thin lines, and
+ * a press had confetti scattered across its base. The clutter was not coming
+ * from the subjects; it was coming from here.
+ *
+ * **Solid 3D forms**, because the same sentence asked for "flat 2D circles" and
+ * flattened whole scenes with it. Isometric is the house style *because* it has
+ * volume (AGENTS.md, "Illustrations"), so the constraint now says so outright
+ * rather than pulling against it.
+ *
+ * The glossy-sphere guard survives, since it was a real failure — scatter dots,
+ * chart markers and tree nodes rendering as a bag of marbles. It is phrased as
+ * a treatment for round elements *the subject already calls for*, not as an
+ * instruction to include any, and "low solid discs" keeps them three-
+ * dimensional instead of trading marbles for stickers.
  */
 const GLOBAL_CONSTRAINTS =
-  "No text. Draw dots, markers, and nodes as flat 2D circles, never as glossy " +
-  "3D spheres or balls.";
+  "No text. Draw only the objects described — nothing scattered over, around, " +
+  "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
+  "Render each object as a solid three-dimensional form with real thickness, " +
+  "flat matte shading, and clean edges; draw any repeated round elements the " +
+  "subject calls for as low solid discs, never as glossy spheres or balls.";
 
 /**
  * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.
  *
  *   An isometric illustration of a marmot waving beside a monitor. No text.
- *   Draw dots, markers, and nodes as flat 2D circles, never as glossy 3D
- *   spheres or balls.
+ *   Draw only the objects described — nothing scattered over, around, or
+ *   behind them: no speckled dots, no confetti, no stray connecting lines.
+ *   Render each object as a solid three-dimensional form with real thickness,
+ *   flat matte shading, and clean edges; draw any repeated round elements the
+ *   subject calls for as low solid discs, never as glossy spheres or balls.
  *
  *   Blue: #148cff
  *   Green: #20c621

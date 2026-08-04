@@ -89,16 +89,25 @@ shared by the API and the gallery.
 Marking an illustration with the note field left blank does **not** store an
 empty note. `DEFAULT_REGEN_NOTE` goes in instead:
 
-> redraw this from scratch with a different composition: fewer, larger shapes
-> and less fine detail, since the small details came out malformed
+> redraw this from scratch as a solid 3D isometric scene built from a few large
+> objects, dropping the decorative dots, speckles, and connecting lines that
+> cluttered it; simplify by removing decoration, not by flattening it
 
-That is the common case by a wide margin (mushed star points, broken little
-characters, lettering-shaped smears), and the fix is always the same. It asks
-for a redraw *from scratch* rather than "a simpler illustration" because the
-older wording was read as an edit to the existing prompt: clauses came off the
-end of the old `subject` and the same composition came back, thinner. The
-gallery shows the default as the input's placeholder, so what will be stored is
-visible before the button is pressed. Type anything and that wins.
+That is the common case by a wide margin — decorative dots strewn over the
+objects, faint lines webbing them together, speckles in the background — and the
+fix is always the same: keep the scene, lose the debris. It asks for a redraw
+*from scratch* rather than "a simpler illustration" because the older wording was
+read as an edit to the existing prompt: clauses came off the end of the old
+`subject` and the same composition came back, thinner. The gallery shows the
+default as the input's placeholder, so what will be stored is visible before the
+button is pressed. Type anything and that wins.
+
+**It says "not by flattening it" for a reason.** The wording before this one —
+"fewer, larger shapes and less fine detail" — was read as *flatten*: a round of
+redraws came back as flat slabs, plates and discs, which is a different
+illustration rather than a cleaner one. Isometric is the house style because it
+has volume. "Simplify" in this queue has only ever meant **remove decoration**,
+never **remove the third dimension**.
 
 ---
 
