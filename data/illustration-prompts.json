@@ -90,7 +90,7 @@
       "title": "Numbers",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a wooden abacus beside a smooth number line arrow, a few counting beads sliding along a rod"
+      "subject": "a wooden abacus beside a smooth number line arrow, a few flat counting discs sliding along a rod"
     },
     {
       "id": "python-basics-strings",
@@ -102,7 +102,7 @@
       "title": "Strings",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a long ribbon threaded with small blank rounded tiles like a bead necklace, curling gracefully across the frame"
+      "subject": "a long ribbon threaded with small blank rounded tiles, curling gracefully across the frame"
     },
     {
       "id": "python-basics-booleans",
@@ -198,7 +198,7 @@
       "title": "Functions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a whimsical machine with an input funnel on top and an output chute below, plain shapes going in one side and finished shapes coming out the other"
+      "subject": "one large closed box on a platform with a wide funnel mouth on its left and a broad chute on its right, one big finished block leaving the chute"
     },
     {
       "id": "python-basics-modules",
@@ -222,7 +222,7 @@
       "title": "Exceptions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a safety net stretched between four posts, catching a single falling block in mid-air just above the ground"
+      "subject": "one big taut sheet slung between two thick posts on a platform, a single large block resting safely in its sag"
     },
     {
       "id": "python-basics-classes",
@@ -270,7 +270,7 @@
       "title": "Comprehensions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a compact assembly press folding a long row of loose blocks into one tidy stacked tray in a single pass"
+      "subject": "one wide chute on a platform swallowing a long loose ribbon and dropping one tidy stacked block below it"
     },
     {
       "id": "python-basics-scope",
@@ -306,7 +306,7 @@
       "title": "Inheritance",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a larger robot standing beside a smaller robot built from the same shapes, a short connecting line between them"
+      "subject": "one tall robot and one short robot of the same simple rounded shape standing on a platform, joined by a single thick bar"
     },
     {
       "id": "python-basics-iterators",
@@ -510,7 +510,7 @@
       "title": "Machine Learning with scikit-learn: course thumbnail",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot beside a raised plane holding a few large coloured spheres with one smooth curve fitted through them"
+      "subject": "the Dataslope marmot mascot beside a raised plane holding a few large flat coloured discs with one smooth curve fitted through them"
     },
     {
       "id": "mastering-dsa-cpp-thumbnail",
@@ -774,7 +774,7 @@
       "title": "What data analysis is",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a small desk turning a scattered pile of loose tiles into one clear answer card"
+      "subject": "the Dataslope marmot mascot on a low platform tipping a bucket of large loose blocks onto a wide tray where they settle into one neat stack"
     },
     {
       "id": "pandas-history-of-data",
@@ -906,7 +906,7 @@
       "title": "Rows and columns",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a coarse grid platform with one row band and one column band raised above the rest"
+      "subject": "one large flat slab crossed by a single thick horizontal bar and a single thick vertical bar, both bars raised clear of the slab where they meet"
     },
     {
       "id": "pandas-indexes-and-labels",
@@ -918,7 +918,7 @@
       "title": "Indexes and labels",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a coarse grid platform with three large blank tabs down its left edge, one tab pulled out"
+      "subject": "four thick file dividers standing upright in one wide tray, a single divider lifted out and held above the rest"
     },
     {
       "id": "pandas-loading-datasets",
@@ -954,7 +954,7 @@
       "title": "The EDA workflow",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a simple loop track circling a central grid platform with three large blank stations spaced around it"
+      "subject": "three big rounded arrows chasing each other in a ring above one large plate on a platform"
     },
     {
       "id": "pandas-selecting-data",
@@ -990,7 +990,7 @@
       "title": "Filtering data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a coarse grid platform passing through one wide sieve gate, two of its rows continuing through to the far side"
+      "subject": "a wide chute tipping six big flat discs against a comb of thick bars, three of them passing between the bars onto a clean platform"
     },
     {
       "id": "pandas-sorting-and-ranking",
@@ -1086,7 +1086,7 @@
       "title": "Statistical summaries",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tall grid platform collapsing down into one small summary card carrying a few marks"
+      "subject": "a tall stack of wide plates on a platform being pressed by one broad flat lid down into a single thick puck"
     },
     {
       "id": "pandas-aggregation-basics",
@@ -1110,7 +1110,7 @@
       "title": "GroupBy operations",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a giant panda directing six large cubes into three coloured lanes, each lane merging into one block"
+      "subject": "a giant panda seated on a wide platform stacking nine large blocks into three tall towers, one tower per colour"
     },
     {
       "id": "pandas-pivot-tables",
@@ -1170,7 +1170,7 @@
       "title": "Exporting cleaned data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tidy grid platform feeding along a short conveyor into a labelled output crate"
+      "subject": "a large round hopper pouring one thick stream of blocks into a single open crate on a low platform, the crate lid propped open beside it"
     },
     {
       "id": "pandas-visualization-basics",
@@ -1206,7 +1206,7 @@
       "title": "Hypothesis intuition",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a balance beam on a platform weighing one large blue sphere against one large green sphere"
+      "subject": "a balance beam on a platform weighing one large blue block against one large green block"
     },
     {
       "id": "pandas-debugging",
@@ -1362,7 +1362,7 @@
       "title": "Numbers and arithmetic",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a platform holding a rail of six large sliding counter beads beside one simple boxy adding machine"
+      "subject": "a platform holding a rail of six large flat sliding counters beside one simple boxy adding machine"
     },
     {
       "id": "js-strings-and-text",
@@ -1506,7 +1506,7 @@
       "title": "Map, filter, and reduce",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three large stations in a row on a single track, a shaper then a sieve then a funnel, three big cubes passing along"
+      "subject": "three wide trays stepping down a slope, four large cubes on the top tray, two of them recast as big flat discs on the middle tray, and one single large disc resting on the bottom tray"
     },
     {
       "id": "js-functional-intuition",
@@ -1530,7 +1530,7 @@
       "title": "Problem solving with code",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a plain workbench fitting four large puzzle pieces into a single row"
+      "subject": "the Dataslope marmot mascot on a low platform drawing one big tangled loop of thick rope out into a single straight rail"
     },
     {
       "id": "js-debugging-and-reasoning",
@@ -1938,7 +1938,7 @@
       "title": "Filtering and projection",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one large sieve station followed by one large shaping station on a single track, three big cubes passing through both"
+      "subject": "a broad plate of six chunky tiles sliding over a wide grate, three tiles dropping through onto a lower plate and standing there on edge as three tall slabs"
     },
     {
       "id": "cs-ordering-and-grouping",
@@ -2142,7 +2142,7 @@
       "title": "How design drives data quality",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one crisp table block beside one warped table block with a large round gauge standing between them"
+      "subject": "two wide platforms side by side, a tall neatly stacked tower of plain blocks on one and a low leaning heap on the other, one large round dial on a post standing between them"
     },
     {
       "id": "db-design-and-scale",
@@ -2166,7 +2166,7 @@
       "title": "The relational revolution",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a stepped platform rising from a few loose blank ledgers to three neatly linked table blocks, a friendly blue elephant (the PostgreSQL mascot) at the summit"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) on a wide round platform pulling one thick rope that lifts three big plain slabs off a loose pile into a neat stack"
     },
     {
       "id": "db-ingres-to-postgresql",
@@ -2238,7 +2238,7 @@
       "title": "Reading an ER diagram",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot tracing a thick connector rod between two large entity boxes"
+      "subject": "the Dataslope marmot mascot kneeling on a platform over one large unrolled sheet showing two big blank rectangles joined by a single thick line"
     },
     {
       "id": "db-what-are-relationships",
@@ -2430,7 +2430,7 @@
       "title": "Why normalization exists",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) splitting one large bloated table block into three tidy linked blocks"
+      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) on a round platform drawing one oversized block apart into three even blocks along a single thick rail"
     },
     {
       "id": "db-first-normal-form",
@@ -2538,7 +2538,7 @@
       "title": "Evolving a schema safely",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot swapping one large schema block while a single bypass rod keeps the connection flowing"
+      "subject": "the Dataslope marmot mascot sliding one plain smooth block into a gap in a low wall of three plain smooth blocks, a single thick rod arching over the gap, every block untextured and free of patterns"
     },
     {
       "id": "db-next-steps",
@@ -2658,7 +2658,7 @@
       "title": "Functions and modularity",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a simple machine with one input hopper and one output chute, built from three large separate bays"
+      "subject": "three separate plain boxes in a line on a platform, each with one round port, joined by two short thick pipes"
     },
     {
       "id": "cpp-the-call-stack",
@@ -2742,7 +2742,7 @@
       "title": "Constructors and destructors",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a simple machine assembling one large block at one end and taking it apart at the other"
+      "subject": "one large plain block standing between two big round gates on a platform, three loose parts waiting at the left gate and an empty tray at the right"
     },
     {
       "id": "cpp-encapsulation",
@@ -2814,7 +2814,7 @@
       "title": "Dynamic memory",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a small crane lifting one large block from a low heap of a few big blocks onto a simple shelf"
+      "subject": "a broad pedestal with three big empty bays, one large block hanging on a single thick cable above the middle bay"
     },
     {
       "id": "cpp-data-structures",
@@ -2886,7 +2886,7 @@
       "title": "The evolution of software complexity",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a loose knot of three thick wires on one side of a platform beside one clean modular assembly on the other"
+      "subject": "one big tangled ball of thick cord on a low platform beside a single straight column of three stacked plain blocks"
     },
     {
       "id": "fp-roots-of-fp",
@@ -2898,7 +2898,7 @@
       "title": "The roots of functional thinking",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three large steps rising from a simple hand-cranked machine to a clean pipe segment"
+      "subject": "three wide steps rising on a platform, one large plain hand wheel on the lowest step and a single smooth pipe elbow on the top step"
     },
     {
       "id": "fp-typescript-meets-fp",
@@ -2910,7 +2910,7 @@
       "title": "TypeScript meets functional programming",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "loose blocks snapping into shaped labelled slots that feed into a pipeline"
+      "subject": "one large plain pipe lying on a platform wearing three chunky collar rings of different colours, a fourth ring waiting on the ground beside it"
     },
     {
       "id": "fp-declarative-thinking",
@@ -2934,7 +2934,7 @@
       "title": "Pure functions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a sealed machine with exactly one input pipe and one output pipe and no side outlets"
+      "subject": "one large smooth sealed drum on a plain platform, a straight pipe entering its left side and one leaving its right, nothing else attached to it"
     },
     {
       "id": "fp-immutability",
@@ -2982,7 +2982,7 @@
       "title": "Higher-order functions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one large machine holding a smaller machine as an interchangeable part"
+      "subject": "one large open box on a platform with a smaller box slotted into a socket on its front face, a single thick pipe running straight through both"
     },
     {
       "id": "fp-option-and-result",
@@ -3006,7 +3006,7 @@
       "title": "Pattern matching",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a sorter routing differently shaped tokens down the chute that matches each shape"
+      "subject": "a thick plate cut with one round hole, one square hole and one triangular hole, three big matching blocks resting above their own holes"
     },
     {
       "id": "fp-algebraic-data-types",
@@ -3090,7 +3090,7 @@
       "title": "Composable architecture",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot fitting three large pipe modules into one working system"
+      "subject": "the Dataslope marmot mascot on a round platform stacking three big plain rings into one tall column"
     },
     {
       "id": "fp-category-theory",
@@ -3150,7 +3150,7 @@
       "title": "Why charts exist",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a dense grid of number tiles beside the same data as a clean bar chart plate"
+      "subject": "a tall stack of plain blank cards on one side of a platform beside one big smooth curve rising from a wide panel on the other"
     },
     {
       "id": "viz-history-of-data-pictures",
@@ -3234,7 +3234,7 @@
       "title": "Introducing Plotly Express",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a compact machine turning a data tile into a chart plate in one pass"
+      "subject": "one big plain block on a platform with a wide chart panel rising out of its top face on a single thick post"
     },
     {
       "id": "viz-loading-data",
@@ -3258,7 +3258,7 @@
       "title": "Filtering before plotting",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform passing through a sieve gate before reaching a chart plate"
+      "subject": "six large flat circles above one broad slotted gate, three of them passing through onto a plain chart panel below"
     },
     {
       "id": "viz-your-first-chart",
@@ -3282,7 +3282,7 @@
       "title": "The simple_white template",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a cluttered chart plate beside the same chart stripped to clean minimal furniture"
+      "subject": "one wide chart panel alone on a bare platform, stripped to a single thick curve and one plain base rail"
     },
     {
       "id": "viz-scatter-plots",
@@ -3294,7 +3294,7 @@
       "title": "Scatter plots",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a scattering of dots across a raised plane with two axis rails"
+      "subject": "a wide plate with two thick axis rails carrying a scatter of small flat circular dots"
     },
     {
       "id": "viz-line-charts",
@@ -3354,7 +3354,7 @@
       "title": "Bubble charts",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "dots of graded sizes positioned across a plane, the largest set slightly higher"
+      "subject": "three large flat circles of clearly different sizes resting on one wide plain plate with two thick edge rails"
     },
     {
       "id": "viz-heatmaps",
@@ -3390,7 +3390,7 @@
       "title": "Faceting and small multiples",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid of nine identical small chart plates on one platform"
+      "subject": "four large plain panels arranged in a two-by-two block on one platform, each carrying a single thick curve"
     },
     {
       "id": "viz-time-series",
@@ -3450,7 +3450,7 @@
       "title": "Always look at the data",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot lifting a magnifying lens over a scatter of dots that hides a shape"
+      "subject": "the Dataslope marmot mascot lifting one large flat plate clear of a platform to reveal a single big curved line underneath"
     },
     {
       "id": "viz-exploratory-workflow",
@@ -3462,7 +3462,7 @@
       "title": "The exploratory workflow",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a looping track of numbered stations circling a central chart plate"
+      "subject": "a broad spiral ramp winding up a low platform, one large chart panel standing at the top"
     },
     {
       "id": "viz-dashboard-intuition",
@@ -3486,7 +3486,7 @@
       "title": "Storytelling with data",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot presenting a sequence of three chart plates on stands in order"
+      "subject": "the Dataslope marmot mascot walking up one wide ramp with a large chart panel standing at the top of it"
     },
     {
       "id": "viz-ethics-accessibility",
@@ -3498,7 +3498,7 @@
       "title": "Ethics and accessibility",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a chart plate with a truncated axis rail beside the same chart with a full axis"
+      "subject": "two thick bars on a short base rail beside the same two bars on a full-length base rail, both on one wide platform"
     },
     {
       "id": "viz-best-practices",
@@ -3510,7 +3510,7 @@
       "title": "Best practices",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tidy chart plate beside a cluttered one, the tidy one on a raised step"
+      "subject": "one large chart panel on a wide pedestal, three thick bars of even height rising from a single clean base rail"
     },
     {
       "id": "viz-debugging-viz",
@@ -3522,7 +3522,7 @@
       "title": "Debugging visualizations",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot holding a magnifying lens over a chart plate with one mark out of place"
+      "subject": "the Dataslope marmot mascot standing on a wide chart panel, pushing one big circle back into a line of evenly spaced circles"
     },
     {
       "id": "viz-interesting-discussions",
@@ -3534,7 +3534,7 @@
       "title": "Interesting discussions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a scatter of dots on a plate arranging into an unexpected recognisable outline"
+      "subject": "two clear clusters of large flat circles on one wide plate, a broad empty gap between them"
     },
     {
       "id": "viz-next-steps",
@@ -3582,7 +3582,7 @@
       "title": "Managed runtimes",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a machine running inside a protective glass housing that handles its waste and fuel"
+      "subject": "a big smooth glass dome on a round base with one large plain block turning inside it"
     },
     {
       "id": "mcs-java-managed-runtimes",
@@ -3594,7 +3594,7 @@
       "title": "Java and the rise of managed runtimes",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a stepped platform rising from bare metal blocks to a machine inside a glass housing"
+      "subject": "two wide platforms at different heights, one bare block sitting exposed on the low platform and an identical block resting under a big clear dome on the high one"
     },
     {
       "id": "mcs-rise-of-oop",
@@ -3606,7 +3606,7 @@
       "title": "The rise of object-oriented programming",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "loose procedure blocks gathering into three sealed labelled objects"
+      "subject": "a wide platform with a scatter of loose plain parts on one half and three big closed cases on the other"
     },
     {
       "id": "mcs-road-to-csharp",
@@ -3618,7 +3618,7 @@
       "title": "The road to C#",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a stepped platform of language eras rising to a clean modern workbench"
+      "subject": "one broad straight ramp rising across a platform with three big plain milestone posts along it"
     },
     {
       "id": "mcs-birth-of-csharp",
@@ -3630,7 +3630,7 @@
       "title": "The birth of C#",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a drafting table holding a language blueprint with a finished compiler block beside it"
+      "subject": "one large unrolled blueprint sheet lying across a wide drafting table, a plain drawing compass resting on it"
     },
     {
       "id": "mcs-evolution-of-dotnet",
@@ -3642,7 +3642,7 @@
       "title": "The evolution of .NET",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a platform growing outward in concentric rings, each ring adding new capability bays"
+      "subject": "three big plain rings of increasing size lying flat one inside another on a platform, the outermost ring raised on short posts"
     },
     {
       "id": "mcs-variables-and-memory",
@@ -3690,7 +3690,7 @@
       "title": "Methods and modularity",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a machine built from separate labelled bays, each with its own input and output"
+      "subject": "one large plain frame on a platform holding three big drawers, a single drawer pulled fully out and standing on its own"
     },
     {
       "id": "mcs-collections",
@@ -3702,7 +3702,7 @@
       "title": "Collections and data organization",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a rack holding a rail of cells, a keyed cabinet and a set of distinct tokens"
+      "subject": "three large plain containers on one platform, a long open trough, a round lidded pot, and a deep square bin"
     },
     {
       "id": "mcs-classes-and-objects",
@@ -3762,7 +3762,7 @@
       "title": "Resource management",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a resource token held in a bracket that releases it as the bracket leaves the frame"
+      "subject": "one large plain block held above a wide tray by two big clamps, the clamps swung open"
     },
     {
       "id": "mcs-software-organization",
@@ -3786,7 +3786,7 @@
       "title": "Writing maintainable software",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tidy structure with labelled removable panels, one lifted clear"
+      "subject": "one big plain block on a platform held together by four large visible bolts, a single bolt lifted out and hanging above it"
     },
     {
       "id": "mcs-debugging",
@@ -3846,7 +3846,7 @@
       "title": "Spreadsheets vs databases",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a loose grid of cells on one side beside a structured table block on the other"
+      "subject": "a loose fan of thin plain sheets on one side of a platform beside one solid stacked block on the other"
     },
     {
       "id": "sql-why-sql-exists",
@@ -3858,7 +3858,7 @@
       "title": "Why SQL and why PostgreSQL",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a friendly blue elephant (the PostgreSQL mascot) standing proudly on a stepped platform of database eras, at the top step"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) resting one foot on a large plain cube at the centre of a wide round platform, two smaller cubes beside it"
     },
     {
       "id": "sql-how-apps-use-databases",
@@ -3906,7 +3906,7 @@
       "title": "Creating tables",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot bolting together an empty table block from labelled column slots"
+      "subject": "the Dataslope marmot mascot laying one wide plain slab across three big plain posts on a platform"
     },
     {
       "id": "sql-inserting-data",
@@ -3918,7 +3918,7 @@
       "title": "Inserting, updating, and deleting data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three carts at a table block, one loading a row, one swapping a row, one removing a row"
+      "subject": "one wide plain tray on a platform with a big block being lowered into it, a second block lifted out of it, and a third already resting in place"
     },
     {
       "id": "sql-first-queries",
@@ -3942,7 +3942,7 @@
       "title": "SELECT basics",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a friendly blue elephant (the PostgreSQL mascot) using its trunk to lift two chosen column slots clear of a table block"
+      "subject": "a friendly blue elephant (the PostgreSQL mascot) lifting one wide plain plank clear of a stack of three planks on a platform"
     },
     {
       "id": "sql-expressions-aliases",
@@ -3966,7 +3966,7 @@
       "title": "Filtering rows with WHERE",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a table block passing through a sieve gate, only some rows continuing"
+      "subject": "a wide plain slab of four thick bands sliding past an upright bar gate, two bands continuing beyond it and two stopped"
     },
     {
       "id": "sql-sorting-limiting",
@@ -3978,7 +3978,7 @@
       "title": "Sorting and limiting",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "rows rearranging into order along a track with a stop marker after the third"
+      "subject": "five big plain blocks standing along a rail in rising height order, one thick post planted after the third"
     },
     {
       "id": "sql-working-with-null",
@@ -4014,7 +4014,7 @@
       "title": "Grouping data with GROUP BY",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "mixed row tiles splitting into three labelled lanes, each lane merging into one tile"
+      "subject": "nine large plain blocks on a wide platform gathered into three tidy piles of three"
     },
     {
       "id": "sql-filtering-groups",
@@ -4026,7 +4026,7 @@
       "title": "Filtering groups with HAVING",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three group tiles passing a gauge gate, one being turned away"
+      "subject": "one large round gauge standing over a narrow gate on a platform, three big plain single-colour blocks queued in front of it and one turned aside"
     },
     {
       "id": "sql-query-execution-order",
@@ -4074,7 +4074,7 @@
       "title": "Foreign keys",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a key token in one table block matching a socket in another, joined by a rod"
+      "subject": "two big plain boxes standing apart on a platform, a single large ring linking one hook on each"
     },
     {
       "id": "sql-thinking-in-entities",
@@ -4086,7 +4086,7 @@
       "title": "Thinking in entities",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot gathering loose attribute tokens into three labelled entity boxes"
+      "subject": "the Dataslope marmot mascot pressing a big plain cube, a big plain cylinder and a big plain cone onto three matching outlines on a wide platform"
     },
     {
       "id": "sql-er-diagrams",
@@ -4158,7 +4158,7 @@
       "title": "Normalization",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) together splitting one bloated table block into three tidy linked blocks"
+      "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) on a wide platform unstacking one tall wobbling pile of plates into three short even stacks"
     },
     {
       "id": "sql-subqueries",
@@ -4434,7 +4434,7 @@
       "title": "Project: interactive scoreboard",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a scoreboard panel pressing a button that steps the number tile up"
+      "subject": "the Dataslope marmot mascot pressing a large round button on a low pedestal, one big blank tile flipping up on a post beside it"
     },
     {
       "id": "web-next-steps",
@@ -4470,7 +4470,7 @@
       "title": "The birth of reusable containers",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a stepped platform rising from a bare rail to a rack of purpose-built containers"
+      "subject": "one long bare rail on a low platform beside three big purpose-shaped bins on a higher one"
     },
     {
       "id": "jcol-collections-framework",
@@ -4506,7 +4506,7 @@
       "title": "Sets",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a container admitting one of each distinct token and turning away a duplicate"
+      "subject": "one wide open bin holding three large blocks of different colours, a fourth block in a colour already inside resting on the rim outside"
     },
     {
       "id": "jcol-maps",
@@ -4530,7 +4530,7 @@
       "title": "Queues and deques",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a channel loading tokens at one end and releasing them at the other, plus one that does both"
+      "subject": "one long open trough on a platform with a big flat disc sliding in at the left end and one sliding out at the right, a second trough below it open at both ends"
     },
     {
       "id": "jcol-iterables-iterators",
@@ -4578,7 +4578,7 @@
       "title": "Equality and hashing",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two identical tokens dropping into the same numbered bucket of a bank of bins"
+      "subject": "two identical large blue discs dropping into one wide blue bin, a green bin and a yellow bin standing empty beside it"
     },
     {
       "id": "jcol-immutable-collections",
@@ -4638,7 +4638,7 @@
       "title": "Type erasure",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a labelled adapter being lifted away at a checkpoint, leaving the plain container behind"
+      "subject": "a large plain container passing under one wide arch, a big coloured collar lifting off it and hanging above as it goes through"
     },
     {
       "id": "jcol-performance-tradeoffs",
@@ -4650,7 +4650,7 @@
       "title": "Performance tradeoffs",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three containers on a weighing platform with differently loaded gauges beside each"
+      "subject": "two big plain containers on the ends of one wide seesaw beam on a platform, the beam tipped toward one of them"
     },
     {
       "id": "jcol-data-modeling",
@@ -4734,7 +4734,7 @@
       "title": "Problem solving",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a puzzle laid out as a numbered sequence of ordered steps on a workbench"
+      "subject": "four large plain blocks arranged in one straight row along a wide bench, each a step taller than the one before"
     },
     {
       "id": "java-how-programs-execute",
@@ -4758,7 +4758,7 @@
       "title": "From punched cards to objects",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a stepped platform rising from a punch card to three sealed labelled objects"
+      "subject": "one tall stack of flat punched sheets on a platform with a single large sealed cube resting on top of it"
     },
     {
       "id": "java-gosling-and-java",
@@ -4794,7 +4794,7 @@
       "title": "How Java conquered the world",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one capsule at the centre with bridges out to a phone, a server rack and a card reader"
+      "subject": "one big plain capsule standing at the centre of a wide round platform, three thick ramps running from it out to three separate platforms"
     },
     {
       "id": "java-javas-influence",
@@ -4806,7 +4806,7 @@
       "title": "How Java influenced modern software engineering",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a workbench of tools, three of them clearly copied onto neighbouring benches"
+      "subject": "one large plain tool standing on a central platform with three identical copies of it on three smaller platforms around it"
     },
     {
       "id": "java-your-first-program",
@@ -4866,7 +4866,7 @@
       "title": "Methods and modularity",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a machine built from separate labelled bays, each with its own input and output"
+      "subject": "three plain blocks clipped onto a single long rail on a platform, one block unclipped and held above the rail"
     },
     {
       "id": "java-stack-and-heap",
@@ -4890,7 +4890,7 @@
       "title": "Arrays and collections",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a fixed rail of cells beside a rack of purpose-built containers"
+      "subject": "one long tray divided into five equal cells with a block in each, beside a single big open sack that has swallowed a loose pile of blocks"
     },
     {
       "id": "java-maps-and-sets",
@@ -4914,7 +4914,7 @@
       "title": "Basic algorithms and data structures",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a rack holding a rail, a chain of linked boxes and a small branching tree"
+      "subject": "three large plain shapes on one platform, a straight rail of blocks, a chain of two big linked rings, and a single forked post"
     },
     {
       "id": "java-classes-and-objects",
@@ -4938,7 +4938,7 @@
       "title": "Constructors and object lifecycle",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a machine assembling an object at one end and dismantling it at the other"
+      "subject": "a wide turntable on a platform carrying one large plain block, a clamp closing on it at one side and an open chute taking it away at the other"
     },
     {
       "id": "java-encapsulation",
@@ -4986,7 +4986,7 @@
       "title": "Exception handling",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a falling token caught by a safety net stretched between four posts"
+      "subject": "one large plain block tumbling off the edge of a high platform into a wide open basket waiting below"
     },
     {
       "id": "java-software-organization",
@@ -5010,7 +5010,7 @@
       "title": "Writing maintainable software",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tidy structure with labelled removable panels, one lifted clear"
+      "subject": "one large plain cabinet on a platform with three big smooth doors, a single door swung wide open"
     },
     {
       "id": "java-debugging",
@@ -5058,7 +5058,7 @@
       "title": "What is machine learning",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot watching a machine derive a fitted curve from a scatter of dots by itself"
+      "subject": "the Dataslope marmot mascot watching a plain machine draw one smooth curve across a wide panel by itself"
     },
     {
       "id": "ml-why-ml-exists",
@@ -5070,7 +5070,7 @@
       "title": "Why machine learning exists",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a wall of hand-written rule cards beside one compact fitted-curve plate"
+      "subject": "a long wall of plain blank tiles standing on one half of a platform beside one small block carrying a single curve on its face"
     },
     {
       "id": "ml-supervised-vs-unsupervised",
@@ -5082,7 +5082,7 @@
       "title": "Supervised vs unsupervised learning",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "labelled dots being fitted on one platform, unlabelled dots self-clustering on another"
+      "subject": "two wide plates on a platform, flat circles on one sorted into two separate trays and flat circles on the other drifting into two loose groups"
     },
     {
       "id": "ml-three-task-types",
@@ -5094,7 +5094,7 @@
       "title": "Regression, classification, and clustering",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three small plates side by side: a fitted line, a dividing boundary, and three clusters"
+      "subject": "three wide panels in a row on a platform, one crossed by a straight rail, one split by a single dividing wall, and one holding three separate groups of flat circles"
     },
     {
       "id": "ml-features-and-targets",
@@ -5106,7 +5106,7 @@
       "title": "Features and targets",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform with several column slots feeding a machine and one column set apart as the answer"
+      "subject": "three tall plain columns standing together on one platform and a single fourth column standing apart on its own small platform"
     },
     {
       "id": "ml-ml-workflow",
@@ -5118,7 +5118,7 @@
       "title": "The practical ML workflow",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot walking a looping track of numbered stations around a central model block"
+      "subject": "the Dataslope marmot mascot walking a wide circular platform with three big plain blocks spaced around its rim"
     },
     {
       "id": "ml-sklearn-api",
@@ -5142,7 +5142,7 @@
       "title": "Your first model, end to end",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot pulling a lever that turns a grid platform into a fitted curve plate"
+      "subject": "the Dataslope marmot mascot lifting one finished chart panel off a plain press on a wide platform"
     },
     {
       "id": "ml-train-test-split",
@@ -5154,7 +5154,7 @@
       "title": "The train/test split",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform cleaved into a large training block and a small sealed test block"
+      "subject": "one wide slab on a platform split by a single clean cut into a large piece and a small piece, the small piece pushed aside"
     },
     {
       "id": "ml-generalization",
@@ -5166,7 +5166,7 @@
       "title": "Generalization, overfitting, and underfitting",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three plates: a curve too straight, one fitting well, and one contorting through every dot"
+      "subject": "three wide chart panels in a row on a platform, one crossed by a straight rail, one by a gentle curve, and one by a wildly wavy ribbon"
     },
     {
       "id": "ml-bias-variance",
@@ -5178,7 +5178,7 @@
       "title": "The bias–variance tradeoff",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a balance beam with a rigid rod on one pan and a wildly flexible one on the other"
+      "subject": "one wide seesaw beam on a platform with a thick straight bar resting on one end and a floppy coiled ribbon on the other"
     },
     {
       "id": "ml-cross-validation",
@@ -5190,7 +5190,7 @@
       "title": "Cross-validation",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform divided into five bands, a different band sealed off in each of five passes"
+      "subject": "one long plain bar on a platform divided into five equal blocks, a single block lifted out onto a small side tray"
     },
     {
       "id": "ml-data-preprocessing",
@@ -5214,7 +5214,7 @@
       "title": "Encoding categorical features",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "labelled category tokens converting into rows of small on-off switches"
+      "subject": "one big plain tile on a platform feeding a bank of three large toggle switches, a single switch flipped up"
     },
     {
       "id": "ml-feature-engineering",
@@ -5226,7 +5226,7 @@
       "title": "Feature engineering",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a workbench combining two column slots into one new sharper column"
+      "subject": "the Dataslope marmot mascot on a platform pressing two big plain blocks together into one taller block"
     },
     {
       "id": "ml-pipelines",
@@ -5238,7 +5238,7 @@
       "title": "Pipelines and ColumnTransformer",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two column groups taking separate treatment stations before merging into one model block"
+      "subject": "two thick pipes running from two plain trays into one large block on a platform"
     },
     {
       "id": "ml-linear-regression",
@@ -5250,7 +5250,7 @@
       "title": "Linear regression",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a straight rod fitted through a scatter of dots with small gaps marked to each dot"
+      "subject": "one straight thick rail crossing a wide plate, a scatter of flat circles lying either side of it"
     },
     {
       "id": "ml-logistic-regression",
@@ -5262,7 +5262,7 @@
       "title": "Logistic regression",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an S-shaped ramp separating dots of two colours across a threshold line"
+      "subject": "one broad S-shaped ramp on a wide plate, flat blue circles gathered at its low end and flat green circles at its high end"
     },
     {
       "id": "ml-knn",
@@ -5274,7 +5274,7 @@
       "title": "K-nearest neighbors",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one unlabelled dot with a ring drawn round its three closest neighbours"
+      "subject": "one large flat circle at the centre of a wide plate with a single thick ring drawn around its three nearest flat circles"
     },
     {
       "id": "ml-decision-trees",
@@ -5298,7 +5298,7 @@
       "title": "Ensembles and random forests",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot collecting votes from a row of small trees into one result tile"
+      "subject": "the Dataslope marmot mascot gathering three large plain discs from three separate stands into one wide tray"
     },
     {
       "id": "ml-regression-metrics",
@@ -5310,7 +5310,7 @@
       "title": "Regression metrics",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a fitted rod with the gap to each dot drawn as a small measured bar"
+      "subject": "one straight thick rail across a wide plate with three short upright bars measuring the gap from the rail to three flat circles"
     },
     {
       "id": "ml-classification-metrics",
@@ -5322,7 +5322,7 @@
       "title": "Classification metrics beyond accuracy",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a two-by-two tray of outcome bins with the counts stacked differently in each"
+      "subject": "one wide plain tray split into four big square compartments on a platform, two filled level with flat tiles and two nearly empty"
     },
     {
       "id": "ml-roc-auc",
@@ -5346,7 +5346,7 @@
       "title": "Hyperparameter tuning",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot turning two dials on a model block while a score gauge climbs"
+      "subject": "the Dataslope marmot mascot turning one big dial on a plain block while a large round gauge beside it swings up"
     },
     {
       "id": "ml-k-means",
@@ -5358,7 +5358,7 @@
       "title": "K-means clustering",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three centre markers with dots gathering to their nearest marker on a plane"
+      "subject": "three big cross markers on a wide plate, a loose ring of flat circles gathered around each"
     },
     {
       "id": "ml-hierarchical-clustering",
@@ -5370,7 +5370,7 @@
       "title": "Hierarchical clustering",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "dots merging pairwise up a branching structure into progressively larger groups"
+      "subject": "four flat circles standing on a base rail, joined upward by thick brackets into two pairs and then into one bracket at the top"
     },
     {
       "id": "ml-evaluating-clusters",
@@ -5382,7 +5382,7 @@
       "title": "Evaluating clusters",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three tight well-separated dot groups beside three overlapping smeared ones"
+      "subject": "two wide plates on a platform, three well-separated groups of flat circles on one and three overlapping groups on the other"
     },
     {
       "id": "ml-model-interpretation",
@@ -5406,7 +5406,7 @@
       "title": "Common pitfalls and misconceptions",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot holding a magnifying lens over a suspiciously perfect fitted curve"
+      "subject": "the Dataslope marmot mascot on a wide platform steadying one large chart panel that is tipping off its stand"
     },
     {
       "id": "ml-next-steps",
@@ -5430,7 +5430,7 @@
       "title": "Why C++ for DSA?",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a cutaway engine block on a platform with its inner gears exposed, a small speed dial beside it reading high"
+      "subject": "one large plain engine block on a platform with a single big gear exposed on its side and a broad round dial beside it"
     },
     {
       "id": "dsa-cpp-essentials",
@@ -5466,7 +5466,7 @@
       "title": "Arrays and std::vector",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a single long tray of identical adjacent cells, one cell lifted straight up on a thin arrow to show instant direct access"
+      "subject": "one wide plain bar divided into six equal blocks on a platform, a single block standing proud of the rest"
     },
     {
       "id": "dsa-strings",
@@ -5526,7 +5526,7 @@
       "title": "Queues and deques",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a straight open channel with four rounded tokens queued inside, one leaving at the front and one entering at the back"
+      "subject": "one wide turnstile on a platform with a big plain block passing through it and two blocks waiting behind"
     },
     {
       "id": "dsa-recursion",
@@ -5562,7 +5562,7 @@
       "title": "Basic sorting algorithms",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a row of uneven vertical bars on a platform with two adjacent bars swapping places along a small curved arrow"
+      "subject": "five big plain blocks of different heights standing in a row on a rail, two neighbours lifted and crossing over each other"
     },
     {
       "id": "dsa-sorting-efficient",
@@ -5586,7 +5586,7 @@
       "title": "Hash tables",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a scrambler drum feeding a row of numbered pigeonhole slots, one key-shaped token dropping directly into a single slot"
+      "subject": "one big plain drum on a platform dropping a single large key-shaped token into one of four wide open slots"
     },
     {
       "id": "dsa-trees",
@@ -5598,7 +5598,7 @@
       "title": "Trees and binary trees",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a branching structure of connected spheres rising from a single root node, each node splitting into two children"
+      "subject": "one big flat circle at the top of a platform with two thick straight connectors running down to two flat circles below it"
     },
     {
       "id": "dsa-bst",
@@ -5610,7 +5610,7 @@
       "title": "Binary search trees",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a branching node structure where every left branch holds a smaller block and every right branch a larger one, a descending path highlighted"
+      "subject": "one big flat circle at the top of a platform with a thick connector down to a smaller flat circle on its left and a larger one on its right"
     },
     {
       "id": "dsa-heaps",
@@ -5622,7 +5622,7 @@
       "title": "Heaps and priority queues",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a pyramid of stacked spheres with the largest resting at the apex, one sphere climbing a side arrow toward the top"
+      "subject": "three big flat discs stacked into a low pyramid on a platform, the largest at the top and one disc rising toward it on a thick arrow"
     },
     {
       "id": "dsa-tries",
@@ -5658,7 +5658,7 @@
       "title": "Graph traversal: BFS and DFS",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a node network with concentric rings expanding outward from one starting node, beside a single deep thread winding through the same network"
+      "subject": "two wide plates on a platform, thick rings spreading outward from one flat circle on the first and a single thick line threading deep between flat circles on the second"
     },
     {
       "id": "dsa-shortest-paths",
@@ -5670,7 +5670,7 @@
       "title": "Shortest paths: Dijkstra",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a network of nodes with weighted edges of varying thickness, one glowing route threading from a start node to a distant node"
+      "subject": "four flat circles on a wide plate joined by thick and thin connectors, one thick route running clear from the near circle to the far one"
     },
     {
       "id": "dsa-greedy",
@@ -5682,7 +5682,7 @@
       "title": "Greedy algorithms",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a forking road where a cart takes the immediately steepest downhill branch at every junction without looking ahead"
+      "subject": "one wide ramp forking into two on a platform, a big plain cart tipping onto the steeper branch"
     },
     {
       "id": "dsa-dynamic-programming",
@@ -5694,7 +5694,7 @@
       "title": "Dynamic programming",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid of small pigeonhole cells being filled one row at a time, each new cell drawing short arrows from two already-filled neighbours"
+      "subject": "one wide plain grid of nine big cells on a platform, six filled with flat tiles and one being placed with two short arrows from its neighbours"
     },
     {
       "id": "dsa-backtracking",
@@ -5706,7 +5706,7 @@
       "title": "Backtracking",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a branching maze of corridors where one dead-end branch is folded away and a marker steps back to the previous junction to try another"
+      "subject": "a wide plain board with two thick channels, one ending at a blank wall and a big marker turned back at the fork"
     },
     {
       "id": "dsa-union-find",
@@ -5718,7 +5718,7 @@
       "title": "Union-find",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two separate clusters of connected spheres on a platform being joined by a single new cable, their two root nodes merging into one"
+      "subject": "two large flat circles on a wide platform, each with one smaller circle attached, a single new thick cable joining the two large ones"
     },
     {
       "id": "dsa-next-steps",
@@ -5730,7 +5730,7 @@
       "title": "Next steps",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot standing on a summit platform beside a signpost, three arrows pointing toward distant floating structures"
+      "subject": "the Dataslope marmot mascot on a high round platform beside one big plain signpost with two broad arms"
     },
     {
       "id": "gg-systems-dont-scale",
@@ -5754,7 +5754,7 @@
       "title": "The grammar, and the package that runs it",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an open reference volume on a stand with seven small labelled component blocks lifting out of its pages and arranging into a neat chart"
+      "subject": "one large open book standing on a stand on a platform with three big plain blocks lifting out of its pages"
     },
     {
       "id": "gg-seven-components",
@@ -5778,7 +5778,7 @@
       "title": "Your first ggplot",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot slotting three component blocks into the base of an empty plotting frame as a scatter of dots appears on it"
+      "subject": "the Dataslope marmot mascot sliding one big plain block into the base of an empty chart frame as three flat circles appear on it"
     },
     {
       "id": "gg-data-layer",
@@ -5802,7 +5802,7 @@
       "title": "Aesthetic mappings",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "four ribbons running from a column of data tiles to four separate visual dials for position, colour, size and shape"
+      "subject": "one plain tile on a platform with two thick ribbons running from it to a big colour swatch and a big size marker"
     },
     {
       "id": "gg-mapping-vs-setting",
@@ -5814,7 +5814,7 @@
       "title": "Mapping vs. setting",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two side-by-side plot frames, one where every dot is a single flat colour and one where the dots take colours from a data column"
+      "subject": "two wide panels side by side on a platform, the flat circles on one all a single colour and the flat circles on the other in three different colours"
     },
     {
       "id": "gg-thinking-in-layers",
@@ -5826,7 +5826,7 @@
       "title": "Thinking in layers",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three transparent chart sheets floating one above another, each carrying different marks, aligning into a single combined image"
+      "subject": "three wide plain sheets stacked with clear gaps on a single post, each carrying one different mark"
     },
     {
       "id": "gg-what-is-a-geom",
@@ -5838,7 +5838,7 @@
       "title": "What is a geom?",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one set of data points feeding three interchangeable mark heads on a turret, a dot head, a bar head and a line head"
+      "subject": "one plain block on a platform feeding three separate wide panels, one showing flat circles, one a single bar and one a single line"
     },
     {
       "id": "gg-choosing-geoms",
@@ -5850,7 +5850,7 @@
       "title": "Choosing geometries",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a decision fork where one and two variable tokens roll down separate chutes into matching chart-shaped bins"
+      "subject": "one wide chute forking into two on a platform, a big plain tile heading down one branch toward a bar-shaped bin"
     },
     {
       "id": "gg-layering-geoms",
@@ -5862,7 +5862,7 @@
       "title": "Layering multiple geoms",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a scatter of dots on a base plane with a smooth curved ribbon layered above them on a second transparent sheet"
+      "subject": "one wide plate of flat circles on a platform with a single thick curved ribbon floating on a clear sheet above it"
     },
     {
       "id": "gg-geom-has-a-stat",
@@ -5886,7 +5886,7 @@
       "title": "Bars and histograms",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a row of equal-width bins along a track, loose spheres dropping into them and stacking into bars of different heights"
+      "subject": "three wide bins in a row on a track, flat discs stacked to three different heights inside them"
     },
     {
       "id": "gg-smoothers",
@@ -5898,7 +5898,7 @@
       "title": "Smoothers and summaries",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a cloud of scattered dots on a plane with a smooth ribbon curve threading through them inside a soft confidence band"
+      "subject": "one wide plate of flat circles on a platform with a single smooth ribbon curve running through them inside a broad soft band"
     },
     {
       "id": "gg-what-scales-do",
@@ -5910,7 +5910,7 @@
       "title": "What scales do",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a translator mechanism with raw numeric tokens entering one side and pixel positions and colour swatches leaving the other"
+      "subject": "one plain box on a platform with a big plain tile entering one side and a large colour swatch leaving the other"
     },
     {
       "id": "gg-position-scales",
@@ -5946,7 +5946,7 @@
       "title": "Cartesian and beyond",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a flat gridded plane on a platform with a viewing frame hovering above it, cropping a smaller region of the grid"
+      "subject": "one wide gridded plate on a platform with a big empty frame hovering over one corner of it"
     },
     {
       "id": "gg-polar-coordinates",
@@ -5982,7 +5982,7 @@
       "title": "Themes and styling",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a chart on a platform with its gridlines, background panel and border lifting away as separate skins, the data marks untouched"
+      "subject": "one wide chart panel on a platform with two big plain skins peeling off it and floating to one side"
     },
     {
       "id": "gg-labels-annotations",
@@ -5994,7 +5994,7 @@
       "title": "Labels, titles and annotations",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a chart plane with blank ribbon banners hovering above and beside it and a dashed reference line crossing the marks"
+      "subject": "one wide chart panel on a platform with two big blank banners hovering above it and a single dashed line crossing it"
     },
     {
       "id": "gg-anatomy",
@@ -6006,7 +6006,7 @@
       "title": "Anatomy of a complete plot",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a finished chart exploded into its stacked component plates, each plate floating a short distance apart on a platform"
+      "subject": "one large chart panel standing upright on a platform with its base rail and its frame separated a short distance away from it"
     },
     {
       "id": "gg-complete-workflow",
@@ -6018,7 +6018,7 @@
       "title": "A complete workflow",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "four chart panels on a rising staircase, each one tidier than the last, the Dataslope marmot mascot admiring the polished framed figure at the top"
+      "subject": "the Dataslope marmot mascot at the top of a wide ramp beside one large framed chart panel"
     },
     {
       "id": "gg-discussions",
@@ -6042,7 +6042,7 @@
       "title": "Next steps",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot beside a layered chart platform, extension blocks orbiting above it on a signpost"
+      "subject": "the Dataslope marmot mascot standing on a stack of three wide chart plates with one further plate hovering above"
     },
     {
       "id": "css-cascade",
@@ -6066,7 +6066,7 @@
       "title": "Selectors and combinators",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a targeting reticle hovering over one panel in a branching tree of nested panels, thin connector lines reaching to its siblings"
+      "subject": "one big round targeting ring resting over a single panel in a row of three plain panels on a platform"
     },
     {
       "id": "css-box-model",
@@ -6270,7 +6270,7 @@
       "title": "What is natural language processing?",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tangled ribbon of loose blank word tiles on one platform beside the same tiles arranged into a tidy structured lattice"
+      "subject": "one loose tangle of thick ribbon on one half of a platform beside a tidy stack of three big plain tiles on the other"
     },
     {
       "id": "nlp-pipeline",
@@ -6282,7 +6282,7 @@
       "title": "The anatomy of an NLP pipeline",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a straight conveyor line passing through five distinct processing stations, the material growing tidier at each stop"
+      "subject": "one straight thick pipe crossing a platform through three large plain collars, a big tile entering rough and leaving smooth"
     },
     {
       "id": "nlp-tokenization",
@@ -6318,7 +6318,7 @@
       "title": "Identifying and removing stopwords",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a sieve on a platform catching a pile of tiny featureless pebbles while larger distinctive shapes pass through into a tray"
+      "subject": "one wide grate on a platform with three large plain shapes resting on top of it and a drift of small flat chips fallen through underneath"
     },
     {
       "id": "nlp-stemming",
@@ -6330,7 +6330,7 @@
       "title": "Stemming vs. lemmatization",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "four branching stalks of different lengths converging down into one shared root block on a platform"
+      "subject": "three thick stalks of different heights on a platform curving down into one shared plain root block"
     },
     {
       "id": "nlp-frequencies",
@@ -6354,7 +6354,7 @@
       "title": "N-grams: bigrams and trigrams",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a sliding viewing frame two tiles wide travelling along a row of blank tiles, capturing overlapping adjacent pairs"
+      "subject": "one wide open frame two cells across sliding along a row of five big blank tiles on a rail"
     },
     {
       "id": "nlp-pos-tagging",
@@ -6366,7 +6366,7 @@
       "title": "Part-of-speech tagging",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a row of blank word tiles on a track, each receiving a small differently shaped coloured cap from an overhead sorter"
+      "subject": "four big blank tiles standing in a row on a track, each wearing a large differently shaped coloured cap"
     },
     {
       "id": "nlp-bag-of-words",
@@ -6378,7 +6378,7 @@
       "title": "From text to features: bag-of-words",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an open sack tipping loose tiles onto a counting grid that fills into a sparse matrix of small numeric blocks"
+      "subject": "one wide open sack tipping large plain tiles onto a broad tray of nine big cells, three cells already stacked higher than the rest"
     },
     {
       "id": "nlp-tf-idf",
@@ -6390,7 +6390,7 @@
       "title": "TF-IDF: weighting words by how telling they are",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a balance beam on a platform where a common repeated tile sits light and a rare distinctive tile weighs the pan down"
+      "subject": "one wide seesaw beam on a platform with a stack of three identical plain tiles riding high on one end and a single large tile holding the other end down"
     },
     {
       "id": "nlp-sentiment",
@@ -6414,7 +6414,7 @@
       "title": "Designing the right preprocessing pipeline",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a modular conveyor with interchangeable station blocks, two stations lifted out and set aside on the platform"
+      "subject": "three large plain station blocks bolted along one straight rail on a platform, a fourth block resting unattached beside the rail"
     },
     {
       "id": "nlp-discussions",
@@ -6426,7 +6426,7 @@
       "title": "Interesting discussions: how NLP got here",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a row of six small commemorative platform plinths of increasing height, each carrying a different simple machine"
+      "subject": "three plain plinths of rising height on one platform, each carrying a single large simple machine part"
     },
     {
       "id": "nlp-next-steps",
@@ -6438,7 +6438,7 @@
       "title": "Where to go next",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot beside a finished pipeline platform, a signpost pointing toward larger floating structures"
+      "subject": "the Dataslope marmot mascot on a wide platform beside one big plain signpost, a single large structure floating in the distance"
     },
     {
       "id": "oopj-software-crisis",
@@ -6450,7 +6450,7 @@
       "title": "The software crisis",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a precarious leaning tower of mismatched blocks on a platform, loose cables spilling out of its sides"
+      "subject": "one tall leaning tower of mismatched plain blocks on a platform with a single thick cable spilling from its side"
     },
     {
       "id": "oopj-birth-of-oop",
@@ -6486,7 +6486,7 @@
       "title": "Constructors and state",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an assembly cradle on a platform releasing one fully formed sealed object, a rejected half-built shell set aside"
+      "subject": "one wide cradle on a platform holding a single large sealed block, an open half-shell lying beside it"
     },
     {
       "id": "oopj-encapsulation",
@@ -6570,7 +6570,7 @@
       "title": "Abstract classes",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a partly built frame on a platform with most panels fitted and one empty socket left open, two finished variants standing beside it"
+      "subject": "one large plain frame on a platform with a single empty socket in its face, two finished blocks standing beside it"
     },
     {
       "id": "oopj-interfaces",
@@ -6642,7 +6642,7 @@
       "title": "The Gang of Four",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a shelf of four bound volumes on a platform with repeating identical structural motifs lifting out of them into the air"
+      "subject": "one large closed book lying flat on a plinth with three identical plain shapes rising out of its cover"
     },
     {
       "id": "oopj-packages",
@@ -6690,7 +6690,7 @@
       "title": "The age of data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a single precious ledger book on a small plinth beside a towering cascade of identical data tiles pouring off a platform"
+      "subject": "one small closed ledger on a low plinth beside a tall cascade of plain tiles pouring off a high platform"
     },
     {
       "id": "rlang-stats-before-computers",
@@ -6702,7 +6702,7 @@
       "title": "Statistics before computers",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a long shared desk with three hand-crank calculating machines and neat columns of paper sheets stacked between them"
+      "subject": "one long plain desk on a platform carrying a single large hand-crank machine and one neat stack of blank sheets"
     },
     {
       "id": "rlang-rise-of-computing",
@@ -6714,7 +6714,7 @@
       "title": "The rise of statistical computing",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a room-sized mainframe cabinet with a tape reel spinning, a small punched-card tray feeding into its front slot"
+      "subject": "one large plain cabinet on a platform with a single big tape reel turning on its front"
     },
     {
       "id": "rlang-from-s-to-r",
@@ -6726,7 +6726,7 @@
       "title": "From S to R",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two connected workbenches on stepped platforms, a small teaching bench feeding a larger open one built from the same parts"
+      "subject": "one small plain bench on a low platform joined by a single thick ramp to a much larger bench on a high one"
     },
     {
       "id": "rlang-why-r-matters",
@@ -6738,7 +6738,7 @@
       "title": "Why R matters today",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a specialised precision instrument standing on a platform beside three bulkier general-purpose machines"
+      "subject": "one slim precise instrument standing on a tall plinth beside two bulky plain machines on a lower platform"
     },
     {
       "id": "rlang-thinking-in-data",
@@ -6786,7 +6786,7 @@
       "title": "Variables and assignment",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a labelled storage jar on a platform with a left-pointing arrow feeding a value block into its open mouth"
+      "subject": "one large plain jar standing open on a platform with a single big block being lowered into its mouth"
     },
     {
       "id": "rlang-vectors",
@@ -6858,7 +6858,7 @@
       "title": "Data frames",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a rectangular grid platform of tiles with one full column lifted straight up as a separate tray"
+      "subject": "one wide plain grid on a platform with a single full column lifted straight out of it as a separate tray"
     },
     {
       "id": "rlang-inspecting",
@@ -6870,7 +6870,7 @@
       "title": "Inspecting a dataset",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a magnifying lens on an arm hovering over a grid platform, a small checklist of five ticked marks beside it"
+      "subject": "one big round lens on a tall arm hovering over a wide plain grid on a platform"
     },
     {
       "id": "rlang-subsetting",
@@ -6882,7 +6882,7 @@
       "title": "Subsetting and filtering",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform with a rectangular selection frame lifting out one block of rows and columns"
+      "subject": "one wide plain grid on a platform with a big open frame lifting a single square block of it clear"
     },
     {
       "id": "rlang-summary-stats",
@@ -6894,7 +6894,7 @@
       "title": "Summary statistics",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a column of tiles funnelling down into three small dials showing centre, spread and range"
+      "subject": "one tall stack of plain tiles on a platform funnelling down into a single large round dial"
     },
     {
       "id": "rlang-tidy-data",
@@ -6906,7 +6906,7 @@
       "title": "Tidy data principles",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a messy heap of irregular tiles on one platform beside the same tiles arranged into a perfect rectangular grid"
+      "subject": "one loose heap of irregular plain tiles on a platform beside the same tiles laid into a neat rectangular block"
     },
     {
       "id": "rlang-reshaping",
@@ -6930,7 +6930,7 @@
       "title": "The dplyr verbs",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "five distinct station blocks chained along a pipe on a platform, a grid of tiles flowing through them in sequence"
+      "subject": "three large plain station blocks threaded on one straight pipe across a platform, a single big tile passing through them"
     },
     {
       "id": "rlang-grouped-analysis",
@@ -6942,7 +6942,7 @@
       "title": "Grouped analysis",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid of tiles splitting into three coloured piles, each pile compressing into one summary block, then combining into a small result tray"
+      "subject": "nine large plain tiles on a wide platform gathered into three coloured piles, each pile capped by one flat summary slab"
     },
     {
       "id": "rlang-scripts-projects",
@@ -6954,7 +6954,7 @@
       "title": "Scripts and projects",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an open folder platform holding three tidy labelled sub-trays for code, data and outputs, connected by short arrows"
+      "subject": "one large open folder lying on a platform holding three big plain trays side by side"
     },
     {
       "id": "rlang-reproducible",
@@ -6966,7 +6966,7 @@
       "title": "Reproducible analysis",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one script block feeding a machine that stamps three identical output sheets on a platform"
+      "subject": "one plain block on a platform feeding a wide press that stamps three identical flat sheets into a stack"
     },
     {
       "id": "rlang-viz-principles",
@@ -6978,7 +6978,7 @@
       "title": "Principles of visualization",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a cluttered chart panel on one platform beside a stripped-back version of the same chart, only its data marks remaining"
+      "subject": "one wide chart panel on a platform with its frame, gridlines and backing peeled away and stacked to one side, a single curve left on the bare panel"
     },
     {
       "id": "rlang-ggplot-grammar",
@@ -7014,7 +7014,7 @@
       "title": "Relationships between variables",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a scatter of dots rising across a plane with a straight trend ribbon threading through them, a small cross-tab grid beside it"
+      "subject": "one wide plate with a scatter of flat circles rising across it and a single straight ribbon laid through them"
     },
     {
       "id": "rlang-interpreting-plots",
@@ -7050,7 +7050,7 @@
       "title": "Sampling and distributions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a large bin of mixed spheres with a small scoop lifting out a handful, the scoop's contents forming a small mound-shaped pile"
+      "subject": "one wide bin of flat discs on a platform with a big scoop lifted clear of it, a small pile of discs on a tray below"
     },
     {
       "id": "rlang-inference",
@@ -7062,7 +7062,7 @@
       "title": "Intuition for inference",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a horizontal range bar on a platform with a bracketed interval marked on it and a single point estimate pin inside"
+      "subject": "a small tray holding four flat discs on one side of a wide platform and a large crowd of flat discs on the other, one broad bracket arching from the tray across to the crowd"
     },
     {
       "id": "rlang-mini-project",
@@ -7074,7 +7074,7 @@
       "title": "Mini project walkthrough",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "six stepped platforms rising in sequence from a raw grid to a finished chart, the Dataslope marmot mascot standing at the summit"
+      "subject": "the Dataslope marmot mascot at the top of three broad steps, one finished chart panel standing beside it"
     },
     {
       "id": "rlang-next-steps",
@@ -7098,7 +7098,7 @@
       "title": "Thinking in React",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a machine on a platform taking a state block in one side and emitting a fully assembled screen panel from the other"
+      "subject": "one big cube dropping into a wide machine on a platform and one large finished screen panel rising out of its top"
     },
     {
       "id": "rx-components-jsx",
@@ -7122,7 +7122,7 @@
       "title": "Props",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a parent panel above three child panels, small sealed tokens dropping down thin chutes into each child"
+      "subject": "one wide panel raised above two large panels on a platform, a single thick chute dropping one big token into each"
     },
     {
       "id": "rx-usestate",
@@ -7146,7 +7146,7 @@
       "title": "State and immutability",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an old tray of tiles set aside intact while a freshly built replacement tray takes its place on the platform"
+      "subject": "one large tray lifted aside on a platform while a second identical tray settles into its place"
     },
     {
       "id": "rx-events",
@@ -7182,7 +7182,7 @@
       "title": "Rendering lists",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tray of data tiles feeding a press that stamps out a matching column of identical panel rows, each with a small keyed notch"
+      "subject": "one large press on a platform stamping three big identical panels onto a rail below it"
     },
     {
       "id": "rx-forms",
@@ -7278,7 +7278,7 @@
       "title": "Next steps",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot beside an assembled component tree platform and a signpost pointing outward"
+      "subject": "the Dataslope marmot mascot standing on a platform beside one large signpost with two broad arms"
     },
     {
       "id": "scipy-manual-limits",
@@ -7290,7 +7290,7 @@
       "title": "When computers were people",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a long shared desk of seated human calculators with paper sheets passing down the row, one enormous ledger at its end"
+      "subject": "one long plain desk on a platform with three seated figures along it and one oversized ledger open at its end"
     },
     {
       "id": "scipy-python-in-science",
@@ -7302,7 +7302,7 @@
       "title": "From FORTRAN to Python",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three stepped platforms carrying a punched-card reader, a matrix calculator panel, and a small modern console"
+      "subject": "three broad steps on a platform carrying one bulky old machine, one mid-sized cabinet, and one small flat screen"
     },
     {
       "id": "scipy-math-meets-computation",
@@ -7314,7 +7314,7 @@
       "title": "When mathematics meets computation",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a perfectly smooth continuous curve on one platform beside the same curve rebuilt from discrete stepped blocks"
+      "subject": "one broad smooth curved ribbon on a platform beside the same shape rebuilt from four thick steps"
     },
     {
       "id": "scipy-floating-point",
@@ -7398,7 +7398,7 @@
       "title": "Linear algebra essentials",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a square matrix block on a platform with a vector column slotting into its side and a solution column emerging"
+      "subject": "one large square block on a platform with a tall column slab pushed into its side and a second column slab emerging opposite"
     },
     {
       "id": "scipy-decompositions",
@@ -7446,7 +7446,7 @@
       "title": "Monte Carlo methods",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a square platform scattered with random dots and a quarter-circle arc inscribed on it, dots inside the arc a different colour"
+      "subject": "one big square plate on a platform with a wide quarter-circle arc drawn across it, a loose scattering of large flat circles resting on both sides of the arc"
     },
     {
       "id": "scipy-signal-processing",
@@ -7482,7 +7482,7 @@
       "title": "Reproducible experiments",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a sealed environment capsule on a platform with a fixed seed dial on its side stamping three identical output sheets"
+      "subject": "one large sealed capsule on a platform with one big dial on its side and two identical flat sheets resting below it"
     },
     {
       "id": "scipy-capstone",
@@ -7494,7 +7494,7 @@
       "title": "Capstone simulation",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a closed loop track on a platform with a predator figure and a prey figure chasing around it, a small phase-spiral panel beside it"
+      "subject": "one large closed loop of track on a platform with two big markers chasing around it"
     },
     {
       "id": "scipy-discussions",
@@ -7518,7 +7518,7 @@
       "title": "Next steps",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot beside a workbench of numerical tools with a signpost pointing toward larger floating machines"
+      "subject": "the Dataslope marmot mascot on a platform beside one large open toolbox and a broad signpost pointing outward"
     },
     {
       "id": "sns-why-visualize",
@@ -7530,7 +7530,7 @@
       "title": "Why visualize statistical data?",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "four small scatter panels arranged in a square on a platform, each showing a visibly different pattern of dots"
+      "subject": "two large panels side by side on a platform, each carrying a clearly different arrangement of big flat circles"
     },
     {
       "id": "sns-how-seaborn-thinks",
@@ -7542,7 +7542,7 @@
       "title": "How Seaborn thinks",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a cluttered manual drawing bench on one platform beside a single tidy dial panel that produces the same finished chart"
+      "subject": "one big dial on a platform turning out one large finished chart panel, a bundle of loose drawing tools set aside beside it"
     },
     {
       "id": "sns-loading-themes",
@@ -7554,7 +7554,7 @@
       "title": "Loading data and setting a theme",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a small shelf of ready-made tidy datasets beside a single styling dial that restyles a chart panel on the platform"
+      "subject": "one large open dataset crate on a platform beside one big styling dial, a single chart panel standing between them"
     },
     {
       "id": "sns-tidy-data",
@@ -7566,7 +7566,7 @@
       "title": "Tidy data for Seaborn",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a wide irregular grid on one platform folding into a tall tidy long-form grid on the next"
+      "subject": "one wide short grid slab on a platform folding into one tall narrow grid slab beside it"
     },
     {
       "id": "sns-continuous-categorical",
@@ -7602,7 +7602,7 @@
       "title": "Scatter plots",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a raised plane scattered with dots forming a loose upward drift, a few outlying dots off to one side"
+      "subject": "one wide plane on a platform carrying a loose upward drift of large flat circles, two of them set well apart from the rest"
     },
     {
       "id": "sns-line-plots",
@@ -7626,7 +7626,7 @@
       "title": "Histograms",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a row of equal-width bins along a track with spheres dropping in and stacking into a silhouette of bars"
+      "subject": "three wide bins side by side on a platform, large flat circles stacked to a different height in each"
     },
     {
       "id": "sns-kde",
@@ -7662,7 +7662,7 @@
       "title": "The categorical plot family",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a central hub block on a platform with six short spokes each ending in a different small chart shape"
+      "subject": "one large hub block on a platform with three thick spokes, each ending in one big simple chart shape"
     },
     {
       "id": "sns-bar-count",
@@ -7674,7 +7674,7 @@
       "title": "Bar and count plots",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two panels on a platform, one with bars counting stacked tokens and one with bars showing a single averaged marker each"
+      "subject": "three thick bars rising from a platform, the tallest topped by one large flat disc and a single straight whisker"
     },
     {
       "id": "sns-box-violin",
@@ -7686,7 +7686,7 @@
       "title": "Box and violin plots",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a five-point box marker on a plane beside a symmetric curved violin shape of the same height"
+      "subject": "one large box marker on a platform beside one big symmetrical violin shape of the same height"
     },
     {
       "id": "sns-strip-swarm",
@@ -7698,7 +7698,7 @@
       "title": "Strip and swarm plots",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two category columns of individual dots, one jittered into a loose band and one nudged into a tidy non-overlapping cluster"
+      "subject": "two tall columns on a platform, one of large flat circles loosely overlapping and one of the same circles spread apart in a neat outline"
     },
     {
       "id": "sns-pair-plots",
@@ -7710,7 +7710,7 @@
       "title": "Pair plots",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a square matrix grid of small scatter panels on a platform, the diagonal cells holding little distribution mounds"
+      "subject": "a two-by-two block of four large panels on a platform, the two diagonal panels each holding one broad mound"
     },
     {
       "id": "sns-joint-plots",
@@ -7722,7 +7722,7 @@
       "title": "Joint plots",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a central scatter panel on a platform with a small bar strip along its top edge and another down its right edge"
+      "subject": "one large square scatter panel on a platform with one thick bar strip along its top edge and one down its right edge"
     },
     {
       "id": "sns-heatmaps",
@@ -7746,7 +7746,7 @@
       "title": "Regression and trend lines",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a scatter of dots on a plane with a straight ribbon fitted through them, a curved dot pattern nearby resisting the same straight line"
+      "subject": "a loose upward drift of large flat circles across a wide plane on a platform, one thick straight ribbon laid through them"
     },
     {
       "id": "sns-facets",
@@ -7782,7 +7782,7 @@
       "title": "Themes and context",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one chart panel shown at three sizes on stepped platforms, its frame and gridlines lightening at each step"
+      "subject": "the same large chart panel shown at three sizes on three broad steps, its frame lighter at each step"
     },
     {
       "id": "sns-matplotlib-touches",
@@ -7806,7 +7806,7 @@
       "title": "The exploratory data analysis workflow",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a closed circular track of five stations on a platform, a small cart looping around it past each stop"
+      "subject": "one large closed loop of track on a platform with three big stations spaced around it and one cart on the rail"
     },
     {
       "id": "sns-visual-storytelling",
@@ -7818,7 +7818,7 @@
       "title": "Telling a story with data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a cluttered exploratory panel on one platform beside a stripped clean version with one highlighted mark and a blank banner above"
+      "subject": "one large plain chart panel on a platform with a single bar picked out in a different colour, one broad blank banner above it"
     },
     {
       "id": "sns-eda-capstone",
@@ -7854,7 +7854,7 @@
       "title": "OLAP vs. OLTP: a needle and a net",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a fine needle plucking one single cell from a grid platform beside a wide net sweeping a whole column of cells"
+      "subject": "one thin needle lifting a single cell out of a wide grid slab, one broad scoop lifting a whole column out of a second slab"
     },
     {
       "id": "duck-why-duckdb",
@@ -7878,7 +7878,7 @@
       "title": "Thinking in datasets",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an enormous grid platform too wide to see across, a small summarising lens compressing one region into three number blocks"
+      "subject": "one enormous wide grid slab on a platform with one large lens above it and three big blocks resting where it points"
     },
     {
       "id": "duck-first-query",
@@ -7902,7 +7902,7 @@
       "title": "Loading and generating data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "four chutes feeding one grid platform, one carrying loose literal blocks and one spooling out a generated ribbon of rows"
+      "subject": "two broad chutes feeding one wide grid slab on a platform, one chute carrying big loose blocks and one an unrolled ribbon"
     },
     {
       "id": "duck-profiling",
@@ -7926,7 +7926,7 @@
       "title": "Filtering and slicing",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a wide grid platform with a narrow cutting frame lifting out one contiguous slab of rows"
+      "subject": "one wide grid slab on a platform with a single thick frame lifting one broad band of it clear"
     },
     {
       "id": "duck-sorting-top-n",
@@ -7950,7 +7950,7 @@
       "title": "Aggregate functions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tall column of many tiles funnelling down through a narrow neck into a single summary block"
+      "subject": "one wide tray of large tiles on a platform funnelling through a broad neck into one single big block"
     },
     {
       "id": "duck-grouping",
@@ -7962,7 +7962,7 @@
       "title": "Grouping data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a mixed pile of coloured tiles sorting down three chutes into three separate bins, each bin producing one summary block"
+      "subject": "one large pile of tiles on a platform splitting down two wide chutes into two big bins, one block resting on each bin"
     },
     {
       "id": "duck-having",
@@ -7974,7 +7974,7 @@
       "title": "Filtering groups with HAVING",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two gates on a conveyor, the first screening loose tiles and the second screening the finished summary blocks further along"
+      "subject": "two big gates spaced along one straight conveyor on a platform, large tiles passing the first and one summary block passing the second"
     },
     {
       "id": "duck-grouping-sets",
@@ -7986,7 +7986,7 @@
       "title": "GROUP BY ALL and grouping sets",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a stepped pyramid of summary blocks on a platform, each tier a coarser subtotal of the tier below"
+      "subject": "one broad stepped pyramid of three thick tiers on a platform, each tier a single wide block"
     },
     {
       "id": "duck-conditional-logic",
@@ -7998,7 +7998,7 @@
       "title": "Conditional logic",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a sorting gate on a platform routing incoming tiles down three labelled chutes into separate bracket bins"
+      "subject": "one large gate on a platform sending big tiles down two broad chutes into two separate bins"
     },
     {
       "id": "duck-dates",
@@ -8010,7 +8010,7 @@
       "title": "Working with dates and time",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a calendar ribbon on a platform with day tiles snapping together into month blocks, a small gap being filled by a spare tile"
+      "subject": "one long calendar ribbon on a platform folding into three thick month blocks, one gap left open"
     },
     {
       "id": "duck-subqueries",
@@ -8022,7 +8022,7 @@
       "title": "Subqueries in analytics",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a small query box nested inside a larger query box on a platform, a single result token passing outward from the inner one"
+      "subject": "one small box resting inside one much larger open box on a platform, a single big token passing out of the inner one"
     },
     {
       "id": "duck-ctes",
@@ -8034,7 +8034,7 @@
       "title": "Common table expressions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a straight pipeline of four named stations on a platform beside a tangled knot of inward-nested boxes"
+      "subject": "three big named boxes bolted in a line along one straight rail on a platform"
     },
     {
       "id": "duck-why-windows",
@@ -8058,7 +8058,7 @@
       "title": "Ranking and ROW_NUMBER",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three podium steps on a platform inside a partitioned lane, small numbered markers resting on each step"
+      "subject": "three broad podium steps on a platform inside one wide lane, a single large marker resting on the top step"
     },
     {
       "id": "duck-running-totals",
@@ -8070,7 +8070,7 @@
       "title": "Running totals and moving averages",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a rising cumulative staircase across a plane with a small sliding frame three cells wide travelling along it"
+      "subject": "one rising staircase of four thick steps on a platform with one wide frame sliding along it"
     },
     {
       "id": "duck-pivoting",
@@ -8082,7 +8082,7 @@
       "title": "Pivoting and reshaping",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tall narrow grid platform rotating on a hinge into a wide short grid of the same tiles"
+      "subject": "one tall narrow grid slab on a platform tipping on a hinge into one wide short slab"
     },
     {
       "id": "duck-business-metrics",
@@ -8094,7 +8094,7 @@
       "title": "Building business metrics",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a definition card on a plinth feeding a small meter gauge, two count blocks forming a ratio above it"
+      "subject": "one large card standing on a plinth and feeding one big round gauge on a platform"
     },
     {
       "id": "duck-reproducible",
@@ -8118,7 +8118,7 @@
       "title": "Next steps",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot beside a small duck on a platform of stacked query pipelines, a signpost pointing outward"
+      "subject": "the Dataslope marmot mascot and a small duck standing together on a platform beside one broad signpost"
     },
     {
       "id": "lite-what-is-a-database",
@@ -8130,7 +8130,7 @@
       "title": "What is a database?",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a sturdy vault-like cabinet on a platform holding neat trays of labelled fact tiles, a small retrieval arm at its front"
+      "subject": "one sturdy vault cabinet on a platform holding three broad trays"
     },
     {
       "id": "lite-spreadsheets-vs-db",
@@ -8142,7 +8142,7 @@
       "title": "Spreadsheets vs. databases",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a loose freeform sheet of mismatched cells on one platform beside a rigid structured grid cabinet on the next"
+      "subject": "one loose sagging sheet on a platform beside one solid rigid grid cabinet"
     },
     {
       "id": "lite-why-sqlite",
@@ -8154,7 +8154,7 @@
       "title": "Why SQLite?",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a single small self-contained file block resting on a platform beside a large empty server rack, a tiny ship's hull motif on its base"
+      "subject": "one small solid block resting on a platform beside one large empty server rack"
     },
     {
       "id": "lite-how-apps-store",
@@ -8178,7 +8178,7 @@
       "title": "Tables, rows and columns",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform with one row highlighted as a horizontal strip and one column highlighted as a vertical strip, crossing at a single cell"
+      "subject": "one wide grid slab on a platform with one row and one column picked out as thick bands crossing at a single cell"
     },
     {
       "id": "lite-first-queries",
@@ -8226,7 +8226,7 @@
       "title": "Inserting data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a hopper above a grid platform dropping three complete row strips into place one after another"
+      "subject": "one large hopper above a wide grid slab on a platform, one thick row strip dropping into place"
     },
     {
       "id": "lite-select-basics",
@@ -8238,7 +8238,7 @@
       "title": "SELECT basics",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform with two of its columns lifted out onto a small temporary result tray beside it"
+      "subject": "one wide grid slab on a platform with two whole columns lifted out onto a small tray beside it"
     },
     {
       "id": "lite-expressions-aliases",
@@ -8250,7 +8250,7 @@
       "title": "Expressions and aliases",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two value tiles feeding a small calculating block that emits a new computed tile with a blank name plate"
+      "subject": "two big tiles feeding one large calculating block on a platform, one new blank tile leaving it"
     },
     {
       "id": "lite-filtering-rows",
@@ -8274,7 +8274,7 @@
       "title": "Sorting and limiting",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an ascending staircase of tiles on a platform with a small bracket capturing only its first three steps"
+      "subject": "one ascending staircase of five thick steps on a platform with a broad bracket capturing its first two"
     },
     {
       "id": "lite-null",
@@ -8298,7 +8298,7 @@
       "title": "Aggregate functions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tall stack of tiles funnelling into a narrow neck and emerging as one single summary block"
+      "subject": "one tall stack of large tiles on a platform narrowing through a broad funnel into one single block"
     },
     {
       "id": "lite-grouping",
@@ -8310,7 +8310,7 @@
       "title": "Grouping data with GROUP BY",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a mixed pile of coloured tiles splitting into three bins on a platform, each bin producing its own summary block"
+      "subject": "one large pile of tiles on a platform dividing into two big bins, one summary block above each"
     },
     {
       "id": "lite-having",
@@ -8322,7 +8322,7 @@
       "title": "Filtering groups with HAVING",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two sequential gates on a platform, the first screening single tiles and the second screening assembled summary blocks"
+      "subject": "two big gates along one straight rail on a platform, loose tiles stopped at the first and one summary block stopped at the second"
     },
     {
       "id": "lite-execution-order",
@@ -8334,7 +8334,7 @@
       "title": "Query execution order",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a numbered sequence of six stations on a curved track, the written order shown as a separate straight ribbon above it"
+      "subject": "three big numbered stations on a curved track on a platform, one straight ribbon running above them in a different order"
     },
     {
       "id": "lite-data-organization",
@@ -8346,7 +8346,7 @@
       "title": "Organizing data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one bloated grid platform with repeated identical cells beside three small tidy grids linked by short connector arrows"
+      "subject": "one bloated grid slab of repeated identical cells on a platform beside two small tidy slabs joined by a thick arrow"
     },
     {
       "id": "lite-relationships-intro",
@@ -8358,7 +8358,7 @@
       "title": "Introduction to relationships",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three grid platforms at different heights joined by connector arrows, one arrow fanning out to many rows"
+      "subject": "three wide grid slabs at different heights on a platform, joined by two thick arrows"
     },
     {
       "id": "lite-primary-keys",
@@ -8370,7 +8370,7 @@
       "title": "Primary keys",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a grid platform where each row carries a unique numbered key tag on its leading edge, no two tags alike"
+      "subject": "one wide grid slab on a platform with one large tag standing on the leading edge of each of its three rows"
     },
     {
       "id": "lite-foreign-keys",
@@ -8382,7 +8382,7 @@
       "title": "Foreign keys",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a key tag on one grid platform with an arrow pointing across to the exact matching row on a second platform"
+      "subject": "one wide grid slab on a platform carrying a single large tag, one thick arrow crossing to the matching row of a second slab"
     },
     {
       "id": "lite-understanding-joins",
@@ -8394,7 +8394,7 @@
       "title": "Understanding joins",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two grid platforms side by side with matching rows bridged by short connectors into a single combined strip above"
+      "subject": "two wide grid slabs side by side on a platform, one thick connector bridging them into a single combined strip above"
     },
     {
       "id": "lite-inner-joins",
@@ -8406,7 +8406,7 @@
       "title": "Inner joins",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two overlapping grid platforms where only the rows in the shared middle region lift out onto a result tray"
+      "subject": "two wide grid slabs overlapping on a platform, one broad band lifted out of the shared middle"
     },
     {
       "id": "lite-outer-joins",
@@ -8418,7 +8418,7 @@
       "title": "Outer joins",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two grid platforms joined at the middle, every row of the left platform lifting out, the unmatched ones carrying an empty hole"
+      "subject": "two wide grid slabs joined at the middle on a platform, one broad band lifted clear with a single empty hole in it"
     },
     {
       "id": "lite-many-to-many",
@@ -8430,7 +8430,7 @@
       "title": "Many-to-many relationships",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two grid platforms bridged by a small third junction platform, arrows crossing through it in both directions"
+      "subject": "two wide grid slabs on a platform bridged by one small slab between them, one thick arrow crossing each way"
     },
     {
       "id": "lite-data-exploration",
@@ -8442,7 +8442,7 @@
       "title": "Exploring data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a magnifying lens sweeping over an unfamiliar cabinet of grid trays, a small checklist plinth beside it"
+      "subject": "one large lens on a platform sweeping over one wide cabinet of open trays"
     },
     {
       "id": "lite-next-steps",
@@ -8466,7 +8466,7 @@
       "title": "Why statistics matters",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two nearly identical bar pairs on a platform, a small caliper measuring the tiny gap between them"
+      "subject": "two tall bars of almost the same height on a platform with one large caliper measuring the gap between their tops"
     },
     {
       "id": "stat-statistical-thinking",
@@ -8490,7 +8490,7 @@
       "title": "Types of data",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "four sorting bins on a platform, two holding graded measuring rods and two holding unordered label plates"
+      "subject": "two wide bins on a platform, one holding two graded measuring rods and one holding two plain unmarked plates"
     },
     {
       "id": "stat-measures-of-center",
@@ -8502,7 +8502,7 @@
       "title": "Measures of center",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a skewed mound of blocks on a platform with three differently coloured marker pins standing at three different positions"
+      "subject": "one broad lopsided mound on a platform with three tall pins standing at three different points along it"
     },
     {
       "id": "stat-measures-of-spread",
@@ -8538,7 +8538,7 @@
       "title": "Visualizing distributions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "four small panels on a platform showing a bar silhouette, a box marker, a violin shape and a staircase curve"
+      "subject": "two large panels on a platform, one showing a thick bar silhouette and one a single broad mound"
     },
     {
       "id": "stat-probability-basics",
@@ -8550,7 +8550,7 @@
       "title": "Probability basics",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a sample-space tray on a platform holding all possible outcome tokens, a smaller ring lassoing a subset of them"
+      "subject": "one wide tray of large flat circles on a platform with one big ring laid over part of them"
     },
     {
       "id": "stat-conditional-probability",
@@ -8562,7 +8562,7 @@
       "title": "Conditional probability",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a large tray of tokens on a platform with a gate narrowing it to one subset, the proportions inside visibly different"
+      "subject": "one wide tray of large flat circles on a platform narrowing through a gate into one smaller tray"
     },
     {
       "id": "stat-random-variables",
@@ -8574,7 +8574,7 @@
       "title": "Random variables",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a mapping bridge on a platform carrying labelled outcome tokens across and dropping numbered blocks on the far side"
+      "subject": "one broad bridge on a platform carrying two large plain tokens across and dropping two numbered blocks on the far side"
     },
     {
       "id": "stat-discrete-distributions",
@@ -8586,7 +8586,7 @@
       "title": "Discrete distributions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a row of separate integer bins on a platform with spheres stacked to differing heights in each"
+      "subject": "three wide separate bins on a platform, large flat circles stacked to a different height in each"
     },
     {
       "id": "stat-continuous-distributions",
@@ -8598,7 +8598,7 @@
       "title": "Continuous distributions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a smooth curve over a platform with one shaded slab of area beneath a marked interval"
+      "subject": "one broad smooth curve over a platform with one thick shaded slab of area beneath it"
     },
     {
       "id": "stat-normal-distribution",
@@ -8622,7 +8622,7 @@
       "title": "Working with distributions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a four-dial control panel on a platform beside a curve being nudged to sit over a histogram silhouette"
+      "subject": "one large panel on a platform with two big dials on its face, one broad curve laid over a thick bar silhouette"
     },
     {
       "id": "stat-populations-samples",
@@ -8634,7 +8634,7 @@
       "title": "Populations and samples",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an enormous crowd of tiny spheres on a wide platform with a small scoop lifting out a handful onto a tray"
+      "subject": "one wide platform carrying one enormous mound, a single small scoop lifting one tray clear of it"
     },
     {
       "id": "stat-sampling-bias",
@@ -8646,7 +8646,7 @@
       "title": "Sampling and bias",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two scoops drawing from a mixed bin, one reaching across the whole bin and one only skimming a single corner"
+      "subject": "one wide bin on a platform with one broad scoop reaching across all of it and one narrow scoop dipping into a single corner"
     },
     {
       "id": "stat-sampling-distributions",
@@ -8658,7 +8658,7 @@
       "title": "Sampling distributions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three stacked platforms, a wide population mound, one small sample mound, and a narrow mound of repeated averages on top"
+      "subject": "three broad steps on a platform carrying one wide mound, one small mound, and one narrow tall mound"
     },
     {
       "id": "stat-clt",
@@ -8694,7 +8694,7 @@
       "title": "Confidence intervals",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a row of twenty horizontal interval bars on a platform crossing one vertical truth line, one bar missing it"
+      "subject": "five thick horizontal bars stacked on a platform crossing one tall vertical line, the top bar falling short of it"
     },
     {
       "id": "stat-bootstrap",
@@ -8706,7 +8706,7 @@
       "title": "The bootstrap",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "one sample tray on a platform being re-drawn from repeatedly with replacement, the copies stacking into a small mound"
+      "subject": "one large tray on a platform with a scoop drawing from it and returning to it, three copies stacked beside it"
     },
     {
       "id": "stat-hypothesis-testing",
@@ -8742,7 +8742,7 @@
       "title": "Errors and power",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a two-by-two grid of four cells on a platform, two cells holding a correct tick and two holding a distinct error marker"
+      "subject": "one large two-by-two grid on a platform, two cells left plain and two carrying one big marker each"
     },
     {
       "id": "stat-effect-sizes",
@@ -8766,7 +8766,7 @@
       "title": "t-tests",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a fraction machine on a platform with a signal block on top and a noise block beneath, emitting one statistic token"
+      "subject": "one large machine on a platform with one big block set above a smaller block, a single token leaving its side"
     },
     {
       "id": "stat-anova-chi-square",
@@ -8778,7 +8778,7 @@
       "title": "ANOVA and chi-square",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "four group mounds compared at once on one platform beside a grid of observed and expected count cells"
+      "subject": "three broad mounds side by side on a platform beside one large two-by-two grid"
     },
     {
       "id": "stat-correlation",
@@ -8790,7 +8790,7 @@
       "title": "Correlation and nonparametric tests",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a scatter rising across a plane beside the same points converted into a tidy ordered rank ladder"
+      "subject": "one wide plane on a platform with large flat circles rising across it, beside a short ladder of three thick rungs"
     },
     {
       "id": "stat-fallacies",
@@ -8814,7 +8814,7 @@
       "title": "Exploratory statistical analysis",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a wall dividing a platform, an open exploration workbench on one side and a sealed confirmation chamber on the other"
+      "subject": "one thick wall dividing a platform, an open workbench on one side and one sealed chamber on the other"
     },
     {
       "id": "stat-ab-testing",
@@ -8826,7 +8826,7 @@
       "title": "A/B testing",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a splitter gate on a platform sending traffic tokens evenly into two variant chambers, a meter comparing their outputs"
+      "subject": "one large splitter gate on a platform sending tokens into two big chambers, one broad gauge standing between them"
     },
     {
       "id": "stat-next-steps",
@@ -8850,7 +8850,7 @@
       "title": "Why C for systems programming?",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a small lean engine block bolted directly onto a bare machine floor, no insulating layers between them"
+      "subject": "one small solid engine block bolted straight onto a wide bare floor plate"
     },
     {
       "id": "sysc-toolchain",
@@ -8862,7 +8862,7 @@
       "title": "The C toolchain",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "four sequential machine stations on a platform, a source sheet entering the first and a solid binary block leaving the last"
+      "subject": "three big machine stations bolted along one straight rail on a platform, one sheet entering the first and one solid block leaving the last"
     },
     {
       "id": "sysc-data-types",
@@ -8874,7 +8874,7 @@
       "title": "Data types and memory",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "four byte-width trays of increasing size on a platform, one tray visibly overflowing its edge"
+      "subject": "four plain trays of increasing size in a row on a platform, the smallest overflowing with one block spilling out"
     },
     {
       "id": "sysc-memory-layout",
@@ -8946,7 +8946,7 @@
       "title": "The heap and dynamic allocation",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a wide open field of free blocks on a platform with a requesting hand receiving one block and a return chute beside it"
+      "subject": "one wide open field of large free blocks on a platform with one block lifted clear and one broad return chute"
     },
     {
       "id": "sysc-structs-unions",
@@ -8970,7 +8970,7 @@
       "title": "Memory bugs",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a memory strip on a platform with a dangling arrow pointing into a freed hole and a block spilling past its boundary"
+      "subject": "one long memory strip on a platform with one big arrow pointing into an empty gap and one block hanging over its end"
     },
     {
       "id": "sysc-disasters",
@@ -8994,7 +8994,7 @@
       "title": "Where to go next",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot on a platform beside a bare machine block and a signpost with six arrows pointing outward"
+      "subject": "the Dataslope marmot mascot on a platform beside one bare machine block and a broad signpost with two arms"
     },
     {
       "id": "tsa-what-makes-unique",
@@ -9018,7 +9018,7 @@
       "title": "Mastering the pandas timeline",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a calendar rail running along the edge of a grid platform, date plates slotted into it as the index rather than as a column"
+      "subject": "one wide grid slab on a platform with one long calendar rail bolted along its edge"
     },
     {
       "id": "tsa-resampling",
@@ -9030,7 +9030,7 @@
       "title": "Resampling and aggregation",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a fine-toothed rail of many small tiles on one platform condensing into a coarse rail of fewer larger tiles"
+      "subject": "one long rail of small tiles on a platform condensing into a short rail of three big tiles"
     },
     {
       "id": "tsa-missing-data",
@@ -9042,7 +9042,7 @@
       "title": "Mind the gap: handling missing temporal values",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an evenly spaced rail of tiles with two empty sockets, one being filled by a copy from the left and one by a bridging ramp"
+      "subject": "one straight rail of large tiles on a platform with two empty sockets, one broad ramp bridging one of them"
     },
     {
       "id": "tsa-rolling-windows",
@@ -9078,7 +9078,7 @@
       "title": "The concept of stationarity",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two rails on a platform, one where the mound sits at a fixed height throughout and one where it drifts steadily upward"
+      "subject": "two long rails on a platform, one with a mound sitting level throughout and one with a mound drifting upward"
     },
     {
       "id": "tsa-differencing",
@@ -9090,7 +9090,7 @@
       "title": "Detrending data: mastering differencing",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a rising staircase ribbon on a platform passing through a subtracting mechanism and emerging as a flat level band"
+      "subject": "one rising staircase ribbon on a platform passing through one big machine and leaving as a flat level band"
     },
     {
       "id": "tsa-acf-pacf",
@@ -9102,7 +9102,7 @@
       "title": "Reading the echoes: ACF and PACF plots",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two stem-plot panels on a platform, one with spikes tapering gradually and one with spikes stopping abruptly, dashed bands on both"
+      "subject": "two large panels on a platform, one with four spikes tapering down and one with two spikes stopping abruptly"
     },
     {
       "id": "tsa-arima",
@@ -9114,7 +9114,7 @@
       "title": "Classic forecasting: AR, MA and ARIMA models",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three interlocking gear blocks on a platform feeding one forecast ribbon that fans into a widening uncertainty cone"
+      "subject": "two large interlocking gears on a platform feeding one ribbon that opens into a wide cone"
     },
     {
       "id": "tsa-chronological-validation",
@@ -9126,7 +9126,7 @@
       "title": "The cardinal sin: chronological validation splits",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a timeline rail cleanly cut once with everything left of the cut in a training tray, beside a rail with dots wrongly interleaved across the cut"
+      "subject": "one long rail on a platform cut once by a thick vertical bar, everything left of the cut resting in one broad tray"
     },
     {
       "id": "tsa-capstone",
@@ -9138,7 +9138,7 @@
       "title": "Capstone: an end-to-end forecasting pipeline",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "eight stepped platforms rising in order from a raw jagged ribbon to a forecast cone measured against a baseline marker"
+      "subject": "four broad steps rising on a platform, one jagged ribbon at the bottom and one widening forecast cone at the top"
     },
     {
       "id": "tsx-evolution-of-js",
@@ -9150,7 +9150,7 @@
       "title": "The evolution of JavaScript",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a tiny ten-day prototype block on a low plinth growing into a sprawling untidy tower of mismatched blocks beside it"
+      "subject": "one tiny block on a low plinth beside one tall sprawling tower of mismatched blocks"
     },
     {
       "id": "tsx-birth-of-typescript",
@@ -9162,7 +9162,7 @@
       "title": "The birth of TypeScript",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a scaffolding frame of type rails being fitted around an existing loose block tower on a platform"
+      "subject": "one loose tower of blocks on a platform with a broad scaffolding frame fitted around it"
     },
     {
       "id": "tsx-how-it-works",
@@ -9186,7 +9186,7 @@
       "title": "Setup and tsconfig.json",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a control panel of strictness toggles on a platform, most switches flipped to their tightest position"
+      "subject": "one large panel on a platform with three big switches, all flipped to the same tight position"
     },
     {
       "id": "tsx-primitive-types",
@@ -9198,7 +9198,7 @@
       "title": "Primitive types",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "seven small distinct atomic tokens resting in individual fitted sockets on a platform"
+      "subject": "three large distinct tokens resting in three fitted sockets on a platform"
     },
     {
       "id": "tsx-type-inference",
@@ -9210,7 +9210,7 @@
       "title": "Type inference",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a value block dropping into an empty socket that automatically moulds itself to the block's exact shape"
+      "subject": "one large block dropping into an empty socket on a platform, the socket moulded to its exact outline"
     },
     {
       "id": "tsx-aliases-literals",
@@ -9270,7 +9270,7 @@
       "title": "Unions and intersections",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two overlapping rings on a platform, one holding the tokens of either ring and one only the tokens in the shared overlap"
+      "subject": "two big overlapping rings on a platform, large flat circles filling both and a few sitting in the shared middle"
     },
     {
       "id": "tsx-type-narrowing",
@@ -9282,7 +9282,7 @@
       "title": "Type narrowing",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a mixed group of token shapes entering a branching gate that separates them into single-shape lanes"
+      "subject": "one mixed group of large tokens on a platform entering a wide branching gate that splits into two lanes"
     },
     {
       "id": "tsx-any-unknown-never",
@@ -9294,7 +9294,7 @@
       "title": "Any, unknown, never",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a lattice on a platform with a wide open top plate, a sealed top plate beside it, and one entirely empty socket at the bottom"
+      "subject": "three large plates on a platform, one wide open, one sealed shut, and one an empty socket"
     },
     {
       "id": "tsx-functions-signatures",
@@ -9318,7 +9318,7 @@
       "title": "Discriminated unions",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three variant blocks on a platform each carrying a distinct shaped tag, a reader gate sorting them by tag alone"
+      "subject": "three large blocks on a platform each carrying a differently shaped tag, one wide reader gate sorting them"
     },
     {
       "id": "tsx-modeling-domains",
@@ -9330,7 +9330,7 @@
       "title": "Modeling domains with types",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a socket board on a platform where every impossible pairing of tokens is physically blocked from fitting"
+      "subject": "one large socket board on a platform where one token fits cleanly and one is plainly blocked"
     },
     {
       "id": "tsx-error-handling",
@@ -9390,7 +9390,7 @@
       "title": "keyof, typeof and template literals",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a value block on a lower platform lifting its key plates up to a type rail above it, two plates joining into one"
+      "subject": "one large value block on a lower platform lifting two broad plates up to a rail above it"
     },
     {
       "id": "tsx-utility-types",
@@ -9402,7 +9402,7 @@
       "title": "Utility types",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a rack of six labelled ready-made transformer blocks on a platform, one lifted out and opened to show simpler parts inside"
+      "subject": "one large rack on a platform holding three big transformer blocks, one lifted out and opened"
     },
     {
       "id": "tsx-branded-types",
@@ -9414,7 +9414,7 @@
       "title": "Branded types",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two structurally identical tokens on a platform, each stamped with a different phantom brand marker so neither fits the other's socket"
+      "subject": "two identical large tokens on a platform, each stamped with a different big mark, one socket accepting only one of them"
     },
     {
       "id": "tsx-api-contracts",
@@ -9426,7 +9426,7 @@
       "title": "API modeling and contracts",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "two separate module platforms joined by a single shared contract plate that both must match at the seam"
+      "subject": "two big module blocks on a platform joined by one shared plate at the seam"
     },
     {
       "id": "tsx-scalable-architecture",
@@ -9438,7 +9438,7 @@
       "title": "Scalable architecture",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "three stacked layer platforms with every connector arrow pointing in one direction only, inward toward the core"
+      "subject": "three broad stacked layers on a platform with two thick arrows pointing inward to the core"
     },
     {
       "id": "tsx-static-analysis",
@@ -9450,7 +9450,7 @@
       "title": "Static analysis in action",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a checking lens sweeping a block assembly on a platform, flagging one mismatched socket before the machine runs"
+      "subject": "one large lens on a platform sweeping across a block assembly, one mismatched socket picked out beneath it"
     },
     {
       "id": "tsx-next-steps",
@@ -10170,7 +10170,7 @@
       "style": "isometric illustration",
       "title": "Probability interview questions",
       "mascot": false,
-      "subject": "a pegboard funnel on a platform dropping small balls into a row of collecting bins that pile up into a bell-shaped mound"
+      "subject": "a pegboard funnel on a platform dropping small flat discs into a row of collecting bins that pile up into a bell-shaped mound"
     },
     {
       "id": "interview-data-scientist-product-sense-and-metrics",
@@ -10338,7 +10338,7 @@
       "title": "How Large Language Models Work: course thumbnail",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a simple cutaway machine on a platform, three large blank chips entering one end and one larger glowing chip emerging at the far end"
+      "subject": "a large smooth dome on a low round base, one wide ribbon spooling in through its left side and one broad ribbon flowing out of its right, two oversized blank tiles stacked on the platform beside it"
     },
     {
       "id": "llm-what-is-a-model",
@@ -10350,7 +10350,7 @@
       "title": "What a language model is",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a machine with one output chute producing a single large chip, a looping belt carrying it back into the input hopper"
+      "subject": "a large smooth block on a round platform with one thick ribbon leaving its front face and curling back into its top"
     },
     {
       "id": "llm-tokens",
@@ -10398,7 +10398,7 @@
       "title": "Embeddings",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a few large spheres floating over a coarse grid, three clustered close together and one sitting far away"
+      "subject": "a few large flat discs floating over a coarse grid, three clustered close together and one sitting far away"
     },
     {
       "id": "llm-similarity",
@@ -10542,7 +10542,7 @@
       "title": "Benchmark pitfalls",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "a podium and scoreboard where a hidden pipe feeds answers directly to one contestant from behind, and a fresh sealed envelope of unseen questions sits unopened to one side"
+      "subject": "a broad podium on a platform holding one large plain cup, with a single thick pipe curving out of a closed box straight into the back of the podium"
     },
     {
       "id": "llm-evaluating-task",
@@ -10566,7 +10566,7 @@
       "title": "Next steps",
       "style": "isometric illustration",
       "mascot": false,
-      "subject": "an open machine casing on a platform beside a simple path leading away toward two further platforms"
+      "subject": "one wide plain doorway standing open on a platform, two large stepping stones leading away from it"
     }
   ]
 }

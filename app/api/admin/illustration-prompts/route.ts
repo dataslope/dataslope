@@ -12,8 +12,9 @@
  *          WebP (the only image the gallery shows), and the current
  *          regeneration marks.
  *   PUT  → set or clear one illustration's regeneration mark, with an optional
- *          note ("use a simpler illustration"), or, with `approve: true`, sign
- *          off a redraw so it stops showing as waiting to be looked at.
+ *          note (the brief the redraw's new prompt gets written from), or, with
+ *          `approve: true`, sign off a redraw so it stops showing as waiting to
+ *          be looked at.
  *
  * Marks live in D1 `dataslope-illustrations`, table `illustration_regen_marks`
  * (binding `ILLUSTRATIONS_DB`; see lib/illustrations/regenMarks.ts and

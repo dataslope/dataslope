@@ -56,6 +56,12 @@ Violating any of these has already been tried and rejected. Don't re-litigate.
   yellow `#ffdd6c`. `"No text."` is appended automatically by
   `lib/illustrationPrompt.ts` — **never ask for lettering**, the model bakes in garbled
   text.
+- **No sphere-like dot groups.** Repeated round elements — scatter dots, chart markers,
+  tokens in a tray, the nodes of a tree — draw as **flat 2D circles**, never glossy 3D
+  balls. `lib/illustrationPrompt.ts` appends that rule to every prompt alongside
+  `"No text."`, so a subject never has to say it; what a subject must not do is *ask*
+  for spheres or beads and fight it. A single large round object (a globe, one marble
+  running a track) is fine, which is why the rule names repeated elements only.
 - Promotion writes **straight to `public/images/`**. Never add a copy under
   `assets/images/` — that is the double-encode this branch removed (cost ~1.8 dB PSNR).
 - Exactly **one `<Figure>` per page**, referencing the **`-cutout`** slug.
@@ -128,6 +134,9 @@ set that shipped:
   "gate" recur because they cut out cleanly and read at small sizes.
 - **No text, ever.** If a label seems needed, use "blank name plate", "blank banner",
   "blank paper tag".
+- **Flat discs, not spheres.** Say "flat circles", "flat discs", "flat counters" when a
+  subject needs many small round things. Writing "spheres", "balls", or "beads" asks the
+  model for glossy 3D marbles, which is the look the global rule exists to stop.
 - **Contrast pairs work well** for before/after lessons: "a messy heap of irregular
   tiles on one platform beside the same tiles arranged into a perfect rectangular grid".
 - **Keep it simple.** The user's explicit feedback: complex compositions failed
@@ -308,8 +317,16 @@ The handle printed under every figure on the site **is** the prompt id, and is e
 what `--only` takes. That is what it is for — a user reporting "regenerate `css-grid`"
 gives you everything you need.
 
+A redraw means a **new `subject`, written from scratch** — not the old string with
+clauses trimmed off it, which is how the composition that failed comes back thinner.
+Read whatever was said about the image first (the reviewer's words, or the note on its
+row in the regeneration queue), treat that as the brief, and keep only two things from
+the old subject: any **creature** in it, unchanged, and the idea the lesson needs
+illustrated. `agent-outputs/20260803-0900-illustration-regeneration-queue.md` step 2
+has the long version.
+
 ```bash
-# 1. edit that prompt's "subject" in data/illustration-prompts.json, then:
+# 1. rewrite that prompt's "subject" in data/illustration-prompts.json, then:
 node scripts/generate-illustrations.mjs submit --only css-grid --sink r2 --run 2026-08-fix
 node scripts/generate-illustrations.mjs status
 node scripts/generate-illustrations.mjs download --sink r2 --run 2026-08-fix

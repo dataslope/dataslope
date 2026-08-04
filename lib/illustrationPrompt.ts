@@ -61,17 +61,33 @@ function article(style: string): string {
 }
 
 /**
+ * Constraints every generated illustration carries, whatever its subject.
+ *
+ * **No text** because none of the illustrations should carry lettering (the
+ * model bakes in garbled text otherwise).
+ *
+ * **Flat circles, not spheres**, because repeated round elements were the
+ * house failure mode: scatter dots, chart markers, tokens in a tray, and the
+ * nodes of a tree all came back as glossy 3D balls, which read as a bag of
+ * marbles rather than as data. It is scoped to *repeated* round elements on
+ * purpose, so a single large round object (a globe, one marble on a track)
+ * still draws as itself.
+ */
+const GLOBAL_CONSTRAINTS =
+  "No text. Draw dots, markers, and nodes as flat 2D circles, never as glossy " +
+  "3D spheres or balls.";
+
+/**
  * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.
  *
  *   An isometric illustration of a marmot waving beside a monitor. No text.
+ *   Draw dots, markers, and nodes as flat 2D circles, never as glossy 3D
+ *   spheres or balls.
  *
  *   Blue: #148cff
  *   Green: #20c621
  *   Red: #ff4f59
  *   Yellow: #ffdd6c
- *
- * "No text." is always appended: none of the illustrations should carry
- * lettering (the model tends to bake in garbled text otherwise).
  */
 export function buildIllustrationPrompt(
   spec: IllustrationSpec,
@@ -79,7 +95,7 @@ export function buildIllustrationPrompt(
 ): string {
   const style = spec.style?.trim() || DEFAULT_STYLE;
   return (
-    `${article(style)} ${style} of ${spec.subject}. No text.\n\n` +
+    `${article(style)} ${style} of ${spec.subject}. ${GLOBAL_CONSTRAINTS}\n\n` +
     `Blue: ${colors.blue}\n` +
     `Green: ${colors.green}\n` +
     `Red: ${colors.red}\n` +

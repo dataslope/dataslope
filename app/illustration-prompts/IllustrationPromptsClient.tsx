@@ -19,10 +19,12 @@
  *    for. Clicking one opens the raw file in a new tab, at full size.
  *
  * 3. **A regeneration queue.** Each card can be marked "redraw this" with a
- *    note ("use a simpler illustration"), persisted through `PUT` on the same
- *    endpoint into D1 `dataslope-illustrations` → `illustration_regen_marks`.
- *    A later regeneration run reads that table. See
- *    agent-outputs/20260803-0900-illustration-regeneration-queue.md.
+ *    note ("too busy, the small parcels came out as smears"), persisted through
+ *    `PUT` on the same endpoint into D1 `dataslope-illustrations` →
+ *    `illustration_regen_marks`. A later regeneration run reads that table and
+ *    writes the prompt again from scratch against the note, so the note is a
+ *    brief for a new illustration rather than an addition to the old prompt.
+ *    See agent-outputs/20260803-0900-illustration-regeneration-queue.md.
  *
  * Theme is the shared site one (ThemePillToggle → siteTheme.ts → `.dark` on
  * <html>), not a page-local toggle, so the palette matches every other surface
@@ -320,8 +322,12 @@ function PromptCard({
           disabled={!marksAvailable}
           // The placeholder is the default the server will store if this is
           // left blank, so what happens on an empty note is visible up front.
-          placeholder={`Extra prompt for the redraw. Blank: "${defaultNote}"`}
-          title={`Typing here also marks this illustration. Left blank, marking stores: "${defaultNote}"`}
+          placeholder={`What the new illustration should be. Blank: "${defaultNote}"`}
+          title={
+            "Typing here also marks this illustration. The note is the brief for a " +
+            "prompt rewritten from scratch, not an addition to the one above; any " +
+            `animal in the old prompt is kept. Left blank, marking stores: "${defaultNote}"`
+          }
           aria-label={`Regeneration note for ${entry.title}`}
           onChange={(e) => onNoteChange(entry.id, e.target.value)}
           onBlur={() => onNoteCommit(entry.id)}
@@ -703,7 +709,9 @@ export function IllustrationPromptsClient() {
             Every generated illustration as the site serves it: the
             background-removed WebP over the live page background. Flip the theme
             to check a cut-out reads on both, click one to open the full-size file,
-            and mark whatever needs redrawing with a note for the next run.{" "}
+            and mark whatever needs redrawing with a note saying what the new
+            illustration should be: the next run writes its prompt from scratch
+            against that note, keeping any animal the old one had.{" "}
             <span className={styles.count}>{gallery.totalIllustrations}</span>{" "}
             illustration{gallery.totalIllustrations === 1 ? "" : "s"} across{" "}
             <span className={styles.count}>{gallery.totalCourses}</span> course
