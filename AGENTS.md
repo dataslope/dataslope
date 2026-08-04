@@ -315,8 +315,15 @@ ringed by dot-and-line networks. **A named noun is content, even inside a
 negative rule** — so the constraint now names only the *categories of debris* to
 omit (speckled dots, confetti, stray connecting lines) and never a thing to draw.
 
+**One piece, one colour.** Every object is a single solid piece in one flat brand
+colour. The model cannot hold an assembly together: a cube built from cubelets, a
+bin packed with blocks, or a tower of stacked cubes comes back fused and notched,
+with colours bleeding into shades outside the palette. The failure is the
+*assembly*, not the count — three large blocks render perfectly where forty
+cubelets do not — so containers hold a few large items, never a heap.
+
 **Solid 3D forms.** Isometric is the house style because it has volume, so the
-constraints say so outright: real thickness, flat matte shading, clean edges.
+constraints say so outright: real thickness, smooth matte shading, clean edges.
 The old wording asked for "flat 2D circles" and flattened whole scenes with it.
 Write subjects in volumetric language — "thick", "deep", "solid", "chunky",
 "block", "cabinet", "column" — and avoid "flat circles", "slab", "plate",

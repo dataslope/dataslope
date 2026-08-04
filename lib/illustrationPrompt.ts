@@ -92,6 +92,16 @@ function article(style: string): string {
  * platforms (see any illustration predating the regeneration rounds), so the
  * background and the plinths are pinned here rather than left to each subject
  * to remember — "heavy base" in a subject is otherwise taken literally.
+ *
+ * **One piece, one colour**, because the model cannot hold an assembly together.
+ * Anything described as built from or filled with many small units — a cube made
+ * of cubelets, a bin packed with blocks, a tower of stacked cubes — comes back
+ * with the units fused, notched, or half-melted into each other, and their
+ * colours bleeding into shades that are not in the palette at all (a four-colour
+ * brand returning an orange face). The failure is the *assembly*, not the count:
+ * three large blocks side by side render perfectly, while the same volume drawn
+ * as forty cubelets does not. So each object is one solid piece in one flat
+ * brand colour, and a container holds a few large items rather than a heap.
  */
 const GLOBAL_CONSTRAINTS =
   "No text. Draw only the objects described — nothing scattered over, around, " +
@@ -100,7 +110,10 @@ const GLOBAL_CONSTRAINTS =
   "smooth matte shading, and clean edges; draw any repeated round elements the " +
   "subject calls for as low solid discs, never as glossy spheres or balls. " +
   "Stage everything light and airy on a white background: pale grey and white " +
-  "platforms, bright brand colors, no dark or black bases.";
+  "platforms, bright brand colors, no dark or black bases. Make every object a " +
+  "single solid piece in one flat brand color: never build one object out of " +
+  "many small blocks or cubelets, never pack a container with a heap of little " +
+  "pieces, and never blend, mix, or bleed two colors into each other.";
 
 /**
  * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.

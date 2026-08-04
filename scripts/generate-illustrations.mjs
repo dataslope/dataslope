@@ -180,7 +180,10 @@ export function buildPrompt(spec, colors) {
     "smooth matte shading, and clean edges; draw any repeated round elements the " +
     "subject calls for as low solid discs, never as glossy spheres or balls. " +
     "Stage everything light and airy on a white background: pale grey and white " +
-    "platforms, bright brand colors, no dark or black bases.";
+    "platforms, bright brand colors, no dark or black bases. Make every object a " +
+    "single solid piece in one flat brand color: never build one object out of " +
+    "many small blocks or cubelets, never pack a container with a heap of little " +
+    "pieces, and never blend, mix, or bleed two colors into each other.";
   return (
     `${article} ${style} of ${spec.subject}. ${constraints}\n\n` +
     `Blue: ${colors.blue}\n` +

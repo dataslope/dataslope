@@ -146,6 +146,21 @@ set that shipped:
 - **Do not describe decoration.** No "scattered dots", "connecting lines", "constellation",
   "network of nodes" unless the lesson's idea genuinely *is* a graph. A field of small
   repeated marks is the single failure mode this pipeline keeps rediscovering.
+- **One piece, one colour. Never an assembly.** The model cannot hold many small units
+  together: anything worded as built from or filled with them — "a cube of cubelets", "a
+  bin of blocks", "a heap", "a pile", "a tower of stacked cubes" — comes back fused,
+  notched, or half-melted, with colours bleeding into shades outside the palette (a
+  four-colour brand returning orange). Three large blocks side by side render perfectly;
+  the same volume as forty cubelets does not. Say "one solid block", and let a container
+  hold **a few large items**, never a heap of little ones.
+- **A creature per course.** The roster in use: marmot (Dataslope, Python, scikit-learn,
+  SciPy), blue elephant (PostgreSQL), yellow duck (DuckDB), panda (pandas), penguin
+  (Seaborn), parrot (NLP), chameleon (Plotly viz), peacock (ggplot2), red fox (R), owl
+  (statistics), squirrel (DSA), beaver (systems C), hedgehog (C++), brown bear (Java),
+  grey rabbit (C#), otter (TypeScript), canary (JavaScript), tree frog (React), grey
+  mouse (SQLite), tortoise (time series), octopus (LLMs), spider (CSS/web). A page that
+  already has a creature **keeps it** — add the course animal alongside rather than
+  swapping it out.
 - **Contrast pairs work well** for before/after lessons: "a messy heap of irregular
   tiles on one platform beside the same tiles arranged into a perfect rectangular grid".
 - **Keep it simple.** The user's explicit feedback: complex compositions failed
