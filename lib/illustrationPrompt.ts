@@ -102,6 +102,12 @@ function article(style: string): string {
  * three large blocks side by side render perfectly, while the same volume drawn
  * as forty cubelets does not. So each object is one solid piece in one flat
  * brand colour, and a container holds a few large items rather than a heap.
+ *
+ * **Animals are exempt from the colour half of that rule.** Without the
+ * exception the model reads a creature as one more object and paints it a flat
+ * brand colour: a run of 60 creature illustrations came back with 15 of them
+ * carrying a solid blue marmot, a blue owl, and a green marmot. Fur, feathers
+ * and skin keep their own colours; only the props obey the palette.
  */
 const GLOBAL_CONSTRAINTS =
   "No text. Draw only the objects described — nothing scattered over, around, " +
@@ -113,7 +119,9 @@ const GLOBAL_CONSTRAINTS =
   "platforms, bright brand colors, no dark or black bases. Make every object a " +
   "single solid piece in one flat brand color: never build one object out of " +
   "many small blocks or cubelets, never pack a container with a heap of little " +
-  "pieces, and never blend, mix, or bleed two colors into each other.";
+  "pieces, and never blend, mix, or bleed two colors into each other. Animals " +
+  "are the exception: give each one its own natural fur, feather, or skin " +
+  "color, never a flat brand color.";
 
 /**
  * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.

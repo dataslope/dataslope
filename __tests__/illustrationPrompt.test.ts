@@ -28,7 +28,9 @@ const CONSTRAINTS =
   "platforms, bright brand colors, no dark or black bases. Make every object a " +
   "single solid piece in one flat brand color: never build one object out of " +
   "many small blocks or cubelets, never pack a container with a heap of little " +
-  "pieces, and never blend, mix, or bleed two colors into each other.";
+  "pieces, and never blend, mix, or bleed two colors into each other. Animals " +
+  "are the exception: give each one its own natural fur, feather, or skin " +
+  "color, never a flat brand color.";
 
 describe("buildIllustrationPrompt", () => {
   it("defaults to the isometric house style, with brand colors and the constraints", () => {
