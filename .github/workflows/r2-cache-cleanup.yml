@@ -33,6 +33,14 @@ name: R2 incremental-cache cleanup
 #     deploy stalls past the grace window; the THRESHOLD_HOURS age rule still
 #     retires these once they are old enough to be long superseded.
 #
+#   • any folder that a PREVIEW is still serving, i.e. a recent commit of an
+#     open PR whose head build has not populated its cache yet. A push moves
+#     the PR head immediately but the preview Worker keeps serving the previous
+#     commit until the new build lands, so the head-only rule below would
+#     delete the cache out from under a live preview and 500 it. Production has
+#     been guarded against this since 2026-07-16 by the build-ID probe; this is
+#     the preview equivalent, added 2026-08-05 after a run did exactly that.
+#
 # Every OTHER folder is kept only while ALL of these hold:
 #   • younger than THRESHOLD_HOURS, AND
 #   • its commit is the current head of an OPEN pull request, i.e. the most
@@ -119,6 +127,18 @@ jobs:
       # production deploy that stalls past the grace window still can't lose
       # its cache. The THRESHOLD_HOURS age rule retires these eventually.
       MAIN_COMMITS: "30"
+      # A preview branch whose HEAD build has not populated its cache yet is
+      # mid-deploy, and its Worker is still serving an EARLIER commit. Keep
+      # that many recent commits of such a branch so the build actually being
+      # served cannot be pruned out from under it. Only branches with a pending
+      # head cost anything: a branch whose head cache is present protects
+      # nothing extra. See step 4b.
+      PR_COMMITS: "3"
+      # How many objects a build folder must hold to count as populated. A
+      # full cache is ~1,600 objects (one per prerendered page); anything far
+      # below that is a folder mid-populate or mid-delete, which cannot serve a
+      # preview and must not be mistaken for a finished deploy.
+      MIN_CACHE_OBJECTS: "100"
       # Scheduled runs delete for real; manual runs honor the dry_run input
       # (default true).
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
@@ -177,6 +197,15 @@ jobs:
           # attempts converge on an empty folder. Returns non-zero only if the
           # folder still has objects after every attempt (a persistent, not
           # transient, failure), so one flaky delete no longer aborts the run.
+          # Number of objects under a folder. The CLI auto-paginates and applies
+          # --query per page, so this emits one count per page; sum them. A
+          # missing folder yields 0, which is what step 4b wants.
+          folder_objects() {
+            aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$1" \
+              --query 'length(Contents)' --output text 2>/dev/null \
+              | grep -vxF 'None' | awk '{s+=$1} END {print s+0}'
+          }
+
           delete_folder() {
             local folder="$1" attempt
             for attempt in 1 2 3 4 5; do
@@ -266,6 +295,50 @@ jobs:
             exit 1
           fi
 
+          # 4b) Protect the build each PREVIEW is actually serving.
+          #
+          #     Step 2 keeps a preview folder only while its SHA is the CURRENT
+          #     head of an open PR. That assumes the head commit is what the
+          #     preview Worker is serving, and between pushing a commit and its
+          #     Workers Build finishing, it is not: the Worker still serves the
+          #     previous commit, whose folder now matches nothing and is deleted.
+          #     The preview then loses its prerendered pages and re-renders on
+          #     demand, which 500s every `node:fs` page (see open-next.config.ts).
+          #     That is exactly the production race fixed on 2026-07-16 — the
+          #     build-ID probe in step 1 protects production from it, and
+          #     previews had no equivalent guard until this (2026-08-05: a
+          #     scheduled run deleted the cache of the commit a preview was
+          #     still serving, 500ing / and /courses/* on that PR).
+          #
+          #     A head whose folder is populated is not mid-deploy, so it costs
+          #     nothing. Only a PENDING head — folder absent or far short of a
+          #     full cache — protects its branch's recent commits, and only
+          #     until its own build lands.
+          declare -A pr_pending   # sha -> "branch (PR #n)", predecessor still serving
+          pending=0
+          while IFS=$'\t' read -r sha branch num; do
+            [[ -z "$sha" ]] && continue
+            if [[ $(folder_objects "${PREFIX}${sha}/") -ge $MIN_CACHE_OBJECTS ]]; then continue; fi
+            pending=$((pending+1))
+            if (( pending > MAX_BRANCHES )); then
+              echo "::warning::More than $MAX_BRANCHES open PRs have a pending head build; predecessors of the rest are not protected."
+              break
+            fi
+            # Abort rather than continue: a failed lookup here leaves this
+            # branch's still-serving folder unmatched, i.e. deleted — the very
+            # outage this step exists to prevent.
+            if ! recent="$(gh api "repos/$GITHUB_REPOSITORY/commits" -X GET \
+                  -f sha="$branch" -f per_page="$PR_COMMITS" --jq '.[].sha')"; then
+              echo "::error::Could not list recent commits for '$branch' (PR #$num). Aborting without deleting."
+              exit 1
+            fi
+            while IFS= read -r c; do
+              [[ -z "$c" || "$c" == "$sha" ]] && continue
+              pr_pending["$c"]="$branch (PR #$num)"
+            done <<< "$recent"
+            echo "Pending head build: $branch (PR #$num) at ${sha:0:7}, protecting its last $PR_COMMITS commits"
+          done < <(printf '%s' "$pr_json" | jq -r '.[] | [.headRefOid, .headRefName, (.number|tostring)] | @tsv')
+
           now=$(date -u +%s)
           cutoff=$(( now - THRESHOLD_HOURS * 3600 ))
           grace_cutoff=$(( now - GRACE_HOURS * 3600 ))
@@ -309,6 +382,13 @@ jobs:
             # per-branch keeps, then the cap.
             if (( ts >= grace_cutoff )); then
               echo "KEEP  $folder (last written $newest, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy)"
+              kept=$((kept+1)); continue
+            elif [[ -n "${pr_pending[$sha]+set}" ]]; then
+              # Outranks the age rule deliberately: a build that is still being
+              # served must keep its cache however old it is. Deleting it does
+              # not save a stale folder, it takes down a live preview. Bounded
+              # by PR_COMMITS x MAX_BRANCHES, and only while a head is pending.
+              echo "KEEP  $folder (${pr_pending[$sha]}, still being served while that branch's head build is pending)"
               kept=$((kept+1)); continue
             elif (( ts < cutoff )); then
               echo "DELETE $folder (last written $newest, older than ${THRESHOLD_HOURS}h)"
