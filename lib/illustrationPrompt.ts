@@ -123,7 +123,8 @@ const GLOBAL_CONSTRAINTS =
   "are the exception and the focal point: draw each one as a rounded, " +
   "realistic creature with soft fur or feather texture and its own natural " +
   "coloring and markings, never a flat brand color and never a flat " +
-  "silhouette.";
+  "silhouette. A bird has wings, a beak and feet and never hands or arms: it " +
+  "perches, stands, or nudges things with its beak rather than holding them.";
 
 /**
  * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.
