@@ -154,13 +154,39 @@ set that shipped:
   the same volume as forty cubelets does not. Say "one solid block", and let a container
   hold **a few large items**, never a heap of little ones.
 - **A creature per course.** The roster in use: marmot (Dataslope, Python, scikit-learn,
-  SciPy), blue elephant (PostgreSQL), yellow duck (DuckDB), panda (pandas), penguin
-  (Seaborn), parrot (NLP), chameleon (Plotly viz), peacock (ggplot2), red fox (R), owl
-  (statistics), squirrel (DSA), beaver (systems C), hedgehog (C++), brown bear (Java),
-  grey rabbit (C#), otter (TypeScript), canary (JavaScript), tree frog (React), grey
-  mouse (SQLite), tortoise (time series), octopus (LLMs), spider (CSS/web). A page that
-  already has a creature **keeps it** — add the course animal alongside rather than
-  swapping it out.
+  SciPy), blue elephant (PostgreSQL, SQL), yellow duck (DuckDB), panda (pandas), penguin
+  (Seaborn), plain green bird (NLP), chipmunk (Plotly viz), plain blue bird (ggplot2),
+  red fox (R), owl (statistics), capybara (DSA), beaver (systems C, data engineering),
+  quokka (C++), brown bear (Java), grey rabbit (C#), otter (TypeScript), canary
+  (JavaScript), red panda (React), golden hamster (SQLite), koala (time series), raccoon
+  (LLMs), tabby cat (CSS/web). A page that already has a creature **keeps it** — add the
+  course animal alongside rather than swapping it out.
+
+  **Retired by the reviewer, never reintroduce:** squirrel (use a chipmunk; capybaras
+  are fine too), peacock and multi-colour parrot (use a single-colour bird),
+  mallard (use a yellow duck), rat and mouse (use a chipmunk or hamster), hedgehog (use
+  a quokka, capybara or deer), and green lizards, octopuses and spiders. Seals and
+  dolphins are welcome additions. The blue elephant is a **cute smooth 3D character**,
+  not a realistic animal: bright matte blue, plain solid ears, and **no white lines or
+  markings in the ears**.
+- **Birds have feet, never hands.** A bird perches, stands, or nudges things with its
+  beak. It never holds, carries, or grasps. If the scene needs something held, give it
+  to a non-bird creature or restage the action.
+- **Never ask for writing.** "labelled", "numbered", "titled", a screen "showing output"
+  — the model obeys the subject over the global "No text." rule and returns garbled
+  glyphs. Distinguish parts by colour, size, or shape instead. (Audited 2026-08-05: the
+  global rule has in fact held on every such image so far, but it is a coin flip and not
+  worth taking.)
+- **Name objects, don't define them recursively.** `dsa-recursion` read "one large box
+  holding a smaller box, which holds a smaller one again" and rendered as a bare
+  capybara on an empty platform — the whole scene missing. "Three open boxes of
+  decreasing size, the smallest standing inside the middle one and the middle one inside
+  the largest" renders correctly. Say how many things there are and where each one sits.
+- **No prison bars on filtering scenes.** A "sieve", "grille", "grating", "mesh" or
+  "slats" renders as a row of vertical bars with solid planks passing straight through
+  them, which cannot physically happen. Use "a wide gate with one open doorway" — same
+  this-one-through-that-one-not reading, and it is possible. ("bars" alone is fine; a bar
+  chart is legitimately bars.)
 - **Contrast pairs work well** for before/after lessons: "a messy heap of irregular
   tiles on one platform beside the same tiles arranged into a perfect rectangular grid".
 - **Keep it simple.** The user's explicit feedback: complex compositions failed
@@ -398,6 +424,17 @@ git status --short public/images | grep -- -cutout
 **2. Never use bare `run` for a large batch.** A 65-minute batch outlived its `run`
 process; the images were only recovered with `download --batch <id>`.
 `submit` → `status` → `download` cannot lose paid work.
+
+**2a. `--run` does not select a batch; it only names the R2 prefix.** `download` with no
+`--batch` reads `last-batch.json`, which holds whatever was submitted **last** — not the
+run you named. With two batches in flight, `download --run A` after submitting B writes
+B's images under A's prefix. Always pass `download --batch <id>` when more than one batch
+is open, and promote by explicit id list rather than `--all` if a prefix has been
+polluted this way.
+
+**2b. Do not grep batch status for `failed`.** The status line reads
+`… · 0/20 done, 0 failed`, so `grep -qE "completed|failed"` matches a batch that has
+barely started. Anchor on the status word: `grep -qE ": (completed|failed|expired|cancelled)"`.
 
 **3. Every expensive failure so far has been on the *retrieval* side, after the paid
 work completed.** Three separate times: the OpenAI batch-output GET, the R2
