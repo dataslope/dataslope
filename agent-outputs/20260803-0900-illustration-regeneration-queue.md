@@ -269,9 +269,32 @@ you were working is not one you have handled.
 ```sql
 UPDATE illustration_regen_marks
    SET marked = 0,
-       regenerated_at = '2026-08-03T12:00:00Z',   -- now, ISO-8601 UTC
-       updated_at     = '2026-08-03T12:00:00Z'
+       regenerated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+       updated_at     = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
  WHERE prompt_id IN ('aida-broken-joins', 'python-basics-loops');
+```
+
+**Let the database supply the time. Never type the timestamp in.** Approval is
+a comparison, not a flag: the card stays green while `regenerated_at >
+approved_at`. A stamp written even a few minutes into the future therefore
+makes the row *unapprovable* — the reviewer presses Approve, the API writes a
+real `approved_at`, and because that real time is still behind the invented
+one the card comes straight back as awaiting approval. It looks exactly like a
+broken button, and it cannot be fixed from the UI.
+
+This is not hypothetical. On 2026-08-05 a batch of 20 was stamped with
+hand-written times roughly half an hour ahead of the clock, and every one of
+them silently refused to approve until the rows were rewritten with the true
+promotion time. `strftime` costs nothing and cannot drift. `%f` is deliberate:
+it yields `SS.SSS`, matching the millisecond precision the Approve endpoint
+writes with `new Date().toISOString()`, so the two timestamps sort against
+each other correctly rather than by an accident of how `Z` and `.` compare.
+
+To check for the damage after any stamping run:
+
+```sql
+SELECT COUNT(*) FROM illustration_regen_marks
+ WHERE regenerated_at > strftime('%Y-%m-%dT%H:%M:%fZ', 'now');   -- must be 0
 ```
 
 Do **not** touch `approved_at`. Approving is the human's half of the round trip
