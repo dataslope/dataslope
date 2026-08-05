@@ -135,9 +135,11 @@ jobs:
       # nothing extra. See step 4b.
       PR_COMMITS: "3"
       # How many objects a build folder must hold to count as populated. A
-      # full cache is ~1,600 objects (one per prerendered page); anything far
-      # below that is a folder mid-populate or mid-delete, which cannot serve a
-      # preview and must not be mistaken for a finished deploy.
+      # healthy folder held 966-986 objects when this was written; the point is
+      # only to tell "a finished deploy" from "absent, or mid-populate, or
+      # half-deleted" (the folder this rule was written for had 5 left), so the
+      # threshold sits an order of magnitude below a real cache rather than
+      # tracking its exact size.
       MIN_CACHE_OBJECTS: "100"
       # Scheduled runs delete for real; manual runs honor the dry_run input
       # (default true).

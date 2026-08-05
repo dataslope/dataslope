@@ -57,4 +57,6 @@ run("fumadocs-mdx");
 run("node", ["scripts/build-almostnode-workers.mjs"]);
 run("node", ["scripts/build-search-index.mjs"]);
 run("node", ["scripts/build-brand-fallbacks.mjs"]);
+run("node", ["scripts/build-course-catalog.mjs"]);
+run("node", ["scripts/build-home-stats.mjs"]);
 run("node", ["scripts/build-images.mjs"]);
