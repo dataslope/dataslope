@@ -2693,8 +2693,8 @@
       "category": "course-illustration",
       "title": "Pointers and references",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "an arrow aimed at a numbered cell, beside a second arrow bound directly to the same cell"
+      "mascot": true,
+      "subject": "a quokka on a pale grey platform beside two thick arrows aimed at the same single blue cell in a wide tray"
     },
     {
       "id": "cpp-arrays-and-strings",
@@ -2729,8 +2729,8 @@
       "category": "course-illustration",
       "title": "Classes and objects",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a plan card standing beside three identical objects built from it"
+      "mascot": true,
+      "subject": "a quokka on a pale grey platform beside one upright blue plan board and three identical green blocks standing in a row before it"
     },
     {
       "id": "cpp-constructors-destructors",
@@ -3665,8 +3665,8 @@
       "category": "course-illustration",
       "title": "The type system",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "tokens of several shapes admitted only by correspondingly shaped labelled slots"
+      "mascot": true,
+      "subject": "a grey rabbit on a pale grey platform fitting one round block, one square block and one triangular block into three matching openings in a wide board"
     },
     {
       "id": "mcs-control-flow",
@@ -3726,7 +3726,7 @@
       "title": "Encapsulation and abstraction",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot adjusting a labelled dial on a sealed casing that hides the works inside"
+      "subject": "the Dataslope marmot mascot on a pale grey platform turning one large round dial on a sealed white casing"
     },
     {
       "id": "mcs-inheritance",
@@ -3870,7 +3870,7 @@
       "title": "How applications use databases",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a small app panel joined by a rod to a table block that a friendly blue elephant (the PostgreSQL mascot) stands beside, a request card passing along the rod"
+      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform passing one green block along a short rail from a white panel to a wide blue table block"
     },
     {
       "id": "sql-tables-rows-columns",
@@ -4361,8 +4361,8 @@
       "category": "course-illustration",
       "title": "Tailwind CSS: quickstart",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "small labelled utility tiles clipping directly onto the elements of a page panel"
+      "mascot": true,
+      "subject": "a tabby cat on a pale grey platform clipping three small coloured tiles onto the edge of one wide white panel"
     },
     {
       "id": "web-js-dom-basics",
@@ -4385,8 +4385,8 @@
       "category": "course-illustration",
       "title": "JavaScript: events",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a button tile being pressed, a signal travelling along a rod to a waiting handler block"
+      "mascot": true,
+      "subject": "a tabby cat on a pale grey platform pressing one large blue button, a short rail carrying the push along to a green block that tips upright"
     },
     {
       "id": "web-js-forms-validation",
@@ -4410,7 +4410,7 @@
       "title": "JavaScript: fetching and showing data",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot carrying a data crate from a server rack and unpacking it into a page panel"
+      "subject": "the Dataslope marmot mascot on a pale grey platform lifting one blue block out of a tall white rack and setting it into a wide open frame"
     },
     {
       "id": "web-react-first-components",
@@ -4421,8 +4421,8 @@
       "category": "course-illustration",
       "title": "React: first components",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "nested rounded component frames on a panel, one frame reused three times in a row"
+      "mascot": true,
+      "subject": "a tabby cat on a pale grey platform beside three identical rounded blue frames standing in a row inside one larger frame"
     },
     {
       "id": "web-project-scoreboard",
@@ -4446,7 +4446,7 @@
       "title": "Next steps",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading to distant page panels"
+      "subject": "the Dataslope marmot mascot on a pale grey platform at a tall signpost, three wide ramps leading away to three raised platforms"
     },
     {
       "id": "jcol-tyranny-of-arrays",
@@ -4734,7 +4734,7 @@
       "title": "Problem solving",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a friendly brown bear on a pale grey platform fitting one large blue block into a matching opening in a wide green wall"
+      "subject": "a brown bear on a pale grey platform pushing one large blue block into a matching opening in a wide green wall"
     },
     {
       "id": "java-how-programs-execute",
@@ -4818,7 +4818,7 @@
       "title": "Your first Java program",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot beside a small terminal screen showing a single glowing line of output"
+      "subject": "the Dataslope marmot mascot on a pale grey platform switching on one small white console, a single green block rising from its top"
     },
     {
       "id": "java-variables-and-memory",
@@ -4841,8 +4841,8 @@
       "category": "course-illustration",
       "title": "The type system",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "tokens of several shapes admitted only by correspondingly shaped labelled slots"
+      "mascot": true,
+      "subject": "a brown bear on a pale grey platform fitting one round block, one square block and one triangular block into three matching openings in a wide board"
     },
     {
       "id": "java-control-flow",
@@ -4997,8 +4997,8 @@
       "category": "course-illustration",
       "title": "Software organization",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "interlocking crates slotted into a labelled shelf, each in its own bay"
+      "mascot": true,
+      "subject": "a brown bear on a pale grey platform sliding one blue crate into its own bay in a wide white shelf, two other bays already holding crates"
     },
     {
       "id": "java-maintainable-software",
@@ -5046,7 +5046,7 @@
       "title": "Where to go next",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading to distant floating platforms"
+      "subject": "the Dataslope marmot mascot on a pale grey platform at the foot of three broad steps rising to one high platform"
     },
     {
       "id": "ml-what-is-ml",
@@ -5381,8 +5381,8 @@
       "category": "course-illustration",
       "title": "Evaluating clusters",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "two deep open bowls on one pale grey platform, the first holding three solid coloured blocks standing well apart in their own compartments and the second holding three blocks crowded together against one another"
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot on a pale grey platform between two wide open trays, one holding three coloured blocks standing well apart and the other holding three blocks pressed tight together"
     },
     {
       "id": "ml-model-interpretation",
@@ -5538,7 +5538,7 @@
       "title": "Recursion",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a capybara on a pale grey platform beside one large blue box holding a smaller blue box, which holds a smaller one again"
+      "subject": "a capybara on a pale grey platform beside three open blue boxes of decreasing size, the smallest standing inside the middle one and the middle one standing inside the largest"
     },
     {
       "id": "dsa-searching",
@@ -5561,8 +5561,8 @@
       "category": "course-illustration",
       "title": "Basic sorting algorithms",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "three thick coloured planks lying jumbled on one pale grey platform beside three of the same planks arranged into a rising staircase on a second"
+      "mascot": true,
+      "subject": "a capybara on a pale grey platform lifting one of three jumbled coloured planks into place at the top of a rising staircase of planks"
     },
     {
       "id": "dsa-sorting-efficient",
@@ -6005,8 +6005,8 @@
       "category": "course-illustration",
       "title": "Anatomy of a complete plot",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "three thick pale grey boards stacked with open gaps between them on four corner posts, one bold coloured shape resting on each"
+      "mascot": true,
+      "subject": "a small plain blue bird perched beside three broad pale grey boards stacked with open gaps on four corner posts, one bold coloured shape resting on each"
     },
     {
       "id": "gg-complete-workflow",
@@ -6221,8 +6221,8 @@
       "category": "course-illustration",
       "title": "Transitions and animations",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a block sliding along a curved easing track through three ghosted intermediate positions toward its resting place"
+      "mascot": true,
+      "subject": "a tabby cat on a pale grey platform watching one blue block slide along a long curved track into a low resting cradle at the far end"
     },
     {
       "id": "css-toolbox",
@@ -7421,8 +7421,8 @@
       "category": "course-illustration",
       "title": "Root finding and optimization",
       "style": "isometric illustration",
-      "mascot": false,
-      "subject": "a curved valley landscape on a platform with a ball rolling toward its lowest point and a marker pin where the curve crosses the floor"
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot on a pale grey platform beside one long curved green ramp dipping to its lowest point, a tall red pin standing where the curve meets the floor"
     },
     {
       "id": "scipy-odes",
