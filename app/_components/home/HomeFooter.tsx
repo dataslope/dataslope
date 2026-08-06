@@ -74,7 +74,10 @@ export function HomeFooter() {
           /playground, /interview-prep, the dashboard, the share and quiz
           routes, and the error/not-found pages. */}
       <FooterPattern />
-      <div className="mx-auto max-w-6xl px-4 pt-12 pb-20 sm:px-6 sm:pb-28">
+      {/* pt-20/24 rather than pt-12: the pattern above needs clear air beneath
+          it, or the links read as part of the band rather than as the footer
+          proper. */}
+      <div className="mx-auto max-w-6xl px-4 pt-20 pb-20 sm:px-6 sm:pt-24 sm:pb-28">
         <div className="ds-footer-grid">
           {/* Column 1, logo (no wordmark) + GitHub at the bottom. */}
           <div className="flex flex-col justify-between gap-8">
