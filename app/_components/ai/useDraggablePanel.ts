@@ -21,24 +21,45 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "askai_panel_pos";
 const MIN_DRAG_WIDTH = 768;
-/** Keep at least this much of the panel on screen in each axis. */
-const KEEP_VISIBLE = 64;
+/** Panel size assumed when the element cannot be measured (it is always
+ *  mounted by the time a drag can start, so this only covers the restore
+ *  path racing layout). Matches the panel's CSS width/height. */
+const FALLBACK_SIZE: PanelSize = { width: 400, height: 620 };
 
 export interface PanelPosition {
   left: number;
   top: number;
 }
 
-/** `width` lets the panel hang off the left edge while keeping a grabbable
- *  strip on screen. There is no height equivalent: `top` is clamped at 0 so
- *  the header (the drag handle, and the close button) is always reachable. */
-function clampToViewport(pos: PanelPosition, width: number): PanelPosition {
-  const maxLeft = Math.max(0, window.innerWidth - KEEP_VISIBLE);
-  const maxTop = Math.max(0, window.innerHeight - KEEP_VISIBLE);
+interface PanelSize {
+  width: number;
+  height: number;
+}
+
+/** The panel is kept wholly inside the window: no edge may pass a viewport
+ *  edge, so it can never be dragged half (or entirely) out of the browser.
+ *  Measured against the document element's client box rather than
+ *  `innerWidth`/`innerHeight`, which count the scrollbar gutter.
+ *
+ *  `Math.max(0, …)` on the upper bounds handles a panel taller or wider than
+ *  the window: it pins to the top-left rather than going negative, so the
+ *  header (the drag handle, and the close button) stays reachable. */
+function clampToViewport(pos: PanelPosition, size: PanelSize): PanelPosition {
+  const view = document.documentElement;
+  const vw = view?.clientWidth || window.innerWidth;
+  const vh = view?.clientHeight || window.innerHeight;
   return {
-    left: Math.min(Math.max(pos.left, KEEP_VISIBLE - width), maxLeft),
-    top: Math.min(Math.max(pos.top, 0), maxTop),
+    left: Math.min(Math.max(pos.left, 0), Math.max(0, vw - size.width)),
+    top: Math.min(Math.max(pos.top, 0), Math.max(0, vh - size.height)),
   };
+}
+
+/** Current on-screen size of the panel, or the CSS defaults if it has not
+ *  been laid out yet. */
+function measure(el: HTMLElement | null | undefined): PanelSize {
+  const rect = el?.getBoundingClientRect();
+  if (!rect || !rect.width || !rect.height) return FALLBACK_SIZE;
+  return { width: rect.width, height: rect.height };
 }
 
 function readStored(): PanelPosition | null {
@@ -83,17 +104,15 @@ export function useDraggablePanel(panelRef: React.RefObject<HTMLElement | null>)
     if (!enabled) return;
     const stored = readStored();
     if (!stored) return;
-    const el = panelRef.current;
-    const rect = el?.getBoundingClientRect();
-    setPos(clampToViewport(stored, rect?.width ?? 400));
+    setPos(clampToViewport(stored, measure(panelRef.current)));
   }, [enabled, panelRef]);
 
   // A window that shrinks must not strand the panel outside it.
   useEffect(() => {
     if (!enabled || !pos) return;
     const onResize = () => {
-      const rect = panelRef.current?.getBoundingClientRect();
-      setPos((prev) => (prev ? clampToViewport(prev, rect?.width ?? 400) : prev));
+      const size = measure(panelRef.current);
+      setPos((prev) => (prev ? clampToViewport(prev, size) : prev));
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
@@ -126,14 +145,13 @@ export function useDraggablePanel(panelRef: React.RefObject<HTMLElement | null>)
   const onPointerMove = useCallback(
     (event: React.PointerEvent<HTMLElement>) => {
       if (!dragging) return;
-      const rect = panelRef.current?.getBoundingClientRect();
       setPos(
         clampToViewport(
           {
             left: event.clientX - grabRef.current.x,
             top: event.clientY - grabRef.current.y,
           },
-          rect?.width ?? 400,
+          measure(panelRef.current),
         ),
       );
     },

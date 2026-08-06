@@ -14,6 +14,13 @@ import { TabbiedPattern } from "tabbied/react";
  * before it ends, which reads as a backdrop the content sits on rather than
  * a band it happens to overlap.
  *
+ * `fullWidth` breaks the pattern layer out of the container and runs it edge
+ * to edge, via the same `left-1/2` / `w-screen` / `-translate-x-1/2` escape
+ * `PlaygroundHero` uses. It centres on the container's axis, so the container
+ * must itself be centred in the page (every current caller is `mx-auto`). The
+ * 100vw box overhangs by the scrollbar's width, so the page needs an
+ * `overflow-x-clip` ancestor that is *not* the width-constrained wrapper.
+ *
  * Colour follows `FooterPattern`: the palette's first entry is the
  * background and is left transparent so the page colour shows through, and
  * the inks are low-alpha mid-grey and brand blue, light enough to read as
@@ -33,6 +40,7 @@ export function PatternBackdrop({
   insetTop = 0,
   insetBottom = 0,
   insetX = 0,
+  fullWidth = false,
   cellSize = 48,
   redrawInterval,
   maskEdges = true,
@@ -46,8 +54,12 @@ export function PatternBackdrop({
    *  Negative values push the pattern past the content, which is how you
    *  get it to emerge from underneath an opaque card. */
   insetBottom?: number | string;
-  /** Horizontal inset; negative widens the pattern past the content. */
+  /** Horizontal inset; negative widens the pattern past the content.
+   *  Ignored when `fullWidth` is set. */
   insetX?: number | string;
+  /** Run the pattern the full width of the viewport instead of stopping at
+   *  the container's edges. */
+  fullWidth?: boolean;
   cellSize?: number;
   redrawInterval?: number;
   /** Fade the pattern out at the left and right edges (default true). */
@@ -60,11 +72,22 @@ export function PatternBackdrop({
       <div
         aria-hidden="true"
         className={`pointer-events-none absolute select-none opacity-40 dark:opacity-35 ${
+          fullWidth ? "left-1/2 w-screen -translate-x-1/2" : ""
+        } ${
           maskEdges
             ? "[mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]"
             : ""
         }`}
-        style={{ top: insetTop, bottom: insetBottom, left: insetX, right: insetX }}
+        style={
+          fullWidth
+            ? { top: insetTop, bottom: insetBottom }
+            : {
+                top: insetTop,
+                bottom: insetBottom,
+                left: insetX,
+                right: insetX,
+              }
+        }
       >
         <TabbiedPattern
           pattern={pattern}

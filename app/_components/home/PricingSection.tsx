@@ -16,7 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { windowpane } from "tabbied/patterns";
+import { dotfade } from "tabbied/patterns";
 
 import Link from "../Link";
 import { useRouter } from "next/navigation";
@@ -543,17 +543,17 @@ export function PricingSection({
           cards. The stripe layer sits behind an OPAQUE inner surface (the
           bordered card below), so it only shows in the down-right offset
           sliver, not through the table body. */}
-      {/* Windowpane backdrop. The table's surface is opaque, so the pattern
-          is only visible where it extends past it: it starts a little way
-          down the table, runs a little wider than it, and continues below
-          its bottom edge, so it reads as something the table is resting on.
-          The trailing margin keeps that overhang from crowding whatever the
-          page puts next. */}
+      {/* Dotfade backdrop. The table's surface is opaque, so the pattern is
+          only visible where it extends past it: it starts a little way down
+          the table, runs the full width of the viewport, and continues below
+          the table's bottom edge, so it reads as something the table is
+          resting on. The trailing margin keeps that overhang from crowding
+          whatever the page puts next. */}
       <PatternBackdrop
-        pattern={windowpane}
+        pattern={dotfade}
         insetTop={140}
         insetBottom={-110}
-        insetX={-48}
+        fullWidth
         cellSize={54}
         className="mb-32 sm:mb-36"
       >

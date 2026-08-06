@@ -139,7 +139,12 @@ function PlaygroundFacade({
               onto the lower part of the illustration so it reads as
               belonging to it; the cut-out's own transparent margin means a
               flush stack would leave an odd gap. Hidden on short cards,
-              where the art would crowd the button. */}
+              where the art would crowd the button.
+
+              At rest it sits back at 60% so the Launch CTA stays the loudest
+              thing in the mock; hovering the facade (which also tints the
+              whole surface blue) brings it to full strength, matching the
+              code-line skeleton's own 70% → 100% lift. */}
           {playgroundArt && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -150,7 +155,7 @@ function PlaygroundFacade({
               aria-hidden="true"
               loading="lazy"
               decoding="async"
-              className="pointer-events-none -mb-7 hidden w-[min(72%,320px)] select-none object-contain opacity-90 transition-opacity duration-200 group-hover:opacity-100 sm:block"
+              className="pointer-events-none -mb-7 hidden w-[min(72%,320px)] select-none object-contain opacity-60 transition-opacity duration-200 group-hover:opacity-100 sm:block"
             />
           )}
           {/* Magic UI ShimmerButton with the brand-green shimmer as the accent
