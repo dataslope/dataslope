@@ -5,7 +5,6 @@ import {
   Briefcase,
   Check,
   CloudUpload,
-  Crown,
   Database,
   GraduationCap,
   HardDrive,
@@ -13,8 +12,6 @@ import {
   Share2,
   Sparkle,
   SquareTerminal,
-  User,
-  UserCheck,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -41,8 +38,12 @@ type Feature = {
 
 interface Plan {
   name: string;
-  /** Tier glyph shown at the right end of the column's title line. */
-  icon: LucideIcon;
+  /** Illustration slug shown at the right end of the column's title line, one
+   *  marmot posed to read as the tier: a satchel for the visiting Guest, a
+   *  scarf for the signed-up Free Member, a crown for Pro. Replaces the Lucide
+   *  glyphs (User / UserCheck / Crown) these columns used to carry, so the
+   *  table is dressed in the same artwork as the rest of the site. */
+  iconSlug: string;
   description: string;
   /** Price + sub-line per billing period. The free tiers ignore the toggle
    *  (both periods are identical). */
@@ -71,7 +72,7 @@ const FEATURE_COUNT = 8;
 const PLANS: Plan[] = [
   {
     name: "Guest",
-    icon: User,
+    iconSlug: "pricing-guest",
     description: "Jump straight in, sign-in optional.",
     priceMonthly: "$0",
     priceAnnual: "$0",
@@ -100,7 +101,7 @@ const PLANS: Plan[] = [
   },
   {
     name: "Free Member",
-    icon: UserCheck,
+    iconSlug: "pricing-free-member",
     description: "Register for free to save and share in the cloud.",
     priceMonthly: "$0",
     priceAnnual: "$0",
@@ -152,7 +153,7 @@ const PLANS: Plan[] = [
   //   • widen the grid again (see the grid-cols / subgrid-row comments below).
   {
     name: "Pro",
-    icon: Crown,
+    iconSlug: "pricing-pro",
     description: "For people who live in their playgrounds.",
     priceMonthly: "$4.99",
     priceAnnual: "$40",
@@ -357,11 +358,7 @@ function PlanColumn({
 }) {
   const price = annual ? plan.priceAnnual : plan.priceMonthly;
   const note = annual ? plan.noteAnnual : plan.noteMonthly;
-  const PlanIcon = plan.icon;
-  // Guest / Free Member: match the title text colour. Pro: brand green.
-  const iconClass = plan.highlighted
-    ? "text-[var(--ds-green-600)] dark:text-[var(--ds-green-400)]"
-    : "text-[var(--ds-gray-900)] dark:text-white";
+
   return (
     // On desktop each plan is a row-subgrid spanning all FEATURE_COUNT + 3 rows
     // so its header / price / CTA / feature rows align with the other plans.
@@ -381,9 +378,17 @@ function PlanColumn({
               {plan.badge}
             </span>
           )}
-          <PlanIcon
-            className={`ml-auto size-5 shrink-0 ${iconClass}`}
+          {/* Decorative: the plan name beside it already says which tier this
+              is, so the marmot is hidden from assistive tech rather than
+              read out as "Guest, Guest". */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`/images/${plan.iconSlug}-cutout.webp`}
+            alt=""
             aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+            className="ml-auto size-9 shrink-0 object-contain"
           />
         </div>
       </div>

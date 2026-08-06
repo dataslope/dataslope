@@ -27,16 +27,29 @@ import {
  *  exist so chrome artwork — the home page's bento icons, the auth globe pins —
  *  is authored, reviewed, and regenerated through the same pipeline as
  *  everything else rather than as one-off art. */
-export type Collection = "courses" | "interview" | "home" | "auth";
+export type Collection =
+  | "courses"
+  | "interview"
+  | "home"
+  | "auth"
+  | "pricing"
+  | "playground";
 const URL_BASE: Record<Collection, string> = {
   courses: "/courses",
   interview: "/interview-prep",
   home: "/",
   auth: "/sign-in",
+  pricing: "/pricing",
+  playground: "/playground",
 };
 
 /** Collections that are one page, with nothing addressable beneath them. */
-const SINGLE_PAGE: ReadonlySet<Collection> = new Set<Collection>(["home", "auth"]);
+const SINGLE_PAGE: ReadonlySet<Collection> = new Set<Collection>([
+  "home",
+  "auth",
+  "pricing",
+  "playground",
+]);
 
 /** Asset categories, in the order they are shown on the gallery page. */
 export type Category =
@@ -45,6 +58,9 @@ export type Category =
   | "interview-thumbnail"
   | "interview-illustration"
   | "home-icon"
+  | "home-marquee"
+  | "pricing-plan"
+  | "playground-category"
   | "auth-globe-pin";
 
 const CATEGORY_LABEL: Record<Category, string> = {
@@ -53,6 +69,9 @@ const CATEGORY_LABEL: Record<Category, string> = {
   "interview-thumbnail": "Interview prep thumbnails",
   "interview-illustration": "Interview prep illustrations",
   "home-icon": "Home page bento icons",
+  "home-marquee": "Home page marquee icons",
+  "pricing-plan": "Pricing plan icons",
+  "playground-category": "Playground category illustrations",
   "auth-globe-pin": "Auth globe pins",
 };
 
@@ -62,6 +81,9 @@ const CATEGORY_ORDER: Category[] = [
   "interview-thumbnail",
   "interview-illustration",
   "home-icon",
+  "home-marquee",
+  "pricing-plan",
+  "playground-category",
   "auth-globe-pin",
 ];
 

@@ -27,6 +27,11 @@ interface LanguageItem {
 
 interface Category {
   name: string;
+  /** Illustration slug for this category. It REPLACES the prose blurb these
+   *  rows used to carry; the old wording lives on in `alt` so the page still
+   *  describes itself to screen readers and search engines. */
+  imageSlug: string;
+  /** The former blurb, now the illustration's alt text. */
   description: string;
   items: LanguageItem[];
 }
@@ -36,6 +41,7 @@ interface Category {
 const CATEGORIES: Category[] = [
   {
     name: "Languages",
+    imageSlug: "playground-languages",
     description:
       "General-purpose editors for writing, running, and debugging real programs without leaving the tab.",
     items: [
@@ -52,6 +58,7 @@ const CATEGORIES: Category[] = [
   },
   {
     name: "Web",
+    imageSlug: "playground-web",
     description:
       "A live HTML, CSS, and JavaScript preview, plus a React sandbox with instant in-browser JSX transpilation.",
     items: [
@@ -61,6 +68,7 @@ const CATEGORIES: Category[] = [
   },
   {
     name: "Databases",
+    imageSlug: "playground-databases",
     description:
       "A full SQL workbench in the browser. Load data, run queries, and inspect results against embedded or remote engines.",
     items: [
@@ -114,9 +122,16 @@ export function LanguageCategories() {
             <h2 className="text-sm font-medium text-[#121212] dark:text-white">
               {cat.name}
             </h2>
-            <p className="mt-2.5 text-sm leading-relaxed text-[var(--ds-gray-500)] [text-wrap:pretty] dark:text-[var(--ds-gray-400)]">
-              {cat.description}
-            </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`/images/${cat.imageSlug}-cutout.webp`}
+              alt={cat.description}
+              loading="lazy"
+              decoding="async"
+              width={264}
+              height={264}
+              className="mt-2.5 h-auto w-full max-w-[200px] md:max-w-none"
+            />
           </div>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] content-start gap-2 sm:grid-cols-[repeat(auto-fill,minmax(120px,1fr))]">
             {cat.items.map((item) => (

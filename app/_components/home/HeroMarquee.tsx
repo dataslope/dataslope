@@ -36,6 +36,33 @@ const BRAND_CYCLE = [
   "var(--ds-red-500)",
 ];
 
+/**
+ * One of the course creatures, standing in for the emoji this line used to
+ * separate its phrases with (⚡ 🔓 💯).
+ *
+ * Emoji here rendered as whatever glyph the visitor's OS ships, which on some
+ * platforms arrived as a dark-backed sticker that fought the light hero. These
+ * are the background-removed cut-outs, so they sit on the page background in
+ * both themes like every other illustration.
+ *
+ * Sized in `em` so they scale with the marquee's responsive font size, and
+ * `aria-hidden` because they are punctuation between phrases, not content — the
+ * line already reads correctly as "Interactive No sign-up Free".
+ */
+function MarqueeCreature({ slug, alt }: { slug: string; alt: string }) {
+  return (
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src={`/images/${slug}-cutout.webp`}
+      alt={alt}
+      aria-hidden="true"
+      loading="lazy"
+      decoding="async"
+      className="mx-3 inline-block h-[1.1em] w-auto shrink-0 align-[-0.2em] sm:mx-4"
+    />
+  );
+}
+
 function HeroGlyph({ id, color }: { id: string; color: string }) {
   const Icon: IconType | undefined = LANGUAGE_ICONS[id];
   if (!Icon) return null;
@@ -194,8 +221,13 @@ export function HeroMarquee() {
         reverse
         className="py-1 text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
       >
-        <span className="mx-8 text-[#CED7DB]">
-          Interactive ⚡ No sign-up 🔓 Free 💯
+        <span className="mx-8 inline-flex items-center text-[#CED7DB]">
+          Interactive
+          <MarqueeCreature slug="home-marquee-interactive" alt="" />
+          No sign-up
+          <MarqueeCreature slug="home-marquee-no-signup" alt="" />
+          Free
+          <MarqueeCreature slug="home-marquee-free" alt="" />
         </span>
       </JsMarquee>
 
