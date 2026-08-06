@@ -2569,6 +2569,44 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [closeSettingsTab, setActiveFileId, setActiveTabId, setOpenTabIds, showToast],
   );
 
+  /** Reopen a workspace file's tab and activate it.
+   *
+   *  Closing a tab only hides its editor, so the file is still in the
+   *  workspace; this is the way back. The Files pane offers the same
+   *  thing, but adapters that set `hideFilesPane` (the web playground)
+   *  have no Files pane, which left a closed file unreachable until the
+   *  tab strip grew its own reopen affordance.
+   *
+   *  The tab is reinserted at the file's position in the workspace file
+   *  list rather than appended, so reopening does not silently reorder
+   *  the strip. */
+  const reopenFileTab = useCallback(
+    (fileId: string) => {
+      const open = openTabIdsRef.current;
+      if (open.includes(fileId)) {
+        selectTab(fileId);
+        return;
+      }
+      if (!filesRef.current.some((f) => f.id === fileId)) return;
+      flushActiveFileToBuffer();
+      const order = filesRef.current.map((f) => f.id);
+      const next = [...open, fileId].sort(
+        (a, b) => order.indexOf(a) - order.indexOf(b),
+      );
+      setOpenTabIds(next);
+      activeFileIdRef.current = fileId;
+      setActiveFileId(fileId);
+      setActiveTabId(fileId);
+    },
+    [
+      flushActiveFileToBuffer,
+      selectTab,
+      setActiveFileId,
+      setActiveTabId,
+      setOpenTabIds,
+    ],
+  );
+
   /** Permanently delete a workspace file: its tab, dirty buffer, output
    *  history, and OPFS copy. Reached from the Files pane's Delete (which
    *  confirms first) and the tab context menu's "Delete File". */
@@ -3764,6 +3802,21 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     };
   }, [loaded, statusState]);
 
+  /** Workspace files with no open tab, in workspace order, for the tab
+   *  strip's Reopen menu. Derived from state rather than from the
+   *  recently-closed stack so it survives a reload. */
+  const closedFileTabs = useMemo(
+    () =>
+      files
+        .filter((f) => !openTabIds.includes(f.id))
+        .map((f) => ({
+          id: f.id,
+          label: f.filename.split("/").pop() ?? f.filename,
+          icon: <FileCode2 size={11} aria-hidden="true" />,
+        })),
+    [files, openTabIds],
+  );
+
   const fileTabDescriptors = useMemo<TabDescriptor[]>(
     () => {
       // The tab strip shows the OPEN tabs only, a subset of the
@@ -4342,6 +4395,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             onSelectTab={selectTab}
             onCloseTab={closeFileTab}
             onAddTab={adapter.disableAddFile ? undefined : addNewFile}
+            closedTabs={closedFileTabs}
+            onReopenTab={reopenFileTab}
+            addTabLabel="New file"
             onRenameTab={renameFileTab}
             onReorderTabs={(files.length > 1 || settingsOpen) ? reorderFileTabs : undefined}
             className="playground-file-tabbar"

@@ -3,6 +3,7 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
 import { ContextMenu } from "@base-ui/react/context-menu";
+import { Menu } from "@base-ui/react/menu";
 import { Popover } from "@base-ui/react/popover";
 import {
   DndContext,
@@ -38,6 +39,20 @@ export interface TabBarProps {
    * `undefined` to keep the bar non-draggable (cheaper render path).
    */
   onReorderTabs?: (nextTabs: TabDescriptor[]) => void;
+  /**
+   * Items that exist but have no tab open, offered under a "Reopen"
+   * heading in the "+" button's menu. Closing a tab in the playgrounds
+   * hides its editor without deleting the file, and the Files pane is the
+   * only other way back — which the web playground does not have
+   * (`hideFilesPane`), leaving a closed file unreachable. Supplying these
+   * turns the "+" into a split button and closes that gap for any host,
+   * whether or not it has a Files pane.
+   */
+  closedTabs?: Array<{ id: string; label: string; icon?: React.ReactNode }>;
+  /** Reopen a closed item by id. Required for `closedTabs` to render. */
+  onReopenTab?: (id: string) => void;
+  /** Label for the menu's "add" row; defaults to "New tab". */
+  addTabLabel?: string;
   /** Optional className appended to the root tabbar element. */
   className?: string;
 }
@@ -55,10 +70,17 @@ export function TabBar({
   onAddTab,
   onRenameTab,
   onReorderTabs,
+  closedTabs,
+  onReopenTab,
+  addTabLabel = "New tab",
   className,
 }: TabBarProps) {
   const cls = ["playground-tabbar", className].filter(Boolean).join(" ");
   const sortable = !!onReorderTabs;
+  // The "+" stays a plain button until there is something to reopen, so
+  // the common case keeps its single-click behaviour and gains a menu
+  // only when the menu would have something in it.
+  const reopenable = onReopenTab ? (closedTabs ?? []) : [];
 
   // Keep the active tab visible in the now horizontally-scrollable strip
   //, e.g. after opening a new tab (the "+" button) or switching tabs
@@ -105,16 +127,52 @@ export function TabBar({
       ) : (
         strip
       )}
-      {onAddTab && (
+      {onAddTab && reopenable.length === 0 && (
         <button
           type="button"
           className="playground-tab-add"
           onMouseDown={(e) => e.preventDefault()}
           onClick={onAddTab}
-          aria-label="New tab"
+          aria-label={addTabLabel}
         >
           <Plus size={12} aria-hidden="true" />
         </button>
+      )}
+      {reopenable.length > 0 && (
+        <Menu.Root>
+          <Menu.Trigger
+            className="playground-tab-add"
+            onMouseDown={(e) => e.preventDefault()}
+            aria-label={onAddTab ? `${addTabLabel} or reopen a closed tab` : "Reopen a closed tab"}
+          >
+            <Plus size={12} aria-hidden="true" />
+          </Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner sideOffset={6} align="end">
+              <Menu.Popup className="bui-popup playground-tab-add-menu">
+                {onAddTab && (
+                  <Menu.Item className="example-item" onClick={onAddTab}>
+                    <div className="ex-title">{addTabLabel}</div>
+                  </Menu.Item>
+                )}
+                <div className="playground-tab-add-heading">Reopen</div>
+                {reopenable.map((item) => (
+                  <Menu.Item
+                    key={item.id}
+                    className="example-item"
+                    onClick={() => onReopenTab!(item.id)}
+                  >
+                    <div className="ex-title">
+                      {item.icon}
+                      {item.icon ? " " : null}
+                      {item.label}
+                    </div>
+                  </Menu.Item>
+                ))}
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
       )}
     </div>
   );

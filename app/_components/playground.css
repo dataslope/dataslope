@@ -3966,6 +3966,24 @@ html[data-playground-theme="dark"] .welcome h3 {
   background: color-mix(in srgb, var(--bg) 90%, transparent);
 }
 
+/* The "+" grows a menu when files exist with no open tab (see TabBar's
+   `closedTabs`): "New file" on top, then the closed files under a
+   heading. `.example-item` already draws its own bottom border, so the
+   heading only needs to read as a label rather than as another row. */
+.playground-tab-add-menu {
+  min-width: 180px;
+}
+
+.playground-tab-add-heading {
+  padding: 8px 14px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+
 /* ───────────────────────────────────────────────────────────────────────
    Workspace badge + popover + manager drawer (Phase 6).
    ─────────────────────────────────────────────────────────────────────── */
