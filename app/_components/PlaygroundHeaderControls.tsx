@@ -32,6 +32,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Menu } from "@base-ui/react/menu";
 import { Popover } from "@base-ui/react/popover";
 import {
@@ -39,11 +40,19 @@ import {
   Cloud,
   CloudUpload,
   Download,
+  FilePlus2,
   LogIn,
   Pencil,
   type LucideIcon,
 } from "lucide-react";
-import { getWorkspaceRegistry, renameWorkspace } from "./opfs/workspace";
+import { useSession } from "@/lib/auth/client";
+import { switchActiveWorkspace } from "./opfs/activeWorkspace";
+import {
+  createWorkspace,
+  getWorkspaceRegistry,
+  renameWorkspace,
+} from "./opfs/workspace";
+import { defaultWorkspaceName } from "./workspace/WorkspaceBadge";
 import { downloadWorkspaceZip } from "./opfs/workspaceArchive";
 import type { WorkspaceBundle } from "@/lib/workspaces/types";
 import {
@@ -168,6 +177,119 @@ export function WorkspaceNameControl({
         <Pencil size={11} aria-hidden="true" />
       </button>
     </span>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// New workspace
+// ---------------------------------------------------------------------------
+
+/**
+ * The "start a new workspace" button that sits beside the rename pencil,
+ * and its confirmation dialog.
+ *
+ * Creating a workspace swaps the editor over to it (`switchActiveWorkspace`
+ * reloads the page), so this is a disruptive-looking action even though it
+ * destroys nothing: the current workspace stays in the registry, its files
+ * are already in OPFS, and a signed-in user's auto-sync has it on their
+ * account. The dialog exists to say so before the editor blanks, because
+ * "my code vanished" is the reasonable thing to assume otherwise.
+ *
+ * The name field is optional. Left blank it takes the same
+ * `Workspace <n>` default the workspace manager's "New" button uses, so
+ * the two entry points cannot drift apart.
+ */
+export function NewWorkspaceControl({
+  playgroundId,
+}: {
+  playgroundId: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const { data: session } = useSession();
+  const signedIn = Boolean(session?.user);
+
+  // Read at open time so the suggestion reflects the registry as it is now.
+  const suggested = useMemo(
+    () => (open ? defaultWorkspaceName(getWorkspaceRegistry(), playgroundId) : ""),
+    [open, playgroundId],
+  );
+
+  const create = useCallback(async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const created = await createWorkspace(name.trim() || suggested, playgroundId);
+      // Reloads the page onto the new workspace.
+      switchActiveWorkspace(playgroundId, created.id);
+    } finally {
+      setBusy(false);
+    }
+  }, [busy, name, suggested, playgroundId]);
+
+  return (
+    <AlertDialog.Root
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (next) setName("");
+      }}
+    >
+      <AlertDialog.Trigger
+        className="ph-rename-btn"
+        title="New workspace"
+        aria-label="New workspace"
+      >
+        <FilePlus2 size={11} aria-hidden="true" />
+      </AlertDialog.Trigger>
+      <AlertDialog.Portal>
+        <AlertDialog.Backdrop className="confirm-backdrop" />
+        <AlertDialog.Popup className="confirm-popup ph-new-ws-popup">
+          <AlertDialog.Title className="confirm-title">
+            Start a new workspace?
+          </AlertDialog.Title>
+          <AlertDialog.Description className="confirm-desc">
+            The editor will switch to a fresh set of files.{" "}
+            {signedIn
+              ? "Your current workspace is kept in this browser and backed up to your account, so you can reopen it from Workspaces at any time."
+              : "Your current workspace is kept in this browser, so you can reopen it from Workspaces at any time. Sign in to also back it up to your account."}
+          </AlertDialog.Description>
+
+          <form
+            className="ph-new-ws-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void create();
+            }}
+          >
+            <label className="ph-new-ws-label" htmlFor="ph-new-ws-name">
+              Name <span className="ph-new-ws-optional">(optional)</span>
+            </label>
+            <input
+              id="ph-new-ws-name"
+              className="sql-rename-input"
+              value={name}
+              placeholder={suggested}
+              autoComplete="off"
+              onChange={(event) => setName(event.target.value)}
+            />
+            <div className="confirm-actions">
+              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                Cancel
+              </AlertDialog.Close>
+              <button
+                type="submit"
+                className="confirm-btn confirm-btn-primary"
+                disabled={busy}
+              >
+                {busy ? "Creating…" : "Create workspace"}
+              </button>
+            </div>
+          </form>
+        </AlertDialog.Popup>
+      </AlertDialog.Portal>
+    </AlertDialog.Root>
   );
 }
 

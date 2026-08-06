@@ -247,6 +247,19 @@ body.playground-active {
   align-items: center;
   flex-shrink: 0;
 }
+/* On a phone the header runs out of room and the Dataslope mark is the
+   first thing to get squeezed out. The language icon already says which
+   playground this is, so drop the word and keep the mark. The dropdown
+   still lists every language by name. */
+@media (max-width: 768px) {
+  .playground-switcher-label {
+    display: none;
+  }
+  .playground-switcher {
+    padding: 4px 7px;
+    gap: 5px;
+  }
+}
 
 /* Base UI Select popup (used by the playground switcher). */
 .bui-select-popup {
@@ -1586,23 +1599,32 @@ body.playground-active {
   gap: 8px;
   animation: playground-fadeSlide 0.18s ease;
 }
+/* Label above value, both on the same left edge.
+   The old layout put the label left and the value hard right, which at
+   this width left long values ("almostnode (browser-native Node.js)")
+   wrapping into a ragged right-aligned block that read as unrelated to
+   its own label. Stacking gives every value the full panel width and one
+   shared left edge, so the rows line up down the panel. */
 .info-popover-row {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
 }
 .info-popover-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--text-dim);
 }
 .info-popover-val {
-  font-size: 12.5px;
+  font-size: 13px;
+  line-height: 1.45;
   color: var(--text);
   font-family: var(--font-mono);
+  /* Long engine strings must wrap inside the panel rather than widen it. */
+  overflow-wrap: anywhere;
 }
 .info-popover-val a {
   color: var(--primary);
@@ -1614,14 +1636,14 @@ body.playground-active {
 .info-github-link {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 .info-popover-notes {
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--text-dim);
-  line-height: 1.5;
+  line-height: 1.55;
   border-top: 1px solid var(--border);
-  padding-top: 8px;
+  padding-top: 12px;
 }
 .settings-close {
   width: 22px;
@@ -2752,8 +2774,25 @@ input[type="range"].fs-slider:disabled {
      stay on one row without forcing the layout wider than the viewport. */
   .playground-header,
   .logo,
+  .ph-name-wrap,
   .workspace-badge {
     min-width: 0;
+  }
+
+  /* The workspace name is the one elastic thing in the row, so it is what
+     gives when the name is long: it truncates instead of pushing the
+     Dataslope mark off the left edge (which is what used to happen).
+     The two icon buttons beside it never shrink. */
+  .ph-name {
+    max-width: 40vw;
+  }
+  .ph-name-wrap > button {
+    flex-shrink: 0;
+  }
+  /* The rename input needs the same ceiling or editing a long name
+     reflows the header mid-type. */
+  .ph-rename-input {
+    max-width: 44vw;
   }
 
   /* Hide the CodeMirror line-number gutter on mobile so the code takes
@@ -4683,6 +4722,28 @@ html[data-playground-theme="dark"] .welcome h3 {
   background: #ffffff;
 }
 
+/* An open menu closes when you click outside it, which works everywhere
+   except over the preview: a click inside a cross-origin iframe is
+   delivered to that document and never reaches ours, so the
+   outside-press listener does not fire and the menu stays open.
+   Every playground surface behaves correctly here; only the one with an
+   iframe over it did not.
+
+   While any popup is open, take the frame out of hit-testing so the
+   click lands on the slot behind it and dismisses the menu the same way
+   a click on the editor would. Base UI portals its popups to
+   `body > div` and marks the open positioner with `data-open`, and the
+   popup itself carries a menu/listbox/dialog role, so `:has()` can see
+   the open state without any component needing to publish it.
+
+   The click is swallowed rather than passed through to the page, which
+   is the normal first-click-dismisses behaviour of a menu. */
+body:has([data-open][role="menu"]) .ds-web-preview-frame,
+body:has([data-open][role="listbox"]) .ds-web-preview-frame,
+body:has([data-open][role="dialog"]) .ds-web-preview-frame {
+  pointer-events: none;
+}
+
 /* ─── CodePen-style split editors (web playground) ───────────────────────
    One always-visible editor per workspace file, stacked vertically in
    the editor pane. Pane headers carry an uppercase language chip and
@@ -5037,6 +5098,26 @@ html[data-playground-theme="dark"] {
   cursor: pointer;
   padding: 0;
 }
+/* New-workspace dialog: an optional name field above the usual
+   confirm-popup action row. */
+.ph-new-ws-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+.ph-new-ws-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+.ph-new-ws-optional {
+  font-weight: 400;
+  color: var(--text-dim);
+}
+.ph-new-ws-form .confirm-actions {
+  margin-top: 14px;
+}
 .ph-rename-btn:hover {
   color: var(--text);
   background: var(--menu-item-hover);
@@ -5297,7 +5378,10 @@ html[data-playground-theme="dark"] {
   color: var(--text-dim);
 }
 .ph-more-panel-body {
-  max-height: 280px;
+  /* 280px cut the Runtime info notes mid-sentence once the panel moved to
+     13px text (the longest, the web adapter's, needs ~370px). It still
+     scrolls for the genuinely long panels like Examples. */
+  max-height: 380px;
   overflow-y: auto;
 }
 /* Sub-panel list rows reuse the examples-dropdown metrics from the mock:
@@ -5329,11 +5413,18 @@ html[data-playground-theme="dark"] {
   color: var(--text-dim);
   margin-top: 2px;
 }
+/* The ⋯ menu's Runtime info sub-panel. `gap` is what separates the
+   stacked label/value groups from each other; the 3px inside a group
+   comes from `.info-popover-row`, so the two nest without either one
+   needing a margin. */
 .ph-more-info {
-  padding: 12px 14px;
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 .ph-more-info-notes {
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--text-dim);
   line-height: 1.55;
   margin-top: 10px;

@@ -152,6 +152,7 @@ import {
   HeaderDivider,
   MobileMoreSections,
   MoreMenu,
+  NewWorkspaceControl,
   SaveControl,
   WorkspaceNameControl,
   type MoreMenuSection,
@@ -3961,7 +3962,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     </span>
                   ) : null;
                 })()}
-                <Select.Value>
+                {/* The label is hidden below 768px (the icon already
+                    identifies the language) so the header has room for the
+                    logo; the dropdown items keep their labels either way. */}
+                <Select.Value className="playground-switcher-label">
                   {PLAYGROUNDS.find((p) => p.id === adapter.id)?.label ??
                     adapter.id}
                 </Select.Value>
@@ -4019,6 +4023,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   if (workspaceId) setWorkspace(workspaceId, name);
                 }}
               />
+              <NewWorkspaceControl playgroundId={adapter.id} />
             </>
           )}
 

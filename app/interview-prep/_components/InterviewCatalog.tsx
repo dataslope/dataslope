@@ -20,7 +20,9 @@
  * server component (the banners read the build-time image manifest directly).
  */
 import type { ReactNode } from "react";
+import { scumble } from "tabbied/patterns";
 import Link from "@/app/_components/Link";
+import { PatternBackdrop } from "@/app/_components/PatternBackdrop";
 import imageManifest from "@/lib/generated/images";
 import type { InterviewTrack } from "@/lib/interviewCatalog";
 import styles from "./InterviewCatalog.module.css";
@@ -303,17 +305,27 @@ export function InterviewCatalog({ tracks }: { tracks: InterviewTrack[] }) {
 
   return (
     <>
-      {/* ── Track cards ── */}
-      <div className="mt-12 grid grid-cols-1 items-stretch gap-8 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3">
-        {tracks.map((track) => (
-          <TrackCard key={track.slug} track={track} />
-        ))}
-      </div>
+      {/* ── Track cards, on a scumble backdrop ──
+          The pattern is inset vertically so it emerges a little below the
+          first row of cards and stops a little above the last row's
+          bottom, which reads as a surface the grid sits on rather than a
+          band laid across it. */}
+      <PatternBackdrop
+        pattern={scumble}
+        insetTop={56}
+        insetBottom={56}
+        cellSize={44}
+        className="mt-12 sm:mt-14"
+      >
+        <div className="grid grid-cols-1 items-stretch gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {tracks.map((track) => (
+            <TrackCard key={track.slug} track={track} />
+          ))}
+        </div>
+      </PatternBackdrop>
 
       {/* ── Footer line: totals + a pointer to the courses catalog ── */}
-      <div
-        className={`mt-11 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between ${HAIRLINE}`}
-      >
+      <div className="mt-11 flex flex-col gap-3 pt-6 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-[13px] text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
           {tracks.length} tracks · {topicCount} topics · all free
         </span>

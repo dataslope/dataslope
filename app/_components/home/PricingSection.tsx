@@ -16,10 +16,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { windowpane } from "tabbied/patterns";
+
 import Link from "../Link";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth/client";
 import { Highlighter } from "@/components/ui/highlighter";
+import { PatternBackdrop } from "../PatternBackdrop";
 import { stashCheckoutPeriod, startProCheckout } from "../billing/proCheckout";
 
 /** A single capability line: an icon that maps to the feature, the text, and an
@@ -540,29 +543,44 @@ export function PricingSection({
           cards. The stripe layer sits behind an OPAQUE inner surface (the
           bordered card below), so it only shows in the down-right offset
           sliver, not through the table body. */}
-      <div className="ds-striped-shell rounded-2xl">
-        <div className="rounded-2xl border border-[var(--ds-gray-200)] bg-white dark:border-white/10 dark:bg-[#121212]">
-          {/* Column count tracks the number of visible plans; the subgrid row
-              count is FEATURE_COUNT + 3 (header/price/CTA). Both are literal
-              class strings so Tailwind's JIT can see them, when restoring Pro,
-              switch `lg:grid-cols-2` back to `lg:grid-cols-3`. */}
-          <div
-            className={`grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-rows-[repeat(11,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10 ${
-              SHOW_PRO_PLAN ? "lg:grid-cols-3" : "lg:grid-cols-2"
-            }`}
-          >
-            {VISIBLE_PLANS.map((plan, i) => (
-              <PlanColumn
-                key={plan.name}
-                plan={plan}
-                annual={annual}
-                colClass={COL_START[i]}
-                prevPlan={i > 0 ? VISIBLE_PLANS[i - 1] : undefined}
-              />
-            ))}
+      {/* Windowpane backdrop. The table's surface is opaque, so the pattern
+          is only visible where it extends past it: it starts a little way
+          down the table, runs a little wider than it, and continues below
+          its bottom edge, so it reads as something the table is resting on.
+          The trailing margin keeps that overhang from crowding whatever the
+          page puts next. */}
+      <PatternBackdrop
+        pattern={windowpane}
+        insetTop={140}
+        insetBottom={-110}
+        insetX={-48}
+        cellSize={54}
+        className="mb-32 sm:mb-36"
+      >
+        <div className="ds-striped-shell rounded-2xl">
+          <div className="rounded-2xl border border-[var(--ds-gray-200)] bg-white dark:border-white/10 dark:bg-[#121212]">
+            {/* Column count tracks the number of visible plans; the subgrid
+                row count is FEATURE_COUNT + 3 (header/price/CTA). Both are
+                literal class strings so Tailwind's JIT can see them; when
+                restoring Pro, switch `lg:grid-cols-2` to `lg:grid-cols-3`. */}
+            <div
+              className={`grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-rows-[repeat(11,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10 ${
+                SHOW_PRO_PLAN ? "lg:grid-cols-3" : "lg:grid-cols-2"
+              }`}
+            >
+              {VISIBLE_PLANS.map((plan, i) => (
+                <PlanColumn
+                  key={plan.name}
+                  plan={plan}
+                  annual={annual}
+                  colClass={COL_START[i]}
+                  prevPlan={i > 0 ? VISIBLE_PLANS[i - 1] : undefined}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </PatternBackdrop>
     </section>
   );
 }

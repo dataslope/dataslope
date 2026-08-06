@@ -143,7 +143,7 @@ function formatBytes(bytes: number): string {
  *  "Workspace 2", instead of a raw `toLocaleString()` timestamp (which
  *  was meaningless and truncated in the header badge). Reads naturally
  *  next to the auto-created "Default <playground>". */
-function defaultWorkspaceName(
+export function defaultWorkspaceName(
   registry: WorkspaceEntry[],
   playgroundId: string,
 ): string {
