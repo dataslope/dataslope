@@ -1,5 +1,6 @@
 import Link from "../Link";
 import { GitHubIcon } from "./icons";
+import { FooterPattern } from "./FooterPattern";
 
 const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 
@@ -67,6 +68,12 @@ function FooterLink({
 export function HomeFooter() {
   return (
     <footer className="mt-24">
+      {/* Full-bleed, so it sits outside the max-w-6xl content column below.
+          Living here rather than in any one page means every route that
+          renders HomeFooter gets it — the home page, /courses, /pricing,
+          /playground, /interview-prep, the dashboard, the share and quiz
+          routes, and the error/not-found pages. */}
+      <FooterPattern />
       <div className="mx-auto max-w-6xl px-4 pt-12 pb-20 sm:px-6 sm:pb-28">
         <div className="ds-footer-grid">
           {/* Column 1, logo (no wordmark) + GitHub at the bottom. */}

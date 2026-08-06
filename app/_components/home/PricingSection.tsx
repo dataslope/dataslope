@@ -368,7 +368,12 @@ function PlanColumn({
     <div
       className={`flex flex-col gap-3 px-6 py-6 lg:row-span-11 lg:row-start-1 lg:grid lg:grid-rows-subgrid lg:px-8 lg:py-0 ${colClass}`}
     >
-      <div className="lg:pt-8">
+      {/* `relative` so the marmot can be lifted OUT OF FLOW below. The title
+          row must keep the height it had when this was a 20px Lucide glyph:
+          as a flex item, a 120px image sets the row height and pushes the
+          price, CTA and every feature row down, which shows up as the plan
+          columns no longer aligning with each other. */}
+      <div className="relative lg:pt-8">
         <div className="flex items-center gap-2.5">
           <h3 className="text-lg font-semibold text-[var(--ds-gray-900)] dark:text-white">
             {plan.name}
@@ -378,19 +383,25 @@ function PlanColumn({
               {plan.badge}
             </span>
           )}
-          {/* Decorative: the plan name beside it already says which tier this
-              is, so the marmot is hidden from assistive tech rather than
-              read out as "Guest, Guest". */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`/images/${plan.iconSlug}-cutout.webp`}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            decoding="async"
-            className="ml-auto size-[120px] shrink-0 object-contain"
-          />
         </div>
+        {/* Decorative: the plan name beside it already says which tier this is,
+            so the marmot is hidden from assistive tech rather than read out as
+            "Guest, Guest".
+
+            Out of flow, and deliberately overhanging the card's top edge — the
+            reviewer liked the marmot breaking the border rather than sitting
+            inside it. -40% rather than -50% drops it a little further into the
+            card so it reads as resting on the edge instead of floating over
+            it. `pointer-events-none` keeps it from swallowing clicks. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/images/${plan.iconSlug}-cutout.webp`}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+          className="pointer-events-none absolute right-0 top-1/2 size-[120px] -translate-y-[40%] object-contain"
+        />
       </div>
 
       <div>
