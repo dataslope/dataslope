@@ -22,7 +22,7 @@ import type { PyodideInterface } from "pyodide";
 
 declare const self: DedicatedWorkerGlobalScope;
 
-const PYODIDE_VERSION = "v314.0.2";
+const PYODIDE_VERSION = "v314.0.4";
 const PYODIDE_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`;
 
 /** Load Pyodide's ES-module entry point from the CDN, outside the

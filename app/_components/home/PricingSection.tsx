@@ -76,8 +76,12 @@ const PLANS: Plan[] = [
     description: "Jump straight in, sign-in optional.",
     priceMonthly: "$0",
     priceAnnual: "$0",
-    noteMonthly: "Sign-in optional",
-    noteAnnual: "Sign-in optional",
+    // Sits directly under the "$0 / month" line, so it reads as the billing
+    // sub-line (the Free Member column's "Free forever" is its counterpart).
+    // "Sign-in optional" was both the wrong register for that slot and a
+    // repeat of the column description right above it.
+    noteMonthly: "No account needed",
+    noteAnnual: "No account needed",
     features: [
       { icon: GraduationCap, text: "Full access to courses" },
       { icon: Briefcase, text: "Full access to interview prep" },

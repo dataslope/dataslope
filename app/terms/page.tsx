@@ -94,15 +94,8 @@ export default function TermsPage() {
         The Dataslope name, site design, and original learning content are owned
         by Dataslope and its contributors. The Service is built on open-source
         software and runtimes that remain governed by their own licenses; see
-        the{" "}
-        <a
-          href="https://github.com/dataslope/dataslope/blob/main/LICENSE"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          project license
-        </a>{" "}
-        for details. Code you write in the playgrounds is yours.
+        the <a href="/license">License page</a> for details. Code you write in
+        the playgrounds is yours.
       </p>
 
       <h2>Third-party services</h2>

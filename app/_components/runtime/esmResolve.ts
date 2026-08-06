@@ -17,7 +17,7 @@
 
 import { ESM_SH_ORIGIN } from "./cdn";
 
-export const REACT_VERSION = "19.2.7";
+export const REACT_VERSION = "19.2.8";
 
 /** Exact-version pins applied when learner code imports these packages.
  *  Everything else resolves to the package's latest published version

@@ -52,7 +52,12 @@ export function LegalShell({
             Last updated: {updated}
           </p>
 
-          <div className="mt-10 [&_a]:font-medium [&_a]:text-[var(--ds-blue-700)] [&_a]:underline [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-[var(--ds-gray-900)] [&_li]:mt-1.5 [&_p]:mt-4 [&_p]:leading-relaxed [&_strong]:font-semibold [&_strong]:text-[var(--ds-gray-900)] [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-6 dark:[&_a]:text-[var(--ds-blue-400)] dark:[&_h2]:text-white dark:[&_strong]:text-white">
+          {/* `h3`, `pre`, and `table` are here for the License page, which
+              needs sub-sections, verbatim license text, and a runtime/license
+              matrix. A table keeps a `min-w`, so wrap each one in an
+              `overflow-x-auto` div at the call site: that way a wide row
+              scrolls inside its own box instead of widening the page. */}
+          <div className="mt-10 [&_a]:font-medium [&_a]:text-[var(--ds-blue-700)] [&_a]:underline [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-[var(--ds-gray-900)] [&_h3]:mt-8 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-[var(--ds-gray-900)] [&_li]:mt-1.5 [&_p]:mt-4 [&_p]:leading-relaxed [&_pre]:mt-4 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:border [&_pre]:border-[var(--ds-gray-200)] [&_pre]:bg-[var(--ds-gray-50)] [&_pre]:p-4 [&_pre]:text-[13px] [&_pre]:leading-relaxed [&_strong]:font-semibold [&_strong]:text-[var(--ds-gray-900)] [&_td]:border-t [&_td]:border-[var(--ds-gray-200)] [&_td]:py-2 [&_td]:pr-6 [&_td]:align-top [&_th]:pb-2 [&_th]:pr-6 [&_th]:text-left [&_th]:font-semibold [&_th]:text-[var(--ds-gray-900)] [&_table]:mt-4 [&_table]:w-full [&_table]:min-w-[34rem] [&_table]:border-collapse [&_table]:text-[15px] [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-6 dark:[&_a]:text-[var(--ds-blue-400)] dark:[&_h2]:text-white dark:[&_h3]:text-white dark:[&_pre]:border-white/10 dark:[&_pre]:bg-white/[0.04] dark:[&_strong]:text-white dark:[&_td]:border-white/10 dark:[&_th]:text-white">
             {children}
           </div>
 
