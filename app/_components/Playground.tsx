@@ -2543,6 +2543,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         closeSettingsTab();
         return;
       }
+      // A locked workspace has no ✕ and no Close menu item, so nothing
+      // should reach here; the guard keeps a future caller (a keyboard
+      // binding, the mobile pane bar) from routing around the lock.
+      if (adapter.lockWorkspaceFiles) return;
       const open = openTabIdsRef.current;
       if (!open.includes(fileId)) return;
       if (open.length <= 1) {
@@ -2566,44 +2570,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         setActiveTabId(next);
       }
     },
-    [closeSettingsTab, setActiveFileId, setActiveTabId, setOpenTabIds, showToast],
-  );
-
-  /** Reopen a workspace file's tab and activate it.
-   *
-   *  Closing a tab only hides its editor, so the file is still in the
-   *  workspace; this is the way back. The Files pane offers the same
-   *  thing, but adapters that set `hideFilesPane` (the web playground)
-   *  have no Files pane, which left a closed file unreachable until the
-   *  tab strip grew its own reopen affordance.
-   *
-   *  The tab is reinserted at the file's position in the workspace file
-   *  list rather than appended, so reopening does not silently reorder
-   *  the strip. */
-  const reopenFileTab = useCallback(
-    (fileId: string) => {
-      const open = openTabIdsRef.current;
-      if (open.includes(fileId)) {
-        selectTab(fileId);
-        return;
-      }
-      if (!filesRef.current.some((f) => f.id === fileId)) return;
-      flushActiveFileToBuffer();
-      const order = filesRef.current.map((f) => f.id);
-      const next = [...open, fileId].sort(
-        (a, b) => order.indexOf(a) - order.indexOf(b),
-      );
-      setOpenTabIds(next);
-      activeFileIdRef.current = fileId;
-      setActiveFileId(fileId);
-      setActiveTabId(fileId);
-    },
     [
-      flushActiveFileToBuffer,
-      selectTab,
+      adapter.lockWorkspaceFiles,
+      closeSettingsTab,
       setActiveFileId,
       setActiveTabId,
       setOpenTabIds,
+      showToast,
     ],
   );
 
@@ -2612,6 +2585,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
    *  confirms first) and the tab context menu's "Delete File". */
   const deleteWorkspaceFile = useCallback(
     (fileId: string) => {
+      if (adapter.lockWorkspaceFiles) return;
       const current = filesRef.current;
       if (current.length <= 1) {
         // Refuse to delete the last file, the playground needs at
@@ -2646,6 +2620,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       }
     },
     [
+      adapter.lockWorkspaceFiles,
       clearDirtyBuffer,
       clearOutputsForFile,
       markDirty,
@@ -2659,6 +2634,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   const renameFileTab = useCallback(
     (fileId: string, newName: string) => {
+      if (adapter.lockWorkspaceFiles) return;
       const trimmed = newName.trim();
       if (!trimmed) return;
       const target = filesRef.current.find((f) => f.id === fileId);
@@ -2698,7 +2674,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       filesRef.current = next;
       setFiles(next);
     },
-    [setFiles, showToast],
+    [adapter.lockWorkspaceFiles, setFiles, showToast],
   );
 
   /** Reorder the file tabs after a drag-and-drop drop. The generic
@@ -2805,6 +2781,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
    *  becomes the active tab. */
   const closeOtherFileTabs = useCallback(
     (fileId: string) => {
+      // Sets `openTabIds` directly rather than looping `closeFileTab`,
+      // so it needs the lock check of its own.
+      if (adapter.lockWorkspaceFiles) return;
       if (!filesRef.current.some((f) => f.id === fileId)) return;
       if (openTabIdsRef.current.length <= 1) return;
       flushActiveFileToBuffer();
@@ -2813,7 +2792,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       setActiveFileId(fileId);
       setActiveTabId(fileId);
     },
-    [flushActiveFileToBuffer, setActiveFileId, setActiveTabId, setOpenTabIds],
+    [
+      adapter.lockWorkspaceFiles,
+      flushActiveFileToBuffer,
+      setActiveFileId,
+      setActiveTabId,
+      setOpenTabIds,
+    ],
   );
 
   // ─── Merge workspace tabs into the Files pane ─────────────────────────
@@ -3802,21 +3787,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     };
   }, [loaded, statusState]);
 
-  /** Workspace files with no open tab, in workspace order, for the tab
-   *  strip's Reopen menu. Derived from state rather than from the
-   *  recently-closed stack so it survives a reload. */
-  const closedFileTabs = useMemo(
-    () =>
-      files
-        .filter((f) => !openTabIds.includes(f.id))
-        .map((f) => ({
-          id: f.id,
-          label: f.filename.split("/").pop() ?? f.filename,
-          icon: <FileCode2 size={11} aria-hidden="true" />,
-        })),
-    [files, openTabIds],
-  );
-
   const fileTabDescriptors = useMemo<TabDescriptor[]>(
     () => {
       // The tab strip shows the OPEN tabs only, a subset of the
@@ -3827,6 +3797,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         .map((id) => byId.get(id))
         .filter((f): f is PlaygroundFile => Boolean(f));
       const multiple = openFiles.length > 1;
+      const locked = adapter.lockWorkspaceFiles === true;
       // The context-menu closures defer to `useCallback` handlers
       // that intentionally read refs internally. The handlers only
       // run on user click, never during render, so the
@@ -3839,32 +3810,38 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         // full path, so we show only the leaf and let the Files pane
         // expose the rest.
         const leaf = f.filename.split("/").pop() ?? f.filename;
-        const extras: TabContextMenuItem[] = [
-          {
+        // A locked workspace (the web playground) has no per-tab actions
+        // at all: every item here either closes a tab or changes which
+        // files exist, and that adapter has no Files pane to undo it
+        // with. With no extras and no rename, TabItem renders no context
+        // menu. See `lockWorkspaceFiles` in types.ts.
+        const extras: TabContextMenuItem[] = [];
+        if (!locked) {
+          extras.push({
             key: "duplicate",
             label: "Duplicate",
             onSelect: () => duplicateFileTab(f.id),
-          },
-        ];
-        if (multiple) {
+          });
+          if (multiple) {
+            extras.push({
+              key: "close-others",
+              label: "Close Others",
+              onSelect: () => closeOtherFileTabs(f.id),
+            });
+          }
           extras.push({
-            key: "close-others",
-            label: "Close Others",
-            onSelect: () => closeOtherFileTabs(f.id),
+            key: "delete-file",
+            label: "Delete File",
+            onSelect: () => deleteWorkspaceFile(f.id),
           });
         }
-        extras.push({
-          key: "delete-file",
-          label: "Delete File",
-          onSelect: () => deleteWorkspaceFile(f.id),
-        });
         return {
           id: f.id,
           kind: "code" as const,
           label: leaf,
           icon: <FileCode2 size={11} aria-hidden="true" />,
-          closeable: multiple,
-          renameable: true,
+          closeable: multiple && !locked,
+          renameable: !locked,
           renameDialogTitle: "Rename file",
           renameDialogDescription:
             "Use a leaf name (e.g. utils.py) to keep the file in its current folder, or a full path to move it.",
@@ -3892,6 +3869,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       return list;
     },
     [
+      adapter.lockWorkspaceFiles,
       closeOtherFileTabs,
       deleteWorkspaceFile,
       duplicateFileTab,
@@ -4395,9 +4373,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             onSelectTab={selectTab}
             onCloseTab={closeFileTab}
             onAddTab={adapter.disableAddFile ? undefined : addNewFile}
-            closedTabs={closedFileTabs}
-            onReopenTab={reopenFileTab}
-            addTabLabel="New file"
             onRenameTab={renameFileTab}
             onReorderTabs={(files.length > 1 || settingsOpen) ? reorderFileTabs : undefined}
             className="playground-file-tabbar"
