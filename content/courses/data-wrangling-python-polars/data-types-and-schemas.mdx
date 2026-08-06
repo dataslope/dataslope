@@ -1,0 +1,343 @@
+---
+title: Data Types and Schemas
+description: "The Polars type system, why it is strict, how to cast safely, and what a schema buys you before any data is read."
+---
+
+Polars knows the type of every column at every point in a query,
+including before any data has been read. That is unusual for a Python
+library and it is the reason several other features work at all.
+
+<Figure
+  slug="pl-dtypes-cutout"
+  alt="A wide platform with four deep sockets of different shapes, a round one, a square one, a triangular one and a long rectangular one, each holding the one thick solid block in blue, green, red or yellow that fits it"
+/>
+
+## The type list
+
+| Family | Types |
+| --- | --- |
+| Signed integers | `Int8`, `Int16`, `Int32`, `Int64`, `Int128` |
+| Unsigned integers | `UInt8`, `UInt16`, `UInt32`, `UInt64` |
+| Floats | `Float32`, `Float64` |
+| Text | `String` |
+| Boolean | `Boolean` |
+| Temporal | `Date`, `Datetime`, `Duration`, `Time` |
+| Categorical | `Categorical`, `Enum` |
+| Nested | `List`, `Array`, `Struct` |
+| Other | `Binary`, `Decimal`, `Null`, `Object` |
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame(
+    {
+        "i": [1, 2, 3],
+        "f": [1.5, 2.5, 3.5],
+        "s": ["a", "b", "c"],
+        "b": [True, False, True],
+        "lst": [[1, 2], [3], []],
+    }
+)
+
+print(df.schema)
+print(df)
+`,
+    },
+  ]}
+/>
+
+## Width costs memory
+
+The integer types differ only in how many bytes each value takes. On
+small data it never matters. On large data it is the difference
+between a table fitting in memory and not.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+n = 1_000_000
+wide = pl.DataFrame({"id": pl.int_range(n, eager=True)})
+narrow = wide.with_columns(pl.col("id").cast(pl.UInt32))
+
+print("Int64 :", wide.estimated_size("mb"), "MB")
+print("UInt32:", narrow.estimated_size("mb"), "MB")
+`,
+    },
+  ]}
+/>
+
+Rules of thumb: a count or an ID that cannot be negative wants an
+unsigned type; a value under 65,536 fits in `UInt16`; and money
+should not be a float, it should be `Decimal` or an integer count of
+cents.
+
+## Casting
+
+`cast` changes a column's type. It is strict by default, which means
+a value that does not fit raises rather than wrapping around or
+silently becoming null.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"n": [1, 2, 300]})
+
+print(df.with_columns(pl.col("n").cast(pl.Int64)))
+
+try:
+    df.with_columns(pl.col("n").cast(pl.UInt8))  # 300 does not fit in a byte
+except Exception as error:
+    print(type(error).__name__, "-", error)
+
+# strict=False turns the overflow into a null instead of an error
+print(df.with_columns(pl.col("n").cast(pl.UInt8, strict=False)))
+`,
+    },
+  ]}
+/>
+
+The same applies to parsing text into numbers.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+messy = pl.DataFrame({"amount": ["12", "7", "n/a", "3"]})
+
+# Strict: the bad value stops everything
+try:
+    messy.with_columns(pl.col("amount").cast(pl.Int64))
+except Exception as error:
+    print("strict cast failed:", type(error).__name__)
+
+# Lenient: unparseable values become null, which you can then count
+parsed = messy.with_columns(
+    pl.col("amount").cast(pl.Int64, strict=False).alias("amount_n")
+)
+print(parsed)
+print("failed to parse:", parsed["amount_n"].null_count())
+`,
+    },
+  ]}
+/>
+
+Neither is the right default for every job. The useful habit is to
+*choose*: use strict casting when bad data should stop the pipeline,
+and lenient casting plus a null count when you want to measure how
+bad the data is.
+
+## Schemas exist before the data does
+
+This is the part with no pandas equivalent. A `LazyFrame` knows its
+output schema without reading anything, because the schema follows
+from the plan.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `plan = (
+    pl.scan_csv("penguins.csv", null_values=["NA"])
+    .select("species", "body_mass_g")
+    .with_columns((pl.col("body_mass_g") / 1000).alias("mass_kg"))
+)
+
+# No rows have been read. The output schema is still known:
+print(plan.collect_schema())
+`,
+    },
+  ]}
+/>
+
+Because the schema is known up front, a query that references a
+column you spelled wrong, or divides a string by a number, can fail
+*before* reading a 40 GB file rather than forty minutes into it.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `try:
+    (
+        pl.scan_csv("penguins.csv", null_values=["NA"])
+        .select(pl.col("body_mass_grams"))  # misspelled
+        .collect()
+    )
+except Exception as error:
+    print(type(error).__name__)
+    print(str(error).splitlines()[0])
+`,
+    },
+  ]}
+/>
+
+## Enforcing a schema on read
+
+When you own the pipeline, state the types rather than letting them
+be inferred. It is faster (no sampling pass) and it fails loudly when
+the upstream file changes shape.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+open("sales.csv", "w").write("sku,units,price\\nA1,3,9.99\\nB2,10,4.50\\n")
+
+df = pl.read_csv(
+    "sales.csv",
+    schema={"sku": pl.String, "units": pl.UInt16, "price": pl.Float64},
+)
+print(df.schema)
+print(df)
+`,
+    },
+  ]}
+/>
+
+`schema` declares every column. `schema_overrides` fixes only the
+ones you care about and infers the rest, which is usually the more
+practical option.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Parse a messy numeric column"
+  instructions={`\`raw\` has one column, \`reading\`, holding text: some values are numbers, some are junk.
+
+Produce a DataFrame called \`out\` with two columns, in this order:
+
+1. \`reading\`, the original text, unchanged
+2. \`value\`, the reading cast to \`pl.Float64\`, with unparseable entries becoming null
+
+Then set \`n_bad\` to the number of values that failed to parse.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+raw = pl.DataFrame(
+    {"reading": ["12.5", "7", "n/a", "3.25", "", "-1.5", "unknown"]}
+)`,
+      starterCode: `out = None  # TODO
+n_bad = None  # TODO
+
+print(out)
+print("bad:", n_bad)
+`,
+      solutionCode: `out = raw.with_columns(
+    pl.col("reading").cast(pl.Float64, strict=False).alias("value")
+)
+n_bad = out["value"].null_count()
+
+print(out)
+print("bad:", n_bad)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_frame",
+      name: "out is a DataFrame",
+      description: "Type check",
+      code: `import polars as pl
+assert isinstance(out, pl.DataFrame)`,
+    },
+    {
+      id: "cols",
+      name: "reading then value",
+      description: "Two columns, in order",
+      code: `assert out.columns == ["reading", "value"], out.columns`,
+    },
+    {
+      id: "dtype",
+      name: "value is Float64",
+      description: "Cast, not left as text",
+      code: `import polars as pl
+assert out["value"].dtype == pl.Float64, out["value"].dtype`,
+    },
+    {
+      id: "values",
+      name: "The parseable values came through",
+      description: "12.5, 7.0, 3.25, -1.5",
+      code: `got = [v for v in out["value"].to_list() if v is not None]
+assert got == [12.5, 7.0, 3.25, -1.5], got`,
+    },
+    {
+      id: "count",
+      name: "n_bad counts the failures",
+      description: "Three values could not be parsed",
+      code: `assert n_bad == 3, n_bad`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`cast(pl.UInt8, strict=False)\` do to a value of 300?
+
+- Wraps it around to 44, since 300 modulo 256 is 44
+  > Silent wrap-around is a C-style behaviour that produces plausible wrong numbers; Polars refuses to do it.
+- [o] Produces a null for that entry and leaves the rest of the column intact
+  > Counting the resulting nulls is then how you measure how much data was out of range.
+- Widens the whole column to UInt16 so the value fits
+  > The cast performs the conversion you asked for; it never quietly substitutes a different target type.
+- Raises an error, because \`strict=False\` only applies to string parsing
+  > Raising is the \`strict=True\` behaviour, and the lenient mode applies to numeric range failures as much as to parse failures.
+
+Strict casting stops the pipeline; lenient casting lets you measure the damage.`}
+/>
+
+<MultipleChoice
+  markdown={`How can \`collect_schema()\` report a LazyFrame's output types without reading the file?
+
+- It reads the first row of the file to determine each column's type
+  > Reading even one row would be I/O, and this works on plans whose source has not been opened at all.
+- It runs the query on a small sample and reports the sample's types
+  > No execution happens. A sample would also give the wrong answer whenever the sample's types differ from the full file's.
+- It caches the schema from a previous run of the same query
+  > No cache is consulted; a brand-new plan in a fresh process reports its schema just as readily.
+- [o] The source's schema plus the operations in the plan determine the output types
+  > Dividing an Int64 by an integer yields Float64, and Polars can work that out without any data.
+
+Knowing the schema early is what lets a typo fail in milliseconds rather than after a long read.`}
+/>
+
+<MultipleChoice
+  markdown={`Why store an ID column as \`UInt32\` rather than the default \`Int64\`?
+
+- Unsigned integers are compared faster than signed ones by the CPU
+  > Signed and unsigned comparison cost the same; the saving is in bytes moved, not in the comparison itself.
+- \`Int64\` cannot represent values above two billion
+  > \`Int64\` reaches about 9.2 quintillion. \`UInt32\` is the type that stops just above four billion.
+- Polars cannot use an Int64 column as a join key
+  > Any integer type works as a join key; the choice here is purely about memory.
+- [o] It halves the memory the column uses, which matters at scale
+  > Four bytes instead of eight, on a hundred million rows, is 400 MB saved.
+
+The ceiling is the trade: \`UInt32\` tops out around 4.29 billion, so pick it knowing your data's range.`}
+/>

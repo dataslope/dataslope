@@ -1,0 +1,126 @@
+---
+title: Where to Go Next
+description: "What you now know, the parts of Polars this course left out, and the honest next steps for getting good at it."
+---
+
+You started this course being able to write Python. You can now
+describe a computation as an expression, hand it to the right
+context, build a lazy pipeline over a file larger than memory, read
+the plan the optimizer produced, and defend a finding against a
+confounder.
+
+<Figure
+  slug="pl-next-steps-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading standing at the foot of a broad blue staircase of four thick solid steps rising from a platform, one yellow block resting on the top step"
+/>
+
+## What you learned
+
+- **Expressions.** `pl.col("x").mean()` is a value describing a
+  computation, not a result. Everything else follows from that.
+- **The four contexts.** `select` builds a frame, `with_columns`
+  extends one, `filter` chooses rows, `group_by().agg()` computes per
+  group. Same expressions, different meanings.
+- **Selectors.** Choosing columns by type or pattern, combined with
+  set operations, so a new column does not break your code.
+- **Windows.** `.over()` for a group statistic that keeps the rows.
+- **Real data.** Nulls that are not NaN, strings, dates, categories
+  that carry an order.
+- **Combining.** Joins with their row-multiplication trap, concat
+  with its schema strictness, pivot and unpivot.
+- **Lazy execution.** Plans, the optimizer's rewrites, and the
+  streaming engine.
+
+## What this course left out
+
+Deliberately, to keep it to a readable length:
+
+- **Plugins.** You can write an expression in Rust and register it
+  as a Polars expression, which is the escape hatch when the built-in
+  ones genuinely cannot express something and `map_elements` is too
+  slow. See the `pyo3-polars` project.
+- **`rolling` and `group_by_dynamic`.** Time-based windowing with
+  real gaps: "the sum over the trailing 7 days", where the window is
+  a duration rather than a row count. If you work with time series,
+  read these next.
+- **`Decimal`.** Exact fixed-point arithmetic for money. Supported,
+  and worth using when a float's rounding is not acceptable.
+- **`polars-cloud` and distributed execution.** Recent, and moving
+  fast enough that anything written here would date badly.
+- **The Rust API.** Polars is a Rust library first. If you already
+  write Rust, the same concepts transfer with a different surface.
+
+## Getting good at it
+
+Three things, in order of how much they help:
+
+**1. Rewrite something you already have.** Take a pandas script you
+understand and port it. You will hit the places where your habits do
+not translate, which is exactly where the learning is. The
+[Polars vs pandas](/courses/data-wrangling-python-polars/polars-vs-pandas)
+table is a starting point, not a substitute for doing it.
+
+**2. Read plans.** Put `.explain()` on any lazy query that feels
+slow. You will develop an intuition for which of your habits the
+optimizer can see through and which it cannot, and that intuition is
+most of what "knowing Polars" means in practice.
+
+**3. Read the user guide's expression pages.** The
+[official user guide](https://docs.pola.rs/) is unusually good, and
+its expressions section covers a wider catalogue of methods than any
+course can. Now that you know what an expression *is*, that catalogue
+reads as a list of tools rather than a wall of names.
+
+## Where to go on this site
+
+- [SQL for Data Analysis with DuckDB](/courses/sql-analytics-duckdb),
+  the same analytical ideas expressed in SQL, on an engine that
+  shares Polars' columnar design. Its window-function chapters in
+  particular will feel familiar.
+- [Data Analysis with Python Pandas](/courses/data-analysis-python-pandas),
+  the other side of the comparison, from the ground up. Worth reading
+  if you meet pandas code and would rather understand it than
+  translate it.
+- [Statistics for Data Science with Python](/courses/statistics-for-data-science-python),
+  because the capstone here found a confounder by eye, and this is
+  the course that makes that rigorous.
+- [Time Series Analysis with Python](/courses/time-series-analysis-python),
+  where rolling windows, resampling, and gaps in a date index become
+  the whole problem rather than one page of it.
+- The [Python Playground](/playground/python), a workspace that
+  persists across runs, with Polars and the rest of the data stack
+  already available.
+
+## One last exercise
+
+No tests, no solution. Find a CSV you actually care about, one from
+your own work or a public dataset you have opinions about, and answer
+one question about it end to end: scan it lazily, clean what is
+broken, group it, and write down what you found and how confident you
+are.
+
+The gap between "I have done the exercises" and "I can use this" is
+one real dataset wide, and nothing here can close it for you.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `# A blank slate on a dataset you know by now. Ask it something.
+(
+    pl.scan_csv("penguins.csv", null_values=["NA"])
+    .group_by("species", "island")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("body_mass_g").mean().round(0).alias("avg_mass"),
+    )
+    .sort("species", "island")
+    .collect()
+)
+`,
+    },
+  ]}
+/>

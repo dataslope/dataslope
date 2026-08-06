@@ -23,6 +23,7 @@ import {
   ChartColumn,
   ChartScatter,
   Coffee,
+  Columns3,
   Combine,
   Cpu,
   Database,
@@ -80,6 +81,7 @@ const MOTIFS: Record<string, string> = {
 export const COURSE_MOTIFS: Record<string, string> = {
   "python-basics": "snake",
   "data-analysis-python-pandas": "bars",
+  "data-wrangling-python-polars": "columns",
   "intro-sql-postgres": "cylinder",
   "beginners-javascript": "braces",
   "machine-learning-scikit-learn": "nodes",
@@ -116,6 +118,7 @@ export const COURSE_MOTIFS: Record<string, string> = {
 const KIND_ICONS: Record<string, LucideIcon> = {
   snake: Terminal,
   bars: ChartColumn,
+  columns: Columns3,
   cylinder: Database,
   braces: Braces,
   nodes: Network,

@@ -1,0 +1,356 @@
+---
+title: What an Expression Is
+description: "The one idea the whole library is built from: a value that describes a computation on a column, before any data exists."
+---
+
+This is the most important page in the course. Everything after it is
+this idea applied to a new problem.
+
+<Figure
+  slug="pl-expressions-cutout"
+  alt="A thick blue lever standing upright in a socket on a platform, joined by one long green rail to three identical yellow blocks waiting in a row on a tray"
+/>
+
+## A recipe, not a result
+
+In pandas, `df["a"] * 2` reaches into a frame, pulls out a column,
+doubles it, and hands you the doubled values. Three things happened
+and you are holding the result.
+
+In Polars, `pl.col("a") * 2` does none of that. It builds an object
+that *means* "take the column called a and double it". No frame was
+consulted. No arithmetic was done.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+doubled = pl.col("a") * 2
+
+print(type(doubled))
+print(doubled.meta.tree_format(return_as_string=True))
+`,
+    },
+  ]}
+/>
+
+That tree is the expression: a small syntax tree with a binary
+multiply at the root, a column reference on one side and a literal on
+the other. Polars builds one of these for every computation you
+write, then optimizes and executes the whole forest at once.
+
+## Why that is worth the indirection
+
+Four things follow from separating description from execution.
+
+1. **Expressions compose.** `pl.col("a").mean()` is an expression;
+   so is `(pl.col("a") - pl.col("a").mean()) / pl.col("a").std()`.
+   You build big ones out of small ones with no special syntax.
+2. **Expressions are values.** Put them in a list. Return one from a
+   function. Store a dictionary of them as your project's business
+   rules and apply the same rules to three different tables.
+3. **Expressions run in parallel.** Handing Polars five independent
+   descriptions lets it compute all five at once. Handing it five
+   already-computed columns does not.
+4. **Expressions can be rewritten.** The optimizer works on these
+   trees. This is the whole basis of the lazy engine.
+
+## Building one from parts
+
+Every expression starts from a source and then has methods chained
+onto it.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"mass": [3750, 5400, 3250, 4100]})
+
+print(
+    df.select(
+        pl.col("mass"),                       # a column
+        pl.lit(1000).alias("grams_per_kg"),   # a constant
+        (pl.col("mass") / 1000).alias("kg"),  # arithmetic
+        pl.col("mass").mean().alias("mean"),  # an aggregation
+        (pl.col("mass") > 4000).alias("big"), # a comparison
+    )
+)
+`,
+    },
+  ]}
+/>
+
+Notice what happened to `mean`. It produced one value, but the
+output has four rows, so Polars *broadcast* it: a length-1 result is
+repeated to match the frame. That rule is worth remembering, because
+it is what makes "compare each row to the column average" a one-liner.
+
+## The five starting points
+
+| Starter | Means |
+| --- | --- |
+| `pl.col("a")` | the column named `a` |
+| `pl.col("a", "b")` | several columns at once |
+| `pl.all()` | every column |
+| `pl.lit(3)` | a constant value |
+| `pl.len()` | the number of rows |
+
+`pl.col` is the one you will type most. It also takes a regex or a
+dtype:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame(
+    {
+        "name": ["a", "b"],
+        "score_math": [90, 70],
+        "score_art": [65, 88],
+    }
+)
+
+# By name
+print(df.select(pl.col("score_math")))
+
+# By regex: the ^…$ anchors are what tell Polars it is a pattern
+print(df.select(pl.col("^score_.*$")))
+
+# By dtype: every integer column
+print(df.select(pl.col(pl.Int64)))
+`,
+    },
+  ]}
+/>
+
+## One expression, many columns
+
+An expression that starts with `pl.all()` or a multi-column `pl.col`
+is applied to each matching column independently. This is where
+Polars starts saving you real typing.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# The mean of every numeric column, in one expression
+print(penguins.select(pl.col(pl.Float64, pl.Int64).mean().round(2)))
+
+# Round every float column to one decimal, keep everything else
+print(
+    penguins.with_columns(pl.col(pl.Float64).round(1)).head(3)
+)
+`,
+    },
+  ]}
+/>
+
+## Naming the output
+
+By default an expression keeps the name of the column it started
+from, which is a problem the moment you compute two things from one
+column.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"mass": [3750, 5400, 3250]})
+
+# Both expressions want to be called "mass"
+try:
+    df.select(pl.col("mass").min(), pl.col("mass").max())
+except Exception as error:
+    print(type(error).__name__, "-", str(error).splitlines()[0])
+
+# alias() names one output
+print(df.select(
+    pl.col("mass").min().alias("lightest"),
+    pl.col("mass").max().alias("heaviest"),
+))
+
+# name.suffix() names many at once
+print(df.select(pl.all().max().name.suffix("_max")))
+`,
+    },
+  ]}
+/>
+
+The `.name` namespace has `prefix`, `suffix`, `to_lowercase`,
+`to_uppercase`, and `map` for arbitrary renaming, and all of them
+work across multiple columns at once.
+
+## Expressions as reusable values
+
+Because an expression is an ordinary Python object, you can keep a
+library of them.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `def z_score(column: str) -> pl.Expr:
+    """Standardize a column: how many standard deviations from the mean."""
+    col = pl.col(column)
+    return ((col - col.mean()) / col.std()).round(2).alias(f"{column}_z")
+
+MEASUREMENTS = ["bill_length_mm", "flipper_length_mm", "body_mass_g"]
+
+print(
+    penguins
+    .select("species", *[z_score(c) for c in MEASUREMENTS])
+    .head(5)
+)
+`,
+    },
+  ]}
+/>
+
+`z_score` is a function that returns an expression. It has no
+DataFrame, no data, and no side effects, so it is trivially testable
+and works on any frame with that column. This pattern, expressions
+built by functions and applied wherever they are needed, is what
+idiomatic Polars looks like.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Write an expression factory"
+  instructions={`Write a function \`pct_of_max(column: str) -> pl.Expr\` that returns an expression computing each value as a percentage of the column's maximum, rounded to 1 decimal place, and named \`"<column>_pct"\`.
+
+For example, on a column \`mass\` with values 50 and 100, the output column \`mass_pct\` should hold 50.0 and 100.0.
+
+Then use it to build \`out\`, which selects \`species\` plus \`pct_of_max("body_mass_g")\`.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `def pct_of_max(column: str) -> pl.Expr:
+    ...  # TODO
+
+out = None  # TODO
+
+print(out)
+`,
+      solutionCode: `def pct_of_max(column: str) -> pl.Expr:
+    col = pl.col(column)
+    return (col / col.max() * 100).round(1).alias(f"{column}_pct")
+
+out = penguins.select("species", pct_of_max("body_mass_g"))
+
+print(out.head())
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "returns_expr",
+      name: "pct_of_max returns an expression",
+      description: "Not a Series and not a number",
+      code: `import polars as pl
+assert isinstance(pct_of_max("body_mass_g"), pl.Expr)`,
+    },
+    {
+      id: "naming",
+      name: "Names the output <column>_pct",
+      description: "Suffix applied",
+      code: `import polars as pl
+probe = pl.DataFrame({"mass": [50, 100]}).select(pct_of_max("mass"))
+assert probe.columns == ["mass_pct"], probe.columns`,
+    },
+    {
+      id: "math",
+      name: "Computes a percentage of the maximum",
+      description: "50 and 100 become 50.0 and 100.0",
+      code: `import polars as pl
+probe = pl.DataFrame({"mass": [50, 100]}).select(pct_of_max("mass"))
+assert probe["mass_pct"].to_list() == [50.0, 100.0], probe["mass_pct"].to_list()`,
+    },
+    {
+      id: "reusable",
+      name: "Works on any column name",
+      description: "Not hard-coded to body_mass_g",
+      code: `import polars as pl
+probe = pl.DataFrame({"width": [2.0, 8.0]}).select(pct_of_max("width"))
+assert probe.columns == ["width_pct"], probe.columns
+assert probe["width_pct"].to_list() == [25.0, 100.0]`,
+    },
+    {
+      id: "out_frame",
+      name: "out has species and body_mass_g_pct",
+      description: "Two columns",
+      code: `assert out.columns == ["species", "body_mass_g_pct"], out.columns
+assert out.height == 344, out.height`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`\`df.select(pl.col("mass").min(), pl.col("mass").max())\` raises an error. Why?
+
+- \`select\` accepts only one expression at a time
+  > \`select\` takes any number of expressions; passing several is the normal way to build a summary row.
+- \`min\` and \`max\` cannot be computed in the same pass over the data
+  > Both are ordinary aggregations and Polars is happy to compute them together, in parallel.
+- [o] Both expressions inherit the name \`mass\`, and two output columns cannot share a name
+  > Give at least one of them an \`alias\`, or use \`.name.suffix\` to rename them together.
+- The frame has only one column, so it cannot produce a two-column result
+  > A one-column frame can produce as many output columns as you write expressions for; width in equals width out is not a rule.
+
+An expression keeps its source column's name until you say otherwise.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the practical value of a function that *returns* an expression rather than a DataFrame?
+
+- It runs faster, because functions returning expressions skip the query planner
+  > Every expression goes through the same planner. The value is in reuse and testability, not in bypassing anything.
+- It is the only way to apply a computation to more than one column
+  > Multi-column work is done with \`pl.all()\` or a multi-column \`pl.col\`, with no helper function required.
+- [o] The same rule can be applied to any frame, kept in one place, and tested on its own
+  > A function taking and returning frames couples the rule to one table's shape; an expression factory does not.
+- It avoids reading the data twice when the rule is used in two places
+  > Whether data is read twice depends on the query plan, not on how the expression was constructed.
+
+Business rules as expression factories is the pattern that scales a Polars codebase.`}
+/>
+
+<MultipleChoice
+  markdown={`In \`df.select(pl.col("mass"), pl.col("mass").mean().alias("avg"))\` on a four-row frame, what shape is the result?
+
+- One row, because an aggregation reduces the frame to a single row
+  > Aggregating inside \`select\` alongside a full-length column does not collapse the other column; it broadcasts instead.
+- An error, because a four-row column and a one-row aggregation cannot be combined
+  > Combining them is explicitly supported: a length-1 result is broadcast to the frame's height.
+- Four rows, but \`avg\` holds the value in row 0 and nulls below
+  > Broadcasting repeats the value; it does not pad with nulls.
+- [o] Four rows, with \`avg\` repeating the same mean on each row
+  > A length-1 expression result is broadcast, which is what makes "compare each row to the average" a one-liner.
+
+That broadcasting rule is used constantly once you notice it.`}
+/>

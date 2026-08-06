@@ -1,0 +1,148 @@
+---
+title: Welcome
+description: "An expression-first tour of Polars, the fast columnar DataFrame library, with every example running in your browser."
+---
+
+Welcome to **Data Wrangling with Python Polars**. Polars is a
+DataFrame library that reads a lot like pandas from a distance and
+turns out to be a genuinely different way of thinking once you get
+close.
+
+<Figure
+  slug="data-wrangling-python-polars-thumbnail-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading standing on a wide platform beside three thick upright blocks in blue, green and yellow, the nearest block tilted forward to show its depth"
+  priority
+/>
+
+This course is about that difference. Not "here are the method
+names", but *why* Polars asks you to describe a computation before
+running it, and what you get in exchange.
+
+## Try it right now
+
+Every code block on this page and every page after it runs a real
+Python interpreter in your browser. Nothing to install, no
+`pip`, no virtual environment. The block below loads 344 penguins
+measured in Antarctica and asks Polars for the average body mass of
+each species. Click *Run*.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `penguins.group_by("species").agg(
+    pl.col("body_mass_g").mean().round(0).alias("avg_mass")
+)
+`,
+    },
+  ]}
+/>
+
+<Callout type="info" title="First run is slower">
+Polars downloads into the browser the first time a page needs it,
+which takes a few seconds. Every run after that is instant.
+</Callout>
+
+Look at what you wrote. `pl.col("body_mass_g").mean()` is not a
+number and it is not a column. It is a *description* of a
+computation, an object you can hold, name, and pass around before
+anything has been computed. That object is called an **expression**,
+and it is the single idea this course is built on.
+
+Change `"body_mass_g"` to `"flipper_length_mm"` and run again. Change
+`"species"` to `"island"`. Add a second line inside `agg` and compute
+two things at once. The shape of the code does not change, because
+you are always doing the same thing: handing Polars a description and
+letting it decide how to execute it.
+
+## Who this course is for
+
+You will get the most out of this if you can already write basic
+Python: variables, functions, lists, and a `for` loop. Beyond that,
+two paths lead here and both are welcome:
+
+- **You know pandas** and keep hearing that Polars is faster. It is,
+  but speed is the least interesting part. The interesting part is
+  that a Polars program is usually *shorter and clearer* than the
+  pandas one, and the course spends real time on why.
+- **You know very little about DataFrames** and would rather learn
+  one good model than unlearn a decade of habits. Polars is arguably
+  the better first library: it has one way to do most things, and
+  that way is consistent.
+
+You do **not** need any pandas experience. Where the course compares
+the two, the pandas side is always explained.
+
+## What you will learn
+
+By the end you will be able to:
+
+- Read data from CSV, Parquet, and JSON, and write it back out.
+- Express any column computation as a Polars expression.
+- Use the four contexts (`select`, `with_columns`, `filter`, and
+  `group_by().agg()`) fluently, and know which one a problem needs.
+- Aggregate, window, sort, join, and reshape real tables.
+- Clean missing values, messy strings, dates, and categories.
+- Write lazy queries, read the query plan Polars builds from them,
+  and understand what its optimizer did to your code.
+- Process files larger than memory with the streaming engine.
+- Move data between Polars, pandas, NumPy, and Arrow with no copying
+  where it can be avoided.
+
+## How the course is organized
+
+The first three chapters are context: what Polars is for, how it
+differs from pandas, and why columnar memory makes the difference. If
+you would rather write code immediately, skip to
+[Your first DataFrame](/courses/data-wrangling-python-polars/your-first-dataframe)
+and come back later.
+
+The middle of the course is the expression system, taught in one long
+arc, because everything else in Polars is that one idea applied to a
+new problem. The last chapters cover lazy evaluation and the
+optimizer, which are what expressions were for all along.
+
+## How the interactive widgets work
+
+Three kinds of widget appear throughout:
+
+1. **Executable code blocks.** Edit, click *Run*, see output below.
+2. **Challenge cards.** A problem with test cases. Write a solution,
+   click *Run tests*, and see which pass. Every one has a worked
+   solution behind a button.
+3. **Multiple-choice questions.** Conceptual checks at the end of
+   most pages, with an explanation for every option.
+
+<Callout type="info" title="Each code block is isolated">
+Variables defined in one code block are **not** visible to the next,
+even on the same page. Blocks that need setup carry it in a read-only
+init section you can expand. For a workspace that persists across
+runs, open the [Python Playground](/playground/python) in a new tab.
+</Callout>
+
+## The datasets you will work with
+
+Three real, public datasets recur, so you get to know them rather
+than meeting a new file every page:
+
+- **Palmer Penguins**, 344 penguins with species, island, body
+  measurements, and sex. Small, friendly, and it has genuinely
+  missing values, which makes it perfect for learning to clean data.
+- **Diamonds**, 53,940 diamonds with cut, color, clarity, and price.
+  The one to reach for when a lesson needs scale or rich categories.
+- **California Housing**, about 20,640 districts, all numeric, good
+  for summary statistics and correlations.
+
+## A note on philosophy
+
+Polars has a small number of ideas that compose, rather than a large
+number of methods that almost compose. Learning it well means
+learning those few ideas properly and then recognizing them
+everywhere. That is why this course keeps returning to expressions
+long after you can write them: fluency is not knowing more methods,
+it is seeing that a window function, a `group_by`, and a `filter` are
+all the same machinery pointed at different problems.

@@ -21,6 +21,7 @@ export const TAG_LABELS: Record<string, string> = {
   sql: "SQL",
   typescript: "TypeScript",
   // Tools / databases
+  "apache-arrow": "Apache Arrow",
   dotnet: ".NET",
   duckdb: "DuckDB",
   postgresql: "PostgreSQL",
@@ -34,6 +35,7 @@ export const TAG_LABELS: Record<string, string> = {
   numpy: "NumPy",
   pandas: "pandas",
   plotly: "Plotly",
+  polars: "Polars",
   "scikit-learn": "scikit-learn",
   scipy: "SciPy",
   seaborn: "seaborn",

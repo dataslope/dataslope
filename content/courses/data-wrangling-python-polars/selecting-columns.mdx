@@ -1,0 +1,317 @@
+---
+title: Selecting Columns
+description: "Every way to name the columns you want: by name, by position, by pattern, by type, and by exclusion."
+---
+
+`select` builds a new frame from the expressions you give it.
+Everything you do not mention is dropped, which makes it the tool for
+projecting a wide table down to the handful of columns a question
+needs.
+
+<Figure
+  slug="pl-select-cutout"
+  alt="A wide platform holding five thick upright columns in a row, two of them lifted onto a raised green tray standing beside the row"
+/>
+
+## By name
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# Bare strings are shorthand for pl.col(...)
+print(penguins.select("species", "island").head(3))
+
+# The explicit form, which is what the strings become
+print(penguins.select(pl.col("species"), pl.col("island")).head(3))
+
+# A list works too
+print(penguins.select(["species", "body_mass_g"]).head(3))
+`,
+    },
+  ]}
+/>
+
+Order is yours to choose: `select` emits columns in the order you
+name them, regardless of their order in the source.
+
+## Everything, and everything except
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(penguins.select(pl.all()).columns)
+print(penguins.select(pl.exclude("year", "sex")).columns)
+
+# drop() is the same idea from the other direction
+print(penguins.drop("year", "sex").columns)
+`,
+    },
+  ]}
+/>
+
+`pl.exclude` is the one to reach for when a table has forty columns
+and you want thirty-eight of them.
+
+## By pattern
+
+A `pl.col` argument wrapped in `^` and `$` is treated as a regular
+expression.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# Every column whose name ends in _mm
+print(penguins.select(pl.col("^.*_mm$")).head(3))
+
+# Every column starting with "bill"
+print(penguins.select(pl.col("^bill_.*$")).columns)
+`,
+    },
+  ]}
+/>
+
+<Callout type="warn" title="The anchors are the switch">
+`pl.col("^bill_.*$")` is a regex; `pl.col("bill_length_mm")` is a
+literal name. Polars decides which you meant by looking for a leading
+`^` and a trailing `$`. A pattern without them is treated as a plain
+name and raises a "column not found" error.
+</Callout>
+
+## By type
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(penguins.select(pl.col(pl.String)).columns)
+print(penguins.select(pl.col(pl.Float64, pl.Int64)).columns)
+
+# Which is exactly what you want before a numeric summary
+print(penguins.select(pl.col(pl.Float64).mean().round(2)))
+`,
+    },
+  ]}
+/>
+
+The next page covers `polars.selectors`, which does this more
+readably and composes with set operations.
+
+## By position
+
+There is no `iloc`. Positional access exists but is deliberately
+awkward, because column *names* are the stable thing and positions
+are not.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# nth() by position
+print(penguins.select(pl.nth(0), pl.nth(5)).head(3))
+
+# Or slice the columns list yourself, which reads better
+first_three = penguins.columns[:3]
+print(penguins.select(first_three).head(3))
+`,
+    },
+  ]}
+/>
+
+## Renaming while selecting
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# One at a time, with alias
+print(penguins.select(
+    pl.col("species").alias("kind"),
+    pl.col("body_mass_g").alias("mass"),
+).head(2))
+
+# Many at once, with the .name namespace
+print(penguins.select(pl.col("^.*_mm$").name.to_uppercase()).columns)
+print(penguins.select(pl.all().name.prefix("p_")).columns)
+
+# Or rename outside the expression system entirely
+print(penguins.rename({"body_mass_g": "mass_g"}).columns)
+`,
+    },
+  ]}
+/>
+
+## select is not just for columns
+
+Anything that produces a column belongs in `select`, including
+constants and computations that reference no column at all.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(
+    penguins.select(
+        pl.col("species"),
+        pl.lit("palmer-station").alias("source"),
+        pl.int_range(pl.len()).alias("row_number"),
+    ).head(3)
+)
+`,
+    },
+  ]}
+/>
+
+`pl.int_range(pl.len())` is how you get a row number in a library
+with no index. It is explicit, which is the point: the numbers are a
+column you asked for rather than an axis you inherited.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Project a tidy measurement table"
+  instructions={`From \`penguins\`, build a frame called \`tidy\` with exactly these columns, in this order:
+
+1. \`species\`
+2. \`island\`
+3. every column whose name ends in \`_mm\`, with its name **uppercased**
+
+Do not list the \`_mm\` columns by hand: match them with a pattern, so the code still works if a fourth measurement is added.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `tidy = None  # TODO
+
+print(tidy)
+`,
+      solutionCode: `tidy = penguins.select(
+    "species",
+    "island",
+    pl.col("^.*_mm$").name.to_uppercase(),
+)
+
+print(tidy.head())
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_frame",
+      name: "tidy is a DataFrame",
+      description: "Type check",
+      code: `import polars as pl
+assert isinstance(tidy, pl.DataFrame)`,
+    },
+    {
+      id: "columns",
+      name: "The right columns in the right order",
+      description: "species, island, then three uppercased measurements",
+      code: `expected = [
+    "species",
+    "island",
+    "BILL_LENGTH_MM",
+    "BILL_DEPTH_MM",
+    "FLIPPER_LENGTH_MM",
+]
+assert tidy.columns == expected, tidy.columns`,
+    },
+    {
+      id: "rows",
+      name: "Every row survives",
+      description: "344 penguins",
+      code: `assert tidy.height == 344, tidy.height`,
+    },
+    {
+      id: "pattern",
+      name: "Matched by pattern, not by hand",
+      description: "A new _mm column would be picked up too",
+      code: `import polars as pl
+probe = penguins.with_columns(
+    pl.col("bill_length_mm").alias("tail_length_mm")
+)
+out = probe.select("species", "island", pl.col("^.*_mm$").name.to_uppercase())
+assert "TAIL_LENGTH_MM" in out.columns, out.columns`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why does \`pl.col("bill_.*")\` raise a "column not found" error while \`pl.col("^bill_.*$")\` works?
+
+- The first pattern is missing a wildcard for the trailing characters
+  > \`.*\` already matches any trailing characters; the difference is not in the pattern's content.
+- Regular expressions must always be passed as compiled pattern objects
+  > Polars takes patterns as plain strings; no compilation step is involved.
+- [o] Polars treats the argument as a regex only when it is anchored with \`^\` and \`$\`
+  > Without the anchors it is a literal column name, and no column is literally called \`bill_.*\`.
+- The first pattern matches too many columns, and Polars rejects ambiguous matches
+  > Matching many columns is fine and often the intent; a multi-column match is a normal Polars result.
+
+The anchors are the switch between "a name" and "a pattern".`}
+/>
+
+<MultipleChoice
+  markdown={`What is \`pl.int_range(pl.len())\` for?
+
+- Generating a random sample of row positions
+  > Sampling is done with \`sample\`; \`int_range\` produces a deterministic ascending sequence.
+- Limiting the frame to its first \`n\` rows
+  > Limiting rows is \`head\` or \`limit\`; this expression adds values rather than removing rows.
+- [o] Producing a row-number column, since Polars has no index
+  > Row numbers are a column you ask for, not an axis you inherit.
+- Converting a string column into consecutive integer codes
+  > Encoding categories as integers is what \`cast(pl.Categorical).to_physical()\` does; this ignores existing columns entirely.
+
+Making the row number explicit is deliberate: it cannot silently participate in an operation you did not intend.`}
+/>
+
+<MultipleChoice
+  markdown={`A table has 40 columns and you want all of them except \`internal_id\` and \`_scratch\`. What reads best?
+
+- \`df.select(df.columns[:38])\`
+  > This depends on the two unwanted columns being the last two, which is fragile and silent when the order changes.
+- [o] \`df.select(pl.exclude("internal_id", "_scratch"))\`
+  > Or \`df.drop(...)\`, which expresses the same thing from the other direction.
+- \`df.select(pl.all()).drop(pl.col("internal_id"))\`
+  > \`drop\` takes column names rather than expressions, and the \`select(pl.all())\` in front of it does nothing.
+- Listing the other 38 column names explicitly in a \`select\` call
+  > It works, but it breaks the moment a column is added and is painful to review in a diff.
+
+Say what you are removing when that list is shorter than what you are keeping.`}
+/>

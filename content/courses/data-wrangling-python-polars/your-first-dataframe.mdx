@@ -1,0 +1,340 @@
+---
+title: Your First DataFrame
+description: "Building DataFrames and Series by hand, and reading the output Polars prints back at you."
+---
+
+Everything in Polars sits on two containers. A **Series** is one
+typed column. A **DataFrame** is an ordered collection of Series that
+all have the same length. That is the whole data model; there is no
+index, no hierarchical axis, and no third container hiding behind
+them.
+
+<Figure
+  slug="pl-first-dataframe-cutout"
+  alt="A wide low tray on a platform holding three thick upright columns of different heights in blue, green and yellow, each seated in its own deep socket"
+/>
+
+## A Series
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+masses = pl.Series("body_mass_g", [3750, 3800, 3250, 4500])
+
+print(masses)
+`,
+    },
+  ]}
+/>
+
+Read the header block that Polars prints:
+
+```
+shape: (4,)
+Series: 'body_mass_g' [i64]
+```
+
+`shape` is the length, then the name, then the dtype in square
+brackets. `i64` is a 64-bit signed integer. Polars always shows you
+the type, on every printed frame, which turns out to prevent a lot of
+bugs.
+
+## A DataFrame
+
+The usual constructor takes a dictionary of column name to values.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame(
+    {
+        "species": ["Adelie", "Adelie", "Gentoo", "Chinstrap"],
+        "island": ["Torgersen", "Biscoe", "Biscoe", "Dream"],
+        "body_mass_g": [3750, 3800, 5400, 3250],
+        "adult": [True, True, True, False],
+    }
+)
+
+print(df)
+`,
+    },
+  ]}
+/>
+
+The printed frame carries the shape, then a name row, then a dtype
+row (`str`, `i64`, `bool`), then the data. Getting a type row for
+free on every print is a small thing that pays off constantly.
+
+<Callout type="info" title="Printing versus displaying">
+In these code blocks, a bare expression on the last line is
+displayed as a rendered table, the way a notebook would. `print()`
+gives you the text box above. Both are useful; the rendered table is
+easier to scan, the text box is what you will see in a terminal.
+</Callout>
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame(
+    {
+        "species": ["Adelie", "Adelie", "Gentoo", "Chinstrap"],
+        "body_mass_g": [3750, 3800, 5400, 3250],
+    }
+)
+
+# No print(): the last expression is displayed as a table
+df
+`,
+    },
+  ]}
+/>
+
+## Other ways to build one
+
+Three more constructors cover most of what you will meet.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+# 1. From a list of row dictionaries (JSON-shaped data)
+rows = pl.DataFrame(
+    [
+        {"city": "Oslo", "temp_c": -3.0},
+        {"city": "Lisbon", "temp_c": 17.5},
+    ]
+)
+print(rows)
+
+# 2. From a list of tuples, naming the columns yourself.
+#    orient="row" says each tuple is a row, not a column.
+tuples = pl.DataFrame(
+    [("Oslo", -3.0), ("Lisbon", 17.5)],
+    schema=["city", "temp_c"],
+    orient="row",
+)
+print(tuples)
+
+# 3. From existing Series
+a = pl.Series("city", ["Oslo", "Lisbon"])
+b = pl.Series("temp_c", [-3.0, 17.5])
+print(pl.DataFrame([a, b]))
+`,
+    },
+  ]}
+/>
+
+<Callout type="warn" title="orient matters for tuples">
+Given `[("Oslo", -3.0), ("Lisbon", 17.5)]`, Polars cannot tell
+whether you meant two rows or two columns. It will guess from the
+shape and the types, and it will occasionally guess wrong. Pass
+`orient="row"` or `orient="col"` and remove the ambiguity.
+</Callout>
+
+## Declaring types up front
+
+Passing a `schema` lets you fix the dtypes rather than accepting what
+Polars infers.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+inferred = pl.DataFrame({"id": [1, 2, 3], "score": [90, 85, 77]})
+print(inferred.dtypes)
+
+declared = pl.DataFrame(
+    {"id": [1, 2, 3], "score": [90, 85, 77]},
+    schema={"id": pl.UInt32, "score": pl.Float64},
+)
+print(declared.dtypes)
+print(declared)
+`,
+    },
+  ]}
+/>
+
+Narrowing `id` from `Int64` to `UInt32` halves the memory that
+column uses. On four rows that is irrelevant; on four hundred million
+it is not.
+
+## Getting at the pieces
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame(
+    {
+        "species": ["Adelie", "Gentoo", "Chinstrap"],
+        "body_mass_g": [3750, 5400, 3250],
+    }
+)
+
+print("columns:", df.columns)
+print("dtypes :", df.dtypes)
+print("shape  :", df.shape)
+print("height :", df.height)
+print("width  :", df.width)
+
+# One column, as a Series
+print(df["body_mass_g"])
+
+# One value
+print(df["body_mass_g"][1])
+
+# One row, as a tuple
+print(df.row(1))
+`,
+    },
+  ]}
+/>
+
+`df["col"]` is fine for pulling out a Series to look at. It is *not*
+how you do work: the moment you want a computation, you switch to
+expressions, which is the next chapter but one.
+
+## Building one yourself
+
+<ChallengeCard
+  adapter="python"
+  title="Build a frame with the right types"
+  instructions={`Create a DataFrame called \`stock\` with exactly these three columns, in this order:
+
+| column | values | dtype |
+| --- | --- | --- |
+| \`sku\` | \`"A1"\`, \`"B2"\`, \`"C3"\` | \`pl.String\` |
+| \`units\` | \`12\`, \`0\`, \`7\` | \`pl.UInt16\` |
+| \`price\` | \`9.99\`, \`24.5\`, \`3.0\` | \`pl.Float64\` |
+
+The types are part of the task: declare them rather than letting Polars infer.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+stock = None  # TODO
+
+print(stock)
+`,
+      solutionCode: `import polars as pl
+
+stock = pl.DataFrame(
+    {
+        "sku": ["A1", "B2", "C3"],
+        "units": [12, 0, 7],
+        "price": [9.99, 24.5, 3.0],
+    },
+    schema={"sku": pl.String, "units": pl.UInt16, "price": pl.Float64},
+)
+
+print(stock)
+print(stock.dtypes)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_frame",
+      name: "stock is a DataFrame",
+      description: "Type check",
+      code: `import polars as pl
+assert isinstance(stock, pl.DataFrame)`,
+    },
+    {
+      id: "shape",
+      name: "Three rows, three columns",
+      description: "shape is (3, 3)",
+      code: `assert stock.shape == (3, 3), stock.shape`,
+    },
+    {
+      id: "order",
+      name: "Columns in the right order",
+      description: "sku, units, price",
+      code: `assert stock.columns == ["sku", "units", "price"], stock.columns`,
+    },
+    {
+      id: "dtypes",
+      name: "Declared dtypes",
+      description: "String, UInt16, Float64",
+      code: `import polars as pl
+assert stock.dtypes == [pl.String, pl.UInt16, pl.Float64], stock.dtypes`,
+    },
+    {
+      id: "values",
+      name: "The right values",
+      description: "Contents match the table",
+      code: `assert stock["sku"].to_list() == ["A1", "B2", "C3"]
+assert stock["units"].to_list() == [12, 0, 7]
+assert stock["price"].to_list() == [9.99, 24.5, 3.0]`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does the \`i64\` in \`Series: 'mass' [i64]\` tell you?
+
+- The Series holds 64 values
+  > The length appears on the \`shape:\` line above it; \`i64\` is unrelated to how many values there are.
+- [o] The column's values are 64-bit signed integers
+  > Polars prints the dtype on every Series and every DataFrame, which makes type surprises visible immediately.
+- The Series occupies 64 bytes of memory in total
+  > Total memory depends on the number of values; the notation describes the width of a single value, not the buffer.
+- The values are indexed from 0 to 64 in this particular Series
+  > Polars has no index at all, so there is nothing here describing index positions.
+
+Types are printed everywhere in Polars on purpose.`}
+/>
+
+<MultipleChoice
+  markdown={`Why pass \`orient="row"\` when building a frame from a list of tuples?
+
+- It sorts the resulting rows into a stable order for you
+  > The argument describes how to interpret the input, not how to order the output; row order is preserved as given.
+- It converts each tuple into a struct column rather than separate columns
+  > Struct columns are built with \`pl.struct\`; \`orient\` only chooses whether tuples are read as rows or as columns.
+- [o] A list of tuples is ambiguous, and it says each tuple is a row rather than a column
+  > Polars guesses from shape and dtypes otherwise, and the guess is wrong often enough to be worth removing.
+- It is required whenever a frame is built from anything other than a dictionary
+  > Frames built from row dictionaries or from Series are unambiguous, so no orientation hint is needed for them.
+
+A square input (three tuples of three values) is the case where guessing fails silently.`}
+/>
+
+<MultipleChoice
+  markdown={`Given \`df\` with a \`price\` column, what is \`df["price"]\`?
+
+- A DataFrame with one column
+  > Selecting with \`df.select("price")\` gives a one-column DataFrame; square-bracket access on a single name gives you the column itself.
+- An expression describing the price column
+  > \`pl.col("price")\` builds an expression. Square-bracket access reaches into an existing frame and returns the data.
+- A Python list of the price values
+  > A list is what \`.to_list()\` produces; the bracket access returns a typed Polars container instead.
+- [o] A Series holding that column's values
+  > Useful for inspecting a column, but computations belong in expressions rather than in extracted Series.
+
+Pulling a Series out to look at it is fine. Pulling one out to compute with it is usually the slow path.`}
+/>

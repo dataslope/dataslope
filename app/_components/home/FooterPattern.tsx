@@ -1,13 +1,13 @@
 "use client";
 
 import { TabbiedPattern } from "tabbied/react";
-import { mixtape } from "tabbied/patterns";
+import { glazing } from "tabbied/patterns";
 
 /**
  * The faint decorative band that sits directly above the footer content.
  *
- * `mixtape` is the reviewer's pick, replacing the `bothways` crossings this
- * started as.
+ * `glazing` is the reviewer's pick, replacing the `mixtape` bars it ran with
+ * before (and the `bothways` crossings this started as).
  *
  * Colours are theme-neutral on purpose. The palette's first entry is the
  * background, left transparent so the page colour shows through, and the inks
@@ -36,7 +36,7 @@ export function FooterPattern() {
       className="pointer-events-none w-full select-none opacity-60 [mask-image:linear-gradient(to_bottom,transparent,black_55%)] dark:opacity-50"
     >
       <TabbiedPattern
-        pattern={mixtape}
+        pattern={glazing}
         palette={[
           "transparent",
           "rgba(128,128,128,0.30)",

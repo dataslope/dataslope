@@ -1,0 +1,362 @@
+---
+title: Idiomatic Polars
+description: "The habits that separate Polars written by someone who knows it from Polars written by someone translating pandas line by line."
+---
+
+Everything in this course works. This page is about which of the
+working options a Polars programmer would actually write, and why.
+
+<Figure
+  slug="pl-idiomatic-cutout"
+  alt="A wide platform holding one long straight blue rail with three thick green blocks seated evenly along it, and a knotted red rail lying discarded on the ground beside the platform"
+/>
+
+## 1. Stay in the expression system
+
+The single biggest difference between fast and slow Polars is whether
+a Python function ended up in the hot path.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import time
+import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `def timed(label, fn):
+    start = time.perf_counter()
+    out = fn()
+    print(f"{label:<12} {(time.perf_counter() - start) * 1000:8.1f} ms -> {out[0]}")
+
+timed(
+    "map_elements",
+    lambda: diamonds.select(
+        pl.col("price")
+        .map_elements(lambda p: p * 2, return_dtype=pl.Int64)
+        .alias("d")
+    )["d"].to_list(),
+)
+
+timed(
+    "expression",
+    lambda: diamonds.select((pl.col("price") * 2).alias("d"))["d"].to_list(),
+)
+`,
+    },
+  ]}
+/>
+
+Same answer, one of them an order of magnitude slower even in a
+single-threaded browser. On a real machine the expression version
+also uses every core. Before reaching for `map_elements`, check
+whether `when/then`, the `.str`/`.dt`/`.list` namespaces, or plain
+arithmetic already covers it. They almost always do.
+
+## 2. Chain, and let the planner flatten it
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# Readable steps, one pipeline. Wrap in parens for the line breaks.
+result = (
+    penguins.lazy()
+    .drop_nulls("body_mass_g")
+    .with_columns(mass_kg=pl.col("body_mass_g") / 1000)
+    .filter(pl.col("mass_kg") > 4.0)
+    .group_by("species")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("mass_kg").mean().round(2).alias("avg_kg"),
+    )
+    .sort("avg_kg", descending=True)
+    .collect()
+)
+
+print(result)
+`,
+    },
+  ]}
+/>
+
+Consecutive filters merge, consecutive projections collapse, and
+repeated subexpressions are computed once. Writing the chain in
+readable steps costs nothing, so optimize for the reader.
+
+## 3. Name things with keyword arguments
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"a": [1, 2, 3], "b": [10, 20, 30]})
+
+# Fine
+print(df.with_columns((pl.col("a") + pl.col("b")).alias("total")))
+
+# Better: the name sits where you read it, and cannot drift from the value
+print(df.with_columns(total=pl.col("a") + pl.col("b")))
+`,
+    },
+  ]}
+/>
+
+## 4. Put business rules in functions that return expressions
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `def price_band() -> pl.Expr:
+    """Our standard price banding. One definition, used everywhere."""
+    price = pl.col("price")
+    return (
+        pl.when(price < 1000).then(pl.lit("budget"))
+        .when(price < 5000).then(pl.lit("mid"))
+        .otherwise(pl.lit("premium"))
+        .alias("band")
+    )
+
+print(
+    diamonds.with_columns(price_band())
+    .group_by("band")
+    .agg(pl.len().alias("n"))
+    .sort("n", descending=True)
+)
+`,
+    },
+  ]}
+/>
+
+The function has no frame, no data, and no side effects, so it can be
+unit-tested against a three-row fixture and reused on any table with
+a `price` column. This is the pattern that keeps a growing Polars
+codebase from turning into a pile of one-off transformations.
+
+## 5. Use `pipe` for frame-level steps
+
+`pipe` does the same thing one level up, for reusable steps that take
+and return a frame.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+import polars.selectors as cs
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `def tidy_names(df: pl.DataFrame) -> pl.DataFrame:
+    return df.rename({c: c.lower().replace(" ", "_") for c in df.columns})
+
+def drop_constant_columns(df: pl.DataFrame) -> pl.DataFrame:
+    constant = [c for c in df.columns if df[c].n_unique() <= 1]
+    return df.drop(constant)
+
+cleaned = (
+    penguins.pipe(tidy_names)
+    .pipe(drop_constant_columns)
+    .with_columns(cs.float().round(1))
+)
+
+print(cleaned.head(3))
+`,
+    },
+  ]}
+/>
+
+## 6. Prefer selectors to hard-coded column lists
+
+Covered on its own page, and it belongs on this one too: a list of
+column names is a bug waiting for someone to add a column.
+
+## 7. Scan, do not read
+
+`scan_csv` and `scan_parquet` cost nothing extra and let the
+optimizer push filters and column selection into the reader. Reach
+for `read_*` only when you genuinely want the frame in memory now.
+
+## The anti-patterns, collected
+
+| Instead of | Write |
+| --- | --- |
+| `map_elements(lambda x: ...)` | an expression |
+| `for` loop over rows | an expression |
+| `df = pl.concat([df, part])` in a loop | `pl.concat(parts)` once, or a glob |
+| `read_csv` then filter | `scan_csv` then filter |
+| `collect()` mid-chain | `collect()` once, at the end |
+| `df["a"].to_list()` then Python | keep it in Polars |
+| a hard-coded list of column names | a selector |
+| `to_pandas()` to reuse known code | learn the Polars equivalent once |
+
+## When to break the rules
+
+- `map_elements` is fine for something Polars genuinely cannot
+  express, on a small frame, once. A parsing library call over 500
+  rows is not worth an afternoon of expression golf.
+- `to_pandas()` is right when you need a library that only speaks
+  pandas. Convert at the boundary, not in the middle.
+- Eager mode is right while exploring. Reach for lazy when the code
+  moves into a script.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Rewrite it idiomatically"
+  instructions={`\`legacy\` below is written the way someone translating pandas would write it: a Python loop, a \`map_elements\`, and a hard-coded column list.
+
+Write \`idiomatic(df)\` producing the **same result** using expressions only: no Python loop over rows, no \`map_elements\`, and no \`to_list()\`.
+
+The result must have columns \`species\`, \`n\`, \`avg_kg\` (mean \`body_mass_g\` divided by 1000, rounded to 2), for penguins over 4000 g, sorted by \`avg_kg\` descending.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])
+
+def legacy(df: pl.DataFrame) -> pl.DataFrame:
+    rows = []
+    for species in df["species"].unique().to_list():
+        masses = [
+            m
+            for m in df.filter(pl.col("species") == species)["body_mass_g"].to_list()
+            if m is not None and m > 4000
+        ]
+        if masses:
+            rows.append(
+                {
+                    "species": species,
+                    "n": len(masses),
+                    "avg_kg": round(sum(masses) / len(masses) / 1000, 2),
+                }
+            )
+    return pl.DataFrame(rows).sort("avg_kg", descending=True)`,
+      starterCode: `def idiomatic(df: pl.DataFrame) -> pl.DataFrame:
+    ...  # TODO
+
+print(idiomatic(penguins))
+`,
+      solutionCode: `def idiomatic(df: pl.DataFrame) -> pl.DataFrame:
+    return (
+        df.lazy()
+        .filter(pl.col("body_mass_g") > 4000)
+        .group_by("species")
+        .agg(
+            pl.len().alias("n"),
+            (pl.col("body_mass_g").mean() / 1000).round(2).alias("avg_kg"),
+        )
+        .sort("avg_kg", descending=True)
+        .collect()
+    )
+
+print(legacy(penguins))
+print(idiomatic(penguins))
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "same",
+      name: "Same result as the legacy version",
+      description: "Rows, columns, and values",
+      code: `import polars as pl
+from polars.testing import assert_frame_equal
+assert_frame_equal(
+    idiomatic(penguins), legacy(penguins), check_dtypes=False
+)`,
+    },
+    {
+      id: "cols",
+      name: "The right columns in order",
+      description: "species, n, avg_kg",
+      code: `assert idiomatic(penguins).columns == ["species", "n", "avg_kg"]`,
+    },
+    {
+      id: "sorted",
+      name: "Sorted by avg_kg descending",
+      description: "Heaviest species first",
+      code: `vals = idiomatic(penguins)["avg_kg"].to_list()
+assert vals == sorted(vals, reverse=True), vals`,
+    },
+    {
+      id: "no_loop",
+      name: "No Python loop over rows",
+      description: "Checked by inspecting the source",
+      code: `import inspect
+src = inspect.getsource(idiomatic)
+assert "for " not in src, "still looping in Python"`,
+    },
+    {
+      id: "no_map_elements",
+      name: "No map_elements and no to_list",
+      description: "Everything stays in expressions",
+      code: `import inspect
+src = inspect.getsource(idiomatic)
+assert "map_elements" not in src, "map_elements is the slow path"
+assert "to_list" not in src, "pulling values into Python defeats the point"`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the strongest reason to avoid \`map_elements\` with a Python lambda?
+
+- It produces a different dtype from the equivalent expression
+  > The dtype is under your control via \`return_dtype\`; correctness is not the problem.
+- It only works in eager mode
+  > It runs in lazy plans too. That is part of the trouble: the planner cannot see inside it.
+- [o] It runs row by row through the interpreter, giving up vectorization, parallelism, and the optimizer
+  > Check \`when/then\` and the \`.str\`/\`.dt\`/\`.list\` namespaces first; they almost always cover it.
+- It cannot be used on string columns
+  > It accepts any column type. The objection is to what it costs, not to where it applies.
+
+It stays reasonable for something Polars genuinely cannot express, on a small frame, once.`}
+/>
+
+<MultipleChoice
+  markdown={`Why write business rules as functions that return \`pl.Expr\`?
+
+- Expressions returned from functions are cached between calls
+  > No caching happens across calls; the benefits are about structure rather than speed.
+- It is the only way to use the same logic in \`select\` and \`agg\`
+  > An inline expression works in both contexts too; a function just saves writing it twice.
+- [o] The rule has one definition, is testable on a small fixture, and works on any frame with those columns
+  > A function that takes and returns frames couples the rule to one table's shape.
+- Functions returning expressions bypass the query planner's overhead
+  > Every expression goes through the planner regardless of how it was constructed.
+
+This is what keeps a growing Polars codebase from becoming a pile of one-off transformations.`}
+/>
+
+<MultipleChoice
+  markdown={`When is \`to_pandas()\` the right call?
+
+- Whenever a computation feels easier to express in pandas
+  > That is the habit worth breaking; the Polars equivalent is usually shorter once you know it.
+- Before every plot, since plotting libraries need pandas
+  > Many plotting libraries now accept any Arrow-backed frame, and those that do not usually accept NumPy arrays.
+- [o] At the boundary, when you must hand data to a library that only speaks pandas
+  > Convert once, at the edge, rather than in the middle of a pipeline.
+- Whenever the frame is small enough that performance does not matter
+  > Size does not make a conversion worthwhile; if performance is irrelevant, staying in Polars costs nothing either.
+
+A \`to_pandas()\` in the middle of a chain ends the query plan and gives up every optimization downstream.`}
+/>

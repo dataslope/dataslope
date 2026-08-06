@@ -1,0 +1,381 @@
+---
+title: Working with Strings
+description: "The .str namespace: cleaning, matching, extracting, splitting, and replacing text without a Python loop in sight."
+---
+
+Text arrives dirty. Trailing spaces, inconsistent case, a phone
+number with three different separators, a category spelled four ways.
+Polars puts every string operation behind the `.str` namespace, and
+all of them are vectorized.
+
+<Figure
+  slug="pl-strings-cutout"
+  alt="A long thick green ribbon of solid material lying along a platform, cut cleanly into three shorter pieces by a wide blue blade on a heavy stand"
+/>
+
+## Cleaning
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"city": ["  Oslo ", "LISBON", "bergen  ", "Reykjavík"]})
+
+print(
+    df.with_columns(
+        stripped=pl.col("city").str.strip_chars(),
+        lower=pl.col("city").str.to_lowercase(),
+        title=pl.col("city").str.strip_chars().str.to_titlecase(),
+        length=pl.col("city").str.len_chars(),
+        bytes=pl.col("city").str.len_bytes(),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+`len_chars` and `len_bytes` differ for anything outside ASCII:
+"Reykjavík" is 9 characters and 10 bytes. Use `len_chars` when you
+mean "how long is this word" and `len_bytes` when you mean "how much
+memory does it take".
+
+## The canonical cleaning chain
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+raw = pl.DataFrame(
+    {"category": ["  Books ", "BOOKS", "books", "Book s", "Music", " music"]}
+)
+
+print(
+    raw.with_columns(
+        clean=pl.col("category").str.strip_chars().str.to_lowercase()
+    )["clean"].value_counts(sort=True)
+)
+`,
+    },
+  ]}
+/>
+
+Six raw values collapse to three real ones, and `"Book s"` stays
+separate because it is a genuinely different typo that needs a human
+decision rather than a lowercase.
+
+## Matching and testing
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `species = pl.col("species")
+
+print(
+    penguins.select("species")
+    .unique()
+    .with_columns(
+        starts_a=species.str.starts_with("A"),
+        ends_o=species.str.ends_with("o"),
+        has_in=species.str.contains("in"),
+        # A regex: two vowels in a row
+        two_vowels=species.str.contains(r"[aeiou]{2}"),
+    )
+    .sort("species")
+)
+`,
+    },
+  ]}
+/>
+
+`contains` takes a regex by default. Pass `literal=True` when the
+needle contains regex metacharacters you mean literally, such as a
+dot in a filename.
+
+<Callout type="warn" title="Polars regexes are not Python regexes">
+Polars uses Rust's `regex` crate, which guarantees linear-time
+matching by leaving out the two features that make backtracking
+possible: **backreferences** (`(.)\1`) and **lookaround**
+(`(?=...)`, `(?<=...)`). Both raise a `ComputeError` rather than
+silently misbehaving. The trade is that no pattern you write can
+blow up into catastrophic backtracking on a hostile input. When you
+genuinely need one of them, extract the candidates first and do the
+final test in Python on the much smaller result.
+</Callout>
+
+## Extracting
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+logs = pl.DataFrame(
+    {
+        "line": [
+            "2026-03-01 ERROR disk full",
+            "2026-03-02 WARN  retrying",
+            "2026-03-02 INFO  ok",
+        ]
+    }
+)
+
+print(
+    logs.with_columns(
+        date=pl.col("line").str.extract(r"^(\\d{4}-\\d{2}-\\d{2})"),
+        level=pl.col("line").str.extract(r"(ERROR|WARN|INFO)"),
+        # extract_all returns every match, as a list
+        numbers=pl.col("line").str.extract_all(r"\\d+"),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+`extract` takes the first capture group by default and returns null
+when nothing matches, which is exactly the behaviour you want for
+messy input: no exception, and the failures are countable.
+
+## Splitting
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+people = pl.DataFrame(
+    {"full_name": ["Ada Lovelace", "Grace Hopper", "Alan Turing"]}
+)
+
+# Into a list column
+print(people.with_columns(parts=pl.col("full_name").str.split(" ")))
+
+# Into separate columns, via a struct
+print(
+    people.with_columns(
+        pl.col("full_name")
+        .str.split_exact(" ", 1)
+        .struct.rename_fields(["first", "last"])
+        .alias("name")
+    ).unnest("name")
+)
+`,
+    },
+  ]}
+/>
+
+## Replacing
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+phones = pl.DataFrame(
+    {"phone": ["+47 22 33 44 55", "(+351) 21-123-4567", "+354 555 1234"]}
+)
+
+print(
+    phones.with_columns(
+        # replace changes the first match, replace_all changes every match
+        first_only=pl.col("phone").str.replace(r"\\s", ""),
+        digits=pl.col("phone").str.replace_all(r"[^0-9]", ""),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+<Callout type="warn" title="replace is not replace_all">
+`str.replace` changes only the *first* match. Reaching for it when
+you meant `replace_all` produces output that looks almost right,
+which is worse than output that looks wrong.
+</Callout>
+
+## Padding, slicing, and joining
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"code": ["7", "42", "1234"], "word": ["alpha", "beta", "gamma"]})
+
+print(
+    df.with_columns(
+        padded=pl.col("code").str.pad_start(5, "0"),
+        head=pl.col("word").str.slice(0, 3),
+        tail=pl.col("word").str.slice(-2),
+    )
+)
+
+# Concatenating columns
+print(df.select(pl.concat_str("code", "word", separator=":").alias("joined")))
+
+# Concatenating down a column
+print(df.select(pl.col("word").str.join(", ").alias("all_words")))
+`,
+    },
+  ]}
+/>
+
+Note the two directions: `concat_str` joins several columns within a
+row, `str.join` joins one column's values down the rows.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Parse a messy product code"
+  instructions={`\`raw\` has a \`code\` column of the form \`"<REGION>-<number>-<name>"\`, with inconsistent spacing and casing.
+
+Build \`parsed\` with these columns, in this order:
+
+1. \`code\`, unchanged
+2. \`region\`, the part before the first hyphen, trimmed and **uppercased**
+3. \`item_id\`, the number between the hyphens, as \`pl.Int64\`
+4. \`name\`, everything after the second hyphen, trimmed and **title-cased**
+
+Rows whose code does not match the pattern should get nulls rather than raising.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+raw = pl.DataFrame(
+    {
+        "code": [
+            " eu-1041-blue widget ",
+            "NA-77-red BOLT",
+            "apac-9-Green Panel",
+            "malformed entry",
+        ]
+    }
+)`,
+      starterCode: `parsed = None  # TODO
+
+print(parsed)
+`,
+      solutionCode: `pattern = r"^\\s*([A-Za-z]+)-(\\d+)-(.*?)\\s*$"
+
+parsed = raw.with_columns(
+    region=pl.col("code").str.extract(pattern, 1).str.to_uppercase(),
+    item_id=pl.col("code").str.extract(pattern, 2).cast(pl.Int64),
+    name=pl.col("code").str.extract(pattern, 3).str.to_titlecase(),
+)
+
+print(parsed)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "cols",
+      name: "The right columns in order",
+      description: "code, region, item_id, name",
+      code: `assert parsed.columns == ["code", "region", "item_id", "name"], parsed.columns`,
+    },
+    {
+      id: "rows",
+      name: "All four rows kept",
+      description: "Nothing dropped",
+      code: `assert parsed.height == 4, parsed.height`,
+    },
+    {
+      id: "region",
+      name: "region is trimmed and uppercased",
+      description: "EU, NA, APAC, then null",
+      code: `assert parsed["region"].to_list() == ["EU", "NA", "APAC", None], parsed["region"].to_list()`,
+    },
+    {
+      id: "item_id",
+      name: "item_id is a real integer",
+      description: "Int64, not a string",
+      code: `import polars as pl
+assert parsed["item_id"].dtype == pl.Int64, parsed["item_id"].dtype
+assert parsed["item_id"].to_list() == [1041, 77, 9, None], parsed["item_id"].to_list()`,
+    },
+    {
+      id: "name",
+      name: "name is trimmed and title-cased",
+      description: "Blue Widget, Red Bolt, Green Panel, null",
+      code: `expected = ["Blue Widget", "Red Bolt", "Green Panel", None]
+assert parsed["name"].to_list() == expected, parsed["name"].to_list()`,
+    },
+    {
+      id: "malformed",
+      name: "The malformed row produced nulls, not an error",
+      description: "Extraction returns null on no match",
+      code: `bad = parsed.filter(parsed["code"] == "malformed entry")
+assert bad["region"][0] is None
+assert bad["item_id"][0] is None`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`\`str.extract(r"(\\d+)")\` is applied to a row containing no digits. What happens?
+
+- The row is dropped from the result
+  > Expressions never change a frame's height; \`filter\` is the only thing that removes rows.
+- [o] That row gets null
+  > No exception, and the failures are countable with \`null_count()\`, which is what you want for messy input.
+- An exception is raised for the whole column
+  > Raising on the first non-matching row would make the method useless on real data.
+- An empty string is returned for that row
+  > An empty string would be indistinguishable from a genuine match of zero length; null says "no match" unambiguously.
+
+Count the nulls afterwards to find out how much of your input did not fit the pattern.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between \`str.replace\` and \`str.replace_all\`?
+
+- \`replace\` takes a literal string and \`replace_all\` takes a regex
+  > Both accept a regex by default, and both take \`literal=True\` when you want the pattern treated literally.
+- \`replace\` returns a new column while \`replace_all\` modifies in place
+  > Nothing in Polars modifies in place; both return a new column.
+- [o] \`replace\` changes only the first match in each value
+  > Output that is almost right is worse than output that is obviously wrong, which is what makes this one costly.
+- \`replace\` works on one column and \`replace_all\` across every column
+  > Which columns are affected is decided by the expression they are attached to, not by the method name.
+
+Stripping non-digits from a phone number with \`replace\` leaves all but the first separator in place.`}
+/>
+
+<MultipleChoice
+  markdown={`Which pair joins values *across columns within a row*, and which joins them *down a column*?
+
+- Both operate down a column, and only their separators differ
+  > They produce different shapes: one returns a value per row, the other a single value for the whole column.
+- Both operate across a row, and only the argument type differs
+  > \`str.join\` reduces a column to one string, which is a down-the-column operation by definition.
+- \`str.join\` works across a row, \`concat_str\` works down a column
+  > This has the two the wrong way around.
+- [o] \`concat_str\` works across a row, \`str.join\` works down a column
+  > One returns a column the same height as the frame; the other returns a single value.
+
+The distinction matters because their outputs have different shapes.`}
+/>

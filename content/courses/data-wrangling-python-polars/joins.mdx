@@ -1,0 +1,395 @@
+---
+title: Joining Frames
+description: "inner, left, full, semi, anti, and cross joins, the row-multiplication trap, and how to check a join did what you meant."
+---
+
+A join combines two frames by matching values in a key column. It is
+the operation that most often silently produces the wrong number of
+rows, so this page spends as much time on verification as on syntax.
+
+<Figure
+  slug="pl-joins-cutout"
+  alt="Two wide platforms standing side by side, a thick blue block on one and a thick green block on the other, bridged by a single solid yellow key-shaped bar spanning the gap"
+/>
+
+## The join types
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+people = pl.DataFrame(
+    {"id": [1, 2, 3], "name": ["Ada", "Grace", "Alan"]}
+)
+scores = pl.DataFrame(
+    {"id": [2, 3, 4], "score": [95, 88, 70]}
+)
+
+for how in ["inner", "left", "right", "full", "semi", "anti"]:
+    print(f"── {how}")
+    print(people.join(scores, on="id", how=how).sort("id" if how != "full" else "name"))
+`,
+    },
+  ]}
+/>
+
+| How | Keeps |
+| --- | --- |
+| `inner` | rows whose key is in both (the default) |
+| `left` | every left row; unmatched right columns are null |
+| `right` | every right row |
+| `full` | every row from both sides |
+| `semi` | left rows that have a match, with **no** right columns |
+| `anti` | left rows that have **no** match |
+| `cross` | every left row paired with every right row |
+
+`semi` and `anti` are the ones people do not know they wanted. They
+are filters that use another frame as the criterion, and unlike an
+`inner` join they cannot change the row count upward.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+orders = pl.DataFrame({"customer": ["a", "b", "c", "d"], "total": [10, 20, 30, 40]})
+active = pl.DataFrame({"customer": ["a", "c"]})
+
+print("orders from active customers:")
+print(orders.join(active, on="customer", how="semi"))
+
+print("orders from everyone else:")
+print(orders.join(active, on="customer", how="anti"))
+`,
+    },
+  ]}
+/>
+
+## The row-multiplication trap
+
+An inner or left join does **not** preserve the left frame's row
+count. If a key appears twice on the right, every matching left row
+is duplicated.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+people = pl.DataFrame({"id": [1, 2], "name": ["Ada", "Grace"]})
+
+# id 2 appears twice on the right
+scores = pl.DataFrame({"id": [1, 2, 2], "score": [90, 95, 70]})
+
+joined = people.join(scores, on="id", how="left")
+print(joined)
+print("left rows:", people.height, "-> joined rows:", joined.height)
+`,
+    },
+  ]}
+/>
+
+Two rows in, three rows out. On a real dataset this is how a total
+quietly becomes 1.4x too large. The defence is to know which side is
+unique before joining, and to say so:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+people = pl.DataFrame({"id": [1, 2], "name": ["Ada", "Grace"]})
+scores = pl.DataFrame({"id": [1, 2, 2], "score": [90, 95, 70]})
+
+# validate= states your expectation and raises if it is wrong
+try:
+    people.join(scores, on="id", how="left", validate="1:1")
+except Exception as error:
+    print(type(error).__name__, "-", str(error).splitlines()[0])
+
+# 1:m says "one left row may match many right rows", which is true here
+print(people.join(scores, on="id", how="left", validate="1:m").height)
+`,
+    },
+  ]}
+/>
+
+`validate` takes `"1:1"`, `"1:m"`, `"m:1"`, and `"m:m"`. Writing the
+one you expect turns a silent row explosion into an error at the
+line that caused it.
+
+## Different key names, and multiple keys
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+left = pl.DataFrame({"user_id": [1, 2], "city": ["Oslo", "Lisbon"]})
+right = pl.DataFrame({"id": [1, 2], "plan": ["pro", "free"]})
+
+print(left.join(right, left_on="user_id", right_on="id", how="left"))
+
+# Several keys: every one must match
+a = pl.DataFrame({"y": [2026, 2026], "m": [1, 2], "v": [10, 20]})
+b = pl.DataFrame({"y": [2026, 2026], "m": [1, 3], "w": ["x", "z"]})
+print(a.join(b, on=["y", "m"], how="left"))
+`,
+    },
+  ]}
+/>
+
+## Overlapping column names
+
+Columns that clash get a suffix rather than silently overwriting.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+a = pl.DataFrame({"id": [1, 2], "value": [10, 20]})
+b = pl.DataFrame({"id": [1, 2], "value": [99, 98]})
+
+print(a.join(b, on="id"))
+print(a.join(b, on="id", suffix="_from_b"))
+`,
+    },
+  ]}
+/>
+
+## Checking a join went as intended
+
+Three questions, every time:
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])
+regions = pl.DataFrame(
+    {
+        "island": ["Biscoe", "Dream", "Torgersen"],
+        "region": ["south", "south", "north"],
+    }
+)`,
+      starterCode: `# 1. Is the right-hand key unique? (If not, expect row multiplication.)
+print("unique keys:", regions["island"].is_duplicated().sum() == 0)
+
+joined = penguins.join(regions, on="island", how="left")
+
+# 2. Did the row count change?
+print("rows:", penguins.height, "->", joined.height)
+
+# 3. Did anything fail to match?
+print("unmatched:", joined["region"].null_count())
+print(
+    penguins.join(regions, on="island", how="anti")
+    .select("island")
+    .unique()
+)
+`,
+    },
+  ]}
+/>
+
+The `anti` join in step 3 is the useful one: it shows you *which*
+keys failed to match rather than only how many.
+
+## join_asof, for nearest-match joins
+
+When the keys will not match exactly, `join_asof` matches each left
+row to the most recent right row at or before it. It is built for
+time series: price at the moment of a trade, exchange rate on the day
+of an invoice.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+from datetime import date
+
+invoices = pl.DataFrame(
+    {
+        "day": [date(2026, 1, 3), date(2026, 1, 8), date(2026, 1, 20)],
+        "amount_eur": [100.0, 250.0, 80.0],
+    }
+).sort("day")
+
+rates = pl.DataFrame(
+    {
+        "day": [date(2026, 1, 1), date(2026, 1, 6), date(2026, 1, 15)],
+        "usd_per_eur": [1.10, 1.12, 1.09],
+    }
+).sort("day")
+
+print(
+    invoices.join_asof(rates, on="day", strategy="backward").with_columns(
+        amount_usd=(pl.col("amount_eur") * pl.col("usd_per_eur")).round(2)
+    )
+)
+`,
+    },
+  ]}
+/>
+
+Both frames must be sorted on the join key. Polars will tell you if
+they are not.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Enrich and audit a join"
+  instructions={`\`penguins\` and \`islands\` are loaded. \`islands\` has \`island\`, \`region\`, and \`km2\`, but it is **missing a row** for one of the islands the penguins live on.
+
+Produce three things:
+
+1. \`enriched\`: \`penguins\` left-joined to \`islands\` on \`island\`, keeping all 344 rows.
+2. \`unmatched\`: the distinct island names in \`penguins\` that have no row in \`islands\`, as a **list of strings**.
+3. \`by_region\`: one row per non-null \`region\` with \`region\` and \`n\` (the count), sorted by \`region\`.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.DataFrame(
+    {
+        "island": ["Biscoe"] * 168 + ["Dream"] * 124 + ["Torgersen"] * 52,
+        "mass": [4000] * 344,
+    }
+)
+islands = pl.DataFrame(
+    {
+        "island": ["Biscoe", "Dream"],
+        "region": ["south", "south"],
+        "km2": [45.0, 12.5],
+    }
+)`,
+      starterCode: `enriched = None   # TODO
+unmatched = None  # TODO
+by_region = None  # TODO
+
+print(unmatched)
+`,
+      solutionCode: `enriched = penguins.join(islands, on="island", how="left")
+
+unmatched = (
+    penguins.join(islands, on="island", how="anti")["island"]
+    .unique()
+    .sort()
+    .to_list()
+)
+
+by_region = (
+    enriched.drop_nulls("region")
+    .group_by("region")
+    .agg(pl.len().alias("n"))
+    .sort("region")
+)
+
+print(enriched.head())
+print(unmatched)
+print(by_region)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "rows",
+      name: "enriched keeps every penguin",
+      description: "A left join preserves the left side here",
+      code: `assert enriched.height == 344, enriched.height`,
+    },
+    {
+      id: "cols",
+      name: "enriched gained the island columns",
+      description: "region and km2",
+      code: `assert "region" in enriched.columns and "km2" in enriched.columns, enriched.columns`,
+    },
+    {
+      id: "nulls",
+      name: "The unmatched island's rows have null region",
+      description: "52 Torgersen penguins",
+      code: `assert enriched["region"].null_count() == 52, enriched["region"].null_count()`,
+    },
+    {
+      id: "unmatched",
+      name: "unmatched names the missing island",
+      description: "A list holding just Torgersen",
+      code: `assert unmatched == ["Torgersen"], unmatched`,
+    },
+    {
+      id: "by_region",
+      name: "by_region counts only matched rows",
+      description: "One region, 292 penguins",
+      code: `assert by_region.columns == ["region", "n"], by_region.columns
+assert by_region.height == 1, by_region.height
+assert by_region["n"][0] == 292, by_region["n"][0]`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`A left join of a 1,000-row frame returns 1,340 rows. What happened?
+
+- The join added 340 rows of nulls for keys with no match
+  > Unmatched left rows appear once each with nulls in the right-hand columns; they never add extra rows.
+- [o] Some keys appear more than once on the right, so those left rows were duplicated
+  > \`validate="1:1"\` or \`"m:1"\` turns this into an error at the line that caused it.
+- A left join always returns the sum of both frames' row counts
+  > That describes neither a left join nor any other join type; \`concat\` is what stacks frames.
+- The right frame contained 340 rows whose key was null
+  > Null keys are a real hazard, but they would not inflate the result past the left frame's height this way.
+
+Check the right-hand key's uniqueness before joining, or state your expectation and let Polars check it.`}
+/>
+
+<MultipleChoice
+  markdown={`You want the orders belonging to active customers, and no columns from the customer table. Which join?
+
+- \`inner\`, then drop the customer columns afterwards
+  > It works until a customer appears twice in the active list, at which point the order rows are duplicated.
+- \`left\`, then filter out the null rows
+  > Two steps to express one idea, and it carries the same duplication risk as the inner join.
+- [o] \`semi\`
+  > A semi join is a filter that uses another frame as the criterion, and it cannot multiply rows.
+- \`anti\`
+  > That returns the exact complement: the orders from customers who are *not* active.
+
+\`semi\` and \`anti\` are the join types people most often do not know they wanted.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you find out *which* keys failed to match after a left join?
+
+- Read the warning Polars prints when keys go unmatched
+  > No warning is emitted; an unmatched key is a normal and expected outcome of a left join.
+- Count the nulls in the joined result
+  > That tells you how many rows failed, which is useful, but it does not name the offending keys.
+- [o] Run the same join with \`how="anti"\`
+  > It returns exactly the left rows that found no match, so the keys are right there to look at.
+- Compare the two frames' row counts before and after
+  > The difference conflates unmatched rows with duplicated ones and names nothing either way.
+
+An anti join is the diagnostic step that turns "some rows are null" into "these three IDs are missing".`}
+/>

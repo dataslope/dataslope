@@ -1,0 +1,385 @@
+---
+title: Lists and Structs
+description: "Nested columns: a List holds many values of one type per row, a Struct holds named fields, and both stay fast."
+---
+
+Not every cell holds one scalar. Polars has two nested types, both
+first-class Arrow types rather than columns of Python objects, so
+operations on them stay vectorized.
+
+<Figure
+  slug="pl-lists-structs-cutout"
+  alt="A thick blue box standing open on a platform with two smaller green boxes inside it, and one open yellow box beside it holding three short solid rods"
+/>
+
+| Type | Holds | Analogy |
+| --- | --- | --- |
+| `List` | many values of one type, variable length | a Python list |
+| `Array` | many values of one type, **fixed** length | a fixed-size vector |
+| `Struct` | named fields, each with its own type | a dict, or a row |
+
+## List columns
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame(
+    {
+        "user": ["ada", "grace", "alan"],
+        "scores": [[90, 85, 77], [100], [60, 70]],
+    }
+)
+
+print(df)
+print(df.schema)
+`,
+    },
+  ]}
+/>
+
+They arrive naturally from three places: JSON input, `str.split`, and
+a `group_by().agg()` without an aggregation.
+
+## The .list namespace
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame(
+    {
+        "user": ["ada", "grace", "alan"],
+        "scores": [[90, 85, 77], [100], [60, 70]],
+    }
+)
+
+s = pl.col("scores")
+
+print(
+    df.with_columns(
+        n=s.list.len(),
+        best=s.list.max(),
+        mean=s.list.mean().round(1),
+        first=s.list.first(),
+        sorted=s.list.sort(descending=True),
+        top2=s.list.head(2),
+        has_100=s.list.contains(100),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+Every one of these operates on all rows at once. There is no Python
+loop and no `apply`.
+
+## explode: one row per element
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame(
+    {
+        "user": ["ada", "grace", "alan"],
+        "scores": [[90, 85, 77], [100], [60, 70]],
+    }
+)
+
+flat = df.explode("scores")
+print(flat)
+
+# And back again
+print(flat.group_by("user").agg(pl.col("scores")).sort("user"))
+`,
+    },
+  ]}
+/>
+
+`explode` and `group_by().agg()` are inverses. That round trip is
+worth remembering: it is how you get from a nested layout into the
+flat one every other operation prefers, and back.
+
+## Struct columns
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame(
+    {
+        "user": ["ada", "grace"],
+        "address": [
+            {"city": "London", "zip": "E1"},
+            {"city": "Arlington", "zip": "22201"},
+        ],
+    }
+)
+
+print(df)
+print(df.schema)
+
+print(
+    df.with_columns(
+        city=pl.col("address").struct.field("city"),
+    )
+)
+
+# unnest promotes every field to a top-level column
+print(df.unnest("address"))
+`,
+    },
+  ]}
+/>
+
+## Building a struct
+
+Structs are how one expression returns several values at once.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# value_counts returns a struct of (value, count)
+print(penguins["island"].value_counts(sort=True))
+
+# Packing several columns into one
+packed = penguins.select(
+    "species",
+    pl.struct("bill_length_mm", "bill_depth_mm").alias("bill"),
+)
+print(packed.head(3))
+print(packed.unnest("bill").head(3))
+`,
+    },
+  ]}
+/>
+
+## Where nesting is worth it
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+# JSON-shaped input keeps its shape, no flattening pass needed
+events = pl.DataFrame(
+    {
+        "session": ["s1", "s2"],
+        "tags": [["checkout", "mobile"], ["search"]],
+    }
+)
+
+print(
+    events.with_columns(
+        n_tags=pl.col("tags").list.len(),
+        is_mobile=pl.col("tags").list.contains("mobile"),
+    )
+)
+
+# Filter on a nested value without exploding
+print(events.filter(pl.col("tags").list.contains("checkout")))
+`,
+    },
+  ]}
+/>
+
+<Callout type="warn" title="Nesting is a storage choice, not a computation one">
+Almost every aggregation, join, and window works on flat columns and
+not on nested ones. If you are reaching for `.list` methods to do
+something a `group_by` would do on flat data, explode first. The
+right use for a list column is data that genuinely *is* a list per
+row: tags, a fixed-size embedding, a set of related IDs.
+</Callout>
+
+## Arrays, when the length is fixed
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+emb = pl.DataFrame(
+    {"vec": [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]]},
+    schema={"vec": pl.Array(pl.Float64, 3)},
+)
+
+print(emb)
+print(emb.schema)
+print(emb.with_columns(norm=pl.col("vec").arr.sum().round(2)))
+`,
+    },
+  ]}
+/>
+
+An `Array` promises the same length on every row, which lets Polars
+store it without an offsets buffer. Use it for embeddings and fixed
+coordinate tuples; use `List` when the length genuinely varies.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Analyze a tag column"
+  instructions={`\`events\` has \`session\` and \`tags\` (a list of strings).
+
+Produce three results:
+
+1. \`enriched\`: \`events\` plus \`n_tags\` (the list's length) and \`is_mobile\` (a Boolean, true when \`"mobile"\` is in the list).
+2. \`tag_counts\`: one row per distinct tag with \`tags\` (the tag) and \`n\` (how many sessions carried it), sorted by \`n\` descending then \`tags\` ascending.
+3. \`busiest\`: the \`session\` with the most tags, as a plain string.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+events = pl.DataFrame(
+    {
+        "session": ["s1", "s2", "s3", "s4"],
+        "tags": [
+            ["checkout", "mobile"],
+            ["search"],
+            ["search", "mobile", "promo"],
+            [],
+        ],
+    }
+)`,
+      starterCode: `enriched = None    # TODO
+tag_counts = None  # TODO
+busiest = None     # TODO
+
+print(enriched)
+`,
+      solutionCode: `enriched = events.with_columns(
+    n_tags=pl.col("tags").list.len(),
+    is_mobile=pl.col("tags").list.contains("mobile"),
+)
+
+tag_counts = (
+    events.explode("tags")
+    .drop_nulls("tags")
+    .group_by("tags")
+    .agg(pl.len().alias("n"))
+    .sort("n", "tags", descending=[True, False])
+)
+
+busiest = enriched.sort("n_tags", descending=True)["session"][0]
+
+print(enriched)
+print(tag_counts)
+print("busiest:", busiest)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "enriched",
+      name: "enriched has n_tags and is_mobile",
+      description: "Four rows, four columns",
+      code: `assert enriched.shape == (4, 4), enriched.shape
+assert "n_tags" in enriched.columns and "is_mobile" in enriched.columns`,
+    },
+    {
+      id: "n_tags",
+      name: "n_tags counts the elements",
+      description: "2, 1, 3, 0",
+      code: `assert enriched["n_tags"].to_list() == [2, 1, 3, 0], enriched["n_tags"].to_list()`,
+    },
+    {
+      id: "is_mobile",
+      name: "is_mobile is Boolean and correct",
+      description: "True, False, True, False",
+      code: `import polars as pl
+assert enriched["is_mobile"].dtype == pl.Boolean, enriched["is_mobile"].dtype
+assert enriched["is_mobile"].to_list() == [True, False, True, False]`,
+    },
+    {
+      id: "tag_counts",
+      name: "tag_counts counts sessions per tag",
+      description: "mobile 2, search 2, checkout 1, promo 1",
+      code: `assert tag_counts.columns == ["tags", "n"], tag_counts.columns
+assert tag_counts["tags"].to_list() == ["mobile", "search", "checkout", "promo"], tag_counts["tags"].to_list()
+assert tag_counts["n"].to_list() == [2, 2, 1, 1], tag_counts["n"].to_list()`,
+    },
+    {
+      id: "empty_row",
+      name: "The session with no tags contributed nothing",
+      description: "Four distinct tags, not five",
+      code: `assert tag_counts.height == 4, tag_counts.height`,
+    },
+    {
+      id: "busiest",
+      name: "busiest is the session with three tags",
+      description: "A plain string, not a frame",
+      code: `assert busiest == "s3", busiest`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the relationship between \`explode\` and \`group_by().agg()\`?
+
+- They are unrelated: one reshapes rows, the other summarizes them
+  > \`agg\` without an aggregating expression collects a group's values into a list, which is exactly what \`explode\` undoes.
+- \`explode\` is the lazy version of \`group_by\`
+  > Both work in eager and lazy contexts; laziness is not what separates them.
+- [o] They are inverses: one flattens a list column into rows, the other gathers rows into a list
+  > That round trip is how you move between a nested layout and the flat one most operations prefer.
+- \`explode\` requires a prior \`group_by\` to know which rows belong together
+  > It works on any list column, wherever the lists came from, including JSON input and \`str.split\`.
+
+Reach for the flat form whenever you need a join, a window, or an aggregation.`}
+/>
+
+<MultipleChoice
+  markdown={`When should a column be a \`List\` rather than exploded into rows?
+
+- Whenever it would otherwise produce more than a million rows
+  > Row count is not the criterion; Polars handles very tall frames comfortably.
+- Whenever the values are strings rather than numbers
+  > Type has nothing to do with it; both list and flat columns hold any type.
+- [o] When the list genuinely *is* one value of the row: tags, an embedding, a set of IDs
+  > If you find yourself using \`.list\` methods to do a \`group_by\`'s job, explode first.
+- Whenever the number of elements varies from row to row
+  > Varying length chooses \`List\` over \`Array\`; it does not decide nested versus flat.
+
+Nesting is a statement about what the data means, not a performance trick.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`pl.Array(pl.Float64, 3)\` give you over \`pl.List(pl.Float64)\`?
+
+- It allows elements of mixed types within one row
+  > Both are homogeneous; the element type is part of each dtype.
+- It sorts the elements automatically on every write
+  > Neither type imposes an order; \`list.sort()\` is available when you want one.
+- It permits nesting to arbitrary depth
+  > Both nest; depth is not what distinguishes them.
+- [o] Every row is guaranteed the same length, so no offsets buffer is needed
+  > Right for embeddings and coordinate tuples; use \`List\` when the length genuinely varies.
+
+The fixed length is a schema guarantee, so a row of the wrong length is an error rather than a surprise later.`}
+/>

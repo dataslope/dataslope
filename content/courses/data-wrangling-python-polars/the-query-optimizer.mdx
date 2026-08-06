@@ -1,0 +1,337 @@
+---
+title: The Query Optimizer
+description: "Reading a query plan, the rewrites Polars applies to it, and how to write queries that give the optimizer something to work with."
+---
+
+The optimizer is why expressions were worth the indirection. It takes
+the plan you described and rewrites it into an equivalent plan that
+does less work.
+
+<Figure
+  slug="pl-optimizer-cutout"
+  alt="A wide platform carrying one long green rail that winds through four wide bends, and beside it the same two endpoints joined by a single short straight blue rail"
+/>
+
+## Reading a plan
+
+`explain()` prints two plans. `optimized=False` shows what you wrote;
+the default shows what will actually run.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `q = (
+    pl.scan_csv("diamonds.csv")
+    .with_columns((pl.col("price") / pl.col("carat")).alias("per_carat"))
+    .filter(pl.col("cut") == "Ideal")
+    .filter(pl.col("carat") > 1.0)
+    .select("cut", "carat", "per_carat")
+)
+
+print("── as written")
+print(q.explain(optimized=False))
+print("── optimized")
+print(q.explain())
+`,
+    },
+  ]}
+/>
+
+Plans read bottom-up: the leaf is the data source, each line above it
+consumes the one below. Compare the two and you can see the rewrites.
+
+## The main rewrites
+
+### Projection pushdown
+
+Polars works out which columns the query actually needs and tells the
+reader to parse only those. On a wide Parquet file this is often the
+single biggest saving, because an unread column costs nothing at all.
+
+### Predicate pushdown
+
+Filters move as close to the source as possible. A filter that
+reaches the scan is applied while parsing, so rejected rows are never
+built into a frame. With Parquet it goes further: row groups whose
+statistics prove no row can match are skipped without decompression.
+
+### Slice pushdown
+
+`head(10)` at the end of a chain becomes "stop reading after enough
+rows" at the source, rather than "read everything, then take ten".
+
+### Common subexpression elimination
+
+An expression written twice is computed once.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `per_carat = pl.col("price") / pl.col("carat")
+
+q = pl.scan_csv("diamonds.csv").select(
+    cheap=(per_carat < 2000),
+    expensive=(per_carat > 8000),
+    ratio=per_carat.round(0),
+)
+
+print(q.explain())
+print(q.head(3).collect())
+`,
+    },
+  ]}
+/>
+
+This is why "repeat the expression rather than splitting into two
+`with_columns` calls" is sound advice in a lazy query: the repetition
+is free.
+
+### Filters merge, projections collapse
+
+Two consecutive `filter` calls become one conjunction. Two
+consecutive `select` calls collapse into one. Writing a chain in
+readable steps costs nothing.
+
+## Showing the saving
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import time
+import polars as pl`,
+      starterCode: `def timed(label, fn):
+    start = time.perf_counter()
+    value = fn()
+    print(f"{label:<24} {(time.perf_counter() - start) * 1000:7.1f} ms -> {value}")
+
+# Optimizations on
+timed(
+    "optimized",
+    lambda: pl.scan_csv("diamonds.csv")
+    .filter(pl.col("cut") == "Ideal")
+    .select(pl.col("price").mean().round(0))
+    .collect()
+    .item(),
+)
+
+# The same query with the optimizer turned off
+timed(
+    "no pushdown",
+    lambda: pl.scan_csv("diamonds.csv")
+    .filter(pl.col("cut") == "Ideal")
+    .select(pl.col("price").mean().round(0))
+    .collect(optimizations=pl.QueryOptFlags(projection_pushdown=False, predicate_pushdown=False))
+    .item(),
+)
+`,
+    },
+  ]}
+/>
+
+Same answer, different amount of work. `QueryOptFlags` exists mostly
+for debugging: if a lazy query gives a different answer from the
+eager one, turning optimizations off one at a time is how you find
+out which rewrite the bug is hiding behind.
+
+## What the optimizer cannot do
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `# A Python function is opaque: Polars cannot see inside it, so it
+# cannot be reordered, pushed down, or parallelized.
+opaque = (
+    pl.scan_csv("diamonds.csv")
+    .with_columns(
+        pl.col("price").map_elements(lambda p: p * 2, return_dtype=pl.Int64)
+    )
+    .select("price")
+)
+
+print(opaque.explain())
+`,
+    },
+  ]}
+/>
+
+Three things block the optimizer, and all three are worth avoiding:
+
+1. **`map_elements` with a Python callable.** Opaque, row-at-a-time,
+   and it holds the interpreter lock. Almost always replaceable with
+   an expression.
+2. **A `collect()` in the middle of a chain.** Everything after it is
+   planned separately from everything before it.
+3. **Converting to and from another library mid-pipeline.** A
+   `to_pandas()` round trip ends the plan.
+
+## Writing optimizer-friendly queries
+
+- **Start from `scan_*`, not `read_*`.** Pushdown into a file is the
+  biggest single win, and it is only available if Polars owns the
+  read.
+- **Filter early in the text, but do not agonize.** The optimizer
+  moves filters anyway; writing them early is for the reader.
+- **Prefer Parquet.** Its row-group statistics let predicate pushdown
+  skip data without decompressing it, which CSV cannot do.
+- **Select what you need.** Even with pushdown, an explicit `select`
+  documents the query's real inputs.
+- **Keep expressions expressions.** Anything expressible with
+  `when/then`, `str`, `dt`, or arithmetic will be faster and visible
+  to the planner than the same logic in Python.
+
+<Callout type="info" title="show_graph, when the plan gets big">
+`q.show_graph()` renders the plan as a diagram instead of text. It
+needs graphviz installed, so it will not run in this browser
+environment, but it is worth knowing about for a plan with several
+joins.
+</Callout>
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Read the plan"
+  instructions={`Build a lazy query \`q\` over \`diamonds.csv\` that keeps \`Premium\`-cut diamonds, computes \`per_carat\` as \`price / carat\`, and selects \`cut\`, \`carat\`, and \`per_carat\`.
+
+Then, from \`q.explain()\`, set:
+
+- \`n_projected\`: how many source columns the plan reads, as an \`int\` (parse it out of the \`PROJECT n/10 COLUMNS\` line).
+- \`pushed_down\`: \`True\` if the plan contains a \`SELECTION\` line, meaning the filter reached the scan.
+
+The point is that the plan is a string you can assert on, which makes performance a testable property.`}
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import re
+import polars as pl`,
+      starterCode: `q = None            # TODO
+n_projected = None  # TODO
+pushed_down = None  # TODO
+
+print(n_projected, pushed_down)
+`,
+      solutionCode: `q = (
+    pl.scan_csv("diamonds.csv")
+    .filter(pl.col("cut") == "Premium")
+    .with_columns((pl.col("price") / pl.col("carat")).alias("per_carat"))
+    .select("cut", "carat", "per_carat")
+)
+
+plan = q.explain()
+print(plan)
+
+n_projected = int(re.search(r"PROJECT (\\d+)/\\d+ COLUMNS", plan).group(1))
+pushed_down = "SELECTION" in plan
+
+print(n_projected, pushed_down)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "lazy",
+      name: "q is a LazyFrame",
+      description: "Built with scan_csv",
+      code: `import polars as pl
+assert isinstance(q, pl.LazyFrame), type(q).__name__`,
+    },
+    {
+      id: "result",
+      name: "The query returns the right shape",
+      description: "13,791 Premium diamonds, three columns",
+      code: `out = q.collect()
+assert out.columns == ["cut", "carat", "per_carat"], out.columns
+assert out.height == 13791, out.height`,
+    },
+    {
+      id: "projected",
+      name: "Only three source columns are read",
+      description: "cut, carat, price, out of ten",
+      code: `assert n_projected == 3, n_projected`,
+    },
+    {
+      id: "pushed",
+      name: "The filter reached the scan",
+      description: "A SELECTION line in the plan",
+      code: `assert pushed_down is True, pushed_down`,
+    },
+    {
+      id: "values",
+      name: "per_carat is price divided by carat",
+      description: "Checked against the source file",
+      code: `import polars as pl
+got = q.head(1).collect().row(0, named=True)
+src = (
+    pl.scan_csv("diamonds.csv")
+    .filter(pl.col("cut") == "Premium")
+    .head(1)
+    .collect()
+    .row(0, named=True)
+)
+assert abs(got["per_carat"] - src["price"] / src["carat"]) < 1e-9, got["per_carat"]`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`On a 200-column Parquet file, a query uses 4 columns. What does projection pushdown save?
+
+- Nothing: Parquet files must be read in full before columns can be selected
+  > Parquet is columnar precisely so a reader can fetch individual columns; that is the format's main advantage.
+- Only memory, since all 200 columns are still decompressed
+  > Unread columns are neither fetched nor decompressed, so the saving is in I/O and CPU as well.
+- [o] The other 196 columns are never fetched or decompressed at all
+  > This is usually the single biggest saving on a wide file, and it is what \`scan_*\` exists to enable.
+- It reorders the columns so the four appear first, speeding up access
+  > No reordering occurs; the reader simply skips the column chunks the query does not name.
+
+An unread column in a columnar file costs nothing, which is what makes wide tables cheap.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does writing the same subexpression twice cost nothing in a lazy query?
+
+- Polars caches the result of every expression it has evaluated before
+  > No cross-query cache exists; the saving comes from analysing this plan, not from remembering earlier ones.
+- The second occurrence is silently dropped from the plan
+  > Both occurrences remain in the output; what is shared is the computation behind them.
+- [o] Common subexpression elimination computes it once and reuses the result
+  > Which is why repeating an expression beats splitting a chain into two \`with_columns\` calls.
+- Expressions are lazy, so neither occurrence is ever evaluated
+  > They are certainly evaluated; laziness postpones the work rather than avoiding it.
+
+You can write for readability and let the planner remove the duplication.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these stops the optimizer from seeing through your query?
+
+- Chaining five \`with_columns\` calls in a row
+  > Consecutive projections collapse into one, so the chain costs nothing beyond its readability benefit.
+- Writing two \`filter\` calls instead of one \`&\` expression
+  > Consecutive filters merge into a single conjunction during optimization.
+- [o] \`map_elements\` with a Python lambda
+  > Opaque to the planner, row-at-a-time, and it holds the interpreter lock.
+- Sorting before a \`group_by\`
+  > A sort is a normal plan node the optimizer understands and can sometimes even remove.
+
+If a lazy query is unexpectedly slow, look for a Python callable in the plan first.`}
+/>

@@ -32,13 +32,15 @@ export type Collection =
   | "interview"
   | "home"
   | "auth"
-  | "pricing";
+  | "pricing"
+  | "playground";
 const URL_BASE: Record<Collection, string> = {
   courses: "/courses",
   interview: "/interview-prep",
   home: "/",
   auth: "/sign-in",
   pricing: "/pricing",
+  playground: "/playground",
 };
 
 /** Collections that are one page, with nothing addressable beneath them. */
@@ -46,6 +48,7 @@ const SINGLE_PAGE: ReadonlySet<Collection> = new Set<Collection>([
   "home",
   "auth",
   "pricing",
+  "playground",
 ]);
 
 /** Asset categories, in the order they are shown on the gallery page. */
@@ -56,6 +59,7 @@ export type Category =
   | "interview-illustration"
   | "home-icon"
   | "pricing-plan"
+  | "playground-hero"
   | "auth-globe-pin";
 
 const CATEGORY_LABEL: Record<Category, string> = {
@@ -65,6 +69,7 @@ const CATEGORY_LABEL: Record<Category, string> = {
   "interview-illustration": "Interview prep illustrations",
   "home-icon": "Home page bento icons",
   "pricing-plan": "Pricing plan icons",
+  "playground-hero": "Playground hero band",
   "auth-globe-pin": "Auth globe pins",
 };
 
@@ -75,6 +80,7 @@ const CATEGORY_ORDER: Category[] = [
   "interview-illustration",
   "home-icon",
   "pricing-plan",
+  "playground-hero",
   "auth-globe-pin",
 ];
 
