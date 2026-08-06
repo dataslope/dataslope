@@ -270,7 +270,7 @@
       "title": "Comprehensions",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot on a pale grey platform feeding three thick blue planks through one wide press that returns them green"
+      "subject": "the Dataslope marmot mascot on a pale grey platform feeding one blue plank into a wide press that returns it green"
     },
     {
       "id": "python-basics-scope",
@@ -462,7 +462,7 @@
       "title": "Introduction to SQL and Relational Databases: course thumbnail",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, sitting on a pale grey platform beside one wide blue plank and one tall green column"
+      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, sitting large and central on a pale grey platform beside one wide blue block and one tall green block"
     },
     {
       "id": "intro-web-development-thumbnail",
@@ -738,7 +738,7 @@
       "title": "Data Engineer: interview thumbnail",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot on a pale grey platform guiding three coloured cubes along one short pipeline from a tank into a tall silo"
+      "subject": "the Dataslope marmot mascot on a pale grey platform guiding one blue cube along a short pipe from a round tank into a tall silo"
     },
     {
       "id": "interview-data-scientist-thumbnail",
@@ -798,7 +798,7 @@
       "title": "The longer history",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a giant panda on a pale grey platform beside a stepped platform of record-keeping eras, a notched bone on the lowest step rising to a small data disc on the highest"
+      "subject": "a giant panda on a pale grey platform beside three broad steps, one rough grey block on the lowest step and one bright blue screen standing on the highest"
     },
     {
       "id": "pandas-how-computers-see-data",
@@ -1398,7 +1398,7 @@
       "title": "Conditionals and decisions",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot on a pale grey platform guiding one low solid disc down one of the two branches of a track that splits at a wide gate"
+      "subject": "the Dataslope marmot mascot on a pale grey platform guiding one small blue cube down one of the two branches of a track that splits at a wide gate"
     },
     {
       "id": "js-loops-and-iteration",
@@ -1698,7 +1698,7 @@
       "title": "Conditionals",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a brown beaver on a pale grey platform beside a track splitting at a gate, a low solid disc taking one of the two branches"
+      "subject": "a brown beaver on a pale grey platform beside a track splitting at a gate, one small blue cube taking one of the two branches"
     },
     {
       "id": "c-loops",
@@ -1806,7 +1806,7 @@
       "title": "Dynamic memory",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a brown beaver on a pale grey platform beside one small crane lifting one large blue block onto a simple two-shelf rack"
+      "subject": "a brown beaver on a pale grey platform lifting one large blue block onto an empty two-shelf rack"
     },
     {
       "id": "c-linked-lists",
@@ -1986,7 +1986,7 @@
       "title": "SelectMany and flattening",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a grey rabbit on a pale grey platform beside nested trays being emptied out into one long single-level rail of items"
+      "subject": "a grey rabbit on a pale grey platform tipping two small boxes of coloured cubes out into one long straight tray"
     },
     {
       "id": "cs-deferred-execution",
@@ -2310,7 +2310,7 @@
       "title": "Cardinality",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform beside one thick connector rod between two large blocks, a single tall peg at one end and two at the other"
+      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform joining one large blue block to two smaller green blocks with thick rods"
     },
     {
       "id": "db-self-referencing",
@@ -2526,7 +2526,7 @@
       "title": "Why schemas change",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform lifting one large block out of a wide frame as a larger block lowers into its place"
+      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform lifting one small blue block out of a wide frame while a larger green block waits beside it"
     },
     {
       "id": "db-evolving-schemas-safely",
@@ -2550,7 +2550,7 @@
       "title": "Where to go next",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot and a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform at a tall signpost, three wide ramps leading away to three raised platforms"
+      "subject": "the Dataslope marmot mascot and a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform at a tall signpost with three arms, one wide ramp leading away behind it"
     },
     {
       "id": "cpp-brief-history",
@@ -2562,7 +2562,7 @@
       "title": "A brief history of programming",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a quokka on a pale grey platform beside a stepped platform rising from a punch card to a modern terminal"
+      "subject": "a quokka on a pale grey platform beside three broad steps, one boxy old computer on the lowest step and one slim modern screen on the highest"
     },
     {
       "id": "cpp-computational-thinking",
@@ -2646,7 +2646,7 @@
       "title": "Control flow",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a quokka on a pale grey platform beside a track splitting at a gate, a low solid disc taking one of the two branches"
+      "subject": "a quokka on a pale grey platform beside a track splitting at a gate, one small blue cube taking one of the two branches"
     },
     {
       "id": "cpp-functions-and-modularity",
@@ -2838,7 +2838,7 @@
       "title": "Algorithms intuition",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot on a pale grey platform beside a low maze of solid walls with one clear open route running through it"
+      "subject": "the Dataslope marmot mascot on a pale grey platform beside a low maze of solid white walls with one wide open route running straight through it"
     },
     {
       "id": "cpp-debugging",
@@ -3306,7 +3306,7 @@
       "title": "Line charts",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a small striped chipmunk on a pale grey platform beside one continuous ribbon line rising across a wide board, three low solid discs resting along it"
+      "subject": "a small striped chipmunk on a pale grey platform beside one continuous ribbon line rising across a wide board, three small blue cubes resting along it"
     },
     {
       "id": "viz-bar-charts",
@@ -3342,7 +3342,7 @@
       "title": "Box plots",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a small striped chipmunk on a pale grey platform beside a box with whiskers on a scale rail and two outlier discs set apart"
+      "subject": "a small striped chipmunk on a pale grey platform beside one wide blue box standing on a long rail, one straight bar reaching out from each side of the box"
     },
     {
       "id": "viz-bubble-charts",
@@ -3678,7 +3678,7 @@
       "title": "Control flow",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a grey rabbit on a pale grey platform beside a track splitting at a gate, a low solid disc taking one of the two branches"
+      "subject": "a grey rabbit on a pale grey platform beside a track splitting at a gate, one small blue cube taking one of the two branches"
     },
     {
       "id": "mcs-methods-modularity",
@@ -3750,7 +3750,7 @@
       "title": "Error handling",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a grey rabbit on a pale grey platform beside a falling token caught by a safety net stretched between four posts"
+      "subject": "a grey rabbit on a pale grey platform holding one wide green tray under a falling red block"
     },
     {
       "id": "mcs-resource-management",
@@ -3870,7 +3870,7 @@
       "title": "How applications use databases",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform passing one green block along a short rail from a white panel to a wide blue table block"
+      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform passing one green block along a rail from a white panel into a wide blue cabinet"
     },
     {
       "id": "sql-tables-rows-columns",
@@ -4050,7 +4050,7 @@
       "title": "Relationships between tables",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform joining three thick coloured blocks with two short rails"
+      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform joining one large blue block to one green block with a single thick rod"
     },
     {
       "id": "sql-primary-keys",
@@ -4146,7 +4146,7 @@
       "title": "Many-to-many relationships",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform beside three boxes on each side joined through a smaller intermediate box"
+      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform joining two blue blocks and two green blocks through one small yellow block in the middle"
     },
     {
       "id": "sql-normalization",
@@ -4458,7 +4458,7 @@
       "title": "The tyranny of arrays",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a brown bear on a pale grey platform beside a fixed-length rail of cells overflowing, spare tokens stranded beside it"
+      "subject": "a brown bear on a pale grey platform beside one short tray holding three blue cubes end to end, one more cube standing on the platform outside it"
     },
     {
       "id": "jcol-birth-of-containers",
@@ -4554,7 +4554,7 @@
       "title": "Iteration patterns",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a brown bear on a pale grey platform beside three tracks running the same tokens past a station by different routes"
+      "subject": "a brown bear on a pale grey platform beside three straight rails running side by side, one blue cube travelling along each"
     },
     {
       "id": "jcol-comparable-comparator",
@@ -4854,7 +4854,7 @@
       "title": "Control flow",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a brown bear on a pale grey platform beside a track splitting at a gate, a low solid disc taking one of the two branches"
+      "subject": "a brown bear on a pale grey platform beside a track splitting at a gate, one small blue cube taking one of the two branches"
     },
     {
       "id": "java-methods-modularity",
@@ -4974,7 +4974,7 @@
       "title": "Interfaces",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a brown bear on a pale grey platform beside three differently built objects each presenting the same shaped plug to one socket"
+      "subject": "a brown bear on a pale grey platform beside three differently shaped blocks that each carry the same square plug, one wide socket standing ready for them"
     },
     {
       "id": "java-exception-handling",
@@ -5370,7 +5370,7 @@
       "title": "Hierarchical clustering",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot on a pale grey platform beside four low solid discs in a row, joined upward by thick brackets into two pairs and then into one bracket at the top"
+      "subject": "the Dataslope marmot mascot on a pale grey platform beside four short blue columns in a row, joined upward by thick brackets into two pairs and then into one bracket at the top"
     },
     {
       "id": "ml-evaluating-clusters",
@@ -5490,7 +5490,7 @@
       "title": "Singly linked lists",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a capybara on a pale grey platform beside three separated cubes joined left to right by curved arrows, the last arrow trailing off into empty space"
+      "subject": "a capybara on a pale grey platform beside three blue cubes in a row joined by two short arrows, the last cube with no arrow after it"
     },
     {
       "id": "dsa-doubly-linked-lists",
@@ -5598,7 +5598,7 @@
       "title": "Trees and binary trees",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a capybara on a pale grey platform beside one tall blue trunk block with two shorter coloured blocks branching from it on short rails"
+      "subject": "a capybara on a pale grey platform beside one rounded green tree with a thick brown trunk that splits into two branches, a smaller green tree on either side"
     },
     {
       "id": "dsa-bst",
@@ -5682,7 +5682,7 @@
       "title": "Greedy algorithms",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a capybara on a pale grey platform beside one broad claw lifting the tallest yellow block clear of a row of three coloured blocks"
+      "subject": "a capybara on a pale grey platform lifting the tallest of three coloured blocks off a low rail"
     },
     {
       "id": "dsa-dynamic-programming",
@@ -5790,7 +5790,7 @@
       "title": "The data layer",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a small plain blue bird standing on a pale grey platform beside a tidy grid of small tiles forming the base platform of a chart, each row one tile deep and each column a distinct colour"
+      "subject": "a small plain blue bird perched on a pale grey platform beside one wide flat board with three thick coloured bars standing on it"
     },
     {
       "id": "gg-aesthetic-mappings",
@@ -6342,7 +6342,7 @@
       "title": "Word frequencies and lexical diversity",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a small plain green bird standing on a pale grey platform beside a long descending staircase of bars, a few towering at the near end and a very long tail of single-height bars trailing away"
+      "subject": "a small plain green bird standing on a pale grey platform beside four blue bars in a descending row, the tallest at the near end"
     },
     {
       "id": "nlp-ngrams",
@@ -7506,7 +7506,7 @@
       "title": "Interesting discussions",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot on a pale grey platform beside five small commemorative plinths of varying heights, each carrying a different simple machine or instrument"
+      "subject": "the Dataslope marmot mascot on a pale grey platform standing between two plain plinths of different heights, one simple brass instrument on each"
     },
     {
       "id": "scipy-next-steps",
@@ -7638,7 +7638,7 @@
       "title": "KDE and density",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a small penguin standing on a pale grey platform beside a stepped bar silhouette with a smooth continuous mound curve laid over it, a bandwidth dial beside it"
+      "subject": "a small penguin standing on a pale grey platform beside one smooth green mound curve rising over a wide board"
     },
     {
       "id": "sns-ecdf-rug",
@@ -7986,7 +7986,7 @@
       "title": "GROUP BY ALL and grouping sets",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a small cheerful yellow duck (the DuckDB mascot) standing on a pale grey platform beside three shallow white trays of increasing size nested one inside the next, one thick coloured block in each"
+      "subject": "a small cheerful yellow duck (the DuckDB mascot) standing on a pale grey platform beside three white trays of increasing size, one thick coloured block in each"
     },
     {
       "id": "duck-conditional-logic",
@@ -8154,7 +8154,7 @@
       "title": "Why SQLite?",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a golden hamster on a pale grey platform beside one small solid blue block standing next to one large empty server rack"
+      "subject": "a golden hamster on a pale grey platform beside one small blue block and one tall empty grey rack"
     },
     {
       "id": "lite-how-apps-store",
@@ -8874,7 +8874,7 @@
       "title": "Data types and memory",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a brown beaver on a pale grey platform beside three plain white trays of increasing size in a row, the smallest holding one block that overflows its edge"
+      "subject": "a brown beaver on a pale grey platform beside three white trays of increasing size in a row, one blue block sitting in the largest"
     },
     {
       "id": "sysc-memory-layout",
@@ -9054,7 +9054,7 @@
       "title": "Moving windows: rolling and expanding statistics",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a koala on a pale grey platform beside a jagged ribbon across a plane with a small sliding frame travelling along it emitting a smoothed trailing curve"
+      "subject": "a koala on a pale grey platform sliding one small open frame along a wide board, a smooth blue ribbon curving behind it"
     },
     {
       "id": "tsa-decomposition",
@@ -9954,7 +9954,7 @@
       "style": "isometric illustration",
       "title": "Concurrency and parallelism interview questions",
       "mascot": true,
-      "subject": "a brown bear on a pale grey platform beside three parallel lanes where capsules advance side by side, one lane briefly held by a small lock gate while the others keep moving"
+      "subject": "a brown bear on a pale grey platform beside three straight lanes with one blue cube advancing in each, a small gate closed across the middle lane"
     },
     {
       "id": "interview-backend-engineer-databases",
@@ -10470,7 +10470,7 @@
       "title": "Context windows",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a raccoon on a pale grey platform beside a long scroll of content fed through a rectangular viewing frame, with the portions at the two ends brightly lit and the middle section noticeably dimmed, and content beyond the frame edges cut off entirely"
+      "subject": "a raccoon on a pale grey platform beside one wide open frame with a long blue band running through it, the band bright inside the frame and plain grey where it passes outside"
     },
     {
       "id": "llm-reasoning-models",

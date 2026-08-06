@@ -177,8 +177,8 @@ export function buildPrompt(spec, colors) {
     "No text. Draw only the objects described — nothing scattered over, around, " +
     "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
     "Render each object as a solid three-dimensional form with real thickness, " +
-    "smooth matte shading, and clean edges; draw any repeated round elements the " +
-    "subject calls for as low solid discs, never as glossy spheres or balls. " +
+    "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
+    "a thin round counter. " +
     "Stage everything light and airy on a white background: pale grey and white " +
     "platforms, bright brand colors, no dark or black bases. Make every object a " +
     "single solid piece in one flat brand color: never build one object out of " +

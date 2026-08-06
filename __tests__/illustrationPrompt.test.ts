@@ -22,8 +22,8 @@ const CONSTRAINTS =
   "No text. Draw only the objects described — nothing scattered over, around, " +
   "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
   "Render each object as a solid three-dimensional form with real thickness, " +
-  "smooth matte shading, and clean edges; draw any repeated round elements the " +
-  "subject calls for as low solid discs, never as glossy spheres or balls. " +
+  "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
+  "a thin round counter. " +
   "Stage everything light and airy on a white background: pale grey and white " +
   "platforms, bright brand colors, no dark or black bases. Make every object a " +
   "single solid piece in one flat brand color: never build one object out of " +
@@ -79,7 +79,14 @@ describe("buildIllustrationPrompt", () => {
     for (const entry of getIllustrationPrompts().entries) {
       expect(entry.prompt).toContain("no speckled dots, no confetti");
       expect(entry.prompt).toContain("solid three-dimensional form");
-      expect(entry.prompt).toContain("never as glossy spheres or balls");
+      expect(entry.prompt).toContain("never as a glossy sphere, a ball");
+      // The glossy-sphere ban must stay PROHIBITIVE. Naming a replacement
+      // shape ("draw round elements as low solid discs") is a positive
+      // instruction, and the model obeyed it everywhere — scenes came back as
+      // rows of coloured coins. Same failure as the old "draw dots as flat 2D
+      // circles" line. Never prescribe a shape the subject did not ask for.
+      expect(entry.prompt).not.toMatch(/low solid disc/i);
+      expect(entry.prompt).not.toMatch(/draw any repeated round elements/i);
     }
   });
 

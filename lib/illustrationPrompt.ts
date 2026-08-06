@@ -81,10 +81,15 @@ function article(style: string): string {
  * rather than pulling against it.
  *
  * The glossy-sphere guard survives, since it was a real failure — scatter dots,
- * chart markers and tree nodes rendering as a bag of marbles. It is phrased as
- * a treatment for round elements *the subject already calls for*, not as an
- * instruction to include any, and "low solid discs" keeps them three-
- * dimensional instead of trading marbles for stickers.
+ * chart markers and tree nodes rendering as a bag of marbles. What does NOT
+ * survive is the cure: telling the model to draw round elements "as low solid
+ * discs" was a positive instruction naming a shape, the same mistake as the
+ * "draw dots as flat 2D circles" line that once littered every scene. It duly
+ * drew discs everywhere — rows of coloured coins standing in for data points,
+ * cells, and steps — until a reviewer asked why everything looked like tokens.
+ * The rule is now purely prohibitive: no spheres, no balls, no thin counters,
+ * and no opinion about what a round thing should be instead. Subjects that
+ * genuinely need a round object name one.
  *
  * **Light staging** because asking for solid form on its own overshot: the
  * first run under this rule came back as glossy plastic toys on heavy charcoal
@@ -113,8 +118,8 @@ const GLOBAL_CONSTRAINTS =
   "No text. Draw only the objects described — nothing scattered over, around, " +
   "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
   "Render each object as a solid three-dimensional form with real thickness, " +
-  "smooth matte shading, and clean edges; draw any repeated round elements the " +
-  "subject calls for as low solid discs, never as glossy spheres or balls. " +
+  "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
+  "a thin round counter. " +
   "Stage everything light and airy on a white background: pale grey and white " +
   "platforms, bright brand colors, no dark or black bases. Make every object a " +
   "single solid piece in one flat brand color: never build one object out of " +
@@ -133,8 +138,8 @@ const GLOBAL_CONSTRAINTS =
  *   Draw only the objects described — nothing scattered over, around, or
  *   behind them: no speckled dots, no confetti, no stray connecting lines.
  *   Render each object as a solid three-dimensional form with real thickness,
- *   flat matte shading, and clean edges; draw any repeated round elements the
- *   subject calls for as low solid discs, never as glossy spheres or balls.
+ *   smooth matte shading, and clean edges; never as a glossy sphere, a ball,
+ *   or a thin round counter.
  *
  *   Blue: #148cff
  *   Green: #20c621
