@@ -48,6 +48,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, extname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
+import sharp from "sharp";
 
 const KIE_UPLOAD = "https://kieai.redpandaai.co/api/file-base64-upload";
 const KIE_CREATE = "https://api.kie.ai/api/v1/jobs/createTask";
@@ -288,6 +289,54 @@ function makeStore(opts) {
   };
 }
 
+/**
+ * What fraction of the original's drawn content survived into the cut-out.
+ *
+ * Every pixel that is meaningfully not-white in the original is drawn content;
+ * in the cut-out that same pixel should still be opaque. Comparing the two
+ * catches the remover deleting solid objects, which is otherwise invisible
+ * until someone looks at the picture.
+ *
+ * Both are downscaled to a common width first: the comparison is statistical,
+ * and the remover may return a different pixel size than it was given.
+ */
+export async function keptFraction(originalBuf, cutoutBuf) {
+  const W = 320;
+  const raw = (buf) =>
+    sharp(buf).resize({ width: W }).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const [o, c] = await Promise.all([raw(originalBuf), raw(cutoutBuf)]);
+  const w = o.info.width, h = o.info.height;
+  const n = Math.min(w * h, c.info.width * c.info.height);
+
+  // Derive the background from the original's border rather than assuming
+  // white. The house style stages on white, but older art (and the occasional
+  // fresh render) fills the background with a solid colour — and there,
+  // "everything not white" counts the background as content, so a correct
+  // removal scores as catastrophic loss. Taking the median border pixel makes
+  // the measure mean the same thing either way.
+  const chan = [[], [], []];
+  const push = (i) => { for (let k = 0; k < 3; k++) chan[k].push(o.data[i * 4 + k]); };
+  for (let x = 0; x < w; x++) { push(x); push((h - 1) * w + x); }
+  for (let y = 0; y < h; y++) { push(y * w); push(y * w + w - 1); }
+  const bg = chan.map((v) => v.sort((a, b) => a - b)[v.length >> 1]);
+
+  let objects = 0;
+  let survived = 0;
+  for (let i = 0; i < n; i++) {
+    // 18/255 from the background ignores both the faint contact shadow under
+    // each object and any soft vignette, which the remover is right to drop.
+    const d = Math.max(
+      Math.abs(o.data[i * 4] - bg[0]),
+      Math.abs(o.data[i * 4 + 1] - bg[1]),
+      Math.abs(o.data[i * 4 + 2] - bg[2]),
+    );
+    if (d < 18) continue;
+    objects++;
+    if (c.data[i * 4 + 3] > 200) survived++;
+  }
+  return objects ? survived / objects : 1;
+}
+
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (opts.help) return printHelp();
@@ -300,6 +349,28 @@ async function main() {
     console.error(`No originals found in ${store.describe}`);
     process.exit(1);
   }
+
+  // How much of the original's drawn content a cut-out must retain. The
+  // remover occasionally decides that everything except the animal is
+  // background and returns a lone creature on transparency — `c-functions`
+  // came back as a beaver with its blue funnel machine and platform gone,
+  // `dsa-searching` as a capybara with its bar chart gone. Both share a shape:
+  // the animal stands apart from the objects, and only the largest connected
+  // subject survives.
+  //
+  // Measured across all 879 illustrations, a good cut-out keeps a median 96%
+  // of the original's drawn content and the 5th percentile is 90%. The two
+  // failures scored 0.26 and 0.19. A 0.70 floor sits far below anything
+  // healthy and far above both failures.
+  //
+  // Known limit: the measure reads the background off the border, so a
+  // background that is one solid colour (white staging, or a flat blue field)
+  // is handled exactly, but a TEXTURED one is not — legacy `pandas-messy-data`,
+  // a panda on a tiled floor, scores 0.44 for a perfectly good removal. The
+  // house style has staged on plain white since 2026-07, so fresh art does not
+  // hit this; when it does, the run refuses to write and asks for --force,
+  // which is the safe direction to be wrong in.
+  const KEEP_FLOOR = 0.7;
 
   const todo = [];
   for (const id of ids) {
@@ -315,15 +386,29 @@ async function main() {
   let i = 0;
   let ok = 0;
   let failed = 0;
+  const eaten = [];
   async function worker() {
     while (i < todo.length) {
       const id = todo[i++];
       try {
         const src = await store.read(id);
         const cut = await removeBackground(src, `${id}.png`, key);
+        const kept = await keptFraction(src, cut);
+        if (kept < KEEP_FLOOR) {
+          // Do NOT write it. A cut-out is what the site serves, so promoting
+          // this would publish a lone animal on an otherwise empty card, and
+          // the next run would skip the id because a cut-out now exists.
+          eaten.push({ id, kept });
+          failed++;
+          console.error(
+            `  ✗ ${id}: background removal kept only ${(kept * 100).toFixed(0)}% ` +
+              `of the artwork — objects were eaten, not written`,
+          );
+          continue;
+        }
         const where = await store.writeCutout(id, cut);
         ok++;
-        console.log(`  ✓ ${where} (${(cut.length / 1e6).toFixed(2)}MB)`);
+        console.log(`  ✓ ${where} (${(cut.length / 1e6).toFixed(2)}MB, kept ${(kept * 100).toFixed(0)}%)`);
       } catch (err) {
         failed++;
         console.error(`  ✗ ${id}: ${err.message}`);
@@ -332,6 +417,15 @@ async function main() {
   }
   await Promise.all(Array.from({ length: Math.min(opts.concurrency, todo.length) }, worker));
   console.log(`\nDone: ${ok} removed, ${failed} failed.`);
+  if (eaten.length) {
+    console.error(
+      `\n${eaten.length} image(s) lost their objects to the remover and were NOT written:\n` +
+        eaten.map((e) => `  ${e.id} (kept ${(e.kept * 100).toFixed(0)}%)`).join("\n") +
+        `\nRe-run with --force to retry them; the remover is not deterministic, so a` +
+        `\nsecond attempt often succeeds. If one keeps failing, redraw it with the` +
+        `\nanimal touching the objects rather than standing apart from them.`,
+    );
+  }
   if (failed > 0) process.exitCode = 1;
 }
 
