@@ -83,12 +83,24 @@ jobs:
     env:
       BUCKET: dataslope-illustrations
       PREFIX: illustrations/
-      # Two weeks: long enough to generate, review in /illustration-prompts,
-      # promote the keepers, and still re-promote a run at a different quality
-      # after feedback lands — that second pass is free, and re-generating
-      # because the pristine PNG expired is not. Short enough that a few
-      # thousand rejected candidates never sit around being billed.
-      EXPIRE_DAYS: "14"
+      # TEMPORARY: 30 days for the illustration development phase, raised from
+      # the standing value of 14 on 2026-08-06 at the reviewer's request.
+      # REVERT TO "14" once the art has settled.
+      #
+      # Why it was raised: review rounds have been running long. A single batch
+      # can go generate → review → re-roll → review several times over more
+      # than two weeks, and candidates expiring mid-round means paying to
+      # regenerate a PNG that existed. The standing rationale for 14 still
+      # holds and is why this is temporary — a month of rejected candidates,
+      # at a few thousand PNGs per round, is real storage being billed for art
+      # nobody will promote.
+      #
+      # Two weeks was chosen as: long enough to generate, review in
+      # /illustration-prompts, promote the keepers, and still re-promote a run
+      # at a different quality after feedback lands — that second pass is free,
+      # and re-generating because the pristine PNG expired is not. Short enough
+      # that a few thousand rejected candidates never sit around being billed.
+      EXPIRE_DAYS: "30"
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
       # Editing bucket configuration needs an R2 Admin Read & Write token; the
       # object-scoped R2_INC_CACHE_* pair is denied here (see the header).
