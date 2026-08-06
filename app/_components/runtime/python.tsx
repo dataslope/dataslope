@@ -335,7 +335,7 @@ def bye(name: str) -> str:
 const PACKAGES: PackageInfo[] = [
   // Scientific
   {
-    cat: "Scientific Computing", icon: "🔢", color: "#4f8ef7", name: "numpy", ver: "2.2",
+    cat: "Scientific Computing", icon: "🔢", color: "#4f8ef7", name: "numpy", ver: "2.4",
     desc: "N-dimensional arrays, linear algebra, FFT, random sampling",
     example: `import numpy as np
 
@@ -347,7 +347,7 @@ print("eigenvalues:", np.linalg.eigvals(a).round(3))
 `,
   },
   {
-    cat: "Scientific Computing", icon: "📐", color: "#4f8ef7", name: "scipy", ver: "1.14",
+    cat: "Scientific Computing", icon: "📐", color: "#4f8ef7", name: "scipy", ver: "1.18",
     desc: "Optimization, integration, interpolation, signal processing",
     example: `from scipy import integrate, optimize
 import numpy as np
@@ -360,7 +360,7 @@ print(f"min at x={minimum.x:.4f}, f={minimum.fun:.4f}")
 `,
   },
   {
-    cat: "Scientific Computing", icon: "🧮", color: "#4f8ef7", name: "sympy", ver: "1.13",
+    cat: "Scientific Computing", icon: "🧮", color: "#4f8ef7", name: "sympy", ver: "1.14",
     desc: "Symbolic mathematics, algebra, calculus, equation solving",
     example: `from sympy import symbols, expand, diff, integrate
 
@@ -373,7 +373,7 @@ print("∫ dx:  ", integrate(expr, x))
   },
   // Data
   {
-    cat: "Data & Analysis", icon: "🐼", color: "#34d399", name: "pandas", ver: "2.3",
+    cat: "Data & Analysis", icon: "🐼", color: "#34d399", name: "pandas", ver: "3.0",
     desc: "DataFrames, Series, data manipulation and analysis",
     example: `import pandas as pd
 
@@ -417,7 +417,7 @@ print("schema:", table.schema)
   },
   // Visualization
   {
-    cat: "Visualization", icon: "📈", color: "#f59e0b", name: "matplotlib", ver: "3.8",
+    cat: "Visualization", icon: "📈", color: "#f59e0b", name: "matplotlib", ver: "3.10",
     desc: "2D plotting, line, bar, scatter, histogram, heatmap, etc.",
     example: `import matplotlib.pyplot as plt
 import numpy as np
@@ -431,7 +431,7 @@ plt.show()
 `,
   },
   {
-    cat: "Visualization", icon: "🎨", color: "#f59e0b", name: "plotly", ver: "5.24",
+    cat: "Visualization", icon: "🎨", color: "#f59e0b", name: "plotly", ver: "6.9",
     desc: "Interactive charts, line, bar, scatter, 3D, maps",
     example: `import plotly.express as px
 
@@ -476,7 +476,7 @@ print(chart.to_json(indent=2))
 `,
   },
   {
-    cat: "Visualization", icon: "🖼️", color: "#f59e0b", name: "pillow", ver: "11.3",
+    cat: "Visualization", icon: "🖼️", color: "#f59e0b", name: "pillow", ver: "12.2",
     desc: "Image processing, open, transform, save images",
     example: `from PIL import Image, ImageDraw
 
@@ -489,7 +489,7 @@ print("size:", img.size, "mode:", img.mode)
   },
   // ML / AI
   {
-    cat: "Machine Learning", icon: "🤖", color: "#a78bfa", name: "scikit-learn", ver: "1.7",
+    cat: "Machine Learning", icon: "🤖", color: "#a78bfa", name: "scikit-learn", ver: "1.8",
     desc: "Classification, regression, clustering, model selection",
     example: `from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
@@ -516,7 +516,7 @@ print(f"accuracy: {model.score(Xte, yte):.3f}")
   },
   // Text & Data Formats
   {
-    cat: "Text & Formats", icon: "📝", color: "#f472b6", name: "regex", ver: "2024.11",
+    cat: "Text & Formats", icon: "📝", color: "#f472b6", name: "regex", ver: "2026.3",
     desc: "Advanced regular expressions beyond the standard \`re\`",
     example: `import regex
 
@@ -587,7 +587,7 @@ print("unpacked:", msgpack.unpackb(packed))
   },
   // Networking & Utilities
   {
-    cat: "Utilities", icon: "🌐", color: "#60a5fa", name: "requests", ver: "2.32",
+    cat: "Utilities", icon: "🌐", color: "#60a5fa", name: "requests", ver: "2.33",
     desc: "HTTP requests (via micropip, pure Python)",
     example: `# Note: real network calls are blocked in the browser sandbox; this
 # example shows the request-construction API instead of executing it.
@@ -600,7 +600,7 @@ print("method: ", req.method)
 `,
   },
   {
-    cat: "Utilities", icon: "🔐", color: "#60a5fa", name: "cryptography", ver: "46.0",
+    cat: "Utilities", icon: "🔐", color: "#60a5fa", name: "cryptography", ver: "47.0",
     desc: "Cryptographic recipes and primitives",
     example: `from cryptography.fernet import Fernet
 
@@ -612,7 +612,7 @@ print("decrypted:", f.decrypt(token))
 `,
   },
   {
-    cat: "Utilities", icon: "⚙️", color: "#60a5fa", name: "attrs", ver: "25.2",
+    cat: "Utilities", icon: "⚙️", color: "#60a5fa", name: "attrs", ver: "26.1",
     desc: "Classes without boilerplate, define clean data classes",
     example: `import attrs
 
@@ -627,7 +627,7 @@ print("fields:", [f.name for f in attrs.fields(Point)])
 `,
   },
   {
-    cat: "Utilities", icon: "📦", color: "#60a5fa", name: "packaging", ver: "24.2",
+    cat: "Utilities", icon: "📦", color: "#60a5fa", name: "packaging", ver: "26.1",
     desc: "Version parsing and specifiers (PEP 440/508)",
     example: `from packaging.version import Version
 from packaging.specifiers import SpecifierSet
@@ -639,7 +639,7 @@ print(f"{v} satisfies {spec}? {v in spec}")
 `,
   },
   {
-    cat: "Utilities", icon: "🧪", color: "#60a5fa", name: "pytest", ver: "8.3",
+    cat: "Utilities", icon: "🧪", color: "#60a5fa", name: "pytest", ver: "9.0",
     desc: "Testing framework, run via micropip install",
     example: `# A minimal pytest-style sanity check. In a real project these would
 # live in a test_*.py file and be discovered by 'pytest'.
@@ -829,7 +829,7 @@ export const pythonAdapter: LanguageAdapter = {
     language: "Python",
     version: "3.14.2",
     // Keep in sync with PYODIDE_VERSION in pyodide-worker.ts.
-    engine: "Pyodide 314.0.2",
+    engine: "Pyodide 314.0.4",
     engineUrl: "https://pyodide.org",
     notes: "Runs in a Web Worker so the UI stays responsive while your code executes.",
   },

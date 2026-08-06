@@ -40,7 +40,15 @@ const FAQS: { q: string; a: string }[] = [
 
 export function Faq() {
   return (
-    <section className="mx-auto w-full max-w-3xl px-4 sm:px-6">
+    // `id` is the target of the `/#faq` deep links (the pricing page's "Browse
+    // the FAQ" line, the footer). Without it the hash matched nothing and the
+    // browser just left the visitor at the top of the home page.
+    // `scroll-mt-20` clears the sticky header (h-14 / md:h-16) so the heading
+    // isn't parked underneath it.
+    <section
+      id="faq"
+      className="mx-auto w-full max-w-3xl scroll-mt-20 px-4 sm:px-6"
+    >
       <h2 className="mb-16 block text-center text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
         Frequently asked questions
       </h2>

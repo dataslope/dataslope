@@ -35,6 +35,11 @@ import styles from "./Figure.module.css";
 
 const PUBLIC_BASE = "/images";
 
+// The slug printed under each figure is a regeneration handle for authors (see
+// where it's rendered below), not something a learner should see, so it is
+// development-only.
+const SHOW_ASSET_ID = process.env.NODE_ENV === "development";
+
 // Output extension → MIME type for the <picture> <source>/<img> elements.
 const MIME: Record<string, string> = {
   webp: "image/webp",
@@ -125,10 +130,14 @@ export function Figure({
           suffix dropped, which is what `data/illustration-prompts.json` is keyed
           by and what every pipeline script takes as `--only`. Rendered so a
           reviewer reading the live page can name the exact image to redo
-          without cross-referencing the gallery. */}
-      <figcaption className={styles.assetId}>
-        <code>{slug.replace(/-cutout$/, "")}</code>
-      </figcaption>
+          without cross-referencing the gallery, which makes it authoring
+          scaffolding: like the `pending` hint above, it shows only under
+          `next dev` and never on a deployed page. */}
+      {SHOW_ASSET_ID ? (
+        <figcaption className={styles.assetId}>
+          <code>{slug.replace(/-cutout$/, "")}</code>
+        </figcaption>
+      ) : null}
     </figure>
   );
 }

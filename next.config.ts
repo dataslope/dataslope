@@ -76,17 +76,16 @@ const nextConfig: NextConfig = {
   // graphs into every page's chunk.
   experimental: {
     optimizePackageImports: ["lucide-react", "react-icons"],
-    // NOTE: this option is a NO-OP for this project's builds. It is only
-    // wired into Next's webpack/rspack pipeline (CssChunkingPlugin), and Next
-    // 16 builds with Turbopack by default, which `next dev`/`next build`
-    // use here. It's kept solely so a `next build --webpack` fallback keeps
-    // deterministic CSS chunk ordering; do NOT rely on it for the
-    // segment-CSS reorder bugs (#528/#541). The real, bundler-independent
-    // mitigations are CSS-level: the shared @source list in
-    // app/tailwind.shared.css (both Tailwind roots emit identical utility
-    // layers, so stylesheet order can't flip base/variant winners) and the
-    // layer/unlayered re-assertions in app/docs.css + app/home.css.
-    cssChunking: "strict",
+    // `cssChunking: "strict"` used to sit here. It was already a NO-OP for
+    // this project (it only feeds Next's webpack/rspack CssChunkingPlugin,
+    // and `next dev`/`next build` run Turbopack), and as of Next 16.3 setting
+    // it at all is a hard build error under Turbopack, so it's gone. Nothing
+    // is lost: it was never what protected us from the segment-CSS reorder
+    // bugs (#528/#541). Those mitigations are CSS-level and bundler-
+    // independent, the shared @source list in app/tailwind.shared.css (both
+    // Tailwind roots emit identical utility layers, so stylesheet order can't
+    // flip base/variant winners, enforced by __tests__/cssCascadeParity) and
+    // the layer/unlayered re-assertions in app/docs.css + app/home.css.
     // Keep prefetched/visited route payloads reusable in the client router
     // cache so re-hovers and back/forward navigations don't re-fetch the same
     // payload from the edge. (Historically this also mattered to avoid billed

@@ -56,7 +56,7 @@ export const PLOTLY_CDN = `https://cdn.jsdelivr.net/npm/plotly.js-dist-min@${PLO
 // bundle / Worker. Mermaid lazy-loads its per-diagram chunks from the same
 // CDN base at runtime. The package is intentionally NOT in package.json (it
 // was never bundled); this constant is the single version pin.
-export const MERMAID_VERSION = "11.16.0";
+export const MERMAID_VERSION = "11.16.1";
 export const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/+esm`;
 
 // The TypeScript compiler (~2 MB gz) powers JS/TS intellisense inside a
@@ -85,7 +85,7 @@ export const ESBUILD_WASM_CDN_BASE = `https://cdn.jsdelivr.net/npm/esbuild-wasm@
 // compiler (it compiles utility classes on the fly with a
 // MutationObserver), which is exactly the learning-playground use case;
 // don't reuse this pin for anything that ships production pages.
-export const TAILWIND_BROWSER_VERSION = "4.3.2";
+export const TAILWIND_BROWSER_VERSION = "4.3.3";
 export const TAILWIND_BROWSER_CDN = `https://cdn.jsdelivr.net/npm/@tailwindcss/browser@${TAILWIND_BROWSER_VERSION}`;
 
 // esm.sh serves npm packages as native ES modules, the React preview's
@@ -102,6 +102,6 @@ export const ESM_SH_ORIGIN = "https://esm.sh";
 // playground. The set is the closed dependency graph of @types/react:
 // index/global/jsx-runtime + csstype, plus @types/react-dom's client
 // entry. Keep the majors aligned with REACT_VERSION in esmResolve.ts.
-export const REACT_TYPES_VERSION = "19.2.17";
-export const REACT_DOM_TYPES_VERSION = "19.2.3";
+export const REACT_TYPES_VERSION = "19.2.18";
+export const REACT_DOM_TYPES_VERSION = "19.2.4";
 export const CSSTYPE_VERSION = "3.2.3";

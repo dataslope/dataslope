@@ -68,8 +68,15 @@ function utilityRules(css: string): Array<[string, string]> {
   return rules;
 }
 
-/** Learn-only utilities must be Fumadocs-theme/plugin-dependent. */
-const FUMADOCS_ONLY = /fd-|^prose(-|$)|^not-prose$/;
+/** Learn-only utilities must be Fumadocs-theme/plugin-dependent.
+ *
+ * The optional leading `.` is for rules `utilityRules` keys by raw selector
+ * rather than by class, i.e. anything that isn't a lone class. fumadocs-ui
+ * ≤16.9 wrote `.prose-no-margin { & > :first-child { … } }`, one class-keyed
+ * rule; 16.14 emits the same styling desugared into
+ * `.prose-no-margin > :first-child` and `… > :last-child`, which arrive here
+ * as selectors. Same Fumadocs-only prose rule either way. */
+const FUMADOCS_ONLY = /fd-|^\.?prose(-|$)|^not-prose$/;
 
 describe("Tailwind root cascade parity (app/tailwind.css vs app/docs.css)", () => {
   let tw: Array<[string, string]>;
