@@ -825,6 +825,36 @@ export function IllustrationPromptsClient() {
             </button>
           </nav>
         ) : null}
+
+        {/* Every page as its own link, so a reviewer working through the queue
+            can jump straight to where they left off instead of stepping through
+            with Next. Real hrefs, so they can be opened in a new tab or copied;
+            the click is intercepted to keep the SPA's pushState behaviour. */}
+        {pageCount > 1 ? (
+          <nav className={styles.pageList} aria-label="Jump to illustration page">
+            {Array.from({ length: pageCount }, (_, i) => (
+              <a
+                key={i}
+                href={urlFor(i, filter)}
+                className={
+                  i === current
+                    ? `${styles.pageListLink} ${styles.pageListLinkCurrent}`
+                    : styles.pageListLink
+                }
+                aria-current={i === current ? "page" : undefined}
+                onClick={(e) => {
+                  // Let modified clicks (new tab, new window, download) through.
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0)
+                    return;
+                  e.preventDefault();
+                  goTo(i);
+                }}
+              >
+                {i + 1}
+              </a>
+            ))}
+          </nav>
+        ) : null}
       </>
     );
   };

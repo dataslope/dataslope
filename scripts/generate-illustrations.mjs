@@ -174,8 +174,21 @@ export function buildPrompt(spec, colors) {
   const article = /^[aeiou]/i.test(style) ? "An" : "A";
   // Mirror of GLOBAL_CONSTRAINTS in lib/illustrationPrompt.ts (same parity test).
   const constraints =
-    "No text. Draw dots, markers, and nodes as flat 2D circles, never as " +
-    "glossy 3D spheres or balls.";
+    "No text. Draw only the objects described — nothing scattered over, around, " +
+    "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
+    "Render each object as a solid three-dimensional form with real thickness, " +
+    "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
+    "a thin round counter. " +
+    "Stage everything light and airy on a white background: pale grey and white " +
+    "platforms, bright brand colors, no dark or black bases. Make every object a " +
+    "single solid piece in one flat brand color: never build one object out of " +
+    "many small blocks or cubelets, never pack a container with a heap of little " +
+    "pieces, and never blend, mix, or bleed two colors into each other. Animals " +
+    "are the exception and the focal point: draw each one as a rounded, " +
+    "realistic creature with soft fur or feather texture and its own natural " +
+    "coloring and markings, never a flat brand color and never a flat " +
+    "silhouette. A bird has wings, a beak and feet and never hands or arms: it " +
+    "perches, stands, or nudges things with its beak rather than holding them.";
   return (
     `${article} ${style} of ${spec.subject}. ${constraints}\n\n` +
     `Blue: ${colors.blue}\n` +

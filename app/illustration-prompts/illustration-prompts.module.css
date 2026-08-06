@@ -660,3 +660,39 @@
     display: none;
   }
 }
+
+/* Every page number, under the prev/next row. Wraps rather than scrolls: the
+   queue runs to dozens of pages and a reviewer should see all of them at once
+   rather than hunt along a strip. */
+.pageList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.pageListLink {
+  min-width: 2rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  background: var(--btn-bg);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+
+.pageListLink:hover {
+  background: var(--btn-hover);
+  color: var(--fg);
+}
+
+.pageListLinkCurrent {
+  border-color: var(--fg);
+  color: var(--fg);
+  font-weight: 600;
+}

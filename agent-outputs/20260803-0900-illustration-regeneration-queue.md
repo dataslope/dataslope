@@ -89,16 +89,25 @@ shared by the API and the gallery.
 Marking an illustration with the note field left blank does **not** store an
 empty note. `DEFAULT_REGEN_NOTE` goes in instead:
 
-> redraw this from scratch with a different composition: fewer, larger shapes
-> and less fine detail, since the small details came out malformed
+> redraw this from scratch as a solid 3D isometric scene built from a few large
+> objects, dropping the decorative dots, speckles, and connecting lines that
+> cluttered it; simplify by removing decoration, not by flattening it
 
-That is the common case by a wide margin (mushed star points, broken little
-characters, lettering-shaped smears), and the fix is always the same. It asks
-for a redraw *from scratch* rather than "a simpler illustration" because the
-older wording was read as an edit to the existing prompt: clauses came off the
-end of the old `subject` and the same composition came back, thinner. The
-gallery shows the default as the input's placeholder, so what will be stored is
-visible before the button is pressed. Type anything and that wins.
+That is the common case by a wide margin — decorative dots strewn over the
+objects, faint lines webbing them together, speckles in the background — and the
+fix is always the same: keep the scene, lose the debris. It asks for a redraw
+*from scratch* rather than "a simpler illustration" because the older wording was
+read as an edit to the existing prompt: clauses came off the end of the old
+`subject` and the same composition came back, thinner. The gallery shows the
+default as the input's placeholder, so what will be stored is visible before the
+button is pressed. Type anything and that wins.
+
+**It says "not by flattening it" for a reason.** The wording before this one —
+"fewer, larger shapes and less fine detail" — was read as *flatten*: a round of
+redraws came back as flat slabs, plates and discs, which is a different
+illustration rather than a cleaner one. Isometric is the house style because it
+has volume. "Simplify" in this queue has only ever meant **remove decoration**,
+never **remove the third dimension**.
 
 ---
 
@@ -260,9 +269,32 @@ you were working is not one you have handled.
 ```sql
 UPDATE illustration_regen_marks
    SET marked = 0,
-       regenerated_at = '2026-08-03T12:00:00Z',   -- now, ISO-8601 UTC
-       updated_at     = '2026-08-03T12:00:00Z'
+       regenerated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+       updated_at     = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
  WHERE prompt_id IN ('aida-broken-joins', 'python-basics-loops');
+```
+
+**Let the database supply the time. Never type the timestamp in.** Approval is
+a comparison, not a flag: the card stays green while `regenerated_at >
+approved_at`. A stamp written even a few minutes into the future therefore
+makes the row *unapprovable* — the reviewer presses Approve, the API writes a
+real `approved_at`, and because that real time is still behind the invented
+one the card comes straight back as awaiting approval. It looks exactly like a
+broken button, and it cannot be fixed from the UI.
+
+This is not hypothetical. On 2026-08-05 a batch of 20 was stamped with
+hand-written times roughly half an hour ahead of the clock, and every one of
+them silently refused to approve until the rows were rewritten with the true
+promotion time. `strftime` costs nothing and cannot drift. `%f` is deliberate:
+it yields `SS.SSS`, matching the millisecond precision the Approve endpoint
+writes with `new Date().toISOString()`, so the two timestamps sort against
+each other correctly rather than by an accident of how `Z` and `.` compare.
+
+To check for the damage after any stamping run:
+
+```sql
+SELECT COUNT(*) FROM illustration_regen_marks
+ WHERE regenerated_at > strftime('%Y-%m-%dT%H:%M:%fZ', 'now');   -- must be 0
 ```
 
 Do **not** touch `approved_at`. Approving is the human's half of the round trip

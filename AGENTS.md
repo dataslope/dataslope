@@ -149,8 +149,12 @@ tool, and a click opens the raw image in a new tab. Every card can be marked
 `dataslope-illustrations`, table `illustration_regen_marks` (binding
 `ILLUSTRATIONS_DB`, schema in `migrations-illustrations/`). Typing in the note
 marks the illustration by itself; marking with the note blank stores
-`DEFAULT_REGEN_NOTE` ("redraw this from scratch with a different composition:
-fewer, larger shapes…"), which is the usual reason to redraw.
+`DEFAULT_REGEN_NOTE` ("redraw this from scratch as a solid 3D isometric scene
+built from a few large objects, dropping the decorative dots…"), which is the
+usual reason to redraw. It says "simplify by removing decoration, not by
+flattening it" because the previous wording ("fewer, larger shapes") was read as
+*flatten*, and the redraws it produced traded the isometric house style for flat
+slabs and discs.
 
 A card moves through three states: normal, red once queued, then **green with an
 Approve button** once redrawn and not yet signed off. Approve is the human's
@@ -301,13 +305,31 @@ Default to it — it is also the literal default (`DEFAULT_STYLE` in
 `lib/illustrationPrompt.ts` and `meta.defaultStyle` in the JSON), so a prompt
 that omits `style` gets it automatically.
 
-**No sphere-like dot groups.** Repeated round elements (scatter dots, chart
-markers, tokens in a tray, tree nodes) draw as **flat 2D circles**, never glossy
-3D balls, which read as a bag of marbles instead of as data.
-`buildIllustrationPrompt` appends that rule to every prompt next to "No text.",
-so a subject never has to state it — but a subject that asks for "spheres",
-"balls" or "beads" fights it, so write "flat discs" or "flat counters" instead.
-A single large round object (a globe, one marble on a track) is unaffected.
+**Nothing beyond the objects the subject names.** `buildIllustrationPrompt`
+appends this to every prompt next to "No text.", because the rule it replaced
+caused the failure it was meant to prevent: "draw dots, markers, and nodes as
+flat 2D circles" named three things to draw in all 879 prompts, and the model
+duly drew them into subjects that had none. A chest of drawers came back with a
+coloured dot on every corner; an elephant resting a foot on a cube came back
+ringed by dot-and-line networks. **A named noun is content, even inside a
+negative rule** — so the constraint now names only the *categories of debris* to
+omit (speckled dots, confetti, stray connecting lines) and never a thing to draw.
+
+**One piece, one colour.** Every object is a single solid piece in one flat brand
+colour. The model cannot hold an assembly together: a cube built from cubelets, a
+bin packed with blocks, or a tower of stacked cubes comes back fused and notched,
+with colours bleeding into shades outside the palette. The failure is the
+*assembly*, not the count — three large blocks render perfectly where forty
+cubelets do not — so containers hold a few large items, never a heap.
+
+**Solid 3D forms.** Isometric is the house style because it has volume, so the
+constraints say so outright: real thickness, smooth matte shading, clean edges.
+The old wording asked for "flat 2D circles" and flattened whole scenes with it.
+Write subjects in volumetric language — "thick", "deep", "solid", "chunky",
+"block", "cabinet", "column" — and avoid "flat circles", "slab", "plate",
+"panel", "sheet", which read as 2D and render that way. A subject that asks for
+"spheres", "balls", or "beads" still fights the glossy-marble guard; say "low
+solid discs" when a scene genuinely needs repeated round elements.
 
 **Every other style is retired.** Risograph, flat geometric vector, line art,
 blueprint schematic and cut-paper collage were all tried and dropped: the

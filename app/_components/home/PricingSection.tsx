@@ -5,7 +5,6 @@ import {
   Briefcase,
   Check,
   CloudUpload,
-  Crown,
   Database,
   GraduationCap,
   HardDrive,
@@ -13,8 +12,6 @@ import {
   Share2,
   Sparkle,
   SquareTerminal,
-  User,
-  UserCheck,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -41,8 +38,12 @@ type Feature = {
 
 interface Plan {
   name: string;
-  /** Tier glyph shown at the right end of the column's title line. */
-  icon: LucideIcon;
+  /** Illustration slug shown at the right end of the column's title line, one
+   *  marmot posed to read as the tier: a satchel for the visiting Guest, a
+   *  scarf for the signed-up Free Member, a crown for Pro. Replaces the Lucide
+   *  glyphs (User / UserCheck / Crown) these columns used to carry, so the
+   *  table is dressed in the same artwork as the rest of the site. */
+  iconSlug: string;
   description: string;
   /** Price + sub-line per billing period. The free tiers ignore the toggle
    *  (both periods are identical). */
@@ -71,7 +72,7 @@ const FEATURE_COUNT = 8;
 const PLANS: Plan[] = [
   {
     name: "Guest",
-    icon: User,
+    iconSlug: "pricing-guest",
     description: "Jump straight in, sign-in optional.",
     priceMonthly: "$0",
     priceAnnual: "$0",
@@ -100,7 +101,7 @@ const PLANS: Plan[] = [
   },
   {
     name: "Free Member",
-    icon: UserCheck,
+    iconSlug: "pricing-free-member",
     description: "Register for free to save and share in the cloud.",
     priceMonthly: "$0",
     priceAnnual: "$0",
@@ -152,7 +153,7 @@ const PLANS: Plan[] = [
   //   • widen the grid again (see the grid-cols / subgrid-row comments below).
   {
     name: "Pro",
-    icon: Crown,
+    iconSlug: "pricing-pro",
     description: "For people who live in their playgrounds.",
     priceMonthly: "$4.99",
     priceAnnual: "$40",
@@ -357,11 +358,7 @@ function PlanColumn({
 }) {
   const price = annual ? plan.priceAnnual : plan.priceMonthly;
   const note = annual ? plan.noteAnnual : plan.noteMonthly;
-  const PlanIcon = plan.icon;
-  // Guest / Free Member: match the title text colour. Pro: brand green.
-  const iconClass = plan.highlighted
-    ? "text-[var(--ds-green-600)] dark:text-[var(--ds-green-400)]"
-    : "text-[var(--ds-gray-900)] dark:text-white";
+
   return (
     // On desktop each plan is a row-subgrid spanning all FEATURE_COUNT + 3 rows
     // so its header / price / CTA / feature rows align with the other plans.
@@ -371,7 +368,12 @@ function PlanColumn({
     <div
       className={`flex flex-col gap-3 px-6 py-6 lg:row-span-11 lg:row-start-1 lg:grid lg:grid-rows-subgrid lg:px-8 lg:py-0 ${colClass}`}
     >
-      <div className="lg:pt-8">
+      {/* `relative` so the marmot can be lifted OUT OF FLOW below. The title
+          row must keep the height it had when this was a 20px Lucide glyph:
+          as a flex item, a 120px image sets the row height and pushes the
+          price, CTA and every feature row down, which shows up as the plan
+          columns no longer aligning with each other. */}
+      <div className="relative lg:pt-8">
         <div className="flex items-center gap-2.5">
           <h3 className="text-lg font-semibold text-[var(--ds-gray-900)] dark:text-white">
             {plan.name}
@@ -381,11 +383,25 @@ function PlanColumn({
               {plan.badge}
             </span>
           )}
-          <PlanIcon
-            className={`ml-auto size-5 shrink-0 ${iconClass}`}
-            aria-hidden="true"
-          />
         </div>
+        {/* Decorative: the plan name beside it already says which tier this is,
+            so the marmot is hidden from assistive tech rather than read out as
+            "Guest, Guest".
+
+            Out of flow, and deliberately overhanging the card's top edge — the
+            reviewer liked the marmot breaking the border rather than sitting
+            inside it. -40% rather than -50% drops it a little further into the
+            card so it reads as resting on the edge instead of floating over
+            it. `pointer-events-none` keeps it from swallowing clicks. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/images/${plan.iconSlug}-cutout.webp`}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+          className="pointer-events-none absolute right-0 top-1/2 size-[120px] -translate-y-[40%] object-contain"
+        />
       </div>
 
       <div>

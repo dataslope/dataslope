@@ -56,12 +56,14 @@ Violating any of these has already been tried and rejected. Don't re-litigate.
   yellow `#ffdd6c`. `"No text."` is appended automatically by
   `lib/illustrationPrompt.ts` — **never ask for lettering**, the model bakes in garbled
   text.
-- **No sphere-like dot groups.** Repeated round elements — scatter dots, chart markers,
-  tokens in a tray, the nodes of a tree — draw as **flat 2D circles**, never glossy 3D
-  balls. `lib/illustrationPrompt.ts` appends that rule to every prompt alongside
-  `"No text."`, so a subject never has to say it; what a subject must not do is *ask*
-  for spheres or beads and fight it. A single large round object (a globe, one marble
-  running a track) is fine, which is why the rule names repeated elements only.
+- **Nothing beyond the objects the subject names**, and **solid 3D forms**.
+  `lib/illustrationPrompt.ts` appends both to every prompt alongside `"No text."`, so a
+  subject never has to say either. The rule they replaced — "draw dots, markers, and
+  nodes as flat 2D circles" — did the damage it existed to prevent: naming those nouns
+  in all 879 prompts made the model add them everywhere (dots on a chest of drawers,
+  dot-and-line webs around an elephant), and "flat 2D circles" flattened the isometric
+  style itself. A subject must not *ask* for spheres or beads and fight the glossy-
+  marble guard; where a scene needs repeated round elements, say "low solid discs".
 - Promotion writes **straight to `public/images/`**. Never add a copy under
   `assets/images/` — that is the double-encode this branch removed (cost ~1.8 dB PSNR).
 - Exactly **one `<Figure>` per page**, referencing the **`-cutout`** slug.
@@ -134,9 +136,57 @@ set that shipped:
   "gate" recur because they cut out cleanly and read at small sizes.
 - **No text, ever.** If a label seems needed, use "blank name plate", "blank banner",
   "blank paper tag".
-- **Flat discs, not spheres.** Say "flat circles", "flat discs", "flat counters" when a
-  subject needs many small round things. Writing "spheres", "balls", or "beads" asks the
-  model for glossy 3D marbles, which is the look the global rule exists to stop.
+- **Write in volume, not in outlines.** "thick", "deep", "solid", "chunky", "heavy",
+  "block", "cabinet", "column" all render with real depth. Avoid "flat circles", "slab",
+  "plate", "panel", "sheet" and bare "frame": they read as 2D and come back that way —
+  a subject reading "one large plain frame holding three big drawers" rendered as a
+  wireframe drawing rather than a cabinet. Where a scene needs repeated round things,
+  "low solid discs" keeps them dimensional; "spheres", "balls", and "beads" ask for
+  glossy marbles, which is the look the global rule exists to stop.
+- **Do not describe decoration.** No "scattered dots", "connecting lines", "constellation",
+  "network of nodes" unless the lesson's idea genuinely *is* a graph. A field of small
+  repeated marks is the single failure mode this pipeline keeps rediscovering.
+- **One piece, one colour. Never an assembly.** The model cannot hold many small units
+  together: anything worded as built from or filled with them — "a cube of cubelets", "a
+  bin of blocks", "a heap", "a pile", "a tower of stacked cubes" — comes back fused,
+  notched, or half-melted, with colours bleeding into shades outside the palette (a
+  four-colour brand returning orange). Three large blocks side by side render perfectly;
+  the same volume as forty cubelets does not. Say "one solid block", and let a container
+  hold **a few large items**, never a heap of little ones.
+- **A creature per course.** The roster in use: marmot (Dataslope, Python, scikit-learn,
+  SciPy), blue elephant (PostgreSQL, SQL), yellow duck (DuckDB), panda (pandas), penguin
+  (Seaborn), plain green bird (NLP), chipmunk (Plotly viz), plain blue bird (ggplot2),
+  red fox (R), owl (statistics), capybara (DSA), beaver (systems C, data engineering),
+  quokka (C++), brown bear (Java), grey rabbit (C#), otter (TypeScript), canary
+  (JavaScript), red panda (React), golden hamster (SQLite), koala (time series), raccoon
+  (LLMs), tabby cat (CSS/web). A page that already has a creature **keeps it** — add the
+  course animal alongside rather than swapping it out.
+
+  **Retired by the reviewer, never reintroduce:** squirrel (use a chipmunk; capybaras
+  are fine too), peacock and multi-colour parrot (use a single-colour bird),
+  mallard (use a yellow duck), rat and mouse (use a chipmunk or hamster), hedgehog (use
+  a quokka, capybara or deer), and green lizards, octopuses and spiders. Seals and
+  dolphins are welcome additions. The blue elephant is a **cute smooth 3D character**,
+  not a realistic animal: bright matte blue, plain solid ears, and **no white lines or
+  markings in the ears**.
+- **Birds have feet, never hands.** A bird perches, stands, or nudges things with its
+  beak. It never holds, carries, or grasps. If the scene needs something held, give it
+  to a non-bird creature or restage the action.
+- **Never ask for writing.** "labelled", "numbered", "titled", a screen "showing output"
+  — the model obeys the subject over the global "No text." rule and returns garbled
+  glyphs. Distinguish parts by colour, size, or shape instead. (Audited 2026-08-05: the
+  global rule has in fact held on every such image so far, but it is a coin flip and not
+  worth taking.)
+- **Name objects, don't define them recursively.** `dsa-recursion` read "one large box
+  holding a smaller box, which holds a smaller one again" and rendered as a bare
+  capybara on an empty platform — the whole scene missing. "Three open boxes of
+  decreasing size, the smallest standing inside the middle one and the middle one inside
+  the largest" renders correctly. Say how many things there are and where each one sits.
+- **No prison bars on filtering scenes.** A "sieve", "grille", "grating", "mesh" or
+  "slats" renders as a row of vertical bars with solid planks passing straight through
+  them, which cannot physically happen. Use "a wide gate with one open doorway" — same
+  this-one-through-that-one-not reading, and it is possible. ("bars" alone is fine; a bar
+  chart is legitimately bars.)
 - **Contrast pairs work well** for before/after lessons: "a messy heap of irregular
   tiles on one platform beside the same tiles arranged into a perfect rectangular grid".
 - **Keep it simple.** The user's explicit feedback: complex compositions failed
@@ -374,6 +424,17 @@ git status --short public/images | grep -- -cutout
 **2. Never use bare `run` for a large batch.** A 65-minute batch outlived its `run`
 process; the images were only recovered with `download --batch <id>`.
 `submit` → `status` → `download` cannot lose paid work.
+
+**2a. `--run` does not select a batch; it only names the R2 prefix.** `download` with no
+`--batch` reads `last-batch.json`, which holds whatever was submitted **last** — not the
+run you named. With two batches in flight, `download --run A` after submitting B writes
+B's images under A's prefix. Always pass `download --batch <id>` when more than one batch
+is open, and promote by explicit id list rather than `--all` if a prefix has been
+polluted this way.
+
+**2b. Do not grep batch status for `failed`.** The status line reads
+`… · 0/20 done, 0 failed`, so `grep -qE "completed|failed"` matches a batch that has
+barely started. Anchor on the status word: `grep -qE ": (completed|failed|expired|cancelled)"`.
 
 **3. Every expensive failure so far has been on the *retrieval* side, after the paid
 work completed.** Three separate times: the OpenAI batch-output GET, the R2

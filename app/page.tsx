@@ -1,5 +1,3 @@
-import { readdir, readFile } from "node:fs/promises";
-import path from "node:path";
 // Opt the home route into Tailwind + the Magic UI components. Importing the
 // shared stylesheet here scopes it to the home page bundle (see app/tailwind.css).
 import "@/app/tailwind.css";
@@ -9,6 +7,7 @@ import "@/app/home.css";
 import type { Metadata } from "next";
 import { HomeClient } from "./_components/home/HomeClient";
 import { getCourseCatalog, type CatalogCourse } from "@/lib/courseCatalog";
+import generatedStats from "@/lib/generated/home-stats";
 import type { HomeStats } from "./_components/home/StatsBento";
 import { JsonLd } from "./_components/JsonLd";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
@@ -48,69 +47,26 @@ export const metadata: Metadata = {
 // preference. A missing/"light" value leaves the page in its light default.
 const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
 
-// Recursively read every MDX lesson under a content directory so the home
-// page's stats reflect the live corpus instead of a hand-maintained number.
-async function readMdxFiles(dir: string): Promise<string[]> {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const out: string[] = [];
-  for (const entry of entries) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      out.push(...(await readMdxFiles(full)));
-    } else if (entry.name.endsWith(".mdx")) {
-      out.push(await readFile(full, "utf-8"));
-    }
-  }
-  return out;
-}
-
-function countMatches(haystacks: string[], pattern: RegExp): number {
-  return haystacks.reduce(
-    (total, text) => total + (text.match(pattern)?.length ?? 0),
-    0,
-  );
-}
-
-// Build-time figures shown in the home page's Magic UI bento grid. Computed by
-// scanning the MDX corpus so they never drift from reality, then floored to a
-// round number for display (the grid renders them with a trailing "+").
-async function getHomeStats(courses: CatalogCourse[]): Promise<HomeStats> {
-  const contentDir = path.join(process.cwd(), "content");
-  // Courses + the fumadocs-dev demo pages + interview prep, the same corpus
-  // that lived under content/learn + content/interview before the split, so
-  // the figures stay comparable across the route restructuring.
-  const [courseMdx, devMdx, interviewMdx] = await Promise.all([
-    readMdxFiles(path.join(contentDir, "courses")),
-    readMdxFiles(path.join(contentDir, "fumadocs-dev")),
-    readMdxFiles(path.join(contentDir, "interview")),
-  ]);
-  const allMdx = [...courseMdx, ...devMdx, ...interviewMdx];
-
-  // Runnable blocks: executable `<CodeBlock>` (non-SQL) + `<SqlCodeBlock>`.
-  const runnableCodeBlocks =
-    countMatches(allMdx, /<CodeBlock[\s/>]/g) +
-    countMatches(allMdx, /<SqlCodeBlock[\s/>]/g);
-  // Auto-graded challenges: `<ChallengeCard>` (non-SQL) + `<SqlChallengeCard>`.
-  const codeChallenges =
-    countMatches(allMdx, /<ChallengeCard[\s/>]/g) +
-    countMatches(allMdx, /<SqlChallengeCard[\s/>]/g);
-
-  // Interview-prep role tracks: top-level directories under content/interview.
-  const interviewEntries = await readdir(path.join(contentDir, "interview"), {
-    withFileTypes: true,
-  });
-  const interviewRoles = interviewEntries.filter((e) =>
-    e.isDirectory(),
-  ).length;
-
-  // Floor to a tidy round number; the grid appends "+" so the figure stays
-  // honest as the corpus grows between builds.
+// Figures shown in the home page's Magic UI bento grid.
+//
+// The raw counts come from `scripts/build-home-stats.mjs`, which scans the MDX
+// corpus at build time so they never drift from reality. They used to be
+// scanned HERE, reading ~800 files per render — which cannot work on
+// Cloudflare Workers, where there is no filesystem, so any `/` that had to
+// render on demand instead of coming from the incremental cache returned a
+// 500 (see `open-next.config.ts`, and the 2026-08-05 incident where a cache
+// cleanup deleted the folder a preview was serving). Keep this path free of
+// `node:fs`.
+//
+// The flooring stays here: it is a display choice, and the grid appends "+"
+// so the figure stays honest as the corpus grows between builds.
+function getHomeStats(courses: CatalogCourse[]): HomeStats {
   const floorTo = (n: number, step: number) => Math.floor(n / step) * step;
 
   return {
-    runnableCodeBlocks: floorTo(runnableCodeBlocks, 100),
-    codeChallenges: floorTo(codeChallenges, 50),
-    interviewRoles,
+    runnableCodeBlocks: floorTo(generatedStats.runnableCodeBlocks, 100),
+    codeChallenges: floorTo(generatedStats.codeChallenges, 50),
+    interviewRoles: generatedStats.interviewRoles,
     courses: courses.length,
   };
 }
@@ -119,7 +75,7 @@ export default async function Home() {
   // Popularity-sorted catalog (shared with /courses), the Courses section
   // shows the top four and filters by topic client-side.
   const courses = await getCourseCatalog();
-  const stats = await getHomeStats(courses);
+  const stats = getHomeStats(courses);
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />

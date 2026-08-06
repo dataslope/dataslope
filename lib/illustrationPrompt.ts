@@ -66,23 +66,80 @@ function article(style: string): string {
  * **No text** because none of the illustrations should carry lettering (the
  * model bakes in garbled text otherwise).
  *
- * **Flat circles, not spheres**, because repeated round elements were the
- * house failure mode: scatter dots, chart markers, tokens in a tray, and the
- * nodes of a tree all came back as glossy 3D balls, which read as a bag of
- * marbles rather than as data. It is scoped to *repeated* round elements on
- * purpose, so a single large round object (a globe, one marble on a track)
- * still draws as itself.
+ * **Nothing beyond the objects described**, because the previous wording of
+ * this rule — "draw dots, markers, and nodes as flat 2D circles" — named three
+ * things to draw in all 879 prompts, including the ones with no dot, marker, or
+ * node anywhere in the subject. An image model reads a named noun as content,
+ * so it supplied them: a chest of drawers came back with a coloured dot on
+ * every corner, a folder wore a constellation of dots joined by thin lines, and
+ * a press had confetti scattered across its base. The clutter was not coming
+ * from the subjects; it was coming from here.
+ *
+ * **Solid 3D forms**, because the same sentence asked for "flat 2D circles" and
+ * flattened whole scenes with it. Isometric is the house style *because* it has
+ * volume (AGENTS.md, "Illustrations"), so the constraint now says so outright
+ * rather than pulling against it.
+ *
+ * The glossy-sphere guard survives, since it was a real failure — scatter dots,
+ * chart markers and tree nodes rendering as a bag of marbles. What does NOT
+ * survive is the cure: telling the model to draw round elements "as low solid
+ * discs" was a positive instruction naming a shape, the same mistake as the
+ * "draw dots as flat 2D circles" line that once littered every scene. It duly
+ * drew discs everywhere — rows of coloured coins standing in for data points,
+ * cells, and steps — until a reviewer asked why everything looked like tokens.
+ * The rule is now purely prohibitive: no spheres, no balls, no thin counters,
+ * and no opinion about what a round thing should be instead. Subjects that
+ * genuinely need a round object name one.
+ *
+ * **Light staging** because asking for solid form on its own overshot: the
+ * first run under this rule came back as glossy plastic toys on heavy charcoal
+ * plinths. The house look has always been bright colours on pale grey and white
+ * platforms (see any illustration predating the regeneration rounds), so the
+ * background and the plinths are pinned here rather than left to each subject
+ * to remember — "heavy base" in a subject is otherwise taken literally.
+ *
+ * **One piece, one colour**, because the model cannot hold an assembly together.
+ * Anything described as built from or filled with many small units — a cube made
+ * of cubelets, a bin packed with blocks, a tower of stacked cubes — comes back
+ * with the units fused, notched, or half-melted into each other, and their
+ * colours bleeding into shades that are not in the palette at all (a four-colour
+ * brand returning an orange face). The failure is the *assembly*, not the count:
+ * three large blocks side by side render perfectly, while the same volume drawn
+ * as forty cubelets does not. So each object is one solid piece in one flat
+ * brand colour, and a container holds a few large items rather than a heap.
+ *
+ * **Animals are exempt from the colour half of that rule.** Without the
+ * exception the model reads a creature as one more object and paints it a flat
+ * brand colour: a run of 60 creature illustrations came back with 15 of them
+ * carrying a solid blue marmot, a blue owl, and a green marmot. Fur, feathers
+ * and skin keep their own colours; only the props obey the palette.
  */
 const GLOBAL_CONSTRAINTS =
-  "No text. Draw dots, markers, and nodes as flat 2D circles, never as glossy " +
-  "3D spheres or balls.";
+  "No text. Draw only the objects described — nothing scattered over, around, " +
+  "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
+  "Render each object as a solid three-dimensional form with real thickness, " +
+  "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
+  "a thin round counter. " +
+  "Stage everything light and airy on a white background: pale grey and white " +
+  "platforms, bright brand colors, no dark or black bases. Make every object a " +
+  "single solid piece in one flat brand color: never build one object out of " +
+  "many small blocks or cubelets, never pack a container with a heap of little " +
+  "pieces, and never blend, mix, or bleed two colors into each other. Animals " +
+  "are the exception and the focal point: draw each one as a rounded, " +
+  "realistic creature with soft fur or feather texture and its own natural " +
+  "coloring and markings, never a flat brand color and never a flat " +
+  "silhouette. A bird has wings, a beak and feet and never hands or arms: it " +
+  "perches, stands, or nudges things with its beak rather than holding them.";
 
 /**
  * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.
  *
  *   An isometric illustration of a marmot waving beside a monitor. No text.
- *   Draw dots, markers, and nodes as flat 2D circles, never as glossy 3D
- *   spheres or balls.
+ *   Draw only the objects described — nothing scattered over, around, or
+ *   behind them: no speckled dots, no confetti, no stray connecting lines.
+ *   Render each object as a solid three-dimensional form with real thickness,
+ *   smooth matte shading, and clean edges; never as a glossy sphere, a ball,
+ *   or a thin round counter.
  *
  *   Blue: #148cff
  *   Green: #20c621

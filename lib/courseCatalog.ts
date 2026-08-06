@@ -1,18 +1,28 @@
 /**
  * Build-time data for the `/courses` catalog page.
  *
- * Reads every course folder's `meta.json` under `content/courses/` (the same
- * source of truth the homepage cards use, see `getCourses` in `app/page.tsx`)
- * and enriches it with the description and a "most popular" rank for the
- * catalog's default sort.
+ * Every course folder's `meta.json` under `content/courses/` (the same source
+ * of truth the homepage cards use, see `getCourses` in `app/page.tsx`) is
+ * mirrored into `lib/generated/course-catalog.js` by
+ * `scripts/build-course-catalog.mjs`. This module enriches that with a "most
+ * popular" rank for the catalog's default sort.
+ *
+ * It reads the generated module rather than the filesystem ON PURPOSE. The
+ * previous version called `readdir`/`readFile` here, which throws on
+ * Cloudflare Workers — workerd has no filesystem — so any request that had to
+ * render `/` or `/courses` on demand rather than serve them from the
+ * incremental cache returned a 500. That happened for real on 2026-08-05 when
+ * a cache cleanup deleted the folder a preview was serving. Importing the data
+ * keeps a cache miss slow rather than fatal. Keep this module free of
+ * `node:fs`.
  *
  * The popularity ranking is a hand-curated stand-in, the repo has no
  * analytics data, ordered roughly "friendliest entry points first". Replace
  * with real engagement figures when they exist. Courses missing from the list
- * sort after every ranked course, alphabetically.
+ * sort after every ranked course, alphabetically. It stays here rather than in
+ * the generated file because it is editorial judgement, not content.
  */
-import { readdir, readFile } from "node:fs/promises";
-import path from "node:path";
+import generatedCourses from "@/lib/generated/course-catalog";
 import type { CourseTags } from "@/app/_components/home/CoursesSection";
 
 export interface CatalogCourse {
@@ -62,43 +72,19 @@ const POPULARITY_ORDER: string[] = [
 
 const RANK = new Map(POPULARITY_ORDER.map((slug, i) => [slug, i + 1]));
 
-interface CourseMetaFile {
-  title?: unknown;
-  description?: unknown;
-  root?: unknown;
-  tags?: CourseTags;
-}
-
 /** Every course (root folder with a titled meta.json) under content/courses,
- *  sorted by the stand-in popularity rank (ties: alphabetical). */
+ *  sorted by the stand-in popularity rank (ties: alphabetical).
+ *
+ *  Async purely to keep the call sites unchanged — the two callers await it
+ *  from server components, and this stayed a promise so switching the data
+ *  source is not also a refactor of `app/page.tsx` and `app/courses/page.tsx`. */
 export async function getCourseCatalog(): Promise<CatalogCourse[]> {
-  const coursesDir = path.join(process.cwd(), "content", "courses");
-  const entries = await readdir(coursesDir, { withFileTypes: true });
-
-  const courses: CatalogCourse[] = [];
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    try {
-      const raw = await readFile(
-        path.join(coursesDir, entry.name, "meta.json"),
-        "utf-8",
-      );
-      const meta = JSON.parse(raw) as CourseMetaFile;
-      if (meta.root !== true || typeof meta.title !== "string") continue;
-      courses.push({
-        slug: entry.name,
-        title: meta.title,
-        description:
-          typeof meta.description === "string" ? meta.description : "",
-        tags: meta.tags ?? {},
-        popularity: RANK.get(entry.name) ?? 1000,
-      });
-    } catch {
-      // No meta.json or unreadable, skip
-    }
-  }
-
-  return courses.sort(
-    (a, b) => a.popularity - b.popularity || a.title.localeCompare(b.title),
-  );
+  return generatedCourses
+    .map((course) => ({
+      ...course,
+      popularity: RANK.get(course.slug) ?? 1000,
+    }))
+    .sort(
+      (a, b) => a.popularity - b.popularity || a.title.localeCompare(b.title),
+    );
 }

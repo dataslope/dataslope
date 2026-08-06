@@ -14,13 +14,26 @@ import {
 // card, and the batch generator (scripts/generate-illustrations.mjs) all key
 // off these pure helpers and the shared JSON, so their output is pinned here:
 // the prompt text must match the authored GPT Image 2 template exactly (always
-// "No text." plus the flat-circles rule), and the file name must be a stable
-// PNG slug.
+// "No text." plus the no-clutter/solid-form rules), and the file name must be a
+// stable PNG slug.
 
 /** The constraints appended to every prompt regardless of subject. */
 const CONSTRAINTS =
-  "No text. Draw dots, markers, and nodes as flat 2D circles, never as glossy " +
-  "3D spheres or balls.";
+  "No text. Draw only the objects described — nothing scattered over, around, " +
+  "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
+  "Render each object as a solid three-dimensional form with real thickness, " +
+  "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
+  "a thin round counter. " +
+  "Stage everything light and airy on a white background: pale grey and white " +
+  "platforms, bright brand colors, no dark or black bases. Make every object a " +
+  "single solid piece in one flat brand color: never build one object out of " +
+  "many small blocks or cubelets, never pack a container with a heap of little " +
+  "pieces, and never blend, mix, or bleed two colors into each other. Animals " +
+  "are the exception and the focal point: draw each one as a rounded, " +
+  "realistic creature with soft fur or feather texture and its own natural " +
+  "coloring and markings, never a flat brand color and never a flat " +
+  "silhouette. A bird has wings, a beak and feet and never hands or arms: it " +
+  "perches, stands, or nudges things with its beak rather than holding them.";
 
 describe("buildIllustrationPrompt", () => {
   it("defaults to the isometric house style, with brand colors and the constraints", () => {
@@ -56,13 +69,33 @@ describe("buildIllustrationPrompt", () => {
     ).toContain(`A line art illustration of a duck. ${CONSTRAINTS}`);
   });
 
-  // The rule exists because repeated round elements (scatter dots, chart
-  // markers, tree nodes) kept coming back as glossy 3D balls. Every prompt
-  // carries it, so no individual subject has to remember to say it.
-  it("bans sphere-like dot groups on every prompt", () => {
+  // Two rules, both on every prompt so no individual subject has to remember
+  // them. The clutter ban is there because the previous wording named "dots,
+  // markers, and nodes" in all 879 prompts and the model drew them into
+  // subjects that had none; the solid-form rule is there because the same
+  // sentence asked for "flat 2D circles" and flattened the isometric style it
+  // was supposed to be decorating.
+  it("bans scattered decoration and keeps forms solid on every prompt", () => {
     for (const entry of getIllustrationPrompts().entries) {
-      expect(entry.prompt).toContain("flat 2D circles");
+      expect(entry.prompt).toContain("no speckled dots, no confetti");
+      expect(entry.prompt).toContain("solid three-dimensional form");
+      expect(entry.prompt).toContain("never as a glossy sphere, a ball");
+      // The glossy-sphere ban must stay PROHIBITIVE. Naming a replacement
+      // shape ("draw round elements as low solid discs") is a positive
+      // instruction, and the model obeyed it everywhere — scenes came back as
+      // rows of coloured coins. Same failure as the old "draw dots as flat 2D
+      // circles" line. Never prescribe a shape the subject did not ask for.
+      expect(entry.prompt).not.toMatch(/low solid disc/i);
+      expect(entry.prompt).not.toMatch(/draw any repeated round elements/i);
     }
+  });
+
+  // Regression: the constraint block must not name a decorative element as
+  // something to draw. "flat 2D circles" did, and every prompt inherited it.
+  it("never asks for flat 2D shapes in the shared constraints", () => {
+    const prompt = buildIllustrationPrompt({ subject: "a chest of drawers" });
+    expect(prompt).not.toContain("flat 2D");
+    expect(prompt).not.toMatch(/Draw dots, markers, and nodes/);
   });
 
   it("exposes the canonical brand palette", () => {
