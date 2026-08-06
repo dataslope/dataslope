@@ -37,28 +37,34 @@ const BRAND_CYCLE = [
 ];
 
 /**
- * One of the course creatures, standing in for the emoji this line used to
- * separate its phrases with (⚡ 🔓 💯).
+ * The ⚡ 🔓 💯 separating this line's phrases, as images rather than characters.
  *
- * Emoji here rendered as whatever glyph the visitor's OS ships, which on some
- * platforms arrived as a dark-backed sticker that fought the light hero. These
- * are the background-removed cut-outs, so they sit on the page background in
- * both themes like every other illustration.
+ * Written as literal emoji, these rendered as whatever glyph the visitor's OS
+ * ships — so the line looked materially different on Windows and macOS, and the
+ * reviewer preferred the Windows drawing. Windows renders them from Segoe UI
+ * Emoji, which is proprietary and cannot be embedded on a site. Microsoft's
+ * Fluent Emoji is the same design language open-sourced under MIT, so these are
+ * its 3D variants, self-hosted: one drawing, identical on every platform.
+ *
+ * They live in `public/emoji/` rather than `public/images/`, deliberately —
+ * `scripts/build-images.mjs` prunes anything under `public/images` that is not
+ * in its generated manifest, and these are third-party assets it knows nothing
+ * about. Attribution is in THIRD-PARTY-NOTICES.md.
  *
  * Sized in `em` so they scale with the marquee's responsive font size, and
  * `aria-hidden` because they are punctuation between phrases, not content — the
  * line already reads correctly as "Interactive No sign-up Free".
  */
-function MarqueeCreature({ slug, alt }: { slug: string; alt: string }) {
+function MarqueeEmoji({ name }: { name: string }) {
   return (
     /* eslint-disable-next-line @next/next/no-img-element */
     <img
-      src={`/images/${slug}-cutout.webp`}
-      alt={alt}
+      src={`/emoji/${name}.webp`}
+      alt=""
       aria-hidden="true"
       loading="lazy"
       decoding="async"
-      className="mx-3 inline-block h-[1.1em] w-auto shrink-0 align-[-0.2em] sm:mx-4"
+      className="mx-3 inline-block h-[1.1em] w-auto shrink-0 align-[-0.15em] sm:mx-4"
     />
   );
 }
@@ -223,11 +229,11 @@ export function HeroMarquee() {
       >
         <span className="mx-8 inline-flex items-center text-[#CED7DB]">
           Interactive
-          <MarqueeCreature slug="home-marquee-interactive" alt="" />
+          <MarqueeEmoji name="interactive" />
           No sign-up
-          <MarqueeCreature slug="home-marquee-no-signup" alt="" />
+          <MarqueeEmoji name="no-signup" />
           Free
-          <MarqueeCreature slug="home-marquee-free" alt="" />
+          <MarqueeEmoji name="free" />
         </span>
       </JsMarquee>
 

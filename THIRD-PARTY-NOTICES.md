@@ -77,6 +77,37 @@ Radix / Base UI primitives and shadcn/Magic UI-derived components (MIT), and
 lucide-react (ISC). Refer to each package's own `LICENSE` for the authoritative
 terms.
 
+## Bundled emoji artwork
+
+The home page hero marquee separates its second line with three emoji images
+served from `public/emoji/`. These are the 3D variants from **Microsoft Fluent
+Emoji**, redistributed under the MIT License.
+
+| File | Emoji | Source asset |
+| --- | --- | --- |
+| `public/emoji/interactive.webp` | ⚡ High voltage | `assets/High voltage/3D/high_voltage_3d.png` |
+| `public/emoji/no-signup.webp` | 🔓 Unlocked | `assets/Unlocked/3D/unlocked_3d.png` |
+| `public/emoji/free.webp` | 💯 Hundred points | `assets/Hundred points/3D/hundred_points_3d.png` |
+
+> Copyright (c) Microsoft Corporation.
+>
+> Permission is hereby granted, free of charge, to any person obtaining a copy
+> of this software and associated documentation files (the "Software"), to deal
+> in the Software without restriction, including without limitation the rights
+> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> copies of the Software, and to permit persons to whom the Software is
+> furnished to do so, subject to the conditions of the MIT License.
+
+Source: https://github.com/microsoft/fluentui-emoji (MIT). The files here are
+resized to 160px and re-encoded as WebP; the artwork is otherwise unmodified.
+
+Why these are bundled rather than typed as characters: written as literal
+emoji, each platform substitutes its own font, so the line reads differently on
+Windows and macOS. Windows draws them from Segoe UI Emoji, which is proprietary
+and not licensed for embedding — Fluent Emoji is the same design language
+released by Microsoft under MIT, so bundling it gives one drawing everywhere
+without redistributing a proprietary font.
+
 ## Datasets and fonts
 
 Sample datasets and any bundled fonts are subject to their respective licenses.

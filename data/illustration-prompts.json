@@ -16,9 +16,7 @@
       "interview-illustration": "1536x1024",
       "home-icon": "1024x1024",
       "auth-globe-pin": "1024x1024",
-      "home-marquee": "1024x1024",
-      "pricing-plan": "1024x1024",
-      "playground-category": "1024x1024"
+      "pricing-plan": "1024x1024"
     },
     "postgresElephant": "a friendly blue elephant (the PostgreSQL mascot)"
   },
@@ -10572,42 +10570,6 @@
       "subject": "a raccoon on a pale grey platform stepping up onto the tallest of three broad steps"
     },
     {
-      "id": "home-marquee-interactive",
-      "collection": "home",
-      "course": "home",
-      "courseTitle": "Home page",
-      "lesson": "index",
-      "category": "home-marquee",
-      "title": "Marquee: Interactive",
-      "subject": "the Dataslope marmot mascot sitting upright with one paw raised in a friendly wave, nothing else in the scene",
-      "style": "isometric illustration",
-      "mascot": true
-    },
-    {
-      "id": "home-marquee-no-signup",
-      "collection": "home",
-      "course": "home",
-      "courseTitle": "Home page",
-      "lesson": "index",
-      "category": "home-marquee",
-      "title": "Marquee: No sign-up",
-      "subject": "a quokka sitting upright with a wide friendly open-mouthed smile, nothing else in the scene",
-      "style": "isometric illustration",
-      "mascot": true
-    },
-    {
-      "id": "home-marquee-free",
-      "collection": "home",
-      "course": "home",
-      "courseTitle": "Home page",
-      "lesson": "index",
-      "category": "home-marquee",
-      "title": "Marquee: Free",
-      "subject": "a small cheerful yellow duck (the DuckDB mascot) standing upright with both wings spread wide, nothing else in the scene",
-      "style": "isometric illustration",
-      "mascot": true
-    },
-    {
       "id": "pricing-guest",
       "collection": "pricing",
       "course": "pricing",
@@ -10615,7 +10577,7 @@
       "lesson": "index",
       "category": "pricing-plan",
       "title": "Plan: Guest",
-      "subject": "the Dataslope marmot mascot standing upright with one large blue travel satchel hanging at its side, the satchel big and boldly visible, nothing else in the scene and no platform beneath it",
+      "subject": "the Dataslope marmot mascot, drawn as a smooth stylised cartoon character with simple rounded shapes, clean flat cel shading and no photographic fur detail, standing upright with one large blue travel satchel hanging at its side, nothing else in the scene and no platform beneath it",
       "style": "isometric illustration",
       "mascot": true
     },
@@ -10627,7 +10589,7 @@
       "lesson": "index",
       "category": "pricing-plan",
       "title": "Plan: Free Member",
-      "subject": "the Dataslope marmot mascot sitting upright wearing one thick bright blue scarf wound high and full around its neck, nothing else in the scene and no platform beneath it",
+      "subject": "the Dataslope marmot mascot, drawn as a smooth stylised cartoon character with simple rounded shapes, clean flat cel shading and no photographic fur detail, sitting upright wearing one thick bright blue scarf wound high and full around its neck, nothing else in the scene and no platform beneath it",
       "style": "isometric illustration",
       "mascot": true
     },
@@ -10639,43 +10601,7 @@
       "lesson": "index",
       "category": "pricing-plan",
       "title": "Plan: Pro",
-      "subject": "the Dataslope marmot mascot sitting upright wearing one large golden crown standing tall and wide on its head, nothing else in the scene and no platform beneath it",
-      "style": "isometric illustration",
-      "mascot": true
-    },
-    {
-      "id": "playground-languages",
-      "collection": "playground",
-      "course": "playground",
-      "courseTitle": "Playground",
-      "lesson": "index",
-      "category": "playground-category",
-      "title": "Playground: Languages",
-      "subject": "the Dataslope marmot mascot on a pale grey platform beside one small white console with a bright green screen",
-      "style": "isometric illustration",
-      "mascot": true
-    },
-    {
-      "id": "playground-web",
-      "collection": "playground",
-      "course": "playground",
-      "courseTitle": "Playground",
-      "lesson": "index",
-      "category": "playground-category",
-      "title": "Playground: Web",
-      "subject": "a tabby cat on a pale grey platform beside one wide white browser frame with three coloured blocks standing inside it",
-      "style": "isometric illustration",
-      "mascot": true
-    },
-    {
-      "id": "playground-databases",
-      "collection": "playground",
-      "course": "playground",
-      "courseTitle": "Playground",
-      "lesson": "index",
-      "category": "playground-category",
-      "title": "Playground: Databases",
-      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform beside one wide blue cabinet with three open drawers",
+      "subject": "the Dataslope marmot mascot, drawn as a smooth stylised cartoon character with simple rounded shapes, clean flat cel shading and no photographic fur detail, sitting upright wearing one large golden crown standing tall and wide on its head, nothing else in the scene and no platform beneath it",
       "style": "isometric illustration",
       "mascot": true
     }
