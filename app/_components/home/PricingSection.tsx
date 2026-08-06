@@ -388,7 +388,7 @@ function PlanColumn({
             aria-hidden="true"
             loading="lazy"
             decoding="async"
-            className="ml-auto size-9 shrink-0 object-contain"
+            className="ml-auto size-12 shrink-0 object-contain"
           />
         </div>
       </div>
