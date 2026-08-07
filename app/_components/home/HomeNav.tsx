@@ -51,7 +51,8 @@ function NavLink({
   href: string;
   prefetch?: boolean;
   /** The header has been scrolled past its threshold, so the type steps down
-   *  with everything else. */
+   *  with everything else. Half a pixel: the compaction should read as the bar
+   *  getting tighter, not as the type changing size. */
   compact?: boolean;
   children: React.ReactNode;
 }) {
@@ -65,7 +66,7 @@ function NavLink({
       // font-size is animated alongside the colour, so the step down happens
       // with the nav's height rather than snapping a frame ahead of it.
       className={`rounded-lg px-3 py-2 font-medium transition-[color,font-size] duration-200 ${
-        compact ? "text-sm" : "text-[15px]"
+        compact ? "text-[14.5px]" : "text-[15px]"
       } ${
         active
           ? "text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]"
@@ -86,10 +87,10 @@ function GitHubLink({ compact }: { compact?: boolean }) {
       aria-label="View source on GitHub"
       title="GitHub"
       className={`inline-flex items-center justify-center rounded-lg text-[#121212] transition-[color,background-color,width,height] duration-200 hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/[0.06] ${
-        compact ? "size-8" : "size-9"
+        compact ? "size-[34px]" : "size-9"
       }`}
     >
-      <GitHubIcon size={compact ? 16 : 18} />
+      <GitHubIcon size={compact ? 17 : 18} />
     </a>
   );
 }
@@ -124,13 +125,13 @@ function BrandLogo({ compact }: { compact?: boolean }) {
         // fight the hover rotate on the same property and undo the layer
         // stability the comment above is about.
         className={`relative top-px w-auto transition-[transform,height] duration-200 will-change-transform group-hover:rotate-[8deg] ${
-          compact ? "h-[11px]" : "h-[13px]"
+          compact ? "h-[12px]" : "h-[13px]"
         }`}
         aria-hidden="true"
       />
       <span
         className={`font-semibold tracking-tight text-[#121212] transition-[transform,font-size] duration-200 will-change-transform group-hover:translate-x-0.5 dark:text-white ${
-          compact ? "text-base" : "text-lg"
+          compact ? "text-[17px]" : "text-lg"
         }`}
       >
         Dataslope

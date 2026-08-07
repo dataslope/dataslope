@@ -266,6 +266,7 @@ const dictCtor = py.globals.get("dict");
  */
 const MICROPIP_PACKAGES = { openpyxl: "openpyxl", seaborn: "seaborn" };
 const micropipInstalled = new Set(["plotly"]);
+const implicitLoaded = new Set();
 
 /** Packages a block needs but never names. Mirrors IMPLICIT_PACKAGES in the
  *  worker; the comment there explains why the trigger is a call pattern rather
@@ -294,9 +295,12 @@ async function ensurePackages(code) {
     messageCallback: () => {},
     errorCallback: () => {},
   });
-  const implicit = IMPLICIT_PACKAGES.filter(({ pattern }) => pattern.test(code)).map((p) => p.pkg);
+  const implicit = IMPLICIT_PACKAGES.filter(
+    ({ pattern, pkg }) => pattern.test(code) && !implicitLoaded.has(pkg),
+  ).map((p) => p.pkg);
   if (implicit.length > 0) {
     await py.loadPackage(implicit, { messageCallback: () => {}, errorCallback: () => {} });
+    for (const pkg of implicit) implicitLoaded.add(pkg);
   }
   const needed = Object.entries(MICROPIP_PACKAGES)
     .filter(

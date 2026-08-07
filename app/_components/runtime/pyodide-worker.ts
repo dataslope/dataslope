@@ -172,13 +172,15 @@ const IMPLICIT_PACKAGES: { pattern: RegExp; pkg: string }[] = [
   },
 ];
 
-/** Distribution packages implied by `code` that are not yet loaded. Pyodide's
- *  `loadPackage` is idempotent, so an already-loaded name is a cheap no-op and
- *  this does not need to track what it has done. */
+/** Implied packages already pulled in this session, so the pandas/pyarrow
+ *  repair below runs at most once. */
+const implicitLoaded = new Set<string>();
+
+/** Distribution packages implied by `code` that have not been asked for yet. */
 function implicitPackagesFor(code: string): string[] {
   const wanted = new Set<string>();
   for (const { pattern, pkg } of IMPLICIT_PACKAGES) {
-    if (pattern.test(code)) wanted.add(pkg);
+    if (pattern.test(code) && !implicitLoaded.has(pkg)) wanted.add(pkg);
   }
   return [...wanted];
 }
@@ -779,6 +781,7 @@ async function runCode(
           console.error("[pyodide:loadPackage]", m);
         },
       });
+      for (const pkg of implicit) implicitLoaded.add(pkg);
     }
     // Pure-Python drawer packages that aren't in the Pyodide lockfile
     // (e.g. openpyxl, seaborn) need an explicit micropip install.

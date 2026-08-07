@@ -78,7 +78,7 @@ export function AuthMenu({ compact }: { compact?: boolean } = {}) {
       <span
         aria-hidden="true"
         className={`inline-block w-[4.5rem] animate-pulse rounded-lg bg-[var(--ds-gray-100)] transition-[height] duration-200 dark:bg-white/10 ${
-          compact ? "h-7" : "h-8"
+          compact ? "h-[30px]" : "h-8"
         }`}
       />
     );
@@ -90,7 +90,7 @@ export function AuthMenu({ compact }: { compact?: boolean } = {}) {
       <Link
         href="/sign-in"
         className={`${SIGN_IN_BUTTON_BASE} transition-[padding] duration-200 ${
-          compact ? "py-1" : "py-1.5"
+          compact ? "py-[5px]" : "py-1.5"
         }`}
       >
         <LogIn size={14} aria-hidden="true" />
