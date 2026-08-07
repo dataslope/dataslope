@@ -297,19 +297,18 @@ assert vals == sorted(vals, reverse=True), vals`,
     {
       id: "no_loop",
       name: "No Python loop over rows",
-      description: "Checked by inspecting the source",
-      code: `import inspect
-src = inspect.getsource(idiomatic)
-assert "for " not in src, "still looping in Python"`,
+      description: "Checked in the compiled function, not the text",
+      code: `import dis
+ops = {i.opname for i in dis.get_instructions(idiomatic)}
+assert "FOR_ITER" not in ops, "still looping in Python"`,
     },
     {
       id: "no_map_elements",
       name: "No map_elements and no to_list",
       description: "Everything stays in expressions",
-      code: `import inspect
-src = inspect.getsource(idiomatic)
-assert "map_elements" not in src, "map_elements is the slow path"
-assert "to_list" not in src, "pulling values into Python defeats the point"`,
+      code: `names = set(idiomatic.__code__.co_names)
+assert "map_elements" not in names, "map_elements is the slow path"
+assert "to_list" not in names, "pulling values into Python defeats the point"`,
     },
   ]}
 />

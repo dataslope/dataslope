@@ -194,26 +194,15 @@ machine the URL form works as written.
 
 ## Practice
 
-<ChallengeCard
-  adapter="python"
-  title="Read a subset, write Parquet"
-  instructions={`\`penguins.csv\` is staged in the working directory. It uses \`"NA"\` for missing values.
+Try it yourself before reading on. `penguins.csv` uses `"NA"` for missing
+values. Read only the `species`, `island` and `body_mass_g` columns treating
+`"NA"` as missing, write the result to `penguins.parquet`, and read that file
+back. The point is that the types survive the round trip.
 
-1. Read **only** the \`species\`, \`island\`, and \`body_mass_g\` columns, treating \`"NA"\` as missing.
-2. Write the result to \`penguins.parquet\`.
-3. Read that Parquet file back into a variable called \`round_trip\`.
+```python
+import polars as pl
 
-The point of step 3 is that the types survive the round trip.`}
-  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import polars as pl`,
-      starterCode: `round_trip = None  # TODO
-
-print(round_trip)
-`,
-      solutionCode: `subset = pl.read_csv(
+subset = pl.read_csv(
     "penguins.csv",
     null_values=["NA"],
     columns=["species", "island", "body_mass_g"],
@@ -223,44 +212,15 @@ round_trip = pl.read_parquet("penguins.parquet")
 
 print(round_trip.head())
 print(round_trip.dtypes)
-`,
-    },
-  ]}
-  tests={[
-    {
-      id: "is_frame",
-      name: "round_trip is a DataFrame",
-      description: "Type check",
-      code: `import polars as pl
-assert isinstance(round_trip, pl.DataFrame)`,
-    },
-    {
-      id: "cols",
-      name: "Only the three requested columns",
-      description: "species, island, body_mass_g",
-      code: `assert round_trip.columns == ["species", "island", "body_mass_g"], round_trip.columns`,
-    },
-    {
-      id: "rows",
-      name: "All 344 penguins",
-      description: "No rows dropped",
-      code: `assert round_trip.height == 344, round_trip.height`,
-    },
-    {
-      id: "typed",
-      name: "body_mass_g came back numeric",
-      description: "Int64, not String",
-      code: `import polars as pl
-assert round_trip["body_mass_g"].dtype == pl.Int64, round_trip["body_mass_g"].dtype`,
-    },
-    {
-      id: "nulls",
-      name: "The two missing masses survived as nulls",
-      description: "null_values did its job",
-      code: `assert round_trip["body_mass_g"].null_count() == 2`,
-    },
-  ]}
-/>
+# body_mass_g comes back as Int64, with its two nulls intact.
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The Polars build that ships with Pyodide is compiled without the streaming
+engine, and `write_parquet` is implemented on top of it, so writing Parquet
+raises here. The code is correct on a normal Polars install; it is shown
+rather than run.
+</Callout>
 
 ## Check your understanding
 

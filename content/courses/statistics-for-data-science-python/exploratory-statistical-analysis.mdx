@@ -595,7 +595,7 @@ assert best_pair[0] != best_pair[1]`,
       name: "it is the strongest positive pair",
       description: "Matches the max off-diagonal correlation",
       code: `import numpy as np
-corr = tips.select_dtypes("number").corr().values
+corr = tips.select_dtypes("number").corr().to_numpy(copy=True)
 np.fill_diagonal(corr, -2.0)
 assert abs(best_r - corr.max()) < 1e-9`,
     },

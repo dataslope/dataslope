@@ -276,7 +276,7 @@ assert list(students.columns) == expected, f"Got {list(students.columns)}, expec
       name: "Each column has the right type",
       description: "name=string, grade=int, gpa=float, passed_math=bool",
       code: `import pandas as pd
-assert students["name"].dtype == object, "name should be string/object"
+assert pd.api.types.is_string_dtype(students["name"]), "name should be text"
 assert pd.api.types.is_integer_dtype(students["grade"]), "grade should be integer"
 assert pd.api.types.is_float_dtype(students["gpa"]), "gpa should be float"
 assert students["passed_math"].dtype == bool, "passed_math should be bool"`,
