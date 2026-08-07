@@ -77,6 +77,12 @@ def load_day(ds: str):              # ds injected by the scheduler
     """)
 ```
 
+The failure it prevents compounds. Without idempotent writes, a retry
+after a partial success does not repair the run, it duplicates part of
+it.
+
+<Chart slug="idempotency-retry-storm" />
+
 ### What is a backfill, and how do you design for it?
 
 A **backfill** reprocesses historical data, to populate a new table, fix a
@@ -86,6 +92,12 @@ independently and re-runs safely. In Airflow, `catchup=True` with a
 sensible `start_date` schedules the historical runs; partitioned assets do
 this in Dagster. Backfilling years of data often needs **throttling** so
 you don't overwhelm source systems or the warehouse.
+
+Backfills are also where image build time starts to matter, and layer
+ordering is the whole game: a dependency install placed after a source
+copy is re-run on every commit.
+
+<Chart slug="docker-layer-cache" />
 
 ### How should you configure retries, and what shouldn't you retry?
 
@@ -123,6 +135,11 @@ instead of polluting downstream tables. It is implemented as a
 quality-gate task the DAG must pass before continuing. The point is to
 contain a data-quality incident to one table rather than fanning it out to
 every dependent asset and dashboard.
+
+The point of opening the circuit is not to fail faster, it is to stop
+sending load to something that cannot recover while it is under load.
+
+<Chart slug="circuit-breaker-states" />
 
 ### What is an SLA in a pipeline, and how do you enforce it?
 

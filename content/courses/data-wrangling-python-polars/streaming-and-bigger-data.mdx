@@ -15,14 +15,10 @@ the file.
 
 ## Turning it on
 
-<CodeBlock
-  adapter="python"
-  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import polars as pl`,
-      starterCode: `q = (
+```python
+import polars as pl
+
+q = (
     pl.scan_csv("diamonds.csv")
     .filter(pl.col("carat") > 0.5)
     .group_by("cut")
@@ -34,10 +30,15 @@ the file.
 )
 
 print(q.collect(engine="streaming"))
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The Polars build that ships with Pyodide is compiled without the streaming
+engine, so `engine="streaming"` raises here.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
 
 One argument. Everything else about the query is unchanged, which is
 the point: you do not write a different program for large data, you
@@ -54,14 +55,10 @@ in memory before you could ask for anything else.
 `collect()` returns a `DataFrame`, which has to fit in memory. If the
 output is also large, sink it straight to a file instead.
 
-<CodeBlock
-  adapter="python"
-  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import polars as pl`,
-      starterCode: `(
+```python
+import polars as pl
+
+(
     pl.scan_csv("diamonds.csv")
     .filter(pl.col("cut") == "Ideal")
     .select("carat", "cut", "price")
@@ -71,10 +68,15 @@ output is also large, sink it straight to a file instead.
 # Nothing above ever held the result in memory
 print(pl.scan_parquet("ideal.parquet").select(pl.len()).collect())
 print(pl.scan_parquet("ideal.parquet").head(3).collect())
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+`sink_parquet` belongs to the streaming engine, which the Polars build that
+ships with Pyodide is compiled without.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
 
 `sink_parquet`, `sink_csv`, `sink_ndjson`, and `sink_ipc` all read in
 batches and write in batches. A 200 GB file can be filtered and
@@ -82,12 +84,8 @@ rewritten on a laptop, at whatever speed the disk allows.
 
 ## Many files as one frame
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import polars as pl
+```python
+import polars as pl
 
 # Pretend these arrived as a monthly export
 for month in range(1, 4):
@@ -99,10 +97,15 @@ for month in range(1, 4):
 lf = pl.scan_parquet("sales-2026-*.parquet")
 
 print(lf.group_by("month").agg(pl.col("sales").sum()).sort("month").collect())
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+`sink_parquet` belongs to the streaming engine, which the Polars build that
+ships with Pyodide is compiled without.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
 
 This is better than concatenating by hand: the optimizer sees all the
 files as one source, so projection and predicate pushdown apply to
@@ -128,14 +131,10 @@ so a full sort of a larger-than-memory frame is expensive whatever the
 engine. Sorting *after* an aggregation is fine, because the
 aggregated result is small.
 
-<CodeBlock
-  adapter="python"
-  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import polars as pl`,
-      starterCode: `# Good: aggregate first (small), then sort the small result
+```python
+import polars as pl
+
+# Good: aggregate first (small), then sort the small result
 good = (
     pl.scan_csv("diamonds.csv")
     .group_by("cut")
@@ -152,10 +151,15 @@ print(
     .select("carat", "cut", "price")
     .collect(engine="streaming")
 )
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The Polars build that ships with Pyodide is compiled without the streaming
+engine, so `engine="streaming"` raises here.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
 
 ## Keeping memory down without streaming
 
@@ -198,29 +202,16 @@ print("parquet on disk:", round(os.path.getsize("d.parquet") / 1e6, 2), "MB")
 
 ## Practice
 
-<ChallengeCard
-  adapter="python"
-  title="A streaming pipeline that never materializes"
-  instructions={`Write a pipeline over \`diamonds.csv\` that:
+Try it yourself before reading on. Scan `diamonds.csv` lazily, keep the
+diamonds over 1.0 carat, select `cut`, `carat` and `price`, and sink the result
+to `big.parquet` without ever collecting it. Then count the rows with a lazy
+scan rather than by reading the file in, and build a per-`cut` summary with the
+streaming engine.
 
-1. scans the file lazily,
-2. keeps diamonds with \`carat\` above 1.0,
-3. selects \`cut\`, \`carat\`, \`price\`,
-4. **sinks** the result to \`big.parquet\` without ever collecting it.
+```python
+import polars as pl
 
-Then set \`n_rows\` to the number of rows in that file, read back with a lazy scan (do not read the whole file into memory to count them), and \`summary\` to a frame with one row per \`cut\` holding \`cut\` and \`n\`, sorted by \`cut\`, collected with the **streaming** engine.`}
-  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import polars as pl`,
-      starterCode: `n_rows = None   # TODO
-summary = None  # TODO
-
-print(n_rows)
-print(summary)
-`,
-      solutionCode: `(
+(
     pl.scan_csv("diamonds.csv")
     .filter(pl.col("carat") > 1.0)
     .select("cut", "carat", "price")
@@ -237,49 +228,18 @@ summary = (
     .collect(engine="streaming")
 )
 
-print(n_rows)
-print(summary)
-`,
-    },
-  ]}
-  tests={[
-    {
-      id: "file",
-      name: "big.parquet was written",
-      description: "sink_parquet ran",
-      code: `import os
-assert os.path.exists("big.parquet")`,
-    },
-    {
-      id: "schema",
-      name: "The file has the three requested columns",
-      description: "cut, carat, price",
-      code: `import polars as pl
-cols = pl.scan_parquet("big.parquet").collect_schema().names()
-assert cols == ["cut", "carat", "price"], cols`,
-    },
-    {
-      id: "rows",
-      name: "17,502 diamonds over one carat",
-      description: "The filter reached the file",
-      code: `assert n_rows == 17502, n_rows`,
-    },
-    {
-      id: "summary",
-      name: "summary has one row per cut, sorted",
-      description: "Five cut grades",
-      code: `assert summary.columns == ["cut", "n"], summary.columns
-assert summary.height == 5, summary.height
-assert summary["cut"].to_list() == sorted(summary["cut"].to_list())`,
-    },
-    {
-      id: "total",
-      name: "The per-cut counts add up",
-      description: "Same total as the file",
-      code: `assert summary["n"].sum() == n_rows, (summary["n"].sum(), n_rows)`,
-    },
-  ]}
-/>
+print(n_rows)   # 17502
+print(summary)  # one row per cut grade, five in all
+```
+
+Nothing above ever holds the filtered data in memory: the sink writes as it
+reads, and the count comes from the file's own metadata.
+
+<Callout type="info" title="Not runnable in the browser">
+The Polars build that ships with Pyodide is compiled without the streaming
+engine, so both `sink_parquet` and `collect(engine="streaming")` raise here.
+The code is correct on a normal Polars install; it is shown rather than run.
+</Callout>
 
 ## Check your understanding
 

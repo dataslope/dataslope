@@ -98,6 +98,10 @@ other spread from floor to ceiling, or split into two clumps. As bars, they
 look **identical**. The bar literally cannot show the difference, because it
 threw the difference away.
 
+Four groups, one bar height, four completely different distributions:
+
+<Chart slug="bar-hides-distribution" />
+
 <MultipleChoice
   markdown={`Group A is \`[50, 50, 50, 50]\` and Group B is \`[0, 0, 100, 100]\`. You draw a
 bar plot of the mean of each group. What do the two bars look like?
@@ -235,7 +239,11 @@ order. Both have simple fixes.
 First, **ordering**. By default the categories appear in whatever order they
 occur (or alphabetically). Pass `order=` an explicit list to control it, and
 a bar chart sorted by *value* is far easier to read than one in arbitrary
-order. Second, **orientation**. When labels are long or numerous, put the
+order. The same twelve bars, alphabetical and then sorted:
+
+<Chart slug="sorted-bars" />
+
+Second, **orientation**. When labels are long or numerous, put the
 category on **y** for horizontal bars whose names read cleanly left to right.
 
 <CodeBlock

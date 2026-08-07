@@ -13,7 +13,7 @@
  * generation prompt (a risograph of the subject, in the four brand colors) plus
  * a copy button, so the prompt can be dropped straight into the image tool or
  * generated in bulk with scripts/generate-illustrations.mjs. Centralising the
- * definitions in the JSON keeps the lesson card, the `/illustration-prompts`
+ * definitions in the JSON keeps the lesson card, the `/dashboard/admin/illustration-prompts`
  * gallery, and the generator perfectly in sync; authors only supply the id.
  */
 import { useCallback, useState } from "react";

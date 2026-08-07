@@ -286,6 +286,12 @@ int main() {
   ]}
 />
 
+The gap between O(log n) and O(n) here is entirely the gap between a
+balanced tree and a degenerate one, and sorted input is the everyday way
+of landing in the second case.
+
+<Chart slug="tree-height-balanced" />
+
 ## In-order traversal gives sorted order
 
 Because all left values come first, then the root, then all right values, in-order traversal of a BST yields sorted values.

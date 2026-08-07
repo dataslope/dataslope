@@ -136,6 +136,12 @@ means less I/O, and since analytical queries are I/O-bound, that directly
 speeds up scans, not just saves storage. Sorting/clustering data before
 writing further boosts run-length and delta encoding.
 
+Which codec, though, is its own trade-off. There is no winner, only a
+frontier, and where you want to sit on it depends on how fast the link
+reading the data is.
+
+<Chart slug="compression-ratio-speed" />
+
 ### What is the tradeoff between file size and the small files problem?
 
 Files that are **too small** (one per minute) create huge metadata and

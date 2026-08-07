@@ -78,9 +78,19 @@ script-runner-src/__pycache__/
 /lib/generated/brand-fallbacks.js
 /lib/generated/course-catalog.js
 /lib/generated/home-stats.js
+/lib/generated/charts.js
 
 # Playground audit output (e2e/playground-audit.spec.ts)
 audit-results/
 
 # GPT Image 2 output from scripts/generate-illustrations.mjs
 generated-illustrations/
+
+# Local chart preview harness (.cp.mjs renders charts/*.mjs to PNGs in both
+# themes so a spec can be eyeballed without running the site)
+/.cp.mjs
+/.cp.html
+/.cp/
+
+# Datasets cached by scripts/check-code-blocks.mjs
+/.dataset-cache/

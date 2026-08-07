@@ -27,6 +27,11 @@ error from over-sensitivity to training data (overfitting). More model
 capacity lowers bias but raises variance. You tune complexity,
 regularization, and data volume to minimize total error on unseen data.
 
+The two error sources moving against each other, and the total they sum
+to.
+
+<Chart slug="bias-variance" />
+
 ### Why split data into train / validation / test?
 
 **Train** fits parameters; **validation** tunes hyperparameters and
@@ -58,6 +63,11 @@ print(f"Train: {len(X_train)}  Val: {len(X_val)}  Test: {len(X_test)}")
 This calls `train_test_split` twice, first carving off a 20% `X_test`
 hold-out, then splitting the remainder so `X_val` is another 20% of the
 original, yielding a 60/20/20 train/validation/test partition.
+
+And why one split is not enough: the same model scores very differently
+depending on which rows happened to land in the test set.
+
+<Chart slug="one-split-is-a-lottery" />
 
 ### L1 vs L2 regularization?
 
@@ -131,6 +141,10 @@ print(f"CV accuracy: {scores.mean():.3f} ± {scores.std():.3f}")  # mean ± std 
 Here `KFold` defines the 5 rotating splits and `cross_val_score` trains
 and scores `LogisticRegression` on each; reporting `scores.mean()` with
 `scores.std()` captures both the typical accuracy and its variability.
+
+The spread this is averaging away.
+
+<Chart slug="one-split-is-a-lottery" />
 
 ### What is dropout and how does it regularize a neural network?
 
@@ -260,6 +274,11 @@ This applies the formulas above directly: `precision_score`,
 `recall_score`, and `f1_score` count the TP/FP/FN entries from `y_true`
 and `y_pred` so you can read off all three metrics at once.
 
+The two move against each other as the threshold slides, so a model is a
+curve rather than a number.
+
+<Chart slug="precision-recall-threshold" />
+
 ### What is ROC-AUC and when does PR-AUC matter more?
 
 The receiver operating characteristic (ROC) curve plots true positive
@@ -292,6 +311,10 @@ Both metrics take the continuous `y_scores` rather than hard labels:
 `roc_auc_score` computes ROC-AUC and `average_precision_score` computes
 PR-AUC, letting you compare a ranking on the same predictions.
 
+What the curve is tracing, and what an AUC of 0.5 looks like.
+
+<Chart slug="roc-curve" />
+
 ### What is the difference between RMSE, MAE, and R²?
 
 **RMSE** (root mean squared error) penalizes large errors heavily,
@@ -300,6 +323,11 @@ equally, more robust to outliers. **$R^2$** (coefficient of
 determination) measures the fraction of variance explained by the model;
 1.0 is perfect, 0.0 means the model is no better than predicting the mean.
 
+Why the two error measures disagree: RMSE squares before averaging, so
+one large miss costs far more than several small ones.
+
+<Chart slug="mae-vs-rmse" />
+
 ### What is class imbalance and how do you handle it?
 
 When one class is far more frequent (e.g., 99% negative), a model that
@@ -307,6 +335,10 @@ predicts the majority class always achieves high accuracy but is useless.
 Remedies: use precision/recall/F1 or PR-AUC instead of accuracy; oversample
 the minority (SMOTE) or undersample the majority; apply class weights in
 the loss function; or use anomaly detection framing for extreme imbalance.
+
+Why accuracy stops meaning anything when positives are rare.
+
+<Chart slug="base-rate-grid" />
 
 ### What is feature scaling and why does it matter?
 
@@ -345,6 +377,11 @@ Note that `scaler.fit_transform` learns the mean and standard deviation
 from `X_train` only, then `scaler.transform` reuses those statistics on
 `X_val` and `X_test`, the discipline that prevents leakage from the
 hold-out sets back into training.
+
+Measured rather than argued: two features that matter equally, in units
+that do not.
+
+<Chart slug="feature-scaling-distance" />
 
 ### What is one-hot encoding?
 

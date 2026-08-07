@@ -223,6 +223,11 @@ healthy people, 1% of a huge number (999) dwarfs the 99 true positives
 from the tiny sick group. So most positives are false alarms. Let's
 verify both by direct calculation and by simulating a population.
 
+Counting is more convincing than arithmetic here. Every person who tests
+positive, one dot each:
+
+<Chart slug="base-rate-grid" />
+
 <CodeBlock
   adapter="python"
   files={[
@@ -367,6 +372,12 @@ usually a false positive. This one reflex, anchoring on the base rate,
 prevents a huge fraction of real-world misjudgments in fraud, security,
 medicine, and analytics.
 </Callout>
+
+Updating does not have to stop at one step. When the thing you are
+estimating is a proportion, the same rule applied over and over has a
+shape: the belief starts wide and tightens as evidence accumulates.
+
+<Chart slug="beta-posterior-update" />
 
 ## The Monty Hall problem: conditioning that fooled the experts
 

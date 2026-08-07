@@ -22,6 +22,11 @@ models → high bias, low variance; flexible models → low bias, high
 variance. The goal is the sweet spot that minimizes total error on unseen
 data, tuned via model complexity, regularization, and more data.
 
+The two error sources moving against each other, and the total they sum
+to.
+
+<Chart slug="bias-variance" />
+
 ### How do you detect and fix overfitting?
 
 Detect it as a large gap between **training** and **validation** scores
@@ -59,6 +64,11 @@ print("Lasso coefs:", lasso.coef_)  # some may be exactly 0
   ]}
 />
 
+The difference, drawn as coefficient paths: L2 shrinks everything and
+keeps it, L1 drives coefficients to exactly zero one at a time.
+
+<Chart slug="regularization-l1-l2" />
+
 ### What is cross-validation and why use it?
 
 Instead of one train/test split, **k-fold CV** rotates which fold is the
@@ -87,6 +97,11 @@ print(f"CV accuracy: {scores.mean():.3f} ± {scores.std():.3f}")
     },
   ]}
 />
+
+The spread it averages away: the same model scores very differently
+depending on which rows land in the test set.
+
+<Chart slug="one-split-is-a-lottery" />
 
 ### Precision vs recall, when do you favor each?
 
@@ -126,6 +141,11 @@ print(f"F1:        {f1_score(y_true, y_pred):.2f}")
   ]}
 />
 
+Threshold by threshold, so the trade is a curve rather than a pair of
+numbers.
+
+<Chart slug="precision-recall-threshold" />
+
 ### What is ROC-AUC and when is PR-AUC preferred?
 
 **ROC-AUC** is the area under the Receiver Operating Characteristic curve (true positive rate, TPR, vs false positive rate, FPR, across thresholds).
@@ -152,6 +172,10 @@ print(f"PR-AUC:  {average_precision_score(y_true, y_score):.3f}")
     },
   ]}
 />
+
+What the curve traces, and what chance looks like on it.
+
+<Chart slug="roc-curve" />
 
 ### What is gradient descent and how does learning rate affect it?
 
@@ -225,6 +249,11 @@ print(f"R²:   {r2_score(y_true, y_pred):.3f}")
   ]}
 />
 
+Why the two disagree: RMSE squares before averaging, so one large miss
+costs more than several small ones.
+
+<Chart slug="mae-vs-rmse" />
+
 ### What is feature scaling and when is it necessary?
 
 Feature scaling (standardization or min-max normalization) puts features on a comparable scale.
@@ -260,6 +289,11 @@ Common strategies:
 - **Class weights**: pass `class_weight='balanced'` to penalize misclassifying the minority class more.
 - **Threshold tuning**: lower the decision threshold to increase recall for the minority class.
 - **Evaluation**: use PR-AUC or F1 on the minority class rather than accuracy.
+
+The reason it matters: at a low base rate, most positives are false
+alarms even from an accurate classifier.
+
+<Chart slug="base-rate-grid" />
 
 ### How do you encode categorical variables?
 
@@ -319,11 +353,22 @@ print("Explained variance ratio:", pca.explained_variance_ratio_.round(3))
   ]}
 />
 
+And how the component count actually gets chosen: off the cumulative
+line, not off where the bars look like they stop.
+
+<Chart slug="pca-scree" />
+
 ### What is the curse of dimensionality?
 
 As dimensionality grows, data becomes increasingly sparse: the volume of the space grows exponentially and the nearest neighbor becomes almost as far as the farthest neighbor.
 This hurts distance-based methods, kNN, SVM with a radial basis function (RBF) kernel, k-means, and increases the sample size needed to learn accurate models.
 Remedies include dimensionality reduction (PCA, autoencoders), feature selection, and regularization.
+
+Two curves that between them are the whole curse: there is no middle
+left to be near, and every point becomes about equally far from every
+other.
+
+<Chart slug="curse-of-dimensionality" />
 
 ### What is logistic regression and how does it output probabilities?
 

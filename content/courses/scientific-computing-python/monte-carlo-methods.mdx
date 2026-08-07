@@ -25,6 +25,11 @@ Three things make Monte Carlo special:
 
 ## A first example: estimating $\pi$
 
+The convergence you should expect from any Monte Carlo estimate: noisy early,
+settling as the square root of the sample count rather than linearly.
+
+<Chart slug="lln-convergence" />
+
 Drop random points uniformly into the unit square. The fraction
 that lands inside the unit quarter-disk approximates $\pi/4$.
 
@@ -238,6 +243,12 @@ to the same Gaussian, the *stationary distribution*. Monte Carlo
 lets you see analytical results emerge from raw randomness.
 
 ## Uncertainty quantification by bootstrap
+
+What the bootstrap is doing: resample the sample you have, recompute, and let
+the spread of those recomputations stand in for the sampling distribution you
+cannot observe.
+
+<Chart slug="bootstrap-distribution" />
 
 Got a sample of measurements and want a confidence interval for
 the mean, median, or any statistic? Resample with replacement

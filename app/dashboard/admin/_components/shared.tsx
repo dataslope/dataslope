@@ -128,6 +128,12 @@ export function ErrorNote({ children }: { children: React.ReactNode }) {
 
 // ─── Page chrome ──────────────────────────────────────────────────────────
 
+/** Reading-width column for the table/form pages. The gallery pages (charts,
+ *  illustrations) skip it and use the shell's full column instead. */
+export function AdminNarrow({ children }: { children: React.ReactNode }) {
+  return <div className="mx-auto max-w-5xl">{children}</div>;
+}
+
 export function AdminPageHeader({
   title,
   description,

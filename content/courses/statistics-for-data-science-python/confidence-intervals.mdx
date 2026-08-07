@@ -202,6 +202,8 @@ each, and color the ones that miss μ. About 5 of the 100 should
 fail, that's the 95% coverage made visible. This is the single most
 important picture on the page.
 
+<Chart slug="ci-coverage" />
+
 <CodeBlock
   adapter="python"
   files={[
@@ -407,6 +409,12 @@ expensive fast.
 
 Width scales with $1/\\sqrt{n}$, so more data is the honest lever for a tighter interval.`}
 />
+
+The square root in that formula is the part worth internalising: halving
+the margin of error costs four times the sample, and the curve flattens
+long before most people expect it to.
+
+<Chart slug="sample-size-margin-of-error" />
 
 ## A CI for a proportion
 

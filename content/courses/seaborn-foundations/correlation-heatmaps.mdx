@@ -83,7 +83,17 @@ midpoint** that means "no linear relationship."
 
 That demands a **diverging** colormap: two contrasting hues meeting at a
 neutral color in the middle. Center it at zero and fix the limits to the
-full range so the colors are anchored to their true meaning:
+full range so the colors are anchored to their true meaning.
+
+The same correlation matrix twice, once on a rainbow ramp and once on a
+diverging one centred at zero:
+
+<Chart slug="rainbow-vs-sequential" />
+
+A correlation matrix is also worth reading as a whole rather than cell by
+cell. Sorted so related variables sit together, the blocks are the story:
+
+<Chart slug="correlation-matrix" />
 
 <CodeBlock
   adapter="python"

@@ -28,6 +28,8 @@ statistics is to keep those two activities on opposite sides of a wall.
 There are two fundamentally different modes of data analysis, and
 conflating them is how analyses go wrong.
 
+<Chart slug="anscombes-quartet" />
+
 - **Exploratory (hypothesis-generating):** roam the data, slice it many
   ways, follow your curiosity, look at hundreds of summaries and plots.
   Output: *interesting questions and candidate hypotheses.* Nothing here
@@ -593,7 +595,7 @@ assert best_pair[0] != best_pair[1]`,
       name: "it is the strongest positive pair",
       description: "Matches the max off-diagonal correlation",
       code: `import numpy as np
-corr = tips.select_dtypes("number").corr().values
+corr = tips.select_dtypes("number").corr().to_numpy(copy=True)
 np.fill_diagonal(corr, -2.0)
 assert abs(best_r - corr.max()) < 1e-9`,
     },

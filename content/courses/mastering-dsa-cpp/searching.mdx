@@ -47,6 +47,12 @@ Linear search is often right for tiny arrays, one-time scans, linked lists, or u
 
 Binary search only works on sorted data. It maintains an interval `[low, high]` that is guaranteed to contain the target if it exists anywhere. Check the middle element: if it is too small, the target (if present) must be to the right, so move `low`; too big, move `high`; equal, done. Every comparison halves the interval, giving O(log n) time.
 
+O(n) against O(log n) is a pair of symbols until you put numbers on it. On a
+million-element array the difference is half a million comparisons against
+twenty:
+
+<Chart slug="binary-vs-linear-search" />
+
 The discipline that keeps you out of trouble is the *invariant*: at every moment, "if the target exists, it is inside `[low, high]`." Each update must preserve that sentence. The classic off-by-one bugs, `low = mid` instead of `mid + 1`, looping while `low < high` when both ends are inclusive, are all violations of the invariant, and checking your code against the sentence catches them.
 
 ```mermaid

@@ -51,6 +51,11 @@ words, so the two senses of "bank" get different representations. This
 context-sensitivity is a big reason transformers outperformed earlier
 methods.
 
+It helps to see what the pre-embedding baseline could and could not do,
+since that is the gap embeddings were introduced to close.
+
+<Chart slug="tfidf-vs-embedding" />
+
 ### What is self-attention?
 
 Self-attention lets each token look at every other token and pull in the
@@ -183,6 +188,11 @@ diverse, creative output. **Top-k** sampling restricts choices to the k
 most likely tokens; **top-p (nucleus)** sampling keeps the smallest set of
 tokens whose cumulative probability exceeds p. Use low temperature for
 factual/extraction tasks and higher for brainstorming.
+
+Top-k and top-p are the two truncation rules, and they diverge exactly
+where the model's confidence does.
+
+<Chart slug="topk-topp-cutoff" />
 
 ### How do you evaluate an LLM or NLP model?
 

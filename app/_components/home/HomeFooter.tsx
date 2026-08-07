@@ -4,11 +4,14 @@ import { FooterPattern } from "./FooterPattern";
 
 const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 
-// Column 2 used to carry the redesign's development-only pages (color test,
-// illustration prompts, the Fumadocs gallery, email preview). Those aren't
-// useful to a visitor, so for launch this column carries the site's own
-// destinations instead: the same set the header links to, plus the home
-// page's FAQ, which is otherwise reachable only by scrolling.
+// Column 2 carries the site's own destinations: the same set the header links
+// to, plus the home page's FAQ, which is otherwise reachable only by scrolling.
+//
+// The footer used to grow a "Development" row under `next dev` (color test,
+// illustration prompts, the Fumadocs gallery, email preview). Those tools now
+// live in the dashboard's Admin group (app/dashboard/_studio/nav.ts), where
+// they sit beside the other internal surfaces instead of hanging off a public
+// page that had to remember to hide them in every deployed build.
 const EXPLORE_LINKS = [
   { href: "/courses", label: "Courses", external: false },
   { href: "/interview-prep", label: "Interview Prep", external: false },
@@ -35,16 +38,6 @@ const RESOURCE_LINKS = [
     external: true,
   },
 ];
-
-// Kept for local work, but never shipped: these render only under
-// `next dev`, so the production footer stays user-facing.
-const DEV_LINKS = [
-  { href: "/color-test", label: "Color Theme Test", external: false },
-  { href: "/illustration-prompts", label: "Illustration Prompts", external: false },
-  { href: "/fumadocs-dev", label: "Fumadocs Dev", external: false },
-  { href: "/email-preview", label: "Email Preview", external: false },
-];
-const SHOW_DEV_LINKS = process.env.NODE_ENV === "development";
 
 // `inline-block w-fit` so each link shrinks to its text: as a stretched flex
 // item (`block`) the trailing whitespace across the column was clickable too.
@@ -149,19 +142,6 @@ export function HomeFooter() {
           </div>
         </div>
 
-        {/* Local-development pages, hidden in every deployed build. Sits under
-            the grid rather than in it so the three published columns keep
-            their widths whether or not this row is present. */}
-        {SHOW_DEV_LINKS && (
-          <div className="mt-12 flex flex-col gap-1 border-t border-[var(--ds-gray-200)] pt-8 dark:border-white/10">
-            <h3 className={headingClass}>Development</h3>
-            <div className="flex flex-wrap gap-x-6">
-              {DEV_LINKS.map((link) => (
-                <FooterLink key={link.href} {...link} />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </footer>
   );

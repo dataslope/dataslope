@@ -1,14 +1,26 @@
 /**
- * The `/interview-prep` catalog body: a "formats" band explaining how the
- * questions run, a grid of six role-track cards (each a risograph banner, a
- * role glyph, a short description of what the track drills, its topic count,
- * and a "Start track" link), and a footer line with the totals and a pointer
- * to /courses.
+ * The `/interview-prep` catalog body: two columns of role-track rows (each a
+ * small banner thumbnail, a short description of what the track drills, its
+ * topic count, and a "Start track" link), and a footer line with the totals
+ * and a pointer to /courses.
  *
- * Implements the "4a, Centered header, riso cards" mockup from the
- * interview-prep redesign. The centered page header lives in the server page
+ * The centered page header lives in the server page
  * (`app/interview-prep/page.tsx`), mirroring how `/courses` splits its header
  * from `CoursesCatalog`.
+ *
+ * ── No cards ───────────────────────────────────────────────────────────────
+ *
+ * This used to be the "4a, riso cards" mockup: each track sat in a bordered
+ * surface with a hatched second-print shadow behind it, a full-bleed 3:2
+ * banner across its top, and a role glyph in a ring straddling the banner's
+ * edge. Six of those on one screen meant the artwork and the frames were doing
+ * all the talking and the six *sentences* that actually tell a visitor which
+ * track is theirs were the quietest thing on the page.
+ *
+ * Now each track is a borderless row: a small thumbnail beside its text, at a
+ * size that identifies the track without competing with it. The glyphs went
+ * with the cards — they were a device for straddling the banner edge, and
+ * beside a thumbnail of the same role they were a second icon for one idea.
  *
  * The track list (title, topics, links) is content-driven, passed in from
  * `getInterviewTracks` (see `lib/interviewCatalog.ts`). The per-role
@@ -20,106 +32,9 @@
  * No client interactivity, the hover affordances are pure CSS, so this stays a
  * server component (the banners read the build-time image manifest directly).
  */
-import type { ReactNode } from "react";
 import Link from "@/app/_components/Link";
 import imageManifest from "@/lib/generated/images";
 import type { InterviewTrack } from "@/lib/interviewCatalog";
-import styles from "./InterviewCatalog.module.css";
-
-// Theme-follower shorthand for the card-footer divider, same tokens the
-// /courses catalog uses. (Surfaces, the riso shadow, and the badge live in the
-// CSS module, see the note there.)
-const HAIRLINE = "border-[var(--ds-gray-100)] dark:border-white/[0.07]";
-
-/** 24×24 lucide-style glyph, stroked in currentColor. Paths are the exact
- *  icon geometry from the mockup so each role reads at a glance. */
-function Glyph({ size = 21, children }: { size?: number; children: ReactNode }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {children}
-    </svg>
-  );
-}
-
-const ROLE_GLYPHS: Record<string, ReactNode> = {
-  // ChartColumnIncreasing
-  "data-analyst": (
-    <>
-      <path d="M3 3v16a2 2 0 0 0 2 2h16" />
-      <path d="M13 17V9" />
-      <path d="M18 17V5" />
-      <path d="M8 17v-3" />
-    </>
-  ),
-  // FlaskConical
-  "data-scientist": (
-    <>
-      <path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2" />
-      <path d="M6.453 15h11.094" />
-      <path d="M8.5 2h7" />
-    </>
-  ),
-  // Waypoints
-  "data-engineer": (
-    <>
-      <circle cx="12" cy="4.5" r="2.5" />
-      <path d="m10.2 6.3-3.9 3.9" />
-      <circle cx="4.5" cy="12" r="2.5" />
-      <path d="M7 12h10" />
-      <circle cx="19.5" cy="12" r="2.5" />
-      <path d="m13.8 17.7 3.9-3.9" />
-      <circle cx="12" cy="19.5" r="2.5" />
-    </>
-  ),
-  // Workflow
-  "analytics-engineer": (
-    <>
-      <rect width="8" height="8" x="3" y="3" rx="2" />
-      <path d="M7 11v4a2 2 0 0 0 2 2h4" />
-      <rect width="8" height="8" x="13" y="13" rx="2" />
-    </>
-  ),
-  // Network
-  "machine-learning-engineer": (
-    <>
-      <rect x="16" y="16" width="6" height="6" rx="1" />
-      <rect x="2" y="16" width="6" height="6" rx="1" />
-      <rect x="9" y="2" width="6" height="6" rx="1" />
-      <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
-      <path d="M12 12V8" />
-    </>
-  ),
-  // ListTree
-  "backend-engineer": (
-    <>
-      <rect x="14" y="14" width="4" height="6" rx="2" />
-      <rect x="6" y="4" width="4" height="6" rx="2" />
-      <path d="M6 20h4" />
-      <path d="M14 10h4" />
-      <path d="M6 14h2v6" />
-      <path d="M14 4h2v6" />
-    </>
-  ),
-};
-
-// Fallback glyph for any future role without a mapped icon (GraduationCap).
-const FALLBACK_GLYPH: ReactNode = (
-  <>
-    <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" />
-    <path d="M22 10v6" />
-    <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />
-  </>
-);
 
 interface Presentation {
   /** Short paragraph shown under the role name, the card's whole body now
@@ -180,14 +95,16 @@ const MIME: Record<string, string> = {
   avif: "image/avif",
 };
 
-/** The 3:2 card banner, served WebP-first with a raster fallback from the
- *  build-time image manifest (same source `<Figure>` reads), but styled to
- *  fill the card top edge to edge rather than as an in-content figure.
+/** The track's illustration, at thumbnail size. Served WebP-first with a
+ *  raster fallback from the build-time image manifest (the same source
+ *  `<Figure>` reads).
  *
  *  3:2 (1.5:1) is the illustrations' native ratio — every image the pipeline
- *  produces is 1536x1024 — so the banner shows the whole artwork and
- *  `object-cover` never crops the subject out of frame. */
-function TrackBanner({ slug, alt }: { slug: string; alt: string }) {
+ *  produces is 1536x1024 — so the thumbnail shows the whole artwork and
+ *  `object-cover` never crops the subject out of frame. `sizes` tells the
+ *  browser it is only ever painted a few hundred CSS pixels wide, so it can
+ *  pick the cheap decode. */
+function TrackThumb({ slug, alt }: { slug: string; alt: string }) {
   const entry = imageManifest[slug];
   if (!entry) return null;
   const fallback = entry.formats[entry.formats.length - 1];
@@ -195,7 +112,7 @@ function TrackBanner({ slug, alt }: { slug: string; alt: string }) {
   return (
     <picture>
       {sources.map((ext) => (
-        <source key={ext} srcSet={`/images/${slug}.${ext}`} type={MIME[ext]} />
+        <source key={ext} srcSet={`/images/${slug}.${ext}`} type={MIME[ext]} sizes="160px" />
       ))}
       <img
         src={`/images/${slug}.${fallback}`}
@@ -204,80 +121,74 @@ function TrackBanner({ slug, alt }: { slug: string; alt: string }) {
         height={entry.height}
         loading="lazy"
         decoding="async"
-        className="block aspect-[3/2] w-full object-cover"
+        sizes="160px"
+        className="block aspect-[3/2] w-full rounded-xl object-cover"
       />
     </picture>
   );
 }
 
-function TrackCard({ track }: { track: InterviewTrack }) {
+/**
+ * One track: thumbnail, name, what it drills, and the two facts a visitor
+ * chooses on (how much is in there, and where the link goes).
+ *
+ * `-mx-3 px-3` with a hover tint gives the row a target that lights up under
+ * the pointer without painting a resting surface, so at rest the page is the
+ * six thumbnails and the six sentences and nothing else.
+ */
+function TrackRow({ track }: { track: InterviewTrack }) {
   const p = PRESENTATION[track.slug];
-  const glyph = ROLE_GLYPHS[track.slug] ?? FALLBACK_GLYPH;
   return (
-    <div className={styles.cardWrap}>
-      <Link
-        href={track.url}
-        // Six-card index, don't viewport-prefetch every track (same opt-out
-        // the courses grid uses).
-        prefetch={false}
-        className={`group ${styles.card}`}
-      >
-        {p ? <TrackBanner slug={p.banner} alt={p.bannerAlt} /> : null}
+    <Link
+      href={track.url}
+      // Six-row index, don't viewport-prefetch every track (same opt-out the
+      // courses grid uses).
+      prefetch={false}
+      className="group -mx-3 grid grid-cols-[104px_1fr] items-start gap-4 rounded-2xl px-3 py-4 transition-colors hover:bg-[var(--ds-gray-50)] sm:grid-cols-[132px_1fr] sm:gap-5 dark:hover:bg-white/[0.035]"
+    >
+      {p ? <TrackThumb slug={p.banner} alt={p.bannerAlt} /> : <span />}
 
-        <div className="flex flex-1 flex-col px-[26px] pb-[22px]">
-          {/* Role glyph, lifted to straddle the banner's bottom edge. */}
-          <div className="-mt-[21px] flex">
-            <span className={styles.badge}>
-              <Glyph>{glyph}</Glyph>
-            </span>
-          </div>
+      <span className="flex min-w-0 flex-col">
+        <span className="text-[17px] font-semibold tracking-[-0.01em] text-[var(--ds-gray-900)] transition-colors group-hover:text-[var(--ds-blue-700)] dark:text-white dark:group-hover:text-[var(--ds-blue-400)]">
+          {track.title}
+        </span>
 
-          <span className="mt-6 text-[21px] font-semibold tracking-[-0.015em] text-[var(--ds-gray-900)] dark:text-white">
-            {track.title}
+        {/* `line-clamp-3` is the guard against a future entry running long and
+            pushing one row taller than the rest of its grid line. */}
+        {p ? (
+          <span className="mt-1.5 line-clamp-3 text-[14px] leading-[1.55] text-[#8a8a8a] dark:text-[var(--ds-gray-400)]">
+            {p.description}
           </span>
+        ) : null}
 
-          {/* The card's whole body. This replaced a row-per-topic list that
-              ran nine deep on some roles and pushed the cards so tall that
-              comparing two roles meant scrolling; the description says what
-              the track drills in a couple of lines instead, the way the
-              /courses rows do. `line-clamp-3` is the guard against a future
-              entry running long and re-inflating the grid. */}
-          {p ? (
-            <span className="mt-1.5 line-clamp-3 text-[14.5px] leading-[1.5] text-[#999999] dark:text-[var(--ds-gray-400)]">
-              {p.description}
-            </span>
-          ) : null}
-
-          {/* The topic count keeps the one thing the list carried that the
-              description can't — how much is in there — in a single line. */}
-          <div
-            className={`mt-auto flex items-center justify-between gap-3 border-t pt-3.5 ${HAIRLINE}`}
+        <span className="mt-2.5 flex items-center gap-2.5 text-[13px]">
+          <span className="font-semibold text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]">
+            Start track
+          </span>
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className="-ml-1.5 text-[var(--ds-blue-700)] transition-transform duration-200 group-hover:translate-x-0.5 dark:text-[var(--ds-blue-400)]"
           >
-            <span className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]">
-              Start track
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                className="transition-transform duration-200 group-hover:translate-x-0.5"
-              >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
-            </span>
-            <span className="text-[13px] text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
-              {track.topics.length} topics
-            </span>
-          </div>
-        </div>
-      </Link>
-    </div>
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+          <span aria-hidden="true" className="text-[var(--ds-gray-300)] dark:text-[var(--ds-gray-600)]">
+            ·
+          </span>
+          <span className="text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
+            {track.topics.length} topics
+          </span>
+        </span>
+      </span>
+    </Link>
   );
 }
 
@@ -286,13 +197,14 @@ export function InterviewCatalog({ tracks }: { tracks: InterviewTrack[] }) {
 
   return (
     <>
-      {/* ── Track cards ──
-          Two columns at most, even on the widest viewports: at three across,
-          the 1120px column left each card too narrow for its banner and its
-          topic list to breathe. Six tracks divide evenly into three rows. */}
-      <div className="mt-12 grid grid-cols-1 items-stretch gap-8 sm:mt-14 sm:grid-cols-2">
+      {/* ── Track rows ──
+          Two columns at most, even on the widest viewports: a third column
+          would leave each description too narrow to say anything. Six tracks
+          divide evenly into three lines. `items-start` rather than stretch,
+          because rows carry no surface to align the bottoms of. */}
+      <div className="mt-10 grid grid-cols-1 items-start gap-x-10 gap-y-2 sm:mt-12 sm:grid-cols-2">
         {tracks.map((track) => (
-          <TrackCard key={track.slug} track={track} />
+          <TrackRow key={track.slug} track={track} />
         ))}
       </div>
 

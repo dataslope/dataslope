@@ -62,6 +62,12 @@ the condition is **true**. Not false, and *not unknown*. A
 comparison against `NULL` is always unknown, so the row is dropped.
 That is why the next section's rule exists.
 
+Three-valued logic is the rule behind all of it. Once `UNKNOWN` is a
+value that `AND`, `OR` and `NOT` have to handle, the truth tables stop
+looking like the ones you know.
+
+<Chart slug="sql-null-logic" />
+
 ## Testing for NULL: use IS NULL, never = NULL
 
 Since `= NULL` does not work, SQL gives you special tests:

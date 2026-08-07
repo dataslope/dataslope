@@ -77,6 +77,12 @@ Radix / Base UI primitives and shadcn/Magic UI-derived components (MIT), and
 lucide-react (ISC). Refer to each package's own `LICENSE` for the authoritative
 terms.
 
+Build-time only: the lesson charts are rendered by **Observable Plot** (ISC)
+into SVG by `scripts/build-charts.mjs`, using **linkedom** (ISC) for a DOM. Both
+are devDependencies and neither reaches the browser or the Worker bundle; what
+ships is the generated markup, which is Dataslope's own content. Refer to each
+package's own `LICENSE` for the authoritative terms.
+
 ## Bundled emoji artwork
 
 The home page hero marquee separates its second line with three emoji images

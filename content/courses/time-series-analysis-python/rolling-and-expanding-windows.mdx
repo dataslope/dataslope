@@ -231,6 +231,11 @@ Centered rolling features include future observations, which is leakage; forecas
 
 ## The biggest misconception: a moving average is **not** a forecast
 
+Both smoothed lines below peak after the series does, and the wider window
+peaks later:
+
+<Chart slug="rolling-window-lag" />
+
 This one sinks real projects. A rolling mean is a **smoother of data you
 already have**. It describes the *past*. It has no machinery to project
 *beyond* the last observation, the line simply *stops* where your data
@@ -478,7 +483,7 @@ print(trailing_at_1, centered_at_1, uses_future)
 `,
       solutionCode: `trailing_at_1 = float(s.rolling(3, min_periods=1).mean().iloc[1])
 centered_at_1 = float(s.rolling(3, center=True).mean().iloc[1])
-uses_future = abs(centered_at_1 - (s.iloc[0] + s.iloc[1] + s.iloc[2]) / 3) < 1e-9
+uses_future = bool(abs(centered_at_1 - (s.iloc[0] + s.iloc[1] + s.iloc[2]) / 3) < 1e-9)
 print(
     "trailing@1:",
     trailing_at_1,

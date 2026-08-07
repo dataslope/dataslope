@@ -43,12 +43,8 @@ Arrow-backed columns instead: no copy of the values, and nulls stay
 nulls without changing the dtype.
 </Callout>
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import polars as pl
+```python
+import polars as pl
 
 df = pl.DataFrame({"n": [1, 2, None, 4]})
 
@@ -58,10 +54,17 @@ arrow_backed = df.to_pandas(use_pyarrow_extension_array=True)
 print("numpy-backed dtype:", numpy_backed["n"].dtype)
 print("arrow-backed dtype:", arrow_backed["n"].dtype)
 print(numpy_backed["n"].tolist())
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+pandas records whether pyarrow is importable when it is first imported, and
+caches the answer. In this runtime pandas loads with the page and pyarrow is
+fetched later, on the first call that needs it, so pandas has already decided
+Arrow is unavailable. Re-importing pandas to refresh that check changes how
+`read_csv` handles explicit dtypes and broke unrelated lessons, so the block is
+shown rather than run.
+</Callout>
+
 
 The integer column became `float64` on the NumPy path, because that
 is the only way NumPy can carry a missing value. This is the pandas
@@ -199,81 +202,34 @@ them.
 
 ## Practice
 
-<ChallengeCard
-  adapter="python"
-  title="Cross the boundary without losing types"
-  instructions={`\`df\` has an integer column \`n\` containing a null.
+Try it yourself before reading on. Convert the frame to pandas twice, once
+with the default NumPy-backed conversion and once with
+`use_pyarrow_extension_array=True`, and compare what happened to the integer
+column that contains a null.
 
-Produce three things:
-
-1. \`naive\`: \`df.to_pandas()\`, the default conversion.
-2. \`arrow\`: \`df.to_pandas(use_pyarrow_extension_array=True)\`.
-3. \`preserved\`: the **string name** of \`arrow\`'s \`n\` dtype (use \`str(...)\`), which should still describe an integer type.
-
-Then set \`widened\` to \`True\` if \`naive\`'s \`n\` column is a floating-point dtype.`}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import polars as pl
+```python
+import polars as pl
 import pandas as pd
-df = pl.DataFrame({"n": [1, 2, None, 4], "label": ["a", "b", "c", "d"]})`,
-      starterCode: `naive = None      # TODO
-arrow = None      # TODO
-preserved = None  # TODO
-widened = None    # TODO
 
-print(preserved, widened)
-`,
-      solutionCode: `naive = df.to_pandas()
+df = pl.DataFrame({"n": [1, 2, None, 4], "label": ["a", "b", "c", "d"]})
+
+naive = df.to_pandas()
 arrow = df.to_pandas(use_pyarrow_extension_array=True)
 
-preserved = str(arrow["n"].dtype)
-widened = pd.api.types.is_float_dtype(naive["n"])
+print("naive :", naive["n"].dtype)  # float64
+print("arrow :", arrow["n"].dtype)  # int64[pyarrow]
+```
 
-print("naive :", naive["n"].dtype)
-print("arrow :", arrow["n"].dtype)
-print(preserved, widened)
-`,
-    },
-  ]}
-  tests={[
-    {
-      id: "frames",
-      name: "Both conversions produced pandas DataFrames",
-      description: "Type check",
-      code: `import pandas as pd
-assert isinstance(naive, pd.DataFrame)
-assert isinstance(arrow, pd.DataFrame)`,
-    },
-    {
-      id: "rows",
-      name: "All four rows survived both conversions",
-      description: "Nothing dropped",
-      code: `assert len(naive) == 4 and len(arrow) == 4`,
-    },
-    {
-      id: "widened",
-      name: "The default conversion widened the integer column",
-      description: "NumPy needs a float to carry the missing value",
-      code: `assert widened is True, widened`,
-    },
-    {
-      id: "preserved",
-      name: "The Arrow-backed column stayed an integer type",
-      description: "int64[pyarrow]",
-      code: `assert "int" in preserved.lower(), preserved
-assert "float" not in preserved.lower(), preserved`,
-    },
-    {
-      id: "null",
-      name: "The null survived as missing in both",
-      description: "It did not become zero",
-      code: `import pandas as pd
-assert pd.isna(naive["n"][2])
-assert pd.isna(arrow["n"][2])`,
-    },
-  ]}
-/>
+The default conversion has to widen `n` to `float64`, because a NumPy integer
+array has no way to represent a missing value. The Arrow-backed conversion
+keeps it an integer and carries the null alongside, which is the whole reason
+to reach for it when types matter downstream.
+
+<Callout type="info" title="Not runnable in the browser">
+`int64[pyarrow]` needs pandas to have found pyarrow when pandas itself was
+imported, and pandas is imported before any lesson code runs. The code is
+correct on a normal install; it is shown rather than run.
+</Callout>
 
 ## Check your understanding
 

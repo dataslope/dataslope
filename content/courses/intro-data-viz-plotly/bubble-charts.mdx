@@ -79,6 +79,12 @@ cannot reliably tell you "this is 2.3× that." So:
 
 ## Linear vs square-root size scaling
 
+This is the reason the square root is there. Encode the value on the radius
+and the eye, which reads area, sees every ratio squared:
+
+<Chart slug="bubble-area-vs-radius" />
+
+
 By default, Plotly Express scales bubble *area* in proportion to
 the value, which is correct: when a value doubles, the area
 doubles, and that's roughly what the eye reads. *Do not* be

@@ -49,6 +49,13 @@ flowchart TD
     N["nums<br/>(name for<br/>the start)"] --> A0
 ```
 
+Contiguity is not a detail of the layout, it is the performance. Reading
+the same number of elements with a bigger gap between them costs several
+times as much, because each cache line delivers less of what you asked
+for.
+
+<Chart slug="cache-stride-cost" />
+
 ## `a[i]` *is* `*(a + i)`
 
 Indexing in C is sugar for pointer arithmetic. The expression `a[i]`

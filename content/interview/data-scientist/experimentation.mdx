@@ -50,6 +50,11 @@ print(f"Required n per variant: {int(n) + 1}")
   ]}
 />
 
+The steepness is the point, and it is the number most sample-size
+intuitions get wrong.
+
+<Chart slug="power-vs-n" />
+
 ### Why fix the sample size in advance instead of "peeking"?
 
 Repeatedly checking and stopping as soon as p < 0.05 (**peeking**)
@@ -63,6 +68,11 @@ $p < 0.05$ by luck. At a fixed $\alpha = 0.05$, continuously peeking and
 stopping on the first significant result can push the real false-positive
 rate well above 30%. Commit to the sample size before you start.
 </Callout>
+
+Why peeking works so well: under the null, p-values are uniform, so
+enough looks will hand you a small one on luck alone.
+
+<Chart slug="pvalues-under-null" />
 
 ### What are common A/B testing pitfalls?
 
@@ -152,6 +162,10 @@ Simpson's paradox is when a result that holds within each subgroup reverses in t
 In A/B testing this can appear if a new feature is rolled out unevenly across platforms (e.g., mobile vs desktop) and the platforms have different baseline rates.
 Always segment results by key dimensions and check whether the aggregate effect is consistent with subgroup effects.
 
+The same data favouring one arm in every subgroup and the other overall.
+
+<Chart slug="simpsons-paradox" />
+
 ### What are novelty and primacy effects, and how do you handle them?
 
 A **novelty effect** is a temporary boost in engagement just because something is new; it fades once users adapt.
@@ -163,6 +177,11 @@ Both cause the early experiment period to be unrepresentative. Run experiments f
 When you test many metrics or run many experiments simultaneously, some will appear significant by chance alone (at `alpha = 0.05`, one in 20 true nulls will produce a false positive).
 Corrections include **Bonferroni** (divide `alpha` by number of tests) or **Benjamini-Hochberg** (control the false discovery rate).
 Best practice: define one primary metric before the test and treat secondary metrics as directional signals.
+
+How fast the chance of at least one false positive climbs with the
+number of tests.
+
+<Chart slug="multiple-comparisons" />
 
 ### What is CUPED and how does it reduce variance?
 

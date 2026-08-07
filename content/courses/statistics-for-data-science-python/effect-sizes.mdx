@@ -146,6 +146,12 @@ anchor for interpreting `d`. They are conventions, not laws of nature.
 | ~0.5 | medium | a noticeable, visible separation |
 | ~0.8 | large | the groups are clearly distinct |
 
+The overlap column is worth seeing rather than reading. Each panel below
+is the same two groups at a different `d`, and even the "large" one leaves
+them sharing most of their range:
+
+<Chart slug="effect-size-overlap" />
+
 <Callout type="warn" title="Context defines 'big', not a table">
 These labels are starting points, not verdicts. In a domain where tiny
 gains compound across millions of users (ad click-through, search
@@ -562,7 +568,7 @@ For this data, \`p\` should be **below 0.05** (significant) while \`abs(d)\` sho
       filename: "main.py",
       initCode: `import numpy as np
 rng = np.random.default_rng(2024)
-n = 80_000
+n = 300_000
 a = rng.normal(100.00, 15, size=n)
 b = rng.normal(100.12, 15, size=n)`,
       starterCode: `import numpy as np

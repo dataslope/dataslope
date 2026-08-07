@@ -29,9 +29,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/api/",
           "/llms/",
-          "/color-test",
-          "/illustration-prompts",
-          "/email-preview",
           // Auth surfaces: personalized or credential flows, no SEO value
           // (also marked `robots: { index: false }` in their metadata).
           "/sign-in",

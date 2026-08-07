@@ -32,6 +32,17 @@ QPS. Distinguish **average** QPS from **peak** (often 2–3x average), and
 compute the **read/write ratio**, most consumer systems are read-heavy
 (100:1 or more), which drives caching and replica decisions.
 
+The set worth memorising is really one picture: what each level of the
+memory and network hierarchy costs, and how far apart they are.
+
+<Chart slug="memory-latency-ladder" />
+
+One more habit worth having: quote latency as a percentile, never as a
+mean. The distribution is skewed enough that the average describes almost
+nobody's experience.
+
+<Chart slug="latency-percentiles" />
+
 ### What is a load balancer and how does it distribute traffic?
 
 A load balancer sits in front of a pool of servers and spreads requests so
@@ -48,6 +59,12 @@ single point of failure. **Horizontal scaling** (more machines behind a load
 balancer) scales nearly without limit and adds redundancy, but requires your
 app tier to be **stateless** so any server can handle any request. Push
 session state into a shared cache or database so you can scale out freely.
+
+The reason headroom is the thing you are buying: queueing delay is
+proportional to one over the slack, so the last few points of
+utilisation cost more than all the ones before them.
+
+<Chart slug="queue-utilization-latency" />
 
 ### Explain the cache-aside pattern.
 
@@ -85,6 +102,12 @@ cost; write-behind batches writes for speed but risks data loss on crash.
 The classic quip, "there are only two hard things in computer science: cache
 invalidation and naming things", is about exactly this trade-off.
 
+A related number people underestimate: a request that fans out to many
+backends is as slow as its slowest call, so a one-percent tail per call
+becomes a coin flip for the page.
+
+<Chart slug="tail-latency-fanout" />
+
 ### What is database replication and what does it buy you?
 
 Replication keeps copies of the data on multiple nodes. In **leader-follower**
@@ -112,6 +135,11 @@ both during a partition. A **CP** system (e.g. a leader-based store) rejects
 requests to stay consistent; an **AP** system (e.g. Dynamo-style) keeps
 serving and reconciles later. Since partitions are unavoidable, CAP is really
 a choice between C and A when one occurs.
+
+The theorem is easiest to hold onto as the three pairs you could pick and
+the one that is not actually available to you.
+
+<Chart slug="cap-theorem-grid" />
 
 ### What consistency models should you know?
 
@@ -186,6 +214,12 @@ the system, one database, one load balancer, one cache. Remove it with
 **redundancy**: multiple app servers, replicated databases with failover,
 load balancers in active-passive pairs, and multi-availability-zone
 deployment. The goal is that no single machine's death causes an outage.
+
+Removing the single point of failure is only half of it. The other half
+is making sure a failing dependency is not kept failing by the traffic
+still being sent to it.
+
+<Chart slug="circuit-breaker-states" />
 
 ### SQL or NoSQL at scale, how do you choose?
 

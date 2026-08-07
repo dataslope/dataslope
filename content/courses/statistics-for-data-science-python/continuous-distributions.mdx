@@ -187,6 +187,12 @@ Same rate parameter underneath; choose based on whether you're counting
 events or timing the gaps between them.
 </Callout>
 
+Memorylessness is the property that makes the exponential strange, and it
+is easier to see than to state: having already waited does not improve
+your position.
+
+<Chart slug="exponential-memoryless" />
+
 ## Normal: the bell curve (a first look)
 
 The **Normal** (Gaussian) distribution is the famous symmetric bell
@@ -226,6 +232,12 @@ fig.show()
     },
   ]}
 />
+
+Those are the three shapes to carry around. Drawn on one pair of axes,
+with the *same* mean of 2, they show that "continuous" is not one shape
+and that a mean tells you almost nothing about which one you are holding:
+
+<Chart slug="continuous-families" />
 
 ## Quantiles: inverting the question with ppf
 

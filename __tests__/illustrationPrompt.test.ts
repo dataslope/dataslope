@@ -10,7 +10,7 @@ import {
   getIllustrationPromptById,
 } from "../lib/illustrationPromptsGallery";
 
-// The `/illustration-prompts` gallery, the in-lesson `<IllustrationPrompt>`
+// The `/dashboard/admin/illustration-prompts` gallery, the in-lesson `<IllustrationPrompt>`
 // card, and the batch generator (scripts/generate-illustrations.mjs) all key
 // off these pure helpers and the shared JSON, so their output is pinned here:
 // the prompt text must match the authored GPT Image 2 template exactly (always

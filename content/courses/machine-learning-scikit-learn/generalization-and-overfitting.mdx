@@ -121,6 +121,8 @@ Let us quantify what the eye just saw. We will sweep the polynomial degree
 from rigid to flexible and, at each step, measure error on the training
 data and on a held-out test set.
 
+<Chart slug="bias-variance" />
+
 <CodeBlock
   adapter="python"
   files={[
@@ -261,6 +263,13 @@ both, small gap → you are done.
 </Callout>
 
 ## How to fight overfitting
+
+
+Which of the two you have, read off the curves: a gap still closing
+means more data is the cheapest fix, and two curves that met early and
+levelled off high mean the model is too simple.
+
+<Chart slug="learning-curve" />
 
 When you have diagnosed overfitting, the toolbox is:
 

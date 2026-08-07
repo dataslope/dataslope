@@ -100,6 +100,11 @@ The four knobs trade off against each other:
 | Smaller α (stricter) | needs **more** users |
 | Noisier metric (bigger variance) | needs **more** users |
 
+The trade is steep enough that a table understates it. Each halving of the
+lift you want to catch roughly quadruples the users you need:
+
+<Chart slug="power-vs-n" />
+
 <CodeBlock
   adapter="python"
   files={[
@@ -350,6 +355,12 @@ of two *identical* arms will cross p < 0.05 *at some point* surprisingly
 often if you keep peeking. Pre-commit to your stopping rule, or use a
 method designed for continuous monitoring.
 </Callout>
+
+Peeking is the one on that list that feels harmless, so it is worth
+seeing. Below, one experiment where nothing is happening is tested after
+every new observation instead of once at the end.
+
+<Chart slug="ab-test-peeking" />
 
 ## Practice
 

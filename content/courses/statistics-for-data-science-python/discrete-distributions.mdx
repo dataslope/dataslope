@@ -142,6 +142,12 @@ The safe habit: write the inequality out, then translate.
 Seeing the shape builds intuition fast. The PMF is just a bar for each
 possible count, with bar heights summing to 1.
 
+Before writing any code, here is what the two parameters do. `n` sets how
+many trials there are to count, so it fixes the range; `p` sets where the
+mass piles up inside that range:
+
+<Chart slug="binomial-shapes" />
+
 <CodeBlock
   adapter="python"
   files={[
@@ -268,6 +274,12 @@ assert abs(p_at_least_25 - wrong) > 1e-12`,
 />
 
 ## Poisson: counting rare events in a fixed interval
+
+
+How the shape moves with the rate, and the property that identifies it:
+the mean and the variance are the same number.
+
+<Chart slug="poisson-shapes" />
 
 The **Poisson** distribution counts how many times a rare-ish event
 happens in a fixed window of time or space, when events occur

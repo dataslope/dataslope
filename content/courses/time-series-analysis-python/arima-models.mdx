@@ -127,7 +127,7 @@ who formalized it:
 
 ```mermaid
 flowchart TD
-    A["Stationarize<br/>(log, difference) -> d"] --> B["Identify p and q<br/>from PACF and ACF"]
+    A["Stationarize<br/>(log, difference) → d"] --> B["Identify p and q<br/>from PACF and ACF"]
     B --> C["Fit ARIMA(p, d, q)"]
     C --> D{"Residuals look<br/>like white noise?"}
     D -->|"no: structure remains"| B
@@ -136,6 +136,13 @@ flowchart TD
 </Callout>
 
 ## Fitting and forecasting
+
+
+And what a forecast actually claims. The line is one number per step;
+the cone is the interval, and it widens as the square root of the
+horizon.
+
+<Chart slug="forecast-uncertainty-cone" />
 
 Time for a real forecast. We'll use a simulated series with a trend and
 autoregressive noise, deliberately *non-seasonal*, so a plain ARIMA can

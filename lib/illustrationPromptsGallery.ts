@@ -1,5 +1,5 @@
 /**
- * Data layer for the `/illustration-prompts` review gallery and the in-lesson
+ * Data layer for the `/dashboard/admin/illustration-prompts` review gallery and the in-lesson
  * `<IllustrationPrompt>` card.
  *
  * The prompt definitions live in `data/illustration-prompts.json` (the single

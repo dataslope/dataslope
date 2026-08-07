@@ -477,6 +477,12 @@ response = b"Hello"  # from a network request
 ```
 </Callout>
 
+How many bytes a character costs depends on the character. UTF-8 spends
+one byte on ASCII and up to four on everything else, which is why
+`len(s)` and `len(s.encode())` disagree.
+
+<Chart slug="utf8-bytes-per-script" />
+
 ## Challenges
 
 <ChallengeCard

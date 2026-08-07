@@ -71,6 +71,13 @@ per-class metrics instead.
 
 ## The confusion matrix: where every metric is born
 
+
+Four counts, and the four different questions people ask of them. Note
+how far apart precision and accuracy sit when the positive class is
+rare.
+
+<Chart slug="confusion-matrix-grid" />
+
 To talk precisely about classifier mistakes, we first need names for the
 four things that can happen on a binary problem. Compare each prediction to
 the truth:
@@ -186,6 +193,11 @@ this pair, chosen around which mistake hurts more.
 
 ## The threshold is the dial
 
+Precision and recall move in opposite directions as you turn it, and no
+setting maximises both:
+
+<Chart slug="precision-recall-threshold" />
+
 Most classifiers do not really output a class, they output a
 **probability**, and a threshold (0.5 by default) turns it into a class.
 Moving that threshold is exactly how you trade precision against recall.
@@ -226,6 +238,12 @@ confidence before saying "positive," so precision climbs and recall falls.
 There is no universally correct threshold, it depends on whether a false
 alarm or a missed case is worse for *your* problem. The default 0.5 is just
 a convention, not a law.
+
+Moving the threshold assumes the scores mean something. A model can rank
+perfectly and still be badly calibrated, which matters the moment anyone
+treats `predict_proba` as a probability.
+
+<Chart slug="calibration-curve" />
 
 ## F1: one number when you must have one
 

@@ -35,6 +35,13 @@ flowchart TD
 
 ## The Discrete Fourier Transform (and FFT)
 
+
+First, the constraint that decides whether the transform is telling you
+anything: sample below the Nyquist rate and a fast wave comes back as a
+slow one, fitting every sample exactly.
+
+<Chart slug="aliasing-nyquist" />
+
 For a sampled signal $x_0, x_1, \dots, x_{N-1}$, the DFT is
 
 $$

@@ -94,6 +94,12 @@ would predict, so between-spread ≈ within-spread and **F ≈ 1**. But if
 some groups are genuinely shifted, the group means spread out *more* than
 within-group noise alone can explain, pushing **F well above 1**.
 
+Both panels below carry the identical three group means. Only the noise
+inside the groups changes, and that alone decides whether the gaps are
+worth anything:
+
+<Chart slug="anova-between-within" />
+
 ```mermaid
 flowchart TD
   A["Total variation in the data"] --> B["BETWEEN groups<br/>(how far group means<br/>sit from each other)"]
@@ -101,8 +107,8 @@ flowchart TD
   B --> D["F = between / within"]
   C --> D
   D --> E{"F much bigger<br/>than 1?"}
-  E -->|"yes"| F["Group means spread MORE<br/>than noise explains<br/>(small p -> reject)"]
-  E -->|"no"| G["Spread looks like noise<br/>(large p -> fail to reject)"]
+  E -->|"yes"| F["Group means spread MORE<br/>than noise explains<br/>(small p → reject)"]
+  E -->|"no"| G["Spread looks like noise<br/>(large p → fail to reject)"]
 ```
 
 Same shape as the t-test: a signal (between-group spread) divided by
@@ -193,6 +199,13 @@ ANOVA is the smoke alarm: it signals a difference exists somewhere, then post-ho
 />
 
 ## Part B, Chi-square: tests for categorical data
+
+
+The family the statistic is compared against. The critical value moves
+with the degrees of freedom, which is why there is a table rather than a
+number.
+
+<Chart slug="chi-square-shapes" />
 
 ANOVA and t-tests need **numbers** (heights, times, dollars). But masses
 of real data are **categorical**: device type, subscription tier,

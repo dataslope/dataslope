@@ -67,6 +67,9 @@ const nextConfig: NextConfig = {
       "./tools-jar/**",
       "./assets/**",
       "./brand-assets/**",
+      // Chart specs are build-time only: scripts/build-charts.mjs renders them
+      // into lib/generated/charts.js, and that module is what the app imports.
+      "./charts/**",
       "./__tests__/**",
       "./migrations/**",
     ],

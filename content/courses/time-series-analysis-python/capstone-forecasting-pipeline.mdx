@@ -13,7 +13,7 @@ actually beat a trivial baseline on data it has never seen?**
 ```mermaid
 flowchart TD
     A["1. Load & plot<br/>(see trend, season, variance)"] --> B["2. Stabilize variance<br/>(log)"]
-    B --> C["3. Difference to stationarity<br/>(regular + seasonal) -> ADF passes"]
+    B --> C["3. Difference to stationarity<br/>(regular + seasonal) → ADF passes"]
     C --> D["4. Identify orders<br/>(ACF / PACF)"]
     D --> E["5. Split chronologically<br/>(hold out the future)"]
     E --> F["6. Fit on TRAIN only"]

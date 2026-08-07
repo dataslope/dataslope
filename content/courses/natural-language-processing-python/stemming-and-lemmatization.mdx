@@ -28,8 +28,8 @@ Both techniques map many forms to one. The disagreement is entirely about
 flowchart TB
     W["Word: 'studies'"] --> S["STEMMING (Porter)<br/>apply suffix-chopping rules"]
     W --> L["LEMMATIZATION (WordNet)<br/>look up the dictionary form"]
-    S --> S1["chop the ending -> 'studi'<br/>fast, no dictionary,<br/>result may not be a real word"]
-    L --> L1["map to lemma -> 'study'<br/>needs a dictionary and POS,<br/>result is always a real word"]
+    S --> S1["chop the ending → 'studi'<br/>fast, no dictionary,<br/>result may not be a real word"]
+    L --> L1["map to lemma → 'study'<br/>needs a dictionary and POS,<br/>result is always a real word"]
 ```
 
 **Stemming** is crude and mechanical: it strips suffixes according to fixed

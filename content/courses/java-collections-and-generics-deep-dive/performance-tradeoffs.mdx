@@ -17,6 +17,11 @@ This chapter is the cheat sheet you'll come back to.
 
 ## The big table
 
+Before the table, what the notation is claiming. These are the growth curves
+the entries in it name:
+
+<Chart slug="big-o-growth" />
+
 | Operation | `ArrayList` | `LinkedList` | `ArrayDeque` | `HashSet` / `HashMap` | `LinkedHashSet` / `LinkedHashMap` | `TreeSet` / `TreeMap` |
 | --- | --- | --- | --- | --- | --- | --- |
 | `get(i)` | **O(1)** | O(n) | n/a | n/a | n/a | n/a |
@@ -60,6 +65,12 @@ flowchart TD
     end
 ```
 
+The size of that effect surprises people. Walking the same array with a
+larger stride does the same number of operations and takes several times
+as long, because the cache line stops paying for itself.
+
+<Chart slug="cache-stride-cost" />
+
 ## ArrayList capacity and resizing
 
 `ArrayList` keeps a backing `Object[]`. When it fills up, it
@@ -99,6 +110,12 @@ public class Main {
 />
 
 `ensureCapacity(int)` is the runtime equivalent.
+
+The growth factor is what makes the amortized cost constant. Below, the
+same sequence of appends under doubling and under adding a fixed number of
+slots each time.
+
+<Chart slug="amortized-vector-growth" />
 
 ## HashMap capacity and load factor
 

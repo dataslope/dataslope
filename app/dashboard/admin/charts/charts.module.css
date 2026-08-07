@@ -1,0 +1,668 @@
+/*
+ * Admin chart gallery.
+ *
+ * The charts themselves are painted by Chart.module.css (imported by the page
+ * and by ChartPane), which is the same stylesheet a lesson uses; everything
+ * here is the frame around them.
+ *
+ * Deliberately cardless. A figure on this page is being judged against two
+ * surfaces, white and #121212, and wrapping that in a third (the dashboard's
+ * tinted panel) put a grey rectangle between the eye and the only comparison
+ * the page exists to make. Structure comes from hairlines and alignment
+ * instead, so the two theme panes are the only filled shapes.
+ */
+
+/* ── Summary line ── */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  margin: 0 0 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+}
+
+.stat dt {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.stat dd {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.statNote {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--faint);
+}
+
+.empty {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.empty code,
+.summary code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.9em;
+}
+
+/* ── One chart ── */
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* A rule between figures rather than a box around each: the separation is
+   real, the enclosure was not. With no card edge to mark where one figure
+   stops, the gap has to do that work, so it is deliberately generous. */
+.item {
+  padding: 3.75rem 0;
+  border-top: 1px solid var(--divider);
+}
+
+.item:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.headMain {
+  min-width: 0;
+}
+
+.slug {
+  margin: 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.caption {
+  margin: 0.375rem 0 0;
+  max-width: 78ch;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.dims {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+/* ── Where it appears ── */
+.usedBy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.875rem;
+}
+
+.useLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  padding: 0.1875rem 0.5rem 0.1875rem 0.625rem;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--divider);
+  font-size: 0.8125rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition:
+    color 0.12s,
+    box-shadow 0.12s;
+}
+
+.useLink:hover {
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--faint);
+}
+
+/* A chart can sit in several courses, and lesson titles repeat across them
+   ("Histograms" exists in three), so the link carries the course name. It
+   stays quieter than the lesson: the course is context, the lesson is the
+   destination. */
+.useCourse {
+  color: var(--faint);
+  /* Course titles run long ("Introduction to Data Visualization with Python
+     and Plotly Express"), and a chart placed in four lessons would otherwise
+     produce four pills wider than the column. The link's `title` carries the
+     untruncated text. */
+  max-width: 16ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.useSep {
+  color: var(--faint);
+  opacity: 0.6;
+}
+
+.useLink:hover .useCourse {
+  color: var(--muted);
+}
+
+.unplaced {
+  font-size: 0.8125rem;
+  color: var(--faint);
+  font-style: italic;
+}
+
+/* ── The two theme panes ── */
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-top: 1.125rem;
+}
+
+/* Side by side only when each pane still has room to render a 680px-wide
+   figure legibly; below that they stack, and the comparison takes a scroll. */
+@media (min-width: 1100px) {
+  .split {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Each pane paints the *site's* page colour, not the dashboard's (#ffffff and
+   #121212, the two surfaces a chart actually ships on), so what is being
+   judged is the real thing. */
+.pane {
+  position: relative;
+  border-radius: 0.625rem;
+  padding: 1.5rem 1rem 1rem;
+  overflow: hidden;
+}
+
+.light {
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgb(113 113 122 / 0.16);
+}
+
+.dark {
+  background: #121212;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+}
+
+.paneLabel {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.75rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.light .paneLabel {
+  color: #121212;
+}
+
+.dark .paneLabel {
+  color: #ffffff;
+}
+
+.expandBtn {
+  position: absolute;
+  top: 0.4375rem;
+  right: 0.5rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.625rem;
+  height: 1.625rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: none;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.12s,
+    background 0.12s;
+}
+
+.pane:hover .expandBtn,
+.expandBtn:focus-visible {
+  opacity: 1;
+}
+
+.light .expandBtn {
+  color: rgb(18 18 18 / 0.55);
+}
+
+.light .expandBtn:hover {
+  background: rgb(18 18 18 / 0.06);
+  color: #121212;
+}
+
+.dark .expandBtn {
+  color: rgb(255 255 255 / 0.55);
+}
+
+.dark .expandBtn:hover {
+  background: rgb(255 255 255 / 0.1);
+  color: #ffffff;
+}
+
+/* The figure wrapper carries `margin: 2.25rem auto` for prose flow; inside a
+   preview pane that top margin is dead space. */
+.pane > :global(figure),
+.pane > div {
+  margin: 0;
+}
+
+/* ── Expanded view ──
+   Keeps the pane's pinned theme (the class is applied alongside .overlay), so
+   the enlarged figure is still the one that ships, not a re-themed copy. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+}
+
+.overlayBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  flex-shrink: 0;
+}
+
+.overlaySlug {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  opacity: 0.75;
+}
+
+.overlayTheme {
+  margin-left: 0.5rem;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.light .overlaySlug,
+.light .overlayClose {
+  color: #121212;
+}
+
+.dark .overlaySlug,
+.dark .overlayClose {
+  color: #ffffff;
+}
+
+.overlayClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: none;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.12s;
+}
+
+.overlayClose:hover {
+  opacity: 1;
+}
+
+/* Centres the figure in whatever space is left and lets it grow to a
+   comfortable reading size without stretching a 680px design to 2560px. */
+.overlayStage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem 3rem;
+  overflow: auto;
+}
+
+.overlayChart {
+  width: min(100%, 1200px);
+}
+
+/* ── Accessible-name disclosure ── */
+.details {
+  margin-top: 1rem;
+}
+
+.summary {
+  cursor: pointer;
+  font-size: 0.8125rem;
+  color: var(--faint);
+}
+
+.title {
+  margin: 0.5rem 0 0;
+  max-width: 80ch;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* ── Pager ──
+   Route-segment pagination (see the note in the page), so these are ordinary
+   links and a page is bookmarkable. */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--divider);
+}
+
+.pagerStep {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  box-shadow: inset 0 0 0 1px var(--divider);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  transition:
+    color 0.12s,
+    box-shadow 0.12s;
+}
+
+.pagerStep:hover {
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--faint);
+}
+
+.pagerDisabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.pagerNums {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.125rem;
+}
+
+.pagerNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.875rem;
+  height: 1.875rem;
+  padding: 0 0.375rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  text-decoration: none;
+  transition:
+    color 0.12s,
+    background 0.12s;
+}
+
+.pagerNum:hover {
+  color: var(--ink);
+  background: var(--side-active);
+}
+
+.pagerNumOn {
+  color: var(--ink);
+  font-weight: 600;
+  background: var(--side-active);
+}
+
+/* ── Review queue ────────────────────────────────────────────────────────────
+ *
+ * The queue layered on by ChartReview.tsx. Everything here is absent for a
+ * non-admin, whose fetch of /api/admin/charts is refused and who therefore gets
+ * the gallery exactly as it was before the queue existed.
+ *
+ * Colours come from the Studio shell's tokens (app/dashboard/_studio/studio.css)
+ * rather than the illustration gallery's private palette. That page defines its
+ * own --border/--btn-bg/--fg because it predates the shell; this one is inside
+ * it, and borrowing names the shell never sets would have left every control
+ * unpainted.
+ *
+ * State is carried on the left edge of a figure's section rather than by
+ * tinting it. This page's whole argument is that the only filled rectangles
+ * should be the two theme panes, since a third surface is a third thing for the
+ * eye to compare the figure against; a coloured rule outside the section says
+ * the same without adding one.
+ */
+
+/* Reaches the server-rendered <section> from the client control nested inside
+   it, so the state marker costs no extra client component. */
+.item:has([data-mark-state="marked"]) {
+  box-shadow: inset 3px 0 0 var(--ds-red-500, #ff4f59);
+  padding-left: 1.25rem;
+}
+
+.item:has([data-mark-state="awaiting"]) {
+  box-shadow: inset 3px 0 0 var(--green-btn, #0aa80f);
+  padding-left: 1.25rem;
+}
+
+.review {
+  margin-top: 0.875rem;
+}
+
+.reviewRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Takes the rest of the row, with a floor so it stays usable when the mark and
+   approve controls are both present. */
+.noteInput {
+  flex: 1 1 18rem;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid var(--divider);
+  border-radius: 0.5rem;
+  background: var(--input);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.8125rem;
+}
+
+.noteInput::placeholder {
+  color: var(--faint);
+}
+
+.noteInput:focus-visible {
+  outline: none;
+  border-color: var(--muted);
+}
+
+.noteInput:disabled {
+  opacity: 0.5;
+}
+
+.markBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid var(--divider);
+  border-radius: 0.5rem;
+  background: var(--input);
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.markBtn:hover:not(:disabled) {
+  background: var(--panel-hover);
+}
+
+.markBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.markBtnOn {
+  border-color: transparent;
+  background: var(--ds-red-500, #ff4f59);
+  color: #ffffff;
+}
+
+.markBtnOn:hover:not(:disabled) {
+  background: var(--ds-red-600, #dc3f49);
+}
+
+.approveBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: var(--green-btn, #0aa80f);
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.approveBtn:hover:not(:disabled) {
+  background: var(--ds-green-700, #008b03);
+}
+
+.approveBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.reviewChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--green-text);
+}
+
+.spin {
+  animation: chart-review-spin 1s linear infinite;
+}
+
+@keyframes chart-review-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Queue summary ── */
+
+/* A second row under the library counts, so the two questions the page answers
+   ("what is here" and "what needs work") stay visually separate. */
+.queueStats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2.5rem;
+  margin: -1rem 0 1.5rem;
+}
+
+.queueOffline,
+.queueError {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.queueError {
+  margin-bottom: 1.25rem;
+  color: var(--danger);
+}
+
+/* Charts in the queue that this page's slice does not contain. Without these a
+   marked figure on page 4 is invisible from page 1, since pagination is a route
+   segment and the queue spans the library. */
+.queueJump {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.queueJumpLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.queueChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.1875rem 0.5rem;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.queueChip:hover {
+  background: var(--panel-hover);
+}
+
+.queueChipPage {
+  font-family: inherit;
+  color: var(--faint);
+}

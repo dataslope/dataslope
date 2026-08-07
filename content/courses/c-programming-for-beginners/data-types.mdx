@@ -87,6 +87,11 @@ flowchart TD
     end
 ```
 
+The fixed width has a consequence worth seeing before it bites you:
+adding one to the largest value does not produce a larger value.
+
+<Chart slug="integer-overflow-wrap" />
+
 ## Characters: a sneaky kind of integer
 
 `char` is the smallest integer type in C. It is one byte. A `char` can

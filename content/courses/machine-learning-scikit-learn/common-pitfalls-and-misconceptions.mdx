@@ -157,6 +157,12 @@ red flag, never a trophy.
 
 ## (c) Ignoring class imbalance
 
+Why accuracy stops meaning anything when positives are rare. A test that is
+99% accurate on a 1-in-1000 condition still calls ten false alarms for every
+true one:
+
+<Chart slug="base-rate-grid" />
+
 **The trap.** On a dataset where one class is rare, you celebrate a high
 accuracy while the model quietly ignores the rare class entirely, which is
 often the *only* class you care about.
@@ -217,6 +223,11 @@ the confusion matrix instead.
 
 ## (d) Chasing a single metric
 
+Precision and recall move against each other as the threshold slides; a model
+is a curve, not a number:
+
+<Chart slug="precision-recall-threshold" />
+
 **The trap.** Optimizing one number to the exclusion of everything else, and
 losing sight of what the number leaves out.
 
@@ -242,6 +253,10 @@ others it ignores.
 </Callout>
 
 ## (e) Not setting random seeds
+
+How much a single split moves the score, which is what a seed is pinning:
+
+<Chart slug="one-split-is-a-lottery" />
 
 **The trap.** Leaving the random pieces of your workflow, the split, a
 forest's bootstrap sampling, a `KMeans` initialization, unseeded, so every
@@ -288,6 +303,11 @@ results are the bedrock of honest comparison and of anyone being able to
 reproduce your work, including future you.
 
 ## (f) Tuning against the test set / repeated peeking
+
+Why repeated peeking works: under the null, p-values are uniform, so enough
+looks will hand you a good one on luck alone.
+
+<Chart slug="pvalues-under-null" />
 
 **The trap.** Using the test score to guide your choices, picking a model,
 a threshold, a hyperparameter, or just deciding when to stop, and then
@@ -372,6 +392,11 @@ deeply skeptical of predictions outside it, and never assume a pattern
 learned in one region holds in another.
 
 ## (h) Confusing correlation with causation
+
+The sharpest version of the trap: the same data can favour one group in every
+subgroup and the other overall.
+
+<Chart slug="simpsons-paradox" />
 
 **The trap.** Concluding that because a feature predicts the target (or is
 "important" to the model), changing that feature would change the outcome.

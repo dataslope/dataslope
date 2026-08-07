@@ -141,6 +141,81 @@ const MICROPIP_PACKAGES: Record<string, string> = {
 };
 const micropipInstalled = new Set<string>();
 
+/**
+ * Packages a block needs but never names, keyed by the call that needs them.
+ *
+ * `loadPackagesFromImports` only sees `import` statements, which misses every
+ * dependency a library reaches for internally. A lesson that writes
+ * `px.scatter(..., trendline="ols")` imports plotly and nothing else, and the
+ * reader gets "The module 'statsmodels' is included in the Pyodide
+ * distribution, but it is not installed" instead of a chart. The same happens
+ * to `df.to_excel(...)` (openpyxl), `df.to_parquet(...)` and polars'
+ * `.to_arrow()` (pyarrow), and any tz-aware timestamp (tzdata).
+ *
+ * Making the author add a dead `import statsmodels` to the block would work
+ * and would be a worse lesson, so the trigger lives here instead. Each entry
+ * is a pattern over the source and the distribution package it implies; a
+ * false positive costs one download, so the patterns are written to be
+ * specific rather than clever.
+ */
+const IMPLICIT_PACKAGES: { pattern: RegExp; pkg: string }[] = [
+  // plotly's trendlines are fitted by statsmodels.
+  { pattern: /\btrendline\s*=/, pkg: "statsmodels" },
+  // Arrow interop, and the parquet engine pandas and polars both prefer.
+  { pattern: /\bpyarrow\b|\.(?:to|from)_(?:arrow|pandas)\(/, pkg: "pyarrow" },
+  { pattern: /\.(?:to|read|scan|sink)_parquet\(/, pkg: "pyarrow" },
+  // polars decides once, at import time, whether pyarrow is available, and
+  // caches the answer for the life of the interpreter. There is no way to
+  // change its mind afterwards (see the note on the deleted repair below), so
+  // pyarrow has to be on disk before the first `import polars` runs, which
+  // means triggering on the import rather than on the Arrow call that needs
+  // it. The cost is one extra wheel on polars lessons that never touch Arrow;
+  // the alternative is a polars that quietly answers wrongly.
+  {
+    pattern:
+      /^\s*(?:from\s+polars(?:\.[\w.]+)?\s+import\b|import\s+(?:[\w.]+\s*,\s*)*polars(?:\.[\w.]+)?(?:\s+as\s+\w+)?\s*(?:,|$|#))/m,
+    pkg: "pyarrow",
+  },
+  // zoneinfo's database is a separate package on Pyodide, and pandas reaches
+  // for it on any named time zone.
+  {
+    pattern: /\btz_localize\(|\btz_convert\(|\bZoneInfo\(|\btz\s*=\s*["']/,
+    pkg: "tzdata",
+  },
+];
+
+/** Implied packages already pulled in this session, so each is fetched once. */
+const implicitLoaded = new Set<string>();
+
+/*
+ * There used to be a `repairPolarsForArrow()` here that dropped polars from
+ * `sys.modules` so the next import would re-run its pyarrow check. It did not
+ * work, and it broke more than it fixed.
+ *
+ * polars' compiled extension cannot be re-initialised in wasm, so the
+ * re-imported package binds to the Rust registry the first import already
+ * created while rebuilding its dtype singletons on the Python side. The result
+ * is a polars that looks fine and compares wrongly: `df["b"].dtype ==
+ * pl.String` is False, `df.dtypes == [...]` is False, and `Series == "x"`
+ * raises `NotImplementedError: Series of type String does not have eq
+ * operator`. Fresh objects created entirely after the repair are affected too,
+ * so the old comment here claiming it only hurt "code that mixes objects from
+ * before and after an Arrow call" was wrong.
+ *
+ * Loading pyarrow before polars is ever imported avoids the situation instead
+ * of trying to recover from it, which is what the IMPLICIT_PACKAGES rule above
+ * now does.
+ */
+
+/** Distribution packages implied by `code` that have not been asked for yet. */
+function implicitPackagesFor(code: string): string[] {
+  const wanted = new Set<string>();
+  for (const { pattern, pkg } of IMPLICIT_PACKAGES) {
+    if (pattern.test(code) && !implicitLoaded.has(pkg)) wanted.add(pkg);
+  }
+  return [...wanted];
+}
+
 /** True when `code` imports the top-level module `mod` (matches
  *  `import mod`, `import mod as x`, `import a, mod`, `from mod import …`,
  *  anchored to a line start so matches inside strings/comments are
@@ -162,7 +237,11 @@ async function ensureMicropipPackages(code: string): Promise<void> {
   const needed = Object.entries(MICROPIP_PACKAGES)
     .filter(
       ([mod, req]) =>
-        !micropipInstalled.has(req) && codeImportsModule(code, mod),
+        !micropipInstalled.has(req) &&
+        // openpyxl is pandas' Excel engine and is almost never imported by
+        // name: `df.to_excel(...)` is the whole usage, so the call counts too.
+        (codeImportsModule(code, mod) ||
+          (mod === "openpyxl" && /\.(?:to|read)_excel\(/.test(code))),
     )
     .map(([, req]) => req);
   if (needed.length === 0) return;
@@ -720,6 +799,21 @@ async function runCode(
         console.error("[pyodide:loadPackage]", m);
       },
     });
+    // Dependencies the block never imports by name (statsmodels behind a
+    // plotly trendline, pyarrow behind .to_arrow(), tzdata behind a named
+    // time zone). loadPackagesFromImports cannot see these.
+    const implicit = implicitPackagesFor(code);
+    if (implicit.length > 0) {
+      await pyodide.loadPackage(implicit, {
+        messageCallback: (m: string) => {
+          console.log("[pyodide:loadPackage]", m);
+        },
+        errorCallback: (m: string) => {
+          console.error("[pyodide:loadPackage]", m);
+        },
+      });
+      for (const pkg of implicit) implicitLoaded.add(pkg);
+    }
     // Pure-Python drawer packages that aren't in the Pyodide lockfile
     // (e.g. openpyxl, seaborn) need an explicit micropip install.
     await ensureMicropipPackages(code);

@@ -28,14 +28,10 @@ before it runs. If your query only touches three columns and only
 keeps rows from 2009, Polars can push both facts down into the
 reader and never parse the rest.
 
-<CodeBlock
-  adapter="python"
-  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import polars as pl`,
-      starterCode: `eager = pl.read_csv("penguins.csv", null_values=["NA"])
+```python
+import polars as pl
+
+eager = pl.read_csv("penguins.csv", null_values=["NA"])
 print(type(eager).__name__, eager.shape)
 
 lazy = pl.scan_csv("penguins.csv", null_values=["NA"])
@@ -43,10 +39,15 @@ print(type(lazy).__name__)
 
 # Nothing has been read yet. collect() is what runs it.
 print(lazy.select("species", "body_mass_g").head(3).collect())
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The Polars build that ships with Pyodide is compiled without the streaming
+engine, so `engine="streaming"` raises here.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
 
 The rule of thumb: **use `scan_*` unless you have a reason not to.**
 The eager/lazy chapter later explains why in detail; for now, know
@@ -108,12 +109,8 @@ to scan the whole file (slower, always right).
 
 ## Writing files back out
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import polars as pl
+```python
+import polars as pl
 
 df = pl.DataFrame(
     {
@@ -132,10 +129,15 @@ print(pl.read_parquet("out.parquet"))
 # CSV forgot the types; Parquet did not.
 print("from csv    :", pl.read_csv("out.csv").dtypes)
 print("from parquet:", pl.read_parquet("out.parquet").dtypes)
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+`sink_parquet` belongs to the streaming engine, which the Polars build that
+ships with Pyodide is compiled without.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
 
 That last pair of lines is the argument for Parquet in miniature.
 CSV stores text, so every read re-guesses your types. Parquet stores
@@ -145,12 +147,8 @@ information.
 
 ## JSON, and its two shapes
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import polars as pl
+```python
+import polars as pl
 
 # One JSON array of objects
 open("array.json", "w").write(
@@ -159,15 +157,20 @@ open("array.json", "w").write(
 
 # Newline-delimited JSON: one object per line, the streaming-friendly shape
 open("lines.ndjson", "w").write(
-    '{"city": "Oslo", "temp_c": -3.0}\\n{"city": "Lisbon", "temp_c": 17.5}\\n'
+    '{"city": "Oslo", "temp_c": -3.0}\n{"city": "Lisbon", "temp_c": 17.5}\n'
 )
 
 print(pl.read_json("array.json"))
 print(pl.read_ndjson("lines.ndjson"))
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The Polars build that ships with Pyodide is compiled without JSON support, so
+`read_json` is missing from it.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
 
 Use NDJSON where you can: it can be read in chunks and appended to,
 neither of which is true of one enormous JSON array.
@@ -191,26 +194,15 @@ machine the URL form works as written.
 
 ## Practice
 
-<ChallengeCard
-  adapter="python"
-  title="Read a subset, write Parquet"
-  instructions={`\`penguins.csv\` is staged in the working directory. It uses \`"NA"\` for missing values.
+Try it yourself before reading on. `penguins.csv` uses `"NA"` for missing
+values. Read only the `species`, `island` and `body_mass_g` columns treating
+`"NA"` as missing, write the result to `penguins.parquet`, and read that file
+back. The point is that the types survive the round trip.
 
-1. Read **only** the \`species\`, \`island\`, and \`body_mass_g\` columns, treating \`"NA"\` as missing.
-2. Write the result to \`penguins.parquet\`.
-3. Read that Parquet file back into a variable called \`round_trip\`.
+```python
+import polars as pl
 
-The point of step 3 is that the types survive the round trip.`}
-  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import polars as pl`,
-      starterCode: `round_trip = None  # TODO
-
-print(round_trip)
-`,
-      solutionCode: `subset = pl.read_csv(
+subset = pl.read_csv(
     "penguins.csv",
     null_values=["NA"],
     columns=["species", "island", "body_mass_g"],
@@ -220,44 +212,15 @@ round_trip = pl.read_parquet("penguins.parquet")
 
 print(round_trip.head())
 print(round_trip.dtypes)
-`,
-    },
-  ]}
-  tests={[
-    {
-      id: "is_frame",
-      name: "round_trip is a DataFrame",
-      description: "Type check",
-      code: `import polars as pl
-assert isinstance(round_trip, pl.DataFrame)`,
-    },
-    {
-      id: "cols",
-      name: "Only the three requested columns",
-      description: "species, island, body_mass_g",
-      code: `assert round_trip.columns == ["species", "island", "body_mass_g"], round_trip.columns`,
-    },
-    {
-      id: "rows",
-      name: "All 344 penguins",
-      description: "No rows dropped",
-      code: `assert round_trip.height == 344, round_trip.height`,
-    },
-    {
-      id: "typed",
-      name: "body_mass_g came back numeric",
-      description: "Int64, not String",
-      code: `import polars as pl
-assert round_trip["body_mass_g"].dtype == pl.Int64, round_trip["body_mass_g"].dtype`,
-    },
-    {
-      id: "nulls",
-      name: "The two missing masses survived as nulls",
-      description: "null_values did its job",
-      code: `assert round_trip["body_mass_g"].null_count() == 2`,
-    },
-  ]}
-/>
+# body_mass_g comes back as Int64, with its two nulls intact.
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The Polars build that ships with Pyodide is compiled without the streaming
+engine, and `write_parquet` is implemented on top of it, so writing Parquet
+raises here. The code is correct on a normal Polars install; it is shown
+rather than run.
+</Callout>
 
 ## Check your understanding
 

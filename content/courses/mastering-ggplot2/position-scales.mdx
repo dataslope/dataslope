@@ -41,7 +41,12 @@ ggplot(mpg, aes(displ, hwy)) +
 
 A **transformation** changes the *spacing* of the axis, not the data.
 The classic case is a log scale, which turns multiplicative
-relationships into straight lines and tames skewed data:
+relationships into straight lines and tames skewed data. The same series
+on both axes, where the linear view shows a flat line that suddenly
+explodes and the log view shows the constant growth rate that was there
+all along:
+
+<Chart slug="log-vs-linear-growth" />
 
 <CodeBlock
   adapter="r"
@@ -105,7 +110,17 @@ while changing only the spacing. Let the scale do the transform.
 
 Here is a subtle but important behavior. Setting `limits` on a position
 scale does **not** just zoom, it **drops** any data outside the range
-*before* statistics run. Watch what it does to a smoother:
+*before* statistics run.
+
+The related trap is what a cropped axis does to bars, where the length
+*is* the number. Five scores within five points of each other, drawn
+honestly and then on an axis that starts near the top of the range:
+
+<Chart slug="bar-truncation" />
+
+<Chart slug="bar-truncation-cropped" />
+
+Watch what `limits` does to a smoother:
 
 <CodeBlock
   adapter="r"

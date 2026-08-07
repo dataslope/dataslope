@@ -37,6 +37,12 @@ flowchart TB
 
 ## Measures of center
 
+Where the mean, median and mode land depends on the shape. On a symmetric
+distribution they coincide; on a skewed one they separate, and the mean moves
+furthest:
+
+<Chart slug="skew-mean-median-mode" />
+
 <CodeBlock
   adapter="r"
   files={[
@@ -68,6 +74,11 @@ distribution is skewed, and you should report the median (or
 both).
 
 ## Measures of spread
+
+Three samples with the same center and nothing else in common, which is the
+reason a center alone is never a summary:
+
+<Chart slug="spread-same-center" />
 
 <CodeBlock
   adapter="r"

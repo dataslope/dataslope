@@ -23,6 +23,11 @@ This page explains:
 
 ## Population vs. sample
 
+One population, drawn many times. No sample is the population, and no two
+samples agree:
+
+<Chart slug="one-population-many-samples" />
+
 ```mermaid
 flowchart TD
   pop[(Population: everyone of interest)] -->|draw n cases| samp[(Sample: what we actually observed)]
@@ -79,6 +84,11 @@ everyone.
 
 ## Bias vs. variability
 
+The distinction that matters most: a bigger sample shrinks variability and
+does nothing at all about bias.
+
+<Chart slug="bigger-biased-sample" />
+
 Two things can go wrong with a sample:
 
 - **Bias**, your sampling method systematically misses certain
@@ -98,6 +108,10 @@ biased survey of 10 million people is still biased. This is why
 | Unbiased + high variance | Centered on the truth, but scattered |
 
 ## The sampling distribution of the mean
+
+Where it comes from: draw a sample, take its mean, put a dot down, repeat.
+
+<Chart slug="sampling-distribution-build" />
 
 If you took *many* samples of size 50 from our population and
 computed `mean()` each time, you'd get a distribution of means.
@@ -144,6 +158,11 @@ bell-shaped and narrower than the population, is what makes
 quantitative inference possible.
 
 ## The Central Limit Theorem (in plain English)
+
+The claim, simulated rather than asserted. The population is nothing like a
+bell curve, and the means still converge to one:
+
+<Chart slug="clt-convergence" />
 
 Here's the magic: *even if the underlying population is not
 bell-shaped*, the distribution of sample means becomes

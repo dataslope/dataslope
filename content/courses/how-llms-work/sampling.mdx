@@ -68,6 +68,8 @@ Temperature divides the logits before the softmax.
 * **Temperature 0** means "always take the maximum", which removes
   randomness entirely.
 
+<Chart slug="temperature-softmax" />
+
 <CodeBlock
   adapter="python"
   files={[
@@ -149,6 +151,12 @@ print(f"  nucleus holds {len(kept)} token(s): {kept}")
     },
   ]}
 />
+
+Top-k and top-p answer the same question with different rules, and they
+disagree exactly where it matters: when the model is confident, and when
+it is not.
+
+<Chart slug="topk-topp-cutoff" />
 
 ## Watch randomness accumulate
 

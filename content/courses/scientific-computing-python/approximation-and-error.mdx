@@ -143,6 +143,11 @@ about $16$ until round-off finally takes over near $n \approx 512$.
 
 ## Convergence rate matters more than constants
 
+The same argument the complexity curves make: a better rate overtakes a
+better constant, and it does so sooner than intuition suggests.
+
+<Chart slug="big-o-growth" />
+
 A first-order method needs $10^6$ steps to gain $6$ digits of
 accuracy. A fourth-order method needs only $30$. **Order beats
 constants** for any problem accurate enough to matter.

@@ -73,6 +73,8 @@ That's the canonical Plotly Express call. Note:
 
 ## Sort by value, almost always
 
+<Chart slug="sorted-bars" />
+
 A bar chart in *alphabetical* order is almost always worse than one
 sorted by value. Sorting lets the eye read the *ranking* in zero
 time.
@@ -226,6 +228,16 @@ comparison is the main point, use grouped bars instead.
 </Callout>
 
 ## Common bar chart mistakes
+
+The first one is the axis. A bar's length *is* its value, so the moment the
+axis stops at something other than zero, the two have come apart:
+
+<Chart slug="bar-truncation" />
+
+And here is that crop, drawn:
+
+<Chart slug="bar-truncation-cropped" />
+
 
 - **Truncating the y-axis baseline.** Bar lengths encode quantity
   relative to *zero*. Cutting the axis (so bars start at 90

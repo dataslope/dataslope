@@ -98,8 +98,13 @@ from the relational plots.)
 
 A straight fit assumes the relationship *is* a straight line. When it
 isn't, the line is not just imprecise, it is **wrong**, and it will lie to
-you confidently. The `mpg` dataset shows this beautifully: fuel efficiency
-versus engine horsepower.
+you confidently. Anscombe's second and fourth datasets are the canonical
+demonstration: both fit the same line, and neither should have one.
+
+<Chart slug="anscombes-quartet" />
+
+The `mpg` dataset shows it on real measurements: fuel efficiency versus
+engine horsepower.
 
 <CodeBlock
   adapter="python"

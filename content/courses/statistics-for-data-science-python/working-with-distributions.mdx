@@ -25,7 +25,7 @@ authoritative, *wrong* answers.
 
 ```mermaid
 flowchart TD
-  A["Real data"] --> B["Fit a distribution<br/>(.fit -> parameters)"]
+  A["Real data"] --> B["Fit a distribution<br/>(.fit → parameters)"]
   B --> C["Sanity-check the fit<br/>(histogram overlay, Q-Q plot)"]
   C -->|"looks good"| D["Use the model:<br/>probabilities, thresholds, sims"]
   C -->|"poor fit"| E["Pick a different<br/>distribution"]
@@ -98,6 +98,12 @@ print("rvs sample       =", d.rvs(size=5, random_state=0).round(1))
     },
   ]}
 />
+
+One more question comes up often enough to name: *how many are still
+going after time t?* That is the survival function, which is just
+`1 - cdf` given a name of its own.
+
+<Chart slug="survival-curve" />
 
 ## The loc/scale convention and frozen distributions
 
@@ -195,6 +201,11 @@ good; **you** have to check. Two standard checks:
    distribution's quantiles. If the fit is good, the points fall on a
    straight line. Systematic curving away from the line reveals exactly
    *how* the fit fails (heavy tails, skew, etc.).
+
+A good fit and a bad one, side by side, so the second check has something
+to be compared against:
+
+<Chart slug="qq-plot-fit" />
 
 ### Histogram overlay
 

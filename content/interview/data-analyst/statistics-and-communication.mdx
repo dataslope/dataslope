@@ -21,6 +21,11 @@ prices, and session durations are right-skewed: a few huge values drag
 the mean up, so the median ("typical" value) is more representative.
 Report both when the gap between them is itself informative.
 
+Where the two land depends on the shape. On a symmetric distribution
+they coincide; on a skewed one the mean moves furthest.
+
+<Chart slug="skew-mean-median-mode" />
+
 ### Explain "correlation does not imply causation" with an example.
 
 Two variables can move together because of a **confounder** or
@@ -29,6 +34,11 @@ with drownings, both are driven by hot weather (the confounder), not by
 each other. To argue causation you need a controlled experiment (A/B
 test) or a careful causal-inference design.
 
+The sharpest version of the trap: the same data can favour one group in
+every subgroup and the other overall.
+
+<Chart slug="simpsons-paradox" />
+
 ### What is sampling bias, and how can it distort results?
 
 When the sample isn't representative of the population, conclusions don't
@@ -36,6 +46,11 @@ generalize. Surveying only app users about a feature ignores people who
 churned because of it (**survivorship bias**); a web poll captures only
 the engaged (**self-selection**). The fix is sampling design, random or
 stratified sampling, not more data.
+
+And the part that catches people out: a bigger sample shrinks
+variability and does nothing at all about bias.
+
+<Chart slug="bigger-biased-sample" />
 
 ### A metric went up 20% week-over-week. How do you investigate?
 
@@ -81,6 +96,11 @@ print(s.std())   # sample standard deviation`,
   ]}
 />
 
+Three samples with the same center and nothing else in common, which is
+why a center alone is never a summary.
+
+<Chart slug="spread-same-center" />
+
 ### What is the mode, and when is it the most useful measure of center?
 
 The **mode** is the most frequently occurring value. It is most useful
@@ -96,6 +116,10 @@ approximate it, and it underpins common statistical tests. In practice,
 analysts care because departures from normality (heavy tails, skew) can
 invalidate assumptions of parametric tests.
 
+The three numbers worth knowing cold.
+
+<Chart slug="normal-68-95-997" />
+
 ### What is the difference between a population and a sample?
 
 The **population** is the full set of observations you care about (e.g.,
@@ -103,6 +127,11 @@ all customers). A **sample** is a subset drawn from it. We analyze
 samples because measuring the full population is usually impractical.
 Sample statistics (mean, proportion) are **estimates** of the true
 population parameters, subject to sampling error.
+
+One population drawn many times. No sample is the population, and no two
+samples agree.
+
+<Chart slug="one-population-many-samples" />
 
 ### What are percentiles and quartiles?
 
@@ -169,6 +198,11 @@ print("Z-score outliers:", outliers_z["amount"].tolist())`,
   ]}
 />
 
+A caution on the usual tool: the box plot's rule finds outliers and is
+blind to shape, so three very different samples produce the same box.
+
+<Chart slug="box-hides-shape" />
+
 ### What is the purpose of an A/B test?
 
 An A/B test is a **controlled experiment** that randomly assigns users to
@@ -176,6 +210,11 @@ a control group (A) and a treatment group (B) to measure the causal
 effect of a change (e.g., a new button color) on a metric. Randomization
 ensures the groups are comparable, so any difference in outcomes can be
 attributed to the treatment.
+
+And what it costs to detect a smaller effect: each halving of the lift
+you want to catch roughly quadruples the users you need.
+
+<Chart slug="power-vs-n" />
 
 ### What is a p-value in the context of an A/B test?
 

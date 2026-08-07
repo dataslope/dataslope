@@ -65,8 +65,8 @@ flowchart TD
   D --> E["Mark your OBSERVED statistic<br/>on that distribution"]
   E --> F["p-value = area in the tail(s)<br/>at least as extreme as observed"]
   F --> G{"Tail tiny?"}
-  G -->|"yes, p small"| H["Data is surprising under H0<br/>-> doubt H0"]
-  G -->|"no, p large"| I["Data is ordinary under H0<br/>-> no reason to doubt H0"]
+  G -->|"yes, p small"| H["Data is surprising under H0<br/>→ doubt H0"]
+  G -->|"no, p large"| I["Data is ordinary under H0<br/>→ no reason to doubt H0"]
 ```
 
 Let's make that picture real. We'll simulate the null distribution for a
@@ -167,6 +167,8 @@ null distribution of a difference in means (two groups with no real
 difference), then shade everything at least as extreme as one observed
 gap. The vertical lines are the observed difference and its mirror image;
 the p-value is the shaded probability beyond them.
+
+<Chart slug="p-value-tail-area" />
 
 <CodeBlock
   adapter="python"
@@ -434,6 +436,10 @@ test **20 independent things** that are all truly null, you *expect* one
 of them to come up "significant" at α = 0.05, by pure luck. Hunt
 through enough comparisons and you will always find a "discovery."
 
+<Chart slug="pvalues-under-null" />
+
+<Chart slug="multiple-comparisons" />
+
 <Callout type="info" title="The green jelly beans">
 The canonical illustration of this is the webcomic *xkcd* #882,
 "Significant." Scientists test whether jelly beans cause acne and find
@@ -495,6 +501,13 @@ the line, so your real false-positive rate climbs far above 5%. A p-value
 is only trustworthy when the number of looks and tests was fixed in
 advance.
 </Callout>
+
+There are two standard corrections, and they are not interchangeable.
+Bonferroni controls the chance of *any* false positive; Benjamini-Hochberg
+controls the *share* of your discoveries that are false, which is usually
+the question you actually have.
+
+<Chart slug="bonferroni-vs-fdr" />
 
 ## Challenge 1, Compute a p-value from a null distribution
 

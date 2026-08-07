@@ -52,6 +52,12 @@ print(f"Saving from routing this one workload: \${everything_on_opus - routed:,.
   ]}
 />
 
+Serving a smaller version of the *same* model is the other half of that
+lever. Quantization trades bits per weight for memory, and the quality
+cost is not linear in the saving.
+
+<Chart slug="quantization-size-quality" />
+
 ## 2. Cache the stable prefix
 
 If a long system prompt, schema, or document repeats across requests,

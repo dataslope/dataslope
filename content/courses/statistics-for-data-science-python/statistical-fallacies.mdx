@@ -94,6 +94,12 @@ are admitted more often, yet pooled together, men come out ahead,
 purely because women concentrated in the hard-to-enter department. Same
 numbers, opposite story.
 
+It is not a quirk of admissions data either. Here is the same reversal in
+a published kidney-stone study, where the treatment that wins in both
+subgroups loses once the subgroups are pooled:
+
+<Chart slug="simpsons-paradox" />
+
 ```mermaid
 flowchart TD
   subgraph WITHIN["Within each group"]
@@ -309,6 +315,13 @@ For rare events, even accurate detectors produce mostly false alarms, that's bas
 
 ## Survivorship bias
 
+
+The whole effect in one histogram: a piece of the distribution is
+missing, and the average of what remains is a true statement about the
+wrong population.
+
+<Chart slug="survivorship-bias" />
+
 **What it is.** Drawing conclusions from only the cases that "survived"
 some selection, while the ones that didn't make it are invisible,
 silently dropped from your data. The survivors are a biased sample, so
@@ -340,6 +353,13 @@ index"), the dropouts carry information you can't see. Mutual-fund
 modern, financial version of the bullet-hole map.
 
 ## Regression to the mean
+
+
+Two noisy measurements of the same unchanging thing, with nothing done
+in between. The extremes move toward the middle anyway, which is what
+makes useless interventions look effective.
+
+<Chart slug="regression-to-the-mean" />
 
 **What it is.** Extreme measurements tend to be followed by less extreme
 ones, simply because part of any extreme value was *luck*, and luck
@@ -416,6 +436,15 @@ group, you can't separate the treatment from the inevitable bounce-back.
 </Callout>
 
 ## Cherry-picking and the Texas sharpshooter
+
+
+Ten years of a series that goes nowhere, and the four months inside it
+that someone would show you instead. Nothing in the second chart is
+false.
+
+<Chart slug="cherry-picked-window" />
+
+<Chart slug="cherry-picked-window-zoom" />
 
 **Cherry-picking** is reporting only the data points, time windows, or
 subgroups that support your conclusion and quietly dropping the rest.

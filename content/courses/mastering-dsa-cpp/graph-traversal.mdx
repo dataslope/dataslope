@@ -192,6 +192,11 @@ graph LR
 Use `vector<bool>` or another visited structure before pushing or recursing into neighbors. Without it, cyclic graphs can loop forever.
 </Callout>
 
+The two differ in one line of code and in the shape of what they hold in
+memory. On a wide graph the queue balloons; on a deep one the stack does.
+
+<Chart slug="bfs-vs-dfs-frontier" />
+
 ## Connected components
 
 A single traversal reaches only one "island" of the graph. To count the islands, the **connected components**, wrap the traversal in a loop over all vertices: every time you find a vertex that no previous traversal touched, you have discovered a new component, so increment the count and flood it. The visited array is shared across all the traversals, which is what keeps the total work at O(V + E) no matter how many components there are.

@@ -116,6 +116,12 @@ a wide table that can mean reading a small fraction of the data instead of
 all of it. That single design choice is most of why purpose-built
 analytical engines crush row-oriented databases on summary queries.
 
+Put a number on it and the argument stops being architectural taste. The
+analyst's query touches a few columns of a wide table; the row store has
+to read every one of them to get there.
+
+<Chart slug="columnar-vs-row-io" />
+
 ## Vectorized execution: the second half of the speed
 
 Storing data by column is only half the story. The other half is how the

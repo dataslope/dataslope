@@ -3,7 +3,7 @@
  *
  *   - the in-lesson `<IllustrationPrompt>` MDX card
  *     (app/_components/mdx/IllustrationPrompt.tsx),
- *   - the `/illustration-prompts` review gallery
+ *   - the `/dashboard/admin/illustration-prompts` review gallery
  *     (lib/illustrationPromptsGallery.ts), and
  *   - the batch image generator (scripts/generate-illustrations.mjs).
  *

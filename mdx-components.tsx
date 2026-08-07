@@ -22,6 +22,7 @@ import { Mermaid } from "@/app/_components/mdx/mermaid";
 import { SvgLabel } from "@/app/_components/mdx/SvgLabel";
 import { IllustrationPrompt } from "@/app/_components/mdx/IllustrationPrompt";
 import { Figure } from "@/app/_components/mdx/Figure";
+import { Chart } from "@/app/_components/mdx/Chart";
 import LoadingAnimationsGallery from "@/app/_components/mdx/loadingAnimations";
 import RuntimeLoadingStates from "@/app/_components/RuntimeBootNotice";
 import { LivePreview } from "@/app/_components/mdx/LivePreview";
@@ -40,6 +41,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     SvgLabel,
     IllustrationPrompt,
     Figure,
+    Chart,
     LoadingAnimationsGallery,
     RuntimeLoadingStates,
     // Live, no-Run lesson widgets: <LivePreview> renders HTML/CSS in a

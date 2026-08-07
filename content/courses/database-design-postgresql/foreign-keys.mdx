@@ -40,7 +40,7 @@ customer can have many orders, and each order belongs to one customer.
 
 ```mermaid
 flowchart TD
-    O["orders.<code>customer_id</code> = 7"] -->|"FK -> PK"| C["customers.<code>customer_id</code> = 7<br/>Mina Patel"]
+    O["orders.<code>customer_id</code> = 7"] -->|"FK → PK"| C["customers.<code>customer_id</code> = 7<br/>Mina Patel"]
 ```
 
 That arrow is more than a drawing. When you declare the constraint,
@@ -74,8 +74,8 @@ flowchart TB
         O1["<code>order_id = 101<br/>customer_id = 7</code>"]
         O2["<code>order_id = 102<br/>customer_id = 7</code>"]
     end
-    O1 -->|"FK -> PK"| C1
-    O2 -->|"FK -> PK"| C1
+    O1 -->|"FK → PK"| C1
+    O2 -->|"FK → PK"| C1
 ```
 
 This is a design for consistency. The order does not need its own copy

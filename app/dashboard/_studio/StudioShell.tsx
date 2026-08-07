@@ -26,6 +26,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronRight,
+  ExternalLink,
   Eye,
   LogIn,
   LogOut,
@@ -34,11 +35,15 @@ import {
   Minimize,
   PanelLeft,
   Plus,
+  Shield,
 } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth/client";
 import { ThemePillToggle } from "@/app/_components/ThemePillToggle";
 import {
+  activeAdminItem,
   activeKeyForPath,
+  adminCrumbFor,
+  ADMIN_ITEMS,
   BUILDER_KEYS,
   CREATE_ITEMS,
   crumbFor,
@@ -67,6 +72,10 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(true);
+  // Eight entries, only relevant while you're in there: the Admin group starts
+  // open on an admin route and closed everywhere else, where Create is the
+  // group that matters.
+  const [adminOpen, setAdminOpen] = useState(active === "admin");
 
   // Resizing back to a wide layout dismisses a left-over drawer (the inline
   // sidebar takes over), mirroring the design's resize handler. Adjusted
@@ -84,7 +93,14 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
   // `role`/`plan` are auth additionalFields, not on the inferred client
   // session type, so read them the way AccountClient does (a cast).
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === "admin";
-  const pageItems = PAGE_ITEMS.filter((i) => i.key !== "admin" || isAdmin);
+  // The Admin group also carries the build/design tools that used to hang off
+  // the footer under `next dev` (color ramps, chart gallery, email designs).
+  // Those need no session, so on localhost the group is always reachable —
+  // otherwise moving them here would have hidden them from exactly the people
+  // who use them. Deployed, it stays admin-only. The data pages inside are
+  // gated server-side either way; this only decides what the sidebar offers.
+  const showAdmin = isAdmin || process.env.NODE_ENV === "development";
+  const pageItems = PAGE_ITEMS.filter((i) => i.key !== "admin");
 
   const toggleSidebar = () => {
     if (isNarrow || isPhone) setDrawerOpen((o) => !o);
@@ -111,21 +127,36 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
       {showFullSidebar ? (
         <FullSidebar
           active={active}
+          pathname={pathname}
           createOpen={createOpen}
           onToggleCreate={() => setCreateOpen((o) => !o)}
+          adminOpen={adminOpen}
+          onToggleAdmin={() => setAdminOpen((o) => !o)}
+          showAdmin={showAdmin}
           pageItems={pageItems}
           session={session}
         />
       ) : null}
-      {showRail ? <RailSidebar active={active} pageItems={pageItems} session={session} /> : null}
+      {showRail ? (
+        <RailSidebar
+          active={active}
+          pageItems={pageItems}
+          showAdmin={showAdmin}
+          session={session}
+        />
+      ) : null}
 
       {/* Drawer sidebar (narrow + phone) */}
       {drawerOpen ? (
         <div className="fixed inset-y-0 left-0 z-50">
           <FullSidebar
             active={active}
+            pathname={pathname}
             createOpen={createOpen}
             onToggleCreate={() => setCreateOpen((o) => !o)}
+            adminOpen={adminOpen}
+            onToggleAdmin={() => setAdminOpen((o) => !o)}
+            showAdmin={showAdmin}
             pageItems={pageItems}
             session={session}
             onNavigate={closeDrawer}
@@ -141,6 +172,7 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
       >
         <TopBar
           active={active}
+          pathname={pathname}
           isBuilder={isBuilder}
           onToggleSidebar={toggleSidebar}
           isPhone={isPhone}
@@ -166,21 +198,30 @@ type SessionData = ReturnType<typeof useSession>["data"];
 
 function FullSidebar({
   active,
+  pathname,
   createOpen,
   onToggleCreate,
+  adminOpen,
+  onToggleAdmin,
+  showAdmin,
   pageItems,
   session,
   onNavigate,
   elevated,
 }: {
   active: StudioRouteKey;
+  pathname: string;
   createOpen: boolean;
   onToggleCreate: () => void;
+  adminOpen: boolean;
+  onToggleAdmin: () => void;
+  showAdmin: boolean;
   pageItems: StudioNavItem[];
   session: SessionData;
   onNavigate?: () => void;
   elevated?: boolean;
 }) {
+  const activeAdmin = activeAdminItem(pathname);
   return (
     <aside
       aria-label="Studio navigation"
@@ -255,6 +296,64 @@ function FullSidebar({
             onNavigate={onNavigate}
           />
         ))}
+
+        {showAdmin ? (
+          <>
+            <button
+              type="button"
+              onClick={onToggleAdmin}
+              aria-expanded={adminOpen}
+              className="ds-nav-item w-full text-left font-medium"
+              style={{ border: "none", background: "transparent" }}
+            >
+              <Shield
+                size={17}
+                style={{
+                  // The parent stays lit while a child is active, so a
+                  // collapsed group still shows where you are.
+                  color: active === "admin" ? "var(--green-text)" : "var(--muted)",
+                }}
+              />
+              Admin
+              <ChevronRight
+                size={14}
+                className="ml-auto transition-transform"
+                style={{
+                  color: "var(--faint)",
+                  transform: adminOpen ? "rotate(90deg)" : "none",
+                }}
+              />
+            </button>
+
+            {adminOpen ? (
+              <div
+                className="mb-1 ml-[18px] mt-0.5 flex flex-col gap-0.5 pl-[9px]"
+                style={{ borderLeft: "1px solid var(--divider)" }}
+              >
+                {ADMIN_ITEMS.map((item, i) => (
+                  <div key={item.key} className="contents">
+                    {/* Hairline between the account tools and the build/design
+                        tools, which are a different kind of thing (and a
+                        different auth story, see nav.ts). */}
+                    {i > 0 && item.band !== ADMIN_ITEMS[i - 1].band ? (
+                      <span
+                        aria-hidden="true"
+                        className="my-1 ml-1 block h-px"
+                        style={{ background: "var(--divider)" }}
+                      />
+                    ) : null}
+                    <NavLink
+                      item={item}
+                      active={activeAdmin?.key === item.key}
+                      onNavigate={onNavigate}
+                      small
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </>
+        ) : null}
       </nav>
 
       <div className="flex-1" />
@@ -280,6 +379,9 @@ function NavLink({
     <Link
       href={item.href}
       onClick={onNavigate}
+      // An entry that leaves the shell (Fumadocs Dev brings its own docs
+      // chrome) opens beside the dashboard rather than replacing it.
+      {...(item.external ? { target: "_blank", rel: "noreferrer" } : {})}
       aria-current={active ? "page" : undefined}
       data-active={active || undefined}
       className={`ds-nav-item font-medium ${small ? "ds-nav-sub" : ""}`}
@@ -290,6 +392,9 @@ function NavLink({
         style={{ color: active ? "var(--green-text)" : "var(--muted)" }}
       />
       {item.label}
+      {item.external ? (
+        <ExternalLink size={12} className="ml-auto" style={{ color: "var(--faint)" }} />
+      ) : null}
     </Link>
   );
 }
@@ -297,12 +402,20 @@ function NavLink({
 function RailSidebar({
   active,
   pageItems,
+  showAdmin,
   session,
 }: {
   active: StudioRouteKey;
   pageItems: StudioNavItem[];
+  showAdmin: boolean;
   session: SessionData;
 }) {
+  // The rail is icons only, so the Admin group collapses back to its single
+  // parent entry; opening it lands on Users and the full sidebar takes over
+  // from there.
+  const railItems = showAdmin
+    ? [...pageItems, ...PAGE_ITEMS.filter((i) => i.key === "admin")]
+    : pageItems;
   const user = session?.user;
   const initial = (user?.name?.trim()?.[0] ?? user?.email?.[0] ?? "").toUpperCase();
   return (
@@ -327,7 +440,7 @@ function RailSidebar({
         ))}
       </div>
       <div className="mt-1 flex flex-col gap-0.5">
-        {pageItems.map((item) => (
+        {railItems.map((item) => (
           <RailLink key={item.key} item={item} active={active === item.key} />
         ))}
       </div>
@@ -447,16 +560,22 @@ function UserFooter({ session }: { session: SessionData }) {
 
 function TopBar({
   active,
+  pathname,
   isBuilder,
   onToggleSidebar,
   isPhone,
 }: {
   active: StudioRouteKey;
+  pathname: string;
   isBuilder: boolean;
   onToggleSidebar: () => void;
   isPhone: boolean;
 }) {
   const showPrefix = active === "hub" || isBuilder;
+  // Admin sections used to be a tab row inside the page. Now that they're
+  // sidebar children, the breadcrumb is what names the section: "Admin / AI
+  // Usage".
+  const adminCrumb = active === "admin" ? adminCrumbFor(pathname) : null;
   return (
     <div className="flex h-14 flex-shrink-0 items-center gap-3 px-2 sm:px-3.5 min-[900px]:px-6">
       <button
@@ -475,12 +594,19 @@ function TopBar({
             <span style={{ color: "var(--faint)" }}>/</span>
           </>
         ) : null}
-        <span
-          className="truncate font-semibold"
-          style={{ color: "var(--ink)" }}
-        >
-          {crumbFor(active)}
-        </span>
+        {adminCrumb ? (
+          <>
+            <span style={{ color: "var(--faint)" }}>{crumbFor(active)}</span>
+            <span style={{ color: "var(--faint)" }}>/</span>
+            <span className="truncate font-semibold" style={{ color: "var(--ink)" }}>
+              {adminCrumb}
+            </span>
+          </>
+        ) : (
+          <span className="truncate font-semibold" style={{ color: "var(--ink)" }}>
+            {crumbFor(active)}
+          </span>
+        )}
       </div>
       <div className="flex-1" />
       {isBuilder ? <PreviewControls /> : null}

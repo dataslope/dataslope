@@ -15,7 +15,7 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { requireAdmin } from "@/lib/auth/admin";
 import { sendEmail } from "@/lib/auth/email";
-import { EMAIL_TEMPLATES, SAMPLE_URL } from "@/app/email-preview/samples";
+import { EMAIL_TEMPLATES, SAMPLE_URL } from "@/app/dashboard/admin/email-preview/samples";
 
 export const dynamic = "force-dynamic";
 

@@ -43,6 +43,11 @@ An **ROC curve** plots TPR (vertical) against FPR (horizontal) as the
 threshold sweeps from very strict to very lenient. Each threshold is one
 point on the curve.
 
+One curve on its own is hard to judge, because every ROC curve bows the same
+way. Three of them over the no-skill diagonal give you the scale:
+
+<Chart slug="roc-curve" />
+
 ```mermaid
 flowchart TD
     P["Predicted probabilities"] --> S["Sweep the threshold<br/>from 1.0 down to 0.0"]

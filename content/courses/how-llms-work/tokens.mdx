@@ -133,6 +133,12 @@ These estimates are approximations. For anything where the number
 matters (a budget, a context-limit check) use the provider's own token
 counting endpoint, which is exact and usually free.
 
+The rate is not the same for every language, and the reason starts one
+level below tokens: the same sentence costs a different number of *bytes*
+depending on the script it is written in.
+
+<Chart slug="utf8-bytes-per-script" />
+
 ## Concept check
 
 <MultipleChoice

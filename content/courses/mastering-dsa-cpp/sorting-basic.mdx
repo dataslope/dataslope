@@ -139,6 +139,11 @@ A stable sort keeps equal elements in their original relative order. Why care? S
 
 ## Comparing basic sorts
 
+All three are quadratic, which is the point: the difference between them is
+constants, and the difference between them and merge sort is a curve.
+
+<Chart slug="big-o-growth" />
+
 | Algorithm | Best | Average | Worst | Extra space | Stable? |
 | --- | --- | --- | --- | --- | --- |
 | Bubble sort with early exit | O(n) | O(n^2) | O(n^2) | O(1) | Yes |
