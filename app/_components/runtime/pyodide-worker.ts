@@ -164,6 +164,18 @@ const IMPLICIT_PACKAGES: { pattern: RegExp; pkg: string }[] = [
   // Arrow interop, and the parquet engine pandas and polars both prefer.
   { pattern: /\bpyarrow\b|\.(?:to|from)_(?:arrow|pandas)\(/, pkg: "pyarrow" },
   { pattern: /\.(?:to|read|scan|sink)_parquet\(/, pkg: "pyarrow" },
+  // polars decides once, at import time, whether pyarrow is available, and
+  // caches the answer for the life of the interpreter. There is no way to
+  // change its mind afterwards (see the note on the deleted repair below), so
+  // pyarrow has to be on disk before the first `import polars` runs, which
+  // means triggering on the import rather than on the Arrow call that needs
+  // it. The cost is one extra wheel on polars lessons that never touch Arrow;
+  // the alternative is a polars that quietly answers wrongly.
+  {
+    pattern:
+      /^\s*(?:from\s+polars(?:\.[\w.]+)?\s+import\b|import\s+(?:[\w.]+\s*,\s*)*polars(?:\.[\w.]+)?(?:\s+as\s+\w+)?\s*(?:,|$|#))/m,
+    pkg: "pyarrow",
+  },
   // zoneinfo's database is a separate package on Pyodide, and pandas reaches
   // for it on any named time zone.
   {
@@ -172,37 +184,28 @@ const IMPLICIT_PACKAGES: { pattern: RegExp; pkg: string }[] = [
   },
 ];
 
-/** Implied packages already pulled in this session, so the pandas/pyarrow
- *  repair below runs at most once. */
+/** Implied packages already pulled in this session, so each is fetched once. */
 const implicitLoaded = new Set<string>();
 
-/**
- * Re-import polars after pyarrow arrives late.
+/*
+ * There used to be a `repairPolarsForArrow()` here that dropped polars from
+ * `sys.modules` so the next import would re-run its pyarrow check. It did not
+ * work, and it broke more than it fixed.
  *
- * polars decides once, at import time, whether pyarrow is available, and caches
- * the answer. Here it usually is not: polars is fetched on demand and pyarrow
- * is fetched on demand *later*, the first time a block calls `.to_arrow()` or
- * `.to_pandas()`. By then polars has already recorded that Arrow is missing and
- * raises `pa.Table requires 'pyarrow' module to be installed` no matter how
- * present pyarrow now is.
+ * polars' compiled extension cannot be re-initialised in wasm, so the
+ * re-imported package binds to the Rust registry the first import already
+ * created while rebuilding its dtype singletons on the Python side. The result
+ * is a polars that looks fine and compares wrongly: `df["b"].dtype ==
+ * pl.String` is False, `df.dtypes == [...]` is False, and `Series == "x"`
+ * raises `NotImplementedError: Series of type String does not have eq
+ * operator`. Fresh objects created entirely after the repair are affected too,
+ * so the old comment here claiming it only hurt "code that mixes objects from
+ * before and after an Arrow call" was wrong.
  *
- * Dropping polars from `sys.modules` makes the next `import polars` re-run that
- * check against the pyarrow that is now there. The same trick on *pandas* is
- * deliberately not done: re-importing pandas with pyarrow present changes how
- * `read_csv` handles explicit dtypes, which broke unrelated blocks. polars has
- * no equivalent behaviour behind the flag, so only its DataFrames lose
- * `isinstance` identity with the freshly imported classes, and only for code
- * that mixes objects from before and after an Arrow call.
+ * Loading pyarrow before polars is ever imported avoids the situation instead
+ * of trying to recover from it, which is what the IMPLICIT_PACKAGES rule above
+ * now does.
  */
-async function repairPolarsForArrow(): Promise<void> {
-  if (!pyodide) return;
-  await pyodide.runPythonAsync(`
-import sys
-if "polars" in sys.modules:
-    for _m in [k for k in list(sys.modules) if k == "polars" or k.startswith("polars.")]:
-        del sys.modules[_m]
-`);
-}
 
 /** Distribution packages implied by `code` that have not been asked for yet. */
 function implicitPackagesFor(code: string): string[] {
@@ -810,7 +813,6 @@ async function runCode(
         },
       });
       for (const pkg of implicit) implicitLoaded.add(pkg);
-      if (implicit.includes("pyarrow")) await repairPolarsForArrow();
     }
     // Pure-Python drawer packages that aren't in the Pyodide lockfile
     // (e.g. openpyxl, seaborn) need an explicit micropip install.
