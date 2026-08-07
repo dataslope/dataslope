@@ -235,8 +235,18 @@ import plotly.graph_objects as _go
 _go.Figure.show = lambda self, *a, **k: None
 `);
 
+// Pyodide runs Python synchronously, so the only way to stop a block that
+// loops forever (or sits waiting on a package that will never arrive) is the
+// interrupt buffer: Python checks it between bytecodes and raises
+// KeyboardInterrupt when it sees a 2. Without this, one bad block hangs the
+// whole sweep and every result collected so far is lost.
+const interrupt = new Uint8Array(new SharedArrayBuffer(1));
+py.setInterruptBuffer(interrupt);
+const BLOCK_TIMEOUT_MS = 30_000;
+
 const staged = new Set();
 const failures = [];
+let slowest = { ms: 0 };
 
 for (const [i, b] of blocks.entries()) {
   for (const d of b.datasets) {
@@ -253,6 +263,10 @@ for (const [i, b] of blocks.entries()) {
     if (f.filename === b.entry) continue;
     py.FS.writeFile(f.filename, `${f.initCode}\n${f.starterCode}`);
   }
+  const startedAt = Date.now();
+  const alarm = setTimeout(() => {
+    interrupt[0] = 2;
+  }, BLOCK_TIMEOUT_MS);
   try {
     const ns = py.globals.get("dict")();
     await py.runPythonAsync(b.code, { globals: ns });
@@ -260,13 +274,32 @@ for (const [i, b] of blocks.entries()) {
   } catch (err) {
     const message = String(err.message ?? err);
     const last = message.trim().split("\n").filter(Boolean).pop();
-    failures.push({ ...b, error: last, full: message });
+    const timedOut = message.includes("KeyboardInterrupt");
+    failures.push({
+      ...b,
+      error: timedOut ? `did not finish in ${BLOCK_TIMEOUT_MS / 1000}s` : last,
+      full: message,
+    });
+  } finally {
+    clearTimeout(alarm);
+    interrupt[0] = 0;
   }
-  if ((i + 1) % 50 === 0) console.log(`  …${i + 1}/${blocks.length}`);
+  const ms = Date.now() - startedAt;
+  if (ms > slowest.ms) slowest = { ms, file: b.file, line: b.line };
+  // Named progress, so a stall points at the block that caused it rather
+  // than at a bare counter.
+  if ((i + 1) % 25 === 0) {
+    console.log(`  …${i + 1}/${blocks.length}  (${b.file}:${b.line})`);
+  }
 }
 
 const jsonPath = flag("--json");
 if (jsonPath) writeFileSync(jsonPath, JSON.stringify(failures, null, 2));
+
+console.log(
+  `check-code-blocks: slowest block was ${(slowest.ms / 1000).toFixed(1)}s ` +
+    `(${slowest.file}:${slowest.line})`,
+);
 
 if (failures.length === 0) {
   console.log(`✓ all ${blocks.length} python code block(s) run without raising`);

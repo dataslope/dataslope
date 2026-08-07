@@ -241,12 +241,26 @@ for (const file of specs) {
   const el = mod.render();
   const svg = postProcess(el.outerHTML, slug);
 
-  const literal = literalColors(svg);
+  // A spec may opt out of the literal-colour guard, but only by exporting a
+  // reason, which lands in the failure message of any future spec that copies
+  // the pattern without one. The single legitimate case is a chart whose
+  // subject *is* a set of specific colours (a colour-map comparison), where
+  // the role tokens would change the very thing being shown. Such a chart
+  // does not follow the page theme, which is correct: the swatches are data.
+  const literal = mod.literalColorsAllowed ? [] : literalColors(svg);
+  if (mod.literalColorsAllowed && typeof mod.literalColorsAllowed !== "string") {
+    problems.push(
+      `${file}: literalColorsAllowed must be a string explaining why this ` +
+        "chart's colours cannot come from the theme tokens",
+    );
+    continue;
+  }
   if (literal.length > 0) {
     problems.push(
       `${file}: literal colour(s) ${[...new Set(literal)].join(", ")} — ` +
         "use the SERIES/PRIMARY/MUTED/ACCENT tokens from charts/_theme.mjs so " +
-        "the chart reads in both themes",
+        "the chart reads in both themes (or export literalColorsAllowed with " +
+        "a reason, which is only right when the colours are the subject)",
     );
     continue;
   }
