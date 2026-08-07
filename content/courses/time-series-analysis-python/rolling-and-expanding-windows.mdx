@@ -231,6 +231,11 @@ Centered rolling features include future observations, which is leakage; forecas
 
 ## The biggest misconception: a moving average is **not** a forecast
 
+Both smoothed lines below peak after the series does, and the wider window
+peaks later:
+
+<Chart slug="rolling-window-lag" />
+
 This one sinks real projects. A rolling mean is a **smoother of data you
 already have**. It describes the *past*. It has no machinery to project
 *beyond* the last observation, the line simply *stops* where your data
