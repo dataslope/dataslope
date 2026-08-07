@@ -483,7 +483,7 @@ print(trailing_at_1, centered_at_1, uses_future)
 `,
       solutionCode: `trailing_at_1 = float(s.rolling(3, min_periods=1).mean().iloc[1])
 centered_at_1 = float(s.rolling(3, center=True).mean().iloc[1])
-uses_future = abs(centered_at_1 - (s.iloc[0] + s.iloc[1] + s.iloc[2]) / 3) < 1e-9
+uses_future = bool(abs(centered_at_1 - (s.iloc[0] + s.iloc[1] + s.iloc[2]) / 3) < 1e-9)
 print(
     "trailing@1:",
     trailing_at_1,

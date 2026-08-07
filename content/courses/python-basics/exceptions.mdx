@@ -581,17 +581,15 @@ assert f() == "ok"`,
     {
       id: "succeeds_on_second",
       name: "Function that succeeds on second try",
-      code: `call_count = 0
+      code: `calls = []
 @retry_on_rate_limit(max_retries=3)
 def f():
-    global call_count
-    call_count += 1
-    if call_count < 2:
+    calls.append(1)
+    if len(calls) < 2:
         raise RateLimitError("rate limited")
     return "ok"
-call_count = 0
 assert f() == "ok"
-assert call_count == 2`,
+assert len(calls) == 2`,
     },
     {
       id: "fails_after_max",
