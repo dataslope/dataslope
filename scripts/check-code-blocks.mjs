@@ -244,6 +244,12 @@ const interrupt = new Uint8Array(new SharedArrayBuffer(1));
 py.setInterruptBuffer(interrupt);
 const BLOCK_TIMEOUT_MS = 30_000;
 
+// Fetched once. `py.globals.get(...)` mints a PyProxy on every call, and one
+// leaked per block was enough to wedge the interpreter about a thousand blocks
+// in — which looked exactly like a hang on whatever block happened to be next,
+// and sent two debugging attempts after innocent lesson content.
+const dictCtor = py.globals.get("dict");
+
 const staged = new Set();
 const failures = [];
 let slowest = { ms: 0 };
@@ -267,20 +273,34 @@ for (const [i, b] of blocks.entries()) {
   const alarm = setTimeout(() => {
     interrupt[0] = 2;
   }, BLOCK_TIMEOUT_MS);
+  const ns = dictCtor();
   try {
-    const ns = py.globals.get("dict")();
-    await py.runPythonAsync(b.code, { globals: ns });
-    ns.destroy();
+    // Two timeouts, because there are two ways to hang. The interrupt buffer
+    // above stops Python spinning in its own bytecode; it cannot touch a
+    // pending JS promise, and `runPythonAsync` awaits package downloads for
+    // any module the block imports. This race covers that second case.
+    await Promise.race([
+      py.runPythonAsync(b.code, { globals: ns }),
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`block exceeded ${BLOCK_TIMEOUT_MS / 1000}s`)),
+          BLOCK_TIMEOUT_MS + 2000,
+        ),
+      ),
+    ]);
   } catch (err) {
     const message = String(err.message ?? err);
     const last = message.trim().split("\n").filter(Boolean).pop();
-    const timedOut = message.includes("KeyboardInterrupt");
+    const timedOut = message.includes("KeyboardInterrupt") || message.includes("exceeded");
     failures.push({
       ...b,
       error: timedOut ? `did not finish in ${BLOCK_TIMEOUT_MS / 1000}s` : last,
       full: message,
     });
   } finally {
+    // Always, including on the failure path: a leaked namespace per broken
+    // block is the same slow death as above.
+    ns.destroy();
     clearTimeout(alarm);
     interrupt[0] = 0;
   }

@@ -133,6 +133,8 @@ they'll just clutter the line.
 
 ## Many lines? Avoid the spaghetti
 
+<Chart slug="spaghetti-vs-facets" />
+
 A common failure mode is the **spaghetti chart**, twenty or more
 overlapping lines that no one can read.
 
@@ -172,6 +174,11 @@ We'll cover faceting in its own chapter. For now, the rule: **if
 you have more than ~7 lines, plan how you'll keep them readable.**
 
 ## Linear and log scales
+
+Three products with very different sizes. On a log axis the slopes are
+directly comparable, and the smallest is climbing fastest:
+
+<Chart slug="log-vs-linear-growth" />
 
 When values span many orders of magnitude (e.g., country GDPs,
 COVID case counts), a **log scale** for y reveals structure that a
@@ -223,6 +230,8 @@ Log scales are powerful but require *labeling*, always say
 "log scale" in your axis label, because viewers do not assume it.
 
 ## A common subtle mistake
+
+<Chart slug="aspect-ratio-banking" />
 
 Plotly Express orders line points by their order in the DataFrame,
 not by the x-axis value. If your data isn't sorted by x, you'll
