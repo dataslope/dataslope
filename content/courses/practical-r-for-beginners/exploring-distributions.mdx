@@ -34,6 +34,11 @@ flowchart LR
 
 ## Histograms
 
+The bin width is a decision you make, not a fact about the data, and it
+changes what the chart says:
+
+<Chart slug="histogram-bin-width" />
+
 A histogram chops the range of values into bins and counts how
 many values fall in each. The result is a picture of where values
 *pile up*.
@@ -99,6 +104,11 @@ histogram. Too much, and you've smoothed real features away. R's
 default usually does a reasonable job.
 
 ## Boxplots
+
+A boxplot knows only about quartiles, so it is blind to shape. Three very
+different samples, one identical box:
+
+<Chart slug="box-hides-shape" />
 
 A boxplot summarizes a distribution as a *picture of the
 five-number summary* (min, Q1, median, Q3, max), with conventions
@@ -191,6 +201,10 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
 />
 
 ## Reading a distribution: skew
+
+The three shapes you will meet most often, side by side:
+
+<Chart slug="skew-shapes" />
 
 Most real-world data is **right-skewed** (income, transaction
 sizes, web traffic, response times). The bulk of values cluster

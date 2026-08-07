@@ -26,6 +26,11 @@ We'll do all of them in R using built-in functions like
 
 ## A confidence interval, plainly
 
+What "95% confident" means, drawn: a hundred intervals from a hundred
+samples, about five of which miss.
+
+<Chart slug="ci-coverage" />
+
 A **95% confidence interval** for a parameter is a range
 constructed from your data such that, *across many hypothetical
 repetitions of the study*, 95% of intervals constructed this way
@@ -115,6 +120,11 @@ sampling variability made visible.
 
 ## A p-value, plainly
 
+The p-value is the shaded area: how much of the null's distribution sits at
+least as far out as what you saw.
+
+<Chart slug="p-value-tail-area" />
+
 A **p-value** is the probability, *if there were no real
 effect*, of seeing a result as extreme as the one you got, or
 more extreme.
@@ -171,6 +181,11 @@ skeptical assumption (the null), how surprising is what we
 saw?* That's it.
 
 ## Effect size: significance ≠ importance
+
+What the standard effect sizes actually look like as overlap between two
+groups:
+
+<Chart slug="effect-size-overlap" />
 
 Two studies can both have `p < 0.001` and tell wildly different
 stories:

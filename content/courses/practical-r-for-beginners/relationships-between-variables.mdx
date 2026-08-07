@@ -25,6 +25,11 @@ causation.**
 
 ## Scatterplots
 
+With enough points a scatterplot fills in solid. Opacity is the first fix,
+and it costs nothing:
+
+<Chart slug="overplotting-alpha" />
+
 The simplest, most informative two-variable plot: one dot per
 observation, position by (x, y).
 
@@ -59,6 +64,10 @@ is very tight. (This is unsurprising, but it's reassuring when
 the data agrees with intuition.)
 
 ## Correlation: one number for "how related?"
+
+What the number looks like at various strengths, and what it cannot see:
+
+<Chart slug="correlation-scatters" />
 
 The **Pearson correlation** measures linear association on a
 scale from -1 to +1:
@@ -199,6 +208,11 @@ overlap but differ a little. The picture and the table tell the
 same story.
 
 ## The most important warning: correlation ≠ causation
+
+A related trap: the same data can favour one group in every subgroup and the
+other overall, purely from how the groups are sized.
+
+<Chart slug="simpsons-paradox" />
 
 Two variables can be correlated without one *causing* the other.
 Possibilities:
