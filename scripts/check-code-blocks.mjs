@@ -250,6 +250,55 @@ const BLOCK_TIMEOUT_MS = 30_000;
 // and sent two debugging attempts after innocent lesson content.
 const dictCtor = py.globals.get("dict");
 
+/**
+ * The two package steps the browser does before every run, mirrored here.
+ *
+ * Without them this sweep reports a few hundred false failures: every polars
+ * and scikit-learn block fails with Pyodide's "see loading-packages" notice,
+ * every openpyxl block with ModuleNotFoundError, and every tz-aware timestamp
+ * with ZoneInfoNotFoundError — none of which happens to a reader, because
+ * app/_components/runtime/pyodide-worker.ts loads those packages first.
+ *
+ * `loadPackagesFromImports` covers everything in the Pyodide distribution
+ * (polars, scikit-learn, tzdata). MICROPIP_PACKAGES covers the pure-Python
+ * wheels the distribution's lockfile does not know about; it has to stay in
+ * step with the map of the same name in the worker.
+ */
+const MICROPIP_PACKAGES = { openpyxl: "openpyxl", seaborn: "seaborn" };
+const micropipInstalled = new Set(["plotly"]);
+
+/** Anchored to a line start, so a module named inside a string or a comment
+ *  does not trigger an install. Mirrors the worker's `codeImportsModule`. */
+function codeImportsModule(code, mod) {
+  const esc = mod.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(
+    `^\\s*(?:from\\s+${esc}(?:\\.[\\w.]+)?\\s+import\\b|import\\s+(?:[\\w.]+\\s*,\\s*)*${esc}(?:\\.[\\w.]+)?(?:\\s+as\\s+\\w+)?\\s*(?:,|$|#))`,
+    "m",
+  ).test(code);
+}
+
+async function ensurePackages(code) {
+  // Quiet: the loader narrates every fetch through stdout, which would be
+  // interleaved with the block's own output.
+  await py.loadPackagesFromImports(code, {
+    messageCallback: () => {},
+    errorCallback: () => {},
+  });
+  const needed = Object.entries(MICROPIP_PACKAGES)
+    .filter(([mod, req]) => !micropipInstalled.has(req) && codeImportsModule(code, mod))
+    .map(([, req]) => req);
+  if (needed.length === 0) return;
+  const micropip = py.pyimport("micropip");
+  try {
+    for (const req of needed) {
+      await micropip.install(req);
+      micropipInstalled.add(req);
+    }
+  } finally {
+    micropip.destroy();
+  }
+}
+
 const staged = new Set();
 const failures = [];
 let slowest = { ms: 0 };
@@ -280,7 +329,7 @@ for (const [i, b] of blocks.entries()) {
     // pending JS promise, and `runPythonAsync` awaits package downloads for
     // any module the block imports. This race covers that second case.
     await Promise.race([
-      py.runPythonAsync(b.code, { globals: ns }),
+      ensurePackages(b.code).then(() => py.runPythonAsync(b.code, { globals: ns })),
       new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error(`block exceeded ${BLOCK_TIMEOUT_MS / 1000}s`)),
@@ -313,19 +362,57 @@ for (const [i, b] of blocks.entries()) {
   }
 }
 
+/**
+ * Failures this environment causes, which a reader never sees.
+ *
+ * Pyodide-in-Node is close to Pyodide-in-a-browser but not identical, and the
+ * gaps are all in the host rather than in the lesson:
+ *
+ *   • polars ships a Rust thread pool. A browser worker gives it threads; Node
+ *     does not, so the first parallel query panics and every later one finds
+ *     the poisoned lock.
+ *   • `pyodide_http` patches urllib onto `fetch` in the browser. Here a block
+ *     that reads a URL gets Node's socket layer and no TLS.
+ *
+ * Reporting these as content failures is worse than not running the block at
+ * all: it buries the real breakages (a deprecated argument, a dtype that
+ * pandas 3 now rejects) in a few hundred lines of noise, which is how the
+ * first sweep of this file ended up chasing the wrong thing twice.
+ */
+const ENVIRONMENT_ONLY = [
+  /could not spawn threads/,
+  /LazyLock instance has previously been poisoned/,
+  /TLS not supported in this environment/,
+];
+
+const isEnvironmental = (f) => ENVIRONMENT_ONLY.some((re) => re.test(f.full ?? f.error ?? ""));
+const real = failures.filter((f) => !isEnvironmental(f));
+const skipped = failures.filter(isEnvironmental);
+
 const jsonPath = flag("--json");
-if (jsonPath) writeFileSync(jsonPath, JSON.stringify(failures, null, 2));
+if (jsonPath) writeFileSync(jsonPath, JSON.stringify({ real, skipped }, null, 2));
 
 console.log(
   `check-code-blocks: slowest block was ${(slowest.ms / 1000).toFixed(1)}s ` +
     `(${slowest.file}:${slowest.line})`,
 );
 
-if (failures.length === 0) {
-  console.log(`✓ all ${blocks.length} python code block(s) run without raising`);
+// Counted, never hidden: a growing number here means the runner is drifting
+// further from the browser and the sweep is covering less than it claims.
+if (skipped.length > 0) {
+  console.log(
+    `check-code-blocks: ${skipped.length} block(s) could not run in Node ` +
+      `(polars threads, network) and were not checked`,
+  );
+}
+
+if (real.length === 0) {
+  console.log(
+    `✓ all ${blocks.length - skipped.length} checkable python code block(s) run without raising`,
+  );
   process.exit(0);
 }
 
-console.error(`\n✗ ${failures.length} of ${blocks.length} python code block(s) failed:\n`);
-for (const f of failures) console.error(`  ${f.file}:${f.line}\n      ${f.error}`);
+console.error(`\n✗ ${real.length} of ${blocks.length} python code block(s) failed:\n`);
+for (const f of real) console.error(`  ${f.file}:${f.line}\n      ${f.error}`);
 process.exit(1);
