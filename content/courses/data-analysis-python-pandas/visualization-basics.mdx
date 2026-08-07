@@ -56,6 +56,11 @@ A single function call:
 
 ## Histograms, see a distribution
 
+The one thing to know before drawing one: the bin width is your choice, and
+it changes the answer:
+
+<Chart slug="histogram-bin-width" />
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -84,6 +89,11 @@ for:
 
 ## Box plots, distributions across categories
 
+A box knows only about quartiles, so three very different distributions can
+produce the same one:
+
+<Chart slug="box-hides-shape" />
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -106,6 +116,11 @@ A box plot shows median, quartiles, and outliers in one
 glance. Use it to compare a numeric column across categories.
 
 ## Scatter, relationships between two numerics
+
+With enough points a scatter turns into a solid blob. Opacity is the first
+fix, and it costs nothing:
+
+<Chart slug="overplotting-alpha" />
 
 <CodeBlock
   adapter="python"
@@ -231,6 +246,18 @@ different shapes that are obvious in a scatter plot. Always
 *look* at your data, not just summarize it.
 
 ## How visualizations can mislead
+
+The first one on the list, drawn. Five scores within five points of each
+other, from zero and then on a cropped axis:
+
+<Chart slug="bar-truncation" />
+
+<Chart slug="bar-truncation-cropped" />
+
+And the second: the same data can favour one group in every subgroup and the
+other overall.
+
+<Chart slug="simpsons-paradox" />
 
 - **Truncated y-axes** that make 5% changes look like 50%.
 - **Inappropriate aggregation** that hides subgroups (Simpson's

@@ -65,6 +65,11 @@ You get `count`, `unique`, `top` (most common), and `freq`.
 
 ## Mean vs Median, the classic trap
 
+Where the two land depends entirely on the shape of the data, and on a
+skewed distribution they are not close:
+
+<Chart slug="skew-mean-median-mode" />
+
 <CodeBlock
   adapter="python"
   files={[
@@ -165,6 +170,11 @@ print((df["cut"].value_counts(normalize=True) * 100).round(1))
 for "what share of our customers are in each tier?".
 
 ## Correlation
+
+Before the number, what it can and cannot see. All four of these have the
+same correlation to two decimal places:
+
+<Chart slug="anscombes-quartet" />
 
 <CodeBlock
   adapter="python"
