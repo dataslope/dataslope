@@ -35,7 +35,6 @@ import {
   approveRegenMark,
   listRegenMarks,
   upsertRegenMark,
-  DEFAULT_REGEN_NOTE,
   MAX_NOTE_LENGTH,
   type RegenMark,
 } from "@/lib/illustrations/regenMarks";
@@ -65,10 +64,6 @@ export interface IllustrationGallery {
   /** False when ILLUSTRATIONS_DB isn't bound: the gallery renders read-only. */
   marksAvailable: boolean;
   maxNoteLength: number;
-  /** Guidance stored when an illustration is marked with no note of its own.
-   *  Sent so the gallery can show it as the input's placeholder, rather than
-   *  keeping a second copy of the wording in the client. */
-  defaultNote: string;
 }
 
 function json(data: unknown, status = 200): Response {
@@ -122,7 +117,6 @@ export async function GET(request: Request): Promise<Response> {
     marks,
     marksAvailable,
     maxNoteLength: MAX_NOTE_LENGTH,
-    defaultNote: DEFAULT_REGEN_NOTE,
   };
   return json(payload);
 }

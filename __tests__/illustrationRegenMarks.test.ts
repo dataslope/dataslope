@@ -9,7 +9,6 @@ import { describe, expect, it } from "vitest";
 import type { D1Database } from "@cloudflare/workers-types";
 
 import {
-  DEFAULT_REGEN_NOTE,
   MAX_NOTE_LENGTH,
   approveRegenMark,
   isAwaitingApproval,
@@ -162,10 +161,13 @@ describe("the regeneration queue", () => {
     expect(rows.get("a")?.note).toBe("two lines");
   });
 
-  it("falls back to the default note when marking with nothing typed", async () => {
+  // The note is optional and has no default in either direction: marking with
+  // nothing typed used to substitute a canned brief, which read back as though
+  // someone had written it.
+  it("leaves the note empty when marking with nothing typed", async () => {
     const { db } = fakeDb();
     const mark = await upsertRegenMark(db, { promptId: "a", marked: true, note: "" });
-    expect(mark.note).toBe(DEFAULT_REGEN_NOTE);
+    expect(mark.note).toBe("");
   });
 
   it("does not invent a note when clearing a mark", async () => {
@@ -174,12 +176,14 @@ describe("the regeneration queue", () => {
     expect(mark.note).toBe("");
   });
 
-  // The default is substituted *after* normalizeNote, so it is the one note
-  // that reaches SQL unchecked: it has to already be the single bounded line
-  // every other note is reduced to.
-  it("stores a default note that is already normalized and within the cap", () => {
-    expect(normalizeNote(DEFAULT_REGEN_NOTE)).toBe(DEFAULT_REGEN_NOTE);
-    expect(DEFAULT_REGEN_NOTE.length).toBeLessThanOrEqual(MAX_NOTE_LENGTH);
+  it("caps a note at the stored maximum", async () => {
+    const { db, rows } = fakeDb();
+    await upsertRegenMark(db, {
+      promptId: "a",
+      marked: true,
+      note: "x".repeat(MAX_NOTE_LENGTH + 50),
+    });
+    expect(rows.get("a")?.note).toHaveLength(MAX_NOTE_LENGTH);
   });
 });
 

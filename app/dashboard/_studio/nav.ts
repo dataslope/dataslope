@@ -94,13 +94,6 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
     band: "tools",
   },
   {
-    key: "admin-color-palette",
-    label: "Color Palette",
-    href: "/dashboard/admin/color-palette",
-    icon: Palette,
-    band: "tools",
-  },
-  {
     key: "admin-illustrations",
     label: "Illustration Prompts",
     href: "/dashboard/admin/illustration-prompts",
@@ -124,6 +117,15 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
     icon: BookOpen,
     band: "tools",
     external: true,
+  },
+  // Color Palette is the brand-ramp reference rather than a place work gets
+  // done, so it sits last, below the tools that are actually used in a session.
+  {
+    key: "admin-color-palette",
+    label: "Color Palette",
+    href: "/dashboard/admin/color-palette",
+    icon: Palette,
+    band: "tools",
   },
 ];
 

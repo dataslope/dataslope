@@ -189,7 +189,6 @@ function PromptCard({
   entry,
   mark,
   maxNoteLength,
-  defaultNote,
   marksAvailable,
   copiedKey,
   onCopy,
@@ -201,7 +200,6 @@ function PromptCard({
   entry: GalleryEntry;
   mark: MarkState;
   maxNoteLength: number;
-  defaultNote: string;
   marksAvailable: boolean;
   copiedKey: string | null;
   onCopy: (key: string, text: string) => void;
@@ -329,13 +327,12 @@ function PromptCard({
           value={mark.note}
           maxLength={maxNoteLength}
           disabled={!marksAvailable}
-          // The placeholder is the default the server will store if this is
-          // left blank, so what happens on an empty note is visible up front.
-          placeholder={`What the new illustration should be. Blank: "${defaultNote}"`}
+          placeholder="Optional note: what the new illustration should be"
           title={
-            "Typing here also marks this illustration. The note is the brief for a " +
-            "prompt rewritten from scratch, not an addition to the one above; any " +
-            `animal in the old prompt is kept. Left blank, marking stores: "${defaultNote}"`
+            "Optional. Typing here also marks this illustration. The note is the brief " +
+            "for a prompt rewritten from scratch, not an addition to the one above; any " +
+            "animal in the old prompt is kept. Marking without a note is fine and stores " +
+            "nothing."
           }
           aria-label={`Regeneration note for ${entry.title}`}
           onChange={(e) => onNoteChange(entry.id, e.target.value)}
@@ -796,7 +793,6 @@ export function IllustrationPromptsClient() {
                     entry={entry}
                     mark={marks[entry.id] ?? EMPTY_MARK}
                     maxNoteLength={gallery.maxNoteLength}
-                    defaultNote={gallery.defaultNote}
                     marksAvailable={gallery.marksAvailable}
                     copiedKey={copiedKey}
                     onCopy={onCopy}

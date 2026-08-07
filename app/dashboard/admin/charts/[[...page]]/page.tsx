@@ -26,9 +26,14 @@
  *
  * Server component; the SVG and the usage index are both already in the
  * generated manifest, so there is nothing to fetch and the only client code is
- * the per-pane expand control. No auth gate either — this renders build
- * artifacts from this repo, not anyone's data (see the note on the tools band
- * in app/dashboard/_studio/nav.ts).
+ * the per-pane expand control and the review queue. No auth gate either — this
+ * renders build artifacts from this repo, not anyone's data (see the note on
+ * the tools band in app/dashboard/_studio/nav.ts).
+ *
+ * The review queue (ChartReview.tsx) is the one part that *is* admin-only, and
+ * it is layered on rather than built in: it fetches its marks from
+ * /api/admin/charts, which gates itself, so a non-admin gets this page exactly
+ * as it was before the queue existed.
  */
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -37,6 +42,11 @@ import chartManifest from "@/lib/generated/charts";
 import Link from "@/app/_components/Link";
 import { AdminPageHeader } from "../../_components/shared";
 import { ChartPane } from "../ChartPane";
+import {
+  ChartMarkControls,
+  ChartReviewProvider,
+  ChartReviewSummary,
+} from "../ChartReview";
 import styles from "../charts.module.css";
 
 export const dynamic = "force-static";
@@ -87,7 +97,7 @@ export default async function AdminChartsPage(props: {
   const placed = ALL.filter(([, c]) => c.usedBy.length > 0).length;
 
   return (
-    <>
+    <ChartReviewProvider>
       <AdminPageHeader
         title="Charts"
         description="Every figure produced by scripts/build-charts.mjs, drawn on both page surfaces so a colour that only works in one theme has nowhere to hide."
@@ -129,6 +139,12 @@ export default async function AdminChartsPage(props: {
               </div>
             ) : null}
           </dl>
+
+          <ChartReviewSummary
+            slugs={ALL.map(([slug]) => slug)}
+            perPage={PER_PAGE}
+            currentPage={current}
+          />
 
           <div className={styles.list}>
             {charts.map(([slug, chart]) => (
@@ -177,6 +193,8 @@ export default async function AdminChartsPage(props: {
                     <span className={styles.unplaced}>Not placed in a lesson yet</span>
                   )}
                 </div>
+
+                <ChartMarkControls slug={slug} title={slug} />
 
                 <div className={styles.split}>
                   <ChartPane theme="light" slug={slug} title={chart.title} svg={chart.svg} />
@@ -234,6 +252,6 @@ export default async function AdminChartsPage(props: {
           ) : null}
         </>
       )}
-    </>
+    </ChartReviewProvider>
   );
 }

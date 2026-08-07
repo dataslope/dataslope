@@ -15,6 +15,13 @@
  * `data-force` pins a subtree to one theme regardless of the page, which the
  * admin gallery (/dashboard/admin/charts) uses to show light and dark side by
  * side. Ordinary pages never set it.
+ *
+ * The page-theme rule below is scoped `:not([data-force])` for that reason.
+ * `.dark .chart` and `.chart[data-force="light"]` are the same specificity
+ * (0-2-0), so on a dark page the later of the two won and a *light*-forced pane
+ * was painted with dark tokens: 400-step series colours, and a #121212 label
+ * halo that boxed every annotation in black. The gallery exists to compare the
+ * two surfaces, so both panes silently agreeing with the page defeated it.
  */
 
 .chart,
@@ -38,7 +45,7 @@
   --ds-chart-surface: #ffffff;
 }
 
-:global(.dark) .chart,
+:global(.dark) .chart:not([data-force]),
 .chart[data-force="dark"] {
   /* The 400s on the dark page: same hue order, re-lit for a dark surface. */
   --ds-chart-1: var(--ds-blue-400);
