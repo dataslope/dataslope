@@ -104,6 +104,11 @@ The histogram's most important knob is bin width. The KDE's equivalent is
 - **Large bandwidth** → wide bumps → an *oversmoothed* blob that can merge
   real modes into one.
 
+One sample, three bandwidths. The rug underneath is the same in all three,
+so the only thing changing is the smoothing:
+
+<Chart slug="kde-bandwidth" />
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}

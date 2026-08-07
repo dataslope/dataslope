@@ -157,6 +157,11 @@ the busy regions all render as the same solid color, and you lose exactly
 the structure you came to see. The first and easiest fix is **`alpha`**
 (opacity): semi-transparent dots make dense regions visibly darker.
 
+The same points at three opacities. Nothing about the data changes; what
+you can see about it changes completely:
+
+<Chart slug="overplotting-alpha" />
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}

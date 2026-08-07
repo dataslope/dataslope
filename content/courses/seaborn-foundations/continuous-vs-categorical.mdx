@@ -65,6 +65,13 @@ something you can see. A continuous variable is a number measured on a scale
 | **Continuous**        | a continuous axis; a color *gradient* for `hue`; marker *size* | `relplot`, `displot` (scatter, line, histogram, KDE) |
 | **Categorical**       | evenly spaced discrete slots; *distinct* colors for `hue`; one *facet* per level | `catplot` (bar, count, box, violin, strip, swarm) |
 
+Not every channel in that table is equally good at carrying a number.
+Position is read most accurately, then length, then angle, then area, and
+color last, which is why a value you want compared precisely belongs on an
+axis and not in a hue:
+
+<Chart slug="encoding-accuracy" />
+
 The clearest place to *feel* this is the `hue` parameter, which behaves in
 two completely different ways depending on the column you give it.
 
