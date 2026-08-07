@@ -14,6 +14,10 @@ export interface ChartUsage {
   title: string;
   /** Content collection the page belongs to (`courses`, `interview`, …). */
   collection: string;
+  /** Display name of the course or interview track the lesson sits in, from
+   *  that directory's meta.json. Absent for a top-level page that belongs to
+   *  no course. */
+  section?: string;
 }
 
 export interface GeneratedChart {

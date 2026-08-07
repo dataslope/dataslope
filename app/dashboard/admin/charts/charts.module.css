@@ -145,6 +145,31 @@
   box-shadow: inset 0 0 0 1px var(--faint);
 }
 
+/* A chart can sit in several courses, and lesson titles repeat across them
+   ("Histograms" exists in three), so the link carries the course name. It
+   stays quieter than the lesson: the course is context, the lesson is the
+   destination. */
+.useCourse {
+  color: var(--faint);
+  /* Course titles run long ("Introduction to Data Visualization with Python
+     and Plotly Express"), and a chart placed in four lessons would otherwise
+     produce four pills wider than the column. The link's `title` carries the
+     untruncated text. */
+  max-width: 16ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.useSep {
+  color: var(--faint);
+  opacity: 0.6;
+}
+
+.useLink:hover .useCourse {
+  color: var(--muted);
+}
+
 .unplaced {
   font-size: 0.8125rem;
   color: var(--faint);

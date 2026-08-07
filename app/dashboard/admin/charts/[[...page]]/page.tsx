@@ -159,7 +159,16 @@ export default async function AdminChartsPage(props: {
                         rel="noreferrer"
                         prefetch={false}
                         className={styles.useLink}
+                        title={use.section ? `${use.section} / ${use.title}` : use.title}
                       >
+                        {use.section && (
+                          <>
+                            <span className={styles.useCourse}>{use.section}</span>
+                            <span className={styles.useSep} aria-hidden="true">
+                              /
+                            </span>
+                          </>
+                        )}
                         {use.title}
                         <ArrowUpRight size={13} aria-hidden="true" />
                       </Link>

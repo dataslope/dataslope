@@ -88,12 +88,36 @@ function mdxFiles(dir) {
 }
 
 /**
- * Where each chart is used: slug → [{ url, title, collection }].
+ * Display name of the course or track a lesson belongs to, which is the
+ * `title` in the top-level directory's meta.json (the same string the site's
+ * own navigation shows). Falls back to the directory name so a collection
+ * without one still labels its links.
+ */
+function sectionName(collection, relPath) {
+  const top = relPath.split("/")[0];
+  if (!top || top === relPath.replace(/\.mdx$/, "")) return null;
+  const meta = join(CONTENT_DIR, collection, top, "meta.json");
+  if (existsSync(meta)) {
+    try {
+      const title = JSON.parse(readFileSync(meta, "utf8")).title;
+      if (typeof title === "string" && title.length > 0) return title;
+    } catch {
+      // A malformed meta.json is the site's problem to report, not this
+      // script's; fall through to the directory name.
+    }
+  }
+  return top;
+}
+
+/**
+ * Where each chart is used: slug → [{ url, title, section, collection }].
  *
  * The gallery's whole job is reviewing a figure in context, so it needs a way
- * back to the lesson. Building the index here (rather than in the page) keeps
- * the app from reading ~800 MDX files at request time inside the Worker, which
- * is the same reason the charts themselves are rendered at build time.
+ * back to the lesson, and `section` names the course it belongs to so a link
+ * reading "Histograms" is not ambiguous across thirty-odd courses. Building the
+ * index here (rather than in the page) keeps the app from reading ~800 MDX
+ * files at request time inside the Worker, which is the same reason the charts
+ * themselves are rendered at build time.
  *
  * The scan is a regex over `<Chart slug="…"`, not an MDX parse: the tag is
  * written by hand in a lesson body and that is the entire surface. A chart
@@ -115,12 +139,25 @@ function chartUsages() {
       const url = path ? `${base}/${path}` : base;
       const title = src.match(/^title:\s*(.+)$/m)?.[1].trim().replace(/^["']|["']$/g, "");
 
+      const section = sectionName(collection, file.slice(dir.length + 1));
       for (const slug of new Set(slugs)) {
-        (usages[slug] ??= []).push({ url, title: title ?? url, collection });
+        (usages[slug] ??= []).push({
+          url,
+          title: title ?? url,
+          collection,
+          ...(section ? { section } : {}),
+        });
       }
     }
   }
-  for (const list of Object.values(usages)) list.sort((a, b) => a.url.localeCompare(b.url));
+  // Grouped by course, then by lesson: a chart used four times in one course
+  // and once in another should not interleave them.
+  for (const list of Object.values(usages)) {
+    list.sort(
+      (a, b) =>
+        (a.section ?? "").localeCompare(b.section ?? "") || a.title.localeCompare(b.title),
+    );
+  }
   return usages;
 }
 
