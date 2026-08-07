@@ -186,6 +186,11 @@ this pair, chosen around which mistake hurts more.
 
 ## The threshold is the dial
 
+Precision and recall move in opposite directions as you turn it, and no
+setting maximises both:
+
+<Chart slug="precision-recall-threshold" />
+
 Most classifiers do not really output a class, they output a
 **probability**, and a threshold (0.5 by default) turns it into a class.
 Moving that threshold is exactly how you trade precision against recall.
