@@ -146,6 +146,34 @@ export function plot(options = {}) {
   });
 }
 
+/**
+ * A `Plot.text` mark split into a right-hanging half and a left-hanging half.
+ *
+ * `textAnchor`, `dx`, `dy` and `strokeDasharray` are *constant options* in
+ * Plot, not channels. Passing a function does not throw and does not fall back
+ * — the function is stringified straight into the attribute
+ * (`text-anchor="(d) => …"`), which every renderer then ignores, so every
+ * label silently reverts to `start` and the offsets vanish. The only way to
+ * vary them per row is one mark per value, which is what this does:
+ *
+ *   ...sidedText(LABELS, {
+ *     side: (d) => (d.leads ? "start" : "end"),
+ *     x: "value", y: "row", text: "label", ...HALO,
+ *   }, { start: { dx: 10 }, end: { dx: -10 } })
+ *
+ * `side(d)` picks the anchor; `overrides` carries the per-side options, which
+ * is where the mirrored `dx` (and any `dy` nudge) belongs. Sides with no rows
+ * emit no mark. `scripts/build-charts.mjs` fails the build if a function ever
+ * reaches an attribute again, so this stays the only way to do it.
+ */
+export function sidedText(data, { side, ...options }, overrides = {}) {
+  return ["start", "end"].flatMap((anchor) => {
+    const rows = data.filter((d) => side(d) === anchor);
+    if (rows.length === 0) return [];
+    return Plot.text(rows, { ...options, ...overrides[anchor], textAnchor: anchor });
+  });
+}
+
 // ── Small maths helpers, so specs stay about the picture ────────────────────
 
 /** `n` evenly spaced values across [min, max], inclusive of both ends. */

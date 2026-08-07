@@ -187,6 +187,22 @@ function literalColors(svg) {
   );
 }
 
+/**
+ * Reject a function that leaked into an SVG attribute.
+ *
+ * Several Plot options that read like channels are constants: `textAnchor`,
+ * `dx`, `dy`, `strokeDasharray`. Handing one a function neither throws nor
+ * falls back — Plot stringifies it into the attribute, so the output carries
+ * `text-anchor="(d) => …"`, the renderer discards the invalid value, and every
+ * label quietly reverts to its default. That is invisible in a spec review and
+ * subtle enough in a rendered chart (labels that look a little off rather than
+ * obviously broken) to ship. Fail the build instead; `sidedText()` in
+ * charts/_theme.mjs is the supported way to vary anchoring per row.
+ */
+function stringifiedFunctions(svg) {
+  return [...svg.matchAll(/([a-zA-Z-]+)="[^"]*=>[^"]*"/g)].map((m) => m[1]);
+}
+
 const files = existsSync(CHARTS_DIR)
   ? readdirSync(CHARTS_DIR).filter((f) => f.endsWith(".mjs")).sort()
   : [];
@@ -223,6 +239,16 @@ for (const file of specs) {
       `${file}: literal colour(s) ${[...new Set(literal)].join(", ")} — ` +
         "use the SERIES/PRIMARY/MUTED/ACCENT tokens from charts/_theme.mjs so " +
         "the chart reads in both themes",
+    );
+    continue;
+  }
+
+  const leaked = stringifiedFunctions(svg);
+  if (leaked.length > 0) {
+    problems.push(
+      `${file}: function(s) stringified into ${[...new Set(leaked)].join(", ")} — ` +
+        "these Plot options are constants, not channels, so the renderer drops " +
+        "the value; use sidedText() from charts/_theme.mjs or split the mark",
     );
     continue;
   }

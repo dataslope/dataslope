@@ -7,7 +7,7 @@
  * At twenty tests a false positive is more likely than not, so the finding
  * needs no explanation beyond the number of times you looked.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED } from "./_theme.mjs";
+import { Plot, plot, sidedText, ACCENT, GUIDE, HALO, MUTED } from "./_theme.mjs";
 
 export const title =
   "The probability that at least one of k independent tests returns p below 0.05, rising from 5% at one test through 40% at ten to 64% at twenty, drawn against a line marking even odds.";
@@ -57,21 +57,24 @@ export function render() {
       Plot.areaY(curve, { x: "k", y: "p", fill: ACCENT, fillOpacity: 0.13 }),
       Plot.lineY(curve, { x: "k", y: "p", stroke: ACCENT, strokeWidth: 2 }),
       Plot.dot(MARKS, { x: "k", y: "p", r: 3.5, fill: ACCENT, stroke: null }),
-      Plot.text(MARKS, {
-        x: "k",
-        y: "p",
-        text: (d) => `${d.k} test${d.k === 1 ? "" : "s"}\n${Math.round(d.p * 100)}%`,
-        fill: ACCENT,
-        fontSize: 12,
-        fontWeight: 600,
-        lineHeight: 1.25,
-        // The last mark sits against the right edge, so its label turns inward
-        // rather than running off the frame.
-        textAnchor: (d) => (d.k === MAX_K ? "end" : "start"),
-        dx: (d) => (d.k === MAX_K ? -10 : 10),
-        dy: -28,
-        ...HALO,
-      }),
+      // The last mark sits against the right edge, so its label turns inward
+      // rather than running off the frame.
+      ...sidedText(
+        MARKS,
+        {
+          side: (d) => (d.k === MAX_K ? "end" : "start"),
+          x: "k",
+          y: "p",
+          text: (d) => `${d.k} test${d.k === 1 ? "" : "s"}\n${Math.round(d.p * 100)}%`,
+          fill: ACCENT,
+          fontSize: 12,
+          fontWeight: 600,
+          lineHeight: 1.25,
+          dy: -28,
+          ...HALO,
+        },
+        { start: { dx: 10 }, end: { dx: -10 } },
+      ),
       Plot.ruleY([0], { stroke: "currentColor", strokeOpacity: 0.35 }),
     ],
   });

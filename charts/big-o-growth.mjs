@@ -9,7 +9,7 @@
  * O(n) climbs steadily, O(n log n) shadows it, O(n²) climbs twice as fast, and
  * O(2ⁿ) leaves the frame before n = 30.
  */
-import { Plot, plot, linspace, ACCENT, HALO, MUTED, SERIES } from "./_theme.mjs";
+import { Plot, plot, linspace, sidedText, ACCENT, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
   "Six complexity curves on a logarithmic vertical axis: constant, logarithmic, linear, linearithmic, quadratic and exponential. Each is a straight line of a different slope, with the exponential curve leaving the top of the chart before n reaches 30.";
@@ -69,21 +69,23 @@ export function render() {
         strokeWidth: 2,
         clip: true,
       }),
-      Plot.text(LABELS, {
-        x: "n",
-        y: "ops",
-        text: "label",
-        fill: (d) => d.color,
-        fontSize: 12,
-        fontWeight: 600,
-        // A curve that exits the top is labelled to its left, under the point
-        // where it leaves; one that reaches the right edge is labelled beyond
-        // it, in the margin kept clear for exactly this.
-        textAnchor: (d) => (d.exits ? "end" : "start"),
-        dx: (d) => (d.exits ? -8 : 8),
-        dy: (d) => (d.exits ? -8 : 0),
-        ...HALO,
-      }),
+      // A curve that exits the top is labelled to its left, under the point
+      // where it leaves; one that reaches the right edge is labelled beyond
+      // it, in the margin kept clear for exactly this.
+      ...sidedText(
+        LABELS,
+        {
+          side: (d) => (d.exits ? "end" : "start"),
+          x: "n",
+          y: "ops",
+          text: "label",
+          fill: (d) => d.color,
+          fontSize: 12,
+          fontWeight: 600,
+          ...HALO,
+        },
+        { start: { dx: 8 }, end: { dx: -8, dy: -8 } },
+      ),
       Plot.text([{ n: MAX_N * 0.52, ops: CEILING * 0.55 }], {
         x: "n",
         y: "ops",

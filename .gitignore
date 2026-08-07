@@ -85,3 +85,9 @@ audit-results/
 
 # GPT Image 2 output from scripts/generate-illustrations.mjs
 generated-illustrations/
+
+# Local chart preview harness (.cp.mjs renders charts/*.mjs to PNGs in both
+# themes so a spec can be eyeballed without running the site)
+/.cp.mjs
+/.cp.html
+/.cp/

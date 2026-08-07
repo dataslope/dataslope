@@ -14,7 +14,7 @@
  * same tail at the same size, just moved right. See the note on plot() in
  * _theme.mjs.
  */
-import { Plot, plot, linspace, HALO, MUTED, SERIES } from "./_theme.mjs";
+import { Plot, plot, linspace, sidedText, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
   "Three t-distributions with 2, 5 and 30 degrees of freedom drawn over the standard normal, with each distribution's two-sided 95% critical value marked. The cutoff is 1.96 for the normal, 2.04 at 30 degrees of freedom, 2.57 at 5, and 4.30 at 2.";
@@ -75,13 +75,21 @@ export function render() {
     x: { label: "Test statistic", labelAnchor: "center", domain: DOMAIN, ticks: 6 },
     y: { label: null, ticks: [], grid: false, domain: [0, PEAK * 1.1] },
     marks: [
-      Plot.lineY(curves, {
+      // Two marks, because `strokeDasharray` is a constant option rather than
+      // a channel: the reference normal is dashed, the three t curves solid.
+      Plot.lineY(curves.filter((d) => d.label !== "normal"), {
         x: "x",
         y: "y",
         z: "label",
         stroke: (d) => COLOR[d.label],
-        strokeWidth: (d) => (d.label === "normal" ? 1.75 : 2),
-        strokeDasharray: (d) => (d.label === "normal" ? "4,3" : null),
+        strokeWidth: 2,
+      }),
+      Plot.lineY(curves.filter((d) => d.label === "normal"), {
+        x: "x",
+        y: "y",
+        stroke: MUTED,
+        strokeWidth: 1.75,
+        strokeDasharray: "4,3",
       }),
 
       // The cutoffs. Drawn on the right tail only; the left is its mirror and
@@ -100,19 +108,22 @@ export function render() {
         fill: (d) => d.color,
         stroke: null,
       }),
-      Plot.text(CURVES, {
-        x: "crit",
-        y: (d) => rowY(d.row),
-        text: (d) => `${d.label}   t* = ${d.crit.toFixed(2)}`,
-        fill: (d) => d.color,
-        fontSize: 12.5,
-        fontWeight: 600,
-        // df = 2's cutoff sits close to the right edge, so its label turns
-        // inward rather than running off the frame.
-        textAnchor: (d) => (d.crit > 3.5 ? "end" : "start"),
-        dx: (d) => (d.crit > 3.5 ? -10 : 10),
-        ...HALO,
-      }),
+      // df = 2's cutoff sits close to the right edge, so its label turns
+      // inward rather than running off the frame.
+      ...sidedText(
+        CURVES,
+        {
+          side: (d) => (d.crit > 3.5 ? "end" : "start"),
+          x: "crit",
+          y: (d) => rowY(d.row),
+          text: (d) => `${d.label}   t* = ${d.crit.toFixed(2)}`,
+          fill: (d) => d.color,
+          fontSize: 12.5,
+          fontWeight: 600,
+          ...HALO,
+        },
+        { start: { dx: 10 }, end: { dx: -10 } },
+      ),
       Plot.ruleY([0], { stroke: "currentColor", strokeOpacity: 0.35 }),
     ],
   });

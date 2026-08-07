@@ -12,7 +12,7 @@
  * is what overfitting looks like on a plot and what a reader will actually see
  * in their own logs.
  */
-import { Plot, plot, linspace, ACCENT, GUIDE, HALO, MUTED, SERIES } from "./_theme.mjs";
+import { Plot, plot, linspace, sidedText, ACCENT, GUIDE, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
   "Model complexity on the horizontal axis against error. Bias squared falls, variance rises, their sum is a U-shaped test error curve with a marked minimum, and training error falls steadily below it.";
@@ -59,13 +59,23 @@ export function render() {
     x: { label: "Model complexity", labelAnchor: "center", domain: [0.2, 10], ticks: [] },
     y: { label: "Error", ticks: [], grid: false, domain: [0, 10.5] },
     marks: [
-      Plot.lineY(curves, {
+      // The two components are dashed and their sum is solid, which needs two
+      // marks: `strokeDasharray` is a constant option, not a channel.
+      Plot.lineY(curves.filter((d) => DASH[d.key]), {
         x: "x",
         y: "y",
         z: "key",
         stroke: (d) => COLOR[d.key],
-        strokeWidth: (d) => (DASH[d.key] ? 1.75 : 2),
-        strokeDasharray: (d) => DASH[d.key],
+        strokeWidth: 1.75,
+        strokeDasharray: "4,3",
+        clip: true,
+      }),
+      Plot.lineY(curves.filter((d) => !DASH[d.key]), {
+        x: "x",
+        y: "y",
+        z: "key",
+        stroke: (d) => COLOR[d.key],
+        strokeWidth: 2,
         clip: true,
       }),
 
@@ -85,18 +95,20 @@ export function render() {
         fill: ACCENT,
         fontSize: 12,
         fontWeight: 600,
-        dy: -16,
+        // Below the dot: above it is where the Bias² label has to sit, since
+        // total error hugs bias² on the left and there is no clear band there.
+        dy: 20,
         ...HALO,
       }),
 
-      Plot.text([{ x: 0.5 }, { x: 9.6 }], {
+      ...sidedText([{ x: 0.5 }, { x: 9.6 }], {
+        side: (d) => (d.x < 5 ? "start" : "end"),
         x: "x",
         y: 10.1,
         text: (d) => (d.x < 5 ? "underfitting" : "overfitting"),
         fill: MUTED,
         fontSize: 11.5,
         fontWeight: 600,
-        textAnchor: (d) => (d.x < 5 ? "start" : "end"),
         ...HALO,
       }),
 

@@ -7,7 +7,7 @@
  * itself rather than reported as numbers, because the point is *positional*:
  * the long right tail drags the mean away from where most of the data is.
  */
-import { Plot, plot, linspace, HALO, SERIES } from "./_theme.mjs";
+import { Plot, plot, linspace, sidedText, HALO, SERIES } from "./_theme.mjs";
 
 export const title =
   "A right-skewed distribution with the mode, median and mean marked at three separate points, the mean pulled furthest into the long tail.";
@@ -84,17 +84,20 @@ export function render() {
         stroke: (d) => d.color,
         strokeWidth: 1.5,
       }),
-      Plot.text(CENTERS, {
-        x: "at",
-        y: (d, i) => peak * (ruleTop(i) + 0.045),
-        text: (d) => `${d.label}  $${d.at.toFixed(0)}`,
-        fill: (d) => d.color,
-        fontSize: 12.5,
-        fontWeight: 600,
-        textAnchor: (d) => d.side,
-        dx: (d) => (d.side === "end" ? -10 : 10),
-        ...HALO,
-      }),
+      ...sidedText(
+        CENTERS,
+        {
+          side: (d) => d.side,
+          x: "at",
+          y: (d) => peak * (ruleTop(CENTERS.indexOf(d)) + 0.045),
+          text: (d) => `${d.label}  $${d.at.toFixed(0)}`,
+          fill: (d) => d.color,
+          fontSize: 12.5,
+          fontWeight: 600,
+          ...HALO,
+        },
+        { start: { dx: 10 }, end: { dx: -10 } },
+      ),
       Plot.ruleY([0], { stroke: "currentColor", strokeOpacity: 0.35 }),
     ],
   });
