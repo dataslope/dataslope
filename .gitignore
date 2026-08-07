@@ -91,3 +91,6 @@ generated-illustrations/
 /.cp.mjs
 /.cp.html
 /.cp/
+
+# Datasets cached by scripts/check-code-blocks.mjs
+/.dataset-cache/

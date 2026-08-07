@@ -75,9 +75,15 @@
   gap: 8px;
 }
 
+/* No width/height here on purpose. This used to clamp the button to
+   22 x 22, which is smaller than the editor's copy button (13px glyph +
+   5px/7px padding = 27 x 23) and, with border-box sizing, left only 8px
+   of the 22 for a 13px icon. The two buttons sit on the same card a few
+   rem apart and read as a mismatched pair. Letting this one size from
+   `.iconBtn`'s padding makes it identical to `.copyBtn` by construction,
+   so the two stay in step if that padding ever changes. */
 .outputCopyBtn {
-  width: 22px;
-  height: 22px;
+  align-self: center;
 }
 
 /* Aligns the boot notice with the output body's text inset. The notice

@@ -96,7 +96,7 @@ import numpy as np
 import plotly.express as px
 
 # Fabricate hourly data over 30 days
-hours = pd.date_range("2024-01-01", periods=30 * 24, freq="H")
+hours = pd.date_range("2024-01-01", periods=30 * 24, freq="h")
 np.random.seed(0)
 val = (
     50 + np.sin(np.arange(len(hours)) * 0.05) * 10 + np.random.normal(0, 3, len(hours))
