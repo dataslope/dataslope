@@ -177,12 +177,6 @@ def tfidf(word, doc):
     tf = Counter(doc)[word] / len(doc)
     return tf * idf(word)
 
-It is worth being clear about what this cannot do. TF-IDF compares
-vocabularies, so two sentences that say the same thing in different words
-score near zero however obvious the paraphrase is.
-
-<Chart slug="tfidf-vs-embedding" />
-
 # Score every word in the FIRST document.
 doc0 = corpus[0]
 scores = {w: round(tfidf(w, doc0), 3) for w in set(doc0)}
@@ -226,6 +220,12 @@ what happens to their IDF values, and why does that help?
 
 Rare words earn high IDF and common words earn near-zero IDF, that asymmetry is what makes TF-IDF work.`}
 />
+
+It is worth being clear about what this cannot do. TF-IDF compares
+vocabularies, so two sentences that say the same thing in different words
+score near zero however obvious the paraphrase is.
+
+<Chart slug="tfidf-vs-embedding" />
 
 ## Your turn: compute TF-IDF by hand
 

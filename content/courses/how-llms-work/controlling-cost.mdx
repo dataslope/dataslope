@@ -38,12 +38,6 @@ def month(model, in_tok, out_tok, per_day):
     pin, pout = PRICE[model]
     return (in_tok / 1e6 * pin + out_tok / 1e6 * pout) * per_day * 30
 
-Serving a smaller version of the *same* model is the other half of that
-lever. Quantization trades bits per weight for memory, and the quality
-cost is not linear in the saving.
-
-<Chart slug="quantization-size-quality" />
-
 # 50,000 classifications a day, 600 tokens in, 15 out.
 print("Same classification workload on each tier:")
 for m in PRICE:
@@ -57,6 +51,12 @@ print(f"Saving from routing this one workload: \${everything_on_opus - routed:,.
     },
   ]}
 />
+
+Serving a smaller version of the *same* model is the other half of that
+lever. Quantization trades bits per weight for memory, and the quality
+cost is not linear in the saving.
+
+<Chart slug="quantization-size-quality" />
 
 ## 2. Cache the stable prefix
 

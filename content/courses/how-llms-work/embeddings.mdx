@@ -34,12 +34,6 @@ partially handled already, without ever having been observed.
       filename: "main.py",
       starterCode: `import numpy as np
 
-The older way of turning text into vectors counts words. That is enough
-for a lot of tasks and hopeless for others, and the difference shows up as
-soon as two sentences mean the same thing in different words.
-
-<Chart slug="tfidf-vs-embedding" />
-
 # A tiny hand-built embedding space. Real ones have thousands of
 # dimensions; here we use three so they can be read directly.
 #            [ animal, size, domestic ]
@@ -68,6 +62,12 @@ for word, vec in embeddings.items():
 relationships down; in a real model they fall out of the training
 objective, because words used in similar sentences get pushed toward
 similar vectors.
+
+The older way of turning text into vectors counts words. That is enough
+for a lot of tasks and hopeless for others, and the difference shows up as
+soon as two sentences mean the same thing in different words.
+
+<Chart slug="tfidf-vs-embedding" />
 
 ## The dimensions are not interpretable
 

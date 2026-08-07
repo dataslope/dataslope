@@ -27,6 +27,7 @@
     "db:migrate:illustrations:remote": "wrangler d1 migrations apply dataslope-illustrations --remote",
     "lint": "eslint .",
     "check:mcq": "node scripts/check-mcq.mjs",
+    "check:mdx": "node scripts/check-mdx-blocks.mjs",
     "check:prose": "node scripts/check-prose.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",

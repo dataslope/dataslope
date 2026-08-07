@@ -163,12 +163,6 @@ housing = pd.read_csv("housing.csv")`,
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
-The elbow plot is the other half of this question, and the two are worth
-reading side by side: the silhouette often has an opinion where the elbow
-does not.
-
-<Chart slug="kmeans-elbow" />
-
 # silhouette_score is O(n^2), so sample before scoring on 20k+ districts.
 sample = housing.sample(n=2000, random_state=0)
 X = StandardScaler().fit_transform(sample)
@@ -185,6 +179,12 @@ The scores hover in a modest band and the "peak" is shallow, there is no
 crisp natural number of clusters, just a few defensible choices. That is the
 normal experience on real data, and exactly why the silhouette is a guide to
 weigh against domain sense, not an oracle that hands you the answer.
+
+The elbow plot is the other half of this question, and the two are worth
+reading side by side: the silhouette often has an opinion where the elbow
+does not.
+
+<Chart slug="kmeans-elbow" />
 
 ## The per-point silhouette plot
 

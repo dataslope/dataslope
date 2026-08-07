@@ -67,12 +67,6 @@ slice) or **upsert by key** (`MERGE` / `ON CONFLICT`) instead of blind
 risks double-counting, so you can't safely automate recovery.
 
 ```python
-
-The failure it prevents compounds. Without idempotent writes, a retry
-after a partial success does not repair the run, it duplicates part of
-it.
-
-<Chart slug="idempotency-retry-storm" />
 # Idempotent partition overwrite: re-running any date is safe.
 @task
 def load_day(ds: str):              # ds injected by the scheduler
@@ -82,6 +76,12 @@ def load_day(ds: str):              # ds injected by the scheduler
         SELECT * FROM events_raw WHERE event_date = '{ds}';
     """)
 ```
+
+The failure it prevents compounds. Without idempotent writes, a retry
+after a partial success does not repair the run, it duplicates part of
+it.
+
+<Chart slug="idempotency-retry-storm" />
 
 ### What is a backfill, and how do you design for it?
 
