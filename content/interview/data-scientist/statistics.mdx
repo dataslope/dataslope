@@ -37,6 +37,11 @@ the mean more precisely with more data); the standard deviation does not,
 because it estimates a fixed population property that does not depend on
 $n$.
 
+How fast it shrinks, which is the part interviewers probe: as the square
+root of n, so four times the data halves it.
+
+<Chart slug="standard-error-vs-n" />
+
 ### What is a sampling distribution?
 
 A **sampling distribution** is the probability distribution of a statistic
@@ -69,6 +74,11 @@ print(f"SE (simulated): {np.std(sample_means):.3f}")
   ]}
 />
 
+Where it comes from: draw a sample, take its statistic, put a dot down,
+repeat.
+
+<Chart slug="sampling-distribution-build" />
+
 ### Why does the Central Limit Theorem matter?
 
 For a large enough sample, the distribution of the **sample mean** is
@@ -77,6 +87,11 @@ what justifies normal-based confidence intervals and z/t-tests for means
 even when the underlying data is skewed. A common rule of thumb is that
 $n \geq 30$ is "large enough" for moderately skewed data; heavier skew
 needs more.
+
+Simulated rather than asserted. The population is nothing like a bell
+curve, and the means converge to one anyway.
+
+<Chart slug="clt-convergence" />
 
 ### What is the Law of Large Numbers?
 
@@ -89,6 +104,11 @@ probability; the **strong** law gives almost-sure convergence.
 Note the distinction from the Central Limit Theorem: the Law of Large
 Numbers says *where* the sample mean ends up (at $\mu$); the Central Limit
 Theorem says *what shape* its uncertainty takes (normal) along the way.
+
+And the distinction from the CLT, drawn: the LLN is about one running
+average settling down, not about the shape of many.
+
+<Chart slug="lln-convergence" />
 
 ### What is conditional probability?
 
@@ -142,6 +162,10 @@ print(f"P(disease | positive) = {p_disease_given_pos:.3f}")
   ]}
 />
 
+The classic interview version, counted out one dot at a time.
+
+<Chart slug="base-rate-grid" />
+
 ### Describe the normal distribution and its key properties.
 
 The normal (Gaussian) distribution is symmetric and bell-shaped,
@@ -153,6 +177,10 @@ $$P(\mu - k\sigma \leq X \leq \mu + k\sigma) \approx 68\%,\ 95\%,\ 99.7\% \quad 
 
 It arises naturally via the Central Limit Theorem and is the foundation
 for many statistical tests.
+
+The three numbers worth knowing cold.
+
+<Chart slug="normal-68-95-997" />
 
 ### What is a Poisson distribution?
 
@@ -173,6 +201,10 @@ $$P(X = k) = \binom{n}{k} p^k (1 - p)^{n-k}$$
 
 Its mean is $np$ and its variance is $np(1 - p)$. It is used for click
 rates, conversion rates, and quality control.
+
+How its shape moves with n and p, including where it starts to look normal.
+
+<Chart slug="binomial-shapes" />
 
 ### What is Maximum Likelihood Estimation?
 
@@ -250,6 +282,11 @@ print(f"95% CI: ({ci_low:.2f}, {ci_high:.2f})")
   ]}
 />
 
+The definition, drawn: a hundred intervals from a hundred samples, about
+five of which miss.
+
+<Chart slug="ci-coverage" />
+
 ### What is hypothesis testing, and what are its four key steps?
 
 Hypothesis testing is a formal procedure for deciding whether data provide
@@ -308,6 +345,11 @@ print(f"t={t_stat:.3f}, p={p_value:.4f}")
     },
   ]}
 />
+
+Why it stops mattering as n grows: the t distribution's tails pull in
+toward the normal.
+
+<Chart slug="t-vs-normal" />
 
 ### What is the chi-square test used for?
 
@@ -372,6 +414,11 @@ print(f"F={f_stat:.3f}, p={p_value:.4f}")
   ]}
 />
 
+The comparison the F ratio is making: spread between the groups against
+spread within them.
+
+<Chart slug="anova-between-within" />
+
 ### What exactly is a p-value?
 
 Now that the tests above each emit one, here is what the number means: a
@@ -413,6 +460,11 @@ print(f"t={t_stat:.3f}, p={p_value:.4f}")
   ]}
 />
 
+The p-value is the shaded area: how much of the null's distribution sits
+at least as far out as what you saw.
+
+<Chart slug="p-value-tail-area" />
+
 ### What is the difference between a Type I and a Type II error?
 
 A **Type I error** is a false positive (rejecting a true null); its rate
@@ -428,6 +480,10 @@ possible outcomes of a test form a decision matrix:
 Lowering $\alpha$ (a stricter test) reduces false positives but raises
 false negatives, all else equal, the two error rates trade off against
 each other.
+
+The two error rates on one axis, so the trade between them is visible.
+
+<Chart slug="alpha-power-tradeoff" />
 
 ### What is statistical power?
 
@@ -459,6 +515,11 @@ print(f"Power: {power:.3f}")
     },
   ]}
 />
+
+What it costs to detect a smaller effect: each halving of the effect
+roughly quadruples the sample.
+
+<Chart slug="power-vs-n" />
 
 ### What is the difference between one-tailed and two-tailed tests?
 
