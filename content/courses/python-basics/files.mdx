@@ -403,8 +403,10 @@ print("First row:", rows[0]["species"], "on", rows[0]["island"])
 Notice that every value `csv` hands back is a **string**, even the numeric
 columns like `body_mass_g`. That is true of CSV everywhere: a CSV file is just
 text, so converting fields to numbers is your responsibility. Here we read the
-body-mass column, skip the blank cells that real data always contains, and
-average what's left:
+body-mass column, skip the missing cells that real data always contains, and
+average what's left. Note that "missing" here is the literal text `NA`, not an
+empty cell: every dataset picks its own marker, and you have to look before
+you can skip it.
 
 <CodeBlock
   adapter="python"
@@ -418,7 +420,7 @@ masses = []
 with open("penguins.csv", newline="") as f:
     for row in csv.DictReader(f):
         value = row["body_mass_g"]
-        if value:                      # skip empty cells
+        if value and value != "NA":    # this file marks missing cells "NA"
             masses.append(float(value))
 
 print("Penguins with a known mass:", len(masses))

@@ -405,6 +405,9 @@ const ENVIRONMENT_ONLY = [
   /could not spawn threads/,
   /LazyLock instance has previously been poisoned/,
   /TLS not supported in this environment/,
+  // JSPI. Chrome has it; Node's V8 build here does not, so any block that
+  // suspends WebAssembly (`input()`, and anything built on it) cannot run.
+  /WebAssembly stack switching not supported/,
 ];
 
 const isEnvironmental = (f) => ENVIRONMENT_ONLY.some((re) => re.test(f.full ?? f.error ?? ""));
