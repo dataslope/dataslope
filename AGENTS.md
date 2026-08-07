@@ -30,7 +30,7 @@ sparingly, to highlight or differentiate.
 ### Tonal shades (100–900)
 
 Each hue has a full tonal ramp exposed as CSS variables in `app/brand.css`
-(`--ds-<hue>-<step>`) and previewable at `/dashboard/admin/color-test`.
+(`--ds-<hue>-<step>`) and previewable at `/dashboard/admin/color-palette`.
 **Prefer the `500` shade** (the primary/base color); the other steps exist for
 when a lighter or darker tone is required (backgrounds, borders, hover states,
 AA-legible text on white, and telling chart/diagram series apart). `500` = the

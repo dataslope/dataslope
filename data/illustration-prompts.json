@@ -2312,7 +2312,7 @@
       "title": "Cardinality",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform joining one large blue block to two smaller green blocks with thick rods"
+      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, standing on a wide pale grey platform beside one tall thick blue column on the left and three large green columns standing in a row on the right, one heavy bar running across from the blue column to the green ones"
     },
     {
       "id": "db-self-referencing",
@@ -3872,7 +3872,7 @@
       "title": "How applications use databases",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform passing one green block along a rail from a white panel into a wide blue cabinet"
+      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, standing on a wide pale grey platform and pushing one large green block along a thick rail out of a chunky white housing and into a deep wide blue cabinet"
     },
     {
       "id": "sql-tables-rows-columns",
@@ -7508,7 +7508,7 @@
       "title": "Interesting discussions",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot on a pale grey platform standing between two plain plinths of different heights, one simple brass instrument on each"
+      "subject": "the Dataslope marmot mascot on a wide pale grey platform, standing beside a thick heavy beam balanced on one solid blue wedge, with one large green cube resting on the left end of the beam and one large yellow cube on the right end"
     },
     {
       "id": "scipy-next-steps",

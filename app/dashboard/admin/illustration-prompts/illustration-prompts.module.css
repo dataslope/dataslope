@@ -122,12 +122,13 @@
 /* Column grid: as many items per row as fit, each at least 300px so a
    1536x1024 cut-out is still large enough to judge. Cells stretch to the row
    height so the mark controls line up along the bottom of each row. The
-   generous row gap replaces the padding the cards used to supply; without it
-   a cardless grid runs together vertically. */
+   generous row gap replaces the padding the cards used to supply: with no
+   card edge to say where one item ends, the gap is the only thing separating
+   a row's controls from the next row's artwork. */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2.25rem 1.75rem;
+  gap: 3.5rem 1.75rem;
   align-items: stretch;
 }
 

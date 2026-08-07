@@ -69,9 +69,10 @@
 }
 
 /* A rule between figures rather than a box around each: the separation is
-   real, the enclosure was not. */
+   real, the enclosure was not. With no card edge to mark where one figure
+   stops, the gap has to do that work, so it is deliberately generous. */
 .item {
-  padding: 2.25rem 0;
+  padding: 3.75rem 0;
   border-top: 1px solid var(--divider);
 }
 

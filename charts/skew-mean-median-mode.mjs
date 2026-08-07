@@ -7,7 +7,7 @@
  * itself rather than reported as numbers, because the point is *positional*:
  * the long right tail drags the mean away from where most of the data is.
  */
-import { Plot, plot, linspace, SERIES } from "./_theme.mjs";
+import { Plot, plot, linspace, HALO, SERIES } from "./_theme.mjs";
 
 export const title =
   "A right-skewed distribution with the mode, median and mean marked at three separate points, the mean pulled furthest into the long tail.";
@@ -35,14 +35,27 @@ const MEAN = SCALE * Math.exp((SIGMA * SIGMA) / 2);
 const curve = linspace(0.5, 220, 220).map((x) => ({ x, y: lognormalPdf(x) }));
 const peak = Math.max(...curve.map((d) => d.y));
 
-// `side` puts the mode's label to the left of its rule. At this skew the three
-// marks are close enough that three right-hand labels would have the median's
-// rule striking through the mode's text.
+// Three marks within $32 of each other on a 220-wide axis, so label placement
+// is the whole difficulty here. Three things keep them apart:
+//
+//   • `side` sends the mode's label left of its rule and the other two right,
+//     so no label starts where another one ends;
+//   • the rules climb in steps (`step` below), so each label has its own band
+//     of height and its own rule to sit at the top of;
+//   • every label carries a page-coloured halo, so where a neighbour's rule
+//     does pass behind the text (the median's label reaches past the mean's
+//     rule at this skew) it is masked instead of striking through.
+//
+// The labels also stand off their rules by 10px rather than 6, which is what
+// turns "touching" into "labelled".
 const CENTERS = [
   { label: "Mode", at: MODE, color: SERIES[2], side: "end" },
   { label: "Median", at: MEDIAN, color: SERIES[0], side: "start" },
   { label: "Mean", at: MEAN, color: SERIES[1], side: "start" },
 ];
+
+/** Height of the i-th rule, as a multiple of the curve's peak. */
+const ruleTop = (i) => 1.06 + i * 0.115;
 
 export function render() {
   return plot({
@@ -58,7 +71,7 @@ export function render() {
     },
     // Density units would be noise here; the shape and the three marks carry
     // the whole message.
-    y: { label: null, ticks: [], grid: false, domain: [0, peak * 1.34] },
+    y: { label: null, ticks: [], grid: false, domain: [0, peak * 1.42] },
     marks: [
       Plot.areaY(curve, { x: "x", y: "y", fill: SERIES[0], fillOpacity: 0.13 }),
       Plot.lineY(curve, { x: "x", y: "y", stroke: SERIES[0], strokeWidth: 2 }),
@@ -67,19 +80,20 @@ export function render() {
       Plot.ruleX(CENTERS, {
         x: "at",
         y1: 0,
-        y2: (d, i) => peak * (1.06 + i * 0.09),
+        y2: (d, i) => peak * ruleTop(i),
         stroke: (d) => d.color,
         strokeWidth: 1.5,
       }),
       Plot.text(CENTERS, {
         x: "at",
-        y: (d, i) => peak * (1.09 + i * 0.09),
+        y: (d, i) => peak * (ruleTop(i) + 0.045),
         text: (d) => `${d.label}  $${d.at.toFixed(0)}`,
         fill: (d) => d.color,
         fontSize: 12.5,
         fontWeight: 600,
         textAnchor: (d) => d.side,
-        dx: (d) => (d.side === "end" ? -6 : 6),
+        dx: (d) => (d.side === "end" ? -10 : 10),
+        ...HALO,
       }),
       Plot.ruleY([0], { stroke: "currentColor", strokeOpacity: 0.35 }),
     ],

@@ -94,9 +94,9 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
     band: "tools",
   },
   {
-    key: "admin-color-test",
-    label: "Color Test",
-    href: "/dashboard/admin/color-test",
+    key: "admin-color-palette",
+    label: "Color Palette",
+    href: "/dashboard/admin/color-palette",
     icon: Palette,
     band: "tools",
   },

@@ -11,7 +11,7 @@
  * label dropped somewhere in the shading, so the label's extent *is* the claim:
  * "this much of the x-axis holds 95% of the area".
  */
-import { Plot, plot, normalCurve, normalPdf, ACCENT, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, normalCurve, normalPdf, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
   "A normal curve with the regions within one, two and three standard deviations shaded, holding 68%, 95% and 99.7% of the distribution.";
@@ -59,7 +59,7 @@ export function render() {
       Plot.ruleX([-3, -2, -1, 1, 2, 3], {
         y1: 0,
         y2: (d) => normalPdf(d),
-        stroke: MUTED,
+        stroke: GUIDE,
         strokeWidth: 1,
         strokeDasharray: "3,3",
       }),
@@ -81,6 +81,7 @@ export function render() {
         fill: ACCENT,
         fontSize: 13,
         fontWeight: 600,
+        ...HALO,
       }),
     ],
   });

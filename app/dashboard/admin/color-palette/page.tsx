@@ -13,7 +13,7 @@ import {
 } from "@/app/_components/playgroundTheme";
 import "@/app/_components/playground.css";
 import { AdminPageHeader } from "../_components/shared";
-import styles from "./color-test.module.css";
+import styles from "./color-palette.module.css";
 
 interface SwatchDef {
   name: string;
@@ -131,7 +131,7 @@ export default function ColorTestPage() {
   return (
     <>
       <AdminPageHeader
-        title="Color Test"
+        title="Color Palette"
         description="Every editor theme's resolved palette, plus the brand ramps from app/brand.css. Pick a theme to re-resolve every swatch against it; click a swatch to copy its hex."
       />
 
@@ -236,95 +236,6 @@ export default function ColorTestPage() {
           </div>
         </Section>
 
-        <Section title="Typography" note="var(--font-ui) and var(--font-mono)">
-          <div className={styles.typoGrid}>
-            <div className={styles.typoBlock}>
-              <h3 className={styles.blockTitle}>Sans-serif, UI font</h3>
-              <div
-                className={styles.typoSamples}
-                style={{ fontFamily: "var(--font-ui)" }}
-              >
-                <p className={styles.typoH1} style={{ color: "var(--text)" }}>
-                  Heading One
-                </p>
-                <p className={styles.typoH2} style={{ color: "var(--text)" }}>
-                  Heading Two
-                </p>
-                <p className={styles.typoH3} style={{ color: "var(--text)" }}>
-                  Heading Three
-                </p>
-                <p className={styles.typoBody} style={{ color: "var(--text)" }}>
-                  Body text, The quick brown fox jumps over the lazy dog. Pack
-                  my box with five dozen liquor jugs.
-                </p>
-                <p
-                  className={styles.typoBody}
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  Muted body, Secondary descriptions and helper text appear
-                  here, blended toward the background.
-                </p>
-                <p
-                  className={styles.typoSmall}
-                  style={{ color: "var(--text-dim)" }}
-                >
-                  Dimmed caption, Timestamps, metadata, and low-priority labels
-                  rendered at reduced opacity.
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.typoBlock}>
-              <h3 className={styles.blockTitle}>Monospace, code font</h3>
-              {/* The code sample keeps a surface of its own: it is standing in
-                  for the editor, and an editor has a background. That is the
-                  theme under test, not the dashboard's card grey. */}
-              <pre className={styles.codeBlock}>
-                <code>
-                  <span style={{ color: "var(--theme-primary)" }}>def </span>
-                  <span style={{ color: "var(--text-complementary)" }}>fibonacci</span>
-                  <span style={{ color: "var(--text)" }}>(</span>
-                  <span style={{ color: "var(--text-dim)" }}>n: int</span>
-                  <span style={{ color: "var(--text)" }}>) -&gt; int:{"\n"}</span>
-                  <span style={{ color: "var(--text-dim)" }}>{"    "}{'"""Return the nth Fibonacci number."""'}{"\n"}</span>
-                  {"    "}<span style={{ color: "var(--theme-primary)" }}>if </span>
-                  <span style={{ color: "var(--text)" }}>n &lt;= </span>
-                  <span style={{ color: "var(--text-muted)" }}>1</span>
-                  <span style={{ color: "var(--text)" }}>:{"\n"}</span>
-                  {"        "}<span style={{ color: "var(--theme-primary)" }}>return </span>
-                  <span style={{ color: "var(--text-muted)" }}>n{"\n"}</span>
-                  {"    "}<span style={{ color: "var(--theme-primary)" }}>return </span>
-                  <span style={{ color: "var(--text-complementary)" }}>fibonacci</span>
-                  <span style={{ color: "var(--text)" }}>(n - </span>
-                  <span style={{ color: "var(--text-muted)" }}>1</span>
-                  <span style={{ color: "var(--text)" }}>) + </span>
-                  <span style={{ color: "var(--text-complementary)" }}>fibonacci</span>
-                  <span style={{ color: "var(--text)" }}>(n - </span>
-                  <span style={{ color: "var(--text-muted)" }}>2</span>
-                  <span style={{ color: "var(--text)" }}>){"\n\n"}</span>
-                  <span style={{ color: "var(--text-dim)" }}># Compute first 10 values{"\n"}</span>
-                  <span style={{ color: "var(--text-complementary)" }}>results</span>
-                  <span style={{ color: "var(--text)" }}> = [</span>
-                  <span style={{ color: "var(--text-complementary)" }}>fibonacci</span>
-                  <span style={{ color: "var(--text)" }}>(i) </span>
-                  <span style={{ color: "var(--theme-primary)" }}>for </span>
-                  <span style={{ color: "var(--text)" }}>i </span>
-                  <span style={{ color: "var(--theme-primary)" }}>in </span>
-                  <span style={{ color: "var(--text-complementary)" }}>range</span>
-                  <span style={{ color: "var(--text)" }}>(</span>
-                  <span style={{ color: "var(--text-muted)" }}>10</span>
-                  <span style={{ color: "var(--text)" }}>)]{"\n"}</span>
-                  <span style={{ color: "var(--text-complementary)" }}>print</span>
-                  <span style={{ color: "var(--text)" }}>(</span>
-                  <span style={{ color: "var(--text-dim)" }}>{'f"'}Sequence: {"{"}</span>
-                  <span style={{ color: "var(--text-complementary)" }}>results</span>
-                  <span style={{ color: "var(--text-dim)" }}>{'}"'}</span>
-                  <span style={{ color: "var(--text)" }}>)</span>
-                </code>
-              </pre>
-            </div>
-          </div>
-        </Section>
       </div>
     </>
   );

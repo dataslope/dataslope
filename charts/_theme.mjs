@@ -67,10 +67,42 @@ export const MUTED = "var(--ds-chart-muted)";
 /** Highlight colour for the one thing a chart is actually about. */
 export const ACCENT = "var(--ds-chart-accent)";
 
+/** Guide lines: the dropped verticals, tick marks and construction lines that
+ *  help the eye find a position on an axis. A tint of the primary series
+ *  rather than a neutral grey, so they read as part of the same drawing
+ *  instead of as chart furniture borrowed from somewhere else. */
+export const GUIDE = "var(--ds-chart-guide)";
+
+/**
+ * Halo options for a text mark sitting over the plot rather than beside it.
+ *
+ * Spread into a `Plot.text` mark, this strokes the glyphs in the page colour
+ * underneath the fill (Plot sets `paint-order: stroke`), so a label crossing a
+ * curve, a rule or a shaded region reads cleanly without a box around it and
+ * without having to be nudged somewhere it no longer points at anything.
+ *
+ * `--ds-chart-surface` is the page background per theme, so the halo is
+ * invisible on both.
+ */
+export const HALO = {
+  stroke: "var(--ds-chart-surface)",
+  strokeWidth: 4,
+  strokeLinejoin: "round",
+};
+
 /**
  * `Plot.plot()` with the house theme applied. Pass any Plot option to override
  * a default; `x`/`y`/`color` scale options are merged one level deep so a spec
  * can set `x: { label: "z" }` without losing the shared axis treatment.
+ *
+ * **Facets share every scale.** `fx`/`fy` panels are windows onto one pair of
+ * axes, not separate plots, so faceting only works when the panels show the
+ * *same quantities in the same units* — three sample sizes of one statistic,
+ * four scatters on one pair of variables. Two panels showing different things
+ * (a histogram of p-values beside a probability-versus-k curve, a distribution
+ * beside a magnified tail) collapse: whichever has the narrower range is
+ * squeezed into a corner of the union of both. Plot has no per-facet scale.
+ * When the quantities differ, write two charts.
  */
 export function plot(options = {}) {
   const { x, y, color, style, marks = [], ...rest } = options;

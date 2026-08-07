@@ -31,6 +31,9 @@
   /* Roles */
   --ds-chart-accent: var(--ds-red-700);
   --ds-chart-muted: var(--ds-gray-400);
+  /* Guides (dropped verticals, construction lines): a tint of the primary,
+     light enough to sit under the data without competing with it. */
+  --ds-chart-guide: var(--ds-blue-400);
   /* Plot's own token, for label halos and tip backdrops: the page surface. */
   --ds-chart-surface: #ffffff;
 }
@@ -47,6 +50,7 @@
   --ds-chart-7: var(--ds-yellow-400);
   --ds-chart-accent: var(--ds-red-400);
   --ds-chart-muted: var(--ds-gray-500);
+  --ds-chart-guide: var(--ds-blue-600);
   --ds-chart-surface: #121212;
 }
 
