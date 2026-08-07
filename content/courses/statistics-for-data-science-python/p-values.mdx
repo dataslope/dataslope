@@ -463,6 +463,13 @@ from scipy import stats
 
 rng = np.random.default_rng(123)
 
+There are two standard corrections, and they are not interchangeable.
+Bonferroni controls the chance of *any* false positive; Benjamini-Hochberg
+controls the *share* of your discoveries that are false, which is usually
+the question you actually have.
+
+<Chart slug="bonferroni-vs-fdr" />
+
 # Test 20 brand-new "features", ALL of which are pure noise (no real effect).
 n_tests = 20
 alpha = 0.05

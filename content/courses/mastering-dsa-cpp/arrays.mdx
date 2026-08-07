@@ -201,6 +201,12 @@ int main() {
 
 Each printed line marks a reallocation. Note the side effect: a reallocation moves elements to a *new address*, so any pointer or iterator you saved into the old buffer is now dangling. Iterator invalidation on growth is one of the most common real-world vector bugs, if you hold an iterator, do not `push_back`.
 
+"Amortized O(1)" is a claim about a total, not about any single push.
+Doubling makes the expensive pushes rare enough that the average stays
+flat; growing by a constant does not.
+
+<Chart slug="amortized-vector-growth" />
+
 ## Timing one million pushes
 
 Browser timing is noisy, but this shows how to measure a sequence of pushes with `<chrono>`. A million pushes, including all the reallocation copying along the way, typically lands in the low tens of milliseconds, the amortization argument, verified by stopwatch.

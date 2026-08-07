@@ -177,6 +177,12 @@ def tfidf(word, doc):
     tf = Counter(doc)[word] / len(doc)
     return tf * idf(word)
 
+It is worth being clear about what this cannot do. TF-IDF compares
+vocabularies, so two sentences that say the same thing in different words
+score near zero however obvious the paraphrase is.
+
+<Chart slug="tfidf-vs-embedding" />
+
 # Score every word in the FIRST document.
 doc0 = corpus[0]
 scores = {w: round(tfidf(w, doc0), 3) for w in set(doc0)}

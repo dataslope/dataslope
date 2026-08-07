@@ -104,6 +104,12 @@ GET /orders?limit=20&after=eyJpZCI6MTQwfQ HTTP/1.1
 { "data": [ ... ], "next_cursor": "eyJpZCI6MTYwfQ" }
 ```
 
+The reason to prefer keyset pagination is a curve. `OFFSET` makes the
+database walk and discard the rows it skips, so page 500 costs five
+hundred times page one.
+
+<Chart slug="api-pagination-cost" />
+
 ### Sessions vs JWT vs OAuth, how do they relate?
 
 They answer different questions. **Session cookies**: the server stores
@@ -149,6 +155,12 @@ communicate state via headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`,
 `X-RateLimit-Reset`, and `Retry-After` so a well-behaved client can back off.
 Rate limiting protects the service from abuse and noisy neighbors and enforces
 fair usage across tenants.
+
+The token bucket is the default for a reason: it enforces an average rate
+while still letting a client spend a saved-up burst, which is what real
+traffic looks like.
+
+<Chart slug="token-bucket-burst" />
 
 ### REST vs GraphQL vs gRPC, when does each fit?
 

@@ -202,6 +202,12 @@ gantt
 The JS thread is only ever busy in the *short* bursts; the *long*
 waits happen elsewhere.
 
+One thread has a consequence you can measure: anything that takes longer
+than a frame does not slow the page down a little, it drops frames
+outright.
+
+<Chart slug="frame-budget-long-tasks" />
+
 ## Order is not what it looks like
 
 This is the biggest mental shift. The order code is *written* in

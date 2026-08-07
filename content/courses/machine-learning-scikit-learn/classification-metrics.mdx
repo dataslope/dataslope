@@ -239,6 +239,12 @@ There is no universally correct threshold, it depends on whether a false
 alarm or a missed case is worse for *your* problem. The default 0.5 is just
 a convention, not a law.
 
+Moving the threshold assumes the scores mean something. A model can rank
+perfectly and still be badly calibrated, which matters the moment anyone
+treats `predict_proba` as a probability.
+
+<Chart slug="calibration-curve" />
+
 ## F1: one number when you must have one
 
 Sometimes you genuinely need a single score, to rank models, to early-stop

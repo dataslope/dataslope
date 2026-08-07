@@ -78,6 +78,12 @@ can see how the pieces relate.
       filename: "main.py",
       starterCode: `from scipy import stats
 
+One more question comes up often enough to name: *how many are still
+going after time t?* That is the survival function, which is just
+`1 - cdf` given a name of its own.
+
+<Chart slug="survival-curve" />
+
 # Delivery times: Normal, mean 30 min, sd 6 min.
 d = stats.norm(loc=30, scale=6)
 

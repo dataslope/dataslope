@@ -131,6 +131,12 @@ air = pd.Series(_passengers, index=idx, name="passengers")`,
       starterCode: `from statsmodels.tsa.seasonal import seasonal_decompose
 import matplotlib.pyplot as plt
 
+"Is there seasonality here" is usually better asked as "how much of the
+variation is seasonal", which is a number you can compute from the
+decomposition rather than a judgement call about the picture.
+
+<Chart slug="seasonal-strength" />
+
 # Decompose the airline series BOTH ways and compare the RESIDUALS.
 res_add = seasonal_decompose(air, model="additive", period=12).resid.dropna()
 res_mul = seasonal_decompose(air, model="multiplicative", period=12).resid.dropna()

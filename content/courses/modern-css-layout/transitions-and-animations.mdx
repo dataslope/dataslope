@@ -119,6 +119,13 @@ transform: scale(1.1);         /* grow to 110% */
 transform: rotate(15deg);      /* tilt */
 ```
 
+The reason `transform` is the recommended property is the frame budget.
+At 60fps there are about 16 milliseconds per frame for everything,
+layout included, and animating a layout-triggering property spends them
+all.
+
+<Chart slug="frame-budget-long-tasks" />
+
 ## Animations: scripted, repeatable motion
 
 For motion that isn't tied to a state change, define keyframes and

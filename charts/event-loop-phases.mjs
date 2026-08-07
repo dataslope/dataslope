@@ -52,7 +52,7 @@ const OVERRUN = BLOCKS.filter((b) => b.kind === "task").find((b) => b.ms > FRAME
 const FRAMES_SKIPPED = OVERRUN ? Math.floor(OVERRUN.ms / FRAME_MS) : 0;
 
 export const caption = OVERRUN
-  ? `Each task runs to completion, then the microtask queue drains entirely, then the browser may paint. The ${OVERRUN.label} takes ${OVERRUN.ms} ms — more than ${FRAMES_SKIPPED} whole ${FRAME_MS} ms frame${FRAMES_SKIPPED === 1 ? "" : "s"} — and because nothing can interrupt a task, those frames are not delayed but skipped. This is why "chunk the work" is the fix and "make it async" on its own is not: an await that resolves immediately is still a microtask, and microtasks run before the paint.`
+  ? `Each task runs to completion, then the microtask queue drains entirely, then the browser may paint. The ${OVERRUN.label} takes ${OVERRUN.ms} ms, more than ${FRAMES_SKIPPED} whole ${FRAME_MS} ms frame${FRAMES_SKIPPED === 1 ? "" : "s"}, and because nothing can interrupt a task, those frames are not delayed but skipped. This is why "chunk the work" is the fix and "make it async" on its own is not: an await that resolves immediately is still a microtask, and microtasks run before the paint.`
   : `Each task runs to completion, then the microtask queue drains entirely, then the browser may paint.`;
 
 const LANES = {
@@ -231,7 +231,7 @@ export function render() {
         x: X0,
         y: 296,
         text: () =>
-          "microtasks drain completely between tasks — and before the paint, which is why an\nimmediately-resolved await does not give the browser a chance to render",
+          "microtasks drain completely between tasks, and before the paint, which is why an\nimmediately-resolved await does not give the browser a chance to render",
         fill: MUTED,
         fontSize: 10.5,
         lineHeight: 1.4,

@@ -127,6 +127,12 @@ You *describe the match* with `ON`, and the database finds an
 efficient way to perform it. But this "keep the matching pairs"
 picture is exactly what a join means.
 
+Matching is also how joins surprise people. If a key repeats on both
+sides, the result has more rows than either input, and any `SUM` over it
+is quietly wrong.
+
+<Chart slug="join-fanout-rows" />
+
 ## What comes next
 
 There is one more crucial question: what about rows that have **no

@@ -71,6 +71,12 @@ contextual but you own latency, scaling, and availability. Choose by the
 freshness and latency the product needs; a common hybrid caches batch
 features and does light online scoring on top.
 
+Batch size pulls in two directions at once, which is what makes the
+choice a real one: throughput rises with it, and so does the latency any
+individual request sees.
+
+<Chart slug="batch-size-throughput" />
+
 ### What are the stages of a CI/CD pipeline for models?
 
 Continuous integration and delivery for ML typically runs: (1) **data
@@ -196,6 +202,12 @@ container so the serving environment matches training exactly. Exporting
 to a framework-neutral format like **ONNX** decouples the model from the
 training framework and enables optimized runtimes (ONNX Runtime,
 TensorRT). The container plus a versioned artifact is the promotable unit.
+
+Packaging is also where serving cost is decided, and quantization is the
+biggest single lever on it: fewer bits per weight, against a quality cost
+that is not linear in the saving.
+
+<Chart slug="quantization-size-quality" />
 
 ### What is a champion/challenger setup?
 

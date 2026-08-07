@@ -121,6 +121,12 @@ print(f"prose: {len(prose):5d} chars -> ~{estimate_tokens(prose):4d} tokens")
 print(f"code:  {len(code):5d} chars -> ~{estimate_tokens(code, 'code'):4d} tokens")
 print()
 
+The rate is not the same for every language, and the reason starts one
+level below tokens: the same sentence costs a different number of *bytes*
+depending on the script it is written in.
+
+<Chart slug="utf8-bytes-per-script" />
+
 # Try your own text:
 mine = "Paste something here and see roughly how many tokens it is."
 print(f"yours: {len(mine):5d} chars -> ~{estimate_tokens(mine):4d} tokens")

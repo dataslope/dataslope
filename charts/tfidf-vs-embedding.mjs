@@ -80,7 +80,7 @@ const OVERLAP = ROWS[1];
 const CROSSES = PARAPHRASE.tfidf < OVERLAP.tfidf && PARAPHRASE.embedding > OVERLAP.embedding;
 
 export const caption = CROSSES
-  ? `TF-IDF scores the paraphrase pair at ${PARAPHRASE.tfidf.toFixed(2)} and the pun pair at ${OVERLAP.tfidf.toFixed(2)}: it can only count shared tokens, and the paraphrase shares almost none. Embeddings are fitted on context rather than counts, so the ranking flips. Neither is wrong — they answer different questions, and the lines crossing is the whole reason to know which one you asked.`
+  ? `TF-IDF scores the paraphrase pair at ${PARAPHRASE.tfidf.toFixed(2)} and the pun pair at ${OVERLAP.tfidf.toFixed(2)}: it can only count shared tokens, and the paraphrase shares almost none. Embeddings are fitted on context rather than counts, so the ranking flips. Neither is wrong; they answer different questions, and the lines crossing is the whole reason to know which one you asked.`
   : `TF-IDF scores the paraphrase pair at ${PARAPHRASE.tfidf.toFixed(2)} and the pun pair at ${OVERLAP.tfidf.toFixed(2)}. TF-IDF counts shared tokens; embeddings are fitted on context.`;
 
 // ── Layout ─────────────────────────────────────────────────────────────────

@@ -36,6 +36,11 @@ $O(\log n)$ lookups and efficient **range scans** (`WHERE age BETWEEN ...`).
 Without an index, a filter or join on a column requires a full table scan,
 $O(n)$.
 
+Which *kind* of index matters as much as having one. A hash index answers
+equality in constant time and cannot answer a range at all.
+
+<Chart slug="hash-vs-tree-index" />
+
 ### When does an index help, and when does it hurt?
 
 An index helps **selective** reads: equality lookups, range scans, joins, and
@@ -90,6 +95,11 @@ Three classic read anomalies, each blocked at a higher level:
   Repeatable Read.
 - **Phantom read**, re-running the same **query** returns new rows because
   another transaction inserted matching rows. Prevented by Serializable.
+
+The levels are usually memorised as a list; they are easier to keep
+straight as a grid of which anomaly each one still permits.
+
+<Chart slug="isolation-levels" />
 
 ### What is a transaction, and how do you use one?
 
@@ -163,6 +173,11 @@ JOIN order_totals t ON t.customer_id = c.id
 ORDER BY c.name;`}
 />
 
+The inflation is multiplicative, which is why it can go unnoticed on a
+small sample and be wildly wrong in production.
+
+<Chart slug="join-fanout-rows" />
+
 ### What is a deadlock, and how do you avoid it?
 
 A deadlock is a cycle of transactions each holding a lock the other needs:
@@ -171,6 +186,12 @@ for row 1. Neither proceeds. Databases detect the cycle and **abort one**
 transaction (the victim), which the app should retry. Prevent deadlocks by
 acquiring locks in a **consistent global order**, keeping transactions short,
 and using the lowest isolation level that is correct.
+
+A related failure mode that looks like a deadlock from the outside is a
+saturated connection pool: nothing is stuck, but every request is queued
+behind a fixed number of connections.
+
+<Chart slug="connection-pool-saturation" />
 
 ### What is an optimistic vs pessimistic locking strategy?
 

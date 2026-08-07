@@ -155,6 +155,12 @@ You don't call the garbage collector. You don't decide when it
 runs. You just write code that doesn't keep references to objects
 you no longer need, and the JVM takes care of the rest.
 
+Collection is not free, and what it costs depends on how full the heap
+is. The pauses stay small over a wide range and then stop being small
+quite suddenly.
+
+<Chart slug="gc-pause-heap" />
+
 ## What you do *not* need to know yet
 
 The JVM is a vast subject. As a beginner, you do **not** need to

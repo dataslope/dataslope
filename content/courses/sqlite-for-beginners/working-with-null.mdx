@@ -189,6 +189,11 @@ produce `NULL`, often displayed as a blank cell.
   > The issue is NULL comparison logic, not the column type.`}
 />
 
+`UNKNOWN` is a third truth value, not a missing second one, and the
+operators have to say what they do with it.
+
+<Chart slug="sql-null-logic" />
+
 ## NULL can propagate through expressions
 
 A calculation involving an unknown value usually has an unknown result.

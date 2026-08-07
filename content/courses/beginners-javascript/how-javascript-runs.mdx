@@ -167,6 +167,12 @@ That's the whole "event loop."
 The key rule: **microtasks run to completion before the next task
 starts.** That tiny rule explains a lot of surprising orderings.
 
+Laid out on a clock, the rules stop needing to be memorised. A task runs
+to completion, the microtask queue drains entirely, and only then may the
+browser paint.
+
+<Chart slug="event-loop-phases" />
+
 ## A famous ordering puzzle
 
 Try predicting the output *before* running.

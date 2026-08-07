@@ -183,6 +183,12 @@ chunks of a file when your filter rules them out, and why Parquet
 plus Polars is a much better pairing than CSV plus Polars.
 </Callout>
 
+The prediction is about bytes read, and it is easy to make concrete:
+selecting three columns out of thirty reads a tenth of the file in a
+column store and all of it in a row store.
+
+<Chart slug="columnar-vs-row-io" />
+
 ## Check your understanding
 
 <MultipleChoice

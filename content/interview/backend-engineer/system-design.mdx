@@ -37,6 +37,12 @@ memory and network hierarchy costs, and how far apart they are.
 
 <Chart slug="memory-latency-ladder" />
 
+One more habit worth having: quote latency as a percentile, never as a
+mean. The distribution is skewed enough that the average describes almost
+nobody's experience.
+
+<Chart slug="latency-percentiles" />
+
 ### What is a load balancer and how does it distribute traffic?
 
 A load balancer sits in front of a pool of servers and spreads requests so
@@ -130,6 +136,11 @@ requests to stay consistent; an **AP** system (e.g. Dynamo-style) keeps
 serving and reconciles later. Since partitions are unavoidable, CAP is really
 a choice between C and A when one occurs.
 
+The theorem is easiest to hold onto as the three pairs you could pick and
+the one that is not actually available to you.
+
+<Chart slug="cap-theorem-grid" />
+
 ### What consistency models should you know?
 
 **Strong consistency**: every read reflects the most recent write (as if one
@@ -203,6 +214,12 @@ the system, one database, one load balancer, one cache. Remove it with
 **redundancy**: multiple app servers, replicated databases with failover,
 load balancers in active-passive pairs, and multi-availability-zone
 deployment. The goal is that no single machine's death causes an outage.
+
+Removing the single point of failure is only half of it. The other half
+is making sure a failing dependency is not kept failing by the traffic
+still being sent to it.
+
+<Chart slug="circuit-breaker-states" />
 
 ### SQL or NoSQL at scale, how do you choose?
 

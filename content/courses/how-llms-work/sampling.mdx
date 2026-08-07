@@ -152,6 +152,12 @@ print(f"  nucleus holds {len(kept)} token(s): {kept}")
   ]}
 />
 
+Top-k and top-p answer the same question with different rules, and they
+disagree exactly where it matters: when the model is confident, and when
+it is not.
+
+<Chart slug="topk-topp-cutoff" />
+
 ## Watch randomness accumulate
 
 One sampled token changes the context for the next prediction, so

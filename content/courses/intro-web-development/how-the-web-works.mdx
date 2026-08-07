@@ -32,6 +32,12 @@ same page can adapt to a phone screen, why you can zoom text, and why
 a page can keep working interactively without talking to the server
 again.
 
+How long that round trip takes is something browsers now measure in
+specific, named ways, because "the page feels slow" turned out to mean
+three different problems.
+
+<Chart slug="core-web-vitals" />
+
 ## The three languages, one page
 
 Here's a complete, self-contained page that uses all three languages
@@ -99,6 +105,12 @@ A few things to notice:
 - The `<style>` and `<script>` blocks live *inside* the HTML here. In
   the CSS and JavaScript lessons you'll move them into their own
   files, the way real projects do.
+
+The JavaScript is the expensive one of the three. It is not just
+downloaded, it is parsed and compiled before it runs, and on a phone that
+second cost is larger than the first.
+
+<Chart slug="bundle-parse-cost" />
 
 ## Where your lessons run
 

@@ -69,6 +69,12 @@ split) to make the trees even more diverse. So: random forest is a kind of
 bagging, which is a kind of ensemble.
 </Callout>
 
+Averaging cuts variance, but only to the extent the members disagree.
+That is the whole reason for bootstrap samples and random feature
+subsets: correlated trees average to almost nothing.
+
+<Chart slug="ensemble-variance" />
+
 ## Trick one: bootstrap samples (bagging)
 
 How do you get many *different* trees from one dataset? The first idea is

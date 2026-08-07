@@ -228,6 +228,12 @@ flowchart TD
     Guard --> Trust["A metric you<br/>can defend"]
 ```
 
+The clearest example of a metric that hides its own composition is
+retention. One aggregate curve can be flat while every cohort inside it is
+declining, simply because newer cohorts keep being added.
+
+<Chart slug="cohort-retention" />
+
 ## Check your understanding
 
 <MultipleChoice
