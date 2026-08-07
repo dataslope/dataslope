@@ -30,11 +30,11 @@ sparingly, to highlight or differentiate.
 ### Tonal shades (100–900)
 
 Each hue has a full tonal ramp exposed as CSS variables in `app/brand.css`
-(`--ds-<hue>-<step>`) and previewable at `/color-test`. **Prefer the `500`
-shade** (the primary/base color); the other steps exist for when a lighter or
-darker tone is required (backgrounds, borders, hover states, AA-legible text on
-white, and telling chart/diagram series apart). `500` = the brand color; the
-`ink` text anchors that clear WCAG AA body text on white are noted per hue.
+(`--ds-<hue>-<step>`) and previewable at `/dashboard/admin/color-test`.
+**Prefer the `500` shade** (the primary/base color); the other steps exist for
+when a lighter or darker tone is required (backgrounds, borders, hover states,
+AA-legible text on white, and telling chart/diagram series apart). `500` = the
+brand color; the `ink` text anchors that clear WCAG AA body text on white are noted per hue.
 
 **Primary hues**
 
@@ -96,8 +96,8 @@ Five steps, four scripts. Candidates live in R2 until someone picks the
 keepers; only the keepers reach git.
 
 1. **Author** the prompt in `data/illustration-prompts.json` (one source of
-   truth: the `/illustration-prompts` gallery, the in-lesson `<Figure>`, and
-   every script read it). `lesson` must equal the MDX file stem.
+   truth: the `/dashboard/admin/illustration-prompts` gallery, the in-lesson
+   `<Figure>`, and every script read it). `lesson` must equal the MDX file stem.
 2. **Generate** — `scripts/generate-illustrations.mjs`, OpenAI `gpt-image-2`,
    **quality `low`**, **size `1536x1024`**, always via the **Batch API**.
 3. **Remove the background** — `scripts/remove-background-kie.mjs`, Recraft
@@ -136,11 +136,11 @@ node scripts/promote-illustrations.mjs python-basics-loops python-basics-sets
 
 ### Reviewing, and the regeneration queue
 
-`/illustration-prompts` is the review surface and is **admin-only**: the page is
-a static shell that fetches everything from `GET
+`/dashboard/admin/illustration-prompts` is the review surface and is
+**admin-only**: the page is a static shell that fetches everything from `GET
 /api/admin/illustration-prompts` behind `requireAdmin`, so a non-admin gets an
-access-denied notice rather than the prompt corpus. The footer link stays
-public; following it just shows the notice.
+access-denied notice rather than the prompt corpus. Its sidebar entry is
+reachable without a session on purpose; following it just shows the notice.
 
 It renders a grid of the **background-removed WebP only** (the file the site
 serves), each over the live page background so the theme pill is the judgement
@@ -229,8 +229,9 @@ Candidates expire after **14 days**, applied by
 `.github/workflows/r2-illustrations-lifecycle.yml` (run it via
 workflow_dispatch, or it re-applies on push when the retention window is
 edited). Cloudflare does the deleting server-side, so nothing polls. That is
-the review window: generate, review in `/illustration-prompts`, promote the
-keepers inside a fortnight. Promotion writes its own encoded copy into
+the review window: generate, review in
+`/dashboard/admin/illustration-prompts`, promote the keepers inside a
+fortnight. Promotion writes its own encoded copy into
 `public/images/`, so an expired candidate that was already promoted still
 serves fine — what you lose is the pristine PNG, and with it the ability to
 re-promote at a different quality without paying to regenerate.
@@ -386,11 +387,77 @@ backgrounds — black linework is crisp on `#ffffff` and nearly invisible on
 colours, never in black, white, or a single hue.** Polychrome subjects survive
 both themes; monochrome ones do not.
 
-Check both themes with the toggle on `/illustration-prompts`, which renders
-each cut-out over the live page background for exactly this reason. A cut-out
+Check both themes with the toggle on
+`/dashboard/admin/illustration-prompts`, which renders each cut-out over the
+live page background for exactly this reason. A cut-out
 that fails one theme is what the "mark for regeneration" button is for.
 
 ---
+
+## Charts
+
+Data-driven figures in lessons (a normal density, a sampling distribution, a
+power curve) are **Observable Plot specs rendered to SVG at build time**, not a
+chart library shipped to the browser.
+
+### The pipeline
+
+1. **Author** a spec at `charts/<slug>.mjs`. It exports `title` (the figure's
+   accessible name, required), an optional `caption`, and `render()` returning
+   `plot({...})` from `charts/_theme.mjs`.
+2. **Build** — `npm run build:charts` renders every spec into
+   `lib/generated/charts.js` (gitignored; its committed `.d.ts` types it). Runs
+   from `dev`, `build`, and `postinstall`.
+3. **Place** it in MDX: `<Chart slug="<slug>" />`. The component inlines the
+   SVG; no import needed, it is registered globally in `mdx-components.tsx`.
+
+### Why build-time
+
+Course MDX compiles **at request time inside the Worker** (`dynamic: true` in
+`source.config.ts`), against a gzipped 10 MiB ceiling. A chart library imported
+by an MDX component would land in that bundle. Rendering here means Plot is a
+devDependency that never ships: the app imports a string.
+
+### Why the SVG is inlined, and never given a literal colour
+
+Dark mode is a `.dark` class toggled at runtime, not a `prefers-color-scheme`
+match, so a generated file referenced as `<img src="…svg">` could never follow
+it (an `<img>` cannot see page CSS) and a `<picture media>` would desync from
+the toggle. The SVG is therefore inlined and painted with:
+
+- `currentColor` — Plot's own default for axis text, ticks and gridlines, left
+  exactly as it emits them, so they follow the page foreground; and
+- `var(--ds-chart-*)` — chart-scoped role tokens that
+  `app/_components/mdx/Chart.module.css` maps to a different brand step per
+  theme (the `600`s on white, the `400`s on the near-black page).
+
+**Never write a hex into a spec.** Use `PRIMARY`, `SERIES`, `ACCENT`, `MUTED`
+from `_theme.mjs`. The build fails on any literal `fill`/`stroke` colour that
+survives into the output, because that is the one defect review cannot catch:
+it looks right in whichever theme the author had open.
+
+### Determinism
+
+The generated module is diffed on every build, so a spec that uses random data
+**must** draw from the seeded `rng()` / `normalSamples()` helpers in
+`_theme.mjs`. An unseeded `Math.random()` rewrites its chart on every run.
+
+The build gate hashes `charts/`, the build script, and the Plot version into
+one digest and exits before importing Plot when it matches. Rendering costs
+~5 ms per chart, so there is no per-chart cache: any edit re-renders everything.
+
+### Reviewing
+
+`/dashboard/admin/charts` draws every chart on both page surfaces at once,
+which is the only way to check the two-theme property while writing a spec.
+
+### The look
+
+Academic-minimal, in the spirit of ggplot2's `theme_minimal()`: transparent
+panel, no frame, no tick marks, faint horizontal rules only, labels placed in
+the plot rather than in a legend, and the page's own Inter tracked slightly
+tight. Chart junk is the enemy; the data is the ink.
+
 
 ## Prose style
 

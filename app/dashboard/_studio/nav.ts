@@ -1,16 +1,24 @@
-// Navigation model for the /create Studio shell: the routes the sidebar links
-// to, their labels + icons, and how to map the current pathname back to the
-// active entry (for highlight + breadcrumb). Kept data-only so the shell and
-// any future consumer share one source of truth.
+// Navigation model for the /dashboard Studio shell: the routes the sidebar
+// links to, their labels + icons, and how to map the current pathname back to
+// the active entry (for highlight + breadcrumb). Kept data-only so the shell
+// and any future consumer share one source of truth.
 import {
+  BookOpen,
+  ChartSpline,
   Code2,
   Database,
+  FlaskConical,
+  Image,
   Layers,
   LayoutGrid,
   ListTodo,
+  Mail,
+  Palette,
+  Shield,
+  Sparkle,
   SquareTerminal,
   User,
-  Shield,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
@@ -25,10 +33,13 @@ export type StudioRouteKey =
   | "admin";
 
 export interface StudioNavItem {
-  key: StudioRouteKey;
+  key: string;
   label: string;
   href: string;
   icon: LucideIcon;
+  /** Leaves the Studio shell (its own chrome takes over). Opens in a new tab
+   *  so the dashboard stays put behind it. */
+  external?: boolean;
 }
 
 /** The "Create" group: the hub plus the four builders. */
@@ -40,8 +51,84 @@ export const CREATE_ITEMS: StudioNavItem[] = [
   { key: "quiz", label: "Quiz Set", href: "/dashboard/create/quiz", icon: Layers },
 ];
 
+/**
+ * The "Admin" group, previously a row of tabs inside the admin pages
+ * (`_components/AdminTabs.tsx`). Two bands, separated by a rule in the
+ * sidebar:
+ *
+ *   • `data` — the account tools. Presentation-only, like every admin page:
+ *     each one calls a server-authorized endpoint, so a non-admin who opens
+ *     one sees an access-denied notice and never receives any data.
+ *   • `tools` — the build/design surfaces that used to hang off the site
+ *     footer under `next dev`. These are unauthenticated on purpose: they
+ *     render generated artifacts from this repo (the brand ramps, the chart
+ *     manifest, the auth email designs), not anyone's data. The one
+ *     exception, Illustration Prompts, keeps its own admin gate because its
+ *     corpus comes from an admin-only endpoint.
+ */
+export interface AdminNavItem extends StudioNavItem {
+  band: "data" | "tools";
+}
+
+export const ADMIN_ITEMS: AdminNavItem[] = [
+  { key: "admin-users", label: "Users", href: "/dashboard/admin", icon: Users, band: "data" },
+  {
+    key: "admin-test-users",
+    label: "Test Users",
+    href: "/dashboard/admin/test-users",
+    icon: FlaskConical,
+    band: "data",
+  },
+  {
+    key: "admin-ai-usage",
+    label: "AI Usage",
+    href: "/dashboard/admin/ai-usage",
+    icon: Sparkle,
+    band: "data",
+  },
+  {
+    key: "admin-charts",
+    label: "Charts",
+    href: "/dashboard/admin/charts",
+    icon: ChartSpline,
+    band: "tools",
+  },
+  {
+    key: "admin-color-test",
+    label: "Color Test",
+    href: "/dashboard/admin/color-test",
+    icon: Palette,
+    band: "tools",
+  },
+  {
+    key: "admin-illustrations",
+    label: "Illustration Prompts",
+    href: "/dashboard/admin/illustration-prompts",
+    icon: Image,
+    band: "tools",
+  },
+  {
+    key: "admin-email-preview",
+    label: "Email Preview",
+    href: "/dashboard/admin/email-preview",
+    icon: Mail,
+    band: "tools",
+  },
+  // Fumadocs Dev is a docs collection with its own DocsLayout sidebar, so it
+  // can't nest inside this shell without stacking two navigations. It stays at
+  // its own route and opens in a new tab.
+  {
+    key: "admin-fumadocs",
+    label: "Fumadocs Dev",
+    href: "/fumadocs-dev",
+    icon: BookOpen,
+    band: "tools",
+    external: true,
+  },
+];
+
 /** Standalone dashboard pages linked below the Create group. Admin is filtered
- *  to admins by the shell. */
+ *  by the shell. */
 export const PAGE_ITEMS: StudioNavItem[] = [
   {
     key: "playground",
@@ -79,4 +166,22 @@ export function activeKeyForPath(pathname: string): StudioRouteKey {
   if (path.startsWith("/dashboard/account")) return "account";
   if (path.startsWith("/dashboard/admin")) return "admin";
   return "hub";
+}
+
+/** The admin sub-item a pathname is on, or null. `/dashboard/admin` is the
+ *  Users page, so it only matches exactly; every other entry also claims its
+ *  nested routes. */
+export function activeAdminItem(pathname: string): AdminNavItem | null {
+  const path = pathname.replace(/\/+$/, "") || "/";
+  if (path === "/dashboard/admin") return ADMIN_ITEMS[0];
+  return (
+    ADMIN_ITEMS.find(
+      (i) => !i.external && i.href !== "/dashboard/admin" && path.startsWith(i.href),
+    ) ?? null
+  );
+}
+
+/** Breadcrumb tail for an admin route: "Admin / Test Users". */
+export function adminCrumbFor(pathname: string): string | null {
+  return activeAdminItem(pathname)?.label ?? null;
 }

@@ -26,6 +26,11 @@
 //                                comments. A bare "-" glyph marking an empty
 //                                table cell is a typographic convention, not
 //                                prose, so `{col.type || "<em dash>"}` passes.
+//   - charts/**/*.mjs          same rule as app/: a chart's `title` and
+//                                `caption` exports are read on the lesson page
+//                                exactly like the prose around them, and the
+//                                MDX linter above cannot see them because they
+//                                live in a spec rather than in content/.
 //
 // Used both as a CLI (`node scripts/check-prose.mjs [files...]`, defaults to
 // all three roots) and as a library by __tests__/proseStyle.test.ts.
@@ -112,6 +117,8 @@ export function proseFiles(root = process.cwd()) {
   const files = [
     ...walk(path.join(root, "content"), (n) => n.endsWith(".mdx")).map((f) => [f, "mdx"]),
     ...walk(path.join(root, "app"), (n) => /\.tsx?$/.test(n)).map((f) => [f, "code"]),
+    // Chart specs: their `title`/`caption` exports render as lesson prose.
+    ...walk(path.join(root, "charts"), (n) => n.endsWith(".mjs")).map((f) => [f, "code"]),
   ];
   const prompts = path.join(root, "data", "illustration-prompts.json");
   if (existsSync(prompts)) files.push([prompts, "json"]);

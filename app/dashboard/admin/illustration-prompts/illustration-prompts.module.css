@@ -21,7 +21,10 @@
   --badge-muted-fg: #6b7280;
 
   box-sizing: border-box;
-  min-height: 100vh;
+  /* Not a full-bleed page any more: it renders inside the dashboard shell, as
+     a panel that keeps painting the *site's* backgrounds so a cut-out is
+     judged on the surface it actually ships on. */
+  border-radius: 1rem;
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans, system-ui, sans-serif);
@@ -47,7 +50,7 @@
 .inner {
   box-sizing: border-box;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 5rem;
+  padding: 1.75rem 1.5rem 3rem;
   max-width: 1440px;
 }
 
@@ -55,20 +58,6 @@
   margin-bottom: 1.5rem;
   padding-bottom: 1.25rem;
   border-bottom: 1px solid var(--border);
-}
-
-.headerRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.title {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
 }
 
 .subtitle {
@@ -88,31 +77,6 @@
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   color: var(--fg);
-}
-
-/* Docked theme pill: pinned to the viewport so it stays reachable through the
-   whole scroll. The translucent backing keeps it legible when a bright
-   illustration scrolls underneath. */
-.themeDock {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  padding: 0.3rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
-}
-
-@media (max-width: 720px) {
-  .themeDock {
-    top: 0.6rem;
-    right: 0.6rem;
-  }
 }
 
 /* ── Sections (People / Objects & scenes) ───────────────────────────────── */

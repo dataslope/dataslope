@@ -1,20 +1,12 @@
 /* ─── Color Theme Test Page ───────────────────────────────────────────────── */
 
+/* The page now renders inside the dashboard shell, so this root no longer
+   paints a full-bleed surface or claims the viewport height; it only scopes
+   the playground variables the swatches below are demonstrating. `color` is
+   still set from --text because every preview inside depends on it. */
 .root {
-  min-height: 100vh;
-  background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
-}
-
-/* ── Header / theme switcher ── */
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  padding: 10px 16px;
 }
 
 .themeGrid {
@@ -87,33 +79,20 @@
   text-overflow: ellipsis;
 }
 
-/* ── Main content ── */
+/* ── Main content ──
+   Section chrome (surface, radius, title) now comes from the dashboard's
+   <Panel>/<PanelHeader>, so a section only contributes spacing. The panel
+   background is deliberately the *dashboard's*, not --bg2: the swatches are
+   what demonstrate the editor theme, and a panel painted in the theme under
+   test would tint every sample sitting on it. */
 .content {
-  padding: 24px;
-  max-width: 960px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 1.5rem;
 }
 
-/* ── Section ── */
 .section {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-}
-
-.sectionTitle {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0 0 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
+  margin-top: 1.5rem;
 }
 
 /* ── Color swatches ── */

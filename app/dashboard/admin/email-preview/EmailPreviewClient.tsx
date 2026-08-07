@@ -25,7 +25,7 @@ export function PreviewFrame({ title, html }: { title: string; html: string }) {
       srcDoc={html}
       onLoad={fit}
       style={{ height }}
-      className="w-full rounded-xl border border-[var(--ds-gray-200)] bg-white"
+      className="w-full rounded-xl bg-white shadow-[0_0_0_1px_rgba(113,113,122,0.14)]"
     />
   );
 }
@@ -79,16 +79,14 @@ export function SendTestEmail({ templates }: { templates: TemplateChoice[] }) {
   const sending = status.type === "sending";
 
   return (
-    <div className="rounded-xl border border-[var(--ds-gray-200)] bg-[var(--ds-gray-50)] p-4">
+    <div>
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium text-[#121212] dark:text-white">
-          Send a live test to your inbox:
-        </label>
         <select
+          aria-label="Email template to send"
           value={key}
           onChange={(e) => setKey(e.target.value as PreviewKey)}
           disabled={sending}
-          className="rounded-lg border border-[var(--ds-gray-200)] bg-white px-3 py-1.5 text-sm text-[#121212] disabled:opacity-60 dark:bg-[#1a1a1a] dark:text-white"
+          className="rounded-lg bg-zinc-500/[0.07] px-3 py-1.5 text-sm disabled:opacity-60 dark:bg-white/[0.07]"
         >
           {templates.map((t) => (
             <option key={t.key} value={t.key}>
@@ -100,18 +98,18 @@ export function SendTestEmail({ templates }: { templates: TemplateChoice[] }) {
           type="button"
           onClick={send}
           disabled={sending}
-          className="rounded-lg bg-[var(--ds-blue-700)] px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="rounded-lg bg-[var(--ds-blue-600)] px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           {sending ? "Sending…" : "Send test email"}
         </button>
       </div>
       {status.type === "ok" && (
-        <p className="mt-3 text-sm text-[var(--ds-green-700)]">{status.msg}</p>
+        <p className="mt-3 text-sm text-emerald-700 dark:text-emerald-400">{status.msg}</p>
       )}
       {status.type === "error" && (
-        <p className="mt-3 text-sm text-[var(--ds-red-700)]">{status.msg}</p>
+        <p className="mt-3 text-sm text-red-700 dark:text-red-400">{status.msg}</p>
       )}
-      <p className="mt-3 text-xs text-[var(--ds-gray-500)]">
+      <p className="mt-3 text-xs text-muted-foreground">
         Admin-only. The email is sent to your own account address using a sample
         (non-functional) link.
       </p>

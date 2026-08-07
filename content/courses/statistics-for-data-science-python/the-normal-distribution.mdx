@@ -54,6 +54,8 @@ The normal has exactly two parameters: the mean μ sets the
 Change μ and the curve slides; change σ and it gets wider or
 narrower. The shape is always the same symmetric bell.
 
+<Chart slug="normal-mean-and-sd" />
+
 <CodeBlock
   adapter="python"
   files={[
@@ -159,13 +161,7 @@ If exam scores are normal with μ = 100, σ = 15, then ~95% of
 people score between 70 and 130; a score of 145 (3σ out) is genuinely
 rare.
 
-```mermaid
-flowchart TD
-  A["Normal centered at mu"] --> B["mu ± 1 sigma<br/>~68% of values"]
-  A --> C["mu ± 2 sigma<br/>~95% of values"]
-  A --> D["mu ± 3 sigma<br/>~99.7% of values"]
-  D --> E["Outside 3 sigma<br/>~0.3%, rare"]
-```
+<Chart slug="normal-68-95-997" />
 
 <CodeBlock
   adapter="python"

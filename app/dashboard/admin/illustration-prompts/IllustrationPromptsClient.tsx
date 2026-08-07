@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Interactive shell for the `/illustration-prompts` review gallery.
+ * Interactive shell for the `/dashboard/admin/illustration-prompts` review gallery.
  *
  * Three things shape this component:
  *
@@ -42,7 +42,6 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import Link from "@/app/_components/Link";
-import { ThemePillToggle } from "@/app/_components/ThemePillToggle";
 import { useSession } from "@/lib/auth/client";
 import type {
   GalleryEntry,
@@ -702,9 +701,6 @@ export function IllustrationPromptsClient() {
     return (
       <>
         <header className={styles.header}>
-          <div className={styles.headerRow}>
-            <h1 className={styles.title}>Illustration prompts</h1>
-          </div>
           <p className={styles.subtitle}>
             Every generated illustration as the site serves it: the
             background-removed WebP over the live page background. Flip the theme
@@ -860,13 +856,13 @@ export function IllustrationPromptsClient() {
   };
 
   return (
+    // `styles.page` still paints the site's own backgrounds (#ffffff / #121212)
+    // rather than inheriting the dashboard's, because judging a cut-out means
+    // seeing it on the exact surface the lesson serves it on. The dashboard's
+    // main background is a near-neighbour (#161616 in dark), which would make
+    // this page quietly lie. The theme pill it used to dock itself is now in
+    // the shell's top bar.
     <div className={styles.page}>
-      {/* Docked rather than inline in the header: the page is a long scroll of
-          artwork, and flipping the background under it is the point, so the
-          pill has to stay reachable wherever the reader has got to. */}
-      <div className={styles.themeDock}>
-        <ThemePillToggle />
-      </div>
       <div className={styles.inner}>{body()}</div>
     </div>
   );

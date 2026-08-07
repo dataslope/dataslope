@@ -4,7 +4,7 @@
  * GPT Image 2 (https://developers.openai.com/api/docs/models/gpt-image-2).
  *
  * Reads the prompt definitions from `data/illustration-prompts.json` (the same
- * source of truth the `/illustration-prompts` gallery and the in-lesson
+ * source of truth the `/dashboard/admin/illustration-prompts` gallery and the in-lesson
  * `<IllustrationPrompt>` cards render), builds each generation prompt in the
  * Dataslope house style (an isometric illustration of the subject, in the four
  * brand colors), and writes one PNG per prompt named `<id>.png`.

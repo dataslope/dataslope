@@ -1,5 +1,5 @@
 // The illustration regeneration queue (lib/illustrations/regenMarks.ts), the
-// D1 layer behind the "mark for regeneration" control on /illustration-prompts.
+// D1 layer behind the "mark for regeneration" control on /dashboard/admin/illustration-prompts.
 //
 // D1 is stubbed rather than run: what is worth pinning here is the contract the
 // gallery and a later regeneration run both depend on, namely that a note

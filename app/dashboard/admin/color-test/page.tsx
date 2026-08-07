@@ -10,8 +10,9 @@ import {
   applyThemePalette,
   getStoredEditorTheme,
   setStoredEditorTheme,
-} from "../_components/playgroundTheme";
-import "../_components/playground.css";
+} from "@/app/_components/playgroundTheme";
+import "@/app/_components/playground.css";
+import { AdminPageHeader, Panel, PanelBody, PanelHeader } from "../_components/shared";
 import styles from "./color-test.module.css";
 
 interface SwatchDef {
@@ -127,10 +128,25 @@ export default function ColorTestPage() {
   }
 
   return (
-    <div className={`playground-root ${styles.root}`}>
-      {/* ── Theme switcher ── */}
-      <header className={styles.header}>
-        <div className={styles.themeGrid}>
+    <>
+      <AdminPageHeader
+        title="Color Test"
+        description="Every editor theme's resolved palette, plus the brand ramps from app/brand.css. Pick a theme to re-resolve every swatch against it; click a hex to copy it."
+      />
+
+      {/* The preview surfaces below paint themselves from the *playground*
+          variables (--bg, --text, --theme-primary …), which is the whole point
+          of the page: they have to show the chosen editor theme, not the
+          dashboard's. `playground-root` is what scopes those variables, so it
+          stays wrapped around this subtree and nothing outside it is touched. */}
+      <div className={`playground-root ${styles.root}`}>
+        <Panel>
+          <PanelHeader
+            title="Editor theme"
+            description="Drives the resolved values in every panel below."
+          />
+          <PanelBody>
+            <div className={styles.themeGrid}>
           {ALL_THEMES.map(({ value, label }) => {
             const p = THEME_PALETTES[value];
             const isLight = LIGHT_THEMES.has(value);
@@ -156,15 +172,15 @@ export default function ColorTestPage() {
                     />
                   )}
                 </div>
-                <span className={styles.themeLabel}>{label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </header>
+                  <span className={styles.themeLabel}>{label}</span>
+                </button>
+              );
+            })}
+            </div>
+          </PanelBody>
+        </Panel>
 
-      {/* ── Content ── */}
-      <main className={styles.content}>
+        <div className={styles.content}>
         {/* Color swatches */}
         <Section title="Color Variables">
           <div className={styles.swatchGrid}>
@@ -330,13 +346,15 @@ export default function ColorTestPage() {
                 </code>
               </pre>
             </div>
-          </div>
-        </Section>
-      </main>
-    </div>
+            </div>
+          </Section>
+        </div>
+      </div>
+    </>
   );
 }
 
+/** A titled block of preview surfaces, in the dashboard's panel language. */
 function Section({
   title,
   children,
@@ -345,9 +363,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className={styles.section}>
-      <h2 className={styles.sectionTitle}>{title}</h2>
-      {children}
-    </section>
+    <Panel className={styles.section}>
+      <PanelHeader title={title} />
+      <PanelBody>{children}</PanelBody>
+    </Panel>
   );
 }

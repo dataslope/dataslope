@@ -1,0 +1,115 @@
+/*
+ * Theme mapping for the build-time Observable Plot charts.
+ *
+ * The rendered SVG (see charts/_theme.mjs and scripts/build-charts.mjs) never
+ * contains a literal colour. Axis text, ticks and gridlines are Plot's own
+ * `currentColor`, so they follow the page foreground for free; everything the
+ * spec draws references one of the `--ds-chart-*` role tokens defined here.
+ *
+ * That indirection is the whole dark-mode story. The brand `500` shades in
+ * app/brand.css are tuned to sit on white and go muddy on the near-black page,
+ * so each role resolves to a different step per theme, exactly the way
+ * docs.css maps the brand hues onto Fumadocs tokens. One rendered SVG, both
+ * themes, no JavaScript and no second asset.
+ *
+ * `data-force` pins a subtree to one theme regardless of the page, which the
+ * admin gallery (/dashboard/admin/charts) uses to show light and dark side by
+ * side. Ordinary pages never set it.
+ */
+
+.chart,
+.chart[data-force="light"] {
+  /* Categorical wheel, brand 600s: AA-legible on white and distinct from one
+     another at the widths a chart draws (a 1.5px line, a small point). */
+  --ds-chart-1: var(--ds-blue-600);
+  --ds-chart-2: var(--ds-orange-600);
+  --ds-chart-3: var(--ds-green-700);
+  --ds-chart-4: var(--ds-purple-600);
+  --ds-chart-5: var(--ds-teal-700);
+  --ds-chart-6: var(--ds-red-600);
+  --ds-chart-7: var(--ds-yellow-800);
+  /* Roles */
+  --ds-chart-accent: var(--ds-red-700);
+  --ds-chart-muted: var(--ds-gray-400);
+  /* Plot's own token, for label halos and tip backdrops: the page surface. */
+  --ds-chart-surface: #ffffff;
+}
+
+:global(.dark) .chart,
+.chart[data-force="dark"] {
+  /* The 400s on the dark page: same hue order, re-lit for a dark surface. */
+  --ds-chart-1: var(--ds-blue-400);
+  --ds-chart-2: var(--ds-orange-400);
+  --ds-chart-3: var(--ds-green-400);
+  --ds-chart-4: var(--ds-purple-400);
+  --ds-chart-5: var(--ds-teal-400);
+  --ds-chart-6: var(--ds-red-400);
+  --ds-chart-7: var(--ds-yellow-400);
+  --ds-chart-accent: var(--ds-red-400);
+  --ds-chart-muted: var(--ds-gray-500);
+  --ds-chart-surface: #121212;
+}
+
+/* A forced subtree also has to carry its own foreground, or `currentColor`
+   (the axes and labels) would still inherit the page's. */
+.chart[data-force="light"] {
+  color: var(--ds-gray-900);
+}
+.chart[data-force="dark"] {
+  color: var(--ds-gray-100);
+}
+
+.figure {
+  margin: 2.25rem auto;
+  width: 100%;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+}
+
+.chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.caption {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-fd-muted-foreground);
+}
+
+/* Dev-only "no chart with this slug" hint, mirroring <Figure>'s pending
+   treatment so the two read as the same family. */
+.pending {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.5rem auto;
+  max-width: 640px;
+  border: 1px dashed var(--color-fd-border);
+  border-radius: 0.625rem;
+  background-color: var(--color-fd-muted);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-fd-muted-foreground);
+}
+
+.pendingIcon {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+}
+
+.pending code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+}

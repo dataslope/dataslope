@@ -9,7 +9,7 @@
  * whole queue can be read, dumped, or wiped by a coding agent without touching
  * accounts or sessions.
  *
- * Marks are written from `/illustration-prompts` (admin-only) via
+ * Marks are written from `/dashboard/admin/illustration-prompts` (admin-only) via
  * `/api/admin/illustration-prompts`, and read back by whoever regenerates the
  * art. The full workflow is written up in
  * `agent-outputs/20260803-0900-illustration-regeneration-queue.md`.

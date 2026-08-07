@@ -1,5 +1,5 @@
 /**
- * Admin-only data + write endpoint behind the `/illustration-prompts` review
+ * Admin-only data + write endpoint behind the `/dashboard/admin/illustration-prompts` review
  * gallery.
  *
  * The page itself stays a statically prerendered shell (the codebase's "auth
