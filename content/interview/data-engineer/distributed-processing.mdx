@@ -95,6 +95,12 @@ disk, serializes it, and moves it over the **network** between executors,
 by far the most costly operation in a Spark job. Minimizing shuffles
 (and the data volume shuffled) is the core of Spark tuning.
 
+Why it is expensive, in one figure: a shuffle turns memory access into
+disk and network access, and those are four and five orders of magnitude
+further away.
+
+<Chart slug="memory-latency-ladder" />
+
 ### What is the difference between narrow and wide dependencies?
 
 A **narrow** dependency means each parent partition feeds **at most one**
@@ -123,6 +129,12 @@ the hot key to spread it across partitions, then aggregate in two steps);
 filtering or handling null/sentinel keys separately; enabling Spark's
 **Adaptive Query Execution (AQE)** skew-join handling, which splits large
 partitions automatically.
+
+Skew is the reason an average partition size tells you nothing about how
+long a stage takes. Four groups with an identical mean and four
+different shapes:
+
+<Chart slug="bar-hides-distribution" />
 
 ### What is a broadcast join and when should you use it?
 
@@ -184,6 +196,12 @@ will OOM the driver and defeats the point of distributing the work. Use it
 only for small results. To inspect data use `show(n)` or `take(n)`; to
 persist results, `write` them out in parallel from the executors rather
 than collecting to the driver first.
+
+A related tail effect: a stage waits for its slowest task, so a small
+per-task chance of being slow becomes near-certainty across enough
+partitions.
+
+<Chart slug="tail-latency-fanout" />
 
 ### What is `groupByKey` vs `reduceByKey`, and why does it matter?
 
