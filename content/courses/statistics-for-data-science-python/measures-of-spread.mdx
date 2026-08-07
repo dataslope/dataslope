@@ -93,8 +93,8 @@ rng = np.random.default_rng(0)
 small = rng.normal(50, 5, size=20)
 large = rng.normal(50, 5, size=20000)
 
-print(f"Same process, n=20    -> range = {small.ptp():.1f}")
-print(f"Same process, n=20000 -> range = {large.ptp():.1f}")
+print(f"Same process, n=20    -> range = {np.ptp(small):.1f}")
+print(f"Same process, n=20000 -> range = {np.ptp(large):.1f}")
 print("\\nThe range grows with sample size even though the spread did not.")
 print("(np.ptp = 'peak to peak' = max - min)")
 `,

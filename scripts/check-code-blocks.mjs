@@ -226,13 +226,27 @@ try {
 
 // The blocks call fig.show() and plt.show(); neither has anywhere to draw
 // here, and a headless failure there is not a lesson bug.
+//
+// `display` is the other one. The worker installs it into builtins so a lesson
+// can render a DataFrame as a table (see pyodide-worker.ts), and without the
+// same shim here every block that uses it fails with NameError: a runner gap
+// reported as seven broken lessons.
 py.runPython(`
+import builtins
 import matplotlib
 matplotlib.use("Agg")
 import plotly.io as pio
 pio.renderers.default = "json"
 import plotly.graph_objects as _go
 _go.Figure.show = lambda self, *a, **k: None
+
+def display(*objs, **kwargs):
+    """Stand-in for the worker's rich display: printing is enough to prove the
+    object exists and can be rendered."""
+    for o in objs:
+        print(o)
+
+builtins.display = display
 `);
 
 // Pyodide runs Python synchronously, so the only way to stop a block that
@@ -404,8 +418,12 @@ for (const [i, b] of blocks.entries()) {
  *   • polars ships a Rust thread pool. A browser worker gives it threads; Node
  *     does not, so the first parallel query panics and every later one finds
  *     the poisoned lock.
- *   • `pyodide_http` patches urllib onto `fetch` in the browser. Here a block
- *     that reads a URL gets Node's socket layer and no TLS.
+ *   • `pyodide_http` patches urllib onto `fetch` in the browser, where it has
+ *     XMLHttpRequest to do it with. Node has neither, so `patch_all()` is a
+ *     no-op here and a block that reads a URL falls through to the real socket
+ *     layer and no TLS. This is the largest hole in the sweep: every
+ *     `sns.load_dataset(...)` block in the Seaborn course goes unchecked, and
+ *     closing it means a real HTTP shim rather than a flag.
  *
  * Reporting these as content failures is worse than not running the block at
  * all: it buries the real breakages (a deprecated argument, a dtype that

@@ -295,7 +295,10 @@ df["plan"] = df["plan"].astype(plan_order)
 print("Now plan is ORDERED:", df["plan"].cat.ordered)
 print("S < M is", df["plan"].iloc[0] < df["plan"].iloc[1])  # S < L -> True
 print()
-print("Median plan (valid because ordinal+ordered):", df["plan"].median())
+# The median of an ordinal is the middle *category*, which is what the codes
+# give you: pandas will not compute it for you (see the note below).
+median_plan = df["plan"].cat.categories[int(df["plan"].cat.codes.median())]
+print("Median plan (valid because ordinal+ordered):", median_plan)
 print()
 print(
     "region_code dtype is now:",
@@ -307,6 +310,17 @@ print(df["region_code"].value_counts())
     },
   ]}
 />
+
+<Callout type="info" title="Why the median is computed by hand here">
+Pandas will not call `.median()` on a categorical column, even an ordered
+one: it raises `TypeError: 'Categorical' with dtype category does not
+support operation 'median'`. That is a deliberate refusal rather than a
+gap. Pandas knows the *order* of your categories but not the *distances*
+between them, and the median it would have to return is a category rather
+than a number, so it declines to guess. Taking the median of
+`.cat.codes` and indexing back into `.cat.categories` does exactly what an
+ordinal median means: find the middle position, report the label there.
+</Callout>
 
 <Callout type="info" title="Likert scales: the gray zone">
 Survey scales ("Strongly disagree" … "Strongly agree", coded 1–5) are
