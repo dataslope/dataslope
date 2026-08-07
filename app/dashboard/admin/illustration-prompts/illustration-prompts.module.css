@@ -60,22 +60,33 @@
   border-bottom: 1px solid var(--border);
 }
 
-.subtitle {
-  margin: 0.75rem 0 0;
-  max-width: 64ch;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: var(--muted);
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  margin: 0;
 }
 
-.subtitle code {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.85em;
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
-.count {
-  font-variant-numeric: tabular-nums;
+.stat dt {
+  font-size: 0.68rem;
   font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.stat dd {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
   color: var(--fg);
 }
 
@@ -108,91 +119,103 @@
   color: var(--faint);
 }
 
-/* Column grid: as many cards per row as fit, each at least 300px so a
-   1536x1024 cut-out is still large enough to judge. Cards stretch to the row
-   height so the mark controls line up along the bottom of each row. */
+/* Column grid: as many items per row as fit, each at least 300px so a
+   1536x1024 cut-out is still large enough to judge. Cells stretch to the row
+   height so the mark controls line up along the bottom of each row. The
+   generous row gap replaces the padding the cards used to supply; without it
+   a cardless grid runs together vertically. */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
+  gap: 2.25rem 1.75rem;
   align-items: stretch;
 }
 
-/* ── Prompt card ────────────────────────────────────────────────────────── */
-.card {
+/* ── One illustration ───────────────────────────────────────────────────
+ *
+ * No card. The old layout put every item in a bordered, tinted box, which on
+ * a page whose whole job is judging a transparent cut-out against the page
+ * colour meant each image sat on a surface the site never serves it on. The
+ * only frame now is the dashed one around the artwork itself, which is also
+ * where queue state is shown. */
+.item {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.55rem;
   margin: 0;
-  padding: 0.85rem 0.9rem 0.9rem;
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  background: var(--card-bg);
+  padding: 0;
   scroll-margin-top: 1.5rem;
 }
 
-/* A queued card is tinted and outlined so a marked one is obvious while
-   scanning a dense grid; the button label says the same thing in words. */
-.cardMarked {
-  border-color: var(--ds-red-400, #ff807f);
-  background: color-mix(in srgb, var(--ds-red-500, #ff4f59) 7%, var(--card-bg));
+/* Queue state, on the artwork's own frame. Solid rather than dashed, so a
+   marked item reads at a glance in a dense grid without a fill. */
+.itemMarked .imageCutout,
+.itemMarked .imagePending {
+  border-style: solid;
+  border-color: var(--ds-red-500, #ff4f59);
 }
 
-/* Redrawn since anyone last signed it off: green until Approve is pressed,
-   which is what makes a batch of regenerated art findable in the grid. Never
-   applied at the same time as .cardMarked (see `tint` at the call site), so
-   the two tints cannot mix. */
-.cardRegenerated {
-  border-color: var(--ds-green-400, #66d361);
-  background: color-mix(in srgb, var(--ds-green-500, #20c621) 8%, var(--card-bg));
+.itemRegenerated .imageCutout,
+.itemRegenerated .imagePending {
+  border-style: solid;
+  border-color: var(--ds-green-500, #20c621);
 }
 
-/* Says in words what the tint says in colour, and carries the date. */
-.regenBanner {
-  display: flex;
+/* Wraps the artwork so the state chip can sit on it. */
+.frame {
+  position: relative;
+}
+
+/* On the artwork's top-left corner, over an opaque page-coloured pill so it
+   stays legible whatever the cut-out has underneath it. */
+.stateChip {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  margin: 0;
-  font-size: 0.72rem;
+  gap: 0.3rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--border);
+  font-size: 0.68rem;
   font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.stateChipMarked {
+  color: var(--ds-red-ink, #ba303a);
+}
+
+:global(html.dark) .stateChipMarked {
+  color: var(--ds-red-400, #ff807f);
+}
+
+.stateChipRegen {
   color: var(--ds-green-ink, #006f01);
 }
 
-:global(html.dark) .regenBanner {
+:global(html.dark) .stateChipRegen {
   color: var(--ds-green-300, #93e08e);
 }
 
-.cardTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+/* Trails the title as a quiet tag rather than claiming a row of its own. */
+.badgeMuted {
+  margin-left: 0.5rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--faint);
 }
 
 .file {
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--fg);
+  font-size: 0.72rem;
+  color: var(--faint);
   word-break: break-all;
   user-select: all;
-}
-
-.badge {
-  flex-shrink: 0;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  font-family: var(--font-mono, ui-monospace, monospace);
-}
-
-.badgeMuted {
-  background: var(--badge-muted-bg);
-  color: var(--badge-muted-fg);
 }
 
 /* The artwork links to itself, so a click opens the raw WebP in a new tab at
@@ -236,7 +259,15 @@
   color: var(--muted);
 }
 
-.cardTitle {
+/* Text block under the artwork: name, slug, where it renders, prompt. One
+   column, one left edge, so the grid reads down as well as across. */
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.itemTitle {
   margin: 0;
   font-size: 0.9rem;
   font-weight: 600;
@@ -281,36 +312,32 @@
   text-decoration: underline;
 }
 
-.usages {
+/* Where the illustration renders. Two lines, course then route, so the route
+   (the thing you scan for) starts on the same left edge as everything else in
+   the meta column instead of trailing off the course title. */
+.usage {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.05rem;
   min-width: 0;
-  margin-top: auto;
-  font-size: 0.75rem;
-}
-
-.usagesLabel {
-  color: var(--faint);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.usage {
-  color: var(--link);
   text-decoration: none;
+  color: var(--link);
 }
 
-.usage:hover {
+.usage:hover .usageRoute {
   text-decoration: underline;
 }
 
 .usageCourse {
-  color: var(--muted);
+  font-size: 0.72rem;
+  color: var(--faint);
 }
 
-/* Labelled button (copy prompt). */
+.usageRoute {
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
 .copyPrompt {
   display: inline-flex;
   align-items: center;
@@ -333,10 +360,14 @@
 /* ── Regeneration queue controls ─────────────────────────────────────────── */
 /* The mark + note pair writes to D1 `dataslope-illustrations` →
    `illustration_regen_marks`; a later regeneration run reads that table. */
+/* The mark controls sit at the bottom of a cell that no longer has a card to
+   pin them to, so a hairline does that job and `margin-top: auto` keeps them
+   on one line across a row however long the prompts above them run. */
 .regen {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  margin-top: auto;
   padding-top: 0.6rem;
   border-top: 1px solid var(--border-soft);
 }

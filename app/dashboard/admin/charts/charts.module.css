@@ -1,18 +1,165 @@
 /*
- * Layout for the admin chart gallery. The charts themselves are painted by
- * Chart.module.css (imported by the page), which is the same stylesheet a
- * lesson uses; everything here is the frame around them.
+ * Admin chart gallery.
+ *
+ * The charts themselves are painted by Chart.module.css (imported by the page
+ * and by ChartPane), which is the same stylesheet a lesson uses; everything
+ * here is the frame around them.
+ *
+ * Deliberately cardless. A figure on this page is being judged against two
+ * surfaces, white and #121212, and wrapping that in a third (the dashboard's
+ * tinted panel) put a grey rectangle between the eye and the only comparison
+ * the page exists to make. Structure comes from hairlines and alignment
+ * instead, so the two theme panes are the only filled shapes.
  */
 
+/* ── Summary line ── */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  margin: 0 0 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+}
+
+.stat dt {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.stat dd {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.statNote {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--faint);
+}
+
+.empty {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.empty code,
+.summary code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.9em;
+}
+
+/* ── One chart ── */
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* A rule between figures rather than a box around each: the separation is
+   real, the enclosure was not. */
+.item {
+  padding: 2.25rem 0;
+  border-top: 1px solid var(--divider);
+}
+
+.item:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.headMain {
+  min-width: 0;
+}
+
+.slug {
+  margin: 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.caption {
+  margin: 0.375rem 0 0;
+  max-width: 78ch;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.dims {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+/* ── Where it appears ── */
+.usedBy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.875rem;
+}
+
+.useLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  padding: 0.1875rem 0.5rem 0.1875rem 0.625rem;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--divider);
+  font-size: 0.8125rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition:
+    color 0.12s,
+    box-shadow 0.12s;
+}
+
+.useLink:hover {
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--faint);
+}
+
+.unplaced {
+  font-size: 0.8125rem;
+  color: var(--faint);
+  font-style: italic;
+}
+
+/* ── The two theme panes ── */
 .split {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.75rem;
+  margin-top: 1.125rem;
 }
 
 /* Side by side only when each pane still has room to render a 680px-wide
-   figure legibly; below that they stack, which is fine, the comparison just
-   takes a scroll. */
+   figure legibly; below that they stack, and the comparison takes a scroll. */
 @media (min-width: 1100px) {
   .split {
     grid-template-columns: 1fr 1fr;
@@ -24,8 +171,8 @@
    judged is the real thing. */
 .pane {
   position: relative;
-  border-radius: 0.75rem;
-  padding: 1.25rem 1rem 1rem;
+  border-radius: 0.625rem;
+  padding: 1.5rem 1rem 1rem;
   overflow: hidden;
 }
 
@@ -48,6 +195,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   opacity: 0.4;
+  pointer-events: none;
 }
 
 .light .paneLabel {
@@ -58,6 +206,49 @@
   color: #ffffff;
 }
 
+.expandBtn {
+  position: absolute;
+  top: 0.4375rem;
+  right: 0.5rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.625rem;
+  height: 1.625rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: none;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.12s,
+    background 0.12s;
+}
+
+.pane:hover .expandBtn,
+.expandBtn:focus-visible {
+  opacity: 1;
+}
+
+.light .expandBtn {
+  color: rgb(18 18 18 / 0.55);
+}
+
+.light .expandBtn:hover {
+  background: rgb(18 18 18 / 0.06);
+  color: #121212;
+}
+
+.dark .expandBtn {
+  color: rgb(255 255 255 / 0.55);
+}
+
+.dark .expandBtn:hover {
+  background: rgb(255 255 255 / 0.1);
+  color: #ffffff;
+}
+
 /* The figure wrapper carries `margin: 2.25rem auto` for prose flow; inside a
    preview pane that top margin is dead space. */
 .pane > :global(figure),
@@ -65,26 +256,95 @@
   margin: 0;
 }
 
-.dims {
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--muted, #6b7280);
-  white-space: nowrap;
+/* ── Expanded view ──
+   Keeps the pane's pinned theme (the class is applied alongside .overlay), so
+   the enlarged figure is still the one that ships, not a re-themed copy. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
 }
 
+.overlayBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  flex-shrink: 0;
+}
+
+.overlaySlug {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  opacity: 0.75;
+}
+
+.overlayTheme {
+  margin-left: 0.5rem;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.light .overlaySlug,
+.light .overlayClose {
+  color: #121212;
+}
+
+.dark .overlaySlug,
+.dark .overlayClose {
+  color: #ffffff;
+}
+
+.overlayClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: none;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.12s;
+}
+
+.overlayClose:hover {
+  opacity: 1;
+}
+
+/* Centres the figure in whatever space is left and lets it grow to a
+   comfortable reading size without stretching a 680px design to 2560px. */
+.overlayStage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem 3rem;
+  overflow: auto;
+}
+
+.overlayChart {
+  width: min(100%, 1200px);
+}
+
+/* ── Accessible-name disclosure ── */
 .details {
-  margin-top: 0.875rem;
+  margin-top: 1rem;
 }
 
 .summary {
   cursor: pointer;
   font-size: 0.8125rem;
-  color: var(--muted, #6b7280);
-}
-
-.summary code {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.9em;
+  color: var(--faint);
 }
 
 .title {
@@ -92,5 +352,78 @@
   max-width: 80ch;
   font-size: 0.8125rem;
   line-height: 1.6;
-  color: var(--muted, #6b7280);
+  color: var(--muted);
+}
+
+/* ── Pager ──
+   Route-segment pagination (see the note in the page), so these are ordinary
+   links and a page is bookmarkable. */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--divider);
+}
+
+.pagerStep {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  box-shadow: inset 0 0 0 1px var(--divider);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  transition:
+    color 0.12s,
+    box-shadow 0.12s;
+}
+
+.pagerStep:hover {
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--faint);
+}
+
+.pagerDisabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.pagerNums {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.125rem;
+}
+
+.pagerNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.875rem;
+  height: 1.875rem;
+  padding: 0 0.375rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  text-decoration: none;
+  transition:
+    color 0.12s,
+    background 0.12s;
+}
+
+.pagerNum:hover {
+  color: var(--ink);
+  background: var(--side-active);
+}
+
+.pagerNumOn {
+  color: var(--ink);
+  font-weight: 600;
+  background: var(--side-active);
 }

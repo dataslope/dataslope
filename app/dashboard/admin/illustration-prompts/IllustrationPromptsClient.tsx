@@ -216,50 +216,60 @@ function PromptCard({
   // A fresh mark outranks a pending approval: if the redraw is still wrong and
   // it has been queued again, "waiting to be looked at" is no longer the state
   // worth showing.
-  const tint = mark.marked
-    ? styles.cardMarked
+  // State is carried on the artwork's own dashed frame rather than by tinting
+  // a card, because there is no card any more: the frame is already the one
+  // piece of chrome each item has, and colouring it puts the signal on the
+  // thing being judged. The chip above it says the same in words.
+  const state = mark.marked
+    ? styles.itemMarked
     : mark.awaitingApproval
-      ? styles.cardRegenerated
+      ? styles.itemRegenerated
       : "";
 
   return (
-    <figure id={entry.id} className={`${styles.card} ${tint}`}>
-      {mark.awaitingApproval && !mark.marked ? (
-        <p className={styles.regenBanner}>
-          <Sparkles size={13} aria-hidden="true" />
-          Regenerated {shortDate(mark.regeneratedAt)}, not yet approved
-        </p>
-      ) : null}
-
-      <CutoutImage entry={entry} />
-
-      {/* No style badge: every prompt in the set is isometric (the house
-          default), so it labelled nothing and only crowded the card. */}
-      <div className={styles.cardTop}>
-        <code className={styles.file}>{entry.file}</code>
-        {entry.mascot ? (
-          <span className={`${styles.badge} ${styles.badgeMuted}`}>marmot</span>
+    <figure id={entry.id} className={`${styles.item} ${state}`}>
+      {/* The state chip sits on the artwork rather than above it: with no card
+          to hold a status line, a separate row would either add a permanent
+          gap over every unmarked image or let the images fall out of line
+          across a row. */}
+      <div className={styles.frame}>
+        <CutoutImage entry={entry} />
+        {mark.marked ? (
+          <span className={`${styles.stateChip} ${styles.stateChipMarked}`}>
+            <RefreshCw size={11} aria-hidden="true" />
+            Queued for redraw
+          </span>
+        ) : mark.awaitingApproval ? (
+          <span className={`${styles.stateChip} ${styles.stateChipRegen}`}>
+            <Sparkles size={11} aria-hidden="true" />
+            Redrawn {shortDate(mark.regeneratedAt)}
+          </span>
         ) : null}
       </div>
 
-      <p className={styles.cardTitle}>{entry.title}</p>
-      <p className={expanded ? styles.prompt : styles.promptClamped}>
-        {entry.prompt}
-      </p>
-      <button
-        type="button"
-        className={styles.linkBtn}
-        onClick={() => setExpanded((v) => !v)}
-      >
-        {expanded ? "Show less" : "Show full prompt"}
-      </button>
-
-      <div className={styles.usages}>
-        <span className={styles.usagesLabel}>Used on</span>
+      <div className={styles.meta}>
+        <p className={styles.itemTitle}>
+          {entry.title}
+          {entry.mascot ? <span className={styles.badgeMuted}>marmot</span> : null}
+        </p>
+        {/* The slug is the handle every pipeline script takes as `--only`, so
+            it sits directly under the name where it can be read off and
+            selected in one gesture. */}
+        <code className={styles.file}>{entry.file}</code>
         <a className={styles.usage} href={entry.href}>
-          <span className={styles.usageCourse}>{entry.courseTitle}</span> ·{" "}
-          {entry.route} →
+          <span className={styles.usageCourse}>{entry.courseTitle}</span>
+          <span className={styles.usageRoute}>{entry.route}</span>
         </a>
+        <p className={expanded ? styles.prompt : styles.promptClamped}>
+          {entry.prompt}
+        </p>
+        <button
+          type="button"
+          className={styles.linkBtn}
+          onClick={() => setExpanded((v) => !v)}
+        >
+          {expanded ? "Show less" : "Show full prompt"}
+        </button>
       </div>
 
       {/* The regeneration queue controls. Disabled wholesale when the D1
@@ -700,19 +710,28 @@ export function IllustrationPromptsClient() {
 
     return (
       <>
+        {/* The page's prose lives in the dashboard's <AdminPageHeader> (see
+            page.tsx); what belongs here is the shape of the corpus, as figures
+            you can scan rather than a paragraph you have to read. */}
         <header className={styles.header}>
-          <p className={styles.subtitle}>
-            Every generated illustration as the site serves it: the
-            background-removed WebP over the live page background. Flip the theme
-            to check a cut-out reads on both, click one to open the full-size file,
-            and mark whatever needs redrawing with a note saying what the new
-            illustration should be: the next run writes its prompt from scratch
-            against that note, keeping any animal the old one had.{" "}
-            <span className={styles.count}>{gallery.totalIllustrations}</span>{" "}
-            illustration{gallery.totalIllustrations === 1 ? "" : "s"} across{" "}
-            <span className={styles.count}>{gallery.totalCourses}</span> course
-            {gallery.totalCourses === 1 ? "" : "s"}.
-          </p>
+          <dl className={styles.stats}>
+            <div className={styles.stat}>
+              <dt>Illustrations</dt>
+              <dd>{gallery.totalIllustrations}</dd>
+            </div>
+            <div className={styles.stat}>
+              <dt>Courses</dt>
+              <dd>{gallery.totalCourses}</dd>
+            </div>
+            <div className={styles.stat}>
+              <dt>Marked</dt>
+              <dd>{counts.marked}</dd>
+            </div>
+            <div className={styles.stat}>
+              <dt>Awaiting approval</dt>
+              <dd>{counts.regenerated}</dd>
+            </div>
+          </dl>
           {!gallery.marksAvailable ? (
             <p className={styles.warn}>
               <TriangleAlert size={14} aria-hidden="true" /> The regeneration queue

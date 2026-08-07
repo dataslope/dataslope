@@ -1,285 +1,325 @@
-/* ─── Color Theme Test Page ───────────────────────────────────────────────── */
+/* ─── Color Test ──────────────────────────────────────────────────────────
+ *
+ * The page renders inside the dashboard shell, so this root paints no surface
+ * of its own; it only scopes the playground variables the samples below are
+ * demonstrating.
+ *
+ * Chrome and content are drawn from different palettes on purpose. Section
+ * labels, hairlines, hex readouts and captions use the *dashboard's* tokens
+ * (--ink / --muted / --faint / --divider); only the swatches, the "Aa"
+ * samples and the code block use the editor theme's (--bg / --text /
+ * --theme-primary …). Mixing them meant a theme whose "muted" is a saturated
+ * blue, GitHub Light among them, turned every section heading and label on the
+ * page blue, so the furniture kept changing colour with the specimen.
+ *
+ * No cards. The old layout wrapped each section in a filled panel and each
+ * swatch in a centred, variable-width box, which meant the only aligned thing
+ * on a page *about colour* was nothing: swatch labels wandered row to row and
+ * every filled rectangle competed with the samples. Here the structure is
+ * carried by a hairline under each section label and by a single uniform grid
+ * cell, so the swatches are the only filled shapes and the hex column, the
+ * token column and the label column line up all the way down.
+ */
 
-/* The page now renders inside the dashboard shell, so this root no longer
-   paints a full-bleed surface or claims the viewport height; it only scopes
-   the playground variables the swatches below are demonstrating. `color` is
-   still set from --text because every preview inside depends on it. */
 .root {
-  color: var(--text);
+  color: var(--ink);
   font-family: var(--font-ui);
 }
 
-.themeGrid {
+/* ── Section ── */
+.section {
+  margin-top: 2.25rem;
+}
+
+.section:first-child {
+  margin-top: 0;
+}
+
+/* The label sits on the baseline of a rule that runs to the right edge, which
+   is what puts every section heading on the same left margin as its grid. */
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 1.125rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sectionNote {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Editor theme picker ── */
+.themeRow {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 0.375rem;
 }
 
-.themeCard {
+.themeChip {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  background: none;
+  gap: 0.5rem;
+  padding: 0.3125rem 0.625rem 0.3125rem 0.375rem;
   border: 1px solid transparent;
-  border-radius: 8px;
-  padding: 4px;
+  border-radius: 0.5rem;
+  background: none;
+  color: var(--muted);
+  font-size: 0.8125rem;
   cursor: pointer;
   transition:
-    border-color 0.15s,
-    background 0.15s;
+    color 0.12s,
+    border-color 0.12s,
+    background 0.12s;
 }
 
-.themeCard:hover {
-  background: var(--bg3);
-  border-color: var(--border);
+.themeChip:hover {
+  color: var(--ink);
+  background: var(--side-active);
 }
 
-.themeCardActive {
-  border-color: var(--text-complementary) !important;
-  background: color-mix(
-    in srgb,
-    var(--text-complementary) 10%,
-    var(--bg2)
-  ) !important;
+.themeChipActive {
+  color: var(--ink);
+  border-color: var(--ds-blue-500);
 }
 
 .themePreview {
   position: relative;
-  width: 48px;
-  height: 30px;
-  border-radius: 5px;
-  border: 1px solid;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
+  width: 34px;
+  height: 22px;
+  border: 1px solid;
+  border-radius: 5px;
+  flex-shrink: 0;
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  display: inline-block;
 }
 
 .activeCheck {
   position: absolute;
-  top: 2px;
-  right: 3px;
+  inset: 0;
+  margin: auto;
 }
 
 .themeLabel {
-  font-size: 11px;
-  color: var(--text-muted);
-  text-align: center;
   white-space: nowrap;
-  max-width: 64px;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-/* ── Main content ──
-   Section chrome (surface, radius, title) now comes from the dashboard's
-   <Panel>/<PanelHeader>, so a section only contributes spacing. The panel
-   background is deliberately the *dashboard's*, not --bg2: the swatches are
-   what demonstrate the editor theme, and a panel painted in the theme under
-   test would tint every sample sitting on it. */
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.section {
-  margin-top: 1.5rem;
-}
-
-/* ── Color swatches ── */
+/* ── Colour swatches ──
+   One geometry for every token. `auto-fill` with a fixed minimum keeps the
+   columns even at any width, and because every cell is the same shape the
+   four text rows beneath the chips form real columns down the page. */
 .swatchGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.25rem, 1fr));
+  gap: 1.25rem 1rem;
 }
 
-/* Single-color swatch item */
 .swatch {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  width: 90px;
-  margin-bottom: 16px;
-}
-
-/* Dual-color swatch item (text colors showing both "Aa on bg" and solid fill) */
-.swatchDual {
-  width: 132px;
-}
-
-/* Highlight the --text-complementary swatch */
-.swatchHighlight .swatchColors {
-  outline: 2px solid var(--text-complementary);
-  outline-offset: 2px;
-  border-radius: 7px;
-}
-
-/* Flex row holding one or two color boxes */
-.swatchColors {
-  display: flex;
-  gap: 4px;
-  width: 100%;
-}
-
-/* Main color box: for non-text colors it is the solid fill;
-   for text colors it shows "Aa" text on --bg */
-.swatchColor {
-  flex: 1;
-  height: 40px;
-  border-radius: 6px;
-  border: 1px solid;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-}
-
-/* Secondary box: solid fill of the text color */
-.swatchColorSolid {
-  width: 48px;
-  height: 40px;
-  border-radius: 6px;
-  border: 1px solid;
-  flex-shrink: 0;
-}
-
-.swatchSample {
-  font-size: 17px;
-  font-weight: 700;
-}
-
-/* Hex value + copy button row */
-.swatchMeta {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  width: 100%;
-  justify-content: center;
-  margin-top: 4px;
-}
-
-.swatchHex {
-  font-size: 11px;
-  font-family: var(--font-mono);
-  color: var(--text-dim);
-  letter-spacing: 0.02em;
-  margin-top: 4px;
-}
-
-.copyBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
   border: none;
-  border-radius: 3px;
-  color: var(--text-dim);
+  background: none;
+  text-align: left;
   cursor: pointer;
-  padding: 1px 3px;
-  transition:
-    color 0.12s,
-    background 0.12s;
-  flex-shrink: 0;
+  font: inherit;
+  color: inherit;
 }
 
-.copyBtn:hover:not(:disabled) {
-  color: var(--text);
-  background: var(--bg3);
-}
-
-.copyBtn:disabled {
-  opacity: 0.3;
+.swatch:disabled {
   cursor: default;
 }
 
-.swatchName {
-  font-size: 11px;
-  font-family: var(--font-mono);
+/* The colour itself. A 1px inset ring rather than a border, so a swatch whose
+   fill matches the page (--bg, white) still reads as a rectangle without the
+   ring changing the cell's size. */
+.chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 3.25rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.chipFill {
+  position: absolute;
+  inset: 0;
+}
+
+/* Text tokens: "Aa" over the page background, with a solid band of the colour
+   beneath it. Both readings in one cell, so a text token no longer needs the
+   wider cell that used to break the grid. */
+.chipSample {
+  position: relative;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.chipBand {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 0.625rem;
+}
+
+.swatchHighlight .chip {
+  box-shadow: inset 0 0 0 2px var(--text-complementary);
+}
+
+/* Copy affordance, revealed on hover/focus so the resting grid stays quiet. */
+.chipAction {
+  position: absolute;
+  top: 0.3125rem;
+  right: 0.3125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 0.25rem;
+  background: var(--bg2);
   color: var(--text-dim);
-  text-align: center;
-  word-break: break-all;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.swatch:hover .chipAction,
+.swatch:focus-visible .chipAction {
+  opacity: 1;
+}
+
+.swatch:disabled .chipAction {
+  display: none;
+}
+
+.swatchHex {
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+.swatchName {
+  margin-top: 0.125rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--faint);
+  overflow-wrap: anywhere;
 }
 
 .swatchLabel {
-  font-size: 12px;
-  color: var(--text);
-  text-align: center;
+  margin-top: 0.125rem;
+  font-size: 0.75rem;
+  color: var(--muted);
 }
 
 /* ── Typography ── */
-.typoStack {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.typoGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
 }
 
-.typoCard {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 16px;
+@media (min-width: 62rem) {
+  .typoGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 2.5rem;
+  }
 }
 
-.cmCard {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 16px;
+.typoBlock {
+  min-width: 0;
 }
 
-.typoCardTitle {
-  font-size: 12px;
+.blockTitle {
+  margin: 0 0 0.875rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  color: var(--text-dim);
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0 0 12px;
+  color: var(--faint);
 }
 
 .typoSamples {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.5rem;
 }
 
 .typoH1 {
-  font-size: 24px;
+  margin: 0;
+  font-size: 1.5rem;
   font-weight: 700;
-  margin: 0;
-}
-.typoH2 {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-}
-.typoH3 {
-  font-size: 16px;
-  font-weight: 500;
-  margin: 0;
+  letter-spacing: -0.02em;
 }
 
-/* ── Code block (pre) ── */
-.codeBlock {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.8;
+.typoH2 {
   margin: 0;
-  overflow-x: auto;
-  padding: 14px 18px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.typoH3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.typoBody {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.typoSmall {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.codeBlock {
+  margin: 0;
+  padding: 0.875rem 1.125rem;
+  border-radius: 0.5rem;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.8;
   color: var(--text);
+  overflow-x: auto;
   white-space: pre;
 }

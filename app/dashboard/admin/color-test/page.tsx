@@ -12,7 +12,7 @@ import {
   setStoredEditorTheme,
 } from "@/app/_components/playgroundTheme";
 import "@/app/_components/playground.css";
-import { AdminPageHeader, Panel, PanelBody, PanelHeader } from "../_components/shared";
+import { AdminPageHeader } from "../_components/shared";
 import styles from "./color-test.module.css";
 
 interface SwatchDef {
@@ -127,11 +127,12 @@ export default function ColorTestPage() {
     setTimeout(() => setCopiedVar((v) => (v === varName ? null : v)), 1500);
   }
 
+
   return (
     <>
       <AdminPageHeader
         title="Color Test"
-        description="Every editor theme's resolved palette, plus the brand ramps from app/brand.css. Pick a theme to re-resolve every swatch against it; click a hex to copy it."
+        description="Every editor theme's resolved palette, plus the brand ramps from app/brand.css. Pick a theme to re-resolve every swatch against it; click a swatch to copy its hex."
       />
 
       {/* The preview surfaces below paint themselves from the *playground*
@@ -140,124 +141,105 @@ export default function ColorTestPage() {
           dashboard's. `playground-root` is what scopes those variables, so it
           stays wrapped around this subtree and nothing outside it is touched. */}
       <div className={`playground-root ${styles.root}`}>
-        <Panel>
-          <PanelHeader
-            title="Editor theme"
-            description="Drives the resolved values in every panel below."
-          />
-          <PanelBody>
-            <div className={styles.themeGrid}>
-          {ALL_THEMES.map(({ value, label }) => {
-            const p = THEME_PALETTES[value];
-            const isLight = LIGHT_THEMES.has(value);
-            return (
-              <button
-                key={value}
-                className={`${styles.themeCard} ${activeTheme === value ? styles.themeCardActive : ""}`}
-                onClick={() => handleThemeChange(value)}
-                title={label}
-              >
-                <div
-                  className={styles.themePreview}
-                  style={{ background: p.bg, borderColor: p.border }}
-                >
-                  <span className={styles.dot} style={{ background: p.kw }} />
-                  <span className={styles.dot} style={{ background: p.fn }} />
-                  <span className={styles.dot} style={{ background: p.str }} />
-                  {activeTheme === value && (
-                    <Check
-                      size={10}
-                      className={styles.activeCheck}
-                      style={{ color: isLight ? "#000" : "#fff" }}
-                    />
-                  )}
-                </div>
-                  <span className={styles.themeLabel}>{label}</span>
-                </button>
-              );
-            })}
-            </div>
-          </PanelBody>
-        </Panel>
-
-        <div className={styles.content}>
-        {/* Color swatches */}
-        <Section title="Color Variables">
-          <div className={styles.swatchGrid}>
-            {SWATCH_DEFS.map(({ name, label, isTextColor, highlight }) => {
-              const hex = resolvedHex[name] ?? "";
+        <Section
+          title="Editor theme"
+          note="Drives every resolved value below."
+        >
+          <div className={styles.themeRow}>
+            {ALL_THEMES.map(({ value, label }) => {
+              const p = THEME_PALETTES[value];
+              const isLight = LIGHT_THEMES.has(value);
+              const active = activeTheme === value;
               return (
-                <div
-                  key={name}
-                  className={[
-                    styles.swatch,
-                    isTextColor ? styles.swatchDual : "",
-                    highlight ? styles.swatchHighlight : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={active}
+                  className={`${styles.themeChip} ${active ? styles.themeChipActive : ""}`}
+                  onClick={() => handleThemeChange(value)}
                 >
-                  <div className={styles.swatchColors}>
-                    <div
-                      className={styles.swatchColor}
-                      style={{
-                        background: isTextColor
-                          ? "var(--bg)"
-                          : `var(${name})`,
-                        borderColor: "var(--border)",
-                      }}
-                    >
-                      {isTextColor && (
-                        <span
-                          className={styles.swatchSample}
-                          style={{ color: `var(${name})` }}
-                        >
-                          Aa
-                        </span>
-                      )}
-                    </div>
-                    {isTextColor && (
-                      <div
-                        className={styles.swatchColorSolid}
-                        style={{
-                          background: `var(${name})`,
-                          borderColor: "var(--border)",
-                        }}
+                  <span
+                    className={styles.themePreview}
+                    style={{ background: p.bg, borderColor: p.border }}
+                  >
+                    <span className={styles.dot} style={{ background: p.kw }} />
+                    <span className={styles.dot} style={{ background: p.fn }} />
+                    <span className={styles.dot} style={{ background: p.str }} />
+                    {active && (
+                      <Check
+                        size={10}
+                        className={styles.activeCheck}
+                        style={{ color: isLight ? "#000" : "#fff" }}
                       />
                     )}
-                  </div>
-
-                  <div className={styles.swatchMeta}>
-                    <span className={styles.swatchHex}>
-                      {hex || "—"}
-                    </span>
-                    <button
-                      className={styles.copyBtn}
-                      onClick={() => handleCopy(name)}
-                      title="Copy hex (without #)"
-                      disabled={!hex}
-                    >
-                      {copiedVar === name ? (
-                        <Check size={9} />
-                      ) : (
-                        <Copy size={9} />
-                      )}
-                    </button>
-                  </div>
-
-                  <span className={styles.swatchName}>{name}</span>
-                  <span className={styles.swatchLabel}>{label}</span>
-                </div>
+                  </span>
+                  <span className={styles.themeLabel}>{label}</span>
+                </button>
               );
             })}
           </div>
         </Section>
 
-        {/* Typography */}
-        <Section title="Typography">
-          <div className={styles.typoStack}>
-            <div className={styles.typoCard}>
-              <h3 className={styles.typoCardTitle}>Sans-serif, UI Font</h3>
+        <Section
+          title="Color variables"
+          note={`${SWATCH_DEFS.length} tokens · click to copy`}
+        >
+          <div className={styles.swatchGrid}>
+            {SWATCH_DEFS.map(({ name, label, isTextColor, highlight }) => {
+              const hex = resolvedHex[name] ?? "";
+              const copied = copiedVar === name;
+              return (
+                <button
+                  key={name}
+                  type="button"
+                  onClick={() => handleCopy(name)}
+                  disabled={!hex}
+                  title={hex ? `Copy ${hex}` : undefined}
+                  className={`${styles.swatch} ${highlight ? styles.swatchHighlight : ""}`}
+                >
+                  {/* One cell geometry for every token, so the hex, the name
+                      and the label line up in columns down the grid. A text
+                      token shows "Aa" over --bg with a solid band of itself
+                      beneath, rather than claiming a wider cell as it used
+                      to and breaking the alignment for everything after it. */}
+                  <span className={styles.chip} style={{ background: "var(--bg)" }}>
+                    {isTextColor ? (
+                      <>
+                        <span
+                          className={styles.chipSample}
+                          style={{ color: `var(${name})` }}
+                        >
+                          Aa
+                        </span>
+                        <span
+                          className={styles.chipBand}
+                          style={{ background: `var(${name})` }}
+                        />
+                      </>
+                    ) : (
+                      <span
+                        className={styles.chipFill}
+                        style={{ background: `var(${name})` }}
+                      />
+                    )}
+                    <span className={styles.chipAction} aria-hidden="true">
+                      {copied ? <Check size={11} /> : <Copy size={11} />}
+                    </span>
+                  </span>
+
+                  <span className={styles.swatchHex}>{hex || "—"}</span>
+                  <span className={styles.swatchName}>{name}</span>
+                  <span className={styles.swatchLabel}>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </Section>
+
+        <Section title="Typography" note="var(--font-ui) and var(--font-mono)">
+          <div className={styles.typoGrid}>
+            <div className={styles.typoBlock}>
+              <h3 className={styles.blockTitle}>Sans-serif, UI font</h3>
               <div
                 className={styles.typoSamples}
                 style={{ fontFamily: "var(--font-ui)" }}
@@ -271,28 +253,20 @@ export default function ColorTestPage() {
                 <p className={styles.typoH3} style={{ color: "var(--text)" }}>
                   Heading Three
                 </p>
-                <p
-                  style={{ color: "var(--text)", fontSize: 15, lineHeight: 1.6 }}
-                >
+                <p className={styles.typoBody} style={{ color: "var(--text)" }}>
                   Body text, The quick brown fox jumps over the lazy dog. Pack
                   my box with five dozen liquor jugs.
                 </p>
                 <p
-                  style={{
-                    color: "var(--text-muted)",
-                    fontSize: 14,
-                    lineHeight: 1.6,
-                  }}
+                  className={styles.typoBody}
+                  style={{ color: "var(--text-muted)" }}
                 >
                   Muted body, Secondary descriptions and helper text appear
                   here, blended toward the background.
                 </p>
                 <p
-                  style={{
-                    color: "var(--text-dim)",
-                    fontSize: 13,
-                    lineHeight: 1.6,
-                  }}
+                  className={styles.typoSmall}
+                  style={{ color: "var(--text-dim)" }}
                 >
                   Dimmed caption, Timestamps, metadata, and low-priority labels
                   rendered at reduced opacity.
@@ -300,8 +274,11 @@ export default function ColorTestPage() {
               </div>
             </div>
 
-            <div className={styles.cmCard}>
-              <h3 className={styles.typoCardTitle}>Monospace, Code Font</h3>
+            <div className={styles.typoBlock}>
+              <h3 className={styles.blockTitle}>Monospace, code font</h3>
+              {/* The code sample keeps a surface of its own: it is standing in
+                  for the editor, and an editor has a background. That is the
+                  theme under test, not the dashboard's card grey. */}
               <pre className={styles.codeBlock}>
                 <code>
                   <span style={{ color: "var(--theme-primary)" }}>def </span>
@@ -346,26 +323,35 @@ export default function ColorTestPage() {
                 </code>
               </pre>
             </div>
-            </div>
-          </Section>
-        </div>
+          </div>
+        </Section>
       </div>
     </>
   );
 }
 
-/** A titled block of preview surfaces, in the dashboard's panel language. */
+/**
+ * A titled band. No card: a small-caps label with a hairline running to the
+ * right edge, which lines every section heading up on the same left margin as
+ * the grid beneath it and lets the swatches be the only filled shapes on the
+ * page.
+ */
 function Section({
   title,
+  note,
   children,
 }: {
   title: string;
+  note?: string;
   children: React.ReactNode;
 }) {
   return (
-    <Panel className={styles.section}>
-      <PanelHeader title={title} />
-      <PanelBody>{children}</PanelBody>
-    </Panel>
+    <section className={styles.section}>
+      <div className={styles.sectionHead}>
+        <h2 className={styles.sectionTitle}>{title}</h2>
+        {note ? <span className={styles.sectionNote}>{note}</span> : null}
+      </div>
+      {children}
+    </section>
   );
 }

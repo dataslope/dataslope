@@ -31,6 +31,10 @@
  * hashing: a spec that imports `_theme.mjs` would silently go stale under
  * per-file hashing when only the helper changed.
  *
+ * Alongside the markup, each entry carries `usedBy`: the lessons whose MDX
+ * contains its `<Chart>` tag, so the admin gallery can link a figure back to
+ * the page it appears on without reading the corpus at request time.
+ *
  * Output: `lib/generated/charts.js` (gitignored; its committed `.d.ts` sibling
  * types it so typecheck/lint pass on a fresh checkout). Runs from `dev`,
  * `build`, and `postinstall`, so the file always exists before typecheck.
@@ -46,7 +50,16 @@ import { pathToFileURL, fileURLToPath } from "node:url";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const CHARTS_DIR = join(ROOT, "charts");
+const CONTENT_DIR = join(ROOT, "content");
 const OUT_FILE = join(ROOT, "lib", "generated", "charts.js");
+
+/** Content collection → route prefix, mirroring the `baseUrl`s in lib/source.ts.
+ *  A collection that isn't listed here simply contributes no links. */
+const ROUTE_BASES = {
+  courses: "/courses",
+  interview: "/interview-prep",
+  "fumadocs-dev": "/fumadocs-dev",
+};
 
 /** Files starting with `_` are shared helpers, not charts, but they still
  *  belong in the digest: editing the theme must re-render every chart. */
@@ -64,6 +77,53 @@ function plotVersion() {
   }
 }
 
+/** Every `.mdx` under a directory, recursively. */
+function mdxFiles(dir) {
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    const full = join(dir, e.name);
+    if (e.isDirectory()) return mdxFiles(full);
+    return e.name.endsWith(".mdx") ? [full] : [];
+  });
+}
+
+/**
+ * Where each chart is used: slug → [{ url, title, collection }].
+ *
+ * The gallery's whole job is reviewing a figure in context, so it needs a way
+ * back to the lesson. Building the index here (rather than in the page) keeps
+ * the app from reading ~800 MDX files at request time inside the Worker, which
+ * is the same reason the charts themselves are rendered at build time.
+ *
+ * The scan is a regex over `<Chart slug="…"`, not an MDX parse: the tag is
+ * written by hand in a lesson body and that is the entire surface. A chart
+ * rendered through a variable slug would be missed, and would show as unused.
+ */
+function chartUsages() {
+  const usages = {};
+  for (const [collection, base] of Object.entries(ROUTE_BASES)) {
+    const dir = join(CONTENT_DIR, collection);
+    for (const file of mdxFiles(dir)) {
+      const src = readFileSync(file, "utf8");
+      const slugs = [...src.matchAll(/<Chart\s[^>]*slug="([^"]+)"/g)].map((m) => m[1]);
+      if (slugs.length === 0) continue;
+
+      // content/<collection>/<…>/<page>.mdx → <base>/<…>/<page>, with `index`
+      // collapsing to its parent, exactly as Fumadocs's loader routes it.
+      const rel = file.slice(dir.length + 1).replace(/\.mdx$/, "");
+      const path = rel === "index" ? "" : rel.replace(/(^|\/)index$/, "");
+      const url = path ? `${base}/${path}` : base;
+      const title = src.match(/^title:\s*(.+)$/m)?.[1].trim().replace(/^["']|["']$/g, "");
+
+      for (const slug of new Set(slugs)) {
+        (usages[slug] ??= []).push({ url, title: title ?? url, collection });
+      }
+    }
+  }
+  for (const list of Object.values(usages)) list.sort((a, b) => a.url.localeCompare(b.url));
+  return usages;
+}
+
 /**
  * Digest of everything that can change the rendered output: every file in
  * `charts/`, Plot's version, and this script's own bytes (the post-processing
@@ -71,11 +131,15 @@ function plotVersion() {
  * removes the "remember to bump RENDERER_VERSION" step that would otherwise
  * silently ship stale charts).
  */
-function computeDigest(files) {
+function computeDigest(files, usages) {
   const h = createHash("sha256")
     .update(readFileSync(fileURLToPath(import.meta.url)))
     .update("\0")
-    .update(plotVersion());
+    .update(plotVersion())
+    // The usage index is part of the output, so placing a `<Chart>` in a new
+    // lesson has to invalidate too, even though no spec changed.
+    .update("\0")
+    .update(JSON.stringify(usages));
   for (const name of files) {
     h.update("\0").update(name).update("\0").update(readFileSync(join(CHARTS_DIR, name)));
   }
@@ -127,7 +191,8 @@ const files = existsSync(CHARTS_DIR)
   ? readdirSync(CHARTS_DIR).filter((f) => f.endsWith(".mjs")).sort()
   : [];
 const specs = files.filter(isSpec);
-const digest = computeDigest(files);
+const usages = chartUsages();
+const digest = computeDigest(files, usages);
 
 if (priorDigest() === digest) {
   console.log(`build-charts: ${specs.length} chart(s) up to date`);
@@ -167,6 +232,7 @@ for (const file of specs) {
     ...(mod.caption ? { caption: mod.caption } : {}),
     width: Number(el.getAttribute("width")),
     height: Number(el.getAttribute("height")),
+    usedBy: usages[slug] ?? [],
     svg,
   };
 }
@@ -187,7 +253,14 @@ writeFileSync(
 );
 
 const bytes = Object.values(charts).reduce((n, c) => n + c.svg.length, 0);
+const orphans = Object.keys(charts).filter((slug) => charts[slug].usedBy.length === 0);
 console.log(
   `build-charts: ${specs.length} chart(s) rendered ` +
     `(${(bytes / 1024).toFixed(0)} KB SVG) → lib/generated/charts.js`,
 );
+// Not an error: a spec is often written before the lesson that will carry it.
+// Worth saying out loud, though, since an unplaced chart costs bundle bytes
+// for nothing and a typo'd slug looks exactly like this.
+if (orphans.length > 0) {
+  console.log(`build-charts: not placed in any lesson yet: ${orphans.join(", ")}`);
+}
