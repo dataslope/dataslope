@@ -69,6 +69,12 @@ A few things to notice:
 
 ## Machine epsilon
 
+Epsilon is the gap at 1.0, and the gap is not a constant: it scales with the
+number. Both axes are logarithmic, which turns the doubling into the straight
+line it is.
+
+<Chart slug="float-precision-gaps" />
+
 The smallest float strictly greater than $1.0$ is $1 + \epsilon$
 where $\epsilon = 2^{-52} \approx 2.22 \times 10^{-16}$. This is
 called the **machine epsilon** and it is the most important

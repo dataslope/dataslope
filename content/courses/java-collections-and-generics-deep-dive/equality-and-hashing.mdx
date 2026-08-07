@@ -55,6 +55,12 @@ would essentially never work.
 
 ## What hashCode is for
 
+And why the contract matters so much: collisions are not rare. With a
+thousand buckets it is already even money that two keys share one by the
+fortieth key, at four percent full.
+
+<Chart slug="hash-collision-birthday" />
+
 Hashing turns an arbitrary object into an `int` "fingerprint." A
 `HashSet` or `HashMap` uses that fingerprint to jump *directly* to
 the bucket where the element should live, instead of scanning all

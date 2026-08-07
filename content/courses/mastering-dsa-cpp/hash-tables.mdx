@@ -53,6 +53,12 @@ Hash tables are fast because most buckets stay short. If too many keys collide, 
 
 ## Collisions: chaining
 
+First, why collisions are the normal case rather than an edge case. This is
+the birthday problem: with a thousand buckets it is even money by the fortieth
+key, at four percent full.
+
+<Chart slug="hash-collision-birthday" />
+
 Collisions are not a defect; they are a mathematical certainty. With even 23 random keys in 365 buckets, the odds of a collision pass 50%, the birthday paradox working against you. So every hash table needs a collision policy.
 
 The oldest policy is **chaining** (Luhn's original): each bucket holds a little list of every entry that landed there. Lookup hashes to the bucket, then walks the chain comparing actual keys. As long as chains stay short, a few entries, performance stays effectively constant.
