@@ -165,7 +165,15 @@ function priorDigest() {
 function postProcess(svg, slug) {
   const out = svg
     .replace(/--plot-background:\s*white;/g, "--plot-background: var(--ds-chart-surface);")
-    .replace(/-?\d+\.\d{3,}/g, (n) => String(Number(Number(n).toFixed(2))));
+    // Round long decimals to 2dp, which halves the file with no visible effect
+    // on a path or a transform. Scoped to attribute values: applied to the
+    // whole document it also rewrites *text content*, so a label reading
+    // "t* = 1.645" would silently ship as "1.65".
+    .replace(/="([^"]*)"/g, (m, value) =>
+      value.includes(".")
+        ? `="${value.replace(/-?\d+\.\d{3,}/g, (n) => String(Number(Number(n).toFixed(2))))}"`
+        : m,
+    );
   // Plot names each chart's scoped stylesheet `plot-<hash of its own CSS>`, so
   // two charts with identical styling would share a class — and any change to
   // Plot's stylesheet would rename every chart at once. Rename it after the

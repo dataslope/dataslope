@@ -94,6 +94,12 @@ would predict, so between-spread ≈ within-spread and **F ≈ 1**. But if
 some groups are genuinely shifted, the group means spread out *more* than
 within-group noise alone can explain, pushing **F well above 1**.
 
+Both panels below carry the identical three group means. Only the noise
+inside the groups changes, and that alone decides whether the gaps are
+worth anything:
+
+<Chart slug="anova-between-within" />
+
 ```mermaid
 flowchart TD
   A["Total variation in the data"] --> B["BETWEEN groups<br/>(how far group means<br/>sit from each other)"]

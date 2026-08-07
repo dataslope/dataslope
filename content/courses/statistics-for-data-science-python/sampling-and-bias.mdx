@@ -158,6 +158,12 @@ people who don't. **Noise shrinks as `n` grows; bias does not.** If your
 selection method is skewed, growing the sample just gives you a sharper,
 more confident estimate of the *wrong* number.
 
+Each band below is where the estimate lands about 95% of the time. Both
+narrow at exactly the same rate; only one of them is narrowing onto the
+truth:
+
+<Chart slug="bigger-biased-sample" />
+
 <CodeBlock
   adapter="python"
   files={[
