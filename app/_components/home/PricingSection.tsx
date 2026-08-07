@@ -547,14 +547,14 @@ export function PricingSection({
           The table's surface and its striped shell are both opaque, so the
           pattern is only visible where it extends past them: it starts a
           little way down the table, runs the full width of the viewport, and
-          continues 220px below the table's bottom edge, so it reads as
+          continues 120px below the table's bottom edge, so it reads as
           something the table is resting on.
 
           That tail is long enough that a hard bottom edge would read as a
           band, so the last 96px fade to nothing — shorter than the footer
           band's own 143px fade-in, which is the deepest dissolve on the site
           and the one the others stay under. The trailing margin clears the
-          full 220px so the faded tail never reaches the next section.
+          full 120px so the faded tail never reaches the next section.
 
           Brand green joins the grey + blue inks here (the free tiers' CTA and
           "Recommended" badge are green), giving the table's backdrop its own
@@ -562,7 +562,7 @@ export function PricingSection({
       <PatternBackdrop
         pattern={fadedbar}
         insetTop={72}
-        insetBottom={-220}
+        insetBottom={-120}
         fullWidth
         fadeBottom={96}
         inks={[
@@ -571,7 +571,7 @@ export function PricingSection({
           "rgba(32,198,33,0.20)",
         ]}
         cellSize={54}
-        className="mb-60 sm:mb-64"
+        className="mb-40 sm:mb-44"
       >
         <div className="ds-striped-shell rounded-2xl">
           <div className="rounded-2xl border border-[var(--ds-gray-200)] bg-white dark:border-white/10 dark:bg-[#121212]">

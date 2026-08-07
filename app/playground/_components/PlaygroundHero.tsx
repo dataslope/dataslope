@@ -16,6 +16,11 @@ import imageManifest from "@/lib/generated/images";
  *
  * Colour follows `FooterPattern`: theme-neutral low-alpha inks, with the
  * palette's first entry left transparent so the page colour shows through.
+ * Grey and blue are joined by brand yellow and green, which is the full
+ * four-colour brand set the illustrations use — the band sits directly under
+ * the playground artwork, so the two now share a palette. Yellow carries a
+ * higher alpha than the others because it is the lightest of the four and
+ * washes out against white at the alpha the rest use.
  *
  * Motion is deliberately faster here than in the footer (2.5s against 18s).
  * The footer band is ambient texture a reader passes over; this one is the
@@ -56,6 +61,8 @@ export function PlaygroundHero() {
             "transparent",
             "rgba(128,128,128,0.28)",
             "rgba(20,140,255,0.20)",
+            "rgba(255,221,108,0.34)",
+            "rgba(32,198,33,0.20)",
           ]}
           cellSize={48}
           height={260}

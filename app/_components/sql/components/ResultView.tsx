@@ -11,10 +11,11 @@ import {
 } from "react";
 import React from "react";
 import {
+  createSortedRowModel,
   flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
+  rowSortingFeature,
+  tableFeatures,
+  useTable,
   type ColumnDef,
   type SortingState,
 } from "@tanstack/react-table";
@@ -65,6 +66,19 @@ import type {
   PendingEditsByResult,
 } from "../types";
 import type { ColumnConstraintInfo } from "../../runtime/sqlite";
+
+/** TanStack Table v9 replaces v8's `get*RowModel()` options with an explicit,
+ *  tree-shakeable feature set. The core row model is always present, so only
+ *  sorting has to be opted into here — the grid's other behaviour (column
+ *  sizing, selection, editing) is this component's own, not the table's.
+ *  `manualSorting` stays on at the call site: the sorted row model is what
+ *  registers the sorting state and headers, while the actual ordering is done
+ *  upstream against the full result set, not just the loaded page. Built once
+ *  at module scope so its identity is stable across renders. */
+const RESULT_TABLE_FEATURES = tableFeatures({
+  rowSortingFeature,
+  sortedRowModel: createSortedRowModel(),
+});
 import {
   compareCellValues,
   formatCellValue,
@@ -2437,7 +2451,7 @@ export function ResultTableBody({
     [visible, originalIndices],
   );
 
-  const columns = useMemo<ColumnDef<ResultTableRow>[]>(
+  const columns = useMemo<ColumnDef<typeof RESULT_TABLE_FEATURES, ResultTableRow>[]>(
     () => [
       ...(deletable
         ? [
@@ -2483,7 +2497,7 @@ export function ResultTableBody({
                   </Checkbox.Root>
                 );
               },
-            } satisfies ColumnDef<ResultTableRow>,
+            } satisfies ColumnDef<typeof RESULT_TABLE_FEATURES, ResultTableRow>,
           ]
         : []),
       ...set.columns.map((c, ci) => {
@@ -3097,7 +3111,7 @@ export function ResultTableBody({
                 </span>
               );
             },
-          } satisfies ColumnDef<ResultTableRow>;
+          } satisfies ColumnDef<typeof RESULT_TABLE_FEATURES, ResultTableRow>;
       }),
     ],
     // `activeEditCell` and `pendingEdits` are read via refs (above), and the
@@ -3119,17 +3133,20 @@ export function ResultTableBody({
       someVisibleSelected,
     ],
   );
-  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is required for stable result-table customization.
-  const table = useReactTable({
+  const table = useTable({
+    features: RESULT_TABLE_FEATURES,
     data,
     columns,
     state: { sorting },
     onSortingChange: handleSortingChange,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     manualSorting: true,
   });
   const tableRows = table.getRowModel().rows;
+  // This suppression used to sit on `useReactTable`, where it masked the
+  // virtualizer's own report — the rule only names the first incompatible
+  // call in a component. React Table v9's `useTable` is compatible, so
+  // TanStack Virtual is now the only one left.
+  // eslint-disable-next-line react-hooks/incompatible-library -- row virtualization has no compatible alternative here.
   const rowVirtualizer = useVirtualizer({
     count: tableRows.length,
     getScrollElement: () =>
@@ -3249,7 +3266,10 @@ export function ResultTableBody({
     const absoluteRow = row.original.absoluteRow;
     const rowValues = row.original.values;
     const checked = selectedRows?.has(absoluteRow) ?? false;
-    const cells = row.getVisibleCells().map((cell) => {
+    // getAllCells, not getVisibleCells: v9 gates visibility behind
+    // `columnVisibilityFeature`, and this grid never hides a column, so the
+    // two return the same cells.
+    const cells = row.getAllCells().map((cell) => {
       const isSelect = cell.column.id === "select";
       const rawVal = isSelect ? undefined : cell.getValue();
       const ci = isSelect
