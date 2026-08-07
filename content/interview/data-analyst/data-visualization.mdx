@@ -37,12 +37,22 @@ flowchart TD
 The encoding should make the answer readable at a glance; if the reader
 has to work to decode it, the chart is wrong.
 
+The ranking underneath most of these decisions: position is read most
+accurately, then length, then angle, then area, and colour last.
+
+<Chart slug="encoding-accuracy" />
+
 ### When is a pie chart appropriate, and when not?
 
 A pie chart shows parts of a single whole, and only works with **2–4
 slices** that sum to 100%. Beyond that, humans compare angles poorly, and
 a **bar chart** (sorted descending) is easier to read. Never use pie
 charts to compare across groups or over time.
+
+Five shares, twice. Ranking them by angle is genuinely hard; by length
+it is immediate.
+
+<Chart slug="pie-vs-bar" />
 
 ### Line chart or bar chart?
 
@@ -59,11 +69,23 @@ binning its range and counting observations per bin, its x-axis is
 numeric and ordered, and bin width is a real choice that changes the
 story.
 
+And the choice a histogram carries that a bar chart does not: the bin
+width is yours, and it changes the answer.
+
+<Chart slug="histogram-bin-width" />
+
 ### How can a truncated y-axis mislead a reader?
 
 Starting a **bar chart** axis above zero exaggerates differences: a bar
 twice as tall can represent a 3% difference. Because a bar's **length**
 encodes the value, bar charts should almost always start at zero.
+
+Five scores within five points of each other, drawn from zero and then
+on an axis starting near the top of the range.
+
+<Chart slug="bar-truncation" />
+
+<Chart slug="bar-truncation-cropped" />
 
 ### So a non-zero baseline is always wrong?
 
@@ -81,6 +103,11 @@ danger is that you can slide the scales to manufacture a correlation or a
 arbitrary axis choices. Prefer indexing both series to a common baseline,
 or use two aligned panels.
 
+Both panels below hold the same two series and the same left axis. Only
+the right-hand one differs, and they support opposite conclusions.
+
+<Chart slug="dual-axis-illusion" />
+
 ### What other ways do charts commonly mislead?
 
 Cherry-picked date ranges that hide the fuller trend; encoding a quantity
@@ -88,6 +115,14 @@ by **area or radius** when readers perceive length (doubling a circle's
 radius quadruples its area); 3D effects that distort proportions; inverted
 or omitted axes; and unequal bin widths. The fix is honest encodings and
 labeled scales.
+
+The hardest one to catch, because nothing on the chart is false. Ten
+years going nowhere, then the four months someone would show you
+instead.
+
+<Chart slug="cherry-picked-window" />
+
+<Chart slug="cherry-picked-window-zoom" />
 
 ### What makes a dashboard effective?
 
@@ -129,6 +164,11 @@ ramping in lightness. **Diverging** data with a meaningful midpoint
 (e.g., profit vs loss) uses two hues meeting at a neutral center. Reserve
 a bold accent color for the one series you want to emphasize.
 
+The most common mistake, drawn: a rainbow ramp invents bands where the
+data is smooth.
+
+<Chart slug="rainbow-vs-sequential" />
+
 ### How do you make visualizations accessible?
 
 About 8% of men have red-green color vision deficiency, so **don't encode
@@ -136,6 +176,11 @@ meaning by color alone**. Use colorblind-safe palettes, add a secondary
 cue (labels, patterns, position, direct annotation), and ensure sufficient
 contrast. Test by viewing in grayscale: if the chart still reads, it's
 robust.
+
+The same chart in a default palette and a colourblind-safe one, each
+shown as a red-green viewer sees it.
+
+<Chart slug="colorblind-safe" />
 
 ### How do Tableau, Power BI, and Looker differ?
 
