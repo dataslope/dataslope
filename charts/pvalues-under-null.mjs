@@ -84,7 +84,9 @@ export function render() {
         fontSize: 12,
         fontWeight: 600,
         textAnchor: "end",
-        dy: -10,
+        // Clear of both the dashed rule it names and the bar tops, which sit
+        // within a few tenths of a point of it all the way across.
+        dy: -24,
         ...HALO,
       }),
       Plot.text([ALPHA], {

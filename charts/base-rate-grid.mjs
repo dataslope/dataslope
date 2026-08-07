@@ -36,15 +36,17 @@ const ROWS = Math.ceil(TOTAL / COLS);
 
 export function render() {
   return plot({
-    height: 310,
-    marginTop: 46,
-    marginBottom: 46,
+    height: 340,
+    marginTop: 56,
+    marginBottom: 54,
     marginLeft: 16,
     marginRight: 16,
     ariaLabel: title,
     x: { label: null, ticks: [], domain: [-1, COLS], grid: false },
     // Row 0 at the top, so the sick block reads first.
-    y: { label: null, ticks: [], domain: [ROWS + 0.4, -1.6], grid: false },
+    // A clear row of space above the block and below the grid: at -1.1 and
+    // ROWS - 0.35 the two labels were sitting on the dots they name.
+    y: { label: null, ticks: [], domain: [ROWS + 1.1, -2.2], grid: false },
     marks: [
       Plot.dot(dots, {
         x: "col",
@@ -56,7 +58,7 @@ export function render() {
       }),
       Plot.text([{}], {
         x: 0,
-        y: -1.1,
+        y: -1.7,
         text: () => `${TRUE_POSITIVES} really have it`,
         fill: ACCENT,
         fontSize: 12.5,
@@ -66,7 +68,7 @@ export function render() {
       }),
       Plot.text([{}], {
         x: COLS - 1,
-        y: ROWS - 0.35,
+        y: ROWS + 0.7,
         text: () => `${FALSE_POSITIVES} false alarms`,
         fill: MUTED,
         fontSize: 12.5,

@@ -30,7 +30,9 @@ const GROUPS = [
 
 const DOMAIN = [168, 240];
 const PEAK = normalPdf(0, 0, 6.5);
-const BRACKET = PEAK * 1.2;
+// The bracket clears the two group labels, which are two lines tall and sit
+// at their own curve's peak. At 1.2 the rule was landing on their top line.
+const BRACKET = PEAK * 1.5;
 
 export function render() {
   return plot({
@@ -40,7 +42,7 @@ export function render() {
     ariaLabel: title,
     x: { label: "Flipper length (mm)", labelAnchor: "center", domain: DOMAIN, ticks: 7 },
     // Density units mean nothing to a reader here; the separation is the point.
-    y: { label: null, ticks: [], grid: false, domain: [0, PEAK * 1.42] },
+    y: { label: null, ticks: [], grid: false, domain: [0, PEAK * 1.68] },
     marks: [
       ...GROUPS.map((g) =>
         Plot.areaY(normalCurve(DOMAIN[0], DOMAIN[1], g.mean, g.sd), {
@@ -96,7 +98,7 @@ export function render() {
       }),
       Plot.text([(GROUPS[0].mean + GROUPS[1].mean) / 2], {
         x: (d) => d,
-        y: BRACKET + PEAK * 0.06,
+        y: BRACKET + PEAK * 0.075,
         text: () => "27 mm apart",
         fill: MUTED,
         fontSize: 12.5,
