@@ -64,6 +64,11 @@ print("Lasso coefs:", lasso.coef_)  # some may be exactly 0
   ]}
 />
 
+The difference, drawn as coefficient paths: L2 shrinks everything and
+keeps it, L1 drives coefficients to exactly zero one at a time.
+
+<Chart slug="regularization-l1-l2" />
+
 ### What is cross-validation and why use it?
 
 Instead of one train/test split, **k-fold CV** rotates which fold is the
@@ -348,11 +353,22 @@ print("Explained variance ratio:", pca.explained_variance_ratio_.round(3))
   ]}
 />
 
+And how the component count actually gets chosen: off the cumulative
+line, not off where the bars look like they stop.
+
+<Chart slug="pca-scree" />
+
 ### What is the curse of dimensionality?
 
 As dimensionality grows, data becomes increasingly sparse: the volume of the space grows exponentially and the nearest neighbor becomes almost as far as the farthest neighbor.
 This hurts distance-based methods, kNN, SVM with a radial basis function (RBF) kernel, k-means, and increases the sample size needed to learn accurate models.
 Remedies include dimensionality reduction (PCA, autoencoders), feature selection, and regularization.
+
+Two curves that between them are the whole curse: there is no middle
+left to be near, and every point becomes about equally far from every
+other.
+
+<Chart slug="curse-of-dimensionality" />
 
 ### What is logistic regression and how does it output probabilities?
 

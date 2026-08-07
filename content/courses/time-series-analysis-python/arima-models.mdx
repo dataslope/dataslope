@@ -137,6 +137,13 @@ flowchart TD
 
 ## Fitting and forecasting
 
+
+And what a forecast actually claims. The line is one number per step;
+the cone is the interval, and it widens as the square root of the
+horizon.
+
+<Chart slug="forecast-uncertainty-cone" />
+
 Time for a real forecast. We'll use a simulated series with a trend and
 autoregressive noise, deliberately *non-seasonal*, so a plain ARIMA can
 handle it well, fit on a training portion, and forecast the rest.

@@ -106,6 +106,13 @@ your initial guess, there is another solution near $(-0.82,
 
 ## Unconstrained minimization
 
+
+The step size is the whole game for a first-order method. Too small and
+it never arrives; too large and it does not converge slowly, it
+diverges.
+
+<Chart slug="gradient-descent-lr" />
+
 The workhorse is `scipy.optimize.minimize`. For smooth problems
 prefer the quasi-Newton methods **BFGS** (stores a dense Hessian
 approximation, fine up to a few hundred variables) or **L-BFGS-B**

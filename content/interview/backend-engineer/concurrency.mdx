@@ -23,6 +23,11 @@ tasks make progress by interleaving (one core switching between them).
 multiple cores. Async on a single thread is concurrent but not parallel;
 multiprocessing across cores is both.
 
+And the ceiling on what parallelism can buy: speedup flattens at one
+over the serial fraction, however many cores arrive.
+
+<Chart slug="amdahl-law" />
+
 ### Processes vs threads, how do they differ?
 
 **Threads** live inside one process and **share** its memory, so they

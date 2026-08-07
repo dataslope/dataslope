@@ -54,6 +54,12 @@ balancer) scales nearly without limit and adds redundancy, but requires your
 app tier to be **stateless** so any server can handle any request. Push
 session state into a shared cache or database so you can scale out freely.
 
+The reason headroom is the thing you are buying: queueing delay is
+proportional to one over the slack, so the last few points of
+utilisation cost more than all the ones before them.
+
+<Chart slug="queue-utilization-latency" />
+
 ### Explain the cache-aside pattern.
 
 Cache-aside (lazy loading) is the default caching strategy: on a read, the
