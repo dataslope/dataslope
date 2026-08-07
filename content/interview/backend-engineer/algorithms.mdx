@@ -23,12 +23,23 @@ scales: an $O(n^2)$ double loop that's fine for 100 items melts at
 1,000,000. The usual game is "make this brute-force $O(n^2)$ into $O(n)$
 with the right data structure."
 
+The curves the notation names, which is what makes the difference
+between two of them worth an interview question.
+
+<Chart slug="big-o-growth" />
+
 ### When do you reach for a hash map?
 
 When you need **$O(1)$ average lookup/insert by key**, membership tests,
 counting frequencies, grouping, or "have I seen this before?" It's what
 turns many $O(n^2)$ "compare all pairs" problems into a single $O(n)$ pass
 (see Two Sum below).
+
+And the reason a hash map is more machinery than an array: collisions
+are not rare, they are the normal state. With a thousand buckets it is
+even money by the fortieth key.
+
+<Chart slug="hash-collision-birthday" />
 
 ### Array vs linked list, trade-offs?
 
