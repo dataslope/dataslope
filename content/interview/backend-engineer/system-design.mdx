@@ -32,6 +32,11 @@ QPS. Distinguish **average** QPS from **peak** (often 2–3x average), and
 compute the **read/write ratio**, most consumer systems are read-heavy
 (100:1 or more), which drives caching and replica decisions.
 
+The set worth memorising is really one picture: what each level of the
+memory and network hierarchy costs, and how far apart they are.
+
+<Chart slug="memory-latency-ladder" />
+
 ### What is a load balancer and how does it distribute traffic?
 
 A load balancer sits in front of a pool of servers and spreads requests so
@@ -84,6 +89,12 @@ Write-through (update cache and DB together) keeps them consistent at write
 cost; write-behind batches writes for speed but risks data loss on crash.
 The classic quip, "there are only two hard things in computer science: cache
 invalidation and naming things", is about exactly this trade-off.
+
+A related number people underestimate: a request that fans out to many
+backends is as slow as its slowest call, so a one-percent tail per call
+becomes a coin flip for the page.
+
+<Chart slug="tail-latency-fanout" />
 
 ### What is database replication and what does it buy you?
 
