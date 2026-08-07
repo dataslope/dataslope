@@ -327,6 +327,8 @@ the p-value is so small it's printed in scientific notation. This is the
 the species differ. Real analyses are rarely this clean, which is exactly
 why we needed a test rather than eyeballing the means.
 
+<Chart slug="penguin-flipper-ttest" />
+
 ## Paired t-test: the same units, measured twice
 
 **The question it answers:** when you measure the *same* unit under two
@@ -355,9 +357,9 @@ flowchart TD
     U1 -. "compare group means;<br/>person variation = noise" .-> U2
   end
   subgraph PAIRED["Paired view (correct)"]
-    P1["Person 1: before -> after = diff"]
-    P2["Person 2: before -> after = diff"]
-    P3["Person 3: before -> after = diff"]
+    P1["Person 1: before → after = diff"]
+    P2["Person 2: before → after = diff"]
+    P3["Person 3: before → after = diff"]
     P1 --> PD["Test the DIFFERENCES<br/>against 0"]
     P2 --> PD
     P3 --> PD

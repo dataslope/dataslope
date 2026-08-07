@@ -127,7 +127,7 @@ who formalized it:
 
 ```mermaid
 flowchart TD
-    A["Stationarize<br/>(log, difference) -> d"] --> B["Identify p and q<br/>from PACF and ACF"]
+    A["Stationarize<br/>(log, difference) → d"] --> B["Identify p and q<br/>from PACF and ACF"]
     B --> C["Fit ARIMA(p, d, q)"]
     C --> D{"Residuals look<br/>like white noise?"}
     D -->|"no: structure remains"| B

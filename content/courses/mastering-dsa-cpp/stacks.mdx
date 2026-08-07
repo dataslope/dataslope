@@ -111,9 +111,9 @@ Here is the stack's signature party trick, and the warm-up question of a thousan
 
 ```mermaid
 flowchart TD
-    A["read '{' -> push"] --> B["read '[' -> push"]
-    B --> C["read ']' -> matches top, pop"]
-    C --> D["read '}' -> matches top, pop"]
+    A["read '{' → push"] --> B["read '[' → push"]
+    B --> C["read ']' → matches top, pop"]
+    C --> D["read '}' → matches top, pop"]
     D --> E["empty stack means balanced"]
 ```
 

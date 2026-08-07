@@ -26,8 +26,8 @@ A **copy** allocates a new buffer and duplicates every element:
 
 ```mermaid
 flowchart LR
-    A["a: vector<br/>data ptr -> buffer A"] --> BA["buffer A<br/>1,000,000 ints"]
-    B["b: vector<br/>data ptr -> buffer B"] --> BB["buffer B<br/>1,000,000 copies"]
+    A["a: vector<br/>data ptr → buffer A"] --> BA["buffer A<br/>1,000,000 ints"]
+    B["b: vector<br/>data ptr → buffer B"] --> BB["buffer B<br/>1,000,000 copies"]
 ```
 
 A **move** just steals the pointer:
@@ -35,7 +35,7 @@ A **move** just steals the pointer:
 ```mermaid
 flowchart TD
     A2["a: vector<br/>data ptr = nullptr<br/><code>size = 0</code>"]
-    B2["b: vector<br/>data ptr -> buffer A"] --> BA2["buffer A<br/>1,000,000 ints"]
+    B2["b: vector<br/>data ptr → buffer A"] --> BA2["buffer A<br/>1,000,000 ints"]
 ```
 
 The buffer is unchanged. `a` is left in a valid but empty state

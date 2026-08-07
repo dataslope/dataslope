@@ -25,7 +25,7 @@ authoritative, *wrong* answers.
 
 ```mermaid
 flowchart TD
-  A["Real data"] --> B["Fit a distribution<br/>(.fit -> parameters)"]
+  A["Real data"] --> B["Fit a distribution<br/>(.fit → parameters)"]
   B --> C["Sanity-check the fit<br/>(histogram overlay, Q-Q plot)"]
   C -->|"looks good"| D["Use the model:<br/>probabilities, thresholds, sims"]
   C -->|"poor fit"| E["Pick a different<br/>distribution"]
