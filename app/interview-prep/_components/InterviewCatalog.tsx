@@ -20,7 +20,7 @@
  * server component (the banners read the build-time image manifest directly).
  */
 import type { ReactNode } from "react";
-import { dotfade } from "tabbied/patterns";
+import { fadedbar } from "tabbied/patterns";
 import Link from "@/app/_components/Link";
 import { PatternBackdrop } from "@/app/_components/PatternBackdrop";
 import imageManifest from "@/lib/generated/images";
@@ -305,14 +305,14 @@ export function InterviewCatalog({ tracks }: { tracks: InterviewTrack[] }) {
 
   return (
     <>
-      {/* ── Track cards, on a dotfade backdrop ──
+      {/* ── Track cards, on a fadedbar backdrop ──
           The pattern is inset vertically so it emerges a little below the
           first row of cards and stops a little above the last row's
           bottom, which reads as a surface the grid sits on rather than a
           band laid across it, and runs the full width of the viewport so it
           does not stop dead at the 1120px content column. */}
       <PatternBackdrop
-        pattern={dotfade}
+        pattern={fadedbar}
         insetTop={56}
         insetBottom={56}
         fullWidth

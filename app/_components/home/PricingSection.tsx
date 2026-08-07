@@ -16,7 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { dotfade } from "tabbied/patterns";
+import { fadedbar } from "tabbied/patterns";
 
 import Link from "../Link";
 import { useRouter } from "next/navigation";
@@ -543,14 +543,15 @@ export function PricingSection({
           cards. The stripe layer sits behind an OPAQUE inner surface (the
           bordered card below), so it only shows in the down-right offset
           sliver, not through the table body. */}
-      {/* Dotfade backdrop. The table's surface is opaque, so the pattern is
-          only visible where it extends past it: it starts a little way down
-          the table, runs the full width of the viewport, and continues below
-          the table's bottom edge, so it reads as something the table is
-          resting on. The trailing margin keeps that overhang from crowding
-          whatever the page puts next. */}
+      {/* Fadedbar backdrop, the same pattern the /playground hero band uses.
+          The table's surface and its striped shell are both opaque, so the
+          pattern is only visible where it extends past them: it starts a
+          little way down the table, runs the full width of the viewport, and
+          continues below the table's bottom edge, so it reads as something
+          the table is resting on. The trailing margin keeps that overhang
+          from crowding whatever the page puts next. */}
       <PatternBackdrop
-        pattern={dotfade}
+        pattern={fadedbar}
         insetTop={140}
         insetBottom={-110}
         fullWidth
