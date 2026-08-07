@@ -190,15 +190,17 @@ system.
       filename: "main.py",
       starterCode: `import sympy as sp
 
-x = sp.symbols("x")
+x = sp.symbols("x", real=True)
 expr = sp.sin(x) * sp.exp(-(x**2))
 print("expression :", expr)
 print("derivative :", sp.diff(expr, x))
 print("series at 0:", sp.series(expr, x, 0, 6))
 
-# Solve an equation symbolically
-y = sp.symbols("y")
-print("solutions to x² + y² = 1, y > 0:", sp.solve([x**2 + y**2 - 1, y > 0], y))
+# Solve an equation symbolically. Constraints go on the *symbols*, not into
+# the system: x real and y positive is what makes solve() drop the negative
+# root and return one branch.
+y = sp.symbols("y", positive=True)
+print("solutions to x² + y² = 1, y > 0:", sp.solve(x**2 + y**2 - 1, y))
 
 # Convert a symbolic expression to a fast NumPy function
 f_num = sp.lambdify(x, sp.diff(expr, x), modules="numpy")

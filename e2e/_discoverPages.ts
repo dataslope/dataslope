@@ -1,23 +1,36 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-// Discovers the docs routes whose MDX source contains a given component,
-// by walking content/courses + content/fumadocs-dev and mapping file paths
-// to fumadocs routes:
+// Discovers the docs routes whose MDX source contains a given component, by
+// walking every MDX collection and mapping file paths to fumadocs routes:
 //
 //   content/fumadocs-dev/index.mdx                 -> /fumadocs-dev
 //   content/fumadocs-dev/code-blocks-python.mdx    -> /fumadocs-dev/code-blocks-python
 //   content/courses/python-basics/strings.mdx      -> /courses/python-basics/strings
 //   content/courses/<course>/index.mdx             -> /courses/<course>
+//   content/interview/backend-engineer/concurrency.mdx
+//                                                  -> /interview-prep/backend-engineer/concurrency
 //
 // Used by the courseware-wide e2e sweeps so they don't hardcode a page list.
+//
+// The sections here MUST stay in step with the collections in
+// `source.config.ts` and the `baseUrl`s in `lib/source.ts` — a collection
+// missing from this list is not a smaller sweep, it is a silent one. When
+// `content/interview` was absent, the opt-in `COURSEWARE=1` run reported
+// success while never loading a single interview page, and the 138
+// `<CodeBlock>`s, 16 `<ChallengeCard>`s and 39 `<SqlCodeBlock>`s under it went
+// unchecked by anything. `__tests__/discoverPages.test.ts` pins the list
+// against the collections so the next one added fails a unit test rather than
+// quietly shrinking the sweep.
 
-const SECTIONS = [
-  { dir: path.join(process.cwd(), "content", "courses"), base: "/courses" },
-  {
-    dir: path.join(process.cwd(), "content", "fumadocs-dev"),
-    base: "/fumadocs-dev",
-  },
+const CONTENT_ROOT = path.join(process.cwd(), "content");
+
+export const SECTIONS = [
+  { dir: path.join(CONTENT_ROOT, "courses"), base: "/courses" },
+  { dir: path.join(CONTENT_ROOT, "fumadocs-dev"), base: "/fumadocs-dev" },
+  // `content/interview` is served at `/interview-prep`; the directory name and
+  // the route deliberately differ (see `interviewSource` in `lib/source.ts`).
+  { dir: path.join(CONTENT_ROOT, "interview"), base: "/interview-prep" },
 ];
 
 function walk(dir: string): string[] {

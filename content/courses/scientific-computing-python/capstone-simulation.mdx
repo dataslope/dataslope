@@ -91,20 +91,33 @@ plt.show()
       starterCode: `import numpy as np
 from scipy.integrate import solve_ivp
 
-def make_rhs(r, K, a, e, m, sigma, rng):
-    """Returns f(t, y) with stochastic prey growth perturbation."""
+def make_rhs(r, K, a, e, m, sigma, rng, t_end, n_nodes=401):
+    """Returns f(t, y) with a stochastic prey-growth perturbation.
+
+    The noise is drawn ONCE, as a fixed path in time, and interpolated.
+    That is not a stylistic choice. An adaptive solver requires f to be a
+    deterministic function of (t, y): it estimates the local error by
+    comparing two embedded formulas built from evaluations of f, and it
+    reruns a step at a smaller h whenever that estimate is too big. Draw a
+    fresh random number inside f and every evaluation disagrees with every
+    other, so the solver reads noise as error, shrinks h, and reads the same
+    noise again. The step size collapses and the run never ends. Freezing
+    the path keeps the randomness (a seed still selects a realization) and
+    gives the integrator something it can actually integrate.
+    """
+    t_nodes = np.linspace(0.0, t_end, n_nodes)
+    xi = rng.standard_normal(n_nodes)
 
     def f(t, z):
         x, y = z
-        # Tiny random perturbation in prey growth to make seeds matter
-        noise = sigma * rng.standard_normal()
+        noise = sigma * np.interp(t, t_nodes, xi)
         return [r * x * (1 - x / K) - a * x * y + noise * x, e * a * x * y - m * y]
 
     return f
 
 def run_one(a, seed, r=1.0, K=200.0, e=0.1, m=0.4, sigma=0.02, t_end=200.0):
     rng = np.random.default_rng(seed)
-    rhs = make_rhs(r, K, a, e, m, sigma, rng)
+    rhs = make_rhs(r, K, a, e, m, sigma, rng, t_end)
 
     # Event: predators go extinct (y drops below 0.5)
     def extinct(t, z):
@@ -275,10 +288,15 @@ from scipy.integrate import solve_ivp
 
 def survives(a, seed):
     rng = np.random.default_rng(seed)
+    # One frozen noise path per replicate, for the reason spelled out in
+    # simulate.py: f has to be a deterministic function of (t, y) or the
+    # adaptive step controller mistakes the randomness for its own error.
+    t_nodes = np.linspace(0.0, 200.0, 401)
+    xi = rng.standard_normal(t_nodes.size)
 
     def rhs(t, z, r=1.0, K=200.0, e=0.1, m=0.4, sigma=0.05):
         x, y = z
-        noise = sigma * rng.standard_normal()
+        noise = sigma * np.interp(t, t_nodes, xi)
         return [r * x * (1 - x / K) - a * x * y + noise * x, e * a * x * y - m * y]
 
     def extinct(t, z):
@@ -303,10 +321,22 @@ for a in [0.005, 0.010, 0.015, 0.020, 0.030]:
   ]}
 />
 
-The survival probability falls as predation intensifies, and
-binomial standard errors quantify how confident we are in each
-estimate. This is the *output* of a real computational science
-project: not just a number, but a number with an uncertainty.
+Predator survival *rises* with the attack rate, and it does not
+rise gently: it is near zero up to $a = 0.015$, uncertain at
+$a = 0.020$, and certain by $a = 0.030$. That is a threshold, and
+the model tells you exactly where it should be. Predators grow
+only while $e a x > m$, i.e. while prey exceed $m / (e a) = 4 / a$.
+With a carrying capacity of $K = 200$ the prey can never supply
+that until $4 / a < 200$, or $a > 0.02$. The Monte Carlo finds
+the same number the algebra does, which is the check worth making
+whenever a simulation and a closed form can both answer.
+
+The interesting estimate is the one *at* the boundary. Only
+$a = 0.020$ has a standard error worth printing, because only
+there does the outcome depend on the noise rather than on the
+parameters. This is the *output* of a real computational science
+project: not just a number, but a number with an uncertainty, and
+a reason the uncertainty is where it is.
 
 ## What you just used
 

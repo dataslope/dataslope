@@ -286,26 +286,48 @@ def robertson(t, y):
 y0 = [1.0, 0.0, 0.0]
 t_span = [0, 1e5]
 
-for method in ["RK45", "BDF", "LSODA"]:
+# RK45 is not merely slower here, it is unusable: on a stiff problem its step
+# size is capped by *stability* rather than accuracy, so the work scales with
+# the length of the interval. Asking it for the full 1e5 would run for hours,
+# so it gets a ten-thousandth of the span, and still does more work than the
+# implicit solvers do for the whole thing.
+RK45_END = 10.0
+runs = {}
+
+for method, span in [("RK45", [0, RK45_END]), ("BDF", t_span), ("LSODA", t_span)]:
     t0 = time.perf_counter()
     try:
-        sol = solve_ivp(robertson, t_span, y0, method=method, rtol=1e-6, atol=1e-10)
-        dt = time.perf_counter() - t0
+        sol = solve_ivp(robertson, span, y0, method=method, rtol=1e-6, atol=1e-10)
+        runs[method] = sol
         print(
-            f"{method:7s}: {sol.nfev:>6d} fevals, "
-            f"{sol.t.size:>5d} steps, {dt * 1000:.1f} ms, "
+            f"{method:7s}: t to {span[1]:<8.0e} {sol.nfev:>7d} fevals, "
+            f"{sol.t.size:>5d} steps, {(time.perf_counter() - t0) * 1000:8.1f} ms, "
             f"final = {sol.y[:, -1].round(6)}"
         )
     except Exception as e:
         print(f"{method:7s}: FAILED  ({e})")
+
+# Extrapolate what the explicit method would have cost for the real interval.
+if "RK45" in runs and "BDF" in runs:
+    per_unit = runs["RK45"].nfev / RK45_END
+    total = per_unit * t_span[1]
+    print(f"\\nRK45 used {per_unit:,.0f} evaluations per unit of t.")
+    print(f"The full span to {t_span[1]:.0e} would be about {total:.0e} of them,")
+    print(f"or {total / runs['BDF'].nfev:.0e}x what BDF needed for all of it.")
 `,
     },
   ]}
 />
 
-`RK45` either fails or takes thousands of evaluations. `BDF` and
-`LSODA`, *implicit* methods designed for stiff problems, handle
-it in tens of steps.
+`BDF` and `LSODA`, *implicit* methods designed for stiff problems,
+cross the whole interval in around a thousand evaluations. `RK45`
+spends fifty times that to cover a ten-thousandth of it, and the
+gap is not a constant factor you could buy back with a faster
+machine: the explicit method's cost grows with the interval,
+the implicit ones' does not.
+
+That is what "stiff" costs you, and it is why the run above does
+not simply wait for `RK45` to finish. It would not finish.
 
 **Rule of thumb:** if `RK45` gets unbearably slow or refuses to
 converge, switch to `BDF` or `LSODA`.

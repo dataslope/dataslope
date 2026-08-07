@@ -235,6 +235,22 @@ export function extractChallengeCards(root = CONTENT_DIR, adapter = "python") {
       continue;
     }
 
+    // Which buffers the Solution button fills, mirroring `solutionFiles` in
+    // ChallengeCard.tsx: every file is shown, one that supplies `solutionCode`
+    // shows that and one that does not keeps its starter.
+    //
+    // Reading `solutionCode` off the *entry* alone was wrong in both
+    // directions. On the multi-file cards in python-basics the entry is a
+    // fixed driver the instructions say not to edit ("Do not edit main.py")
+    // and the whole exercise lives in the sibling modules, so ten fully
+    // solved cards looked unsolved and went unchecked. In the other
+    // direction, `stage()` wrote siblings from `starterCode`, so a card whose
+    // solution spanned files would have been graded against its own blanks —
+    // it passes only if the tests never touch the sibling, which is a test
+    // gap reported as a pass.
+    const solved = files.filter((f) => f.solutionCode);
+    for (const f of files) f.solutionSource = f.solutionCode || f.starterCode;
+
     cards.push({
       file,
       line,
@@ -244,10 +260,11 @@ export function extractChallengeCards(root = CONTENT_DIR, adapter = "python") {
       entry: entry.filename,
       tests,
       // What Check Answer runs: the hidden setup, then the solution buffer.
-      // A card with no solutionCode has nothing to verify.
-      solution: entry.solutionCode
-        ? `${entry.initCode ? `${entry.initCode}\n` : ""}${entry.solutionCode}`
-        : null,
+      // A card where no file supplies a solution has nothing to verify.
+      solution:
+        solved.length > 0
+          ? `${entry.initCode ? `${entry.initCode}\n` : ""}${entry.solutionSource}`
+          : null,
     });
   }
   return cards;

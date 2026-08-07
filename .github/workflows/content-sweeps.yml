@@ -1,0 +1,133 @@
+name: Content sweeps
+
+# Runs the two Pyodide sweeps that execute the site's Python content:
+#
+#   • check:challenges  (~7m)  — every <ChallengeCard>'s reference solution
+#                                against that card's own tests.
+#   • check:code-blocks (~25m) — every <CodeBlock> a reader can press Run on.
+#
+# Both existed as npm scripts that nothing invoked, which is the same as not
+# having them: the failure they catch is a library deprecating an argument
+# under content nobody edited, so it appears on a day when no PR touches the
+# lesson and there is nothing to notice it. `freq="H"` reached pandas 3 that
+# way.
+#
+# Triggers, and why each one:
+#   • pull_request, paths-filtered — the lesson-facing case. A PR that edits
+#     content, the sweeps, or the harness the cards run in gets checked before
+#     merge.
+#   • schedule (nightly) — the case a PR trigger cannot cover, and the reason
+#     this file exists. Nothing in the repo changes when Pyodide ships a new
+#     pandas; the CDN does. Only a clock finds that.
+#   • workflow_dispatch — re-run one sweep on demand without waiting for the
+#     other.
+#
+# The two run as separate jobs so wall-clock is the slower one (~25m) rather
+# than the sum, and so a red challenge sweep still reports its own failures
+# instead of being masked by a timeout in the other.
+
+on:
+  pull_request:
+    paths:
+      - "content/**"
+      - "scripts/check-code-blocks.mjs"
+      - "scripts/check-challenge-cards.mjs"
+      - "scripts/lib/mdx-blocks.mjs"
+      - "scripts/lib/pyodide-runner.mjs"
+      - "app/_components/challengeHarness.ts"
+      # A Pyodide bump changes the interpreter both sweeps mirror.
+      - "package-lock.json"
+      - ".github/workflows/content-sweeps.yml"
+  schedule:
+    # 05:40 UTC daily. Off the hour because the shared runner pool is busiest
+    # exactly on it.
+    - cron: "40 5 * * *"
+  workflow_dispatch:
+    inputs:
+      sweep:
+        description: "Which sweep to run"
+        type: choice
+        default: both
+        options: [both, challenges, code-blocks]
+
+permissions:
+  contents: read
+
+concurrency:
+  # Supersede an in-flight run for the same PR, but never cancel a nightly:
+  # the scheduled run is the only thing watching for CDN drift.
+  group: content-sweeps-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  challenges:
+    name: Challenge cards
+    if: github.event_name != 'workflow_dispatch' || inputs.sweep != 'code-blocks'
+    runs-on: ubuntu-latest
+    # Generous against a cold cache and a slow PyPI, tight enough that a block
+    # which hangs past its own 30s budget cannot burn a runner for six hours.
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      # The sweeps need `pyodide` and node built-ins. `--ignore-scripts` skips
+      # the postinstall codegen, which they do not read.
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Restore dataset cache
+        uses: actions/cache@v4
+        with:
+          path: .dataset-cache
+          key: dataset-cache-v1-${{ hashFiles('content/**/*.mdx') }}
+          restore-keys: dataset-cache-v1-
+
+      - name: Run check:challenges
+        run: npm run check:challenges -- --json challenges-report.json
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: challenges-report
+          path: challenges-report.json
+          if-no-files-found: ignore
+
+  code-blocks:
+    name: Code blocks
+    if: github.event_name != 'workflow_dispatch' || inputs.sweep != 'challenges'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Restore dataset cache
+        uses: actions/cache@v4
+        with:
+          path: .dataset-cache
+          key: dataset-cache-v1-${{ hashFiles('content/**/*.mdx') }}
+          restore-keys: dataset-cache-v1-
+
+      - name: Run check:code-blocks
+        run: npm run check:code-blocks -- --json code-blocks-report.json
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-blocks-report
+          path: code-blocks-report.json
+          if-no-files-found: ignore
