@@ -75,6 +75,8 @@ position. The well-documented pattern is often called
 end of a long context is recalled reliably, while information buried
 in the middle is recalled noticeably less well.
 
+<Chart slug="lost-in-the-middle" />
+
 <CodeBlock
   adapter="python"
   files={[
@@ -108,6 +110,11 @@ Recall from the attention chapter that every token attends to every
 other token, so cost scales with the square of the length. Going from
 8,000 to 1,000,000 tokens is a 125-fold increase in length and roughly
 15,000-fold in naive attention work.
+
+Against a linear reference, which is what "125 times the text" would cost if
+each token were as cheap as the last, the gap is two orders of magnitude:
+
+<Chart slug="attention-cost" />
 
 Getting there required a stack of engineering (attention
 approximations, better memory layouts, positional schemes that

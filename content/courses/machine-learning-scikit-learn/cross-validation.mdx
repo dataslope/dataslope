@@ -61,6 +61,12 @@ have been several points too optimistic or too pessimistic, and you would
 never have known. Which split is the "true" one? None of them. The truth is
 somewhere in the middle, and a single split cannot tell you where.
 
+Here is the same wobble next to the fix. Each dot is one evaluation of the
+same model, and the only difference between the rows is how much of the data
+each estimate was allowed to see:
+
+<Chart slug="one-split-is-a-lottery" />
+
 <Callout type="warn" title="A single split hides its own uncertainty">
 One train/test split gives you a point estimate with no error bars. With a
 few hundred rows, that estimate can easily be off by several points. Model

@@ -72,6 +72,12 @@ the repeating **seasonal** wave, and the **residual**, what's left when you
 subtract the other two. For data we built additively, the residual is
 shapeless noise, exactly as it should be.
 
+Those four panels each have their own vertical scale, which hides how the
+pieces relate. Drawn on one axis in the order they are added, "additive" stops
+being a keyword argument:
+
+<Chart slug="decomposition-buildup" />
+
 <Callout type="info" title="How seasonal_decompose actually works (the short version)">
 1. **Trend**, estimate it with a centered moving average whose window is
    the seasonal period (so the season averages out). This is why the trend

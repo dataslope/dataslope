@@ -65,8 +65,8 @@ flowchart TD
   D --> E["Mark your OBSERVED statistic<br/>on that distribution"]
   E --> F["p-value = area in the tail(s)<br/>at least as extreme as observed"]
   F --> G{"Tail tiny?"}
-  G -->|"yes, p small"| H["Data is surprising under H0<br/>-> doubt H0"]
-  G -->|"no, p large"| I["Data is ordinary under H0<br/>-> no reason to doubt H0"]
+  G -->|"yes, p small"| H["Data is surprising under H0<br/>→ doubt H0"]
+  G -->|"no, p large"| I["Data is ordinary under H0<br/>→ no reason to doubt H0"]
 ```
 
 Let's make that picture real. We'll simulate the null distribution for a

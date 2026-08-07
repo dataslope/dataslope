@@ -22,6 +22,12 @@ mergeSort(a): if size <= 1 return; sort left; sort right; merge
 
 The guarantees are ironclad: O(n log n) time on every input, no exceptions, plus stability when the merge prefers the left element on ties (note the `<=` in the code below, change it to `<` and stability dies silently). The price is O(n) extra memory for the merge buffer.
 
+The n log n is not a coincidence, it is the shape of the recursion. Every row
+below costs n, because merging a level touches each element once, and the
+number of rows is how many times n can be halved:
+
+<Chart slug="merge-sort-levels" />
+
 ```mermaid
 graph TD
     A["<code>[5,2,8,1,9,3,7,4]</code>"] --> B["<code>[5,2,8,1]</code>"]
