@@ -242,8 +242,12 @@ function TrackCard({ track }: { track: InterviewTrack }) {
               the track drills in a couple of lines instead, the way the
               /courses rows do. `line-clamp-3` is the guard against a future
               entry running long and re-inflating the grid. */}
+          {/* `mb-5` is the floor on the gap to the footer rule below. The
+              footer's `mt-auto` only pays out the row's *leftover* height, so
+              on the tallest card in a row (a three-line description) it
+              collapses to zero and the paragraph sits right on the border. */}
           {p ? (
-            <span className="mt-1.5 line-clamp-3 text-[14.5px] leading-[1.5] text-[#999999] dark:text-[var(--ds-gray-400)]">
+            <span className="mt-1.5 mb-5 line-clamp-3 text-[14.5px] leading-[1.5] text-[#999999] dark:text-[var(--ds-gray-400)]">
               {p.description}
             </span>
           ) : null}
