@@ -143,6 +143,11 @@ back to. That is expected, and it is why the first `change` is also
 
 ## The window frame, moving averages
 
+What the frame width buys and what it costs. A wider window is smoother and
+lags further behind a turn:
+
+<Chart slug="rolling-window-lag" />
+
 So far an ordered `SUM` summed *everything up to the current row*. That
 default is called the frame `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT
 ROW`. You can change the frame to a **sliding window**, say, the current

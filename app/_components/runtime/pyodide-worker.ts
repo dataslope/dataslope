@@ -162,7 +162,7 @@ const IMPLICIT_PACKAGES: { pattern: RegExp; pkg: string }[] = [
   // plotly's trendlines are fitted by statsmodels.
   { pattern: /\btrendline\s*=/, pkg: "statsmodels" },
   // Arrow interop, and the parquet engine pandas and polars both prefer.
-  { pattern: /\bpyarrow\b|\.to_arrow\(|\.from_arrow\(/, pkg: "pyarrow" },
+  { pattern: /\bpyarrow\b|\.(?:to|from)_(?:arrow|pandas)\(/, pkg: "pyarrow" },
   { pattern: /\.(?:to|read|scan|sink)_parquet\(/, pkg: "pyarrow" },
   // zoneinfo's database is a separate package on Pyodide, and pandas reaches
   // for it on any named time zone.

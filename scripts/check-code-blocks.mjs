@@ -273,7 +273,7 @@ const implicitLoaded = new Set();
  *  than an import. */
 const IMPLICIT_PACKAGES = [
   { pattern: /\btrendline\s*=/, pkg: "statsmodels" },
-  { pattern: /\bpyarrow\b|\.to_arrow\(|\.from_arrow\(/, pkg: "pyarrow" },
+  { pattern: /\bpyarrow\b|\.(?:to|from)_(?:arrow|pandas)\(/, pkg: "pyarrow" },
   { pattern: /\.(?:to|read|scan|sink)_parquet\(/, pkg: "pyarrow" },
   { pattern: /\btz_localize\(|\btz_convert\(|\bZoneInfo\(|\btz\s*=\s*["']/, pkg: "tzdata" },
 ];
