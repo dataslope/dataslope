@@ -16,8 +16,13 @@ import { glazing } from "tabbied/patterns";
  * Passing theme-specific colours would mean threading the current theme in
  * here and re-rendering the doodle on every toggle.
  *
- * The band is masked to fade out at the top, so it emerges from the page
- * rather than starting on a hard edge.
+ * The band is masked at both ends: a long fade-in at the top so it emerges
+ * from the page rather than starting on a hard edge, and a shorter fade-out
+ * at the bottom so it dissolves into the footer instead of stopping dead
+ * against the links. The two are deliberately unequal — the top edge is the
+ * one a reader scrolls into, so it gets the gentler ramp, while the bottom
+ * only needs enough to kill the hard line. This fade-in is the deepest on the
+ * site, and the other bands' fade-outs (see `PatternBackdrop`) stay under it.
  *
  * Motion is handled by the library: `redrawInterval` reseeds the pattern
  * periodically, and Tabbied already skips ticks under
@@ -29,11 +34,22 @@ import { glazing } from "tabbied/patterns";
  *
  * `decorative` defaults to true, so the wrapper is `aria-hidden`.
  */
+/** Band height, and the two mask ramps measured against it: the fade-in runs
+ *  0 → 55% (143px) and the fade-out covers the last 64px. Written as a single
+ *  `mask-image` rather than Tailwind arbitrary values because the fade-out
+ *  needs a `calc()` the utility syntax renders awkwardly. */
+const HEIGHT = 260;
+const FADE_OUT_PX = 64;
+const MASK =
+  "linear-gradient(to bottom, transparent 0, #000 55%, " +
+  `#000 calc(100% - ${FADE_OUT_PX}px), transparent 100%)`;
+
 export function FooterPattern() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none w-full select-none opacity-60 [mask-image:linear-gradient(to_bottom,transparent,black_55%)] dark:opacity-50"
+      className="pointer-events-none w-full select-none opacity-60 dark:opacity-50"
+      style={{ maskImage: MASK, WebkitMaskImage: MASK }}
     >
       <TabbiedPattern
         pattern={glazing}
@@ -43,7 +59,7 @@ export function FooterPattern() {
           "rgba(20,140,255,0.22)",
         ]}
         cellSize={56}
-        height={220}
+        height={HEIGHT}
         redrawInterval={18_000}
       />
     </div>
