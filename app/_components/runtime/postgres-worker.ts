@@ -2,7 +2,7 @@
 // runtime rather than bundled by Next.js/Turbopack. This mirrors the pattern
 // already used for SQLite (@sqlite.org/sqlite-wasm), DuckDB
 // (@duckdb/duckdb-wasm), Pyodide, and PHP throughout this repo, keeping
-// the large WASM payload off Vercel's bandwidth budget and avoiding
+// the large WASM payload off this app's own origin and avoiding
 // Turbopack's inability to statically analyse PGlite's internal dynamic
 // imports. CDN URLs and version are defined in cdn.ts.
 

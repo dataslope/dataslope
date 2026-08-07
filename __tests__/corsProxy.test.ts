@@ -6,14 +6,24 @@ import {
   isLocalhostOrigin,
 } from "../cloudflare-cors-proxy/src/origins";
 
+// The allowlist the proxy actually ships with (see cloudflare-cors-proxy's
+// README): the app's production domains plus its Cloudflare Workers hosts.
+// This used to be modelled on the Vercel deployment, whose preview wildcard
+// put the variable part in a *suffix* segment
+// (`dataslope-*-<team>.vercel.app`). Cloudflare inverts that — the version or
+// alias is a *prefix* on a fixed worker-name host — so the old fixtures were
+// exercising a pattern shape this project no longer deploys, and leaving the
+// deployed one untested.
 const ALLOW = parseAllowedOrigins(
-  "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.vercel.app,https://dataslope-*-ye-joo-parks-projects.vercel.app",
+  "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.subwaymatch.workers.dev,https://*-dataslope.subwaymatch.workers.dev",
 );
 
 describe("parseAllowedOrigins", () => {
   it("separates exact entries from wildcard patterns", () => {
     expect(ALLOW.exact.has("https://dataslope.com")).toBe(true);
-    expect(ALLOW.exact.has("https://dataslope.vercel.app")).toBe(true);
+    expect(
+      ALLOW.exact.has("https://dataslope.subwaymatch.workers.dev"),
+    ).toBe(true);
     expect(ALLOW.patterns).toHaveLength(1);
   });
 
@@ -34,7 +44,9 @@ describe("isOriginInAllowList, exact origins", () => {
     expect(isOriginInAllowList("https://dataslope.com", ALLOW)).toBe(true);
     expect(isOriginInAllowList("https://www.dataslope.com", ALLOW)).toBe(true);
     expect(isOriginInAllowList("http://localhost:3000", ALLOW)).toBe(true);
-    expect(isOriginInAllowList("https://dataslope.vercel.app", ALLOW)).toBe(true);
+    expect(
+      isOriginInAllowList("https://dataslope.subwaymatch.workers.dev", ALLOW),
+    ).toBe(true);
   });
 
   it("rejects unrelated origins", () => {
@@ -45,34 +57,39 @@ describe("isOriginInAllowList, exact origins", () => {
   });
 });
 
-describe("isOriginInAllowList, Vercel preview wildcards", () => {
-  it("accepts branch/commit preview deployments under the team scope", () => {
+describe("isOriginInAllowList, Workers preview wildcards", () => {
+  it("accepts version and alias preview deployments of the app worker", () => {
+    // Per-version hostname.
     expect(
       isOriginInAllowList(
-        "https://dataslope-git-claude-focused-barde-c4a546-ye-joo-parks-projects.vercel.app",
+        "https://6f1c2a3b-dataslope.subwaymatch.workers.dev",
         ALLOW,
       ),
     ).toBe(true);
+    // Named alias.
     expect(
       isOriginInAllowList(
-        "https://dataslope-git-claude-vigilant-feyn-a92c1c-ye-joo-parks-projects.vercel.app",
-        ALLOW,
-      ),
-    ).toBe(true);
-    // Bare per-deployment hash form.
-    expect(
-      isOriginInAllowList(
-        "https://dataslope-a92c1c-ye-joo-parks-projects.vercel.app",
+        "https://staging-dataslope.subwaymatch.workers.dev",
         ALLOW,
       ),
     ).toBe(true);
   });
 
-  it("rejects a same-named project under a different (attacker) team scope", () => {
-    // The `*` cannot cross the team-scope suffix, so a different scope fails.
+  it("rejects another worker on the same workers.dev subdomain", () => {
+    // The pattern's fixed `-dataslope` segment is what scopes it to the app
+    // worker; a different worker on the same owner subdomain must not match.
     expect(
       isOriginInAllowList(
-        "https://dataslope-abc-evil-team-projects.vercel.app",
+        "https://some-other-worker.subwaymatch.workers.dev",
+        ALLOW,
+      ),
+    ).toBe(false);
+  });
+
+  it("rejects the same worker name under a different (attacker) subdomain", () => {
+    expect(
+      isOriginInAllowList(
+        "https://staging-dataslope.attacker.workers.dev",
         ALLOW,
       ),
     ).toBe(false);
@@ -81,13 +98,13 @@ describe("isOriginInAllowList, Vercel preview wildcards", () => {
   it("does not let the wildcard cross a dot into another domain", () => {
     expect(
       isOriginInAllowList(
-        "https://dataslope-x.ye-joo-parks-projects.vercel.app",
+        "https://x.staging-dataslope.subwaymatch.workers.dev",
         ALLOW,
       ),
     ).toBe(false);
     expect(
       isOriginInAllowList(
-        "https://dataslope-x-ye-joo-parks-projects.vercel.app.evil.com",
+        "https://staging-dataslope.subwaymatch.workers.dev.evil.com",
         ALLOW,
       ),
     ).toBe(false);
@@ -96,7 +113,7 @@ describe("isOriginInAllowList, Vercel preview wildcards", () => {
   it("requires the https scheme exactly", () => {
     expect(
       isOriginInAllowList(
-        "http://dataslope-x-ye-joo-parks-projects.vercel.app",
+        "http://staging-dataslope.subwaymatch.workers.dev",
         ALLOW,
       ),
     ).toBe(false);
@@ -126,8 +143,8 @@ describe("wildcardOriginToRegExp", () => {
   });
 
   it("requires at least one character for the wildcard", () => {
-    const re = wildcardOriginToRegExp("https://app-*.vercel.app");
-    expect(re.test("https://app-.vercel.app")).toBe(false);
-    expect(re.test("https://app-x.vercel.app")).toBe(true);
+    const re = wildcardOriginToRegExp("https://*-dataslope.example.workers.dev");
+    expect(re.test("https://-dataslope.example.workers.dev")).toBe(false);
+    expect(re.test("https://x-dataslope.example.workers.dev")).toBe(true);
   });
 });

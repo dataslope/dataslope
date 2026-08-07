@@ -561,7 +561,7 @@ export function PricingSection({
           accent without leaving the palette. */}
       <PatternBackdrop
         pattern={fadedbar}
-        insetTop={140}
+        insetTop={72}
         insetBottom={-220}
         fullWidth
         fadeBottom={96}

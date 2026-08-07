@@ -1,8 +1,12 @@
 // jsDelivr CDN configuration for the C# .NET WebAssembly runtime
 // bundle. The bundle's assemblies (~35 MB) are committed under
 // cdn-assets/_dotnet/ but intentionally kept out of Next.js's public/
-// folder so Vercel does not serve, and charge bandwidth for, those
-// files. (Java's tools.jar is handled the same way, published as the
+// folder so this app's own origin never serves them. (Originally that was
+// to keep them off Vercel's metered bandwidth; the site runs on Cloudflare
+// Workers now, where the cost is different but the conclusion is the same —
+// see the outputFileTracingExcludes note in next.config.ts for what a
+// traced .wasm does to the Worker bundle.) (Java's tools.jar is handled the
+// same way, published as the
 // dataslope-tools-jar npm package and fetched from unpkg, see
 // TOOLS_JAR_CDN below, because jsDelivr refuses .jar files.)
 //
@@ -28,8 +32,8 @@ export const PGLITE_WORKER_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pgl
 
 // Java's tools.jar (~18 MB), the OpenJDK 8 javac that CheerpJ drives,
 // is published as the standalone npm package `dataslope-tools-jar` and
-// fetched from unpkg at runtime (see cheerpj.ts), so Vercel never serves
-// it. unpkg is used rather than jsDelivr (which refuses .jar files with
+// fetched from unpkg at runtime (see cheerpj.ts), so this app's origin
+// never serves it. unpkg is used rather than jsDelivr (which refuses .jar files with
 // HTTP 403) and rather than GitHub release assets (which send no
 // Access-Control-Allow-Origin header): unpkg serves .jar with
 // `access-control-allow-origin: *` and, when the version is pinned, an

@@ -25,8 +25,8 @@
 //          has no per-file size limit below GitHub's 100 MB cap, but
 //          only allows ~5-minute HTTP caching. Used when jsDelivr
 //          fails (outage, or its ~20 MB per-file limit).
-//      Either way the bytes come from a CDN, not Vercel, so sample
-//      databases stop counting against Vercel's bandwidth budget.
+//      Either way the bytes come from a CDN rather than this app's own
+//      origin, which never has to serve a sample database.
 //
 // The helpers below are dialect-agnostic: SQLite and Postgres fetch SQL
 // scripts with `fetchDatasetText`, the DuckDB runtime uses
