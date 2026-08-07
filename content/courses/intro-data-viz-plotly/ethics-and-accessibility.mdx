@@ -69,6 +69,13 @@ fig2.show()
 The data is identical. The second chart screams "B is *twice* A",
 which it manifestly isn't.
 
+The same trick on five values instead of two, drawn honestly and then
+on the cropped axis:
+
+<Chart slug="bar-truncation" />
+
+<Chart slug="bar-truncation-cropped" />
+
 ### 2. Cherry-picked time ranges
 
 Show only the months that support your story; omit the months that
@@ -79,11 +86,27 @@ The fix: **always show enough history** to put a trend in context.
 If a series has been wandering up and down for 10 years, a
 3-month "uptrend" is noise.
 
+Ten years of a metric that goes nowhere, with the window a motivated
+author would reach for marked on it:
+
+<Chart slug="cherry-picked-window" />
+
+And that window on its own. Every value is real, the axis starts at
+zero, and it tells you the opposite of the chart above:
+
+<Chart slug="cherry-picked-window-zoom" />
+
 ### 3. Dual y-axes
 
 Two unrelated series on the same chart with two y-axes can be
 *scaled* to look correlated, even when they aren't. Most
 visualization style guides discourage dual axes entirely.
+
+Here is why. Both panels below hold the same two series and the same
+left axis; only the right-hand one differs, and both settings are
+ordinary choices. They support opposite conclusions:
+
+<Chart slug="dual-axis-illusion" />
 
 ### 4. Misleading color choices
 
@@ -93,17 +116,36 @@ visualization style guides discourage dual axes entirely.
 - Inverting an intuitive color direction (red for "good"?) makes
   the chart read backwards.
 
+The first two, drawn. A rainbow ramp against a perceptually uniform
+one on the same field:
+
+<Chart slug="rainbow-vs-sequential" />
+
+And a default palette against a colorblind-safe one, each shown as a
+red-green viewer sees it:
+
+<Chart slug="colorblind-safe" />
+
 ### 5. Inappropriate aggregation
 
 Showing an average can hide a bimodal distribution. Showing a
 median can hide the magnitude of outliers. Always ask whether
 your chosen summary is honest about the variation.
 
+Four groups with an identical mean, and the data behind the bars:
+
+<Chart slug="bar-hides-distribution" />
+
 ### 6. Map projections that distort area
 
 We covered this in the geographic chapter. Mercator's
 exaggeration of polar regions has shaped centuries of cultural
 geography. Choose your projection deliberately.
+
+How much exaggeration, exactly: area scales as sec²(latitude), which
+is 1 at the equator and past 10 where Greenland sits.
+
+<Chart slug="mercator-area" />
 
 ## The Tufte "data-ink" principle
 
