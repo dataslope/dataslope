@@ -47,6 +47,16 @@ size are weaker but let you pack *more variables* into one chart. A
 2-D scatter shows two variables through position; map color and size
 too and you are showing four variables at once.
 
+The channels are not equally good, though, and the ranking is measured
+rather than aesthetic. The same difference read as a position, a length,
+an angle, an area, and a colour:
+
+<Chart slug="encoding-accuracy" />
+
+That is the reason to spend `x` and `y` on the comparison your reader
+actually has to make, and to put the variable they only need to
+distinguish into colour.
+
 <CodeBlock adapter="r"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[{ filename: "main.r",

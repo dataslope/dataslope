@@ -267,6 +267,16 @@ const dictCtor = py.globals.get("dict");
 const MICROPIP_PACKAGES = { openpyxl: "openpyxl", seaborn: "seaborn" };
 const micropipInstalled = new Set(["plotly"]);
 
+/** Packages a block needs but never names. Mirrors IMPLICIT_PACKAGES in the
+ *  worker; the comment there explains why the trigger is a call pattern rather
+ *  than an import. */
+const IMPLICIT_PACKAGES = [
+  { pattern: /\btrendline\s*=/, pkg: "statsmodels" },
+  { pattern: /\bpyarrow\b|\.to_arrow\(|\.from_arrow\(/, pkg: "pyarrow" },
+  { pattern: /\.(?:to|read|scan|sink)_parquet\(/, pkg: "pyarrow" },
+  { pattern: /\btz_localize\(|\btz_convert\(|\bZoneInfo\(|\btz\s*=\s*["']/, pkg: "tzdata" },
+];
+
 /** Anchored to a line start, so a module named inside a string or a comment
  *  does not trigger an install. Mirrors the worker's `codeImportsModule`. */
 function codeImportsModule(code, mod) {
@@ -284,8 +294,16 @@ async function ensurePackages(code) {
     messageCallback: () => {},
     errorCallback: () => {},
   });
+  const implicit = IMPLICIT_PACKAGES.filter(({ pattern }) => pattern.test(code)).map((p) => p.pkg);
+  if (implicit.length > 0) {
+    await py.loadPackage(implicit, { messageCallback: () => {}, errorCallback: () => {} });
+  }
   const needed = Object.entries(MICROPIP_PACKAGES)
-    .filter(([mod, req]) => !micropipInstalled.has(req) && codeImportsModule(code, mod))
+    .filter(
+      ([mod, req]) =>
+        !micropipInstalled.has(req) &&
+        (codeImportsModule(code, mod) || (mod === "openpyxl" && /\.(?:to|read)_excel\(/.test(code))),
+    )
     .map(([, req]) => req);
   if (needed.length === 0) return;
   const micropip = py.pyimport("micropip");

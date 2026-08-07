@@ -22,11 +22,16 @@ import { signOut, useSession } from "@/lib/auth/client";
 const TRIGGER_CLASS =
   "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]";
 
-/** Solid "Sign in" button: near-black on light (#121212 fill, white text),
- *  inverted to white-on-#121212 on dark. Shared with the mobile drawer's
- *  sign-in row so the two match. */
-export const SIGN_IN_BUTTON_CLASS =
-  "inline-flex items-center gap-2 rounded-lg bg-[#121212] px-3 py-1.5 text-sm font-medium tracking-tight text-white transition-colors hover:bg-[#2a2a2a] dark:bg-white dark:text-[#121212] dark:hover:bg-[var(--ds-gray-200)]";
+/** Everything about the "Sign in" button except its vertical padding:
+ *  near-black on light (#121212 fill, white text), inverted to white-on-#121212
+ *  on dark. Split out so the header can tighten the box when it compacts
+ *  without an `!important` fighting the padding baked into one string. */
+const SIGN_IN_BUTTON_BASE =
+  "inline-flex items-center gap-2 rounded-lg bg-[#121212] px-3 text-sm font-medium tracking-tight text-white transition-colors hover:bg-[#2a2a2a] dark:bg-white dark:text-[#121212] dark:hover:bg-[var(--ds-gray-200)]";
+
+/** The button at its normal size. Shared with the mobile drawer's sign-in row
+ *  so the two match. */
+export const SIGN_IN_BUTTON_CLASS = `${SIGN_IN_BUTTON_BASE} py-1.5`;
 
 /** Circular avatar: the provider image when present, otherwise an initial. */
 function Avatar({ image, name }: { image?: string | null; name?: string | null }) {
@@ -53,7 +58,13 @@ function Avatar({ image, name }: { image?: string | null; name?: string | null }
   );
 }
 
-export function AuthMenu() {
+/**
+ * @param compact The site header has scrolled past its threshold and stepped
+ *   everything down a size. The button's *type* stays put (14px, matching the
+ *   drawer's copy of it); only the box around it tightens, which is enough to
+ *   keep it in proportion with the shrunken logo and links beside it.
+ */
+export function AuthMenu({ compact }: { compact?: boolean } = {}) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
@@ -66,7 +77,9 @@ export function AuthMenu() {
     return (
       <span
         aria-hidden="true"
-        className="inline-block h-8 w-[4.5rem] animate-pulse rounded-lg bg-[var(--ds-gray-100)] dark:bg-white/10"
+        className={`inline-block w-[4.5rem] animate-pulse rounded-lg bg-[var(--ds-gray-100)] transition-[height] duration-200 dark:bg-white/10 ${
+          compact ? "h-7" : "h-8"
+        }`}
       />
     );
   }
@@ -76,7 +89,9 @@ export function AuthMenu() {
     return (
       <Link
         href="/sign-in"
-        className={SIGN_IN_BUTTON_CLASS}
+        className={`${SIGN_IN_BUTTON_BASE} transition-[padding] duration-200 ${
+          compact ? "py-1" : "py-1.5"
+        }`}
       >
         <LogIn size={14} aria-hidden="true" />
         Sign in

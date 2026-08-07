@@ -156,8 +156,10 @@ A subtle but important reason to use `loc` is **safe assignment**.
     {
       filename: "main.py",
       initCode: `import pandas as pd
+# Salaries as floats: a 10% raise produces fractional values, and pandas
+# will not write those into an integer column (see the note below).
 df = pd.DataFrame({
-    "salary": [120, 95, 140, 80, 128],
+    "salary": [120.0, 95.0, 140.0, 80.0, 128.0],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
 }, index=["Aiko","Bilal","Chen","Diego","Eve"])`,
       starterCode: `# Give every Engineer a 10% raise. Use loc, never chained []:
@@ -167,6 +169,17 @@ print(df)
     },
   ]}
 />
+
+<Callout type="warn" title="Assignment cannot change a column's dtype">
+Note that `salary` starts as a float here. Multiplying an **integer**
+column by 1.10 produces fractional values, and pandas will not quietly
+widen the column to hold them, it raises `TypeError: Invalid value ... for
+dtype 'int64'`. That is deliberate: silently changing a column's type
+under an assignment used to be a common source of surprise. If your
+column really is integer, convert it first with
+`df["salary"] = df["salary"].astype(float)`, or round the result back
+with `.round().astype(int)`.
+</Callout>
 
 The "chained" alternative, `df[df["dept"] == "Eng"]["salary"]
 *= 1.10`, sometimes works and sometimes silently does nothing,

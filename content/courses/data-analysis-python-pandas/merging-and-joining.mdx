@@ -63,6 +63,22 @@ default.
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+
+employees = pd.DataFrame(
+    {
+        "emp_id": [1, 2, 3, 4, 5],
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Esra"],
+        "dept_id": [10, 20, 10, 30, 99],  # 99 has no matching department
+    }
+)
+
+departments = pd.DataFrame(
+    {
+        "dept_id": [10, 20, 30, 40],  # 40 has no employees
+        "dept_name": ["Engineering", "Sales", "Marketing", "HR"],
+    }
+)`,
       starterCode: `inner = employees.merge(departments, on="dept_id", how="inner")
 print(inner)
 `,
@@ -83,6 +99,22 @@ columns with NaN.
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+
+employees = pd.DataFrame(
+    {
+        "emp_id": [1, 2, 3, 4, 5],
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Esra"],
+        "dept_id": [10, 20, 10, 30, 99],  # 99 has no matching department
+    }
+)
+
+departments = pd.DataFrame(
+    {
+        "dept_id": [10, 20, 30, 40],  # 40 has no employees
+        "dept_name": ["Engineering", "Sales", "Marketing", "HR"],
+    }
+)`,
       starterCode: `left = employees.merge(departments, on="dept_id", how="left")
 print(left)
 `,
@@ -105,6 +137,22 @@ more naturally.
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+
+employees = pd.DataFrame(
+    {
+        "emp_id": [1, 2, 3, 4, 5],
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Esra"],
+        "dept_id": [10, 20, 10, 30, 99],  # 99 has no matching department
+    }
+)
+
+departments = pd.DataFrame(
+    {
+        "dept_id": [10, 20, 30, 40],  # 40 has no employees
+        "dept_name": ["Engineering", "Sales", "Marketing", "HR"],
+    }
+)`,
       starterCode: `right = employees.merge(departments, on="dept_id", how="right")
 print(right)
 `,
@@ -123,6 +171,22 @@ Keep everything from both sides.
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+
+employees = pd.DataFrame(
+    {
+        "emp_id": [1, 2, 3, 4, 5],
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Esra"],
+        "dept_id": [10, 20, 10, 30, 99],  # 99 has no matching department
+    }
+)
+
+departments = pd.DataFrame(
+    {
+        "dept_id": [10, 20, 30, 40],  # 40 has no employees
+        "dept_name": ["Engineering", "Sales", "Marketing", "HR"],
+    }
+)`,
       starterCode: `outer = employees.merge(departments, on="dept_id", how="outer")
 print(outer)
 `,
@@ -140,6 +204,22 @@ Great for spotting *what doesn't match*.
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+
+employees = pd.DataFrame(
+    {
+        "emp_id": [1, 2, 3, 4, 5],
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Esra"],
+        "dept_id": [10, 20, 10, 30, 99],  # 99 has no matching department
+    }
+)
+
+departments = pd.DataFrame(
+    {
+        "dept_id": [10, 20, 30, 40],  # 40 has no employees
+        "dept_name": ["Engineering", "Sales", "Marketing", "HR"],
+    }
+)`,
       starterCode: `check = employees.merge(departments, on="dept_id", how="outer", indicator=True)
 print(check)
 print()

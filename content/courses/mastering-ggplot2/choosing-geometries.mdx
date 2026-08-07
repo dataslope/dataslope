@@ -98,7 +98,11 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
 
 ## Categorical + continuous: compare distributions across groups
 
-Boxplots and violins compare a numeric variable *across* categories:
+Boxplots and violins compare a numeric variable *across* categories.
+The difference between them is not decoration: a box knows only about
+quartiles, so three very different shapes can produce the same one.
+
+<Chart slug="box-hides-shape" />
 
 <CodeBlock
   adapter="r"

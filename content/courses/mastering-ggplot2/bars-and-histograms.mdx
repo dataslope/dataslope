@@ -15,6 +15,11 @@ the **position adjustments** that decide how bars share space.
 
 ## A histogram is binning + counting
 
+Before the syntax, the thing `binwidth` decides. One sample, three bin
+widths, three different answers to "how many peaks does this have?":
+
+<Chart slug="histogram-bin-width" />
+
 A histogram answers: *how is one continuous variable distributed?* The
 stat slices the range of x into equal **bins** and counts how many
 values land in each.
@@ -83,7 +88,12 @@ how the sub-bars share that space:
 | `dodge` | Sub-bars side by side | Comparing groups within a category |
 | `fill` | Stacked to 100 percent | Proportions, ignoring totals |
 
-See all three on the same data:
+The same counts under all three, so the trade is visible rather than
+described. Note what happens to the smallest category in the third panel:
+
+<Chart slug="stack-dodge-fill" />
+
+See all three in ggplot2 on the same data:
 
 <CodeBlock
   adapter="r"

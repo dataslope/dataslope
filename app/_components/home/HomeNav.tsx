@@ -45,10 +45,14 @@ const NAV_SECTIONS: {
 function NavLink({
   href,
   prefetch,
+  compact,
   children,
 }: {
   href: string;
   prefetch?: boolean;
+  /** The header has been scrolled past its threshold, so the type steps down
+   *  with everything else. */
+  compact?: boolean;
   children: React.ReactNode;
 }) {
   const pathname = usePathname() ?? "";
@@ -58,7 +62,11 @@ function NavLink({
       href={href}
       prefetch={prefetch}
       aria-current={active ? "page" : undefined}
-      className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+      // font-size is animated alongside the colour, so the step down happens
+      // with the nav's height rather than snapping a frame ahead of it.
+      className={`rounded-lg px-3 py-2 font-medium transition-[color,font-size] duration-200 ${
+        compact ? "text-sm" : "text-[15px]"
+      } ${
         active
           ? "text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]"
           : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
@@ -69,7 +77,7 @@ function NavLink({
   );
 }
 
-function GitHubLink() {
+function GitHubLink({ compact }: { compact?: boolean }) {
   return (
     <a
       href={GITHUB_URL}
@@ -77,14 +85,16 @@ function GitHubLink() {
       rel="noopener noreferrer"
       aria-label="View source on GitHub"
       title="GitHub"
-      className="inline-flex size-9 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/[0.06]"
+      className={`inline-flex items-center justify-center rounded-lg text-[#121212] transition-[color,background-color,width,height] duration-200 hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/[0.06] ${
+        compact ? "size-8" : "size-9"
+      }`}
     >
-      <GitHubIcon size={18} />
+      <GitHubIcon size={compact ? 16 : 18} />
     </a>
   );
 }
 
-function BrandLogo() {
+function BrandLogo({ compact }: { compact?: boolean }) {
   return (
     <Link
       href="/"
@@ -110,10 +120,19 @@ function BrandLogo() {
       <img
         src="/dataslope-logo-blue.svg"
         alt=""
-        className="relative top-px h-[13px] w-auto transition-transform duration-200 will-change-transform group-hover:rotate-[8deg]"
+        // `height` is animated rather than `transform: scale`, which would
+        // fight the hover rotate on the same property and undo the layer
+        // stability the comment above is about.
+        className={`relative top-px w-auto transition-[transform,height] duration-200 will-change-transform group-hover:rotate-[8deg] ${
+          compact ? "h-[11px]" : "h-[13px]"
+        }`}
         aria-hidden="true"
       />
-      <span className="text-lg font-semibold tracking-tight text-[#121212] transition-transform duration-200 will-change-transform group-hover:translate-x-0.5 dark:text-white">
+      <span
+        className={`font-semibold tracking-tight text-[#121212] transition-[transform,font-size] duration-200 will-change-transform group-hover:translate-x-0.5 dark:text-white ${
+          compact ? "text-base" : "text-lg"
+        }`}
+      >
         Dataslope
       </span>
     </Link>
@@ -293,7 +312,7 @@ export function HomeNav() {
       >
         {/* Left: brand */}
         <div className="flex items-center">
-          <BrandLogo />
+          <BrandLogo compact={scrolled} />
         </div>
 
         {/* Center: primary menu (desktop only, visibility handled by the
@@ -301,7 +320,7 @@ export function HomeNav() {
             from a docs route can't keep it collapsed after a back-navigation). */}
         <div className="ds-nav-menu items-center justify-center gap-4 lg:gap-6">
           {NAV_SECTIONS.map(({ href, label, prefetch }) => (
-            <NavLink key={href} href={href} prefetch={prefetch}>
+            <NavLink key={href} href={href} prefetch={prefetch} compact={scrolled}>
               {label}
             </NavLink>
           ))}
@@ -313,12 +332,12 @@ export function HomeNav() {
               theme switch and a GitHub link instead. */}
           <span className="ds-nav-icons items-center gap-2">
             <ThemePillToggle />
-            <GitHubLink />
+            <GitHubLink compact={scrolled} />
           </span>
           {/* Desktop-only: the mobile drawer carries its own auth control so
               this one isn't crammed next to the hamburger on small screens. */}
           <span className="ds-nav-auth">
-            <AuthMenu />
+            <AuthMenu compact={scrolled} />
           </span>
           <MobileDrawer />
         </div>

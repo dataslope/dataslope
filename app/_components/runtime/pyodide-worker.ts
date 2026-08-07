@@ -141,6 +141,48 @@ const MICROPIP_PACKAGES: Record<string, string> = {
 };
 const micropipInstalled = new Set<string>();
 
+/**
+ * Packages a block needs but never names, keyed by the call that needs them.
+ *
+ * `loadPackagesFromImports` only sees `import` statements, which misses every
+ * dependency a library reaches for internally. A lesson that writes
+ * `px.scatter(..., trendline="ols")` imports plotly and nothing else, and the
+ * reader gets "The module 'statsmodels' is included in the Pyodide
+ * distribution, but it is not installed" instead of a chart. The same happens
+ * to `df.to_excel(...)` (openpyxl), `df.to_parquet(...)` and polars'
+ * `.to_arrow()` (pyarrow), and any tz-aware timestamp (tzdata).
+ *
+ * Making the author add a dead `import statsmodels` to the block would work
+ * and would be a worse lesson, so the trigger lives here instead. Each entry
+ * is a pattern over the source and the distribution package it implies; a
+ * false positive costs one download, so the patterns are written to be
+ * specific rather than clever.
+ */
+const IMPLICIT_PACKAGES: { pattern: RegExp; pkg: string }[] = [
+  // plotly's trendlines are fitted by statsmodels.
+  { pattern: /\btrendline\s*=/, pkg: "statsmodels" },
+  // Arrow interop, and the parquet engine pandas and polars both prefer.
+  { pattern: /\bpyarrow\b|\.to_arrow\(|\.from_arrow\(/, pkg: "pyarrow" },
+  { pattern: /\.(?:to|read|scan|sink)_parquet\(/, pkg: "pyarrow" },
+  // zoneinfo's database is a separate package on Pyodide, and pandas reaches
+  // for it on any named time zone.
+  {
+    pattern: /\btz_localize\(|\btz_convert\(|\bZoneInfo\(|\btz\s*=\s*["']/,
+    pkg: "tzdata",
+  },
+];
+
+/** Distribution packages implied by `code` that are not yet loaded. Pyodide's
+ *  `loadPackage` is idempotent, so an already-loaded name is a cheap no-op and
+ *  this does not need to track what it has done. */
+function implicitPackagesFor(code: string): string[] {
+  const wanted = new Set<string>();
+  for (const { pattern, pkg } of IMPLICIT_PACKAGES) {
+    if (pattern.test(code)) wanted.add(pkg);
+  }
+  return [...wanted];
+}
+
 /** True when `code` imports the top-level module `mod` (matches
  *  `import mod`, `import mod as x`, `import a, mod`, `from mod import …`,
  *  anchored to a line start so matches inside strings/comments are
@@ -162,7 +204,11 @@ async function ensureMicropipPackages(code: string): Promise<void> {
   const needed = Object.entries(MICROPIP_PACKAGES)
     .filter(
       ([mod, req]) =>
-        !micropipInstalled.has(req) && codeImportsModule(code, mod),
+        !micropipInstalled.has(req) &&
+        // openpyxl is pandas' Excel engine and is almost never imported by
+        // name: `df.to_excel(...)` is the whole usage, so the call counts too.
+        (codeImportsModule(code, mod) ||
+          (mod === "openpyxl" && /\.(?:to|read)_excel\(/.test(code))),
     )
     .map(([, req]) => req);
   if (needed.length === 0) return;
@@ -720,6 +766,20 @@ async function runCode(
         console.error("[pyodide:loadPackage]", m);
       },
     });
+    // Dependencies the block never imports by name (statsmodels behind a
+    // plotly trendline, pyarrow behind .to_arrow(), tzdata behind a named
+    // time zone). loadPackagesFromImports cannot see these.
+    const implicit = implicitPackagesFor(code);
+    if (implicit.length > 0) {
+      await pyodide.loadPackage(implicit, {
+        messageCallback: (m: string) => {
+          console.log("[pyodide:loadPackage]", m);
+        },
+        errorCallback: (m: string) => {
+          console.error("[pyodide:loadPackage]", m);
+        },
+      });
+    }
     // Pure-Python drawer packages that aren't in the Pyodide lockfile
     // (e.g. openpyxl, seaborn) need an explicit micropip install.
     await ensureMicropipPackages(code);
