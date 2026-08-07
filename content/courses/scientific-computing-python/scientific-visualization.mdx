@@ -126,6 +126,16 @@ the absolute value at every point matters.
 
 ## Colormaps: choose perceptually uniform
 
+The same field on a rainbow ramp and a perceptually uniform one. Rainbow
+invents bands where the data is smooth:
+
+<Chart slug="rainbow-vs-sequential" />
+
+And the second half of the same question, whether the palette survives a
+red-green deficiency:
+
+<Chart slug="colorblind-safe" />
+
 Avoid the legacy `jet` colormap. It is **perceptually nonuniform**,
 it has bright cyan and yellow bands that look like ridges even
 where the data is flat. Use the modern perceptually uniform
@@ -232,6 +242,10 @@ almost always *worse* than 2-D contours or small multiples for
 quantitative comparison, humans cannot read depth accurately.
 
 ## Small multiples
+
+Why they beat one crowded axes: the same series, tangled and then split.
+
+<Chart slug="spaghetti-vs-facets" />
 
 When you want to compare many similar things, the single most
 effective layout is the **small-multiples grid** (Edward Tufte's
