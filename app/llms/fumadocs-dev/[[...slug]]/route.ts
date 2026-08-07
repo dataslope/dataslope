@@ -28,9 +28,24 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  const filePath =
-    page.absolutePath ??
-    path.join(process.cwd(), "content", "fumadocs-dev", page.path);
+  // The literal "content"/"fumadocs-dev" segments are load-bearing, not
+  // decoration: Turbopack statically analyses this call to decide what to
+  // put in the server output's file trace, and a path it cannot scope makes
+  // it trace the WHOLE project. This used to read
+  // `page.absolutePath ?? path.join(…)`, and `page.absolutePath` is an
+  // opaque value with no static prefix, so the analysis gave up and swept in
+  // 4489 files — all 1832 of public/images and 834 of public/courses among
+  // them, none of which this route reads. Scoping the join to a literal
+  // subfolder is the documented fix (the build warns and names it), and it
+  // is a pure simplification besides: fumadocs-mdx builds `absolutePath` as
+  // `path.resolve("content/fumadocs-dev/<page.path>")`, so the branch that
+  // was defeating the analysis only ever produced this same path.
+  const filePath = path.join(
+    process.cwd(),
+    "content",
+    "fumadocs-dev",
+    page.path,
+  );
   const content = await readFile(filePath, "utf8");
 
   return new Response(content, {
