@@ -1,0 +1,323 @@
+---
+title: Interoperating with Other Tools
+description: "Moving data between Polars, pandas, NumPy, Arrow, and SQL, and knowing which of those crossings costs a copy."
+---
+
+Polars does not have to be the only thing in your stack. Because it
+stores Arrow, several of these crossings are close to free; because
+some libraries want their own layout, others are not.
+
+<Figure
+  slug="pl-interop-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading and a panda standing on a wide platform, passing one thick yellow block between them along a short green rail"
+/>
+
+## pandas, both directions
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+import pandas as pd
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `pdf = penguins.to_pandas()
+print(type(pdf).__name__, pdf.shape)
+print(pdf.head(3))
+
+back = pl.from_pandas(pdf)
+print(type(back).__name__, back.shape)
+print(back.schema)
+`,
+    },
+  ]}
+/>
+
+<Callout type="info" title="use_pyarrow_extension_array avoids a copy">
+`to_pandas()` converts each column into a NumPy array, which is a
+copy and which turns an integer column with nulls into a float one.
+`to_pandas(use_pyarrow_extension_array=True)` gives pandas
+Arrow-backed columns instead: no copy of the values, and nulls stay
+nulls without changing the dtype.
+</Callout>
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"n": [1, 2, None, 4]})
+
+numpy_backed = df.to_pandas()
+arrow_backed = df.to_pandas(use_pyarrow_extension_array=True)
+
+print("numpy-backed dtype:", numpy_backed["n"].dtype)
+print("arrow-backed dtype:", arrow_backed["n"].dtype)
+print(numpy_backed["n"].tolist())
+`,
+    },
+  ]}
+/>
+
+The integer column became `float64` on the NumPy path, because that
+is the only way NumPy can carry a missing value. This is the pandas
+null problem from the comparison chapter, arriving through the back
+door.
+
+## NumPy
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# One column
+masses = penguins["body_mass_g"].drop_nulls().to_numpy()
+print(type(masses).__name__, masses.dtype, masses.shape)
+
+# A 2-D array of several columns, which is what a model wants
+X = penguins.select("bill_length_mm", "bill_depth_mm").drop_nulls().to_numpy()
+print(X.shape, X.dtype)
+print(np.round(X.mean(axis=0), 2))
+
+# And back
+print(pl.from_numpy(X, schema=["length", "depth"]).head(3))
+`,
+    },
+  ]}
+/>
+
+A single numeric column with no nulls converts without copying,
+because Arrow's values buffer already has NumPy's layout. Nulls, or
+any string column, force a copy.
+
+## Arrow
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `table = penguins.to_arrow()
+print(type(table).__name__, table.num_rows, "rows")
+print(table.schema)
+
+back = pl.from_arrow(table)
+print(type(back).__name__, back.shape)
+`,
+    },
+  ]}
+/>
+
+This is the cheap one. Polars already stores Arrow, so `to_arrow()`
+hands over the same buffers. Any library speaking Arrow (DuckDB,
+PyArrow, DataFusion, an Arrow Flight client) can take a Polars frame
+without a serialization step.
+
+## SQL, against a Polars frame
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(
+    pl.sql(
+        """
+        SELECT species, COUNT(*) AS n, ROUND(AVG(body_mass_g)) AS avg_mass
+        FROM penguins
+        WHERE body_mass_g IS NOT NULL
+        GROUP BY species
+        ORDER BY avg_mass DESC
+        """
+    ).collect()
+)
+`,
+    },
+  ]}
+/>
+
+`pl.sql` resolves table names from frames in scope and returns a
+`LazyFrame`, so the result goes through the same optimizer. Useful
+for a query that is genuinely easier to read as SQL, and for porting
+one that already exists.
+
+## The dataframe interchange protocol
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+import pandas as pd
+
+pdf = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
+
+# Standard protocol: any library implementing it can be consumed with
+# no library-specific import on either side
+print(pl.from_dataframe(pdf))
+`,
+    },
+  ]}
+/>
+
+Worth knowing about if you write a library: accepting anything with
+`__dataframe__` means you accept Polars, pandas, cuDF, and Vaex
+without depending on any of them.
+
+## What each crossing costs
+
+| Crossing | Cost |
+| --- | --- |
+| `to_arrow()` / `from_arrow()` | close to free, shared buffers |
+| `to_pandas(use_pyarrow_extension_array=True)` | close to free |
+| `to_pandas()` | a copy per column, and integer columns with nulls become floats |
+| `to_numpy()`, one numeric column, no nulls | free |
+| `to_numpy()`, anything else | a copy |
+| `to_dicts()`, `to_list()` | a copy, plus a Python object per value |
+| `pl.sql` | none, it is the same engine |
+
+`to_dicts()` is the expensive one people reach for without thinking:
+it builds a Python dictionary per row. On a million rows that is a
+million dictionaries, which is slower than the query that produced
+them.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Cross the boundary without losing types"
+  instructions={`\`df\` has an integer column \`n\` containing a null.
+
+Produce three things:
+
+1. \`naive\`: \`df.to_pandas()\`, the default conversion.
+2. \`arrow\`: \`df.to_pandas(use_pyarrow_extension_array=True)\`.
+3. \`preserved\`: the **string name** of \`arrow\`'s \`n\` dtype (use \`str(...)\`), which should still describe an integer type.
+
+Then set \`widened\` to \`True\` if \`naive\`'s \`n\` column is a floating-point dtype.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+import pandas as pd
+df = pl.DataFrame({"n": [1, 2, None, 4], "label": ["a", "b", "c", "d"]})`,
+      starterCode: `naive = None      # TODO
+arrow = None      # TODO
+preserved = None  # TODO
+widened = None    # TODO
+
+print(preserved, widened)
+`,
+      solutionCode: `naive = df.to_pandas()
+arrow = df.to_pandas(use_pyarrow_extension_array=True)
+
+preserved = str(arrow["n"].dtype)
+widened = pd.api.types.is_float_dtype(naive["n"])
+
+print("naive :", naive["n"].dtype)
+print("arrow :", arrow["n"].dtype)
+print(preserved, widened)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "frames",
+      name: "Both conversions produced pandas DataFrames",
+      description: "Type check",
+      code: `import pandas as pd
+assert isinstance(naive, pd.DataFrame)
+assert isinstance(arrow, pd.DataFrame)`,
+    },
+    {
+      id: "rows",
+      name: "All four rows survived both conversions",
+      description: "Nothing dropped",
+      code: `assert len(naive) == 4 and len(arrow) == 4`,
+    },
+    {
+      id: "widened",
+      name: "The default conversion widened the integer column",
+      description: "NumPy needs a float to carry the missing value",
+      code: `assert widened is True, widened`,
+    },
+    {
+      id: "preserved",
+      name: "The Arrow-backed column stayed an integer type",
+      description: "int64[pyarrow]",
+      code: `assert "int" in preserved.lower(), preserved
+assert "float" not in preserved.lower(), preserved`,
+    },
+    {
+      id: "null",
+      name: "The null survived as missing in both",
+      description: "It did not become zero",
+      code: `import pandas as pd
+assert pd.isna(naive["n"][2])
+assert pd.isna(arrow["n"][2])`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why is \`to_arrow()\` cheaper than \`to_pandas()\`?
+
+- Arrow tables are lazy, so nothing is materialized until used
+  > Arrow tables hold real data; laziness is not part of the format.
+- Arrow compresses the data, so there is less of it to move
+  > In-memory Arrow is uncompressed. The saving comes from not moving the data at all.
+- [o] Polars already stores Arrow, so the buffers are handed over rather than converted
+  > \`to_pandas()\` by default converts each column into a NumPy array, which is a copy.
+- \`to_arrow()\` returns only the schema, deferring the values
+  > The full table is returned; only the copying is avoided.
+
+Arrow interchange is the reason a Polars frame can reach DuckDB or PyArrow without a serialization step.`}
+/>
+
+<MultipleChoice
+  markdown={`An \`Int64\` column with one null becomes \`float64\` after \`to_pandas()\`. Why?
+
+- Polars casts every column to float on the way out for consistency
+  > Columns without nulls keep their integer dtype; the widening is caused specifically by the missing value.
+- pandas does not support 64-bit integers
+  > It supports them fine. What a NumPy-backed integer array cannot carry is a missing value.
+- [o] The default conversion is NumPy-backed, and NumPy needs a float to represent the missing value
+  > \`use_pyarrow_extension_array=True\` gives Arrow-backed columns instead, and the dtype survives.
+- The null was converted to NaN, which pandas then rounds
+  > No rounding occurs; the dtype change happens because NaN is a float and forces the whole array to be floats.
+
+This is the pandas null problem arriving through the back door of a conversion.`}
+/>
+
+<MultipleChoice
+  markdown={`Which conversion is the one to be most careful with on a large frame?
+
+- \`to_arrow()\`
+  > It is the cheapest crossing available, since the buffers are handed over as they are.
+- \`pl.sql\` on the frame
+  > No conversion happens at all; \`pl.sql\` runs on the same engine and returns a LazyFrame.
+- \`to_numpy()\` on a single null-free numeric column
+  > Arrow's values buffer already has NumPy's layout, so this case is free.
+- [o] \`to_dicts()\`
+  > It builds one Python dictionary per row, which on a million rows costs more than the query that produced them.
+
+Staying in columns is the whole point; materializing Python objects per row gives that up.`}
+/>

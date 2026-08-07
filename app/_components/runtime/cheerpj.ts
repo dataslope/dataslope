@@ -15,7 +15,7 @@
 //
 // The jar is fetched cross-origin from unpkg (the `dataslope-tools-jar`
 // npm package, see TOOLS_JAR_CDN in cdn.ts) rather than served from this
-// app's own origin, so Vercel never handles its ~18 MB of bandwidth. We
+// app's own origin, which never handles its ~18 MB. We
 // fetch the bytes ourselves and inject them via `cheerpjAddStringFile`
 // instead of relying on CheerpJ's `/app` → origin mapping; that is what
 // lets the jar live on an external CDN. jsDelivr refuses .jar files and

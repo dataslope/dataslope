@@ -1,0 +1,356 @@
+---
+title: Eager and Lazy Execution
+description: "DataFrame runs each step now; LazyFrame builds a plan and runs it at collect(). What each one costs and when to use which."
+---
+
+Everything so far has been eager: each method ran when Python reached
+it. Polars has a second mode where methods build a *plan* and nothing
+executes until you ask.
+
+<Figure
+  slug="pl-eager-vs-lazy-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading watching one thick blue block run straight down a short green chute into a tray on a wide platform, while three thick yellow blocks wait in a row behind a closed red gate beside it"
+/>
+
+## The two objects
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `eager = pl.read_csv("penguins.csv", null_values=["NA"])
+lazy = pl.scan_csv("penguins.csv", null_values=["NA"])
+
+print(type(eager).__name__)
+print(type(lazy).__name__)
+
+# A lazy chain returns another LazyFrame. No data has moved.
+plan = lazy.filter(pl.col("body_mass_g") > 4000).select("species", "body_mass_g")
+print(type(plan).__name__)
+
+# collect() is what runs it
+print(plan.collect().head(3))
+`,
+    },
+  ]}
+/>
+
+| | Eager | Lazy |
+| --- | --- | --- |
+| Built by | `pl.read_csv`, `pl.DataFrame` | `pl.scan_csv`, `df.lazy()` |
+| Runs | immediately, step by step | at `.collect()` |
+| Optimized | no | yes, over the whole query |
+| Can inspect the plan | no | `.explain()` |
+| Intermediate results | materialized | often never exist |
+
+The API is otherwise the same. Nearly every method you have learned
+works identically on both.
+
+## What laziness buys
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `q = (
+    pl.scan_csv("diamonds.csv")
+    .filter(pl.col("cut") == "Ideal")
+    .select("carat", "price")
+    .head(3)
+)
+
+print(q.explain())
+`,
+    },
+  ]}
+/>
+
+Read the plan from the bottom up. Polars pushed the column selection
+and the filter down into the CSV reader itself: `PROJECT 3/10 COLUMNS`
+says three of the ten columns are parsed, and `SELECTION` says the
+filter is applied while parsing rather than afterwards.
+
+Three, not two, is the detail worth noticing. You asked for `carat`
+and `price`, but the filter needs `cut`, so the optimizer works out
+that it must read that column too and then drop it. The other seven
+are never materialized at all.
+
+## Moving between the two
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `df = pl.read_csv("penguins.csv", null_values=["NA"])
+
+# Eager to lazy, to get the optimizer on an in-memory frame
+result = (
+    df.lazy()
+    .group_by("species")
+    .agg(pl.col("body_mass_g").mean().round(0))
+    .sort("species")
+    .collect()
+)
+print(result)
+
+# Lazy to eager
+back = pl.scan_csv("penguins.csv", null_values=["NA"]).collect()
+print(type(back).__name__)
+`,
+    },
+  ]}
+/>
+
+`df.lazy()` is free: it wraps the frame you already have in a plan.
+Worth doing for any chain of more than two or three steps, even when
+the data is already in memory.
+
+## Seeing the difference
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import time
+import polars as pl`,
+      starterCode: `def timed(label, fn):
+    start = time.perf_counter()
+    out = fn()
+    print(f"{label:<10} {(time.perf_counter() - start) * 1000:7.1f} ms  -> {out}")
+
+timed(
+    "eager",
+    lambda: pl.read_csv("diamonds.csv")
+    .filter(pl.col("cut") == "Ideal")
+    .select(pl.col("price").mean().round(0))
+    .item(),
+)
+
+timed(
+    "lazy",
+    lambda: pl.scan_csv("diamonds.csv")
+    .filter(pl.col("cut") == "Ideal")
+    .select(pl.col("price").mean().round(0))
+    .collect()
+    .item(),
+)
+`,
+    },
+  ]}
+/>
+
+The eager version reads all ten columns and all 53,940 rows, then
+throws almost everything away. The lazy version reads two columns and
+filters while parsing. On a Parquet file with row-group statistics
+the gap is wider still, because whole chunks can be skipped without
+being decompressed.
+
+## Peeking without running the whole thing
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `q = pl.scan_csv("diamonds.csv").filter(pl.col("carat") > 2.0)
+
+# The schema, with no execution at all
+print(q.collect_schema())
+
+# A few rows, without processing the whole file
+print(q.head(3).collect())
+
+# fetch a bounded number of source rows: quick, and NOT a valid sample
+print(q.limit(2).collect())
+`,
+    },
+  ]}
+/>
+
+## When eager is the right choice
+
+Lazy is the default recommendation, not a rule. Prefer eager when:
+
+- **You are exploring interactively.** Seeing each intermediate frame
+  is the point, and `collect()` on every line is noise.
+- **The next step depends on a value you have to look at.** If a
+  Python `if` needs the row count, you have to materialize it.
+- **You need `pivot`.** Its output schema depends on the data, so it
+  is eager-only.
+- **The data is small.** Below a few thousand rows the optimizer has
+  nothing meaningful to save.
+
+<Callout type="info" title="collect() once, at the end">
+The common mistake is collecting in the middle of a chain, which
+throws away the optimizer's view of everything downstream. If you
+need the same intermediate result twice, that is what
+`pl.collect_all` is for: it runs several plans together and shares
+the common work.
+</Callout>
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `base = pl.scan_csv("diamonds.csv").filter(pl.col("carat") > 1.0)
+
+by_cut = base.group_by("cut").agg(pl.len().alias("n"))
+by_color = base.group_by("color").agg(pl.col("price").mean().round(0))
+
+# One call, both plans, shared scan of the source
+cut_result, color_result = pl.collect_all([by_cut, by_color])
+
+print(cut_result.sort("cut"))
+print(color_result.sort("color"))
+`,
+    },
+  ]}
+/>
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Write it lazily"
+  instructions={`Using \`pl.scan_csv\` (not \`read_csv\`), build a lazy query over \`diamonds.csv\` that:
+
+1. keeps only diamonds with \`carat\` above 1.0,
+2. groups by \`cut\`,
+3. computes \`n\` (the row count) and \`avg_price\` (mean \`price\`, rounded to 0 decimals),
+4. sorts by \`avg_price\` descending.
+
+Assign the **uncollected** query to \`query\` and its collected result to \`result\`. Do not call \`collect()\` until the very end.`}
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `query = None   # TODO
+result = None  # TODO
+
+print(result)
+`,
+      solutionCode: `query = (
+    pl.scan_csv("diamonds.csv")
+    .filter(pl.col("carat") > 1.0)
+    .group_by("cut")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("price").mean().round(0).alias("avg_price"),
+    )
+    .sort("avg_price", descending=True)
+)
+
+result = query.collect()
+
+print(query.explain())
+print(result)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "lazy",
+      name: "query is still a LazyFrame",
+      description: "Not collected too early",
+      code: `import polars as pl
+assert isinstance(query, pl.LazyFrame), type(query).__name__`,
+    },
+    {
+      id: "eager",
+      name: "result is a DataFrame",
+      description: "collect() was called",
+      code: `import polars as pl
+assert isinstance(result, pl.DataFrame), type(result).__name__`,
+    },
+    {
+      id: "cols",
+      name: "The right columns in order",
+      description: "cut, n, avg_price",
+      code: `assert result.columns == ["cut", "n", "avg_price"], result.columns`,
+    },
+    {
+      id: "rows",
+      name: "Five cut grades survive the filter",
+      description: "One row each",
+      code: `assert result.height == 5, result.height`,
+    },
+    {
+      id: "sorted",
+      name: "Sorted by avg_price descending",
+      description: "Most expensive cut first",
+      code: `prices = result["avg_price"].to_list()
+assert prices == sorted(prices, reverse=True), prices`,
+    },
+    {
+      id: "pushdown",
+      name: "The plan pushes the filter into the scan",
+      description: "That is what scan_csv buys you",
+      code: `plan = query.explain()
+assert "SELECTION" in plan, plan`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`\`pl.scan_csv("big.csv").filter(pl.col("a") > 5)\` is assigned to a variable. How much of the file has been read?
+
+- The whole file, since the filter has to examine every row
+  > The filter is part of the plan, not an action; nothing examines anything until \`collect()\`.
+- Enough rows to determine the schema, then reading pauses
+  > Schema inference happens at scan time for CSV, but the point here is that no *filtering* work has begun.
+- [o] None of it: the variable holds a plan, not data
+  > That is the whole distinction, and it is what lets the optimizer rewrite the plan before it runs.
+- One row group, so the filter can be tested for selectivity
+  > No sampling for selectivity happens, and CSV has no row groups to sample.
+
+The plan is a value you can inspect, extend, and pass around before any I/O occurs.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is calling \`collect()\` in the middle of a chain usually a mistake?
+
+- \`collect()\` may only be called once per LazyFrame
+  > It can be called as often as you like; each call runs the plan again.
+- It converts the frame to pandas, which is slow
+  > It produces a Polars \`DataFrame\`; pandas is not involved unless you ask for it.
+- [o] The optimizer can no longer see the downstream steps, so it cannot push filters or drop columns
+  > Collect once, at the end, and use \`pl.collect_all\` when you genuinely need two results from a shared source.
+- The intermediate result is discarded, so the later steps recompute it
+  > The collected frame is kept and reused; what is lost is planning information, not the data.
+
+Everything after the \`collect()\` is planned in isolation from everything before it.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these genuinely requires eager mode?
+
+- Grouping by two columns and aggregating
+  > Grouped aggregation is fully supported lazily and is one of the operations the optimizer helps most.
+- Reading a CSV larger than memory
+  > That is lazy mode's strongest case, especially with the streaming engine.
+- Joining two frames on a key
+  > Joins work lazily, and the optimizer can reorder and push filters through them.
+- [o] \`pivot\`, whose output column names come from the data
+  > Its schema cannot be known before execution, so it is a \`DataFrame\` method only.
+
+Collect first, then pivot; it is the one operation the lazy API cannot express.`}
+/>

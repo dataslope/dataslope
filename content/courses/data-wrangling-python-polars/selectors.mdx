@@ -1,0 +1,305 @@
+---
+title: Selectors
+description: "polars.selectors: choosing columns by type, name pattern, or position, and combining those choices with set operations."
+---
+
+`pl.col(pl.Float64)` and `pl.col("^bill_.*$")` work, but they read
+poorly and they do not combine. The `polars.selectors` module solves
+both problems. It is conventionally imported as `cs`.
+
+<Figure
+  slug="pl-selectors-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading pushing a broad green sweep arm along a row of six thick upright columns in blue and yellow on a wide platform, the arm lifting the three blue ones onto a raised tray"
+/>
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+import polars.selectors as cs
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(penguins.select(cs.numeric()).columns)
+print(penguins.select(cs.string()).columns)
+print(penguins.select(cs.ends_with("_mm")).columns)
+`,
+    },
+  ]}
+/>
+
+## The selector families
+
+| Selector | Matches |
+| --- | --- |
+| `cs.numeric()` | every integer and float column |
+| `cs.integer()`, `cs.float()` | one half of the above |
+| `cs.string()` | `String` columns |
+| `cs.boolean()` | `Boolean` columns |
+| `cs.temporal()` | `Date`, `Datetime`, `Time`, `Duration` |
+| `cs.categorical()` | `Categorical` and `Enum` |
+| `cs.by_dtype(pl.UInt8, ...)` | exactly these dtypes |
+| `cs.starts_with("x")` | name prefix |
+| `cs.ends_with("x")` | name suffix |
+| `cs.contains("x")` | name substring |
+| `cs.matches("^x.*$")` | name regex |
+| `cs.by_name("a", "b")` | exactly these names |
+| `cs.by_index(0, -1)` | by position |
+| `cs.all()` | everything |
+| `cs.first()`, `cs.last()` | the first or last column |
+
+## They combine with set operations
+
+This is the part `pl.col` cannot do. Selectors support union,
+intersection, difference, and complement.
+
+| Operator | Meaning |
+| --- | --- |
+| `A \| B` | in either |
+| `A & B` | in both |
+| `A - B` | in A but not B |
+| `~A` | everything except A |
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+import polars.selectors as cs
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# Numeric, but not the year column
+print(penguins.select(cs.numeric() - cs.by_name("year")).columns)
+
+# Numeric AND ending in _mm
+print(penguins.select(cs.numeric() & cs.ends_with("_mm")).columns)
+
+# Text or boolean
+print(penguins.select(cs.string() | cs.boolean()).columns)
+
+# Everything except the text columns
+print(penguins.select(~cs.string()).columns)
+`,
+    },
+  ]}
+/>
+
+`cs.numeric() - cs.by_name("year")` is the one you will write most:
+"every measurement, but not the identifier that happens to be a
+number". Getting that right by hand is exactly the kind of thing that
+breaks when a column is added.
+
+## Selectors are expressions
+
+A selector is an expression, so everything from the last three pages
+applies to it. Methods chain onto it and apply to each matched column.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+import polars.selectors as cs
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `measurements = cs.numeric() - cs.by_name("year")
+
+# One summary row across every measurement
+print(penguins.select(measurements.mean().round(1)))
+
+# Fill every numeric null with that column's median, in one line
+filled = penguins.with_columns(measurements.fill_null(measurements.median()))
+print(filled.null_count())
+
+# Standardize them all, keeping the originals
+print(
+    penguins.with_columns(
+        ((measurements - measurements.mean()) / measurements.std())
+        .round(2)
+        .name.suffix("_z")
+    ).columns
+)
+`,
+    },
+  ]}
+/>
+
+## A cleaning pass in four lines
+
+Selectors are what make a generic cleaning step short enough to be
+worth writing.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+import polars.selectors as cs
+
+messy = pl.DataFrame(
+    {
+        "name": ["  Ada  ", "GRACE", "alan "],
+        "city": [" Oslo", "LISBON ", "Bergen"],
+        "score": [90.4567, None, 77.1234],
+        "weight": [1.5, 2.25, None],
+    }
+)
+
+clean = messy.with_columns(
+    cs.string().str.strip_chars().str.to_titlecase(),
+    cs.float().round(2).fill_null(0.0),
+)
+
+print(clean)
+`,
+    },
+  ]}
+/>
+
+Two expressions cleaned four columns, and they will clean forty when
+the file grows.
+
+## Expanding a selector to see what it caught
+
+Before trusting a selector in a pipeline, ask it what it matched.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+import polars.selectors as cs
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `sel = cs.numeric() - cs.by_name("price")
+
+print(cs.expand_selector(diamonds, sel))
+print(cs.expand_selector(diamonds, cs.string()))
+`,
+    },
+  ]}
+/>
+
+`expand_selector` takes a frame and a selector and returns the names
+it resolves to. It is the debugging tool for this whole page.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Summarize every measurement, and only measurements"
+  instructions={`\`penguins\` has five numeric columns: the four measurements (\`bill_length_mm\`, \`bill_depth_mm\`, \`flipper_length_mm\`, \`body_mass_g\`) plus \`year\`, which is numeric but is not a measurement.
+
+Build a one-row frame called \`means\` holding the mean of every numeric column **except \`year\`**, each rounded to 2 decimals and keeping its original name.
+
+Use selectors, not a hand-written list of column names: the code should still be right if a fifth measurement is added.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+import polars.selectors as cs
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `means = None  # TODO
+
+print(means)
+`,
+      solutionCode: `means = penguins.select(
+    (cs.numeric() - cs.by_name("year")).mean().round(2)
+)
+
+print(means)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "shape",
+      name: "One row, four columns",
+      description: "Every measurement, not year",
+      code: `assert means.shape == (1, 4), means.shape`,
+    },
+    {
+      id: "names",
+      name: "Original column names kept",
+      description: "No prefix or suffix",
+      code: `expected = [
+    "bill_length_mm",
+    "bill_depth_mm",
+    "flipper_length_mm",
+    "body_mass_g",
+]
+assert means.columns == expected, means.columns`,
+    },
+    {
+      id: "values",
+      name: "Means rounded to 2 decimals",
+      description: "Mean body mass is 4201.75",
+      code: `assert means["body_mass_g"][0] == 4201.75, means["body_mass_g"][0]
+assert means["bill_length_mm"][0] == 43.92, means["bill_length_mm"][0]`,
+    },
+    {
+      id: "generic",
+      name: "Written with selectors, not a hard-coded list",
+      description: "A new measurement column is picked up automatically",
+      code: `import polars as pl
+import polars.selectors as cs
+probe = penguins.with_columns(
+    (pl.col("body_mass_g") / 1000).alias("mass_kg")
+).select((cs.numeric() - cs.by_name("year")).mean().round(2))
+assert "mass_kg" in probe.columns, probe.columns`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`cs.numeric() - cs.by_name("year")\` produce?
+
+- The numeric columns with \`year\` subtracted from each of their values
+  > Arithmetic on values would need something like \`cs.numeric() - pl.col("year")\`; between two selectors, \`-\` is set difference.
+- An error, because selectors cannot be combined with operators
+  > Combining is the main reason selectors exist; union, intersection, difference, and complement are all supported.
+- [o] A selector matching every numeric column except \`year\`
+  > The set operators are what \`pl.col\` cannot do, and this difference is the most common of them.
+- The columns that are numeric in one frame and named \`year\` in another
+  > Selectors describe columns within a single frame; no second frame is involved.
+
+An ID that happens to be numeric is the usual reason you need this.`}
+/>
+
+<MultipleChoice
+  markdown={`Why prefer \`cs.numeric()\` over listing the numeric columns by name?
+
+- Selectors are evaluated faster than a list of column names
+  > Both resolve to the same set of columns before execution; there is no measurable difference in speed.
+- A list of names cannot be passed to \`select\` at all
+  > Lists of names are perfectly valid; the argument for selectors is about maintenance, not legality.
+- [o] The code stays correct when a column is added, renamed, or retyped
+  > A hard-coded list silently omits a new column, which is a wrong answer rather than an error.
+- Selectors work in lazy queries while name lists work only in eager ones
+  > Both work identically in eager and lazy contexts.
+
+The silent-omission failure is the dangerous one, because nothing raises.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you check which columns a selector will actually match?
+
+- Print the selector, which lists its matched names
+  > Printing shows the selector's structure. It has no frame to resolve against, so it cannot know the names.
+- Call \`.columns\` on the selector
+  > Selectors are expressions rather than frames, and expressions carry no \`columns\` attribute.
+- [o] \`cs.expand_selector(df, sel)\`
+  > It takes a frame and a selector and returns the names it resolves to, which is the debugging tool for this page.
+- Run \`df.select(sel)\` and read the error message when it matches nothing
+  > A selector matching nothing returns an empty frame rather than raising, so no message appears.
+
+Resolve it against a real frame before you trust it in a pipeline.`}
+/>

@@ -1,0 +1,434 @@
+---
+title: A Complete Analysis
+description: "One capstone: take the diamonds dataset from a raw CSV to a defensible finding, using every idea in the course."
+---
+
+Everything so far has been one idea at a time. This page is one
+question, answered properly, with the whole toolkit.
+
+<Figure
+  slug="pl-capstone-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading standing on a wide platform beside a finished chart of four thick solid bars of different heights in blue, green, red and yellow"
+/>
+
+**The question:** in the diamonds dataset, the *best* cut grade has
+the *lowest* average price. Is that real, and if so, why?
+
+## Step 1: look at the data first
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `print(diamonds.shape)
+diamonds.glimpse()
+print(diamonds.null_count())
+`,
+    },
+  ]}
+/>
+
+Ten columns, 53,940 rows, no nulls. `cut`, `color`, and `clarity` are
+graded categories; the rest are measurements.
+
+## Step 2: reproduce the claim
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+GRADES = pl.Enum(["Fair", "Good", "Very Good", "Premium", "Ideal"])
+diamonds = pl.read_csv("diamonds.csv").with_columns(
+    pl.col("cut").cast(GRADES)
+)`,
+      starterCode: `print(
+    diamonds.group_by("cut")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("price").mean().round(0).alias("avg_price"),
+        pl.col("price").median().alias("median_price"),
+    )
+    .sort("cut")
+)
+`,
+    },
+  ]}
+/>
+
+The claim holds. Ideal is the best grade, the most common, and the
+cheapest on average. Something is confounded.
+
+## Step 3: form a hypothesis and test it
+
+Diamond price is dominated by **carat**, not by cut. If ideal-cut
+stones are systematically smaller, that alone would explain it.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+GRADES = pl.Enum(["Fair", "Good", "Very Good", "Premium", "Ideal"])
+diamonds = pl.read_csv("diamonds.csv").with_columns(
+    pl.col("cut").cast(GRADES)
+)`,
+      starterCode: `print(
+    diamonds.group_by("cut")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("carat").mean().round(3).alias("avg_carat"),
+        pl.col("price").mean().round(0).alias("avg_price"),
+        (pl.col("price") / pl.col("carat")).mean().round(0).alias("avg_per_carat"),
+    )
+    .sort("cut")
+)
+`,
+    },
+  ]}
+/>
+
+Half the answer is there. Ideal diamonds average 0.70 carat against
+Fair's 1.05, so the best-graded stones really are the smallest.
+
+Per-carat price is only half convincing, though. It climbs from
+3,767 for Fair to 4,223 for Premium, and then *drops* to 3,920 for
+Ideal. Dividing by carat assumes price is proportional to weight, and
+it is not: a two-carat stone costs far more than twice a one-carat
+one. So the ratio over-corrects for the largest stones and
+under-corrects for the smallest. It is a hint, not a control.
+
+## Step 4: control for the confounder properly
+
+The honest version compares diamonds of similar size: bucket by
+carat, then look at cut within each bucket.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+GRADES = pl.Enum(["Fair", "Good", "Very Good", "Premium", "Ideal"])
+diamonds = pl.read_csv("diamonds.csv").with_columns(
+    pl.col("cut").cast(GRADES)
+)`,
+      starterCode: `banded = (
+    diamonds.lazy()
+    .with_columns(
+        band=pl.when(pl.col("carat") < 0.5)
+        .then(pl.lit("under 0.5ct"))
+        .when(pl.col("carat") < 1.0)
+        .then(pl.lit("0.5 to 1ct"))
+        .when(pl.col("carat") < 1.5)
+        .then(pl.lit("1 to 1.5ct"))
+        .otherwise(pl.lit("1.5ct and up"))
+    )
+    .group_by("band", "cut")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("price").median().alias("median_price"),
+    )
+    .collect()
+)
+
+BANDS = ["under 0.5ct", "0.5 to 1ct", "1 to 1.5ct", "1.5ct and up"]
+
+print(
+    banded.pivot(on="cut", index="band", values="median_price")
+    # pivot names columns in the order it met them, so restate the order
+    .select("band", "Fair", "Good", "Very Good", "Premium", "Ideal")
+    .sort(pl.col("band").cast(pl.Enum(BANDS)))
+)
+`,
+    },
+  ]}
+/>
+
+Read across each row, worst cut to best. In the two bands that carry
+the money, the reversal is gone and the expected ordering is clear:
+at 1 to 1.5 carats a Fair stone's median is 4,209 and an Ideal one's
+is 6,323. The `under 0.5ct` row is the ragged one, which is what a
+band holding the cheapest stones tends to look like.
+
+So the original finding was Simpson's paradox: an aggregate that
+reverses direction once you condition on the confounding variable.
+
+## Step 5: quantify it
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `print(
+    diamonds.select(
+        carat_price=pl.corr("carat", "price").round(3),
+        table_price=pl.corr("table", "price").round(3),
+        depth_price=pl.corr("depth", "price").round(3),
+    )
+)
+
+# The premium a better cut earns, holding size roughly constant
+print(
+    diamonds.filter(pl.col("carat").is_between(0.9, 1.1))
+    .group_by("cut")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("price").median().alias("median_price"),
+    )
+    .sort("median_price")
+)
+`,
+    },
+  ]}
+/>
+
+Carat correlates with price at 0.922; `table` manages 0.127 and
+`depth` is essentially zero. Among near-one-carat stones the cut
+ordering behaves: Fair 3,730 rising to Ideal 5,220, about a 1,500
+dollar spread. Set that against the carat effect, where the median
+jumps from roughly 2,300 in the 0.5-to-1 band to 12,700 above 1.5
+carats, and the relative sizes are clear.
+
+## Step 6: write it as one pipeline
+
+The exploratory version was many cells. The version you keep is one
+lazy pipeline that another person can read.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `GRADES = pl.Enum(["Fair", "Good", "Very Good", "Premium", "Ideal"])
+
+def carat_band() -> pl.Expr:
+    """Size bands used throughout this analysis."""
+    carat = pl.col("carat")
+    return (
+        pl.when(carat < 0.5).then(pl.lit("under 0.5ct"))
+        .when(carat < 1.0).then(pl.lit("0.5 to 1ct"))
+        .when(carat < 1.5).then(pl.lit("1 to 1.5ct"))
+        .otherwise(pl.lit("1.5ct and up"))
+        .alias("band")
+    )
+
+report = (
+    pl.scan_csv("diamonds.csv")
+    .with_columns(pl.col("cut").cast(GRADES), carat_band())
+    .group_by("band", "cut")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("carat").mean().round(2).alias("avg_carat"),
+        pl.col("price").median().alias("median_price"),
+        (pl.col("price") / pl.col("carat")).median().round(0).alias("per_carat"),
+    )
+    .sort("band", "cut")
+    .collect()
+)
+
+print(report)
+print(report.select(pl.col("n").sum()))
+`,
+    },
+  ]}
+/>
+
+Eight ideas from this course appear in that block: `scan_csv`, an
+`Enum`, an expression factory, `when/then`, multi-key `group_by`,
+several aggregations, a sort, and one `collect` at the end.
+
+## The finding
+
+> Ideal-cut diamonds have the lowest average price not because a
+> better cut is worth less, but because ideal-cut stones in this
+> dataset are systematically smaller. Carat drives price (r = 0.922),
+> and average carat falls from 1.05 for Fair to 0.70 for Ideal.
+> Within a size band the expected ordering returns: among stones of
+> 1 to 1.5 carats, the median rises from 4,209 for Fair to 6,323 for
+> Ideal. Cut is worth roughly 1,500 dollars on a one-carat stone,
+> against a carat effect measured in five figures.
+
+That is a defensible answer: it states the effect, the mechanism, the
+evidence, and the size of the real effect once the confounder is
+controlled for.
+
+## Your turn
+
+<ChallengeCard
+  adapter="python"
+  title="Run the same analysis on colour"
+  instructions={`Diamond \`color\` is graded D (best) through J (worst). Run the same diagnostic on it.
+
+Build \`colour_report\`, one row per \`color\`, with these columns in this order:
+
+1. \`color\`
+2. \`n\`, the number of diamonds
+3. \`avg_carat\`, mean \`carat\` rounded to 3 decimals
+4. \`median_price\`, median \`price\`
+5. \`median_per_carat\`, the median of \`price / carat\`, rounded to 0 decimals
+
+Sort by \`color\` ascending (D first). Then set two booleans, comparing the best grade (D) with the worst (J):
+
+- \`price_reversed\`: does D have a **lower** \`median_price\` than J?
+- \`per_carat_fixes_it\`: does D have a **higher** \`median_per_carat\` than J?
+
+Look at the answers before you assume them. The interesting result here is that the two do not agree.`}
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `colour_report = None       # TODO
+price_reversed = None      # TODO
+per_carat_fixes_it = None  # TODO
+
+print(colour_report)
+`,
+      solutionCode: `colour_report = (
+    diamonds.lazy()
+    .group_by("color")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("carat").mean().round(3).alias("avg_carat"),
+        pl.col("price").median().alias("median_price"),
+        (pl.col("price") / pl.col("carat")).median().round(0).alias("median_per_carat"),
+    )
+    .sort("color")
+    .collect()
+)
+
+best = colour_report.row(0, named=True)
+worst = colour_report.row(-1, named=True)
+
+price_reversed = best["median_price"] < worst["median_price"]
+per_carat_fixes_it = best["median_per_carat"] > worst["median_per_carat"]
+
+print(colour_report)
+print("price_reversed:", price_reversed)
+print("per_carat_fixes_it:", per_carat_fixes_it)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "shape",
+      name: "Seven rows, five columns",
+      description: "Colours D through J",
+      code: `assert colour_report.shape == (7, 5), colour_report.shape`,
+    },
+    {
+      id: "cols",
+      name: "The right columns in order",
+      description: "color, n, avg_carat, median_price, median_per_carat",
+      code: `expected = ["color", "n", "avg_carat", "median_price", "median_per_carat"]
+assert colour_report.columns == expected, colour_report.columns`,
+    },
+    {
+      id: "sorted",
+      name: "Sorted D through J",
+      description: "Best grade first",
+      code: `assert colour_report["color"].to_list() == list("DEFGHIJ"), colour_report["color"].to_list()`,
+    },
+    {
+      id: "carat_trend",
+      name: "The confounder is present: better colours are smaller",
+      description: "D averages well under J",
+      code: `d = colour_report.row(0, named=True)
+j = colour_report.row(-1, named=True)
+assert d["avg_carat"] < j["avg_carat"], (d["avg_carat"], j["avg_carat"])`,
+    },
+    {
+      id: "price_reversed",
+      name: "The price reversal is there",
+      description: "D is cheaper overall than J",
+      code: `assert price_reversed is True, price_reversed`,
+    },
+    {
+      id: "per_carat",
+      name: "But the per-carat ratio does not undo it",
+      description: "D is 3411 per carat, J is 3780",
+      code: `assert per_carat_fixes_it is False, per_carat_fixes_it`,
+    },
+    {
+      id: "counts",
+      name: "Every diamond is counted once",
+      description: "53,940 across the seven grades",
+      code: `assert colour_report["n"].sum() == 53940, colour_report["n"].sum()`,
+    },
+  ]}
+/>
+
+The colour result is the more instructive one. The confounder is
+present and stronger than it was for cut (D averages 0.66 carat, J
+averages 1.16), and it fully explains why the best grade looks
+cheapest. But dividing by carat does *not* flip the ordering back,
+because price is not proportional to weight. Only banding by size
+settles it, which is the same conclusion step 4 reached, arrived at
+from a case where the shortcut visibly fails.
+
+A diagnostic that gives you the answer you expected on one variable
+and refuses on the next is a diagnostic worth keeping.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What made the original "better cut, lower price" finding misleading?
+
+- The mean was distorted by a few extremely expensive outliers
+  > Outliers do pull the mean, but the reversal survives when medians are used, so that is not the cause here.
+- The cut grades were compared in alphabetical rather than quality order
+  > Ordering the grades correctly is what made the pattern legible; it did not create the pattern.
+- [o] Cut is confounded with carat, and carat is what actually drives price
+  > Conditioning on the confounder makes the reversal largely disappear, which is Simpson's paradox.
+- The dataset contains duplicate rows that over-count ideal-cut stones
+  > Duplicates would inflate counts, not reverse a price ordering, and the counts here are legitimate.
+
+An aggregate that reverses when you condition on a third variable is the signature to watch for.`}
+/>
+
+<MultipleChoice
+  markdown={`Why bucket by carat rather than just dividing price by carat?
+
+- Division by carat fails when carat is zero
+  > No diamond in the dataset has a carat of zero, so the division is well defined throughout.
+- Per-carat price cannot be computed inside a \`group_by\`
+  > It can, and the course does exactly that; the objection is to what the number assumes.
+- [o] Price is not proportional to carat, so a per-carat ratio still favours one size range
+  > Comparing like with like inside a band makes fewer assumptions than dividing does.
+- Bucketing is faster than computing a ratio on every row
+  > Bucketing adds work rather than saving it; the reason to prefer it is honesty, not speed.
+
+Price rises faster than linearly with carat, which is why the ratio is a crude control rather than a clean one.`}
+/>
+
+<MultipleChoice
+  markdown={`What makes the step 6 pipeline better than the exploratory cells that preceded it?
+
+- It runs faster because it uses fewer intermediate variables
+  > Some speed comes from being lazy, but a chain of eager steps would give the same answer at a similar cost.
+- It is more accurate, since lazy execution avoids floating-point drift
+  > Both paths do identical arithmetic; laziness changes when work happens, not what it computes.
+- [o] It states the whole analysis in one readable, re-runnable, reviewable unit
+  > The exploratory version was for you; this version is for the next person, including future you.
+- It avoids the confounder that the exploratory version was subject to
+  > The confounder is handled by the banding logic, which appears in both versions.
+
+Explore in cells; keep a pipeline.`}
+/>

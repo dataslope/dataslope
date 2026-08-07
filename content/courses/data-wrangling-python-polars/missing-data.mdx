@@ -1,0 +1,334 @@
+---
+title: Missing Data and Nulls
+description: "Finding nulls, filling them, dropping them, and the difference between null and NaN that Polars keeps and pandas historically did not."
+---
+
+Real data is missing values. Polars has exactly one way to represent
+that, which removes a whole class of confusion before it starts.
+
+<Figure
+  slug="pl-missing-data-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading holding a thick yellow block just above an empty socket on a wide platform, a row of five thick blue blocks standing along the platform with two empty sockets among them"
+/>
+
+## null is not NaN
+
+`null` means "no value here". `NaN` is a *floating-point number*
+meaning "the result of an impossible calculation", like `0/0`. pandas
+historically used `NaN` for both; Polars keeps them apart.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"x": [1.0, None, float("nan"), 4.0]})
+
+print(df)
+print("is_null:", df["x"].is_null().to_list())
+print("is_nan :", df["x"].is_nan().to_list())
+print("sum    :", df["x"].sum())   # null skipped, NaN poisons the result
+print("mean   :", df["x"].mean())
+`,
+    },
+  ]}
+/>
+
+A null is skipped by aggregations. A `NaN` propagates: any sum
+containing one is `NaN`. If a numeric column returns `NaN` from a
+mean, you have a genuine `NaN` in the data, not a missing value, and
+the fix is different.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"x": [1.0, None, float("nan"), 4.0]})
+
+# Convert NaN to null when it really means "missing"
+cleaned = df.with_columns(pl.col("x").fill_nan(None))
+print(cleaned["x"].mean())
+print(cleaned["x"].null_count())
+`,
+    },
+  ]}
+/>
+
+## Finding them
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(penguins.null_count())
+
+# As a share of rows
+print(penguins.select((pl.all().null_count() / pl.len() * 100).round(2)))
+
+# The rows with any null at all
+any_null = penguins.filter(pl.any_horizontal(pl.all().is_null()))
+print("rows with at least one null:", any_null.height)
+print(any_null)
+`,
+    },
+  ]}
+/>
+
+`pl.any_horizontal` combines a Boolean expression *across* columns
+within a row, which is the missing half of the toolkit: most
+expressions work down a column, this one works across a row.
+
+## Dropping
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print("all rows          :", penguins.height)
+print("no nulls anywhere :", penguins.drop_nulls().height)
+print("mass present      :", penguins.drop_nulls("body_mass_g").height)
+print("mass and sex      :", penguins.drop_nulls(["body_mass_g", "sex"]).height)
+`,
+    },
+  ]}
+/>
+
+Dropping 11 rows out of 344 to lose one unknown `sex` value costs you
+9 perfectly good measurements. `drop_nulls` with an explicit column
+list is almost always better than the bare version, because it drops
+rows for a reason you named.
+
+## Filling
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"g": ["a", "a", "a", "b", "b"], "x": [1.0, None, 3.0, None, 5.0]})
+
+print(
+    df.with_columns(
+        zero=pl.col("x").fill_null(0),
+        mean=pl.col("x").fill_null(pl.col("x").mean()),
+        forward=pl.col("x").fill_null(strategy="forward"),
+        backward=pl.col("x").fill_null(strategy="backward"),
+        interpolated=pl.col("x").interpolate(),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+| Strategy | Use when |
+| --- | --- |
+| a constant | the missing value has a known meaning (0 sales, "unknown") |
+| the mean or median | the value is missing at random and you need a number |
+| `forward` / `backward` | the data is a time series where the last reading holds |
+| `interpolate` | the quantity moves smoothly between readings |
+
+<Callout type="warn" title="Filling with the mean is not free">
+Imputing the mean keeps the mean and shrinks the variance, which
+makes a distribution look tighter than it is and biases anything
+downstream that cares about spread. It is a reasonable default and it
+is a decision, so record it.
+</Callout>
+
+## Filling within a group
+
+The mean of the whole column is often the wrong filler. The mean of
+the row's own group is usually better.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `filled = penguins.with_columns(
+    pl.col("body_mass_g")
+    .fill_null(pl.col("body_mass_g").mean().round(0).over("species"))
+    .alias("mass_filled")
+)
+
+print(
+    filled.filter(pl.col("body_mass_g").is_null())
+    .select("species", "body_mass_g", "mass_filled")
+)
+`,
+    },
+  ]}
+/>
+
+The two penguins with no mass are both Adelie, so they get the Adelie
+average rather than the overall one. Overall would have been 500 g
+too heavy.
+
+## Nulls in comparisons and joins
+
+Two rules to keep in mind, both inherited from SQL:
+
+- A comparison with null is null, so `filter` drops the row. (Covered
+  on the filtering page; it is worth repeating.)
+- `null == null` is null, but Polars' **join keys treat nulls as
+  equal by default**, so null keys will match each other.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+a = pl.DataFrame({"k": ["x", None], "left": [1, 2]})
+b = pl.DataFrame({"k": ["x", None], "right": [10, 20]})
+
+print(a.join(b, on="k", how="inner"))
+print(a.join(b, on="k", how="inner", nulls_equal=False))
+`,
+    },
+  ]}
+/>
+
+A null key almost never means "this row matches that row", so pass
+`nulls_equal=False` when a key column can be missing, or filter the
+nulls out before joining.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Impute within species, and record what you did"
+  instructions={`From \`penguins\`, build \`filled\` with:
+
+- every original column,
+- \`bill_length_mm\` and \`bill_depth_mm\` with their nulls replaced by that penguin's **species** mean, rounded to 1 decimal,
+- a Boolean column \`imputed\` that is true for rows where \`bill_length_mm\` was originally null.
+
+Every one of the 344 rows must survive.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `filled = None  # TODO
+
+print(filled)
+`,
+      solutionCode: `bills = pl.col("bill_length_mm", "bill_depth_mm")
+
+filled = penguins.with_columns(
+    imputed=pl.col("bill_length_mm").is_null()
+).with_columns(
+    bills.fill_null(bills.mean().round(1).over("species"))
+)
+
+print(filled.filter(pl.col("imputed")))
+print(filled.null_count())
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "rows",
+      name: "All 344 rows kept",
+      description: "Nothing dropped",
+      code: `assert filled.height == 344, filled.height`,
+    },
+    {
+      id: "flag",
+      name: "imputed marks the two originally-null rows",
+      description: "Boolean column",
+      code: `import polars as pl
+assert filled["imputed"].dtype == pl.Boolean, filled["imputed"].dtype
+assert filled["imputed"].sum() == 2, filled["imputed"].sum()`,
+    },
+    {
+      id: "no_nulls",
+      name: "No bill nulls remain",
+      description: "Both columns filled",
+      code: `assert filled["bill_length_mm"].null_count() == 0
+assert filled["bill_depth_mm"].null_count() == 0`,
+    },
+    {
+      id: "by_species",
+      name: "Filled with the species mean, not the overall mean",
+      description: "Both missing penguins are Adelie",
+      code: `row = filled.filter(filled["imputed"]).row(0, named=True)
+assert row["species"] == "Adelie", row["species"]
+assert row["bill_length_mm"] == 38.8, row["bill_length_mm"]`,
+    },
+    {
+      id: "untouched",
+      name: "Present values were not changed",
+      description: "First penguin still 39.1",
+      code: `assert filled["bill_length_mm"][0] == 39.1, filled["bill_length_mm"][0]`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`A float column's \`mean()\` returns \`NaN\`. What does that tell you?
+
+- The column is entirely null, so there is nothing to average
+  > An all-null column returns null from \`mean\`, not NaN; the two outcomes have different causes.
+- Polars could not parse some of the values when the file was read
+  > Unparsed values become nulls or raise at read time; neither produces a NaN in the result.
+- [o] The column contains at least one genuine \`NaN\` value, which propagates
+  > Nulls are skipped by aggregations. A NaN is a real float and poisons any sum it takes part in.
+- The column mixes integers and floats, which Polars cannot average
+  > A column has exactly one dtype, so no such mixture can exist in the first place.
+
+Use \`fill_nan(None)\` when a NaN in your data actually means "missing".`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`drop_nulls("body_mass_g")\` usually better than a bare \`drop_nulls()\`?
+
+- The bare form is much slower on a wide frame
+  > Both are fast; the difference that matters is how many rows each one removes and why.
+- The bare form removes columns rather than rows
+  > Both remove rows. Removing columns would be \`drop\`, which takes column names.
+- [o] The bare form drops a row for a null in *any* column, discarding good data for an irrelevant reason
+  > On the penguins, one unknown \`sex\` costs you nine perfectly good measurements.
+- The bare form leaves nulls in columns you did not name
+  > It drops any row with a null anywhere, so no nulls survive it in any column.
+
+Name the columns your analysis actually depends on.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the cost of filling a numeric column with its own mean?
+
+- The column's mean shifts toward the filled value
+  > The mean is exactly what the imputation preserves, which is the one statistic it leaves alone.
+- Nulls reappear whenever the frame is re-sorted
+  > Filling writes real values into the column; sorting cannot bring the nulls back.
+- The column's dtype changes to Float64 even if it was integer
+  > Filling an integer column with an integer keeps it integer; a float filler is what would widen it.
+- [o] The variance shrinks, so the distribution looks tighter than it is
+  > Every imputed row sits exactly at the centre, which understates spread and biases anything downstream that uses it.
+
+It is a reasonable default and it is a decision worth recording.`}
+/>

@@ -39,13 +39,21 @@
 
 // Attribute names whose template-literal value IS the code. These are the
 // top-level props still used by the SQL components (`starterCode`,
-// `initSql`, `solutionSql`).
+// `initSql`, `solutionSql`) and by the read-only preview components, whose
+// code is displayed rather than edited: `<LivePreview html={…} css={…}>`
+// (the CSS course) and `<ReactPreview code={…}>` (the React course). Those
+// three were missing until 2026-08, so every CSS rule body and JSX block in
+// those two courses rendered flush against the left margin while the .mdx
+// source was correctly indented.
 const CODE_ATTRS = new Set([
   "starterCode",
   "solutionCode",
   "solutionSql",
   "initCode",
   "initSql",
+  "html",
+  "css",
+  "code",
 ]);
 // Object keys carrying code inside `files={[ { … } ]}` blocks. The non-SQL
 // CodeBlock/ChallengeCard now keep all per-file code here as `initCode` /

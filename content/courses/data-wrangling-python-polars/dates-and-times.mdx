@@ -1,0 +1,397 @@
+---
+title: Dates and Times
+description: "Parsing dates, the .dt namespace, truncating to periods, date ranges, durations, and time zones."
+---
+
+Temporal data has four types in Polars, and telling them apart saves
+a lot of confusion later.
+
+<Figure
+  slug="pl-dates-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading resting one paw on a thick round blue dial with one solid green hand standing upright on a platform, beside a wide yellow block carved with a few deep square recesses"
+/>
+
+| Type | Holds | Example |
+| --- | --- | --- |
+| `Date` | a calendar day | 2026-03-14 |
+| `Datetime` | an instant, with a unit and optional time zone | 2026-03-14 09:30:00 |
+| `Time` | a clock time with no date | 09:30:00 |
+| `Duration` | a length of time | 3 days, 4 hours |
+
+## Getting dates in
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"when": ["2026-03-14", "2026-03-15", "2026-04-01"]})
+
+# ISO 8601 parses with no format string
+print(df.with_columns(pl.col("when").str.to_date()))
+
+# Anything else needs a chrono format
+odd = pl.DataFrame({"when": ["14/03/2026", "15/03/2026"]})
+print(odd.with_columns(pl.col("when").str.to_date("%d/%m/%Y")))
+
+# Timestamps too
+stamps = pl.DataFrame({"when": ["2026-03-14 09:30:00"]})
+print(stamps.with_columns(pl.col("when").str.to_datetime()))
+`,
+    },
+  ]}
+/>
+
+`try_parse_dates=True` on `read_csv` does this at read time for
+ISO-shaped columns, which is one fewer step.
+
+<Callout type="warn" title="A failed parse raises by default">
+`str.to_date` raises on the first value it cannot parse. Pass
+`strict=False` to get nulls instead, then count them. On a file of
+unknown provenance that is the better first move: you learn how many
+rows are broken instead of only that one row is.
+</Callout>
+
+## The .dt namespace
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame(
+    {"when": ["2026-01-05", "2026-03-14", "2026-12-31"]}
+).with_columns(pl.col("when").str.to_date())
+
+d = pl.col("when")
+
+print(
+    df.with_columns(
+        year=d.dt.year(),
+        month=d.dt.month(),
+        day=d.dt.day(),
+        weekday=d.dt.weekday(),        # 1 = Monday
+        ordinal_day=d.dt.ordinal_day(), # day of year
+        week=d.dt.week(),               # ISO week
+        quarter=d.dt.quarter(),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+## Truncating to a period
+
+This is the operation behind every "by month" report.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+sales = pl.DataFrame(
+    {
+        "when": [
+            "2026-01-05", "2026-01-19", "2026-02-02",
+            "2026-02-27", "2026-03-14",
+        ],
+        "amount": [100, 250, 75, 300, 180],
+    }
+).with_columns(pl.col("when").str.to_date())
+
+print(
+    sales.with_columns(
+        month=pl.col("when").dt.truncate("1mo"),
+        week=pl.col("when").dt.truncate("1w"),
+    )
+)
+
+print(
+    sales.group_by(pl.col("when").dt.truncate("1mo").alias("month"))
+    .agg(pl.col("amount").sum())
+    .sort("month")
+)
+`,
+    },
+  ]}
+/>
+
+`truncate` rounds *down* to the start of the period, which keeps the
+result a real date rather than a string like `"2026-01"`. That
+matters: dates sort and compare correctly, strings sort
+lexicographically and compare badly.
+
+The period strings compose: `"1mo"`, `"1w"`, `"1d"`, `"6h"`,
+`"15m"`, `"30s"`, and combinations like `"1h30m"`.
+
+## Arithmetic and durations
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+from datetime import date, timedelta
+
+df = pl.DataFrame(
+    {
+        "start": [date(2026, 1, 1), date(2026, 3, 1)],
+        "end": [date(2026, 1, 31), date(2026, 4, 15)],
+    }
+)
+
+print(
+    df.with_columns(
+        span=pl.col("end") - pl.col("start"),
+        days=(pl.col("end") - pl.col("start")).dt.total_days(),
+        plus_week=pl.col("start") + pl.duration(days=7),
+        # Calendar-aware offsets, which duration() cannot do
+        plus_month=pl.col("start").dt.offset_by("1mo"),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+The difference between two dates is a `Duration`. `dt.total_days()`,
+`total_hours()`, `total_seconds()` turn it into a number.
+
+<Callout type="info" title="duration versus offset_by">
+`pl.duration(days=30)` adds exactly 30 x 24 hours. `dt.offset_by("1mo")`
+adds one calendar month, so January 31 plus one month is February 28.
+Months and years are not fixed lengths, so they only exist in
+`offset_by`.
+</Callout>
+
+## Generating a date range
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+from datetime import date
+
+days = pl.date_range(
+    date(2026, 3, 1), date(2026, 3, 7), interval="1d", eager=True
+)
+print(days)
+
+months = pl.date_range(
+    date(2026, 1, 1), date(2026, 6, 1), interval="1mo", eager=True
+)
+print(months.to_list())
+`,
+    },
+  ]}
+/>
+
+A generated range is how you fill gaps: build every day you expect,
+left-join the days you have, and the missing ones show up as nulls
+rather than as absent rows nobody noticed.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+from datetime import date
+
+observed = pl.DataFrame(
+    {
+        "day": [date(2026, 3, 1), date(2026, 3, 3), date(2026, 3, 4)],
+        "reading": [9.1, 9.4, 9.0],
+    }
+)
+
+calendar = pl.DataFrame(
+    {
+        "day": pl.date_range(
+            date(2026, 3, 1), date(2026, 3, 5), interval="1d", eager=True
+        )
+    }
+)
+
+print(calendar.join(observed, on="day", how="left").sort("day"))
+`,
+    },
+  ]}
+/>
+
+March 2 and 5 are now visibly missing rather than silently absent.
+
+## Time zones
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"t": ["2026-06-15 12:00:00"]}).with_columns(
+    pl.col("t").str.to_datetime()
+)
+
+print(df.with_columns(
+    utc=pl.col("t").dt.replace_time_zone("UTC"),
+).with_columns(
+    oslo=pl.col("utc").dt.convert_time_zone("Europe/Oslo"),
+))
+`,
+    },
+  ]}
+/>
+
+Two operations, easily confused:
+
+- **`replace_time_zone`** attaches a zone without changing the clock
+  reading. Use it when a naive timestamp is *known* to be in some
+  zone.
+- **`convert_time_zone`** changes the clock reading to the same
+  instant elsewhere. Use it to display a stored instant locally.
+
+The safe pattern is to store everything in UTC and convert only at
+the point of display.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="A monthly report from raw timestamps"
+  instructions={`\`raw\` has \`when\` (an ISO date string) and \`amount\`.
+
+Build \`monthly\` with one row per calendar month and exactly these columns, in this order:
+
+1. \`month\`, the first day of the month, as a real \`pl.Date\`
+2. \`n\`, the number of sales that month
+3. \`total\`, the sum of \`amount\`
+
+Sort by \`month\` ascending. Do not build the month as a string.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+raw = pl.DataFrame(
+    {
+        "when": [
+            "2026-01-05", "2026-01-19", "2026-01-30",
+            "2026-02-02", "2026-02-27",
+            "2026-03-14", "2026-03-15", "2026-03-31",
+        ],
+        "amount": [100, 250, 40, 75, 300, 180, 60, 90],
+    }
+)`,
+      starterCode: `monthly = None  # TODO
+
+print(monthly)
+`,
+      solutionCode: `monthly = (
+    raw.with_columns(pl.col("when").str.to_date())
+    .group_by(pl.col("when").dt.truncate("1mo").alias("month"))
+    .agg(
+        pl.len().alias("n"),
+        pl.col("amount").sum().alias("total"),
+    )
+    .sort("month")
+)
+
+print(monthly)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "shape",
+      name: "Three rows, three columns",
+      description: "One row per month",
+      code: `assert monthly.shape == (3, 3), monthly.shape`,
+    },
+    {
+      id: "cols",
+      name: "The right columns in order",
+      description: "month, n, total",
+      code: `assert monthly.columns == ["month", "n", "total"], monthly.columns`,
+    },
+    {
+      id: "dtype",
+      name: "month is a real Date, not a string",
+      description: "So it sorts and compares correctly",
+      code: `import polars as pl
+assert monthly["month"].dtype == pl.Date, monthly["month"].dtype`,
+    },
+    {
+      id: "values",
+      name: "The months are the first of each month",
+      description: "January, February, March 2026",
+      code: `from datetime import date
+expected = [date(2026, 1, 1), date(2026, 2, 1), date(2026, 3, 1)]
+assert monthly["month"].to_list() == expected, monthly["month"].to_list()`,
+    },
+    {
+      id: "totals",
+      name: "Counts and totals are right",
+      description: "3/390, 2/375, 3/330",
+      code: `assert monthly["n"].to_list() == [3, 2, 3], monthly["n"].to_list()
+assert monthly["total"].to_list() == [390, 375, 330], monthly["total"].to_list()`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why truncate to \`"1mo"\` rather than formatting the date as the string \`"2026-01"\`?
+
+- String formatting is much slower than truncation
+  > Both are fast. The problem with the string is what it can and cannot do afterwards, not how long it takes.
+- A truncated date takes less memory than the equivalent string
+  > It does, but that is a minor benefit next to keeping the column's temporal behaviour.
+- [o] The result stays a Date, so it sorts, compares, and can be offset like one
+  > A string month sorts lexicographically, which happens to work for \`YYYY-MM\` and fails for almost every other format.
+- Truncation groups the rows for you, so no \`group_by\` is needed
+  > Truncation only computes a value; grouping is still an explicit step.
+
+The lexicographic accident is what makes the string version work just long enough to be trusted.`}
+/>
+
+<MultipleChoice
+  markdown={`January 31 plus one month. What do \`pl.duration(days=30)\` and \`dt.offset_by("1mo")\` give?
+
+- Both give March 2, since a month is normalized to 30 days
+  > Only the duration normalizes; \`offset_by\` deliberately understands the calendar.
+- Both give February 28, since Polars is calendar-aware everywhere
+  > The duration path has no notion of months at all and simply adds a fixed span.
+- [o] March 2 and February 28: one adds a fixed span, the other a calendar month
+  > Months and years have no fixed length, which is why they exist only in \`offset_by\`.
+- The first raises, because a duration cannot be added to a date
+  > Adding a duration to a date is valid and common; it just means something different from a calendar offset.
+
+Reach for \`offset_by\` whenever the answer should land on the same day-of-month.`}
+/>
+
+<MultipleChoice
+  markdown={`A naive timestamp is known to have been recorded in Oslo. Which method attaches that fact?
+
+- \`convert_time_zone("Europe/Oslo")\`
+  > That converts an already-zoned instant into Oslo's local reading, so it needs a zone to already be present.
+- [o] \`replace_time_zone("Europe/Oslo")\`
+  > It attaches the zone while leaving the clock reading alone, which is what "this reading was local time" means.
+- \`cast(pl.Datetime(time_zone="Europe/Oslo"))\`
+  > A cast reinterprets the stored instant rather than declaring the reading's origin, giving a different wall-clock time.
+- \`dt.offset_by("+1h")\`
+  > Shifting by the offset gets today's arithmetic right and silently breaks across a daylight-saving boundary.
+
+Store in UTC, convert at display time, and the question rarely comes up again.`}
+/>

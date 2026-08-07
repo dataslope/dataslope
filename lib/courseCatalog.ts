@@ -53,6 +53,7 @@ const POPULARITY_ORDER: string[] = [
   "c-programming-for-beginners",
   "statistics-for-data-science-python",
   "sql-analytics-duckdb",
+  "data-wrangling-python-polars",
   "practical-r-for-beginners",
   "intro-data-viz-plotly",
   "mastering-dsa-cpp",

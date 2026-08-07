@@ -28,11 +28,12 @@ import {
 export interface Env {
   /**
    * Comma-separated list of allowed Origin values, e.g.:
-   *   "http://localhost:3000,https://dataslope.com,https://dataslope.vercel.app"
+   *   "http://localhost:3000,https://dataslope.com,https://dataslope.subwaymatch.workers.dev"
    *
    * Entries may contain a `*` wildcard that matches a single hostname label
-   * (no dots, no slashes) so Vercel preview deployments can be allowed, e.g.:
-   *   "https://dataslope-*-ye-joo-parks-projects.vercel.app"
+   * (no dots, no slashes) so the app worker's version and alias preview
+   * hostnames can be allowed without listing each one, e.g.:
+   *   "https://*-dataslope.subwaymatch.workers.dev"
    *
    * Configure in wrangler.toml [vars] for development, or via
    * `wrangler secret put ALLOWED_ORIGINS` / Cloudflare dashboard for production.

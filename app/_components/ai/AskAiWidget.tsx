@@ -95,6 +95,7 @@ import {
   type AiEditSuggestion,
 } from "./editSuggestions";
 import styles from "./AskAiPanel.module.css";
+import { useDraggablePanel } from "./useDraggablePanel";
 
 /** Where the closed-state launcher sits, chosen from Settings → "Where the
  *  button lives": a slim square tab docked to the right viewport edge (default),
@@ -431,6 +432,8 @@ export default function AskAiWidget({
   // into the panel collapses the document selection). Highlight-to-ask stays a
   // first-class feature; the selection shows up as a source in the sheet.
   const panelRef = useRef<HTMLDivElement>(null);
+  // Desktop-only drag-to-reposition, handled from the panel header.
+  const drag = useDraggablePanel(panelRef);
   const [selection, setSelection] = useState<CapturedSelection | null>(null);
   useEffect(() => {
     const onSelectionChange = () => {
@@ -879,9 +882,24 @@ export default function AskAiWidget({
     userTurns % 2 === 0 ? "AI can make mistakes." : "Verify important answers.";
 
   return (
-    <div className={styles.panel} role="dialog" aria-label="Ask AI" ref={panelRef}>
+    <div
+      className={`${styles.panel} ${drag.dragging ? styles.dragging : ""}`}
+      style={drag.style}
+      role="dialog"
+      aria-label="Ask AI"
+      ref={panelRef}
+    >
       <div className={`${styles.chatArea} ${sheetOpen ? styles.dimmed : ""}`}>
-        <div className={styles.header}>
+        {/* The header doubles as the drag handle on desktop (see
+            useDraggablePanel); its own buttons are excluded, so only the
+            empty space and the title move the panel. Double-click sends it
+            back to the docked corner. */}
+        <div
+          className={`${styles.header} ${drag.enabled ? styles.headerDraggable : ""}`}
+          {...drag.handleProps}
+          onDoubleClick={drag.moved ? drag.reset : undefined}
+          title={drag.enabled ? "Drag to move" : undefined}
+        >
           <Sparkle className={styles.sparkle} size={17} />
           <span className={styles.title}>Ask AI</span>
           {tier && (

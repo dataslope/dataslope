@@ -1,0 +1,313 @@
+---
+title: Categoricals and Enums
+description: "Storing repeated strings once, the difference between Categorical and Enum, and the ordering that only one of them gives you."
+---
+
+A column holding 53,940 diamond cuts contains five distinct strings
+repeated ten thousand times each. Storing the text once and the
+positions as small integers is both smaller and faster to compare.
+That is what `Categorical` and `Enum` do.
+
+<Figure
+  slug="pl-categoricals-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading placing one thick block onto a small raised tray that holds exactly one block each in blue, green and yellow, a wide platform beside it spread with six thick blocks in the same three colours"
+/>
+
+## The memory case
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `text = diamonds.select("cut", "color", "clarity")
+cats = text.with_columns(pl.all().cast(pl.Categorical))
+
+print("as String     :", round(text.estimated_size("mb"), 2), "MB")
+print("as Categorical:", round(cats.estimated_size("mb"), 2), "MB")
+print(cats.dtypes)
+print(cats.head(3))
+`,
+    },
+  ]}
+/>
+
+The values still print as text. Underneath, each column is a buffer
+of small integers plus one table of the distinct strings.
+
+## Categorical versus Enum
+
+This is the distinction that matters.
+
+| | `Categorical` | `Enum` |
+| --- | --- | --- |
+| Categories | discovered from the data | declared up front |
+| A new, unlisted value | added silently | raises |
+| Ordering | by appearance, not meaningful | the declared order |
+| Use when | you do not know the set in advance | you do |
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+sizes = ["small", "medium", "large"]
+
+df = pl.DataFrame({"size": ["large", "small", "medium", "small"]})
+
+cat = df.with_columns(pl.col("size").cast(pl.Categorical))
+enum = df.with_columns(pl.col("size").cast(pl.Enum(sizes)))
+
+print(cat.dtypes, enum.dtypes)
+
+# Sorting a Categorical uses appearance order, which is arbitrary
+print("categorical sort:", cat.sort("size")["size"].to_list())
+
+# Sorting an Enum uses the declared order, which is what you meant
+print("enum sort       :", enum.sort("size")["size"].to_list())
+`,
+    },
+  ]}
+/>
+
+The Enum sorts small, small, medium, large. That is the whole reason
+to use one: an ordered category that sorts, compares, and groups in
+the order a human would expect, without a lookup table of sort keys.
+
+## Enum catches bad data
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+sizes = pl.Enum(["small", "medium", "large"])
+
+good = pl.DataFrame({"size": ["small", "large"]})
+print(good.with_columns(pl.col("size").cast(sizes)))
+
+typo = pl.DataFrame({"size": ["small", "smal"]})
+try:
+    typo.with_columns(pl.col("size").cast(sizes))
+except Exception as error:
+    print(type(error).__name__, "-", str(error).splitlines()[0])
+`,
+    },
+  ]}
+/>
+
+A `Categorical` would have accepted `"smal"` as a fourth perfectly
+valid category, and you would find out at the report stage. This is
+a schema constraint doing what schema constraints are for.
+
+## Comparisons on an Enum
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+sizes = pl.Enum(["small", "medium", "large"])
+
+df = pl.DataFrame(
+    {"size": ["small", "medium", "large", "medium"], "n": [1, 2, 3, 4]}
+).with_columns(pl.col("size").cast(sizes))
+
+print(df.filter(pl.col("size") >= "medium"))
+print(df.select(pl.col("size").max()))
+`,
+    },
+  ]}
+/>
+
+`>= "medium"` works because the Enum knows the order. On a `String`
+column the same comparison would be alphabetical, and "large" sorts
+before "medium", which is exactly the wrong answer delivered without
+complaint.
+
+## Getting back to text and to codes
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"size": ["large", "small", "medium"]}).with_columns(
+    pl.col("size").cast(pl.Enum(["small", "medium", "large"]))
+)
+
+print(
+    df.with_columns(
+        as_text=pl.col("size").cast(pl.String),
+        code=pl.col("size").to_physical(),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+`to_physical()` exposes the underlying integer codes, which is what
+you want when handing the column to a model that needs numbers.
+
+## Where categoricals bite
+
+<Callout type="warn" title="Two Categoricals from different frames may not share a mapping">
+Each `Categorical` column builds its own string-to-integer mapping
+from the data it saw. Comparing or joining two of them requires
+Polars to reconcile the mappings, which it will do, but it is work
+you can avoid entirely by using an `Enum` with a declared category
+list when the set of values is known. That way both sides agree by
+construction.
+</Callout>
+
+Two more practical notes:
+
+- **Cast late, not early.** Categorical is a storage optimization.
+  Read the file, clean the strings (trim, lowercase, fix typos),
+  *then* cast. Casting first means your typos become categories.
+- **A high-cardinality column is a bad categorical.** If nearly every
+  value is distinct, the mapping table is as big as the data and you
+  have added indirection for nothing. Categoricals pay off when the
+  ratio of rows to distinct values is large.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Order the diamond cuts properly"
+  instructions={`Diamond \`cut\` grades have a real order, worst to best: \`Fair\`, \`Good\`, \`Very Good\`, \`Premium\`, \`Ideal\`.
+
+Build \`by_cut\` from \`diamonds\`:
+
+1. Cast \`cut\` to an \`Enum\` with that order.
+2. Group by \`cut\` and compute \`n\` (the row count) and \`median_price\` (the median of \`price\`).
+3. Sort by \`cut\`, which must come out in **quality order**, not alphabetical order.
+
+Columns, in this order: \`cut\`, \`n\`, \`median_price\`.`}
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `by_cut = None  # TODO
+
+print(by_cut)
+`,
+      solutionCode: `grades = pl.Enum(["Fair", "Good", "Very Good", "Premium", "Ideal"])
+
+by_cut = (
+    diamonds.with_columns(pl.col("cut").cast(grades))
+    .group_by("cut")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("price").median().alias("median_price"),
+    )
+    .sort("cut")
+)
+
+print(by_cut)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "shape",
+      name: "Five rows, three columns",
+      description: "One per cut grade",
+      code: `assert by_cut.shape == (5, 3), by_cut.shape`,
+    },
+    {
+      id: "cols",
+      name: "The right columns in order",
+      description: "cut, n, median_price",
+      code: `assert by_cut.columns == ["cut", "n", "median_price"], by_cut.columns`,
+    },
+    {
+      id: "dtype",
+      name: "cut is an Enum, not a String",
+      description: "That is what carries the order",
+      code: `import polars as pl
+assert isinstance(by_cut["cut"].dtype, pl.Enum), by_cut["cut"].dtype`,
+    },
+    {
+      id: "order",
+      name: "Sorted worst to best, not alphabetically",
+      description: "Fair, Good, Very Good, Premium, Ideal",
+      code: `expected = ["Fair", "Good", "Very Good", "Premium", "Ideal"]
+assert [str(c) for c in by_cut["cut"].to_list()] == expected, by_cut["cut"].to_list()`,
+    },
+    {
+      id: "values",
+      name: "The counts are right",
+      description: "1610 Fair, 21551 Ideal",
+      code: `assert by_cut["n"].to_list() == [1610, 4906, 12082, 13791, 21551], by_cut["n"].to_list()`,
+    },
+    {
+      id: "insight",
+      name: "Ideal diamonds have the lowest median price",
+      description: "Best cut, cheapest stone: they skew small",
+      code: `prices = by_cut["median_price"].to_list()
+assert prices[-1] == min(prices), prices`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why does sorting a \`Categorical\` column give an order that looks arbitrary?
+
+- Categorical columns cannot be sorted at all
+  > They sort perfectly well; the question is whether the resulting order means anything.
+- The values are sorted alphabetically, which rarely matches meaning
+  > Alphabetical is what a plain \`String\` column gives. A categorical sorts by its internal codes.
+- [o] Its categories are numbered in the order they were first seen in the data
+  > Declare an \`Enum\` when the order matters, and it sorts the way you declared.
+- Sorting uses the number of occurrences of each category
+  > Frequency plays no part in the encoding; the codes reflect first appearance only.
+
+Row order in a file is not a meaningful ranking of its categories.`}
+/>
+
+<MultipleChoice
+  markdown={`A \`size\` column is cast to \`pl.Enum(["small", "medium", "large"])\` and one row holds \`"smal"\`. What happens?
+
+- That row becomes null and the rest is cast normally
+  > Silently nulling a typo would hide the very problem the declared category list exists to surface.
+- \`"smal"\` is added as a fourth category
+  > That is \`Categorical\` behaviour. An \`Enum\`'s list is a constraint, not a starting point.
+- [o] The cast raises, because the value is not in the declared list
+  > A \`Categorical\` would have accepted it and you would find out at the report stage.
+- The value is matched to the nearest category, \`"small"\`
+  > No fuzzy matching happens anywhere; a near-miss is still a miss.
+
+This is a schema constraint doing what schema constraints are for.`}
+/>
+
+<MultipleChoice
+  markdown={`When is casting to \`Categorical\` a bad idea?
+
+- When the column will later be used as a join key
+  > Categorical join keys work; the only cost is reconciling mappings, which an \`Enum\` avoids anyway.
+- When the column has fewer than ten distinct values
+  > A handful of distinct values across many rows is the ideal case for a categorical, not a problem.
+- When the column's values need to be printed as text
+  > Categorical columns display as their strings, so printing looks identical to a \`String\` column.
+- [o] When nearly every value is distinct, so the mapping is as big as the data
+  > The saving comes from the ratio of rows to distinct values; with no repetition there is nothing to save.
+
+An email address column is the classic bad candidate.`}
+/>

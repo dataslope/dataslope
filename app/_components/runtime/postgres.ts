@@ -2,7 +2,7 @@
 
 // PGlite and PGliteWorker are loaded from the jsDelivr CDN at runtime
 // (same pattern as SQLite, DuckDB, Pyodide) to keep the large WASM payload
-// off Vercel's bandwidth budget and avoid Turbopack build-time issues.
+// off this app's own origin and avoid Turbopack build-time issues.
 // CDN URLs and version are defined in cdn.ts.
 
 import type { PGlite } from "@electric-sql/pglite";

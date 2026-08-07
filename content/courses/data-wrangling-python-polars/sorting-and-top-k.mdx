@@ -1,0 +1,336 @@
+---
+title: Sorting and Top-K
+description: "Sorting by one or many columns, controlling where nulls land, and why top_k beats sort-then-head."
+---
+
+Sorting is conceptually simple and computationally expensive: it
+touches every row and it is the operation that most often turns out
+to be unnecessary. This page covers how to do it and when not to.
+
+<Figure
+  slug="pl-sort-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading standing at the foot of five thick blocks of increasing height arranged as a rising staircase on a wide platform, the two tallest standing on a raised yellow step at the end"
+/>
+
+## sort
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
+    "species", "island", "body_mass_g"
+)`,
+      starterCode: `print(penguins.sort("body_mass_g").head(3))
+print(penguins.sort("body_mass_g", descending=True).head(3))
+`,
+    },
+  ]}
+/>
+
+Note the argument is `descending`, not `ascending`. Polars names the
+thing you are asking for rather than the thing you are turning off.
+
+## Sorting by several columns
+
+Pass several names, and a list of booleans if the directions differ.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
+    "species", "island", "body_mass_g"
+)`,
+      starterCode: `# Species ascending, then mass descending within each species
+print(
+    penguins.sort(
+        "species", "body_mass_g", descending=[False, True]
+    ).head(6)
+)
+`,
+    },
+  ]}
+/>
+
+A single boolean applies to every column; a list must have one entry
+per sort key.
+
+## Sorting by an expression
+
+The sort keys do not have to be columns that exist.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# Sort by a ratio that is never added to the frame
+print(
+    penguins.sort(
+        pl.col("bill_length_mm") / pl.col("bill_depth_mm"), descending=True
+    )
+    .select("species", "bill_length_mm", "bill_depth_mm")
+    .head(3)
+)
+
+# Sort by name length
+print(penguins.sort(pl.col("species").str.len_chars()).head(3))
+`,
+    },
+  ]}
+/>
+
+## Where nulls go
+
+By default nulls sort first. `nulls_last=True` moves them to the end,
+which is usually what a human reading a report expects.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"x": [3, None, 1, None, 2]})
+
+print(df.sort("x")["x"].to_list())
+print(df.sort("x", nulls_last=True)["x"].to_list())
+print(df.sort("x", descending=True, nulls_last=True)["x"].to_list())
+`,
+    },
+  ]}
+/>
+
+<Callout type="warn" title="Nulls do not follow the sort direction">
+Reversing the sort does not move nulls to the other end; they stay
+first unless you pass `nulls_last`. That surprises people writing a
+"worst first" report and finding a block of missing values at the top.
+</Callout>
+
+## top_k and bottom_k
+
+"Sort the whole table, then take three rows" does far more work than
+necessary. `top_k` keeps a small heap and never sorts the rest.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import time
+import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `start = time.perf_counter()
+a = diamonds.sort("price", descending=True).head(5)
+sort_ms = (time.perf_counter() - start) * 1000
+
+start = time.perf_counter()
+b = diamonds.top_k(5, by="price")
+topk_ms = (time.perf_counter() - start) * 1000
+
+print(a.select("carat", "cut", "price"))
+print(f"sort+head: {sort_ms:.1f} ms")
+print(f"top_k    : {topk_ms:.1f} ms")
+print("same rows:", a["price"].to_list() == b["price"].to_list())
+`,
+    },
+  ]}
+/>
+
+On 53,940 rows in a browser the gap is modest. On tens of millions it
+is the difference between a query you wait for and one you do not.
+`top_k` also does not promise the *rest* of the frame is ordered,
+which is precisely why it can be faster.
+
+## Sorting inside a group
+
+Inside `agg`, `sort_by` orders a group's values before you take from
+them.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# The heaviest penguin's island, per species
+print(
+    penguins.group_by("species").agg(
+        pl.col("island").sort_by("body_mass_g", descending=True).first(),
+        pl.col("body_mass_g").max().alias("max_mass"),
+    ).sort("species")
+)
+`,
+    },
+  ]}
+/>
+
+## Reversing, shuffling, and ranking
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"score": [70, 95, 82, 95, 61]})
+
+print(
+    df.with_columns(
+        rank_min=pl.col("score").rank("min", descending=True),
+        rank_dense=pl.col("score").rank("dense", descending=True),
+        rank_ordinal=pl.col("score").rank("ordinal", descending=True),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+The tie at 95 shows the difference: `min` gives both rank 1 and skips
+to 3, `dense` gives both rank 1 and continues at 2, `ordinal` breaks
+the tie arbitrarily and never repeats a rank.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="The three heaviest penguins per species"
+  instructions={`From \`penguins\`, build \`heaviest\`: the three heaviest penguins of **each** species.
+
+Columns, in this order: \`species\`, \`island\`, \`body_mass_g\`.
+
+Sort the final result by \`species\` ascending, then \`body_mass_g\` descending. Penguins with a missing \`body_mass_g\` must not appear.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `heaviest = None  # TODO
+
+print(heaviest)
+`,
+      solutionCode: `heaviest = (
+    penguins.drop_nulls("body_mass_g")
+    .select("species", "island", "body_mass_g")
+    .filter(
+        pl.col("body_mass_g").rank("ordinal", descending=True).over("species")
+        <= 3
+    )
+    .sort("species", "body_mass_g", descending=[False, True])
+)
+
+print(heaviest)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "cols",
+      name: "The right columns in the right order",
+      description: "species, island, body_mass_g",
+      code: `assert heaviest.columns == ["species", "island", "body_mass_g"], heaviest.columns`,
+    },
+    {
+      id: "rows",
+      name: "Three per species",
+      description: "Three species, nine rows",
+      code: `assert heaviest.height == 9, heaviest.height`,
+    },
+    {
+      id: "per_species",
+      name: "Every species gets exactly three",
+      description: "Not nine from one species",
+      code: `import polars as pl
+counts = heaviest.group_by("species").agg(pl.len()).sort("species")
+assert counts["len"].to_list() == [3, 3, 3], counts["len"].to_list()`,
+    },
+    {
+      id: "no_nulls",
+      name: "No missing masses",
+      description: "drop_nulls did its job",
+      code: `assert heaviest["body_mass_g"].null_count() == 0`,
+    },
+    {
+      id: "order",
+      name: "Sorted by species, then mass descending",
+      description: "Heaviest first within each species",
+      code: `species = heaviest["species"].to_list()
+assert species == sorted(species), species
+masses = heaviest["body_mass_g"].to_list()
+for i in range(0, 9, 3):
+    chunk = masses[i : i + 3]
+    assert chunk == sorted(chunk, reverse=True), chunk`,
+    },
+    {
+      id: "values",
+      name: "The actual heaviest Gentoo is 6300 g",
+      description: "Spot check",
+      code: `gentoo = heaviest.filter(heaviest["species"] == "Gentoo")
+assert gentoo["body_mass_g"][0] == 6300, gentoo["body_mass_g"][0]`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why can \`top_k(5, by="price")\` beat \`sort("price", descending=True).head(5)\`?
+
+- \`top_k\` reads only the first rows of the frame and stops early
+  > Every row still has to be examined; a large value could be anywhere in the frame.
+- \`top_k\` returns an approximation, trading accuracy for speed
+  > The result is exact. The saving comes from doing less ordering work, not from approximating.
+- [o] It keeps a small heap instead of ordering all the rows it does not return
+  > Fully ordering rows you are about to discard is the wasted work \`top_k\` avoids.
+- Sorting always materializes a copy of the frame while \`top_k\` works in place
+  > Neither mutates the input, and both allocate a result; the difference is in comparisons performed.
+
+The trade is that \`top_k\` says nothing about the order of the rows it did not return.`}
+/>
+
+<MultipleChoice
+  markdown={`Where do nulls land in \`df.sort("x", descending=True)\`?
+
+- At the end, since descending order reverses their default position
+  > The direction argument orders the values; it does not carry the nulls along with it.
+- They are removed, because a null has no position in an ordering
+  > Sorting never drops rows. The frame's height is the same before and after.
+- Wherever they happened to be before the sort
+  > Their position is determined by the sort's null policy, not by the input order.
+- [o] First, because the direction does not move them; pass \`nulls_last=True\`
+  > This surprises people building a "worst first" report and finding missing values at the top.
+
+Null placement is its own argument precisely because it is not implied by the direction.`}
+/>
+
+<MultipleChoice
+  markdown={`Scores are 95, 95, 82. What ranks does \`rank("dense", descending=True)\` give?
+
+- 1, 1, 3
+  > That is \`"min"\`: tied values share the lowest rank and the next rank skips ahead by the number of ties.
+- 1, 2, 3
+  > That is \`"ordinal"\`, which breaks the tie arbitrarily so that no rank is ever repeated.
+- [o] 1, 1, 2
+  > "Dense" means the rank sequence has no gaps, so the value after a tie continues at the next integer.
+- 2, 2, 3
+  > No ranking method starts at 2; the highest value under a descending rank is always 1.
+
+Pick the method by what the gap should mean: \`min\` for competition placings, \`dense\` for tiers.`}
+/>

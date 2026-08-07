@@ -8,12 +8,18 @@ import type {
   PackageInfo,
   RunOptions,
 } from "../types";
+import { TYPESCRIPT_VERSION } from "./cdn";
 import { getWebFmt, WEB_FMT_2SPACE } from "./webFmt";
 import {
   buildTsCompletionRequest,
   completeWithTsService,
   decodeWorkspaceTextFiles,
 } from "./tsLanguageService";
+
+// The compiler version shown in the runtime panel, derived from the single
+// pin in cdn.ts rather than written out again. The two had already drifted
+// apart (panel said 5.7 while the worker loaded 5.9.3).
+const TS_MINOR = TYPESCRIPT_VERSION.split(".").slice(0, 2).join(".");
 
 // TypeScript runs in a dedicated Web Worker (typescript-worker.ts):
 //   1. Every .ts/.tsx file in the workspace is transpiled to JavaScript
@@ -388,8 +394,8 @@ export const typescriptAdapter: LanguageAdapter = {
   readyStatus: "TypeScript ready",
   runtimeInfo: {
     language: "TypeScript",
-    version: "5.7",
-    engine: "TypeScript 5.7 → almostnode (browser-native Node.js)",
+    version: TS_MINOR,
+    engine: `TypeScript ${TS_MINOR} → almostnode (browser-native Node.js)`,
     engineUrl: "https://almostnode.dev/",
     notes:
       "Code is transpiled in a Web Worker by the official TypeScript compiler, then executed by almostnode. Multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser.",

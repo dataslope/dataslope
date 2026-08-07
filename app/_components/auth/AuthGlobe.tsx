@@ -86,7 +86,6 @@ const SHARED: Omit<
 > = {
   width: 1000,
   height: 1000,
-  onRender: () => {},
   devicePixelRatio: 2,
   phi: 0,
   theta: 0.24,
@@ -179,49 +178,62 @@ export function AuthGlobe() {
       ...config,
       width: width * 2,
       height: width * 2,
-      onRender: (state) => {
-        phiRef.current += 0.0045;
-        state.phi = phiRef.current;
-        state.width = width * 2;
-        state.height = width * 2;
-
-        // Project each sticker onto the sphere from the live rotation.
-        const r = width * 0.455; // sphere radius in CSS px (tuned to the fill)
-        const c = width / 2;
-        for (let i = 0; i < PINS.length; i++) {
-          const el = pinRefs.current[i];
-          if (!el) continue;
-          const latR = PINS[i].location[0] * DEG;
-          const lonR = PINS[i].location[1] * DEG;
-          const x = Math.cos(latR) * Math.sin(lonR + phiRef.current);
-          const y0 = Math.sin(latR);
-          const z0 = Math.cos(latR) * Math.cos(lonR + phiRef.current);
-          // Tilt by theta so the stickers follow cobe's northward lean.
-          const y = y0 * cosT - z0 * sinT;
-          const z = y0 * sinT + z0 * cosT;
-          if (z <= 0.02) {
-            el.style.opacity = "0";
-            continue;
-          }
-          // Fade in as a point clears the limb; grow slightly toward the front.
-          const edge = Math.min(1, (z - 0.02) / 0.22);
-          const scale = 0.82 + 0.18 * z;
-          el.style.opacity = String(0.25 + 0.75 * edge);
-          el.style.transform = `translate(-50%,-50%) translate(${(
-            c +
-            x * r
-          ).toFixed(1)}px, ${(c - y * r).toFixed(1)}px) scale(${scale.toFixed(
-            3,
-          )})`;
-          el.style.zIndex = z > 0.5 ? "2" : "1";
-        }
-      },
     });
+
+    // cobe v2 removed the `onRender` option: v1 called it from inside its own
+    // render loop and let you mutate the next frame's state in place. v2
+    // exposes `globe.update(partialState)` instead, so the rotation and the
+    // sticker projection that used to live in `onRender` now run from a rAF
+    // loop this component owns. Same work, same once-per-frame cadence,
+    // just driven from the outside.
+    let frame = 0;
+    const step = () => {
+      frame = requestAnimationFrame(step);
+      phiRef.current += 0.0045;
+      globe.update({
+        phi: phiRef.current,
+        width: width * 2,
+        height: width * 2,
+      });
+
+      // Project each sticker onto the sphere from the live rotation.
+      const r = width * 0.455; // sphere radius in CSS px (tuned to the fill)
+      const c = width / 2;
+      for (let i = 0; i < PINS.length; i++) {
+        const el = pinRefs.current[i];
+        if (!el) continue;
+        const latR = PINS[i].location[0] * DEG;
+        const lonR = PINS[i].location[1] * DEG;
+        const x = Math.cos(latR) * Math.sin(lonR + phiRef.current);
+        const y0 = Math.sin(latR);
+        const z0 = Math.cos(latR) * Math.cos(lonR + phiRef.current);
+        // Tilt by theta so the stickers follow cobe's northward lean.
+        const y = y0 * cosT - z0 * sinT;
+        const z = y0 * sinT + z0 * cosT;
+        if (z <= 0.02) {
+          el.style.opacity = "0";
+          continue;
+        }
+        // Fade in as a point clears the limb; grow slightly toward the front.
+        const edge = Math.min(1, (z - 0.02) / 0.22);
+        const scale = 0.82 + 0.18 * z;
+        el.style.opacity = String(0.25 + 0.75 * edge);
+        el.style.transform = `translate(-50%,-50%) translate(${(
+          c +
+          x * r
+        ).toFixed(1)}px, ${(c - y * r).toFixed(1)}px) scale(${scale.toFixed(
+          3,
+        )})`;
+        el.style.zIndex = z > 0.5 ? "2" : "1";
+      }
+    };
+    frame = requestAnimationFrame(step);
 
     const raf = requestAnimationFrame(() => {
       if (canvasRef.current) canvasRef.current.style.opacity = String(targetOpacity);
     });
     return () => {
+      cancelAnimationFrame(frame);
       cancelAnimationFrame(raf);
       globe.destroy();
       window.removeEventListener("resize", onResize);

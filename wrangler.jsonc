@@ -17,7 +17,7 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   // Prerendered pages and /_next/static/* are uploaded as free static assets
   // (unlimited bandwidth, no per-request meter) and served before the worker
-  // ever runs. This is what removes the Vercel ISR-read meter.
+  // ever runs, so a cold hit on a prerendered page costs nothing at all.
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"

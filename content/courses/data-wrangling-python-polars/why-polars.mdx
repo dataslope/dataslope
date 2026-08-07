@@ -1,0 +1,202 @@
+---
+title: Why Polars Exists
+description: "The problem Polars was built to solve, and why the answer turned out to be a new API rather than a faster pandas."
+---
+
+pandas was released in 2008, designed around NumPy, and written for
+a world where a big dataset was a few hundred thousand rows and a
+laptop had one useful CPU core. It is still excellent. It is also
+carrying fifteen years of decisions that made sense then.
+
+<Figure
+  slug="pl-why-polars-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading standing beside a broad blue engine block on a platform, four thick green pipes feeding into the engine at once, and a much smaller yellow block behind the bear fed by a single thin red pipe"
+/>
+
+Polars started in 2020 as a personal project by Ritchie Vink, who
+wanted to know how fast a DataFrame library could be if you designed
+one from scratch on top of Apache Arrow, in Rust, with modern
+hardware assumed. The answer was: much faster, and, more
+surprisingly, much more consistent to use.
+
+## The three things that changed
+
+### Your laptop has cores now
+
+A 2010 laptop had two cores. A 2026 laptop has eight to sixteen, and
+a cloud machine has ninety-six. pandas is largely single-threaded:
+during a `groupby` on a wide table, one core works and the rest sit
+idle.
+
+Polars is parallel by default. Not "parallel if you pass
+`n_jobs=-1`", not "parallel if you install a plugin". Every
+aggregation, join, sort, and column computation is split across
+cores because the engine was written that way from the first commit.
+
+### Memory got cheap, but not free
+
+The other half of the speed story is layout. pandas stores a
+DataFrame as a collection of NumPy arrays with an index bolted on;
+strings become Python objects, which means a column of city names is
+an array of pointers to objects scattered across the heap. Reading it
+touches memory in an order the CPU cannot predict.
+
+Polars stores everything in **Apache Arrow** format: contiguous,
+columnar, with a separate validity bitmap for nulls. A string column
+is one long buffer of bytes plus a buffer of offsets. Summing a
+column reads one straight run of memory, which is the case CPUs are
+built for. The next chapter covers this properly.
+
+### The API can know what you meant
+
+This is the part people underestimate. In pandas you write:
+
+```python
+df[df["price"] > 500].groupby("cut")["carat"].mean()
+```
+
+Each step is executed the moment Python evaluates it. The library
+filters the whole frame, materializes a copy, then groups it. It
+cannot skip reading columns you never use, because by the time it
+sees the `groupby` it has already done the filter.
+
+In Polars you describe the whole thing first:
+
+```python
+(
+    df.lazy()
+    .filter(pl.col("price") > 500)
+    .group_by("cut")
+    .agg(pl.col("carat").mean())
+    .collect()
+)
+```
+
+Nothing runs until `.collect()`. Polars sees the entire query, works
+out that only `price`, `cut`, and `carat` are needed, pushes the
+filter down to the file reader if the source is a file, and then
+executes. That is a query optimizer, the same idea a database has
+had for forty years, applied to a DataFrame.
+
+## What that adds up to
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import time
+import polars as pl`,
+      starterCode: `start = time.perf_counter()
+
+result = (
+    pl.scan_csv("diamonds.csv")
+    .filter(pl.col("price") > 500)
+    .group_by("cut")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("carat").mean().round(3).alias("avg_carat"),
+        pl.col("price").median().alias("median_price"),
+    )
+    .sort("median_price", descending=True)
+    .collect()
+)
+
+elapsed = time.perf_counter() - start
+print(result)
+print(f"53,940 rows summarized in {elapsed * 1000:.0f} ms")
+`,
+    },
+  ]}
+/>
+
+That is 53,940 rows read from disk, filtered, grouped, and
+aggregated. In a browser, in WebAssembly, which is *single-threaded
+and slower than native Python*. On a real machine with real cores it
+is a different order of magnitude again.
+
+## Speed is not the reason to learn it
+
+Here is the honest pitch. If your data is 10,000 rows, pandas is
+fast enough forever and you should use whatever you already know.
+
+The reason to learn Polars is that the API is smaller and more
+regular. There is one way to add a column. There is one way to
+aggregate. The thing you write inside `filter` is the same kind of
+object as the thing you write inside `group_by().agg()`, so learning
+one teaches you the other. pandas has `loc`, `iloc`, `at`, `iat`,
+`ix` (removed), boolean masks, `query`, `where`, `mask`, and
+`filter`, which does something different from what you would guess.
+
+<Callout type="info" title="You do not have to pick a side">
+Polars converts to and from pandas in one call and shares memory
+with Arrow, so a project can use both. The
+[Interoperability](/courses/data-wrangling-python-polars/interoperability)
+chapter covers moving data between them.
+</Callout>
+
+## Where Polars is not the answer
+
+Being fair about this saves you time later:
+
+- **The pandas ecosystem is enormous.** If a library takes a
+  DataFrame, it usually means a pandas one. Polars has `to_pandas()`
+  for exactly this, but a conversion is a copy unless the data is
+  Arrow-backed.
+- **Distributed clusters.** Polars is a single-machine engine. It
+  goes remarkably far on one machine (hundreds of gigabytes with the
+  streaming engine), but if you genuinely need a cluster, Spark or
+  Dask is a different tool for a different job.
+- **Deep NumPy integration.** If your workflow is really array math
+  with a table wrapped around it, NumPy plus pandas may fit better.
+- **Notebook muscle memory.** If you have typed `df.loc[...]` ten
+  thousand times, the first week of Polars is slower for you. That is
+  a real cost and it is temporary.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why can Polars skip work that pandas cannot, when both express the same filter-then-group query?
+
+- Polars caches previous query results and reuses them across runs
+  > Polars does not maintain a query result cache; re-running the same query re-executes it, and the saving comes from planning rather than memoization.
+- Polars samples the data instead of reading every row of the input
+  > Sampling would give approximate answers. Polars computes exact results; what it skips is columns and rows the query provably does not need.
+- [o] It sees the whole query before running any of it, so it can drop unused columns and push filters down
+  > This is what "lazy" buys you. The plan is optimized as a whole rather than step by step.
+- Polars is written in Rust and Rust programs skip unnecessary work automatically
+  > The implementation language explains constant-factor speed, not the elimination of whole passes over the data; a Rust library evaluating eagerly would do the same work pandas does.
+
+The optimizer is the payoff for describing computations instead of performing them immediately.`}
+/>
+
+<MultipleChoice
+  markdown={`A colleague says "we should switch to Polars because it is faster". What is the strongest argument *against* switching a working 10,000-row pandas pipeline?
+
+- Polars cannot read the CSV files the pipeline already uses
+  > Polars reads CSV, Parquet, JSON, Excel, and databases, so file formats are not the obstacle here.
+- [o] At that size both finish instantly, so the rewrite costs time and buys nothing
+  > Engineering time is the scarce resource. Reach for Polars on new work, or where pandas is actually hurting.
+- Polars results differ from pandas results, so the numbers would change
+  > Both compute the same statistics; the differences are in null semantics and API surface, not in whether a mean is a mean.
+- The pipeline would have to be rewritten in Rust rather than in Python
+  > Polars is a Rust engine with a full Python API. You write Python either way, and never touch Rust.
+
+Speed matters when speed is your problem. Consistency of API is the reason to learn Polars for new work.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these is a genuine limitation of Polars today?
+
+- It cannot run on a laptop, only on a server with many cores
+  > Polars runs anywhere Python does, including in the browser via WebAssembly, which is how the code blocks on this page work.
+- It has no way to express grouped aggregations
+  > Grouped aggregation via \`group_by().agg()\` is one of its core operations, covered later in this course.
+- [o] It runs on a single machine, so a genuinely cluster-sized job needs a different tool
+  > It scales unusually well on one machine, but one machine is the ceiling.
+- It stores data row by row, which makes analytical scans slow
+  > Row-major storage describes transactional databases. Polars is columnar, which is what makes analytical scans fast.
+
+Knowing where a tool stops is part of knowing the tool.`}
+/>

@@ -166,7 +166,13 @@ export function ErDiagramLoadingFallback() {
 
 /** Body of the runtime-info popover (the small info button in the
  *  header). Surfaces language/runtime/version + a GitHub link. Reused
- *  verbatim by the SQL playground. */
+ *  verbatim by the SQL playground.
+ *
+ *  Label above value rather than label-left/value-right: at this panel
+ *  width the values are long enough to wrap ("almostnode (browser-native
+ *  Node.js)"), and a right-aligned wrapped value ends up ragged and
+ *  visually unrelated to the row above it. Stacking puts every value on
+ *  the same left edge and gives each one the full width. */
 export function RuntimeInfoContent({ info }: { info: RuntimeInfo }) {
   return (
     <>

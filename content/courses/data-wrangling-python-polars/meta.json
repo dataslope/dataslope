@@ -1,0 +1,74 @@
+{
+    "title": "Data Wrangling with Python Polars",
+    "description": "A hands-on course on Polars, the fast DataFrame library built on Apache Arrow. Learn to think in expressions, lazy query plans, and columnar memory, with every example running in your browser.",
+    "root": true,
+    "tags": {
+        "language": [
+            "python"
+        ],
+        "libraries": [
+            "polars",
+            "pandas"
+        ],
+        "domain": [
+            "data-analysis",
+            "data-processing"
+        ],
+        "skills": [
+            "data-wrangling",
+            "query-optimization",
+            "data-cleaning",
+            "aggregation"
+        ],
+        "tools": [
+            "apache-arrow"
+        ],
+        "level": [
+            "intermediate"
+        ]
+    },
+    "pages": [
+        "index",
+        "---",
+        "why-polars",
+        "polars-vs-pandas",
+        "columnar-memory-and-arrow",
+        "---",
+        "your-first-dataframe",
+        "reading-and-writing-data",
+        "inspecting-a-dataframe",
+        "data-types-and-schemas",
+        "---",
+        "what-is-an-expression",
+        "the-four-contexts",
+        "selecting-columns",
+        "creating-columns",
+        "filtering-rows",
+        "selectors",
+        "---",
+        "sorting-and-top-k",
+        "aggregations",
+        "group-by-and-agg",
+        "window-expressions",
+        "---",
+        "missing-data",
+        "working-with-strings",
+        "dates-and-times",
+        "categoricals-and-enums",
+        "---",
+        "joins",
+        "concatenating-frames",
+        "pivot-and-unpivot",
+        "lists-and-structs",
+        "---",
+        "eager-vs-lazy",
+        "the-query-optimizer",
+        "streaming-and-bigger-data",
+        "---",
+        "idiomatic-polars",
+        "interoperability",
+        "---",
+        "a-complete-analysis",
+        "next-steps"
+    ]
+}

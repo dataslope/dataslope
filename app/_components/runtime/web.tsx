@@ -499,6 +499,14 @@ export const webAdapter: LanguageAdapter = {
   // script.js trio, hide the "+ New file" affordances so the workspace
   // stays the CodePen-style three-pane shape.
   disableAddFile: true,
+  // ...and for the same reason no file may be closed, deleted,
+  // duplicated, or renamed. This adapter has no Files pane, which is the
+  // only thing that reopens a closed tab, so a closed file would be
+  // unreachable in tabbed mode. Renaming is out for a related reason:
+  // the trio references itself by name (styles.css and script.js are
+  // pulled in by index.html, which is also the preview entry), so a
+  // rename breaks the composed page without saying so.
+  lockWorkspaceFiles: true,
   // The Run button runs the composed preview (index.html), not a named
   // file, so show a bare "Run" rather than "Run index".
   simpleRunLabel: true,

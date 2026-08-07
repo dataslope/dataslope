@@ -138,6 +138,13 @@ html.dark .skip-to-content {
   --ds-shell-period: 4px; /* band + gap */
   --ds-shell-border-color: var(--ds-gray-200);
   --ds-shell-radius: 16px; /* match rounded-2xl */
+  /* Opaque fill under the stripes. The gaps between the painted bands are
+     transparent, so without this the sliver is a window onto whatever sits
+     behind the shell — which, since the pricing table gained a Tabbied
+     backdrop, meant the pattern showing through the hatching. Pinned to the
+     page background rather than left transparent so the sliver reads as the
+     page, the way it did before the backdrop existed. */
+  --ds-shell-base: #ffffff;
 }
 .ds-striped-shell::after {
   content: "";
@@ -147,7 +154,8 @@ html.dark .skip-to-content {
     calc(-1 * var(--ds-shell-offset)) var(--ds-shell-offset);
   border: 1px solid var(--ds-shell-border-color);
   border-radius: var(--ds-shell-radius);
-  background: repeating-linear-gradient(
+  background-color: var(--ds-shell-base);
+  background-image: repeating-linear-gradient(
     45deg,
     var(--ds-shell-color) 0,
     var(--ds-shell-color) var(--ds-shell-stripe),
@@ -159,6 +167,7 @@ html.dark .skip-to-content {
 html:is(.dark, [data-theme="dark"]) .ds-striped-shell {
   --ds-shell-color: color-mix(in srgb, var(--ds-white) 10%, transparent);
   --ds-shell-border-color: #2e2e2e;
+  --ds-shell-base: #121212;
 }
 @media (max-width: 768px) {
   .ds-striped-shell {

@@ -9,7 +9,7 @@
 /**
  * An allow-list of Origins, split into exact matches and wildcard patterns.
  * Most entries are exact strings (fast Set lookup); entries containing a `*`
- * (e.g. Vercel preview deployments) are compiled to anchored RegExps.
+ * (e.g. the app worker's preview hostnames) are compiled to anchored RegExps.
  */
 export interface AllowList {
   /** Exact origin strings (no trailing slash). */
@@ -23,9 +23,11 @@ export interface AllowList {
  *
  * A `*` matches one or more characters *within a single hostname label*,
  * i.e. it never matches a `.` (a label separator) or `/` (a path separator).
- * That keeps a pattern like `https://dataslope-*.vercel.app` scoped to the
- * intended host: it can match `dataslope-abc123.vercel.app` but never
- * `dataslope-abc.evil.com` or `evil.com/dataslope-.vercel.app`.
+ * That keeps a pattern like `https://*-dataslope.subwaymatch.workers.dev`
+ * scoped to the intended host: it can match
+ * `staging-dataslope.subwaymatch.workers.dev` but never
+ * `staging-dataslope.attacker.workers.dev` or
+ * `evil.com/-dataslope.subwaymatch.workers.dev`.
  *
  * Splitting on `*` first, then escaping each literal segment, ensures the
  * regex-escaping and the wildcard substitution can't interfere with one

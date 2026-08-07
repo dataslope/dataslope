@@ -39,15 +39,15 @@ const CATEGORIES: Category[] = [
     description:
       "General-purpose editors for writing, running, and debugging real programs without leaving the tab.",
     items: [
-      { id: "python", label: "Python", version: "3.12" },
-      { id: "r", label: "R", version: "4.4" },
-      { id: "javascript", label: "JavaScript", version: "ES2024" },
-      { id: "typescript", label: "TypeScript", version: "5.6" },
-      { id: "php", label: "PHP", version: "8.3" },
+      { id: "python", label: "Python", version: "3.14" },
+      { id: "r", label: "R", version: "4.6" },
+      { id: "javascript", label: "JavaScript", version: "ES2023+" },
+      { id: "typescript", label: "TypeScript", version: "5.9" },
+      { id: "php", label: "PHP", version: "8.4" },
       { id: "c", label: "C", version: "C17" },
       { id: "cpp", label: "C++", version: "C++20" },
-      { id: "java", label: "Java", version: "21 LTS" },
-      { id: "csharp", label: "C#", version: "12 · .NET 8" },
+      { id: "java", label: "Java", version: "8" },
+      { id: "csharp", label: "C#", version: "13 · .NET 10" },
     ],
   },
   {
@@ -56,7 +56,7 @@ const CATEGORIES: Category[] = [
       "A live HTML, CSS, and JavaScript preview, plus a React sandbox with instant in-browser JSX transpilation.",
     items: [
       { id: "web", label: "HTML", version: "HTML5 · CSS3" },
-      { id: "react", label: "React", version: "18.3" },
+      { id: "react", label: "React", version: "19.2" },
     ],
   },
   {
@@ -64,9 +64,9 @@ const CATEGORIES: Category[] = [
     description:
       "A full SQL workbench in the browser. Load data, run queries, and inspect results against embedded or remote engines.",
     items: [
-      { id: "sqlite", label: "SQLite", version: "3.46" },
-      { id: "postgres", label: "PostgreSQL", version: "16" },
-      { id: "duckdb", label: "DuckDB", version: "1.1" },
+      { id: "sqlite", label: "SQLite", version: "3.53" },
+      { id: "postgres", label: "PostgreSQL", version: "17" },
+      { id: "duckdb", label: "DuckDB", version: "1.32" },
     ],
   },
 ];

@@ -1,8 +1,9 @@
 /**
  * The `/interview-prep` catalog body: a "formats" band explaining how the
  * questions run, a grid of six role-track cards (each a risograph banner, a
- * role glyph, its tagline, the topics it covers, and a "Start track" link),
- * and a footer line with the totals and a pointer to /courses.
+ * role glyph, a short description of what the track drills, its topic count,
+ * and a "Start track" link), and a footer line with the totals and a pointer
+ * to /courses.
  *
  * Implements the "4a, Centered header, riso cards" mockup from the
  * interview-prep redesign. The centered page header lives in the server page
@@ -11,8 +12,8 @@
  *
  * The track list (title, topics, links) is content-driven, passed in from
  * `getInterviewTracks` (see `lib/interviewCatalog.ts`). The per-role
- * presentation, tagline, glyph, and banner illustration, is the design layer
- * and lives here in `PRESENTATION`, keyed by role slug. A role with no entry
+ * presentation, description, glyph, and banner illustration, is the design
+ * layer and lives here in `PRESENTATION`, keyed by role slug. A role with no entry
  * still renders (glyph + banner fall back), so adding a track in content never
  * breaks the page.
  *
@@ -25,7 +26,7 @@ import imageManifest from "@/lib/generated/images";
 import type { InterviewTrack } from "@/lib/interviewCatalog";
 import styles from "./InterviewCatalog.module.css";
 
-// Theme-follower shorthand for the topic/footer dividers, same tokens the
+// Theme-follower shorthand for the card-footer divider, same tokens the
 // /courses catalog uses. (Surfaces, the riso shadow, and the badge live in the
 // CSS module, see the note there.)
 const HAIRLINE = "border-[var(--ds-gray-100)] dark:border-white/[0.07]";
@@ -121,8 +122,12 @@ const FALLBACK_GLYPH: ReactNode = (
 );
 
 interface Presentation {
-  /** One-line pitch shown under the role name. */
-  tagline: string;
+  /** Short paragraph shown under the role name, the card's whole body now
+   *  that the topic list is gone (see `TrackCard`). Written to name what the
+   *  track actually drills, so a reader gets the same signal the list used to
+   *  carry in a few lines instead of nine. Clamped to three lines, so the
+   *  useful detail belongs in the first sentence. */
+  description: string;
   /** Image slug for the 3:2 card banner. */
   banner: string;
   /** Alt text describing the banner illustration. */
@@ -131,32 +136,38 @@ interface Presentation {
 
 const PRESENTATION: Record<string, Presentation> = {
   "data-analyst": {
-    tagline: "SQL fluency, aggregation, and turning data into answers.",
+    description:
+      "SQL from joins to window functions, plus pandas, spreadsheets, and the statistics behind an A/B test. Ends on turning a result into a chart and an argument.",
     banner: "interview-data-analyst-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot holding a magnifying lens over an isometric dashboard of small charts",
   },
   "data-scientist": {
-    tagline: "Statistics, modeling, and experiment design.",
+    description:
+      "Statistics, probability, and experiment design, then machine learning and deep learning. Python, pandas, and SQL throughout, with product-sense metrics questions.",
     banner: "interview-data-scientist-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot holding a flask beside an isometric scatter plane with a fitted curve",
   },
   "data-engineer": {
-    tagline: "SQL at depth, pipelines, modeling, and systems.",
+    description:
+      "SQL and data modeling at depth, then the systems around them: batch pipelines, distributed processing, streaming, warehousing, and orchestration you can rely on.",
     banner: "interview-data-engineer-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot guiding coloured cubes along an isometric pipeline into a storage silo",
   },
   "analytics-engineer": {
-    tagline: "The dbt and warehouse layer between engineering and analytics.",
+    description:
+      "The dbt and warehouse layer between engineering and analytics: dimensional modeling, advanced SQL, data-quality testing, and metrics in a semantic layer.",
     banner: "interview-analytics-engineer-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot feeding raw tiles into an isometric pipeline that returns tidy modelled tables",
   },
   "machine-learning-engineer": {
-    tagline: "ML fundamentals plus production engineering.",
+    description:
+      "ML fundamentals, coding, and the statistics under them, then deep learning and LLMs. Closes on ML system design and shipping a model to production.",
     banner: "interview-machine-learning-engineer-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot placing an isometric trained-model block into a deployment container",
   },
   "backend-engineer": {
-    tagline: "Data structures, algorithms, and language fundamentals.",
+    description:
+      "Data structures and algorithms, Python fundamentals, and object-oriented design, plus concurrency, databases, API design, and system design rounds.",
     banner: "interview-backend-engineer-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot beside an isometric server rack linked to an API gateway block and a database disc",
   },
@@ -199,35 +210,6 @@ function TrackBanner({ slug, alt }: { slug: string; alt: string }) {
   );
 }
 
-/** A single topic row inside a card: a small brand-blue arrow and the topic
- *  title. Display-only, the whole card is one link to the role track. */
-function TopicRow({ title, last }: { title: string; last: boolean }) {
-  return (
-    <div
-      className={`flex items-center gap-[9px] py-[9px] text-[13.5px] text-[var(--ds-gray-700)] dark:text-[var(--ds-gray-300)] ${
-        last ? "" : `border-b ${HAIRLINE}`
-      }`}
-    >
-      <svg
-        width="13"
-        height="13"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-        className="shrink-0 text-[var(--ds-blue-500)]"
-      >
-        <path d="M5 12h14" />
-        <path d="m12 5 7 7-7 7" />
-      </svg>
-      {title}
-    </div>
-  );
-}
-
 function TrackCard({ track }: { track: InterviewTrack }) {
   const p = PRESENTATION[track.slug];
   const glyph = ROLE_GLYPHS[track.slug] ?? FALLBACK_GLYPH;
@@ -254,24 +236,22 @@ function TrackCard({ track }: { track: InterviewTrack }) {
             {track.title}
           </span>
 
+          {/* The card's whole body. This replaced a row-per-topic list that
+              ran nine deep on some roles and pushed the cards so tall that
+              comparing two roles meant scrolling; the description says what
+              the track drills in a couple of lines instead, the way the
+              /courses rows do. `line-clamp-3` is the guard against a future
+              entry running long and re-inflating the grid. */}
           {p ? (
-            <span className="mt-1.5 min-h-[44px] text-[14.5px] leading-[1.5] text-[#999999] dark:text-[var(--ds-gray-400)]">
-              {p.tagline}
+            <span className="mt-1.5 line-clamp-3 text-[14.5px] leading-[1.5] text-[#999999] dark:text-[var(--ds-gray-400)]">
+              {p.description}
             </span>
           ) : null}
 
-          <div className={`mt-4 border-t ${HAIRLINE}`}>
-            {track.topics.map((topic, i) => (
-              <TopicRow
-                key={topic.slug}
-                title={topic.title}
-                last={i === track.topics.length - 1}
-              />
-            ))}
-          </div>
-
+          {/* The topic count keeps the one thing the list carried that the
+              description can't — how much is in there — in a single line. */}
           <div
-            className={`mt-auto flex items-center justify-between border-t pt-3.5 ${HAIRLINE}`}
+            className={`mt-auto flex items-center justify-between gap-3 border-t pt-3.5 ${HAIRLINE}`}
           >
             <span className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]">
               Start track
@@ -291,6 +271,9 @@ function TrackCard({ track }: { track: InterviewTrack }) {
                 <path d="m12 5 7 7-7 7" />
               </svg>
             </span>
+            <span className="text-[13px] text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
+              {track.topics.length} topics
+            </span>
           </div>
         </div>
       </Link>
@@ -303,17 +286,18 @@ export function InterviewCatalog({ tracks }: { tracks: InterviewTrack[] }) {
 
   return (
     <>
-      {/* ── Track cards ── */}
-      <div className="mt-12 grid grid-cols-1 items-stretch gap-8 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3">
+      {/* ── Track cards ──
+          Two columns at most, even on the widest viewports: at three across,
+          the 1120px column left each card too narrow for its banner and its
+          topic list to breathe. Six tracks divide evenly into three rows. */}
+      <div className="mt-12 grid grid-cols-1 items-stretch gap-8 sm:mt-14 sm:grid-cols-2">
         {tracks.map((track) => (
           <TrackCard key={track.slug} track={track} />
         ))}
       </div>
 
       {/* ── Footer line: totals + a pointer to the courses catalog ── */}
-      <div
-        className={`mt-11 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between ${HAIRLINE}`}
-      >
+      <div className="mt-11 flex flex-col gap-3 pt-6 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-[13px] text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
           {tracks.length} tracks · {topicCount} topics · all free
         </span>

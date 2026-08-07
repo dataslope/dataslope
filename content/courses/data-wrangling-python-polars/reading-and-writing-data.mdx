@@ -1,0 +1,307 @@
+---
+title: Reading and Writing Data
+description: "CSV, Parquet, JSON, and the scan functions that let Polars read only the part of a file your query needs."
+---
+
+Real work starts with a file. Polars reads the usual formats, and for
+most of them it offers two functions that look nearly identical and
+behave very differently.
+
+<Figure
+  slug="pl-reading-data-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading standing at a wide open tray on a platform, a thick blue folder sliding into the tray along a green rail and a thick yellow folder leaving it along a red rail"
+/>
+
+## read versus scan
+
+| Function | What it does |
+| --- | --- |
+| `pl.read_csv(path)` | Reads the file now, returns a `DataFrame` |
+| `pl.scan_csv(path)` | Returns a `LazyFrame`, reads nothing yet |
+
+`read_*` is eager: the bytes are parsed immediately and you hold a
+table. `scan_*` is lazy: you get a query plan whose first step is
+"read this file", and no I/O happens until you call `.collect()`.
+
+That distinction matters because a lazy plan can be *rewritten*
+before it runs. If your query only touches three columns and only
+keeps rows from 2009, Polars can push both facts down into the
+reader and never parse the rest.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `eager = pl.read_csv("penguins.csv", null_values=["NA"])
+print(type(eager).__name__, eager.shape)
+
+lazy = pl.scan_csv("penguins.csv", null_values=["NA"])
+print(type(lazy).__name__)
+
+# Nothing has been read yet. collect() is what runs it.
+print(lazy.select("species", "body_mass_g").head(3).collect())
+`,
+    },
+  ]}
+/>
+
+The rule of thumb: **use `scan_*` unless you have a reason not to.**
+The eager/lazy chapter later explains why in detail; for now, know
+that the lazy version is rarely slower and frequently much faster.
+
+## CSV, and the arguments worth knowing
+
+CSV is a bad format that everyone uses. It has no types, no schema,
+and no agreement on how to spell "missing". Polars gives you the
+knobs to cope.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `# Without null_values, "NA" is just another string, so a numeric
+# column containing one comes back as text.
+naive = pl.read_csv("penguins.csv")
+print("without null_values:", naive["bill_length_mm"].dtype)
+
+told = pl.read_csv("penguins.csv", null_values=["NA"])
+print("with null_values   :", told["bill_length_mm"].dtype)
+
+# columns= reads a subset, which is both faster and less memory
+subset = pl.read_csv(
+    "penguins.csv",
+    null_values=["NA", ""],
+    columns=["species", "island", "body_mass_g"],
+)
+print(subset.head(3))
+`,
+    },
+  ]}
+/>
+
+The arguments you will actually reach for:
+
+| Argument | Use |
+| --- | --- |
+| `null_values` | The strings that mean missing (`"NA"`, `"N/A"`, `"-"`) |
+| `columns` | Read a subset, by name or by index |
+| `separator` | `";"` for European CSV, `"\t"` for TSV |
+| `has_header` | `False` when the file starts with data |
+| `schema_overrides` | Force one column's dtype without declaring them all |
+| `try_parse_dates` | Turn date-shaped strings into real dates |
+| `n_rows` | Read the first N rows, for a quick look at a huge file |
+| `infer_schema_length` | How many rows to sample before deciding types |
+
+<Callout type="warn" title="infer_schema_length is a common trap">
+Polars samples the first 100 rows to guess each column's type. A
+column that is integers for 40,000 rows and then contains `"unknown"`
+will fail to parse when it gets there. Either pass
+`schema_overrides={"col": pl.String}`, or `infer_schema_length=None`
+to scan the whole file (slower, always right).
+</Callout>
+
+## Writing files back out
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame(
+    {
+        "city": ["Oslo", "Lisbon", "Reykjavik"],
+        "temp_c": [-3.0, 17.5, 1.5],
+    }
+)
+
+df.write_csv("out.csv")
+df.write_parquet("out.parquet")
+df.write_ndjson("out.ndjson")
+
+print(open("out.csv").read())
+print(pl.read_parquet("out.parquet"))
+
+# CSV forgot the types; Parquet did not.
+print("from csv    :", pl.read_csv("out.csv").dtypes)
+print("from parquet:", pl.read_parquet("out.parquet").dtypes)
+`,
+    },
+  ]}
+/>
+
+That last pair of lines is the argument for Parquet in miniature.
+CSV stores text, so every read re-guesses your types. Parquet stores
+the schema, the values in columnar form, per-column compression, and
+per-chunk statistics. It is smaller, faster, and does not lose
+information.
+
+## JSON, and its two shapes
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+# One JSON array of objects
+open("array.json", "w").write(
+    '[{"city": "Oslo", "temp_c": -3.0}, {"city": "Lisbon", "temp_c": 17.5}]'
+)
+
+# Newline-delimited JSON: one object per line, the streaming-friendly shape
+open("lines.ndjson", "w").write(
+    '{"city": "Oslo", "temp_c": -3.0}\\n{"city": "Lisbon", "temp_c": 17.5}\\n'
+)
+
+print(pl.read_json("array.json"))
+print(pl.read_ndjson("lines.ndjson"))
+`,
+    },
+  ]}
+/>
+
+Use NDJSON where you can: it can be read in chunks and appended to,
+neither of which is true of one enormous JSON array.
+
+## Reading straight from a URL
+
+Polars can read a remote file directly, which is handy for public
+datasets.
+
+```python
+url = "https://example.com/data/measurements.parquet"
+df = pl.read_parquet(url)
+```
+
+<Callout type="info" title="In-browser exception">
+The code blocks in this course run in WebAssembly, where network
+access goes through the browser and is subject to cross-origin rules.
+That is why lessons here stage a local file instead. On your own
+machine the URL form works as written.
+</Callout>
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Read a subset, write Parquet"
+  instructions={`\`penguins.csv\` is staged in the working directory. It uses \`"NA"\` for missing values.
+
+1. Read **only** the \`species\`, \`island\`, and \`body_mass_g\` columns, treating \`"NA"\` as missing.
+2. Write the result to \`penguins.parquet\`.
+3. Read that Parquet file back into a variable called \`round_trip\`.
+
+The point of step 3 is that the types survive the round trip.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `round_trip = None  # TODO
+
+print(round_trip)
+`,
+      solutionCode: `subset = pl.read_csv(
+    "penguins.csv",
+    null_values=["NA"],
+    columns=["species", "island", "body_mass_g"],
+)
+subset.write_parquet("penguins.parquet")
+round_trip = pl.read_parquet("penguins.parquet")
+
+print(round_trip.head())
+print(round_trip.dtypes)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_frame",
+      name: "round_trip is a DataFrame",
+      description: "Type check",
+      code: `import polars as pl
+assert isinstance(round_trip, pl.DataFrame)`,
+    },
+    {
+      id: "cols",
+      name: "Only the three requested columns",
+      description: "species, island, body_mass_g",
+      code: `assert round_trip.columns == ["species", "island", "body_mass_g"], round_trip.columns`,
+    },
+    {
+      id: "rows",
+      name: "All 344 penguins",
+      description: "No rows dropped",
+      code: `assert round_trip.height == 344, round_trip.height`,
+    },
+    {
+      id: "typed",
+      name: "body_mass_g came back numeric",
+      description: "Int64, not String",
+      code: `import polars as pl
+assert round_trip["body_mass_g"].dtype == pl.Int64, round_trip["body_mass_g"].dtype`,
+    },
+    {
+      id: "nulls",
+      name: "The two missing masses survived as nulls",
+      description: "null_values did its job",
+      code: `assert round_trip["body_mass_g"].null_count() == 2`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is returned by \`pl.scan_parquet("big.parquet")\`?
+
+- A DataFrame containing the file's contents
+  > That is what \`read_parquet\` returns. The scan family deliberately avoids touching the data.
+- The first few rows, as a preview of the file
+  > No rows are read at all. Even a preview would require opening and parsing part of the file.
+- [o] A LazyFrame: a query plan whose first step is reading that file
+  > Nothing is read until \`.collect()\`, which is what lets the optimizer rewrite the plan first.
+- A file handle you then pass to a separate parsing function
+  > Polars manages the file itself; there is no separate parse step for you to call.
+
+Scanning is what makes column pruning and filter pushdown possible.`}
+/>
+
+<MultipleChoice
+  markdown={`A 2 GB CSV has a column that is integers for the first 50,000 rows and then contains \`"n/a"\`. What fails, and why?
+
+- Nothing fails; Polars widens the column to a string type when it meets the value
+  > Polars does not re-infer mid-file. Having committed to Int64, it raises rather than silently changing type.
+- The file cannot be read at all, because CSV files may not mix types in a column
+  > The file reads fine once the column's type is stated; the problem is only with the inference default.
+- [o] Type inference sampled the first rows, chose Int64, and hits a parse error later
+  > Fix it with \`schema_overrides={"col": pl.String}\`, or \`infer_schema_length=None\` to scan the whole file.
+- The read succeeds but every value after the \`"n/a"\` becomes null
+  > Silent data loss would be worse than an error; Polars raises so the problem is visible where it happens.
+
+The default samples 100 rows, which is fast and occasionally wrong.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does a CSV round trip lose type information when Parquet does not?
+
+- Parquet compresses the data, and compression preserves types
+  > Compression reduces size; it says nothing about types. Parquet keeps types because it stores a schema alongside the data.
+- CSV files are always read with \`infer_schema_length=100\`
+  > That setting controls how much is sampled, but even sampling the entire file only lets Polars guess, since the file itself records nothing.
+- [o] CSV stores only text, so types must be re-guessed on every read
+  > Parquet writes a schema and columnar data, so the frame that comes back is the frame that went in.
+- CSV cannot represent numbers, only strings and dates
+  > Numbers appear in CSV files constantly; they are simply written as text with no declaration of what they are.
+
+"Guess the types again every time" is the hidden cost of CSV.`}
+/>

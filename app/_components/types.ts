@@ -313,8 +313,25 @@ export interface LanguageAdapter {
    *  adapter. The HTML/CSS/JS playground sets this, it's a fixed
    *  index.html / styles.css / script.js trio, so the "+ New file"
    *  affordances (the tab strip's "+" and the split view's footer
-   *  button) are hidden. Existing files can still be renamed or closed. */
+   *  button) are hidden. Existing files can still be renamed. */
   disableAddFile?: boolean;
+  /** Optional: the workspace file set is fixed, so no file may be
+   *  closed, removed, duplicated, or renamed. Every per-tab affordance
+   *  is dropped: the tab's ✕, double-click-to-rename, and the whole
+   *  context menu (Rename / Close / Close Others / Delete File /
+   *  Duplicate), which leaves `TabItem` rendering no menu at all.
+   *
+   *  The HTML/CSS/JS playground sets this alongside `disableAddFile` and
+   *  `hideFilesPane`. Those three together are the point: closing a tab
+   *  hides its editor but keeps the file, and the Files pane is what
+   *  reopens it — so an adapter with no Files pane and no way to add a
+   *  file must not let one be closed either, or the file becomes
+   *  unreachable in tabbed mode with nothing to reopen it. Renaming is
+   *  locked for a related reason: the trio is wired together by name
+   *  (`<link href="styles.css">`, `<script src="script.js">`, and
+   *  index.html as the preview entry), so a rename silently breaks the
+   *  page it composes. */
+  lockWorkspaceFiles?: boolean;
   /** Optional: show a bare "Run" label on the Run button instead of the
    *  per-entry "Run <file>" chip. The web playground sets this, it runs
    *  the composed preview (always index.html) rather than a named file,

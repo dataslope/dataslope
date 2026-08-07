@@ -1,0 +1,360 @@
+---
+title: Creating and Transforming Columns
+description: "with_columns, conditional logic with when/then/otherwise, and the difference between adding a column and replacing one."
+---
+
+`with_columns` keeps the frame you have and adds to it. It is the
+workhorse of a cleaning pipeline: read a file, then add a dozen
+derived and corrected columns to it, one `with_columns` at a time.
+
+<Figure
+  slug="pl-with-columns-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading guiding a thick red column down into an empty socket at the end of a row on a wide platform, three thick upright columns in blue, green and yellow already standing in the row"
+/>
+
+## Add, or replace
+
+The rule is entirely about the output name. A new name adds a
+column; an existing name replaces it.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"price": [10.0, 25.5, 3.0], "qty": [2, 1, 10]})
+
+added = df.with_columns((pl.col("price") * pl.col("qty")).alias("total"))
+print(added)
+
+# Same name in, same name out: the column is replaced
+replaced = df.with_columns(pl.col("price").round(0))
+print(replaced)
+`,
+    },
+  ]}
+/>
+
+## Everything in one call runs in parallel
+
+This is worth internalizing early, because it changes how you write.
+All the expressions inside one `with_columns` are evaluated against
+the *same* input frame, at the same time.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"a": [1, 2, 3]})
+
+# b and c BOTH see the original a, not each other
+print(
+    df.with_columns(
+        (pl.col("a") * 10).alias("b"),
+        (pl.col("a") * 100).alias("c"),
+    )
+)
+
+# To use b when computing c, you need a second call
+print(
+    df.with_columns((pl.col("a") * 10).alias("b"))
+      .with_columns((pl.col("b") + 1).alias("c"))
+)
+`,
+    },
+  ]}
+/>
+
+<Callout type="warn" title="A column cannot see its siblings">
+Referring to a column created in the same `with_columns` call raises
+a "column not found" error. Split into two calls, or repeat the
+expression. Polars will spot the repetition in a lazy plan and
+compute it once anyway (common subexpression elimination).
+</Callout>
+
+## Keyword form
+
+`with_columns` also takes keyword arguments, where the keyword *is*
+the output name. Shorter, and it removes a whole class of
+alias-related mistakes.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
+    "species", "bill_length_mm", "bill_depth_mm", "body_mass_g"
+)`,
+      starterCode: `print(
+    penguins.with_columns(
+        mass_kg=pl.col("body_mass_g") / 1000,
+        bill_ratio=pl.col("bill_length_mm") / pl.col("bill_depth_mm"),
+    ).head(3)
+)
+`,
+    },
+  ]}
+/>
+
+The one limitation: a keyword has to be a valid Python identifier, so
+a column named `total sales` or `2024` still needs `alias`.
+
+## Conditional logic: when / then / otherwise
+
+This is Polars' `if`. It chains, and the first matching branch wins.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
+    "species", "body_mass_g"
+)`,
+      starterCode: `sized = penguins.with_columns(
+    size=pl.when(pl.col("body_mass_g") > 5000)
+    .then(pl.lit("large"))
+    .when(pl.col("body_mass_g") > 4000)
+    .then(pl.lit("medium"))
+    .otherwise(pl.lit("small"))
+)
+
+print(sized.head(5))
+print(sized["size"].value_counts(sort=True))
+`,
+    },
+  ]}
+/>
+
+Two things to watch:
+
+- **`otherwise` is not optional in practice.** Leave it out and
+  unmatched rows become null, which is occasionally what you want and
+  usually a bug.
+- **Nulls do not match anything.** `pl.col("x") > 5000` is *null*
+  where `x` is null, not `False`, so a null row falls through to
+  `otherwise`. If nulls need their own branch, test for them
+  explicitly with `pl.col("x").is_null()` first.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"x": [1, None, 10]})
+
+print(
+    df.with_columns(
+        naive=pl.when(pl.col("x") > 5).then(pl.lit("big")).otherwise(pl.lit("small")),
+        careful=pl.when(pl.col("x").is_null())
+        .then(pl.lit("unknown"))
+        .when(pl.col("x") > 5)
+        .then(pl.lit("big"))
+        .otherwise(pl.lit("small")),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+The null row is labelled `"small"` by the naive version, which is a
+quiet lie.
+
+## Building several columns at once
+
+An expression that matches many columns applies to each of them.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# One expression, matching three columns, producing three new ones
+measurements = pl.col("^.*_mm$")
+
+print(
+    penguins.with_columns(
+        ((measurements - measurements.mean()) / measurements.std())
+        .round(2)
+        .name.suffix("_z")
+    )
+    .select("species", "^.*_z$")
+    .head(3)
+)
+`,
+    },
+  ]}
+/>
+
+## Removing and reordering
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(penguins.drop("year").columns)
+
+# Reordering is just a select in the order you want
+print(penguins.select("body_mass_g", "species", pl.exclude("body_mass_g", "species")).columns)
+`,
+    },
+  ]}
+/>
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Classify penguins by bill shape"
+  instructions={`Add two columns to \`penguins\`, producing a frame called \`out\`:
+
+1. \`bill_ratio\`: \`bill_length_mm\` divided by \`bill_depth_mm\`, rounded to 2 decimals.
+2. \`bill_shape\`: a string built from \`bill_ratio\`, with these rules **in order**:
+   - null \`bill_ratio\` becomes \`"unknown"\`
+   - ratio above 2.5 becomes \`"long"\`
+   - ratio above 2.0 becomes \`"medium"\`
+   - anything else becomes \`"stubby"\`
+
+Every other column must survive.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `out = None  # TODO
+
+print(out)
+`,
+      solutionCode: `out = penguins.with_columns(
+    bill_ratio=(pl.col("bill_length_mm") / pl.col("bill_depth_mm")).round(2)
+).with_columns(
+    bill_shape=pl.when(pl.col("bill_ratio").is_null())
+    .then(pl.lit("unknown"))
+    .when(pl.col("bill_ratio") > 2.5)
+    .then(pl.lit("long"))
+    .when(pl.col("bill_ratio") > 2.0)
+    .then(pl.lit("medium"))
+    .otherwise(pl.lit("stubby"))
+)
+
+print(out.head())
+print(out["bill_shape"].value_counts(sort=True))
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "shape",
+      name: "Two columns added, none lost",
+      description: "344 rows, 10 columns",
+      code: `assert out.shape == (344, 10), out.shape
+assert "bill_ratio" in out.columns and "bill_shape" in out.columns`,
+    },
+    {
+      id: "ratio",
+      name: "bill_ratio is rounded to 2 decimals",
+      description: "First penguin: 39.1 / 18.7 = 2.09",
+      code: `assert out["bill_ratio"][0] == 2.09, out["bill_ratio"][0]`,
+    },
+    {
+      id: "unknown",
+      name: "Null ratios become 'unknown'",
+      description: "Two penguins have no bill measurements",
+      code: `n = out.filter(out["bill_shape"] == "unknown").height
+assert n == 2, n`,
+    },
+    {
+      id: "buckets",
+      name: "The three size buckets are right",
+      description: "long, medium, stubby",
+      code: `assert set(out["bill_shape"].unique().to_list()) == {
+    "unknown", "long", "medium", "stubby"
+}, out["bill_shape"].unique().to_list()`,
+    },
+    {
+      id: "boundary",
+      name: "Boundaries use strict greater-than",
+      description: "A ratio of exactly 2.5 is 'medium', not 'long'",
+      code: `import polars as pl
+probe = pl.DataFrame({"bill_ratio": [2.5, 2.51, 2.0]})
+labelled = probe.with_columns(
+    shape=pl.when(pl.col("bill_ratio").is_null())
+    .then(pl.lit("unknown"))
+    .when(pl.col("bill_ratio") > 2.5)
+    .then(pl.lit("long"))
+    .when(pl.col("bill_ratio") > 2.0)
+    .then(pl.lit("medium"))
+    .otherwise(pl.lit("stubby"))
+)
+assert labelled["shape"].to_list() == ["medium", "long", "stubby"]`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why does \`df.with_columns(b=pl.col("a") * 2, c=pl.col("b") + 1)\` fail?
+
+- Keyword arguments cannot be mixed with expressions in the same call
+  > Mixing positional expressions and keyword arguments in one call is supported and common.
+- \`with_columns\` accepts at most one new column per call
+  > Any number of columns can be added at once; adding several is the reason the call is parallel in the first place.
+- [o] Both expressions see the input frame, where \`b\` does not exist yet
+  > Chain a second \`with_columns\` when one new column depends on another.
+- Column \`c\` would need an explicit \`alias\` as well as its keyword
+  > The keyword already supplies the name, and adding an alias would be redundant rather than required.
+
+Everything in one call is computed against the same input, which is what lets Polars run them in parallel.`}
+/>
+
+<MultipleChoice
+  markdown={`A row has a null in \`mass\`. What does \`pl.when(pl.col("mass") > 5000).then(...).otherwise("small")\` give it?
+
+- \`null\`, because a null propagates through the whole expression
+  > \`otherwise\` supplies a value for every row the conditions did not match, so the result is not null.
+- An error, since a null cannot be compared with a number
+  > The comparison is legal; it simply evaluates to null rather than to true or false.
+- [o] \`"small"\`, because the null comparison is not true, so it falls to \`otherwise\`
+  > Test \`is_null()\` in its own branch first when missing data deserves its own label.
+- \`"small"\` only if the column has been filled beforehand, otherwise the row is dropped
+  > \`when/then\` never drops rows; the frame's height is unchanged whatever the conditions do.
+
+A null comparison is null, and null is not true, which is how missing data quietly acquires a wrong label.`}
+/>
+
+<MultipleChoice
+  markdown={`What happens when an expression's output name matches an existing column?
+
+- Both columns are kept, and the newer one gets a numeric suffix
+  > Polars does not invent suffixed names; two columns may never share a name in a frame.
+- The call raises a duplicate-column error
+  > Duplicates raise only when *two expressions in the same call* produce the same name, not when one matches an existing column.
+- [o] The existing column is replaced by the new one
+  > This is how a column is cleaned in place: \`with_columns(pl.col("name").str.strip_chars())\` needs no alias.
+- The new column is appended at the end and the original moves to the front
+  > No reordering occurs; a replaced column keeps its original position in the frame.
+
+Replacement in place is a feature, not a collision, and it keeps cleaning code short.`}
+/>

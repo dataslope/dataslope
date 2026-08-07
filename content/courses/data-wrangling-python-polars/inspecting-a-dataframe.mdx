@@ -1,0 +1,338 @@
+---
+title: Inspecting a DataFrame
+description: "The first ten minutes with an unfamiliar table: shape, schema, head, describe, glimpse, and counting what is missing."
+---
+
+Before you compute anything on a new dataset, you look at it. This
+page is the checklist, and it is worth running every single time. The
+number of analyses that quietly produce a wrong answer because nobody
+noticed a duplicated key or a column of strings where numbers were
+expected is very large.
+
+<Figure
+  slug="pl-inspecting-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading leaning over a large round magnifier on a heavy stand angled above the top face of one thick blue block on a wide platform, a small yellow block set to one side"
+/>
+
+## The five-second version
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print("shape  :", penguins.shape)
+print("columns:", penguins.columns)
+print(penguins.schema)
+`,
+    },
+  ]}
+/>
+
+`schema` is a mapping from column name to dtype. Reading it first is
+a habit worth building: half of all "why is this not working"
+questions are answered by noticing that a column is `String` when you
+assumed `Int64`.
+
+## head, tail, sample
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(penguins.head(3))
+print(penguins.tail(2))
+
+# A random sample is the one that catches sorted-by-something files
+print(penguins.sample(3, seed=0))
+`,
+    },
+  ]}
+/>
+
+`head` on a file that arrived sorted by date shows you January and
+nothing else. `sample` with a fixed `seed` gives you a reproducible
+look at the middle.
+
+## glimpse, for wide tables
+
+When a table has forty columns, printing it is useless: the output
+wraps and you see nothing. `glimpse` transposes the problem, one
+column per line.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `diamonds.glimpse()
+`,
+    },
+  ]}
+/>
+
+Every column, its dtype, and its first few values, on one line each.
+For anything wider than about eight columns this is the better first
+look.
+
+## describe
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `penguins.describe()
+`,
+    },
+  ]}
+/>
+
+Unlike its pandas namesake, Polars' `describe` covers *every* column,
+including strings, and puts `null_count` right there in the table.
+Read down that row first. Two missing bill lengths is a note; two
+hundred is a different analysis.
+
+## Counting what is missing
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(penguins.null_count())
+
+# As a share of rows, which is what you actually want to judge
+print(
+    penguins.select(
+        (pl.all().null_count() / pl.len() * 100).round(1)
+    )
+)
+`,
+    },
+  ]}
+/>
+
+## Counting values in a column
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(penguins["species"].value_counts(sort=True))
+print("distinct islands:", penguins["island"].n_unique())
+print(penguins["island"].unique().to_list())
+`,
+    },
+  ]}
+/>
+
+`value_counts` on a categorical column is the fastest way to find
+data-entry problems: `"male"`, `"Male"`, and `"M "` show up as three
+categories the moment you look.
+
+## Checking for duplicates
+
+This is the check people skip and then regret, because a duplicated
+key silently multiplies rows in a later join.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+orders = pl.DataFrame(
+    {
+        "order_id": [1, 2, 2, 3, 4, 4],
+        "amount": [10, 20, 20, 30, 40, 41],
+    }
+)
+
+print("fully duplicated rows:", orders.is_duplicated().sum())
+print("duplicate order_ids  :", orders["order_id"].is_duplicated().sum())
+print(orders.filter(pl.col("order_id").is_duplicated()))
+`,
+    },
+  ]}
+/>
+
+Note the difference: order 2 is duplicated *entirely*, while order 4
+appears twice with different amounts. The second case is the
+dangerous one, because deduplicating rows will not fix it and you
+have to decide which amount is right.
+
+## An inspection routine
+
+Put together, the first thing to run on an unfamiliar file:
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `def inspect(df: pl.DataFrame, name: str = "frame") -> None:
+    print(f"── {name}: {df.height:,} rows x {df.width} columns")
+    summary = pl.DataFrame(
+        {
+            "column": df.columns,
+            "dtype": [str(dt) for dt in df.dtypes],
+            "nulls": df.null_count().row(0),
+            "distinct": [df[c].n_unique() for c in df.columns],
+        }
+    )
+    print(summary)
+
+inspect(pl.read_csv("diamonds.csv"), "diamonds")
+`,
+    },
+  ]}
+/>
+
+A column whose `distinct` count equals the row count is a candidate
+key. A column whose `distinct` count is 1 carries no information and
+can usually be dropped.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Profile the diamonds table"
+  instructions={`\`diamonds\` is loaded for you (53,940 rows). Build a DataFrame called \`profile\` with one row per **string** column of \`diamonds\` and exactly these columns, in this order:
+
+1. \`column\`, the column name
+2. \`n_distinct\`, how many distinct values it has
+
+Sort by \`n_distinct\` ascending. There are three string columns: \`cut\`, \`color\`, and \`clarity\`.`}
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `profile = None  # TODO
+
+print(profile)
+`,
+      solutionCode: `text_cols = [
+    name
+    for name, dtype in diamonds.schema.items()
+    if dtype == pl.String
+]
+
+profile = pl.DataFrame(
+    {
+        "column": text_cols,
+        "n_distinct": [diamonds[c].n_unique() for c in text_cols],
+    }
+).sort("n_distinct")
+
+print(profile)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_frame",
+      name: "profile is a DataFrame",
+      description: "Type check",
+      code: `import polars as pl
+assert isinstance(profile, pl.DataFrame)`,
+    },
+    {
+      id: "cols",
+      name: "Right columns in the right order",
+      description: "column, n_distinct",
+      code: `assert profile.columns == ["column", "n_distinct"], profile.columns`,
+    },
+    {
+      id: "rows",
+      name: "One row per string column",
+      description: "Three of them",
+      code: `assert profile.height == 3, profile.height`,
+    },
+    {
+      id: "names",
+      name: "The three string columns",
+      description: "cut, color, clarity",
+      code: `assert sorted(profile["column"].to_list()) == ["clarity", "color", "cut"]`,
+    },
+    {
+      id: "sorted",
+      name: "Sorted by n_distinct ascending",
+      description: "Fewest categories first",
+      code: `vals = profile["n_distinct"].to_list()
+assert vals == sorted(vals), vals`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why is \`sample(3, seed=0)\` often more informative than \`head(3)\`?
+
+- Sampling is faster than reading the first rows of a frame
+  > Reading the first three rows is the cheaper operation; sampling has to reach across the frame.
+- \`head\` returns a lazy view while \`sample\` returns real data
+  > Both return an ordinary DataFrame here. The difference is which rows you see, not how they are computed.
+- [o] Files often arrive sorted, so the first rows are unrepresentative
+  > A file sorted by date shows you January in \`head\` and nothing about the rest of the year.
+- \`head\` skips rows containing nulls, which hides missing data
+  > Neither method filters nulls; \`head\` gives the first rows exactly as they are, nulls included.
+
+The \`seed\` keeps the sample reproducible so a colleague sees the same rows you did.`}
+/>
+
+<MultipleChoice
+  markdown={`\`orders["order_id"].is_duplicated().sum()\` returns 4, but \`orders.is_duplicated().sum()\` returns 2. What does that tell you?
+
+- Two rows have a null \`order_id\`, which is counted differently by each method
+  > Nulls would appear in both counts the same way; the gap here is about which columns each method compares.
+- The frame contains exactly two duplicate rows and four unique ones
+  > The second count is of rows involved in duplication, not of unique rows, so this reading does not follow from the numbers.
+- [o] Some IDs repeat with *different* values in the other columns
+  > Deduplicating rows will not fix those, because the rows genuinely differ. You have to decide which record is correct.
+- The frame is sorted by \`order_id\`, which makes the two counts disagree
+  > Row order has no effect on either count; both compare values rather than positions.
+
+The key-duplicated-but-row-different case is the one that silently multiplies rows in a later join.`}
+/>
+
+<MultipleChoice
+  markdown={`In a profile table, a column's distinct count equals the number of rows. What does that suggest?
+
+- The column is constant and carries no information
+  > A constant column has a distinct count of 1, which is the opposite end of the range.
+- The column contains only null values throughout
+  > An all-null column has a distinct count of zero or one, not one per row.
+- The column must be numeric rather than text
+  > Distinct counts say nothing about type; a string column of unique identifiers behaves the same way.
+- [o] It is a candidate key: every row has its own value
+  > Useful for spotting an ID column, and for spotting that a supposed ID column is *not* one.
+
+The other end of the range is just as useful: a distinct count of 1 means the column can usually be dropped.`}
+/>

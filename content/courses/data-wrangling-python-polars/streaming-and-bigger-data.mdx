@@ -1,0 +1,329 @@
+---
+title: Streaming Larger Data
+description: "Processing files that do not fit in memory: the streaming engine, sink_parquet, and the operations that still need everything at once."
+---
+
+The in-memory engine needs the data it is working on to fit in RAM.
+The **streaming engine** processes a query in batches instead, so
+the peak memory is a function of the batch size and the query, not of
+the file.
+
+<Figure
+  slug="pl-streaming-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading feeding three thick blue blocks one at a time onto a wide green conveyor chute on a platform that carries them into a small yellow cabinet, a much larger red block resting on the ground beside the platform"
+/>
+
+## Turning it on
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `q = (
+    pl.scan_csv("diamonds.csv")
+    .filter(pl.col("carat") > 0.5)
+    .group_by("cut")
+    .agg(
+        pl.len().alias("n"),
+        pl.col("price").mean().round(0).alias("avg_price"),
+    )
+    .sort("cut")
+)
+
+print(q.collect(engine="streaming"))
+`,
+    },
+  ]}
+/>
+
+One argument. Everything else about the query is unchanged, which is
+the point: you do not write a different program for large data, you
+ask for a different engine.
+
+<Callout type="info" title="Streaming needs a lazy query">
+`engine="streaming"` is an argument to `collect()`, so it only exists
+on a `LazyFrame`. An eager `read_csv` has already put the whole file
+in memory before you could ask for anything else.
+</Callout>
+
+## sink: never materialize the result at all
+
+`collect()` returns a `DataFrame`, which has to fit in memory. If the
+output is also large, sink it straight to a file instead.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `(
+    pl.scan_csv("diamonds.csv")
+    .filter(pl.col("cut") == "Ideal")
+    .select("carat", "cut", "price")
+    .sink_parquet("ideal.parquet")
+)
+
+# Nothing above ever held the result in memory
+print(pl.scan_parquet("ideal.parquet").select(pl.len()).collect())
+print(pl.scan_parquet("ideal.parquet").head(3).collect())
+`,
+    },
+  ]}
+/>
+
+`sink_parquet`, `sink_csv`, `sink_ndjson`, and `sink_ipc` all read in
+batches and write in batches. A 200 GB file can be filtered and
+rewritten on a laptop, at whatever speed the disk allows.
+
+## Many files as one frame
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+# Pretend these arrived as a monthly export
+for month in range(1, 4):
+    pl.DataFrame(
+        {"month": [month] * 3, "sales": [100 + month, 200 + month, 300 + month]}
+    ).write_parquet(f"sales-2026-{month:02d}.parquet")
+
+# One glob, one lazy frame, all three files
+lf = pl.scan_parquet("sales-2026-*.parquet")
+
+print(lf.group_by("month").agg(pl.col("sales").sum()).sort("month").collect())
+`,
+    },
+  ]}
+/>
+
+This is better than concatenating by hand: the optimizer sees all the
+files as one source, so projection and predicate pushdown apply to
+every one of them, and files whose statistics rule them out are
+skipped.
+
+## What streams and what does not
+
+Streaming works by processing batches independently and combining
+partial results. Operations that need to see everything at once
+cannot do that, so the engine falls back to in-memory for those parts
+of the plan.
+
+| Streams well | Needs everything |
+| --- | --- |
+| `filter`, `select`, `with_columns` | `pivot` (eager only anyway) |
+| `group_by().agg()` (partial aggregates merge) | a sort of the whole frame |
+| joins (build side must fit) | `rank` over the whole frame |
+| `sink_*` | anything needing a global order |
+
+A `sort` is the one that catches people: sorting is inherently global,
+so a full sort of a larger-than-memory frame is expensive whatever the
+engine. Sorting *after* an aggregation is fine, because the
+aggregated result is small.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `# Good: aggregate first (small), then sort the small result
+good = (
+    pl.scan_csv("diamonds.csv")
+    .group_by("cut")
+    .agg(pl.col("price").mean().round(0).alias("avg"))
+    .sort("avg", descending=True)
+)
+print(good.collect(engine="streaming"))
+
+# Expensive: sorting the whole frame just to take five rows.
+# top_k does the same job without the global order.
+print(
+    pl.scan_csv("diamonds.csv")
+    .top_k(5, by="price")
+    .select("carat", "cut", "price")
+    .collect(engine="streaming")
+)
+`,
+    },
+  ]}
+/>
+
+## Keeping memory down without streaming
+
+Three habits help regardless of engine:
+
+- **Narrow the types.** `UInt32` instead of `Int64` halves a column;
+  `Categorical` collapses a repeated string column to a byte or two
+  per row.
+- **Read fewer columns.** With `scan_*` this is automatic; it is the
+  reason to prefer it.
+- **Store Parquet, not CSV.** Smaller on disk, typed, and its
+  statistics let whole row groups be skipped.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `slim = diamonds.with_columns(
+    pl.col("cut", "color", "clarity").cast(pl.Categorical),
+    pl.col("price").cast(pl.UInt32),
+)
+
+print("as read:", round(diamonds.estimated_size("mb"), 2), "MB")
+print("narrowed:", round(slim.estimated_size("mb"), 2), "MB")
+
+diamonds.write_csv("d.csv")
+slim.write_parquet("d.parquet")
+
+import os
+print("csv on disk    :", round(os.path.getsize("d.csv") / 1e6, 2), "MB")
+print("parquet on disk:", round(os.path.getsize("d.parquet") / 1e6, 2), "MB")
+`,
+    },
+  ]}
+/>
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="A streaming pipeline that never materializes"
+  instructions={`Write a pipeline over \`diamonds.csv\` that:
+
+1. scans the file lazily,
+2. keeps diamonds with \`carat\` above 1.0,
+3. selects \`cut\`, \`carat\`, \`price\`,
+4. **sinks** the result to \`big.parquet\` without ever collecting it.
+
+Then set \`n_rows\` to the number of rows in that file, read back with a lazy scan (do not read the whole file into memory to count them), and \`summary\` to a frame with one row per \`cut\` holding \`cut\` and \`n\`, sorted by \`cut\`, collected with the **streaming** engine.`}
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl`,
+      starterCode: `n_rows = None   # TODO
+summary = None  # TODO
+
+print(n_rows)
+print(summary)
+`,
+      solutionCode: `(
+    pl.scan_csv("diamonds.csv")
+    .filter(pl.col("carat") > 1.0)
+    .select("cut", "carat", "price")
+    .sink_parquet("big.parquet")
+)
+
+n_rows = pl.scan_parquet("big.parquet").select(pl.len()).collect().item()
+
+summary = (
+    pl.scan_parquet("big.parquet")
+    .group_by("cut")
+    .agg(pl.len().alias("n"))
+    .sort("cut")
+    .collect(engine="streaming")
+)
+
+print(n_rows)
+print(summary)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "file",
+      name: "big.parquet was written",
+      description: "sink_parquet ran",
+      code: `import os
+assert os.path.exists("big.parquet")`,
+    },
+    {
+      id: "schema",
+      name: "The file has the three requested columns",
+      description: "cut, carat, price",
+      code: `import polars as pl
+cols = pl.scan_parquet("big.parquet").collect_schema().names()
+assert cols == ["cut", "carat", "price"], cols`,
+    },
+    {
+      id: "rows",
+      name: "17,502 diamonds over one carat",
+      description: "The filter reached the file",
+      code: `assert n_rows == 17502, n_rows`,
+    },
+    {
+      id: "summary",
+      name: "summary has one row per cut, sorted",
+      description: "Five cut grades",
+      code: `assert summary.columns == ["cut", "n"], summary.columns
+assert summary.height == 5, summary.height
+assert summary["cut"].to_list() == sorted(summary["cut"].to_list())`,
+    },
+    {
+      id: "total",
+      name: "The per-cut counts add up",
+      description: "Same total as the file",
+      code: `assert summary["n"].sum() == n_rows, (summary["n"].sum(), n_rows)`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why can \`engine="streaming"\` not be used with \`pl.read_csv\`?
+
+- Streaming supports Parquet input only
+  > Streaming reads CSV, Parquet, and NDJSON alike; the input format is not the obstacle.
+- \`read_csv\` uses a different parser that cannot produce batches
+  > The same reader serves both paths; what differs is when the reading happens.
+- [o] It is an argument to \`collect()\`, and \`read_csv\` has already loaded the file eagerly
+  > By the time you hold a \`DataFrame\`, the memory has been spent; streaming has to be chosen before the read.
+- Streaming requires the file to be sorted, which \`read_csv\` does not guarantee
+  > No ordering requirement exists; batches are processed in whatever order they are read.
+
+Streaming is a property of executing a plan, so you need a plan first.`}
+/>
+
+<MultipleChoice
+  markdown={`Which operation is genuinely hard to stream?
+
+- Filtering rows on a column value
+  > Each batch can be filtered independently with no knowledge of any other batch.
+- Computing a grouped mean
+  > Partial sums and counts merge across batches, which is exactly how streaming aggregation works.
+- Adding a column computed from two others
+  > This is row-local: every row's value depends only on that row.
+- [o] Sorting the entire frame
+  > Ordering is inherently global, so a full sort of a larger-than-memory frame is expensive whatever the engine.
+
+Aggregate first and sort the small result, or use \`top_k\` when you only want the extremes.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`sink_parquet\` do that \`collect().write_parquet()\` does not?
+
+- It compresses the output more aggressively
+  > Both write standard Parquet with the same compression options available.
+- It writes the file in a format only Polars can read
+  > The output is ordinary Parquet, readable by any Parquet reader.
+- [o] It writes in batches, so the full result never has to fit in memory
+  > Which is what lets a 200 GB file be filtered and rewritten on a laptop.
+- It skips the query optimizer, making the write faster to start
+  > The plan is optimized exactly as it would be for \`collect\`; the difference is where the output goes.
+
+\`collect()\` returns a \`DataFrame\`, and a \`DataFrame\` is by definition in memory.`}
+/>

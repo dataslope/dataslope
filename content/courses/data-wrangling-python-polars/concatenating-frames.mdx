@@ -1,0 +1,338 @@
+---
+title: Concatenating Frames
+description: "Stacking frames vertically and horizontally, coping with mismatched schemas, and the relaxed and diagonal strategies."
+---
+
+A join matches rows by key. Concatenation just puts frames next to
+each other: vertically (more rows) or horizontally (more columns).
+
+<Figure
+  slug="pl-concat-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading pushing two wide trays end to end on a platform to form one longer tray, three thick blue blocks standing in the first tray and two thick green blocks in the second"
+/>
+
+## Vertical: more rows
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+jan = pl.DataFrame({"day": [1, 2], "sales": [100, 120]})
+feb = pl.DataFrame({"day": [1, 2], "sales": [95, 130]})
+
+print(pl.concat([jan, feb]))                       # vertical is the default
+print(pl.concat([jan, feb], how="vertical").height)
+`,
+    },
+  ]}
+/>
+
+Plain `vertical` demands identical schemas: the same column names, in
+the same order, with the same dtypes. That strictness is the point.
+It catches the case where last month's export gained a column.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+jan = pl.DataFrame({"day": [1, 2], "sales": [100, 120]})
+feb_extra = pl.DataFrame({"day": [1], "sales": [95], "region": ["N"]})
+
+try:
+    pl.concat([jan, feb_extra])
+except Exception as error:
+    print(type(error).__name__, "-", str(error).splitlines()[0])
+`,
+    },
+  ]}
+/>
+
+## The relaxed strategies
+
+| `how` | Behaviour |
+| --- | --- |
+| `vertical` | schemas must match exactly |
+| `vertical_relaxed` | same columns, dtypes are widened to a common type |
+| `diagonal` | union of columns; missing ones become null |
+| `diagonal_relaxed` | both of the above |
+| `horizontal` | side by side, padded with nulls to the longest |
+| `align` | join on the common columns, keeping row order |
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+# Different dtypes for the same column
+a = pl.DataFrame({"x": [1, 2]})                 # Int64
+b = pl.DataFrame({"x": [3.5, 4.5]})             # Float64
+
+try:
+    pl.concat([a, b])
+except Exception as error:
+    print("vertical:", type(error).__name__)
+
+print(pl.concat([a, b], how="vertical_relaxed"))
+`,
+    },
+  ]}
+/>
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+jan = pl.DataFrame({"day": [1, 2], "sales": [100, 120]})
+feb = pl.DataFrame({"day": [1], "sales": [95], "region": ["N"]})
+
+# diagonal takes the union of columns and fills the gaps with null
+print(pl.concat([jan, feb], how="diagonal"))
+`,
+    },
+  ]}
+/>
+
+`diagonal` is convenient and it is also how a typo becomes a column.
+If `region` arrives as `Region` next month, you get two columns, each
+half null, and no error. Reach for it when schemas genuinely differ,
+not as a way to avoid thinking about them.
+
+## Horizontal: more columns
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+left = pl.DataFrame({"a": [1, 2, 3]})
+right = pl.DataFrame({"b": ["x", "y"]})
+
+print(pl.concat([left, right], how="horizontal"))
+`,
+    },
+  ]}
+/>
+
+Horizontal concatenation pairs rows **by position**, which is a
+strong assumption. The shorter frame is padded with nulls rather than
+raising, so a mismatch is silent. If the two frames share a key
+column, join on it instead: a join states the relationship, a
+horizontal concat assumes it.
+
+## Adding rows to an existing frame
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"id": [1, 2], "v": [10, 20]})
+new = pl.DataFrame({"id": [3], "v": [30]})
+
+print(df.vstack(new))       # cheap, leaves the frame chunked
+print(df.extend(new))       # appends into the existing buffers
+
+# A frame in many chunks reads more slowly; rechunk consolidates it
+combined = pl.concat([df, new, new]).rechunk()
+print(combined.n_chunks())
+`,
+    },
+  ]}
+/>
+
+<Callout type="info" title="Do not concatenate in a loop">
+Appending inside a loop is the classic slow pattern, in every
+DataFrame library. Collect the frames in a list and call
+`pl.concat(frames)` once. One call can allocate the result correctly;
+a thousand calls copy the accumulated data a thousand times.
+</Callout>
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+# The right shape for reading many files
+def load_month(month: int) -> pl.DataFrame:
+    return pl.DataFrame({"month": [month], "sales": [100 + month]})
+
+frames = [load_month(m) for m in range(1, 13)]
+year = pl.concat(frames)
+
+print(year.head(3))
+print("rows:", year.height, "chunks:", year.n_chunks())
+`,
+    },
+  ]}
+/>
+
+For files specifically, Polars will do this for you: `scan_csv` and
+`scan_parquet` accept a glob and read every match as one lazy frame,
+which is both shorter and faster than concatenating by hand.
+
+```python
+lf = pl.scan_parquet("data/2026-*.parquet")
+```
+
+## Deduplicating after a concat
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+a = pl.DataFrame({"id": [1, 2, 3], "v": ["a", "b", "c"]})
+b = pl.DataFrame({"id": [3, 4], "v": ["c", "d"]})
+
+stacked = pl.concat([a, b])
+print("stacked:", stacked.height)
+
+print(stacked.unique())                                   # whole-row duplicates
+print(stacked.unique(subset="id", keep="last").sort("id"))  # by key
+`,
+    },
+  ]}
+/>
+
+`keep` takes `"first"`, `"last"`, `"any"`, and `"none"`. Use
+`"none"` when a duplicate key means the data is broken and you want
+to see which rows are involved.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Combine three monthly exports"
+  instructions={`Three monthly exports are loaded. They do not agree:
+
+- \`jan\` has \`day\`, \`sales\`
+- \`feb\` has \`day\`, \`sales\`, \`region\`
+- \`mar\` has \`day\`, \`sales\` where \`sales\` is a **float**
+
+Build \`year\`, one frame holding all the rows:
+
+- every column that appears in any input, with nulls where a frame lacked it
+- \`sales\` widened to a common numeric type rather than raising
+- rows in the order jan, feb, mar
+
+Then set \`n_missing_region\` to the number of rows with a null \`region\`.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+jan = pl.DataFrame({"day": [1, 2], "sales": [100, 120]})
+feb = pl.DataFrame({"day": [1, 2], "sales": [95, 130], "region": ["N", "S"]})
+mar = pl.DataFrame({"day": [1], "sales": [88.5]})`,
+      starterCode: `year = None              # TODO
+n_missing_region = None  # TODO
+
+print(year)
+`,
+      solutionCode: `year = pl.concat([jan, feb, mar], how="diagonal_relaxed")
+n_missing_region = year["region"].null_count()
+
+print(year)
+print("missing region:", n_missing_region)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "rows",
+      name: "All five rows present",
+      description: "2 + 2 + 1",
+      code: `assert year.height == 5, year.height`,
+    },
+    {
+      id: "cols",
+      name: "The union of the three schemas",
+      description: "day, sales, region",
+      code: `assert set(year.columns) == {"day", "sales", "region"}, year.columns`,
+    },
+    {
+      id: "dtype",
+      name: "sales was widened, not rejected",
+      description: "Float64 covers both inputs",
+      code: `import polars as pl
+assert year["sales"].dtype == pl.Float64, year["sales"].dtype`,
+    },
+    {
+      id: "order",
+      name: "Rows are in jan, feb, mar order",
+      description: "Sales 100, 120, 95, 130, 88.5",
+      code: `assert year["sales"].to_list() == [100.0, 120.0, 95.0, 130.0, 88.5], year["sales"].to_list()`,
+    },
+    {
+      id: "region",
+      name: "The frames without a region got nulls",
+      description: "Three of them",
+      code: `assert n_missing_region == 3, n_missing_region`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Why is plain \`how="vertical"\` strict about matching schemas?
+
+- Relaxing it would make the concatenation much slower
+  > The relaxed strategies cost very little; the strictness is about catching mistakes, not about speed.
+- Polars cannot represent a frame whose columns have mixed types
+  > A frame's columns each have one type, and the relaxed strategies widen them precisely so a union is representable.
+- [o] A mismatch usually means a file changed shape, which you want to hear about
+  > Silently unioning the schemas turns a broken export into a half-null column nobody notices.
+- Only the first frame's schema is read, so later frames must match it
+  > Every frame's schema is inspected; the comparison is what produces the error.
+
+Use \`diagonal\` when schemas genuinely differ, not to avoid thinking about why they differ.`}
+/>
+
+<MultipleChoice
+  markdown={`Two frames of 3 and 2 rows are concatenated with \`how="horizontal"\`. What happens?
+
+- An error, because the frames have different heights
+  > Horizontal concatenation pads rather than raising, which is exactly what makes the mismatch easy to miss.
+- The result has 2 rows, truncated to the shorter frame
+  > No rows are discarded; the longer frame's rows all survive.
+- The result has 5 rows, one frame stacked after the other
+  > Stacking rows is vertical concatenation; horizontal adds columns instead.
+- [o] The result has 3 rows and the shorter frame's column is padded with nulls
+  > Rows are paired by position, which is a strong assumption; a shared key column and a join state the relationship instead.
+
+The silence is the problem: a length mismatch usually means the positional assumption was wrong.`}
+/>
+
+<MultipleChoice
+  markdown={`What is wrong with \`for f in files: df = pl.concat([df, read(f)])\`?
+
+- \`pl.concat\` cannot be called more than once on the same frame
+  > It can be called freely; the objection is to how much work the repetition adds up to.
+- The result ends up in the wrong row order
+  > Row order comes out correct. The cost is time, not correctness.
+- [o] Each iteration copies everything accumulated so far, so the work grows quadratically
+  > Collect the frames in a list and call \`pl.concat(frames)\` once, or pass a glob to \`scan_parquet\`.
+- Intermediate frames are never freed, so memory grows without bound
+  > Python releases each intermediate as it is replaced; the problem is the repeated copying, not a leak.
+
+For files, a glob passed to a \`scan_*\` function is shorter still and lets the optimizer see all of them at once.`}
+/>

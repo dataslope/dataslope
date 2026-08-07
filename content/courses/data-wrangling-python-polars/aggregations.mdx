@@ -1,0 +1,348 @@
+---
+title: Aggregating a Column
+description: "Reducing many values to one: the aggregation catalogue, how nulls are treated, and computing several summaries in a single pass."
+---
+
+An aggregation takes a column and returns one value. In `select` it
+produces a one-row frame; in `agg` it produces one value per group;
+in `with_columns` it broadcasts back across every row. Same
+expressions, three uses.
+
+<Figure
+  slug="pl-aggregations-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading feeding three thick blue blocks into the mouth of a wide green funnel-shaped chute on a platform, one small yellow cube resting in the tray below its spout"
+/>
+
+## The catalogue
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `mass = pl.col("body_mass_g")
+
+print(
+    penguins.select(
+        n=pl.len(),
+        count=mass.count(),          # non-null values only
+        sum=mass.sum(),
+        mean=mass.mean().round(1),
+        median=mass.median(),
+        std=mass.std().round(1),
+        var=mass.var().round(1),
+        min=mass.min(),
+        max=mass.max(),
+        n_unique=mass.n_unique(),
+        null_count=mass.null_count(),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+`pl.len()` counts *rows*; `.count()` counts *non-null values in that
+column*. The gap between them is the missing data, and confusing the
+two is a common source of quietly wrong averages.
+
+## Nulls are skipped, not treated as zero
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"x": [10, None, 20]})
+
+print("sum   :", df["x"].sum())      # 30, the null contributes nothing
+print("mean  :", df["x"].mean())     # 15, divided by 2 not 3
+print("count :", df["x"].count())    # 2
+print("len   :", df.height)          # 3
+
+# Treating a null as zero is a decision you make explicitly
+print("mean if null means 0:", df["x"].fill_null(0).mean())
+`,
+    },
+  ]}
+/>
+
+Both answers are defensible. The point is that 15 and 10 mean
+different things, and the library will not choose for you.
+
+## Quantiles and spread
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `price = pl.col("price")
+
+print(
+    diamonds.select(
+        p10=price.quantile(0.10),
+        q1=price.quantile(0.25),
+        median=price.median(),
+        q3=price.quantile(0.75),
+        p90=price.quantile(0.90),
+        iqr=price.quantile(0.75) - price.quantile(0.25),
+        mean=price.mean().round(0),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+The mean sits well above the median, which is the signature of a
+right-skewed distribution: a few very expensive diamonds pull the
+average up while leaving the middle alone.
+
+## Boolean aggregations
+
+A Boolean column aggregates in ways that read naturally.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `heavy = pl.col("body_mass_g") > 5000
+
+print(
+    penguins.select(
+        any_heavy=heavy.any(),
+        all_heavy=heavy.all(),
+        n_heavy=heavy.sum(),                    # True counts as 1
+        pct_heavy=(heavy.mean() * 100).round(1),  # mean of a Boolean is a share
+    )
+)
+`,
+    },
+  ]}
+/>
+
+`heavy.mean()` being the *proportion* is worth remembering. It turns
+"what fraction of rows satisfy this?" into one short expression.
+
+## Positional and conditional aggregations
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(
+    penguins.select(
+        first=pl.col("species").first(),
+        last=pl.col("species").last(),
+        mode=pl.col("island").mode().first(),
+        # The species of the heaviest penguin
+        heaviest_species=pl.col("species")
+        .sort_by("body_mass_g", descending=True, nulls_last=True)
+        .first(),
+        # Mean mass of Gentoos only, computed in one pass
+        gentoo_mean=pl.col("body_mass_g")
+        .filter(pl.col("species") == "Gentoo")
+        .mean()
+        .round(0),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+That last one is the pattern worth stealing: `.filter()` *inside* an
+expression narrows the rows that one aggregation sees, without
+filtering the frame. It lets you compute several differently-filtered
+summaries in a single pass over the data.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `price = pl.col("price")
+
+print(
+    diamonds.select(
+        ideal_mean=price.filter(pl.col("cut") == "Ideal").mean().round(0),
+        fair_mean=price.filter(pl.col("cut") == "Fair").mean().round(0),
+        big_mean=price.filter(pl.col("carat") > 1.5).mean().round(0),
+        overall=price.mean().round(0),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+Four differently-scoped averages, one scan. Doing this with four
+separate `filter` calls would read the frame four times.
+
+## Aggregating many columns at once
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+import polars.selectors as cs
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `measurements = cs.numeric() - cs.by_name("year")
+
+print(
+    penguins.select(
+        measurements.mean().round(1).name.suffix("_mean"),
+        measurements.std().round(1).name.suffix("_std"),
+    )
+)
+`,
+    },
+  ]}
+/>
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="One-pass diamond summary"
+  instructions={`Build a **one-row** frame called \`summary\` from \`diamonds\` with exactly these columns, in this order:
+
+1. \`n\`, the number of rows
+2. \`median_price\`, the median of \`price\`
+3. \`pct_over_1ct\`, the percentage of diamonds with \`carat\` above 1.0, rounded to 1 decimal
+4. \`ideal_median\`, the median \`price\` of \`Ideal\`-cut diamonds only
+
+Compute all four in a single \`select\` call, so the frame is scanned once.`}
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+diamonds = pl.read_csv("diamonds.csv")`,
+      starterCode: `summary = None  # TODO
+
+print(summary)
+`,
+      solutionCode: `summary = diamonds.select(
+    n=pl.len(),
+    median_price=pl.col("price").median(),
+    pct_over_1ct=((pl.col("carat") > 1.0).mean() * 100).round(1),
+    ideal_median=pl.col("price")
+    .filter(pl.col("cut") == "Ideal")
+    .median(),
+)
+
+print(summary)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "shape",
+      name: "One row, four columns",
+      description: "An aggregation in select collapses the frame",
+      code: `assert summary.shape == (1, 4), summary.shape`,
+    },
+    {
+      id: "cols",
+      name: "The right column names in order",
+      description: "n, median_price, pct_over_1ct, ideal_median",
+      code: `expected = ["n", "median_price", "pct_over_1ct", "ideal_median"]
+assert summary.columns == expected, summary.columns`,
+    },
+    {
+      id: "n",
+      name: "Counts all 53,940 rows",
+      description: "pl.len()",
+      code: `assert summary["n"][0] == 53940, summary["n"][0]`,
+    },
+    {
+      id: "median",
+      name: "Median price is 2401",
+      description: "Well below the mean of 3933",
+      code: `assert summary["median_price"][0] == 2401.0, summary["median_price"][0]`,
+    },
+    {
+      id: "pct",
+      name: "About a third are over one carat",
+      description: "32.4%",
+      code: `assert summary["pct_over_1ct"][0] == 32.4, summary["pct_over_1ct"][0]`,
+    },
+    {
+      id: "ideal",
+      name: "Ideal-cut median is lower than the overall median",
+      description: "1810: ideal stones skew small",
+      code: `assert summary["ideal_median"][0] == 1810.0, summary["ideal_median"][0]`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`A column has 100 rows, 10 of them null. What do \`pl.len()\` and \`pl.col("x").count()\` return?
+
+- 100 and 100, since both count rows regardless of content
+  > \`count\` is column-aware and deliberately excludes nulls; that is the whole difference between the two.
+- 90 and 90, since nulls are excluded from both
+  > \`pl.len()\` counts the frame's rows and knows nothing about any particular column's nulls.
+- [o] 100 and 90
+  > The gap between them is the missing data, which makes their difference a quick null count.
+- 100 and 10, because \`count\` returns the number of nulls
+  > Counting nulls is \`null_count()\`; \`count()\` reports the values that are present.
+
+Using \`len()\` where you meant \`count()\` produces a mean divided by the wrong denominator.`}
+/>
+
+<MultipleChoice
+  markdown={`What is \`(pl.col("mass") > 5000).mean()\`?
+
+- The mean mass of the rows heavier than 5000
+  > That would be \`pl.col("mass").filter(pl.col("mass") > 5000).mean()\`; here the mean is taken of the Boolean itself.
+- Always either 0.0 or 1.0, since the input is Boolean
+  > Averaging a mix of trues and falses lands between the two, which is exactly what makes it useful.
+- [o] The proportion of rows where the condition holds
+  > True counts as 1 and false as 0, so their mean is the share. Multiply by 100 for a percentage.
+- An error, because \`mean\` is not defined on a Boolean column
+  > Boolean columns support \`mean\`, \`sum\`, \`any\`, and \`all\`, and each has a natural reading.
+
+"What fraction of rows satisfy this?" becomes one short expression.`}
+/>
+
+<MultipleChoice
+  markdown={`Why compute four differently-filtered averages inside one \`select\` rather than with four \`filter\` calls?
+
+- \`filter\` cannot be applied to the same frame more than once
+  > A frame can be filtered any number of times; the argument is about how many passes the data takes.
+- The results would otherwise have different column names
+  > Naming is under your control either way, through \`alias\` or keyword arguments.
+- [o] Expression-level filters let all four be computed in one pass over the data
+  > Four separate \`filter\` calls scan the frame four times and produce four frames to stitch together.
+- Frame-level filters silently drop rows containing nulls in other columns
+  > \`filter\` only considers the condition you give it; other columns' nulls do not affect which rows survive.
+
+An expression-level \`filter\` narrows one aggregation's view without narrowing the frame.`}
+/>

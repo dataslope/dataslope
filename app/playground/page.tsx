@@ -26,6 +26,7 @@ import { PLAYGROUNDS } from "../_components/playgrounds";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import { absUrl, breadcrumbLd } from "@/lib/structuredData";
 import { LanguageCategories } from "./_components/LanguageCategories";
+import { PlaygroundHero } from "./_components/PlaygroundHero";
 import { RecentWorkspaces } from "./_components/RecentWorkspaces";
 
 const PAGE_TITLE = "Playground, Dataslope";
@@ -100,6 +101,8 @@ export default function PlaygroundPage() {
               languages, free, no setup, no sign-up.
             </p>
           </div>
+
+          <PlaygroundHero />
 
           <LanguageCategories />
 

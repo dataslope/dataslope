@@ -3,10 +3,27 @@
 import { useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
+import imageManifest from "@/lib/generated/images";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "../languageIcons";
+
+/** The playground illustration shown over the skeleton's call to action —
+ *  the same cut-out the /playground hero band uses, so the two surfaces
+ *  agree on what "the playgrounds" look like. Resolved once at module
+ *  scope; `null` (a slug with no promoted image) renders nothing rather
+ *  than a broken box. */
+const PLAYGROUND_ART_SLUG = "playground-hero-cutout";
+const playgroundArt = (() => {
+  const entry = imageManifest[PLAYGROUND_ART_SLUG];
+  if (!entry) return null;
+  return {
+    src: `/images/${PLAYGROUND_ART_SLUG}.${entry.formats[entry.formats.length - 1]}`,
+    width: entry.width,
+    height: entry.height,
+  };
+})();
 
 /**
  * Showcase embed of the real playground, driven by `playgroundId` from the
@@ -115,7 +132,32 @@ function PlaygroundFacade({
           ))}
         </div>
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6">
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
+          {/* The playground artwork sits above the call to action, and the
+              two are centered as one group rather than the button being
+              centered on its own. The negative margin pulls the button up
+              onto the lower part of the illustration so it reads as
+              belonging to it; the cut-out's own transparent margin means a
+              flush stack would leave an odd gap. Hidden on short cards,
+              where the art would crowd the button.
+
+              At rest it sits back at 80% so the Launch CTA stays the loudest
+              thing in the mock; hovering the facade (which also tints the
+              whole surface blue) brings it to full strength, the same lift
+              the code-line skeleton behind it makes. */}
+          {playgroundArt && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={playgroundArt.src}
+              width={playgroundArt.width}
+              height={playgroundArt.height}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+              className="pointer-events-none -mb-7 hidden w-[min(72%,320px)] select-none object-contain opacity-80 transition-opacity duration-200 group-hover:opacity-100 sm:block"
+            />
+          )}
           {/* Magic UI ShimmerButton with the brand-green shimmer as the accent
               edge; like the hero's PickerSelect trigger, the fill tracks the
               page surface (--color-fd-background) so it reads as part of the
@@ -134,7 +176,7 @@ function PlaygroundFacade({
             </span>
           </ShimmerButton>
           {suspended && (
-            <span className="text-center text-xs text-[var(--ds-gray-500)] transition-colors group-hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-400)] dark:group-hover:text-[var(--ds-blue-400)]">
+            <span className="mt-3 text-center text-xs text-[var(--ds-gray-500)] transition-colors group-hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-400)] dark:group-hover:text-[var(--ds-blue-400)]">
               Paused to free memory, relaunch to pick up where you left off.
             </span>
           )}

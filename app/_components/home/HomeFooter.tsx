@@ -93,10 +93,12 @@ export function HomeFooter() {
           /playground, /interview-prep, the dashboard, the share and quiz
           routes, and the error/not-found pages. */}
       <FooterPattern />
-      {/* pt-20/24 rather than pt-12: the pattern above needs clear air beneath
-          it, or the links read as part of the band rather than as the footer
-          proper. */}
-      <div className="mx-auto max-w-6xl px-4 pt-20 pb-20 sm:px-6 sm:pt-24 sm:pb-28">
+      {/* The pattern above still needs clear air beneath it, or the links read
+          as part of the band rather than as the footer proper — but less of it
+          than the pt-20/24 this used to carry: the band now fades out over its
+          last 64px (see `FooterPattern`), so a chunk of that separation is
+          drawn rather than padded. */}
+      <div className="mx-auto max-w-6xl px-4 pt-14 pb-20 sm:px-6 sm:pt-16 sm:pb-28">
         <div className="ds-footer-grid">
           {/* Column 1, logo (no wordmark) + GitHub at the bottom. */}
           <div className="flex flex-col justify-between gap-8">

@@ -1,0 +1,338 @@
+---
+title: Filtering Rows
+description: "Boolean expressions, combining conditions, membership tests, and the null trap that quietly drops rows."
+---
+
+`filter` keeps the rows where a Boolean expression is true. That
+sentence hides one detail that causes more bugs than any other in
+this course: a null is not true, and it is not false either.
+
+<Figure
+  slug="pl-filter-cutout"
+  alt="A friendly polar bear with warm cream fur and soft grey shading standing beside a wide yellow gate with one open doorway on a platform, two thick blue blocks passing through the opening and one thick red block stopped in front of the closed side"
+/>
+
+## The basics
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(penguins.filter(pl.col("species") == "Gentoo").height)
+print(penguins.filter(pl.col("body_mass_g") > 5000).height)
+print(penguins.filter(pl.col("island") != "Biscoe").height)
+`,
+    },
+  ]}
+/>
+
+## Combining conditions
+
+Several arguments to `filter` are combined with AND. For anything
+else, use the operators.
+
+| Logic | Operator |
+| --- | --- |
+| and | `&` |
+| or | `\|` |
+| not | `~` |
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# AND, the readable way
+print(penguins.filter(
+    pl.col("species") == "Adelie",
+    pl.col("body_mass_g") > 4000,
+).height)
+
+# OR needs the operator, and parentheses around each side
+print(penguins.filter(
+    (pl.col("species") == "Gentoo") | (pl.col("body_mass_g") > 5000)
+).height)
+
+# NOT
+print(penguins.filter(~(pl.col("island") == "Biscoe")).height)
+`,
+    },
+  ]}
+/>
+
+<Callout type="warn" title="Python's and / or / not do not work here">
+`pl.col("a") > 1 and pl.col("b") < 2` raises, because Python's `and`
+calls `__bool__` on the expression and an expression has no truth
+value. This is a hard error rather than a silent wrong answer, which
+is the good outcome. Use `&`, `|`, `~`, with parentheses.
+</Callout>
+
+## Membership and ranges
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(penguins.filter(pl.col("island").is_in(["Dream", "Torgersen"])).height)
+print(penguins.filter(pl.col("body_mass_g").is_between(3500, 4500)).height)
+
+# is_between takes a closed/left/right/none boundary rule
+print(penguins.filter(
+    pl.col("body_mass_g").is_between(3500, 4500, closed="left")
+).height)
+`,
+    },
+  ]}
+/>
+
+## String and null predicates
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `print(penguins.filter(pl.col("species").str.starts_with("A")).height)
+print(penguins.filter(pl.col("species").str.contains("in")).height)
+print(penguins.filter(pl.col("sex").is_null()).height)
+print(penguins.filter(pl.col("sex").is_not_null()).height)
+`,
+    },
+  ]}
+/>
+
+## The null trap
+
+This is the page's real lesson. Comparing anything with null gives
+null, and `filter` keeps only rows that are *true*. So a null row is
+dropped by a condition **and** by its negation.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"x": [1, None, 10]})
+
+print("x > 5      :", df.filter(pl.col("x") > 5).height)
+print("x <= 5     :", df.filter(pl.col("x") <= 5).height)
+print("total rows :", df.height)   # 1 + 1 != 3
+
+# The comparison itself shows why
+print(df.with_columns(gt=pl.col("x") > 5, le=pl.col("x") <= 5))
+`,
+    },
+  ]}
+/>
+
+One plus one does not make three. The null row vanished from both
+halves of what looked like an exhaustive split. If you need it, say
+so:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import polars as pl
+
+df = pl.DataFrame({"x": [1, None, 10]})
+
+# Keep the null rows explicitly
+print(df.filter((pl.col("x") <= 5) | pl.col("x").is_null()).height)
+
+# Or decide up front what a missing value counts as
+print(df.filter(pl.col("x").fill_null(0) <= 5).height)
+`,
+    },
+  ]}
+/>
+
+This is not a Polars quirk. It is SQL's three-valued logic, and
+pandas behaves the same way. Polars makes it visible sooner because
+it does not conflate null with `NaN` or with zero.
+
+## Filtering by a computed value
+
+The expression can reference aggregations of the same frame.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# Heavier than average
+print(penguins.filter(
+    pl.col("body_mass_g") > pl.col("body_mass_g").mean()
+).height)
+
+# Heavier than their own species' average, using a window
+print(penguins.filter(
+    pl.col("body_mass_g") > pl.col("body_mass_g").mean().over("species")
+).height)
+`,
+    },
+  ]}
+/>
+
+The second one is a preview of window expressions, which get their
+own page. `.over("species")` makes the mean a per-species mean while
+keeping one value per row.
+
+## Filtering groups rather than rows
+
+Sometimes the unit you want to keep or drop is a whole group.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `# Keep only islands with more than 100 penguins
+print(
+    penguins.filter(pl.len().over("island") > 100)
+    .group_by("island")
+    .agg(pl.len())
+    .sort("island")
+)
+`,
+    },
+  ]}
+/>
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  title="Filter without losing the nulls"
+  instructions={`From \`penguins\`, build \`light_or_unknown\`: every penguin whose \`body_mass_g\` is **at most 3500**, **plus** every penguin whose \`body_mass_g\` is missing.
+
+Then set \`n_split\` to the total number of rows you would get from \`body_mass_g <= 3500\` and \`body_mass_g > 3500\` combined, to show the gap.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import polars as pl
+penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
+      starterCode: `light_or_unknown = None  # TODO
+n_split = None  # TODO
+
+print(n_split, "of", penguins.height)
+`,
+      solutionCode: `light_or_unknown = penguins.filter(
+    (pl.col("body_mass_g") <= 3500) | pl.col("body_mass_g").is_null()
+)
+
+n_split = (
+    penguins.filter(pl.col("body_mass_g") <= 3500).height
+    + penguins.filter(pl.col("body_mass_g") > 3500).height
+)
+
+print(light_or_unknown.height, "kept")
+print(n_split, "of", penguins.height, "covered by the naive split")
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_frame",
+      name: "light_or_unknown is a DataFrame",
+      description: "Type check",
+      code: `import polars as pl
+assert isinstance(light_or_unknown, pl.DataFrame)`,
+    },
+    {
+      id: "count",
+      name: "Keeps the light penguins and the unknown ones",
+      description: "78 at or under 3500 g, plus 2 with no mass",
+      code: `assert light_or_unknown.height == 80, light_or_unknown.height`,
+    },
+    {
+      id: "nulls_kept",
+      name: "The two null masses survived",
+      description: "That is the point of the exercise",
+      code: `assert light_or_unknown["body_mass_g"].null_count() == 2`,
+    },
+    {
+      id: "columns",
+      name: "No columns were dropped",
+      description: "Filtering changes rows, not columns",
+      code: `assert light_or_unknown.columns == penguins.columns`,
+    },
+    {
+      id: "gap",
+      name: "n_split shows the two-way split loses the nulls",
+      description: "342, not 344",
+      code: `assert n_split == 342, n_split`,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`A frame has 100 rows and 5 nulls in \`x\`. How many rows do \`filter(x > 0)\` and \`filter(x <= 0)\` return between them?
+
+- 100, since every row satisfies exactly one of the two conditions
+  > That holds only when \`x\` is never null; a null satisfies neither condition.
+- 105, because the null rows are returned by both filters
+  > A null comparison is null rather than true, so those rows are returned by neither filter.
+- [o] 95, because the 5 null rows satisfy neither condition
+  > Add \`| pl.col("x").is_null()\` to whichever side should own them.
+- It depends on whether the nulls are stored as NaN or as null
+  > Polars keeps the two distinct, and a genuine null behaves this way regardless of what a float NaN would do.
+
+Two conditions that look exhaustive are not exhaustive when nulls are present.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does \`filter(pl.col("a") > 1 and pl.col("b") < 2)\` raise rather than silently misbehave?
+
+- Polars inspects the source code and rejects the \`and\` keyword
+  > No source inspection happens; the failure comes from ordinary Python semantics on an object that refuses to be coerced.
+- \`and\` is valid only inside \`when/then\` chains in Polars
+  > It is not valid anywhere in an expression; \`&\` is the operator for conjunction in every context.
+- [o] Python's \`and\` asks the expression for a truth value, and an expression refuses to give one
+  > \`__bool__\` raising is deliberate: returning an arbitrary answer would produce a silently wrong filter.
+- The two comparisons produce different column names, which cannot be combined
+  > Names play no part here; the error occurs before any frame or column naming is involved.
+
+Use \`&\`, \`|\`, and \`~\`, and parenthesise each comparison.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`filter(pl.len().over("island") > 100)\` do?
+
+- Keeps the first 100 rows of each island
+  > Taking the first rows per group is \`head\` inside a \`group_by\`; this expression compares group sizes instead.
+- [o] Keeps every row belonging to an island that has more than 100 rows
+  > \`over\` computes the group's size and broadcasts it to each of that group's rows, so the filter acts group-wise.
+- Keeps islands whose name is longer than 100 characters
+  > \`pl.len()\` counts rows in the window; string length would be \`str.len_chars()\`.
+- Returns one row per island, with those over 100 rows kept
+  > Filtering never collapses a frame; every surviving row of a qualifying island is returned.
+
+Filtering on a windowed aggregate is how you keep or drop whole groups without leaving the row level.`}
+/>

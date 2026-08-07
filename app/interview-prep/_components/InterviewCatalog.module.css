@@ -26,7 +26,11 @@
   inset: 6px -6px -6px 6px;
   border: 1px solid var(--ds-gray-200);
   border-radius: 16px;
-  background: repeating-linear-gradient(
+  /* Opaque page-coloured fill under the hatching: the gaps between the bands
+     are transparent, so without it the Tabbied backdrop behind the grid shows
+     through the shadow and the sliver stops reading as a second print. */
+  background-color: #ffffff;
+  background-image: repeating-linear-gradient(
     45deg,
     rgba(0, 0, 0, 0.06) 0,
     rgba(0, 0, 0, 0.06) 1px,
@@ -37,7 +41,8 @@
 }
 :global(.dark) .cardWrap::after {
   border-color: rgba(255, 255, 255, 0.1);
-  background: repeating-linear-gradient(
+  background-color: #121212;
+  background-image: repeating-linear-gradient(
     45deg,
     rgba(255, 255, 255, 0.05) 0,
     rgba(255, 255, 255, 0.05) 1px,

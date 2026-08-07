@@ -41,8 +41,8 @@ import { Menu } from "@base-ui/react/menu";
 import {
   createColumnHelper,
   flexRender,
-  getCoreRowModel,
-  useReactTable,
+  tableFeatures,
+  useTable,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
@@ -110,6 +110,17 @@ import { DiamondSpinner } from "./mdx/loadingAnimations";
 import styles from "./ChallengeCard.module.css";
 
 // ─── Types ────────────────────────────────────────────────────────────
+
+/** One row of the result grid: the source row plus its index, which is what
+ *  the column helper's accessors read. */
+type ResultRow = { __idx: number; row: unknown[] };
+
+/** TanStack Table v9 requires an explicit, tree-shakeable feature set in place
+ *  of v8's `get*RowModel()` options — the core row model is always present, so
+ *  this preview grid (no sorting, filtering, or pagination) needs no features
+ *  at all. Built once at module scope so its identity is stable across
+ *  renders. */
+const RESULT_TABLE_FEATURES = tableFeatures({});
 
 /** Supported SQL dialects. Each maps to a distinct WASM runtime in
  *  this codebase. */
@@ -2506,7 +2517,8 @@ export function VirtualizedResultTable({
     [values],
   );
   const columnHelper = useMemo(
-    () => createColumnHelper<{ __idx: number; row: unknown[] }>(),
+    () =>
+      createColumnHelper<typeof RESULT_TABLE_FEATURES, ResultRow>(),
     [],
   );
   const tableColumns = useMemo(
@@ -2526,13 +2538,17 @@ export function VirtualizedResultTable({
       ),
     [columns, columnHelper],
   );
-  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is required for the column / cell model.
-  const table = useReactTable({
+  const table = useTable({
+    features: RESULT_TABLE_FEATURES,
     data,
     columns: tableColumns,
-    getCoreRowModel: getCoreRowModel(),
   });
   const tableRows = table.getRowModel().rows;
+  // This suppression used to sit on `useReactTable`, where it masked the
+  // virtualizer's own report — the rule only names the first incompatible
+  // call in a component. React Table v9's `useTable` is compatible, so
+  // TanStack Virtual is now the only one left.
+  // eslint-disable-next-line react-hooks/incompatible-library -- row virtualization has no compatible alternative here.
   const rowVirtualizer = useVirtualizer({
     count: tableRows.length,
     getScrollElement: () => scrollRef.current,
@@ -2603,7 +2619,10 @@ export function VirtualizedResultTable({
                 data-index={vr.index}
                 ref={rowVirtualizer.measureElement}
               >
-                {row.getVisibleCells().map((cell) => (
+                {/* getAllCells, not getVisibleCells: v9 gates visibility
+                    behind `columnVisibilityFeature`, and this grid never
+                    hides a column, so the two return the same cells. */}
+                {row.getAllCells().map((cell) => (
                   <td key={cell.id} title={cellText(row.original.row[Number(cell.column.id)])}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
