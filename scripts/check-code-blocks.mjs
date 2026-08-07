@@ -301,6 +301,17 @@ async function ensurePackages(code) {
   if (implicit.length > 0) {
     await py.loadPackage(implicit, { messageCallback: () => {}, errorCallback: () => {} });
     for (const pkg of implicit) implicitLoaded.add(pkg);
+    // polars caches "is pyarrow available?" at import time, so a late pyarrow
+    // leaves .to_arrow()/.to_pandas() broken. See `repairPolarsForArrow` in the
+    // worker; the same trick on pandas is deliberately not done.
+    if (implicit.includes("pyarrow")) {
+      await py.runPythonAsync(`
+import sys
+if "polars" in sys.modules:
+    for _m in [k for k in list(sys.modules) if k == "polars" or k.startswith("polars.")]:
+        del sys.modules[_m]
+`);
+    }
   }
   const needed = Object.entries(MICROPIP_PACKAGES)
     .filter(

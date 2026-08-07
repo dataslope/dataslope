@@ -174,12 +174,8 @@ Months and years are not fixed lengths, so they only exist in
 
 ## Generating a date range
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import polars as pl
+```python
+import polars as pl
 from datetime import date
 
 days = pl.date_range(
@@ -191,21 +187,23 @@ months = pl.date_range(
     date(2026, 1, 1), date(2026, 6, 1), interval="1mo", eager=True
 )
 print(months.to_list())
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+Pyodide is 32-bit WebAssembly, and a nanosecond interval overflows the
+pointer-sized integer `date_range` uses internally, so it raises here whatever
+form the interval is given in.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
 
 A generated range is how you fill gaps: build every day you expect,
 left-join the days you have, and the missing ones show up as nulls
 rather than as absent rows nobody noticed.
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import polars as pl
+```python
+import polars as pl
 from datetime import date
 
 observed = pl.DataFrame(
@@ -224,10 +222,16 @@ calendar = pl.DataFrame(
 )
 
 print(calendar.join(observed, on="day", how="left").sort("day"))
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+Pyodide is 32-bit WebAssembly, and a nanosecond interval overflows the
+pointer-sized integer `date_range` uses internally, so it raises here whatever
+form the interval is given in.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
 
 March 2 and 5 are now visibly missing rather than silently absent.
 

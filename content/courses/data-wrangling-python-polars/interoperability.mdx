@@ -43,12 +43,8 @@ Arrow-backed columns instead: no copy of the values, and nulls stay
 nulls without changing the dtype.
 </Callout>
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import polars as pl
+```python
+import polars as pl
 
 df = pl.DataFrame({"n": [1, 2, None, 4]})
 
@@ -58,10 +54,17 @@ arrow_backed = df.to_pandas(use_pyarrow_extension_array=True)
 print("numpy-backed dtype:", numpy_backed["n"].dtype)
 print("arrow-backed dtype:", arrow_backed["n"].dtype)
 print(numpy_backed["n"].tolist())
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+pandas records whether pyarrow is importable when it is first imported, and
+caches the answer. In this runtime pandas loads with the page and pyarrow is
+fetched later, on the first call that needs it, so pandas has already decided
+Arrow is unavailable. Re-importing pandas to refresh that check changes how
+`read_csv` handles explicit dtypes and broke unrelated lessons, so the block is
+shown rather than run.
+</Callout>
+
 
 The integer column became `float64` on the NumPy path, because that
 is the only way NumPy can carry a missing value. This is the pandas

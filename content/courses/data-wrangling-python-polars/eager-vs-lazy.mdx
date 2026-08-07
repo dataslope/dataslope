@@ -14,14 +14,10 @@ executes until you ask.
 
 ## The two objects
 
-<CodeBlock
-  adapter="python"
-  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import polars as pl`,
-      starterCode: `eager = pl.read_csv("penguins.csv", null_values=["NA"])
+```python
+import polars as pl
+
+eager = pl.read_csv("penguins.csv", null_values=["NA"])
 lazy = pl.scan_csv("penguins.csv", null_values=["NA"])
 
 print(type(eager).__name__)
@@ -33,10 +29,15 @@ print(type(plan).__name__)
 
 # collect() is what runs it
 print(plan.collect().head(3))
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The Polars build that ships with Pyodide is compiled without the streaming
+engine, so `engine="streaming"` raises here.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
 
 | | Eager | Lazy |
 | --- | --- | --- |
@@ -83,14 +84,10 @@ are never materialized at all.
 
 ## Moving between the two
 
-<CodeBlock
-  adapter="python"
-  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import polars as pl`,
-      starterCode: `df = pl.read_csv("penguins.csv", null_values=["NA"])
+```python
+import polars as pl
+
+df = pl.read_csv("penguins.csv", null_values=["NA"])
 
 # Eager to lazy, to get the optimizer on an in-memory frame
 result = (
@@ -105,10 +102,15 @@ print(result)
 # Lazy to eager
 back = pl.scan_csv("penguins.csv", null_values=["NA"]).collect()
 print(type(back).__name__)
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The Polars build that ships with Pyodide is compiled without the streaming
+engine, so `engine="streaming"` raises here.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
 
 `df.lazy()` is free: it wraps the frame you already have in a plan.
 Worth doing for any chain of more than two or three steps, even when

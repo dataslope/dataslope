@@ -102,14 +102,10 @@ are.
 The gap between "I have done the exercises" and "I can use this" is
 one real dataset wide, and nothing here can close it for you.
 
-<CodeBlock
-  adapter="python"
-  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import polars as pl`,
-      starterCode: `# A blank slate on a dataset you know by now. Ask it something.
+```python
+import polars as pl
+
+# A blank slate on a dataset you know by now. Ask it something.
 (
     pl.scan_csv("penguins.csv", null_values=["NA"])
     .group_by("species", "island")
@@ -120,7 +116,12 @@ one real dataset wide, and nothing here can close it for you.
     .sort("species", "island")
     .collect()
 )
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The Polars build that ships with Pyodide is compiled without the streaming
+engine, so `engine="streaming"` raises here.
+The code is correct and works on a normal Polars install; it is shown
+here rather than run.
+</Callout>
+
