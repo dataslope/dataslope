@@ -187,12 +187,8 @@ Here is the algorithm for "find the maximum element of a list":
 
 Now the translation into C++ is almost mechanical:
 
-<CodeBlock
-  adapter="cpp"
-  files={[
-    {
-      filename: "main.cpp",
-      starterCode: `#include <iostream>
+```cpp
+#include <iostream>
 #include <stdexcept>
 #include <vector>
 
@@ -211,13 +207,17 @@ int max_element(const std::vector<int> &xs) {
 
 int main() {
   std::vector<int> v = {3, 1, 4, 1, 5, 9, 2, 6};
-  std::cout << "max = " << max_element(v) << "\\n";
+  std::cout << "max = " << max_element(v) << "\n";
   return 0;
 }
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The C++ toolchain behind these pages compiles with `-fno-exceptions`, because
+its WebAssembly sysroot ships no exception runtime at all. `throw` therefore
+does not compile here. The code is correct on any ordinary compiler; it is
+shown rather than run.
+</Callout>
 
 If you ever feel stuck staring at a blank editor, drop down a level:
 write the algorithm in English first, then translate.

@@ -69,12 +69,8 @@ Here is a hand-written RAII wrapper around C's `fopen`/`fclose` to
 make the pattern concrete. (In real code, use `std::ofstream`,
 which *is* a RAII wrapper around the OS file handle.)
 
-<CodeBlock
-  adapter="cpp"
-  files={[
-    {
-      filename: "main.cpp",
-      starterCode: `#include <cstdio>
+```cpp
+#include <cstdio>
 #include <iostream>
 #include <stdexcept>
 
@@ -93,7 +89,7 @@ public:
   File(const File &) = delete;
   File &operator=(const File &) = delete;
 
-  void writeln(const char *s) { std::fprintf(fp_, "%s\\n", s); }
+  void writeln(const char *s) { std::fprintf(fp_, "%s\n", s); }
 
 private:
   std::FILE *fp_;
@@ -105,15 +101,21 @@ int main() {
     f.writeln("hello from RAII");
     // no close needed: ~File runs here, no matter what.
   } catch (const std::exception &e) {
-    std::cerr << "error: " << e.what() << "\\n";
+    std::cerr << "error: " << e.what() << "\n";
   }
-  std::cout << "done\\n";
+  std::cout << "done\n";
   return 0;
 }
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The C++ toolchain behind these pages compiles with `-fno-exceptions`, because
+its WebAssembly sysroot ships no exception runtime at all, so both the `throw`
+and the `catch` above fail to compile here. That is a limitation of the
+in-browser compiler, not of the pattern: exception safety is exactly what
+makes RAII worth having, which is why the example keeps it. It is shown rather
+than run.
+</Callout>
 
 What you should notice:
 
