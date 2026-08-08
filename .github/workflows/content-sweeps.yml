@@ -473,14 +473,21 @@ jobs:
       # `playwright.config.ts` starts the dev server with a bare `next dev`,
       # which skips the generators `npm run dev` chains ahead of it. Without
       # these the routes 404 and every page reports "no code block".
+      #
+      # The list is derived from the `dev` script rather than copied, because a
+      # copy goes stale silently: `build-search-index.mjs` was deleted on main
+      # while this branch was open, and a hard-coded list would have failed the
+      # job on a missing file for reasons unrelated to any sweep.
       - name: Generate content sources
         run: |
-          npx fumadocs-mdx
-          for s in build-almostnode-workers build-search-index build-course-md \
-                   build-brand-fallbacks build-charts build-course-catalog \
-                   build-home-stats build-images; do
-            node "scripts/$s.mjs"
-          done
+          node -e "process.stdout.write(require('./package.json').scripts.dev
+            .split('&&').map(s => s.trim())
+            .filter(s => !s.startsWith('next '))
+            .join(' && '))" > .sweep-generators.sh
+          cat .sweep-generators.sh; echo
+          # npm puts node_modules/.bin on PATH for `npm run`; a bare `sh` does
+          # not, and `fumadocs-mdx` is only there.
+          PATH="$PWD/node_modules/.bin:$PATH" sh .sweep-generators.sh
 
       - name: Run check:browser
         env:
