@@ -387,24 +387,23 @@ Console.WriteLine($"sum = {sum} ({sw.Elapsed.TotalMilliseconds:F2} ms)");
  *  using directive that appears after a class or namespace declaration
  *  is intentionally left in place. Multi-line using directives (an
  *  extremely rare formatting style) are not stripped. */
-function stripCSharpUsings(source: string): string {
+function stripCSharpUsings(source: string): { usings: string[]; body: string } {
   const lines = source.split("\n");
+  const usings: string[] = [];
   let i = 0;
   while (i < lines.length) {
     const trimmed = lines[i].trim();
-    if (
-      trimmed === "" ||
-      trimmed.startsWith("//") ||
+    const isUsing =
       // Matches: using Ns;  using static Ns.T;  using A = Ns;  global using Ns;
-      (/^(?:global\s+)?using(?:\s+static)?\s/.test(trimmed) &&
-        trimmed.endsWith(";"))
-    ) {
+      /^(?:global\s+)?using(?:\s+static)?\s/.test(trimmed) && trimmed.endsWith(";");
+    if (trimmed === "" || trimmed.startsWith("//") || isUsing) {
+      if (isUsing) usings.push(trimmed);
       i++;
     } else {
       break;
     }
   }
-  return lines.slice(i).join("\n");
+  return { usings, body: lines.slice(i).join("\n") };
 }
 
 class CSharpRuntime implements LanguageRuntime {
@@ -440,16 +439,31 @@ class CSharpRuntime implements LanguageRuntime {
     const entry = options?.entryFilename ?? "Program.cs";
     const decoder = new TextDecoder();
     const extraBodies: string[] = [];
+    const extraUsings: string[] = [];
     for (const [path, bytes] of this.stagedFiles) {
       // Skip the entry file, its content is passed directly via
       // `code` and must not be appended again.
       if (path === entry) continue;
-      const body = stripCSharpUsings(decoder.decode(bytes));
+      const { usings, body } = stripCSharpUsings(decoder.decode(bytes));
+      extraUsings.push(...usings);
       if (body.trim()) extraBodies.push(body);
     }
     let combined = code;
     if (extraBodies.length > 0) {
-      combined = code + "\n" + extraBodies.join("\n");
+      // A sibling's `using` directives have to be *hoisted*, not discarded.
+      // Dropping them silently broke every multi-file workspace whose sibling
+      // needed an import the entry file did not already have: `Report.cs`
+      // opened with `using System.Globalization;` for `CultureInfo`, that line
+      // was stripped to keep Roslyn happy about ordering, and the script then
+      // failed to resolve the type. Roslyn reported it with exit code 0 and an
+      // empty stderr, so the block produced no output and no error, which is
+      // the hardest possible failure to diagnose from the page.
+      const hoisted = [...new Set(extraUsings)].filter((u) => !code.includes(u));
+      combined =
+        (hoisted.length > 0 ? `${hoisted.join("\n")}\n` : "") +
+        code +
+        "\n" +
+        extraBodies.join("\n");
     }
 
     let result;
