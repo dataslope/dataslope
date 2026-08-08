@@ -287,6 +287,29 @@ function emptyLabels(svg) {
  * Below `MIN_LEGIBLE_PX` the chart stops scaling and its container scrolls
  * instead, which is the same bargain a wide table makes.
  */
+/**
+ * The smallest type a spec may author.
+ *
+ * Not a style preference: it is the input to the floor below. A chart is one
+ * fixed drawing scaled to whatever column it lands in, so its smallest label
+ * decides how far it can shrink, and a single 9px annotation drags the whole
+ * chart's floor up by 65px of forced horizontal scrolling on a phone. 10px is
+ * where the library already sits (224 of 250 specs bottom out there), so
+ * holding the line costs nothing and keeps one chart's stray small label from
+ * making that chart worse than its neighbours for no benefit anyone chose.
+ *
+ * A spec whose *subject* is unreadably small type exports `smallTypeAllowed`
+ * with a reason, the same escape hatch `literalColorsAllowed` offers when the
+ * colours are the data.
+ */
+const MIN_AUTHORED_PX = 10;
+
+function undersizedType(svg) {
+  return [...svg.matchAll(/font-size[=:]\s*"?([0-9.]+)/g)]
+    .map((m) => Number(m[1]))
+    .filter((n) => n < MIN_AUTHORED_PX);
+}
+
 const MIN_LEGIBLE_PX = 8.5;
 
 /** Below this the floor is not worth publishing: the chart already fits the
@@ -357,6 +380,25 @@ for (const file of specs) {
         "use the SERIES/PRIMARY/MUTED/ACCENT tokens from charts/_theme.mjs so " +
         "the chart reads in both themes (or export literalColorsAllowed with " +
         "a reason, which is only right when the colours are the subject)",
+    );
+    continue;
+  }
+
+  if (mod.smallTypeAllowed && typeof mod.smallTypeAllowed !== "string") {
+    problems.push(
+      `${file}: smallTypeAllowed must be a string explaining why this chart's ` +
+        "type has to be smaller than the floor",
+    );
+    continue;
+  }
+  const tiny = mod.smallTypeAllowed ? [] : undersizedType(svg);
+  if (tiny.length > 0) {
+    problems.push(
+      `${file}: type below ${MIN_AUTHORED_PX}px (${[...new Set(tiny)].sort((a, b) => a - b).join(", ")}) — ` +
+        "a chart is one drawing scaled to its column, so its smallest label " +
+        "sets how far it can shrink before the whole thing has to scroll on a " +
+        "phone (or export smallTypeAllowed with a reason, which is only right " +
+        "when the unreadable type is the subject)",
     );
     continue;
   }

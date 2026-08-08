@@ -133,7 +133,7 @@ export function render() {
         frameAnchor: "bottom",
         text: (d) => `n = ${d.n}`,
         fill: (d) => (d.key === SMALLEST.key ? ACCENT : MUTED),
-        fontSize: 9.5,
+        fontSize: 10,
         fontWeight: 600,
         dy: 26,
         ...HALO,

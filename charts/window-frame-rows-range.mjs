@@ -63,8 +63,8 @@ export const caption = `Fourteen rows ordered by day, three of them sharing day 
 
 export function render() {
   return plot({
-    height: 290,
-    marginTop: 34,
+    height: 300,
+    marginTop: 54,
     marginLeft: 200,
     marginRight: 20,
     marginBottom: 46,
@@ -77,7 +77,7 @@ export function render() {
     },
     y: {
       label: null,
-      domain: [FRAMES.length - 0.4, -0.6],
+      domain: [FRAMES.length - 0.4, -0.78],
       ticks: FRAMES.map((_, i) => i),
       tickFormat: (i) => FRAMES[i].label,
       grid: false,
@@ -94,7 +94,7 @@ export function render() {
       Plot.ruleX([CURRENT], { stroke: GUIDE, strokeWidth: 1.6, strokeDasharray: "4 3" }),
       Plot.text([{}], {
         x: CURRENT,
-        y: -0.6,
+        y: -0.78,
         text: () => "current row",
         fill: GUIDE,
         fontSize: 11,
@@ -109,10 +109,10 @@ export function render() {
         DAYS.map((d, i) => ({ d, pos: i + 1 })),
         {
           x: "pos",
-          y: -0.44,
+          y: -0.78,
           text: (d) => `day ${d.d}`,
           fill: MUTED,
-          fontSize: 9,
+          fontSize: 10,
         },
       ),
       Plot.text(FRAMES, {

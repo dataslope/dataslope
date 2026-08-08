@@ -89,7 +89,7 @@ export function render() {
         y: (d, i) => TYPES[i].key,
         text: "key",
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         fontWeight: 600,
         textAnchor: "start",
         dx: 5,

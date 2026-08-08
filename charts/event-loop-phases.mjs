@@ -160,7 +160,7 @@ export function render() {
           y: (d) => d.y1 - 6,
           text: (d) => `${d.ms} ms`,
           fill: MUTED,
-          fontSize: 9,
+          fontSize: 10,
           textAnchor: "middle",
           ...HALO,
         },

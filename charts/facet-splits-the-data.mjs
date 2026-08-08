@@ -106,7 +106,7 @@ export function render() {
         text: (d) => `slope ${d.slope.toFixed(2)}`,
         fill: (d) =>
           d.panel === ALL ? MUTED : d.panel === STEEPEST.panel ? ACCENT : MUTED,
-        fontSize: 9,
+        fontSize: 10,
         fontWeight: 600,
         dy: 18,
         ...HALO,
@@ -116,7 +116,7 @@ export function render() {
         frameAnchor: "top-left",
         text: () => "no effect here",
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         fontWeight: 600,
         textAnchor: "start",
         dx: 3,

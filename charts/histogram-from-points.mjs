@@ -135,7 +135,7 @@ export function render() {
         frameAnchor: "top-right",
         text: () => `${BINS} bins, ${WIDTH} wide`,
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         fontWeight: 600,
         textAnchor: "end",
         dx: -4,

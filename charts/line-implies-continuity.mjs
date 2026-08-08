@@ -89,7 +89,7 @@ export function render() {
         y: 0,
         text: "label",
         fill: MUTED,
-        fontSize: 9,
+        fontSize: 10,
         dy: 15,
       }),
       Plot.text([{ panel: CATEGORY }], {

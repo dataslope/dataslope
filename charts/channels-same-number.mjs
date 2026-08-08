@@ -110,7 +110,7 @@ export function render() {
           y: "y",
           text: "note",
           fill: (d) => (d.note === "no order at all" ? ACCENT : MUTED),
-          fontSize: 9,
+          fontSize: 10,
           textAnchor: "end",
         },
       ),

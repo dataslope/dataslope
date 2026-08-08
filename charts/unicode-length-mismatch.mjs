@@ -65,7 +65,7 @@ export function render() {
         x: "n",
         text: (d) => String(d.n),
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         fontWeight: 600,
         textAnchor: "start",
         dx: 6,

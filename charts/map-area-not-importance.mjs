@@ -33,10 +33,10 @@ const REGIONS = [
   { key: "Lakeshore", x: 3, y: 0, w: 2, h: 2, pop: 2.1 },
   { key: "Midlands", x: 3, y: 2, w: 2, h: 2, pop: 1.8 },
   { key: "Riverbend", x: 3, y: 4, w: 2, h: 2, pop: 1.4 },
-  { key: "Harbour", x: 5, y: 0, w: 1, h: 1.5, pop: 4.6 },
-  { key: "Old Town", x: 5, y: 1.5, w: 1, h: 1.5, pop: 3.9 },
-  { key: "Eastgate", x: 5, y: 3, w: 1, h: 1.5, pop: 3.2 },
-  { key: "Docks", x: 5, y: 4.5, w: 1, h: 1.5, pop: 2.7 },
+  { key: "Harbour", x: 5, y: 0, w: 1.45, h: 1.5, pop: 4.6 },
+  { key: "Old Town", x: 5, y: 1.5, w: 1.45, h: 1.5, pop: 3.9 },
+  { key: "Eastgate", x: 5, y: 3, w: 1.45, h: 1.5, pop: 3.2 },
+  { key: "Docks", x: 5, y: 4.5, w: 1.45, h: 1.5, pop: 2.7 },
 ];
 
 const RATE = 12.4;
@@ -60,7 +60,11 @@ export const caption = `A choropleth encodes a value in a fill and, whether the 
 const W = 680;
 const H = 320;
 
-const MAP = { x0: 34, y0: 54, scale: 42 };
+// Scale trimmed so the widened dense column still clears the bar chart's
+// row labels. The dense regions are wide enough to hold a name at 10px:
+// a patch too small for its own label is a layout accident, and this
+// chart is about area meaning something, so its areas have to be read.
+const MAP = { x0: 30, y0: 54, scale: 38 };
 const BAR = { x0: 420, x1: 640, y0: 58, step: 26 };
 
 const patches = REGIONS.map((r) => ({
@@ -117,7 +121,7 @@ export function render() {
           y: (d) => (d.py1 + d.py2) / 2,
           text: (d) => `${d.key}\n${d.pop.toFixed(1)}m`,
           fill: MUTED,
-          fontSize: 9.5,
+          fontSize: 10,
           lineHeight: 1.3,
           textAnchor: "middle",
           ...HALO,
@@ -132,15 +136,15 @@ export function render() {
           y: (d) => (d.py1 + d.py2) / 2,
           text: (d) => `${d.key}\n${d.pop.toFixed(1)}m`,
           fill: MUTED,
-          fontSize: 8,
-          lineHeight: 1.3,
+          fontSize: 10,
+          lineHeight: 1.25,
           textAnchor: "middle",
           ...HALO,
         },
       ),
       Plot.text([{}], {
         x: MAP.x0,
-        y: MAP.y0 + 6 * MAP.scale + 18,
+        y: MAP.y0 + 6 * MAP.scale + 20,
         text: () => `two regions, ${AREA_SHARE}% of the page, ${POP_SHARE}% of the people`,
         fill: ACCENT,
         fontSize: 10.5,
@@ -171,7 +175,7 @@ export function render() {
         y: "cy",
         text: "key",
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         textAnchor: "end",
       }),
       Plot.text(bars, {
@@ -179,7 +183,7 @@ export function render() {
         y: "cy",
         text: (d) => `${d.pop.toFixed(1)}m`,
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         fontWeight: 600,
         textAnchor: "start",
       }),

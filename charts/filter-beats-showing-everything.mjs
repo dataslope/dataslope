@@ -157,7 +157,7 @@ export function render() {
         y: band[Math.floor(MONTHS / 2)].lo,
         text: () => `the other ${REST.length}, as a range`,
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         fontWeight: 600,
         textAnchor: "middle",
         dy: 12,

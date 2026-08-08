@@ -107,7 +107,7 @@ export function render() {
           frameAnchor: "top-left",
           text: (d) => `peaks at ${Math.round(d.top)}`,
           fill: MUTED,
-          fontSize: 9.5,
+          fontSize: 10,
           fontWeight: 600,
           textAnchor: "start",
           dx: 5,

@@ -114,7 +114,7 @@ export function render() {
           y: 0,
           text: "note",
           fill: MUTED,
-          fontSize: 9.5,
+          fontSize: 10,
           textAnchor: "middle",
           // Clear of the axis labels, which the top axis draws at y = 0 less
           // its own tick padding.

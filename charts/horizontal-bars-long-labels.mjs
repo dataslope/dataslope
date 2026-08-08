@@ -46,8 +46,12 @@ const H = 340;
 
 /** Hand-placed in pixel space: the two panels put the categories on different
  *  axes, so there is no shared pair of scales for a facet to share. */
-const LEFT = { x0: 118, x1: 288, y0: 44, y1: 214 };
-const RIGHT = { x0: 420, x1: 636, y0: 40, y1: 300 };
+/* The left panel is wide enough that its rotated labels are *legible*, which
+   is the claim the caption makes about them: rotation is the polite failure,
+   not an unreadable one. Nine names at 10px on a 45 degree diagonal need
+   about 24px of bar pitch to clear each other, so 216px of panel. */
+const LEFT = { x0: 96, x1: 312, y0: 44, y1: 210 };
+const RIGHT = { x0: 448, x1: 636, y0: 40, y1: 300 };
 
 const MAX = Math.max(...ITEMS.map((d) => d.v));
 
@@ -117,7 +121,7 @@ export function render() {
         y: LEFT.y1 + 7,
         text: "key",
         fill: MUTED,
-        fontSize: 9,
+        fontSize: 10,
         textAnchor: "end",
         rotate: 45,
       }),
@@ -154,7 +158,7 @@ export function render() {
         y: "cy",
         text: "key",
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         textAnchor: "end",
       }),
       Plot.text(horizontal, {
@@ -162,7 +166,7 @@ export function render() {
         y: "cy",
         text: (d) => String(d.v),
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         fontWeight: 600,
         textAnchor: "start",
       }),

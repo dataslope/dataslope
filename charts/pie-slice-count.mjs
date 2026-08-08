@@ -188,7 +188,7 @@ export function render() {
             y: "ly",
             text: "key",
             fill: MUTED,
-            fontSize: 9.5,
+            fontSize: 10,
             fontWeight: 600,
             textAnchor: anchor,
             ...HALO,

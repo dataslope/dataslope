@@ -17,6 +17,12 @@
  */
 import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, rng } from "./_theme.mjs";
 
+/** The 7.5px value labels are the subject: this chart exists to show what a
+ *  panel looks like when every number is printed on it, and printing them at
+ *  a readable size would be a different chart making the opposite point. */
+export const smallTypeAllowed =
+  "the left panel's unreadably small value labels are the thing being shown";
+
 export const title =
   "One series printed with a label on every point, where the numbers crowd out the line, and the same series clean with a single hover tooltip showing the detail for one point.";
 

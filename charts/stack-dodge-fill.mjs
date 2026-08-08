@@ -208,7 +208,7 @@ export function render() {
         y: BASE + 12,
         text: "label",
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         textAnchor: "middle",
       }),
 

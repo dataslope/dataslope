@@ -126,7 +126,7 @@ export function render() {
         y: 93,
         text: () => "Orders",
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         textAnchor: "start",
       }),
 

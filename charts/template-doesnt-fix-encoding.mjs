@@ -113,7 +113,7 @@ export function render() {
           frameAnchor: "top-left",
           text: () => `baseline ${p.floor}`,
           fill: p.floor === 0 ? MUTED : ACCENT,
-          fontSize: 9.5,
+          fontSize: 10,
           fontWeight: 600,
           textAnchor: "start",
           dx: 3,

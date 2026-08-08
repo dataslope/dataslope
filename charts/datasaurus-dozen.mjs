@@ -154,7 +154,7 @@ export function render() {
         text: (d) =>
           `x̄ ${d.mx.toFixed(1)}   ȳ ${d.my.toFixed(1)}   r ${d.r.toFixed(2)}\nsx ${d.sx.toFixed(1)}   sy ${d.sy.toFixed(1)}`,
         fill: MUTED,
-        fontSize: 9,
+        fontSize: 10,
         lineHeight: 1.4,
         dy: 52,
         ...HALO,

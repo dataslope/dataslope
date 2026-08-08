@@ -104,7 +104,7 @@ export function render() {
         y: "row",
         text: "label",
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         fontWeight: 600,
         textAnchor: "middle",
         dy: -22,
