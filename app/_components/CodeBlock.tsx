@@ -48,12 +48,7 @@ import { describeCodeBlock } from "./ai/widgetSnapshots";
 import { aiInlineCompletion } from "./ai/inlineCompletion";
 import { languageCompletion } from "./completion/languageCompletion";
 
-import type {
-  LanguageAdapter,
-  LanguageRuntime,
-  OutputCell,
-  PlotlyFigure,
-} from "./types";
+import type { LanguageAdapter, LanguageRuntime, OutputCell } from "./types";
 import {
   getSharedRuntime,
   isRuntimeReady,
@@ -67,7 +62,7 @@ import {
   type DatasetStageSpec,
 } from "./runtime/remoteDatasets";
 import { warmRuntimeOnRouteLand } from "./runtime/warmup";
-import { PLOTLY_CDN } from "./runtime/cdn";
+import { PlotlyChart } from "./PlotlyChart";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -1684,51 +1679,3 @@ function OutputSegment({ cell }: { cell: OutputCell }) {
   );
 }
 
-/** Minimal Plotly surface used for chart cells. Mirrors `Playground`'s
- *  `PlotlyChart`/`PlotlyAPI` so both consumers render charts the same
- *  way; kept in sync by hand because extracting a shared module would
- *  require bumping `Playground.tsx`'s import surface for no behavioural
- *  benefit. */
-interface PlotlyAPI {
-  newPlot(
-    el: HTMLElement,
-    data: unknown[],
-    layout?: Record<string, unknown>,
-    config?: Record<string, unknown>,
-  ): Promise<unknown>;
-}
-
-const PLOTLY_MARGIN = { l: 48, r: 24, t: 48, b: 48 };
-
-function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let cancelled = false;
-    void (async () => {
-      // Plotly is heavy and only needed when a chart actually renders, so we
-      // lazy-load it from jsDelivr on demand, keeping it out of the client
-      // bundle and the OpenNext Worker bundle (see PLOTLY_CDN in runtime/cdn).
-      const mod = await import(
-        /* webpackIgnore: true */ /* turbopackIgnore: true */ PLOTLY_CDN
-      );
-      if (cancelled || !ref.current) return;
-      const Plotly = (mod.default ?? mod) as unknown as PlotlyAPI;
-      // The Python runtime bakes the theme-appropriate template (plotly_dark in
-      // dark mode, plotly in light mode) into figure.layout.template, so we only
-      // set a default margin here and otherwise render the figure as-is.
-      const layout = { margin: PLOTLY_MARGIN, ...(figure.layout ?? {}) };
-      void Plotly.newPlot(el, figure.data, layout, {
-        responsive: true,
-        displayModeBar: true,
-        displaylogo: false,
-        modeBarButtonsToRemove: ["sendDataToCloud", "lasso2d"],
-      });
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [figure]);
-  return <div ref={ref} style={{ width: "100%" }} />;
-}

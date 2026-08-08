@@ -267,6 +267,46 @@ function emptyLabels(svg) {
   return [...svg.matchAll(/<text\b[^>]*>(?:<tspan\b[^>]*>\s*<\/tspan>)*<\/text>/g)].length;
 }
 
+/**
+ * The narrowest width this chart can be drawn at before its smallest label
+ * stops being readable.
+ *
+ * An inlined chart is responsive the cheap way: `width: 100%` on an SVG with a
+ * viewBox scales the whole drawing, type included. That is fine down to a
+ * point and then it is not. A 680px chart in a 358px phone column renders at
+ * 0.53x, which turns a 13px axis tick into 6.9px and a 9px annotation into
+ * 4.8px — present, and unreadable. The page never overflows and the chart
+ * looks fine in a screenshot, so nothing about it announces itself as broken.
+ *
+ * A single global floor would be wrong, because how far a chart can shrink
+ * depends on what it drew: a spec whose smallest type is a 13px tick has far
+ * more room than one carrying 9px annotations inside a facet grid. The build
+ * already has the answer in the markup, so it computes the floor per chart
+ * and the stylesheet enforces it, and specs stay unaware of any of it.
+ *
+ * Below `MIN_LEGIBLE_PX` the chart stops scaling and its container scrolls
+ * instead, which is the same bargain a wide table makes.
+ */
+const MIN_LEGIBLE_PX = 8.5;
+
+/** Below this the floor is not worth publishing: the chart already fits the
+ *  narrowest phone column with room to spare. */
+const IGNORE_BELOW_PX = 340;
+
+function legibleMinWidth(svg, width) {
+  const sizes = [...svg.matchAll(/font-size[=:]\s*"?([0-9.]+)/g)].map((m) =>
+    Number(m[1]),
+  );
+  if (sizes.length === 0) return 0;
+  const smallest = Math.min(...sizes);
+  // Scaling the SVG scales its type by the same factor, so a label of
+  // `smallest` px renders at `smallest * (w / width)`. Solve that for the w
+  // where it reaches the floor. Never ask for more than the chart's own
+  // width: at 1x every label is already the size the spec chose.
+  const floor = Math.min(width, Math.ceil((width * MIN_LEGIBLE_PX) / smallest));
+  return floor <= IGNORE_BELOW_PX ? 0 : floor;
+}
+
 const files = existsSync(CHARTS_DIR)
   ? readdirSync(CHARTS_DIR).filter((f) => f.endsWith(".mjs")).sort()
   : [];
@@ -342,11 +382,17 @@ for (const file of specs) {
     continue;
   }
 
+  const width = Number(el.getAttribute("width"));
+  const minWidth = legibleMinWidth(svg, width);
+
   charts[slug] = {
     title: mod.title,
     ...(mod.caption ? { caption: mod.caption } : {}),
-    width: Number(el.getAttribute("width")),
+    width,
     height: Number(el.getAttribute("height")),
+    // Omitted when the chart can shrink to any width without a label falling
+    // under the legibility floor, so the common case costs nothing.
+    ...(minWidth ? { minWidth } : {}),
     usedBy: usages[slug] ?? [],
     svg,
   };
