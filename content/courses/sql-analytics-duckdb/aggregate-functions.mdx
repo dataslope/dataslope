@@ -78,6 +78,12 @@ analysis:
   present values.
 - `COUNT(DISTINCT column)` counts the number of **different** values.
 
+The third one is the expensive one, because an exact distinct count has to
+remember every value it has seen. When approximate is good enough,
+`approx_count_distinct` answers from a few kilobytes instead:
+
+<Chart slug="approx-count-distinct-error" />
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Three kinds of counting"

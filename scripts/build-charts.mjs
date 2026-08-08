@@ -248,6 +248,25 @@ function stringifiedFunctions(svg) {
   return [...svg.matchAll(/([a-zA-Z-]+)="[^"]*=>[^"]*"/g)].map((m) => m[1]);
 }
 
+/**
+ * Count `<text>` elements that rendered with nothing in them.
+ *
+ * Almost always a tick whose label was thrown away. On a `type: "log"` scale
+ * d3 formats only the values it considers nice for the base, and returns an
+ * empty string for the rest — *including* values handed to it explicitly
+ * through `ticks`, and regardless of any `tickFormat` the spec supplies. So
+ * `ticks: [1, 16, 256, 4096, 65536]` on a base-10 log axis draws five ticks
+ * and labels two, with no warning from Plot and nothing wrong-looking in the
+ * spec. The fix is `base: 2` when the ticks are powers of two, or ticks that
+ * are powers of ten when they are not.
+ *
+ * A spec never has a reason to draw an empty string, so the check needs no
+ * exceptions: any empty text element is a label that went missing.
+ */
+function emptyLabels(svg) {
+  return [...svg.matchAll(/<text\b[^>]*>(?:<tspan\b[^>]*>\s*<\/tspan>)*<\/text>/g)].length;
+}
+
 const files = existsSync(CHARTS_DIR)
   ? readdirSync(CHARTS_DIR).filter((f) => f.endsWith(".mjs")).sort()
   : [];
@@ -308,6 +327,17 @@ for (const file of specs) {
       `${file}: function(s) stringified into ${[...new Set(leaked)].join(", ")} — ` +
         "these Plot options are constants, not channels, so the renderer drops " +
         "the value; use sidedText() from charts/_theme.mjs or split the mark",
+    );
+    continue;
+  }
+
+  const blank = emptyLabels(svg);
+  if (blank > 0) {
+    problems.push(
+      `${file}: ${blank} empty text element(s) — almost always a tick label ` +
+        "d3 declined to format. A log scale only labels the values that are " +
+        "nice for its base, whatever `ticks` and `tickFormat` say, so give the " +
+        "scale `base: 2` for powers of two or use powers of ten",
     );
     continue;
   }

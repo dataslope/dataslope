@@ -42,6 +42,11 @@ The buffer is unchanged. `a` is left in a valid but empty state
 (safe to destroy or reassign). `b` now owns the data. Total work:
 copying a few pointers and integers. Done.
 
+Which means the cost of a move does not depend on the size of what is
+being moved, and the cost of a copy is nothing but:
+
+<Chart slug="copy-vs-move-cost" />
+
 ## `std::move` is not the operation, it's a *cast*
 
 The name is a bit misleading. `std::move(x)` does **not** itself

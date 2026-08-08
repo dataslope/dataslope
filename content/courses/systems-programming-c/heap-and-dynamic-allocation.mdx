@@ -33,6 +33,13 @@ not magic, just a library function managing a big region of memory
 with ordinary data structures, free lists, size bins, boundary
 tags. Anyone can write one, and one person famously did.
 
+That distinction is worth a number. Crossing into the kernel costs a
+privilege switch and a copy across the boundary, per call, which is why
+the library batches: `malloc` asks the kernel for a large region rarely,
+and `FILE*` buffers writes for exactly the same reason.
+
+<Chart slug="syscall-vs-userspace-cost" />
+
 In 1987,
 computer science professor Doug Lea began writing a general-purpose
 allocator, **dlmalloc**, and placed it in the public domain. It was

@@ -185,6 +185,12 @@ When a column's value depends on more complex logic, fall back
 to `.apply`. It is slower than vectorized operations, but
 flexible.
 
+"Slower" understates it at scale. What costs is entering the Python
+interpreter, which a vectorized expression does a handful of times and
+`.apply` does once per row:
+
+<Chart slug="groupby-vectorized-speedup" />
+
 <CodeBlock
   adapter="python"
   files={[

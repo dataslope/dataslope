@@ -194,6 +194,14 @@ If you need byte length, encode first: `len(s.encode("utf-8"))`.
 
 You **cannot** mutate a string in place. Methods like `upper()`, `replace()`, and `strip()` return **new** strings.
 
+That has a consequence worth knowing before you write your first loop over
+text: `s += piece` inside a loop is not appending, it is copying everything
+accumulated so far into a fresh string each time.
+
+<Chart slug="string-concat-quadratic" />
+
+Use `"".join(pieces)` instead, which walks the list once.
+
 <CodeBlock
   adapter="python"
   files={[
