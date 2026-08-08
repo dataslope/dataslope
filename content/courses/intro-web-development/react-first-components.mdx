@@ -210,6 +210,7 @@ if (!/likes:\\s*1/i.test(h1.textContent || "")) {
       name: "Every click keeps counting",
       code: `const button = document.querySelector("button");
 button.click();
+await new Promise((r) => setTimeout(r, 80));
 button.click();
 await new Promise((r) => setTimeout(r, 80));
 const h1 = document.querySelector("h1");

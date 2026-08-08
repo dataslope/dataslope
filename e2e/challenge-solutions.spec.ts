@@ -162,11 +162,16 @@ async function runOneCard(
   // clicks landing as two. Everything is driven programmatically through
   // `window.__dsChallenges` so nothing else here needs the card visible;
   // this scroll is what makes the preview measurable.
-  await page
+  const cardRoot = page
     .locator(
       `[data-challenge-title="${card.title.replace(/"/g, '\\"')}"][data-adapter-id="${card.adapterId}"]`,
     )
-    .first()
+    .first();
+  // The preview slot, not the card's top edge: a card is tall enough that its
+  // heading can be on screen while the iframe underneath is still below the
+  // fold, and a document that is not being presented does not get laid out.
+  const preview = cardRoot.locator('[data-testid="web-preview"]').first();
+  await ((await preview.count()) > 0 ? preview : cardRoot)
     .scrollIntoViewIfNeeded()
     .catch(() => {});
 

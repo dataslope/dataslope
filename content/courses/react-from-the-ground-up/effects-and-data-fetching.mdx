@@ -288,7 +288,7 @@ for (const expected of ["Ada", "Grace", "Linus"]) {
     {
       id: "loading_gone",
       name: "The Loading… message is replaced",
-      code: `if (/loading/i.test(document.body.textContent || "")) {
+      code: `if (/loading/i.test((document.getElementById("root") || {}).textContent || "")) {
   throw new Error("Once data loads, 'Loading…' should no longer be shown, did you call setUsers?");
 }`,
     },
