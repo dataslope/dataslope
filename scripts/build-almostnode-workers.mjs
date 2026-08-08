@@ -46,7 +46,7 @@
 
 import { build } from "esbuild";
 import { mkdir, rm } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -114,10 +114,12 @@ const targets = [
   {
     entry: join(SRC_DIR, "javascript-worker.ts"),
     out: join(OUT_DIR, "javascript-worker.js"),
+    why: "almostnode",
   },
   {
     entry: join(SRC_DIR, "typescript-worker.ts"),
     out: join(OUT_DIR, "typescript-worker.js"),
+    why: "almostnode",
   },
   {
     // Pyodide 314 refuses to boot in classic workers, and Turbopack
@@ -128,14 +130,24 @@ const targets = [
     // pyodide.mjs from the CDN, so the bundle is tiny.
     entry: join(SRC_DIR, "pyodide-worker.ts"),
     out: join(OUT_DIR, "pyodide-worker.js"),
+    why: "pyodide",
   },
 ];
 
-for (const { entry, out } of targets) {
+/** Repo-relative, forward-slashed, so the line reads the same on Windows as it
+ *  does in CI and matches how the other generators name their outputs. */
+const shortPath = (abs) => relative(ROOT, abs).split(sep).join("/");
+
+for (const { entry, out, why } of targets) {
   await build({
     ...common,
     entryPoints: [entry],
     outfile: out,
   });
-  console.log(`[build-almostnode-workers] wrote ${out}`);
+  // Tagged for what this script does, not for the one dependency that first
+  // forced it to exist: only the JS/TS workers are almostnode-backed, and the
+  // Pyodide worker is here for an unrelated reason (see the docblock). The
+  // per-target suffix says which is which, so a slow line or a stale bundle
+  // points at the right cause.
+  console.log(`[build-workers] wrote ${shortPath(out)} (${why})`);
 }
