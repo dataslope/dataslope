@@ -193,20 +193,37 @@ export function createR2Client(creds = credentialsFromEnv(), bucket = creds.buck
     },
     /** List every key under a prefix, following continuation tokens. */
     async list(prefix) {
-      const keys = [];
+      return (await this.listDetailed(prefix)).map((o) => o.key);
+    },
+    /**
+     * As `list`, but keeping the size and last-modified each `<Contents>`
+     * already carries. Same requests, same pages — the plain `list` above was
+     * simply throwing this away, and asking for it afterwards would be a HEAD
+     * per object (5000+ round trips to weigh one prefix).
+     */
+    async listDetailed(prefix) {
+      const unescape = (s) =>
+        s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+      const out = [];
       let token;
       do {
         const query = { "list-type": "2", prefix };
         if (token) query["continuation-token"] = token;
         const res = await signedFetch(creds, { method: "GET", bucket, query });
         const xml = await res.text();
-        for (const m of xml.matchAll(/<Key>([^<]+)<\/Key>/g)) {
-          keys.push(m[1].replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">"));
+        for (const entry of xml.matchAll(/<Contents>([\s\S]*?)<\/Contents>/g)) {
+          const key = /<Key>([^<]*)<\/Key>/.exec(entry[1])?.[1];
+          if (key === undefined) continue;
+          out.push({
+            key: unescape(key),
+            size: Number(/<Size>(\d+)<\/Size>/.exec(entry[1])?.[1] ?? 0),
+            lastModified: /<LastModified>([^<]+)<\/LastModified>/.exec(entry[1])?.[1] ?? null,
+          });
         }
         const next = /<NextContinuationToken>([^<]+)<\/NextContinuationToken>/.exec(xml);
         token = next ? next[1] : undefined;
       } while (token);
-      return keys;
+      return out;
     },
   };
 }
