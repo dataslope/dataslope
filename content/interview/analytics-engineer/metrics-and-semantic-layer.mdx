@@ -95,6 +95,11 @@ JOIN order_items i ON i.order_id = o.order_id;
 -- True revenue is 100 + 50 = 150, but this returns 350.`}
 />
 
+What makes it dangerous rather than merely wrong is that the overcount scales
+with the fan-out and the result set never looks unusual:
+
+<Chart slug="join-fanout-rows" />
+
 ### How do you avoid double counting from a fan-out?
 
 Aggregate each grain **before** joining, or aggregate at the correct level. Sum
@@ -173,6 +178,12 @@ refunds, tax, canceled orders?), different grains, different date logic
 (order date vs ship date), or one dashboard hitting a fan trap. The cure is a
 shared definition in a semantic layer or a certified mart, so both dashboards
 derive from identical SQL instead of two analysts' interpretations.
+
+The gap also widens, which is what turns a definitional disagreement into a
+credibility problem: each definition weights a shift in traffic differently,
+so the numbers diverge exactly when everyone is looking at them.
+
+<Chart slug="metric-definition-drift" />
 
 ### What is governance in the metrics context?
 
