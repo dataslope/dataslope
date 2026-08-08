@@ -35,6 +35,7 @@
  * /api/admin/charts, which gates itself, so a non-admin gets this page exactly
  * as it was before the queue existed.
  */
+import { Fragment } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
@@ -118,6 +119,31 @@ function orderable([slug, chart]: Entry): Orderable {
 }
 
 const PAGE_COUNT = Math.max(1, Math.ceil(Object.keys(chartManifest).length / PER_PAGE));
+
+/** The date orderings, which are the two that get a date banner. */
+const DATED: readonly Ordering[] = ["newest", "oldest"];
+
+/**
+ * How many charts share each creation date, across the whole library.
+ *
+ * Specs arrive in bulk: at the time of writing, three commits account for every
+ * chart here, so a date ordering is mostly long runs of one timestamp. Inside a
+ * run `compareCreated` falls back to the slug, which is correct (the sort has
+ * to be total and stable) but means "oldest first" can render a page that is
+ * character-for-character "A→Z" and reads as a button that did nothing.
+ *
+ * Counting the runs lets the page say so. It is not a workaround for a broken
+ * comparator; the comparator is right and the underlying dates are real, and
+ * the fix for a control that looks dead is to show the reader what it did.
+ */
+const DATE_RUNS: ReadonlyMap<string, number> = (() => {
+  const runs = new Map<string, number>();
+  for (const slug of Object.keys(chartManifest)) {
+    const key = createdAt.charts[slug] ?? "";
+    runs.set(key, (runs.get(key) ?? 0) + 1);
+  }
+  return runs;
+})();
 
 const sortedBy = (sort: Ordering): Entry[] =>
   orderBy(Object.entries(chartManifest) as Entry[], sort, orderable);
@@ -240,8 +266,28 @@ export default async function AdminChartsPage(props: {
           />
 
           <div className={styles.list}>
-            {charts.map(([slug, chart]) => (
-              <section key={slug} className={styles.item} id={slug}>
+            {charts.map(([slug, chart], i) => {
+              // A banner whenever the date changes, and always at the top of a
+              // slice so every page says which run it is in rather than only
+              // the page the run started on.
+              const iso = createdAt.charts[slug] ?? "";
+              const previous = i === 0 ? null : (createdAt.charts[charts[i - 1][0]] ?? "");
+              const banner =
+                DATED.includes(sort) && iso !== previous ? (
+                  <h2 key={`when-${slug}`} className={styles.dateGroup}>
+                    {iso ? formatCreated(iso) : "Not committed yet"}
+                    <span className={styles.dateGroupNote}>
+                      {DATE_RUNS.get(iso) === 1
+                        ? "1 chart"
+                        : `${DATE_RUNS.get(iso)} charts, A→Z within the commit`}
+                    </span>
+                  </h2>
+                ) : null;
+
+              return (
+              <Fragment key={slug}>
+              {banner}
+              <section className={styles.item} id={slug}>
                 <header className={styles.head}>
                   <div className={styles.headMain}>
                     <h2 className={styles.slug}>{slug}</h2>
@@ -319,7 +365,9 @@ export default async function AdminChartsPage(props: {
                   <p className={styles.title}>{chart.title}</p>
                 </details>
               </section>
-            ))}
+              </Fragment>
+              );
+            })}
           </div>
 
           {PAGE_COUNT > 1 ? (
