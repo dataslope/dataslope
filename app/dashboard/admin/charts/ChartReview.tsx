@@ -40,7 +40,7 @@ import {
 } from "react";
 import { Check, Loader2, RefreshCw, Sparkles, ThumbsUp } from "lucide-react";
 import Link from "@/app/_components/Link";
-import type { ChartMarksPayload } from "@/app/api/admin/charts/route";
+import type { ChartMarksPayload, ChartQueueState } from "@/app/api/admin/charts/route";
 import { isAwaitingApproval, type RegenMark } from "@/lib/charts/regenMarks";
 import { ChartDelete } from "./ChartDelete";
 import styles from "./charts.module.css";
@@ -107,6 +107,9 @@ interface ReviewContext {
   /** Null until the fetch resolves; stays null for a non-admin. */
   marks: Record<string, MarkState> | null;
   available: boolean;
+  /** Why the queue is read-only, when it is: the two causes have different
+   *  fixes and reporting the wrong one sends people to the wrong file. */
+  state: ChartQueueState;
   maxNoteLength: number;
   onToggleMark: (slug: string, marked: boolean) => void;
   onNoteChange: (slug: string, note: string) => void;
@@ -118,11 +121,32 @@ interface ReviewContext {
   error: string | null;
 }
 
+/**
+ * What to say when the queue will not accept writes.
+ *
+ * `unreadable` is the one worth being specific about. The binding is declared
+ * in wrangler.jsonc so it is nearly always present; what is usually missing is
+ * the `chart_regen_marks` table, because it arrived after the
+ * `dataslope-illustrations` database already existed and a deployment only gets
+ * it by re-running the migration. Naming the command is the difference between
+ * a two-minute fix and an afternoon spent auditing bindings.
+ */
+const QUEUE_OFFLINE: Record<ChartQueueState, string> = {
+  ok: "",
+  unbound:
+    "ILLUSTRATIONS_DB is not bound on this deployment, so the queue is read-only.",
+  unreadable:
+    "The review table could not be read, which usually means the migration has " +
+    "not been applied to this database. Run `npm run db:migrate:illustrations:remote` " +
+    "(or `:illustrations` for a local one). Until then the queue is read-only.",
+};
+
 const Ctx = createContext<ReviewContext | null>(null);
 
 export function ChartReviewProvider({ children }: { children: React.ReactNode }) {
   const [marks, setMarks] = useState<Record<string, MarkState> | null>(null);
   const [available, setAvailable] = useState(false);
+  const [state, setState] = useState<ChartQueueState>("unbound");
   const [maxNoteLength, setMaxNoteLength] = useState(500);
   const [error, setError] = useState<string | null>(null);
 
@@ -144,6 +168,9 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
         for (const m of data.marks) next[m.promptId] = markStateFrom(m);
         setMarks(next);
         setAvailable(data.available);
+        // `state` predates nothing, but an older cached payload will not carry
+        // it; fall back to the boolean rather than claiming a cause.
+        setState(data.state ?? (data.available ? "ok" : "unbound"));
         setMaxNoteLength(data.maxNoteLength);
       } catch {
         // Network failure on an optional layer: the gallery is still the page.
@@ -255,6 +282,7 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
     () => ({
       marks,
       available,
+      state,
       maxNoteLength,
       onToggleMark,
       onNoteChange,
@@ -266,6 +294,7 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
     [
       marks,
       available,
+      state,
       maxNoteLength,
       onToggleMark,
       onNoteChange,
@@ -331,9 +360,7 @@ export function ChartReviewSummary({
           <dd>{queuedForDeletion.length}</dd>
         </div>
         {!ctx.available ? (
-          <p className={styles.queueOffline}>
-            Review database not bound; the queue is read-only.
-          </p>
+          <p className={styles.queueOffline}>{QUEUE_OFFLINE[ctx.state]}</p>
         ) : null}
       </dl>
 
@@ -381,11 +408,7 @@ export function ChartMarkControls({ slug, title }: { slug: string; title: string
           onClick={() => ctx.onToggleMark(slug, !mark.marked)}
           disabled={!ctx.available || mark.saving}
           aria-pressed={mark.marked}
-          title={
-            ctx.available
-              ? "Queue this chart for a redraw"
-              : "Review queue unavailable (ILLUSTRATIONS_DB not bound)"
-          }
+          title={ctx.available ? "Queue this chart for a redraw" : QUEUE_OFFLINE[ctx.state]}
         >
           {mark.saving ? (
             <Loader2 size={13} className={styles.spin} />
@@ -467,6 +490,7 @@ export function ChartDeleteControls({
       requested={Boolean(mark?.deleteRequestedAt)}
       requestedAt={mark?.deleteRequestedAt ?? null}
       available={Boolean(ctx?.available)}
+      unavailableReason={QUEUE_OFFLINE[ctx?.state ?? "unbound"]}
       onChange={ctx?.onDeleteRequestChange ?? (() => {})}
     />
   );
