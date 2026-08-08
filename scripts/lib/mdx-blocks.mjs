@@ -173,6 +173,33 @@ export function propString(raw, name) {
   return raw.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1];
 }
 
+/**
+ * A prop that carries text, in either syntax MDX allows: `name="value"` or
+ * ``name={`value`}``.
+ *
+ * `propString` alone was not enough and failed in the worst direction. Every
+ * SQL prop that matters (`initSql`, `starterCode`, `solutionSql`) is authored
+ * as a template literal, so `propString` returned undefined, the sweep ran an
+ * empty string, and twelve blocks reported as passing having executed nothing
+ * at all.
+ */
+export function propText(raw, name) {
+  const plain = propString(raw, name);
+  if (plain !== undefined) return plain;
+  const src = propSource(raw, name);
+  if (src === null) return undefined;
+  const trimmed = src.trim();
+  if (trimmed.startsWith("`")) {
+    const at = src.indexOf("`");
+    return readTemplate(src, at)[0];
+  }
+  // A quoted string inside braces, e.g. name={"value"}.
+  if (trimmed.startsWith('"') || trimmed.startsWith("'")) {
+    return trimmed.slice(1, -1);
+  }
+  return trimmed;
+}
+
 export function mdxFiles(dir) {
   const out = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -414,9 +441,9 @@ export function extractSqlBlocks(root = CONTENT_DIR, dialect = null) {
       line,
       dialect: d,
       title: propString(raw, "title") ?? "(untitled)",
-      initSql: propString(raw, "initSql") ?? "",
+      initSql: propText(raw, "initSql") ?? "",
       remoteInitSql: propString(raw, "remoteInitSql") ?? null,
-      sql: propString(raw, "starterCode") ?? "",
+      sql: propText(raw, "starterCode") ?? "",
     });
   }
   return blocks;
@@ -452,10 +479,10 @@ export function extractSqlCards(root = CONTENT_DIR, dialect = null) {
       line,
       title,
       dialect: d,
-      initSql: propString(raw, "initSql") ?? "",
+      initSql: propText(raw, "initSql") ?? "",
       remoteInitSql: propString(raw, "remoteInitSql") ?? null,
-      starterSql: propString(raw, "starterCode") ?? "",
-      solutionSql: propString(raw, "solutionSql") ?? null,
+      starterSql: propText(raw, "starterCode") ?? "",
+      solutionSql: propText(raw, "solutionSql") ?? null,
       tests,
     });
   }
