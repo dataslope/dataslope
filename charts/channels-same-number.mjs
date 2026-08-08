@@ -17,7 +17,7 @@
  * wrong more often. Hue and shape cannot answer it at all, because neither has
  * an order for a reader to consult, which is not a matter of difficulty.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
+import { Plot, plot, ACCENT, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
 
 export const title =
   "The same five values encoded seven ways in seven rows: position, length, angle, area, colour value, colour hue and shape, ordered from the most accurate channel to the least.";
