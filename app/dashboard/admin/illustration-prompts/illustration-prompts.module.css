@@ -692,3 +692,56 @@
   color: var(--fg);
   font-weight: 600;
 }
+
+/* ── Ordering, and when each illustration was made ─────────────────────────
+   A second toolbar row under the filter chips: those narrow what is shown and
+   these change the order, and one strip carrying both read as six filters. */
+
+.sortBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0 0 1.25rem;
+}
+
+.sortLabel {
+  margin-right: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sortBtn {
+  border: 1px solid var(--divider);
+  border-radius: 0.5rem;
+  background: var(--input);
+  padding: 0.3125rem 0.625rem;
+  font-size: 0.8125rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.sortBtn:hover {
+  background: var(--panel-hover);
+}
+
+.sortBtnOn {
+  border-color: transparent;
+  background: var(--ds-blue-600, #0878dd);
+  color: #ffffff;
+}
+
+.sortBtnOn:hover {
+  background: var(--ds-blue-700, #0064bd);
+}
+
+/* Under the slug, where the pipeline metadata already lives, rather than in
+   the title row: it is reference, not something to scan the grid by. */
+.created {
+  margin: 0.25rem 0 0;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}

@@ -25,6 +25,7 @@
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { requireAdmin } from "@/lib/auth/admin";
+import createdAt from "@/lib/generated/created-at";
 import imageManifest from "@/lib/generated/images";
 import {
   getIllustrationPrompts,
@@ -53,6 +54,11 @@ const CUTOUT_SUFFIX = "-cutout";
 export interface GalleryEntry extends IllustrationPromptEntry {
   cutout: { src: string; width: number; height: number } | null;
   hasOriginal: boolean;
+  /** ISO-8601 UTC of the commit that added this illustration's cut-out, or
+   *  null when it has never been committed (or the clone has no history to
+   *  read). The cut-out is the file the site serves, so its birth is the
+   *  illustration's; see scripts/build-created-at.mjs. */
+  createdAt: string | null;
 }
 
 export interface IllustrationGallery {
@@ -111,6 +117,7 @@ export async function GET(request: Request): Promise<Response> {
       ...e,
       cutout: cutoutFor(e.id),
       hasOriginal: Boolean(imageManifest[e.id]),
+      createdAt: createdAt.illustrations[e.id] ?? null,
     })),
     totalIllustrations: data.totalIllustrations,
     totalCourses: data.totalCourses,

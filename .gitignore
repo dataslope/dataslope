@@ -79,6 +79,7 @@ script-runner-src/__pycache__/
 /lib/generated/course-catalog.js
 /lib/generated/home-stats.js
 /lib/generated/charts.js
+/lib/generated/created-at.js
 
 # Playground audit output (e2e/playground-audit.spec.ts)
 audit-results/

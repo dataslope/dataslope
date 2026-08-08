@@ -42,6 +42,7 @@ import { Check, Loader2, RefreshCw, Sparkles, ThumbsUp } from "lucide-react";
 import Link from "@/app/_components/Link";
 import type { ChartMarksPayload } from "@/app/api/admin/charts/route";
 import { isAwaitingApproval, type RegenMark } from "@/lib/charts/regenMarks";
+import { ChartDelete } from "./ChartDelete";
 import styles from "./charts.module.css";
 
 /** How long typing has to pause before the note is written. Long enough that a
@@ -63,6 +64,10 @@ interface MarkState {
   saving: boolean;
   /** Set briefly after a successful write, to flash a tick. */
   justSaved: boolean;
+  /** ISO-8601 of an outstanding request to delete this chart from the repo,
+   *  null when none. The gallery cannot delete anything, so this is a decision
+   *  waiting on a commit; see ChartDelete.tsx. */
+  deleteRequestedAt: string | null;
 }
 
 const EMPTY_MARK: MarkState = {
@@ -73,6 +78,7 @@ const EMPTY_MARK: MarkState = {
   regeneratedAt: null,
   saving: false,
   justSaved: false,
+  deleteRequestedAt: null,
 };
 
 function markStateFrom(mark: RegenMark): MarkState {
@@ -84,6 +90,7 @@ function markStateFrom(mark: RegenMark): MarkState {
     regeneratedAt: mark.regeneratedAt,
     saving: false,
     justSaved: false,
+    deleteRequestedAt: mark.deleteRequestedAt,
   };
 }
 
@@ -105,6 +112,9 @@ interface ReviewContext {
   onNoteChange: (slug: string, note: string) => void;
   onNoteCommit: (slug: string) => void;
   onApprove: (slug: string) => void;
+  /** Written by ChartDelete after its own request, so the button's state and
+   *  the summary count both follow one source. */
+  onDeleteRequestChange: (slug: string, requestedAt: string | null) => void;
   error: string | null;
 }
 
@@ -236,6 +246,11 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
 
   const onApprove = useCallback((slug: string) => void save(slug, { approve: true }), [save]);
 
+  const onDeleteRequestChange = useCallback(
+    (slug: string, requestedAt: string | null) => patch(slug, { deleteRequestedAt: requestedAt }),
+    [patch],
+  );
+
   const value = useMemo<ReviewContext>(
     () => ({
       marks,
@@ -245,6 +260,7 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
       onNoteChange,
       onNoteCommit,
       onApprove,
+      onDeleteRequestChange,
       error,
     }),
     [
@@ -255,6 +271,7 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
       onNoteChange,
       onNoteCommit,
       onApprove,
+      onDeleteRequestChange,
       error,
     ],
   );
@@ -271,10 +288,16 @@ export function ChartReviewSummary({
   slugs,
   perPage,
   currentPage,
+  /** URL prefix for the current ordering, so a jump link lands on the page
+   *  that really holds the slug. `slugs` arrives already sorted, and the page
+   *  a chart sits on depends on that ordering, so a link built against the
+   *  default sort would be wrong on every other one. */
+  basePath,
 }: {
   slugs: string[];
   perPage: number;
   currentPage: number;
+  basePath: string;
 }) {
   const ctx = useContext(Ctx);
   if (!ctx?.marks) return null;
@@ -283,12 +306,12 @@ export function ChartReviewSummary({
   const known = slugs.filter((s) => marks[s]);
   const marked = known.filter((s) => marks[s].marked);
   const awaiting = known.filter((s) => !marks[s].marked && marks[s].awaitingApproval);
+  const queuedForDeletion = known.filter((s) => marks[s].deleteRequestedAt);
 
   const pageOf = (slug: string) => Math.floor(slugs.indexOf(slug) / perPage) + 1;
   const hrefFor = (slug: string) => {
     const n = pageOf(slug);
-    const base = n <= 1 ? "/dashboard/admin/charts" : `/dashboard/admin/charts/${n}`;
-    return `${base}#${slug}`;
+    return `${n <= 1 ? basePath : `${basePath}/${n}`}#${slug}`;
   };
   const elsewhere = (list: string[]) => list.filter((s) => pageOf(s) !== currentPage);
 
@@ -302,6 +325,10 @@ export function ChartReviewSummary({
         <div className={styles.stat}>
           <dt>Awaiting approval</dt>
           <dd>{awaiting.length}</dd>
+        </div>
+        <div className={styles.stat}>
+          <dt>Queued for deletion</dt>
+          <dd>{queuedForDeletion.length}</dd>
         </div>
         {!ctx.available ? (
           <p className={styles.queueOffline}>
@@ -410,5 +437,37 @@ export function ChartMarkControls({ slug, title }: { slug: string; title: string
         />
       </div>
     </div>
+  );
+}
+
+/**
+ * The deletion-request control for one figure, wired to the queue.
+ *
+ * Separate from `ChartMarkControls` and deliberately more forgiving: that
+ * component returns null until the marks fetch resolves and for anyone who is
+ * not an admin, which is right for a redraw queue nobody else can write to.
+ * This one renders regardless and disables itself instead, because a control
+ * that silently is not there reads as a missing feature rather than as a
+ * permission, and because the button is the only place the outstanding request
+ * is visible on the figure itself.
+ */
+export function ChartDeleteControls({
+  slug,
+  usedBy,
+}: {
+  slug: string;
+  usedBy: string[];
+}) {
+  const ctx = useContext(Ctx);
+  const mark = ctx?.marks?.[slug];
+  return (
+    <ChartDelete
+      slug={slug}
+      usedBy={usedBy}
+      requested={Boolean(mark?.deleteRequestedAt)}
+      requestedAt={mark?.deleteRequestedAt ?? null}
+      available={Boolean(ctx?.available)}
+      onChange={ctx?.onDeleteRequestChange ?? (() => {})}
+    />
   );
 }

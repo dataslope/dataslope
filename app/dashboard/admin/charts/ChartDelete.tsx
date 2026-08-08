@@ -1,36 +1,32 @@
 "use client";
 
 /**
- * The per-figure delete control on the chart gallery.
+ * The per-figure "request deletion" control on the chart gallery.
  *
- * What it deletes is `charts/<slug>.mjs` in the working tree, which is the
- * only thing a chart actually *is*: the SVG on this page and the entry in
- * `lib/generated/charts.js` are both outputs of that file. So the button
- * exists only under `next dev`, where the app is running from a checkout and
- * the file is reachable; the page hides it otherwise and the route 404s. See
- * the header comment in app/api/admin/charts/route.ts for why a production
- * version of this could not do anything real.
+ * It does not delete anything, and could not: a chart is `charts/<slug>.mjs`,
+ * a file in git compiled into the deployed bundle at build time, so removing
+ * one is a commit. What this records is the *decision*, taken by the person
+ * actually looking at the figure, into `chart_regen_marks.delete_requested_at`
+ * for whoever is next in the repository. Reading the queue back and clearing a
+ * request is documented in `migrations-illustrations/0004_…`.
  *
- * Two things make the confirmation more than a speed bump:
+ * Two things make the confirmation worth a dialog rather than a second click:
  *
- *   • It names the file, so it is obvious the action is a filesystem
- *     operation on your own tree rather than a change to some record.
- *   • It lists the lessons the chart is placed in, because that is what the
- *     deletion breaks. A `<Chart slug="…">` tag whose spec has gone renders
- *     the dev-only "no chart with this slug" notice instead of a figure, and
- *     nothing fails the build, so an unplaced-first deletion is quiet and a
- *     placed-first one is a job half done. The count is the difference
- *     between "go ahead" and "edit two lessons first".
+ *   • It says plainly that nothing is deleted yet, so nobody goes looking for
+ *     a file that is still there, and nobody assumes the job is done.
+ *   • It lists the lessons the chart is placed in, because that is the work the
+ *     request implies. A `<Chart slug="…">` tag whose spec has gone renders the
+ *     dev-only "no chart with this slug" notice and fails no build, so deleting
+ *     a placed chart without editing its lessons is a job half done. The count
+ *     is the difference between "go ahead" and "two lessons to edit first".
  *
- * After a successful delete the section is collapsed to a short receipt in
- * place rather than removed, because the gallery is a static server component
- * sliced by route segment: dropping the node would leave a hole in a
- * twelve-item page and a reload would still show the chart until
- * `build:charts` runs again. Saying so is more useful than pretending.
+ * The request is a toggle: withdrawing is the same button, so a misclick is
+ * undone here rather than with a hand-written UPDATE. Withdrawal skips the
+ * dialog, because the destructive direction is the one worth interrupting.
  */
 import { useState } from "react";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
-import { Loader2, Trash2, TriangleAlert } from "lucide-react";
+import { Loader2, Trash2, TriangleAlert, Undo2 } from "lucide-react";
 import type { ChartDeletePayload } from "@/app/api/admin/charts/route";
 import styles from "./charts.module.css";
 
@@ -38,79 +34,94 @@ interface ChartDeleteProps {
   slug: string;
   /** Lesson titles the chart is currently placed in, for the warning. */
   usedBy: string[];
+  /** Whether a request is already outstanding, from the queue fetch. */
+  requested: boolean;
+  /** ISO-8601 of the outstanding request, for the "asked for on" line. */
+  requestedAt: string | null;
+  /** Whether the queue is reachable at all (ILLUSTRATIONS_DB bound, admin
+   *  session present). Without it the control is inert rather than absent, so
+   *  the page does not silently lose a feature. */
+  available: boolean;
+  onChange: (slug: string, requestedAt: string | null) => void;
 }
 
-type Status = "idle" | "deleting" | "deleted" | "error";
+/** "3 Aug 2026", matching the queue's other date chip. */
+function shortDate(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
 
-export function ChartDelete({ slug, usedBy }: ChartDeleteProps) {
+export function ChartDelete({
+  slug,
+  usedBy,
+  requested,
+  requestedAt,
+  available,
+  onChange,
+}: ChartDeleteProps) {
   const [open, setOpen] = useState(false);
-  const [status, setStatus] = useState<Status>("idle");
-  const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  async function remove() {
-    setStatus("deleting");
-    setMessage("");
+  async function send(next: boolean) {
+    setSaving(true);
+    setError("");
     try {
       const res = await fetch("/api/admin/charts", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug }),
+        body: JSON.stringify({ slug, requested: next }),
       });
-      const data = (await res.json()) as ChartDeletePayload & {
-        error?: string;
-      };
+      const data = (await res.json()) as ChartDeletePayload & { error?: string };
       if (!res.ok) {
-        setStatus("error");
-        setMessage(data.error ?? "Couldn't delete that spec file.");
+        setError(data.error ?? "Couldn't record that request.");
         return;
       }
-      setStatus("deleted");
-      setMessage(data.removed);
+      onChange(slug, data.mark.deleteRequestedAt);
     } catch {
-      setStatus("error");
-      setMessage("Couldn't reach the server.");
+      setError("Couldn't reach the server.");
     } finally {
+      setSaving(false);
       setOpen(false);
     }
-  }
-
-  if (status === "deleted") {
-    return (
-      <p className={styles.deleteDone}>
-        Deleted <code>{message}</code>. Run <code>npm run build:charts</code> to
-        drop it from the manifest
-        {usedBy.length > 0 ? (
-          <>
-            , and remove the{" "}
-            <code>&lt;Chart slug=&quot;{slug}&quot; /&gt;</code> tag from{" "}
-            {usedBy.length} lesson{usedBy.length === 1 ? "" : "s"}
-          </>
-        ) : null}
-        .
-      </p>
-    );
   }
 
   return (
     <>
       <button
         type="button"
-        className={styles.deleteBtn}
-        onClick={() => setOpen(true)}
-        disabled={status === "deleting"}
-        aria-label={`Delete the spec for ${slug}`}
+        className={`${styles.deleteBtn} ${requested ? styles.deleteBtnOn : ""}`}
+        onClick={() => (requested ? send(false) : setOpen(true))}
+        disabled={saving || !available}
+        aria-pressed={requested}
+        title={
+          available
+            ? requested
+              ? "Withdraw the deletion request"
+              : "Ask for this chart to be deleted from the repository"
+            : "Review queue unavailable (ILLUSTRATIONS_DB not bound)"
+        }
       >
-        {status === "deleting" ? (
+        {saving ? (
           <Loader2 size={14} className={styles.spin} aria-hidden="true" />
+        ) : requested ? (
+          <Undo2 size={14} aria-hidden="true" />
         ) : (
           <Trash2 size={14} aria-hidden="true" />
         )}
-        Delete spec
+        {requested ? "Withdraw deletion request" : "Request deletion"}
       </button>
 
-      {status === "error" ? (
+      {requested && requestedAt ? (
+        <span className={styles.deleteChip}>Queued for deletion {shortDate(requestedAt)}</span>
+      ) : null}
+
+      {error ? (
         <span className={styles.deleteError} role="status">
-          {message}
+          {error}
         </span>
       ) : null}
 
@@ -119,48 +130,38 @@ export function ChartDelete({ slug, usedBy }: ChartDeleteProps) {
           <AlertDialog.Backdrop className={styles.confirmBackdrop} />
           <AlertDialog.Popup className={styles.confirmPopup}>
             <AlertDialog.Title className={styles.confirmTitle}>
-              Delete <code>charts/{slug}.mjs</code>?
+              Request deletion of <code>{slug}</code>?
             </AlertDialog.Title>
-            <AlertDialog.Description
-              className={styles.confirmDesc}
-              render={<div />}
-            >
+            <AlertDialog.Description className={styles.confirmDesc} render={<div />}>
               <p>
-                This removes the spec file from your working tree. The figure
-                stays on this page until you run{" "}
-                <code>npm run build:charts</code>, which regenerates the
-                manifest.
+                This does not delete anything. It records the decision in the
+                review database, and <code>charts/{slug}.mjs</code> stays where
+                it is until someone removes it in the repository and commits.
               </p>
               {usedBy.length > 0 ? (
                 <p className={styles.confirmWarn}>
                   <TriangleAlert size={15} aria-hidden="true" />
                   <span>
                     It is placed in {usedBy.length} lesson
-                    {usedBy.length === 1 ? "" : "s"}:{" "}
-                    <strong>{usedBy.join(", ")}</strong>. Those pages will show
-                    a missing-chart notice until you remove the tags.
+                    {usedBy.length === 1 ? "" : "s"}: <strong>{usedBy.join(", ")}</strong>.
+                    Those tags have to go with it, or the pages will show a
+                    missing-chart notice.
                   </span>
                 </p>
               ) : (
                 <p className={styles.confirmQuiet}>
-                  It is not placed in any lesson, so nothing else needs editing.
+                  It is not placed in any lesson, so the spec file is the only
+                  thing to remove.
                 </p>
               )}
               <p className={styles.confirmQuiet}>
-                Nothing is committed, so <code>git restore</code> brings it
-                back.
+                You can withdraw the request from the same button afterwards.
               </p>
             </AlertDialog.Description>
             <div className={styles.confirmActions}>
-              <AlertDialog.Close className={styles.confirmCancel}>
-                Cancel
-              </AlertDialog.Close>
-              <button
-                type="button"
-                className={styles.confirmDanger}
-                onClick={remove}
-              >
-                Delete spec
+              <AlertDialog.Close className={styles.confirmCancel}>Cancel</AlertDialog.Close>
+              <button type="button" className={styles.confirmDanger} onClick={() => send(true)}>
+                Request deletion
               </button>
             </div>
           </AlertDialog.Popup>

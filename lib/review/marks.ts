@@ -59,6 +59,11 @@ export interface RegenMark {
   regeneratedAt: string | null;
   /** ISO-8601 UTC stamped when a redo was last signed off, null if never. */
   approvedAt: string | null;
+  /** ISO-8601 UTC stamped when someone asked for this artefact to be deleted
+   *  from the repository, null when no request is outstanding. */
+  deleteRequestedAt: string | null;
+  /** Why deletion was asked for, "" when no reason was given. */
+  deleteReason: string;
 }
 
 interface MarkRow {
@@ -68,6 +73,8 @@ interface MarkRow {
   updated_at: string;
   regenerated_at: string | null;
   approved_at: string | null;
+  delete_requested_at: string | null;
+  delete_reason: string | null;
 }
 
 function toMark(row: MarkRow): RegenMark {
@@ -78,6 +85,8 @@ function toMark(row: MarkRow): RegenMark {
     updatedAt: row.updated_at,
     regeneratedAt: row.regenerated_at,
     approvedAt: row.approved_at,
+    deleteRequestedAt: row.delete_requested_at,
+    deleteReason: row.delete_reason ?? "",
   };
 }
 
@@ -121,7 +130,8 @@ export async function listRegenMarks(
 ): Promise<RegenMark[]> {
   const { results } = await db
     .prepare(
-      `SELECT prompt_id, marked, note, updated_at, regenerated_at, approved_at
+      `SELECT prompt_id, marked, note, updated_at, regenerated_at, approved_at,
+              delete_requested_at, delete_reason
          FROM ${queueTable(queue)}
         ORDER BY marked DESC, updated_at ASC`,
     )
@@ -137,7 +147,8 @@ export async function readMark(
 ): Promise<RegenMark | null> {
   const row = await db
     .prepare(
-      `SELECT prompt_id, marked, note, updated_at, regenerated_at, approved_at
+      `SELECT prompt_id, marked, note, updated_at, regenerated_at, approved_at,
+              delete_requested_at, delete_reason
          FROM ${queueTable(queue)} WHERE prompt_id = ?`,
     )
     .bind(promptId)
@@ -196,6 +207,8 @@ export async function upsertRegenMark(
       updatedAt: now,
       regeneratedAt: null,
       approvedAt: null,
+      deleteRequestedAt: null,
+      deleteReason: "",
     }
   );
 }
@@ -224,4 +237,75 @@ export async function approveRegenMark(
     .bind(now, input.approvedBy ?? null, now, input.promptId)
     .run();
   return readMark(db, queue, input.promptId);
+}
+
+/**
+ * Ask for an artefact to be deleted from the repository, or withdraw the ask.
+ *
+ * The gallery cannot do the deletion. A chart is `charts/<slug>.mjs` and an
+ * illustration is a file under `public/images/`, both of them in git and
+ * compiled into the deployed bundle at build time, so removing one is a commit
+ * and a commit is something a person or a coding agent makes. What the gallery
+ * can do is record the decision, taken by the one person actually looking at
+ * the artefact, and hand it to whoever is next in the repository. The SQL for
+ * reading the queue back and clearing a request is in
+ * `migrations-illustrations/0004_…`.
+ *
+ * The request is its own field rather than another value of `marked`, because
+ * the two mean opposite things about the artefact's future: `marked` says redo
+ * this one, and a deletion request says do not. An artefact can carry both at
+ * once (queued for a redraw last month, judged not worth keeping today) and
+ * the gallery shows the deletion, since it is the decision that supersedes.
+ *
+ * Upsert, so a chart with no review history can still be requested without a
+ * mark being invented for it first.
+ */
+export async function requestDeletion(
+  db: D1Database,
+  queue: QueueName,
+  input: {
+    promptId: string;
+    requested: boolean;
+    reason: string;
+    requestedBy?: string | null;
+  },
+): Promise<RegenMark> {
+  const now = new Date().toISOString();
+  const reason = input.requested ? normalizeNote(input.reason) : "";
+  const requestedAt = input.requested ? now : null;
+  await db
+    .prepare(
+      `INSERT INTO ${queueTable(queue)}
+         (prompt_id, marked, note, created_at, updated_at,
+          delete_requested_at, delete_requested_by, delete_reason)
+       VALUES (?, 0, '', ?, ?, ?, ?, ?)
+       ON CONFLICT(prompt_id) DO UPDATE SET
+         delete_requested_at = excluded.delete_requested_at,
+         delete_requested_by = excluded.delete_requested_by,
+         delete_reason       = excluded.delete_reason,
+         updated_at          = excluded.updated_at`,
+    )
+    .bind(
+      input.promptId,
+      now,
+      now,
+      requestedAt,
+      input.requested ? (input.requestedBy ?? null) : null,
+      reason,
+    )
+    .run();
+
+  const row = await readMark(db, queue, input.promptId);
+  return (
+    row ?? {
+      promptId: input.promptId,
+      marked: false,
+      note: "",
+      updatedAt: now,
+      regeneratedAt: null,
+      approvedAt: null,
+      deleteRequestedAt: requestedAt,
+      deleteReason: reason,
+    }
+  );
 }
