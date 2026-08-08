@@ -59,11 +59,13 @@ Production and preview deploys run through Cloudflare Workers Builds rather than
 | Field | Value |
 | --- | --- |
 | Build command | `npx opennextjs-cloudflare build` |
-| Deploy command | `npx opennextjs-cloudflare deploy` |
+| Deploy command | `npx opennextjs-cloudflare deploy && npx wrangler d1 execute dataslope-search --remote --file=lib/generated/search-seed.sql` |
 | Non-production branch deploy command | `npx opennextjs-cloudflare upload` |
 | Path | `/` |
 
 Both `deploy` (production) and `upload` (preview versions) populate the R2 cache before shipping, `upload` wraps `wrangler versions upload`, so previews get the same populated cache production does. `Path` is `/` because this Worker lives at the repo root; the CORS proxy under `cloudflare-cors-proxy/` is a separate Worker with its own config.
+
+The search re-seed is appended to the **production** deploy command only, and the ordering is deliberate on both counts. It runs after `deploy` so that a hiccup rebuilding the search index can never block shipping the site itself; the previous index stays queryable in the meantime, since seeding replaces the rows in one transaction rather than emptying the table first. And it is absent from the preview command because there is one `dataslope-search` database and one set of rows in it: a preview build that seeded would overwrite production's index with a feature branch's content, and nothing would look broken until someone searched.
 
 ### Incremental cache cleanup
 
@@ -84,6 +86,43 @@ It needs three repository secrets (Settings → Secrets and variables → Action
 The `R2_INC_CACHE_*` pair is named for the bucket it belongs to, because a second R2 credential now exists: `.github/workflows/r2-illustrations-lifecycle.yml` needs an **Admin Read & Write** token (`R2_ADMIN_*`) to edit bucket configuration, which is a tier this job deliberately does not get — it deletes objects unattended every six hours, and admin tokens are account-wide, so one here could destroy `dataslope-workspaces` (live user data) or `dataslope-inc-cache` itself. The job aborts rather than running credential-less, so a missing or half-renamed secret fails loudly instead of reporting a green run that pruned nothing.
 
 To change how long stale/preview cache lingers, edit `THRESHOLD_HOURS` (age limit) and `MAX_BRANCHES` (how many active-branch previews may coexist) in the workflow. At ~1–1.4 GB per retained build, retention is what decides whether the bucket sits near R2's 10 GB free tier or balloons, storage beyond it is cheap ($0.015/GB-month), but there's no reason to pay for dead previews.
+
+## Search
+
+Site search is a **SQLite FTS5 index on D1** (`dataslope-search`), built from `content/` at build time and queried by `app/api/search/route.ts`. It replaced an in-Worker Orama index, which had to be fetched, parsed and re-tokenised on the first search in every fresh isolate — a cost paid per data centre, per deploy, and growing with the content. An FTS5 query is a `SELECT` against an index that already exists, so there is nothing to warm up.
+
+Three build steps produce it, all wired into `npm run build`:
+
+| Step | Output |
+| --- | --- |
+| `scripts/build-search-corpus.mjs` | `lib/generated/search-corpus.json` — one row per `(page, heading)` |
+| `scripts/build-search-sql.mjs` | `lib/generated/search-seed.sql` — the `DELETE` + batched `INSERT`s |
+| `npm run db:seed:search[:remote]` | the rows, in D1 |
+
+The corpus is extracted from the MDX **ASTs**, not the rendered HTML, which is what lets it reach content that never exists in the DOM until a learner interacts: `<ChallengeCard>` instructions and solutions, `<MultipleChoice>` questions and per-choice explanations, fenced and `<CodeBlock>` source, Mermaid definitions, `<Chart>` titles and captions, and the whole of `content/interview/`, which the previous index omitted entirely. Prose and code land in separate columns so `bm25()` can weight prose about seven to one over code — that ratio is what makes indexing code safe, since a search for a common identifier should surface the lesson that *explains* it above the dozen that merely use it in a starter file.
+
+### One-time setup
+
+The database and its schema already exist. To recreate them from scratch:
+
+```bash
+npx wrangler d1 create dataslope-search   # paste database_id into wrangler.jsonc
+npm run db:migrate:search:remote          # migrations-search/0001_create_docs_fts.sql
+npm run db:seed:search:remote             # ~9k rows; re-runs on every production deploy
+```
+
+Sizing, measured rather than estimated: 8,965 rows over ~890 lessons produce a **~21 MB** database (14.7 MB of stored text so `snippet()` can quote matches, 5.5 MB of actual inverted index). That is 4% of the free plan's 500 MB per-database cap and 0.2% of the paid plan's 10 GB, so storage is not a constraint this index will run into.
+
+### Two D1 rules the seed generator exists to respect
+
+Both fail *only* on the remote seed, so both are enforced at build time instead:
+
+- **100 KB per statement.** Batching a fixed number of rows per `INSERT` overran it, because section rows range from ~200 bytes to ~12 KB. Batches are closed on a byte budget, and `build-search-sql.mjs` re-checks the finished file and exits non-zero if any statement is over.
+- **No transactions in the file.** `wrangler d1 execute --file` already runs inside one, so a `BEGIN TRANSACTION` earns `cannot start a transaction within a transaction`. That enclosing transaction is also what makes the leading `DELETE FROM docs` safe — the delete and the inserts land together, so a failed seed cannot leave an empty index.
+
+`dataslope-search` is deliberately its own database. It is the only one holding an FTS5 **virtual table**, and `wrangler d1 export` refuses to export any database containing one — a failed attempt has been reported to wedge the database entirely ([workers-sdk#9519](https://github.com/cloudflare/workers-sdk/issues/9519), [#6305](https://github.com/cloudflare/workers-sdk/issues/6305)). Every row here is derived from `content/` and rebuilt each deploy, so the recovery for anything going wrong is to delete the database and re-seed. Extending that exposure to `dataslope-auth` or `dataslope-illustrations`, which record human decisions and cannot be rebuilt from source, would not be an acceptable trade.
+
+Queries go through `withSession("first-unconstrained")`, so enabling [read replication](https://developers.cloudflare.com/d1/best-practices/read-replication/) later is a dashboard toggle rather than a code change: the index only changes at deploy, so there is no read-after-write hazard and any replica's answer is as good as the primary's.
 
 ## Authentication (accounts)
 
