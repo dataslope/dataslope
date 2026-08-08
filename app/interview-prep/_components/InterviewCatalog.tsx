@@ -99,11 +99,19 @@ const MIME: Record<string, string> = {
  *  raster fallback from the build-time image manifest (the same source
  *  `<Figure>` reads).
  *
- *  3:2 (1.5:1) is the illustrations' native ratio — every image the pipeline
- *  produces is 1536x1024 — so the thumbnail shows the whole artwork and
- *  `object-cover` never crops the subject out of frame. `sizes` tells the
- *  browser it is only ever painted a few hundred CSS pixels wide, so it can
- *  pick the cheap decode. */
+ *  The 3:2 box is kept — six thumbnails the same shape is what makes this read
+ *  as a list rather than a scrapbook — but the art no longer fills it exactly.
+ *  Every render starts 1536x1024, and then `scripts/trim-cutouts.mjs` crops the
+ *  transparent band off its top and bottom, so a banner arrives wider than 3:2
+ *  and `object-cover` would answer that by cropping the sides, quietly cutting
+ *  the marmot out of its own frame. `object-contain` keeps the whole artwork
+ *  and letterboxes instead — invisibly, the art being transparent — and it
+ *  actually paints *larger* than the untrimmed version did, since the blank it
+ *  used to carry inside the box is gone. The row's height is set by its three
+ *  lines of copy either way, so nothing moves.
+ *
+ *  `sizes` tells the browser it is only ever painted a few hundred CSS pixels
+ *  wide, so it can pick the cheap decode. */
 function TrackThumb({ slug, alt }: { slug: string; alt: string }) {
   const entry = imageManifest[slug];
   if (!entry) return null;
@@ -122,7 +130,7 @@ function TrackThumb({ slug, alt }: { slug: string; alt: string }) {
         loading="lazy"
         decoding="async"
         sizes="160px"
-        className="block aspect-[3/2] w-full rounded-xl object-cover"
+        className="block aspect-[3/2] w-full rounded-xl object-contain"
       />
     </picture>
   );

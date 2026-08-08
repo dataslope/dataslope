@@ -49,16 +49,23 @@
  * Idempotent: a second run finds each image already tight and skips it under
  * `--min-gain`.
  *
+ * Re-running is safe and produces no git churn: the crop is derived from the
+ * pristine PNG and WebP encoding is deterministic, so an already-trimmed image
+ * is rewritten with the same bytes it already had.
+ *
  * Usage:
  *   node scripts/trim-cutouts.mjs <ids...> [options]
  *   node scripts/trim-cutouts.mjs --prefix python-basics-
+ *   node scripts/trim-cutouts.mjs --all
  *
  * Ids are prompt ids (e.g. `python-basics-loops`), the same strings promotion
  * takes; the `-cutout` suffix is added for you.
  *
  * Options:
+ *   --all            Trim every promoted cut-out
  *   --prefix <s>     Trim every promoted cut-out whose id starts with this
  *   --from r2|local  Pixel source (default: r2, falling back to local per image)
+ *   --concurrency <n> Images in flight at once (default: 6)
  *   --alpha <n>      Alpha above which a pixel counts as drawn (default: 16)
  *   --row-frac <n>   Fraction of a row that must be drawn (default: 0.002)
  *   --pad <n>        Padding kept, as a fraction of height (default: 0.02)
@@ -91,8 +98,10 @@ const MATCH_FLOOR = 30;
 function parseArgs(argv) {
   const opts = {
     ids: [],
+    all: false,
     prefix: null,
     from: "r2",
+    concurrency: 6,
     alpha: 16,
     rowFrac: 0.002,
     pad: 0.02,
@@ -106,8 +115,10 @@ function parseArgs(argv) {
     const a = argv[i];
     const next = () => argv[++i];
     switch (a) {
+      case "--all": opts.all = true; break;
       case "--prefix": opts.prefix = next(); break;
       case "--from": opts.from = next(); break;
+      case "--concurrency": opts.concurrency = Math.max(1, Number(next()) || 6); break;
       case "--alpha": opts.alpha = Math.max(0, Number(next()) || 0); break;
       case "--row-frac": opts.rowFrac = Math.max(0, Number(next()) || 0); break;
       case "--pad": opts.pad = Math.max(0, Number(next()) || 0); break;
@@ -186,20 +197,39 @@ export function trimPlan(bounds, { pad = 0.02, minGain = 0.02 } = {}) {
 }
 
 /**
- * Premultiplied PSNR between two images, in dB, at a common small size.
+ * An image reduced to just its drawn content, at a fixed small size.
+ *
+ * Normalising away the blank band is what makes matching survive this script's
+ * own work. Comparing whole frames, a trimmed WebP no longer resembles the
+ * pristine PNG it came from — different heights squashed into the same box
+ * read as different pictures — so a second run would quietly fall back to
+ * re-encoding the served file, and the pristine source would be unreachable
+ * from then on. Both sides are cropped to their own content first, so the
+ * comparison asks "is this the same artwork?" rather than "is this the same
+ * rectangle?", and a trim stays re-derivable from R2 forever.
+ */
+async function contentSignature(buf) {
+  const bounds = await verticalBounds(buf);
+  const img = sharp(buf);
+  if (!bounds.empty) {
+    img.extract({
+      left: 0,
+      top: bounds.top,
+      width: bounds.width,
+      height: bounds.bottom - bounds.top + 1,
+    });
+  }
+  return img.resize({ width: 128, height: 128, fit: "fill" }).ensureAlpha().raw().toBuffer();
+}
+
+/**
+ * Premultiplied PSNR between two content signatures, in dB.
  *
  * Premultiplying matters: RGB under a fully transparent pixel is undefined and
  * each encoder is free to rewrite it, so a naive comparison reports a large
  * difference across the very blank regions this script is about to remove.
  */
-async function similarity(a, b) {
-  const signature = (buf) =>
-    sharp(buf)
-      .resize({ width: 128, height: 128, fit: "fill" })
-      .ensureAlpha()
-      .raw()
-      .toBuffer();
-  const [x, y] = await Promise.all([signature(a), signature(b)]);
+function similarity(x, y) {
   let se = 0;
   const pixels = x.length / 4;
   for (let i = 0; i < pixels; i++) {
@@ -219,30 +249,52 @@ async function similarity(a, b) {
 /** Read-only view of the cut-out PNGs in R2, indexed by prompt id. */
 function makeR2Index() {
   const client = createR2Client(credentialsFromEnv());
-  let byId = null;
-  const load = async () => {
-    if (byId) return byId;
-    byId = new Map();
-    for (const key of await client.list("illustrations/")) {
-      const m = /^illustrations\/[^/]+\/([^/]+)\/v\d+\/cutout\.png$/.exec(key);
-      if (!m) continue;
-      if (!byId.has(m[1])) byId.set(m[1], []);
-      byId.get(m[1]).push(key);
-    }
-    return byId;
-  };
+
+  // Cache the *promise*, not the map it resolves to. Publishing a half-filled
+  // map and awaiting the listing afterwards is a race with teeth here: the
+  // second worker finds a truthy (empty) index, concludes the id has no
+  // candidate, and silently re-encodes the served WebP instead of re-cropping
+  // the pristine PNG. Nothing fails, the run just quietly does the lossy thing
+  // for most of the images — which is exactly what it did before this line.
+  let indexing = null;
+  const load = () =>
+    (indexing ??= (async () => {
+      const byId = new Map();
+      for (const key of await client.list("illustrations/")) {
+        const m = /^illustrations\/[^/]+\/([^/]+)\/v\d+\/cutout\.png$/.exec(key);
+        if (!m) continue;
+        if (!byId.has(m[1])) byId.set(m[1], []);
+        byId.get(m[1]).push(key);
+      }
+      return byId;
+    })());
   return {
     describe: `r2://${client.bucket}/illustrations/`,
-    /** The pristine PNG the served WebP was encoded from, or null. */
-    async sourceFor(id, servedBuf) {
-      const keys = (await load()).get(id) ?? [];
-      let best = null;
+    /**
+     * The pristine PNG the served WebP was encoded from, or null.
+     *
+     * Candidates are tried newest run first and the search stops at the first
+     * one over the floor rather than scoring them all. Over 900 images that is
+     * the difference between downloading every historical redraw (~2 GB) and
+     * usually downloading one: an id's current art almost always comes from
+     * its most recent run, and the floor is nowhere near ambiguous — a match
+     * is ~44 dB and the runner-up 6-11, so "first over 30" and "best of all"
+     * cannot disagree. Run ids are dated (`2026-08-…`), so sorting the keys
+     * descending is chronological enough to make the guess pay off.
+     */
+    async sourceFor(id, servedSig) {
+      const keys = [...((await load()).get(id) ?? [])].sort().reverse();
+      let bestDb = null;
       for (const key of keys) {
         const buf = await client.get(key);
-        const db = await similarity(servedBuf, buf);
-        if (!best || db > best.db) best = { key, buf, db };
+        const db = similarity(servedSig, await contentSignature(buf));
+        if (db >= MATCH_FLOOR) return { hit: { key, buf, db }, bestDb: db };
+        if (bestDb === null || db > bestDb) bestDb = db;
       }
-      return best && best.db >= MATCH_FLOOR ? best : null;
+      // `bestDb` distinguishes the two ways to miss, which matters over a
+      // sweep: null means no candidate exists for this id at all (its run has
+      // aged out of the bucket), a number means one does and did not match.
+      return { hit: null, bestDb };
     },
   };
 }
@@ -251,16 +303,16 @@ function makeR2Index() {
 function resolveSlugs(opts) {
   const promoted = readdirSync(OUT_DIR)
     .filter((f) => f.endsWith(`${CUTOUT_SUFFIX}.webp`))
-    .map((f) => f.slice(0, -".webp".length));
-  if (opts.prefix) {
-    return promoted.filter((s) => s.startsWith(opts.prefix)).sort();
-  }
+    .map((f) => f.slice(0, -".webp".length))
+    .sort();
+  if (opts.all) return promoted;
+  if (opts.prefix) return promoted.filter((s) => s.startsWith(opts.prefix));
   return opts.ids.map((id) => `${id}${CUTOUT_SUFFIX}`);
 }
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  if (opts.help || (!opts.ids.length && !opts.prefix)) return printHelp();
+  if (opts.help || (!opts.ids.length && !opts.prefix && !opts.all)) return printHelp();
 
   const slugs = resolveSlugs(opts);
   if (!slugs.length) {
@@ -284,26 +336,33 @@ async function main() {
   let heightBefore = 0;
   let heightAfter = 0;
 
-  for (const slug of slugs) {
+  async function trimOne(slug) {
     const file = join(OUT_DIR, `${slug}.webp`);
     if (!existsSync(file)) {
       console.error(`  ✗ ${slug}: not promoted (no ${slug}.webp)`);
       failed++;
-      continue;
+      return;
     }
     const served = readFileSync(file);
     try {
       const id = slug.slice(0, -CUTOUT_SUFFIX.length);
-      const match = r2 ? await r2.sourceFor(id, served) : null;
+      const found = r2 ? await r2.sourceFor(id, await contentSignature(served)) : null;
+      const match = found?.hit ?? null;
       const source = match ? match.buf : served;
-      const origin = match ? `r2 ${match.key.split("/")[1]} (${match.db.toFixed(0)}dB)` : "served webp";
+      const origin = match
+        ? `r2 ${match.key.split("/")[1]} (${match.db.toFixed(0)}dB)`
+        : `served webp; ${
+            found?.bestDb == null
+              ? "no R2 candidate"
+              : `best R2 candidate only ${found.bestDb.toFixed(0)}dB`
+          }`;
 
       const bounds = await verticalBounds(source, { alpha: opts.alpha, rowFrac: opts.rowFrac });
       const plan = trimPlan(bounds, { pad: opts.pad, minGain: opts.minGain });
       if (!plan) {
         console.log(`  • skip ${slug} (${bounds.empty ? "fully transparent" : "already tight"})`);
         skipped++;
-        continue;
+        return;
       }
 
       // Crop to a PNG rather than straight to WebP so the one definition of
@@ -340,6 +399,18 @@ async function main() {
       console.error(`  ✗ ${slug}: ${err.message}`);
     }
   }
+
+  // Each image is a download, a decode, a crop and an encode, so the run is
+  // alternately network- and CPU-bound and neither saturates on its own. A
+  // handful of workers keeps both busy; the images are independent and each
+  // writes only its own file, so there is nothing to coordinate beyond the
+  // counters above.
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(opts.concurrency, slugs.length) }, async () => {
+      while (next < slugs.length) await trimOne(slugs[next++]);
+    }),
+  );
 
   console.log(
     `\n${trimmed} trimmed · ${skipped} skipped · ${failed} failed` +
