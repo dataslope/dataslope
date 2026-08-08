@@ -12,6 +12,11 @@ name: Content sweeps
 #                         PGlite and sqlite-wasm, graded by the same
 #                         evaluateSqlTest a reader's Check Answer runs.
 #   • check:r           — every R <CodeBlock> and <ChallengeCard> through webR.
+#   • check:browser     — java, csharp, web, react and php, the five languages
+#                         whose runtimes exist only in a browser (CheerpJ, the
+#                         .NET wasm runtime, the sandboxed preview iframe,
+#                         php-wasm), driven through Playwright against a real
+#                         dev server.
 #
 # All existed as npm scripts that nothing invoked, which is the same as not
 # having them.
@@ -64,6 +69,23 @@ name: Content sweeps
 # a week, at a seventh of the runner time. Raise the frequency if that window
 # turns out to be too wide, or drop the trigger entirely and accept that a
 # broken upstream release is found by the next pull request.
+#
+# ── Why `browser` is scoped harder than the rest ────────────────────────────
+#
+# The other five sweeps are headless and cheap. `browser` boots a Next dev
+# server and drives a real Chromium, and its cost is dominated by per-page
+# runtime init that no amount of tuning removes: CheerpJ plus an 18 MB
+# tools.jar for Java, a ~35 MB assembly set for C#, once per page because
+# each Playwright context gets its own empty HTTP cache. A full run is about
+# 30 minutes of blocks and 35 of cards, so it is deliberately *not* part of
+# the default pull-request path — only the changed lessons are, which is
+# seconds.
+#
+# It still earns a scheduled run, and for a stronger reason than the Python
+# one. CheerpJ is loaded from `cjrtnc.leaningtech.com/4.3/loader.js`, a
+# mutable path that upstream can republish under the same 4.3 label, and the
+# React preview resolves bare imports through esm.sh at run time. Neither is
+# in `package-lock.json`, so neither can be caught by a lockfile diff.
 
 on:
   pull_request:
@@ -74,6 +96,11 @@ on:
       - "scripts/check-js-blocks.mjs"
       - "scripts/check-r-blocks.mjs"
       - "scripts/check-sql-blocks.mjs"
+      - "scripts/check-browser-blocks.mjs"
+      - "e2e/_adapterFilter.ts"
+      - "e2e/_discoverPages.ts"
+      - "e2e/code-blocks-run.spec.ts"
+      - "e2e/challenge-solutions.spec.ts"
       - "scripts/lib/mdx-blocks.mjs"
       - "scripts/lib/pyodide-runner.mjs"
       - "scripts/lib/sync-http.mjs"
@@ -98,7 +125,7 @@ on:
         description: "Which sweep to run"
         type: choice
         default: all
-        options: [all, challenges, code-blocks, js, sql, r]
+        options: [all, challenges, code-blocks, js, sql, r, browser]
       full:
         description: "Sweep all content (ignore the changed-files filter)"
         type: boolean
@@ -153,7 +180,7 @@ jobs:
           # Anything that changes the interpreter itself invalidates a partial
           # run: the same block can start failing without its file being
           # touched. Those pull requests get everything.
-          if echo "$changed" | grep -qE '^(scripts/(check-(code-blocks|challenge-cards|js-blocks|sql-blocks|r-blocks)\.mjs|lib/(mdx-blocks|pyodide-runner|sync-http|sql-engines|datasets)\.mjs)|app/_components/(challengeHarness|sqlChallengeHarness|runtime/almostnode-worker-shared|runtime/tsTranspile|runtime/rPackages)\.ts|\.github/workflows/content-sweeps\.yml)$'; then
+          if echo "$changed" | grep -qE '^(scripts/(check-(code-blocks|challenge-cards|js-blocks|sql-blocks|r-blocks|browser-blocks)\.mjs|lib/(mdx-blocks|pyodide-runner|sync-http|sql-engines|datasets)\.mjs)|e2e/(_adapterFilter|_discoverPages|code-blocks-run\.spec|challenge-solutions\.spec)\.ts|app/_components/(challengeHarness|sqlChallengeHarness|runtime/almostnode-worker-shared|runtime/tsTranspile|runtime/rPackages)\.ts|\.github/workflows/content-sweeps\.yml)$'; then
             echo "filter=" >> "$GITHUB_OUTPUT"
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "label=full sweep (sweep internals changed)" >> "$GITHUB_OUTPUT"
@@ -411,4 +438,69 @@ jobs:
         with:
           name: r-report
           path: r-report.json
+          if-no-files-found: ignore
+
+  browser:
+    name: Browser runtimes (${{ needs.scope.outputs.label }})
+    needs: scope
+    # The only sweep that opts *out* of the full-sweep pull-request path. A
+    # change to a shared extractor gives the other five everything, and rightly
+    # so — they cost minutes. Giving this one everything costs over an hour, so
+    # a pull request only ever gets the lessons it actually edited. The
+    # scheduled run and an explicit dispatch still cover all of it.
+    if: >-
+      needs.scope.outputs.run == 'true' &&
+      (github.event_name != 'workflow_dispatch' ||
+       contains(fromJSON('["all","browser"]'), inputs.sweep)) &&
+      (github.event_name != 'pull_request' || needs.scope.outputs.filter != '')
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      # Not `--ignore-scripts`: unlike the headless sweeps this one serves the
+      # actual site, so the postinstall codegen has to run.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # `playwright.config.ts` starts the dev server with a bare `next dev`,
+      # which skips the generators `npm run dev` chains ahead of it. Without
+      # these the routes 404 and every page reports "no code block".
+      - name: Generate content sources
+        run: |
+          npx fumadocs-mdx
+          for s in build-almostnode-workers build-search-index build-course-md \
+                   build-brand-fallbacks build-charts build-course-catalog \
+                   build-home-stats build-images; do
+            node "scripts/$s.mjs"
+          done
+
+      - name: Run check:browser
+        env:
+          FILTER: ${{ needs.scope.outputs.filter }}
+        # One worker on purpose. Measured at three: React cards lost clicks
+        # ("after three clicks the heading should read 'Likes: 3'. Got: Likes:
+        # 2") and web cards measured zero-height elements, none of which
+        # reproduced serially. A sweep that reports contention as broken
+        # content is worse than a slower one.
+        run: |
+          if [ -n "$FILTER" ]; then
+            npm run check:browser -- --json browser-report.json --filter "$FILTER" -- --workers=1
+          else
+            npm run check:browser -- --json browser-report.json -- --workers=1
+          fi
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-report
+          path: browser-report.json
           if-no-files-found: ignore

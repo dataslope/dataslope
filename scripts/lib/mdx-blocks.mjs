@@ -264,6 +264,30 @@ function insideCode(src, idx) {
 }
 
 /**
+ * Advance a top-level fence state across `text`, returning the new state.
+ *
+ * "Top-level" is what makes this safe. A document-wide backtick count is
+ * wrong, because `markdown={…}` and `starterCode={…}` props carry fenced
+ * blocks of their own and flip the parity mid-prop — that attempt lost 20
+ * `<SqlCodeBlock>`s and was reverted. Here the caller only ever feeds in the
+ * text *between* tags, never a tag's own body, so prop fences are invisible
+ * to it by construction.
+ */
+function advanceFence(text, open) {
+  for (const line of text.split("\n")) {
+    // CommonMark: a fence is three or more backticks up to three spaces deep,
+    // and the info string that follows may not itself contain a backtick.
+    // That last clause is the whole difference between a fence and an inline
+    // code span written with triple backticks — pattern-matching.mdx has
+    // ``` `${current}:${emergency}` ``` mid-sentence, and reading it as an
+    // opening fence swallowed the real `<ChallengeCard>` 21 lines below it.
+    // Tildes cannot be escaped that way and take the looser rule.
+    if (/^ {0,3}`{3,}[^`]*$/.test(line) || /^ {0,3}~{3,}/.test(line)) open = !open;
+  }
+  return open;
+}
+
+/**
  * Every `<Tag …/>` in `content/`, as `{file, line, raw}`.
  *
  * Two things here are load-bearing, and both were learned from this generator
@@ -277,6 +301,12 @@ function insideCode(src, idx) {
  *     every remaining tag in that file: ~84 `<ChallengeCard>`s across nine
  *     files and ~20 `<CodeBlock>`s across thirteen were invisible to the
  *     sweeps, which then reported everything they *had* found as passing.
+ *   • A tag inside a top-level ```jsx fence is documentation *of* a component,
+ *     not a component. The eleven `content/fumadocs-dev/*` demo pages print
+ *     each example's own MDX source below it, so every item on them was
+ *     counted twice. Harmless while nothing compared the count to reality;
+ *     `check:browser` does exactly that, and read the duplicates as 50%
+ *     of the page having gone unswept.
  *
  * An unterminated tag after the frontmatter is still yielded, with
  * `unterminated: true` and no `raw`, so callers count it rather than lose it.
@@ -289,14 +319,21 @@ export function* eachTag(tag, root = CONTENT_DIR) {
     const src = readFileSync(file, "utf8");
     const rel = relative(process.cwd(), file);
     let idx = bodyStart(src);
+    // Fence parity over the text between tags only. `scanned` is how far that
+    // parity has been carried; a tag's own body is jumped over rather than
+    // scanned, which is what keeps prop-level fences out of it.
+    let scanned = idx;
+    let fenced = false;
     for (;;) {
       const tagAt = src.indexOf(opener, idx);
       if (tagAt === -1) break;
 
       idx = tagAt;
+      fenced = advanceFence(src.slice(scanned, tagAt), fenced);
+      scanned = tagAt;
       // `<CodeBlock` must not match `<CodeBlockSomething`.
       const after = src[idx + opener.length];
-      if (/[A-Za-z0-9]/.test(after) || insideCode(src, idx)) {
+      if (/[A-Za-z0-9]/.test(after) || insideCode(src, idx) || fenced) {
         idx += opener.length;
         continue;
       }
@@ -309,6 +346,7 @@ export function* eachTag(tag, root = CONTENT_DIR) {
       }
       const raw = src.slice(idx, end);
       idx = end;
+      scanned = end;
       yield { file: rel, line, raw };
     }
   }

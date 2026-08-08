@@ -1224,6 +1224,13 @@ function CodeBlockInner({
       className={`${challengeStyles.card} ${styles.outputScope}`}
       aria-label={`${adapter.runtimeInfo.language} executable code block`}
       data-testid="code-block"
+      // Lets a sweep select only the blocks it can actually run. Without it
+      // the courseware-wide e2e run is all-or-nothing: it would re-run the
+      // ~1700 Python blocks the Node sweeps already cover far more cheaply,
+      // just to reach the browser-only languages sharing their pages.
+      // `ChallengeCard` has carried the equivalent `data-adapter-id` since it
+      // was written.
+      data-adapter={adapter.id}
       data-expect-error={expectError ? "true" : undefined}
     >
       <div className={challengeStyles.header}>
