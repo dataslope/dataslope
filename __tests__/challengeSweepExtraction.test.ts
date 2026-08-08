@@ -18,7 +18,12 @@
 // itself (it needs a 30s Pyodide boot and cannot run in unit CI).
 import { describe, expect, it } from "vitest";
 
-import { extractChallengeCards, parseFiles } from "../scripts/lib/mdx-blocks.mjs";
+import {
+  extractChallengeCards,
+  matchesFilter,
+  parseFilter,
+  parseFiles,
+} from "../scripts/lib/mdx-blocks.mjs";
 
 interface CardFile {
   filename: string;
@@ -152,5 +157,57 @@ describe("parseFiles", () => {
     expect(files.map((f) => f.filename)).toEqual(["a.py", "b.py"]);
     expect(files[0].solutionCode).toBe("");
     expect(files[1].solutionCode).toBe("answer = 2");
+  });
+});
+
+// `--filter` is what keeps a pull-request sweep to the lessons it changed
+// (see .github/workflows/content-sweeps.yml). The workflow builds the value
+// from a git diff, so the parsing here decides how much CI actually checks,
+// and the dangerous direction is a filter that quietly selects everything or
+// nothing while the run still reports a green tick.
+describe("parseFilter", () => {
+  it("returns null when no filter was given, meaning sweep everything", () => {
+    expect(parseFilter(null)).toBeNull();
+    expect(parseFilter(undefined)).toBeNull();
+  });
+
+  it("splits a comma-separated list and trims it", () => {
+    expect(parseFilter("a/b.mdx, c/d.mdx ,e/f.mdx")).toEqual(["a/b.mdx", "c/d.mdx", "e/f.mdx"]);
+  });
+
+  it("keeps a bare substring working, as it always did", () => {
+    expect(parseFilter("polars")).toEqual(["polars"]);
+  });
+
+  it("treats an explicitly empty filter as selecting nothing", () => {
+    // Not as selecting everything. CI computes this from a diff, and "no
+    // lesson files changed" must never widen into an unrequested full sweep
+    // (or, worse, look like one that passed).
+    expect(parseFilter("")).toEqual([]);
+    expect(parseFilter("  ,  ")).toEqual([]);
+  });
+});
+
+describe("matchesFilter", () => {
+  const parts = ["content/courses/python-basics/files.mdx", "seaborn-foundations"];
+
+  it("matches any listed path", () => {
+    expect(matchesFilter(parts, "content/courses/python-basics/files.mdx")).toBe(true);
+    expect(matchesFilter(parts, "content/courses/seaborn-foundations/bar.mdx")).toBe(true);
+  });
+
+  it("does not match an unlisted file", () => {
+    expect(matchesFilter(parts, "content/courses/python-basics/loops.mdx")).toBe(false);
+  });
+
+  it("also matches a card title when one is supplied", () => {
+    // `--filter "Two Sum"` is the by-hand ergonomic the challenge sweep has
+    // always had; the file-path lists CI passes go through the same call.
+    expect(matchesFilter(["Two Sum"], "content/x.mdx", "Two Sum")).toBe(true);
+    expect(matchesFilter(["Two Sum"], "content/x.mdx", "Valid Anagram")).toBe(false);
+  });
+
+  it("selects nothing for an empty list", () => {
+    expect(matchesFilter([], "content/anything.mdx")).toBe(false);
   });
 });

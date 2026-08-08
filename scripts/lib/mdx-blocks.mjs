@@ -26,6 +26,42 @@ import { join, relative } from "node:path";
 
 export const CONTENT_DIR = "content";
 
+/**
+ * Split a `--filter` value into the substrings it selects.
+ *
+ * Comma-separated so CI can hand a sweep exactly the files a pull request
+ * touched. Checking one edited lesson takes seconds; checking all 1,694 blocks
+ * to prove that one lesson still works takes 25 minutes, and a check nobody
+ * wants to wait for is a check that gets bypassed.
+ *
+ * A single substring still behaves as it always did, so `--filter polars` is
+ * unchanged.
+ */
+export function parseFilter(value) {
+  if (value === null || value === undefined) return null;
+  const parts = String(value)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  // An explicitly empty filter selects nothing rather than everything. CI
+  // computes this list from a diff, and "no content files changed" must not
+  // silently widen into a full sweep.
+  return parts;
+}
+
+/**
+ * Does a block or card match any substring in a parsed filter?
+ *
+ * @param {string[]} parts substrings from `parseFilter`
+ * @param {string} file the block's or card's source path
+ * @param {string|null} [extra] a card title, so the challenge sweep keeps its
+ *   `--filter "Two Sum"` ergonomic alongside the path lists CI passes
+ * @returns {boolean}
+ */
+export function matchesFilter(parts, file, extra = null) {
+  return parts.some((p) => file.includes(p) || (extra !== null && extra.includes(p)));
+}
+
 /** Walk from `open` (index of the char after `<Tag`) to the matching `/>`,
  *  tracking brace/bracket depth and skipping over string literals so a `>` or
  *  `}` inside code never ends the tag early. */

@@ -17,11 +17,15 @@
  * sweep.
  *
  * Usage:
- *   node scripts/check-code-blocks.mjs [--filter <substring>] [--list] [--json <path>]
+ *   node scripts/check-code-blocks.mjs [--filter <substr>[,<substr>…]] [--list]
+ *                                      [--json <path>]
+ *
+ * `--filter` takes a comma-separated list, which is how CI checks only the
+ * lessons a pull request touched instead of all of them.
  */
 import { writeFileSync } from "node:fs";
 
-import { extractBlocks } from "./lib/mdx-blocks.mjs";
+import { extractBlocks, matchesFilter, parseFilter } from "./lib/mdx-blocks.mjs";
 import { bootPyodide, isEnvironmental } from "./lib/pyodide-runner.mjs";
 
 const args = process.argv.slice(2);
@@ -30,9 +34,22 @@ const flag = (name) => {
   return i === -1 ? null : (args[i + 1] ?? "");
 };
 
-const filter = flag("--filter");
-let blocks = extractBlocks();
-if (filter) blocks = blocks.filter((b) => b.file.includes(filter));
+const filter = parseFilter(flag("--filter"));
+const allBlocks = extractBlocks();
+const blocks = filter ? allBlocks.filter((b) => matchesFilter(filter, b.file)) : allBlocks;
+
+// Say what was selected and what that leaves out. A filtered run reporting
+// "✓ all blocks pass" without saying it looked at eleven of them is the same
+// false comfort the sweeps exist to remove.
+if (filter) {
+  console.log(
+    `check-code-blocks: --filter selected ${blocks.length} of ${allBlocks.length} block(s) ` +
+      `from ${filter.length} path(s)`,
+  );
+  if (blocks.length === 0) {
+    console.log("check-code-blocks: nothing to run (no python blocks in those files)");
+  }
+}
 
 if (args.includes("--list")) {
   for (const b of blocks) console.log(`${b.file}:${b.line}  (${b.code.split("\n").length} lines)`);

@@ -2,29 +2,54 @@ name: Content sweeps
 
 # Runs the two Pyodide sweeps that execute the site's Python content:
 #
-#   • check:challenges  (~7m)  — every <ChallengeCard>'s reference solution
-#                                against that card's own tests.
-#   • check:code-blocks (~25m) — every <CodeBlock> a reader can press Run on.
+#   • check:challenges  — every <ChallengeCard>'s reference solution against
+#                         that card's own tests.
+#   • check:code-blocks — every <CodeBlock> a reader can press Run on.
 #
 # Both existed as npm scripts that nothing invoked, which is the same as not
-# having them: the failure they catch is a library deprecating an argument
-# under content nobody edited, so it appears on a day when no PR touches the
-# lesson and there is nothing to notice it. `freq="H"` reached pandas 3 that
-# way.
+# having them.
 #
-# Triggers, and why each one:
-#   • pull_request, paths-filtered — the lesson-facing case. A PR that edits
-#     content, the sweeps, or the harness the cards run in gets checked before
-#     merge.
-#   • schedule (nightly) — the case a PR trigger cannot cover, and the reason
-#     this file exists. Nothing in the repo changes when Pyodide ships a new
-#     pandas; the CDN does. Only a clock finds that.
-#   • workflow_dispatch — re-run one sweep on demand without waiting for the
-#     other.
+# ── Scope, and why a pull request does not get the full sweep ───────────────
 #
-# The two run as separate jobs so wall-clock is the slower one (~25m) rather
-# than the sum, and so a red challenge sweep still reports its own failures
-# instead of being masked by a timeout in the other.
+# Sweeping everything takes ~25 minutes, and spending that to prove one edited
+# lesson still works is a bad trade twice over: it is slow, and a check nobody
+# wants to wait for is a check that gets bypassed. Checking two changed lessons
+# instead takes about 45 seconds, most of it Pyodide booting. So the scope
+# depends on what changed:
+#
+#   • A pull request that edits lessons checks *those lessons* (`--filter`
+#     takes a comma-separated list).
+#   • A pull request that changes the interpreter — the runner, the harness,
+#     the extractor, or the lockfile that pins Pyodide — gets the full sweep,
+#     because a partial run proves nothing about a change that affects every
+#     block. A Pyodide bump is this case, and it is the one that would surface
+#     something like `freq="H"` raising under a new pandas.
+#   • A pull request that touches neither runs nothing at all.
+#
+# The `scope` job below decides which, and says so in the run's summary so a
+# green tick is never ambiguous about how much it covered.
+#
+# ── Why there is still a scheduled run ──────────────────────────────────────
+#
+# Not to re-check content: content only changes through pull requests, and
+# those are swept above. It is there for the inputs that are *not* in this
+# repo and can therefore change with no commit to notice:
+#
+#   • `micropip.install(...)` resolves to the latest release from PyPI at run
+#     time, unpinned, for plotly, pyodide_http, seaborn and openpyxl. The
+#     reader's worker does the same installs (see `loadHeavyPackages` in
+#     pyodide-worker.ts), so a breaking release reaches readers directly.
+#   • Lesson datasets come from `dataslope/datasets@main`, a different repo.
+#   • `sns.load_dataset(...)` fetches from `mwaskom/seaborn-data`, a
+#     third-party one.
+#
+# Everything Pyodide ships (numpy, pandas, scipy, matplotlib) is pinned by
+# version and immutable on the CDN, so it cannot drift on its own. That makes
+# the schedule's job narrow, and weekly rather than nightly is proportionate
+# to it: it bounds how long a bad upstream release can sit unnoticed to about
+# a week, at a seventh of the runner time. Raise the frequency if that window
+# turns out to be too wide, or drop the trigger entirely and accept that a
+# broken upstream release is found by the next pull request.
 
 on:
   pull_request:
@@ -34,14 +59,16 @@ on:
       - "scripts/check-challenge-cards.mjs"
       - "scripts/lib/mdx-blocks.mjs"
       - "scripts/lib/pyodide-runner.mjs"
+      - "scripts/lib/sync-http.mjs"
       - "app/_components/challengeHarness.ts"
-      # A Pyodide bump changes the interpreter both sweeps mirror.
       - "package-lock.json"
       - ".github/workflows/content-sweeps.yml"
   schedule:
-    # 05:40 UTC daily. Off the hour because the shared runner pool is busiest
-    # exactly on it.
-    - cron: "40 5 * * *"
+    # 05:40 UTC on Sundays. Off the hour because the shared runner pool is
+    # busiest exactly on it. Note that GitHub disables scheduled workflows in a
+    # repository with no activity for 60 days, so this stops on its own if the
+    # repo goes quiet.
+    - cron: "40 5 * * 0"
   workflow_dispatch:
     inputs:
       sweep:
@@ -49,20 +76,114 @@ on:
         type: choice
         default: both
         options: [both, challenges, code-blocks]
+      full:
+        description: "Sweep all content (ignore the changed-files filter)"
+        type: boolean
+        default: true
 
 permissions:
   contents: read
 
 concurrency:
-  # Supersede an in-flight run for the same PR, but never cancel a nightly:
-  # the scheduled run is the only thing watching for CDN drift.
+  # Supersede an in-flight run for the same PR, but never cancel a scheduled
+  # one: it is the only thing watching for upstream drift.
   group: content-sweeps-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  scope:
+    name: Decide scope
+    runs-on: ubuntu-latest
+    outputs:
+      # Comma-separated content paths to check, or empty for a full sweep.
+      filter: ${{ steps.decide.outputs.filter }}
+      # "false" when a pull request touched only lessons and none of them
+      # contain runnable content, so both sweeps can be skipped outright.
+      run: ${{ steps.decide.outputs.run }}
+      label: ${{ steps.decide.outputs.label }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Needed to diff against the base branch.
+          fetch-depth: 0
+
+      - name: Work out what to sweep
+        id: decide
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          FORCE_FULL: ${{ github.event_name != 'pull_request' || inputs.full }}
+        run: |
+          set -euo pipefail
+
+          if [ "$FORCE_FULL" = "true" ]; then
+            echo "filter=" >> "$GITHUB_OUTPUT"
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "label=full sweep (all content)" >> "$GITHUB_OUTPUT"
+            echo "Full sweep: not a pull request, or explicitly requested." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          changed=$(git diff --name-only --diff-filter=d "$BASE_SHA" "$HEAD_SHA")
+          echo "Changed files:"; echo "$changed"
+
+          # Anything that changes the interpreter itself invalidates a partial
+          # run: the same block can start failing without its file being
+          # touched. Those pull requests get everything.
+          if echo "$changed" | grep -qE '^(scripts/(check-(code-blocks|challenge-cards)\.mjs|lib/(mdx-blocks|pyodide-runner|sync-http)\.mjs)|app/_components/challengeHarness\.ts|\.github/workflows/content-sweeps\.yml)$'; then
+            echo "filter=" >> "$GITHUB_OUTPUT"
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "label=full sweep (sweep internals changed)" >> "$GITHUB_OUTPUT"
+            echo "Full sweep: a change here affects every block, so a partial run would prove nothing." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # The lockfile only matters for one package. A Pyodide bump swaps the
+          # interpreter under every block at once (a new pandas is exactly how
+          # `freq="H"` broke), so it earns the full sweep. Any other dependency
+          # moving does not, and treating them alike would spend 25 minutes on
+          # every unrelated Dependabot pull request.
+          if echo "$changed" | grep -qx 'package-lock\.json'; then
+            v() { git show "$1:package-lock.json" | jq -r '.packages["node_modules/pyodide"].version // empty'; }
+            before=$(v "$BASE_SHA"); after=$(v "$HEAD_SHA")
+            if [ "$before" != "$after" ]; then
+              echo "filter=" >> "$GITHUB_OUTPUT"
+              echo "run=true" >> "$GITHUB_OUTPUT"
+              echo "label=full sweep (pyodide $before to $after)" >> "$GITHUB_OUTPUT"
+              echo "Full sweep: pyodide moved from \`$before\` to \`$after\`, which changes the interpreter for every block." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "package-lock.json changed but pyodide is still $after; not a reason to sweep." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          mdx=$(echo "$changed" | grep -E '^content/.*\.mdx$' || true)
+          if [ -z "$mdx" ]; then
+            echo "filter=" >> "$GITHUB_OUTPUT"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "label=nothing to sweep" >> "$GITHUB_OUTPUT"
+            echo "No lesson files changed; both sweeps skipped." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          filter=$(echo "$mdx" | paste -sd, -)
+          count=$(echo "$mdx" | wc -l | tr -d ' ')
+          echo "filter=$filter" >> "$GITHUB_OUTPUT"
+          echo "run=true" >> "$GITHUB_OUTPUT"
+          echo "label=$count changed lesson(s)" >> "$GITHUB_OUTPUT"
+          {
+            echo "Sweeping **$count changed lesson(s)** rather than all content."
+            echo ""
+            echo '```'
+            echo "$mdx"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
   challenges:
-    name: Challenge cards
-    if: github.event_name != 'workflow_dispatch' || inputs.sweep != 'code-blocks'
+    name: Challenge cards (${{ needs.scope.outputs.label }})
+    needs: scope
+    if: >-
+      needs.scope.outputs.run == 'true' &&
+      (github.event_name != 'workflow_dispatch' || inputs.sweep != 'code-blocks')
     runs-on: ubuntu-latest
     # Generous against a cold cache and a slow PyPI, tight enough that a block
     # which hangs past its own 30s budget cannot burn a runner for six hours.
@@ -88,7 +209,14 @@ jobs:
           restore-keys: dataset-cache-v1-
 
       - name: Run check:challenges
-        run: npm run check:challenges -- --json challenges-report.json
+        env:
+          FILTER: ${{ needs.scope.outputs.filter }}
+        run: |
+          if [ -n "$FILTER" ]; then
+            npm run check:challenges -- --json challenges-report.json --filter "$FILTER"
+          else
+            npm run check:challenges -- --json challenges-report.json
+          fi
 
       - name: Upload report
         if: always()
@@ -99,8 +227,11 @@ jobs:
           if-no-files-found: ignore
 
   code-blocks:
-    name: Code blocks
-    if: github.event_name != 'workflow_dispatch' || inputs.sweep != 'challenges'
+    name: Code blocks (${{ needs.scope.outputs.label }})
+    needs: scope
+    if: >-
+      needs.scope.outputs.run == 'true' &&
+      (github.event_name != 'workflow_dispatch' || inputs.sweep != 'challenges')
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -122,7 +253,14 @@ jobs:
           restore-keys: dataset-cache-v1-
 
       - name: Run check:code-blocks
-        run: npm run check:code-blocks -- --json code-blocks-report.json
+        env:
+          FILTER: ${{ needs.scope.outputs.filter }}
+        run: |
+          if [ -n "$FILTER" ]; then
+            npm run check:code-blocks -- --json code-blocks-report.json --filter "$FILTER"
+          else
+            npm run check:code-blocks -- --json code-blocks-report.json
+          fi
 
       - name: Upload report
         if: always()
