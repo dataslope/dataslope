@@ -30,6 +30,7 @@
     "check:code-blocks": "node scripts/check-code-blocks.mjs",
     "check:js": "node scripts/check-js-blocks.mjs",
     "check:r": "node scripts/check-r-blocks.mjs",
+    "check:cpp": "node scripts/check-cpp-blocks.mjs",
     "check:sql": "node scripts/check-sql-blocks.mjs",
     "check:mcq": "node scripts/check-mcq.mjs",
     "check:mdx": "node scripts/check-mdx-blocks.mjs",
