@@ -374,13 +374,17 @@ async function main() {
         .extract({ left: 0, top: plan.top, width: bounds.width, height: plan.height })
         .png({ compressionLevel: 0 })
         .toBuffer();
-      const out = await toWebpSource(cropped, opts.quality);
 
-      // The served file's own height, not the source's: an R2 PNG and the WebP
-      // promoted from it are the same size today, but --max-width promotion
-      // means that is a convention rather than a guarantee, and the number the
-      // report is about is the layout the site serves.
+      // Re-apply whatever downscale promotion applied. Some art is promoted
+      // with `--max-width` because it is only ever painted small — the auth
+      // globe pins are 264px wide for a 36 CSS px slot — and re-cropping from
+      // the 1024px pristine PNG would silently undo that, handing those pins
+      // back at full resolution and five times the bytes for detail no one can
+      // see. The served file's own width is the record of that decision, so it
+      // is what the new encode is held to.
       const servedMeta = await sharp(served).metadata();
+      const keepWidth = servedMeta.width < bounds.width ? servedMeta.width : null;
+      const out = await toWebpSource(cropped, opts.quality, keepWidth);
       const outMeta = await sharp(out).metadata();
 
       if (!opts.dryRun) writeFileSync(file, out);
