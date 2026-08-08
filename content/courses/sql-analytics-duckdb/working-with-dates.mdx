@@ -27,7 +27,7 @@ tool is `date_trunc('month', d)`.
   title="Revenue per month with date_trunc"
   initSql={`CREATE TABLE orders AS
 SELECT
-  DATE '2024-01-01' + (i * 5) AS order_date,
+  DATE '2024-01-01' + (i * 5)::INTEGER AS order_date,
   (i * 17) % 200 + 20 AS amount
 FROM
   range(0, 40) t (i);`}
@@ -68,7 +68,7 @@ busiest?" by grouping across all weeks.
   title="Which day of week sees the most orders?"
   initSql={`CREATE TABLE orders AS
 SELECT
-  DATE '2024-01-01' + i AS order_date
+  DATE '2024-01-01' + i::INTEGER AS order_date
 FROM
   range(0, 60) t (i);`}
   starterCode={`SELECT

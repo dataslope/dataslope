@@ -58,7 +58,7 @@ column span*. `COUNT(*)`, `MIN`, and `MAX` answer both at once.
   initSql={`CREATE TABLE signups AS
 SELECT
   i AS id,
-  DATE '2024-01-01' + (i % 200) AS signup_date,
+  DATE '2024-01-01' + (i % 200)::INTEGER AS signup_date,
   (i * 11) % 5 AS plan_id
 FROM
   range(1, 1201) t (i);`}
@@ -86,7 +86,7 @@ also reveals **duplicates**.
   initSql={`CREATE TABLE signups AS
 SELECT
   i AS id,
-  DATE '2024-01-01' + (i % 200) AS signup_date,
+  DATE '2024-01-01' + (i % 200)::INTEGER AS signup_date,
   (i * 11) % 5 AS plan_id
 FROM
   range(1, 1201) t (i);`}

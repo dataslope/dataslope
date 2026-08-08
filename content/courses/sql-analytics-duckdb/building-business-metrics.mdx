@@ -162,7 +162,7 @@ series, a direct application of the window-function lessons.
   title="Month-over-month revenue growth"
   initSql={`CREATE TABLE orders AS
 SELECT
-  DATE '2024-01-01' + (i * 9) AS order_date,
+  DATE '2024-01-01' + (i * 9)::INTEGER AS order_date,
   (i * 23) % 150 + 50 AS amount
 FROM
   range(0, 30) t (i);`}

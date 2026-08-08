@@ -65,7 +65,7 @@ before running it.
   title="Monthly paid revenue, share of total, and growth"
   initSql={`CREATE TABLE orders AS
 SELECT
-  DATE '2024-01-01' + (i * 6) AS order_date,
+  DATE '2024-01-01' + (i * 6)::INTEGER AS order_date,
   CASE
     WHEN i % 5 = 0 THEN 'refunded'
     ELSE 'paid'

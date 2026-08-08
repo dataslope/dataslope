@@ -36,6 +36,7 @@ import {
   createEngine,
   fetchRemoteInitSql,
   preparePostgresScript,
+  remoteUrlsIn,
 } from "./lib/sql-engines.mjs";
 
 const args = process.argv.slice(2);
@@ -88,6 +89,12 @@ let slowest = { ms: 0 };
 /** Run `initSql` (remote first, if any) then hand back the engine. */
 async function prepare(item) {
   const engine = await createEngine(item.dialect);
+  // DuckDB lessons read parquet straight from a URL; give the engine those
+  // bytes up front so the lesson's own SQL runs unmodified.
+  if (engine.registerUrls) {
+    const sql = [item.initSql, item.sql, item.solutionSql].filter(Boolean).join("\n");
+    await engine.registerUrls(remoteUrlsIn(sql));
+  }
   if (item.remoteInitSql) {
     const raw = await fetchRemoteInitSql(item.remoteInitSql);
     await engine.exec(item.dialect === "postgres" ? preparePostgresScript(raw) : raw);
