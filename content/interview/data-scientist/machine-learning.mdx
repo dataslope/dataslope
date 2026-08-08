@@ -403,8 +403,8 @@ print(f"Test accuracy: {accuracy_score(y_test, model.predict(X_test)):.3f}")
 
 ### What is the difference between a generative and a discriminative model?
 
-A **discriminative model** learns `P(y|x)` directly, the conditional probability of the label given input (logistic regression, SVM, neural nets).
-A **generative model** learns the joint `P(x, y)` or the data distribution per class, Naive Bayes, Gaussian mixture model (GMM), then applies Bayes' theorem to classify.
+A **discriminative model** learns $P(y \mid x)$ directly, the conditional probability of the label given input (logistic regression, SVM, neural nets).
+A **generative model** learns the joint $P(x, y)$ or the data distribution per class, Naive Bayes, Gaussian mixture model (GMM), then applies Bayes' theorem to classify.
 Generative models can generate new data and work better with limited labeled data; discriminative models typically achieve higher classification accuracy with enough labeled data.
 
 ### How does a decision tree split?

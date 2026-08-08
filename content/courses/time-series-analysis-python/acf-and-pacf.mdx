@@ -25,9 +25,9 @@ otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
   between. It captures only the **direct** relationship.
 
 Why does "direct vs total" matter so much? Picture an AR(1) series where
-each value is `0.7 ×` the previous one. Then `y(t)` is directly tied to
-`y(t-1)`. But `y(t-1)` is tied to `y(t-2)`, so `y(t)` is *indirectly*
-correlated with `y(t-2)` too, through the chain, even though there's no
+each value is $0.7 \times$ the previous one. Then $y(t)$ is directly tied to
+$y(t-1)$. But $y(t-1)$ is tied to $y(t-2)$, so $y(t)$ is *indirectly*
+correlated with $y(t-2)$ too, through the chain, even though there's no
 direct link. The **ACF** at lag 2 sees that indirect echo and is nonzero;
 the **PACF** at lag 2 strips the chain away and reveals the truth: no direct
 lag-2 relationship.
@@ -211,7 +211,7 @@ A sharp PACF cut-off (with a tailing ACF) names an AR model, and two spikes mean
 
 ## The significance bands: which spikes are real?
 
-Every ACF/PACF plot draws a shaded band, roughly `±1.96/√n`. Spikes *inside*
+Every ACF/PACF plot draws a shaded band, roughly $\pm 1.96/\sqrt{n}$. Spikes *inside*
 the band are statistically indistinguishable from zero, noise. Spikes
 *poking outside* are "significant." When we say a plot "cuts off after lag
 `p`," we mean the spikes are significant up through lag `p` and then duck
@@ -499,7 +499,7 @@ A non-stationary ACF lingers near 1 and hides the short-lag pattern, so the chea
   off.
 - Mnemonic: **PACF → AR order; ACF → MA order**. The plot that *cuts off*
   names the model; the number of spikes is the order.
-- Spikes inside the **`±1.96/√n`** band are noise; don't over-read a lone
+- Spikes inside the $\mathbf{\pm 1.96/\sqrt{n}}$ band are noise; don't over-read a lone
   far-out spike (some are false alarms).
 - **Always difference to stationarity first**, a slowly-decaying ACF means
   "non-stationary," not "high-order AR."

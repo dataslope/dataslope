@@ -50,18 +50,18 @@ Every CI you will ever build has three ingredients:
 **point estimate** (where you think the parameter is),
 **standard error** (how much your estimate wobbles), and a
 **critical value** (how many standard errors wide to make the band, set
-by the confidence level). Combine them: `estimate ± (critical value × standard error)`. Memorize the
+by the confidence level). Combine them: $\text{estimate} \pm (\text{critical value} \times \text{standard error})$. Memorize the
 *shape*, not any single formula, the shape is universal.
 </Callout>
 
 ## Building a CI for a mean
 
-For a population mean, the point estimate is x̄ and the standard
-error is `s / √n` (sample standard deviation over root-n). Because
-we estimate σ from the data, the right critical value comes from
-the **t-distribution** with `n − 1` degrees of freedom, not the normal,
+For a population mean, the point estimate is $\bar{x}$ and the standard
+error is $s / \sqrt{n}$ (sample standard deviation over root-n). Because
+we estimate $\sigma$ from the data, the right critical value comes from
+the **t-distribution** with $n - 1$ degrees of freedom, not the normal,
 the t is slightly wider to pay for that extra uncertainty, and the
-difference matters most when `n` is small.
+difference matters most when $n$ is small.
 
 `scipy.stats` does the arithmetic for you. `stats.t.interval` takes the
 confidence level, the degrees of freedom, the center, and the standard
@@ -102,8 +102,8 @@ print(f"{low:.2f} to {high:.2f}, given how noisy a sample of 50 is.'")
   ]}
 />
 
-The margin of error is half the width, the `± ` part. Notice it is
-built entirely from things you can compute from the sample (`s`, `n`)
+The margin of error is half the width, the $\pm$ part. Notice it is
+built entirely from things you can compute from the sample ($s$, $n$)
 and the confidence level (the critical value). If you want the critical
 value explicitly, it's `stats.t.ppf(0.975, df=n-1)` for a 95% interval
 (0.975 because 2.5% is left in each tail), and the CI is `x_bar ±
@@ -311,10 +311,10 @@ flowchart TD
   above, the parameter is fixed, so it's already in or out. The
   probability lived in the random interval, which is now decided.
 - **"95% of the data falls inside the interval."** No. A CI for the
-  *mean* is built from the *standard error* (`s / √n`), which
-  shrinks as `n` grows. The range that holds ~95% of individual values
-  is roughly `x̄ ± 2s` (using the *standard deviation*) and does
-  **not** shrink with `n`. Confusing these two is rampant, a 95% CI
+  *mean* is built from the *standard error* ($s / \sqrt{n}$), which
+  shrinks as $n$ grows. The range that holds ~95% of individual values
+  is roughly $\bar{x} \pm 2s$ (using the *standard deviation*) and does
+  **not** shrink with $n$. Confusing these two is rampant, a 95% CI
   for the mean of a big sample can be razor-thin while the data
   themselves are spread all over.
 - **"A wider interval is better/safer."** Wider means *less* precise,
@@ -332,9 +332,9 @@ flowchart TD
 <Callout type="warn" title="CI for the MEAN vs. range of the DATA">
 This is worth isolating because it bites experienced analysts. The
 **confidence interval for the mean** uses the **standard error**
-`s / √n` and gets *narrower* with more data, it's about pinning
-down μ. The **spread of the data** uses the **standard deviation**
-`s` and does *not* shrink with `n`, it's about how individual values
+$s / \sqrt{n}$ and gets *narrower* with more data, it's about pinning
+down $\mu$. The **spread of the data** uses the **standard deviation**
+$s$ and does *not* shrink with $n$, it's about how individual values
 scatter. A CI of (49.8, 50.2) on 100,000 points does **not** mean the
 data lives in that sliver; it means you know the *average* very
 precisely. Always ask: "a range for the parameter, or for the values?"
@@ -342,16 +342,16 @@ precisely. Always ask: "a range for the parameter, or for the values?"
 
 ## What controls the width
 
-The margin of error is `critical value × standard error`, so the width
+The margin of error is $\text{critical value} \times \text{standard error}$, so the width
 responds to exactly three levers:
 
 - **Confidence level ↑ → wider.** Demanding 99% coverage instead of 95%
   needs a bigger critical value, so the band grows. More confidence
   costs precision.
-- **Sample size `n` ↑ → narrower.** The standard error is `s / √n`,
-  so width shrinks like `1 / √n`, quadruple the data to halve the
+- **Sample size $n$ ↑ → narrower.** The standard error is $s / \sqrt{n}$,
+  so width shrinks like $1 / \sqrt{n}$, quadruple the data to halve the
   margin. (The same diminishing return from *Standard Error*.)
-- **Variability `s` ↑ → wider.** Noisier data gives a noisier estimate.
+- **Variability $s$ ↑ → wider.** Noisier data gives a noisier estimate.
   You don't control this directly, but cleaner measurement helps.
 
 Let's watch the first two levers move.
@@ -392,7 +392,7 @@ print("Notice: each 4x increase in n roughly HALVES the width.")
 
 The two blocks make the trade-off concrete: you buy precision (a
 narrower interval) either by accepting less confidence or by collecting
-more data, and the `√n` rule means the second option gets
+more data, and the $\sqrt{n}$ rule means the second option gets
 expensive fast.
 
 <MultipleChoice
@@ -421,9 +421,13 @@ long before most people expect it to.
 Means aren't the only thing you estimate. Conversion rates, churn
 rates, click-through rates, "yes" shares in a survey, these are all
 **proportions**, and they get confidence intervals too. The point
-estimate is p̂ (successes over trials), and the standard error
-of a proportion is `√( p̂(1 − p̂) / n )`. The classic
-"normal-approximation" (Wald) interval is `p̂ ± z × √( p̂(1 − p̂) / n )`.
+estimate is $\hat{p}$ (successes over trials), and the standard error
+of a proportion is $\sqrt{\hat{p}(1 - \hat{p}) / n}$. The classic
+"normal-approximation" (Wald) interval is
+
+$$
+\hat{p} \pm z \sqrt{\frac{\hat{p}(1 - \hat{p})}{n}}
+$$
 
 <CodeBlock
   adapter="python"
@@ -821,9 +825,9 @@ The legitimate route to a tighter interval at the same confidence is more data, 
 <Callout type="success" title="Key takeaways">
 - A confidence interval is **point estimate ± margin of error**, where margin = **critical value × standard error**. It expresses how *precise* your estimate is.
 - "95% confidence" is a property of the **procedure**: repeat the sampling-and-interval process and ~95% of the intervals cover the true parameter. It is **not** "a 95% probability the parameter is in this one interval", the parameter is fixed, the interval was random.
-- A CI for the **mean** (uses standard error, shrinks with `n`) is **not** a range for the **data** (uses standard deviation, doesn't shrink).
-- Width grows with the **confidence level** and the **variability**, and shrinks like **`1 / √n`**. Wider is *less* precise, not "safer."
-- Use **`stats.t.interval`** for means (t-distribution, `df = n − 1`) and a proportion formula (or **`stats.binomtest(...).proportion_ci()`**) for rates.
+- A CI for the **mean** (uses standard error, shrinks with $n$) is **not** a range for the **data** (uses standard deviation, doesn't shrink).
+- Width grows with the **confidence level** and the **variability**, and shrinks like $\mathbf{1 / \sqrt{n}}$. Wider is *less* precise, not "safer."
+- Use **`stats.t.interval`** for means (t-distribution, $df = n - 1$) and a proportion formula (or **`stats.binomtest(...).proportion_ci()`**) for rates.
 - A difference CI that **includes 0** means *inconclusive*, not *no effect*, this is the bridge to *Hypothesis Testing*.
 </Callout>
 

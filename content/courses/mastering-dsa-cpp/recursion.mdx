@@ -164,7 +164,7 @@ int main() {
   ]}
 />
 
-But recursion can also make things *faster*, not just prettier. To compute `a^n`, notice that `a^n = (a^(n/2))² ` when `n` is even, one recursive call on half the exponent, then one multiplication. The exponent halves every level, so the recursion is only O(log n) deep: `powerFast(3, 13)` finishes in four recursive steps where the naive version needs thirteen. Halving the problem instead of shrinking it by one is the divide-and-conquer move, and the sorting chapter is built on it.
+But recursion can also make things *faster*, not just prettier. To compute $a^n$, notice that $a^n = (a^{n/2})^2$ when $n$ is even, one recursive call on half the exponent, then one multiplication. The exponent halves every level, so the recursion is only O(log n) deep: `powerFast(3, 13)` finishes in four recursive steps where the naive version needs thirteen. Halving the problem instead of shrinking it by one is the divide-and-conquer move, and the sorting chapter is built on it.
 
 <CodeBlock
   adapter="cpp"

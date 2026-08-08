@@ -20,22 +20,26 @@ An ARIMA model is built from two simple ideas about where the next value
 comes from.
 
 **AR(p), autoregressive.** "Regress the series on its own recent *values*."
-Each value is a weighted sum of the last `p` values plus a random shock:
+Each value is a weighted sum of the last $p$ values plus a random shock:
 
-`y(t) = c + φ₁·y(t-1) + φ₂·y(t-2) + ... + φₚ·y(t-p) + ε(t)`
+$$
+y(t) = c + \varphi_1 y(t-1) + \varphi_2 y(t-2) + \cdots + \varphi_p y(t-p) + \varepsilon(t)
+$$
 
 This captures **momentum / persistence**: a high value tends to be followed
-by another high value. The `φ` weights say how strongly the past pulls the
+by another high value. The $\varphi$ weights say how strongly the past pulls the
 present.
 
 **MA(q), moving average.** "Regress the series on its own recent *shocks*."
-Each value is the current shock plus a weighted sum of the last `q` shocks
+Each value is the current shock plus a weighted sum of the last $q$ shocks
 (the past forecast errors):
 
-`y(t) = c + ε(t) + θ₁·ε(t-1) + ... + θ_q·ε(t-q)`
+$$
+y(t) = c + \varepsilon(t) + \theta_1 \varepsilon(t-1) + \cdots + \theta_q \varepsilon(t-q)
+$$
 
 This captures **how long a surprise echoes**: an unexpected jump last month
-nudges this month, then fades after `q` steps.
+nudges this month, then fades after $q$ steps.
 
 <Callout type="danger" title="An MA MODEL is NOT a moving-average smoother">
 This is the single most confusing name collision in time series. The

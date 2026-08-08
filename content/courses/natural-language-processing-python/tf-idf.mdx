@@ -81,7 +81,7 @@ for word in ["data", "stories", "and"]:
   ]}
 />
 
-"data" appears twice in seven words, so its term frequency is `2/7 ≈ 0.286`,
+"data" appears twice in seven words, so its term frequency is $2/7 \approx 0.286$,
 the highest in the document. So far this is just normalized counting, and on its
 own it still over-rewards common words. The magic is in the second factor.
 
@@ -138,7 +138,7 @@ is bigger than the gap between 100 and 1,000.
 
 <Callout type="warn" title="Why the logarithm, and the zero-division guard">
 Without the `log`, a word seen in 1 of 10000 documents would get an IDF of
-10000 and swamp everything else; the log compresses that to a sane `≈9.2`.
+10000 and swamp everything else; the log compresses that to a sane $\approx 9.2$.
 Two practical notes: a word that appears in *no* document would divide by zero,
 so real implementations add **smoothing** (e.g., `log(N / (1 + df))` or
 `log(N / df) + 1`); and different libraries use slightly different formulas.
@@ -148,7 +148,7 @@ the same across all variants.
 
 ## Step 3: putting them together
 
-TF-IDF for a word in a document is simply `TF × IDF`. A high score means the word
+TF-IDF for a word in a document is simply $\text{TF} \times \text{IDF}$. A high score means the word
 is frequent *here* and rare *elsewhere*, the definition of a distinctive,
 topic-revealing word. Let us compute the full table for our tiny corpus and watch
 "the" vanish while the content words light up.

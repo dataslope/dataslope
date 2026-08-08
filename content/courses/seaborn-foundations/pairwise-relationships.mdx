@@ -206,7 +206,7 @@ sns.pairplot(penguins, hue="species", diag_kind="kde")
 <Callout type="warn" title="When a pair plot becomes unreadable">
 Two failure modes, two fixes:
 
-- **Too many variables.** The panel count is `n²`, so ten numeric columns
+- **Too many variables.** The panel count is $n^2$, so ten numeric columns
   means a hundred postage-stamp plots. Use `vars=` to pick the few that
   matter, and `corner=True` to drop the redundant half.
 - **Too many points.** Every one of those panels is a scatter, so a large
@@ -229,8 +229,8 @@ result is an unreadable wall of tiny panels. What is the most direct fix?
 - Increase the figure \`height\` so each panel is bigger.
   > A bigger figure still contains 12×12 = 144 panels; it just makes a larger wall. You need *fewer* panels, not a bigger canvas.
 
-Because the grid is \`n × n\`, the lever that matters most for readability is
-reducing \`n\`, that's exactly what \`vars=\` does.`}
+Because the grid is $n \\times n$, the lever that matters most for readability is
+reducing $n$, that's exactly what \`vars=\` does.`}
 />
 
 ## Under the hood: `PairGrid`
@@ -277,7 +277,7 @@ fast, sensible default (which is most of the time), and drop down to
 - **What it hides:** anything that isn't a pairwise, two-variable view. A
   three-way interaction won't show up, and with many points the individual
   dots blur together in every panel.
-- **When it breaks:** many columns (`n²` tiny panels, subset with `vars=`)
+- **When it breaks:** many columns ($n^2$ tiny panels, subset with `vars=`)
   or many rows (every panel overplots, sample, or use `corner`/`kde`).
 
 ## Your turn

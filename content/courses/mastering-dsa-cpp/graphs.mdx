@@ -51,7 +51,7 @@ Unlike a tree, a graph has no root, no parent pointers, no natural "shape" to ha
 
 ### Adjacency matrix
 
-An adjacency matrix is a `V × V` table. `matrix[u][v]` tells whether edge `u -> v` exists. It uses **O(V²)** space and supports **O(1)** edge lookup. Note how the undirected edges are written twice, `matrix[u][v]` and `matrix[v][u]`, making the matrix symmetric about its diagonal.
+An adjacency matrix is a $V \times V$ table. `matrix[u][v]` tells whether edge `u -> v` exists. It uses **O(V²)** space and supports **O(1)** edge lookup. Note how the undirected edges are written twice, `matrix[u][v]` and `matrix[v][u]`, making the matrix symmetric about its diagonal.
 
 <CodeBlock
   adapter="cpp"
@@ -217,7 +217,7 @@ int main() {
   ]}
 />
 
-A graph is **sparse** when `E` is much smaller than `V²`. It is **dense** when the possible edges are mostly present. Almost every graph arising from the real world is sparse, road intersections connect to a handful of streets, people follow hundreds of accounts out of billions, which is why the adjacency list wins by default, and the matrix is reserved for small or genuinely dense graphs.
+A graph is **sparse** when $E$ is much smaller than $V^2$. It is **dense** when the possible edges are mostly present. Almost every graph arising from the real world is sparse, road intersections connect to a handful of streets, people follow hundreds of accounts out of billions, which is why the adjacency list wins by default, and the matrix is reserved for small or genuinely dense graphs.
 
 ```mermaid
 graph TD

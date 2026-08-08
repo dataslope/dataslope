@@ -16,7 +16,7 @@ a process's consistency, a portfolio's volatility, a sensor's noise,
 all of these are spread, not center. This page builds the vocabulary:
 **range**, **variance**, **standard deviation**, the **IQR**, the
 **MAD**, and the **coefficient of variation**, plus the one divisor
-detail (`n−1`) that trips up almost everyone.
+detail ($n-1$) that trips up almost everyone.
 
 <Figure
   slug="stat-measures-of-spread-cutout"
@@ -71,7 +71,7 @@ a center with a spread.
 
 ## Range: the quick-and-dirty spread
 
-The **range** is just `max − min`. It's the easiest spread to compute
+The **range** is just $\text{max} - \text{min}$. It's the easiest spread to compute
 and explain, and it's genuinely useful as a first glance or a
 sanity check (a range of 0 means a constant column; a range of 10,000
 on what should be ages means a data-entry bug).
@@ -123,7 +123,9 @@ square minutes, which nobody can interpret. So we take the square root
 and get the **standard deviation**, which is back in the original units
 and reads as a typical distance from the mean.
 
-`s = √( Σ(xᵢ − x̄)² / (n − 1) )`
+$$
+s = \sqrt{\frac{\sum_i (x_i - \bar{x})^2}{n - 1}}
+$$
 
 You will rarely compute this by hand, `numpy` and `pandas` do it, but
 the shape matters: square the distances, average them, square-root back.
@@ -162,29 +164,29 @@ mean and about 95% within two SDs (we'll make this precise in *The
 Normal Distribution*).
 </Callout>
 
-## The `n−1` divisor: why sample spread uses `ddof=1`
+## The $n-1$ divisor: why sample spread uses `ddof=1`
 
 Here is the detail that confuses everyone, so let's make it intuitive
 rather than mathematical. When you compute spread from a **sample**
 (not the whole population), you divide the sum of squared deviations by
-`n−1`, not `n`.
+$n-1$, not $n$.
 
 Why? Because you measured the deviations from the **sample mean**, not
 the true population mean, and the sample mean is, by construction, the
 point that sits as close as possible to your sample's points. Your data
 hugs its own mean a little more tightly than it hugs the real
 population mean. So squared deviations from the sample mean are
-*systematically a bit too small*, and dividing by `n` would
+*systematically a bit too small*, and dividing by $n$ would
 **underestimate** the true spread. Dividing by the smaller number
-`n−1` nudges the estimate up to compensate. People say the sample mean
-"uses up one degree of freedom", once you know the mean and `n−1` of
-the values, the last value is determined, so only `n−1` deviations are
+$n-1$ nudges the estimate up to compensate. People say the sample mean
+"uses up one degree of freedom", once you know the mean and $n-1$ of
+the values, the last value is determined, so only $n-1$ deviations are
 truly free to vary.
 
 <Callout type="info" title="ddof = 'delta degrees of freedom'">
-In NumPy, `ddof` is what gets subtracted from `n` in the divisor.
-`ddof=0` divides by `n` (the **population** formula). `ddof=1` divides
-by `n−1` (the **sample** formula). **pandas defaults to `ddof=1`**
+In NumPy, `ddof` is what gets subtracted from $n$ in the divisor.
+`ddof=0` divides by $n$ (the **population** formula). `ddof=1` divides
+by $n-1$ (the **sample** formula). **pandas defaults to `ddof=1`**
 (sample), while **NumPy defaults to `ddof=0`** (population), a classic
 source of "why don't my numbers match?" bugs.
 </Callout>
@@ -222,7 +224,7 @@ usually want**. When you see a small discrepancy between two "standard
 deviations," check the divisor first.
 </Callout>
 
-For large `n` the difference between dividing by `n` and `n−1` is tiny
+For large $n$ the difference between dividing by $n$ and $n-1$ is tiny
 (1000 vs 999 barely moves the answer). It matters most for small
 samples, exactly when you're most at risk of underestimating spread.
 
@@ -235,11 +237,11 @@ every one, averaged against the truth.
 
 Just as the median is a robust center, the **interquartile range
 (IQR)** is a robust spread. It's the range of the *middle 50%* of the
-data: the 75th percentile minus the 25th percentile (`Q3 − Q1`).
+data: the 75th percentile minus the 25th percentile ($Q_3 - Q_1$).
 Because it ignores the top and bottom 25%, no single outlier, however
 extreme, can move it. That makes it the spread of choice for skewed,
 outlier-prone data, and it's the engine behind box plots and the
-`1.5×IQR` outlier rule we'll meet in *Shape and Outliers*.
+$1.5 \times \text{IQR}$ outlier rule we'll meet in *Shape and Outliers*.
 
 ```mermaid
 flowchart TD
@@ -534,10 +536,10 @@ assert more_variable == expected`,
 
 - One of the two libraries has a bug
   > Both results are correct; they simply use different default divisors, which is expected behavior, not a bug.
-- [o] NumPy's default uses \`ddof=0\` (divide by n) while pandas defaults to \`ddof=1\` (divide by n−1), so the pandas value is slightly larger
-  > The \`n−1\` divisor produces a marginally larger estimate, and matching them just means passing \`ddof=1\` to NumPy or \`ddof=0\` to pandas.
+- [o] NumPy's default uses \`ddof=0\` (divide by $n$) while pandas defaults to \`ddof=1\` (divide by $n-1$), so the pandas value is slightly larger
+  > The $n-1$ divisor produces a marginally larger estimate, and matching them just means passing \`ddof=1\` to NumPy or \`ddof=0\` to pandas.
 - pandas rounds and NumPy does not
-  > Neither silently rounds; the gap comes from the divisor (\`n\` vs \`n−1\`), not from rounding.
+  > Neither silently rounds; the gap comes from the divisor ($n$ vs $n-1$), not from rounding.
 - The data must contain missing values that pandas dropped
   > Dropping values would change the result unpredictably; this specific, small gap is the signature of the differing default \`ddof\`.
 
@@ -545,14 +547,14 @@ Whenever two "standard deviations" differ slightly on identical data, suspect th
 />
 
 <MultipleChoice
-  markdown={`Why do we divide by \`n−1\` instead of \`n\` when estimating spread from a *sample*?
+  markdown={`Why do we divide by $n-1$ instead of $n$ when estimating spread from a *sample*?
 
 - To make the standard deviation smaller and more conservative
-  > Dividing by the smaller \`n−1\` makes the estimate *larger*, not smaller, the opposite of this claim.
-- [o] Deviations are measured from the sample mean, which hugs the sample too tightly, so dividing by \`n\` would underestimate the true spread; \`n−1\` corrects for that
+  > Dividing by the smaller $n-1$ makes the estimate *larger*, not smaller, the opposite of this claim.
+- [o] Deviations are measured from the sample mean, which hugs the sample too tightly, so dividing by $n$ would underestimate the true spread; $n-1$ corrects for that
   > Because the sample mean sits closer to the sample's own points than the true mean does, the squared deviations run small, and the smaller divisor compensates.
 - Because the population is always smaller than the sample
-  > The population is the larger thing we're estimating; the \`n−1\` correction has nothing to do with population size.
+  > The population is the larger thing we're estimating; the $n-1$ correction has nothing to do with population size.
 - It is an arbitrary convention with no real justification
   > There is a concrete reason: it removes the systematic downward bias that arises from estimating deviations around the sample's own mean.
 

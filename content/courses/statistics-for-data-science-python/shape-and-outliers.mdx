@@ -83,7 +83,7 @@ print("\\nPositive skew -> mean above median. Negative -> mean below.")
   ]}
 />
 
-Notice the `mean − median` column tracks the skew sign exactly. That's
+Notice the $\text{mean} - \text{median}$ column tracks the skew sign exactly. That's
 the cheap field test from *Measures of Center*: you don't need to
 compute a skewness coefficient to suspect skew, just compare the mean
 and median.
@@ -220,14 +220,14 @@ correct default is **investigate, then decide**, never delete on sight.
 Flagging is mechanical; deciding is human. Two standard rules flag
 candidates:
 
-**The 1.5×IQR rule (box-plot fences).** Compute `Q1`, `Q3`, and
-`IQR = Q3 − Q1`. Anything below `Q1 − 1.5×IQR` or above
-`Q3 + 1.5×IQR` is flagged. Because it's built on quartiles, it's
+**The 1.5×IQR rule (box-plot fences).** Compute $Q_1$, $Q_3$, and
+$IQR = Q_3 - Q_1$. Anything below $Q_1 - 1.5 \times IQR$ or above
+$Q_3 + 1.5 \times IQR$ is flagged. Because it's built on quartiles, it's
 **robust**, the outliers themselves don't move the fences, so it
 works on skewed data.
 
-**The z-score rule.** Compute each point's `z = (x − mean) / std` and
-flag anything with `|z| > 3` (sometimes 2). It asks "how many standard
+**The z-score rule.** Compute each point's $z = (x - \text{mean}) / \text{std}$ and
+flag anything with $|z| > 3$ (sometimes 2). It asks "how many standard
 deviations from the mean?" But it's built on the **mean and standard
 deviation**, which the outliers *themselves* inflate, so on skewed or
 contaminated data it can hide the very points it's meant to catch.
