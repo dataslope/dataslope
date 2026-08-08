@@ -118,6 +118,11 @@ flowchart LR
 
 ## What happens during a method call
 
+Each call puts a frame on the stack, and the stack is a fixed allocation,
+so the depth a program survives is that budget divided by the frame size:
+
+<Chart slug="stack-depth-overflow" />
+
 Every method call pushes a fresh frame onto the stack. Every return
 pops it. Watch what happens here:
 

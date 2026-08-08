@@ -234,6 +234,12 @@ ORDER BY
 
 ## Junction tables can hold facts about the relationship
 
+One warning before you put a number in a junction table. Aggregating
+across a join that matches each row several times inflates every `SUM` by
+the fan-out, and the result set looks perfectly ordinary:
+
+<Chart slug="join-fanout-rows" />
+
 A value like `grade` or `enrolled_on` belongs on `enrollments`, because it describes a particular student-course pairing. Ada's grade in Math is not just a fact about Ada, and it is not just a fact about Math. It is a fact about Ada taking Math.
 
 <SqlCodeBlock
