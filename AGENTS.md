@@ -134,6 +134,47 @@ node scripts/remove-background-kie.mjs                 # adds <id>-cutout.png
 node scripts/promote-illustrations.mjs python-basics-loops python-basics-sets
 ```
 
+### Trimming the blank band above and below the artwork
+
+Background removal leaves the subject floating in the frame it was generated
+in, so a promoted cut-out is 1536x1024 of *layout* carrying rather less than
+that of drawing. `<Figure>` renders at the full content width with `height:
+auto`, so every transparent row is vertical space a lesson pays for and nobody
+sees — a median 11% of each image's height across the promoted set, over 30% on
+41 of them.
+
+`scripts/trim-cutouts.mjs` removes it, **vertically only**. The left/right
+margins are deliberately kept: horizontal blank costs nothing in a page that
+scrolls, and cropping it would leave each figure a different width, so a run of
+lessons would stop sharing an edge.
+
+```bash
+node scripts/trim-cutouts.mjs --prefix python-basics- --dry-run
+node scripts/trim-cutouts.mjs --prefix python-basics-
+```
+
+It re-crops the **pristine `cutout.png` in R2**, so a trimmed image is still a
+single lossy generation from the original rather than a second pass over the
+served WebP. A prompt id usually exists in several runs (a redraw writes a new
+run prefix and leaves the old one), so the right PNG is found by matching pixels
+against the file the site currently serves: the true source scores ~44 dB and
+every other run of the same id 6-11 dB. When no candidate matches — the run has
+aged out of the bucket — it falls back to re-encoding the served WebP, measured
+at 41-49 dB premultiplied PSNR, which is visually lossless but not free. **The
+script only reads from R2**; it never puts and never deletes.
+
+It is idempotent (an already-tight image is skipped, not re-encoded) and runs
+`build-images` afterwards, which is what updates the manifest's `height` so
+`<Figure>` keeps reserving the right box.
+
+Trimming changes an image's aspect ratio, which every consumer that sizes a
+cut-out by width (`<Figure>`, the course-card thumbnails) or letterboxes it
+(`object-contain`: the auth-globe pins, the pricing icons) absorbs for free.
+Two do not, and want checking before a sweep reaches their slugs:
+`StatsBento` sizes the four `home-icon-*` cut-outs `h-40 w-40` with no
+`object-fit`, and `InterviewCatalog` uses `aspect-[3/2] object-cover` for the
+six `interview-*-thumbnail` banners.
+
 ### Reviewing, and the regeneration queue
 
 `/dashboard/admin/illustration-prompts` is the review surface and is
