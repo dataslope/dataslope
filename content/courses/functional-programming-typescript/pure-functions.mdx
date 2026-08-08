@@ -125,7 +125,10 @@ easily.
 ### 3. They're cacheable (memoizable)
 
 `f(x)` always returns the same value, so you can compute it once and
-remember it. This is called **memoization**.
+remember it. This is called **memoization**. On a function that calls
+itself, that one property is worth several orders of magnitude:
+
+<Chart slug="memoization-call-tree" />
 
 <CodeBlock
   adapter="typescript"

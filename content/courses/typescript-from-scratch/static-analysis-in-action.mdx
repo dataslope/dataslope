@@ -25,6 +25,12 @@ When you run `tsc` (the TypeScript compiler), it doesn't just transform `.ts` fi
 
 These proofs eliminate entire classes of bugs. Let's see them in action.
 
+What makes that worth the annotations is *when* the proofs happen. A bug is
+never only the cost of its fix; it is the fix plus everything that happened
+between writing it and finding it:
+
+<Chart slug="bug-cost-by-stage" />
+
 ---
 
 ## Type Safety: Catching Typos and Mismatches

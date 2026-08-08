@@ -262,6 +262,13 @@ like Immer (using copy-on-write proxies) or Immutable.js (using hash
 array mapped tries) give you immutability with O(log n) updates.
 But you almost never need them.
 
+That O(log n) is worth seeing, because it is the number that makes the
+naive worry wrong. A persistent structure rewrites only the nodes between
+the root and the element you changed; everything else is shared with the
+version you started from:
+
+<Chart slug="structural-sharing-copy" />
+
 ## Immutability + parallelism = free
 
 Two pieces of code that share *no mutable state* cannot race.

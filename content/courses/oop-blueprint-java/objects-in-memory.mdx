@@ -289,6 +289,13 @@ answer affects everything.
 
 ## Object lifecycle: from `new` to garbage collection
 
+An object is never only its fields. Every one carries a header the JVM
+uses for its identity hash, lock state and garbage-collection bookkeeping,
+which is why a million boxed integers cost several times what a million
+primitive ones do:
+
+<Chart slug="object-header-overhead" />
+
 ```mermaid
 stateDiagram-v2
     [*] --> Allocated: new Dog(...)
