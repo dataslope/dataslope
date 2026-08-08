@@ -122,7 +122,7 @@ public class IntRange implements Iterable<Integer> {
 
   @Override
   public Iterator<Integer> iterator() {
-    return new Iterator<>() {
+    return new Iterator<Integer>() {
       private int cursor = start;
 
       @Override
@@ -364,7 +364,7 @@ public class IntArrayIterable implements Iterable<Integer> {
 
   @Override
   public Iterator<Integer> iterator() {
-    return new Iterator<>() {
+    return new Iterator<Integer>() {
       private int i = 0;
       @Override
       public boolean hasNext() {
@@ -449,7 +449,7 @@ public class Countdown implements Iterable<Integer> {
 
   @Override
   public Iterator<Integer> iterator() {
-    return new Iterator<>() {
+    return new Iterator<Integer>() {
       private int cursor = start;
       @Override
       public boolean hasNext() {

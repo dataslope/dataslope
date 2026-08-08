@@ -43,12 +43,8 @@ construction.
 Java 9 introduced concise factories that return *truly immutable*
 collections:
 
-<CodeBlock
-  adapter="java"
-  files={[
-    {
-      filename: "main.java",
-      starterCode: `import java.util.List;
+```java
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,10 +65,8 @@ public class Main {
     }
   }
 }
-`,
-    },
-  ]}
-/>
+```
+
 
 These factories return purpose-built, compact implementations, not
 just a wrapper. Mutator methods throw `UnsupportedOperationException`.
@@ -90,12 +84,8 @@ just a wrapper. Mutator methods throw `UnsupportedOperationException`.
 `Map.of` has overloads up to 10 entries. For arbitrary numbers, use
 `Map.ofEntries(...)` or `Map.copyOf(existingMap)`:
 
-<CodeBlock
-  adapter="java"
-  files={[
-    {
-      filename: "main.java",
-      starterCode: `import static java.util.Map.entry;
+```java
+import static java.util.Map.entry;
 
 import java.util.Map;
 
@@ -106,10 +96,17 @@ public class Main {
     System.out.println(m);
   }
 }
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The `List.of` / `Set.of` / `Map.of` family arrived in Java 9 and `Map.ofEntries`
+with it; the playground on these pages runs Java 8, so `javac` here cannot
+resolve any of them. Rewriting these two examples in Java 8 would remove the
+very thing they exist to show, so they are shown rather than run. Every other
+block on this page uses the Java 8 spellings (`Arrays.asList`,
+`Collections.unmodifiableList`, `new ArrayList<>(source)`) and does run.
+</Callout>
+
 
 ## Unmodifiable views: Collections.unmodifiableX
 
@@ -126,7 +123,7 @@ still useful, but it is a **view**, not a copy:
 
 public class Main {
   public static void main(String[] args) {
-    List<String> backing = new ArrayList<>(List.of("a", "b"));
+    List<String> backing = new ArrayList<>(Arrays.asList("a", "b"));
     List<String> view = Collections.unmodifiableList(backing);
 
     System.out.println(view);
@@ -184,7 +181,7 @@ public class Main {
 
     // copy on the way in
     Schedule(List<String> tasks) {
-      this.tasks = List.copyOf(tasks); // snapshot + immutable
+      this.tasks = Collections.unmodifiableList(new ArrayList<>(tasks)); // snapshot + immutable
     }
 
     // return a safe view on the way out
@@ -192,7 +189,7 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    List<String> mutable = new ArrayList<>(List.of("write", "review", "ship"));
+    List<String> mutable = new ArrayList<>(Arrays.asList("write", "review", "ship"));
     Schedule s = new Schedule(mutable);
 
     mutable.add("oops"); // caller's mutation does NOT affect Schedule
@@ -235,7 +232,7 @@ The further right you go, the safer your API.
 
 public class Main {
   public static void main(String[] args) {
-    List<String> initial = new ArrayList<>(List.of("apple", "bread", "cheese"));
+    List<String> initial = new ArrayList<>(Arrays.asList("apple", "bread", "cheese"));
     Catalog c = new Catalog(initial);
 
     // External mutation does not leak into the catalog
@@ -255,12 +252,14 @@ public class Main {
     {
       filename: "Catalog.java",
       starterCode: `import java.util.List;
+import java.util.Collections;
+import java.util.ArrayList;
 
 public final class Catalog {
   private final List<String> items;
 
   public Catalog(List<String> items) {
-    this.items = List.copyOf(items); // snapshot in
+    this.items = Collections.unmodifiableList(new ArrayList<>(items)); // snapshot in
   }
 
   public List<String> items() { return items; } // already immutable
@@ -290,10 +289,11 @@ caller mutation was blocked
       filename: "Main.java",
       starterCode: `import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    List<String> names = new ArrayList<>(List.of("Ada", "Grace"));
+    List<String> names = new ArrayList<>(Arrays.asList("Ada", "Grace"));
     Roster r = new Roster(names);
     System.out.println(r.names());
 
@@ -327,11 +327,13 @@ public final class Roster {
 }
 `,
       solutionCode: `import java.util.List;
+import java.util.Collections;
+import java.util.ArrayList;
 
 public final class Roster {
   private final List<String> names;
 
-  public Roster(List<String> names) { this.names = List.copyOf(names); }
+  public Roster(List<String> names) { this.names = Collections.unmodifiableList(new ArrayList<>(names)); }
 
   public List<String> names() { return names; }
 }

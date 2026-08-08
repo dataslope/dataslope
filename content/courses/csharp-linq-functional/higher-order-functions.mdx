@@ -262,7 +262,7 @@ using System.Linq;
 
 static string Trim(string s) => s.Trim();
 static string Lower(string s) => s.ToLowerInvariant();
-static string Collapse(string s) => System.Text.RegularExpressions.Regex.Replace(s, @"s+", " ");
+static string Collapse(string s) => System.Text.RegularExpressions.Regex.Replace(s, @"\\s+", " ");
 
 static Func<string, string> Pipeline(params Func<string, string>[] steps) => input =>
     steps.Aggregate(input, (acc, step) => step(acc));
@@ -270,8 +270,7 @@ static Func<string, string> Pipeline(params Func<string, string>[] steps) => inp
 var clean = Pipeline(Trim, Lower, Collapse);
 
 Console.WriteLine($"[{clean("  Hello   World  ")}]"); // [hello world]
-Console.WriteLine($"[{clean("	C# IS  Fun
-")}]");                                               // [c# is fun]
+Console.WriteLine($"[{clean("\\tC# IS  Fun\\n")}]");  // [c# is fun]
 `,
     },
   ]}

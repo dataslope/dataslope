@@ -87,15 +87,15 @@ public class Main {
   public static void main(String[] args) {
     MusicLibrary lib = new MusicLibrary();
     lib.add(new Track("Clair de Lune", "Debussy", "Suite Bergamasque",
-                      List.of("classical", "impressionist"), 5));
+                      Arrays.asList("classical", "impressionist"), 5));
     lib.add(new Track("Gymnopedie No.1", "Satie", "Gymnopedies",
-                      List.of("classical"), 3));
+                      Arrays.asList("classical"), 3));
     lib.add(new Track("Reverie", "Debussy", "Reveries",
-                      List.of("classical", "impressionist"), 4));
+                      Arrays.asList("classical", "impressionist"), 4));
     lib.add(new Track("Liebestraum", "Liszt", "Liebestraume",
-                      List.of("classical"), 4));
+                      Arrays.asList("classical"), 4));
     lib.add(new Track("La Mer", "Debussy", "Sea Pieces",
-                      List.of("classical", "orchestral"), 5));
+                      Arrays.asList("classical", "orchestral"), 5));
 
     System.out.println("Debussy tracks:");
     for (Track t : lib.byArtist("Debussy")) {
@@ -117,9 +117,45 @@ public class Main {
     {
       filename: "Track.java",
       starterCode: `import java.util.List;
+import java.util.Objects;
 
-public record Track(String title, String artist, String album,
-                    List<String> genres, int rating) {}
+public final class Track {
+  private final String title;
+  private final String artist;
+  private final String album;
+  private final List<String> genres;
+  private final int rating;
+
+  public Track(String title, String artist, String album, List<String> genres, int rating) {
+    this.title = title;
+    this.artist = artist;
+    this.album = album;
+    this.genres = genres;
+    this.rating = rating;
+  }
+
+  public String title() { return title; }
+  public String artist() { return artist; }
+  public String album() { return album; }
+  public List<String> genres() { return genres; }
+  public int rating() { return rating; }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Track)) return false;
+    Track other = (Track)o;
+    return Objects.equals(title, other.title) && Objects.equals(artist, other.artist) && Objects.equals(album, other.album) && Objects.equals(genres, other.genres) && rating == other.rating;
+  }
+
+  @Override
+  public int hashCode() { return Objects.hash(title, artist, album, genres, rating); }
+
+  @Override
+  public String toString() {
+    return "Track[" + "title=" + title + ", " + "artist=" + artist + ", " + "album=" + album + ", " + "genres=" + genres + ", " + "rating=" + rating + "]";
+  }
+}
 `,
     },
     {
@@ -136,25 +172,25 @@ public class MusicLibrary {
   /** All tracks for the artist, in insertion order. */
   public List<Track> byArtist(String artist) {
     // TODO
-    return List.of();
+    return Collections.emptyList();
   }
 
   /** All genres across the library, in insertion order (deduped). */
   public Set<String> genres() {
     // TODO
-    return Set.of();
+    return Collections.emptySet();
   }
 
   /** Top n by rating desc, ties broken by title asc. */
   public List<Track> topRated(int n) {
     // TODO
-    return List.of();
+    return Collections.emptyList();
   }
 
   /** Unique albums for the artist, in insertion order. */
   public Set<String> albumsByArtist(String artist) {
     // TODO
-    return Set.of();
+    return Collections.emptySet();
   }
 }
 `,
@@ -176,7 +212,7 @@ public class MusicLibrary {
 
   public List<Track> byArtist(String artist) {
     return Collections.unmodifiableList(
-        byArtist.getOrDefault(artist, List.of()));
+        byArtist.getOrDefault(artist, Collections.emptyList()));
   }
 
   public Set<String> genres() { return Collections.unmodifiableSet(allGenres); }
@@ -191,7 +227,7 @@ public class MusicLibrary {
 
   public Set<String> albumsByArtist(String artist) {
     return Collections.unmodifiableSet(
-        albumsOfArt.getOrDefault(artist, Set.of()));
+        albumsOfArt.getOrDefault(artist, Collections.emptySet()));
   }
 }
 `,

@@ -53,22 +53,16 @@ A **namespace** is a logical label that prefixes a type's name.
 It lets two libraries have a class called `Logger` without
 clashing, and it lets *your* program group related types.
 
-<CodeBlock
-  adapter="csharp"
-  entryFilename="Program.cs"
-  files={[
-    {
-      filename: "Program.cs",
-      starterCode: `using System;
+```csharp title="Program.cs"
+using System;
 using Banking;
 
 var a = new BankAccount("Alice", 100);
 Console.WriteLine($"{a.Owner}: {a.Balance}");
-`,
-    },
-    {
-      filename: "BankAccount.cs",
-      starterCode: `namespace Banking;
+```
+
+```csharp title="BankAccount.cs"
+namespace Banking;
 
 public class BankAccount
 {
@@ -81,10 +75,17 @@ public class BankAccount
         Balance = opening;
     }
 }
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The C# runtime on these pages evaluates your code as a *script*, the way
+`dotnet script` or the C# Interactive window does, and a script is a single
+implicit compilation unit. A file-scoped `namespace Banking;` has to precede
+every other member of its file, so once the two files above are combined the
+compiler reports `CS8956: File-scoped namespace must precede all other members
+in a file`. Namespaces across separate files are the whole point of this
+lesson, so the example is shown rather than run.
+</Callout>
 
 A few things to notice:
 
@@ -154,13 +155,8 @@ of against it.
 
 ## A small example of conscious organization
 
-<CodeBlock
-  adapter="csharp"
-  entryFilename="Program.cs"
-  files={[
-    {
-      filename: "Program.cs",
-      starterCode: `using System;
+```csharp title="Program.cs"
+using System;
 using Bank.Domain;
 using Bank.App;
 
@@ -171,11 +167,10 @@ teller.Deposit(alice, 50);
 teller.Withdraw(alice, 30);
 
 Console.WriteLine($"{alice.Owner} has {alice.Balance}");
-`,
-    },
-    {
-      filename: "BankAccount.cs",
-      starterCode: `namespace Bank.Domain;
+```
+
+```csharp title="BankAccount.cs"
+namespace Bank.Domain;
 
 public class BankAccount
 {
@@ -195,11 +190,10 @@ public class BankAccount
         Balance += delta;
     }
 }
-`,
-    },
-    {
-      filename: "Teller.cs",
-      starterCode: `using Bank.Domain;
+```
+
+```csharp title="Teller.cs"
+using Bank.Domain;
 
 namespace Bank.App;
 
@@ -208,10 +202,14 @@ public class Teller
     public void Deposit(BankAccount a, decimal amount) => a.ApplyDelta(amount);
     public void Withdraw(BankAccount a, decimal amount) => a.ApplyDelta(-amount);
 }
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+Same reason as the namespace example above: three files with file-scoped
+namespaces cannot be combined into the single script the in-browser C# runtime
+compiles. Splitting a program across `Bank.Domain` and `Bank.App` is the
+lesson, so it is shown rather than run.
+</Callout>
 
 Notice the *direction* of dependency: `Bank.App` uses
 `Bank.Domain`, but the domain doesn't know `Bank.App` exists. If

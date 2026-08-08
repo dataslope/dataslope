@@ -247,8 +247,11 @@ expression and may fail at runtime if you're wrong.
       System.out.println("upgraded: " + asDog.fetch());
     }
 
-    // Modern alternative (pattern matching instanceof, Java 16+):
-    if (a2 instanceof Cat c) {
+    // Java 16 added pattern matching, which folds the cast into the check:
+    //   if (a2 instanceof Cat c) { ... c.purr() ... }
+    // The playground here runs Java 8, so this lesson writes it the long way.
+    if (a2 instanceof Cat) {
+      Cat c = (Cat)a2;
       System.out.println("upgraded: " + c.purr());
     }
   }

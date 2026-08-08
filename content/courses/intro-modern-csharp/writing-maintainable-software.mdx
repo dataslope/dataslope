@@ -167,20 +167,13 @@ diverge tomorrow. Be pragmatic.
 
 ## Comments: explain *why*, not *what*
 
-<CodeBlock
-  adapter="csharp"
-  files={[
-    {
-      filename: "main.cs",
-      starterCode: `// BAD: restates the code
+```csharp
+// BAD: restates the code
 i += 1; // increment i by 1
 
 // GOOD: explains why
 i += 1; // skip the header row, which is never an order
-`,
-    },
-  ]}
-/>
+```
 
 A good comment answers a question the code can't: *why* this
 particular value, *why* this particular order, *why* this

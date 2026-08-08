@@ -262,7 +262,7 @@ public class Main {
   public static void main(String[] args) {
     Map<String, List<String>> byInitial = new HashMap<>();
     for (String name :
-         List.of("Ada", "Alan", "Barbara", "Bjarne", "Ada", "Cathy")) {
+         Arrays.asList("Ada", "Alan", "Barbara", "Bjarne", "Ada", "Cathy")) {
       String key = name.substring(0, 1);
       // create the list lazily the first time we see this key
       byInitial.computeIfAbsent(key, k -> new ArrayList<>()).add(name);
@@ -354,11 +354,12 @@ Expected output (a TreeMap is used in the driver only to make the printout deter
       starterCode: `import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
     List<String> ws =
-        List.of("the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog");
+        Arrays.asList("the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog");
     Map<Integer, List<String>> g = new TreeMap<>(Grouper.byLength(ws));
     g.forEach((k, v) -> System.out.println(k + " -> " + v));
   }

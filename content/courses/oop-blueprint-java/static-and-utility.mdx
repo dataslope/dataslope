@@ -178,7 +178,7 @@ nobody can mistakenly write `new StringTools()`.
   public static boolean isPalindrome(String s) { return s.equals(reverse(s)); }
 
   public static int wordCount(String s) {
-    if (s == null || s.isBlank())
+    if (s == null || s.trim().isEmpty())
       return 0;
     return s.trim().split("\\\\s+").length;
   }

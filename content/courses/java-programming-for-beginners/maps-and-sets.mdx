@@ -173,10 +173,11 @@ trivial.
       starterCode: `import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    List<String> words = List.of("to", "be", "or", "not", "to", "be");
+    List<String> words = Arrays.asList("to", "be", "or", "not", "to", "be");
 
     Map<String, Integer> counts = WordCounter.count(words);
 

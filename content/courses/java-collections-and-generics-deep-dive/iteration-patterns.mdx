@@ -27,10 +27,11 @@ for *"do something with each element, in order"*:
     {
       filename: "main.java",
       starterCode: `import java.util.List;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    List<String> xs = List.of("a", "b", "c");
+    List<String> xs = Arrays.asList("a", "b", "c");
     for (String x : xs) {
       System.out.println(x);
     }
@@ -69,10 +70,11 @@ during iteration:
       starterCode: `import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    List<Integer> xs = new ArrayList<>(List.of(1, 2, 3, 4, 5, 6));
+    List<Integer> xs = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
     Iterator<Integer> it = xs.iterator();
     while (it.hasNext()) {
       int n = it.next();
@@ -97,10 +99,11 @@ the modern one-liner:
       filename: "main.java",
       starterCode: `import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    List<Integer> xs = new ArrayList<>(List.of(1, 2, 3, 4, 5, 6));
+    List<Integer> xs = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
     xs.removeIf(n -> n % 2 == 0);
     System.out.println(xs);
   }
@@ -125,10 +128,11 @@ the cursor (`add`):
       starterCode: `import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    List<String> xs = new ArrayList<>(List.of("a", "c", "e"));
+    List<String> xs = new ArrayList<>(Arrays.asList("a", "c", "e"));
     ListIterator<String> it = xs.listIterator();
     while (it.hasNext()) {
       String s = it.next();
@@ -157,10 +161,11 @@ reads naturally when the action is a simple, terminal side effect:
     {
       filename: "main.java",
       starterCode: `import java.util.List;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    List<String> xs = List.of("a", "b", "c");
+    List<String> xs = Arrays.asList("a", "b", "c");
     xs.forEach(System.out::println);
   }
 }
@@ -187,16 +192,18 @@ should happen to each element (`filter`, `map`, `sorted`,
     {
       filename: "main.java",
       starterCode: `import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class Main {
   public static void main(String[] args) {
-    List<String> names = List.of("Ada", "Linus", "Grace", "Bjarne", "Edsger");
+    List<String> names = Arrays.asList("Ada", "Linus", "Grace", "Bjarne", "Edsger");
 
     List<String> shortLower = names.stream()
                                   .filter(n -> n.length() <= 5)
                                   .map(String::toLowerCase)
                                   .sorted()
-                                  .toList();
+                                  .collect(Collectors.toList());
 
     System.out.println(shortLower);
   }
@@ -218,7 +225,7 @@ mistake-prone:
 
 public class Main {
   public static void main(String[] args) {
-    List<String> names = List.of("Ada", "Linus", "Grace", "Bjarne", "Edsger");
+    List<String> names = Arrays.asList("Ada", "Linus", "Grace", "Bjarne", "Edsger");
 
     List<String> shortLower = new ArrayList<>();
     for (String n : names) {
@@ -277,7 +284,7 @@ The fix is always one of:
 
 public class Main {
   public static void main(String[] args) {
-    List<Post> posts = List.of(new Post("Ada", "hello", true),
+    List<Post> posts = Arrays.asList(new Post("Ada", "hello", true),
                                new Post("Linus", "kernel rant", false),
                                new Post("Grace", "compiler talk", true),
                                new Post("Edsger", "goto considered", true));
@@ -292,12 +299,45 @@ public class Main {
     },
     {
       filename: "Post.java",
-      starterCode: `public record Post(String author, String text, boolean published) {}
+      starterCode: `import java.util.Objects;
+
+public final class Post {
+  private final String author;
+  private final String text;
+  private final boolean published;
+
+  public Post(String author, String text, boolean published) {
+    this.author = author;
+    this.text = text;
+    this.published = published;
+  }
+
+  public String author() { return author; }
+  public String text() { return text; }
+  public boolean published() { return published; }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Post)) return false;
+    Post other = (Post)o;
+    return Objects.equals(author, other.author) && Objects.equals(text, other.text) && published == other.published;
+  }
+
+  @Override
+  public int hashCode() { return Objects.hash(author, text, published); }
+
+  @Override
+  public String toString() {
+    return "Post[" + "author=" + author + ", " + "text=" + text + ", " + "published=" + published + "]";
+  }
+}
 `,
     },
     {
       filename: "FeedFilters.java",
       starterCode: `import java.util.*;
+import java.util.stream.Collectors;
 
 public final class FeedFilters {
   private FeedFilters() {}
@@ -325,7 +365,7 @@ public final class FeedFilters {
 
   /** Declarative pipeline. */
   public static List<String> viaStream(List<Post> posts) {
-    return posts.stream().filter(Post::published).map(Post::author).toList();
+    return posts.stream().filter(Post::published).map(Post::author).collect(Collectors.toList());
   }
 }
 `,
@@ -354,11 +394,12 @@ Expected output:
       filename: "Main.java",
       starterCode: `import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
     List<String> ws =
-        new ArrayList<>(List.of("hi", "alpha", "ok", "gamma", "delta"));
+        new ArrayList<>(Arrays.asList("hi", "alpha", "ok", "gamma", "delta"));
     Pruner.removeShorterThan(ws, 4);
     System.out.println(ws);
   }

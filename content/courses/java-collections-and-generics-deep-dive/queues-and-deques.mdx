@@ -177,9 +177,12 @@ node is *visited* in the order it was discovered, exactly FIFO.
 public class Main {
   public static void main(String[] args) {
     // Tiny graph: 1 -> {2, 3}; 2 -> {4}; 3 -> {4, 5}; 4 -> {}; 5 -> {}
-    Map<Integer, List<Integer>> g =
-        Map.of(1, List.of(2, 3), 2, List.of(4), 3, List.of(4, 5), 4, List.of(),
-               5, List.of());
+    Map<Integer, List<Integer>> g = new LinkedHashMap<>();
+    g.put(1, Arrays.asList(2, 3));
+    g.put(2, Arrays.asList(4));
+    g.put(3, Arrays.asList(4, 5));
+    g.put(4, Collections.emptyList());
+    g.put(5, Collections.emptyList());
 
     Set<Integer> seen = new HashSet<>();
     Queue<Integer> q = new ArrayDeque<>();
@@ -295,7 +298,36 @@ deadline. The "smallest deadline" task runs next.
     },
     {
       filename: "Task.java",
-      starterCode: `public record Task(String name, int deadline) {}
+      starterCode: `import java.util.Objects;
+
+public final class Task {
+  private final String name;
+  private final int deadline;
+
+  public Task(String name, int deadline) {
+    this.name = name;
+    this.deadline = deadline;
+  }
+
+  public String name() { return name; }
+  public int deadline() { return deadline; }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Task)) return false;
+    Task other = (Task)o;
+    return Objects.equals(name, other.name) && deadline == other.deadline;
+  }
+
+  @Override
+  public int hashCode() { return Objects.hash(name, deadline); }
+
+  @Override
+  public String toString() {
+    return "Task[" + "name=" + name + ", " + "deadline=" + deadline + "]";
+  }
+}
 `,
     },
     {
