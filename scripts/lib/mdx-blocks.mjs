@@ -96,9 +96,22 @@ export function readTemplate(src, start) {
     const c = src[i];
     if (c === "\\") {
       const next = src[i + 1];
-      // MDX passes the string through JS, so \` \\ \$ are unescaped, and
-      // \n inside a template literal is a literal backslash-n in Python
-      // (used for "\\n" in print strings) — leave those alone.
+      // MDX hands the prop to JavaScript, so these are template-literal
+      // escapes and have to be resolved the way JavaScript resolves them.
+      //
+      // \n, \t and \r are real control characters, not two characters. Leaving
+      // them as backslash-n was wrong in the direction that hides work: a card
+      // authored on one line as `def f():\n    return 1` extracted as Python
+      // containing a literal backslash, which raises "unexpected character
+      // after line continuation character" — a parser bug reported as broken
+      // content. The `"\\n"` a lesson prints is written `\\n` in the source
+      // and still arrives here as one backslash plus n, via the `\\` case.
+      const simple = { n: "\n", t: "\t", r: "\r" };
+      if (next in simple) {
+        out += simple[next];
+        i += 2;
+        continue;
+      }
       if (next === "`" || next === "\\" || next === "$") {
         out += next;
         i += 2;
@@ -170,21 +183,88 @@ export function mdxFiles(dir) {
   return out.sort();
 }
 
-/** Every `<Tag …/>` in `content/`, as `{file, line, raw}`. */
+/** Offset just past the closing `---` of YAML frontmatter, or 0 when a file
+ *  has none. Frontmatter is prose *about* the page and routinely names the
+ *  components the page demonstrates. */
+function bodyStart(src) {
+  if (!src.startsWith("---")) return 0;
+  const close = src.indexOf("\n---", 3);
+  return close === -1 ? 0 : close + 4;
+}
+
+/**
+ * Is `idx` inside a fenced block or an inline code span?
+ *
+ * Lessons discuss the components they use — "A variable defined in one
+ * `<CodeBlock>` is not visible to the next" appears in ten course overviews —
+ * and prose about a tag is not a tag. Without this those matches are reported
+ * as unterminated tags, which is noise in exactly the channel that has to stay
+ * quiet enough to notice a real one.
+ */
+function insideCode(src, idx) {
+  // An odd number of backticks earlier on the same line means this match is
+  // inside an inline code span, which is how every one of these prose mentions
+  // is written.
+  //
+  // Only the same line is considered. Counting ``` fences across the file
+  // looks more thorough and is wrong: `markdown={…}` and `starterCode={…}`
+  // props carry fenced blocks of their own, so a document-level parity count
+  // flips inside a prop and starts discarding real tags after it (it lost 20
+  // `<SqlCodeBlock>`s that way). A real tag opens its own line, so it has no
+  // backticks before it and this cannot swallow one.
+  const before = src.slice(0, idx);
+  const lineStart = before.lastIndexOf("\n") + 1;
+  const ticks = (before.slice(lineStart).match(/`/g) ?? []).length;
+  return ticks % 2 === 1;
+}
+
+/**
+ * Every `<Tag …/>` in `content/`, as `{file, line, raw}`.
+ *
+ * Two things here are load-bearing, and both were learned from this generator
+ * quietly dropping work:
+ *
+ *   • Frontmatter is skipped. `description: Sandbox for
+ *     \`<SqlChallengeCard dialect="postgres">\` variations.` is not a tag, has
+ *     no `/>` to find, and used to be matched anyway.
+ *   • A match whose tag never terminates skips that occurrence instead of
+ *     abandoning the file. It used to `break`, so one unterminated match cost
+ *     every remaining tag in that file: ~84 `<ChallengeCard>`s across nine
+ *     files and ~20 `<CodeBlock>`s across thirteen were invisible to the
+ *     sweeps, which then reported everything they *had* found as passing.
+ *
+ * An unterminated tag after the frontmatter is still yielded, with
+ * `unterminated: true` and no `raw`, so callers count it rather than lose it.
+ * The whole point of this module is that a component it cannot read is loud;
+ * silently skipping one is the same defect in a politer form.
+ */
 export function* eachTag(tag, root = CONTENT_DIR) {
   const opener = `<${tag}`;
   for (const file of mdxFiles(root)) {
     const src = readFileSync(file, "utf8");
-    let idx = 0;
-    while ((idx = src.indexOf(opener, idx)) !== -1) {
+    const rel = relative(process.cwd(), file);
+    let idx = bodyStart(src);
+    for (;;) {
+      const tagAt = src.indexOf(opener, idx);
+      if (tagAt === -1) break;
+
+      idx = tagAt;
       // `<CodeBlock` must not match `<CodeBlockSomething`.
       const after = src[idx + opener.length];
+      if (/[A-Za-z0-9]/.test(after) || insideCode(src, idx)) {
+        idx += opener.length;
+        continue;
+      }
       const end = tagEnd(src, idx + opener.length);
-      if (end === -1) break;
+      const line = src.slice(0, idx).split("\n").length;
+      if (end === -1) {
+        yield { file: rel, line, raw: null, unterminated: true };
+        idx += opener.length;
+        continue;
+      }
       const raw = src.slice(idx, end);
       idx = end;
-      if (/[A-Za-z0-9]/.test(after)) continue;
-      yield { file: relative(process.cwd(), file), line: src.slice(0, idx).split("\n").length, raw };
+      yield { file: rel, line, raw };
     }
   }
 }
@@ -232,7 +312,11 @@ export function parseDatasets(block) {
 /** Every `<CodeBlock>` for the given adapter, with the source Run executes. */
 export function extractBlocks(root = CONTENT_DIR, adapter = "python") {
   const blocks = [];
-  for (const { file, line, raw } of eachTag("CodeBlock", root)) {
+  for (const { file, line, raw, unterminated } of eachTag("CodeBlock", root)) {
+    if (unterminated) {
+      blocks.push({ file, line, unparsable: "tag never closed" });
+      continue;
+    }
     if (propString(raw, "adapter") !== adapter) continue;
     const files = parseFiles(raw);
     if (files.length === 0) continue;
@@ -255,7 +339,11 @@ export function extractBlocks(root = CONTENT_DIR, adapter = "python") {
  *  Answer executes when the reference solution is in the editor. */
 export function extractChallengeCards(root = CONTENT_DIR, adapter = "python") {
   const cards = [];
-  for (const { file, line, raw } of eachTag("ChallengeCard", root)) {
+  for (const { file, line, raw, unterminated } of eachTag("ChallengeCard", root)) {
+    if (unterminated) {
+      cards.push({ file, line, title: "(unterminated tag)", unparsable: "tag never closed" });
+      continue;
+    }
     if (propString(raw, "adapter") !== adapter) continue;
     const title = propString(raw, "title") ?? "(untitled)";
     const files = parseFiles(raw);
@@ -301,6 +389,74 @@ export function extractChallengeCards(root = CONTENT_DIR, adapter = "python") {
         solved.length > 0
           ? `${entry.initCode ? `${entry.initCode}\n` : ""}${entry.solutionSource}`
           : null,
+    });
+  }
+  return cards;
+}
+
+/**
+ * Every `<SqlCodeBlock>` in `content/`, with the SQL that Run executes.
+ *
+ * `tables` is deliberately ignored: it drives the table-viewer sidebar and has
+ * no bearing on whether the SQL runs.
+ */
+export function extractSqlBlocks(root = CONTENT_DIR, dialect = null) {
+  const blocks = [];
+  for (const { file, line, raw, unterminated } of eachTag("SqlCodeBlock", root)) {
+    if (unterminated) {
+      blocks.push({ file, line, unparsable: "tag never closed" });
+      continue;
+    }
+    const d = propString(raw, "dialect");
+    if (dialect && d !== dialect) continue;
+    blocks.push({
+      file,
+      line,
+      dialect: d,
+      title: propString(raw, "title") ?? "(untitled)",
+      initSql: propString(raw, "initSql") ?? "",
+      remoteInitSql: propString(raw, "remoteInitSql") ?? null,
+      sql: propString(raw, "starterCode") ?? "",
+    });
+  }
+  return blocks;
+}
+
+/**
+ * Every `<SqlChallengeCard>`, with the SQL Check Answer runs once the Solution
+ * button has filled the editor, plus the card's declarative tests.
+ *
+ * `solutionSql` is the whole point of the card, so unlike the Python cards
+ * there is no multi-file subtlety here: a card without one cannot be verified
+ * and is counted rather than dropped.
+ */
+export function extractSqlCards(root = CONTENT_DIR, dialect = null) {
+  const cards = [];
+  for (const { file, line, raw, unterminated } of eachTag("SqlChallengeCard", root)) {
+    if (unterminated) {
+      cards.push({ file, line, title: "(unterminated tag)", unparsable: "tag never closed" });
+      continue;
+    }
+    const d = propString(raw, "dialect");
+    if (dialect && d !== dialect) continue;
+    const title = propString(raw, "title") ?? "(untitled)";
+    let tests;
+    try {
+      tests = propValue(raw, "tests") ?? [];
+    } catch (err) {
+      cards.push({ file, line, title, dialect: d, unparsable: err.message });
+      continue;
+    }
+    cards.push({
+      file,
+      line,
+      title,
+      dialect: d,
+      initSql: propString(raw, "initSql") ?? "",
+      remoteInitSql: propString(raw, "remoteInitSql") ?? null,
+      starterSql: propString(raw, "starterCode") ?? "",
+      solutionSql: propString(raw, "solutionSql") ?? null,
+      tests,
     });
   }
   return cards;

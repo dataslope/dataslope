@@ -335,10 +335,35 @@ builtins.display = display
     // it cost `sales.csv` its header row, so `csv.DictReader` came back with a
     // single empty field name and a correct solution raised
     // `KeyError: 'product'`.
+    const siblings = [];
     for (const f of files) {
       if (f.filename === entry) continue;
       const body = f.solutionSource ?? f.starterCode;
       py.FS.writeFile(f.filename, f.initCode ? `${f.initCode}\n${body}` : body);
+      siblings.push(f.filename);
+    }
+
+    // Drop these modules from the import cache before the run.
+    //
+    // One interpreter serves the whole sweep, but a reader gets a fresh
+    // runtime per card, so module state that persists here persists nowhere
+    // else. `utils.py` is the case that bites: several cards ship one, and
+    // once any of them has been imported, `import utils` in a later card
+    // returns the first card's module and its `greet` is missing. The failure
+    // lands on the innocent card, only in a full sweep, and never for a
+    // reader — the worst combination to debug, and the reason this is done by
+    // filename rather than by clearing everything.
+    const modules = siblings
+      .filter((n) => n.endsWith(".py"))
+      .map((n) => n.slice(0, -3).replace(/\//g, "."));
+    if (modules.length > 0) {
+      py.runPython(`
+import importlib, sys
+for _name in ${JSON.stringify(modules)}:
+    sys.modules.pop(_name, None)
+del _name
+importlib.invalidate_caches()
+`);
     }
     return null;
   }
