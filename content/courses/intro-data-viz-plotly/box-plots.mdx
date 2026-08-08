@@ -39,6 +39,11 @@ A box thus shows you, at a glance:
 
 In *one* compact glyph.
 
+Every part of it is a quantile, and the whiskers are the part people
+misremember:
+
+<Chart slug="box-plot-anatomy" />
+
 ## A first box plot
 
 <CodeBlock
@@ -205,6 +210,11 @@ fig.show()
 Violins reveal **bimodality**, **skew shape**, and other features
 that a plain box would hide. They cost a bit more visual
 complexity, but they're often worth it.
+
+A violin is the box plus the shape the box discards, and the shape is
+sometimes the entire story:
+
+<Chart slug="violin-vs-box" />
 
 ## When to use box plots vs histograms vs violins
 

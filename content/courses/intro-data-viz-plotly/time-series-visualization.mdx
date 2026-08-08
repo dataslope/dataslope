@@ -168,6 +168,11 @@ The 30-day average is the *smoothest* and reveals the underlying
 trend; the 7-day catches *weekly* structure; the raw daily shows
 the noise. All three layered gives the whole story.
 
+Smoothing is not free: a moving average is a trailing view, so it turns
+corners late by roughly half the window.
+
+<Chart slug="rolling-window-lag" />
+
 ## Common time-series pitfalls
 
 1. **Non-monotonic x-axis.** If your DataFrame isn't sorted by
@@ -215,6 +220,11 @@ fig.show()
 
 Notice the x-axis no longer has flat "no movement" stretches over
 weekends.
+
+The commonest pitfall is the window itself. The same series supports
+opposite headlines depending on where you start it:
+
+<Chart slug="cherry-picked-window" />
 
 ## Seasonal patterns: faceting by year
 
