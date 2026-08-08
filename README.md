@@ -59,13 +59,15 @@ Production and preview deploys run through Cloudflare Workers Builds rather than
 | Field | Value |
 | --- | --- |
 | Build command | `npx opennextjs-cloudflare build` |
-| Deploy command | `npx opennextjs-cloudflare deploy && npx wrangler d1 execute dataslope-search --remote --file=lib/generated/search-seed.sql` |
+| Deploy command | `npx opennextjs-cloudflare deploy && npm run db:seed:search:remote` |
 | Non-production branch deploy command | `npx opennextjs-cloudflare upload` |
 | Path | `/` |
 
 Both `deploy` (production) and `upload` (preview versions) populate the R2 cache before shipping, `upload` wraps `wrangler versions upload`, so previews get the same populated cache production does. `Path` is `/` because this Worker lives at the repo root; the CORS proxy under `cloudflare-cors-proxy/` is a separate Worker with its own config.
 
-The search re-seed is appended to the **production** deploy command only, and the ordering is deliberate on both counts. It runs after `deploy` so that a hiccup rebuilding the search index can never block shipping the site itself; the previous index stays queryable in the meantime, since seeding replaces the rows in one transaction rather than emptying the table first. And it is absent from the preview command because there is one `dataslope-search` database and one set of rows in it: a preview build that seeded would overwrite production's index with a feature branch's content, and nothing would look broken until someone searched.
+The search re-seed is appended to the **production** deploy command only, and the ordering is deliberate on both counts. It runs after `deploy` so a hiccup rebuilding the search index can never block shipping the site itself. And it is absent from the preview command because there is one `dataslope-search` database and one set of rows in it: a preview build that seeded would overwrite production's index with a feature branch's content, and nothing would look broken until someone searched.
+
+`db:seed:search:remote` no-ops when no indexed content changed, so the many deploys that touch a component and no lesson cost nothing — see [Search](#search) for how that is decided, and for the **D1 (edit)** permission the build's API token needs before any of this works.
 
 ### Incremental cache cleanup
 
@@ -97,7 +99,9 @@ Three build steps produce it, all wired into `npm run build`:
 | --- | --- |
 | `scripts/build-search-corpus.mjs` | `lib/generated/search-corpus.json` — one row per `(page, heading)` |
 | `scripts/build-search-sql.mjs` | `lib/generated/search-seed.sql` — the `DELETE` + batched `INSERT`s |
-| `npm run db:seed:search[:remote]` | the rows, in D1 |
+| `npm run db:seed:search[:remote]` | the rows, in D1 — skipped when unchanged |
+
+These run **after** `build:charts`, and the order is load-bearing: chart titles and captions live in the generated chart manifest rather than in the MDX, so a corpus built before it silently omits every one of them. That is worth ~264 kB of prose across ~250 charts, and it produced an index with no chart captions in it at all the first time the steps were ordered the other way. `build-search-corpus.mjs` now warns loudly when the manifest is missing or empty rather than quietly indexing less.
 
 The corpus is extracted from the MDX **ASTs**, not the rendered HTML, which is what lets it reach content that never exists in the DOM until a learner interacts: `<ChallengeCard>` instructions and solutions, `<MultipleChoice>` questions and per-choice explanations, fenced and `<CodeBlock>` source, Mermaid definitions, `<Chart>` titles and captions, and the whole of `content/interview/`, which the previous index omitted entirely. Prose and code land in separate columns so `bm25()` can weight prose about seven to one over code — that ratio is what makes indexing code safe, since a search for a common identifier should surface the lesson that *explains* it above the dozen that merely use it in a starter file.
 
@@ -108,8 +112,20 @@ The database and its schema already exist. To recreate them from scratch:
 ```bash
 npx wrangler d1 create dataslope-search   # paste database_id into wrangler.jsonc
 npm run db:migrate:search:remote          # migrations-search/0001_create_docs_fts.sql
-npm run db:seed:search:remote             # ~9k rows; re-runs on every production deploy
+npm run db:seed:search:remote             # ~9k rows
 ```
+
+**The Workers Builds API token needs `D1 (edit)` added to it.** The token Cloudflare generates for Workers Builds is scoped to Account Settings (read), Workers Scripts (edit), Workers KV (edit), Workers R2 (edit) and Workers Routes (edit) — D1 is not in that set, so the deploy-time seed fails to authorize until it is added under **My Profile → API Tokens → (the Workers Builds token) → Edit → Account → D1 → Edit**. Because the seed is chained after `deploy` with `&&`, the symptom is a Worker that ships fine and a build that goes red on the last step, with the index never updating.
+
+### Re-seeding only when content changed
+
+`build-search-sql.mjs` writes a SHA-256 of the corpus into the seed file and, as the seed's last statement, into `docs_meta.content_hash`. `scripts/seed-search.mjs` compares the two and skips the apply when they agree.
+
+The hash is taken over the **corpus**, not over `content/`, which is what makes it correct: it changes when a lesson is edited, and equally when the extractor learns to reach something it previously could not. Hashing the source files would have classified the chart-manifest fix above as a no-op and left the incomplete index in place.
+
+Gating matters more than the row count suggests. A re-seed deletes and re-inserts every row, and on an FTS5 table the rows that get written are not the ~9k logical ones — the shadow tables hold ~20k, and D1 meters deletes as writes too, so an unconditional seed spends roughly 40k written rows on a deploy that may have touched no lesson at all.
+
+Two properties worth keeping if this is ever rewritten: the hash is written **last**, so a partial apply cannot leave a hash claiming to be current and the next deploy retries; and **any uncertainty seeds** — an unreadable remote hash means apply, because a redundant seed costs some written rows while a wrongly skipped one serves stale content. `npm run db:seed:search:remote:force` overrides the check.
 
 Sizing, measured rather than estimated: 8,965 rows over ~890 lessons produce a **~21 MB** database (14.7 MB of stored text so `snippet()` can quote matches, 5.5 MB of actual inverted index). That is 4% of the free plan's 500 MB per-database cap and 0.2% of the paid plan's 10 GB, so storage is not a constraint this index will run into.
 

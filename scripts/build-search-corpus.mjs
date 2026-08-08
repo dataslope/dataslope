@@ -99,19 +99,43 @@ const CONTENT_COMPONENTS = new Set([
   "LivePreview", "ReactPreview", "IllustrationPrompt",
 ]);
 
-/** Chart captions live in the generated manifest, not in the MDX. Absent on a
- *  fresh checkout before `build:charts` has run, which is not fatal: the
- *  captions are simply missing from that build's index. */
+/**
+ * Chart titles and captions live in the generated manifest, not in the MDX, so
+ * this step has to run *after* `build:charts` — which is why it sits where it
+ * does in the `build` chain rather than up with the other content steps.
+ *
+ * Getting that order wrong is not fatal and that is exactly the problem: the
+ * index simply comes out missing every chart title and caption, which was worth
+ * 264 kB of prose across ~250 charts the first time it happened, with nothing
+ * in the build log to say so. So an absent or empty manifest warns loudly now.
+ * It stays non-fatal because running `build:search-corpus` on its own, before
+ * ever rendering charts, is a legitimate thing to do.
+ */
 function loadChartManifest() {
   const path = join(ROOT, "lib", "generated", "charts.js");
-  if (!existsSync(path)) return {};
+  const warn = (why) =>
+    console.warn(
+      `[search-corpus] WARNING: ${why}. Chart titles and captions will be ` +
+        "missing from this index. Run `npm run build:charts` first.",
+    );
+
+  if (!existsSync(path)) {
+    warn("no chart manifest at lib/generated/charts.js");
+    return {};
+  }
   try {
     const src = readFileSync(path, "utf8");
     const start = src.indexOf("{");
     const end = src.lastIndexOf("}");
-    if (start < 0 || end < 0) return {};
-    return JSON.parse(src.slice(start, end + 1));
-  } catch {
+    if (start < 0 || end < 0) {
+      warn("chart manifest is not parseable");
+      return {};
+    }
+    const parsed = JSON.parse(src.slice(start, end + 1));
+    if (Object.keys(parsed).length === 0) warn("chart manifest is empty");
+    return parsed;
+  } catch (err) {
+    warn(`chart manifest failed to parse (${err.message})`);
     return {};
   }
 }
