@@ -170,7 +170,20 @@ for (const [i, item] of runnable.entries()) {
   }
 
   const stderr = [...diagnostics, ...err].join("\n").trim();
-  if (stderr) {
+  // Both directions, as in the SQL and R sweeps: a block marked `expectError`
+  // must produce error output, and one that stops producing it is a
+  // regression nothing else would catch.
+  if (item.expectError && !stderr) {
+    failures.push({
+      file: item.file,
+      line: item.line,
+      adapter: item.adapter,
+      kind: item.kind,
+      title: item.title ?? null,
+      error: "expectError is set but the block produced no error output",
+      full: "The lesson promises this fails and it no longer does.",
+    });
+  } else if (!item.expectError && stderr) {
     failures.push({
       file: item.file,
       line: item.line,

@@ -8,16 +8,20 @@ name: Content sweeps
 #   • check:js          — every JavaScript and TypeScript <CodeBlock> and
 #                         <ChallengeCard>, through the same almostnode runtime
 #                         the browser uses.
+#   • check:sql         — every <SqlCodeBlock> and <SqlChallengeCard> against
+#                         PGlite and sqlite-wasm, graded by the same
+#                         evaluateSqlTest a reader's Check Answer runs.
+#   • check:r           — every R <CodeBlock> and <ChallengeCard> through webR.
 #
 # All existed as npm scripts that nothing invoked, which is the same as not
 # having them.
 #
-# check:sql is deliberately absent. It passes 258 blocks and 42 cards, but 18
-# blocks teach constraint enforcement by triggering it ("A UNIQUE constraint
-# rejects duplicate email") and nothing in the markup distinguishes an intended
-# error from a regression. A check that is red for correct content trains
-# people to ignore it, so it stays out until <SqlCodeBlock> can say
-# `expectError`.
+# Twenty blocks across SQL and R teach a failure by triggering it ("A UNIQUE
+# constraint rejects duplicate email"; a misspelled `prnt()`), and they carry
+# `expectError`. The sweeps assert that in both directions, which is the point:
+# a block that stops failing has turned its own lesson into a lie, prose
+# promising an error above output showing success, and nothing else in the repo
+# would notice.
 #
 # ── Scope, and why a pull request does not get the full sweep ───────────────
 #
@@ -68,12 +72,18 @@ on:
       - "scripts/check-code-blocks.mjs"
       - "scripts/check-challenge-cards.mjs"
       - "scripts/check-js-blocks.mjs"
+      - "scripts/check-r-blocks.mjs"
+      - "scripts/check-sql-blocks.mjs"
       - "scripts/lib/mdx-blocks.mjs"
       - "scripts/lib/pyodide-runner.mjs"
       - "scripts/lib/sync-http.mjs"
+      - "scripts/lib/sql-engines.mjs"
+      - "scripts/lib/datasets.mjs"
       - "app/_components/challengeHarness.ts"
       - "app/_components/runtime/almostnode-worker-shared.ts"
       - "app/_components/runtime/tsTranspile.ts"
+      - "app/_components/runtime/rPackages.ts"
+      - "app/_components/sqlChallengeHarness.ts"
       - "package-lock.json"
       - ".github/workflows/content-sweeps.yml"
   schedule:
@@ -88,7 +98,7 @@ on:
         description: "Which sweep to run"
         type: choice
         default: all
-        options: [all, challenges, code-blocks, js]
+        options: [all, challenges, code-blocks, js, sql, r]
       full:
         description: "Sweep all content (ignore the changed-files filter)"
         type: boolean
@@ -143,7 +153,7 @@ jobs:
           # Anything that changes the interpreter itself invalidates a partial
           # run: the same block can start failing without its file being
           # touched. Those pull requests get everything.
-          if echo "$changed" | grep -qE '^(scripts/(check-(code-blocks|challenge-cards|js-blocks)\.mjs|lib/(mdx-blocks|pyodide-runner|sync-http)\.mjs)|app/_components/(challengeHarness|runtime/almostnode-worker-shared|runtime/tsTranspile)\.ts|\.github/workflows/content-sweeps\.yml)$'; then
+          if echo "$changed" | grep -qE '^(scripts/(check-(code-blocks|challenge-cards|js-blocks|sql-blocks|r-blocks)\.mjs|lib/(mdx-blocks|pyodide-runner|sync-http|sql-engines|datasets)\.mjs)|app/_components/(challengeHarness|sqlChallengeHarness|runtime/almostnode-worker-shared|runtime/tsTranspile|runtime/rPackages)\.ts|\.github/workflows/content-sweeps\.yml)$'; then
             echo "filter=" >> "$GITHUB_OUTPUT"
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "label=full sweep (sweep internals changed)" >> "$GITHUB_OUTPUT"
@@ -321,4 +331,84 @@ jobs:
         with:
           name: js-report
           path: js-report.json
+          if-no-files-found: ignore
+
+  sql:
+    name: SQL (${{ needs.scope.outputs.label }})
+    needs: scope
+    if: >-
+      needs.scope.outputs.run == 'true' &&
+      (github.event_name != 'workflow_dispatch' ||
+       contains(fromJSON('["all","sql"]'), inputs.sweep))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: Restore dataset cache
+        uses: actions/cache@v4
+        with:
+          path: .dataset-cache
+          key: dataset-cache-v1-${{ hashFiles('content/**/*.mdx') }}
+          restore-keys: dataset-cache-v1-
+      - name: Run check:sql
+        env:
+          FILTER: ${{ needs.scope.outputs.filter }}
+        run: |
+          if [ -n "$FILTER" ]; then
+            npm run check:sql -- --json sql-report.json --filter "$FILTER"
+          else
+            npm run check:sql -- --json sql-report.json
+          fi
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sql-report
+          path: sql-report.json
+          if-no-files-found: ignore
+
+  r:
+    name: R (${{ needs.scope.outputs.label }})
+    needs: scope
+    if: >-
+      needs.scope.outputs.run == 'true' &&
+      (github.event_name != 'workflow_dispatch' ||
+       contains(fromJSON('["all","r"]'), inputs.sweep))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: Restore dataset cache
+        uses: actions/cache@v4
+        with:
+          path: .dataset-cache
+          key: dataset-cache-v1-${{ hashFiles('content/**/*.mdx') }}
+          restore-keys: dataset-cache-v1-
+      - name: Run check:r
+        env:
+          FILTER: ${{ needs.scope.outputs.filter }}
+        run: |
+          if [ -n "$FILTER" ]; then
+            npm run check:r -- --json r-report.json --filter "$FILTER"
+          else
+            npm run check:r -- --json r-report.json
+          fi
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r-report
+          path: r-report.json
           if-no-files-found: ignore

@@ -186,6 +186,7 @@ for (const [i, item] of runnable.entries()) {
     }
   }
 
+  let raised = null;
   const shelter = await new webR.Shelter();
   try {
     await webR.FS.writeFile(TMP_PATH, encoder.encode(item.source));
@@ -203,17 +204,34 @@ for (const [i, item] of runnable.entries()) {
       ),
     ]);
   } catch (err) {
-    const message = String(err?.message ?? err);
+    raised = String(err?.message ?? err);
+  } finally {
+    await shelter.purge().catch(() => {});
+  }
+
+  // `expectError` asserts in both directions. "Errors are friendly (most of
+  // the time)" quotes the very error its block triggers, and its paired "Fix
+  // me!" starter is meant to fail until the reader repairs it. If either ever
+  // stops failing, the prose is describing something the reader cannot see,
+  // and nothing else would catch that.
+  if (item.expectError && raised === null) {
     failures.push({
       file: item.file,
       line: item.line,
       kind: item.kind,
       title: item.title ?? null,
-      error: message.split("\n")[0],
-      full: message,
+      error: "expectError is set but the code succeeded",
+      full: "The lesson promises this fails and it no longer does.",
     });
-  } finally {
-    await shelter.purge().catch(() => {});
+  } else if (!item.expectError && raised !== null) {
+    failures.push({
+      file: item.file,
+      line: item.line,
+      kind: item.kind,
+      title: item.title ?? null,
+      error: raised.split("\n")[0],
+      full: raised,
+    });
   }
 
   const ms = Date.now() - startedAt;
@@ -244,6 +262,12 @@ if (slowest.file) {
 }
 if (unsolved.length > 0) {
   console.log(`check-r-blocks: ${unsolved.length} card(s) have no solution to verify`);
+}
+const expected = runnable.filter((x) => x.expectError).length;
+if (expected > 0) {
+  console.log(
+    `check-r-blocks: ${expected} item(s) are marked expectError and were required to fail`,
+  );
 }
 if (installFailures.length > 0) {
   console.log(

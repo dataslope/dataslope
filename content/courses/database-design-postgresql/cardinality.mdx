@@ -262,6 +262,7 @@ The difference between `o{` and `o|` is not decorative. It changes the
 constraints you need.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="Uniqueness turns many into at-most-one"
   initSql={`CREATE TABLE employees (

@@ -65,6 +65,7 @@ customer who does not exist. This guarantee is called **referential
 integrity**: every reference actually points to something real.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="A foreign key rejects a dangling reference"
   initSql={`CREATE TABLE customers (

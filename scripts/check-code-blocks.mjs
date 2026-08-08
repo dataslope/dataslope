@@ -67,7 +67,15 @@ for (const [i, b] of blocks.entries()) {
   if (stageError) failures.push({ ...b, error: stageError });
 
   const { error, full, ms } = await run(b.code);
-  if (error) failures.push({ ...b, error, full });
+  // `expectError` asserts in both directions: a block whose lesson is the
+  // failure must fail, and one that stops failing is a regression the prose
+  // would keep hiding. No Python block needs it today; the rule lives here so
+  // the first one that does is handled the same way as SQL and R.
+  if (b.expectError && !error) {
+    failures.push({ ...b, error: "expectError is set but the block succeeded" });
+  } else if (!b.expectError && error) {
+    failures.push({ ...b, error, full });
+  }
 
   if (ms > slowest.ms) slowest = { ms, file: b.file, line: b.line };
   // Named progress, so a stall points at the block that caused it rather

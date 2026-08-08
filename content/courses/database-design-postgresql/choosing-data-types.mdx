@@ -36,6 +36,7 @@ This table says quantity is an integer. PostgreSQL will not store text
 that cannot be converted into an integer.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="The type system rejects the wrong kind of value"
   initSql={`CREATE TABLE order_items (

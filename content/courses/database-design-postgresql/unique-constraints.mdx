@@ -38,6 +38,7 @@ Run this block. The first account is already present. The attempted
 second account reuses the same email, so PostgreSQL rejects it.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="A UNIQUE constraint rejects duplicate email"
   initSql={`CREATE TABLE accounts (
@@ -125,6 +126,7 @@ students from taking the same course. It only prevents the same pair
 from repeating.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="A composite UNIQUE constraint blocks duplicate pairs"
   initSql={`CREATE TABLE enrollments (

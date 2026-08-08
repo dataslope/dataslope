@@ -105,6 +105,7 @@ defends. If an order points to customer `999` and no such customer row
 exists, PostgreSQL rejects the order.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="A foreign key blocks an order for a missing customer"
   initSql={`CREATE TABLE customers (

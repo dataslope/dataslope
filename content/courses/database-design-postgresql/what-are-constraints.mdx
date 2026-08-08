@@ -94,6 +94,7 @@ This table says every product must have a non-negative price. Run the
 SQL and read the error: PostgreSQL refuses the bad row.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="A constraint blocks an impossible product"
   initSql={`CREATE TABLE products (

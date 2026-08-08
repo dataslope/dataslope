@@ -58,6 +58,7 @@ Without a unique email rule, the same person might appear twice and
 reports may count them twice.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="Unique constraints protect identity rules"
   initSql={`DROP TABLE IF EXISTS customers;

@@ -101,15 +101,31 @@ console.log(`check-sql-blocks: ${blocks.length} block(s), ${cards.length} card(s
 for (const [i, b] of blocks.entries()) {
   const startedAt = Date.now();
   let engine = null;
+  let raised = null;
   try {
     engine = await prepare(b);
     await engine.exec(b.sql);
   } catch (err) {
-    const message = String(err?.message ?? err);
-    failures.push({ ...b, kind: "block", error: message.split("\n")[0], full: message });
+    raised = String(err?.message ?? err);
   } finally {
     await engine?.destroy?.().catch(() => {});
   }
+  // `expectError` asserts in both directions. A block that teaches constraint
+  // enforcement by triggering it must raise; if it ever stops raising, the
+  // lesson has become a lie — prose promising an error above output showing
+  // success — and nothing else in the repo would notice.
+  if (b.expectError && raised === null) {
+    failures.push({
+      ...b,
+      kind: "block",
+      error: "expectError is set but the SQL succeeded",
+      full: "The lesson promises this fails. It no longer does, so either the "
+        + "SQL changed or the engine stopped enforcing what it demonstrates.",
+    });
+  } else if (!b.expectError && raised !== null) {
+    failures.push({ ...b, kind: "block", error: raised.split("\n")[0], full: raised });
+  }
+
   const ms = Date.now() - startedAt;
   if (ms > slowest.ms) slowest = { ms, file: b.file, line: b.line };
   if ((i + 1) % 50 === 0) console.log(`  …${i + 1}/${blocks.length}  (${b.file}:${b.line})`);
@@ -192,6 +208,12 @@ if (unsupportedBlocks.length + unsupportedCards.length > 0) {
 }
 if (unsolved.length > 0) {
   console.log(`check-sql-blocks: ${unsolved.length} card(s) have no solutionSql to verify`);
+}
+const expected = blocks.filter((b) => b.expectError).length;
+if (expected > 0) {
+  console.log(
+    `check-sql-blocks: ${expected} block(s) are marked expectError and were required to fail`,
+  );
 }
 if (unparsable.length > 0) {
   console.error(`check-sql-blocks: ${unparsable.length} tag(s) could not be parsed:`);

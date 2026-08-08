@@ -200,6 +200,24 @@ export function propText(raw, name) {
   return trimmed;
 }
 
+/**
+ * A boolean JSX prop, in either form MDX allows: bare `expectError` or
+ * `expectError={true}`.
+ *
+ * Used for `expectError`, which marks a block whose lesson *is* the failure —
+ * "A UNIQUE constraint rejects duplicate email", or the misspelled `prnt()` in
+ * "Errors are friendly (most of the time)". The sweeps assert it in both
+ * directions: such a block must raise, and one that stops raising is a
+ * regression nothing else would catch, because the prose keeps promising an
+ * error the reader no longer sees.
+ */
+export function propFlag(raw, name) {
+  const explicit = new RegExp(`\\b${name}\\s*=\\s*\\{\\s*(true|false)\\s*\\}`).exec(raw);
+  if (explicit) return explicit[1] === "true";
+  // Bare `expectError`, not followed by `=`.
+  return new RegExp(`\\b${name}\\s*(?![=\\w])`).test(raw);
+}
+
 export function mdxFiles(dir) {
   const out = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -355,6 +373,7 @@ export function extractBlocks(root = CONTENT_DIR, adapter = "python") {
       datasets: parseDatasets(raw),
       files,
       entry: entry.filename,
+      expectError: propFlag(raw, "expectError"),
       // What Run executes: the hidden setup, then the visible buffer.
       code: `${entry.initCode ? `${entry.initCode}\n` : ""}${entry.starterCode}`,
     });
@@ -443,6 +462,7 @@ export function extractSqlBlocks(root = CONTENT_DIR, dialect = null) {
       title: propString(raw, "title") ?? "(untitled)",
       initSql: propText(raw, "initSql") ?? "",
       remoteInitSql: propString(raw, "remoteInitSql") ?? null,
+      expectError: propFlag(raw, "expectError"),
       sql: propText(raw, "starterCode") ?? "",
     });
   }
