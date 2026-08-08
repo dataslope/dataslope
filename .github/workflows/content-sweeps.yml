@@ -1,21 +1,31 @@
 name: Content sweeps
 
-# Runs the two Pyodide sweeps that execute the site's Python content:
+# Runs the sweeps that execute the site's runnable content:
 #
-#   • check:challenges  — every <ChallengeCard>'s reference solution against
-#                         that card's own tests.
-#   • check:code-blocks — every <CodeBlock> a reader can press Run on.
+#   • check:challenges  — every Python <ChallengeCard>'s reference solution
+#                         against that card's own tests.
+#   • check:code-blocks — every Python <CodeBlock> a reader can press Run on.
+#   • check:js          — every JavaScript and TypeScript <CodeBlock> and
+#                         <ChallengeCard>, through the same almostnode runtime
+#                         the browser uses.
 #
-# Both existed as npm scripts that nothing invoked, which is the same as not
+# All existed as npm scripts that nothing invoked, which is the same as not
 # having them.
+#
+# check:sql is deliberately absent. It passes 258 blocks and 42 cards, but 18
+# blocks teach constraint enforcement by triggering it ("A UNIQUE constraint
+# rejects duplicate email") and nothing in the markup distinguishes an intended
+# error from a regression. A check that is red for correct content trains
+# people to ignore it, so it stays out until <SqlCodeBlock> can say
+# `expectError`.
 #
 # ── Scope, and why a pull request does not get the full sweep ───────────────
 #
-# Sweeping everything takes ~25 minutes, and spending that to prove one edited
-# lesson still works is a bad trade twice over: it is slow, and a check nobody
-# wants to wait for is a check that gets bypassed. Checking two changed lessons
-# instead takes about 45 seconds, most of it Pyodide booting. So the scope
-# depends on what changed:
+# A full sweep costs about 6 minutes of wall-clock on a GitHub runner (Python
+# code blocks ~4-6m, challenge cards ~2m, JS/TS well under 1m, in parallel).
+# Spending even that to prove one edited lesson still works is wasteful, and
+# checking two changed lessons instead takes about 45 seconds, most of it
+# Pyodide booting. So the scope depends on what changed:
 #
 #   • A pull request that edits lessons checks *those lessons* (`--filter`
 #     takes a comma-separated list).
@@ -57,10 +67,13 @@ on:
       - "content/**"
       - "scripts/check-code-blocks.mjs"
       - "scripts/check-challenge-cards.mjs"
+      - "scripts/check-js-blocks.mjs"
       - "scripts/lib/mdx-blocks.mjs"
       - "scripts/lib/pyodide-runner.mjs"
       - "scripts/lib/sync-http.mjs"
       - "app/_components/challengeHarness.ts"
+      - "app/_components/runtime/almostnode-worker-shared.ts"
+      - "app/_components/runtime/tsTranspile.ts"
       - "package-lock.json"
       - ".github/workflows/content-sweeps.yml"
   schedule:
@@ -74,8 +87,8 @@ on:
       sweep:
         description: "Which sweep to run"
         type: choice
-        default: both
-        options: [both, challenges, code-blocks]
+        default: all
+        options: [all, challenges, code-blocks, js]
       full:
         description: "Sweep all content (ignore the changed-files filter)"
         type: boolean
@@ -130,7 +143,7 @@ jobs:
           # Anything that changes the interpreter itself invalidates a partial
           # run: the same block can start failing without its file being
           # touched. Those pull requests get everything.
-          if echo "$changed" | grep -qE '^(scripts/(check-(code-blocks|challenge-cards)\.mjs|lib/(mdx-blocks|pyodide-runner|sync-http)\.mjs)|app/_components/challengeHarness\.ts|\.github/workflows/content-sweeps\.yml)$'; then
+          if echo "$changed" | grep -qE '^(scripts/(check-(code-blocks|challenge-cards|js-blocks)\.mjs|lib/(mdx-blocks|pyodide-runner|sync-http)\.mjs)|app/_components/(challengeHarness|runtime/almostnode-worker-shared|runtime/tsTranspile)\.ts|\.github/workflows/content-sweeps\.yml)$'; then
             echo "filter=" >> "$GITHUB_OUTPUT"
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "label=full sweep (sweep internals changed)" >> "$GITHUB_OUTPUT"
@@ -183,7 +196,7 @@ jobs:
     needs: scope
     if: >-
       needs.scope.outputs.run == 'true' &&
-      (github.event_name != 'workflow_dispatch' || inputs.sweep != 'code-blocks')
+      (github.event_name != 'workflow_dispatch' || contains(fromJSON('["all","challenges"]'), inputs.sweep))
     runs-on: ubuntu-latest
     # Generous against a cold cache and a slow PyPI, tight enough that a block
     # which hangs past its own 30s budget cannot burn a runner for six hours.
@@ -231,7 +244,7 @@ jobs:
     needs: scope
     if: >-
       needs.scope.outputs.run == 'true' &&
-      (github.event_name != 'workflow_dispatch' || inputs.sweep != 'challenges')
+      (github.event_name != 'workflow_dispatch' || contains(fromJSON('["all","code-blocks"]'), inputs.sweep))
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -268,4 +281,44 @@ jobs:
         with:
           name: code-blocks-report
           path: code-blocks-report.json
+          if-no-files-found: ignore
+
+  js:
+    name: JavaScript & TypeScript (${{ needs.scope.outputs.label }})
+    needs: scope
+    if: >-
+      needs.scope.outputs.run == 'true' &&
+      (github.event_name != 'workflow_dispatch' ||
+       contains(fromJSON('["all","js"]'), inputs.sweep))
+    runs-on: ubuntu-latest
+    # No WASM toolchain to download and no network per block, so this is the
+    # cheapest of the three by a wide margin: 619 items in well under a minute.
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run check:js
+        env:
+          FILTER: ${{ needs.scope.outputs.filter }}
+        run: |
+          if [ -n "$FILTER" ]; then
+            npm run check:js -- --json js-report.json --filter "$FILTER"
+          else
+            npm run check:js -- --json js-report.json
+          fi
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: js-report
+          path: js-report.json
           if-no-files-found: ignore
