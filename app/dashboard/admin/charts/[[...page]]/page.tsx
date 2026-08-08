@@ -42,6 +42,7 @@ import chartManifest from "@/lib/generated/charts";
 import Link from "@/app/_components/Link";
 import { AdminPageHeader } from "../../_components/shared";
 import { ChartPane } from "../ChartPane";
+import { ChartDelete } from "../ChartDelete";
 import {
   ChartMarkControls,
   ChartReviewProvider,
@@ -50,6 +51,20 @@ import {
 import styles from "../charts.module.css";
 
 export const dynamic = "force-static";
+
+/**
+ * Whether to offer the per-figure delete control.
+ *
+ * Deleting a chart means deleting `charts/<slug>.mjs`, and only a dev server
+ * running from a checkout can reach that file: the deployed Worker holds the
+ * rendered SVG and nothing else. The route enforces this too (it 404s outside
+ * development); this constant is what keeps the button from being rendered at
+ * all in a build, so nobody is offered an action that cannot work.
+ *
+ * Read at module scope on purpose. The page is `force-static`, so it is decided
+ * once when the page is generated rather than per request.
+ */
+const CAN_DELETE_SPECS = process.env.NODE_ENV !== "production";
 
 /** Charts per page. Each one is two stacked panes plus its metadata, so a
  *  dozen is already a long scroll; the number is here to be turned down, not
@@ -195,6 +210,21 @@ export default async function AdminChartsPage(props: {
                 </div>
 
                 <ChartMarkControls slug={slug} title={slug} />
+
+                {/* Its own row rather than a slot inside the queue controls:
+                    those render nothing without a session and without
+                    ILLUSTRATIONS_DB, and deleting a file in your own checkout
+                    depends on neither. */}
+                {CAN_DELETE_SPECS ? (
+                  <div className={styles.devRow}>
+                    <ChartDelete
+                      slug={slug}
+                      usedBy={chart.usedBy.map((use) =>
+                        use.section ? `${use.section} / ${use.title}` : use.title,
+                      )}
+                    />
+                  </div>
+                ) : null}
 
                 <div className={styles.split}>
                   <ChartPane theme="light" slug={slug} title={chart.title} svg={chart.svg} />
