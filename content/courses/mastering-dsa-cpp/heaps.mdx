@@ -146,7 +146,7 @@ int main() {
 
 ## Bottom-up heapify
 
-Given n values all at once, you could push them one by one, O(n log n). Robert Floyd observed in 1964 that you can do better: treat the raw array as an almost-heap and run sift-down on each internal node from the *bottom up*. Why is that only O(n)? Because the cost of a sift-down is the node's distance to the leaves, and almost all nodes live near the bottom: half the nodes are leaves (cost 0), a quarter sit one level up (cost ≤ 1), an eighth two levels up, the sum `n/2·0 + n/4·1 + n/8·2 + …` converges to O(n). The expensive nodes are exactly the rare ones.
+Given n values all at once, you could push them one by one, O(n log n). Robert Floyd observed in 1964 that you can do better: treat the raw array as an almost-heap and run sift-down on each internal node from the *bottom up*. Why is that only O(n)? Because the cost of a sift-down is the node's distance to the leaves, and almost all nodes live near the bottom: half the nodes are leaves (cost 0), a quarter sit one level up (cost ≤ 1), an eighth two levels up, the sum $n/2 \cdot 0 + n/4 \cdot 1 + n/8 \cdot 2 + \cdots$ converges to O(n). The expensive nodes are exactly the rare ones.
 
 ```text
 for i from parent(last_index) down to 0:

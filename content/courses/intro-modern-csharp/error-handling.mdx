@@ -162,7 +162,14 @@ A few common built-in exception types:
 
 ## Exceptions are NOT for ordinary control flow
 
-This is a really common beginner trap:
+This is a really common beginner trap, and it has a measurable cost. A
+throw is not a jump: the runtime captures a stack trace and walks frames
+looking for a handler, which is microseconds against nanoseconds for a
+returned status.
+
+<Chart slug="exception-vs-return-cost" />
+
+The trap in code:
 
 <CodeBlock
   adapter="csharp"

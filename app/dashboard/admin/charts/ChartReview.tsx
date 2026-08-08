@@ -40,8 +40,9 @@ import {
 } from "react";
 import { Check, Loader2, RefreshCw, Sparkles, ThumbsUp } from "lucide-react";
 import Link from "@/app/_components/Link";
-import type { ChartMarksPayload } from "@/app/api/admin/charts/route";
+import type { ChartMarksPayload, ChartQueueState } from "@/app/api/admin/charts/route";
 import { isAwaitingApproval, type RegenMark } from "@/lib/charts/regenMarks";
+import { ChartDelete } from "./ChartDelete";
 import styles from "./charts.module.css";
 
 /** How long typing has to pause before the note is written. Long enough that a
@@ -63,6 +64,10 @@ interface MarkState {
   saving: boolean;
   /** Set briefly after a successful write, to flash a tick. */
   justSaved: boolean;
+  /** ISO-8601 of an outstanding request to delete this chart from the repo,
+   *  null when none. The gallery cannot delete anything, so this is a decision
+   *  waiting on a commit; see ChartDelete.tsx. */
+  deleteRequestedAt: string | null;
 }
 
 const EMPTY_MARK: MarkState = {
@@ -73,6 +78,7 @@ const EMPTY_MARK: MarkState = {
   regeneratedAt: null,
   saving: false,
   justSaved: false,
+  deleteRequestedAt: null,
 };
 
 function markStateFrom(mark: RegenMark): MarkState {
@@ -84,6 +90,7 @@ function markStateFrom(mark: RegenMark): MarkState {
     regeneratedAt: mark.regeneratedAt,
     saving: false,
     justSaved: false,
+    deleteRequestedAt: mark.deleteRequestedAt,
   };
 }
 
@@ -100,19 +107,46 @@ interface ReviewContext {
   /** Null until the fetch resolves; stays null for a non-admin. */
   marks: Record<string, MarkState> | null;
   available: boolean;
+  /** Why the queue is read-only, when it is: the two causes have different
+   *  fixes and reporting the wrong one sends people to the wrong file. */
+  state: ChartQueueState;
   maxNoteLength: number;
   onToggleMark: (slug: string, marked: boolean) => void;
   onNoteChange: (slug: string, note: string) => void;
   onNoteCommit: (slug: string) => void;
   onApprove: (slug: string) => void;
+  /** Written by ChartDelete after its own request, so the button's state and
+   *  the summary count both follow one source. */
+  onDeleteRequestChange: (slug: string, requestedAt: string | null) => void;
   error: string | null;
 }
+
+/**
+ * What to say when the queue will not accept writes.
+ *
+ * `unreadable` is the one worth being specific about. The binding is declared
+ * in wrangler.jsonc so it is nearly always present; what is usually missing is
+ * the `chart_regen_marks` table, because it arrived after the
+ * `dataslope-illustrations` database already existed and a deployment only gets
+ * it by re-running the migration. Naming the command is the difference between
+ * a two-minute fix and an afternoon spent auditing bindings.
+ */
+const QUEUE_OFFLINE: Record<ChartQueueState, string> = {
+  ok: "",
+  unbound:
+    "ILLUSTRATIONS_DB is not bound on this deployment, so the queue is read-only.",
+  unreadable:
+    "The review table could not be read, which usually means the migration has " +
+    "not been applied to this database. Run `npm run db:migrate:illustrations:remote` " +
+    "(or `:illustrations` for a local one). Until then the queue is read-only.",
+};
 
 const Ctx = createContext<ReviewContext | null>(null);
 
 export function ChartReviewProvider({ children }: { children: React.ReactNode }) {
   const [marks, setMarks] = useState<Record<string, MarkState> | null>(null);
   const [available, setAvailable] = useState(false);
+  const [state, setState] = useState<ChartQueueState>("unbound");
   const [maxNoteLength, setMaxNoteLength] = useState(500);
   const [error, setError] = useState<string | null>(null);
 
@@ -134,6 +168,9 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
         for (const m of data.marks) next[m.promptId] = markStateFrom(m);
         setMarks(next);
         setAvailable(data.available);
+        // `state` predates nothing, but an older cached payload will not carry
+        // it; fall back to the boolean rather than claiming a cause.
+        setState(data.state ?? (data.available ? "ok" : "unbound"));
         setMaxNoteLength(data.maxNoteLength);
       } catch {
         // Network failure on an optional layer: the gallery is still the page.
@@ -236,25 +273,34 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
 
   const onApprove = useCallback((slug: string) => void save(slug, { approve: true }), [save]);
 
+  const onDeleteRequestChange = useCallback(
+    (slug: string, requestedAt: string | null) => patch(slug, { deleteRequestedAt: requestedAt }),
+    [patch],
+  );
+
   const value = useMemo<ReviewContext>(
     () => ({
       marks,
       available,
+      state,
       maxNoteLength,
       onToggleMark,
       onNoteChange,
       onNoteCommit,
       onApprove,
+      onDeleteRequestChange,
       error,
     }),
     [
       marks,
       available,
+      state,
       maxNoteLength,
       onToggleMark,
       onNoteChange,
       onNoteCommit,
       onApprove,
+      onDeleteRequestChange,
       error,
     ],
   );
@@ -271,10 +317,16 @@ export function ChartReviewSummary({
   slugs,
   perPage,
   currentPage,
+  /** URL prefix for the current ordering, so a jump link lands on the page
+   *  that really holds the slug. `slugs` arrives already sorted, and the page
+   *  a chart sits on depends on that ordering, so a link built against the
+   *  default sort would be wrong on every other one. */
+  basePath,
 }: {
   slugs: string[];
   perPage: number;
   currentPage: number;
+  basePath: string;
 }) {
   const ctx = useContext(Ctx);
   if (!ctx?.marks) return null;
@@ -283,12 +335,12 @@ export function ChartReviewSummary({
   const known = slugs.filter((s) => marks[s]);
   const marked = known.filter((s) => marks[s].marked);
   const awaiting = known.filter((s) => !marks[s].marked && marks[s].awaitingApproval);
+  const queuedForDeletion = known.filter((s) => marks[s].deleteRequestedAt);
 
   const pageOf = (slug: string) => Math.floor(slugs.indexOf(slug) / perPage) + 1;
   const hrefFor = (slug: string) => {
     const n = pageOf(slug);
-    const base = n <= 1 ? "/dashboard/admin/charts" : `/dashboard/admin/charts/${n}`;
-    return `${base}#${slug}`;
+    return `${n <= 1 ? basePath : `${basePath}/${n}`}#${slug}`;
   };
   const elsewhere = (list: string[]) => list.filter((s) => pageOf(s) !== currentPage);
 
@@ -303,10 +355,12 @@ export function ChartReviewSummary({
           <dt>Awaiting approval</dt>
           <dd>{awaiting.length}</dd>
         </div>
+        <div className={styles.stat}>
+          <dt>Queued for deletion</dt>
+          <dd>{queuedForDeletion.length}</dd>
+        </div>
         {!ctx.available ? (
-          <p className={styles.queueOffline}>
-            Review database not bound; the queue is read-only.
-          </p>
+          <p className={styles.queueOffline}>{QUEUE_OFFLINE[ctx.state]}</p>
         ) : null}
       </dl>
 
@@ -354,11 +408,7 @@ export function ChartMarkControls({ slug, title }: { slug: string; title: string
           onClick={() => ctx.onToggleMark(slug, !mark.marked)}
           disabled={!ctx.available || mark.saving}
           aria-pressed={mark.marked}
-          title={
-            ctx.available
-              ? "Queue this chart for a redraw"
-              : "Review queue unavailable (ILLUSTRATIONS_DB not bound)"
-          }
+          title={ctx.available ? "Queue this chart for a redraw" : QUEUE_OFFLINE[ctx.state]}
         >
           {mark.saving ? (
             <Loader2 size={13} className={styles.spin} />
@@ -410,5 +460,38 @@ export function ChartMarkControls({ slug, title }: { slug: string; title: string
         />
       </div>
     </div>
+  );
+}
+
+/**
+ * The deletion-request control for one figure, wired to the queue.
+ *
+ * Separate from `ChartMarkControls` and deliberately more forgiving: that
+ * component returns null until the marks fetch resolves and for anyone who is
+ * not an admin, which is right for a redraw queue nobody else can write to.
+ * This one renders regardless and disables itself instead, because a control
+ * that silently is not there reads as a missing feature rather than as a
+ * permission, and because the button is the only place the outstanding request
+ * is visible on the figure itself.
+ */
+export function ChartDeleteControls({
+  slug,
+  usedBy,
+}: {
+  slug: string;
+  usedBy: string[];
+}) {
+  const ctx = useContext(Ctx);
+  const mark = ctx?.marks?.[slug];
+  return (
+    <ChartDelete
+      slug={slug}
+      usedBy={usedBy}
+      requested={Boolean(mark?.deleteRequestedAt)}
+      requestedAt={mark?.deleteRequestedAt ?? null}
+      available={Boolean(ctx?.available)}
+      unavailableReason={QUEUE_OFFLINE[ctx?.state ?? "unbound"]}
+      onChange={ctx?.onDeleteRequestChange ?? (() => {})}
+    />
   );
 }

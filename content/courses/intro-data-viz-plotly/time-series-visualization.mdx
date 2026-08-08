@@ -82,6 +82,11 @@ Drag the slider below the chart to zoom into any time window.
 
 ## Resampling: aggregating to a more useful granularity
 
+Every step of aggregation buys legibility with a different loss. The same
+four weeks of traffic at three grains:
+
+<Chart slug="resampling-granularity" />
+
 Raw time-series data is often too granular for the chart you want.
 You may have *per-minute* data but want to see *daily* trends.
 Pandas' `.resample()` is the workhorse:
@@ -168,7 +173,17 @@ The 30-day average is the *smoothest* and reveals the underlying
 trend; the 7-day catches *weekly* structure; the raw daily shows
 the noise. All three layered gives the whole story.
 
+Smoothing is not free: a moving average is a trailing view, so it turns
+corners late by roughly half the window.
+
+<Chart slug="rolling-window-lag" />
+
 ## Common time-series pitfalls
+
+The costliest of them is the quietest. Four missing days, filled with
+zeroes and left as a gap:
+
+<Chart slug="missing-as-zero" />
 
 1. **Non-monotonic x-axis.** If your DataFrame isn't sorted by
    date, the line wiggles backwards through time. Always
@@ -216,7 +231,17 @@ fig.show()
 Notice the x-axis no longer has flat "no movement" stretches over
 weekends.
 
+The commonest pitfall is the window itself. The same series supports
+opposite headlines depending on where you start it:
+
+<Chart slug="cherry-picked-window" />
+
 ## Seasonal patterns: faceting by year
+
+The year-over-year version folds the axis so the same month lands in the
+same place, which is what makes December comparable to December:
+
+<Chart slug="year-over-year-overlay" />
 
 To compare years on the same calendar, facet by year (or use a
 *year-over-year* plot where the x-axis is just month/day):

@@ -112,6 +112,8 @@ import {
   type ParsedTestResult,
 } from "./challengeHarness";
 import { mergeInitAndEntry } from "./runtime/mergeInit";
+import { PlotlyChart } from "./PlotlyChart";
+
 import styles from "./ChallengeCard.module.css";
 // Boot-notice styles are shared with `<CodeBlock>` (which already
 // shares this card's styles for its chrome, the reuse runs both ways).
@@ -2480,11 +2482,18 @@ function SolutionModal({
     : createPortal(modal, document.body);
 }
 
-/** Minimal output cell renderer, text cells use mono-spaced pre-wrap,
- *  HTML cells (DataFrames) get the table styles defined in the
- *  module, image / plot cells fall through to inline rendering. This
- *  is a trimmed copy of `<CodeBlock>`'s `OutputCellView` adjusted for
- *  the lighter challenge-card chrome. */
+/** Output cell renderer, a trimmed copy of `<CodeBlock>`'s adjusted for the
+ *  lighter challenge-card chrome: text cells use mono-spaced pre-wrap, HTML
+ *  cells (DataFrames) get the table styles defined in the module, image and
+ *  plot cells render inline.
+ *
+ *  The `plot` branch was missing until it was noticed that a `fig.show()` in
+ *  a challenge printed a wall of escaped JSON instead of drawing a chart. A
+ *  plot cell carries the raw `fig.to_json()` string in `content` and the
+ *  parsed figure in `plot`, so the text fallback at the bottom of this
+ *  function renders one perfectly happily; nothing throws and nothing warns.
+ *  Any new cell type added to `OutputCellType` needs a branch here as well as
+ *  in `<CodeBlock>`'s `OutputSegment`. */
 function OutputCellView({ cell }: { cell: OutputCell }) {
   if (cell.type === "html") {
     return (
@@ -2511,8 +2520,24 @@ function OutputCellView({ cell }: { cell: OutputCell }) {
       </div>
     );
   }
+  if (cell.type === "plot" && cell.plot) {
+    return (
+      <div className={styles.outCellPlot} data-cell-type="plot">
+        <PlotlyChart figure={cell.plot} />
+      </div>
+    );
+  }
   if (cell.type === "stderr") {
     return <div className={styles.outCellStderr}>{cell.content}</div>;
+  }
+  // A plot cell that arrived without a parsed figure has nothing to draw, and
+  // its `content` is the figure JSON, which is worse than useless on screen.
+  if (cell.type === "plot") {
+    return (
+      <div className={styles.outCellStderr} data-cell-type="plot">
+        A chart was produced but could not be rendered.
+      </div>
+    );
   }
   return <div className={styles.outCellStdout}>{cell.content}</div>;
 }

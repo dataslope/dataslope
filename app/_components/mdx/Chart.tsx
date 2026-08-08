@@ -25,6 +25,7 @@
  * nothing at all in production, so a placement can be authored before its spec
  * exists — the same contract `<Figure>` offers for illustrations.
  */
+import type { CSSProperties } from "react";
 import { ChartLine } from "lucide-react";
 import chartManifest from "@/lib/generated/charts";
 import styles from "./Chart.module.css";
@@ -72,10 +73,19 @@ export function Chart({ slug, caption, maxWidth }: ChartProps) {
       className={styles.figure}
       style={maxWidth ? { maxWidth: `${maxWidth}px` } : undefined}
     >
+      {/* `--ds-chart-min-width` is the narrowest width this chart's smallest
+          label survives (computed by the build, see charts.d.ts). On a wide
+          column nothing consumes it; on a phone the stylesheet lets the
+          figure scroll rather than scale its type into the ground. */}
       <div
         className={styles.chart}
         role="img"
         aria-label={entry.title}
+        style={
+          entry.minWidth
+            ? ({ "--ds-chart-min-width": `${entry.minWidth}px` } as CSSProperties)
+            : undefined
+        }
         // Build-time output from our own spec files, never user input.
         dangerouslySetInnerHTML={{ __html: entry.svg }}
       />

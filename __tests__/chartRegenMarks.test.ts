@@ -15,6 +15,7 @@ import {
   approveRegenMark,
   listRegenMarks,
   readMark,
+  requestDeletion,
   upsertRegenMark,
 } from "../lib/charts/regenMarks";
 
@@ -48,9 +49,10 @@ describe("chart review queue targeting", () => {
     await readMark(db, "bar-truncation");
     await upsertRegenMark(db, { promptId: "bar-truncation", marked: true, note: "" });
     await approveRegenMark(db, { promptId: "bar-truncation" });
+    await requestDeletion(db, { promptId: "bar-truncation", requested: true, reason: "" });
 
-    // Every statement the binding issues, across all four entry points.
-    expect(sql.length).toBeGreaterThanOrEqual(4);
+    // Every statement the binding issues, across all five entry points.
+    expect(sql.length).toBeGreaterThanOrEqual(5);
     for (const query of sql) {
       expect(query).toContain(CHART_TABLE);
       expect(query).not.toContain(ILLUSTRATION_TABLE);

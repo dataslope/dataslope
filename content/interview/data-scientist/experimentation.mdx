@@ -311,7 +311,7 @@ It allows intuitive probability statements and can incorporate prior knowledge, 
 Frequentist tests offer guaranteed error-rate control; Bayesian tests are more flexible but require careful prior specification.
 
 The code draws posterior samples from `Beta(1,1)` priors updated with each
-variant's conversions, then estimates `P(treatment > control)` as the
+variant's conversions, then estimates $P(\text{treatment} > \text{control})$ as the
 fraction of draws where treatment's rate exceeds control's.
 
 <CodeBlock

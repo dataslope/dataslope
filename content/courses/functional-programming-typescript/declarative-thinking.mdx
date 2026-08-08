@@ -177,6 +177,12 @@ them.
 Pipelines work best when each stage does *one thing*. Here is a
 realistic example, computing per-customer paid totals.
 
+A stage-per-job pipeline is also what makes laziness possible, and
+laziness is what stops a pipeline that ends in "give me ten" from
+reading a million rows:
+
+<Chart slug="pipeline-laziness" />
+
 <CodeBlock
   adapter="typescript"
   files={[

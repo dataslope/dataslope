@@ -1405,14 +1405,16 @@ body.playground-active {
   max-width: 100%;
   border-radius: 4px;
 }
+/* Kept in lockstep with `.outCellPlot` in ChallengeCard.module.css: no
+   scroller of its own, because the output panel around it already scrolls
+   and nesting the two gives one figure two scrollbars. */
 .out-seg-plot {
   white-space: normal;
-  max-height: 600px;
-  overflow: auto;
 }
 .plotly-chart {
   width: 100%;
-  height: 380px;
+  max-width: 100%;
+  height: clamp(240px, 42vw, 400px);
 }
 
 /* DataFrame tables, kept in lockstep with `.outCellHtml table` in

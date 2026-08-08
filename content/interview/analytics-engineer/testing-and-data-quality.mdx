@@ -116,6 +116,11 @@ sources:
           error_after: {count: 12, period: hour}
 ```
 
+Two thresholds rather than one, because the interesting signal is usually
+the drift rather than the outage:
+
+<Chart slug="data-freshness-sla" />
+
 ### What is a data contract in dbt?
 
 A contract enforces that a model's output **schema**, column names, data types,
@@ -237,6 +242,12 @@ to surface **unknown** anomalies you did not think to encode (a table's row
 count suddenly halves). They are complementary: tests catch expected violations;
 observability catches surprises. Tools like Monte Carlo or Elementary add the
 observability layer.
+
+The row-count case is the clearest one: every assertion in the project stays
+green while a third of the data quietly stops arriving, because no assertion
+ever mentioned volume.
+
+<Chart slug="row-count-anomaly" />
 
 ### How do you test that a metric is correct, not just non-null?
 

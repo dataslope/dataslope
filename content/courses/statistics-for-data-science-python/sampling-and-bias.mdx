@@ -54,6 +54,11 @@ representativeness the expected outcome and, crucially, lets you quantify
 how far off you might be. That quantification is the entire game.
 </Callout>
 
+Bias and variance are different failures, and only one of them is fixed by
+collecting more data:
+
+<Chart slug="bias-variance" />
+
 ## Probability sampling methods
 
 The good methods share one trait: **every unit has a known, nonzero
@@ -240,7 +245,7 @@ keeping them separate is one of the most important habits in statistics.
   it with more data.**
 - **Variance** is a *random* miss, the estimate scatters around its
   center from sample to sample. Variance comes from *finite sample size*.
-  **You fix it with more data** (it shrinks like `1/√n`).
+  **You fix it with more data** (it shrinks like $1/\sqrt{n}$).
 
 The classic picture is a dartboard: bias is *where the cluster of darts
 is centered relative to the bullseye*; variance is *how spread out the
@@ -749,7 +754,7 @@ The chance mechanism, not effort or size, is what connects the sample to the pop
 <Callout type="success" title="Key takeaways">
 - **How you sample** decides whether inference is honest; the math assumes a random mechanism.
 - **Probability methods** (simple random, stratified, cluster, systematic) give every unit a known selection chance. **Convenience sampling** does not, and usually introduces bias.
-- **Bias** is a systematic, directional miss from *method*, it does **not** shrink with more data. **Variance** is random scatter from *sample size*, it **does** shrink (like `1/√n`).
+- **Bias** is a systematic, directional miss from *method*, it does **not** shrink with more data. **Variance** is random scatter from *sample size*, it **does** shrink (like $1/\sqrt{n}$).
 - Classic biases: **selection**, **self-selection**, **nonresponse**, **survivorship**, **undercoverage**. Always ask *who is missing*.
 - A bigger biased sample is a *more confident wrong answer*. "Random" means a deliberate chance mechanism, never "haphazard."
 </Callout>

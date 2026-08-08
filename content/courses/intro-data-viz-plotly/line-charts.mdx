@@ -27,6 +27,11 @@ Never use a line chart when the x-axis is a set of *unordered
 categories* like "Apple, Banana, Cherry." Lines drawn between them
 imply a relationship that isn't there.
 
+The mark is an assertion about the x-axis, which is why a line belongs on
+time and not on categories:
+
+<Chart slug="line-implies-continuity" />
+
 ## A simple time series
 
 <CodeBlock
@@ -91,7 +96,16 @@ fig.show()
 Now you have several lines, each in a different color, with an
 interactive legend you can click to hide/show series.
 
+One caution before you read any slope off a line: noise alone produces runs
+and dips that look exactly like trends.
+
+<Chart slug="noise-looks-like-a-trend" />
+
 ## Markers: show the actual data points
+
+Two series that look equally well supported until the markers arrive:
+
+<Chart slug="markers-show-observations" />
 
 Lines are great for showing the *shape* of a trend, but sometimes
 you want to also see exactly where each measurement was taken.
@@ -133,7 +147,10 @@ they'll just clutter the line.
 
 ## Many lines? Avoid the spaghetti
 
-<Chart slug="spaghetti-vs-facets" />
+When one of the lines is the story, you do not have to split the chart up at
+all. Leave the overlay alone and change what is loud:
+
+<Chart slug="highlight-one-line" />
 
 A common failure mode is the **spaghetti chart**, twenty or more
 overlapping lines that no one can read.

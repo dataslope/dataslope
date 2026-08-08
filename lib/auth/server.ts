@@ -416,7 +416,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     },
     // Membership tier, surfaced on the session so the "Ask AI" endpoint can
     // pick the model by plan (free → cheaper OpenRouter model; pro → OpenAI).
-    // Backed by the `plan` column added in migrations/0003. `input: false` means
+    // Backed by the `plan` column added in migrations/auth/0003. `input: false` means
     // users can't set their own plan via the sign-up/update API, it's changed
     // server-side only (a future billing webhook, or an admin). Defaults to
     // 'free'. See lib/ai/tier.ts, which also honours a PRO_USER_EMAILS allowlist
@@ -433,7 +433,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
       // Let a user delete their own account from /account. The `user` row's
       // deletion cascades to their `session` + `account` rows and their
       // cloud_workspaces / playground_shares rows (ON DELETE CASCADE,
-      // migrations/0001 + 0005), but the *R2 payloads* behind those saves and
+      // migrations/auth/0001 + 0005), but the *R2 payloads* behind those saves and
       // shares don't cascade, so beforeDelete drops them first. It's
       // best-effort (never throws) so a storage hiccup can't trap a user in an
       // account they asked to delete.
@@ -523,7 +523,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     // Admin capabilities (list/remove/ban users) for the gated /admin
     // dashboard. The `removeUser` action is a hard delete: it drops the `user`
     // row, which cascades to that user's `session` + `account` rows (see the
-    // ON DELETE CASCADE in migrations/0001) and frees their unique email, so a
+    // ON DELETE CASCADE in migrations/auth/0001) and frees their unique email, so a
     // removed user can immediately sign up again with OAuth or email/password.
     // Authorization is enforced *server-side* on every `admin.*` endpoint, so
     // the dashboard staying a statically-prerendered, client-read page (the

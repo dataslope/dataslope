@@ -131,6 +131,12 @@ grouped together and `RANGE BETWEEN INTERVAL '7' DAY PRECEDING ...` bounds by
 value, not row count. `ROWS` is what you usually want; `RANGE` matters when ties
 or value-based windows are involved.
 
+The difference is easiest to see as the rows each frame admits. With
+several events sharing an `ORDER BY` value, `RANGE` runs to the end of the
+peer group and picks up rows that sit *after* the current one:
+
+<Chart slug="window-frame-rows-range" />
+
 ### How do you compute a period-over-period change?
 
 Use `LAG` (previous row) or `LEAD` (next row) to pull the comparison value onto

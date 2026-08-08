@@ -32,6 +32,13 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  ORDERINGS,
+  ORDERING_LABELS,
+  isOrdering,
+  orderBy,
+  type Ordering,
+} from "@/lib/review/ordering";
+import {
   Check,
   Copy,
   ImageIcon,
@@ -80,8 +87,19 @@ interface MarkState {
  *  redraws that have landed but nobody has looked at yet. */
 type Filter = "all" | "marked" | "regenerated";
 
+/** How the gallery is ordered. `category` is the corpus order the prompts file
+ *  and its headings already impose, so it stays the default and is dropped
+ *  from the URL; the rest come from lib/review/ordering.ts, shared with the
+ *  chart gallery so the two agree on what each ordering means. */
+type Sort = "category" | Ordering;
+
+const SORTS: Sort[] = ["category", ...ORDERINGS];
+
+const SORT_LABELS: Record<Sort, string> = { category: "Category", ...ORDERING_LABELS };
+
 const PAGE_PARAM = "page";
 const FILTER_PARAM = "filter";
+const SORT_PARAM = "sort";
 
 /** The page (0-based) named by a URL's `?page=`, or 0 when absent/invalid. */
 function pageFromSearch(search: string): number {
@@ -96,16 +114,35 @@ function filterFromSearch(search: string): Filter {
   return raw === "marked" || raw === "regenerated" ? raw : "all";
 }
 
-/** The current URL carrying a page (1-based) and filter, each dropped at its
- *  default so the plain gallery keeps a clean canonical URL. Hash is
+/** The ordering named by a URL's `?sort=`, defaulting to the corpus order. */
+function sortFromSearch(search: string): Sort {
+  const raw = new URLSearchParams(search).get(SORT_PARAM) ?? "";
+  return isOrdering(raw) ? raw : "category";
+}
+
+/** The current URL carrying a page (1-based), filter and sort, each dropped at
+ *  its default so the plain gallery keeps a clean canonical URL. Hash is
  *  preserved: card ids are anchors on this page. */
-function urlFor(page: number, filter: Filter): string {
+function urlFor(page: number, filter: Filter, sort: Sort): string {
   const url = new URL(window.location.href);
   if (page > 0) url.searchParams.set(PAGE_PARAM, String(page + 1));
   else url.searchParams.delete(PAGE_PARAM);
   if (filter !== "all") url.searchParams.set(FILTER_PARAM, filter);
   else url.searchParams.delete(FILTER_PARAM);
+  if (sort !== "category") url.searchParams.set(SORT_PARAM, sort);
+  else url.searchParams.delete(SORT_PARAM);
   return `${url.pathname}${url.search}${url.hash}`;
+}
+
+/** "3 Aug 2026", or "" when the illustration has never been committed. Fixed
+ *  to en-GB rather than the visitor's locale so the column reads the same for
+ *  everyone reviewing the same corpus. */
+function formatCreated(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
 const EMPTY_MARK: MarkState = {
@@ -254,6 +291,11 @@ function PromptCard({
             it sits directly under the name where it can be read off and
             selected in one gesture. */}
         <code className={styles.file}>{entry.file}</code>
+        <p className={styles.created}>
+          {entry.createdAt
+            ? `Created ${formatCreated(entry.createdAt)}`
+            : "Not committed yet"}
+        </p>
         <a className={styles.usage} href={entry.href}>
           <span className={styles.usageCourse}>{entry.courseTitle}</span>
           <span className={styles.usageRoute}>{entry.route}</span>
@@ -363,6 +405,7 @@ export function IllustrationPromptsClient() {
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
+  const [sort, setSort] = useState<Sort>("category");
   // 0-based internally, 1-based in the URL (`?page=3`).
   const [page, setPage] = useState(0);
 
@@ -603,13 +646,27 @@ export function IllustrationPromptsClient() {
     return all;
   }, [gallery, marks, filter]);
 
-  const pageCount = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+  /** Filtered, then ordered. `orderBy` copies, which matters because `visible`
+   *  is the fetched array itself when no filter is active. */
+  const ordered = useMemo(
+    () =>
+      sort === "category"
+        ? visible
+        : orderBy(visible, sort, (e) => ({
+            id: e.id,
+            createdAt: e.createdAt,
+            group: e.courseTitle,
+          })),
+    [visible, sort],
+  );
+
+  const pageCount = Math.max(1, Math.ceil(ordered.length / PAGE_SIZE));
   const current = Math.min(page, pageCount - 1);
 
   // Group whatever landed on the current page, so category headings still
   // appear but only for what is actually shown.
   const groups = useMemo(() => {
-    const slice = visible.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE);
+    const slice = ordered.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE);
     const byLabel = new Map<string, GalleryEntry[]>();
     for (const entry of slice) {
       const list = byLabel.get(entry.categoryLabel);
@@ -617,7 +674,7 @@ export function IllustrationPromptsClient() {
       else byLabel.set(entry.categoryLabel, [entry]);
     }
     return [...byLabel.entries()];
-  }, [visible, current]);
+  }, [ordered, current]);
 
   // The page and filter live in the URL (`?page=3&filter=regenerated`), so the
   // view survives a reload, can be bookmarked or shared ("here are the ones
@@ -631,6 +688,7 @@ export function IllustrationPromptsClient() {
     const adopt = () => {
       setPage(pageFromSearch(window.location.search));
       setFilter(filterFromSearch(window.location.search));
+      setSort(sortFromSearch(window.location.search));
     };
     adopt();
     window.addEventListener("popstate", adopt);
@@ -644,28 +702,42 @@ export function IllustrationPromptsClient() {
     if (!gallery || page <= pageCount - 1) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- clamping to the real page count, which is only known after the data loads
     setPage(pageCount - 1);
-    window.history.replaceState(null, "", urlFor(pageCount - 1, filter));
-  }, [gallery, page, pageCount, filter]);
+    window.history.replaceState(null, "", urlFor(pageCount - 1, filter, sort));
+  }, [gallery, page, pageCount, filter, sort]);
 
   const goTo = useCallback(
     (next: number) => {
       setPage(next);
       // pushState, so Back walks the pages a reviewer actually visited; the
       // popstate listener above puts the state back in step.
-      window.history.pushState(null, "", urlFor(next, filter));
+      window.history.pushState(null, "", urlFor(next, filter, sort));
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
-    [filter],
+    [filter, sort],
   );
 
   /** Switch filters, back to page 1. replaceState rather than pushState: this
    *  is narrowing the view, not navigating within it, and Back should leave the
    *  gallery rather than undo a chip. */
-  const selectFilter = useCallback((next: Filter) => {
-    setFilter(next);
-    setPage(0);
-    window.history.replaceState(null, "", urlFor(0, next));
-  }, []);
+  const selectFilter = useCallback(
+    (next: Filter) => {
+      setFilter(next);
+      setPage(0);
+      window.history.replaceState(null, "", urlFor(0, next, sort));
+    },
+    [sort],
+  );
+
+  /** Switch orderings, back to page 1. Same reasoning as the filter: reordering
+   *  is a change of view rather than a step through it. */
+  const selectSort = useCallback(
+    (next: Sort) => {
+      setSort(next);
+      setPage(0);
+      window.history.replaceState(null, "", urlFor(0, filter, next));
+    },
+    [filter],
+  );
 
   const body = () => {
     // Order matters: a *settled* signed-out or denied session replaces the
@@ -768,7 +840,25 @@ export function IllustrationPromptsClient() {
           </span>
         </div>
 
-        {visible.length === 0 ? (
+        {/* A second row rather than more chips in the first: the filters narrow
+            *what* is shown and these change the *order*, and mixing the two in
+            one strip made both read as filters. */}
+        <div className={styles.sortBar}>
+          <span className={styles.sortLabel}>Sort by</span>
+          {SORTS.map((key) => (
+            <button
+              key={key}
+              type="button"
+              className={`${styles.sortBtn} ${sort === key ? styles.sortBtnOn : ""}`}
+              onClick={() => selectSort(key)}
+              aria-pressed={sort === key}
+            >
+              {SORT_LABELS[key]}
+            </button>
+          ))}
+        </div>
+
+        {ordered.length === 0 ? (
           <p className={styles.empty}>
             {filter === "marked"
               ? "Nothing is marked for regeneration."
@@ -822,8 +912,8 @@ export function IllustrationPromptsClient() {
               <span className={styles.pagerRange}>
                 {" "}
                 · {current * PAGE_SIZE + 1}–
-                {Math.min((current + 1) * PAGE_SIZE, visible.length)} of{" "}
-                {visible.length}
+                {Math.min((current + 1) * PAGE_SIZE, ordered.length)} of{" "}
+                {ordered.length}
               </span>
             </span>
             <button
@@ -846,7 +936,7 @@ export function IllustrationPromptsClient() {
             {Array.from({ length: pageCount }, (_, i) => (
               <a
                 key={i}
-                href={urlFor(i, filter)}
+                href={urlFor(i, filter, sort)}
                 className={
                   i === current
                     ? `${styles.pageListLink} ${styles.pageListLinkCurrent}`

@@ -93,6 +93,12 @@ A table should represent one kind of thing with coherent rules.`}
 
 ## Keys and relationships guide future lookups
 
+The classic way a good schema still performs badly is a loop that queries
+per row. Each pass is a network round trip, so the cost is the *count*
+times the latency and has almost nothing to do with query speed:
+
+<Chart slug="n-plus-one-queries" />
+
 Primary keys, foreign keys, and unique constraints are design tools.
 They also imply the paths software will use to find related data.
 

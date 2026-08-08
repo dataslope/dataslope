@@ -514,6 +514,38 @@ code.hljs {
   letter-spacing: -0.011em;
 }
 
+/* ── Bold has to look bold ───────────────────────────────────────────────
+   Fumadocs' bundled typography sets `strong { font-weight: 500 }` and
+   `blockquote { font-weight: 500 }`, and under `.prose-sm` both drop to
+   450. Against 400-weight body copy a 500 `strong` is a faint emphasis;
+   *inside a blockquote the two weights are identical*, so `**bold**`
+   renders with no visual difference at all. That is a plain correctness
+   bug in the markup contract (an author writes `**` and gets nothing),
+   and it also broke a lesson: `how-humans-perceive-visuals` asks the
+   reader to spot the bold word in a quoted paragraph as a demonstration
+   of pre-attentive processing, and there was nothing to spot.
+
+   Inter is loaded as a variable font (app/layout.tsx, no `weight` array),
+   so any axis value renders; 650 sits clearly above the body without
+   going as heavy as a heading. The blockquote rule needs its own entry
+   because it has to beat the 500 on the quote itself, not the 400 on
+   body copy, and italic bold at 700 reads as emphasis rather than as a
+   second voice.
+   ─────────────────────────────────────────────────────────────────────── */
+.prose :where(strong, b):not(
+  :where([class~="not-prose"], [class~="not-prose"] *),
+  :where(h1, h2, h3, h4, h5, h6) *,
+  :where(pre *, [data-rehype-pretty-code-figure] *)
+) {
+  font-weight: 650;
+}
+
+.prose :where(blockquote strong, blockquote b):not(
+  :where([class~="not-prose"], [class~="not-prose"] *)
+) {
+  font-weight: 700;
+}
+
 /* ── Table and callout font-size override ────────────────────────────────
    Tables and callouts are compact, information-dense contexts, scale
    their prose text back to 1rem (16px) with tighter leading.

@@ -20,7 +20,7 @@ declare global {
     // R2 bucket backing OpenNext's incremental cache.
     NEXT_INC_CACHE_R2_BUCKET: R2Bucket;
     // R2 bucket holding cloud-saved workspace bundles + shared playground
-    // snapshots (metadata lives in D1, migrations/0005). Optional so the
+    // snapshots (metadata lives in D1, migrations/auth/0005). Optional so the
     // /api/workspaces + /api/shares routes can degrade to 503 "not
     // configured" on deployments that haven't created the bucket yet.
     WORKSPACES_BUCKET?: R2Bucket;
@@ -29,7 +29,7 @@ declare global {
     // D1 database for illustration review state (the regeneration queue behind
     // /illustration-prompts). Optional so the rest of the app keeps working on
     // a deployment that hasn't created it yet: the marks API answers 503 and
-    // the gallery renders read-only. See migrations-illustrations/.
+    // the gallery renders read-only. See migrations/illustrations/.
     ILLUSTRATIONS_DB?: D1Database;
     // Static-assets binding (prerendered pages + /_next/static).
     ASSETS: Fetcher;

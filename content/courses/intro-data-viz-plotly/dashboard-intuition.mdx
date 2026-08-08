@@ -46,6 +46,11 @@ dashboards everyone ignores.
 
 ## Why most dashboards fail
 
+Not by being wrong. By accumulating, while the number anyone reads goes
+the other way:
+
+<Chart slug="dashboard-metric-creep" />
+
 The classic dashboard failure mode is the **wall of charts**: 30+
 small panels, each showing a different metric, with no apparent
 priority. The user opens it, freezes, and closes it.
@@ -71,30 +76,63 @@ and nobody knows which still matter.
 If your dashboard needs scrolling, it's probably two dashboards
 pretending to be one. The whole point is "glance at speed."
 
+The limit isn't really a row count, it's the bottom of the window.
+Measure the page in pixels and the rule explains itself:
+
+<Chart slug="dashboard-rows-fold" />
+
 ### 2. **Big numbers at the top**
 
 The top-left is the most-read part of any chart. Put the *most
 important single number* there, big and labeled.
+
+Attention drains down the page faster than it drains across it, so
+the twelve slots on a grid are not worth anything like the same
+amount:
+
+<Chart slug="dashboard-reading-order" />
 
 ### 3. **Time-series charts in the middle**
 
 The body of the dashboard is usually a few time-series charts
 showing how the headline numbers are evolving.
 
+A KPI tile reports where a number *ended up* and throws away how it
+got there, which is why the tile alone never tells anyone what to
+do:
+
+<Chart slug="dashboard-kpi-trend" />
+
 ### 4. **Detail at the bottom**
 
 Breakdowns by category, top-N tables, and other detail go below.
 The user scrolls only when they want depth.
+
+Category breakdowns are almost always head-heavy, so the sorted
+table earns its place and the twenty-panel grid does not:
+
+<Chart slug="dashboard-detail-pareto" />
 
 ### 5. **One question per chart**
 
 Every chart on the dashboard should answer one clear question. If
 a chart doesn't, remove it.
 
+The danger isn't a chart that answers nothing, it's a chart that
+answers a *second* question badly while answering the first one
+well:
+
+<Chart slug="dashboard-two-questions" />
+
 ### 6. **A consistent visual language**
 
 Same colors mean the same thing across charts. Same axes use the
 same scales. Same time periods.
+
+Color is a variable. Rebinding it between two panels the reader is
+comparing costs them the comparison:
+
+<Chart slug="dashboard-color-consistency" />
 
 ## A toy dashboard pattern
 
@@ -185,6 +223,11 @@ When you're tempted to add a chart to a dashboard, ask:
 
 If yes, add it. If no, delete it. That single question prevents
 ~80% of dashboard bloat.
+
+It is also *countable*, which turns a matter of taste into an audit
+you can run once a quarter:
+
+<Chart slug="dashboard-panel-actions" />
 
 ## Check your understanding
 

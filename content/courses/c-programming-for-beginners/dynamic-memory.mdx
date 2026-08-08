@@ -19,6 +19,11 @@ controls are `malloc` and `free`.
 
 ## Stack vs heap
 
+The two are not only different in lifetime. They differ in what a single
+allocation costs:
+
+<Chart slug="heap-vs-stack-cost" />
+
 A running program's memory is split into a few regions:
 
 - **Code**, your compiled instructions.

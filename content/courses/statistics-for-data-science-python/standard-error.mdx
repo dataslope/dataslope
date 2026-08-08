@@ -39,15 +39,17 @@ dashboards. Burn the distinction in now:
 |  | Standard deviation (SD) | Standard error (SE) |
 | --- | --- | --- |
 | Spread of… | the **data** (how individual values vary) | the **estimate** (how x̄ varies sample to sample) |
-| Behavior | a property of the population; does **not** shrink with more data | the SD of the sampling distribution; **shrinks** as `n` grows, since `SE = s / √n` |
+| Behavior | a property of the population; does **not** shrink with more data | the SD of the sampling distribution; **shrinks** as $n$ grows, since $SE = s / \sqrt{n}$ |
 
 The formula linking them is short and worth memorizing: for the sample
 mean,
 
-`SE = s / √n`
+$$
+SE = \frac{s}{\sqrt{n}}
+$$
 
-where `s` is the sample standard deviation (your estimate of σ) and
-`n` is the sample size. The SD describes your data; divide it by
+where $s$ is the sample standard deviation (your estimate of $\sigma$) and
+$n$ is the sample size. The SD describes your data; divide it by
 √n and you get the SE, which describes your *estimate of the
 mean*. They are different quantities answering different questions.
 
@@ -119,7 +121,7 @@ at the same time, simply by having a large `n`.
 
 The SE isn't an abstract formula, it's literally the standard deviation
 of the sampling distribution we built by hand earlier. From a *single*
-sample we estimate it as `s/√n`. Let's prove that estimate matches
+sample we estimate it as $s/\sqrt{n}$. Let's prove that estimate matches
 the spread you'd see if you actually could draw many samples.
 
 <CodeBlock
@@ -158,7 +160,7 @@ print("spread of the whole sampling distribution -- without repeating the study.
 />
 
 This is the quiet miracle of the standard error: you collect **one**
-sample, compute `s/√n`, and you have a good estimate of how much
+sample, compute $s/\sqrt{n}$, and you have a good estimate of how much
 your mean *would* have wobbled across the thousands of samples you never
 took. That's what lets a single study report a margin of error. The SE is
 the bridge from one sample to the entire sampling distribution.
@@ -180,7 +182,7 @@ SE = SD / $\\sqrt{n}$: the estimate of the mean is far more precise than the und
 
 ## The square-root-of-n law and diminishing returns
 
-Because SE = `s/√n`, precision improves with the **square root** of
+Because $SE = s/\sqrt{n}$, precision improves with the **square root** of
 sample size, not with sample size itself. This has a blunt, expensive
 consequence:
 
@@ -272,7 +274,7 @@ Almost every classical inference tool is "an estimate, plus-or-minus some
 number of standard errors." That's not a coincidence, the SE is the
 natural ruler for measuring how far an estimate can stray.
 
-- A **confidence interval** for a mean is roughly `x̄ ± 2 × SE`
+- A **confidence interval** for a mean is roughly $\bar{x} \pm 2 \times SE$
   (the "2" comes from the normal/t distribution and the CLT).
   We build these properly in *Confidence Intervals*.
 - A **test statistic** like the t-statistic is (estimate − hypothesized
@@ -565,10 +567,10 @@ To improve precision by a factor $k$, you need $k^2$ times the data, here $4^2 =
 
 <Callout type="success" title="Key takeaways">
 - The **standard error (SE)** is the standard deviation of a statistic's **sampling distribution**, the spread of your *estimate*, not your data.
-- For the mean, `SE = s/√n`. The **SD** describes the data and **does not shrink** with `n`; the **SE** describes the estimate and **does**.
-- A small SE means a **precise estimate**, not less-variable data. You can have a huge SD and a tiny SE simultaneously (large `n`).
-- Precision follows the **√n law**: to halve the SE you need **4x** the data; for **10x** precision, **100x** the data, sharp diminishing returns.
-- The SE is the **building block** of confidence intervals (`x̄ ± ≈ 2 × SE`) and test statistics (gap measured in SEs).
+- For the mean, $SE = s/\sqrt{n}$. The **SD** describes the data and **does not shrink** with $n$; the **SE** describes the estimate and **does**.
+- A small SE means a **precise estimate**, not less-variable data. You can have a huge SD and a tiny SE simultaneously (large $n$).
+- Precision follows the **$\sqrt{n}$ law**: to halve the SE you need **4x** the data; for **10x** precision, **100x** the data, sharp diminishing returns.
+- The SE is the **building block** of confidence intervals ($\bar{x} \pm 2 \times SE$, roughly) and test statistics (gap measured in SEs).
 - Report the SE (or a CI) for an estimate; report the SD only when you mean the spread of individual values.
 </Callout>
 

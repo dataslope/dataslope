@@ -19,6 +19,10 @@ numeric column as part of getting acquainted.
 
 ## How a histogram works
 
+The same observations at three stages of assembly:
+
+<Chart slug="histogram-from-points" />
+
 A histogram chops the range of a numeric variable into **bins**
 (usually equal-width buckets) and shows the **count** of values
 that fall into each bin. The result looks like a bar chart, but
@@ -134,6 +138,11 @@ options:
 - `barmode="group"`, places bars side by side per bin (can get
   noisy fast).
 
+The three modes are not styling options. Each answers a different question,
+and the stacked one answers the shape question badly:
+
+<Chart slug="histogram-overlay-modes" />
+
 ## Histograms of *proportions* with `histnorm`
 
 If your groups have very different sizes, counts are misleading,
@@ -180,6 +189,11 @@ Other `histnorm` values: `"percent"`, `"probability"`, `"density"`.
   plot** (next page) is more concise.
 - For **two** numeric variables, use a **2-D density heatmap** or
   scatter plot.
+
+When the bin width is the thing you keep arguing about, the cumulative view
+is the plot with no knobs:
+
+<Chart slug="ecdf-vs-histogram" />
 
 ## A real-world reading of a histogram
 

@@ -156,6 +156,11 @@ compare values across panels. Each panel becomes a standalone
 chart. Default to shared axes; use independent only when you have
 a specific reason.
 
+One ruler or many. Shared axes are what make a grid a comparison; free axes
+make every panel legible and quietly stop it being one:
+
+<Chart slug="facet-shared-vs-free-axes" />
+
 ## Why this is so powerful
 
 Small multiples solve three problems at once:
@@ -171,6 +176,11 @@ a wide range of problems in data presentation." Almost every
 sophisticated information graphic in major newspapers uses them.
 
 ## When NOT to facet
+
+Faceting divides the evidence, and a panel built from a sixth of the
+data draws a slope that is mostly noise:
+
+<Chart slug="facet-splits-the-data" />
 
 - When you have **2 or 3 series**, overlap them on one chart.
 - When the *interaction between groups* matters more than the

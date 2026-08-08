@@ -26,10 +26,6 @@ doing. The fix is awareness.
 
 ## The classic ways charts mislead
 
-<Chart slug="bar-truncation" />
-
-<Chart slug="bar-truncation-cropped" />
-
 ### 1. Truncated y-axis on bar charts
 
 Bar length encodes magnitude *relative to zero*. Cutting the axis
@@ -149,6 +145,10 @@ is 1 at the equator and past 10 where Greenland sits.
 
 ## The Tufte "data-ink" principle
 
+The test is deletion. These two panels differ by no data at all:
+
+<Chart slug="data-ink-ratio" />
+
 Edward Tufte's famous principle:
 
 > Above all else, show the data.
@@ -164,10 +164,12 @@ no decorative borders. The data carries the chart.
 
 ## Accessibility: who can read your chart?
 
-<Chart slug="colorblind-safe" />
-
 A great chart can fail *not because it's wrong* but because parts
-of the audience cannot perceive it.
+of the audience cannot perceive it. The cheapest fix is also the one that
+doesn't depend on the reader at all: put the name where the line is, so
+nobody has to match a colour to a swatch.
+
+<Chart slug="direct-labels-beat-a-legend" />
 
 ### Color blindness
 

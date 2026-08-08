@@ -27,10 +27,10 @@ the **mean**, things converge to the same familiar bell curve.
 Here is the whole idea, stated as plainly as possible:
 
 <Callout type="info" title="The Central Limit Theorem, in one sentence">
-If you take samples of size `n` from *almost any* population (it just
+If you take samples of size $n$ from *almost any* population (it just
 needs a finite variance) and compute the sample mean each time, then **as
-`n` gets large, the sampling distribution of that mean becomes
-approximately normal**, centered on μ, with spread `σ / √n`,
+$n$ gets large, the sampling distribution of that mean becomes
+approximately normal**, centered on $\mu$, with spread $\sigma / \sqrt{n}$,
 **no matter what shape the original population has.**
 </Callout>
 
@@ -289,7 +289,7 @@ mean keeps lurching as you add data, suspect a heavy tail and lean on the
 ## The spread shrinks like 1 over root n
 
 The CLT also pins down the *width* of the bell: the sampling distribution
-of the mean has standard deviation `σ / √n`. That `1/√n` is
+of the mean has standard deviation $\sigma / \sqrt{n}$. That $1/\sqrt{n}$ is
 the same diminishing-returns law we keep meeting, and it's worth
 verifying directly.
 
@@ -342,9 +342,9 @@ for n, e, t in zip(ns, empirical, theory):
   ]}
 />
 
-The simulated spread (the x markers) lands right on the `σ / √n`
+The simulated spread (the x markers) lands right on the $\sigma / \sqrt{n}$
 curve, even though the population is exponential. Notice the perfect
-squares in `ns` (4, 9, 16, 36, …): each time `n` quadruples, the spread
+squares in `ns` (4, 9, 16, 36, …): each time $n$ quadruples, the spread
 halves. That's why precision is expensive, covered fully in *Standard
 Error*.
 
@@ -497,7 +497,7 @@ assert abs(check["theory_sd"] - SIGMA / np.sqrt(64)) < 1e-9`,
 
 <Callout type="tip" title="Why the CLT is the engine of inference">
 Look at what the CLT hands you for free: the sample mean is approximately
-Normal(μ, `σ / √n`) for large `n`, *regardless of the
+$\text{Normal}(\mu,\ \sigma / \sqrt{n})$ for large $n$, *regardless of the
 data's shape*. That single fact is what makes z-intervals, t-tests, and
 "estimate ± 2 standard errors" valid on real, messy data. Every time you
 build a confidence interval for a mean or run a t-test, you are quietly
@@ -598,16 +598,16 @@ The CLT's finite-variance condition is not optional, fat tails with infinite var
 />
 
 <Callout type="success" title="Key takeaways">
-- The **CLT**: for a population with **finite variance**, the *sampling distribution of the mean* becomes approximately **normal** as `n` grows, *whatever* the population's shape.
+- The **CLT**: for a population with **finite variance**, the *sampling distribution of the mean* becomes approximately **normal** as $n$ grows, *whatever* the population's shape.
 - It is about the **mean's distribution**, not the raw data. The CLT does **not** make your data normal.
-- "n ≥ 30" is a **rough guideline**. Symmetric data normalizes at small `n`; heavily skewed/heavy-tailed data may need hundreds.
-- The mean's bell has spread `σ / √n`, quadrupling `n` halves it.
-- The CLT needs **finite variance**; fat-tailed distributions (Cauchy, certain power laws) can break it at any `n`, prefer robust methods there.
+- "$n \ge 30$" is a **rough guideline**. Symmetric data normalizes at small $n$; heavily skewed/heavy-tailed data may need hundreds.
+- The mean's bell has spread $\sigma / \sqrt{n}$, quadrupling $n$ halves it.
+- The CLT needs **finite variance**; fat-tailed distributions (Cauchy, certain power laws) can break it at any $n$, prefer robust methods there.
 - This single theorem is why normal-based confidence intervals and tests work on messy real data.
 </Callout>
 
 The CLT tells us the mean's sampling distribution is normal with spread
-`σ / √n`. That spread, the standard deviation of an *estimate*,
+$\sigma / \sqrt{n}$. That spread, the standard deviation of an *estimate*,
 is the **standard error**, the quantity we estimate from a single sample
 and the building block of every confidence interval and test statistic.
 That's next.

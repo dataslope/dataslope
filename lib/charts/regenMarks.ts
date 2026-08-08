@@ -4,7 +4,7 @@
  *
  * Storage is D1 database **`dataslope-illustrations`**, table
  * **`chart_regen_marks`**, reached through the `ILLUSTRATIONS_DB` binding
- * (schema in `migrations-illustrations/0003_…`). That database holds authoring
+ * (schema in `migrations/illustrations/0003_…`). That database holds authoring
  * and review state rather than illustration state specifically, which is why a
  * second queue lives there instead of getting a binding of its own.
  *
@@ -35,6 +35,7 @@ import {
   approveRegenMark as approveMark,
   listRegenMarks as listMarks,
   readMark as readOneMark,
+  requestDeletion as requestDelete,
   upsertRegenMark as upsertMark,
 } from "@/lib/review/marks";
 
@@ -68,4 +69,14 @@ export function approveRegenMark(
   input: { promptId: string; approvedBy?: string | null },
 ) {
   return approveMark(db, QUEUE, input);
+}
+
+/** Ask for this chart to be deleted from the repository, or withdraw the ask.
+ *  The gallery records the decision; the deletion itself is a commit, made by
+ *  whoever reads the queue back (see migrations/illustrations/0004_…). */
+export function requestDeletion(
+  db: D1Database,
+  input: { promptId: string; requested: boolean; reason: string; requestedBy?: string | null },
+) {
+  return requestDelete(db, QUEUE, input);
 }

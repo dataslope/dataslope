@@ -87,6 +87,11 @@ data, causing subtle bugs in inputs and animations. Prefer a stable id
 from your data.
 </Callout>
 
+The cost is easiest to see on an insert at the front, where stable ids let
+every existing element match itself and index keys renumber all of them:
+
+<Chart slug="list-keys-reconciliation" />
+
 ## Mapping objects and rendering nothing
 
 Real data is usually objects, and sometimes the list is empty. Handle

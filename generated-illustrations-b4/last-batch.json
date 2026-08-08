@@ -1,9 +1,0 @@
-{
-  "model": "gpt-image-2",
-  "count": 123,
-  "outputFormat": "png",
-  "batchIds": [
-    "batch_6a71393aa0b481908b79937f1bd6321e",
-    "batch_6a71393bd260819099bb5455bc6893a7"
-  ]
-}

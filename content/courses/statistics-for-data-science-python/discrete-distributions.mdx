@@ -35,12 +35,12 @@ heights, which we handle in *Continuous Distributions*.
 ## Bernoulli: a single yes/no trial
 
 The **Bernoulli** distribution is the atom of everything else here: a
-single trial with two outcomes, "success" (1) with probability `p` and
-"failure" (0) with probability `1 − p`. One coin flip. One visitor who
+single trial with two outcomes, "success" (1) with probability $p$ and
+"failure" (0) with probability $1 - p$. One coin flip. One visitor who
 either converts or doesn't. One email that either bounces or doesn't.
 
-There's almost nothing to it, the mean is just `p` and the variance is
-`p(1 − p)`, but it's the building block. Every other distribution on this
+There's almost nothing to it, the mean is just $p$ and the variance is
+$p(1 - p)$, but it's the building block. Every other distribution on this
 page is what happens when you start combining Bernoulli trials.
 
 <CodeBlock
@@ -98,9 +98,9 @@ flowchart LR
   S --> R["Binomial(n, p)<br/>= number of successes"]
 ```
 
-A binomial is literally a **sum of `n` independent Bernoulli trials**,
-which is why its mean is `np` (each trial contributes `p` on average)
-and its variance is `np(1 − p)`.
+A binomial is literally a **sum of $n$ independent Bernoulli trials**,
+which is why its mean is $np$ (each trial contributes $p$ on average)
+and its variance is $np(1 - p)$.
 
 <CodeBlock
   adapter="python"
@@ -128,9 +128,9 @@ print(f"same via 1 - cdf(9)           = {1 - d.cdf(9):.4f}")
 />
 
 <Callout type="warn" title="Off-by-one: P(X ≥ k) is .sf(k − 1), not .sf(k)">
-For a discrete distribution, `.sf(k)` computes P(X > k), which equals
-P(X ≥ k+1). So P(X ≥ 10) is `.sf(9)`, and P(X ≤ 4) is
-`.cdf(4)`. Mixing up `>` and `≥` here is the single most common
+For a discrete distribution, `.sf(k)` computes $P(X > k)$, which equals
+$P(X \ge k+1)$. So $P(X \ge 10)$ is `.sf(9)`, and $P(X \le 4)$ is
+`.cdf(4)`. Mixing up $>$ and $\ge$ here is the single most common
 discrete-distribution bug. When in doubt, sanity-check that
 `d.cdf(k) + d.sf(k)` is *not* 1 (it double-counts) but
 `d.cdf(k) + d.sf(k-1)` *is* 1 only if you account for the value at `k`.
@@ -338,7 +338,7 @@ print("So a spike that big happens in roughly 1 hour out of 84.")
 <Callout type="tip" title="Scaling the rate to the interval">
 The Poisson rate must match the interval you care about. If you get 3
 tickets/hour and want a probability for a **full 8-hour shift**, use
-`λ = 3 × 8 = 24`, not 3. Rates add: an interval twice as long
+$\lambda = 3 \times 8 = 24$, not 3. Rates add: an interval twice as long
 has twice the expected count. This linear scaling is one of the
 Poisson's most useful features.
 </Callout>
@@ -458,9 +458,9 @@ print(f"P(more than 10 calls needed)          = {d.sf(10):.4f}")
 
 <Callout type="info" title="Watch the convention: scipy's geom starts at 1">
 `scipy.stats.geom` counts the **trial number of the first success**, so
-its support is 1, 2, 3, ... and its mean is `1/p`. Some textbooks define
+its support is 1, 2, 3, ... and its mean is $1/p$. Some textbooks define
 the geometric as the number of *failures before* the first success
-(support 0, 1, 2, ... with mean `(1 − p)/p`). Same idea, shifted by one,
+(support 0, 1, 2, ... with mean $(1 - p)/p$). Same idea, shifted by one,
 always check which convention a tool uses before trusting the numbers.
 </Callout>
 
@@ -541,18 +541,18 @@ No fixed \`n\`, just a rate over an interval, points squarely at the Poisson.`}
 />
 
 <MultipleChoice
-  markdown={`For \`stats.binom(n=100, p=0.2)\`, which expression gives \`P(X >= 30)\` (30 or more successes)?
+  markdown={`For \`stats.binom(n=100, p=0.2)\`, which expression gives $P(X \\ge 30)$ (30 or more successes)?
 
 - \`d.sf(30)\`
-  > \`sf(30)\` is \`P(X > 30)\` = \`P(X >= 31)\`, which excludes the value 30 and is off by one.
+  > \`sf(30)\` is $P(X > 30) = P(X \\ge 31)$, which excludes the value 30 and is off by one.
 - \`1 - d.sf(30)\`
-  > This equals \`cdf(30)\` = \`P(X <= 30)\`, again the lower tail rather than \`P(X >= 30)\`.
+  > This equals \`cdf(30)\` = $P(X \\le 30)$, again the lower tail rather than $P(X \\ge 30)$.
 - [o] \`d.sf(29)\`
-  > Since \`sf(k)\` is \`P(X > k)\`, evaluating it at 29 gives \`P(X > 29)\` = \`P(X >= 30)\`, the inclusive upper tail.
+  > Since \`sf(k)\` is $P(X > k)$, evaluating it at 29 gives $P(X > 29) = P(X \\ge 30)$, the inclusive upper tail.
 - \`d.cdf(30)\`
-  > \`cdf(30)\` is \`P(X <= 30)\`, the lower tail, the opposite of what's asked.
+  > \`cdf(30)\` is $P(X \\le 30)$, the lower tail, the opposite of what's asked.
 
-For discrete distributions, translate the inequality first: \`P(X >= k)\` is \`sf(k-1)\`.`}
+For discrete distributions, translate the inequality first: $P(X \\ge k)$ is \`sf(k-1)\`.`}
 />
 
 <MultipleChoice
@@ -604,7 +604,7 @@ Counts are whole numbers; continuous measurements like time belong to the next c
 - **Bernoulli(p)**, one yes/no trial; the atom for the rest.
 - **Binomial(n, p)**, count of successes in a **fixed** number of
   independent trials with **constant** p (conversions, defects,
-  yes/no survey counts). Mean `np`, variance `np(1 − p)`.
+  yes/no survey counts). Mean $np$, variance $np(1 - p)$.
 - **Poisson(λ)**, count of independent events at a **constant rate**
   over a fixed interval (arrivals, errors/hour, typos/page).
   Mean = variance = λ; rates scale linearly with the interval.
@@ -614,6 +614,6 @@ Counts are whole numbers; continuous measurements like time belong to the next c
   constant p / constant rate), and never use a discrete count model
   for continuous measurements.
 - The scipy recipe is universal: freeze the distribution, then call
-  `.pmf`, `.cdf`, `.sf`, `.mean`, `.var`, `.rvs`. Remember `P(X ≥ k)`
-  is `.sf(k − 1)`.
+  `.pmf`, `.cdf`, `.sf`, `.mean`, `.var`, `.rvs`. Remember $P(X \ge k)$
+  is `.sf(k - 1)`.
 </Callout>

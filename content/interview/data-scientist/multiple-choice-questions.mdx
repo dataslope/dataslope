@@ -255,10 +255,10 @@ reasoning and runnable examples.
 ## Probability
 
 <MultipleChoice
-  markdown={`What does \`P(A | B)\` mean?
+  markdown={`What does $P(A \\mid B)$ mean?
 
-- [o] The probability of A given that B has occurred, computed as \`P(A ∩ B) / P(B)\`.
-  > Conditioning restricts the sample space to B, which is why the denominator is \`P(B)\` rather than 1.
+- [o] The probability of A given that B has occurred, computed as $P(A \\cap B) / P(B)$.
+  > Conditioning restricts the sample space to B, which is why the denominator is $P(B)$ rather than 1.
 - The probability of A and B both occurring at the same time.
   > That is the joint probability.
 - The probability of A or B.
@@ -284,10 +284,10 @@ reasoning and runnable examples.
   markdown={`Why is linearity of expectation so useful?
 
 - It lets you multiply expectations.
-  > \`E[XY] = E[X]E[Y]\` requires independence.
+  > $E[XY] = E[X]E[Y]$ requires independence.
 - It applies only to discrete variables.
   > It holds for continuous variables too.
-- [o] \`E[X + Y] = E[X] + E[Y]\` holds even under dependence.
+- [o] $E[X + Y] = E[X] + E[Y]$ holds even under dependence.
   > Problems with messy dependence often become trivial as a result. The classic use is counting expected matches by summing indicator variables that are heavily dependent on each other.
 - It only ever holds for genuinely independent variables.
   > It holds regardless of dependence, which is precisely why it is useful.`}
@@ -387,14 +387,14 @@ reasoning and runnable examples.
 <MultipleChoice
   markdown={`State Bayes' theorem and say when you would reach for it.
 
-- [o] \`P(A|B) = P(B|A)P(A) / P(B)\`, used to invert a conditional.
+- [o] $P(A \\mid B) = P(B \\mid A)P(A) / P(B)$, used to invert a conditional.
   > It turns "probability of the evidence given the hypothesis" into "probability of the hypothesis given the evidence". Diagnostic testing, spam filtering, and any question where the base rate matters more than the test's accuracy.
-- \`P(A|B) = P(A)P(B)\`, which is used whenever two events are independent of one another.
+- $P(A \\mid B) = P(A)P(B)$, which is used whenever two events are independent of one another.
   > That is the definition of independence, not Bayes' theorem.
-- \`P(A|B) = 1 − P(B|A)\`, used for complements.
+- $P(A \\mid B) = 1 - P(B \\mid A)$, used for complements.
   > Not a valid relationship.
-- \`P(A|B) = P(A ∩ B)\`, used for joint distributions.
-  > The joint probability is the numerator before dividing by \`P(B)\`.`}
+- $P(A \\mid B) = P(A \\cap B)$, used for joint distributions.
+  > The joint probability is the numerator before dividing by $P(B)$.`}
 />
 
 <MultipleChoice
@@ -442,7 +442,7 @@ reasoning and runnable examples.
 - No; the expected value is negative.
   > It is positive by 2.
 - [o] Yes on expectation, since it works out at +2 per trial.
-  > \`0.3 × 100 − 0.7 × 40 = +2\`. Variance and how often you can repeat it decide whether it is actually a good idea. A positive expectation with a bankroll too small to survive the variance is still a bad bet.
+  > $0.3 \\times 100 - 0.7 \\times 40 = +2$. Variance and how often you can repeat it decide whether it is actually a good idea. A positive expectation with a bankroll too small to survive the variance is still a bad bet.
 - No; you lose more often than you win.
   > Frequency of winning alone does not determine the expected value.
 - It cannot be evaluated without knowing the number of trials.

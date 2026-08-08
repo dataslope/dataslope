@@ -277,8 +277,8 @@ print("Notice: SD roughly HALVES when n goes up 4x (5->20, 20->80, 80->320).")
 
 Two things to internalize. First, **every** curve is centered on 50,
 more data doesn't move the target, it sharpens your aim at it. Second,
-look at the printed standard deviations: each time `n` quadruples
-(5→20→80→320), the spread roughly *halves*. That's the `1/√n` law
+look at the printed standard deviations: each time $n$ quadruples
+(5→20→80→320), the spread roughly *halves*. That's the $1/\sqrt{n}$ law
 peeking through; it's the protagonist of *Standard Error*.
 
 <Callout type="warn" title="Misconception: a wide sample means a wide sampling distribution">
@@ -287,7 +287,7 @@ how spread out any *one* sample looks. A single sample of skewed,
 high-variance data still produces a *mean* that's quite stable across
 repeats. People glance at one wide histogram of raw data and conclude
 "my estimate must be very uncertain", but the estimate's uncertainty is
-governed by `σ / √n`, which shrinks fast. Wide data, narrow
+governed by $\sigma / \sqrt{n}$, which shrinks fast. Wide data, narrow
 estimate.
 </Callout>
 
@@ -688,7 +688,7 @@ A small margin of error reflects a narrow *sampling distribution*, which depends
 <Callout type="success" title="Key takeaways">
 - Keep three things separate: **(a)** the population distribution of raw values, **(b)** one sample's distribution of raw values, **(c)** the **sampling distribution** of a *statistic* over many samples.
 - A histogram of your data is **(b)**, not (c). The sampling distribution describes an *estimate*, not raw data, and is **much narrower**.
-- The sampling distribution of the mean is **centered on μ** and has spread `σ / √n`, it tightens as `n` grows.
+- The sampling distribution of the mean is **centered on $\mu$** and has spread $\sigma / \sqrt{n}$, it tightens as $n$ grows.
 - **Larger samples** sharpen the estimate; **more samples** only smooth the simulated picture (in real life you collect just one).
 - *Every* statistic, mean, median, max, proportion, has its own sampling distribution. This single idea underlies standard errors, confidence intervals, and p-values.
 </Callout>

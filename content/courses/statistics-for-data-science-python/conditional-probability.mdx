@@ -33,7 +33,9 @@ happened*. Conditioning is just **zooming in** on a slice of the sample
 space: you throw away every outcome where B didn't happen, and ask how
 much of *what's left* is also A.
 
-`P(A | B) = P(A ∩ B) / P(B)`
+$$
+P(A \mid B) = \frac{P(A \cap B)}{P(B)}
+$$
 
 The denominator changed from "everything" to "just B." That's the
 entire idea: new information shrinks your sample space, and probabilities
@@ -82,7 +84,9 @@ flowchart TD
 The **general multiplication rule** works whether or not events are
 independent, you just have to use the conditional probability:
 
-`P(A and B) = P(A | B) · P(B)`
+$$
+P(A \text{ and } B) = P(A \mid B) \cdot P(B)
+$$
 
 When A and B happen to be independent, P(A | B) = P(A) and this
 collapses back to the simple P(A) · P(B) you already know. The
@@ -174,7 +178,9 @@ here purely as a *tool for getting base rates right*, not as a gateway
 to Bayesian inference, priors, or posteriors (that machinery is out of
 scope for this course). The version worth knowing:
 
-`P(A | B) = (P(B | A) · P(A)) / P(B)`
+$$
+P(A \mid B) = \frac{P(B \mid A) \cdot P(A)}{P(B)}
+$$
 
 The crucial ingredient is P(A), the **base rate**, how common A is
 *before* you saw any evidence. Ignore the base rate and you'll badly
@@ -428,6 +434,11 @@ straight out of *what the host's move tells you*. That's conditional
 probability doing exactly what the disease-test example did: a piece of
 information (the opened goat door) reshapes a probability you thought was
 settled.
+
+The argument rarely convinces anyone, so here is the simulation: ten
+thousand games of each strategy, plotted as a running win rate.
+
+<Chart slug="monty-hall-simulation" />
 
 ## Practice
 

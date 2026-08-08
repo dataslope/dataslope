@@ -72,6 +72,12 @@ when nothing can reach it anymore.
 You don't decide *when* memory is freed. You just decide when you
 stop *using* it. That's a much smaller responsibility.
 
+The collector can afford to run constantly because of one lopsided fact
+about how programs allocate: nearly everything dies immediately, so a
+sweep of the youngest objects costs almost nothing.
+
+<Chart slug="object-lifetime-survival" />
+
 <CodeBlock
   adapter="csharp"
   files={[

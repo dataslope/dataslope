@@ -59,11 +59,15 @@ Production and preview deploys run through Cloudflare Workers Builds rather than
 | Field | Value |
 | --- | --- |
 | Build command | `npx opennextjs-cloudflare build` |
-| Deploy command | `npx opennextjs-cloudflare deploy` |
+| Deploy command | `npx opennextjs-cloudflare deploy && npm run db:seed:search:remote` |
 | Non-production branch deploy command | `npx opennextjs-cloudflare upload` |
 | Path | `/` |
 
 Both `deploy` (production) and `upload` (preview versions) populate the R2 cache before shipping, `upload` wraps `wrangler versions upload`, so previews get the same populated cache production does. `Path` is `/` because this Worker lives at the repo root; the CORS proxy under `cloudflare-cors-proxy/` is a separate Worker with its own config.
+
+The search re-seed is appended to the **production** deploy command only, and the ordering is deliberate on both counts. It runs after `deploy` so a hiccup rebuilding the search index can never block shipping the site itself. And it is absent from the preview command because there is one `dataslope-search` database and one set of rows in it: a preview build that seeded would overwrite production's index with a feature branch's content, and nothing would look broken until someone searched.
+
+`db:seed:search:remote` no-ops when no indexed content changed, so the many deploys that touch a component and no lesson cost nothing — see [Search](#search) for how that is decided, and for the **D1 (edit)** permission the build's API token needs before any of this works.
 
 ### Incremental cache cleanup
 
@@ -84,6 +88,68 @@ It needs three repository secrets (Settings → Secrets and variables → Action
 The `R2_INC_CACHE_*` pair is named for the bucket it belongs to, because a second R2 credential now exists: `.github/workflows/r2-illustrations-lifecycle.yml` needs an **Admin Read & Write** token (`R2_ADMIN_*`) to edit bucket configuration, which is a tier this job deliberately does not get — it deletes objects unattended every six hours, and admin tokens are account-wide, so one here could destroy `dataslope-workspaces` (live user data) or `dataslope-inc-cache` itself. The job aborts rather than running credential-less, so a missing or half-renamed secret fails loudly instead of reporting a green run that pruned nothing.
 
 To change how long stale/preview cache lingers, edit `THRESHOLD_HOURS` (age limit) and `MAX_BRANCHES` (how many active-branch previews may coexist) in the workflow. At ~1–1.4 GB per retained build, retention is what decides whether the bucket sits near R2's 10 GB free tier or balloons, storage beyond it is cheap ($0.015/GB-month), but there's no reason to pay for dead previews.
+
+## Search
+
+Site search is a **SQLite FTS5 index on D1** (`dataslope-search`), built from `content/` at build time and queried by `app/api/search/route.ts`. It replaced an in-Worker Orama index, which had to be fetched, parsed and re-tokenised on the first search in every fresh isolate — a cost paid per data centre, per deploy, and growing with the content. An FTS5 query is a `SELECT` against an index that already exists, so there is nothing to warm up.
+
+Three build steps produce it, all wired into `npm run build`:
+
+| Step | Output |
+| --- | --- |
+| `scripts/build-search-corpus.mjs` | `lib/generated/search-corpus.json` — one row per `(page, heading)` |
+| `scripts/build-search-sql.mjs` | `lib/generated/search-seed.sql` — the `DELETE` + batched `INSERT`s |
+| `npm run db:seed:search[:remote]` | the rows, in D1 — skipped when unchanged |
+
+These run **after** `build:charts`, and the order is load-bearing: chart titles and captions live in the generated chart manifest rather than in the MDX, so a corpus built before it silently omits every one of them. That is worth ~264 kB of prose across ~250 charts, and it produced an index with no chart captions in it at all the first time the steps were ordered the other way. `build-search-corpus.mjs` now warns loudly when the manifest is missing or empty rather than quietly indexing less.
+
+The corpus is extracted from the MDX **ASTs**, not the rendered HTML, which is what lets it reach content that never exists in the DOM until a learner interacts: `<ChallengeCard>` instructions and solutions, `<MultipleChoice>` questions and per-choice explanations, fenced and `<CodeBlock>` source, Mermaid definitions, `<Chart>` titles and captions, and the whole of `content/interview/`, which the previous index omitted entirely. Prose and code land in separate columns so `bm25()` can weight prose about seven to one over code — that ratio is what makes indexing code safe, since a search for a common identifier should surface the lesson that *explains* it above the dozen that merely use it in a starter file.
+
+### One-time setup
+
+The database and its schema already exist. To recreate them from scratch:
+
+```bash
+npx wrangler d1 create dataslope-search   # paste database_id into wrangler.jsonc
+npm run db:migrate:search:remote          # migrations/search/0001_create_docs_fts.sql
+npm run db:seed:search:remote             # ~9k rows
+```
+
+**The Workers Builds API token needs `D1 (edit)` added to it.** The token Cloudflare generates for Workers Builds is scoped to Account Settings (read), Workers Scripts (edit), Workers KV (edit), Workers R2 (edit) and Workers Routes (edit) — D1 is not in that set, so the deploy-time seed fails to authorize until it is added under **My Profile → API Tokens → (the Workers Builds token) → Edit → Account → D1 → Edit**. Because the seed is chained after `deploy` with `&&`, the symptom is a Worker that ships fine and a build that goes red on the last step, with the index never updating.
+
+### Local development
+
+`next dev` resolves bindings through `initOpenNextCloudflareForDev()` (see `next.config.ts`), so `/api/search` reads the **local** D1 under `.wrangler/`, not the remote one. That database starts empty, and an empty FTS5 table is not an error — it answers every query with no matches. Search therefore looks broken-but-silent until it is set up once:
+
+```bash
+npm run db:migrate:search   # --local
+npm run db:seed:search      # --local, skipped when already current
+```
+
+Re-run the seed after editing lessons; it no-ops when the content hash already matches.
+
+### Re-seeding only when content changed
+
+`build-search-sql.mjs` writes a SHA-256 of the corpus into the seed file and, as the seed's last statement, into `docs_meta.content_hash`. `scripts/seed-search.mjs` compares the two and skips the apply when they agree.
+
+The hash is taken over the **corpus**, not over `content/`, which is what makes it correct: it changes when a lesson is edited, and equally when the extractor learns to reach something it previously could not. Hashing the source files would have classified the chart-manifest fix above as a no-op and left the incomplete index in place.
+
+Gating matters more than the row count suggests. A re-seed deletes and re-inserts every row, and on an FTS5 table the rows that get written are not the ~9k logical ones — the shadow tables hold ~20k, and D1 meters deletes as writes too, so an unconditional seed spends roughly 40k written rows on a deploy that may have touched no lesson at all.
+
+Two properties worth keeping if this is ever rewritten: the hash is written **last**, so a partial apply cannot leave a hash claiming to be current and the next deploy retries; and **any uncertainty seeds** — an unreadable remote hash means apply, because a redundant seed costs some written rows while a wrongly skipped one serves stale content. `npm run db:seed:search:remote:force` overrides the check.
+
+Sizing, measured rather than estimated: 8,965 rows over ~890 lessons produce a **~21 MB** database (14.7 MB of stored text so `snippet()` can quote matches, 5.5 MB of actual inverted index). That is 4% of the free plan's 500 MB per-database cap and 0.2% of the paid plan's 10 GB, so storage is not a constraint this index will run into.
+
+### Two D1 rules the seed generator exists to respect
+
+Both fail *only* on the remote seed, so both are enforced at build time instead:
+
+- **100 KB per statement.** Batching a fixed number of rows per `INSERT` overran it, because section rows range from ~200 bytes to ~12 KB. Batches are closed on a byte budget, and `build-search-sql.mjs` re-checks the finished file and exits non-zero if any statement is over.
+- **No transactions in the file.** `wrangler d1 execute --file` already runs inside one, so a `BEGIN TRANSACTION` earns `cannot start a transaction within a transaction`. That enclosing transaction is also what makes the leading `DELETE FROM docs` safe — the delete and the inserts land together, so a failed seed cannot leave an empty index.
+
+`dataslope-search` is deliberately its own database. It is the only one holding an FTS5 **virtual table**, and `wrangler d1 export` refuses to export any database containing one — a failed attempt has been reported to wedge the database entirely ([workers-sdk#9519](https://github.com/cloudflare/workers-sdk/issues/9519), [#6305](https://github.com/cloudflare/workers-sdk/issues/6305)). Every row here is derived from `content/` and rebuilt each deploy, so the recovery for anything going wrong is to delete the database and re-seed. Extending that exposure to `dataslope-auth` or `dataslope-illustrations`, which record human decisions and cannot be rebuilt from source, would not be an acceptable trade.
+
+Queries go through `withSession("first-unconstrained")`, so enabling [read replication](https://developers.cloudflare.com/d1/best-practices/read-replication/) later is a dashboard toggle rather than a code change: the index only changes at deploy, so there is no read-after-write hazard and any replica's answer is as good as the primary's.
 
 ## Authentication (accounts)
 
@@ -117,8 +183,10 @@ Key files:
 | `lib/auth/client.ts` | Browser client + `useSession` / `signIn` / `signOut`. |
 | `app/sign-in/`, `app/account/` | Sign-in screen (Google/GitHub) and a gated account area. |
 | `app/admin/` | Gated admin dashboard (list / remove / ban users), built on the shadcn UI primitives in `components/ui`. See [Admin dashboard](#admin-dashboard). |
-| `migrations/` | D1 schema for `dataslope-auth` (Better Auth core tables + the admin plugin's `role`/`ban` fields), applied with `wrangler d1 migrations apply`. |
-| `migrations-illustrations/` | D1 schema for `dataslope-illustrations`, a second database holding the illustration regeneration queue written from the admin-only `/dashboard/admin/illustration-prompts` gallery. Applied with `npm run db:migrate:illustrations[:remote]`; see `agent-outputs/20260803-0900-illustration-regeneration-queue.md`. |
+| `migrations/` | D1 schema, one subfolder per database: `auth/`, `illustrations/`, `search/`. Each is a `migrations_dir` in `wrangler.jsonc` with its own numbering and its own `d1_migrations` table. See `migrations/README.md` for which command applies which, and why there are three databases rather than one. |
+| `migrations/auth/` | `dataslope-auth`: Better Auth core tables plus the admin plugin's `role`/`ban` fields, plans, AI usage counters, cloud-workspace metadata and custom content. Applied with `npm run db:migrate[:remote]`. |
+| `migrations/illustrations/` | `dataslope-illustrations`, a second database holding the illustration and chart regeneration queues written from the admin-only `/dashboard/admin/illustration-prompts` and `/dashboard/admin/charts` galleries. Applied with `npm run db:migrate:illustrations[:remote]`; see `agent-outputs/20260803-0900-illustration-regeneration-queue.md`. |
+| `migrations/search/` | `dataslope-search`: the lesson full-text index read by `/api/search`. Applied with `npm run db:migrate:search[:remote]`, seeded with `npm run db:seed:search[:remote]`. |
 
 > Auth is deliberately kept **out of `middleware.ts`**, `cookies()`/middleware sessions have rough edges on the Workers runtime (a known OpenNext limitation). All auth work happens in route handlers and client components instead.
 
@@ -188,9 +256,9 @@ npx wrangler secret put AI_FREE_API_KEY   # OpenRouter key, covers both tiers to
 npx wrangler secret put AI_PRO_API_KEY    # optional: only needed if pro should use a separate key
 ```
 
-If a tier is missing its key, base URL, or model, it degrades to whichever tier *is* fully configured (a half-wired env still answers), keeping its own budgets. With neither tier fully configured, Ask AI stays inert (503). A user's tier comes from the `plan` column (`migrations/0003`, default `'free'`); admins and any address in `PRO_USER_EMAILS` are treated as Pro as a bootstrap before billing exists (`lib/ai/tier.ts`).
+If a tier is missing its key, base URL, or model, it degrades to whichever tier *is* fully configured (a half-wired env still answers), keeping its own budgets. With neither tier fully configured, Ask AI stays inert (503). A user's tier comes from the `plan` column (`migrations/auth/0003`, default `'free'`); admins and any address in `PRO_USER_EMAILS` are treated as Pro as a bootstrap before billing exists (`lib/ai/tier.ts`).
 
-**Cost / abuse controls.** Signed-in only; per-user daily request + token budgets and a global daily token ceiling (`AI_DAILY_GLOBAL_TOKEN_CAP`, default 5M) bound spend regardless of account/IP rotation (`lib/ai/limits.ts`, backed by the `ai_usage_*` tables in `migrations/0003`). Output is capped per tier. Per-minute limiting (a Durable Object / the Rate Limiting binding) and per-widget context capture are tracked as follow-ups in `agent-outputs/20260701-1107-ask-ai-cloudflare-implementation.md`.
+**Cost / abuse controls.** Signed-in only; per-user daily request + token budgets and a global daily token ceiling (`AI_DAILY_GLOBAL_TOKEN_CAP`, default 5M) bound spend regardless of account/IP rotation (`lib/ai/limits.ts`, backed by the `ai_usage_*` tables in `migrations/auth/0003`). Output is capped per tier. Per-minute limiting (a Durable Object / the Rate Limiting binding) and per-widget context capture are tracked as follow-ups in `agent-outputs/20260701-1107-ask-ai-cloudflare-implementation.md`.
 
 For local dev, add the keys to `.dev.vars`:
 
@@ -205,7 +273,7 @@ Copilot-style ghost-text autocomplete in the language-runtime CodeMirror editors
 
 **Pro members only, enforced server-side.** The endpoint returns 401 for guests and 403 for signed-in free members, the client gate (a `GET /api/ai/complete` capability probe the extension fires once per page) is only there to avoid doomed requests. Completions reuse the **pro-tier** provider config above (OpenRouter → DeepSeek V4 Flash today) via the same OpenAI-compatible `/chat/completions` adapter (`lib/ai/provider.ts`), non-streaming with a small output cap (`lib/ai/completion.ts`).
 
-**Cost / abuse controls.** Completions bill per-user daily request + token counters that are **separate from Ask AI chat** (`completions` / `completion_*_tok` columns, `migrations/0004`) so a busy editor session can't eat a member's chat budget, but they share the global daily token ceiling, which stays the single backstop on total provider spend.
+**Cost / abuse controls.** Completions bill per-user daily request + token counters that are **separate from Ask AI chat** (`completions` / `completion_*_tok` columns, `migrations/auth/0004`) so a busy editor session can't eat a member's chat budget, but they share the global daily token ceiling, which stays the single backstop on total provider spend.
 
 ### Pro subscriptions (Polar)
 
@@ -228,7 +296,7 @@ Client side, `app/_components/billing/proCheckout.ts` drives the flow (upgrade b
 
 ### Cloud saves & playground sharing
 
-Workspaces can be pushed to the account ("Cloud" button in every playground header) and shared as immutable snapshot links ("Share", works for **guests too**, no account needed). A workspace travels as a **bundle**: a gzipped JSON document (`lib/workspaces/types.ts`) holding the code files verbatim, or, for the SQL playgrounds, a replayable SQL dump plus the query tabs (the database binary never leaves the browser; opening a bundle replays the dump through the WASM engine). D1 keeps only metadata (`migrations/0005`); the bundle bytes live in a dedicated R2 bucket, because SQL dumps routinely exceed D1's 2 MB row cap and R2 reads are egress-free.
+Workspaces can be pushed to the account ("Cloud" button in every playground header) and shared as immutable snapshot links ("Share", works for **guests too**, no account needed). A workspace travels as a **bundle**: a gzipped JSON document (`lib/workspaces/types.ts`) holding the code files verbatim, or, for the SQL playgrounds, a replayable SQL dump plus the query tabs (the database binary never leaves the browser; opening a bundle replays the dump through the WASM engine). D1 keeps only metadata (`migrations/auth/0005`); the bundle bytes live in a dedicated R2 bucket, because SQL dumps routinely exceed D1's 2 MB row cap and R2 reads are egress-free.
 
 - **Endpoints:** `GET/PUT/DELETE /api/workspaces[/:id[/bundle]]` (owner-only) and `POST/GET/DELETE /api/shares[/:id[/bundle]]` (share reads are public, the slug is the capability). Share links land on `/s/<id>` (noindex, disallowed in robots).
 - **Retention (read-time, no cron):** guest share links carry a fixed ~30-day expiry; free members' saves + links expire after ~30 days of inactivity (opening / viewing resets the clock); Pro storage doesn't expire. Expired rows are never served and are purged lazily by whichever route encounters them. Policy numbers live in `lib/workspaces/policy.ts` and are what `/pricing` documents.
@@ -252,14 +320,14 @@ Optional hardening: an R2 **lifecycle rule** on the `share/` prefix (e.g. delete
 - **Users** (`/admin`), lists every account with per-row actions:
   - **Plan switch**, flips `free` ↔ `pro` via `admin.updateUser` (an already-signed-in session can lag up to five minutes behind, from the session cookie cache; impersonation and fresh sign-ins see the new plan immediately).
   - **Impersonate**, become that user in this browser (refused for admins server-side). Come back to `/admin` and the access-denied card offers **Stop impersonating**.
-  - **Remove**, a **hard delete**. It drops the `user` row, which cascades to that user's `session` and `account` rows (the `ON DELETE CASCADE` in `migrations/0001`) and frees their unique email. **The person can then sign up again** from scratch with OAuth or email/password. Use this for the "let me start over" / account-reset case, e.g. someone who created an unverified email/password account and now can't sign in with Google (see [Account linking](#account-linking)).
+  - **Remove**, a **hard delete**. It drops the `user` row, which cascades to that user's `session` and `account` rows (the `ON DELETE CASCADE` in `migrations/auth/0001`) and frees their unique email. **The person can then sign up again** from scratch with OAuth or email/password. Use this for the "let me start over" / account-reset case, e.g. someone who created an unverified email/password account and now can't sign in with Google (see [Account linking](#account-linking)).
   - **Ban**, the soft alternative. Blocks sign-in but keeps the account (and its email) in place; reversible with **Unban**.
 - **Test users** (`/admin/test-users`), creates disposable accounts for testing member-gated features (AI autocomplete, Ask AI tiers). They're created through `admin.createUser` with `data: { plan, emailVerified: true }`, so they're born verified (no verification email is sent on this path) on the chosen plan, no billing involved. Test accounts are identified purely by their reserved `@dataslope.test` email domain (RFC 6761 `.test` can never receive mail), which is what the list and the "Test" badges key on. Passwords show once at creation; use Impersonate for existing ones.
 - **AI usage** (`/admin/ai-usage`), per-user and site-wide Ask AI + completion + suggestion counters for a chosen UTC window (Day / Week / Month / Total, anchored by an "as of" date), against the global daily cap. Backed by `GET /api/admin/ai-usage?start&end` (inclusive UTC-day range; `start` omitted ⇒ all-time), a custom route gated by `requireAdmin` (`lib/auth/admin.ts`) since it isn't a Better Auth endpoint.
 
 Authorization is enforced **server-side** on every `admin.*` endpoint (and `requireAdmin` on our own `/api/admin/*` routes), so the pages themselves stay statically-prerendered, client-read screens like `/account` (the "auth gates actions, not content" rule): a non-admin who opens `/admin` just gets an access-denied notice and can read or change nothing. The dashboard refuses destructive actions on your own row, so you can't lock yourself out.
 
-The admin plugin adds `role` / `banned` / `banReason` / `banExpires` to `user` and `impersonatedBy` to `session`; that delta is `migrations/0002_add_admin_plugin_fields.sql`, applied by the same `wrangler d1 migrations apply` command as the rest.
+The admin plugin adds `role` / `banned` / `banReason` / `banExpires` to `user` and `impersonatedBy` to `session`; that delta is `migrations/auth/0002_add_admin_plugin_fields.sql`, applied by the same `wrangler d1 migrations apply` command as the rest.
 
 **Designating admins.** Three ways, which compose. All three grant admin regardless of the `role` column, so any of them can bootstrap the *first* admin (there's no admin to promote them yet):
 
@@ -291,7 +359,7 @@ The second case is the default whenever email verification is off (no `RESEND_AP
 
 ### Adding Better Auth plugins later
 
-If you enable additional Better Auth features (e.g. 2FA, organizations), regenerate the schema delta with `npx @better-auth/cli generate` and add it as a **new** migration file in `migrations/` rather than editing the existing one.
+If you enable additional Better Auth features (e.g. 2FA, organizations), regenerate the schema delta with `npx @better-auth/cli generate` and add it as a **new** migration file in `migrations/auth/` rather than editing the existing one.
 
 
 ## License

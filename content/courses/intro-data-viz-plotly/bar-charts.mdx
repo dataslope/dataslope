@@ -13,6 +13,11 @@ accurate encoding the human eye has access to.
   alt="Bar charts, an isometric illustration"
 />
 
+That accuracy holds however many bars you draw, which is exactly the trap: the
+encoding stays perfect long after the chart has stopped being readable.
+
+<Chart slug="too-many-bars" />
+
 ## When to reach for a bar chart
 
 A bar chart is the right choice when:
@@ -117,6 +122,10 @@ have a **natural order**:
 
 ## Horizontal bars for long labels
 
+The same nine categories both ways. Only the axis changed:
+
+<Chart slug="horizontal-bars-long-labels" />
+
 When category labels are long, **horizontal bars** are far more
 readable than vertical bars with rotated labels.
 
@@ -185,6 +194,11 @@ fig.show()
 
 `category_orders={...}` is a small but invaluable trick, it forces
 the days into chronological order instead of alphabetical.
+
+Grouped and stacked are the same twelve numbers, and the choice decides
+which comparison is easy and which is nearly impossible:
+
+<Chart slug="grouped-vs-stacked-bars" />
 
 ## Stacked bars: parts of a whole, across categories
 

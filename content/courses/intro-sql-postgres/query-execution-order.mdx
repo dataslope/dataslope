@@ -32,6 +32,10 @@ Read the numbers: `FROM` is first, `SELECT` is near the **end**, and
 `LIMIT` is last. The clause you *write* first (`SELECT`) is among the
 *last* to actually run.
 
+Seen as row counts, the order also explains where a query spends its time:
+
+<Chart slug="sql-clause-funnel" />
+
 ## Why this explains real errors
 
 Most "why doesn't this work?" moments dissolve once you know the

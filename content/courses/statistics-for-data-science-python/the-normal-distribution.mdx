@@ -245,7 +245,9 @@ heights around 170 cm, temperatures around 20°C. **Standardization**
 puts them all on one common ruler by converting each value to a
 **z-score**: how many standard deviations it sits from its mean.
 
-`z = (x − μ) / σ`
+$$
+z = \frac{x - \mu}{\sigma}
+$$
 
 A z-score of 0 is exactly average; +2 is two standard deviations above
 the mean; −1.5 is one and a half below. Once a value is a z-score, you've
@@ -460,6 +462,11 @@ assert abs(d.sf(cutoff) - 0.05) < 1e-6`,
   ]}
 />
 
+Standardizing moves and rescales a distribution. It does not reshape one,
+which is the part people quietly assume away:
+
+<Chart slug="z-score-standardization" />
+
 ## When the data is NOT normal
 
 The normal is a fantastic *default* and a terrible *assumption*. Vast
@@ -625,7 +632,7 @@ Light normal tails systematically understate the frequency of the rare, costly e
   normal.
 - **68–95–99.7**: ~68% within 1σ, ~95% within 2σ, ~99.7% within 3σ,
   but only for **normal** data.
-- A **z-score** `z = (x − μ) / σ` is a *position* (SDs from the mean),
+- A **z-score** $z = (x - \mu) / \sigma$ is a *position* (SDs from the mean),
   not a probability; convert with `norm.cdf` (z → percentile) and
   `norm.ppf` (percentile → z).
 - Move freely among **raw value ↔ z-score ↔ percentile**; use the direct

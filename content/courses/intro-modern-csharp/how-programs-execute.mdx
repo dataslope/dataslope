@@ -157,6 +157,12 @@ because the machine code has been cached.
 
 ## 5. Memory: the stack and the heap
 
+Before the two regions, one number that explains why the distinction is
+worth caring about at all. The distances a CPU reaches across span ten
+orders of magnitude:
+
+<Chart slug="memory-latency-ladder" />
+
 While your program runs, it uses memory. The runtime divides that
 memory into two big regions, and you'll hear about both for the
 rest of your career.

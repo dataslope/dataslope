@@ -119,6 +119,11 @@ them). The total *work* explodes; the peak *stack depth* is only `n`.
 
 ## Stack overflow
 
+Where it happens is the stack budget divided by the frame size, and the
+frame size is set by the locals rather than by the algorithm:
+
+<Chart slug="stack-depth-overflow" />
+
 When recursion is too deep, or a function declares a huge local
 array, you hit the end of the stack region and the program crashes
 with a stack overflow.

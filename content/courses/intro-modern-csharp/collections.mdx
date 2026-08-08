@@ -158,6 +158,11 @@ much faster than scanning a list.
 
 ## Picking the right collection
 
+The reason this decision matters is that the three lookup strategies grow
+differently, and the difference is invisible until the collection is big:
+
+<Chart slug="collection-lookup-growth" />
+
 ```mermaid
 flowchart TD
     Q1{"Do you need to look<br/>things up by a key<br/>(not just position)?"}

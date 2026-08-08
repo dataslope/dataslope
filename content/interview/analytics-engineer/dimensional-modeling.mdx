@@ -142,6 +142,12 @@ SCD Type 1 **overwrites** the old attribute value with the new one, preserving n
 
 SCD Type 2 adds a **new row** for each attribute change, preserving the full history. Each row gets its own surrogate key plus `valid_from`, `valid_to`, and `is_current` columns. Fact rows joined to their surrogate key automatically reflect the attribute values that were true at event time.
 
+Follow-ups usually go to what that costs. Type 1 keeps one row per entity
+forever; Type 2 keeps one row per *version*, so the table grows with the
+churn rate and every query has to say which version it means:
+
+<Chart slug="scd2-row-growth" />
+
 The runnable example below makes this tangible. The `initSql` setup seeds a
 `dim_customer` in which customer 42 has **two** versions, an `East` row
 valid through 2023-06-14 and a `West` row valid afterward, and the comment
@@ -288,6 +294,12 @@ WHERE pc.store_sk = 5
 ### What is a bridge table, and when do you need one?
 
 A bridge table resolves **many-to-many relationships** between a fact and a dimension. For example, an order can have multiple promotions, and a promotion can apply to multiple orders. The bridge table contains (order_sk, promotion_sk) pairs with an optional weighting factor. It avoids row multiplication in the fact while still allowing drill-down to all related dimension members.
+
+The row multiplication is worth seeing, because the wrong answer does not
+look wrong. A join that matches each order several times inflates every
+`SUM` by the same factor, and the result set is a perfectly ordinary size:
+
+<Chart slug="join-fanout-rows" />
 
 The query below joins `fact_orders` to `dim_promotion` *through* the `bridge_order_promotion` table and multiplies each order's amount by the bridge's `weight_factor`. That weighting splits one order's value across its promotions (0.6 / 0.4 for order 201) instead of double-counting the full amount once per promotion:
 

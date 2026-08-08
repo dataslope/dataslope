@@ -4,7 +4,7 @@
  *
  * Storage is D1 database **`dataslope-illustrations`**, table
  * **`illustration_regen_marks`**, reached through the `ILLUSTRATIONS_DB`
- * binding (schema in `migrations-illustrations/0001_…`). It is deliberately a
+ * binding (schema in `migrations/illustrations/0001_…`). It is deliberately a
  * different database from `dataslope-auth`: this is authoring state, so the
  * whole queue can be read, dumped, or wiped by a coding agent without touching
  * accounts or sessions.

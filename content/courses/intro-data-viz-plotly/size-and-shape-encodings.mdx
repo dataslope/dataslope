@@ -15,7 +15,10 @@ has narrow rules for when it's worth using.
 
 ## Size: a continuous third (or fourth) variable
 
-<Chart slug="bubble-area-vs-radius" />
+Scale it on area, not radius, and the channel is *correct*. It is still a
+narrow channel: both ends of the range fail, for different reasons.
+
+<Chart slug="size-dynamic-range" />
 
 We met `size=` in the chapter on bubble charts. The summary:
 
@@ -69,6 +72,11 @@ flippers, without needing to read any individual value.
 
 ## Shape (symbol): a categorical third variable
 
+Shape has almost no capacity. Three or four values read at a glance, and
+after that the reader is doing a lookup per point:
+
+<Chart slug="shape-channel-capacity" />
+
 `symbol="..."` gives each value of a categorical column its own
 marker shape: circle, square, triangle, diamond, cross, etc.
 
@@ -117,7 +125,9 @@ the eye can no longer reliably distinguish ●  ■  ▲  ▼  ◆  ★  ✦
 
 ## Combining size, color, and shape: just because you can…
 
-<Chart slug="encoding-accuracy" />
+Every channel below is mapped correctly. That is not enough:
+
+<Chart slug="channel-overload" />
 
 Plotly Express makes it easy to map four columns onto color, size,
 shape, *and* faceting. But the more channels you use, the more the

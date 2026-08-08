@@ -206,6 +206,12 @@ Use a natural key when the value is stable, public, and central to the
 domain. Use a surrogate key when the real-world value may change, may be
 private, or may be awkward in joins.
 
+Width is the trade-off people forget, because a key is never stored once:
+it sits in the table, in its own index, and again in everything that
+references it.
+
+<Chart slug="key-width-index-size" />
+
 ```mermaid
 flowchart TB
     T["Key choice trade-offs"]

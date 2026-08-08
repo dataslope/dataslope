@@ -605,13 +605,18 @@
 /* ── Queue summary ── */
 
 /* A second row under the library counts, so the two questions the page answers
-   ("what is here" and "what needs work") stay visually separate. */
+   ("what is here" and "what needs work") stay visually separate.
+
+   No negative top margin. This used to pull up by 1rem to sit closer to the
+   `.stats` list it followed; the sort bar was later inserted between the two,
+   and since that bar carries exactly 1rem of bottom margin the pull cancelled
+   it outright and the counts collided with the buttons. */
 .queueStats {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 2.5rem;
-  margin: -1rem 0 1.5rem;
+  margin: 0 0 1.5rem;
 }
 
 .queueOffline,
@@ -665,4 +670,315 @@
 .queueChipPage {
   font-family: inherit;
   color: var(--faint);
+}
+
+/* ── Delete a spec (development only) ──────────────────────────────────────
+   The control sits in the review row beside the queue buttons and is a
+   destructive action on the working tree, so it is outlined in the red hue
+   rather than filled: filled red is what a *marked* figure already uses for
+   its state, and two solid reds in one row would read as one thing. */
+
+.devRow {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-top: 0.625rem;
+}
+
+.deleteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid var(--divider);
+  border-radius: 0.5rem;
+  background: var(--input);
+  color: var(--ds-red-700, #ba303a);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+:global(.dark) .deleteBtn {
+  color: var(--ds-red-400, #ff807f);
+}
+
+.deleteBtn:hover:not(:disabled) {
+  border-color: var(--ds-red-500, #ff4f59);
+  background: var(--panel-hover);
+}
+
+.deleteBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Requested state. Outlined rather than filled, because a filled red already
+   means "marked for redraw" one row up, and two solid reds in one card would
+   read as one status. */
+.deleteBtnOn {
+  border-color: var(--ds-red-500, #ff4f59);
+  background: color-mix(in srgb, var(--ds-red-500, #ff4f59) 10%, transparent);
+}
+
+.deleteChip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 0.375rem;
+  background: color-mix(in srgb, var(--ds-red-500, #ff4f59) 12%, transparent);
+  padding: 0.1875rem 0.4375rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--ds-red-700, #ba303a);
+}
+
+:global(.dark) .deleteChip {
+  color: var(--ds-red-300, #ffa6a3);
+}
+
+.deleteError {
+  font-size: 0.75rem;
+  color: var(--ds-red-700, #ba303a);
+}
+
+:global(.dark) .deleteError {
+  color: var(--ds-red-400, #ff807f);
+}
+
+.deleteDone {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.deleteDone code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+}
+
+/* The dialog. Scoped here rather than reusing the `confirm-*` classes from
+   app/_components/playground.css, which the dashboard never loads.
+
+   It also cannot use the studio tokens the rest of this file uses. Those are
+   declared on `.ds-studio`, and an AlertDialog portals to `document.body`, so
+   `var(--panel)` resolves to nothing out there and the popup renders with no
+   background at all: readable by luck on the white page, transparent over the
+   dark one. The dialog therefore carries its own two-theme palette, keyed off
+   `.dark` on the root element, which is in scope wherever the portal lands. */
+
+.confirmBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.confirmPopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 61;
+  transform: translate(-50%, -50%);
+  width: min(30rem, calc(100vw - 2rem));
+  border: 1px solid rgb(17 24 39 / 0.1);
+  border-radius: 0.875rem;
+  background: #ffffff;
+  padding: 1.25rem;
+  color: #374151;
+  box-shadow: 0 24px 48px rgb(0 0 0 / 0.28);
+}
+
+:global(.dark) .confirmPopup {
+  border-color: rgb(255 255 255 / 0.09);
+  background: #242424;
+  color: #d4d4d8;
+}
+
+.confirmTitle {
+  margin: 0 0 0.625rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+:global(.dark) .confirmTitle {
+  color: #fafafa;
+}
+
+.confirmTitle code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.875rem;
+}
+
+.confirmDesc {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: inherit;
+}
+
+.confirmDesc p {
+  margin: 0 0 0.625rem;
+}
+
+.confirmDesc p:last-child {
+  margin-bottom: 0;
+}
+
+.confirmDesc code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+}
+
+.confirmWarn {
+  display: flex;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  background: var(--ds-red-50, #fff5f5);
+  padding: 0.5rem 0.625rem;
+  color: var(--ds-red-800, #99212c);
+}
+
+:global(.dark) .confirmWarn {
+  background: rgb(255 79 89 / 0.12);
+  color: var(--ds-red-300, #ffa6a3);
+}
+
+.confirmWarn svg {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.confirmQuiet {
+  opacity: 0.78;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.confirmCancel,
+.confirmDanger {
+  padding: 0.4375rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.confirmCancel {
+  border: 1px solid rgb(17 24 39 / 0.12);
+  background: #ffffff;
+  color: #374151;
+}
+
+.confirmCancel:hover {
+  background: #ededee;
+}
+
+:global(.dark) .confirmCancel {
+  border-color: rgb(255 255 255 / 0.12);
+  background: #161616;
+  color: #d4d4d8;
+}
+
+:global(.dark) .confirmCancel:hover {
+  background: #2e2e2e;
+}
+
+.confirmDanger {
+  border: 1px solid transparent;
+  background: var(--ds-red-600, #dc3f49);
+  color: #ffffff;
+}
+
+.confirmDanger:hover {
+  background: var(--ds-red-700, #ba303a);
+}
+
+/* ── Sort bar and creation dates ───────────────────────────────────────────
+   Sorting is navigation (see the route comment in [[...page]]/page.tsx), so
+   these are links styled as a segmented control rather than a form. */
+
+.sortBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0 0 1.5rem;
+}
+
+/* Date banner for the two date orderings. Charts land in bulk commits, so a
+   date ordering usually shows long runs that share a timestamp and fall back to
+   A→Z inside the run. Naming the date and the size of the run is what stops
+   that reading as a sort button that did nothing. */
+.dateGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--divider);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dateGroup:not(:first-child) {
+  margin-top: 2.5rem;
+}
+
+.dateGroupNote {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--faint);
+}
+
+.sortLabel {
+  margin-right: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sortLink {
+  border: 1px solid var(--divider);
+  border-radius: 0.5rem;
+  background: var(--input);
+  padding: 0.3125rem 0.625rem;
+  font-size: 0.8125rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.sortLink:hover {
+  background: var(--panel-hover);
+}
+
+.sortLinkOn {
+  border-color: transparent;
+  background: var(--ds-blue-600, #0878dd);
+  color: #ffffff;
+}
+
+.sortLinkOn:hover {
+  background: var(--ds-blue-700, #0064bd);
+}
+
+/* On its own line under the dimensions: the header is already tight at narrow
+   widths, and the date is reference rather than something to scan. */
+.created {
+  display: block;
+  margin-top: 0.1875rem;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
 }

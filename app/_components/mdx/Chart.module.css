@@ -88,6 +88,71 @@
   overflow: visible;
 }
 
+/* ── Narrow screens ──────────────────────────────────────────────────────
+   An inlined SVG with a viewBox is responsive for free, and the freedom is
+   the problem: `width: 100%` scales the type along with the drawing, so a
+   680px chart in a 358px phone column renders at 0.53x and turns a 13px
+   axis tick into 6.9px. Nothing overflows and nothing errors, the chart is
+   simply too small to read, which is a failure with no symptom.
+
+   So below the content column's own width the chart stops scaling at the
+   point its smallest label reaches the legibility floor, and the figure
+   scrolls sideways instead — the bargain a wide table already makes. The
+   floor is per chart, published by <Chart> as `--ds-chart-min-width`
+   (scripts/build-charts.mjs computes it from the type in the markup), so a
+   chart whose smallest type is a 13px tick still shrinks a long way and one
+   carrying 9px annotations inside a facet grid barely shrinks at all.
+
+   `svg { overflow: visible }` above lets a mark near the frame edge paint
+   outside it, which a scroll container would otherwise clip, so the padding
+   here buys back that bleed.
+   ────────────────────────────────────────────────────────────────────── */
+/* Scoped to the widths where the content column can actually be narrower
+   than a chart's floor. Above this the column is at least 680px, the floor
+   never binds, and the rule would only risk turning `overflow: visible`
+   into a scroll container for nothing: `overflow-x: auto` computes
+   `overflow-y` to `auto` as well, so a label bleeding past the frame gets
+   clipped instead of painted. Hence the block padding, which buys that
+   bleed back where the rule is live. */
+@media (max-width: 64rem) {
+  .chart {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    padding-block: 8px;
+
+    /* Edge shadows that appear only on the side there is more chart on.
+       Touch scrollbars are overlays that show up once you are already
+       scrolling, so without this the chart just looks cropped. The four
+       layers are the standard trick: two page-coloured covers scrolling
+       *with* the content (`local`), sitting on top of two shadows pinned to
+       the frame (`scroll`), so each shadow is masked exactly while that end
+       is flush and revealed as soon as it is not. No JavaScript and no
+       resize observer. */
+    background:
+      linear-gradient(to right, var(--color-fd-background) 40%, transparent) left center /
+        22px 100% no-repeat local,
+      linear-gradient(to left, var(--color-fd-background) 40%, transparent) right center /
+        22px 100% no-repeat local,
+      radial-gradient(
+          farthest-side at 0 50%,
+          color-mix(in srgb, var(--color-fd-foreground) 20%, transparent),
+          transparent
+        )
+        left center / 11px 100% no-repeat scroll,
+      radial-gradient(
+          farthest-side at 100% 50%,
+          color-mix(in srgb, var(--color-fd-foreground) 20%, transparent),
+          transparent
+        )
+        right center / 11px 100% no-repeat scroll;
+  }
+
+  .chart svg {
+    min-width: var(--ds-chart-min-width, 0);
+  }
+}
+
 .caption {
   margin-top: 0.75rem;
   text-align: center;

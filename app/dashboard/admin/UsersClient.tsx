@@ -16,7 +16,7 @@
  * access-denied notice and can't read or mutate anything.
  *
  * "Remove" is a hard delete: it drops the user row, which cascades to their
- * sessions + accounts (ON DELETE CASCADE in migrations/0001) and frees the
+ * sessions + accounts (ON DELETE CASCADE in migrations/auth/0001) and frees the
  * unique email, so the person can immediately sign up again with OAuth or
  * email/password. "Ban" is the soft alternative: blocks sign-in but keeps the
  * row (and the email) occupied. "Impersonate" becomes that user in this

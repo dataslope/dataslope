@@ -179,9 +179,9 @@ Bin count is a knob, not a fact, corroborate apparent structure rather than trus
 
 ## Box plots: five-number summary and outliers at a glance
 
-A **box plot** draws the distribution's skeleton: the box spans `Q1` to
-`Q3` (the IQR), a line marks the median, and the whiskers reach to the
-last points within the `1.5×IQR` fences from *Measures of Spread* and
+A **box plot** draws the distribution's skeleton: the box spans $Q_1$ to
+$Q_3$ (the IQR), a line marks the median, and the whiskers reach to the
+last points within the $1.5 \times IQR$ fences from *Measures of Spread* and
 *Shape and Outliers*. Points beyond the whiskers show as individual
 outlier dots. Box plots are compact and *brilliant for comparing
 groups* side by side, but they hide modality, because a box plot of a
@@ -279,10 +279,15 @@ bin-count trap and the bandwidth trap are the same trap in different
 clothes. When in doubt, the ECDF below sidesteps both.
 </Callout>
 
+The knob is the point: a KDE is a modelling choice wearing the costume of a
+summary, and the bandwidth decides how many peaks you see.
+
+<Chart slug="kde-bandwidth" />
+
 ## ECDF: the plot with no knobs
 
 The **empirical cumulative distribution function (ECDF)** answers, for
-every value `x`, "what fraction of the data is `≤ x`?" You sort the
+every value $x$, "what fraction of the data is $\le x$?" You sort the
 data and walk upward from 0 to 1. Its superpower: it has **no bins and
 no bandwidth**, nothing to tune, nothing to accidentally hide. Every
 data point is shown exactly. It's less intuitive at a glance than a
@@ -318,6 +323,8 @@ print("No bins, no bandwidth, nothing tuned away.")
 The y-value at any `x` is a **percentile read directly off the curve**,
 which is exactly the quantity the second challenge below asks you to
 compute by hand.
+
+<Chart slug="ecdf-vs-histogram" />
 
 ## Which plot when?
 

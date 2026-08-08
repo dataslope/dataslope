@@ -98,10 +98,11 @@ from the relational plots.)
 
 A straight fit assumes the relationship *is* a straight line. When it
 isn't, the line is not just imprecise, it is **wrong**, and it will lie to
-you confidently. Anscombe's second and fourth datasets are the canonical
-demonstration: both fit the same line, and neither should have one.
+you confidently. The tell is not how far the points sit from the line, it is
+whether the misses form a *pattern*. Colour each point by which side of the
+line it landed on and a wrong-shaped fit gives itself away:
 
-<Chart slug="anscombes-quartet" />
+<Chart slug="residuals-reveal-curvature" />
 
 The `mpg` dataset shows it on real measurements: fuel efficiency versus
 engine horsepower.

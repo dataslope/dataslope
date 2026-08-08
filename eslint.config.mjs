@@ -14,10 +14,6 @@ const eslintConfig = [
       // scripts/build-almostnode-workers.mjs; gitignored). Linting them
       // produces thousands of meaningless errors/warnings.
       "public/_workers/**",
-      // Generated server-side search index (a multi-MB `export default [...]`
-      // emitted by scripts/build-search-index.mjs; gitignored). The committed
-      // .d.ts sibling is linted normally.
-      "lib/generated/search-index.js",
       // Generated brand-token fallback map (emitted from app/brand.css by
       // scripts/build-brand-fallbacks.mjs; gitignored). The committed .d.ts
       // sibling is linted normally.

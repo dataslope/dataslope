@@ -70,7 +70,11 @@ wrong dtype or one value was suspicious.
 
 ## Step 2: Chart every numeric column
 
-<Chart slug="histogram-bin-width" />
+Not to tune anything yet. This pass is looking for the handful of shapes
+that mean "stop and deal with me", and a summary table reports every one of
+them as a perfectly reasonable set of numbers:
+
+<Chart slug="chart-every-column" />
 
 Before asking any specific question, just histogram every numeric
 column. This is your "vibe check", you'll spot skewed
@@ -167,6 +171,10 @@ bills. That's a real pattern: small bills tend to round up to "I
 have a $5 minimum tip in my head." Good, you've turned an outlier
 into an insight.
 
+Step 4 earns its place because a single point can move a summary a long way:
+
+<Chart slug="outlier-influence" />
+
 ## Step 5: Iterate until the story is done
 
 Real exploratory analysis rarely ends with one chart. You'll cycle
@@ -176,6 +184,11 @@ normal. Use a Jupyter notebook (or this page's CodeBlocks) and
 *keep the iteration visible*, your future self will thank you.
 
 ## Exploratory vs presentation
+
+The chart that found the answer and the chart that carries it, from the
+same fourteen series:
+
+<Chart slug="exploratory-vs-presentation" />
 
 The charts you make *during* exploration are not the charts you
 publish. Exploratory charts are quick, ugly, and iterative.

@@ -86,6 +86,11 @@ value React *watches*: change it through the setter and React redraws.
 re-render. Always go through the setter: `setCount(count + 1)`.
 </Callout>
 
+Redrawing means the component *and everything under it*, so where you call
+`useState` decides how much work a keystroke costs:
+
+<Chart slug="rerender-subtree-cost" />
+
 ## Updater functions
 
 When the next value depends on the previous one, and especially when

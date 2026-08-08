@@ -184,7 +184,7 @@ export function render() {
         y: 1,
         text: () => "1× is the uncompressed baseline",
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         textAnchor: "start",
         dx: 4,
         dy: -8,

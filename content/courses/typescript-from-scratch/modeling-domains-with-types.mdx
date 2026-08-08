@@ -28,6 +28,12 @@ type User = {
 };
 ```
 
+Four independent flags is sixteen representable users, and a real product
+has about four kinds. The gap between those two numbers is where the bugs
+live, because nothing in the type says which combinations are impossible:
+
+<Chart slug="illegal-states-explosion" />
+
 At first glance, this looks fine. But think about the combinations it allows:
 
 - `isActive: true, isSuspended: true`, Is the user active or suspended? Both?
