@@ -58,7 +58,8 @@
  * R2 credentials: R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY,
  * R2_BUCKET (see scripts/lib/r2.mjs).
  */
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
@@ -105,14 +106,20 @@ function printHelp() {
 }
 
 /**
- * Refuse a map that is older than the images it claims to describe.
+ * Refuse a map that no longer describes the images on disk.
  *
- * A source map is a statement about the *current* served files. Re-promote or
- * re-trim an illustration without re-running the resolver and that statement
- * silently stops being true — and the failure mode is deleting a live source,
- * which no later run can undo. Cheap to check, so it is not optional.
+ * A mapping is a statement about specific bytes: *this* served cut-out was made
+ * from *that* run. Re-promote or re-trim an illustration and the statement can
+ * silently stop being true, and the failure mode is deleting a live source,
+ * which no later run can undo. So each entry carries the sha256 of the file it
+ * was established from, and every one is re-checked here.
+ *
+ * Hashing all 916 costs well under a second. The earlier version of this
+ * compared the map file's mtime instead and was quietly broken: the map is
+ * byte-stable by design, so re-resolving an unchanged answer never rewrote the
+ * file, its timestamp never advanced, and the check could not be satisfied.
  */
-function assertMapIsCurrent() {
+function assertMapIsCurrent(sources) {
   if (!existsSync(SOURCES_FILE)) {
     console.error(
       `No ${SOURCES_FILE.replace(`${ROOT}/`, "")}. Run:\n` +
@@ -120,17 +127,20 @@ function assertMapIsCurrent() {
     );
     process.exit(1);
   }
-  const mapTime = statSync(SOURCES_FILE).mtimeMs;
-  const newer = readdirSync(IMAGES_DIR)
-    .filter((f) => f.endsWith(`${CUTOUT_SUFFIX}.webp`))
-    .filter((f) => statSync(join(IMAGES_DIR, f)).mtimeMs > mapTime);
-  if (newer.length) {
+  const stale = [];
+  for (const [id, entry] of Object.entries(sources)) {
+    const file = join(IMAGES_DIR, `${id}${CUTOUT_SUFFIX}.webp`);
+    if (!existsSync(file)) { stale.push(`${id} (no longer promoted)`); continue; }
+    if (!entry.servedSha) { stale.push(`${id} (mapped before hashes were recorded)`); continue; }
+    const sha = createHash("sha256").update(readFileSync(file)).digest("hex");
+    if (sha !== entry.servedSha) stale.push(`${id} (bytes changed)`);
+  }
+  if (stale.length) {
     console.error(
-      `${newer.length} cut-out(s) have changed since the source map was built ` +
-        `(e.g. ${newer.slice(0, 3).join(", ")}).\n` +
-        "The map may no longer name the right run, and deleting on a stale map " +
-        "is how a live source is lost. Re-run:\n" +
-        "  node scripts/build-illustration-sources.mjs",
+      `${stale.length} mapping(s) no longer match the file on disk ` +
+        `(e.g. ${stale.slice(0, 3).join(", ")}).\n` +
+        "Deleting on a stale map is how a live source is lost. Re-run:\n" +
+        `  node scripts/build-illustration-sources.mjs --only ${stale.slice(0, 3).map((s) => s.split(" ")[0]).join(",")}`,
     );
     process.exit(1);
   }
@@ -140,8 +150,8 @@ async function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (opts.help) return printHelp();
 
-  assertMapIsCurrent();
   const { sources, unresolved } = readSources();
+  assertMapIsCurrent(sources);
   const keepRuns = new Set(opts.keepRuns);
 
   const served = new Set(

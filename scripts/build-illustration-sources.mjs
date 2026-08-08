@@ -45,6 +45,7 @@
  * R2 credentials: R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY,
  * R2_BUCKET (see scripts/lib/r2.mjs).
  */
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -130,6 +131,14 @@ async function main() {
 
   async function resolveOne(id) {
     const served = readFileSync(join(IMAGES_DIR, `${id}${CUTOUT_SUFFIX}.webp`));
+    // The bytes this mapping was established from. Consumers re-hash the
+    // served file and refuse to act when it no longer matches — a re-promote
+    // or a re-trim can move an id to a different run, and acting on a mapping
+    // that predates that is how a live source gets deleted. A hash rather
+    // than the file's mtime: mtime is per-clone, and the map is byte-stable
+    // on purpose, so an unchanged answer never rewrites the file and its
+    // timestamp would stop advancing exactly when it was relied on.
+    const servedSha = createHash("sha256").update(served).digest("hex");
     const { hit, bestDb } = await index.sourceFor(id, await contentSignature(served));
     done++;
     if (!hit) {
@@ -151,6 +160,7 @@ async function main() {
       // Recorded only when it exists: a few ids were promoted cut-out-only.
       ...(allKeys.has(original) ? { original } : {}),
       matchDb: Math.round(hit.db),
+      servedSha,
     };
     resolved++;
     if (done % 50 === 0) console.log(`  … ${done}/${ids.length}`);
