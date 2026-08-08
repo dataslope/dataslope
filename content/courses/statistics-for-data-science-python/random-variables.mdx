@@ -128,7 +128,9 @@ Large Numbers from *Probability Basics* at work).
 For a discrete variable, E[X] is the **probability-weighted average**
 of the possible values, each value times how likely it is, summed up:
 
-`E[X] = Σ x · P(X = x)`
+$$
+E[X] = \sum_x x \cdot P(X = x)
+$$
 
 A vivid way to picture it: E[X] is the **balance point** (center of
 mass) of the pmf. If you put each probability as a weight at its value on
@@ -186,13 +188,15 @@ Expectation tells you the center; **variance** tells you how far the
 variable typically strays from that center. It's the expected squared
 distance from the mean:
 
-`Var(X) = E[ (X − E[X])² ]`
+$$
+\operatorname{Var}(X) = E\left[\,(X - E[X])^2\,\right]
+$$
 
 We square the deviations so that overshoots and undershoots don't cancel,
 exactly as in *Measures of Spread*. The catch is that variance is in
 **squared units**, square dollars, square seconds, which nobody can
 interpret. So we usually report its square root, the **standard
-deviation** `SD(X) = √Var(X)`, which is back in the
+deviation** $\operatorname{SD}(X) = \sqrt{\operatorname{Var}(X)}$, which is back in the
 original units and reads as a typical distance from the mean.
 
 <CodeBlock
@@ -275,7 +279,9 @@ variable, made concrete.
 One property of expectation is so useful it deserves a callout:
 expectation is **linear**. For any random variables and constants,
 
-`E[aX + bY] = a · E[X] + b · E[Y]`
+$$
+E[aX + bY] = a \cdot E[X] + b \cdot E[Y]
+$$
 
 The remarkable part: this holds **even when `X` and `Y` are dependent**,
 no independence required. It means you can break a messy total into

@@ -110,7 +110,7 @@ estimate μ, p̂ to estimate `p`, and so on.
 <Callout type="danger" title="The #1 confusion: reporting a statistic as a parameter">
 Writing "average revenue per user is \$48.20", full stop, quietly
 claims you measured the *population*. You didn't. You measured
-`x̄ = 48.20` from a sample, and the population μ is *near* it but
+$\bar{x} = 48.20$ from a sample, and the population $\mu$ is *near* it but
 uncertain. The honest sentence names the estimate and its error:
 "x̄ = \$48.20, and μ is plausibly within \$45–\$51." Collapsing
 the statistic and the parameter into one number is how overconfident
@@ -123,8 +123,8 @@ how many tanks Germany was producing. The population size `N` was a
 military secret. But captured and destroyed tanks carried sequential
 **serial numbers** on their gearboxes and chassis, a *sample* drawn
 from that population. Statisticians reasoned that if the highest serial
-number you've seen is `m` from a sample of `k` tanks, a good estimate of
-the total is roughly `m + m/k − 1` (the largest observed value, nudged
+number you've seen is $m$ from a sample of $k$ tanks, a good estimate of
+the total is roughly $m + m/k - 1$ (the largest observed value, nudged
 up to account for the gap above it). The estimates this produced were
 strikingly close to actual German production figures revealed after the
 war, and far more accurate than conventional intelligence. It's a vivid
@@ -300,11 +300,11 @@ for n, e in zip(sizes, errors):
 
 The error trends toward zero as `n` grows (it's jagged because each
 sample is still random, but the envelope shrinks). A key, often-missed
-detail: precision improves with √n, **not** `n`. To halve your
+detail: precision improves with $\sqrt{n}$, **not** $n$. To halve your
 error you need roughly **four times** the data. That diminishing return
 is exactly why a national poll uses ~1,500 people, not 1,500,000, past
 a point, more data buys very little extra precision. We'll quantify this
-with the standard error formula `σ / √n` in *Standard Error*.
+with the standard error formula $\sigma / \sqrt{n}$ in *Standard Error*.
 
 <Callout type="danger" title="Misconception: a bigger sample changes the population">
 A bigger sample does **not** change the population or its parameters,

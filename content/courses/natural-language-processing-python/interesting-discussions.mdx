@@ -161,7 +161,7 @@ frequency, why we weight with IDF, and why the long tail is full of hapaxes.
 
 Let us see the law appear on real text. The block below pulls a public-domain
 book from NLTK's Gutenberg corpus, counts its words, and checks whether
-`rank × frequency` stays roughly constant, Zipf's signature. (This one loads a
+$\text{rank} \times \text{frequency}$ stays roughly constant, Zipf's signature. (This one loads a
 corpus, so the first run pauses to fetch it.)
 
 <CodeBlock
@@ -209,7 +209,7 @@ for rank, (word, freq) in enumerate(ranked[:8], start=1):
   ]}
 />
 
-Read the rightmost column: `rank × freq` stays in the same ballpark down the
+Read the rightmost column: $\text{rank} \times \text{freq}$ stays in the same ballpark down the
 list, which is exactly what Zipf's law predicts. The most common word is roughly
 twice the second, and so on. You are watching a statistical regularity of human
 language, one nobody designed, fall out of a word count.

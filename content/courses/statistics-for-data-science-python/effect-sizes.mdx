@@ -82,12 +82,14 @@ The most common effect size for comparing two groups' means is
 **Cohen's d**. The idea is simple and intuitive: take the difference in
 means, but express it in units of the data's own spread.
 
-`d = (x̄₁ − x̄₂) / s_pooled`
+$$
+d = \frac{\bar{x}_1 - \bar{x}_2}{s_{\text{pooled}}}
+$$
 
-A `d` of 1 means the two group means sit one full standard deviation
-apart. A `d` of 0.1 means they barely overlap-differ at all. Dividing by
-the standard deviation is what makes `d` **unitless** and comparable
-across contexts: a `d` of 0.5 means the same "amount of separation"
+A $d$ of 1 means the two group means sit one full standard deviation
+apart. A $d$ of 0.1 means they barely overlap-differ at all. Dividing by
+the standard deviation is what makes $d$ **unitless** and comparable
+across contexts: a $d$ of 0.5 means the same "amount of separation"
 whether you're measuring dollars, milliseconds, or test scores.
 
 <Callout type="info" title="Why divide by the standard deviation?">
@@ -374,9 +376,9 @@ recovered or not, the natural effect sizes compare two proportions.
 There are two complementary ways to do it, and they tell genuinely
 different stories.
 
-- **Risk difference** (absolute): `p_treat − p_control`. "The
+- **Risk difference** (absolute): $p_{\text{treat}} - p_{\text{control}}$. "The
   conversion rate went up by 2 percentage points."
-- **Relative risk / risk ratio** (relative): `p_treat / p_control`.
+- **Relative risk / risk ratio** (relative): $p_{\text{treat}} / p_{\text{control}}$.
   "The conversion rate was 1.4× higher."
 
 <CodeBlock

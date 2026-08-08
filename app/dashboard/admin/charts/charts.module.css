@@ -605,13 +605,18 @@
 /* ── Queue summary ── */
 
 /* A second row under the library counts, so the two questions the page answers
-   ("what is here" and "what needs work") stay visually separate. */
+   ("what is here" and "what needs work") stay visually separate.
+
+   No negative top margin. This used to pull up by 1rem to sit closer to the
+   `.stats` list it followed; the sort bar was later inserted between the two,
+   and since that bar carries exactly 1rem of bottom margin the pull cancelled
+   it outright and the counts collided with the buttons. */
 .queueStats {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 2.5rem;
-  margin: -1rem 0 1.5rem;
+  margin: 0 0 1.5rem;
 }
 
 .queueOffline,
@@ -906,7 +911,34 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.375rem;
+  margin: 0 0 1.5rem;
+}
+
+/* Date banner for the two date orderings. Charts land in bulk commits, so a
+   date ordering usually shows long runs that share a timestamp and fall back to
+   A→Z inside the run. Naming the date and the size of the run is what stops
+   that reading as a sort button that did nothing. */
+.dateGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
   margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--divider);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dateGroup:not(:first-child) {
+  margin-top: 2.5rem;
+}
+
+.dateGroupNote {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--faint);
 }
 
 .sortLabel {

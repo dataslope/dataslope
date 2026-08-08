@@ -41,7 +41,7 @@ Everything else on this page is a consequence of, or a contrast with,
 that sentence.
 
 <Callout type="info" title="It's a conditional probability, and the condition matters">
-In symbols, a p-value is `P(data this extreme or more | H₀)`.
+In symbols, a p-value is $P(\text{data this extreme or more} \mid H_0)$.
 The thing to the right of the bar, "given H₀", is *assumed*, not
 concluded. This is exactly why a p-value can never be the probability that
 H₀ is true: you cannot end up with a probability *about* the thing you
@@ -241,15 +241,15 @@ The null distribution shows what "pure noise" looks like, and pure noise average
 This is the heart of the page. Every item below is a misreading you will
 hear from smart people. Burn the corrections in.
 
-A p-value is `P(data this extreme or more | H0 true)`, and nothing else.
+A p-value is $P(\text{data this extreme or more} \mid H_0 \text{ true})$, and nothing else.
 Each misreading below, with why it fails:
 
 | A p-value is NOT… | Why |
 | --- | --- |
-| `P(H0 is true)` | It *assumes* H₀; it cannot output a probability about H₀. |
-| `P(result was "due to chance")` | It already assumes chance-only; it can't also measure it. |
+| $P(H_0 \text{ is true})$ | It *assumes* H₀; it cannot output a probability about H₀. |
+| $P(\text{result was "due to chance"})$ | It already assumes chance-only; it can't also measure it. |
 | the probability you are wrong | Being wrong depends on whether H₀ is actually true, which `p` never uses. |
-| `1 − P(H1)` | It says nothing about how likely the alternative is. |
+| $1 - P(H_1)$ | It says nothing about how likely the alternative is. |
 | the effect size or its importance | A tiny effect plus a huge sample gives a tiny `p`. |
 | the probability the result replicates | Replication depends on power and the true effect, not on `p`. |
 
@@ -259,7 +259,7 @@ Let's take the four most damaging ones in turn.
 
 This is the big one. A p-value is computed *assuming* H₀. You cannot
 feed "H₀ is true" into a calculation and have its probability fall out
-the other end. `P(data | H₀)` and `P(H₀ | data)` are
+the other end. $P(\text{data} \mid H_0)$ and $P(H_0 \mid \text{data})$ are
 different quantities, and confusing them is called the **prosecutor's
 fallacy**.
 
@@ -307,14 +307,14 @@ print("P(data | H0) is NOT P(H0 | data).")
 
 The false-positive rate is 5%, yet most positives are false alarms,
 because the disease is rare. In exactly the same way, a p-value of 0.05 is
-**not** a 5% chance that H₀ is true. To get `P(H₀ | data)`
+**not** a 5% chance that H₀ is true. To get $P(H_0 \mid \text{data})$
 you'd also need the prior plausibility of H₀, which the p-value never
 uses.
 
 <Callout type="danger" title="The prosecutor's fallacy, in one line">
 "The p-value is 0.01, so there's a 99% chance the effect is real" is
-**false**. The p-value is `P(data | H₀)`, not
-`P(H₁ | data)`. Swapping the two is the most expensive mistake
+**false**. The p-value is $P(\text{data} \mid H_0)$, not
+$P(H_1 \mid \text{data})$. Swapping the two is the most expensive mistake
 in applied statistics.
 </Callout>
 
@@ -728,12 +728,12 @@ Every extra look or extra test is another chance for chance to fool you.`}
 ## Key takeaways
 
 <Callout type="success" title="What to carry forward">
-- A p-value is `P(data this extreme or more | H₀)`, a **tail
+- A p-value is $P(\text{data this extreme or more} \mid H_0)$, a **tail
   area** under the null distribution, which you can get by simulation or
   by formula.
 - It is **not** the probability H₀ is true, **not** the probability the
   result is chance, **not** the probability you're wrong, **not**
-  `1 − P(H₁)`, **not** the effect size, and **not** the probability of
+  $1 - P(H_1)$, **not** the effect size, and **not** the probability of
   replication.
 - A small p-value says the data is surprising under H₀; it says nothing
   about *how big* the effect is, for that, see *Effect Sizes* and

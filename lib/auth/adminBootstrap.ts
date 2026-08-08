@@ -32,7 +32,7 @@ export interface AdminBootstrapConfig {
 
 /**
  * Set `role = 'admin'` on every config-listed user who doesn't hold it yet.
- * `role` is NOT NULL DEFAULT 'user' (migrations/0002), so the
+ * `role` is NOT NULL DEFAULT 'user' (migrations/auth/0002), so the
  * `role <> 'admin'` guard never trips over NULL. The allowlists are a
  * handful of operators at most, so promoting them all in one statement is
  * as cheap as targeting one, and it means the promotion can run *before*

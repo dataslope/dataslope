@@ -111,7 +111,7 @@ The database and its schema already exist. To recreate them from scratch:
 
 ```bash
 npx wrangler d1 create dataslope-search   # paste database_id into wrangler.jsonc
-npm run db:migrate:search:remote          # migrations-search/0001_create_docs_fts.sql
+npm run db:migrate:search:remote          # migrations/search/0001_create_docs_fts.sql
 npm run db:seed:search:remote             # ~9k rows
 ```
 
@@ -183,8 +183,10 @@ Key files:
 | `lib/auth/client.ts` | Browser client + `useSession` / `signIn` / `signOut`. |
 | `app/sign-in/`, `app/account/` | Sign-in screen (Google/GitHub) and a gated account area. |
 | `app/admin/` | Gated admin dashboard (list / remove / ban users), built on the shadcn UI primitives in `components/ui`. See [Admin dashboard](#admin-dashboard). |
-| `migrations/` | D1 schema for `dataslope-auth` (Better Auth core tables + the admin plugin's `role`/`ban` fields), applied with `wrangler d1 migrations apply`. |
-| `migrations-illustrations/` | D1 schema for `dataslope-illustrations`, a second database holding the illustration regeneration queue written from the admin-only `/dashboard/admin/illustration-prompts` gallery. Applied with `npm run db:migrate:illustrations[:remote]`; see `agent-outputs/20260803-0900-illustration-regeneration-queue.md`. |
+| `migrations/` | D1 schema, one subfolder per database: `auth/`, `illustrations/`, `search/`. Each is a `migrations_dir` in `wrangler.jsonc` with its own numbering and its own `d1_migrations` table. See `migrations/README.md` for which command applies which, and why there are three databases rather than one. |
+| `migrations/auth/` | `dataslope-auth`: Better Auth core tables plus the admin plugin's `role`/`ban` fields, plans, AI usage counters, cloud-workspace metadata and custom content. Applied with `npm run db:migrate[:remote]`. |
+| `migrations/illustrations/` | `dataslope-illustrations`, a second database holding the illustration and chart regeneration queues written from the admin-only `/dashboard/admin/illustration-prompts` and `/dashboard/admin/charts` galleries. Applied with `npm run db:migrate:illustrations[:remote]`; see `agent-outputs/20260803-0900-illustration-regeneration-queue.md`. |
+| `migrations/search/` | `dataslope-search`: the lesson full-text index read by `/api/search`. Applied with `npm run db:migrate:search[:remote]`, seeded with `npm run db:seed:search[:remote]`. |
 
 > Auth is deliberately kept **out of `middleware.ts`**, `cookies()`/middleware sessions have rough edges on the Workers runtime (a known OpenNext limitation). All auth work happens in route handlers and client components instead.
 
@@ -254,9 +256,9 @@ npx wrangler secret put AI_FREE_API_KEY   # OpenRouter key, covers both tiers to
 npx wrangler secret put AI_PRO_API_KEY    # optional: only needed if pro should use a separate key
 ```
 
-If a tier is missing its key, base URL, or model, it degrades to whichever tier *is* fully configured (a half-wired env still answers), keeping its own budgets. With neither tier fully configured, Ask AI stays inert (503). A user's tier comes from the `plan` column (`migrations/0003`, default `'free'`); admins and any address in `PRO_USER_EMAILS` are treated as Pro as a bootstrap before billing exists (`lib/ai/tier.ts`).
+If a tier is missing its key, base URL, or model, it degrades to whichever tier *is* fully configured (a half-wired env still answers), keeping its own budgets. With neither tier fully configured, Ask AI stays inert (503). A user's tier comes from the `plan` column (`migrations/auth/0003`, default `'free'`); admins and any address in `PRO_USER_EMAILS` are treated as Pro as a bootstrap before billing exists (`lib/ai/tier.ts`).
 
-**Cost / abuse controls.** Signed-in only; per-user daily request + token budgets and a global daily token ceiling (`AI_DAILY_GLOBAL_TOKEN_CAP`, default 5M) bound spend regardless of account/IP rotation (`lib/ai/limits.ts`, backed by the `ai_usage_*` tables in `migrations/0003`). Output is capped per tier. Per-minute limiting (a Durable Object / the Rate Limiting binding) and per-widget context capture are tracked as follow-ups in `agent-outputs/20260701-1107-ask-ai-cloudflare-implementation.md`.
+**Cost / abuse controls.** Signed-in only; per-user daily request + token budgets and a global daily token ceiling (`AI_DAILY_GLOBAL_TOKEN_CAP`, default 5M) bound spend regardless of account/IP rotation (`lib/ai/limits.ts`, backed by the `ai_usage_*` tables in `migrations/auth/0003`). Output is capped per tier. Per-minute limiting (a Durable Object / the Rate Limiting binding) and per-widget context capture are tracked as follow-ups in `agent-outputs/20260701-1107-ask-ai-cloudflare-implementation.md`.
 
 For local dev, add the keys to `.dev.vars`:
 
@@ -271,7 +273,7 @@ Copilot-style ghost-text autocomplete in the language-runtime CodeMirror editors
 
 **Pro members only, enforced server-side.** The endpoint returns 401 for guests and 403 for signed-in free members, the client gate (a `GET /api/ai/complete` capability probe the extension fires once per page) is only there to avoid doomed requests. Completions reuse the **pro-tier** provider config above (OpenRouter → DeepSeek V4 Flash today) via the same OpenAI-compatible `/chat/completions` adapter (`lib/ai/provider.ts`), non-streaming with a small output cap (`lib/ai/completion.ts`).
 
-**Cost / abuse controls.** Completions bill per-user daily request + token counters that are **separate from Ask AI chat** (`completions` / `completion_*_tok` columns, `migrations/0004`) so a busy editor session can't eat a member's chat budget, but they share the global daily token ceiling, which stays the single backstop on total provider spend.
+**Cost / abuse controls.** Completions bill per-user daily request + token counters that are **separate from Ask AI chat** (`completions` / `completion_*_tok` columns, `migrations/auth/0004`) so a busy editor session can't eat a member's chat budget, but they share the global daily token ceiling, which stays the single backstop on total provider spend.
 
 ### Pro subscriptions (Polar)
 
@@ -294,7 +296,7 @@ Client side, `app/_components/billing/proCheckout.ts` drives the flow (upgrade b
 
 ### Cloud saves & playground sharing
 
-Workspaces can be pushed to the account ("Cloud" button in every playground header) and shared as immutable snapshot links ("Share", works for **guests too**, no account needed). A workspace travels as a **bundle**: a gzipped JSON document (`lib/workspaces/types.ts`) holding the code files verbatim, or, for the SQL playgrounds, a replayable SQL dump plus the query tabs (the database binary never leaves the browser; opening a bundle replays the dump through the WASM engine). D1 keeps only metadata (`migrations/0005`); the bundle bytes live in a dedicated R2 bucket, because SQL dumps routinely exceed D1's 2 MB row cap and R2 reads are egress-free.
+Workspaces can be pushed to the account ("Cloud" button in every playground header) and shared as immutable snapshot links ("Share", works for **guests too**, no account needed). A workspace travels as a **bundle**: a gzipped JSON document (`lib/workspaces/types.ts`) holding the code files verbatim, or, for the SQL playgrounds, a replayable SQL dump plus the query tabs (the database binary never leaves the browser; opening a bundle replays the dump through the WASM engine). D1 keeps only metadata (`migrations/auth/0005`); the bundle bytes live in a dedicated R2 bucket, because SQL dumps routinely exceed D1's 2 MB row cap and R2 reads are egress-free.
 
 - **Endpoints:** `GET/PUT/DELETE /api/workspaces[/:id[/bundle]]` (owner-only) and `POST/GET/DELETE /api/shares[/:id[/bundle]]` (share reads are public, the slug is the capability). Share links land on `/s/<id>` (noindex, disallowed in robots).
 - **Retention (read-time, no cron):** guest share links carry a fixed ~30-day expiry; free members' saves + links expire after ~30 days of inactivity (opening / viewing resets the clock); Pro storage doesn't expire. Expired rows are never served and are purged lazily by whichever route encounters them. Policy numbers live in `lib/workspaces/policy.ts` and are what `/pricing` documents.
@@ -318,14 +320,14 @@ Optional hardening: an R2 **lifecycle rule** on the `share/` prefix (e.g. delete
 - **Users** (`/admin`), lists every account with per-row actions:
   - **Plan switch**, flips `free` ↔ `pro` via `admin.updateUser` (an already-signed-in session can lag up to five minutes behind, from the session cookie cache; impersonation and fresh sign-ins see the new plan immediately).
   - **Impersonate**, become that user in this browser (refused for admins server-side). Come back to `/admin` and the access-denied card offers **Stop impersonating**.
-  - **Remove**, a **hard delete**. It drops the `user` row, which cascades to that user's `session` and `account` rows (the `ON DELETE CASCADE` in `migrations/0001`) and frees their unique email. **The person can then sign up again** from scratch with OAuth or email/password. Use this for the "let me start over" / account-reset case, e.g. someone who created an unverified email/password account and now can't sign in with Google (see [Account linking](#account-linking)).
+  - **Remove**, a **hard delete**. It drops the `user` row, which cascades to that user's `session` and `account` rows (the `ON DELETE CASCADE` in `migrations/auth/0001`) and frees their unique email. **The person can then sign up again** from scratch with OAuth or email/password. Use this for the "let me start over" / account-reset case, e.g. someone who created an unverified email/password account and now can't sign in with Google (see [Account linking](#account-linking)).
   - **Ban**, the soft alternative. Blocks sign-in but keeps the account (and its email) in place; reversible with **Unban**.
 - **Test users** (`/admin/test-users`), creates disposable accounts for testing member-gated features (AI autocomplete, Ask AI tiers). They're created through `admin.createUser` with `data: { plan, emailVerified: true }`, so they're born verified (no verification email is sent on this path) on the chosen plan, no billing involved. Test accounts are identified purely by their reserved `@dataslope.test` email domain (RFC 6761 `.test` can never receive mail), which is what the list and the "Test" badges key on. Passwords show once at creation; use Impersonate for existing ones.
 - **AI usage** (`/admin/ai-usage`), per-user and site-wide Ask AI + completion + suggestion counters for a chosen UTC window (Day / Week / Month / Total, anchored by an "as of" date), against the global daily cap. Backed by `GET /api/admin/ai-usage?start&end` (inclusive UTC-day range; `start` omitted ⇒ all-time), a custom route gated by `requireAdmin` (`lib/auth/admin.ts`) since it isn't a Better Auth endpoint.
 
 Authorization is enforced **server-side** on every `admin.*` endpoint (and `requireAdmin` on our own `/api/admin/*` routes), so the pages themselves stay statically-prerendered, client-read screens like `/account` (the "auth gates actions, not content" rule): a non-admin who opens `/admin` just gets an access-denied notice and can read or change nothing. The dashboard refuses destructive actions on your own row, so you can't lock yourself out.
 
-The admin plugin adds `role` / `banned` / `banReason` / `banExpires` to `user` and `impersonatedBy` to `session`; that delta is `migrations/0002_add_admin_plugin_fields.sql`, applied by the same `wrangler d1 migrations apply` command as the rest.
+The admin plugin adds `role` / `banned` / `banReason` / `banExpires` to `user` and `impersonatedBy` to `session`; that delta is `migrations/auth/0002_add_admin_plugin_fields.sql`, applied by the same `wrangler d1 migrations apply` command as the rest.
 
 **Designating admins.** Three ways, which compose. All three grant admin regardless of the `role` column, so any of them can bootstrap the *first* admin (there's no admin to promote them yet):
 
@@ -357,7 +359,7 @@ The second case is the default whenever email verification is off (no `RESEND_AP
 
 ### Adding Better Auth plugins later
 
-If you enable additional Better Auth features (e.g. 2FA, organizations), regenerate the schema delta with `npx @better-auth/cli generate` and add it as a **new** migration file in `migrations/` rather than editing the existing one.
+If you enable additional Better Auth features (e.g. 2FA, organizations), regenerate the schema delta with `npx @better-auth/cli generate` and add it as a **new** migration file in `migrations/auth/` rather than editing the existing one.
 
 
 ## License

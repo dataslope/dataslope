@@ -31,7 +31,9 @@ function (PDF)**, a smooth curve. The curve itself is *not*
 probability. Probability is the **area** under the curve between two
 values:
 
-`P(a < X < b) = area under the PDF from a to b`
+$$
+P(a < X < b) = \text{area under the PDF from } a \text{ to } b
+$$
 
 The total area under any PDF is exactly 1 (something must happen). A
 single point has zero width, so it has zero area, which is why
@@ -62,8 +64,8 @@ mental model is genuinely different.
 | | **Discrete (PMF)** | **Continuous (PDF)** |
 | --- | --- | --- |
 | Shape | Bars at 0, 1, 2, … | A smooth curve |
-| Height means | `P(X = k)`, directly a probability | A *density*, **not** a probability |
-| `P` over a range | **Sum** of bar heights | **Area** under the curve |
+| Height means | $P(X = k)$, directly a probability | A *density*, **not** a probability |
+| $P$ over a range | **Sum** of bar heights | **Area** under the curve |
 
 <Callout type="info" title="Why P(X = x) = 0 isn't a paradox">
 "The probability of any exact value is zero" sounds like it means
@@ -442,12 +444,12 @@ For continuous variables, always ask about an interval, never an exact value.`}
 <MultipleChoice
   markdown={`You plot the PDF of a \`Uniform(0, 0.5)\` distribution and notice the density is **2** across the whole interval. What does this tell you?
 
-- [o] The density height (2) is fine because what must equal 1 is the area: 2 × 0.5 = 1
+- [o] The density height (2) is fine because what must equal 1 is the area: $2 \\times 0.5 = 1$
   > Over a narrow interval the curve must rise above 1 so that its total area still integrates to exactly 1, which is the only constraint on a PDF.
 - The distribution is invalid and should be renormalized
   > It is already a valid, normalized PDF; its area is exactly 1, so no renormalization is needed.
 - The probability of landing in that interval is 2
-  > Probability is the area, here \`2 × 0.5 = 1\`, not the height of 2.
+  > Probability is the area, here $2 \\times 0.5 = 1$, not the height of 2.
 - The plot is wrong, because a probability can never exceed 1
   > A *probability* can't exceed 1, but this is a *density* (a height), and densities can exceed 1; nothing is wrong.
 
@@ -466,7 +468,7 @@ A skinny interval forces a tall density so the total area stays at 1, height is 
 - \`d.pdf(8) - d.pdf(2)\`
   > Subtracting PDF heights is meaningless; interval probability comes from the CDF (areas), not the PDF.
 
-\`cdf(b) - cdf(a)\` is the universal recipe for \`P(a < X < b)\`.`}
+\`cdf(b) - cdf(a)\` is the universal recipe for $P(a < X < b)$.`}
 />
 
 <MultipleChoice
@@ -504,7 +506,7 @@ Reading density heights as probabilities is the single most common error with co
   and the total area is 1.
 - The **PDF height is a density, not a probability**, it can exceed 1.
   P(X = exact value) = 0; always ask about intervals.
-- **`cdf(b) − cdf(a)`** gives any interval probability P(a < X < b);
+- **`cdf(b) - cdf(a)`** gives any interval probability $P(a < X < b)$;
   **`sf`** gives the right tail; **`ppf`** inverts the CDF to find
   percentiles and thresholds.
 - **Uniform** = flat density over a range; **Exponential** = waiting

@@ -71,6 +71,10 @@ const nextConfig: NextConfig = {
       // into lib/generated/charts.js, and that module is what the app imports.
       "./charts/**",
       "./__tests__/**",
+      // D1 schema, applied with `wrangler d1 migrations apply` and never read
+      // by the Worker. One entry covers all three databases now that each has
+      // a subfolder here; as sibling top-level `migrations-*` directories the
+      // illustration and search schema were being traced into the deployment.
       "./migrations/**",
     ],
   },

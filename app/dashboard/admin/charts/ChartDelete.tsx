@@ -8,7 +8,7 @@
  * one is a commit. What this records is the *decision*, taken by the person
  * actually looking at the figure, into `chart_regen_marks.delete_requested_at`
  * for whoever is next in the repository. Reading the queue back and clearing a
- * request is documented in `migrations-illustrations/0004_…`.
+ * request is documented in `migrations/illustrations/0004_…`.
  *
  * Two things make the confirmation worth a dialog rather than a second click:
  *
@@ -38,10 +38,14 @@ interface ChartDeleteProps {
   requested: boolean;
   /** ISO-8601 of the outstanding request, for the "asked for on" line. */
   requestedAt: string | null;
-  /** Whether the queue is reachable at all (ILLUSTRATIONS_DB bound, admin
-   *  session present). Without it the control is inert rather than absent, so
-   *  the page does not silently lose a feature. */
+  /** Whether the queue is reachable at all (ILLUSTRATIONS_DB bound, the table
+   *  migrated, admin session present). Without it the control is inert rather
+   *  than absent, so the page does not silently lose a feature. */
   available: boolean;
+  /** What to say when it is not reachable. Passed in rather than written here,
+   *  because this control cannot tell a missing binding from a missing table
+   *  and guessing produced a tooltip that named the wrong one. */
+  unavailableReason: string;
   onChange: (slug: string, requestedAt: string | null) => void;
 }
 
@@ -60,6 +64,7 @@ export function ChartDelete({
   requested,
   requestedAt,
   available,
+  unavailableReason,
   onChange,
 }: ChartDeleteProps) {
   const [open, setOpen] = useState(false);
@@ -102,7 +107,7 @@ export function ChartDelete({
             ? requested
               ? "Withdraw the deletion request"
               : "Ask for this chart to be deleted from the repository"
-            : "Review queue unavailable (ILLUSTRATIONS_DB not bound)"
+            : unavailableReason
         }
       >
         {saving ? (

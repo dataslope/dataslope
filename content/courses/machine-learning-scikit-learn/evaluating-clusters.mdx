@@ -180,11 +180,11 @@ crisp natural number of clusters, just a few defensible choices. That is the
 normal experience on real data, and exactly why the silhouette is a guide to
 weigh against domain sense, not an oracle that hands you the answer.
 
-The elbow plot is the other half of this question, and the two are worth
-reading side by side: the silhouette often has an opinion where the elbow
-does not.
+That is also what separates it from the elbow plot in *K-Means Clustering*.
+Inertia only ever falls, so an elbow has to be judged; the silhouette is not
+monotone in `k`, so it has a genuine maximum you can point at:
 
-<Chart slug="kmeans-elbow" />
+<Chart slug="silhouette-vs-k" />
 
 ## The per-point silhouette plot
 

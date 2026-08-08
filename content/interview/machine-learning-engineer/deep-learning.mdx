@@ -272,7 +272,7 @@ both vision (ImageNet backbones) and NLP (pretrained transformers).
 
 Softmax turns raw logits into a probability distribution over classes;
 cross-entropy measures how far that distribution is from the one-hot
-truth. Their gradient simplifies beautifully to `(prediction − target)`,
+truth. Their gradient simplifies beautifully to $(\text{prediction} - \text{target})$,
 which is large when the model is confidently wrong and gives a clean,
 well-scaled signal, unlike squared error on top of a saturating output,
 whose gradient can vanish. Combined libraries fuse the two

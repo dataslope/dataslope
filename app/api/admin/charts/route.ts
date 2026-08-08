@@ -39,7 +39,7 @@
  * redraws, and for the same reason: the reviewer is in a browser looking at the
  * figure, and the work happens in a checkout. The SQL for reading the queue and
  * clearing a request once the deletion has landed is in
- * `migrations-illustrations/0004_…`.
+ * `migrations/illustrations/0004_…`.
  *
  * It is a toggle, so a request made by mistake can be withdrawn from the same
  * button rather than needing a hand-written UPDATE.
@@ -58,10 +58,25 @@ import {
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Why the queue is read-only, when it is.
+ *
+ * These are two different problems with two different fixes and they used to
+ * arrive as one boolean, so the gallery reported "not bound" for both. That is
+ * the wrong sentence in the commoner case by far: the binding is declared in
+ * wrangler.jsonc and is almost always present, while the *table* is missing on
+ * any deployment where `db:migrate:illustrations:remote` has not been run since
+ * the chart queue landed. Someone reading "not bound" goes looking at bindings
+ * and finds nothing wrong.
+ */
+export type ChartQueueState = "ok" | "unbound" | "unreadable";
+
 export interface ChartMarksPayload {
   marks: RegenMark[];
-  /** False when ILLUSTRATIONS_DB isn't bound: the gallery renders read-only. */
+  /** False when the queue cannot be written: see `state` for which reason. */
   available: boolean;
+  /** Which of the two failures happened, so the gallery can name it. */
+  state: ChartQueueState;
   maxNoteLength: number;
 }
 
@@ -85,21 +100,26 @@ export async function GET(request: Request): Promise<Response> {
 
   const db = env.ILLUSTRATIONS_DB;
   let marks: RegenMark[] = [];
-  let available = false;
+  let state: ChartQueueState = "unbound";
   if (db) {
     try {
       marks = await listRegenMarks(db);
-      available = true;
+      state = "ok";
     } catch (err) {
-      // A missing table (migration not applied) must not take the gallery down
-      // with it; reviewing the figures is still useful without the queue.
+      // Almost always the migration not having been applied to this database:
+      // `chart_regen_marks` arrived after `dataslope-illustrations` already
+      // existed, so a deployment that never re-ran the migration has a bound
+      // binding and no table. Either way, reviewing the figures is still
+      // useful without the queue, so this degrades rather than throws.
       console.error("chart marks read failed", err);
+      state = "unreadable";
     }
   }
 
   const payload: ChartMarksPayload = {
     marks,
-    available,
+    available: state === "ok",
+    state,
     maxNoteLength: MAX_NOTE_LENGTH,
   };
   return json(payload);
