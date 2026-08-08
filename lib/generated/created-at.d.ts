@@ -5,7 +5,7 @@
  *
  * Committed even though the `.js` it describes is gitignored: it keeps
  * typecheck and lint green on a fresh checkout before the build script has run
- * (same approach as `charts.d.ts` and `search-index.d.ts`).
+ * (same approach as `charts.d.ts` and `images.d.ts`).
  *
  * Both maps are keyed by the id the corresponding admin gallery already uses,
  * and both are *partial*: an artefact that has never been committed, or a

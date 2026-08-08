@@ -117,6 +117,17 @@ npm run db:seed:search:remote             # ~9k rows
 
 **The Workers Builds API token needs `D1 (edit)` added to it.** The token Cloudflare generates for Workers Builds is scoped to Account Settings (read), Workers Scripts (edit), Workers KV (edit), Workers R2 (edit) and Workers Routes (edit) — D1 is not in that set, so the deploy-time seed fails to authorize until it is added under **My Profile → API Tokens → (the Workers Builds token) → Edit → Account → D1 → Edit**. Because the seed is chained after `deploy` with `&&`, the symptom is a Worker that ships fine and a build that goes red on the last step, with the index never updating.
 
+### Local development
+
+`next dev` resolves bindings through `initOpenNextCloudflareForDev()` (see `next.config.ts`), so `/api/search` reads the **local** D1 under `.wrangler/`, not the remote one. That database starts empty, and an empty FTS5 table is not an error — it answers every query with no matches. Search therefore looks broken-but-silent until it is set up once:
+
+```bash
+npm run db:migrate:search   # --local
+npm run db:seed:search      # --local, skipped when already current
+```
+
+Re-run the seed after editing lessons; it no-ops when the content hash already matches.
+
 ### Re-seeding only when content changed
 
 `build-search-sql.mjs` writes a SHA-256 of the corpus into the seed file and, as the seed's last statement, into `docs_meta.content_hash`. `scripts/seed-search.mjs` compares the two and skips the apply when they agree.
