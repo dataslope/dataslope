@@ -5,7 +5,7 @@
 // configured build command (`npx opennextjs-cloudflare build` → `npm run
 // build`), whose script re-runs fumadocs-mdx and every generator anyway. The
 // postinstall pass was pure duplication: a second remark parse of ~800 course
-// MDX files (build-search-index), a second esbuild+minify of the almostnode
+// MDX files (build-search-corpus), a second esbuild+minify of the almostnode
 // worker bundles, and a second hash pass over assets/images — tens of seconds
 // per deploy for outputs that are immediately regenerated.
 //
@@ -55,7 +55,8 @@ function run(command, args = []) {
 // Same order the `build`/`dev` scripts use.
 run("fumadocs-mdx");
 run("node", ["scripts/build-almostnode-workers.mjs"]);
-run("node", ["scripts/build-search-index.mjs"]);
+run("node", ["scripts/build-search-corpus.mjs"]);
+run("node", ["scripts/build-search-sql.mjs"]);
 run("node", ["scripts/build-brand-fallbacks.mjs"]);
 run("node", ["scripts/build-charts.mjs"]);
 run("node", ["scripts/build-created-at.mjs"]);
