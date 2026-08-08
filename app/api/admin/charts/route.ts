@@ -39,7 +39,7 @@
  * redraws, and for the same reason: the reviewer is in a browser looking at the
  * figure, and the work happens in a checkout. The SQL for reading the queue and
  * clearing a request once the deletion has landed is in
- * `migrations-illustrations/0004_…`.
+ * `migrations/illustrations/0004_…`.
  *
  * It is a toggle, so a request made by mistake can be withdrawn from the same
  * button rather than needing a hand-written UPDATE.

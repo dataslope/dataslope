@@ -8,7 +8,7 @@
  * one is a commit. What this records is the *decision*, taken by the person
  * actually looking at the figure, into `chart_regen_marks.delete_requested_at`
  * for whoever is next in the repository. Reading the queue back and clearing a
- * request is documented in `migrations-illustrations/0004_…`.
+ * request is documented in `migrations/illustrations/0004_…`.
  *
  * Two things make the confirmation worth a dialog rather than a second click:
  *

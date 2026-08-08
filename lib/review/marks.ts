@@ -249,7 +249,7 @@ export async function approveRegenMark(
  * can do is record the decision, taken by the one person actually looking at
  * the artefact, and hand it to whoever is next in the repository. The SQL for
  * reading the queue back and clearing a request is in
- * `migrations-illustrations/0004_…`.
+ * `migrations/illustrations/0004_…`.
  *
  * The request is its own field rather than another value of `marked`, because
  * the two mean opposite things about the artefact's future: `marked` says redo

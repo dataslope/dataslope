@@ -147,7 +147,7 @@ serves), each over the live page background so the theme pill is the judgement
 tool, and a click opens the raw image in a new tab. Every card can be marked
 "redraw this" with a one-line note, stored in D1 database
 `dataslope-illustrations`, table `illustration_regen_marks` (binding
-`ILLUSTRATIONS_DB`, schema in `migrations-illustrations/`). Typing in the note
+`ILLUSTRATIONS_DB`, schema in `migrations/illustrations/`). Typing in the note
 marks the illustration by itself; marking with the note blank stores
 `DEFAULT_REGEN_NOTE` ("redraw this from scratch as a solid 3D isometric scene
 built from a few large objects, dropping the decorative dots…"), which is the
@@ -466,7 +466,7 @@ galleries record the *decision* instead, and the repository work reads it back.
 
 **Doing the deletions.** Read the queue, remove what it names, then clear the
 rows. Both tables live in D1 `dataslope-illustrations` (schema in
-`migrations-illustrations/0004_…`):
+`migrations/illustrations/0004_…`):
 
 ```bash
 npx wrangler d1 execute dataslope-illustrations --remote --command \

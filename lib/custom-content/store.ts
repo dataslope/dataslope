@@ -20,7 +20,7 @@ import type {
 } from "./types";
 
 // ---------------------------------------------------------------------------
-// Row shapes (snake_case mirrors migrations/0007)
+// Row shapes (snake_case mirrors migrations/auth/0007)
 // ---------------------------------------------------------------------------
 
 export interface CustomItemRow {

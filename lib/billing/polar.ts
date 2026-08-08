@@ -21,7 +21,7 @@
  * webhook's customer carries `externalId = user.id` and plan updates are one
  * indexed D1 UPDATE. No extra tables, no schema change, `user.plan` +
  * lib/ai/tier.ts already treat the column as the source of truth, exactly as
- * the "future billing webhook" comments in migrations/0003 anticipated.
+ * the "future billing webhook" comments in migrations/auth/0003 anticipated.
  *
  * We deliberately key everything off the `customer.state_changed` event: it
  * fires on every subscription transition (created, renewed, canceled at

@@ -16,7 +16,7 @@ import type { MemberTier } from "@/lib/ai/types";
 import { isExpired } from "./policy";
 
 // ---------------------------------------------------------------------------
-// Row shapes (snake_case mirrors migrations/0005)
+// Row shapes (snake_case mirrors migrations/auth/0005)
 // ---------------------------------------------------------------------------
 
 export interface WorkspaceRow {
@@ -240,7 +240,7 @@ export async function deleteShares(
  * used when the whole account is deleted (Better Auth `deleteUser.beforeDelete`
  * in lib/auth/server.ts). The `cloud_workspaces` / `playground_shares` rows
  * themselves cascade from the `user` row's deletion (ON DELETE CASCADE in
- * migrations/0005), but their R2 payloads do not, so we remove those here
+ * migrations/auth/0005), but their R2 payloads do not, so we remove those here
  * *before* the user row goes.
  *
  * Deliberately best-effort, it never throws: orphaned bytes are a storage cost,
