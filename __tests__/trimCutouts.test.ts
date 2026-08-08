@@ -8,7 +8,7 @@
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 
-import { trimPlan, verticalBounds } from "../scripts/trim-cutouts.mjs";
+import { trimPlan, verticalBounds } from "../scripts/lib/cutouts.mjs";
 
 const WIDTH = 200;
 const HEIGHT = 100;

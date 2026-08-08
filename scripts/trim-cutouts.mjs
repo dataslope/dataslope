@@ -83,17 +83,18 @@ import { execFileSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import sharp from "sharp";
-import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
 import { toWebpSource } from "./promote-illustrations.mjs";
+import {
+  contentSignature,
+  createCandidateIndex,
+  trimPlan,
+  verticalBounds,
+} from "./lib/cutouts.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const OUT_DIR = join(ROOT, "public", "images");
 const CUTOUT_SUFFIX = "-cutout";
 
-// Premultiplied PSNR, in dB, above which an R2 candidate is accepted as the
-// source of the served WebP. See the header: real matches score ~44, a
-// different render of the same prompt 6-11.
-const MATCH_FLOOR = 30;
 
 function parseArgs(argv) {
   const opts = {
@@ -145,160 +146,6 @@ function printHelp() {
   );
 }
 
-/**
- * First and last row of an RGBA image that carry drawn content.
- *
- * Exported for `__tests__/trimCutouts.test.ts`, which is where the alpha floor
- * and the speck tolerance are pinned against synthetic images.
- */
-export async function verticalBounds(buf, { alpha = 16, rowFrac = 0.002 } = {}) {
-  const { data, info } = await sharp(buf)
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-  const { width, height, channels } = info;
-  const need = Math.max(1, Math.round(width * rowFrac));
-
-  const drawn = (y) => {
-    let count = 0;
-    const row = y * width * channels;
-    for (let x = 0; x < width; x++) {
-      if (data[row + x * channels + 3] > alpha && ++count >= need) return true;
-    }
-    return false;
-  };
-
-  let top = 0;
-  let bottom = height - 1;
-  while (top < height && !drawn(top)) top++;
-  while (bottom >= top && !drawn(bottom)) bottom--;
-  return { width, height, top, bottom, empty: top > bottom };
-}
-
-/**
- * Turn bounds into the crop to apply, or null when it isn't worth it.
- *
- * Returns null for a fully transparent image (nothing to centre the crop on)
- * and for one already tight enough that the trim would remove less than
- * `minGain` of its height — which is what makes a re-run a no-op instead of a
- * fresh lossy generation for a percent of nothing.
- *
- * Exported for the test suite.
- */
-export function trimPlan(bounds, { pad = 0.02, minGain = 0.02 } = {}) {
-  if (bounds.empty) return null;
-  const padPx = Math.round(bounds.height * pad);
-  const top = Math.max(0, bounds.top - padPx);
-  const bottom = Math.min(bounds.height - 1, bounds.bottom + padPx);
-  const height = bottom - top + 1;
-  const removed = 1 - height / bounds.height;
-  if (removed < minGain) return null;
-  return { top, height, removed };
-}
-
-/**
- * An image reduced to just its drawn content, at a fixed small size.
- *
- * Normalising away the blank band is what makes matching survive this script's
- * own work. Comparing whole frames, a trimmed WebP no longer resembles the
- * pristine PNG it came from — different heights squashed into the same box
- * read as different pictures — so a second run would quietly fall back to
- * re-encoding the served file, and the pristine source would be unreachable
- * from then on. Both sides are cropped to their own content first, so the
- * comparison asks "is this the same artwork?" rather than "is this the same
- * rectangle?", and a trim stays re-derivable from R2 forever.
- */
-async function contentSignature(buf) {
-  const bounds = await verticalBounds(buf);
-  const img = sharp(buf);
-  if (!bounds.empty) {
-    img.extract({
-      left: 0,
-      top: bounds.top,
-      width: bounds.width,
-      height: bounds.bottom - bounds.top + 1,
-    });
-  }
-  return img.resize({ width: 128, height: 128, fit: "fill" }).ensureAlpha().raw().toBuffer();
-}
-
-/**
- * Premultiplied PSNR between two content signatures, in dB.
- *
- * Premultiplying matters: RGB under a fully transparent pixel is undefined and
- * each encoder is free to rewrite it, so a naive comparison reports a large
- * difference across the very blank regions this script is about to remove.
- */
-function similarity(x, y) {
-  let se = 0;
-  const pixels = x.length / 4;
-  for (let i = 0; i < pixels; i++) {
-    const xa = x[i * 4 + 3] / 255;
-    const ya = y[i * 4 + 3] / 255;
-    for (let k = 0; k < 3; k++) {
-      const d = x[i * 4 + k] * xa - y[i * 4 + k] * ya;
-      se += d * d;
-    }
-    const da = x[i * 4 + 3] - y[i * 4 + 3];
-    se += da * da;
-  }
-  const mse = se / (pixels * 4);
-  return mse === 0 ? Infinity : 10 * Math.log10(255 * 255 / mse);
-}
-
-/** Read-only view of the cut-out PNGs in R2, indexed by prompt id. */
-function makeR2Index() {
-  const client = createR2Client(credentialsFromEnv());
-
-  // Cache the *promise*, not the map it resolves to. Publishing a half-filled
-  // map and awaiting the listing afterwards is a race with teeth here: the
-  // second worker finds a truthy (empty) index, concludes the id has no
-  // candidate, and silently re-encodes the served WebP instead of re-cropping
-  // the pristine PNG. Nothing fails, the run just quietly does the lossy thing
-  // for most of the images — which is exactly what it did before this line.
-  let indexing = null;
-  const load = () =>
-    (indexing ??= (async () => {
-      const byId = new Map();
-      for (const key of await client.list("illustrations/")) {
-        const m = /^illustrations\/[^/]+\/([^/]+)\/v\d+\/cutout\.png$/.exec(key);
-        if (!m) continue;
-        if (!byId.has(m[1])) byId.set(m[1], []);
-        byId.get(m[1]).push(key);
-      }
-      return byId;
-    })());
-  return {
-    describe: `r2://${client.bucket}/illustrations/`,
-    /**
-     * The pristine PNG the served WebP was encoded from, or null.
-     *
-     * Candidates are tried newest run first and the search stops at the first
-     * one over the floor rather than scoring them all. Over 900 images that is
-     * the difference between downloading every historical redraw (~2 GB) and
-     * usually downloading one: an id's current art almost always comes from
-     * its most recent run, and the floor is nowhere near ambiguous — a match
-     * is ~44 dB and the runner-up 6-11, so "first over 30" and "best of all"
-     * cannot disagree. Run ids are dated (`2026-08-…`), so sorting the keys
-     * descending is chronological enough to make the guess pay off.
-     */
-    async sourceFor(id, servedSig) {
-      const keys = [...((await load()).get(id) ?? [])].sort().reverse();
-      let bestDb = null;
-      for (const key of keys) {
-        const buf = await client.get(key);
-        const db = similarity(servedSig, await contentSignature(buf));
-        if (db >= MATCH_FLOOR) return { hit: { key, buf, db }, bestDb: db };
-        if (bestDb === null || db > bestDb) bestDb = db;
-      }
-      // `bestDb` distinguishes the two ways to miss, which matters over a
-      // sweep: null means no candidate exists for this id at all (its run has
-      // aged out of the bucket), a number means one does and did not match.
-      return { hit: null, bestDb };
-    },
-  };
-}
-
 /** Promoted cut-out slugs to work on, resolved against public/images. */
 function resolveSlugs(opts) {
   const promoted = readdirSync(OUT_DIR)
@@ -320,7 +167,7 @@ async function main() {
     process.exit(1);
   }
 
-  const r2 = opts.from === "r2" ? makeR2Index() : null;
+  const r2 = opts.from === "r2" ? createCandidateIndex() : null;
   console.log(
     `Trimming ${slugs.length} cut-out(s)` +
       (r2 ? `, preferring pristine PNGs from ${r2.describe}` : ", from the served WebP") +

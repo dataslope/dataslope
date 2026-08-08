@@ -143,14 +143,26 @@ auto`, so every transparent row is vertical space a lesson pays for and nobody
 sees — a median 11% of each image's height across the promoted set, over 30% on
 41 of them.
 
-`scripts/trim-cutouts.mjs` removes it, **vertically only**. The left/right
-margins are deliberately kept: horizontal blank costs nothing in a page that
-scrolls, and cropping it would leave each figure a different width, so a run of
-lessons would stop sharing an edge.
+**Promotion does this for you.** `promote-illustrations.mjs` crops every
+cut-out before its single encode, which is what makes it free: the crop costs
+no quality, where a pass over the promoted WebP afterwards would be a second
+lossy generation. Nothing to remember and nothing to run — promote as usual and
+the art arrives tight.
+
+It is **vertical only**. The left/right margins are deliberately kept:
+horizontal blank costs nothing in a page that scrolls, and cropping it would
+leave each figure a different width, so a run of lessons would stop sharing an
+edge.
+
+`scripts/trim-cutouts.mjs` is the backfill that trimmed the 845 images promoted
+before that existed. It is still the tool for re-trimming at different settings
+(`--pad`, `--alpha`), and the two share their geometry through
+`scripts/lib/cutouts.mjs`, so they cannot drift — a re-promote and a re-trim of
+the same art produce byte-identical files.
 
 ```bash
 node scripts/trim-cutouts.mjs --prefix python-basics- --dry-run
-node scripts/trim-cutouts.mjs --prefix python-basics-
+node scripts/trim-cutouts.mjs --all
 ```
 
 It re-crops the **pristine `cutout.png` in R2**, so a trimmed image is still a

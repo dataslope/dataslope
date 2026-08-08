@@ -26,6 +26,14 @@
  * pristine PNGs stay in R2 for the bucket's retention window, so a run can be
  * re-promoted at a different quality without regenerating.
  *
+ * **Cut-outs are trimmed on the way through.** Background removal leaves the
+ * subject floating in the frame it was generated in, so a cut-out carries a
+ * median 11% of its height in transparent rows that `<Figure>` still pays
+ * layout for. The crop happens before the single encode below, which is what
+ * makes it free — a pass over the promoted WebP afterwards would be a second
+ * lossy generation. Vertical only, and `scripts/trim-cutouts.mjs` explains why
+ * the horizontal margins are kept.
+ *
  * Deliberately kept separate from build-images.mjs, which is a deterministic,
  * content-hashed build step that must stay a true no-op when nothing changed.
  * Promotion is a network-touching, human-triggered action; it would poison
@@ -63,6 +71,7 @@ import { basename, dirname, extname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import sharp from "sharp";
 import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
+import { trimPlan, verticalBounds } from "./lib/cutouts.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 // Promotion writes the *served* file directly. There is deliberately no copy
@@ -120,6 +129,31 @@ function printHelp() {
 /** R2 key for one candidate image. Mirrors generate-illustrations.mjs. */
 export function candidateKey(runId, promptId, variant, kind) {
   return `illustrations/${runId}/${promptId}/v${variant}/${kind}.png`;
+}
+
+/**
+ * Crop a cut-out's transparent top and bottom away, full width preserved.
+ *
+ * Returns the input untouched when there is nothing worth taking — a fully
+ * transparent image, or one already tight enough that the crop would fall
+ * under `trimPlan`'s minimum gain — so promotion stays idempotent and
+ * re-promoting already-trimmed art is a no-op rather than a fresh crop.
+ *
+ * The geometry lives in `scripts/lib/cutouts.mjs`, shared with the sweep in
+ * `trim-cutouts.mjs` that backfilled every image promoted before this step
+ * existed. The two must agree, so they call the same function rather than
+ * restating the arithmetic.
+ */
+async function trimVertical(buf) {
+  const bounds = await verticalBounds(buf);
+  const plan = trimPlan(bounds);
+  if (!plan) return buf;
+  return sharp(buf)
+    .extract({ left: 0, top: plan.top, width: bounds.width, height: plan.height })
+    // Lossless hand-off to the single lossy encode below; leaving the format
+    // off would re-encode at sharp's default quality 80.
+    .png({ compressionLevel: 0 })
+    .toBuffer();
 }
 
 /**
@@ -227,14 +261,27 @@ async function main() {
       continue;
     }
     const raw = await source.read(stem);
-    const webp = await toWebpSource(raw, opts.quality, opts.maxWidth);
+
+    // Cut-outs are trimmed here rather than by a pass afterwards. Background
+    // removal leaves the subject floating in the frame it was generated in, so
+    // a cut-out is 1536x1024 of layout carrying a median 11% less than that of
+    // drawing, and `<Figure>` renders at full width with `height: auto` — every
+    // transparent row is vertical space a lesson pays for and nobody sees.
+    // Doing it before the one encode below is what makes it free: the crop
+    // costs no quality at all, where a later pass over the promoted WebP would
+    // be a second lossy generation. Vertical only — see scripts/trim-cutouts.mjs
+    // for why the left/right margins are deliberately kept, and for the
+    // backfill that trimmed everything promoted before this existed.
+    const trimmed = stem.endsWith(CUTOUT_SUFFIX) ? await trimVertical(raw) : raw;
+    const webp = await toWebpSource(trimmed, opts.quality, opts.maxWidth);
     before += raw.length;
     after += webp.length;
     const out = join(OUT_DIR, `${stem}.webp`);
     if (!opts.dryRun) writeFileSync(out, webp);
     promoted++;
     console.log(
-      `  ✓ ${stem}.webp  ${(raw.length / 1e6).toFixed(2)}MB → ${(webp.length / 1e6).toFixed(2)}MB`,
+      `  ✓ ${stem}.webp  ${(raw.length / 1e6).toFixed(2)}MB → ${(webp.length / 1e6).toFixed(2)}MB` +
+        (trimmed === raw ? "" : "  (vertically trimmed)"),
     );
   }
 
