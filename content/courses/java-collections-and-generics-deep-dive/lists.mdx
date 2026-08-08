@@ -251,16 +251,45 @@ Java 9 added factory methods `List.of(a, b, c)` that produce
 **immutable** lists. They are cheap, type-safe, and exactly what you
 want for small fixed collections (especially as constants).
 
+```java
+import java.util.List;
+
+public class Main {
+  public static void main(String[] args) {
+    List<String> primary = List.of("red", "green", "blue");
+    System.out.println(primary);
+
+    try {
+      primary.add("yellow"); // throws, immutable
+    } catch (UnsupportedOperationException e) {
+      System.out.println("threw: " + e.getClass().getSimpleName());
+    }
+  }
+}
+```
+
+<Callout type="info" title="Not runnable in the browser">
+`List.of` is one of the Java 9 factory methods and the playground on these
+pages runs Java 8, so `javac` here cannot resolve it. The Java 8 spelling is
+`Collections.unmodifiableList(Arrays.asList("red", "green", "blue"))`, which
+throws the same `UnsupportedOperationException`, but the point of this section
+is the factory method itself, so it is shown rather than run.
+</Callout>
+
 <CodeBlock
   adapter="java"
   files={[
     {
       filename: "main.java",
-      starterCode: `import java.util.List;
+      starterCode: `import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class Main {
   public static void main(String[] args) {
-    List<String> primary = List.of("red", "green", "blue");
+    // The Java 8 equivalent, which this playground can run.
+    List<String> primary =
+        Collections.unmodifiableList(Arrays.asList("red", "green", "blue"));
     System.out.println(primary);
 
     try {

@@ -189,11 +189,12 @@ people once and then never again.
       filename: "main.java",
       starterCode: `import java.util.HashSet;
 import java.util.Set;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    Set<Integer> a = new HashSet<>(Set.of(1, 2, 3, 4));
-    Set<Integer> b = new HashSet<>(Set.of(3, 4, 5, 6));
+    Set<Integer> a = new HashSet<>(Arrays.asList(1, 2, 3, 4));
+    Set<Integer> b = new HashSet<>(Arrays.asList(3, 4, 5, 6));
 
     Set<Integer> union = new HashSet<>(a);
     union.addAll(b);
@@ -239,11 +240,12 @@ incoming stream while preserving first-seen order.
     {
       filename: "Main.java",
       starterCode: `import java.util.List;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
     List<String> raw =
-        List.of("alice", "bob", "alice", "carol", "bob", "dave", "alice");
+        Arrays.asList("alice", "bob", "alice", "carol", "bob", "dave", "alice");
     VisitorLog log = new VisitorLog();
     for (String name : raw)
       log.record(name);

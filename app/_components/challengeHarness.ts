@@ -503,7 +503,28 @@ function buildPreviewHarnessScript(
   );
   lines.push("    }");
   lines.push("  };");
+  // `load` does not imply the document has a layout box, and a CSS challenge
+  // reads *used* values: per CSSOM, `getComputedStyle(el).gridTemplateColumns`
+  // resolves to `120px 120px 120px 120px` only for an element that generates a
+  // box, and to the specified `repeat(4, 1fr)` otherwise. The test then splits
+  // that on whitespace and counts two tracks, so a correct four-column
+  // solution failed with "the grid resolved to 2" and the reader was told
+  // their CSS was wrong. Same cause behind "the link is only 0px tall".
+  //
+  // Confirmed reader-facing, not a headless artifact: it reproduces in a real
+  // headed Chromium under Xvfb. So the harness waits for the box rather than
+  // assuming one. `requestAnimationFrame` is the wrong tool here, frames are
+  // throttled in a document that is not being presented and the tests then
+  // never run at all; polling a measured value is not.
+  lines.push("  var __dsAwaitLayout = async function () {");
+  lines.push("    for (var i = 0; i < 60; i++) {");
+  lines.push("      var b = document.body;");
+  lines.push("      if (b && b.getBoundingClientRect().width > 0) return;");
+  lines.push("      await new Promise(function (r) { setTimeout(r, 16); });");
+  lines.push("    }");
+  lines.push("  };");
   lines.push("  var __dstestAll = async function () {");
+  lines.push("    await __dsAwaitLayout();");
   lines.push(`    console.log("${HARNESS_BEGIN}");`);
   tests.forEach((t) => {
     const body = t.code.trim() || "/* empty */";

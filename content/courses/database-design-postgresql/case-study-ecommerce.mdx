@@ -248,6 +248,7 @@ The schema says an order line must have a positive quantity. That is a
 design rule, not just a user-interface rule.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="A line item must have positive quantity"
   initSql={`DROP TABLE IF EXISTS order_items;

@@ -34,6 +34,11 @@
     "lint": "eslint .",
     "check:challenges": "node scripts/check-challenge-cards.mjs",
     "check:code-blocks": "node scripts/check-code-blocks.mjs",
+    "check:js": "node scripts/check-js-blocks.mjs",
+    "check:r": "node scripts/check-r-blocks.mjs",
+    "check:cpp": "node scripts/check-cpp-blocks.mjs",
+    "check:sql": "node scripts/check-sql-blocks.mjs",
+    "check:browser": "node scripts/check-browser-blocks.mjs",
     "check:mcq": "node scripts/check-mcq.mjs",
     "check:mdx": "node scripts/check-mdx-blocks.mjs",
     "check:prose": "node scripts/check-prose.mjs",
@@ -120,6 +125,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260804.1",
+    "@duckdb/duckdb-wasm": "1.32.0",
     "@observablehq/plot": "^0.6.17",
     "@playwright/test": "^1.59.1",
     "@resvg/resvg-js": "^2.6.2",
@@ -139,6 +145,7 @@
     "tailwindcss": "^4.2.4",
     "typescript": "5.9.3",
     "vitest": "^4.1.5",
+    "web-worker": "^1.5.0",
     "wrangler": "^4.103.0"
   }
 }

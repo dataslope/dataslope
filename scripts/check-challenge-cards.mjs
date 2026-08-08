@@ -26,7 +26,11 @@
  * and evaluate any stdout-based tests against what is left.
  *
  * Usage:
- *   node scripts/check-challenge-cards.mjs [--filter <substring>] [--list] [--json <path>]
+ *   node scripts/check-challenge-cards.mjs [--filter <substr>[,<substr>…]] [--list]
+ *                                          [--json <path>]
+ *
+ * `--filter` takes a comma-separated list, which is how CI checks only the
+ * lessons a pull request touched instead of all of them.
  */
 import { writeFileSync } from "node:fs";
 
@@ -36,7 +40,7 @@ import {
   isStdoutTest,
   parseHarnessOutput,
 } from "../app/_components/challengeHarness.ts";
-import { extractChallengeCards } from "./lib/mdx-blocks.mjs";
+import { extractChallengeCards, matchesFilter, parseFilter } from "./lib/mdx-blocks.mjs";
 import { bootPyodide, isEnvironmental } from "./lib/pyodide-runner.mjs";
 
 const ADAPTER = "python";
@@ -47,9 +51,23 @@ const flag = (name) => {
   return i === -1 ? null : (args[i + 1] ?? "");
 };
 
-const filter = flag("--filter");
-let cards = extractChallengeCards(undefined, ADAPTER);
-if (filter) cards = cards.filter((c) => c.file.includes(filter) || c.title.includes(filter));
+const filter = parseFilter(flag("--filter"));
+const allCards = extractChallengeCards(undefined, ADAPTER);
+const cards = filter
+  ? allCards.filter((c) => matchesFilter(filter, c.file, c.title))
+  : allCards;
+
+// Same reasoning as check-code-blocks: a filtered run has to say how much it
+// left out, or its green tick claims more than it checked.
+if (filter) {
+  console.log(
+    `check-challenge-cards: --filter selected ${cards.length} of ${allCards.length} card(s) ` +
+      `from ${filter.length} path(s)`,
+  );
+  if (cards.length === 0) {
+    console.log("check-challenge-cards: nothing to run (no python cards in those files)");
+  }
+}
 
 if (args.includes("--list")) {
   for (const c of cards) {

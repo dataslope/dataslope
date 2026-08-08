@@ -25,10 +25,26 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Worker } from "node:worker_threads";
 
+import { installSyncHttp } from "./sync-http.mjs";
+
 const DATASET_BASE = "https://raw.githubusercontent.com/dataslope/datasets/main/";
 const CACHE = ".dataset-cache";
 
-export const BLOCK_TIMEOUT_MS = 30_000;
+/**
+ * Per-block wall-clock budget.
+ *
+ * 30s is not a guess about the runner, it is a claim about the reader: a block
+ * a lesson invites you to press Run on and which then takes longer than this
+ * is a content problem, not a sweep problem, so the default stays where a
+ * reader's patience is rather than where the machine's is.
+ *
+ * `BLOCK_TIMEOUT_MS` in the environment raises it, which exists for measuring
+ * how long an over-budget block actually takes ("did not finish in 30s" tells
+ * you nothing about whether the answer is 31s or ten minutes) — not for
+ * quieting the sweep. Raising it in CI turns the check into one that cannot
+ * fail on the thing it was built to catch.
+ */
+export const BLOCK_TIMEOUT_MS = Number(process.env.BLOCK_TIMEOUT_MS ?? 30_000);
 
 /** Ceiling on captured stdout+stderr per run, in characters. */
 const CAPTURE_LIMIT = 4_000_000;
@@ -42,22 +58,24 @@ const CAPTURE_LIMIT = 4_000_000;
  *   • polars ships a Rust thread pool. A browser worker gives it threads; Node
  *     does not, so the first parallel query panics and every later one finds
  *     the poisoned lock.
- *   • `pyodide_http` patches urllib onto `fetch` in the browser, where it has
- *     XMLHttpRequest to do it with. Node has neither, so `patch_all()` is a
- *     no-op here and a block that reads a URL falls through to the real socket
- *     layer and no TLS. This is the largest hole in the sweep: every
- *     `sns.load_dataset(...)` block in the Seaborn course goes unchecked, and
- *     closing it means a real HTTP shim rather than a flag.
  *
  * Reporting these as content failures is worse than not running the block at
  * all: it buries the real breakages (a deprecated argument, a dtype that
  * pandas 3 now rejects) in a few hundred lines of noise, which is how the
  * first sweep of this file ended up chasing the wrong thing twice.
+ *
+ * Every entry here is a block nobody is checking, so the list is meant to
+ * shrink. HTTP used to be on it and is not any more: `lib/sync-http.mjs`
+ * gives `pyodide_http` a genuinely blocking XMLHttpRequest to patch onto, so
+ * the 53 `sns.load_dataset(...)` blocks in the Seaborn course — which were
+ * the largest gap the sweep had — now run for real. A TLS error is therefore
+ * no longer expected from anywhere, and is deliberately not excused below:
+ * if one appears it means some block reaches the network by a path the shim
+ * does not cover, and that is worth seeing rather than skipping.
  */
 export const ENVIRONMENT_ONLY = [
   /could not spawn threads/,
   /LazyLock instance has previously been poisoned/,
-  /TLS not supported in this environment/,
   // JSPI. Chrome has it; Node's V8 build here does not, so any block that
   // suspends WebAssembly (`input()`, and anything built on it) cannot run.
   /WebAssembly stack switching not supported/,
@@ -147,6 +165,26 @@ export async function bootPyodide(label) {
   } catch (err) {
     console.error(`${label}: could not install plotly (${err.message}).`);
     console.error("Blocks that import it will be reported as failures; rerun with network access.");
+  }
+
+  // HTTP, the same way the worker sets it up (see SETUP_SCRIPT_B in
+  // pyodide-worker.ts): install pyodide_http and let it reroute urllib and
+  // requests through XMLHttpRequest.
+  //
+  // Node has no XMLHttpRequest, so this used to be a no-op that looked like a
+  // success — `patch_all()` returns cleanly either way, and the first HTTP
+  // call then fell through to a real socket with no TLS. `installSyncHttp`
+  // supplies a genuinely blocking XHR so the patch has something to patch
+  // onto, which is what brings the Seaborn course's `sns.load_dataset(...)`
+  // blocks into the sweep.
+  const uninstallSyncHttp = installSyncHttp();
+  try {
+    const micropip = py.pyimport("micropip");
+    await micropip.install("pyodide_http");
+    py.runPython("import pyodide_http; pyodide_http.patch_all()");
+  } catch (err) {
+    console.error(`${label}: could not set up pyodide_http (${err.message}).`);
+    console.error("Blocks that fetch over HTTP will be reported as failures.");
   }
 
   // The blocks call fig.show() and plt.show(); neither has anywhere to draw
@@ -282,9 +320,50 @@ builtins.display = display
       }
     }
     // Non-entry files are importable siblings, so they have to exist on disk.
+    //
+    // `solutionSource` is set only by the challenge-card extractor, and is the
+    // buffer the Solution button would leave in that file (its `solutionCode`
+    // when it has one, its starter otherwise). Without it a card whose
+    // exercise lives in a sibling module — which is every multi-file card in
+    // python-basics — is graded with that module still blank. Code blocks
+    // never set it and keep staging their starters, which is what Run does.
+    //
+    // `initCode` is joined only when there is some, matching
+    // `effectiveSourceFor` in ChallengeCard.tsx (`init ? merge(init, buf) :
+    // buf`) and the entry-code path in mdx-blocks.mjs. Prepending "\n"
+    // unconditionally is invisible in a .py sibling and corrupts a data one:
+    // it cost `sales.csv` its header row, so `csv.DictReader` came back with a
+    // single empty field name and a correct solution raised
+    // `KeyError: 'product'`.
+    const siblings = [];
     for (const f of files) {
       if (f.filename === entry) continue;
-      py.FS.writeFile(f.filename, `${f.initCode}\n${f.starterCode}`);
+      const body = f.solutionSource ?? f.starterCode;
+      py.FS.writeFile(f.filename, f.initCode ? `${f.initCode}\n${body}` : body);
+      siblings.push(f.filename);
+    }
+
+    // Drop these modules from the import cache before the run.
+    //
+    // One interpreter serves the whole sweep, but a reader gets a fresh
+    // runtime per card, so module state that persists here persists nowhere
+    // else. `utils.py` is the case that bites: several cards ship one, and
+    // once any of them has been imported, `import utils` in a later card
+    // returns the first card's module and its `greet` is missing. The failure
+    // lands on the innocent card, only in a full sweep, and never for a
+    // reader — the worst combination to debug, and the reason this is done by
+    // filename rather than by clearing everything.
+    const modules = siblings
+      .filter((n) => n.endsWith(".py"))
+      .map((n) => n.slice(0, -3).replace(/\//g, "."));
+    if (modules.length > 0) {
+      py.runPython(`
+import importlib, sys
+for _name in ${JSON.stringify(modules)}:
+    sys.modules.pop(_name, None)
+del _name
+importlib.invalidate_caches()
+`);
     }
     return null;
   }
@@ -371,5 +450,5 @@ builtins.display = display
     };
   }
 
-  return { py, run, stage, ensurePackages };
+  return { py, run, stage, ensurePackages, uninstallSyncHttp };
 }

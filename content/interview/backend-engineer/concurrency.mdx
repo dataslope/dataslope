@@ -6,7 +6,9 @@ description: Backend interview questions on processes vs threads, the GIL, race 
 Concurrency questions separate engineers who have shipped multi-threaded code
 from those who have only read about it. Expect to explain the GIL, race
 conditions, and when threads, processes, or async each win. This page is a
-question bank with a few **runnable** (and deterministic) Python examples.
+question bank with worked Python examples. The `asyncio` one is **runnable**
+(and deterministic); the threading examples are shown rather than run, because
+the Python build behind these pages has no threads to start.
 
 <Figure
   slug="interview-backend-engineer-concurrency-cutout"
@@ -55,12 +57,8 @@ atomic (read, add, write). The fix is to make the critical section mutually
 exclusive with a lock. Below, joining the threads makes the run deterministic,
 and the lock guarantees the total is exactly 200000:
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import threading
+```python
+import threading
 
 counter = 0
 lock = threading.Lock()
@@ -77,10 +75,15 @@ for t in threads:
 for t in threads:
     t.join()               # wait for both → deterministic result
 
-print(counter)             # exactly 200000, no lost updates`,
-    },
-  ]}
-/>
+print(counter)             # exactly 200000, no lost updates
+```
+
+<Callout type="info" title="Not runnable in the browser">
+The Python build that runs these pages is compiled without threads
+(`pthreads=False`), so `Thread.start()` raises `RuntimeError: can't start new
+thread`. The code is correct on any normal CPython; it is shown here rather
+than run.
+</Callout>
 
 ### What are locks, mutexes, and semaphores?
 
@@ -176,12 +179,8 @@ tasks, so you avoid the cost of creating and destroying a thread per task and
 provides this. Its `map` returns results in **input order**, which keeps the
 example below deterministic even though tasks run concurrently:
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `from concurrent.futures import ThreadPoolExecutor
+```python
+from concurrent.futures import ThreadPoolExecutor
 
 def square(n):
     return n * n
@@ -189,10 +188,14 @@ def square(n):
 with ThreadPoolExecutor(max_workers=4) as pool:
     results = list(pool.map(square, range(6)))
 
-print(results)   # [0, 1, 4, 9, 16, 25] (map preserves input order)`,
-    },
-  ]}
-/>
+print(results)   # [0, 1, 4, 9, 16, 25] (map preserves input order)
+```
+
+<Callout type="info" title="Not runnable in the browser">
+`ThreadPoolExecutor` starts worker threads, which the threadless Python build
+behind these pages cannot do. Shown rather than run, like the lock example
+above.
+</Callout>
 
 ### When do you choose threads vs multiprocessing vs async?
 

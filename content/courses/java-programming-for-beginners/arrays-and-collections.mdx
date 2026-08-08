@@ -203,10 +203,11 @@ Two safe fixes:
     {
       filename: "Main.java",
       starterCode: `import java.util.List;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    List<Integer> scores = List.of(80, 90, 100, 70, 85);
+    List<Integer> scores = Arrays.asList(80, 90, 100, 70, 85);
     double avg = Stats.average(scores);
     System.out.println("count = " + scores.size());
     System.out.println("avg = " + avg);
@@ -235,8 +236,8 @@ public class Stats {
   ]}
 />
 
-`List.of(...)` produces an *immutable* list, perfect for "just a
-bag of values I won't change."
+`Arrays.asList(...)` produces a *fixed-size* list, perfect for "just a
+bag of values I won't add to or remove from."
 
 ## Arrays vs ArrayList, when to use which?
 
@@ -307,10 +308,11 @@ sumPositive=15
     {
       filename: "Main.java",
       starterCode: `import java.util.List;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    List<Integer> data = List.of(3, -1, 0, 7, -8, 5);
+    List<Integer> data = Arrays.asList(3, -1, 0, 7, -8, 5);
     System.out.println("sumPositive=" + Numbers.sumPositive(data));
   }
 }

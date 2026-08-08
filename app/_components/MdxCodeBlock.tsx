@@ -45,6 +45,9 @@ interface MdxCodeBlockProps {
   /** Inject the pinned Tailwind in-browser compiler into the preview,
    *  see `CodeBlockProps.tailwind`. Preview adapters (web/react) only. */
   tailwind?: boolean;
+  /** Marks a block whose lesson is the failure, see
+   *  `CodeBlockProps.expectError`. */
+  expectError?: boolean;
 }
 
 export default function MdxCodeBlock({
@@ -56,6 +59,7 @@ export default function MdxCodeBlock({
   showFileTabBar,
   packages,
   tailwind,
+  expectError,
 }: MdxCodeBlockProps) {
   const resolved = getAdapterById(adapter);
   if (!resolved) {
@@ -73,6 +77,7 @@ export default function MdxCodeBlock({
       datasets={datasets}
       label={label}
       showFileTabBar={showFileTabBar}
+      expectError={expectError}
       packages={packages}
       tailwind={tailwind}
     />

@@ -227,12 +227,8 @@ and clear, which is what almost every domain class needs.
 Java 16+ has **records**, which generate a correct `equals`,
 `hashCode`, and `toString` for you. For value-like data, prefer them:
 
-<CodeBlock
-  adapter="java"
-  files={[
-    {
-      filename: "main.java",
-      starterCode: `import java.util.HashSet;
+```java
+import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
@@ -247,10 +243,15 @@ public class Main {
     System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
   }
 }
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+Records arrived in Java 16 and the playground on these pages runs Java 8, so
+`javac` here reports `cannot find symbol: class record`. Writing the class out
+by hand would defeat the example (not writing `equals` and `hashCode` yourself
+is the entire point of it), so this one is shown rather than run. Compare it
+with the hand-written `Point` further up the page, which does run.
+</Callout>
 
 Records were added partly *because* getting `equals`/`hashCode` right
 by hand is such a constant source of bugs.
@@ -277,7 +278,7 @@ public class Main {
     Name(String f) { first = f; }
     @Override
     public boolean equals(Object o) {
-      return o instanceof Name n && n.first.equals(first);
+      return o instanceof Name && ((Name)o).first.equals(first);
     }
     @Override
     public int hashCode() {
@@ -380,9 +381,9 @@ public class Email {
   public boolean equals(Object o) {
     if (this == o)
       return true;
-    if (!(o instanceof Email e))
+    if (!(o instanceof Email))
       return false;
-    return e.address.equalsIgnoreCase(this.address);
+    return ((Email)o).address.equalsIgnoreCase(this.address);
   }
   @Override
   public int hashCode() {

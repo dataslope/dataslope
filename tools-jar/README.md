@@ -23,6 +23,14 @@ the app's own bandwidth bill. We use **unpkg** specifically because:
 The app fetches it from `https://unpkg.com/dataslope-tools-jar@<version>/tools.jar`
 (see `TOOLS_JAR_CDN` in `app/_components/runtime/cdn.ts`).
 
+## Why Java 8, and not 11 or 17
+
+`tools.jar` does not exist after Java 8 (JEP 220 folded javac into the
+`jdk.compiler` module), and CheerpJ's Java 11 and 17 images ship neither that
+module nor the metadata an external compiler needs to read their platform
+classes. `JAVA-VERSION.md` in this directory records what was measured and what
+upstream would have to change.
+
 ## Provenance & license
 
 `tools.jar` is taken unmodified from OpenJDK 8 and is distributed under the

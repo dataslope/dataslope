@@ -92,6 +92,7 @@ Run this block. The first row creates customer `1`. The second insert
 tries to reuse the same primary key, so PostgreSQL rejects it.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="A duplicate primary key is rejected"
   initSql={`CREATE TABLE customers (

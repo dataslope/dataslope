@@ -49,12 +49,8 @@ following are paths for deeper study.
 `AsParallel()` turns a LINQ query into a parallel one, distributing
 work across CPU cores.
 
-<CodeBlock
-  adapter="csharp"
-  files={[
-    {
-      filename: "main.cs",
-      starterCode: `using System;
+```csharp
+using System;
 using System.Linq;
 
 var nums = Enumerable.Range(1, 20);
@@ -69,10 +65,16 @@ var squares = nums.AsParallel()
                   .ToList();
 
 Console.WriteLine(string.Join(",", squares));
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+`AsParallel()` lives in `System.Linq.Parallel`, which the .NET WebAssembly
+bundle these pages load does not ship, so the compiler reports `CS1061:
+'IEnumerable<int>' does not contain a definition for 'AsParallel'`. There would
+be nothing to distribute across in any case: the runtime here is
+single-threaded. Run this one in a desktop .NET project, where PLINQ has real
+cores to use.
+</Callout>
 
 PLINQ is ideal when **each element's work is expensive and
 independent**. It is *not* a free upgrade, coordination overhead

@@ -155,6 +155,7 @@ This block creates two parent-child designs. Deleting a draft cascades to
 its comments. Deleting an account with invoices is restricted.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="ON DELETE CASCADE versus RESTRICT"
   initSql={`CREATE TABLE drafts (

@@ -226,6 +226,7 @@ createRoot(document.getElementById("root")!).render(<Stepper />);
       code: `const inc = document.querySelector("#inc");
 if (!inc) throw new Error("Keep the #inc button.");
 inc.click();
+await new Promise((r) => setTimeout(r, 80));
 inc.click();
 await new Promise((r) => setTimeout(r, 80));
 const h1 = document.querySelector("h1");
@@ -239,7 +240,9 @@ if (!/count:\\s*2/i.test(h1.textContent || "")) {
       code: `const dec = document.querySelector("#dec");
 if (!dec) throw new Error("Keep the #dec button.");
 dec.click();
+await new Promise((r) => setTimeout(r, 80));
 dec.click();
+await new Promise((r) => setTimeout(r, 80));
 dec.click();
 await new Promise((r) => setTimeout(r, 80));
 const h1 = document.querySelector("h1");

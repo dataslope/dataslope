@@ -102,6 +102,15 @@ interface CodeBlockProps {
    *  always executes against a freshly-reset state, variables defined
    *  in one block are never visible to another. */
   adapter: LanguageAdapter;
+  /** Marks a block whose lesson *is* the failure: a deliberately misspelled
+   *  function name, a constraint violation the prose then explains. Purely
+   *  declarative — the block runs and reports exactly as it always did — but
+   *  the content sweeps assert it in both directions: such a block must raise,
+   *  and one that stops raising is a regression nothing else would catch,
+   *  because the surrounding prose keeps promising an error the reader no
+   *  longer sees. Surfaced as `data-expect-error` so the e2e sweeps can read
+   *  it too. */
+  expectError?: boolean;
   /** Workspace files. Every block supplies at least one file; each file
    *  carries its own `initCode` (read-only setup prepended on Run) and
    *  `starterCode` (the editable starter). With more than one file, or
@@ -282,6 +291,7 @@ function CodeBlockInner({
   showFileTabBar = false,
   packages,
   tailwind = false,
+  expectError,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
 
@@ -1209,6 +1219,14 @@ function CodeBlockInner({
       className={`${challengeStyles.card} ${styles.outputScope}`}
       aria-label={`${adapter.runtimeInfo.language} executable code block`}
       data-testid="code-block"
+      // Lets a sweep select only the blocks it can actually run. Without it
+      // the courseware-wide e2e run is all-or-nothing: it would re-run the
+      // ~1700 Python blocks the Node sweeps already cover far more cheaply,
+      // just to reach the browser-only languages sharing their pages.
+      // `ChallengeCard` has carried the equivalent `data-adapter-id` since it
+      // was written.
+      data-adapter={adapter.id}
+      data-expect-error={expectError ? "true" : undefined}
     >
       <div className={challengeStyles.header}>
         <div className={challengeStyles.headerRow}>

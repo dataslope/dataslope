@@ -106,6 +106,15 @@ export interface SqlCodeBlockProps {
   remoteInitSql?: string;
   /** Starter SQL shown in the editor. */
   starterCode: string;
+  /** Marks a block whose lesson *is* the failure: "A UNIQUE constraint
+   *  rejects duplicate email", or a deliberately misspelled function name.
+   *  Purely declarative — the block runs and reports exactly as it always
+   *  did — but the content sweeps assert it in both directions: such a block
+   *  must raise, and one that stops raising is a regression nothing else
+   *  would catch, because the surrounding prose keeps promising an error the
+   *  reader no longer sees. Surfaced as `data-expect-error` so the e2e sweeps
+   *  can read it too. */
+  expectError?: boolean;
   /** Hand-picked tables (and optional schemas) to display in the table
    *  viewer. When omitted, every user table in the default schema is
    *  shown. Set to `false` to suppress the viewer entirely. */
@@ -123,6 +132,7 @@ export default function SqlCodeBlock({
   initSql,
   remoteInitSql,
   starterCode,
+  expectError,
   tables,
   tableRowLimit = 50,
 }: SqlCodeBlockProps) {
@@ -588,6 +598,7 @@ export default function SqlCodeBlock({
       data-flavor="sql"
       data-testid="sql-code-block"
       data-run-status={status}
+      data-expect-error={expectError ? "true" : undefined}
       aria-label={title ? `SQL code block: ${title}` : "SQL code block"}
     >
       {/* ── Header ── */}

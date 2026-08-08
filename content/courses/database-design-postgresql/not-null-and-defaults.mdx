@@ -97,6 +97,7 @@ The first insert works and receives the default. The second insert is
 rejected because the required email is missing.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="NOT NULL rejects missing required data"
   initSql={`CREATE TABLE accounts (

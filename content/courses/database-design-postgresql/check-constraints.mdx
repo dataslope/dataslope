@@ -62,6 +62,7 @@ This table protects two rules: product prices cannot be negative, and
 status must be one of a small set of allowed values.
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="CHECK rejects negative prices and bad statuses"
   initSql={`CREATE TABLE products (
@@ -111,6 +112,7 @@ flowchart TD
 ```
 
 <SqlCodeBlock
+  expectError
   dialect="postgres"
   title="A CHECK constraint can compare columns"
   initSql={`CREATE TABLE events (

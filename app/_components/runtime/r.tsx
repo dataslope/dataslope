@@ -1,3 +1,6 @@
+// Shared with scripts/check-r-blocks.mjs so the sweep installs exactly the
+// packages a reader's session installs.
+import { extractLibraryCalls } from "./rPackages";
 import type {
   CompletionListItem,
   CompletionRequest,
@@ -576,35 +579,6 @@ interface WebRInstance {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
-
-const R_BUILTIN_PACKAGES = new Set([
-  "base", "compiler", "datasets", "graphics", "grDevices", "grid",
-  "methods", "parallel", "splines", "stats", "stats4", "tcltk",
-  "tools", "utils", "translations",
-]);
-
-function extractLibraryCalls(code: string): string[] {
-  const stripped = code
-    .split("\n")
-    .map((line) => {
-      const idx = line.indexOf("#");
-      return idx >= 0 ? line.slice(0, idx) : line;
-    })
-    .join("\n");
-
-  const re =
-    /\b(?:library|require|requireNamespace|loadNamespace)\s*\(\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z_.][A-Za-z0-9_.]*))/g;
-  const found = new Set<string>();
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(stripped)) !== null) {
-    const name = m[1] ?? m[2] ?? m[3];
-    if (!name) continue;
-    if (!/^[A-Za-z][A-Za-z0-9_.]*$/.test(name)) continue;
-    if (R_BUILTIN_PACKAGES.has(name)) continue;
-    found.add(name);
-  }
-  return [...found];
-}
 
 async function imageBitmapToPngBase64(bmp: ImageBitmap): Promise<string> {
   const canvas = new OffscreenCanvas(bmp.width, bmp.height);

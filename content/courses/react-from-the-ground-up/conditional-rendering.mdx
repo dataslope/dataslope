@@ -184,7 +184,7 @@ createRoot(document.getElementById("root")!).render(<Notice />);
     {
       id: "hidden_first",
       name: "The message is hidden at first",
-      code: `if (/saved!/i.test(document.body.textContent || "")) {
+      code: `if (/saved!/i.test((document.getElementById("root") || {}).textContent || "")) {
   throw new Error("Before any click, 'Saved!' should not be shown.");
 }`,
     },
@@ -195,7 +195,7 @@ createRoot(document.getElementById("root")!).render(<Notice />);
 if (!btn) throw new Error("Keep the <button>.");
 btn.click();
 await new Promise((r) => setTimeout(r, 80));
-if (!/saved!/i.test(document.body.textContent || "")) {
+if (!/saved!/i.test((document.getElementById("root") || {}).textContent || "")) {
   throw new Error("After one click, 'Saved!' should appear.");
 }
 if (!/hide/i.test(btn.textContent || "")) {
@@ -208,7 +208,7 @@ if (!/hide/i.test(btn.textContent || "")) {
       code: `const btn = document.querySelector("button");
 btn.click();
 await new Promise((r) => setTimeout(r, 80));
-if (/saved!/i.test(document.body.textContent || "")) {
+if (/saved!/i.test((document.getElementById("root") || {}).textContent || "")) {
   throw new Error("A second click should hide the message again.");
 }`,
     },

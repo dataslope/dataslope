@@ -140,7 +140,7 @@ but its API is safe to use everywhere:
 public class Main {
   public static void main(String[] args) {
     BookRepo repo =
-        new BookRepo(List.of(new Book("978-1", "Clean Code", "Martin"),
+        new BookRepo(Arrays.asList(new Book("978-1", "Clean Code", "Martin"),
                              new Book("978-2", "Effective Java", "Bloch"),
                              new Book("978-3", "TAOCP I", "Knuth")));
 
@@ -162,7 +162,39 @@ public class Main {
     },
     {
       filename: "Book.java",
-      starterCode: `public record Book(String isbn, String title, String author) {}
+      starterCode: `import java.util.Objects;
+
+public final class Book {
+  private final String isbn;
+  private final String title;
+  private final String author;
+
+  public Book(String isbn, String title, String author) {
+    this.isbn = isbn;
+    this.title = title;
+    this.author = author;
+  }
+
+  public String isbn() { return isbn; }
+  public String title() { return title; }
+  public String author() { return author; }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Book)) return false;
+    Book other = (Book)o;
+    return Objects.equals(isbn, other.isbn) && Objects.equals(title, other.title) && Objects.equals(author, other.author);
+  }
+
+  @Override
+  public int hashCode() { return Objects.hash(isbn, title, author); }
+
+  @Override
+  public String toString() {
+    return "Book[" + "isbn=" + isbn + ", " + "title=" + title + ", " + "author=" + author + "]";
+  }
+}
 `,
     },
     {
@@ -244,10 +276,11 @@ caller mutation was blocked
       filename: "Main.java",
       starterCode: `import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    List<String> seed = new ArrayList<>(List.of("hello", "world"));
+    List<String> seed = new ArrayList<>(Arrays.asList("hello", "world"));
     Inbox in = new Inbox(seed);
     System.out.println(in.messages());
 
@@ -326,7 +359,7 @@ public class Inbox {
 - \`HashMap<String,?>\`
   > Wrong kind altogether.
 - \`ArrayList<String>\`
-  > Too narrow; rejects \`HashSet\`, \`LinkedList\`, \`List.of(...)\`.
+  > Too narrow; rejects \`HashSet\`, \`LinkedList\`, \`Arrays.asList(...)\`.
 - [o] \`Iterable<String>\` (or \`Collection<String>\` if you also need \`size()\`)
   > Accept the widest interface that satisfies your needs.`}
 />

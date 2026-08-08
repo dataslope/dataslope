@@ -55,10 +55,41 @@ makes sense most of the time:
     {
       filename: "main.java",
       starterCode: `import java.util.Arrays;
+import java.util.Objects;
 
 public class Main {
-  record Version(int major, int minor, int patch)
-      implements Comparable<Version> {
+  static final class Version implements Comparable<Version> {
+    private final int major;
+    private final int minor;
+    private final int patch;
+
+    public Version(int major, int minor, int patch) {
+      this.major = major;
+      this.minor = minor;
+      this.patch = patch;
+    }
+
+    public int major() { return major; }
+    public int minor() { return minor; }
+    public int patch() { return patch; }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof Version)) return false;
+      Version other = (Version)o;
+      return major == other.major && minor == other.minor && patch == other.patch;
+    }
+
+    @Override
+    public int hashCode() { return Objects.hash(major, minor, patch); }
+
+    @Override
+    public String toString() {
+      return "Version[" + "major=" + major + ", " + "minor=" + minor + ", " + "patch=" + patch + "]";
+    }
+
+    @Override
     public int compareTo(Version o) {
       if (this.major != o.major)
         return Integer.compare(this.major, o.major);
@@ -117,11 +148,38 @@ type:
       starterCode: `import java.util.*;
 
 public class Main {
-  record Person(String name, int age) {}
+  static final class Person {
+    private final String name;
+    private final int age;
+
+    public Person(String name, int age) {
+      this.name = name;
+      this.age = age;
+    }
+
+    public String name() { return name; }
+    public int age() { return age; }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof Person)) return false;
+      Person other = (Person)o;
+      return Objects.equals(name, other.name) && age == other.age;
+    }
+
+    @Override
+    public int hashCode() { return Objects.hash(name, age); }
+
+    @Override
+    public String toString() {
+      return "Person[" + "name=" + name + ", " + "age=" + age + "]";
+    }
+  }
 
   public static void main(String[] args) {
     List<Person> ps = new ArrayList<>(
-        List.of(new Person("Ada", 36), new Person("Linus", 54),
+        Arrays.asList(new Person("Ada", 36), new Person("Linus", 54),
                 new Person("Grace", 85), new Person("Bjarne", 73)));
 
     ps.sort(Comparator.comparing(Person::name));
@@ -156,10 +214,40 @@ The real elegance of `Comparator` is composition. You can chain
       starterCode: `import java.util.*;
 
 public class Main {
-  record Employee(String dept, String name, int salary) {}
+  static final class Employee {
+    private final String dept;
+    private final String name;
+    private final int salary;
+
+    public Employee(String dept, String name, int salary) {
+      this.dept = dept;
+      this.name = name;
+      this.salary = salary;
+    }
+
+    public String dept() { return dept; }
+    public String name() { return name; }
+    public int salary() { return salary; }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof Employee)) return false;
+      Employee other = (Employee)o;
+      return Objects.equals(dept, other.dept) && Objects.equals(name, other.name) && salary == other.salary;
+    }
+
+    @Override
+    public int hashCode() { return Objects.hash(dept, name, salary); }
+
+    @Override
+    public String toString() {
+      return "Employee[" + "dept=" + dept + ", " + "name=" + name + ", " + "salary=" + salary + "]";
+    }
+  }
 
   public static void main(String[] args) {
-    List<Employee> es = new ArrayList<>(List.of(
+    List<Employee> es = new ArrayList<>(Arrays.asList(
         new Employee("eng", "Ada", 120), new Employee("eng", "Linus", 150),
         new Employee("sales", "Grace", 90), new Employee("eng", "Brian", 150),
         new Employee("sales", "Edsger", 90)));
@@ -213,7 +301,7 @@ public class Main {
 | Need | Use |
 | --- | --- |
 | Sort an existing `List` in place | `list.sort(cmp)` or `Collections.sort(list, cmp)` |
-| Get a sorted **copy** of any `Collection` | `list.stream().sorted(cmp).toList()` |
+| Get a sorted **copy** of any `Collection` | `list.stream().sorted(cmp).collect(Collectors.toList())` |
 | Sort an array | `Arrays.sort(arr, cmp)` |
 | Keep a continuously sorted view | `TreeSet` / `TreeMap`, or `PriorityQueue` for partial order |
 
@@ -230,7 +318,7 @@ public class Main {
 public class Main {
   public static void main(String[] args) {
     List<User> us = new ArrayList<>(
-        List.of(new User("ada", 36, false), new User("linus", 54, true),
+        Arrays.asList(new User("ada", 36, false), new User("linus", 54, true),
                 new User("grace", 85, true), new User("bjarne", 73, false)));
 
     // active users first, then by age descending, then by name
@@ -242,7 +330,39 @@ public class Main {
     },
     {
       filename: "User.java",
-      starterCode: `public record User(String name, int age, boolean active) {}
+      starterCode: `import java.util.Objects;
+
+public final class User {
+  private final String name;
+  private final int age;
+  private final boolean active;
+
+  public User(String name, int age, boolean active) {
+    this.name = name;
+    this.age = age;
+    this.active = active;
+  }
+
+  public String name() { return name; }
+  public int age() { return age; }
+  public boolean active() { return active; }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof User)) return false;
+    User other = (User)o;
+    return Objects.equals(name, other.name) && age == other.age && active == other.active;
+  }
+
+  @Override
+  public int hashCode() { return Objects.hash(name, age, active); }
+
+  @Override
+  public String toString() {
+    return "User[" + "name=" + name + ", " + "age=" + age + ", " + "active=" + active + "]";
+  }
+}
 `,
     },
     {
@@ -287,10 +407,11 @@ Grace 90
     {
       filename: "Main.java",
       starterCode: `import java.util.List;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
-    List<Player> ps = List.of(new Player("Ada", 80), new Player("Linus", 95),
+    List<Player> ps = Arrays.asList(new Player("Ada", 80), new Player("Linus", 95),
                               new Player("Grace", 90), new Player("Bjarne", 95),
                               new Player("Edsger", 85));
     for (Player p : Leaderboard.top3(ps)) {
@@ -302,7 +423,36 @@ public class Main {
     },
     {
       filename: "Player.java",
-      starterCode: `public record Player(String name, int score) {}
+      starterCode: `import java.util.Objects;
+
+public final class Player {
+  private final String name;
+  private final int score;
+
+  public Player(String name, int score) {
+    this.name = name;
+    this.score = score;
+  }
+
+  public String name() { return name; }
+  public int score() { return score; }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Player)) return false;
+    Player other = (Player)o;
+    return Objects.equals(name, other.name) && score == other.score;
+  }
+
+  @Override
+  public int hashCode() { return Objects.hash(name, score); }
+
+  @Override
+  public String toString() {
+    return "Player[" + "name=" + name + ", " + "score=" + score + "]";
+  }
+}
 `,
     },
     {
@@ -314,7 +464,7 @@ public final class Leaderboard {
 
   public static List<Player> top3(List<Player> players) {
     // TODO: sort by score desc, then name asc, return first 3
-    return List.of();
+    return Collections.emptyList();
   }
 }
 `,

@@ -112,6 +112,7 @@ Declaring \`REFERENCES\` describes the relationship. In SQLite, \`PRAGMA foreign
 </Callout>
 
 <SqlCodeBlock
+  expectError
   dialect="sqlite"
   title="SQLite rejects a bad reference when enforcement is on"
   initSql={`PRAGMA foreign_keys = ON;

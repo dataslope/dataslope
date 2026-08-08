@@ -303,12 +303,8 @@ The big claim of LINQ was that the same query syntax should work
 over *anything that produces a sequence of values*. Watch the same
 shape of query target three different data sources:
 
-<CodeBlock
-  adapter="csharp"
-  files={[
-    {
-      filename: "main.cs",
-      starterCode: `using System;
+```csharp
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Xml.Linq;
@@ -331,6 +327,37 @@ var youngNames = xml.Elements("p").Where(e => (int)e.Attribute("age") < 35).Sele
 Console.WriteLine("XML:     " + string.Join(", ", youngNames));
 
 // 3. LINQ to Objects with grouping (a tiny taste of the rest of the course).
+var ages = new[] { 36, 41, 29, 52, 33, 27 };
+var bucketed = ages.GroupBy(a => a / 10 * 10).OrderBy(g => g.Key).Select(g => $"{g.Key}s: {g.Count()}");
+
+Console.WriteLine("Group:   " + string.Join(" | ", bucketed));
+```
+
+<Callout type="info" title="Not runnable in the browser">
+Section 2 needs `System.Xml.Linq`, which the .NET WebAssembly bundle these
+pages load does not ship, so the block fails to compile as a whole (`CS0234:
+The type or namespace name 'Xml' does not exist in the namespace 'System'`).
+Sections 1 and 3 would run fine on their own, but splitting them out would
+lose the very thing the example is here to show, three sources answering to the
+same operators, so it is shown intact rather than run.
+</Callout>
+
+The two runnable sources, on their own:
+
+<CodeBlock
+  adapter="csharp"
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
+using System.Linq;
+
+// LINQ to Objects, over an in-memory collection.
+var nums = new[] { 1, 2, 3, 4, 5 };
+var doubled = nums.Where(n => n % 2 == 1).Select(n => n * 2);
+Console.WriteLine("Objects: " + string.Join(", ", doubled));
+
+// The same operators, now grouping.
 var ages = new[] { 36, 41, 29, 52, 33, 27 };
 var bucketed = ages.GroupBy(a => a / 10 * 10).OrderBy(g => g.Key).Select(g => $"{g.Key}s: {g.Count()}");
 

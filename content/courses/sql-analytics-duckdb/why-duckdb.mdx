@@ -121,7 +121,9 @@ SELECT
   species,
   island,
   COUNT(*) AS n,
-  ROUND(AVG(body_mass_g), 0) AS avg_mass
+  -- The CSV writes missing values as "NA", so the column infers as text;
+  -- TRY_CAST turns what is numeric into a number and the rest into NULL.
+  ROUND(AVG(TRY_CAST(body_mass_g AS DOUBLE)), 0) AS avg_mass
 FROM
   read_csv_auto(
     'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/palmer-penguins.csv'

@@ -97,13 +97,13 @@ public class Main {
   public static void main(String[] args) {
     Library lib = new Library();
     lib.add(new Track("Clair de Lune", "Debussy", "Suite Bergamasque",
-                      List.of("classical", "impressionist"), 1200));
+                      Arrays.asList("classical", "impressionist"), 1200));
     lib.add(new Track("Gymnopedie No.1", "Satie", "Gymnopedies",
-                      List.of("classical"), 900));
+                      Arrays.asList("classical"), 900));
     lib.add(
-        new Track("Reverie", "Debussy", "Reveries", List.of("classical"), 450));
+        new Track("Reverie", "Debussy", "Reveries", Arrays.asList("classical"), 450));
     lib.add(new Track("Liebestraum", "Liszt", "Liebestraume",
-                      List.of("classical", "romantic"), 700));
+                      Arrays.asList("classical", "romantic"), 700));
 
     System.out.println("Debussy tracks:");
     for (Track t : lib.tracksByArtist("Debussy")) {
@@ -123,9 +123,45 @@ public class Main {
     {
       filename: "Track.java",
       starterCode: `import java.util.List;
+import java.util.Objects;
 
-public record Track(String title, String artist, String album,
-                    List<String> genres, int likes) {}
+public final class Track {
+  private final String title;
+  private final String artist;
+  private final String album;
+  private final List<String> genres;
+  private final int likes;
+
+  public Track(String title, String artist, String album, List<String> genres, int likes) {
+    this.title = title;
+    this.artist = artist;
+    this.album = album;
+    this.genres = genres;
+    this.likes = likes;
+  }
+
+  public String title() { return title; }
+  public String artist() { return artist; }
+  public String album() { return album; }
+  public List<String> genres() { return genres; }
+  public int likes() { return likes; }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Track)) return false;
+    Track other = (Track)o;
+    return Objects.equals(title, other.title) && Objects.equals(artist, other.artist) && Objects.equals(album, other.album) && Objects.equals(genres, other.genres) && likes == other.likes;
+  }
+
+  @Override
+  public int hashCode() { return Objects.hash(title, artist, album, genres, likes); }
+
+  @Override
+  public String toString() {
+    return "Track[" + "title=" + title + ", " + "artist=" + artist + ", " + "album=" + album + ", " + "genres=" + genres + ", " + "likes=" + likes + "]";
+  }
+}
 `,
     },
     {
@@ -150,7 +186,7 @@ public class Library {
 
   public List<Track> tracksByArtist(String artist) {
     return Collections.unmodifiableList(
-        byArtist.getOrDefault(artist, List.of()));
+        byArtist.getOrDefault(artist, Collections.emptyList()));
   }
 
   public Set<String> allGenres() { return Collections.unmodifiableSet(genres); }
@@ -219,11 +255,90 @@ constructor.
       filename: "main.java",
       starterCode: `import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Main {
-  record CustomerId(String value) {}
-  record OrderId(String value) {}
-  record Order(OrderId id, CustomerId customer, int cents) {}
+  static final class CustomerId {
+    private final String value;
+
+    public CustomerId(String value) {
+      this.value = value;
+    }
+
+    public String value() { return value; }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof CustomerId)) return false;
+      CustomerId other = (CustomerId)o;
+      return Objects.equals(value, other.value);
+    }
+
+    @Override
+    public int hashCode() { return Objects.hash(value); }
+
+    @Override
+    public String toString() {
+      return "CustomerId[" + "value=" + value + "]";
+    }
+  }
+  static final class OrderId {
+    private final String value;
+
+    public OrderId(String value) {
+      this.value = value;
+    }
+
+    public String value() { return value; }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof OrderId)) return false;
+      OrderId other = (OrderId)o;
+      return Objects.equals(value, other.value);
+    }
+
+    @Override
+    public int hashCode() { return Objects.hash(value); }
+
+    @Override
+    public String toString() {
+      return "OrderId[" + "value=" + value + "]";
+    }
+  }
+  static final class Order {
+    private final OrderId id;
+    private final CustomerId customer;
+    private final int cents;
+
+    public Order(OrderId id, CustomerId customer, int cents) {
+      this.id = id;
+      this.customer = customer;
+      this.cents = cents;
+    }
+
+    public OrderId id() { return id; }
+    public CustomerId customer() { return customer; }
+    public int cents() { return cents; }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof Order)) return false;
+      Order other = (Order)o;
+      return Objects.equals(id, other.id) && Objects.equals(customer, other.customer) && cents == other.cents;
+    }
+
+    @Override
+    public int hashCode() { return Objects.hash(id, customer, cents); }
+
+    @Override
+    public String toString() {
+      return "Order[" + "id=" + id + ", " + "customer=" + customer + ", " + "cents=" + cents + "]";
+    }
+  }
 
   public static void main(String[] args) {
     Map<OrderId, Order> orders = new HashMap<>();
@@ -266,7 +381,7 @@ carol: [Order[id=4, customerId=carol, total=200]]
 public class Main {
   public static void main(String[] args) {
     List<Order> orders =
-        List.of(new Order(1, "alice", 100), new Order(2, "bob", 40),
+        Arrays.asList(new Order(1, "alice", 100), new Order(2, "bob", 40),
                 new Order(3, "alice", 70), new Order(4, "carol", 200));
     Map<String, List<Order>> idx = new TreeMap<>(OrderIndex.byCustomer(orders));
     idx.forEach((k, v) -> System.out.println(k + ": " + v));
@@ -276,7 +391,39 @@ public class Main {
     },
     {
       filename: "Order.java",
-      starterCode: `public record Order(int id, String customerId, int total) {}
+      starterCode: `import java.util.Objects;
+
+public final class Order {
+  private final int id;
+  private final String customerId;
+  private final int total;
+
+  public Order(int id, String customerId, int total) {
+    this.id = id;
+    this.customerId = customerId;
+    this.total = total;
+  }
+
+  public int id() { return id; }
+  public String customerId() { return customerId; }
+  public int total() { return total; }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Order)) return false;
+    Order other = (Order)o;
+    return id == other.id && Objects.equals(customerId, other.customerId) && total == other.total;
+  }
+
+  @Override
+  public int hashCode() { return Objects.hash(id, customerId, total); }
+
+  @Override
+  public String toString() {
+    return "Order[" + "id=" + id + ", " + "customerId=" + customerId + ", " + "total=" + total + "]";
+  }
+}
 `,
     },
     {

@@ -230,13 +230,19 @@ arguments you pass.
       filename: "main.cs",
       starterCode: `using System;
 
-int Add(int a, int b) => a + b;
-double Add(double a, double b) => a + b;
-string Add(string a, string b) => a + b;
+Console.WriteLine(Maths.Add(2, 3));
+Console.WriteLine(Maths.Add(1.5, 2.5));
+Console.WriteLine(Maths.Add("hello, ", "world"));
 
-Console.WriteLine(Add(2, 3));
-Console.WriteLine(Add(1.5, 2.5));
-Console.WriteLine(Add("hello, ", "world"));
+// Overloads have to live on a type. Top-level statements compile to
+// *local* functions, and C# does not allow two local functions to share
+// a name, so this is the shape overloading actually takes.
+public static class Maths
+{
+    public static int Add(int a, int b) => a + b;
+    public static double Add(double a, double b) => a + b;
+    public static string Add(string a, string b) => a + b;
+}
 `,
     },
   ]}

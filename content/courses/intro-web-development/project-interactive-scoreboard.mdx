@@ -209,6 +209,7 @@ document.querySelector("#reset").addEventListener("click", function () {
       id: "home",
       name: "+1 Home raises the home score",
       code: `document.querySelector("#add-home").click();
+await new Promise((r) => setTimeout(r, 80));
 document.querySelector("#add-home").click();
 await new Promise((r) => setTimeout(r, 30));
 const text = (document.querySelector("#score-home").textContent || "").trim();

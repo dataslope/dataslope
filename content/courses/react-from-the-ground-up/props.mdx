@@ -268,7 +268,7 @@ for (const expected of ["AL", "GH"]) {
     {
       id: "names",
       name: "Each avatar shows its name",
-      code: `const text = document.body.textContent || "";
+      code: `const text = (document.getElementById("root") || {}).textContent || "";
 for (const name of ["Ada Lovelace", "Grace Hopper"]) {
   if (!text.includes(name)) throw new Error("Missing name: '" + name + "'.");
 }`,

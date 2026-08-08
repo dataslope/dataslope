@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { discoverPages } from "./_discoverPages";
+import { pagesForAdapters, requestedAdapters } from "./_adapterFilter";
 
 // Drives every <ChallengeCard> on every /fumadocs-dev/challenge-cards-<lang>
 // page, loads its reference solution into the editor buffers, clicks
@@ -70,15 +70,22 @@ const DEMO_PAGES: { path: string; label: string }[] = [
   { path: "/fumadocs-dev/sql-challenge-cards-postgres", label: "PostgreSQL" },
 ];
 
+// `ADAPTERS=java,csharp,…` narrows both the page list and the cards driven on
+// each page to those languages (see _adapterFilter.ts).
+const ADAPTERS = requestedAdapters();
+
 const CHALLENGE_PAGES: { path: string; label: string }[] = process.env
   .COURSEWARE
-  ? discoverPages(["<ChallengeCard", "<SqlChallengeCard"]).map((p) => ({
+  ? pagesForAdapters(["<ChallengeCard", "<SqlChallengeCard"], ADAPTERS).map((p) => ({
       path: p.route,
       label: p.route,
     }))
   : DEMO_PAGES;
 
-async function readCardsOnPage(page: Page): Promise<
+async function readCardsOnPage(
+  page: Page,
+  adapters: string[] | null,
+): Promise<
   {
     key: string;
     adapterId: string;
@@ -86,7 +93,7 @@ async function readCardsOnPage(page: Page): Promise<
     solutionFiles: SolutionFilePayload[];
   }[]
 > {
-  return await page.evaluate(() => {
+  const all = await page.evaluate(() => {
     const out: {
       key: string;
       adapterId: string;
@@ -117,6 +124,8 @@ async function readCardsOnPage(page: Page): Promise<
     });
     return out;
   });
+  if (adapters === null) return all;
+  return all.filter((c) => adapters.includes(c.adapterId));
 }
 
 async function waitForChallengeHandle(
@@ -144,6 +153,27 @@ async function runOneCard(
   },
 ): Promise<{ ok: boolean; detail: string }> {
   await waitForChallengeHandle(page, card.key, 60_000);
+
+  // The `web` and `react` cards grade a live preview: their tests query the
+  // rendered DOM inside a sandboxed iframe, measure geometry and dispatch
+  // clicks. An iframe that is off-screen has no useful layout, and the tests
+  // then fail on the *harness*, not the solution — `repeat(4, 1fr)` reported
+  // as resolving to two columns, a padded link measured 0 px tall, three
+  // clicks landing as two. Everything is driven programmatically through
+  // `window.__dsChallenges` so nothing else here needs the card visible;
+  // this scroll is what makes the preview measurable.
+  const cardRoot = page
+    .locator(
+      `[data-challenge-title="${card.title.replace(/"/g, '\\"')}"][data-adapter-id="${card.adapterId}"]`,
+    )
+    .first();
+  // The preview slot, not the card's top edge: a card is tall enough that its
+  // heading can be on screen while the iframe underneath is still below the
+  // fold, and a document that is not being presented does not get laid out.
+  const preview = cardRoot.locator('[data-testid="web-preview"]').first();
+  await ((await preview.count()) > 0 ? preview : cardRoot)
+    .scrollIntoViewIfNeeded()
+    .catch(() => {});
 
   // Stage every file's solution into the card's buffers.
   const staged = await page.evaluate(
@@ -220,8 +250,18 @@ test.describe("Challenge solutions", () => {
         { timeout: 60_000 },
       );
 
-      const cards = await readCardsOnPage(page);
-      expect(cards.length, "page should contain at least one challenge card").toBeGreaterThan(0);
+      const cards = await readCardsOnPage(page, ADAPTERS);
+      // With no adapter filter, a page reached through `<ChallengeCard` must
+      // have cards. With one, it may legitimately have none: the page was
+      // selected because the language appears *somewhere* in its MDX, which
+      // can be on a `<CodeBlock>` alone. Reported rather than asserted, and
+      // reconciled against the extractor's totals by check-browser-blocks.mjs
+      // so a filter that silently matches nothing cannot pass for coverage.
+      if (ADAPTERS === null) {
+        expect(cards.length, "page should contain at least one challenge card").toBeGreaterThan(0);
+      }
+      console.log(`SWEEP ${JSON.stringify({ route: pagePath, kind: "card", ran: cards.length })}`);
+      if (cards.length === 0) return;
 
       const failures: { key: string; detail: string }[] = [];
       for (const card of cards) {

@@ -399,7 +399,10 @@ function createOrder(orderId: string, total: number): Order | null {
   if (total <= 0 || orderId.trim() === "") {
     return null;
   }
-  return { orderId, total, __brand: OrderBrand } as any;
+  // The brand lives only in the type system: \`declare const\` emits no
+  // JavaScript, so naming OrderBrand here would be a ReferenceError at run
+  // time. The cast is where you assert the value has been validated.
+  return { orderId, total } as unknown as Order;
 }
 
 function calculateTax(order: Order): number {

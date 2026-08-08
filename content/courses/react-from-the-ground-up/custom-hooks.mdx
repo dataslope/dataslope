@@ -247,7 +247,9 @@ if (!/count:\\s*0/i.test(h1?.textContent || "")) {
       name: "The hook's increment counts up",
       code: `const button = document.querySelector("button");
 button.click();
+await new Promise((r) => setTimeout(r, 80));
 button.click();
+await new Promise((r) => setTimeout(r, 80));
 button.click();
 await new Promise((r) => setTimeout(r, 80));
 const h1 = document.querySelector("h1");

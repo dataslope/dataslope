@@ -99,3 +99,4 @@ generated-illustrations*/
 
 # Datasets cached by scripts/check-code-blocks.mjs
 /.dataset-cache/
+.browsercc-cache/
