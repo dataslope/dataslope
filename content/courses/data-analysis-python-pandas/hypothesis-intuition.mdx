@@ -37,6 +37,11 @@ flowchart TD
 
 The whole craft is in answering that "?".
 
+Noise alone produces runs, dips and what look like trends, which is why
+"the line went up" is not evidence of anything on its own:
+
+<Chart slug="noise-looks-like-a-trend" />
+
 ## Exploratory feel, same dataset, different samples
 
 <CodeBlock
@@ -67,6 +72,8 @@ two groups come from the exact same underlying process.
 **Lesson:** small differences in means happen all the time
 without any "real" effect.
 
+<Chart slug="one-population-many-samples" />
+
 ## The null hypothesis idea
 
 A common framing:
@@ -80,6 +87,12 @@ You compute *how surprising* the observed difference would be
 **if H₀ were true**. If it's very surprising, you reject H₀.
 
 That "surprise" measure is the **p-value**.
+
+The null hypothesis is not a claim about your data; it is a claim about the
+distribution your data was drawn from, and the thing it predicts is how much
+a statistic bounces around from sample to sample:
+
+<Chart slug="sampling-distribution-build" />
 
 ## What a p-value really means
 
@@ -141,6 +154,12 @@ The exact mechanics of `ttest_ind` are less important than the
 **workflow**: state your hypothesis, collect data, compute a
 test, decide based on the p-value plus your domain knowledge.
 
+The statistic itself is one ratio: the gap between the groups over how much
+that gap would wobble from sampling alone. Which is why the same difference
+can be convincing or worthless depending on the other two ingredients:
+
+<Chart slug="t-test-two-groups" />
+
 ## Sample size matters
 
 <CodeBlock
@@ -167,6 +186,12 @@ A real-but-tiny difference of 0.5 looks like nothing at small
 sample sizes and becomes statistically significant with enough
 data. **Significance is not the same as importance.**
 
+Precision improves with the square root of n, so the returns fall away fast:
+quadrupling the sample halves the error bar, and the fifth thousand rows buy
+almost nothing the first thousand did not.
+
+<Chart slug="standard-error-vs-n" />
+
 ## Practical analyst checklist
 
 Before you celebrate or panic about a difference, ask:
@@ -191,6 +216,11 @@ Mitigation: think hard about what *else* could explain the
 pattern; control for it (slice your data by it; include it as a
 covariate; use stratified sampling).
 
+A confounder can reverse a result rather than merely blur it. Every group
+here trends one way and the pooled data trends the other:
+
+<Chart slug="simpsons-paradox" />
+
 ## Be very skeptical of:
 
 - Tiny samples ("I asked 4 friends...")
@@ -201,6 +231,12 @@ covariate; use stratified sampling).
   effect size may be tiny)
 - Comparisons across naturally different populations without
   controlling for differences
+
+The second item on that list deserves its own picture. Test enough things at
+p < 0.05 and a significant result stops being surprising, because that is
+precisely what 5% means:
+
+<Chart slug="multiple-comparisons" />
 
 ## Mini reasoning challenge
 
