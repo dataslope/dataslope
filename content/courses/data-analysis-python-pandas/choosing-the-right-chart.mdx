@@ -44,6 +44,15 @@ Best for: comparing a numeric metric across distinct categories.
 - Compare too many categories, top-N + "Other" is often
   better.
 
+Both of those rules, drawn. Alphabetical order hides the ranking a bar chart
+exists to show, and a truncated baseline turns a 4% gap into a landslide:
+
+<Chart slug="sorted-bars" />
+
+<Chart slug="bar-truncation" />
+
+<Chart slug="bar-truncation-cropped" />
+
 ### Histograms
 Best for: showing the distribution of a single numeric column.
 
@@ -56,6 +65,11 @@ Best for: showing the distribution of a single numeric column.
 - Confuse histograms with bar charts. Histogram x-axis is
   continuous; bar chart x-axis is categorical.
 
+The bin count is not a detail of the rendering, it is the analysis. The same
+numbers give one hump, two humps or noise depending on it:
+
+<Chart slug="histogram-bin-width" />
+
 ### Box plots
 Best for: comparing distributions across several groups.
 
@@ -66,6 +80,11 @@ Best for: comparing distributions across several groups.
 **Don't:**
 - Use box plots for fewer than ~10 points per group.
 
+Why boxes alone mislead: four groups with identical five-number summaries
+and four completely different shapes.
+
+<Chart slug="box-hides-shape" />
+
 ### Scatter plots
 Best for: relationships between two numeric variables.
 
@@ -75,6 +94,17 @@ Best for: relationships between two numeric variables.
 
 **Don't:**
 - Read causation from a scatter, only correlation.
+
+Transparency first, because a dense scatter drawn opaque is a silhouette
+rather than a distribution:
+
+<Chart slug="overplotting-alpha" />
+
+And the reason the trend line is a "do" with a caveat: four datasets with the
+same mean, variance, correlation and regression line, and nothing else in
+common.
+
+<Chart slug="anscombes-quartet" />
 
 ### Line charts
 Best for: change over time, with continuous x-axis.
@@ -87,6 +117,12 @@ Best for: change over time, with continuous x-axis.
 **Don't:**
 - Use lines for categorical x-axes (use bars).
 
+The categorical rule is the one worth seeing, because the mistake looks fine:
+a line asserts the value existed between the points, which months support and
+browsers do not.
+
+<Chart slug="line-implies-continuity" />
+
 ### Pie and donut charts
 Best for: almost nothing. Bar charts almost always do the job
 better.
@@ -94,6 +130,11 @@ better.
 **If you must:**
 - Use only 2–3 slices.
 - Show percentages.
+
+The case against, in one figure. The same six shares are guesswork as angles
+and a ranking as bars:
+
+<Chart slug="pie-vs-bar" />
 
 ## Bad choices and their consequences
 
