@@ -460,6 +460,11 @@ assert abs(d.sf(cutoff) - 0.05) < 1e-6`,
   ]}
 />
 
+Standardizing moves and rescales a distribution. It does not reshape one,
+which is the part people quietly assume away:
+
+<Chart slug="z-score-standardization" />
+
 ## When the data is NOT normal
 
 The normal is a fantastic *default* and a terrible *assumption*. Vast

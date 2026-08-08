@@ -129,6 +129,11 @@ questions.
 
 ## How does "fast lookup" actually work?
 
+The three strategies grow differently, and the gap only opens at a size no
+test ever uses:
+
+<Chart slug="collection-lookup-growth" />
+
 Both `HashSet` and `HashMap` use **hashing**. When you add an
 element (or key), Java calls its `hashCode()` method to compute a
 number, then uses that number to pick a bucket. Looking the

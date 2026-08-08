@@ -10,7 +10,7 @@
   "main": ".open-next/worker.js",
   "name": "dataslope",
   "compatibility_date": "2025-05-19",
-  // `nodejs_compat` is required by OpenNext (Fumadocs/Orama search and the
+  // `nodejs_compat` is required by OpenNext (Next.js internals and the
   // build-time node:fs reads expect Node APIs). `global_fetch_strictly_public`
   // makes the worker's own fetch() calls go out over the public internet
   // rather than looping back into the worker, the OpenNext-recommended flag.
@@ -67,6 +67,25 @@
       "database_name": "dataslope-illustrations",
       "database_id": "0ab9f248-58dc-4e0a-a17e-f41badf9f6c0",
       "migrations_dir": "migrations-illustrations"
+    },
+    // Full-text search index for the lessons, read by /api/search. Its own
+    // database on purpose, and not merged into either of the two above: it is
+    // the only one holding an FTS5 *virtual table*, and `wrangler d1 export`
+    // refuses to export any database that contains one (a failed attempt has
+    // been reported to wedge the database entirely, cloudflare/workers-sdk#9519).
+    // Every row here is derived from content/ and re-seeded on each deploy, so
+    // that limitation costs nothing; extending it to the auth or illustration
+    // data, which cannot be rebuilt from source, would not be acceptable.
+    //
+    // Schema in migrations-search/, applied with `npm run db:migrate:search
+    // [:remote]`; rows loaded with `npm run db:seed:search[:remote]` from the
+    // SQL that `scripts/build-search-sql.mjs` writes at build time.
+    // Created once with: `npx wrangler d1 create dataslope-search`.
+    {
+      "binding": "SEARCH_DB",
+      "database_name": "dataslope-search",
+      "database_id": "ce381a06-35af-4279-ab9e-f33013751c95",
+      "migrations_dir": "migrations-search"
     }
   ],
   // Non-secret auth config. The OAuth client secrets and BETTER_AUTH_SECRET are

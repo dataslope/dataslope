@@ -35,6 +35,7 @@ import {
   approveRegenMark as approveMark,
   listRegenMarks as listMarks,
   readMark as readOneMark,
+  requestDeletion as requestDelete,
   upsertRegenMark as upsertMark,
 } from "@/lib/review/marks";
 
@@ -68,4 +69,14 @@ export function approveRegenMark(
   input: { promptId: string; approvedBy?: string | null },
 ) {
   return approveMark(db, QUEUE, input);
+}
+
+/** Ask for this chart to be deleted from the repository, or withdraw the ask.
+ *  The gallery records the decision; the deletion itself is a commit, made by
+ *  whoever reads the queue back (see migrations-illustrations/0004_…). */
+export function requestDeletion(
+  db: D1Database,
+  input: { promptId: string; requested: boolean; reason: string; requestedBy?: string | null },
+) {
+  return requestDelete(db, QUEUE, input);
 }

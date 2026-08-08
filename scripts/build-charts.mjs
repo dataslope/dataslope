@@ -248,6 +248,88 @@ function stringifiedFunctions(svg) {
   return [...svg.matchAll(/([a-zA-Z-]+)="[^"]*=>[^"]*"/g)].map((m) => m[1]);
 }
 
+/**
+ * Count `<text>` elements that rendered with nothing in them.
+ *
+ * Almost always a tick whose label was thrown away. On a `type: "log"` scale
+ * d3 formats only the values it considers nice for the base, and returns an
+ * empty string for the rest — *including* values handed to it explicitly
+ * through `ticks`, and regardless of any `tickFormat` the spec supplies. So
+ * `ticks: [1, 16, 256, 4096, 65536]` on a base-10 log axis draws five ticks
+ * and labels two, with no warning from Plot and nothing wrong-looking in the
+ * spec. The fix is `base: 2` when the ticks are powers of two, or ticks that
+ * are powers of ten when they are not.
+ *
+ * A spec never has a reason to draw an empty string, so the check needs no
+ * exceptions: any empty text element is a label that went missing.
+ */
+function emptyLabels(svg) {
+  return [...svg.matchAll(/<text\b[^>]*>(?:<tspan\b[^>]*>\s*<\/tspan>)*<\/text>/g)].length;
+}
+
+/**
+ * The narrowest width this chart can be drawn at before its smallest label
+ * stops being readable.
+ *
+ * An inlined chart is responsive the cheap way: `width: 100%` on an SVG with a
+ * viewBox scales the whole drawing, type included. That is fine down to a
+ * point and then it is not. A 680px chart in a 358px phone column renders at
+ * 0.53x, which turns a 13px axis tick into 6.9px and a 9px annotation into
+ * 4.8px — present, and unreadable. The page never overflows and the chart
+ * looks fine in a screenshot, so nothing about it announces itself as broken.
+ *
+ * A single global floor would be wrong, because how far a chart can shrink
+ * depends on what it drew: a spec whose smallest type is a 13px tick has far
+ * more room than one carrying 9px annotations inside a facet grid. The build
+ * already has the answer in the markup, so it computes the floor per chart
+ * and the stylesheet enforces it, and specs stay unaware of any of it.
+ *
+ * Below `MIN_LEGIBLE_PX` the chart stops scaling and its container scrolls
+ * instead, which is the same bargain a wide table makes.
+ */
+/**
+ * The smallest type a spec may author.
+ *
+ * Not a style preference: it is the input to the floor below. A chart is one
+ * fixed drawing scaled to whatever column it lands in, so its smallest label
+ * decides how far it can shrink, and a single 9px annotation drags the whole
+ * chart's floor up by 65px of forced horizontal scrolling on a phone. 10px is
+ * where the library already sits (224 of 250 specs bottom out there), so
+ * holding the line costs nothing and keeps one chart's stray small label from
+ * making that chart worse than its neighbours for no benefit anyone chose.
+ *
+ * A spec whose *subject* is unreadably small type exports `smallTypeAllowed`
+ * with a reason, the same escape hatch `literalColorsAllowed` offers when the
+ * colours are the data.
+ */
+const MIN_AUTHORED_PX = 10;
+
+function undersizedType(svg) {
+  return [...svg.matchAll(/font-size[=:]\s*"?([0-9.]+)/g)]
+    .map((m) => Number(m[1]))
+    .filter((n) => n < MIN_AUTHORED_PX);
+}
+
+const MIN_LEGIBLE_PX = 8.5;
+
+/** Below this the floor is not worth publishing: the chart already fits the
+ *  narrowest phone column with room to spare. */
+const IGNORE_BELOW_PX = 340;
+
+function legibleMinWidth(svg, width) {
+  const sizes = [...svg.matchAll(/font-size[=:]\s*"?([0-9.]+)/g)].map((m) =>
+    Number(m[1]),
+  );
+  if (sizes.length === 0) return 0;
+  const smallest = Math.min(...sizes);
+  // Scaling the SVG scales its type by the same factor, so a label of
+  // `smallest` px renders at `smallest * (w / width)`. Solve that for the w
+  // where it reaches the floor. Never ask for more than the chart's own
+  // width: at 1x every label is already the size the spec chose.
+  const floor = Math.min(width, Math.ceil((width * MIN_LEGIBLE_PX) / smallest));
+  return floor <= IGNORE_BELOW_PX ? 0 : floor;
+}
+
 const files = existsSync(CHARTS_DIR)
   ? readdirSync(CHARTS_DIR).filter((f) => f.endsWith(".mjs")).sort()
   : [];
@@ -302,6 +384,25 @@ for (const file of specs) {
     continue;
   }
 
+  if (mod.smallTypeAllowed && typeof mod.smallTypeAllowed !== "string") {
+    problems.push(
+      `${file}: smallTypeAllowed must be a string explaining why this chart's ` +
+        "type has to be smaller than the floor",
+    );
+    continue;
+  }
+  const tiny = mod.smallTypeAllowed ? [] : undersizedType(svg);
+  if (tiny.length > 0) {
+    problems.push(
+      `${file}: type below ${MIN_AUTHORED_PX}px (${[...new Set(tiny)].sort((a, b) => a - b).join(", ")}) — ` +
+        "a chart is one drawing scaled to its column, so its smallest label " +
+        "sets how far it can shrink before the whole thing has to scroll on a " +
+        "phone (or export smallTypeAllowed with a reason, which is only right " +
+        "when the unreadable type is the subject)",
+    );
+    continue;
+  }
+
   const leaked = stringifiedFunctions(svg);
   if (leaked.length > 0) {
     problems.push(
@@ -312,11 +413,28 @@ for (const file of specs) {
     continue;
   }
 
+  const blank = emptyLabels(svg);
+  if (blank > 0) {
+    problems.push(
+      `${file}: ${blank} empty text element(s) — almost always a tick label ` +
+        "d3 declined to format. A log scale only labels the values that are " +
+        "nice for its base, whatever `ticks` and `tickFormat` say, so give the " +
+        "scale `base: 2` for powers of two or use powers of ten",
+    );
+    continue;
+  }
+
+  const width = Number(el.getAttribute("width"));
+  const minWidth = legibleMinWidth(svg, width);
+
   charts[slug] = {
     title: mod.title,
     ...(mod.caption ? { caption: mod.caption } : {}),
-    width: Number(el.getAttribute("width")),
+    width,
     height: Number(el.getAttribute("height")),
+    // Omitted when the chart can shrink to any width without a label falling
+    // under the legibility floor, so the common case costs nothing.
+    ...(minWidth ? { minWidth } : {}),
     usedBy: usages[slug] ?? [],
     svg,
   };

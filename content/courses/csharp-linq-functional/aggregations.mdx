@@ -201,6 +201,12 @@ small in-memory collections the difference is negligible.
 
 ## `Aggregate` is not always the best choice
 
+It is also worth knowing what the friendly built-ins hide. `Average` is a
+single number that a skewed distribution moves a long way from the
+typical value:
+
+<Chart slug="skew-mean-median-mode" />
+
 Built-in operators are usually clearer and equally fast:
 
 ```csharp

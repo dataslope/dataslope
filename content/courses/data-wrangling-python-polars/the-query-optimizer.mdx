@@ -59,6 +59,8 @@ reaches the scan is applied while parsing, so rejected rows are never
 built into a frame. With Parquet it goes further: row groups whose
 statistics prove no row can match are skipped without decompression.
 
+<Chart slug="predicate-pushdown-rows" />
+
 ### Slice pushdown
 
 `head(10)` at the end of a chain becomes "stop reading after enough

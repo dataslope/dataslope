@@ -20,6 +20,11 @@ shapes.
 
 ## When a heatmap is right
 
+Support volume by weekday and hour, which is the shape a heatmap exists
+to show:
+
+<Chart slug="calendar-heatmap" />
+
 Use a heatmap when:
 
 - You have a **2-D table** of values: rows × columns of numbers.
@@ -164,6 +169,12 @@ This is the single most important decision when making a heatmap.
   where there aren't any. `Viridis` is its modern replacement.
 
 ## Pitfalls of heatmaps
+
+There is a fifth pitfall that outranks all of these, and it is the row
+order. A matrix has no natural sequence unless the labels are a time or a
+size, so the default order hands the reader an accident:
+
+<Chart slug="heatmap-row-ordering" />
 
 - **Too many cells** (1000×1000) make individual cells invisible.
   Either aggregate or switch to a density-based representation.

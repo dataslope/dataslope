@@ -8,7 +8,7 @@
  * re-encodes a source whose content hash changed, so deploys serve the
  * committed outputs with no rebuild. This `.d.ts` still gives the `.js` an
  * explicit type for typecheck/lint (same approach as `brand-fallbacks.d.ts` /
- * `search-index.d.ts`).
+ * `created-at.d.ts`).
  *
  * Keys are image slugs (the source filename without extension, e.g. `panda`);
  * values carry the source content hash (used for incremental re-encoding), the

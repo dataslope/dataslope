@@ -77,6 +77,12 @@ to identify new rows (a timestamp/id via `is_incremental()`), correct
 handling of late-arriving/updated rows, and an occasional **full
 refresh** to repair drift.
 
+Both halves of that answer are in one picture: the saving grows with every
+day the pipeline has run, and the scheduled full refresh is part of the
+design rather than an admission of failure.
+
+<Chart slug="incremental-vs-full-refresh" />
+
 ### How does an incremental model actually filter new rows?
 
 The `is_incremental()` macro returns `true` only when the model already exists in the warehouse and the run is not a full refresh. You use it in a `WHERE` clause to limit rows to those newer than the max value already loaded.
@@ -392,6 +398,12 @@ flowchart TD
   stg2 --> dim["dim_customer"]
   dim --> fct
 ```
+
+The graph is what turns "what does this change break?" into a selector.
+How much it selects depends entirely on which layer the change lands in,
+which is the real argument for the staging/intermediate/mart split:
+
+<Chart slug="dbt-blast-radius" />
 
 ### How do you handle environment-specific schemas in dbt?
 

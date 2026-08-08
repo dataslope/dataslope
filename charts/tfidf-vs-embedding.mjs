@@ -155,7 +155,7 @@ export function render() {
         y: 58,
         text: () => "(illustrative)",
         fill: MUTED,
-        fontSize: 9.5,
+        fontSize: 10,
         textAnchor: "middle",
       }),
 

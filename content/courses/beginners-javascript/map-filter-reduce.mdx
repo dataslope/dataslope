@@ -287,7 +287,11 @@ transformations before writing code.
 
 ## Performance notes (lightly)
 
-Methods chained one after another walk the array multiple times.
+Methods chained one after another walk the array multiple times,
+and each one allocates a new array on the way through.
+
+<Chart slug="chain-vs-single-pass" />
+
 For small data this is fine; for arrays of millions of elements
 you might prefer a single hand-written loop or a streaming
 approach. For everyday programming, *prefer the readable version*,

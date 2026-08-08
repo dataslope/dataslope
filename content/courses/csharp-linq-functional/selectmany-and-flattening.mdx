@@ -107,6 +107,11 @@ different operator, different shape of result.
 
 ## Keeping the parent context
 
+Flattening multiplies rows, which is fine until something downstream sums
+a value from the parent side:
+
+<Chart slug="join-fanout-rows" />
+
 A subtle and common case: you want to flatten, *but you also want to
 know which parent each child came from*. `SelectMany` has a two-arg
 overload for exactly this.

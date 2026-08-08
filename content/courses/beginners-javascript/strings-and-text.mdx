@@ -272,6 +272,11 @@ emoji is encoded as a pair of code units. For accurate
 human-character counts in the presence of emoji, use
 `Array.from(s).length` or a Unicode-aware library.
 
+There are really four different answers to "how long is this string?",
+and they agree only on plain ASCII:
+
+<Chart slug="unicode-length-mismatch" />
+
 <CodeBlock
   adapter="javascript"
   files={[

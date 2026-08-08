@@ -10,7 +10,7 @@
  * width/height so `<Image>` can reserve layout space (no CLS) without shipping
  * the raw file.
  *
- * Unlike the repo's other generated-asset scripts (search-index,
+ * Unlike the repo's other generated-asset scripts (search-corpus,
  * brand-fallbacks, cheap text passes that fully regenerate every build), image
  * encoding is expensive, so this script is *incremental and its outputs are
  * committed*:

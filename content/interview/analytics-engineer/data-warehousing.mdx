@@ -43,6 +43,11 @@ better (dictionary, run-length). Row stores (OLTP databases) win when you read
 whole rows one at a time; column stores win for aggregations over billions of
 rows.
 
+The saving is a ratio of columns touched to columns stored, so it grows
+with the width of the table:
+
+<Chart slug="columnar-vs-row-io" />
+
 ### Why does `SELECT *` cost more in a columnar warehouse?
 
 Because scan cost scales with **columns read**. On a 200-column table, selecting
@@ -83,6 +88,13 @@ PARTITION BY DATE(event_ts) AS
 SELECT * FROM raw.events;
 -- A query filtering event_ts now prunes to the relevant day partitions.
 ```
+
+Because billing follows bytes scanned, pruning is the difference between a
+flat cost and a cost proportional to the window asked for. It is also why
+"partition everything" is the wrong lesson: the two designs converge on the
+query that genuinely reads all of history.
+
+<Chart slug="partition-pruning-scan" />
 
 ### What is clustering, and how does it differ from partitioning?
 

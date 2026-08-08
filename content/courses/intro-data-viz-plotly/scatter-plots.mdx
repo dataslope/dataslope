@@ -26,6 +26,11 @@ If you forget every other chart, remember the scatter plot.
 - You'll later add a **third or fourth variable** through color or
   size (which makes it a *bubble chart*, its own page later).
 
+What each strength of relationship actually looks like, since the number is
+far less intuitive than people expect:
+
+<Chart slug="correlation-scatters" />
+
 ## The minimum
 
 We'll use the **Palmer Penguins** dataset, 344 Antarctic penguins
@@ -169,6 +174,12 @@ Trendlines turn a noisy cloud into a clear *direction*. Use them
 when the question is "is there a relationship?" and the cloud is
 busy.
 
+The catch is that `"ols"` always succeeds, including when a straight
+line is the wrong shape. The check is whether the misses form a
+pattern:
+
+<Chart slug="trendline-wrong-shape" />
+
 ## Overplotting: when there are too many points
 
 Opacity is the cheapest fix and usually the only one you need. Same points,
@@ -222,6 +233,10 @@ For really dense data, switch to a **density heatmap** (which we'll
 meet in its own chapter), where the chart shows *how many points*
 are in each region of the plane.
 
+A trend line is a summary, and it hides as much as any other summary:
+
+<Chart slug="anscombes-quartet" />
+
 ## A typical scatter-plot mistake
 
 Drawing a scatter plot with one *categorical* axis is usually not
@@ -229,6 +244,12 @@ what you want, it produces tall stacks of dots above each category
 label. Use a **strip plot** (`px.strip`), **violin plot**
 (`px.violin`), or **box plot** (`px.box`) instead, we'll cover
 boxes next.
+
+The other one is quieter and harder to undo: plotting a
+`groupby().mean()` and then reading it as if it described
+individuals.
+
+<Chart slug="scatter-mistake-aggregate" />
 
 ## Practice
 

@@ -66,6 +66,12 @@ Hashing turns an arbitrary object into an `int` "fingerprint." A
 the bucket where the element should live, instead of scanning all
 buckets.
 
+Collisions are also why the map resizes long before it is full. The
+average chain a lookup walks is the load factor itself, and 0.75 is where
+`HashMap` decides the memory saved by waiting stops being worth the tail:
+
+<Chart slug="hashmap-load-factor" />
+
 A lookup for `new Customer("ada@…")` flows through these stages:
 
 1. `hashCode()` returns the fingerprint, say `8132917`.

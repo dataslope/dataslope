@@ -226,6 +226,11 @@ For large `n` the difference between dividing by `n` and `n−1` is tiny
 (1000 vs 999 barely moves the answer). It matters most for small
 samples, exactly when you're most at risk of underestimating spread.
 
+Measured rather than argued: 4,000 samples at each size, both divisors on
+every one, averaged against the truth.
+
+<Chart slug="bessel-correction" />
+
 ## IQR: the robust spread
 
 Just as the median is a robust center, the **interquartile range

@@ -40,6 +40,12 @@ three different problems.
 
 ## The three languages, one page
 
+One more thing about that round trip: a page is not one request but a
+chain of them, and the later ones cannot start until the earlier ones
+finish.
+
+<Chart slug="request-waterfall-latency" />
+
 Here's a complete, self-contained page that uses all three languages
 at once. Don't worry about understanding every line, the next ten
 lessons unpack all of it. Run it, then poke at it:

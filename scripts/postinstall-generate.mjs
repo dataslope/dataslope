@@ -5,7 +5,7 @@
 // configured build command (`npx opennextjs-cloudflare build` → `npm run
 // build`), whose script re-runs fumadocs-mdx and every generator anyway. The
 // postinstall pass was pure duplication: a second remark parse of ~800 course
-// MDX files (build-search-index), a second esbuild+minify of the almostnode
+// MDX files (build-search-corpus), a second esbuild+minify of the almostnode
 // worker bundles, and a second hash pass over assets/images — tens of seconds
 // per deploy for outputs that are immediately regenerated.
 //
@@ -52,12 +52,18 @@ function run(command, args = []) {
   }
 }
 
-// Same order the `build`/`dev` scripts use.
+// Same order the `build`/`dev` scripts use, and the order matters in one
+// place: build-charts writes the chart manifest that build-search-corpus reads
+// titles and captions out of, so running the search steps first yields an index
+// missing every chart caption on the site. That is not hypothetical — it is
+// what a fresh `npm ci` produced here before this line moved.
 run("fumadocs-mdx");
 run("node", ["scripts/build-almostnode-workers.mjs"]);
-run("node", ["scripts/build-search-index.mjs"]);
 run("node", ["scripts/build-brand-fallbacks.mjs"]);
 run("node", ["scripts/build-charts.mjs"]);
+run("node", ["scripts/build-search-corpus.mjs"]);
+run("node", ["scripts/build-search-sql.mjs"]);
+run("node", ["scripts/build-created-at.mjs"]);
 run("node", ["scripts/build-course-catalog.mjs"]);
 run("node", ["scripts/build-home-stats.mjs"]);
 run("node", ["scripts/build-images.mjs"]);

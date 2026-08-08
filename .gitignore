@@ -56,7 +56,6 @@ script-runner-src/__pycache__/
 # Pre-bundled almostnode JS/TS workers (rebuilt by
 # `scripts/build-almostnode-workers.mjs` on postinstall + build + dev).
 /public/_workers/
-/public/search-index.json
 
 # Static data behind /svg-gallery (rebuilt by
 # `scripts/build-svg-gallery-data.mjs` on build + dev).
@@ -67,10 +66,12 @@ script-runner-src/__pycache__/
 # `/courses/<lesson>.md`).
 /public/courses/
 
-# Server-side search index, bundled into the Worker (rebuilt by
-# `scripts/build-search-index.mjs` on postinstall + build + dev). The
-# committed `.d.ts` sibling is kept so typecheck/lint pass before it exists.
-/lib/generated/search-index.js
+# Search corpus and the D1 seed built from it (rebuilt by
+# `scripts/build-search-corpus.mjs` + `build-search-sql.mjs` on postinstall +
+# build + dev). Neither is served or bundled: the corpus is an intermediate,
+# and the SQL is applied to D1 at deploy time.
+/lib/generated/search-corpus.json
+/lib/generated/search-seed.sql
 
 # Mermaid's brand-token fallback map, parsed from app/brand.css (rebuilt by
 # `scripts/build-brand-fallbacks.mjs` on postinstall + build + dev). The
@@ -79,6 +80,7 @@ script-runner-src/__pycache__/
 /lib/generated/course-catalog.js
 /lib/generated/home-stats.js
 /lib/generated/charts.js
+/lib/generated/created-at.js
 
 # Playground audit output (e2e/playground-audit.spec.ts)
 audit-results/

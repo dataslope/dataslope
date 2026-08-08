@@ -204,6 +204,12 @@ objects expensive?"*. The honest answer:
 The rule of thumb is: **start immutable, mutate only after a
 profiler proves it matters.**
 
+And when it does matter, the immutable collections are not doing the naive
+thing. `ImmutableList<T>` is a tree, so an update rewrites one path through
+it and shares the rest with the list you started from:
+
+<Chart slug="structural-sharing-copy" />
+
 ## A small map of "mutability levels"
 
 From most immutable to most mutable:

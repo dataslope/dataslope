@@ -39,10 +39,20 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import chartManifest from "@/lib/generated/charts";
+import createdAt from "@/lib/generated/created-at";
+import {
+  ORDERINGS,
+  ORDERING_LABELS,
+  isOrdering,
+  orderBy,
+  type Orderable,
+  type Ordering,
+} from "@/lib/review/ordering";
 import Link from "@/app/_components/Link";
 import { AdminPageHeader } from "../../_components/shared";
 import { ChartPane } from "../ChartPane";
 import {
+  ChartDeleteControls,
   ChartMarkControls,
   ChartReviewProvider,
   ChartReviewSummary,
@@ -51,10 +61,10 @@ import styles from "../charts.module.css";
 
 export const dynamic = "force-static";
 
-/** Charts per page. Each one is two stacked panes plus its metadata, so a
- *  dozen is already a long scroll; the number is here to be turned down, not
- *  up, as the library grows. */
-const PER_PAGE = 12;
+/** Charts per page. Each one is two stacked panes plus its metadata, so this
+ *  is already a long scroll; the number is here to be turned down, not up, as
+ *  the library grows. */
+const PER_PAGE = 20;
 
 export const metadata: Metadata = {
   title: "Charts",
@@ -63,17 +73,70 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const ALL = Object.entries(chartManifest).sort(([a], [b]) => a.localeCompare(b));
-const PAGE_COUNT = Math.max(1, Math.ceil(ALL.length / PER_PAGE));
+type Entry = [slug: string, chart: (typeof chartManifest)[string]];
 
-/** Page 1 is the bare route, so it keeps a clean canonical URL and existing
- *  links to `/dashboard/admin/charts` still land somewhere. */
-const hrefFor = (n: number) =>
-  n <= 1 ? "/dashboard/admin/charts" : `/dashboard/admin/charts/${n}`;
+/** "3 Aug 2026". Fixed to en-GB rather than the server's locale, because this
+ *  page is prerendered: whatever locale the build machine has would otherwise
+ *  be baked in and shown to everyone. */
+function formatCreated(iso: string | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+/**
+ * Sorting is a *route* rather than client state, for the same reason
+ * pagination is: each chart is ~13 KB of inline SVG, so a client-side reorder
+ * would have to ship the whole library to show twenty of it. As a segment,
+ * `generateStaticParams` prerenders every ordering and each page still carries
+ * only its own charts.
+ *
+ * `alpha` is the default and owns the bare URLs, so existing links to
+ * `/dashboard/admin/charts` and `/dashboard/admin/charts/2` keep working and
+ * there is one canonical URL per slice rather than two.
+ *
+ * The comparators live in lib/review/ordering.ts, shared with the illustration
+ * gallery so the two agree on what "newest first" means, and unit-tested there
+ * because neither page can be rendered in this project's Node test
+ * environment.
+ */
+const DEFAULT_SORT: Ordering = "alpha";
+
+/** How a chart projects onto the shared ordering: its slug is the identity,
+ *  and its group is the course or interview track it first appears in. `~`
+ *  sorts after every letter, so unplaced charts collect at the end rather than
+ *  at the top under an empty heading. */
+function orderable([slug, chart]: Entry): Orderable {
+  const use = chart.usedBy[0];
+  return {
+    id: slug,
+    createdAt: createdAt.charts[slug] ?? null,
+    group: use?.section ?? use?.title ?? "~",
+  };
+}
+
+const PAGE_COUNT = Math.max(1, Math.ceil(Object.keys(chartManifest).length / PER_PAGE));
+
+const sortedBy = (sort: Ordering): Entry[] =>
+  orderBy(Object.entries(chartManifest) as Entry[], sort, orderable);
+
+/** Page 1 of the default sort is the bare route, so it keeps a clean canonical
+ *  URL and existing links still land somewhere. */
+function hrefFor(sort: Ordering, n: number): string {
+  const base = "/dashboard/admin/charts";
+  const prefix = sort === DEFAULT_SORT ? base : `${base}/${sort}`;
+  return n <= 1 ? prefix : `${prefix}/${n}`;
+}
 
 export function generateStaticParams() {
-  return Array.from({ length: PAGE_COUNT }, (_, i) =>
-    i === 0 ? { page: [] } : { page: [String(i + 1)] },
+  return ORDERINGS.flatMap((sort) =>
+    Array.from({ length: PAGE_COUNT }, (_, i) => {
+      const n = i + 1;
+      if (sort === DEFAULT_SORT) return { page: n === 1 ? [] : [String(n)] };
+      return { page: n === 1 ? [sort] : [sort, String(n)] };
+    }),
   );
 }
 
@@ -82,16 +145,28 @@ export default async function AdminChartsPage(props: {
 }) {
   const { page: segments } = await props.params;
 
-  // A single numeric segment, or nothing. Anything else (a stray path, page 0,
-  // page 99) is a 404 rather than a silently clamped page, so a bad link is
-  // visible instead of quietly showing the wrong slice.
-  if (segments && segments.length > 1) notFound();
-  const raw = segments?.[0];
-  const current = raw === undefined ? 1 : Number(raw);
-  if (!Number.isInteger(current) || current < 1 || current > PAGE_COUNT) notFound();
-  // Page 1 has one URL, the bare route; `/charts/1` would be a duplicate.
-  if (raw === "1") notFound();
+  // Accepted shapes: nothing, [page], [sort], [sort, page]. Anything else (a
+  // stray path, page 0, an unknown sort) is a 404 rather than a silently
+  // clamped page, so a bad link is visible instead of quietly showing the
+  // wrong slice.
+  if (segments && segments.length > 2) notFound();
+  const [first, second] = segments ?? [];
 
+  const sortSegment = first !== undefined && !/^\d+$/.test(first) ? first : undefined;
+  if (sortSegment !== undefined && !isOrdering(sortSegment)) notFound();
+  // The default sort owns the bare URLs, so naming it explicitly would give a
+  // slice two addresses.
+  if (sortSegment === DEFAULT_SORT) notFound();
+  const sort = sortSegment ?? DEFAULT_SORT;
+
+  const pageSegment = sortSegment === undefined ? first : second;
+  if (sortSegment === undefined && second !== undefined) notFound();
+  const current = pageSegment === undefined ? 1 : Number(pageSegment);
+  if (!Number.isInteger(current) || current < 1 || current > PAGE_COUNT) notFound();
+  // Page 1 has one URL per sort; `/…/1` would be a duplicate of it.
+  if (pageSegment === "1") notFound();
+
+  const ALL = sortedBy(sort);
   const charts = ALL.slice((current - 1) * PER_PAGE, current * PER_PAGE);
   const bytes = ALL.reduce((n, [, c]) => n + c.svg.length, 0);
   const placed = ALL.filter(([, c]) => c.usedBy.length > 0).length;
@@ -140,10 +215,28 @@ export default async function AdminChartsPage(props: {
             ) : null}
           </dl>
 
+          {/* Plain links, not a client control: sorting is navigation here,
+              and a <select> would need JavaScript to do what an <a> does. */}
+          <nav className={styles.sortBar} aria-label="Sort charts">
+            <span className={styles.sortLabel}>Sort by</span>
+            {ORDERINGS.map((key) => (
+              <Link
+                key={key}
+                href={hrefFor(key, 1)}
+                prefetch={false}
+                aria-current={key === sort ? "true" : undefined}
+                className={`${styles.sortLink} ${key === sort ? styles.sortLinkOn : ""}`}
+              >
+                {ORDERING_LABELS[key]}
+              </Link>
+            ))}
+          </nav>
+
           <ChartReviewSummary
             slugs={ALL.map(([slug]) => slug)}
             perPage={PER_PAGE}
             currentPage={current}
+            basePath={hrefFor(sort, 1)}
           />
 
           <div className={styles.list}>
@@ -159,6 +252,11 @@ export default async function AdminChartsPage(props: {
                   <span className={styles.dims}>
                     {chart.width}×{chart.height} ·{" "}
                     {(chart.svg.length / 1024).toFixed(1)} KB
+                    <span className={styles.created}>
+                      {createdAt.charts[slug]
+                        ? `Created ${formatCreated(createdAt.charts[slug])}`
+                        : "Not committed yet"}
+                    </span>
                   </span>
                 </header>
 
@@ -196,6 +294,19 @@ export default async function AdminChartsPage(props: {
 
                 <ChartMarkControls slug={slug} title={slug} />
 
+                {/* Its own row rather than a slot inside the queue controls:
+                    those render nothing until the marks fetch resolves, and
+                    this one disables itself instead so the control is never
+                    silently missing. */}
+                <div className={styles.devRow}>
+                  <ChartDeleteControls
+                    slug={slug}
+                    usedBy={chart.usedBy.map((use) =>
+                      use.section ? `${use.section} / ${use.title}` : use.title,
+                    )}
+                  />
+                </div>
+
                 <div className={styles.split}>
                   <ChartPane theme="light" slug={slug} title={chart.title} svg={chart.svg} />
                   <ChartPane theme="dark" slug={slug} title={chart.title} svg={chart.svg} />
@@ -214,7 +325,7 @@ export default async function AdminChartsPage(props: {
           {PAGE_COUNT > 1 ? (
             <nav className={styles.pager} aria-label="Chart pages">
               <Link
-                href={hrefFor(current - 1)}
+                href={hrefFor(sort, current - 1)}
                 prefetch={false}
                 aria-disabled={current === 1}
                 tabIndex={current === 1 ? -1 : undefined}
@@ -227,7 +338,7 @@ export default async function AdminChartsPage(props: {
                 {Array.from({ length: PAGE_COUNT }, (_, i) => i + 1).map((n) => (
                   <Link
                     key={n}
-                    href={hrefFor(n)}
+                    href={hrefFor(sort, n)}
                     prefetch={false}
                     aria-current={n === current ? "page" : undefined}
                     className={`${styles.pagerNum} ${n === current ? styles.pagerNumOn : ""}`}
@@ -237,7 +348,7 @@ export default async function AdminChartsPage(props: {
                 ))}
               </span>
               <Link
-                href={hrefFor(current + 1)}
+                href={hrefFor(sort, current + 1)}
                 prefetch={false}
                 aria-disabled={current === PAGE_COUNT}
                 tabIndex={current === PAGE_COUNT ? -1 : undefined}

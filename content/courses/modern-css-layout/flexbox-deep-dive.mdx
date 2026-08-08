@@ -138,6 +138,12 @@ Each item's `flex` shorthand controls how it resizes:
   (1 = allowed to shrink).
 - **`flex-basis`**, its starting size before grow/shrink.
 
+Read that first bullet carefully: `flex-grow` divides the *leftover*, not
+the container, which is why three items with grow factors 1, 1 and 2 are
+never in the ratio 1:1:2 at any width unless their bases are zero.
+
+<Chart slug="flex-grow-distribution" />
+
 The two you'll write most:
 
 ```css

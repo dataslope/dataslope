@@ -19,7 +19,7 @@
  *
  * The slug mapping matches how Fumadocs derives lesson URLs from file paths
  * (no course file uses a `slug:` frontmatter override; this is the same
- * mapping scripts/build-search-index.mjs already relies on for search links).
+ * mapping scripts/build-search-corpus.mjs already relies on for search links).
  *
  * Idempotent, and cached on an input hash like the other generators (see
  * scripts/lib/build-cache.mjs). Runs from `dev` and `build`; not needed by

@@ -450,6 +450,53 @@ one digest and exits before importing Plot when it matches. Rendering costs
 
 `/dashboard/admin/charts` draws every chart on both page surfaces at once,
 which is the only way to check the two-theme property while writing a spec.
+Twenty per page, ordered A→Z by default, with the ordering in the route
+(`/dashboard/admin/charts/newest`, `/…/oldest`, `/…/course`, each with its own
+`/2`, `/3`, …) rather than in client state, because a chart is ~13 KB of inline
+SVG and reordering on the client would ship the whole library to show twenty of
+it. Each figure carries the date of the commit that added its spec, from
+`scripts/build-created-at.mjs`.
+
+### The deletion queue
+
+Neither gallery can delete anything, and this is not a gap to close: a chart is
+`charts/<slug>.mjs` and an illustration is a file under `public/images/`, both
+in git and compiled into the deployed bundle, so removing one is a commit. The
+galleries record the *decision* instead, and the repository work reads it back.
+
+**Doing the deletions.** Read the queue, remove what it names, then clear the
+rows. Both tables live in D1 `dataslope-illustrations` (schema in
+`migrations-illustrations/0004_…`):
+
+```bash
+npx wrangler d1 execute dataslope-illustrations --remote --command \
+  "SELECT prompt_id, delete_reason, delete_requested_at
+     FROM chart_regen_marks
+    WHERE delete_requested_at IS NOT NULL
+    ORDER BY delete_requested_at"
+```
+
+For a chart, that means deleting `charts/<slug>.mjs` **and** every
+`<Chart slug="…" />` tag that referenced it. A tag whose spec has gone renders
+the dev-only "no chart with this slug" notice and fails no build, so leaving
+the tags behind is a silent half-finished job; `usedBy` in the generated
+manifest, and the lesson links on the card, list exactly what to edit. Then run
+`npm run build:charts` and clear the row:
+
+```bash
+npx wrangler d1 execute dataslope-illustrations --remote --command \
+  "UPDATE chart_regen_marks
+      SET delete_requested_at = NULL, delete_reason = '',
+          updated_at = datetime('now')
+    WHERE prompt_id = '<slug>'"
+```
+
+Clearing the request is how the gallery learns the deletion happened. Leave the
+row itself: it keeps the review history for a slug that may be reused.
+
+A deletion request and a redraw mark are independent, and a row can carry both.
+The gallery shows the deletion, because it is the decision that supersedes, but
+never assume a request means the redraw mark was withdrawn.
 
 ### The look
 

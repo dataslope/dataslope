@@ -63,6 +63,11 @@ df = pd.read_csv("diamonds.csv")`,
 
 You get `count`, `unique`, `top` (most common), and `freq`.
 
+Those eight numbers are a lot, and they still cannot tell a single hump from
+two. The cumulative view answers the questions `describe()` is usually asked:
+
+<Chart slug="ecdf-vs-histogram" />
+
 ## Mean vs Median, the classic trap
 
 Where the two land depends entirely on the shape of the data, and on a
@@ -122,6 +127,11 @@ print("99%:", s.quantile(0.99))
 Quantiles are great for things like SLAs ("95% of our requests
 finish in under X ms") or pay-band analyses.
 
+Each of those percentages is a cut through the same shape, and on a
+right-skewed column they are nowhere near evenly spaced:
+
+<Chart slug="quantiles-on-a-distribution" />
+
 ## Spread, std and IQR
 
 <CodeBlock
@@ -147,6 +157,10 @@ for name, s in [("a", a), ("b", b), ("c", c)]:
 mean. **IQR** (interquartile range = Q3 − Q1) is the middle 50%
 spread. IQR is more robust to outliers; std is more sensitive.
 
+The difference between the two is what happens when one row is wrong:
+
+<Chart slug="std-vs-iqr-robustness" />
+
 ## value_counts, the categorical describe
 
 <CodeBlock
@@ -168,6 +182,11 @@ print((df["cut"].value_counts(normalize=True) * 100).round(1))
 
 `normalize=True` gives proportions instead of counts, perfect
 for "what share of our customers are in each tier?".
+
+One ordering choice does most of the work here. A count table read
+alphabetically hides the ranking it exists to show:
+
+<Chart slug="sorted-bars" />
 
 ## Correlation
 
@@ -237,6 +256,11 @@ to head west too. It is exactly the third-variable illusion the
 callout just warned about, hiding in plain sight in a dataset about
 houses.
 
+Worth seeing what each value of `r` actually looks like, because the number
+is far less intuitive than people expect:
+
+<Chart slug="correlation-scatters" />
+
 ## Grouped summaries
 
 The natural extension, `describe` per group:
@@ -255,6 +279,11 @@ print(df.groupby("cut")["price"].describe().round(0))
     },
   ]}
 />
+
+A grouped mean has the same blind spot a single mean does: four groups can
+report the same average and be four completely different distributions.
+
+<Chart slug="bar-hides-distribution" />
 
 ## Outlier flags via the 1.5×IQR rule
 
@@ -284,6 +313,10 @@ print("Outliers:", s[(s < lo) | (s > hi)].tolist())
 This is a **heuristic**, not a verdict, you still have to
 decide whether the outlier is wrong data, a real edge case, or
 the most important customer on the list.
+
+The 1.5 is not arbitrary, and the rule is claiming less than it sounds like:
+
+<Chart slug="iqr-fence-rule" />
 
 ## Mini challenge
 

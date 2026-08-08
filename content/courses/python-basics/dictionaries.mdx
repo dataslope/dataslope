@@ -284,6 +284,12 @@ print(d)
 
 ## Keys must be hashable
 
+Hashing is what makes a lookup independent of the dictionary's size, and
+it is why keys have to be immutable: a key that changes after insertion
+hashes to a bucket nobody will look in.
+
+<Chart slug="collection-lookup-growth" />
+
 Keys can be any **hashable** type: strings, numbers, booleans, tuples-of-hashables, frozensets. Lists, sets, and dicts are mutable and therefore not hashable.
 
 <CodeBlock

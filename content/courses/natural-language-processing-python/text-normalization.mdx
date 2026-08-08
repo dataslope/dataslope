@@ -113,6 +113,13 @@ print("Has ALL-CAPS word:", any(w.isupper() and len(w) > 1 for w in review.split
 
 ## Punctuation stripping
 
+Most normalizers reach for a regular expression here, so one warning
+before you write one. A quantifier nested inside another quantifier gives
+a backtracking engine exponentially many ways to fail, and a near-miss
+input turns a fast pattern into a hang:
+
+<Chart slug="regex-backtracking-blowup" />
+
 The second normalization workhorse is removing punctuation. After
 tokenization you often have standalone punctuation tokens (`","`, `"!"`,
 `"."`) and sometimes punctuation still clinging to words. For most

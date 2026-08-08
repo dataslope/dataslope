@@ -279,6 +279,11 @@ bin-count trap and the bandwidth trap are the same trap in different
 clothes. When in doubt, the ECDF below sidesteps both.
 </Callout>
 
+The knob is the point: a KDE is a modelling choice wearing the costume of a
+summary, and the bandwidth decides how many peaks you see.
+
+<Chart slug="kde-bandwidth" />
+
 ## ECDF: the plot with no knobs
 
 The **empirical cumulative distribution function (ECDF)** answers, for
@@ -318,6 +323,8 @@ print("No bins, no bandwidth, nothing tuned away.")
 The y-value at any `x` is a **percentile read directly off the curve**,
 which is exactly the quantity the second challenge below asks you to
 compute by hand.
+
+<Chart slug="ecdf-vs-histogram" />
 
 ## Which plot when?
 

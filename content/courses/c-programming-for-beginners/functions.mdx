@@ -267,6 +267,12 @@ pattern again in the next chapter.
 
 ## Recursion: a function that calls itself
 
+Recursion is bounded by the stack, and the bound is set by the size of a
+frame rather than by the algorithm: a local buffer can cut the survivable
+depth by a factor of a hundred.
+
+<Chart slug="stack-depth-overflow" />
+
 A function can call itself. This is **recursion**. The classic
 example is factorial:
 

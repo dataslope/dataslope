@@ -67,6 +67,10 @@ Without it, very-populous countries can swallow the chart.
 
 ## Why size is a *weaker* encoding than position
 
+Seven values, twice. Rank the bubbles, then look at the row below:
+
+<Chart slug="size-vs-position-judgement" />
+
 The Cleveland-McGill ranking puts area near the *bottom* of
 encoding accuracy. The eye can perceive "bigger" and "smaller" but
 cannot reliably tell you "this is 2.3× that." So:
@@ -152,6 +156,11 @@ A handful of `range_x` / `range_y` arguments keep the axes fixed
 across frames, so the eye reads change without re-anchoring.
 
 ## When animation goes wrong
+
+The same six frames laid out at once, which is what the animation was
+asking you to hold in your head:
+
+<Chart slug="animation-vs-small-multiples" />
 
 Animation is powerful but expensive, viewers can't pause and
 study a frame while it's moving. A few rules:

@@ -187,6 +187,12 @@ A few line-chart rules:
   changes, use `range=[0, ...]` deliberately.
 - One line per "thing being tracked", mapped via `color`.
 
+A line is not just a prettier scatter. It asserts that the quantity existed
+between the points and moved through those values, which is true of time and
+meaningless for categories:
+
+<Chart slug="line-implies-continuity" />
+
 ## Faceting, small multiples
 
 <CodeBlock
@@ -214,6 +220,11 @@ fig.show()
 Faceting splits one chart into multiple small ones. It's often
 clearer than overlaying many colors.
 
+This is what faceting buys: the same series that overlap into an unreadable
+tangle become legible the moment each gets its own panel.
+
+<Chart slug="spaghetti-vs-facets" />
+
 ## Choosing a chart, a quick flow
 
 ```mermaid
@@ -228,6 +239,11 @@ flowchart TB
 
 We'll skip pie charts. Almost any pie chart can be replaced by
 a clearer bar chart.
+
+Underneath that flow is one measured fact: some visual channels are read far
+more accurately than others, and position beats every one of them.
+
+<Chart slug="encoding-accuracy" />
 
 ## Visualization vs summary statistics
 
@@ -244,6 +260,8 @@ with identical means, identical variances, identical
 correlations, and identical regression lines, yet completely
 different shapes that are obvious in a scatter plot. Always
 *look* at your data, not just summarize it.
+
+<Chart slug="anscombes-quartet" />
 
 ## How visualizations can mislead
 

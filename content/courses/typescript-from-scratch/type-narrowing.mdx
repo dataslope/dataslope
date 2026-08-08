@@ -245,7 +245,11 @@ property, so it must be a `Circle`.
 ## Truthiness narrowing
 
 TypeScript can narrow based on **truthiness checks**, if a value is
-truthy or falsy:
+truthy or falsy. It is also the guard most often used to mean something
+it does not mean, so it is worth putting all the guards side by side
+first:
+
+<Chart slug="narrowing-guards-grid" />
 
 <CodeBlock
   adapter="typescript"

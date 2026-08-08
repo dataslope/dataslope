@@ -34,6 +34,12 @@ writing). The `@container` block then styles the container's
 *descendants*, exactly like a media query, but keyed to local space
 instead of the screen.
 
+That difference is not cosmetic. A component's own width and the viewport
+can move in opposite directions, so a viewport-keyed rule can fire on
+exactly the wrong screen:
+
+<Chart slug="container-vs-viewport-width" />
+
 ## One component, two contexts
 
 Here is why this matters. Below is the **same card markup and the same

@@ -1444,7 +1444,11 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-height: 360px;
+  /* The cap has to clear a chart, not a few lines of stdout. Plotly's
+     default figure is 450px tall, so the old flat 360px showed about a
+     third of one figure and nothing of a second; `min()` keeps that from
+     turning into a panel taller than the phone it is being read on. */
+  max-height: min(72vh, 720px);
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--ch-scrollbar-thumb) transparent;
@@ -1576,14 +1580,26 @@
 }
 
 /* Plotly chart segment (emitted by code blocks sharing this panel). */
+/* No max-height and no overflow of its own. `.outputBody` already scrolls,
+   and a scroller inside a scroller gives one figure two scrollbars: the
+   reader drags the inner one, hits its end, and the panel underneath has
+   not moved. One scroll surface per output panel. */
 .outCellPlot {
   white-space: normal;
-  max-height: 600px;
-  overflow: auto;
 }
 
+/* Plotly sizes itself from its container, so the container needs a height.
+   Left to itself it falls back to the figure's own 450px, which is taller
+   than most of these examples need and stacks badly when a cell emits two
+   figures. The clamp tracks the width so the aspect ratio stays sane from
+   a phone up to the full column. */
 .outCellPlot :global(.js-plotly-plot) {
   width: 100%;
+  max-width: 100%;
+}
+
+.outCellPlot > div {
+  height: clamp(240px, 42vw, 400px);
 }
 
 /* ─── Running spinner ────────────────────────────────────────────────

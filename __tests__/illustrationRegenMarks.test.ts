@@ -17,6 +17,8 @@ import {
   upsertRegenMark,
   type RegenMark,
 } from "../lib/illustrations/regenMarks";
+// Queue-generic, so it is called with the queue name the wrappers bind.
+import { requestDeletion } from "../lib/review/marks";
 
 interface Row {
   prompt_id: string;
@@ -28,6 +30,9 @@ interface Row {
   regenerated_at: string | null;
   approved_at: string | null;
   approved_by: string | null;
+  delete_requested_at: string | null;
+  delete_requested_by: string | null;
+  delete_reason: string | null;
 }
 
 /**
@@ -62,19 +67,58 @@ function fakeDb(): { db: D1Database; rows: Map<string, Row> } {
           }
           return { success: true };
         }
+        const blank: Row = {
+          prompt_id: "",
+          marked: 0,
+          note: "",
+          marked_by: null,
+          created_at: "",
+          updated_at: "",
+          regenerated_at: null,
+          approved_at: null,
+          approved_by: null,
+          delete_requested_at: null,
+          delete_requested_by: null,
+          delete_reason: "",
+        };
+
+        // Both upserts bind six values, so arity cannot separate them; the
+        // conflict clause names the columns each one actually writes.
+        if (sql.includes("delete_requested_at = excluded.delete_requested_at")) {
+          const [
+            prompt_id,
+            created_at,
+            updated_at,
+            delete_requested_at,
+            delete_requested_by,
+            delete_reason,
+          ] = args as [string, string, string, string | null, string | null, string];
+          const existing = rows.get(prompt_id);
+          rows.set(prompt_id, {
+            ...blank,
+            ...(existing ?? {}),
+            prompt_id,
+            created_at: existing?.created_at ?? created_at,
+            updated_at,
+            delete_requested_at,
+            delete_requested_by,
+            delete_reason,
+          });
+          return { success: true };
+        }
+
         const [prompt_id, marked, note, marked_by, created_at, updated_at] =
           args as [string, number, string, string | null, string, string];
         const existing = rows.get(prompt_id);
         rows.set(prompt_id, {
+          ...blank,
+          ...(existing ?? {}),
           prompt_id,
           marked,
           note,
           marked_by,
           created_at: existing?.created_at ?? created_at,
           updated_at,
-          regenerated_at: existing?.regenerated_at ?? null,
-          approved_at: existing?.approved_at ?? null,
-          approved_by: existing?.approved_by ?? null,
         });
         return { success: true };
       },
@@ -195,6 +239,8 @@ describe("approval", () => {
     updatedAt: "2026-08-03T00:00:00.000Z",
     regeneratedAt: null,
     approvedAt: null,
+    deleteRequestedAt: null,
+    deleteReason: "",
     ...over,
   });
 
@@ -235,5 +281,84 @@ describe("approval", () => {
 
     const result = await approveRegenMark(db, { promptId: "a" });
     expect(result?.approvedAt).toBeNull();
+  });
+});
+
+describe("deletion requests", () => {
+  it("stamps a timestamp and stores the reason", async () => {
+    const { db, rows } = fakeDb();
+    const mark = await requestDeletion(db, "illustrations", {
+      promptId: "a",
+      requested: true,
+      reason: "superseded by the new one",
+      requestedBy: "admin-1",
+    });
+    expect(mark.deleteRequestedAt).toBeTruthy();
+    expect(mark.deleteReason).toBe("superseded by the new one");
+    expect(rows.get("a")?.delete_requested_by).toBe("admin-1");
+  });
+
+  it("withdraws by clearing the timestamp, the reason and the author", async () => {
+    const { db, rows } = fakeDb();
+    await requestDeletion(db, "illustrations", {
+      promptId: "a",
+      requested: true,
+      reason: "not needed",
+      requestedBy: "admin-1",
+    });
+    const mark = await requestDeletion(db, "illustrations", {
+      promptId: "a",
+      requested: false,
+      reason: "",
+    });
+    expect(mark.deleteRequestedAt).toBeNull();
+    expect(mark.deleteReason).toBe("");
+    // The author goes too: a withdrawn request should leave nothing behind
+    // that reads as an outstanding one.
+    expect(rows.get("a")?.delete_requested_by).toBeNull();
+  });
+
+  it("does not disturb an existing redraw mark or its note", async () => {
+    // The two decisions are independent: something queued for a redraw last
+    // month can be judged not worth keeping today, and asking for the deletion
+    // must not quietly clear the review history that explains why.
+    const { db } = fakeDb();
+    await upsertRegenMark(db, {
+      promptId: "a",
+      marked: true,
+      note: "labels collide in dark mode",
+    });
+    const mark = await requestDeletion(db, "illustrations", {
+      promptId: "a",
+      requested: true,
+      reason: "",
+    });
+    expect(mark.marked).toBe(true);
+    expect(mark.note).toBe("labels collide in dark mode");
+    expect(mark.deleteRequestedAt).toBeTruthy();
+  });
+
+  it("works on an artefact that has never been reviewed", async () => {
+    // Upsert, not update: a chart nobody has ever marked still needs to be
+    // requestable, and an UPDATE would silently do nothing.
+    const { db } = fakeDb();
+    const mark = await requestDeletion(db, "illustrations", {
+      promptId: "never-seen",
+      requested: true,
+      reason: "",
+    });
+    expect(mark.promptId).toBe("never-seen");
+    expect(mark.marked).toBe(false);
+    expect(mark.deleteRequestedAt).toBeTruthy();
+  });
+
+  it("normalizes the reason the same way a note is normalized", async () => {
+    const { db } = fakeDb();
+    const mark = await requestDeletion(db, "illustrations", {
+      promptId: "a",
+      requested: true,
+      reason: "  two\nlines   and   spaces  ",
+    });
+    expect(mark.deleteReason).toBe("two lines and spaces");
   });
 });
