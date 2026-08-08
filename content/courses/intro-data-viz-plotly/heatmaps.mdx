@@ -165,6 +165,12 @@ This is the single most important decision when making a heatmap.
 
 ## Pitfalls of heatmaps
 
+There is a fifth pitfall that outranks all of these, and it is the row
+order. A matrix has no natural sequence unless the labels are a time or a
+size, so the default order hands the reader an accident:
+
+<Chart slug="heatmap-row-ordering" />
+
 - **Too many cells** (1000×1000) make individual cells invisible.
   Either aggregate or switch to a density-based representation.
 - **Wrong palette** (rainbow / Jet) introduces false structure.
