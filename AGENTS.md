@@ -547,6 +547,59 @@ the plot rather than in a legend, and the page's own Inter tracked slightly
 tight. Chart junk is the enemy; the data is the ink.
 
 
+## Generated files and the build cache
+
+`dev` and `build` both run the same chain of generators before Next starts —
+raw-Markdown mirrors, brand fallbacks, charts, the search corpus and its D1
+seed, creation dates, the course catalog, home stats, the image manifest — and
+`postinstall` runs it too (see `scripts/postinstall-generate.mjs`, which skips
+it only on Cloudflare Workers Builds, where the `build` script re-runs it
+anyway).
+
+Running it that often is the point: no generated file is ever stale, and no
+step is anyone's job to remember. What it must not do is cost anything when
+nothing changed. Every expensive step therefore sits behind
+`scripts/lib/build-cache.mjs`, which decides freshness in two tiers — a stat
+signature (path + size + mtime, opens nothing) backed by a content hash
+consulted only when the stat signature moved, so a fresh clone or a branch
+switch does not re-parse 900 lessons for timestamps that changed without any
+bytes changing. Read that file before touching a generator's caching; the
+racy-tick rule at the tier-1 check is subtle and there is a test on it.
+
+Measured on this repo, warm:
+
+| step | before | now |
+| --- | --- | --- |
+| `build-search-corpus` | 26–27s | skipped |
+| `build-images` | 0.6–11s | 0.09s |
+| `build-almostnode-workers` | 1.3–4.7s | skipped |
+| `build-created-at` | 0.1–2.3s | skipped |
+| `build-course-md`, `build-search-sql` | 0.1–1.6s | skipped |
+| **whole chain** | **~48s** | **~2s** |
+
+(The wide "before" ranges are cold vs. warm page cache. Windows sits at the
+cold end and stays there, which is what made this worth doing.)
+
+`build-brand-fallbacks`, `build-course-catalog` and `build-home-stats` are
+deliberately *not* cached: they are 0.05–0.15s each, and a gate would add more
+moving parts than it saves. `build-charts` keeps its own coarse gate, which is
+documented in place.
+
+Adding a generator to the chain? Give it a cache when it costs more than about
+a quarter-second, and give the cache three things:
+
+- **every input**, including the generator's own source file — `build-cache`
+  folds in its own path, so a change to the caching rules invalidates every
+  stamp, but it cannot know yours;
+- **at least one output**, so a deleted (or gitignored, never-cloned) artifact
+  regenerates even when the inputs are untouched;
+- **a `salt`** when the answer depends on something `stat` cannot see.
+  `build-created-at` reads git history, so its salt is `HEAD`.
+
+Manifests live in `node_modules/.cache/dataslope-build/`, so `npm ci` wipes
+them and the first run after an install regenerates everything — which is when
+it should.
+
 ## Prose style
 
 Enforced by `npm run check:prose` (`scripts/check-prose.mjs`) and by

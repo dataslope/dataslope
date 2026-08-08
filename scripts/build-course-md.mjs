@@ -28,12 +28,7 @@
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  collectFiles,
-  hashInputs,
-  isFresh,
-  writeManifest,
-} from "./lib/build-cache.mjs";
+import { collectFiles, freshness } from "./lib/build-cache.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const SRC_DIR = join(ROOT, "content", "courses");
@@ -41,17 +36,13 @@ const OUT_DIR = join(ROOT, "public", "courses");
 
 const files = collectFiles(SRC_DIR, (name) => /\.mdx?$/i.test(name));
 
-const CACHE_NAME = "course-md";
-const inputsHash = hashInputs(ROOT, [
-  fileURLToPath(import.meta.url),
-  ...files,
-]);
-// OUT_DIR itself is the output; spot-check one expected file so a wiped
-// directory with a stale manifest still regenerates.
-const probe = files.length
-  ? [join(ROOT, "public", `${lessonStem(files[0])}.md`)]
-  : [];
-if (isFresh(ROOT, CACHE_NAME, inputsHash, probe)) {
+const cache = freshness(ROOT, "course-md", {
+  inputs: [fileURLToPath(import.meta.url), ...files],
+  // OUT_DIR itself is the output; spot-check one expected file so a wiped
+  // directory with a stale manifest still regenerates.
+  outputs: files.length ? [join(ROOT, "public", `${lessonStem(files[0])}.md`)] : [],
+});
+if (cache.fresh) {
   console.log("[course-md] up to date (inputs unchanged), skipping");
   process.exit(0);
 }
@@ -74,5 +65,5 @@ for (const file of files) {
   writeFileSync(out, readFileSync(file));
   count++;
 }
-writeManifest(ROOT, CACHE_NAME, inputsHash);
+cache.commit();
 console.log(`[course-md] wrote ${count} raw-Markdown mirrors to public/courses/`);

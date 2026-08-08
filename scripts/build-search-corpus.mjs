@@ -64,6 +64,7 @@ import remarkParse from "remark-parse";
 import remarkMdx from "remark-mdx";
 import remarkMath from "remark-math";
 import { visit } from "unist-util-visit";
+import { freshness } from "./lib/build-cache.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 
@@ -304,6 +305,23 @@ function extractComponents(body, headingIds) {
   return perHeading;
 }
 
+// Parsing ~900 lessons through remark is the single most expensive step in
+// `dev` and `build` — 26 seconds, every run, for an answer that only changes
+// when a lesson (or the chart manifest it reads captions from) does. The gate
+// costs about 10 ms; see scripts/lib/build-cache.mjs for why it is stat-first.
+const cache = freshness(ROOT, "search-corpus", {
+  inputs: [
+    fileURLToPath(import.meta.url),
+    join(ROOT, "lib", "generated", "charts.js"),
+    ...SECTIONS.flatMap(({ dir }) => walk(dir).map((rel) => join(dir, rel))),
+  ],
+  outputs: [OUT_FILE],
+});
+if (cache.fresh) {
+  console.log("[search-corpus] up to date (no lesson changed), skipping");
+  process.exit(0);
+}
+
 const rows = [];
 let files = 0;
 let failed = 0;
@@ -369,6 +387,7 @@ for (const { dir, base, collection } of SECTIONS) {
 mkdirSync(dirname(OUT_FILE), { recursive: true });
 const json = JSON.stringify(rows);
 writeFileSync(OUT_FILE, json);
+cache.commit();
 
 const proseChars = rows.reduce((n, r) => n + r.prose.length, 0);
 const codeChars = rows.reduce((n, r) => n + r.code.length, 0);

@@ -33,6 +33,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { freshness } from "./lib/build-cache.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(ROOT, "lib", "generated", "created-at.js");
@@ -98,9 +99,48 @@ function present(dir, filter) {
   }
 }
 
-// ── Charts: charts/<slug>.mjs ───────────────────────────────────────────────
+// ── Freshness ───────────────────────────────────────────────────────────────
+//
+// Unlike the other generators, this one's answer is a function of *history*,
+// not of file contents: committing an unchanged file gives it a date it did not
+// have. So the gate keys on the set of dated files plus `HEAD` — dates cannot
+// move while HEAD is still. `git log` over ~2000 paths is the work being
+// skipped, which is 2 seconds on a cold object store.
+//
+// A dirty tree is not a problem: an uncommitted file has no add-commit and is
+// therefore undated whether this runs or not, and the commit that finally dates
+// it moves HEAD.
+function headCommit() {
+  try {
+    return execFileSync("git", ["rev-parse", "HEAD"], {
+      cwd: ROOT,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return "no-git";
+  }
+}
 
 const chartFiles = present("charts", (f) => f.endsWith(".mjs") && !f.startsWith("_"));
+const cutoutFiles = present("public/images", (f) => f.endsWith(CUTOUT_SUFFIX));
+
+const cache = freshness(ROOT, "created-at", {
+  inputs: [
+    fileURLToPath(import.meta.url),
+    ...[...chartFiles].map((f) => join(ROOT, "charts", f)),
+    ...[...cutoutFiles].map((f) => join(ROOT, "public", "images", f)),
+  ],
+  outputs: [OUT],
+  salt: headCommit(),
+});
+if (cache.fresh) {
+  console.log("build-created-at: up to date (same commit, same files), skipping");
+  process.exit(0);
+}
+
+// ── Charts: charts/<slug>.mjs ───────────────────────────────────────────────
+
 const chartDates = addedDates("charts");
 const charts = {};
 for (const [path, iso] of chartDates) {
@@ -111,7 +151,6 @@ for (const [path, iso] of chartDates) {
 
 // ── Illustrations: public/images/<id>-cutout.webp ───────────────────────────
 
-const cutoutFiles = present("public/images", (f) => f.endsWith(CUTOUT_SUFFIX));
 const cutoutDates = addedDates(`public/images/*${CUTOUT_SUFFIX}`);
 const illustrations = {};
 for (const [path, iso] of cutoutDates) {
@@ -132,6 +171,7 @@ writeFileSync(
     `const createdAt = ${JSON.stringify({ charts: sorted(charts), illustrations: sorted(illustrations) }, null, 0)};\n` +
     `export default createdAt;\n`,
 );
+cache.commit();
 
 const missingCharts = chartFiles.size - Object.keys(charts).length;
 console.log(
