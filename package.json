@@ -28,6 +28,7 @@
     "lint": "eslint .",
     "check:challenges": "node scripts/check-challenge-cards.mjs",
     "check:code-blocks": "node scripts/check-code-blocks.mjs",
+    "check:js": "node scripts/check-js-blocks.mjs",
     "check:sql": "node scripts/check-sql-blocks.mjs",
     "check:mcq": "node scripts/check-mcq.mjs",
     "check:mdx": "node scripts/check-mdx-blocks.mjs",
