@@ -3921,7 +3921,7 @@
       "style": "risograph",
       "title": "The simplest closure",
       "mascot": false,
-      "subject": "a small box carried out of a room with one of that room's blocks still sealed inside it"
+      "subject": "a figure carrying a small sealed box out through a doorway, one block from the room still visible inside the box, the room and its shelves filling the rest of the frame"
     },
     {
       "id": "js-computational-thinking-1-decomposition-inline",
@@ -4005,7 +4005,7 @@
       "style": "risograph",
       "title": "JavaScript is single-threaded",
       "mascot": false,
-      "subject": "one pair of hands at a bench with four jobs waiting in a line, only ever one job held at a time"
+      "subject": "one pair of hands at a bench holding a single block while four more blocks wait in a line beside them, none of the four being touched"
     },
     {
       "id": "js-javascript-beyond-the-browser-idea-runtime-inline",
