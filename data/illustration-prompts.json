@@ -1857,7 +1857,7 @@
       "style": "risograph",
       "title": "Promises and async/await",
       "mascot": false,
-      "subject": "a ticket counter on the left handing over a numbered stub, a figure walking away to do other work in the middle, and the finished parcel waiting at a pickup hatch on the right"
+      "subject": "a ticket counter on the left handing over one plain blank stub, a figure walking away to do other work in the middle, and the finished parcel waiting in a pickup hatch on the right"
     },
     {
       "id": "c-story-of-c",
@@ -2961,7 +2961,7 @@
       "style": "risograph",
       "title": "Primary keys",
       "mascot": false,
-      "subject": "a filing drawer of identical folders, each wearing one unique numbered tab, and a hand pulling exactly one folder by its tab"
+      "subject": "a filing drawer of identical folders, each wearing a tab cut to a different silhouette, and a hand pulling exactly one folder out by its tab"
     },
     {
       "id": "db-foreign-keys-inline",
@@ -3393,7 +3393,7 @@
       "style": "risograph",
       "title": "The memory model",
       "mascot": false,
-      "subject": "one long numbered strip running the width of the frame, divided into three labelled zones of different sizes with blocks resting in each"
+      "subject": "one long strip running the width of the frame divided into three zones of different sizes, each zone a different flat color with its own kind of block resting in it"
     },
     {
       "id": "cpp-raii-and-resources-inline",
@@ -4977,7 +4977,7 @@
       "style": "risograph",
       "title": "Query execution order",
       "mascot": false,
-      "subject": "a numbered chain of six machines along a bench, the parcel entering at a middle machine rather than the first, and the numbers showing the true running order"
+      "subject": "six machines standing in a row along a bench with one thick coloured cord threading between them out of order, entering at a machine in the middle, doubling back to the first, and leaving from the last"
     },
     {
       "id": "web-how-the-web-works",
@@ -8493,7 +8493,7 @@
       "style": "risograph",
       "title": "Vectors",
       "mascot": false,
-      "subject": "a single tray of numbered tiles passing under a stamp that marks every tile at once, rather than one tile at a time"
+      "subject": "a tray of identical blank tiles passing under one wide stamp that marks every tile in a single press, beside a second tray where a small stamp marks one tile at a time"
     },
     {
       "id": "rlang-reshaping-data-inline",
@@ -10125,7 +10125,7 @@
       "style": "risograph",
       "title": "Primary keys",
       "mascot": false,
-      "subject": "a ribbon of identical blank cards feeding through a small numbering press that stamps a rising number on each, and one numbered card being drawn straight out of the middle of the run"
+      "subject": "a ribbon of identical blank cards feeding through a small press that punches one more round hole into each card than into the card before it, and a single card being drawn straight out of the middle of the run"
     },
     {
       "id": "stat-why-statistics",
