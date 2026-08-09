@@ -72,6 +72,11 @@ reference to that record, keeping it alive.
 Closures let a function carry **private state** that survives
 across calls, without exposing it to the outside world.
 
+<Figure
+  slug="js-closures-closures-state-inline-cutout"
+  alt="A sealed box with a counter dial on its face, the dial clicking up one notch each time a handle is pressed"
+/>
+
 <CodeBlock
   adapter="javascript"
   files={[
@@ -146,6 +151,11 @@ Because we declared `i` with `let`, each iteration of the loop
 gets its own fresh `i`. Each function closes over *that
 iteration's* `i`. The functions print `0`, `1`, `2`, `3`, `4`,
 just as you would expect.
+
+<Figure
+  slug="js-closures-simplest-closure-inline-cutout"
+  alt="A figure carrying a small sealed box out through a doorway, one block from the room still visible inside the box, the room and its shelves filling the rest of the frame"
+/>
 
 Now try the same thing with the old `var` (which is
 function-scoped, not block-scoped):

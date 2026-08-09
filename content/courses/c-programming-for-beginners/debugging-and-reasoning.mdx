@@ -63,6 +63,11 @@ The most common pattern in beginner debugging is "tweak something at
 random and hope". This is a trap. Each random change introduces new
 unknowns and you lose track of what you were trying to test.
 
+<Figure
+  slug="c-debugging-and-reasoning-step-2-form-inline-cutout"
+  alt="A written guess pinned above a stopped machine, a hand held back from the machine until the guess is written"
+/>
+
 Instead, every time you face a bug, complete this sentence first:
 
 > "I believe the bug is *here*, because *this evidence* suggests
@@ -79,6 +84,11 @@ Pick a small example, take pen and paper (or a comment block), and
 write down the value of every relevant variable after every step.
 This is called a **trace table** and it's the most boring,
 unglamorous, and effective debugging technique ever invented.
+
+<Figure
+  slug="c-debugging-and-reasoning-step-1-read-inline-cutout"
+  alt="A machine stopped with a printed slip hanging from it, a figure reading the slip rather than opening the machine"
+/>
 
 Consider this buggy function meant to compute a factorial:
 

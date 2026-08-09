@@ -98,6 +98,11 @@ When you have *almost* duplicates that disagree on some columns
 business decision: keep the first, keep the last, sum the spend,
 average it? Pandas will not decide for you.
 
+<Figure
+  slug="pandas-duplicates-and-inconsistencies-counts-as-duplicate-inline-cutout"
+  alt="Two cards held side by side that match in every field but one, a magnifier over the field that differs"
+/>
+
 <Callout type="info" title="A safer pattern">
 When in doubt, *aggregate* instead of *dropping*:
 
@@ -189,6 +194,11 @@ this needs string-similarity tools (Levenshtein distance, the
 `rapidfuzz` library, record-linkage techniques). For most
 beginner work, exact-match deduplication is enough; just be
 aware that fuzzy duplicates exist.
+
+<Figure
+  slug="pandas-duplicates-and-inconsistencies-removing-duplicates-inline-cutout"
+  alt="A line of cards with three identical ones, two lifted out by a gloved hand and dropped in a tray"
+/>
 
 ## Inconsistent units
 

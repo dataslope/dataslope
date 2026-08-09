@@ -59,6 +59,11 @@ Imagine ordering at a café:
 - **Asynchronous (good):** you order, get a buzzer, sit down, and
   do something else. The buzzer fires when your drink is ready.
 
+<Figure
+  slug="js-asynchronous-thinking-non-blocking-everyday-inline-cutout"
+  alt="A figure putting a kettle on, walking away to fold cloths, and returning when the kettle whistles"
+/>
+
 JavaScript's runtime is the café. Your code is the customer. The
 buzzer is a **callback** or a **promise**.
 
@@ -179,6 +184,11 @@ A subtle but important word distinction:
   periods of time. They don't have to *run* simultaneously.
 - **Parallel**: many tasks literally run *at the same time* on
   separate CPU cores.
+
+<Figure
+  slug="js-asynchronous-thinking-async-exists-at-inline-cutout"
+  alt="A single counter where one slow order blocks a long queue behind it, and beside it the same counter with the slow order set aside to one side while the queue moves"
+/>
 
 JavaScript gives you *concurrency* on a single thread. While one
 async task is "in flight" (waiting for the host to do something),

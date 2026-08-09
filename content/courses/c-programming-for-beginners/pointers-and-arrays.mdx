@@ -20,6 +20,11 @@ When you mention an array name in most expressions, the compiler
 silently converts it to **a pointer to its first element**. This is
 called *array-to-pointer decay*.
 
+<Figure
+  slug="c-pointers-and-arrays-array-name-as-inline-cutout"
+  alt="A strip of cells with a marker resting on the first cell, a tag on the marker matching the tag on the strip itself"
+/>
+
 ```c
 int a[5] = {10, 20, 30, 40, 50};
 int *p = a;          // same as &a[0]

@@ -56,6 +56,11 @@ In the wide table, `2022`, `2023`, `2024` are *values* of a
 variable (year), but they are sitting in column names. That's
 the tell-tale sign of "untidy" data.
 
+<Figure
+  slug="pandas-wide-vs-long-tidy-data-principles-inline-cutout"
+  alt="A clean board where every row is one record and every column one measure, a card beside it stating the shape"
+/>
+
 ```mermaid
 flowchart TD
   W["WIDE<br/>Columns = years"] -->|melt| L["LONG<br/>One row per person-year"]

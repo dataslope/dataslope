@@ -50,6 +50,11 @@ runtime, put it on the heap.
 returns a pointer to it (or `NULL` if it failed). Always include
 `<stdlib.h>`.
 
+<Figure
+  slug="c-dynamic-memory-malloc-free-inline-cutout"
+  alt="A crate handed out over a counter, used at a bench, and handed back over the same counter"
+/>
+
 ```c
 int *nums = malloc(10 * sizeof(int));
 if (nums == NULL) {
@@ -197,6 +202,11 @@ automatically. We'll mention them again in the debugging chapter.
 This is the canonical reason for `malloc`: you can't return a local
 array (it'd die when the function returns), but you *can* return a
 pointer to heap memory.
+
+<Figure
+  slug="c-dynamic-memory-stack-vs-heap-inline-cutout"
+  alt="A neat column of trays on the left and an open yard of crates on the right, cords running between them"
+/>
 
 <CodeBlock
   adapter="c"

@@ -53,6 +53,11 @@ Both fetch the same row (because Bilal is at position 1), but
 the *intent* is different. `loc` expresses "I know the label";
 `iloc` expresses "I know the row number."
 
+<Figure
+  slug="pandas-loc-vs-iloc-side-by-side-inline-cutout"
+  alt="One board approached from two sides, a hand on the left holding a name tag and a hand on the right counting rows"
+/>
+
 ## Slicing comparison
 
 <CodeBlock
@@ -79,6 +84,11 @@ Same rows in this case (positions 0..2). But notice how
 counter-intuitive label slicing feels at first: `"Aiko":"Chen"`
 *includes* Chen. The reason is that labels do not have an
 obvious "one past the end", Pandas chose to be inclusive.
+
+<Figure
+  slug="pandas-loc-vs-iloc-slicing-comparison-inline-cutout"
+  alt="Two brackets clamped over the same row of blocks, one ending on the marked block and one stopping just before it"
+/>
 
 ## Selecting rows *and* columns
 

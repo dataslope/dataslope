@@ -101,6 +101,11 @@ JavaScript's primitives (numbers, strings, booleans) *are* already
 immutable, `"hello".toUpperCase()` returns a new string,
 "hello" itself never changes.
 
+<Figure
+  slug="js-functional-intuition-immutability-inline-cutout"
+  alt="A sealed block left untouched on a shelf while a fresh copy with one changed face is set beside it"
+/>
+
 Objects and arrays are *mutable* by default. Functional code
 treats them as if they weren't.
 
@@ -205,6 +210,11 @@ console.log(triple(7));
 Treating functions as data is what enables `map`/`filter`/`reduce`,
 event handlers, callbacks, middleware, promise chains, and dozens
 of other patterns you'll keep meeting.
+
+<Figure
+  slug="js-functional-intuition-pure-functions-inline-cutout"
+  alt="A sealed press with one inlet and one outlet, the same block fed twice and the same result leaving twice"
+/>
 
 ## Composition
 
