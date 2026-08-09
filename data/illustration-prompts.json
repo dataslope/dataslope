@@ -30717,7 +30717,7 @@
       "style": "risograph",
       "title": "1. There is no index",
       "mascot": false,
-      "subject": "a board whose left edge carries no tags at all, its rows identified only by their contents"
+      "subject": "two boards side by side, the left one carrying a column of tags down its edge and the right one having that column removed entirely, its rows bare at the edge"
     },
     {
       "id": "pl-reading-and-writing-data-read-versus-scan-inline",
@@ -30753,7 +30753,7 @@
       "style": "risograph",
       "title": "They combine with set operations",
       "mascot": false,
-      "subject": "two stencils laid over one board, one over the other, only what shows through both being picked up"
+      "subject": "two perforated plates laid one on top of the other over a board of blocks, only the blocks visible through holes in both plates being lifted out"
     },
     {
       "id": "pl-sorting-and-top-k-sort-inline",
