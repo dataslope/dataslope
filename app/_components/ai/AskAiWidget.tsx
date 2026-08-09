@@ -742,10 +742,17 @@ export default function AskAiWidget({
     hasAiEditHandler(collectContext().adapterId);
 
   // ── Suggested follow-ups ("Keep going") ────────────────────────────
+  // Keyed on the id of the answer they would follow, not on `messages.length`:
+  // the count repeats across conversations ("New conversation" resets it to
+  // zero), and the hook fetches at most once per key, so every conversation
+  // after the first was silently left without follow-ups. See the hook.
+  const lastTurn = messages[messages.length - 1];
+  const answeredTurnId =
+    lastTurn?.role === "assistant" && lastTurn.content ? lastTurn.id : "";
   const { suggestions, suggestLoading, clearSuggestions } =
     useSuggestedQuestions({
-      active: open && signedIn && !streaming && messages.length > 0,
-      turnKey: messages.length,
+      active: open && signedIn && !streaming,
+      turnKey: answeredTurnId,
       buildContext,
       history: messages,
     });
@@ -1163,6 +1170,9 @@ export default function AskAiWidget({
                             <Copy size={13} />
                           )}
                         </button>
+                        {/* `fill` on the selected glyph: colour alone carries
+                            the state otherwise, and a filled vs outlined icon
+                            survives both themes and colour-blindness. */}
                         <button
                           type="button"
                           className={`${styles.actionBtn} ${
@@ -1171,21 +1181,27 @@ export default function AskAiWidget({
                           onClick={() => react(i, "up")}
                           aria-label="Good answer"
                           aria-pressed={reactions[i] === "up"}
-                          title="Good answer"
+                          title={reactions[i] === "up" ? "Rated good" : "Good answer"}
                         >
-                          <ThumbsUp size={13} />
+                          <ThumbsUp
+                            size={13}
+                            fill={reactions[i] === "up" ? "currentColor" : "none"}
+                          />
                         </button>
                         <button
                           type="button"
                           className={`${styles.actionBtn} ${
-                            reactions[i] === "down" ? styles.actionBtnOn : ""
+                            reactions[i] === "down" ? styles.actionBtnOnNegative : ""
                           }`}
                           onClick={() => react(i, "down")}
                           aria-label="Bad answer"
                           aria-pressed={reactions[i] === "down"}
-                          title="Bad answer"
+                          title={reactions[i] === "down" ? "Rated bad" : "Bad answer"}
                         >
-                          <ThumbsDown size={13} />
+                          <ThumbsDown
+                            size={13}
+                            fill={reactions[i] === "down" ? "currentColor" : "none"}
+                          />
                         </button>
                       </div>
                     )}
@@ -1202,7 +1218,15 @@ export default function AskAiWidget({
                       <p className={styles.answerNote}>
                         {disclaimer} Rating an answer saves that exchange so we
                         can improve the assistant, handled as described in our{" "}
-                        <Link href="/privacy" className={styles.answerNoteLink}>
+                        {/* New tab on purpose: the panel floats over a lesson,
+                            and following a link in place would throw away the
+                            conversation the reader is in the middle of. */}
+                        <Link
+                          href="/privacy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.answerNoteLink}
+                        >
                           Privacy Policy
                         </Link>
                         .

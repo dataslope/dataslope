@@ -170,7 +170,7 @@ export type CourseCardLayout = "catalog" | "preview";
 
 const LAYOUT = {
   catalog: {
-    row: "grid-cols-[96px_1fr] gap-5 py-8 sm:grid-cols-[116px_1fr] sm:gap-6",
+    row: "grid-cols-[86px_1fr] gap-5 py-8 sm:grid-cols-[104px_1fr] sm:gap-6",
     text: "gap-2",
     desc: "text-[16px] leading-[1.7]",
   },
