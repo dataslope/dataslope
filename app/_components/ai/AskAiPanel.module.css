@@ -459,6 +459,16 @@
    resets `ul, ol` to `list-style: none` — which silently turned every numbered
    list in an answer into unnumbered indented text, exactly where a model writes
    "1. … 2. … 3. …" and the order is the content. */
+/* A display formula is one unbreakable line, and this panel is 340px wide at
+   its narrowest, so a long one has to scroll rather than push the answer
+   sideways. `padding-bottom` keeps the scrollbar off the glyphs' descenders. */
+.answer :global(.katex-display) {
+  margin: 10px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 2px;
+}
+
 .answer :where(ul, ol) {
   margin: 0 0 8px;
   padding-left: 22px;
@@ -546,7 +556,7 @@
    11px they need the gap to stop reading as one crowded block. */
 .answerNote {
   margin: 8px 0 0 4px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.5;
   color: #9ca3af;
 }

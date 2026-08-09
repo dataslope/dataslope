@@ -31,12 +31,17 @@ import {
 } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import rehypeHighlight from "rehype-highlight";
+import rehypeKatex from "rehype-katex";
 // Token colours for the code blocks rehype-highlight marks up. The panel floats
 // over lessons (which inline the same theme via docs.css) but also over the
 // playground and the dashboard, which do not — so it brings its own rather than
-// relying on whatever page it happens to be open on.
+// relying on whatever page it happens to be open on. KaTeX's stylesheet is here
+// for the same reason: an answer can contain a formula anywhere the panel opens.
 import "@/app/hljs.css";
+import "katex/dist/katex.min.css";
+import { normalizeMathDelimiters } from "./mathDelimiters";
 import Link from "@/app/_components/Link";
 import { Popover } from "@base-ui/react/popover";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
@@ -1126,11 +1131,21 @@ export default function AskAiWidget({
                             characters have arrived, and re-guesses per token,
                             which shows up as code changing colour while it is
                             still being written. */}
+                        {/* Math before highlighting, matching how the MCQ
+                            renderer orders them: KaTeX claims its nodes first,
+                            so a formula is never handed to the code
+                            highlighter. `normalizeMathDelimiters` runs before
+                            Markdown parses, because Markdown reads a model's
+                            `\[` as an escaped bracket and the delimiter is
+                            gone by the time any plugin could see it. */}
                         <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          rehypePlugins={[[rehypeHighlight, { detect: false }]]}
+                          remarkPlugins={[remarkGfm, remarkMath]}
+                          rehypePlugins={[
+                            rehypeKatex,
+                            [rehypeHighlight, { detect: false }],
+                          ]}
                         >
-                          {m.content}
+                          {normalizeMathDelimiters(m.content)}
                         </ReactMarkdown>
                         {streamingHere && <span className={styles.caret} />}
                       </div>
@@ -1405,8 +1420,13 @@ export default function AskAiWidget({
               >
                 <Eye size={12} aria-hidden />
                 <span className={styles.chipLabel}>
+                  {/* Singular at 0 as well as 1: "0 sources" is the usual
+                      English, but the chip is a running count that ticks
+                      0 → 1 → 2 as toggles change, and holding the noun
+                      singular until it genuinely goes plural keeps the label
+                      from flipping its last letter under the pointer. */}
                   {MODE_LABELS[contextMode]} · {enabledCount} source
-                  {enabledCount === 1 ? "" : "s"}
+                  {enabledCount <= 1 ? "" : "s"}
                 </span>
                 <ChevronDown size={11} aria-hidden />
               </button>
