@@ -369,7 +369,7 @@
       "style": "risograph",
       "title": "Lists",
       "mascot": false,
-      "subject": "a numbered rail holding five blocks in order, one being lifted out of the middle and the rest sliding along to close the gap"
+      "subject": "a rail of five slots holding blocks in order, one being lifted out of the middle and the rest sliding along to close the gap"
     },
     {
       "id": "python-dictionaries-inline",
@@ -1689,7 +1689,7 @@
       "style": "risograph",
       "title": "Sorting and ranking",
       "mascot": false,
-      "subject": "a row of blocks of different heights being combed into a rising staircase, with a small numbered pennant planted on the tallest three"
+      "subject": "a row of blocks of different heights being combed into a rising staircase, with a small pennant planted on each of the tallest three"
     },
     {
       "id": "pandas-concat-vs-merge-inline",
@@ -1822,6 +1822,162 @@
       "title": "Messy data",
       "mascot": false,
       "subject": "a board where some cells hold the wrong shape, some are empty, and two rows are visibly the same"
+    },
+    {
+      "id": "pandas-what-is-data-analysis-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "what-is-data-analysis",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "What analysis is",
+      "mascot": false,
+      "subject": "a crate of raw records at one end of a bench and a single clear finding pinned at the other, with tools in between"
+    },
+    {
+      "id": "pandas-the-analyst-mindset-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "the-analyst-mindset",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The analyst's habit",
+      "mascot": false,
+      "subject": "a finding pinned to a board with a hand lifting it to check the raw rows stacked underneath"
+    },
+    {
+      "id": "pandas-python-for-analysis-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "python-for-analysis",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Why code for analysis",
+      "mascot": false,
+      "subject": "a hand editing cells one by one on the left, and a short instruction strip redoing the whole board on the right"
+    },
+    {
+      "id": "pandas-how-computers-see-data-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "how-computers-see-data",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "How data is stored",
+      "mascot": false,
+      "subject": "a written record on paper being translated into a strip of coded cells beside it"
+    },
+    {
+      "id": "pandas-notebooks-and-environments-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "notebooks-and-environments",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Notebooks",
+      "mascot": false,
+      "subject": "a bench where each step is a separate small card, run in order and leaving its result pinned beneath it"
+    },
+    {
+      "id": "pandas-loading-datasets-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "loading-datasets",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Loading data",
+      "mascot": false,
+      "subject": "three differently shaped cartons feeding one hopper and coming out as identical rows on a board"
+    },
+    {
+      "id": "pandas-eda-workflow-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "eda-workflow",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The EDA loop",
+      "mascot": false,
+      "subject": "four benches arranged in a ring, a tray moving from look to question to check and back to look"
+    },
+    {
+      "id": "pandas-reproducible-analysis-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "reproducible-analysis",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Reproducibility",
+      "mascot": false,
+      "subject": "one sealed instruction strip run on two separate benches, both producing the same result block"
+    },
+    {
+      "id": "pandas-exporting-cleaned-data-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "exporting-cleaned-data",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Exporting",
+      "mascot": false,
+      "subject": "a cleaned board being sealed into a carton and set on a shelf beside the bench"
+    },
+    {
+      "id": "pandas-choosing-the-right-chart-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "choosing-the-right-chart",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Choosing a chart",
+      "mascot": false,
+      "subject": "one tray of chips with four chart frames fanned above it, a hand reaching for the one that fits"
+    },
+    {
+      "id": "pandas-visualization-basics-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "visualization-basics",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Seeing the data",
+      "mascot": false,
+      "subject": "a column of numbers on the left and the same column as a row of bars on the right, the shape obvious only on the right"
+    },
+    {
+      "id": "pandas-hypothesis-intuition-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "hypothesis-intuition",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Testing a hunch",
+      "mascot": false,
+      "subject": "a written guess pinned to a board with evidence chips stacking beneath it until the pin bends"
+    },
+    {
+      "id": "pandas-debugging-analysis-code-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "debugging-analysis-code",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Debugging an analysis",
+      "mascot": false,
+      "subject": "a result that looks wrong, with a hand walking back along the bench through each earlier tray to find where"
     },
     {
       "id": "js-computational-thinking",
@@ -2145,7 +2301,7 @@
       "title": "Promises and async/await",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a small yellow canary standing on a pale grey platform beside a ticket dispenser handing out a numbered token that later returns as a wrapped parcel"
+      "subject": "a small yellow canary standing on a pale grey platform beside a ticket dispenser handing out a token that later returns as a wrapped parcel"
     },
     {
       "id": "js-modular-organization",
@@ -2265,7 +2421,7 @@
       "style": "risograph",
       "title": "Arrays",
       "mascot": false,
-      "subject": "a long numbered shelf holding six blocks in a fixed order, a hand reaching straight to the fourth slot without touching the others"
+      "subject": "a long shelf of six equal slots holding blocks in a fixed order, a hand reaching straight past the first three to lift the fourth out"
     },
     {
       "id": "js-objects-inline",
@@ -2613,7 +2769,7 @@
       "title": "Arrays",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a brown beaver on a pale grey platform beside a contiguous rail of numbered cells, each holding one coloured cube"
+      "subject": "a brown beaver on a pale grey platform beside a contiguous rail of equal cells, each holding one coloured cube"
     },
     {
       "id": "c-strings",
@@ -2649,7 +2805,7 @@
       "title": "Pointers and arrays",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot sliding an arrow marker along a rail of numbered memory cells"
+      "subject": "the Dataslope marmot mascot sliding an arrow marker along a rail of equal memory cells"
     },
     {
       "id": "c-structs",
@@ -2757,7 +2913,7 @@
       "style": "risograph",
       "title": "Pointers",
       "mascot": false,
-      "subject": "a long row of numbered mail slots, one slot holding a small card that points at another slot further down the row, and a figure following the arrow"
+      "subject": "a long row of mail slots, one slot holding a small card whose arrow points at another slot further down the row, and a figure following that arrow"
     },
     {
       "id": "c-dynamic-memory-inline",
@@ -2817,7 +2973,7 @@
       "style": "risograph",
       "title": "Pointers and arrays",
       "mascot": false,
-      "subject": "a numbered strip of cells with a marker resting on the first, and the same marker two steps further along having jumped exactly two cell widths"
+      "subject": "a strip of equal cells with a marker resting on the first, and the same marker two cells further along having jumped exactly two cell widths"
     },
     {
       "id": "c-functions-inline",
@@ -2937,7 +3093,7 @@
       "style": "risograph",
       "title": "Variables in C",
       "mascot": false,
-      "subject": "a numbered locker holding a block, with a small name plate clipped to the locker's door"
+      "subject": "a locker holding a block, with a small blank name plate clipped to the locker's door"
     },
     {
       "id": "c-compilation-and-execution-inline",
@@ -3370,6 +3526,42 @@
       "title": "Aggregating in LINQ",
       "mascot": false,
       "subject": "a row of blocks folding into one another left to right until a single block remains at the end of the rail"
+    },
+    {
+      "id": "cs-why-declarative-won-inline",
+      "collection": "courses",
+      "course": "csharp-linq-functional",
+      "courseTitle": "C# LINQ and Functional Patterns",
+      "lesson": "why-declarative-won",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Why declarative won",
+      "mascot": false,
+      "subject": "a long hand-built conveyor of many small parts on one bench, and a short clear instruction card doing the same job on the next"
+    },
+    {
+      "id": "cs-query-vs-method-syntax-inline",
+      "collection": "courses",
+      "course": "csharp-linq-functional",
+      "courseTitle": "C# LINQ and Functional Patterns",
+      "lesson": "query-vs-method-syntax",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Two spellings",
+      "mascot": false,
+      "subject": "two differently written instruction cards feeding the same machine and producing identical output trays"
+    },
+    {
+      "id": "cs-side-effect-management-inline",
+      "collection": "courses",
+      "course": "csharp-linq-functional",
+      "courseTitle": "C# LINQ and Functional Patterns",
+      "lesson": "side-effect-management",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Side effects",
+      "mascot": false,
+      "subject": "a clean line of machines with every hose and wire gathered to one end and plugged into a single marked panel"
     },
     {
       "id": "db-what-is-database-design",
@@ -4080,6 +4272,150 @@
       "subject": "four sockets of different widths with a block held above each, one block clearly too wide for the socket beneath it"
     },
     {
+      "id": "db-what-is-database-design-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "what-is-database-design",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "What design is",
+      "mascot": false,
+      "subject": "a bench of loose parts on the left and the same parts fitted into a planned frame on the right"
+    },
+    {
+      "id": "db-thinking-in-entities-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "thinking-in-entities",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Finding the entities",
+      "mascot": false,
+      "subject": "a heap of mixed facts sorted into three crates, each crate holding one kind of thing and nothing else"
+    },
+    {
+      "id": "db-the-design-process-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "the-design-process",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The design process",
+      "mascot": false,
+      "subject": "four benches in a row, a design moving from loose sketch to ruled frame to fitted parts to a working cabinet"
+    },
+    {
+      "id": "db-what-are-constraints-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "what-are-constraints",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Constraints",
+      "mascot": false,
+      "subject": "a chute with three gauges fitted across it, each stopping a block that fails to meet its measure"
+    },
+    {
+      "id": "db-attributes-and-domains-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "attributes-and-domains",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Attributes and domains",
+      "mascot": false,
+      "subject": "one crate with four labelled compartments, each compartment cut to accept only one shape of block"
+    },
+    {
+      "id": "db-reading-er-diagrams-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "reading-er-diagrams",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Reading an ER diagram",
+      "mascot": false,
+      "subject": "a pinned board of boxes and cords with a hand following one cord and a magnifier over its end fitting"
+    },
+    {
+      "id": "db-design-and-data-quality-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "design-and-data-quality",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Design and quality",
+      "mascot": false,
+      "subject": "two cabinets side by side, one whose slots enforce shape and one whose open shelves hold a mess of wrong parts"
+    },
+    {
+      "id": "db-evolving-schemas-safely-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "evolving-schemas-safely",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Evolving a schema",
+      "mascot": false,
+      "subject": "a cabinet gaining a new drawer while the drawers already in use stay open and undisturbed"
+    },
+    {
+      "id": "db-why-schemas-change-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "why-schemas-change",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Why schemas change",
+      "mascot": false,
+      "subject": "a cabinet built for three kinds of part with a fourth kind arriving on a trolley beside it"
+    },
+    {
+      "id": "db-design-and-scale-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "design-and-scale",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Design and scale",
+      "mascot": false,
+      "subject": "the same cabinet drawn small on one bench and very large on the next, its fittings identical in both"
+    },
+    {
+      "id": "db-case-study-blog-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "case-study-blog",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A blog schema",
+      "mascot": false,
+      "subject": "three crates on a bench, one of posts, one of authors and one of comments, joined by cords"
+    },
+    {
+      "id": "db-case-study-ecommerce-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "case-study-ecommerce",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A shop schema",
+      "mascot": false,
+      "subject": "four crates joined by cords, one of products, one of customers, one of orders and one pegboard between orders and products"
+    },
+    {
       "id": "cpp-brief-history",
       "collection": "courses",
       "course": "from-zero-to-cpp",
@@ -4233,7 +4569,7 @@
       "title": "Arrays and strings",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a quokka on a pale grey platform beside a contiguous rail of numbered cells ending in a small terminator cap"
+      "subject": "a quokka on a pale grey platform beside a contiguous rail of equal cells ending in a small terminator cap"
     },
     {
       "id": "cpp-structs-and-aggregates",
@@ -5026,6 +5362,78 @@
       "title": "Declarative thinking",
       "mascot": false,
       "subject": "a figure at the left holding up a card showing a finished stack, while the machine beside them builds that stack without being told each step"
+    },
+    {
+      "id": "fp-pure-functions-inline",
+      "collection": "courses",
+      "course": "functional-programming-typescript",
+      "courseTitle": "Functional Programming with TypeScript",
+      "lesson": "pure-functions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Purity in TypeScript",
+      "mascot": false,
+      "subject": "a sealed machine with no hoses or wires leaving it, giving the same output twice for the same input"
+    },
+    {
+      "id": "fp-evolution-of-complexity-inline",
+      "collection": "courses",
+      "course": "functional-programming-typescript",
+      "courseTitle": "Functional Programming with TypeScript",
+      "lesson": "evolution-of-complexity",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Complexity",
+      "mascot": false,
+      "subject": "a tidy frame on one bench and the same frame on the next after twenty additions, cords crossing everywhere"
+    },
+    {
+      "id": "fp-composable-architecture-inline",
+      "collection": "courses",
+      "course": "functional-programming-typescript",
+      "courseTitle": "Functional Programming with TypeScript",
+      "lesson": "composable-architecture",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Composable architecture",
+      "mascot": false,
+      "subject": "small units with identical fittings clipping into long chains in several different orders"
+    },
+    {
+      "id": "fp-type-driven-design-inline",
+      "collection": "courses",
+      "course": "functional-programming-typescript",
+      "courseTitle": "Functional Programming with TypeScript",
+      "lesson": "type-driven-design",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Type-driven design",
+      "mascot": false,
+      "subject": "a set of shaped sockets cut first, with the parts made afterwards to fit them"
+    },
+    {
+      "id": "fp-functional-state-management-inline",
+      "collection": "courses",
+      "course": "functional-programming-typescript",
+      "courseTitle": "Functional Programming with TypeScript",
+      "lesson": "functional-state-management",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "State without mutation",
+      "mascot": false,
+      "subject": "a shelf of successive trays, each a copy of the last with one slot changed, none of them altered after being set down"
+    },
+    {
+      "id": "fp-functional-async-workflows-inline",
+      "collection": "courses",
+      "course": "functional-programming-typescript",
+      "courseTitle": "Functional Programming with TypeScript",
+      "lesson": "functional-async-workflows",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Async workflows",
+      "mascot": false,
+      "subject": "several slow kettles started at once along a bench, their results collected into one tray as each finishes"
     },
     {
       "id": "viz-what-is-dataviz",
@@ -6081,7 +6489,7 @@
       "style": "risograph",
       "title": "Collections",
       "mascot": false,
-      "subject": "four different containers standing in a row, one a numbered rail, one a bag with no order, one a queue with a gate, one a wall of keyed drawers"
+      "subject": "four different containers standing in a row, one a plain rail of slots, one a drawstring bag whose contents lie in no order, one a channel with a gate at each end, one a wall of small drawers each with a keyhole"
     },
     {
       "id": "mcs-control-flow-inline",
@@ -6141,7 +6549,7 @@
       "style": "risograph",
       "title": "Variables and memory",
       "mascot": false,
-      "subject": "a name plate on a stand joined by a short cord to a numbered locker, the plate moved to a different locker while both lockers stay put"
+      "subject": "a name plate on a stand joined by a short cord to a locker in a row of lockers, the plate moved to a different locker while both lockers stay put"
     },
     {
       "id": "mcs-computational-thinking-inline",
@@ -6153,7 +6561,7 @@
       "style": "risograph",
       "title": "Thinking in steps",
       "mascot": false,
-      "subject": "a numbered route of footplates crossing a bench from a start pad to a finish pad, each plate resting on the last"
+      "subject": "a route of footplates crossing a bench from a start pad to a finish pad, each plate laid down in turn after the last"
     },
     {
       "id": "mcs-debugging-and-reasoning-inline",
@@ -6381,7 +6789,7 @@
       "title": "Query execution order",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot walking a numbered track of query stages in the order they actually run"
+      "subject": "the Dataslope marmot mascot walking a track of query stages in the order they actually run"
     },
     {
       "id": "sql-relationships-intro",
@@ -6778,6 +7186,126 @@
       "title": "Many to many in SQL",
       "mascot": false,
       "subject": "two rows of crates with every cord between them routed through a small board of pegs standing in the middle"
+    },
+    {
+      "id": "sql-what-is-a-database-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "what-is-a-database",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "What a database is",
+      "mascot": false,
+      "subject": "a shared strongroom with several benches drawing from it at once, each bench holding only a small tray"
+    },
+    {
+      "id": "sql-spreadsheets-vs-databases-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "spreadsheets-vs-databases",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Spreadsheets and databases",
+      "mascot": false,
+      "subject": "one enormous unwieldy sheet sagging off a bench, beside a compact cabinet of interlocking drawers holding the same records"
+    },
+    {
+      "id": "sql-how-applications-use-databases-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "how-applications-use-databases",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Applications and databases",
+      "mascot": false,
+      "subject": "three small benches all reaching into one strongroom through the same hatch, none of them holding their own copy"
+    },
+    {
+      "id": "sql-normalization-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "normalization",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Normalising",
+      "mascot": false,
+      "subject": "one wide table with a repeated block appearing in four rows, that block lifted out to its own small table and referenced by cord"
+    },
+    {
+      "id": "sql-relationships-intro-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "relationships-intro",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Relationships between tables",
+      "mascot": false,
+      "subject": "two boards on a bench joined by a single cord that runs from a tagged row in one to a tagged row in the other"
+    },
+    {
+      "id": "sql-thinking-in-entities-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "thinking-in-entities",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Thinking in entities",
+      "mascot": false,
+      "subject": "a bench of loose facts being sorted into three labelled crates, each crate holding one kind of thing"
+    },
+    {
+      "id": "sql-first-queries-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "first-queries",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "First queries",
+      "mascot": false,
+      "subject": "a request slip handed through a hatch and a small tray of rows coming back through the same hatch"
+    },
+    {
+      "id": "sql-data-types-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "data-types",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Types in SQL",
+      "mascot": false,
+      "subject": "a rack of sockets of four distinct profiles with matching blocks resting above each"
+    },
+    {
+      "id": "sql-expressions-and-aliases-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "expressions-and-aliases",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Expressions and aliases",
+      "mascot": false,
+      "subject": "a column passing through a small machine and arriving with a new name plate clipped to its head"
+    },
+    {
+      "id": "sql-entity-relationship-diagrams-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "entity-relationship-diagrams",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Reading a diagram",
+      "mascot": false,
+      "subject": "a pinned board of plain boxes and cords, a hand tracing one cord from a box to the box it points at"
     },
     {
       "id": "web-how-the-web-works",
@@ -7269,7 +7797,7 @@
       "title": "Lists",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a brown bear on a pale grey platform beside an ordered rail of numbered cells, each holding one coloured cube"
+      "subject": "a brown bear on a pale grey platform beside an ordered rail of equal cells, each holding one coloured cube"
     },
     {
       "id": "jcol-sets",
@@ -7497,7 +8025,7 @@
       "style": "risograph",
       "title": "Equality and hashing",
       "mascot": false,
-      "subject": "two identical-looking blocks on a balance that reads level, and beneath them a sorting machine dropping both into the same numbered bin"
+      "subject": "two identical-looking blocks on a balance that reads level, and beneath them a sorting machine dropping both into the same one of several bins"
     },
     {
       "id": "jcol-type-erasure-inline",
@@ -7533,7 +8061,7 @@
       "style": "risograph",
       "title": "Lists",
       "mascot": false,
-      "subject": "a numbered rail of blocks with one being inserted in the middle and the blocks to its right sliding along to make room"
+      "subject": "a rail of slots holding blocks with one being inserted in the middle and the blocks to its right sliding along to make room"
     },
     {
       "id": "jcol-sets-inline",
@@ -8868,6 +9396,66 @@
       "subject": "four different machines all fitted with the same three-handle front plate, one hand working each the same way"
     },
     {
+      "id": "ml-why-machine-learning-exists-inline",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "why-machine-learning-exists",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Why machine learning",
+      "mascot": false,
+      "subject": "a bench of hand-cut rules stacked into an unstable tower, beside a machine learning the same rules from a tray of examples"
+    },
+    {
+      "id": "ml-regression-classification-clustering-inline",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "regression-classification-clustering",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Three kinds of task",
+      "mascot": false,
+      "subject": "three benches, one fitting a ramp to chips, one sorting chips into two bins, one grouping chips with no bins given"
+    },
+    {
+      "id": "ml-the-practical-ml-workflow-inline",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "the-practical-ml-workflow",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The workflow",
+      "mascot": false,
+      "subject": "a ring of five benches with a tray moving round it, from data to features to fit to check and back"
+    },
+    {
+      "id": "ml-your-first-model-inline",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "your-first-model",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A first model",
+      "mascot": false,
+      "subject": "a tray of examples going into a boxed machine and the machine then answering correctly for one new block"
+    },
+    {
+      "id": "ml-evaluating-clusters-inline",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "evaluating-clusters",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Evaluating clusters",
+      "mascot": false,
+      "subject": "two boards of grouped chips, one with tight well-separated groups and one whose groups visibly bleed together"
+    },
+    {
       "id": "dsa-why-cpp",
       "collection": "courses",
       "course": "mastering-dsa-cpp",
@@ -9237,7 +9825,7 @@
       "style": "risograph",
       "title": "Hash tables",
       "mascot": false,
-      "subject": "a key dropped into a small mixing machine that spits out a bin number, and the item landing directly in that numbered bin among a row of bins"
+      "subject": "a key dropped into a small mixing machine whose chute swings to one of several bins, and the item landing directly in that bin"
     },
     {
       "id": "dsa-heaps-inline",
@@ -11808,6 +12396,138 @@
       "subject": "a crate opened with its first rows lifted out, a gauge on its side reading how many rows and columns remain"
     },
     {
+      "id": "rlang-why-r-matters-today-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "why-r-matters-today",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Why R",
+      "mascot": false,
+      "subject": "a bench fitted end to end with statistical tools already in place, nothing needing to be built first"
+    },
+    {
+      "id": "rlang-thinking-in-data-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "thinking-in-data",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Thinking in whole objects",
+      "mascot": false,
+      "subject": "a hand moving one chip at a time beside a tray being lifted and treated as one thing"
+    },
+    {
+      "id": "rlang-r-as-a-calculator-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "r-as-a-calculator",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "R as a calculator",
+      "mascot": false,
+      "subject": "a small machine on a bench taking a short slip and returning a single result on a printed strip"
+    },
+    {
+      "id": "rlang-scripts-and-projects-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "scripts-and-projects",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Scripts and projects",
+      "mascot": false,
+      "subject": "loose slips scattered on one bench, and on the next the same slips filed in order inside a labelled case"
+    },
+    {
+      "id": "rlang-reproducible-analysis-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "reproducible-analysis",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Reproducible work in R",
+      "mascot": false,
+      "subject": "one sealed strip of steps run twice on two benches, both ending with the same result"
+    },
+    {
+      "id": "rlang-principles-of-visualization-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "principles-of-visualization",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Principles",
+      "mascot": false,
+      "subject": "two charts of the same data, one cluttered with ornament and one plain, the plain one obviously easier to read"
+    },
+    {
+      "id": "rlang-interpreting-plots-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "interpreting-plots",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Reading a plot",
+      "mascot": false,
+      "subject": "a chart on a stand with a hand tracing its shape and a magnifier held over two marks that break the pattern"
+    },
+    {
+      "id": "rlang-intuition-for-inference-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "intuition-for-inference",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Inference",
+      "mascot": false,
+      "subject": "a small scoop of chips on a tray, with a large shadowed bin behind it that the scoop is being used to describe"
+    },
+    {
+      "id": "rlang-statistics-before-computers-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "statistics-before-computers",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Statistics by hand",
+      "mascot": false,
+      "subject": "a desk of ruled paper, a mechanical adding machine and a long column of hand-entered figures"
+    },
+    {
+      "id": "rlang-the-age-of-data-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "the-age-of-data",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The age of data",
+      "mascot": false,
+      "subject": "a small crate of records on one bench and an overflowing yard of the same crates behind it"
+    },
+    {
+      "id": "rlang-ggplot-grammar-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "ggplot-grammar",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A grammar for plots",
+      "mascot": false,
+      "subject": "a set of interchangeable parts on a rack, data, marks, scales and frame, assembled into one plot"
+    },
+    {
       "id": "rx-thinking-in-react",
       "collection": "courses",
       "course": "react-from-the-ground-up",
@@ -13485,7 +14205,7 @@
       "style": "risograph",
       "title": "Ranking",
       "mascot": false,
-      "subject": "a row of blocks combed into height order with a small numbered pennant planted on each, two equal blocks sharing one pennant"
+      "subject": "a row of blocks combed into height order with a pennant planted on each, the pennants shortening along the row and two equal blocks sharing one"
     },
     {
       "id": "duck-pivoting-and-reshaping-inline",
@@ -13606,6 +14326,90 @@
       "title": "Metrics",
       "mascot": false,
       "subject": "several raw columns feeding one dial through a small machine, the dial reading a single headline number"
+    },
+    {
+      "id": "duck-why-duckdb-inline",
+      "collection": "courses",
+      "course": "sql-analytics-duckdb",
+      "courseTitle": "SQL Analytics with DuckDB",
+      "lesson": "why-duckdb",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Analytics in process",
+      "mascot": false,
+      "subject": "a heavy remote strongroom with a long pipe on one bench, and on the next a compact engine sitting right beside the workbench"
+    },
+    {
+      "id": "duck-thinking-in-datasets-inline",
+      "collection": "courses",
+      "course": "sql-analytics-duckdb",
+      "courseTitle": "SQL Analytics with DuckDB",
+      "lesson": "thinking-in-datasets",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Thinking in datasets",
+      "mascot": false,
+      "subject": "a hand moving one block at a time on the left, and a full tray lifted in one motion on the right"
+    },
+    {
+      "id": "duck-your-first-analytical-query-inline",
+      "collection": "courses",
+      "course": "sql-analytics-duckdb",
+      "courseTitle": "SQL Analytics with DuckDB",
+      "lesson": "your-first-analytical-query",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A first analytical query",
+      "mascot": false,
+      "subject": "a wide board of rows feeding one machine that leaves a single small summary block on the bench"
+    },
+    {
+      "id": "duck-aggregate-functions-inline",
+      "collection": "courses",
+      "course": "sql-analytics-duckdb",
+      "courseTitle": "SQL Analytics with DuckDB",
+      "lesson": "aggregate-functions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Aggregates in DuckDB",
+      "mascot": false,
+      "subject": "one wide tray of chips feeding four gauges at once, each reading a different single number"
+    },
+    {
+      "id": "duck-filtering-groups-inline",
+      "collection": "courses",
+      "course": "sql-analytics-duckdb",
+      "courseTitle": "SQL Analytics with DuckDB",
+      "lesson": "filtering-groups",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Filtering groups in DuckDB",
+      "mascot": false,
+      "subject": "four summary blocks standing on trays with a marked line across them, the trays below the line taken away"
+    },
+    {
+      "id": "duck-loading-and-generating-data-inline",
+      "collection": "courses",
+      "course": "sql-analytics-duckdb",
+      "courseTitle": "SQL Analytics with DuckDB",
+      "lesson": "loading-and-generating-data",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Loading data",
+      "mascot": false,
+      "subject": "three differently shaped cartons feeding one hopper and arriving inside as identical rows"
+    },
+    {
+      "id": "duck-reproducible-analytical-workflows-inline",
+      "collection": "courses",
+      "course": "sql-analytics-duckdb",
+      "courseTitle": "SQL Analytics with DuckDB",
+      "lesson": "reproducible-analytical-workflows",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Reproducible workflows",
+      "mascot": false,
+      "subject": "a sealed strip of instructions run twice on two benches, both benches ending with identical results"
     },
     {
       "id": "lite-what-is-a-database",
@@ -14073,7 +14877,7 @@
       "style": "risograph",
       "title": "Execution order",
       "mascot": false,
-      "subject": "six numbered stations along a bench with the parcel visibly starting at the fourth, not the first"
+      "subject": "six stations along a bench with the parcel visibly starting at the fourth station, not the first"
     },
     {
       "id": "lite-inner-joins-inline",
@@ -14134,6 +14938,138 @@
       "title": "Foreign keys in SQLite",
       "mascot": false,
       "subject": "a cord joining a row in one board to a row in another, with a small clasp on the cord that can be left open or closed"
+    },
+    {
+      "id": "lite-what-is-a-database-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "what-is-a-database",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A database in one file",
+      "mascot": false,
+      "subject": "a single compact box on a bench with a whole cabinet's worth of drawers folded inside it"
+    },
+    {
+      "id": "lite-spreadsheets-vs-databases-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "spreadsheets-vs-databases",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Beyond the spreadsheet",
+      "mascot": false,
+      "subject": "a sagging oversized sheet on one bench and a small tidy box holding the same rows on the next"
+    },
+    {
+      "id": "lite-creating-tables-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "creating-tables",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Creating a table",
+      "mascot": false,
+      "subject": "an empty frame being ruled into columns of set widths before any row is laid into it"
+    },
+    {
+      "id": "lite-first-queries-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "first-queries",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Asking a question",
+      "mascot": false,
+      "subject": "a slip pushed into a slot on a small box, and a short tray of rows sliding out beneath it"
+    },
+    {
+      "id": "lite-data-exploration-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "data-exploration",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Exploring",
+      "mascot": false,
+      "subject": "a crate opened and its first rows fanned across a bench for a first look"
+    },
+    {
+      "id": "lite-data-organization-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "data-organization",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Organising data",
+      "mascot": false,
+      "subject": "loose records on a bench being filed into three labelled drawers, one kind per drawer"
+    },
+    {
+      "id": "lite-relationships-intro-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "relationships-intro",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Linking tables",
+      "mascot": false,
+      "subject": "two small boards joined by one cord running between a tagged row in each"
+    },
+    {
+      "id": "lite-expressions-and-aliases-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "expressions-and-aliases",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Naming results",
+      "mascot": false,
+      "subject": "a computed column leaving a machine and having a fresh name plate clipped to its head"
+    },
+    {
+      "id": "lite-filtering-groups-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "filtering-groups",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Filtering groups in SQLite",
+      "mascot": false,
+      "subject": "three summary blocks on their trays, one tray lifted away because its block falls short of a marked line"
+    },
+    {
+      "id": "lite-many-to-many-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "many-to-many",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Many to many in SQLite",
+      "mascot": false,
+      "subject": "two rows of crates with all cords between them routed through a small pegboard standing in the middle"
+    },
+    {
+      "id": "lite-sorting-and-limiting-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "sorting-and-limiting",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Sorting and limiting in SQLite",
+      "mascot": false,
+      "subject": "a staircase of blocks with a bracket over the top three and the rest left outside it"
     },
     {
       "id": "stat-why-statistics",
@@ -14709,7 +15645,7 @@
       "style": "risograph",
       "title": "Random variables",
       "mascot": false,
-      "subject": "a machine that turns each outcome of a spinner into a numbered block dropping onto a rail"
+      "subject": "a machine that turns each outcome of a spinner into a block of a matching size dropping onto a rail"
     },
     {
       "id": "stat-discrete-distributions-inline",
@@ -14866,6 +15802,30 @@
       "title": "Exploring first",
       "mascot": false,
       "subject": "a crate of raw chips being spread across a bench and looked at before any gauge is brought near it"
+    },
+    {
+      "id": "stat-why-statistics-matters-inline",
+      "collection": "courses",
+      "course": "statistics-for-data-science-python",
+      "courseTitle": "Statistics for Data Science with Python",
+      "lesson": "why-statistics-matters",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Why statistics",
+      "mascot": false,
+      "subject": "a single measurement on one bench and a whole cloud of measurements on the next, the cloud alone showing a shape"
+    },
+    {
+      "id": "stat-statistical-thinking-inline",
+      "collection": "courses",
+      "course": "statistics-for-data-science-python",
+      "courseTitle": "Statistics for Data Science with Python",
+      "lesson": "statistical-thinking",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Statistical thinking",
+      "mascot": false,
+      "subject": "one chip held up alone, and the same chip shown as part of a mound where its position finally means something"
     },
     {
       "id": "sysc-why-c",
@@ -15117,7 +16077,7 @@
       "style": "risograph",
       "title": "Pointers in C",
       "mascot": false,
-      "subject": "a strip of numbered lockers with a card in one locker carrying the number of another, and a cord following that number across"
+      "subject": "a strip of lockers with a card in one locker whose arrow reaches across to another, and a cord following that arrow"
     },
     {
       "id": "sysc-memory-bugs-inline",
@@ -15153,7 +16113,7 @@
       "style": "risograph",
       "title": "Types and memory",
       "mascot": false,
-      "subject": "four blocks of visibly different widths resting on a numbered strip, each covering a different number of cells"
+      "subject": "four blocks of visibly different widths resting on a strip of equal cells, each block covering a different count of cells"
     },
     {
       "id": "sysc-c-toolchain-inline",
@@ -17280,6 +18240,102 @@
       "subject": "a set of scales with a paper ribbon coiled on one pan and a stack of small chips balancing it on the other"
     },
     {
+      "id": "llm-building-a-tokenizer-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "building-a-tokenizer",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Building a tokenizer",
+      "mascot": false,
+      "subject": "a ribbon of text being cut into chips, the most common runs kept whole and the rare ones cut smaller"
+    },
+    {
+      "id": "llm-pricing-structure-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "pricing-structure",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "How pricing works",
+      "mascot": false,
+      "subject": "a set of scales with input chips on one pan and output chips on the other, the output pan weighted heavier"
+    },
+    {
+      "id": "llm-estimating-cost-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "estimating-cost",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Estimating cost",
+      "mascot": false,
+      "subject": "a measured sample of chips weighed on a small scale and multiplied across a large stack of identical trays"
+    },
+    {
+      "id": "llm-controlling-cost-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "controlling-cost",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Controlling cost",
+      "mascot": false,
+      "subject": "a hopper with an adjustable gate limiting how many chips reach the machine per pass"
+    },
+    {
+      "id": "llm-reasoning-models-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "reasoning-models",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Working through a problem",
+      "mascot": false,
+      "subject": "a machine that lays down a long line of working chips on a side bench before placing its final answer chip"
+    },
+    {
+      "id": "llm-what-benchmarks-measure-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "what-benchmarks-measure",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "What benchmarks measure",
+      "mascot": false,
+      "subject": "a standard test rig with one machine scoring well on it while a second bench of real tasks stands untouched"
+    },
+    {
+      "id": "llm-benchmark-pitfalls-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "benchmark-pitfalls",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Benchmark pitfalls",
+      "mascot": false,
+      "subject": "a machine scoring perfectly on a test rig whose answer card is visibly already inside the machine"
+    },
+    {
+      "id": "llm-evaluating-for-your-task-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "evaluating-for-your-task",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Evaluating for your task",
+      "mascot": false,
+      "subject": "a small bench of your own task cards being run against three machines, one card at a time"
+    },
+    {
       "id": "pricing-guest",
       "collection": "pricing",
       "course": "pricing",
@@ -17997,7 +19053,7 @@
       "style": "risograph",
       "title": "Categoricals",
       "mascot": false,
-      "subject": "a column of repeated word ribbons replaced by small numbered chips, with one key card holding the words once"
+      "subject": "a column of repeated word ribbons replaced by small plain chips of matching colours, with one key card holding each word once"
     },
     {
       "id": "playground-hero",

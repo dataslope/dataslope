@@ -232,3 +232,22 @@ describe("generator / library prompt parity", () => {
     }
   });
 });
+
+describe("authored subjects", () => {
+  // Every style block ends with "No text, letters, numbers or symbols anywhere
+  // in the image", and the model honours it — until the subject itself asks for
+  // the opposite. "A long numbered shelf" produced a shelf stamped 0, 2, 3, 4,
+  // 5, 6 (skipping 1, for good measure), and "one a numbered rail" produced
+  // drawers stamped 1 to 4. Both read as a "No text" failure by the model; both
+  // were written into the prompt by hand.
+  //
+  // Position is drawable without writing a single digit: a hand reaching past
+  // the first three slots to the fourth says index just as clearly. This keeps
+  // the two instructions from contradicting each other in the first place.
+  it("never asks an illustration for numbers it is told not to draw", () => {
+    const offenders = getIllustrationPrompts()
+      .entries.filter((e) => /\bnumbered\b/i.test(e.subject))
+      .map((e) => e.id);
+    expect(offenders).toEqual([]);
+  });
+});

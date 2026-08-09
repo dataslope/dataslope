@@ -21,6 +21,11 @@ converts them:
 
 $$p_i = \frac{e^{z_i}}{\sum_j e^{z_j}}$$
 
+<Figure
+  slug="llm-sampling-inline-cutout"
+  alt="A hopper of candidate chips of different sizes tipped onto a spinner, the largest chip most often landing in the chute but a smaller one sometimes taking its place"
+/>
+
 Exponentiate every score, then divide by the total. The exponential is
 what makes the result *peaked*: a small lead in logits becomes a large
 lead in probability.

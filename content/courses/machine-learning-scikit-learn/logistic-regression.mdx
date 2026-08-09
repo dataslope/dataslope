@@ -46,6 +46,11 @@ user click? A bare label ("fraud") is useful, but a **probability**
 ("87% chance of fraud") is far more useful, it lets you rank cases, set
 thresholds, and decide how much to trust each call.
 
+<Figure
+  slug="ml-logistic-regression-inline-cutout"
+  alt="A board of two-coloured chips with a smooth S-shaped ramp laid across it, chips low on the ramp reading one colour and chips high on it the other"
+/>
+
 Linear regression cannot do this directly. Its straight line runs off to
 plus and minus infinity, so it happily predicts -0.3 or 1.8, nonsense as a
 probability, which must live between 0 and 1. Logistic regression is the fix:

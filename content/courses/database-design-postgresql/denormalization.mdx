@@ -23,6 +23,11 @@ relationships to connect the facts. The normal forms build on each other:
 
 **UNF (mixed and repeated facts) → 1NF (atomic values) → 2NF (whole key) → 3NF (nothing but the key)**
 
+<Figure
+  slug="db-denormalization-inline-cutout"
+  alt="Two tidy tables being deliberately copied into one wider table, with a duplicate block visible in two places and a stopwatch resting beside it"
+/>
+
 Only once you reach a clean, normalized design do you ask whether you
 need a deliberate read model. If not, keep the normalized design. If you
 do, add controlled denormalized data on top of it.

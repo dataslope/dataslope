@@ -20,6 +20,11 @@ you will use more than any other in relational design.
 Read the diagram from left to right: one customer may place zero,
 one, or many orders. Each order belongs to one customer.
 
+<Figure
+  slug="db-one-to-many-inline-cutout"
+  alt="One large parent crate on the left with four smaller crates fanned out to its right, a single cord running from each small crate back to the parent"
+/>
+
 ```mermaid
 erDiagram
     customers ||--o{ orders : places

@@ -28,6 +28,11 @@ A function `f` is **pure** if and only if:
    network request, increment a global counter, read the time, or
    read from a random number generator.
 
+<Figure
+  slug="cs-pure-functions-inline-cutout"
+  alt="A sealed machine with one input and one output and no pipes, hoses or wires leaving it anywhere, the same block in giving the same block out twice"
+/>
+
 ```mermaid
 flowchart LR
     A[Input] --> F["f (pure)"] --> O[Output]

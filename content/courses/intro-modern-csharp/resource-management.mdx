@@ -30,6 +30,11 @@ In low-level languages like C, you call `malloc` and `free` by
 hand. Forget the `free` and you leak memory; double-free and you
 corrupt memory.
 
+<Figure
+  slug="mcs-resource-management-inline-cutout"
+  alt="A tap opened over a basin with a timer beside it, and the same tap shown closed with the basin empty and the timer stopped"
+/>
+
 In C#, when you write `new Person(...)`, the runtime allocates
 memory on the heap. When nothing points to that object anymore,
 the GC eventually reclaims the space:

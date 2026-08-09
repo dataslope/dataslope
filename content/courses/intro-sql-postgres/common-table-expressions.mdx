@@ -19,6 +19,11 @@ A CTE is introduced by the keyword `WITH`. You name a query, and
 then refer to that name in the rest of the statement as if it were a
 table.
 
+<Figure
+  slug="sql-common-table-expressions-inline-cutout"
+  alt="Three small named trays prepared along the top of a bench, and one final machine below drawing from each tray in turn"
+/>
+
 ```mermaid
 flowchart TB
     CTE["WITH <code>big_orders</code> AS (<br/>SELECT ... FROM orders WHERE amount > 50<br/>)"] -->|"named result"| Main["SELECT ... FROM <code>big_orders</code>"]

@@ -24,6 +24,11 @@ understanding them shapes how you think about everything else.
 Picture a sequence as data flowing through a pipe. Each operator is
 a stage in the pipe.
 
+<Figure
+  slug="cs-filtering-and-projection-inline-cutout"
+  alt="A row of mixed parcels passing a grate that drops half of them, and the survivors passing a stamp that reduces each to one small tag"
+/>
+
 ```mermaid
 flowchart TD
     S[Source: 1,2,3,4,5,6] --> W[Where: keep evens] --> P[Select: square it] --> O[Result: 4,16,36]

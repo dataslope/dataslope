@@ -44,6 +44,11 @@ One argument. Everything else about the query is unchanged, which is
 the point: you do not write a different program for large data, you
 ask for a different engine.
 
+<Figure
+  slug="pl-streaming-and-bigger-data-inline-cutout"
+  alt="A long conveyor carrying a river of blocks past a small machine that handles a few at a time, with a hopper far too large to sit on the bench beside it"
+/>
+
 <Callout type="info" title="Streaming needs a lazy query">
 `engine="streaming"` is an argument to `collect()`, so it only exists
 on a `LazyFrame`. An eager `read_csv` has already put the whole file

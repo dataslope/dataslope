@@ -22,6 +22,11 @@ full template machinery, that comes later if you go deep.
 
 Suppose a `std::vector<int>` owns a heap buffer of 1,000,000 ints.
 
+<Figure
+  slug="cpp-move-semantics-intuition-inline-cutout"
+  alt="A heavy crate being copied into a second identical crate on the left, and on the right the same crate simply having its handle passed to another pair of hands"
+/>
+
 A **copy** allocates a new buffer and duplicates every element:
 
 ```mermaid

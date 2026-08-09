@@ -32,9 +32,10 @@
  *
  * Alt text is the prompt's `subject`, sentence-cased: the same description the
  * image was generated from, which is what keeps it true to the art. When a
- * subject is rewritten and the art redrawn, re-running this does *not* update
- * an existing alt — the band is already placed and this leaves it alone. Fix
- * those at the source and check with `--audit`.
+ * subject is rewritten and the art redrawn, placement does *not* touch an
+ * existing alt — the band is already on the page, and this leaves placed bands
+ * alone. That is what `--audit` finds and `--fix-alt` repairs; a stale
+ * description is worse than none, because a screen reader states it as fact.
  *
  * Idempotent: a band already on the page is left exactly where it is, so this
  * is safe to re-run after each wave of new art.
@@ -48,6 +49,9 @@
  *   --only <ids>   Comma-separated prompt ids to consider
  *   --audit        Report placed bands whose alt text no longer matches its
  *                  prompt subject, and any that are unterminated; write nothing
+ *   --fix-alt      Rewrite those alt texts from their subjects. Rewording a
+ *                  subject and redrawing its art leaves the old description on
+ *                  the page, which is worse than none — this is the repair.
  *   -h, --help     Show this help
  */
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
@@ -56,12 +60,13 @@ import { fileURLToPath } from "node:url";
 const ROOT = new URL("..", import.meta.url).pathname;
 
 function parseArgs(argv) {
-  const opts = { write: false, only: null, audit: false, help: false };
+  const opts = { write: false, only: null, audit: false, fixAlt: false, help: false };
   for (let i = 0; i < argv.length; i++) {
     switch (argv[i]) {
       case "--write": opts.write = true; break;
       case "--only": opts.only = new Set(String(argv[++i]).split(",").filter(Boolean)); break;
       case "--audit": opts.audit = true; break;
+      case "--fix-alt": opts.audit = true; opts.fixAlt = true; break;
       case "-h":
       case "--help": opts.help = true; break;
       default:
@@ -154,7 +159,7 @@ export function anchorFor(lines, code) {
  * screen reader wants the scene, not the instruction that produced it. Holding
  * those to `alt === subject` reports sixty problems that are not problems.
  */
-function audit(prompts) {
+function audit(prompts, fix) {
   const problems = [];
   for (const p of prompts) {
     if (!p.id.endsWith("-inline")) continue;
@@ -164,8 +169,22 @@ function audit(prompts) {
     const at = lines.findIndex((l) => l.includes(`slug="${p.id}-cutout"`));
     if (at === -1) continue;
     const alt = lines[at + 1] ?? "";
-    if (!/^\s+alt=".*"\s*$/.test(alt)) problems.push(`${p.id}: alt attribute is not a single closed line`);
-    else if (alt !== `  alt="${altFor(p)}"`) problems.push(`${p.id}: alt no longer matches its subject`);
+    // An unterminated attribute is never rewritten automatically: the value has
+    // already run on into whatever follows it, so the line below is not
+    // necessarily the rest of the tag. That one gets looked at by hand.
+    if (!/^\s+alt=".*"\s*$/.test(alt)) {
+      problems.push(`${p.id}: alt attribute is not a single closed line`);
+    } else if (alt !== `  alt="${altFor(p)}"`) {
+      problems.push(`${p.id}: alt no longer matches its subject`);
+      if (fix) {
+        lines[at + 1] = `  alt="${altFor(p)}"`;
+        writeFileSync(file, lines.join("\n"));
+      }
+    }
+  }
+  if (fix && problems.length) {
+    console.log(`✓ realigned ${problems.length} alt text(s) with their subjects`);
+    return 0;
   }
   console.log(problems.length ? `✗ ${problems.length} problem(s):\n   ${problems.join("\n   ")}`
     : `✓ every placed band's alt text matches the art it describes`);
@@ -179,7 +198,7 @@ function main() {
   const data = JSON.parse(readFileSync("data/illustration-prompts.json", "utf8"));
   let prompts = data.prompts.filter((p) => p.category === "course-inline");
   if (opts.only) prompts = prompts.filter((p) => opts.only.has(p.id));
-  if (opts.audit) process.exit(audit(prompts));
+  if (opts.audit) process.exit(audit(prompts, opts.fixAlt));
 
   // Only place art that exists: a prompt whose image has not been promoted yet
   // would put a broken slug on the page.

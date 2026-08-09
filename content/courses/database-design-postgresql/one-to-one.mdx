@@ -21,6 +21,11 @@ separate table makes the design clearer or safer.
 Imagine a `users` table that starts small, then grows a large set of
 profile details. Some users have those details, many do not.
 
+<Figure
+  slug="db-one-to-one-inline-cutout"
+  alt="Two crates facing each other joined by a single short bar, with no free sockets left on either side"
+/>
+
 ```mermaid
 flowchart TB
     Wide["Wide users table<br/>id | email | <code>display_name</code> | bio | <code>avatar_url</code> | timezone | preferences"]
