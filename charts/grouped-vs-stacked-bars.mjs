@@ -63,6 +63,8 @@ const TOTALS = QUARTERS.map((q, i) => ({
   total: CHANNELS.reduce((s, c) => s + c.values[i], 0),
 }));
 
+const MAX_TOTAL = Math.max(...TOTALS.map((d) => d.total));
+
 const MOBILE = CHANNELS[0];
 const GROWTH = MOBILE.values.at(-1) - MOBILE.values[0];
 
@@ -83,7 +85,13 @@ export function render() {
       ticks: QUARTERS.map((_, i) => i),
       tickFormat: (i) => QUARTERS[i],
     },
-    y: { label: "Orders (thousands)", domain: [0, 78], ticks: 4 },
+    // The domain has to clear the tallest *stack*, not the tallest number in
+    // the data: Q4 totals 83, so a domain stopping at 78 drew that bar and its
+    // printed total straight through the panel title above it. Plot does not
+    // clip marks to the frame, so an under-sized domain is not a visible
+    // truncation — it is a mark in the margin. `MAX_TOTAL` plus room for the
+    // label keeps the arithmetic tied to the data.
+    y: { label: "Orders (thousands)", domain: [0, MAX_TOTAL + 10], ticks: 4 },
     marks: [
       Plot.rect(rows, {
         fx: "panel",
@@ -112,15 +120,17 @@ export function render() {
         stroke: GUIDE,
         strokeDasharray: "4 3",
       }),
+      // Centred over the bar that did the growing, rather than trailing right
+      // from it: a `start` anchor here runs out of the frame and into the
+      // legend sitting in the right margin.
       Plot.text([{}], {
         fx: () => GROUPED,
-        x: QUARTERS.length - 1.4,
+        x: QUARTERS.length - 1 - 0.36 + 0.72 / CHANNELS.length / 2,
         y: MOBILE.values.at(-1),
         text: () => `Mobile: +${GROWTH}`,
         fill: MUTED,
         fontSize: 10.5,
         fontWeight: 600,
-        textAnchor: "start",
         dy: -10,
         ...HALO,
       }),

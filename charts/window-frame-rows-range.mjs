@@ -65,7 +65,7 @@ export function render() {
   return plot({
     height: 300,
     marginTop: 54,
-    marginLeft: 200,
+    marginLeft: 226,
     marginRight: 20,
     marginBottom: 46,
     ariaLabel: title,
