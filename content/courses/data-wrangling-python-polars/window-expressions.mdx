@@ -41,6 +41,11 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
 Every row now knows its own species' average and how far it sits from
 it. The frame still has 344 rows.
 
+<Figure
+  slug="pl-window-expressions-inline-cutout"
+  alt="A long row of blocks with a sliding frame over three of them, a small summary tile appearing beneath the frame as it moves right"
+/>
+
 ```mermaid
 flowchart LR
     A[("344 rows")] -->|"group_by().agg()"| B[("3 rows<br/>one per species")]

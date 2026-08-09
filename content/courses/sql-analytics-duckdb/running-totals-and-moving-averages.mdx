@@ -22,6 +22,11 @@ before it. The magic is just `SUM(...) OVER (ORDER BY ...)`: once the
 window is *ordered*, the sum grows row by row instead of being one
 constant total.
 
+<Figure
+  slug="duck-running-totals-and-moving-averages-inline-cutout"
+  alt="A row of daily blocks with a growing stack behind them, and a smooth bar sliding along averaging the last three at a time"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Cumulative revenue by day"

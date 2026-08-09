@@ -397,13 +397,28 @@ not a one-off: `course-inline`, below.
 
 ### The one other style: inline risograph figures
 
-Everything above is about the art that *opens* a lesson, and stands for its
-idea. `course-inline` is a different job: a band that sits in the body of a
-lesson beside a passage about something that actually happened — the Ariane 5
-flight, the Mars Climate Orbiter, Codd's 1970 paper. Those are editorial
-asides, and drawing them in the same isometric props as the lesson's own art
-made them read as another diagram. Risograph holds the two apart on the page,
-which is the whole reason the category exists.
+Everything above is about the art that *opens* a lesson. `course-inline` is a
+different job: a band that sits *in the body*, next to the paragraph it
+belongs to. Two kinds live there:
+
+- **Something that happened** — the Ariane 5 flight, the Mars Climate Orbiter,
+  Codd's 1970 paper. Editorial asides, and drawing them in the same isometric
+  props as the lesson's own art made them read as another diagram.
+- **Something that is** — a mechanism the lesson is explaining: the call stack
+  as a column of trays, a hash table as a key going into a mixer and out as a
+  bin number, a closure as a machine that left its workshop carrying its own
+  toolbox.
+
+The second kind is the larger half and needs the sharper eye: a concept figure
+earns its place by carrying a *metaphor* the prose does not already draw, and
+is worth nothing when it just restates the heading in shapes. Prefer one
+concrete scene of objects over an abstract arrangement, and check the set for
+repeats before adding one. Nine of the first hundred were cut for exactly that:
+three separate courses had a sliding frame over a row of blocks, and the reader
+meets all three.
+
+Risograph is what holds the two registers apart on the page, which is the whole
+reason the category exists.
 
 Risograph was in the retired list above, for a real reason: a full-bleed riso
 scene has no isolable subject, so background removal returns the whole
@@ -428,10 +443,19 @@ two paragraphs and a lesson cannot spare a half-screen of art there. It is also
 the cheapest frame the API sells: 102 output tokens against 158 at 1536x1024,
 and 1024x512 is refused outright ("below the current minimum pixel budget").
 
-Placement is by hand, one `<Figure>` after the paragraph it belongs to, with a
-`caption` naming the event and its date. `wire-course-figures.mjs` does not
-touch these — it keys on `course-illustration` — so a re-wire will not move or
-clear them.
+Placement is one `<Figure>` after the paragraph it belongs to. An event figure
+carries a `caption` naming the event and its date; a concept figure usually
+does not, because a caption that restates the heading is filler and the prose
+around it already says what the picture means.
+
+`wire-course-figures.mjs` does not touch any of them — it keys on
+`course-illustration` — so a re-wire will not move or clear them.
+
+**Two placement rules worth knowing before scripting a batch.** Start *after*
+the lesson's own opening figure, or the two end up stacked; and never insert
+after a paragraph ending in a colon, because the list, code block or diagram
+below it belongs to that sentence and a figure dropped between them reads as
+the thing being introduced.
 
 **Placing a batch of them: check where each one landed.** Inserting after "the
 paragraph containing this phrase" is mechanical enough to script, and it is

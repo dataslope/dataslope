@@ -360,6 +360,54 @@
       "subject": "a lone figure at a boxy desktop computer in a bay window on the left with snow falling outside, and a small parcel travelling along a wire from that computer to three other desktop computers standing in a row on the right"
     },
     {
+      "id": "python-lists-inline",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "lists",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Lists",
+      "mascot": false,
+      "subject": "a numbered rail holding five blocks in order, one being lifted out of the middle and the rest sliding along to close the gap"
+    },
+    {
+      "id": "python-dictionaries-inline",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "dictionaries",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Dictionaries",
+      "mascot": false,
+      "subject": "a wall of small labelled drawers, one key held up to the wall and exactly one drawer sliding open in response"
+    },
+    {
+      "id": "python-iterators-and-generators-inline",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "iterators-and-generators",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Generators",
+      "mascot": false,
+      "subject": "a dispenser handing out one block at a time on request, with a long roll still coiled inside it rather than laid out on the bench"
+    },
+    {
+      "id": "python-exceptions-inline",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "exceptions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Exceptions",
+      "mascot": false,
+      "subject": "a chute with a side door, a cracked block being routed through the door into a padded tray while the rest continue down"
+    },
+    {
       "id": "beginners-javascript-thumbnail",
       "collection": "courses",
       "course": "beginners-javascript",
@@ -1332,6 +1380,54 @@
       "subject": "a wide conveyor carrying plain blue tiles from the left into a small machine that stamps a calendar leaf onto each one, and the changed tiles piling up on the right"
     },
     {
+      "id": "pandas-dataframes-and-series-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "dataframes-and-series",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "DataFrames and Series",
+      "mascot": false,
+      "subject": "one tall column of stacked cells standing alone on the left, and on the right several of those columns clamped side by side into a single wide grid"
+    },
+    {
+      "id": "pandas-groupby-operations-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "groupby-operations",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Group by",
+      "mascot": false,
+      "subject": "a mixed pile of coloured blocks on the left being sorted into three bins by colour, and each bin producing one summary block on the right"
+    },
+    {
+      "id": "pandas-merging-and-joining-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "merging-and-joining",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Merging and joining",
+      "mascot": false,
+      "subject": "two grids with a matching column of keys sliding together like a zip, the joined rows emerging as one wider grid on the right"
+    },
+    {
+      "id": "pandas-missing-values-inline",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "missing-values",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Missing values",
+      "mascot": false,
+      "subject": "a grid where three cells stand empty as holes, a figure at the left holding a patch tile, and a lever at the right that drops the whole row instead"
+    },
+    {
       "id": "js-computational-thinking",
       "collection": "courses",
       "course": "beginners-javascript",
@@ -1716,6 +1812,54 @@
       "subject": "a browser window standing on the left with a chunky engine block being lifted out of it by a small crane, and the same engine block bolted onto a plain server rack on the right"
     },
     {
+      "id": "js-variables-and-state-inline",
+      "collection": "courses",
+      "course": "beginners-javascript",
+      "courseTitle": "Beginner's Guide to JavaScript",
+      "lesson": "variables-and-state",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Variables and state",
+      "mascot": false,
+      "subject": "a row of four labelled storage tins on a shelf, one open with a coloured block being swapped for a different one, the tin itself unchanged"
+    },
+    {
+      "id": "js-closures-inline",
+      "collection": "courses",
+      "course": "beginners-javascript",
+      "courseTitle": "Beginner's Guide to JavaScript",
+      "lesson": "closures",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Closures",
+      "mascot": false,
+      "subject": "a small machine leaving a workshop on the left carrying its own sealed toolbox, the workshop shuttered behind it, and the machine still working from that toolbox on the right"
+    },
+    {
+      "id": "js-loops-and-iteration-inline",
+      "collection": "courses",
+      "course": "beginners-javascript",
+      "courseTitle": "Beginner's Guide to JavaScript",
+      "lesson": "loops-and-iteration",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Loops and iteration",
+      "mascot": false,
+      "subject": "a closed circular track with one cart running around it, a counter wheel clicking up at each pass, and a gate at the right the cart finally leaves through"
+    },
+    {
+      "id": "js-promises-and-async-await-inline",
+      "collection": "courses",
+      "course": "beginners-javascript",
+      "courseTitle": "Beginner's Guide to JavaScript",
+      "lesson": "promises-and-async-await",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Promises and async/await",
+      "mascot": false,
+      "subject": "a ticket counter on the left handing over a numbered stub, a figure walking away to do other work in the middle, and the finished parcel waiting at a pickup hatch on the right"
+    },
+    {
       "id": "c-story-of-c",
       "collection": "courses",
       "course": "c-programming-for-beginners",
@@ -1992,6 +2136,54 @@
       "subject": "two stylized figures beside a refrigerator-sized computer cabinet with two large tape reels turning on the left, one of them seated at a teletype on the right, and a small round green screen between them showing one planet and one tiny spacecraft"
     },
     {
+      "id": "c-pointers-inline",
+      "collection": "courses",
+      "course": "c-programming-for-beginners",
+      "courseTitle": "C Programming for Beginners",
+      "lesson": "pointers",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Pointers",
+      "mascot": false,
+      "subject": "a long row of numbered mail slots, one slot holding a small card that points at another slot further down the row, and a figure following the arrow"
+    },
+    {
+      "id": "c-dynamic-memory-inline",
+      "collection": "courses",
+      "course": "c-programming-for-beginners",
+      "courseTitle": "C Programming for Beginners",
+      "lesson": "dynamic-memory",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Dynamic memory",
+      "mascot": false,
+      "subject": "a counter on the left handing out a crate of the exact size asked for, a workbench using it in the middle, and the same crate being returned to the counter on the right"
+    },
+    {
+      "id": "c-linked-lists-inline",
+      "collection": "courses",
+      "course": "c-programming-for-beginners",
+      "courseTitle": "C Programming for Beginners",
+      "lesson": "linked-lists",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Linked lists",
+      "mascot": false,
+      "subject": "four separate boxes scattered across the frame, each with a short cord running from its side to the next, the last cord ending in a small stop block"
+    },
+    {
+      "id": "c-strings-inline",
+      "collection": "courses",
+      "course": "c-programming-for-beginners",
+      "courseTitle": "C Programming for Beginners",
+      "lesson": "strings",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Strings",
+      "mascot": false,
+      "subject": "a strip of single-letter tiles laid end to end along a rail, with one small red cap tile closing the run at the right"
+    },
+    {
       "id": "cs-why-declarative-won",
       "collection": "courses",
       "course": "csharp-linq-functional",
@@ -2254,6 +2446,42 @@
       "title": "Why LINQ exists",
       "mascot": false,
       "subject": "a knotted tangle of red cord filling the left of the frame, and on the right one clean blue pipe carrying three shapes through a filter and into a tray"
+    },
+    {
+      "id": "cs-deferred-execution-inline",
+      "collection": "courses",
+      "course": "csharp-linq-functional",
+      "courseTitle": "C# LINQ and Functional Patterns",
+      "lesson": "deferred-execution",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Deferred execution",
+      "mascot": false,
+      "subject": "a long pipe assembled from three empty sections on the left with nothing flowing, and a tap at the right end being opened so blocks finally run the whole length at once"
+    },
+    {
+      "id": "cs-composing-pipelines-inline",
+      "collection": "courses",
+      "course": "csharp-linq-functional",
+      "courseTitle": "C# LINQ and Functional Patterns",
+      "lesson": "composing-pipelines",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Composing pipelines",
+      "mascot": false,
+      "subject": "four short pipe sections being clicked together into one continuous line, shapes entering at the left and leaving sorted at the right"
+    },
+    {
+      "id": "cs-higher-order-functions-inline",
+      "collection": "courses",
+      "course": "csharp-linq-functional",
+      "courseTitle": "C# LINQ and Functional Patterns",
+      "lesson": "higher-order-functions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Higher-order functions",
+      "mascot": false,
+      "subject": "a machine on the left with an open slot in its side, a small tool being slid into that slot, and the machine stamping a different shape because of it"
     },
     {
       "id": "db-what-is-database-design",
@@ -2724,6 +2952,54 @@
       "subject": "an open wallet on the left with a sample card tucked into its pocket, a row of identical wallets laid out on a shop counter across the middle, and an open filing drawer on the right packed with copies of that same card"
     },
     {
+      "id": "db-primary-keys-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "primary-keys",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Primary keys",
+      "mascot": false,
+      "subject": "a filing drawer of identical folders, each wearing one unique numbered tab, and a hand pulling exactly one folder by its tab"
+    },
+    {
+      "id": "db-foreign-keys-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "foreign-keys",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Foreign keys",
+      "mascot": false,
+      "subject": "two filing drawers side by side, a cord running from a tab in the first into a matching slot in the second, and a small lock where the cord enters"
+    },
+    {
+      "id": "db-many-to-many-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "many-to-many",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Many to many",
+      "mascot": false,
+      "subject": "two rows of blocks facing each other with a small junction board between them, every cord passing through a slot on that board rather than joining directly"
+    },
+    {
+      "id": "db-why-normalization-inline",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "why-normalization",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Normalization",
+      "mascot": false,
+      "subject": "one bloated table on the left leaking duplicate blocks, and three tidy narrow tables on the right holding each block exactly once"
+    },
+    {
       "id": "cpp-brief-history",
       "collection": "courses",
       "course": "from-zero-to-cpp",
@@ -3084,6 +3360,54 @@
       "subject": "a long low blue cabinet of six open pigeonholes running the width of the frame, five of them holding one solid green shape each and the middle one standing completely empty, with a small stylized figure at the right reaching into that empty hole"
     },
     {
+      "id": "cpp-the-call-stack-inline",
+      "collection": "courses",
+      "course": "from-zero-to-cpp",
+      "courseTitle": "From Zero to C++ Programming",
+      "lesson": "the-call-stack",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The call stack",
+      "mascot": false,
+      "subject": "a vertical column of trays being added one on top of another as a figure climbs, and the same trays being taken off from the top as they climb back down"
+    },
+    {
+      "id": "cpp-smart-pointers-inline",
+      "collection": "courses",
+      "course": "from-zero-to-cpp",
+      "courseTitle": "From Zero to C++ Programming",
+      "lesson": "smart-pointers",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Smart pointers",
+      "mascot": false,
+      "subject": "a crate carried by a handle that unclips itself, the crate dropping neatly into a return chute the moment the last hand lets go"
+    },
+    {
+      "id": "cpp-memory-model-inline",
+      "collection": "courses",
+      "course": "from-zero-to-cpp",
+      "courseTitle": "From Zero to C++ Programming",
+      "lesson": "memory-model",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The memory model",
+      "mascot": false,
+      "subject": "one long numbered strip running the width of the frame, divided into three labelled zones of different sizes with blocks resting in each"
+    },
+    {
+      "id": "cpp-raii-and-resources-inline",
+      "collection": "courses",
+      "course": "from-zero-to-cpp",
+      "courseTitle": "From Zero to C++ Programming",
+      "lesson": "raii-and-resources",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "RAII",
+      "mascot": false,
+      "subject": "a door that opens as a figure steps through and swings shut behind them on its own spring, a lamp inside switching off with it"
+    },
+    {
       "id": "fp-evolution-of-complexity",
       "collection": "courses",
       "course": "functional-programming-typescript",
@@ -3358,6 +3682,42 @@
       "title": "Lisp at MIT",
       "mascot": false,
       "subject": "a figure at a 1950s console on the left holding open a set of nested boxes, each box holding a smaller box inside it, the whole set opened out along the bench to the right"
+    },
+    {
+      "id": "fp-immutability-inline",
+      "collection": "courses",
+      "course": "functional-programming-typescript",
+      "courseTitle": "Functional Programming with TypeScript",
+      "lesson": "immutability",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Immutability",
+      "mascot": false,
+      "subject": "a sealed block on the left, and beside it a fresh copy with one face changed, the original still sealed and untouched"
+    },
+    {
+      "id": "fp-function-composition-inline",
+      "collection": "courses",
+      "course": "functional-programming-typescript",
+      "courseTitle": "Functional Programming with TypeScript",
+      "lesson": "function-composition",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Function composition",
+      "mascot": false,
+      "subject": "three small machines bolted end to end into one longer machine, a single shape entering the left and leaving transformed at the right"
+    },
+    {
+      "id": "fp-pattern-matching-inline",
+      "collection": "courses",
+      "course": "functional-programming-typescript",
+      "courseTitle": "Functional Programming with TypeScript",
+      "lesson": "pattern-matching",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Pattern matching",
+      "mascot": false,
+      "subject": "a shape sorter board with four differently cut holes, each shape dropping through the one hole it fits and landing in its own tray"
     },
     {
       "id": "viz-what-is-dataviz",
@@ -3804,6 +4164,42 @@
       "subject": "an engraver's bench on the left with a copper plate and a burin, a printing press in the middle, and a printed sheet on the right carrying one row of bars and one round pie"
     },
     {
+      "id": "viz-graphical-encodings-inline",
+      "collection": "courses",
+      "course": "intro-data-viz-plotly",
+      "courseTitle": "Introduction to Data Visualization with Python and Plotly Express",
+      "lesson": "graphical-encodings",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Graphical encodings",
+      "mascot": false,
+      "subject": "the same four data blocks shown four times across the frame, once as bar heights, once as dot positions, once as sizes and once as colours"
+    },
+    {
+      "id": "viz-color-scales-and-aesthetics-inline",
+      "collection": "courses",
+      "course": "intro-data-viz-plotly",
+      "courseTitle": "Introduction to Data Visualization with Python and Plotly Express",
+      "lesson": "color-scales-and-aesthetics",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Color scales",
+      "mascot": false,
+      "subject": "a strip running from pale to deep in one hue on the left, a strip running between two opposite hues in the middle, and separate distinct patches on the right"
+    },
+    {
+      "id": "viz-faceting-and-small-multiples-inline",
+      "collection": "courses",
+      "course": "intro-data-viz-plotly",
+      "courseTitle": "Introduction to Data Visualization with Python and Plotly Express",
+      "lesson": "faceting-and-small-multiples",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Small multiples",
+      "mascot": false,
+      "subject": "one crowded chart panel on the left splitting into a row of four small panels on the right, each holding a single clean line"
+    },
+    {
       "id": "mcs-computational-thinking",
       "collection": "courses",
       "course": "intro-modern-csharp",
@@ -4114,6 +4510,30 @@
       "title": ".NET crosses platforms",
       "mascot": false,
       "subject": "three different machine cabinets standing apart across the frame, one long runtime plank bridging all three of them, and a figure walking along the plank"
+    },
+    {
+      "id": "mcs-managed-runtimes-inline",
+      "collection": "courses",
+      "course": "intro-modern-csharp",
+      "courseTitle": "Introduction to Modern C#",
+      "lesson": "managed-runtimes",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Managed runtimes",
+      "mascot": false,
+      "subject": "a program block resting on a wide platform, with a small tidy-up cart under the platform sweeping discarded blocks away on its own"
+    },
+    {
+      "id": "mcs-type-system-inline",
+      "collection": "courses",
+      "course": "intro-modern-csharp",
+      "courseTitle": "Introduction to Modern C#",
+      "lesson": "type-system",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The type system",
+      "mascot": false,
+      "subject": "a gate with shaped slots, blocks of the wrong shape stopping at the gate and blocks of the right shape passing through onto a rail"
     },
     {
       "id": "sql-what-is-a-database",
@@ -4500,6 +4920,54 @@
       "subject": "two database drums standing on a long bench, the left one small and plain, the right one larger with extra fittings bolted onto it, and a figure at the right fitting one more part"
     },
     {
+      "id": "sql-understanding-joins-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "understanding-joins",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Joins",
+      "mascot": false,
+      "subject": "two overlapping grids on a light table, the overlapping region lit and the outer regions dimmed, with a small selector dial beside them"
+    },
+    {
+      "id": "sql-primary-keys-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "primary-keys",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Primary keys",
+      "mascot": false,
+      "subject": "a rack of identical cards each carrying one unique coloured notch, and a single card being lifted out by that notch"
+    },
+    {
+      "id": "sql-grouping-data-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "grouping-data",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Grouping",
+      "mascot": false,
+      "subject": "a scatter of mixed blocks being raked into three neat piles, and one tall summary block standing beside each pile"
+    },
+    {
+      "id": "sql-query-execution-order-inline",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "query-execution-order",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Query execution order",
+      "mascot": false,
+      "subject": "a numbered chain of six machines along a bench, the parcel entering at a middle machine rather than the first, and the numbers showing the true running order"
+    },
+    {
       "id": "web-how-the-web-works",
       "collection": "courses",
       "course": "intro-web-development",
@@ -4750,6 +5218,54 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot on a pale grey platform at a tall signpost, three wide ramps leading away to three raised platforms"
+    },
+    {
+      "id": "web-how-the-web-works-inline",
+      "collection": "courses",
+      "course": "intro-web-development",
+      "courseTitle": "Intro to Web Development",
+      "lesson": "how-the-web-works",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "How the web works",
+      "mascot": false,
+      "subject": "a small laptop on the left sending a folded note along a cable to a server drum on the right, which sends a larger page back along the same cable"
+    },
+    {
+      "id": "web-css-box-model-inline",
+      "collection": "courses",
+      "course": "intro-web-development",
+      "courseTitle": "Intro to Web Development",
+      "lesson": "css-box-model",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The box model",
+      "mascot": false,
+      "subject": "one block shown in cross-section as four nested frames of different colours, from the content core outward to the outermost margin"
+    },
+    {
+      "id": "web-css-flexbox-layout-inline",
+      "collection": "courses",
+      "course": "intro-web-development",
+      "courseTitle": "Intro to Web Development",
+      "lesson": "css-flexbox-layout",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Flexbox",
+      "mascot": false,
+      "subject": "a single rail with four blocks on it, springs between them stretching and squeezing so the blocks stay evenly spread as the rail changes length"
+    },
+    {
+      "id": "web-js-events-inline",
+      "collection": "courses",
+      "course": "intro-web-development",
+      "courseTitle": "Intro to Web Development",
+      "lesson": "js-events",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Events",
+      "mascot": false,
+      "subject": "a button being pressed on the left, a ripple travelling up through three nested frames, and a small listener bell ringing on the outermost one"
     },
     {
       "id": "jcol-tyranny-of-arrays",
@@ -5014,6 +5530,42 @@
       "title": "Generic Java",
       "mascot": false,
       "subject": "a blue box on the left being carried through a gate in the middle that clamps a coloured tag onto it, and the same box arriving on the right with the tag gone"
+    },
+    {
+      "id": "jcol-equality-and-hashing-inline",
+      "collection": "courses",
+      "course": "java-collections-and-generics-deep-dive",
+      "courseTitle": "Java Collections and Generics Deep Dive",
+      "lesson": "equality-and-hashing",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Equality and hashing",
+      "mascot": false,
+      "subject": "two identical-looking blocks on a balance that reads level, and beneath them a sorting machine dropping both into the same numbered bin"
+    },
+    {
+      "id": "jcol-type-erasure-inline",
+      "collection": "courses",
+      "course": "java-collections-and-generics-deep-dive",
+      "courseTitle": "Java Collections and Generics Deep Dive",
+      "lesson": "type-erasure",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Type erasure",
+      "mascot": false,
+      "subject": "a box wearing a coloured tag passing through a gate that checks the tag, and the same box continuing past the gate with the tag removed"
+    },
+    {
+      "id": "jcol-maps-inline",
+      "collection": "courses",
+      "course": "java-collections-and-generics-deep-dive",
+      "courseTitle": "Java Collections and Generics Deep Dive",
+      "lesson": "maps",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Maps",
+      "mascot": false,
+      "subject": "a wall of small pigeonholes, each with a distinct key hanging beside it, and one key opening exactly one hole to reveal the block inside"
     },
     {
       "id": "java-what-is-a-program",
@@ -5386,6 +5938,30 @@
       "title": "Java on every phone",
       "mascot": false,
       "subject": "a steaming coffee cup on the left, and a row of four flat handheld phone slabs standing across the right, each lit with one plain coloured panel"
+    },
+    {
+      "id": "java-stack-and-heap-inline",
+      "collection": "courses",
+      "course": "java-programming-for-beginners",
+      "courseTitle": "Java Programming for Beginners",
+      "lesson": "stack-and-heap",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Stack and heap",
+      "mascot": false,
+      "subject": "a tidy vertical column of trays on the left and an open yard of scattered crates on the right, thin cords running from trays to the crates they point at"
+    },
+    {
+      "id": "java-jvm-conceptually-inline",
+      "collection": "courses",
+      "course": "java-programming-for-beginners",
+      "courseTitle": "Java Programming for Beginners",
+      "lesson": "jvm-conceptually",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The virtual machine",
+      "mascot": false,
+      "subject": "one program block on the left feeding a single translating machine in the middle, which drives three different machine cabinets on the right"
     },
     {
       "id": "ml-what-is-ml",
@@ -5808,6 +6384,54 @@
       "subject": "a wide chart board with a red curve climbing steeply on the left and a lower green curve running almost flat beneath it, the gap between the two widening toward the right, and a figure standing at the right"
     },
     {
+      "id": "ml-train-test-split-inline",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "train-test-split",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Train and test split",
+      "mascot": false,
+      "subject": "one pile of blocks being divided by a partition into a large left share and a small sealed right share, the right share kept under a lid"
+    },
+    {
+      "id": "ml-generalization-and-overfitting-inline",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "generalization-and-overfitting",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Overfitting",
+      "mascot": false,
+      "subject": "two boards side by side, the left with a line threading through every single point, the right with a smooth line passing near them, and a fresh point landing far from the left line"
+    },
+    {
+      "id": "ml-the-bias-variance-tradeoff-inline",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "the-bias-variance-tradeoff",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Bias and variance",
+      "mascot": false,
+      "subject": "two dartboards on a wall, one with a tight cluster far off centre and the other with a wide scatter around the centre"
+    },
+    {
+      "id": "ml-k-means-clustering-inline",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "k-means-clustering",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "K-means",
+      "mascot": false,
+      "subject": "a board of scattered chips with three marker posts, each chip joined by a short cord to its nearest post, the posts standing at the middle of their own group"
+    },
+    {
       "id": "dsa-why-cpp",
       "collection": "courses",
       "course": "mastering-dsa-cpp",
@@ -6168,6 +6792,54 @@
       "subject": "an open cellar hatch set into a floor on the left with plates being dropped in one at a time, and on the right the topmost plate being lifted back out"
     },
     {
+      "id": "dsa-hash-tables-inline",
+      "collection": "courses",
+      "course": "mastering-dsa-cpp",
+      "courseTitle": "Mastering Data Structures and Algorithms in C++",
+      "lesson": "hash-tables",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Hash tables",
+      "mascot": false,
+      "subject": "a key dropped into a small mixing machine that spits out a bin number, and the item landing directly in that numbered bin among a row of bins"
+    },
+    {
+      "id": "dsa-heaps-inline",
+      "collection": "courses",
+      "course": "mastering-dsa-cpp",
+      "courseTitle": "Mastering Data Structures and Algorithms in C++",
+      "lesson": "heaps",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Heaps",
+      "mascot": false,
+      "subject": "a pyramid of blocks where every block sits above two smaller ones, the largest at the apex being lifted off by a small crane"
+    },
+    {
+      "id": "dsa-graph-traversal-inline",
+      "collection": "courses",
+      "course": "mastering-dsa-cpp",
+      "courseTitle": "Mastering Data Structures and Algorithms in C++",
+      "lesson": "graph-traversal",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Graph traversal",
+      "mascot": false,
+      "subject": "a network of posts joined by cords, with a wave of colour spreading outward from one post to its neighbours, then to theirs"
+    },
+    {
+      "id": "dsa-recursion-inline",
+      "collection": "courses",
+      "course": "mastering-dsa-cpp",
+      "courseTitle": "Mastering Data Structures and Algorithms in C++",
+      "lesson": "recursion",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Recursion",
+      "mascot": false,
+      "subject": "a set of nested boxes opened one inside another down to a tiny solid one, and the stack closing back up in reverse"
+    },
+    {
       "id": "gg-systems-dont-scale",
       "collection": "courses",
       "course": "mastering-ggplot2",
@@ -6492,6 +7164,30 @@
       "subject": "three transparent sheets held apart in a stepped stack on the right, each carrying a different mark, and a figure at the left lowering the topmost sheet onto the others"
     },
     {
+      "id": "gg-thinking-in-layers-inline",
+      "collection": "courses",
+      "course": "mastering-ggplot2",
+      "courseTitle": "Mastering ggplot2",
+      "lesson": "thinking-in-layers",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Thinking in layers",
+      "mascot": false,
+      "subject": "three transparent panels held apart in a stepped stack, one carrying points, one a line, one a band, and the finished plot below where they line up"
+    },
+    {
+      "id": "gg-what-scales-do-inline",
+      "collection": "courses",
+      "course": "mastering-ggplot2",
+      "courseTitle": "Mastering ggplot2",
+      "lesson": "what-scales-do",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Scales",
+      "mascot": false,
+      "subject": "a raw block of data on the left passing through a gauge in the middle that converts it into a position, a size and a colour on the right"
+    },
+    {
       "id": "css-cascade",
       "collection": "courses",
       "course": "modern-css-layout",
@@ -6708,6 +7404,42 @@
       "subject": "the Dataslope marmot mascot standing on a finished layout platform beside a signpost with three arrows pointing outward"
     },
     {
+      "id": "css-the-cascade-and-specificity-inline",
+      "collection": "courses",
+      "course": "modern-css-layout",
+      "courseTitle": "Modern CSS: Layout and Responsive Design",
+      "lesson": "the-cascade-and-specificity",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The cascade",
+      "mascot": false,
+      "subject": "three coloured sheets falling onto one block in order, the last and most specific sheet sitting on top and deciding its final colour"
+    },
+    {
+      "id": "css-css-grid-inline",
+      "collection": "courses",
+      "course": "modern-css-layout",
+      "courseTitle": "Modern CSS: Layout and Responsive Design",
+      "lesson": "css-grid",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "CSS Grid",
+      "mascot": false,
+      "subject": "a rectangular frame ruled into rows and columns, with three blocks placed to span several cells each, the empty cells left visible"
+    },
+    {
+      "id": "css-container-queries-inline",
+      "collection": "courses",
+      "course": "modern-css-layout",
+      "courseTitle": "Modern CSS: Layout and Responsive Design",
+      "lesson": "container-queries",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Container queries",
+      "mascot": false,
+      "subject": "the same card shown twice, once inside a narrow frame with its parts stacked and once inside a wide frame with its parts side by side"
+    },
+    {
       "id": "nlp-what-is-nlp",
       "collection": "courses",
       "course": "natural-language-processing-python",
@@ -6922,6 +7654,42 @@
       "title": "ELIZA",
       "mascot": false,
       "subject": "a figure sitting on a low couch at the left facing a teletype terminal on a small table, an empty armchair standing behind the terminal, and one plain speech bubble rising from its screen"
+    },
+    {
+      "id": "nlp-tokenization-inline",
+      "collection": "courses",
+      "course": "natural-language-processing-python",
+      "courseTitle": "Natural Language Processing with Python",
+      "lesson": "tokenization",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Tokenization",
+      "mascot": false,
+      "subject": "a paper ribbon running into a small guillotine that cuts it into separate word tiles, the tiles dropping into a tray in order"
+    },
+    {
+      "id": "nlp-tf-idf-inline",
+      "collection": "courses",
+      "course": "natural-language-processing-python",
+      "courseTitle": "Natural Language Processing with Python",
+      "lesson": "tf-idf",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "TF-IDF",
+      "mascot": false,
+      "subject": "a balance with a common word tile on one pan barely moving it, and a rare word tile on the other pan tipping the balance hard"
+    },
+    {
+      "id": "nlp-stemming-and-lemmatization-inline",
+      "collection": "courses",
+      "course": "natural-language-processing-python",
+      "courseTitle": "Natural Language Processing with Python",
+      "lesson": "stemming-and-lemmatization",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Stemming and lemmatization",
+      "mascot": false,
+      "subject": "four differently shaped word tiles being trimmed by a small press into one identical root tile"
     },
     {
       "id": "oopj-software-crisis",
@@ -7186,6 +7954,42 @@
       "title": "Simula in Oslo",
       "mascot": false,
       "subject": "two figures at a desk on the left, and a model harbour laid out along the bench to the right with three small ships and two cranes, each one a separate solid piece"
+    },
+    {
+      "id": "oopj-polymorphism-inline",
+      "collection": "courses",
+      "course": "oop-blueprint-java",
+      "courseTitle": "Object-Oriented Programming Blueprint with Java",
+      "lesson": "polymorphism",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Polymorphism",
+      "mascot": false,
+      "subject": "one lever being pulled on the left, and three different machines to the right each answering it in their own way"
+    },
+    {
+      "id": "oopj-encapsulation-inline",
+      "collection": "courses",
+      "course": "oop-blueprint-java",
+      "courseTitle": "Object-Oriented Programming Blueprint with Java",
+      "lesson": "encapsulation",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Encapsulation",
+      "mascot": false,
+      "subject": "a sealed cabinet with its working parts hidden inside and two clean handles on its face, a figure using only the handles"
+    },
+    {
+      "id": "oopj-objects-in-memory-inline",
+      "collection": "courses",
+      "course": "oop-blueprint-java",
+      "courseTitle": "Object-Oriented Programming Blueprint with Java",
+      "lesson": "objects-in-memory",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Objects in memory",
+      "mascot": false,
+      "subject": "a small name plate on the left joined by a cord to a crate standing in an open yard on the right, and a second plate pointing at the same crate"
     },
     {
       "id": "rlang-age-of-data",
@@ -7632,6 +8436,42 @@
       "subject": "a figure at a 1970s terminal on the left, a card punch on the bench beside them, and a long printout unspooling to the right and ending in a plotted curve"
     },
     {
+      "id": "rlang-tidy-data-principles-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "tidy-data-principles",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Tidy data",
+      "mascot": false,
+      "subject": "a jumbled sheet on the left being rebuilt into a clean grid on the right where every row is one record and every column one measure"
+    },
+    {
+      "id": "rlang-vectors-everywhere-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "vectors-everywhere",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Vectors",
+      "mascot": false,
+      "subject": "a single tray of numbered tiles passing under a stamp that marks every tile at once, rather than one tile at a time"
+    },
+    {
+      "id": "rlang-reshaping-data-inline",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "reshaping-data",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Reshaping data",
+      "mascot": false,
+      "subject": "a wide short grid on the left being folded into a narrow tall one on the right, with an arrow showing the fold running both ways"
+    },
+    {
       "id": "rx-thinking-in-react",
       "collection": "courses",
       "course": "react-from-the-ground-up",
@@ -7822,6 +8662,42 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "a red panda on a pale grey platform stepping up onto the tallest of three broad steps"
+    },
+    {
+      "id": "rx-state-with-usestate-inline",
+      "collection": "courses",
+      "course": "react-from-the-ground-up",
+      "courseTitle": "React from the Ground Up",
+      "lesson": "state-with-usestate",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "State",
+      "mascot": false,
+      "subject": "a small dial on a panel being turned one notch, and the display block above it redrawing itself to match"
+    },
+    {
+      "id": "rx-rendering-lists-inline",
+      "collection": "courses",
+      "course": "react-from-the-ground-up",
+      "courseTitle": "React from the Ground Up",
+      "lesson": "rendering-lists",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Rendering lists",
+      "mascot": false,
+      "subject": "a tray of three data blocks on the left, each one stamped into an identical card by a small press, the finished cards standing in a row on the right"
+    },
+    {
+      "id": "rx-effects-and-data-fetching-inline",
+      "collection": "courses",
+      "course": "react-from-the-ground-up",
+      "courseTitle": "React from the Ground Up",
+      "lesson": "effects-and-data-fetching",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Effects",
+      "mascot": false,
+      "subject": "a panel that lights up on the left, sending a cord out to a server drum in the middle, and filling one of its own slots when the parcel returns"
     },
     {
       "id": "scipy-manual-limits",
@@ -8110,6 +8986,42 @@
       "title": "A third of a second",
       "mascot": false,
       "subject": "a large clock face on the left whose hand has slipped just past its mark, a round radar screen in the middle showing a single blip, and a track passing wide of that blip on the right"
+    },
+    {
+      "id": "scipy-floating-point-inline",
+      "collection": "courses",
+      "course": "scientific-computing-python",
+      "courseTitle": "Scientific Computing with Python",
+      "lesson": "floating-point",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Floating point",
+      "mascot": false,
+      "subject": "a ruler whose marks are close together near the left end and further and further apart toward the right, a block landing between two marks"
+    },
+    {
+      "id": "scipy-numerical-stability-inline",
+      "collection": "courses",
+      "course": "scientific-computing-python",
+      "courseTitle": "Scientific Computing with Python",
+      "lesson": "numerical-stability",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Numerical stability",
+      "mascot": false,
+      "subject": "two chains of the same small operations, the near one ending with a block still on its mark and the far one ending far off it"
+    },
+    {
+      "id": "scipy-ordinary-differential-equations-inline",
+      "collection": "courses",
+      "course": "scientific-computing-python",
+      "courseTitle": "Scientific Computing with Python",
+      "lesson": "ordinary-differential-equations",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Solving ODEs",
+      "mascot": false,
+      "subject": "a smooth curve drawn on a board with a walker crossing it in short straight steps, the steps drifting slightly off the curve as they go"
     },
     {
       "id": "sns-why-visualize",
@@ -8448,6 +9360,30 @@
       "subject": "four small framed plots standing in a row across the frame, the points inside each one arranged differently, and one identical plain tile standing beneath every frame"
     },
     {
+      "id": "sns-distributions-kde-inline",
+      "collection": "courses",
+      "course": "seaborn-foundations",
+      "courseTitle": "Seaborn Foundations",
+      "lesson": "distributions-kde",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Density estimates",
+      "mascot": false,
+      "subject": "a row of stacked blocks forming a rough histogram, and a smooth curve laid over them following the same shape"
+    },
+    {
+      "id": "sns-correlation-heatmaps-inline",
+      "collection": "courses",
+      "course": "seaborn-foundations",
+      "courseTitle": "Seaborn Foundations",
+      "lesson": "correlation-heatmaps",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Correlation heatmaps",
+      "mascot": false,
+      "subject": "a square grid of tiles in graded colours with a strong diagonal band, and a colour key standing beside it"
+    },
+    {
       "id": "duck-olap-vs-oltp",
       "collection": "courses",
       "course": "sql-analytics-duckdb",
@@ -8722,6 +9658,30 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "a small cheerful yellow duck (the DuckDB mascot) hopping up onto the tallest of three broad steps on a pale grey platform"
+    },
+    {
+      "id": "duck-running-totals-and-moving-averages-inline",
+      "collection": "courses",
+      "course": "sql-analytics-duckdb",
+      "courseTitle": "SQL Analytics with DuckDB",
+      "lesson": "running-totals-and-moving-averages",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Running totals",
+      "mascot": false,
+      "subject": "a row of daily blocks with a growing stack behind them, and a smooth bar sliding along averaging the last three at a time"
+    },
+    {
+      "id": "duck-olap-vs-oltp-inline",
+      "collection": "courses",
+      "course": "sql-analytics-duckdb",
+      "courseTitle": "SQL Analytics with DuckDB",
+      "lesson": "olap-vs-oltp",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "OLAP and OLTP",
+      "mascot": false,
+      "subject": "a service counter handling one small parcel at a time on the left, and a warehouse aisle on the right where one wide column is read end to end"
     },
     {
       "id": "lite-what-is-a-database",
@@ -9070,6 +10030,18 @@
       "title": "A database with no server",
       "mascot": false,
       "subject": "the deck of a grey warship spanning the frame, one small blue file block resting on a console in the middle, and an empty bolted footprint on the right where a server cabinet would have stood"
+    },
+    {
+      "id": "lite-how-applications-store-information-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "how-applications-store-information",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Storing information",
+      "mascot": false,
+      "subject": "an app window on the left with a short cord running straight into a single file block beside it, no server cabinet anywhere in the frame"
     },
     {
       "id": "stat-why-statistics",
@@ -9468,6 +10440,54 @@
       "subject": "three plain rectangular frames standing side by side across the frame, the first holding one solid dinosaur shape, the second one solid five-pointed star and the third one solid ring, with one identical narrow tile lying beneath each frame"
     },
     {
+      "id": "stat-central-limit-theorem-inline",
+      "collection": "courses",
+      "course": "statistics-for-data-science-python",
+      "courseTitle": "Statistics for Data Science with Python",
+      "lesson": "central-limit-theorem",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The central limit theorem",
+      "mascot": false,
+      "subject": "three lopsided piles of blocks on the left, each producing one average block, and those averages stacking on the right into a smooth symmetric mound"
+    },
+    {
+      "id": "stat-confidence-intervals-inline",
+      "collection": "courses",
+      "course": "statistics-for-data-science-python",
+      "courseTitle": "Statistics for Data Science with Python",
+      "lesson": "confidence-intervals",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Confidence intervals",
+      "mascot": false,
+      "subject": "a row of twenty short horizontal bars each spanning a true value line, one bar clearly missing the line entirely"
+    },
+    {
+      "id": "stat-p-values-inline",
+      "collection": "courses",
+      "course": "statistics-for-data-science-python",
+      "courseTitle": "Statistics for Data Science with Python",
+      "lesson": "p-values",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "P-values",
+      "mascot": false,
+      "subject": "a mound of blocks with a small shaded tail at its right edge, and one observed marker standing out in that tail"
+    },
+    {
+      "id": "stat-the-bootstrap-inline",
+      "collection": "courses",
+      "course": "statistics-for-data-science-python",
+      "courseTitle": "Statistics for Data Science with Python",
+      "lesson": "the-bootstrap",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The bootstrap",
+      "mascot": false,
+      "subject": "one bucket of blocks being scooped from repeatedly with replacement, each scoop producing a summary tile, the tiles piling into a spread"
+    },
+    {
       "id": "sysc-why-c",
       "collection": "courses",
       "course": "systems-programming-c",
@@ -9672,6 +10692,30 @@
       "subject": "one tiny red packet block at the far left multiplying into a spreading fan of identical packets that fills the right of the frame, with two small server racks swamped beneath them"
     },
     {
+      "id": "sysc-memory-layout-inline",
+      "collection": "courses",
+      "course": "systems-programming-c",
+      "courseTitle": "Systems Programming with C",
+      "lesson": "memory-layout",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Memory layout",
+      "mascot": false,
+      "subject": "one tall vertical strip divided into four labelled bands of different sizes, with a stack growing down from the top and a heap growing up from below"
+    },
+    {
+      "id": "sysc-heap-and-dynamic-allocation-inline",
+      "collection": "courses",
+      "course": "systems-programming-c",
+      "courseTitle": "Systems Programming with C",
+      "lesson": "heap-and-dynamic-allocation",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The heap",
+      "mascot": false,
+      "subject": "an open yard of crates of different sizes with gaps between them, a figure fitting one new crate into a gap that just fits"
+    },
+    {
       "id": "tsa-what-makes-unique",
       "collection": "courses",
       "course": "time-series-analysis-python",
@@ -9814,6 +10858,30 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "a koala on a pale grey platform pulling one tall green column up out of a wide machine"
+    },
+    {
+      "id": "tsa-decomposition-trend-seasonality-inline",
+      "collection": "courses",
+      "course": "time-series-analysis-python",
+      "courseTitle": "Time Series Analysis with Python",
+      "lesson": "decomposition-trend-seasonality",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Decomposition",
+      "mascot": false,
+      "subject": "one wavy line on the left separating into three stacked lines on the right, a rising trend, a repeating wave and a rough remainder"
+    },
+    {
+      "id": "tsa-stationarity-inline",
+      "collection": "courses",
+      "course": "time-series-analysis-python",
+      "courseTitle": "Time Series Analysis with Python",
+      "lesson": "stationarity",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Stationarity",
+      "mascot": false,
+      "subject": "two tracks side by side, the near one drifting steadily upward off its rail and the far one wobbling around a fixed centre line"
     },
     {
       "id": "tsx-evolution-of-js",
@@ -10162,6 +11230,42 @@
       "title": "Types for a language already shipped",
       "mascot": false,
       "subject": "a tall leaning stack of loose sheets on a bench in the middle, a figure at the left clamping a blue bracket around it, and the same stack standing square and marked with three coloured tabs on the right"
+    },
+    {
+      "id": "tsx-type-narrowing-inline",
+      "collection": "courses",
+      "course": "typescript-from-scratch",
+      "courseTitle": "TypeScript from Scratch",
+      "lesson": "type-narrowing",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Narrowing",
+      "mascot": false,
+      "subject": "a wide chute holding three differently shaped blocks, passing through two gates that each reject a shape until one block remains"
+    },
+    {
+      "id": "tsx-structural-typing-inline",
+      "collection": "courses",
+      "course": "typescript-from-scratch",
+      "courseTitle": "TypeScript from Scratch",
+      "lesson": "structural-typing",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Structural typing",
+      "mascot": false,
+      "subject": "two differently coloured plugs with identical pin patterns, both fitting the same socket"
+    },
+    {
+      "id": "tsx-generics-basics-inline",
+      "collection": "courses",
+      "course": "typescript-from-scratch",
+      "courseTitle": "TypeScript from Scratch",
+      "lesson": "generics-basics",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Generics",
+      "mascot": false,
+      "subject": "one crate with an interchangeable insert, three differently shaped inserts standing beside it, each making the same crate hold a different shape"
     },
     {
       "id": "home-icon-courses",
@@ -11268,6 +12372,54 @@
       "subject": "a raccoon on a pale grey platform stepping up onto the tallest of three broad steps"
     },
     {
+      "id": "llm-tokens-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "tokens",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Tokens",
+      "mascot": false,
+      "subject": "a long paper ribbon being cut into uneven chips by a small press, some chips whole words and some fragments, the chips collecting in a tray"
+    },
+    {
+      "id": "llm-attention-intuition-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "attention-intuition",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Attention",
+      "mascot": false,
+      "subject": "a row of chips along a rail, with cords of different thicknesses running from one chip back to three earlier ones, the thickest cord clearly heaviest"
+    },
+    {
+      "id": "llm-embeddings-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "embeddings",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Embeddings",
+      "mascot": false,
+      "subject": "a wide board where small chips sit at different heights and distances, similar chips clustered close together and unrelated ones far apart"
+    },
+    {
+      "id": "llm-context-windows-inline",
+      "collection": "courses",
+      "course": "how-llms-work",
+      "courseTitle": "How Large Language Models Work",
+      "lesson": "context-windows",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Context windows",
+      "mascot": false,
+      "subject": "a long ribbon of chips feeding through a fixed rectangular frame, the chips that pass beyond the frame's left edge dropping away off the rail"
+    },
+    {
       "id": "pricing-guest",
       "collection": "pricing",
       "course": "pricing",
@@ -11722,6 +12874,54 @@
       "title": "One layout, every language",
       "mascot": false,
       "subject": "three different machine cabinets standing across the frame, all of them reading from one long shared column of stacked cells that runs between them"
+    },
+    {
+      "id": "pl-eager-vs-lazy-inline",
+      "collection": "courses",
+      "course": "data-wrangling-python-polars",
+      "courseTitle": "Data Wrangling with Python Polars",
+      "lesson": "eager-vs-lazy",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Eager and lazy",
+      "mascot": false,
+      "subject": "two conveyors side by side, the near one running every station immediately, the far one holding its parcels at the entrance until a single lever at the right releases them"
+    },
+    {
+      "id": "pl-the-query-optimizer-inline",
+      "collection": "courses",
+      "course": "data-wrangling-python-polars",
+      "courseTitle": "Data Wrangling with Python Polars",
+      "lesson": "the-query-optimizer",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The query optimizer",
+      "mascot": false,
+      "subject": "a tangled route of pipes on the left being redrawn on a planning board in the middle into a short straight run on the right"
+    },
+    {
+      "id": "pl-joins-inline",
+      "collection": "courses",
+      "course": "data-wrangling-python-polars",
+      "courseTitle": "Data Wrangling with Python Polars",
+      "lesson": "joins",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Joins",
+      "mascot": false,
+      "subject": "two stacks of cards with a shared key notch, being pushed together so only the notches that match lock into one combined stack"
+    },
+    {
+      "id": "pl-window-expressions-inline",
+      "collection": "courses",
+      "course": "data-wrangling-python-polars",
+      "courseTitle": "Data Wrangling with Python Polars",
+      "lesson": "window-expressions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Window expressions",
+      "mascot": false,
+      "subject": "a long row of blocks with a sliding frame over three of them, a small summary tile appearing beneath the frame as it moves right"
     },
     {
       "id": "playground-hero",

@@ -47,6 +47,11 @@ int main() {
 
 A good hash function is **deterministic**, **fast**, and distributes real inputs **uniformly** across buckets. Poor distribution creates long collision chains or probe runs.
 
+<Figure
+  slug="dsa-hash-tables-inline-cutout"
+  alt="A key dropped into a small mixing machine that spits out a bin number, and the item landing directly in that numbered bin among a row of bins"
+/>
+
 <Callout type="info" title="Average case is conditional">
 Hash tables are fast because most buckets stay short. If too many keys collide, operations can degrade from O(1) average to O(n) worst case.
 </Callout>

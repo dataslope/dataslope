@@ -30,6 +30,11 @@ flowchart TD
 
 For index `i`, children are `2*i + 1` and `2*i + 2`. The parent is `(i - 1) / 2`. Read the tree above left to right, level by level, and you get exactly the array below it, completeness means no gaps, so the formulas never miss. Navigation becomes arithmetic: no `left`/`right` pointers, no allocations, and the whole structure enjoys the vector's cache-friendliness.
 
+<Figure
+  slug="dsa-heaps-inline-cutout"
+  alt="A pyramid of blocks where every block sits above two smaller ones, the largest at the apex being lifted off by a small crane"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[

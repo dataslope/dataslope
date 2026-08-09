@@ -37,6 +37,11 @@ Without generics, you face a painful trade-off:
 
 Generics give you the best of both worlds: one function, full type safety, and the compiler **infers** the type parameter based on what you pass in.
 
+<Figure
+  slug="tsx-generics-basics-inline-cutout"
+  alt="One crate with an interchangeable insert, three differently shaped inserts standing beside it, each making the same crate hold a different shape"
+/>
+
 The cost of option 1 is combinatorial, which is easy to miss when the union
 has two members and impossible to miss when a colleague adds a third:
 
