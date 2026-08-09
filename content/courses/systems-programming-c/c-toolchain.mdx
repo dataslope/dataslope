@@ -88,6 +88,11 @@ A header file (`.h`) typically contains type declarations, function
 *declarations* (signatures, not bodies), and macros. It is shared
 between several `.c` files via `#include`.
 
+<Figure
+  slug="sysc-c-toolchain-header-files-include-inline-cutout"
+  alt="A strip pasted onto a card with a small clasp that refuses to paste it a second time"
+/>
+
 Because `#include` is just text substitution, including the same
 header twice would re-declare everything and break the build. Two
 fixes exist:
@@ -122,6 +127,11 @@ The assembler is the simplest stage: it translates human-readable
 assembly into a binary object file (`.o` on Unix-like systems, `.obj`
 on Windows). Object files contain machine code plus *symbols*, names
 the linker can resolve.
+
+<Figure
+  slug="sysc-c-toolchain-stage-1-preprocessor-inline-cutout"
+  alt="A card passing a first machine that pastes extra strips onto it before it continues"
+/>
 
 ## Stage 4: linking
 

@@ -109,6 +109,11 @@ specifically `number`. You'll need to narrow the type before you can do
 math with it (we'll cover narrowing in [Type
 Narrowing](./type-narrowing)).
 
+<Figure
+  slug="tsx-arrays-and-tuples-array-types-homogeneous-inline-cutout"
+  alt="A rail holding any number of blocks that are all the same shape"
+/>
+
 ## Readonly arrays
 
 By default, TypeScript arrays are mutable: you can `push`, `pop`,
@@ -144,6 +149,11 @@ makes that contract explicit. The compiler ensures that the function
 doesn't accidentally call a mutating method. This is especially valuable
 in large codebases where function signatures act as machine-checked
 documentation.
+
+<Figure
+  slug="tsx-arrays-and-tuples-type-inference-arrays-inline-cutout"
+  alt="An empty rail closing around the first blocks set on it to admit only that shape after"
+/>
 
 Alternatively, you can use the `ReadonlyArray<T>` generic:
 

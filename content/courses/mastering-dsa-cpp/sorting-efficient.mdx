@@ -16,6 +16,11 @@ The two stars of this page were born decades apart and embody opposite temperame
 
 Merge sort divides the array in half, recursively sorts each half, then merges the sorted halves. The merge step is the whole secret, and it rests on a simple observation: combining two *already sorted* sequences is easy. Look at the front of each, take the smaller, repeat, one pass, no searching. The recursion exists only to manufacture the sorted halves that make merging possible.
 
+<Figure
+  slug="dsa-sorting-efficient-merge-sort-inline-cutout"
+  alt="Two already-ordered rows being zipped into one longer ordered row by a hand taking the smaller head each time"
+/>
+
 ```text
 mergeSort(a): if size <= 1 return; sort left; sort right; merge
 ```

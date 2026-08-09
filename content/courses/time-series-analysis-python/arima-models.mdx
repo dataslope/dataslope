@@ -151,6 +151,11 @@ And what a forecast actually claims. The line is one number per step;
 the cone is the interval, and it widens as the square root of the
 horizon.
 
+<Figure
+  slug="tsa-arima-models-fitting-forecasting-inline-cutout"
+  alt="A wave running along a rail and continuing past its last sleeper as a lighter dotted extension"
+/>
+
 <Chart slug="forecast-uncertainty-cone" />
 
 Time for a real forecast. We'll use a simulated series with a trend and
@@ -286,6 +291,11 @@ A fitted model's residuals (`actual - fitted`) should look like **white
 noise**, no leftover autocorrelation, roughly normal, constant variance. If
 the residuals still have structure, the model missed something. statsmodels
 bundles the standard four-panel check.
+
+<Figure
+  slug="tsa-arima-models-two-ingredients-ar-inline-cutout"
+  alt="Two machines feeding one output, one looking back at past blocks and one at past mistakes"
+/>
 
 <CodeBlock
   adapter="python"

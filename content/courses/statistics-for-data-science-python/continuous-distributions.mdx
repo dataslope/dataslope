@@ -90,6 +90,11 @@ distribution and the natural model when you have no reason to favor any
 value over another in a range: a random timestamp within an hour, a
 spawn point along a line, the raw output of a random-number generator.
 
+<Figure
+  slug="stat-continuous-distributions-uniform-every-value-inline-cutout"
+  alt="A flat level bar running the width of a rail at exactly one height"
+/>
+
 In scipy the convention is `loc = a` (the left edge) and
 `scale = b - a` (the **width**), so `Uniform(0, 10)` is
 `stats.uniform(loc=0, scale=10)`. This `loc`/`scale` convention runs
@@ -148,6 +153,11 @@ Exponential. Real uses:
 In scipy, parameterize by `scale = mean`. So a process with a **mean
 wait of 5 minutes** is `stats.expon(scale=5)`. (There's also a `loc`
 shift, but you'll almost always leave it at 0.)
+
+<Figure
+  slug="stat-continuous-distributions-exponential-waiting-time-inline-cutout"
+  alt="A ramp that starts high at the left and falls away steadily to the right, chips gathered mostly at its left"
+/>
 
 <CodeBlock
   adapter="python"

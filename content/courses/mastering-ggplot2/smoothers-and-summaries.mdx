@@ -63,6 +63,11 @@ ggplot(mpg, aes(displ, hwy)) +
 `loess`) → fitted values + a confidence band → `geom_smooth` draws the
 line + ribbon.**
 
+<Figure
+  slug="gg-smoothers-and-summaries-geom-smooth-trend-inline-cutout"
+  alt="A cloud of chips with a soft ribbon drawn through their middle and a band either side"
+/>
+
 Switching `method` swaps the *statistic's* model while the *geom*
 (line + ribbon) stays the same, yet another instance of separating
 computation from drawing.

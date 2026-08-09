@@ -33,6 +33,11 @@ If `find(2)` reaches root `0`, then `2` belongs to the set represented by `0`.
 
 A basic DSU stores a parent array. `find` walks up to the root. Without optimizations, a tree can become a long chain, making `find` O(n).
 
+<Figure
+  slug="dsa-union-find-parent-trees-inline-cutout"
+  alt="Several small frames each with one block at the top, two frames being joined by pinning one top block under another"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[

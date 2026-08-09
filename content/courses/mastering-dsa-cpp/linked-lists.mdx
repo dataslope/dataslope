@@ -57,6 +57,11 @@ flowchart TD
 
 Traversal starts at `head` and follows `next` until `nullptr`.
 
+<Figure
+  slug="dsa-linked-lists-build-traverse-list-inline-cutout"
+  alt="Three blocks clipped together by cords in turn, then a finger following the cords from the first to the last"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -220,6 +225,11 @@ int main() {
 ## Memory management with `std::unique_ptr`
 
 Manual `new` and `delete` are useful for learning pointers, but production C++ should prefer ownership types. A node can own its successor with `std::unique_ptr<Node>`.
+
+<Figure
+  slug="dsa-linked-lists-nodes-links-inline-cutout"
+  alt="Separate blocks on a bench each joined to the next by a short cord"
+/>
 
 <CodeBlock
   adapter="cpp"

@@ -120,6 +120,11 @@ console.log(u);
 
 The `+` prefix is implicit (the default), so `+readonly` is the same as `readonly`. But being explicit helps when you're toggling modifiers dynamically.
 
+<Figure
+  slug="tsx-mapped-and-conditional-types-modifiers-readonly-inline-cutout"
+  alt="A rack of sockets passing under a template that clamps a lid on each and makes each optional"
+/>
+
 ---
 
 ## Key Remapping with `as`
@@ -202,6 +207,11 @@ T extends U ? X : Y
 ```
 
 If `T` is assignable to `U`, the type resolves to `X`; otherwise, `Y`.
+
+<Figure
+  slug="tsx-mapped-and-conditional-types-mapped-types-inline-cutout"
+  alt="A tray of assorted fittings passing through a press that stamps the same new collar onto every one"
+/>
 
 Here's a simple example:
 

@@ -264,4 +264,39 @@ describe("authored subjects", () => {
       .map((e) => e.id);
     expect(offenders).toEqual([]);
   });
+
+  // "Whiskers" is a box plot's own vocabulary, and it is the one word here that
+  // fails outright rather than sometimes: a subject naming them came back as a
+  // cube with eyes, a nose and six green whiskers sprouting from it. The rods
+  // are drawable without the word — "a thin rod projecting from its top and its
+  // bottom" produces the same picture and never a cat.
+  it("never names a box plot's whiskers", () => {
+    const offenders = getIllustrationPrompts()
+      .entries.filter((e) => /\bwhiskers?\b/i.test(e.subject))
+      .map((e) => e.id);
+    expect(offenders).toEqual([]);
+  });
 });
+
+// Three more traps found by reviewing generated art, none of them guarded here
+// because each one has more correct uses than incorrect ones and a regex would
+// flag art that is already right. They are recorded so the next author (me)
+// recognises the failure on sight instead of re-deriving it:
+//
+//   * A verb that gives an object intent — a crate "acting in response", a gate
+//     "refusing" to open, a machine "reading" past its tape, a parcel "wearing"
+//     a tag — draws a cartoon character with eyes and a mouth. Roughly half the
+//     time: the same "gate refusing to remove a crate" wording produced a plain
+//     latched gate in one course and a face with a raised hand in another.
+//     Describe the mechanism instead ("the gate staying latched", "a hatch on
+//     its far side swinging open") and it never happens.
+//   * A word with a physical twin gets the twin. "Columns" clamped into a board
+//     came back as fluted classical pillars; a row "combed" into order came back
+//     as five hair combs; "a mask covering others" came back as a carnival mask.
+//     Note the twin is not certain either — the same "columns feeding a machine"
+//     wording drew data drums in pandas and pillars in rlang.
+//   * Naming a thing the style block bans deletes it and keeps the rest. The
+//     risograph rules forbid a frame or a printed panel, so "a frame stretched
+//     wider" produced the landscape that would have been inside the frame, and
+//     "a solid inked panel with chips on it" produced loose scenery. Ask for a
+//     board, a card or a tile.

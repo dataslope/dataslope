@@ -57,6 +57,11 @@ First, why collisions are the normal case rather than an edge case. This is
 the birthday problem: with a thousand buckets it is even money by the fortieth
 key, at four percent full.
 
+<Figure
+  slug="dsa-hash-tables-collisions-chaining-inline-cutout"
+  alt="Two keys whose chutes swing to the same bin, the bin holding a short cord of blocks rather than one"
+/>
+
 <Chart slug="hash-collision-birthday" />
 
 Collisions are not a defect; they are a mathematical certainty. With even 23 random keys in 365 buckets, the odds of a collision pass 50%, the birthday paradox working against you. So every hash table needs a collision policy.
@@ -150,6 +155,11 @@ Open addressing is friendlier to caches (everything lives in one array) but more
 ## Load factor and rehashing
 
 Load factor is `size / bucket_count`, how full the table is. Keep it low and collisions stay rare but memory is wasted; let it climb and chains lengthen or probe runs snake across the array. When the load factor crosses a threshold (libstdc++'s `unordered_map` defaults to 1.0), the table allocates more buckets and **rehashes**: every key's bucket is recomputed against the new capacity. Rehashing is the hash table's version of vector reallocation, and the same amortized argument applies, rare O(n) events paid for by many cheap inserts.
+
+<Figure
+  slug="dsa-hash-tables-core-idea-inline-cutout"
+  alt="A key dropped into a mixing machine whose chute swings to one of several bins"
+/>
 
 ```mermaid
 flowchart TD

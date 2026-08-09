@@ -99,6 +99,11 @@ must handle both cases. This forces you to think about the "parameter not
 provided" scenario, no more `undefined is not a function` errors at
 runtime.
 
+<Figure
+  slug="tsx-functions-and-signatures-parameter-return-types-inline-cutout"
+  alt="A machine whose inlet and outlet are both cut to specific shapes"
+/>
+
 ## Default parameters
 
 A **default parameter** provides a fallback value if the caller omits the
@@ -123,6 +128,11 @@ console.log(greet("Bob", "Hi")); // overrides default
 With a default, the parameter is still optional at the call site, but
 inside the function it's *always* a `string` (never `undefined`). This is
 cleaner than `?` when you have a sensible fallback.
+
+<Figure
+  slug="tsx-functions-and-signatures-optional-parameters-inline-cutout"
+  alt="A machine with three input slots, the third covered by a hinged flap that can stay shut"
+/>
 
 ## Rest parameters
 

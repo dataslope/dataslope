@@ -72,6 +72,11 @@ graph TD
 
 Stage two: memoization. Same recursion, plus a `memo` vector where `-1` means "not yet computed." Each distinct `n` is now computed once, O(n) total. Notice how little the code changed; the cache check and the cache write are the only additions.
 
+<Figure
+  slug="dsa-dynamic-programming-fibonacci-four-ways-inline-cutout"
+  alt="Four benches solving the same stack of blocks, each with visibly fewer repeated parts than the last"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -225,6 +230,11 @@ int main() {
 ## 0/1 knapsack
 
 The knapsack is DP's most famous two-dimensional problem: given items with weights and values and a pack of capacity W, choose items (each at most once, that is the "0/1") to maximize value. The state needs two coordinates because two things constrain you: `dp[i][w]` = best value using only the first `i` items within capacity `w`. Each item presents exactly one binary decision, skip it (`dp[i-1][w]`) or take it (`val[i-1] + dp[i-1][w - wt[i-1]]`, if it fits), and the table tries both.
+
+<Figure
+  slug="dsa-dynamic-programming-mindset-inline-cutout"
+  alt="A wall of small pigeonholes filled left to right, each built from the two beside it rather than from scratch"
+/>
 
 <Figure
   slug="dsa-dynamic-programming-inline-cutout"

@@ -74,6 +74,11 @@ sns.displot(data=penguins, x="flipper_length_mm", kind="kde", height=4, aspect=1
 The two humps are the headline: flipper length is **bimodal**, hinting at
 distinct groups (it's species). A KDE makes modes like this easy to see.
 
+<Figure
+  slug="sns-distributions-kde-drawing-one-inline-cutout"
+  alt="A smooth arched cap laid over a row of solid inked blocks of different heights, touching their tops but not their edges"
+/>
+
 It's often most useful laid over a histogram, so you get the honest bars
 *and* the smooth shape together, that's the `kde=True` overlay:
 
@@ -108,6 +113,11 @@ The histogram's most important knob is bin width. The KDE's equivalent is
   little cluster (and invents peaks from noise).
 - **Large bandwidth** → wide bumps → an *oversmoothed* blob that can merge
   real modes into one.
+
+<Figure
+  slug="sns-distributions-kde-bandwidth-kde-s-inline-cutout"
+  alt="The same chips under three curves, one jagged, one smooth, one so smooth it has lost the shape"
+/>
 
 One sample, three bandwidths. The rug underneath is the same in all three,
 so the only thing changing is the smoothing:

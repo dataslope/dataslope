@@ -94,6 +94,11 @@ your program. It is typically mapped *read-only*, the CPU will fault
 if you try to write to it. Many systems also put string literals and
 other `const` data in a read-only segment called `.rodata`.
 
+<Figure
+  slug="sysc-memory-layout-text-read-only-inline-cutout"
+  alt="One band of a long bar sealed under a clamped cover while the other bands stay open"
+/>
+
 This is why writing through `char *s = "hello"; s[0] = 'X';` is
 undefined behavior: the literal `"hello"` lives in `.rodata`, and the
 OS will not let you modify it.
@@ -193,6 +198,11 @@ to zero on every call.
 
 Worth having in view before either: what it costs to reach each level of the
 hierarchy the program is laid out across.
+
+<Figure
+  slug="sysc-memory-layout-seeing-regions-inline-cutout"
+  alt="One long horizontal bar divided end to end into four bands of different colours"
+/>
 
 <Chart slug="memory-latency-ladder" />
 

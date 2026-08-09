@@ -61,6 +61,11 @@ int main() {
 
 This class keeps both `head` and `tail`, so pushing at either end is O(1). It also frees nodes in the destructor, note how every `push_back` and `push_front` must handle the empty-list case, where one new node becomes both head *and* tail. Doubly linked code always has twice the pointers to keep consistent; the discipline is to update them in pairs.
 
+<Figure
+  slug="dsa-doubly-linked-lists-tiny-implementation-inline-cutout"
+  alt="Three blocks joined by cords running both ways, a hand walking the row from the right-hand end"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -141,6 +146,11 @@ If you already have a pointer to a middle node, a doubly linked list can unlink 
 ## `std::list`
 
 `std::list<T>` is the STL doubly linked list. It has stable iterators: inserting or erasing elsewhere does not invalidate iterators to other elements. It does **not** support random access with `list[i]`.
+
+<Figure
+  slug="dsa-doubly-linked-lists-std-list-inline-cutout"
+  alt="A ready-made run of blocks joined both ways, lifted whole off a shelf"
+/>
 
 <CodeBlock
   adapter="cpp"

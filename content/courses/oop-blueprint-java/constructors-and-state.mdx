@@ -73,6 +73,11 @@ If a class declares **no** constructors at all, Java *secretly* gives
 it a no-argument constructor that does nothing. The moment you
 declare *any* constructor, that freebie disappears.
 
+<Figure
+  slug="oopj-constructors-and-state-constructor-inline-cutout"
+  alt="A crate filled and sealed at the moment it leaves the press, never appearing empty"
+/>
+
 <CodeBlock
   adapter="java"
   files={[
@@ -103,6 +108,11 @@ The thing constructors *really* do for design is enforce invariants
 before the object is allowed to exist. The rule "a `Person`'s age is
 never negative" is a *class* rule, and the class can enforce it by
 refusing to be constructed in violation of it.
+
+<Figure
+  slug="oopj-constructors-and-state-default-constructor-happens-inline-cutout"
+  alt="A crate leaving a press with all its compartments empty, no filling station fitted"
+/>
 
 <CodeBlock
   adapter="java"

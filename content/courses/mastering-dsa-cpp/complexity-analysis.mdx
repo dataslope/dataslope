@@ -43,6 +43,11 @@ Big-O ignores machine speed and focuses on how work changes as input size grows.
 
 Let `f(n)` be the work your algorithm does and `g(n)` be a comparison function such as `n`, `n log n`, or `n^2`.
 
+<Figure
+  slug="dsa-complexity-analysis-we-care-inline-cutout"
+  alt="Two ramps from one start, a cart near the top of the gentle one and barely moved on the steep one"
+/>
+
 | Notation | Meaning | Intuition |
 | --- | --- | --- |
 | Big-O | Upper bound | Grows no faster than this, up to constants. |
@@ -144,6 +149,11 @@ Two patterns to be suspicious of: a loop that *looks* single but hides an O(n) o
 ## Amortized analysis
 
 Now for the subtlest idea on this page, and one of the most useful, because it explains the data structure you will use most.
+
+<Figure
+  slug="dsa-complexity-analysis-big-o-big-inline-cutout"
+  alt="Three ramps drawn over one another, one bounding from above, one from below, one hugging the middle"
+/>
 
 Some operations are occasionally expensive but cheap on average over a sequence. `std::vector::push_back` is the classic example: most pushes write one element into spare capacity, but when capacity runs out, the vector must allocate a larger array and move *every existing element* into it. That one push is O(n). So how can anyone call `push_back` "O(1)"?
 

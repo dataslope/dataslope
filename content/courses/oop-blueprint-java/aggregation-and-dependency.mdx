@@ -42,6 +42,11 @@ person who exists in the world whether or not the library does. If
 the library closed tomorrow, the members would not vanish, they
 would just stop being members. That is **aggregation**.
 
+<Figure
+  slug="oopj-aggregation-and-dependency-aggregation-library-has-inline-cutout"
+  alt="A large crate holding smaller crates that can be lifted out and still stand on their own"
+/>
+
 ```mermaid
 classDiagram
     class Library {
@@ -227,6 +232,11 @@ In a real design, the same class often participates in all three
 kinds of relationships with different collaborators. A `Library` is
 *composed of* its `Catalog`, *aggregates* `Member`s, and may *depend
 on* a `Clock` passed in just to stamp due dates.
+
+<Figure
+  slug="oopj-aggregation-and-dependency-spectrum-relationships-inline-cutout"
+  alt="Three pairs of parts joined differently, one welded, one clipped, one merely resting side by side"
+/>
 
 ## Passing dependencies in: a tiny taste of injection
 

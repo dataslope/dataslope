@@ -73,6 +73,11 @@ graph TD
 
 One of the most useful constraints is `keyof`, which gives you the union of all keys of a type. Combined with `extends keyof`, you can write functions that safely access object properties.
 
+<Figure
+  slug="tsx-generic-constraints-keyof-operator-inline-cutout"
+  alt="A crate's set of compartment tags lifted off as a separate ring of keys"
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -143,6 +148,11 @@ The compiler infers `K = "name"`, so `T[K]` becomes `Person["name"]`, which is `
 ## Default type parameters
 
 Sometimes you want a type parameter to have a **default** value if the caller doesn't provide one explicitly. You can specify defaults with `<T = DefaultType>`.
+
+<Figure
+  slug="tsx-generic-constraints-default-type-parameters-inline-cutout"
+  alt="An adjustable socket resting at a marked default position until it is set otherwise"
+/>
 
 <CodeBlock
   adapter="typescript"

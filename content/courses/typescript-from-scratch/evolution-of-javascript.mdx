@@ -72,6 +72,11 @@ JavaScript went from a toy to the **lingua franca** of software development. It 
 
 As codebases grew, the cracks began to show. JavaScript's permissive nature, the same flexibility that made it easy to learn, became a liability at scale.
 
+<Figure
+  slug="tsx-evolution-of-javascript-maintainability-crisis-inline-cutout"
+  alt="A tidy frame on one bench and the same frame on the next after many additions, cords crossing everywhere"
+/>
+
 Consider this snippet:
 
 <CodeBlock
@@ -134,6 +139,11 @@ Teams tried workarounds:
 - **Runtime assertions** (`if (typeof x !== 'number') throw new Error(...)`), defensive and verbose
 
 None of these solved the core problem: **JavaScript had no static type system**. The language couldn't tell you, before you ran the code, whether a variable was a string or a number, whether a function expected two arguments or three, whether an object had a `save()` method or not.
+
+<Figure
+  slug="tsx-evolution-of-javascript-first-decade-scripting-inline-cutout"
+  alt="A small hand tool on a bench beside the same tool grown into a full machine"
+/>
 
 Developers craved the **autocomplete**, **refactoring safety**, and **early error detection** they'd seen in Java, C#, and other statically typed languages. They wanted the **flexibility** of JavaScript with the **rigor** of a compiler.
 

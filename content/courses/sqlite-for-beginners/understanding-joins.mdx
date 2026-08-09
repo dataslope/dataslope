@@ -79,6 +79,11 @@ flowchart TB
 
 You do not write a loop. SQLite chooses an efficient plan. But conceptually, `ON` is the test that decides which pairings become result rows.
 
+<Figure
+  slug="lite-understanding-joins-row-matching-picture-inline-cutout"
+  alt="Two boards side by side with cords running only between rows whose notches match"
+/>
+
 <SqlCodeBlock
   dialect="sqlite"
   title="See all possible pairs before filtering"

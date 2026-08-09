@@ -56,6 +56,11 @@ crucially, every panel **shares the same axes by default**, so a point in
 one cell is directly comparable to a point in another. That shared scale is
 what makes small multiples honest.
 
+<Figure
+  slug="sns-facets-and-grids-wrapping-many-categories-inline-cutout"
+  alt="A long row of small panels folded onto a second and third row to fit the bench"
+/>
+
 <Callout type="info" title="hue overlays; col/row separate">
 `hue` draws groups *on top of each other* in one panel (good for direct
 overlap and a few groups). `col`/`row` give each group *its own panel* (good
@@ -180,6 +185,11 @@ deliberately, and flag it for the reader.`}
 
 Faceting multiplies panels: `col` levels **×** `row` levels. That's its
 weakness as well as its strength.
+
+<Figure
+  slug="sns-facets-and-grids-faceting-just-col-inline-cutout"
+  alt="One board split into a grid of small panels by two dials, one setting columns and one setting rows"
+/>
 
 - **Too many facets.** Twenty tiny panels are as hard to read as one
   overcrowded chart. Keep a facet variable to a handful of levels; use

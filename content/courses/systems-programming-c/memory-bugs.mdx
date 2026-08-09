@@ -86,6 +86,11 @@ internal bookkeeping. On modern systems it often aborts the program
 immediately ("double free or corruption"); on older or simpler
 allocators it can silently corrupt the heap.
 
+<Figure
+  slug="sysc-memory-bugs-1-use-after-inline-cutout"
+  alt="A cord leading from a bench to an empty space where a crate stood a moment ago"
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -375,6 +380,11 @@ the language:
 | Prefer `snprintf` / `fgets` over `strcpy` / `gets` | Eliminates trivial overflows |
 
 `gets` is so dangerous it was *removed* from C11. Never use it.
+
+<Figure
+  slug="sysc-memory-bugs-2-double-free-inline-cutout"
+  alt="A crate handed back over a counter twice, the counter clerk holding out empty hands the second time"
+/>
 
 ## Practice: write a leak-free echo
 

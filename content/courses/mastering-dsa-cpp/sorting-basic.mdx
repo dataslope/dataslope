@@ -154,6 +154,11 @@ both halves of that sentence:
 
 The deeper lesson of this page is the **loop invariant**, a statement that is true before every iteration of a loop, which together with the loop's exit condition proves the algorithm correct. Each sort has one. Bubble sort: "after pass k, the last k elements are the largest k, in final position." Selection sort: "the first i elements are the smallest i, sorted." Insertion sort: "the elements before index i are sorted (though not necessarily final)." When you write any loop-based algorithm, asking *what is my invariant?* is the fastest route to both correctness and understanding, and it is exactly the reasoning you will need to trust quicksort's partition on the next page.
 
+<Figure
+  slug="dsa-sorting-basic-bubble-sort-inline-cutout"
+  alt="Two neighbouring blocks swapped by a small claw, the claw moving along the row"
+/>
+
 ## Practice: bubble sort with early exit
 
 Both challenges provide a `printVector` helper in the driver; your job is only the sorting function itself. Output is comma-separated, e.g. `1,2,3,5,5,9`.

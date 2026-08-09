@@ -96,6 +96,11 @@ console.log("any bypasses all type checking");
   you don't control, where the shape is unknown).
 - When calling legacy JavaScript libraries without type definitions.
 
+<Figure
+  slug="tsx-any-unknown-never-any-escape-hatch-inline-cutout"
+  alt="A socket with no shape at all, accepting every block that is offered to it"
+/>
+
 **When is `any` dangerous?**
 - Everywhere else. It's a trapdoor: once a value becomes `any`, the
   compiler loses all knowledge of its type. Bugs slip through.
@@ -382,6 +387,11 @@ Here's how the four types relate in terms of assignability:
   exhaustiveness checking).
 - **`void`** is a return-type-only marker: you can assign `undefined` to
   `void`, but not vice versa.
+
+<Figure
+  slug="tsx-any-unknown-never-type-hierarchy-top-inline-cutout"
+  alt="A broad open funnel at the top of a bench narrowing to a sealed point at the bottom"
+/>
 
 <CodeBlock
   adapter="typescript"

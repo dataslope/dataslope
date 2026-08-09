@@ -168,6 +168,11 @@ customers' traffic* into HTTP responses. Sensitive data showed up in
 search engine caches: private messages, OAuth tokens, password
 manager hints, hotel booking details.
 
+<Figure
+  slug="sysc-real-world-disasters-5-cloudbleed-2017-inline-cutout"
+  alt="A machine whose feed runs past the end of its own tape and draws a neighbour’s tape in with it"
+/>
+
 The cause: an HTML-rewriting parser written in Ragel (which
 generates C). The end-of-buffer check used `==` where it should have
 used `>=`:
@@ -307,6 +312,11 @@ removing safety hardware on the assumption that the code is correct.
 On its maiden flight, the European Space Agency's Ariane 5 rocket
 self-destructed 37 seconds after launch, taking with it four
 scientific satellites and roughly $370 million.
+
+<Figure
+  slug="sysc-real-world-disasters-2-code-red-inline-cutout"
+  alt="A request slip far longer than the slot it is being pushed into, spilling past the machine's edge"
+/>
 
 The cause was not, strictly, a memory bug, but it is a textbook
 example of the kind of UB-adjacent disaster C programmers are

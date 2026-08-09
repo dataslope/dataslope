@@ -49,6 +49,11 @@ layout differs.
 
 You can see the call chain by printing addresses of local variables.
 
+<Figure
+  slug="sysc-stack-and-functions-see-stack-addresses-inline-cutout"
+  alt="A column of trays with a small plate on the edge of each, the plates stepping evenly down the column"
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -132,6 +137,11 @@ frame size is set by the locals rather than by the algorithm:
 When recursion is too deep, or a function declares a huge local
 array, you hit the end of the stack region and the program crashes
 with a stack overflow.
+
+<Figure
+  slug="sysc-stack-and-functions-anatomy-stack-frame-inline-cutout"
+  alt="One tray in cross-section with separate compartments for its arguments, its locals and its return cord"
+/>
 
 The error is common enough to have a website named after it. When
 Jeff Atwood and Joel Spolsky launched their programming Q&A site in

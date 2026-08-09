@@ -32,6 +32,11 @@ A BST is not necessarily sorted in memory. It is sorted by the relationship betw
 
 At each node, compare the target with the current value and choose one branch.
 
+<Figure
+  slug="dsa-binary-search-trees-search-inline-cutout"
+  alt="A hand following one path down a branching frame, taking the left branch for smaller and the right for larger"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -73,6 +78,11 @@ int main() {
 ## Insert
 
 Insertion follows the same path as search, then attaches the new node at the first empty child position.
+
+<Figure
+  slug="dsa-binary-search-trees-insert-inline-cutout"
+  alt="A new block walked down a branching frame until it reaches an empty socket and clips in"
+/>
 
 ```mermaid
 flowchart TD

@@ -32,6 +32,11 @@ least 16 bits). The actual sizes depend on the target. The WASI
 target used by this sandbox is 32-bit: `int` is 4 bytes and `void *`
 is 4 bytes.
 
+<Figure
+  slug="sysc-data-types-and-memory-fundamental-types-inline-cutout"
+  alt="Four blocks of visibly different widths resting in recesses cut to each"
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -60,6 +65,11 @@ int main(void) {
 
 Because every C integer wraps at its boundary, arithmetic that would
 silently grow a Python `int` can silently *truncate* in C.
+
+<Figure
+  slug="sysc-data-types-and-memory-fixed-size-turns-inline-cutout"
+  alt="A block too large for its recess, its edge overhanging into the next recess along"
+/>
 
 <CodeBlock
   adapter="c"

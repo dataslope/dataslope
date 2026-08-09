@@ -63,6 +63,11 @@ week, rather than a truncated date. `EXTRACT(part FROM d)` (or
 `date_part`) pulls it out. This is how you answer "which weekday is
 busiest?" by grouping across all weeks.
 
+<Figure
+  slug="duck-working-with-dates-core-move-truncate-inline-cutout"
+  alt="A calendar strip cut by a guillotine into equal months and the pieces stacked"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Which day of week sees the most orders?"

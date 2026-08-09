@@ -177,6 +177,11 @@ true one:
 accuracy while the model quietly ignores the rare class entirely, which is
 often the *only* class you care about.
 
+<Figure
+  slug="ml-common-pitfalls-and-misconceptions-c-ignoring-class-inline-cutout"
+  alt="A balance with ninety-nine chips on one pan and one on the other, a gauge beside it still reading high"
+/>
+
 **Why it fools people.** Accuracy is intuitive and usually trustworthy, so
 people reach for it reflexively. But when most cases share one label, a model
 that *always* predicts that majority label, learning nothing, scores high

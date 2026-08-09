@@ -53,6 +53,11 @@ You can verify the "erased" half of that claim right here: this page's in-browse
 
 This distinction is crucial: **TypeScript's types only exist during compilation. At runtime, TypeScript code is just JavaScript.**
 
+<Figure
+  slug="tsx-how-typescript-works-compile-time-vs-inline-cutout"
+  alt="A gate checking a card on a still bench, then lifting away as the belt starts to move"
+/>
+
 When you write:
 
 ```typescript
@@ -362,6 +367,11 @@ At the end of this pipeline, you have two artifacts:
 - **Declaration files** (`.d.ts`) that let other TypeScript projects import your code and get full type checking.
 
 The types never reach production. They're a *compile-time tool* for correctness and productivity.
+
+<Figure
+  slug="tsx-how-typescript-works-javascript-typescript-relationship-inline-cutout"
+  alt="A card with a shaped gate fitted over it, the gate lifting away and leaving the card untouched"
+/>
 
 ---
 

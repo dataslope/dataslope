@@ -42,6 +42,11 @@ The `sizeof` line still works in `main` (20 bytes, five 4-byte ints) because the
 
 `std::array` is a fixed-size array wrapper. It preserves the size, supports range-for loops, and behaves like a normal value object.
 
+<Figure
+  slug="dsa-arrays-std-array-t-inline-cutout"
+  alt="A fixed strip of cells inside a rigid frame with stop blocks at both ends"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -210,6 +215,11 @@ flat; growing by a constant does not.
 ## Timing one million pushes
 
 Browser timing is noisy, but this shows how to measure a sequence of pushes with `<chrono>`. A million pushes, including all the reallocation copying along the way, typically lands in the low tens of milliseconds, the amortization argument, verified by stopwatch.
+
+<Figure
+  slug="dsa-arrays-c-style-arrays-inline-cutout"
+  alt="A fixed strip of cells with no guard at either end, a marker resting just past the last"
+/>
 
 <Figure
   slug="dsa-arrays-inline-cutout"

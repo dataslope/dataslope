@@ -104,12 +104,22 @@ stay readable even with *many* categories, which is exactly why analysts
 reach for them so often. Data types: a **categorical** grouping variable and
 a **numeric** variable to summarize.
 
+<Figure
+  slug="sns-box-and-violin-plots-anatomy-box-plot-inline-cutout"
+  alt="An upright box with a line across its middle, a thin rod at each end, and two loose chips beyond"
+/>
+
 ## The dangerous thing a box plot hides
 
 A box plot only knows about quartiles. It is completely blind to the
 **shape** of the data *between* those landmarks, most importantly, it can't
 show whether a group is **bimodal** (has two peaks). Two wildly different
 distributions can produce the *same* box plot.
+
+<Figure
+  slug="sns-box-and-violin-plots-comparing-groups-box-inline-cutout"
+  alt="Three upright boxes side by side, each with a thin rod projecting from its top and its bottom, standing over three stacks of chips"
+/>
 
 Three samples, one box plot. The quartiles agree; nothing else does:
 
@@ -232,7 +242,7 @@ evidence.
 
 <Figure
   slug="sns-box-and-violin-plots-inline-cutout"
-  alt="An upright box with whisker rods beside a symmetric bulging shape of the same height, both drawn over the same column of chips"
+  alt="An upright box with a thin rod at each end beside a symmetric bulging shape of the same height, both drawn over the same stack of chips"
 />
 
 <Callout type="warn" title="Violins need data; box plots tolerate scarcity">

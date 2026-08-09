@@ -119,6 +119,11 @@ $$
 \approx \frac{1}{N}\sum \frac{f(x_i)}{g(x_i)}, \quad x_i \sim g.
 $$
 
+<Figure
+  slug="scipy-monte-carlo-methods-variance-reduction-importance-inline-cutout"
+  alt="Chips thrown across a board with more of them aimed at the region that matters most"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -252,6 +257,11 @@ lets you see analytical results emerge from raw randomness.
 What the bootstrap is doing: resample the sample you have, recompute, and let
 the spread of those recomputations stand in for the sampling distribution you
 cannot observe.
+
+<Figure
+  slug="scipy-monte-carlo-methods-first-example-estimating-inline-cutout"
+  alt="A square board with a quarter circle marked on it and chips thrown across, those inside counted"
+/>
 
 <Chart slug="bootstrap-distribution" />
 

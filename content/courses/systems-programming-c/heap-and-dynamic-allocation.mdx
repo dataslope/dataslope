@@ -104,10 +104,20 @@ Three rules visible in that tiny example:
    (double-free, often crash). Exactly once, then stop using the
    pointer.
 
+<Figure
+  slug="sysc-heap-and-dynamic-allocation-first-malloc-inline-cutout"
+  alt="A crate handed out over a counter with a tag clipped to the hand that took it"
+/>
+
 ## A growable array of N ints
 
 This is the most common use of `malloc`: you only know the size at
 runtime.
+
+<Figure
+  slug="sysc-heap-and-dynamic-allocation-growable-array-n-inline-cutout"
+  alt="A rail being replaced by a longer rail with its blocks carried across, the short one set aside"
+/>
 
 <CodeBlock
   adapter="c"

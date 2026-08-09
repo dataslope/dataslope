@@ -34,6 +34,11 @@ BFS would happily report the one-edge path `0 -> 1` at cost 100, never noticing 
 
 Imagine pouring water into the source vertex and letting it flow along every edge at one unit of cost per second. The flood reaches each vertex at a time equal to its shortest distance, the wavefront cannot cheat. Dijkstra's algorithm is that flood, discretized: it repeatedly picks the unprocessed vertex with the smallest known distance (the next place the water arrives), locks it in as final, and **relaxes** its outgoing edges, checking whether going *through* this vertex improves any neighbor's best-known distance.
 
+<Figure
+  slug="dsa-shortest-paths-dijkstra-s-idea-inline-cutout"
+  alt="A network of weighted cords with a lamp lighting outward along the cheapest route first"
+/>
+
 Why is it safe to lock a vertex in? Because when `u` has the smallest tentative distance of all unprocessed vertices, any other route to `u` would have to pass through some vertex that is *farther away already*, and with non-negative edges, going farther first can never come back cheaper. That is the greedy bet, and non-negativity is what makes it a sure thing.
 
 ```text

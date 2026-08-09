@@ -33,6 +33,11 @@ What is the smallest input I can answer immediately? How does every other input 
 
 The leap of faith explains how to *write* recursion; the call stack explains how the machine *runs* it. Each call gets its own **stack frame** containing parameters, local variables, and a return address, so `factorial(3)` and `factorial(2)` each have their own private `n`, stacked one atop the other exactly like the plates from the stacks chapter. Frames pile up on the way down until a base case returns, then unwind in reverse order, each frame finishing its pending multiplication as control passes back through it.
 
+<Figure
+  slug="dsa-recursion-call-stack-inline-cutout"
+  alt="A column of trays growing as each nested job starts and unstacking from the top as each returns"
+/>
+
 ```mermaid
 sequenceDiagram
     participant F3 as factorial 3

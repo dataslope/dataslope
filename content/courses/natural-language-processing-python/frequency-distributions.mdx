@@ -102,6 +102,11 @@ says "very very very good" uses four words but only two *distinct* ones. The
 ratio of distinct words to total words is called **lexical diversity**, and
 it is a quick, classic measure of how repetitive or varied a text is.
 
+<Figure
+  slug="nlp-frequency-distributions-lexical-diversity-varied-inline-cutout"
+  alt="Two racks of tiles of the same total height, one made of many distinct kinds and one of few repeated"
+/>
+
 $$\text{lexical diversity} = \frac{\text{number of distinct words}}{\text{total number of words}}$$
 
 A value near 1 means almost every word is unique (highly varied); a value
@@ -490,3 +495,8 @@ You can now measure *which* words appear and how often. But counts treat every
 word as an isolated atom, they have no idea that "book" can be a noun or a
 verb. To capture that, we need to know each word's role in the sentence:
 **part-of-speech tagging**, next.
+
+<Figure
+  slug="nlp-frequency-distributions-counting-words-freqdist-inline-cutout"
+  alt="A rack of word tiles with a bar growing beside each as tiles are dropped in"
+/>

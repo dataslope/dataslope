@@ -57,6 +57,11 @@ int main() {
 
 Both heap operations follow the same playbook: *restore completeness first, then repair the one broken promise.* To push, append the new value at the end of the array, the only spot that keeps the tree complete. The shape is now right, but the newcomer may outrank its parent, so it bubbles upward, swapping with its parent until the heap property holds. The path from any node to the root is at most log n long, so a push is O(log n).
 
+<Figure
+  slug="dsa-heaps-conceptual-tree-array-inline-cutout"
+  alt="A branching frame drawn above a flat strip of cells, cords showing each branch's place on the strip"
+/>
+
 ```mermaid
 flowchart TD
     A["append new value"] --> B{"larger than parent?"}
@@ -100,6 +105,11 @@ int main() {
 ## Pop: sift down
 
 Pop runs the same playbook in reverse. The root must go, but ripping out index 0 would tear a hole, so move the *last* array element into the root's place (completeness restored), then let this usually-too-small impostor sink: swap it with its **larger** child until both children are smaller. Swapping with the larger child is essential, promote the smaller one and it would immediately violate the property against its sibling.
+
+<Figure
+  slug="dsa-heaps-push-sift-up-inline-cutout"
+  alt="A block set at the bottom of a pyramid and swapped upward past each larger neighbour until it rests"
+/>
 
 <CodeBlock
   adapter="cpp"

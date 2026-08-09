@@ -65,6 +65,11 @@ Every column in the `SELECT` list must be either **in the `GROUP BY`** or
 **inside an aggregate function**. This rule trips up everyone once, so it
 is worth understanding *why*, not just memorizing it.
 
+<Figure
+  slug="duck-grouping-data-golden-rule-group-inline-cutout"
+  alt="Chips raked into trays with a rule laid across saying every chip must belong to exactly one tray"
+/>
+
 When you group by `region`, each result row stands for a *whole group* of
 orders. Asking for a bare `id` makes no sense, *which* order's id, when
 the row represents twenty orders? There is no single answer, so SQL

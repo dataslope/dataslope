@@ -78,6 +78,11 @@ Both tools pointed toward the same insight: **JavaScript developers wanted types
 
 In 2010, a small team at Microsoft started sketching a solution. Leading the project was **Anders Hejlsberg**, a legendary language designer. Hejlsberg had created **Turbo Pascal** in the 1980s, a fast, elegant compiler that made programming accessible to a generation of developers. At Borland, he built **Delphi**, a visual development environment beloved for its productivity. At Microsoft, he was the chief architect of **C#**, a statically typed language designed for the .NET platform.
 
+<Figure
+  slug="tsx-birth-of-typescript-early-experiments-inline-cutout"
+  alt="Several part-built gates on a bench, each a different attempt at checking the same block"
+/>
+
 Hejlsberg understood types deeply. He also understood *pragmatism*. C# had shown that a well-designed type system could catch bugs early, enable powerful tooling, and scale to massive codebases, all without getting in the developer's way.
 
 But JavaScript wasn't C#. JavaScript was already deployed on millions of websites, in npm packages, in Node.js servers. You couldn't replace it. You had to *extend* it.
@@ -97,6 +102,11 @@ The Microsoft team set ambitious goals:
 5. **TypeScript must be gradual.** You can't convert a 100,000-line codebase overnight. TypeScript files can import plain JavaScript. Teams can adopt TypeScript one module at a time, getting value incrementally.
 
 These constraints ruled out many design choices. TypeScript couldn't be a new language (it had to be JavaScript-plus-types). It couldn't change runtime behavior (types are erased at compile time). It couldn't require a complex build pipeline (just run `tsc`, get `.js` files).
+
+<Figure
+  slug="tsx-birth-of-typescript-design-constraints-inline-cutout"
+  alt="A new gate being built that must still let every existing card through unchanged"
+/>
 
 ```mermaid
 timeline

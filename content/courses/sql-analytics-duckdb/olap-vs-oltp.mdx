@@ -133,6 +133,11 @@ is called **vectorized execution**, and column storage is what makes it
 natural: the values are already lined up together, ready to stream through
 in chunks.
 
+<Figure
+  slug="duck-olap-vs-oltp-two-jobs-one-inline-cutout"
+  alt="A counter handling one parcel at a time beside a warehouse aisle being swept end to end"
+/>
+
 Column storage plus vectorized execution is the lineage of decades of
 column-store research, notably **MonetDB**, built at the CWI research
 institute in Amsterdam, and the **C-Store** project associated with

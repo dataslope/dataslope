@@ -123,6 +123,11 @@ Once you have an honest chronological forecast, you need a number for "how
 close." Three metrics dominate, and each makes a different trade-off. Code
 them by hand once and you'll never misread them again.
 
+<Figure
+  slug="tsa-chronological-validation-measuring-error-honestly-inline-cutout"
+  alt="Short sticks measuring the gap between a forecast ribbon and the actual chips beneath it"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -186,6 +191,11 @@ estimate is noisy. Maybe that particular tail happened to be easy or hard.
 **Backtesting** (time-series cross-validation) re-runs the forecast across
 *many* successive cut-off points and averages the skill. The iron rule holds
 in every fold: **train is always strictly before test.**
+
+<Figure
+  slug="tsa-chronological-validation-cardinal-sin-random-inline-cutout"
+  alt="A timeline being shuffled like cards, a large cross drawn over the shuffled pile"
+/>
 
 | Fold | Train (the past) | Test (the future) |
 | --- | --- | --- |

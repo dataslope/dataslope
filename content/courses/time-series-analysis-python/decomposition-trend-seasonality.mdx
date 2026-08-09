@@ -72,6 +72,11 @@ the repeating **seasonal** wave, and the **residual**, what's left when you
 subtract the other two. For data we built additively, the residual is
 shapeless noise, exactly as it should be.
 
+<Figure
+  slug="tsa-decomposition-trend-seasonality-log-trick-turn-inline-cutout"
+  alt="A wave whose swings widen to the right passing through a press and leaving with swings of even width"
+/>
+
 Those four panels each have their own vertical scale, which hides how the
 pieces relate. Drawn on one axis in the order they are added, "additive" stops
 being a keyword argument:
@@ -242,6 +247,11 @@ There's an elegant shortcut. Taking the **logarithm** of a multiplicative
 series makes it *additive*, because `log(T x S x R) = log T + log S + log R`.
 A log compresses the big late-period swings and stretches the small early
 ones until they're the same size, exactly what an additive model wants.
+
+<Figure
+  slug="tsa-decomposition-trend-seasonality-additive-or-multiplicative-inline-cutout"
+  alt="Two waves along a rail, one whose swings stay the same width and one whose swings widen as it rises"
+/>
 
 <CodeBlock
   adapter="python"

@@ -92,6 +92,11 @@ mtcars |>
 `n()` is a special dplyr helper meaning "how many rows in this
 group." You will use it constantly.
 
+<Figure
+  slug="rlang-grouped-analysis-multiple-summaries-at-inline-cutout"
+  alt="Three trays of chips each feeding four gauges at once"
+/>
+
 ## Multiple grouping variables
 
 Group by more than one column to get all combinations:
@@ -371,3 +376,8 @@ if (!all(need %in% names(monthly))) stop(sprintf("missing: %s", paste(setdiff(ne
 
 The last page in this section covers *reshaping*, switching
 between wide and long forms when your data isn't yet tidy.
+
+<Figure
+  slug="rlang-grouped-analysis-basic-pattern-inline-cutout"
+  alt="A board split into three stacks by a comb, each stack pressed into one summary block"
+/>

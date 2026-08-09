@@ -47,6 +47,11 @@ set**, and lock it in a drawer. The model never sees it during training.
 We train on the rest (the **training set**), and only at the very end do we
 unlock the drawer and measure performance on those held-out rows.
 
+<Figure
+  slug="ml-train-test-split-fix-hold-some-inline-cutout"
+  alt="A pile divided by a partition with the smaller share sealed under a lid"
+/>
+
 ```mermaid
 flowchart TD
     A["Full dataset<br/>(all rows)"] --> B{"random split"}

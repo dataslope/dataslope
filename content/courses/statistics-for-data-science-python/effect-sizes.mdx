@@ -82,6 +82,11 @@ The most common effect size for comparing two groups' means is
 **Cohen's d**. The idea is simple and intuitive: take the difference in
 means, but express it in units of the data's own spread.
 
+<Figure
+  slug="stat-effect-sizes-cohen-s-d-inline-cutout"
+  alt="The gap between two mounds measured by a caliper whose scale is the mounds' own width"
+/>
+
 $$
 d = \frac{\bar{x}_1 - \bar{x}_2}{s_{\text{pooled}}}
 $$
@@ -208,6 +213,11 @@ Time to prove the central claim with code. We'll take a difference so
 tiny it's practically nothing, and then collect a giant sample. Watch
 the p-value collapse to "highly significant" while Cohen's d stays
 negligible.
+
+<Figure
+  slug="stat-effect-sizes-problem-significance-not-inline-cutout"
+  alt="Two mounds barely apart with a huge gauge beside them reading high, and a tiny caliper measuring the actual gap"
+/>
 
 <CodeBlock
   adapter="python"

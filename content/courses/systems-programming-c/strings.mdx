@@ -66,6 +66,11 @@ int main(void) {
 characters until it hits `'\0'`. If the terminator is missing, it
 will happily keep walking into unrelated memory.
 
+<Figure
+  slug="sysc-strings-string-literals-inline-cutout"
+  alt="A ribbon of tiles fixed under a clamped bar, unable to be lifted or altered"
+/>
+
 ## String literals
 
 `"hello"` in C is a string literal, an *anonymous array* of `char`
@@ -165,6 +170,11 @@ int main(void) {
 ## The `strncpy` footgun
 
 `strncpy(dst, src, n)` looks like a "safer `strcpy`." It is not.
+
+<Figure
+  slug="sysc-strings-strncpy-footgun-inline-cutout"
+  alt="A ribbon copied into a shorter holder, its stop block left behind outside the holder"
+/>
 
 1. If `src` is *shorter* than `n` bytes, it pads `dst` with extra
    `'\0'`s out to `n` bytes.

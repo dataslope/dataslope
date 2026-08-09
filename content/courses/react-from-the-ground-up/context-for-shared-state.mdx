@@ -78,6 +78,11 @@ Everything inside the `Provider` sees the `value`. When that value
 changes (here, on toggle), every consumer re-renders with the new
 value, no prop plumbing required.
 
+<Figure
+  slug="rx-context-for-shared-state-prop-drilling-problem-inline-cutout"
+  alt="A tray handed down through five nested frames, each pair of hands only passing it on"
+/>
+
 ## Context holds state, not just constants
 
 Notice the value above is an **object bundling state and a setter**:

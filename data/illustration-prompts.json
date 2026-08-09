@@ -6849,7 +6849,7 @@
       "style": "risograph",
       "title": "Cardinality is about counts",
       "mascot": false,
-      "subject": "three pairs of crates joined by cords, one cord single at both ends, one splitting at one end, one splitting at both"
+      "subject": "one crate joined by a cord that fans out into six strands, each strand reaching its own smaller crate"
     },
     {
       "id": "db-case-study-blog-start-requirements-inline",
@@ -7245,7 +7245,7 @@
       "style": "risograph",
       "title": "Requirements evolve",
       "mascot": false,
-      "subject": "a cabinet built for three kinds of part with a fourth kind arriving on a trolley beside it"
+      "subject": "a rack of fixed shelves being re-cut, a new taller shelf slotted into the middle while the old ones shift aside"
     },
     {
       "id": "db-attributes-and-domains-domains-say-values-inline",
@@ -8865,7 +8865,7 @@
       "style": "risograph",
       "title": "The picture",
       "mascot": false,
-      "subject": "small units with identical fittings clipping into long chains in several different orders"
+      "subject": "a wall assembled from interchangeable panels, one panel lifted out and a differently shaped one dropped into the gap"
     },
     {
       "id": "fp-declarative-thinking-same-task-both-inline",
@@ -9597,7 +9597,7 @@
       "style": "risograph",
       "title": "Box plots",
       "mascot": false,
-      "subject": "one upright box with a line across its middle and a whisker rod out of each end, with two loose chips floating beyond the rods"
+      "subject": "one upright box with a line across its middle and a thin rod out of each end, with two loose chips floating beyond the rods"
     },
     {
       "id": "viz-histograms-inline",
@@ -9849,7 +9849,7 @@
       "style": "risograph",
       "title": "Anatomy of a box plot",
       "mascot": false,
-      "subject": "an upright box with a line across its middle and a whisker rod out of each end, two loose chips beyond"
+      "subject": "an upright box with a line across its middle and a thin rod out of each end, two loose chips beyond"
     },
     {
       "id": "viz-bubble-charts-pitch-inline",
@@ -10245,7 +10245,7 @@
       "style": "risograph",
       "title": "A first box plot",
       "mascot": false,
-      "subject": "one upright box with whiskers standing over a column of chips it was built from"
+      "subject": "one upright box with a thin rod standing up from its top and another dropping from its bottom, set above the tall stack of chips it was built from"
     },
     {
       "id": "viz-bubble-charts-first-bubble-chart-inline",
@@ -13953,7 +13953,7 @@
       "style": "risograph",
       "title": "Checked exceptions",
       "mascot": false,
-      "subject": "a parcel wearing a stamped warning tag stopped at a gate, the gate refusing to open until a matching catch basket has been bolted onto the line beyond it"
+      "subject": "a parcel with a stamped warning label on its side halted at a closed gate, the gate staying latched until a matching catch basket has been bolted onto the line beyond it"
     },
     {
       "id": "java-interfaces-inline",
@@ -18321,7 +18321,7 @@
       "style": "risograph",
       "title": "aspect-ratio: size a box proportionally",
       "mascot": false,
-      "subject": "a frame stretched wider whose height rises with it, keeping the same proportion"
+      "subject": "three upright rectangular tiles of the same shape in three sizes, small, medium and large, standing in a row on a shelf"
     },
     {
       "id": "nlp-what-is-nlp",
@@ -18741,7 +18741,7 @@
       "style": "risograph",
       "title": "The shared goal: reduce words to a root",
       "mascot": false,
-      "subject": "four word tiles of different lengths pressed into one shorter root tile"
+      "subject": "four tiles of clearly different lengths stacked on the left, each trimmed at the same point, and the four equal short pieces lined up on the right"
     },
     {
       "id": "nlp-stopwords-are-stopwords-remove-inline",
@@ -19365,7 +19365,7 @@
       "style": "risograph",
       "title": "A method call is a message sent to a receiver",
       "mascot": false,
-      "subject": "a folded note handed to a sealed crate through a slot, the crate acting in response"
+      "subject": "a folded note pushed into a slot in a sealed crate, and a small hatch on the crate's far side swinging open"
     },
     {
       "id": "oopj-objects-and-classes-class-description-object-inline",
@@ -20313,7 +20313,7 @@
       "style": "risograph",
       "title": "Creating a data frame from scratch",
       "mascot": false,
-      "subject": "several columns of different kinds being clamped side by side into one board"
+      "subject": "several tall slats of different patterns being clamped side by side into one board"
     },
     {
       "id": "rlang-dplyr-verbs-five-core-verbs-inline",
@@ -20361,7 +20361,7 @@
       "style": "risograph",
       "title": "A first ggplot",
       "mascot": false,
-      "subject": "a solid inked panel with one layer of bright chips laid onto it"
+      "subject": "a plain board with one layer of bright chips laid across it and two more layers stacked ready beside it"
     },
     {
       "id": "rlang-grouped-analysis-basic-pattern-inline",
@@ -20721,7 +20721,7 @@
       "style": "risograph",
       "title": "Density plots",
       "mascot": false,
-      "subject": "a row of solid inked bins with one thick smooth ribbon resting across their tops in a contrasting ink, the bins fully inked beneath it"
+      "subject": "a row of solid inked bins with a single smooth arched cap of contrasting ink laid over their tops, the bins fully inked beneath it"
     },
     {
       "id": "rlang-from-s-to-r-r-inherited-from-inline",
@@ -21153,7 +21153,7 @@
       "style": "risograph",
       "title": "JSX: markup inside JavaScript",
       "mascot": false,
-      "subject": "a framed panel shape drawn directly onto an instruction card, the two inseparable"
+      "subject": "a plain card with a small shaped tile set flush into the middle of its surface, the two cast as one piece"
     },
     {
       "id": "rx-composition-and-children-children-prop-inline",
@@ -21825,7 +21825,7 @@
       "style": "risograph",
       "title": "What can go wrong",
       "mascot": false,
-      "subject": "two benches running the same steps and producing two visibly different results"
+      "subject": "two identical worktables laid out with the same tools, each holding a differently shaped finished piece"
     },
     {
       "id": "scipy-root-finding-and-optimization-landscape-methods-inline",
@@ -21897,7 +21897,7 @@
       "style": "risograph",
       "title": "Indexing: views, fancy, and boolean",
       "mascot": false,
-      "subject": "a frame laid over a grid showing part of it, a scoop lifting scattered cells, and a mask covering others"
+      "subject": "a frame laid over a grid showing part of it, a scoop lifting scattered cells, and a solid cover plate hiding the rest"
     },
     {
       "id": "scipy-floating-point-special-values-inline",
@@ -21909,7 +21909,7 @@
       "style": "risograph",
       "title": "Special values",
       "mascot": false,
-      "subject": "three odd blocks set apart from a rule, one marked as beyond its end and one as no value at all"
+      "subject": "a measuring rail with one block sitting far past its end and an empty socket in the rail where a block should be"
     },
     {
       "id": "scipy-interesting-discussions-hardware-ladder-inline",
@@ -22401,7 +22401,7 @@
       "style": "risograph",
       "title": "Box and violin plots",
       "mascot": false,
-      "subject": "an upright box with whisker rods beside a symmetric bulging shape of the same height, both drawn over the same column of chips"
+      "subject": "an upright box with a thin rod at each end beside a symmetric bulging shape of the same height, both drawn over the same stack of chips"
     },
     {
       "id": "sns-relational-scatter-plots-inline",
@@ -22581,7 +22581,7 @@
       "style": "risograph",
       "title": "Anatomy of a box plot",
       "mascot": false,
-      "subject": "an upright box with a line across its middle, a whisker rod at each end, and two loose chips beyond"
+      "subject": "an upright box with a line across its middle, a thin rod at each end, and two loose chips beyond"
     },
     {
       "id": "sns-categorical-overview-one-function-many-inline",
@@ -22641,7 +22641,7 @@
       "style": "risograph",
       "title": "Two kinds of return value",
       "mascot": false,
-      "subject": "one machine handing back a single framed panel and another handing back a whole grid of them"
+      "subject": "a single tile clamped in a small vise being reworked by hand, and a whole tray of tiles clamped in a large vise being reworked at once"
     },
     {
       "id": "sns-distributions-ecdf-and-rug-ecdf-running-tally-inline",
@@ -22677,7 +22677,7 @@
       "style": "risograph",
       "title": "Drawing one",
       "mascot": false,
-      "subject": "a smooth curve laid over a row of bins, following their tops without their edges"
+      "subject": "a smooth arched cap laid over a row of solid inked blocks of different heights, touching their tops but not their edges"
     },
     {
       "id": "sns-facets-and-grids-faceting-just-col-inline",
@@ -22881,7 +22881,7 @@
       "style": "risograph",
       "title": "Comparing groups with box plots",
       "mascot": false,
-      "subject": "three upright boxes with whiskers standing side by side over three columns of chips"
+      "subject": "three upright boxes side by side, each with a thin rod projecting from its top and its bottom, standing over three stacks of chips"
     },
     {
       "id": "sns-categorical-overview-same-data-three-inline",
@@ -23553,7 +23553,7 @@
       "style": "risograph",
       "title": "Why aggregation exists",
       "mascot": false,
-      "subject": "a bench heaped with chips that no one can count by eye, and one gauge reading a single number beside it"
+      "subject": "a bench heaped with chips that no one can count by eye, and one gauge with a single pointer resting at one mark beside it"
     },
     {
       "id": "duck-building-business-metrics-metric-definition-first-inline",
@@ -23733,7 +23733,7 @@
       "style": "risograph",
       "title": "Sorting surfaces the extremes",
       "mascot": false,
-      "subject": "a jumbled row combed into a rising staircase, the tallest and shortest now at the two ends"
+      "subject": "a jumbled row of blocks pushed into a rising staircase, the tallest and the shortest now at the two ends"
     },
     {
       "id": "duck-subqueries-in-analytics-three-kinds-subquery-inline",
@@ -24537,7 +24537,7 @@
       "style": "risograph",
       "title": "Expressions create computed columns",
       "mascot": false,
-      "subject": "two columns feeding a small machine that sets a third column down beside them"
+      "subject": "two upright stacks of blocks feeding a small machine that sets a third stack down beside them"
     },
     {
       "id": "lite-filtering-groups-where-filters-rows-inline",
@@ -24585,7 +24585,7 @@
       "style": "risograph",
       "title": "Referential integrity",
       "mascot": false,
-      "subject": "a gate refusing to remove a crate while a cord still runs from it to another"
+      "subject": "a gate latched shut across a crate while a cord still runs from that crate to another"
     },
     {
       "id": "lite-grouping-data-big-idea-split-inline",
@@ -25557,7 +25557,7 @@
       "style": "risograph",
       "title": "Seeing a distribution",
       "mascot": false,
-      "subject": "the same column of chips shown as a mound, as a box with whiskers and as a rising staircase"
+      "subject": "the same stack of chips shown as a mound, as a box with a thin rod at each end and as a rising staircase"
     },
     {
       "id": "stat-anova-and-chi-square-inline",
@@ -25965,7 +25965,7 @@
       "style": "risograph",
       "title": "Why summaries lie: always plot first",
       "mascot": false,
-      "subject": "one gauge reading a single number lifted away to reveal four very different scatters beneath it"
+      "subject": "one gauge with a single pointer lifted away to reveal four very different scatters beneath it"
     },
     {
       "id": "stat-why-statistics-matters-data-alone-often-inline",
@@ -26697,7 +26697,7 @@
       "style": "risograph",
       "title": "5. Cloudbleed (2017), one missing =, a months-long leak",
       "mascot": false,
-      "subject": "a machine reading past the end of its own tape and pulling in a neighbour's tape with it"
+      "subject": "a machine whose feed runs past the end of its own tape and draws a neighbour’s tape in with it"
     },
     {
       "id": "sysc-stack-and-functions-see-stack-addresses-inline",
@@ -27933,7 +27933,7 @@
       "style": "risograph",
       "title": "Mapped Types",
       "mascot": false,
-      "subject": "a rack of sockets passing under a template that reshapes every socket in one stroke"
+      "subject": "a tray of assorted fittings passing through a press that stamps the same new collar onto every one"
     },
     {
       "id": "tsx-modeling-domains-with-types-solution-discriminated-unions-inline",

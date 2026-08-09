@@ -51,6 +51,11 @@ type Result<T, E> =
 
 Functions return `Result` instead of throwing. Callers must check `.ok` to access the value or error, and TypeScript enforces this at compile time.
 
+<Figure
+  slug="tsx-error-handling-with-types-solution-result-t-inline-cutout"
+  alt="One chute splitting into two trays, one for finished blocks and one for marked failure tags"
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -509,6 +514,11 @@ Exceptions are invisible in types; \`Result\` makes errors explicit and unignora
 />
 
 ---
+
+<Figure
+  slug="tsx-error-handling-with-types-problem-exceptions-inline-cutout"
+  alt="A block thrown clear of the bench entirely, landing out of sight beyond its edge"
+/>
 
 ## Multiple Choice: Chaining with `andThen`
 

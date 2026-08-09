@@ -180,6 +180,11 @@ The type of `bob.age` is `number | undefined`, so you must narrow before
 treating it as a pure `number`. This forces you to handle the "missing
 property" case explicitly, preventing `TypeError`s at runtime.
 
+<Figure
+  slug="tsx-objects-and-interfaces-optional-properties-inline-cutout"
+  alt="A compartmented case where two compartments carry hinged covers that may be left closed"
+/>
+
 ## Readonly properties
 
 A `readonly` property can be set once (during initialization) but not
@@ -455,6 +460,11 @@ types are compatible if they have the same shape, regardless of their
 name. This is different from **nominal typing** (used by Java, C#, etc.),
 where types are compatible only if they have the same name or explicit
 inheritance.
+
+<Figure
+  slug="tsx-objects-and-interfaces-object-type-literals-inline-cutout"
+  alt="A contract card showing a panel of shaped sockets held beside the crate that matches it"
+/>
 
 <CodeBlock
   adapter="typescript"

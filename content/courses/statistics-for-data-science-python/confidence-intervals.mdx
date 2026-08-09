@@ -32,6 +32,11 @@ you already know x̄ is a random variable: it has a *standard
 error*, a typical sample-to-sample wobble. The point estimate throws
 that information away. The confidence interval keeps it.
 
+<Figure
+  slug="stat-confidence-intervals-building-ci-mean-inline-cutout"
+  alt="One mark on a rail with a band drawn either side of it, the band's width set by a caliper"
+/>
+
 ```mermaid
 flowchart TD
   A["Point estimate<br/>(x-bar)"] --> C["CI: x-bar +/- margin"]
@@ -62,6 +67,11 @@ we estimate $\sigma$ from the data, the right critical value comes from
 the **t-distribution** with $n - 1$ degrees of freedom, not the normal,
 the t is slightly wider to pay for that extra uncertainty, and the
 difference matters most when $n$ is small.
+
+<Figure
+  slug="stat-confidence-intervals-point-estimate-alone-inline-cutout"
+  alt="A single mark on a rail beside the same mark with a soft band drawn either side"
+/>
 
 `scipy.stats` does the arithmetic for you. `stats.t.interval` takes the
 confidence level, the degrees of freedom, the center, and the standard

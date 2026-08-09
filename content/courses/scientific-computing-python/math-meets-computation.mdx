@@ -41,6 +41,11 @@ flowchart TD
 
 Three lossy steps separate mathematics from a number you can print.
 
+<Figure
+  slug="scipy-math-meets-computation-wrong-floating-point-inline-cutout"
+  alt="A caliper measuring a tiny gap between a mark and where a block actually sits"
+/>
+
 1. **Discretization.** A continuous quantity, time, space, a wave,
    is replaced by samples on a finite grid.
 2. **Floating-point arithmetic.** Each sample is stored in at most
@@ -61,6 +66,11 @@ exactly between most pairs. The spacing between representable
 numbers near $1$ is about $\epsilon \approx 2.22 \times 10^{-16}$,
 the famous *machine epsilon*. You will see this number again and
 again.
+
+<Figure
+  slug="scipy-math-meets-computation-continuous-mathematics-discrete-inline-cutout"
+  alt="A smooth curve laid over a staircase of small steps that approximates it"
+/>
 
 <CodeBlock
   adapter="python"

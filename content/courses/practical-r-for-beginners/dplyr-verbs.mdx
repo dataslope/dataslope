@@ -64,6 +64,11 @@ of these.
 The pipe takes the thing on its left and passes it as the first
 argument to the function on its right.
 
+<Figure
+  slug="rlang-dplyr-verbs-pipe-inline-cutout"
+  alt="A short length of pipe joining one machine's chute to the next machine's hopper"
+/>
+
 ```r
 mtcars |> head()       # same as head(mtcars)
 mtcars |> head(3)      # same as head(mtcars, 3)
@@ -298,6 +303,11 @@ Read it top to bottom: *"From mtcars, keep four- and six-cylinder
 cars, compute a power-to-weight ratio, select these five columns,
 sort by power-to-weight descending, and show me the top 10."* Five
 verbs, one sentence.
+
+<Figure
+  slug="rlang-dplyr-verbs-five-core-verbs-inline-cutout"
+  alt="Five hand tools hanging above a bench, each taking a different bite out of the same board"
+/>
 
 ## Test your understanding
 

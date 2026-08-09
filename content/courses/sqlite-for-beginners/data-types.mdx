@@ -75,6 +75,11 @@ flowchart TB
 
 Most beginner tables use `INTEGER`, `TEXT`, `REAL`, and sometimes `NUMERIC` as declared column types. `NULL` is a value state, not a declared column type you usually choose.
 
+<Figure
+  slug="lite-data-types-five-storage-classes-inline-cutout"
+  alt="Five sockets of clearly different profiles on one rack"
+/>
+
 ## Declared types become affinities
 
 When you write a column type, SQLite maps it to an affinity. Affinity is the column's preferred storage behavior.
@@ -152,6 +157,11 @@ A `NUMERIC` affinity column tries to store numeric-looking text as numbers. So `
 ## SQLite compared with rigid type systems
 
 Think of a rigid system as a locked door and SQLite affinity as a helpful sign.
+
+<Figure
+  slug="lite-data-types-sqlite-odd-one-inline-cutout"
+  alt="A rack of sockets where a mismatched block is quietly reshaped to fit rather than refused"
+/>
 
 ```mermaid
 flowchart TB

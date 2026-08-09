@@ -81,6 +81,11 @@ decoration, it is the encoding. And correlation is a special kind of
 number: it is **signed**, running from −1 to +1, with **0 as a meaningful
 midpoint** that means "no linear relationship."
 
+<Figure
+  slug="sns-correlation-heatmaps-building-correlation-matrix-inline-cutout"
+  alt="A square grid where each cell is shaded by how closely its row and column columns move together"
+/>
+
 That demands a **diverging** colormap: two contrasting hues meeting at a
 neutral color in the middle. Center it at zero and fix the limits to the
 full range so the colors are anchored to their true meaning.
@@ -372,3 +377,8 @@ You can now read every pairwise *linear* relationship in a dataset from a
 single grid, and you know exactly where that view goes blind. Next we keep
 exploring many variables together with **pairwise relationship** plots,
 which restore the scatter that the heatmap had to leave out.
+
+<Figure
+  slug="sns-correlation-heatmaps-key-lesson-choose-inline-cutout"
+  alt="A graded grid shown twice, once in one ink from pale to deep and once running between two inks from a centre"
+/>
