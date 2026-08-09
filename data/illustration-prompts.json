@@ -8097,7 +8097,7 @@
       "style": "risograph",
       "title": "The first computer forecast",
       "mascot": false,
-      "subject": "a room-sized cabinet computer hung with patch cables on the left, a coarse grid laid over a map of a continent in the middle, and a cloud with a wind arrow standing over that grid at the right"
+      "subject": "a room-sized cabinet computer hung with patch cables on the left, a coarse square grid laid over a plain map of North America in the middle, and a cloud with a wind arrow standing over that grid at the right"
     },
     {
       "id": "scipy-discussions-patriot-missile",
@@ -9465,7 +9465,7 @@
       "style": "risograph",
       "title": "The Datasaurus",
       "mascot": false,
-      "subject": "a scatter of points forming a small dinosaur on the left, the same points rearranged into a star in the middle and into a ring on the right, and one identical plain tile standing beneath all three"
+      "subject": "three plain rectangular frames standing side by side across the frame, the first holding one solid dinosaur shape, the second one solid five-pointed star and the third one solid ring, with one identical narrow tile lying beneath each frame"
     },
     {
       "id": "sysc-why-c",
