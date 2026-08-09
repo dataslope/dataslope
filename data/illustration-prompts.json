@@ -3872,7 +3872,7 @@
       "title": "How applications use databases",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, standing on a wide pale grey platform and pushing one large green block across the platform, out of the open mouth of a chunky white housing and into a deep wide blue cabinet standing right beside it"
+      "subject": "a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, standing on a wide pale grey platform beside a chunky white app device with a plain blank front, a deep blue database cabinet standing at the far end of the platform, one thick green arrow pointing from the device to the cabinet and one thick yellow arrow below it pointing back from the cabinet to the device"
     },
     {
       "id": "sql-tables-rows-columns",

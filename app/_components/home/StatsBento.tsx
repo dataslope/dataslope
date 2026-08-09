@@ -52,11 +52,18 @@ const CodeBlocksIcon = illustrationIcon("home-icon-code-blocks-cutout");
  *  now share one size — the illustrations differ enough card to card that the
  *  old large/small split no longer bought any hierarchy.
  *
+ *  `object-contain` is load-bearing, not decoration: the box is square but the
+ *  art is not. `scripts/trim-cutouts.mjs` crops each cut-out's transparent top
+ *  and bottom away, so a 1024x1024 render is served a little shorter than it
+ *  is wide, and a fixed `h-40 w-40` with no fit rule would stretch it back to
+ *  square — subtly, which is the bad kind. Contained, it paints at its own
+ *  ratio inside the same reserved box, so the layout below is unaffected.
+ *
  *  This size drives the copy: at 160px the icon plus a heading, a CTA, and the
  *  card's padding leave roughly two lines for the description inside the
  *  grid's fixed `auto-rows-[22rem]`, and less than that on a single-column
  *  card. Descriptions below are written to that budget. */
-const ICON_SIZE = "mb-3 h-40 w-40 scale-100";
+const ICON_SIZE = "mb-3 h-40 w-40 scale-100 object-contain";
 
 /** The interview prep card only. It is a one-column card whose background is
  *  the typing animation, and at 160px the marmot ran into that text once the

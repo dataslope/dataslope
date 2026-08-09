@@ -134,6 +134,59 @@ node scripts/remove-background-kie.mjs                 # adds <id>-cutout.png
 node scripts/promote-illustrations.mjs python-basics-loops python-basics-sets
 ```
 
+### Trimming the blank band above and below the artwork
+
+Background removal leaves the subject floating in the frame it was generated
+in, so a promoted cut-out is 1536x1024 of *layout* carrying rather less than
+that of drawing. `<Figure>` renders at the full content width with `height:
+auto`, so every transparent row is vertical space a lesson pays for and nobody
+sees — a median 11% of each image's height across the promoted set, over 30% on
+41 of them.
+
+**Promotion does this for you.** `promote-illustrations.mjs` crops every
+cut-out before its single encode, which is what makes it free: the crop costs
+no quality, where a pass over the promoted WebP afterwards would be a second
+lossy generation. Nothing to remember and nothing to run — promote as usual and
+the art arrives tight.
+
+It is **vertical only**. The left/right margins are deliberately kept:
+horizontal blank costs nothing in a page that scrolls, and cropping it would
+leave each figure a different width, so a run of lessons would stop sharing an
+edge.
+
+`scripts/trim-cutouts.mjs` is the backfill that trimmed the 845 images promoted
+before that existed. It is still the tool for re-trimming at different settings
+(`--pad`, `--alpha`), and the two share their geometry through
+`scripts/lib/cutouts.mjs`, so they cannot drift — a re-promote and a re-trim of
+the same art produce byte-identical files.
+
+```bash
+node scripts/trim-cutouts.mjs --prefix python-basics- --dry-run
+node scripts/trim-cutouts.mjs --all
+```
+
+It re-crops the **pristine `cutout.png` in R2**, so a trimmed image is still a
+single lossy generation from the original rather than a second pass over the
+served WebP. A prompt id usually exists in several runs (a redraw writes a new
+run prefix and leaves the old one), so the right PNG is found by matching pixels
+against the file the site currently serves: the true source scores ~44 dB and
+every other run of the same id 6-11 dB. When no candidate matches — the run has
+aged out of the bucket — it falls back to re-encoding the served WebP, measured
+at 41-49 dB premultiplied PSNR, which is visually lossless but not free. **The
+script only reads from R2**; it never puts and never deletes.
+
+It is idempotent (an already-tight image is skipped, not re-encoded) and runs
+`build-images` afterwards, which is what updates the manifest's `height` so
+`<Figure>` keeps reserving the right box.
+
+Trimming changes an image's aspect ratio, which every consumer that sizes a
+cut-out by width (`<Figure>`, the course-card thumbnails) or letterboxes it
+(`object-contain`: the auth-globe pins, the pricing icons) absorbs for free.
+Two do not, and want checking before a sweep reaches their slugs:
+`StatsBento` sizes the four `home-icon-*` cut-outs `h-40 w-40` with no
+`object-fit`, and `InterviewCatalog` uses `aspect-[3/2] object-cover` for the
+six `interview-*-thumbnail` banners.
+
 ### Reviewing, and the regeneration queue
 
 `/dashboard/admin/illustration-prompts` is the review surface and is
@@ -505,6 +558,59 @@ panel, no frame, no tick marks, faint horizontal rules only, labels placed in
 the plot rather than in a legend, and the page's own Inter tracked slightly
 tight. Chart junk is the enemy; the data is the ink.
 
+
+## Generated files and the build cache
+
+`dev` and `build` both run the same chain of generators before Next starts —
+raw-Markdown mirrors, brand fallbacks, charts, the search corpus and its D1
+seed, creation dates, the course catalog, home stats, the image manifest — and
+`postinstall` runs it too (see `scripts/postinstall-generate.mjs`, which skips
+it only on Cloudflare Workers Builds, where the `build` script re-runs it
+anyway).
+
+Running it that often is the point: no generated file is ever stale, and no
+step is anyone's job to remember. What it must not do is cost anything when
+nothing changed. Every expensive step therefore sits behind
+`scripts/lib/build-cache.mjs`, which decides freshness in two tiers — a stat
+signature (path + size + mtime, opens nothing) backed by a content hash
+consulted only when the stat signature moved, so a fresh clone or a branch
+switch does not re-parse 900 lessons for timestamps that changed without any
+bytes changing. Read that file before touching a generator's caching; the
+racy-tick rule at the tier-1 check is subtle and there is a test on it.
+
+Measured on this repo, warm:
+
+| step | before | now |
+| --- | --- | --- |
+| `build-search-corpus` | 26–27s | skipped |
+| `build-images` | 0.6–11s | 0.09s |
+| `build-almostnode-workers` | 1.3–4.7s | skipped |
+| `build-created-at` | 0.1–2.3s | skipped |
+| `build-course-md`, `build-search-sql` | 0.1–1.6s | skipped |
+| **whole chain** | **~48s** | **~2s** |
+
+(The wide "before" ranges are cold vs. warm page cache. Windows sits at the
+cold end and stays there, which is what made this worth doing.)
+
+`build-brand-fallbacks`, `build-course-catalog` and `build-home-stats` are
+deliberately *not* cached: they are 0.05–0.15s each, and a gate would add more
+moving parts than it saves. `build-charts` keeps its own coarse gate, which is
+documented in place.
+
+Adding a generator to the chain? Give it a cache when it costs more than about
+a quarter-second, and give the cache three things:
+
+- **every input**, including the generator's own source file — `build-cache`
+  folds in its own path, so a change to the caching rules invalidates every
+  stamp, but it cannot know yours;
+- **at least one output**, so a deleted (or gitignored, never-cloned) artifact
+  regenerates even when the inputs are untouched;
+- **a `salt`** when the answer depends on something `stat` cannot see.
+  `build-created-at` reads git history, so its salt is `HEAD`.
+
+Manifests live in `node_modules/.cache/dataslope-build/`, so `npm ci` wipes
+them and the first run after an install regenerates everything — which is when
+it should.
 
 ## Prose style
 

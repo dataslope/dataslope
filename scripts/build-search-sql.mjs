@@ -43,6 +43,7 @@ import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { freshness } from "./lib/build-cache.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const IN_FILE = join(ROOT, "lib", "generated", "search-corpus.json");
@@ -62,6 +63,18 @@ const BATCH_BUDGET_BYTES = 80_000;
 if (!existsSync(IN_FILE)) {
   console.error("[search-sql] no corpus; run `npm run build:search-corpus` first");
   process.exit(1);
+}
+
+// One input, but a 12 MB output written on every `dev`/`build` regardless — on
+// Windows that write is the whole cost of this step, and the corpus above it
+// is now gated, so this would otherwise be the last one still churning.
+const cache = freshness(ROOT, "search-sql", {
+  inputs: [fileURLToPath(import.meta.url), IN_FILE],
+  outputs: [OUT_FILE],
+});
+if (cache.fresh) {
+  console.log("[search-sql] up to date (corpus unchanged), skipping");
+  process.exit(0);
 }
 
 const corpusJson = readFileSync(IN_FILE, "utf8");
@@ -152,6 +165,7 @@ assertStatementSizes(parts);
 mkdirSync(dirname(OUT_FILE), { recursive: true });
 const sql = parts.join("\n");
 writeFileSync(OUT_FILE, sql);
+cache.commit();
 
 const largest = Math.max(...parts.map(bytes));
 console.log(

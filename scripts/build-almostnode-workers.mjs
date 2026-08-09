@@ -46,15 +46,13 @@
 
 import { build } from "esbuild";
 import { mkdir, rm } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { freshness, readManifest } from "./lib/build-cache.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const OUT_DIR = join(ROOT, "public", "_workers");
 const SRC_DIR = join(ROOT, "app", "_components", "runtime");
-
-await rm(OUT_DIR, { recursive: true, force: true });
-await mkdir(OUT_DIR, { recursive: true });
 
 /**
  * almostnode pulls in `just-bash`'s browser bundle (`vercel-labs/just-
@@ -114,10 +112,12 @@ const targets = [
   {
     entry: join(SRC_DIR, "javascript-worker.ts"),
     out: join(OUT_DIR, "javascript-worker.js"),
+    why: "almostnode",
   },
   {
     entry: join(SRC_DIR, "typescript-worker.ts"),
     out: join(OUT_DIR, "typescript-worker.js"),
+    why: "almostnode",
   },
   {
     // Pyodide 314 refuses to boot in classic workers, and Turbopack
@@ -128,14 +128,68 @@ const targets = [
     // pyodide.mjs from the CDN, so the bundle is tiny.
     entry: join(SRC_DIR, "pyodide-worker.ts"),
     out: join(OUT_DIR, "pyodide-worker.js"),
+    why: "pyodide",
   },
 ];
 
-for (const { entry, out } of targets) {
-  await build({
+/** Repo-relative, forward-slashed, so the line reads the same on Windows as it
+ *  does in CI and matches how the other generators name their outputs. */
+const shortPath = (abs) => relative(ROOT, abs).split(sep).join("/");
+
+/**
+ * Skip the bundle when nothing it reads has moved.
+ *
+ * The input set is not knowable up front — it is almostnode's dependency
+ * closure, 39 files reaching into node_modules — so it is *learned*: each
+ * build asks esbuild for a metafile and stores the input list, and the next
+ * run stats that list. The first run after `npm ci` has no list and therefore
+ * always bundles, which is also when it must.
+ *
+ * `package-lock.json` is stamped alongside it so a dependency bump re-bundles
+ * even when the lockfile's change never reaches a file in the old closure.
+ * Metafile keys in a plugin namespace (`n:node:zlib`) are virtual modules with
+ * no file behind them, so they are dropped.
+ */
+const cache = freshness(ROOT, "workers", {
+  inputs: [
+    fileURLToPath(import.meta.url),
+    join(ROOT, "package-lock.json"),
+    ...(readManifest(ROOT, "workers")?.bundleInputs ?? []).map((p) => join(ROOT, p)),
+  ],
+  outputs: targets.map((t) => t.out),
+});
+if (cache.fresh) {
+  console.log("[build-workers] up to date (no worker source changed), skipping");
+  process.exit(0);
+}
+
+await rm(OUT_DIR, { recursive: true, force: true });
+await mkdir(OUT_DIR, { recursive: true });
+
+const bundleInputs = new Set();
+for (const { entry, out, why } of targets) {
+  const result = await build({
     ...common,
     entryPoints: [entry],
     outfile: out,
+    metafile: true,
   });
-  console.log(`[build-almostnode-workers] wrote ${out}`);
+  for (const input of Object.keys(result.metafile.inputs)) {
+    if (!/^[a-z-]+:/.test(input)) bundleInputs.add(input);
+  }
+  // Tagged for what this script does, not for the one dependency that first
+  // forced it to exist: only the JS/TS workers are almostnode-backed, and the
+  // Pyodide worker is here for an unrelated reason (see the docblock). The
+  // per-target suffix says which is which, so a slow line or a stale bundle
+  // points at the right cause.
+  console.log(`[build-workers] wrote ${shortPath(out)} (${why})`);
 }
+
+// Stamped with the closure the builds actually read, not the one guessed
+// before them, so the very next run is a hit.
+const learned = [...bundleInputs].sort();
+cache.commit({ bundleInputs: learned }, [
+  fileURLToPath(import.meta.url),
+  join(ROOT, "package-lock.json"),
+  ...learned.map((p) => join(ROOT, p)),
+]);

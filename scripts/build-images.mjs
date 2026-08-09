@@ -60,6 +60,7 @@ import {
 } from "node:fs";
 import { dirname, extname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { readManifest, writeManifest } from "./lib/build-cache.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const SRC_DIR = join(ROOT, "assets", "images");
@@ -173,6 +174,13 @@ async function main() {
     return sharp;
   };
 
+  // Sidecar for the adopt loop below: file → the size/mtime its content hash
+  // was last computed from. Lives in node_modules/.cache rather than beside
+  // the committed manifest, because mtimes are per-clone and would otherwise
+  // put a machine-specific diff in git on every checkout.
+  const statCache = readManifest(ROOT, "images-stat") ?? {};
+  const nextStatCache = {};
+
   const manifest = {};
   const seen = new Map();
   let encoded = 0;
@@ -280,9 +288,33 @@ async function main() {
     if (extname(file).toLowerCase() !== ".webp") continue;
     const slug = file.replace(/\.webp$/i, "");
     if (manifest[slug]) continue; // owned by a legacy source
+    const priorEntry = prior[slug];
+
+    // Fast path: the committed manifest's hash is the authority on whether a
+    // file is unchanged, but *proving* it meant reading all 1832 images —
+    // ~340 MB, about ten seconds on a cold page cache and worse on Windows,
+    // paid on every `dev` and `build` just to conclude "nothing moved". The
+    // sidecar records the size+mtime each hash was computed from, so an
+    // untouched file is settled by `stat` alone. Content still decides: a
+    // file whose stat moved is read and hashed exactly as before.
+    const st = statSync(join(OUT_DIR, file));
+    const seen = statCache[file];
+    if (
+      seen &&
+      seen.size === st.size &&
+      seen.mtime === Math.round(st.mtimeMs) &&
+      priorEntry?.hash === seen.hash &&
+      priorEntry.formats?.length === 1
+    ) {
+      manifest[slug] = priorEntry;
+      nextStatCache[file] = seen;
+      cached += 1;
+      continue;
+    }
+
     const buf = readFileSync(join(OUT_DIR, file));
     const hash = createHash("sha256").update(ENCODER_VERSION).update(buf).digest("hex");
-    const priorEntry = prior[slug];
+    nextStatCache[file] = { size: st.size, mtime: Math.round(st.mtimeMs), hash };
     if (priorEntry?.hash === hash && priorEntry.formats?.length === 1) {
       manifest[slug] = priorEntry;
       cached += 1;
@@ -321,6 +353,10 @@ async function main() {
     ? readFileSync(MANIFEST_FILE, "utf8")
     : null;
   if (next !== current) writeFileSync(MANIFEST_FILE, next);
+
+  // Rebuilt from scratch each run, so a pruned or renamed file drops out
+  // instead of accumulating forever.
+  writeManifest(ROOT, "images-stat", nextStatCache);
 
   console.log(
     `build-images: ${encoded} encoded, ${adopted} adopted, ${cached} cached, ` +
