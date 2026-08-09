@@ -184,6 +184,11 @@ Garbage collection takes care of it. That convenience has a price:
 unpredictable pauses, larger memory footprint, less predictable
 performance.
 
+<Figure
+  slug="cpp-memory-model-four-regions-one-inline-cutout"
+  alt="One long horizontal bar divided end to end into four bands of different colours"
+/>
+
 C++ takes the opposite trade-off. The language gives you tools
 (stack, heap, statics, smart pointers, RAII) and trusts you to
 choose the right one. Once you understand the model, the choices

@@ -50,6 +50,11 @@ here rather than run.
 The API is otherwise the same. Nearly every method you have learned
 works identically on both.
 
+<Figure
+  slug="pl-eager-vs-lazy-two-objects-inline-cutout"
+  alt="Two identical looking crates on a bench, one already full and one holding only a folded instruction card"
+/>
+
 ## What laziness buys
 
 <CodeBlock
@@ -76,6 +81,11 @@ Read the plan from the bottom up. Polars pushed the column selection
 and the filter down into the CSV reader itself: `PROJECT 3/10 COLUMNS`
 says three of the ten columns are parsed, and `SELECTION` says the
 filter is applied while parsing rather than afterwards.
+
+<Figure
+  slug="pl-eager-vs-lazy-laziness-buys-inline-cutout"
+  alt="A folded instruction card being rearranged on a bench before any block is touched, one station moved to the front"
+/>
 
 Three, not two, is the detail worth noticing. You asked for `carat`
 and `price`, but the filter needs `cut`, so the optimizer works out

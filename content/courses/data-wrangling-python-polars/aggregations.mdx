@@ -80,6 +80,11 @@ print("mean if null means 0:", df["x"].fill_null(0).mean())
 Both answers are defensible. The point is that 15 and 10 mean
 different things, and the library will not choose for you.
 
+<Figure
+  slug="pl-aggregations-nulls-are-skipped-inline-cutout"
+  alt="A column of chips with two covers among them tipped into a gauge, the covers set aside rather than counted as empty blocks"
+/>
+
 ## Quantiles and spread
 
 <CodeBlock
@@ -111,6 +116,11 @@ print(
 The mean sits well above the median, which is the signature of a
 right-skewed distribution: a few very expensive diamonds pull the
 average up while leaving the middle alone.
+
+<Figure
+  slug="pl-aggregations-quantiles-spread-inline-cutout"
+  alt="A rising staircase of blocks with markers planted at the quarter, half and three-quarter points"
+/>
 
 ## Boolean aggregations
 

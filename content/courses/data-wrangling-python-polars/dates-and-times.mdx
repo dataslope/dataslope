@@ -47,6 +47,11 @@ print(stamps.with_columns(pl.col("when").str.to_datetime()))
 `try_parse_dates=True` on `read_csv` does this at read time for
 ISO-shaped columns, which is one fewer step.
 
+<Figure
+  slug="pl-dates-and-times-dt-namespace-inline-cutout"
+  alt="A dated card opened out into its separate parts with a small tool hanging above each part"
+/>
+
 <Callout type="warn" title="A failed parse raises by default">
 `str.to_date` raises on the first value it cannot parse. Pass
 `strict=False` to get nulls instead, then count them. On a file of
@@ -88,6 +93,11 @@ print(
 ## Truncating to a period
 
 This is the operation behind every "by month" report.
+
+<Figure
+  slug="pl-dates-and-times-getting-dates-inline-cutout"
+  alt="Written slips fed into a small machine and leaving as tidy dated cards in a tray"
+/>
 
 <CodeBlock
   adapter="python"

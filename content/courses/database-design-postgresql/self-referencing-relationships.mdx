@@ -49,6 +49,11 @@ manager. In a category tree, the root category has no parent.
 A self-reference is still just a foreign key. The referenced table
 happens to be the same table.
 
+<Figure
+  slug="db-self-referencing-relationships-one-table-two-inline-cutout"
+  alt="One crate with a cord that leaves it and returns to another crate of exactly the same kind"
+/>
+
 ```mermaid
 flowchart TD
     Child["employees.<code>manager_id</code> = 2<br/>Mina's row"] -->|"FK → PK"| Parent["<code>employees.id = 2</code><br/>Grace's row"]

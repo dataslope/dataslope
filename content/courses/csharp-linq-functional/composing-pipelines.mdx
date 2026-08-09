@@ -94,6 +94,11 @@ value, sum total." This is the heart of declarative code.
 You're not limited to combining existing operators. `yield return`
 lets you implement entirely new ones, and they remain lazy.
 
+<Figure
+  slug="cs-composing-pipelines-building-custom-operators-inline-cutout"
+  alt="A hand-built section of pipe being clipped into a run of standard sections, indistinguishable once in place"
+/>
+
 ```mermaid
 flowchart TD
     S[Source] --> O["Custom operator<br/>yield return"] --> N[Next stage]

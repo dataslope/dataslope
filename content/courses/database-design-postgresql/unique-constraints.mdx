@@ -197,6 +197,11 @@ Uniqueness also shapes relationships. If `profiles.user_id` is both a
 foreign key and unique, then each user can have at most one profile.
 That is a one-to-one pattern.
 
+<Figure
+  slug="db-unique-constraints-uniqueness-beyond-primary-inline-cutout"
+  alt="A rack whose slots each accept one tag, a second identical tag turned away even though it carries a different punched tab"
+/>
+
 ```mermaid
 erDiagram
     users ||--o| profiles : has

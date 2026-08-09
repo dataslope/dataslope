@@ -34,6 +34,11 @@ Plain `vertical` demands identical schemas: the same column names, in
 the same order, with the same dtypes. That strictness is the point.
 It catches the case where last month's export gained a column.
 
+<Figure
+  slug="pl-concatenating-frames-vertical-more-rows-inline-cutout"
+  alt="Two boards of equal width stacked one onto the other, the join line barely visible"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -107,6 +112,11 @@ print(pl.concat([jan, feb], how="diagonal"))
 If `region` arrives as `Region` next month, you get two columns, each
 half null, and no error. Reach for it when schemas genuinely differ,
 not as a way to avoid thinking about them.
+
+<Figure
+  slug="pl-concatenating-frames-relaxed-strategies-inline-cutout"
+  alt="Two boards of slightly different column widths brought together, a small collar fitted where they do not match"
+/>
 
 ## Horizontal: more columns
 

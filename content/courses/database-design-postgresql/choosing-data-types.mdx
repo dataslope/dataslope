@@ -35,6 +35,11 @@ label. The type makes many invalid values unrepresentable.
 This table says quantity is an integer. PostgreSQL will not store text
 that cannot be converted into an integer.
 
+<Figure
+  slug="db-choosing-data-types-type-equals-domain-inline-cutout"
+  alt="A socket cut to one exact profile with three blocks above it, only one of them able to seat"
+/>
+
 <SqlCodeBlock
   expectError
   dialect="postgres"
@@ -218,6 +223,11 @@ flowchart TB
 ## Types work with constraints
 
 Types are broad constraints. Other constraints narrow the rule.
+
+<Figure
+  slug="db-choosing-data-types-watch-type-reject-inline-cutout"
+  alt="A block too wide for its socket being stopped at the mouth, the socket unchanged"
+/>
 
 ```mermaid
 flowchart TD

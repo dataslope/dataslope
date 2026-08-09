@@ -15,6 +15,11 @@ order have a customer? Can one product appear on many orders?
 **Cardinality** answers: *how many rows on one side may relate to how
 many rows on the other side?*
 
+<Figure
+  slug="db-cardinality-cardinality-about-counts-inline-cutout"
+  alt="Three pairs of crates joined by cords, one cord single at both ends, one splitting at one end, one splitting at both"
+/>
+
 ## Cardinality is about counts
 
 When you read a relationship, ask both directions:
@@ -37,6 +42,11 @@ That gives us a one-to-many relationship: one customer, many orders.
 A **one-to-many** relationship means one row on the first side can
 connect to many rows on the second side, while each row on the second
 side connects back to one row on the first side.
+
+<Figure
+  slug="db-cardinality-one-many-inline-cutout"
+  alt="One crate on the left with a cord that splits into four prongs, each prong reaching a smaller crate"
+/>
 
 ```mermaid
 erDiagram

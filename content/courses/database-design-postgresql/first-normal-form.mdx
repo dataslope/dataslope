@@ -116,6 +116,11 @@ The usual fix is to split the repeating values into rows. When those
 values belong to another entity, place them in a **child table** that
 references the parent.
 
+<Figure
+  slug="db-first-normal-form-1nf-protects-from-inline-cutout"
+  alt="A cell stuffed with three items being emptied so each takes its own row, the crowded cell left holding one"
+/>
+
 ```mermaid
 erDiagram
     students ||--o{ student_phones : has

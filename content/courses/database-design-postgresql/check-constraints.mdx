@@ -13,6 +13,11 @@ data. An order with status `banana` is not creative; it is invalid.
 
 A **CHECK** constraint lets the schema say those things out loud.
 
+<Figure
+  slug="db-check-constraints-check-encodes-domain-inline-cutout"
+  alt="A gauge fitted across a chute, set to a measured opening, stopping any block that exceeds it"
+/>
+
 ## CHECK encodes a domain rule
 
 A CHECK constraint is a boolean expression that must be true for every
@@ -40,6 +45,11 @@ kind of thing the table stores.
 
 The most important design move is translating a sentence about the
 business into a rule the database can enforce.
+
+<Figure
+  slug="db-check-constraints-business-rule-schema-inline-cutout"
+  alt="A written rule card at one end of a bench and a fitted metal gauge at the other, the gauge cut to match the card"
+/>
 
 ```mermaid
 flowchart TB

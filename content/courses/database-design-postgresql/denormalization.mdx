@@ -16,6 +16,11 @@ choose a controlled amount of duplication.
 from normalized tables. The word deliberately matters. This is not a
 shortcut around design; it is a trade-off you make with your eyes open.
 
+<Figure
+  slug="db-denormalization-denormalize-at-all-inline-cutout"
+  alt="A stopwatch beside two benches, the one with a single wide table finishing before the one with four small tables"
+/>
+
 ## Normalize first
 
 Start with the clean design. Give each fact one home. Use keys and
@@ -46,6 +51,11 @@ write shape. Examples include:
 
 These are not random copies. They are **derived facts** stored because a
 particular read path benefits from having them ready.
+
+<Figure
+  slug="db-denormalization-normalize-first-inline-cutout"
+  alt="A tidy set of small cabinets built first, and only then a wider copy assembled beside them"
+/>
 
 ```mermaid
 flowchart TD

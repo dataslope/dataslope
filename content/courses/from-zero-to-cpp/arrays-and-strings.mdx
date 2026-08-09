@@ -70,6 +70,11 @@ For new code, prefer the standard library containers.
 copied, returned from functions, and works with all standard
 algorithms.
 
+<Figure
+  slug="cpp-arrays-and-strings-std-array-t-inline-cutout"
+  alt="A fixed strip of cells inside a rigid frame with stop blocks fitted at both ends"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -204,6 +209,11 @@ for (int& x : v) {
 
 Prefer #2 and #3 when you don't actually need the index, they're
 shorter and harder to get wrong.
+
+<Figure
+  slug="cpp-arrays-and-strings-raw-c-arrays-inline-cutout"
+  alt="A fixed strip of cells with no guard at either end, a marker resting just past the final cell"
+/>
 
 > **Indexing safety.** `v[i]` does *not* bounds-check. `v.at(i)`
 > throws `std::out_of_range` if `i` is invalid. In tight loops use

@@ -103,6 +103,11 @@ sequence without ever holding all million elements in memory. It also
 does not have to *visit* all million: a chain ending in `Take(10)` pulls
 from the source until ten survive the filter, and stops.
 
+<Figure
+  slug="cs-deferred-execution-laziness-default-inline-cutout"
+  alt="A long line of machines standing still with one closed tap at the far end, no block anywhere on the belt"
+/>
+
 <Chart slug="pipeline-laziness" />
 
 ```mermaid

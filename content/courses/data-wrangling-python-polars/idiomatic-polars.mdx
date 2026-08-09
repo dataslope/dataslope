@@ -16,6 +16,11 @@ working options a Polars programmer would actually write, and why.
 The single biggest difference between fast and slow Polars is whether
 a Python function ended up in the hot path.
 
+<Figure
+  slug="pl-idiomatic-polars-1-stay-expression-inline-cutout"
+  alt="A run of clipped-together pipe sections with one hand-carried bucket set aside beside the bench, unused"
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}

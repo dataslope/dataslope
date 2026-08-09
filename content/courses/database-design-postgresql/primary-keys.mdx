@@ -91,6 +91,11 @@ Choosing a primary key is choosing the table's answer to "which row is this?"`}
 Run this block. The first row creates customer `1`. The second insert
 tries to reuse the same primary key, so PostgreSQL rejects it.
 
+<Figure
+  slug="db-primary-keys-rows-need-identity-inline-cutout"
+  alt="A rack of cards where one card carries a punched tab no other card has, a hand lifting it by that tab"
+/>
+
 <SqlCodeBlock
   expectError
   dialect="postgres"

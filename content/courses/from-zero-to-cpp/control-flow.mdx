@@ -18,6 +18,11 @@ A useful mental model: at every moment, the CPU is following exactly
 one path through your program. Control-flow statements are
 *forks* and *loops* in that path.
 
+<Figure
+  slug="cpp-control-flow-if-else-decisions-inline-cutout"
+  alt="A chute with a two-way flap sending blocks down one of two paths, both ending in a tray"
+/>
+
 ## Sequential flow
 
 The simplest flow is straight-line execution: one statement after
@@ -37,6 +42,11 @@ Every program starts this way at `main`'s opening brace.
 An `if` statement tests a condition (a `bool` expression) and runs
 its block only when the condition is true. An optional `else` block
 runs when the condition is false.
+
+<Figure
+  slug="cpp-control-flow-sequential-flow-inline-cutout"
+  alt="A straight rail with four stations along it, a cart passing each in turn without branching"
+/>
 
 ```mermaid
 flowchart TD
