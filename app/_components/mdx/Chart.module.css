@@ -128,28 +128,188 @@
        *with* the content (`local`), sitting on top of two shadows pinned to
        the frame (`scroll`), so each shadow is masked exactly while that end
        is flush and revealed as soon as it is not. No JavaScript and no
-       resize observer. */
+       resize observer.
+
+       The weights are the point of this rule, not the mechanism. At 20% of
+       the foreground over 11px these were invisible in practice — on a phone
+       the reader saw a chart that looked cropped rather than one that looked
+       scrollable, which is the failure the shadows exist to prevent. 38% over
+       16px is still quiet against the drawing and actually legible on a
+       near-black page. The covers stay wider than the shadows so each one is
+       fully masked when that end is flush. */
     background:
-      linear-gradient(to right, var(--color-fd-background) 40%, transparent) left center /
-        22px 100% no-repeat local,
-      linear-gradient(to left, var(--color-fd-background) 40%, transparent) right center /
-        22px 100% no-repeat local,
+      linear-gradient(to right, var(--color-fd-background) 45%, transparent) left center /
+        30px 100% no-repeat local,
+      linear-gradient(to left, var(--color-fd-background) 45%, transparent) right center /
+        30px 100% no-repeat local,
       radial-gradient(
           farthest-side at 0 50%,
-          color-mix(in srgb, var(--color-fd-foreground) 20%, transparent),
+          color-mix(in srgb, var(--color-fd-foreground) 38%, transparent),
           transparent
         )
-        left center / 11px 100% no-repeat scroll,
+        left center / 16px 100% no-repeat scroll,
       radial-gradient(
           farthest-side at 100% 50%,
-          color-mix(in srgb, var(--color-fd-foreground) 20%, transparent),
+          color-mix(in srgb, var(--color-fd-foreground) 38%, transparent),
           transparent
         )
-        right center / 11px 100% no-repeat scroll;
+        right center / 16px 100% no-repeat scroll;
   }
 
   .chart svg {
     min-width: var(--ds-chart-min-width, 0);
+  }
+}
+
+/* ── Expand to full screen ───────────────────────────────────────────────
+   A 680px drawing pinned at its legibility floor inside a 358px phone
+   column shows about two thirds of itself, and no amount of scrolling puts
+   the two halves of a comparison in front of the reader at once. Rotating a
+   phone gives ~844px, which fits the whole chart at full size, so the useful
+   thing is a view that uses the entire viewport and lets the reader turn the
+   device. Pinch-zoom is left to the browser — the site sets no maximum-scale,
+   so it already works and needs no gesture handling of ours.
+   ────────────────────────────────────────────────────────────────────── */
+.stage {
+  position: relative;
+}
+
+.expandBtn {
+  /* Off by default; the media query below turns it on. It has to come *after*
+     this declaration to win — both rules are one class deep, so source order
+     decides, and a `display: inline-flex` written up in the narrow-screen
+     block above would silently lose to this line. */
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-fd-background) 88%, transparent);
+  color: var(--color-fd-muted-foreground);
+  cursor: pointer;
+  z-index: 1;
+}
+
+.expandBtn:hover {
+  color: var(--color-fd-foreground);
+  background: var(--color-fd-background);
+}
+
+/* The affordance only exists where the chart is actually clipped — the same
+   breakpoint that turns the figure into a scroll container. Above it the whole
+   drawing is already on screen and a button offering to show it would be
+   furniture.
+
+   The strip above the chart is what the button sits in, and it is not
+   decoration. The button cannot float over the drawing: it is pinned to the
+   scroll *viewport* while the chart slides underneath, so wherever it is
+   parked it covers whatever happens to be scrolled under it — in a two-panel
+   chart scrolled right, that is the second panel's title. Reserving 34px
+   guarantees it never hides a label, and vertical space is the one thing a
+   phone has plenty of. */
+@media (max-width: 64rem) {
+  .stage {
+    padding-top: 34px;
+  }
+
+  .expandBtn {
+    display: inline-flex;
+  }
+}
+
+.expandIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--color-fd-background);
+  color: var(--color-fd-foreground);
+}
+
+.closeBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 999px;
+  background: var(--color-fd-card, var(--color-fd-background));
+  color: var(--color-fd-foreground);
+  cursor: pointer;
+}
+
+/* The stage takes the whole viewport, and the close button and hint are laid
+   *over* it rather than above and below it. That is the difference between the
+   overlay being worth opening and not: in landscape a phone is only ~390px
+   tall, so a reserved 56px header plus a line of hint text was taking a third
+   of the height the chart is scaled against, and the "full screen" view came
+   out narrower than the scrolling one on the page.
+
+   Both classes are on this element deliberately. `.chart` carries the
+   `--ds-chart-*` tokens and the `currentColor` foreground the SVG is painted
+   with, so without it the chart opens colourless — but `.chart` also carries
+   the narrow-screen scroll rules, which are exactly wrong here. Hence the
+   doubled selectors below: two classes deep (0-2-0) beats the media query's
+   one (0-1-0) at any source order, so the scroll container, its edge shadows
+   and the `min-width` floor are all switched back off. */
+.lightboxStage.chart {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  overflow: visible;
+  background: none;
+}
+
+/* `width: auto` against the SVG's own 680×340 attributes, capped at the box:
+   the element ends up exactly the size of the drawing, scaled to the largest
+   that fits either dimension. No letterboxed dead zone inside the element, so
+   a tap beside the chart reaches the backdrop instead of the chart. */
+.lightboxStage.chart svg {
+  display: block;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: visible;
+}
+
+.lightboxHint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px 16px 10px;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-fd-muted-foreground);
+}
+
+/* The hint says to turn the phone sideways. Once it is sideways the advice is
+   spent, and the height it occupies is the height the chart wants. */
+@media (orientation: landscape) {
+  .lightboxHint {
+    display: none;
   }
 }
 

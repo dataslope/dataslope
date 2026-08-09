@@ -19,7 +19,13 @@ import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, rng } from "./_theme.mjs";
 
 /** The 7.5px value labels are the subject: this chart exists to show what a
  *  panel looks like when every number is printed on it, and printing them at
- *  a readable size would be a different chart making the opposite point. */
+ *  a readable size would be a different chart making the opposite point.
+ *
+ *  The exemption covers *only* that layer. Everything a reader is meant to
+ *  read here — the axes, the annotation, the tooltip's own text — is at the
+ *  authoring floor or above, so `legibleMinWidth` in scripts/build-charts.mjs
+ *  sizes this chart from the floor rather than from the 7.5px: type that is
+ *  deliberately illegible must not also decide how far the drawing shrinks. */
 export const smallTypeAllowed =
   "the left panel's unreadably small value labels are the thing being shown";
 
@@ -117,7 +123,11 @@ export function render() {
         y: (d) => d.y - 6,
         text: (d) => `${DAY(d.x)}\n${d.y.toFixed(1)}k sessions\n+12% on last week`,
         fill: MUTED,
-        fontSize: 8.5,
+        // At the authoring floor, not below it. The tooltip is the half of
+        // this chart the reader is supposed to be able to read — it is the
+        // *printed* layer opposite that is meant to defeat them — so it has no
+        // business riding in on the small-type exemption above.
+        fontSize: 10,
         lineHeight: 1.45,
         textAnchor: "start",
         lineAnchor: "top",

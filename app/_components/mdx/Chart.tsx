@@ -28,6 +28,7 @@
 import type { CSSProperties } from "react";
 import { ChartLine } from "lucide-react";
 import chartManifest from "@/lib/generated/charts";
+import ChartExpand from "./ChartExpand";
 import styles from "./Chart.module.css";
 
 // The slug printed under each chart is an authoring handle (which spec file to
@@ -76,19 +77,23 @@ export function Chart({ slug, caption, maxWidth }: ChartProps) {
       {/* `--ds-chart-min-width` is the narrowest width this chart's smallest
           label survives (computed by the build, see charts.d.ts). On a wide
           column nothing consumes it; on a phone the stylesheet lets the
-          figure scroll rather than scale its type into the ground. */}
-      <div
-        className={styles.chart}
-        role="img"
-        aria-label={entry.title}
-        style={
-          entry.minWidth
-            ? ({ "--ds-chart-min-width": `${entry.minWidth}px` } as CSSProperties)
-            : undefined
-        }
-        // Build-time output from our own spec files, never user input.
-        dangerouslySetInnerHTML={{ __html: entry.svg }}
-      />
+          figure scroll rather than scale its type into the ground — and
+          <ChartExpand> offers the whole drawing at once for the comparisons
+          that scrolling cannot serve. */}
+      <ChartExpand label={entry.title}>
+        <div
+          className={styles.chart}
+          role="img"
+          aria-label={entry.title}
+          style={
+            entry.minWidth
+              ? ({ "--ds-chart-min-width": `${entry.minWidth}px` } as CSSProperties)
+              : undefined
+          }
+          // Build-time output from our own spec files, never user input.
+          dangerouslySetInnerHTML={{ __html: entry.svg }}
+        />
+      </ChartExpand>
       {text ? <figcaption className={styles.caption}>{text}</figcaption> : null}
       {SHOW_CHART_ID ? (
         <figcaption className={styles.caption} style={{ opacity: 0.55, fontSize: "0.6875rem" }}>

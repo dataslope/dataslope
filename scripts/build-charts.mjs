@@ -316,12 +316,21 @@ const MIN_LEGIBLE_PX = 8.5;
  *  narrowest phone column with room to spare. */
 const IGNORE_BELOW_PX = 340;
 
-function legibleMinWidth(svg, width) {
+function legibleMinWidth(svg, width, smallTypeAllowed = false) {
   const sizes = [...svg.matchAll(/font-size[=:]\s*"?([0-9.]+)/g)].map((m) =>
     Number(m[1]),
   );
   if (sizes.length === 0) return 0;
-  const smallest = Math.min(...sizes);
+  // A spec that exempted itself from the authoring floor drew type it *wants*
+  // illegible. Sizing the chart from that type is the wrong bargain twice
+  // over: the drawing is pinned at full width, forcing the most horizontal
+  // scrolling of anything in the library, in order to protect labels whose
+  // whole point is that they cannot be read. Size it from the floor every
+  // other spec is held to, so the type a reader is meant to read is safe and
+  // the chart shrinks like its neighbours.
+  const smallest = smallTypeAllowed
+    ? Math.max(MIN_AUTHORED_PX, Math.min(...sizes))
+    : Math.min(...sizes);
   // Scaling the SVG scales its type by the same factor, so a label of
   // `smallest` px renders at `smallest * (w / width)`. Solve that for the w
   // where it reaches the floor. Never ask for more than the chart's own
@@ -425,7 +434,7 @@ for (const file of specs) {
   }
 
   const width = Number(el.getAttribute("width"));
-  const minWidth = legibleMinWidth(svg, width);
+  const minWidth = legibleMinWidth(svg, width, Boolean(mod.smallTypeAllowed));
 
   charts[slug] = {
     title: mod.title,
