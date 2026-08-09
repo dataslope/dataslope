@@ -33,6 +33,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { remarkPreserveCodeIndent } from "./lib/remarkPreserveCodeIndent";
 import { remarkSvgLabels } from "./lib/remarkSvgLabels";
+import { remarkComponentAnchors } from "./lib/search/anchors.mjs";
 
 export const courses = defineDocs({
   dir: "content/courses",
@@ -80,7 +81,19 @@ export default defineConfig({
     // display formatted code: @mdx-js strips the authored indentation from
     // multi-line `starterCode`/`solutionCode`/… template literals during
     // tokenization, and this restores it from the original source offsets.
-    remarkPlugins: [remarkPreserveCodeIndent, remarkMath, remarkMdxMermaid, remarkSvgLabels],
+    //
+    // `remarkComponentAnchors` MUST run before `remarkMdxMermaid` and
+    // `remarkSvgLabels`: it numbers the *authored* components in document
+    // order, and the search indexer replays the same numbering over the raw
+    // MDX (lib/search/anchors.mjs), so components synthesised by later
+    // plugins must not be visible to it.
+    remarkPlugins: [
+      remarkPreserveCodeIndent,
+      remarkComponentAnchors,
+      remarkMath,
+      remarkMdxMermaid,
+      remarkSvgLabels,
+    ],
     rehypePlugins: (plugins) => [
       [rehypeKatex, { throwOnError: false, errorColor: "#ef4444" }],
       ...plugins,

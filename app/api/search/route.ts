@@ -17,13 +17,22 @@
  *
  * This route no longer uses `createSearchAPI`, so it owns the contract that
  * Fumadocs's default fetch client expects (fumadocs-core/dist/endpoint):
- * `GET ?query=…&limit=…` returning `SortedResult[]`, and `[]` for an empty
- * query. Results are ordered page-first-then-sections so the dialog groups
- * naturally: a `page` result carrying the lesson title, followed by `heading`
- * results linking to the `#anchor` that actually matched.
+ * `GET ?query=…&limit=…&tag=…` returning `SortedResult[]`, and `[]` for an
+ * empty query. Results are ordered page-first-then-sections so the dialog
+ * groups naturally: a `page` result carrying the lesson title, followed by
+ * `heading`/`text` results linking to the `#anchor` that actually matched;
+ * for text that lives inside a component (`<MultipleChoice>`, `<CodeBlock>`,
+ * …) that anchor is the component's own id, not the heading above it (see
+ * lib/search/anchors.mjs).
+ *
+ * `tag` is the dialog's current course / interview track. Stock Fumadocs
+ * treats tags as filters; here it *boosts* (see lib/search/ranking.ts), so
+ * the reader's own course rises without hiding the rest of the site.
  *
  * Snippets come back with `<mark>` around the matched terms, which is the form
- * Fumadocs renders highlights in.
+ * Fumadocs renders highlights in, and every result URL carries the searched
+ * tokens as `?hl=…` so the lesson page can highlight them after navigation
+ * (app/_components/SearchHighlight.tsx).
  *
  * ── Read replication ────────────────────────────────────────────────────────
  *
@@ -38,91 +47,13 @@
 import type { D1Database } from "@cloudflare/workers-types";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-import { toMatchQuery } from "@/lib/search/query";
-
-/** Fumadocs's result shape (fumadocs-core `SortedResult`). */
-interface SortedResult {
-  id: string;
-  url: string;
-  type: "page" | "heading" | "text";
-  content: string;
-  breadcrumbs?: string[];
-}
-
-interface Row {
-  url: string;
-  page: string;
-  anchor: string;
-  section: string;
-  title: string;
-  heading: string;
-  excerpt: string;
-}
-
-/**
- * BM25 column weights, in the table's column order. The five UNINDEXED columns
- * lead and take 0, because `bm25()` wants one weight per column and they carry
- * no tokens.
- *
- * Prose outranks code by roughly seven to one. That ratio is what makes
- * indexing code safe: a search for a common identifier should surface the
- * lesson that *explains* it above the dozen that merely use it in a starter
- * file, and without the split there is no way to express that.
- */
-const WEIGHTS = "0, 0, 0, 0, 0, 8.0, 6.0, 4.0, 1.0, 0.15";
-
-const SQL = `
-  SELECT url, page, anchor, section, title, heading,
-         snippet(docs, 8, '<mark>', '</mark>', '…', 24) AS excerpt
-  FROM docs
-  WHERE docs MATCH ?
-  ORDER BY bm25(docs, ${WEIGHTS})
-  LIMIT ?
-`;
+import { searchTokens, toMatchQuery } from "@/lib/search/query";
+import { parseScope, searchSql, toResults, type SearchRow } from "@/lib/search/ranking";
 
 function db() {
   const env = getCloudflareContext().env as unknown as { SEARCH_DB?: D1Database };
   if (!env.SEARCH_DB) throw new Error("SEARCH_DB binding is not configured");
   return env.SEARCH_DB;
-}
-
-/**
- * Group the flat section rows into Fumadocs's page-then-headings shape.
- *
- * Sections arrive already ranked. The first section seen for a page fixes that
- * page's position in the output, so a lesson whose best section ranked third
- * overall lands third, rather than every page floating to wherever its
- * strongest and weakest sections happen to be.
- */
-function toResults(rows: Row[]): SortedResult[] {
-  const out: SortedResult[] = [];
-  const seenPage = new Set<string>();
-
-  for (const row of rows) {
-    if (!seenPage.has(row.page)) {
-      seenPage.add(row.page);
-      out.push({
-        id: row.page,
-        url: row.page,
-        type: "page",
-        content: row.title,
-        breadcrumbs: row.section ? [row.section] : undefined,
-      });
-    }
-    // The pre-heading chunk of a page has no anchor; its content is already
-    // represented by the page result above, so it adds no second entry.
-    if (!row.anchor) continue;
-    out.push({
-      id: row.url,
-      url: row.url,
-      type: "heading",
-      content: row.heading || row.excerpt,
-    });
-    if (row.excerpt && row.heading) {
-      out.push({ id: `${row.url}-text`, url: row.url, type: "text", content: row.excerpt });
-    }
-  }
-  return out;
 }
 
 export async function GET(request: Request) {
@@ -137,11 +68,21 @@ export async function GET(request: Request) {
 
   const limitParam = Number(url.searchParams.get("limit"));
   const limit = Number.isInteger(limitParam) && limitParam > 0 ? Math.min(limitParam, 50) : 24;
+  const scope = parseScope(url.searchParams.get("tag"));
 
-  let rows: Row[];
+  // Fetch more rows than the response spends: the per-page cap in
+  // `toResults` skips rows, and skipped rows must be replaceable by
+  // lower-ranked pages rather than shrinking the result list.
+  const fetchLimit = Math.min(limit * 3, 120);
+
+  let rows: SearchRow[];
   try {
     const session = db().withSession("first-unconstrained");
-    const result = await session.prepare(SQL).bind(match, limit).all<Row>();
+    const stmt = session.prepare(searchSql(scope !== null));
+    const bound = scope
+      ? stmt.bind(match, fetchLimit, scope.page, scope.pagePrefix, scope.collection)
+      : stmt.bind(match, fetchLimit);
+    const result = await bound.all<SearchRow>();
     rows = result.results ?? [];
   } catch (err) {
     // A malformed MATCH should be impossible after sanitising, so anything
@@ -151,11 +92,12 @@ export async function GET(request: Request) {
     return Response.json({ error: `search unavailable: ${message}` }, { status: 503 });
   }
 
-  const response = Response.json(toResults(rows));
+  const response = Response.json(toResults(rows, limit, searchTokens(raw)));
   // The index only changes on deploy, so a repeat of the same query inside a
   // day is a CDN hit rather than another Worker invocation *and* another D1
   // round trip. This is also what keeps the primary-region latency off the
-  // common path when read replication is not enabled.
+  // common path when read replication is not enabled. `tag` and `query` are
+  // both in the cache key, so scoped and unscoped answers never mix.
   response.headers.set(
     "Cache-Control",
     "public, s-maxage=86400, stale-while-revalidate=604800",

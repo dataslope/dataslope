@@ -668,3 +668,25 @@ code.hljs {
   font-variation-settings: normal;
   letter-spacing: -0.011em;
 }
+
+/* ── Search-result anchors on custom components ──────────────────────────────
+   `remarkComponentAnchors` (lib/search/anchors.mjs) gives every anchored MDX
+   component (<MultipleChoice>, <CodeBlock>, …) a DOM id, rendered by
+   `withSearchAnchor` as a wrapper div carrying this attribute, so /api/search
+   results can deep-link straight to the component that matched. Match the
+   scroll offset Fumadocs gives headings (`scroll-m-28`, 7rem): without it the
+   sticky navbar covers the top of the component the link lands on. */
+[data-search-anchor] {
+  scroll-margin-top: 7rem;
+}
+
+/* Matched-word highlights painted by app/_components/SearchHighlight.tsx
+   (CSS Custom Highlight API) after arriving from a search result. Brand
+   yellow at an opacity that reads as a marker stroke over both page
+   surfaces without crushing text contrast. */
+::highlight(ds-search-match) {
+  background-color: color-mix(in srgb, var(--ds-yellow-500) 45%, transparent);
+}
+.dark ::highlight(ds-search-match) {
+  background-color: color-mix(in srgb, var(--ds-yellow-500) 28%, transparent);
+}

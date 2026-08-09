@@ -32,6 +32,20 @@
  * Content before the first heading becomes a row with a null anchor, which is
  * the page-level result.
  *
+ * ── …and one extra row per anchored component ───────────────────────────────
+ *
+ * A section row's anchor is its heading, but a `<MultipleChoice>` often sits
+ * several screens below its heading, so a hit on quiz text used to land the
+ * reader far above the text that matched. Anchored components (the set in
+ * lib/search/anchors.mjs) therefore get a second, narrower row whose anchor is
+ * the component's own DOM id (injected at render time by
+ * `remarkComponentAnchors`; both sides derive identical ids from the authored
+ * MDX). The component's content stays in the section row too, so queries whose
+ * terms span a paragraph and a component keep matching; the resulting
+ * near-duplicate entries are collapsed at query time in favour of the
+ * component's anchor (lib/search/ranking.ts). Rows with an empty `heading`
+ * column and a non-empty anchor are exactly these component rows.
+ *
  * ── Prose and code are separate columns ─────────────────────────────────────
  *
  * Both are indexed, but a match in prose should outrank a match in a code
@@ -43,14 +57,8 @@
  *
  * ── How component content is reached ────────────────────────────────────────
  *
- * `remark-mdx` attaches an ESTree to every expression attribute, so the values
- * inside `files={[{ starterCode: `…` }]}` and `markdown={`…`}` are read from
- * the parsed tree by property name rather than scraped with a regex. Property
- * keys are classified (see PROSE_KEYS / CODE_KEYS) so an instruction lands in
- * prose and a starter file lands in code.
- *
- * `<Chart>` is the exception: its caption is not in the MDX at all, it lives in
- * the generated chart manifest, so the slug is resolved against that.
+ * See scripts/lib/search-extract.mjs (split out so the anchor-id contract is
+ * testable against the render-side plugin).
  *
  * Output: `lib/generated/search-corpus.json` (gitignored), consumed by
  * `scripts/build-search-sql.mjs` to produce the D1 seed.
@@ -59,12 +67,10 @@ import { readFileSync, readdirSync, mkdirSync, writeFileSync, existsSync } from 
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { structure } from "fumadocs-core/mdx-plugins";
-import { unified } from "unified";
-import remarkParse from "remark-parse";
 import remarkMdx from "remark-mdx";
 import remarkMath from "remark-math";
-import { visit } from "unist-util-visit";
 import { freshness } from "./lib/build-cache.mjs";
+import { extractComponents } from "./lib/search-extract.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 
@@ -78,27 +84,6 @@ const SECTIONS = [
 ];
 
 const OUT_FILE = join(ROOT, "lib", "generated", "search-corpus.json");
-
-/** Prose the reader reads. Weighted as body text. */
-const PROSE_KEYS = new Set([
-  "instructions", "markdown", "title", "name", "description", "alt", "label",
-  "caption", "prompt", "question", "explanation", "hint", "note",
-]);
-
-/** Code and identifiers. Indexed, but weighted well below prose. */
-const CODE_KEYS = new Set([
-  "starterCode", "initCode", "solutionCode", "code", "source", "schema",
-  "setup", "filename", "sql", "html", "css", "js", "tsx", "jsx", "expected",
-]);
-
-/** Components whose attributes carry content worth indexing. Anything else
- *  (layout wrappers, demo components) contributes only its child prose, which
- *  `structure()` already collects. */
-const CONTENT_COMPONENTS = new Set([
-  "CodeBlock", "SqlCodeBlock", "ChallengeCard", "SqlChallengeCard",
-  "MultipleChoice", "Chart", "Figure", "Callout", "Mermaid", "SvgLabel",
-  "LivePreview", "ReactPreview", "IllustrationPrompt",
-]);
 
 /**
  * Chart titles and captions live in the generated manifest, not in the MDX, so
@@ -189,122 +174,6 @@ function sectionTitle(sectionDir, slug) {
   return title;
 }
 
-/**
- * Pull every string out of an ESTree, tagged prose or code by the property key
- * that encloses it.
- *
- * A bare value (an attribute that is just a template literal, like
- * `markdown={`…`}`) inherits `fallback`, which the caller sets from the
- * attribute's own name.
- */
-function harvestEstree(node, fallback, out, key = fallback) {
-  if (!node || typeof node !== "object") return;
-
-  if (node.type === "TemplateLiteral") {
-    const text = (node.quasis ?? []).map((q) => q.value?.cooked ?? "").join(" ");
-    if (text.trim()) out[key === "code" ? "code" : "prose"].push(text);
-    // Interpolations can hold strings too.
-    for (const e of node.expressions ?? []) harvestEstree(e, fallback, out, key);
-    return;
-  }
-  if (node.type === "Literal") {
-    if (typeof node.value === "string" && node.value.trim()) {
-      out[key === "code" ? "code" : "prose"].push(node.value);
-    }
-    return;
-  }
-  if (node.type === "Property") {
-    const name = node.key?.name ?? node.key?.value;
-    const next = CODE_KEYS.has(name) ? "code" : PROSE_KEYS.has(name) ? "prose" : key;
-    harvestEstree(node.value, fallback, out, next);
-    return;
-  }
-
-  for (const v of Object.values(node)) {
-    if (Array.isArray(v)) for (const child of v) harvestEstree(child, fallback, out, key);
-    else if (v && typeof v === "object" && typeof v.type === "string") {
-      harvestEstree(v, fallback, out, key);
-    }
-  }
-}
-
-/** `remarkMath` is not decoration here. Without it, MDX reads the braces in
- *  `$$p_i = \frac{e^{z_i}}{…}$$` as a JSX expression and acorn rejects the
- *  file, which silently dropped 31 lessons from the previous index. The real
- *  render pipeline (source.config.ts) has always had it; the indexer did not. */
-const processor = unified().use(remarkParse).use(remarkMath).use(remarkMdx);
-const charts = loadChartManifest();
-
-/**
- * Walk the MDX for everything `structure()` does not return: fenced code,
- * mermaid sources, and the content carried in component attributes. Each find
- * is attributed to the heading it sits under, matched to `structure()`'s
- * heading ids by document order.
- */
-function extractComponents(body, headingIds) {
-  const perHeading = new Map();
-  let headingIndex = -1;
-
-  const bucket = () => {
-    const id = headingIndex >= 0 ? headingIds[headingIndex] : null;
-    const k = id ?? "";
-    if (!perHeading.has(k)) perHeading.set(k, { prose: [], code: [] });
-    return perHeading.get(k);
-  };
-
-  let tree;
-  try {
-    tree = processor.parse(body);
-  } catch {
-    return perHeading;
-  }
-
-  visit(tree, (node) => {
-    if (node.type === "heading") {
-      headingIndex++;
-      return;
-    }
-    // Fenced blocks, including ```mermaid diagram sources.
-    if (node.type === "code") {
-      if (node.value?.trim()) bucket().code.push(node.value);
-      return;
-    }
-    if (node.type !== "mdxJsxFlowElement" && node.type !== "mdxJsxTextElement") return;
-    if (!CONTENT_COMPONENTS.has(node.name)) return;
-
-    const out = bucket();
-
-    for (const attr of node.attributes ?? []) {
-      if (attr.type !== "mdxJsxAttribute") continue;
-      const name = attr.name;
-
-      // A plain string attribute: alt="…", title="…".
-      if (typeof attr.value === "string") {
-        if (CODE_KEYS.has(name)) out.code.push(attr.value);
-        else if (PROSE_KEYS.has(name)) out.prose.push(attr.value);
-        // `<Chart slug>` and `<Figure slug>` name an asset, not content, but a
-        // chart's title and caption are real prose held in the manifest.
-        else if (name === "slug" && node.name === "Chart") {
-          const entry = charts[attr.value];
-          if (entry?.title) out.prose.push(entry.title);
-          if (entry?.caption) out.prose.push(entry.caption);
-        }
-        continue;
-      }
-
-      // An expression attribute: read its ESTree rather than its source text.
-      const estree = attr.value?.data?.estree;
-      const fallback = CODE_KEYS.has(name) ? "code" : "prose";
-      if (estree) harvestEstree(estree, fallback, out, fallback);
-      else if (typeof attr.value?.value === "string") {
-        out[fallback].push(attr.value.value);
-      }
-    }
-  });
-
-  return perHeading;
-}
-
 // Parsing ~900 lessons through remark is the single most expensive step in
 // `dev` and `build` — 26 seconds, every run, for an answer that only changes
 // when a lesson (or the chart manifest it reads captions from) does. The gate
@@ -312,6 +181,11 @@ function extractComponents(body, headingIds) {
 const cache = freshness(ROOT, "search-corpus", {
   inputs: [
     fileURLToPath(import.meta.url),
+    // The extractor and the anchor-id scheme are inputs too: a change to
+    // either must rebuild the corpus, or its rows drift from the DOM ids the
+    // render pipeline emits.
+    join(ROOT, "scripts", "lib", "search-extract.mjs"),
+    join(ROOT, "lib", "search", "anchors.mjs"),
     join(ROOT, "lib", "generated", "charts.js"),
     ...SECTIONS.flatMap(({ dir }) => walk(dir).map((rel) => join(dir, rel))),
   ],
@@ -322,9 +196,11 @@ if (cache.fresh) {
   process.exit(0);
 }
 
+const charts = loadChartManifest();
 const rows = [];
 let files = 0;
 let failed = 0;
+let componentRows = 0;
 
 for (const { dir, base, collection } of SECTIONS) {
   for (const rel of walk(dir)) {
@@ -351,7 +227,7 @@ for (const { dir, base, collection } of SECTIONS) {
 
     const headingIds = sd.headings.map((h) => h.id);
     const headingText = new Map(sd.headings.map((h) => [h.id, h.content]));
-    const components = extractComponents(body, headingIds);
+    const { perHeading: components, perComponent } = extractComponents(body, headingIds, charts);
 
     // Prose from structure(), grouped by the heading it sits under.
     const proseByHeading = new Map();
@@ -381,6 +257,29 @@ for (const { dir, base, collection } of SECTIONS) {
         code,
       });
     }
+
+    // One narrow row per anchored component: same page metadata, the
+    // component's own id as the anchor, and an empty `heading` column (that
+    // emptiness is how the API recognises these rows, and it keeps the
+    // heading's words from matching once per component under it).
+    for (const [anchor, comp] of perComponent) {
+      const prose = comp.prose.join("\n");
+      const code = comp.code.join("\n");
+      if (!prose.trim() && !code.trim()) continue;
+      componentRows++;
+      rows.push({
+        url: `${url}#${anchor}`,
+        page: url,
+        anchor,
+        title: pageTitle,
+        heading: "",
+        description: "",
+        section: crumb ?? "",
+        collection,
+        prose,
+        code,
+      });
+    }
   }
 }
 
@@ -392,7 +291,8 @@ cache.commit();
 const proseChars = rows.reduce((n, r) => n + r.prose.length, 0);
 const codeChars = rows.reduce((n, r) => n + r.code.length, 0);
 console.log(
-  `[search-corpus] ${files} lesson(s) → ${rows.length} section rows ` +
-    `(${Math.round(proseChars / 1000)}k prose, ${Math.round(codeChars / 1000)}k code, ` +
-    `${Math.round(json.length / 1024)} kB)${failed ? `, ${failed} unparsed` : ""}`,
+  `[search-corpus] ${files} lesson(s) → ${rows.length} rows ` +
+    `(${componentRows} component rows, ${Math.round(proseChars / 1000)}k prose, ` +
+    `${Math.round(codeChars / 1000)}k code, ${Math.round(json.length / 1024)} kB)` +
+    `${failed ? `, ${failed} unparsed` : ""}`,
 );

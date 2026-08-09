@@ -48,14 +48,14 @@ const STOP = new Set([
 ]);
 
 /**
- * Build an FTS5 `MATCH` expression, or `null` when the input has no searchable
- * tokens at all (empty, whitespace, pure punctuation). Callers should treat
- * `null` as "return no results" rather than as an error: it is what a user gets
- * for typing `***`, and that is not a failure worth reporting.
+ * The tokens a query actually searches for: lowercased word tokens, stop words
+ * dropped (unless they are all there is), capped at 12. This is the list the
+ * MATCH expression is built from, and it is also what result URLs carry in
+ * their `hl` parameter so the landing page can highlight the matched words.
  */
-export function toMatchQuery(raw: string): string | null {
+export function searchTokens(raw: string): string[] {
   const tokens = raw.toLowerCase().match(TOKEN);
-  if (!tokens || tokens.length === 0) return null;
+  if (!tokens || tokens.length === 0) return [];
 
   // Keep the stop words when they are *all* there is, so searching "how to" or
   // "why" still looks for those words rather than silently returning nothing.
@@ -64,7 +64,18 @@ export function toMatchQuery(raw: string): string | null {
 
   // A very long query is not more useful than its first several terms, and
   // every extra AND clause costs a scan.
-  const capped = kept.slice(0, 12);
+  return kept.slice(0, 12);
+}
+
+/**
+ * Build an FTS5 `MATCH` expression, or `null` when the input has no searchable
+ * tokens at all (empty, whitespace, pure punctuation). Callers should treat
+ * `null` as "return no results" rather than as an error: it is what a user gets
+ * for typing `***`, and that is not a failure worth reporting.
+ */
+export function toMatchQuery(raw: string): string | null {
+  const capped = searchTokens(raw);
+  if (capped.length === 0) return null;
 
   return capped
     .map((token, i) => (i === capped.length - 1 ? `"${token}"*` : `"${token}"`))
