@@ -460,8 +460,16 @@ async function main() {
       `\n${eaten.length} image(s) lost their objects to the remover and were NOT written:\n` +
         eaten.map((e) => `  ${e.id} (kept ${e.score})`).join("\n") +
         `\nRe-run with --force to retry them; the remover is not deterministic, so a` +
-        `\nsecond attempt often succeeds. If one keeps failing, redraw it with the` +
-        `\nanimal touching the objects rather than standing apart from them.`,
+        `\nsecond attempt often succeeds. If one keeps failing, look at what the` +
+        `\nsubject asks for before retrying a third time:` +
+        `\n  · An outline enclosing white — a ruled sheet, a form, an empty grid —` +
+        `\n    cannot survive. The white inside it is the same white as the paper,` +
+        `\n    so the remover drops it and the object comes back as bare lines.` +
+        `\n    Measured on one: 88% of the frame near-white, ink 100% / solid 56%.` +
+        `\n    Redraw it as solid masses (a column of filled row blocks, not a` +
+        `\n    sheet ruled into rows) and it comes back at solid 98%.` +
+        `\n  · A mascot standing apart from the objects can also fail; redraw with` +
+        `\n    the animal touching them.`,
     );
   }
   if (failed > 0) process.exitCode = 1;
