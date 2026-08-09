@@ -10785,7 +10785,7 @@
       "style": "risograph",
       "title": "Memory layout",
       "mascot": false,
-      "subject": "one tall vertical strip divided into four labelled bands of different sizes, with a stack growing down from the top and a heap growing up from below"
+      "subject": "one long horizontal bar running the full width of the frame, divided end to end into four bands of different colours, a small arrow above the third band pointing right and a small arrow above the fourth pointing left so the two grow toward each other, and three loose crates resting inside the third band"
     },
     {
       "id": "sysc-heap-and-dynamic-allocation-inline",
@@ -11349,7 +11349,7 @@
       "style": "risograph",
       "title": "Narrowing",
       "mascot": false,
-      "subject": "a wide chute holding three differently shaped blocks, passing through two gates that each reject a shape until one block remains"
+      "subject": "a wide chute carrying a cube, a cylinder and a cone, passing through two upright plates in turn, the cube left stopped against the first plate and the cylinder left stopped against the second, so only the cone continues on to the right"
     },
     {
       "id": "tsx-structural-typing-inline",
