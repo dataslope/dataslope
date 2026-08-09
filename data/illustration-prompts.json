@@ -2685,7 +2685,7 @@
       "style": "risograph",
       "title": "Rows and columns are older than writing",
       "mascot": false,
-      "subject": "a clay tablet ruled into rows and columns lying beside a modern board ruled the same way"
+      "subject": "a clay tablet of pressed filled cells lying beside a modern board of coloured filled cells in the same arrangement"
     },
     {
       "id": "pandas-how-computers-see-data-csv-plain-text-inline",
@@ -6861,7 +6861,7 @@
       "style": "risograph",
       "title": "Start with requirements",
       "mascot": false,
-      "subject": "a blank board on an easel with a figure pinning plain cards to it before any cabinet is built"
+      "subject": "a solid dark easel board with a figure pinning bright plain cards across it before any cabinet is built"
     },
     {
       "id": "db-case-study-ecommerce-start-requirements-inline",
@@ -10137,7 +10137,7 @@
       "style": "risograph",
       "title": "What is a template?",
       "mascot": false,
-      "subject": "a blank framed board with its margins, rules and type sizes already set before any mark is laid"
+      "subject": "a solid inked panel with its margins and type sizes marked out in a contrasting ink, no data drawn on it yet"
     },
     {
       "id": "viz-time-series-visualization-default-line-chart-inline",
@@ -10173,7 +10173,7 @@
       "style": "risograph",
       "title": "Tables make you read; charts let you see",
       "mascot": false,
-      "subject": "a dense ruled sheet being read line by line beside a chart whose shape is taken in at a glance"
+      "subject": "a dense board of filled cells being read cell by cell beside a chart of solid bars taken in at a glance"
     },
     {
       "id": "viz-why-plotly-express-python-won-analytics-inline",
@@ -10197,7 +10197,7 @@
       "style": "risograph",
       "title": "The data",
       "mascot": false,
-      "subject": "a small tray of chips set beside a bare framed board, nothing drawn yet"
+      "subject": "a small tray of chips set beside a solid inked panel with nothing drawn on it yet"
     },
     {
       "id": "viz-a-brief-history-of-data-pictures-from-parliamentary-foldouts-inline",
@@ -11901,7 +11901,7 @@
       "style": "risograph",
       "title": "The CREATE TABLE statement",
       "mascot": false,
-      "subject": "an empty frame being ruled into columns of set widths before any row is laid into it"
+      "subject": "a solid slab being divided into columns of set widths by inserted dividers before any row is laid in"
     },
     {
       "id": "sql-data-types-types-will-actually-inline",
@@ -12141,7 +12141,7 @@
       "style": "risograph",
       "title": "Where spreadsheets shine",
       "mascot": false,
-      "subject": "a single small ruled sheet on a bench with a hand writing directly onto it, quick and unaided"
+      "subject": "one small board of filled cells on a bench with a hand marking a cell directly, quick and unaided"
     },
     {
       "id": "sql-subqueries-idea-query-as-inline",
@@ -20361,7 +20361,7 @@
       "style": "risograph",
       "title": "A first ggplot",
       "mascot": false,
-      "subject": "a bare framed board with one layer of chips laid onto it"
+      "subject": "a solid inked panel with one layer of bright chips laid onto it"
     },
     {
       "id": "rlang-grouped-analysis-basic-pattern-inline",
@@ -20481,7 +20481,7 @@
       "style": "risograph",
       "title": "Why spreadsheets fail at reproducibility",
       "mascot": false,
-      "subject": "a ruled sheet with a hand editing one cell directly and no record of the change anywhere"
+      "subject": "a board of filled cells with a hand altering one cell directly and no record of the change anywhere"
     },
     {
       "id": "rlang-reshaping-data-wide-vs-long-inline",
@@ -20541,7 +20541,7 @@
       "style": "risograph",
       "title": "A craft built around scarcity",
       "mascot": false,
-      "subject": "a desk with ruled paper, a mechanical adding machine and one carefully guarded column of figures"
+      "subject": "a desk holding a mechanical adding machine and one guarded column of solid filled cells"
     },
     {
       "id": "rlang-subsetting-and-filtering-mental-model-rows-inline",
@@ -21681,7 +21681,7 @@
       "style": "risograph",
       "title": "Creating arrays",
       "mascot": false,
-      "subject": "an empty grid frame being filled cell by cell from a hopper"
+      "subject": "a solid grid of cells filling in one by one from a hopper, each filled cell a block of ink"
     },
     {
       "id": "scipy-floating-point-machine-epsilon-inline",
