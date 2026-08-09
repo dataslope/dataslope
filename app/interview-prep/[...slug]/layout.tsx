@@ -19,16 +19,18 @@
  */
 import "../../docs.css";
 import type { ReactNode } from "react";
-import { RootProvider } from "fumadocs-ui/provider/next";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { interviewSource } from "@/lib/source";
 import { ThemePillToggleSlot } from "@/app/_components/ThemePillToggle";
+import { DocsRootProvider } from "@/app/_components/DocsRootProvider";
 
 export default function InterviewLayout({ children }: { children: ReactNode }) {
   return (
     // Match the site-wide binary light/dark contract (light default); see the
-    // note in app/courses/[...slug]/layout.tsx.
-    <RootProvider theme={{ defaultTheme: "light", enableSystem: false }}>
+    // note in app/courses/[...slug]/layout.tsx. DocsRootProvider additionally
+    // scopes the search dialog to the current interview track and keeps deep
+    // links aligned + highlighted; see that component's header.
+    <DocsRootProvider theme={{ defaultTheme: "light", enableSystem: false }}>
       <DocsLayout
         tree={interviewSource.pageTree}
         tabs={false}
@@ -68,6 +70,6 @@ export default function InterviewLayout({ children }: { children: ReactNode }) {
       >
         {children}
       </DocsLayout>
-    </RootProvider>
+    </DocsRootProvider>
   );
 }

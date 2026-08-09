@@ -97,13 +97,19 @@ Three build steps produce it, all wired into `npm run build`:
 
 | Step | Output |
 | --- | --- |
-| `scripts/build-search-corpus.mjs` | `lib/generated/search-corpus.json` — one row per `(page, heading)` |
+| `scripts/build-search-corpus.mjs` | `lib/generated/search-corpus.json` — one row per `(page, heading)`, plus one per anchored component |
 | `scripts/build-search-sql.mjs` | `lib/generated/search-seed.sql` — the `DELETE` + batched `INSERT`s |
 | `npm run db:seed:search[:remote]` | the rows, in D1 — skipped when unchanged |
 
 These run **after** `build:charts`, and the order is load-bearing: chart titles and captions live in the generated chart manifest rather than in the MDX, so a corpus built before it silently omits every one of them. That is worth ~264 kB of prose across ~250 charts, and it produced an index with no chart captions in it at all the first time the steps were ordered the other way. `build-search-corpus.mjs` now warns loudly when the manifest is missing or empty rather than quietly indexing less.
 
 The corpus is extracted from the MDX **ASTs**, not the rendered HTML, which is what lets it reach content that never exists in the DOM until a learner interacts: `<ChallengeCard>` instructions and solutions, `<MultipleChoice>` questions and per-choice explanations, fenced and `<CodeBlock>` source, Mermaid definitions, `<Chart>` titles and captions, and the whole of `content/interview/`, which the previous index omitted entirely. Prose and code land in separate columns so `bm25()` can weight prose about seven to one over code — that ratio is what makes indexing code safe, since a search for a common identifier should surface the lesson that *explains* it above the dozen that merely use it in a starter file.
+
+Three query-time behaviours sit on top of that index (`lib/search/ranking.ts`):
+
+- **Component anchors.** Content components get deterministic DOM ids (`#x-mcq-2`, `#x-code-1`) injected at compile time by `remarkComponentAnchors`, and the corpus carries a narrow extra row per component under the same id, so a hit on quiz or challenge text deep-links to the component itself instead of the heading somewhere above it. `lib/search/anchors.mjs` is the single source both sides derive the ids from; `__tests__/searchAnchors.test.ts` pins the contract.
+- **Current-course boost.** The docs layouts send the course / interview track being read as `?tag=` (see `DocsRootProvider`), and the route *boosts* — not filters — rows from that course (×2) and collection (×1.15), so "bar" typed inside the Plotly course surfaces Plotly's bar-chart lesson above ggplot2's while the rest of the site stays reachable.
+- **Landing-page highlights.** Result URLs carry the searched tokens as `?hl=`; `SearchHighlight` paints them browser-find style via the CSS Custom Highlight API, and `HashScrollFix` keeps the viewport pinned to the anchor while CodeMirror/KaTeX/Mermaid finish mounting underneath it.
 
 ### One-time setup
 
@@ -112,7 +118,7 @@ The database and its schema already exist. To recreate them from scratch:
 ```bash
 npx wrangler d1 create dataslope-search   # paste database_id into wrangler.jsonc
 npm run db:migrate:search:remote          # migrations/search/0001_create_docs_fts.sql
-npm run db:seed:search:remote             # ~9k rows
+npm run db:seed:search:remote             # ~19k rows
 ```
 
 **The Workers Builds API token needs `D1 (edit)` added to it.** The token Cloudflare generates for Workers Builds is scoped to Account Settings (read), Workers Scripts (edit), Workers KV (edit), Workers R2 (edit) and Workers Routes (edit) — D1 is not in that set, so the deploy-time seed fails to authorize until it is added under **My Profile → API Tokens → (the Workers Builds token) → Edit → Account → D1 → Edit**. Because the seed is chained after `deploy` with `&&`, the symptom is a Worker that ships fine and a build that goes red on the last step, with the index never updating.

@@ -28,20 +28,27 @@ import RuntimeLoadingStates from "@/app/_components/RuntimeBootNotice";
 import { LivePreview } from "@/app/_components/mdx/LivePreview";
 import { ReactPreview } from "@/app/_components/mdx/ReactPreview";
 import { reactDemoComponents } from "@/app/_components/mdx/reactDemoComponents";
+import { withSearchAnchor } from "@/app/_components/mdx/withSearchAnchor";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
+  // `withSearchAnchor` renders the deterministic `id` that
+  // `remarkComponentAnchors` (lib/search/anchors.mjs) injects into these
+  // components, so search results can deep-link to the exact quiz, code
+  // block, or figure that matched rather than to the heading above it. The
+  // wrapped set must mirror ANCHOR_COMPONENTS in that module.
   return {
     ...defaultMdxComponents,
-    CodeBlock: MdxCodeBlock,
-    ChallengeCard: MdxChallengeCard,
-    SqlChallengeCard: MdxSqlChallengeCard,
-    SqlCodeBlock: MdxSqlCodeBlock,
-    MultipleChoice: MdxMultipleChoiceQuestion,
+    CodeBlock: withSearchAnchor(MdxCodeBlock),
+    ChallengeCard: withSearchAnchor(MdxChallengeCard),
+    SqlChallengeCard: withSearchAnchor(MdxSqlChallengeCard),
+    SqlCodeBlock: withSearchAnchor(MdxSqlCodeBlock),
+    MultipleChoice: withSearchAnchor(MdxMultipleChoiceQuestion),
+    Callout: withSearchAnchor(defaultMdxComponents.Callout),
     Mermaid,
     SvgLabel,
     IllustrationPrompt,
-    Figure,
-    Chart,
+    Figure: withSearchAnchor(Figure),
+    Chart: withSearchAnchor(Chart),
     LoadingAnimationsGallery,
     RuntimeLoadingStates,
     // Live, no-Run lesson widgets: <LivePreview> renders HTML/CSS in a
@@ -49,8 +56,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     // interactive component with its TSX shown below (React course). The
     // React demo components are spread in so lessons can use e.g.
     // <CounterDemo /> as <ReactPreview>'s child without an import.
-    LivePreview,
-    ReactPreview,
+    LivePreview: withSearchAnchor(LivePreview),
+    ReactPreview: withSearchAnchor(ReactPreview),
     ...reactDemoComponents,
     // Fumadocs Steps/Step, a numbered vertical walkthrough. Registered
     // globally so lessons can drop `<Steps>…<Step>` in without an import,

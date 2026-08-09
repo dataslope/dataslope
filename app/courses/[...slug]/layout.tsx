@@ -17,10 +17,10 @@
  */
 import "../../docs.css";
 import type { ReactNode } from "react";
-import { RootProvider } from "fumadocs-ui/provider/next";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { courseSource } from "@/lib/source";
 import { ThemePillToggleSlot } from "@/app/_components/ThemePillToggle";
+import { DocsRootProvider } from "@/app/_components/DocsRootProvider";
 
 export default function CourseLessonLayout({
   children,
@@ -34,7 +34,11 @@ export default function CourseLessonLayout({
     // binary "light" | "dark" with a light default, so without this a dark-OS
     // visitor with no stored choice would get dark docs but light pages
     // everywhere else.
-    <RootProvider theme={{ defaultTheme: "light", enableSystem: false }}>
+    //
+    // DocsRootProvider (not the bare RootProvider) so the search dialog knows
+    // the current course and deep links stay aligned + highlighted; see that
+    // component's header.
+    <DocsRootProvider theme={{ defaultTheme: "light", enableSystem: false }}>
       <DocsLayout
         tree={courseSource.pageTree}
         tabs={false}
@@ -80,6 +84,6 @@ export default function CourseLessonLayout({
       >
         {children}
       </DocsLayout>
-    </RootProvider>
+    </DocsRootProvider>
   );
 }
