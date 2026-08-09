@@ -934,6 +934,9 @@ if _plt is not None:
           const fig = JSON.parse(out.json) as {
             data: unknown[];
             layout?: Record<string, unknown>;
+            // `animation_frame=` figures carry their frames here; the
+            // renderer needs them or the play button and slider are inert.
+            frames?: unknown[];
           };
           post({ kind: "output", id, cell: { type: "plot", content: out.json, plot: fig } });
         } catch {

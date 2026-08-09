@@ -93,12 +93,15 @@ aq = pd.read_csv("anscombe.csv")`,
       starterCode: `fig = px.scatter(
     aq, x="x", y="y", facet_col="dataset", facet_col_wrap=2,
     title="Anscombe's quartet, identical summaries, four shapes",
+    template="simple_white",
 )
 fig.show()
 `,
     },
   ]}
 />
+
+<Chart slug="anscombes-quartet" />
 
 <Callout type="danger" title="Misconception: a mean and standard deviation fully describe a distribution">
 They describe *center and spread* and nothing else, not the number of
@@ -138,7 +141,8 @@ tips = px.data.tips()
 # The SAME column, three bin counts, three different impressions.
 for nbins in [5, 20, 80]:
     fig = px.histogram(
-        tips, x="total_bill", nbins=nbins, title=f"total_bill with nbins={nbins}"
+        tips, x="total_bill", nbins=nbins, title=f"total_bill with nbins={nbins}",
+        template="simple_white",
     )
     fig.show()
 
@@ -187,6 +191,8 @@ outlier dots. Box plots are compact and *brilliant for comparing
 groups* side by side, but they hide modality, because a box plot of a
 two-humped distribution looks just like a box plot of a one-humped one.
 
+<Chart slug="box-plot-anatomy" />
+
 <CodeBlock
   adapter="python"
   files={[
@@ -204,6 +210,7 @@ fig = px.box(
     color="day",
     points="outliers",
     title="total_bill by day (box = IQR, line = median, dots = outliers)",
+    template="simple_white",
 )
 fig.update_layout(showlegend=False)
 fig.show()
@@ -231,6 +238,8 @@ while still comparing groups. The cost is that the smooth outline
 depends on a smoothing choice, so very small samples can look smoother
 and more reliable than they are.
 
+<Chart slug="violin-vs-box" />
+
 <CodeBlock
   adapter="python"
   files={[
@@ -248,6 +257,7 @@ fig = px.violin(
     box=True,  # draw the box plot inside the violin
     points=False,
     title="total_bill by day (violin shows the full shape)",
+    template="simple_white",
 )
 fig.update_layout(showlegend=False)
 fig.show()
@@ -309,6 +319,7 @@ fig = px.ecdf(
     x="total_bill",
     color="sex",
     title="ECDF of total_bill: fraction of bills at or below each value",
+    template="simple_white",
 )
 fig.show()
 

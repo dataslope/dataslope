@@ -250,6 +250,7 @@ aq = pd.read_csv("anscombe.csv")`,
 fig = px.scatter(
     aq, x="x", y="y", facet_col="dataset", facet_col_wrap=2,
     trendline="ols", title="Anscombe's quartet, identical correlation, four pictures",
+    template="simple_white",
 )
 fig.show()
 `,
@@ -331,6 +332,7 @@ fig = px.scatter(
     y=score,
     labels={"x": "hours studied", "y": "exam score"},
     title="Exam score vs hours studied (with least-squares fit)",
+    template="simple_white",
 )
 fig.add_scatter(x=xline, y=yline, mode="lines", name="fit line")
 fig.show()

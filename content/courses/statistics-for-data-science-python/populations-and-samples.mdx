@@ -220,6 +220,7 @@ fig = px.histogram(
     nbins=40,
     labels={"value": "Sample mean (x-bar)"},
     title="x-bar is a random variable: 1000 samples, 1000 means",
+    template="simple_white",
 )
 fig.add_vline(x=MU_TRUE, line_dash="dash", annotation_text="true mu = 100")
 fig.show()
@@ -288,6 +289,7 @@ fig = px.line(
     log_x=True,
     labels={"x": "Sample size n (log scale)", "y": "|x-bar - mu| (estimation error)"},
     title="Bigger samples sharpen the estimate",
+    template="simple_white",
 )
 fig.show()
 

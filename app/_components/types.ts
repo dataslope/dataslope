@@ -24,6 +24,11 @@ export interface OutputCell {
 export interface PlotlyFigure {
   data: unknown[];
   layout?: Record<string, unknown>;
+  /** Animation frames, present whenever the figure was built with
+   *  `animation_frame=`. The play button and the slider live in `layout`
+   *  and are drawn without these, so a figure rendered from `data` and
+   *  `layout` alone looks animated and does nothing when clicked. */
+  frames?: unknown[];
 }
 
 export interface EntryFileInfo {

@@ -112,6 +112,7 @@ fig = px.line(
     y=d.pdf(x),
     labels={"x": "x", "y": "density"},
     title="Uniform(0, 10) PDF, flat; area, not height, is probability",
+    template="simple_white",
 )
 fig.show()
 `,
@@ -167,6 +168,7 @@ fig = px.line(
     y=d.pdf(x),
     labels={"x": "minutes until next event", "y": "density"},
     title="Exponential(mean=5): wait times, most short, a long right tail",
+    template="simple_white",
 )
 fig.show()
 `,
@@ -228,6 +230,7 @@ fig = px.line(
     y=d.pdf(x),
     labels={"x": "score", "y": "density"},
     title="Normal(mean=100, sd=15) PDF",
+    template="simple_white",
 )
 fig.show()
 `,

@@ -147,7 +147,7 @@ t = np.linspace(0, 10, 200)
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=t, y=np.sin(t), name="sin", mode="lines"))
 fig.add_trace(go.Scatter(x=t, y=np.cos(t), name="cos", mode="lines"))
-fig.update_layout(title="Hover, zoom, and pan")
+fig.update_layout(title="Hover, zoom, and pan", template="simple_white")
 fig.show()
 `,
     },
@@ -167,7 +167,7 @@ t = np.linspace(0, 10, 200)
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=t, y=np.sin(t), name="sin", mode="lines"))
 fig.add_trace(go.Scatter(x=t, y=np.cos(t), name="cos", mode="lines"))
-fig.update_layout(title="Hover, zoom, and pan")
+fig.update_layout(title="Hover, zoom, and pan", template="simple_white")
 fig.show()
 `,
     },

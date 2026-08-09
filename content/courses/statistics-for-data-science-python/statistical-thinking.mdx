@@ -142,6 +142,7 @@ fig = px.line(
     markers=True,
     labels={"x": "Month", "y": "Metric"},
     title="A 'trend' that is 100% noise",
+    template="simple_white",
 )
 fig.add_hline(y=100, line_dash="dash", annotation_text="the actual truth (flat)")
 fig.show()
@@ -311,6 +312,7 @@ fig = px.histogram(
     nbins=40,
     labels={"value": "Sample mean (ms)"},
     title="The mean is not a point, it's a distribution",
+    template="simple_white",
 )
 fig.add_vline(
     x=point_estimate, line_dash="dash", annotation_text="your one sample's mean"

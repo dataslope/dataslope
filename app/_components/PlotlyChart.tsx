@@ -29,6 +29,7 @@ interface PlotlyAPI {
     layout?: Record<string, unknown>,
     config?: Record<string, unknown>,
   ): Promise<unknown>;
+  addFrames(el: HTMLElement, frames: unknown[]): Promise<unknown>;
 }
 
 /** Tighter than Plotly's default so a figure in a narrow output panel spends
@@ -58,12 +59,19 @@ export function PlotlyChart({
       // in dark mode, plotly in light mode) into figure.layout.template, so
       // only the margin is defaulted here and the figure renders as-is.
       const layout = { margin: PLOTLY_MARGIN, ...(figure.layout ?? {}) };
-      void Plotly.newPlot(el, figure.data, layout, {
+      await Plotly.newPlot(el, figure.data, layout, {
         responsive: true,
         displayModeBar: true,
         displaylogo: false,
         modeBarButtonsToRemove: ["sendDataToCloud", "lasso2d"],
       });
+      // `animation_frame=` puts the play button and the slider in `layout`
+      // and the thing they animate in `frames`, which newPlot's positional
+      // form has no parameter for. Without this the controls draw, and both
+      // the play button and the slider are inert: their handlers look up
+      // frames by name and find none registered on the graph.
+      if (cancelled || !ref.current) return;
+      if (figure.frames?.length) await Plotly.addFrames(el, figure.frames);
     })();
     return () => {
       cancelled = true;

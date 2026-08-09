@@ -40,7 +40,10 @@ df = pd.DataFrame(
     }
 )
 
-fig = px.bar(df, x="department", y="headcount", color="year", barmode="group")
+fig = px.bar(
+    df, x="department", y="headcount", color="year", barmode="group",
+    template="simple_white",
+)
 fig.show()
 `,
     },
@@ -71,7 +74,8 @@ it changes the answer:
 import plotly.express as px
 penguins = pd.read_csv("penguins.csv")`,
       starterCode: `fig = px.histogram(
-    penguins, x="body_mass_g", nbins=30, title="Distribution of penguin body mass"
+    penguins, x="body_mass_g", nbins=30, title="Distribution of penguin body mass",
+    template="simple_white",
 )
 fig.show()
 `,
@@ -104,7 +108,8 @@ produce the same one:
 import plotly.express as px
 penguins = pd.read_csv("penguins.csv")`,
       starterCode: `fig = px.box(
-    penguins, x="species", y="body_mass_g", title="Body mass by species"
+    penguins, x="species", y="body_mass_g", title="Body mass by species",
+    template="simple_white",
 )
 fig.show()
 `,
@@ -138,6 +143,7 @@ penguins = pd.read_csv("penguins.csv")`,
     color="species",
     opacity=0.7,
     title="Flipper length vs body mass, by species",
+    template="simple_white",
 )
 fig.show()
 `,
@@ -172,7 +178,8 @@ df = pd.DataFrame(
 )
 
 fig = px.line(
-    df, x="date", y="value", color="metric", title="Daily visits and sign-ups"
+    df, x="date", y="value", color="metric", title="Daily visits and sign-ups",
+    template="simple_white",
 )
 fig.show()
 `,
@@ -210,6 +217,7 @@ penguins = pd.read_csv("penguins.csv")`,
     facet_col="species",
     nbins=30,
     title="Body mass distribution by species",
+    template="simple_white",
 )
 fig.show()
 `,
@@ -335,7 +343,10 @@ fig
 `,
       solutionCode: `import plotly.express as px
 
-fig = px.histogram(sales, x="amount", nbins=20, title="Sales amount distribution")
+fig = px.histogram(
+    sales, x="amount", nbins=20, title="Sales amount distribution",
+    template="simple_white",
+)
 fig
 `,
     },
