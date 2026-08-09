@@ -1,0 +1,83 @@
+name: Refresh creation dates
+
+# Keeps `data/created-at.json` — the committed record of when each chart and
+# illustration entered the repository — in step with the files it describes.
+#
+# Why a workflow at all, when `scripts/build-created-at.mjs` already writes it
+# from any local build: a file's creation date is the date of the commit that
+# *added* it, so it cannot exist until that commit does. Left to local runs,
+# art added in one pull request would only get dated by whoever next ran a
+# build — which is to say, in some later pull request, while the newest
+# artwork (exactly what a reviewer opens the gallery to look at) showed no
+# date at all. Running here closes that gap: the add-commit exists by the time
+# this fires.
+#
+# Why the snapshot exists at all, rather than reading git at build time:
+# production is built by Cloudflare Workers Builds, which clones shallow, and
+# a shallow clone reports every file as added at its horizon commit. That is
+# what once stamped the entire gallery with the date of whatever was deployed
+# last. See the header of scripts/build-created-at.mjs.
+#
+# Modelled on optimize-images.yml, including its no-loop property: this
+# triggers on artwork and chart specs, and its own commit only ever touches
+# `data/created-at.json`. A commit pushed with GITHUB_TOKEN cannot retrigger
+# Actions either.
+on:
+  push:
+    paths:
+      - "public/images/**"
+      - "charts/**"
+      - "scripts/build-created-at.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-created-at-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    # Defensive: never react to our own commit-back, or to the images bot's.
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
+          # The whole point: this job's answer *is* the history. A shallow
+          # clone here would write the very dates this file exists to prevent.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      # No dependencies: the script is git plus node built-ins. `npm ci` would
+      # be a minute spent on nothing.
+      - name: Refresh the creation-date snapshot
+        run: node scripts/build-created-at.mjs
+
+      - name: Commit the snapshot if it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/created-at.json
+          if git diff --cached --quiet; then
+            echo "Creation dates already up to date, nothing to commit."
+            exit 0
+          fi
+          git commit -m "chore(dates): refresh created-at snapshot [skip ci]"
+          branch="${{ github.ref_name }}"
+          for i in 1 2 3; do
+            if git pull --rebase --autostash origin "$branch" \
+              && git push origin "HEAD:$branch"; then
+              echo "Pushed refreshed creation dates."
+              exit 0
+            fi
+            echo "Push attempt $i failed; retrying…"
+            sleep "$((2 ** i))"
+          done
+          echo "::error::Could not push refreshed creation dates after 3 attempts."
+          exit 1

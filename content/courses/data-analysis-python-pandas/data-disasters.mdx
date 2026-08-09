@@ -41,6 +41,12 @@ recalculation, into a gap of hundreds of points. When the error was
 found and corrected, the index roughly doubled overnight back to
 where it should have been.
 
+<Figure
+  slug="pandas-data-disasters-vancouver-index-cutout"
+  alt="A rising staircase of green blocks above a falling staircase of red ones, a crumb dropping off the edge of every red step"
+  caption="Vancouver Stock Exchange, 1982 to 1983: the market rose, and a truncated third decimal walked the index down to 520."
+/>
+
 **The habit:** know how your numbers are rounded, and never assume
 a small per-operation error is harmless. Repeated millions of
 times, "small" becomes "catastrophic." (We meet the same lesson in
@@ -57,6 +63,12 @@ software expected **newton-seconds** (metric). Nobody converted
 between them. The numbers were not *wrong*, they were unitless, and
 the two teams quietly assumed different units. The orbiter came in
 too low and was destroyed by the Martian atmosphere.
+
+<Figure
+  slug="pandas-data-disasters-mars-orbiter-cutout"
+  alt="An orbiter passing low over a red planet's horizon, a ground antenna aimed at it, and two measuring rules of different lengths laid end to end"
+  caption="Mars, September 1999: pound-force seconds on one side of the interface, newton-seconds on the other."
+/>
 
 **The habit:** a number without a unit is not data, it is a rumor.
 When you name a column, the unit belongs in the name or the
@@ -92,6 +104,12 @@ least one formula divided by a *sum* where it should have divided by
 an *average*, understating the apparent risk. No single villain;
 just a fragile, undocumented, un-reviewed manual pipeline that
 nobody could fully trace.
+
+<Figure
+  slug="pandas-data-disasters-london-whale-cutout"
+  alt="Four blank spreadsheets pegged along a washing line, a figure carrying one tile by hand between them, and a whale's tail rising behind the last"
+  caption="JPMorgan, 2012: a risk model that ran on copy-paste between sheets, and a formula dividing by a sum instead of an average."
+/>
 
 **The habit:** if an analysis matters, it should be a script, not a
 sequence of clicks and copy-pastes that lives in one person's

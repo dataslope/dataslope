@@ -290,15 +290,37 @@ function makeStore(opts) {
 }
 
 /**
- * What fraction of the original's drawn content survived into the cut-out.
+ * How much of the original's drawn content survived into the cut-out, as two
+ * numbers that have to be read together.
  *
- * Every pixel that is meaningfully not-white in the original is drawn content;
- * in the cut-out that same pixel should still be opaque. Comparing the two
- * catches the remover deleting solid objects, which is otherwise invisible
- * until someone looks at the picture.
+ * The guard exists because a remover that eats an object is invisible until
+ * someone looks at the picture, and by then it has been promoted. Two ways for
+ * that to happen, and one measure cannot see both:
  *
- * Both are downscaled to a common width first: the comparison is statistical,
- * and the remover may return a different pixel size than it was given.
+ *   - `ink` — of all the ink the original laid down, how much is still covered
+ *     by alpha. Weighted by how strongly each pixel was inked, and capped per
+ *     pixel, so a half-tone pixel is fully accounted for by half alpha. This is
+ *     what catches whole objects being deleted.
+ *   - `solid` — of the pixels that were *unambiguously* inked (at least half
+ *     the distance from the background), how many came back genuinely opaque.
+ *     This is what catches a ghost matte: uniform partial alpha over the whole
+ *     frame, which is exactly what the alternatives to Recraft did, and which
+ *     `ink` alone reads as a mild loss rather than a failure.
+ *
+ * **`ink` is weighted rather than counted because of the risograph bands.** The
+ * earlier measure asked every not-background pixel to come back with alpha over
+ * 200, which is true of a flat isometric shape and false of a half-tone screen:
+ * between the dots is paper, the remover is right to make it transparent, and
+ * at the scale below a screened area averages to a mid-tone that can never
+ * satisfy an opacity test. Measured over the first ten inline bands, that read
+ * 0.36 and 0.62 on two images with nothing whatsoever wrong with them, against
+ * 0.998 and 1.000 here. The pair below, on the same ten: ink 0.998-1.000, solid
+ * 0.82-0.98. Against deliberate damage on one of them: a third of the frame
+ * deleted → 0.70 / 0.69, a 30% ghost → 0.40 / 0.00, a 60% ghost → 0.77 / 0.00.
+ *
+ * Both images are downscaled to a common width first: the comparison is
+ * statistical, and the remover may return a different pixel size than it was
+ * given.
  */
 export async function keptFraction(originalBuf, cutoutBuf) {
   const W = 320;
@@ -320,8 +342,10 @@ export async function keptFraction(originalBuf, cutoutBuf) {
   for (let y = 0; y < h; y++) { push(y * w); push(y * w + w - 1); }
   const bg = chan.map((v) => v.sort((a, b) => a - b)[v.length >> 1]);
 
-  let objects = 0;
-  let survived = 0;
+  let ink = 0;
+  let inkKept = 0;
+  let solid = 0;
+  let solidKept = 0;
   for (let i = 0; i < n; i++) {
     // 18/255 from the background ignores both the faint contact shadow under
     // each object and any soft vignette, which the remover is right to drop.
@@ -331,10 +355,18 @@ export async function keptFraction(originalBuf, cutoutBuf) {
       Math.abs(o.data[i * 4 + 2] - bg[2]),
     );
     if (d < 18) continue;
-    objects++;
-    if (c.data[i * 4 + 3] > 200) survived++;
+    const alpha = c.data[i * 4 + 3];
+    ink += d / 255;
+    inkKept += Math.min(d, alpha) / 255;
+    if (d >= 128) {
+      solid++;
+      if (alpha > 200) solidKept++;
+    }
   }
-  return objects ? survived / objects : 1;
+  return {
+    ink: ink ? inkKept / ink : 1,
+    solid: solid ? solidKept / solid : 1,
+  };
 }
 
 async function main() {
@@ -362,6 +394,10 @@ async function main() {
   // of the original's drawn content and the 5th percentile is 90%. The two
   // failures scored 0.26 and 0.19. A 0.70 floor sits far below anything
   // healthy and far above both failures.
+  //
+  // One floor, applied to both of `keptFraction`'s numbers, and a cut-out has
+  // to clear it on each: they fail differently (an object deleted vs. a ghost
+  // matte) and passing one is no evidence about the other.
   //
   // Known limit: the measure reads the background off the border, so a
   // background that is one solid colour (white staging, or a flat blue field)
@@ -394,21 +430,23 @@ async function main() {
         const src = await store.read(id);
         const cut = await removeBackground(src, `${id}.png`, key);
         const kept = await keptFraction(src, cut);
-        if (kept < KEEP_FLOOR) {
+        const pct = (v) => `${(v * 100).toFixed(0)}%`;
+        const score = `ink ${pct(kept.ink)}, solid ${pct(kept.solid)}`;
+        if (kept.ink < KEEP_FLOOR || kept.solid < KEEP_FLOOR) {
           // Do NOT write it. A cut-out is what the site serves, so promoting
           // this would publish a lone animal on an otherwise empty card, and
           // the next run would skip the id because a cut-out now exists.
-          eaten.push({ id, kept });
+          eaten.push({ id, score });
           failed++;
           console.error(
-            `  ✗ ${id}: background removal kept only ${(kept * 100).toFixed(0)}% ` +
-              `of the artwork — objects were eaten, not written`,
+            `  ✗ ${id}: background removal kept ${score} of the artwork ` +
+              `— objects were eaten, not written`,
           );
           continue;
         }
         const where = await store.writeCutout(id, cut);
         ok++;
-        console.log(`  ✓ ${where} (${(cut.length / 1e6).toFixed(2)}MB, kept ${(kept * 100).toFixed(0)}%)`);
+        console.log(`  ✓ ${where} (${(cut.length / 1e6).toFixed(2)}MB, kept ${score})`);
       } catch (err) {
         failed++;
         console.error(`  ✗ ${id}: ${err.message}`);
@@ -420,7 +458,7 @@ async function main() {
   if (eaten.length) {
     console.error(
       `\n${eaten.length} image(s) lost their objects to the remover and were NOT written:\n` +
-        eaten.map((e) => `  ${e.id} (kept ${(e.kept * 100).toFixed(0)}%)`).join("\n") +
+        eaten.map((e) => `  ${e.id} (kept ${e.score})`).join("\n") +
         `\nRe-run with --force to retry them; the remover is not deterministic, so a` +
         `\nsecond attempt often succeeds. If one keeps failing, redraw it with the` +
         `\nanimal touching the objects rather than standing apart from them.`,

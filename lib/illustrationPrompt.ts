@@ -39,9 +39,14 @@ export const BRAND_COLORS: BrandColors = {
 /** The house illustration style when a prompt does not name its own.
  *  Isometric is the default because it was the one style that survived every
  *  test: it isolates a subject cleanly, reads on both page backgrounds, and
- *  cuts out reliably. Risograph is reserved for simple mascot moments; see
+ *  cuts out reliably. It is the only style used for the art that opens a
+ *  lesson; the one other style with constraints of its own is `risograph`,
+ *  reserved for the inline figures that sit beside a passage of history. See
  *  the "Illustrations" section of AGENTS.md. */
 export const DEFAULT_STYLE = "isometric illustration";
+
+/** Style name for the in-body historical figures. */
+export const RISOGRAPH_STYLE = "risograph";
 
 /** The minimal shape needed to build a generation prompt. */
 export interface IllustrationSpec {
@@ -49,9 +54,10 @@ export interface IllustrationSpec {
    *  illustration of " (e.g. "a marmot waving beside a monitor"). */
   subject: string;
   /** Illustration style descriptor, inserted after the article, e.g.
-   *  "isometric illustration" (default) or "risograph". The other styles
-   *  tried (flat geometric vector, line art, blueprint schematic, cut-paper
-   *  collage) are discouraged, see AGENTS.md. */
+   *  "isometric illustration" (default) or "risograph". Those two are the
+   *  only styles with constraints written for them; the others tried (flat
+   *  geometric vector, line art, blueprint schematic, cut-paper collage) are
+   *  discouraged and fall back to the isometric constraints, see AGENTS.md. */
   style?: string;
 }
 
@@ -61,7 +67,8 @@ function article(style: string): string {
 }
 
 /**
- * Constraints every generated illustration carries, whatever its subject.
+ * The two constraints every generated illustration carries, whatever its
+ * subject and whatever its style.
  *
  * **No text** because none of the illustrations should carry lettering (the
  * model bakes in garbled text otherwise).
@@ -74,6 +81,14 @@ function article(style: string): string {
  * every corner, a folder wore a constellation of dots joined by thin lines, and
  * a press had confetti scattered across its base. The clutter was not coming
  * from the subjects; it was coming from here.
+ */
+const SHARED_CONSTRAINTS =
+  "No text. Draw only the objects described — nothing scattered over, around, " +
+  "or behind them: no speckled dots, no confetti, no stray connecting lines.";
+
+/**
+ * What the isometric house style adds to those two, and what every prompt
+ * authored before the risograph pilot carries verbatim.
  *
  * **Solid 3D forms**, because the same sentence asked for "flat 2D circles" and
  * flattened whole scenes with it. Isometric is the house style *because* it has
@@ -114,9 +129,7 @@ function article(style: string): string {
  * carrying a solid blue marmot, a blue owl, and a green marmot. Fur, feathers
  * and skin keep their own colours; only the props obey the palette.
  */
-const GLOBAL_CONSTRAINTS =
-  "No text. Draw only the objects described — nothing scattered over, around, " +
-  "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
+const ISOMETRIC_CONSTRAINTS =
   "Render each object as a solid three-dimensional form with real thickness, " +
   "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
   "a thin round counter. " +
@@ -130,6 +143,74 @@ const GLOBAL_CONSTRAINTS =
   "coloring and markings, never a flat brand color and never a flat " +
   "silhouette. A bird has wings, a beak and feet and never hands or arms: it " +
   "perches, stands, or nudges things with its beak rather than holding them.";
+
+/**
+ * What `risograph` adds instead, for the inline figures that sit beside a
+ * passage of history rather than at the top of a lesson.
+ *
+ * **Why a second style at all**, when the isometric rule is "do not
+ * reintroduce one". Because these illustrate a different kind of thing. The
+ * art that opens a lesson stands for its *idea* — a sorted stack, a call
+ * stack, a marmot at a keyboard — and isometric props say that well. An inline
+ * figure stands for something that *happened*: a launcher breaking up in 1996,
+ * an orbiter coming in too low in 1999. Print stock and flat spot inks are the
+ * register an editorial aside is drawn in, and they hold the two apart on the
+ * page, which is the point of the pilot.
+ *
+ * **Flat inks, not shading.** The isometric block asks for volume; asking a
+ * risograph for it too produces a plastic 3D render with grain sprinkled on
+ * top, which is neither style. So the volume clauses are dropped here and
+ * replaced with what actually makes a risograph legible: a few flat inks,
+ * halftone texture inside the shapes, and the slight misregistration where two
+ * inks overlap.
+ *
+ * **Still the brand palette, and still never black.** This is the transparency
+ * constraint (AGENTS.md), not an aesthetic preference: the background is
+ * removed after generation, so a cut-out drawn in one dark ink would read on
+ * the white page and vanish on the near-black one. Risograph's usual
+ * black-key line work is therefore banned outright.
+ *
+ * **Blank paper, no printed panel.** The reason AGENTS.md retired risograph
+ * the first time is that a full-bleed riso scene has no isolable subject:
+ * background removal returns the whole rectangle. Pinning the paper blank —
+ * no frame, no border, no ground shadow — is what makes the subject liftable,
+ * and it is the difference between this working and the earlier attempt.
+ *
+ * **A wide band.** These are generated at 1536x768 (`course-inline` in
+ * `meta.sizes`), so the composition is asked for in the prompt too; a scene
+ * composed square and letterboxed into a 2:1 frame wastes half the width.
+ *
+ * **No likenesses.** Several of these passages name a real person. The figures
+ * are deliberately anonymous — an image model's attempt at a specific face is
+ * both unreliable and not something to publish next to their name.
+ */
+const RISOGRAPH_CONSTRAINTS =
+  "Print it as a risograph: a few flat spot-color inks, coarse halftone grain " +
+  "inside every inked shape, and slight misregistration where two inks " +
+  "overlap. No gradients, no photographic shading, no glossy highlights. " +
+  "Ink every shape in one of the brand colors below and let two inks overprint " +
+  "into a third; never key the scene off black, grey, or a single hue, and " +
+  "never outline in black. Leave the paper blank white behind and between the " +
+  "shapes: no printed panel, no frame, no border, no ground shadow, so the " +
+  "whole subject lifts off the page in one piece. Compose it as a wide band " +
+  "twice as long as it is tall, reading left to right across the full width " +
+  "rather than centered in the middle. Draw any person as a small stylized " +
+  "figure with minimal facial detail and no resemblance to a real individual.";
+
+/** Constraint block per style. A style with no entry (the retired experiments:
+ *  flat geometric vector, line art, blueprint schematic, cut-paper collage)
+ *  falls back to the isometric block, which is what it got before this map
+ *  existed. */
+const STYLE_CONSTRAINTS: Record<string, string> = {
+  [DEFAULT_STYLE]: ISOMETRIC_CONSTRAINTS,
+  [RISOGRAPH_STYLE]: RISOGRAPH_CONSTRAINTS,
+};
+
+/** The full constraint text for a style: the two shared rules, then the
+ *  style's own. */
+function constraintsFor(style: string): string {
+  return `${SHARED_CONSTRAINTS} ${STYLE_CONSTRAINTS[style] ?? ISOMETRIC_CONSTRAINTS}`;
+}
 
 /**
  * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.
@@ -152,7 +233,7 @@ export function buildIllustrationPrompt(
 ): string {
   const style = spec.style?.trim() || DEFAULT_STYLE;
   return (
-    `${article(style)} ${style} of ${spec.subject}. ${GLOBAL_CONSTRAINTS}\n\n` +
+    `${article(style)} ${style} of ${spec.subject}. ${constraintsFor(style)}\n\n` +
     `Blue: ${colors.blue}\n` +
     `Green: ${colors.green}\n` +
     `Red: ${colors.red}\n` +

@@ -12,6 +12,7 @@
     "sizes": {
       "course-thumbnail": "1536x1024",
       "course-illustration": "1536x1024",
+      "course-inline": "1536x768",
       "interview-thumbnail": "1536x1024",
       "interview-illustration": "1536x1024",
       "home-icon": "1024x1024",
@@ -1247,6 +1248,42 @@
       "subject": "a giant panda waving from a small launch pad with three paths leading off to distant floating platforms"
     },
     {
+      "id": "pandas-data-disasters-vancouver-index",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "data-disasters",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The index that melted",
+      "mascot": false,
+      "subject": "a wide board on which a green staircase of five solid blocks climbs to the right while directly beneath it a red staircase of five blocks steps downward, one small yellow crumb dropping off the edge of each red step, and a stylized figure at the far right watching both"
+    },
+    {
+      "id": "pandas-data-disasters-mars-orbiter",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "data-disasters",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Mars Climate Orbiter",
+      "mascot": false,
+      "subject": "a small blue and white orbiter drifting low across the curved red horizon of a planet filling the right half of the frame, a green dish antenna standing on the ground at the far left aimed toward it, and beneath the orbiter one short yellow measuring rule laid end to end with one much longer blue measuring rule"
+    },
+    {
+      "id": "pandas-data-disasters-london-whale",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "data-disasters",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The London Whale",
+      "mascot": false,
+      "subject": "four blank ruled spreadsheets pegged in a row across a washing line, a stylized figure in the middle lifting one solid blue tile out of the second sheet and carrying it by hand to the third, and the broad tail of a blue whale rising behind the last sheet on the right"
+    },
+    {
       "id": "js-computational-thinking",
       "collection": "courses",
       "course": "beginners-javascript",
@@ -1869,6 +1906,18 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading off to distant floating platforms"
+    },
+    {
+      "id": "c-story-of-c-pdp7-unix",
+      "collection": "courses",
+      "course": "c-programming-for-beginners",
+      "courseTitle": "C Programming for Beginners",
+      "lesson": "story-of-c",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A game on a discarded PDP-7",
+      "mascot": false,
+      "subject": "two stylized figures beside a refrigerator-sized computer cabinet with two large tape reels turning on the left, one of them seated at a teletype on the right, and a small round green screen between them showing one planet and one tiny spacecraft"
     },
     {
       "id": "cs-why-declarative-won",
@@ -2555,6 +2604,18 @@
       "subject": "the Dataslope marmot mascot and a cute blue elephant character (the PostgreSQL mascot), smooth matte bright blue all over with plain solid ears and no white markings, on a pale grey platform at a tall signpost with three arms, one wide ramp leading away behind it"
     },
     {
+      "id": "db-relational-revolution-codd-paper",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "the-relational-revolution",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Codd's 1970 paper",
+      "mascot": false,
+      "subject": "a stylized figure at a research desk on the left holding up one slim blank sheet, a fanned stack of index cards tied together with tangled cords in the middle, and on the right three plain blue tables each ruled into four thick empty bands"
+    },
+    {
       "id": "cpp-brief-history",
       "collection": "courses",
       "course": "from-zero-to-cpp",
@@ -2877,6 +2938,42 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading to distant floating platforms"
+    },
+    {
+      "id": "cpp-types-and-values-ariane-5",
+      "collection": "courses",
+      "course": "from-zero-to-cpp",
+      "courseTitle": "From Zero to C++ Programming",
+      "lesson": "types-and-values",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Ariane 5 Flight 501",
+      "mascot": false,
+      "subject": "a tall blue and white launcher lifting away from a low coastal launch tower on the left, a thick yellow exhaust column beneath it, the launcher tipping hard off its climb at the top right where a red burst breaks out of its flank, and a small green tracking dish standing on the ground at the far right"
+    },
+    {
+      "id": "cpp-brief-history-c-with-classes",
+      "collection": "courses",
+      "course": "from-zero-to-cpp",
+      "courseTitle": "From Zero to C++ Programming",
+      "lesson": "a-brief-history",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "C with Classes",
+      "mascot": false,
+      "subject": "a stylized figure at a boxy 1970s terminal on the left of a long bench, pressing a green block taken from one crate and a blue block taken from another together into one taller two-tone block that stands at the right end of the bench"
+    },
+    {
+      "id": "cpp-pointers-null-mistake",
+      "collection": "courses",
+      "course": "from-zero-to-cpp",
+      "courseTitle": "From Zero to C++ Programming",
+      "lesson": "pointers-and-references",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The billion-dollar mistake",
+      "mascot": false,
+      "subject": "a long low blue cabinet of six open pigeonholes running the width of the frame, five of them holding one solid green shape each and the middle one standing completely empty, with a small stylized figure at the right reaching into that empty hole"
     },
     {
       "id": "fp-evolution-of-complexity",
@@ -8997,6 +9094,30 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot and a friendly beaver on a pale grey platform stepping up onto the tallest of three broad steps"
+    },
+    {
+      "id": "sysc-disasters-heartbleed",
+      "collection": "courses",
+      "course": "systems-programming-c",
+      "courseTitle": "Systems Programming with C",
+      "lesson": "real-world-disasters",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Heartbleed",
+      "mascot": false,
+      "subject": "a large blue padlock split open on the left with a red heart-shaped valve on its face, and a long green ribbon of memory unspooling out of the crack and running right across the frame, carrying small keys and cards off the edge"
+    },
+    {
+      "id": "sysc-disasters-therac-25",
+      "collection": "courses",
+      "course": "systems-programming-c",
+      "courseTitle": "Systems Programming with C",
+      "lesson": "real-world-disasters",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The Therac-25",
+      "mascot": false,
+      "subject": "a large blue radiation therapy machine with a heavy rotating head standing over a flat empty treatment couch on the left, a stylized operator seated at a small terminal on the right, one narrow red beam falling on the couch, and a yellow safety latch lying detached on the floor between them"
     },
     {
       "id": "tsa-what-makes-unique",

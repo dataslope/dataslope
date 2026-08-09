@@ -55,6 +55,10 @@ const SINGLE_PAGE: ReadonlySet<Collection> = new Set<Collection>([
 export type Category =
   | "course-thumbnail"
   | "course-illustration"
+  /** A risograph band placed beside a passage inside a lesson, rather than at
+   *  the top of one. Generated at 2:1 (`meta.sizes`), and the only category
+   *  that is not in the isometric house style — see lib/illustrationPrompt.ts. */
+  | "course-inline"
   | "interview-thumbnail"
   | "interview-illustration"
   | "home-icon"
@@ -65,6 +69,7 @@ export type Category =
 const CATEGORY_LABEL: Record<Category, string> = {
   "course-thumbnail": "Course thumbnails",
   "course-illustration": "Course illustrations",
+  "course-inline": "Course inline figures",
   "interview-thumbnail": "Interview prep thumbnails",
   "interview-illustration": "Interview prep illustrations",
   "home-icon": "Home page bento icons",
@@ -76,6 +81,7 @@ const CATEGORY_LABEL: Record<Category, string> = {
 const CATEGORY_ORDER: Category[] = [
   "course-thumbnail",
   "course-illustration",
+  "course-inline",
   "interview-thumbnail",
   "interview-illustration",
   "home-icon",

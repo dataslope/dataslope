@@ -104,8 +104,9 @@ the home bento icons, and the auth globe pins are all mascot art by request.
   "course": "modern-css-layout",          // must match the content/courses/<dir> name
   "courseTitle": "Modern CSS: Layout and Responsive Design",
   "lesson": "css-grid",                   // MUST equal the MDX file stem
-  "category": "course-illustration",      // or course-thumbnail | interview-thumbnail
-                                          // | home-icon | auth-globe-pin
+  "category": "course-illustration",      // or course-thumbnail | course-inline
+                                          // | interview-thumbnail | home-icon
+                                          // | auth-globe-pin
   "title": "CSS Grid in depth",
   "style": "isometric illustration",      // the default; only change deliberately
   "mascot": false,                        // true iff the subject features a creature
@@ -485,6 +486,14 @@ alone.
 **13. `pkill -f "next start"` can kill your own shell** and any command chained after
 it. Run the kill and the next step as separate calls.
 
+**14. A risograph cut-out that "lost its objects" has probably lost nothing.**
+`remove-background-kie.mjs` now scores each cut-out twice (`ink` and `solid`) precisely
+because the single old score read a half-tone screen as damage: the paper between the
+dots is background, the remover is right to drop it, and two of the first ten inline
+bands were refused at 0.36 and 0.62 with nothing whatsoever wrong with them. Under the
+current pair they read ink 100% / solid 82-88%. If a band is still refused, look at it
+before redrawing it.
+
 ---
 
 ## Cost and performance, measured
@@ -492,6 +501,7 @@ it. Run the kill and the next step as separate calls.
 | | |
 |---|---|
 | Tokens per image | **158** at low/1536x1024 (196 low/1024x1024; 1372 medium; 5488 high) |
+| Inline risograph bands | **102** at low/1536x768, the `course-inline` size. Cheaper than every other frame, and the smallest the API sells: 1024x512 is a 400, "below the current minimum pixel budget". |
 | Batch pricing | $15 / 1M output tokens (standard $30) |
 | Last run | 337 images → **$0.80**, **27 min**, 4 batch jobs, 0 failures |
 | Per image | ~$0.0024 |
