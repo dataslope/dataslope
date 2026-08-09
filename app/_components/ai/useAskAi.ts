@@ -34,6 +34,23 @@ import type {
 export interface UiMessage {
   role: "user" | "assistant";
   content: string;
+  /** Stable id for this turn, for the life of the conversation. Assistant
+   *  turns are rated by it (`/api/ai/feedback`), so it has to survive the
+   *  re-renders a streaming answer causes — an array index would not, and a
+   *  rating would follow the position rather than the answer. */
+  id: string;
+  /** Model that produced this answer, from the stream's `done` event. Rides
+   *  along with a rating so a downvote says which tier produced it. */
+  model?: string;
+}
+
+let turnCounter = 0;
+/** `crypto.randomUUID` needs a secure context; the counter is the fallback,
+ *  and either way the id only has to be unique within one conversation. */
+function newTurnId(): string {
+  turnCounter += 1;
+  const uuid = globalThis.crypto?.randomUUID?.();
+  return uuid ?? `turn-${turnCounter}-${String(Math.trunc(performance.now()))}`;
 }
 
 /** What broke, when the stream did not complete normally. `interrupted` means
@@ -132,8 +149,8 @@ export function useAskAi(
 
       applyMessages((prev) => [
         ...prev,
-        { role: "user", content: item.question },
-        { role: "assistant", content: "" },
+        { role: "user", content: item.question, id: newTurnId() },
+        { role: "assistant", content: "", id: newTurnId() },
       ]);
 
       const ac = new AbortController();
@@ -220,6 +237,14 @@ export function useAskAi(
               } else if (ev.type === "done") {
                 completed = true;
                 setTier(ev.tier);
+                applyMessages((prev) => {
+                  const next = prev.slice();
+                  const last = next[next.length - 1];
+                  if (last?.role === "assistant") {
+                    next[next.length - 1] = { ...last, model: ev.model };
+                  }
+                  return next;
+                });
               } else if (ev.type === "error") {
                 setError({
                   message: ev.message,

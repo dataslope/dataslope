@@ -542,6 +542,19 @@
 :global(html.dark) .answerNote {
   color: #7c828a;
 }
+/* Underlined rather than coloured: at 11px in a grey line, a blue link would
+   be the loudest thing under the answer. */
+.answerNoteLink {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.answerNoteLink:hover {
+  color: var(--ds-blue-700, #0064bd);
+}
+:global(html.dark) .answerNoteLink:hover {
+  color: var(--ds-blue-300, #8abfff);
+}
 
 /* Message action row (copy / thumbs). */
 .answerActions {

@@ -37,6 +37,7 @@ import rehypeHighlight from "rehype-highlight";
 // playground and the dashboard, which do not — so it brings its own rather than
 // relying on whatever page it happens to be open on.
 import "@/app/hljs.css";
+import Link from "@/app/_components/Link";
 import { Popover } from "@base-ui/react/popover";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import {
@@ -799,13 +800,55 @@ export default function AskAiWidget({
       },
     );
   };
+  /**
+   * Rate an answer, and store the exchange it refers to.
+   *
+   * Optimistic: the icon fills immediately and stays filled, because a rating
+   * is the user's own opinion and a network hiccup is no reason to appear to
+   * take it back. The write is best-effort for the same reason — a failed
+   * POST is logged, not surfaced, since there is nothing useful to ask of
+   * someone who just told us an answer was bad.
+   *
+   * Clicking the filled thumb withdraws the rating, which deletes the row: an
+   * answer nobody rated and one whose rating was withdrawn are the same thing.
+   *
+   * Rated turns are the ONLY Ask AI content that leaves the browser for our
+   * storage — see app/api/ai/feedback/route.ts and the notice under each
+   * answer, which says exactly this.
+   */
   const react = (idx: number, kind: "up" | "down") => {
+    const message = messages[idx];
+    if (!message) return;
+    const rating = reactions[idx] === kind ? null : kind;
     setReactions((prev) => {
       const next = { ...prev };
-      if (next[idx] === kind) delete next[idx];
-      else next[idx] = kind;
+      if (rating === null) delete next[idx];
+      else next[idx] = rating;
       return next;
     });
+
+    // The question this answer replied to is the user turn just before it.
+    const question = messages[idx - 1]?.role === "user" ? messages[idx - 1].content : "";
+    const ctx = buildContext();
+    void fetch("/api/ai/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        turnId: message.id,
+        rating,
+        question,
+        answer: message.content,
+        surface: ctx.surface,
+        // `slug` is the lesson's path *segments* (["courses", "python-basics",
+        // "variables"]); joined here so what is stored is the page a reviewer
+        // can open, not an array.
+        slug:
+          ctx.surface === "playground"
+            ? (ctx.adapterId ?? "")
+            : (ctx.slug ?? []).join("/"),
+        model: message.model ?? "",
+      }),
+    }).catch((err) => console.error("Ask AI: rating not saved", err));
   };
 
   // ── Context-sheet interactions ─────────────────────────────────────
@@ -1150,9 +1193,20 @@ export default function AskAiWidget({
                         the answer's own controls rather than pinned to the
                         composer, where it read as a property of the panel. Once
                         per conversation, under the newest answer: repeating it
-                        under every one turns it into furniture nobody reads. */}
+                        under every one turns it into furniture nobody reads.
+                        The second line is directly about the buttons above it —
+                        rating is what causes an exchange to be stored, so the
+                        sentence saying so belongs where the thumbs are, not
+                        only in the Privacy Policy. */}
                     {isLast && m.content && !streamingHere && (
-                      <p className={styles.answerNote}>{disclaimer}</p>
+                      <p className={styles.answerNote}>
+                        {disclaimer} Rating an answer saves that exchange so we
+                        can improve the assistant, handled as described in our{" "}
+                        <Link href="/privacy" className={styles.answerNoteLink}>
+                          Privacy Policy
+                        </Link>
+                        .
+                      </p>
                     )}
                   </div>
                 );

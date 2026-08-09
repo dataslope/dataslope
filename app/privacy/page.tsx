@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <LegalShell title="Privacy Policy" updated="July 16, 2026">
+    <LegalShell title="Privacy Policy" updated="August 9, 2026">
       <p>
         Dataslope is a free, browser-based platform for learning programming and
         data skills. We built it to need as little of your data as possible. You
@@ -62,6 +62,25 @@ export default function PrivacyPage() {
         you&apos;ve highlighted) is sent to a third-party AI provider so it can
         generate a response. Please don&apos;t include sensitive personal
         information in your prompts.
+      </p>
+      <p>
+        <strong>We don&apos;t keep your conversations.</strong>{" "}Ask AI
+        questions and answers pass through our servers to the provider and are
+        not stored by us. What we do record is the running count of how many
+        requests your account has made each day, which is how the daily limits
+        and our own costs are managed; those counters hold no part of what you
+        asked or what you were told.
+      </p>
+      <p>
+        <strong>Rating an answer is the one exception, and it is yours to
+        make.</strong>{" "}Each answer carries a thumbs-up and a thumbs-down
+        button. If you press one, we save that rating together with the question
+        and the answer it refers to, which page you were on, and which model
+        replied, so we can find where the assistant is getting things wrong and
+        improve it. Nothing is saved unless you press one of those buttons.
+        Pressing it again withdraws the rating and deletes what was saved with
+        it, and deleting your account removes your ratings along with the rest
+        of your data.
       </p>
 
       <h2>Data stored on your device</h2>
@@ -131,8 +150,10 @@ export default function PrivacyPage() {
         You can use Dataslope as a guest without giving us any personal
         information. If you have an account, you can delete individual cloud
         saves and share links at any time, or delete your entire account from
-        your account page, doing so removes your profile and the cloud saves and
-        shares associated with it.
+        your account page, doing so removes your profile and the cloud saves,
+        shares, and Ask AI answer ratings associated with it. A single rating
+        can be withdrawn on its own by pressing the same thumbs button again,
+        which deletes the exchange saved with it.
       </p>
 
       <h2>Children&apos;s privacy</h2>
