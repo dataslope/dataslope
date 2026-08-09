@@ -4257,7 +4257,7 @@
       "style": "risograph",
       "title": "Short-circuit evaluation",
       "mascot": false,
-      "subject": "a two-gate chute where the first gate slams shut and the second gate is never reached, its lever left untouched"
+      "subject": "a chute with two levers in a row, the first lever already thrown to shut its flap so the block stops there, and the second lever further along still standing untouched"
     },
     {
       "id": "js-closures-closures-state-inline",
