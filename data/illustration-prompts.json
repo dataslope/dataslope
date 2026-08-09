@@ -4536,6 +4536,18 @@
       "subject": "a gate with shaped slots, blocks of the wrong shape stopping at the gate and blocks of the right shape passing through onto a rail"
     },
     {
+      "id": "mcs-error-handling-inline",
+      "collection": "courses",
+      "course": "intro-modern-csharp",
+      "courseTitle": "Introduction to Modern C#",
+      "lesson": "error-handling",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Try, catch, finally",
+      "mascot": false,
+      "subject": "a cracked block dropping off a bench into a padded catch basket, while a small sweeping arm clears the bench behind it whether or not anything fell"
+    },
+    {
       "id": "sql-what-is-a-database",
       "collection": "courses",
       "course": "intro-sql-postgres",
@@ -5964,6 +5976,18 @@
       "subject": "one program block on the left feeding a single translating machine in the middle, which drives three different machine cabinets on the right"
     },
     {
+      "id": "java-exception-handling-inline",
+      "collection": "courses",
+      "course": "java-programming-for-beginners",
+      "courseTitle": "Java Programming for Beginners",
+      "lesson": "exception-handling",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Checked exceptions",
+      "mascot": false,
+      "subject": "a parcel wearing a stamped warning tag stopped at a gate, the gate refusing to open until a matching catch basket has been bolted onto the line beyond it"
+    },
+    {
       "id": "ml-what-is-ml",
       "collection": "courses",
       "course": "machine-learning-scikit-learn",
@@ -7186,6 +7210,18 @@
       "title": "Scales",
       "mascot": false,
       "subject": "a raw block of data on the left passing through a gauge in the middle that converts it into a position, a size and a colour on the right"
+    },
+    {
+      "id": "gg-small-multiples-with-facets-inline",
+      "collection": "courses",
+      "course": "mastering-ggplot2",
+      "courseTitle": "Mastering ggplot2",
+      "lesson": "small-multiples-with-facets",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Facet grids",
+      "mascot": false,
+      "subject": "a wall of nine small panels in three rows and three columns, one strip of labels running down the left side for the rows and another along the top for the columns"
     },
     {
       "id": "css-cascade",
@@ -9384,6 +9420,18 @@
       "subject": "a square grid of tiles in graded colours with a strong diagonal band, and a colour key standing beside it"
     },
     {
+      "id": "sns-facets-and-grids-inline",
+      "collection": "courses",
+      "course": "seaborn-foundations",
+      "courseTitle": "Seaborn Foundations",
+      "lesson": "facets-and-grids",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Shared scales",
+      "mascot": false,
+      "subject": "four small panels standing in a row over one continuous axis rule that runs beneath all of them, with a single key block at the right serving every panel"
+    },
+    {
       "id": "duck-olap-vs-oltp",
       "collection": "courses",
       "course": "sql-analytics-duckdb",
@@ -9682,6 +9730,18 @@
       "title": "OLAP and OLTP",
       "mascot": false,
       "subject": "a service counter handling one small parcel at a time on the left, and a warehouse aisle on the right where one wide column is read end to end"
+    },
+    {
+      "id": "duck-why-window-functions-inline",
+      "collection": "courses",
+      "course": "sql-analytics-duckdb",
+      "courseTitle": "SQL Analytics with DuckDB",
+      "lesson": "why-window-functions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Windows keep the rows",
+      "mascot": false,
+      "subject": "a pile of blocks collapsing into one summary block on the left, and on the right the same blocks still standing in their original row, each wearing its own small summary tag"
     },
     {
       "id": "lite-what-is-a-database",
@@ -10042,6 +10102,30 @@
       "title": "Storing information",
       "mascot": false,
       "subject": "an app window on the left with a short cord running straight into a single file block beside it, no server cabinet anywhere in the frame"
+    },
+    {
+      "id": "lite-understanding-joins-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "understanding-joins",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Joins",
+      "mascot": false,
+      "subject": "two card racks pushed together so their matching notches interlock, the unmatched cards left standing at the outer edges"
+    },
+    {
+      "id": "lite-primary-keys-inline",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "primary-keys",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Primary keys",
+      "mascot": false,
+      "subject": "a ribbon of identical blank cards feeding through a small numbering press that stamps a rising number on each, and one numbered card being drawn straight out of the middle of the run"
     },
     {
       "id": "stat-why-statistics",
@@ -10716,6 +10800,18 @@
       "subject": "an open yard of crates of different sizes with gaps between them, a figure fitting one new crate into a gap that just fits"
     },
     {
+      "id": "sysc-stack-and-functions-inline",
+      "collection": "courses",
+      "course": "systems-programming-c",
+      "courseTitle": "Systems Programming with C",
+      "lesson": "stack-and-functions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A stack frame",
+      "mascot": false,
+      "subject": "one tray shown open in cross-section with three separate compartments inside it for arguments, local blocks and a return arrow, resting on a column of identical closed trays"
+    },
+    {
       "id": "tsa-what-makes-unique",
       "collection": "courses",
       "course": "time-series-analysis-python",
@@ -10882,6 +10978,18 @@
       "title": "Stationarity",
       "mascot": false,
       "subject": "two tracks side by side, the near one drifting steadily upward off its rail and the far one wobbling around a fixed centre line"
+    },
+    {
+      "id": "tsa-rolling-and-expanding-windows-inline",
+      "collection": "courses",
+      "course": "time-series-analysis-python",
+      "courseTitle": "Time Series Analysis with Python",
+      "lesson": "rolling-and-expanding-windows",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Rolling and expanding",
+      "mascot": false,
+      "subject": "two rails of daily blocks, the near one with a short frame of fixed width sliding along it, the far one with a frame whose left edge stays pinned so it stretches longer as it moves right"
     },
     {
       "id": "tsx-evolution-of-js",
