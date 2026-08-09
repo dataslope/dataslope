@@ -468,6 +468,11 @@ async function main() {
         `\n    Measured on one: 88% of the frame near-white, ink 100% / solid 56%.` +
         `\n    Redraw it as solid masses (a column of filled row blocks, not a` +
         `\n    sheet ruled into rows) and it comes back at solid 98%.` +
+        `\n  · A subject that names a setting — "hung on a panelled wall", "in a` +
+        `\n    room", "against the sky" — asks for a background, and removing` +
+        `\n    backgrounds is the whole job. Measured on one: ink 50%, half the` +
+        `\n    artwork gone with the wall. Put the same things on a bench or a` +
+        `\n    desk instead and it comes back at ink 100%.` +
         `\n  · A mascot standing apart from the objects can also fail; redraw with` +
         `\n    the animal touching them.`,
     );
