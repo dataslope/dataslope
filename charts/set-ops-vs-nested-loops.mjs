@@ -130,6 +130,11 @@ export function render() {
     y: {
       label: "Element operations",
       type: "log",
+      // Pinned to the end ticks. An explicit `ticks` list is drawn wherever
+      // the scale puts each value, inside the domain or not, so an inferred
+      // domain (the data tops out around 450k) hung the 1000k label above the
+      // frame, into the axis label, and the 10 label below it.
+      domain: [10, 1000000],
       ticks: [10, 100, 1000, 10000, 100000, 1000000],
       tickFormat: (d) => (d >= 1000 ? `${Math.round(d / 1000)}k` : String(d)),
     },

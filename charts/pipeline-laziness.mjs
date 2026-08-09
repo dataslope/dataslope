@@ -47,10 +47,14 @@ export function render() {
     height: 320,
     marginTop: 30,
     marginLeft: 128,
-    marginRight: 150,
+    marginRight: 168,
     marginBottom: 46,
     ariaLabel: title,
-    fy: { label: null, domain: STAGES.map((s) => s.key) },
+    // The stage names hang off the right edge, in the same lane the bars'
+    // value labels spill into: a bar reaching 1,000,000 of a 3,000,000 domain
+    // ends near the frame edge and its label carries on past it. The pad puts
+    // the names clear of the longest of those.
+    fy: { label: null, tickPadding: 40, domain: STAGES.map((s) => s.key) },
     x: {
       label: "Elements processed",
       labelAnchor: "center",

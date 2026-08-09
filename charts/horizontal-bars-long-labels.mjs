@@ -50,8 +50,14 @@ const H = 340;
    is the claim the caption makes about them: rotation is the polite failure,
    not an unreadable one. Nine names at 10px on a 45 degree diagonal need
    about 24px of bar pitch to clear each other, so 216px of panel. */
-const LEFT = { x0: 96, x1: 312, y0: 44, y1: 210 };
+const LEFT = { x0: 96, x1: 312, y0: 44, y1: 204 };
 const RIGHT = { x0: 448, x1: 636, y0: 40, y1: 300 };
+
+/** How far the diagonal names hang below the axis: as deep as the longest one
+ *  is wide, over √2. "Timezone wrong on report" sets ~130 units at 10px, so
+ *  ~110 of descent, which is why the left panel's baseline sits higher than
+ *  the right panel's and why the note underneath is placed clear of this. */
+const LABEL_DESCENT = 110;
 
 const MAX = Math.max(...ITEMS.map((d) => d.v));
 
@@ -116,6 +122,13 @@ export function render() {
         stroke: "currentColor",
         strokeOpacity: 0.35,
       }),
+      // `rotate` turns the text clockwise about its anchor, and the anchor is
+      // the *end* of the string, so a positive angle sends every name up and
+      // to the left — across the bars, which is what a rotated label must
+      // never do. Negative sends the same string down and to the left, ending
+      // under its own bar: the convention every plotting library uses for
+      // diagonal category labels, and the one this panel is arguing against.
+      // The names have to be readable for that argument to land.
       Plot.text(vertical, {
         x: "cx",
         y: LEFT.y1 + 7,
@@ -123,11 +136,11 @@ export function render() {
         fill: MUTED,
         fontSize: 10,
         textAnchor: "end",
-        rotate: 45,
+        rotate: -45,
       }),
       Plot.text([{}], {
         x: 14,
-        y: LEFT.y1 + 106,
+        y: LEFT.y1 + LABEL_DESCENT + 20,
         text: () => "nine names, each read at an angle",
         fill: MUTED,
         fontSize: 10.5,

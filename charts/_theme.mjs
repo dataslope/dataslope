@@ -103,10 +103,15 @@ export const HALO = {
  * beside a magnified tail) collapse: whichever has the narrower range is
  * squeezed into a corner of the union of both. Plot has no per-facet scale.
  * When the quantities differ, write two charts.
+ *
+ * **The top margin is sized here, not by the spec.** See `topMarginFor()`:
+ * Plot stacks up to three things above the frame and reserves room for none of
+ * them, so a spec asking for `marginTop: 34` silently gets its axis label and
+ * its panel titles printed on adjacent baselines.
  */
 export function plot(options = {}) {
   const { x, y, color, style, marks = [], ...rest } = options;
-  return Plot.plot({
+  const spec = {
     document,
     width: 680,
     height: 320,
@@ -143,7 +148,62 @@ export function plot(options = {}) {
     y: { tickSize: 0, tickPadding: 8, labelArrow: "none", grid: true, ...y },
     color: { ...color },
     marks,
+  };
+
+  // Draw once to see what actually landed above the frame, then redraw with a
+  // top margin that fits it. Asking Plot is the only reliable test: whether an
+  // axis label exists depends on `y.label`, on the channel Plot can name it
+  // from, and on whether the scale drew an axis at all.
+  const first = Plot.plot(spec);
+  const needed = topMarginFor(first);
+  const marginTop = spec.marginTop ?? 20;
+  if (needed <= marginTop) return first;
+  // Grow the height by the same amount, so the extra band is added *above* the
+  // plot rather than taken out of it: every spec's frame keeps the size and
+  // aspect its author chose.
+  return Plot.plot({
+    ...spec,
+    marginTop: needed,
+    height: (spec.height ?? 320) + (needed - marginTop),
   });
+}
+
+/**
+ * The top margin a rendered plot needs, given what Plot put up there.
+ *
+ * Three things can occupy the band above the frame, and Plot positions each
+ * one independently of the others:
+ *
+ *   • the y-axis label, pinned 3px from the top of the SVG regardless of how
+ *     much room there is — a 15px box at y ∈ [0, 15] at this theme's 13px;
+ *   • the facet titles (an `fx` scale's tick labels), which hang 23px above
+ *     the frame edge, so their top sits at `marginTop - 23`;
+ *   • the topmost y tick label, centred *on* the frame edge, so it reaches
+ *     8px above it whenever the scale's last tick is the domain maximum.
+ *
+ * None of those is measured against the others, so a spec with `marginTop: 34`
+ * gets its axis label at [0, 15] and its panel titles at [11, 26]: two lines
+ * of type 4px apart, reading as one collided block. `marginTop: 20` (the
+ * default here) puts the topmost tick label at [12, 27] and does the same
+ * thing. The fix is a floor on the margin rather than a nudge per spec, since
+ * every faceted chart in the folder hits it and so would the next one.
+ *
+ * The band is only claimed when there is a y-axis label to clear. Without one
+ * the frame can sit as high as the spec likes.
+ *
+ * `FACET_TITLE_LIFT` assumes a one-line panel title, which is every one in the
+ * folder: Plot does not wrap tick labels unless a spec asks it to. A wrapped
+ * title would reach a line higher and want another 15px per extra line.
+ */
+const LABEL_BAND = 15; // the y-axis label's own box, at 13px type
+const CLEAR_GAP = 7; // air between it and whatever is under it
+const FACET_TITLE_LIFT = 23; // how far a facet title hangs above the frame
+const TOP_TICK_RISE = 8; // how far the topmost tick label rises above it
+
+function topMarginFor(svg) {
+  if (!svg.querySelector('[aria-label="y-axis label"]')) return 0;
+  const facetTitles = svg.querySelector('[aria-label="fx-axis tick label"]');
+  return LABEL_BAND + CLEAR_GAP + (facetTitles ? FACET_TITLE_LIFT : TOP_TICK_RISE);
 }
 
 /**

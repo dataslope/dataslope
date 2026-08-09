@@ -22,6 +22,14 @@
  * side) add their text after the first pass, so mutations re-trigger the
  * pass during the same settle window HashScrollFix uses; after that the
  * highlights stay put until navigation.
+ *
+ * Escape dismisses them, the way it leaves a browser's find bar. Highlights
+ * are a *view* of a search, not part of the lesson, and a reader who has found
+ * their answer is otherwise stuck with a yellow-flecked page until they
+ * navigate away: the API paints every prefix match, so a common word can light
+ * up a page dozens of times. Dismissing also drops `?hl=` from the URL, so a
+ * reload, a copied link or a step back through history does not repaint what
+ * was just dismissed.
  */
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
@@ -67,6 +75,21 @@ function collectRanges(root: Node, terms: string[]): Range[] {
   return ranges;
 }
 
+/** Whether Escape belongs to something else on the page: a field being typed
+ *  in, an editor, or an open dialog (the search dialog itself closes on it). */
+function escapeIsClaimed(): boolean {
+  const el = document.activeElement;
+  if (
+    el instanceof HTMLInputElement ||
+    el instanceof HTMLTextAreaElement ||
+    el instanceof HTMLSelectElement ||
+    (el instanceof HTMLElement && el.isContentEditable)
+  ) {
+    return true;
+  }
+  return document.querySelector('[role="dialog"]') !== null;
+}
+
 export default function SearchHighlight() {
   const pathname = usePathname();
 
@@ -75,7 +98,10 @@ export default function SearchHighlight() {
     const terms = highlightTerms();
     if (terms.length === 0) return;
 
+    let dismissed = false;
+
     const apply = () => {
+      if (dismissed) return;
       const root =
         document.querySelector("article") ??
         document.querySelector("main") ??
@@ -98,11 +124,32 @@ export default function SearchHighlight() {
       apply();
     }, SETTLE_MS);
 
-    return () => {
+    const stop = () => {
+      dismissed = true;
       observer.disconnect();
       window.clearTimeout(debounce);
       window.clearTimeout(settleTimer);
       CSS.highlights.delete(HIGHLIGHT_NAME);
+    };
+
+    const onKey = (e: KeyboardEvent) => {
+      // `defaultPrevented` first: a component that has already claimed this
+      // keypress (a closing overlay, a CodeMirror keymap) gets to keep it.
+      if (e.key !== "Escape" || e.defaultPrevented || dismissed) return;
+      if (escapeIsClaimed()) return;
+      stop();
+      // Not `router.replace`: this is a purely local dismissal, and going
+      // through the router would re-run the route's data fetching to change a
+      // query parameter nothing on the server reads.
+      const url = new URL(window.location.href);
+      url.searchParams.delete("hl");
+      window.history.replaceState(window.history.state, "", url);
+    };
+    document.addEventListener("keydown", onKey);
+
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      stop();
     };
   }, [pathname]);
 

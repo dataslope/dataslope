@@ -153,11 +153,17 @@
   }
 }
 
+/* A chart caption here is not a photo credit — several of them run to a
+   paragraph, and they carry the argument the figure is making. So they are set
+   to read like the prose around them: 15px against the body's 16px, and the
+   body's own 1.7-ish leading rather than the tight 1.5 a one-line credit
+   wants. The muted colour and the centring keep the hierarchy; the size no
+   longer punishes anyone for reading it. */
 .caption {
   margin-top: 0.75rem;
   text-align: center;
-  font-size: 0.8125rem;
-  line-height: 1.5;
+  font-size: 0.9375rem;
+  line-height: 1.7;
   color: var(--color-fd-muted-foreground);
 }
 
