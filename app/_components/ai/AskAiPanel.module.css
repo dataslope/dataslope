@@ -77,10 +77,22 @@
   font-family: var(--font-sans, "Inter", system-ui, sans-serif);
   overflow: hidden;
 }
+/* Dark mode: the page behind this is #121212 too, so a black drop shadow —
+   however deep — lands black-on-black and the panel has no edge at all. It is
+   separated the way an unlit surface actually is: lifted a shade above the page
+   it floats over, with a hairline of light along its own rim (an inset
+   highlight, strongest at the top where a light source would catch it) and a
+   soft dark halo underneath to hold it off the background. All of it is
+   `box-shadow`, so no border participates in layout and the corners stay clean.
+   Kept subtle on purpose: enough to read as a separate surface, not so much
+   that it outshines the answer. */
 :global(html.dark) .panel {
-  background: #121212;
+  background: #1c1c1c;
   color: #e8eaed;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 24px 56px rgba(0, 0, 0, 0.66);
 }
 
 .chatArea {
@@ -105,7 +117,44 @@
   user-select: none;
 }
 :global(html.dark) .dragging {
-  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.65);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 32px 72px rgba(0, 0, 0, 0.75);
+}
+
+/* ── Resize grips ─────────────────────────────────────────────────────
+   Invisible until pointed at, because the panel's edge is already the
+   affordance and a permanent handle would be furniture in a small surface.
+   They sit just inside the rounded corners, and are wider than they look
+   (10px) so the target is forgiving without eating the scrollbar. */
+.gripLeft,
+.gripTop,
+.gripCorner {
+  position: absolute;
+  z-index: 3;
+  touch-action: none;
+}
+.gripLeft {
+  top: 14px;
+  bottom: 14px;
+  left: 0;
+  width: 10px;
+  cursor: ew-resize;
+}
+.gripTop {
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 10px;
+  cursor: ns-resize;
+}
+.gripCorner {
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
 }
 
 /* ── Header ───────────────────────────────────────────────────────── */
@@ -328,19 +377,34 @@
   border-radius: 12px 12px 4px 12px;
   background: var(--ds-blue-600, #0878dd);
   color: #fff;
-  font-size: 13.5px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.6;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+/* A question accepted while an answer was still streaming. Same bubble,
+   held back: it reads as "received, not started" without needing a label. */
+.msgQueued {
+  composes: msgUser;
+  background: var(--ds-blue-500, #3d9bff);
+  opacity: 0.62;
+}
+:global(html.dark) .msgQueued {
+  background: var(--ds-blue-700, #0064bd);
+  opacity: 0.72;
+}
+
 .answerBlock {
   align-self: flex-start;
   max-width: 100%;
   display: flex;
   flex-direction: column;
+  font-size: 15px;
+  line-height: 1.6;
 }
 .answer {
-  font-size: 13.5px;
+  font-size: 15px;
   line-height: 1.6;
   color: #374151;
   word-wrap: break-word;
@@ -380,9 +444,26 @@
 :global(html.dark) .answer :where(:not(pre) > code) {
   background: rgba(255, 255, 255, 0.1);
 }
+/* Markers are set explicitly, not left to the user agent. The panel floats over
+   pages that load Tailwind (every lesson does, via Fumadocs), and its preflight
+   resets `ul, ol` to `list-style: none` — which silently turned every numbered
+   list in an answer into unnumbered indented text, exactly where a model writes
+   "1. … 2. … 3. …" and the order is the content. */
 .answer :where(ul, ol) {
   margin: 0 0 8px;
-  padding-left: 20px;
+  padding-left: 22px;
+}
+.answer :where(ul) {
+  list-style: disc;
+}
+.answer :where(ol) {
+  list-style: decimal;
+}
+.answer :where(li) {
+  margin: 3px 0;
+}
+.answer :where(li) :where(p) {
+  margin: 0;
 }
 .answer :where(a) {
   color: var(--ds-blue-700, #0064bd);
@@ -448,6 +529,20 @@
   color: #7c828a;
 }
 
+/* The "AI can make mistakes" line, under the newest answer's action row.
+   Small and quiet: it has to be present and legible, not competing with the
+   answer it qualifies. `-2px` pulls it up against the icon row it belongs to,
+   so the two read as one block rather than two stray lines. */
+.answerNote {
+  margin: -2px 0 0 4px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #9ca3af;
+}
+:global(html.dark) .answerNote {
+  color: #7c828a;
+}
+
 /* Message action row (copy / thumbs). */
 .answerActions {
   display: flex;
@@ -495,7 +590,7 @@
   gap: 5px;
   margin-bottom: 3px;
   padding: 0 2px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--ds-blue-700, #0064bd);
 }
@@ -512,8 +607,8 @@
   background: #f0f7ff;
   color: var(--ds-blue-700, #0064bd);
   font-family: inherit;
-  font-size: 12.5px;
-  line-height: 1.4;
+  font-size: 13px;
+  line-height: 1.6;
   text-align: left;
   cursor: pointer;
   transition: background 0.12s ease;
@@ -556,15 +651,52 @@
 
 .error {
   align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 8px 12px;
   border-radius: 10px;
   background: #fef2f2;
   color: #b42318;
   font-size: 12.5px;
+  line-height: 1.5;
 }
 :global(html.dark) .error {
   background: rgba(255, 79, 89, 0.12);
   color: var(--ds-red-400, #ff807f);
+}
+
+/* A stream that stopped early is a different event from one that never
+   started: an answer IS on screen and most of it is usually usable, so this
+   states what happened without painting the panel red over it. */
+.errorSoft {
+  background: rgba(127, 127, 127, 0.1);
+  color: #6b7280;
+}
+:global(html.dark) .errorSoft {
+  background: rgba(255, 255, 255, 0.06);
+  color: #9aa1a9;
+}
+
+.errorRetry {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 3px 9px;
+  border: none;
+  border-radius: 7px;
+  background: rgba(127, 127, 127, 0.14);
+  color: inherit;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.errorRetry:hover {
+  background: rgba(127, 127, 127, 0.22);
 }
 
 /* "Review changes in the editor" actions (playground surface only). */
@@ -713,14 +845,37 @@
   cursor: default;
 }
 
+/* Stop sits beside Send rather than replacing it (a question can be queued
+   while one is still answering), so it takes the quiet treatment — Send stays
+   the one blue thing in the row. */
+.stopBtn {
+  composes: sendBtn;
+  background: rgba(127, 127, 127, 0.16);
+  color: #4b5563;
+}
+.stopBtn:hover:not(:disabled) {
+  background: rgba(127, 127, 127, 0.26);
+}
+:global(html.dark) .stopBtn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #d3d7dc;
+}
+:global(html.dark) .stopBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Right-aligned rather than space-between: the note to the left of the quota
+   is now conditional, and space-between would leave the quota stranded in the
+   middle of the row whenever it is absent. */
 .footerLine {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 8px;
   margin: 10px 4px 0;
 }
 .disclaimer {
+  margin-right: auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

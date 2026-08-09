@@ -115,6 +115,9 @@ const THUMB_MIME: Record<string, string> = {
  * a transparent margin here would be column the subject is painted smaller to
  * make room for. Rows are `items-start`, so the ragged heights that leaves are
  * a top-aligned list rather than anything that shifts.
+ *
+ * The column's width comes from `LAYOUT` above — the art is sized by the
+ * surface, not by the image.
  */
 function CourseThumb({ course }: { course: CatalogCourse }) {
   const slug = `${course.slug}-thumbnail-cutout`;
@@ -150,30 +153,61 @@ function CourseThumb({ course }: { course: CatalogCourse }) {
   );
 }
 
-export function CourseCard({ course }: { course: CatalogCourse }) {
+/**
+ * How much room the row gets, which is a property of the surface it is on.
+ *
+ * `catalog` is /courses: one row per line at full width, where the page IS the
+ * list and a visitor is reading it to choose. It gets the larger art, the
+ * looser rhythm, and a description set at reading size and never truncated —
+ * the catalog is the one place the full sentence is the point.
+ *
+ * `preview` is the home page's Courses section: four rows in two columns,
+ * inside a page that has other things to say. It stays denser, and clamps the
+ * description, so four of them still read as a taste of the catalog rather
+ * than as the catalog.
+ */
+export type CourseCardLayout = "catalog" | "preview";
+
+const LAYOUT = {
+  catalog: {
+    row: "grid-cols-[96px_1fr] gap-5 py-8 sm:grid-cols-[116px_1fr] sm:gap-6",
+    text: "gap-2",
+    desc: "text-[16px] leading-[1.7]",
+  },
+  preview: {
+    row: "grid-cols-[84px_1fr] gap-5 py-6",
+    text: "gap-[5px]",
+    desc: "line-clamp-2 text-[15px] leading-[1.6]",
+  },
+} as const satisfies Record<CourseCardLayout, Record<string, string>>;
+
+export function CourseCard({
+  course,
+  layout = "preview",
+}: {
+  course: CatalogCourse;
+  layout?: CourseCardLayout;
+}) {
   const lang = course.tags.language?.[0] ?? "python";
   const level = course.tags.level?.[0] ?? "intermediate";
+  const l = LAYOUT[layout];
   return (
     <Link
       href={`/courses/${course.slug}`}
       // Dense index list, don't viewport-prefetch every course row
       // (see the opt-out note in app/_components/Link.tsx).
       prefetch={false}
-      // The art column is what the row leads with, so it is sized to hold its
-      // own against the three lines of copy beside it rather than to sit under
-      // them as a bullet. It widens once there is room, matching how
-      // /interview-prep sizes its own track thumbnails.
-      className="group -mx-3 grid grid-cols-[96px_1fr] items-start gap-4 px-3 py-6 sm:grid-cols-[116px_1fr] sm:gap-5"
+      className={`group -mx-3 grid items-start px-3 ${l.row}`}
     >
       <CourseThumb course={course} />
-      <span className="flex min-w-0 flex-col gap-[5px]">
+      <span className={`flex min-w-0 flex-col ${l.text}`}>
         <span
           className={`text-[17px] font-semibold tracking-[-0.01em] ${HEADING} ${HOVER_TEXT}`}
         >
           {course.title}
         </span>
         <span
-          className={`line-clamp-2 text-[15px] leading-normal text-[#999999] dark:text-[var(--ds-gray-400)] ${HOVER_DESC}`}
+          className={`text-[#999999] dark:text-[var(--ds-gray-400)] ${l.desc} ${HOVER_DESC}`}
         >
           {course.description}
         </span>

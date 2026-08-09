@@ -166,12 +166,12 @@ function TrackRow({ track }: { track: InterviewTrack }) {
         {/* `line-clamp-3` is the guard against a future entry running long and
             pushing one row taller than the rest of its grid line. */}
         {p ? (
-          <span className="mt-1.5 line-clamp-3 text-[14px] leading-[1.55] text-[#8a8a8a] dark:text-[var(--ds-gray-400)]">
+          <span className="mt-1.5 line-clamp-3 text-[15px] leading-[1.6] text-[#8a8a8a] dark:text-[var(--ds-gray-400)]">
             {p.description}
           </span>
         ) : null}
 
-        <span className="mt-2.5 flex items-center gap-2.5 text-[13px]">
+        <span className="mt-2.5 flex items-center gap-2.5 text-[14px]">
           <span className="font-semibold text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]">
             Start track
           </span>
@@ -220,12 +220,12 @@ export function InterviewCatalog({ tracks }: { tracks: InterviewTrack[] }) {
 
       {/* ── Footer line: totals + a pointer to the courses catalog ── */}
       <div className="mt-11 flex flex-col gap-3 pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <span className="text-[13px] text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
+        <span className="text-[15px] text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
           {tracks.length} tracks · {topicCount} topics · all free
         </span>
         <Link
           href="/courses"
-          className="group inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ds-blue-700)] transition-colors hover:text-[var(--ds-blue-800)] dark:text-[var(--ds-blue-400)] dark:hover:text-[var(--ds-blue-300)]"
+          className="group inline-flex items-center gap-1.5 text-[15px] font-semibold text-[var(--ds-blue-700)] transition-colors hover:text-[var(--ds-blue-800)] dark:text-[var(--ds-blue-400)] dark:hover:text-[var(--ds-blue-300)]"
         >
           Need fundamentals first? Browse courses
           <svg

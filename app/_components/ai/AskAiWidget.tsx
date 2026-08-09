@@ -31,6 +31,12 @@ import {
 } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+// Token colours for the code blocks rehype-highlight marks up. The panel floats
+// over lessons (which inline the same theme via docs.css) but also over the
+// playground and the dashboard, which do not — so it brings its own rather than
+// relying on whatever page it happens to be open on.
+import "@/app/hljs.css";
 import { Popover } from "@base-ui/react/popover";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import {
@@ -537,8 +543,17 @@ export default function AskAiWidget({
 
   const getAnswerLength = useCallback(() => answerLength, [answerLength]);
 
-  const { messages, streaming, error, tier, needsSignIn, send, stop, reset } =
-    useAskAi(buildContext, getAnswerLength);
+  const {
+    messages,
+    queued,
+    streaming,
+    error,
+    tier,
+    needsSignIn,
+    send,
+    stop,
+    reset,
+  } = useAskAi(buildContext, getAnswerLength);
 
   const listRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -883,12 +898,38 @@ export default function AskAiWidget({
 
   return (
     <div
-      className={`${styles.panel} ${drag.dragging ? styles.dragging : ""}`}
+      className={`${styles.panel} ${
+        drag.dragging || drag.resizing ? styles.dragging : ""
+      }`}
       style={drag.style}
       role="dialog"
       aria-label="Ask AI"
       ref={panelRef}
     >
+      {/* Resize grips on the two edges that grow away from the docked corner
+          (see useDraggablePanel). Pointer-only affordances — the panel has a
+          sensible default size and every control in it is reachable without
+          resizing — so they are hidden from assistive tech rather than
+          announced as controls that cannot be operated. */}
+      {drag.enabled && (
+        <>
+          <span
+            className={styles.gripLeft}
+            {...drag.resizeProps("left")}
+            aria-hidden
+          />
+          <span
+            className={styles.gripTop}
+            {...drag.resizeProps("top")}
+            aria-hidden
+          />
+          <span
+            className={styles.gripCorner}
+            {...drag.resizeProps("corner")}
+            aria-hidden
+          />
+        </>
+      )}
       <div className={`${styles.chatArea} ${sheetOpen ? styles.dimmed : ""}`}>
         {/* The header doubles as the drag handle on desktop (see
             useDraggablePanel); its own buttons are excluded, so only the
@@ -1029,7 +1070,16 @@ export default function AskAiWidget({
                       </>
                     ) : (
                       <div className={styles.answer}>
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {/* `detect: false` so only fenced blocks that named a
+                            language are highlighted. Auto-detection on a
+                            half-streamed block guesses from whatever few
+                            characters have arrived, and re-guesses per token,
+                            which shows up as code changing colour while it is
+                            still being written. */}
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          rehypePlugins={[[rehypeHighlight, { detect: false }]]}
+                        >
                           {m.content}
                         </ReactMarkdown>
                         {streamingHere && <span className={styles.caret} />}
@@ -1096,9 +1146,25 @@ export default function AskAiWidget({
                         </button>
                       </div>
                     )}
+                    {/* The disclaimer belongs to the answer, so it sits with
+                        the answer's own controls rather than pinned to the
+                        composer, where it read as a property of the panel. Once
+                        per conversation, under the newest answer: repeating it
+                        under every one turns it into furniture nobody reads. */}
+                    {isLast && m.content && !streamingHere && (
+                      <p className={styles.answerNote}>{disclaimer}</p>
+                    )}
                   </div>
                 );
               })}
+              {/* Questions asked while an answer was still streaming. They are
+                  already accepted — showing them as dimmed turns is what makes
+                  that legible, rather than the composer swallowing them. */}
+              {queued.map((q, i) => (
+                <div key={`q${i}`} className={styles.msgQueued}>
+                  {q}
+                </div>
+              ))}
               {/* Follow-ups: hidden once the quota is spent — clicking one
                   could only produce a guaranteed 429. */}
               {!streaming &&
@@ -1130,7 +1196,26 @@ export default function AskAiWidget({
                 )}
             </>
           )}
-          {error && <div className={styles.error}>{error}</div>}
+          {error && (
+            <div
+              className={`${styles.error} ${
+                error.kind === "interrupted" ? styles.errorSoft : ""
+              }`}
+              role="status"
+            >
+              <span>{error.message}</span>
+              {error.retry && !streaming && (
+                <button
+                  type="button"
+                  className={styles.errorRetry}
+                  onClick={() => sendQuestion(error.retry as string)}
+                >
+                  <RotateCcw size={12} aria-hidden />
+                  Retry
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -1262,38 +1347,45 @@ export default function AskAiWidget({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={onKeyDown}
-              disabled={streaming || outOfPrompts}
+              // Deliberately NOT disabled while streaming: a question thought
+              // of mid-answer is queued (see useAskAi), so the composer has no
+              // reason to lock the user out of writing it down.
+              disabled={outOfPrompts}
             />
-            {streaming ? (
+            {/* Stop stays reachable while an answer streams, even mid-typing,
+                so Send appears beside it rather than replacing it. */}
+            {streaming && (
               <button
                 type="button"
-                className={styles.sendBtn}
+                className={styles.stopBtn}
                 onClick={stop}
                 aria-label="Stop"
-                title="Stop"
+                title={queued.length ? "Stop and clear the queue" : "Stop"}
               >
                 <StopIcon />
               </button>
-            ) : (
-              <button
-                type="button"
-                className={styles.sendBtn}
-                onClick={submit}
-                disabled={!draft.trim() || outOfPrompts}
-                aria-label="Send"
-                title="Send"
-              >
-                <Send size={15} />
-              </button>
             )}
+            <button
+              type="button"
+              className={styles.sendBtn}
+              onClick={submit}
+              disabled={!draft.trim() || outOfPrompts}
+              aria-label={streaming ? "Send when the answer finishes" : "Send"}
+              title={streaming ? "Send when the answer finishes" : "Send"}
+            >
+              <Send size={15} />
+            </button>
           </div>
           {!sheetOpen && (
             <div className={styles.footerLine}>
-              <span className={styles.disclaimer}>
-                {outOfPrompts && messages.length > 0
-                  ? "Your conversation is saved."
-                  : disclaimer}
-              </span>
+              {/* The "AI can make mistakes" line used to live here; it now sits
+                  under the answer it qualifies (see `.answerNote`). What is
+                  left is composer state, which is the composer's own business. */}
+              {outOfPrompts && messages.length > 0 && (
+                <span className={styles.disclaimer}>
+                  Your conversation is saved.
+                </span>
+              )}
               {usage && isFreeTier && promptsLeft !== null && (
                 <Popover.Root>
                   <Popover.Trigger
