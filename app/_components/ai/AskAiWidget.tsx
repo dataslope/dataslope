@@ -14,6 +14,14 @@
  * is a remembered global preference; the Custom per-source toggles reset per
  * page. Answer length lives in Settings and is also remembered.
  *
+ * One source is on before the reader touches anything: "Page you're on", a
+ * ~20-token line naming the page and its course. Without it a question asked
+ * with every switch off reached the model with no indication of the page at
+ * all — `slug` is used server-side only to resolve the Markdown and never
+ * reaches the prompt — so answers came back generic. It is a listed, countable,
+ * toggleable source like any other, which is what keeps the chip's count an
+ * honest description of the request.
+ *
  * The sheet's rows, the chip count, and the send payload are all derived from
  * the same enumeration (`collectPanelSources` + `sourceEnabled`), so what the
  * user sees is what is sent: the widget cap is applied AFTER the per-source
@@ -65,6 +73,7 @@ import {
   ThumbsDown,
   CornerDownRight,
   BookOpen,
+  Compass,
   CodeXml,
   Terminal,
   Hourglass,
@@ -166,7 +175,7 @@ const MODE_LABELS: Record<ContextMode, string> = {
 
 /** A source group, drives its icon, default toggle, and where it maps in the
  *  request payload. */
-type SourceGroup = "lesson" | "code" | "output" | "selection";
+type SourceGroup = "page" | "lesson" | "code" | "output" | "selection";
 
 /** One on-screen context source as shown in the sheet + counted by the chip.
  *  `id` is a STABLE key (group name, `file:<name>`, or `w:<kind>:<label>` for
@@ -185,6 +194,25 @@ interface PanelSource {
  *  reminted on every re-registration, so keying user toggles on them would
  *  silently drop an explicit OFF when the widget remounts. */
 const widgetKey = (kind: string, label: string): string => `w:${kind}:${label}`;
+
+/**
+ * The page's own heading, as the reader sees it.
+ *
+ * The rendered `<h1>` rather than `document.title`, which carries the site
+ * suffix from the root layout's title template ("Variables · DataSlope") and
+ * would put our own brand into the model's context for no reason. Falls back to
+ * the document title with that suffix stripped when a page has no heading.
+ *
+ * The course name is NOT read here: the server resolves it from the slug
+ * against the course catalog, so the collection a path belongs to stays our
+ * claim rather than the page's.
+ */
+function readPageTitle(): string {
+  const heading = document.querySelector("main h1, article h1, h1");
+  const text = heading?.textContent?.trim();
+  if (text) return text.slice(0, 120);
+  return document.title.replace(/\s*·\s*DataSlope\s*$/i, "").trim().slice(0, 120);
+}
 
 /** Group default: everything on screen is in by default; lesson text is the
  *  one opt-in source. Single source of truth for the sheet UI, the payload
@@ -207,14 +235,22 @@ function sourceEnabled(
 const fmtK = (tokens: number): string =>
   `${(Math.max(tokens, 100) / 1000).toFixed(1)}k`;
 
+/** Roughly what `pageIdentityLine` costs: one sentence naming the page, the
+ *  course and the path. Fixed rather than measured, because the client does not
+ *  build that sentence — the server does (lib/ai/context.ts). */
+const PAGE_IDENTITY_TOKENS = 20;
+
 /** Tokens a source contributes to the estimate (its content, or the lesson cap). */
 function sourceTokens(s: PanelSource): number {
   if (s.group === "lesson") return LESSON_TEXT_MAX_TOKENS;
+  if (s.group === "page") return PAGE_IDENTITY_TOKENS;
   return estimateTokensForChars(s.chars ?? 0);
 }
 
 function sourceSubline(s: PanelSource): string {
   switch (s.group) {
+    case "page":
+      return `Which lesson you're on · ~${PAGE_IDENTITY_TOKENS} tokens`;
     case "lesson":
       return `Trimmed to fit · up to ${Math.round(LESSON_TEXT_MAX_TOKENS / 1000)}k tokens`;
     case "output":
@@ -227,6 +263,7 @@ function sourceSubline(s: PanelSource): string {
 }
 
 function sourceIconFor(s: PanelSource): typeof CodeXml {
+  if (s.group === "page") return Compass;
   if (s.group === "lesson") return BookOpen;
   if (s.group === "output") return Terminal;
   if (s.group === "selection") return TextSelect;
@@ -237,7 +274,7 @@ function sourceIconFor(s: PanelSource): typeof CodeXml {
  *  question, built from the sources attached to THAT question. */
 function readingStatusFor(list: PanelSource[]): string {
   const names = list
-    .filter((s) => s.group !== "lesson")
+    .filter((s) => s.group !== "lesson" && s.group !== "page")
     .map((s) =>
       s.group === "output"
         ? "your last output"
@@ -531,10 +568,18 @@ export default function AskAiWidget({
         base.surface === "learn" &&
         LESSON_BASES.has(base.slug?.[0] ?? "") &&
         on("lesson", "lesson");
+      // Where the reader is. On by default, and the only source that is: with
+      // everything off the model otherwise had nothing identifying the page,
+      // because `slug` never reaches the prompt — it only resolves the Markdown
+      // fetch server-side. Toggleable like any other source, so the chip's count
+      // stays the truth about what is sent.
+      const pageOn =
+        base.surface === "learn" && (base.slug?.length ?? 0) > 0 && on("page", "page");
 
       return {
         surface: base.surface,
         ...(base.slug ? { slug: base.slug } : {}),
+        ...(pageOn ? { page: { title: readPageTitle() } } : {}),
         ...(base.adapterId ? { adapterId: base.adapterId } : {}),
         includeLessonText: lessonOn,
         ...(files.length ? { files } : {}),
@@ -592,6 +637,12 @@ export default function AskAiWidget({
       }
     };
     const base = collectContext();
+    // Listed first, because it is the one source that is on before the reader
+    // does anything, and a sheet that did not show it would be describing a
+    // smaller request than the one actually sent.
+    if (base.surface === "learn" && (base.slug?.length ?? 0) > 0) {
+      push({ id: "page", group: "page", label: "Page you're on" });
+    }
     if (routeMeta.hasLessonText) {
       push({ id: "lesson", group: "lesson", label: "Lesson text" });
     }

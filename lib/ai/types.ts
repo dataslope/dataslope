@@ -64,6 +64,23 @@ export interface AskAiClientContext {
    * text to a few thousand tokens. Ignored off the learn surface.
    */
   includeLessonText?: boolean;
+  /**
+   * Where the reader is, in words: the page's own heading, and the course or
+   * track it sits in.
+   *
+   * This is the one context source that is on by default and costs ~15 tokens.
+   * Without it the model gets the system prompt, the conversation, and the
+   * question — and nothing that says which lesson is on screen, because `slug`
+   * is only ever used server-side to resolve the Markdown and never reaches the
+   * prompt. Answers were correspondingly generic: asked about "residuals" on a
+   * scikit-learn page, the model had no way to know it was a scikit-learn page.
+   *
+   * `title` is read from the rendered heading, so it is what the reader can
+   * see. `course` is resolved server-side from `slug` against the course
+   * catalog rather than taken from here, so the collection name is ours rather
+   * than the page's to assert.
+   */
+  page?: { title?: string };
   /** Language / SQL-dialect id, e.g. "python", "duckdb". */
   adapterId?: string;
   /** Open / active files the user is looking at. */

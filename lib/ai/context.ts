@@ -7,6 +7,7 @@ import type {
   ChatMessage,
 } from "./types";
 import { systemPrompt } from "./prompt";
+import generatedCourses from "@/lib/generated/course-catalog";
 
 // Plain slug segments only, guards the `.md` fetch against path traversal or
 // injection from a tampered client (e.g. "..", "%2e", absolute URLs).
@@ -21,6 +22,78 @@ export const LESSON_BASES = new Set(["courses", "fumadocs-dev"]);
 
 /** Hard cap on client-supplied widget blocks (the client sends ≤6). */
 const MAX_WIDGETS = 8;
+
+/** Longest page heading kept in the identity line. A heading is a few words;
+ *  anything past this is not a heading. */
+const MAX_PAGE_TITLE = 120;
+
+/** Course slug → title, from the build-time catalog. The course name is
+ *  resolved here rather than accepted from the client: the client can say what
+ *  heading is on its screen, but which course a path belongs to is ours to
+ *  state, and this costs a lookup instead of trust. */
+const COURSE_TITLES = new Map(
+  (generatedCourses as { slug: string; title: string }[]).map((c) => [
+    c.slug,
+    c.title,
+  ]),
+);
+
+/** Turn a slug segment into something readable, for the collections that have
+ *  no catalog behind them (interview-prep tracks, fumadocs-dev pages). */
+function humanizeSlug(segment: string): string {
+  return segment
+    .split("-")
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+/**
+ * One line saying where the reader is: the page's heading, the course or track
+ * around it, and the path.
+ *
+ * This is the always-on minimum. Everything else in the panel's context is
+ * something the reader turns on, and with all of it off the model previously
+ * received no indication of the page at all — `slug` never reached the prompt,
+ * it only ever resolved the Markdown fetch — so an answer on a scikit-learn
+ * lesson could not know it was a scikit-learn lesson. Roughly fifteen tokens
+ * buys the difference between a textbook answer and one about this page.
+ *
+ * Returns null off the learn surface or when there is nothing to say, so the
+ * playground (which identifies itself through `adapterId` and the files) does
+ * not gain an empty line.
+ *
+ * Exported for `__tests__/aiContext.test.ts`.
+ */
+export function pageIdentityLine(context: AskAiClientContext): string | null {
+  const slug = Array.isArray(context.slug) ? context.slug : [];
+  const base = typeof slug[0] === "string" ? slug[0] : "";
+  if (!base) return null;
+
+  const title =
+    typeof context.page?.title === "string"
+      ? context.page.title.trim().slice(0, MAX_PAGE_TITLE)
+      : "";
+  const courseSlug = typeof slug[1] === "string" ? slug[1] : "";
+  const collection =
+    base === "courses"
+      ? (COURSE_TITLES.get(courseSlug) ?? humanizeSlug(courseSlug))
+      : base === "interview-prep"
+        ? `${humanizeSlug(courseSlug)} interview track`
+        : humanizeSlug(courseSlug);
+
+  const where = title && collection
+    ? `the page "${title}" in ${collection}`
+    : title
+      ? `the page "${title}"`
+      : collection
+        ? collection
+        : "";
+  if (!where) return null;
+  // The path is included because it is the one part a model can quote back as
+  // a link, and it is already sent to this server either way.
+  return `The user is reading ${where} (/${slug.join("/")}).`;
+}
 
 /**
  * Hard cap on lesson-text tokens, independent of the per-tier context budget.
@@ -115,6 +188,17 @@ export function buildMessages(args: BuildArgs): {
   const messages: ChatMessage[] = [
     { role: "system", content: args.system ?? systemPrompt(surface) },
   ];
+
+  // Where the reader is. First after the system prompt and outside the budget
+  // arithmetic below: it is one short line, it is the same line for every
+  // question asked on a page (so it extends the cache-friendly prefix rather
+  // than breaking it), and it is the last thing that should be dropped when a
+  // context-rich page runs the budget down — an answer without it is an answer
+  // to a stranger.
+  const identity = pageIdentityLine(context);
+  if (identity) {
+    messages.push({ role: "user", content: `Page context (DATA): ${identity}` });
+  }
 
   let budget = contextBudget;
   const take = (text: string, share: number): string => {
