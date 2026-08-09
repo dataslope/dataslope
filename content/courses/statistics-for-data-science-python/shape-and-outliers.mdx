@@ -119,6 +119,7 @@ fig = px.histogram(
     nbins=50,
     title="One column, two hidden groups (bimodal)",
     labels={"value": "height (cm)"},
+    template="simple_white",
 )
 fig.update_layout(showlegend=False)
 fig.show()
@@ -312,6 +313,7 @@ fig = px.box(
     y="income",
     points="outliers",
     title="Box plot: whiskers = 1.5xIQR fences, dots = flagged outliers",
+    template="simple_white",
 )
 fig.show()
 

@@ -108,6 +108,7 @@ fig = px.histogram(
     nbins=50,
     title=f"Sampling distribution of x-bar  (n={n}, {n_samples} samples)",
     labels={"value": "Sample mean (x-bar)"},
+    template="simple_white",
 )
 fig.add_vline(x=MU, line_dash="dash", annotation_text="true mu = 50")
 fig.show()
@@ -186,6 +187,7 @@ fig = px.histogram(
     nbins=50,
     height=650,
     title="Three different distributions on the same axis",
+    template="simple_white",
 )
 fig.add_vline(x=MU, line_dash="dash")
 fig.show()
@@ -263,6 +265,7 @@ fig = px.histogram(
     opacity=0.6,
     title="Bigger n -> narrower sampling distribution (same center)",
     labels={"x_bar": "Sample mean (x-bar)"},
+    template="simple_white",
 )
 fig.add_vline(x=MU, line_dash="dash", annotation_text="mu = 50")
 fig.show()
@@ -402,6 +405,7 @@ fig = px.histogram(
     facet_col_wrap=3,
     height=400,
     title=f"Each statistic has its OWN sampling distribution (n={n})",
+    template="simple_white",
 )
 fig.update_xaxes(matches=None)
 fig.show()

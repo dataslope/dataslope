@@ -93,6 +93,7 @@ fig = px.line(
     y="density",
     color="distribution",
     title="The normal: mu moves the center, sigma sets the width",
+    template="simple_white",
 )
 fig.show()
 `,
@@ -129,6 +130,7 @@ grid = np.linspace(flippers.min(), flippers.max(), 200)
 fig = px.histogram(
     flippers, x="flipper_length_mm", histnorm="probability density", nbins=20,
     title=f"Adelie flipper length vs a fitted normal (mu={mu:.0f}, sigma={sigma:.1f})",
+    template="simple_white",
 )
 fig.add_scatter(x=grid, y=stats.norm(mu, sigma).pdf(grid), mode="lines", name="normal fit")
 fig.show()
@@ -220,6 +222,7 @@ fig.update_layout(
     title="Normal(100, 15): the central ~95% band",
     xaxis_title="score",
     yaxis_title="density",
+    template="simple_white",
 )
 fig.show()
 
@@ -518,6 +521,7 @@ fig.update_layout(
     title="A normal forced onto skewed income data, it doesn't fit",
     xaxis_title="income",
     yaxis_title="density",
+    template="simple_white",
 )
 fig.show()
 

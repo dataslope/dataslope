@@ -154,12 +154,18 @@ aq = pd.read_csv("anscombe.csv")`,
 fig = px.scatter(
     aq, x="x", y="y", facet_col="dataset", facet_col_wrap=2,
     trendline="ols", title="Anscombe's quartet, same stats, different data",
+    template="simple_white",
 )
 fig.show()
 `,
     },
   ]}
 />
+
+Here is what comes out, four pictures that no summary table could
+tell apart:
+
+<Chart slug="anscombes-quartet" />
 
 That single comparison is the whole argument for this course in one
 screen. A data scientist who trusts the summary numbers alone calls all

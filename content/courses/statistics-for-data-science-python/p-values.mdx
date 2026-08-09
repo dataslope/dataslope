@@ -196,7 +196,8 @@ observed_diff = 0.45  # a gap we supposedly saw in a real experiment
 p_value = (np.abs(null_diffs) >= abs(observed_diff)).mean()
 
 fig = px.histogram(
-    null_diffs, nbins=60, title="Null distribution of the difference in means"
+    null_diffs, nbins=60, title="Null distribution of the difference in means",
+    template="simple_white",
 )
 fig.add_vline(x=observed_diff, line_color="red", line_width=2)
 fig.add_vline(x=-observed_diff, line_color="red", line_width=2, line_dash="dash")
