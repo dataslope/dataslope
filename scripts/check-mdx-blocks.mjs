@@ -70,6 +70,19 @@ for (const file of files) {
     if (attrsLive && lines[i].includes("{")) attrsLive = false;
     const oneLineTag = !code[i] && /^<[A-Z]\w*[^>{]*\/>\s*$/.test(lines[i]);
     if (attrsLive || oneLineTag) {
+      // An attribute that opens a quote and never closes it on the same line.
+      // The value then runs on until the next `"` anywhere below, swallowing
+      // the tag's own `/>` and whatever follows, and the parse dies far from
+      // the real damage. The rule above cannot see this one: it matches
+      // complete `name="…"` pairs, and there is no pair to match. An odd
+      // number of quotes on an attribute line says so directly, and no
+      // legitimate line in `content/` has one.
+      if (((lines[i].match(/"/g) ?? []).length & 1) === 1) {
+        problems.push(
+          `${where}:${i + 1}: attribute value opens a quote and never closes it: ` +
+            lines[i].trim().slice(0, 90),
+        );
+      }
       for (const m of lines[i].matchAll(/(?:\s|^)([A-Za-z_][\w:-]*)="[^"]*"/g)) {
         const after = lines[i][m.index + m[0].length];
         // Whitespace, `/>` or the end of the line all mean the value really
