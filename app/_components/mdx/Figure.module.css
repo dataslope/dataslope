@@ -23,11 +23,16 @@
   margin: 0 auto;
 }
 
+/* Matched to the chart caption in Chart.module.css: 15px against the body's
+   16px, and the body's leading rather than a one-line credit's 1.5. The two
+   captions sit in the same column, often on the same page, so they have to be
+   the same voice — and an illustration caption that explains what the art is
+   showing deserves the same reading comfort as the prose it sits under. */
 .caption {
   margin-top: 0.75rem;
   text-align: center;
-  font-size: 0.8125rem;
-  line-height: 1.5;
+  font-size: 0.9375rem;
+  line-height: 1.7;
   color: var(--color-fd-muted-foreground);
 }
 
