@@ -63,11 +63,6 @@ type. If you later try to assign `greeting = 99`, TypeScript raises a
 compile-time error, it knows `greeting` is a `string`, and `99` is a
 `number`.
 
-<Figure
-  slug="tsx-primitive-types-inline-cutout"
-  alt="Five small blocks of clearly different kinds resting in their own moulded recesses, none of them able to sit in another's"
-/>
-
 ## Type inference vs explicit annotation
 
 You don't *always* need to write the type. TypeScript infers it from the
@@ -331,6 +326,11 @@ function area(width, height) {
 Nothing stops you from calling `area("10", 5)`, JavaScript will coerce
 the string `"10"` to a number, and you'll get `50`. But what if the string
 were `"10px"`? You'd get `NaN`. The bug hides until runtime.
+
+<Figure
+  slug="tsx-primitive-types-inline-cutout"
+  alt="Five small blocks of clearly different kinds resting in their own moulded recesses, none of them able to sit in another's"
+/>
 
 Now add types:
 

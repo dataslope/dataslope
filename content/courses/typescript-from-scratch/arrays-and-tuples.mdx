@@ -52,11 +52,6 @@ console.log("First name:", names[0]);
 `"six"` is not a `number`. The type annotation acts as a contract: "this
 array holds only numbers."
 
-<Figure
-  slug="tsx-arrays-and-tuples-inline-cutout"
-  alt="A rail that takes any number of identical blocks beside a fixed strip with three shaped slots in a set order"
-/>
-
 TypeScript also provides a generic `Array<T>` syntax, which is
 functionally identical to `T[]`:
 
@@ -354,6 +349,11 @@ so powerful.
 - The collection can grow or shrink at runtime
 - All elements have the same type and role
 - You'll iterate over the entire collection
+
+<Figure
+  slug="tsx-arrays-and-tuples-inline-cutout"
+  alt="A rail that takes any number of identical blocks beside a fixed strip with three shaped slots in a set order"
+/>
 
 **Use tuples when:**
 - The length is fixed and known at compile time

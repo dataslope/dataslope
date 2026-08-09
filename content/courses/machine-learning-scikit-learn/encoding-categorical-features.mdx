@@ -34,11 +34,6 @@ The `price` column is already numeric, a model can use it directly. But
 `LogisticRegression` or `KNeighborsClassifier`, you get an error, because
 there is no sensible way to compute "red times a weight."
 
-<Figure
-  slug="ml-encoding-categorical-features-inline-cutout"
-  alt="Three coloured tags each replaced by a small row of on-off switches, one switch raised in each row"
-/>
-
 So we must **encode**: replace each category with numbers. The question is
 *which* numbers, and here is where intuition matters more than syntax.
 
@@ -148,6 +143,11 @@ If colors have no order, we must encode them in a way that treats them as
 exactly that: it replaces the single `color` column with one new column
 *per category*, each holding a 0 or a 1. A row's color is marked by a `1`
 in its column and `0` everywhere else.
+
+<Figure
+  slug="ml-encoding-categorical-features-inline-cutout"
+  alt="Three coloured tags each replaced by a small row of on-off switches, one switch raised in each row"
+/>
 
 ```mermaid
 flowchart LR

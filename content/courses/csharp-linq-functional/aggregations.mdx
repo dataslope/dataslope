@@ -66,11 +66,6 @@ The lambda overloads (`Sum(p => p.Price)`, `Count(p =>
 p.Stock > 0)`) are the same as projecting first and then aggregating,
 just a shortcut.
 
-<Figure
-  slug="cs-aggregations-inline-cutout"
-  alt="A row of blocks folding into one another left to right until a single block remains at the end of the rail"
-/>
-
 ## Empty-sequence behavior
 
 Aggregations on empty sequences are a famous source of bugs.
@@ -173,6 +168,11 @@ already, reach for `Aggregate`.
 The accumulator doesn't have to be a simple type. It can be a tuple,
 record, or even a collection, useful when you want to compute
 several things in one pass.
+
+<Figure
+  slug="cs-aggregations-inline-cutout"
+  alt="A row of blocks folding into one another left to right until a single block remains at the end of the rail"
+/>
 
 <CodeBlock
   adapter="csharp"

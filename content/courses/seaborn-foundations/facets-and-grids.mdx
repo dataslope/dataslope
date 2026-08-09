@@ -56,11 +56,6 @@ crucially, every panel **shares the same axes by default**, so a point in
 one cell is directly comparable to a point in another. That shared scale is
 what makes small multiples honest.
 
-<Figure
-  slug="sns-facets-and-grids-inline-cutout"
-  alt="Four small panels standing in a row over one continuous axis rule that runs beneath all of them, with a single key block at the right serving every panel"
-/>
-
 <Callout type="info" title="hue overlays; col/row separate">
 `hue` draws groups *on top of each other* in one panel (good for direct
 overlap and a few groups). `col`/`row` give each group *its own panel* (good
@@ -159,6 +154,11 @@ others and you'll want to free a scale with `sharey=False` (via
 `facet_kws={"sharey": False}` on the figure-level functions), but do it
 *consciously*, and tell your reader, because un-shared axes make panels look
 similar when they aren't.
+
+<Figure
+  slug="sns-facets-and-grids-inline-cutout"
+  alt="Four small panels standing in a row over one continuous axis rule that runs beneath all of them, with a single key block at the right serving every panel"
+/>
 
 <MultipleChoice
   markdown={`Why does Seaborn make facets **share the same axis limits** by default?

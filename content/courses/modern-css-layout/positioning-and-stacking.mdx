@@ -28,11 +28,6 @@ The workhorse combination: a parent set to `position: relative` becomes
 the **positioning context**, and an `absolute` child is placed inside
 it with `top`/`right`/`bottom`/`left`.
 
-<Figure
-  slug="css-positioning-and-stacking-inline-cutout"
-  alt="Three overlapping panels raised on pins of different heights, the highest pin's panel clearly on top"
-/>
-
 Here the green "online" dot is an absolutely-positioned child pinned to
 the bottom-right corner of its `relative` avatar. The dot doesn't take
 up space in the flow, it floats over the corner:
@@ -144,6 +139,11 @@ higher numbers sit in front. Two things trip people up:
   its children's `z-index` values are compared only *within* it, not
   against the rest of the page. A child's `z-index: 9999` can't escape
   a parent that sits behind something else.
+
+<Figure
+  slug="css-positioning-and-stacking-inline-cutout"
+  alt="Three overlapping panels raised on pins of different heights, the highest pin's panel clearly on top"
+/>
 
 Three overlapping cards, each positioned with a different `z-index`.
 The one with the highest value sits in front regardless of source

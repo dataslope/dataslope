@@ -20,11 +20,6 @@ fast.
 
 Think of a busy online store.
 
-<Figure
-  slug="duck-olap-vs-oltp-inline-cutout"
-  alt="A service counter handling one small parcel at a time on the left, and a warehouse aisle on the right where one wide column is read end to end"
-/>
-
 - The **application** asks tiny, sharply targeted questions, millions of
   times a day: *"What is in cart #84213?"*, *"Save this new order."*,
   *"Mark order #91 as shipped."* Each touches a handful of rows and must
@@ -206,3 +201,8 @@ engines fly through large scans.`}
 You now know *why* analytical SQL is shaped the way it is, and what kind
 of engine answers it fast. Next: meet that engine, and understand *why
 DuckDB* in particular.
+
+<Figure
+  slug="duck-olap-vs-oltp-inline-cutout"
+  alt="A service counter handling one small parcel at a time on the left, and a warehouse aisle on the right where one wide column is read end to end"
+/>

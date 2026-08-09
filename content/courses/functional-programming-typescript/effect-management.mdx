@@ -69,11 +69,6 @@ passing it around, returning it from a function, all pure.
 Running it is the impure act, and it happens at *one* place: the
 top of your program.
 
-<Figure
-  slug="fp-effect-management-inline-cutout"
-  alt="A clean sealed line of machines with all its hoses, taps and wires gathered at one end of the bench and plugged into a single marked panel"
-/>
-
 ## Map and chain over IO
 
 Once you have `IO<A>`, you can build the familiar trio:
@@ -148,6 +143,11 @@ Three big reasons:
 3. **The boundary is visible.** Effectful types like `IO<A>`,
    `Task<A>`, `Effect<R, E, A>` show up in signatures. You can
    tell from a function's type whether it's pure.
+
+<Figure
+  slug="fp-effect-management-inline-cutout"
+  alt="A clean sealed line of machines with all its hoses, taps and wires gathered at one end of the bench and plugged into a single marked panel"
+/>
 
 ## A tiny Console / FileSystem effect
 

@@ -19,11 +19,6 @@ being informative once everyone scores near its ceiling.** MMLU is the
 canonical case. The frontier moved past what the test can measure, and
 the reported numbers now differ by less than the measurement error.
 
-<Figure
-  slug="llm-benchmark-pitfalls-inline-cutout"
-  alt="A machine scoring perfectly on a test rig whose answer card is visibly already inside the machine"
-/>
-
 The tell is easy to spot. If every model in the table is within three
 points of every other, the benchmark is not distinguishing them.
 
@@ -33,6 +28,11 @@ Benchmark questions and answers get published. Published text gets
 crawled. Crawled text becomes training data. A model that saw the test
 answers during training scores well without having the capability the
 test was designed to measure.
+
+<Figure
+  slug="llm-benchmark-pitfalls-inline-cutout"
+  alt="A machine scoring perfectly on a test rig whose answer card is visibly already inside the machine"
+/>
 
 This is rarely deliberate and is very hard to rule out, because
 nobody can fully audit a multi-trillion-token corpus for overlap with

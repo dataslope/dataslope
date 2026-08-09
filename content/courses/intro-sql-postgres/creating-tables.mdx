@@ -36,11 +36,6 @@ integer `id`, a text `title`, a text `author`, and an integer
 `year`."* The parentheses hold a comma-separated list of
 `column_name TYPE` pairs. That is the core of the whole statement.
 
-<Figure
-  slug="sql-creating-tables-inline-cutout"
-  alt="An empty ruled board being clamped into a frame, its column widths set before anything is placed on it"
-/>
-
 ## Adding rules with constraints
 
 Beyond a name and type, each column can carry **constraints**,
@@ -128,6 +123,11 @@ guaranteed-unique id without you tracking the numbers yourself.
 
 To delete an entire table and all its rows, use `DROP TABLE`. Handle
 with care, it is permanent.
+
+<Figure
+  slug="sql-creating-tables-inline-cutout"
+  alt="An empty ruled board being clamped into a frame, its column widths set before anything is placed on it"
+/>
 
 ```sql
 DROP TABLE books;

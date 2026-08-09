@@ -17,11 +17,6 @@ not quite a pointer, but it *becomes* one almost any time you use it.
 `int nums[5] = {10, 20, 30, 40, 50};` reserves enough room for five
 ints, side by side, and names the start `nums`.
 
-<Figure
-  slug="sysc-arrays-and-pointers-inline-cutout"
-  alt="A strip of cells with a marker that moves by exact cell widths, the strip's own start marked by a peg"
-/>
-
 <CodeBlock
   adapter="c"
   files={[
@@ -226,6 +221,11 @@ Hence we compute `n` in `main` and pass it down, never inside `sum`.
 
 Two ways to represent a matrix. They look similar; they are not the
 same in memory.
+
+<Figure
+  slug="sysc-arrays-and-pointers-inline-cutout"
+  alt="A strip of cells with a marker that moves by exact cell widths, the strip's own start marked by a peg"
+/>
 
 ```c
 int grid[3][4];           // 12 ints in one contiguous block

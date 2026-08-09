@@ -16,6 +16,11 @@ character" `\0`.
 This page is about how to think about that, and how not to shoot
 yourself in the foot.
 
+<Figure
+  slug="c-strings-inline-cutout"
+  alt="A strip of single-letter tiles laid end to end along a rail, with one small red cap tile closing the run at the right"
+/>
+
 ## The null-terminated string
 
 ```c
@@ -33,11 +38,6 @@ Value:   'h'  'e'  'l'  'l'  'o'  '\0'
 The terminator is the **only** way functions like `printf("%s", s)`
 or `strlen(s)` know where the string ends. There is no length field.
 There is no metadata. The convention is: walk until you see a `\0`.
-
-<Figure
-  slug="c-strings-inline-cutout"
-  alt="A strip of single-letter tiles laid end to end along a rail, with one small red cap tile closing the run at the right"
-/>
 
 This convention is fast and compact, but it shifts a lot of
 responsibility onto the programmer. Forget the terminator and

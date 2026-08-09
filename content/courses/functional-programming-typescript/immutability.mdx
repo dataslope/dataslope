@@ -20,11 +20,6 @@ Immutability is not about asceticism. It is about *reasoning*.
 Consider a simple function that "increments a user's age" and a
 caller that uses the user afterward.
 
-<Figure
-  slug="fp-immutability-inline-cutout"
-  alt="A sealed block on the left, and beside it a fresh copy with one face changed, the original still sealed and untouched"
-/>
-
 <CodeBlock
   adapter="typescript"
   files={[
@@ -279,6 +274,11 @@ version you started from:
 Two pieces of code that share *no mutable state* cannot race.
 Period. They might run in any order, on any thread, on any machine,
 and the result is the same.
+
+<Figure
+  slug="fp-immutability-inline-cutout"
+  alt="A sealed block on the left, and beside it a fresh copy with one face changed, the original still sealed and untouched"
+/>
 
 ```mermaid
 flowchart LR

@@ -35,11 +35,6 @@ you must perform in the right order, on the right data, every time:
 5. Fit the model on the training matrix.
 6. Repeat steps 2–4 *exactly* on any new data before predicting.
 
-<Figure
-  slug="ml-pipelines-and-columntransformer-inline-cutout"
-  alt="Several columns each taking a different route through its own small machine before all routes join into one"
-/>
-
 Every one of those steps is a chance to leak the test set (fit on the wrong
 data), to forget a transform, or to apply transforms in a different order at
 predict time than at training time. And it gets worse: when you later use
@@ -196,6 +191,11 @@ into a training portion and a held-out portion, scoring on each. If your
 scaler was fit once on the whole dataset *before* cross-validation, then in
 every fold the "held-out" portion was already seen by the scaler, a leak,
 repeated in every fold, quietly inflating the average.
+
+<Figure
+  slug="ml-pipelines-and-columntransformer-inline-cutout"
+  alt="Several columns each taking a different route through its own small machine before all routes join into one"
+/>
 
 When you cross-validate a **pipeline**, scikit-learn re-fits the *entire*
 pipeline, scaler, encoder, and all, separately inside each fold, using

@@ -75,11 +75,6 @@ Two big problems:
    things happen.
 2. **Forgotten fields.** Nothing forces you to set every field.
 
-<Figure
-  slug="java-constructors-and-lifecycle-inline-cutout"
-  alt="A crate stamped out of a template, filled at the next station, used at the third, and left empty on a trolley at the end of the bench"
-/>
-
 Constructors fix both. With `new Point(3, 4)`, an object is *born
 fully initialized*, in one atomic step.
 
@@ -190,6 +185,11 @@ An object moves through six stages, from creation to reclamation:
    it, the object becomes garbage.
 6. **Garbage collection.** Eventually the JVM's garbage collector
    notices and reclaims the memory.
+
+<Figure
+  slug="java-constructors-and-lifecycle-inline-cutout"
+  alt="A crate stamped out of a template, filled at the next station, used at the third, and left empty on a trolley at the end of the bench"
+/>
 
 Steps 1-3 happen in milliseconds during `new`. Steps 4-6 happen over
 the program's lifetime.

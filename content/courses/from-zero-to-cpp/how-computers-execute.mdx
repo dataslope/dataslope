@@ -36,11 +36,6 @@ flowchart LR
 3. **Input/Output devices**, the keyboard, the screen, the disk, the
    network, let memory and the outside world exchange data.
 
-<Figure
-  slug="cpp-how-computers-execute-inline-cutout"
-  alt="A small unit repeating a three-station cycle, taking a card, reading it, and acting on it before returning for the next"
-/>
-
 Everything more complicated is built on top of those three ideas.
 
 ## Bytes, bits, and addresses
@@ -106,6 +101,11 @@ that says "the next instruction is at memory address X". After
 each instruction, the pointer advances. A `jump` instruction *sets*
 the pointer to a different address, which is how loops, `if`
 branches, and function calls work under the hood.
+
+<Figure
+  slug="cpp-how-computers-execute-inline-cutout"
+  alt="A small unit repeating a three-station cycle, taking a card, reading it, and acting on it before returning for the next"
+/>
 
 The CPU also has a tiny set of very fast storage slots called
 **registers** (typically 16 to 32 of them, each holding 4 or 8

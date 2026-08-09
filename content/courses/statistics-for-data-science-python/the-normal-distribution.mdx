@@ -33,11 +33,6 @@ transactions. Whenever a quantity is the accumulation of lots of small,
 roughly independent contributions, its distribution drifts toward a bell
 curve, *regardless* of what the individual pieces look like.
 
-<Figure
-  slug="stat-the-normal-distribution-inline-cutout"
-  alt="A symmetric mound of chips with three widening bands marked outward from its centre, each band holding fewer chips"
-/>
-
 ```mermaid
 flowchart TD
   A["Many small,<br/>independent effects"] --> B["They add up"]
@@ -491,6 +486,11 @@ produces confidently wrong answers:
 - **Bounded / discrete**: proportions live in [0, 1]; counts are
   non-negative integers. A symmetric, unbounded bell can't honestly
   represent them, especially near the boundaries.
+
+<Figure
+  slug="stat-the-normal-distribution-inline-cutout"
+  alt="A symmetric mound of chips with three widening bands marked outward from its centre, each band holding fewer chips"
+/>
 
 Let's *see* the misfit by forcing a normal onto right-skewed income data.
 

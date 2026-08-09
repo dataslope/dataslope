@@ -17,11 +17,6 @@ In pandas, `df["a"] * 2` reaches into a frame, pulls out a column,
 doubles it, and hands you the doubled values. Three things happened
 and you are holding the result.
 
-<Figure
-  slug="pl-what-is-an-expression-inline-cutout"
-  alt="A small recipe card clipped to a rail that describes a change, held above a column it has not yet touched"
-/>
-
 In Polars, `pl.col("a") * 2` does none of that. It builds an object
 that *means* "take the column called a and double it". No frame was
 consulted. No arithmetic was done.
@@ -205,6 +200,11 @@ work across multiple columns at once.
 
 Because an expression is an ordinary Python object, you can keep a
 library of them.
+
+<Figure
+  slug="pl-what-is-an-expression-inline-cutout"
+  alt="A small recipe card clipped to a rail that describes a change, held above a column it has not yet touched"
+/>
 
 <CodeBlock
   adapter="python"

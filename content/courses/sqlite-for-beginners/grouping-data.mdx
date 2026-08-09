@@ -21,11 +21,6 @@ Aggregate functions can summarize a whole table into one answer. That is useful,
 
 Without `GROUP BY`, an aggregate gives one summary for all rows. With `GROUP BY`, SQLite makes one group for each distinct value, then runs the aggregate once per group.
 
-<Figure
-  slug="lite-grouping-data-inline-cutout"
-  alt="Chips raked into three trays by colour, with one small counter standing on each tray"
-/>
-
 ```mermaid
 flowchart TB
     Rows["All employee rows"] --> Group{"<code>GROUP BY dept</code>"}
@@ -200,6 +195,11 @@ This is the pattern behind many reports: category on the left, summary number on
 ## Grouping by more than one column
 
 You can group by multiple columns. The group becomes each unique combination of those column values.
+
+<Figure
+  slug="lite-grouping-data-inline-cutout"
+  alt="Chips raked into three trays by colour, with one small counter standing on each tray"
+/>
 
 For example, `GROUP BY region, year` means:
 

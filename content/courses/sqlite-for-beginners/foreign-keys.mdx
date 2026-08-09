@@ -73,11 +73,6 @@ ORDER BY
 
 The phrase `REFERENCES customers(id)` declares the relationship: each `orders.customer_id` is meant to refer to a value in `customers.id`.
 
-<Figure
-  slug="lite-foreign-keys-inline-cutout"
-  alt="A cord joining a row in one board to a row in another, with a small clasp on the cord that can be left open or closed"
-/>
-
 <MultipleChoice
   markdown={`In the orders table, what does \`customer_id = 1\` mean?
 
@@ -155,6 +150,11 @@ FROM
 />
 
 The second insert is blocked. SQLite is protecting you from an **orphan row**: an order that claims to belong to a missing customer.
+
+<Figure
+  slug="lite-foreign-keys-inline-cutout"
+  alt="A cord joining a row in one board to a row in another, with a small clasp on the cord that can be left open or closed"
+/>
 
 ## Seeing the links
 

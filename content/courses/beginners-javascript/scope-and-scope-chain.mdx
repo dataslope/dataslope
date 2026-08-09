@@ -20,11 +20,6 @@ names is "in effect". When the runtime sees a name, it asks: *is
 that name defined in the current scope? If not, what about the
 scope around it? And the one around that?*
 
-<Figure
-  slug="js-scope-and-scope-chain-inline-cutout"
-  alt="Three rooms nested one inside another, a lamp in the outermost lighting all three, and a lamp in the innermost lighting only its own room"
-/>
-
 JavaScript has three kinds of scope:
 
 - **Global scope**, the outermost level. Variables declared here
@@ -91,6 +86,11 @@ The inner `const x` *shadows* the outer one. The two are separate
 variables that happen to share a name. The moment the `if` block
 ends, the inner `x` vanishes and the outer `x` is again the only
 one in scope.
+
+<Figure
+  slug="js-scope-and-scope-chain-inline-cutout"
+  alt="Three rooms nested one inside another, a lamp in the outermost lighting all three, and a lamp in the innermost lighting only its own room"
+/>
 
 ## The scope chain
 

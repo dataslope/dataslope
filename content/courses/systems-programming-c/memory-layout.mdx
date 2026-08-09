@@ -46,11 +46,6 @@ rather than your laptop's physical RAM.
 You can roughly identify which region a variable lives in by printing
 its address.
 
-<Figure
-  slug="sysc-memory-layout-inline-cutout"
-  alt="One long horizontal bar running the full width of the frame, divided end to end into four bands of different colours, a small arrow above the third band pointing right and a small arrow above the fourth pointing left so the two grow toward each other, and three loose crates resting inside the third band"
-/>
-
 <CodeBlock
   adapter="c"
   files={[
@@ -112,6 +107,11 @@ C splits globals into two pieces purely as a file-size optimization:
 - `.bss` ("Block Started by Symbol") holds globals initialized to
   zero. They take *no space in the executable file*, the OS just
   zeroes a region of memory at load time.
+
+<Figure
+  slug="sysc-memory-layout-inline-cutout"
+  alt="One long horizontal bar running the full width of the frame, divided end to end into four bands of different colours, a small arrow above the third band pointing right and a small arrow above the fourth pointing left so the two grow toward each other, and three loose crates resting inside the third band"
+/>
 
 <CodeBlock
   adapter="c"

@@ -29,11 +29,6 @@ Let's unpack:
 - `K in keyof T` iterates over each key.
 - `T[K]` is an **indexed access type**: the type of property `K` in `T`.
 
-<Figure
-  slug="tsx-mapped-and-conditional-types-inline-cutout"
-  alt="A rack of sockets passing under a template that reshapes every socket in one stroke"
-/>
-
 Here's a simple example that copies a type unchanged:
 
 <CodeBlock
@@ -130,6 +125,11 @@ The `+` prefix is implicit (the default), so `+readonly` is the same as `readonl
 ## Key Remapping with `as`
 
 TypeScript 4.1 introduced **key remapping** in mapped types: you can use `as` to rename keys during the mapping. The new key must resolve to a `string | number | symbol` (or `never` to *exclude* that key).
+
+<Figure
+  slug="tsx-mapped-and-conditional-types-inline-cutout"
+  alt="A rack of sockets passing under a template that reshapes every socket in one stroke"
+/>
 
 Here's a type that prefixes every key with `get`:
 

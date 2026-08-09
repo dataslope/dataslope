@@ -16,15 +16,15 @@ comment stores `post_id = 20`, then post `20` must exist. The database
 protects those promises so your design cannot quietly drift into broken
 links.
 
-## The orphan-row problem
-
-An **orphan row** is a child row that points to a parent row that does
-not exist.
-
 <Figure
   slug="db-referential-integrity-inline-cutout"
   alt="A cord running from one crate to another, and a gate refusing to remove the far crate while the cord is still attached"
 />
+
+## The orphan-row problem
+
+An **orphan row** is a child row that points to a parent row that does
+not exist.
 
 ```mermaid
 flowchart TD

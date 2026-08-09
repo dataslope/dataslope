@@ -22,11 +22,6 @@ the end.
 *requires* an `ORDER BY` inside `OVER`, because numbering only makes sense
 once you have decided the order.
 
-<Figure
-  slug="duck-ranking-and-row-number-inline-cutout"
-  alt="A row of blocks combed into height order with a pennant planted on each, the pennants shortening along the row and two equal blocks sharing one"
-/>
-
 <SqlCodeBlock
   dialect="duckdb"
   title="Number orders from biggest to smallest"
@@ -62,6 +57,11 @@ sequential rank over the whole table.
 Add `PARTITION BY` and the numbering **restarts** in each group. This is
 how you ask "rank within each region", every region gets its own 1, 2,
 3.
+
+<Figure
+  slug="duck-ranking-and-row-number-inline-cutout"
+  alt="A row of blocks combed into height order with a pennant planted on each, the pennants shortening along the row and two equal blocks sharing one"
+/>
 
 <SqlCodeBlock
   dialect="duckdb"

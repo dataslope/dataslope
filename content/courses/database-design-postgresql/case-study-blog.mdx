@@ -39,11 +39,6 @@ flowchart TD
 The nouns become candidates. The verbs tell us how those candidates
 connect.
 
-<Figure
-  slug="db-case-study-blog-inline-cutout"
-  alt="Three crates on a bench, one of posts, one of authors and one of comments, joined by cords"
-/>
-
 ## Choose entities
 
 The main entities are `users`, `posts`, `comments`, and `tags`.
@@ -301,6 +296,11 @@ VALUES
 A schema earns its keep when new questions are easy. Here is one the
 product team will ask on day two: *how active is each post?* The full
 blog schema and its sample data are loaded below.
+
+<Figure
+  slug="db-case-study-blog-inline-cutout"
+  alt="Three crates on a bench, one of posts, one of authors and one of comments, joined by cords"
+/>
 
 <SqlChallengeCard
   dialect="postgres"

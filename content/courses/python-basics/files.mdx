@@ -12,6 +12,11 @@ Every real program touches files, reading config, writing logs, parsing CSV data
 
 The two core ideas: **`open()` returns a file object**, and **the `with` statement closes it for you**.
 
+<Figure
+  slug="python-files-inline-cutout"
+  alt="A drawer opened, a strip of tape drawn out and read, then wound back and the drawer closed"
+/>
+
 ## Why file I/O matters: the real world
 
 File operations are everywhere in production code:
@@ -23,11 +28,6 @@ File operations are everywhere in production code:
 - **Interprocess communication**, Unix sockets, named pipes, temp files
 
 Mastering file I/O means you can build scripts that process data, integrate with other tools, and persist state across runs.
-
-<Figure
-  slug="python-files-inline-cutout"
-  alt="A drawer opened, a strip of tape drawn out and read, then wound back and the drawer closed"
-/>
 
 ```mermaid
 flowchart TD

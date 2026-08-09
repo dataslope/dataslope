@@ -22,11 +22,6 @@ locally, it **throws** an exception. The JVM walks back up the
 call stack looking for a method that **catches** that kind of
 exception. If no one does, the program crashes with a stack trace.
 
-<Figure
-  slug="java-exception-handling-inline-cutout"
-  alt="A parcel wearing a stamped warning tag stopped at a gate, the gate refusing to open until a matching catch basket has been bolted onto the line beyond it"
-/>
-
 ```mermaid
 flowchart TB
     A[main calls process]
@@ -116,6 +111,11 @@ Three branches matter:
 **Checked** exceptions represent "expected problems with the
 outside world", files missing, networks failing, parsing user
 input. Java forces you to acknowledge them.
+
+<Figure
+  slug="java-exception-handling-inline-cutout"
+  alt="A parcel wearing a stamped warning tag stopped at a gate, the gate refusing to open until a matching catch basket has been bolted onto the line beyond it"
+/>
 
 **Unchecked** exceptions represent "your program has a bug", null
 pointers, out-of-bounds indices, divisions by zero, illegal

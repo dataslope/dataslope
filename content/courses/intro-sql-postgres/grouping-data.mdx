@@ -20,11 +20,6 @@ in SQL. Take your time, there are extra checks at the end.
 same value in that column, then computes the aggregate **once per
 group** instead of once for the whole table.
 
-<Figure
-  slug="sql-grouping-data-inline-cutout"
-  alt="A scatter of mixed blocks being raked into three neat piles, and one tall summary block standing beside each pile"
-/>
-
 ```mermaid
 flowchart TB
     All["All employees"] --> G{"<code>GROUP BY dept</code>"}
@@ -128,6 +123,11 @@ ORDER BY
 
 Each row is now one (region, year) pair. Grouping by multiple
 columns is how you build cross-tabulated summaries.
+
+<Figure
+  slug="sql-grouping-data-inline-cutout"
+  alt="A scatter of mixed blocks being raked into three neat piles, and one tall summary block standing beside each pile"
+/>
 
 ## Where GROUP BY sits in the query
 

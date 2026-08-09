@@ -43,11 +43,6 @@ print(
 mean "how long is this word" and `len_bytes` when you mean "how much
 memory does it take".
 
-<Figure
-  slug="pl-working-with-strings-inline-cutout"
-  alt="A full column of letter ribbons passing under one wide blade that trims every ribbon in the same stroke"
-/>
-
 ## The canonical cleaning chain
 
 <CodeBlock
@@ -107,6 +102,11 @@ print(
 `contains` takes a regex by default. Pass `literal=True` when the
 needle contains regex metacharacters you mean literally, such as a
 dot in a filename.
+
+<Figure
+  slug="pl-working-with-strings-inline-cutout"
+  alt="A full column of letter ribbons passing under one wide blade that trims every ribbon in the same stroke"
+/>
 
 <Callout type="warn" title="Polars regexes are not Python regexes">
 Polars uses Rust's `regex` crate, which guarantees linear-time

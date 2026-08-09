@@ -47,11 +47,6 @@ repeat as you experiment, but the loop never reaches into the test set. And
 interpretation comes *after* you trust the model's accuracy, not before. We
 will take the steps one at a time.
 
-<Figure
-  slug="ml-the-practical-ml-workflow-inline-cutout"
-  alt="A ring of five benches with a tray moving round it, from data to features to fit to check and back"
-/>
-
 ## Step 1, Frame the problem
 
 Before a single line of code, answer: **what are we predicting, and why?**
@@ -487,6 +482,11 @@ The ten steps are a default, not a law. Real projects adapt:
 - **Pure-exploration projects** (unsupervised clustering to understand a
   dataset) have no target and no test split in the usual sense, you judge
   with the cluster-evaluation tools instead.
+
+<Figure
+  slug="ml-the-practical-ml-workflow-inline-cutout"
+  alt="A ring of five benches with a tray moving round it, from data to features to fit to check and back"
+/>
 
 What never bends is the principle underneath: **be honest about what your
 model has and has not seen.** Every adaptation above is just that principle

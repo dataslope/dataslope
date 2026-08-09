@@ -16,11 +16,6 @@ Good inference means you write fewer annotations while keeping full type safety.
 
 The simplest case: when you declare a variable with an initial value, TypeScript looks at that value and assigns a type.
 
-<Figure
-  slug="tsx-type-inference-inline-cutout"
-  alt="A block dropped into an empty socket, the socket closing around it to take exactly its shape without anyone measuring"
-/>
-
 <CodeBlock
   adapter="typescript"
   files={[
@@ -182,6 +177,11 @@ if (result !== null) {
 ## Best-common-type inference for arrays
 
 When you initialize an array with mixed values, the compiler tries to find a **best common type** that accommodates all elements.
+
+<Figure
+  slug="tsx-type-inference-inline-cutout"
+  alt="A block dropped into an empty socket, the socket closing around it to take exactly its shape without anyone measuring"
+/>
 
 <CodeBlock
   adapter="typescript"

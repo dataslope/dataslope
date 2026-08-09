@@ -38,11 +38,6 @@ a percent in conversion will be "significant." Significance, past a
 certain sample size, is almost guaranteed, so it stops carrying
 information about whether you should care.
 
-<Figure
-  slug="stat-effect-sizes-inline-cutout"
-  alt="Two mounds barely apart with a large marker showing the gap, beside two mounds far apart with the same marker looking tiny"
-/>
-
 ```mermaid
 flowchart TD
   A["Effect exists?"] -->|"p-value answers this"| B["Yes / can't tell"]
@@ -380,6 +375,11 @@ When your outcome is a yes/no event, converted or not, churned or not,
 recovered or not, the natural effect sizes compare two proportions.
 There are two complementary ways to do it, and they tell genuinely
 different stories.
+
+<Figure
+  slug="stat-effect-sizes-inline-cutout"
+  alt="Two mounds barely apart with a large marker showing the gap, beside two mounds far apart with the same marker looking tiny"
+/>
 
 - **Risk difference** (absolute): $p_{\text{treat}} - p_{\text{control}}$. "The
   conversion rate went up by 2 percentage points."

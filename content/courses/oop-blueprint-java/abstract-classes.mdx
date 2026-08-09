@@ -43,11 +43,6 @@ classDiagram
 The `*` on `area()` and the `<<abstract>>` stereotype mark them as
 abstract. Concrete subclasses must implement `area()`.
 
-<Figure
-  slug="oopj-abstract-classes-inline-cutout"
-  alt="A partly finished cabinet with one panel left as an empty opening, and two completed cabinets beside it that each fill that opening differently"
-/>
-
 <CodeBlock
   adapter="java"
   entryFilename="Main.java"
@@ -244,6 +239,11 @@ The next page is about **interfaces**, which solve a similar problem
   to reuse.
 - Use an **interface** when you want to describe *only* a set of
   capabilities and have many unrelated classes implement them.
+
+<Figure
+  slug="oopj-abstract-classes-inline-cutout"
+  alt="A partly finished cabinet with one panel left as an empty opening, and two completed cabinets beside it that each fill that opening differently"
+/>
 
 Many modern OOP designs use interfaces by default and reach for
 abstract classes only when there's real shared code to factor out.

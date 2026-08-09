@@ -20,11 +20,6 @@ back to the table's own primary key.
 The table appears twice in your thinking: once as the child row, and
 once as the parent row it points to.
 
-<Figure
-  slug="db-self-referencing-relationships-inline-cutout"
-  alt="One crate with a cord that leaves it and comes back to another crate of the very same kind"
-/>
-
 ```mermaid
 erDiagram
     employees ||--o{ employees : manages
@@ -146,6 +141,11 @@ a model of a digital music store, stores its staff in a single
 `employee_id`. The whole org chart lives in one table. Run the query
 and read the result from the top down: the general manager has no
 manager, and everyone else's `reports_to` chain ends at him.
+
+<Figure
+  slug="db-self-referencing-relationships-inline-cutout"
+  alt="One crate with a cord that leaves it and comes back to another crate of the very same kind"
+/>
 
 <SqlCodeBlock
   dialect="postgres"

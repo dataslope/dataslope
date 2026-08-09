@@ -42,11 +42,6 @@ For each order, the database finds the customer whose `id` equals
 the order's `customer_id`, and glues their columns together into one
 wide row.
 
-<Figure
-  slug="sql-understanding-joins-inline-cutout"
-  alt="Two overlapping grids on a light table, the overlapping region lit and the outer regions dimmed, with a small selector dial beside them"
-/>
-
 ## The anatomy of a JOIN
 
 A join lives in the `FROM` part of a query. It names a second table
@@ -106,6 +101,11 @@ FROM
 `orders o` means "call orders `o` here." This is the style you will
 see in nearly all real SQL, because joins of three or four tables
 would be unreadable otherwise.
+
+<Figure
+  slug="sql-understanding-joins-inline-cutout"
+  alt="Two overlapping grids on a light table, the overlapping region lit and the outer regions dimmed, with a small selector dial beside them"
+/>
 
 <Callout type="info" title="Why prefix columns at all?">
 Both tables might have a column named `id`. Writing `o.id` versus

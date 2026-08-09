@@ -44,11 +44,6 @@ print(roundtrip)
 **`index=False`** is almost always what you want, otherwise you
 get a mystery unnamed column when someone re-reads the file.
 
-<Figure
-  slug="pandas-exporting-cleaned-data-inline-cutout"
-  alt="A cleaned board being sealed into a carton and set on a shelf beside the bench"
-/>
-
 ### CSV gotchas
 
 - Text fields containing commas need quoting (Pandas handles
@@ -227,6 +222,11 @@ print("Round-trip OK.")
 
 You'd be amazed how often the answer to "did the export work?"
 is "...no, the dtypes changed."
+
+<Figure
+  slug="pandas-exporting-cleaned-data-inline-cutout"
+  alt="A cleaned board being sealed into a carton and set on a shelf beside the bench"
+/>
 
 ## Handling categorical and missing data on export
 

@@ -35,11 +35,6 @@ If an order points to a customer who exists → it appears. If a
 customer has no orders → they do not appear. Only the **overlap**
 survives.
 
-<Figure
-  slug="sql-inner-joins-inline-cutout"
-  alt="Two card racks pushed together with only the pairs whose notches match lifted out onto a tray between them"
-/>
-
 ## Seeing what survives and what drops
 
 This data is rigged to show the rule. There is an order with no
@@ -101,6 +96,11 @@ which is most of the time:
   enrollments are irrelevant.
 - "Products **that have** been sold", unsold products are not part
   of the question.
+
+<Figure
+  slug="sql-inner-joins-inline-cutout"
+  alt="Two card racks pushed together with only the pairs whose notches match lifted out onto a tray between them"
+/>
 
 The giveaway is the word **with** or **that have**: you want rows
 that *do* have a counterpart.

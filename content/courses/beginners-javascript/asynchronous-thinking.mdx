@@ -30,11 +30,6 @@ entire program* until the data arrives. With a single-threaded
 language like JavaScript, that's catastrophic, the UI freezes,
 no other code runs, and your one CPU sits idle waiting.
 
-<Figure
-  slug="js-asynchronous-thinking-inline-cutout"
-  alt="A single worker at a counter starting a slow kettle, serving two other customers while it boils, and returning to the kettle when it whistles"
-/>
-
 The async philosophy is:
 
 > Start the slow work, *don't wait*, do something else, and
@@ -494,6 +489,11 @@ runSequentially(tasks, (err, results) => {
 />
 
 ---
+
+<Figure
+  slug="js-asynchronous-thinking-inline-cutout"
+  alt="A single worker at a counter starting a slow kettle, serving two other customers while it boils, and returning to the kettle when it whistles"
+/>
 
 <MultipleChoice
   markdown={`Why does JavaScript provide asynchronous APIs even though it runs on a single thread?

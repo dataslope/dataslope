@@ -21,11 +21,6 @@ You could count words with a plain `collections.Counter`, and that is exactly
 what is happening under the hood. NLTK wraps it in a `FreqDist` ("frequency
 distribution") that adds text-specific conveniences.
 
-<Figure
-  slug="nlp-frequency-distributions-inline-cutout"
-  alt="A rack of word tiles with a bar growing beside each, the shortest few words carrying by far the tallest bars"
-/>
-
 ```mermaid
 flowchart TD
     A["Clean tokens:<br/>fox, dog, fox, run, fox, dog"] --> B["FreqDist<br/>(tally each word)"]
@@ -255,6 +250,11 @@ The long-tail shape leads directly to a practical problem. If you just ask
 "what are the most frequent words?", the answer is almost always the
 stopwords, "the", "a", "of", which tell you *nothing* about the topic. The
 content words you actually care about are buried below them.
+
+<Figure
+  slug="nlp-frequency-distributions-inline-cutout"
+  alt="A rack of word tiles with a bar growing beside each, the shortest few words carrying by far the tallest bars"
+/>
 
 <CodeBlock
   adapter="python"

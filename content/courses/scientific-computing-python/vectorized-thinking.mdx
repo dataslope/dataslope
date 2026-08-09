@@ -65,11 +65,6 @@ exactly the same arithmetic, but each iteration also pays for a
 Python bytecode dispatch, an attribute lookup on `np`, a function
 call, and the wrapping of a `float` into a `numpy.float64` and back.
 
-<Figure
-  slug="scipy-vectorized-thinking-inline-cutout"
-  alt="One hand stamping a single block at a time on the left, and a full-width press stamping a whole row in one stroke on the right"
-/>
-
 ## How NumPy actually runs
 
 ```mermaid
@@ -223,6 +218,11 @@ of the result.
 
 Vectorization is wonderful but not magical. A few situations call
 for something else.
+
+<Figure
+  slug="scipy-vectorized-thinking-inline-cutout"
+  alt="One hand stamping a single block at a time on the left, and a full-width press stamping a whole row in one stroke on the right"
+/>
 
 - **The algorithm is fundamentally sequential.** Iterating a
   recurrence one element at a time (`x_{n+1} = f(x_n)`) cannot be

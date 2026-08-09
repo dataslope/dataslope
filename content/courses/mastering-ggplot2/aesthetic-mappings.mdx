@@ -28,11 +28,6 @@ An **aesthetic mapping** is a *correspondence between a data column and
 one of these visual properties*. "Map `displ` to x." "Map `class` to
 color." You declare mappings inside `aes()`.
 
-<Figure
-  slug="gg-aesthetic-mappings-inline-cutout"
-  alt="A column of raw blocks on the left with cords running to three dials on the right marked for position, size and colour"
-/>
-
 | Data column | Aesthetic |
 | --- | --- |
 | `displ` | x position |
@@ -144,6 +139,11 @@ value displ." It is "**let the column `displ` *vary* x across the
 rows.**" Each row gets its own x from its own `displ`. A mapping is a
 *rule applied to every row*, not a single value. This distinction is
 the entire subject of the next page, mapping versus setting.
+
+<Figure
+  slug="gg-aesthetic-mappings-inline-cutout"
+  alt="A column of raw blocks on the left with cords running to three dials on the right marked for position, size and colour"
+/>
 
 <MultipleChoice
   markdown={`In ggplot2, what is an "aesthetic"?

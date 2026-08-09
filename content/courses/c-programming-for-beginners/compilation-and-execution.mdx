@@ -18,11 +18,6 @@ to one specific stage.
 
 The pipeline runs **`hello.c` → Preprocessor → Compiler → Assembler → Linker → Executable**, and then the operating system loads and runs that executable.
 
-<Figure
-  slug="c-compilation-and-execution-inline-cutout"
-  alt="A source card fed into a machine, an object block leaving it, and that block driving a second machine"
-/>
-
 | Stage         | Input              | Output             | Job                                                  |
 |---------------|--------------------|--------------------|------------------------------------------------------|
 | Preprocessor  | `.c` + `.h` files  | one big `.c` file  | Handle `#include`, `#define`, `#ifdef`, comments     |
@@ -129,6 +124,11 @@ something has gone very wrong, probably in the compiler.
 The linker stitches all the `.o` files together into one executable.
 It also pulls in the **standard library** (which contains the
 compiled machine code for `printf`, `malloc`, and friends).
+
+<Figure
+  slug="c-compilation-and-execution-inline-cutout"
+  alt="A source card fed into a machine, an object block leaving it, and that block driving a second machine"
+/>
 
 The linker's job is to resolve every undefined symbol. If it can't,
 you see errors like:

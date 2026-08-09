@@ -49,11 +49,6 @@ one that throws on failure (`add`, `remove`, `element`). **Prefer
 the soft versions**, they make queue-emptiness a value, not an
 exception.
 
-<Figure
-  slug="jcol-queues-and-deques-inline-cutout"
-  alt="A straight channel with a gate at each end, a block entering at the left and leaving at the right, and one block being pushed back in at the end it came from"
-/>
-
 ## ArrayDeque: the modern default
 
 `ArrayDeque` is the default implementation of `Deque`, and the
@@ -219,6 +214,11 @@ Swap the `Queue` for an `ArrayDeque`-as-stack and you have DFS.
 **smallest** element according to natural order (or a `Comparator`
 you provide). It is backed by a *binary heap*, so `offer` and
 `poll` are both `O(log n)`.
+
+<Figure
+  slug="jcol-queues-and-deques-inline-cutout"
+  alt="A straight channel with a gate at each end, a block entering at the left and leaving at the right, and one block being pushed back in at the end it came from"
+/>
 
 <CodeBlock
   adapter="java"

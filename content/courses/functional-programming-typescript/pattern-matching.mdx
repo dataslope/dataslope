@@ -21,11 +21,6 @@ matching: *the compiler refuses to build code that forgets a case*.
 A discriminated union is a sum type where every variant has a
 **literal tag** (called a *discriminant*) on the same property name.
 
-<Figure
-  slug="fp-pattern-matching-inline-cutout"
-  alt="A shape sorter board with four differently cut holes, each shape dropping through the one hole it fits and landing in its own tray"
-/>
-
 <CodeBlock
   adapter="typescript"
   files={[
@@ -267,6 +262,11 @@ type Pair = readonly [Light, boolean];
 ```
 
 …then `switch` on a derived discriminant such as
+
+<Figure
+  slug="fp-pattern-matching-inline-cutout"
+  alt="A shape sorter board with four differently cut holes, each shape dropping through the one hole it fits and landing in its own tray"
+/>
 ``` `${current}:${emergency}` ```.
 
 ## A visual model

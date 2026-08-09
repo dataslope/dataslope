@@ -76,6 +76,12 @@ any object. Dereferencing it is undefined behavior, usually a
 crash. Initialize every pointer to *something* (often `nullptr`)
 and check before dereferencing.
 
+<Figure
+  slug="cpp-pointers-null-mistake-cutout"
+  alt="A row of six pigeonholes, five holding a solid shape and the middle one empty, with a small figure reaching into the empty one"
+  caption="Tony Hoare added the null reference to ALGOL W in 1965, and called it his billion-dollar mistake in 2009."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -114,12 +120,6 @@ Hoare introduced null into the ALGOL W language in 1965, and in a
 > innumerable errors, vulnerabilities, and system crashes, which
 > have probably caused a billion dollars of pain and damage in the
 > last forty years.
-
-<Figure
-  slug="cpp-pointers-null-mistake-cutout"
-  alt="A row of six pigeonholes, five holding a solid shape and the middle one empty, with a small figure reaching into the empty one"
-  caption="Tony Hoare added the null reference to ALGOL W in 1965, and called it his billion-dollar mistake in 2009."
-/>
 
 C++ inherits the mistake, every pointer type carries a "maybe
 nothing" state whether you want it or not. The discipline that

@@ -25,11 +25,6 @@ just a vector of numbers, which is exactly what an algorithm can work with.
 Bag-of-words turns a whole collection of documents into a table of numbers in
 a fixed sequence of steps.
 
-<Figure
-  slug="nlp-bag-of-words-inline-cutout"
-  alt="A bag tipped out onto a bench so the word tiles land in a heap with their order lost, and a tally rack counting each kind"
-/>
-
 1. **Documents** come in (`doc1`, `doc2`, `doc3`).
 2. **Tokenize and clean** each document.
 3. **Build the vocabulary**, all distinct words across the corpus.
@@ -130,6 +125,11 @@ Sometimes you care only *whether* a word appears, not how often, for short
 texts or spam-style signals, presence is enough and is less swayed by length.
 That variant is **binary** bag-of-words: each cell is 1 or 0 instead of a
 count.
+
+<Figure
+  slug="nlp-bag-of-words-inline-cutout"
+  alt="A bag tipped out onto a bench so the word tiles land in a heap with their order lost, and a tally rack counting each kind"
+/>
 
 <CodeBlock
   adapter="python"

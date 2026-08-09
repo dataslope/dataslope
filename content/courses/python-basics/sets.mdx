@@ -16,11 +16,6 @@ Every snippet on this page runs in your browser, no setup required.
 
 Like dicts, sets are implemented as **hash tables**. A set is essentially a dict with only keys (no values). This gives O(1) average-case membership testing, insertion, and deletion.
 
-<Figure
-  slug="python-sets-inline-cutout"
-  alt="A bin that takes each distinct block once, an identical second block bouncing off its rim onto the bench"
-/>
-
 ```mermaid
 flowchart LR
     A["Set: <code>{1, 2, 3}</code>"] --> B["<code>hash(1)</code> → bucket"]
@@ -35,6 +30,11 @@ Sets and dicts share the same underlying implementation: hash tables. A set is l
 ## Creating sets
 
 The literal syntax uses curly braces, but **without** colons.
+
+<Figure
+  slug="python-sets-inline-cutout"
+  alt="A bin that takes each distinct block once, an identical second block bouncing off its rim onto the bench"
+/>
 
 <CodeBlock
   adapter="python"

@@ -32,11 +32,6 @@ A BST is not necessarily sorted in memory. It is sorted by the relationship betw
 
 At each node, compare the target with the current value and choose one branch.
 
-<Figure
-  slug="dsa-binary-search-trees-inline-cutout"
-  alt="A branching frame where every left branch carries a smaller block and every right branch a larger one, a hand following one path down"
-/>
-
 <CodeBlock
   adapter="cpp"
   files={[
@@ -249,6 +244,11 @@ int main() {
 ## Complexity and balance
 
 Every operation follows one root-to-leaf path, so cost is O(h), where `h` is height, and there lies the BST's embarrassing secret. Height depends on *insertion order*. Insert `{4, 2, 6, 1, 3, 5, 7}` and you get a bushy tree of height 3. Insert the same values as `{1, 2, 3, 4, 5, 6, 7}` and every node hangs off the right of the previous one: the "tree" is a linked list in disguise, and every operation is O(n). Sorted input, the most natural input in the world, is the BST's worst case, just as it was naive quicksort's.
+
+<Figure
+  slug="dsa-binary-search-trees-inline-cutout"
+  alt="A branching frame where every left branch carries a smaller block and every right branch a larger one, a hand following one path down"
+/>
 
 | Shape | Height | Operation cost |
 | --- | --- | --- |

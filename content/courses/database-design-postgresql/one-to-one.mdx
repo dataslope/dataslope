@@ -21,11 +21,6 @@ separate table makes the design clearer or safer.
 Imagine a `users` table that starts small, then grows a large set of
 profile details. Some users have those details, many do not.
 
-<Figure
-  slug="db-one-to-one-inline-cutout"
-  alt="Two crates facing each other joined by a single short bar, with no free sockets left on either side"
-/>
-
 ```mermaid
 flowchart TB
     Wide["Wide users table<br/>id | email | <code>display_name</code> | bio | <code>avatar_url</code> | timezone | preferences"]
@@ -110,6 +105,11 @@ One-to-one needs both a reference and a uniqueness rule on that reference.`}
 
 This example models optional user profiles. Ada and Grace are users;
 Ada has a profile, and Grace does not yet.
+
+<Figure
+  slug="db-one-to-one-inline-cutout"
+  alt="Two crates facing each other joined by a single short bar, with no free sockets left on either side"
+/>
 
 <SqlCodeBlock
   dialect="postgres"

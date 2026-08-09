@@ -20,11 +20,6 @@ When you mention an array name in most expressions, the compiler
 silently converts it to **a pointer to its first element**. This is
 called *array-to-pointer decay*.
 
-<Figure
-  slug="c-pointers-and-arrays-inline-cutout"
-  alt="A strip of equal cells with a marker resting on the first, and the same marker two cells further along having jumped exactly two cell widths"
-/>
-
 ```c
 int a[5] = {10, 20, 30, 40, 50};
 int *p = a;          // same as &a[0]
@@ -180,6 +175,11 @@ void *memcpy(void *dest, const void *src, size_t n);
 
 Idiomatic C functions take a pointer to the first element **and** a
 size. Always.
+
+<Figure
+  slug="c-pointers-and-arrays-inline-cutout"
+  alt="A strip of equal cells with a marker resting on the first, and the same marker two cells further along having jumped exactly two cell widths"
+/>
 
 ## Pointer subtraction
 

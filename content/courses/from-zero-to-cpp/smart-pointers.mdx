@@ -57,11 +57,6 @@ int main() {
 two reasons: it's exception-safe in surprising ways, and you never
 have to write the type twice.
 
-<Figure
-  slug="cpp-smart-pointers-inline-cutout"
-  alt="A crate carried by a handle that unclips itself, the crate dropping neatly into a return chute the moment the last hand lets go"
-/>
-
 A `unique_ptr` cannot be copied, only **moved** (next chapter).
 That single restriction enforces "exactly one owner" at compile
 time:
@@ -185,6 +180,11 @@ For things that already manage their own storage (`std::vector`,
 `std::string`, `std::map`, ...), you do *not* need smart pointers.
 A `std::vector<Widget>` already owns its Widgets. Wrapping vectors
 in smart pointers is almost always wrong.
+
+<Figure
+  slug="cpp-smart-pointers-inline-cutout"
+  alt="A crate carried by a handle that unclips itself, the crate dropping neatly into a return chute the moment the last hand lets go"
+/>
 
 Use smart pointers when you have a single *polymorphic* object whose
 lifetime needs explicit management, e.g., `std::unique_ptr<Shape>`

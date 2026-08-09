@@ -44,11 +44,6 @@ package ships, the price drops. And **protect** facts: do not
 accept an order with no customer, do not lose today's sales if
 the power flickers.
 
-<Figure
-  slug="lite-what-is-a-database-inline-cutout"
-  alt="A single compact box on a bench with a whole cabinet's worth of drawers folded inside it"
-/>
-
 The first three jobs sound easy. The fourth is where things get
 interesting, and it is the real reason databases exist.
 
@@ -58,6 +53,11 @@ A reasonable first instinct: skip the database, write everything
 into a file. Sometimes that genuinely is the right answer, a
 photo, a PDF, a configuration file. But for *facts that change
 and matter*, plain files hide three hard problems.
+
+<Figure
+  slug="lite-what-is-a-database-inline-cutout"
+  alt="A single compact box on a bench with a whole cabinet's worth of drawers folded inside it"
+/>
 
 **Problem one: memory disappears and files corrupt.** A program's
 memory vanishes the instant it exits, so the data must reach disk.

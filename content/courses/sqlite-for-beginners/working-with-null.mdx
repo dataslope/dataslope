@@ -33,11 +33,6 @@ flowchart TB
 For a `phone` column, an empty string could mean someone intentionally
 entered a blank phone. `NULL` means the phone number is not known.
 
-<Figure
-  slug="lite-working-with-null-inline-cutout"
-  alt="Two sockets side by side, one holding a zero-height block and one holding a small cover, clearly not the same thing"
-/>
-
 <SqlCodeBlock
   dialect="sqlite"
   title="See zero, empty text, and NULL"
@@ -143,6 +138,11 @@ slowly. Most programming logic has two truth values: true and
 false. SQL has **three**: true, false, and *unknown*. This system
 is called **three-valued logic**, and it follows directly from
 what `NULL` means.
+
+<Figure
+  slug="lite-working-with-null-inline-cutout"
+  alt="Two sockets side by side, one holding a zero-height block and one holding a small cover, clearly not the same thing"
+/>
 
 Think of a `NULL` as a sealed envelope. There may be a number
 inside; you simply cannot see it. Now someone asks: "is the value

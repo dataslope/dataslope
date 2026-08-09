@@ -55,6 +55,12 @@ The intercept is where the line crosses the vertical axis (the prediction
 when the feature is zero). The slope is how steeply the line rises, how
 much the prediction changes for each one-unit increase in the feature.
 
+<Figure
+  slug="ml-linear-regression-ceres-cutout"
+  alt="A telescope aimed across a dark band where a small rock is crossing, and a sheet carrying a curve with one marker on it"
+  caption="1801: least squares put to work to predict where Ceres would reappear after passing behind the sun."
+/>
+
 But which line? Infinitely many lines pass *near* a cloud of points. Linear
 regression picks the one that makes the **total squared error** as small as
 possible. For each point, the error is the vertical gap between the real
@@ -70,12 +76,6 @@ have used it earlier, and famously put it to work in 1801 to predict where
 the newly discovered asteroid Ceres would reappear after slipping behind the
 sun. His least-squares forecast was strikingly accurate, and the method has
 anchored statistics ever since.
-
-<Figure
-  slug="ml-linear-regression-ceres-cutout"
-  alt="A telescope aimed across a dark band where a small rock is crossing, and a sheet carrying a curve with one marker on it"
-  caption="1801: least squares put to work to predict where Ceres would reappear after passing behind the sun."
-/>
 
 ```mermaid
 flowchart TD

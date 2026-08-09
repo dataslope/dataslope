@@ -30,11 +30,6 @@ They render from the bottom up:
 The base `ggplot()` call sets up the shared space; each `+ geom_*()`
 paints a transparent sheet over it.
 
-<Figure
-  slug="gg-thinking-in-layers-inline-cutout"
-  alt="Three transparent panels held apart in a stepped stack, one carrying points, one a line, one a band, and the finished plot below where they line up"
-/>
-
 ## Layers stack in order
 
 Because layers draw in the order you add them, **order can matter**
@@ -76,6 +71,11 @@ ggplot(mpg, aes(displ, hwy)) +
 Same components, different stacking order, different result where they
 overlap. The points and line are *independent layers*; you composite
 them in whatever order tells your story best.
+
+<Figure
+  slug="gg-thinking-in-layers-inline-cutout"
+  alt="Three transparent panels held apart in a stepped stack, one carrying points, one a line, one a band, and the finished plot below where they line up"
+/>
 
 ## Each layer can have its own data and mappings
 

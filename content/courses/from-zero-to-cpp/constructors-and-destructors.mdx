@@ -19,11 +19,6 @@ management in C++.
 A constructor is a special method named after the class. It runs
 once, automatically, when an object is created.
 
-<Figure
-  slug="cpp-constructors-and-destructors-inline-cutout"
-  alt="A workbench where a crate is assembled and filled at the left, used in the middle, and emptied and folded flat at the right"
-/>
-
 <CodeBlock
   adapter="cpp"
   files={[
@@ -98,6 +93,11 @@ If you write *no* constructors, the compiler gives you a default
 constructor that default-initializes each field. The moment you
 write *any* constructor, the compiler-generated default goes away.
 If you still want it, write `Rect() = default;`.
+
+<Figure
+  slug="cpp-constructors-and-destructors-inline-cutout"
+  alt="A workbench where a crate is assembled and filled at the left, used in the middle, and emptied and folded flat at the right"
+/>
 
 ## The destructor releases resources
 

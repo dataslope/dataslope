@@ -58,11 +58,6 @@ print(departments)
 Only rows where the key is present in both. This is the
 default.
 
-<Figure
-  slug="pandas-merging-and-joining-inline-cutout"
-  alt="Two grids with a matching column of keys sliding together like a zip, the joined rows emerging as one wider grid on the right"
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -370,6 +365,11 @@ print(all_check[all_check["_merge"] == "right_only"])
 
 This is the everyday detective work of joining real datasets:
 first check coverage, then narrow down what's missing and why.
+
+<Figure
+  slug="pandas-merging-and-joining-inline-cutout"
+  alt="Two grids with a matching column of keys sliding together like a zip, the joined rows emerging as one wider grid on the right"
+/>
 
 ## Mini challenge
 

@@ -21,11 +21,6 @@ A **constraint** is a rule the database checks on every write: every
 `INSERT`, every `UPDATE`, and sometimes every `DELETE`. If the new data
 breaks the rule, PostgreSQL rejects the write.
 
-<Figure
-  slug="db-what-are-constraints-inline-cutout"
-  alt="A chute with three gauges fitted across it, each stopping a block that fails to meet its measure"
-/>
-
 That rejection is not a failure of the database. It is the database
 protecting the meaning of your data.
 
@@ -183,6 +178,11 @@ Constraints are for rules that determine whether stored data is valid.`}
 Without constraints, bad data can sit quietly for months. A report is
 wrong, a join loses rows, or a customer cannot sign in, and the cause
 is an old invalid row.
+
+<Figure
+  slug="db-what-are-constraints-inline-cutout"
+  alt="A chute with three gauges fitted across it, each stopping a block that fails to meet its measure"
+/>
 
 With constraints, the mistake is caught at the door. The writer gets an
 error immediately, when the bad value is still close to the code or

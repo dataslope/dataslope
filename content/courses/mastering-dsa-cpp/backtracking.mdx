@@ -41,11 +41,6 @@ sequenceDiagram
 
 The cleanest first example: print every ordering of `{1, 2, 3}`. The choice at position `idx` is "which remaining element goes here?", implemented as a swap; the un-choose is the swap back. Watch the symmetry in the code, `swap`, recurse, `swap`, that is the template in its purest form. (There are n! permutations, so this is inherently factorial work; backtracking doesn't make exponential spaces small, it just avoids exploring them redundantly.)
 
-<Figure
-  slug="dsa-backtracking-inline-cutout"
-  alt="A maze of low walls with a route drawn to a dead end, that stretch rubbed out, and the route resumed from the last junction"
-/>
-
 <CodeBlock
   adapter="cpp"
   files={[
@@ -140,6 +135,11 @@ int main() {
 ## N-Queens
 
 The aristocrat of backtracking puzzles: place n queens on an n×n chessboard so that none attacks another. It was posed for the standard board by the chess composer Max Bezzel in 1848, drew the attention of Gauss, and has been the canonical backtracking demo ever since, Dijkstra used it in 1972 to showcase structured programming. (For the record: the 8×8 board has 92 solutions out of 4.4 billion ways to place 8 queens, pruning is not optional.)
+
+<Figure
+  slug="dsa-backtracking-inline-cutout"
+  alt="A maze of low walls with a route drawn to a dead end, that stretch rubbed out, and the route resumed from the last junction"
+/>
 
 The setup does most of the work. Place one queen per row, so the only choice per level is the column; then attacks reduce to three constraint arrays, columns, and the two diagonal directions, where `r - c` is constant on one diagonal family and `r + c` on the other. A placement is legal only if all three slots are free; mark them (choose), recurse to the next row (explore), unmark them (un-choose).
 

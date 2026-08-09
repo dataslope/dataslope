@@ -29,11 +29,6 @@ if (condition) {
 The `condition` is any expression. If its value is truthy, the
 block runs; otherwise it is skipped entirely.
 
-<Figure
-  slug="js-conditionals-inline-cutout"
-  alt="A chute with a hinged flap, blocks that clear a marked height going one way and the rest going the other"
-/>
-
 <CodeBlock
   adapter="javascript"
   files={[
@@ -261,6 +256,11 @@ A few things to know about `switch`:
   several days share one outcome), but it is a common source of
   bugs.
 - The `default` clause is optional and acts like `else`.
+
+<Figure
+  slug="js-conditionals-inline-cutout"
+  alt="A chute with a hinged flap, blocks that clear a marked height going one way and the rest going the other"
+/>
 
 Many modern codebases avoid `switch` and use plain `if`/`else if`
 or a lookup object. Use it if it makes a particular piece of code

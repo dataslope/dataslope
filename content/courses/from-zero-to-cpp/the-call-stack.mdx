@@ -27,11 +27,6 @@ variables, and bookkeeping (most importantly, the **return address**,
 *where in the caller's code execution should resume when this
 function returns*).
 
-<Figure
-  slug="cpp-the-call-stack-inline-cutout"
-  alt="A vertical column of trays being added one on top of another as a figure climbs, and the same trays being taken off from the top as they climb back down"
-/>
-
 ```mermaid
 flowchart TB
     subgraph "Stack (grows downward in this diagram)"
@@ -195,6 +190,11 @@ The stack is *finite*. On most desktop OSes it's about 1 MB to 8 MB.
 If you call functions deep enough, typically through unbounded
 recursion, the stack runs out of room, and the program crashes
 with a **stack overflow**.
+
+<Figure
+  slug="cpp-the-call-stack-inline-cutout"
+  alt="A vertical column of trays being added one on top of another as a figure climbs, and the same trays being taken off from the top as they climb back down"
+/>
 
 <CodeBlock
   adapter="cpp"

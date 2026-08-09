@@ -26,11 +26,6 @@ so they would all stack onto a single vertical line and you could not tell
 one from a hundred. The fix is **jitter**, a small random horizontal
 nudge that spreads the points out so you can see them.
 
-<Figure
-  slug="sns-strip-and-swarm-plots-inline-cutout"
-  alt="One column of chips overlapping in a line, and beside it the same chips nudged sideways so none overlap"
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -190,6 +185,11 @@ colors. Try setting `dodge=False` to see why the separation helps.
   the dots overplot into a smear (strip) or refuse to stay separated (swarm,
   which warns and overlaps). At that scale, switch to a low-`alpha` strip, or
   to a box/violin summary.
+
+<Figure
+  slug="sns-strip-and-swarm-plots-inline-cutout"
+  alt="One column of chips overlapping in a line, and beside it the same chips nudged sideways so none overlap"
+/>
 
 <MultipleChoice
   markdown={`What is the purpose of **jitter** in a strip plot?

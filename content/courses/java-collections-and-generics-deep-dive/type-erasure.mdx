@@ -51,11 +51,6 @@ That is the whole trick. Generics give you compile-time guarantees;
 at runtime, they look like the old `Object`-based code, with the
 casts written for you.
 
-<Figure
-  slug="jcol-type-erasure-inline-cutout"
-  alt="A box wearing a coloured tag passing through a gate that checks the tag, and the same box continuing past the gate with the tag removed"
-/>
-
 | Source | What `javac` does | Bytecode |
 | --- | --- | --- |
 | `List<String>` | type-checks the element type | `List` (of `Object`) |
@@ -228,6 +223,11 @@ it *keeps*:
   working. You can see them with `javap -v`.
 - **Compile-time safety.** This is the big one. The *whole point* of
   generics, the cast that never fails, survives erasure intact.
+
+<Figure
+  slug="jcol-type-erasure-inline-cutout"
+  alt="A box wearing a coloured tag passing through a gate that checks the tag, and the same box continuing past the gate with the tag removed"
+/>
 
 ## When erasure bites you in real life
 

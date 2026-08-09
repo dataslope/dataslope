@@ -28,11 +28,6 @@ detail ($n-1$) that trips up almost everyone.
 Let's make the delivery story concrete. Both services have a mean of
 30, but everything that matters is in the spread.
 
-<Figure
-  slug="stat-measures-of-spread-inline-cutout"
-  alt="Two rows of chips of the same width, one clustered tightly at the centre and one spread evenly end to end"
-/>
-
 <Chart slug="spread-same-center" />
 
 <CodeBlock
@@ -387,6 +382,11 @@ In practice you compute several spread measures together and read them
 against each other, just like you did with centers. A big gap between
 the standard deviation and the IQR is itself a clue that outliers or
 skew are present.
+
+<Figure
+  slug="stat-measures-of-spread-inline-cutout"
+  alt="Two rows of chips of the same width, one clustered tightly at the centre and one spread evenly end to end"
+/>
 
 <CodeBlock
   adapter="python"

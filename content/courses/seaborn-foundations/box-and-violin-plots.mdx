@@ -22,11 +22,6 @@ A **box plot** (or box-and-whisker plot) compresses a distribution into a
 handful of robust summary numbers based on **quartiles**, the values that
 cut the sorted data into four equal parts.
 
-<Figure
-  slug="sns-box-and-violin-plots-inline-cutout"
-  alt="An upright box with whisker rods beside a symmetric bulging shape of the same height, both drawn over the same column of chips"
-/>
-
 Reading the parts:
 
 - **The box** spans the first quartile (**Q1**, 25th percentile) to the
@@ -234,6 +229,11 @@ Because a violin *is* a KDE, it inherits the KDE's caveats: it needs enough
 data per group to be trustworthy, and its smoothing can spill past the
 data's real range. A violin drawn over five points is decoration, not
 evidence.
+
+<Figure
+  slug="sns-box-and-violin-plots-inline-cutout"
+  alt="An upright box with whisker rods beside a symmetric bulging shape of the same height, both drawn over the same column of chips"
+/>
 
 <Callout type="warn" title="Violins need data; box plots tolerate scarcity">
 With small groups, a box plot's quartiles are still meaningful, but a

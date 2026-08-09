@@ -42,11 +42,6 @@ is behavior: how much each person listens to each genre, time of day,
 session length. You suspect there are natural *types* of listener in
 there, but which ones, and who belongs to which?
 
-<Figure
-  slug="ml-k-means-clustering-inline-cutout"
-  alt="A board of scattered chips with three marker posts, each chip joined by a short cord to its nearest post, the posts standing at the middle of their own group"
-/>
-
 This is the core unsupervised question: **given unlabeled examples, can we
 group them so that members of a group resemble each other?** That grouping
 is called a **cluster**, and finding clusters is **cluster analysis**.
@@ -489,6 +484,11 @@ around its center, a roughly round, convex region. When the real groups
 are round-ish blobs, perfect. But when the true shape is a crescent, a
 ring, or a long thin band, "nearest center" is the wrong rule, and k-means
 fails in a way that looks confident and is completely wrong.
+
+<Figure
+  slug="ml-k-means-clustering-inline-cutout"
+  alt="A board of scattered chips with three marker posts, each chip joined by a short cord to its nearest post, the posts standing at the middle of their own group"
+/>
 
 The classic demonstration is `make_moons`: two interleaving crescents that
 any human eye separates instantly. Watch k-means butcher them.

@@ -55,11 +55,6 @@ A `HashSet`:
 - Offers `add`, `remove`, `contains` in (effectively) constant
   time, on average.
 
-<Figure
-  slug="java-maps-and-sets-inline-cutout"
-  alt="A wall of keyed drawers on the left and a plain bin on the right that will hold only one of each block"
-/>
-
 Use a `Set` when you need to ask "have I seen this before?" or
 "what are the *distinct* values?"
 
@@ -233,6 +228,11 @@ The fastest way to slow down a small program is to reach for a
 "map" has exactly the same three keys every time (`"name"`, `"age"`,
 `"city"`), make a class. Maps are for *dynamic* sets of keys you
 genuinely don't know in advance.
+
+<Figure
+  slug="java-maps-and-sets-inline-cutout"
+  alt="A wall of keyed drawers on the left and a plain bin on the right that will hold only one of each block"
+/>
 
 <MultipleChoice
   markdown={`What happens if you add the same string twice to a HashSet?

@@ -32,11 +32,6 @@ least 16 bits). The actual sizes depend on the target. The WASI
 target used by this sandbox is 32-bit: `int` is 4 bytes and `void *`
 is 4 bytes.
 
-<Figure
-  slug="sysc-data-types-and-memory-inline-cutout"
-  alt="Four blocks of visibly different widths resting on a strip of equal cells, each block covering a different count of cells"
-/>
-
 <CodeBlock
   adapter="c"
   files={[
@@ -102,6 +97,11 @@ wrap-around (e.g. a hash function), use unsigned.
 Because `int`, `long`, etc. vary across platforms, anything you write
 to disk, send over a network, or talk to hardware with should use the
 fixed-width types from `<stdint.h>`.
+
+<Figure
+  slug="sysc-data-types-and-memory-inline-cutout"
+  alt="Four blocks of visibly different widths resting on a strip of equal cells, each block covering a different count of cells"
+/>
 
 | Type | Width | Use case |
 | --- | --- | --- |

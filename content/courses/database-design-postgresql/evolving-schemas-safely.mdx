@@ -28,11 +28,6 @@ A **migration** is an intentional change to the schema. It might add a
 column, create a table, copy data, add a constraint, or remove an old
 column after the new design is ready.
 
-<Figure
-  slug="db-evolving-schemas-safely-inline-cutout"
-  alt="A cabinet gaining a new drawer while the drawers already in use stay open and undisturbed"
-/>
-
 Good migrations are:
 
 - small enough to understand
@@ -55,6 +50,11 @@ operations; it is how to protect meaning while the model changes.
 An **additive** change adds something without removing the old shape.
 Examples include adding a nullable column, adding a new table, or
 adding a new relationship table.
+
+<Figure
+  slug="db-evolving-schemas-safely-inline-cutout"
+  alt="A cabinet gaining a new drawer while the drawers already in use stay open and undisturbed"
+/>
 
 A **destructive** change removes or changes something existing. Dropping
 a column, renaming a table, or changing a required type can break code

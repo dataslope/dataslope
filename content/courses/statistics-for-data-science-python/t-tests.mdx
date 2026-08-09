@@ -34,11 +34,6 @@ Strip away the bookkeeping and it's just a ratio:
 
 `t = (difference you observed) / (noise in that difference)`
 
-<Figure
-  slug="stat-t-tests-inline-cutout"
-  alt="Two mounds of chips side by side with a caliper measuring the gap between their peaks against the width of the mounds"
-/>
-
 The numerator is the **signal**, how far the means are apart. The
 denominator is the **standard error**, the typical size of the random
 wobble you'd expect even if nothing were going on (you met the standard
@@ -513,6 +508,11 @@ like the Mann–Whitney U or Wilcoxon signed-rank test, covered in
 ## When to use a t-test, and when not to
 
 **Reach for a t-test when:**
+
+<Figure
+  slug="stat-t-tests-inline-cutout"
+  alt="Two mounds of chips side by side with a caliper measuring the gap between their peaks against the width of the mounds"
+/>
 
 - You're comparing **means** (averages), and
 - The data is numeric/continuous, and

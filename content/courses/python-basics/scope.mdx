@@ -29,11 +29,6 @@ Understanding scope is critical because:
 
 The LEGB rule is simple, but its implications are profound.
 
-<Figure
-  slug="python-scope-inline-cutout"
-  alt="Four frames standing nested one inside another with a block resting in each, and a hand reaching out from the innermost frame through each one in turn until it finds the block it wants"
-/>
-
 ```mermaid
 flowchart TD
     A["Looking for name x"] --> B["Local scope?"]
@@ -151,6 +146,11 @@ print(c(), c(), c())
 />
 
 Each call to `make_counter()` returns a fresh `step` with its own private `count`. This is the basis of **decorators**, **factory functions**, and many Pythonic patterns.
+
+<Figure
+  slug="python-scope-inline-cutout"
+  alt="Four frames standing nested one inside another with a block resting in each, and a hand reaching out from the innermost frame through each one in turn until it finds the block it wants"
+/>
 
 <Callout type="tip" title="Closures vs classes">
 A closure is a lightweight alternative to a class when you need "a function with private state." For simple cases (like a counter), a closure is cleaner. For complex state with multiple methods, use a class.

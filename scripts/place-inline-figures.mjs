@@ -49,6 +49,9 @@
  *   --only <ids>   Comma-separated prompt ids to consider
  *   --audit        Report placed bands whose alt text no longer matches its
  *                  prompt subject, and any that are unterminated; write nothing
+ *   --reflow       Lift every already-placed band and re-anchor it. Use after
+ *                  changing where bands go; without it, placement leaves the
+ *                  bands already on the page exactly where they are.
  *   --fix-alt      Rewrite those alt texts from their subjects. Rewording a
  *                  subject and redrawing its art leaves the old description on
  *                  the page, which is worse than none — this is the repair.
@@ -60,13 +63,14 @@ import { fileURLToPath } from "node:url";
 const ROOT = new URL("..", import.meta.url).pathname;
 
 function parseArgs(argv) {
-  const opts = { write: false, only: null, audit: false, fixAlt: false, help: false };
+  const opts = { write: false, only: null, audit: false, fixAlt: false, reflow: false, help: false };
   for (let i = 0; i < argv.length; i++) {
     switch (argv[i]) {
       case "--write": opts.write = true; break;
       case "--only": opts.only = new Set(String(argv[++i]).split(",").filter(Boolean)); break;
       case "--audit": opts.audit = true; break;
       case "--fix-alt": opts.audit = true; opts.fixAlt = true; break;
+      case "--reflow": opts.reflow = true; break;
       case "-h":
       case "--help": opts.help = true; break;
       default:
@@ -119,32 +123,126 @@ const isProse = (line) =>
 
 const altFor = (prompt) => prompt.subject.charAt(0).toUpperCase() + prompt.subject.slice(1);
 
+/** Words too common to say anything about which section a figure belongs to. */
+const STOPWORDS = new Set([
+  "the", "and", "for", "with", "from", "into", "your", "that", "this", "what",
+  "when", "how", "why", "are", "its", "over", "under", "them", "they", "you",
+  "first", "more", "than", "then", "each", "one", "two", "three", "data",
+]);
+
+/**
+ * Content words from a figure's title, and only its title.
+ *
+ * The lesson slug was in here too and had to come out. On a page carrying
+ * several figures — `real-world-disasters` has four — the slug is identical for
+ * all of them, so every figure scored "real", "world" and "disasters" equally
+ * across every section and the signal that separates them drowned. Heartbleed
+ * landed in "How modern systems push back" rather than the section named after
+ * it. The title alone is what distinguishes one band on a page from another.
+ */
+function keywordsFor(prompt) {
+  return [...new Set(
+    prompt.title
+      .toLowerCase()
+      .split(/[^a-z]+/)
+      .filter((w) => w.length >= 4 && !STOPWORDS.has(w)),
+  )];
+}
+
+/** `## ` sections as {heading, start, end}, ignoring headings inside code. */
+function sectionsOf(lines, code, floor) {
+  const heads = [];
+  for (let i = floor; i < lines.length; i++) {
+    if (!code[i] && /^##\s/.test(lines[i])) heads.push(i);
+  }
+  if (!heads.length) return [{ heading: "", start: floor, end: lines.length }];
+  return heads.map((start, k) => ({
+    heading: lines[start],
+    start,
+    end: heads[k + 1] ?? lines.length,
+  }));
+}
+
 /**
  * The line index to insert at, or -1 when the page offers no anchor.
  *
- * `floor` is where scanning starts: past the lesson's own figure, and past the
- * first `## ` heading when there is one.
+ * The band goes in the section that actually discusses it, which is both more
+ * useful to a reader and the thing that stops placement looking mechanical.
+ *
+ * The first version of this anchored every band to the first paragraph after
+ * the first `## ` heading. That is a defensible rule and it produced a median
+ * depth of 9%: 87% of 671 bands sat in the top fifth of their page and not one
+ * sat below 70%. Every lesson opened with its illustration, a paragraph, and
+ * then a band, over and over. Correct by the rule, and obviously formulaic on
+ * the page.
+ *
+ * So sections are scored on how much of the figure's own vocabulary they carry
+ * — its title and lesson slug, which speak the lesson's language, rather than
+ * its subject, which speaks in rails and chutes and trays — and the band goes
+ * to the best match. A heading hit counts triple: a section called "Outer
+ * joins" is a stronger signal than one that mentions joins in passing.
+ *
+ * Two guards keep that honest. The opening section is excluded whenever a page
+ * has three or more, because it belongs to the lesson's own illustration. And
+ * when nothing scores at all — a page whose headings are "Exercises" and
+ * "Recap" — the middle section is taken rather than defaulting to the top,
+ * since an arbitrary choice may as well be an arbitrary choice that varies.
  */
-export function anchorFor(lines, code) {
+export function anchorFor(lines, code, prompt) {
+  // Past the lesson's own figure — the *first* one on the page. This used to
+  // take the last, which was indistinguishable while a page held exactly one
+  // figure and wrong the moment reflow ran against pages that already carried
+  // bands: the floor jumped past every band on the page, leaving only the
+  // sections below the last of them as candidates.
   let floor = 0;
   for (let i = 0; i < lines.length; i++) {
     if (code[i] === "jsx" && lines[i].includes("<Figure")) {
       while (i < lines.length && !/^\s*\/>/.test(lines[i])) i++;
       floor = i + 1;
+      break;
     }
   }
-  const heading = lines.findIndex((l, i) => !code[i] && /^##\s/.test(l));
-  if (heading > floor) floor = heading + 1;
 
-  let paragraphs = 0;
+  const all = sectionsOf(lines, code, floor);
+  const candidates = all.length >= 3 ? all.slice(1) : all;
+  const keywords = prompt ? keywordsFor(prompt) : [];
+
+  let best = null;
+  let bestScore = 0;
+  for (const section of candidates) {
+    // A section already holding a band is spoken for. Four figures on one page
+    // should sit in four sections, not stack in whichever scores highest.
+    const occupied = lines
+      .slice(section.start, section.end)
+      .some((l) => /slug="[a-z0-9-]+-cutout"/.test(l));
+    if (occupied) continue;
+    const heading = section.heading.toLowerCase();
+    const body = lines.slice(section.start, section.end).join(" ").toLowerCase();
+    let score = 0;
+    for (const word of keywords) {
+      if (heading.includes(word)) score += 3;
+      const hits = body.split(word).length - 1;
+      if (hits) score += Math.min(hits, 3);
+    }
+    if (score > bestScore) { bestScore = score; best = section; }
+  }
+  if (!best) best = candidates[Math.floor(candidates.length / 2)] ?? all[0];
+
+  // Inside the chosen section, the first paragraph that is not a lead-in.
+  for (let i = Math.max(best.start, floor); i < best.end; i++) {
+    if (code[i] || !isProse(lines[i])) continue;
+    let j = i;
+    while (j + 1 < lines.length && lines[j + 1].trim() !== "" && !code[j + 1]) j++;
+    if (lines[j].trimEnd().endsWith(":")) { i = j; continue; }
+    return j + 1;
+  }
+  // A section of nothing but code or lists: fall back to anywhere below the floor.
   for (let i = floor; i < lines.length; i++) {
     if (code[i] || !isProse(lines[i])) continue;
     let j = i;
     while (j + 1 < lines.length && lines[j + 1].trim() !== "" && !code[j + 1]) j++;
     if (lines[j].trimEnd().endsWith(":")) { i = j; continue; }
-    paragraphs++;
-    if (paragraphs >= (floor > 0 ? 1 : 2)) return j + 1;
-    i = j;
+    return j + 1;
   }
   return -1;
 }
@@ -210,14 +308,37 @@ function main() {
   let placed = 0;
   let already = 0;
   const stuck = [];
+  let moved = 0;
   for (const p of prompts) {
     if (!drawn.has(p.id)) continue;
     const file = `content/courses/${p.course}/${p.lesson}.mdx`;
     const src = readFileSync(file, "utf8");
-    if (src.includes(`${p.id}-cutout`)) { already++; continue; }
+    let lines = src.split("\n");
 
-    const lines = src.split("\n");
-    const at = anchorFor(lines, regions(lines));
+    if (src.includes(`${p.id}-cutout`)) {
+      if (!opts.reflow) { already++; continue; }
+      // Lift the band out — the `<Figure>` block and the blank line above it
+      // that was inserted with it — so the anchor is chosen against the page as
+      // it reads without it.
+      const slug = lines.findIndex((l) => l.includes(`slug="${p.id}-cutout"`));
+      let open = slug;
+      while (open > 0 && !lines[open].startsWith("<Figure")) open--;
+      let close = slug;
+      while (close < lines.length && !/^\s*\/>/.test(lines[close])) close++;
+      const from = open > 0 && lines[open - 1].trim() === "" ? open - 1 : open;
+      const before = lines.slice(from, close + 1);
+      lines.splice(from, close + 1 - from);
+
+      const to = anchorFor(lines, regions(lines), p);
+      if (to === -1) { stuck.push(`${p.id} (${file})`); continue; }
+      lines.splice(to, 0, ...before);
+      if (to === from) { already++; continue; }
+      moved++;
+      if (opts.write) writeFileSync(file, lines.join("\n"));
+      continue;
+    }
+
+    const at = anchorFor(lines, regions(lines), p);
     if (at === -1) { stuck.push(`${p.id} (${file})`); continue; }
 
     placed++;
@@ -230,7 +351,8 @@ function main() {
   }
   console.log(
     `\n${placed} band(s) ${opts.write ? "placed" : "would be placed"}` +
-      `, ${already} already on the page` +
+      (opts.reflow ? `, ${moved} ${opts.write ? "moved" : "would move"}` : "") +
+      `, ${already} already in place` +
       (stuck.length ? `, ${stuck.length} without an anchor:\n   ${stuck.join("\n   ")}` : ""),
   );
 }

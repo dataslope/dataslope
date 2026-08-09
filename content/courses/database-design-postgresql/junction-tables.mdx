@@ -23,11 +23,6 @@ A many-to-many relationship is hard to store directly because the
 relationship itself has many instances. A junction table gives each
 instance its own row.
 
-<Figure
-  slug="db-junction-tables-inline-cutout"
-  alt="Two rows of crates facing each other across a low bench, every cord between them passing through a peg on that bench rather than crossing directly"
-/>
-
 ```mermaid
 flowchart TD
     MN["Many-to-many<br/>students and courses"] --> J["enrollments<br/>one row per pairing"]
@@ -180,6 +175,11 @@ enrollment."
 Sometimes you will see a junction table with a surrogate `id` as its
 primary key. That can be reasonable if other tables need to point at a
 specific enrollment row.
+
+<Figure
+  slug="db-junction-tables-inline-cutout"
+  alt="Two rows of crates facing each other across a low bench, every cord between them passing through a peg on that bench rather than crossing directly"
+/>
 
 Even then, you usually still add `UNIQUE (student_id, course_id)` so
 the same pairing cannot be duplicated.

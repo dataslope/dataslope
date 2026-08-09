@@ -32,11 +32,6 @@ increases?" is the question.
 * **When it breaks:** too many overlapping lines turn into unreadable
   "spaghetti," and an unsorted x makes the line zig-zag back on itself.
 
-<Figure
-  slug="sns-relational-line-plots-inline-cutout"
-  alt="Three ribbons of different inks rising across the same board, each with its own key swatch"
-/>
-
 In Seaborn you draw one with the same `relplot` you already know, switching
 `kind="scatter"` to **`kind="line"`**.
 
@@ -232,6 +227,11 @@ strain: every extra line competes for the same space.
 ## The pitfalls: order and spaghetti
 
 Two mistakes hurt line plots more than any others.
+
+<Figure
+  slug="sns-relational-line-plots-inline-cutout"
+  alt="Three ribbons of different inks rising across the same board, each with its own key swatch"
+/>
 
 **1. Don't draw a line between unordered categories.** A line *asserts*
 that x flows from one value to the next. If x is a set of unordered

@@ -47,11 +47,6 @@ int main() {
 
 A good hash function is **deterministic**, **fast**, and distributes real inputs **uniformly** across buckets. Poor distribution creates long collision chains or probe runs.
 
-<Figure
-  slug="dsa-hash-tables-inline-cutout"
-  alt="A key dropped into a small mixing machine whose chute swings to one of several bins, and the item landing directly in that bin"
-/>
-
 <Callout type="info" title="Average case is conditional">
 Hash tables are fast because most buckets stay short. If too many keys collide, operations can degrade from O(1) average to O(n) worst case.
 </Callout>
@@ -194,6 +189,11 @@ int main() {
 ## When hashing goes wrong: the 2011 DoS attacks
 
 The "O(1) average" promise has a dark corollary: if *all* keys land in one bucket, a hash table degrades into a linked list, and every operation costs O(n). For decades that was treated as a statistical impossibility. Then someone weaponized it.
+
+<Figure
+  slug="dsa-hash-tables-inline-cutout"
+  alt="A key dropped into a small mixing machine whose chute swings to one of several bins, and the item landing directly in that bin"
+/>
 
 At the Chaos Communication Congress in December 2011, researchers Alexander Klink and Julian Wälde showed that the hash functions used by PHP, ASP.NET, Java, Python, Ruby, and others were deterministic and publicly documented, so an attacker could *precompute* tens of thousands of strings that all hash to the same bucket. Send those strings as ordinary HTTP POST parameters, which web frameworks helpfully insert into a hash table, and each insert costs O(n): the server burns minutes of CPU on a single small request. A handful of requests could pin an entire server. Vendors shipped emergency patches; the long-term fix, adopted across language runtimes, was to *randomize* hashing per process, most famously via SipHash, a keyed hash function designed by Jean-Philippe Aumasson and Daniel J. Bernstein in 2012 specifically for hash tables, now used by Python, Ruby, Rust, and others.
 

@@ -33,11 +33,6 @@ write `Dog d = new Dog(...)`, two things happen:
 2. The local variable `d` on the **stack** holds a *reference* (an
    address) pointing to that heap object.
 
-<Figure
-  slug="oopj-objects-in-memory-inline-cutout"
-  alt="A small name plate on the left joined by a cord to a crate standing in an open yard on the right, and a second plate pointing at the same crate"
-/>
-
 ```mermaid
 flowchart TD
     subgraph S["Stack (current method)"]
@@ -216,6 +211,11 @@ method receives a *new local variable* (on its own stack frame) that
 points at the *same* heap object as the caller's variable. Changes the
 method makes to the object's fields are therefore visible to the
 caller.
+
+<Figure
+  slug="oopj-objects-in-memory-inline-cutout"
+  alt="A small name plate on the left joined by a cord to a crate standing in an open yard on the right, and a second plate pointing at the same crate"
+/>
 
 <CodeBlock
   adapter="java"

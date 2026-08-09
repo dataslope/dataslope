@@ -23,11 +23,6 @@ conceptual unlock for Pandas.
 - The **cell** at row $r$, column $c$ is *that thing's value of
   that attribute*.
 
-<Figure
-  slug="pandas-rows-and-columns-inline-cutout"
-  alt="A board where one row is drawn out sideways as a strip and one column is lifted straight up as a stack"
-/>
-
 A DataFrame of 4 employees (rows) × 3 attributes (columns):
 
 | name  | department | salary |
@@ -88,6 +83,11 @@ Columns share three properties that you will rely on constantly:
 3. **A column is the unit of most Pandas operations.** You
    filter rows *based on a column*. You group rows *by a
    column*. You sum, average, or count *a column*.
+
+<Figure
+  slug="pandas-rows-and-columns-inline-cutout"
+  alt="A board where one row is drawn out sideways as a strip and one column is lifted straight up as a stack"
+/>
 
 The Pandas operation `df["salary"].mean()` reads naturally as
 "the mean of the salary column" because the column *is* the

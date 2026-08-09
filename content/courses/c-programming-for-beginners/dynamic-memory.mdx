@@ -32,11 +32,6 @@ A running program's memory is split into a few regions:
   `free`.
 - **Stack**, where function locals live, one frame per call.
 
-<Figure
-  slug="c-dynamic-memory-inline-cutout"
-  alt="A counter on the left handing out a crate of the exact size asked for, a workbench using it in the middle, and the same crate being returned to the counter on the right"
-/>
-
 | Stack                                | Heap                              |
 |--------------------------------------|-----------------------------------|
 | Automatic, frame per function call  | Manual, `malloc` / `free`        |
@@ -158,6 +153,11 @@ Every `_new` call must be balanced by exactly one `_free` call.
 
 These are the classics. Every C programmer will write them at some
 point. The skill is recognizing them quickly.
+
+<Figure
+  slug="c-dynamic-memory-inline-cutout"
+  alt="A counter on the left handing out a crate of the exact size asked for, a workbench using it in the middle, and the same crate being returned to the counter on the right"
+/>
 
 ### 1. Memory leak
 

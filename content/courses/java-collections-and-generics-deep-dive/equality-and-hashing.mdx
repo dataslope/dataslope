@@ -27,11 +27,6 @@ once and for all.
 `Set.contains(x)`, `Set.add(x)`, `Map.containsKey(k)`, `Map.get(k)`,
 all of them, under the hood, call `equals` to compare candidates.
 
-<Figure
-  slug="jcol-equality-and-hashing-inline-cutout"
-  alt="Two identical-looking blocks on a balance that reads level, and beneath them a sorting machine dropping both into the same one of several bins"
-/>
-
 `==` compares **identity** (same object in memory). `.equals` compares
 **value** (logically the same thing). For a sane container,
 *equality has to mean value*.
@@ -326,6 +321,11 @@ a `HashSet` for the same data, almost always a bug. We'll meet
 
 This is one of the most common real uses of `equals`/`hashCode`: a
 "have I seen this before?" service.
+
+<Figure
+  slug="jcol-equality-and-hashing-inline-cutout"
+  alt="Two identical-looking blocks on a balance that reads level, and beneath them a sorting machine dropping both into the same one of several bins"
+/>
 
 <ChallengeCard
   adapter="java"

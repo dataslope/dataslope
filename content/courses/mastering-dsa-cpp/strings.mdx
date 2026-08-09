@@ -16,11 +16,6 @@ What makes strings worth their own chapter is the toolkit, and one piece of inhe
 
 A string owns its characters and tracks its length. Like `std::vector`, indexing is O(1), and the string can grow as needed.
 
-<Figure
-  slug="dsa-strings-inline-cutout"
-  alt="A ribbon of letter tiles with a small marker at its end showing where the ribbon stops"
-/>
-
 <CodeBlock
   adapter="cpp"
   files={[
@@ -141,6 +136,11 @@ int main() {
 ## C-strings and conversion
 
 Before `std::string`, there was the C-string: a bare character array with no length field at all. How do you know where it ends? You walk forward until you hit a zero byte, the *null terminator*. It is a remarkably thrifty design from an era when every byte mattered, and a remarkably dangerous one: forget the terminator, or write past it, and functions like `strlen` and `strcpy` march off the end of the buffer into whatever memory comes next. In a 2011 ACM Queue essay, FreeBSD developer Poul-Henning Kamp argued that choosing the null terminator over a length-prefixed format was "the most expensive one-byte mistake" in computing, tallying decades of buffer overflows, security exploits, and lost performance against it.
+
+<Figure
+  slug="dsa-strings-inline-cutout"
+  alt="A ribbon of letter tiles with a small marker at its end showing where the ribbon stops"
+/>
 
 `std::string` fixes this by storing its length explicitly, `size()` is O(1), not a scan, but C-strings still surround you: every string literal like `"hello"` is one, and many operating system APIs speak nothing else. So you need the two conversion moves: a literal can initialize a `std::string` directly, and `.c_str()` hands back a null-terminated pointer view for C-style APIs.
 

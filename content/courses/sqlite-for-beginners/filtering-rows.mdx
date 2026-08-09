@@ -20,11 +20,6 @@ A `WHERE` clause is a test that SQLite applies to each row. If the test
 is true, the row stays in the result. If the test is false, the row is
 left out.
 
-<Figure
-  slug="lite-filtering-rows-inline-cutout"
-  alt="A board of rows passing a gate that swings open only for rows carrying a matching notch"
-/>
-
 ```mermaid
 flowchart TD
     A["all rows<br/>in books"] --> W{"WHERE condition<br/>is true?"}
@@ -130,6 +125,11 @@ WHERE
 
 `BETWEEN` includes both ends of the range. In the example, 200 and 320
 would both count as matches.
+
+<Figure
+  slug="lite-filtering-rows-inline-cutout"
+  alt="A board of rows passing a gate that swings open only for rows carrying a matching notch"
+/>
 
 <MultipleChoice
   markdown={`Which clause keeps only rows that pass a test?

@@ -29,11 +29,6 @@ LINQ operators fall into two camps:
 The deferred operators define a *recipe* for producing elements. The
 immediate operators *execute* the recipe.
 
-<Figure
-  slug="cs-deferred-execution-inline-cutout"
-  alt="A long pipe assembled from three empty sections on the left with nothing flowing, and a tap at the right end being opened so blocks finally run the whole length at once"
-/>
-
 ## Seeing laziness with your own eyes
 
 The clearest demonstration: a deferred pipeline that prints as it
@@ -298,6 +293,11 @@ When writing LINQ, ask:
 3. Are captured variables stable? → if not, your pipeline's behavior
    depends on when it runs.
 4. Is the source expensive? → materialize once, reuse the result.
+
+<Figure
+  slug="cs-deferred-execution-inline-cutout"
+  alt="A long pipe assembled from three empty sections on the left with nothing flowing, and a tap at the right end being opened so blocks finally run the whole length at once"
+/>
 
 <MultipleChoice
   markdown={`Given:

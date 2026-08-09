@@ -48,11 +48,6 @@ Every column is a variable (city, year, population). Every row is
 an observation (a city in a year). This is the form everything
 downstream wants.
 
-<Figure
-  slug="rlang-tidy-data-principles-inline-cutout"
-  alt="A jumbled sheet on the left being rebuilt into a clean grid on the right where every row is one record and every column one measure"
-/>
-
 ## What "messy" looks like
 
 Here is the same data, but **wide**, years spread across columns:
@@ -200,6 +195,11 @@ Here is a concrete payoff. `ggplot2` is the visualization library
 we'll spend a whole section on later. Its central idea is to map
 *columns* to *visual properties*. That mapping only works when
 data is tidy.
+
+<Figure
+  slug="rlang-tidy-data-principles-inline-cutout"
+  alt="A jumbled sheet on the left being rebuilt into a clean grid on the right where every row is one record and every column one measure"
+/>
 
 Want a line chart of population over time, colored by city?
 

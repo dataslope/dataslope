@@ -22,11 +22,6 @@ A `CASE` expression evaluates conditions in order and returns the value
 for the first one that matches. It is SQL's if/else, and it turns a
 continuous or messy column into clean, analysis-ready categories.
 
-<Figure
-  slug="duck-conditional-logic-inline-cutout"
-  alt="A chute with a three-way sorter, each block dropping into the branch whose condition it satisfies and the rest falling to a default tray"
-/>
-
 <SqlCodeBlock
   dialect="duckdb"
   title="Bucket amounts into size labels"
@@ -105,6 +100,11 @@ Here is the pattern that feels like magic the first time you see it. By
 putting a `CASE` *inside* an aggregate, you can compute **several
 filtered totals in a single row**, paid vs. refunded, this year vs. last,
 mobile vs. desktop, all side by side.
+
+<Figure
+  slug="duck-conditional-logic-inline-cutout"
+  alt="A chute with a three-way sorter, each block dropping into the branch whose condition it satisfies and the rest falling to a default tray"
+/>
 
 <SqlCodeBlock
   dialect="duckdb"

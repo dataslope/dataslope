@@ -28,11 +28,6 @@ two contributions:
 
 $$ E(h) \;=\; \underbrace{C \, h^p}_{\text{truncation}} \;+\; \underbrace{D / h^q}_{\text{round-off}} $$
 
-<Figure
-  slug="scipy-approximation-and-error-inline-cutout"
-  alt="A curved rail with a straight rod laid against it, small gaps visible between rod and rail at both ends"
-/>
-
 - **Truncation error** dominates when $h$ is *large*. Use a smaller
   $h$ to fix it.
 - **Round-off error** dominates when $h$ is *small*. Use a larger
@@ -216,6 +211,11 @@ When the answer changes quickly in one region and slowly in another,
 a fixed step size is wasteful. **Adaptive methods** estimate the
 local error on each step and shrink or grow $h$ to keep the error
 near a user-specified tolerance.
+
+<Figure
+  slug="scipy-approximation-and-error-inline-cutout"
+  alt="A curved rail with a straight rod laid against it, small gaps visible between rod and rail at both ends"
+/>
 
 SciPy's `quad` (general 1-D integration) is adaptive by default.
 Try integrating something with a sharp spike.

@@ -30,12 +30,6 @@ By the early 2000s, JavaScript had evolved from a form-validation toy into the *
 
 Then came the **AJAX revolution**. In 2004–2005, Google launched Gmail and Google Maps, web applications that felt like desktop software. They loaded once, then used `XMLHttpRequest` to fetch data in the background and update the UI without page reloads. Suddenly, JavaScript wasn't just a scripting language; it was the engine of single-page applications.
 
-<Figure
-  slug="tsx-evolution-ajax-cutout"
-  alt="A page on screen staying whole while one parcel travels along a rail from a server drum and slots into a single panel"
-  caption="Gmail and Google Maps, 2004 to 2005: pages that fetched in the background and never reloaded."
-/>
-
 The **jQuery era** followed. jQuery, released in 2006, smoothed over browser inconsistencies and made DOM manipulation pleasant. Sites that once had 500 lines of JS now had 5,000. But they were still manageable. You could fit the whole codebase in your head.
 
 ```mermaid
@@ -148,6 +142,12 @@ The stage was set for a new tool, one that would bring static types to JavaScrip
 ## The turning point
 
 By 2012, JavaScript had conquered the world. But the codebases built on it were fragile. Refactoring was terrifying. Onboarding new developers took weeks because the implicit contracts, "this function expects a number, that one expects an object with `name` and `email` fields", existed only in comments, wikis, and tribal knowledge.
+
+<Figure
+  slug="tsx-evolution-ajax-cutout"
+  alt="A page on screen staying whole while one parcel travels along a rail from a server drum and slots into a single panel"
+  caption="Gmail and Google Maps, 2004 to 2005: pages that fetched in the background and never reloaded."
+/>
 
 The industry needed a way to make JavaScript **safe** without making it **different**. The solution would have to be *optional*, *gradual*, and *pragmatic*. It would have to compile to readable JavaScript so existing tooling still worked. It would have to integrate with editors so developers got instant feedback.
 

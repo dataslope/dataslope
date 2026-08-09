@@ -30,11 +30,6 @@ In low-level languages like C, you call `malloc` and `free` by
 hand. Forget the `free` and you leak memory; double-free and you
 corrupt memory.
 
-<Figure
-  slug="mcs-resource-management-inline-cutout"
-  alt="A tap opened over a basin with a timer beside it, and the same tap shown closed with the basin empty and the timer stopped"
-/>
-
 In C#, when you write `new Person(...)`, the runtime allocates
 memory on the heap. When nothing points to that object anymore,
 the GC eventually reclaims the space:
@@ -61,6 +56,11 @@ second category.
 Consider opening a file. Behind the scenes, the OS gives you a
 **file handle**, a small numeric ticket the kernel tracks. The
 OS only allows a limited number per process.
+
+<Figure
+  slug="mcs-resource-management-inline-cutout"
+  alt="A tap opened over a basin with a timer beside it, and the same tap shown closed with the basin empty and the timer stopped"
+/>
 
 If you open a file, never close it, and let the variable go out of
 scope, the GC will *eventually* reclaim the .NET object, but it

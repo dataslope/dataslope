@@ -44,11 +44,6 @@ at any moment:
   the class of the object the variable currently points to. The JVM
   uses it to decide which override of a method to actually run.
 
-<Figure
-  slug="oopj-polymorphism-inline-cutout"
-  alt="One lever being pulled on the left, and three different machines to the right each answering it in their own way"
-/>
-
 ```mermaid
 flowchart LR
     V["Noisy n = new Dog()"] --> CT["compile-time type:<br/>Noisy"]
@@ -207,6 +202,11 @@ There are several flavors of polymorphism. In a beginner OOP course
 the one to know is **subtype polymorphism**, which is what we just
 saw: a variable of a parent type can hold any subtype, and calls
 dispatch to the actual subtype.
+
+<Figure
+  slug="oopj-polymorphism-inline-cutout"
+  alt="One lever being pulled on the left, and three different machines to the right each answering it in their own way"
+/>
 
 ```mermaid
 flowchart TB

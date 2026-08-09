@@ -21,11 +21,6 @@ as a number, and any value that is not a number gets rejected at
 the door. PostgreSQL, MySQL, and SQL Server all work this way, and
 most SQL books simply assume it.
 
-<Figure
-  slug="lite-data-types-inline-cutout"
-  alt="A rack of sockets where a block of the wrong shape is quietly reshaped to fit rather than being refused"
-/>
-
 SQLite made a different and deliberate choice. It uses **dynamic
 typing**: the type belongs to the *value*, not to the column. A
 column declaration gives SQLite a preference, called **affinity**,
@@ -83,6 +78,11 @@ Most beginner tables use `INTEGER`, `TEXT`, `REAL`, and sometimes `NUMERIC` as d
 ## Declared types become affinities
 
 When you write a column type, SQLite maps it to an affinity. Affinity is the column's preferred storage behavior.
+
+<Figure
+  slug="lite-data-types-inline-cutout"
+  alt="A rack of sockets where a block of the wrong shape is quietly reshaped to fit rather than being refused"
+/>
 
 ```mermaid
 flowchart TB

@@ -32,11 +32,6 @@ A custom property starts with `--` and is read with `var()`:
 Defining them on **`:root`** (the `<html>` element) makes them
 available to the whole page, because custom properties **inherit**.
 
-<Figure
-  slug="css-custom-properties-inline-cutout"
-  alt="One dial on a panel wired to six blocks, turning it repainting all six at once"
-/>
-
 One `--brand` value drives every button below, background, border, and
 text color all read from it. Because variables inherit and can be
 **redefined in a scope**, the second card overrides `--brand` locally
@@ -138,6 +133,11 @@ one on a subtree to re-theme just that part:
 
 `var()` also takes a **fallback** for when a variable isn't set:
 `color: var(--accent, #333)` uses `#333` if `--accent` is undefined.
+
+<Figure
+  slug="css-custom-properties-inline-cutout"
+  alt="One dial on a panel wired to six blocks, turning it repainting all six at once"
+/>
 
 ## Theming and dark mode
 

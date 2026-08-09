@@ -140,15 +140,15 @@ The flaw: for very large arrays, `low + high` can exceed the maximum value an `i
 
 The fix costs nothing: compute `mid = low + (high - low) / 2`. The subtraction cannot overflow because `high - low` is at most the array length. Write it this way from day one, even on toy inputs, the habit is free and the bug is not.
 
+## Variants
+
+Real problems rarely ask plain "is it there?", they ask *where does it start*, *where would it go*, *how many are there*. All are small mutations of the same loop. When duplicates exist, ordinary binary search may return any matching index; to find the *first* occurrence, record a match but keep searching left instead of stopping.
+
 <Figure
   slug="dsa-searching-overflow-cutout"
   alt="A long measuring beam with a marker at its midpoint, its ends pressed inward by heavy blocks until a crack opens at the marker"
   caption="2006: low plus high overflowed, and the bug sat in textbooks and the JDK until arrays got big enough to reach it."
 />
-
-## Variants
-
-Real problems rarely ask plain "is it there?", they ask *where does it start*, *where would it go*, *how many are there*. All are small mutations of the same loop. When duplicates exist, ordinary binary search may return any matching index; to find the *first* occurrence, record a match but keep searching left instead of stopping.
 
 <CodeBlock
   adapter="cpp"

@@ -24,11 +24,6 @@ Not a character, not a word, something in between:
   different tokens with different ids.
 * Numbers split unpredictably. `2026` might be one token or two.
 
-<Figure
-  slug="llm-tokens-inline-cutout"
-  alt="A long paper ribbon being cut into uneven chips by a small press, some chips whole words and some fragments, the chips collecting in a tray"
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -108,6 +103,11 @@ words. So:
 Code is denser in tokens than prose, because whitespace, punctuation,
 and identifiers fragment. Estimate code at about three characters per
 token.
+
+<Figure
+  slug="llm-tokens-inline-cutout"
+  alt="A long paper ribbon being cut into uneven chips by a small press, some chips whole words and some fragments, the chips collecting in a tray"
+/>
 
 <CodeBlock
   adapter="python"

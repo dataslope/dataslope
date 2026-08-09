@@ -16,6 +16,11 @@ and fix them faster.
 That speed comes from a few habits. None of them are magic. All of
 them can be practiced.
 
+<Figure
+  slug="c-debugging-and-reasoning-inline-cutout"
+  alt="A long chain folded in half and tested, then folded again, the search closing on one bad link"
+/>
+
 ## Step 1: read the error message
 
 The single biggest improvement a new programmer can make is to
@@ -37,11 +42,6 @@ hello.c:5:9: error: expected ';' before 'return'
 
 Read it as: *"in `hello.c`, on line 5, column 9, you forgot a `;`
 before `return`. Here's where to put it."*
-
-<Figure
-  slug="c-debugging-and-reasoning-inline-cutout"
-  alt="A long chain folded in half and tested, then folded again, the search closing on one bad link"
-/>
 
 Trust the location. Compiler errors point at the spot the compiler
 *noticed* the problem, which is sometimes one line **after** the

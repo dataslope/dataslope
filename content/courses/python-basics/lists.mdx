@@ -16,11 +16,6 @@ Every snippet on this page runs in your browser, no setup required.
 
 The simplest list is written with square brackets, separating items with commas.
 
-<Figure
-  slug="python-lists-inline-cutout"
-  alt="A rail of five slots holding blocks in order, one being lifted out of the middle and the rest sliding along to close the gap"
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -79,6 +74,11 @@ print(from_str)
 ## How lists work under the hood
 
 Lists are implemented as **dynamic arrays**: a contiguous block of memory holding references to objects. This gives O(1) random access by index but O(n) insertion/deletion in the middle. Think of a list as a row of numbered parking spots, where each spot points to the actual object.
+
+<Figure
+  slug="python-lists-inline-cutout"
+  alt="A rail of five slots holding blocks in order, one being lifted out of the middle and the rest sliding along to close the gap"
+/>
 
 ```mermaid
 flowchart LR

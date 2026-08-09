@@ -35,11 +35,6 @@ handed out by the next `malloc`. Reading or writing through `p` is
 undefined behavior, sometimes it "works", sometimes it returns
 someone else's bytes, sometimes it crashes.
 
-<Figure
-  slug="sysc-memory-bugs-inline-cutout"
-  alt="Three benches side by side, one with a crate overflowing past its edge, one with a cord leading to an empty space, one with crates piling up unclaimed"
-/>
-
 <CodeBlock
   adapter="c"
   files={[
@@ -127,6 +122,11 @@ harmless.
 A leak is the *opposite* of double-free: every `malloc` *should* be
 matched by exactly one `free`, but isn't. The block lives on,
 unreachable, until the process exits.
+
+<Figure
+  slug="sysc-memory-bugs-inline-cutout"
+  alt="Three benches side by side, one with a crate overflowing past its edge, one with a cord leading to an empty space, one with crates piling up unclaimed"
+/>
 
 <CodeBlock
   adapter="c"

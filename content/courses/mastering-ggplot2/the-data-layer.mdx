@@ -19,11 +19,6 @@ ggplot2 plots **data frames** (or tibbles): a rectangle where each
 **row is one observation** and each **column is one variable**. The
 plot's mappings then refer to columns by name.
 
-<Figure
-  slug="gg-the-data-layer-inline-cutout"
-  alt="A plain board with a tray of chips resting beside it, nothing yet drawn on the board itself"
-/>
-
 <CodeBlock
   adapter="r"
   files={[
@@ -212,6 +207,11 @@ The wide table below hides `year` in its column *names*. Reshape it into
 a **long** data frame called `tidy` with three columns, `region`,
 `year`, and `sales`, so that `year` becomes something you could map.
 Six rows in total (two regions × three years).
+
+<Figure
+  slug="gg-the-data-layer-inline-cutout"
+  alt="A plain board with a tray of chips resting beside it, nothing yet drawn on the board itself"
+/>
 
 <ChallengeCard
   adapter="r"

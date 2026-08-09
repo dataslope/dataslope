@@ -21,6 +21,11 @@ library, and they all speak the same small vocabulary. Learn that vocabulary
 once and you can pick up any model in the ecosystem without learning a new
 interface. This page is about that vocabulary: the **estimator API**.
 
+<Figure
+  slug="ml-the-scikit-learn-api-inline-cutout"
+  alt="Four different machines all fitted with the same three-handle front plate, one hand working each the same way"
+/>
+
 <Callout type="info" title="Why a consistent API is a superpower">
 Imagine if every model came with its own bespoke method names, one wanted
 `train()`, another `learn()`, a third `optimize()`. You would spend your life
@@ -50,11 +55,6 @@ need a few to be productive:
   check, though the metrics chapters will give you sharper tools.
 - **`.predict_proba(X)`**, *for many classifiers,* the predicted
   *probability* of each class, not just the single hard label.
-
-<Figure
-  slug="ml-the-scikit-learn-api-inline-cutout"
-  alt="Four different machines all fitted with the same three-handle front plate, one hand working each the same way"
-/>
 
 The rhythm is almost always the same two beats: **fit, then use.** You `fit`
 on training data, then `predict` (or `transform`, or `score`) on new data.

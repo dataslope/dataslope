@@ -23,11 +23,6 @@ Half of responsiveness is just *not* hard-coding pixel widths:
   together.
 - **`vw`/`vh`** are percentages of the viewport itself.
 
-<Figure
-  slug="web-css-responsive-design-inline-cutout"
-  alt="The same panel of blocks shown in three frames of decreasing width, its blocks rearranging from a row into a column as the frame narrows"
-/>
-
 And one line every responsive page needs, in the HTML `<head>`, so
 phones don't pretend to be desktops:
 
@@ -113,6 +108,11 @@ The habit most teams follow: write the **small-screen** layout as the
 base (no media query), then *add* complexity for larger screens with
 `min-width` queries. It tends to produce simpler CSS, the base case is
 the constrained one, and enhancements pile on only where there's room.
+
+<Figure
+  slug="web-css-responsive-design-inline-cutout"
+  alt="The same panel of blocks shown in three frames of decreasing width, its blocks rearranging from a row into a column as the frame narrows"
+/>
 
 <Callout type="info" title="You already met a query-free responsive trick">
 `grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))` from the

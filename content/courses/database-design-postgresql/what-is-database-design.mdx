@@ -29,11 +29,6 @@ fixes one of her rows and misses the other. Run the block and look at
 the result: the database now claims, with complete confidence, that
 the same person has two different email addresses.
 
-<Figure
-  slug="db-what-is-database-design-inline-cutout"
-  alt="A bench of loose parts on the left and the same parts fitted into a planned frame on the right"
-/>
-
 <SqlCodeBlock
   dialect="postgres"
   title="An update anomaly in a flat table"
@@ -100,6 +95,11 @@ inconsistent ways. Concretely, it means deciding:
 - Which tables point to which other tables?
 - Which values must be present, unique, or limited, and how will
   the database *enforce* that?
+
+<Figure
+  slug="db-what-is-database-design-inline-cutout"
+  alt="A bench of loose parts on the left and the same parts fitted into a planned frame on the right"
+/>
 
 SQL syntax is how you express a design. It is not the design itself.
 Two people can both type flawless `CREATE TABLE` statements and

@@ -25,11 +25,6 @@ might keep a dozen values in a `REAL ARRAY(100)` and that was the
 whole world. Code that small does not need *abstractions* over
 storage. It can just point at memory directly.
 
-<Figure
-  slug="jcol-the-tyranny-of-arrays-inline-cutout"
-  alt="A rail with exactly eight slots, all filled, and a ninth block waiting on the bench with nowhere to go"
-/>
-
 ```mermaid
 flowchart TD
     A["1950s<br/>fixed-size arrays<br/>one programmer"]
@@ -89,6 +84,11 @@ Indexing is wonderful. Everything *else* is on you.
 
 Let's list, concretely, what an application built only on raw arrays
 has to write by hand, every time, in every project.
+
+<Figure
+  slug="jcol-the-tyranny-of-arrays-inline-cutout"
+  alt="A rail with exactly eight slots, all filled, and a ninth block waiting on the bench with nowhere to go"
+/>
 
 ### 1. Resize themselves
 

@@ -54,11 +54,6 @@ Three things happen on the line `int age = 30;`:
 3. **Initialize.** The bit pattern for `30` is written into those
    bytes.
 
-<Figure
-  slug="c-variables-and-memory-inline-cutout"
-  alt="A plain metal locker with its door open, one block resting on the shelf inside, and a small blank name plate clipped to the outside of the door"
-/>
-
 ## Picture it
 
 After the two declarations above, memory might look like:
@@ -131,6 +126,11 @@ Variable names in C:
 - Cannot collide with C **keywords** (`int`, `if`, `return`, ...).
 - Should be **descriptive**. `n` is fine for a loop counter; `score`
   is better than `s` for a score.
+
+<Figure
+  slug="c-variables-and-memory-inline-cutout"
+  alt="A plain metal locker with its door open, one block resting on the shelf inside, and a small blank name plate clipped to the outside of the door"
+/>
 
 ```c
 int score;            // good

@@ -46,11 +46,6 @@ names the summary.
 Let's build a daily series, website visits with a slow upward trend and a
 weekend dip, and roll it up.
 
-<Figure
-  slug="tsa-resampling-and-aggregation-inline-cutout"
-  alt="A dense row of daily chips being swept into seven-chip trays, each tray leaving one summary block behind"
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -565,3 +560,8 @@ Upsampling left us staring at a grid full of `NaN`s, and even real-world
 data arrives with holes. How you fill those gaps is not a button-press but
 a genuine assumption about what happened when you weren't looking, which
 is exactly the next page.
+
+<Figure
+  slug="tsa-resampling-and-aggregation-inline-cutout"
+  alt="A dense row of daily chips being swept into seven-chip trays, each tray leaving one summary block behind"
+/>

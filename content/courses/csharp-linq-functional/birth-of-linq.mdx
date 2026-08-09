@@ -24,12 +24,6 @@ In an **imperative** program, you describe a computation as a
 you mutate them, you branch, you loop, you mutate some more, and
 eventually a variable somewhere contains the answer.
 
-<Figure
-  slug="cs-birth-of-linq-loops-cutout"
-  alt="A knot of tangled cord on one side, and on the other a clean pipe carrying three shapes through a filter into a tray"
-  caption="C# 3.0, 2007: the bugs were in the shape of the code, so the shape is what LINQ changed."
-/>
-
 Here is a tiny imperative task: *"Find the average age of people who
 live in Berlin."*
 
@@ -411,6 +405,12 @@ it; and the same person who wrote the domain model wrote the
 queries. Other languages took note: Java Streams, Kotlin sequences,
 Rust iterators, and JavaScript's array methods all echo LINQ's
 design.
+
+<Figure
+  slug="cs-birth-of-linq-loops-cutout"
+  alt="A knot of tangled cord on one side, and on the other a clean pipe carrying three shapes through a filter into a tray"
+  caption="C# 3.0, 2007: the bugs were in the shape of the code, so the shape is what LINQ changed."
+/>
 
 LINQ also rode a larger wave. Around the same time, two pressures
 pushed the whole industry toward functional ideas: CPUs stopped

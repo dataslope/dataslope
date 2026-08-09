@@ -20,11 +20,6 @@ move.
 Worth keeping in view throughout: an aggregate is a number standing in for a
 column, and identical aggregates can come from very different columns.
 
-<Figure
-  slug="duck-aggregate-functions-inline-cutout"
-  alt="One wide tray of chips feeding four gauges at once, each reading a different single number"
-/>
-
 <Chart slug="bar-hides-distribution" />
 
 A human cannot comprehend a million rows. But "the average order was
@@ -120,6 +115,11 @@ people?", three genuinely different business questions, three different
 `SUM`, `AVG`, `MIN`, `MAX`, and `COUNT(column)` all **skip NULLs**. This
 is almost always what you want, an unknown value should not be treated as
 zero and drag an average down.
+
+<Figure
+  slug="duck-aggregate-functions-inline-cutout"
+  alt="One wide tray of chips feeding four gauges at once, each reading a different single number"
+/>
 
 <SqlCodeBlock
   dialect="duckdb"

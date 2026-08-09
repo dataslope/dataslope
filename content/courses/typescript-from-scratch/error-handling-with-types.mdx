@@ -31,11 +31,6 @@ The signature says it returns `any`, but it doesn't mention that it can *throw*.
 - When should I catch?
 - Did the maintainer forget to document this?
 
-<Figure
-  slug="tsx-error-handling-with-types-inline-cutout"
-  alt="Two chutes leaving one machine, one carrying finished blocks and one carrying marked failure tags, both feeding trays"
-/>
-
 This leads to two failure modes:
 1. **Over-catching**: Wrap everything in `try/catch`, slowing code and hiding real bugs.
 2. **Under-catching**: Forget to catch, and the exception propagates to production.
@@ -473,6 +468,11 @@ export function map<T, E, U>(
 - **Programmer errors**: Bugs that should never happen in correct code (e.g., `assert`, null dereference). These should crash during development, not be handled gracefully.
 - **Unrecoverable failures**: Out-of-memory, stack overflow, or critical infrastructure failures that you can't reasonably handle.
 - **Third-party code**: If a library throws, you might catch at the boundary and convert to `Result`.
+
+<Figure
+  slug="tsx-error-handling-with-types-inline-cutout"
+  alt="Two chutes leaving one machine, one carrying finished blocks and one carrying marked failure tags, both feeding trays"
+/>
 
 Use `Result` for:
 - **Expected failures**: Validation errors, missing files, network timeouts, user input errors, anything that's part of normal operation.

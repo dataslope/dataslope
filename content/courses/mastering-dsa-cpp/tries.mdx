@@ -18,11 +18,6 @@ The name has a story: Edward Fredkin coined *trie* in 1960, from the middle of t
 
 This trie contains `cat`, `car`, `cart`, and `dog`.
 
-<Figure
-  slug="dsa-tries-inline-cutout"
-  alt="A branching rack of letter tiles where words that share a beginning share the same first branches before splitting"
-/>
-
 ```mermaid
 flowchart TD
     R["root"] --> C["c"]
@@ -282,6 +277,11 @@ int main() {
 ## Where tries earn their memory
 
 The trie's costs are worth restating before you decide to use one: every node carries a child table, so a trie usually spends more memory per string than a hash set, that is the price of prefix structure. It pays off when prefixes *are* the workload. Autocomplete and spellcheck are the obvious cases. Internet routers run on the same idea: forwarding a packet means finding the routing-table entry with the **longest prefix match** against the destination address, which is a root-to-leaf walk in a binary trie of address bits. And word-game solvers (find all dictionary words on this letter board) use a trie to prune their search the instant a path stops being any word's prefix, turning an exponential board walk into a brisk one.
+
+<Figure
+  slug="dsa-tries-inline-cutout"
+  alt="A branching rack of letter tiles where words that share a beginning share the same first branches before splitting"
+/>
 
 ## Practice: Implement a Trie
 

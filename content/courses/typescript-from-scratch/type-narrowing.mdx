@@ -45,11 +45,6 @@ print(42);
 To call `value.length`, you need to prove to the compiler that `value` is
 a `string`. That's where narrowing comes in.
 
-<Figure
-  slug="tsx-type-narrowing-inline-cutout"
-  alt="A wide chute carrying a cube, a cylinder and a cone, passing through two upright plates in turn, the cube left stopped against the first plate and the cylinder left stopped against the second, so only the cone continues on to the right"
-/>
-
 ## `typeof` guards
 
 The **`typeof`** operator checks the primitive type at runtime. TypeScript
@@ -281,6 +276,11 @@ printLength(undefined);
 The check `if (value)` eliminates `null` and `undefined` (both falsy),
 leaving only `string`. This is a common pattern for handling optional
 values.
+
+<Figure
+  slug="tsx-type-narrowing-inline-cutout"
+  alt="A wide chute carrying a cube, a cylinder and a cone, passing through two upright plates in turn, the cube left stopped against the first plate and the cylinder left stopped against the second, so only the cone continues on to the right"
+/>
 
 **Caveat:** Truthiness narrowing can be imprecise. The empty string `""`
 is falsy, so `if (value)` will treat it the same as `null`. If you need

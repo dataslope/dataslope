@@ -34,11 +34,6 @@ writing). The `@container` block then styles the container's
 *descendants*, exactly like a media query, but keyed to local space
 instead of the screen.
 
-<Figure
-  slug="css-container-queries-inline-cutout"
-  alt="The same card shown twice, once inside a narrow frame with its parts stacked and once inside a wide frame with its parts side by side"
-/>
-
 That difference is not cosmetic. A component's own width and the viewport
 can move in opposite directions, so a viewport-keyed rule can fire on
 exactly the wrong screen:
@@ -179,6 +174,11 @@ two containers, two sizes:
 The `220px` container renders `22px` text; the `420px` one renders
 `42px`, from one declaration. It is `clamp()`'s viewport trick, scoped
 to a component.
+
+<Figure
+  slug="css-container-queries-inline-cutout"
+  alt="The same card shown twice, once inside a narrow frame with its parts stacked and once inside a wide frame with its parts side by side"
+/>
 
 <Callout type="info" title="You query the descendants, not the container itself">
 An `@container` rule styles elements *inside* the query container, never

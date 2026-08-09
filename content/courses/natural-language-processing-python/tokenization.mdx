@@ -33,11 +33,6 @@ in "don't" is a separate, meaningful unit.
 Let us put the naive approach and a real tokenizer side by side on one tiny,
 nasty input.
 
-<Figure
-  slug="nlp-tokenization-inline-cutout"
-  alt="A paper ribbon running into a small guillotine that cuts it into separate word tiles, the tiles dropping into a tray in order"
-/>
-
 ```mermaid
 flowchart TB
     S["Input text: don't stop!"]
@@ -140,6 +135,11 @@ The mirror-image problem appears one level up. To split a paragraph into
 sentences, your instinct might be `text.split(".")`. That fails immediately,
 because a period is wildly overloaded: it ends sentences, but it also
 abbreviates "Dr." and "U.S.A.", and it marks the decimal in "2.5".
+
+<Figure
+  slug="nlp-tokenization-inline-cutout"
+  alt="A paper ribbon running into a small guillotine that cuts it into separate word tiles, the tiles dropping into a tray in order"
+/>
 
 ```mermaid
 flowchart TB

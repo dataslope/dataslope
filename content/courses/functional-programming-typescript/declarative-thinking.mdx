@@ -23,11 +23,6 @@ smaller, easier to read, and easier to change.
 **Problem.** From a list of orders, keep only the paid ones over
 $50, take their customer names, deduplicate, and sort alphabetically.
 
-<Figure
-  slug="fp-declarative-thinking-inline-cutout"
-  alt="A figure at the left holding up a card showing a finished stack, while the machine beside them builds that stack without being told each step"
-/>
-
 ### Imperative
 
 <CodeBlock
@@ -136,6 +131,11 @@ Declarative code:
 3. **Composes**, each step is a value that flows into the next.
 4. **Avoids intermediate mutable state**, no `let acc = ...; acc =
    acc + 1`.
+
+<Figure
+  slug="fp-declarative-thinking-inline-cutout"
+  alt="A figure at the left holding up a card showing a finished stack, while the machine beside them builds that stack without being told each step"
+/>
 
 You can think of it as moving up one level of abstraction: instead of
 working at the level of *statements*, you work at the level of

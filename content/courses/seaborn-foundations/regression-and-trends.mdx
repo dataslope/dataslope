@@ -26,11 +26,6 @@ Seaborn has two functions that draw a scatter **plus** a fitted line:
 - **`sns.lmplot`**, figure-level. Makes its own figure and, crucially,
   supports `hue`, `col`, and `row` to fit lines per group or per panel.
 
-<Figure
-  slug="sns-regression-and-trends-inline-cutout"
-  alt="A cloud of chips pinned flat across a board with one straight rod laid through the middle of the cloud, and a soft shaded band following that rod closely on either side"
-/>
-
 Both draw the same two things: the **points**, and a line that estimates
 the *central tendency of y for each value of x*, your best single guess
 for y given x. Around that line is a translucent band.
@@ -406,3 +401,8 @@ design beyond the plot itself.`}
 You can now lay an honest trend over a scatter, and spot when that trend is
 lying. Next we widen the lens from one pair of variables to *all* of them
 at once, with the **correlation heatmap**.
+
+<Figure
+  slug="sns-regression-and-trends-inline-cutout"
+  alt="A cloud of chips pinned flat across a board with one straight rod laid through the middle of the cloud, and a soft shaded band following that rod closely on either side"
+/>

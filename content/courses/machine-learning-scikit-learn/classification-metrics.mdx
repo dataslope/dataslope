@@ -22,11 +22,6 @@ its inputs and predicts "did not default" for everyone, and on the real
 **lending-club** data it will score a high accuracy while catching not a
 single defaulter. Let us watch this happen on genuinely imbalanced data.
 
-<Figure
-  slug="ml-classification-metrics-inline-cutout"
-  alt="A two-by-two board of trays with correct calls piled in the diagonal trays and mistakes in the other two, a small gauge reading each"
-/>
-
 <CodeBlock
   adapter="python"
   datasets={[{ path: "lending-club-loan-results.csv", stageAs: "loans.csv" }]}
@@ -276,6 +271,11 @@ $$
 In practice you rarely compute these by hand. `classification_report`
 prints precision, recall, and F1 for every class, plus support (how many
 true examples of each class there were).
+
+<Figure
+  slug="ml-classification-metrics-inline-cutout"
+  alt="A two-by-two board of trays with correct calls piled in the diagonal trays and mistakes in the other two, a small gauge reading each"
+/>
 
 <CodeBlock
   adapter="python"

@@ -50,11 +50,6 @@ for how in ["inner", "left", "right", "full", "semi", "anti"]:
 are filters that use another frame as the criterion, and unlike an
 `inner` join they cannot change the row count upward.
 
-<Figure
-  slug="pl-joins-inline-cutout"
-  alt="Two stacks of cards with a shared key notch, being pushed together so only the notches that match lock into one combined stack"
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -223,6 +218,11 @@ When the keys will not match exactly, `join_asof` matches each left
 row to the most recent right row at or before it. It is built for
 time series: price at the moment of a trade, exchange rate on the day
 of an invoice.
+
+<Figure
+  slug="pl-joins-inline-cutout"
+  alt="Two stacks of cards with a shared key notch, being pushed together so only the notches that match lock into one combined stack"
+/>
 
 <CodeBlock
   adapter="python"

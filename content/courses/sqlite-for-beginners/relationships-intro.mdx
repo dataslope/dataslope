@@ -16,11 +16,6 @@ Instead of storing every fact in one giant table, you store each kind of thing i
 
 Imagine an orders table that repeats the customer's details on every order.
 
-<Figure
-  slug="lite-relationships-intro-inline-cutout"
-  alt="Two small boards joined by one cord running between a tagged row in each"
-/>
-
 | order_id | order_date | customer_name | customer_phone | total |
 | --- | --- | --- | --- | --- |
 | 101 | 2026-01-05 | Ada | 555-0101 | 42.00 |
@@ -41,6 +36,11 @@ flowchart TD
 ## Tables connect through keys
 
 The customer table has a primary key: `customers.id`. The orders table stores a matching value: `orders.customer_id`.
+
+<Figure
+  slug="lite-relationships-intro-inline-cutout"
+  alt="Two small boards joined by one cord running between a tagged row in each"
+/>
 
 ```mermaid
 flowchart TD

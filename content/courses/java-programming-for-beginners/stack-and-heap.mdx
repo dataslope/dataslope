@@ -40,11 +40,6 @@ flowchart TD
   outlive the method that created them, as long as *some* reference
   still points at them.
 
-<Figure
-  slug="java-stack-and-heap-inline-cutout"
-  alt="A tidy vertical column of trays on the left and an open yard of scattered crates on the right, thin cords running from trays to the crates they point at"
-/>
-
 ## Primitives live on the stack; objects live on the heap
 
 When you write:
@@ -59,6 +54,11 @@ String s = "hello";
 - `s` is a *reference variable*. Inside the frame it holds an
   arrow (a memory address). The `"hello"` `String` object itself
   lives on the heap.
+
+<Figure
+  slug="java-stack-and-heap-inline-cutout"
+  alt="A tidy vertical column of trays on the left and an open yard of scattered crates on the right, thin cords running from trays to the crates they point at"
+/>
 
 ```mermaid
 flowchart LR

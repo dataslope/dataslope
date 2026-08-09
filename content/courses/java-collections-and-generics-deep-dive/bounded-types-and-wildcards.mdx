@@ -35,11 +35,6 @@ classDiagram
 
 `Dog` and `Cat` both extend `Animal`. So far, normal OOP.
 
-<Figure
-  slug="jcol-bounded-types-and-wildcards-inline-cutout"
-  alt="A slot cut to accept a family of related shapes, wide enough for three of them and clearly too narrow for a fourth waiting beside it"
-/>
-
 ## Why List&lt;Dog&gt; is not List&lt;Animal&gt;
 
 Imagine the rule were the other way, that `List<Dog>` *was* a
@@ -123,6 +118,11 @@ public class Main {
 />
 
 That's `List<?>`: maximally general, but read-only.
+
+<Figure
+  slug="jcol-bounded-types-and-wildcards-inline-cutout"
+  alt="A slot cut to accept a family of related shapes, wide enough for three of them and clearly too narrow for a fourth waiting beside it"
+/>
 
 ## Upper-bounded: ? extends T (you can read T)
 

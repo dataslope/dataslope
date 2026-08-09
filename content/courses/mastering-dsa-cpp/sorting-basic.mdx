@@ -15,11 +15,6 @@ This page covers the three classic "slow" sorts: bubble, selection, and insertio
 
 Bubble sort repeatedly compares adjacent elements and swaps them if they are out of order. After one full pass, the largest value has bubbled to the end; after two passes, the two largest are settled, and so on.
 
-<Figure
-  slug="dsa-sorting-basic-inline-cutout"
-  alt="Two neighbouring blocks in a row being swapped by a small claw, the row a little more ordered after each pass"
-/>
-
 It is also computing's favorite punching bag. Knuth's verdict in *The Art of Computer Programming* is that bubble sort "seems to have nothing to recommend it, except a catchy name", and the name really is most of its legacy. In a 2007 Google town hall, Eric Schmidt jokingly asked candidate Barack Obama the most efficient way to sort a million 32-bit integers; Obama's deadpan "I think the bubble sort would be the wrong way to go" brought down the house. He was right. But the catchy name marks a genuinely useful teaching specimen: it is the simplest sort to verify, and its early-exit trick below introduces an idea, *detect that you are already done*, that better algorithms reuse.
 ```mermaid
 flowchart TD
@@ -162,6 +157,11 @@ The deeper lesson of this page is the **loop invariant**, a statement that is tr
 ## Practice: bubble sort with early exit
 
 Both challenges provide a `printVector` helper in the driver; your job is only the sorting function itself. Output is comma-separated, e.g. `1,2,3,5,5,9`.
+
+<Figure
+  slug="dsa-sorting-basic-inline-cutout"
+  alt="Two neighbouring blocks in a row being swapped by a small claw, the row a little more ordered after each pass"
+/>
 
 <ChallengeCard
   adapter="cpp"

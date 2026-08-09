@@ -29,11 +29,6 @@ let you see**. Every group of numbers has a full shape, where it clusters,
 how spread out it is, where the outliers sit. A categorical plot makes a
 choice about how much of that shape to draw versus boil away.
 
-<Figure
-  slug="sns-categorical-overview-inline-cutout"
-  alt="Four small boards in a row showing the same groups as bars, boxes, strips and violins"
-/>
-
 | `kind` | What it draws | How much it reveals | Needs |
 | ------ | ------------- | ------------------- | ----- |
 | `"strip"` | Every point, with jitter | **All** observations | category + numeric |
@@ -229,6 +224,11 @@ band of the detail dial and goes deep:
 - **Strip and swarm plots**, the show-everything band. Drawing every
   observation with jitter (`strip`) or non-overlapping nudges (`swarm`), and
   when that becomes too dense to read.
+
+<Figure
+  slug="sns-categorical-overview-inline-cutout"
+  alt="Four small boards in a row showing the same groups as bars, boxes, strips and violins"
+/>
 
 <Callout type="info" title="catplot is the hub; the kinds are the spokes">
 You will keep calling `catplot` the same way, `data`, a categorical

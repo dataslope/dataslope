@@ -23,11 +23,6 @@ Every plot is made of two kinds of "ink":
 - **Non-data ink**, axes, gridlines, background, labels, legend
   styling. Controlled by the **theme**.
 
-<Figure
-  slug="gg-themes-and-styling-inline-cutout"
-  alt="The same finished plot shown three times in three different framings, the data marks identical in each"
-/>
-
 The theme owns all of the non-data ink. You can hand the same data plot
 to ten different themes and get ten different looks with identical
 meaning.
@@ -88,6 +83,11 @@ p + theme_classic() # axis lines, no grid -> a traditional look
 One function call, the whole appearance changes, the data untouched.
 Other built-ins include `theme_bw()`, `theme_light()`, and
 `theme_void()` (which removes *all* non-data ink, handy for maps).
+
+<Figure
+  slug="gg-themes-and-styling-inline-cutout"
+  alt="The same finished plot shown three times in three different framings, the data marks identical in each"
+/>
 
 ## Fine control with theme()
 

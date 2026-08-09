@@ -32,11 +32,6 @@ single engineered feature and the pattern becomes obvious; make it
 reconstruct the ratio from two separate columns and you have made its job
 harder for no reason.
 
-<Figure
-  slug="ml-feature-engineering-inline-cutout"
-  alt="Raw blocks on the left being cut, combined and re-shaped at a bench into a smaller set of cleaner parts that fit the machine at the right"
-/>
-
 ```mermaid
 flowchart TD
     A["raw columns<br/>rooms, people, date, ..."] --> B["feature engineering<br/>ratios, bins, date parts, interactions"]
@@ -365,6 +360,11 @@ size-to-price relationship easier to read.
 Engineered features are not automatically good. Each new column is a
 hypothesis: "this representation exposes useful signal." Some hypotheses are
 right; some just add noise and dimensions for the model to overfit to.
+
+<Figure
+  slug="ml-feature-engineering-inline-cutout"
+  alt="Raw blocks on the left being cut, combined and re-shaped at a bench into a smaller set of cleaner parts that fit the machine at the right"
+/>
 
 It **helps** when:
 

@@ -21,11 +21,6 @@ Every business question hides a filter. "How are sales in the West?" means
 `WHERE region = 'West'`. "What happened in Q1?" means a date range.
 Learning to *hear* the filter inside a question is half of analytical SQL.
 
-<Figure
-  slug="duck-filtering-and-slicing-inline-cutout"
-  alt="A long board with a section cut out by two straight blades, that section lifted away on its own"
-/>
-
 ```mermaid
 flowchart TD
     All[("Whole dataset")] --> F["<code>WHERE</code><br/>(the slice)"]
@@ -188,6 +183,11 @@ Filtering early is both a performance habit and a clarity habit:
 - **Clearer reasoning.** Once the data is reduced to "the rows this
   question is about," every later step, grouping, joining, averaging, is
   easier to think about.
+
+<Figure
+  slug="duck-filtering-and-slicing-inline-cutout"
+  alt="A long board with a section cut out by two straight blades, that section lifted away on its own"
+/>
 
 ```mermaid
 flowchart TD

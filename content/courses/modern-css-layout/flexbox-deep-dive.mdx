@@ -22,11 +22,6 @@ items**. Everything flexbox does is described relative to two axes:
   → horizontal; `column` → vertical).
 - The **cross axis**, perpendicular to it.
 
-<Figure
-  slug="css-flexbox-deep-dive-inline-cutout"
-  alt="A rail of blocks with springs between them, one block visibly wider because its own spring is stiffer than the rest"
-/>
-
 `justify-content` aligns along the **main** axis; `align-items` aligns
 along the **cross** axis. Flip `flex-direction` and those two swap
 meaning, which is the single most common source of "why is my
@@ -331,3 +326,8 @@ if (parseFloat(s.flexGrow) < 1) {
 
 Flexbox owns one dimension. For rows *and* columns together, you want
 [CSS Grid](/courses/modern-css-layout/css-grid).
+
+<Figure
+  slug="css-flexbox-deep-dive-inline-cutout"
+  alt="A rail of blocks with springs between them, one block visibly wider because its own spring is stiffer than the rest"
+/>

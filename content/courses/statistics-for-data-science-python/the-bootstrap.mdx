@@ -31,11 +31,6 @@ much a statistic wobbles, you'd want to draw many fresh samples from the
 population and watch the statistic vary. But you can't, you only have
 *one* sample, and the population is hidden.
 
-<Figure
-  slug="stat-the-bootstrap-inline-cutout"
-  alt="One bucket of blocks being scooped from repeatedly with replacement, each scoop producing a summary tile, the tiles piling into a spread"
-/>
-
 The bootstrap's trick is a bold substitution: **treat your sample as if
 it were the population.** Your sample is your single best picture of the
 population, so drawing new samples *from your sample* mimics drawing new
@@ -109,6 +104,11 @@ check, we'll compare the bootstrap CI for the mean against the classic
 t-interval from *Confidence Intervals*, they should land in nearly the
 same place, which is reassuring evidence the bootstrap isn't magic, just
 simulation.
+
+<Figure
+  slug="stat-the-bootstrap-inline-cutout"
+  alt="One bucket of blocks being scooped from repeatedly with replacement, each scoop producing a summary tile, the tiles piling into a spread"
+/>
 
 <CodeBlock
   adapter="python"

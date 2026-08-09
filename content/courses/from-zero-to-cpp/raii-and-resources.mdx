@@ -40,11 +40,6 @@ worse. C alone gives you no help, you must remember every paired
 acquire/release on every code path including error paths. C++ gives
 you RAII.
 
-<Figure
-  slug="cpp-raii-and-resources-inline-cutout"
-  alt="A door that opens as a figure steps through and swings shut behind them on its own spring, a lamp inside switching off with it"
-/>
-
 ## The RAII pattern
 
 > **Acquire the resource in the constructor.<br/>
@@ -171,6 +166,11 @@ flowchart TB
 ## Containers and strings are RAII
 
 You've been using RAII the whole course without naming it.
+
+<Figure
+  slug="cpp-raii-and-resources-inline-cutout"
+  alt="A door that opens as a figure steps through and swings shut behind them on its own spring, a lamp inside switching off with it"
+/>
 
 - `std::vector` owns its heap buffer. When the vector dies, the
   buffer is freed.

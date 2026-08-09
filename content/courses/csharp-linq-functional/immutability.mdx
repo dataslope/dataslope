@@ -22,11 +22,6 @@ your code gets *simpler*, not more complex.
 Here is a tiny "shopping cart" written with a mutable list. Look
 at what happens.
 
-<Figure
-  slug="cs-immutability-inline-cutout"
-  alt="A sealed block set aside untouched while a fresh copy with one changed face is placed beside it"
-/>
-
 <CodeBlock
   adapter="csharp"
   files={[
@@ -239,6 +234,11 @@ You don't have to make every class a record. A practical rule:
   small set of methods.
 - **Services** (the OrderService that processes things) → typically
   stateless or have only configuration as state.
+
+<Figure
+  slug="cs-immutability-inline-cutout"
+  alt="A sealed block set aside untouched while a fresh copy with one changed face is placed beside it"
+/>
 
 Most of the bugs in a typical codebase live in the *values*, not the
 services. Making values immutable is where the biggest win is.

@@ -20,11 +20,6 @@ key, the whole key, and nothing but the key.
 A **transitive dependency** happens when a non-key column depends on
 another non-key column instead of depending directly on the key.
 
-<Figure
-  slug="db-third-normal-form-inline-cutout"
-  alt="A table where one column is found to depend on another column rather than on the key, and is lifted out to its own table"
-/>
-
 Imagine an `orders` table like this:
 
 ```mermaid
@@ -261,6 +256,11 @@ while a non-key column still determines part of a key, which can
 happen when a table has overlapping candidate keys. The cases are
 rare enough that many working designers never meet one outside a
 textbook.
+
+<Figure
+  slug="db-third-normal-form-inline-cutout"
+  alt="A table where one column is found to depend on another column rather than on the key, and is lifted out to its own table"
+/>
 
 The practical takeaway: if every table you design keeps each non-key
 column loyal to the key, the whole key, and nothing but the key, you

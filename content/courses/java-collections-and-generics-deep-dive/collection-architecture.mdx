@@ -25,11 +25,6 @@ boundaries with collections.
 These three together produce APIs that are simultaneously *easy to
 call* and *impossible to misuse*.
 
-<Figure
-  slug="jcol-collection-architecture-inline-cutout"
-  alt="One set of standard fittings at the top of a board with several different containers below, each carrying those fittings"
-/>
-
 ## Principle 1: program to interfaces, not implementations
 
 Imagine a method whose job is to count occurrences:
@@ -128,6 +123,11 @@ A few useful conventions:
   that you fully control. Don't serialize internal domain
   collections directly, they couple your storage shape to your wire
   format.
+
+<Figure
+  slug="jcol-collection-architecture-inline-cutout"
+  alt="One set of standard fittings at the top of a board with several different containers below, each carrying those fittings"
+/>
 
 ## A worked example: an in-memory `BookRepo`
 

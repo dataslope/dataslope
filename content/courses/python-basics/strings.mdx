@@ -20,11 +20,6 @@ Strings show up in almost every program:
 - **Automation scripts:** command output, configuration files, environment variables.
 - **Games:** dialogue, item names, save files.
 
-<Figure
-  slug="python-strings-inline-cutout"
-  alt="A ribbon of letter tiles being cut, joined and reversed by three small hand tools"
-/>
-
 Understanding strings-indexing, slicing, formatting, and the immutability gotcha-is essential to productive Python programming.
 
 ## String literals
@@ -198,6 +193,11 @@ If you need byte length, encode first: `len(s.encode("utf-8"))`.
 ## Strings are immutable
 
 You **cannot** mutate a string in place. Methods like `upper()`, `replace()`, and `strip()` return **new** strings.
+
+<Figure
+  slug="python-strings-inline-cutout"
+  alt="A ribbon of letter tiles being cut, joined and reversed by three small hand tools"
+/>
 
 That has a consequence worth knowing before you write your first loop over
 text: `s += piece` inside a loop is not appending, it is copying everything

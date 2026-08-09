@@ -37,11 +37,6 @@ WHERE avg_order > 100;
 The actual steps, *keep paid orders, average per region, keep big
 averages*, are scrambled. A reader has to mentally unwrap it.
 
-<Figure
-  slug="duck-common-table-expressions-inline-cutout"
-  alt="Four small named trays along a bench, each built from the one before it, with the last feeding a machine"
-/>
-
 ## The fix: a pipeline of named steps
 
 A CTE pulls each step out, names it, and stacks the steps **top to
@@ -102,6 +97,11 @@ Read it straight down: *define `paid`, then `per_region` built on `paid`,
 then the final query built on `per_region`.* Each step has a name that
 says what it is. This is how analysts write queries they can revisit a
 month later and still understand.
+
+<Figure
+  slug="duck-common-table-expressions-inline-cutout"
+  alt="Four small named trays along a bench, each built from the one before it, with the last feeding a machine"
+/>
 
 ```mermaid
 flowchart TD

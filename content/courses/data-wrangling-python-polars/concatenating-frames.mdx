@@ -34,11 +34,6 @@ Plain `vertical` demands identical schemas: the same column names, in
 the same order, with the same dtypes. That strictness is the point.
 It catches the case where last month's export gained a column.
 
-<Figure
-  slug="pl-concatenating-frames-inline-cutout"
-  alt="Two boards of the same width stacked one directly onto the other so their columns line up into one taller board"
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -191,6 +186,11 @@ print("rows:", year.height, "chunks:", year.n_chunks())
 For files specifically, Polars will do this for you: `scan_csv` and
 `scan_parquet` accept a glob and read every match as one lazy frame,
 which is both shorter and faster than concatenating by hand.
+
+<Figure
+  slug="pl-concatenating-frames-inline-cutout"
+  alt="Two boards of the same width stacked one directly onto the other so their columns line up into one taller board"
+/>
 
 ```python
 lf = pl.scan_parquet("data/2026-*.parquet")

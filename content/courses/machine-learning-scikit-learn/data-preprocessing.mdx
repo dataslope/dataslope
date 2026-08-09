@@ -26,11 +26,6 @@ rule that separates an honest pipeline from a leaky one.
 The problem, measured. Two features that matter equally, in units that
 do not, and the share of distance each ends up contributing.
 
-<Figure
-  slug="ml-data-preprocessing-inline-cutout"
-  alt="Raw blocks passing through a washing, trimming and gauging line before reaching the machine at the end of the bench"
-/>
-
 <Chart slug="feature-scaling-distance" />
 
 Suppose you are predicting whether a loan will default, and two of your
@@ -243,6 +238,11 @@ from the **training set only**. If you compute them using the test set too,
 information about the test set has leaked into your training process, and
 your test score is no longer an honest estimate of performance on truly
 unseen data.
+
+<Figure
+  slug="ml-data-preprocessing-inline-cutout"
+  alt="Raw blocks passing through a washing, trimming and gauging line before reaching the machine at the end of the bench"
+/>
 
 Think back to the train/test split page: the whole point of a test set is
 that the model knows *nothing* about it until evaluation. The moment your

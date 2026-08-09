@@ -18,11 +18,6 @@ A **CHECK** constraint lets the schema say those things out loud.
 A CHECK constraint is a boolean expression that must be true for every
 row. If the expression is false, PostgreSQL rejects the write.
 
-<Figure
-  slug="db-check-constraints-inline-cutout"
-  alt="A chute with a gauge across it, a block that is too tall stopped at the gauge while a block within the limit passes underneath"
-/>
-
 ```mermaid
 flowchart TD
     Row["Incoming row"] --> Check{"CHECK expression<br/>is true?"}
@@ -167,6 +162,11 @@ CHECK is best for row-level domain rules that evaluate to true or false.`}
 
 CHECK is one member of the constraint family. It does not replace the
 others.
+
+<Figure
+  slug="db-check-constraints-inline-cutout"
+  alt="A chute with a gauge across it, a block that is too tall stopped at the gauge while a block within the limit passes underneath"
+/>
 
 ```mermaid
 flowchart TB

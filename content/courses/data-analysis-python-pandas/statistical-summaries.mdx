@@ -45,11 +45,6 @@ df = pd.read_csv("diamonds.csv")`,
 `.T` (transpose) to put columns as rows, much easier to read
 when you have many columns.
 
-<Figure
-  slug="pandas-statistical-summaries-inline-cutout"
-  alt="One tall column of chips feeding a rack of five small gauges, each showing a different reading"
-/>
-
 For non-numeric columns:
 
 <CodeBlock
@@ -287,6 +282,11 @@ print(df.groupby("cut")["price"].describe().round(0))
 
 A grouped mean has the same blind spot a single mean does: four groups can
 report the same average and be four completely different distributions.
+
+<Figure
+  slug="pandas-statistical-summaries-inline-cutout"
+  alt="One tall column of chips feeding a rack of five small gauges, each showing a different reading"
+/>
 
 <Chart slug="bar-hides-distribution" />
 

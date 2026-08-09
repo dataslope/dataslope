@@ -124,6 +124,12 @@ memory or crash the server, it did something arguably worse: it
 let any attacker read up to ~64 KB of the server's process memory
 *per request*, with no authentication and no log trace.
 
+<Figure
+  slug="sysc-disasters-heartbleed-cutout"
+  alt="A padlock split open around a heart-shaped valve, with a ribbon of memory unspooling out of the crack carrying keys and cards away"
+  caption="CVE-2014-0160: a heartbeat that answered with 64 KB of whatever was next to the buffer."
+/>
+
 The bug, distilled:
 
 ```c
@@ -138,12 +144,6 @@ sent a few bytes of `data`, OpenSSL happily read 65535 bytes
 bytes contained anything that happened to be in the process, TLS
 private keys, session cookies, user passwords, fragments of other
 users' HTTP requests.
-
-<Figure
-  slug="sysc-disasters-heartbleed-cutout"
-  alt="A padlock split open around a heart-shaped valve, with a ribbon of memory unspooling out of the crack carrying keys and cards away"
-  caption="CVE-2014-0160: a heartbeat that answered with 64 KB of whatever was next to the buffer."
-/>
 
 **Bug class:** *buffer over-read* (closely related to overflow, same
 "trust attacker-supplied length" mistake, but reading rather than
@@ -275,6 +275,12 @@ Energy of Canada Limited. Between 1985 and 1987 it gave at least six
 patients massive radiation overdoses, hundreds of times the
 intended dose. At least three died as a direct result.
 
+<Figure
+  slug="sysc-disasters-therac-25-cutout"
+  alt="A radiation therapy machine aiming a beam at an empty couch, an operator at a console across the room, and a safety latch lying detached on the floor"
+  caption="Therac-25, 1985 to 1987: the hardware interlock earlier models carried was removed, leaving the software alone."
+/>
+
 The Therac-25's software was written in PDP-11 assembly (not C), but
 its failure modes are the systems-programming nightmare scenarios
 this course has been preparing you to recognize. They included:
@@ -288,12 +294,6 @@ this course has been preparing you to recognize. They included:
 - **No hardware interlock** to back up the software, earlier models
   had one; the Therac-25 removed it because "the software was now
   good enough."
-
-<Figure
-  slug="sysc-disasters-therac-25-cutout"
-  alt="A radiation therapy machine aiming a beam at an empty couch, an operator at a console across the room, and a safety latch lying detached on the floor"
-  caption="Therac-25, 1985 to 1987: the hardware interlock earlier models carried was removed, leaving the software alone."
-/>
 
 **Bug classes:** concurrency bugs, integer overflow used as a flag,
 and over-reliance on unverified software.

@@ -16,11 +16,6 @@ This page gives you the vocabulary for talking about those shapes. The notation 
 
 On ten items, almost any correct solution feels instant. On ten million items, an O(n^2) loop can be impossible while an O(n log n) solution still finishes. The program below makes the gap concrete: watch how the `quadratic` column races away from the `linear` one as `n` grows by factors of ten.
 
-<Figure
-  slug="dsa-complexity-analysis-inline-cutout"
-  alt="Three ramps of different steepness rising across the frame from the same start, a cart on each having travelled very different distances"
-/>
-
 <CodeBlock
   adapter="cpp"
   files={[
@@ -138,6 +133,11 @@ Timing small programs is noisy, especially in a browser sandbox, but measurement
 ## Reading complexity off the code
 
 With practice you can read growth rates straight from a function's shape. A single loop over `n` items is usually O(n). A nested loop over all pairs is usually O(n²), more precisely, the inner body runs `n(n-1)/2` times, and the constant `1/2` gets absorbed by the notation. A loop whose variable *halves* each iteration (`n`, `n/2`, `n/4`, …) runs O(log n) times; that is exactly why binary search, which discards half of the remaining candidates per comparison, is O(log n).
+
+<Figure
+  slug="dsa-complexity-analysis-inline-cutout"
+  alt="Three ramps of different steepness rising across the frame from the same start, a cart on each having travelled very different distances"
+/>
 
 Two patterns to be suspicious of: a loop that *looks* single but hides an O(n) operation in its body (like `v.erase(v.begin())` or substring copies), and recursion, for recursive functions, count the total number of calls, not the lines of code. Both pitfalls will come up again, by name, in the sorting and recursion chapters.
 

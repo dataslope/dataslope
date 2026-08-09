@@ -22,11 +22,6 @@ what you already know about vectors. On the next pages we'll meet
 The bracket on a data frame takes two arguments separated by a
 comma: which rows, which columns. An empty slot means *all*.
 
-<Figure
-  slug="rlang-subsetting-and-filtering-inline-cutout"
-  alt="A board of rows passing under a comb that lets some rows through and holds the rest back at the teeth"
-/>
-
 ```mermaid
 flowchart TD
   df["data frame"] -->|"[rows, cols]"| sub["subset"]
@@ -156,6 +151,11 @@ right side?"*
 If your filter condition involves a column with `NA`s, those rows
 become problematic, `NA > 5` is `NA`, not `FALSE`, and indexing
 with `NA` yields a row of all `NA`s.
+
+<Figure
+  slug="rlang-subsetting-and-filtering-inline-cutout"
+  alt="A board of rows passing under a comb that lets some rows through and holds the rest back at the teeth"
+/>
 
 <CodeBlock
   adapter="r"

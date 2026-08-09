@@ -28,11 +28,6 @@ A histogram chops the range of a numeric variable into **bins**
 that fall into each bin. The result looks like a bar chart, but
 the bars represent *intervals*, not categories.
 
-<Figure
-  slug="viz-histograms-inline-cutout"
-  alt="A tray of loose chips being dropped into a row of adjacent bins, the bins filling to different heights as they land"
-/>
-
 In short: **a numeric column → cut into bins (e.g. 0-10, 10-20, ...) →
 count per bin → plot as bars.**
 
@@ -183,6 +178,11 @@ fig.show()
 Now the bars represent *probability density* (so each group's
 total area sums to 1), making the *shapes* directly comparable
 regardless of group size.
+
+<Figure
+  slug="viz-histograms-inline-cutout"
+  alt="A tray of loose chips being dropped into a row of adjacent bins, the bins filling to different heights as they land"
+/>
 
 Other `histnorm` values: `"percent"`, `"probability"`, `"density"`.
 

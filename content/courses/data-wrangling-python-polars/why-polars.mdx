@@ -19,6 +19,12 @@ one from scratch on top of Apache Arrow, in Rust, with modern
 hardware assumed. The answer was: much faster, and, more
 surprisingly, much more consistent to use.
 
+<Figure
+  slug="pl-why-polars-one-core-cutout"
+  alt="One figure working alone at a bench beside a tall pile of crates, and four identical benches each taking a quarter of it"
+  caption="pandas, 2008: built when a big dataset was a few hundred thousand rows and a laptop had one useful core."
+/>
+
 ## The three things that changed
 
 ### Your laptop has cores now
@@ -27,12 +33,6 @@ A 2010 laptop had two cores. A 2026 laptop has eight to sixteen, and
 a cloud machine has ninety-six. pandas is largely single-threaded:
 during a `groupby` on a wide table, one core works and the rest sit
 idle.
-
-<Figure
-  slug="pl-why-polars-one-core-cutout"
-  alt="One figure working alone at a bench beside a tall pile of crates, and four identical benches each taking a quarter of it"
-  caption="pandas, 2008: built when a big dataset was a few hundred thousand rows and a laptop had one useful core."
-/>
 
 Polars is parallel by default. Not "parallel if you pass
 `n_jobs=-1`", not "parallel if you install a plugin". Every

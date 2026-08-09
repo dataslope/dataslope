@@ -20,11 +20,6 @@ their split, much of Pandas's apparent quirkiness goes away.
 
 That is the whole rule. Everything else is examples.
 
-<Figure
-  slug="pandas-loc-vs-iloc-inline-cutout"
-  alt="One grid approached from two sides, a hand on the left picking a cell by the name tag on its row, a hand on the right counting rows to reach the same cell"
-/>
-
 ## Side by side
 
 <CodeBlock
@@ -211,6 +206,11 @@ If your index happens to be `[10, 20, 30]`, then `df.loc[10]`
 returns the row labeled 10 (the *first* row), while `df.iloc[10]`
 would be an out-of-bounds error. The difference between label
 and position becomes very obvious in this case.
+
+<Figure
+  slug="pandas-loc-vs-iloc-inline-cutout"
+  alt="One grid approached from two sides, a hand on the left picking a cell by the name tag on its row, a hand on the right counting rows to reach the same cell"
+/>
 
 <CodeBlock
   adapter="python"

@@ -31,11 +31,6 @@ A dataset can lie to you in quiet ways:
 - The **range** is wrong, dates that stop early, amounts that go
   negative.
 
-<Figure
-  slug="duck-profiling-a-dataset-inline-cutout"
-  alt="A board of columns with a small gauge clipped to the head of each, every gauge reading a different property of its column"
-/>
-
 Profiling surfaces these before they corrupt a conclusion. Think of it as
 checking the ingredients before you cook.
 
@@ -182,6 +177,11 @@ Before analyzing any new dataset, answer:
 5. **What is missing?** (`COUNT(*) - COUNT(column)`)
 
 Or just run `SUMMARIZE` and read the lot at a glance.
+
+<Figure
+  slug="duck-profiling-a-dataset-inline-cutout"
+  alt="A board of columns with a small gauge clipped to the head of each, every gauge reading a different property of its column"
+/>
 
 ## Check your understanding
 

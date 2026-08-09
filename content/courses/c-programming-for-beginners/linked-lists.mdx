@@ -38,11 +38,6 @@ A few details worth unpacking:
 - A `next` value of `NULL` means "no more nodes", the end of the
   list.
 
-<Figure
-  slug="c-linked-lists-inline-cutout"
-  alt="Four separate boxes scattered across the frame, each with a short cord running from its side to the next, the last cord ending in a small stop block"
-/>
-
 ```mermaid
 flowchart TD
     H["head"] --> N1["[ 10 | * ]"]
@@ -222,6 +217,11 @@ If those two pictures aren't crystal clear, the program crashes or
 leaks. If they are, every operation is just rearranging arrows. Once
 you can write `list_free` from scratch without looking it up, you
 have internalized pointers.
+
+<Figure
+  slug="c-linked-lists-inline-cutout"
+  alt="Four separate boxes scattered across the frame, each with a short cord running from its side to the next, the last cord ending in a small stop block"
+/>
 
 ## Multi-file challenge: a complete linked-list module
 

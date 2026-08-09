@@ -35,11 +35,6 @@ other software-engineering vice:
 - A second thread sees your collection halfway through a mutation
   and reads garbage.
 
-<Figure
-  slug="jcol-immutable-collections-inline-cutout"
-  alt="A sealed tray of blocks with a lid clamped down, a hand trying to lift one block and finding it fixed"
-/>
-
 Immutable collections make every one of those bugs impossible by
 construction.
 
@@ -151,6 +146,11 @@ The view forbids *callers* from mutating, but the *owner* of
 `backing` can still mutate. That is sometimes exactly right (a
 controller publishes a live read-only view), and sometimes very wrong
 (you wanted nobody to mutate it ever).
+
+<Figure
+  slug="jcol-immutable-collections-inline-cutout"
+  alt="A sealed tray of blocks with a lid clamped down, a hand trying to lift one block and finding it fixed"
+/>
 
 When you want a snapshot that genuinely cannot change, copy first:
 

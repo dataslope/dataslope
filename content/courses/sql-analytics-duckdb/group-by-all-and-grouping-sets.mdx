@@ -23,11 +23,6 @@ error-prone, add a dimension to `SELECT` and forget to add it to `GROUP
 BY`, and you get an error (or worse, a wrong result in databases that
 allow it).
 
-<Figure
-  slug="duck-group-by-all-and-grouping-sets-inline-cutout"
-  alt="One tray of chips summarised three ways at once, by colour, by shape, and by both together, onto three small boards"
-/>
-
 `GROUP BY ALL` tells DuckDB: *group by every selected column that is not
 inside an aggregate.* You write the dimensions once. Here it is over a real
 file of Lending Club loan results, default rate by loan `grade` and
@@ -160,6 +155,11 @@ There is a subtlety: a subtotal row uses `NULL` to mark "all values," but
 your data might *also* contain genuine `NULL`s. The `GROUPING()` function
 returns 1 for a "subtotal" NULL and 0 for a real value, letting you label
 rows unambiguously.
+
+<Figure
+  slug="duck-group-by-all-and-grouping-sets-inline-cutout"
+  alt="One tray of chips summarised three ways at once, by colour, by shape, and by both together, onto three small boards"
+/>
 
 <SqlCodeBlock
   dialect="duckdb"

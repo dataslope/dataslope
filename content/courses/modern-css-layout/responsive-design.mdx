@@ -23,11 +23,6 @@ Before any media query, prefer units that flex with the viewport:
 - **`rem`** for type, so everything scales from one root size.
 - **`min()`, `max()`, `clamp()`** for values that adapt within limits.
 
-<Figure
-  slug="css-responsive-design-inline-cutout"
-  alt="One panel of blocks in three frames of decreasing width, its blocks reflowing from a row to a column"
-/>
-
 `clamp(min, preferred, max)` is the star: a value that grows with the
 screen but never past a floor or ceiling. One line replaces several
 font-size media queries:
@@ -130,6 +125,11 @@ complexity for wider screens using `min-width`:
 This tends to produce simpler CSS: the base case is the most
 constrained, and each query only *adds*. It also means the smallest,
 often slowest, devices get the least CSS to process.
+
+<Figure
+  slug="css-responsive-design-inline-cutout"
+  alt="One panel of blocks in three frames of decreasing width, its blocks reflowing from a row to a column"
+/>
 
 <Callout type="info" title="Don't forget the viewport meta tag">
 Responsive CSS does nothing without `<meta name="viewport"

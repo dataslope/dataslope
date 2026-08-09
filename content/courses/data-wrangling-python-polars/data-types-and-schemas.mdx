@@ -56,11 +56,6 @@ The integer types differ only in how many bytes each value takes. On
 small data it never matters. On large data it is the difference
 between a table fitting in memory and not.
 
-<Figure
-  slug="pl-data-types-and-schemas-inline-cutout"
-  alt="A rack of column slots each cut to a different profile, and a matching set of column blocks being lowered so each fits only its own slot"
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -151,6 +146,11 @@ bad the data is.
 This is the part with no pandas equivalent. A `LazyFrame` knows its
 output schema without reading anything, because the schema follows
 from the plan.
+
+<Figure
+  slug="pl-data-types-and-schemas-inline-cutout"
+  alt="A rack of column slots each cut to a different profile, and a matching set of column blocks being lowered so each fits only its own slot"
+/>
 
 <CodeBlock
   adapter="python"

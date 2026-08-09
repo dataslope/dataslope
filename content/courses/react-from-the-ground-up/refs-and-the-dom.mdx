@@ -21,11 +21,6 @@ That's what **`useRef`** is for.
 of state, and exactly why refs suit values the UI doesn't directly
 display.
 
-<Figure
-  slug="rx-refs-and-the-dom-inline-cutout"
-  alt="A panel with one direct handle reaching past the usual controls to grip an element underneath"
-/>
-
 ```tsx
 const ref = useRef(0);
 ref.current += 1;   // mutate freely; no re-render happens
@@ -83,6 +78,11 @@ that DOM node, so you can call imperative methods like `.focus()`,
 The `?.` matters: `inputRef.current` is `null` on the first render (the
 element doesn't exist yet) and becomes the node once React mounts it. By
 the time a click handler runs, it's set.
+
+<Figure
+  slug="rx-refs-and-the-dom-inline-cutout"
+  alt="A panel with one direct handle reaching past the usual controls to grip an element underneath"
+/>
 
 <Callout type="warn" title="Don't reach for a ref to do what state does">
 Refs are an escape hatch. If a value should be *shown* in the UI, it

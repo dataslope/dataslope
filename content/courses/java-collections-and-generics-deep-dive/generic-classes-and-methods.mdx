@@ -20,11 +20,6 @@ The traditional "hello world" of generics is a `Box<T>`, a container
 of exactly one element of some type `T`. Compare the untyped and
 typed versions.
 
-<Figure
-  slug="jcol-generic-classes-and-methods-inline-cutout"
-  alt="One crate design shown holding three different kinds of block, the crate itself identical in each case"
-/>
-
 <CodeBlock
   adapter="java"
   files={[
@@ -182,6 +177,11 @@ Generic methods are how the standard library writes things like
 `Collections.emptyList()` or `Map.of(k, v)`. You usually do not have
 to specify the type parameter at the call site, the compiler infers
 it.
+
+<Figure
+  slug="jcol-generic-classes-and-methods-inline-cutout"
+  alt="One crate design shown holding three different kinds of block, the crate itself identical in each case"
+/>
 
 ## A multi-file generic class: a stack
 

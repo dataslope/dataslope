@@ -26,11 +26,6 @@ are less than or equal to this value?* Sort the data, then walk left to
 right; each observation steps the curve up a little, so it climbs from
 **0** at the smallest value to **1** at the largest.
 
-<Figure
-  slug="sns-distributions-ecdf-and-rug-inline-cutout"
-  alt="A rising staircase climbing to a ceiling line, with a row of short ticks beneath it marking each observation"
-/>
-
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -120,6 +115,11 @@ larger share of its penguins at or below that length, that is, it sits
 furthest right, confirming it as the long-flipper group, while Adelie and
 Chinstrap rise earlier on the left. Three distributions compared cleanly, no
 occlusion, no bins.
+
+<Figure
+  slug="sns-distributions-ecdf-and-rug-inline-cutout"
+  alt="A rising staircase climbing to a ceiling line, with a row of short ticks beneath it marking each observation"
+/>
 
 <Callout type="tip" title="Reach for ECDF when groups pile up">
 The moment a multi-group histogram or KDE turns into an unreadable tangle,

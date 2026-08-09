@@ -20,11 +20,6 @@ Garbage cannot get in if the schema forbids it.
 **Data quality** means the data is accurate, complete, consistent, and
 trustworthy enough for the software that depends on it.
 
-<Figure
-  slug="db-design-and-data-quality-inline-cutout"
-  alt="Two cabinets side by side, one whose slots enforce shape and one whose open shelves hold a mess of wrong parts"
-/>
-
 Schema design affects each part.
 
 ```mermaid
@@ -177,6 +172,11 @@ erDiagram
 
 If the schema allows bad data, every query and every screen has to
 compensate.
+
+<Figure
+  slug="db-design-and-data-quality-inline-cutout"
+  alt="Two cabinets side by side, one whose slots enforce shape and one whose open shelves hold a mess of wrong parts"
+/>
 
 ```mermaid
 flowchart TD

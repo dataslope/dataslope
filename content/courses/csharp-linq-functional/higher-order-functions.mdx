@@ -71,11 +71,6 @@ These three methods are **the same method** except for one
 expression: the condition inside the `if`. That's a code smell. The
 *behavior* is what differs, but we've duplicated everything else.
 
-<Figure
-  slug="cs-higher-order-functions-inline-cutout"
-  alt="A machine on the left with an open slot in its side, a small tool being slid into that slot, and the machine stamping a different shape because of it"
-/>
-
 A higher-order function lets us extract behavior as an *argument*:
 
 <CodeBlock
@@ -288,6 +283,11 @@ testable in isolation.
 ## A multi-file challenge
 
 Implement a small reusable HOF utility.
+
+<Figure
+  slug="cs-higher-order-functions-inline-cutout"
+  alt="A machine on the left with an open slot in its side, a small tool being slid into that slot, and the machine stamping a different shape because of it"
+/>
 
 <ChallengeCard
   adapter="csharp"

@@ -53,11 +53,6 @@ handles every line that starts with `#`:
 It does **not** understand C syntax. It is just a smart find-and-
 replace pass.
 
-<Figure
-  slug="sysc-c-toolchain-inline-cutout"
-  alt="A source card passing through four machines in a row, emerging as a card, an object block, a linked block, and finally a running machine"
-/>
-
 <CodeBlock
   adapter="c"
   files={[
@@ -178,6 +173,11 @@ demands at least one definition per used symbol.
 The browser sandbox supports multiple translation units. Pass `files`
 and `entryFilename` to `<CodeBlock>` and you can practice the same
 header / implementation split you would use in a real project.
+
+<Figure
+  slug="sysc-c-toolchain-inline-cutout"
+  alt="A source card passing through four machines in a row, emerging as a card, an object block, a linked block, and finally a running machine"
+/>
 
 <CodeBlock
   adapter="c"

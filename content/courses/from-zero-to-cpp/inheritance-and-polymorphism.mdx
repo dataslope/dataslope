@@ -62,11 +62,6 @@ Three new keywords to absorb:
   virtual function." If the signature doesn't match a base virtual,
   you get a compile error instead of a silent mismatch.
 
-<Figure
-  slug="cpp-inheritance-and-polymorphism-inline-cutout"
-  alt="One plain base cabinet at the left, and to its right three cabinets built on the same frame with a different top fitted to each"
-/>
-
 ```mermaid
 flowchart TB
     A[Animal<br/>+ name<br/>+ sound virtual ]
@@ -177,6 +172,11 @@ fields `private` and let derived classes call public methods.
 It's tempting to use inheritance whenever two classes share fields
 or behaviour. Often the better tool is **composition**, one class
 *has* the other as a member.
+
+<Figure
+  slug="cpp-inheritance-and-polymorphism-inline-cutout"
+  alt="One plain base cabinet at the left, and to its right three cabinets built on the same frame with a different top fitted to each"
+/>
 
 ```cpp
 // Inheritance: Car is-a Vehicle

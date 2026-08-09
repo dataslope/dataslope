@@ -36,11 +36,6 @@ Differentiation in finite precision is *ill-conditioned*, you are
 subtracting nearby numbers. Integration is *well-conditioned*,
 errors average out. This asymmetry shapes every algorithm below.
 
-<Figure
-  slug="scipy-numerical-calculus-inline-cutout"
-  alt="A curve with a row of thin rectangles fitted under it, and a straight rod resting tangent against one point of the curve"
-/>
-
 ## Finite differences
 
 The definition $f'(x) = \lim_{h\to 0} (f(x+h)-f(x))/h$ suggests we
@@ -298,6 +293,11 @@ its own error by comparing one Simpson's rule against the sum of
 two half-interval Simpson rules, and recurses only where the
 disagreement exceeds the tolerance. SciPy's `quad` is a much more
 sophisticated relative, but the idea is the same.
+
+<Figure
+  slug="scipy-numerical-calculus-inline-cutout"
+  alt="A curve with a row of thin rectangles fitted under it, and a straight rod resting tangent against one point of the curve"
+/>
 
 ## Challenge: estimate $\pi$ by integration
 

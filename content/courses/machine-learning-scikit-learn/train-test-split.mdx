@@ -22,11 +22,6 @@ the night before. The next day they score 100%. Did they learn the
 material? You have no idea. The score is meaningless because they were
 tested on the very thing they memorized.
 
-<Figure
-  slug="ml-train-test-split-inline-cutout"
-  alt="One pile of blocks being divided by a partition into a large left share and a small sealed right share, the right share kept under a lid"
-/>
-
 Machine learning models can memorize too. A flexible enough model can
 essentially store the training data and replay it. If you then "test" it
 on that same data, it looks brilliant, and tells you nothing about how it
@@ -67,6 +62,11 @@ is the whole trick.
 
 scikit-learn gives us one function for this. It shuffles the rows and cuts
 them into two groups.
+
+<Figure
+  slug="ml-train-test-split-inline-cutout"
+  alt="One pile of blocks being divided by a partition into a large left share and a small sealed right share, the right share kept under a lid"
+/>
 
 <CodeBlock
   adapter="python"

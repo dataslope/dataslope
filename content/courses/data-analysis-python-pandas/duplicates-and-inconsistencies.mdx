@@ -20,11 +20,6 @@ customer ID appearing twice is a duplicate. In an orders table,
 the same customer ID appearing twice is just a returning
 customer, not a duplicate.
 
-<Figure
-  slug="pandas-duplicates-and-inconsistencies-inline-cutout"
-  alt="A line of cards where three are visibly the same card, a gloved hand lifting two of them out, and a fourth card in the line spelled differently from its twin"
-/>
-
 So the question is always: *what columns, taken together, should
 uniquely identify a row?*
 
@@ -66,6 +61,11 @@ print(df[df.duplicated(subset=["customer_id"])])
 By default, `duplicated()` marks the **second and later** copies
 as duplicates and leaves the first untouched. `keep="last"`
 reverses that; `keep=False` marks *all* duplicates.
+
+<Figure
+  slug="pandas-duplicates-and-inconsistencies-inline-cutout"
+  alt="A line of cards where three are visibly the same card, a gloved hand lifting two of them out, and a fourth card in the line spelled differently from its twin"
+/>
 
 ## Removing duplicates
 

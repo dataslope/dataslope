@@ -21,11 +21,6 @@ A primary key already guarantees one kind of uniqueness: every row has a
 unique identity. But many tables have other values that must be unique
 too.
 
-<Figure
-  slug="db-unique-constraints-inline-cutout"
-  alt="A rack where each slot accepts one tag only, an identical second tag being turned away at the slot's mouth"
-/>
-
 ```mermaid
 flowchart TB
     Account["accounts table"] --> ID["id<br/>PRIMARY KEY"]
@@ -177,6 +172,11 @@ Composite uniqueness protects a repeated combination, not each column by itself.
 
 A primary key and a unique constraint both prevent duplicates, but they
 have different jobs.
+
+<Figure
+  slug="db-unique-constraints-inline-cutout"
+  alt="A rack where each slot accepts one tag only, an identical second tag being turned away at the slot's mouth"
+/>
 
 ```mermaid
 flowchart TB

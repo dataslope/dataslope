@@ -26,11 +26,6 @@ Every test has an unknowable **truth** (H₀ is really true, or it's
 really false) and a **decision** you make (reject H₀, or fail to
 reject). Cross them and you get four outcomes, two right, two wrong.
 
-<Figure
-  slug="stat-errors-and-power-inline-cutout"
-  alt="A two-by-two board of trays, one tray holding a false alarm and another a missed catch, with a dial beside it turning to shrink the miss"
-/>
-
 | | **You fail to reject H₀** | **You reject H₀** |
 | --- | --- | --- |
 | **H₀ is true** | Correct (specificity) | **Type I error**, false positive, rate α |
@@ -130,6 +125,11 @@ beautifully simple:
 3. Repeat thousands of times.
 4. **Power = the fraction of repeats that rejected**, the rate at which
    your test catches the effect you planted.
+
+<Figure
+  slug="stat-errors-and-power-inline-cutout"
+  alt="A two-by-two board of trays, one tray holding a false alarm and another a missed catch, with a dial beside it turning to shrink the miss"
+/>
 
 <CodeBlock
   adapter="python"

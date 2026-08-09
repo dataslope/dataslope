@@ -20,11 +20,6 @@ and duplication.
 A schema that scales well has clear tables, stable keys, and
 relationships that match the real world.
 
-<Figure
-  slug="db-design-and-scale-inline-cutout"
-  alt="The same cabinet drawn small on one bench and very large on the next, its fittings identical in both"
-/>
-
 ```mermaid
 flowchart TD
     Clear["Clear entity tables"] --> Keys["Stable keys"]
@@ -161,6 +156,11 @@ erDiagram
 
 Good design is not "normalize everything forever." It is choosing the
 structure that preserves meaning while supporting expected growth.
+
+<Figure
+  slug="db-design-and-scale-inline-cutout"
+  alt="The same cabinet drawn small on one bench and very large on the next, its fittings identical in both"
+/>
 
 For example:
 

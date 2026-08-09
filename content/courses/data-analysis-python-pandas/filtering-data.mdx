@@ -19,11 +19,6 @@ A boolean mask is a Series of `True`/`False` values, one per row.
 Apply it to a DataFrame and you get back only the rows where the
 mask is `True`.
 
-<Figure
-  slug="pandas-filtering-data-inline-cutout"
-  alt="A board of rows tipping through a grate, the rows that fail the test dropping away and the rest continuing"
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -264,6 +259,11 @@ print(big_gentoos[["species", "island", "body_mass_g", "sex"]].head())
 You will write filters like this all day, every day, as an analyst.
 Cosmetic note: breaking each condition onto its own line and
 aligning the `&`s makes complex filters readable.
+
+<Figure
+  slug="pandas-filtering-data-inline-cutout"
+  alt="A board of rows tipping through a grate, the rows that fail the test dropping away and the rest continuing"
+/>
 
 ## Filter, then assign
 

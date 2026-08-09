@@ -81,11 +81,6 @@ Once `reducer` is pure and `history` is just an array of actions,
 you get "time travel" for free: prefix of history → state at any
 point in time.
 
-<Figure
-  slug="fp-functional-state-management-inline-cutout"
-  alt="A shelf of successive trays, each a copy of the last with one slot changed, none of them altered after being set down"
-/>
-
 <CodeBlock
   adapter="typescript"
   files={[
@@ -231,6 +226,11 @@ Sometimes you want to **thread** a state through a sequence of pure
 computations without making the state a global. That's modeled in
 FP by `State<S, A> = (s: S) => [A, S]`, "given the current state,
 produce a value and the next state".
+
+<Figure
+  slug="fp-functional-state-management-inline-cutout"
+  alt="A shelf of successive trays, each a copy of the last with one slot changed, none of them altered after being set down"
+/>
 
 <CodeBlock
   adapter="typescript"

@@ -30,11 +30,6 @@ gaps, and outliers all at once, in about half a second.
   into a solid blob (**overplotting**), and with too many color groups the
   legend becomes a guessing game. We'll fix both below.
 
-<Figure
-  slug="sns-relational-scatter-plots-inline-cutout"
-  alt="Chips pinned across a board with a second series in another ink laid over them, the two drifting apart to the right"
-/>
-
 ## The minimum
 
 `relplot` ("relational plot") is Seaborn's figure-level entry point for
@@ -207,6 +202,11 @@ You'll see two ways to draw the same scatter:
   manages its own figure, and can split into panels with `col`/`row`.
 - `sns.scatterplot(...)`, **axes-level**. Draws onto a single matplotlib
   Axes you can combine with other plots.
+
+<Figure
+  slug="sns-relational-scatter-plots-inline-cutout"
+  alt="Chips pinned across a board with a second series in another ink laid over them, the two drifting apart to the right"
+/>
 
 They produce the same dots; they differ in what they *return* and how they
 *compose*. We devote a whole page to that distinction, for now, reach for

@@ -56,11 +56,6 @@ Read it as a sentence:
 That's the whole grammar. Every ggplot in existence is some
 extension of this skeleton.
 
-<Figure
-  slug="rlang-ggplot-grammar-inline-cutout"
-  alt="A set of interchangeable parts on a rack, data, marks, scales and frame, assembled into one plot"
-/>
-
 ## Geometries: change the chart, not the rest
 
 Try different geoms on the same data:
@@ -86,6 +81,11 @@ p + geom_point() + geom_smooth(method = "lm") # both!
 You change one word (`geom_point` → `geom_smooth`) and you get a
 fundamentally different chart. Same data, same mapping, different
 mark.
+
+<Figure
+  slug="rlang-ggplot-grammar-inline-cutout"
+  alt="A set of interchangeable parts on a rack, data, marks, scales and frame, assembled into one plot"
+/>
 
 A small map of the most-used geoms:
 

@@ -23,11 +23,6 @@ Almost every time series operation needs to compare *now* to *then*.
 value from its own past (a **lag**). `shift(-k)` does the reverse (a
 **lead**, peeking ahead).
 
-<Figure
-  slug="tsa-rolling-and-expanding-windows-inline-cutout"
-  alt="Two rails of daily blocks, the near one with a short frame of fixed width sliding along it, the far one with a frame whose left edge stays pinned so it stretches longer as it moves right"
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -371,6 +366,11 @@ Where `rolling(N)` looks back a fixed `N` steps, **`expanding`** looks back
 running (cumulative) average, "the average of everything up to and
 including now." It's the honest, leakage-free way to say "the typical value
 *so far*," because at each point it only knows the past.
+
+<Figure
+  slug="tsa-rolling-and-expanding-windows-inline-cutout"
+  alt="Two rails of daily blocks, the near one with a short frame of fixed width sliding along it, the far one with a frame whose left edge stays pinned so it stretches longer as it moves right"
+/>
 
 <CodeBlock
   adapter="python"

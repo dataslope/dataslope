@@ -37,11 +37,6 @@ similar houses nearby sold for around 400,000, you would guess about
 400,000. KNN formalizes exactly this instinct: **similar inputs tend to
 have similar outputs.**
 
-<Figure
-  slug="ml-k-nearest-neighbors-inline-cutout"
-  alt="One new chip placed on a board of coloured chips, with short cords running from it to the three closest chips and taking their colour"
-/>
-
 ```mermaid
 flowchart TD
     Q["New point<br/>(species unknown)"] --> M["Measure distance<br/>to every training point"]
@@ -362,6 +357,11 @@ unintuitive happens, *all* points become roughly equally far from one
 another. The distance to your nearest neighbor and the distance to your
 farthest neighbor converge, so "nearest" stops carrying much meaning, and
 KNN's core assumption quietly breaks down.
+
+<Figure
+  slug="ml-k-nearest-neighbors-inline-cutout"
+  alt="One new chip placed on a board of coloured chips, with short cords running from it to the three closest chips and taking their colour"
+/>
 
 <CodeBlock
   adapter="python"

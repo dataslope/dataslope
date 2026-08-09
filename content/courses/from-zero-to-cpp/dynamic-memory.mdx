@@ -30,11 +30,6 @@ Modern C++ has *much* better tools (we'll meet them in the smart
 pointer chapter). But you need to understand the raw mechanism
 first, because every higher-level tool is built on top of it.
 
-<Figure
-  slug="cpp-dynamic-memory-inline-cutout"
-  alt="A yard where a crate is requested from a counter, used at a bench, and returned to the counter when finished"
-/>
-
 The two are not just different places, they have very different prices. A
 stack allocation moves a pointer; a heap allocation goes and looks for
 somewhere to put the thing.
@@ -184,6 +179,11 @@ with your bug.
 Look at how much energy these examples spend on bookkeeping. Every
 `new` must be balanced by exactly one `delete`, on every code path,
 including exception paths. That is fragile.
+
+<Figure
+  slug="cpp-dynamic-memory-inline-cutout"
+  alt="A yard where a crate is requested from a counter, used at a bench, and returned to the counter when finished"
+/>
 
 Modern C++ flips the model around: instead of writing `new` and
 `delete` by hand, you let objects *own* their resources, and the

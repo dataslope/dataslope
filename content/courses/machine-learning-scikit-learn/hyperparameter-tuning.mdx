@@ -27,11 +27,6 @@ tuning process worse than useless.
 The distinction sounds like pedantry, but it is the whole foundation of
 this topic, so let us make it concrete.
 
-<Figure
-  slug="ml-hyperparameter-tuning-inline-cutout"
-  alt="A panel of three dials being turned through a grid of settings, a small gauge recording the best combination"
-/>
-
 A **parameter** is a number the model discovers by fitting to data. You
 never set it; `.fit()` computes it. When a `LinearRegression` finds the
 slope and intercept of a line, those coefficients are parameters. When a
@@ -495,6 +490,11 @@ validation data.
 
 Hyperparameter tuning is not free, it costs compute, time, and a little of
 your sanity, and it is not always worth it.
+
+<Figure
+  slug="ml-hyperparameter-tuning-inline-cutout"
+  alt="A panel of three dials being turned through a grid of settings, a small gauge recording the best combination"
+/>
 
 - **A simple model with few hyperparameters.** `LinearRegression` has
   almost nothing to tune. Do not invent a grid for a model that has no

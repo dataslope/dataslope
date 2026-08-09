@@ -32,6 +32,12 @@ steadily *downward*, reaching about 520. The exchange was, by its
 own published number, losing nearly half its value while the
 underlying stocks gained.
 
+<Figure
+  slug="pandas-data-disasters-vancouver-index-cutout"
+  alt="A rising staircase of green blocks above a falling staircase of red ones, a crumb dropping off the edge of every red step"
+  caption="Vancouver Stock Exchange, 1982 to 1983: the market rose, and a truncated third decimal walked the index down to 520."
+/>
+
 The culprit was rounding. The index was recalculated thousands of
 times a day, and each recalculation **truncated** the result to
 three decimals instead of rounding it. Truncation always throws
@@ -40,12 +46,6 @@ did not cancel out, it *accumulated*, recalculation after
 recalculation, into a gap of hundreds of points. When the error was
 found and corrected, the index roughly doubled overnight back to
 where it should have been.
-
-<Figure
-  slug="pandas-data-disasters-vancouver-index-cutout"
-  alt="A rising staircase of green blocks above a falling staircase of red ones, a crumb dropping off the edge of every red step"
-  caption="Vancouver Stock Exchange, 1982 to 1983: the market rose, and a truncated third decimal walked the index down to 520."
-/>
 
 **The habit:** know how your numbers are rounded, and never assume
 a small per-operation error is harmless. Repeated millions of

@@ -22,11 +22,6 @@ Inheritance shows up everywhere in Python:
 
 Understanding inheritance is essential for working with frameworks and designing extensible systems. But remember: **composition is often better than inheritance**. We'll cover that too.
 
-<Figure
-  slug="python-inheritance-inline-cutout"
-  alt="A base cabinet with two cabinets behind it built on the same frame, each adding one part of its own"
-/>
-
 <Callout type="info" title="Real-world example: Django models">
 Every Django model inherits from \`django.db.models.Model\`. That base class provides the entire ORM machinery: \`save()\`, \`delete()\`, \`objects.filter(...)\`, etc. You just define fields and optionally override methods. This is inheritance done right: the base class provides infrastructure, subclasses provide domain logic.
 </Callout>
@@ -210,6 +205,11 @@ Use \`isinstance(x, int)\` instead of \`type(x) is int\`. The former allows subc
 ## Multiple inheritance and the MRO
 
 Python allows a class to inherit from **multiple** parents. Method lookup uses the **Method Resolution Order (MRO)**, which is computed with the **C3 linearization** algorithm.
+
+<Figure
+  slug="python-inheritance-inline-cutout"
+  alt="A base cabinet with two cabinets behind it built on the same frame, each adding one part of its own"
+/>
 
 <CodeBlock
   adapter="python"

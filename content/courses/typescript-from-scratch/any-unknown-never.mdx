@@ -26,11 +26,6 @@ accepts *every* value, the **top type**. At the very bottom sits a type
 that accepts *no* values, the **bottom type**. Every other type falls
 somewhere in between.
 
-<Figure
-  slug="tsx-any-unknown-never-inline-cutout"
-  alt="Three sockets in a row, one open to everything, one covered by a lid that must be lifted first, and one welded shut"
-/>
-
 ```mermaid
 graph TD
     any["any (escape hatch)"]
@@ -181,6 +176,11 @@ process(true);
 **What bugs does this prevent?** It forces you to handle the "I don't
 know what this is" case explicitly. You can't accidentally call a method
 that doesn't exist. This is far safer than `any`.
+
+<Figure
+  slug="tsx-any-unknown-never-inline-cutout"
+  alt="Three sockets in a row, one open to everything, one covered by a lid that must be lifted first, and one welded shut"
+/>
 
 **When to use `unknown`:**
 - When you truly don't know the type of a value (e.g., parsing JSON,

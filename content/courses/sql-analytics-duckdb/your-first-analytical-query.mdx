@@ -19,11 +19,6 @@ Before summarizing anything, an analyst usually takes a quick look at a
 few rows just to learn the columns and their flavor. `LIMIT` makes this
 cheap even on a huge table, you peek, you do not pull everything.
 
-<Figure
-  slug="duck-your-first-analytical-query-inline-cutout"
-  alt="A wide board of rows feeding one machine that leaves a single small summary block on the bench"
-/>
-
 <SqlCodeBlock
   dialect="duckdb"
   title="Peek at the shape of the data"
@@ -259,3 +254,8 @@ changing the stored data.`}
 
 You can now *look* like an analyst. Next: how to get data *into* DuckDB,
 and how to conjure test data out of thin air with `range()`.
+
+<Figure
+  slug="duck-your-first-analytical-query-inline-cutout"
+  alt="A wide board of rows feeding one machine that leaves a single small summary block on the bench"
+/>

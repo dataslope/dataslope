@@ -22,11 +22,6 @@ write is a stream of bytes.
 You've used `printf` since the first chapter. Time to look at it
 properly.
 
-<Figure
-  slug="c-input-and-output-inline-cutout"
-  alt="A small terminal with a slot at the left taking a punched slip and a printer at the right pushing out a finished strip"
-/>
-
 ```c
 printf(format_string, args...);
 ```
@@ -108,6 +103,11 @@ readable.
 Its format string looks similar to `printf`'s but with one critical
 difference: you must pass the **address** of each variable to fill
 (using the `&` operator).
+
+<Figure
+  slug="c-input-and-output-inline-cutout"
+  alt="A small terminal with a slot at the left taking a punched slip and a printer at the right pushing out a finished strip"
+/>
 
 ```c
 int n;

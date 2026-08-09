@@ -24,11 +24,6 @@ programs in dynamically typed languages.
 That's it. The compiler is doing a constant check: *does this code
 make sense given the types?*
 
-<Figure
-  slug="mcs-type-system-inline-cutout"
-  alt="A gate with shaped slots, blocks of the wrong shape stopping at the gate and blocks of the right shape passing through onto a rail"
-/>
-
 <CodeBlock
   adapter="csharp"
   files={[
@@ -95,6 +90,11 @@ the question is always whether the thing you are counting fits under it:
 
 Sometimes you really do need to turn one type into another. C# has
 two flavors of conversion.
+
+<Figure
+  slug="mcs-type-system-inline-cutout"
+  alt="A gate with shaped slots, blocks of the wrong shape stopping at the gate and blocks of the right shape passing through onto a rail"
+/>
 
 ### Implicit conversions (safe, automatic)
 

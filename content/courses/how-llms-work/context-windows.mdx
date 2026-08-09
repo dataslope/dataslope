@@ -24,11 +24,6 @@ system around the model does about that (reject the request, drop the
 oldest turns, summarize) happens outside the model, and the model has
 no way to know something was removed.
 
-<Figure
-  slug="llm-context-windows-inline-cutout"
-  alt="A long ribbon of chips feeding through a fixed rectangular frame, the chips that pass beyond the frame's left edge dropping away off the rail"
-/>
-
 This is why a long chat can quietly forget its own beginning. The
 interface trimmed the history to fit, and no signal about the
 trimming reaches the model or you.
@@ -121,6 +116,11 @@ Recall from the attention chapter that every token attends to every
 other token, so cost scales with the square of the length. Going from
 8,000 to 1,000,000 tokens is a 125-fold increase in length and roughly
 15,000-fold in naive attention work.
+
+<Figure
+  slug="llm-context-windows-inline-cutout"
+  alt="A long ribbon of chips feeding through a fixed rectangular frame, the chips that pass beyond the frame's left edge dropping away off the rail"
+/>
 
 Against a linear reference, which is what "125 times the text" would cost if
 each token were as cheap as the last, the gap is two orders of magnitude:

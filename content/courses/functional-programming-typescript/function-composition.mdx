@@ -24,11 +24,6 @@ In math, given `f: A → B` and `g: B → C`, the composition `g ∘ f`
 is the function `A → C` defined by `(g ∘ f)(x) = g(f(x))`. You apply
 `f` first, then feed the result into `g`.
 
-<Figure
-  slug="fp-function-composition-inline-cutout"
-  alt="Three small machines bolted end to end into one longer machine, a single shape entering the left and leaving transformed at the right"
-/>
-
 ```mermaid
 flowchart TD
     A((A)) -- f --> B((B)) -- g --> C((C))
@@ -72,6 +67,11 @@ Two things to notice:
    `g(f(x))`. This is the mathematical convention.
 2. Composition is *not* commutative: `compose2(g, f)` is different
    from `compose2(f, g)`. Order matters.
+
+<Figure
+  slug="fp-function-composition-inline-cutout"
+  alt="Three small machines bolted end to end into one longer machine, a single shape entering the left and leaving transformed at the right"
+/>
 
 ## `pipe`: the left-to-right cousin
 

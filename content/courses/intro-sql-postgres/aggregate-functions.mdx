@@ -19,11 +19,6 @@ are aggregate questions, and they are the heart of reporting.
 Worth carrying through the whole page: an aggregate is a number standing in
 for a column, and identical aggregates can come from very different columns.
 
-<Figure
-  slug="sql-aggregate-functions-inline-cutout"
-  alt="One tray of blocks feeding four small gauges in a row, each gauge showing a different single reading from the same tray"
-/>
-
 <Chart slug="bar-hides-distribution" />
 
 ```mermaid
@@ -118,6 +113,11 @@ exactly the kind of surprise a quick aggregate sweep is good at
 surfacing. Try swapping `MAX` for `MIN` to find the shortest track,
 or add `SUM(milliseconds) / 3600000 AS total_hours` to see how long
 the whole catalog would take to listen to.
+
+<Figure
+  slug="sql-aggregate-functions-inline-cutout"
+  alt="One tray of blocks feeding four small gauges in a row, each gauge showing a different single reading from the same tray"
+/>
 
 ## Aggregates over a filtered set
 

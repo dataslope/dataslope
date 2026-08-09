@@ -18,6 +18,12 @@ which are not.
 A table is two-dimensional. Memory is one-dimensional. Something has
 to give, and there are exactly two reasonable choices.
 
+<Figure
+  slug="pl-arrow-shared-columns-cutout"
+  alt="Three different machine cabinets all reading from one long shared column of stacked cells running between them"
+  caption="Apache Arrow, 2016: one agreed memory layout, so a column can cross a language boundary without being copied."
+/>
+
 **Row-major** stores each record's fields together:
 
 ```
@@ -88,12 +94,6 @@ Columnar layout is an old idea. **Apache Arrow**, started in 2016, is
 a *standard* for it: an exact specification of how a column of
 integers, strings, or nested structs is laid out in memory, agreed on
 across languages.
-
-<Figure
-  slug="pl-arrow-shared-columns-cutout"
-  alt="Three different machine cabinets all reading from one long shared column of stacked cells running between them"
-  caption="Apache Arrow, 2016: one agreed memory layout, so a column can cross a language boundary without being copied."
-/>
 
 An Arrow column is a few buffers:
 

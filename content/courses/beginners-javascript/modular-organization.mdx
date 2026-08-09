@@ -28,11 +28,6 @@ Two modules can both declare a variable called `helper` without
 clashing, because each name only exists inside its own file. That
 isolation is the entire point.
 
-<Figure
-  slug="js-modular-organization-inline-cutout"
-  alt="One large workshop divided into four small booths, each booth's parts staying inside it and a hatch joining them"
-/>
-
 ```mermaid
 flowchart TD
     subgraph users.js["<code>users.js</code>"]
@@ -64,6 +59,11 @@ the wild:
    years. Uses `require()` and `module.exports`.
 2. **ES Modules (ESM)**, the official language standard, used by
    browsers and now widely by Node. Uses `import` and `export`.
+
+<Figure
+  slug="js-modular-organization-inline-cutout"
+  alt="One large workshop divided into four small booths, each booth's parts staying inside it and a hatch joining them"
+/>
 
 The runtime used in these lessons (`almostnode`) uses CommonJS,
 so all the multi-file challenges have looked like this:

@@ -31,11 +31,6 @@ An **exception** is an object that represents a failure. When code
 call stack looking for a matching `catch` block. If no `catch` is
 found, the program crashes.
 
-<Figure
-  slug="mcs-error-handling-inline-cutout"
-  alt="A cracked block dropping off a bench into a padded catch basket, while a small sweeping arm clears the bench behind it whether or not anything fell"
-/>
-
 <CodeBlock
   adapter="csharp"
   files={[
@@ -118,6 +113,11 @@ Rules:
   runtime picks the first matching one.
 - A `finally` block **always runs**, whether or not an exception
   was thrown, perfect for cleanup.
+
+<Figure
+  slug="mcs-error-handling-inline-cutout"
+  alt="A cracked block dropping off a bench into a padded catch basket, while a small sweeping arm clears the bench behind it whether or not anything fell"
+/>
 
 ## Throwing your own exceptions
 

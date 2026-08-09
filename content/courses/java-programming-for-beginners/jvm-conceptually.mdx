@@ -22,11 +22,6 @@ machine, it has its own instruction set (bytecode), its own model
 of memory, and its own rules, and it runs on top of any real
 machine that hosts it.
 
-<Figure
-  slug="java-jvm-conceptually-inline-cutout"
-  alt="One program block on the left feeding a single translating machine in the middle, which drives three different machine cabinets on the right"
-/>
-
 ```mermaid
 flowchart TB
     A[Your Java Program<br/>.class files / bytecode]
@@ -55,6 +50,11 @@ services to your program:
    (this is the JIT).
 4. **A standard library and runtime**, the classes in `java.lang`,
    `java.util`, `java.io`, etc. that ship with every JVM.
+
+<Figure
+  slug="java-jvm-conceptually-inline-cutout"
+  alt="One program block on the left feeding a single translating machine in the middle, which drives three different machine cabinets on the right"
+/>
 
 ```mermaid
 flowchart TD

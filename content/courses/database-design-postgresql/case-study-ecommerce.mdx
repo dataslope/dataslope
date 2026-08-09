@@ -38,11 +38,6 @@ The phrase "an order contains products" hides a key design point.
 The relationship itself has attributes: quantity and price charged.
 That means it needs a table.
 
-<Figure
-  slug="db-case-study-ecommerce-inline-cutout"
-  alt="Four crates joined by cords, one of products, one of customers, one of orders and one pegboard between orders and products"
-/>
-
 ## Find the entities and relationships
 
 The core entities are `customers`, `products`, `categories`, and
@@ -246,6 +241,11 @@ ORDER BY
 />
 
 The query uses the relationships exactly as the model describes.
+
+<Figure
+  slug="db-case-study-ecommerce-inline-cutout"
+  alt="Four crates joined by cords, one of products, one of customers, one of orders and one pegboard between orders and products"
+/>
 
 ## Test a design rule
 

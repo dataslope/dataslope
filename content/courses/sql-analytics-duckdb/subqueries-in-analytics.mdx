@@ -26,11 +26,6 @@ flowchart TB
 They differ by *what they return* and *how they connect* to the outer
 query. Let us take them in turn.
 
-<Figure
-  slug="duck-subqueries-in-analytics-inline-cutout"
-  alt="A small machine feeding its finished tray straight into the hopper of the larger machine that contains it"
-/>
-
 ## Scalar subquery: a single value
 
 A scalar subquery returns exactly one row, one column, a single number
@@ -183,6 +178,11 @@ expresses the same idea more directly and usually runs better. Knowing
 `EXISTS` is a correlated subquery that returns true/false, "is there at
 least one matching row?" It is the natural way to ask "customers who have
 placed *any* order" without caring how many.
+
+<Figure
+  slug="duck-subqueries-in-analytics-inline-cutout"
+  alt="A small machine feeding its finished tray straight into the hopper of the larger machine that contains it"
+/>
 
 <SqlCodeBlock
   dialect="duckdb"

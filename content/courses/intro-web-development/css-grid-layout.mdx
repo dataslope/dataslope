@@ -30,11 +30,6 @@ row into three equal columns. `2fr 1fr` makes the first column twice
 as wide as the second. It's like `flex: 1`, but for the whole grid at
 once.
 
-<Figure
-  slug="web-css-grid-layout-inline-cutout"
-  alt="A frame ruled into rows and columns with three blocks laid across several cells each, and the unused cells left plainly visible"
-/>
-
 The `repeat()` helper saves typing: `repeat(3, 1fr)` is exactly
 `1fr 1fr 1fr`.
 
@@ -111,6 +106,11 @@ preview and watch the column count change on its own.
   rows, a label next to a value.
 - **Grid**: layout defined in *two* directions, page scaffolding,
   card galleries, anything that lines up in rows *and* columns.
+
+<Figure
+  slug="web-css-grid-layout-inline-cutout"
+  alt="A frame ruled into rows and columns with three blocks laid across several cells each, and the unused cells left plainly visible"
+/>
 
 They compose happily: a grid of cards where each card is a flex
 column is completely normal.

@@ -22,11 +22,6 @@ Human descriptions are often messy. Names repeat. Titles change. Email
 addresses get corrected. A row needs an identity that survives all of
 that.
 
-<Figure
-  slug="db-primary-keys-inline-cutout"
-  alt="A filing drawer of identical folders, each wearing a tab cut to a different silhouette, and a hand pulling exactly one folder out by its tab"
-/>
-
 ```mermaid
 flowchart TB
     O["Order: coffee beans"] --> A["Taylor Kim<br/>Portland"]
@@ -127,6 +122,11 @@ two rows claim to be the same thing.
 
 A primary key does not have to be one column. A **composite primary key**
 uses multiple columns together.
+
+<Figure
+  slug="db-primary-keys-inline-cutout"
+  alt="A filing drawer of identical folders, each wearing a tab cut to a different silhouette, and a hand pulling exactly one folder out by its tab"
+/>
 
 This is common when the row represents a relationship. In a class
 roster, neither `student_id` nor `course_id` is unique by itself. A

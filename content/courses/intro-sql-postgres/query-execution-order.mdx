@@ -32,11 +32,6 @@ Read the numbers: `FROM` is first, `SELECT` is near the **end**, and
 `LIMIT` is last. The clause you *write* first (`SELECT`) is among the
 *last* to actually run.
 
-<Figure
-  slug="sql-query-execution-order-inline-cutout"
-  alt="Six machines standing in a row along a bench with one thick coloured cord threading between them out of order, entering at a machine in the middle, doubling back to the first, and leaving from the last"
-/>
-
 Seen as row counts, the order also explains where a query spends its time:
 
 <Chart slug="sql-clause-funnel" />
@@ -126,6 +121,11 @@ Trace it in execution order:
    output, naming the sum `total`.
 6. **ORDER BY** `total DESC`, sort the surviving groups.
 7. **LIMIT 2**, keep the top two.
+
+<Figure
+  slug="sql-query-execution-order-inline-cutout"
+  alt="Six machines standing in a row along a bench with one thick coloured cord threading between them out of order, entering at a machine in the middle, doubling back to the first, and leaving from the last"
+/>
 
 This is the **query transformation pipeline**: each stage reshapes a
 table and passes it on. Every query you write, however complex,

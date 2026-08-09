@@ -20,11 +20,6 @@ Without `GROUP BY`, an aggregate collapses the *whole* table to one row.
 `GROUP BY` first **sorts the rows into bins** by some key, then computes
 the aggregate **once per bin**. One total becomes one total *per group*.
 
-<Figure
-  slug="duck-grouping-data-inline-cutout"
-  alt="A wide tray of chips raked into four trays by a comb, each tray carrying its own small counter"
-/>
-
 ```mermaid
 flowchart TB
     All[("All orders")] --> G["<code>GROUP BY region</code>"]
@@ -123,6 +118,11 @@ matrix of the business. Adding a grouping column is exactly the
 You can group by something computed, not just a stored column, by month
 extracted from a date, by a price bucket, by the first letter of a name.
 This is where grouping becomes genuinely creative.
+
+<Figure
+  slug="duck-grouping-data-inline-cutout"
+  alt="A wide tray of chips raked into four trays by a comb, each tray carrying its own small counter"
+/>
 
 <SqlCodeBlock
   dialect="duckdb"

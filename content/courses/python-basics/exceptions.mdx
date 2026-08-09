@@ -44,16 +44,16 @@ except ZeroDivisionError as e:
 
 The traceback shows the **exception propagation** up the call stack: `main()` called `divide()`, which raised `ZeroDivisionError`. Since `main()` didn't catch it, it propagated up to the caller (in this case, our outer `try` block).
 
-<Figure
-  slug="python-exceptions-inline-cutout"
-  alt="A chute with a side door, a cracked block being routed through the door into a padded tray while the rest continue down"
-/>
-
 In production, **unhandled exceptions are bugs**. Your job is to anticipate failure modes (`try` opening a file; it might not exist) and handle them gracefully.
 
 ## Real-world: exceptions encode expected failures
 
 Exceptions are **not** like Java checked exceptions (which force you to declare every possible error). They are Python's way of saying "this can fail, and you should decide what to do."
+
+<Figure
+  slug="python-exceptions-inline-cutout"
+  alt="A chute with a side door, a cracked block being routed through the door into a padded tray while the rest continue down"
+/>
 
 Common patterns:
 

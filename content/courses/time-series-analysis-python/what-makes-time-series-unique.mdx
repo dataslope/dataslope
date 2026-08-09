@@ -19,11 +19,6 @@ every mistake beginners make comes from forgetting that. This page is the
 A **time series** is a sequence of observations recorded in time order,
 written $y_1, y_2, y_3, \ldots, y_t, \ldots$, where the *order carries meaning*.
 
-<Figure
-  slug="tsa-what-makes-time-series-unique-inline-cutout"
-  alt="A row of chips being shuffled on the left and losing its meaning, and kept in order on the right where it forms a shape"
-/>
-
 The subscript is not a row number you could reshuffle, it is a
 **timestamp**. $y_t$ is "the value *at time* $t$," and it sits between
 $y_{t-1}$ (its past) and $y_{t+1}$ (its future). Examples are everywhere:
@@ -130,6 +125,11 @@ observations are **i.i.d.**, *independent and identically distributed*.
 "Independent" means knowing one observation tells you nothing about
 another. "Identically distributed" means every observation is drawn from
 the same fixed distribution (same mean, same variance, forever).
+
+<Figure
+  slug="tsa-what-makes-time-series-unique-inline-cutout"
+  alt="A row of chips being shuffled on the left and losing its meaning, and kept in order on the right where it forms a shape"
+/>
 
 A time series violates **both** halves, on purpose:
 

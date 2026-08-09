@@ -20,11 +20,6 @@ make text uppercase. An **alias** gives the computed result a clear name.
 Anywhere you can select a column, you can also write a calculation.
 SQLite evaluates that calculation for each row in the result.
 
-<Figure
-  slug="lite-expressions-and-aliases-inline-cutout"
-  alt="A plain striped strip of blocks leaving a small machine on a bench and having a blank name plate clipped to its leading end"
-/>
-
 ```mermaid
 flowchart TD
     A["one row<br/>price 12.99<br/>quantity 2"] --> B["expression<br/>price * quantity"]
@@ -112,6 +107,11 @@ examples, though real financial systems need more careful rules.
 
 Without an alias, a computed column may get a clumsy name based on the
 expression. `AS` lets you choose a friendly output name.
+
+<Figure
+  slug="lite-expressions-and-aliases-inline-cutout"
+  alt="A plain striped strip of blocks leaving a small machine on a bench and having a blank name plate clipped to its leading end"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"

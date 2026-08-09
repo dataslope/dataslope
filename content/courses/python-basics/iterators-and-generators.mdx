@@ -41,11 +41,6 @@ except StopIteration:
 
 The `for` loop does exactly this, catching `StopIteration` invisibly.
 
-<Figure
-  slug="python-iterators-and-generators-inline-cutout"
-  alt="A dispenser handing out one block at a time on request, with a long roll still coiled inside it rather than laid out on the bench"
-/>
-
 ```mermaid
 sequenceDiagram
     participant C as Caller (for loop)
@@ -144,6 +139,11 @@ for x in countdown(5):
 />
 
 Each `yield` **pauses** the function and hands a value to the caller. The next `next()` call resumes the function right after that `yield`, with all local state (variables, the instruction pointer) intact.
+
+<Figure
+  slug="python-iterators-and-generators-inline-cutout"
+  alt="A dispenser handing out one block at a time on request, with a long roll still coiled inside it rather than laid out on the bench"
+/>
 
 <Callout type="info" title="Generators are lazy">
 Calling a generator function does NOT run any code. It returns a generator object. Code runs only when you iterate, pulling one value at a time. This is why generators can represent infinite sequences, you never build the whole thing in memory.

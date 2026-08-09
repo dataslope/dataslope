@@ -20,11 +20,6 @@ component gets some.
 **setter** function. Calling the setter updates the value *and tells
 React to re-render* the component with the new value.
 
-<Figure
-  slug="rx-state-with-usestate-inline-cutout"
-  alt="A small dial on a panel being turned one notch, and the display block above it redrawing itself to match"
-/>
-
 ```tsx
 const [count, setCount] = useState(0);
 //     ^value  ^setter          ^initial value
@@ -85,6 +80,11 @@ you changed *state*, and the UI followed.
 This is the key difference from a plain variable. A normal `let count`
 would change in memory but the screen would never update. State is the
 value React *watches*: change it through the setter and React redraws.
+
+<Figure
+  slug="rx-state-with-usestate-inline-cutout"
+  alt="A small dial on a panel being turned one notch, and the display block above it redrawing itself to match"
+/>
 
 <Callout type="warn" title="Never assign state directly">
 `count = count + 1` does nothing useful, React won't know and won't

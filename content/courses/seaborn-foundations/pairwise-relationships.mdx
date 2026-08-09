@@ -32,11 +32,6 @@ cell in row *A*, column *B* is a scatter plot of *A* (y-axis) against *B*
   straight line), so Seaborn replaces them with that variable's
   **univariate distribution**, a histogram by default.
 
-<Figure
-  slug="sns-pairwise-relationships-inline-cutout"
-  alt="A square arrangement of small panels where the diagonal holds single shapes and every off-diagonal panel holds a scatter"
-/>
-
 That single layout lets you scan every pairwise relationship *and* every
 variable's spread at once.
 
@@ -133,6 +128,11 @@ A pair plot's great weakness is that it grows as the **square** of the
 number of numeric columns. With four columns you get sixteen panels; with
 ten columns you'd get one hundred tiny, unreadable ones. Three parameters
 keep it under control.
+
+<Figure
+  slug="sns-pairwise-relationships-inline-cutout"
+  alt="A square arrangement of small panels where the diagonal holds single shapes and every off-diagonal panel holds a scatter"
+/>
 
 **`vars=[...]`** restricts the grid to a chosen subset of columns, the
 single most important lever for readability. Pick the handful you actually

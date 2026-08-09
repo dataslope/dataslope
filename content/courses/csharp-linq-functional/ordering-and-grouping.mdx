@@ -18,11 +18,6 @@ groups.
 `OrderBy` produces a new sequence sorted by a *key* that you extract
 from each element with a selector lambda.
 
-<Figure
-  slug="cs-ordering-and-grouping-inline-cutout"
-  alt="A jumbled tray of blocks combed into a rising line by height, then that line cut into three separate trays by colour"
-/>
-
 <CodeBlock
   adapter="csharp"
   files={[
@@ -106,6 +101,11 @@ wanted. Use `ThenBy` instead.
 
 `GroupBy` partitions a sequence into groups by a key. Each group is
 itself an `IEnumerable<T>` (plus a `Key` property).
+
+<Figure
+  slug="cs-ordering-and-grouping-inline-cutout"
+  alt="A jumbled tray of blocks combed into a rising line by height, then that line cut into three separate trays by colour"
+/>
 
 <CodeBlock
   adapter="csharp"

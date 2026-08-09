@@ -19,11 +19,6 @@ datasets that wobble can be large enough to make you pick the wrong model.
 Let us prove the wobble is real. We will evaluate the *same* model on the
 *same* data, changing only the random seed of the split.
 
-<Figure
-  slug="ml-cross-validation-inline-cutout"
-  alt="One pile of blocks divided into five trays, and five rows below where a different tray is sealed each time while the other four are used"
-/>
-
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -224,6 +219,11 @@ hyperparameters. The moment you select the option with the best CV score,
 that score is slightly optimistic, because you picked the winner of a
 contest with some luck in it. A final, untouched test set gives you one
 clean number after all the choosing is done.
+
+<Figure
+  slug="ml-cross-validation-inline-cutout"
+  alt="One pile of blocks divided into five trays, and five rows below where a different tray is sealed each time while the other four are used"
+/>
 
 ```mermaid
 flowchart TD

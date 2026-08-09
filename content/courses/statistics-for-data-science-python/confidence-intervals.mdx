@@ -32,11 +32,6 @@ you already know x̄ is a random variable: it has a *standard
 error*, a typical sample-to-sample wobble. The point estimate throws
 that information away. The confidence interval keeps it.
 
-<Figure
-  slug="stat-confidence-intervals-inline-cutout"
-  alt="A row of twenty short horizontal bars each spanning a true value line, one bar clearly missing the line entirely"
-/>
-
 ```mermaid
 flowchart TD
   A["Point estimate<br/>(x-bar)"] --> C["CI: x-bar +/- margin"]
@@ -159,6 +154,11 @@ print("the mean mass of ALL Adelie penguins, not just the ones we weighed.")
 Here is the sentence almost everyone gets wrong. A 95% confidence level
 is **a property of the procedure, not of any single interval you
 computed.**
+
+<Figure
+  slug="stat-confidence-intervals-inline-cutout"
+  alt="A row of twenty short horizontal bars each spanning a true value line, one bar clearly missing the line entirely"
+/>
 
 > If you repeated the entire process, draw a fresh sample, build a 95%
 > interval from it, over and over, about 95% of those intervals would

@@ -40,11 +40,6 @@ The methods that distinguish a `List` from a plain `Collection` are
 all about *position*: `get(i)`, `add(i, x)`, `remove(i)`,
 `indexOf(x)`, `subList(from, to)`. A list has *seat numbers*.
 
-<Figure
-  slug="jcol-lists-inline-cutout"
-  alt="A rail of slots holding blocks with one being inserted in the middle and the blocks to its right sliding along to make room"
-/>
-
 <CodeBlock
   adapter="java"
   files={[
@@ -255,6 +250,11 @@ surprise for people who expect a copy.
 Java 9 added factory methods `List.of(a, b, c)` that produce
 **immutable** lists. They are cheap, type-safe, and exactly what you
 want for small fixed collections (especially as constants).
+
+<Figure
+  slug="jcol-lists-inline-cutout"
+  alt="A rail of slots holding blocks with one being inserted in the middle and the blocks to its right sliding along to make room"
+/>
 
 ```java
 import java.util.List;

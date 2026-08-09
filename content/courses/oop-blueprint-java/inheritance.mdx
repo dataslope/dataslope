@@ -37,11 +37,6 @@ classDiagram
 The hollow arrow `<|--` in UML means **inheritance**, *Dog
 is-an Animal*. In Java, the keyword is `extends`.
 
-<Figure
-  slug="oopj-inheritance-inline-cutout"
-  alt="A base cabinet with three cabinets standing behind it, each keeping the base's frame and adding one part of its own"
-/>
-
 <CodeBlock
   adapter="java"
   entryFilename="Main.java"
@@ -240,6 +235,11 @@ subclass depends on its parent's internal design. If the parent
 changes how it stores its data or which methods it calls internally,
 subclasses can break in surprising ways. This is sometimes called the
 **fragile base class problem**.
+
+<Figure
+  slug="oopj-inheritance-inline-cutout"
+  alt="A base cabinet with three cabinets standing behind it, each keeping the base's frame and adding one part of its own"
+/>
 
 ```mermaid
 flowchart TB

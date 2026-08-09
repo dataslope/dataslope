@@ -28,11 +28,6 @@ A perfectly accurate model you cannot explain is, in many settings, nearly
 useless. Interpretability is not a nicety bolted on at the end; it is often
 the difference between a model that ships and one that sits in a notebook.
 
-<Figure
-  slug="ml-model-interpretation-and-importance-inline-cutout"
-  alt="A machine with several input pipes of different widths, the widest pipes marked as mattering most to the result"
-/>
-
 - **Trust.** A clinician, a loan officer, or a judge will not, and often
   legally *cannot*, act on a prediction they cannot scrutinize. "The model
   said so" is not a reason anyone can stand behind.
@@ -150,6 +145,11 @@ the resulting groups purer in their labels). scikit-learn adds up how much
 each feature reduced impurity across all the splits that used it, and
 reports the totals as `feature_importances_`. A feature that was chosen for
 many high-value splits scores high; one never split on scores zero.
+
+<Figure
+  slug="ml-model-interpretation-and-importance-inline-cutout"
+  alt="A machine with several input pipes of different widths, the widest pipes marked as mattering most to the result"
+/>
 
 This works for a single tree and, more reliably, for a whole random forest
 (averaging over many trees smooths out the noise of any single one).

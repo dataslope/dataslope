@@ -54,11 +54,6 @@ round(prices * 1.08, 2)
 No loops, no temporary variables. The expression *describes the
 shape of the answer*, and R fills it in.
 
-<Figure
-  slug="rlang-vectorized-computation-inline-cutout"
-  alt="A full-width press coming down on a whole row of blocks at once rather than one stamp moving along the row"
-/>
-
 ## Two vectors of the same length
 
 When you combine two vectors, R lines them up element-by-element:
@@ -234,6 +229,11 @@ overhead at every step. In R, every vectorized operation is
 implemented in highly-optimized C under the hood, when you write
 `x + y`, R does the whole computation in one call to a fast
 internal routine.
+
+<Figure
+  slug="rlang-vectorized-computation-inline-cutout"
+  alt="A full-width press coming down on a whole row of blocks at once rather than one stamp moving along the row"
+/>
 
 This means **vectorized R is often 10–100x faster than the
 equivalent loop**, on top of being shorter and easier to read.

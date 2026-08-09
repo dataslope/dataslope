@@ -26,11 +26,6 @@ Computers compare strings by their exact characters, so `"The" == "the"` is
 do not care that one "the" started a sentence and another did not. Case
 folding, usually just `str.lower()`, collapses all of them into one form.
 
-<Figure
-  slug="nlp-text-normalization-inline-cutout"
-  alt="Word tiles of different heights, casings and trims passing through a press that leaves them all the same plain shape"
-/>
-
 ```mermaid
 flowchart LR
     A["'The'"] --> X["lowercase"]
@@ -130,6 +125,11 @@ tokenization you often have standalone punctuation tokens (`","`, `"!"`,
 `"."`) and sometimes punctuation still clinging to words. For most
 bag-of-words style tasks, punctuation is noise you want gone. There are a few
 common ways to strip it; know more than one.
+
+<Figure
+  slug="nlp-text-normalization-inline-cutout"
+  alt="Word tiles of different heights, casings and trims passing through a press that leaves them all the same plain shape"
+/>
 
 <CodeBlock
   adapter="python"

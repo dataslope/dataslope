@@ -27,11 +27,6 @@ function can write to any data, bugs become impossible to localize
 and rules become impossible to enforce. Encapsulation is the direct
 fix.
 
-<Figure
-  slug="oopj-encapsulation-inline-cutout"
-  alt="A sealed cabinet with its working parts hidden inside and two clean handles on its face, a figure using only the handles"
-/>
-
 ```mermaid
 flowchart LR
     subgraph Outside["The outside world"]
@@ -199,6 +194,11 @@ data effectively immutable, which removes whole classes of bug.
 Let's encapsulate a slightly richer object: a `Thermostat` with an
 allowed temperature range and a current setting. Outsiders can
 *request* a new setting, but the thermostat enforces its own limits.
+
+<Figure
+  slug="oopj-encapsulation-inline-cutout"
+  alt="A sealed cabinet with its working parts hidden inside and two clean handles on its face, a figure using only the handles"
+/>
 
 <CodeBlock
   adapter="java"

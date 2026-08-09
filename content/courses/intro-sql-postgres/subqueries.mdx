@@ -19,11 +19,6 @@ A subquery is a `SELECT` wrapped in parentheses, whose result feeds
 the outer query. PostgreSQL runs the inner query first, then uses
 its answer.
 
-<Figure
-  slug="sql-subqueries-inline-cutout"
-  alt="A small machine sitting inside the hopper of a larger machine, the small one producing a tray of blocks that the larger one then works on"
-/>
-
 ```mermaid
 flowchart TB
     Inner["Inner query:<br/><code>SELECT AVG(amount) FROM orders</code>"] -->|"produces a value"| Outer["Outer query:<br/><code>SELECT ... WHERE amount &gt; (that value)</code>"]
@@ -128,6 +123,11 @@ flowchart TD
 - **In `FROM`**, use a query's result as if it were a table (a
   "derived table"), then query *that*.
 - **In `SELECT`**, produce a single extra value alongside each row.
+
+<Figure
+  slug="sql-subqueries-inline-cutout"
+  alt="A small machine sitting inside the hopper of a larger machine, the small one producing a tray of blocks that the larger one then works on"
+/>
 
 You will use the `WHERE` form constantly; the others appear as
 questions grow more complex.

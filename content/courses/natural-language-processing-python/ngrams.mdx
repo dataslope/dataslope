@@ -25,11 +25,6 @@ The mental image is a window of width `n` that slides along the token list one
 step at a time. Each position is one n-gram, and consecutive windows
 **overlap**.
 
-<Figure
-  slug="nlp-ngrams-inline-cutout"
-  alt="A strip of word tiles with a two-tile window sliding along it, each pair it frames dropping into its own tray"
-/>
-
 ```mermaid
 flowchart TB
     S["Tokens: the / quick / brown / fox"]
@@ -47,6 +42,11 @@ bigrams).
 
 NLTK gives you `ngrams(tokens, n)`, which yields the windows as tuples. It
 returns a generator, so wrap it in `list(...)` to see or reuse the results.
+
+<Figure
+  slug="nlp-ngrams-inline-cutout"
+  alt="A strip of word tiles with a two-tile window sliding along it, each pair it frames dropping into its own tray"
+/>
 
 <CodeBlock
   adapter="python"

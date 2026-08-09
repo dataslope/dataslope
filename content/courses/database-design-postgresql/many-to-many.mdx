@@ -20,11 +20,6 @@ stored directly with one foreign key.
 Start with the real-world picture, before tables. Ada takes Math and
 History. Grace takes Math and Art. Math has both Ada and Grace.
 
-<Figure
-  slug="db-many-to-many-inline-cutout"
-  alt="Two rows of blocks facing each other with a small junction board between them, every cord passing through a slot on that board rather than joining directly"
-/>
-
 ```mermaid
 flowchart LR
     S1["Student: Ada"] --- C1["Course: Math"]
@@ -61,6 +56,11 @@ one value in one row.
 
 Suppose you put `course_id` on `students`. Then each student row has
 room for one course id.
+
+<Figure
+  slug="db-many-to-many-inline-cutout"
+  alt="Two rows of blocks facing each other with a small junction board between them, every cord passing through a slot on that board rather than joining directly"
+/>
 
 ```mermaid
 flowchart TB

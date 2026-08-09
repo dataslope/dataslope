@@ -30,11 +30,6 @@ flowchart TD
 
 For index `i`, children are `2*i + 1` and `2*i + 2`. The parent is `(i - 1) / 2`. Read the tree above left to right, level by level, and you get exactly the array below it, completeness means no gaps, so the formulas never miss. Navigation becomes arithmetic: no `left`/`right` pointers, no allocations, and the whole structure enjoys the vector's cache-friendliness.
 
-<Figure
-  slug="dsa-heaps-inline-cutout"
-  alt="A pyramid of blocks where every block sits above two smaller ones, the largest at the apex being lifted off by a small crane"
-/>
-
 <CodeBlock
   adapter="cpp"
   files={[
@@ -203,6 +198,11 @@ int main() {
 ## Heap sort
 
 Williams's original application falls out almost for free. Build a max-heap (O(n), as above); now the maximum is at index 0. Swap it with the last element, the maximum is in its final sorted position, shrink the heap by one, and sift the new root down. Repeat n−1 times: O(n log n) total, in place, no merge buffer. Heapsort is rarely the fastest sort in practice (its memory access pattern jumps around, which caches dislike), but its guaranteed bound is why introsort keeps it as the emergency parachute behind `std::sort`.
+
+<Figure
+  slug="dsa-heaps-inline-cutout"
+  alt="A pyramid of blocks where every block sits above two smaller ones, the largest at the apex being lifted off by a small crane"
+/>
 
 ```mermaid
 flowchart TD

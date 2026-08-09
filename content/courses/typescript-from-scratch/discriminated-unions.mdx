@@ -18,11 +18,6 @@ This is how you model state machines, API responses, domain events, parser resul
 
 A discriminated union is a union of object types that share a common property, the **discriminant**, with distinct literal values for each variant.
 
-<Figure
-  slug="tsx-discriminated-unions-inline-cutout"
-  alt="Three sealed boxes each wearing a differently shaped tag, a sorter reading only the tag to send each box down its own chute"
-/>
-
 <CodeBlock
   adapter="typescript"
   files={[
@@ -476,6 +471,11 @@ Discriminated unions are the right choice whenever you have:
 - **Parser results.** Success vs. SyntaxError vs. EOF. Each outcome carries different data.
 
 The pattern is always the same: define a union of object types with a shared discriminant field, use `switch` or `if` to narrow by the discriminant, and add exhaustiveness checking in the `default` case to catch missing variants.
+
+<Figure
+  slug="tsx-discriminated-unions-inline-cutout"
+  alt="Three sealed boxes each wearing a differently shaped tag, a sorter reading only the tag to send each box down its own chute"
+/>
 
 <Callout type="success" title="The most powerful pattern">
 If you learn one advanced TypeScript pattern, make it discriminated unions. They combine the flexibility of unions with the precision of narrowing, and they make illegal states unrepresentable. You'll use them everywhere once you see how they simplify state management and domain modeling.

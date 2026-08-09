@@ -22,11 +22,6 @@ The single most important rule about `NA`: **most computations
 involving `NA` return `NA`**. R is being careful, if you don't
 know one of the inputs, you don't know the answer either.
 
-<Figure
-  slug="rlang-missing-values-inline-cutout"
-  alt="A board where three cells hold a small cover instead of a chip, and a switch beside it that decides whether to skip them or stop"
-/>
-
 <CodeBlock
   adapter="r"
   files={[
@@ -151,6 +146,11 @@ downstream analyses. Use it knowingly, not by default.
 Here is the most important idea in this entire page, and probably
 the most under-appreciated idea in beginner data work: **the fact
 that a value is missing is itself information.**
+
+<Figure
+  slug="rlang-missing-values-inline-cutout"
+  alt="A board where three cells hold a small cover instead of a chip, and a switch beside it that decides whether to skip them or stop"
+/>
 
 If 30% of survey respondents skipped the "income" question, that
 is not noise, that's a signal. Maybe people in certain income

@@ -63,11 +63,6 @@ Three things to notice:
 - The same function can be called many times with different
   arguments.
 
-<Figure
-  slug="c-functions-inline-cutout"
-  alt="A bench with a machine that has a fixed-size input slot and a fixed-size output chute, a block being cut to fit before it goes in"
-/>
-
 ## Parameters are local copies
 
 C passes arguments **by value**. The function receives a fresh copy
@@ -179,6 +174,11 @@ expression that evaluates to `a` if the condition is true, else `b`.
 Suppose you wrote a 200-line `main` that did everything: read input,
 processed it, and printed results. To understand that program, a
 reader must hold all 200 lines in their head at once.
+
+<Figure
+  slug="c-functions-inline-cutout"
+  alt="A bench with a machine that has a fixed-size input slot and a fixed-size output chute, a block being cut to fit before it goes in"
+/>
 
 Now suppose you split it into:
 

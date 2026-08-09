@@ -21,11 +21,6 @@ Imagine a table like a spreadsheet. It has rows going down and columns
 going across. `SELECT` names the columns you want to see, and `FROM`
 names the table that holds them.
 
-<Figure
-  slug="lite-select-basics-inline-cutout"
-  alt="A wide board with a narrow frame laid over three of its columns, only what the frame covers copied onto a smaller board"
-/>
-
 ```mermaid
 flowchart TD
     T[("books table<br/>stored data")] --> C["<code>SELECT title, author</code><br/>choose columns"]
@@ -139,6 +134,11 @@ flowchart TB
 ## Pick one column
 
 You can select just one column when that is all you need.
+
+<Figure
+  slug="lite-select-basics-inline-cutout"
+  alt="A wide board with a narrow frame laid over three of its columns, only what the frame covers copied onto a smaller board"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"

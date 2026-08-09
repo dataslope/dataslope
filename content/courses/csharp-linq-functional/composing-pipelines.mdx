@@ -21,11 +21,6 @@ vocabulary tailored to your domain.
 Because LINQ operators return `IEnumerable<T>`, any chain of
 operators is just a method that returns `IEnumerable<T>`.
 
-<Figure
-  slug="cs-composing-pipelines-inline-cutout"
-  alt="Four short pipe sections being clicked together into one continuous line, shapes entering at the left and leaving sorted at the right"
-/>
-
 ```csharp
 IEnumerable<Order> Active(IEnumerable<Order> orders) =>
     orders.Where(o => o.Status == "active");
@@ -49,6 +44,11 @@ but we can do better.
 ## Extension methods: pipelines that *look* native
 
 Extensions let your custom pipelines chain like built-in LINQ.
+
+<Figure
+  slug="cs-composing-pipelines-inline-cutout"
+  alt="Four short pipe sections being clicked together into one continuous line, shapes entering at the left and leaving sorted at the right"
+/>
 
 <CodeBlock
   adapter="csharp"

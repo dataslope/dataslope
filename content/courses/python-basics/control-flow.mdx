@@ -16,11 +16,6 @@ Every snippet on this page runs in your browser, no setup required.
 
 Conditionals are not just syntax, they are the logical heart of every program. A web server routes requests with `if method == "GET"`. A data pipeline filters invalid rows with `if is_valid(row)`. A game checks `if player.health <= 0`. You write conditionals hundreds of times a day. Mastering them means writing clear, correct, maintainable logic.
 
-<Figure
-  slug="python-control-flow-inline-cutout"
-  alt="A track with points and a loop, a cart taking the branch while the loop curls back behind it"
-/>
-
 ```mermaid
 flowchart TD
     A[Start] --> B{"<code>score &gt;= 90</code>?"}
@@ -291,6 +286,11 @@ if a < b < c:
 ## `match` statement (Python 3.10+)
 
 `match` is **structural pattern matching**, not just a `switch`. It matches the *shape* of data and can bind values from inside it.
+
+<Figure
+  slug="python-control-flow-inline-cutout"
+  alt="A track with points and a loop, a cart taking the branch while the loop curls back behind it"
+/>
 
 <CodeBlock
   adapter="python"
