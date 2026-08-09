@@ -559,6 +559,43 @@ the plot rather than in a legend, and the page's own Inter tracked slightly
 tight. Chart junk is the enemy; the data is the ink.
 
 
+## Registering a new MDX widget
+
+An interactive (`"use client"`) widget gets a lazy wrapper in
+`app/_components/mdx/lazyWidgets.ts`, and `mdx-components.tsx` imports that
+wrapper into the component map:
+
+```ts
+// app/_components/mdx/lazyWidgets.ts  ("use client" — that matters, see below)
+export const MyWidget = lazyWidget(() => import("@/app/_components/MyWidget"));
+```
+
+The map is handed to `<MDX>` on every lesson render, so a statically imported
+client component joins the bundle of every page of every course whether or not
+a lesson mentions it. Before this was split (2026-08-09), a prose-only lesson
+downloaded a byte-identical 41 chunks / 3.1 MB to a lesson with eight runnable
+code blocks: the whole CodeMirror stack, the SQL cards, all 33 React demos.
+That JavaScript is the dominant cost of a lesson load — the incremental cache
+never touches it — so one static import hands the regression back.
+
+**The wrapper has to live in that `"use client"` module.** Calling `dynamic()`
+directly from `mdx-components.tsx` type-checks, builds green, and splits
+nothing: in the App Router a client component reached from a Server Component
+becomes a client *reference*, and every client reference in a route's server
+graph joins that route's client entry however it was imported. Measured, that
+version left all 41 chunks as eager `<script src>` tags and added a 42nd. Only
+an `import()` evaluated inside the client graph is a split point.
+
+Server Components are the exception and stay statically imported in
+`mdx-components.tsx`: `Figure`, `Chart` and `SvgLabel` render to markup on the
+server and ship no client code, so splitting them would only add a Suspense
+boundary. The test is whether the component's own module carries
+`"use client"`.
+
+Server rendering is unaffected either way. `lazyWidget()` leaves SSR on
+(`dynamic()`'s default), so the prerendered HTML still contains every widget
+and search still indexes it.
+
 ## Generated files and the build cache
 
 `dev` and `build` both run the same chain of generators before Next starts —

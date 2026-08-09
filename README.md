@@ -52,6 +52,18 @@ npx wrangler r2 bucket create dataslope-inc-cache
 
 The bucket is bound as `NEXT_INC_CACHE_R2_BUCKET` in `wrangler.jsonc`. It is **populated at deploy time**, so the deploy command must run `opennextjs-cloudflare deploy` (which `npm run cf:deploy` does), a bare `wrangler deploy` skips the populate step and leaves the cache empty. If you deploy via Cloudflare Workers Builds (the CI path that builds production and per-branch previews), configure its build settings as shown below.
 
+### Recommended: a Cache Rule for lesson HTML
+
+A Worker runs *ahead* of Cloudflare's CDN cache, and its response is not stored there unless something explicitly puts it there. Next sets `s-maxage=31536000` on every prerendered page, but that header buys nothing on the first hop: page responses come back with **no `cf-cache-status` header at all**, while `/_next/static/*` (served by the assets binding, not the Worker) reports `cf-cache-status: HIT`. So today every visitor to a lesson costs a Worker invocation plus an R2 read, and two readers of the same page share nothing.
+
+`open-next.config.ts` closes half of that gap in code: `withRegionalCache` fronts R2 with the per-data-centre Cache API, so the first reader in a colo pays the R2 round trip and everyone behind them is served locally. The Worker invocation itself can only be skipped from the origin side, which is dashboard configuration:
+
+> Caching → Cache Rules → **Create rule**
+> - **If** URI Path starts with `/courses/` (add `/interview-prep/` and `/fumadocs-dev/` to taste)
+> - **Then** Eligible for cache, Edge TTL → *Use cache-control header if present*
+
+This is safe here because lesson content only changes on deploy and every asset URL is build-ID-scoped, so a new deploy can never be served the previous build's HTML. Leave `/api/*` out of the rule: those routes are `force-dynamic` and several are per-user.
+
 ### Cloudflare Workers Builds configuration
 
 Production and preview deploys run through Cloudflare Workers Builds rather than the local `npm run cf:*` scripts, so its build settings (Workers → the `dataslope` worker → Settings → Build) must populate the R2 cache on **both** paths. The non-production (preview) command is the easy one to get wrong: a bare `npx wrangler versions upload` builds the Worker but skips the cache populate step, leaving previews with an empty cache that 500s the home page and `/courses/*`.

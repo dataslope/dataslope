@@ -1,5 +1,6 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache";
+import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-cache/regional-cache";
 
 // OpenNext (Cloudflare) build configuration.
 //
@@ -24,8 +25,36 @@ import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cac
 // render correctly too. Each deploy's populate step writes a full copy of the
 // cache under a new build ID, ~1–1.4 GB (one HTML+RSC `.cache` object per
 // prerendered page), so stale build folders are pruned on a schedule by
-// .github/workflows/r2-cache-cleanup.yml. Reads are rare behind the edge
-// `s-maxage` cache.
+// .github/workflows/r2-cache-cleanup.yml.
+//
+// Reads are NOT rare, which this comment used to claim. Next sets
+// `s-maxage=31536000` on the prerendered responses, but a Worker runs *ahead*
+// of Cloudflare's CDN cache and its response is not stored there unless the
+// Worker or a Cache Rule puts it there: page responses come back with no
+// `cf-cache-status` header at all, while `/_next/static/*` (served by the
+// assets binding) reports `cf-cache-status: HIT` (measured 2026-08-09). So
+// every visitor to a lesson costs one Worker invocation and one R2 GET, and
+// nothing is shared between two readers of the same page.
+//
+// `withRegionalCache` is the fix that lives in this repo: it fronts R2 with
+// the per-data-centre Cache API, so the first reader in a colo pays the R2
+// round trip and everyone behind them is served locally. It does not remove
+// the Worker invocation — only an origin-side Cache Rule on `/courses/*` can
+// do that, which is dashboard configuration rather than code (see the
+// "Incremental cache cleanup" section of README.md).
+//
+// The two non-default options are both safe *because* the regional key is
+// scoped by build ID (`getCacheUrlKey` prefixes `OPEN_NEXT_BUILD_ID`, i.e. the
+// deployed commit SHA), which makes an entry immutable for the life of a
+// deploy and unreachable from the next one:
+//   - `long-lived` + a 24 h TTL: nothing here revalidates, so there is no
+//     staleness for a long TTL to expose. Colo eviction, not this number, is
+//     what actually bounds an entry's life.
+//   - `shouldLazilyUpdateOnCacheHit: false`: the default re-fetches from R2 in
+//     the background on every regional hit to catch out-of-band changes. With
+//     build-ID-scoped, write-once entries there is nothing to catch, and
+//     leaving it on would keep paying the R2 read this wrapper exists to
+//     avoid.
 //
 // IMPORTANT: the R2 cache must be POPULATED at deploy time. `npm run cf:deploy`
 // (`opennextjs-cloudflare deploy`) and `npm run cf:preview` do this; if you
@@ -39,6 +68,10 @@ import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cac
 // cache is configured because nothing here revalidates; add one alongside this
 // only when a server feature that revalidates is introduced.
 export default defineCloudflareConfig({
-  incrementalCache: r2IncrementalCache,
+  incrementalCache: withRegionalCache(r2IncrementalCache, {
+    mode: "long-lived",
+    defaultLongLivedTtlSec: 24 * 60 * 60,
+    shouldLazilyUpdateOnCacheHit: false,
+  }),
   enableCacheInterception: true,
 });
