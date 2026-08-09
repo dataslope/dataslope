@@ -348,6 +348,18 @@
       "subject": "the Dataslope marmot mascot standing at a signpost on a small hill, three arrows pointing off toward distant floating platforms"
     },
     {
+      "id": "python-history-first-release",
+      "collection": "courses",
+      "course": "python-basics",
+      "courseTitle": "Python Basics",
+      "lesson": "python-history",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Python 0.9.0 goes out",
+      "mascot": false,
+      "subject": "a lone figure at a boxy desktop computer in a bay window on the left with snow falling outside, and a small parcel travelling along a wire from that computer to three other desktop computers standing in a row on the right"
+    },
+    {
       "id": "beginners-javascript-thumbnail",
       "collection": "courses",
       "course": "beginners-javascript",
@@ -1284,6 +1296,42 @@
       "subject": "four blank ruled spreadsheets pegged in a row across a washing line, a stylized figure in the middle lifting one solid blue tile out of the second sheet and carrying it by hand to the third, and the broad tail of a blue whale rising behind the last sheet on the right"
     },
     {
+      "id": "pandas-history-of-data-visicalc",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "history-of-data",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "VisiCalc",
+      "mascot": false,
+      "subject": "a small personal computer on a desk at the left showing a plain empty grid with one cell lit, and a row of blocks tipping into one another in sequence across the grid to the right"
+    },
+    {
+      "id": "pandas-spreadsheets-vs-code-austerity",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "spreadsheets-vs-code",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Five rows short",
+      "mascot": false,
+      "subject": "a tall blank spreadsheet standing in the middle of the frame with a bright selection bracket that stops five rows short of the bottom, those five rows left grey at the foot, a figure at the left pointing at the gap, and an empty lectern on the right"
+    },
+    {
+      "id": "pandas-data-disasters-excel-genes",
+      "collection": "courses",
+      "course": "data-analysis-python-pandas",
+      "courseTitle": "Data Analysis with Python Pandas",
+      "lesson": "data-disasters",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Genes turned into dates",
+      "mascot": false,
+      "subject": "a wide conveyor carrying plain blue tiles from the left into a small machine that stamps a calendar leaf onto each one, and the changed tiles piling up on the right"
+    },
+    {
       "id": "js-computational-thinking",
       "collection": "courses",
       "course": "beginners-javascript",
@@ -1642,6 +1690,30 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading off to distant floating platforms"
+    },
+    {
+      "id": "js-birth-ten-days",
+      "collection": "courses",
+      "course": "beginners-javascript",
+      "courseTitle": "Beginner's Guide to JavaScript",
+      "lesson": "birth-of-javascript",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Ten days in May",
+      "mascot": false,
+      "subject": "a figure hunched over a keyboard at a desk on the left with a large hourglass standing beside them, a leaning pile of loose sheets in the middle, and a browser window open on a screen at the right with one small gear turning inside it"
+    },
+    {
+      "id": "js-today-node-server",
+      "collection": "courses",
+      "course": "beginners-javascript",
+      "courseTitle": "Beginner's Guide to JavaScript",
+      "lesson": "javascript-today",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "JavaScript leaves the browser",
+      "mascot": false,
+      "subject": "a browser window standing on the left with a chunky engine block being lifted out of it by a small crane, and the same engine block bolted onto a plain server rack on the right"
     },
     {
       "id": "c-story-of-c",
@@ -2172,6 +2244,18 @@
       "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading off to distant floating platforms"
     },
     {
+      "id": "cs-birth-of-linq-loops",
+      "collection": "courses",
+      "course": "csharp-linq-functional",
+      "courseTitle": "C# LINQ and Functional Patterns",
+      "lesson": "birth-of-linq",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Why LINQ exists",
+      "mascot": false,
+      "subject": "a knotted tangle of red cord filling the left of the frame, and on the right one clean blue pipe carrying three shapes through a filter and into a tray"
+    },
+    {
       "id": "db-what-is-database-design",
       "collection": "courses",
       "course": "database-design-postgresql",
@@ -2614,6 +2698,30 @@
       "title": "Codd's 1970 paper",
       "mascot": false,
       "subject": "a stylized figure at a research desk on the left holding up one slim blank sheet, a fanned stack of index cards tied together with tangled cords in the middle, and on the right three plain blue tables each ruled into four thick empty bands"
+    },
+    {
+      "id": "db-ingres-to-postgresql-postgres95",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "from-ingres-to-postgresql",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Postgres95",
+      "mascot": false,
+      "subject": "two figures at a bench unbolting the front panel of a database drum and fitting a new panel in its place, the old panel leaning against the bench on the left"
+    },
+    {
+      "id": "db-natural-keys-wallet-card",
+      "collection": "courses",
+      "course": "database-design-postgresql",
+      "courseTitle": "Database Design with PostgreSQL",
+      "lesson": "natural-vs-surrogate-keys",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The sample card in the wallet",
+      "mascot": false,
+      "subject": "an open wallet on the left with a sample card tucked into its pocket, a row of identical wallets laid out on a shop counter across the middle, and an open filing drawer on the right packed with copies of that same card"
     },
     {
       "id": "cpp-brief-history",
@@ -3228,6 +3336,30 @@
       "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading to distant floating platforms"
     },
     {
+      "id": "fp-roots-lambda-calculus",
+      "collection": "courses",
+      "course": "functional-programming-typescript",
+      "courseTitle": "Functional Programming with TypeScript",
+      "lesson": "roots-of-functional-thinking",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The lambda calculus",
+      "mascot": false,
+      "subject": "a figure at the left feeding one small block into a plain machine that hands out a different block, that block feeding straight into a second identical machine, and a third machine at the right, the three chained in a row"
+    },
+    {
+      "id": "fp-roots-lisp",
+      "collection": "courses",
+      "course": "functional-programming-typescript",
+      "courseTitle": "Functional Programming with TypeScript",
+      "lesson": "roots-of-functional-thinking",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Lisp at MIT",
+      "mascot": false,
+      "subject": "a figure at a 1950s console on the left holding open a set of nested boxes, each box holding a smaller box inside it, the whole set opened out along the bench to the right"
+    },
+    {
       "id": "viz-what-is-dataviz",
       "collection": "courses",
       "course": "intro-data-viz-plotly",
@@ -3648,6 +3780,30 @@
       "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading to distant chart boards"
     },
     {
+      "id": "viz-history-nightingale",
+      "collection": "courses",
+      "course": "intro-data-viz-plotly",
+      "courseTitle": "Introduction to Data Visualization with Python and Plotly Express",
+      "lesson": "a-brief-history-of-data-pictures",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The rose diagram",
+      "mascot": false,
+      "subject": "a hospital ward with a row of low beds along the left, and on the right a large round diagram built from wedges of different lengths standing on an easel"
+    },
+    {
+      "id": "viz-history-playfair",
+      "collection": "courses",
+      "course": "intro-data-viz-plotly",
+      "courseTitle": "Introduction to Data Visualization with Python and Plotly Express",
+      "lesson": "a-brief-history-of-data-pictures",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The first bar chart",
+      "mascot": false,
+      "subject": "an engraver's bench on the left with a copper plate and a burin, a printing press in the middle, and a printed sheet on the right carrying one row of bars and one round pie"
+    },
+    {
       "id": "mcs-computational-thinking",
       "collection": "courses",
       "course": "intro-modern-csharp",
@@ -3922,6 +4078,42 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading to distant floating platforms"
+    },
+    {
+      "id": "mcs-anders-turbo-pascal",
+      "collection": "courses",
+      "course": "intro-modern-csharp",
+      "courseTitle": "Introduction to Modern C#",
+      "lesson": "anders-and-birth-of-csharp",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Turbo Pascal",
+      "mascot": false,
+      "subject": "a single floppy disk standing upright on the left, a boxy home computer in the middle with a stopwatch on the desk beside it, and one finished program block sitting on the right"
+    },
+    {
+      "id": "mcs-road-to-csharp-dotnet",
+      "collection": "courses",
+      "course": "intro-modern-csharp",
+      "courseTitle": "Introduction to Modern C#",
+      "lesson": "the-road-to-csharp",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "One runtime, several languages",
+      "mascot": false,
+      "subject": "three different language blocks standing in a row on the left, each on its own short stand, all of them resting on one long shared slab that runs to the right where a figure stands"
+    },
+    {
+      "id": "mcs-evolution-dotnet-mono",
+      "collection": "courses",
+      "course": "intro-modern-csharp",
+      "courseTitle": "Introduction to Modern C#",
+      "lesson": "evolution-of-dotnet",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": ".NET crosses platforms",
+      "mascot": false,
+      "subject": "three different machine cabinets standing apart across the frame, one long runtime plank bridging all three of them, and a figure walking along the plank"
     },
     {
       "id": "sql-what-is-a-database",
@@ -4294,6 +4486,18 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot and a friendly blue elephant (the PostgreSQL mascot) at a signpost on a platform, three paths leading to distant floating platforms"
+    },
+    {
+      "id": "sql-why-sql-exists-postgres",
+      "collection": "courses",
+      "course": "intro-sql-postgres",
+      "courseTitle": "Introduction to SQL and Relational Databases with PostgreSQL",
+      "lesson": "why-sql-exists",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Post-Ingres",
+      "mascot": false,
+      "subject": "two database drums standing on a long bench, the left one small and plain, the right one larger with extra fittings bolted onto it, and a figure at the right fitting one more part"
     },
     {
       "id": "web-how-the-web-works",
@@ -4800,6 +5004,18 @@
       "subject": "the Dataslope marmot mascot at a signpost on a platform, three paths leading to distant floating platforms"
     },
     {
+      "id": "jcol-generics-revolution-gj",
+      "collection": "courses",
+      "course": "java-collections-and-generics-deep-dive",
+      "courseTitle": "Java Collections and Generics Deep Dive",
+      "lesson": "the-generics-revolution",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Generic Java",
+      "mascot": false,
+      "subject": "a blue box on the left being carried through a gate in the middle that clamps a coloured tag onto it, and the same box arriving on the right with the tag gone"
+    },
+    {
       "id": "java-what-is-a-program",
       "collection": "courses",
       "course": "java-programming-for-beginners",
@@ -5146,6 +5362,30 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot on a pale grey platform at the foot of three broad steps rising to one high platform"
+    },
+    {
+      "id": "java-gosling-green-project",
+      "collection": "courses",
+      "course": "java-programming-for-beginners",
+      "courseTitle": "Java Programming for Beginners",
+      "lesson": "gosling-and-java",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The Green Project",
+      "mascot": false,
+      "subject": "three figures around a workbench on the left building a boxy handheld remote control, and a television set standing on the right showing one plain green shape"
+    },
+    {
+      "id": "java-conquers-android",
+      "collection": "courses",
+      "course": "java-programming-for-beginners",
+      "courseTitle": "Java Programming for Beginners",
+      "lesson": "java-conquers-the-world",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Java on every phone",
+      "mascot": false,
+      "subject": "a steaming coffee cup on the left, and a row of four flat handheld phone slabs standing across the right, each lit with one plain coloured panel"
     },
     {
       "id": "ml-what-is-ml",
@@ -5520,6 +5760,54 @@
       "subject": "the Dataslope marmot mascot standing on the highest of three broad steps on a pale grey platform, two taller blocks rising ahead of it"
     },
     {
+      "id": "ml-what-is-ml-samuel-checkers",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "what-is-machine-learning",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A program that taught itself",
+      "mascot": false,
+      "subject": "two identical cabinet computers facing each other across the frame with a checkers board on a low table between them, the pieces caught mid-game"
+    },
+    {
+      "id": "ml-linear-regression-ceres",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "linear-regression",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Finding Ceres again",
+      "mascot": false,
+      "subject": "a telescope on a stand at the left aimed across the frame, a small rock crossing a dark band in the middle, and a sheet on the right carrying one smooth curve with a marker where the rock will reappear"
+    },
+    {
+      "id": "ml-random-forests-breiman",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "ensembles-and-random-forests",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Many trees, one vote",
+      "mascot": false,
+      "subject": "a row of five small trees across the frame, each a slightly different shape, and a single basket at the right collecting one token from each of them"
+    },
+    {
+      "id": "ml-pitfalls-flu-trends",
+      "collection": "courses",
+      "course": "machine-learning-scikit-learn",
+      "courseTitle": "Machine Learning with scikit-learn",
+      "lesson": "common-pitfalls-and-misconceptions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The parable of Google Flu",
+      "mascot": false,
+      "subject": "a wide chart board with a red curve climbing steeply on the left and a lower green curve running almost flat beneath it, the gap between the two widening toward the right, and a figure standing at the right"
+    },
+    {
       "id": "dsa-why-cpp",
       "collection": "courses",
       "course": "mastering-dsa-cpp",
@@ -5832,6 +6120,54 @@
       "subject": "a capybara on a pale grey platform stepping up onto the tallest of three broad steps"
     },
     {
+      "id": "dsa-sorting-quicksort-moscow",
+      "collection": "courses",
+      "course": "mastering-dsa-cpp",
+      "courseTitle": "Mastering Data Structures and Algorithms in C++",
+      "lesson": "sorting-efficient",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Quicksort in Moscow",
+      "mascot": false,
+      "subject": "a figure at a desk by a tall window on the left, a long row of small cards on that desk being swept into two piles either side of one raised card in the middle, and a dictionary tape reel standing at the right"
+    },
+    {
+      "id": "dsa-searching-overflow",
+      "collection": "courses",
+      "course": "mastering-dsa-cpp",
+      "courseTitle": "Mastering Data Structures and Algorithms in C++",
+      "lesson": "searching",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The midpoint that overflowed",
+      "mascot": false,
+      "subject": "a long measuring beam spanning the frame with a marker at its midpoint, its two ends pressed inward by heavy blocks until a red crack opens at the marker"
+    },
+    {
+      "id": "dsa-union-find-boruvka",
+      "collection": "courses",
+      "course": "mastering-dsa-cpp",
+      "courseTitle": "Mastering Data Structures and Algorithms in C++",
+      "lesson": "union-find",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The first spanning tree",
+      "mascot": false,
+      "subject": "a wide map board with six small village blocks scattered across it, one heavy cable joining them all into a single network, and a figure at the left holding a cable spool"
+    },
+    {
+      "id": "dsa-stacks-cellar",
+      "collection": "courses",
+      "course": "mastering-dsa-cpp",
+      "courseTitle": "Mastering Data Structures and Algorithms in C++",
+      "lesson": "stacks",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The cellar",
+      "mascot": false,
+      "subject": "an open cellar hatch set into a floor on the left with plates being dropped in one at a time, and on the right the topmost plate being lifted back out"
+    },
+    {
       "id": "gg-systems-dont-scale",
       "collection": "courses",
       "course": "mastering-ggplot2",
@@ -6142,6 +6478,18 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot and a friendly blue peacock on a pale grey platform stepping up onto the tallest of three broad steps"
+    },
+    {
+      "id": "gg-origins-layered-grammar",
+      "collection": "courses",
+      "course": "mastering-ggplot2",
+      "courseTitle": "Mastering ggplot2",
+      "lesson": "origins-of-the-grammar",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A layered grammar",
+      "mascot": false,
+      "subject": "three transparent sheets held apart in a stepped stack on the right, each carrying a different mark, and a figure at the left lowering the topmost sheet onto the others"
     },
     {
       "id": "css-cascade",
@@ -6540,6 +6888,42 @@
       "subject": "the Dataslope marmot mascot and a friendly green parrot on a pale grey platform, both stepping up onto the tallest of three broad steps"
     },
     {
+      "id": "nlp-discussions-turing-test",
+      "collection": "courses",
+      "course": "natural-language-processing-python",
+      "courseTitle": "Natural Language Processing with Python",
+      "lesson": "interesting-discussions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The imitation game",
+      "mascot": false,
+      "subject": "two identical closed doors standing side by side in the middle of the frame, a blank slip passing under each of them, a figure seated at the left holding both slips, and the outline of a cabinet machine behind the right door"
+    },
+    {
+      "id": "nlp-discussions-georgetown-ibm",
+      "collection": "courses",
+      "course": "natural-language-processing-python",
+      "courseTitle": "Natural Language Processing with Python",
+      "lesson": "interesting-discussions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The Georgetown-IBM demonstration",
+      "mascot": false,
+      "subject": "a large cabinet computer with two tape reels standing in the middle of the frame, a press camera on a tripod at the left pointed at it, and a printed ribbon running out of the machine to the right carrying a row of small blank cards"
+    },
+    {
+      "id": "nlp-discussions-eliza",
+      "collection": "courses",
+      "course": "natural-language-processing-python",
+      "courseTitle": "Natural Language Processing with Python",
+      "lesson": "interesting-discussions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "ELIZA",
+      "mascot": false,
+      "subject": "a figure sitting on a low couch at the left facing a teletype terminal on a small table, an empty armchair standing behind the terminal, and one plain speech bubble rising from its screen"
+    },
+    {
       "id": "oopj-software-crisis",
       "collection": "courses",
       "course": "oop-blueprint-java",
@@ -6778,6 +7162,30 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot on a platform beside a stack of bound volumes and a signpost with three arrows pointing outward"
+    },
+    {
+      "id": "oopj-software-crisis-nato",
+      "collection": "courses",
+      "course": "oop-blueprint-java",
+      "courseTitle": "Object-Oriented Programming Blueprint with Java",
+      "lesson": "software-crisis",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The software crisis",
+      "mascot": false,
+      "subject": "a long conference table running across the frame with several stylised figures seated along it, a half-built bridge model standing on the table in the middle, and a toppling pile of loose paper at the right end"
+    },
+    {
+      "id": "oopj-birth-of-oop-simula",
+      "collection": "courses",
+      "course": "oop-blueprint-java",
+      "courseTitle": "Object-Oriented Programming Blueprint with Java",
+      "lesson": "birth-of-oop",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Simula in Oslo",
+      "mascot": false,
+      "subject": "two figures at a desk on the left, and a model harbour laid out along the bench to the right with three small ships and two cranes, each one a separate solid piece"
     },
     {
       "id": "rlang-age-of-data",
@@ -7186,6 +7594,42 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot on a platform beside a signpost with five arrows fanning toward distant floating structures"
+    },
+    {
+      "id": "rlang-from-s-to-r-auckland",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "from-s-to-r",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Two colleagues in Auckland",
+      "mascot": false,
+      "subject": "two figures sharing one desk under a wide window on the left, a small potted seedling standing between them, and a plotted curve glowing on a screen at the right"
+    },
+    {
+      "id": "rlang-from-s-to-r-cran",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "from-s-to-r",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "CRAN",
+      "mascot": false,
+      "subject": "a wide shelving rack filling the frame, packed with plain coloured crates of the same size, and a figure on a short ladder at the left sliding one more crate into place"
+    },
+    {
+      "id": "rlang-rise-of-stat-computing-bell-labs",
+      "collection": "courses",
+      "course": "practical-r-for-beginners",
+      "courseTitle": "Practical R for Beginners",
+      "lesson": "rise-of-statistical-computing",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "S at Bell Labs",
+      "mascot": false,
+      "subject": "a figure at a 1970s terminal on the left, a card punch on the bench beside them, and a long printout unspooling to the right and ending in a plotted curve"
     },
     {
       "id": "rx-thinking-in-react",
@@ -7620,6 +8064,54 @@
       "subject": "the Dataslope marmot mascot on a pale grey platform stepping up onto the tallest of three broad steps"
     },
     {
+      "id": "scipy-limits-monte-carlo",
+      "collection": "courses",
+      "course": "scientific-computing-python",
+      "courseTitle": "Scientific Computing with Python",
+      "lesson": "limits-of-manual-calculation",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Monte Carlo",
+      "mascot": false,
+      "subject": "a figure in an armchair at the left with a spread of playing cards on their lap, and a room-sized cabinet computer on the right dealing the same hand over and over onto a table"
+    },
+    {
+      "id": "scipy-python-in-science-numpy",
+      "collection": "courses",
+      "course": "scientific-computing-python",
+      "courseTitle": "Scientific Computing with Python",
+      "lesson": "python-in-science",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "One array library",
+      "mascot": false,
+      "subject": "two small toolboxes on the left being emptied into one larger shared toolbox in the middle, and a row of tall instruments standing on the right"
+    },
+    {
+      "id": "scipy-discussions-eniac-forecast",
+      "collection": "courses",
+      "course": "scientific-computing-python",
+      "courseTitle": "Scientific Computing with Python",
+      "lesson": "interesting-discussions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The first computer forecast",
+      "mascot": false,
+      "subject": "a room-sized cabinet computer hung with patch cables on the left, a coarse grid laid over a map of a continent in the middle, and a cloud with a wind arrow standing over that grid at the right"
+    },
+    {
+      "id": "scipy-discussions-patriot-missile",
+      "collection": "courses",
+      "course": "scientific-computing-python",
+      "courseTitle": "Scientific Computing with Python",
+      "lesson": "interesting-discussions",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A third of a second",
+      "mascot": false,
+      "subject": "a large clock face on the left whose hand has slipped just past its mark, a round radar screen in the middle showing a single blip, and a track passing wide of that blip on the right"
+    },
+    {
       "id": "sns-why-visualize",
       "collection": "courses",
       "course": "seaborn-foundations",
@@ -7942,6 +8434,18 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot on a pale grey platform beside a tall signpost pointing toward three upright frames standing further off, one bold coloured shape in each"
+    },
+    {
+      "id": "sns-why-visualize-anscombe",
+      "collection": "courses",
+      "course": "seaborn-foundations",
+      "courseTitle": "Seaborn Foundations",
+      "lesson": "why-visualize-statistical-data",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Anscombe's quartet",
+      "mascot": false,
+      "subject": "four small framed plots standing in a row across the frame, the points inside each one arranged differently, and one identical plain tile standing beneath every frame"
     },
     {
       "id": "duck-olap-vs-oltp",
@@ -8556,6 +9060,18 @@
       "subject": "the Dataslope marmot mascot on a platform beside a single small database file block and a signpost pointing outward"
     },
     {
+      "id": "lite-why-sqlite-destroyer",
+      "collection": "courses",
+      "course": "sqlite-for-beginners",
+      "courseTitle": "SQLite for Beginners",
+      "lesson": "why-sqlite",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "A database with no server",
+      "mascot": false,
+      "subject": "the deck of a grey warship spanning the frame, one small blue file block resting on a console in the middle, and an empty bolted footprint on the right where a server cabinet would have stood"
+    },
+    {
       "id": "stat-why-statistics",
       "collection": "courses",
       "course": "statistics-for-data-science-python",
@@ -8940,6 +9456,18 @@
       "subject": "the Dataslope marmot mascot on a summit platform beside a signpost with five arrows pointing toward distant structures"
     },
     {
+      "id": "stat-fallacies-datasaurus",
+      "collection": "courses",
+      "course": "statistics-for-data-science-python",
+      "courseTitle": "Statistics for Data Science with Python",
+      "lesson": "statistical-fallacies",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The Datasaurus",
+      "mascot": false,
+      "subject": "a scatter of points forming a small dinosaur on the left, the same points rearranged into a star in the middle and into a ring on the right, and one identical plain tile standing beneath all three"
+    },
+    {
       "id": "sysc-why-c",
       "collection": "courses",
       "course": "systems-programming-c",
@@ -9118,6 +9646,30 @@
       "title": "The Therac-25",
       "mascot": false,
       "subject": "a large blue radiation therapy machine with a heavy rotating head standing over a flat empty treatment couch on the left, a stylized operator seated at a small terminal on the right, one narrow red beam falling on the couch, and a yellow safety latch lying detached on the floor between them"
+    },
+    {
+      "id": "sysc-disasters-morris-worm",
+      "collection": "courses",
+      "course": "systems-programming-c",
+      "courseTitle": "Systems Programming with C",
+      "lesson": "real-world-disasters",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The Morris Worm",
+      "mascot": false,
+      "subject": "a row of six small beige desktop computers along a wide bench, a green coil threading out of the first one and looping into each of the others, and the last two tipped over on the right"
+    },
+    {
+      "id": "sysc-disasters-sql-slammer",
+      "collection": "courses",
+      "course": "systems-programming-c",
+      "courseTitle": "Systems Programming with C",
+      "lesson": "real-world-disasters",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "SQL Slammer",
+      "mascot": false,
+      "subject": "one tiny red packet block at the far left multiplying into a spreading fan of identical packets that fills the right of the frame, with two small server racks swamped beneath them"
     },
     {
       "id": "tsa-what-makes-unique",
@@ -9586,6 +10138,30 @@
       "style": "isometric illustration",
       "mascot": true,
       "subject": "the Dataslope marmot mascot on a platform beside a typed block assembly and a signpost with four arrows pointing outward"
+    },
+    {
+      "id": "tsx-evolution-ajax",
+      "collection": "courses",
+      "course": "typescript-from-scratch",
+      "courseTitle": "TypeScript from Scratch",
+      "lesson": "evolution-of-javascript",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "The AJAX turn",
+      "mascot": false,
+      "subject": "a desktop screen on the left showing a page that stays whole while one small parcel travels along a rail from a server drum on the right and slots into a single panel of that page"
+    },
+    {
+      "id": "tsx-birth-typescript-team",
+      "collection": "courses",
+      "course": "typescript-from-scratch",
+      "courseTitle": "TypeScript from Scratch",
+      "lesson": "birth-of-typescript",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "Types for a language already shipped",
+      "mascot": false,
+      "subject": "a tall leaning stack of loose sheets on a bench in the middle, a figure at the left clamping a blue bracket around it, and the same stack standing square and marked with three coloured tabs on the right"
     },
     {
       "id": "home-icon-courses",
@@ -11122,6 +11698,30 @@
       "title": "Where to go next",
       "mascot": true,
       "subject": "a friendly polar bear with warm cream fur and soft grey shading standing at the foot of a broad blue staircase of four thick solid steps rising from a platform, one yellow block resting on the top step"
+    },
+    {
+      "id": "pl-why-polars-one-core",
+      "collection": "courses",
+      "course": "data-wrangling-python-polars",
+      "courseTitle": "Data Wrangling with Python Polars",
+      "lesson": "why-polars",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "One core, then many",
+      "mascot": false,
+      "subject": "one figure working alone at a single bench on the left beside a tall pile of crates, and four identical benches on the right each working through a quarter of that same pile"
+    },
+    {
+      "id": "pl-arrow-shared-columns",
+      "collection": "courses",
+      "course": "data-wrangling-python-polars",
+      "courseTitle": "Data Wrangling with Python Polars",
+      "lesson": "columnar-memory-and-arrow",
+      "category": "course-inline",
+      "style": "risograph",
+      "title": "One layout, every language",
+      "mascot": false,
+      "subject": "three different machine cabinets standing across the frame, all of them reading from one long shared column of stacked cells that runs between them"
     },
     {
       "id": "playground-hero",

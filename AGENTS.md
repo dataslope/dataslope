@@ -433,6 +433,14 @@ Placement is by hand, one `<Figure>` after the paragraph it belongs to, with a
 touch these — it keys on `course-illustration` — so a re-wire will not move or
 clear them.
 
+**Placing a batch of them: check where each one landed.** Inserting after "the
+paragraph containing this phrase" is mechanical enough to script, and it is
+wrong often enough to audit. Of fifty placed that way, two came to rest
+directly against the lesson's *own* opening figure and one under a heading
+rather than under its paragraph, none of which any check catches: `check:mdx`
+only asserts that component tags sit at the top level. Print the preceding and
+following line for every figure you place and read the list.
+
 **Always render in the brand palette** (the four primaries above). This is not
 only aesthetic: see the transparency constraint below.
 

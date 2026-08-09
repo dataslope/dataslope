@@ -85,6 +85,12 @@ int main() {
 
 In 1960, a 26-year-old Tony Hoare was a visiting student at Moscow State University, working on a machine-translation project that needed to sort the words of Russian sentences before looking them up on a dictionary tape. He thought of the partitioning idea, pick a *pivot*, sweep everything smaller to its left and everything larger to its right, but couldn't express the "sort the two sides the same way" step in the languages he knew. Soon after, he learned ALGOL 60, one of the first languages to support recursion, and the algorithm finally fit on a page. He published it in 1961 as a half-column algorithm in the *Communications of the ACM*; in 1980 he received the Turing Award. Quicksort remains, six decades on, the backbone of most standard-library sorts.
 
+<Figure
+  slug="dsa-sorting-quicksort-moscow-cutout"
+  alt="A figure at a desk by a tall window sweeping a row of cards into two piles either side of one raised card, a tape reel nearby"
+  caption="Moscow, 1960: a student needed Russian words sorted, and got the partition idea before he had a language with recursion."
+/>
+
 The mechanism: choose a pivot, partition values around it, and recursively sort both sides. Unlike merge sort, all the real work happens *before* the recursive calls, and no merge buffer is needed, quicksort rearranges in place. The version below uses the Lomuto partition scheme (pivot at the end, one sweep with a write frontier `i`); after `partition` returns, the pivot sits at its final sorted position, with smaller values on its left and larger on its right.
 
 <CodeBlock

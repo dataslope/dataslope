@@ -302,6 +302,12 @@ int main() {
 
 The minimum spanning tree problem is older than computers, and it was born practical: in 1926, the Czech mathematician Otakar Borůvka devised the first MST algorithm to plan the cheapest electrical grid for rural Moravia, which towns to wire to which so that everyone is connected and the total cable cost is minimal. That is exactly the modern definition: a **minimum spanning tree (MST)** connects all vertices of an undirected weighted graph with minimum total weight and no cycles.
 
+<Figure
+  slug="dsa-union-find-boruvka-cutout"
+  alt="A map board of scattered village blocks joined into one network by a heavy cable, a figure holding the spool"
+  caption="Moravia, 1926: the first spanning-tree algorithm was written to lay the cheapest rural electrical grid."
+/>
+
 Joseph Kruskal's 1956 algorithm is the version everyone learns, and it is pure greed plus DSU: sort the edges by weight, then walk them cheapest-first, adding each edge *unless it would create a cycle*. The cycle test is the hard part, and it is exactly the question `unite` answers. If an edge's endpoints are already in the same set, the edge is redundant; skip it. If `unite` succeeds, the edge joined two separate islands, so keep it.
 
 ```text

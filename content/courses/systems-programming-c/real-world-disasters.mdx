@@ -53,6 +53,12 @@ request, the worm overwrote the function's return address on the
 stack and redirected execution into shellcode it had injected as
 part of the input.
 
+<Figure
+  slug="sysc-disasters-morris-worm-cutout"
+  alt="A row of small desktop computers along a bench with a coil threading out of the first and into each of the others, the last two toppled"
+  caption="November 1988: roughly 6,000 machines, about a tenth of the internet, and the reason CERT exists."
+/>
+
 **Bug class:** stack buffer overflow.
 **Fallout:** Morris received the first conviction under the U.S.
 Computer Fraud and Abuse Act. `gets()` was deprecated in C99 and
@@ -91,6 +97,12 @@ Slammer is famous for two things: it was tiny (the entire payload
 fit in a single 376-byte UDP packet) and it was *fast*, it doubled
 the infected population every 8.5 seconds and effectively saturated
 the global internet's routing capacity within ten minutes.
+
+<Figure
+  slug="sysc-disasters-sql-slammer-cutout"
+  alt="One tiny packet block multiplying into a spreading fan of identical packets that swamps two small server racks"
+  caption="January 2003: 376 bytes, no disk write, and most of its damage done inside ten minutes."
+/>
 
 The bug: a *stack buffer overflow* in the SQL Server 2000 Resolution
 Service that listened on UDP port 1434. The worm sent one carefully

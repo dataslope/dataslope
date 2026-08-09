@@ -89,6 +89,12 @@ a *standard* for it: an exact specification of how a column of
 integers, strings, or nested structs is laid out in memory, agreed on
 across languages.
 
+<Figure
+  slug="pl-arrow-shared-columns-cutout"
+  alt="Three different machine cabinets all reading from one long shared column of stacked cells running between them"
+  caption="Apache Arrow, 2016: one agreed memory layout, so a column can cross a language boundary without being copied."
+/>
+
 An Arrow column is a few buffers:
 
 | Buffer | Holds |
