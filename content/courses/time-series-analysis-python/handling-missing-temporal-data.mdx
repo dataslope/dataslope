@@ -32,6 +32,11 @@ A series can hide gaps simply by skipping timestamps. The fix is to
 `reindex` onto a *complete* `date_range`, which turns every absent
 timestamp into an explicit `NaN` you can see and deal with.
 
+<Figure
+  slug="tsa-handling-missing-temporal-data-inline-cutout"
+  alt="A rail of evenly spaced date sleepers with two sleepers bare and a small bridging piece being fitted over them"
+/>
+
 <CodeBlock
   adapter="python"
   files={[

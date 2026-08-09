@@ -19,6 +19,11 @@ output, and produce a forecast with honest uncertainty bands.
 An ARIMA model is built from two simple ideas about where the next value
 comes from.
 
+<Figure
+  slug="tsa-arima-models-inline-cutout"
+  alt="Three small machines feeding one output, one looking back at past values, one at past errors, one at the trend"
+/>
+
 **AR(p), autoregressive.** "Regress the series on its own recent *values*."
 Each value is a weighted sum of the last $p$ values plus a random shock:
 

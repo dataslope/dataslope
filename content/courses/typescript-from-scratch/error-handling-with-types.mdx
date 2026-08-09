@@ -31,6 +31,11 @@ The signature says it returns `any`, but it doesn't mention that it can *throw*.
 - When should I catch?
 - Did the maintainer forget to document this?
 
+<Figure
+  slug="tsx-error-handling-with-types-inline-cutout"
+  alt="Two chutes leaving one machine, one carrying finished blocks and one carrying marked failure tags, both feeding trays"
+/>
+
 This leads to two failure modes:
 1. **Over-catching**: Wrap everything in `try/catch`, slowing code and hiding real bugs.
 2. **Under-catching**: Forget to catch, and the exception propagates to production.

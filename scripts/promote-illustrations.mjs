@@ -62,7 +62,15 @@
  *                     with its background (every `<Figure>` references the
  *                     `-cutout` slug), the original is 0.22 MB of git per
  *                     image that nothing serves. The pristine PNG stays in R2.
- *   --no-build        Skip the build-images run afterwards
+ *   --no-build        Skip the build-images run afterwards. **Required when two
+ *                     promotions run at once.** build-images prunes every file
+ *                     in public/images that is missing from the manifest it
+ *                     just scanned, so a second promotion writing files after
+ *                     that scan has them deleted out from under it. Running
+ *                     waves three, four and five concurrently cost two images
+ *                     exactly this way — promoted, reported ✓, gone before the
+ *                     commit. Pass --no-build to every concurrent run and do
+ *                     one `npm run build:images` at the end.
  *   --dry-run         Report what would be promoted; write nothing
  *   -h, --help        Show this help
  *

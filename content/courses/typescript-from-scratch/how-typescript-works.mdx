@@ -16,6 +16,11 @@ This page takes you inside TypeScript's architecture, from the relationship betw
 
 Here's the most important fact about TypeScript: **TypeScript is a syntactic superset of JavaScript.** That means every valid JavaScript program is a valid TypeScript program. If you take a `.js` file and rename it to `.ts`, it compiles. You don't have to change a single character.
 
+<Figure
+  slug="tsx-how-typescript-works-inline-cutout"
+  alt="A card passing a checking gate that inspects it and then falls away, the card continuing unchanged"
+/>
+
 TypeScript adds *optional annotations* on top of JavaScript. These annotations describe the *types* of values, whether a variable holds a number, a string, an object with specific properties, or a function with a particular signature. The TypeScript compiler checks these annotations against your code, reports errors, and then *erases the types* to produce plain JavaScript.
 
 Let's see this in action:

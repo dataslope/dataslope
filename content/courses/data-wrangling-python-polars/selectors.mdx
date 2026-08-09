@@ -54,6 +54,11 @@ print(penguins.select(cs.ends_with("_mm")).columns)
 This is the part `pl.col` cannot do. Selectors support union,
 intersection, difference, and complement.
 
+<Figure
+  slug="pl-selectors-inline-cutout"
+  alt="A wide board with a template laid over it that picks out every column of one kind at once"
+/>
+
 | Operator | Meaning |
 | --- | --- |
 | `A \| B` | in either |

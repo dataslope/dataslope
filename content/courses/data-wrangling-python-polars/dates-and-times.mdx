@@ -47,6 +47,11 @@ print(stamps.with_columns(pl.col("when").str.to_datetime()))
 `try_parse_dates=True` on `read_csv` does this at read time for
 ISO-shaped columns, which is one fewer step.
 
+<Figure
+  slug="pl-dates-and-times-inline-cutout"
+  alt="A calendar strip with a clock face at its end, one square marked and a caliper measuring to another"
+/>
+
 <Callout type="warn" title="A failed parse raises by default">
 `str.to_date` raises on the first value it cannot parse. Pass
 `strict=False` to get nulls instead, then count them. On a file of
