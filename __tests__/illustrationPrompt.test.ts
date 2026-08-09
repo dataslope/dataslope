@@ -250,6 +250,13 @@ describe("authored subjects", () => {
     // single number" is deliberately not caught — that one comes back as a
     // dial with a pointer, which is exactly right, and banning the word
     // outright would flag six subjects that are already correct.
+    //
+    // Note for whoever authors the next batch, which will probably be me: the
+    // word this catches most often is not a request for numbers at all. Three
+    // separate waves have contained "a numbered-free ticket", "numbered-free
+    // step plates" and "a numbered-free rail", each time reaching for *plain*
+    // or *unlabelled* and landing on the one word that guarantees digits. If
+    // you mean the thing has no markings, write "unmarked" or "blank".
     const asksForDigits =
       /\bnumbered\b|\b(?:column|grid|row|stack|strip|list|table) of numbers\b|\bnumber tiles?\b/i;
     const offenders = getIllustrationPrompts()
