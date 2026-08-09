@@ -100,6 +100,7 @@ fig = px.histogram(
     nbins=50,
     height=620,
     title="Exponential population: sampling distribution of x-bar normalizes as n grows",
+    template="simple_white",
 )
 fig.update_xaxes(matches=None)
 fig.show()
@@ -183,6 +184,7 @@ fig.update_layout(
     barmode="overlay",
     title=f"Three very different populations -> same normal mean (n={n})",
     xaxis_title="standardized x-bar",
+    template="simple_white",
 )
 fig.show()
 
@@ -322,6 +324,7 @@ fig = px.line(
     markers=True,
     labels={"x": "sample size n", "y": "SD of x-bar"},
     title="SD of x-bar follows sigma / sqrt(n)",
+    template="simple_white",
 )
 fig.add_scatter(
     x=ns,

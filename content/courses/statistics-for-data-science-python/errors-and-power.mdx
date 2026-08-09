@@ -212,6 +212,7 @@ fig = px.line(
     y=power_by_n,
     markers=True,
     title="Power rises with sample size (true effect = 0.5)",
+    template="simple_white",
 )
 fig.add_hline(y=0.8, line_dash="dash", line_color="green")
 fig.update_layout(
@@ -264,6 +265,7 @@ fig = px.line(
     y=power_by_effect,
     markers=True,
     title="Power rises with effect size (n = 40 per group)",
+    template="simple_white",
 )
 fig.add_hline(y=0.8, line_dash="dash", line_color="green")
 fig.update_layout(

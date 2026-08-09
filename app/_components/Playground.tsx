@@ -55,7 +55,6 @@ import type {
   LanguageRuntime,
   OutputCell,
   PackageInfo,
-  PlotlyFigure,
   RunOptions,
 } from "./types";
 import { PLAYGROUNDS } from "./playgrounds";
@@ -190,7 +189,7 @@ import {
   retainRuntime,
   RuntimeScope,
 } from "./runtimeRegistry";
-import { PLOTLY_CDN } from "./runtime/cdn";
+import { PlotlyChart } from "./PlotlyChart";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
 
@@ -201,17 +200,6 @@ const CODE_CLEAR_BEFORE_RUN_DEFAULT = false;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
 // transition can complete and be clearly visible to the user.
 const MIN_ANIMATION_MS = 300;
-
-/** Minimal Plotly surface we use for rendering chart cells. */
-interface PlotlyAPI {
-  newPlot(
-    el: HTMLElement,
-    data: unknown[],
-    layout?: Record<string, unknown>,
-    config?: Record<string, unknown>,
-  ): Promise<unknown>;
-}
-
 
 /** Build the empty-state output-panel blurb based on what the runtime
  *  can actually produce. Every runtime supports plain text; richer
@@ -390,41 +378,6 @@ function computeRunButtonState(
       },
     ],
   };
-}
-
-const PLOTLY_MARGIN = { l: 48, r: 24, t: 48, b: 48 };
-
-function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let cancelled = false;
-    void (async () => {
-      // Plotly is heavy and only needed when a chart actually renders, so we
-      // lazy-load it from jsDelivr on demand, keeping it out of the client
-      // bundle and the OpenNext Worker bundle (see PLOTLY_CDN in runtime/cdn).
-      const mod = await import(
-        /* webpackIgnore: true */ /* turbopackIgnore: true */ PLOTLY_CDN
-      );
-      if (cancelled || !ref.current) return;
-      const Plotly = (mod.default ?? mod) as unknown as PlotlyAPI;
-      // The Python runtime bakes the theme-appropriate template (plotly_dark in
-      // dark mode, plotly in light mode) into figure.layout.template, so we only
-      // set a default margin here and otherwise render the figure as-is.
-      const layout = { margin: PLOTLY_MARGIN, ...(figure.layout ?? {}) };
-      void Plotly.newPlot(el, figure.data, layout, {
-        responsive: true,
-        displayModeBar: true,
-        displaylogo: false,
-        modeBarButtonsToRemove: ["sendDataToCloud", "lasso2d"],
-      });
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [figure]);
-  return <div ref={ref} className="plotly-chart" />;
 }
 
 interface PackagesDrawerProps {
@@ -5112,7 +5065,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                               className="out-seg out-seg-plot"
                               data-cell-type="plot"
                             >
-                              <PlotlyChart figure={cell.plot} />
+                              <PlotlyChart
+                                figure={cell.plot}
+                                className="plotly-chart"
+                              />
                             </div>
                           ) : (
                             <div

@@ -551,6 +551,7 @@ dd = pd.read_csv("datasaurus.csv")`,
 fig = px.scatter(
     dd, x="x", y="y", facet_col="dataset", facet_col_wrap=4,
     height=700, title="The Datasaurus Dozen, identical statistics, wildly different shapes",
+    template="simple_white",
 )
 fig.update_xaxes(matches=None, showticklabels=False)
 fig.update_yaxes(matches=None, showticklabels=False)

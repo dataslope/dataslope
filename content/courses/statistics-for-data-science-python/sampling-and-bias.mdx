@@ -207,6 +207,7 @@ fig = px.line(
     log_x=True,
     title="More data fixes noise, not bias",
     labels={"n": "Sample size n (log scale)", "estimate": "Estimated mean"},
+    template="simple_white",
 )
 fig.add_hline(y=true_mean, line_dash="dash", annotation_text="true mean")
 fig.show()

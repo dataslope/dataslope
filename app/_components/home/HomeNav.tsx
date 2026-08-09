@@ -303,11 +303,25 @@ export function HomeNav() {
     // compositing layer, so hover repaints inside it (nav-link colour
     // transitions, the logo's group-hover transform) stay isolated from the
     // continuously-animating hero marquee below. Combined with the fixed
-    // h-14/16 box (see above), it makes the header a constant-size opaque
-    // occluder over the marquee.
-    <header className="sticky top-0 z-40 h-14 transform-gpu bg-white md:h-16 dark:bg-[#121212]">
+    // h-14/16 box (see above), it keeps that layer a constant size over the
+    // marquee; the opaque occluder itself is the background div inside it.
+    <header className="sticky top-0 z-40 h-14 transform-gpu md:h-16">
+      {/* The opaque background, tracking the nav's height rather than the
+          header box's. The box has to stay h-14/16 (see above), so painting
+          the background across all of it left the compacted header carrying a
+          16px band of dead white below the content before the fade began.
+          Painting only as far as the nav puts the fade directly under the
+          logo/menu row, and costs the occluder nothing the fade doesn't
+          immediately cover. This is a repaint inside the header's existing
+          layer, not a resize of the layer itself. */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-x-0 top-0 bg-white transition-[height] duration-200 dark:bg-[#121212] ${
+          scrolled ? "h-11 md:h-12" : "h-14 md:h-16"
+        }`}
+      />
       <nav
-        className={`mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 transition-[height] duration-200 sm:px-6 md:grid-cols-[1fr_auto_1fr] ${
+        className={`relative mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 transition-[height] duration-200 sm:px-6 md:grid-cols-[1fr_auto_1fr] ${
           scrolled ? "h-11 md:h-12" : "h-14 md:h-16"
         }`}
       >
@@ -345,16 +359,19 @@ export function HomeNav() {
       </nav>
       {/* Short fade below the compacted header so its solid background melts
           into the page instead of slicing through content scrolling under it
-          (most visible against the hero marquee). Hidden while the page is at
-          the top, where the header sits in normal flow above the content.
+          (most visible against the hero marquee). It sits at the background's
+          bottom edge, not the header box's, so it moves up with the shrink
+          instead of leaving a gap of flat colour behind it. Hidden while the
+          page is at the top, where the header sits in normal flow above the
+          content.
           `will-change-[opacity]` keeps this strip permanently on its own
           compositor layer: without it, the opacity transition creates and
           destroys a layer on every scroll-threshold crossing, right at the
           band under the header where stale marquee raster has ghosted. */}
       <div
         aria-hidden="true"
-        className={`pointer-events-none absolute inset-x-0 top-full h-3 bg-gradient-to-b from-white to-transparent transition-opacity duration-200 will-change-[opacity] dark:from-[#121212] ${
-          scrolled ? "opacity-100" : "opacity-0"
+        className={`pointer-events-none absolute inset-x-0 h-3 bg-gradient-to-b from-white to-transparent transition-[opacity,top] duration-200 will-change-[opacity] dark:from-[#121212] ${
+          scrolled ? "top-11 opacity-100 md:top-12" : "top-full opacity-0"
         }`}
       />
     </header>

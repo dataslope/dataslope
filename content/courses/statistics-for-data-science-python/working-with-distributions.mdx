@@ -237,6 +237,7 @@ fig.update_layout(
     title="Histogram with fitted normal overlay, shapes match well",
     xaxis_title="score",
     yaxis_title="density",
+    template="simple_white",
 )
 fig.show()
 `,
@@ -304,6 +305,7 @@ fig = px.scatter(
     y=samp,
     labels={"x": "theoretical quantiles (fitted normal)", "y": "sample quantiles"},
     title="Q-Q plot: skewed data vs a fitted normal, note the curve",
+    template="simple_white",
 )
 lo, hi = min(theo.min(), samp.min()), max(theo.max(), samp.max())
 fig.add_shape(type="line", x0=lo, y0=lo, x1=hi, y1=hi, line=dict(dash="dash"))
