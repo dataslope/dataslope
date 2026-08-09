@@ -16,16 +16,16 @@ indexes, configuration, frequency counts, lookup tables, JSON
 objects, and the symbol tables of every compiler in the world are
 maps under the skin.
 
-<Figure
-  slug="jcol-maps-inline-cutout"
-  alt="A wall of small pigeonholes, each with a distinct key hanging beside it, and one key opening exactly one hole to reveal the block inside"
-/>
-
 ## The Map interface
 
 `Map<K, V>` is its own root, it does not extend `Collection`,
 because its elements are *pairs* (`Map.Entry<K, V>`), not single
 values.
+
+<Figure
+  slug="jcol-maps-inline-cutout"
+  alt="A wall of small pigeonholes, each with a distinct key hanging beside it, and one key opening exactly one hole to reveal the block inside"
+/>
 
 ```mermaid
 classDiagram

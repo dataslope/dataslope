@@ -19,11 +19,6 @@ questions:
    end of program, never)
 3. **Who is responsible for it?** (the compiler, you, or the OS)
 
-<Figure
-  slug="cpp-memory-model-inline-cutout"
-  alt="One long strip running the width of the frame divided into three zones of different sizes, each zone a different flat color with its own kind of block resting in it"
-/>
-
 | Region | What lives there | Lifetime / owner |
 | --- | --- | --- |
 | Text segment | compiled machine code | whole program, read-only |
@@ -38,6 +33,11 @@ questions:
 The compiled machine code of your program. Read-only, the OS marks
 those pages so that trying to write to them crashes the program.
 You don't directly interact with this region.
+
+<Figure
+  slug="cpp-memory-model-inline-cutout"
+  alt="One long strip running the width of the frame divided into three zones of different sizes, each zone a different flat color with its own kind of block resting in it"
+/>
 
 ### 2. Data segment (globals and statics)
 

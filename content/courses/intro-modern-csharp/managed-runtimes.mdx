@@ -16,11 +16,6 @@ and why that matters.
 We'll stay conceptual, no deep internals. The goal is intuition,
 not a reading list of CLR source code.
 
-<Figure
-  slug="mcs-managed-runtimes-inline-cutout"
-  alt="A program block resting on a wide platform, with a small tidy-up cart under the platform sweeping discarded blocks away on its own"
-/>
-
 ## What is a runtime, in one paragraph?
 
 A **runtime** is a piece of software that runs *alongside* your
@@ -28,6 +23,11 @@ program, providing services your program would otherwise have to
 do itself: loading code, managing memory, looking up methods,
 enforcing safety rules, handling exceptions, talking to the
 operating system.
+
+<Figure
+  slug="mcs-managed-runtimes-inline-cutout"
+  alt="A program block resting on a wide platform, with a small tidy-up cart under the platform sweeping discarded blocks away on its own"
+/>
 
 You can have an *unmanaged* runtime (think of the very thin one
 behind a C program, basically just the C standard library and

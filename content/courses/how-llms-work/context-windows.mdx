@@ -17,17 +17,17 @@ million tokens, with output capped separately at a much lower figure
 (commonly around 128,000). Those are two distinct limits and it is
 worth keeping them apart.
 
-<Figure
-  slug="llm-context-windows-inline-cutout"
-  alt="A long ribbon of chips feeding through a fixed rectangular frame, the chips that pass beyond the frame's left edge dropping away off the rail"
-/>
-
 ## The window is a hard boundary
 
 Content outside it does not degrade. It is not there. Whatever the
 system around the model does about that (reject the request, drop the
 oldest turns, summarize) happens outside the model, and the model has
 no way to know something was removed.
+
+<Figure
+  slug="llm-context-windows-inline-cutout"
+  alt="A long ribbon of chips feeding through a fixed rectangular frame, the chips that pass beyond the frame's left edge dropping away off the rail"
+/>
 
 This is why a long chat can quietly forget its own beginning. The
 interface trimmed the history to fit, and no signal about the

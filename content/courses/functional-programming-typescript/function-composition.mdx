@@ -18,16 +18,16 @@ This chapter covers function composition, the closely related
 techniques of **currying** and **partial application**, and the two
 helper functions (`compose` and `pipe`) you'll use everywhere.
 
-<Figure
-  slug="fp-function-composition-inline-cutout"
-  alt="Three small machines bolted end to end into one longer machine, a single shape entering the left and leaving transformed at the right"
-/>
-
 ## What composition means, mathematically
 
 In math, given `f: A → B` and `g: B → C`, the composition `g ∘ f`
 is the function `A → C` defined by `(g ∘ f)(x) = g(f(x))`. You apply
 `f` first, then feed the result into `g`.
+
+<Figure
+  slug="fp-function-composition-inline-cutout"
+  alt="Three small machines bolted end to end into one longer machine, a single shape entering the left and leaving transformed at the right"
+/>
 
 ```mermaid
 flowchart TD

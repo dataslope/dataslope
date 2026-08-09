@@ -19,11 +19,6 @@ been using HOFs every time you wrote `.Where(n => n % 2 == 0)`.
 `Where` is a higher-order function: it takes another function (the
 predicate) as a parameter.
 
-<Figure
-  slug="cs-higher-order-functions-inline-cutout"
-  alt="A machine on the left with an open slot in its side, a small tool being slid into that slot, and the machine stamping a different shape because of it"
-/>
-
 This page is about why that idea is so powerful, and how to wield it
 in everyday C#.
 
@@ -75,6 +70,11 @@ Console.WriteLine(FirstOver100(nums));
 These three methods are **the same method** except for one
 expression: the condition inside the `if`. That's a code smell. The
 *behavior* is what differs, but we've duplicated everything else.
+
+<Figure
+  slug="cs-higher-order-functions-inline-cutout"
+  alt="A machine on the left with an open slot in its side, a small tool being slid into that slot, and the machine stamping a different shape because of it"
+/>
 
 A higher-order function lets us extract behavior as an *argument*:
 

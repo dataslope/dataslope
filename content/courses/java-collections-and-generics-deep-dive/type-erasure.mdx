@@ -17,11 +17,6 @@ working Java programmer eventually trips on.
 This page lays them out so you don't have to learn each one by
 crash.
 
-<Figure
-  slug="jcol-type-erasure-inline-cutout"
-  alt="A box wearing a coloured tag passing through a gate that checks the tag, and the same box continuing past the gate with the tag removed"
-/>
-
 ## What erasure actually does
 
 When `javac` compiles a generic class, it **erases** the type
@@ -55,6 +50,11 @@ String s = b.get();        // compiler inserts: (String) b.get();
 That is the whole trick. Generics give you compile-time guarantees;
 at runtime, they look like the old `Object`-based code, with the
 casts written for you.
+
+<Figure
+  slug="jcol-type-erasure-inline-cutout"
+  alt="A box wearing a coloured tag passing through a gate that checks the tag, and the same box continuing past the gate with the tag removed"
+/>
 
 | Source | What `javac` does | Bytecode |
 | --- | --- | --- |

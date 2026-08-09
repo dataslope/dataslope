@@ -451,11 +451,25 @@ around it already says what the picture means.
 `wire-course-figures.mjs` does not touch any of them — it keys on
 `course-illustration` — so a re-wire will not move or clear them.
 
-**Two placement rules worth knowing before scripting a batch.** Start *after*
-the lesson's own opening figure, or the two end up stacked; and never insert
-after a paragraph ending in a colon, because the list, code block or diagram
-below it belongs to that sentence and a figure dropped between them reads as
-the thing being introduced.
+**Three placement rules worth knowing before scripting a batch.**
+
+- Start *after* the lesson's own opening figure, or the two end up stacked.
+- Never insert after a paragraph ending in a colon: the list, code block or
+  diagram below it belongs to that sentence, and a figure dropped between them
+  reads as the thing being introduced.
+- **Put it past the first `## ` heading**, not in the opening section with the
+  lesson's own art. "After the opening figure" is not enough on its own: 36 of
+  the first hundred landed a paragraph below it, close enough to read as a
+  second opinion on the same picture, and on `python-basics/lists` the two were
+  the same idea twice (isometric carts of coloured blocks, then a risograph
+  rail of coloured blocks). Moving each into the section that explains it fixed
+  the crowding and improved every placement: the pointer band now sits under
+  "What a pointer is", the context-window band under "The window is a hard
+  boundary".
+
+None of this is visible to `check:mdx`, which only knows about tag nesting, so
+the audit after a batch is the check. Print each figure's preceding and
+following line and read the list.
 
 **Placing a batch of them: check where each one landed.** Inserting after "the
 paragraph containing this phrase" is mechanical enough to script, and it is

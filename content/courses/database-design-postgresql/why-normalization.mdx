@@ -16,11 +16,6 @@ that story into several tables?
 Because duplication has a cost. Before learning the cure, you need to
 recognize the disease.
 
-<Figure
-  slug="db-why-normalization-inline-cutout"
-  alt="One bloated table on the left leaking duplicate blocks, and three tidy narrow tables on the right holding each block exactly once"
-/>
-
 The diagnosis is older than you might expect. E. F. Codd, the IBM
 mathematician whose 1970 paper invented the relational model, did
 not stop at proposing tables. In a follow-up paper published in 1971
@@ -47,6 +42,11 @@ flowchart TB
 The table is easy to read, but look carefully. Ada's email appears in
 two rows. The notebook price appears in two rows. Those are not two
 separate facts; they are the same facts copied into several places.
+
+<Figure
+  slug="db-why-normalization-inline-cutout"
+  alt="One bloated table on the left leaking duplicate blocks, and three tidy narrow tables on the right holding each block exactly once"
+/>
 
 A good design tries to store **each fact in exactly one place**. When a
 fact has more than one home, the database can start disagreeing with

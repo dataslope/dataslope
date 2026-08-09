@@ -22,11 +22,6 @@ There are three to know:
 - `std::weak_ptr<T>`, non-owning observer of a `shared_ptr`. Used
   to break cycles or watch an object without keeping it alive.
 
-<Figure
-  slug="cpp-smart-pointers-inline-cutout"
-  alt="A crate carried by a handle that unclips itself, the crate dropping neatly into a return chute the moment the last hand lets go"
-/>
-
 ## `std::unique_ptr`: one owner, no overhead
 
 <CodeBlock
@@ -61,6 +56,11 @@ int main() {
 `std::make_unique<Widget>(1)` is preferred over `new Widget(1)` for
 two reasons: it's exception-safe in surprising ways, and you never
 have to write the type twice.
+
+<Figure
+  slug="cpp-smart-pointers-inline-cutout"
+  alt="A crate carried by a handle that unclips itself, the crate dropping neatly into a return chute the moment the last hand lets go"
+/>
 
 A `unique_ptr` cannot be copied, only **moved** (next chapter).
 That single restriction enforces "exactly one owner" at compile

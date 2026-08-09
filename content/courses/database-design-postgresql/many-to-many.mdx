@@ -15,15 +15,15 @@ That is a **many-to-many relationship**: many rows on the left can
 connect to many rows on the right. It is common, but it cannot be
 stored directly with one foreign key.
 
-<Figure
-  slug="db-many-to-many-inline-cutout"
-  alt="Two rows of blocks facing each other with a small junction board between them, every cord passing through a slot on that board rather than joining directly"
-/>
-
 ## Seeing both sides as many
 
 Start with the real-world picture, before tables. Ada takes Math and
 History. Grace takes Math and Art. Math has both Ada and Grace.
+
+<Figure
+  slug="db-many-to-many-inline-cutout"
+  alt="Two rows of blocks facing each other with a small junction board between them, every cord passing through a slot on that board rather than joining directly"
+/>
 
 ```mermaid
 flowchart LR

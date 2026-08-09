@@ -16,15 +16,15 @@ unions** + **exhaustiveness checking** via the `never` type.
 Used well, this pair gives you the central guarantee of pattern
 matching: *the compiler refuses to build code that forgets a case*.
 
-<Figure
-  slug="fp-pattern-matching-inline-cutout"
-  alt="A shape sorter board with four differently cut holes, each shape dropping through the one hole it fits and landing in its own tray"
-/>
-
 ## The setup: a discriminated union
 
 A discriminated union is a sum type where every variant has a
 **literal tag** (called a *discriminant*) on the same property name.
+
+<Figure
+  slug="fp-pattern-matching-inline-cutout"
+  alt="A shape sorter board with four differently cut holes, each shape dropping through the one hole it fits and landing in its own tray"
+/>
 
 <CodeBlock
   adapter="typescript"

@@ -21,16 +21,16 @@ They are tiny. They are also the single most-bugged corner of the
 whole framework. This page is about why, and how to get them right
 once and for all.
 
-<Figure
-  slug="jcol-equality-and-hashing-inline-cutout"
-  alt="Two identical-looking blocks on a balance that reads level, and beneath them a sorting machine dropping both into the same numbered bin"
-/>
-
 ## What collections actually do with equals
 
 `List.contains(x)`, `List.indexOf(x)`, `List.remove(x)`,
 `Set.contains(x)`, `Set.add(x)`, `Map.containsKey(k)`, `Map.get(k)`,
 all of them, under the hood, call `equals` to compare candidates.
+
+<Figure
+  slug="jcol-equality-and-hashing-inline-cutout"
+  alt="Two identical-looking blocks on a balance that reads level, and beneath them a sorting machine dropping both into the same numbered bin"
+/>
 
 `==` compares **identity** (same object in memory). `.equals` compares
 **value** (logically the same thing). For a sane container,
