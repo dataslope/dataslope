@@ -36,6 +36,11 @@ Differentiation in finite precision is *ill-conditioned*, you are
 subtracting nearby numbers. Integration is *well-conditioned*,
 errors average out. This asymmetry shapes every algorithm below.
 
+<Figure
+  slug="scipy-numerical-calculus-inline-cutout"
+  alt="A curve with a row of thin rectangles fitted under it, and a straight rod resting tangent against one point of the curve"
+/>
+
 ## Finite differences
 
 The definition $f'(x) = \lim_{h\to 0} (f(x+h)-f(x))/h$ suggests we

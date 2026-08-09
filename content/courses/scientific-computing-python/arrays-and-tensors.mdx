@@ -35,6 +35,11 @@ flowchart TD
 - A **strides** tuple, how many bytes to skip in the buffer to
   step along each axis.
 
+<Figure
+  slug="scipy-arrays-and-tensors-inline-cutout"
+  alt="A single row of cells, a flat grid of them, and a stack of those grids, standing side by side in increasing dimension"
+/>
+
 Most array operations, slicing, transposing, reshaping, just
 change the *header*. The underlying bytes are not copied. That is
 what makes NumPy so fast.

@@ -501,7 +501,7 @@
       "style": "risograph",
       "title": "Scope in Python",
       "mascot": false,
-      "subject": "three nested rooms with a lamp in each, the outer lamp's light reaching inward and the inner lamp's light staying in its own room"
+      "subject": "four frames standing nested one inside another with a block resting in each, and a hand reaching out from the innermost frame through each one in turn until it finds the block it wants"
     },
     {
       "id": "python-variables-inline",
@@ -1953,7 +1953,7 @@
       "style": "risograph",
       "title": "Seeing the data",
       "mascot": false,
-      "subject": "a column of numbers on the left and the same column as a row of bars on the right, the shape obvious only on the right"
+      "subject": "a column of plain chips on the left and the same column as a row of bars on the right, the shape of the data obvious only on the right"
     },
     {
       "id": "pandas-hypothesis-intuition-inline",
@@ -5445,7 +5445,7 @@
       "title": "What data visualization is",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "the Dataslope marmot mascot turning a stack of number tiles into a raised bar chart plate"
+      "subject": "the Dataslope marmot mascot turning a stack of plain tiles into a raised bar chart on a pale grey platform"
     },
     {
       "id": "viz-why-charts-exist",
@@ -5781,7 +5781,7 @@
       "title": "Dashboard intuition",
       "style": "isometric illustration",
       "mascot": true,
-      "subject": "a small striped chipmunk on a pale grey platform beside a panel holding a big number tile, a small line ribbon and a status lamp"
+      "subject": "a marmot on a pale grey platform beside a panel holding one large blank tile, a small line ribbon and a compact bar cluster"
     },
     {
       "id": "viz-storytelling",
@@ -10449,7 +10449,7 @@
       "style": "risograph",
       "title": "Colour scales",
       "mascot": false,
-      "subject": "an outline shape with its edge inked one colour and its interior inked another, with two separate keys standing beside it"
+      "subject": "an outline shape with its edge inked one colour and its interior inked another, with two separate legend strips of graded swatches standing beside it"
     },
     {
       "id": "gg-flipping-and-polar-coordinates-inline",
@@ -11709,7 +11709,7 @@
       "style": "risograph",
       "title": "Enums",
       "mascot": false,
-      "subject": "a dial with exactly four detents and no positions between them, the pointer resting firmly in one"
+      "subject": "a dial with exactly four detents and no positions between them, its pointer resting firmly in one, and four blocks set out in a row beside it, one answering each detent"
     },
     {
       "id": "oopj-static-and-utility-inline",
@@ -12213,7 +12213,7 @@
       "style": "risograph",
       "title": "Data frames",
       "mascot": false,
-      "subject": "several columns of different kinds, one of numbers, one of labels, one of marks, clamped side by side into a single board"
+      "subject": "several columns of different kinds clamped side by side into one board, one column of plain blocks, one of coloured tags, one of small marks"
     },
     {
       "id": "rlang-dplyr-verbs-inline",
@@ -13233,7 +13233,7 @@
       "style": "risograph",
       "title": "Linear algebra",
       "mascot": false,
-      "subject": "a grid of numbers acting on an arrow, the arrow leaving the grid rotated and stretched"
+      "subject": "a grid of plain square cells acting on an arrow, the arrow leaving the far side of the grid both turned and stretched"
     },
     {
       "id": "scipy-matrix-decompositions-inline",
@@ -13761,7 +13761,7 @@
       "style": "risograph",
       "title": "Trend lines",
       "mascot": false,
-      "subject": "a cloud of chips with a straight rod laid through their middle and a soft band of the same shape drawn either side of it"
+      "subject": "a cloud of chips pinned flat across a board with one straight rod laid through the middle of the cloud, and a soft shaded band following that rod closely on either side"
     },
     {
       "id": "sns-tidy-data-for-seaborn-inline",

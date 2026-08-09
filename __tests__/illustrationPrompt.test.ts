@@ -245,8 +245,15 @@ describe("authored subjects", () => {
   // the first three slots to the fourth says index just as clearly. This keeps
   // the two instructions from contradicting each other in the first place.
   it("never asks an illustration for numbers it is told not to draw", () => {
+    // Three spellings, all of which produced literal digits: "a numbered
+    // shelf", "a column of numbers", "number tiles". A gauge that "reads a
+    // single number" is deliberately not caught — that one comes back as a
+    // dial with a pointer, which is exactly right, and banning the word
+    // outright would flag six subjects that are already correct.
+    const asksForDigits =
+      /\bnumbered\b|\b(?:column|grid|row|stack|strip|list|table) of numbers\b|\bnumber tiles?\b/i;
     const offenders = getIllustrationPrompts()
-      .entries.filter((e) => /\bnumbered\b/i.test(e.subject))
+      .entries.filter((e) => asksForDigits.test(e.subject))
       .map((e) => e.id);
     expect(offenders).toEqual([]);
   });

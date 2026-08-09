@@ -24,6 +24,11 @@ otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
   at lag `k` **after removing** the influence of all the shorter lags in
   between. It captures only the **direct** relationship.
 
+<Figure
+  slug="tsa-acf-and-pacf-inline-cutout"
+  alt="One wave laid over a copy of itself shifted along by a few steps, with a gauge reading how well the two still line up"
+/>
+
 Why does "direct vs total" matter so much? Picture an AR(1) series where
 each value is $0.7 \times$ the previous one. Then $y(t)$ is directly tied to
 $y(t-1)$. But $y(t-1)$ is tied to $y(t-2)$, so $y(t)$ is *indirectly*

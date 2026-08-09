@@ -24,6 +24,11 @@ function logLength<T>(item: T): void {
 
 The compiler doesn't know if `T` has a `length` property. For all it knows, `T` could be `number` or `boolean`, which don't have `length`.
 
+<Figure
+  slug="tsx-generic-constraints-inline-cutout"
+  alt="An adjustable slot that widens to take many shapes but stops at a fixed limit, one oversized shape resting outside it"
+/>
+
 The solution: **constrain** `T` to types that *do* have a `length` property.
 
 <CodeBlock

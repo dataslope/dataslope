@@ -31,6 +31,11 @@ training set* by February and April. The model gets to peek at both sides of
 every test point. It will score brilliantly in evaluation and collapse in
 production, where the future genuinely doesn't exist yet.
 
+<Figure
+  slug="tsa-chronological-validation-inline-cutout"
+  alt="A timeline cut once, everything left of the cut used for fitting and everything right of it sealed, with no shuffling anywhere"
+/>
+
 Line the two schemes up month by month and the flaw is obvious, under the
 random split, every `TEST` month is hemmed in by `train` months on both
 sides; under the chronological split, all training is in the past and all

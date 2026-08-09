@@ -22,6 +22,11 @@ give one group per *day*. You first **truncate** each date down to the
 first of its month, so every day in March collapses to `2024-03-01`. The
 tool is `date_trunc('month', d)`.
 
+<Figure
+  slug="duck-working-with-dates-inline-cutout"
+  alt="A calendar strip being cut into months by a small guillotine, and the pieces stacked into three labelled trays"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Revenue per month with date_trunc"

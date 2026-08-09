@@ -28,6 +28,11 @@ When you write `int x = 42;`, the compiler picks a memory address for
 `x`, makes sure that address holds the four bytes of `42`, and from
 then on the *name* `x` refers to that address.
 
+<Figure
+  slug="sysc-pointers-inline-cutout"
+  alt="A strip of lockers with a card in one locker whose arrow reaches across to another, and a cord following that arrow"
+/>
+
 The `&` operator gives you the address itself. The `%p` format
 specifier prints it in hex (after a cast to `void *`).
 

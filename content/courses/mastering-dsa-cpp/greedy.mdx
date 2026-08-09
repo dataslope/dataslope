@@ -100,6 +100,11 @@ int main() {
 
 Why is "earliest end" provably safe? The **exchange argument** goes like this. Take any optimal schedule `O`. Look at its first activity; the greedy choice `g` ends no later than it (greedy picked the earliest ender of all). So swap `g` in for `O`'s first activity: nothing that followed is disturbed, they all started after the old first activity ended, hence after `g` ends too, and the schedule is exactly as large. Therefore *some* optimal schedule starts with the greedy choice; repeat the argument on the rest, and greedy's whole output is optimal. Every greedy proof you will ever write has this shape: "take an optimal solution, exchange one piece for the greedy piece, show it got no worse."
 
+<Figure
+  slug="dsa-greedy-inline-cutout"
+  alt="A figure walking a row of coin trays taking the largest from each in turn without looking ahead, and one tray further on holding a much larger prize"
+/>
+
 ```mermaid
 flowchart TD
     O[Optimal starts with X] --> G[Swap in greedy activity G]

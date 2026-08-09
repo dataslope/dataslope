@@ -26,6 +26,11 @@ Computers compare strings by their exact characters, so `"The" == "the"` is
 do not care that one "the" started a sentence and another did not. Case
 folding, usually just `str.lower()`, collapses all of them into one form.
 
+<Figure
+  slug="nlp-text-normalization-inline-cutout"
+  alt="Word tiles of different heights, casings and trims passing through a press that leaves them all the same plain shape"
+/>
+
 ```mermaid
 flowchart LR
     A["'The'"] --> X["lowercase"]

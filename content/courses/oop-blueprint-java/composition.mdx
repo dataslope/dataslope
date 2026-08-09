@@ -37,6 +37,11 @@ composition relationship, the *whole* owns the *part*. The part's
 lifetime is tied to the whole's. If the car goes to the junkyard, so
 does the engine.
 
+<Figure
+  slug="oopj-composition-inline-cutout"
+  alt="One machine assembled from four smaller machines bolted into a frame, each smaller one still recognisable inside it"
+/>
+
 In Java, composition looks like one class holding a `private final`
 field of another type, with the part being constructed by the whole
 (or handed in via the constructor) and never shared with anyone else.
