@@ -34,6 +34,11 @@ The `price` column is already numeric, a model can use it directly. But
 `LogisticRegression` or `KNeighborsClassifier`, you get an error, because
 there is no sensible way to compute "red times a weight."
 
+<Figure
+  slug="ml-encoding-categorical-features-inline-cutout"
+  alt="Three coloured tags each replaced by a small row of on-off switches, one switch raised in each row"
+/>
+
 So we must **encode**: replace each category with numbers. The question is
 *which* numbers, and here is where intuition matters more than syntax.
 

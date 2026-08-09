@@ -41,6 +41,11 @@ sequenceDiagram
 
 The cleanest first example: print every ordering of `{1, 2, 3}`. The choice at position `idx` is "which remaining element goes here?", implemented as a swap; the un-choose is the swap back. Watch the symmetry in the code, `swap`, recurse, `swap`, that is the template in its purest form. (There are n! permutations, so this is inherently factorial work; backtracking doesn't make exponential spaces small, it just avoids exploring them redundantly.)
 
+<Figure
+  slug="dsa-backtracking-inline-cutout"
+  alt="A maze of low walls with a route drawn to a dead end, that stretch rubbed out, and the route resumed from the last junction"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[

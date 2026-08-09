@@ -18,6 +18,11 @@ The price of this flexibility is the loss of the array's address formula. Nodes 
 
 A minimal node stores data and a pointer to the next node. The last node's `next` is `nullptr`, the "address of nothing" that marks the end of the chain.
 
+<Figure
+  slug="dsa-linked-lists-inline-cutout"
+  alt="Separate blocks on a bench each joined to the next by a short cord, one cord unclipped and rerouted to insert a new block"
+/>
+
 A historical aside about that null: the null reference was introduced by Tony Hoare in 1965, in the type system of ALGOL W, "simply because it was so easy to implement." Speaking at a conference in 2009, Hoare publicly called it his "billion-dollar mistake," estimating that null-related crashes and vulnerabilities have cost roughly that much over the decades. You are about to spend a chapter deliberately handling `nullptr` at every turn, consider it supervised practice with the most dangerous value in programming.
 
 <CodeBlock

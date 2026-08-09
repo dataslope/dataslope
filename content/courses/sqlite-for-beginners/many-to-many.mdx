@@ -25,6 +25,11 @@ Ada connects to more than one course. Math connects to more than one student. A 
 
 If you put `course_id` on `students`, each student could store only one course. If you put `student_id` on `courses`, each course could store only one student. Both designs lose information.
 
+<Figure
+  slug="lite-many-to-many-inline-cutout"
+  alt="Two rows of crates with all cords between them routed through a small pegboard standing in the middle"
+/>
+
 ```mermaid
 flowchart TB
     Bad1["students.<code>course_id</code>"] --> Problem1["one student row<br/>can point to only one course"]

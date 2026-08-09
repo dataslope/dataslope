@@ -71,6 +71,11 @@ other** in memory. `primes[i]` is shorthand for "the cell at address
 `primes + i * sizeof(int)`". This contiguity is the secret to why
 arrays are fast: predicting the next address is one addition.
 
+<Figure
+  slug="c-arrays-inline-cutout"
+  alt="A strip of equal cells with a marker resting past the final cell, one step beyond where the strip ends"
+/>
+
 ## The size is fixed at declaration
 
 In C, the size of a standard array is **set when it's declared** and

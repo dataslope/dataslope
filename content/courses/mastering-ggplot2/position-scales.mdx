@@ -96,6 +96,11 @@ ggplot(df, aes(size, score)) +
 Same data, same mapping, same geom. Only the **scale's
 transformation** changed, and the chart went from unreadable to clear.
 
+<Figure
+  slug="gg-position-scales-inline-cutout"
+  alt="The same chips shown on an evenly spaced rule and again on a rule whose marks crowd toward one end"
+/>
+
 **Skewed data (1 ... 100000) → `scale_x_log10` transforms the spacing →
 an evenly spread axis where equal gaps mean 10x steps.**
 

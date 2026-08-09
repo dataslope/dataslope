@@ -21,6 +21,11 @@ links.
 An **orphan row** is a child row that points to a parent row that does
 not exist.
 
+<Figure
+  slug="db-referential-integrity-inline-cutout"
+  alt="A cord running from one crate to another, and a gate refusing to remove the far crate while the cord is still attached"
+/>
+
 ```mermaid
 flowchart TD
     O["orders<br/><code>order_id</code> = 101<br/><code>customer_id</code> = 7"] --> C["customers<br/><code>customer_id</code> = 7"]

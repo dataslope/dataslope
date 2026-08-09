@@ -33,6 +33,11 @@ function takes 5 seconds, *nothing else* in your program runs
 during those 5 seconds. (We'll see why slow blocking code is a
 problem, and how async solves it without adding more threads.)
 
+<Figure
+  slug="js-how-javascript-runs-inline-cutout"
+  alt="A single worker at a bench with a queue of trays beside them, taking one tray at a time and never two at once"
+/>
+
 ## The call stack
 
 When a function is called, JS pushes a **stack frame** for it.

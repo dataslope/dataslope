@@ -35,6 +35,11 @@ the entries in it name:
 `*` *amortized*: occasionally an `O(n)` resize/rehash happens, but
 spread over many inserts it averages to `O(1)`.
 
+<Figure
+  slug="jcol-performance-tradeoffs-inline-cutout"
+  alt="Two containers side by side, one quick to reach into and slow to insert, the other the reverse, each with its own gauge"
+/>
+
 ## Big-O is not the whole story: cache locality
 
 Modern CPUs are *much* faster than memory. A linear walk over a

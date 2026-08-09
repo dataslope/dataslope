@@ -34,6 +34,11 @@ print(penguins.sort("body_mass_g", descending=True).head(3))
 Note the argument is `descending`, not `ascending`. Polars names the
 thing you are asking for rather than the thing you are turning off.
 
+<Figure
+  slug="pl-sorting-and-top-k-inline-cutout"
+  alt="A rising staircase of blocks with a clamp taking the top three off the end, the rest left where they stand"
+/>
+
 ## Sorting by several columns
 
 Pass several names, and a list of booleans if the directions differ.

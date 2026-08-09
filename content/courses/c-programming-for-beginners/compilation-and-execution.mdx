@@ -18,6 +18,11 @@ to one specific stage.
 
 The pipeline runs **`hello.c` → Preprocessor → Compiler → Assembler → Linker → Executable**, and then the operating system loads and runs that executable.
 
+<Figure
+  slug="c-compilation-and-execution-inline-cutout"
+  alt="A source card fed into a machine, an object block leaving it, and that block driving a second machine"
+/>
+
 | Stage         | Input              | Output             | Job                                                  |
 |---------------|--------------------|--------------------|------------------------------------------------------|
 | Preprocessor  | `.c` + `.h` files  | one big `.c` file  | Handle `#include`, `#define`, `#ifdef`, comments     |

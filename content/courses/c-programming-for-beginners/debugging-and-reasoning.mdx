@@ -38,6 +38,11 @@ hello.c:5:9: error: expected ';' before 'return'
 Read it as: *"in `hello.c`, on line 5, column 9, you forgot a `;`
 before `return`. Here's where to put it."*
 
+<Figure
+  slug="c-debugging-and-reasoning-inline-cutout"
+  alt="A long chain folded in half and tested, then folded again, the search closing on one bad link"
+/>
+
 Trust the location. Compiler errors point at the spot the compiler
 *noticed* the problem, which is sometimes one line **after** the
 real mistake (because, say, you forgot a semicolon and the compiler

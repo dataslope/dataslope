@@ -22,6 +22,11 @@ visual property like color:
 2. **Set** it, fix it to a *constant*, the same for every mark. →
    goes **outside** `aes()`.
 
+<Figure
+  slug="gg-mapping-versus-setting-inline-cutout"
+  alt="One dial wired to a column of data on the left, and on the right a dial simply turned by hand to a fixed position"
+/>
+
 ```mermaid
 flowchart TD
     Q["Do you want color (or size, shape...)<br/>to depend on the data?"] -->|"Yes, varies by a column"| M["MAP it<br/>inside <code>aes()</code><br/><code>aes(color = drv)</code>"]

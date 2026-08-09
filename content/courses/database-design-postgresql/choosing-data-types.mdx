@@ -20,6 +20,11 @@ That is why data types are the first constraint in a schema.
 A **domain** is the set of values a column is allowed to hold. Choosing a
 type chooses the broad domain before any other constraint narrows it.
 
+<Figure
+  slug="db-choosing-data-types-inline-cutout"
+  alt="Four sockets of different widths with a block held above each, one block clearly too wide for the socket beneath it"
+/>
+
 ```mermaid
 flowchart TD
     Type["Column type"] --> Domain["Allowed domain<br/>what values can exist"]

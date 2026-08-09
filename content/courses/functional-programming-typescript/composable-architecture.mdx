@@ -44,6 +44,11 @@ rules and *none* of the I/O. The **shell** is a thin layer that
 fetches data from the world, hands it to the core, and writes the
 core's output back out.
 
+<Figure
+  slug="fp-composable-architecture-inline-cutout"
+  alt="Small units with identical fittings clipping into long chains in several different orders"
+/>
+
 Two rules carry the whole architecture:
 
 1. **Effects live at the edge.** Database calls, HTTP requests,

@@ -19,6 +19,11 @@ page nails down.
 
 `WHERE` and `HAVING` both filter, but at different stages of the query.
 
+<Figure
+  slug="duck-filtering-groups-inline-cutout"
+  alt="Four summary blocks standing on trays with a marked line across them, the trays below the line taken away"
+/>
+
 - **`WHERE`** runs **before** grouping. It filters individual *rows*, so
   it can only see raw columns, never group totals.
 - **`HAVING`** runs **after** grouping. It filters whole *groups*, so it

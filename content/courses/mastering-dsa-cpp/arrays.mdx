@@ -16,6 +16,11 @@ Everything else about arrays follows from that bargain. Indexing is O(1) and ite
 
 A C-style array such as `int a[5]` has a fixed size known at compile time. It is compact and fast, but it carries a famous trap inherited from C: when passed to a function, it **decays to a pointer**, the size information silently falls off. Run the program below and notice that `print_first` receives only an address; inside that function there is no way to ask "how long is this array?"
 
+<Figure
+  slug="dsa-arrays-inline-cutout"
+  alt="One continuous strip of equal cells with a marker landing directly on the fifth, ignoring the four before it"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[

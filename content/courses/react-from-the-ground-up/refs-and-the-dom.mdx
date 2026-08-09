@@ -21,6 +21,11 @@ That's what **`useRef`** is for.
 of state, and exactly why refs suit values the UI doesn't directly
 display.
 
+<Figure
+  slug="rx-refs-and-the-dom-inline-cutout"
+  alt="A panel with one direct handle reaching past the usual controls to grip an element underneath"
+/>
+
 ```tsx
 const ref = useRef(0);
 ref.current += 1;   // mutate freely; no re-render happens

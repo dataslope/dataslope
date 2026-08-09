@@ -56,6 +56,11 @@ That has one immediate consequence: **you cannot remove elements
 from the collection inside a for-each loop.** Doing so triggers
 `ConcurrentModificationException` on the next `it.hasNext()`.
 
+<Figure
+  slug="jcol-iteration-patterns-inline-cutout"
+  alt="The same rail of blocks walked three ways, by a crank, by a hand counting slots, and by a chute taking them in bulk"
+/>
+
 ## 2. Explicit Iterator and Iterator.remove()
 
 When you need to remove while iterating, use the explicit `Iterator`

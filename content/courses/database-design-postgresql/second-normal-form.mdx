@@ -22,6 +22,11 @@ example, an order item can be identified by the pair `(order_id,
 product_id)`: the same product can appear on many orders, and the same
 order can contain many products, but the pair identifies one line.
 
+<Figure
+  slug="db-second-normal-form-inline-cutout"
+  alt="A wide table split so that facts depending on only part of its key move out into their own smaller table"
+/>
+
 ```mermaid
 erDiagram
     orders ||--o{ order_items : has

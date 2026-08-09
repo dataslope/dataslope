@@ -78,6 +78,11 @@ const program: Task<string> = chain(of(1), (n) =>
 The familiar trio appears again: `of`, `map`, `chain`. The exact
 same patterns you used for `Option` and `Result` apply to `Task`.
 
+<Figure
+  slug="fp-functional-async-workflows-inline-cutout"
+  alt="Several slow kettles started at once along a bench, their results collected into one tray as each finishes"
+/>
+
 ## Running tasks in parallel vs sequence
 
 For independent tasks, you want **applicative** behavior: run them
