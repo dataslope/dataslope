@@ -2781,7 +2781,7 @@
       "style": "risograph",
       "title": "Three things a computer fundamentally has",
       "mascot": false,
-      "subject": "three parts standing side by side on one bench, a small engine, a wall of numbered slots, and a tray of cards feeding both"
+      "subject": "three parts standing side by side on one bench, a small engine, a wall of identical small slots, and a tray of cards feeding both"
     },
     {
       "id": "js-how-javascript-runs-javascript-single-threaded-inline",
@@ -2937,7 +2937,7 @@
       "style": "risograph",
       "title": "A Promise is a placeholder",
       "mascot": false,
-      "subject": "an empty tray set on a bench with a numbered-free ticket clipped to it, the tray filled later by a chute above"
+      "subject": "an empty tray set on a bench with a plain blank ticket clipped to it, the tray filled later by a chute above"
     },
     {
       "id": "js-scope-and-scope-chain-scope-inline",
