@@ -14,10 +14,11 @@
  *     continuation lines indented by 2+ spaces extend the choice text
  *
  *   Fenced code blocks inside a choice are fully supported. The opening
- *   fence (e.g. ```python) may appear right after `- ` or as an indented
- *   continuation line. All lines, including blank lines, inside the
- *   fence are captured verbatim as part of the choice text; the fence is
- *   closed when an indented ``` or ~~~ line (matching 3+ chars) appears.
+ *   fence (e.g. ```python) may appear right after `- `, or on the line
+ *   below it (indented when authored, though MDX strips that indent
+ *   before this parser sees it). All lines, including blank lines,
+ *   inside the fence are captured verbatim as part of the choice text;
+ *   the fence is closed when a ``` or ~~~ line (3+ chars) appears.
  *
  *   Overall explanation paragraph(s) appear after the final choice and
  *   are written without any special marker.
@@ -208,6 +209,38 @@ export function parseQuestion(source: string): ParsedQuestion {
           inChoiceFence = false;
         }
         pendingBlanks = 0;
+        continue;
+      }
+
+      // A fence that opens on the line AFTER the choice marker, rather than
+      // on the marker line itself:
+      //
+      //   - [o]
+      //     ```javascript
+      //     const pa = fetchA();
+      //     ```
+      //
+      // Authored that way the fence is indented, but MDX strips the template
+      // literal's indentation before this parser ever runs (see the note in
+      // the `inChoiceFence` branch above), so it arrives at column 0 and the
+      // indented-continuation rule below cannot match it. Without this branch
+      // the fence falls through to "unindented text ends the choices block",
+      // which silently swallows every remaining choice into the overall
+      // explanation and renders a question with one empty option — the shape
+      // `promises-and-async-await` shipped with.
+      //
+      // `pendingBlanks === 0` is what keeps this from capturing a genuine
+      // overall explanation that happens to start with a code block: that is
+      // always separated from the last choice by a blank line, while a
+      // continuation fence directly abuts its choice.
+      if (
+        choices.length > 0 &&
+        pendingBlanks === 0 &&
+        FENCE_OPEN_RE.test(trimmed)
+      ) {
+        appendToChoiceText(trimmed);
+        inChoiceFence = true;
+        pendingFenceBlanks = 0;
         continue;
       }
 

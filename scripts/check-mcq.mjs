@@ -50,7 +50,21 @@ export function extractMcqBlocks(src) {
 }
 
 // Parse one block into { body, choices:[{ correct, text, explanation }] }.
-// Mirrors parseQuestion.ts closely enough for linting purposes.
+//
+// A LOOSE approximation of parseQuestion.ts, kept separate so this script stays
+// dependency-free plain JS. It is deliberately more permissive than the real
+// parser — notably it drops fenced code rather than capturing it as choice
+// text, so `choices[].text` is empty for any fenced choice, which is why the
+// duplicate-choice rule below skips empty keys.
+//
+// That permissiveness has bitten once: `promises-and-async-await` authored its
+// choices as a bare `- ` with the fence on the next line, which this parser
+// read as four choices and parseQuestion read as one empty one. Every check was
+// green while the lesson rendered a single blank radio button in production.
+//
+// So do not treat a green run here as proof a question is answerable. The
+// authoritative guard is __tests__/mcqRuntimeParse.test.ts, which runs the
+// component's own parser over this same corpus; add structural rules there.
 export function parseChoices(md) {
   const lines = md.replace(/\r\n?/g, "\n").split("\n");
   const choices = [];
