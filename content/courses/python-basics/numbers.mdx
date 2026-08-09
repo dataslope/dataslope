@@ -27,6 +27,11 @@ Understanding the quirks of Python's numeric types-especially the precision limi
 
 `int` has **no fixed size**: it grows to fit whatever value you give it. No overflow, no wraparound. This is one of Python's nicest features.
 
+<Figure
+  slug="python-numbers-integers-inline-cutout"
+  alt="A rule with evenly spaced marks and a slider resting exactly on one"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -75,6 +80,11 @@ print(0b1111_0000)
 ## Floats
 
 `float` is a 64-bit IEEE 754 double-precision floating-point number. That's the same representation used by C, Java, JavaScript, and most other languages. It's fast and space-efficient, but it has precision quirks.
+
+<Figure
+  slug="python-numbers-floats-inline-cutout"
+  alt="A rule whose marks are evenly spaced at one end and crowded at the other"
+/>
 
 ### The 0.1 + 0.2 surprise
 

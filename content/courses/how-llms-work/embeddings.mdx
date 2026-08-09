@@ -93,6 +93,11 @@ Embeddings alone are unordered. The vectors for "dog bites man" and
 "man bites dog" are the same three vectors, and any operation that
 treats them as a set gives both the same answer.
 
+<Figure
+  slug="llm-embeddings-vector-helps-inline-cutout"
+  alt="Chips placed on a board by meaning rather than order, close ones sitting together and unrelated ones far apart"
+/>
+
 So position information is added, either by adding a
 position-dependent vector to each embedding or by encoding relative
 positions in the attention step. Either way, **the model does not get

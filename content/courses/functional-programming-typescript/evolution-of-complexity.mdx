@@ -178,6 +178,11 @@ component it was for has unmounted. A `Promise` resolves into a
 closure that captured a stale variable. A database write races
 against a read.
 
+<Figure
+  slug="fp-evolution-of-complexity-from-scripts-systems-inline-cutout"
+  alt="One short strip of instructions on a bench beside a wall of interlocking frames built from many such strips"
+/>
+
 Imperative programs handle time by *mutating state*: the request
 handler updates a session, the timer fires and re-reads it, the
 component remounts and re-syncs. Every interaction is a tiny mutual

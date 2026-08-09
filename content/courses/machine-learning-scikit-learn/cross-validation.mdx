@@ -19,6 +19,11 @@ datasets that wobble can be large enough to make you pick the wrong model.
 Let us prove the wobble is real. We will evaluate the *same* model on the
 *same* data, changing only the random seed of the split.
 
+<Figure
+  slug="ml-cross-validation-problem-one-split-inline-cutout"
+  alt="A pile of blocks cut once by a single blade, a spinner beside it showing the cut could have fallen elsewhere"
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -79,6 +84,11 @@ Instead of one split, make several and average. **K-fold cross-validation**
 divides the data into `k` equal parts ("folds"). It then runs `k` rounds: in
 each round, one fold is the test set and the other `k-1` folds are the
 training set. Every row gets to be in the test set exactly once.
+
+<Figure
+  slug="ml-cross-validation-fix-k-fold-inline-cutout"
+  alt="One pile divided into five trays, with five rows below where a different tray is sealed each time"
+/>
 
 ```mermaid
 flowchart TD

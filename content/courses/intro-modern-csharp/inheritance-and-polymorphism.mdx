@@ -257,6 +257,11 @@ relationship. A better rule:
   and the subclass extends the base in a substitutable way.
 - Use **composition** ("has-a") when one class merely uses another.
 
+<Figure
+  slug="mcs-inheritance-and-polymorphism-inheritance-basic-mechanics-inline-cutout"
+  alt="A base cabinet with one cabinet behind it built on the same frame with one extra drawer"
+/>
+
 A `Car` *has* an `Engine`, it isn't *a kind of* `Engine`. So
 `Car` should hold a field of type `Engine`, not inherit from it.
 

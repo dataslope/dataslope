@@ -134,6 +134,11 @@ In C, you have to remember to free every chunk of memory you
 allocate. Forget once, and your program leaks; free twice, and your
 program crashes.
 
+<Figure
+  slug="java-jvm-conceptually-virtual-machine-really-inline-cutout"
+  alt="A machine drawn as a platform that sits on three different benches, the program on top unchanged"
+/>
+
 The JVM does it for you. Its **garbage collector** periodically
 asks: "starting from the live program state (local variables,
 static fields, etc.), which objects can I still *reach* by following

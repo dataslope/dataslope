@@ -71,6 +71,11 @@ public class Main {
 These factories return purpose-built, compact implementations, not
 just a wrapper. Mutator methods throw `UnsupportedOperationException`.
 
+<Figure
+  slug="jcol-immutable-collections-immutable-factories-list-inline-cutout"
+  alt="Three sealed trays coming off a press already clamped shut, no opening fitted to any of them"
+/>
+
 ### A few rules to know
 
 - They reject `null` keys, values, and elements. (If you need
@@ -224,6 +229,11 @@ flowchart LR
 ```
 
 The further right you go, the safer your API.
+
+<Figure
+  slug="jcol-immutable-collections-immutability-matters-inline-cutout"
+  alt="A sealed tray with a clamped lid on a shared bench, two hands unable to alter it"
+/>
 
 ## Multi-file example: a safe `Catalog`
 

@@ -59,6 +59,11 @@ And why the contract matters so much: collisions are not rare. With a
 thousand buckets it is already even money that two keys share one by the
 fortieth key, at four percent full.
 
+<Figure
+  slug="jcol-equality-and-hashing-hashcode-inline-cutout"
+  alt="A block dropped into a mixing machine whose chute swings to one of several bins"
+/>
+
 <Chart slug="hash-collision-birthday" />
 
 Hashing turns an arbitrary object into an `int` "fingerprint." A
@@ -316,6 +321,11 @@ strongly recommended rule is:
 If this is violated, a `TreeSet` will silently behave differently from
 a `HashSet` for the same data, almost always a bug. We'll meet
 `Comparable` in detail in its own chapter.
+
+<Figure
+  slug="jcol-equality-and-hashing-collections-actually-do-inline-cutout"
+  alt="Two identical-looking blocks held up to a gauge that reads them as the same before either is filed"
+/>
 
 ## A multi-file challenge: a uniqueness service
 

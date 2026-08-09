@@ -57,6 +57,11 @@ for animal in [Dog("Rex"), Cat("Luna"), Animal("Thing")]:
 
 `Dog(Animal)` reads as "Dog inherits from Animal" or "Dog is a subclass of Animal". Calling `Dog("Rex")` runs `Animal.__init__` because `Dog` does not define its own `__init__`.
 
+<Figure
+  slug="python-inheritance-single-inheritance-inline-cutout"
+  alt="One base cabinet with a single cabinet behind it built on the same frame"
+/>
+
 ```mermaid
 classDiagram
     Animal <|-- Dog
@@ -70,6 +75,11 @@ classDiagram
 ## Method overriding
 
 When a subclass defines a method with the same name as a parent method, the subclass version **overrides** the parent.
+
+<Figure
+  slug="python-inheritance-method-overriding-inline-cutout"
+  alt="A cabinet built on a base frame with one of the base's panels replaced by a different one"
+/>
 
 <CodeBlock
   adapter="python"

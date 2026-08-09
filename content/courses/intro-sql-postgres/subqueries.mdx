@@ -62,6 +62,11 @@ The inner `SELECT AVG(amount)` computes `40`. The outer query then
 behaves as if you had written `WHERE amount > 40`, but you never had
 to know the number yourself. Change the data and it stays correct.
 
+<Figure
+  slug="sql-subqueries-idea-query-as-inline-cutout"
+  alt="A small machine sitting inside the hopper of a larger one, its tray feeding the larger machine"
+/>
+
 <Callout type="info" title="Why not just type the number?">
 You could run the average separately and paste `40` into your query.
 But then it is frozen, add an order and it is wrong. A subquery

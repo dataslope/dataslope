@@ -62,6 +62,11 @@ at the middle element. If it matches, done. If your target is
 smaller, search the left half. Otherwise the right half. Each step
 eliminates *half* of what is left.
 
+<Figure
+  slug="java-basic-algorithms-and-data-structures-linear-search-inline-cutout"
+  alt="A hand walking a row of blocks one at a time from the left until it reaches the marked one"
+/>
+
 Searching for `17` in `[2, 5, 8, 11, 17, 23, 31, 42]`:
 
 1. Middle of the whole list is `11`. `17 > 11`, so search the right half: `[17, 23, 31, 42]`.
@@ -263,6 +268,11 @@ A working programmer's mental table of first-resort tools:
 
 You will, of course, run into problems that don't fit this table.
 But this table covers an *astonishing* fraction of day-to-day code.
+
+<Figure
+  slug="java-basic-algorithms-and-data-structures-binary-search-inline-cutout"
+  alt="A sorted row of blocks with a hand splitting it in half, discarding one half, and splitting again"
+/>
 
 <MultipleChoice
   markdown={`Why does binary search require a sorted input?

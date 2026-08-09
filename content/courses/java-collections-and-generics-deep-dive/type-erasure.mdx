@@ -242,6 +242,11 @@ Three patterns where erasure most often shows up in working code:
 3. **You want different `static` fields per parameterization.** You
    can't, and probably don't want to.
 
+<Figure
+  slug="jcol-type-erasure-erasure-actually-does-inline-cutout"
+  alt="A tagged crate passing through a gate and arriving on the far side with its tag gone"
+/>
+
 ## Passing a Class&lt;T&gt; token: the standard workaround
 
 When you genuinely need the type at runtime, for reading from JSON,

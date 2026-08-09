@@ -121,6 +121,11 @@ It would be lovely if `.fit()` could also figure out the best `max_depth`
 or the best `C` on its own. It cannot, and the reason is fundamental, not a
 missing feature.
 
+<Figure
+  slug="ml-hyperparameter-tuning-parameters-vs-hyperparameters-inline-cutout"
+  alt="A machine with dials on its outside set by hand and gears inside that set themselves as it runs"
+/>
+
 A hyperparameter like `max_depth` decides *how flexible* the model is
 allowed to be. If you let the model choose its own flexibility using the
 training data, it will always choose **maximum** flexibility, because more
@@ -213,6 +218,11 @@ fine for one knob. But models often have several knobs, and the best value
 of one can depend on another. `GridSearchCV` automates the search: you hand
 it a model and a small **grid** of values to try, and it runs
 cross-validation for *every combination*, then reports the winner.
+
+<Figure
+  slug="ml-hyperparameter-tuning-exists-models-do-inline-cutout"
+  alt="A machine with three dials on its face and no marks on them, a hand turning each in turn"
+/>
 
 The "grid" is just the set of all combinations. If you give it 3 values of
 one hyperparameter and 2 of another, that is 3 × 2 = 6 combinations, and

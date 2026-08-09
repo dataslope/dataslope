@@ -91,6 +91,11 @@ If you write your own class and implement `Iterable<E>`, the for-each
 loop just works on it. That is the *return on* implementing the
 interface.
 
+<Figure
+  slug="jcol-iterables-and-iterators-each-loop-just-inline-cutout"
+  alt="A smooth handle on the outside of a drum, its cover lifted to show a crank and a pointer inside"
+/>
+
 ## Writing an Iterable from scratch
 
 The fastest way to internalize the contract is to write one. Here is
@@ -158,6 +163,11 @@ Three observations:
 - The `IntRange` itself is immutable. The state of the walk lives in
   the *iterator*, not in the iterable. That separation is the whole
   trick.
+
+<Figure
+  slug="jcol-iterables-and-iterators-writing-iterable-from-inline-cutout"
+  alt="A drum being built on a bench with its crank and pointer fitted by hand before its cover goes on"
+/>
 
 ## Why a separate Iterator object?
 

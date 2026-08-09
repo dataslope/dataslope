@@ -41,6 +41,11 @@ If we take `ArrayList`, callers with a `LinkedHashSet` must copy
 their data first. If we take `Collection`, every caller is happy and
 nothing is given up, we only need `size()` and iteration anyway.
 
+<Figure
+  slug="jcol-collection-architecture-principle-1-program-inline-cutout"
+  alt="One standard front plate shown on five very different containers, one hand working them all"
+/>
+
 The same idea on the return side, in reverse:
 
 ```java
@@ -83,6 +88,11 @@ public List<Order> orders() { return List.copyOf(orders); }
 Which to pick depends on whether the caller benefits from seeing
 later writes. For most "give me the data right now" calls, the
 snapshot is the right default.
+
+<Figure
+  slug="jcol-collection-architecture-principle-2-never-inline-cutout"
+  alt="A sealed tray handed out through a hatch as a copy, the original staying clamped inside the cabinet"
+/>
 
 ## Principle 3: defensive copy on input
 

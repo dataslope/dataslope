@@ -18,6 +18,11 @@ There are two ways to provide that ordering:
 - **`Comparator<T>`**, an *external* object defines an order on the
   type, often one of many possible orderings.
 
+<Figure
+  slug="jcol-comparable-and-comparator-comparable-natural-order-inline-cutout"
+  alt="Two blocks on a balance built into the blocks themselves, no separate tool needed"
+/>
+
 ## Comparable: the natural order
 
 `Comparable<T>` has a single method, `int compareTo(T other)`, which
@@ -123,6 +128,11 @@ which silently overflows for very large or very negative values.
 
 Whenever practical, `compareTo` should be **consistent with
 `equals`**: `a.compareTo(b) == 0` iff `a.equals(b)`.
+
+<Figure
+  slug="jcol-comparable-and-comparator-equals-consistency-advisory-inline-cutout"
+  alt="A balance reading level while a separate gauge beside it reads the two blocks as different, a small warning flag between them"
+/>
 
 When it is *not* consistent, sorted collections quietly do
 surprising things. For example, a `TreeSet<BigDecimal>` treats

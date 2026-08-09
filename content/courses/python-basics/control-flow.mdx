@@ -31,6 +31,11 @@ flowchart TD
 
 The simplest form: execute a block only if a condition is true.
 
+<Figure
+  slug="python-control-flow-just-if-inline-cutout"
+  alt="A single hinged flap over a chute with one path beneath it"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -233,6 +238,11 @@ print(f"Grade: {'pass' if score >= 60 else 'fail'}")
 />
 
 This reads naturally: "pick X if condition, else pick Y." It combines nicely with f-strings and comprehensions.
+
+<Figure
+  slug="python-control-flow-real-world-impact-inline-cutout"
+  alt="A rail with points and a loop, carts routed differently at each pass"
+/>
 
 <Callout type="warn">
 The conditional expression requires **both** the `if` and `else` parts. You cannot write `x if condition` without an `else`. If you only need the `if`, write a full `if` statement instead.

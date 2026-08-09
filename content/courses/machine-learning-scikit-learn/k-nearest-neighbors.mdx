@@ -66,6 +66,11 @@ Pythagorean theorem extended to as many dimensions as you have features.
 Two examples are close if the sum of their squared differences across all
 features is small.
 
+<Figure
+  slug="ml-k-nearest-neighbors-does-closest-mean-inline-cutout"
+  alt="A caliper measuring the straight gap between two chips on a board"
+/>
+
 This is intuitive, but it hides a trap that we will spend most of this page
 on. Euclidean distance adds up differences across features *as if every
 feature were measured in the same units*. It almost never is, and that is
@@ -76,6 +81,11 @@ where scaling comes in.
 Let us classify penguins by species. The API is, as always, identical to
 every other scikit-learn estimator. (We will see in a moment that raw KNN is
 held back here by the feature scales, but it is a fine starting point.)
+
+<Figure
+  slug="ml-k-nearest-neighbors-intuition-are-who-inline-cutout"
+  alt="One new chip on a board taking the colour of the three chips nearest to it"
+/>
 
 <CodeBlock
   adapter="python"

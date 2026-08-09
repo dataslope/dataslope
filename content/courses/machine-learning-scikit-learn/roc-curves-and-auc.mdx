@@ -24,6 +24,11 @@ $$
 \text{TPR} = \frac{TP}{TP + FN} \qquad \text{(this is exactly recall)}
 $$
 
+<Figure
+  slug="ml-roc-curves-and-auc-two-rates-move-inline-cutout"
+  alt="One dial turned through its range with two gauges beside it moving in opposite directions"
+/>
+
 $$
 \text{FPR} = \frac{FP}{FP + TN} \qquad \text{(fraction of negatives wrongly flagged)}
 $$
@@ -42,6 +47,11 @@ more false alarms (bad). The ROC curve traces this tradeoff.
 An **ROC curve** plots TPR (vertical) against FPR (horizontal) as the
 threshold sweeps from very strict to very lenient. Each threshold is one
 point on the curve.
+
+<Figure
+  slug="ml-roc-curves-and-auc-roc-curve-inline-cutout"
+  alt="A dial turned through its range with a curve tracing out beside it and the area beneath shaded"
+/>
 
 One curve on its own is hard to judge, because every ROC curve bows the same
 way. Three of them over the no-skill diagonal give you the scale:

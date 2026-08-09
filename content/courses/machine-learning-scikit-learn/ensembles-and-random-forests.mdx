@@ -84,6 +84,11 @@ set. "With replacement" means some rows appear two or three times in a given
 sample and others not at all. Each tree therefore sees a slightly different
 slice of the world and grows a slightly different structure.
 
+<Figure
+  slug="ml-ensembles-and-random-forests-trick-one-bootstrap-inline-cutout"
+  alt="Several scoops taken from one bin with replacement, each scoop feeding its own small machine"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -313,6 +318,11 @@ Because a forest is built from trees, it can report which features were most
 useful for splitting, aggregated across all the trees:
 `forest.feature_importances_`. This is a quick way to see what the model
 leaned on.
+
+<Figure
+  slug="ml-ensembles-and-random-forests-intuition-wisdom-crowds-inline-cutout"
+  alt="One gauge alone reading badly beside twenty gauges whose averaged needle sits on the mark"
+/>
 
 <CodeBlock
   adapter="python"

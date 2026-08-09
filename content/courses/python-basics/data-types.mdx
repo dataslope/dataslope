@@ -54,6 +54,11 @@ In production codebases, type annotations are increasingly standard practice.
 
 Python's type system is built on a hierarchy rooted in `object`. Every value in Python is an instance of some class, and every class (eventually) inherits from `object`.
 
+<Figure
+  slug="python-data-types-type-hierarchy-inline-cutout"
+  alt="A branching frame of sockets, broad at the top and narrowing into specific shapes below"
+/>
+
 ```mermaid
 graph TD
     object[object] --> numeric[Numeric types]
@@ -86,6 +91,11 @@ This is a quirk of Python's design: `True` and `False` are instances of `bool`, 
 ## Checking the type
 
 `type(obj)` returns the exact class; `isinstance(obj, T)` checks the class or any of its parent classes.
+
+<Figure
+  slug="python-data-types-real-world-context-inline-cutout"
+  alt="A gate that checks a block as it passes beside another that checks only when the block is used"
+/>
 
 <CodeBlock
   adapter="python"

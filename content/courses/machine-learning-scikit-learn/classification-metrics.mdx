@@ -22,6 +22,11 @@ its inputs and predicts "did not default" for everyone, and on the real
 **lending-club** data it will score a high accuracy while catching not a
 single defaulter. Let us watch this happen on genuinely imbalanced data.
 
+<Figure
+  slug="ml-classification-metrics-accuracy-trap-inline-cutout"
+  alt="A gauge reading almost full beside a tray where ninety-nine chips are one colour and one is another"
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "lending-club-loan-results.csv", stageAs: "loans.csv" }]}
@@ -75,6 +80,11 @@ per-class metrics instead.
 Four counts, and the four different questions people ask of them. Note
 how far apart precision and accuracy sit when the positive class is
 rare.
+
+<Figure
+  slug="ml-classification-metrics-confusion-matrix-where-inline-cutout"
+  alt="A two-by-two board of trays with correct calls in the diagonal and mistakes in the other two"
+/>
 
 <Chart slug="confusion-matrix-grid" />
 

@@ -20,6 +20,11 @@ This page is a catalog of those traps. For each one: **what the trap is**,
 to it whenever a result looks too good to be true, because that feeling is
 usually right.
 
+<Figure
+  slug="ml-common-pitfalls-and-misconceptions-data-leakage-inline-cutout"
+  alt="A sealed test crate with a small pipe running into it from the training bench, a chip travelling along the pipe"
+/>
+
 ```mermaid
 flowchart TD
     A["A result that looks<br/>too good to be true"] --> B{"Did you peek<br/>at the test set?"}
@@ -113,6 +118,11 @@ leakage hard to commit by accident.
 
 **The trap.** Reporting how well the model does on the very data it was
 trained on, and treating that as its performance.
+
+<Figure
+  slug="ml-common-pitfalls-and-misconceptions-b-evaluating-on-inline-cutout"
+  alt="A machine being tested with the very blocks that were used to build it, its gauge pinned at full"
+/>
 
 **Why it fools people.** The number is always flattering, sometimes a
 perfect 1.000, and a perfect score *feels* like the goal. But a flexible

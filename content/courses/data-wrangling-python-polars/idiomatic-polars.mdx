@@ -94,6 +94,11 @@ Consecutive filters merge, consecutive projections collapse, and
 repeated subexpressions are computed once. Writing the chain in
 readable steps costs nothing, so optimize for the reader.
 
+<Figure
+  slug="pl-idiomatic-polars-2-chain-let-inline-cutout"
+  alt="A long chain of clipped-together sections that a planner's hand flattens into a shorter run before anything moves"
+/>
+
 ## 3. Name things with keyword arguments
 
 <CodeBlock

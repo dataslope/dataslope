@@ -19,6 +19,11 @@ A natural first instinct is to cram everything into one giant table.
 Resist it. Real information has natural *kinds of things*,
 customers, orders, products, and each kind deserves its own table.
 
+<Figure
+  slug="sql-relationships-intro-split-data-across-inline-cutout"
+  alt="One crowded crate spilling mixed items beside three tidy crates each holding one kind, cords joining them"
+/>
+
 Why? Because mixing them forces duplication. If every order row also
 stored the customer's full name, address, and phone number, then a
 customer with 50 orders would have their details copied 50 times,

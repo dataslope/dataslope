@@ -68,6 +68,11 @@ cost is not linear in the saving.
 If a long system prompt, schema, or document repeats across requests,
 caching cuts it to about a tenth.
 
+<Figure
+  slug="llm-controlling-cost-2-cache-stable-inline-cutout"
+  alt="A long ribbon whose first stretch is clamped under a cover and reused, only its tail being fed through the machine"
+/>
+
 The requirement is that the prefix be **byte-identical**. That means:
 
 * Put stable content first, volatile content last.

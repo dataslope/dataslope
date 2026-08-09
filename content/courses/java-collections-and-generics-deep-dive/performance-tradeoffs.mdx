@@ -126,6 +126,11 @@ slots each time.
 - **Load factor**, the threshold ratio of `size / capacity` at
   which the table doubles and rehashes. Defaults to 0.75.
 
+<Figure
+  slug="jcol-performance-tradeoffs-big-table-inline-cutout"
+  alt="A grid of small gauges, one per container per operation, their needles at visibly different angles"
+/>
+
 Both values matter. A too-small initial capacity causes repeated
 rehashing; a too-large load factor causes more collisions and
 slower lookups.

@@ -86,6 +86,11 @@ for item in it:
 
 Notice that after pulling `"alpha"` with `next()`, the `for` loop sees only what remains. Iterators are **stateful** and **single-pass**.
 
+<Figure
+  slug="python-iterators-and-generators-manually-driving-iterator-inline-cutout"
+  alt="A hand turning a drum's crank one notch at a time, one block leaving per turn"
+/>
+
 ## Custom iterator class
 
 If you need complex state, write your own iterator with `__iter__` and `__next__`:
@@ -653,3 +658,8 @@ Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\
 />
 
 Functions that decorate other functions are next.
+
+<Figure
+  slug="python-iterators-and-generators-really-does-inline-cutout"
+  alt="A smooth handle on a drum's outside with its cover lifted to show a crank and pointer within"
+/>

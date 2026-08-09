@@ -69,6 +69,11 @@ $$
 z = \frac{x - \mu}{\sigma}
 $$
 
+<Figure
+  slug="ml-data-preprocessing-standardscaler-turning-features-inline-cutout"
+  alt="Two rules of very different lengths passing through a press and leaving the same length"
+/>
+
 If you have run a hypothesis test, you have seen this exact formula, it is
 the **z-score**. After the transform, each feature has a mean of about 0
 and a standard deviation of about 1. A value of `+2` now means "two
@@ -138,6 +143,11 @@ Talk is cheap. Let us prove that scaling can change a model's accuracy.
 We will train a k-nearest-neighbors classifier on the penguin data twice,
 once on the raw features, once on scaled features, using the exact same
 split so the comparison is fair.
+
+<Figure
+  slug="ml-data-preprocessing-problem-scaling-solves-inline-cutout"
+  alt="Two measuring rules of wildly different lengths feeding one balance, the balance tipped hard by the longer"
+/>
 
 <CodeBlock
   adapter="python"

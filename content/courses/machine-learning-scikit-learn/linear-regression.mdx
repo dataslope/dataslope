@@ -106,6 +106,11 @@ its **carat** (its weight)? Bigger stones cost more; the relationship is
 close to a straight line. We fit a `LinearRegression` and plot the points
 with the line the model chose.
 
+<Figure
+  slug="ml-linear-regression-one-feature-see-inline-cutout"
+  alt="A rod being tilted over a cloud of chips until the sticks measuring to it are shortest"
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
@@ -227,6 +232,11 @@ stone several ways, and beyond carat we can hand the model the numeric
 columns `carat`, `depth`, `table`, and the three physical dimensions `x`,
 `y`, `z`. The model now fits a flat plane through six-dimensional space,
 impossible to picture, but the math and the code are identical.
+
+<Figure
+  slug="ml-linear-regression-problem-solves-inline-cutout"
+  alt="A cloud of chips with a straight rod being laid through their middle"
+/>
 
 <CodeBlock
   adapter="python"

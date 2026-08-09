@@ -50,6 +50,11 @@ Every productive debugging session looks like this:
 5. **Refine.** Either narrow the suspect zone or update the
    hypothesis.
 
+<Figure
+  slug="mcs-debugging-and-reasoning-scientific-method-applied-inline-cutout"
+  alt="A written guess pinned above a stopped machine, one part changed, the result checked against the guess"
+/>
+
 The single biggest beginner mistake is to change five things at
 once and hope something works. That doesn't *teach* you anything,
 even if the symptom goes away.
@@ -174,6 +179,11 @@ The fix is to initialize `max` from the array itself: `int max = arr[0];`
 An **invariant** is a property of your program that must hold at
 some point: "after `Withdraw`, `Balance >= 0`", "the list is
 sorted", "this index is between 0 and `length`".
+
+<Figure
+  slug="mcs-debugging-and-reasoning-bug-gap-between-inline-cutout"
+  alt="Two written cards pinned side by side describing the same machine differently, a lamp on the line between them"
+/>
 
 Writing them down (in comments, or as assertions) is one of the
 single most useful debugging habits.

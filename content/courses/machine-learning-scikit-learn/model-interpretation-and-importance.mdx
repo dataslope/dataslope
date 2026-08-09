@@ -62,6 +62,11 @@ each feature by its coefficient and adding them up. A coefficient's *sign*
 tells you the direction of the relationship; its *magnitude* hints at how
 strongly that feature pushes the prediction.
 
+<Figure
+  slug="ml-model-interpretation-and-importance-coefficients-as-importance-inline-cutout"
+  alt="A machine with input pipes of visibly different widths, the widest carrying the most"
+/>
+
 This is the appeal of linear models: their parameters *are* an explanation,
 for free. Let us read the coefficients of a logistic regression on the
 penguins data, whose four body measurements have plain, interpretable
@@ -386,6 +391,11 @@ Here is the single most important sentence on this page. **A feature being
 important to a model does not mean it causes the outcome.** Importance is a
 statement about the *model and the data it was trained on*, not about the
 world.
+
+<Figure
+  slug="ml-model-interpretation-and-importance-interpretability-matters-inline-cutout"
+  alt="A sealed machine beside the same machine with a glass panel showing which input pipes are widest"
+/>
 
 A model can lean heavily on a feature for reasons that have nothing to do
 with cause and effect:

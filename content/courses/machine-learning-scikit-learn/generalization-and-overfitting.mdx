@@ -23,6 +23,11 @@ reality, not in your particular sample. A model that generalizes has
 captured the underlying pattern. A model that fails to generalize has
 latched onto quirks of the sample that will not repeat.
 
+<Figure
+  slug="ml-generalization-and-overfitting-generalization-really-means-inline-cutout"
+  alt="A shape fitted to a set of chips and then tested against a fresh set it has never seen"
+/>
+
 ```mermaid
 flowchart TD
     A["Underfitting<br/>(model too simple)"] --> B["Good generalization<br/>(captures the pattern)"]
@@ -49,6 +54,11 @@ will generate data from a gently wiggling true function, add a little
 noise, and then fit polynomials of increasing flexibility. A degree-1
 polynomial is a straight line (very rigid). A degree-15 polynomial can bend
 almost anywhere (very flexible).
+
+<Figure
+  slug="ml-generalization-and-overfitting-seeing-both-failures-inline-cutout"
+  alt="A line threading through every chip on the left and a straight rod ignoring them all on the right"
+/>
 
 We use *synthetic* data here on purpose: overfitting is defined as fitting
 noise instead of the true pattern, and the only way to point at that

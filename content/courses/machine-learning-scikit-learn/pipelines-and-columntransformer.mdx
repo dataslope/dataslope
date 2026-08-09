@@ -22,6 +22,11 @@ different columns. Together they turn a fragile, multi-step ritual into one
 object you `fit` once. This is not a convenience feature, it is how
 professional scikit-learn code stays correct.
 
+<Figure
+  slug="ml-pipelines-and-columntransformer-problem-preprocessing-modeling-inline-cutout"
+  alt="Two benches worked separately with a chip slipping between them, beside one bench where both are bolted together"
+/>
+
 ## The problem: preprocessing and modeling are easy to desynchronize
 
 Without pipelines, a realistic workflow looks like a chain of manual steps
@@ -69,6 +74,11 @@ it transforms `X_test` with the *already-fitted* scaler (no re-fitting) and
 passes that to the model's `predict`. The fit-on-train / transform-both rule
 is enforced by construction, you cannot accidentally fit a step on the test
 set, because you never touch the steps individually.
+
+<Figure
+  slug="ml-pipelines-and-columntransformer-pipeline-one-estimator-inline-cutout"
+  alt="Several small machines welded into one housing with a single handle on its front"
+/>
 
 ```mermaid
 flowchart TD

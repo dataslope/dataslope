@@ -20,6 +20,11 @@ in SQL. Take your time, there are extra checks at the end.
 same value in that column, then computes the aggregate **once per
 group** instead of once for the whole table.
 
+<Figure
+  slug="sql-grouping-data-idea-split-then-inline-cutout"
+  alt="A scatter of chips raked into three trays, each tray then pressed into a single block"
+/>
+
 ```mermaid
 flowchart TB
     All["All employees"] --> G{"<code>GROUP BY dept</code>"}
