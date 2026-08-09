@@ -101,13 +101,15 @@ const MIME: Record<string, string> = {
  *
  *  The 3:2 box is kept — six thumbnails the same shape is what makes this read
  *  as a list rather than a scrapbook — but the art no longer fills it exactly.
- *  Every render starts 1536x1024, and then `scripts/trim-cutouts.mjs` crops the
- *  transparent band off its top and bottom, so a banner arrives wider than 3:2
- *  and `object-cover` would answer that by cropping the sides, quietly cutting
+ *  Every render starts 1536x1024, and then `scripts/trim-cutouts.mjs` crops
+ *  away every transparent margin, so a banner arrives at whatever shape its own
+ *  artwork is and `object-cover` would answer that by cropping, quietly cutting
  *  the marmot out of its own frame. `object-contain` keeps the whole artwork
  *  and letterboxes instead — invisibly, the art being transparent — and it
- *  actually paints *larger* than the untrimmed version did, since the blank it
- *  used to carry inside the box is gone. The row's height is set by its three
+ *  paints *larger* than an untrimmed version would, since the blank the frame
+ *  used to carry inside the box is gone. That is the whole point of cropping a
+ *  thumbnail on both axes: the box is fixed, so every margin removed from the
+ *  file is width the subject gets back. The row's height is set by its three
  *  lines of copy either way, so nothing moves.
  *
  *  `sizes` tells the browser it is only ever painted a few hundred CSS pixels

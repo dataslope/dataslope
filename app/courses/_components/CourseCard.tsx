@@ -108,6 +108,13 @@ const THUMB_MIME: Record<string, string> = {
  * the row background in both themes instead of inside a white tile. Courses
  * without generated art keep the glyph, so the catalog degrades a row at a
  * time rather than all-or-nothing.
+ *
+ * `w-full` with `height: auto` means the column width *is* the size of the
+ * drawing, which is why the cut-outs are cropped to their artwork on both axes
+ * (`scripts/lib/cutouts.mjs`) rather than vertically like an in-lesson figure:
+ * a transparent margin here would be column the subject is painted smaller to
+ * make room for. Rows are `items-start`, so the ragged heights that leaves are
+ * a top-aligned list rather than anything that shifts.
  */
 function CourseThumb({ course }: { course: CatalogCourse }) {
   const slug = `${course.slug}-thumbnail-cutout`;
@@ -152,7 +159,11 @@ export function CourseCard({ course }: { course: CatalogCourse }) {
       // Dense index list, don't viewport-prefetch every course row
       // (see the opt-out note in app/_components/Link.tsx).
       prefetch={false}
-      className="group -mx-3 grid grid-cols-[72px_1fr] items-start gap-4 px-3 py-6"
+      // The art column is what the row leads with, so it is sized to hold its
+      // own against the three lines of copy beside it rather than to sit under
+      // them as a bullet. It widens once there is room, matching how
+      // /interview-prep sizes its own track thumbnails.
+      className="group -mx-3 grid grid-cols-[96px_1fr] items-start gap-4 px-3 py-6 sm:grid-cols-[116px_1fr] sm:gap-5"
     >
       <CourseThumb course={course} />
       <span className="flex min-w-0 flex-col gap-[5px]">

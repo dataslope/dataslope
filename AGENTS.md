@@ -134,7 +134,7 @@ node scripts/remove-background-kie.mjs                 # adds <id>-cutout.png
 node scripts/promote-illustrations.mjs python-basics-loops python-basics-sets
 ```
 
-### Trimming the blank band above and below the artwork
+### Trimming the blank margins around the artwork
 
 Background removal leaves the subject floating in the frame it was generated
 in, so a promoted cut-out is 1536x1024 of *layout* carrying rather less than
@@ -149,20 +149,40 @@ no quality, where a pass over the promoted WebP afterwards would be a second
 lossy generation. Nothing to remember and nothing to run — promote as usual and
 the art arrives tight.
 
-It is **vertical only**. The left/right margins are deliberately kept:
-horizontal blank costs nothing in a page that scrolls, and cropping it would
-leave each figure a different width, so a run of lessons would stop sharing an
-edge.
+**How much of the frame goes depends on where the image is painted**, and
+`trimAxesFor` in `scripts/lib/cutouts.mjs` is the single place that decides:
+
+- **In-lesson figures are vertical only.** The left/right margins are
+  deliberately kept: horizontal blank costs nothing in a page that scrolls, and
+  cropping it would leave each figure a different width, so a run of lessons
+  would stop sharing an edge.
+- **Thumbnails lose all four margins.** A `course-thumbnail` or
+  `interview-thumbnail` is painted ~100px wide inside a fixed box, and there the
+  same reasoning runs the other way: a blank column is drawing surface the
+  subject does not get, at exactly the size where it can least afford to be
+  small. Nothing shares an edge with a thumbnail — each sits alone in its own
+  box — so the ragged widths that rule out cropping a figure cost nothing.
+  Across the 38 promoted thumbnails this took a further 10.8% of the layout box,
+  over 30% on six of them, at flat bytes.
+
+The category comes from `data/illustration-prompts.json`, so a **new course or
+interview-prep thumbnail is trimmed on both axes automatically** — declaring the
+prompt is the whole of it. (An id the corpus has never seen falls back to the
+`-thumbnail` naming convention the corpus itself follows;
+`__tests__/trimCutouts.test.ts` pins the two in agreement.)
 
 `scripts/trim-cutouts.mjs` is the backfill that trimmed the 845 images promoted
-before that existed. It is still the tool for re-trimming at different settings
-(`--pad`, `--alpha`), and the two share their geometry through
-`scripts/lib/cutouts.mjs`, so they cannot drift — a re-promote and a re-trim of
-the same art produce byte-identical files.
+before that existed, and re-trimmed the thumbnails when they moved to both axes.
+It is still the tool for re-trimming at different settings (`--pad`, `--alpha`,
+`--axes`), and the two share their geometry through `scripts/lib/cutouts.mjs`,
+so they cannot drift — a re-promote and a re-trim of the same art produce
+byte-identical files.
 
 ```bash
 node scripts/trim-cutouts.mjs --prefix python-basics- --dry-run
 node scripts/trim-cutouts.mjs --all
+# --axes overrides the per-id default, for a one-off experiment:
+node scripts/trim-cutouts.mjs python-basics-thumbnail --axes vertical --dry-run
 ```
 
 It re-crops the **pristine `cutout.png` in R2**, so a trimmed image is still a
@@ -176,16 +196,24 @@ at 41-49 dB premultiplied PSNR, which is visually lossless but not free. **The
 script only reads from R2**; it never puts and never deletes.
 
 It is idempotent (an already-tight image is skipped, not re-encoded) and runs
-`build-images` afterwards, which is what updates the manifest's `height` so
-`<Figure>` keeps reserving the right box.
+`build-images` afterwards, which is what updates the manifest's `width`/`height`
+so `<Figure>` keeps reserving the right box.
+
+Re-trimming an image also invalidates its `servedSha` in
+`data/illustration-sources.json`, and `prune-illustration-candidates.mjs`
+refuses to delete anything against a map that no longer matches the files on
+disk. Follow a sweep with the ids it touched:
+
+```bash
+node scripts/build-illustration-sources.mjs --only id-one,id-two
+```
 
 Trimming changes an image's aspect ratio, which every consumer that sizes a
 cut-out by width (`<Figure>`, the course-card thumbnails) or letterboxes it
-(`object-contain`: the auth-globe pins, the pricing icons) absorbs for free.
-Two do not, and want checking before a sweep reaches their slugs:
-`StatsBento` sizes the four `home-icon-*` cut-outs `h-40 w-40` with no
-`object-fit`, and `InterviewCatalog` uses `aspect-[3/2] object-cover` for the
-six `interview-*-thumbnail` banners.
+(`object-contain`: the auth-globe pins, the pricing icons, the
+`InterviewCatalog` banners) absorbs for free. One does not, and wants checking
+before a sweep reaches its slugs: `StatsBento` sizes the four `home-icon-*`
+cut-outs `h-40 w-40` with no `object-fit`.
 
 ### Reviewing, and the regeneration queue
 

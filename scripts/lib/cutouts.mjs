@@ -1,9 +1,12 @@
-// Answering "which pristine PNG in R2 is this served illustration made of?".
+// The geometry of a cut-out: where its artwork actually is, how much of the
+// frame around it to take, and — separately — answering "which pristine PNG in
+// R2 is this served illustration made of?".
 //
-// Shared by the three scripts that need it: `trim-cutouts.mjs` re-crops from
-// the source it names, `build-illustration-sources.mjs` writes the answers
-// down as committed provenance, and `prune-illustration-candidates.mjs` uses
-// those answers to decide what is safe to delete.
+// Shared by the four scripts that need it: `promote-illustrations.mjs` crops
+// each cut-out on the way in, `trim-cutouts.mjs` re-crops from the source it
+// names, `build-illustration-sources.mjs` writes the answers down as committed
+// provenance, and `prune-illustration-candidates.mjs` uses those answers to
+// decide what is safe to delete.
 //
 // ── Why matching, and not the run id ────────────────────────────────────────
 //
@@ -24,11 +27,17 @@
 // longer has the same shape as the PNG it came from, and comparing whole
 // frames would call them different pictures — matching would break the moment
 // it was first used, and the pristine source would be unreachable from then
-// on. Both sides are therefore cropped to their own drawn content before the
-// comparison, which asks "is this the same artwork?" rather than "is this the
-// same rectangle?".
+// on. Both sides are therefore cropped to their own drawn content — on both
+// axes, so the normalisation is blind to which of the two crops below an image
+// has had — before the comparison, which asks "is this the same artwork?"
+// rather than "is this the same rectangle?".
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { createR2Client, credentialsFromEnv } from "./r2.mjs";
+
+const ROOT = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
 /** Premultiplied PSNR, in dB, above which a candidate is accepted. Real
  *  matches score 33-55, a different render of the same prompt 6-11, so
@@ -36,69 +45,136 @@ import { createR2Client, credentialsFromEnv } from "./r2.mjs";
 export const MATCH_FLOOR = 30;
 
 /**
- * First and last row of an RGBA image that carry drawn content.
+ * The rectangle of an RGBA image that carries drawn content.
  *
  * A pixel counts as drawn once its alpha clears `alpha` (16 by default, which
- * ignores the faint halo a background remover leaves), and a row counts once
- * `rowFrac` of its pixels are (0.2%, so a stray speck of leftover background
+ * ignores the faint halo a background remover leaves), and a line counts once
+ * `frac` of its pixels are (0.2%, so a stray speck of leftover background
  * cannot defeat a trim). Both thresholds are pinned in
  * `__tests__/trimCutouts.test.ts` against synthetic images.
+ *
+ * Rows are measured across the full frame, columns only within the rows that
+ * survived — so a speck too small to make its own row count cannot drag the
+ * left or right bound out to meet it either. That ordering also keeps the
+ * vertical answer exactly what it was when these bounds were rows-only.
  */
-export async function verticalBounds(buf, { alpha = 16, rowFrac = 0.002 } = {}) {
+export async function contentBounds(buf, { alpha = 16, frac = 0.002 } = {}) {
   const { data, info } = await sharp(buf)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
   const { width, height, channels } = info;
-  const need = Math.max(1, Math.round(width * rowFrac));
+  const at = (x, y) => data[(y * width + x) * channels + 3];
 
-  const drawn = (y) => {
+  const rowNeed = Math.max(1, Math.round(width * frac));
+  const rowDrawn = (y) => {
     let count = 0;
-    const row = y * width * channels;
-    for (let x = 0; x < width; x++) {
-      if (data[row + x * channels + 3] > alpha && ++count >= need) return true;
-    }
+    for (let x = 0; x < width; x++) if (at(x, y) > alpha && ++count >= rowNeed) return true;
     return false;
   };
 
   let top = 0;
   let bottom = height - 1;
-  while (top < height && !drawn(top)) top++;
-  while (bottom >= top && !drawn(bottom)) bottom--;
-  return { width, height, top, bottom, empty: top > bottom };
+  while (top < height && !rowDrawn(top)) top++;
+  while (bottom >= top && !rowDrawn(bottom)) bottom--;
+  if (top > bottom) {
+    return { width, height, top: 0, bottom: height - 1, left: 0, right: width - 1, empty: true };
+  }
+
+  const colNeed = Math.max(1, Math.round((bottom - top + 1) * frac));
+  const colDrawn = (x) => {
+    let count = 0;
+    for (let y = top; y <= bottom; y++) if (at(x, y) > alpha && ++count >= colNeed) return true;
+    return false;
+  };
+
+  let left = 0;
+  let right = width - 1;
+  while (left < width && !colDrawn(left)) left++;
+  while (right >= left && !colDrawn(right)) right--;
+  return { width, height, top, bottom, left, right, empty: false };
 }
 
 /**
  * Turn bounds into the crop to apply, or null when it isn't worth it.
  *
+ * `axes` picks which margins are taken: `"vertical"` keeps the full width (the
+ * default, and what every in-lesson figure gets — see `trim-cutouts.mjs` for
+ * why), `"both"` takes the left and right blank as well.
+ *
+ * `removed` is the fraction of the *frame* removed, so it reads as "how much of
+ * the layout box was blank" under either setting; with `axes: "vertical"` that
+ * is exactly the fraction of the height, as it always was.
+ *
  * Returns null for a fully transparent image (nothing to centre the crop on)
  * and for one already tight enough that the trim would remove less than
- * `minGain` of its height — which is what makes a re-run a no-op instead of a
+ * `minGain` of its area — which is what makes a re-run a no-op instead of a
  * fresh lossy generation for a percent of nothing.
  *
  * Exported for `__tests__/trimCutouts.test.ts`.
  */
-export function trimPlan(bounds, { pad = 0.02, minGain = 0.02 } = {}) {
+export function trimPlan(bounds, { pad = 0.02, minGain = 0.02, axes = "vertical" } = {}) {
   if (bounds.empty) return null;
-  const padPx = Math.round(bounds.height * pad);
-  const top = Math.max(0, bounds.top - padPx);
-  const bottom = Math.min(bounds.height - 1, bounds.bottom + padPx);
+  const padY = Math.round(bounds.height * pad);
+  const top = Math.max(0, bounds.top - padY);
+  const bottom = Math.min(bounds.height - 1, bounds.bottom + padY);
   const height = bottom - top + 1;
-  const removed = 1 - height / bounds.height;
+
+  let left = 0;
+  let width = bounds.width;
+  if (axes === "both") {
+    // Padding is a fraction of each axis in turn, so a frame gets the same
+    // proportional breathing room all the way round rather than the same
+    // pixel count on a 1536-wide image as on its 1024-tall one.
+    const padX = Math.round(bounds.width * pad);
+    left = Math.max(0, bounds.left - padX);
+    const right = Math.min(bounds.width - 1, bounds.right + padX);
+    width = right - left + 1;
+  }
+
+  const removed = 1 - (width * height) / (bounds.width * bounds.height);
   if (removed < minGain) return null;
-  return { top, height, removed };
+  return { left, top, width, height, removed };
+}
+
+/**
+ * Which margins a cut-out's crop should take, from its prompt id.
+ *
+ * Thumbnails are trimmed on both axes, everything else vertically only. The
+ * split is about where the image is painted, not about the art: a thumbnail is
+ * shown at ~100px inside a fixed box, where every blank column is drawing
+ * surface the subject doesn't get, while an in-lesson figure spans the content
+ * column and shares its edges with the figure in the next lesson.
+ *
+ * The answer comes from the prompt corpus rather than the file name, so a
+ * future thumbnail is trimmed for what it *is* — `data/illustration-prompts.json`
+ * is where a new one is declared, and the `course-thumbnail` /
+ * `interview-thumbnail` categories are already the pipeline's word for "this is
+ * a thumbnail". An id the corpus doesn't know (promoted from a scratch
+ * directory, say) falls back to the naming convention the corpus itself
+ * follows; `__tests__/trimCutouts.test.ts` pins the two in agreement.
+ */
+const THUMBNAIL_SUFFIX = "-thumbnail";
+let categoryById = null;
+
+export function trimAxesFor(id) {
+  categoryById ??= new Map(
+    JSON.parse(readFileSync(join(ROOT, "data", "illustration-prompts.json"), "utf8"))
+      .prompts.map((p) => [p.id, p.category]),
+  );
+  return (categoryById.get(id) ?? id).endsWith(THUMBNAIL_SUFFIX) ? "both" : "vertical";
 }
 
 /** An image reduced to just its drawn content, at a fixed small size — the
  *  crop-invariant form the comparison below is defined on. */
 export async function contentSignature(buf) {
-  const bounds = await verticalBounds(buf);
+  const bounds = await contentBounds(buf);
   const img = sharp(buf);
   if (!bounds.empty) {
     img.extract({
-      left: 0,
+      left: bounds.left,
       top: bounds.top,
-      width: bounds.width,
+      width: bounds.right - bounds.left + 1,
       height: bounds.bottom - bounds.top + 1,
     });
   }
