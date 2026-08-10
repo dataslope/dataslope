@@ -108,6 +108,7 @@ top, and a **gradient counts as an image**, so it lives here too.
 <Figure
   slug="css-backgrounds-and-borders-inline-cutout"
   alt="A panel with a patterned fill inside and a distinct framed edge drawn around it"
+  caption="The background fills the box; the border is drawn around its edge."
 />
 
 Four properties control how that image sits:
@@ -116,7 +117,7 @@ Four properties control how that image sits:
   as needed), `contain` fits the whole image inside, or give explicit
   lengths like `40px 40px`.
 - **`background-position`** places it, e.g. `center` or `top right`.
-- **`background-repeat`** tiles it; the default is `repeat`, or turn it
+- **`background-repeat`** tiles it; the default is `repeat()`, or turn it
   off with `no-repeat`.
 - The **`background` shorthand** packs them into one line.
 
@@ -183,6 +184,7 @@ focus rings.
 <Figure
   slug="css-backgrounds-and-borders-borders-inline-cutout"
   alt="A panel with a distinct framed edge drawn around it, the frame's thickness visible at the corner"
+  caption="A border takes up space in the box, which is why adding one shifts the layout."
 />
 
 Notice how the **border** button below is visibly taller than its

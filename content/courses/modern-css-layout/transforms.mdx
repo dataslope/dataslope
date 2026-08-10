@@ -73,6 +73,7 @@ rotating.
 <Figure
   slug="css-transforms-inline-cutout"
   alt="One block shown four times, moved, turned, scaled and skewed, its original outline left faintly in place"
+  caption="A transform moves, turns or scales the box without disturbing the layout."
 />
 
 By default every transform pivots around the element's center. The
@@ -117,7 +118,7 @@ where each box sat before rotating:
 ## A hover interaction
 
 Transforms shine on hover, because moving a card with `translate` and
-`scale` never nudges the layout around it. Pair the transform with a
+`scale()` never nudges the layout around it. Pair the transform with a
 `transition` and the change eases instead of snapping. Hover the card
 below (it's live) to watch it lift and grow:
 
