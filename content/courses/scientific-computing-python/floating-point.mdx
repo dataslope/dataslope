@@ -30,6 +30,7 @@ The value represented is
 <Figure
   slug="scipy-floating-point-inline-cutout"
   alt="A ruler whose marks are close together near the left end and further and further apart toward the right, a block landing between two marks"
+  caption="Representable numbers thin out as they grow, so precision is relative."
 />
 
 $$ (-1)^s \cdot (1 + m) \cdot 2^{e - 1023} $$
@@ -81,6 +82,7 @@ line it is.
 <Figure
   slug="scipy-floating-point-machine-epsilon-inline-cutout"
   alt="A rule with a caliper measuring the smallest gap between two adjacent marks near its left end"
+  caption="Machine epsilon is the gap between 1.0 and the next number after it."
 />
 
 <Chart slug="float-precision-gaps" />
@@ -126,6 +128,7 @@ Three special "numbers" appear all the time:
 <Figure
   slug="scipy-floating-point-special-values-inline-cutout"
   alt="A measuring rail with one block sitting far past its end and an empty socket in the rail where a block should be"
+  caption="Infinity and not-a-number are values the format carries deliberately."
 />
 
 NaN is special because it is **not equal to anything, including

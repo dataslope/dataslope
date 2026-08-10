@@ -26,6 +26,7 @@ The answer depends on two independent properties:
 <Figure
   slug="scipy-numerical-stability-stability-intuitively-inline-cutout"
   alt="Two chains of steps from the same start, one ending on its mark and one visibly off"
+  caption="Two algorithms for the same answer can end in very different places."
 />
 
 ```mermaid
@@ -94,6 +95,7 @@ hope for at finite precision.
 <Figure
   slug="scipy-numerical-stability-conditioning-intuitively-inline-cutout"
   alt="A lever where a tiny nudge at one end swings the far end wildly"
+  caption="An ill-conditioned problem amplifies a tiny change into a large one."
 />
 
 An algorithm is **unstable** if it can produce arbitrarily wrong
@@ -152,6 +154,7 @@ Consider the integrals
 <Figure
   slug="scipy-numerical-stability-inline-cutout"
   alt="Two chains of the same small operations, the near one ending with a block still on its mark and the far one ending far off it"
+  caption="A stable algorithm keeps the small errors small all the way through."
 />
 
 $$ I_n = \int_0^1 \frac{x^n}{x + 10} \, dx $$

@@ -1,9 +1,9 @@
 ---
 title: Matrix Decompositions
-description: LU, QR, Cholesky, SVD, the factorizations behind every numerical linear algebra routine
+description: LU, QR, Cholesky and the singular value decomposition, the factorizations behind every numerical linear algebra routine
 ---
 
-When you call `solve`, `lstsq`, `eig`, or `inv`, you are not running
+When you call `solve`, `lstsq()`, `eig()`, or `inv`, you are not running
 a black-box routine. You are running a *factorization*: a way of
 writing $A$ as a product of structured matrices for which the
 target problem is easy. Choosing the right factorization is choosing
@@ -52,6 +52,7 @@ once, solve many times**.
 <Figure
   slug="scipy-matrix-decompositions-lu-decomposition-inline-cutout"
   alt="One grid separated into a lower stepped grid and an upper stepped grid that stack back together"
+  caption="Factor once into two triangular pieces and every later solve is cheap."
 />
 
 <CodeBlock
@@ -180,7 +181,7 @@ print("True coefficients : [1.000, -2.000, 0.000, 0.500]")
   ]}
 />
 
-NumPy's `np.linalg.lstsq` does exactly this dance for you, but
+NumPy's `np.linalg.lstsq()` does exactly this dance for you, but
 seeing it explicitly makes it obvious that least squares is *just*
 QR plus a triangular solve.
 
@@ -194,6 +195,7 @@ is the most informative factorization in numerical analysis.
 <Figure
   slug="scipy-matrix-decompositions-five-factorizations-at-inline-cutout"
   alt="One solid block shown separated five different ways along a bench"
+  caption="Five ways to take a matrix apart, each answering a different question."
 />
 
 The singular values $\sigma_1 \ge \sigma_2 \ge \cdots$ tell you:
@@ -284,11 +286,12 @@ Three of them gets you to 1% relative error.
 For a diagonalizable square $A$, $A = V \Lambda V^{-1}$. The
 columns of $V$ are eigenvectors, $\Lambda$ is a diagonal of
 eigenvalues. Symmetric matrices admit an *orthogonal*
-diagonalization $A = V \Lambda V^T$ (use `eigh`, not `eig`).
+diagonalization $A = V \Lambda V^T$ (use `eigh()`, not `eig()`).
 
 <Figure
   slug="scipy-matrix-decompositions-inline-cutout"
   alt="One solid block being separated into three simpler blocks that stack back together to the same shape"
+  caption="A decomposition rewrites one matrix as simpler ones that multiply back to it."
 />
 
 A beautiful application: **matrix exponentiation** for solving a
@@ -484,7 +487,7 @@ assert abs(got - expected) < 1e-8`,
   markdown={`You need to solve $A x = b$ for the same 5000×5000 matrix $A$ but with 200 different right-hand sides $b$. Which strategy is fastest?
 
 - Call \`np.linalg.solve(A, b_k)\` 200 times
-  > Each call to \`np.linalg.solve\` performs the full $O(n^3)$ LU factorization; repeating it 200 times throws away the factorization after each use, wasting the dominant cost.
+  > Each call to \`np.linalg.solve()\` performs the full $O(n^3)$ LU factorization; repeating it 200 times throws away the factorization after each use, wasting the dominant cost.
 - Use the SVD because it generalizes
   > SVD costs roughly $4n^3$, about 6× more than LU, so reaching for it when a standard LU solve suffices wastes significant compute time.
 - Compute \`np.linalg.inv(A)\` once and multiply

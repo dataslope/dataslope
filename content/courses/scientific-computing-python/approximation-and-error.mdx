@@ -31,6 +31,7 @@ $$ E(h) \;=\; \underbrace{C \, h^p}_{\text{truncation}} \;+\; \underbrace{D / h^
 <Figure
   slug="scipy-approximation-and-error-truncation-vs-round-inline-cutout"
   alt="A curve cut short at one end beside a measurement whose last mark is fractionally off"
+  caption="Truncation is the maths you cut short; round-off is what the machine loses."
 />
 
 - **Truncation error** dominates when $h$ is *large*. Use a smaller
@@ -110,6 +111,7 @@ halves an order-4 method's error by a factor of $16$.
 <Figure
   slug="scipy-approximation-and-error-convergence-order-inline-cutout"
   alt="Three curves closing on a line at visibly different rates"
+  caption="A higher order means the error falls away far faster as the step shrinks."
 />
 
 We can *empirically measure* convergence order. Compute the error at
@@ -169,7 +171,7 @@ constants** for any problem accurate enough to matter.
 | 4 | $\div 16$ | ~13 |
 | 8 | $\div 256$ | ~6 |
 
-This is why SciPy's `solve_ivp` defaults to `RK45` (a 4th–5th order
+This is why SciPy's `solve_ivp()` defaults to `RK45` (a 4th–5th order
 Runge–Kutta pair) rather than to plain Euler.
 
 ## Series acceleration: when convergence is slow
@@ -225,9 +227,10 @@ near a user-specified tolerance.
 <Figure
   slug="scipy-approximation-and-error-inline-cutout"
   alt="A curved rail with a straight rod laid against it, small gaps visible between rod and rail at both ends"
+  caption="An adaptive method shortens the step where the answer is changing fastest."
 />
 
-SciPy's `quad` (general 1-D integration) is adaptive by default.
+SciPy's `quad()` (general 1-D integration) is adaptive by default.
 Try integrating something with a sharp spike.
 
 <CodeBlock
@@ -256,7 +259,7 @@ for n in [101, 1001, 10001]:
   ]}
 />
 
-`quad` converges fast because it concentrates samples near the
+`quad()` converges fast because it concentrates samples near the
 spike. The uniform Simpson rule wastes most of its samples on the
 flat regions. **Use adaptive methods unless you have a reason not
 to.**

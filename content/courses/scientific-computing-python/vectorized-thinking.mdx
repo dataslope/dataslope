@@ -68,6 +68,7 @@ call, and the wrapping of a `float` into a `numpy.float64` and back.
 <Figure
   slug="scipy-vectorized-thinking-single-most-important-inline-cutout"
   alt="A stopwatch beside two benches, one stamping blocks one at a time and one stamping a whole row"
+  caption="The loop and the vectorised version do the same arithmetic at very different speeds."
 />
 
 ## How NumPy actually runs
@@ -227,6 +228,7 @@ for something else.
 <Figure
   slug="scipy-vectorized-thinking-inline-cutout"
   alt="One hand stamping a single block at a time on the left, and a full-width press stamping a whole row in one stroke on the right"
+  caption="One operation over a whole array beats one operation per element."
 />
 
 - **The algorithm is fundamentally sequential.** Iterating a
@@ -426,7 +428,7 @@ When you sit down to translate a formula into NumPy, ask:
 2. **What dimensions need to broadcast?** Insert `None` or call
    `np.newaxis`/`reshape` to align them.
 3. **Which axis am I reducing?** Pass it explicitly as `axis=`.
-4. **Is there an existing ufunc?** Reach for `np.where`, `np.clip`,
+4. **Is there an existing ufunc?** Reach for `np.where()`, `np.clip`,
    `np.minimum`, `np.einsum`, before you start writing a loop.
 5. **Did I accidentally fall back to Python?** Look for `for`
    loops, `map`, list comprehensions, or `np.vectorize`, if you

@@ -27,6 +27,7 @@ $$
 <Figure
   slug="scipy-ordinary-differential-equations-inline-cutout"
   alt="A smooth curve drawn on a board with a walker crossing it in short straight steps, the steps drifting slightly off the curve as they go"
+  caption="A solver walks the solution in steps, and each step drifts a little."
 />
 
 Given the law $f$ and a starting state $y_0$, find $y(t)$ for
@@ -54,6 +55,7 @@ step, easy to code, and almost always wrong.
 <Figure
   slug="scipy-ordinary-differential-equations-euler-s-method-inline-cutout"
   alt="A walker crossing a curve in short straight steps, drifting further from it with each"
+  caption="Euler's method assumes the slope holds for the whole step, and it drifts."
 />
 
 <CodeBlock
@@ -232,7 +234,7 @@ print(f"Expected (closed form)  : t = {2 * 20 / 9.81:.6f} s")
   ]}
 />
 
-`solve_ivp` solves the equation $g(t, y) = 0$ to root-finding
+`solve_ivp()` solves the equation $g(t, y) = 0$ to root-finding
 precision, *not* just to the nearest time step. The reported event
 time is essentially exact.
 
@@ -396,7 +398,7 @@ few time units, yet the system is fully deterministic.
 <ChallengeCard
   adapter="python"
   title="Find when a projectile reaches its peak"
-  instructions={`A projectile in 1-D obeys $\\ddot y = -g$, with $g = 9.81$. Starting at $y(0) = 0$ with initial upward velocity $v_0$, integrate with \`solve_ivp\` and use an **event** to detect the moment the velocity crosses zero (the apex).
+  instructions={`A projectile in 1-D obeys $\\ddot y = -g$, with $g = 9.81$. Starting at $y(0) = 0$ with initial upward velocity $v_0$, integrate with \`solve_ivp()\` and use an **event** to detect the moment the velocity crosses zero (the apex).
 
 Implement \`time_to_apex(v0)\` that returns the apex time as a float.
 
@@ -460,7 +462,7 @@ This is also why high-order methods can deliver far more accuracy *per function 
 />
 
 <MultipleChoice
-  markdown={`Your reaction-network ODE has fast equilibria on timescales of $10^\{-6\}$ seconds and slow dynamics on timescales of $10^\{3\}$ seconds. \`solve_ivp\` with the default \`RK45\` method either crawls or returns "step size too small". What's the right next step?
+  markdown={`Your reaction-network ODE has fast equilibria on timescales of $10^\{-6\}$ seconds and slow dynamics on timescales of $10^\{3\}$ seconds. \`solve_ivp()\` with the default \`RK45\` method either crawls or returns "step size too small". What's the right next step?
 
 - Switch to \`DOP853\` for higher order
   > DOP853 is an explicit 8th-order method; using a higher-order explicit method does not solve stiffness, because explicit methods of any order are still constrained by the CFL-like stability condition.

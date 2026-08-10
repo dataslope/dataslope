@@ -5,8 +5,8 @@ description: Solving systems, computing eigenvalues, and the linear-algebra patt
 
 If numerical computing has a *secret*, it is this: **almost every
 scientific problem reduces to a linear algebra problem**. A
-nonlinear least squares fit? A sequence of linear systems. A PDE
-discretization? A sparse linear system. A neural network training
+nonlinear least squares fit? A sequence of linear systems. A partial
+differential equation discretization? A sparse linear system. A neural network training
 step? A chain of matrix multiplies and a linear solve. Eigenvalue
 problems? They are everywhere, vibration modes, principal
 component analysis, page ranking, quantum mechanics.
@@ -37,6 +37,7 @@ chapter is about *using* them.
 <Figure
   slug="scipy-linear-algebra-essentials-inline-cutout"
   alt="A grid of plain square cells acting on an arrow, the arrow leaving the far side of the grid both turned and stretched"
+  caption="A matrix acts on a vector, turning and stretching it."
 />
 
 ## Solving linear systems
@@ -50,6 +51,7 @@ algorithm we mentioned in the stability chapter.
 <Figure
   slug="scipy-linear-algebra-essentials-solving-linear-systems-inline-cutout"
   alt="A grid of cells and a column of blocks being brought together to yield a second column"
+  caption="Solving means finding the vector that the matrix maps onto the one you have."
 />
 
 <CodeBlock
@@ -84,6 +86,7 @@ times faster. **Use them.**
 <Figure
   slug="scipy-linear-algebra-essentials-special-structure-trust-inline-cutout"
   alt="A grid whose cells are mostly empty in a clear pattern, a machine reaching only for the filled ones"
+  caption="Structure in the matrix means a specialised solver can skip most of the work."
 />
 
 | Structure | NumPy / SciPy call | Speedup vs general |
@@ -301,7 +304,7 @@ number of rooms per dwelling from four other features.
 There are two ways to solve $\min_x \lVert A x - b \rVert$. The
 textbook route forms the **normal equations** $A^\mathsf{T} A\,x =
 A^\mathsf{T} b$ and solves them. The robust route hands $A$ and $b$
-straight to `lstsq`, which goes through a QR or SVD factorization
+straight to `lstsq()`, which goes through a QR or SVD factorization
 instead. They usually agree, but the normal equations *square the
 condition number*, so on poorly scaled data they can disagree badly.
 

@@ -38,11 +38,13 @@ flowchart TD
 <Figure
   slug="scipy-arrays-and-tensors-creating-arrays-inline-cutout"
   alt="A solid grid of cells filling in one by one from a hopper, each filled cell a block of ink"
+  caption="An array is one flat buffer plus a shape that says how to read it."
 />
 
 <Figure
   slug="scipy-arrays-and-tensors-inline-cutout"
   alt="A single row of cells, a flat grid of them, and a stack of those grids, standing side by side in increasing dimension"
+  caption="The same buffer is a vector, a matrix or a stack, depending on its shape."
 />
 
 Most array operations, slicing, transposing, reshaping, just
@@ -131,6 +133,7 @@ terms of memory.
 <Figure
   slug="scipy-arrays-and-tensors-indexing-views-fancy-inline-cutout"
   alt="A frame laid over a grid showing part of it, a scoop lifting scattered cells, and a solid cover plate hiding the rest"
+  caption="A slice is a view of the same memory; fancy indexing copies."
 />
 
 **Basic indexing** (slices, integers, `:`, `None`) returns a **view**.
@@ -220,7 +223,7 @@ print("T.reshape(12) shares memory?", np.shares_memory(T, T.reshape(12)))
 ## Vector, matrix, and tensor arithmetic
 
 All the standard arithmetic ops are *element-wise*. Matrix-style
-products use `@` (or `np.matmul` / `np.dot`).
+products use `@` (or `np.matmul` / `np.dot()`).
 
 <CodeBlock
   adapter="python"
@@ -255,7 +258,8 @@ arithmetic; **matmul** when you want linear-algebra composition.
 A "tensor" in scientific computing usually means a NumPy array with
 $\ge 3$ axes. They show up everywhere images (height $\times$ width
 $\times$ channels), video (frames $\times$ height $\times$ width
-$\times$ channels), time-series ensembles, and PDE solution states
+$\times$ channels), time-series ensembles, and partial differential
+equation solution states
 live.
 
 The general-purpose tool for tensor contractions is **`np.einsum`**,

@@ -40,13 +40,14 @@ flowchart TB
 ## Root finding in one dimension
 
 For 1-D problems where you can find an interval $[a, b]$ with
-$f(a)\, f(b) < 0$, **always** use `brentq`. It guarantees
+$f(a)\, f(b) < 0$, **always** use `brentq()`. It guarantees
 convergence, never escapes the bracket, and converges
 super-linearly.
 
 <Figure
   slug="scipy-root-finding-and-optimization-inline-cutout"
   alt="A curved rail dipping below a straight line, with a marker walking down the curve toward its lowest point"
+  caption="Root finding walks along the curve to where it crosses zero."
 />
 
 <CodeBlock
@@ -74,7 +75,7 @@ print(f"newton  : x = {root_n:.12f}   f(x) = {f(root_n):.2e}")
 
 Newton is fast when it works (*quadratic* convergence: digits
 double each step) but can spectacularly diverge from a bad starting
-point. `brentq` is the safe default; reach for Newton only when
+point. `brentq()` is the safe default; reach for Newton only when
 speed matters *and* you have a reliable guess.
 
 ## Root finding in many dimensions
@@ -186,7 +187,7 @@ print(f"with jac:{r2.nfev:>4d} f-evals, {r2.njev:>4d} jac-evals")
 
 Real engineering problems have constraints. Variables live in
 intervals; sums must equal one; physical quantities must be
-non-negative. `minimize` supports both **box bounds** (per-variable
+non-negative. `minimize()` supports both **box bounds** (per-variable
 lower/upper) and **constraints** (equality or inequality
 functions).
 
@@ -218,7 +219,7 @@ print("constraint value (≥ 0):", (res.x[0] + res.x[1] - 3).round(6))
 
 Fitting a model $\hat y_i = m(x_i;\theta)$ to data by minimizing
 $\sum_i (y_i - \hat y_i)^2$ is the most common optimization in
-science. Don't use generic `minimize` for it, use
+science. Don't use generic `minimize()` for it, use
 `scipy.optimize.curve_fit` or `least_squares`, which exploit the
 sum-of-squares structure for faster, more reliable convergence.
 
@@ -273,7 +274,7 @@ $$
 c(t) = a + b\,t + d\,t^2 + A\cos(2\pi t) + B\sin(2\pi t)
 $$
 
-where $t$ is time in years. `curve_fit` estimates all five parameters
+where $t$ is time in years. `curve_fit()` estimates all five parameters
 at once.
 
 <CodeBlock
@@ -325,12 +326,13 @@ meaningful constants, each with an uncertainty.
 
 Local solvers like BFGS find the *nearest* minimum. When your
 landscape has many local minima, use **global** methods:
-`differential_evolution`, `dual_annealing`, `basinhopping`,
-`shgo`.
+`differential_evolution()`, `dual_annealing()`, `basinhopping()`,
+`shgo()`.
 
 <Figure
   slug="scipy-root-finding-and-optimization-landscape-methods-inline-cutout"
   alt="A rolling landscape with several markers descending it by different routes"
+  caption="A local method finds the nearest minimum, not the best one."
 />
 
 <CodeBlock
@@ -476,16 +478,16 @@ When a bracket exists, bracketing methods are virtually always the right choice.
 />
 
 <MultipleChoice
-  markdown={`You have a least-squares fitting problem: minimize $\\sum_i (y_i - m(x_i;\\theta))^2$. Why is \`scipy.optimize.curve_fit\` (or \`least_squares\`) a better default than passing the sum-of-squares objective into generic \`minimize\`?
+  markdown={`You have a least-squares fitting problem: minimize $\\sum_i (y_i - m(x_i;\\theta))^2$. Why is \`scipy.optimize.curve_fit\` (or \`least_squares\`) a better default than passing the sum-of-squares objective into generic \`minimize()\`?
 
 - It always finds the global minimum
-  > Like all gradient-based methods, \`curve_fit\` finds a local minimum; it can get stuck in a wrong local minimum if the initial parameter guess is poor.
+  > Like all gradient-based methods, \`curve_fit()\` finds a local minimum; it can get stuck in a wrong local minimum if the initial parameter guess is poor.
 - [o] It exploits the sum-of-squares structure (Jacobian of residuals via the Levenberg–Marquardt algorithm) for faster, more reliable convergence, and returns parameter covariances for free
-  > The residual Jacobian is far more informative than the gradient of the squared loss; LM combines Gauss–Newton with trust-region damping to get robust quadratic-ish convergence. Plus \`curve_fit\` returns the covariance matrix you need for uncertainty bars, which generic \`minimize\` would not give you.
+  > The residual Jacobian is far more informative than the gradient of the squared loss; LM combines Gauss–Newton with trust-region damping to get robust quadratic-ish convergence. Plus \`curve_fit()\` returns the covariance matrix you need for uncertainty bars, which generic \`minimize()\` would not give you.
 - It uses less memory
-  > Both \`curve_fit\` and generic \`minimize\` work with dense parameter vectors of the same size; memory usage is not the distinguishing factor.
+  > Both \`curve_fit()\` and generic \`minimize()\` work with dense parameter vectors of the same size; memory usage is not the distinguishing factor.
 - It only works for linear models
-  > \`curve_fit\` is specifically designed for nonlinear models; for purely linear models, \`np.linalg.lstsq\` would be the more direct choice.
+  > \`curve_fit()\` is specifically designed for nonlinear models; for purely linear models, \`np.linalg.lstsq()\` would be the more direct choice.
 
 Match the algorithm to the *structure* of the problem, least squares is special enough to deserve its own solver.`}
 />
