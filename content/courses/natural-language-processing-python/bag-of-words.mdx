@@ -39,13 +39,14 @@ that is precisely the form a classifier wants.
 
 ## Building it by hand
 
-The model is simple enough to build from scratch with a `Counter`, and doing
+The model is simple enough to build from scratch with a `Counter()`, and doing
 so demystifies it completely. Watch a tiny three-document corpus become a
 matrix of numbers.
 
 <Figure
   slug="nlp-bag-of-words-building-by-hand-inline-cutout"
   alt="A hand placing word tiles one at a time into labelled slots of a tally rack"
+  caption="Each document becomes a row of counts, one column per vocabulary word."
 />
 
 <CodeBlock
@@ -134,6 +135,7 @@ count.
 <Figure
   slug="nlp-bag-of-words-inline-cutout"
   alt="A bag tipped out onto a bench so the word tiles land in a heap with their order lost, and a tally rack counting each kind"
+  caption="The bag keeps which words appeared and throws their order away."
 />
 
 <CodeBlock
@@ -171,7 +173,7 @@ the previous page.
 <Callout type="tip" title="In practice you'd reach for a vectorizer">
 Building bag-of-words by hand, as we just did, is the right way to *understand*
 it. In real projects you would typically use a ready-made vectorizer (such as
-scikit-learn's `CountVectorizer`) that does tokenizing, vocabulary-building, and
+scikit-learn's `CountVectorizer()`) that does tokenizing, vocabulary-building, and
 counting in one step and returns an efficient sparse matrix. The mechanics are
 identical to what you just coded, vocabulary, then per-document counts, so you
 now know exactly what such a tool produces under the hood.
@@ -364,4 +366,5 @@ classifier.
 <Figure
   slug="nlp-bag-of-words-feature-extraction-process-inline-cutout"
   alt="A bag of word tiles tipped onto a bench and counted into a tally rack"
+  caption="Counting is what turns text into the numbers a model can take."
 />

@@ -15,10 +15,10 @@ analytics".
   alt="A long descending staircase of bars, a few towering at the near end and a very long tail of single-height bars trailing away"
 />
 
-## Counting words with `FreqDist`
+## Counting words with `FreqDist()`
 
 You could count words with a plain `collections.Counter`, and that is exactly
-what is happening under the hood. NLTK wraps it in a `FreqDist` ("frequency
+what is happening under the hood. NLTK wraps it in a `FreqDist()` ("frequency
 distribution") that adds text-specific conveniences.
 
 ```mermaid
@@ -77,20 +77,20 @@ print("Relative freq 'the': ", round(fd.freq("the"), 3))
   ]}
 />
 
-A few `FreqDist` methods you will use constantly:
+A few `FreqDist()` methods you will use constantly:
 
 - `fd.most_common(n)`, the `n` highest-frequency words as `(word, count)`
   pairs, already sorted. The everyday workhorse.
 - `fd.N()`, the total number of word tokens (counting repeats).
 - `len(fd)`, the number of *distinct* words (the vocabulary size).
 - `fd["word"]`, the count of a word; missing words return `0` rather than
-  raising, because `FreqDist` is a `dict` subclass.
+  raising, because `FreqDist()` is a `dict` subclass.
 - `fd.freq("word")`, the *relative* frequency, i.e. count divided by `N()`.
 
 <Callout type="info" title="FreqDist is just a smarter Counter">
-`FreqDist` subclasses `collections.Counter`, so everything you know about
-`Counter` works, and you can build one from any iterable of tokens. NLTK adds
-text-flavored helpers like `most_common`, `hapaxes`, `freq`, and plotting. If
+`FreqDist()` subclasses `collections.Counter`, so everything you know about
+`Counter()` works, and you can build one from any iterable of tokens. NLTK adds
+text-flavored helpers like `most_common()`, `hapaxes`, `freq`, and plotting. If
 you ever do not have NLTK handy, `Counter(tokens).most_common(n)` gets you the
 same top-words list.
 </Callout>
@@ -105,6 +105,7 @@ it is a quick, classic measure of how repetitive or varied a text is.
 <Figure
   slug="nlp-frequency-distributions-lexical-diversity-varied-inline-cutout"
   alt="Two racks of tiles of the same total height, one made of many distinct kinds and one of few repeated"
+  caption="Distinct words over total words is how varied a text is measured."
 />
 
 $$\text{lexical diversity} = \frac{\text{number of distinct words}}{\text{total number of words}}$$
@@ -186,7 +187,7 @@ forever. (This regularity is known as **Zipf's law**.)
 <Chart slug="zipf-law" />
 
 Words that appear exactly once have their own name, **hapaxes**, and
-`FreqDist` will list them for you. Let us visualize the lopsidedness with a
+`FreqDist()` will list them for you. Let us visualize the lopsidedness with a
 bar chart of the top words.
 
 <CodeBlock
@@ -259,6 +260,7 @@ content words you actually care about are buried below them.
 <Figure
   slug="nlp-frequency-distributions-inline-cutout"
   alt="A rack of word tiles with a bar growing beside each, the shortest few words carrying by far the tallest bars"
+  caption="Raw frequency puts the least informative words at the top."
 />
 
 <CodeBlock
@@ -327,14 +329,14 @@ over-rewards the commonplace.
 </Callout>
 
 <MultipleChoice
-  markdown={`You build a \`FreqDist\` over the raw tokens of a news article and ask for
+  markdown={`You build a \`FreqDist()\` over the raw tokens of a news article and ask for
 \`most_common(5)\`. The result is "the", "to", "of", "a", "and". Why is this
 unhelpful for figuring out the article's topic, and what is the usual fix?
 
 - [o] The most frequent words are stopwords that appear in nearly all text; removing stopwords first surfaces the content words that actually indicate the topic
   > Language is long-tailed, so function words dominate raw counts. Filtering stopwords before counting lets topical content words rise to the top, which is exactly why keyword extraction removes them first.
-- \`FreqDist\` counted wrong; use \`Counter\` instead
-  > \`FreqDist\` is built on top of \`Counter\` and counts correctly; the top-five result is accurate, it is just that stopwords genuinely are the most frequent words in most texts.
+- \`FreqDist()\` counted wrong; use \`Counter()\` instead
+  > \`FreqDist()\` is built on top of \`Counter()\` and counts correctly; the top-five result is accurate, it is just that stopwords genuinely are the most frequent words in most texts.
 - You must lemmatize before any counting will work at all
   > Lemmatization is helpful for reducing variant forms, but counting works perfectly well without it; it does not affect which words dominate the raw frequency list.
 - The article has no topic; nothing can be done
@@ -356,7 +358,7 @@ Raw frequency over-represents the commonplace; stopword removal is the standard 
    by the total number of tokens, as a float. For an empty list, return
    \`0.0\` (avoid dividing by zero).
 2. \`top_words(tokens, n)\`, return the \`n\` most common tokens as a list of
-   \`(word, count)\` pairs. Use \`FreqDist\` (already imported).
+   \`(word, count)\` pairs. Use \`FreqDist()\` (already imported).
 
 For example, with \`tokens = ["a", "b", "a", "c", "a", "b"]\`,
 \`lexical_diversity(tokens)\` is \`0.5\` and \`top_words(tokens, 2)\` is
@@ -430,16 +432,16 @@ assert out == [("x", 3)], "Got: " + repr(out)`,
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What does \`fd.most_common(3)\` return for a \`FreqDist\` \`fd\`?
+  markdown={`What does \`fd.most_common(3)\` return for a \`FreqDist()\` \`fd\`?
 
 - [o] The three highest-frequency items as \`(word, count)\` pairs, sorted from most to least frequent
   > \`most_common(n)\` gives the top \`n\` entries by count, already ordered, as tuples. It is the standard way to pull "top words" out of a frequency distribution.
 - The first three words in the original text
-  > \`FreqDist\` does not preserve the original token order; it tallies counts and returns words ranked by frequency, not by position in the text.
+  > \`FreqDist()\` does not preserve the original token order; it tallies counts and returns words ranked by frequency, not by position in the text.
 - The three rarest words in the text
   > \`most_common(n)\` returns the highest-frequency items, not the lowest; to get the rarest words you would inspect the tail or use \`fd.hapaxes()\` for once-only words.
 - A random sample of three words
-  > \`most_common\` is deterministic, not random; it always returns the top entries sorted by count, with ties broken consistently.
+  > \`most_common()\` is deterministic, not random; it always returns the top entries sorted by count, with ties broken consistently.
 
 It returns the most frequent items, as ordered (word, count) tuples.`}
 />
@@ -465,7 +467,7 @@ Distinct over total is 0.4 here, signaling fairly repetitive text.`}
 captures a practical consequence?
 
 - Frequency counts are impossible to compute for real text
-  > Frequency counting is straightforward on real text; \`FreqDist\` and \`Counter\` do it directly on any tokenized corpus.
+  > Frequency counting is straightforward on real text; \`FreqDist()\` and \`Counter()\` do it directly on any tokenized corpus.
 - Every word in a text appears roughly the same number of times
   > Zipf's law describes the opposite pattern: a small number of words are extremely frequent and a long tail of words appear rarely; uniform frequency is not observed in natural language.
 - Rare words are always more frequent than common words
@@ -499,4 +501,5 @@ verb. To capture that, we need to know each word's role in the sentence:
 <Figure
   slug="nlp-frequency-distributions-counting-words-freqdist-inline-cutout"
   alt="A rack of word tiles with a bar growing beside each as tiles are dropped in"
+  caption="A frequency distribution tallies each word as the tokens go past."
 />

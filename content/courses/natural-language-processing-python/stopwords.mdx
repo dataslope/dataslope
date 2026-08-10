@@ -28,6 +28,7 @@ at it.
 <Figure
   slug="nlp-stopwords-are-stopwords-remove-inline-cutout"
   alt="A stream of tiles over a sieve that catches the smallest and most frequent"
+  caption="Stopwords are the frequent, functional words that carry little on their own."
 />
 
 <CodeBlock
@@ -86,7 +87,7 @@ flowchart TD
     F -->|"no"| K["Kept (content words):<br/>movie, great"]
 ```
 
-Here is the filter in action. The pattern is always the same: build a `set`
+Here is the filter in action. The pattern is always the same: build a `set()`
 of stopwords for fast lookup, then keep only the tokens that are not in it.
 
 <CodeBlock
@@ -141,8 +142,8 @@ building a search index, dropping them is a clear win.
 
 <Callout type="info" title="Why a set, not a list?">
 Checking `token in stop` is done once per token, potentially millions of
-times. Membership testing in a Python `set` is roughly constant time, while a
-`list` scans every element. Converting the stopword list to a `set` once,
+times. Membership testing in a Python `set()` is roughly constant time, while a
+`list()` scans every element. Converting the stopword list to a `set()` once,
 up front, can make the filtering step dramatically faster on large texts. It
 is a small habit that scales well.
 </Callout>
@@ -154,6 +155,7 @@ Now the other personality. Look closely at what is *in* the stopword list.
 <Figure
   slug="nlp-stopwords-inline-cutout"
   alt="A stream of word tiles passing a sieve that catches the smallest, most common tiles and lets the rest through"
+  caption="The sieve catches `not` too, which is how removing stopwords flips a meaning."
 />
 
 <CodeBlock
@@ -525,7 +527,7 @@ Customizing the set, subtract what you must keep, add domain noise, is how this 
 />
 
 <MultipleChoice
-  markdown={`Converting the stopword list to a Python \`set\` before filtering mainly
+  markdown={`Converting the stopword list to a Python \`set()\` before filtering mainly
 improves:
 
 - The language of the text
