@@ -25,6 +25,7 @@ Plotly Express offers three main map families:
 <Figure
   slug="viz-geographic-visualization-choropleths-data-per-inline-cutout"
   alt="A plain coastline outline divided into regions, each shaded a different depth of one ink"
+  caption="A choropleth shades regions, so it answers questions about areas, not points."
 />
 
 ## Choropleths: data per region
@@ -80,7 +81,7 @@ of where people live:
 ## Scatter geos: data per point
 
 When your data is *point-based* (cities, observations, individual
-events), use `px.scatter_geo`:
+events), use `px.scatter_geo()`:
 
 <CodeBlock
   adapter="python"
@@ -142,7 +143,7 @@ most exactly where the high-latitude countries are:
 ## Tile-based maps with Mapbox
 
 For *cities*, *addresses*, or *fine geographic detail*, use
-`px.scatter_mapbox` or `px.density_mapbox`. These use map tiles
+`px.scatter_mapbox()` or `px.density_mapbox()`. These use map tiles
 (satellite imagery, OpenStreetMap, etc.) underneath:
 
 ```python
@@ -161,6 +162,7 @@ choropleth and scatter_geo cover most beginner needs.)
 <Figure
   slug="viz-geographic-visualization-inline-cutout"
   alt="A plain coastline outline with shaded regions and a few pins standing at different heights on it"
+  caption="Regions carry a value by shade; points carry theirs by position and size."
 />
 
 ## Pitfalls of map visualizations

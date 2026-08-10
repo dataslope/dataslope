@@ -182,13 +182,14 @@ regardless of group size.
 <Figure
   slug="viz-histograms-inline-cutout"
   alt="A tray of loose chips being dropped into a row of adjacent bins, the bins filling to different heights as they land"
+  caption="Normalising to proportions is what makes groups of different sizes comparable."
 />
 
 Other `histnorm` values: `"percent"`, `"probability"`, `"density"`.
 
 ## When NOT to use a histogram
 
-- For **categorical** data, use a bar chart (`px.bar`) showing
+- For **categorical** data, use a bar chart (`px.bar()`) showing
   counts per category, not a histogram.
 - For comparing **summary statistics** across many groups, a **box
   plot** (next page) is more concise.
@@ -198,6 +199,7 @@ Other `histnorm` values: `"percent"`, `"probability"`, `"density"`.
 <Figure
   slug="viz-histograms-histogram-works-inline-cutout"
   alt="Loose chips dropping into a row of adjacent bins, the bins filling to different heights"
+  caption="A histogram bins one numeric column and shows how the values are distributed."
 />
 
 When the bin width is the thing you keep arguing about, the cumulative view
@@ -229,7 +231,7 @@ ever see.
   title="Histogram body mass by species"
   instructions={`The \`penguins\` DataFrame is loaded. Build a histogram of penguin **body mass**, split by **species** so the three distributions can be compared.
 
-1. Use \`px.histogram\` with \`x="body_mass_g"\` and \`color="species"\`.
+1. Use \`px.histogram()\` with \`x="body_mass_g"\` and \`color="species"\`.
 2. Set \`template="simple_white"\`.
 3. So the three distributions can overlap and be compared, set \`barmode="overlay"\` and \`opacity=0.6\`.
 

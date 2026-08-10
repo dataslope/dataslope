@@ -93,6 +93,7 @@ exactly as you would on your own machine.
 <Figure
   slug="viz-loading-data-with-pandas-dataframe-inline-cutout"
   alt="Several columns of different kinds clamped side by side into one board"
+  caption="Every chart starts from a DataFrame, whichever way the data arrived."
 />
 
 <CodeBlock
@@ -241,7 +242,7 @@ print(".query():", asia_2007_q.shape)
 
 ## Sorting
 
-Sort by a column with `sort_values`:
+Sort by a column with `sort_values()`:
 
 ```python
 df.sort_values("gdpPercap", ascending=False)
@@ -284,7 +285,7 @@ the eye reads "ranking" instantly.
 
 A common pattern is to *summarize* a DataFrame before plotting:
 "average GDP per continent," "total sales per region," etc. The
-pandas pattern is `groupby` + an aggregation:
+pandas pattern is `groupby()` + an aggregation:
 
 ```python
 avg_by_continent = (

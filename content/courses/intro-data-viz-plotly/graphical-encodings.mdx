@@ -28,6 +28,7 @@ call.
 <Figure
   slug="viz-graphical-encodings-seven-or-so-inline-cutout"
   alt="One measure shown seven ways along a bench, as height, length, angle, area, depth of ink, shape and position"
+  caption="The same number can be drawn as length, angle, area, shade or position."
 />
 
 ## The seven (or so) visual channels
@@ -44,7 +45,7 @@ combination of these channels:
 | --- | --- | --- |
 | **Position (x)** | Quantity or ordered category | `x="..."` |
 | **Position (y)** | Quantity or ordered category | `y="..."` |
-| **Length** | Quantity (bar charts) | implicit from `y` in `px.bar` |
+| **Length** | Quantity (bar charts) | implicit from `y` in `px.bar()` |
 | **Color hue** | Categorical grouping | `color="..."` |
 | **Color luminance** | Sequential quantity | `color="..."` with continuous scale |
 | **Size** | Quantity (less precise) | `size="..."` |
@@ -139,6 +140,7 @@ one in the chart.** The reader's eye will go to it first.
 <Figure
   slug="viz-graphical-encodings-inline-cutout"
   alt="The same four data blocks shown four times across the frame, once as bar heights, once as dot positions, once as sizes and once as colours"
+  caption="Whichever channel you choose decides how precisely the reader can compare."
 />
 
 This means you can convey your *narrative* through encoding

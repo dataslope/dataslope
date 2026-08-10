@@ -19,6 +19,7 @@ This page is about the *pre-chart* step: choosing what to show.
 <Figure
   slug="viz-filtering-before-plotting-inline-cutout"
   alt="A crowded board of marks passing through a grate, the thinned result laid out clearly on a second board"
+  caption="Choosing what to leave out is part of making the chart readable."
 />
 
 ## Why filter at all?
@@ -70,7 +71,7 @@ avg_by_region = (
 )
 ```
 
-`groupby` collapses rows into one per group; the aggregation
+`groupby()` collapses rows into one per group; the aggregation
 function says how to combine.
 
 ### 4. Date range
@@ -125,7 +126,7 @@ fig.show()
   ]}
 />
 
-Notice how much of the work is *before* the `px.bar` line. The
+Notice how much of the work is *before* the `px.bar()` line. The
 chart itself is one line; the *data preparation* is four. That's
 the normal ratio.
 
@@ -144,6 +145,7 @@ the normal ratio.
 <Figure
   slug="viz-filtering-before-plotting-filter-at-all-inline-cutout"
   alt="A board so crowded its marks merge into a single mass, beside the same board thinned to a readable few"
+  caption="Past a certain density every mark overlaps and the chart stops saying anything."
 />
 
 ## The `.query()` style
