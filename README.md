@@ -42,6 +42,19 @@ npm run cf:preview   # build + preview in the local Workers runtime
 npm run cf:deploy    # build + deploy to Cloudflare
 ```
 
+### Static asset file count
+
+Cloudflare caps the static-asset files in a **single Worker version** at [20,000 on the free plan and 100,000 on Workers Paid](https://developers.cloudflare.com/workers/platform/limits/#static-assets), with a 25 MiB ceiling on any individual file. That cap is content-driven here rather than code-driven: `.open-next/assets` is mostly per-lesson output (one `.md` mirror per course, several `.webp` illustrations per lesson), so it creeps up with authoring. `npm run cf:deploy` and `npm run cf:preview` check it between the build and the upload, and it can be run on its own against an existing build:
+
+```bash
+npx opennextjs-cloudflare build   # the count only exists after a build
+npm run check:assets              # add -- --plan=free to check the lower cap
+```
+
+At the time of writing that reports **5,222 files, 5.2% of the 100,000 limit**, the largest being a 6.2 MiB wasm bundle. The ~1,600 prerendered pages are not part of that number: they are served from the R2 incremental cache (below), and the assets directory contains no HTML at all.
+
+Two things to know if you cross-check this by hand. `wrangler deploy` logs "Read N files from the assets directory" from a plain recursive `readdir`, so **its N includes directory entries** (5,268 against 5,222 real files); the manifest it uploads skips directories and symlinks and applies `.assetsignore`, which is what `check:assets` mirrors. And the effective cap is server-side, read from the upload token's `max_file_count_allowed` claim, defaulting to 20,000 when absent — the plan numbers in the script are a local mirror of an account property. Using the raised limit also needs wrangler ≥ 4.34.0.
+
 ### One-time setup: incremental cache bucket
 
 OpenNext serves the prerendered home page and `/courses/*` lessons from an R2-backed incremental cache (see `open-next.config.ts`). Without it the Worker re-renders those pages on demand and hits `node:fs`, which doesn't exist in the Workers runtime, returning a 500 (this is what caused `*.workers.dev` preview URLs to fail). Create the bucket once before the first deploy:
