@@ -63,6 +63,7 @@ forever:
 <Figure
   slug="js-how-computers-execute-programs-fetch-decode-execute-inline-cutout"
   alt="A small unit repeating a three-station circuit, taking a card, reading it, acting on it, and returning for the next"
+  caption="Fetch, decode, execute, repeat: the loop under every program you write."
 />
 
 A modern CPU does this billions of times per second, with a lot of
@@ -75,7 +76,7 @@ memory that the CPU fetches and runs.
 ## So where does JavaScript fit?
 
 JavaScript code is **not** a list of CPU instructions. It is *text*.
-The CPU has no idea what `function` or `console.log` mean.
+The CPU has no idea what `function` or `console.log()` mean.
 
 The bridge between them is the **JavaScript runtime**. When you run
 a JavaScript program, here is roughly what happens:
@@ -127,6 +128,7 @@ That's it. Five things to internalise:
 <Figure
   slug="js-how-computers-execute-programs-inline-cutout"
   alt="A card of instructions feeding a machine one line at a time, each line dropping into a slot as it is consumed"
+  caption="A program is instructions consumed one at a time, in an order you control."
 />
 
 That mental model is enough to read 95% of all JavaScript you will
@@ -152,7 +154,7 @@ The runtime walks the program from top to bottom:
 | 1 | `let a = 2;` | Allocate a slot named `a`. Store the value `2` in it. | `a = 2` |
 | 2 | `let b = 3;` | Allocate a slot named `b`. Store `3`. | `a = 2`, `b = 3` |
 | 3 | `let sum = a + b;` | Read the value of `a` (2) and `b` (3). Compute `2 + 3` = `5`. Allocate `sum`. Store `5`. | `a = 2`, `b = 3`, `sum = 5` |
-| 4 | `console.log("sum is", sum);` | Read the value of `sum` (5). Call the `console.log` function with the arguments `"sum is"` and `5`. This produces a side effect: text appears in the output. | unchanged |
+| 4 | `console.log("sum is", sum);` | Read the value of `sum` (5). Call the `console.log()` function with the arguments `"sum is"` and `5`. This produces a side effect: text appears in the output. | unchanged |
 
 Try it yourself. You should see exactly that output:
 
@@ -238,13 +240,14 @@ Hold this picture in your head. We will refer back to it constantly.
 ## Try the trace yourself
 
 Below is a slightly bigger program. Before you press Run, *mentally
-walk through it* and predict what each `console.log` will print.
+walk through it* and predict what each `console.log()` will print.
 Then run it and check whether you were right. Doing this exercise
 honestly is worth more than any amount of passive reading.
 
 <Figure
   slug="js-how-computers-execute-programs-three-things-computer-inline-cutout"
   alt="Three parts standing side by side on one bench, a small engine, a wall of identical small slots, and a tray of cards feeding both"
+  caption="A processor, memory, and a program: everything else is built on those three."
 />
 
 <CodeBlock
@@ -286,8 +289,8 @@ because when we wrote `let y = x;`, the value `10` was copied into
   > Knowing the standard library is helpful, but memorisation is not a debugging skill; the ability to trace execution step by step is what lets you find out *why* a specific program is misbehaving.
 - [o] "Pretending to be the runtime", walking through the program one line at a time, writing down the value of each variable after each step
   > When a program does something unexpected, the fastest way to figure out why is to simulate the runtime yourself, step by step. Most bugs reveal themselves the moment you do this carefully.
-- Adding more \`console.log\` statements until the bug fixes itself
-  > \`console.log\` is a useful tool for inspecting values, but adding logs indiscriminately and hoping the bug disappears is not a strategy; the logs are only useful when you use them to trace values intentionally against your expectations.
+- Adding more \`console.log()\` statements until the bug fixes itself
+  > \`console.log()\` is a useful tool for inspecting values, but adding logs indiscriminately and hoping the bug disappears is not a strategy; the logs are only useful when you use them to trace values intentionally against your expectations.
 
 Step-by-step manual tracing is the bedrock of all debugging skill. We will return to this throughout the course.`}
 />

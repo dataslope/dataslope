@@ -111,6 +111,7 @@ readable.
 <Figure
   slug="js-loops-and-iteration-while-loop-inline-cutout"
   alt="A belt that keeps circling past a gauge, the gate at its end staying shut while the gauge still reads high"
+  caption="A `while` loop keeps going as long as its test still reads true."
 />
 
 The two loops you just ran are exactly equivalent to writing them
@@ -249,6 +250,7 @@ blank result, walk a list, update the result**.
 <Figure
   slug="js-loops-and-iteration-loop-inline-cutout"
   alt="A closed belt with a counter dial beside it, the dial clicking once per pass and a gate lifting when it reaches its last notch"
+  caption="Start with a blank result, walk the list, update it: the commonest loop there is."
 />
 
 <CodeBlock
@@ -293,7 +295,7 @@ console.log("max:", max);
 Notice that each example is the same pattern: *initialise; loop;
 update*. Once you see this shape, you see it everywhere.
 
-## Higher-level alternatives: `forEach`, `map`, `filter`, `reduce`
+## Higher-level alternatives: `forEach()`, `map()`, `filter()`, `reduce()`
 
 For the very common pattern of "do something with every element
 of an array", arrays come with built-in methods that often read
@@ -331,7 +333,7 @@ the loop, you describe *what* you want done with each element, and
 JavaScript runs the loop for you.
 
 When learning, write the explicit `for` loop first; then, once you
-are comfortable, switch to `map`/`filter`/`reduce` where they make
+are comfortable, switch to `map()`/`filter()`/`reduce()` where they make
 the intent clearer.
 
 ## Nested loops
@@ -344,6 +346,7 @@ item to every other item.
 <Figure
   slug="js-loops-and-iteration-inline-cutout"
   alt="A closed circular track with one cart running around it, a counter wheel clicking up at each pass, and a gate at the right the cart finally leaves through"
+  caption="The inner loop runs all the way through for each pass of the outer one."
 />
 
 <CodeBlock

@@ -48,6 +48,7 @@ occasionally you create one yourself.
 <Figure
   slug="js-promises-and-async-await-promise-placeholder-inline-cutout"
   alt="An empty tray set on a bench with a plain blank ticket clipped to it, the tray filled later by a chute above"
+  caption="A promise is a ticket for a value that has not arrived yet."
 />
 
 <CodeBlock
@@ -143,6 +144,7 @@ the syntax most modern code uses.
 <Figure
   slug="js-promises-and-async-await-inline-cutout"
   alt="A ticket counter on the left handing over one plain blank stub, a figure walking away to do other work in the middle, and the finished parcel waiting in a pickup hatch on the right"
+  caption="`await` lets you walk away and pick the value up when it is ready."
 />
 
 - A function marked `async` *always* returns a Promise.
@@ -358,9 +360,9 @@ broken().then(fixed);
 If a variable holding "the value" turns out to be a Promise, you
 forgot an `await`.
 
-### Using `await` inside a `forEach`
+### Using `await` inside a `forEach()`
 
-`forEach` ignores the promise that an `async` arrow returns, so
+`forEach()` ignores the promise that an `async` arrow returns, so
 your code doesn't wait.
 
 <CodeBlock
@@ -604,7 +606,7 @@ retry(flaky, 5)
 <MultipleChoice
   markdown={`Which snippet runs the two fetches *concurrently* (overlapping in time)?
 
-*Hint: look for the version where both \`fetch\` calls are *started* before any \`await\` pauses execution.*
+*Hint: look for the version where both \`fetch()\` calls are *started* before any \`await\` pauses execution.*
 
 - 
   \`\`\`javascript

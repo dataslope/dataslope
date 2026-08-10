@@ -90,6 +90,7 @@ one in scope.
 <Figure
   slug="js-scope-and-scope-chain-inline-cutout"
   alt="Three rooms nested one inside another, a lamp in the outermost lighting all three, and a lamp in the innermost lighting only its own room"
+  caption="An inner block can see out, but nothing outside can see in."
 />
 
 ## The scope chain
@@ -102,6 +103,7 @@ sequence of nested scopes is called the **scope chain**.
 <Figure
   slug="js-scope-and-scope-chain-scope-inline-cutout"
   alt="One lit room inside a larger dark one, the light reaching only as far as the inner room's walls"
+  caption="A name not found here is looked for in the scope that encloses this one."
 />
 
 ```mermaid
@@ -332,7 +334,7 @@ given it a value.
 ## Putting it together: visualising the chain
 
 Below is a slightly bigger example. Before you press Run, predict
-what each `console.log` will print, given the scope rules above.
+what each `console.log()` will print, given the scope rules above.
 
 <CodeBlock
   adapter="javascript"

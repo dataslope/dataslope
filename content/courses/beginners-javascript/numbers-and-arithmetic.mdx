@@ -207,6 +207,7 @@ than `1/3` can be represented exactly in decimal.
 <Figure
   slug="js-numbers-and-arithmetic-inline-cutout"
   alt="A rule with evenly spaced marks and a slider being moved along it by exact amounts"
+  caption="Every JavaScript number is a double, which is why exact steps are not guaranteed."
 />
 
 <Callout type="warn" title="When 0.1 killed: the Patriot missile failure">
@@ -290,11 +291,11 @@ console.log(x.toLocaleString()); // e.g. "1,234.568"  (locale-dependent)
   ]}
 />
 
-Notice the very important detail: `toFixed` returns a **string**,
+Notice the very important detail: `toFixed()` returns a **string**,
 not a number. This is a recurring beginner trap. If you write
 `x.toFixed(2) + 1`, you get the string `"1234.571"`, not the
 number `1235.57`. When you want to *display* a value, use
-`toFixed`. When you want to *compute* with a value, keep it as a
+`toFixed()`. When you want to *compute* with a value, keep it as a
 number.
 
 ## Integer-safe range
@@ -447,6 +448,7 @@ if (typeof toFahrenheit(50) !== "number") throw new Error("toFahrenheit must ret
 <Figure
   slug="js-numbers-and-arithmetic-all-numbers-are-inline-cutout"
   alt="A single measuring rule whose marks are evenly spaced at the left and visibly crowded at the right"
+  caption="The spacing between representable values grows as the numbers do."
 />
 
 <MultipleChoice

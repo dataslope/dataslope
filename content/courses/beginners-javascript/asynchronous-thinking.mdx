@@ -27,7 +27,7 @@ Many real things take time:
 
 A synchronous version of "fetch some data" would mean: *stop the
 entire program* until the data arrives. With a single-threaded
-language like JavaScript, that's catastrophic, the UI freezes,
+language like JavaScript, that's catastrophic, the interface freezes,
 no other code runs, and your one CPU sits idle waiting.
 
 The async philosophy is:
@@ -62,6 +62,7 @@ Imagine ordering at a café:
 <Figure
   slug="js-asynchronous-thinking-non-blocking-everyday-inline-cutout"
   alt="A figure putting a kettle on, walking away to fold cloths, and returning when the kettle whistles"
+  caption="Start the slow thing, get on with something else, come back when it signals."
 />
 
 JavaScript's runtime is the café. Your code is the customer. The
@@ -90,8 +91,8 @@ console.log("2: kept going");
 />
 
 Read the output carefully: `1`, `2`, `3`. The arrow function we
-gave `setTimeout` is a **callback**. We didn't *call* it ourselves,
-we *gave* it to `setTimeout` to call later.
+gave `setTimeout()` is a **callback**. We didn't *call* it ourselves,
+we *gave* it to `setTimeout()` to call later.
 
 This is the heart of async thinking:
 
@@ -188,12 +189,13 @@ A subtle but important word distinction:
 <Figure
   slug="js-asynchronous-thinking-async-exists-at-inline-cutout"
   alt="A single counter where one slow order blocks a long queue behind it, and beside it the same counter with the slow order set aside to one side while the queue moves"
+  caption="One slow job blocks everything behind it unless you set it aside."
 />
 
 JavaScript gives you *concurrency* on a single thread. While one
 async task is "in flight" (waiting for the host to do something),
 your code can start another one. They make progress together,
-but only one bit of JS is executing at any given moment.
+but only one bit of JavaScript is executing at any given moment.
 
 ```mermaid
 gantt
@@ -242,7 +244,7 @@ console.log("E");
   ]}
 />
 
-Output is `A C E B D`. The `setTimeout` callbacks wait until the
+Output is `A C E B D`. The `setTimeout()` callbacks wait until the
 synchronous code finishes. *Reading* this requires you to mentally
 split the code into:
 
@@ -359,7 +361,7 @@ module.exports = { createBus };
 />
 
 There's no Promise here, just callbacks. This is the same
-pattern the DOM uses (`element.addEventListener`), Node uses
+pattern the browser document model uses (`element.addEventListener()`), Node uses
 (`EventEmitter`), and many libraries use internally.
 
 ## Challenge
@@ -503,6 +505,7 @@ runSequentially(tasks, (err, results) => {
 <Figure
   slug="js-asynchronous-thinking-inline-cutout"
   alt="A single worker at a counter starting a slow kettle, serving two other customers while it boils, and returning to the kettle when it whistles"
+  caption="One worker can keep several jobs in flight without doing two at once."
 />
 
 <MultipleChoice

@@ -28,7 +28,7 @@ This is the most important sentence in the whole chapter:
 
 > JavaScript runs one piece of code at a time on a single thread.
 
-There is no parallelism happening inside your JS code. If a
+There is no parallelism happening inside your JavaScript code. If a
 function takes 5 seconds, *nothing else* in your program runs
 during those 5 seconds. (We'll see why slow blocking code is a
 problem, and how async solves it without adding more threads.)
@@ -43,6 +43,7 @@ top."
 <Figure
   slug="js-how-javascript-runs-javascript-single-threaded-inline-cutout"
   alt="One pair of hands at a bench holding a single block while four more blocks wait in a line beside them, none of the four being touched"
+  caption="JavaScript runs one thing at a time; everything else waits its turn."
 />
 
 <CodeBlock
@@ -130,7 +131,7 @@ console.log("B"); // logs after ~500ms
 />
 
 This is exactly why long synchronous work in a browser freezes
-the UI, the browser also can't process clicks while the stack is
+the page, the browser also can't process clicks while the stack is
 busy. The fix isn't "make it faster"; it's "don't block the
 thread." That's what asynchronous APIs let you do.
 
@@ -145,6 +146,7 @@ they hand a result back to JS by **scheduling a task**.
 <Figure
   slug="js-how-javascript-runs-inline-cutout"
   alt="A single worker at a bench with a queue of trays beside them, taking one tray at a time and never two at once"
+  caption="The event loop hands the single worker one queued job at a time."
 />
 
 A simplified picture:
@@ -169,7 +171,7 @@ repeat:
 
 That's the whole "event loop."
 
-- A **task** (macrotask) comes from `setTimeout`, `setInterval`,
+- A **task** (macrotask) comes from `setTimeout()`, `setInterval()`,
   I/O completions, UI events, etc.
 - A **microtask** comes from a Promise reaction (`.then`/`await`)
   or from `queueMicrotask`.
@@ -190,6 +192,7 @@ Try predicting the output *before* running.
 <Figure
   slug="js-how-javascript-runs-call-stack-inline-cutout"
   alt="A column of trays growing upward as each new job starts and coming apart from the top as each finishes"
+  caption="Each call stacks a frame on top, and returning takes it off again."
 />
 
 <CodeBlock
@@ -303,7 +306,7 @@ in that order?"* questions.
 
 - Code runs *to completion* on the stack before anything else runs.
 - Long sync work blocks *everything*.
-- `setTimeout` schedules a *task*; promises schedule *microtasks*.
+- `setTimeout()` schedules a *task*; promises schedule *microtasks*.
 - Microtasks run between tasks; many can run back-to-back.
 - The event loop alternates: drain microtasks → run one task → repeat.
 
@@ -369,7 +372,7 @@ the one B spawns), then tasks.
 <ChallengeCard
   adapter="javascript"
   title="Predict and produce"
-  instructions={`Write a function \`schedule(log)\` that, when called, uses \`setTimeout\` and \`Promise.resolve().then\` to push strings into \`log\` (an array) such that, after the event loop fully drains, \`log\` equals:
+  instructions={`Write a function \`schedule(log)\` that, when called, uses \`setTimeout()\` and \`Promise.resolve().then\` to push strings into \`log\` (an array) such that, after the event loop fully drains, \`log\` equals:
 
 \`["sync", "micro", "task"]\`
 
@@ -453,14 +456,14 @@ console.log("D");
 
 What does it print?
 
-*Hint: the two \`console.log\` calls are synchronous and run first; then ask which kind of callback the event loop drains first, a promise (microtask) or a \`setTimeout\` (task).*
+*Hint: the two \`console.log()\` calls are synchronous and run first; then ask which kind of callback the event loop drains first, a promise (microtask) or a \`setTimeout()\` (task).*
 
 - A D B C
-  > The two synchronous logs \`A\` and \`D\` are in the right place, but this assumes the \`setTimeout\` callback (\`B\`) runs before the promise callback (\`C\`). It's the other way around, microtasks run before tasks.
+  > The two synchronous logs \`A\` and \`D\` are in the right place, but this assumes the \`setTimeout()\` callback (\`B\`) runs before the promise callback (\`C\`). It's the other way around, microtasks run before tasks.
 - [o] A D C B
-  > \`A\` and \`D\` are synchronous and run first. When the stack empties, the event loop drains *microtasks* before tasks, so the promise callback \`C\` runs before the \`setTimeout\` callback \`B\`. Even though \`setTimeout\` is scheduled before the promise, microtasks always win against macrotasks.
+  > \`A\` and \`D\` are synchronous and run first. When the stack empties, the event loop drains *microtasks* before tasks, so the promise callback \`C\` runs before the \`setTimeout()\` callback \`B\`. Even though \`setTimeout()\` is scheduled before the promise, microtasks always win against macrotasks.
 - A B C D
-  > This would be the order if callbacks ran the instant they were scheduled. They don't: \`setTimeout\` and the promise \`.then\` are both deferred until the synchronous code finishes, so \`B\` and \`C\` cannot appear before \`D\`.
+  > This would be the order if callbacks ran the instant they were scheduled. They don't: \`setTimeout()\` and the promise \`.then\` are both deferred until the synchronous code finishes, so \`B\` and \`C\` cannot appear before \`D\`.
 - A C D B
   > This puts \`C\` before \`D\`, but \`D\` is synchronous and the promise callback \`C\` is a microtask, microtasks only run after all the synchronous code (including \`D\`) has finished.
 
