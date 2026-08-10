@@ -76,7 +76,7 @@ At twenty lines, that's an annoyance. At scale it becomes four
 compounding kinds of pain:
 
 ```mermaid
-flowchart TB
+flowchart LR
     A[Imperative code at scale] --> B[Mutable state]
     A --> C[Deeply nested loops]
     A --> D[Repetitive transformation logic]
@@ -393,7 +393,7 @@ to ordinary methods, and the pipeline executes in your process.
 provider walks and translates into another language entirely.
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph LinqToObjects[LINQ to Objects]
         Q1["<code>IEnumerable&lt;T&gt;</code>"] -->|"<code>Func&lt;T,bool&gt;</code>"| F1[Pipeline executes locally]
     end

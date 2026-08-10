@@ -144,7 +144,7 @@ from. It reduces hallucination, supplies up-to-date or private knowledge
 without retraining, and lets you cite sources.
 
 ```mermaid
-flowchart LR
+flowchart TD
   q["User query"] --> e["Embed query"]
   e --> s["Vector search over document store"]
   s --> c["Top-k relevant passages"]

@@ -55,7 +55,7 @@ Bloch, the architect of the Collections Framework: *"Does anyone
 actually use LinkedList? I wrote it, and I never use it."*
 
 ```mermaid
-flowchart TD
+flowchart LR
     subgraph AL[ArrayList - contiguous]
       direction LR
       A0[a0] --- A1[a1] --- A2[a2] --- A3[a3] --- A4[a4]
@@ -293,14 +293,14 @@ flowchart TD
 ## Test your understanding
 
 <MultipleChoice
-  markdown={`Why does \`ArrayList\` outperform \`LinkedList\` on iteration in practice, even though both are \`$O(n)$\`?
+  markdown={`Why does \`ArrayList\` outperform \`LinkedList\` on iteration in practice, even though both are $O(n)$?
 
 - \`LinkedList.iterator()\` allocates per element
   > It does not.
 - [o] \`ArrayList\` stores elements in a contiguous backing array, so a sequential walk is extremely cache-friendly; \`LinkedList\` follows pointers to scattered heap nodes
   > Cache behavior dominates Big-O for in-memory walks at modern CPU speeds.
-- \`ArrayList.iterator()\` is \`$O(\\log n)$\`
-  > Both are \`$O(n)$\` per \`next()\`.
+- \`ArrayList.iterator()\` is $O(\\log n)$
+  > Both are $O(n)$ per \`next()\`.
 - \`ArrayList\` parallelizes by default
   > It does not.`}
 />

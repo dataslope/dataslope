@@ -161,7 +161,7 @@ two-word summary of *every* opinion about software architecture
 ever written.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph H[High cohesion + Low coupling - good]
         A1[Order] --> A2["<code>OrderRepository</code>"]
         A1 --> A3["<code>PricingService</code>"]
@@ -173,6 +173,7 @@ flowchart LR
         B1 --- B5[HTTP]
         B1 --- B6[Auth]
     end
+    H ~~~ B
 ```
 
 ## Architecture is the *outline* of the code

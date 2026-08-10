@@ -89,7 +89,7 @@ Many-to-many relationships become their own table in a relational design.`}
 Each attribute belongs with the entity it describes.
 
 ```mermaid
-flowchart TD
+flowchart LR
     User["<code>users</code>"] --> Email["email"]
     User --> Display["<code>display_name</code>"]
     Post["<code>posts</code>"] --> Title["title"]

@@ -100,7 +100,7 @@ could write web servers, command-line tools, and build scripts in
 JavaScript, and share code between the browser and the server.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Before["Before Node.js (pre-2009)"]
         B1[JavaScript] --> B2[Only runs inside browsers]
     end
@@ -111,6 +111,7 @@ flowchart LR
         A1 --> A5[Build pipelines]
         A1 --> A6[Desktop apps, IoT, ...]
     end
+    Before ~~~ After
 ```
 
 Node.js brought a companion that mattered just as much: **npm**,

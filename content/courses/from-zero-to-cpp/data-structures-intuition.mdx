@@ -92,7 +92,7 @@ Use it for almost everything. The CPU loves contiguous memory.
 - Same as `unordered_map` but stores keys only.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Q[Need a key/value lookup?]
     Q -- "Iterate in order?" --> M["<code>std::map</code>"]
     Q -- "Don't care about order?" --> UM["<code>std::unordered_map</code>"]

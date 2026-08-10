@@ -93,7 +93,7 @@ training set. Every row gets to be in the test set exactly once.
 />
 
 ```mermaid
-flowchart TD
+flowchart LR
     D["Full training data"] --> S["Split into 5 equal folds"]
     S --> R1["Round 1: test on fold 1, train on folds 2-5"]
     S --> R2["Round 2: test on fold 2, train on folds 1,3,4,5"]

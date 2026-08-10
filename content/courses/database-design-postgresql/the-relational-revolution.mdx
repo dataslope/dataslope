@@ -64,13 +64,14 @@ they want, not *where to walk*. Every time you have joined two tables
 in this course by matching key values, you have used Codd's idea.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph nav["Navigational, 1960s"]
         P["Program follows pointers<br/>parent to child to sibling"]
     end
     subgraph rel["Relational, 1970"]
         Q["Program states a condition<br/>match rows by value"]
     end
+    nav ~~~ rel
     P -->|"physical layout changes, programs break"| X["Fragile"]
     Q -->|"physical layout changes, queries still work"| Y["Data independence"]
 ```

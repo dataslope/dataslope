@@ -20,7 +20,7 @@ Imagine tracking orders in a single flat table. Every row repeats
 the customer's name and email, and even the product's price:
 
 ```mermaid
-flowchart TB
+flowchart LR
     T["<code>orders_flat</code><br/><code>order_id</code> | <code>customer_name</code> | <code>customer_email</code> | product | price"]
     T --> R1["1 | Ada | ada@x.com | Book | 20"]
     T --> R2["2 | Ada | ada@x.com | Pen  | 3"]

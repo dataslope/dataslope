@@ -81,7 +81,7 @@ Inside each box are attributes. For example, `customers` has `id`,
 `placed_on`, and `status`.
 
 ```mermaid
-flowchart TB
+flowchart LR
     Entity["<code>orders</code>"] --> ID["id PK"]
     Entity --> CustomerID["<code>customer_id</code> FK"]
     Entity --> Placed["<code>placed_on</code>"]

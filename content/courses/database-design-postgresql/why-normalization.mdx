@@ -32,7 +32,7 @@ actually goes wrong.
 Imagine a shop stores orders in one flat table:
 
 ```mermaid
-flowchart TB
+flowchart LR
     T["<code>orders_flat<br/>order_id | customer_name | customer_email | product_name | product_price</code>"]
     T --> R1["1 | Ada | ada@<code>old.test</code> | Notebook | 8.00"]
     T --> R2["2 | Ada | ada@<code>old.test</code> | Pencil | 1.50"]

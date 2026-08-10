@@ -163,7 +163,7 @@ Once a database has real data and real application code, the schema is
 not just a diagram. Other things depend on it.
 
 ```mermaid
-flowchart TD
+flowchart LR
     Schema["Schema"] --> Data["Existing data"]
     Schema --> App["Application code"]
     Schema --> Queries["Reports and queries"]

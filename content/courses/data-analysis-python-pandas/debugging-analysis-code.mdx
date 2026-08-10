@@ -16,7 +16,7 @@ who catch their own bugs early."
 ## The taxonomy of analysis bugs
 
 ```mermaid
-flowchart TB
+flowchart LR
   B["Bug"] --> B1["Loud<br/>Code crashes,<br/>error printed"]
   B --> B2["Quiet<br/>Code runs,<br/>output is wrong"]
   B2 --> B2a["Wrong rows<br/>(bad filter)"]

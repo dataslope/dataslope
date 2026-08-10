@@ -36,7 +36,7 @@ conditions multiplied together.
 />
 
 ```mermaid
-flowchart LR
+flowchart TD
     TF["Term Frequency (TF)<br/>how often the word<br/>appears in THIS document"] --> M["× multiply"]
     IDF["Inverse Document Frequency (IDF)<br/>how RARE the word is<br/>across ALL documents"] --> M
     M --> S["TF-IDF score<br/>high = frequent here,<br/>rare elsewhere"]

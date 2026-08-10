@@ -17,7 +17,7 @@ datasets in seconds, no files required.
 ## Four ways data arrives
 
 ```mermaid
-flowchart TB
+flowchart LR
     A["Typed-in rows<br/>(VALUES)"] --> DB[("DuckDB")]
     B["Generated rows<br/>(range, <code>generate_series</code>)"] --> DB
     C["Files<br/>(CSV, Parquet)"] --> DB

@@ -389,7 +389,7 @@ route.
 ## Decision tree: which factorization?
 
 ```mermaid
-flowchart TB
+flowchart LR
     Q["Need to..."]
     Q --> Q1{"Solve A x = b?"}
     Q1 -- "A is SPD" --> CH[Cholesky]

@@ -59,7 +59,7 @@ one part of a composite key.
 Consider this 1NF table:
 
 ```mermaid
-flowchart TB
+flowchart LR
     T["<code>order_items_bad</code><br/><code>order_id</code> | <code>product_id</code> | <code>product_name</code> | quantity"]
     T --> R1["100 | 10 | Notebook | 2"]
     T --> R2["100 | 20 | Pencil | 5"]

@@ -33,7 +33,7 @@ install, nothing to configure, nothing to administer, and nothing
 else to blame.
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph CS["Client-server database"]
         A1["Application"] -->|"network connection"| S1[("Database server<br/>separate process")]
     end
@@ -123,7 +123,7 @@ games, phones, and test suites adopt SQLite so readily, and it
 keeps the mental model refreshingly small:
 
 ```mermaid
-flowchart TB
+flowchart LR
     A[("<code>app.db</code>")]
     A --> B["users table"]
     A --> C["orders table"]

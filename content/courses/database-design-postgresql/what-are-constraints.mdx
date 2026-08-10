@@ -60,7 +60,7 @@ If the rule exists only in one of those places, another path can forget
 it. If the rule exists in the schema, **every path** must obey it.
 
 ```mermaid
-flowchart TB
+flowchart LR
     Web["Web app"] --> DB["PostgreSQL<br/>schema constraints"]
     Mobile["Mobile app"] --> DB
     Import["Import job"] --> DB

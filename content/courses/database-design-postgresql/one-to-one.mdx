@@ -28,7 +28,7 @@ profile details. Some users have those details, many do not.
 />
 
 ```mermaid
-flowchart TB
+flowchart LR
     Wide["Wide users table<br/>id | email | <code>display_name</code> | bio | <code>avatar_url</code> | timezone | preferences"]
     Wide --> Sparse["Many optional columns are empty"]
     Wide --> Mixed["Login identity mixed with profile details"]

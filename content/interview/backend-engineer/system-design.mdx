@@ -185,7 +185,7 @@ writes, so a **cache** in front of the database handles most redirects. A
 stateless app tier behind a load balancer scales horizontally:
 
 ```mermaid
-flowchart LR
+flowchart TD
   U[Client] --> LB[Load Balancer]
   LB --> A1[App Server]
   LB --> A2[App Server]

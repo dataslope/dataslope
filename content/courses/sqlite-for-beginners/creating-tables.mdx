@@ -38,7 +38,7 @@ The `SELECT` returns no rows because the table is empty. That is still useful: i
 Read the statement as: *create a table called `books` with an integer `id`, text `title`, text `author`, and integer `year`.*
 
 ```mermaid
-flowchart TB
+flowchart LR
     S["<code>CREATE TABLE books</code>"] --> P["column list"]
     P --> C1["id INTEGER"]
     P --> C2["title TEXT"]
@@ -219,7 +219,7 @@ ORDER BY
 />
 
 ```mermaid
-flowchart TB
+flowchart LR
     T["movies table"] --> I["id INTEGER PRIMARY KEY"]
     T --> N["title TEXT NOT NULL"]
     T --> Y["<code>release_year</code> INTEGER"]

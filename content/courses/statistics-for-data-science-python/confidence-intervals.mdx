@@ -318,7 +318,7 @@ The interpretation trap has several flavors. Name each one so you can
 catch yourself.
 
 ```mermaid
-flowchart TD
+flowchart LR
   Q{"What is the claim<br/>actually about?"}
   Q -->|"this one interval"| W1["WRONG: 'P(mu is in this CI) = 95%'<br/>mu is fixed; no probability left"]
   Q -->|"individual data points"| W2["WRONG: '95% of the data is in here'<br/>that's roughly +/- 2 sd, not a CI"]

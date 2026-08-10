@@ -22,7 +22,7 @@ name, email address, signup date, and loyalty status. An order might
 have an order date, status, and total amount.
 
 ```mermaid
-flowchart TB
+flowchart LR
     Customer["Entity: customer"] --> Name["Attribute: name"]
     Customer --> Email["Attribute: email"]
     Customer --> Joined["Attribute: <code>joined_on</code>"]
@@ -46,7 +46,7 @@ rules such as `NOT NULL`, `CHECK`, and `UNIQUE`.
 />
 
 ```mermaid
-flowchart TB
+flowchart LR
     Status["Attribute: status"] --> Domain["Domain: allowed values"]
     Domain --> Pending["pending"]
     Domain --> Paid["paid"]

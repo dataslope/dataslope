@@ -25,7 +25,7 @@ data it depended on is actually ready. Airflow, Dagster, and Prefect model
 the **graph** and the **run history**, cron models neither.
 
 ```mermaid
-flowchart LR
+flowchart TD
   E[extract] --> T[transform]
   T --> Q{quality gate}
   Q -- pass --> L[load]

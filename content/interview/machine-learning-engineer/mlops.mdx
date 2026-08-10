@@ -88,7 +88,7 @@ on a holdout set before it advances; (5) **registry promotion**; (6) a
 triggered by code, data, or schedule changes.
 
 ```mermaid
-flowchart LR
+flowchart TD
   d["Validate data"] --> t["Train on versioned data"]
   t --> e["Evaluation gate: beat incumbent?"]
   e -->|yes| r["Register + promote"]
