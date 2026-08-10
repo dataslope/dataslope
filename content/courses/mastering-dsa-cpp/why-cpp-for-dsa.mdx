@@ -1,5 +1,5 @@
 ---
-title: Why C++ for DSA?
+title: Why C++ for Data Structures and Algorithms?
 description: Why C++ is a powerful language for data structures, algorithms, interviews, and performance-critical systems
 ---
 
@@ -7,7 +7,7 @@ When a game engine has 16 milliseconds to draw a frame, when a trading system me
 
 That second property is why this course uses it. C++ is not the easiest first language, but for learning **data structures and algorithms** it is both a practical tool and a microscope: you will solve problems efficiently while *seeing* how arrays, linked structures, heaps, hash tables, trees, and graphs really behave, where the bytes live, what a pointer costs, why two O(n) loops can differ by a factor of fifty.
 
-The language has been sharpening this dual nature for a long time. Bjarne Stroustrup began C++ at Bell Labs in 1979 as "C with Classes," wanting Simula's abstractions without giving up C's speed. And the Standard Template Library you will lean on throughout this course has its own origin story: Alexander Stepanov had spent years pursuing the idea of generic programming, algorithms written once, independent of the container they run on, and when his STL design was presented to the C++ standards committee in 1993, it was voted into the standard with unusual speed. Every `std::sort` and `std::vector` you call is that idea, industrialized.
+The language has been sharpening this dual nature for a long time. Bjarne Stroustrup began C++ at Bell Labs in 1979 as "C with Classes," wanting Simula's abstractions without giving up C's speed. And the Standard Template Library you will lean on throughout this course has its own origin story: Alexander Stepanov had spent years pursuing the idea of generic programming, algorithms written once, independent of the container they run on, and when his STL design was presented to the C++ standards committee in 1993, it was voted into the standard with unusual speed. Every `std::sort()` and `std::vector` you call is that idea, industrialized.
 
 <Figure
   slug="dsa-why-cpp-cutout"
@@ -25,7 +25,7 @@ C++ is compiled ahead of time to machine code. There is no interpreter in the ho
 | High-frequency trading | Microseconds matter, and pauses are unacceptable. |
 | Embedded systems | Memory and CPU budgets are small, sometimes with no operating system. |
 
-The program below sums a thousand integers with `std::accumulate`. It is short, but notice what is *absent*: no interpreter warming up, no garbage collector that might pause mid-loop. What you wrote is, more or less, what the CPU runs.
+The program below sums a thousand integers with `std::accumulate()`. It is short, but notice what is *absent*: no interpreter warming up, no garbage collector that might pause mid-loop. What you wrote is, more or less, what the CPU runs.
 
 <CodeBlock
   adapter="cpp"
@@ -68,7 +68,7 @@ The **Standard Template Library (STL)** gives you production-quality containers 
 | `std::stack` | LIFO adapter | push/pop/top O(1) |
 | `std::queue` | FIFO adapter | push/pop/front O(1) |
 
-Here is what that buys you in practice. Suppose you need to repeatedly grab the most urgent item from a changing pool of scores. With `std::priority_queue`, that is three lines, no heap implementation required (though you *will* implement one later in this course, and it will demystify what `push` and `top` actually do):
+Here is what that buys you in practice. Suppose you need to repeatedly grab the most urgent item from a changing pool of scores. With `std::priority_queue`, that is three lines, no heap implementation required (though you *will* implement one later in this course, and it will demystify what `push()` and `top()` actually do):
 
 <CodeBlock
   adapter="cpp"
@@ -141,6 +141,7 @@ Templates let you write algorithms once and let the compiler generate type-speci
 <Figure
   slug="dsa-why-cpp-for-dsa-speed-predictability-inline-cutout"
   alt="A machine with its cover off showing every gear exposed, a stopwatch beside it reading the same on each run"
+  caption="Nothing is hidden, so the cost of an operation is the cost you can see."
 />
 
 <CodeBlock
@@ -167,7 +168,7 @@ Try calling `bigger("heap", "graph")` without the `std::string` wrappers. It sti
 
 ## A small end-to-end example
 
-Here is a tiny program that pulls the pieces together: build a vector, sort it with `std::sort`, print the result, and time the sort with `<chrono>`. Measuring is a habit worth forming early, this course will keep asking you to check claims against the clock.
+Here is a tiny program that pulls the pieces together: build a vector, sort it with `std::sort()`, print the result, and time the sort with `<chrono>`. Measuring is a habit worth forming early, this course will keep asking you to check claims against the clock.
 
 <CodeBlock
   adapter="cpp"
@@ -228,7 +229,7 @@ flowchart TD
 
 ## Practice: use the STL
 
-Time to write some code yourself. Both challenges below need only what you have seen on this page, `std::sort` for the first, `std::priority_queue` for the second.
+Time to write some code yourself. Both challenges below need only what you have seen on this page, `std::sort()` for the first, `std::priority_queue` for the second.
 
 <ChallengeCard
   adapter="cpp"

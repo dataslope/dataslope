@@ -19,6 +19,7 @@ Merge sort divides the array in half, recursively sorts each half, then merges t
 <Figure
   slug="dsa-sorting-efficient-merge-sort-inline-cutout"
   alt="Two already-ordered rows being zipped into one longer ordered row by a hand taking the smaller head each time"
+  caption="Merging two sorted rows is one pass, which is what the recursion is for."
 />
 
 ```text
@@ -143,9 +144,9 @@ Why "O(n log n) on average but O(n²) worst case"? Everything depends on the piv
 Naive quicksort can degrade to O(n^2). Random pivots and median-of-three pivots reduce the chance of consistently bad partitions, and make it hard for an adversary to construct a killer input on purpose.
 </Callout>
 
-## `std::sort`
+## `std::sort()`
 
-So which do you actually use? Neither, directly: `std::sort`. In 1997 David Musser proposed *introsort* ("introspective sort"), the hybrid most C++ standard libraries adopted: run quicksort for speed, but track recursion depth, and if it exceeds about 2·log n, the signature of bad pivots, switch to heapsort, which guarantees O(n log n). Tiny sub-ranges go to insertion sort. The result is quicksort's average speed with merge-sort-class worst-case insurance, which is why `std::sort` is the right default unless you specifically need stability.
+So which do you actually use? Neither, directly: `std::sort()`. In 1997 David Musser proposed *introsort* ("introspective sort"), the hybrid most C++ standard libraries adopted: run quicksort for speed, but track recursion depth, and if it exceeds about 2·log n, the signature of bad pivots, switch to heapsort, which guarantees O(n log n). Tiny sub-ranges go to insertion sort. The result is quicksort's average speed with merge-sort-class worst-case insurance, which is why `std::sort()` is the right default unless you specifically need stability.
 
 ```mermaid
 flowchart TD
@@ -360,7 +361,7 @@ int main() {
 />
 
 <MultipleChoice
-  markdown={`What strategy does \`std::sort\` commonly use in modern C++ implementations?
+  markdown={`What strategy does \`std::sort()\` commonly use in modern C++ implementations?
 
 - [o] Introsort: quicksort-style partitioning with safeguards and small-range optimizations
   > It combines speed with fallback protection.

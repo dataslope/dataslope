@@ -1,6 +1,6 @@
 ---
 title: Union-Find (Disjoint Set Union)
-description: Learn DSU find and unite operations, path compression, union by rank, connected components, cycle detection, and Kruskal's MST in C++
+description: Learn the disjoint-set find and unite operations, path compression, union by rank, connected components, cycle detection, and Kruskal's minimum spanning tree in C++
 ---
 
 Picture a data center being cabled up, one link at a time. After every new cable, someone asks: "can machine 4051 reach machine 17?" You could re-run BFS after each cable, O(V + E) per question, brutal at scale. But notice how little the question actually needs: not the path, not the distance, just *are they in the same connected group?* Groups only ever **merge** (cables are added, never cut), so what we need is a structure that tracks a collection of disjoint groups under exactly two operations:
@@ -31,11 +31,12 @@ If `find(2)` reaches root `0`, then `2` belongs to the set represented by `0`.
 
 ## Naive implementation
 
-A basic DSU stores a parent array. `find` walks up to the root. Without optimizations, a tree can become a long chain, making `find` O(n).
+A basic DSU stores a parent array. `find()` walks up to the root. Without optimizations, a tree can become a long chain, making `find()` O(n).
 
 <Figure
   slug="dsa-union-find-parent-trees-inline-cutout"
   alt="Several small frames each with one block at the top, two frames being joined by pinning one top block under another"
+  caption="Each set is a tree, and union pins one root under the other."
 />
 
 <CodeBlock
@@ -83,7 +84,7 @@ int main() {
 
 ## Path compression
 
-The first fix is gloriously lazy. Since `find(x)` has to walk all the way to the root anyway, why not make every node it passes point *directly* to the root on the way back? That is **path compression**: one recursive line, and every future `find` through those nodes is a single hop. The tree flattens itself as a side effect of being used.
+The first fix is gloriously lazy. Since `find(x)` has to walk all the way to the root anyway, why not make every node it passes point *directly* to the root on the way back? That is **path compression**: one recursive line, and every future `find()` through those nodes is a single hop. The tree flattens itself as a side effect of being used.
 
 ```mermaid
 graph TD

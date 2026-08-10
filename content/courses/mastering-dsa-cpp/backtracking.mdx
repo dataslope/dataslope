@@ -3,7 +3,7 @@ title: Backtracking
 description: Learn choose-explore-unchoose search, pruning, and classic backtracking problems in C++
 ---
 
-Some problems offer no clever shortcut. No greedy rule finds all valid Sudoku grids; no DP table enumerates every permutation. When the answer genuinely requires *searching* a space of possibilities, the question becomes: how do you search exhaustively without being stupid about it?
+Some problems offer no clever shortcut. No greedy rule finds all valid Sudoku grids; no dynamic-programming table enumerates every permutation. When the answer genuinely requires *searching* a space of possibilities, the question becomes: how do you search exhaustively without being stupid about it?
 
 Backtracking is the disciplined answer. Build a candidate solution one choice at a time; the moment the partial candidate cannot possibly be completed into a valid solution, abandon it, *prune the branch*, and undo the last choice to try the next option. The name "backtrack" was coined by the American mathematician D. H. Lehmer in the 1950s, but the method is older than the term: it is Trémaux's maze strategy from the graph chapter, applied to a maze of *decisions* instead of corridors. The template never changes:
 
@@ -78,6 +78,7 @@ For subsets, each element poses a yes/no question, in or out?, giving 2^n subset
 <Figure
   slug="dsa-backtracking-subsets-inline-cutout"
   alt="A branching frame where each fork is a block taken or left, the leaves holding every combination"
+  caption="Every element is taken or left, and the leaves are all the combinations."
 />
 
 <CodeBlock
@@ -144,6 +145,7 @@ The aristocrat of backtracking puzzles: place n queens on an n×n chessboard so 
 <Figure
   slug="dsa-backtracking-inline-cutout"
   alt="A maze of low walls with a route drawn to a dead end, that stretch rubbed out, and the route resumed from the last junction"
+  caption="Walk until it fails, undo the last choice, and carry on from the junction."
 />
 
 The setup does most of the work. Place one queen per row, so the only choice per level is the column; then attacks reduce to three constraint arrays, columns, and the two diagonal directions, where `r - c` is constant on one diagonal family and `r + c` on the other. A placement is legal only if all three slots are free; mark them (choose), recurse to the next row (explore), unmark them (un-choose).
@@ -239,6 +241,7 @@ Backtracking on a grid: does the word `ABCCED` appear as a path of adjacent cell
 <Figure
   slug="dsa-backtracking-permutations-inline-cutout"
   alt="A branching frame where every branch orders the same three blocks differently"
+  caption="Each branch fixes one more position, so the leaves are all the orderings."
 />
 
 <CodeBlock

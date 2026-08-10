@@ -36,6 +36,7 @@ The leap of faith explains how to *write* recursion; the call stack explains how
 <Figure
   slug="dsa-recursion-call-stack-inline-cutout"
   alt="A column of trays growing as each nested job starts and unstacking from the top as each returns"
+  caption="Each call stacks a frame, and returning unwinds them in reverse."
 />
 
 ```mermaid
@@ -201,6 +202,7 @@ Every frame costs memory, and the stack region is finite, typically a few megaby
 <Figure
   slug="dsa-recursion-inline-cutout"
   alt="A set of nested boxes opened one inside another down to a tiny solid one, and the stack closing back up in reverse"
+  caption="Recursion needs a base case, or the stack runs out before the work does."
 />
 
 Tail recursion means the recursive call is the very last action, nothing is pending after it returns. In `factorialTail` below, the running product travels *down* the recursion in the `acc` parameter instead of being multiplied on the way back up. Because no frame has unfinished work, a compiler *may* reuse the current frame for the next call, turning the recursion into a loop. Clang often does; but C++ (unlike Scheme) does not guarantee it, so never bet a deep recursion's correctness on the optimizer's mood.

@@ -73,7 +73,7 @@ int main() {
 
 ## Common operations
 
-`find` returns the index of a match, or `std::string::npos` when no match exists. `substr(pos, count)` copies a substring. `replace` modifies a range.
+`find()` returns the index of a match, or `std::string::npos` when no match exists. `substr(pos, count)` copies a substring. `replace` modifies a range.
 
 <CodeBlock
   adapter="cpp"
@@ -106,7 +106,7 @@ int main() {
 
 ## Concatenation
 
-`+` creates a brand-new string each time; `+=` appends in place, reusing spare capacity exactly like `push_back` on a vector. Inside a loop the difference compounds: building an n-character string with repeated `s = s + part` copies the whole prefix every iteration, O(n²), while `s += part` stays amortized O(n). Same output, very different bill.
+`+` creates a brand-new string each time; `+=` appends in place, reusing spare capacity exactly like `push_back()` on a vector. Inside a loop the difference compounds: building an n-character string with repeated `s = s + part` copies the whole prefix every iteration, O(n²), while `s += part` stays amortized O(n). Same output, very different bill.
 
 <CodeBlock
   adapter="cpp"
@@ -140,6 +140,7 @@ Before `std::string`, there was the C-string: a bare character array with no len
 <Figure
   slug="dsa-strings-inline-cutout"
   alt="A ribbon of letter tiles with a small marker at its end showing where the ribbon stops"
+  caption="A C-string ends at the null terminator, and nothing records its length."
 />
 
 `std::string` fixes this by storing its length explicitly, `size()` is O(1), not a scan, but C-strings still surround you: every string literal like `"hello"` is one, and many operating system APIs speak nothing else. So you need the two conversion moves: a literal can initialize a `std::string` directly, and `.c_str()` hands back a null-terminated pointer view for C-style APIs.
@@ -209,11 +210,12 @@ flowchart TD
 
 ## Splitting by a delimiter
 
-A simple split helper repeatedly calls `find` and `substr`. This is a useful pattern for parsing CSV-like toy inputs and interview strings.
+A simple split helper repeatedly calls `find()` and `substr()`. This is a useful pattern for parsing CSV-like toy inputs and interview strings.
 
 <Figure
   slug="dsa-strings-creating-reading-strings-inline-cutout"
   alt="A ribbon of tiles being clamped at both ends and then read left to right by a marker"
+  caption="`std::string` knows its own length and manages its own storage."
 />
 
 <CodeBlock
@@ -414,12 +416,12 @@ int main() {
 <MultipleChoice
   markdown={`What does \`s.substr(pos, count)\` return for a \`std::string s\`?
 
-- [o] A new string containing up to \`count\` characters starting at \`pos\`.
+- [o] A new string containing up to \`count()\` characters starting at \`pos\`.
   > The result owns its copied characters.
 - The number of characters after \`pos\`.
-  > That would be a length calculation, not \`substr\`.
+  > That would be a length calculation, not \`substr()\`.
 - A pointer into the original string that can mutate it.
-  > \`substr\` returns a string object, not a mutable pointer.
+  > \`substr()\` returns a string object, not a mutable pointer.
 - A boolean indicating whether the substring exists.
-  > Search functions such as \`find\` are used for that.`}
+  > Search functions such as \`find()\` are used for that.`}
 />

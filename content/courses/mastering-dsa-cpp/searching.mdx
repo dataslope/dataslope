@@ -50,6 +50,7 @@ Binary search only works on sorted data. It maintains an interval `[low, high]` 
 <Figure
   slug="dsa-searching-linear-search-inline-cutout"
   alt="A hand walking a row of blocks one at a time from the left"
+  caption="Linear search checks every element; binary search halves the field each time."
 />
 
 O(n) against O(log n) is a pair of symbols until you put numbers on it. On a
@@ -129,7 +130,7 @@ int main() {
   ]}
 />
 
-* `std::binary_search` returns `true` or `false`.
+* `std::binary_search()` returns `true` or `false`.
 * `std::lower_bound` returns an iterator to the first element `>= target`.
 * `std::upper_bound` returns an iterator to the first element `> target`.
 
@@ -187,7 +188,7 @@ int main() {
   ]}
 />
 
-The insert position is the first index where the target could be placed while keeping the vector sorted. It is exactly what `lower_bound` computes.
+The insert position is the first index where the target could be placed while keeping the vector sorted. It is exactly what `lower_bound()` computes.
 
 <CodeBlock
   adapter="cpp"
@@ -351,7 +352,7 @@ int main() {
 - The first element strictly greater than \`x\`.
   > That is \`std::upper_bound\`.
 - A boolean indicating whether \`x\` exists.
-  > That is \`std::binary_search\`.
+  > That is \`std::binary_search()\`.
 - The last occurrence of \`x\`.
   > It returns the insertion position before equal values.
 - [o] An iterator to the first element not less than \`x\`.
