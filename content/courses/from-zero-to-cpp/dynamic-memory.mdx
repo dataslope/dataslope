@@ -183,6 +183,7 @@ including exception paths. That is fragile.
 <Figure
   slug="cpp-dynamic-memory-inline-cutout"
   alt="A yard where a crate is requested from a counter, used at a bench, and returned to the counter when finished"
+  caption="Every `new` needs its matching `delete`, on every path out of the function."
 />
 
 Modern C++ flips the model around: instead of writing `new` and
@@ -381,13 +382,13 @@ int main() {
 <MultipleChoice
   markdown={`Which of the following is the *modern* way to manage a single heap-allocated object?
 
-- Use \`malloc\`/\`free\`.
+- Use \`malloc()\`/\`free()\`.
   > Those are C functions; they don't construct C++ objects.
 - Allocate it on the stack with \`new\` followed by no \`delete\`.
   > \`new\` does not allocate on the stack.
 - Call \`new\` and remember to \`delete\` it on every code path.
   > That is the raw, error-prone style this chapter warns against.
-- [o] Use \`std::unique_ptr\` (often via \`std::make_unique\`); its destructor frees the object automatically.
+- [o] Use \`std::unique_ptr\` (often via \`std::make_unique()\`); its destructor frees the object automatically.
   > This applies the RAII pattern and removes the need for manual \`delete\`.`}
 />
 
@@ -398,4 +399,5 @@ again.
 <Figure
   slug="cpp-dynamic-memory-stack-vs-heap-inline-cutout"
   alt="A neat column of trays beside an open yard of crates, one cord running between them"
+  caption="The stack cleans up after itself; the heap does exactly what you tell it."
 />

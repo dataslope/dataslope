@@ -170,6 +170,7 @@ You've been using RAII the whole course without naming it.
 <Figure
   slug="cpp-raii-and-resources-inline-cutout"
   alt="A door that opens as a figure steps through and swings shut behind them on its own spring, a lamp inside switching off with it"
+  caption="Acquire on the way in, release on the way out, automatically."
 />
 
 - `std::vector` owns its heap buffer. When the vector dies, the
@@ -197,6 +198,7 @@ RAII wrappers, where the language can enforce correctness.
 <Figure
   slug="cpp-raii-and-resources-resource-inline-cutout"
   alt="A tap, a drawer and a cord end laid together on a bench, each with a small clasp that must be closed again"
+  caption="Anything that must be closed again is a resource, whatever it is called."
 />
 
 ## Challenge: see RAII run

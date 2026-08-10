@@ -84,6 +84,7 @@ When the count hits zero, the object is deleted.
 <Figure
   slug="cpp-smart-pointers-std-unique-ptr-inline-cutout"
   alt="A crate with a single handle that only one pair of hands can hold at a time"
+  caption="`unique_ptr` allows exactly one owner, and moving is how ownership travels."
 />
 
 <CodeBlock
@@ -189,6 +190,7 @@ in smart pointers is almost always wrong.
 <Figure
   slug="cpp-smart-pointers-inline-cutout"
   alt="A crate carried by a handle that unclips itself, the crate dropping neatly into a return chute the moment the last hand lets go"
+  caption="The pointer frees what it owns the moment the last owner lets go."
 />
 
 Use smart pointers when you have a single *polymorphic* object whose
@@ -200,7 +202,7 @@ in a heterogeneous container.
 <ChallengeCard
   adapter="cpp"
   title="A unique owner"
-  instructions={`Replace the raw \`new\`/\`delete\` in the provided \`main\` with \`std::make_unique\` and \`std::unique_ptr\`. The behaviour and output must be unchanged: prints \`Widget 1 created\`, then \`123\`, then \`Widget 1 destroyed\`, each on its own line.`}
+  instructions={`Replace the raw \`new\`/\`delete\` in the provided \`main\` with \`std::make_unique()\` and \`std::unique_ptr\`. The behaviour and output must be unchanged: prints \`Widget 1 created\`, then \`123\`, then \`Widget 1 destroyed\`, each on its own line.`}
   files={[
     {
       filename: "main.cpp",

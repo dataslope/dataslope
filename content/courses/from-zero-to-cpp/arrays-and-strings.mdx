@@ -73,6 +73,7 @@ algorithms.
 <Figure
   slug="cpp-arrays-and-strings-std-array-t-inline-cutout"
   alt="A fixed strip of cells inside a rigid frame with stop blocks fitted at both ends"
+  caption="`std::array` remembers its own size, which a raw array never does."
 />
 
 <CodeBlock
@@ -146,7 +147,7 @@ A vector owns three things internally: a pointer to its heap buffer,
 its current size (how many elements you've put in), and its capacity
 (how many it could hold before having to reallocate).
 
-`push_back` is cheap *on average* because the vector doubles its
+`push_back()` is cheap *on average* because the vector doubles its
 capacity when it runs out of room. Occasional growth is expensive
 (it has to copy/move everything), but amortized over many pushes the
 cost per element stays constant.
@@ -213,11 +214,12 @@ shorter and harder to get wrong.
 <Figure
   slug="cpp-arrays-and-strings-raw-c-arrays-inline-cutout"
   alt="A fixed strip of cells with no guard at either end, a marker resting just past the final cell"
+  caption="A raw array has no guard at either end, so overrunning it is silent."
 />
 
 > **Indexing safety.** `v[i]` does *not* bounds-check. `v.at(i)`
 > throws `std::out_of_range` if `i` is invalid. In tight loops use
-> `[]`; in code that handles untrusted input, prefer `at`.
+> `[]`; in code that handles untrusted input, prefer `at()`.
 
 ## Two-dimensional data
 
@@ -357,7 +359,7 @@ int main() {
 />
 
 <MultipleChoice
-  markdown={`Why is \`push_back\` on a \`std::vector\` considered O(1) *amortized*?
+  markdown={`Why is \`push_back()\` on a \`std::vector\` considered O(1) *amortized*?
 
 - It is O(log n).
   > Logarithmic growth would make growth too slow; vectors double (or similar).
@@ -373,7 +375,7 @@ int main() {
   markdown={`What does \`v.at(i)\` do that \`v[i]\` does not?
 
 - [o] It checks the index against the vector's size and throws \`std::out_of_range\` if it is invalid; \`[]\` performs no such check.
-  > Use \`at\` when handling unvalidated input.
+  > Use \`at()\` when handling unvalidated input.
 - It allocates new storage.
   > Neither does.
 - It is significantly faster.
@@ -388,4 +390,5 @@ type, *structs* and aggregates.
 <Figure
   slug="cpp-arrays-and-strings-inline-cutout"
   alt="A fixed strip of cells holding blocks beside a fixed strip of letter tiles ending in a small stop mark"
+  caption="A string is an array of characters that manages its own storage."
 />
