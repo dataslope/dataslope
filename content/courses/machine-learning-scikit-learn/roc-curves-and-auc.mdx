@@ -1,14 +1,15 @@
 ---
-title: ROC Curves and AUC
-description: Precision and recall judge a classifier at one threshold. ROC curves judge it at every threshold at once, and AUC boils that into a single, threshold-free score.
+title: ROC Curves and the Area Under Them
+description: Precision and recall judge a classifier at one threshold. ROC curves judge it at every threshold at once, and the area under the curve boils that into a single, threshold-free score.
 ---
 
 In the last chapter we saw that a classifier's precision and recall depend
 on where you put the decision threshold. That raises an awkward question:
 if the threshold changes everything, how do you judge the *model itself*,
-separate from any one operating point? The **ROC curve** answers by
-evaluating the model at *every* threshold simultaneously, and **AUC**
-summarizes the whole picture in one number.
+separate from any one operating point? The **ROC curve** (for receiver
+operating characteristic, a name inherited from wartime radar) answers by
+evaluating the model at *every* threshold simultaneously, and the **area
+under that curve**, AUC, summarizes the whole picture in one number.
 
 <Figure
   slug="ml-roc-auc-cutout"
@@ -27,6 +28,7 @@ $$
 <Figure
   slug="ml-roc-curves-and-auc-two-rates-move-inline-cutout"
   alt="One dial turned through its range with two gauges beside it moving in opposite directions"
+  caption="Loosen the threshold and you catch more positives but raise more false alarms."
 />
 
 $$
@@ -51,6 +53,7 @@ point on the curve.
 <Figure
   slug="ml-roc-curves-and-auc-roc-curve-inline-cutout"
   alt="A dial turned through its range with a curve tracing out beside it and the area beneath shaded"
+  caption="The curve is every threshold at once, and the shaded area summarises it."
 />
 
 One curve on its own is hard to judge, because every ROC curve bows the same
@@ -67,8 +70,8 @@ flowchart TD
 ```
 
 Let us draw a real one on the **penguins** dataset, posing the clean binary
-question Adelie vs. Gentoo. `roc_curve` returns the FPR and TPR at every
-useful threshold; `roc_auc_score` returns the area underneath.
+question Adelie vs. Gentoo. `roc_curve()` returns the FPR and TPR at every
+useful threshold; `roc_auc_score()` returns the area underneath.
 
 <CodeBlock
   adapter="python"
@@ -126,7 +129,7 @@ How to read the picture:
 <Callout type="info" title="Why ROC needs probabilities, not classes">
 You cannot draw an ROC curve from a single set of 0/1 predictions, those
 already baked in one threshold. ROC needs the model's underlying scores
-(`predict_proba` or `decision_function`) so it can re-threshold them at many
+(`predict_proba()` or `decision_function`) so it can re-threshold them at many
 cutoffs. If a model only gives hard labels, it gets a single point, not a
 curve.
 </Callout>
@@ -296,6 +299,7 @@ matter.
 <Figure
   slug="ml-roc-curves-and-auc-inline-cutout"
   alt="A dial being turned through its range on the left, and on the right a curve tracing out as it turns, with the area under that curve shaded"
+  caption="A model that ranks well can still be thresholded badly for your problem."
 />
 
 ## Real-world applications
@@ -321,7 +325,7 @@ the test set.
 
 1. For each fitted model, get the positive-class probabilities with
    \`model.predict_proba(X_test)[:, 1]\`.
-2. Compute \`auc_logreg\` and \`auc_tree\` with \`roc_auc_score\`.
+2. Compute \`auc_logreg\` and \`auc_tree\` with \`roc_auc_score()\`.
 3. Set \`better\` to the string \`"logreg"\` or \`"tree"\`, whichever has the
    higher AUC.
 
@@ -441,13 +445,13 @@ AUC of 0.5 is the "coin flip" baseline; useful models sit well above it.`}
   markdown={`Why can you **not** compute an ROC curve from a model's hard 0/1 predictions alone?
 
 - scikit-learn forbids it
-  > scikit-learn does not forbid it, but \`roc_curve\` expects scores or probabilities, not hard 0/1 predictions. Passing hard labels simply gives a single (FPR, TPR) point, not a curve.
+  > scikit-learn does not forbid it, but \`roc_curve()\` expects scores or probabilities, not hard 0/1 predictions. Passing hard labels simply gives a single (FPR, TPR) point, not a curve.
 - ROC curves only work for balanced data
   > ROC curves can be computed regardless of class balance, though on heavily imbalanced data the precision-recall curve is often more informative. The technical requirement is scores, not balanced classes.
 - ROC curves require regression outputs
   > ROC curves are specifically designed for classifiers, not regression models. They need the classifier's probability scores or decision function values, not regression predictions.
 - [o] Hard predictions have already fixed a single threshold; ROC needs the underlying scores or probabilities to re-threshold at many cutoffs
-  > A single set of 0/1 labels gives just one (FPR, TPR) point. The curve requires \`predict_proba\` or \`decision_function\` so the threshold can be swept.
+  > A single set of 0/1 labels gives just one (FPR, TPR) point. The curve requires \`predict_proba()\` or \`decision_function\` so the threshold can be swept.
 
 ROC analysis is inherently about varying the threshold, which needs continuous scores.`}
 />

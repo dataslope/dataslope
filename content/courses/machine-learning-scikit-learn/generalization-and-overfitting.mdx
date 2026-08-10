@@ -26,6 +26,7 @@ latched onto quirks of the sample that will not repeat.
 <Figure
   slug="ml-generalization-and-overfitting-generalization-really-means-inline-cutout"
   alt="A shape fitted to a set of chips and then tested against a fresh set it has never seen"
+  caption="Generalisation is measured on data the model has never been shown."
 />
 
 ```mermaid
@@ -58,6 +59,7 @@ almost anywhere (very flexible).
 <Figure
   slug="ml-generalization-and-overfitting-seeing-both-failures-inline-cutout"
   alt="A line threading through every chip on the left and a straight rod ignoring them all on the right"
+  caption="Too flexible chases the noise; too rigid misses the pattern altogether."
 />
 
 We use *synthetic* data here on purpose: overfitting is defined as fitting
@@ -282,6 +284,7 @@ levelled off high mean the model is too simple.
 <Figure
   slug="ml-generalization-and-overfitting-inline-cutout"
   alt="Two boards side by side, the left with a line threading through every single point, the right with a smooth line passing near them, and a fresh point landing far from the left line"
+  caption="The curve that fits every training point is the one a new point defeats."
 />
 
 <Chart slug="learning-curve" />

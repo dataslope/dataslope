@@ -23,6 +23,7 @@ usually right.
 <Figure
   slug="ml-common-pitfalls-and-misconceptions-data-leakage-inline-cutout"
   alt="A sealed test crate with a small pipe running into it from the training bench, a chip travelling along the pipe"
+  caption="Leakage is any pipe that carries test information back into training."
 />
 
 ```mermaid
@@ -122,6 +123,7 @@ trained on, and treating that as its performance.
 <Figure
   slug="ml-common-pitfalls-and-misconceptions-b-evaluating-on-inline-cutout"
   alt="A machine being tested with the very blocks that were used to build it, its gauge pinned at full"
+  caption="Scoring on the training rows measures memory, not the ability to generalise."
 />
 
 **Why it fools people.** The number is always flattering, sometimes a
@@ -180,6 +182,7 @@ often the *only* class you care about.
 <Figure
   slug="ml-common-pitfalls-and-misconceptions-c-ignoring-class-inline-cutout"
   alt="A balance with ninety-nine chips on one pan and one on the other, a gauge beside it still reading high"
+  caption="When one class is rare, a high score can hide a model that ignores it."
 />
 
 **Why it fools people.** Accuracy is intuitive and usually trustworthy, so
@@ -312,7 +315,7 @@ print("Which one do you report? With a fixed random_state, there is one answer."
   ]}
 />
 
-**The fix.** Set `random_state` (and `np.random.seed` where relevant) on
+**The fix.** Set `random_state` (and `np.random.seed()` where relevant) on
 every component that has one: the split, the model, the search. Reproducible
 results are the bedrock of honest comparison and of anyone being able to
 reproduce your work, including future you.
@@ -619,7 +622,7 @@ is already fitted for you as \`model\`, and its predictions are in
 \`pred\`. The labels are in \`y\`.
 
 1. Compute the plain accuracy of \`pred\` against \`y\` and store it in
-   \`acc\` (use \`accuracy_score\`).
+   \`acc\` (use \`accuracy_score()\`).
 2. Compute the **recall on defaults** (the \`True\` class) and store it in
    \`rare_recall\` (use \`recall_score(y, pred, pos_label=True)\`).
 

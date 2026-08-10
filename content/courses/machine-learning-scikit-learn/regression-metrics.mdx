@@ -1,5 +1,5 @@
 ---
-title: "Regression Metrics: MAE, MSE, RMSE, R²"
+title: "Regression Metrics: Absolute, Squared, and Explained Error"
 description: A model predicts numbers, but how wrong is it, and does "wrong" mean a few big misses or many small ones? Choosing and reading the right error metric is a skill in itself.
 ---
 
@@ -23,6 +23,7 @@ between actual and predicted values, one per example.
 <Figure
   slug="ml-regression-metrics-inline-cutout"
   alt="A straight rod laid through a cloud of chips with short vertical sticks measuring each chip's distance to the rod"
+  caption="Every regression metric is built from these gaps between actual and predicted."
 />
 
 ```mermaid
@@ -74,6 +75,7 @@ direction: take the absolute value of each residual and average them.
 <Figure
   slug="ml-regression-metrics-mae-mean-absolute-inline-cutout"
   alt="Short vertical sticks measuring each chip's distance to a rod, all sticks laid end to end and halved"
+  caption="Mean absolute error averages the gaps, treating every mistake alike."
 />
 
 $$
@@ -155,6 +157,7 @@ keeps MSE's heavy penalty on large errors.
 <Figure
   slug="ml-regression-metrics-mse-mean-squared-inline-cutout"
   alt="Sticks measuring chip distances to a rod, each stick redrawn as a square of its own length"
+  caption="Squaring makes one large error count for more than several small ones."
 />
 
 $$

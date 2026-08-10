@@ -72,6 +72,7 @@ $$
 <Figure
   slug="ml-data-preprocessing-standardscaler-turning-features-inline-cutout"
   alt="Two rules of very different lengths passing through a press and leaving the same length"
+  caption="Standardising puts every feature on one scale, so none dominates by units."
 />
 
 If you have run a hypothesis test, you have seen this exact formula, it is
@@ -125,13 +126,13 @@ The columns are now directly comparable.
 
 Notice the two-step shape: `scaler.fit(...)` **learns** the mean and
 standard deviation of each column, and `scaler.transform(...)` **applies**
-them. `fit_transform` just does both in one call. That `fit`/`transform`
+them. `fit_transform()` just does both in one call. That `fit()`/`transform()`
 split is not a stylistic detail, it is the whole game, as we are about to
 see.
 
 <Callout type="tip" title="fit learns, transform applies">
-`fit` is where a transformer *looks at data and remembers something* (here,
-each column's mean and standard deviation). `transform` *uses* what was
+`fit()` is where a transformer *looks at data and remembers something* (here,
+each column's mean and standard deviation). `transform()` *uses* what was
 remembered to change data. Every scikit-learn transformer follows this
 pattern, and keeping the two mentally separate is the key to avoiding the
 mistake in the next section.
@@ -147,6 +148,7 @@ split so the comparison is fair.
 <Figure
   slug="ml-data-preprocessing-problem-scaling-solves-inline-cutout"
   alt="Two measuring rules of wildly different lengths feeding one balance, the balance tipped hard by the longer"
+  caption="A distance-based model is dominated by whichever feature has the widest range."
 />
 
 <CodeBlock
@@ -216,7 +218,8 @@ flowchart TD
   scikit-learn's `LogisticRegression`) penalize the size of the weights;
   that penalty is only fair if features share a scale. Gradient descent
   also converges faster on scaled inputs.
-- **K-Means** clustering and **PCA** are built on distances and variances,
+- **K-Means** clustering and **principal component analysis** are built on
+  distances and variances,
   so they are highly scale-sensitive too. (More on these in the clustering
   pages.)
 
@@ -242,7 +245,7 @@ logistic regression than for forests.
 ## The leakage rule: fit on TRAIN only
 
 Here is the most important idea on this page, and the one beginners get
-wrong most often. The scaler **learns** something from data when you `fit`
+wrong most often. The scaler **learns** something from data when you `fit()`
 it: each column's mean and standard deviation. Those statistics must come
 from the **training set only**. If you compute them using the test set too,
 information about the test set has leaked into your training process, and
@@ -252,6 +255,7 @@ unseen data.
 <Figure
   slug="ml-data-preprocessing-inline-cutout"
   alt="Raw blocks passing through a washing, trimming and gauging line before reaching the machine at the end of the bench"
+  caption="Preprocessing is fitted on the training rows only, then applied to both."
 />
 
 Think back to the train/test split page: the whole point of a test set is
@@ -344,9 +348,9 @@ what you learned at training time. Doing it this way means your test score
 faithfully simulates that reality.
 
 <Callout type="danger" title="Fit the scaler on train only, always">
-The rule has no exceptions for ordinary tabular modeling: **`fit` every
-preprocessing step on the training set, then `transform` both the training
-and test sets with it.** Calling `fit_transform` on the full dataset before
+The rule has no exceptions for ordinary tabular modeling: **`fit()` every
+preprocessing step on the training set, then `transform()` both the training
+and test sets with it.** Calling `fit_transform()` on the full dataset before
 splitting is the classic leakage bug. It inflates your test score, so you
 ship a model that looks great in evaluation and underperforms in
 production. The gap is often small enough to miss and large enough to
@@ -600,7 +604,7 @@ The z-score is the same transform you use in hypothesis testing, applied indepen
 />
 
 <MultipleChoice
-  markdown={`You scale the entire dataset with \`fit_transform\`, *then* call \`train_test_split\`. What is wrong with this?
+  markdown={`You scale the entire dataset with \`fit_transform()\`, *then* call \`train_test_split()\`. What is wrong with this?
 
 - It will raise an error at fit time
   > It runs without error, which is exactly why the bug is easy to miss.
@@ -609,7 +613,7 @@ The z-score is the same transform you use in hypothesis testing, applied indepen
 - [o] The scaler's mean and standard deviation are computed using the test rows too, so information from the test set leaks into training and inflates the test score
   > Because the test rows helped compute the scaling statistics, the test set is no longer truly unseen, and its score becomes optimistic.
 - Nothing, scaling order does not matter
-  > Order matters precisely because \`fit\` learns statistics from the data it sees. Fitting before the split lets those statistics see the test rows.
+  > Order matters precisely because \`fit()\` learns statistics from the data it sees. Fitting before the split lets those statistics see the test rows.
 
 The correct order is split first, fit the scaler on the training set, then transform both halves.`}
 />

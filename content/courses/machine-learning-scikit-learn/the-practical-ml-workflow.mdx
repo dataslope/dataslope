@@ -25,6 +25,7 @@ end to end on a real dataset.
 <Figure
   slug="ml-the-practical-ml-workflow-workflow-at-glance-inline-cutout"
   alt="A ring of five benches with one tray travelling round them"
+  caption="The workflow is a loop, not a checklist, and you go round it more than once."
 />
 
 ## The workflow at a glance
@@ -64,6 +65,7 @@ or a domain expert than by a model.
 <Figure
   slug="ml-the-practical-ml-workflow-step-1-frame-inline-cutout"
   alt="A blank card pinned above a bench with the tools still racked below it"
+  caption="Frame the question before touching a tool, including whether a model is needed."
 />
 
 The choice of metric belongs here too, decided *before* you see results so
@@ -95,7 +97,7 @@ debugging a model that "works too well."
 
 The moment you understand the data, split it, **before** you scale,
 encode, impute, or engineer anything. Set aside a test set with
-`train_test_split` (stratified, for classification) and then *forget it
+`train_test_split()` (stratified, for classification) and then *forget it
 exists* until the very end. The test set is your one honest measurement of
 the future, and it is honest only as long as it stays sealed.
 
@@ -496,6 +498,7 @@ The ten steps are a default, not a law. Real projects adapt:
 <Figure
   slug="ml-the-practical-ml-workflow-inline-cutout"
   alt="A ring of five benches with a tray moving round it, from data to features to fit to check and back"
+  caption="Data, features, fit, check, and round again: the loop every project runs."
 />
 
 What never bends is the principle underneath: **be honest about what your

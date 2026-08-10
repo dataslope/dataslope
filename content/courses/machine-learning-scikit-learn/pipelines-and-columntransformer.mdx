@@ -6,7 +6,7 @@ description: How to bundle preprocessing and a model into one object that is imp
 By now you have met two preprocessing steps, scaling numbers and encoding
 categories, and one ironclad rule: **fit preprocessing on the training set
 only, then apply it to everything else.** You have also seen how easy it is
-to break that rule by accident. A misplaced `fit_transform`, a `pd.get_dummies`
+to break that rule by accident. A misplaced `fit_transform()`, a `pd.get_dummies`
 called separately on train and test, a scaler quietly fit on all the data,
 each leaks the test set and inflates your score.
 
@@ -19,12 +19,13 @@ This page introduces the tools that make doing it right *easier* than doing
 it wrong: `Pipeline`, which chains preprocessing and a model into a single
 estimator, and `ColumnTransformer`, which applies different preprocessing to
 different columns. Together they turn a fragile, multi-step ritual into one
-object you `fit` once. This is not a convenience feature, it is how
+object you `fit()` once. This is not a convenience feature, it is how
 professional scikit-learn code stays correct.
 
 <Figure
   slug="ml-pipelines-and-columntransformer-problem-preprocessing-modeling-inline-cutout"
   alt="Two benches worked separately with a chip slipping between them, beside one bench where both are bolted together"
+  caption="Two separate benches are where a step goes missing; one bolted unit cannot."
 />
 
 ## The problem: preprocessing and modeling are easy to desynchronize
@@ -69,15 +70,16 @@ Pipeline([
 
 When you call `.fit(X_train, y_train)` on this pipeline, it does the right
 thing automatically: it fits the scaler on `X_train`, transforms `X_train`,
-and feeds the result to the model's `fit`. When you call `.predict(X_test)`,
+and feeds the result to the model's `fit()`. When you call `.predict(X_test)`,
 it transforms `X_test` with the *already-fitted* scaler (no re-fitting) and
-passes that to the model's `predict`. The fit-on-train / transform-both rule
+passes that to the model's `predict()`. The fit-on-train / transform-both rule
 is enforced by construction, you cannot accidentally fit a step on the test
 set, because you never touch the steps individually.
 
 <Figure
   slug="ml-pipelines-and-columntransformer-pipeline-one-estimator-inline-cutout"
   alt="Several small machines welded into one housing with a single handle on its front"
+  caption="A pipeline is one estimator, so you fit it once and cannot skip a step."
 />
 
 ```mermaid
@@ -149,9 +151,9 @@ applied consistently to the test data, and you never wrote a single
 here, and the code is shorter to boot.
 
 <Callout type="tip" title="A pipeline IS an estimator">
-Anywhere scikit-learn expects a model, `train_test_split` workflows,
-`cross_val_score`, `GridSearchCV`, you can hand it a whole `Pipeline`. It
-exposes the same `.fit`, `.predict`, and `.score` methods. From the outside
+Anywhere scikit-learn expects a model, `train_test_split()` workflows,
+`cross_val_score()`, `GridSearchCV`, you can hand it a whole `Pipeline`. It
+exposes the same `.fit()`, `.predict()`, and `.score()` methods. From the outside
 it is a model; on the inside it is your entire preprocessing-plus-model
 recipe. This is the key that makes leak-free cross-validation effortless,
 as the next section explains.
@@ -159,7 +161,7 @@ as the next section explains.
 
 ### make_pipeline: the same thing, names for free
 
-If you do not care to name the steps, `make_pipeline` builds the identical
+If you do not care to name the steps, `make_pipeline()` builds the identical
 object and names each step after its class automatically:
 
 <CodeBlock
@@ -205,6 +207,7 @@ repeated in every fold, quietly inflating the average.
 <Figure
   slug="ml-pipelines-and-columntransformer-inline-cutout"
   alt="Several columns each taking a different route through its own small machine before all routes join into one"
+  caption="`ColumnTransformer` sends each group of columns down its own preparation."
 />
 
 When you cross-validate a **pipeline**, scikit-learn re-fits the *entire*
@@ -242,7 +245,7 @@ print(f"Mean accuracy:     {scores.mean():.3f}")
   ]}
 />
 
-Hand `cross_val_score` a bare model with pre-scaled data and you leak; hand
+Hand `cross_val_score()` a bare model with pre-scaled data and you leak; hand
 it a pipeline and you do not. Same number of lines, opposite correctness.
 This is the single strongest argument for building pipelines as a default
 habit rather than an afterthought.
@@ -406,7 +409,7 @@ intend to use.
 </Callout>
 
 <Callout type="tip" title="make_column_transformer for brevity">
-Just as `make_pipeline` auto-names pipeline steps, `make_column_transformer`
+Just as `make_pipeline()` auto-names pipeline steps, `make_column_transformer()`
 builds a `ColumnTransformer` from bare `(transformer, columns)` pairs and
 names each block for you. Use whichever reads more clearly to you; they
 produce equivalent objects.
@@ -416,10 +419,10 @@ produce equivalent objects.
 
 Because the pipeline *is* an estimator, the complete preprocessing-plus-model
 recipe moves around as a single thing. You can pass it to a train/test
-workflow, to `cross_val_score`, or (with a small grid) to `GridSearchCV` for
+workflow, to `cross_val_score()`, or (with a small grid) to `GridSearchCV` for
 tuning, all covered on their own pages, and the preprocessing rides along,
 re-fit correctly in each context. You predict on brand-new raw data by
-calling `.predict` on the same object, and it applies the identical scaling
+calling `.predict()` on the same object, and it applies the identical scaling
 and encoding it learned at training time.
 
 <CodeBlock
@@ -493,7 +496,7 @@ Pipelines are a strong default, but a few honest notes:
   clearer. Reach for a pipeline once you are training and evaluating a model
   you will trust.
 - **Steps that are not fit-then-transform.** A pipeline composes
-  scikit-learn transformers (objects with `fit`/`transform`). One-off
+  scikit-learn transformers (objects with `fit()`/`transform()`). One-off
   cleaning that does not learn anything from the data, dropping a column,
   parsing a date string, can happen *before* the pipeline; it does not leak
   because it learns nothing. (Engineering features *with* a fit step,
@@ -524,7 +527,7 @@ Pipelines are the backbone of production scikit-learn:
   the same preprocessing that trained the model also runs at prediction time,
   with no drift between the two.
 - **Reproducibility and handoff.** One object captures the entire recipe, so
-  a teammate (or a future you) can load it, call `.predict`, and get exactly
+  a teammate (or a future you) can load it, call `.predict()`, and get exactly
   the training-time behavior, no separate, undocumented preprocessing script
   to forget.
 - **Honest model selection.** Because the whole pipeline cross-validates
@@ -555,7 +558,7 @@ target), and the train/test split is done.
 2. Build a \`Pipeline\` named \`pipe\` with two steps: \`("prep", preprocess)\`
    then \`("clf", LogisticRegression(max_iter=1000))\`.
 3. Fit \`pipe\` on \`X_train\`, \`y_train\` (the split is done for you).
-4. Store the pipeline's test accuracy (via \`.score\`) in \`test_acc\`.
+4. Store the pipeline's test accuracy (via \`.score()\`) in \`test_acc\`.
 
 The tests check that \`pipe\` is a fitted \`Pipeline\` whose final step
 is a \`LogisticRegression\`, that its preprocessing step is a
@@ -680,7 +683,7 @@ assert test_acc > 0.85, f"Expected a strong accuracy on penguins, got {test_acc}
   > Averaging models is ensembling; a pipeline composes steps in sequence, it does not combine model predictions.
 - Multiple datasets concatenated into one
   > A pipeline composes processing steps, not datasets; concatenating columns is what \`ColumnTransformer\` does internally.
-- [o] A sequence of transformers followed by a final estimator (a model), exposed as a single object with one \`.fit\` and one \`.predict\`
+- [o] A sequence of transformers followed by a final estimator (a model), exposed as a single object with one \`.fit()\` and one \`.predict()\`
   > Bundling preprocessing steps and the model into one estimator is exactly what lets you fit and predict in a single call without touching the steps individually.
 - Only several preprocessing transformers, with no model
   > A pipeline *can* end in a model; its defining shape is zero or more transformers followed by a final estimator.
@@ -727,7 +730,7 @@ Mixed numeric-and-categorical data is the canonical case: numbers get scaled, ca
   > The scaler is essential at predict time, the model expects scaled inputs, so \`X_new\` must be transformed the same way as the training data.
 - It returns the raw \`X_new\` unchanged
   > Returning raw values would feed the model unscaled inputs, breaking the consistency between training and prediction.
-- [o] It transforms \`X_new\` using the mean and standard deviation it learned during \`fit\`, without re-fitting
+- [o] It transforms \`X_new\` using the mean and standard deviation it learned during \`fit()\`, without re-fitting
   > Reusing the statistics learned at training time is what keeps prediction consistent with training and free of leakage.
 
 During prediction the scaler only transforms; it fits only once, during training.`}
@@ -749,10 +752,10 @@ To keep unlisted columns, set \`remainder="passthrough"\`; otherwise they are dr
 />
 
 <MultipleChoice
-  markdown={`A teammate scales and one-hot encodes the **entire** dataset, then passes the transformed arrays to \`cross_val_score\` with a bare \`LogisticRegression\`. What is the consequence?
+  markdown={`A teammate scales and one-hot encodes the **entire** dataset, then passes the transformed arrays to \`cross_val_score()\` with a bare \`LogisticRegression\`. What is the consequence?
 
-- The code will not run because \`cross_val_score\` requires a pipeline
-  > \`cross_val_score\` accepts a bare model and pre-transformed data; it runs fine, which is what makes the leak easy to miss.
+- The code will not run because \`cross_val_score()\` requires a pipeline
+  > \`cross_val_score()\` accepts a bare model and pre-transformed data; it runs fine, which is what makes the leak easy to miss.
 - Nothing, preprocessing the whole dataset first is the recommended approach
   > Preprocessing the whole dataset first is precisely the leak; the recommended approach is to wrap preprocessing and model in a pipeline and cross-validate that.
 - The model will underfit and score near zero

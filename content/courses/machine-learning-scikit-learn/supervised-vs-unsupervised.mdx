@@ -76,6 +76,7 @@ most directly useful kind.
 <Figure
   slug="ml-supervised-vs-unsupervised-supervised-learning-learning-inline-cutout"
   alt="Tagged blocks entering a machine and the machine learning to place a tag on an untagged one"
+  caption="Supervised learning copies a mapping from examples that carry answers."
 />
 
 Supervised learning splits in two by the type of `y`:
@@ -87,7 +88,7 @@ Supervised learning splits in two by the type of `y`:
 Here is a compact supervised example. We train a `LogisticRegression`
 classifier on the Palmer penguins, a supervised task, because every training
 penguin comes labeled with its true species, and then *score* it on held-out
-penguins. The crucial detail: we pass both `X` and `y` to `fit`, because
+penguins. The crucial detail: we pass both `X` and `y` to `fit()`, because
 supervised learning needs the answers to learn from.
 
 <CodeBlock
@@ -144,6 +145,7 @@ anyone ever telling the model what the "right" groups are.
 <Figure
   slug="ml-supervised-vs-unsupervised-inline-cutout"
   alt="One bench where every block arrives with a tag, and another where blocks arrive plain and are sorted into groups by shape alone"
+  caption="With labels you learn a mapping; without them you look for structure."
 />
 
 We will cluster synthetic data made of three natural blobs of points. Synthetic
@@ -198,7 +200,7 @@ Evaluating clusters needs entirely different tools, covered in the
 ## Seeing them side by side
 
 Putting the two calls next to each other makes the distinction unmistakable.
-Same library, same `fit` method, but one gets answers and one does not.
+Same library, same `fit()` method, but one gets answers and one does not.
 
 <CodeBlock
   adapter="python"
@@ -442,6 +444,7 @@ predict?*
 <Figure
   slug="ml-supervised-vs-unsupervised-deciding-question-there-inline-cutout"
   alt="One bench where every block arrives with a tag and another where blocks arrive plain"
+  caption="One question decides it: is there a labelled target to predict?"
 />
 
 <ChallengeCard
@@ -534,13 +537,13 @@ print(answers)
   markdown={`In scikit-learn, which call signature signals a **supervised** algorithm?
 
 - \`fit()\`, no arguments at all
-  > Calling \`fit\` with no arguments is not valid for any scikit-learn estimator. Supervised learning requires at minimum both the feature matrix \`X\` and the target vector \`y\`.
+  > Calling \`fit()\` with no arguments is not valid for any scikit-learn estimator. Supervised learning requires at minimum both the feature matrix \`X\` and the target vector \`y\`.
 - \`fit(X)\`, features only
   > Passing only \`X\` is the signature of an unsupervised algorithm; it has no target to learn from. Supervised algorithms require both \`X\` and \`y\` so the model can learn the mapping from inputs to known answers.
 - \`fit(y)\`, the target only
   > Passing only the target is not a valid scikit-learn call, and it would not make sense, the model needs the input features to learn a mapping, not just the answers.
 - [o] \`fit(X, y)\`, features and a target, because supervised learning needs the answers to learn the mapping
-  > Supervised \`fit\` takes both the feature matrix and the target. Passing \`y\` is exactly what lets the model learn the input-to-output relationship.
+  > Supervised \`fit()\` takes both the feature matrix and the target. Passing \`y\` is exactly what lets the model learn the input-to-output relationship.
 
 The two-argument \`fit(X, y)\` is the hallmark of supervised learning; \`fit(X)\` alone is unsupervised.`}
 />
