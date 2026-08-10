@@ -39,6 +39,11 @@ type), but the *order* is preserved.
 `Where` takes a predicate (`Func<T, bool>`) and returns a sequence
 containing only the elements for which the predicate is true.
 
+<Figure
+  slug="cs-filtering-and-projection-inline-cutout"
+  alt="A row of mixed parcels passing a grate that drops half of them, and the survivors passing a stamp that reduces each to one small tag"
+/>
+
 <CodeBlock
   adapter="csharp"
   files={[
@@ -215,6 +220,11 @@ For an order with `Product = "Gizmo"`, the first `Where` rejects it
 and *neither subsequent operator runs*. This is part of what makes
 LINQ pipelines efficient, the work for "dropped" elements is
 skipped entirely.
+
+<Figure
+  slug="cs-filtering-and-projection-mental-model-inline-cutout"
+  alt="A row of parcels passing a grate that drops some, then a press that reduces each survivor to one small tag"
+/>
 
 ## `Select` is not a loop
 

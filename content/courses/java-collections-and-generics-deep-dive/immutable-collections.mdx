@@ -71,6 +71,11 @@ public class Main {
 These factories return purpose-built, compact implementations, not
 just a wrapper. Mutator methods throw `UnsupportedOperationException`.
 
+<Figure
+  slug="jcol-immutable-collections-immutable-factories-list-inline-cutout"
+  alt="Three sealed trays coming off a press already clamped shut, no opening fitted to any of them"
+/>
+
 ### A few rules to know
 
 - They reject `null` keys, values, and elements. (If you need
@@ -147,6 +152,11 @@ The view forbids *callers* from mutating, but the *owner* of
 controller publishes a live read-only view), and sometimes very wrong
 (you wanted nobody to mutate it ever).
 
+<Figure
+  slug="jcol-immutable-collections-inline-cutout"
+  alt="A sealed tray of blocks with a lid clamped down, a hand trying to lift one block and finding it fixed"
+/>
+
 When you want a snapshot that genuinely cannot change, copy first:
 
 ```java
@@ -219,6 +229,11 @@ flowchart LR
 ```
 
 The further right you go, the safer your API.
+
+<Figure
+  slug="jcol-immutable-collections-immutability-matters-inline-cutout"
+  alt="A sealed tray with a clamped lid on a shared bench, two hands unable to alter it"
+/>
 
 ## Multi-file example: a safe `Catalog`
 

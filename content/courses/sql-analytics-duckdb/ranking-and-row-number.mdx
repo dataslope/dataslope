@@ -58,6 +58,11 @@ Add `PARTITION BY` and the numbering **restarts** in each group. This is
 how you ask "rank within each region", every region gets its own 1, 2,
 3.
 
+<Figure
+  slug="duck-ranking-and-row-number-inline-cutout"
+  alt="A row of blocks combed into height order with a pennant planted on each, the pennants shortening along the row and two equal blocks sharing one"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Rank orders within each region"
@@ -288,3 +293,8 @@ see.`}
 Ranking answers "where does this row stand?" The next page answers a
 different positional question, "how does this row's value accumulate or
 compare over time?", with running totals and moving averages.
+
+<Figure
+  slug="duck-ranking-and-row-number-numbering-rows-row-inline-cutout"
+  alt="A row of blocks in height order with a pennant planted on each, the pennants shortening along the row"
+/>

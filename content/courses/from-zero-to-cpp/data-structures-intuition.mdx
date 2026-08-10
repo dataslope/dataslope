@@ -17,6 +17,11 @@ often a bigger performance win than any micro-optimization.
 This chapter sketches the standard containers and when to reach for
 each, without diving into their implementations.
 
+<Figure
+  slug="cpp-data-structures-intuition-associative-containers-inline-cutout"
+  alt="A wall of small drawers each with a keyhole, a key going straight to one drawer"
+/>
+
 ## A map of the standard containers
 
 | Family | Container | What it is |
@@ -40,6 +45,11 @@ each, without diving into their implementations.
 - Inserting or erasing in the middle is O(n).
 
 Use it for almost everything. The CPU loves contiguous memory.
+
+<Figure
+  slug="cpp-data-structures-intuition-sequence-containers-inline-cutout"
+  alt="Three containers in a row, a fixed strip, a growing rail, and separate blocks joined by cords"
+/>
 
 ### `std::array<T, N>`, fixed size
 

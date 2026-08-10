@@ -51,6 +51,11 @@ The two most common violations are easy to *see*: a drifting mean (a trend)
 and a changing variance (a widening or narrowing band). Let's put a
 stationary series next to both.
 
+<Figure
+  slug="tsa-stationarity-inline-cutout"
+  alt="Two tracks side by side, the near one drifting steadily upward off its rail and the far one wobbling around a fixed centre line"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -191,6 +196,11 @@ walk gives a large p-value (can't reject → non-stationary). The ADF
 *statistic* tells the same story: it's very negative for the stationary
 series and near zero for the walk. The rule of thumb, **more negative than
 the 5% critical value → stationary**, agrees with the p-value.
+
+<Figure
+  slug="tsa-stationarity-stationary-actually-means-inline-cutout"
+  alt="Two tracks, one drifting steadily upward and one wobbling around a level line"
+/>
 
 Now the airline series, which we've been calling non-stationary all along:
 

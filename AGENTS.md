@@ -413,15 +413,99 @@ Write subjects in volumetric language — "thick", "deep", "solid", "chunky",
 "spheres", "balls", or "beads" still fights the glossy-marble guard; say "low
 solid discs" when a scene genuinely needs repeated round elements.
 
-**Every other style is retired.** Risograph, flat geometric vector, line art,
-blueprint schematic and cut-paper collage were all tried and dropped: the
-monochrome ones (line art, blueprint) only read against one page background
-once the background is removed, and the busy ones (risograph scenes) have no
-isolable subject to cut out. Hand-authored inline `<svg>` graphics are retired
-in the same move — the `/svg-gallery` page that catalogued them is gone.
+**Every other style is retired.** Flat geometric vector, line art, blueprint
+schematic and cut-paper collage were all tried and dropped: the monochrome ones
+(line art, blueprint) only read against one page background once the background
+is removed. Hand-authored inline `<svg>` graphics are retired in the same move
+— the `/svg-gallery` page that catalogued them is gone.
 
-Do not reintroduce a second style "just for this one". A mixed set is what
-made the first pass unusable.
+Do not reintroduce a style "just for this one". A mixed set is what made the
+first pass unusable. There is exactly one exception, and it is a **category**,
+not a one-off: `course-inline`, below.
+
+### The one other style: inline risograph figures
+
+Everything above is about the art that *opens* a lesson. `course-inline` is a
+different job: a band that sits *in the body*, next to the paragraph it
+belongs to. Two kinds live there:
+
+- **Something that happened** — the Ariane 5 flight, the Mars Climate Orbiter,
+  Codd's 1970 paper. Editorial asides, and drawing them in the same isometric
+  props as the lesson's own art made them read as another diagram.
+- **Something that is** — a mechanism the lesson is explaining: the call stack
+  as a column of trays, a hash table as a key going into a mixer and out as a
+  bin number, a closure as a machine that left its workshop carrying its own
+  toolbox.
+
+The second kind is the larger half and needs the sharper eye: a concept figure
+earns its place by carrying a *metaphor* the prose does not already draw, and
+is worth nothing when it just restates the heading in shapes. Prefer one
+concrete scene of objects over an abstract arrangement, and check the set for
+repeats before adding one. Nine of the first hundred were cut for exactly that:
+three separate courses had a sliding frame over a row of blocks, and the reader
+meets all three.
+
+Risograph is what holds the two registers apart on the page, which is the whole
+reason the category exists.
+
+Risograph was in the retired list above, for a real reason: a full-bleed riso
+scene has no isolable subject, so background removal returns the whole
+rectangle. Four constraints in `RISOGRAPH_CONSTRAINTS`
+(`lib/illustrationPrompt.ts`) are what make it work this time, and none of them
+is optional:
+
+- **Blank paper.** No printed panel, no frame, no border, no ground shadow.
+  This is what leaves a subject for the remover to lift, instead of a rectangle.
+- **Brand inks, never black.** The transparency constraint again: risograph's
+  usual black key line would read on the white page and vanish on the near-black
+  one. Flat spot inks from the four primaries, overprinting into a third.
+- **Flat, not solid.** The isometric block's volume clauses are dropped here.
+  Asking one prompt for both gives a plastic 3D render with grain sprinkled on
+  top, which is neither style.
+- **No likenesses.** These passages name real people; the figures in them are
+  deliberately anonymous.
+
+Each is generated at **1536x768** (`meta.sizes["course-inline"]`), a 2:1 band
+rather than the 3:2 the rest of the pipeline uses, because it sits *between*
+two paragraphs and a lesson cannot spare a half-screen of art there. It is also
+the cheapest frame the API sells: 102 output tokens against 158 at 1536x1024,
+and 1024x512 is refused outright ("below the current minimum pixel budget").
+
+Placement is one `<Figure>` after the paragraph it belongs to. An event figure
+carries a `caption` naming the event and its date; a concept figure usually
+does not, because a caption that restates the heading is filler and the prose
+around it already says what the picture means.
+
+`wire-course-figures.mjs` does not touch any of them — it keys on
+`course-illustration` — so a re-wire will not move or clear them.
+
+**Three placement rules worth knowing before scripting a batch.**
+
+- Start *after* the lesson's own opening figure, or the two end up stacked.
+- Never insert after a paragraph ending in a colon: the list, code block or
+  diagram below it belongs to that sentence, and a figure dropped between them
+  reads as the thing being introduced.
+- **Put it past the first `## ` heading**, not in the opening section with the
+  lesson's own art. "After the opening figure" is not enough on its own: 36 of
+  the first hundred landed a paragraph below it, close enough to read as a
+  second opinion on the same picture, and on `python-basics/lists` the two were
+  the same idea twice (isometric carts of coloured blocks, then a risograph
+  rail of coloured blocks). Moving each into the section that explains it fixed
+  the crowding and improved every placement: the pointer band now sits under
+  "What a pointer is", the context-window band under "The window is a hard
+  boundary".
+
+None of this is visible to `check:mdx`, which only knows about tag nesting, so
+the audit after a batch is the check. Print each figure's preceding and
+following line and read the list.
+
+**Placing a batch of them: check where each one landed.** Inserting after "the
+paragraph containing this phrase" is mechanical enough to script, and it is
+wrong often enough to audit. Of fifty placed that way, two came to rest
+directly against the lesson's *own* opening figure and one under a heading
+rather than under its paragraph, none of which any check catches: `check:mdx`
+only asserts that component tags sit at the top level. Print the preceding and
+following line for every figure you place and read the list.
 
 **Always render in the brand palette** (the four primaries above). This is not
 only aesthetic: see the transparency constraint below.
@@ -537,6 +621,35 @@ Twenty per page, ordered A→Z by default, with the ordering in the route
 SVG and reordering on the client would ship the whole library to show twenty of
 it. Each figure carries the date of the commit that added its spec, from
 `scripts/build-created-at.mjs`.
+
+### Where the creation dates come from
+
+Both galleries date their cards from `lib/generated/created-at.js`, built by
+`scripts/build-created-at.mjs`: the commit that *added* `charts/<slug>.mjs` or
+`public/images/<id>-cutout.webp` is when that chart or illustration was made.
+
+**Production cannot read that from git, and used to get it wrong.** Cloudflare
+Workers Builds clones shallow. git presents a shallow clone's oldest commit as
+parentless, so its diff is its entire tree and every file in it is reported as
+*added there* — at depth 1, that is the commit being deployed. The whole
+gallery came back stamped with the date of the last deploy, and moved every
+time the site shipped. It is invisible locally, where the clone has the history
+to answer properly.
+
+Two things now stand between that and the gallery:
+
+- Additions attributed to a **shallow-boundary commit are dropped**. That
+  commit is where the clone's knowledge stops, not where anything was born, so
+  it yields no date rather than a wrong one.
+- The dates git *can* prove are kept in **`data/created-at.json`**, committed,
+  and a shallow build reads them from there.
+
+The snapshot is a build output, not a file to maintain: any run with complete
+history rewrites it (a development clone, `npm run dev`, `npm run build`), and
+`.github/workflows/refresh-created-at.yml` commits it back whenever artwork or
+a chart spec lands, since a file's add-commit does not exist until it does.
+A shallow build never writes it, so a deploy can neither lose a date nor invent
+one. An entry that is present in neither shows as "Not committed yet".
 
 ### The deletion queue
 
@@ -671,7 +784,9 @@ a quarter-second, and give the cache three things:
 - **at least one output**, so a deleted (or gitignored, never-cloned) artifact
   regenerates even when the inputs are untouched;
 - **a `salt`** when the answer depends on something `stat` cannot see.
-  `build-created-at` reads git history, so its salt is `HEAD`.
+  `build-created-at` reads git history, so its salt is `HEAD` **and how much
+  history this clone has** — the same commit read shallow and read whole gives
+  different dates, and only the second one is right.
 
 Manifests live in `node_modules/.cache/dataslope-build/`, so `npm ci` wipes
 them and the first run after an install regenerates everything — which is when

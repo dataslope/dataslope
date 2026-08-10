@@ -98,6 +98,11 @@ width, and padding and border are *added on top*. So
 `width: 200px; padding: 20px; border: 2px` actually occupies **244px**.
 That surprises everyone and makes layouts hard to reason about.
 
+<Figure
+  slug="css-box-model-and-sizing-inline-cutout"
+  alt="Two identical blocks measured by a rule, one measured to its content only and one measured to its outer edge, giving different totals"
+/>
+
 The fix is universal:
 
 ```css
@@ -192,6 +197,11 @@ second uses `border-box` and stays exactly 220px. The gridlines are
   `gap` (flex/grid) or one-directional margins instead.
 - **`margin: 0 auto`** horizontally centers a block that has a set
   width, the classic centered container.
+
+<Figure
+  slug="css-box-model-and-sizing-four-layers-inline-cutout"
+  alt="Four nested frames around one core, each gap between them a different width"
+/>
 
 ## Challenge
 

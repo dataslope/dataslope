@@ -39,6 +39,11 @@ print(penguins.select(["species", "body_mass_g"]).head(3))
 Order is yours to choose: `select` emits columns in the order you
 name them, regardless of their order in the source.
 
+<Figure
+  slug="pl-selecting-columns-inline-cutout"
+  alt="A wide board of standing columns with three of them lifted straight up out of the board and set down side by side on a smaller board"
+/>
+
 ## Everything, and everything except
 
 <CodeBlock
@@ -61,6 +66,11 @@ print(penguins.drop("year", "sex").columns)
 
 `pl.exclude` is the one to reach for when a table has forty columns
 and you want thirty-eight of them.
+
+<Figure
+  slug="pl-selecting-columns-everything-everything-except-inline-cutout"
+  alt="A wide board with a full-width frame laid over it, and beside it the same frame with one column cut out of it"
+/>
 
 ## By pattern
 

@@ -144,6 +144,11 @@ Three big reasons:
    `Task<A>`, `Effect<R, E, A>` show up in signatures. You can
    tell from a function's type whether it's pure.
 
+<Figure
+  slug="fp-effect-management-inline-cutout"
+  alt="A clean sealed line of machines with all its hoses, taps and wires gathered at one end of the bench and plugged into a single marked panel"
+/>
+
 ## A tiny Console / FileSystem effect
 
 For a slightly more realistic example, here's an effect type with
@@ -268,6 +273,11 @@ like to happen.
 
 Convince yourself that `IO` really is just three tiny functions by
 writing two of them.
+
+<Figure
+  slug="fp-effect-management-core-idea-thunk-inline-cutout"
+  alt="A sealed envelope holding a folded instruction card, set on a bench and not yet opened"
+/>
 
 <ChallengeCard
   adapter="typescript"

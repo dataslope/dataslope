@@ -116,6 +116,11 @@ people?", three genuinely different business questions, three different
 is almost always what you want, an unknown value should not be treated as
 zero and drag an average down.
 
+<Figure
+  slug="duck-aggregate-functions-inline-cutout"
+  alt="One wide tray of chips feeding four gauges at once, each reading a different single number"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="AVG skips the unknowns"
@@ -234,3 +239,8 @@ Aggregates skip NULLs, so \`AVG\` reflects only the present values.`}
 A single grand total is useful, but the real power comes from computing
 one summary **per group**, revenue *per region*, average *per category*.
 That is `GROUP BY`, and it is next.
+
+<Figure
+  slug="duck-aggregate-functions-aggregation-exists-inline-cutout"
+  alt="A bench heaped with chips that no one can count by eye, and one gauge with a single pointer resting at one mark beside it"
+/>

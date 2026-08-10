@@ -97,6 +97,11 @@ The combination `public static final` is the standard idiom for a
 **constant**: a single value that belongs to the class and can never
 change. By convention, constants are written in `UPPER_SNAKE_CASE`.
 
+<Figure
+  slug="oopj-static-and-utility-inline-cutout"
+  alt="One shared tool bolted to the wall of a workshop, used by three separate benches without any bench owning it"
+/>
+
 <CodeBlock
   adapter="java"
   files={[
@@ -131,6 +136,11 @@ A **utility class** is a class that holds *only* `static` members,
 no instance state, no constructor anyone calls. It is a namespace for
 related helper functions. Java's own `Math` class is the canonical
 example.
+
+<Figure
+  slug="oopj-static-and-utility-static-belongs-class-inline-cutout"
+  alt="One tool bolted to a workshop wall, used by three benches without any bench owning it"
+/>
 
 ```mermaid
 classDiagram

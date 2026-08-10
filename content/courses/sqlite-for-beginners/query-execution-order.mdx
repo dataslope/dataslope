@@ -32,6 +32,11 @@ Read the numbers: `FROM` is first, `SELECT` is near the **end**, and
 `LIMIT` is last. The clause you *write* first (`SELECT`) is among the
 *last* to actually run.
 
+<Figure
+  slug="lite-query-execution-order-inline-cutout"
+  alt="Six stations along a bench with the parcel visibly starting at the fourth station, not the first"
+/>
+
 Seen as row counts, the order also explains where a query spends its time:
 
 <Chart slug="sql-clause-funnel" />
@@ -69,6 +74,11 @@ ORDER BY
 **But you *can* use the alias in `ORDER BY`,** because `ORDER BY`
 (step 7) runs *after* `SELECT` (step 5), by which time the alias
 exists. The execution order predicts exactly which works.
+
+<Figure
+  slug="lite-query-execution-order-this-explains-real-inline-cutout"
+  alt="A parcel stopped at the fourth station of six with a small warning flag raised there"
+/>
 
 <Callout type="info" title="A rule you can now derive, not memorize">
 "Aliases work in `ORDER BY` but not in `WHERE`" used to be a fact to

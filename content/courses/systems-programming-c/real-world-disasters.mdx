@@ -53,6 +53,12 @@ request, the worm overwrote the function's return address on the
 stack and redirected execution into shellcode it had injected as
 part of the input.
 
+<Figure
+  slug="sysc-disasters-morris-worm-cutout"
+  alt="A row of small desktop computers along a bench with a coil threading out of the first and into each of the others, the last two toppled"
+  caption="November 1988: roughly 6,000 machines, about a tenth of the internet, and the reason CERT exists."
+/>
+
 **Bug class:** stack buffer overflow.
 **Fallout:** Morris received the first conviction under the U.S.
 Computer Fraud and Abuse Act. `gets()` was deprecated in C99 and
@@ -92,6 +98,12 @@ fit in a single 376-byte UDP packet) and it was *fast*, it doubled
 the infected population every 8.5 seconds and effectively saturated
 the global internet's routing capacity within ten minutes.
 
+<Figure
+  slug="sysc-disasters-sql-slammer-cutout"
+  alt="One tiny packet block multiplying into a spreading fan of identical packets that swamps two small server racks"
+  caption="January 2003: 376 bytes, no disk write, and most of its damage done inside ten minutes."
+/>
+
 The bug: a *stack buffer overflow* in the SQL Server 2000 Resolution
 Service that listened on UDP port 1434. The worm sent one carefully
 crafted packet; the vulnerable server's stack got smashed; the
@@ -111,6 +123,12 @@ implementation of the TLS Heartbeat extension. It did not corrupt
 memory or crash the server, it did something arguably worse: it
 let any attacker read up to ~64 KB of the server's process memory
 *per request*, with no authentication and no log trace.
+
+<Figure
+  slug="sysc-disasters-heartbleed-cutout"
+  alt="A padlock split open around a heart-shaped valve, with a ribbon of memory unspooling out of the crack carrying keys and cards away"
+  caption="CVE-2014-0160: a heartbeat that answered with 64 KB of whatever was next to the buffer."
+/>
 
 The bug, distilled:
 
@@ -149,6 +167,11 @@ web, had been intermittently injecting fragments of *random other
 customers' traffic* into HTTP responses. Sensitive data showed up in
 search engine caches: private messages, OAuth tokens, password
 manager hints, hotel booking details.
+
+<Figure
+  slug="sysc-real-world-disasters-5-cloudbleed-2017-inline-cutout"
+  alt="A machine whose feed runs past the end of its own tape and draws a neighbour’s tape in with it"
+/>
 
 The cause: an HTML-rewriting parser written in Ragel (which
 generates C). The end-of-buffer check used `==` where it should have
@@ -257,6 +280,12 @@ Energy of Canada Limited. Between 1985 and 1987 it gave at least six
 patients massive radiation overdoses, hundreds of times the
 intended dose. At least three died as a direct result.
 
+<Figure
+  slug="sysc-disasters-therac-25-cutout"
+  alt="A radiation therapy machine aiming a beam at an empty couch, an operator at a console across the room, and a safety latch lying detached on the floor"
+  caption="Therac-25, 1985 to 1987: the hardware interlock earlier models carried was removed, leaving the software alone."
+/>
+
 The Therac-25's software was written in PDP-11 assembly (not C), but
 its failure modes are the systems-programming nightmare scenarios
 this course has been preparing you to recognize. They included:
@@ -283,6 +312,11 @@ removing safety hardware on the assumption that the code is correct.
 On its maiden flight, the European Space Agency's Ariane 5 rocket
 self-destructed 37 seconds after launch, taking with it four
 scientific satellites and roughly $370 million.
+
+<Figure
+  slug="sysc-real-world-disasters-2-code-red-inline-cutout"
+  alt="A request slip far longer than the slot it is being pushed into, spilling past the machine's edge"
+/>
 
 The cause was not, strictly, a memory bug, but it is a textbook
 example of the kind of UB-adjacent disaster C programmers are

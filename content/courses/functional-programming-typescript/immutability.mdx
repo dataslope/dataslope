@@ -275,6 +275,11 @@ Two pieces of code that share *no mutable state* cannot race.
 Period. They might run in any order, on any thread, on any machine,
 and the result is the same.
 
+<Figure
+  slug="fp-immutability-inline-cutout"
+  alt="A sealed block on the left, and beside it a fresh copy with one face changed, the original still sealed and untouched"
+/>
+
 ```mermaid
 flowchart LR
     A[input v1] --> P1[task 1] --> O1[output a]
@@ -396,6 +401,11 @@ The standard library is full of these traps. As a rule:
 - `Array#map`, `Array#filter`, `Array#slice`, `Array#concat`,
   `Array#flatMap`, `Array#toSorted`, `Array#toReversed`,
   `Array#toSpliced`, `Array#with`, **return new**
+
+<Figure
+  slug="fp-immutability-cost-mutation-one-inline-cutout"
+  alt="Two benches sharing one tray, a hand at each altering it, and the block on it ending up wrong for both"
+/>
 
 When in doubt, prefer the new immutable variants (`toSorted`,
 `toReversed`, etc.) introduced in ES2023.

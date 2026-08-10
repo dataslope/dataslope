@@ -57,6 +57,11 @@ int main() {
 
 Both heap operations follow the same playbook: *restore completeness first, then repair the one broken promise.* To push, append the new value at the end of the array, the only spot that keeps the tree complete. The shape is now right, but the newcomer may outrank its parent, so it bubbles upward, swapping with its parent until the heap property holds. The path from any node to the root is at most log n long, so a push is O(log n).
 
+<Figure
+  slug="dsa-heaps-conceptual-tree-array-inline-cutout"
+  alt="A branching frame drawn above a flat strip of cells, cords showing each branch's place on the strip"
+/>
+
 ```mermaid
 flowchart TD
     A["append new value"] --> B{"larger than parent?"}
@@ -100,6 +105,11 @@ int main() {
 ## Pop: sift down
 
 Pop runs the same playbook in reverse. The root must go, but ripping out index 0 would tear a hole, so move the *last* array element into the root's place (completeness restored), then let this usually-too-small impostor sink: swap it with its **larger** child until both children are smaller. Swapping with the larger child is essential, promote the smaller one and it would immediately violate the property against its sibling.
+
+<Figure
+  slug="dsa-heaps-push-sift-up-inline-cutout"
+  alt="A block set at the bottom of a pyramid and swapped upward past each larger neighbour until it rests"
+/>
 
 <CodeBlock
   adapter="cpp"
@@ -198,6 +208,11 @@ int main() {
 ## Heap sort
 
 Williams's original application falls out almost for free. Build a max-heap (O(n), as above); now the maximum is at index 0. Swap it with the last element, the maximum is in its final sorted position, shrink the heap by one, and sift the new root down. Repeat n−1 times: O(n log n) total, in place, no merge buffer. Heapsort is rarely the fastest sort in practice (its memory access pattern jumps around, which caches dislike), but its guaranteed bound is why introsort keeps it as the emergency parachute behind `std::sort`.
+
+<Figure
+  slug="dsa-heaps-inline-cutout"
+  alt="A pyramid of blocks where every block sits above two smaller ones, the largest at the apex being lifted off by a small crane"
+/>
 
 ```mermaid
 flowchart TD

@@ -72,6 +72,11 @@ Read it: *"From orders, joined to customers wherever the order's
 customer name, and the amount."* The `ON` clause is the heart, it
 states which rows belong together.
 
+<Figure
+  slug="sql-understanding-joins-question-join-answers-inline-cutout"
+  alt="Two separate boards on a bench with a single question card held between them"
+/>
+
 ## Table aliases keep joins readable
 
 Writing `orders.` and `customers.` everywhere is tedious. SQL lets
@@ -101,6 +106,11 @@ FROM
 `orders o` means "call orders `o` here." This is the style you will
 see in nearly all real SQL, because joins of three or four tables
 would be unreadable otherwise.
+
+<Figure
+  slug="sql-understanding-joins-inline-cutout"
+  alt="Two overlapping grids on a light table, the overlapping region lit and the outer regions dimmed, with a small selector dial beside them"
+/>
 
 <Callout type="info" title="Why prefix columns at all?">
 Both tables might have a column named `id`. Writing `o.id` versus

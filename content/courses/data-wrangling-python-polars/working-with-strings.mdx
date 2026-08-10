@@ -70,6 +70,11 @@ Six raw values collapse to three real ones, and `"Book s"` stays
 separate because it is a genuinely different typo that needs a human
 decision rather than a lowercase.
 
+<Figure
+  slug="pl-working-with-strings-cleaning-inline-cutout"
+  alt="A column of ribbons passing through a brush and a trimmer, leaving the far side even at both ends"
+/>
+
 ## Matching and testing
 
 <CodeBlock
@@ -102,6 +107,11 @@ print(
 `contains` takes a regex by default. Pass `literal=True` when the
 needle contains regex metacharacters you mean literally, such as a
 dot in a filename.
+
+<Figure
+  slug="pl-working-with-strings-inline-cutout"
+  alt="A full column of letter ribbons passing under one wide blade that trims every ribbon in the same stroke"
+/>
 
 <Callout type="warn" title="Polars regexes are not Python regexes">
 Polars uses Rust's `regex` crate, which guarantees linear-time

@@ -19,6 +19,11 @@ A CTE is introduced by the keyword `WITH`. You name a query, and
 then refer to that name in the rest of the statement as if it were a
 table.
 
+<Figure
+  slug="sql-common-table-expressions-inline-cutout"
+  alt="Three small named trays prepared along the top of a bench, and one final machine below drawing from each tray in turn"
+/>
+
 ```mermaid
 flowchart TB
     CTE["WITH <code>big_orders</code> AS (<br/>SELECT ... FROM orders WHERE amount > 50<br/>)"] -->|"named result"| Main["SELECT ... FROM <code>big_orders</code>"]
@@ -69,6 +74,11 @@ The `big_orders` CTE defines "orders over 50" once, with a clear
 name. The main query then groups and counts them. Anyone reading it
 sees the steps in order: *find big orders → count them per
 customer.*
+
+<Figure
+  slug="sql-common-table-expressions-subquery-rewritten-as-inline-cutout"
+  alt="A small machine lifted out of a larger one's hopper and set on the bench in front of it, feeding it by a short chute"
+/>
 
 <Callout type="info" title="CTEs are about readability">
 A CTE rarely changes *what* a query computes, you could usually

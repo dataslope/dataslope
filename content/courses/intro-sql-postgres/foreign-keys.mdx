@@ -19,6 +19,11 @@ A **foreign key** is a column in one table that holds the **primary
 key value of a row in another table.** It is a *reference*, a way
 for one row to say "I belong to that row over there."
 
+<Figure
+  slug="sql-foreign-keys-foreign-key-pointer-inline-cutout"
+  alt="A row carrying an arrow that reaches across to a row in another board bearing a punched tab"
+/>
+
 ```mermaid
 erDiagram
     CUSTOMER ||--o{ ORDER : places
@@ -63,6 +68,11 @@ Declaring a foreign key does more than document intent, PostgreSQL
 **enforces** it. It will refuse to create an order that points to a
 customer who does not exist. This guarantee is called **referential
 integrity**: every reference actually points to something real.
+
+<Figure
+  slug="sql-foreign-keys-inline-cutout"
+  alt="A tag in one board's row carrying the same notch as a row in another board, a cord joining the two"
+/>
 
 <SqlCodeBlock
   expectError

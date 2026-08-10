@@ -63,6 +63,11 @@ ggplot(mpg, aes(displ, hwy)) +
 `loess`) → fitted values + a confidence band → `geom_smooth` draws the
 line + ribbon.**
 
+<Figure
+  slug="gg-smoothers-and-summaries-geom-smooth-trend-inline-cutout"
+  alt="A cloud of chips with a soft ribbon drawn through their middle and a band either side"
+/>
+
 Switching `method` swaps the *statistic's* model while the *geom*
 (line + ribbon) stays the same, yet another instance of separating
 computation from drawing.
@@ -135,6 +140,11 @@ groups whose summary is identical and whose data is not:
 
 The same argument for a fitted line: all four of Anscombe's datasets
 produce the same regression, and only one of them should have one.
+
+<Figure
+  slug="gg-smoothers-and-summaries-inline-cutout"
+  alt="A cloud of chips with a soft ribbon drawn through their middle and a lighter band either side of it"
+/>
 
 <Chart slug="anscombes-quartet" />
 

@@ -48,6 +48,11 @@ This table is the whole API in a nutshell:
 Plus the summaries `.mean()`, `.var()`, `.std()`, and `.median()`. That's
 it, learn these once and every distribution behaves the same way.
 
+<Figure
+  slug="stat-working-with-distributions-four-questions-four-inline-cutout"
+  alt="Four small tools hanging above one smooth ramp, each shown taking a different reading from it"
+/>
+
 ```mermaid
 flowchart TD
   Q["A question about a distribution"] --> Q1{"Which kind?"}
@@ -114,6 +119,11 @@ Two habits make `scipy.stats` painless:
 `scale` is the standard deviation. For the exponential, `scale` is the
 mean. For the uniform, `loc` is the left edge and `scale` is the width.
 The *meaning* changes per distribution, but the *interface* is identical.
+
+<Figure
+  slug="stat-working-with-distributions-inline-cutout"
+  alt="A smooth ramp over a rail with a shaded slice cut from it and a gauge reading that slice's share"
+/>
 
 **Frozen distributions.** Calling `stats.norm(loc=30, scale=6)` once
 returns an object with the parameters baked in. Pass that object around

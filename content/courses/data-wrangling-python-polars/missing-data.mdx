@@ -17,6 +17,11 @@ that, which removes a whole class of confusion before it starts.
 meaning "the result of an impossible calculation", like `0/0`. pandas
 historically used `NaN` for both; Polars keeps them apart.
 
+<Figure
+  slug="pl-missing-data-inline-cutout"
+  alt="A board with several empty sockets, a tray of matching plugs beside it, and one socket deliberately left open with a small cover set over it"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -87,6 +92,11 @@ print(any_null)
 within a row, which is the missing half of the toolkit: most
 expressions work down a column, this one works across a row.
 
+<Figure
+  slug="pl-missing-data-finding-them-inline-cutout"
+  alt="A board passed under a lamp that lights only the covered cells, leaving the filled ones dark"
+/>
+
 ## Dropping
 
 <CodeBlock
@@ -110,6 +120,11 @@ Dropping 11 rows out of 344 to lose one unknown `sex` value costs you
 9 perfectly good measurements. `drop_nulls` with an explicit column
 list is almost always better than the bare version, because it drops
 rows for a reason you named.
+
+<Figure
+  slug="pl-missing-data-dropping-inline-cutout"
+  alt="A board tilted so the rows carrying covers slide off the edge into a tray below"
+/>
 
 ## Filling
 

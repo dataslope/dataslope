@@ -28,6 +28,11 @@ feature. This page is the long, careful introduction.
 
 They all live in `<stdlib.h>`.
 
+<Figure
+  slug="sysc-heap-and-dynamic-allocation-inline-cutout"
+  alt="An open yard of crates of different sizes with gaps between them, a figure fitting one new crate into a gap that just fits"
+/>
+
 It is worth pausing on what `malloc` actually *is*: not a syscall,
 not magic, just a library function managing a big region of memory
 with ordinary data structures, free lists, size bins, boundary
@@ -99,10 +104,20 @@ Three rules visible in that tiny example:
    (double-free, often crash). Exactly once, then stop using the
    pointer.
 
+<Figure
+  slug="sysc-heap-and-dynamic-allocation-first-malloc-inline-cutout"
+  alt="A crate handed out over a counter with a tag clipped to the hand that took it"
+/>
+
 ## A growable array of N ints
 
 This is the most common use of `malloc`: you only know the size at
 runtime.
+
+<Figure
+  slug="sysc-heap-and-dynamic-allocation-growable-array-n-inline-cutout"
+  alt="A rail being replaced by a longer rail with its blocks carried across, the short one set aside"
+/>
 
 <CodeBlock
   adapter="c"

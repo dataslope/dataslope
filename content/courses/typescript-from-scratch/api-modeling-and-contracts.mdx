@@ -73,6 +73,11 @@ Now the contract is clear:
 - Input: `UserId` (a string).
 - Output: `User | null` (an object with three fields, or `null` if not found).
 
+<Figure
+  slug="tsx-api-modeling-and-contracts-problem-implicit-contracts-inline-cutout"
+  alt="Two benches joined by a chute with no fitting at either end, blocks falling through the gap"
+/>
+
 If you change `User`'s shape, every caller that accesses a field gets a compile error. The type is the source of truth.
 
 ---
@@ -524,6 +529,11 @@ You've learned how to:
 - **Generalize responses** with `ApiResponse<T>` or `Result<T, E>`.
 - **Separate domain, application, and transport layers** using types to enforce boundaries.
 - **Use discriminated unions** for endpoints with multiple response shapes.
+
+<Figure
+  slug="tsx-api-modeling-and-contracts-explicit-contracts-types-inline-cutout"
+  alt="Two benches joined by a chute with a matching shaped fitting clamped at each end"
+/>
 
 Types as contracts shift entire classes of integration bugs leftward, from production to compile time. They're living documentation that never goes stale. In the next chapter, we'll apply these ideas to **error handling**, modeling failures as values rather than exceptions.
 

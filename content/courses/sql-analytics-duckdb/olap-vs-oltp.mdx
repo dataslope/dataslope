@@ -133,6 +133,11 @@ is called **vectorized execution**, and column storage is what makes it
 natural: the values are already lined up together, ready to stream through
 in chunks.
 
+<Figure
+  slug="duck-olap-vs-oltp-two-jobs-one-inline-cutout"
+  alt="A counter handling one parcel at a time beside a warehouse aisle being swept end to end"
+/>
+
 Column storage plus vectorized execution is the lineage of decades of
 column-store research, notably **MonetDB**, built at the CWI research
 institute in Amsterdam, and the **C-Store** project associated with
@@ -201,3 +206,8 @@ engines fly through large scans.`}
 You now know *why* analytical SQL is shaped the way it is, and what kind
 of engine answers it fast. Next: meet that engine, and understand *why
 DuckDB* in particular.
+
+<Figure
+  slug="duck-olap-vs-oltp-inline-cutout"
+  alt="A service counter handling one small parcel at a time on the left, and a warehouse aisle on the right where one wide column is read end to end"
+/>

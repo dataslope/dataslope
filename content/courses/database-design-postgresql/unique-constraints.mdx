@@ -173,6 +173,11 @@ Composite uniqueness protects a repeated combination, not each column by itself.
 A primary key and a unique constraint both prevent duplicates, but they
 have different jobs.
 
+<Figure
+  slug="db-unique-constraints-inline-cutout"
+  alt="A rack where each slot accepts one tag only, an identical second tag being turned away at the slot's mouth"
+/>
+
 ```mermaid
 flowchart TB
     Key["No duplicates"] --> PK["PRIMARY KEY<br/>row identity<br/>not null<br/>one per table"]
@@ -191,6 +196,11 @@ relationship pair.
 Uniqueness also shapes relationships. If `profiles.user_id` is both a
 foreign key and unique, then each user can have at most one profile.
 That is a one-to-one pattern.
+
+<Figure
+  slug="db-unique-constraints-uniqueness-beyond-primary-inline-cutout"
+  alt="A rack whose slots each accept one tag, a second identical tag turned away even though it carries a different punched tab"
+/>
 
 ```mermaid
 erDiagram

@@ -82,6 +82,11 @@ In real code, you almost always reach for an **`ArrayList`**
 instead of a bare array. It can grow and shrink, has a rich set of
 operations, and is part of Java's broader **Collections Framework**.
 
+<Figure
+  slug="java-arrays-and-collections-arraylist-growable-generic-inline-cutout"
+  alt="A rail that grows a further slot as a seventh block is set on it"
+/>
+
 <CodeBlock
   adapter="java"
   files={[
@@ -239,6 +244,11 @@ public class Stats {
 `Arrays.asList(...)` produces a *fixed-size* list, perfect for "just a
 bag of values I won't add to or remove from."
 
+<Figure
+  slug="java-arrays-and-collections-arrays-fixed-size-inline-cutout"
+  alt="A rigid strip of six slots all filled, a seventh block waiting beside it"
+/>
+
 ## Arrays vs ArrayList, when to use which?
 
 | | Array | ArrayList |
@@ -251,6 +261,11 @@ bag of values I won't add to or remove from."
 
 In modern Java code, you'll see `ArrayList` (or `List`) **far**
 more often than bare arrays.
+
+<Figure
+  slug="java-arrays-and-collections-inline-cutout"
+  alt="A fixed rail with exactly six slots on the left and an expandable rail on the right that has grown a seventh slot to take one more block"
+/>
 
 <MultipleChoice
   markdown={`What happens if you try \`scores[scores.length]\` on a Java array?

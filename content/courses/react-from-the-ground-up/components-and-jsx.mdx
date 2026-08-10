@@ -80,6 +80,11 @@ elements. A `Card` can render a `Title` and an `Avatar`; a `Page`
 renders many `Card`s. You build big UIs by combining small, named
 pieces, each one readable on its own.
 
+<Figure
+  slug="rx-components-and-jsx-inline-cutout"
+  alt="One page assembled from separate framed panels that each clip in and out, one panel lifted out to show the socket beneath"
+/>
+
 The card below is built from three tiny components: a `Star`, a
 `Rating` that renders three `Star`s, and a `ProductCard` that renders
 the `Rating`. It's live, and its source is right underneath:
@@ -205,3 +210,8 @@ if (!ps.some((p) => /admiral/i.test(p.textContent || ""))) {
 
 You can build and compose components. Now let's make them reusable by
 feeding them data: [Props](/courses/react-from-the-ground-up/props).
+
+<Figure
+  slug="rx-components-and-jsx-jsx-markup-inside-inline-cutout"
+  alt="A plain card with a small shaped tile set flush into the middle of its surface, the two cast as one piece"
+/>

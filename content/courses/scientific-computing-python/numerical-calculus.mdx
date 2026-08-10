@@ -46,6 +46,11 @@ just pick a small $h$. In floating point, two things fight:
 - **Round-off error** *increases* as $h$ shrinks (subtraction of
   nearby numbers loses digits)
 
+<Figure
+  slug="scipy-numerical-calculus-finite-differences-inline-cutout"
+  alt="Two points on a curve joined by a straight rod, the rod's slope measured"
+/>
+
 The optimal $h$ is a *balance*. For the forward difference
 $f'(x)\approx (f(x+h)-f(x))/h$, the sweet spot is around
 $h \approx \sqrt{\epsilon_\text{mach}} \approx 10^{-8}$.
@@ -225,6 +230,11 @@ total. Beyond 4-5 dimensions, switch to **Monte Carlo**, whose
 error scales as $1/\sqrt{N}$ regardless of dimension (we devote a
 whole chapter to it later).
 
+<Figure
+  slug="scipy-numerical-calculus-big-picture-inline-cutout"
+  alt="A curve with thin rectangles fitted under it and a straight rod resting tangent at one point"
+/>
+
 ## A multi-file calculus toolkit
 
 <CodeBlock
@@ -293,6 +303,11 @@ its own error by comparing one Simpson's rule against the sum of
 two half-interval Simpson rules, and recurses only where the
 disagreement exceeds the tolerance. SciPy's `quad` is a much more
 sophisticated relative, but the idea is the same.
+
+<Figure
+  slug="scipy-numerical-calculus-inline-cutout"
+  alt="A curve with a row of thin rectangles fitted under it, and a straight rod resting tangent against one point of the curve"
+/>
 
 ## Challenge: estimate $\pi$ by integration
 

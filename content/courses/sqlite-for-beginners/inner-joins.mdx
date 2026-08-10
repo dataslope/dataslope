@@ -70,6 +70,11 @@ ORDER BY
 
 Ada and Grace appear because they have matching orders. Linus disappears because no order matches him. Order `104` disappears because customer `7` does not exist.
 
+<Figure
+  slug="lite-inner-joins-inline-cutout"
+  alt="Two card racks pushed together, the pairs whose notches align lifted out onto a tray and the rest left in place"
+/>
+
 ```mermaid
 flowchart LR
     C1["customer 1<br/>Ada"] -->|"matches"| O1["order 101<br/><code>customer_id</code> 1"]
@@ -234,6 +239,11 @@ complete sample database modeled on a digital music store, with
 real tables for artists, albums, and tracks. The join below climbs
 two foreign keys, track to album, album to artist, exactly the
 pattern you just learned, only now across thousands of rows.
+
+<Figure
+  slug="lite-inner-joins-join-inner-join-inline-cutout"
+  alt="Two card racks pushed together with only aligned pairs lifted onto a tray"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"

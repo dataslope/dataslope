@@ -82,6 +82,11 @@ describes nobody present. This is not a rare edge case; it's the
 default for money, sizes, durations, and counts, which are almost all
 **right-skewed** (a long tail stretching toward large values).
 
+<Figure
+  slug="stat-measures-of-center-three-centers-each-inline-cutout"
+  alt="A plank on a fulcrum, a marker at the middle block, and a marker at the tallest pile"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -209,6 +214,11 @@ bottom 10%), then take the mean of what's left. It's a compromise: more
 robust than the mean, but still uses most of the data. This is exactly
 how Olympic judging and many sensor pipelines discard extremes before
 averaging.
+
+<Figure
+  slug="stat-measures-of-center-inline-cutout"
+  alt="One plank balanced on a fulcrum with blocks along it, and two other markers standing at the middle block and the tallest pile"
+/>
 
 **Weighted mean.** When some observations count more than others,
 larger stores, more-reliable sensors, bigger survey strata, give each a

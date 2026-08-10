@@ -321,6 +321,11 @@ the *nested data* chapter.
 The same reference-vs-value point we made for arrays applies to all
 objects.
 
+<Figure
+  slug="js-objects-creating-objects-inline-cutout"
+  alt="An empty compartmented case being filled, each compartment taking one item and gaining a blank tag"
+/>
+
 <CodeBlock
   adapter="javascript"
   files={[
@@ -346,6 +351,11 @@ console.log("c:", c);
 Object equality with `===` is **reference equality**, not
 structural equality. Two objects with identical contents are not
 considered equal unless they are *literally the same object*.
+
+<Figure
+  slug="js-objects-inline-cutout"
+  alt="One crate whose lid is open to show separate labelled compartments inside, each compartment holding a different small item"
+/>
 
 <CodeBlock
   adapter="javascript"

@@ -76,6 +76,11 @@ The exception travels *up* the stack until something catches it.
 Anything in its path (open files, half-built objects) gets cleaned
 up by stack unwinding plus `finally` blocks.
 
+<Figure
+  slug="mcs-error-handling-flow-exception-inline-cutout"
+  alt="A block leaving a belt, falling past two open baskets, and being caught by the third"
+/>
+
 ## `try` / `catch` / `finally`
 
 <CodeBlock
@@ -113,6 +118,11 @@ Rules:
   runtime picks the first matching one.
 - A `finally` block **always runs**, whether or not an exception
   was thrown, perfect for cleanup.
+
+<Figure
+  slug="mcs-error-handling-inline-cutout"
+  alt="A cracked block dropping off a bench into a padded catch basket, while a small sweeping arm clears the bench behind it whether or not anything fell"
+/>
 
 ## Throwing your own exceptions
 
@@ -166,6 +176,11 @@ This is a really common beginner trap, and it has a measurable cost. A
 throw is not a jump: the runtime captures a stack trace and walks frames
 looking for a handler, which is microseconds against nanoseconds for a
 returned status.
+
+<Figure
+  slug="mcs-error-handling-exceptions-mechanism-inline-cutout"
+  alt="A block falling off a belt into a padded basket held out beneath it"
+/>
 
 <Chart slug="exception-vs-return-cost" />
 

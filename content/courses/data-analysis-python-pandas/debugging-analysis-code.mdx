@@ -32,6 +32,11 @@ are what bite you.
 
 After any non-trivial line, print and check.
 
+<Figure
+  slug="pandas-debugging-analysis-code-habit-1-look-inline-cutout"
+  alt="A bench where a small viewing window is fitted after every station, each showing the tray as it passes"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -237,6 +242,11 @@ If your aggregation says revenue is $1.2M, double-check with a
 crude calculation, `df["revenue"].sum()`, to ensure the
 groupby didn't drop or duplicate rows.
 
+<Figure
+  slug="pandas-debugging-analysis-code-taxonomy-analysis-bugs-inline-cutout"
+  alt="Four labelled specimen jars on a shelf, each holding a differently shaped broken part"
+/>
+
 The act of computing the same number two ways catches an
 astonishing number of bugs.
 
@@ -263,6 +273,11 @@ Before you change any code, run through:
 - Can you reproduce it in 5 rows?
 
 *Then* fix it.
+
+<Figure
+  slug="pandas-debugging-analysis-code-inline-cutout"
+  alt="A result that looks wrong, with a hand walking back along the bench through each earlier tray to find where"
+/>
 
 ## Check your understanding
 

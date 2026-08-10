@@ -20,6 +20,11 @@ Picture trying to store this with one column. If `students` had a
 had a `student_id`, each course could hold only one student. Neither
 works, because **both sides are "many."**
 
+<Figure
+  slug="sql-many-to-many-foreign-key-not-inline-cutout"
+  alt="A crate with only one socket on its side and four cords needing to reach it at once"
+/>
+
 ```mermaid
 flowchart LR
     S1["Ada"] --- C1["Math"]
@@ -39,6 +44,11 @@ The solution is a third table that sits **between** the two,
 storing one row per connection. It is called a **junction**,
 **bridge**, or **join** table. Each of its rows holds two foreign
 keys: one to each side.
+
+<Figure
+  slug="sql-many-to-many-inline-cutout"
+  alt="Two rows of crates with every cord between them routed through a small board of pegs standing in the middle"
+/>
 
 ```mermaid
 erDiagram

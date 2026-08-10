@@ -47,6 +47,11 @@ The small shapes at the **ends** of a relationship line tell you
 *how many* rows take part. They are called **crow's-foot** notation
 because the "many" symbol looks like a bird's footprint.
 
+<Figure
+  slug="sql-entity-relationship-diagrams-inline-cutout"
+  alt="A pinned board of plain boxes and cords, a hand tracing one cord from a box to the box it points at"
+/>
+
 ```mermaid
 erDiagram
     A ||--|| B : "one-to-one"
@@ -132,6 +137,11 @@ ORDER BY
 The `PK` markers became `PRIMARY KEY`; the `FK` became `REFERENCES`;
 the `||--o{` line became the `customer_id` column on the "many"
 side. The diagram and the schema are two views of the same design.
+
+<Figure
+  slug="sql-entity-relationship-diagrams-anatomy-er-diagram-inline-cutout"
+  alt="One plain box, one cord, one single peg and one three-pronged fitting laid out separately on a bench"
+/>
 
 ## A fuller model
 

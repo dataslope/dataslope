@@ -63,6 +63,11 @@ week, rather than a truncated date. `EXTRACT(part FROM d)` (or
 `date_part`) pulls it out. This is how you answer "which weekday is
 busiest?" by grouping across all weeks.
 
+<Figure
+  slug="duck-working-with-dates-core-move-truncate-inline-cutout"
+  alt="A calendar strip cut by a guillotine into equal months and the pieces stacked"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Which day of week sees the most orders?"
@@ -221,3 +226,8 @@ A generated date spine plus a left join produces a gap-free time series.`}
 
 Dates handled, the last transformation skill is **reshaping**, turning
 long data into wide and back. That is the next page.
+
+<Figure
+  slug="duck-working-with-dates-inline-cutout"
+  alt="A calendar strip being cut into months by a small guillotine, and the pieces stacked into three labelled trays"
+/>

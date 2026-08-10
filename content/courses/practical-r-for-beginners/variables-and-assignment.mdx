@@ -132,6 +132,11 @@ When you assign, R does not print anything. Only by *referencing*
 the variable (or by wrapping the assignment in parentheses) do you
 see the value.
 
+<Figure
+  slug="rlang-variables-and-assignment-inline-cutout"
+  alt="A labelled tag being tied to a block on a bench, and the same tag later moved to a different block"
+/>
+
 <CodeBlock
   adapter="r"
   files={[
@@ -188,6 +193,11 @@ When you write `x <- c(1, 2, 3)`, R does three things:
 2. Stores that vector somewhere in memory.
 3. Adds an entry to your workspace mapping the name `x` to that
    stored vector.
+
+<Figure
+  slug="rlang-variables-and-assignment-not-inline-cutout"
+  alt="A tag being tied onto a block by a hooked tool that only works in one direction"
+/>
 
 When you later write `x + 1`, R:
 

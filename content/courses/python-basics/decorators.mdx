@@ -39,6 +39,11 @@ print(add_five(20))  # 25
 
 `inner` "closes over" `x` from `outer`. Even after `outer` returns, `inner` remembers `x=5`. Decorators use this pattern to wrap functions.
 
+<Figure
+  slug="python-decorators-preserve-metadata-functools-inline-cutout"
+  alt="A machine wrapped in a frame with its original blank name plate carried through onto the frame's face"
+/>
+
 ## The minimal decorator
 
 <CodeBlock
@@ -73,6 +78,11 @@ greet = shout(greet)
 ```
 
 The decorator `shout` takes the original `greet`, wraps it in a new function that uppercases the result, and replaces `greet` with that wrapper.
+
+<Figure
+  slug="python-decorators-minimal-decorator-inline-cutout"
+  alt="A small machine lifted into a surrounding frame that wraps it and adds one extra stamp"
+/>
 
 ```mermaid
 flowchart TD
@@ -279,6 +289,11 @@ greet = bracketed(excited(greet))
 ```
 
 The call stack is: `bracketed wrapper` → `excited wrapper` → original `greet`. So `greet("Ada")` returns `"hello Ada"`, then `excited` adds `!`, then `bracketed` adds `[]`, producing `"[hello Ada!]"`.
+
+<Figure
+  slug="python-decorators-inline-cutout"
+  alt="A small machine being lifted into a surrounding frame that wraps it, the wrapped unit doing the original job plus one extra stamp"
+/>
 
 <Callout type="info" title="Order matters">
 Stacking decorators bottom-up can be counterintuitive. The decorator **closest** to the function definition runs **first** (wraps the original function), and decorators above it wrap the result. If order matters (e.g., a \`@cache\` decorator should wrap \`@retry\`, not the other way around), pay attention to the order.

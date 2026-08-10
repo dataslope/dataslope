@@ -14,10 +14,11 @@ import {
 // card, and the batch generator (scripts/generate-illustrations.mjs) all key
 // off these pure helpers and the shared JSON, so their output is pinned here:
 // the prompt text must match the authored GPT Image 2 template exactly (always
-// "No text." plus the no-clutter/solid-form rules), and the file name must be a
-// stable PNG slug.
+// "No text." plus the no-clutter rule, then the constraints of the style being
+// drawn), and the file name must be a stable PNG slug.
 
-/** The constraints appended to every prompt regardless of subject. */
+/** The constraints appended to every isometric prompt, which is every prompt
+ *  except the `course-inline` risograph bands. */
 const CONSTRAINTS =
   "No text. Draw only the objects described — nothing scattered over, around, " +
   "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
@@ -35,6 +36,11 @@ const CONSTRAINTS =
   "silhouette. A bird has wings, a beak and feet and never hands or arms: it " +
   "perches, stands, or nudges things with its beak rather than holding them.";
 
+/** The part of it that is shared with every other style. */
+const SHARED =
+  "No text. Draw only the objects described — nothing scattered over, around, " +
+  "or behind them: no speckled dots, no confetti, no stray connecting lines.";
+
 describe("buildIllustrationPrompt", () => {
   it("defaults to the isometric house style, with brand colors and the constraints", () => {
     expect(
@@ -48,10 +54,38 @@ describe("buildIllustrationPrompt", () => {
     );
   });
 
-  it("still honours an explicitly authored risograph", () => {
+  // Risograph is the one style with constraints of its own: the inline
+  // historical bands. It keeps the two shared rules and swaps everything the
+  // isometric block says about volume, staging and animals, because asking one
+  // prompt for both gives a 3D render with grain sprinkled over it.
+  it("gives risograph its own constraints, keeping the shared two", () => {
+    const prompt = buildIllustrationPrompt({
+      subject: "a ribbon of tiles",
+      style: "risograph",
+    });
+    expect(prompt).toContain(`A risograph of a ribbon of tiles. ${SHARED}`);
+    expect(prompt).toContain("Print it as a risograph");
+    expect(prompt).not.toContain("solid three-dimensional form");
+    expect(prompt).not.toContain("pale grey and white");
+  });
+
+  // Every one of these is load-bearing, not stylistic. Blank paper is what
+  // leaves the background remover a subject to lift rather than a rectangle;
+  // brand inks are the transparency constraint (a black-keyed cut-out reads on
+  // the white page and vanishes on the near-black one); the band shape is the
+  // 2:1 frame these are generated at.
+  it("keeps the risograph rules that make a cut-out survive both themes", () => {
+    const prompt = buildIllustrationPrompt({ subject: "a rocket", style: "risograph" });
+    expect(prompt).toContain("Leave the paper blank white");
+    expect(prompt).toContain("no printed panel, no frame, no border, no ground shadow");
+    expect(prompt).toContain("never key the scene off black, grey, or a single hue");
+    expect(prompt).toContain("twice as long as it is tall");
+  });
+
+  it("falls back to the isometric constraints for a style with no block", () => {
     expect(
-      buildIllustrationPrompt({ subject: "a ribbon of tiles", style: "risograph" }),
-    ).toContain(`A risograph of a ribbon of tiles. ${CONSTRAINTS}`);
+      buildIllustrationPrompt({ subject: "a duck", style: "cut-paper collage" }),
+    ).toContain(`A cut-paper collage of a duck. ${CONSTRAINTS}`);
   });
 
   it("uses 'An' for a vowel-initial style and honours custom styles/colors", () => {
@@ -78,6 +112,9 @@ describe("buildIllustrationPrompt", () => {
   it("bans scattered decoration and keeps forms solid on every prompt", () => {
     for (const entry of getIllustrationPrompts().entries) {
       expect(entry.prompt).toContain("no speckled dots, no confetti");
+      // The solid-form half is the isometric block's, and the risograph bands
+      // deliberately do not carry it: they are flat spot-ink prints.
+      if (entry.style === "risograph") continue;
       expect(entry.prompt).toContain("solid three-dimensional form");
       expect(entry.prompt).toContain("never as a glossy sphere, a ball");
       // The glossy-sphere ban must stay PROHIBITIVE. Naming a replacement
@@ -87,6 +124,19 @@ describe("buildIllustrationPrompt", () => {
       // circles" line. Never prescribe a shape the subject did not ask for.
       expect(entry.prompt).not.toMatch(/low solid disc/i);
       expect(entry.prompt).not.toMatch(/draw any repeated round elements/i);
+    }
+  });
+
+  // The two styles in use, and the categories that may carry them. A lesson's
+  // own art is isometric; risograph exists for the inline bands and nothing
+  // else, which is what keeps "do not reintroduce a second style" true.
+  it("keeps risograph to the inline category, and everything else isometric", () => {
+    for (const entry of getIllustrationPrompts().entries) {
+      if (entry.category === "course-inline") {
+        expect(entry.style).toBe("risograph");
+      } else {
+        expect(entry.style).toBe("isometric illustration");
+      }
     }
   });
 
@@ -182,3 +232,71 @@ describe("generator / library prompt parity", () => {
     }
   });
 });
+
+describe("authored subjects", () => {
+  // Every style block ends with "No text, letters, numbers or symbols anywhere
+  // in the image", and the model honours it — until the subject itself asks for
+  // the opposite. "A long numbered shelf" produced a shelf stamped 0, 2, 3, 4,
+  // 5, 6 (skipping 1, for good measure), and "one a numbered rail" produced
+  // drawers stamped 1 to 4. Both read as a "No text" failure by the model; both
+  // were written into the prompt by hand.
+  //
+  // Position is drawable without writing a single digit: a hand reaching past
+  // the first three slots to the fourth says index just as clearly. This keeps
+  // the two instructions from contradicting each other in the first place.
+  it("never asks an illustration for numbers it is told not to draw", () => {
+    // Three spellings, all of which produced literal digits: "a numbered
+    // shelf", "a column of numbers", "number tiles". A gauge that "reads a
+    // single number" is deliberately not caught — that one comes back as a
+    // dial with a pointer, which is exactly right, and banning the word
+    // outright would flag six subjects that are already correct.
+    //
+    // Note for whoever authors the next batch, which will probably be me: the
+    // word this catches most often is not a request for numbers at all. Three
+    // separate waves have contained "a numbered-free ticket", "numbered-free
+    // step plates" and "a numbered-free rail", each time reaching for *plain*
+    // or *unlabelled* and landing on the one word that guarantees digits. If
+    // you mean the thing has no markings, write "unmarked" or "blank".
+    const asksForDigits =
+      /\bnumbered\b|\b(?:column|grid|row|stack|strip|list|table) of numbers\b|\bnumber tiles?\b/i;
+    const offenders = getIllustrationPrompts()
+      .entries.filter((e) => asksForDigits.test(e.subject))
+      .map((e) => e.id);
+    expect(offenders).toEqual([]);
+  });
+
+  // "Whiskers" is a box plot's own vocabulary, and it is the one word here that
+  // fails outright rather than sometimes: a subject naming them came back as a
+  // cube with eyes, a nose and six green whiskers sprouting from it. The rods
+  // are drawable without the word — "a thin rod projecting from its top and its
+  // bottom" produces the same picture and never a cat.
+  it("never names a box plot's whiskers", () => {
+    const offenders = getIllustrationPrompts()
+      .entries.filter((e) => /\bwhiskers?\b/i.test(e.subject))
+      .map((e) => e.id);
+    expect(offenders).toEqual([]);
+  });
+});
+
+// Three more traps found by reviewing generated art, none of them guarded here
+// because each one has more correct uses than incorrect ones and a regex would
+// flag art that is already right. They are recorded so the next author (me)
+// recognises the failure on sight instead of re-deriving it:
+//
+//   * A verb that gives an object intent — a crate "acting in response", a gate
+//     "refusing" to open, a machine "reading" past its tape, a parcel "wearing"
+//     a tag — draws a cartoon character with eyes and a mouth. Roughly half the
+//     time: the same "gate refusing to remove a crate" wording produced a plain
+//     latched gate in one course and a face with a raised hand in another.
+//     Describe the mechanism instead ("the gate staying latched", "a hatch on
+//     its far side swinging open") and it never happens.
+//   * A word with a physical twin gets the twin. "Columns" clamped into a board
+//     came back as fluted classical pillars; a row "combed" into order came back
+//     as five hair combs; "a mask covering others" came back as a carnival mask.
+//     Note the twin is not certain either — the same "columns feeding a machine"
+//     wording drew data drums in pandas and pillars in rlang.
+//   * Naming a thing the style block bans deletes it and keeps the rest. The
+//     risograph rules forbid a frame or a printed panel, so "a frame stretched
+//     wider" produced the landscape that would have been inside the frame, and
+//     "a solid inked panel with chips on it" produced loose scenery. Ask for a
+//     board, a card or a tile.

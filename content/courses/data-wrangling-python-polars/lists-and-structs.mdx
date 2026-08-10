@@ -44,6 +44,11 @@ print(df.schema)
 They arrive naturally from three places: JSON input, `str.split`, and
 a `group_by().agg()` without an aggregation.
 
+<Figure
+  slug="pl-lists-and-structs-inline-cutout"
+  alt="One cell of a board opened to show a small rail of blocks inside it, and another opened to show labelled compartments"
+/>
+
 ## The .list namespace
 
 <CodeBlock
@@ -81,6 +86,11 @@ print(
 Every one of these operates on all rows at once. There is no Python
 loop and no `apply`.
 
+<Figure
+  slug="pl-lists-and-structs-list-namespace-inline-cutout"
+  alt="One cell of a board opened to show a small rail of blocks inside it, a set of small tools hanging above that cell"
+/>
+
 ## explode: one row per element
 
 <CodeBlock
@@ -110,6 +120,11 @@ print(flat.group_by("user").agg(pl.col("scores")).sort("user"))
 `explode` and `group_by().agg()` are inverses. That round trip is
 worth remembering: it is how you get from a nested layout into the
 flat one every other operation prefers, and back.
+
+<Figure
+  slug="pl-lists-and-structs-explode-one-row-inline-cutout"
+  alt="One cell holding a small rail of blocks tipped out so each block takes a full row of its own beneath"
+/>
 
 ## Struct columns
 

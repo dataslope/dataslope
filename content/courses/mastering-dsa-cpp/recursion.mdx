@@ -33,6 +33,11 @@ What is the smallest input I can answer immediately? How does every other input 
 
 The leap of faith explains how to *write* recursion; the call stack explains how the machine *runs* it. Each call gets its own **stack frame** containing parameters, local variables, and a return address, so `factorial(3)` and `factorial(2)` each have their own private `n`, stacked one atop the other exactly like the plates from the stacks chapter. Frames pile up on the way down until a base case returns, then unwind in reverse order, each frame finishing its pending multiplication as control passes back through it.
 
+<Figure
+  slug="dsa-recursion-call-stack-inline-cutout"
+  alt="A column of trays growing as each nested job starts and unstacking from the top as each returns"
+/>
+
 ```mermaid
 sequenceDiagram
     participant F3 as factorial 3
@@ -192,6 +197,11 @@ int main() {
 ## Stack overflow and tail recursion
 
 Every frame costs memory, and the stack region is finite, typically a few megabytes. A **stack overflow** happens when recursive calls create more frames than the stack can hold: a missing or unreachable base case is the classic cause, but even a *correct* recursion can overflow on a deep enough input (a recursive list traversal over a million nodes, say). The defenses, in order of preference: verify the base case is always reachable, switch to iteration when depth can be large, or convert tail recursion to a loop.
+
+<Figure
+  slug="dsa-recursion-inline-cutout"
+  alt="A set of nested boxes opened one inside another down to a tiny solid one, and the stack closing back up in reverse"
+/>
 
 Tail recursion means the recursive call is the very last action, nothing is pending after it returns. In `factorialTail` below, the running product travels *down* the recursion in the `acc` parameter instead of being multiplied on the way back up. Because no frame has unfinished work, a compiler *may* reuse the current frame for the next call, turning the recursion into a loop. Clang often does; but C++ (unlike Scheme) does not guarantee it, so never bet a deep recursion's correctness on the optimizer's mood.
 

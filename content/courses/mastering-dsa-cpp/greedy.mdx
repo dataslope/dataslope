@@ -111,6 +111,11 @@ flowchart TD
 
 A pleasing contrast with the DP chapter: 0/1 knapsack *requires* dynamic programming, but allow items to be split, you can take half the sack of flour, and greedy suddenly becomes correct. Sort by value-per-kilogram and take the densest item until it runs out or the bag fills, topping off with a fraction of the next. Divisibility is what saves the local rule: there is never a "this dense item doesn't quite fit, should I have skipped it?" regret, because you take exactly the part that fits. A tiny change in the problem's rules flips which paradigm applies, worth remembering in interviews.
 
+<Figure
+  slug="dsa-greedy-fractional-knapsack-inline-cutout"
+  alt="A sack being filled with the densest blocks first, the last one cut to fit exactly"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -181,6 +186,11 @@ int main() {
 ## Huffman coding
 
 The most consequential greedy algorithm ever devised was a homework dodge. In 1951, David Huffman was a graduate student in Robert Fano's information theory course at MIT, where students could either take the final exam or solve a term-paper problem: construct the most efficient binary code for a set of symbols with known frequencies. What Huffman didn't know was that Fano himself, with Claude Shannon, had attacked the problem and settled for a suboptimal method. Huffman struggled for months and was about to give up and study for the exam when the insight arrived: build the code tree *bottom-up*, greedily merging the two least frequent symbols, again and again. The result was provably optimal, outdoing his professor, and Huffman coding still runs inside ZIP, JPEG, and MP3 files today.
+
+<Figure
+  slug="dsa-greedy-activity-selection-inline-cutout"
+  alt="A row of overlapping bars with the earliest-finishing one taken first and the overlaps swept aside"
+/>
 
 The implementation is a priority-queue loop: repeatedly extract the two smallest frequencies, merge them, and push the sum back. (The full algorithm builds tree nodes; the version below computes just the total encoding cost, each merge's sum is the number of bits that merge contributes.)
 
@@ -266,6 +276,11 @@ int main() {
 ## Practice
 
 Three challenges, three greedy flavors: the sort-and-scan (activity selection), the running-frontier (jump game), and biggest-coin-first on a coin system where it is actually legal.
+
+<Figure
+  slug="dsa-greedy-inline-cutout"
+  alt="A figure walking a row of coin trays taking the largest from each in turn without looking ahead, and one tray further on holding a much larger prize"
+/>
 
 <ChallengeCard
   adapter="cpp"

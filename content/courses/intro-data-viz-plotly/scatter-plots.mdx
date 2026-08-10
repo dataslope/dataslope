@@ -198,6 +198,11 @@ The **diamonds** dataset, 53,940 rows of carat, cut, and price, is a
 realistic stress test. At full opacity the cloud is a solid blob; at
 `opacity=0.2` the dense regions reveal themselves as darker.
 
+<Figure
+  slug="viz-scatter-plots-use-scatter-plot-inline-cutout"
+  alt="Two columns of chips pinned against each other on a board, a loose upward drift emerging"
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
@@ -246,6 +251,11 @@ what you want, it produces tall stacks of dots above each category
 label. Use a **strip plot** (`px.strip`), **violin plot**
 (`px.violin`), or **box plot** (`px.box`) instead, we'll cover
 boxes next.
+
+<Figure
+  slug="viz-scatter-plots-inline-cutout"
+  alt="A plain board with chips pinned at different heights and distances, forming a loose upward drift from left to right"
+/>
 
 The other one is quieter and harder to undo: plotting a
 `groupby().mean()` and then reading it as if it described

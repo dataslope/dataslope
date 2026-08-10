@@ -94,12 +94,22 @@ constructor that default-initializes each field. The moment you
 write *any* constructor, the compiler-generated default goes away.
 If you still want it, write `Rect() = default;`.
 
+<Figure
+  slug="cpp-constructors-and-destructors-inline-cutout"
+  alt="A workbench where a crate is assembled and filled at the left, used in the middle, and emptied and folded flat at the right"
+/>
+
 ## The destructor releases resources
 
 The destructor is a method named `~ClassName` that takes no
 parameters. It runs automatically when an object's lifetime ends,
 at the closing brace of its scope for a local, at `delete` for a
 heap object, when the program ends for a global.
+
+<Figure
+  slug="cpp-constructors-and-destructors-destructor-releases-resources-inline-cutout"
+  alt="A crate being emptied and folded flat as it leaves the bench, its tap closed behind it"
+/>
 
 <CodeBlock
   adapter="cpp"
@@ -158,6 +168,11 @@ existed, we *knew* its month and day were sensible. The
 constructor's job is to put the object in a state that satisfies the
 class invariants. The rest of the class's methods can then assume
 the invariants hold.
+
+<Figure
+  slug="cpp-constructors-and-destructors-constructors-put-fields-inline-cutout"
+  alt="A crate whose compartments are all filled before its lid will close, one empty compartment holding the lid open"
+/>
 
 ## A first taste of the Rule of Three
 

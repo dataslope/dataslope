@@ -98,6 +98,11 @@ then the final query built on `per_region`.* Each step has a name that
 says what it is. This is how analysts write queries they can revisit a
 month later and still understand.
 
+<Figure
+  slug="duck-common-table-expressions-inline-cutout"
+  alt="Four small named trays along a bench, each built from the one before it, with the last feeding a machine"
+/>
+
 ```mermaid
 flowchart TD
     A["WITH paid<br/>(filter)"] --> B["<code>per_region</code><br/>(aggregate)"]
@@ -231,3 +236,8 @@ Named steps let analysts inspect and iterate on each stage of a pipeline.`}
 CTEs are the *named* way to build sub-results. SQL also has unnamed,
 inline ones, **subqueries**, each with its own best use. That contrast
 is the next page.
+
+<Figure
+  slug="duck-common-table-expressions-problem-queries-nest-inline-cutout"
+  alt="A machine inside a machine inside a machine, the innermost barely reachable"
+/>

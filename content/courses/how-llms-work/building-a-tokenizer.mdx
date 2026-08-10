@@ -25,6 +25,16 @@ Stop when you have as many merges as you want vocabulary entries. The
 list of merges *is* the tokenizer: to tokenize new text, split it into
 characters and replay the merges in order.
 
+<Figure
+  slug="llm-building-a-tokenizer-counting-pairs-inline-cutout"
+  alt="A ribbon of chips with a tally rack beside it counting how often each neighbouring pair appears"
+/>
+
+<Figure
+  slug="llm-building-a-tokenizer-inline-cutout"
+  alt="A ribbon of text being cut into chips, the most common runs kept whole and the rare ones cut smaller"
+/>
+
 The elegance is that frequency does all the work. Common sequences get
 merged early and become single tokens; rare ones never merge and stay
 fragmented. That is exactly the behavior we observed in the previous

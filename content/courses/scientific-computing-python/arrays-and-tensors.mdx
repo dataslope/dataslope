@@ -35,6 +35,16 @@ flowchart TD
 - A **strides** tuple, how many bytes to skip in the buffer to
   step along each axis.
 
+<Figure
+  slug="scipy-arrays-and-tensors-creating-arrays-inline-cutout"
+  alt="A solid grid of cells filling in one by one from a hopper, each filled cell a block of ink"
+/>
+
+<Figure
+  slug="scipy-arrays-and-tensors-inline-cutout"
+  alt="A single row of cells, a flat grid of them, and a stack of those grids, standing side by side in increasing dimension"
+/>
+
 Most array operations, slicing, transposing, reshaping, just
 change the *header*. The underlying bytes are not copied. That is
 what makes NumPy so fast.
@@ -117,6 +127,11 @@ print("choice :", rng.choice(["a", "b", "c"], size=4))
 
 There are three indexing modes, and they behave very differently in
 terms of memory.
+
+<Figure
+  slug="scipy-arrays-and-tensors-indexing-views-fancy-inline-cutout"
+  alt="A frame laid over a grid showing part of it, a scoop lifting scattered cells, and a solid cover plate hiding the rest"
+/>
 
 **Basic indexing** (slices, integers, `:`, `None`) returns a **view**.
 A view shares memory with the original; modifying the view modifies

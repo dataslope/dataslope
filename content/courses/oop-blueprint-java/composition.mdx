@@ -63,6 +63,11 @@ classDiagram
 The solid diamond `*--` in UML means *composition*, strong
 ownership. The `Engine` is part of the `Car`.
 
+<Figure
+  slug="oopj-composition-first-example-car-inline-cutout"
+  alt="A vehicle body with an engine block fitted inside it, the two joined permanently"
+/>
+
 <CodeBlock
   adapter="java"
   entryFilename="Main.java"
@@ -121,6 +126,11 @@ Things to notice:
 Composition is what lets you build *big* objects out of *small*
 ones. Each small one is well-encapsulated, easy to reason about, and
 easy to test. The big one just orchestrates.
+
+<Figure
+  slug="oopj-composition-inline-cutout"
+  alt="One machine assembled from four smaller machines bolted into a frame, each smaller one still recognisable inside it"
+/>
 
 ```mermaid
 flowchart TD
@@ -210,6 +220,11 @@ Beginners often reach for inheritance ("a `SportsCar` extends `Car`")
 when composition would serve better ("a `Car` has an `Engine`, which
 might be a sports engine"). We will study inheritance later, and you
 will see how often the right move is to reach for composition first.
+
+<Figure
+  slug="oopj-composition-has-relationship-inline-cutout"
+  alt="A machine with a smaller machine bolted inside it, still recognisable through an opening"
+/>
 
 > "**Favor object composition over class inheritance**", Gang of
 > Four

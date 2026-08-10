@@ -27,6 +27,11 @@ A 64-bit double is a triplet of bit fields:
 
 The value represented is
 
+<Figure
+  slug="scipy-floating-point-inline-cutout"
+  alt="A ruler whose marks are close together near the left end and further and further apart toward the right, a block landing between two marks"
+/>
+
 $$ (-1)^s \cdot (1 + m) \cdot 2^{e - 1023} $$
 
 for ordinary "normal" numbers. There are also *subnormals*
@@ -73,6 +78,11 @@ Epsilon is the gap at 1.0, and the gap is not a constant: it scales with the
 number. Both axes are logarithmic, which turns the doubling into the straight
 line it is.
 
+<Figure
+  slug="scipy-floating-point-machine-epsilon-inline-cutout"
+  alt="A rule with a caliper measuring the smallest gap between two adjacent marks near its left end"
+/>
+
 <Chart slug="float-precision-gaps" />
 
 The smallest float strictly greater than $1.0$ is $1 + \epsilon$
@@ -112,6 +122,11 @@ Three special "numbers" appear all the time:
   `0.0 / 0.0` or `inf - inf`
 - **`-0.0`**, yes, negative zero, distinguishable from `+0.0`
   in a few rare cases
+
+<Figure
+  slug="scipy-floating-point-special-values-inline-cutout"
+  alt="A measuring rail with one block sitting far past its end and an empty socket in the rail where a block should be"
+/>
 
 NaN is special because it is **not equal to anything, including
 itself**. This is a deliberate design choice: it lets you check

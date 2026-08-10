@@ -102,6 +102,11 @@ each instruction, the pointer advances. A `jump` instruction *sets*
 the pointer to a different address, which is how loops, `if`
 branches, and function calls work under the hood.
 
+<Figure
+  slug="cpp-how-computers-execute-inline-cutout"
+  alt="A small unit repeating a three-station cycle, taking a card, reading it, and acting on it before returning for the next"
+/>
+
 The CPU also has a tiny set of very fast storage slots called
 **registers** (typically 16 to 32 of them, each holding 4 or 8
 bytes). Registers are where actual arithmetic happens. Adding two
@@ -296,3 +301,8 @@ detail to keep in mind for the next several chapters.
 
 Next: *how* your source code becomes machine instructions in the
 first place.
+
+<Figure
+  slug="cpp-how-computers-execute-simplest-useful-model-inline-cutout"
+  alt="One small engine, one wall of slots and one card feeder, joined in a triangle by short cords"
+/>

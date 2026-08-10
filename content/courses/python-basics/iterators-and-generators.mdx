@@ -86,6 +86,11 @@ for item in it:
 
 Notice that after pulling `"alpha"` with `next()`, the `for` loop sees only what remains. Iterators are **stateful** and **single-pass**.
 
+<Figure
+  slug="python-iterators-and-generators-manually-driving-iterator-inline-cutout"
+  alt="A hand turning a drum's crank one notch at a time, one block leaving per turn"
+/>
+
 ## Custom iterator class
 
 If you need complex state, write your own iterator with `__iter__` and `__next__`:
@@ -139,6 +144,11 @@ for x in countdown(5):
 />
 
 Each `yield` **pauses** the function and hands a value to the caller. The next `next()` call resumes the function right after that `yield`, with all local state (variables, the instruction pointer) intact.
+
+<Figure
+  slug="python-iterators-and-generators-inline-cutout"
+  alt="A dispenser handing out one block at a time on request, with a long roll still coiled inside it rather than laid out on the bench"
+/>
 
 <Callout type="info" title="Generators are lazy">
 Calling a generator function does NOT run any code. It returns a generator object. Code runs only when you iterate, pulling one value at a time. This is why generators can represent infinite sequences, you never build the whole thing in memory.
@@ -648,3 +658,8 @@ Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\
 />
 
 Functions that decorate other functions are next.
+
+<Figure
+  slug="python-iterators-and-generators-really-does-inline-cutout"
+  alt="A smooth handle on a drum's outside with its cover lifted to show a crank and pointer within"
+/>

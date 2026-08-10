@@ -107,11 +107,21 @@ print(type(g))  # a seaborn FacetGrid
 That difference in return type is not a technicality, it determines what
 you can *do* next.
 
+<Figure
+  slug="sns-figure-level-vs-axes-level-seeing-difference-they-inline-cutout"
+  alt="Two machines each handing back a different thing, one a single panel and one a framed grid of panels"
+/>
+
 ## What axes-level gives you: composition
 
 Because axes-level functions accept an `ax=`, you can build your own
 matplotlib figure and place several different plots into it. Figure-level
 functions can't do this, they insist on owning the whole figure.
+
+<Figure
+  slug="sns-figure-level-vs-axes-level-inline-cutout"
+  alt="One panel drawn alone on a bench, and a whole grid of such panels built in one stroke beside it"
+/>
 
 <CodeBlock
   adapter="python"
@@ -171,6 +181,11 @@ sns.relplot(
 
 Try doing that with `scatterplot` and you'd be writing the subplot loop
 yourself. Faceting is the reason figure-level functions exist.
+
+<Figure
+  slug="sns-figure-level-vs-axes-level-two-kinds-functions-inline-cutout"
+  alt="One machine handing back a single framed panel and another handing back a whole grid of them"
+/>
 
 <MultipleChoice
   markdown={`You want **one panel per category** (small multiples) using a single

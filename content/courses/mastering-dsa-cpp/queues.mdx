@@ -35,6 +35,11 @@ flowchart TD
 
 `std::queue` is an adapter. By default it uses `std::deque`, exposing only FIFO operations.
 
+<Figure
+  slug="dsa-queues-queue-adt-inline-cutout"
+  alt="A channel with an entry gate at one end and an exit gate at the other"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -63,6 +68,11 @@ int main() {
 ## Producer-consumer style
 
 One part of a program can produce work while another consumes it in the same order.
+
+<Figure
+  slug="dsa-queues-std-queue-t-inline-cutout"
+  alt="A ready-made channel lifted off a shelf with its two gates already fitted"
+/>
 
 <CodeBlock
   adapter="cpp"
@@ -158,6 +168,11 @@ int main() {
 ## Priority queues teaser
 
 `std::priority_queue` is not FIFO. It returns the highest-priority item first and is usually implemented with a heap. We will cover it later in the heaps section.
+
+<Figure
+  slug="dsa-queues-inline-cutout"
+  alt="A channel with an entry gate at one end and an exit gate at the other, blocks leaving strictly in the order they arrived"
+/>
 
 <CodeBlock
   adapter="cpp"

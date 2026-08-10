@@ -182,6 +182,11 @@ This same pattern works whenever the question says "never," "missing," or "no re
 
 `COUNT(column)` ignores `NULL`, which is useful with left joins. It lets you count matching right-side rows while still keeping left-side rows with zero matches.
 
+<Figure
+  slug="lite-outer-joins-left-join-keeps-inline-cutout"
+  alt="Two racks pushed together where every card from the left is kept, unmatched ones paired with a blank"
+/>
+
 <SqlCodeBlock
   dialect="sqlite"
   title="Count orders for every customer"
@@ -207,6 +212,11 @@ Linus gets `0` because there are no non-NULL order ids to count.
 ## A note about RIGHT and FULL OUTER JOIN in SQLite
 
 For beginners, `LEFT JOIN` is the most important outer join. Recent SQLite versions also support `RIGHT JOIN` and `FULL OUTER JOIN`, but you can usually make your query clearer by arranging the table you want to preserve on the left and using `LEFT JOIN`.
+
+<Figure
+  slug="lite-outer-joins-inline-cutout"
+  alt="Two racks pushed together where every card from the left rack is kept, unmatched ones paired with a blank"
+/>
 
 ```mermaid
 flowchart TD

@@ -140,6 +140,11 @@ createRoot(document.getElementById("root")!).render(<TaskList tasks={TASKS} />);
 That early `return` for the empty case is a common React idiom: guard
 the edge case first, then render the normal path.
 
+<Figure
+  slug="rx-rendering-lists-inline-cutout"
+  alt="A tray of three data blocks on the left, each one stamped into an identical card by a small press, the finished cards standing in a row on the right"
+/>
+
 Lists get interesting when the array is *derived* from state. Type in
 the box below: the visible list is `fruits.filter(...)` recomputed on
 every render, and when nothing matches, the empty-state guard kicks in:

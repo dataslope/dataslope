@@ -19,8 +19,11 @@
  * stem (`index.mdx` uses the collection's thumbnail prompt instead):
  *
  *   - Drops any `<Figure>` pointing at a slug that is not a known prompt id.
- *     That is how retired art (the old risographs and one-off slugs) is cleared.
- *     A `<Figure>` already pointing at the right slug is left untouched.
+ *     That is how retired art (one-off slugs, the inline SVGs' replacements) is
+ *     cleared. A `<Figure>` already pointing at the right slug is left
+ *     untouched, and so is one pointing at any *other* id in the JSON: the
+ *     `course-inline` risograph bands are placed by hand beside the paragraph
+ *     they illustrate, and a re-wire must not sweep them out or move them.
  *   - Replaces the first inline `<svg>…</svg>` block with the `<Figure>` and
  *     deletes any further ones. Inline SVG is retired repo-wide; a course
  *     authored in the old style is converted in place. Pages that had two or

@@ -367,6 +367,11 @@ running (cumulative) average, "the average of everything up to and
 including now." It's the honest, leakage-free way to say "the typical value
 *so far*," because at each point it only knows the past.
 
+<Figure
+  slug="tsa-rolling-and-expanding-windows-inline-cutout"
+  alt="Two rails of daily blocks, the near one with a short frame of fixed width sliding along it, the far one with a frame whose left edge stays pinned so it stretches longer as it moves right"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -630,3 +635,8 @@ Windows assume the data is *there* to average. But real series have holes,
 a sensor drops out, a day goes unrecorded, and a single `NaN` can poison a
 rolling window. How you fill those gaps is a genuine assumption about the
 unseen, and that's next.
+
+<Figure
+  slug="tsa-rolling-and-expanding-windows-first-looking-backward-inline-cutout"
+  alt="A rail of blocks with every block slid one sleeper to the right, leaving the first sleeper bare"
+/>

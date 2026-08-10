@@ -35,6 +35,11 @@ A short trace, where each operation acts on the top:
 
 `std::stack` is a container adapter. By default, it uses `std::deque` underneath and exposes only stack operations.
 
+<Figure
+  slug="dsa-stacks-std-stack-t-inline-cutout"
+  alt="A column of trays where only the top one can be lifted or added to"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -191,6 +196,12 @@ This same algorithm, scaled up, is how your compiler checks that every `{` in yo
 ## Function call stack
 
 Every function call needs a place to remember local variables and where to return, and calls finish in reverse order of starting, which is LIFO by definition. So the machine keeps a stack of *frames*, pushing one per call and popping it on return. This is Turing's "bury and unbury" and Bauer's cellar, built into every CPU you own.
+
+<Figure
+  slug="dsa-stacks-cellar-cutout"
+  alt="An open cellar hatch in a floor taking plates one at a time, with the topmost plate being lifted back out"
+  caption="Bauer and Samelson, 1950s: they called it the Keller, the cellar, because the last thing dropped in comes out first."
+/>
 
 ```mermaid
 sequenceDiagram

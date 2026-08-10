@@ -29,6 +29,11 @@ crawled. Crawled text becomes training data. A model that saw the test
 answers during training scores well without having the capability the
 test was designed to measure.
 
+<Figure
+  slug="llm-benchmark-pitfalls-inline-cutout"
+  alt="A machine scoring perfectly on a test rig whose answer card is visibly already inside the machine"
+/>
+
 This is rarely deliberate and is very hard to rule out, because
 nobody can fully audit a multi-trillion-token corpus for overlap with
 every benchmark.
@@ -91,6 +96,11 @@ thing.
 The deepest problem, and the least discussed. A benchmark measures
 performance on the benchmark. Whether that transfers to your task
 depends entirely on whether your task resembles it.
+
+<Figure
+  slug="llm-benchmark-pitfalls-1-saturation-inline-cutout"
+  alt="A test rig whose gauge is pinned hard at its top stop, three different machines all reading the same"
+/>
 
 SWE-bench predicts agentic coding reasonably well because the task
 shapes match. It predicts almost nothing about how well the model will

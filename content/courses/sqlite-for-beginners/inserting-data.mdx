@@ -103,6 +103,11 @@ Leaving out an auto id keeps inserts shorter and avoids manual numbering mistake
 
 You can add multiple rows with one `INSERT` by separating value groups with commas.
 
+<Figure
+  slug="lite-inserting-data-insert-adds-rows-inline-cutout"
+  alt="A fresh row of blocks slid into the open end of a board already holding rows"
+/>
+
 <SqlCodeBlock
   dialect="sqlite"
   title="Insert multiple rows"
@@ -195,6 +200,11 @@ Values line up with columns from left to right.`}
 ## Insert with explicit columns
 
 You do not have to fill every column every time. Name the columns you are providing, and let defaults or empty values handle the rest.
+
+<Figure
+  slug="lite-inserting-data-inline-cutout"
+  alt="A new row of blocks slid into the open end of a board that already holds several rows"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"

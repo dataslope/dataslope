@@ -90,6 +90,11 @@ inheritance, but achieved without `extends`.
 You may be thinking: "this sounds like an abstract class." There is
 overlap, but the differences matter.
 
+<Figure
+  slug="java-interfaces-inline-cutout"
+  alt="Three different machines each fitted with the identical front plate and handle, so one hand works all three the same way"
+/>
+
 | | abstract class | interface |
 | --- | --- | --- |
 | Models | **is-a** (identity) | **can-do** (capability) |
@@ -241,6 +246,11 @@ Why? Because callers may have an `ArrayList`, a `LinkedList`, or
 anything else that `implements List`. Asking only for the
 *capability* you actually need gives callers freedom and gives you
 the right to change your storage later.
+
+<Figure
+  slug="java-interfaces-interface-inline-cutout"
+  alt="A standard front plate with two handles, shown detached on a bench beside the machines it fits"
+/>
 
 ```mermaid
 flowchart LR

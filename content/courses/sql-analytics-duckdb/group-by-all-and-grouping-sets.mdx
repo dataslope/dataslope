@@ -156,6 +156,11 @@ your data might *also* contain genuine `NULL`s. The `GROUPING()` function
 returns 1 for a "subtotal" NULL and 0 for a real value, letting you label
 rows unambiguously.
 
+<Figure
+  slug="duck-group-by-all-and-grouping-sets-inline-cutout"
+  alt="One tray of chips summarised three ways at once, by colour, by shape, and by both together, onto three small boards"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Label subtotal rows with GROUPING()"
@@ -236,3 +241,8 @@ hierarchy of them.`}
 You can now summarize at multiple levels in a single query. But what if
 you want to filter *based on a group's summary*, "only regions with
 revenue over \$1000"? That needs `HAVING`, which is next.
+
+<Figure
+  slug="duck-group-by-all-and-grouping-sets-group-by-all-inline-cutout"
+  alt="A machine with one lever replacing a row of five identical levers that had to be set the same way"
+/>

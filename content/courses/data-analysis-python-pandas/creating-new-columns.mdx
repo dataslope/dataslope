@@ -46,6 +46,11 @@ The whole column appears on both sides of `=`. That is the
 `.assign()` produces a *new* DataFrame with the added columns,
 which makes it perfect for method chains.
 
+<Figure
+  slug="pandas-creating-new-columns-assign-chainable-column-inline-cutout"
+  alt="A board passing through three machines in a row, each adding one more column and handing the board on"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -103,6 +108,11 @@ variable.
 
 `np.where(condition, value_if_true, value_if_false)` is a vector
 ized ternary.
+
+<Figure
+  slug="pandas-creating-new-columns-inline-cutout"
+  alt="Two existing columns feeding a small machine that sets a third column down beside them on the same board"
+/>
 
 <CodeBlock
   adapter="python"
@@ -267,6 +277,11 @@ print(df)
 
 Put several techniques together, the penguins dataset with four
 derived fields, one per technique from this chapter.
+
+<Figure
+  slug="pandas-creating-new-columns-simplest-case-arithmetic-inline-cutout"
+  alt="Two standing columns feeding a small adding machine that sets a third column down beside them"
+/>
 
 <CodeBlock
   adapter="python"

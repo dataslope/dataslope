@@ -87,6 +87,11 @@ That diamond is a **decision point** in the flow of the program.
 Every conditional in your code corresponds to one of these
 diamonds.
 
+<Figure
+  slug="js-conditionals-if-else-inline-cutout"
+  alt="A chute with a two-way flap, blocks that clear a marked bar going left and the rest going right, both paths ending in a tray"
+/>
+
 ## `if`/`else if`/`else`
 
 When there are several mutually exclusive cases:
@@ -256,6 +261,11 @@ A few things to know about `switch`:
   several days share one outcome), but it is a common source of
   bugs.
 - The `default` clause is optional and acts like `else`.
+
+<Figure
+  slug="js-conditionals-inline-cutout"
+  alt="A chute with a hinged flap, blocks that clear a marked height going one way and the rest going the other"
+/>
 
 Many modern codebases avoid `switch` and use plain `if`/`else if`
 or a lookup object. Use it if it makes a particular piece of code
@@ -445,6 +455,11 @@ if (action("") !== "unknown signal") throw new Error("empty string should also b
 />
 
 ---
+
+<Figure
+  slug="js-conditionals-if-statement-inline-cutout"
+  alt="A single hinged flap over a chute, open for blocks that clear a marked bar and shut for the rest"
+/>
 
 <MultipleChoice
   markdown={`Why do programmers often prefer "guard clauses" (early returns at the top of a function) over deeply nested \`if\` statements?

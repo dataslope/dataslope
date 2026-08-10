@@ -180,6 +180,11 @@ neither of which is true of one enormous JSON array.
 Polars can read a remote file directly, which is handy for public
 datasets.
 
+<Figure
+  slug="pl-reading-and-writing-data-read-versus-scan-inline-cutout"
+  alt="One carton tipped fully onto a bench beside another carton with only a thin peephole cut in its side"
+/>
+
 ```python
 url = "https://example.com/data/measurements.parquet"
 df = pl.read_parquet(url)

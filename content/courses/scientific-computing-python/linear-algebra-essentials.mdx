@@ -34,6 +34,11 @@ Most of scientific computing falls into one of these four buckets.
 The next chapter will cover the factorizations behind each. This
 chapter is about *using* them.
 
+<Figure
+  slug="scipy-linear-algebra-essentials-inline-cutout"
+  alt="A grid of plain square cells acting on an arrow, the arrow leaving the far side of the grid both turned and stretched"
+/>
+
 ## Solving linear systems
 
 The single most-used routine in scientific Python is
@@ -41,6 +46,11 @@ The single most-used routine in scientific Python is
 and (numerically) non-singular. It calls LAPACK's `dgesv`, which
 uses LU factorization with partial pivoting, the backward-stable
 algorithm we mentioned in the stability chapter.
+
+<Figure
+  slug="scipy-linear-algebra-essentials-solving-linear-systems-inline-cutout"
+  alt="A grid of cells and a column of blocks being brought together to yield a second column"
+/>
 
 <CodeBlock
   adapter="python"
@@ -70,6 +80,11 @@ A general `solve` works on any non-singular matrix. But many real
 problems have structure, symmetric, positive-definite, banded,
 triangular, sparse, and dedicated solvers can be ten or a hundred
 times faster. **Use them.**
+
+<Figure
+  slug="scipy-linear-algebra-essentials-special-structure-trust-inline-cutout"
+  alt="A grid whose cells are mostly empty in a clear pattern, a machine reaching only for the filled ones"
+/>
 
 | Structure | NumPy / SciPy call | Speedup vs general |
 | --- | --- | --- |

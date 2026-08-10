@@ -141,6 +141,11 @@ already had. Parsing is a runtime check that *returns a stricter
 type*, and from then on, the rest of the program *knows* the
 constraint is satisfied because of the type signature.
 
+<Figure
+  slug="fp-type-driven-design-inline-cutout"
+  alt="A set of shaped sockets cut first, with the parts made afterwards to fit them"
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -258,6 +263,11 @@ The combination of:
 …means that vast classes of bugs simply cannot exist in your
 program. Not "would be caught by tests", *cannot exist*. The
 compiler refuses to build them.
+
+<Figure
+  slug="fp-type-driven-design-slogan-1-make-inline-cutout"
+  alt="A set of shaped sockets cut so that an impossible pairing physically cannot be assembled"
+/>
 
 This is what people mean when they say functional programmers
 prefer *types* over *tests*. Tests are still valuable (especially

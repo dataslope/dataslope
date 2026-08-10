@@ -75,6 +75,11 @@ print(from_str)
 
 Lists are implemented as **dynamic arrays**: a contiguous block of memory holding references to objects. This gives O(1) random access by index but O(n) insertion/deletion in the middle. Think of a list as a row of numbered parking spots, where each spot points to the actual object.
 
+<Figure
+  slug="python-lists-inline-cutout"
+  alt="A rail of five slots holding blocks in order, one being lifted out of the middle and the rest sliding along to close the gap"
+/>
+
 ```mermaid
 flowchart LR
     A["List: [10, 20, 30, 40]"] --> B["Index 0: 10"]
@@ -90,6 +95,11 @@ Every web framework returns search results as a list. Every database driver give
 ## Indexing
 
 Lists support zero-based indexing. Negative indices count from the end.
+
+<Figure
+  slug="python-lists-indexing-inline-cutout"
+  alt="A hand reaching straight past the first three slots of a rail to lift the fourth"
+/>
 
 <CodeBlock
   adapter="python"
@@ -490,6 +500,11 @@ print("max:   ", max(xs))
 ## Copying lists: shallow vs deep
 
 Assignment does **not** copy. Both names point to the same list.
+
+<Figure
+  slug="python-lists-creating-list-inline-cutout"
+  alt="An empty rail being filled left to right with blocks"
+/>
 
 <CodeBlock
   adapter="python"

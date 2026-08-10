@@ -115,6 +115,11 @@ You can give SQLite a first sort key, then a second sort key for ties.
 Think of sorting books by genre first, and then by price inside each
 genre.
 
+<Figure
+  slug="lite-sorting-and-limiting-inline-cutout"
+  alt="A staircase of blocks with a bracket over the top three and the rest left outside it"
+/>
+
 <SqlCodeBlock
   dialect="sqlite"
   title="Genre first, price within genre"
@@ -157,6 +162,11 @@ the main sort. Later columns break ties.
 
 `LIMIT n` keeps only the first `n` rows. When you use it with
 `ORDER BY`, you can ask for "top N" or "bottom N" lists.
+
+<Figure
+  slug="lite-sorting-and-limiting-order-by-sorts-inline-cutout"
+  alt="A jumbled row of blocks combed into a rising staircase"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"

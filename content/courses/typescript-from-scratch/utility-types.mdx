@@ -231,6 +231,11 @@ A mapped type that iterates over `K` (a union of keys) and assigns type `T` to e
 
 These types filter or extract members from unions.
 
+<Figure
+  slug="tsx-utility-types-object-transformation-utilities-inline-cutout"
+  alt="One crate passing through three presses that leave it partial, then sealed, then narrower"
+/>
+
 ### `Exclude<UnionType, ExcludedMembers>`
 
 Removes types from `UnionType` that are assignable to `ExcludedMembers`.
@@ -671,6 +676,11 @@ The \`-?\` modifier is the key: it removes the optional modifier from each prope
 />
 
 ---
+
+<Figure
+  slug="tsx-utility-types-inline-cutout"
+  alt="One crate passing through three small presses that make it partial, then read-only, then narrower, each leaving a visibly changed crate"
+/>
 
 ## Multiple Choice: `ReturnType` Inference
 

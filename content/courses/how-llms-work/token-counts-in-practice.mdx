@@ -22,6 +22,11 @@ matters.
    time is roughly proportional to output length. Input is processed
    in parallel and contributes far less.
 
+<Figure
+  slug="llm-token-counts-in-practice-inline-cutout"
+  alt="A set of scales with a paper ribbon coiled on one pan and a stack of small chips balancing it on the other"
+/>
+
 That third point has a practical consequence people miss: **asking for
 a shorter answer makes it arrive faster**, while shortening the prompt
 mostly saves money rather than time.
@@ -64,6 +69,11 @@ doubles its token cost compared with a compact tabular format, because
 every key is repeated on every record and every brace and quote is a
 token. If you are sending many records to a model, CSV is markedly
 cheaper than JSON for identical content.
+
+<Figure
+  slug="llm-token-counts-in-practice-measuring-compression-across-inline-cutout"
+  alt="Three ribbons of the same written length cut into visibly different numbers of chips"
+/>
 
 <CodeBlock
   adapter="python"

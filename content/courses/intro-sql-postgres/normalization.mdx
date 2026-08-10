@@ -57,6 +57,11 @@ The fix is to pull each independent thing into its own table and
 products a `products` table, and `orders` keeps only what is true of
 *that order* plus foreign keys.
 
+<Figure
+  slug="sql-normalization-problem-one-big-inline-cutout"
+  alt="One enormously wide board with the same block repeated across four of its rows"
+/>
+
 ```mermaid
 erDiagram
     customers ||--o{ orders : "places"
@@ -146,6 +151,11 @@ flowchart TD
 - **Third normal form (3NF):** non-key columns depend *only* on the
   key, a customer's email depends on the customer, so it belongs in
   `customers`, not `orders`.
+
+<Figure
+  slug="sql-normalization-inline-cutout"
+  alt="One wide table with a repeated block appearing in four rows, that block lifted out to its own small table and referenced by cord"
+/>
 
 A handy summary of 3NF: every column should describe **"the key, the
 whole key, and nothing but the key."** That phrasing comes from a

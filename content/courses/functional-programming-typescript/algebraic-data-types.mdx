@@ -78,11 +78,21 @@ A product type is "all of these fields, simultaneously". TypeScript
 already has them, they're records and tuples. There's nothing
 novel here.
 
+<Figure
+  slug="fp-algebraic-data-types-inline-cutout"
+  alt="A rack holding three differently shaped slots where exactly one slot is filled at a time, and a lid that only closes when one is"
+/>
+
 ## Sums in TypeScript: discriminated unions
 
 The interesting half. A sum says *"one of these alternatives"*. In
 TypeScript, we model it as a **discriminated union**, a union of
 record types, each with a unique tag field.
+
+<Figure
+  slug="fp-algebraic-data-types-sums-typescript-discriminated-inline-cutout"
+  alt="Three boxes with differently shaped tags, a sorter reading only the tag to send each down its own chute"
+/>
 
 <CodeBlock
   adapter="typescript"
@@ -362,6 +372,11 @@ and two subtrees. Three lines of definition; the entire algorithm
 ## Designing with sums and products together
 
 Real domain types interleave the two operations.
+
+<Figure
+  slug="fp-algebraic-data-types-two-operations-products-inline-cutout"
+  alt="One tray holding three compartments all filled at once, beside another tray with three compartments where exactly one is filled"
+/>
 
 ```mermaid
 flowchart TD

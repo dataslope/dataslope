@@ -17,6 +17,11 @@ derived and corrected columns to it, one `with_columns` at a time.
 The rule is entirely about the output name. A new name adds a
 column; an existing name replaces it.
 
+<Figure
+  slug="pl-creating-columns-add-or-replace-inline-cutout"
+  alt="One column being set into an empty slot at the board's edge, and another column being lifted out and swapped for a new one"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -42,6 +47,11 @@ print(replaced)
 This is worth internalizing early, because it changes how you write.
 All the expressions inside one `with_columns` are evaluated against
 the *same* input frame, at the same time.
+
+<Figure
+  slug="pl-creating-columns-everything-one-call-inline-cutout"
+  alt="Four columns being set into a board at once by four arms moving together rather than one after another"
+/>
 
 <CodeBlock
   adapter="python"
@@ -176,6 +186,11 @@ quiet lie.
 ## Building several columns at once
 
 An expression that matches many columns applies to each of them.
+
+<Figure
+  slug="pl-creating-columns-inline-cutout"
+  alt="A board gaining one more standing column at its right edge, built from two columns already in place"
+/>
 
 <CodeBlock
   adapter="python"

@@ -106,11 +106,21 @@ Three branches matter:
 - **`RuntimeException`**, **unchecked**. The compiler does *not*
   force you to handle them.
 
+<Figure
+  slug="java-exception-handling-exception-inline-cutout"
+  alt="A block leaving a belt mid-run and falling toward a padded basket held beneath"
+/>
+
 ## Checked vs unchecked, intuitively
 
 **Checked** exceptions represent "expected problems with the
 outside world", files missing, networks failing, parsing user
 input. Java forces you to acknowledge them.
+
+<Figure
+  slug="java-exception-handling-inline-cutout"
+  alt="A parcel with a stamped warning label on its side halted at a closed gate, the gate staying latched until a matching catch basket has been bolted onto the line beyond it"
+/>
 
 **Unchecked** exceptions represent "your program has a bug", null
 pointers, out-of-bounds indices, divisions by zero, illegal

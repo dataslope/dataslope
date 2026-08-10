@@ -60,6 +60,11 @@ the wild:
 2. **ES Modules (ESM)**, the official language standard, used by
    browsers and now widely by Node. Uses `import` and `export`.
 
+<Figure
+  slug="js-modular-organization-inline-cutout"
+  alt="One large workshop divided into four small booths, each booth's parts staying inside it and a hatch joining them"
+/>
+
 The runtime used in these lessons (`almostnode`) uses CommonJS,
 so all the multi-file challenges have looked like this:
 
@@ -114,6 +119,11 @@ golden rule:
 Why? Because anything you export becomes a *promise* to callers.
 Renaming or removing it might break them. The smaller your
 surface, the freer you are to change the internals.
+
+<Figure
+  slug="js-modular-organization-module-inline-cutout"
+  alt="One workshop booth lifted whole off a bench, its tools still inside, and set down on another bench"
+/>
 
 <CodeBlock
   adapter="javascript"

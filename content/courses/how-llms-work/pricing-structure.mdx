@@ -31,6 +31,11 @@ years, even as the absolute prices fall.
 
 This is not a pricing policy, it reflects the computation.
 
+<Figure
+  slug="llm-pricing-structure-inline-cutout"
+  alt="A set of scales with input chips on one pan and output chips on the other, the output pan weighted heavier"
+/>
+
 **Input** is processed in parallel. All your tokens go through the
 model together in one pass, and the hardware is fully occupied.
 
@@ -49,6 +54,11 @@ If you send the same 50,000-token prefix on every turn, the provider
 can store its processed internal state and skip recomputing it. What
 you pay for is retrieving that state rather than producing it, which
 is roughly a tenth of the work.
+
+<Figure
+  slug="llm-pricing-structure-cached-input-so-inline-cutout"
+  alt="Two scales side by side, one weighing a fresh ribbon and one weighing a ribbon already under a cover, the second barely tipping"
+/>
 
 Caches expire quickly (minutes, by default, on most providers) and
 match on an **exact prefix**. A single changed byte anywhere in the

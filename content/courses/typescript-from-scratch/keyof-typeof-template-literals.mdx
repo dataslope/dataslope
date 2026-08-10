@@ -70,6 +70,11 @@ Notice that `T[K]` is an **indexed access type**: the type of property `K` in `T
 
 The **`typeof`** operator (in a type context) takes a runtime value and produces its type. This lets you derive types from constants, configuration objects, or function declarations.
 
+<Figure
+  slug="tsx-keyof-typeof-template-literals-typeof-value-from-inline-cutout"
+  alt="A finished crate on a bench with its outline traced onto a card held beside it"
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -335,6 +340,11 @@ Here's how it works:
 2. Indexing with `[keyof T]` extracts the values: `never | "name" | "email" | never`.
 3. `never` vanishes from the union, leaving `"name" | "email"`.
 
+<Figure
+  slug="tsx-keyof-typeof-template-literals-inline-cutout"
+  alt="A crate's set of labelled compartments lifted off as a separate ring of key tags"
+/>
+
 ---
 
 ## Challenge: Build `EventHandlerMap<T>`
@@ -428,6 +438,11 @@ This pattern is essential for deriving types from configuration objects.`}
 />
 
 ---
+
+<Figure
+  slug="tsx-keyof-typeof-template-literals-keyof-t-keys-inline-cutout"
+  alt="A wall of labelled drawers with its labels lifted off as a separate strip of tags"
+/>
 
 ## Multiple Choice: Template Literal Distribution
 

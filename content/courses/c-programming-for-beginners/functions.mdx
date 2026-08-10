@@ -69,6 +69,11 @@ C passes arguments **by value**. The function receives a fresh copy
 of each argument, and changes inside the function do not affect the
 caller's variables.
 
+<Figure
+  slug="c-functions-parameters-are-local-inline-cutout"
+  alt="A block copied at a machine's mouth, the copy going in and being altered inside while the original sits untouched outside"
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -101,6 +106,11 @@ and what we'll explore in a few chapters.
 
 If a function does its work via side effects (like printing) and
 has nothing meaningful to return, use `void` as the return type.
+
+<Figure
+  slug="c-functions-anatomy-function-inline-cutout"
+  alt="A machine shown in cross-section, its input opening, its inner works and its output chute all visible at once"
+/>
 
 <CodeBlock
   adapter="c"
@@ -174,6 +184,11 @@ expression that evaluates to `a` if the condition is true, else `b`.
 Suppose you wrote a 200-line `main` that did everything: read input,
 processed it, and printed results. To understand that program, a
 reader must hold all 200 lines in their head at once.
+
+<Figure
+  slug="c-functions-inline-cutout"
+  alt="A bench with a machine that has a fixed-size input slot and a fixed-size output chute, a block being cut to fit before it goes in"
+/>
 
 Now suppose you split it into:
 

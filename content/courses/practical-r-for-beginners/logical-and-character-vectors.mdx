@@ -138,6 +138,11 @@ The real payoff: you can use a logical vector as an *index* into
 another vector. R keeps only the positions where the logical is
 `TRUE`.
 
+<Figure
+  slug="rlang-logical-and-character-vectors-logical-vectors-inline-cutout"
+  alt="A rail of two-position switches, some up and some down"
+/>
+
 <CodeBlock
   adapter="r"
   files={[
@@ -199,6 +204,11 @@ substr(fruits, 1, 3) # first three characters of each
 Like everything else in R, character functions are vectorized:
 `toupper()` doesn't take one string, it takes a whole vector and
 returns a transformed one.
+
+<Figure
+  slug="rlang-logical-and-character-vectors-inline-cutout"
+  alt="One rail of two-position switches and another rail of letter ribbons, standing side by side"
+/>
 
 ## Pasting strings together
 

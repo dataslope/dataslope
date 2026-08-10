@@ -77,6 +77,11 @@ This works, but every query is `O(n)`, every "is this duplicate?"
 check is hand-written, and the *intent*, "lookup by artist", "set
 of unique genres", is hidden inside loop bodies.
 
+<Figure
+  slug="jcol-data-modeling-with-collections-worked-example-music-inline-cutout"
+  alt="A rack of records, a wall of keyed drawers for artists, and cords running between the two"
+/>
+
 ### Second pass: shape per query
 
 If we let the **questions** drive the **shape**, we get:
@@ -216,6 +221,11 @@ relationship with collections:
 
 `Map<ParentKey, List<Child>>` (ordered) or
 `Map<ParentKey, Set<Child>>` (unique).
+
+<Figure
+  slug="jcol-data-modeling-with-collections-shape-mental-model-inline-cutout"
+  alt="Four containers in a row, a rail, a bag, a channel and a wall of keyed drawers, each shaped for a different job"
+/>
 
 Example: orders per customer.
 

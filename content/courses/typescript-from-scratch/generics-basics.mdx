@@ -37,6 +37,11 @@ Without generics, you face a painful trade-off:
 
 Generics give you the best of both worlds: one function, full type safety, and the compiler **infers** the type parameter based on what you pass in.
 
+<Figure
+  slug="tsx-generics-basics-inline-cutout"
+  alt="One crate with an interchangeable insert, three differently shaped inserts standing beside it, each making the same crate hold a different shape"
+/>
+
 The cost of option 1 is combinatorial, which is easy to miss when the union
 has two members and impossible to miss when a colleague adds a third:
 
@@ -110,6 +115,11 @@ console.log(objects); // [{ id: 1, name: "Alice" }]
 
 The type parameter `T` flows through the signature: the input is `T`, the output is `T[]`. The compiler infers `T` from the argument you pass, so you get precise types at every call site.
 
+<Figure
+  slug="tsx-generics-basics-generic-functions-inline-cutout"
+  alt="One machine shown working on three different shapes of block without any change to itself"
+/>
+
 ### Multiple type parameters
 
 You can have more than one type parameter:
@@ -170,6 +180,11 @@ When a generic function has no parameters (or the parameters don't help inferenc
 ## Generic interfaces and type aliases
 
 Generics aren't limited to functions. You can parameterize interfaces and type aliases too.
+
+<Figure
+  slug="tsx-generics-basics-generic-interfaces-type-inline-cutout"
+  alt="One contract card held against three crates of different contents, matching all three"
+/>
 
 <CodeBlock
   adapter="typescript"

@@ -31,6 +31,11 @@ Sets and dicts share the same underlying implementation: hash tables. A set is l
 
 The literal syntax uses curly braces, but **without** colons.
 
+<Figure
+  slug="python-sets-inline-cutout"
+  alt="A bin that takes each distinct block once, an identical second block bouncing off its rim onto the bench"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -243,6 +248,11 @@ In data analysis, you constantly ask questions like "which users visited both pa
 ## Sets vs lists for lookup
 
 This is where sets shine. Membership testing in a list is O(n); in a set it is O(1).
+
+<Figure
+  slug="python-sets-sets-work-inline-cutout"
+  alt="A bin with a narrow mouth accepting a block once and rejecting an identical second"
+/>
 
 That gap compounds when the whole *operation* is a set operation. Intersecting
 two collections with a nested loop compares every element against every

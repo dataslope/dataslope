@@ -50,6 +50,11 @@ In production, **unhandled exceptions are bugs**. Your job is to anticipate fail
 
 Exceptions are **not** like Java checked exceptions (which force you to declare every possible error). They are Python's way of saying "this can fail, and you should decide what to do."
 
+<Figure
+  slug="python-exceptions-inline-cutout"
+  alt="A chute with a side door, a cracked block being routed through the door into a padded tray while the rest continue down"
+/>
+
 Common patterns:
 
 - **File I/O**: `FileNotFoundError`, `PermissionError`, `OSError`
@@ -82,6 +87,11 @@ The second is more concise and handles race conditions (file deleted between `ex
 ## Exception propagation up the call stack
 
 When an exception is raised, Python **unwinds the stack**, looking for a `try`/`except` that handles it.
+
+<Figure
+  slug="python-exceptions-exception-propagation-up-inline-cutout"
+  alt="A block falling down a column of trays, each tray refusing it, until one catches"
+/>
 
 ```mermaid
 flowchart TD
@@ -688,3 +698,8 @@ else:
 />
 
 Many exceptions come from I/O. Files are next.
+
+<Figure
+  slug="python-exceptions-happens-exceptions-are-inline-cutout"
+  alt="A block falling past every basket on a bench and off the end onto the floor"
+/>

@@ -90,6 +90,11 @@ keeping the *uncommon* case possible.
 Let's write something concrete: a function that takes a numeric
 vector and returns a small named list summarizing it.
 
+<Figure
+  slug="rlang-writing-your-own-functions-anatomy-function-inline-cutout"
+  alt="A machine in cross-section with its input opening, inner works and output chute visible"
+/>
+
 <CodeBlock
   adapter="r"
   files={[
@@ -195,6 +200,11 @@ head(z_mtcars)
 
 Without the function, you'd repeat the standardization
 expression once per column.
+
+<Figure
+  slug="rlang-writing-your-own-functions-inline-cutout"
+  alt="A bench where a repeated set of three actions is boxed into a single crank-handled machine used three times over"
+/>
 
 ## Function design tips
 

@@ -43,6 +43,11 @@ classDiagram
 The `*` on `area()` and the `<<abstract>>` stereotype mark them as
 abstract. Concrete subclasses must implement `area()`.
 
+<Figure
+  slug="oopj-abstract-classes-first-abstract-class-inline-cutout"
+  alt="A partly finished cabinet with one panel left as an open socket, unable to stand on its own"
+/>
+
 <CodeBlock
   adapter="java"
   entryFilename="Main.java"
@@ -122,6 +127,11 @@ A classic use of abstract classes is the **Template Method** pattern
 (one of the GoF originals). The parent class defines the *overall
 shape* of an algorithm in a concrete method and leaves the variable
 steps as `abstract`.
+
+<Figure
+  slug="oopj-abstract-classes-template-method-idea-inline-cutout"
+  alt="A fixed frame with three fitted steps and one open slot, two different parts able to fill that slot"
+/>
 
 ```mermaid
 sequenceDiagram
@@ -239,6 +249,11 @@ The next page is about **interfaces**, which solve a similar problem
   to reuse.
 - Use an **interface** when you want to describe *only* a set of
   capabilities and have many unrelated classes implement them.
+
+<Figure
+  slug="oopj-abstract-classes-inline-cutout"
+  alt="A partly finished cabinet with one panel left as an empty opening, and two completed cabinets beside it that each fill that opening differently"
+/>
 
 Many modern OOP designs use interfaces by default and reach for
 abstract classes only when there's real shared code to factor out.

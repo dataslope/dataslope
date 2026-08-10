@@ -81,6 +81,11 @@ flowchart TD
 Each copy increments the count; each destruction decrements it.
 When the count hits zero, the object is deleted.
 
+<Figure
+  slug="cpp-smart-pointers-std-unique-ptr-inline-cutout"
+  alt="A crate with a single handle that only one pair of hands can hold at a time"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -180,6 +185,11 @@ For things that already manage their own storage (`std::vector`,
 `std::string`, `std::map`, ...), you do *not* need smart pointers.
 A `std::vector<Widget>` already owns its Widgets. Wrapping vectors
 in smart pointers is almost always wrong.
+
+<Figure
+  slug="cpp-smart-pointers-inline-cutout"
+  alt="A crate carried by a handle that unclips itself, the crate dropping neatly into a return chute the moment the last hand lets go"
+/>
 
 Use smart pointers when you have a single *polymorphic* object whose
 lifetime needs explicit management, e.g., `std::unique_ptr<Shape>`

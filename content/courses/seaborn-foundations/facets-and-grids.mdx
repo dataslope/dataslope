@@ -56,6 +56,11 @@ crucially, every panel **shares the same axes by default**, so a point in
 one cell is directly comparable to a point in another. That shared scale is
 what makes small multiples honest.
 
+<Figure
+  slug="sns-facets-and-grids-wrapping-many-categories-inline-cutout"
+  alt="A long row of small panels folded onto a second and third row to fit the bench"
+/>
+
 <Callout type="info" title="hue overlays; col/row separate">
 `hue` draws groups *on top of each other* in one panel (good for direct
 overlap and a few groups). `col`/`row` give each group *its own panel* (good
@@ -155,6 +160,11 @@ others and you'll want to free a scale with `sharey=False` (via
 *consciously*, and tell your reader, because un-shared axes make panels look
 similar when they aren't.
 
+<Figure
+  slug="sns-facets-and-grids-inline-cutout"
+  alt="Four small panels standing in a row over one continuous axis rule that runs beneath all of them, with a single key block at the right serving every panel"
+/>
+
 <MultipleChoice
   markdown={`Why does Seaborn make facets **share the same axis limits** by default?
 
@@ -175,6 +185,11 @@ deliberately, and flag it for the reader.`}
 
 Faceting multiplies panels: `col` levels **×** `row` levels. That's its
 weakness as well as its strength.
+
+<Figure
+  slug="sns-facets-and-grids-faceting-just-col-inline-cutout"
+  alt="One board split into a grid of small panels by two dials, one setting columns and one setting rows"
+/>
 
 - **Too many facets.** Twenty tiny panels are as hard to read as one
   overcrowded chart. Keep a facet variable to a handful of levels; use

@@ -60,6 +60,11 @@ In an application, `WHERE id = 4` finds one specific row. In analysis,
 *Seattle trips*, *long trips*, *this month*. You are not hunting a needle;
 you are choosing a subset to summarize.
 
+<Figure
+  slug="duck-your-first-analytical-query-reading-table-analyst-inline-cutout"
+  alt="A board of rows with a first small window cut into it, a figure looking through"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Slice: only the long Seattle trips"
@@ -254,3 +259,8 @@ changing the stored data.`}
 
 You can now *look* like an analyst. Next: how to get data *into* DuckDB,
 and how to conjure test data out of thin air with `range()`.
+
+<Figure
+  slug="duck-your-first-analytical-query-inline-cutout"
+  alt="A wide board of rows feeding one machine that leaves a single small summary block on the bench"
+/>

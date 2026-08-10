@@ -16,6 +16,11 @@ The two strategies have opposite personalities. **Depth-first search (DFS)** is 
 
 BFS explores level by level from a source. It uses a queue: push the source, pop the oldest vertex, then push each unvisited neighbor.
 
+<Figure
+  slug="dsa-graph-traversal-depth-first-search-inline-cutout"
+  alt="One route followed all the way to a dead end in a network of cords before any other is tried"
+/>
+
 ```text
 BFS(adj, src):
     mark src visited
@@ -90,6 +95,11 @@ The visited check happens *at enqueue time*, not at dequeue time, a vertex is cl
 ## Depth-first search
 
 DFS goes as deep as possible before backtracking, Trémaux's string and chalk. The chalk is the `visited` array; the string is the call stack itself, which remembers the way back automatically. That is why recursive DFS is so short: the language's own function-call machinery does the backtracking.
+
+<Figure
+  slug="dsa-graph-traversal-breadth-first-search-inline-cutout"
+  alt="A wave spreading outward from one post through a network of cords, reaching all nearest posts before any further"
+/>
 
 ```text
 DFS(u):
@@ -411,6 +421,11 @@ int main() {
 ## Grids as graphs: flood fill and islands
 
 The most common graphs in interviews never declare themselves as graphs, they arrive disguised as 2D grids. The translation is mechanical: each cell is a vertex, and edges connect it to its up/down/left/right neighbors. No adjacency list is even built; the neighbor relation is computed on the fly from `(row ± 1, col)` and `(row, col ± 1)`. The paint-bucket tool in every image editor is exactly this: BFS/DFS from the clicked pixel across same-colored neighbors, *flood fill*.
+
+<Figure
+  slug="dsa-graph-traversal-inline-cutout"
+  alt="A network of posts joined by cords, with a wave of colour spreading outward from one post to its neighbours, then to theirs"
+/>
 
 ```mermaid
 graph TD

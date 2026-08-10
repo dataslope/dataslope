@@ -15,6 +15,11 @@ remember to catch every one of those mistakes, every time?
 A well-designed schema does not merely *suggest* good data. It uses
 **constraints** to make bad data impossible to store.
 
+<Figure
+  slug="db-what-are-constraints-constraints-are-enforced-inline-cutout"
+  alt="A chute with three gauges fitted across it, each stopping a block that fails its measure"
+/>
+
 ## Constraints are enforced rules
 
 A **constraint** is a rule the database checks on every write: every
@@ -178,6 +183,11 @@ Constraints are for rules that determine whether stored data is valid.`}
 Without constraints, bad data can sit quietly for months. A report is
 wrong, a join loses rows, or a customer cannot sign in, and the cause
 is an old invalid row.
+
+<Figure
+  slug="db-what-are-constraints-inline-cutout"
+  alt="A chute with three gauges fitted across it, each stopping a block that fails to meet its measure"
+/>
 
 With constraints, the mistake is caught at the door. The writer gets an
 error immediately, when the bad value is still close to the code or

@@ -19,6 +19,11 @@ page nails down.
 
 `WHERE` and `HAVING` both filter, but at different stages of the query.
 
+<Figure
+  slug="duck-filtering-groups-two-filters-two-inline-cutout"
+  alt="One grate before a press stopping single chips and another after it stopping whole summary blocks"
+/>
+
 - **`WHERE`** runs **before** grouping. It filters individual *rows*, so
   it can only see raw columns, never group totals.
 - **`HAVING`** runs **after** grouping. It filters whole *groups*, so it
@@ -75,6 +80,11 @@ time there is no per-region total to compare against.
 They are not rivals, analysts routinely use both in one query, each doing
 its proper job: `WHERE` narrows the rows that *enter* the groups; `HAVING`
 selects which resulting groups *survive*.
+
+<Figure
+  slug="duck-filtering-groups-inline-cutout"
+  alt="Four summary blocks standing on trays with a marked line across them, the trays below the line taken away"
+/>
 
 <SqlCodeBlock
   dialect="duckdb"

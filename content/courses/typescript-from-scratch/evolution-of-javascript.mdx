@@ -72,6 +72,11 @@ JavaScript went from a toy to the **lingua franca** of software development. It 
 
 As codebases grew, the cracks began to show. JavaScript's permissive nature, the same flexibility that made it easy to learn, became a liability at scale.
 
+<Figure
+  slug="tsx-evolution-of-javascript-maintainability-crisis-inline-cutout"
+  alt="A tidy frame on one bench and the same frame on the next after many additions, cords crossing everywhere"
+/>
+
 Consider this snippet:
 
 <CodeBlock
@@ -135,6 +140,11 @@ Teams tried workarounds:
 
 None of these solved the core problem: **JavaScript had no static type system**. The language couldn't tell you, before you ran the code, whether a variable was a string or a number, whether a function expected two arguments or three, whether an object had a `save()` method or not.
 
+<Figure
+  slug="tsx-evolution-of-javascript-first-decade-scripting-inline-cutout"
+  alt="A small hand tool on a bench beside the same tool grown into a full machine"
+/>
+
 Developers craved the **autocomplete**, **refactoring safety**, and **early error detection** they'd seen in Java, C#, and other statically typed languages. They wanted the **flexibility** of JavaScript with the **rigor** of a compiler.
 
 The stage was set for a new tool, one that would bring static types to JavaScript without breaking the millions of lines of JS already written. One that would let you adopt types gradually, module by module, file by file. One that would treat JavaScript as a first-class citizen, not a compilation target to be abandoned.
@@ -142,6 +152,12 @@ The stage was set for a new tool, one that would bring static types to JavaScrip
 ## The turning point
 
 By 2012, JavaScript had conquered the world. But the codebases built on it were fragile. Refactoring was terrifying. Onboarding new developers took weeks because the implicit contracts, "this function expects a number, that one expects an object with `name` and `email` fields", existed only in comments, wikis, and tribal knowledge.
+
+<Figure
+  slug="tsx-evolution-ajax-cutout"
+  alt="A page on screen staying whole while one parcel travels along a rail from a server drum and slots into a single panel"
+  caption="Gmail and Google Maps, 2004 to 2005: pages that fetched in the background and never reloaded."
+/>
 
 The industry needed a way to make JavaScript **safe** without making it **different**. The solution would have to be *optional*, *gradual*, and *pragmatic*. It would have to compile to readable JavaScript so existing tooling still worked. It would have to integrate with editors so developers got instant feedback.
 

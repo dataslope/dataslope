@@ -57,6 +57,11 @@ Here's the tension. α is the bar for "convincing." Lower the bar
 Raise the bar and the reverse happens. With a fixed sample, **pushing one
 error rate down pushes the other up.**
 
+<Figure
+  slug="stat-errors-and-power-2x2-decision-matrix-inline-cutout"
+  alt="A two-by-two board of trays, one holding a false alarm and another a missed catch"
+/>
+
 <Chart slug="alpha-power-tradeoff" />
 
 ```mermaid
@@ -96,6 +101,11 @@ you trade α against β. But collect more data and you can lower
 *both*, a bigger sample sharpens the test's ability to tell signal from
 noise, so the same α buys you more power. Power has four levers.
 
+<Figure
+  slug="stat-errors-and-power-tradeoff-can-t-inline-cutout"
+  alt="A beam on a pivot with a false alarm on one end and a missed catch on the other, pressing one down raising the other"
+/>
+
 ```mermaid
 flowchart TD
   P["What increases POWER<br/>(the chance to detect a real effect)?"]
@@ -125,6 +135,11 @@ beautifully simple:
 3. Repeat thousands of times.
 4. **Power = the fraction of repeats that rejected**, the rate at which
    your test catches the effect you planted.
+
+<Figure
+  slug="stat-errors-and-power-inline-cutout"
+  alt="A two-by-two board of trays, one tray holding a false alarm and another a missed catch, with a dial beside it turning to shrink the miss"
+/>
 
 <CodeBlock
   adapter="python"

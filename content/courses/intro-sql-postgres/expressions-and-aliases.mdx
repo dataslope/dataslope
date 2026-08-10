@@ -46,6 +46,11 @@ FROM
 row and returned as a new column named `line_total`. This is how
 queries turn raw data into answers.
 
+<Figure
+  slug="sql-expressions-and-aliases-calculated-columns-inline-cutout"
+  alt="Two standing columns feeding a small machine that sets a third column down beside them"
+/>
+
 ## Aliases make output readable
 
 That `AS line_total` is an **alias**, a name you give a result
@@ -53,6 +58,11 @@ column. Without it, a computed column gets an ugly auto-name like
 `?column?`. Aliases are not decoration; they make results
 self-explanatory and let later parts of bigger queries refer to the
 value by name.
+
+<Figure
+  slug="sql-expressions-and-aliases-inline-cutout"
+  alt="A narrow strip of stacked value blocks leaving a small machine and having a fresh blank name plate clipped to its head, the board it came from still standing behind it"
+/>
 
 ```mermaid
 flowchart TD

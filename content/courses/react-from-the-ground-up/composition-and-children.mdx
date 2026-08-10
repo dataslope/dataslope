@@ -68,6 +68,11 @@ createRoot(document.getElementById("root")!).render(<App />);
 around *whatever* you hand it. That's composition: the wrapper owns the
 frame, the caller owns the content.
 
+<Figure
+  slug="rx-composition-and-children-inline-cutout"
+  alt="An outer frame with an open slot, and three different panels each dropped into that same slot in turn"
+/>
+
 The two panels below share one `Panel` wrapper. It owns the header bar
 and padding; each caller supplies completely different `children`, a
 paragraph in one, a bullet list in the other:
@@ -313,3 +318,8 @@ if (!texts.some((t) => /cannot be undone/i.test(t))) {
 Composition is how React apps stay readable at scale. The other half
 of reuse is sharing *logic*, which is exactly what
 [Custom hooks](/courses/react-from-the-ground-up/custom-hooks) are for.
+
+<Figure
+  slug="rx-composition-and-children-children-prop-inline-cutout"
+  alt="An outer frame with an open slot and three different panels dropped into that same slot in turn"
+/>

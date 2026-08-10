@@ -192,6 +192,11 @@ but in practice we tolerate it for argument validation. We'll see in
 [Option and Result](./option-and-result) how to model
 "this function can fail" *in the type* and avoid throwing entirely.
 
+<Figure
+  slug="fp-pure-functions-inline-cutout"
+  alt="A sealed machine with no hoses or wires leaving it, giving the same output twice for the same input"
+/>
+
 ## "But my program *has* to print things"
 
 Of course. A program that does nothing but compute pure values is
@@ -203,6 +208,11 @@ functional answer is not "no side effects ever". It is:
 
 This is sometimes called the *functional core, imperative shell*
 pattern.
+
+<Figure
+  slug="fp-pure-functions-definition-can-hold-inline-cutout"
+  alt="A sealed machine with no hoses, wires or taps anywhere on it, one block in and one block out"
+/>
 
 ```mermaid
 flowchart TD

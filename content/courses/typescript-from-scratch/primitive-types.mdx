@@ -119,6 +119,11 @@ console.log("data:", data);
 "abc"`, the compiler halts compilation. The type annotation acts as a
 machine-checked contract.
 
+<Figure
+  slug="tsx-primitive-types-type-inference-vs-inline-cutout"
+  alt="A socket closing around a block to take its shape beside a socket cut to a stated shape beforehand"
+/>
+
 ## The difference between `number` and `Number`
 
 JavaScript has both a primitive `number` type and a wrapper object
@@ -221,6 +226,11 @@ type. When you use `let`, it infers the broader primitive type (because
 insight is this: **TypeScript's type system is more precise than "just a
 number", it can track the exact value when the code makes that
 guarantee.**
+
+<Figure
+  slug="tsx-primitive-types-seven-primitive-types-inline-cutout"
+  alt="Seven small blocks of clearly different kinds resting in their own moulded recesses"
+/>
 
 ## BigInt and Symbol
 
@@ -326,6 +336,11 @@ function area(width, height) {
 Nothing stops you from calling `area("10", 5)`, JavaScript will coerce
 the string `"10"` to a number, and you'll get `50`. But what if the string
 were `"10px"`? You'd get `NaN`. The bug hides until runtime.
+
+<Figure
+  slug="tsx-primitive-types-inline-cutout"
+  alt="Five small blocks of clearly different kinds resting in their own moulded recesses, none of them able to sit in another's"
+/>
 
 Now add types:
 

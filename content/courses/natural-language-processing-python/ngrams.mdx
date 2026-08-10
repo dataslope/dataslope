@@ -43,6 +43,11 @@ bigrams).
 NLTK gives you `ngrams(tokens, n)`, which yields the windows as tuples. It
 returns a generator, so wrap it in `list(...)` to see or reuse the results.
 
+<Figure
+  slug="nlp-ngrams-inline-cutout"
+  alt="A strip of word tiles with a two-tile window sliding along it, each pair it frames dropping into its own tray"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -447,3 +452,8 @@ You have now met every classic building block: tokens, normalized tokens,
 filtered tokens, roots, counts, tags, and n-grams. The final section puts them
 to work, starting with the most important skill of all: **choosing which of
 these steps your task actually needs.**
+
+<Figure
+  slug="nlp-ngrams-sliding-window-inline-cutout"
+  alt="A two-tile window sliding along a strip of tiles, each pair it frames dropping into a tray"
+/>

@@ -15,6 +15,11 @@ store facts in the wrong place.
 **Second normal form (2NF)** asks one focused question: when a table has
 a composite key, does every non-key column depend on the whole key?
 
+<Figure
+  slug="db-second-normal-form-2nf-only-matters-inline-cutout"
+  alt="A card held by two tabs at once, a fact that depends on only one of them being lifted out to its own card"
+/>
+
 ## 2NF only matters with composite keys
 
 A **composite key** is a primary key made from more than one column. For
@@ -226,6 +231,11 @@ flowchart TD
 1NF made every cell atomic. 2NF now checks whether each non-key column
 belongs with the whole composite key. 3NF will ask whether non-key
 columns depend on other non-key columns.
+
+<Figure
+  slug="db-second-normal-form-inline-cutout"
+  alt="A wide table split so that facts depending on only part of its key move out into their own smaller table"
+/>
 
 ## Check your understanding
 

@@ -74,6 +74,11 @@ You can name the discriminant field anything you want, but `kind` and `type` are
 
 The real power of discriminated unions is **exhaustiveness checking**: the compiler can verify you've handled *every* variant. If you add a new variant later and forget to update a `switch` statement, the compiler catches it.
 
+<Figure
+  slug="tsx-discriminated-unions-exhaustiveness-checking-inline-cutout"
+  alt="A sorter with a chute for every tag shape and a bell that rings when a tag has no chute"
+/>
+
 Here's the trick: assign the unhandled case to `never`. If you've covered all variants, the code is unreachable and `never` is satisfied. If you missed a variant, the compiler complains that the leftover type isn't assignable to `never`.
 
 <CodeBlock
@@ -472,6 +477,11 @@ Discriminated unions are the right choice whenever you have:
 
 The pattern is always the same: define a union of object types with a shared discriminant field, use `switch` or `if` to narrow by the discriminant, and add exhaustiveness checking in the `default` case to catch missing variants.
 
+<Figure
+  slug="tsx-discriminated-unions-inline-cutout"
+  alt="Three sealed boxes each wearing a differently shaped tag, a sorter reading only the tag to send each box down its own chute"
+/>
+
 <Callout type="success" title="The most powerful pattern">
 If you learn one advanced TypeScript pattern, make it discriminated unions. They combine the flexibility of unions with the precision of narrowing, and they make illegal states unrepresentable. You'll use them everywhere once you see how they simplify state management and domain modeling.
 </Callout>
@@ -479,6 +489,11 @@ If you learn one advanced TypeScript pattern, make it discriminated unions. They
 ## Recap
 
 Discriminated unions let you model variants, states, events, commands, results, where each variant has different data and a unique tag. The compiler uses the tag (the **discriminant**) to narrow the union, so you get precise type checking and autocomplete for each variant.
+
+<Figure
+  slug="tsx-discriminated-unions-discriminant-field-inline-cutout"
+  alt="Three sealed boxes each wearing a differently shaped tag on the same corner"
+/>
 
 **Key takeaways:**
 

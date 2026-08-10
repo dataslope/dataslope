@@ -58,6 +58,11 @@ Two rules carry the whole architecture:
 
 It's not aesthetics. There are concrete benefits.
 
+<Figure
+  slug="fp-composable-architecture-this-design-wins-inline-cutout"
+  alt="One unit unclipped from the middle of a chain and replaced with another, the chain running on unchanged"
+/>
+
 **Testing.** The core is testable without mocks. You feed it
 plain data; you check the data it returns. No need to stub a
 database, no test containers, no flaky network. Most of your
@@ -171,6 +176,11 @@ The shell provides **adapters** that satisfy those ports against
 real systems (a Postgres adapter, an in-memory adapter for tests,
 a REST adapter, etc.).
 
+<Figure
+  slug="fp-composable-architecture-picture-inline-cutout"
+  alt="A wall assembled from interchangeable panels, one panel lifted out and a differently shaped one dropped into the gap"
+/>
+
 ```ts
 // PORT, defined by the core, language: domain
 type InvoiceRepo = {
@@ -200,6 +210,11 @@ In the small, composability shows up as
 *same* idea applies: an application is a *pipeline* of
 small, composable, well-typed transformations from input to
 output, with thin adapters at the ends.
+
+<Figure
+  slug="fp-composable-architecture-inline-cutout"
+  alt="Small units with identical fittings clipping into long chains in several different orders"
+/>
 
 When you internalize that, all the FP techniques you learned
 become *architectural*, not just micro-stylistic:

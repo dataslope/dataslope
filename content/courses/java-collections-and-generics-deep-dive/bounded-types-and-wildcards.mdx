@@ -51,6 +51,11 @@ The compiler will never allow that, so Java declares generic types
 **invariant**: `List<X>` and `List<Y>` are not subtype-related, even
 when `X` and `Y` are.
 
+<Figure
+  slug="jcol-bounded-types-and-wildcards-list-lt-dog-inline-cutout"
+  alt="A crate of small parts refused at a slot cut for a crate of general parts, the two crates visibly different"
+/>
+
 <CodeBlock
   adapter="java"
   files={[
@@ -118,6 +123,11 @@ public class Main {
 />
 
 That's `List<?>`: maximally general, but read-only.
+
+<Figure
+  slug="jcol-bounded-types-and-wildcards-inline-cutout"
+  alt="A slot cut to accept a family of related shapes, wide enough for three of them and clearly too narrow for a fourth waiting beside it"
+/>
 
 ## Upper-bounded: ? extends T (you can read T)
 
@@ -247,6 +257,11 @@ permissive bound:
 `? extends T` shrinks toward subtypes (read-only side). `? super T`
 shrinks toward supertypes (write-only side). Plain `T` is the fixed
 point in the middle.
+
+<Figure
+  slug="jcol-bounded-types-and-wildcards-setup-inline-cutout"
+  alt="A slot cut to accept a family of related shapes, a clearly larger shape waiting beside it"
+/>
 
 ## A more concrete example: a generic max
 

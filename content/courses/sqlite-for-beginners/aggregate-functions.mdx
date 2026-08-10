@@ -23,6 +23,11 @@ But many everyday questions are not detail questions. They are summary questions
 
 Think of an aggregate as a tiny summarizing machine. Many rows go in. One value comes out.
 
+<Figure
+  slug="lite-aggregate-functions-counting-rows-count-inline-cutout"
+  alt="A row of blocks passing a clicking counter, the counter's needle rising with each"
+/>
+
 ```mermaid
 flowchart TD
     Rows["Many rows<br/>five order amounts"] --> Agg["Aggregate function<br/>SUM, AVG, COUNT"]
@@ -42,6 +47,11 @@ The five core aggregate functions are:
 ## Counting rows with COUNT(*)
 
 `COUNT(*)` counts rows. It does not care what values are inside those rows. It simply answers: "How many rows are in this result?"
+
+<Figure
+  slug="lite-aggregate-functions-from-many-rows-inline-cutout"
+  alt="A tall column of chips tipped into a funnel and leaving as one block"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -205,6 +215,11 @@ flowchart LR
 ## Aggregates respect WHERE
 
 `WHERE` filters rows first. Then the aggregate summarizes only the rows that survived the filter.
+
+<Figure
+  slug="lite-aggregate-functions-inline-cutout"
+  alt="One tray of chips feeding a single gauge that reads one number, the tray left empty afterwards"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"

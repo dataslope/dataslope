@@ -31,6 +31,11 @@ graph TD
 
 This is a small undirected graph. Edge `0-1` also means `1-0`.
 
+<Figure
+  slug="dsa-graphs-graph-vocabulary-inline-cutout"
+  alt="Posts joined by cords with small blank plates hanging on a post, a cord and a junction"
+/>
+
 ```mermaid
 graph TD
     A((0)) -- "5" --> B((1))
@@ -48,6 +53,11 @@ A linked list is a graph where each vertex has at most one outgoing edge. A tree
 ## The same example in three representations
 
 Unlike a tree, a graph has no root, no parent pointers, no natural "shape" to hang in memory, so we must choose an encoding, and the three standard choices answer different questions quickly. We will store the same little graph all three ways: vertices `0, 1, 2, 3` and undirected edges `0-1`, `0-2`, `1-2`, `2-3`.
+
+<Figure
+  slug="dsa-graphs-inline-cutout"
+  alt="A scatter of posts joined by cords of different thicknesses, some cords one-way with a small collar, and one post left joined to nothing"
+/>
 
 ### Adjacency matrix
 
@@ -187,6 +197,11 @@ int main() {
 ## Degrees and neighbors
 
 In an undirected graph, the **degree** of a vertex is its number of incident edges. In a directed graph, **out-degree** counts outgoing edges and **in-degree** counts incoming edges.
+
+<Figure
+  slug="dsa-graphs-degrees-neighbors-inline-cutout"
+  alt="One post with five cords leaving it beside a post with one, a small tally beside each"
+/>
 
 <CodeBlock
   adapter="cpp"

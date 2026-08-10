@@ -52,6 +52,11 @@ rows tie on the sort key, SQL may return them in either order, so a
 "top 10" can change between runs even on identical data. Always add a
 **tiebreaker** to make the order total and stable.
 
+<Figure
+  slug="duck-reproducible-analytical-workflows-reproducibility-non-negotiable-inline-cutout"
+  alt="One sealed strip of steps run on two benches, both ending with identical blocks"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="A stable top-N with a tiebreaker"
@@ -243,3 +248,8 @@ way.`}
 
 That completes the analytical toolkit, from mindset to metrics to
 reproducible workflows. Let us wrap up and look at where to go next.
+
+<Figure
+  slug="duck-reproducible-analytical-workflows-inline-cutout"
+  alt="A sealed strip of instructions run twice on two benches, both benches ending with identical results"
+/>

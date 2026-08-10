@@ -16,6 +16,16 @@ process the whole thing as a pipeline?
 This chapter is a tour of the five iteration patterns you'll use
 every week, plus the single most common bug each one introduces.
 
+<Figure
+  slug="jcol-iteration-patterns-2-explicit-iterator-inline-cutout"
+  alt="A drum with its cover off, a hand on the crank and a second hand lifting one block out mid-turn"
+/>
+
+<Figure
+  slug="jcol-iteration-patterns-1-enhanced-each-inline-cutout"
+  alt="A drum with a single smooth handle, one block leaving per turn with nothing else to operate"
+/>
+
 ## 1. Enhanced for-each
 
 The for-each loop is sugar over an `Iterator`. It is the right tool
@@ -185,6 +195,11 @@ should happen to each element (`filter`, `map`, `sorted`,
 `distinct`, `flatMap`, ...) and end with a terminal operation
 (`toList`, `count`, `reduce`, `forEach`, ...). The library decides
 *how*.
+
+<Figure
+  slug="jcol-iteration-patterns-inline-cutout"
+  alt="The same rail of blocks walked three ways, by a crank, by a hand counting slots, and by a chute taking them in bulk"
+/>
 
 <CodeBlock
   adapter="java"

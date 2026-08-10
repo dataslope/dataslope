@@ -20,6 +20,11 @@ A `LEFT JOIN` keeps **every row from the left (first) table**,
 matched or not. Where a match exists, the right table's columns are
 filled in. Where none exists, those columns come back as `NULL`.
 
+<Figure
+  slug="sql-outer-joins-inline-cutout"
+  alt="Two racks pushed together where the matched pairs go to a tray and the unmatched cards from the left rack are kept, each with a blank card clipped to it"
+/>
+
 ```mermaid
 flowchart TB
     subgraph L["Left table (customers)"]
@@ -98,6 +103,11 @@ ORDER BY
 Linus and Mae have no orders, so their joined `o.id` is `NULL`, and
 the filter keeps exactly them. This pattern, *outer join, then test
 for `NULL`*, answers a whole family of "who is missing?" questions.
+
+<Figure
+  slug="sql-outer-joins-finding-unmatched-rows-inline-cutout"
+  alt="Two racks pushed together with a lamp lighting only the cards that found no partner"
+/>
 
 ## RIGHT and FULL joins
 

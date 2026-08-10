@@ -321,6 +321,11 @@ Upsampling reshapes the grid and forces an assumption; it never adds information
   nothing to aggregate, you use `.asfreq()` to lay down the grid, then a
   fill method to populate it.
 
+<Figure
+  slug="tsa-resampling-and-aggregation-downsampling-summarizing-coarser-inline-cutout"
+  alt="A dense row of chips swept into seven-chip trays, each tray leaving one block"
+/>
+
 <MultipleChoice
   markdown={`Which statement correctly pairs the direction with what you must supply?
 
@@ -560,3 +565,8 @@ Upsampling left us staring at a grid full of `NaN`s, and even real-world
 data arrives with holes. How you fill those gaps is not a button-press but
 a genuine assumption about what happened when you weren't looking, which
 is exactly the next page.
+
+<Figure
+  slug="tsa-resampling-and-aggregation-inline-cutout"
+  alt="A dense row of daily chips being swept into seven-chip trays, each tray leaving one summary block behind"
+/>

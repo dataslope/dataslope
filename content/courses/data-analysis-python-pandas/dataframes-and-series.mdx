@@ -16,6 +16,11 @@ library returns one or the other.
 - **`Series`**, a 1-D array of values, with a single set of
   labels (also called an index).
 
+<Figure
+  slug="pandas-dataframes-and-series-making-them-by-inline-cutout"
+  alt="A single column of blocks being clamped upright, then three more clamped beside it to make a board"
+/>
+
 A DataFrame is essentially a dictionary of Series that all share
 the same row index.
 
@@ -74,6 +79,11 @@ and its `name`. The DataFrame is the same idea, scaled up.
 
 When you select a single column from a DataFrame, you get back
 a Series.
+
+<Figure
+  slug="pandas-dataframes-and-series-pulling-column-out-inline-cutout"
+  alt="One column lifted straight up out of a clamped board and set down alone"
+/>
 
 <CodeBlock
   adapter="python"
@@ -252,6 +262,11 @@ print(df)
 The `axis` parameter is your friend: `axis=0` (default) means
 "down the rows, returning one value per column"; `axis=1` means
 "across the columns, returning one value per row."
+
+<Figure
+  slug="pandas-dataframes-and-series-inline-cutout"
+  alt="One tall column of stacked cells standing alone on the left, and on the right several of those columns clamped side by side into a single wide grid"
+/>
 
 ## Quick reference: when do you get back a Series vs a DataFrame?
 

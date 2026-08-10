@@ -35,6 +35,11 @@ made **before** data collection:
 increases the purchase-conversion rate." Not "the new button is better"
 (better at what?), name the exact change and the exact outcome.
 
+<Figure
+  slug="stat-ab-testing-inline-cutout"
+  alt="Two identical benches running side by side with one part changed on the right, and a gauge comparing their outputs"
+/>
+
 **2. One primary metric, chosen in advance.** Pick *the* number the
 decision hinges on, say, conversion rate, and commit to it. Tracking
 ten metrics and celebrating whichever one moves is the multiple-comparisons
@@ -67,6 +72,11 @@ arms. So if B outperforms A by more than chance allows, the *only*
 systematic difference between the groups is the treatment. That severs
 the confounder's arrow and earns you a causal conclusion.
 
+<Figure
+  slug="stat-ab-testing-randomization-licenses-causal-inline-cutout"
+  alt="A mixed heap of chips split by a spinner rather than by hand, the two halves visibly alike"
+/>
+
 ```mermaid
 flowchart TD
   Z["Confounders<br/>(known + unknown)"] -.->|"randomization balances<br/>these across arms"| X["Treatment<br/>(A vs B)"]
@@ -90,6 +100,11 @@ users and even a genuine, worthwhile lift can come back non-significant,
 you "found nothing" only because you lacked the data to find it. So you
 size the experiment up front, around the *smallest effect worth
 detecting* (the minimum detectable effect, MDE).
+
+<Figure
+  slug="stat-ab-testing-power-sample-size-inline-cutout"
+  alt="A dial set and locked before two benches begin running, its setting fixing how many chips each will need"
+/>
 
 The four knobs trade off against each other:
 

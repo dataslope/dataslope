@@ -85,6 +85,11 @@ constant.** If a series climbs by the same amount every step, then its
 converts "a steadily rising level" into "a steady rate," and a steady rate
 has no trend.
 
+<Figure
+  slug="tsa-differencing-inline-cutout"
+  alt="A rising line of blocks on the left, and on the right the gaps between consecutive blocks drawn as short bars around a flat centre"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -256,6 +261,11 @@ series that's *already* stationary doesn't help, it *injects* artificial
 structure and inflates the variance. The fingerprint of over-differencing is
 a strong **negative lag-1 autocorrelation** (around `-0.5`) and a variance
 that went *up* instead of down.
+
+<Figure
+  slug="tsa-differencing-differencing-inline-cutout"
+  alt="A rising row of blocks with the gaps between neighbours drawn beneath as short bars around a flat centre"
+/>
 
 <CodeBlock
   adapter="python"

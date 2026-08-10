@@ -19,6 +19,11 @@ A natural first instinct is to cram everything into one giant table.
 Resist it. Real information has natural *kinds of things*,
 customers, orders, products, and each kind deserves its own table.
 
+<Figure
+  slug="sql-relationships-intro-split-data-across-inline-cutout"
+  alt="One crowded crate spilling mixed items beside three tidy crates each holding one kind, cords joining them"
+/>
+
 Why? Because mixing them forces duplication. If every order row also
 stored the customer's full name, address, and phone number, then a
 customer with 50 orders would have their details copied 50 times,
@@ -71,6 +76,11 @@ its customer, or gather all orders for a customer.
 
 Almost every relationship between two kinds of things takes one of
 three shapes. Learning to recognize them is a core modeling skill.
+
+<Figure
+  slug="sql-relationships-intro-inline-cutout"
+  alt="Two boards on a bench joined by a single cord that runs from a tagged row in one to a tagged row in the other"
+/>
 
 ### One-to-many (the most common)
 

@@ -70,6 +70,16 @@ The rules that make this work:
 - **Name them `useSomething`**, the `use` prefix is how React (and its
   linter) recognizes a hook.
 
+<Figure
+  slug="rx-custom-hooks-hooks-can-use-inline-cutout"
+  alt="A reusable module clipped into a panel with its own small cord running out to a drum"
+/>
+
+<Figure
+  slug="rx-custom-hooks-inline-cutout"
+  alt="A small reusable module unclipped from one panel and clipped into two others, each panel then behaving the same way"
+/>
+
 The card below calls `useToggle` *twice*, once for dark mode, once for
 bold, and each call keeps its own independent state. That independence
 is the whole point: a hook is a function, not a shared global:

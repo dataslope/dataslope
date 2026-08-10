@@ -190,6 +190,11 @@ two sets (all values that are in A, or in B, or in both). An intersection
 `A & B` is the *intersection* of the two sets (only values that are in
 *both* A and B).
 
+<Figure
+  slug="tsx-unions-and-intersections-inline-cutout"
+  alt="Two overlapping outlines on a board, one lamp lighting everything either outline covers and another lighting only where they overlap"
+/>
+
 ```mermaid
 graph LR
     A["A (set of values)"]
@@ -385,6 +390,11 @@ When calling a `Func`, the compiler doesn't know which variant it is, so
 you can only call it with arguments that satisfy *all* overloads (in this
 case, none exist, so it's tricky to use). Function unions are often
 better expressed with overloads or generics.
+
+<Figure
+  slug="tsx-unions-and-intersections-union-types-this-inline-cutout"
+  alt="Two overlapping outlines with a lamp lighting everything either one covers"
+/>
 
 ## Intersection of object types: merging properties
 

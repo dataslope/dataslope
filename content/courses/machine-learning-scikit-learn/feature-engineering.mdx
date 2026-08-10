@@ -22,6 +22,11 @@ why the representation matters so much, the everyday moves that help
 (ratios, interactions, binning, date parts, polynomial terms), and the
 discipline to know when a new feature is signal and when it is just noise.
 
+<Figure
+  slug="ml-feature-engineering-core-idea-right-inline-cutout"
+  alt="The same heap of parts laid out two ways, one jumbled and one sorted, a machine reading the sorted one easily"
+/>
+
 ## The core idea: the right representation makes learning easy
 
 Imagine predicting whether a household is crowded. You have two columns:
@@ -56,6 +61,11 @@ usually better spent than time spent swapping algorithms.
 
 Often the meaningful quantity is a *combination* of columns, not any column
 alone.
+
+<Figure
+  slug="ml-feature-engineering-move-1-ratios-inline-cutout"
+  alt="Two columns feeding a small machine that sets down a third built from the pair"
+/>
 
 A **ratio** captures "per-unit" relationships: people per room, price per
 square meter, clicks per impression, debt relative to income. The raw
@@ -360,6 +370,11 @@ size-to-price relationship easier to read.
 Engineered features are not automatically good. Each new column is a
 hypothesis: "this representation exposes useful signal." Some hypotheses are
 right; some just add noise and dimensions for the model to overfit to.
+
+<Figure
+  slug="ml-feature-engineering-inline-cutout"
+  alt="Raw blocks on the left being cut, combined and re-shaped at a bench into a smaller set of cleaner parts that fit the machine at the right"
+/>
 
 It **helps** when:
 

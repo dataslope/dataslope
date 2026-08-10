@@ -76,6 +76,11 @@ An inner or left join does **not** preserve the left frame's row
 count. If a key appears twice on the right, every matching left row
 is duplicated.
 
+<Figure
+  slug="pl-joins-row-multiplication-trap-inline-cutout"
+  alt="Two boards joined where one key matches three rows on the far side, the tray between them filling with far more rows than either board held"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -212,12 +217,22 @@ print(
 The `anti` join in step 3 is the useful one: it shows you *which*
 keys failed to match rather than only how many.
 
+<Figure
+  slug="pl-joins-join-types-inline-cutout"
+  alt="Four pairs of boards pushed together on one bench, each pair keeping a different set of rows on its tray"
+/>
+
 ## join_asof, for nearest-match joins
 
 When the keys will not match exactly, `join_asof` matches each left
 row to the most recent right row at or before it. It is built for
 time series: price at the moment of a trade, exchange rate on the day
 of an invoice.
+
+<Figure
+  slug="pl-joins-inline-cutout"
+  alt="Two stacks of cards with a shared key notch, being pushed together so only the notches that match lock into one combined stack"
+/>
 
 <CodeBlock
   adapter="python"

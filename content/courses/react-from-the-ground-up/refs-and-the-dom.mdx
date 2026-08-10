@@ -79,6 +79,11 @@ The `?.` matters: `inputRef.current` is `null` on the first render (the
 element doesn't exist yet) and becomes the node once React mounts it. By
 the time a click handler runs, it's set.
 
+<Figure
+  slug="rx-refs-and-the-dom-inline-cutout"
+  alt="A panel with one direct handle reaching past the usual controls to grip an element underneath"
+/>
+
 <Callout type="warn" title="Don't reach for a ref to do what state does">
 Refs are an escape hatch. If a value should be *shown* in the UI, it
 belongs in **state**, not a ref, because a ref won't re-render when it

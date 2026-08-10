@@ -32,6 +32,12 @@ steadily *downward*, reaching about 520. The exchange was, by its
 own published number, losing nearly half its value while the
 underlying stocks gained.
 
+<Figure
+  slug="pandas-data-disasters-vancouver-index-cutout"
+  alt="A rising staircase of green blocks above a falling staircase of red ones, a crumb dropping off the edge of every red step"
+  caption="Vancouver Stock Exchange, 1982 to 1983: the market rose, and a truncated third decimal walked the index down to 520."
+/>
+
 The culprit was rounding. The index was recalculated thousands of
 times a day, and each recalculation **truncated** the result to
 three decimals instead of rounding it. Truncation always throws
@@ -58,6 +64,12 @@ between them. The numbers were not *wrong*, they were unitless, and
 the two teams quietly assumed different units. The orbiter came in
 too low and was destroyed by the Martian atmosphere.
 
+<Figure
+  slug="pandas-data-disasters-mars-orbiter-cutout"
+  alt="An orbiter passing low over a red planet's horizon, a ground antenna aimed at it, and two measuring rules of different lengths laid end to end"
+  caption="Mars, September 1999: pound-force seconds on one side of the interface, newton-seconds on the other."
+/>
+
 **The habit:** a number without a unit is not data, it is a rumor.
 When you name a column, the unit belongs in the name or the
 documentation, `mass_g`, `price_usd`, `distance_km`. The Palmer
@@ -77,6 +89,12 @@ persistent and so hard to stamp out that in 2020 the body that names
 human genes officially **renamed the affected genes**, it was
 easier to rename the biology than to fix the spreadsheets.
 
+<Figure
+  slug="pandas-data-disasters-excel-genes-cutout"
+  alt="A conveyor carrying plain tiles into a machine that stamps a calendar leaf onto each one, the changed tiles piling up"
+  caption="By 2020 it was easier to rename the genes than to stop spreadsheets reading SEPT2 as a date."
+/>
+
 **The habit:** type inference is a guess, and a tool guessing on
 your behalf is a tool that can silently corrupt your data. This is
 exactly why this course nags you to check `df.dtypes` after every
@@ -92,6 +110,12 @@ least one formula divided by a *sum* where it should have divided by
 an *average*, understating the apparent risk. No single villain;
 just a fragile, undocumented, un-reviewed manual pipeline that
 nobody could fully trace.
+
+<Figure
+  slug="pandas-data-disasters-london-whale-cutout"
+  alt="Four blank spreadsheets pegged along a washing line, a figure carrying one tile by hand between them, and a whale's tail rising behind the last"
+  caption="JPMorgan, 2012: a risk model that ran on copy-paste between sheets, and a formula dividing by a sum instead of an average."
+/>
 
 **The habit:** if an analysis matters, it should be a script, not a
 sequence of clicks and copy-pastes that lives in one person's
@@ -115,6 +139,11 @@ near-miss was whether *some check* stood between the error and the
 decision. Building those checks into your reflexes, verify types,
 label units, re-run from scratch, look before you trust, is most
 of what "being good at this" means.
+
+<Figure
+  slug="pandas-data-disasters-museum-has-common-inline-cutout"
+  alt="Four cracked exhibits on plinths in a row, each cracked in the same place"
+/>
 
 ## Check your understanding
 

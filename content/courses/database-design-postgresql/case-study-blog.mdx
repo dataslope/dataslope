@@ -45,6 +45,11 @@ The main entities are `users`, `posts`, `comments`, and `tags`.
 The many-to-many relationship between posts and tags needs a fifth
 table: `post_tags`.
 
+<Figure
+  slug="db-case-study-blog-choose-entities-inline-cutout"
+  alt="Three crates being lifted out of a heap of loose cards and set apart on a bench"
+/>
+
 ```mermaid
 flowchart TD
     Users["<code>users</code>"] --> Posts["<code>posts</code>"]
@@ -146,6 +151,11 @@ flowchart TD
 
 The SQL below creates the complete blog schema and inserts a tiny
 sample dataset.
+
+<Figure
+  slug="db-case-study-blog-start-requirements-inline-cutout"
+  alt="A solid dark easel board with a figure pinning bright plain cards across it before any cabinet is built"
+/>
 
 <SqlCodeBlock
   dialect="postgres"
@@ -296,6 +306,11 @@ VALUES
 A schema earns its keep when new questions are easy. Here is one the
 product team will ask on day two: *how active is each post?* The full
 blog schema and its sample data are loaded below.
+
+<Figure
+  slug="db-case-study-blog-inline-cutout"
+  alt="Three crates on a bench, one of posts, one of authors and one of comments, joined by cords"
+/>
 
 <SqlChallengeCard
   dialect="postgres"

@@ -138,6 +138,11 @@ int main() {
 
 Templates let you write algorithms once and let the compiler generate type-specific code. You can sort `int`, `double`, `std::string`, or your own types without runtime boxing or reflection. This is Stepanov's generic-programming idea made concrete: `bigger` below is written once, yet the compiler emits a dedicated, fully optimized version for each type it is used with.
 
+<Figure
+  slug="dsa-why-cpp-for-dsa-speed-predictability-inline-cutout"
+  alt="A machine with its cover off showing every gear exposed, a stopwatch beside it reading the same on each run"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[

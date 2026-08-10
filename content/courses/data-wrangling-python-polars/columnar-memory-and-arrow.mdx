@@ -18,6 +18,12 @@ which are not.
 A table is two-dimensional. Memory is one-dimensional. Something has
 to give, and there are exactly two reasonable choices.
 
+<Figure
+  slug="pl-arrow-shared-columns-cutout"
+  alt="Three different machine cabinets all reading from one long shared column of stacked cells running between them"
+  caption="Apache Arrow, 2016: one agreed memory layout, so a column can cross a language boundary without being copied."
+/>
+
 **Row-major** stores each record's fields together:
 
 ```
@@ -76,6 +82,11 @@ all three reward contiguous access:
    but only if they are adjacent. A column is adjacent by
    construction.
 
+<Figure
+  slug="pl-columnar-memory-and-arrow-cpu-cares-so-inline-cutout"
+  alt="A machine reaching along one continuous column of blocks in a single sweep rather than hopping across rows"
+/>
+
 A pandas string column is an array of pointers to Python `str`
 objects living wherever the allocator put them. Every value read is a
 cache miss the prefetcher cannot help with. That single design
@@ -88,6 +99,11 @@ Columnar layout is an old idea. **Apache Arrow**, started in 2016, is
 a *standard* for it: an exact specification of how a column of
 integers, strings, or nested structs is laid out in memory, agreed on
 across languages.
+
+<Figure
+  slug="pl-columnar-memory-and-arrow-apache-arrow-adds-inline-cutout"
+  alt="Two different machines drawing from one shared tray without either repacking it first"
+/>
 
 An Arrow column is a few buffers:
 

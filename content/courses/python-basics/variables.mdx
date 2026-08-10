@@ -35,6 +35,11 @@ Variables are the foundation of every program. In a web app, you might have `use
 
 **This is the most important mental model for Python.** Variables are not containers that hold values-they're *labels* that point to objects in memory.
 
+<Figure
+  slug="python-variables-inline-cutout"
+  alt="A labelled tag tied to a block, then untied and tied to a different block, the first block left where it was"
+/>
+
 ```mermaid
 graph LR
     x[name: x] --> obj1["object: list at <code>0x1a2b3c</code>"]
@@ -106,6 +111,11 @@ print(f"Same object? {x is z}")
 ## Dynamic typing: freedom and footguns
 
 Python names have no fixed type. You can rebind a name to a value of any type at any time.
+
+<Figure
+  slug="python-variables-dynamic-typing-freedom-inline-cutout"
+  alt="A tag moving freely between blocks of different shapes, with one slot where the wrong shape jams"
+/>
 
 <CodeBlock
   adapter="python"

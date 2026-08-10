@@ -53,6 +53,11 @@ You can verify the "erased" half of that claim right here: this page's in-browse
 
 This distinction is crucial: **TypeScript's types only exist during compilation. At runtime, TypeScript code is just JavaScript.**
 
+<Figure
+  slug="tsx-how-typescript-works-compile-time-vs-inline-cutout"
+  alt="A gate checking a card on a still bench, then lifting away as the belt starts to move"
+/>
+
 When you write:
 
 ```typescript
@@ -249,6 +254,11 @@ We'll cover narrowing deeply in later lessons. For now, recognize that TypeScrip
 
 When you open a `.ts` file in VS Code or WebStorm, you get instant feedback: red squiggles under errors, autocomplete as you type, tooltips showing function signatures, refactorings like "Rename Symbol" that work across files. How?
 
+<Figure
+  slug="tsx-how-typescript-works-inline-cutout"
+  alt="A card passing a checking gate that inspects it and then falls away, the card continuing unchanged"
+/>
+
 The TypeScript compiler exposes a **language service**, an API that editors can call to ask questions like:
 
 - "What's the type of this variable?"
@@ -357,6 +367,11 @@ At the end of this pipeline, you have two artifacts:
 - **Declaration files** (`.d.ts`) that let other TypeScript projects import your code and get full type checking.
 
 The types never reach production. They're a *compile-time tool* for correctness and productivity.
+
+<Figure
+  slug="tsx-how-typescript-works-javascript-typescript-relationship-inline-cutout"
+  alt="A card with a shaped gate fitted over it, the gate lifting away and leaving the card untouched"
+/>
 
 ---
 

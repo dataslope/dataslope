@@ -178,6 +178,11 @@ if (result !== null) {
 
 When you initialize an array with mixed values, the compiler tries to find a **best common type** that accommodates all elements.
 
+<Figure
+  slug="tsx-type-inference-inline-cutout"
+  alt="A block dropped into an empty socket, the socket closing around it to take exactly its shape without anyone measuring"
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -383,5 +388,10 @@ Type inference is what makes TypeScript feel lightweight. The compiler deduces t
 - **Arrays:** Inferred as the best common type of all elements, or a union if they differ.
 
 The best practice is to **annotate at module boundaries** (function parameters, return types, exported values) and **let the compiler infer inside implementations** (local variables, intermediate results). This keeps your code concise and maintainable while preserving full type safety.
+
+<Figure
+  slug="tsx-type-inference-variable-initializer-inference-inline-cutout"
+  alt="A block dropped into a soft empty socket that closes around it to take exactly its shape"
+/>
 
 Next up: [Structural Typing](./structural-typing), where we explore how TypeScript compares types by their *shape*, not their name, and why that matters for reusability and flexibility.

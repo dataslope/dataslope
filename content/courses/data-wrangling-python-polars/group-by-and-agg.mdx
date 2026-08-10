@@ -51,11 +51,21 @@ There is no equivalent of pandas' named-aggregation-versus-dict
 confusion, because there is only one form: expressions, named the
 same way expressions are named everywhere else.
 
+<Figure
+  slug="pl-group-by-and-agg-basic-shape-inline-cutout"
+  alt="Chips swept into three trays by a comb, each tray tipped into a small press leaving one block on top"
+/>
+
 ## Group order is not guaranteed
 
 Polars groups in parallel, so the output row order depends on which
 thread finished first. This is deliberate: guaranteeing order would
 cost the parallelism.
+
+<Figure
+  slug="pl-group-by-and-agg-inline-cutout"
+  alt="A scatter of coloured chips swept into three trays, each tray tipped into a small press that leaves one summary block on top of it"
+/>
 
 <CodeBlock
   adapter="python"
@@ -109,6 +119,11 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
 No MultiIndex appears. The keys are ordinary columns in the result,
 which is one of the places where having no index pays off most
 obviously.
+
+<Figure
+  slug="pl-group-by-and-agg-grouping-by-several-inline-cutout"
+  alt="Chips sorted first into rows by colour and then into columns by shape, each cell of the resulting grid its own small tray"
+/>
 
 ## Grouping by an expression
 

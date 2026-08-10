@@ -146,6 +146,11 @@ program. With polymorphism, you just add a new derived class with
 its own `Speak()`, and every existing call site that says
 `animal.Speak()` already does the right thing.
 
+<Figure
+  slug="mcs-inheritance-and-polymorphism-inline-cutout"
+  alt="Three machines of different shapes all wearing the same standard front panel, one handle turned on each producing a different result"
+/>
+
 ## `abstract` classes: forcing the family to fill in the blanks
 
 Sometimes the base class can't define a method itself, it only
@@ -251,6 +256,11 @@ relationship. A better rule:
 - Use **inheritance** when the relationship is genuinely "is-a"
   and the subclass extends the base in a substitutable way.
 - Use **composition** ("has-a") when one class merely uses another.
+
+<Figure
+  slug="mcs-inheritance-and-polymorphism-inheritance-basic-mechanics-inline-cutout"
+  alt="A base cabinet with one cabinet behind it built on the same frame with one extra drawer"
+/>
 
 A `Car` *has* an `Engine`, it isn't *a kind of* `Engine`. So
 `Car` should hold a field of type `Engine`, not inherit from it.

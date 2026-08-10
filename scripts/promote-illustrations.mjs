@@ -64,7 +64,19 @@
  *                     a 1024px source is ~50 kB of detail no one can see.
  *                     Never upscales.
  *   --no-cutout       Promote only the original, not its background-removed pair
- *   --no-build        Skip the build-images run afterwards
+ *   --cutout-only     Promote only the cut-out. For art that is never shown
+ *                     with its background (every `<Figure>` references the
+ *                     `-cutout` slug), the original is 0.22 MB of git per
+ *                     image that nothing serves. The pristine PNG stays in R2.
+ *   --no-build        Skip the build-images run afterwards. **Required when two
+ *                     promotions run at once.** build-images prunes every file
+ *                     in public/images that is missing from the manifest it
+ *                     just scanned, so a second promotion writing files after
+ *                     that scan has them deleted out from under it. Running
+ *                     waves three, four and five concurrently cost two images
+ *                     exactly this way — promoted, reported ✓, gone before the
+ *                     commit. Pass --no-build to every concurrent run and do
+ *                     one `npm run build:images` at the end.
  *   --dry-run         Report what would be promoted; write nothing
  *   -h, --help        Show this help
  *
@@ -96,6 +108,7 @@ function parseArgs(argv) {
     quality: 92,
     maxWidth: null,
     cutout: true,
+    cutoutOnly: false,
     build: true,
     dryRun: false,
     help: false,
@@ -111,6 +124,7 @@ function parseArgs(argv) {
       case "--quality": opts.quality = Math.min(100, Math.max(1, Number(next()) || 92)); break;
       case "--max-width": opts.maxWidth = Math.max(1, Number(next()) || 0) || null; break;
       case "--no-cutout": opts.cutout = false; break;
+      case "--cutout-only": opts.cutoutOnly = true; break;
       case "--no-build": opts.build = false; break;
       case "--dry-run": opts.dryRun = true; break;
       case "-h":
@@ -242,12 +256,18 @@ async function main() {
   }
 
   // Each id promotes its original plus, unless suppressed, its cut-out pair.
+  //
+  // `--cutout-only` drops the original, and for art that is *only* ever shown
+  // cut out that is the honest setting: pages reference `<id>-cutout`, the
+  // review gallery renders the cut-out, and the opaque `<id>.webp` beside it
+  // is 0.22 MB of git per figure serving nothing but a "background removal
+  // ran" flag that `hasOriginal` reads off the manifest. The pristine PNG
+  // stays in R2 either way, so a re-promote can still bring it back.
   const stems = [];
   for (const id of ids) {
-    stems.push(id);
-    if (opts.cutout && (await source.has(`${id}${CUTOUT_SUFFIX}`))) {
-      stems.push(`${id}${CUTOUT_SUFFIX}`);
-    }
+    const hasCutout = opts.cutout && (await source.has(`${id}${CUTOUT_SUFFIX}`));
+    if (!opts.cutoutOnly || !hasCutout) stems.push(id);
+    if (hasCutout) stems.push(`${id}${CUTOUT_SUFFIX}`);
   }
 
   console.log(

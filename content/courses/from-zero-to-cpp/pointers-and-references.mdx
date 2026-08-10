@@ -76,6 +76,12 @@ any object. Dereferencing it is undefined behavior, usually a
 crash. Initialize every pointer to *something* (often `nullptr`)
 and check before dereferencing.
 
+<Figure
+  slug="cpp-pointers-null-mistake-cutout"
+  alt="A row of six pigeonholes, five holding a solid shape and the middle one empty, with a small figure reaching into the empty one"
+  caption="Tony Hoare added the null reference to ALGOL W in 1965, and called it his billion-dollar mistake in 2009."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -126,6 +132,11 @@ when absence is not a meaningful state.
 
 A **reference** is a second name for an existing variable. Once
 bound, it cannot be re-bound to anything else.
+
+<Figure
+  slug="cpp-pointers-and-references-pointer-address-type-inline-cutout"
+  alt="A card carrying an arrow to another slot, the card cut to a shape matching only one kind of block"
+/>
 
 ```cpp
 int n = 42;

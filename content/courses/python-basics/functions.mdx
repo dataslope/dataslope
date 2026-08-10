@@ -25,6 +25,11 @@ Think of every `import requests; requests.get(url)` or `df.groupby("category").m
 
 The term **function** comes from mathematics: **f(x) = y** means "given input x, produce output y."
 
+<Figure
+  slug="python-functions-inline-cutout"
+  alt="A hopper taking blocks, a boxed machine below it, and a chute returning one finished block, the machine's inside hidden"
+/>
+
 In math, functions are **pure**:
 - `f(3)` always returns the same value.
 - `f` doesn't modify anything; it just computes.
@@ -57,6 +62,11 @@ flowchart TD
 
 A function is **defined once** with `def`, then **called many times**. Each call creates a new local scope, binds arguments to parameters, executes the body, and returns a value (or `None` if no `return` is hit).
 
+<Figure
+  slug="python-functions-anatomy-function-call-inline-cutout"
+  alt="A block entering a machine's hopper, the machine working, and a different block leaving its chute"
+/>
+
 ## Defining a function
 
 <CodeBlock
@@ -75,6 +85,11 @@ print(greet("Ada"))
 />
 
 A function that does not explicitly `return` returns `None`.
+
+<Figure
+  slug="python-functions-defining-function-inline-cutout"
+  alt="A machine assembled on a bench but not yet switched on, its hopper empty"
+/>
 
 <CodeBlock
   adapter="python"

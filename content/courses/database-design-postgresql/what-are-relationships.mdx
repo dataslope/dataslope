@@ -136,11 +136,21 @@ ORDER BY
 Without the relationship, the query could list customers and list
 orders, but it could not reliably know which orders belonged to whom.
 
+<Figure
+  slug="db-what-are-relationships-inline-cutout"
+  alt="Two crates on a bench joined by a cord, with the cord's ends fitting sockets that only accept that cord"
+/>
+
 ## Some relationships become entities
 
 A relationship can be important enough to store as its own entity. For
 example, an enrollment is the relationship between a student and a
 course, but it may also have attributes like `enrolled_on` or `grade`.
+
+<Figure
+  slug="db-what-are-relationships-relationships-are-verbs-inline-cutout"
+  alt="Two crates joined by a cord with a small blank plate hanging from the middle of the cord"
+/>
 
 ```mermaid
 erDiagram

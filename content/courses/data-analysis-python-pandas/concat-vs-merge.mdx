@@ -27,6 +27,11 @@ flowchart LR
   key. "For each employee, look up their department from the
   departments table."
 
+<Figure
+  slug="pandas-concat-vs-merge-inline-cutout"
+  alt="Two boards stacked one directly under the other on the left, and on the right two boards joined edge to edge through a shared column of notches"
+/>
+
 ## Concat, when shapes match
 
 <CodeBlock
@@ -49,6 +54,11 @@ print(q1)
 
 `ignore_index=True` resets the integer index so it runs 0, 1, 2,
 ... instead of repeating each month's 0, 1.
+
+<Figure
+  slug="pandas-concat-vs-merge-concat-shapes-match-inline-cutout"
+  alt="Two boards of identical width stacked one directly onto the other so their columns line up into one taller board"
+/>
 
 You can also concat horizontally:
 
@@ -107,6 +117,11 @@ print(joined)
 
 The result has every employee's row, with `dept_name` filled in
 from the other table by matching `dept_id`.
+
+<Figure
+  slug="pandas-concat-vs-merge-merge-joining-on-inline-cutout"
+  alt="Two boards drawn together by a shared column of notches, matching notches interlocking"
+/>
 
 ## A side-by-side example
 

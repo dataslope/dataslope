@@ -69,6 +69,11 @@ you could just multiply. When the conditional probability *differs* from
 the unconditional one, the events are **dependent**, and that difference
 is information you can exploit.
 
+<Figure
+  slug="stat-conditional-probability-independence-vs-dependence-inline-cutout"
+  alt="Two spinners side by side turning freely, and two more joined by a cord so one drags the other"
+/>
+
 - Two separate coin flips: independent. The first tells you nothing
   about the second.
 - A user's age and their plan tier: usually **dependent**. Knowing one
@@ -109,6 +114,11 @@ In practice you rarely start from clean formulas, you start from
 the row (or column) you care about, then take a fraction within it."
 Suppose we survey 1,000 users and cross-tabulate whether they're on a
 paid plan against whether they churned this quarter.
+
+<Figure
+  slug="stat-conditional-probability-inline-cutout"
+  alt="A board of chips with one region fenced off, the count taken only inside the fence and the rest ignored"
+/>
 
 <CodeBlock
   adapter="python"
@@ -674,3 +684,8 @@ Bayes' rule formalizes updating: prior 30% plus phrase evidence yields a higher 
 With conditional reasoning in hand, *Random Variables* puts numbers on
 random outcomes so we can talk about averages and spread, the gateway
 to the probability distributions that model real data.
+
+<Figure
+  slug="stat-conditional-probability-conditioning-means-inline-cutout"
+  alt="A board of chips with a fence dropped around one region and the count taken only inside it"
+/>

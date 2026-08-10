@@ -173,6 +173,16 @@ Three habits help regardless of engine:
 - **Store Parquet, not CSV.** Smaller on disk, typed, and its
   statistics let whole row groups be skipped.
 
+<Figure
+  slug="pl-streaming-and-bigger-data-turning-on-inline-cutout"
+  alt="A single lever thrown on a bench, after which blocks arrive in small trays instead of one overflowing load"
+/>
+
+<Figure
+  slug="pl-streaming-and-bigger-data-inline-cutout"
+  alt="A long conveyor carrying a river of blocks past a small machine that handles a few at a time, with a hopper far too large to sit on the bench beside it"
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}

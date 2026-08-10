@@ -109,6 +109,11 @@ The classic use of `useEffect([])` is loading data when a component
 first appears. The shape is always the same: a `loading` flag, a
 `data` state, and an effect that fetches and fills them in.
 
+<Figure
+  slug="rx-effects-and-data-fetching-inline-cutout"
+  alt="A panel that lights up on the left, sending a cord out to a server drum in the middle, and filling one of its own slots when the parcel returns"
+/>
+
 ```tsx
 useEffect(() => {
   let active = true;
@@ -298,3 +303,8 @@ for (const expected of ["Ada", "Grace", "Linus"]) {
 Effects connect React to the outside world. Sometimes you need to reach
 that world more directly, to a real DOM node:
 [Refs and the DOM](/courses/react-from-the-ground-up/refs-and-the-dom).
+
+<Figure
+  slug="rx-effects-and-data-fetching-useeffect-basics-inline-cutout"
+  alt="A panel lighting up and a cord running from it to a drum, a tray returning along the cord"
+/>

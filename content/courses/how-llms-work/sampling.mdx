@@ -21,6 +21,11 @@ converts them:
 
 $$p_i = \frac{e^{z_i}}{\sum_j e^{z_j}}$$
 
+<Figure
+  slug="llm-sampling-softmax-turns-scores-inline-cutout"
+  alt="A row of chips of different heights fed into a machine that hands back a spinner with wedges of matching sizes"
+/>
+
 Exponentiate every score, then divide by the total. The exponential is
 what makes the result *peaked*: a small lead in logits becomes a large
 lead in probability.
@@ -102,6 +107,11 @@ print("High T gives the long tail a real chance.")
 
 Temperature alone has a problem: at high temperature, genuinely absurd
 tokens become reachable. Top-p fixes this by truncating the tail first.
+
+<Figure
+  slug="llm-sampling-inline-cutout"
+  alt="A hopper of candidate chips of different sizes tipped onto a spinner, the largest chip most often landing in the chute but a smaller one sometimes taking its place"
+/>
 
 Sort tokens by probability, accumulate until the total reaches *p*
 (commonly 0.9), discard everything else, renormalize, then sample.

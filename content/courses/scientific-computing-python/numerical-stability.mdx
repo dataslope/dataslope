@@ -23,6 +23,11 @@ The answer depends on two independent properties:
   slightly perturbed problem. An *unstable* algorithm produces
   garbage even on well-conditioned problems.
 
+<Figure
+  slug="scipy-numerical-stability-stability-intuitively-inline-cutout"
+  alt="Two chains of steps from the same start, one ending on its mark and one visibly off"
+/>
+
 ```mermaid
 flowchart TB
     P{Conditioning<br/>property of the<br/>problem}
@@ -86,6 +91,11 @@ you get to $Ax = b$ is the exact answer to $(A + E)x = b$, with
 $\|E\| / \|A\| = O(\epsilon)$. That is the best you could possibly
 hope for at finite precision.
 
+<Figure
+  slug="scipy-numerical-stability-conditioning-intuitively-inline-cutout"
+  alt="A lever where a tiny nudge at one end swings the far end wildly"
+/>
+
 An algorithm is **unstable** if it can produce arbitrarily wrong
 answers on well-conditioned problems. The classic example: solving
 a $2\times2$ linear system with Cramer's rule on a matrix whose
@@ -138,6 +148,11 @@ extra cancellation. None of them can do better than $\kappa$ allows.
 ## A canonical instability: forward vs backward recursion
 
 Consider the integrals
+
+<Figure
+  slug="scipy-numerical-stability-inline-cutout"
+  alt="Two chains of the same small operations, the near one ending with a block still on its mark and the far one ending far off it"
+/>
 
 $$ I_n = \int_0^1 \frac{x^n}{x + 10} \, dx $$
 

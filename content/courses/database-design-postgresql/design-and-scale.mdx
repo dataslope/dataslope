@@ -37,6 +37,11 @@ A **god-table** tries to store too many kinds of things in one place.
 It often has many nullable columns, repeated groups, and confusing
 rules.
 
+<Figure
+  slug="db-design-and-scale-designs-scale-meaning-inline-cutout"
+  alt="The same cabinet built small and built very large, its fittings identical at both sizes"
+/>
+
 ```mermaid
 flowchart LR
     Bad["one huge activity table"] --> UserFacts["user facts"]
@@ -123,6 +128,11 @@ Some duplication is deliberate, like copying an order line's historical
 unit price. Unbounded duplication is different. It repeats the same
 fact across many rows for no good reason.
 
+<Figure
+  slug="db-design-and-scale-avoid-wide-god-inline-cutout"
+  alt="One enormously wide board sagging under its own length beside four narrow boards standing square"
+/>
+
 ```mermaid
 flowchart TD
     Repeat["Product name copied into every order item"] --> ManyCopies["many copies"]
@@ -156,6 +166,11 @@ erDiagram
 
 Good design is not "normalize everything forever." It is choosing the
 structure that preserves meaning while supporting expected growth.
+
+<Figure
+  slug="db-design-and-scale-inline-cutout"
+  alt="The same cabinet drawn small on one bench and very large on the next, its fittings identical in both"
+/>
 
 For example:
 

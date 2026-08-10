@@ -322,6 +322,11 @@ modest; an SD of 5 on a 1-to-10 satisfaction score is enormous. Raw
 standard deviations are **not comparable across variables measured in
 different units or at different magnitudes**.
 
+<Figure
+  slug="stat-measures-of-spread-same-center-different-inline-cutout"
+  alt="Two rows of chips centred on the same mark, one clustered tightly and one spread end to end"
+/>
+
 The **coefficient of variation (CV)** fixes this by dividing the
 standard deviation by the mean: `CV = std / mean`. It's a *unitless*,
 relative measure of spread, "how big is the spread compared to the
@@ -382,6 +387,11 @@ In practice you compute several spread measures together and read them
 against each other, just like you did with centers. A big gap between
 the standard deviation and the IQR is itself a clue that outliers or
 skew are present.
+
+<Figure
+  slug="stat-measures-of-spread-inline-cutout"
+  alt="Two rows of chips of the same width, one clustered tightly at the centre and one spread evenly end to end"
+/>
 
 <CodeBlock
   adapter="python"

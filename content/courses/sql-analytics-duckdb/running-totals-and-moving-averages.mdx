@@ -67,6 +67,11 @@ most important idea on this page.
 Combine `PARTITION BY` with the ordered window to get a running total that
 **resets for each group**, cumulative revenue per region, say.
 
+<Figure
+  slug="duck-running-totals-and-moving-averages-inline-cutout"
+  alt="A row of daily blocks with a growing stack behind them, and a smooth bar sliding along averaging the last three at a time"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Cumulative revenue within each region"
@@ -278,3 +283,8 @@ it within each.`}
 You now command the window-function toolkit, ranking, running totals,
 moving averages, and row comparisons. Next we shift from *summarizing*
 data to *transforming* it: conditional logic, dates, and reshaping.
+
+<Figure
+  slug="duck-running-totals-and-moving-averages-running-total-inline-cutout"
+  alt="A row of blocks with a growing stack beside it, each stack taller than the last by that block"
+/>

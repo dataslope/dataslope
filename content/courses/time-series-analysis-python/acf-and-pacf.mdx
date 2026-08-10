@@ -24,6 +24,16 @@ otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
   at lag `k` **after removing** the influence of all the shorter lags in
   between. It captures only the **direct** relationship.
 
+<Figure
+  slug="tsa-acf-and-pacf-watch-cheat-sheet-inline-cutout"
+  alt="A wave laid over the four reference shapes, one of them matching it exactly"
+/>
+
+<Figure
+  slug="tsa-acf-and-pacf-inline-cutout"
+  alt="One wave laid over a copy of itself shifted along by a few steps, with a gauge reading how well the two still line up"
+/>
+
 Why does "direct vs total" matter so much? Picture an AR(1) series where
 each value is $0.7 \times$ the previous one. Then $y(t)$ is directly tied to
 $y(t-1)$. But $y(t-1)$ is tied to $y(t-2)$, so $y(t)$ is *indirectly*
@@ -75,6 +85,11 @@ is the order. AR → PACF cut → `p`. MA → ACF cut → `q`.
 
 Let's *manufacture* an AR(1), an AR(2), and an MA(1) with known coefficients,
 then confirm their ACF/PACF match the table exactly.
+
+<Figure
+  slug="tsa-acf-and-pacf-cheat-sheet-inline-cutout"
+  alt="A small card of four shapes pinned above a bench, each shape matched to one of four wave patterns below"
+/>
 
 ### AR(1): PACF cuts off at lag 1
 

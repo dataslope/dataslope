@@ -43,6 +43,11 @@ The model is simple enough to build from scratch with a `Counter`, and doing
 so demystifies it completely. Watch a tiny three-document corpus become a
 matrix of numbers.
 
+<Figure
+  slug="nlp-bag-of-words-building-by-hand-inline-cutout"
+  alt="A hand placing word tiles one at a time into labelled slots of a tally rack"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -125,6 +130,11 @@ Sometimes you care only *whether* a word appears, not how often, for short
 texts or spam-style signals, presence is enough and is less swayed by length.
 That variant is **binary** bag-of-words: each cell is 1 or 0 instead of a
 count.
+
+<Figure
+  slug="nlp-bag-of-words-inline-cutout"
+  alt="A bag tipped out onto a bench so the word tiles land in a heap with their order lost, and a tally rack counting each kind"
+/>
 
 <CodeBlock
   adapter="python"
@@ -350,3 +360,8 @@ weakness we met when counting words: the most common words dominate and tell you
 the least. The next page fixes that with **TF-IDF**, a way to weight each word
 by how *distinctive* it is, before we assemble everything into a working
 classifier.
+
+<Figure
+  slug="nlp-bag-of-words-feature-extraction-process-inline-cutout"
+  alt="A bag of word tiles tipped onto a bench and counted into a tally rack"
+/>

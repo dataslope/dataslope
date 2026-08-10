@@ -147,6 +147,11 @@ need the exact number; what matters is the intuition: heavy-tailed
 distributions produce extreme values *far more often* than a normal
 distribution would, so "rare" events aren't actually that rare.
 
+<Figure
+  slug="stat-shape-and-outliers-skewness-which-way-inline-cutout"
+  alt="Two mounds side by side, one with a long tail trailing right and one trailing left"
+/>
+
 `scipy.stats.kurtosis` reports **excess** kurtosis by default (it
 subtracts 3, so a normal distribution reads ~0). Positive means heavier
 tails than normal; negative means lighter.
@@ -190,6 +195,11 @@ beat the standard deviation, one fat-tailed draw can dominate the SD.
 
 What one of them costs each summary. The mean and the standard deviation
 move a long way; the median barely notices.
+
+<Figure
+  slug="stat-shape-and-outliers-inline-cutout"
+  alt="A lopsided mound of chips with a long tail to one side and two chips sitting far out beyond the tail"
+/>
 
 <Chart slug="outlier-influence" />
 

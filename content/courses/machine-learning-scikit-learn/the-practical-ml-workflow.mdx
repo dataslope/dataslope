@@ -22,6 +22,11 @@ a way of working that keeps you honest, makes your results reproducible, and
 fails loudly instead of silently. Let us walk the whole loop, then run it
 end to end on a real dataset.
 
+<Figure
+  slug="ml-the-practical-ml-workflow-workflow-at-glance-inline-cutout"
+  alt="A ring of five benches with one tray travelling round them"
+/>
+
 ## The workflow at a glance
 
 ```mermaid
@@ -55,6 +60,11 @@ there no target at all (clustering)? What would a *useful* result look like,
 and how will you measure it? Crucially, is this even a machine learning
 problem? Plenty of questions are better answered by a simple query, a chart,
 or a domain expert than by a model.
+
+<Figure
+  slug="ml-the-practical-ml-workflow-step-1-frame-inline-cutout"
+  alt="A blank card pinned above a bench with the tools still racked below it"
+/>
 
 The choice of metric belongs here too, decided *before* you see results so
 you cannot rationalize a flattering one after the fact. Predicting a rare
@@ -482,6 +492,11 @@ The ten steps are a default, not a law. Real projects adapt:
 - **Pure-exploration projects** (unsupervised clustering to understand a
   dataset) have no target and no test split in the usual sense, you judge
   with the cluster-evaluation tools instead.
+
+<Figure
+  slug="ml-the-practical-ml-workflow-inline-cutout"
+  alt="A ring of five benches with a tray moving round it, from data to features to fit to check and back"
+/>
 
 What never bends is the principle underneath: **be honest about what your
 model has and has not seen.** Every adaptation above is just that principle

@@ -109,6 +109,11 @@ The most important habit in this lesson: **`CREATE TABLE AS SELECT`**
 new table. Analysts use it to "freeze" a cleaned-up or generated dataset
 so later queries can build on it.
 
+<Figure
+  slug="duck-loading-and-generating-data-four-ways-data-inline-cutout"
+  alt="Four differently shaped cartons feeding one hopper and arriving inside as identical rows"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Generate once, then query the saved table"
@@ -214,3 +219,8 @@ applies unchanged to files and warehouse tables.`}
 You can now bring data into DuckDB and conjure practice datasets at will.
 With data in hand, the real fun begins, let us learn how an analyst
 *profiles* an unfamiliar dataset.
+
+<Figure
+  slug="duck-loading-and-generating-data-inline-cutout"
+  alt="Three differently shaped cartons feeding one hopper and arriving inside as identical rows"
+/>

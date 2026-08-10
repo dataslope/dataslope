@@ -19,6 +19,11 @@ includes how far each is from the origin, which for embeddings is
 mostly noise: vector *magnitude* tends to track things like token
 frequency rather than meaning.
 
+<Figure
+  slug="llm-similarity-inline-cutout"
+  alt="Two chips held on a board at a measured distance apart, with a caliper reading the gap between them and a third chip much further away"
+/>
+
 **Cosine similarity** measures the angle between two vectors and
 ignores their lengths entirely. Two vectors pointing the same
 direction score 1.0 regardless of how long either is.
@@ -60,6 +65,11 @@ print("which is what we want when magnitude is not about meaning.")
 This is the whole of retrieval, minus a real embedding model. Note
 that the query shares no words with the best match, which is the point:
 the search is over meaning rather than text.
+
+<Figure
+  slug="llm-similarity-working-semantic-search-inline-cutout"
+  alt="One chip held up to a board of chips, a caliper finding the three nearest to it"
+/>
 
 <CodeBlock
   adapter="python"

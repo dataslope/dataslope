@@ -138,6 +138,11 @@ print(
 `unpivot` *is* available on a `LazyFrame`, because the output schema
 is known from the input schema: three columns, whatever the data says.
 
+<Figure
+  slug="pl-pivot-and-unpivot-inline-cutout"
+  alt="A folded paper fan opened out flat into a wide sheet on the left and pressed back into a narrow column on the right, the same squares visible in both"
+/>
+
 ## Selectors make unpivot robust
 
 Naming the columns to melt by hand breaks when a month is added.
@@ -204,6 +209,11 @@ Every one of those would need a hand-maintained list of month columns
 in wide form. The usual pipeline is therefore: **unpivot on the way
 in, compute in long form, pivot on the way out** for the final
 presentation table.
+
+<Figure
+  slug="pl-pivot-and-unpivot-pivot-long-wide-inline-cutout"
+  alt="A narrow tall board unfolding sideways into a wide flat one, the same squares visible in both"
+/>
 
 ## Transposing
 

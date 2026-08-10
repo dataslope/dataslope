@@ -83,6 +83,11 @@ These are conventions, not rules, the compiler will accept any
 identifier, but every Java reader is wired to expect them, so
 straying is gratuitous noise.
 
+<Figure
+  slug="jcol-generic-classes-and-methods-naming-conventions-inline-cutout"
+  alt="A rack of small blank tags hanging above a row of identical crates, each tag a plain unmarked shape"
+/>
+
 ## Multiple type parameters
 
 A generic class can take more than one type parameter. The classic
@@ -178,10 +183,20 @@ Generic methods are how the standard library writes things like
 to specify the type parameter at the call site, the compiler infers
 it.
 
+<Figure
+  slug="jcol-generic-classes-and-methods-inline-cutout"
+  alt="One crate design shown holding three different kinds of block, the crate itself identical in each case"
+/>
+
 ## A multi-file generic class: a stack
 
 This is the classic generic class to write next. `Stack<E>` is a
 typed LIFO container, `push`, `pop`, `peek`, `size`.
+
+<Figure
+  slug="jcol-generic-classes-and-methods-first-generic-class-inline-cutout"
+  alt="One crate design shown holding three different kinds of block, the crate itself unchanged"
+/>
 
 <CodeBlock
   adapter="java"

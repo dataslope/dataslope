@@ -18,6 +18,11 @@ accessor.
 Any text column has a `.str` namespace. Methods you call on it
 behave element-wise.
 
+<Figure
+  slug="pandas-string-operations-basic-shape-inline-cutout"
+  alt="A column of ribbons passing under one wide blade that trims every ribbon in the same stroke"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -276,6 +281,11 @@ print(clean)
 By default, string methods *propagate* NaN, a NaN input yields
 a NaN output. Boolean methods (`contains`, `startswith`) can
 optionally fill NaN with True/False using `na=`.
+
+<Figure
+  slug="pandas-string-operations-inline-cutout"
+  alt="A strip of letter tiles passing through three small hand tools in turn, one trimming its ends, one splitting it in two, one swapping a tile in the middle"
+/>
 
 <CodeBlock
   adapter="python"

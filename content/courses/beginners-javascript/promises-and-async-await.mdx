@@ -45,6 +45,11 @@ stateDiagram-v2
 You usually *consume* promises returned by other functions, but
 occasionally you create one yourself.
 
+<Figure
+  slug="js-promises-and-async-await-promise-placeholder-inline-cutout"
+  alt="An empty tray set on a bench with a plain blank ticket clipped to it, the tray filled later by a chute above"
+/>
+
 <CodeBlock
   adapter="javascript"
   files={[
@@ -134,6 +139,11 @@ you don't, the chain has no idea to wait for it.
 
 `async`/`await` is just syntactic sugar over Promises, but it's
 the syntax most modern code uses.
+
+<Figure
+  slug="js-promises-and-async-await-inline-cutout"
+  alt="A ticket counter on the left handing over one plain blank stub, a figure walking away to do other work in the middle, and the finished parcel waiting in a pickup hatch on the right"
+/>
 
 - A function marked `async` *always* returns a Promise.
 - Inside an `async` function, `await somePromise` pauses the

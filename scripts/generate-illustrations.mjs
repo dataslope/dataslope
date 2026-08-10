@@ -86,7 +86,14 @@ import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DATA_FILE = join(ROOT, "data", "illustration-prompts.json");
 const API_BASE = "https://api.openai.com/v1";
-const IMAGES_ENDPOINT = "/v1/images/generations";
+// Two spellings of one endpoint, and they are not interchangeable. `api()`
+// joins IMAGES_PATH onto API_BASE, which already carries the version; a Batch
+// JSONL line names the endpoint from the API root instead, version and all.
+// Passing the batch spelling to `api()` builds `/v1/v1/images/generations` and
+// gets a 404 that reads like a missing model — which is what `sync` did until
+// the first person tried it.
+const IMAGES_PATH = "/images/generations";
+const IMAGES_ENDPOINT = `/v1${IMAGES_PATH}`;
 
 // ── CLI parsing ────────────────────────────────────────────────────────────
 const COMMANDS = new Set([
@@ -172,10 +179,13 @@ export function buildPrompt(spec, colors) {
   // Mirror of DEFAULT_STYLE in lib/illustrationPrompt.ts (pinned by a parity test).
   const style = (spec.style && spec.style.trim()) || "isometric illustration";
   const article = /^[aeiou]/i.test(style) ? "An" : "A";
-  // Mirror of GLOBAL_CONSTRAINTS in lib/illustrationPrompt.ts (same parity test).
-  const constraints =
+  // Mirror of SHARED_CONSTRAINTS in lib/illustrationPrompt.ts (same parity test).
+  const shared =
     "No text. Draw only the objects described — nothing scattered over, around, " +
-    "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
+    "or behind them: no speckled dots, no confetti, no stray connecting lines.";
+  // Mirror of ISOMETRIC_CONSTRAINTS. Also the fallback for a style with no
+  // block of its own, exactly as in the library.
+  const isometric =
     "Render each object as a solid three-dimensional form with real thickness, " +
     "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
     "a thin round counter. " +
@@ -189,6 +199,23 @@ export function buildPrompt(spec, colors) {
     "coloring and markings, never a flat brand color and never a flat " +
     "silhouette. A bird has wings, a beak and feet and never hands or arms: it " +
     "perches, stands, or nudges things with its beak rather than holding them.";
+  // Mirror of RISOGRAPH_CONSTRAINTS: the inline historical figures. Flat inks
+  // instead of volume, brand colors so the cut-out survives both page
+  // backgrounds, blank paper so there is a subject to cut out at all.
+  const risograph =
+    "Print it as a risograph: a few flat spot-color inks, coarse halftone grain " +
+    "inside every inked shape, and slight misregistration where two inks " +
+    "overlap. No gradients, no photographic shading, no glossy highlights. " +
+    "Ink every shape in one of the brand colors below and let two inks overprint " +
+    "into a third; never key the scene off black, grey, or a single hue, and " +
+    "never outline in black. Leave the paper blank white behind and between the " +
+    "shapes: no printed panel, no frame, no border, no ground shadow, so the " +
+    "whole subject lifts off the page in one piece. Compose it as a wide band " +
+    "twice as long as it is tall, reading left to right across the full width " +
+    "rather than centered in the middle. Draw any person as a small stylized " +
+    "figure with minimal facial detail and no resemblance to a real individual.";
+  const byStyle = { "isometric illustration": isometric, risograph };
+  const constraints = `${shared} ${byStyle[style] ?? isometric}`;
   return (
     `${article} ${style} of ${spec.subject}. ${constraints}\n\n` +
     `Blue: ${colors.blue}\n` +
@@ -209,6 +236,11 @@ const COST_TOKENS = {
   "1536x1024/low": 158,
   "1536x1024/medium": 1372,
   "1536x1024/high": 5488,
+  // The 2:1 band the inline risograph figures use (`course-inline`). Measured
+  // 2026-08-09, and the cheapest frame the API will take: 1024x512 is refused
+  // ("below the current minimum pixel budget"), so this is the floor for a
+  // wide figure. Only `low` is measured, the tier everything ships at.
+  "1536x768/low": 102,
 };
 // USD per 1M image output tokens (https://developers.openai.com/api/docs/pricing).
 const USD_PER_MTOK = { batch: 15, sync: 30 };
@@ -688,7 +720,7 @@ async function cmdSync(entries, opts, model, key) {
     while (i < todo.length) {
       const e = todo[i++];
       try {
-        const res = await api(IMAGES_ENDPOINT, {
+        const res = await api(IMAGES_PATH, {
           method: "POST",
           key,
           json: requestBody(e, opts, model),

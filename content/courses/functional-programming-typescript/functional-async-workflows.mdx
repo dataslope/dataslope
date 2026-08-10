@@ -83,6 +83,11 @@ same patterns you used for `Option` and `Result` apply to `Task`.
 For independent tasks, you want **applicative** behavior: run them
 in parallel, combine their results.
 
+<Figure
+  slug="fp-functional-async-workflows-tasks-their-three-inline-cutout"
+  alt="Three kettles started together with three small tools hanging above them, one to start, one to chain, one to gather"
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -227,6 +232,11 @@ const loadDashboard = (uid: string) =>
 The functional version reads as one long sequence of "and then",
 the error handling has been *moved out of the code's body* into
 the structure of the type itself.
+
+<Figure
+  slug="fp-functional-async-workflows-inline-cutout"
+  alt="Several slow kettles started at once along a bench, their results collected into one tray as each finishes"
+/>
 
 ## A small multi-file challenge
 

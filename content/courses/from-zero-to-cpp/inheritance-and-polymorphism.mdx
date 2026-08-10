@@ -19,6 +19,11 @@ features for these situations:
 - **Polymorphism** lets a single call site invoke different code
   depending on the actual type of the object at runtime.
 
+<Figure
+  slug="cpp-inheritance-and-polymorphism-first-hierarchy-inline-cutout"
+  alt="One base cabinet with two cabinets standing behind it, each keeping the base frame and adding one part"
+/>
+
 Used carefully, this combination is powerful. Used carelessly, it
 produces tangled hierarchies that are hard to change. We'll lean
 toward small examples and clear rules.
@@ -172,6 +177,11 @@ fields `private` and let derived classes call public methods.
 It's tempting to use inheritance whenever two classes share fields
 or behaviour. Often the better tool is **composition**, one class
 *has* the other as a member.
+
+<Figure
+  slug="cpp-inheritance-and-polymorphism-inline-cutout"
+  alt="One plain base cabinet at the left, and to its right three cabinets built on the same frame with a different top fitted to each"
+/>
 
 ```cpp
 // Inheritance: Car is-a Vehicle

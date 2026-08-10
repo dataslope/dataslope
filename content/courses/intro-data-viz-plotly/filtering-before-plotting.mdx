@@ -16,6 +16,11 @@ the highest-leverage habits in visualization work.
 
 This page is about the *pre-chart* step: choosing what to show.
 
+<Figure
+  slug="viz-filtering-before-plotting-inline-cutout"
+  alt="A crowded board of marks passing through a grate, the thinned result laid out clearly on a second board"
+/>
+
 ## Why filter at all?
 
 Most analytic questions are about a **subset** of the data:
@@ -135,6 +140,11 @@ the normal ratio.
 - **Filtering with `==` vs `.isin()`.** For multiple values, use
   `df[df["continent"].isin(["Europe", "Asia"])]`, not chained
   ORs.
+
+<Figure
+  slug="viz-filtering-before-plotting-filter-at-all-inline-cutout"
+  alt="A board so crowded its marks merge into a single mass, beside the same board thinned to a readable few"
+/>
 
 ## The `.query()` style
 

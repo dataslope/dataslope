@@ -38,6 +38,11 @@ thing you are asking for rather than the thing you are turning off.
 
 Pass several names, and a list of booleans if the directions differ.
 
+<Figure
+  slug="pl-sorting-and-top-k-sort-inline-cutout"
+  alt="A jumbled row of blocks combed into a rising staircase in one pass"
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -158,6 +163,11 @@ which is precisely why it can be faster.
 
 Inside `agg`, `sort_by` orders a group's values before you take from
 them.
+
+<Figure
+  slug="pl-sorting-and-top-k-inline-cutout"
+  alt="A rising staircase of blocks with a clamp taking the top three off the end, the rest left where they stand"
+/>
 
 <CodeBlock
   adapter="python"

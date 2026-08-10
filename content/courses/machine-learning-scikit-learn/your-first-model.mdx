@@ -54,6 +54,11 @@ Here is the entire workflow as a picture. Read it top to bottom: data comes
 in, gets split, one half teaches the model, the other half grades it, and
 finally the finished model labels brand-new penguins.
 
+<Figure
+  slug="ml-your-first-model-inline-cutout"
+  alt="A tray of examples going into a boxed machine and the machine then answering correctly for one new block"
+/>
+
 ```mermaid
 flowchart TD
     A["Raw labeled data<br/>X (features), y (labels)"] --> B{"<code>train_test_split</code>"}
@@ -85,6 +90,11 @@ penguins. The features are `X` (342 rows, 4 columns) and the species labels
 are `y`. (This dataset has become the community's preferred first example
 over the classic iris flowers, in part because the iris data was published
 by Ronald Fisher, a prominent eugenicist.)
+
+<Figure
+  slug="ml-your-first-model-move-1-load-inline-cutout"
+  alt="A sealed carton opened on a bench with its first rows fanned out"
+/>
 
 <CodeBlock
   adapter="python"
@@ -465,6 +475,11 @@ its accuracy first.
 Everything above, assembled into the canonical shape you will repeat for
 the rest of the course. This is the template; future pages mostly change
 which estimator sits on the highlighted line.
+
+<Figure
+  slug="ml-your-first-model-problem-this-workflow-inline-cutout"
+  alt="A bench with five stations, examples entering at one end and a correct answer for a new block leaving at the other"
+/>
 
 <CodeBlock
   adapter="python"

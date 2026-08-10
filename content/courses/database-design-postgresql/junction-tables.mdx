@@ -17,6 +17,11 @@ You will also hear it called a **bridge table**, **join table**, or
 **associative table**. The names differ, but the design job is the
 same.
 
+<Figure
+  slug="db-junction-tables-turning-many-many-inline-cutout"
+  alt="A tangle of cords between two rows of crates replaced by cords running into a pegboard in the middle"
+/>
+
 ## Turning many-to-many into two one-to-many links
 
 A many-to-many relationship is hard to store directly because the
@@ -175,6 +180,11 @@ enrollment."
 Sometimes you will see a junction table with a surrogate `id` as its
 primary key. That can be reasonable if other tables need to point at a
 specific enrollment row.
+
+<Figure
+  slug="db-junction-tables-inline-cutout"
+  alt="Two rows of crates facing each other across a low bench, every cord between them passing through a peg on that bench rather than crossing directly"
+/>
 
 Even then, you usually still add `UNIQUE (student_id, course_id)` so
 the same pairing cannot be duplicated.

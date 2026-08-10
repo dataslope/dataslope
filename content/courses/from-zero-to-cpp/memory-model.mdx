@@ -184,6 +184,11 @@ Garbage collection takes care of it. That convenience has a price:
 unpredictable pauses, larger memory footprint, less predictable
 performance.
 
+<Figure
+  slug="cpp-memory-model-four-regions-one-inline-cutout"
+  alt="One long horizontal bar divided end to end into four bands of different colours"
+/>
+
 C++ takes the opposite trade-off. The language gives you tools
 (stack, heap, statics, smart pointers, RAII) and trusts you to
 choose the right one. Once you understand the model, the choices
@@ -295,6 +300,11 @@ int main() {
 The right column is what really matters. Stack things get freed for
 free. Heap things need either *you* (raw `new`/`delete`) or a smart
 container/pointer to do it for you.
+
+<Figure
+  slug="cpp-memory-model-inline-cutout"
+  alt="One long strip running the width of the frame divided into three zones of different sizes, each zone a different flat color with its own kind of block resting in it"
+/>
 
 ## Test your understanding
 

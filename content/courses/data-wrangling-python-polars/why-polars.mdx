@@ -19,6 +19,12 @@ one from scratch on top of Apache Arrow, in Rust, with modern
 hardware assumed. The answer was: much faster, and, more
 surprisingly, much more consistent to use.
 
+<Figure
+  slug="pl-why-polars-one-core-cutout"
+  alt="One figure working alone at a bench beside a tall pile of crates, and four identical benches each taking a quarter of it"
+  caption="pandas, 2008: built when a big dataset was a few hundred thousand rows and a laptop had one useful core."
+/>
+
 ## The three things that changed
 
 ### Your laptop has cores now
@@ -153,6 +159,11 @@ Being fair about this saves you time later:
 - **Notebook muscle memory.** If you have typed `df.loc[...]` ten
   thousand times, the first week of Polars is slower for you. That is
   a real cost and it is temporary.
+
+<Figure
+  slug="pl-why-polars-three-things-changed-inline-cutout"
+  alt="Three parts fitted to one machine in turn, each making the belt beside it run visibly faster"
+/>
 
 ## Check your understanding
 

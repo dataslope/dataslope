@@ -81,6 +81,11 @@ overlap at all**. The result is that each category's points fan out into a
 shape, and that shape's width at any height tells you the **density** of
 points there. It is a strip plot and a rough distribution in one.
 
+<Figure
+  slug="sns-strip-and-swarm-plots-strip-plot-every-inline-cutout"
+  alt="A column of chips nudged slightly sideways at random so each stays visible"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -185,6 +190,11 @@ colors. Try setting `dodge=False` to see why the separation helps.
   the dots overplot into a smear (strip) or refuse to stay separated (swarm,
   which warns and overlaps). At that scale, switch to a low-`alpha` strip, or
   to a box/violin summary.
+
+<Figure
+  slug="sns-strip-and-swarm-plots-inline-cutout"
+  alt="One column of chips overlapping in a line, and beside it the same chips nudged sideways so none overlap"
+/>
 
 <MultipleChoice
   markdown={`What is the purpose of **jitter** in a strip plot?

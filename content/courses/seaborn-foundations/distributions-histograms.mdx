@@ -62,6 +62,11 @@ tidy hump. There is a tall group on the left and a second rise on the right,
 a hint that *more than one kind of penguin* is hiding in this column. Hold
 onto that observation; it is about to be the whole lesson.
 
+<Figure
+  slug="sns-distributions-histograms-minimum-inline-cutout"
+  alt="One column of chips and one row of bins, nothing else on the bench"
+/>
+
 <Callout type="info" title="Figure-level and axes-level, same chart">
 `sns.displot(..., kind="hist")` is the **figure-level** door: it makes its
 own figure and can split into panels with `col`/`row`. Its **axes-level**
@@ -77,6 +82,11 @@ Here is the single most important thing to understand about histograms: the
 **number of bins** (or equivalently their **width**) is a decision *you*
 make, and it changes the story the chart tells. Same data, same column,
 different number of bars, different conclusion.
+
+<Figure
+  slug="sns-distributions-histograms-inline-cutout"
+  alt="A tray of chips falling into bins, shown twice with wide bins and with narrow bins, the same chips reading very differently"
+/>
 
 One sample, three bin widths, three different answers to "how many peaks
 does this have?":
@@ -275,6 +285,11 @@ The mystery is solved in color: the left peak is mostly **Adelie** and
 **Chinstrap**, the right peak is **Gentoo**. The bimodality was a mix of
 species all along, the same reveal a `hue` gave us on the scatter page,
 now for a single variable.
+
+<Figure
+  slug="sns-distributions-histograms-histogram-needs-shows-inline-cutout"
+  alt="One column of chips going in and a row of filled bins coming out"
+/>
 
 ### Choosing how the groups stack: `multiple=`
 

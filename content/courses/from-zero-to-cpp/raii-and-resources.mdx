@@ -167,6 +167,11 @@ flowchart TB
 
 You've been using RAII the whole course without naming it.
 
+<Figure
+  slug="cpp-raii-and-resources-inline-cutout"
+  alt="A door that opens as a figure steps through and swings shut behind them on its own spring, a lamp inside switching off with it"
+/>
+
 - `std::vector` owns its heap buffer. When the vector dies, the
   buffer is freed.
 - `std::string` owns its character storage.
@@ -188,6 +193,11 @@ RAII wrappers, where the language can enforce correctness.
 5. **Avoid copying owners** unless you have a clear, well-defined
    copy operation. Otherwise prefer moves (next chapter) or delete
    the copy operations entirely.
+
+<Figure
+  slug="cpp-raii-and-resources-resource-inline-cutout"
+  alt="A tap, a drawer and a cord end laid together on a bench, each with a small clasp that must be closed again"
+/>
 
 ## Challenge: see RAII run
 

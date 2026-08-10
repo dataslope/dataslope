@@ -104,6 +104,11 @@ A foreign key is not just documentation. It is a rule the database
 defends. If an order points to customer `999` and no such customer row
 exists, PostgreSQL rejects the order.
 
+<Figure
+  slug="db-foreign-keys-relationship-needs-reference-inline-cutout"
+  alt="A row in one board carrying a notch that matches a row in another, a cord running between the two"
+/>
+
 <SqlCodeBlock
   expectError
   dialect="postgres"
@@ -193,6 +198,11 @@ A foreign key makes the relationship checkable by the database.`}
 Foreign keys often encode **cardinality**, the shape of a relationship.
 In the common one-to-many case, many child rows can reference one parent
 row.
+
+<Figure
+  slug="db-foreign-keys-inline-cutout"
+  alt="Two filing drawers side by side, a cord running from a tab in the first into a matching slot in the second, and a small lock where the cord enters"
+/>
 
 ```mermaid
 erDiagram

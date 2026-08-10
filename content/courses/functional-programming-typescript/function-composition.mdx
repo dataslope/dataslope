@@ -68,6 +68,11 @@ Two things to notice:
 2. Composition is *not* commutative: `compose2(g, f)` is different
    from `compose2(f, g)`. Order matters.
 
+<Figure
+  slug="fp-function-composition-inline-cutout"
+  alt="Three small machines bolted end to end into one longer machine, a single shape entering the left and leaving transformed at the right"
+/>
+
 ## `pipe`: the left-to-right cousin
 
 In practice, most TypeScript code reads better when the data *flows
@@ -461,6 +466,11 @@ export const slug = (s: string): string =>
 />
 
 ---
+
+<Figure
+  slug="fp-function-composition-composition-means-mathematically-inline-cutout"
+  alt="Two machines bolted mouth to chute so the pair has one inlet and one outlet, a single block passing through both"
+/>
 
 <MultipleChoice
   markdown={`What is the difference between \`compose(f, g)\` and \`pipe(x, g, f)\`?

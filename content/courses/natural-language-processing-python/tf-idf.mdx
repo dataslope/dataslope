@@ -92,6 +92,11 @@ documents contain the word (its **document frequency**), and take the log of the
 total number of documents divided by that. The logarithm keeps the numbers from
 exploding and is part of the standard definition.
 
+<Figure
+  slug="nlp-tf-idf-intuition-before-formula-inline-cutout"
+  alt="A balance with a very common tile on one pan barely moving it and a rare tile on the other tipping it"
+/>
+
 $$\text{idf}(w) = \log\left(\frac{N}{\text{df}(w)}\right)$$
 
 where `N` is the number of documents and `df(w)` is how many of them contain `w`.
@@ -152,6 +157,11 @@ TF-IDF for a word in a document is simply $\text{TF} \times \text{IDF}$. A high 
 is frequent *here* and rare *elsewhere*, the definition of a distinctive,
 topic-revealing word. Let us compute the full table for our tiny corpus and watch
 "the" vanish while the content words light up.
+
+<Figure
+  slug="nlp-tf-idf-inline-cutout"
+  alt="A balance with a common word tile on one pan barely moving it, and a rare word tile on the other pan tipping the balance hard"
+/>
 
 <CodeBlock
   adapter="python"

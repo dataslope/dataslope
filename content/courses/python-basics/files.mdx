@@ -12,6 +12,11 @@ Every real program touches files, reading config, writing logs, parsing CSV data
 
 The two core ideas: **`open()` returns a file object**, and **the `with` statement closes it for you**.
 
+<Figure
+  slug="python-files-inline-cutout"
+  alt="A drawer opened, a strip of tape drawn out and read, then wound back and the drawer closed"
+/>
+
 ## Why file I/O matters: the real world
 
 File operations are everywhere in production code:
@@ -44,6 +49,11 @@ The `with` statement is Python's **context manager** protocol. For files, it gua
 ## Opening a file
 
 Every snippet on this page runs in your browser, no setup required.
+
+<Figure
+  slug="python-files-opening-file-inline-cutout"
+  alt="A drawer being pulled open with a small clasp that must be closed again after"
+/>
 
 <CodeBlock
   adapter="python"
@@ -170,6 +180,11 @@ with open("output.txt") as f:
 />
 
 `f.write(s)` writes the string `s` and returns the number of characters written. It does **not** add a newline automatically, you must include `\n` yourself.
+
+<Figure
+  slug="python-files-file-i-o-inline-cutout"
+  alt="A drawer opened, a strip of tape drawn out, and the drawer closed again"
+/>
 
 <CodeBlock
   adapter="python"

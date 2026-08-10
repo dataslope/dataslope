@@ -161,6 +161,11 @@ One line of intent, a complete profile of ten columns. Scan the `min` and
 file than scrolling it for an hour would tell you. `SUMMARIZE` is the
 first thing many DuckDB analysts type when they meet a new dataset.
 
+<Figure
+  slug="duck-profiling-a-dataset-profile-first-inline-cutout"
+  alt="A crate with a gauge clipped to each of its sides before its lid is opened"
+/>
+
 ```mermaid
 flowchart TD
     S["SUMMARIZE table"] --> R["Per-column report:<br/>count, distinct,<br/>null %, min, max,<br/>avg, quantiles"]
@@ -177,6 +182,11 @@ Before analyzing any new dataset, answer:
 5. **What is missing?** (`COUNT(*) - COUNT(column)`)
 
 Or just run `SUMMARIZE` and read the lot at a glance.
+
+<Figure
+  slug="duck-profiling-a-dataset-inline-cutout"
+  alt="A board of columns with a small gauge clipped to the head of each, every gauge reading a different property of its column"
+/>
 
 ## Check your understanding
 

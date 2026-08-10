@@ -37,6 +37,11 @@ flowchart TD
 
 The customer table has a primary key: `customers.id`. The orders table stores a matching value: `orders.customer_id`.
 
+<Figure
+  slug="lite-relationships-intro-inline-cutout"
+  alt="Two small boards joined by one cord running between a tagged row in each"
+/>
+
 ```mermaid
 flowchart TD
     C["<code>customers.id</code><br/>primary key"]:::pk --> O["orders.<code>customer_id</code><br/>points to customer"]:::fk
@@ -66,6 +71,11 @@ Read it as: one customer can place many orders, and each order belongs to one cu
 ## Relationship shape 1: one-to-many
 
 **One-to-many** is the most common relationship shape.
+
+<Figure
+  slug="lite-relationships-intro-not-one-giant-inline-cutout"
+  alt="One crowded crate spilling mixed items beside three tidy crates joined by cords"
+/>
 
 Examples:
 

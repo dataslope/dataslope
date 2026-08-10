@@ -75,6 +75,11 @@ axis and not in a hue:
 The clearest place to *feel* this is the `hue` parameter, which behaves in
 two completely different ways depending on the column you give it.
 
+<Figure
+  slug="sns-continuous-vs-categorical-inline-cutout"
+  alt="A smooth rule with a slider beside a set of separate labelled trays, a chip belonging to one or the other"
+/>
+
 ### `hue` on a categorical column → distinct colors
 
 <CodeBlock
@@ -156,6 +161,11 @@ A colorbar means "continuous gradient"; a set of discrete swatches means
 Seaborn infers a column's type from its **pandas dtype**, not from what it
 *means*. So a column stored as numbers gets treated as continuous, even
 when it's really a category in disguise.
+
+<Figure
+  slug="sns-continuous-vs-categorical-gotcha-numbers-are-inline-cutout"
+  alt="Blocks of rising height standing on labelled trays, a hand lifting them off the rising order into separate bins"
+/>
 
 A classic example is party `size` in the `tips` dataset: it's stored as an
 integer (1–6), but it behaves like an ordered category. Watch what happens
@@ -362,3 +372,8 @@ With the continuous/categorical lens in hand, you're ready to actually load
 data and start drawing. Next we'll meet Seaborn's built-in datasets and set
 a theme, then learn the one structural idea behind its whole API: the split
 between figure-level and axes-level functions.
+
+<Figure
+  slug="sns-continuous-vs-categorical-two-kinds-variables-inline-cutout"
+  alt="A smooth rule with a slider beside a set of separate labelled trays"
+/>

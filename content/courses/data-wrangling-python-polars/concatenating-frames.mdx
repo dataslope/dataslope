@@ -34,6 +34,11 @@ Plain `vertical` demands identical schemas: the same column names, in
 the same order, with the same dtypes. That strictness is the point.
 It catches the case where last month's export gained a column.
 
+<Figure
+  slug="pl-concatenating-frames-vertical-more-rows-inline-cutout"
+  alt="Two boards of equal width stacked one onto the other, the join line barely visible"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -107,6 +112,11 @@ print(pl.concat([jan, feb], how="diagonal"))
 If `region` arrives as `Region` next month, you get two columns, each
 half null, and no error. Reach for it when schemas genuinely differ,
 not as a way to avoid thinking about them.
+
+<Figure
+  slug="pl-concatenating-frames-relaxed-strategies-inline-cutout"
+  alt="Two boards of slightly different column widths brought together, a small collar fitted where they do not match"
+/>
 
 ## Horizontal: more columns
 
@@ -186,6 +196,11 @@ print("rows:", year.height, "chunks:", year.n_chunks())
 For files specifically, Polars will do this for you: `scan_csv` and
 `scan_parquet` accept a glob and read every match as one lazy frame,
 which is both shorter and faster than concatenating by hand.
+
+<Figure
+  slug="pl-concatenating-frames-inline-cutout"
+  alt="Two boards of the same width stacked one directly onto the other so their columns line up into one taller board"
+/>
 
 ```python
 lf = pl.scan_parquet("data/2026-*.parquet")

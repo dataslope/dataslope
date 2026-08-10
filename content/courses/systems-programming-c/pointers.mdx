@@ -28,6 +28,16 @@ When you write `int x = 42;`, the compiler picks a memory address for
 `x`, makes sure that address holds the four bytes of `42`, and from
 then on the *name* `x` refers to that address.
 
+<Figure
+  slug="sysc-pointers-declaring-dereferencing-pointers-inline-cutout"
+  alt="A card with an arrow to a locker, and a hand following that arrow to lift out what the locker holds"
+/>
+
+<Figure
+  slug="sysc-pointers-variables-live-at-inline-cutout"
+  alt="A row of lockers each with its own small plate, one block resting inside one of them"
+/>
+
 The `&` operator gives you the address itself. The `%p` format
 specifier prints it in hex (after a cast to `void *`).
 
@@ -256,6 +266,11 @@ Two `const` positions, two meanings:
 | `const int *const p` | no | no |
 
 Read right-to-left: "p is a const pointer to a const int."
+
+<Figure
+  slug="sysc-pointers-inline-cutout"
+  alt="A strip of lockers with a card in one locker whose arrow reaches across to another, and a cord following that arrow"
+/>
 
 <Callout type="info" title="Library convention: const pointers for read-only inputs">
 When a function only reads through a pointer, declare it

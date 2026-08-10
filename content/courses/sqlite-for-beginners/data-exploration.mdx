@@ -80,6 +80,11 @@ In SQLite, the database keeps a built-in catalog of itself in a
 special table called `sqlite_master` (also available as
 `sqlite_schema`). Querying it lists every table you can work with.
 
+<Figure
+  slug="lite-data-exploration-step-1-tables-inline-cutout"
+  alt="A cabinet opened to show which drawers exist before any drawer is pulled"
+/>
+
 <SqlCodeBlock
   dialect="sqlite"
   title="List the tables in the database"
@@ -156,6 +161,11 @@ Now ask quantitative questions. Three are almost always useful:
 - **What distinct values does a column take?** `DISTINCT` or
   `GROUP BY`
 - **What is the range of a number or date?** `MIN` and `MAX`
+
+<Figure
+  slug="lite-data-exploration-inline-cutout"
+  alt="A crate opened and its first rows fanned across a bench for a first look"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -234,6 +244,11 @@ database modeling a food-trading company, with customers, orders,
 products, suppliers, and more. Nobody is going to tell you what is
 inside. Run the starter query to list its tables, then work the
 loop yourself.
+
+<Figure
+  slug="lite-data-exploration-exploration-loop-inline-cutout"
+  alt="A ring of benches with a tray travelling round, each pass revealing one more card"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"

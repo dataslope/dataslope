@@ -15,6 +15,11 @@ facts do we need to remember about each customer?* Those facts are
 Attributes become columns. But good columns are not just names, they
 also have **domains**, the set of values that are allowed to appear.
 
+<Figure
+  slug="db-attributes-and-domains-attributes-describe-entity-inline-cutout"
+  alt="One crate with four blank tags clipped along its side, each tag naming a different face of the same crate"
+/>
+
 ## Attributes describe an entity
 
 An **attribute** is a property of an entity. A customer might have a
@@ -38,6 +43,11 @@ the columns `id`, `name`, `email`, `joined_on`, and `status`.
 A **domain** is the set of valid values for an attribute. In SQL, the
 domain is partly expressed by the column's data type and partly by
 rules such as `NOT NULL`, `CHECK`, and `UNIQUE`.
+
+<Figure
+  slug="db-attributes-and-domains-domains-say-values-inline-cutout"
+  alt="A tag slot cut to accept only a narrow range of tag widths, wider and narrower tags refused beside it"
+/>
 
 ```mermaid
 flowchart TB
@@ -89,6 +99,11 @@ everyday life: a person has a first name and a last name, an address
 has a house number and a street, a phone number has ten digits. The
 trouble is that almost every one of those "obvious" facts is false
 for someone, somewhere.
+
+<Figure
+  slug="db-attributes-and-domains-inline-cutout"
+  alt="One crate with four labelled compartments, each compartment cut to accept only one shape of block"
+/>
 
 There is a whole genre of programming essays about this, started by
 Patrick McKenzie's widely shared 2010 post "Falsehoods Programmers

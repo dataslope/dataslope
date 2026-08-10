@@ -18,6 +18,11 @@ time. The type controls three things:
 - **What operations are legal** (you can add two `int`s; you can't
   add a function to a string).
 
+<Figure
+  slug="c-data-types-fundamental-types-inline-cutout"
+  alt="Four blocks of clearly different widths, each sitting in a recess cut exactly to its size"
+/>
+
 ## The fundamental types
 
 | Type      | Typical size | What it stores                                                    |
@@ -66,6 +71,11 @@ Every integer type comes in two flavors:
   The most significant bit acts as a sign.
 - **Unsigned**: only non-negative values, but the range goes twice as
   high.
+
+<Figure
+  slug="c-data-types-signed-unsigned-inline-cutout"
+  alt="One rule running from a centre mark in both directions, beside another rule of the same length starting at one end"
+/>
 
 ```c
 int      a = -100;       // signed, default
@@ -280,6 +290,11 @@ Same memory, different sized chunks, different bit interpretations.
 The CPU has separate instructions for integer arithmetic and
 floating-point arithmetic, the type tells the compiler which to
 emit.
+
+<Figure
+  slug="c-data-types-inline-cutout"
+  alt="Four blocks of visibly different widths, each sitting exactly in a recess cut to its size"
+/>
 
 ## Challenge: average of three numbers
 

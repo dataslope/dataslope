@@ -20,6 +20,11 @@ named "John Smith" and both live in Springfield. Their rows could
 be byte-for-byte identical. Now an order comes in for "John Smith."
 *Which* John Smith?
 
+<Figure
+  slug="sql-primary-keys-identity-problem-inline-cutout"
+  alt="A rack of cards that look alike, one hand unable to tell which is which until one gains a punched tab"
+/>
+
 ```mermaid
 flowchart TB
     O["Order for<br/>'John Smith'"] --> J1["John Smith<br/>Springfield"]
@@ -78,6 +83,11 @@ There are two flavors of primary key:
   like a country's ISO code or a book's ISBN.
 - A **surrogate key** is an artificial value created just to be an
   identifier, most often an auto-incrementing number like `id`.
+
+<Figure
+  slug="sql-primary-keys-inline-cutout"
+  alt="A rack of identical cards each carrying one unique coloured notch, and a single card being lifted out by that notch"
+/>
 
 ```mermaid
 flowchart LR

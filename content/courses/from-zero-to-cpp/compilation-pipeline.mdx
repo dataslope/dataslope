@@ -83,6 +83,11 @@ handles every line that starts with `#`:
 - `#ifdef DEBUG ... #endif` conditionally keeps or deletes code
   blocks based on whether a name is defined.
 
+<Figure
+  slug="cpp-compilation-pipeline-step-1-preprocessor-inline-cutout"
+  alt="A card passing a first machine that pastes extra strips onto it before it continues"
+/>
+
 ```mermaid
 flowchart TD
     A["<code>your.cpp</code><br/>#include &lt;iostream&gt;"] --> P[Preprocessor]
@@ -116,6 +121,11 @@ unit, in order:
    compiler can reason about.
 5. **Optimizer**, fold constants, inline, vectorize.
 6. **Code generator**, IR to assembly.
+
+<Figure
+  slug="cpp-compilation-pipeline-four-step-pipeline-inline-cutout"
+  alt="A card passing through four machines in a row, leaving each visibly changed"
+/>
 
 The result is a `.s` assembly file.
 
@@ -416,3 +426,8 @@ void greet(const std::string &name) { std::cout << "Hello, " << name << "!\\n"; 
 
 Next: let's actually look at "Hello, World!" line by line, and see
 which parts of the language each piece is using.
+
+<Figure
+  slug="cpp-compilation-pipeline-inline-cutout"
+  alt="A card passing through four machines and leaving as a running unit, each stage's output visibly different"
+/>

@@ -88,6 +88,11 @@ Three arguments do all the work:
 - `values_to`: the name of the new column that will hold the
   *values* (here, `"value"`)
 
+<Figure
+  slug="rlang-reshaping-data-wide-vs-long-inline-cutout"
+  alt="A wide short board and a narrow tall board of the same squares, a hinge between them"
+/>
+
 You can also clean up the year strings on the fly:
 
 <CodeBlock
@@ -233,6 +238,11 @@ df |>
 
 The result has two columns where there was one. The reverse
 operation, `unite()`, glues columns back together.
+
+<Figure
+  slug="rlang-reshaping-data-inline-cutout"
+  alt="A wide short grid on the left being folded into a narrow tall one on the right, with an arrow showing the fold running both ways"
+/>
 
 ## When to reshape
 

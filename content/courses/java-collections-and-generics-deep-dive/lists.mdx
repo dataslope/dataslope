@@ -78,6 +78,11 @@ public class Main {
 `size` counter. When the array fills up, it allocates a bigger one
 (typically 1.5× the current capacity) and copies.
 
+<Figure
+  slug="jcol-lists-list-interface-inline-cutout"
+  alt="A rail of identical unmarked slots, blocks kept in the order they were set down"
+/>
+
 ```mermaid
 flowchart TD
     subgraph Heap
@@ -129,6 +134,11 @@ The honest short answer: **`ArrayList` wins almost every real
 benchmark**. The reason is hardware: arrays have **contiguous
 memory**, which the CPU's cache loves. Linked-list nodes are
 scattered all over the heap, costing a cache miss on every step.
+
+<Figure
+  slug="jcol-lists-arraylist-list-backed-inline-cutout"
+  alt="A growing rail with a fixed strip visible underneath it, the strip replaced by a longer one when full"
+/>
 
 The cases where `LinkedList` still wins:
 
@@ -250,6 +260,11 @@ surprise for people who expect a copy.
 Java 9 added factory methods `List.of(a, b, c)` that produce
 **immutable** lists. They are cheap, type-safe, and exactly what you
 want for small fixed collections (especially as constants).
+
+<Figure
+  slug="jcol-lists-inline-cutout"
+  alt="A rail of slots holding blocks with one being inserted in the middle and the blocks to its right sliding along to make room"
+/>
 
 ```java
 import java.util.List;

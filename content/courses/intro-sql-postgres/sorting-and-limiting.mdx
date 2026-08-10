@@ -70,6 +70,11 @@ The rows are grouped by department alphabetically, and *within* each
 department, sorted by salary high to low. The order of the columns
 in `ORDER BY` is the order of priority.
 
+<Figure
+  slug="sql-sorting-and-limiting-inline-cutout"
+  alt="A rising staircase of blocks with a bracket clamped over the top three, the rest of the staircase left outside the bracket"
+/>
+
 ```mermaid
 flowchart TD
     A["Sort by<br/>dept (A→Z)"] --> B["Ties broken by<br/>salary (high→low)"]
@@ -156,6 +161,11 @@ flowchart TD
 You can leave out the middle ones, but whichever you include must
 follow this sequence. *Select* from a table, *filter*, *sort*, then
 *trim*, a pipeline that reads almost like a sentence.
+
+<Figure
+  slug="sql-sorting-and-limiting-order-by-deliberate-inline-cutout"
+  alt="A jumbled row of blocks combed into a rising staircase by one deliberate stroke"
+/>
 
 ## Check your understanding
 

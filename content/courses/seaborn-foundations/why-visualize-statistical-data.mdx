@@ -55,6 +55,12 @@ passage. We load them from a tidy table where every row carries a `dataset`
 label (the group, `"I"` through `"IV"`) alongside its `x` and `y`, all four
 groups stacked into one long DataFrame.
 
+<Figure
+  slug="sns-why-visualize-anscombe-cutout"
+  alt="Four framed plots in a row with the points arranged differently in each, one identical tile standing beneath every frame"
+  caption="Francis Anscombe, 1973: four datasets, one set of summary statistics, four completely different pictures."
+/>
+
 Let's start the way many people start with a new dataset: by computing
 summary statistics per group and reading the numbers off a table.
 
@@ -221,6 +227,11 @@ places, and one of them is shaped, unmistakably, like a **dinosaur**. (The
 dino itself was drawn by Alberto Cairo; Matejka and Fitzmaurice built the
 twelve siblings around it with an optimization that nudges points into a new
 shape while pinning the summary statistics in place.)
+
+<Figure
+  slug="sns-why-visualize-statistical-data-eye-pattern-detector-inline-cutout"
+  alt="A dense board of filled cells beside a chart of the same figures, a shape leaping out of the chart"
+/>
 
 Let's confirm the "identical statistics" half first, the way we did with
 Anscombe. Group the thirteen shapes and read off their summaries.

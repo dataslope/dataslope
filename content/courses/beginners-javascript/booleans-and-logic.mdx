@@ -92,6 +92,11 @@ The classic way to learn the operators is a tiny table:
 
 `a && b`
 
+<Figure
+  slug="js-booleans-and-logic-inline-cutout"
+  alt="Two levers feeding one gate, the gate opening only in the combination the panel below it shows"
+/>
+
 | `a` | `b` | `a && b` |
 | :---: | :---: | :---: |
 | `false` | `false` | `false` |
@@ -123,6 +128,11 @@ This is one of the most useful properties of `&&` and `||`:
   the result is `a` and `b` is never touched.
 - `a || b` only evaluates `b` if `a` is falsy. If `a` is truthy,
   the result is `a` and `b` is never touched.
+
+<Figure
+  slug="js-booleans-and-logic-short-circuit-evaluation-inline-cutout"
+  alt="A chute with two levers in a row, the first lever already thrown to shut its flap so the block stops there, and the second lever further along still standing untouched"
+/>
 
 This is called **short-circuit evaluation**. The right-hand side
 might never run.
@@ -240,6 +250,11 @@ Two algebraic identities that come up constantly in real code:
 
 In plain English: *"not both"* is *"not one, or not the other"*,
 and *"neither"* is *"not one, and not the other"*.
+
+<Figure
+  slug="js-booleans-and-logic-where-booleans-come-inline-cutout"
+  alt="A comparison balance with two blocks on it, its needle resting hard against one of only two stops"
+/>
 
 These are not just pedantic. They let you simplify confusing
 negations into cleaner conditions.

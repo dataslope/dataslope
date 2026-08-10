@@ -96,6 +96,11 @@ console.log("any bypasses all type checking");
   you don't control, where the shape is unknown).
 - When calling legacy JavaScript libraries without type definitions.
 
+<Figure
+  slug="tsx-any-unknown-never-any-escape-hatch-inline-cutout"
+  alt="A socket with no shape at all, accepting every block that is offered to it"
+/>
+
 **When is `any` dangerous?**
 - Everywhere else. It's a trapdoor: once a value becomes `any`, the
   compiler loses all knowledge of its type. Bugs slip through.
@@ -176,6 +181,11 @@ process(true);
 **What bugs does this prevent?** It forces you to handle the "I don't
 know what this is" case explicitly. You can't accidentally call a method
 that doesn't exist. This is far safer than `any`.
+
+<Figure
+  slug="tsx-any-unknown-never-inline-cutout"
+  alt="Three sockets in a row, one open to everything, one covered by a lid that must be lifted first, and one welded shut"
+/>
 
 **When to use `unknown`:**
 - When you truly don't know the type of a value (e.g., parsing JSON,
@@ -377,6 +387,11 @@ Here's how the four types relate in terms of assignability:
   exhaustiveness checking).
 - **`void`** is a return-type-only marker: you can assign `undefined` to
   `void`, but not vice versa.
+
+<Figure
+  slug="tsx-any-unknown-never-type-hierarchy-top-inline-cutout"
+  alt="A broad open funnel at the top of a bench narrowing to a sealed point at the bottom"
+/>
 
 <CodeBlock
   adapter="typescript"

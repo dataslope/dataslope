@@ -18,6 +18,11 @@ A `WHERE` clause is a **condition**, a true/false test. The
 database checks it against every row and keeps only the rows where
 the test comes out **true**.
 
+<Figure
+  slug="sql-filtering-rows-idea-test-applied-inline-cutout"
+  alt="Every row of a board passing under one identical gauge in turn"
+/>
+
 ```mermaid
 flowchart TD
     A["All rows"] --> T{"<code>WHERE</code><br/>condition true?"}
@@ -156,6 +161,11 @@ surprising results.
 A useful way to picture a query: the database first figures out
 which rows pass `WHERE`, *then* picks the `SELECT` columns from those
 surviving rows.
+
+<Figure
+  slug="sql-filtering-rows-inline-cutout"
+  alt="Rows passing a checkpoint with a template held up to each, the ones that do not match turned aside"
+/>
 
 ```mermaid
 flowchart TD

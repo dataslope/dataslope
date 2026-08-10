@@ -126,6 +126,11 @@ slots each time.
 - **Load factor**, the threshold ratio of `size / capacity` at
   which the table doubles and rehashes. Defaults to 0.75.
 
+<Figure
+  slug="jcol-performance-tradeoffs-big-table-inline-cutout"
+  alt="A grid of small gauges, one per container per operation, their needles at visibly different angles"
+/>
+
 Both values matter. A too-small initial capacity causes repeated
 rehashing; a too-large load factor causes more collisions and
 slower lookups.
@@ -177,6 +182,11 @@ A short, honest list:
   it for any output that must be deterministic.
 - **`TreeSet`**, sorted, supports range queries. Worth `O(log n)`
   when you need sorted iteration or "next element after `x`."
+
+<Figure
+  slug="jcol-performance-tradeoffs-inline-cutout"
+  alt="Two containers side by side, one quick to reach into and slow to insert, the other the reverse, each with its own gauge"
+/>
 
 ## The cost of generics: autoboxing
 

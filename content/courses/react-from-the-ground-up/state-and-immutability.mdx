@@ -21,6 +21,11 @@ unchanged, so React compares "same array === same array", sees no
 difference, and skips the re-render. Your data changed but the screen
 didn't. The fix is to build a **new** value and pass it to the setter.
 
+<Figure
+  slug="rx-state-and-immutability-inline-cutout"
+  alt="An old tray set aside intact while a fresh copy with one changed slot is mounted in its place"
+/>
+
 ## Arrays: add, remove, update by copying
 
 Three patterns cover almost everything, all of them produce a new array:

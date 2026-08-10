@@ -38,6 +38,11 @@ A **layered architecture** divides code into three (or more) layers:
 
 Dependencies flow in one direction: Infrastructure → Application → Domain. The domain knows nothing about infrastructure.
 
+<Figure
+  slug="tsx-scalable-architecture-problem-tangled-dependencies-inline-cutout"
+  alt="A bench where cords run between every pair of machines, crossing everywhere"
+/>
+
 ```mermaid
 graph TD
     A[Infrastructure Layer<br/>Database, HTTP, File System] --> B[Application Layer<br/>Use Cases, Orchestration]

@@ -52,6 +52,11 @@ For DSA, use `int` for ordinary counts, `long long` for large integer answers, `
 
 This is the part of C++ that has no Python or JavaScript equivalent, so let's take it slowly.
 
+<Figure
+  slug="dsa-cpp-essentials-references-vs-pointers-inline-cutout"
+  alt="A card carrying an arrow to a block beside a second tag fastened directly onto the block itself"
+/>
+
 Every object in your program lives somewhere in memory, it has an address, like a house. A **pointer** is a slip of paper with an address written on it. You can hand the slip to someone else, cross out the address and write a different one, or write "nowhere" on it (`nullptr`). To actually visit the house, you have to follow the address: that is the `*p` dereference. A **reference**, by contrast, is not a slip of paper at all, it is a second *name* for the house itself. Once `int &x = a;` is declared, `x` and `a` are the same object, full stop. You cannot re-aim a reference, and there is no such thing as a null reference.
 
 That difference drives the style rule used throughout this course: prefer references when a parameter must refer to a valid object ("this function needs *a real thing* to work on"), and use pointers when "nothing" is a meaningful answer or when you need to re-aim mid-flight, which is exactly what linked lists and trees will require.
@@ -138,6 +143,11 @@ Why does this matter for algorithms specifically? Because a careless `std::vecto
 ## A quick tour of `std::vector`
 
 `std::vector` is the default sequence container for DSA: fast indexing, compact storage, and amortized O(1) appends. Iterators mark ranges; STL algorithms operate on the half-open range `[begin, end)`, the end iterator points one past the last element, which makes empty ranges and loop bounds work out cleanly.
+
+<Figure
+  slug="dsa-cpp-essentials-compilation-model-inline-cutout"
+  alt="A card passing four machines and leaving as a running unit"
+/>
 
 <CodeBlock
   adapter="cpp"

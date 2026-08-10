@@ -20,6 +20,11 @@ regression is to predicting numbers, the simple, fast, interpretable
 baseline you reach for first and that everything fancier has to beat. It is
 probably the single most widely deployed classifier in the world.
 
+<Figure
+  slug="ml-logistic-regression-problem-solves-inline-cutout"
+  alt="A board of two-coloured chips with a smooth S-shaped ramp laid across it"
+/>
+
 <Callout type="danger" title="The one misconception to kill on sight">
 **Logistic regression does NOT predict a continuous number, and it is not a
 flavor of linear regression for regression tasks.** It predicts a **class**.
@@ -58,6 +63,11 @@ Logistic regression works in three steps. Hold this pipeline in your head and
 the whole algorithm follows:
 
 **Features → linear score `z` → sigmoid squash → probability `p` → threshold at 0.5 → class 1 or class 0**
+
+<Figure
+  slug="ml-logistic-regression-intuition-linear-score-inline-cutout"
+  alt="A straight rod producing a value that is then pressed through an S-shaped ramp into a narrow band"
+/>
 
 **Step 1, a linear score.** Exactly like linear regression, the model
 computes a weighted sum of the features plus a constant:
@@ -145,6 +155,11 @@ binary question: is a penguin an **Adelie** or a **Gentoo**? These two
 species separate almost perfectly on their body measurements, which makes
 them an ideal first classification target. We keep only those two species
 and predict the species from four numeric measurements.
+
+<Figure
+  slug="ml-logistic-regression-inline-cutout"
+  alt="A board of two-coloured chips with a smooth S-shaped ramp laid across it, chips low on the ramp reading one colour and chips high on it the other"
+/>
 
 <CodeBlock
   adapter="python"

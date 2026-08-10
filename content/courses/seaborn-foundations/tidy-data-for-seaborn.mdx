@@ -317,6 +317,11 @@ tidy = scores.melt(id_vars="student", var_name="subject", value_name="score")
   not an observation. Seaborn can compute totals for you, drop it from the
   raw table.
 
+<Figure
+  slug="sns-tidy-data-for-seaborn-inline-cutout"
+  alt="A jumbled sheet on the left rebuilt into a clean board on the right, one row per record and one column per measure"
+/>
+
 <Callout type="warn" title="Tidy first, plot second">
 If a Seaborn call is fighting you, you can't get `hue` to work, or the
 x-axis has the wrong thing on it, stop and look at the table's *shape*
@@ -398,3 +403,8 @@ You now have the single most important prerequisite for everything that
 follows: **data in the right shape**. Next, let's look at the two kinds of
 variables Seaborn cares about, continuous and categorical, and how that
 distinction drives every chart choice.
+
+<Figure
+  slug="sns-tidy-data-for-seaborn-tidy-means-inline-cutout"
+  alt="A board where every row is one record and every column one measure"
+/>

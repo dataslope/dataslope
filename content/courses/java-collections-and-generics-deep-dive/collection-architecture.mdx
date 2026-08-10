@@ -41,6 +41,11 @@ If we take `ArrayList`, callers with a `LinkedHashSet` must copy
 their data first. If we take `Collection`, every caller is happy and
 nothing is given up, we only need `size()` and iteration anyway.
 
+<Figure
+  slug="jcol-collection-architecture-principle-1-program-inline-cutout"
+  alt="One standard front plate shown on five very different containers, one hand working them all"
+/>
+
 The same idea on the return side, in reverse:
 
 ```java
@@ -84,6 +89,11 @@ Which to pick depends on whether the caller benefits from seeing
 later writes. For most "give me the data right now" calls, the
 snapshot is the right default.
 
+<Figure
+  slug="jcol-collection-architecture-principle-2-never-inline-cutout"
+  alt="A sealed tray handed out through a hatch as a copy, the original staying clamped inside the cabinet"
+/>
+
 ## Principle 3: defensive copy on input
 
 The mirror of principle 2:
@@ -123,6 +133,11 @@ A few useful conventions:
   that you fully control. Don't serialize internal domain
   collections directly, they couple your storage shape to your wire
   format.
+
+<Figure
+  slug="jcol-collection-architecture-inline-cutout"
+  alt="One set of standard fittings at the top of a board with several different containers below, each carrying those fittings"
+/>
 
 ## A worked example: an in-memory `BookRepo`
 

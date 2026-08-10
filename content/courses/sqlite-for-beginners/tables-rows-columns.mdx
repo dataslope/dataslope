@@ -193,6 +193,11 @@ what lets one query reason about a million rows at once.
 A table is not a numbered list. SQLite may return rows in any
 order unless you ask for an order.
 
+<Figure
+  slug="lite-tables-rows-columns-big-picture-inline-cutout"
+  alt="One ruled board with a row drawn out sideways and a column lifted straight up"
+/>
+
 ```mermaid
 flowchart TD
     TABLE["Table rows<br/>stored without a promised order"] --> QUERY["Need a sorted result?"]
@@ -295,3 +300,8 @@ at.
 Next: if two rows can look identical, two customers named John
 Smith in Springfield, how does the database tell them apart? That
 is the job of the **primary key**.
+
+<Figure
+  slug="lite-tables-rows-columns-inline-cutout"
+  alt="One board ruled into rows and columns with a single row lifted out on the left and a single column lifted out on the right"
+/>

@@ -52,6 +52,11 @@ flowchart TD
 The loop is the important part. *Validation often reveals
 issues that detection missed*, so cleaning is iterative.
 
+<Figure
+  slug="pandas-messy-data-overview-canonical-workflow-inline-cutout"
+  alt="A bench of five stations, a messy board entering at one end and a clean one leaving at the other"
+/>
+
 ## Three classes of problem, three classes of response
 
 A useful taxonomy:
@@ -92,6 +97,11 @@ overwrote the raw file, you cannot.
 The following toy dataset has at least one example of nearly
 every problem in the table above. Read it carefully and try to
 spot each issue before reading on.
+
+<Figure
+  slug="pandas-messy-data-overview-inline-cutout"
+  alt="A board where some cells hold the wrong shape, some are empty, and two rows are visibly the same"
+/>
 
 <CodeBlock
   adapter="python"
@@ -185,6 +195,11 @@ dozen problems.
 
 A taste, we will not fix everything here, just demonstrate the
 pattern.
+
+<Figure
+  slug="pandas-messy-data-overview-messy-actually-means-inline-cutout"
+  alt="A board where one cell holds the wrong shape, one is covered, and two rows carry the same card"
+/>
 
 <CodeBlock
   adapter="python"

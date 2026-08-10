@@ -16,6 +16,11 @@ The algorithm at the heart of it has the best origin story in computer science. 
 
 BFS minimizes the number of edges. In a weighted graph, fewer edges may cost more.
 
+<Figure
+  slug="dsa-shortest-paths-inline-cutout"
+  alt="A network of posts with weighted cords, one route lit from end to end and two longer routes left dark beside it"
+/>
+
 ```mermaid
 graph TD
     A((0)) -- "100" --> B((1))
@@ -28,6 +33,11 @@ BFS would happily report the one-edge path `0 -> 1` at cost 100, never noticing 
 ## Dijkstra's idea
 
 Imagine pouring water into the source vertex and letting it flow along every edge at one unit of cost per second. The flood reaches each vertex at a time equal to its shortest distance, the wavefront cannot cheat. Dijkstra's algorithm is that flood, discretized: it repeatedly picks the unprocessed vertex with the smallest known distance (the next place the water arrives), locks it in as final, and **relaxes** its outgoing edges, checking whether going *through* this vertex improves any neighbor's best-known distance.
+
+<Figure
+  slug="dsa-shortest-paths-dijkstra-s-idea-inline-cutout"
+  alt="A network of weighted cords with a lamp lighting outward along the cheapest route first"
+/>
 
 Why is it safe to lock a vertex in? Because when `u` has the smallest tentative distance of all unprocessed vertices, any other route to `u` would have to pass through some vertex that is *farther away already*, and with non-negative edges, going farther first can never come back cheaper. That is the greedy bet, and non-negativity is what makes it a sure thing.
 

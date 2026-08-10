@@ -46,6 +46,11 @@ Read that again, because three different claims are packed in:
    sampling distribution still looks like the population. Large `n`: it's
    essentially normal.
 
+<Figure
+  slug="stat-central-limit-theorem-theorem-plain-words-inline-cutout"
+  alt="Lopsided piles of chips each reduced to one average block, the blocks building a smooth mound"
+/>
+
 ```mermaid
 flowchart TD
     A["ANY population shape<br/>(skewed, uniform, bimodal...)<br/>finite variance"] --> B["Take many samples of size n<br/>compute x-bar each time"]
@@ -58,6 +63,11 @@ Talk is cheap; the CLT is best *seen*. We'll start with a heavily
 right-skewed exponential population, about as un-normal as it gets, and
 build the sampling distribution of the mean at n = 1, 5, 30, 100. Watch
 the shape morph from skewed to bell.
+
+<Figure
+  slug="stat-central-limit-theorem-watch-happen-from-inline-cutout"
+  alt="A lopsided pile scooped repeatedly, the scoop averages building a smooth symmetric mound on the rail beside it"
+/>
 
 <Chart slug="clt-convergence" />
 
@@ -614,3 +624,8 @@ $\sigma / \sqrt{n}$. That spread, the standard deviation of an *estimate*,
 is the **standard error**, the quantity we estimate from a single sample
 and the building block of every confidence interval and test statistic.
 That's next.
+
+<Figure
+  slug="stat-central-limit-theorem-inline-cutout"
+  alt="Three lopsided piles of blocks on the left, each producing one average block, and those averages stacking on the right into a smooth symmetric mound"
+/>

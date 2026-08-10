@@ -20,6 +20,11 @@ data correctly, but the data isn't what you thought it was. The
 first move is rarely "fix the chart code." It's usually
 **inspect the DataFrame**.
 
+<Figure
+  slug="viz-debugging-visualizations-mindset-chart-honest-inline-cutout"
+  alt="A chart on a stand with its raw chips visible in a tray underneath, the two clearly agreeing"
+/>
+
 A debugging session almost always starts like this:
 
 <CodeBlock
@@ -100,6 +105,11 @@ fig_good.show()
 Lines connect points *in the order the DataFrame gives them*. If
 the data isn't sorted by x, you get a "scribble." Always
 `sort_values()` before a line chart.
+
+<Figure
+  slug="viz-debugging-visualizations-common-failure-modes-inline-cutout"
+  alt="Four small charts in a row, each broken differently, one empty, one clipped, one flipped, one overplotted"
+/>
 
 This one is worth seeing. The same fourteen points, connected in row
 order and connected in x order:

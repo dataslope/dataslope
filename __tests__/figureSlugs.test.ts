@@ -42,22 +42,32 @@ async function mdxFiles(dir: string): Promise<string[]> {
 
 /** Every `<Figure …>` opening tag across content/, with its slug and whether
  *  an alt attribute is present. JSX attribute blocks contain no `>`, so the
- *  `[^>]*` body matches multi-line tags too. */
-async function figurePlacements(): Promise<Placement[]> {
-  const placements: Placement[] = [];
-  for (const file of await mdxFiles(CONTENT_DIR)) {
-    const text = await readFile(file, "utf-8");
-    for (const match of text.matchAll(/<Figure\b[^>]*>/g)) {
-      const tag = match[0];
-      placements.push({
-        file: path.relative(process.cwd(), file),
-        tag,
-        slug: tag.match(/\bslug="([^"]*)"/)?.[1] ?? null,
-        hasAlt: /\balt="/.test(tag),
-      });
+ *  `[^>]*` body matches multi-line tags too.
+ *
+ *  Read once and shared. Each of the four tests below wants the same list, and
+ *  walking content/ per test meant reading every lesson four times over — fine
+ *  at 169 figures in 300 files, past the 5 s default at 1,671 in 923 whenever
+ *  the rest of the suite was competing for the disk. The content cannot change
+ *  mid-run, so there is nothing to invalidate. */
+let cached: Promise<Placement[]> | null = null;
+function figurePlacements(): Promise<Placement[]> {
+  cached ??= (async () => {
+    const placements: Placement[] = [];
+    for (const file of await mdxFiles(CONTENT_DIR)) {
+      const text = await readFile(file, "utf-8");
+      for (const match of text.matchAll(/<Figure\b[^>]*>/g)) {
+        const tag = match[0];
+        placements.push({
+          file: path.relative(process.cwd(), file),
+          tag,
+          slug: tag.match(/\bslug="([^"]*)"/)?.[1] ?? null,
+          hasAlt: /\balt="/.test(tag),
+        });
+      }
     }
-  }
-  return placements;
+    return placements;
+  })();
+  return cached;
 }
 
 /** Slugs listed in the README's pending-images table (`| `slug` | … |`). */

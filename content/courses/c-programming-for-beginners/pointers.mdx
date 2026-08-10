@@ -145,6 +145,11 @@ Recall that C passes arguments **by value**: a function gets a copy
 of each argument. If you want a function to *modify* a caller's
 variable, you pass a **pointer** to it.
 
+<Figure
+  slug="c-pointers-inline-cutout"
+  alt="A long row of mail slots, one slot holding a small card whose arrow points at another slot further down the row, and a figure following that arrow"
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -221,6 +226,11 @@ if (p != NULL) {
 ```
 
 A common idiom is `if (p)` / `if (!p)`, since `NULL` is zero (false).
+
+<Figure
+  slug="c-pointers-pointer-inline-cutout"
+  alt="A card in one slot whose arrow reaches across to another slot further along the row"
+/>
 
 ## What happens if you forget to initialize a pointer
 

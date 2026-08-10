@@ -55,6 +55,11 @@ How does a tree decide which question to ask? At every node it searches
 over **every feature and every possible threshold** and picks the split
 that makes the two resulting groups as *pure* as possible.
 
+<Figure
+  slug="ml-decision-trees-core-idea-split-inline-cutout"
+  alt="A mixed heap divided by one cut into two heaps that are each more uniform than the first"
+/>
+
 "Pure" means homogeneous with respect to the target. For classification, a
 group is pure if it contains mostly one class. The tree measures impurity
 with a number, usually **Gini impurity** or **entropy**, and chooses the
@@ -91,6 +96,11 @@ Let us train a `DecisionTreeClassifier` on the penguins dataset: 342 penguins
 (after dropping rows with missing measurements), four body measurements, 3
 species. We will keep it shallow so it stays honest, then read its accuracy
 on held-out data.
+
+<Figure
+  slug="ml-decision-trees-problem-tree-solves-inline-cutout"
+  alt="A heap of mixed chips that no single straight blade can separate, beside a branching chute that does"
+/>
 
 <CodeBlock
   adapter="python"
@@ -202,6 +212,11 @@ questions; the only change is what a leaf stores. Instead of a majority
 class, a leaf holds the **average target value** of the training examples
 that fell into it. Predicting means dropping a sample down the tree and
 returning that leaf's average.
+
+<Figure
+  slug="ml-decision-trees-inline-cutout"
+  alt="A branching chute where each fork carries a small gauge, a block dropping through three forks in turn and landing in one of eight trays"
+/>
 
 <CodeBlock
   adapter="python"

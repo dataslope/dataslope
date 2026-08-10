@@ -43,6 +43,11 @@ The first idea everyone has is to number the categories: red = 0, green =
 1, blue = 2. It is compact and easy. It is also, for most categorical
 features, a genuine modeling error.
 
+<Figure
+  slug="ml-encoding-categorical-features-problem-models-need-inline-cutout"
+  alt="A machine whose inlet accepts only plain blocks, three coloured tags waiting outside it"
+/>
+
 Watch what it implies:
 
 <CodeBlock
@@ -143,6 +148,11 @@ If colors have no order, we must encode them in a way that treats them as
 exactly that: it replaces the single `color` column with one new column
 *per category*, each holding a 0 or a 1. A row's color is marked by a `1`
 in its column and `0` everywhere else.
+
+<Figure
+  slug="ml-encoding-categorical-features-inline-cutout"
+  alt="Three coloured tags each replaced by a small row of on-off switches, one switch raised in each row"
+/>
 
 ```mermaid
 flowchart LR
@@ -278,6 +288,11 @@ The integer-label mistake is not just theoretically untidy, it measurably
 hurts. Let us prove it the way the preprocessing page proved scaling
 matters: train the same model two ways on the same data, once with integer
 labels and once with one-hot encoding, and compare.
+
+<Figure
+  slug="ml-encoding-categorical-features-tempting-trap-integer-inline-cutout"
+  alt="Three coloured tags replaced by blocks of rising height, the heights implying an order the colours never had"
+/>
 
 We will build a dataset where a city's risk is **non-monotonic** in any
 ordering: cities `Alpha` and `Charlie` are high-risk, while `Bravo` and

@@ -21,6 +21,11 @@ and points in different groups are far apart. Nobody told it what the
 groups *mean*, it just finds structure that was already sitting in the
 data, waiting to be noticed.
 
+<Figure
+  slug="ml-k-means-clustering-problem-solves-inline-cutout"
+  alt="A scatter of chips with three posts being driven in among them, each chip roped to its nearest post"
+/>
+
 This is your entry point into **unsupervised learning**, and the ideas
 here, distance, centers, "similar things belong together", echo through
 everything that follows.
@@ -67,6 +72,11 @@ represented by a single point called its **centroid** (think "the center of
 mass of the cluster"). A data point belongs to whichever centroid is
 nearest. So the whole model is just `k` centers, and the rule "you belong
 to your closest center."
+
+<Figure
+  slug="ml-k-means-clustering-intuition-centers-points-inline-cutout"
+  alt="Three posts among a scatter of chips, each chip roped to its nearest post and the posts shifting to the middle of their ropes"
+/>
 
 The clever part is *how* it finds good centers, because at the start it has
 no idea where they should go. It uses a loop:
@@ -484,6 +494,11 @@ around its center, a roughly round, convex region. When the real groups
 are round-ish blobs, perfect. But when the true shape is a crescent, a
 ring, or a long thin band, "nearest center" is the wrong rule, and k-means
 fails in a way that looks confident and is completely wrong.
+
+<Figure
+  slug="ml-k-means-clustering-inline-cutout"
+  alt="A board of scattered chips with three marker posts, each chip joined by a short cord to its nearest post, the posts standing at the middle of their own group"
+/>
 
 The classic demonstration is `make_moons`: two interleaving crescents that
 any human eye separates instantly. Watch k-means butcher them.

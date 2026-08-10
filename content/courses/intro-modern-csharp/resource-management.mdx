@@ -22,6 +22,11 @@ C# splits resources into two camps:
    which the runtime can *help* you release but can't fully manage
    on its own.
 
+<Figure
+  slug="mcs-resource-management-memory-handled-mostly-inline-cutout"
+  alt="A yard of crates with a cart moving through collecting the ones nobody is holding"
+/>
+
 Understanding this split is the foundation of clean, leak-free C#.
 
 ## Memory: handled (mostly) for you
@@ -56,6 +61,11 @@ second category.
 Consider opening a file. Behind the scenes, the OS gives you a
 **file handle**, a small numeric ticket the kernel tracks. The
 OS only allows a limited number per process.
+
+<Figure
+  slug="mcs-resource-management-inline-cutout"
+  alt="A tap opened over a basin with a timer beside it, and the same tap shown closed with the basin empty and the timer stopped"
+/>
 
 If you open a file, never close it, and let the variable go out of
 scope, the GC will *eventually* reclaim the .NET object, but it

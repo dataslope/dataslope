@@ -16,6 +16,11 @@ character" `\0`.
 This page is about how to think about that, and how not to shoot
 yourself in the foot.
 
+<Figure
+  slug="c-strings-inline-cutout"
+  alt="A strip of single-letter tiles laid end to end along a rail, with one small red cap tile closing the run at the right"
+/>
+
 ## The null-terminated string
 
 ```c
@@ -215,6 +220,11 @@ for (const char *p = s; *p != '\0'; p++) {
 ```
 
 We'll see why that pattern is so common in the pointers chapter.
+
+<Figure
+  slug="c-strings-null-terminated-string-inline-cutout"
+  alt="A ribbon of tiles ending in one small stop block, and a second ribbon with no stop block running off the bench edge"
+/>
 
 ## Picture: a `char` array versus a `char *`
 

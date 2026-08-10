@@ -56,6 +56,11 @@ Read it as a sentence:
 That's the whole grammar. Every ggplot in existence is some
 extension of this skeleton.
 
+<Figure
+  slug="rlang-ggplot-grammar-mapping-vs-setting-inline-cutout"
+  alt="One dial wired to a data column beside another dial turned by hand with no cord"
+/>
+
 ## Geometries: change the chart, not the rest
 
 Try different geoms on the same data:
@@ -82,6 +87,11 @@ You change one word (`geom_point` → `geom_smooth`) and you get a
 fundamentally different chart. Same data, same mapping, different
 mark.
 
+<Figure
+  slug="rlang-ggplot-grammar-inline-cutout"
+  alt="A set of interchangeable parts on a rack, data, marks, scales and frame, assembled into one plot"
+/>
+
 A small map of the most-used geoms:
 
 | Geom | What it draws |
@@ -98,6 +108,11 @@ A small map of the most-used geoms:
 ## Mapping vs. setting
 
 This is the single most common confusion for ggplot beginners.
+
+<Figure
+  slug="rlang-ggplot-grammar-first-ggplot-inline-cutout"
+  alt="A plain board with one layer of bright chips laid across it and two more layers stacked ready beside it"
+/>
 
 - **Inside `aes()`**: you're saying "let *this column* control
   this property."

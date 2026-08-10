@@ -53,6 +53,11 @@ The name is a bit misleading. `std::move(x)` does **not** itself
 move anything. It just tells the compiler "treat `x` as if it were
 an rvalue (a temporary, eligible for moving from)."
 
+<Figure
+  slug="cpp-move-semantics-intuition-inline-cutout"
+  alt="A heavy crate being copied into a second identical crate on the left, and on the right the same crate simply having its handle passed to another pair of hands"
+/>
+
 The actual move happens when something *accepts* an rvalue, like a
 move constructor or move assignment operator. Many standard library
 types (vector, string, unique_ptr, ...) have move operations defined
@@ -107,6 +112,11 @@ third constructs a nameless temporary and moves it in; no cast was
 needed, because a temporary is *already* an rvalue. Try deleting the
 `v.reserve(3)` line and watch extra moves appear as the vector
 reallocates its buffer mid-growth.
+
+<Figure
+  slug="cpp-move-semantics-intuition-copy-vs-move-inline-cutout"
+  alt="A heavy crate duplicated into a second identical crate on the left, and on the right the same crate simply having its handle passed across"
+/>
 
 `std::unique_ptr` cannot be copied (because then there would be two
 owners). It *can* be moved, transferring ownership:

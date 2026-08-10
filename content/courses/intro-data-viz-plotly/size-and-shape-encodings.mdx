@@ -80,6 +80,11 @@ after that the reader is doing a lookup per point:
 `symbol="..."` gives each value of a categorical column its own
 marker shape: circle, square, triangle, diamond, cross, etc.
 
+<Figure
+  slug="viz-size-and-shape-encodings-size-continuous-third-inline-cutout"
+  alt="A row of chips growing steadily in size across a board while their positions stay fixed"
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -133,6 +138,11 @@ Plotly Express makes it easy to map four columns onto color, size,
 shape, *and* faceting. But the more channels you use, the more the
 reader has to *decode*. A 6-channel chart is a puzzle, not a
 visualization.
+
+<Figure
+  slug="viz-size-and-shape-encodings-inline-cutout"
+  alt="One row of identical chips growing in size, and another row keeping one size but changing shape"
+/>
 
 A working rule:
 

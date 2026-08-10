@@ -103,6 +103,11 @@ Density plots have one parameter to keep in mind: the **bandwidth**
 histogram. Too much, and you've smoothed real features away. R's
 default usually does a reasonable job.
 
+<Figure
+  slug="rlang-exploring-distributions-density-plots-inline-cutout"
+  alt="A row of solid inked bins with a single smooth arched cap of contrasting ink laid over their tops, the bins fully inked beneath it"
+/>
+
 ## Boxplots
 
 A boxplot knows only about quartiles, so it is blind to shape. Three very
@@ -113,6 +118,11 @@ different samples, one identical box:
 A boxplot summarizes a distribution as a *picture of the
 five-number summary* (min, Q1, median, Q3, max), with conventions
 for marking outliers.
+
+<Figure
+  slug="rlang-exploring-distributions-inline-cutout"
+  alt="A tray of chips poured into a row of bins, the bins filling into a rounded mound with thin tails at both ends"
+/>
 
 <CodeBlock
   adapter="r"
@@ -209,6 +219,11 @@ The three shapes you will meet most often, side by side:
 Most real-world data is **right-skewed** (income, transaction
 sizes, web traffic, response times). The bulk of values cluster
 at low-to-medium values with a long tail of high values.
+
+<Figure
+  slug="rlang-exploring-distributions-histograms-inline-cutout"
+  alt="Chips poured into a row of adjacent bins, the bins filling to different heights"
+/>
 
 <CodeBlock
   adapter="r"

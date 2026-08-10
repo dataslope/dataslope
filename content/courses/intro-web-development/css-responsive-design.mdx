@@ -109,6 +109,11 @@ base (no media query), then *add* complexity for larger screens with
 `min-width` queries. It tends to produce simpler CSS, the base case is
 the constrained one, and enhancements pile on only where there's room.
 
+<Figure
+  slug="web-css-responsive-design-inline-cutout"
+  alt="The same panel of blocks shown in three frames of decreasing width, its blocks rearranging from a row into a column as the frame narrows"
+/>
+
 <Callout type="info" title="You already met a query-free responsive trick">
 `grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))` from the
 Grid lesson reflows columns to fit any width, no media query at all.
@@ -233,3 +238,8 @@ if (!ok) throw new Error("Inside the media query, set .cards { grid-template-col
 One layout, every screen. You've now covered the full CSS toolkit.
 Time to make the page *respond to the user*, starting with
 [JavaScript and the DOM](/courses/intro-web-development/js-dom-basics).
+
+<Figure
+  slug="web-css-responsive-design-start-fluid-units-inline-cutout"
+  alt="A block that stretches to fill whatever frame it is put in, shown in three frames of different widths"
+/>

@@ -224,6 +224,16 @@ The source method runs **twice**. If `Source()` were reading from a
 file or making HTTP calls, that's two disk reads or two network
 trips, usually not what you want.
 
+<Figure
+  slug="cs-ienumerable-and-iteration-interface-itself-inline-cutout"
+  alt="A sealed drum with one crank and one chute, handing out a single block per turn"
+/>
+
+<Figure
+  slug="cs-ienumerable-and-iteration-inline-cutout"
+  alt="A sealed drum with a crank handing out one block per turn, the drum's remaining contents unknown from outside"
+/>
+
 The fix is to **materialize** the sequence once, into a real
 collection:
 

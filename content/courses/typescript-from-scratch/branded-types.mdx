@@ -66,6 +66,11 @@ type Dollars = number & { readonly __brand: "Dollars" };
 
 Now `Cents` and `Dollars` are no longer compatible, even though they're both `number` at runtime. The `__brand` property is a **phantom**, it doesn't exist on the value, but TypeScript sees it in the type.
 
+<Figure
+  slug="tsx-branded-types-solution-branding-phantom-inline-cutout"
+  alt="Two identical blocks, one carrying a small stamped mark, only the marked one accepted by the slot"
+/>
+
 Here's how to create branded values:
 
 <CodeBlock
@@ -227,6 +232,11 @@ Because `Email` can only be created through `createEmail`, you know that any `Em
 ## Multi-File Example: Branded Types Across Modules
 
 Let's organize branded types and their constructors across multiple files for better maintainability.
+
+<Figure
+  slug="tsx-branded-types-inline-cutout"
+  alt="Two blocks of the same shape, one carrying a small stamped mark, only the marked one accepted by the slot"
+/>
 
 <CodeBlock
   adapter="typescript"
@@ -474,6 +484,11 @@ You've learned how to:
 - Prefer **`unique symbol`** for collision-proof brands.
 - **Validate inputs** at construction time, ensuring all branded values are valid.
 - Organize branded types across modules for maintainability.
+
+<Figure
+  slug="tsx-branded-types-problem-structural-typing-inline-cutout"
+  alt="Two blocks of exactly the same shape sitting in each other's sockets without complaint"
+/>
 
 Brands add a thin layer of nominal typing to TypeScript's structural world. They prevent entire classes of bugs (mixing IDs, units, or invalid data) at zero runtime cost. In the next chapter, we'll scale up to **API modeling**, where brands and other type-level contracts ensure correctness across module and service boundaries.
 

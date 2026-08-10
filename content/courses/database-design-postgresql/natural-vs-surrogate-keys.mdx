@@ -92,6 +92,12 @@ Social Security Administration eventually had to void it and issue
 her a new one, and stray uses of the original were still turning up
 decades later.
 
+<Figure
+  slug="db-natural-keys-wallet-card-cutout"
+  alt="An open wallet with a sample card in its pocket, a counter of identical wallets, and a drawer packed with copies of that card"
+  caption="Lockport, New York, 1938: a sample card in every wallet, carrying one real Social Security number."
+/>
+
 Every assumption a designer might make about a natural identifier
 failed at once: the "unique" value was shared by thousands of
 people, the "stable" value had to be changed, and the system that
@@ -129,6 +135,11 @@ A natural key is strongest when the outside world already treats the value as st
 A surrogate key has no business meaning. That is the point. If a user's
 email changes, `user_id` does not. If a product is renamed, `product_id`
 does not. Other tables can keep pointing at the same row.
+
+<Figure
+  slug="db-natural-vs-surrogate-keys-two-ways-identify-inline-cutout"
+  alt="One card identified by a printed detail on its face beside another identified by a blank punched tab on its edge"
+/>
 
 ```mermaid
 flowchart LR

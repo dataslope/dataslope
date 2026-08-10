@@ -83,6 +83,11 @@ source of silent bugs.
 
 Structs follow the same value/reference rules as built-in types.
 
+<Figure
+  slug="cpp-structs-and-aggregates-inline-cutout"
+  alt="Several loose parts on a bench being set into one fitted case, the case then lifted and carried by a single handle"
+/>
+
 ```cpp
 double length(const Point& p) {   // const ref: no copy, can't modify
     return std::sqrt(p.x * p.x + p.y * p.y);
@@ -202,6 +207,11 @@ Conventionally:
 - Use `class` when you have *invariants* to protect (data that must
   always satisfy some condition), which leads us straight into the
   object-oriented chapter.
+
+<Figure
+  slug="cpp-structs-and-aggregates-struct-named-bundle-inline-cutout"
+  alt="Several loose parts set into one fitted case that is then lifted by a single handle"
+/>
 
 ## Challenges
 

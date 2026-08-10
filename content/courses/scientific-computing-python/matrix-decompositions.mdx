@@ -49,6 +49,11 @@ have $PA = LU$, every linear solve is two triangular sweeps,
 $O(n^2)$ instead of $O(n^3)$. This is why you should **factor
 once, solve many times**.
 
+<Figure
+  slug="scipy-matrix-decompositions-lu-decomposition-inline-cutout"
+  alt="One grid separated into a lower stepped grid and an upper stepped grid that stack back together"
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -186,6 +191,11 @@ $U$ ($m \times m$) and $V$ ($n \times n$) are orthogonal and
 $\Sigma$ is a non-negative diagonal of **singular values**. This
 is the most informative factorization in numerical analysis.
 
+<Figure
+  slug="scipy-matrix-decompositions-five-factorizations-at-inline-cutout"
+  alt="One solid block shown separated five different ways along a bench"
+/>
+
 The singular values $\sigma_1 \ge \sigma_2 \ge \cdots$ tell you:
 
 - **Rank**, the number of nonzero singular values (numerically:
@@ -275,6 +285,11 @@ For a diagonalizable square $A$, $A = V \Lambda V^{-1}$. The
 columns of $V$ are eigenvectors, $\Lambda$ is a diagonal of
 eigenvalues. Symmetric matrices admit an *orthogonal*
 diagonalization $A = V \Lambda V^T$ (use `eigh`, not `eig`).
+
+<Figure
+  slug="scipy-matrix-decompositions-inline-cutout"
+  alt="One solid block being separated into three simpler blocks that stack back together to the same shape"
+/>
 
 A beautiful application: **matrix exponentiation** for solving a
 linear system of ODEs. If $\dot x = A x$, then $x(t) = e^{tA} x_0$

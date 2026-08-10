@@ -31,6 +31,11 @@ objectively *the* answer. So cluster evaluation splits into two situations:
   clusters to the known groups with **external** metrics like the adjusted
   Rand index. Useful for research, seldom available in real problems.
 
+<Figure
+  slug="ml-evaluating-clusters-inline-cutout"
+  alt="Two boards of grouped chips, one with tight well-separated groups and one whose groups visibly bleed together"
+/>
+
 <Callout type="info" title="Internal vs external, in a sentence">
 Internal metrics ask "are these clusters geometrically tight and
 well-separated?" using only the data. External metrics ask "do these
@@ -60,6 +65,11 @@ the *nearest* other cluster:
 $$
 s(i) = \frac{b(i) - a(i)}{\max\lbrace\,a(i),\ b(i)\,\rbrace}
 $$
+
+<Figure
+  slug="ml-evaluating-clusters-silhouette-score-inline-cutout"
+  alt="One chip measured for its distance to its own group and to the nearest other group, two calipers on it at once"
+/>
 
 - **What it measures.** Per point, how much better it fits its own cluster
   than the nearest alternative, scaled to lie between −1 and +1.
@@ -105,6 +115,11 @@ it never needed a true answer.
 
 The most practical use of the silhouette score is picking the number of
 clusters. Try several values of `k`, score each, and let the data vote.
+
+<Figure
+  slug="ml-evaluating-clusters-using-silhouette-score-inline-cutout"
+  alt="Three boards of grouped chips with a gauge beside each, one gauge visibly higher than the others"
+/>
 
 <CodeBlock
   adapter="python"

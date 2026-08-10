@@ -56,6 +56,11 @@ You already have the tool to pivot from the conditional-logic page:
 one filtered aggregate. This "manual pivot" works in any SQL database and
 makes the mechanics visible.
 
+<Figure
+  slug="duck-pivoting-and-reshaping-inline-cutout"
+  alt="A narrow tall board of records unfolding into a wide flat board, each record landing in its own square"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Manual pivot: quarters into columns"
@@ -222,3 +227,8 @@ into wide columns.`}
 You can now reshape data into whatever form a task needs. The next section
 zooms out to *structure*: how to compose large analytical queries from
 small, readable pieces.
+
+<Figure
+  slug="duck-pivoting-and-reshaping-long-vs-wide-inline-cutout"
+  alt="A narrow tall board and a wide short board holding the same squares, a hinge between them"
+/>

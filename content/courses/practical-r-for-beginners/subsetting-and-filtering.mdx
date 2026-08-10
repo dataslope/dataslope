@@ -91,6 +91,11 @@ The third form, passing a *logical vector* of the same length as
 the number of rows, is the workhorse. Every "filter" you'll ever
 do is some variation of it.
 
+<Figure
+  slug="rlang-subsetting-and-filtering-mental-model-rows-inline-cutout"
+  alt="A board with one bracket clamped across its rows and another down its columns"
+/>
+
 ## Selecting rows AND columns at once
 
 You can do both in one expression:
@@ -151,6 +156,11 @@ right side?"*
 If your filter condition involves a column with `NA`s, those rows
 become problematic, `NA > 5` is `NA`, not `FALSE`, and indexing
 with `NA` yields a row of all `NA`s.
+
+<Figure
+  slug="rlang-subsetting-and-filtering-inline-cutout"
+  alt="A board of rows passing under a comb that lets some rows through and holds the rest back at the teeth"
+/>
 
 <CodeBlock
   adapter="r"

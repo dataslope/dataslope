@@ -118,6 +118,11 @@ LINQ, got there earlier than most.
 A useful way to see the convergence: here is the same query, even
 numbers, squared, summed, as you would write it in four languages.
 
+<Figure
+  slug="cs-why-declarative-won-lineage-inline-cutout"
+  alt="A long hand-built conveyor of many small parts beside one short instruction card doing the same job"
+/>
+
 ```csharp
 // C#
 nums.Where(n => n % 2 == 0).Select(n => n * n).Sum()
@@ -165,6 +170,11 @@ Console.WriteLine(nums.Where(n => n % 2 == 0).Select(n => n * n).Sum());
 That `220` is carrying a lot of history: Lisp's functions-as-values,
 SQL's describe-the-answer, Haskell's laziness, and a 2005 hardware
 crisis, all compiled by Roslyn and executed in your browser tab.
+
+<Figure
+  slug="cs-why-declarative-won-inline-cutout"
+  alt="A long hand-built conveyor of many small parts on one bench, and a short clear instruction card doing the same job on the next"
+/>
 
 <MultipleChoice
   markdown={`What is the defining characteristic of **declarative** code, as discussed on this page?

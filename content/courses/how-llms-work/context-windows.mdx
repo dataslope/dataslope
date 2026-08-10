@@ -64,6 +64,11 @@ if available_for_output < 2000:
 
 Two costs, both real.
 
+<Figure
+  slug="llm-context-windows-window-hard-boundary-inline-cutout"
+  alt="A fixed frame over a long ribbon of chips, the chips beyond its edge falling away off the bench"
+/>
+
 **Money.** You pay for every input token on every turn. A 500,000-token
 document in a ten-turn conversation is five million billed input
 tokens unless caching intervenes.
@@ -116,6 +121,11 @@ Recall from the attention chapter that every token attends to every
 other token, so cost scales with the square of the length. Going from
 8,000 to 1,000,000 tokens is a 125-fold increase in length and roughly
 15,000-fold in naive attention work.
+
+<Figure
+  slug="llm-context-windows-inline-cutout"
+  alt="A long ribbon of chips feeding through a fixed rectangular frame, the chips that pass beyond the frame's left edge dropping away off the rail"
+/>
 
 Against a linear reference, which is what "125 times the text" would cost if
 each token were as cheap as the last, the gap is two orders of magnitude:

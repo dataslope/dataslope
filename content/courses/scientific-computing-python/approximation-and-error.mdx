@@ -28,6 +28,11 @@ two contributions:
 
 $$ E(h) \;=\; \underbrace{C \, h^p}_{\text{truncation}} \;+\; \underbrace{D / h^q}_{\text{round-off}} $$
 
+<Figure
+  slug="scipy-approximation-and-error-truncation-vs-round-inline-cutout"
+  alt="A curve cut short at one end beside a measurement whose last mark is fractionally off"
+/>
+
 - **Truncation error** dominates when $h$ is *large*. Use a smaller
   $h$ to fix it.
 - **Round-off error** dominates when $h$ is *small*. Use a larger
@@ -101,6 +106,11 @@ A numerical method **converges of order $p$** if its error shrinks
 like $h^p$ as $h \to 0$. Higher $p$ means dramatically faster
 convergence: halving $h$ for an order-1 method halves the error, but
 halves an order-4 method's error by a factor of $16$.
+
+<Figure
+  slug="scipy-approximation-and-error-convergence-order-inline-cutout"
+  alt="Three curves closing on a line at visibly different rates"
+/>
 
 We can *empirically measure* convergence order. Compute the error at
 two step sizes $h_1$ and $h_2 = h_1 / 2$:
@@ -211,6 +221,11 @@ When the answer changes quickly in one region and slowly in another,
 a fixed step size is wasteful. **Adaptive methods** estimate the
 local error on each step and shrink or grow $h$ to keep the error
 near a user-specified tolerance.
+
+<Figure
+  slug="scipy-approximation-and-error-inline-cutout"
+  alt="A curved rail with a straight rod laid against it, small gaps visible between rod and rail at both ends"
+/>
 
 SciPy's `quad` (general 1-D integration) is adaptive by default.
 Try integrating something with a sharp spike.

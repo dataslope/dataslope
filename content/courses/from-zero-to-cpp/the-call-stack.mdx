@@ -191,6 +191,11 @@ If you call functions deep enough, typically through unbounded
 recursion, the stack runs out of room, and the program crashes
 with a **stack overflow**.
 
+<Figure
+  slug="cpp-the-call-stack-inline-cutout"
+  alt="A vertical column of trays being added one on top of another as a figure climbs, and the same trays being taken off from the top as they climb back down"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -357,3 +362,8 @@ The stack is the secret protagonist of every C++ program.
 Up next: zoom out from the stack to the *whole* memory model, what
 the heap is, what global data looks like, and how programs juggle
 all three.
+
+<Figure
+  slug="cpp-the-call-stack-stack-frames-inline-cutout"
+  alt="A column of trays growing upward as jobs start and coming apart from the top as they finish"
+/>

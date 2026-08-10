@@ -157,6 +157,11 @@ the busy regions all render as the same solid color, and you lose exactly
 the structure you came to see. The first and easiest fix is **`alpha`**
 (opacity): semi-transparent dots make dense regions visibly darker.
 
+<Figure
+  slug="sns-relational-scatter-plots-scatter-plot-needs-inline-cutout"
+  alt="Two columns of chips pinned against each other on a board with a loose drift emerging"
+/>
+
 The same points at three opacities. Nothing about the data changes; what
 you can see about it changes completely:
 
@@ -202,6 +207,11 @@ You'll see two ways to draw the same scatter:
   manages its own figure, and can split into panels with `col`/`row`.
 - `sns.scatterplot(...)`, **axes-level**. Draws onto a single matplotlib
   Axes you can combine with other plots.
+
+<Figure
+  slug="sns-relational-scatter-plots-inline-cutout"
+  alt="Chips pinned across a board with a second series in another ink laid over them, the two drifting apart to the right"
+/>
 
 They produce the same dots; they differ in what they *return* and how they
 *compose*. We devote a whole page to that distinction, for now, reach for

@@ -180,6 +180,11 @@ Look at how much energy these examples spend on bookkeeping. Every
 `new` must be balanced by exactly one `delete`, on every code path,
 including exception paths. That is fragile.
 
+<Figure
+  slug="cpp-dynamic-memory-inline-cutout"
+  alt="A yard where a crate is requested from a counter, used at a bench, and returned to the counter when finished"
+/>
+
 Modern C++ flips the model around: instead of writing `new` and
 `delete` by hand, you let objects *own* their resources, and the
 language calls the destructor automatically when those objects go
@@ -389,3 +394,8 @@ int main() {
 Next: aggregates and strings, how to bundle data, and the tools
 the standard library gives you so you almost never need raw arrays
 again.
+
+<Figure
+  slug="cpp-dynamic-memory-stack-vs-heap-inline-cutout"
+  alt="A neat column of trays beside an open yard of crates, one cord running between them"
+/>

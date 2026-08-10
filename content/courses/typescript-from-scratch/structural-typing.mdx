@@ -117,6 +117,11 @@ welcomeUser({ id: "456", name: "Grace" }); // ✅ OK
 
 This is why TypeScript is often described as having **duck typing for compilers**: "If it looks like a duck and quacks like a duck, it's a duck."
 
+<Figure
+  slug="tsx-structural-typing-inline-cutout"
+  alt="Two differently coloured plugs with identical pin patterns, both fitting the same socket"
+/>
+
 The phrase has a real lineage, and it's older than any programming language. The "duck test", *if it looks like a duck, swims like a duck, and quacks like a duck, it's probably a duck*, was a piece of American folk reasoning long before computing. The Python community adopted it around 2000 to describe their language's habit of caring only about what an object can *do*, never what class it claims to be; Alex Martelli's postings on the comp.lang.python newsgroup are usually credited with cementing the term. TypeScript's contribution was to take this runtime philosophy and make a *compiler* enforce it: you get duck typing's flexibility, but the quack-check happens before the program ever runs.
 
 <Callout type="info" title="Contrast with Go's interfaces">
@@ -301,6 +306,11 @@ TypeScript's structural typing gives you flexibility by default, but you can lay
 ## Challenge: Structural compatibility
 
 Let's test your understanding. The function below is typed against a small `LogEntry` interface, and, thanks to structural typing, the program feeds it objects that were never declared as `LogEntry` but happen to have the right shape (plus extra fields). Your job is just the body.
+
+<Figure
+  slug="tsx-structural-typing-shape-based-compatibility-inline-cutout"
+  alt="Two plugs with identical pins from different makers, both seating in the same socket"
+/>
 
 <ChallengeCard
   adapter="typescript"

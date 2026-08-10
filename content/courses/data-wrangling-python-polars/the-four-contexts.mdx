@@ -26,6 +26,11 @@ flowchart TD
 `select` returns a new frame made only of the expressions you gave
 it. Anything you did not mention is gone.
 
+<Figure
+  slug="pl-the-four-contexts-select-result-whole-inline-cutout"
+  alt="An expression card slotted into a machine that hands back a whole new board rather than a single column"
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -179,6 +184,11 @@ column" refers to.
 
 This is the point of the design. One description, four meanings,
 decided by where you put it.
+
+<Figure
+  slug="pl-the-four-contexts-inline-cutout"
+  alt="One expression card being slotted into four different machines in turn, each machine using it in its own way"
+/>
 
 <CodeBlock
   adapter="python"

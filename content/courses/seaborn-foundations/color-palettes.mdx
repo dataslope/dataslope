@@ -67,6 +67,11 @@ sns.relplot(
 No species should look bigger or more important than another, and a
 qualitative palette respects that, every hue carries equal weight.
 
+<Figure
+  slug="sns-color-palettes-qualitative-distinct-colors-inline-cutout"
+  alt="A strip of clearly separate swatches with no two shading into one another"
+/>
+
 <Callout type="warn" title="Don't use a gradient for unordered groups">
 Coloring unordered categories with a *sequential* palette (a light-to-dark
 ramp) implies an order that isn't there, the reader will assume the dark
@@ -175,6 +180,11 @@ sns.palplot(sns.color_palette("vlag", 8))
 Notice the structure of each strip: the qualitative one jumps between
 unrelated hues; the sequential one marches steadily darker; the diverging one
 runs from one hue through a pale middle to another.
+
+<Figure
+  slug="sns-color-palettes-three-palette-types-inline-cutout"
+  alt="Three swatch strips, one grading in one ink, one grading between two, one of distinct colours"
+/>
 
 <MultipleChoice
   markdown={`You're shading a heatmap of **temperature anomalies** (degrees above or
@@ -399,3 +409,8 @@ categories or facet instead of coloring.`}
 Color now works *for* you instead of against you. You've reached the end of
 the aesthetics tools, next we put everything together into the craft of
 telling a clear story with data.
+
+<Figure
+  slug="sns-color-palettes-inline-cutout"
+  alt="Three strips of swatches, one running pale to deep in one hue, one running between two hues, one of separate distinct colours"
+/>

@@ -75,6 +75,11 @@ int main() {
 
 For subsets, each element poses a yes/no question, in or out?, giving 2^n subsets. The recursion below makes both choices for each element: recurse without it, then push it, recurse with it, and pop it (the un-choose). The driver prints each subset's size; modify it to print the contents if you want to see the order they appear in.
 
+<Figure
+  slug="dsa-backtracking-subsets-inline-cutout"
+  alt="A branching frame where each fork is a block taken or left, the leaves holding every combination"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -135,6 +140,11 @@ int main() {
 ## N-Queens
 
 The aristocrat of backtracking puzzles: place n queens on an n×n chessboard so that none attacks another. It was posed for the standard board by the chess composer Max Bezzel in 1848, drew the attention of Gauss, and has been the canonical backtracking demo ever since, Dijkstra used it in 1972 to showcase structured programming. (For the record: the 8×8 board has 92 solutions out of 4.4 billion ways to place 8 queens, pruning is not optional.)
+
+<Figure
+  slug="dsa-backtracking-inline-cutout"
+  alt="A maze of low walls with a route drawn to a dead end, that stretch rubbed out, and the route resumed from the last junction"
+/>
 
 The setup does most of the work. Place one queen per row, so the only choice per level is the column; then attacks reduce to three constraint arrays, columns, and the two diagonal directions, where `r - c` is constant on one diagonal family and `r + c` on the other. A placement is legal only if all three slots are free; mark them (choose), recurse to the next row (explore), unmark them (un-choose).
 
@@ -225,6 +235,11 @@ int main() {
 ## Word search
 
 Backtracking on a grid: does the word `ABCCED` appear as a path of adjacent cells, each cell used at most once? The choose step marks the current cell with a sentinel `'#'` so the path cannot revisit it; the un-choose restores the original letter. That restoration is essential, a cell that failed for *this* path may be exactly what a *different* path needs later.
+
+<Figure
+  slug="dsa-backtracking-permutations-inline-cutout"
+  alt="A branching frame where every branch orders the same three blocks differently"
+/>
 
 <CodeBlock
   adapter="cpp"

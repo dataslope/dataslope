@@ -702,7 +702,11 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.375rem;
-  margin: 0 0 1.25rem;
+  /* Held off the row above rather than left to touch it. The toolbar's own
+     gap separates the chips from the note about D1 only while they share a
+     line; once the note wraps below them it is the last thing in that row and
+     nothing stands between it and this strip, so the two read as one block. */
+  margin: 0.875rem 0 1.25rem;
 }
 
 .sortLabel {

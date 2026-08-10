@@ -15,6 +15,11 @@ is a refinement of that single sentence.
 
 This page is about the simplest way to honor it: the **train/test split**.
 
+<Figure
+  slug="ml-train-test-split-problem-solves-inline-cutout"
+  alt="A machine graded on the very blocks it was built from, its gauge reading perfectly and meaning nothing"
+/>
+
 ## The problem it solves
 
 Imagine a student who is given the exact questions and answers for an exam
@@ -42,6 +47,11 @@ set**, and lock it in a drawer. The model never sees it during training.
 We train on the rest (the **training set**), and only at the very end do we
 unlock the drawer and measure performance on those held-out rows.
 
+<Figure
+  slug="ml-train-test-split-fix-hold-some-inline-cutout"
+  alt="A pile divided by a partition with the smaller share sealed under a lid"
+/>
+
 ```mermaid
 flowchart TD
     A["Full dataset<br/>(all rows)"] --> B{"random split"}
@@ -62,6 +72,11 @@ is the whole trick.
 
 scikit-learn gives us one function for this. It shuffles the rows and cuts
 them into two groups.
+
+<Figure
+  slug="ml-train-test-split-inline-cutout"
+  alt="One pile of blocks being divided by a partition into a large left share and a small sealed right share, the right share kept under a lid"
+/>
 
 <CodeBlock
   adapter="python"

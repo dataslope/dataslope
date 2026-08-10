@@ -20,6 +20,11 @@ know what it is quietly *not* telling you.
 Every regression metric is built from **residuals**, the differences
 between actual and predicted values, one per example.
 
+<Figure
+  slug="ml-regression-metrics-inline-cutout"
+  alt="A straight rod laid through a cloud of chips with short vertical sticks measuring each chip's distance to the rod"
+/>
+
 ```mermaid
 flowchart TD
     A["Actual y"] --> R["Residual = actual - predicted"]
@@ -65,6 +70,11 @@ print("First five residuals: ", np.round(residuals[:5], 1))
 
 **What it measures.** The average size of the errors, ignoring their
 direction: take the absolute value of each residual and average them.
+
+<Figure
+  slug="ml-regression-metrics-mae-mean-absolute-inline-cutout"
+  alt="Short vertical sticks measuring each chip's distance to a rod, all sticks laid end to end and halved"
+/>
 
 $$
 \text{MAE} = \frac{1}{n}\sum_{i=1}^{n} \lvert y_i - \hat{y}_i \rvert
@@ -141,6 +151,11 @@ optimize, even when you report something more readable.
 **What it measures.** The square root of MSE. Taking the root undoes the
 squaring of the *units*, so RMSE is back in the target's units, but it
 keeps MSE's heavy penalty on large errors.
+
+<Figure
+  slug="ml-regression-metrics-mse-mean-squared-inline-cutout"
+  alt="Sticks measuring chip distances to a rod, each stick redrawn as a square of its own length"
+/>
 
 $$
 \text{RMSE} = \sqrt{\text{MSE}} = \sqrt{\frac{1}{n}\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}

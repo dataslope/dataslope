@@ -38,6 +38,11 @@ Use a heatmap when:
 Plotly Express offers `px.imshow` (for image-like 2-D matrices) and
 `px.density_heatmap` (which bins two continuous variables on the fly).
 
+<Figure
+  slug="viz-heatmaps-heatmap-right-inline-cutout"
+  alt="A grid of tiles in graded shades with the deepest clustered in one corner, a key strip beside it"
+/>
+
 This is exactly the tool for big, overplotted data. The **diamonds**
 dataset has 53,940 rows, far too many for a scatter, so we bin them
 into a grid and color by count instead.
@@ -183,6 +188,11 @@ size, so the default order hands the reader an accident:
   colors mean nothing to the reader. Always show the legend.
 - **Truncating the color range** can mask outliers, similar to a
   truncated y-axis on a bar chart.
+
+<Figure
+  slug="viz-heatmaps-inline-cutout"
+  alt="A grid of tiles in graded shades of one ink, the deepest tiles clustered in one corner and a small key strip beside the grid"
+/>
 
 ## Check your understanding
 

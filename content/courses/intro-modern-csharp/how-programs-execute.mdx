@@ -71,6 +71,11 @@ until the program exits and the OS frees its memory.
 
 This is what you write.
 
+<Figure
+  slug="mcs-how-programs-execute-1-source-code-inline-cutout"
+  alt="A plain written card resting alone on a bench before any machine has touched it"
+/>
+
 <CodeBlock
   adapter="csharp"
   files={[
@@ -304,6 +309,11 @@ Console.WriteLine($"now a list of length {nums.Count}");
 ## 8. The full lifecycle, one more time
 
 Here is the whole picture, now with the pieces named.
+
+<Figure
+  slug="mcs-how-programs-execute-big-picture-inline-cutout"
+  alt="A card feeding a translating machine, whose output drives a second machine on the same bench"
+/>
 
 1. You write `.cs` source.
 2. Roslyn compiles it to IL (`.dll`).

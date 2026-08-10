@@ -97,6 +97,11 @@ is \$52K, much more representative. **For skewed
 distributions, prefer median.** Income, prices, durations, and
 file sizes are almost always skewed.
 
+<Figure
+  slug="pandas-statistical-summaries-mean-vs-median-inline-cutout"
+  alt="A plank on a fulcrum tipped by one very heavy block at its end, and a marker standing calmly at the middle block"
+/>
+
 | Distribution | Mean vs. median | Prefer |
 | --- | --- | --- |
 | Symmetric (e.g. exam scores) | Mean ≈ median | Either |
@@ -282,6 +287,11 @@ print(df.groupby("cut")["price"].describe().round(0))
 
 A grouped mean has the same blind spot a single mean does: four groups can
 report the same average and be four completely different distributions.
+
+<Figure
+  slug="pandas-statistical-summaries-inline-cutout"
+  alt="One tall column of chips feeding a rack of five small gauges, each showing a different reading"
+/>
 
 <Chart slug="bar-hides-distribution" />
 

@@ -225,6 +225,11 @@ C++ lets multiple functions share a name as long as they differ in
 their parameter types. The compiler picks the right one at the call
 site based on the arguments.
 
+<Figure
+  slug="cpp-functions-and-modularity-anatomy-function-inline-cutout"
+  alt="A machine in cross-section with its input opening, inner works and output chute all visible"
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -259,6 +264,11 @@ A function that returns `void` is one that exists for its **side
 effects** (printing, modifying things). A function that returns a
 value but has no side effects is sometimes called **pure**, and is
 the easiest kind to reason about and test.
+
+<Figure
+  slug="cpp-functions-and-modularity-inline-cutout"
+  alt="One large machine on the left drawn as a single welded lump, and the same machine on the right built from four separate boxes that unclip"
+/>
 
 A useful design principle: every function should do **one thing**,
 and its name should describe that thing. Functions over ~30 lines

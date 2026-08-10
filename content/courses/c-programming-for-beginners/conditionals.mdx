@@ -109,6 +109,11 @@ int main(void) {
 The branches are checked **top to bottom**. The first one whose
 condition is true runs, and the rest are skipped.
 
+<Figure
+  slug="c-conditionals-if-else-inline-cutout"
+  alt="A chute with a two-way flap sending blocks down one of two paths, both ending in a tray"
+/>
+
 ## Comparison operators
 
 | Operator | Meaning                  |
@@ -229,6 +234,11 @@ Deep nesting is hard to read. When it grows past two levels, it's
 usually a sign to refactor, split a chunk into a separate function,
 or rewrite with `&&` and `||`.
 
+<Figure
+  slug="c-conditionals-inline-cutout"
+  alt="A track meeting a set of points, a lever thrown one way sending the cart down the upper branch and the lower branch left empty"
+/>
+
 ## The dangling-else pitfall
 
 ```c
@@ -259,6 +269,11 @@ mandatory. Make it your default.
 
 When you have many branches on a single integer value, `switch` is
 sometimes clearer than a long `if/else if` chain.
+
+<Figure
+  slug="c-conditionals-if-statement-inline-cutout"
+  alt="One hinged flap on a chute, blocks clearing a marked bar passing under it and the rest turned aside"
+/>
 
 <CodeBlock
   adapter="c"

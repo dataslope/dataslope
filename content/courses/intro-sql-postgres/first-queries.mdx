@@ -28,6 +28,11 @@ On its own, it can do arithmetic and produce text. Run this:
 PostgreSQL evaluated `2 + 2` and handed back a one-row, one-column
 result containing `4`. You just ran a complete, valid SQL query.
 
+<Figure
+  slug="sql-first-queries-sql-can-run-inline-cutout"
+  alt="A slip pushed into a machine that has no board loaded, a single small block coming back out"
+/>
+
 ## Naming results with AS
 
 That last result column had an unhelpful auto-generated name. You
@@ -69,6 +74,11 @@ flowchart TD
 When you are just computing values, like `SELECT 2 + 2`, you can
 skip `FROM` entirely. The moment you want stored data, you add
 `FROM table_name`.
+
+<Figure
+  slug="sql-first-queries-inline-cutout"
+  alt="A request slip handed through a hatch and a small tray of rows coming back through the same hatch"
+/>
 
 <Callout type="info" title="SQL keywords and your style">
 SQL keywords like \`SELECT\` and \`FROM\` are not case-sensitive,

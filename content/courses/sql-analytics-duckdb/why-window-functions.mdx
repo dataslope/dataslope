@@ -90,6 +90,11 @@ the rows into one window **per region**, so each row gets *its own
 region's* total. This is the window-function echo of `GROUP BY`, but the
 rows stay.
 
+<Figure
+  slug="duck-why-window-functions-problem-group-by-inline-cutout"
+  alt="Chips collapsing into one summary block on one bench, and on the next the chips still standing each with its own tag"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Each order tagged with its region total"
@@ -279,3 +284,8 @@ The \`OVER\` clause is what makes an aggregate a window function.`}
 
 Now that the `OVER` clause makes sense, the next pages put it to work:
 ranking rows, then computing running totals and moving averages.
+
+<Figure
+  slug="duck-why-window-functions-inline-cutout"
+  alt="A pile of blocks collapsing into one summary block on the left, and on the right the same blocks still standing in their original row, each wearing its own small summary tag"
+/>

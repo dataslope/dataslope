@@ -17,6 +17,11 @@ does less work.
 `explain()` prints two plans. `optimized=False` shows what you wrote;
 the default shows what will actually run.
 
+<Figure
+  slug="pl-the-query-optimizer-reading-plan-inline-cutout"
+  alt="A folded plan opened out on a bench showing a chain of stations, one station visibly moved earlier than where it was drawn"
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
@@ -195,6 +200,11 @@ Three things block the optimizer, and all three are worth avoiding:
 - **Keep expressions expressions.** Anything expressible with
   `when/then`, `str`, `dt`, or arithmetic will be faster and visible
   to the planner than the same logic in Python.
+
+<Figure
+  slug="pl-the-query-optimizer-inline-cutout"
+  alt="A tangled route of pipes on the left being redrawn on a planning board in the middle into a short straight run on the right"
+/>
 
 <Callout type="info" title="show_graph, when the plan gets big">
 `q.show_graph()` renders the plan as a diagram instead of text. It

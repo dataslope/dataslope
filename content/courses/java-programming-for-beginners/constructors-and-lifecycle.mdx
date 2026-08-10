@@ -75,6 +75,11 @@ Two big problems:
    things happen.
 2. **Forgotten fields.** Nothing forces you to set every field.
 
+<Figure
+  slug="java-constructors-and-lifecycle-anatomy-constructor-inline-cutout"
+  alt="A crate on a bench whose compartments are filled in order before its lid will close"
+/>
+
 Constructors fix both. With `new Point(3, 4)`, an object is *born
 fully initialized*, in one atomic step.
 
@@ -186,6 +191,11 @@ An object moves through six stages, from creation to reclamation:
 6. **Garbage collection.** Eventually the JVM's garbage collector
    notices and reclaims the memory.
 
+<Figure
+  slug="java-constructors-and-lifecycle-inline-cutout"
+  alt="A crate stamped out of a template, filled at the next station, used at the third, and left empty on a trolley at the end of the bench"
+/>
+
 Steps 1-3 happen in milliseconds during `new`. Steps 4-6 happen over
 the program's lifetime.
 
@@ -227,6 +237,11 @@ handle, network socket, database connection), you must release it
 *explicitly*, usually with a `close()` method called inside a
 `try-with-resources` block. We will see that in the exceptions
 chapter.
+
+<Figure
+  slug="java-constructors-and-lifecycle-constructors-exist-inline-cutout"
+  alt="A crate leaving a press already filled and sealed, beside another leaving empty with its compartments still open"
+/>
 
 <MultipleChoice
   markdown={`Why do constructors not have a return type?

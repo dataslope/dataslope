@@ -50,6 +50,11 @@ When the first sort key ties, a second key breaks the tie. Analysts use
 this to organize a result meaningfully, e.g. newest-first within each
 region.
 
+<Figure
+  slug="duck-sorting-and-top-n-sorting-surfaces-extremes-inline-cutout"
+  alt="A jumbled row of blocks pushed into a rising staircase, the tallest and the shortest now at the two ends"
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Within each region, biggest orders first"
@@ -116,6 +121,11 @@ Two subtleties that quietly trip up analysts:
   `amount`, `LIMIT 5` returns *some* five of them, unpredictably. Add a
   tiebreaker column to `ORDER BY` to make results stable and reproducible,
   which matters for analysis you intend to repeat.
+
+<Figure
+  slug="duck-sorting-and-top-n-inline-cutout"
+  alt="A staircase of blocks with a bracket clamped over the highest four, the rest of the staircase outside the bracket"
+/>
 
 ```mermaid
 flowchart TD

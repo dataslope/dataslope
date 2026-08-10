@@ -92,6 +92,11 @@ The points are colored by drivetrain; the smoother, which never saw
 a mapping decides which layers it affects.** This is the lever behind
 most sophisticated ggplot figures.
 
+<Figure
+  slug="gg-layering-multiple-geoms-stacking-geoms-share-inline-cutout"
+  alt="Three transparent sheets lowered onto one another over the same tray of chips"
+/>
+
 ## Overriding inherited data for one layer
 
 A layer can also swap in different *data*. This is how you annotate or
@@ -121,6 +126,11 @@ ggplot(mpg, aes(displ, hwy)) +
 Three layers: all cars in grey, the standout cars re-emphasized in red,
 and text labels, the red layer and the text layer both override the
 base data with `best`, while still inheriting the `x`/`y` mappings.
+
+<Figure
+  slug="gg-layering-multiple-geoms-inline-cutout"
+  alt="Three transparent sheets lowered one onto another, chips on the first, a ribbon on the second, labels on the third"
+/>
 
 <Callout type="info" title="inherit.aes = FALSE">
 Occasionally a layer needs to ignore the base mappings entirely (common

@@ -19,6 +19,11 @@ Recall that `geom_bar()` needs only an x aesthetic, yet it produces
 bars with *heights*. Where do the heights come from? You never supplied
 a y.
 
+<Figure
+  slug="gg-every-geom-has-a-stat-inline-cutout"
+  alt="A hopper of loose chips feeding a small counting machine, and the counted result leaving it as a row of bars"
+/>
+
 <CodeBlock
   adapter="r"
   files={[
@@ -47,6 +52,11 @@ your raw data and the drawn marks:
 **Raw data (234 rows of `mpg`) → `stat_count` groups by `class` and
 counts → computed data (7 rows: `class` + `count`) → `geom_bar` draws a
 bar per row → bar chart.**
+
+<Figure
+  slug="gg-every-geom-has-a-stat-layer-pipeline-inline-cutout"
+  alt="A hopper of loose chips feeding a counting machine whose output feeds a drawing head"
+/>
 
 For a scatter plot the stat is `stat_identity`, it passes the data
 through *unchanged*, which is why `geom_point()` needs you to supply

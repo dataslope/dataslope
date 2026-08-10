@@ -22,6 +22,11 @@ These are not row-by-row conditions. They are conditions about **groups after ag
 
 `WHERE` runs before grouping. At that moment, there are only individual rows. There are no group totals yet, so `WHERE COUNT(*) > 2` does not make sense.
 
+<Figure
+  slug="lite-filtering-groups-where-filters-rows-inline-cutout"
+  alt="A grate placed before the press so single chips are stopped while whole trays are still forming"
+/>
+
 ```mermaid
 flowchart TD
     From["<code>FROM</code><br/>read rows"] --> Where["<code>WHERE</code><br/>filter individual rows"]
@@ -40,6 +45,11 @@ Think of it like making piles of receipts:
 ## HAVING filters groups
 
 `HAVING` runs after `GROUP BY`, so it can use aggregate functions such as `COUNT(*)`, `SUM(amount)`, and `AVG(salary)`.
+
+<Figure
+  slug="lite-filtering-groups-inline-cutout"
+  alt="Three summary blocks on their trays, one tray lifted away because its block falls short of a marked line"
+/>
 
 <SqlCodeBlock
   dialect="sqlite"

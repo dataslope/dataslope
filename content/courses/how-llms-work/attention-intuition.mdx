@@ -26,6 +26,11 @@ Now "it" is the suitcase. Nothing about the token "it" changed. The
 resolution depends on a relationship between "it", "big"/"small",
 "trophy", and "suitcase" all at once.
 
+<Figure
+  slug="llm-attention-intuition-inline-cutout"
+  alt="A row of chips along a rail, with cords of different thicknesses running from one chip back to three earlier ones, the thickest cord clearly heaviest"
+/>
+
 A model that processed tokens independently could never do this. It
 needs a way for each token's representation to be **updated using
 information from the other tokens**, weighted by how relevant each one
@@ -43,6 +48,11 @@ For each token, the model compares its query against every key,
 producing a relevance score per token. Those scores are turned into
 weights that sum to 1, and the token's new representation becomes a
 weighted sum of all the values.
+
+<Figure
+  slug="llm-attention-intuition-query-key-value-inline-cutout"
+  alt="One plain chip on a rail holding up a shaped template, a row of other plain chips each carrying a notch of a different shape, and the chip whose notch matches the template passing its block back along the rail"
+/>
 
 The mental image: every token asks a question, every token advertises
 what it knows, and each token builds an updated version of itself out

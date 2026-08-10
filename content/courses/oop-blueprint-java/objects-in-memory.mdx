@@ -53,6 +53,11 @@ This is where most beginners get a surprise. If you copy an object
 variable into another variable, you copy *the reference*, not the
 object itself. Both variables now point at the *same* heap object.
 
+<Figure
+  slug="oopj-objects-in-memory-two-regions-stack-inline-cutout"
+  alt="A name plate in a column of trays joined by a cord to a crate in an open yard"
+/>
+
 <CodeBlock
   adapter="java"
   files={[
@@ -211,6 +216,11 @@ method receives a *new local variable* (on its own stack frame) that
 points at the *same* heap object as the caller's variable. Changes the
 method makes to the object's fields are therefore visible to the
 caller.
+
+<Figure
+  slug="oopj-objects-in-memory-inline-cutout"
+  alt="A small name plate on the left joined by a cord to a crate standing in an open yard on the right, and a second plate pointing at the same crate"
+/>
 
 <CodeBlock
   adapter="java"

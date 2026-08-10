@@ -104,6 +104,11 @@ print("Both recovered the true coefficients closely. The model 'learned the rule
   `d` times**, with forecasts integrated back. That `d` is what lets ARIMA
   handle the non-stationary, trending series we actually have.
 
+<Figure
+  slug="tsa-arima-models-inline-cutout"
+  alt="Three small machines feeding one output, one looking back at past values, one at past errors, one at the trend"
+/>
+
 ```mermaid
 flowchart LR
     P["AR(p): regress on<br/>p past VALUES"] --> M["ARIMA(p, d, q)"]
@@ -145,6 +150,11 @@ flowchart TD
 And what a forecast actually claims. The line is one number per step;
 the cone is the interval, and it widens as the square root of the
 horizon.
+
+<Figure
+  slug="tsa-arima-models-fitting-forecasting-inline-cutout"
+  alt="A wave running along a rail and continuing past its last sleeper as a lighter dotted extension"
+/>
 
 <Chart slug="forecast-uncertainty-cone" />
 
@@ -281,6 +291,11 @@ A fitted model's residuals (`actual - fitted`) should look like **white
 noise**, no leftover autocorrelation, roughly normal, constant variance. If
 the residuals still have structure, the model missed something. statsmodels
 bundles the standard four-panel check.
+
+<Figure
+  slug="tsa-arima-models-two-ingredients-ar-inline-cutout"
+  alt="Two machines feeding one output, one looking back at past blocks and one at past mistakes"
+/>
 
 <CodeBlock
   adapter="python"

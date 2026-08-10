@@ -45,6 +45,7 @@ import type { MDXComponents } from "mdx/types";
 import { SvgLabel } from "@/app/_components/mdx/SvgLabel";
 import { Figure } from "@/app/_components/mdx/Figure";
 import { Chart } from "@/app/_components/mdx/Chart";
+import { CalloutWithCodeTitle } from "@/app/_components/mdx/CalloutWithCodeTitle";
 import { reactDemoComponents } from "@/app/_components/mdx/reactDemoComponents";
 import { withSearchAnchor } from "@/app/_components/mdx/withSearchAnchor";
 // Interactive widgets, one async chunk each. The `dynamic()` calls live in
@@ -77,7 +78,10 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     SqlChallengeCard: withSearchAnchor(MdxSqlChallengeCard),
     SqlCodeBlock: withSearchAnchor(MdxSqlCodeBlock),
     MultipleChoice: withSearchAnchor(MdxMultipleChoiceQuestion),
-    Callout: withSearchAnchor(defaultMdxComponents.Callout),
+    // Not fumadocs' Callout directly: `title` is a JSX attribute, so MDX
+    // passes it as a plain string and backticks in it stayed literal on the
+    // page. See CalloutWithCodeTitle for why only code spans are parsed.
+    Callout: withSearchAnchor(CalloutWithCodeTitle),
     Mermaid,
     SvgLabel,
     IllustrationPrompt,

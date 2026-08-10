@@ -69,6 +69,11 @@ a new *language* feature with two distinct ideas:
    `List<String>`, the *compile* fails, before the program even
    runs.
 
+<Figure
+  slug="jcol-the-generics-revolution-world-looked-like-inline-cutout"
+  alt="A crate of mixed shapes with every item needing to be measured by hand as it comes out"
+/>
+
 |  | Pre-generics (Java 1.4) | Generics (Java 5+) |
 | --- | --- | --- |
 | **Declaration** | `List names = new ArrayList()` | `List<String> names = new ArrayList<>()` |
@@ -188,6 +193,12 @@ took what he learned about bolting a sophisticated type system onto
 the JVM and went on to create **Scala**; Wadler had earlier helped
 design Haskell. Java's generics have a serious pedigree.) The
 erasure decision has consequences we'll meet two pages from now.
+
+<Figure
+  slug="jcol-generics-revolution-gj-cutout"
+  alt="A box carried through a gate that clamps a coloured tag onto it, arriving on the far side with the tag gone"
+  caption="GJ, 1998: check the types at compile time, then erase them, so every existing class file keeps working."
+/>
 
 ## Why generic *types* and not just generic *methods*?
 

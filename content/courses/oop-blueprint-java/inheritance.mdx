@@ -227,6 +227,11 @@ flowchart LR
 good reason; if anyone could subclass `String` and break its rules,
 the entire JVM's security model would collapse.
 
+<Figure
+  slug="oopj-inheritance-first-family-inline-cutout"
+  alt="One base cabinet with two cabinets behind it built on the same frame"
+/>
+
 ## The trap: inheritance is *strong* coupling
 
 The reason the GoF say *"favor composition over inheritance"* is not
@@ -235,6 +240,11 @@ subclass depends on its parent's internal design. If the parent
 changes how it stores its data or which methods it calls internally,
 subclasses can break in surprising ways. This is sometimes called the
 **fragile base class problem**.
+
+<Figure
+  slug="oopj-inheritance-inline-cutout"
+  alt="A base cabinet with three cabinets standing behind it, each keeping the base's frame and adding one part of its own"
+/>
 
 ```mermaid
 flowchart TB

@@ -49,6 +49,11 @@ manager. In a category tree, the root category has no parent.
 A self-reference is still just a foreign key. The referenced table
 happens to be the same table.
 
+<Figure
+  slug="db-self-referencing-relationships-one-table-two-inline-cutout"
+  alt="One crate with a cord that leaves it and returns to another crate of exactly the same kind"
+/>
+
 ```mermaid
 flowchart TD
     Child["employees.<code>manager_id</code> = 2<br/>Mina's row"] -->|"FK → PK"| Parent["<code>employees.id = 2</code><br/>Grace's row"]
@@ -141,6 +146,11 @@ a model of a digital music store, stores its staff in a single
 `employee_id`. The whole org chart lives in one table. Run the query
 and read the result from the top down: the general manager has no
 manager, and everyone else's `reports_to` chain ends at him.
+
+<Figure
+  slug="db-self-referencing-relationships-inline-cutout"
+  alt="One crate with a cord that leaves it and comes back to another crate of the very same kind"
+/>
 
 <SqlCodeBlock
   dialect="postgres"

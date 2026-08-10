@@ -26,6 +26,11 @@ Noise looks like a flat spectrum. Music looks like a moving cloud
 of peaks. Once you can see a signal in frequency space, filtering
 and analysis become almost trivial.
 
+<Figure
+  slug="scipy-signal-processing-big-idea-time-inline-cutout"
+  alt="A wave running along a bench and the same wave shown as a row of bars of different heights"
+/>
+
 ```mermaid
 flowchart TD
     Time["signal x(t)"] -- FFT --> Freq["spectrum X(f)"]
@@ -244,6 +249,11 @@ Why **`sosfiltfilt`** instead of `lfilter`?
 Real signals change over time. A single FFT averages the whole
 duration; a **spectrogram** slides a windowed FFT along the signal
 to show how its frequency content evolves.
+
+<Figure
+  slug="scipy-signal-processing-inline-cutout"
+  alt="A jagged wave passing through a boxed filter and leaving as a smooth wave of the same overall shape"
+/>
 
 <CodeBlock
   adapter="python"

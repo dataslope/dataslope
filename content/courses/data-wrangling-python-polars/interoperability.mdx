@@ -102,6 +102,11 @@ A single numeric column with no nulls converts without copying,
 because Arrow's values buffer already has NumPy's layout. Nulls, or
 any string column, force a copy.
 
+<Figure
+  slug="pl-interoperability-numpy-inline-cutout"
+  alt="One column of blocks lifted from a board and set into a plain unlabelled rail beside it"
+/>
+
 ## Arrow
 
 <CodeBlock
@@ -206,6 +211,11 @@ Try it yourself before reading on. Convert the frame to pandas twice, once
 with the default NumPy-backed conversion and once with
 `use_pyarrow_extension_array=True`, and compare what happened to the integer
 column that contains a null.
+
+<Figure
+  slug="pl-interoperability-pandas-both-directions-inline-cutout"
+  alt="Two benches joined by a short chute that runs equally well in either direction, a tray passing along it"
+/>
 
 ```python
 import polars as pl

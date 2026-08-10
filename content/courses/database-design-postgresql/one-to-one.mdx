@@ -16,6 +16,11 @@ one-row-to-one-row connection.
 That is a **one-to-one relationship**. It is rarer, but useful when a
 separate table makes the design clearer or safer.
 
+<Figure
+  slug="db-one-to-one-split-one-one-inline-cutout"
+  alt="One very deep crate cut into two shallower crates joined by a single short bar"
+/>
+
 ## Why split a one-to-one?
 
 Imagine a `users` table that starts small, then grows a large set of
@@ -105,6 +110,11 @@ One-to-one needs both a reference and a uniqueness rule on that reference.`}
 
 This example models optional user profiles. Ada and Grace are users;
 Ada has a profile, and Grace does not yet.
+
+<Figure
+  slug="db-one-to-one-inline-cutout"
+  alt="Two crates facing each other joined by a single short bar, with no free sockets left on either side"
+/>
 
 <SqlCodeBlock
   dialect="postgres"
