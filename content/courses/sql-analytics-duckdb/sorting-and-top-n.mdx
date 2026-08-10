@@ -144,6 +144,12 @@ question analysts actually ask, and a plain `LIMIT` cannot do it, because
 pairs a window function (which you will meet properly soon) with
 **`QUALIFY`**, a filter on the window result.
 
+<Figure
+  slug="duck-sorting-and-top-n-per-group-top-n-inline-cutout"
+  alt="Three separate shelves each having its own top two items lifted off, rather than the top two of the whole room"
+  caption="`LIMIT` takes the top of the whole table; `QUALIFY` takes the top of each group."
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="The two most expensive diamonds in each cut"

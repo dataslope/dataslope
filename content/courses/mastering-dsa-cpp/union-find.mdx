@@ -130,6 +130,12 @@ int main() {
 
 The second fix prevents bad trees from forming in the first place. Long chains appear when `unite` carelessly hangs a tall tree under a short one. So don't: **union by rank** attaches the shallower tree under the deeper, and **union by size** attaches the smaller set under the larger. Either rule alone caps tree height at $O(\log n)$.
 
+<Figure
+  slug="dsa-union-find-union-by-rank-size-inline-cutout"
+  alt="Two trees joined by hanging the shorter one beneath the taller, keeping the whole thing flat"
+  caption="Hang the shorter tree under the taller and the structure never grows deep."
+/>
+
 ```mermaid
 graph TD
     Q{"unite roots ra, rb"}

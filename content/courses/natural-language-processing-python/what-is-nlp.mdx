@@ -57,6 +57,12 @@ is there. A computer has no such instincts. It is worth seeing the main
 kinds of ambiguity explicitly, because nearly every NLP technique exists to
 fight one of them.
 
+<Figure
+  slug="nlp-what-is-nlp-hard-ambiguity-everywhere-inline-cutout"
+  alt="One written slip that seats equally well in two differently shaped sockets, with no way to tell which was meant"
+  caption="One sentence with two readings is ordinary in human language and fatal to a formal parser."
+/>
+
 ```mermaid
 flowchart TD
     A["Ambiguity in text"] --> B["Lexical<br/>one word, many meanings"]
@@ -122,6 +128,12 @@ Your instinct, as a Python programmer, is probably to reach for
 `text.split()` to break a sentence into words. It is a reasonable first
 guess, and seeing exactly where it fails is the perfect motivation for what
 comes next. Run this and read the output carefully.
+
+<Figure
+  slug="nlp-what-is-nlp-first-look-split-not-inline-cutout"
+  alt="A strip of writing pulled apart at every gap, leaving pieces with punctuation still stuck to their ends"
+  caption="A real tokenizer peels off punctuation and splits contractions that a space never sees."
+/>
 
 <CodeBlock
   adapter="python"
@@ -248,6 +260,12 @@ honest.
 There are two broad strategies for handling language, and this course leans
 firmly toward the first.
 
+<Figure
+  slug="nlp-what-is-nlp-rules-versus-learning-brief-inline-cutout"
+  alt="A hand-cut stencil beside a machine cutting its own stencil from a pile of worked examples"
+  caption="Rules encode what somebody already knows; learning derives it from labelled examples."
+/>
+
 **Rule-based / algorithmic** approaches encode human knowledge directly: a
 list of stopwords, a set of suffix-stripping rules for stemming, a dictionary
 of positive and negative words for sentiment. They are transparent, you can
@@ -285,6 +303,12 @@ power tools you use every day:
   and negative language.
 - **Plagiarism and duplicate detection** compare normalized word sets and
   n-grams between documents.
+
+<Figure
+  slug="nlp-what-is-nlp-where-nlp-shows-up-inline-cutout"
+  alt="A loading bay of raw sacks emptied, sorted and squared into uniform pieces before the fine work begins"
+  caption="Before any of the clever parts, the raw text has to become comparable units."
+/>
 
 In every case, the first thing that happens, before any cleverness, is the
 unglamorous work of turning raw text into clean, comparable units. That is

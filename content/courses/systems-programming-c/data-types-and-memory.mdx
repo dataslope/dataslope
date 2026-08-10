@@ -198,6 +198,12 @@ memory:
 - **Big-endian** (older PowerPC, network byte order): the *most*
   significant byte first, `12 34 56 78`.
 
+<Figure
+  slug="sysc-data-types-and-memory-endianness-which-byte-comes-inline-cutout"
+  alt="The same four-part value loaded into a rail from the low end on one machine and from the high end on another"
+  caption="Little-endian stores the low byte first, which matters the moment bytes leave the machine."
+/>
+
 Laid out byte by byte at increasing addresses:
 
 ```text

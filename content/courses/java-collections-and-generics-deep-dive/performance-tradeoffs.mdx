@@ -47,6 +47,12 @@ Modern CPUs are *much* faster than memory. A linear walk over a
 contiguous array hits L1 cache on almost every access; a walk over a
 linked list jumps to random addresses and stalls on cache misses.
 
+<Figure
+  slug="jcol-performance-tradeoffs-big-o-not-whole-inline-cutout"
+  alt="One long unbroken shelf walked end to end, beside the same items scattered across a room joined by cords"
+  caption="A contiguous walk beats pointer-chasing badly enough to overturn the complexity on paper."
+/>
+
 For most workloads, **a slower-on-paper `ArrayList` beats a
 faster-on-paper `LinkedList`.** Real-world middle-insertion has to
 be enormous and frequent for the linked list to win. The verdict

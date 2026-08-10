@@ -166,6 +166,12 @@ ROW`. You can change the frame to a **sliding window**, say, the current
 row plus the two before it, to compute a **moving average** that smooths
 out noise.
 
+<Figure
+  slug="duck-running-totals-and-moving-averages-window-frame-moving-averages-inline-cutout"
+  alt="A hooded scoop passing along a row of marks, holding only a fixed number of them at any one moment"
+  caption="The frame decides how much of the past each row sees, and a fixed frame is a moving average."
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="3-day moving average"

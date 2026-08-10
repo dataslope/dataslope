@@ -40,6 +40,12 @@ scratch with the layered `+` syntax you use today. The original
 in conversation, they almost always mean ggplot2, the "2" has faded
 into a quirk of the name.
 
+<Figure
+  slug="gg-interesting-discussions-little-more-on-2-inline-cutout"
+  alt="A second, cleaner plotting arm lifted onto the bench in place of the first"
+  caption="The 2 is a version number: the second implementation of the grammar, not of the package."
+/>
+
 ## The penguins you have been plotting
 
 Several examples in this course use the **Palmer Penguins** data set,
@@ -53,6 +59,12 @@ to its author's promotion of eugenics. Penguins do the same teaching
 job (three groups, several numeric measurements that separate them) with
 a far better backstory, which is why the visualization community
 adopted them so quickly.
+
+<Figure
+  slug="gg-interesting-discussions-penguins-have-been-plotting-inline-cutout"
+  alt="Three groups of measured cards from a cold field station, each group tagged with a different mark and a penguin standing beside them"
+  caption="Three species measured at a research station, and the data set half this course runs on."
+/>
 
 <CodeBlock adapter="r"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -71,6 +83,12 @@ called **Anscombe's quartet**, engineered to share nearly identical
 summary statistics. Each of the four has the *same* mean of x, mean of
 y, variance, correlation, and best-fit regression line, to two decimal
 places. By the numbers, they are indistinguishable.
+
+<Figure
+  slug="gg-interesting-discussions-anscombe-s-quartet-case-inline-cutout"
+  alt="Four small boards of scattered marks whose measuring gauges all read exactly the same"
+  caption="Anscombe, 1973: four data sets with identical statistics and four different pictures."
+/>
 
 Plot them, and they could not be more different.
 
@@ -143,6 +161,12 @@ ggplot2 itself. But in real projects you will usually see data prepared
 with `dplyr`/`tidyr` and then piped straight into `ggplot()`, and the
 [Next Steps](/courses/mastering-ggplot2/next-steps) page shows that
 pattern.
+
+<Figure
+  slug="gg-interesting-discussions-ggplot2-tidyverse-inline-cutout"
+  alt="A family of tools cut to one common fitting, any of them able to hand work straight to the next"
+  caption="Shared conventions are what let the output of one package be the input of the next."
+/>
 
 <MultipleChoice
   markdown={`What is the main lesson of Anscombe's quartet?

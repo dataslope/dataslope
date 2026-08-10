@@ -49,6 +49,12 @@ methods all over the JDK are declared in terms of `List`, `Set`,
 Here is the **shape** of the framework. Memorize this diagram, every
 remaining page in the course refers to some corner of it.
 
+<Figure
+  slug="jcol-the-collections-framework-interface-hierarchy-inline-cutout"
+  alt="A family of sockets that all take the same plug, and one socket set apart from them shaped to take a pair"
+  caption="Collections share one shape, and `Map` sits apart because it holds pairs, not elements."
+/>
+
 ```mermaid
 classDiagram
     Iterable <|-- Collection
@@ -135,6 +141,12 @@ The vocabulary of the JCF is small and worth saying out loud:
 You will reach for the *names on the left* in your method signatures.
 The implementations come next.
 
+<Figure
+  slug="jcol-the-collections-framework-first-multi-file-example-inline-cutout"
+  alt="One bench that takes any container with the right collar, the containers behind it swapped without the bench being touched"
+  caption="Take a `List` rather than an `ArrayList` and the caller keeps the choice."
+/>
+
 ## The default implementations
 
 For each interface, the JCF ships one (sometimes two) production-grade
@@ -156,6 +168,12 @@ course:
 
 Each implementation has its own performance and memory profile. We
 will earn that table over many pages, for now, it's a road map.
+
+<Figure
+  slug="jcol-the-collections-framework-default-implementations-inline-cutout"
+  alt="One shelf holding a single well-made container for each shape of socket on the wall behind it"
+  caption="One production-grade implementation per interface is what you will reach for by default."
+/>
 
 ## Programming to the interface
 
@@ -206,6 +224,12 @@ callers with a `LinkedList` would have been stuck. By accepting
 `List<String>`, the method gains *every* present and future `List`
 implementation for free.
 
+<Figure
+  slug="jcol-the-collections-framework-programming-interface-inline-cutout"
+  alt="One socket taking three differently built plugs because all three carry the same collar at the tip"
+  caption="Accept the interface and callers may hand you any implementation of it."
+/>
+
 ## The Collections utility class
 
 A second hallmark of the framework is that **algorithms live
@@ -213,6 +237,12 @@ separately from data structures**. The class `java.util.Collections`
 holds static helpers, `sort()`, `shuffle()`, `reverse()`,
 `unmodifiableList()`, `frequency()`, `min`, `max`, that work on any
 matching collection.
+
+<Figure
+  slug="jcol-the-collections-framework-collections-utility-class-inline-cutout"
+  alt="A rack of differently shaped containers beside one shelf of shared tools, each tool reaching into any of them"
+  caption="Sorting and shuffling are written once and work on any collection that fits the interface."
+/>
 
 <CodeBlock
   adapter="java"
@@ -259,6 +289,12 @@ on user-written `List` implementations, anything that says "I am a
 The JCF replaced `Enumeration` with `Iterator`, which adds one
 crucial method: `remove()`. It also became the basis of the
 for-each loop in Java 5.
+
+<Figure
+  slug="jcol-the-collections-framework-iterator-real-walking-protocol-inline-cutout"
+  alt="A hooked arm walking a row of items one at a time, able to lift one out as it passes"
+  caption="One item at a time, with the option to remove the one just handed to you."
+/>
 
 <CodeBlock
   adapter="java"

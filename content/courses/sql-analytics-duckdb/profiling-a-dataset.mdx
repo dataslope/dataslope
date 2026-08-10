@@ -167,6 +167,12 @@ One line of intent, a complete profile of ten columns. Scan the `min` and
 file than scrolling it for an hour would tell you. `SUMMARIZE()` is the
 first thing many DuckDB analysts type when they meet a new dataset.
 
+<Figure
+  slug="duck-profiling-a-dataset-shortcut-summarize-inline-cutout"
+  alt="One lever that prints a full row of readings for every column of a cabinet at once"
+  caption="`SUMMARIZE()` runs the whole profiling checklist over every column in one statement."
+/>
+
 ```mermaid
 flowchart TD
     S["SUMMARIZE table"] --> R["Per-column report:<br/>count, distinct,<br/>null %, min, max,<br/>avg, quantiles"]

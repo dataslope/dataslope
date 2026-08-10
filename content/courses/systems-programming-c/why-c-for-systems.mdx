@@ -115,6 +115,12 @@ coercions, reference counts, and a method dispatch through a hash
 table. In C, `a + b` for two `int`s usually compiles to a single CPU
 instruction.
 
+<Figure
+  slug="sysc-why-c-for-systems-portable-assembly-inline-cutout"
+  alt="One short instruction card driving a single machine stroke, beside a card that sets off a long chain of smaller machines"
+  caption="In C one line usually becomes one instruction, which is what makes the cost visible."
+/>
+
 <CodeBlock
   adapter="c"
   files={[

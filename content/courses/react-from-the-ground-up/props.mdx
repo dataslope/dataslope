@@ -134,6 +134,12 @@ data flow (and React would ignore the change anyway). If a value needs
 to change over time, that's **state**, the next topic. Props are for
 data a component *receives*; state is for data a component *owns*.
 
+<Figure
+  slug="rx-props-props-read-only-inline-cutout"
+  alt="A tray handed down from a shelf above, the receiving hands able to read what is on it but not to move anything"
+  caption="A child may read its props and never write them, which is what keeps the flow one-way."
+/>
+
 <Callout type="info" title="Default values">
 Give a prop a default with normal JavaScript defaults during
 destructuring: `function Badge({ tone = "info" }: { tone?: string })`.

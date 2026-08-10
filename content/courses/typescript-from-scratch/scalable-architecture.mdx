@@ -44,6 +44,12 @@ A **layered architecture** divides code into three (or more) layers:
 
 Dependencies flow in one direction: Infrastructure → Application → Domain. The domain knows nothing about infrastructure.
 
+<Figure
+  slug="tsx-scalable-architecture-monorepo-type-sharing-teaser-inline-cutout"
+  alt="One shared drawer of shapes drawn on by three separate workshops in the same building"
+  caption="Shared types are how separate packages keep speaking the same language across layers."
+/>
+
 ```mermaid
 graph TD
     A[Infrastructure Layer<br/>Database, HTTP, File System] --> B[Application Layer<br/>Use Cases, Orchestration]
@@ -103,6 +109,12 @@ Notice:
 ## Application Layer: Use Cases
 
 The application layer orchestrates domain logic to fulfill use cases. It defines *interfaces* (contracts) for infrastructure, but doesn't implement them.
+
+<Figure
+  slug="tsx-scalable-architecture-application-layer-use-cases-inline-cutout"
+  alt="An inner ring holding the rules with every outside connection plugged into its rim rather than reaching through it"
+  caption="The use cases hold the rules, and everything at the edge plugs into them."
+/>
 
 <CodeBlock
   adapter="typescript"
@@ -187,6 +199,12 @@ graph LR
 ## Dependency Inversion in TypeScript
 
 Dependency inversion is simple in TypeScript: define an interface (or a function type) in the application layer, and require implementations to match.
+
+<Figure
+  slug="tsx-scalable-architecture-dependency-inversion-typescript-inline-cutout"
+  alt="An inner room describing the socket it needs, with the outer wall built to fit that socket"
+  caption="The core declares the interface it needs, and the outside layer supplies something matching."
+/>
 
 <CodeBlock
   adapter="typescript"

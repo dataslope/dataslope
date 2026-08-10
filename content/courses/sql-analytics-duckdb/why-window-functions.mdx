@@ -51,6 +51,12 @@ Any aggregate becomes a window function when you add an `OVER (...)`
 clause. `SUM(amount)` collapses; `SUM(amount) OVER (...)` does **not**,
 it computes a sum over a "window" of rows and writes it onto each row.
 
+<Figure
+  slug="duck-why-window-functions-over-clause-makes-window-inline-cutout"
+  alt="An aggregate that leaves every row standing and writes its total alongside, instead of collapsing them into one"
+  caption="`OVER` is what stops an aggregate collapsing the rows it summarises."
+/>
+
 Start with the simplest possible window: `OVER ()` with empty parentheses
 means "the whole result set is one window." Every row gets the grand
 total beside it.

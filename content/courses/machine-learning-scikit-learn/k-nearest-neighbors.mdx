@@ -205,6 +205,12 @@ across features. If one feature ranges over 0–1000 and another over 0–1,
 the large-range feature utterly dominates the distance, and the small one
 is ignored, no matter how informative it actually is.
 
+<Figure
+  slug="ml-k-nearest-neighbors-make-break-issue-feature-inline-cutout"
+  alt="A compass whose one long arm swamps the short one, the pair then trimmed until both arms match"
+  caption="Nearest depends on the units, so an unscaled column decides every neighbour."
+/>
+
 Let us prove it. We will build a dataset with one genuinely useful feature
 measured in *small* units and one pure-noise feature measured in *huge*
 units, then run KNN with and without scaling.

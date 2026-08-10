@@ -391,6 +391,12 @@ not by position. Add two series and pandas matches March-to-March,
 April-to-April, even if they're in different orders or have different
 lengths. Where a label is missing on one side, the result is `NaN`.
 
+<Figure
+  slug="tsa-the-pandas-timeline-quiet-hero-automatic-alignment-inline-cutout"
+  alt="Two runs of dated cards laid together by their dates rather than by their positions, gaps left where a date is missing on one side"
+  caption="Pandas pairs values by index, not by position, which is why misaligned dates show as gaps."
+/>
+
 ```mermaid
 flowchart TD
     A["Series A<br/>Jan-01, Jan-02, Jan-03"] --> U["Align on the union<br/>of the two indices"]

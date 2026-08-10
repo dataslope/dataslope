@@ -86,6 +86,12 @@ is `undefined`, then `order.customer.address` will throw a
 `TypeError: Cannot read properties of undefined (reading 'address')`.
 A classic source of beginner crashes.
 
+<Figure
+  slug="js-nested-data-reading-deep-paths-inline-cutout"
+  alt="A chain of hooks reached down one at a time, one hook missing halfway and the reach stopping there"
+  caption="One missing link partway down is what makes a deep path throw."
+/>
+
 ### Optional chaining: `?.`
 
 Modern JavaScript has a special operator for safe navigation. If

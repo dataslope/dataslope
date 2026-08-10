@@ -100,6 +100,12 @@ The compiler tracks the control flow and **narrows** `s` from `string | null` to
 
 When you have a discriminated union and switch on the discriminant, the compiler checks that you've handled every case. If you add a new variant and forget to handle it, the compiler catches it.
 
+<Figure
+  slug="tsx-static-analysis-in-action-exhaustiveness-checking-inline-cutout"
+  alt="A rack with every slot filled and one narrow empty slot left at the end that nothing on the bench can fit"
+  caption="Handle every case and the default branch has type `never`, which nothing can be assigned to."
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -160,6 +166,12 @@ The compiler forces you to add a `case "triangle"` branch. This guarantees you w
 
 One of TypeScript's superpowers is **refactoring confidence**. When you rename a type, function, or property, the compiler finds every usage and tells you what to update.
 
+<Figure
+  slug="tsx-static-analysis-in-action-refactor-safety-inline-cutout"
+  alt="One part renamed at its source and every place that reached for it lighting up at the same moment"
+  caption="Rename at the source and every stale reference becomes a compile error, not a runtime one."
+/>
+
 Let's see a refactor in action:
 
 <CodeBlock
@@ -193,6 +205,12 @@ Suppose you rename `fullName` to `name`. Every place that accesses `.fullName` b
 ## The Pipeline, Revisited
 
 Back in [How TypeScript Works](./how-typescript-works), near the very start of the course, we walked through the compiler's stages, scanner, parser, binder, checker, emitter, when most of them were still abstractions. Now you can read the same diagram with different eyes: every guarantee on this page is the **Checker** doing its job, and everything you've learned since (narrowing, discriminated unions, generics, mapped types) is vocabulary the checker reasons in.
+
+<Figure
+  slug="tsx-static-analysis-in-action-pipeline-revisited-inline-cutout"
+  alt="One gauge feeding two outputs, the left taken once at the end of a run and the right taken again after every touch"
+  caption="The emitter reads the checker once per build; the editor reads it on every keystroke."
+/>
 
 ```mermaid
 graph TD
@@ -266,6 +284,12 @@ console.log(user1, user2);
 />
 
 The compiler tells you exactly which call sites need updating. No manual search, no chance of missing one. This scales to codebases with hundreds of thousands of lines.
+
+<Figure
+  slug="tsx-static-analysis-in-action-null-safety-strictnullchecks-inline-cutout"
+  alt="A part of two possible shapes passing a gate that admits only one of them, and leaving as that single shape"
+  caption="After the null check the compiler knows the type is narrower, and lets you use it."
+/>
 
 ---
 

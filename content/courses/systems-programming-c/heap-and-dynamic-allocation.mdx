@@ -252,6 +252,12 @@ contains the whole growth strategy, when the array is full, double
 the capacity with `realloc()` (using the safe temporary pattern from
 above), then append.
 
+<Figure
+  slug="sysc-heap-and-dynamic-allocation-building-dynamic-array-mini-inline-cutout"
+  alt="A tray that copies itself into a larger tray the moment it fills, the old tray tipped out behind it"
+  caption="Double the capacity when it fills, and the copy is rare enough to amortize away."
+/>
+
 <CodeBlock
   adapter="c"
   files={[

@@ -93,6 +93,12 @@ binding*. This is not a deep guarantee, the underlying object is
 the same as a mutable one at runtime, but it is enough to catch a
 huge category of bugs at compile time.
 
+<Figure
+  slug="fp-typescript-meets-fp-immutability-through-readonly-as-inline-cutout"
+  alt="A handle that will not turn beside an open access hatch on the far side of the same case"
+  caption="`readonly` stops writes through this binding, and nothing deeper than that."
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -220,6 +226,12 @@ compiler will *prove* this `switch` is complete".
 Most useful FP abstractions are *generic*. They work for any inner
 type, with no extra runtime cost.
 
+<Figure
+  slug="fp-typescript-meets-fp-generics-types-as-parameters-inline-cutout"
+  alt="One jig with an adjustable throat, taking a different size of stock each time without being rebuilt"
+  caption="Write the combinator once and let the caller supply the type it works over."
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -254,6 +266,12 @@ shape, and the compiler still tracks the types end-to-end.
 We'll spend a whole chapter on this later, but here is a tiny preview
 of what type-driven design feels like when all three pieces, sum
 types, generics, exhaustiveness, come together.
+
+<Figure
+  slug="fp-typescript-meets-fp-multi-file-preview-separating-inline-cutout"
+  alt="A clean inner room of sealed parts with every tap and drain fitted on the outer wall"
+  caption="Pure functions in the middle, and everything that touches the world at the edge."
+/>
 
 <CodeBlock
   adapter="typescript"

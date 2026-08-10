@@ -254,6 +254,12 @@ the fan-out, and the result set looks perfectly ordinary:
 
 A value like `grade` or `enrolled_on` belongs on `enrollments`, because it describes a particular student-course pairing. Ada's grade in Math is not just a fact about Ada, and it is not just a fact about Math. It is a fact about Ada taking Math.
 
+<Figure
+  slug="lite-many-to-many-junction-tables-can-hold-inline-cutout"
+  alt="A cord running between two crates with a small tag of its own hanging from it, holding a fact that belongs to neither end"
+  caption="A grade belongs to the pairing of student and course, so it lives on the junction table."
+/>
+
 <SqlCodeBlock
   dialect="sqlite"
   title="Store relationship details on the junction row"

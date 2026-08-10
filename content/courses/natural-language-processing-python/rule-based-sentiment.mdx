@@ -60,6 +60,12 @@ Let us start with the obvious version: count positive words, count negative
 words, compare. It will work on simple sentences and then fail in a way you can
 now predict.
 
+<Figure
+  slug="nlp-rule-based-sentiment-naive-first-attempt-fails-inline-cutout"
+  alt="A tally counting one favourable word while the small reversing flag standing in front of it goes unread"
+  caption="Counting positive words scores not good as positive, because it never reads the not."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -127,6 +133,12 @@ The fix is to track whether the previous token was a negation and, if so, flip
 the polarity of the next sentiment word. We also reset the negation at
 punctuation, so it does not bleed across clauses. This is a tiny amount of
 "local order" awareness, the same insight behind n-grams.
+
+<Figure
+  slug="nlp-rule-based-sentiment-adding-negation-handling-inline-cutout"
+  alt="A small flag standing on a rail that flips the sign of every chip passing behind it"
+  caption="One negation flag flips the score of everything it governs, and not bad becomes positive."
+/>
 
 <CodeBlock
   adapter="python"
@@ -222,6 +234,12 @@ ceilings you should respect:
   typos, and new expressions slip through.
 - **Intensity and mixed opinion.** "good" and "phenomenal" both score +1; a
   review that is half-praise, half-complaint nets out to a muddle.
+
+<Figure
+  slug="nlp-rule-based-sentiment-limits-rules-graduate-learning-inline-cutout"
+  alt="A hand-written list of word cards failing on a phrase nobody anticipated, beside a machine reading its way through a stack of examples"
+  caption="A hand-written lexicon meets a phrase nobody anticipated, which is where learning starts."
+/>
 
 These limits are *why* machine-learning approaches exist: instead of a
 hand-written lexicon, they **learn** word sentiment (and more) from thousands of

@@ -56,6 +56,12 @@ C++ lets you write very fast code, but speed comes from clear choices: good data
 
 The **Standard Template Library (STL)** gives you production-quality containers and algorithms that are available in every standard C++ environment. Instead of hand-writing a heap or hash table for every problem, you can focus on choosing the right abstraction.
 
+<Figure
+  slug="dsa-why-cpp-for-dsa-stl-algorithm-toolbox-inline-cutout"
+  alt="A drawer of finished tools beside a bench of hand-cut parts, the drawer's tools already the shape of the work"
+  caption="The STL usually already holds the container and the algorithm you were about to write."
+/>
+
 | STL type | Typical use | Key operations |
 | --- | --- | --- |
 | `std::vector` | Dynamic array | index $O(1)$, push back $O(1)$ amortized |
@@ -98,6 +104,12 @@ int main() {
 ## Closeness to memory makes DSA visible
 
 Many data structure tradeoffs are really memory-layout tradeoffs. A `std::vector<int>` stores integers contiguously, so walking through it usually benefits from CPU cache locality. A `std::list<int>` stores nodes separately, so traversal follows pointers from one allocation to the next.
+
+<Figure
+  slug="dsa-why-cpp-for-dsa-closeness-memory-makes-dsa-inline-cutout"
+  alt="A strip of identical cells in a row with a caliper spanning two neighbours and reading the gap between them"
+  caption="Neighbouring elements sit a fixed number of bytes apart, and C++ lets you check it."
+/>
 
 | Container | Memory layout | Consequence |
 | --- | --- | --- |
@@ -170,6 +182,12 @@ Try calling `bigger("heap", "graph")` without the `std::string` wrappers. It sti
 
 Here is a tiny program that pulls the pieces together: build a vector, sort it with `std::sort()`, print the result, and time the sort with `<chrono>`. Measuring is a habit worth forming early, this course will keep asking you to check claims against the clock.
 
+<Figure
+  slug="dsa-why-cpp-for-dsa-small-end-end-example-inline-cutout"
+  alt="A heap of loose blocks poured into a sorter and leaving in order, a stopwatch resting beside the chute"
+  caption="Build, sort, print, time: the whole toolkit in one short program."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -207,6 +225,12 @@ int main() {
 ## Language landscape
 
 No language is best at everything, and honest comparison beats advocacy. Python lets you sketch an algorithm in half the lines; Java's collections are excellent and garbage collection removes a whole class of bugs. C++ is popular for DSA because it sits near the performance end while still providing a rich standard library, and because what you learn about memory in C++ transfers to every other language you will ever use.
+
+<Figure
+  slug="dsa-why-cpp-for-dsa-language-landscape-inline-cutout"
+  alt="Three benches side by side, each one quickest at a different stage of the same job"
+  caption="No language wins everywhere, and honest comparison beats advocacy."
+/>
 
 ```mermaid
 flowchart LR

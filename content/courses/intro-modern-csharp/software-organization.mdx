@@ -59,6 +59,12 @@ A **namespace** is a logical label that prefixes a type's name.
 It lets two libraries have a class called `Logger` without
 clashing, and it lets *your* program group related types.
 
+<Figure
+  slug="mcs-software-organization-namespaces-inline-cutout"
+  alt="Two identically shaped parts kept apart by the room each hangs in rather than by their shape"
+  caption="Two libraries may each have a `Logger`, because the namespace keeps them apart."
+/>
+
 ```csharp title="Program.cs"
 using System;
 using Banking;
@@ -111,6 +117,12 @@ In a real workspace (not a single-file playground like this one),
 your code lives in a **project** described by a `.csproj` file.
 A project compiles to a single output, a console app, a library, a
 web app.
+
+<Figure
+  slug="mcs-software-organization-projects-solutions-inline-cutout"
+  alt="Several small workshops listed on one plan sheet, each with its own bench and shared doors between them"
+  caption="A project is one unit that builds; a solution is the set of them that ships together."
+/>
 
 Multiple projects can be grouped into a **solution** (`.sln`),
 which is just a list of projects that ship together. Typical

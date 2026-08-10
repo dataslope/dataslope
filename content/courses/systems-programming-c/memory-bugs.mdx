@@ -183,6 +183,12 @@ C bug. Depending on the layout it may corrupt neighboring variables,
 allocator metadata, or, historically, before stack protections, the
 function's return address, leading to remote code execution.
 
+<Figure
+  slug="sysc-memory-bugs-4-buffer-overflow-inline-cutout"
+  alt="A tray filled past its last cell, the excess spilling into the tray sitting next to it"
+  caption="Writing past the end of an allocation lands in whatever happened to be next to it."
+/>
+
 <CodeBlock
   adapter="c"
   files={[

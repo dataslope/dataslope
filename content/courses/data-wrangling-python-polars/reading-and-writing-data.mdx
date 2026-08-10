@@ -59,6 +59,12 @@ CSV is a bad format that everyone uses. It has no types, no schema,
 and no agreement on how to spell "missing". Polars gives you the
 knobs to cope.
 
+<Figure
+  slug="pl-reading-and-writing-data-writing-files-back-out-inline-cutout"
+  alt="A stack of plain slips reread and re-guessed every time, beside a sealed carton whose contents are already labelled"
+  caption="CSV re-guesses your types on every read; Parquet already knows them."
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}

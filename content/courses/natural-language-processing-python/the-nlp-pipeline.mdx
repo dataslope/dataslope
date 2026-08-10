@@ -223,6 +223,12 @@ The stopword list is all lowercase, so comparing un-lowercased tokens like
 
 It helps to mentally split the pipeline into two halves.
 
+<Figure
+  slug="nlp-the-nlp-pipeline-two-families-steps-cleaning-inline-cutout"
+  alt="A bench in two halves, the first squaring and cleaning every piece and the second measuring the pieces it is handed"
+  caption="Cleaning turns raw text into comparable units; analysis is what you do to them afterwards."
+/>
+
 **Preprocessing (cleaning)**, a fixed sequence:
 
 1. Tokenize
@@ -265,6 +271,12 @@ You cannot transform a list of tokens you have not produced yet.`}
 We just hinted at it; let us prove it. The block below runs the *same three
 operations*, lowercase, remove stopwords, keep alphabetic, but in two
 different orders, and compares the results.
+
+<Figure
+  slug="nlp-the-nlp-pipeline-order-matters-concrete-example-inline-cutout"
+  alt="The same three steps run in two different orders, one order leaving stray pieces the other had already removed"
+  caption="Lowercase before removing stopwords and all three thes go; reverse it and one survives."
+/>
 
 <CodeBlock
   adapter="python"

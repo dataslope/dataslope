@@ -38,6 +38,12 @@ domain**, so they deserve their own classes. (If you reduced them to
 fields on `Book` or methods on `Library`, the design would get
 muddier.)
 
+<Figure
+  slug="oopj-capstone-library-system-step-1-find-objects-inline-cutout"
+  alt="Nouns lifted out of a written brief as separate cards, two of them pulled from between the lines rather than off them"
+  caption="The nouns in the brief are the first draft of your classes, and two of them are implied."
+/>
+
 ## Step 2, assign responsibilities
 
 Using the cards format from *Responsibility-Driven Design*:
@@ -105,6 +111,12 @@ Two interesting design choices in that diagram:
    member. The `Member` also keeps a list of its own loans,
    bidirectional access, but `Loan` itself owns the due date and
    the "is overdue?" decision.
+
+<Figure
+  slug="oopj-capstone-library-system-step-3-sketch-relationships-inline-cutout"
+  alt="Three plain boxes joined by cords, one of the cords carrying a small dated tag of its own"
+  caption="The loan owns the due date, because it belongs to the pairing rather than to either side."
+/>
 
 ## Step 4, message flow for borrowing
 
@@ -390,6 +402,12 @@ just built. Notice that:
   lives where the data lives.
 - Nothing reaches into anyone else's fields. Every interaction is a
   message.
+
+<Figure
+  slug="oopj-capstone-library-system-step-6-read-own-inline-cutout"
+  alt="A finished cabinet with its plan pinned open beside it, every drawer in the cabinet answering to a shape on the plan"
+  caption="A design is finished when the objects on the page answer to the plan you sketched first."
+/>
 
 That is what a *pure-OOP* model looks like. The exact same shape
 scales to a real library system with thousands of books and

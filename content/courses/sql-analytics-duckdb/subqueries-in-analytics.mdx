@@ -141,6 +141,12 @@ is conceptually re-evaluated for *each* outer row. It is expressive, "the
 average amount for *this row's* region", but can be slower, and a window
 function or join is often clearer.
 
+<Figure
+  slug="duck-subqueries-in-analytics-correlated-subquery-one-per-inline-cutout"
+  alt="An inner gauge re-run once for every row of the outer tray, computing the same reading again and again"
+  caption="A correlated subquery runs once per outer row, which is what a window function avoids."
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Each order vs. its own region's average"

@@ -324,6 +324,12 @@ a **seasonal** ARIMA (the extra terms at lag 12 we just justified) and a
 baseline**. Then we score all three on the held-out months with honest
 out-of-sample metrics.
 
+<Figure
+  slug="tsa-capstone-forecasting-pipeline-step-5-7-split-inline-cutout"
+  alt="A strip of past marks cut across by a line, a curve fitted to the left of it and drawn on past the cut over marks kept covered"
+  caption="Fit on the past, predict the part you covered up, and only then compare the two."
+/>
+
 <Callout type="info" title="What 'seasonal ARIMA' adds">
 A seasonal ARIMA is just ARIMA with the *same AR/I/MA machinery repeated at
 the seasonal lag*. `order=(1,1,1)` handles the month-to-month dynamics;

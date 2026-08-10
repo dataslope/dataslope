@@ -75,6 +75,12 @@ back down as new props. This "one-way data flow" makes an app's
 behavior easy to trace: to understand what a component shows, you only
 need to know the props and state it received.
 
+<Figure
+  slug="rx-thinking-in-react-3-data-flows-one-inline-cutout"
+  alt="Trays on descending shelves each pouring only into the tray below, and one thin cord running back up to a handle at the top"
+  caption="Props go down to children, and a child asks for change by calling a function it was handed."
+/>
+
 <CodeBlock
   adapter="react"
   files={[

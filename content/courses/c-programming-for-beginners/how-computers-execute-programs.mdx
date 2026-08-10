@@ -57,6 +57,12 @@ Each mailbox holds one byte (a number between 0 and 255, or a
 character). Larger values like a 32-bit integer occupy several
 consecutive mailboxes, typically 4 bytes for an `int`.
 
+<Figure
+  slug="c-how-computers-execute-programs-memory-as-row-mailboxes-inline-cutout"
+  alt="A wall of small identical doors in one long row, four neighbouring doors holding a single value between them"
+  caption="Memory is one long row of addressed slots, and an `int` occupies four neighbours."
+/>
+
 When your C program declares a variable `int score = 42;`, the
 compiler arranges for four mailboxes somewhere in RAM to hold the
 number `42`. The variable name `score` is **purely a convenience for
@@ -90,6 +96,12 @@ flowchart TD
    a register, perhaps writing to memory, perhaps changing the PC to
    jump elsewhere.
 
+<Figure
+  slug="c-how-computers-execute-programs-fetch-decode-execute-cycle-inline-cutout"
+  alt="A hand crank turning one notch to lift a single card, setting it down worked, and coming back for the next"
+  caption="Fetch one instruction, decode it, execute it, repeat: the entire job of a processor."
+/>
+
 Then it goes back to step 1. That tiny loop is **the entire job of a
 CPU**. Everything your computer does, running your operating system,
 streaming a movie, rendering a 3D game, is some combination of those
@@ -111,6 +123,12 @@ When you double-click a program, here is the (simplified) sequence:
    counter.
 6. The CPU begins fetching, decoding, and executing instructions from
    that address.
+
+<Figure
+  slug="c-how-computers-execute-programs-running-program-actually-means-inline-cutout"
+  alt="A strip of instructions drawn steadily past a reading head, with three separate bins beside it holding what the work touches"
+  caption="Instructions stream past the processor while code, stack and heap sit in memory beside it."
+/>
 
 ```mermaid
 flowchart LR
@@ -156,6 +174,12 @@ That is *exactly* what your computer does when you write
 `x = x + 10;` in C, where `x` happens to live at address 1000. The C
 compiler emits those three instructions for you.
 
+<Figure
+  slug="c-how-computers-execute-programs-worked-example-on-paper-inline-cutout"
+  alt="One door in a wall of identical doors opened, its contents read, ten more added, and the result set back behind the same door"
+  caption="`x = x + 10` is a read from an address, an addition, and a write back to it."
+/>
+
 ## Why this matters for programming
 
 When you understand the fetch-decode-execute cycle, several things
@@ -179,6 +203,12 @@ that confuse beginners become obvious:
 Programming is the art of **arranging a sequence of small operations
 in memory** such that, when the CPU walks through them, something
 useful happens at the end.
+
+<Figure
+  slug="c-how-computers-execute-programs-programming-then-just-inline-cutout"
+  alt="A plain arrangement of levers and rails set out on a card, the card being everything a language finally produces"
+  caption="Every language exists to make arranging those instructions bearable for a human."
+/>
 
 Every language we use, Python, JavaScript, Rust, C, ultimately
 exists to make it easier for humans to describe such arrangements.

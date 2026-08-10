@@ -82,6 +82,12 @@ int main() {
 
 The Fibonacci numbers come with eight centuries of backstory: Leonardo of Pisa, nicknamed Fibonacci, posed the famous rabbit-breeding puzzle in his 1202 book *Liber Abaci*, the same book that introduced Hindu-Arabic numerals to European readers. The sequence is recursive by definition: `fib(n) = fib(n - 1) + fib(n - 2)`, with `fib(0) = 0` and `fib(1) = 1`.
 
+<Figure
+  slug="dsa-recursion-naive-fibonacci-inline-cutout"
+  alt="A branching tree of small jobs where the same job turns up again and again on different branches"
+  caption="The same subproblem is recomputed on branch after branch, which is where the time goes."
+/>
+
 Translating the definition straight into code is honest and correct, and a performance disaster. The version below is exponential, and the reason matters more than the example:
 
 <CodeBlock

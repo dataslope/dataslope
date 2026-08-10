@@ -83,6 +83,12 @@ Referential integrity means references remain real, not imaginary.`}
 Imagine deleting a customer who has orders. What should happen to the
 orders? PostgreSQL can enforce several designs.
 
+<Figure
+  slug="db-referential-integrity-delete-behavior-design-choice-inline-cutout"
+  alt="A gate that refuses to take a crate while cords still run from it, beside a gate that takes the crate and everything on those cords with it"
+  caption="`RESTRICT` refuses while children remain; `CASCADE` takes them along. Both are decisions."
+/>
+
 ```mermaid
 flowchart TB
     D["Delete parent row"] --> Q{"What should happen to child rows?"}

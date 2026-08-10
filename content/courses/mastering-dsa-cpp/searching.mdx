@@ -142,6 +142,12 @@ If the range is not sorted according to the same comparison used by the search, 
 
 There is one more trap, and its story is worth telling in full. The obvious way to compute the middle index is `mid = (low + high) / 2`. In 2006, Joshua Bloch, author of Java's collections framework, wrote a now-famous post titled "Extra, Extra, Read All About It: Nearly All Binary Searches and Mergesorts are Broken." A colleague's program had crashed inside `java.util.Arrays.binarySearch`, code Bloch himself had written years earlier, adapted from a version in *Programming Pearls* that had been considered proven correct.
 
+<Figure
+  slug="dsa-searching-bug-hid-decades-inline-cutout"
+  alt="Two large marks added together on a narrow rail that cannot hold the total, the sum wrapping round below zero"
+  caption="`(low + high) / 2` overflows on a large array, which took years to surface."
+/>
+
 The flaw: for very large arrays, `low + high` can exceed the maximum value an `int` can hold. The sum overflows, `mid` comes out negative or nonsensical, and the search reads outside the array. On arrays of fewer than about a billion elements the bug is invisible, which is exactly why it sat unnoticed in textbooks, in the JDK, and in countless production systems for decades, until data got big enough to trip it.
 
 The fix costs nothing: compute `mid = low + (high - low) / 2`. The subtraction cannot overflow because `high - low` is at most the array length. Write it this way from day one, even on toy inputs, the habit is free and the bug is not.

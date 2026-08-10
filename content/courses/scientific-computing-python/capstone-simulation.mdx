@@ -232,6 +232,12 @@ space, predator on one axis, prey on the other. Closed orbits
 mean sustained oscillations; spirals mean damped or growing
 oscillations; runaway escape means extinction.
 
+<Figure
+  slug="scipy-capstone-simulation-phase-portrait-inline-cutout"
+  alt="Two axes with a closed loop drawn across them, one marker travelling round the loop and arriving back where it began"
+  caption="Plot predator against prey and a sustained oscillation shows up as a closed orbit."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -278,6 +284,12 @@ loops (the classic Lotka–Volterra cycle).
 A useful question: **how sensitive is extinction probability to
 the attack rate $a$?** A small Monte Carlo over many seeds gives
 us an answer with confidence bars.
+
+<Figure
+  slug="scipy-capstone-simulation-quantifying-sensitivity-inline-cutout"
+  alt="A dial turned slowly past a row of marks while a gate stays shut, then swings wide open at one particular mark"
+  caption="A sweep tells you not just that a parameter matters but where it starts to matter."
+/>
 
 <CodeBlock
   adapter="python"

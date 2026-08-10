@@ -129,6 +129,12 @@ So a database keeps data safe, consistent, and findable. But what
 does the data actually *look like* inside? The relational answer is
 disarmingly simple: **rectangles.**
 
+<Figure
+  slug="sql-what-is-a-database-stored-data-looks-like-inline-cutout"
+  alt="A paragraph of writing beside the same facts ruled into a grid, with a gauge running straight down one column"
+  caption="A grid makes questions answerable mechanically, which a paragraph never can be."
+/>
+
 Almost all useful data is a collection of **facts about things**.
 "This customer is named Ada and lives in Toronto." "This order was
 placed on March 3rd for \$42." A relational database groups those
@@ -184,6 +190,12 @@ itself. Every time it needs to remember or retrieve something, it
 sends the database a request written in SQL. That request is called
 a **query**.
 
+<Figure
+  slug="sql-what-is-a-database-where-database-hides-app-inline-cutout"
+  alt="A shopfront with a hatch at the back through which every order and answer quietly passes"
+  caption="Every tap in the app is a query; the database is the part you never see."
+/>
+
 ```mermaid
 flowchart TD
     User["You<br/>(tap, type, click)"] --> App["Application<br/>(screens & logic)"]
@@ -206,6 +218,12 @@ course.)
 
 For the rest of this course, hold this picture in your head: a
 database is a **trustworthy librarian** for your data.
+
+<Figure
+  slug="sql-what-is-a-database-tiny-mental-model-carry-inline-cutout"
+  alt="A cabinet of ruled drawers standing behind a shopfront, the two speaking through a single hatch"
+  caption="The app is not the database; it talks to one through a narrow, well-defined opening."
+/>
 
 ```mermaid
 flowchart TD

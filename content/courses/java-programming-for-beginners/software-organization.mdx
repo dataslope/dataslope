@@ -58,6 +58,12 @@ The most common shape for a non-trivial Java application is a
 **layered architecture**. Each layer has a focused job and only
 talks to the layer immediately below it.
 
+<Figure
+  slug="java-software-organization-layered-architecture-inline-cutout"
+  alt="A stack of platforms where every support runs downward, and one support drawn upward struck through"
+  caption="Higher layers may depend on lower ones, and never the other way round."
+/>
+
 ```mermaid
 flowchart TB
     A[Web / UI Layer<br/>controllers, views]
@@ -183,6 +189,12 @@ from "real coding." It is not. **Architecture is the shape of the
 code.** Every time you decide which class owns a piece of state,
 which package something goes in, which method calls which, you
 are *practicing* architecture.
+
+<Figure
+  slug="java-software-organization-architecture-outline-code-inline-cutout"
+  alt="A plan of rooms and doorways drawn out before a single bench is carried in"
+  caption="Architecture is the shape of the code, decided before there is much code to shape."
+/>
 
 Good architecture is the same thing as good *organization*: when
 something needs to change, only a small part of the system needs to

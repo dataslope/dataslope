@@ -81,6 +81,12 @@ series and computes a summary at each stop. The **moving average**,
 becomes the average of itself and its `N-1` predecessors, so random
 up-and-down jitter cancels out while the slow signal survives.
 
+<Figure
+  slug="tsa-rolling-and-expanding-windows-moving-average-rolling-inline-cutout"
+  alt="A run of marks with a twelve-notch measure laid along it, the sawtooth flattening out under the measure"
+  caption="A window spanning exactly one seasonal cycle averages the season away and leaves the trend."
+/>
+
 A **rolling** window is a fixed size that slides forward; an **expanding**
 window is anchored at the start and grows. Watch what each averages as it
 advances:

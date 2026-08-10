@@ -121,6 +121,12 @@ A pointer that does not point anywhere meaningful should be `NULL`
 (defined in `<stddef.h>`, usually as `((void*)0)`). Dereferencing a
 `NULL` pointer is undefined behavior, usually a crash.
 
+<Figure
+  slug="sysc-pointers-null-points-nothing-pointer-inline-cutout"
+  alt="A signpost pointing at an empty patch of ground, with a figure walking confidently toward it"
+  caption="`NULL` is the pointer that goes nowhere, and following it is the classic C crash."
+/>
+
 The idea of a special "points at nothing" value is older than C, and
 its inventor regrets it. Tony Hoare added the null reference to the
 ALGOL W language in 1965, in his words, "simply because it was so

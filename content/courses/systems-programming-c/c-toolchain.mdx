@@ -142,6 +142,12 @@ standard libraries (libc for `printf()`, libm for `sqrt`, etc.) and
 resolves *undefined symbols*, references that one object file makes
 to functions defined in another.
 
+<Figure
+  slug="sysc-c-toolchain-stage-4-linking-inline-cutout"
+  alt="Several finished parts drawn together into one assembly, with a stock fitting pulled off the shelf to fill the last gap"
+  caption="The linker joins the object files and pulls the standard library in behind them."
+/>
+
 <Callout type="info" title="Why is the default output called a.out?">
 If you link without `-o`, the executable is named `a.out`, short for
 *assembler output*. The name comes from the assembler on the PDP-7

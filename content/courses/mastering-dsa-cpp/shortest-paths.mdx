@@ -234,6 +234,12 @@ int main() {
 
 Every guarantee above leaned on edges being non-negative. Introduce a negative edge and the flood metaphor breaks, water that "arrived" at a vertex might later find a route that runs backward in time. A vertex Dijkstra confidently finalized can become cheaper through a negative edge discovered afterward, and the algorithm never reopens finalized vertices, so it simply returns the wrong answer (no error, no warning).
 
+<Figure
+  slug="dsa-shortest-paths-dijkstra-fails-inline-cutout"
+  alt="Water flooding outward through a network of channels, one channel running uphill and the flood front stalling at it"
+  caption="A negative edge breaks the assumption that the closest settled node is final."
+/>
+
 <Callout type="warn" title="Negative weights need a different algorithm">
 If negative weights are possible, use Bellman-Ford for single-source shortest paths. If a negative cycle is reachable from the source, no finite shortest path exists for affected vertices.
 </Callout>

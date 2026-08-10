@@ -178,6 +178,12 @@ hierarchical clustering special. To *see* the tree we draw a dendrogram,
 and for that we use SciPy, whose `linkage` and `dendrogram` functions are
 the standard tools.
 
+<Figure
+  slug="ml-hierarchical-clustering-seeing-tree-dendrogram-on-inline-cutout"
+  alt="A small set of marks joined into a branching frame, the height of each join showing how late the two came together"
+  caption="The height of each join is how different the two groups were when they merged."
+/>
+
 A dendrogram of 300 points is an unreadable smear, so we plot a **small
 sample**, about 18 points, where every leaf and merge is legible. This is
 not a limitation of the method; it is just good visualization. You read the

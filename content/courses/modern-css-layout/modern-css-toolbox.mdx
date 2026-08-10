@@ -87,6 +87,12 @@ That renders identically to writing `.card .title`, `.card .text`, and
 grouped by component. Nesting also shines for state and queries: a
 `&:hover` or a nested `@media` sits right next to the base rule.
 
+<Figure
+  slug="css-modern-css-toolbox-native-css-nesting-inline-cutout"
+  alt="Rules written inside the box they apply to rather than on separate sheets, the result identical either way"
+  caption="Nesting is shorthand for the descendant selector, with the same cascade behaviour."
+/>
+
 ## :has(): the parent selector
 
 For years CSS could only style down the tree. `:has()` finally lets an
@@ -171,6 +177,12 @@ Both boxes below share one rule. The second sets `dir="rtl"`, and the
 
 Reach for logical properties by default. They cost nothing in the common
 case and make internationalization almost free.
+
+<Figure
+  slug="css-modern-css-toolbox-logical-properties-inline-cutout"
+  alt="A frame described by the direction its text runs, keeping its shape when the whole flow is mirrored"
+  caption="Describe the box in terms of the text flow and it survives being mirrored."
+/>
 
 ## clamp(): one line of fluid sizing
 

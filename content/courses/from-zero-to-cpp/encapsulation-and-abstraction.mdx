@@ -104,6 +104,12 @@ rope data structure, even an on-disk file. The *interface*, the
 public method names and meanings, stays the same. Code that uses a
 `TextStorage` does not care which implementation it got.
 
+<Figure
+  slug="cpp-encapsulation-and-abstraction-abstraction-same-interface-different-inline-cutout"
+  alt="One socket panel fitted to the front of three quite different machines, each doing the same job behind it its own way"
+  caption="Keep the interface and the storage behind it can be replaced without callers noticing."
+/>
+
 ```mermaid
 flowchart TB
     UI[code using TextStorage] -->|append, get| I[Interface]
@@ -134,6 +140,12 @@ If your function happens to return results in sorted order, even
 though you never promised that, someone's code will break the day
 it stops. Every detail you fail to hide eventually becomes a detail
 you can never change.
+
+<Figure
+  slug="cpp-encapsulation-and-abstraction-interface-leaks-hyrum-s-inline-cutout"
+  alt="A panel with one clear handle on its face and several bare edges, hands gripping the edges instead of the handle"
+  caption="Expose anything and somebody depends on it, whether or not you meant it as an interface."
+/>
 
 Language designers take this seriously. The Go team deliberately
 *randomizes* the iteration order of its built-in hash maps on every

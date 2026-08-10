@@ -44,6 +44,12 @@ Specificity is a score with three buckets. Count the selectors:
 Compare bucket by bucket, left to right. An ID beats *any* number of
 classes; a class beats any number of element selectors.
 
+<Figure
+  slug="css-the-cascade-and-specificity-specificity-counted-inline-cutout"
+  alt="Three weights of clearly different sizes hung along one beam, the heaviest deciding which way it tips"
+  caption="An id outranks a class, which outranks a tag, whatever the order in the file."
+/>
+
 ```css
 p            { color: black; }   /* 0 ids, 0 classes, 1 element */
 .note        { color: blue;  }   /* 0 ids, 1 class,   0 elements → wins over p */
@@ -127,6 +133,12 @@ Two more forces you'll lean on constantly:
   from parent to child automatically. Set `font-family` once on
   `body` and the whole page inherits it. Layout properties (margin,
   padding, border) do *not* inherit.
+
+<Figure
+  slug="css-the-cascade-and-specificity-source-order-inheritance-inline-cutout"
+  alt="A property set once at the top of a frame and picked up by everything nested inside it, one edge setting stopping at its own box"
+  caption="Inherited properties pass down the tree; a border stops at the box that set it."
+/>
 
 The `.parent` below sets `color` and `font-family` once; the nested
 elements pick them up for free. But the border set on `.parent` stays

@@ -30,6 +30,12 @@ Everything else follows.
 Consider what the model does when asked for a citation supporting a
 claim.
 
+<Figure
+  slug="llm-why-models-hallucinate-there-no-i-do-inline-cutout"
+  alt="A machine turning out well-formed cards at a steady rate, with no lamp anywhere on it to mark the ones it guessed"
+  caption="The model produces fluent text either way, and nothing inside it marks a fact as absent."
+/>
+
 Its training contains millions of citations. The pattern is
 overwhelmingly clear: author names, a year, a plausible title, a
 journal. Producing something with that shape is exactly what it is good
@@ -85,6 +91,12 @@ Hallucination is not uniformly distributed. It rises sharply where:
   this?" presupposes such a study, and the most plausible continuation
   is a name.
 
+<Figure
+  slug="llm-why-models-hallucinate-where-risk-concentrates-inline-cutout"
+  alt="A question card shaped around a part that was never made, and a machine cutting that part anyway to fill the gap"
+  caption="A question that presupposes a source makes inventing one the most plausible continuation."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -119,6 +131,12 @@ for label, flags in cases.items():
 
 Because it asks the model to report on a property it cannot observe.
 
+<Figure
+  slug="llm-why-models-hallucinate-just-tell-me-if-inline-cutout"
+  alt="A machine handed an instruction card that changes the phrasing it prints but not the way it decides what to print"
+  caption="The instruction changes the phrasing, not the mechanism that decides what comes next."
+/>
+
 The instruction does have a real effect: it shifts the distribution
 toward hedged phrasing, so you get more sentences containing "I am not
 certain". But that shift is stylistic, not diagnostic. The hedges do
@@ -137,6 +155,12 @@ the process knows which answers are wrong.
 * **Give it an exit.** "If the document does not contain this, reply
   NOT_FOUND" works better than "do not make things up", because it
   provides a specific alternative continuation that is easy to produce.
+
+<Figure
+  slug="llm-why-models-hallucinate-actually-reduces-inline-cutout"
+  alt="A machine given a spare blank card within reach, and taking that card instead of cutting a part that was never specified"
+  caption="Give it an easy alternative to reach for and it stops inventing one of its own."
+/>
 
 <Callout type="warn" title="The uncomfortable implication">
 Hallucination cannot be fully solved at the model level, because it is

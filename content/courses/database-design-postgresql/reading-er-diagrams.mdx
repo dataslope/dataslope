@@ -259,6 +259,12 @@ zero or many tracks. The foreign keys predict the joins, and the
 query below follows exactly the path the diagram promises, from
 artist through album to track.
 
+<Figure
+  slug="db-reading-er-diagrams-read-real-schema-chinook-inline-cutout"
+  alt="Four crates joined in a line by cords, artist to album to track, with a genre tag hanging off the side"
+  caption="One artist, many albums, many tracks: read the crow's feet and the joins follow."
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="Follow the diagram through a real database"

@@ -144,6 +144,12 @@ That "guard the edge cases, then render the happy path" shape is
 everywhere in React, especially in data fetching, where `loading` and
 `error` states return early before the data renders.
 
+<Figure
+  slug="rx-conditional-rendering-pulling-logic-out-variables-inline-cutout"
+  alt="A run of gates at the entrance turning back the odd cases, leaving one clear path through the middle"
+  caption="Return early on loading and error, and the rest of the component is the happy path."
+/>
+
 ## Challenge
 
 <ChallengeCard

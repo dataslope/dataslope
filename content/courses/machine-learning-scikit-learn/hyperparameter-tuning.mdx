@@ -226,6 +226,12 @@ of one can depend on another. `GridSearchCV` automates the search: you hand
 it a model and a small **grid** of values to try, and it runs
 cross-validation for *every combination*, then reports the winner.
 
+<Figure
+  slug="ml-hyperparameter-tuning-gridsearchcv-try-every-combination-inline-cutout"
+  alt="A rack of dials worked through every combination of settings in turn, with the best combination marked"
+  caption="Every combination of settings tried under cross-validation, and the winner refitted."
+/>
+
 The "grid" is just the set of all combinations. If you give it 3 values of
 one hyperparameter and 2 of another, that is 3 × 2 = 6 combinations, and
 with 5-fold cross-validation that is 6 × 5 = 30 model fits. Keep grids

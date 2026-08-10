@@ -267,6 +267,12 @@ categorical ones, in the same dataset, at the same time. A single `Pipeline`
 step applies one transform to *all* the columns it receives, which is not
 what you want here.
 
+<Figure
+  slug="ml-pipelines-and-columntransformer-columntransformer-different-transforms-different-inline-cutout"
+  alt="One board's columns sent off to three different machines and returning to a single tray in the order they left"
+  caption="Numeric columns scale, categorical columns encode, and one `fit()` call runs both."
+/>
+
 `ColumnTransformer` solves this. You give it a list of
 `(name, transformer, columns)` triples, and it routes each group of columns
 to its own transformer, then concatenates the results side by side.
