@@ -377,6 +377,23 @@ that was big had already been moved out of the payload.
 - **`<ChallengeCard>` starter output stays out of scope**, for the reason in
   §1.7: its "output" is a `None` or a failing assertion.
 
+### 3.3b Where it landed, site-wide
+
+The full pass, for the record:
+
+| | |
+| --- | --- |
+| Blocks recorded | **1,687 of 1,689** (2 print nothing; 0 failed) |
+| Lessons covered | 303 |
+| Inline in the manifest | **308 kB total**, median **0.7 kB** a lesson, heaviest 9 kB |
+| Written as files | 212 images + 156 figures, 11 MB, all lazily fetched |
+| Dropped by the size caps | **0** |
+| Flagged unstable | 19 |
+
+For contrast, the first working version put 2,635 kB inline, up to 160 kB on
+a single lesson, and dropped 11 blocks. The whole difference is that charts
+became files.
+
 ### 3.4 What is still open
 
 - **The other nine adapters.** The generator runs Python today. The manifest,
