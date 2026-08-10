@@ -36,13 +36,13 @@ is fine.
    `df.isna().sum()`.*
 2. **Look at one variable at a time (univariate).** What does each column's
    distribution look like, its center, spread, skew, and any second peak?
-   *Tools: `displot` / `histplot`, and the distribution chapters.*
+   *Tools: `displot()` / `histplot()`, and the distribution chapters.*
 3. **Compare variables in pairs (bivariate).** How do two variables relate, and
-   does the relationship change when you split by a group? *Tools: `relplot`
-   (scatter/line), `catplot` (categorical), with `hue`.*
+   does the relationship change when you split by a group? *Tools: `relplot()`
+   (scatter/line), `catplot()` (categorical), with `hue`.*
 4. **Look at many variables at once (multivariate).** Which variables move
-   together across the whole table? *Tools: `pairplot`, faceting with
-   `col`/`row`, and the correlation `heatmap`.*
+   together across the whole table? *Tools: `pairplot()`, faceting with
+   `col`/`row`, and the correlation `heatmap()`.*
 5. **Hypothesize, check, and communicate, then loop back.** Form a hunch,
    test it with a targeted plot, and either refine it or move on. When a
    finding is solid, polish one chart to share it.
@@ -50,9 +50,9 @@ is fine.
 | Step | Question it answers | Seaborn tools |
 | ---- | ------------------- | ------------- |
 | 1. Structure | What *is* this table? | `shape`, `head`, `info`, `isna().sum()` |
-| 2. Univariate | What does each variable look like? | `displot`, `histplot` |
-| 3. Bivariate | How do two variables relate? | `relplot`, `catplot`, `hue` |
-| 4. Multivariate | What moves together overall? | `pairplot`, facets, `heatmap` |
+| 2. Univariate | What does each variable look like? | `displot()`, `histplot()` |
+| 3. Bivariate | How do two variables relate? | `relplot()`, `catplot()`, `hue` |
+| 4. Multivariate | What moves together overall? | `pairplot()`, facets, `heatmap()` |
 | 5. Hypothesize | Is my hunch real? | a targeted, polished plot |
 
 <Callout type="info" title="Structure before beauty">
@@ -211,8 +211,8 @@ question to the next plot is the loop in action.`}
 ### Steps 4 and 5, widen out, then hypothesize
 
 From here the loop keeps turning. **Step 4 (multivariate)** would widen the
-view: a `pairplot` to scatter every pair of measurements at once, or a
-correlation `heatmap` to see which variables move together across the whole
+view: a `pairplot()` to scatter every pair of measurements at once, or a
+correlation `heatmap()` to see which variables move together across the whole
 table, quick ways to find relationships you did not think to look for. We
 build those in their own chapters.
 
@@ -232,6 +232,7 @@ and each lap left us knowing more than the last.
 <Figure
   slug="sns-the-eda-workflow-practical-5-step-inline-cutout"
   alt="A ring of five benches with one tray travelling round and returning changed"
+  caption="Exploration is a loop, and each lap leaves you knowing more than the last."
 />
 
 ```mermaid

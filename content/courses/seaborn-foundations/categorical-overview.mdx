@@ -10,7 +10,7 @@ Survival by passenger class. Here one axis is a **category**, a label, not
 a quantity, and the chart's job is to compare the groups.
 
 Seaborn gathers every chart for this situation under one figure-level
-function: **`catplot`** ("categorical plot"). You always call it the same
+function: **`catplot()`** ("categorical plot"). You always call it the same
 way, name the categorical column, the numeric column, and then choose a
 **`kind`**. That single `kind` argument swaps the entire view, from "show me
 every raw point" to "show me one summarizing number per group." Learning the
@@ -36,7 +36,7 @@ choice about how much of that shape to draw versus boil away.
 | `"box"` | Quartiles + whiskers + outliers | A **summary** of the spread | category + numeric |
 | `"violin"` | A mirrored density curve | A **summary** of the spread | category + numeric |
 | `"boxen"` | Many quantile boxes | A **summary** of the spread | category + numeric |
-| `"bar"` | One bar = the **mean** (+ CI) | A **single estimate** | category + numeric |
+| `"bar"` | One bar = the **mean**, with its confidence interval | A **single estimate** | category + numeric |
 | `"point"` | One dot = the **mean** (+ CI) | A **single estimate** | category + numeric |
 | `"count"` | One bar = how **many rows** | A **single count** | category only |
 
@@ -73,6 +73,7 @@ changes while the data does not.
 <Figure
   slug="sns-categorical-overview-same-data-three-inline-cutout"
   alt="One tray of chips drawn three ways along a bench, as bars, as boxes and as scattered points"
+  caption="The same numbers as bars, boxes or points: only the detail changes."
 />
 
 First, **`kind="strip"`**, every single bill as a dot:
@@ -233,10 +234,11 @@ band of the detail dial and goes deep:
 <Figure
   slug="sns-categorical-overview-inline-cutout"
   alt="Four small boards in a row showing the same groups as bars, boxes, strips and violins"
+  caption="The categorical family is one dial running from summary to every observation."
 />
 
 <Callout type="info" title="catplot is the hub; the kinds are the spokes">
-You will keep calling `catplot` the same way, `data`, a categorical
+You will keep calling `catplot()` the same way, `data`, a categorical
 variable, a numeric variable, and a `kind`. Once that pattern is muscle
 memory, exploring a new categorical view is just a matter of changing one
 word.
@@ -247,7 +249,7 @@ word.
 <ChallengeCard
   adapter="python"
   title="Make your first categorical plot"
-  instructions={`Use \`sns.catplot\` on the \`tips\` dataset to compare total bills
+  instructions={`Use \`sns.catplot()\` on the \`tips\` dataset to compare total bills
 across days of the week.
 
 - Put the categorical \`day\` on the x-axis.
@@ -293,18 +295,18 @@ g = sns.catplot(data=tips, x="day", y="total_bill", kind="box", height=4)
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What does the \`kind\` argument to \`sns.catplot\` control?
+  markdown={`What does the \`kind\` argument to \`sns.catplot()\` control?
 
 - The DataFrame that gets plotted.
   > The data comes from the \`data\` argument; \`kind\` does not choose or change the dataset.
 - The color palette used for the groups.
   > Palette is set with \`palette=\`; \`kind\` selects the chart type, not its colors.
 - [o] Which categorical chart is drawn, how much of each group's distribution is shown or summarized.
-  > \`catplot\` is one function that draws many chart types; \`kind\` selects among them, from raw points (\`strip\`) to a single estimate (\`bar\`).
+  > \`catplot()\` is one function that draws many chart types; \`kind\` selects among them, from raw points (\`strip\`) to a single estimate (\`bar\`).
 - Whether the x variable is treated as numeric or categorical.
   > Variable types come from the columns themselves; \`kind\` only changes how the groups are drawn, not their types.
 
-\`catplot\` is a hub: the same call with a different \`kind\` gives you a strip,
+\`catplot()\` is a hub: the same call with a different \`kind\` gives you a strip,
 box, violin, bar, point, or count plot.`}
 />
 
@@ -351,4 +353,5 @@ single most common way a categorical chart can mislead.
 <Figure
   slug="sns-categorical-overview-one-function-many-inline-cutout"
   alt="One handle on a machine turned to four settings, each producing a different chart on the board"
+  caption="`catplot()` is one function whose `kind` argument picks the chart."
 />

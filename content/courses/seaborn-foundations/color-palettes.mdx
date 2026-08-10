@@ -70,6 +70,7 @@ qualitative palette respects that, every hue carries equal weight.
 <Figure
   slug="sns-color-palettes-qualitative-distinct-colors-inline-cutout"
   alt="A strip of clearly separate swatches with no two shading into one another"
+  caption="A qualitative palette gives every category equal visual weight."
 />
 
 <Callout type="warn" title="Don't use a gradient for unordered groups">
@@ -152,7 +153,7 @@ because the palette has a center.
 
 ## Seeing the three side by side
 
-`sns.color_palette` builds a palette and `sns.palplot` displays it, which
+`sns.color_palette()` builds a palette and `sns.palplot` displays it, which
 makes the three types easy to compare:
 
 <CodeBlock
@@ -184,6 +185,7 @@ runs from one hue through a pale middle to another.
 <Figure
   slug="sns-color-palettes-three-palette-types-inline-cutout"
   alt="Three swatch strips, one grading in one ink, one grading between two, one of distinct colours"
+  caption="Sequential grades one hue, diverging runs through a pale middle, qualitative jumps."
 />
 
 <MultipleChoice
@@ -282,7 +284,7 @@ qualitative, sequential, or diverging, and rules the other two out.
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Color categories accessibly"
   instructions={`Using \`penguins\`, draw a scatter of \`bill_length_mm\` (x) vs
-\`bill_depth_mm\` (y) with \`sns.relplot\`, colored by \`species\` using the
+\`bill_depth_mm\` (y) with \`sns.relplot()\`, colored by \`species\` using the
 **colorblind-safe** qualitative palette:
 
 - \`hue="species"\`,
@@ -413,4 +415,5 @@ telling a clear story with data.
 <Figure
   slug="sns-color-palettes-inline-cutout"
   alt="Three strips of swatches, one running pale to deep in one hue, one running between two hues, one of separate distinct colours"
+  caption="Pick the palette family from what the numbers mean, not from taste."
 />

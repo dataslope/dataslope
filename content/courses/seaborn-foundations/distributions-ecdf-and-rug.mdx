@@ -1,6 +1,6 @@
 ---
-title: ECDF and Rug Plots
-description: displot with kind='ecdf' and rug marks, distribution views that use no bins and hide nothing.
+title: Cumulative Distribution and Rug Plots
+description: The empirical cumulative distribution function and rug marks, distribution views that use no bins and hide nothing.
 ---
 
 A histogram has to make a choice, where to put the bin edges, and that
@@ -119,6 +119,7 @@ occlusion, no bins.
 <Figure
   slug="sns-distributions-ecdf-and-rug-inline-cutout"
   alt="A rising staircase climbing to a ceiling line, with a row of short ticks beneath it marking each observation"
+  caption="The cumulative curve shows what fraction of the data lies below each value."
 />
 
 <Callout type="tip" title="Reach for ECDF when groups pile up">
@@ -144,6 +145,7 @@ cost in **intuitiveness**:
 <Figure
   slug="sns-distributions-ecdf-and-rug-tradeoff-inline-cutout"
   alt="A staircase climbing to a ceiling beside a row of bins, one exact and stepped, one smooth and approximate"
+  caption="The cumulative curve is exact but harder to read shape from than a histogram."
 />
 
 That trade drawn on one sample. The staircase reads a median off with no
@@ -165,7 +167,7 @@ on a rug. On its own it is spare, but as an **add-on** it is invaluable,
 laid under a histogram, a KDE, or beside a scatter, it shows exactly where
 the real data points sit, with no binning or smoothing in between.
 
-Here it is on its own, via the axes-level `sns.rugplot`:
+Here it is on its own, via the axes-level `sns.rugplot()`:
 
 <CodeBlock
   adapter="python"
@@ -186,7 +188,7 @@ sns.rugplot(data=penguins, x="flipper_length_mm", height=0.1)
   ]}
 />
 
-Its real value shows when you layer it onto another plot. `displot` will add
+Its real value shows when you layer it onto another plot. `displot()` will add
 one for you with `rug=True`, so the smooth or binned summary sits *above*
 the actual observations that produced it:
 
@@ -249,7 +251,7 @@ of plotting every point.
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Compare distributions with an ECDF"
-  instructions={`Using the \`penguins\` dataset, draw an **ECDF** with \`sns.displot\`:
+  instructions={`Using the \`penguins\` dataset, draw an **ECDF** with \`sns.displot()\`:
 
 - put \`flipper_length_mm\` on the x-axis,
 - color by \`species\` (use \`hue\`),
@@ -362,4 +364,5 @@ plots.
 <Figure
   slug="sns-distributions-ecdf-and-rug-ecdf-running-tally-inline-cutout"
   alt="A rising staircase climbing to a ceiling line with short ticks beneath marking each observation"
+  caption="Every observation adds one step, and the ticks below mark where they fell."
 />

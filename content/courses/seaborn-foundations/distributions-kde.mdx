@@ -1,5 +1,5 @@
 ---
-title: KDE and Density
+title: Kernel Density Estimates
 description: How a Kernel Density Estimate smooths a histogram into a curve, why the bandwidth matters as much as bin width, and where KDEs quietly mislead.
 ---
 
@@ -26,6 +26,7 @@ and the result can look jagged or wobble as you nudge the edges.
 <Figure
   slug="sns-distributions-kde-inline-cutout"
   alt="A row of stacked blocks forming a rough histogram, and a smooth curve laid over them following the same shape"
+  caption="A density curve smooths the bin edges away and keeps the shape."
 />
 
 A KDE makes a softer choice. Instead of dropping each point into a bin, it
@@ -51,7 +52,7 @@ KDE tells you about *relative* concentration, not raw counts.
 
 ## Drawing one
 
-`displot` with `kind="kde"` gives the figure-level version:
+`displot()` with `kind="kde"` gives the figure-level version:
 
 <CodeBlock
   adapter="python"
@@ -77,6 +78,7 @@ distinct groups (it's species). A KDE makes modes like this easy to see.
 <Figure
   slug="sns-distributions-kde-drawing-one-inline-cutout"
   alt="A smooth arched cap laid over a row of solid inked blocks of different heights, touching their tops but not their edges"
+  caption="Two humps in the curve mean two groups hiding in one column."
 />
 
 It's often most useful laid over a histogram, so you get the honest bars
@@ -117,6 +119,7 @@ The histogram's most important knob is bin width. The KDE's equivalent is
 <Figure
   slug="sns-distributions-kde-bandwidth-kde-s-inline-cutout"
   alt="The same chips under three curves, one jagged, one smooth, one so smooth it has lost the shape"
+  caption="Too little smoothing invents peaks; too much erases the real ones."
 />
 
 One sample, three bandwidths. The rug underneath is the same in all three,
@@ -210,7 +213,7 @@ don't obscure each other.
 
 ## Bivariate KDE: density in 2-D
 
-Give `kdeplot` both an `x` and a `y` and the bumps become 2-D, the result
+Give `kdeplot()` both an `x` and a `y` and the bumps become 2-D, the result
 is a contour map of where points concentrate, like a topographic map of the
 data cloud. It's a clean way to show density when a scatter would overplot:
 
@@ -300,7 +303,7 @@ against the bars.
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Compare group densities with a KDE"
-  instructions={`Using \`penguins\`, draw a **KDE** with \`sns.displot\` that compares the
+  instructions={`Using \`penguins\`, draw a **KDE** with \`sns.displot()\` that compares the
 distribution of \`body_mass_g\` across the three species:
 
 - \`x="body_mass_g"\`,

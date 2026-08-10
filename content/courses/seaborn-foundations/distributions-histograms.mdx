@@ -35,7 +35,7 @@ there; short bar, few. That count-by-bin picture is the most common way to
 
 ## The minimum
 
-`displot` ("distribution plot") is Seaborn's figure-level entry point for
+`displot()` ("distribution plot") is Seaborn's figure-level entry point for
 distributions. With `kind="hist"` you get a histogram of whatever column you
 put on `x`:
 
@@ -65,6 +65,7 @@ onto that observation; it is about to be the whole lesson.
 <Figure
   slug="sns-distributions-histograms-minimum-inline-cutout"
   alt="One column of chips and one row of bins, nothing else on the bench"
+  caption="A histogram needs one numeric column and a choice of bins."
 />
 
 <Callout type="info" title="Figure-level and axes-level, same chart">
@@ -72,7 +73,7 @@ onto that observation; it is about to be the whole lesson.
 own figure and can split into panels with `col`/`row`. Its **axes-level**
 twin is `sns.histplot(...)`, which draws onto one Axes you control. Same
 bars; they differ in what they return and how they compose. Reach for
-`displot` when you might want facets, `histplot` when placing one chart on
+`displot()` when you might want facets, `histplot()` when placing one chart on
 an Axes of your own.
 </Callout>
 
@@ -86,6 +87,7 @@ different number of bars, different conclusion.
 <Figure
   slug="sns-distributions-histograms-inline-cutout"
   alt="A tray of chips falling into bins, shown twice with wide bins and with narrow bins, the same chips reading very differently"
+  caption="The bin width is your decision, and it changes the story the chart tells."
 />
 
 One sample, three bin widths, three different answers to "how many peaks
@@ -254,7 +256,7 @@ sns.displot(penguins, x="flipper_length_mm", kind="hist", kde=True, height=4)
 
 The curve traces the same two-humped shape without committing to hard bin
 edges. It has its *own* tuning knob (a smoothing bandwidth) and its own ways
-of misleading, so the KDE gets a full treatment on the next page. For now,
+of misleading, so the density curve gets a full treatment on the next page. For now,
 just know it as a quick way to sketch the distribution's outline over the
 bars.
 
@@ -289,6 +291,7 @@ now for a single variable.
 <Figure
   slug="sns-distributions-histograms-histogram-needs-shows-inline-cutout"
   alt="One column of chips going in and a row of filled bins coming out"
+  caption="Values go in, bin counts come out, and the shape appears."
 />
 
 ### Choosing how the groups stack: `multiple=`
@@ -432,7 +435,7 @@ only the features that survive.
   adapter="python"
   title="Build a histogram with 20 bins"
   instructions={`Using the \`tips\` dataset, draw a **histogram** of \`total_bill\`
-with \`sns.displot\`:
+with \`sns.displot()\`:
 
 - put \`total_bill\` on the x-axis,
 - use \`kind="hist"\`,

@@ -115,7 +115,7 @@ approximately equal by luck; they were *designed* to be equal.
 ## Now look at them
 
 Here is the payoff. We hand the same table to Seaborn and ask for one panel
-per `dataset`. `lmplot` draws a scatter of the points **and** overlays the
+per `dataset`. `lmplot()` draws a scatter of the points **and** overlays the
 straight regression line that those identical statistics describe.
 
 <CodeBlock
@@ -231,6 +231,7 @@ shape while pinning the summary statistics in place.)
 <Figure
   slug="sns-why-visualize-statistical-data-eye-pattern-detector-inline-cutout"
   alt="A dense board of filled cells beside a chart of the same figures, a shape leaping out of the chart"
+  caption="The same figures as a table say nothing; as a chart the shape leaps out."
 />
 
 Let's confirm the "identical statistics" half first, the way we did with

@@ -32,10 +32,10 @@ look at where to go from here.
   grids** (facets, pair plots, joint plots, heatmaps) for many variables at
   once.
 - **Choose figure-level vs axes-level deliberately.** You reach for the
-  figure-level functions (`relplot`, `displot`, `catplot`, `lmplot`,
-  `pairplot`, `jointplot`) when you might want facets or a self-contained
-  figure, and the axes-level ones (`scatterplot`, `histplot`, `boxplot`,
-  `heatmap`, ...) when you are placing one chart on an Axes you control.
+  figure-level functions (`relplot()`, `displot()`, `catplot()`, `lmplot()`,
+  `pairplot()`, `jointplot()`) when you might want facets or a self-contained
+  figure, and the axes-level ones (`scatterplot()`, `histplot()`, `boxplot()`,
+  `heatmap()`, ...) when you are placing one chart on an Axes you control.
 - **Use aesthetics to communicate, not decorate.** Themes, contexts, and
   color palettes are tools in service of a message, a diverging palette
   centered at zero, a message-style title, clear labels, not garnish you
@@ -55,7 +55,7 @@ it.
 ### The seaborn objects interface
 
 Everything in this course used Seaborn's **function interface**,
-`relplot`, `catplot`, and friends. Seaborn also ships a newer, more
+`relplot()`, `catplot()`, and friends. Seaborn also ships a newer, more
 composable **objects interface**, imported as `seaborn.objects`. Instead of
 choosing a function up front, you start a `Plot` describing your data and
 roles, then **add** layers onto it with a small, consistent grammar:
@@ -139,7 +139,7 @@ asking, the through-line of the entire course.`}
 
 <MultipleChoice
   markdown={`How does the **objects interface** (\`import seaborn.objects as so\`) differ
-in spirit from the function interface (\`relplot\`, \`catplot\`, ...) you used
+in spirit from the function interface (\`relplot()\`, \`catplot()\`, ...) you used
 throughout this course?
 
 - It removes the need to think about what a chart reveals or hides.
@@ -173,8 +173,8 @@ histogram, a box plot, a pair plot: your call. The point is to run the loop
 one more time on your own.
 
 Assign your plot to a variable named \`g\`. (For a figure-level function like
-\`relplot\`/\`displot\`/\`catplot\`, that is the returned grid; for an axes-level
-function like \`scatterplot\`/\`histplot\`/\`boxplot\`, that is the returned
+\`relplot()\`/\`displot()\`/\`catplot()\`, that is the returned grid; for an axes-level
+function like \`scatterplot()\`/\`histplot()\`/\`boxplot()\`, that is the returned
 Axes.)`}
   files={[
     {

@@ -73,7 +73,7 @@ ax.set_title("Anatomy of a box plot (total_bill)")
 ## Comparing groups with box plots
 
 The real power of box plots is **comparison**: line several up, one per
-category, and differences in center and spread jump out. Use `catplot` with
+category, and differences in center and spread jump out. Use `catplot()` with
 `kind="box"`:
 
 <CodeBlock
@@ -107,6 +107,7 @@ a **numeric** variable to summarize.
 <Figure
   slug="sns-box-and-violin-plots-anatomy-box-plot-inline-cutout"
   alt="An upright box with a line across its middle, a thin rod at each end, and two loose chips beyond"
+  caption="The box is the middle half, the whiskers the reach, the dots the outliers."
 />
 
 ## The dangerous thing a box plot hides
@@ -119,6 +120,7 @@ distributions can produce the *same* box plot.
 <Figure
   slug="sns-box-and-violin-plots-comparing-groups-box-inline-cutout"
   alt="Three upright boxes side by side, each with a thin rod projecting from its top and its bottom, standing over three stacks of chips"
+  caption="Boxes stay readable across many categories, which is why they get used so much."
 />
 
 Three samples, one box plot. The quartiles agree; nothing else does:
@@ -205,8 +207,8 @@ to a violin (or a strip/swarm) when shape matters.`}
 
 ## Violin plots: box plus shape
 
-A **violin plot** combines a box plot's summary with a **KDE** (the smooth
-density from the previous chapters) mirrored on both sides. The width at any
+A **violin plot** combines a box plot's summary with a **kernel density
+estimate** (the smooth density from the previous chapters) mirrored on both sides. The width at any
 height shows how many observations sit there, so you see modality and skew
 that a box hides. The `inner` argument controls what's drawn inside:
 
@@ -243,6 +245,7 @@ evidence.
 <Figure
   slug="sns-box-and-violin-plots-inline-cutout"
   alt="An upright box with a thin rod at each end beside a symmetric bulging shape of the same height, both drawn over the same stack of chips"
+  caption="The violin adds the shape between the quartiles that the box leaves out."
 />
 
 <Callout type="warn" title="Violins need data; box plots tolerate scarcity">
@@ -301,7 +304,7 @@ And remember the option from the next page: when groups are small, just show
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Compare distributions with a violin plot"
-  instructions={`Using \`penguins\`, draw a **violin plot** with \`sns.catplot\` that
+  instructions={`Using \`penguins\`, draw a **violin plot** with \`sns.catplot()\` that
 compares \`body_mass_g\` across the three \`species\`:
 
 - \`x="species"\`, \`y="body_mass_g"\`, \`kind="violin"\`.
