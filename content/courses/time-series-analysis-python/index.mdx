@@ -162,10 +162,10 @@ reverse.** Break that rule and every accuracy number you compute becomes
 a comfortable lie.
 </Callout>
 
-## This is a reasoning course, not an API reference
+## This is a reasoning course, not a function reference
 
 Most time series material is either a wall of equations or a tour of
-function signatures (`resample`, `rolling`, `adfuller`, `ARIMA`...) with
+function signatures (`resample()`, `rolling()`, `adfuller()`, `ARIMA`...) with
 no story connecting them. This course is the opposite. For every concept
 and every transformation we ask:
 
@@ -185,7 +185,7 @@ know which question you're asking and whether the answer makes sense.
 - Recognize **why temporal data needs its own toolkit** and why ordinary
   machine-learning habits (shuffling, random splits) quietly corrupt it.
 - Wield pandas's **time machinery**, `DatetimeIndex`, frequencies,
-  partial-string slicing, `shift`, `resample`, `rolling`.
+  partial-string slicing, `shift()`, `resample()`, `rolling()`.
 - **Resample** between time resolutions (daily ⇄ weekly ⇄ monthly) and
   know when you are *summarizing* versus *inventing* data.
 - Fill **missing timestamps** the right way, and explain why forward-fill,
@@ -195,9 +195,13 @@ know which question you're asking and whether the answer makes sense.
   each piece.
 - Define **stationarity**, test for it with the **Augmented Dickey-Fuller**
   test, and create it with **differencing**.
-- Read **ACF and PACF** plots well enough to propose ARIMA orders by eye.
-- Fit and interpret **AR, MA, ARMA, and ARIMA** models with statsmodels.
-- Evaluate forecasts with **MAE, RMSE, and MAPE** coded by hand in NumPy.
+- Read **autocorrelation** and **partial autocorrelation** plots well enough
+  to propose model orders by eye.
+- Fit and interpret **autoregressive**, **moving-average**, and **ARIMA**
+  models with statsmodels.
+- Evaluate forecasts with the **mean absolute error**, the **root mean
+  squared error**, and the **mean absolute percentage error**, each coded by
+  hand in NumPy.
 - Design a **chronological backtest** that estimates real-world forecast
   skill without leaking the future into the past.
 
@@ -234,8 +238,8 @@ analysis needs surprisingly little machinery.
 | --- | --- |
 | **pandas** | The `DatetimeIndex`, resampling, rolling windows, gap-filling |
 | **NumPy** | Simulating series, vectorized math, hand-coded error metrics |
-| **matplotlib** | Line charts, component subplots, ACF/PACF plots |
-| **statsmodels** | Decomposition, the ADF test, ACF/PACF, ARIMA models |
+| **matplotlib** | Line charts, component subplots, autocorrelation plots |
+| **statsmodels** | Decomposition, the Augmented Dickey-Fuller test, autocorrelation, ARIMA models |
 
 <Callout type="info" title="Each code block runs on its own">
 Variables you define in one code block are **not** shared with the next,

@@ -3,7 +3,7 @@ title: "What Makes Time Series Unique"
 description: Why temporal data needs its own toolkit, temporal dependence, autocorrelation, the failure of the i.i.d. assumption, and why shuffling or random-splitting a time series silently destroys it.
 ---
 
-Before a single forecast, before `resample` or `ARIMA`, you need one idea
+Before a single forecast, before any resampling or any model, you need one idea
 in your bones: **a time series is not an ordinary table that happens to
 have a date column.** It is a fundamentally different object, and almost
 every mistake beginners make comes from forgetting that. This page is the
@@ -129,6 +129,7 @@ the same fixed distribution (same mean, same variance, forever).
 <Figure
   slug="tsa-what-makes-time-series-unique-inline-cutout"
   alt="A row of chips being shuffled on the left and losing its meaning, and kept in order on the right where it forms a shape"
+  caption="Order is the information. Shuffle the rows of a customer table and you lose nothing; shuffle a time series and the shape it was carrying disappears, which is why the usual statistical instincts have to be retrained here."
 />
 
 A time series violates **both** halves, on purpose:
@@ -196,6 +197,7 @@ flowchart LR
 <Figure
   slug="tsa-what-makes-time-series-unique-actually-time-series-inline-cutout"
   alt="A row of chips fixed to evenly spaced sleepers, one chip lifted showing its sleeper cannot be moved"
+  caption="Each observation is pinned to a timestamp, and the timestamp is not free to move. Lifting one chip shows its sleeper staying put, and that immovable spacing is what separates a time series from an ordinary table of numbers."
 />
 
 <Callout type="warn" title="Seasonal is not the same as cyclic">
@@ -260,7 +262,8 @@ multiplicative models and when we reach for a log transform.
 ## Why shuffling is sabotage (and where it sneaks in)
 
 You would never *manually* shuffle a time series, but a random train/test
-split does exactly that, and it's the default in almost every ML tutorial.
+split does exactly that, and it's the default in almost every
+machine-learning tutorial.
 Here's the trap, made concrete.
 
 When you randomly assign rows to "train" and "test", a test point from

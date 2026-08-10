@@ -5,16 +5,16 @@ description: One complete workflow that threads the whole course together, explo
 
 This is where it all comes together. Across the course you collected a
 toolkit, datetime indexing, resampling, gap-filling, decomposition,
-stationarity testing, differencing, ACF/PACF reading, ARIMA, and honest
-validation. Here we run the *entire* pipeline, start to finish, on the
+stationarity testing, differencing, reading the autocorrelation plots,
+ARIMA, and honest validation. Here we run the *entire* pipeline, start to finish, on the
 airline series, and end with the only question that matters: **does our model
 actually beat a trivial baseline on data it has never seen?**
 
 ```mermaid
 flowchart TD
     A["1. Load & plot<br/>(see trend, season, variance)"] --> B["2. Stabilize variance<br/>(log)"]
-    B --> C["3. Difference to stationarity<br/>(regular + seasonal) → ADF passes"]
-    C --> D["4. Identify orders<br/>(ACF / PACF)"]
+    B --> C["3. Difference to stationarity<br/>(regular + seasonal) → the test passes"]
+    C --> D["4. Identify orders<br/>(autocorrelation plots)"]
     D --> E["5. Split chronologically<br/>(hold out the future)"]
     E --> F["6. Fit on TRAIN only"]
     F --> G["7. Forecast + uncertainty"]
@@ -46,15 +46,16 @@ Take logs so the seasonal swings stop growing with the level of the series.
 
 **Difference to stationarity**
 
-Apply regular and seasonal differencing until an ADF test says the series is
-stationary.
+Apply regular and seasonal differencing until an Augmented Dickey-Fuller
+test says the series is stationary.
 
 </Step>
 <Step>
 
 **Identify the orders**
 
-Read the ACF and PACF of the stationary series to choose the ARIMA terms.
+Read the autocorrelation and partial autocorrelation of the stationary
+series to choose the ARIMA terms.
 
 </Step>
 <Step>
@@ -154,7 +155,8 @@ print(" - GROWING VARIANCE: the summer-winter swing widens over time (-> log).")
 
 ## Step 2, Confirm non-stationarity, then plan the transforms
 
-We don't guess; we test. The raw series should fail the ADF test, and the
+We don't guess; we test. The raw series should fail the Augmented
+Dickey-Fuller test, and the
 fix-up sequence (log for variance, a regular difference for trend, a seasonal
 difference for the yearly cycle) should drive it to stationarity.
 
@@ -261,7 +263,8 @@ print("Multiplicative: summer runs ~+25-30% above trend, winter dips below.")
 
 ## Step 4, Identify orders from the stationary series
 
-With the series made stationary, the ACF/PACF become readable. We're looking
+With the series made stationary, both autocorrelation plots become
+readable. We're looking
 for the regular short-lag structure (for `p`, `q`) and any leftover spike at
 the seasonal lag 12 (which tells us we need *seasonal* terms).
 
@@ -486,8 +489,9 @@ print("validated forecast looks like.")
 <Callout type="success" title="What 'done' looks like">
 A finished forecast is not just a line into the future. It is: a model whose
 assumptions you *checked* (stationarity), whose orders you *justified*
-(ACF/PACF), evaluated on data it *never saw* (chronological split), that
-*beats a baseline* on honest metrics (MAE/RMSE/MAPE), with *uncertainty bands*
+(from the autocorrelation plots), evaluated on data it *never saw*
+(chronological split), that *beats a baseline* on honest error metrics, with
+*uncertainty bands*
 that the actuals fall inside. Anything less is a guess wearing a lab coat.
 </Callout>
 
@@ -723,8 +727,8 @@ Logging stabilizes the variance that grows with the level, aligning the series w
 
 - That its forecast line looked smooth
   > Visual smoothness says nothing about accuracy. A smooth, confident, wrong forecast is still wrong; the baseline comparison on held-out data is the real test.
-- That its AIC was the lowest
-  > AIC is an in-sample criterion and wasn't even computed here. What makes the out-of-sample number meaningful is beating a baseline on that same held-out data.
+- That its information criterion was the lowest
+  > The Akaike information criterion is an in-sample criterion and wasn't even computed here. What makes the out-of-sample number meaningful is beating a baseline on that same held-out data.
 - That it used more parameters than the alternatives
   > More parameters is a cost, not evidence of value, it raises overfitting risk. Skill is shown by out-of-sample performance versus a baseline, not by complexity.
 - [o] That it beat the seasonal-naive **baseline** on the same honest, held-out test
@@ -753,11 +757,13 @@ You can now take a raw, messy, seasonal, non-stationary series and:
 
 - get it onto a clean **timeline**, **resample** it, and fill its **gaps**;
 - **decompose** it and recognize trend, seasonality, and noise;
-- test and engineer **stationarity** with the ADF test and **differencing**;
-- read **ACF/PACF** to propose **ARIMA** orders;
+- test and engineer **stationarity** with the Augmented Dickey-Fuller test
+  and **differencing**;
+- read the **autocorrelation plots** to propose **ARIMA** orders;
 - **fit** a model and forecast with honest **uncertainty**;
 - and, most importantly, **validate chronologically**, measure with
-  **MAE/RMSE/MAPE**, and prove your model **beats a baseline** without leaking
+  **absolute, squared and percentage error**, and prove your model **beats a
+  baseline** without leaking
   the future.
 
 That last skill is the one that separates forecasts you can stake decisions

@@ -1,14 +1,15 @@
 ---
-title: "Reading ACF and PACF Plots"
-description: What the ACF and PACF measure, how 'tails off' vs 'cuts off' distinguishes AR from MA models, the visual cheat-sheet, why you must difference to stationarity before reading them, and how to propose ARIMA orders by eye.
+title: "Reading Autocorrelation Plots"
+description: What the autocorrelation and partial autocorrelation functions measure, how 'tails off' vs 'cuts off' distinguishes an autoregressive model from a moving-average one, the visual cheat-sheet, why you must difference to stationarity before reading them, and how to propose model orders by eye.
 ---
 
 A stationary series still has a personality: each value echoes the ones
-before it in a particular way. The **ACF** and **PACF** plots are how we
-*listen* to those echoes, and reading them is how forecasters propose
+before it in a particular way. Two plots are how we *listen* to those
+echoes, the **autocorrelation function** and the **partial
+autocorrelation function**, and reading them is how forecasters propose
 model orders without brute-force search. Master these two plots and the
-otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
-*read off a chart*.
+otherwise-mysterious `(p, d, q)` of an ARIMA model becomes something you
+can often *read off a chart*.
 
 <Figure
   slug="tsa-acf-pacf-cutout"
@@ -17,36 +18,39 @@ otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
 
 ## Two kinds of correlation with the past
 
-- The **ACF** (Autocorrelation Function) measures the correlation between
+- The **autocorrelation function** (ACF) measures the correlation between
   the series and itself `k` steps earlier, for each lag `k`. It captures the
   **total** relationship at that lag, direct *and* indirect.
-- The **PACF** (Partial Autocorrelation Function) measures the correlation
+- The **partial autocorrelation function** (PACF) measures the correlation
   at lag `k` **after removing** the influence of all the shorter lags in
   between. It captures only the **direct** relationship.
 
 <Figure
-  slug="tsa-acf-and-pacf-watch-cheat-sheet-inline-cutout"
-  alt="A wave laid over the four reference shapes, one of them matching it exactly"
+  slug="tsa-acf-and-pacf-inline-cutout"
+  alt="One wave laid over a copy of itself shifted along by a few steps, with a gauge reading how well the two still line up"
+  caption="Autocorrelation is a series compared against a shifted copy of itself. Slide the copy k steps along, ask how well the two still line up, and the gauge reading you get is the correlation at lag k. One reading per shift is what the whole plot is made of."
 />
 
 <Figure
-  slug="tsa-acf-and-pacf-inline-cutout"
-  alt="One wave laid over a copy of itself shifted along by a few steps, with a gauge reading how well the two still line up"
+  slug="tsa-acf-and-pacf-watch-cheat-sheet-inline-cutout"
+  alt="A wave laid over the four reference shapes, one of them matching it exactly"
+  caption="Reading a plot means matching its shape against a small set of known signatures. The four reference shapes are the ones the cheat-sheet below names, and identifying a model comes down to seeing which one your plot is."
 />
 
-Why does "direct vs total" matter so much? Picture an AR(1) series where
-each value is $0.7 \times$ the previous one. Then $y(t)$ is directly tied to
-$y(t-1)$. But $y(t-1)$ is tied to $y(t-2)$, so $y(t)$ is *indirectly*
-correlated with $y(t-2)$ too, through the chain, even though there's no
-direct link. The **ACF** at lag 2 sees that indirect echo and is nonzero;
-the **PACF** at lag 2 strips the chain away and reveals the truth: no direct
-lag-2 relationship.
+Why does "direct vs total" matter so much? Picture an autoregressive
+series where each value is $0.7 \times$ the previous one. Then $y(t)$ is
+directly tied to $y(t-1)$. But $y(t-1)$ is tied to $y(t-2)$, so $y(t)$ is
+*indirectly* correlated with $y(t-2)$ too, through the chain, even though
+there's no direct link. The autocorrelation at lag 2 sees that indirect
+echo and is nonzero; the partial autocorrelation at lag 2 strips the chain
+away and reveals the truth: no direct lag-2 relationship.
 
 <Callout type="tip" title="The intuition in one line">
-ACF asks "how related are values `k` apart, *however* that relationship
-arises?" PACF asks "how related are they *directly*, once the middlemen are
-removed?" The gap between those two questions is exactly what lets us tell an
-AR process from an MA process.
+Autocorrelation asks "how related are values `k` apart, *however* that
+relationship arises?" Partial autocorrelation asks "how related are they
+*directly*, once the middlemen are removed?" The gap between those two
+questions is exactly what lets us tell an **autoregressive** process from a
+**moving-average** one.
 </Callout>
 
 ## The cheat-sheet
@@ -56,13 +60,17 @@ indistinguishable from noise:
 
 <Chart slug="acf-shapes" />
 
-Here is the single most useful table in classical forecasting. For a
-**stationary** series:
+Here is the single most useful table in classical forecasting. Two
+families of model appear in it, and the next lesson builds both: an
+**autoregressive** model of order `p`, written AR(p), predicts each value
+from the `p` values before it, and a **moving-average** model of order
+`q`, written MA(q), predicts it from the last `q` shocks. A model with
+both parts is an ARMA(p,q). For a **stationary** series:
 
-| Pattern | ACF | PACF | Read it as |
+| Pattern | Autocorrelation | Partial autocorrelation | Read it as |
 | --- | --- | --- | --- |
-| **AR(p)** | tails off (gradual decay) | **cuts off** after lag `p` | order `p` = number of PACF spikes |
-| **MA(q)** | **cuts off** after lag `q` | tails off (gradual decay) | order `q` = number of ACF spikes |
+| **AR(p)** | tails off (gradual decay) | **cuts off** after lag `p` | order `p` = number of partial-autocorrelation spikes |
+| **MA(q)** | **cuts off** after lag `q` | tails off (gradual decay) | order `q` = number of autocorrelation spikes |
 | **ARMA(p,q)** | tails off | tails off | neither cuts cleanly, try small `p`, `q` |
 | **white noise** | all ~0 (within bands) | all ~0 | nothing to model |
 | **non-stationary** | decays *very slowly* / lingers | (irrelevant) | **difference first**, then re-read |
@@ -84,11 +92,12 @@ is the order. AR → PACF cut → `p`. MA → ACF cut → `q`.
 ## Watch the cheat-sheet hold on data we built
 
 Let's *manufacture* an AR(1), an AR(2), and an MA(1) with known coefficients,
-then confirm their ACF/PACF match the table exactly.
+then confirm their plots match the table exactly.
 
 <Figure
   slug="tsa-acf-and-pacf-cheat-sheet-inline-cutout"
   alt="A small card of four shapes pinned above a bench, each shape matched to one of four wave patterns below"
+  caption="The card pinned above the bench is the cheat-sheet, and the wave patterns below it are the series we are about to build. Because we choose the coefficients ourselves, we know which shape each one should match before we plot it, which is what turns the table from a claim into something you can check."
 />
 
 ### AR(1): PACF cuts off at lag 1
@@ -226,7 +235,7 @@ A sharp PACF cut-off (with a tailing ACF) names an AR model, and two spikes mean
 
 ## The significance bands: which spikes are real?
 
-Every ACF/PACF plot draws a shaded band, roughly $\pm 1.96/\sqrt{n}$. Spikes *inside*
+Both plots draw a shaded band, roughly $\pm 1.96/\sqrt{n}$. Spikes *inside*
 the band are statistically indistinguishable from zero, noise. Spikes
 *poking outside* are "significant." When we say a plot "cuts off after lag
 `p`," we mean the spikes are significant up through lag `p` and then duck
@@ -243,11 +252,11 @@ suspicion unless it's at a meaningful lag (like the seasonal period).
 ## You must difference FIRST
 
 The cheat-sheet's fine print, "of the **stationary** series", is not
-optional. On a **non-stationary** (trending) series, the ACF decays *very
-slowly*, lingering near 1 across many lags. That slow decay is not an AR
-signature; it's the plot *screaming "I'm non-stationary, difference me."*
-Reading model orders off an undifferenced series is the most common ACF/PACF
-mistake.
+optional. On a **non-stationary** (trending) series, the autocorrelation
+decays *very slowly*, lingering near 1 across many lags. That slow decay
+is not an autoregressive signature; it's the plot *screaming "I'm
+non-stationary, difference me."* Reading model orders off an
+undifferenced series is the most common mistake these two plots invite.
 
 <CodeBlock
   adapter="python"
@@ -506,21 +515,23 @@ A non-stationary ACF lingers near 1 and hides the short-lag pattern, so the chea
 />
 
 <Callout type="success" title="Key takeaways">
-- The **ACF** measures total correlation at each lag (direct + indirect);
-  the **PACF** measures only the **direct** correlation, with intermediate
-  lags removed.
-- **Cheat-sheet:** **AR(p)** → ACF tails off, **PACF cuts off at `p`**.
-  **MA(q)** → **ACF cuts off at `q`**, PACF tails off. **ARMA** → both tail
-  off.
-- Mnemonic: **PACF → AR order; ACF → MA order**. The plot that *cuts off*
-  names the model; the number of spikes is the order.
+- **Autocorrelation** measures the total correlation at each lag (direct +
+  indirect); **partial autocorrelation** measures only the **direct**
+  correlation, with intermediate lags removed.
+- **Cheat-sheet:** **AR(p)** → autocorrelation tails off, **partial
+  autocorrelation cuts off at `p`**. **MA(q)** → **autocorrelation cuts off
+  at `q`**, partial autocorrelation tails off. **ARMA** → both tail off.
+- Mnemonic: **the partial plot names the autoregressive order; the ordinary
+  plot names the moving-average order**. The plot that *cuts off* names the
+  model; the number of spikes is the order.
 - Spikes inside the $\mathbf{\pm 1.96/\sqrt{n}}$ band are noise; don't over-read a lone
   far-out spike (some are false alarms).
-- **Always difference to stationarity first**, a slowly-decaying ACF means
-  "non-stationary," not "high-order AR."
+- **Always difference to stationarity first**, a slowly-decaying
+  autocorrelation means "non-stationary," not "high-order autoregressive."
 </Callout>
 
 You can now propose `(p, d, q)` by eye: `d` from how many differences reach
-stationarity, `p` from the PACF cut-off, `q` from the ACF cut-off. Time to
-hand those orders to an actual model and make a forecast, AR, MA, and their
+stationarity, `p` from the partial-autocorrelation cut-off, `q` from the
+autocorrelation cut-off. Time to hand those orders to an actual model and
+make a forecast: the autoregressive and moving-average families, and their
 union, ARIMA.

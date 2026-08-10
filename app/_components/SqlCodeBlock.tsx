@@ -72,6 +72,7 @@ import {
   persistKey,
   savePersistedCode,
 } from "./codePersistence";
+import { SqlCardToolsMenu } from "./sqlCardTools/SqlCardToolsMenu";
 import styles from "./ChallengeCard.module.css";
 import {
   DialectGlyph,
@@ -162,6 +163,12 @@ export default function SqlCodeBlock({
   // label, and the boot-progress state that drives the boot loader.
   const { ensureEngine, engineLabel, bootState, destroyEngine, resetEngine } =
     useSqlEngineBoot({ dialect, initSql, remoteInitSql });
+  // Raw `exec` handle for the header's tools menu (Excel export, ER
+  // diagram, DDL), which reads the same live database the block queries.
+  const ensureExec = useCallback(async () => {
+    const engine = await ensureEngine();
+    return (sql: string) => engine.exec(sql);
+  }, [ensureEngine]);
   const runSeqRef = useRef(0);
   const runRef = useRef<() => void>(() => {});
 
@@ -602,12 +609,19 @@ export default function SqlCodeBlock({
       aria-label={title ? `SQL code block: ${title}` : "SQL code block"}
     >
       {/* ── Header ── */}
-      <div className={styles.header}>
+      <div className={`${styles.header} ${styles.headerCompact}`}>
         <div className={styles.headerRow}>
           <div className={styles.badge}>
             <Database size={9} aria-hidden /> {badge}
           </div>
           <div className={styles.headerMeta}>
+            <SqlCardToolsMenu
+              dialect={dialect}
+              ensureExec={ensureExec}
+              disabled={isBusy}
+              exportBaseName={title ?? `${dialect}-tables`}
+              showToast={toasts.show}
+            />
             <span className={styles.headerRuntimeLabel}>
               <DialectGlyph dialect={dialect} />
               {engineLabel}

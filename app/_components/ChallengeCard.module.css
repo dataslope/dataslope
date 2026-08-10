@@ -115,6 +115,15 @@
   gap: 14px;
 }
 
+/* Code blocks (`CodeBlock`, `SqlCodeBlock`) carry a single header row —
+   badge, runtime label, status dot — where a challenge card's header
+   also holds the title row beneath it. The taller 16px inset reads as
+   balanced above two rows and top-heavy above one, so the code blocks
+   opt into a 12px top inset and the challenge cards keep 16px. */
+.headerCompact {
+  padding-top: 12px;
+}
+
 .headerRow {
   display: flex;
   align-items: center;

@@ -16,10 +16,10 @@ timeline correctly.
   alt="A calendar rail running along the edge of a grid platform, date plates slotted into it as the index rather than as a column"
 />
 
-## From strings to timestamps: `pd.to_datetime`
+## From strings to timestamps: `pd.to_datetime()`
 
 Dates almost always arrive as **text**. The first job of any time series
-workflow is to parse that text into real timestamps. `pd.to_datetime` is
+workflow is to parse that text into real timestamps. `pd.to_datetime()` is
 the workhorse.
 
 <CodeBlock
@@ -57,7 +57,7 @@ Two new types just appeared, and they matter:
 Convert date columns to real timestamps the moment the data lands, then
 forget they were ever strings. String dates are a trap: `"2014-1-5"`,
 `"01/05/2014"`, and `"Jan 5, 2014"` all *look* like dates but sort and
-compare like gibberish until parsed. `pd.to_datetime` handles all three.
+compare like gibberish until parsed. `pd.to_datetime()` handles all three.
 </Callout>
 
 When some values are unparseable, choose your failure mode explicitly:
@@ -95,6 +95,7 @@ The pivotal move: take a parsed date column and make it the index.
 <Figure
   slug="tsa-the-pandas-timeline-inline-cutout"
   alt="A rail whose sleepers are evenly spaced dates, with chips resting on the sleepers and two sleepers left bare"
+  caption="Putting dates in the index is laying this rail. Each value rests on the timestamp it belongs to, so the spacing between values becomes part of the data, and a date with nothing on it shows up as a bare sleeper rather than silently vanishing."
 />
 
 <CodeBlock
@@ -127,16 +128,16 @@ print("Now the timeline tools are available.")
 
 <Callout type="info" title="Why the index, not a column?">
 pandas reserves its time-series superpowers, partial-string slicing,
-`resample`, `rolling`, automatic alignment, for data indexed by a
+`resample()`, `rolling()`, automatic alignment, for data indexed by a
 `DatetimeIndex`. A date sitting in a normal column is just data; a date in
 the *index* is a coordinate the library can navigate. When in doubt with
 time series, **put time in the index**.
 </Callout>
 
-## Building a timeline from scratch: `date_range`
+## Building a timeline from scratch: `date_range()`
 
 When you need a regular grid of timestamps, for simulated data, for a
-forecast horizon, or to reindex onto a clean calendar, `pd.date_range`
+forecast horizon, or to reindex onto a clean calendar, `pd.date_range()`
 generates one. The `freq` argument sets the spacing.
 
 <CodeBlock
@@ -198,6 +199,7 @@ off.
 <Figure
   slug="tsa-the-pandas-timeline-from-strings-timestamps-inline-cutout"
   alt="Written slips fed into a machine and leaving as tidy dated cards that clip onto a rail"
+  caption="Parsing is this machine. Hand-written date text goes in and uniform dated cards come out, and only once they are uniform can they clip onto the rail in order, which is what every slice and every resample later depends on."
 />
 
 <CodeBlock
@@ -591,7 +593,7 @@ assert total.loc[pd.Timestamp("2014-03-04")] == 8`,
   > Memory is not the motivation, and the savings are negligible. The point is unlocking behavior, not shrinking storage.
 - It converts the data to a NumPy array
   > Indexing has nothing to do with converting to NumPy, and you wouldn't want that, you'd lose the very label-awareness that makes the index useful.
-- [o] A \`DatetimeIndex\` unlocks partial-string slicing, \`resample\`, \`rolling\`, and automatic alignment, features that don't work on a plain column
+- [o] A \`DatetimeIndex\` unlocks partial-string slicing, \`resample()\`, \`rolling()\`, and automatic alignment, features that don't work on a plain column
   > pandas attaches its time-series machinery to the index. With dates in the index you can write \`df.loc["1955"]\`, \`df.resample("ME")\`, and rely on label alignment; with dates in a column you can't.
 
 The index is where pandas keeps its time-series powers; a date in a column is inert by comparison.`}
@@ -628,7 +630,7 @@ Arithmetic aligns on the union of labels and yields \`NaN\` where a label is mis
 />
 
 <Callout type="success" title="Key takeaways">
-- **`pd.to_datetime`** parses date text into **`Timestamp`** values; bad
+- **`pd.to_datetime()`** parses date text into **`Timestamp`** values; bad
   rows become **`NaT`** with `errors="coerce"`.
 - Put time in the **index** (a **`DatetimeIndex`**) to unlock slicing,
   resampling, rolling, and alignment.
@@ -646,4 +648,4 @@ Arithmetic aligns on the union of labels and yields \`NaN\` where a label is mis
 
 You can now get any dataset onto a clean timeline. Next we change the
 *resolution* of that timeline, squeezing daily data up to monthly, or
-stretching monthly data down to daily, with `resample`.
+stretching monthly data down to daily, with `resample()`.

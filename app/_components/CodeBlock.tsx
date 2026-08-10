@@ -1228,7 +1228,7 @@ function CodeBlockInner({
       data-adapter={adapter.id}
       data-expect-error={expectError ? "true" : undefined}
     >
-      <div className={challengeStyles.header}>
+      <div className={`${challengeStyles.header} ${challengeStyles.headerCompact}`}>
         <div className={challengeStyles.headerRow}>
           <div className={challengeStyles.badge}>
             <Play size={9} aria-hidden /> Code Block

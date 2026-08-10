@@ -107,6 +107,7 @@ import {
 } from "./codePersistence";
 import { RuntimeBootNotice } from "./RuntimeBootNotice";
 import { DiamondSpinner } from "./mdx/loadingAnimations";
+import { SqlCardToolsMenu } from "./sqlCardTools/SqlCardToolsMenu";
 import styles from "./ChallengeCard.module.css";
 
 // ─── Types ────────────────────────────────────────────────────────────
@@ -810,6 +811,12 @@ export default function SqlChallengeCard({
   // label, and the boot-progress state that drives the boot loader.
   const { ensureEngine, engineLabel, bootState, destroyEngine, resetEngine } =
     useSqlEngineBoot({ dialect, initSql, remoteInitSql });
+  // Raw `exec` handle for the header's tools menu (Excel export, ER
+  // diagram, DDL), which reads the same live database the card grades.
+  const ensureExec = useCallback(async () => {
+    const engine = await ensureEngine();
+    return (sql: string) => engine.exec(sql);
+  }, [ensureEngine]);
   const runSeqRef = useRef(0);
   const runRef = useRef<() => void>(() => {});
   // Default action of the split button (Submit when canCheck,
@@ -1683,6 +1690,13 @@ export default function SqlChallengeCard({
             <Database size={9} aria-hidden /> {badge}
           </div>
           <div className={styles.headerMeta}>
+            <SqlCardToolsMenu
+              dialect={dialect}
+              ensureExec={ensureExec}
+              disabled={isBusy}
+              exportBaseName={title}
+              showToast={toasts.show}
+            />
             <span className={styles.headerRuntimeLabel}>
               <DialectGlyph dialect={dialect} />
               {engineLabel}
