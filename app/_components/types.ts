@@ -9,16 +9,19 @@ export interface OutputCell {
    *  arbitrary value (e.g. Plotly figure JSON) for plot. */
   content: string;
   /**
-   * For "image" cells only: a URL to fetch the picture from, instead of
-   * carrying its bytes in `content`.
+   * For "image" and "plot" cells: a URL to fetch the picture (or the Plotly
+   * figure JSON) from, instead of carrying it in `content`.
    *
    * Set exclusively by prepopulated output (see
-   * `scripts/build-block-outputs.mjs`). A run's own figures stay inline —
+   * `scripts/build-block-outputs.mjs`). A run's own charts stay inline —
    * they are already in memory and the reader is looking straight at them —
-   * but a prepopulated figure is paid for on page load by every reader,
-   * including the ones who never scroll to it, and base64 is ~98% of that
-   * weight. Written out as a WebP under `public/block-outputs/` it is a
-   * lazily-loaded, separately-cached file instead.
+   * but a prepopulated one is paid for on page load by every reader,
+   * including those who never scroll to it. Measured across the site those
+   * two cell types were essentially the entire weight: base64 PNG was 98%
+   * of the first manifest, and once the images were externalised, figure
+   * JSON was 88% of what remained. Both are files under
+   * `public/block-outputs/` now, fetched lazily and cached apart from the
+   * page.
    */
   src?: string;
   /** For "plot" cells, the parsed Plotly figure JSON. */

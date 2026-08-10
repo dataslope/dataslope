@@ -329,16 +329,25 @@ comment at both ends.
 
 ### 3.2 Three departures from the plan
 
-**Figures are files, not base64.** §1.5 proposed capping and re-encoding
-inline base64. Measured, that was not enough: the first working run of one
-course produced 1,189 kB of manifest, of which **1,165 kB (98%) was base64
-PNG**, up to 273 kB on a single lesson — all of it inlined into the page
-whether or not the reader ever scrolled to the block. Figures are now written
-to `public/block-outputs/<key>-<n>.webp` and referenced by URL. The same
-course: **25 kB inline** plus 538 kB of WebP that loads lazily and caches
-separately. `OutputCell` grew an optional `src` for this; a *run's* figures
-still arrive inline, because they are already in memory and the reader is
-looking straight at them.
+**Charts are files, not base64 and not inline JSON.** §1.5 proposed capping
+and re-encoding inline base64. Measured, that was not enough, and it took two
+rounds to find the floor:
+
+1. The first working run of one course produced 1,189 kB of manifest, of
+   which **1,165 kB (98%) was base64 PNG**, up to 273 kB on a single lesson.
+   Matplotlib figures moved to `public/block-outputs/<key>-<n>.webp`. That
+   course dropped to 25 kB inline plus 538 kB of lazily-loaded WebP.
+2. Across the whole site, what was left was **2,328 kB of Plotly figure JSON
+   out of 2,635 kB inline (88%)**, 160 kB on the heaviest lesson — and it was
+   the sole reason 11 chart blocks were dropped by the cell cap, at 146 kB to
+   866 kB each. Figures moved out too, to `<key>-<n>.json`, fetched by an
+   `IntersectionObserver` so a chart the reader never scrolls to costs
+   nothing. The Plotly course went from 11 dropped blocks and ~110 kB a
+   lesson to **all 104 blocks recorded at 7 kB inline**.
+
+`OutputCell` grew an optional `src` for both. A *run's* own charts still
+arrive inline, because they are already in memory and the reader is looking
+straight at them.
 
 **Per-lesson chunking was unnecessary.** §1.5 proposed emitting one JSON
 chunk per lesson so a page only pays for its own. With the figures gone the

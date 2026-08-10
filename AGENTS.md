@@ -805,10 +805,13 @@ Three things about it are worth knowing before you touch it:
   it with `--empty`, which writes the manifest's shape and boots nothing: a
   fresh clone gets empty output panels, exactly what the blocks did before
   this existed. `dev` and `build` do the real pass.
-- **Figures are files, not payload.** Base64 PNG was 98% of the first
-  measured manifest. Charts go to `public/block-outputs/<key>-<n>.webp` and
-  the manifest carries a URL, which is why `OutputCell` has an optional
-  `src`. A *run's* own figures still arrive inline.
+- **Charts are files, not payload.** Between them they were nearly the whole
+  weight: base64 PNG was 98% of the first measured manifest, and once the
+  images were out, Plotly JSON was 88% of what remained. Both go to
+  `public/block-outputs/` and the manifest carries a URL, which is why
+  `OutputCell` has an optional `src`; figures are fetched by an
+  `IntersectionObserver`, so a chart nobody scrolls to costs nothing. A
+  *run's* own charts still arrive inline.
 - **Entries are keyed by a hash of the block's source** (`lib/blockOutputKey.ts`),
   never by file and line. An edited block loses its entry and falls back to
   the empty panel; a positional key would confidently show output the code no

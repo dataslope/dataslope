@@ -52,14 +52,16 @@ import { captureSetupScript, wrapLastExpression } from "./lib/python-output-capt
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = join(ROOT, "lib", "generated");
 const OUT_FILE = join(OUT_DIR, "block-outputs.js");
-// Figures land here as files rather than inside the manifest. Base64 PNG was
-// 98% of a first measurement's weight (1,165 kB of 1,189 kB across one
-// course, up to 273 kB on a single lesson), and every byte of it would have
-// been inlined into the page whether or not the reader ever scrolled to the
-// block. As WebP files they are a third the size, fetched lazily, and cached
-// separately from the HTML.
-const IMAGE_DIR = join(ROOT, "public", "block-outputs");
-const IMAGE_URL_BASE = "/block-outputs";
+// Charts land here as files rather than inside the manifest, and between
+// them they were essentially the entire payload. Base64 PNG was 98% of the
+// first measurement (1,165 kB of 1,189 kB across one course, 273 kB on a
+// single lesson); with the images externalised, Plotly figure JSON was 88%
+// of what remained, 160 kB on the heaviest lesson, and the sole reason 11
+// chart blocks had to be dropped outright. All of it would have been
+// inlined into the page whether or not the reader ever scrolled to the
+// block. As files they are fetched lazily and cached apart from the HTML.
+const ASSET_DIR = join(ROOT, "public", "block-outputs");
+const ASSET_URL_BASE = "/block-outputs";
 
 /**
  * Size ceilings, and why each one is where it is.
@@ -74,6 +76,7 @@ const MAX_CELL_BYTES = 120_000; // one very wide table (images are files)
 const MAX_BLOCK_BYTES = 250_000; // all inline cells of one block
 const MAX_TEXT_CHARS = 20_000; // a runaway print loop
 const MAX_IMAGE_BYTES = 400_000; // one encoded figure on disk
+const MAX_PLOT_BYTES = 1_500_000; // one figure JSON on disk
 
 function writeManifestFile(data) {
   mkdirSync(OUT_DIR, { recursive: true });
@@ -169,8 +172,8 @@ py.runPython(captureSetupScript());
 // A full run owns the whole directory, so stale figures from deleted or
 // edited blocks are cleared rather than accumulating forever. A filtered run
 // touches only the blocks it selected, so it must leave the rest alone.
-if (!filter) rmSync(IMAGE_DIR, { recursive: true, force: true });
-mkdirSync(IMAGE_DIR, { recursive: true });
+if (!filter) rmSync(ASSET_DIR, { recursive: true, force: true });
+mkdirSync(ASSET_DIR, { recursive: true });
 
 const { default: sharp } = await import("sharp");
 
@@ -187,9 +190,30 @@ async function writeFigure(base64, key, index) {
   try {
     const webp = await sharp(Buffer.from(base64, "base64")).webp({ quality: 82 }).toBuffer();
     if (webp.length > MAX_IMAGE_BYTES) return null;
-    writeFileSync(join(IMAGE_DIR, name), webp);
+    writeFileSync(join(ASSET_DIR, name), webp);
     imageBytes += webp.length;
-    return `${IMAGE_URL_BASE}/${name}`;
+    return `${ASSET_URL_BASE}/${name}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Write one Plotly figure out as JSON and return its URL, or null when it
+ * is implausibly large.
+ *
+ * Same reasoning as the images, and the same measurement behind it: with
+ * the PNGs externalised, figure JSON was 2,328 kB of the manifest's 2,635 kB
+ * and put 160 kB on the heaviest lesson. It was also the sole reason 11
+ * chart blocks were dropped outright, at 146 kB to 866 kB a cell.
+ */
+function writePlot(json, key, index) {
+  const name = `${key}-${index}.json`;
+  if (json.length > MAX_PLOT_BYTES) return null;
+  try {
+    writeFileSync(join(ASSET_DIR, name), json);
+    plotBytes += json.length;
+    return `${ASSET_URL_BASE}/${name}`;
   } catch {
     return null;
   }
@@ -265,6 +289,9 @@ const overCapExamples = [];
 let imageBytes = 0;
 let imagesWritten = 0;
 let imagesDropped = 0;
+let plotBytes = 0;
+let plotsWritten = 0;
+let plotsDropped = 0;
 
 for (const [i, block] of blocks.entries()) {
   const entry = block.files.find((f) => f.filename === block.entry) ?? block.files[0];
@@ -329,17 +356,30 @@ for (const [i, block] of blocks.entries()) {
   const stored = [];
   let figureIndex = 0;
   for (const cell of cells) {
-    if (cell.type !== "image") {
-      stored.push(cell);
+    if (cell.type === "image") {
+      const src = await writeFigure(cell.content, key, figureIndex++);
+      if (!src) {
+        imagesDropped++;
+        continue;
+      }
+      imagesWritten++;
+      stored.push({ type: "image", content: "", src });
       continue;
     }
-    const src = await writeFigure(cell.content, key, figureIndex++);
-    if (!src) {
-      imagesDropped++;
+    if (cell.type === "plot") {
+      const src = writePlot(cell.content, key, figureIndex++);
+      if (!src) {
+        plotsDropped++;
+        continue;
+      }
+      plotsWritten++;
+      // `plot` is dropped along with `content`: the renderer fetches and
+      // parses the JSON itself, and keeping the parsed copy here would put
+      // the whole figure straight back into the payload.
+      stored.push({ type: "plot", content: "", src });
       continue;
     }
-    imagesWritten++;
-    stored.push({ type: "image", content: "", src });
+    stored.push(cell);
   }
   if (stored.length === 0) {
     stats.empty++;
@@ -373,15 +413,18 @@ writeManifestFile(manifest);
 if (!filter) cache.commit();
 
 const kb = Math.round(stats.bytes / 1024);
-const imgKb = Math.round(imageBytes / 1024);
+const assetKb = Math.round((imageBytes + plotBytes) / 1024);
 console.log(
   `build-block-outputs: ${stats.recorded} block(s) recorded of ${blocks.length} ` +
-    `(${kb} kB inline + ${imagesWritten} figure(s), ${imgKb} kB on disk), ` +
-    `${stats.empty} produced no output, ${stats.failed} failed, ` +
-    `${stats.environmental} could not run in Node`,
+    `(${kb} kB inline + ${imagesWritten} image(s) + ${plotsWritten} figure(s), ` +
+    `${assetKb} kB on disk), ${stats.empty} produced no output, ` +
+    `${stats.failed} failed, ${stats.environmental} could not run in Node`,
 );
-if (imagesDropped > 0) {
-  console.log(`build-block-outputs: ${imagesDropped} figure(s) could not be encoded and were dropped`);
+if (imagesDropped + plotsDropped > 0) {
+  console.log(
+    `build-block-outputs: ${imagesDropped} image(s) and ${plotsDropped} figure(s) ` +
+      `were too large to write and were dropped`,
+  );
 }
 // Never let a cap pass silently: a dropped block reads as "we covered
 // everything" unless it is said out loud.

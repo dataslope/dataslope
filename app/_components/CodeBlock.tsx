@@ -49,7 +49,12 @@ import { describeCodeBlock } from "./ai/widgetSnapshots";
 import { aiInlineCompletion } from "./ai/inlineCompletion";
 import { languageCompletion } from "./completion/languageCompletion";
 
-import type { LanguageAdapter, LanguageRuntime, OutputCell } from "./types";
+import type {
+  LanguageAdapter,
+  LanguageRuntime,
+  OutputCell,
+  PlotlyFigure,
+} from "./types";
 import {
   getSharedRuntime,
   isRuntimeReady,
@@ -1729,6 +1734,64 @@ async function copyToClipboard(text: string): Promise<boolean> {
  *  `data-cell-type` attribute the per-cell rendering used to carry, so
  *  tests and tooling can keep counting stdout/stderr/html/image/plot
  *  outputs. */
+/**
+ * A prepopulated Plotly figure, fetched when it nears the viewport.
+ *
+ * Deferring on visibility rather than on mount matters here: the output
+ * panels are server-rendered, so every chart on a lesson would otherwise
+ * fetch its figure the moment the page hydrates, which is the cost this
+ * indirection exists to avoid. `PlotlyChart` then loads plotly.js itself,
+ * so nothing about a chart the reader never reaches is downloaded.
+ */
+function LazyPlotCell({ src }: { src: string }) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const [figure, setFigure] = useState<PlotlyFigure | null>(null);
+
+  useEffect(() => {
+    const el = hostRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      // No observer (older browser, jsdom): fetch straight away rather than
+      // leave the panel permanently blank.
+      void fetch(src)
+        .then((r) => r.json())
+        .then(setFigure)
+        .catch(() => {});
+      return;
+    }
+    let cancelled = false;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        observer.disconnect();
+        void fetch(src)
+          .then((r) => r.json())
+          .then((fig) => {
+            if (!cancelled) setFigure(fig as PlotlyFigure);
+          })
+          // A figure that fails to load leaves an empty slot, which is the
+          // same thing the reader saw before any of this existed.
+          .catch(() => {});
+      },
+      { rootMargin: "400px" },
+    );
+    observer.observe(el);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [src]);
+
+  return (
+    <div
+      ref={hostRef}
+      className={challengeStyles.outCellPlot}
+      data-cell-type="plot"
+    >
+      {figure ? <PlotlyChart figure={figure} /> : null}
+    </div>
+  );
+}
+
 function OutputSegment({ cell }: { cell: OutputCell }) {
   if (cell.type === "html") {
     // Same trust assumption as the main playground: HTML cells are
@@ -1761,12 +1824,22 @@ function OutputSegment({ cell }: { cell: OutputCell }) {
       </div>
     );
   }
-  if (cell.type === "plot" && cell.plot) {
-    return (
-      <div className={challengeStyles.outCellPlot} data-cell-type="plot">
-        <PlotlyChart figure={cell.plot} />
-      </div>
-    );
+  if (cell.type === "plot") {
+    // A run's own figure arrives parsed; a prepopulated one carries a `src`
+    // and is fetched when it scrolls into view. Figure JSON is the single
+    // heaviest thing these panels hold — 88% of the manifest's inline bytes
+    // before this, and 146 kB to 866 kB on the charts that had to be
+    // dropped entirely — so it is kept out of the page the same way the
+    // images are.
+    if (cell.plot) {
+      return (
+        <div className={challengeStyles.outCellPlot} data-cell-type="plot">
+          <PlotlyChart figure={cell.plot} />
+        </div>
+      );
+    }
+    if (cell.src) return <LazyPlotCell src={cell.src} />;
+    return null;
   }
   return (
     <div
