@@ -42,6 +42,7 @@ either converts or doesn't. One email that either bounces or doesn't.
 <Figure
   slug="stat-discrete-distributions-binomial-counting-successes-inline-cutout"
   alt="Ten two-position switches thrown in a row with a tally rack counting how many came up lit"
+  caption="The binomial counts how many of n independent trials came up a success."
 />
 
 There's almost nothing to it, the mean is just $p$ and the variance is
@@ -110,6 +111,7 @@ and its variance is $np(1 - p)$.
 <Figure
   slug="stat-discrete-distributions-bernoulli-single-yes-inline-cutout"
   alt="One two-position switch thrown once, its lamp either lit or dark"
+  caption="A Bernoulli trial is one switch thrown once: the atom of the others."
 />
 
 <CodeBlock
@@ -484,6 +486,7 @@ events at a rate?
 <Figure
   slug="stat-discrete-distributions-inline-cutout"
   alt="A row of separate bins holding whole blocks, with clear gaps between the bins and no partial blocks anywhere"
+  caption="Discrete values come in whole steps, with nothing in the gaps between them."
 />
 
 ```mermaid
@@ -509,7 +512,7 @@ doesn't apply.
 ## Simulation as a sanity check
 
 When you're unsure whether a formula is right, simulate. Draw many
-samples with `.rvs`, count how often the event happens, and compare to
+samples with `.rvs()`, count how often the event happens, and compare to
 the analytic probability. They should match closely, that agreement is
 your confidence the model is set up correctly.
 
@@ -630,6 +633,6 @@ Counts are whole numbers; continuous measurements like time belong to the next c
   constant p / constant rate), and never use a discrete count model
   for continuous measurements.
 - The scipy recipe is universal: freeze the distribution, then call
-  `.pmf`, `.cdf`, `.sf`, `.mean`, `.var`, `.rvs`. Remember $P(X \ge k)$
+  `.pmf()`, `.cdf()`, `.sf()`, `.mean()`, `.var()`, `.rvs()`. Remember $P(X \ge k)$
   is `.sf(k - 1)`.
 </Callout>

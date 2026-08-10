@@ -11,7 +11,8 @@ churns**? Those are counts of categories, not averages.
 
 This page covers the two tools that handle these cases:
 
-- **One-way ANOVA**, compares the means of **3+ groups** at once.
+- **One-way ANOVA** (analysis of variance), compares the means of **3+
+  groups** at once.
 - **Chi-square tests**, work with **categorical** data: are two
   categorical variables associated (independence), and does a category's
   counts match an expected pattern (goodness-of-fit)?
@@ -37,11 +38,13 @@ by pure luck climbs well above 5%.
 <Figure
   slug="stat-anova-and-chi-square-common-misconceptions-gathered-inline-cutout"
   alt="Three covered pits along a bench, each with a plank laid over it"
+  caption="Run enough pairwise tests and one fires by luck alone."
 />
 
 <Figure
   slug="stat-anova-and-chi-square-inline-cutout"
   alt="Four mounds standing in a row with one gauge measuring the spread between their peaks against the spread within each"
+  caption="ANOVA weighs the spread between group means against the spread inside each group."
 />
 
 <CodeBlock
@@ -218,6 +221,7 @@ number.
 <Figure
   slug="stat-anova-and-chi-square-part-b-chi-inline-cutout"
   alt="A grid of trays holding counted chips, with a shorter solid marker block standing beside each tray showing the count that was expected"
+  caption="Chi-square compares the counts you saw against the counts you expected."
 />
 
 <Chart slug="chi-square-shapes" />
@@ -307,7 +311,7 @@ else:
 - H₀: the two variables are **independent** (no association).
 - H₁: they are **associated** (not independent).
 
-`chi2_contingency` returns four things: the statistic, the p-value, the
+`chi2_contingency()` returns four things: the statistic, the p-value, the
 degrees of freedom, and the **expected** counts table. A small p-value
 means observed and expected diverge more than chance would allow, so the
 variables are related. Notice the expected table: it's what each cell
@@ -490,7 +494,7 @@ assert conclusion == expected`,
 - Store the p-value as a float named **\`p_value\`**.
 - Set a boolean **\`associated\`** to whether the variables are associated at \`alpha = 0.05\` (reject \`H0\` when \`p_value <= alpha\`).
 
-Remember: chi-square needs **counts**, which is exactly what \`crosstab\` produces.`}
+Remember: chi-square needs **counts**, which is exactly what \`crosstab()\` produces.`}
   files={[
     {
       filename: "main.py",
@@ -658,7 +662,7 @@ A significant ANOVA is the start of the investigation, not the end; post-hoc com
   positives (*Errors and Power*). And ANOVA is an **omnibus** test: it
   says *something* differs, not *which* (use post-hoc tests).
 - **Chi-square** handles **categorical** data: **independence** (two
-  variables, via a `crosstab` + `chi2_contingency`) and **goodness-of-fit**
+  variables, via a `crosstab()` + `chi2_contingency()`) and **goodness-of-fit**
   (one variable vs expected proportions, via `chisquare`).
 - Chi-square needs **counts, not proportions**, tests **existence not
   strength** (use Cramér's V for magnitude), and gets shaky with **small

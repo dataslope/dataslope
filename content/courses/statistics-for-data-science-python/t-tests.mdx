@@ -37,6 +37,7 @@ Strip away the bookkeeping and it's just a ratio:
 <Figure
   slug="stat-t-tests-t-statistic-signal-inline-cutout"
   alt="A caliper measuring the gap between two mounds held against a second caliper measuring the mounds' own width"
+  caption="The t-statistic is the gap you measured divided by the noise in that gap."
 />
 
 The numerator is the **signal**, how far the means are apart. The
@@ -450,7 +451,7 @@ matching and usually *loses* power (you may miss a real effect). Using a
 simply invalid, because you'd be pairing rows that have no relationship.
 The rule: if each row is one unit measured under both conditions, pair it
 (`ttest_rel`). If the two groups are different units, don't
-(`ttest_ind`).
+(`ttest_ind()`).
 </Callout>
 
 ## The assumptions, and how much they matter
@@ -517,6 +518,7 @@ like the Mann–Whitney U or Wilcoxon signed-rank test, covered in
 <Figure
   slug="stat-t-tests-inline-cutout"
   alt="Two mounds of chips side by side with a caliper measuring the gap between their peaks against the width of the mounds"
+  caption="A t-test asks whether two means differ by more than their spread allows."
 />
 
 - You're comparing **means** (averages), and
@@ -788,7 +790,7 @@ A p-value tells you whether a difference is distinguishable from zero, never whe
 - A t-test compares **means**; its statistic is **signal ÷ noise**
   (difference ÷ standard error), and the p-value asks how surprising that
   ratio is if there's no real difference.
-- Match the **design**: one group vs a target → `ttest_1samp`; two
+- Match the **design**: one group vs a target → `ttest_1samp()`; two
   independent groups → `ttest_ind(..., equal_var=False)` (Welch's); same
   units measured twice → `ttest_rel` (paired).
 - **Default to Welch's** for two independent samples, it drops the

@@ -36,6 +36,7 @@ curve, *regardless* of what the individual pieces look like.
 <Figure
   slug="stat-the-normal-distribution-normal-shows-up-inline-cutout"
   alt="Many small unrelated nudges added along a rail, the total settling into a smooth mound"
+  caption="Many small independent nudges add up to a bell, whatever each nudge looks like."
 />
 
 ```mermaid
@@ -495,6 +496,7 @@ produces confidently wrong answers:
 <Figure
   slug="stat-the-normal-distribution-inline-cutout"
   alt="A symmetric mound of chips with three widening bands marked outward from its centre, each band holding fewer chips"
+  caption="The bands hold roughly 68, 95 and 99.7 per cent of a normal distribution."
 />
 
 Let's *see* the misfit by forcing a normal onto right-skewed income data.
@@ -614,7 +616,7 @@ The empirical rule is a normal-distribution fact, not a universal one.`}
   markdown={`To convert a raw value \`x\` from a \`Normal(mu, sigma)\` into the **percentile** of scores at or below it, what's the correct computation?
 
 - \`stats.norm(loc=mu, scale=sigma).ppf(x)\`
-  > \`ppf\` expects a probability (0 to 1), so feeding it a raw score is invalid and would not return a percentile.
+  > \`ppf()\` expects a probability (0 to 1), so feeding it a raw score is invalid and would not return a percentile.
 - \`(x - mu) / sigma\`, and that is the percentile
   > That formula gives the *z-score* (a position), not a percentile; you still need to pass it through the CDF.
 - [o] Compute \`z = (x - mu) / sigma\`, then \`stats.norm().cdf(z)\` (equivalently \`stats.norm(loc=mu, scale=sigma).cdf(x)\`)
@@ -650,7 +652,7 @@ Light normal tails systematically understate the frequency of the rare, costly e
   not a probability; convert with `norm.cdf` (z → percentile) and
   `norm.ppf` (percentile → z).
 - Move freely among **raw value ↔ z-score ↔ percentile**; use the direct
-  `norm(loc, scale).cdf`/`.ppf` when you want to skip the z step.
+  `norm(loc, scale).cdf`/`.ppf()` when you want to skip the z step.
 - **Do not assume normality by default.** Skewed, heavy-tailed, and
   bounded data break the model, and assuming normal there
   underestimates the tails where the expensive surprises live.

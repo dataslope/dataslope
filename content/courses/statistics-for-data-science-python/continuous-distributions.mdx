@@ -24,7 +24,7 @@ into place.
   alt="A smooth curve over a platform with one shaded slab of area beneath a marked interval"
 />
 
-## The big idea: probability is area under the PDF
+## The big idea: probability is area under the density curve
 
 A continuous distribution is described by a **probability density
 function (PDF)**, a smooth curve. The curve itself is *not*
@@ -38,6 +38,7 @@ $$
 <Figure
   slug="stat-continuous-distributions-inline-cutout"
   alt="A smooth unbroken ramp lying over a rail, its height varying with no steps or gaps along its length"
+  caption="For a continuous variable, probability is area under the curve, not height."
 />
 
 The total area under any PDF is exactly 1 (something must happen). A
@@ -93,6 +94,7 @@ spawn point along a line, the raw output of a random-number generator.
 <Figure
   slug="stat-continuous-distributions-uniform-every-value-inline-cutout"
   alt="A flat level bar running the width of a rail at exactly one height"
+  caption="A flat curve means no value in the range is favoured over another."
 />
 
 In scipy the convention is `loc = a` (the left edge) and
@@ -157,6 +159,7 @@ shift, but you'll almost always leave it at 0.)
 <Figure
   slug="stat-continuous-distributions-exponential-waiting-time-inline-cutout"
   alt="A ramp that starts high at the left and falls away steadily to the right, chips gathered mostly at its left"
+  caption="Short waits are common and long ones rare, which is the exponential shape."
 />
 
 <CodeBlock
@@ -261,10 +264,10 @@ and that a mean tells you almost nothing about which one you are holding:
 
 ## Quantiles: inverting the question with ppf
 
-So far we've gone *value → probability* with `cdf`. Often you need the
+So far we've gone *value → probability* with `cdf()`. Often you need the
 reverse: *probability → value*. "What wait time are 90% of waits below?"
 "What score puts you in the top 5%?" That's the **percent-point function
-(`ppf`)**, the inverse of the CDF, also called the **quantile function**.
+(`ppf()`)**, the inverse of the CDF, also called the **quantile function**.
 
 `ppf(0.9)` returns the value x such that P(X ≤ x) = 0.9, the 90th
 percentile. It's the tool for setting thresholds, SLAs, and cutoffs.
@@ -303,10 +306,10 @@ print(f"90th percentile score  = {scores.ppf(0.9):.1f}")
 />
 
 <Callout type="tip" title="cdf and ppf are inverses">
-`cdf` takes a value and returns a probability (area to the left). `ppf`
+`cdf()` takes a value and returns a probability (area to the left). `ppf()`
 takes a probability and returns the value. `d.ppf(d.cdf(x)) == x` and
-`d.cdf(d.ppf(p)) == p`. Use `cdf`/`sf` for "what's the chance?" and
-`ppf`/`isf` for "what's the cutoff?".
+`d.cdf(d.ppf(p)) == p`. Use `cdf()`/`sf()` for "what's the chance?" and
+`ppf()`/`isf()` for "what's the cutoff?".
 </Callout>
 
 <ChallengeCard
@@ -480,7 +483,7 @@ A skinny interval forces a tall density so the total area stays at 1, height is 
 - \`d.cdf(8) + d.cdf(2)\`
   > Adding the two left-tail areas double-counts the region below 2 and overshoots; you need the difference.
 - \`d.ppf(8) - d.ppf(2)\`
-  > \`ppf\` takes probabilities (between 0 and 1), so feeding it 2 and 8 is invalid; it returns values, not probabilities.
+  > \`ppf()\` takes probabilities (between 0 and 1), so feeding it 2 and 8 is invalid; it returns values, not probabilities.
 - [o] \`d.cdf(8) - d.cdf(2)\`
   > The CDF gives the area to the left of a value, so the difference \`cdf(8) - cdf(2)\` is exactly the area between 2 and 8, the interval probability.
 - \`d.pdf(8) - d.pdf(2)\`
@@ -495,13 +498,13 @@ A skinny interval forces a tall density so the total area stays at 1, height is 
 - [o] \`d.ppf(0.95)\`
   > The percent-point function is the inverse of the CDF: given the probability 0.95 it returns the value with 95% of outcomes below it, exactly the 95th percentile.
 - \`d.sf(0.95)\`
-  > \`sf\` is the right-tail probability for a *value* (1 − cdf), not a way to recover a percentile from a probability.
+  > \`sf()\` is the right-tail probability for a *value* (1 − cdf), not a way to recover a percentile from a probability.
 - \`d.cdf(0.95)\`
-  > \`cdf\` maps a *value* to a probability; passing 0.95 treats it as a value, giving the area below 0.95, not a percentile.
+  > \`cdf()\` maps a *value* to a probability; passing 0.95 treats it as a value, giving the area below 0.95, not a percentile.
 - \`d.pdf(0.95)\`
-  > \`pdf\` returns a density height at the value 0.95 and has nothing to do with percentiles.
+  > \`pdf()\` returns a density height at the value 0.95 and has nothing to do with percentiles.
 
-\`cdf\`/\`sf\` answer "what's the chance?"; \`ppf\`/\`isf\` answer "what's the cutoff?".`}
+\`cdf()\`/\`sf()\` answer "what's the chance?"; \`ppf()\`/\`isf()\` answer "what's the cutoff?".`}
 />
 
 <MultipleChoice
@@ -525,7 +528,7 @@ Reading density heights as probabilities is the single most common error with co
 - The **PDF height is a density, not a probability**, it can exceed 1.
   P(X = exact value) = 0; always ask about intervals.
 - **`cdf(b) - cdf(a)`** gives any interval probability $P(a < X < b)$;
-  **`sf`** gives the right tail; **`ppf`** inverts the CDF to find
+  **`sf()`** gives the right tail; **`ppf()`** inverts the CDF to find
   percentiles and thresholds.
 - **Uniform** = flat density over a range; **Exponential** = waiting
   time between events at a constant rate (right-skewed, memoryless);

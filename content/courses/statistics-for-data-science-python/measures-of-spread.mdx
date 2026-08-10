@@ -1,6 +1,6 @@
 ---
 title: Measures of Spread
-description: Range, variance, standard deviation, IQR, MAD, and the coefficient of variation, why how spread out the data is matters as much as where its center sits.
+description: Range, variance, standard deviation, the interquartile range, the median absolute deviation, and the coefficient of variation, why how spread out the data is matters as much as where its center sits.
 ---
 
 Two delivery services both average a 30-minute wait. One always
@@ -314,7 +314,7 @@ print(f"Std dev for comparison  : {data.std(ddof=1):.1f}  <- outlier-driven")
   ]}
 />
 
-## CV: comparing spread across different scales
+## The coefficient of variation: comparing spread across scales
 
 Here's a trap. Is a standard deviation of 5 "big"? You can't say, it
 depends entirely on the scale. An SD of 5 on human heights (cm) is
@@ -325,6 +325,7 @@ different units or at different magnitudes**.
 <Figure
   slug="stat-measures-of-spread-same-center-different-inline-cutout"
   alt="Two rows of chips centred on the same mark, one clustered tightly and one spread end to end"
+  caption="Two batches can share a centre and still be nothing alike."
 />
 
 The **coefficient of variation (CV)** fixes this by dividing the
@@ -391,6 +392,7 @@ skew are present.
 <Figure
   slug="stat-measures-of-spread-inline-cutout"
   alt="Two rows of chips of the same width, one clustered tightly at the centre and one spread evenly end to end"
+  caption="A gap between the standard deviation and the interquartile range signals skew."
 />
 
 <CodeBlock

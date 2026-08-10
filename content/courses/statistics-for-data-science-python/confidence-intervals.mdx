@@ -35,6 +35,7 @@ that information away. The confidence interval keeps it.
 <Figure
   slug="stat-confidence-intervals-building-ci-mean-inline-cutout"
   alt="One mark on a rail with a band drawn either side of it, the band's width set by a caliper"
+  caption="A point estimate hides its wobble; the interval puts that wobble on the page."
 />
 
 ```mermaid
@@ -51,7 +52,7 @@ band says "I've pinned this down." The interval turns a single number
 into an *honest* number.
 
 <Callout type="info" title="The anatomy of every confidence interval">
-Every CI you will ever build has three ingredients:
+Every confidence interval you will ever build has three ingredients:
 **point estimate** (where you think the parameter is),
 **standard error** (how much your estimate wobbles), and a
 **critical value** (how many standard errors wide to make the band, set
@@ -59,7 +60,7 @@ by the confidence level). Combine them: $\text{estimate} \pm (\text{critical val
 *shape*, not any single formula, the shape is universal.
 </Callout>
 
-## Building a CI for a mean
+## Building a confidence interval for a mean
 
 For a population mean, the point estimate is $\bar{x}$ and the standard
 error is $s / \sqrt{n}$ (sample standard deviation over root-n). Because
@@ -71,9 +72,10 @@ difference matters most when $n$ is small.
 <Figure
   slug="stat-confidence-intervals-point-estimate-alone-inline-cutout"
   alt="A single mark on a rail beside the same mark with a soft band drawn either side"
+  caption="The band's width comes from the standard error and the confidence you want."
 />
 
-`scipy.stats` does the arithmetic for you. `stats.t.interval` takes the
+`scipy.stats` does the arithmetic for you. `stats.t.interval()` takes the
 confidence level, the degrees of freedom, the center, and the standard
 error, and hands back the two endpoints.
 
@@ -125,7 +127,7 @@ deviation from the same sample, which is essentially always in
 practice. The t has heavier tails to account for that extra guesswork,
 so its intervals are a touch wider, especially for small `n`. By the
 time `n` is in the hundreds, t and normal are nearly identical, but
-reaching for `stats.t.interval` is the safe default that's never wrong.
+reaching for `stats.t.interval()` is the safe default that's never wrong.
 </Callout>
 
 The same three lines work on any real sample. Here's a 95% CI for the
@@ -168,6 +170,7 @@ computed.**
 <Figure
   slug="stat-confidence-intervals-inline-cutout"
   alt="A row of twenty short horizontal bars each spanning a true value line, one bar clearly missing the line entirely"
+  caption="Ninety-five per cent of such intervals cover the truth; this one either does or does not."
 />
 
 > If you repeated the entire process, draw a fresh sample, build a 95%
@@ -843,7 +846,7 @@ The legitimate route to a tighter interval at the same confidence is more data, 
 - "95% confidence" is a property of the **procedure**: repeat the sampling-and-interval process and ~95% of the intervals cover the true parameter. It is **not** "a 95% probability the parameter is in this one interval", the parameter is fixed, the interval was random.
 - A CI for the **mean** (uses standard error, shrinks with $n$) is **not** a range for the **data** (uses standard deviation, doesn't shrink).
 - Width grows with the **confidence level** and the **variability**, and shrinks like $\mathbf{1 / \sqrt{n}}$. Wider is *less* precise, not "safer."
-- Use **`stats.t.interval`** for means (t-distribution, $df = n - 1$) and a proportion formula (or **`stats.binomtest(...).proportion_ci()`**) for rates.
+- Use **`stats.t.interval()`** for means (t-distribution, $df = n - 1$) and a proportion formula (or **`stats.binomtest(...).proportion_ci()`**) for rates.
 - A difference CI that **includes 0** means *inconclusive*, not *no effect*, this is the bridge to *Hypothesis Testing*.
 </Callout>
 

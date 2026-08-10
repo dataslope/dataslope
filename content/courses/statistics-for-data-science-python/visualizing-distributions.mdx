@@ -1,6 +1,6 @@
 ---
 title: Visualizing Distributions
-description: Why you should see a distribution before you summarize or test it, histograms, box plots, violins, ECDFs, and KDEs, and how a single summary statistic can lie.
+description: Why you should see a distribution before you summarize or test it, histograms, box plots, violins, cumulative distribution plots, and smoothed density curves, and how a single summary statistic can lie.
 ---
 
 You can compute a mean, a standard deviation, and a skewness
@@ -34,6 +34,7 @@ the plot is the original.
 <Figure
   slug="stat-visualizing-distributions-summaries-lie-always-inline-cutout"
   alt="One gauge with a single pointer lifted away to reveal four very different scatters beneath it"
+  caption="Very different shapes can hide behind identical summary numbers."
 />
 
 <CodeBlock
@@ -199,6 +200,7 @@ two-humped distribution looks just like a box plot of a one-humped one.
 <Figure
   slug="stat-visualizing-distributions-inline-cutout"
   alt="The same stack of chips shown as a mound, as a box with a thin rod at each end and as a rising staircase"
+  caption="Histogram, box plot and cumulative curve show the same data three ways."
 />
 
 <Chart slug="box-plot-anatomy" />
@@ -477,7 +479,7 @@ at or below this value?", a percentile, computed directly.
 
 Produce:
 
-- **\`x_sorted\`**, \`data\` sorted ascending, as a NumPy array (use \`np.sort\`).
+- **\`x_sorted\`**, \`data\` sorted ascending, as a NumPy array (use \`np.sort()\`).
 - **\`ecdf\`**, a NumPy array the same length as \`data\` where the \`i\`-th entry (0-based) is \`(i + 1) / n\` (the cumulative proportion up to and including \`x_sorted[i]\`). With \`n = len(data)\`, the last value must be exactly \`1.0\`.
 - **\`prop_at_threshold\`**, a plain Python \`float\`: the fraction of \`data\` **less than or equal to \`threshold\`** (the ECDF value at \`threshold\`). Compute it as \`(data <= threshold).mean()\`.
 

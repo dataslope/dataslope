@@ -33,11 +33,13 @@ numeric variables into a single number in **[−1, +1]**:
 <Figure
   slug="stat-correlation-and-nonparametric-common-misconceptions-gathered-inline-cutout"
   alt="Two boards drifting together with a cord between them and a small warning flag on the cord"
+  caption="Two things moving together is not yet evidence that one moves the other."
 />
 
 <Figure
   slug="stat-correlation-and-nonparametric-inline-cutout"
   alt="Two boards of chips side by side, one drifting tightly upward and one scattered with no drift at all"
+  caption="Correlation measures how tightly two variables drift together, and only linearly."
 />
 
 <Chart slug="correlation-scatters" />
@@ -384,6 +386,7 @@ tests are the distribution-free backups for when it doesn't.
 <Figure
   slug="stat-correlation-and-nonparametric-part-b-nonparametric-inline-cutout"
   alt="Chips ranked in order by a comb rather than measured by a rule"
+  caption="Rank-based tests work from the order of the values, not their exact sizes."
 />
 
 Reach for them when:
@@ -452,7 +455,7 @@ print("read on whether the two groups differ.")
   ]}
 />
 
-**How to read it.** `mannwhitneyu` returns the U statistic and a p-value.
+**How to read it.** `mannwhitneyu()` returns the U statistic and a p-value.
 A small p-value says one group tends to produce larger values than the
 other. Note it's testing a shift in the *distribution* (often summarized
 via the median), not the mean, which is exactly why it survives outliers

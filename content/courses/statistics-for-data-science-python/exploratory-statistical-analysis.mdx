@@ -1,6 +1,6 @@
 ---
 title: Exploratory Statistical Analysis
-description: A disciplined EDA workflow that uses statistics to understand distributions, relationships, missingness, and outliers, while keeping a hard wall between exploration that generates hypotheses and confirmation that tests them on fresh data.
+description: A disciplined exploratory workflow that uses statistics to understand distributions, relationships, missingness, and outliers, while keeping a hard wall between exploration that generates hypotheses and confirmation that tests them on fresh data.
 ---
 
 Before you test anything, you have to *look*. **Exploratory data
@@ -31,6 +31,7 @@ conflating them is how analyses go wrong.
 <Figure
   slug="stat-exploratory-statistical-analysis-exploratory-vs-confirmatory-inline-cutout"
   alt="Two benches separated by a solid wall, chips freely rearranged on one and sealed on the other"
+  caption="Explore freely on one side of the wall, but the confirming data stays sealed."
 />
 
 <Chart slug="anscombes-quartet" />
@@ -86,6 +87,7 @@ checklist so you don't miss something basic.
 <Figure
   slug="stat-exploratory-statistical-analysis-eda-pipeline-inline-cutout"
   alt="A bench of five stations with a crate entering at one end and a small set of findings pinned at the other"
+  caption="Exploration runs through stages, and each one pins down a little more."
 />
 
 Here is that checklist as a walkthrough, the question each stage answers:
@@ -172,7 +174,7 @@ and Outliers*. Compare the standard deviation to the mean to gauge
 relative spread. The 25th-to-75th percentile range tells you where the
 bulk of the data lives.
 
-For categorical columns, `describe()` won't help, use `value_counts`
+For categorical columns, `describe()` won't help, use `value_counts()`
 to see the categories and how (im)balanced they are.
 
 <CodeBlock
@@ -320,7 +322,7 @@ pattern.
 ## Step 4: outliers
 
 Outliers are either **data errors** to fix or **real extremes** that
-carry information, and EDA is where you tell them apart. A common
+carry information, and exploration is where you tell them apart. A common
 quick rule is the **1.5 × IQR** fence: points beyond the quartiles by
 more than 1.5 times the interquartile range are flagged for inspection
 (not automatic deletion).
@@ -367,13 +369,14 @@ documented reason.
 
 ## Step 5: relationships
 
-Now look at how variables move *together*. Two workhorses: `groupby`
+Now look at how variables move *together*. Two workhorses: `groupby()`
 summaries (how a metric differs across categories) and a **correlation
 matrix** (linear association between numeric columns).
 
 <Figure
   slug="stat-exploratory-statistical-analysis-inline-cutout"
   alt="A crate of raw chips being spread across a bench and looked at before any gauge is brought near it"
+  caption="Look at the data before you measure it, or you will measure the wrong thing."
 />
 
 <CodeBlock
@@ -692,6 +695,6 @@ Correlation matrices generate leads; treat each cell as a hypothesis, not a resu
 - EDA is **hypothesis-generating**: understand distributions, missingness, outliers, and relationships, then form candidate questions.
 - Keep a wall between **exploratory** (look freely) and **confirmatory** (test a pre-stated hypothesis on fresh/held-out data).
 - **Never test a hypothesis on the same data that suggested it**, it inflates false positives (the garden of forking paths).
-- Read `describe()` for skew and spread; use `value_counts` for balance; quantify missingness and ask *why*; flag outliers but don't delete reflexively.
-- Correlation matrices and `groupby` summaries surface leads, confirm them later with the tools from *Hypothesis Testing*.
+- Read `describe()` for skew and spread; use `value_counts()` for balance; quantify missingness and ask *why*; flag outliers but don't delete reflexively.
+- Correlation matrices and `groupby()` summaries surface leads, confirm them later with the tools from *Hypothesis Testing*.
 </Callout>
