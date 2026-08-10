@@ -6,7 +6,7 @@ description: Text, data, BSS, heap, and stack, where every variable in a C progr
 A running C program is not just "code." Its address space is
 partitioned into several regions, each with different rules about
 *who can write*, *how it grows*, and *when its memory is reclaimed*.
-Understanding the map is the foundation for understanding `malloc`,
+Understanding the map is the foundation for understanding `malloc()`,
 the stack, and every memory bug class.
 
 ## The classic four-segment map
@@ -29,7 +29,7 @@ flowchart TB
 | Text (code) | Compiled machine instructions, often string literals | program lifetime | no |
 | Data | Globals / `static` with non-zero initializers | program lifetime | yes |
 | BSS | Globals / `static` initialized to zero | program lifetime | yes |
-| Heap | `malloc` / `calloc` / `realloc` allocations | until `free` | yes |
+| Heap | `malloc()` / `calloc()` / `realloc()` allocations | until `free()` | yes |
 | Stack | Function parameters and local variables | function call lifetime | yes |
 
 The WASI runtime uses a similar layout in linear memory; the
@@ -97,6 +97,7 @@ other `const` data in a read-only segment called `.rodata`.
 <Figure
   slug="sysc-memory-layout-text-read-only-inline-cutout"
   alt="One band of a long bar sealed under a clamped cover while the other bands stay open"
+  caption="The code segment is mapped read-only, so writing to it faults."
 />
 
 This is why writing through `char *s = "hello"; s[0] = 'X';` is
@@ -116,6 +117,7 @@ C splits globals into two pieces purely as a file-size optimization:
 <Figure
   slug="sysc-memory-layout-inline-cutout"
   alt="One long horizontal bar running the full width of the frame, divided end to end into four bands of different colours, a small arrow above the third band pointing right and a small arrow above the fourth pointing left so the two grow toward each other, and three loose crates resting inside the third band"
+  caption="The stack grows down and the heap grows up, toward each other."
 />
 
 <CodeBlock
@@ -162,7 +164,7 @@ C has several ways to control where a variable lives:
 | `int x;` at file scope | BSS (or .data if initialized) | program |
 | `static int x;` inside a function | BSS / .data | program (but only visible to that function) |
 | `static int x;` at file scope | Like a global, but only visible to that file | program |
-| `int *p = malloc(...);` | Heap (the bytes) + wherever `p` is declared (the pointer) | until `free` |
+| `int *p = malloc(...);` | Heap (the bytes) + wherever `p` is declared (the pointer) | until `free()` |
 | `register int x;` | Hint to keep in a CPU register | until function returns |
 
 `static` inside a function is a great way to give a function its own
@@ -202,6 +204,7 @@ hierarchy the program is laid out across.
 <Figure
   slug="sysc-memory-layout-seeing-regions-inline-cutout"
   alt="One long horizontal bar divided end to end into four bands of different colours"
+  caption="One address space, divided into regions with very different rules."
 />
 
 <Chart slug="memory-latency-ladder" />
@@ -217,8 +220,8 @@ flowchart TB
 
 | | Stack | Heap |
 | --- | --- | --- |
-| Allocates with | function call (push frame) | `malloc`/`calloc`/`realloc` |
-| Frees with | `return` (pop frame) | `free` |
+| Allocates with | function call (push frame) | `malloc()`/`calloc()`/`realloc()` |
+| Frees with | `return` (pop frame) | `free()` |
 | Speed | very fast (just move a pointer) | slower (bookkeeping) |
 | Size limit | small (usually a few MB) | large (gigabytes) |
 | Lives across function calls? | no | yes |
@@ -257,7 +260,7 @@ int main(void) {
 />
 
 The correct fix is to either (a) allocate on the heap and let the
-caller `free` it, or (b) have the caller pass in a buffer.
+caller `free()` it, or (b) have the caller pass in a buffer.
 
 ## Practice: place variables in the right region
 
@@ -313,7 +316,7 @@ int main(void) {
 <MultipleChoice
   markdown={`In which segment does a large zero-initialized global like \`int big[100000];\` live, and what does that mean for the executable file size?
 
-- The heap, \`malloc\` is called implicitly at program start.
+- The heap, \`malloc()\` is called implicitly at program start.
   > Globals are not heap-allocated; they have static storage duration.
 - \`.data\`, the binary grows by ~400 KB to store the zeros.
   > That would be true if the array were *non-zero* initialized.

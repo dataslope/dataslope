@@ -63,6 +63,7 @@ text substitution.
 <Figure
   slug="sysc-why-c-for-systems-language-named-after-inline-cutout"
   alt="Two machines side by side, the second built directly from the first's parts with one more fitting"
+  caption="C grew straight out of B, keeping the same shape and adding types."
 />
 
 That smallness is a feature. It means a compiler is small enough to
@@ -86,7 +87,7 @@ int main(void) {
 />
 
 That program, once compiled for a real CPU, is a few kilobytes of
-machine code and a handful of `printf` calls in libc. There is no
+machine code and a handful of `printf()` calls in libc. There is no
 virtual machine. There is no interpreter. The operating system
 loads it and jumps to `main`.
 

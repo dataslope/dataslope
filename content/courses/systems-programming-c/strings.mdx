@@ -17,7 +17,7 @@ any length cost exactly one extra byte on the tiny machines Unix
 ran on. In 2011, veteran FreeBSD developer Poul-Henning Kamp wrote
 an ACM Queue essay calling that choice
 *"The Most Expensive One-Byte Mistake"*: four decades of buffer
-overflows, `strlen` scans, and security advisories, all downstream
+overflows, `strlen()` scans, and security advisories, all downstream
 of one byte saved per string in 1970. Whether or not you accept his
 accounting, the lesson of this page is that the terminator is a
 **convention enforced by nothing**. The language will not stop you
@@ -69,6 +69,7 @@ will happily keep walking into unrelated memory.
 <Figure
   slug="sysc-strings-string-literals-inline-cutout"
   alt="A ribbon of tiles fixed under a clamped bar, unable to be lifted or altered"
+  caption="A string literal lives in read-only memory and cannot be modified."
 />
 
 ## String literals
@@ -126,7 +127,7 @@ int main(void) {
 | `strchr(s, c)` | First occurrence of `c` | Returns pointer or `NULL` |
 | `strstr(haystack, needle)` | First occurrence of substring | |
 | `memcpy(dst, src, n)` | Copy `n` bytes (no terminator) | Buffers must not overlap |
-| `memmove(dst, src, n)` | Like `memcpy` but overlap-safe | |
+| `memmove(dst, src, n)` | Like `memcpy()` but overlap-safe | |
 | `memset(dst, b, n)` | Fill `n` bytes with byte `b` | |
 
 The "unsafe" functions are unsafe because they have no way to know
@@ -135,6 +136,7 @@ how big `dst` is. You are responsible for that.
 <Figure
   slug="sysc-strings-inline-cutout"
   alt="A ribbon of letter tiles ending in a small stop block, and a second ribbon whose stop block is missing"
+  caption="Without the terminating null byte, nothing tells a function where to stop."
 />
 
 <CodeBlock
@@ -167,13 +169,14 @@ int main(void) {
   ]}
 />
 
-## The `strncpy` footgun
+## The `strncpy()` footgun
 
-`strncpy(dst, src, n)` looks like a "safer `strcpy`." It is not.
+`strncpy(dst, src, n)` looks like a "safer `strcpy()`." It is not.
 
 <Figure
   slug="sysc-strings-strncpy-footgun-inline-cutout"
   alt="A ribbon copied into a shorter holder, its stop block left behind outside the holder"
+  caption="`strncpy()` may leave the copy with no terminator at all."
 />
 
 1. If `src` is *shorter* than `n` bytes, it pads `dst` with extra
@@ -213,7 +216,7 @@ int main(void) {
   ]}
 />
 
-## Counting your own `strlen`
+## Counting your own `strlen()`
 
 Writing string functions by hand is a great way to internalize
 null-termination.
@@ -480,5 +483,5 @@ int main(void) {
 - \`strncpy(dst, src, sizeof dst);\`
   > Subtle bug: if \`src\` is too long, \`dst\` will not be null-terminated.
 - [o] \`snprintf(dst, sizeof dst, "%s", src);\`
-  > \`snprintf\` always writes a terminator and tells you how many bytes it would have written.`}
+  > \`snprintf()\` always writes a terminator and tells you how many bytes it would have written.`}
 />

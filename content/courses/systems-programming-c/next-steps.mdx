@@ -63,8 +63,8 @@ Action* (the C and C++ memory models are very similar).
 
 ## 3. File I/O and the VFS
 
-Above `stdio.h` lives the standard library's buffered I/O (`fopen`,
-`fread`, `fwrite`, `fprintf`). Below it lives the raw POSIX layer:
+Above `stdio.h` lives the standard library's buffered I/O (`fopen()`,
+`fread()`, `fwrite()`, `fprintf`). Below it lives the raw POSIX layer:
 
 - `open` / `close` / `read` / `write`, the four core syscalls
 - `lseek`, `dup`, `dup2`, `pipe`, file-descriptor plumbing
@@ -160,7 +160,7 @@ and kernels themselves.
 - Cross-compilation: `arm-none-eabi-gcc`, `xtensa-esp32-elf-gcc`
 - Linker scripts: telling the linker where flash and RAM live
 - `volatile` for memory-mapped I/O, interrupt service routines
-- No `malloc` (or a very limited one), often no `printf`
+- No `malloc()` (or a very limited one), often no `printf()`
 - Real-time operating systems: FreeRTOS, Zephyr, ChibiOS
 
 The mental model you built on the stack/heap pages transfers
@@ -216,7 +216,7 @@ The fastest way to consolidate everything you've learned:
 
 1. **A tiny shell**, `fork` + `execve` + a parser. ~500 lines.
 2. **A `cat` / `wc` / `grep` reimplementation.** Teaches you file I/O.
-3. **A toy `malloc`.** Implement `mmalloc`/`mfree` on top of `mmap`
+3. **A toy `malloc()`.** Implement `mmalloc`/`mfree` on top of `mmap`
    with a free-list. You will never look at the heap the same way.
 4. **A TCP echo server.** First blocking, then with `select`, then
    with `epoll`.

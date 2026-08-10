@@ -31,7 +31,7 @@ patterns is half the battle.
 ## 1. Use-after-free
 
 After `free(p)` the memory is returned to the allocator and may be
-handed out by the next `malloc`. Reading or writing through `p` is
+handed out by the next `malloc()`. Reading or writing through `p` is
 undefined behavior, sometimes it "works", sometimes it returns
 someone else's bytes, sometimes it crashes.
 
@@ -81,7 +81,7 @@ s = NULL;       // turns silent UAF into loud NULL-deref
 
 ## 2. Double-free
 
-Calling `free` twice on the same pointer corrupts the allocator's
+Calling `free()` twice on the same pointer corrupts the allocator's
 internal bookkeeping. On modern systems it often aborts the program
 immediately ("double free or corruption"); on older or simpler
 allocators it can silently corrupt the heap.
@@ -89,6 +89,7 @@ allocators it can silently corrupt the heap.
 <Figure
   slug="sysc-memory-bugs-1-use-after-inline-cutout"
   alt="A cord leading from a bench to an empty space where a crate stood a moment ago"
+  caption="A pointer to freed memory still looks valid, which is what makes it dangerous."
 />
 
 <CodeBlock
@@ -124,13 +125,14 @@ harmless.
 
 ## 3. Memory leak
 
-A leak is the *opposite* of double-free: every `malloc` *should* be
-matched by exactly one `free`, but isn't. The block lives on,
+A leak is the *opposite* of double-free: every `malloc()` *should* be
+matched by exactly one `free()`, but isn't. The block lives on,
 unreachable, until the process exits.
 
 <Figure
   slug="sysc-memory-bugs-inline-cutout"
   alt="Three benches side by side, one with a crate overflowing past its edge, one with a cord leading to an empty space, one with crates piling up unclaimed"
+  caption="Overflow, use after free, and leaks are the three classic memory bugs."
 />
 
 <CodeBlock
@@ -164,7 +166,7 @@ int main(void) {
 
 **Cure:** treat every successful allocation as a *promise to free
 later*. Tools like Valgrind and AddressSanitizer can report exactly
-which `malloc` site was never matched by a `free`. Modern C++ uses
+which `malloc()` site was never matched by a `free()`. Modern C++ uses
 RAII (smart pointers) to make this automatic; C requires discipline
 and clear ownership documentation.
 
@@ -244,11 +246,11 @@ int main(void) {
 />
 
 **Cure:** when sizing a string buffer, always remember the `+ 1` for
-the terminator. Or use length-aware functions like `snprintf`.
+the terminator. Or use length-aware functions like `snprintf()`.
 
 ## 6. Uninitialized read
 
-`malloc` does *not* zero memory. Stack variables are *not*
+`malloc()` does *not* zero memory. Stack variables are *not*
 zero-initialized either (unlike Python/Java). Reading them before
 writing returns whatever bytes happen to be there, often the
 previous user's data.
@@ -280,7 +282,7 @@ int main(void) {
 **Cure:**
 
 - Initialize every variable at declaration: `int local = 0;`.
-- Use `calloc` instead of `malloc` when you want zeros.
+- Use `calloc()` instead of `malloc()` when you want zeros.
 - Compile with `-Wall -Wextra`, modern compilers warn about many
   uninitialized reads.
 
@@ -325,7 +327,7 @@ function" is the most common way a dangling stack pointer corrupts
 data without crashing.
 
 **Cure:** return values (which are copied), have the caller pass a
-buffer, or `malloc` and let the caller `free`.
+buffer, or `malloc()` and let the caller `free()`.
 
 ## 8. Type confusion via casts
 
@@ -355,10 +357,10 @@ int main(void) {
 
 Reading bytes through a `char *` is *legal* (the standard
 specifically allows it). Reading an `int` through a `float *`,
-without going via a `union` or `memcpy`, is generally a strict
+without going via a `union` or `memcpy()`, is generally a strict
 aliasing violation, another form of undefined behavior.
 
-**Cure:** when you really need to reinterpret bytes, use `memcpy` or
+**Cure:** when you really need to reinterpret bytes, use `memcpy()` or
 a `union`. Do not cast unrelated pointer types and dereference them.
 
 ## Defenses in depth
@@ -375,15 +377,16 @@ the language:
 | Valgrind | UAF, leaks, uninit, double-free (no recompile needed) |
 | Static analyzers (clang-tidy, cppcheck, Coverity) | Patterns the compiler misses |
 | Always initialize at declaration | Eliminates a whole class of UB |
-| Pair every `malloc` with a matching `free`, document the owner | Eliminates leaks and double-frees |
+| Pair every `malloc()` with a matching `free()`, document the owner | Eliminates leaks and double-frees |
 | `free(p); p = NULL;` | Turns UAF/double-free into NULL deref |
-| Prefer `snprintf` / `fgets` over `strcpy` / `gets` | Eliminates trivial overflows |
+| Prefer `snprintf()` / `fgets()` over `strcpy()` / `gets()` | Eliminates trivial overflows |
 
-`gets` is so dangerous it was *removed* from C11. Never use it.
+`gets()` is so dangerous it was *removed* from C11. Never use it.
 
 <Figure
   slug="sysc-memory-bugs-2-double-free-inline-cutout"
   alt="A crate handed back over a counter twice, the counter clerk holding out empty hands the second time"
+  caption="Freeing the same block twice corrupts the allocator's own bookkeeping."
 />
 
 ## Practice: write a leak-free echo
@@ -453,7 +456,7 @@ int main(void) {
 <ChallengeCard
   adapter="c"
   title="Build a string by repeated append"
-  instructions={`Implement \`char *repeat(const char *s, int times)\` that returns a fresh heap string containing \`s\` repeated \`times\` times. Use a single \`malloc\` (no \`realloc\` needed). Do not leak; do not overflow. \`repeat("ab", 3)\` must produce \`ababab\`. The provided \`main\` prints and frees the result.`}
+  instructions={`Implement \`char *repeat(const char *s, int times)\` that returns a fresh heap string containing \`s\` repeated \`times\` times. Use a single \`malloc()\` (no \`realloc()\` needed). Do not leak; do not overflow. \`repeat("ab", 3)\` must produce \`ababab\`. The provided \`main\` prints and frees the result.`}
   files={[
     {
       filename: "main.c",
@@ -519,11 +522,11 @@ int main(void) {
 <MultipleChoice
   markdown={`Which defensive pattern turns a use-after-free or double-free into a much louder, easier-to-debug NULL-pointer dereference?
 
-- Call \`free\` twice in a row to be certain.
+- Call \`free()\` twice in a row to be certain.
   > That is the bug, not the defense.
 - Always cast the pointer to \`void *\` before freeing.
   > Casts do not change the runtime behavior of free.
-- Wrap every \`free\` in a \`try / catch\`.
+- Wrap every \`free()\` in a \`try / catch\`.
   > C has no \`try / catch\`.
 - [o] After \`free(p);\`, immediately set \`p = NULL;\`. Future \`free(NULL)\` is a no-op and \`*p\` immediately crashes instead of silently corrupting memory.
   > This is one of the most common C defensive idioms.`}
@@ -532,14 +535,14 @@ int main(void) {
 <MultipleChoice
   markdown={`Why is \`strcpy(buf, user_input)\` considered unsafe?
 
-- \`strcpy\` is not part of the C standard.
+- \`strcpy()\` is not part of the C standard.
   > It is part of \`<string.h>\` in every C standard.
 - It always allocates extra memory you forget to free.
   > It does not allocate at all.
 - It corrupts the file descriptor table.
   > It does not touch file descriptors.
 - [o] It has no way to know how big \`buf\` is and will keep copying until it finds a \`'\\0'\` in \`user_input\`, overflowing the buffer if the input is too long.
-  > Use \`snprintf\` or another length-aware API.`}
+  > Use \`snprintf()\` or another length-aware API.`}
 />
 
 <MultipleChoice
