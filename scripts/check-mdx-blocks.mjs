@@ -53,7 +53,19 @@ for (const file of files) {
     // takes. Inside a props block it is not a component at all: it is text that
     // has been dropped into somebody else's JavaScript expression. Inside a
     // fence it is a code sample, which several lessons legitimately contain.
-    if (code[i] === "props" && /^<[A-Z]\w*[^>]*\/>\s*$/.test(lines[i])) {
+    //
+    // Both shapes count. The one-line `<Chart … />` is what a stray insertion
+    // used to look like; a tag that opens a props block of its own is what an
+    // automated placement produces, and for a while only the first was checked.
+    // A `<Figure>` written over four lines went into a runnable React sample and
+    // this rule watched it go past, because the opening line has no `/>` on it.
+    // The opening line of a legitimate top-level block is a props line too, so
+    // what separates them is whether a block was *already* open above.
+    const nested = code[i] === "props" && i > 0 && code[i - 1] === "props";
+    if (
+      /^<[A-Z]\w*/.test(lines[i]) &&
+      (nested || (code[i] === "props" && /^<[A-Z]\w*[^>]*\/>\s*$/.test(lines[i])))
+    ) {
       problems.push(`${where}:${i + 1}: component tag inside a props block: ${lines[i].trim()}`);
     }
 

@@ -60,6 +60,8 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
+import { backticks } from "./lib/mdx-regions.mjs";
+
 const ROOT = new URL("..", import.meta.url).pathname;
 
 function parseArgs(argv) {
@@ -90,11 +92,20 @@ function printHelp() {
   );
 }
 
-/** Per-line "fence" | "jsx" | null, mirroring how MDX reads them. */
+/**
+ * Per-line "fence" | "jsx" | null, mirroring how MDX reads them.
+ *
+ * Deliberately not `lib/mdx-regions.mjs`, which exempts the markdown containers
+ * (`<Callout>` and friends) because a heading inside one is a real heading.
+ * Placement wants the opposite: a Callout body is somebody's aside, not a place
+ * to drop a band. Only the template-literal rule is shared, and it is shared
+ * because getting it wrong put a band inside a runnable React sample.
+ */
 export function regions(lines) {
   const out = new Array(lines.length).fill(null);
   let fence = null;
   let tag = null;
+  let literal = false;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (fence !== null) {
@@ -104,6 +115,15 @@ export function regions(lines) {
     }
     if (tag !== null) {
       out[i] = "jsx";
+      const odd = backticks(line) % 2 === 1;
+      if (literal) {
+        if (!odd) continue;
+        literal = false;
+        const tail = line.slice(line.lastIndexOf("`") + 1);
+        if (/\/>/.test(tail) || new RegExp(`</${tag}>`).test(tail)) tag = null;
+        continue;
+      }
+      if (odd) { literal = true; continue; }
       if (/^\s*\/>/.test(line) || new RegExp(`^\\s*</${tag}>`).test(line)) tag = null;
       continue;
     }
@@ -112,7 +132,10 @@ export function regions(lines) {
     const t = /^<([A-Z]\w*)/.exec(line);
     if (t) {
       out[i] = "jsx";
-      if (!/\/>\s*$/.test(line) && !new RegExp(`</${t[1]}>\\s*$`).test(line)) tag = t[1];
+      if (!/\/>\s*$/.test(line) && !new RegExp(`</${t[1]}>\\s*$`).test(line)) {
+        tag = t[1];
+        literal = backticks(line) % 2 === 1;
+      }
     }
   }
   return out;

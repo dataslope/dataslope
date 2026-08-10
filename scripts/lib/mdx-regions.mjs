@@ -29,6 +29,26 @@
 const MARKDOWN_CONTAINERS = new Set(["Callout", "Step", "Steps"]);
 
 /**
+ * Unescaped backticks on a line, which is how a props block's template literals
+ * are tracked.
+ *
+ * They have to be, because a props block does not end at the first `/>` — it
+ * ends at the first `/>` *outside* its template literals, and those literals
+ * hold whole programs. A React sample containing
+ *
+ *     <SplitPanel
+ *       left={…}
+ *     />
+ *
+ * closes the enclosing `<CodeBlock>` three lines early if the literal is not
+ * tracked, and every line of the rest of that sample then reads as prose. That
+ * is not hypothetical either: it is how a `<Figure>` was placed into the middle
+ * of a runnable React block, where it compiled to `Figure is not defined` and
+ * cost a 1.2 hour browser suite to find.
+ */
+export const backticks = (line) => (line.match(/(?<!\\)`/g) ?? []).length;
+
+/**
  * @param {string[]} lines
  * @returns {(null|"fence"|"props")[]} one entry per line, null for prose. The
  *   opening and closing lines of a region belong to it, so a caller can use
@@ -38,6 +58,7 @@ export function codeRegions(lines) {
   const code = new Array(lines.length).fill(null);
   let fence = null; // the opening fence string, e.g. "```"
   let component = null; // the tag name of the open props block
+  let literal = false; // inside a template literal within that props block
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -50,6 +71,20 @@ export function codeRegions(lines) {
 
     if (component !== null) {
       code[i] = "props";
+      const odd = backticks(line) % 2 === 1;
+      if (literal) {
+        // Only the text after the closing backtick can end the tag; a `/>` before
+        // it is part of the sample.
+        if (!odd) continue;
+        literal = false;
+        const tail = line.slice(line.lastIndexOf("`") + 1);
+        if (/\/>/.test(tail) || new RegExp(`</${component}>`).test(tail)) component = null;
+        continue;
+      }
+      if (odd) {
+        literal = true;
+        continue;
+      }
       if (/^\s*\/>/.test(line) || new RegExp(`^\\s*</${component}>`).test(line)) {
         component = null;
       }
@@ -70,6 +105,7 @@ export function codeRegions(lines) {
       if (!/\/>\s*$/.test(line)) {
         code[i] = "props";
         component = tag[1];
+        literal = backticks(line) % 2 === 1;
       }
       continue;
     }

@@ -126,3 +126,49 @@ ${LIVE_BLOCK}
     expect(extractBlocks(root, "java")).toHaveLength(0);
   });
 });
+
+// A props block ends at the first `/>` *outside* its template literals. The
+// literals hold whole programs, and a React sample's own self-closing JSX looks
+// exactly like the end of the enclosing tag. Getting this wrong does not fail
+// loudly: the rest of the sample reads as prose, so an automated placement drops
+// a component into the middle of somebody's source, and it compiles to a
+// `ReferenceError` that only a browser run catches.
+describe("codeRegions template literals", () => {
+  it("does not end a props block at a `/>` inside a template literal", async () => {
+    const { codeRegions } = await import("../scripts/lib/mdx-regions.mjs");
+    const lines = [
+      "<CodeBlock",
+      "  files={[",
+      "    {",
+      "      starterCode: `function App() {",
+      "  return (",
+      "    <SplitPanel",
+      "      left={<img />}",
+      "    />",
+      "  );",
+      "}",
+      "",
+      "render(<App />);",
+      "`,",
+      "    },",
+      "  ]}",
+      "/>",
+      "",
+      "Real prose again.",
+    ];
+    const code = codeRegions(lines);
+    // Every line of the sample, including the blank one and the `/>` that closes
+    // SplitPanel, stays inside the block.
+    for (let i = 0; i <= 15; i++) expect(code[i]).toBe("props");
+    expect(code[16]).toBeNull();
+    expect(code[17]).toBeNull();
+  });
+
+  it("still ends a props block at its own `/>`", async () => {
+    const { codeRegions } = await import("../scripts/lib/mdx-regions.mjs");
+    const code = codeRegions(["<Figure", '  slug="x"', "/>", "", "Prose."]);
+    expect(code.slice(0, 3)).toEqual(["props", "props", "props"]);
+    expect(code[3]).toBeNull();
+    expect(code[4]).toBeNull();
+  });
+});
