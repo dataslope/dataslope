@@ -21,6 +21,7 @@
     "build:home-stats": "node scripts/build-home-stats.mjs",
     "build:images": "node scripts/build-images.mjs",
     "build:block-outputs": "node scripts/build-block-outputs.mjs",
+    "capture:block-outputs": "node scripts/capture-browser-outputs.mjs",
     "build:og-image": "node scripts/build-og-image.mjs",
     "publish:tools-jar": "npm publish ./tools-jar",
     "postinstall": "node scripts/patch-almostnode.mjs && node scripts/postinstall-generate.mjs",

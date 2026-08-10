@@ -30,9 +30,10 @@
  * `runtime/r.tsx` decides visibility with `withVisible()`, renders a data
  * frame as an HTML table, and turns captured graphics into images; a runner
  * that only collected stdout would record a panel missing every table and
- * every plot, and would double-print the visible result besides. Doing R
- * properly means lifting that conversion out of `r.tsx` the way Python's
- * already is, which is a change of its own.
+ * every plot, and would double-print the visible result besides. Rather than
+ * lift that conversion out of `r.tsx`, R is captured from a real page by
+ * `scripts/capture-browser-outputs.mjs`, which gets the conversion for free —
+ * along with java, csharp and php, which have no Node runtime at all.
  *
  * ── The contract ────────────────────────────────────────────────────────
  *

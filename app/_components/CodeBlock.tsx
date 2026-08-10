@@ -369,9 +369,12 @@ function CodeBlockInner({
   const entryFile =
     (entryFilename ? files?.find((f) => f.filename === entryFilename) : null) ??
     files?.[0];
-  const prepopulated = usePrepopulatedOutput(
-    blockOutputKey(adapter.id, entryFile?.initCode, entryFile?.starterCode ?? ""),
+  const outputKey = blockOutputKey(
+    adapter.id,
+    entryFile?.initCode,
+    entryFile?.starterCode ?? "",
   );
+  const prepopulated = usePrepopulatedOutput(outputKey);
   // Negative ids so a prepopulated cell can never collide with a run's own
   // (which count up from 1).
   const seedOutputs = useCallback(
@@ -1234,6 +1237,33 @@ function CodeBlockInner({
   }, [toastManager]);
 
   const isBusy = status === "loading" || status === "running";
+
+  // Test-only capture seam, for `scripts/capture-browser-outputs.mjs`.
+  //
+  // The languages that only run in a browser — java, csharp, web, react, php —
+  // and R, whose output is HTML tables and images rather than text, cannot be
+  // prepopulated by a Node runner, so their blocks show an empty panel. The
+  // capture drives a real page with Playwright and reads the cells off here
+  // rather than off the DOM, because a `plot` cell's figure JSON has already
+  // been handed to Plotly by the time it is markup and an `image` cell's
+  // bytes are a base64 attribute.
+  //
+  // Nothing in production creates this global, so for a reader the effect is
+  // a closure that reads one undefined property and returns.
+  useEffect(() => {
+    const sink = (window as unknown as { __blockCapture?: unknown[] })
+      .__blockCapture;
+    if (!sink || isBusy || outputs.length === 0 || showingPreview) return;
+    sink.push({
+      key: outputKey,
+      adapter: adapter.id,
+      cells: outputs.map((c) => ({
+        type: c.type,
+        content: c.content,
+        ...(c.plot ? { plot: c.plot } : {}),
+      })),
+    });
+  }, [outputs, isBusy, showingPreview, outputKey, adapter.id]);
 
   // Smoothed boot fraction for the wave progress bar (null → spinner only).
   const bootDisplayFraction = useCreepingBootFraction(

@@ -823,23 +823,44 @@ content rather than parsing it. It runs every `<CodeBlock>` it has a headless
 runtime for and records what it printed, so a lesson shows its output before
 the reader presses Run.
 
-**Which languages, and why not the rest.** Python goes through Pyodide-in-Node,
+**Two generators, one manifest.** Python goes through Pyodide-in-Node,
 JavaScript and TypeScript through `AlmostNodeRunner`, and C and C++ through the
-pinned browsercc toolchain (`scripts/lib/block-runners.mjs`). Every one of them
-is the runtime the browser itself uses, which is the point: a prepopulated
-panel that disagrees with what Run produces is worse than an empty one, because
-nothing tells the reader which to believe. That leaves two groups out.
+pinned browsercc toolchain (`scripts/lib/block-runners.mjs`). Every one is the
+runtime the browser itself uses, which is the point: a prepopulated panel that
+disagrees with what Run produces is worse than an empty one, because nothing
+tells the reader which to believe.
 
-- **R** could run here — webR works under Node, and the R sweep proves it —
-  but its output is not text. `runtime/r.tsx` decides visibility with
-  `withVisible()`, renders a data frame as an HTML table and turns captured
-  graphics into images, and none of that is shared the way
-  `pythonDisplayOutputs.ts` is. A stdout-only runner would record a panel
-  missing every table and every plot, and double-print the visible result
-  besides. Lifting that conversion out of `r.tsx` is the prerequisite.
-- **java, csharp, web, react, php** have no Node runtime at all: CheerpJ,
-  .NET wasm and php-wasm need a browser, which is why `check-browser-blocks`
-  drives Playwright for them.
+The rest cannot run under Node at all, and
+`scripts/capture-browser-outputs.mjs` records them from a real page instead
+(`npm run capture:block-outputs`). It drives Playwright, reads the finished
+`OutputCell[]` off a test-only seam in `CodeBlock`, and writes into the same
+manifest under the same content-hash keys — so a reader cannot tell which
+generator filled a panel, and neither can the site.
+
+- **java, csharp, php** need a browser outright: CheerpJ, the .NET wasm bundle
+  and php-wasm have no Node build.
+- **r** *does* run under Node, and the R sweep proves it, but its output is
+  not text: `runtime/r.tsx` decides visibility with `withVisible()`, renders a
+  data frame as an HTML table and turns captured graphics into images, none of
+  it shared the way `pythonDisplayOutputs.ts` is. A stdout-only runner would
+  record a panel missing every table and every plot. The browser has already
+  done that conversion, which is why R is captured rather than run headlessly.
+- **web and react have no prepopulated output at all, and cannot.** Their
+  output *is* a live sandboxed iframe, not cells; the capture comes back with
+  nothing but "the preview didn't finish within the time limit". There is
+  nothing to store, so those 72 blocks stay blank by nature.
+
+Two things the capture had to solve, both easy to trip over again. Cells are
+read off `window.__blockCapture` rather than the DOM, because by the time a
+`plot` cell is markup its figure JSON has gone to Plotly and an `image` cell is
+a base64 attribute. And `--relay` exists because a sandbox can allow Node's
+egress while blocking the browser's: every runtime downloads itself at run
+time, so without it CheerpJ, webR, php-wasm and the .NET bundle all fail on
+their first request and every block records an error. It is off by default.
+
+The capture does no second run, so its entries are recorded `stable: false` —
+the conservative answer rather than a measured one. Booting CheerpJ and webR
+over again for an hour to set a field nothing reads is not worth it.
 
 **What almostnode does to the process**, which a sweep never notices and a
 generator does. It replaces `process.exit` with one that throws on any code,
