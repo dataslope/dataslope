@@ -79,7 +79,7 @@ int main() {
 
 ## Subsets
 
-For subsets, each element poses a yes/no question, in or out?, giving 2^n subsets. The recursion below makes both choices for each element: recurse without it, then push it, recurse with it, and pop it (the un-choose). The driver prints each subset's size; modify it to print the contents if you want to see the order they appear in.
+For subsets, each element poses a yes/no question, in or out?, giving $2^n$ subsets. The recursion below makes both choices for each element: recurse without it, then push it, recurse with it, and pop it (the un-choose). The driver prints each subset's size; modify it to print the contents if you want to see the order they appear in.
 
 <Figure
   slug="dsa-backtracking-subsets-inline-cutout"
@@ -114,7 +114,7 @@ int main() {
   ]}
 />
 
-For subsets specifically there is also a non-recursive route worth knowing: count from 0 to 2^n − 1 and read each number's bits as the in/out decisions. Mask `5` is binary `101`, elements 0 and 2 in, element 1 out. Deterministic order, no recursion, and a handy trick whenever n ≤ 20 or so.
+For subsets specifically there is also a non-recursive route worth knowing: count from 0 to $2^n$ − 1 and read each number's bits as the in/out decisions. Mask `5` is binary `101`, elements 0 and 2 in, element 1 out. Deterministic order, no recursion, and a handy trick whenever n ≤ 20 or so.
 
 <CodeBlock
   adapter="cpp"

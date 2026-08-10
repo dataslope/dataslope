@@ -161,7 +161,7 @@ int main() {
 
 ## Jump game
 
-Some greedy solutions need no sort at all, just the right thing to be greedy *about*. In the jump game, `nums[i]` is the farthest you can jump from index `i`; can you reach the end? Don't track every possible route, track one number: `far`, the farthest index reachable so far. Scan left to right; if the current index ever exceeds `far`, you are standing somewhere unreachable and the answer is no; otherwise extend `far` with `i + nums[i]`. One pass, O(1) space.
+Some greedy solutions need no sort at all, just the right thing to be greedy *about*. In the jump game, `nums[i]` is the farthest you can jump from index `i`; can you reach the end? Don't track every possible route, track one number: `far`, the farthest index reachable so far. Scan left to right; if the current index ever exceeds `far`, you are standing somewhere unreachable and the answer is no; otherwise extend `far` with `i + nums[i]`. One pass, $O(1)$ space.
 
 <Figure
   slug="dsa-greedy-inline-cutout"

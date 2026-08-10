@@ -3,9 +3,9 @@ title: Doubly Linked Lists and std::list
 description: Learn previous and next pointers, bidirectional traversal, std::list iterators, splicing use cases, and cycle detection patterns
 ---
 
-A singly linked list has a blind spot: a node cannot see *backward*. Deleting a node you are already holding still costs O(n), because you must re-walk from the head to find whoever points at you. The doubly linked list fixes this with one extra pointer per node, `prev` alongside `next`, so a node can introduce its two neighbors to each other and step out of the chain in O(1).
+A singly linked list has a blind spot: a node cannot see *backward*. Deleting a node you are already holding still costs $O(n)$, because you must re-walk from the head to find whoever points at you. The doubly linked list fixes this with one extra pointer per node, `prev` alongside `next`, so a node can introduce its two neighbors to each other and step out of the chain in $O(1)$.
 
-That one capability, *unlink this exact node, right now, cheaply*, is the doubly linked list's reason to exist, and it powers a famous real-world design: the LRU cache. An LRU ("least recently used") cache keeps hot items in a doubly linked list ordered by recency; every access unlinks the touched node and re-splices it to the front, and every eviction pops the tail. All O(1), all impossible with a singly linked list or an array. You will find this exact structure inside CPU caches, database buffer pools, and `memcached`.
+That one capability, *unlink this exact node, right now, cheaply*, is the doubly linked list's reason to exist, and it powers a famous real-world design: the LRU cache. An LRU ("least recently used") cache keeps hot items in a doubly linked list ordered by recency; every access unlinks the touched node and re-splices it to the front, and every eviction pops the tail. All $O(1)$, all impossible with a singly linked list or an array. You will find this exact structure inside CPU caches, database buffer pools, and `memcached`.
 
 <Figure
   slug="dsa-doubly-linked-lists-cutout"
@@ -60,7 +60,7 @@ int main() {
 
 ## A tiny implementation
 
-This class keeps both `head` and `tail`, so pushing at either end is O(1). It also frees nodes in the destructor, note how every `push_back()` and `push_front()` must handle the empty-list case, where one new node becomes both head *and* tail. Doubly linked code always has twice the pointers to keep consistent; the discipline is to update them in pairs.
+This class keeps both `head` and `tail`, so pushing at either end is $O(1)$. It also frees nodes in the destructor, note how every `push_back()` and `push_front()` must handle the empty-list case, where one new node becomes both head *and* tail. Doubly linked code always has twice the pointers to keep consistent; the discipline is to update them in pairs.
 
 <Figure
   slug="dsa-doubly-linked-lists-tiny-implementation-inline-cutout"
@@ -142,7 +142,7 @@ int main() {
 />
 
 <Callout type="info" title="Deletion when you have the node">
-If you already have a pointer to a middle node, a doubly linked list can unlink it by changing the neighboring `prev` and `next` links. Finding that node by value is still O(n).
+If you already have a pointer to a middle node, a doubly linked list can unlink it by changing the neighboring `prev` and `next` links. Finding that node by value is still $O(n)$.
 </Callout>
 
 ## `std::list`
@@ -186,11 +186,11 @@ Almost never as a default. `std::vector` or `std::deque` usually wins because co
 
 | Good reason | Why it matters |
 | --- | --- |
-| `splice` | Move nodes between lists in O(1) without copying values |
+| `splice` | Move nodes between lists in $O(1)$ without copying values |
 | stable iterators | Keep references to nodes while inserting elsewhere |
 | frequent known-position insert/erase | You already have the iterator, so no search cost |
 
-`splice` deserves a demonstration, because nothing else in the STL can do what it does: move elements *between containers* in O(1), without copying or reallocating, by rewiring node pointers. Below, one task migrates from `backlog` to `urgent` and no element is ever copied.
+`splice` deserves a demonstration, because nothing else in the STL can do what it does: move elements *between containers* in $O(1)$, without copying or reallocating, by rewiring node pointers. Below, one task migrates from `backlog` to `urgent` and no element is ever copied.
 
 <CodeBlock
   adapter="cpp"
@@ -252,7 +252,7 @@ int main() {
 />
 
 <Callout type="warn" title="Big-O can hide cache costs">
-A list may advertise O(1) insertion once you have an iterator, but walking to that iterator and chasing scattered nodes can dominate runtime.
+A list may advertise $O(1)$ insertion once you have an iterator, but walking to that iterator and chasing scattered nodes can dominate runtime.
 </Callout>
 
 ## Practice: print backward
@@ -325,7 +325,7 @@ int main() {
 
 ## Practice: detect a cycle
 
-One more pointer pattern before we leave lists, because it is too elegant to skip. Suppose a list's last node accidentally points back into the middle, traversal never ends. How do you detect this without storing every visited node? Run two pointers: a tortoise that moves one step at a time and a hare that moves two. If the list ends, the hare hits null and there is no cycle. If there is a loop, the hare enters it, circles, and, because it gains exactly one step on the tortoise per move, must eventually land on the same node. This is **Floyd's cycle detection**, and it uses O(1) memory no matter how long the list is.
+One more pointer pattern before we leave lists, because it is too elegant to skip. Suppose a list's last node accidentally points back into the middle, traversal never ends. How do you detect this without storing every visited node? Run two pointers: a tortoise that moves one step at a time and a hare that moves two. If the list ends, the hare hits null and there is no cycle. If there is a loop, the hare enters it, circles, and, because it gains exactly one step on the tortoise per move, must eventually land on the same node. This is **Floyd's cycle detection**, and it uses $O(1)$ memory no matter how long the list is.
 
 <ChallengeCard
   adapter="cpp"

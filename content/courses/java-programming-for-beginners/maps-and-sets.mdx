@@ -260,11 +260,11 @@ genuinely don't know in advance.
 - [o] It computes the key's hash code, picks a bucket directly, and looks only in that bucket
   > Hashing jumps straight to where the value would be, instead of scanning entries.
 - It linearly scans every entry, but very quickly
-  > That would be O(n).
+  > That would be $O(n)$.
 - It keeps the map sorted by key
   > It does not sort.
 - It uses a binary search across the keys
-  > That's a TreeMap (and it's O(log n), not O(1)).`}
+  > That's a TreeMap (and it's $O(\\log n)$, not $O(1)$).`}
 />
 
 <MultipleChoice

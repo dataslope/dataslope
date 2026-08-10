@@ -91,7 +91,7 @@ int main() {
   ]}
 />
 
-The visited check happens *at enqueue time*, not at dequeue time, a vertex is claimed the moment it is discovered. With an adjacency list, BFS touches each vertex once and each edge once: O(V + E).
+The visited check happens *at enqueue time*, not at dequeue time, a vertex is claimed the moment it is discovered. With an adjacency list, BFS touches each vertex once and each edge once: $O(V + E)$.
 
 ## Depth-first search
 
@@ -211,7 +211,7 @@ memory. On a wide graph the queue balloons; on a deep one the stack does.
 
 ## Connected components
 
-A single traversal reaches only one "island" of the graph. To count the islands, the **connected components**, wrap the traversal in a loop over all vertices: every time you find a vertex that no previous traversal touched, you have discovered a new component, so increment the count and flood it. The visited array is shared across all the traversals, which is what keeps the total work at O(V + E) no matter how many components there are.
+A single traversal reaches only one "island" of the graph. To count the islands, the **connected components**, wrap the traversal in a loop over all vertices: every time you find a vertex that no previous traversal touched, you have discovered a new component, so increment the count and flood it. The visited array is shared across all the traversals, which is what keeps the total work at $O(V + E)$ no matter how many components there are.
 
 <CodeBlock
   adapter="cpp"

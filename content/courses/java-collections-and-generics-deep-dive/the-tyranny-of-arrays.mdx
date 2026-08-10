@@ -55,7 +55,7 @@ element type. Indexing is fast because it is just arithmetic:
 address(arr[i]) = base + i * sizeof(element)
 ```
 
-That is its great strength, `O(1)` random access, and the source
+That is its great strength, $O(1)$ random access, and the source
 of its great weakness: once you allocate `new int[10]`, you have ten
 slots forever.
 
@@ -155,7 +155,7 @@ later, will forget to update.
 
 ### 3. Search efficiently
 
-Looking up a value in an unsorted array is `O(n)`: walk every slot.
+Looking up a value in an unsorted array is $O(n)$: walk every slot.
 If you want fast lookup by key, you have to build a hash table or a
 tree yourself. Possible, but it is a couple hundred lines of code
 that has nothing to do with your problem.
@@ -260,7 +260,7 @@ string.
 - They cannot be iterated
   > Arrays can be iterated; the issue is uniformity, not capability.
 - [o] They have a fixed size and offer no built-in support for resizing, searching, uniqueness, or higher-level access patterns
-  > Arrays solve one job, O(1) indexed storage, and leave every other data-handling concern to the programmer.
+  > Arrays solve one job, $O(1)$ indexed storage, and leave every other data-handling concern to the programmer.
 - The Java compiler doesn't allow them in modern code
   > Arrays are still fully supported in Java and are the substrate of most collections.`}
 />

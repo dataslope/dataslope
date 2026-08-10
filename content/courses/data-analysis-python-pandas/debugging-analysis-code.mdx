@@ -182,7 +182,7 @@ flowchart LR
   M -- "Wrong" --> R2["Bug is in 1–15"]
 ```
 
-This O(log n) approach beats O(n) re-reading every time.
+This $O(\log n)$ approach beats $O(n)$ re-reading every time.
 
 ## Habit 7, Reproduce in a minimal example
 
@@ -322,7 +322,7 @@ Encode assumptions; let Pandas tell you when reality breaks them.`}
 - [o] Bisect, check the intermediate output halfway through; whichever half is wrong, bisect again
   > Logarithmic search through your pipeline beats linear search.
 - Re-read every step
-  > Re-reading all 30 steps is O(n) search; bisection reduces the problem to O(log n) by splitting the problem in half each time.
+  > Re-reading all 30 steps is $O(n)$ search; bisection reduces the problem to $O(\\log n)$ by splitting the problem in half each time.
 - Add more comments
   > Comments explain intent but do not execute or reveal the intermediate state that would expose where the wrong answer originates.
 

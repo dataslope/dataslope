@@ -857,6 +857,33 @@ can drift.
 Enforced by `npm run check:prose` (`scripts/check-prose.mjs`) and by
 `__tests__/proseStyle.test.ts`, which runs as part of `npm test`.
 
+### Notation is math, not text
+
+Complexity notation goes in `$…$` and renders through KaTeX, which is already
+wired for MDX bodies (`source.config.ts`). `$O(n \log n)$`, never `O(n log n)`
+and never `` `O(n log n)` ``: a code span sets it in the monospace face used
+for identifiers, so a growth rate reads as something you could type into the
+editor beside it. The same goes for the growth terms themselves, `$n^2$` and
+`$2^n$`, and for `$\Theta$` and `$\Omega$`. The *names* stay prose: a sentence
+about "Big-O" or a table row labelled "Big-Θ" is talking about the notation
+rather than using it.
+
+Two places where the surrounding syntax decides the spelling:
+
+- **Inside a component prop**, the value is a JS template literal, so every
+  LaTeX command needs its backslash doubled: `$O(n \\log n)$`. A single one is
+  eaten by the literal and KaTeX receives `log`, which it sets as three italic
+  variables rather than the operator.
+- **Not every prop renders math.** `<MultipleChoice>` does (its own
+  ReactMarkdown pipeline carries `remarkMath` + `rehypeKatex`). A challenge
+  card's `instructions` does *not*: `renderMarkdownInstructions` in
+  `app/_components/challengeShared.tsx` runs `remarkGfm` alone, so `$…$` there
+  reaches the reader as dollar signs. Leave those as plain text.
+
+Code is exempt, in both directions: an `O(1)` in a comment inside
+`starterCode` is code, and `` `f(n) = O(g(n))` `` is one span of pseudo-code
+rather than a span that happens to end in notation.
+
 ### No em dashes
 
 **Never use an em dash (`—`) in authored prose.** It is banned precisely

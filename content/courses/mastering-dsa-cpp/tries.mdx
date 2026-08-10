@@ -43,7 +43,7 @@ flowchart TD
 ```
 
 <Callout type="info" title="Length-based complexity">
-Trie insert, exact search, and prefix search are O(L), where L is the length of the key, independent of how many other words are stored. A dictionary of ten words and a dictionary of ten million answer "is `cart` a word?" in the same four steps.
+Trie insert, exact search, and prefix search are $O(L)$, where L is the length of the key, independent of how many other words are stored. A dictionary of ten words and a dictionary of ten million answer "is `cart` a word?" in the same four steps.
 </Callout>
 
 ## Node representation
@@ -544,13 +544,13 @@ int main() {
 
 <MultipleChoice markdown={`What is the time complexity of searching for a word of length L in a trie?
 
-- [o] O(L)
+- [o] $O(L)$
   > One edge is followed per character.
-- O(n log n)
+- $O(n \\log n)$
   > The number of stored words is not directly multiplied this way.
-- O(1) always
+- $O(1)$ always
   > Each character must be followed.
-- O(26 to the power L)
+- $O(26 to the power L)$
   > Search follows one path, not all possible paths.`} />
 
 <MultipleChoice markdown={`When can a trie beat a hash set of strings?

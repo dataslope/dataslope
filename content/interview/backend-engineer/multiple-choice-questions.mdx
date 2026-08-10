@@ -26,7 +26,7 @@ reasoning and runnable code.
 - The best case running time.
   > Big-O is normally used for the upper bound; best case is usually written with Ω.
 - [o] How the cost grows as the input grows.
-  > Constants and lower-order terms are ignored. It answers "what happens at 10x the data", which is why an O(n log n) algorithm can lose to an O(n²) one on small inputs and still be the right choice.
+  > Constants and lower-order terms are ignored. It answers "what happens at 10x the data", which is why an $O(n \\log n)$ algorithm can lose to an $O(n^2)$ one on small inputs and still be the right choice.
 - The exact number of operations an algorithm performs.
   > Constants and lower-order terms are deliberately discarded.`}
 />
@@ -34,13 +34,13 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What is the average and worst-case lookup cost of a hash map?
 
-- [o] O(1) on average, O(n) in the worst case.
-  > The worst case is every key hashing to the same bucket. Java's HashMap mitigates this by converting a long collision chain into a balanced tree, giving O(log n) instead.
-- O(n) on average.
-  > Average O(n) would make hash maps useless.
-- O(1) in both cases.
+- [o] $O(1)$ on average, $O(n)$ in the worst case.
+  > The worst case is every key hashing to the same bucket. Java's HashMap mitigates this by converting a long collision chain into a balanced tree, giving $O(\\log n)$ instead.
+- $O(n)$ on average.
+  > Average $O(n)$ would make hash maps useless.
+- $O(1)$ in both cases.
   > Worst case degrades when many keys collide into one bucket.
-- O(log n) in both the average and worst cases.
+- $O(\\log n)$ in both the average and worst cases.
   > That is a balanced tree, not a hash table.`}
 />
 
@@ -48,39 +48,39 @@ reasoning and runnable code.
   markdown={`When is a linked list genuinely preferable to a dynamic array?
 
 - [o] When you already hold a reference to the node you are splicing.
-  > The splice is then O(1) with no shifting. Without that reference you pay O(n) to find the node first, which is why arrays win in practice more often than the textbook suggests.
+  > The splice is then $O(1)$ with no shifting. Without that reference you pay $O(n)$ to find the node first, which is why arrays win in practice more often than the textbook suggests.
 - When you need to sort the whole collection frequently.
   > Sorting a linked list is generally slower than sorting an array.
 - When you need fast lookup by index.
-  > Indexing a linked list is O(n); an array is O(1).
+  > Indexing a linked list is $O(n)$; an array is $O(1)$.
 - When memory is tight.
   > Each node carries pointer overhead and destroys cache locality.`}
 />
 
 <MultipleChoice
-  markdown={`What does "amortized O(1)" mean for appending to a dynamic array?
+  markdown={`What does "amortized $O(1)$" mean for appending to a dynamic array?
 
-- It is only O(1) when the capacity has been preallocated.
-  > Preallocating removes the resizes entirely; amortization is what makes it O(1) without doing so.
+- It is only $O(1)$ when the capacity has been preallocated.
+  > Preallocating removes the resizes entirely; amortization is what makes it $O(1)$ without doing so.
 - Every append takes constant time.
   > The append that triggers a resize copies every element.
 - The first append is slow and the rest are fast.
   > Resizes recur as the array grows, not just at the start.
-- [o] Most appends are O(1) and the occasional resize is O(n).
-  > Doubling the capacity spreads that cost so the average over many appends stays constant. Growing by a constant amount instead of doubling would make the amortized cost O(n).`}
+- [o] Most appends are $O(1)$ and the occasional resize is $O(n)$.
+  > Doubling the capacity spreads that cost so the average over many appends stays constant. Growing by a constant amount instead of doubling would make the amortized cost $O(n)$.`}
 />
 
 <MultipleChoice
   markdown={`What are the time complexities of a binary heap's push and pop-min?
 
-- O(log n) and O(n).
-  > Popping sifts down through the height of the tree, which is O(log n).
-- O(n log n) for both the push and the pop-min.
+- $O(\\log n)$ and $O(n)$.
+  > Popping sifts down through the height of the tree, which is $O(\\log n)$.
+- $O(n \\log n)$ for both the push and the pop-min.
   > That is the cost of a full heapsort, not a single operation.
-- O(1) and O(1).
+- $O(1)$ and $O(1)$.
   > Maintaining the heap property costs a sift.
-- [o] O(log n) for both, with O(1) to peek at the minimum.
-  > Building a heap from n items in one pass is O(n), which is better than n separate pushes.`}
+- [o] $O(\\log n)$ for both, with $O(1)$ to peek at the minimum.
+  > Building a heap from n items in one pass is $O(n)$, which is better than n separate pushes.`}
 />
 
 <MultipleChoice
@@ -125,26 +125,26 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What is the complexity of Dijkstra's algorithm with a binary heap, and what breaks it?
 
-- O(E log E), and it breaks on dense graphs.
+- $O(E \\log E)$, and it breaks on dense graphs.
   > Density affects the constant, not correctness.
-- O(V + E), and it breaks on weighted graphs.
-  > Weights are exactly what it is for; O(V + E) is BFS.
-- [o] O((V + E) log V), and it breaks on negative edge weights.
-  > Once a node is finalized Dijkstra never revisits it, which a negative edge could invalidate. Bellman-Ford handles negatives at O(VE).
-- O(V²), and it breaks on graphs that are not connected.
-  > O(V²) is the array implementation; disconnection is handled fine.`}
+- $O(V + E)$, and it breaks on weighted graphs.
+  > Weights are exactly what it is for; $O(V + E)$ is BFS.
+- [o] $O((V + E) \\log V)$, and it breaks on negative edge weights.
+  > Once a node is finalized Dijkstra never revisits it, which a negative edge could invalidate. Bellman-Ford handles negatives at $O(VE)$.
+- $O(V^2)$, and it breaks on graphs that are not connected.
+  > $O(V^2)$ is the array implementation; disconnection is handled fine.`}
 />
 
 <MultipleChoice
   markdown={`What are the average and worst-case complexities of search in an unbalanced BST?
 
-- [o] O(log n) average and O(n) in the worst case.
-  > Sorted insertion degenerates the tree into a linked list. Self-balancing variants (red-black, AVL) restore the O(log n) guarantee.
-- O(log n) in both the average and the worst case.
+- [o] $O(\\log n)$ average and $O(n)$ in the worst case.
+  > Sorted insertion degenerates the tree into a linked list. Self-balancing variants (red-black, AVL) restore the $O(\\log n)$ guarantee.
+- $O(\\log n)$ in both the average and the worst case.
   > Only a balanced tree guarantees the worst case.
-- O(1) and O(log n).
+- $O(1)$ and $O(\\log n)$.
   > Constant-time search would require hashing.
-- O(n) and O(n log n).
+- $O(n)$ and $O(n \\log n)$.
   > Search never exceeds the tree's height.`}
 />
 
@@ -170,7 +170,7 @@ reasoning and runnable code.
   > That is a heap's job.
 - Range queries over numbers.
   > A balanced BST or a sorted array serves ranges better.
-- Detecting duplicate entries using O(1) space.
+- Detecting duplicate entries using $O(1)$ space.
   > A trie's whole cost is space.`}
 />
 
@@ -197,11 +197,11 @@ reasoning and runnable code.
 - Searching an unsorted array.
   > A window offers nothing over a linear scan there.
 - [o] Problems over contiguous subarrays or substrings.
-  > Extending and shrinking a window beats re-examining every subarray, turning O(n²) into O(n). "Longest substring without repeating characters" is the canonical case, usually paired with a hash map of last-seen positions.`}
+  > Extending and shrinking a window beats re-examining every subarray, turning $O(n^2)$ into $O(n)$. "Longest substring without repeating characters" is the canonical case, usually paired with a hash map of last-seen positions.`}
 />
 
 <MultipleChoice
-  markdown={`Quicksort's worst case is O(n²). When does it occur, and what mitigates it?
+  markdown={`Quicksort's worst case is $O(n^2)$. When does it occur, and what mitigates it?
 
 - When the array is too large for memory; mitigated by merge sort.
   > External sorting is a different problem.
@@ -218,7 +218,7 @@ reasoning and runnable code.
 
 - It always runs in the same time regardless of input.
   > That is a consistency property, not stability.
-- It uses O(1) extra space.
+- It uses $O(1)$ extra space.
   > That is being in-place, which is often at odds with stability.
 - [o] Equal elements keep their original relative order.
   > It matters when sorting by several keys in sequence. Sort by name, then stably by department, and within each department the names remain sorted. Quicksort is not stable; merge sort and Timsort are.
@@ -256,12 +256,12 @@ reasoning and runnable code.
   markdown={`When should you represent a graph as an adjacency matrix rather than an adjacency list?
 
 - Always, on the grounds that a matrix is simpler to work with.
-  > Simplicity costs O(V²) memory regardless of edge count.
+  > Simplicity costs $O(V^2)$ memory regardless of edge count.
 - When the graph is a tree.
   > A tree is maximally sparse, the worst case for a matrix.
 - When edges are weighted.
   > Both representations carry weights fine.
-- [o] When the graph is dense, or edge checks must be O(1).
+- [o] When the graph is dense, or edge checks must be $O(1)$.
   > A sparse graph with a million nodes would need a terabyte-scale matrix, which is why lists are the default.`}
 />
 
@@ -273,7 +273,7 @@ reasoning and runnable code.
 - That it fits in memory.
   > True but not the distinguishing requirement.
 - [o] Some exploitable order, usually sortedness.
-  > Moving a pointer then rules out a whole range of possibilities. "Find two numbers summing to a target in a sorted array" is O(n) with two pointers and O(n log n) if you have to sort first.
+  > Moving a pointer then rules out a whole range of possibilities. "Find two numbers summing to a target in a sorted array" is $O(n)$ with two pointers and $O(n \\log n)$ if you have to sort first.
 - That it is a linked list.
   > Arrays are the more common setting, though fast/slow pointers on a linked list are a well-known variant.`}
 />
@@ -1121,13 +1121,13 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What are the average time complexities of Python's \`dict\` operations, and what makes them possible?
 
-- O(1) for lookup but O(n) for insert.
-  > Insertion is amortized O(1); the occasional resize is what "amortized" absorbs.
-- O(log n), because a \`dict\` is a balanced tree.
+- $O(1)$ for lookup but $O(n)$ for insert.
+  > Insertion is amortized $O(1)$; the occasional resize is what "amortized" absorbs.
+- $O(\\log n)$, because a \`dict\` is a balanced tree.
   > Python's \`dict\` is a hash table, not a tree.
-- [o] O(1) average for lookup, insert, and delete.
-  > Keys are hashed to a slot, which is also why they must be hashable and therefore effectively immutable. Worst case degrades to O(n) under heavy collisions, and since 3.7 insertion order is part of the language guarantee.
-- O(n) for all three on large dictionaries.
+- [o] $O(1)$ average for lookup, insert, and delete.
+  > Keys are hashed to a slot, which is also why they must be hashable and therefore effectively immutable. Worst case degrades to $O(n)$ under heavy collisions, and since 3.7 insertion order is part of the language guarantee.
+- $O(n)$ for all three on large dictionaries.
   > That would defeat the point of the structure.`}
 />
 

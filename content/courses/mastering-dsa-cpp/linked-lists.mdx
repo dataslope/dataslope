@@ -7,7 +7,7 @@ The array's contiguity is its superpower and its curse. Insert one element at th
 
 That is the linked list: values in separate nodes, stitched together by `next` pointers. It is one of the oldest ideas in programming, Allen Newell, Cliff Shaw, and Herbert Simon developed linked lists in the mid-1950s for their IPL language while building the Logic Theorist, one of the first artificial intelligence programs, precisely because they needed structures that could grow and reshape themselves mid-computation. John McCarthy's Lisp then made the linked list the very fabric of a language.
 
-The price of this flexibility is the loss of the array's address formula. Nodes are not contiguous, so there is no O(1) random access: to reach the ith node you must walk i links. Linked lists trade arithmetic for navigation.
+The price of this flexibility is the loss of the array's address formula. Nodes are not contiguous, so there is no $O(1)$ random access: to reach the ith node you must walk i links. Linked lists trade arithmetic for navigation.
 
 <Figure
   slug="dsa-linked-lists-cutout"
@@ -145,7 +145,7 @@ int main() {
 
 ## Append, search, and delete
 
-Appending without a tail pointer requires walking to the end, O(n) just to find the last node. Deletion is the genuinely tricky one: to unlink a node you must rewrite the pointer that *leads to it*, which means you need access to the previous link, not just the node itself.
+Appending without a tail pointer requires walking to the end, $O(n)$ just to find the last node. Deletion is the genuinely tricky one: to unlink a node you must rewrite the pointer that *leads to it*, which means you need access to the previous link, not just the node itself.
 
 <Figure
   slug="dsa-linked-lists-inline-cutout"
@@ -228,10 +228,10 @@ int main() {
 
 | Operation | Complexity | Note |
 | --- | --- | --- |
-| access ith element | O(n) | Must follow links from the head |
-| prepend | O(1) | Change one pointer |
-| append without tail pointer | O(n) | Must find the last node |
-| search by value | O(n) | May inspect every node |
+| access ith element | $O(n)$ | Must follow links from the head |
+| prepend | $O(1)$ | Change one pointer |
+| append without tail pointer | $O(n)$ | Must find the last node |
+| search by value | $O(n)$ | May inspect every node |
 
 </Callout>
 
@@ -422,7 +422,7 @@ int main() {
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`Which operation is O(1) on a singly linked list when you have the head pointer?
+  markdown={`Which operation is $O(1)$ on a singly linked list when you have the head pointer?
 
 - Sorting the list
   > Sorting is not a constant-time operation.

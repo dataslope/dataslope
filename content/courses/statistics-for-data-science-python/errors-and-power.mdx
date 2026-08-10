@@ -368,15 +368,15 @@ p-value in *P-values*.
   markdown={`In the simulation above, both groups were drawn from the *same* distribution, yet the test rejected $H_0$ about 5% of the time. What does that 5% represent?
 
 - The probability that $H_0$ is true
-  > $\alpha$ is a long-run error rate conditional on $H_0$ being true; it is not the probability that $H_0$ is true.
+  > $\\alpha$ is a long-run error rate conditional on $H_0$ being true; it is not the probability that $H_0$ is true.
 - The power of the test
   > Power is the rejection rate when $H_0$ is *false*. Here $H_0$ is true, so these rejections are errors, not detections.
 - A sign the test is broken
-  > Producing false positives at rate $\alpha$ is the test working exactly as designed, not a malfunction.
-- [o] The Type I error rate, which equals the chosen $\alpha$
-  > Rejecting a true null is a Type I error by definition, and a valid test produces them at the rate $\alpha$ you selected.
+  > Producing false positives at rate $\\alpha$ is the test working exactly as designed, not a malfunction.
+- [o] The Type I error rate, which equals the chosen $\\alpha$
+  > Rejecting a true null is a Type I error by definition, and a valid test produces them at the rate $\\alpha$ you selected.
 
-Setting $\alpha = 0.05$ is agreeing to a 5% false-positive rate whenever the null holds.`}
+Setting $\\alpha = 0.05$ is agreeing to a 5% false-positive rate whenever the null holds.`}
 />
 
 ## Why underpowered studies are doubly dangerous
@@ -602,12 +602,12 @@ asking about power later is how underpowered studies happen.
 <MultipleChoice
   markdown={`A new drug truly works, but a small trial fails to reach significance and concludes "no effect." Which error was made, and what is its rate called?
 
-- A Type I error, with rate $\alpha$
+- A Type I error, with rate $\\alpha$
   > A Type I error is rejecting a *true* null, a false positive. Here a *real* effect was missed, which is the opposite kind of error.
-- [o] A Type II error, with rate $\beta$
-  > Failing to reject a false null is a Type II error (a false negative), and its long-run rate is denoted $\beta$.
-- A false positive, with rate $1 - \beta$
-  > Missing a real effect is a false *negative*, not a false positive; and $1 - \beta$ is power, the rate of correctly detecting effects.
+- [o] A Type II error, with rate $\\beta$
+  > Failing to reject a false null is a Type II error (a false negative), and its long-run rate is denoted $\\beta$.
+- A false positive, with rate $1 - \\beta$
+  > Missing a real effect is a false *negative*, not a false positive; and $1 - \\beta$ is power, the rate of correctly detecting effects.
 - No error, non-significant means there is no effect
   > A non-significant result does not establish absence of an effect, especially in a small (low-power) trial where real effects are often missed.
 
@@ -617,12 +617,12 @@ Missing a real effect is a Type II error, made more likely by low power.`}
 <MultipleChoice
   markdown={`Statistical power is best defined as:
 
-- [o] The probability of correctly rejecting $H_0$ when $H_0$ is actually false (that is, $1 - \beta$)
-  > Power is the chance the test catches a real effect, equal to one minus the Type II error rate $\beta$.
+- [o] The probability of correctly rejecting $H_0$ when $H_0$ is actually false (that is, $1 - \\beta$)
+  > Power is the chance the test catches a real effect, equal to one minus the Type II error rate $\\beta$.
 - The probability that $H_0$ is false
   > Whether $H_0$ is false is a fact about the world, not a probability the test outputs; power is about detecting that falsity when it holds.
 - The probability of making a Type I error
-  > The probability of a Type I error is $\alpha$, a false-positive rate. Power concerns correctly detecting real effects, not false alarms.
+  > The probability of a Type I error is $\\alpha$, a false-positive rate. Power concerns correctly detecting real effects, not false alarms.
 - 1 minus the p-value
   > The p-value is a single study's tail-area result; power is a design property averaged over many hypothetical studies, unrelated to $1 -$ p.
 
@@ -634,14 +634,14 @@ Power = the chance you catch a real effect when there is one.`}
 
 - Reducing the variability (noise) in the measurements
   > Cleaner, less variable data sharpens the test and *increases* power.
-- [o] Reducing $\alpha$ from 0.05 to 0.01
+- [o] Reducing $\\alpha$ from 0.05 to 0.01
   > A stricter threshold makes the test reject less often overall, which lowers the chance of rejecting even when the null is false, reducing power.
 - Studying a larger true effect
   > Bigger effects are easier to detect, so power goes *up*, not down.
 - Increasing the sample size
   > A larger sample reduces noise in the estimate and *raises* power, the opposite of what is asked.
 
-A stricter $\alpha$ buys fewer false positives at the cost of power; the other levers raise power.`}
+A stricter $\\alpha$ buys fewer false positives at the cost of power; the other levers raise power.`}
 />
 
 <MultipleChoice
@@ -679,8 +679,8 @@ The "winner's curse": underpowered significant findings overstate effects and re
 
 - [o] Run a power analysis to find the sample size that yields power >= 0.80 for that effect size, then collect that much data
   > Choosing the smallest effect worth detecting and solving for the required $n$ ensures the experiment can actually catch the effect at the desired power.
-- Lower $\alpha$ to 0.001 to be safe
-  > Tightening $\alpha$ reduces false positives but *lowers* power, making it harder to detect the effect you care about, the opposite of the goal.
+- Lower $\\alpha$ to 0.001 to be safe
+  > Tightening $\\alpha$ reduces false positives but *lowers* power, making it harder to detect the effect you care about, the opposite of the goal.
 - Launch immediately and check power afterward if the result is null
   > Computing power after the fact does not fix an undersized study; the sample size must be planned in advance to guarantee adequate power.
 - Pick whatever sample size is convenient; power takes care of itself

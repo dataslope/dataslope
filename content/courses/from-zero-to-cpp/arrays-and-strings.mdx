@@ -365,15 +365,15 @@ int main() {
 />
 
 <MultipleChoice
-  markdown={`Why is \`push_back()\` on a \`std::vector\` considered O(1) *amortized*?
+  markdown={`Why is \`push_back()\` on a \`std::vector\` considered $O(1)$ *amortized*?
 
-- It is O(log n).
+- It is $O(\\log n)$.
   > Logarithmic growth would make growth too slow; vectors double (or similar).
-- It is always O(1).
-  > Occasionally it triggers a reallocation and copy, which is O(n).
-- [o] Most pushes are O(1); when capacity is exceeded the vector reallocates and copies, but it grows geometrically, so the *average* cost per push is constant.
+- It is always $O(1)$.
+  > Occasionally it triggers a reallocation and copy, which is $O(n)$.
+- [o] Most pushes are $O(1)$; when capacity is exceeded the vector reallocates and copies, but it grows geometrically, so the *average* cost per push is constant.
   > This is the classic amortized-analysis argument.
-- It is O(n) every time.
+- It is $O(n)$ every time.
   > That would make any vector-based algorithm slow; this isn't the case.`}
 />
 

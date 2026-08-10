@@ -51,7 +51,7 @@ iterate a map. Of those, `entrySet()` is almost always what you want.
 
 ## HashMap
 
-`HashMap` is the workhorse. Average `O(1)` for `put()`, `get()`,
+`HashMap` is the workhorse. Average $O(1)$ for `put()`, `get()`,
 `containsKey()`. No order guarantee.
 
 <CodeBlock
@@ -110,7 +110,7 @@ flowchart LR
 
 This explains a lot:
 
-- Why `put()` and `get()` are `O(1)` *average* but worst-case `O(log n)`
+- Why `put()` and `get()` are $O(1)$ *average* but worst-case $O(\log n)$
   (post-Java-8) after collisions.
 - Why a bad `hashCode()` (constant, or near-constant) destroys
   performance, every operation falls back to walking a long chain.
@@ -129,7 +129,7 @@ could pin a CPU core for minutes. PHP, Python, Ruby, ASP.NET, and
 Java servers were all vulnerable, and vendors scrambled out patches.
 Java's deeper fix arrived in Java 8: once a bucket's chain grows past
 eight entries, `HashMap` converts it into a red-black tree, capping
-even an adversarial worst case at `O(log n)`. The data structure you
+even an adversarial worst case at $O(\log n)$. The data structure you
 are studying was hardened by an actual attack.
 
 ## LinkedHashMap
@@ -170,7 +170,7 @@ display or determinism, for example, JSON-like response objects.
 
 ## TreeMap
 
-`TreeMap` keeps keys in sorted order (red-black tree). `O(log n)`
+`TreeMap` keeps keys in sorted order (red-black tree). $O(\log n)$
 everywhere, but in exchange you get range queries, `firstKey`,
 `lastKey`, `floorKey`, `ceilingKey`, and `subMap`.
 
@@ -440,7 +440,7 @@ public class Grouper {
 - When you need higher throughput
   > \`HashMap\` is faster on average.
 - [o] When you need keys iterated in sorted order, range queries (\`subMap\`), or "next key after \`x\`" (\`ceilingKey\`, \`floorKey\`)
-  > The \`O(log n)\` price buys real ordering operations a hash table cannot provide.`}
+  > The \`$O(\\log n)$\` price buys real ordering operations a hash table cannot provide.`}
 />
 
 <MultipleChoice

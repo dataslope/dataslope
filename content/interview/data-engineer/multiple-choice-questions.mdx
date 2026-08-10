@@ -1256,9 +1256,9 @@ reasoning and runnable examples.
   markdown={`Which is the correct way to deduplicate a list while preserving order?
 
 - [o] \`list(dict.fromkeys(items))\`
-  > Dictionaries preserve insertion order as of Python 3.7, and the lookup stays O(1) per item.
+  > Dictionaries preserve insertion order as of Python 3.7, and the lookup stays $O(1)$ per item.
 - A nested loop checking membership in the output list.
-  > Correct but O(n²), since each membership test scans the list.
+  > Correct but $O(n^2)$, since each membership test scans the list.
 - \`sorted(set(items))\`
   > This produces sorted order, not the original order.
 - \`list(set(items))\`

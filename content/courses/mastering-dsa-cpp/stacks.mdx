@@ -108,7 +108,7 @@ int main() {
 />
 
 <Callout type="success" title="Stack operation costs">
-For `std::stack` backed by `std::deque`, `push()`, `pop()`, `top()`, and `empty()` are O(1). A vector-backed stack also gives amortized O(1) `push()`.
+For `std::stack` backed by `std::deque`, `push()`, `pop()`, `top()`, and `empty()` are $O(1)$. A vector-backed stack also gives amortized $O(1)$ `push()`.
 </Callout>
 
 ## Balanced parentheses
@@ -408,13 +408,13 @@ int main() {
 <MultipleChoice
   markdown={`What is the usual time complexity of \`push()\` and \`pop()\` on \`std::stack\`?
 
-- O(n^2)
+- $O(n^2)$
   > That would be far too expensive for a stack adapter.
-- [o] O(1)
+- [o] $O(1)$
   > The default deque-backed stack pushes and pops at one end in constant time.
-- O(n)
+- $O(n)$
   > Stack operations touch only one end.
-- O(log n)
+- $O(\\log n)$
   > No tree operation is required.`}
 />
 
@@ -425,7 +425,7 @@ int main() {
   > A deque can store many element types.
 - It sorts stack values automatically.
   > A stack preserves LIFO order; it does not sort.
-- It makes \`top()\` O(n).
+- It makes \`top()\` $O(n)$.
   > \`top()\` remains constant time.
 - [o] It supports efficient insertion and removal at the back without requiring contiguous reallocation like a vector.
   > It gives stable, efficient end operations.`}

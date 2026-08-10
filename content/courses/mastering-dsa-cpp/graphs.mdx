@@ -63,7 +63,7 @@ Unlike a tree, a graph has no root, no parent pointers, no natural "shape" to ha
 
 ### Adjacency matrix
 
-An adjacency matrix is a $V \times V$ table. `matrix[u][v]` tells whether edge `u -> v` exists. It uses **O(V²)** space and supports **O(1)** edge lookup. Note how the undirected edges are written twice, `matrix[u][v]` and `matrix[v][u]`, making the matrix symmetric about its diagonal.
+An adjacency matrix is a $V \times V$ table. `matrix[u][v]` tells whether edge `u -> v` exists. It uses **$O(V^2)$** space and supports **$O(1)$** edge lookup. Note how the undirected edges are written twice, `matrix[u][v]` and `matrix[v][u]`, making the matrix symmetric about its diagonal.
 
 <CodeBlock
   adapter="cpp"
@@ -100,7 +100,7 @@ Matrix lookup is great for dense graphs or repeated `hasEdge(u, v)` checks. But 
 
 ### Adjacency list
 
-An adjacency list stores, for each vertex, only the neighbors it actually has: `adj[u]` is a vector of `u`'s neighbors. Space drops to **O(V + E)**, you pay for what exists, not for what could exist, and "visit all neighbors of `u`," the inner loop of nearly every graph algorithm, becomes a tight scan of exactly the right data. This is why the adjacency list is the default representation in practice and in the rest of this course.
+An adjacency list stores, for each vertex, only the neighbors it actually has: `adj[u]` is a vector of `u`'s neighbors. Space drops to **$O(V + E)$**, you pay for what exists, not for what could exist, and "visit all neighbors of `u`," the inner loop of nearly every graph algorithm, becomes a tight scan of exactly the right data. This is why the adjacency list is the default representation in practice and in the rest of this course.
 
 <CodeBlock
   adapter="cpp"
@@ -377,11 +377,11 @@ int main() {
 - A single stack
   > A stack is a traversal helper, not a graph representation.
 - Adjacency matrix
-  > A matrix needs O(V²) space, which is enormous for one million vertices.
+  > A matrix needs $O(V^2)$ space, which is enormous for one million vertices.
 - A sorted array of vertices only
   > Vertices alone do not store connectivity.
 - [o] Adjacency list
-  > It stores only existing edges and uses O(V + E) space.
+  > It stores only existing edges and uses $O(V + E)$ space.
 
 Sparse graphs usually favor adjacency lists because they avoid storing absent edges.`}
 />
@@ -404,13 +404,13 @@ DAGs are common in dependency graphs, build systems, and scheduling.`}
 <MultipleChoice
   markdown={`How does edge lookup \`hasEdge(u, v)\` compare between an adjacency matrix and an unsorted adjacency list?
 
-- Both are always O(E)
+- Both are always $O(E)$
   > Neither needs to scan all edges for this basic lookup.
-- Matrix is O(V²); list is O(1)
-  > Matrix construction is O(V²), but lookup is direct.
-- Both are always O(1)
-  > Lists are not O(1) unless additional indexing is added.
-- [o] Matrix is O(1); list is O(degree(u))
+- Matrix is $O(V^2)$; list is $O(1)$
+  > Matrix construction is $O(V^2)$, but lookup is direct.
+- Both are always $O(1)$
+  > Lists are not $O(1)$ unless additional indexing is added.
+- [o] Matrix is $O(1)$; list is $O(degree(u))$
   > A matrix indexes directly, while a list scans neighbors of u.
 
 Choose representation based on the operations your algorithm performs most often.`}

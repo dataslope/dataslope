@@ -285,7 +285,7 @@ for item in pipeline:
   ]}
 />
 
-No intermediate lists are built. Memory usage is O(1) regardless of how many lines flow through. This pattern is the backbone of big-data tools like Apache Spark's lazy transformations.
+No intermediate lists are built. Memory usage is $O(1)$ regardless of how many lines flow through. This pattern is the backbone of big-data tools like Apache Spark's lazy transformations.
 
 <Callout type="success" title="Real-world streaming">
 In production, you might chain generators to process log files too large for RAM, stream JSON from an API endpoint, or apply transformations to database cursors. The pattern is always the same: small composable stages that yield one item at a time.

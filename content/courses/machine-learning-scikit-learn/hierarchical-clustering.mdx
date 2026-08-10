@@ -403,7 +403,7 @@ numeric attributes, no target, just structure. Two real-world details show
 up immediately. First, the features live on wildly different scales
 (`Population` is in the thousands, `AveRooms` is a single digit), so without
 `StandardScaler` the largest-magnitude column would dominate every distance.
-Second, agglomerative clustering is roughly *O(n²)*, so we draw a **random
+Second, agglomerative clustering is roughly *$O(n^2)$*, so we draw a **random
 sample of 400 districts** rather than all ~20,000, large enough to find
 structure, small enough to stay fast. We fix `random_state` on `.sample()` so
 the draw is reproducible; the clustering itself needs no seed.

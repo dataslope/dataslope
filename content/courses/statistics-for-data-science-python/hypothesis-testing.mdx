@@ -567,7 +567,7 @@ The null is always the "no effect / status quo" claim you try to contradict.`}
 />
 
 <MultipleChoice
-  markdown={`A test yields p = 0.42 at $\alpha = 0.05$. Which statement is the most accurate conclusion?
+  markdown={`A test yields p = 0.42 at $\\alpha = 0.05$. Which statement is the most accurate conclusion?
 
 - We should accept $H_0$ as true
   > Careful practice says "fail to reject," never "accept." Accepting $H_0$ overstates what the test can show.
@@ -582,15 +582,15 @@ The null is always the "no effect / status quo" claim you try to contradict.`}
 />
 
 <MultipleChoice
-  markdown={`Why do we fix the significance level $\alpha$ *before* collecting data?
+  markdown={`Why do we fix the significance level $\\alpha$ *before* collecting data?
 
 - [o] Because choosing the threshold after seeing the data lets you tune it to get the verdict you want, which destroys the error guarantee
   > Fixing the decision rule in advance is what keeps the false-positive rate at the level you claim; setting it afterward is a form of cheating.
-- Because a smaller $\alpha$ always gives a better test
-  > A smaller $\alpha$ reduces false positives but increases false negatives, it is a tradeoff, not a strict improvement, and it is unrelated to the timing question.
+- Because a smaller $\\alpha$ always gives a better test
+  > A smaller $\\alpha$ reduces false positives but increases false negatives, it is a tradeoff, not a strict improvement, and it is unrelated to the timing question.
 - Because the p-value cannot be computed otherwise
-  > The p-value can be computed regardless of $\alpha$; $\alpha$ is only the threshold you compare it against.
-- Because $\alpha$ must always equal 0.05 by law
+  > The p-value can be computed regardless of $\\alpha$; $\\alpha$ is only the threshold you compare it against.
+- Because $\\alpha$ must always equal 0.05 by law
   > 0.05 is a common convention, not a requirement; fields use 0.01, 0.10, and others. The reason for fixing it early is about avoiding bias, not a mandated value.
 
 Decide the rules of the game before you play.`}
@@ -631,11 +631,11 @@ The asymmetry of the verdict is the whole point: you can reject $H_0$, but you c
 
 - No test is needed; just compare the two averages
   > Comparing raw averages ignores whether the difference exceeds ordinary noise, which is exactly what the test evaluates.
-- A one-sided test with $H_1: \mu > \mu_0$, because you hope it helps
+- A one-sided test with $H_1: \\mu > \\mu_0$, because you hope it helps
   > Choosing a direction based on hope rather than a constraint is not justified, and it would miss a harmful effect entirely.
-- A one-sided test with $H_1: \mu < \mu_0$, to be conservative
+- A one-sided test with $H_1: \\mu < \\mu_0$, to be conservative
   > A left-sided test would be blind to a beneficial effect; "conservative" is not a reason to pick a direction that ignores half the possibilities.
-- [o] A two-sided test with $H_1: \mu \neq \mu_0$, because the effect could go in either direction
+- [o] A two-sided test with $H_1: \\mu \\neq \\mu_0$, because the effect could go in either direction
   > When either direction is of interest and neither is ruled out in advance, a two-sided alternative is the appropriate, unbiased default.
 
 Use two-sided unless a substantive constraint genuinely rules out one direction beforehand.`}

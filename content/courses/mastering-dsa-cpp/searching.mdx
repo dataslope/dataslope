@@ -14,7 +14,7 @@ That second idea, binary search, carries a warning label earned over decades. Jo
 
 ## Linear search
 
-Linear search checks each element from left to right until it finds the target or reaches the end. It works on unsorted data and runs in O(n).
+Linear search checks each element from left to right until it finds the target or reaches the end. It works on unsorted data and runs in $O(n)$.
 
 <CodeBlock
   adapter="cpp"
@@ -45,7 +45,7 @@ Linear search is often right for tiny arrays, one-time scans, linked lists, or u
 
 ## Binary search
 
-Binary search only works on sorted data. It maintains an interval `[low, high]` that is guaranteed to contain the target if it exists anywhere. Check the middle element: if it is too small, the target (if present) must be to the right, so move `low`; too big, move `high`; equal, done. Every comparison halves the interval, giving O(log n) time.
+Binary search only works on sorted data. It maintains an interval `[low, high]` that is guaranteed to contain the target if it exists anywhere. Check the middle element: if it is too small, the target (if present) must be to the right, so move `low`; too big, move `high`; equal, done. Every comparison halves the interval, giving $O(\log n)$ time.
 
 <Figure
   slug="dsa-searching-linear-search-inline-cutout"
@@ -53,7 +53,7 @@ Binary search only works on sorted data. It maintains an interval `[low, high]` 
   caption="Linear search checks every element; binary search halves the field each time."
 />
 
-O(n) against O(log n) is a pair of symbols until you put numbers on it. On a
+$O(n)$ against $O(\log n)$ is a pair of symbols until you put numbers on it. On a
 million-element array the difference is half a million comparisons against
 twenty:
 
@@ -323,13 +323,13 @@ int main() {
 <MultipleChoice
   markdown={`What is the worst-case time complexity of linear search over \`n\` elements?
 
-- O(n log n)
+- $O(n \\log n)$
   > That is common for efficient sorting, not linear search.
-- O(log n)
+- $O(\\log n)$
   > That is binary search on sorted data.
-- [o] O(n)
+- [o] $O(n)$
   > It may inspect every element.
-- O(1)
+- $O(1)$
   > Linear search is not constant time in the worst case.`}
 />
 

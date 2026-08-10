@@ -3,7 +3,7 @@ title: Dictionaries
 description: Key-value mappings, the most-used data structure in Python
 ---
 
-A `dict` maps **keys** to **values**. Lookups, insertions, and deletions are all average-case O(1). Dictionaries are everywhere in Python: JSON decoding produces dicts, function `**kwargs` are dicts, object `__dict__` attributes are dicts, module globals live in a dict, configuration files parse to dicts. **Dictionaries _are_ Python.** Understanding them deeply is not optional.
+A `dict` maps **keys** to **values**. Lookups, insertions, and deletions are all average-case $O(1)$. Dictionaries are everywhere in Python: JSON decoding produces dicts, function `**kwargs` are dicts, object `__dict__` attributes are dicts, module globals live in a dict, configuration files parse to dicts. **Dictionaries _are_ Python.** Understanding them deeply is not optional.
 
 <Figure
   slug="python-basics-dictionaries-cutout"
@@ -14,7 +14,7 @@ Every snippet on this page runs in your browser, no setup required.
 
 ## How dictionaries work
 
-Under the hood, a dict is a **hash table**: Python computes a hash of your key, uses that to find a bucket, and stores the key-value pair there. Hash collisions are handled with open addressing. This gives O(1) average-case access.
+Under the hood, a dict is a **hash table**: Python computes a hash of your key, uses that to find a bucket, and stores the key-value pair there. Hash collisions are handled with open addressing. This gives $O(1)$ average-case access.
 
 <Figure
   slug="python-dictionaries-inline-cutout"
@@ -621,14 +621,14 @@ print(d)
 <MultipleChoice
   markdown={`What is the time complexity of \`key in d\` where \`d\` is a dict?
 
-- O(n²)
+- $O(n^2)$
   > Dict lookup is much faster than quadratic.
-- O(n)
+- $O(n)$
   > That would be true for a list, not a dict.
-- O(log n)
+- $O(\\log n)$
   > Dicts are not sorted; they use hashing, not binary search.
-- [o] O(1) average case
-  > Dicts use hash tables, giving O(1) average-case lookup.`}
+- [o] $O(1)$ average case
+  > Dicts use hash tables, giving $O(1)$ average-case lookup.`}
 />
 
 <MultipleChoice

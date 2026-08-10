@@ -3,9 +3,9 @@ title: Efficient Sorting Algorithms
 description: Learn merge sort, quicksort, std::sort, std::stable_sort, custom comparators, and stability trade-offs in C++
 ---
 
-The slow sorts of the last page all share a flaw: they move information one comparison at a time across short distances. The efficient sorts escape O(n²) with one strategic idea, *divide and conquer*. Split the array, solve the halves, and combine. Each element participates in only about log n levels of splitting, and each level does O(n) work, giving O(n log n), which, for comparison-based sorting, is provably as good as it gets.
+The slow sorts of the last page all share a flaw: they move information one comparison at a time across short distances. The efficient sorts escape $O(n^2)$ with one strategic idea, *divide and conquer*. Split the array, solve the halves, and combine. Each element participates in only about $\log n$ levels of splitting, and each level does $O(n)$ work, giving $O(n \log n)$, which, for comparison-based sorting, is provably as good as it gets.
 
-The two stars of this page were born decades apart and embody opposite temperaments. Merge sort is the careful one: John von Neumann worked it out in 1945, making it one of the first algorithms ever written for a stored-program computer, and it *guarantees* O(n log n) no matter what you feed it. Quicksort is the daring one, usually faster in practice, occasionally catastrophic, and its origin story is one of the best in computing.
+The two stars of this page were born decades apart and embody opposite temperaments. Merge sort is the careful one: John von Neumann worked it out in 1945, making it one of the first algorithms ever written for a stored-program computer, and it *guarantees* $O(n \log n)$ no matter what you feed it. Quicksort is the daring one, usually faster in practice, occasionally catastrophic, and its origin story is one of the best in computing.
 
 <Figure
   slug="dsa-sorting-efficient-cutout"
@@ -26,9 +26,9 @@ Merge sort divides the array in half, recursively sorts each half, then merges t
 mergeSort(a): if size <= 1 return; sort left; sort right; merge
 ```
 
-The guarantees are ironclad: O(n log n) time on every input, no exceptions, plus stability when the merge prefers the left element on ties (note the `<=` in the code below, change it to `<` and stability dies silently). The price is O(n) extra memory for the merge buffer.
+The guarantees are ironclad: $O(n \log n)$ time on every input, no exceptions, plus stability when the merge prefers the left element on ties (note the `<=` in the code below, change it to `<` and stability dies silently). The price is $O(n)$ extra memory for the merge buffer.
 
-The n log n is not a coincidence, it is the shape of the recursion. Every row
+The $n \log n$ is not a coincidence, it is the shape of the recursion. Every row
 below costs n, because merging a level touches each element once, and the
 number of rows is how many times n can be halved:
 
@@ -138,15 +138,15 @@ int main() {
   ]}
 />
 
-Why "O(n log n) on average but O(n²) worst case"? Everything depends on the pivot's luck. A pivot near the median splits the range in half and the recursion is log n deep. But always picking the *smallest* element splits n into (0, n−1), the recursion becomes n levels deep and the total work quadratic. With the last-element pivot used above, the input that triggers this disaster is embarrassingly ordinary: an **already sorted array**.
+Why "$O(n \log n)$ on average but $O(n^2)$ worst case"? Everything depends on the pivot's luck. A pivot near the median splits the range in half and the recursion is $\log n$ deep. But always picking the *smallest* element splits n into (0, n−1), the recursion becomes n levels deep and the total work quadratic. With the last-element pivot used above, the input that triggers this disaster is embarrassingly ordinary: an **already sorted array**.
 
 <Callout type="warn" title="Pivot strategy matters">
-Naive quicksort can degrade to O(n^2). Random pivots and median-of-three pivots reduce the chance of consistently bad partitions, and make it hard for an adversary to construct a killer input on purpose.
+Naive quicksort can degrade to $O(n^2)$. Random pivots and median-of-three pivots reduce the chance of consistently bad partitions, and make it hard for an adversary to construct a killer input on purpose.
 </Callout>
 
 ## `std::sort()`
 
-So which do you actually use? Neither, directly: `std::sort()`. In 1997 David Musser proposed *introsort* ("introspective sort"), the hybrid most C++ standard libraries adopted: run quicksort for speed, but track recursion depth, and if it exceeds about 2·log n, the signature of bad pivots, switch to heapsort, which guarantees O(n log n). Tiny sub-ranges go to insertion sort. The result is quicksort's average speed with merge-sort-class worst-case insurance, which is why `std::sort()` is the right default unless you specifically need stability.
+So which do you actually use? Neither, directly: `std::sort()`. In 1997 David Musser proposed *introsort* ("introspective sort"), the hybrid most C++ standard libraries adopted: run quicksort for speed, but track recursion depth, and if it exceeds about 2·$\log n$, the signature of bad pivots, switch to heapsort, which guarantees $O(n \log n)$. Tiny sub-ranges go to insertion sort. The result is quicksort's average speed with merge-sort-class worst-case insurance, which is why `std::sort()` is the right default unless you specifically need stability.
 
 ```mermaid
 flowchart TD
@@ -350,13 +350,13 @@ int main() {
 <MultipleChoice
   markdown={`Which statement best compares merge sort and naive quicksort worst-case time?
 
-- [o] Merge sort guarantees O(n log n), while naive quicksort can be O(n^2).
+- [o] Merge sort guarantees $O(n \\log n)$, while naive quicksort can be $O(n^2)$.
   > Bad pivots make partitions unbalanced.
-- Both require O(n) extra arrays in standard forms.
+- Both require $O(n)$ extra arrays in standard forms.
   > Merge sort usually does; quicksort is commonly in-place aside from recursion stack.
-- Both are always O(n^2).
+- Both are always $O(n^2)$.
   > Both are designed to be faster than quadratic on typical inputs.
-- Merge sort can be O(n^2), while quicksort is always O(n log n).
+- Merge sort can be $O(n^2)$, while quicksort is always $O(n \\log n)$.
   > This reverses the usual guarantee.`}
 />
 

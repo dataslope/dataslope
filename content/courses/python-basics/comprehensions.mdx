@@ -309,7 +309,7 @@ print("gen total:", gen_total)
   ]}
 />
 
-The results are identical, but the generator uses O(1) memory while the list uses O(n).
+The results are identical, but the generator uses $O(1)$ memory while the list uses $O(n)$.
 
 <Callout type="info" title="Generator vs list memory">
 A list comprehension builds the entire list in memory before you can use it. A generator expression produces values on demand, one at a time. If you only need to iterate once (e.g., in `sum`, `max`, `any`, `all`), use a generator. If you need to iterate multiple times or slice the result, use a list.
@@ -485,12 +485,12 @@ For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2
 <MultipleChoice
   markdown={`What is the key advantage of a generator expression over a list comprehension?
 
-- [o] Generators use O(1) memory regardless of input size.
+- [o] Generators use $O(1)$ memory regardless of input size.
   > Generators produce items lazily, one at a time.
 - Generators automatically deduplicate.
   > Generators do not deduplicate; that is what sets do.
 - Generators are always faster.
-  > Not always, list access is O(1), generator iteration has per-item overhead.
+  > Not always, list access is $O(1)$, generator iteration has per-item overhead.
 - Generators support slicing.
   > Generators do **not** support slicing; lists do.`}
 />

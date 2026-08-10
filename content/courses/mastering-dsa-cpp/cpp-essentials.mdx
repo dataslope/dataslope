@@ -145,11 +145,11 @@ int main() {
 | `<stack>` | `stack` |
 | `<numeric>` | `accumulate`, `iota`, `gcd` |
 
-Why does this matter for algorithms specifically? Because a careless `std::vector<int> v` parameter copies *every element* on *every call*. Pass a million-element vector by value inside a loop and your "O(n)" function quietly becomes O(n²). `const&` makes the copy disappear.
+Why does this matter for algorithms specifically? Because a careless `std::vector<int> v` parameter copies *every element* on *every call*. Pass a million-element vector by value inside a loop and your "$O(n)$" function quietly becomes $O(n^2)$. `const&` makes the copy disappear.
 
 ## A quick tour of `std::vector`
 
-`std::vector` is the default sequence container for this course: fast indexing, compact storage, and amortized O(1) appends. Iterators mark ranges; standard library algorithms operate on the half-open range `[begin, end)`, the end iterator points one past the last element, which makes empty ranges and loop bounds work out cleanly.
+`std::vector` is the default sequence container for this course: fast indexing, compact storage, and amortized $O(1)$ appends. Iterators mark ranges; standard library algorithms operate on the half-open range `[begin, end)`, the end iterator points one past the last element, which makes empty ranges and loop bounds work out cleanly.
 
 <CodeBlock
   adapter="cpp"

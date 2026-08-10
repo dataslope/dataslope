@@ -137,7 +137,7 @@ int main() {
   ]}
 />
 
-With a binary heap, the time complexity is **O((V + E) log V)**. The adjacency list contributes the `V + E` scan; heap pushes and pops cost `log V`.
+With a binary heap, the time complexity is **$O((V + E) \log V)$**. The adjacency list contributes the `V + E` scan; heap pushes and pops cost `log V`.
 
 ## Relaxation in isolation
 
@@ -251,11 +251,11 @@ BellmanFord(edges, n, src):
     one more pass can detect negative cycles
 ```
 
-Bellman-Ford gives up Dijkstra's greedy shortcut and pays for it with O(V·E) time, but it is immune to negative edges, and that extra detection pass is how systems flag negative cycles (in currency-exchange graphs, a negative cycle is literally an arbitrage loop).
+Bellman-Ford gives up Dijkstra's greedy shortcut and pays for it with $O(V·E)$ time, but it is immune to negative edges, and that extra detection pass is how systems flag negative cycles (in currency-exchange graphs, a negative cycle is literally an arbitrage loop).
 
 ## Floyd-Warshall for all pairs
 
-Floyd-Warshall computes shortest paths between every pair of vertices in **O(V³)** time. It is often useful for dense graphs and supports negative edges as long as there are no negative cycles.
+Floyd-Warshall computes shortest paths between every pair of vertices in **$O(V^3)$** time. It is often useful for dense graphs and supports negative edges as long as there are no negative cycles.
 
 ```text
 for k in 0..n-1:
@@ -520,16 +520,16 @@ Use Bellman-Ford when negative edges are allowed.`}
 <MultipleChoice
   markdown={`What is the usual time complexity of Dijkstra with an adjacency list and binary heap?
 
-- [o] O((V + E) log V)
+- [o] $O((V + E) \\log V)$
   > Heap operations occur as distances are pushed and popped while edges are scanned.
-- O(log V)
+- $O(\\log V)$
   > A single heap operation is logarithmic, but the whole algorithm processes vertices and edges.
-- O(V²E)
+- $O(V^{2E})$
   > This is far larger than the standard heap implementation.
-- O(1)
+- $O(1)$
   > Shortest paths require examining graph structure.
 
-The exact bound is often written O(E log V) for connected sparse graphs, but O((V + E) log V) is a safe general form.`}
+The exact bound is often written $O(E \\log V)$ for connected sparse graphs, but $O((V + E) \\log V)$ is a safe general form.`}
 />
 
 <MultipleChoice

@@ -256,7 +256,7 @@ print(s)
 />
 
 <Callout type="warn" title="Immutability gotcha">
-Because strings are immutable, repeatedly concatenating with `+=` in a loop is O(n²), each operation creates a new string and copies everything.
+Because strings are immutable, repeatedly concatenating with `+=` in a loop is $O(n^2)$, each operation creates a new string and copies everything.
 
 **Bad:**
 ```python
@@ -673,12 +673,12 @@ print(slugify("Python 3.12 Released"))
 />
 
 <MultipleChoice
-  markdown={`Which approach builds a string from a list of 1000 items **without** the O(n²) cost of repeated concatenation?
+  markdown={`Which approach builds a string from a list of 1000 items **without** the $O(n^2)$ cost of repeated concatenation?
 
 - \`result = "".add(str(x) for x in items)\`
   > \`str\` has no \`.add\` method, so this raises an \`AttributeError\`.
 - \`result = ""; for x in items: result += str(x)\`
-  > This is the O(n²) approach: strings are immutable, so each \`+=\` creates and copies a new string.
+  > This is the $O(n^2)$ approach: strings are immutable, so each \`+=\` creates and copies a new string.
 - [o] \`result = "".join(str(x) for x in items)\`
   > \`str.join\` builds the result in a single pass and one allocation, avoiding the repeated copying that \`+=\` causes.
 - \`result = sum(str(x) for x in items)\`

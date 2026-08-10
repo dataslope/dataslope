@@ -76,7 +76,7 @@ graph TD
     C --> G["<code>fib(1)</code>"]
 ```
 
-Stage two: memoization. Same recursion, plus a `memo` vector where `-1` means "not yet computed." Each distinct `n` is now computed once, O(n) total. Notice how little the code changed; the cache check and the cache write are the only additions.
+Stage two: memoization. Same recursion, plus a `memo` vector where `-1` means "not yet computed." Each distinct `n` is now computed once, $O(n)$ total. Notice how little the code changed; the cache check and the cache write are the only additions.
 
 <Figure
   slug="dsa-dynamic-programming-fibonacci-four-ways-inline-cutout"
@@ -135,7 +135,7 @@ int main() {
   ]}
 />
 
-Stage four: notice that the table only ever looks back two cells, so keep two variables instead of an array, O(1) space. This "rolling" trick applies to any DP whose transition reaches back a bounded distance.
+Stage four: notice that the table only ever looks back two cells, so keep two variables instead of an array, $O(1)$ space. This "rolling" trick applies to any DP whose transition reaches back a bounded distance.
 
 <CodeBlock
   adapter="cpp"
@@ -325,7 +325,7 @@ int main() {
   ]}
 />
 
-The **longest increasing subsequence** (LIS) shows how much the *wording* of a state matters. Defining `dp[i]` as "LIS of the first i elements" leads nowhere, knowing a length doesn't tell you whether the next element can extend it. The state that works is `dp[i]` = "length of the LIS *ending exactly at index i*": now extension is checkable (`nums[j] < nums[i]`), and the global answer is the max over all endings. (An O(n log n) patience-sorting version exists; the O(n²) DP below is the one to understand first.)
+The **longest increasing subsequence** (LIS) shows how much the *wording* of a state matters. Defining `dp[i]` as "LIS of the first i elements" leads nowhere, knowing a length doesn't tell you whether the next element can extend it. The state that works is `dp[i]` = "length of the LIS *ending exactly at index i*": now extension is checkable (`nums[j] < nums[i]`), and the global answer is the max over all endings. (An $O(n \log n)$ patience-sorting version exists; the $O(n^2)$ DP below is the one to understand first.)
 
 <CodeBlock
   adapter="cpp"
@@ -508,16 +508,16 @@ int main() {
 
 <MultipleChoice markdown={`The standard LCS table for lengths n and m costs:
 
-- O(n + m)
+- $O(n + m)$
   > It checks pairs of prefixes.
-- [o] O(nm)
+- [o] $O(nm)$
   > The table has n × m cells and each one is filled in constant time.
-- O(2^n)
+- $O(2^n)$
   > DP avoids the exponential recursion.
-- O(log n)
+- $O(\\log n)$
   > No halving.`} />
 
-<MultipleChoice markdown={`Why can Fibonacci use O(1) extra space?
+<MultipleChoice markdown={`Why can Fibonacci use $O(1)$ extra space?
 
 - [o] Each state needs only the previous two values.
   > Keeping just the last two results lets each new value be computed in place, so no full array is needed.

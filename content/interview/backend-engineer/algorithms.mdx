@@ -64,7 +64,7 @@ overflow (Python's default limit is ~1000). Iteration (often with an
 explicit stack/queue) avoids that and is usually faster by a constant
 factor. Convert recursion to iteration when depth can be large.
 
-### What is amortized O(1) and when does it apply?
+### What is amortized $O(1)$ and when does it apply?
 
 Amortized analysis spreads the cost of occasional expensive operations
 across many cheap ones. A dynamic array (Python `list`) appends in
@@ -704,7 +704,7 @@ use a balanced BST for ordered iteration or range queries.
 
 The Master Theorem solves recurrences of the form
 
-$$T(n) = a\,T(n/b) + O(n^d)$$
+$$T(n) = a\,T(n/b) + $O(n^d)$$$
 
 by comparing $d$ against $\log_b a$ across three cases:
 
@@ -778,16 +778,16 @@ print("cycle?" , len(order) < 4)     # False`,
 ## Concept checks
 
 <MultipleChoice
-  markdown={`Your first Two Sum solution uses two nested loops, O(n²). How does a single pass with a hash map bring it to O(n)?
+  markdown={`Your first Two Sum solution uses two nested loops, $O(n^2)$. How does a single pass with a hash map bring it to $O(n)$?
 
-- It can't; comparing all pairs is fundamentally O(n²).
+- It can't; comparing all pairs is fundamentally $O(n^2)$.
   > A hash map avoids comparing all pairs by checking each number once against what you've already seen.
 - Sort the array first, then binary search for each complement.
-  > Sorting is O(n log n) and loses the original indices the question asks for, slower and more bookkeeping.
+  > Sorting is $O(n \\log n)$ and loses the original indices the question asks for, slower and more bookkeeping.
 - Use recursion to divide the array in half.
-  > Divide-and-conquer doesn't apply cleanly and wouldn't beat the O(n) hash-map scan.
+  > Divide-and-conquer doesn't apply cleanly and wouldn't beat the $O(n)$ hash-map scan.
 - [o] As you scan, store each value's index in a dict and check whether \`target - num\` is already in it.
-  > Each lookup/insert is O(1) average, so one pass over n elements is O(n) time (O(n) space), the standard optimal Two Sum.`}
+  > Each lookup/insert is $O(1)$ average, so one pass over n elements is $O(n)$ time ($O(n)$ space), the standard optimal Two Sum.`}
 />
 
 <MultipleChoice

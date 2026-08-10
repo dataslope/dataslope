@@ -5,7 +5,7 @@ description: Why C++ is a powerful language for data structures, algorithms, int
 
 When a game engine has 16 milliseconds to draw a frame, when a trading system measures its reaction time in microseconds, when a router decides where your packet goes, the code making those decisions is very often C++. That is not an accident of fashion. C++ occupies a peculiar spot in the language landscape: high-level enough to express an algorithm the way a textbook writes it, low-level enough that you can point at any line and say exactly what the memory underneath is doing.
 
-That second property is why this course uses it. C++ is not the easiest first language, but for learning **data structures and algorithms** it is both a practical tool and a microscope: you will solve problems efficiently while *seeing* how arrays, linked structures, heaps, hash tables, trees, and graphs really behave, where the bytes live, what a pointer costs, why two O(n) loops can differ by a factor of fifty.
+That second property is why this course uses it. C++ is not the easiest first language, but for learning **data structures and algorithms** it is both a practical tool and a microscope: you will solve problems efficiently while *seeing* how arrays, linked structures, heaps, hash tables, trees, and graphs really behave, where the bytes live, what a pointer costs, why two $O(n)$ loops can differ by a factor of fifty.
 
 The language has been sharpening this dual nature for a long time. Bjarne Stroustrup began C++ at Bell Labs in 1979 as "C with Classes," wanting Simula's abstractions without giving up C's speed. And the Standard Template Library you will lean on throughout this course has its own origin story: Alexander Stepanov had spent years pursuing the idea of generic programming, algorithms written once, independent of the container they run on, and when his STL design was presented to the C++ standards committee in 1993, it was voted into the standard with unusual speed. Every `std::sort()` and `std::vector` you call is that idea, industrialized.
 
@@ -58,15 +58,15 @@ The **Standard Template Library (STL)** gives you production-quality containers 
 
 | STL type | Typical use | Key operations |
 | --- | --- | --- |
-| `std::vector` | Dynamic array | index O(1), push back O(1) amortized |
-| `std::list` | Doubly linked list | insert/erase with iterator O(1), search O(n) |
-| `std::deque` | Double-ended queue | push/pop front/back O(1) amortized |
-| `std::map` | Ordered key-value tree | find/insert/erase O(log n) |
-| `std::unordered_map` | Hash table | find/insert/erase O(1) average |
-| `std::set` | Ordered unique values | find/insert/erase O(log n) |
-| `std::priority_queue` | Heap-backed max queue | top O(1), push/pop O(log n) |
-| `std::stack` | LIFO adapter | push/pop/top O(1) |
-| `std::queue` | FIFO adapter | push/pop/front O(1) |
+| `std::vector` | Dynamic array | index $O(1)$, push back $O(1)$ amortized |
+| `std::list` | Doubly linked list | insert/erase with iterator $O(1)$, search $O(n)$ |
+| `std::deque` | Double-ended queue | push/pop front/back $O(1)$ amortized |
+| `std::map` | Ordered key-value tree | find/insert/erase $O(\log n)$ |
+| `std::unordered_map` | Hash table | find/insert/erase $O(1)$ average |
+| `std::set` | Ordered unique values | find/insert/erase $O(\log n)$ |
+| `std::priority_queue` | Heap-backed max queue | top $O(1)$, push/pop $O(\log n)$ |
+| `std::stack` | LIFO adapter | push/pop/top $O(1)$ |
+| `std::queue` | FIFO adapter | push/pop/front $O(1)$ |
 
 Here is what that buys you in practice. Suppose you need to repeatedly grab the most urgent item from a changing pool of scores. With `std::priority_queue`, that is three lines, no heap implementation required (though you *will* implement one later in this course, and it will demystify what `push()` and `top()` actually do):
 
@@ -104,7 +104,7 @@ Many data structure tradeoffs are really memory-layout tradeoffs. A `std::vector
 | `std::vector<int>` | Contiguous memory | Fast iteration and random access |
 | `std::list<int>` | Separate heap nodes | Cheap splicing, slower traversal |
 
-That is why a vector can beat a list even when both have O(n) traversal: Big-O describes growth, but cache locality changes the constant factor dramatically.
+That is why a vector can beat a list even when both have $O(n)$ traversal: Big-O describes growth, but cache locality changes the constant factor dramatically.
 
 You do not have to take this on faith, C++ lets you *look*. The next program prints the actual memory addresses of two neighboring vector elements. Run it and subtract them in your head: they should differ by exactly `sizeof(int)`, four bytes. The integers really are sitting shoulder to shoulder.
 
@@ -339,7 +339,7 @@ int main() {
 />
 
 <MultipleChoice
-  markdown={`Why can a \`std::vector<int>\` be faster to iterate than a \`std::list<int>\`, even though both traversals are O(n)?
+  markdown={`Why can a \`std::vector<int>\` be faster to iterate than a \`std::list<int>\`, even though both traversals are $O(n)$?
 
 - [o] Vector stores elements contiguously, which is usually cache-friendly
   > Contiguous memory helps the CPU fetch nearby elements efficiently.
@@ -347,6 +347,6 @@ int main() {
   > Vector is compact, but \"always\" is too strong and not the key reason here.
 - List nodes are sorted automatically
   > A list does not sort itself automatically.
-- List traversal is O(log n)
-  > List traversal is O(n), not O(log n).`}
+- List traversal is $O(\\log n)$
+  > List traversal is $O(n)$, not $O(\\log n)$.`}
 />

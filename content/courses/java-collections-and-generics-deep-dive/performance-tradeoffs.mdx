@@ -24,16 +24,16 @@ the entries in it name:
 
 | Operation | `ArrayList` | `LinkedList` | `ArrayDeque` | `HashSet` / `HashMap` | `LinkedHashSet` / `LinkedHashMap` | `TreeSet` / `TreeMap` |
 | --- | --- | --- | --- | --- | --- | --- |
-| `get(i)` | **O(1)** | O(n) | n/a | n/a | n/a | n/a |
-| `add(e)` at end | **O(1)\*** | O(1) | **O(1)\*** | **O(1)\*** | **O(1)\*** | O(log n) |
-| `add(0, e)` at front | O(n) | **O(1)** | **O(1)** | n/a | n/a | n/a |
-| `remove(i)` at random position | O(n) | O(n) (find) + O(1) (remove) | n/a | n/a | n/a | n/a |
-| `contains(e)` | O(n) | O(n) | O(n) | **O(1)\*** | **O(1)\*** | O(log n) |
-| Iteration | **O(n)**, cache-friendly | O(n), pointer-chasing | **O(n)**, cache-friendly | O(n + capacity) | **O(n)** in insertion order | **O(n)** in sort order |
+| `get(i)` | **$O(1)$** | $O(n)$ | n/a | n/a | n/a | n/a |
+| `add(e)` at end | **$O(1)$\*** | $O(1)$ | **$O(1)$\*** | **$O(1)$\*** | **$O(1)$\*** | $O(\log n)$ |
+| `add(0, e)` at front | $O(n)$ | **$O(1)$** | **$O(1)$** | n/a | n/a | n/a |
+| `remove(i)` at random position | $O(n)$ | $O(n)$ (find) + $O(1)$ (remove) | n/a | n/a | n/a | n/a |
+| `contains(e)` | $O(n)$ | $O(n)$ | $O(n)$ | **$O(1)$\*** | **$O(1)$\*** | $O(\log n)$ |
+| Iteration | **$O(n)$**, cache-friendly | $O(n)$, pointer-chasing | **$O(n)$**, cache-friendly | $O(n + capacity)$ | **$O(n)$** in insertion order | **$O(n)$** in sort order |
 | Memory per element | 1 reference | 3 references | 1 reference | ~3 references + bucket | ~5 references | ~5 references |
 
-`*` *amortized*: occasionally an `O(n)` resize/rehash happens, but
-spread over many inserts it averages to `O(1)`.
+`*` *amortized*: occasionally an $O(n)$ resize/rehash happens, but
+spread over many inserts it averages to $O(1)$.
 
 <Figure
   slug="jcol-performance-tradeoffs-big-table-inline-cutout"
@@ -82,8 +82,8 @@ as long, because the cache line stops paying for itself.
 `ArrayList` keeps a backing `Object[]`. When it fills up, it
 allocates a new array that is **1.5×** the size, copies, and
 discards the old one. That copy is what makes the *worst-case*
-`add()` `O(n)`, but it happens rarely enough that the *amortized*
-cost is `O(1)`.
+`add()` $O(n)$, but it happens rarely enough that the *amortized*
+cost is $O(1)$.
 
 If you know roughly how many elements you'll add, **pre-size**:
 
@@ -181,7 +181,7 @@ A short, honest list:
 - **`HashSet`**, fastest, no order. Default choice for "set of stuff."
 - **`LinkedHashSet`**, keeps insertion order. Tiny extra cost. Use
   it for any output that must be deterministic.
-- **`TreeSet`**, sorted, supports range queries. Worth `O(log n)`
+- **`TreeSet`**, sorted, supports range queries. Worth $O(\log n)$
   when you need sorted iteration or "next element after `x`."
 
 <Figure
@@ -293,14 +293,14 @@ flowchart TD
 ## Test your understanding
 
 <MultipleChoice
-  markdown={`Why does \`ArrayList\` outperform \`LinkedList\` on iteration in practice, even though both are \`O(n)\`?
+  markdown={`Why does \`ArrayList\` outperform \`LinkedList\` on iteration in practice, even though both are \`$O(n)$\`?
 
 - \`LinkedList.iterator()\` allocates per element
   > It does not.
 - [o] \`ArrayList\` stores elements in a contiguous backing array, so a sequential walk is extremely cache-friendly; \`LinkedList\` follows pointers to scattered heap nodes
   > Cache behavior dominates Big-O for in-memory walks at modern CPU speeds.
-- \`ArrayList.iterator()\` is \`O(log n)\`
-  > Both are \`O(n)\` per \`next()\`.
+- \`ArrayList.iterator()\` is \`$O(\\log n)$\`
+  > Both are \`$O(n)$\` per \`next()\`.
 - \`ArrayList\` parallelizes by default
   > It does not.`}
 />

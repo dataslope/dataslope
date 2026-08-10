@@ -105,7 +105,7 @@ int main() {
 
 ## `std::deque<T>`
 
-Why can't a `std::vector` back a queue? Because popping its *front* is O(n), every remaining element shifts left. The deque ("double-ended queue," pronounced "deck") solves this by storing elements in a sequence of fixed-size blocks plus a small index of block pointers: growing or shrinking at either end just adds or drops a block, so push and pop are O(1) at *both* ends, while indexing stays O(1). It is the unsung hero of container choice, the default backing store for both `std::stack` and `std::queue`.
+Why can't a `std::vector` back a queue? Because popping its *front* is $O(n)$, every remaining element shifts left. The deque ("double-ended queue," pronounced "deck") solves this by storing elements in a sequence of fixed-size blocks plus a small index of block pointers: growing or shrinking at either end just adds or drops a block, so push and pop are $O(1)$ at *both* ends, while indexing stays $O(1)$. It is the unsung hero of container choice, the default backing store for both `std::stack` and `std::queue`.
 
 <CodeBlock
   adapter="cpp"
@@ -135,7 +135,7 @@ int main() {
 Unlike `std::vector`, popping from the front of a deque does not shift every remaining element.
 
 <Callout type="success" title="Queue and deque costs">
-`std::queue` backed by `std::deque` gives O(1) `push()`, `pop()`, `front()`, and `empty()`. `std::deque` also gives O(1) push/pop at both ends.
+`std::queue` backed by `std::deque` gives $O(1)$ `push()`, `pop()`, `front()`, and `empty()`. `std::deque` also gives $O(1)$ push/pop at both ends.
 </Callout>
 
 ## Vector front-pop versus deque front-pop
@@ -383,19 +383,19 @@ int main() {
   > A deque grows dynamically.
 - [o] It supports efficient end operations with better locality and fewer per-element allocations.
   > Deque storage is usually friendlier to caches than linked nodes.
-- It makes every operation O(log n).
+- It makes every operation $O(\\log n)$.
   > Queue end operations are constant time.`}
 />
 
 <MultipleChoice
   markdown={`What is the complexity of removing the front element from a \`std::vector\` with \`erase(begin())\` compared with \`std::deque::pop_front()\`?
 
-- Both are always O(1).
+- Both are always $O(1)$.
   > Vector must shift remaining elements.
-- Vector front erase is O(log n), while deque pop_front is O(n).
+- Vector front erase is $O(\\log n)$, while deque pop_front is $O(n)$.
   > These are not the usual complexities.
-- Both are O(n^2).
+- Both are $O(n^2)$.
   > Removing one element is not quadratic here.
-- [o] Vector front erase is O(n), while deque pop_front is O(1).
+- [o] Vector front erase is $O(n)$, while deque pop_front is $O(1)$.
   > This is why deque is a natural queue backing container.`}
 />

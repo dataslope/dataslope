@@ -84,7 +84,7 @@ A lookup for `new Customer("ada@…")` flows through these stages:
 2. `bucket = 8132917 mod N` picks the bucket, say `5`.
 3. Bucket `5` holds only 1–2 candidates.
 4. Walk those candidates, calling `equals(x)` on each.
-5. Hit or miss, in `O(1)` on average.
+5. Hit or miss, in $O(1)$ on average.
 
 So a hash collection's lookup is two steps:
 

@@ -252,7 +252,7 @@ prompt.
   markdown={`Why does doubling an LLM's context length more than double the attention compute?
 
 - [o] Self-attention compares every token with every other, so cost grows quadratically, roughly 4x for 2x the length.
-  > Each of n tokens attends to all n tokens, giving O(n^2) compute and memory in sequence length.
+  > Each of n tokens attends to all n tokens, giving $O(n^2)$ compute and memory in sequence length.
 - Because the vocabulary size doubles with the context.
   > Vocabulary is fixed and independent of sequence length.
 - It doesn't; attention cost is linear in length.
