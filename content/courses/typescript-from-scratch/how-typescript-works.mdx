@@ -56,6 +56,7 @@ This distinction is crucial: **TypeScript's types only exist during compilation.
 <Figure
   slug="tsx-how-typescript-works-compile-time-vs-inline-cutout"
   alt="A gate checking a card on a still bench, then lifting away as the belt starts to move"
+  caption="The checking happens before the program runs, then the types are erased."
 />
 
 When you write:
@@ -257,6 +258,7 @@ When you open a `.ts` file in VS Code or WebStorm, you get instant feedback: red
 <Figure
   slug="tsx-how-typescript-works-inline-cutout"
   alt="A card passing a checking gate that inspects it and then falls away, the card continuing unchanged"
+  caption="The language service runs the same checks as you type, inside the editor."
 />
 
 The TypeScript compiler exposes a **language service**, an API that editors can call to ask questions like:
@@ -371,6 +373,7 @@ The types never reach production. They're a *compile-time tool* for correctness 
 <Figure
   slug="tsx-how-typescript-works-javascript-typescript-relationship-inline-cutout"
   alt="A card with a shaped gate fitted over it, the gate lifting away and leaving the card untouched"
+  caption="What ships is JavaScript; the types were scaffolding for the build."
 />
 
 ---
@@ -379,7 +382,7 @@ The types never reach production. They're a *compile-time tool* for correctness 
   markdown={`What happens to TypeScript's type annotations at runtime?
 
 - [o] They are erased during compilation and do not exist in the emitted JavaScript
-  > TypeScript performs type checking at *compile time*, then removes all type annotations before emitting JavaScript. The runtime behavior is identical to plain JS, there's no runtime type enforcement unless you add it yourself.
+  > TypeScript performs type checking at *compile time*, then removes all type annotations before emitting JavaScript. The runtime behavior is identical to plain JavaScript, there's no runtime type enforcement unless you add it yourself.
 - They are checked by the JavaScript engine for validation
   > JavaScript engines have no knowledge of TypeScript annotations; they only understand plain JavaScript.
 - They are kept as comments in the JavaScript output

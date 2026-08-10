@@ -76,6 +76,7 @@ Now the contract is clear:
 <Figure
   slug="tsx-api-modeling-and-contracts-problem-implicit-contracts-inline-cutout"
   alt="Two benches joined by a chute with no fitting at either end, blocks falling through the gap"
+  caption="Without a written contract, nothing stops the wrong shape crossing the gap."
 />
 
 If you change `User`'s shape, every caller that accesses a field gets a compile error. The type is the source of truth.
@@ -269,8 +270,8 @@ Now every handler returns `ApiResponse<T>`, and the client knows to check `.stat
 
 A well-architected system separates:
 1. **Domain layer**: Pure business logic and types (e.g., `User`, `Order`).
-2. **Application layer**: Use cases that orchestrate domain logic (e.g., `getUserById`, `placeOrder`).
-3. **Transport layer**: HTTP handlers, WebSocket listeners, CLI parsers, anything that talks to the outside world.
+2. **Application layer**: Use cases that orchestrate domain logic (e.g., `getUserById()`, `placeOrder()`).
+3. **Transport layer**: HTTP handlers, WebSocket listeners, command-line parsers, anything that talks to the outside world.
 
 Types enforce these boundaries:
 
@@ -533,6 +534,7 @@ You've learned how to:
 <Figure
   slug="tsx-api-modeling-and-contracts-explicit-contracts-types-inline-cutout"
   alt="Two benches joined by a chute with a matching shaped fitting clamped at each end"
+  caption="A typed contract puts a matching fitting on both ends of the call."
 />
 
 Types as contracts shift entire classes of integration bugs leftward, from production to compile time. They're living documentation that never goes stale. In the next chapter, we'll apply these ideas to **error handling**, modeling failures as values rather than exceptions.

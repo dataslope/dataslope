@@ -123,6 +123,7 @@ The `+` prefix is implicit (the default), so `+readonly` is the same as `readonl
 <Figure
   slug="tsx-mapped-and-conditional-types-modifiers-readonly-inline-cutout"
   alt="A rack of sockets passing under a template that clamps a lid on each and makes each optional"
+  caption="A mapped type can add or strip `readonly` and `?` across every property at once."
 />
 
 ---
@@ -134,6 +135,7 @@ TypeScript 4.1 introduced **key remapping** in mapped types: you can use `as` to
 <Figure
   slug="tsx-mapped-and-conditional-types-inline-cutout"
   alt="A rack of sockets passing under a template that reshapes every socket in one stroke"
+  caption="One template reshapes every property of a type in a single pass."
 />
 
 Here's a type that prefixes every key with `get`:
@@ -211,6 +213,7 @@ If `T` is assignable to `U`, the type resolves to `X`; otherwise, `Y`.
 <Figure
   slug="tsx-mapped-and-conditional-types-mapped-types-inline-cutout"
   alt="A tray of assorted fittings passing through a press that stamps the same new collar onto every one"
+  caption="A conditional type picks one of two results by testing what it was given."
 />
 
 Here's a simple example:

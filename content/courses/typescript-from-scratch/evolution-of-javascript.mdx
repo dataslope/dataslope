@@ -22,13 +22,13 @@ In May 1995, Eich delivered **Mocha** (soon renamed JavaScript), a small, dynami
   alt="A tiny ten-day prototype block on a low plinth growing into a sprawling untidy tower of mismatched blocks beside it"
 />
 
-## The first decade: scripting toy to DOM workhorse
+## The first decade: scripting toy to document-model workhorse
 
 JavaScript's initial decade was marked by chaos. The language had quirks, `==` vs `===`, automatic semicolon insertion, the infamous `this` binding rules, a prototype chain that confused most programmers. But it had one killer advantage: it was *the only* language that ran in every browser.
 
 By the early 2000s, JavaScript had evolved from a form-validation toy into the **DOM scripting** language. Developers used it to manipulate web pages dynamically, create dropdown menus, and animate elements. But the code was still small, a few script tags, maybe a thousand lines for a large site.
 
-Then came the **AJAX revolution**. In 2004–2005, Google launched Gmail and Google Maps, web applications that felt like desktop software. They loaded once, then used `XMLHttpRequest` to fetch data in the background and update the UI without page reloads. Suddenly, JavaScript wasn't just a scripting language; it was the engine of single-page applications.
+Then came the **AJAX revolution**. In 2004–2005, Google launched Gmail and Google Maps, web applications that felt like desktop software. They loaded once, then used `XMLHttpRequest` to fetch data in the background and update the page without reloading it. Suddenly, JavaScript wasn't just a scripting language; it was the engine of single-page applications.
 
 The **jQuery era** followed. jQuery, released in 2006, smoothed over browser inconsistencies and made DOM manipulation pleasant. Sites that once had 500 lines of JS now had 5,000. But they were still manageable. You could fit the whole codebase in your head.
 
@@ -75,6 +75,7 @@ As codebases grew, the cracks began to show. JavaScript's permissive nature, the
 <Figure
   slug="tsx-evolution-of-javascript-maintainability-crisis-inline-cutout"
   alt="A tidy frame on one bench and the same frame on the next after many additions, cords crossing everywhere"
+  caption="The same flexibility that made JavaScript easy made large codebases hard."
 />
 
 Consider this snippet:
@@ -143,6 +144,7 @@ None of these solved the core problem: **JavaScript had no static type system**.
 <Figure
   slug="tsx-evolution-of-javascript-first-decade-scripting-inline-cutout"
   alt="A small hand tool on a bench beside the same tool grown into a full machine"
+  caption="A language written for small scripts ended up carrying whole applications."
 />
 
 Developers craved the **autocomplete**, **refactoring safety**, and **early error detection** they'd seen in Java, C#, and other statically typed languages. They wanted the **flexibility** of JavaScript with the **rigor** of a compiler.

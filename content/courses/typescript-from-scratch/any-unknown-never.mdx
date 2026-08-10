@@ -99,6 +99,7 @@ console.log("any bypasses all type checking");
 <Figure
   slug="tsx-any-unknown-never-any-escape-hatch-inline-cutout"
   alt="A socket with no shape at all, accepting every block that is offered to it"
+  caption="`any` turns the checking off: every value fits, and nothing is verified."
 />
 
 **When is `any` dangerous?**
@@ -185,6 +186,7 @@ that doesn't exist. This is far safer than `any`.
 <Figure
   slug="tsx-any-unknown-never-inline-cutout"
   alt="Three sockets in a row, one open to everything, one covered by a lid that must be lifted first, and one welded shut"
+  caption="`unknown` accepts anything too, but makes you check before you use it."
 />
 
 **When to use `unknown`:**
@@ -391,6 +393,7 @@ Here's how the four types relate in terms of assignability:
 <Figure
   slug="tsx-any-unknown-never-type-hierarchy-top-inline-cutout"
   alt="A broad open funnel at the top of a bench narrowing to a sealed point at the bottom"
+  caption="Everything narrows down from `unknown` at the top to `never` at the bottom."
 />
 
 <CodeBlock
@@ -429,7 +432,7 @@ that parses JSON and uses `unknown` to ensure type safety.
 <ChallengeCard
   adapter="typescript"
   title="Type-Safe JSON Parser"
-  instructions={`Implement \`parseJSON(text: string): unknown\` that wraps \`JSON.parse\` and returns \`unknown\` (not \`any\`). Then implement \`getString(value: unknown): string\` that returns the value if it's a string, or throws an error otherwise. Test with valid and invalid inputs.`}
+  instructions={`Implement \`parseJSON(text: string): unknown\` that wraps \`JSON.parse()\` and returns \`unknown\` (not \`any\`). Then implement \`getString(value: unknown): string\` that returns the value if it's a string, or throws an error otherwise. Test with valid and invalid inputs.`}
   files={[
     {
       filename: "main.ts",

@@ -77,6 +77,7 @@ The real power of discriminated unions is **exhaustiveness checking**: the compi
 <Figure
   slug="tsx-discriminated-unions-exhaustiveness-checking-inline-cutout"
   alt="A sorter with a chute for every tag shape and a bell that rings when a tag has no chute"
+  caption="Add a variant with no branch and the compiler rings the bell."
 />
 
 Here's the trick: assign the unhandled case to `never`. If you've covered all variants, the code is unreachable and `never` is satisfied. If you missed a variant, the compiler complains that the leftover type isn't assignable to `never`.
@@ -480,6 +481,7 @@ The pattern is always the same: define a union of object types with a shared dis
 <Figure
   slug="tsx-discriminated-unions-inline-cutout"
   alt="Three sealed boxes each wearing a differently shaped tag, a sorter reading only the tag to send each box down its own chute"
+  caption="The tag is read first, and it decides which shape the rest must have."
 />
 
 <Callout type="success" title="The most powerful pattern">
@@ -493,6 +495,7 @@ Discriminated unions let you model variants, states, events, commands, results, 
 <Figure
   slug="tsx-discriminated-unions-discriminant-field-inline-cutout"
   alt="Three sealed boxes each wearing a differently shaped tag on the same corner"
+  caption="Every variant carries the same tag field in the same place."
 />
 
 **Key takeaways:**

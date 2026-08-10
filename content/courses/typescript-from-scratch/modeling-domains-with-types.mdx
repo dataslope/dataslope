@@ -45,6 +45,7 @@ These are **illegal states**: combinations that don't make sense in your domain.
 <Figure
   slug="tsx-modeling-domains-with-types-inline-cutout"
   alt="A set of shaped sockets cut so that an impossible combination physically cannot be assembled"
+  caption="Model the domain so that an impossible state cannot be constructed at all."
 />
 
 <CodeBlock
@@ -105,6 +106,7 @@ The fix is to model the user's **status** as a discriminated union. A user can b
 <Figure
   slug="tsx-modeling-domains-with-types-solution-discriminated-unions-inline-cutout"
   alt="Three boxes with differently shaped tags, a sorter reading only the tag"
+  caption="Each state carries only the data that state actually has."
 />
 
 <CodeBlock
@@ -334,6 +336,7 @@ You can't forget the tracking number when marking an order as shipped. You can't
 <Figure
   slug="tsx-modeling-domains-with-types-evolving-sloppy-type-inline-cutout"
   alt="A loose open tray being rebuilt into a fitted case whose compartments admit only one arrangement"
+  caption="Tightening a loose type turns runtime checks into compile-time guarantees."
 />
 
 <Callout type="info" title="Redundancy is fine">

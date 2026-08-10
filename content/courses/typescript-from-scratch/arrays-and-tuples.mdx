@@ -112,12 +112,13 @@ Narrowing](./type-narrowing)).
 <Figure
   slug="tsx-arrays-and-tuples-array-types-homogeneous-inline-cutout"
   alt="A rail holding any number of blocks that are all the same shape"
+  caption="An array holds any number of values, all of the same type."
 />
 
 ## Readonly arrays
 
-By default, TypeScript arrays are mutable: you can `push`, `pop`,
-`splice`, etc. But sometimes you want to express that an array should not
+By default, TypeScript arrays are mutable: you can `push()`, `pop()`,
+`splice()`, etc. But sometimes you want to express that an array should not
 be modified. Enter `readonly`:
 
 <CodeBlock
@@ -153,6 +154,7 @@ documentation.
 <Figure
   slug="tsx-arrays-and-tuples-type-inference-arrays-inline-cutout"
   alt="An empty rail closing around the first blocks set on it to admit only that shape after"
+  caption="The compiler reads the element type from what you first put in."
 />
 
 Alternatively, you can use the `ReadonlyArray<T>` generic:
@@ -319,7 +321,7 @@ console.log(\`\${aliceName}'s scores:\`, aliceScores);
 />
 
 The rest element must be last. It behaves like a normal array, so you can
-iterate over it, `push` to it (if the tuple is mutable), etc.
+iterate over it, `push()` to it (if the tuple is mutable), etc.
 
 ## Variadic tuple types (a glimpse)
 
@@ -363,6 +365,7 @@ so powerful.
 <Figure
   slug="tsx-arrays-and-tuples-inline-cutout"
   alt="A rail that takes any number of identical blocks beside a fixed strip with three shaped slots in a set order"
+  caption="An array varies in length; a tuple fixes both length and the type of each slot."
 />
 
 **Use tuples when:**

@@ -280,6 +280,7 @@ values.
 <Figure
   slug="tsx-type-narrowing-inline-cutout"
   alt="A wide chute carrying a cube, a cylinder and a cone, passing through two upright plates in turn, the cube left stopped against the first plate and the cylinder left stopped against the second, so only the cone continues on to the right"
+  caption="Each check rules out possibilities, until one type is left."
 />
 
 **Caveat:** Truthiness narrowing can be imprecise. The empty string `""`
@@ -498,7 +499,7 @@ try {
 
 ## Narrowing with array methods
 
-Some array methods (like `filter`) can narrow types if you use type
+Some array methods (like `filter()`) can narrow types if you use type
 predicates:
 
 <CodeBlock
@@ -532,6 +533,7 @@ area using narrowing.
 <Figure
   slug="tsx-type-narrowing-narrowing-problem-inline-cutout"
   alt="A wide chute carrying three different shapes with a single narrow opening at its end"
+  caption="Narrowing is how a wide union becomes a single type you can act on."
 />
 
 <ChallengeCard
