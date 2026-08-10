@@ -105,6 +105,41 @@ const nextConfig: NextConfig = {
       dynamic: 300,
       static: 1800,
     },
+    // Off, and load-bearing: the default flipped to `true` in Next 16.3.0
+    // (#623 picked that up on 2026-08-06), and on this deployment it produced
+    // a client-side request storm — ~150 requests/second per open tab, ~7.5M
+    // requests in the week it was live (traffic dashboard, Aug 6-9).
+    //
+    // The chain, each link verified against the deployed preview:
+    //
+    //  1. With inlining enabled, a page prerendered at build time WITHOUT
+    //     `prefetch-hints.json` is stamped `PrefetchHint.InliningHintsStale`
+    //     (bit 512 in the router state's 5th tuple slot). On Workers Builds
+    //     that manifest is missing at prerender time, so every deployed page
+    //     carries the bit; a local build of the same commit produces the
+    //     hints and does not. (The deployed home payload reads 4608/4624
+    //     where a local build reads 4224/4112 — that one row is the ONLY
+    //     byte difference between the two.)
+    //  2. Next's client contract for the bit: write the route entry into the
+    //     prefetch cache ALREADY EXPIRED and immediately re-fetch, expecting
+    //     a live server to answer with fresh hints.
+    //  3. This origin has no live server for prerendered routes: the assets
+    //     binding and the R2 incremental cache serve the same frozen,
+    //     variant-blind snapshot — with the same stale bit — for every
+    //     re-fetch. Pre-expired entry, re-fetch, same answer, no backoff:
+    //     the loop cycles every prefetchable link on the page forever.
+    //
+    // With inlining disabled the stale bit is unreachable (`else if
+    // (prefetchInliningEnabled)` guards it), which is exactly the 16.2.6
+    // behavior this site ran without incident until Aug 6. Nothing else about
+    // prefetching changes: links still viewport-prefetch, the segment cache
+    // still works, and `staleTimes` above still govern reuse.
+    //
+    // Do NOT remove this when bumping Next until BOTH halves are fixed
+    // upstream: the client re-fetching stale-hint routes without backoff
+    // (Next), and prerendered payloads being served identically for every
+    // prefetch variant (OpenNext on Cloudflare).
+    prefetchInlining: false,
   },
   // Expose every `/fumadocs-dev` demo page as raw Markdown at
   // `${page.url}.md`, served by the route handler under `app/llms/`. The
