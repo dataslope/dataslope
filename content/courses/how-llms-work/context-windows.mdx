@@ -67,6 +67,7 @@ Two costs, both real.
 <Figure
   slug="llm-context-windows-window-hard-boundary-inline-cutout"
   alt="A fixed frame over a long ribbon of chips, the chips beyond its edge falling away off the bench"
+  caption="The window is a hard edge, and anything past it is simply not there."
 />
 
 **Money.** You pay for every input token on every turn. A 500,000-token
@@ -125,6 +126,7 @@ other token, so cost scales with the square of the length. Going from
 <Figure
   slug="llm-context-windows-inline-cutout"
   alt="A long ribbon of chips feeding through a fixed rectangular frame, the chips that pass beyond the frame's left edge dropping away off the rail"
+  caption="Cost grows with the square of the length, which is why long context was hard."
 />
 
 Against a linear reference, which is what "125 times the text" would cost if

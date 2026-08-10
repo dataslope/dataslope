@@ -28,11 +28,13 @@ characters and replay the merges in order.
 <Figure
   slug="llm-building-a-tokenizer-counting-pairs-inline-cutout"
   alt="A ribbon of chips with a tally rack beside it counting how often each neighbouring pair appears"
+  caption="The commonest neighbouring pair is merged, and then the count is taken again."
 />
 
 <Figure
   slug="llm-building-a-tokenizer-inline-cutout"
   alt="A ribbon of text being cut into chips, the most common runs kept whole and the rare ones cut smaller"
+  caption="Common runs of text end up as one token; rare ones get cut smaller."
 />
 
 The elegance is that frequency does all the work. Common sequences get

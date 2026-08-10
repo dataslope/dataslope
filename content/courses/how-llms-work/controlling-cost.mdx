@@ -20,6 +20,7 @@ competes with that.
 <Figure
   slug="llm-controlling-cost-inline-cutout"
   alt="A hopper with an adjustable gate limiting how many chips reach the machine per pass"
+  caption="Sending fewer tokens per request is the lever with the most travel."
 />
 
 The mistake is choosing one model for everything, usually the best one,
@@ -71,6 +72,7 @@ caching cuts it to about a tenth.
 <Figure
   slug="llm-controlling-cost-2-cache-stable-inline-cutout"
   alt="A long ribbon whose first stretch is clamped under a cover and reused, only its tail being fed through the machine"
+  caption="A stable prefix can be cached, so only the changing tail is paid for in full."
 />
 
 The requirement is that the prefix be **byte-identical**. That means:

@@ -34,6 +34,7 @@ This is not a pricing policy, it reflects the computation.
 <Figure
   slug="llm-pricing-structure-inline-cutout"
   alt="A set of scales with input chips on one pan and output chips on the other, the output pan weighted heavier"
+  caption="Output costs more than input because it is generated one token at a time."
 />
 
 **Input** is processed in parallel. All your tokens go through the
@@ -58,6 +59,7 @@ is roughly a tenth of the work.
 <Figure
   slug="llm-pricing-structure-cached-input-so-inline-cutout"
   alt="Two scales side by side, one weighing a fresh ribbon and one weighing a ribbon already under a cover, the second barely tipping"
+  caption="A cached prefix is retrieved rather than recomputed, which is far cheaper."
 />
 
 Caches expire quickly (minutes, by default, on most providers) and
