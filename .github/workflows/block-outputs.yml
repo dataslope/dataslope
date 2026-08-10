@@ -29,11 +29,15 @@ name: Prepopulated block output
 #
 # ── What a pull request sees ──────────────────────────────────────────────
 #
-# Nothing, until it merges. A PR that edits a lesson has no entry for the
-# edited block, so that block shows the empty output panel it showed before
-# any of this existed, and the workflow fills it in on main. Running this on
-# every PR would mean a bot commit on every content branch, which is a worse
-# trade than one lesson previewing empty for the length of a review.
+# The right output, because the generator is still in the `build` chain. A PR
+# that adds or edits a block has no committed entry for it, so that build
+# boots Pyodide and runs *that block* — seconds, not twelve minutes, because
+# every other block is reused from the manifest. The preview is accurate and
+# the workflow merely saves main from repeating the work.
+#
+# This workflow deliberately does not run on pull requests: it would mean a
+# bot commit on every content branch, for an answer the PR build already
+# computes for itself.
 
 on:
   push:

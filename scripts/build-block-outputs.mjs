@@ -109,11 +109,24 @@ function writeManifestFile(data) {
  */
 function failSoft(err) {
   console.error(`build-block-outputs: FAILED (${err?.message ?? err})`);
-  console.error("build-block-outputs: writing an empty manifest; lessons will show empty output panels.");
-  try {
-    writeManifestFile({});
-  } catch {
-    /* nothing more we can do; the consumer treats a missing file as empty too */
+  // Leave a manifest that is already on disk exactly where it is. It is
+  // committed, so it is correct for every block except the handful this run
+  // was going to add — and overwriting it with `{}` would turn one transient
+  // failure (a dataset fetch timing out on a build runner, say) into every
+  // lesson on the site losing its output. Only a tree that has no manifest
+  // at all gets an empty one written, so the build has something to read.
+  if (existsSync(OUT_FILE)) {
+    console.error(
+      "build-block-outputs: keeping the committed manifest; only blocks added " +
+        "since it was generated will show an empty output panel.",
+    );
+  } else {
+    console.error("build-block-outputs: no manifest on disk, writing an empty one.");
+    try {
+      writeManifestFile({});
+    } catch {
+      /* nothing more we can do; the consumer treats a missing file as empty too */
+    }
   }
   process.exit(0);
 }
