@@ -49,6 +49,7 @@ queries turn raw data into answers.
 <Figure
   slug="sql-expressions-and-aliases-calculated-columns-inline-cutout"
   alt="Two standing columns feeding a small machine that sets a third column down beside them"
+  caption="A calculated column is computed per row and stored nowhere."
 />
 
 ## Aliases make output readable
@@ -62,6 +63,7 @@ value by name.
 <Figure
   slug="sql-expressions-and-aliases-inline-cutout"
   alt="A narrow strip of stacked value blocks leaving a small machine and having a fresh blank name plate clipped to its head, the board it came from still standing behind it"
+  caption="`AS` clips a readable name onto a column the query has just made up."
 />
 
 ```mermaid
@@ -80,8 +82,8 @@ with spaces or capitals need double quotes, e.g.
 ## Working with text
 
 Numbers are not the only thing you can compute. The `||` operator
-**joins** (concatenates) text, and functions like `UPPER`, `LOWER`,
-and `LENGTH` transform it:
+**joins** (concatenates) text, and functions like `UPPER()`, `LOWER()`,
+and `LENGTH()` transform it:
 
 <SqlCodeBlock
   dialect="postgres"
@@ -109,14 +111,14 @@ everyday SQL.
 ## Functions do focused jobs
 
 A **function** takes input(s) and returns a value. You have just
-used `UPPER` and `LENGTH`. There are many, grouped by what they work
+used `UPPER()` and `LENGTH()`. There are many, grouped by what they work
 on:
 
 | Kind | Examples | Does |
 | --- | --- | --- |
-| Numeric | `ROUND`, `ABS`, `CEIL` | Round, absolute value, round up |
-| Text | `UPPER`, `LOWER`, `TRIM`, `LENGTH` | Transform and measure text |
-| Date | `NOW`, `AGE`, `EXTRACT` | Work with dates and times |
+| Numeric | `ROUND()`, `ABS`, `CEIL` | Round, absolute value, round up |
+| Text | `UPPER()`, `LOWER()`, `TRIM()`, `LENGTH()` | Transform and measure text |
+| Date | `NOW()`, `AGE()`, `EXTRACT()` | Work with dates and times |
 
 <SqlCodeBlock
   dialect="postgres"

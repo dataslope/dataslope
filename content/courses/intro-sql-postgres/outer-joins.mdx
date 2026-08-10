@@ -23,6 +23,7 @@ filled in. Where none exists, those columns come back as `NULL`.
 <Figure
   slug="sql-outer-joins-inline-cutout"
   alt="Two racks pushed together where the matched pairs go to a tray and the unmatched cards from the left rack are kept, each with a blank card clipped to it"
+  caption="A left join keeps every left-hand row, filling the gaps with `NULL`."
 />
 
 ```mermaid
@@ -107,6 +108,7 @@ for `NULL`*, answers a whole family of "who is missing?" questions.
 <Figure
   slug="sql-outer-joins-finding-unmatched-rows-inline-cutout"
   alt="Two racks pushed together with a lamp lighting only the cards that found no partner"
+  caption="Outer join, then test for `NULL`, is how you find what has no match."
 />
 
 ## RIGHT and FULL joins

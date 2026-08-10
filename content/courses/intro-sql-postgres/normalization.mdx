@@ -60,6 +60,7 @@ products a `products` table, and `orders` keeps only what is true of
 <Figure
   slug="sql-normalization-problem-one-big-inline-cutout"
   alt="One enormously wide board with the same block repeated across four of its rows"
+  caption="One wide table repeats the same fact on every row that mentions it."
 />
 
 ```mermaid
@@ -155,6 +156,7 @@ flowchart TD
 <Figure
   slug="sql-normalization-inline-cutout"
   alt="One wide table with a repeated block appearing in four rows, that block lifted out to its own small table and referenced by cord"
+  caption="Normalising lifts a repeated fact into its own table and points at it."
 />
 
 A handy summary of 3NF: every column should describe **"the key, the

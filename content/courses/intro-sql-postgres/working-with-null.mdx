@@ -43,6 +43,7 @@ not know someone's age, you also do not know "their age plus one."
 <Figure
   slug="sql-working-with-null-inline-cutout"
   alt="A socket left deliberately empty with a small cover over it, beside a socket holding a zero-sized block, the two clearly not the same"
+  caption="An unknown value is not an empty one, and arithmetic on it stays unknown."
 />
 
 <SqlCodeBlock
@@ -151,7 +152,7 @@ ORDER BY
   name;`}
 />
 
-`COALESCE` reads as "use the phone, or if that is `NULL`, use this
+`COALESCE()` reads as "use the phone, or if that is `NULL`, use this
 text instead." It is the standard, clean way to handle missing
 values for display or calculation.
 
@@ -162,7 +163,7 @@ and honest state.** When a customer has not given a phone number,
 forcing in a fake `0` or `''` would *lie* about the data. `NULL`
 lets the database tell the truth: "we do not know." The strange
 behavior is the price of that honesty, and `IS NULL` plus
-`COALESCE` make it manageable.
+`COALESCE()` make it manageable.
 
 ```mermaid
 flowchart TD
@@ -222,15 +223,15 @@ Use \`IS NULL\` (never \`= NULL\`) to test for missing values.`}
   markdown={`What does \`COALESCE(phone, 'No phone')\` return for a row where \`phone\` is \`NULL\`?
 
 - An error, because the arguments differ.
-  > \`COALESCE\` is designed to take multiple arguments and pick the first non-NULL; differing arguments are fine.
-- [o] \`'No phone'\`, because \`COALESCE\` returns the first argument that is not \`NULL\`.
-  > When \`phone\` is missing, \`COALESCE\` falls through to the provided fallback text.
+  > \`COALESCE()\` is designed to take multiple arguments and pick the first non-NULL; differing arguments are fine.
+- [o] \`'No phone'\`, because \`COALESCE()\` returns the first argument that is not \`NULL\`.
+  > When \`phone\` is missing, \`COALESCE()\` falls through to the provided fallback text.
 - The literal word "COALESCE".
-  > \`COALESCE\` returns one of its argument values, not its own name.
+  > \`COALESCE()\` returns one of its argument values, not its own name.
 - \`NULL\`, because the first argument is \`NULL\`.
-  > \`COALESCE\` skips \`NULL\` arguments and moves on to the next one.
+  > \`COALESCE()\` skips \`NULL\` arguments and moves on to the next one.
 
-\`COALESCE\` returns the first non-NULL argument, making it ideal for fallback values.`}
+\`COALESCE()\` returns the first non-NULL argument, making it ideal for fallback values.`}
 />
 
 <MultipleChoice
