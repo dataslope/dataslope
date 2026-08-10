@@ -73,6 +73,7 @@ decision rather than a lowercase.
 <Figure
   slug="pl-working-with-strings-cleaning-inline-cutout"
   alt="A column of ribbons passing through a brush and a trimmer, leaving the far side even at both ends"
+  caption="Trimming and lowercasing collapse the accidental variants, not the real ones."
 />
 
 ## Matching and testing
@@ -111,6 +112,7 @@ dot in a filename.
 <Figure
   slug="pl-working-with-strings-inline-cutout"
   alt="A full column of letter ribbons passing under one wide blade that trims every ribbon in the same stroke"
+  caption="The `.str` namespace applies one text operation to a whole column at once."
 />
 
 <Callout type="warn" title="Polars regexes are not Python regexes">
@@ -349,7 +351,7 @@ assert bad["item_id"][0] is None`,
   markdown={`\`str.extract(r"(\\d+)")\` is applied to a row containing no digits. What happens?
 
 - The row is dropped from the result
-  > Expressions never change a frame's height; \`filter\` is the only thing that removes rows.
+  > Expressions never change a frame's height; \`filter()\` is the only thing that removes rows.
 - [o] That row gets null
   > No exception, and the failures are countable with \`null_count()\`, which is what you want for messy input.
 - An exception is raised for the whole column

@@ -108,6 +108,7 @@ coexisting.
 <Figure
   slug="pl-polars-vs-pandas-1-there-no-inline-cutout"
   alt="Two boards side by side, the left one carrying a column of tags down its edge and the right one having that column removed entirely, its rows bare at the edge"
+  caption="There is no index in Polars, so a row is identified by its values alone."
 />
 
 Polars has one. Every column has a validity bitmap saying which
@@ -135,7 +136,7 @@ print(nan_df["x"].is_null().to_list())
   ]}
 />
 
-`is_null` and `is_nan` ask different questions and you will
+`is_null()` and `is_nan` ask different questions and you will
 occasionally need both.
 
 ## 4. Types are strict, and that is a feature
@@ -199,7 +200,7 @@ changes the frame you called it on.
 | `df.a.value_counts()` | `df["a"].value_counts()` |
 
 Two naming rules explain most of the rest: Polars uses
-`snake_case` consistently (`group_by`, not `groupby`), and it names
+`snake_case` consistently (`group_by()`, not `groupby`), and it names
 the operation rather than the axis (`descending`, not `ascending`).
 
 ## Try the translation yourself
@@ -273,7 +274,7 @@ assert isinstance(heavy, pl.DataFrame)`,
 - A Series of doubled values
   > A Series holds actual data. This expression has never seen any data, so it cannot hold values.
 - [o] An expression object describing a computation
-  > It is a plan, not a result. Contexts like \`select\` and \`with_columns\` are what run it.
+  > It is a plan, not a result. Contexts like \`select()\` and \`with_columns()\` are what run it.
 - An error, because no DataFrame has been supplied to it yet
   > Building an expression without data is the normal case; expressions are designed to be created, stored, and reused before any frame exists.
 - A string that Polars parses later when the expression is finally used

@@ -20,6 +20,7 @@ historically used `NaN` for both; Polars keeps them apart.
 <Figure
   slug="pl-missing-data-inline-cutout"
   alt="A board with several empty sockets, a tray of matching plugs beside it, and one socket deliberately left open with a small cover set over it"
+  caption="A null is an absent value; `NaN` is a number that came out of bad arithmetic."
 />
 
 <CodeBlock
@@ -88,13 +89,14 @@ print(any_null)
   ]}
 />
 
-`pl.any_horizontal` combines a Boolean expression *across* columns
+`pl.any_horizontal()` combines a Boolean expression *across* columns
 within a row, which is the missing half of the toolkit: most
 expressions work down a column, this one works across a row.
 
 <Figure
   slug="pl-missing-data-finding-them-inline-cutout"
   alt="A board passed under a lamp that lights only the covered cells, leaving the filled ones dark"
+  caption="Finding the gaps is a first-class operation, not something you infer."
 />
 
 ## Dropping
@@ -117,13 +119,14 @@ print("mass and sex      :", penguins.drop_nulls(["body_mass_g", "sex"]).height)
 />
 
 Dropping 11 rows out of 344 to lose one unknown `sex` value costs you
-9 perfectly good measurements. `drop_nulls` with an explicit column
+9 perfectly good measurements. `drop_nulls()` with an explicit column
 list is almost always better than the bare version, because it drops
 rows for a reason you named.
 
 <Figure
   slug="pl-missing-data-dropping-inline-cutout"
   alt="A board tilted so the rows carrying covers slide off the edge into a tray below"
+  caption="Naming the columns you care about drops fewer rows than the bare version."
 />
 
 ## Filling
@@ -201,7 +204,7 @@ too heavy.
 
 Two rules to keep in mind, both inherited from SQL:
 
-- A comparison with null is null, so `filter` drops the row. (Covered
+- A comparison with null is null, so `filter()` drops the row. (Covered
   on the filtering page; it is worth repeating.)
 - `null == null` is null, but Polars' **join keys treat nulls as
   equal by default**, so null keys will match each other.
@@ -307,7 +310,7 @@ assert row["bill_length_mm"] == 38.8, row["bill_length_mm"]`,
   markdown={`A float column's \`mean()\` returns \`NaN\`. What does that tell you?
 
 - The column is entirely null, so there is nothing to average
-  > An all-null column returns null from \`mean\`, not NaN; the two outcomes have different causes.
+  > An all-null column returns null from \`mean()\`, not NaN; the two outcomes have different causes.
 - Polars could not parse some of the values when the file was read
   > Unparsed values become nulls or raise at read time; neither produces a NaN in the result.
 - [o] The column contains at least one genuine \`NaN\` value, which propagates
@@ -324,7 +327,7 @@ Use \`fill_nan(None)\` when a NaN in your data actually means "missing".`}
 - The bare form is much slower on a wide frame
   > Both are fast; the difference that matters is how many rows each one removes and why.
 - The bare form removes columns rather than rows
-  > Both remove rows. Removing columns would be \`drop\`, which takes column names.
+  > Both remove rows. Removing columns would be \`drop()\`, which takes column names.
 - [o] The bare form drops a row for a null in *any* column, discarding good data for an irrelevant reason
   > On the penguins, one unknown \`sex\` costs you nine perfectly good measurements.
 - The bare form leaves nulls in columns you did not name

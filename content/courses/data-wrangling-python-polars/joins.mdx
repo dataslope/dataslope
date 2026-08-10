@@ -79,6 +79,7 @@ is duplicated.
 <Figure
   slug="pl-joins-row-multiplication-trap-inline-cutout"
   alt="Two boards joined where one key matches three rows on the far side, the tray between them filling with far more rows than either board held"
+  caption="A duplicated key on the right multiplies rows rather than adding columns."
 />
 
 <CodeBlock
@@ -220,11 +221,12 @@ keys failed to match rather than only how many.
 <Figure
   slug="pl-joins-join-types-inline-cutout"
   alt="Four pairs of boards pushed together on one bench, each pair keeping a different set of rows on its tray"
+  caption="Which rows survive a join is decided entirely by the join type you pick."
 />
 
 ## join_asof, for nearest-match joins
 
-When the keys will not match exactly, `join_asof` matches each left
+When the keys will not match exactly, `join_asof()` matches each left
 row to the most recent right row at or before it. It is built for
 time series: price at the moment of a trade, exchange rate on the day
 of an invoice.
@@ -232,6 +234,7 @@ of an invoice.
 <Figure
   slug="pl-joins-inline-cutout"
   alt="Two stacks of cards with a shared key notch, being pushed together so only the notches that match lock into one combined stack"
+  caption="Only the keys that match lock together; the rest depends on the join type."
 />
 
 <CodeBlock
@@ -372,7 +375,7 @@ assert by_region["n"][0] == 292, by_region["n"][0]`,
 - [o] Some keys appear more than once on the right, so those left rows were duplicated
   > \`validate="1:1"\` or \`"m:1"\` turns this into an error at the line that caused it.
 - A left join always returns the sum of both frames' row counts
-  > That describes neither a left join nor any other join type; \`concat\` is what stacks frames.
+  > That describes neither a left join nor any other join type; \`concat()\` is what stacks frames.
 - The right frame contained 340 rows whose key was null
   > Null keys are a real hazard, but they would not inflate the result past the left frame's height this way.
 

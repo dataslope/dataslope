@@ -23,12 +23,13 @@ flowchart TD
 
 ## select: the result is the whole frame
 
-`select` returns a new frame made only of the expressions you gave
+`select()` returns a new frame made only of the expressions you gave
 it. Anything you did not mention is gone.
 
 <Figure
   slug="pl-the-four-contexts-select-result-whole-inline-cutout"
   alt="An expression card slotted into a machine that hands back a whole new board rather than a single column"
+  caption="In `select()` the expressions are the whole result; anything unnamed is gone."
 />
 
 <CodeBlock
@@ -59,12 +60,12 @@ print(
   ]}
 />
 
-Use `select` when you are building a *new* table: a summary, a
+Use `select()` when you are building a *new* table: a summary, a
 projection, a reshaped view.
 
 ## with_columns: the result is added
 
-`with_columns` keeps everything and adds (or replaces) the columns
+`with_columns()` keeps everything and adds (or replaces) the columns
 you describe. It is the same machinery, with the original columns
 implicitly kept.
 
@@ -108,12 +109,12 @@ print(df.with_columns(pl.col("name").str.strip_chars().str.to_titlecase()))
   ]}
 />
 
-No `alias` is needed because the expression already carries the name
+No `alias()` is needed because the expression already carries the name
 `name`, so the new column lands on top of the old one.
 
 ## filter: the expression must be Boolean
 
-`filter` takes an expression that evaluates to a Boolean column and
+`filter()` takes an expression that evaluates to a Boolean column and
 keeps the rows where it is `True`.
 
 <CodeBlock
@@ -153,7 +154,7 @@ Wrap each comparison: `(pl.col("a") > 1) & (pl.col("b") < 2)`.
 
 ## group_by().agg(): the expression runs per group
 
-Inside `agg`, an expression sees one group at a time rather than the
+Inside `agg()`, an expression sees one group at a time rather than the
 whole column.
 
 <CodeBlock
@@ -177,7 +178,7 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
 />
 
 `pl.col("body_mass_g").mean()` is the *same expression* you would
-write in `select`. Only the context changed, and with it what "the
+write in `select()`. Only the context changed, and with it what "the
 column" refers to.
 
 ## The same expression in all four
@@ -188,6 +189,7 @@ decided by where you put it.
 <Figure
   slug="pl-the-four-contexts-inline-cutout"
   alt="One expression card being slotted into four different machines in turn, each machine using it in its own way"
+  caption="One expression means four different things depending on where you put it."
 />
 
 <CodeBlock
@@ -222,7 +224,7 @@ print(
   ]}
 />
 
-Look carefully at the last one. Inside `agg`, `pl.col("body_mass_g").mean()`
+Look carefully at the last one. Inside `agg()`, `pl.col("body_mass_g").mean()`
 is *the group's* mean, so the final line counts penguins heavier than
 their own species' average, not heavier than the overall average.
 Same expression, different question, because the context changed.
@@ -320,29 +322,29 @@ assert by_island["n"].to_list() == [168, 124, 52], by_island["n"].to_list()`,
 <MultipleChoice
   markdown={`You want to keep every existing column and add one computed column. Which context?
 
-- \`select\`, listing the new expression
-  > \`select\` returns only what you list, so every existing column would have to be named again to survive.
-- [o] \`with_columns\`
-  > It keeps the frame and adds to it, which is the difference between it and \`select\`.
-- \`filter\`, with the computed expression as its argument
-  > \`filter\` chooses rows and returns no new columns; its expression has to be Boolean.
+- \`select()\`, listing the new expression
+  > \`select()\` returns only what you list, so every existing column would have to be named again to survive.
+- [o] \`with_columns()\`
+  > It keeps the frame and adds to it, which is the difference between it and \`select()\`.
+- \`filter()\`, with the computed expression as its argument
+  > \`filter()\` chooses rows and returns no new columns; its expression has to be Boolean.
 - \`group_by().agg()\`, grouping by the existing columns
   > That collapses the frame to one row per group, which is the opposite of keeping every row intact.
 
-\`select\` builds a new table; \`with_columns\` extends the one you have.`}
+\`select()\` builds a new table; \`with_columns()\` extends the one you have.`}
 />
 
 <MultipleChoice
   markdown={`Inside \`group_by("species").agg(...)\`, what does \`pl.col("mass").mean()\` compute?
 
 - The mean over the whole frame, repeated once per group
-  > That would be the same number on every row. Grouping changes what "the column" refers to inside \`agg\`.
+  > That would be the same number on every row. Grouping changes what "the column" refers to inside \`agg()\`.
 - [o] The mean within each group, one value per species
-  > Only the context changed; the expression is identical to the one you would write in \`select\`.
+  > Only the context changed; the expression is identical to the one you would write in \`select()\`.
 - The mean of the group keys rather than the mass values
   > The expression names \`mass\` explicitly, so the group keys are not what is being averaged.
-- An error, because aggregations are not permitted inside \`agg\`
-  > Aggregations are exactly what \`agg\` is for; a non-aggregating expression is the case that needs care there.
+- An error, because aggregations are not permitted inside \`agg()\`
+  > Aggregations are exactly what \`agg()\` is for; a non-aggregating expression is the case that needs care there.
 
 One expression, four meanings, chosen by the context it runs in.`}
 />
@@ -352,7 +354,7 @@ One expression, four meanings, chosen by the context it runs in.`}
 
 - Polars requires \`and\` rather than \`&\` for combining conditions
   > Python's \`and\` cannot be overloaded to build an expression, which is exactly why Polars uses \`&\`.
-- \`filter\` accepts only one condition per call
+- \`filter()\` accepts only one condition per call
   > Multiple conditions are fine, either as separate arguments (combined with AND) or joined with \`&\`.
 - Comparison operators cannot be used on expressions in Polars
   > Comparisons on expressions are the standard way to build Boolean masks and work as written.

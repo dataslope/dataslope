@@ -249,9 +249,9 @@ print(report.select(pl.col("n").sum()))
   ]}
 />
 
-Eight ideas from this course appear in that block: `scan_csv`, an
-`Enum`, an expression factory, `when/then`, multi-key `group_by`,
-several aggregations, a sort, and one `collect` at the end.
+Eight ideas from this course appear in that block: `scan_csv()`, an
+`Enum`, an expression factory, `when/then`, multi-key `group_by()`,
+several aggregations, a sort, and one `collect()` at the end.
 
 ## The finding
 
@@ -408,7 +408,7 @@ An aggregate that reverses when you condition on a third variable is the signatu
 
 - Division by carat fails when carat is zero
   > No diamond in the dataset has a carat of zero, so the division is well defined throughout.
-- Per-carat price cannot be computed inside a \`group_by\`
+- Per-carat price cannot be computed inside a \`group_by()\`
   > It can, and the course does exactly that; the objection is to what the number assumes.
 - [o] Price is not proportional to carat, so a per-carat ratio still favours one size range
   > Comparing like with like inside a band makes fewer assumptions than dividing does.

@@ -183,6 +183,7 @@ datasets.
 <Figure
   slug="pl-reading-and-writing-data-read-versus-scan-inline-cutout"
   alt="One carton tipped fully onto a bench beside another carton with only a thin peephole cut in its side"
+  caption="`read_*()` loads the whole file; `scan_*()` peers in and reads what it needs."
 />
 
 ```python
@@ -222,7 +223,7 @@ print(round_trip.dtypes)
 
 <Callout type="info" title="Not runnable in the browser">
 The Polars build that ships with Pyodide is compiled without the streaming
-engine, and `write_parquet` is implemented on top of it, so writing Parquet
+engine, and `write_parquet()` is implemented on top of it, so writing Parquet
 raises here. The code is correct on a normal Polars install; it is shown
 rather than run.
 </Callout>
@@ -233,7 +234,7 @@ rather than run.
   markdown={`What is returned by \`pl.scan_parquet("big.parquet")\`?
 
 - A DataFrame containing the file's contents
-  > That is what \`read_parquet\` returns. The scan family deliberately avoids touching the data.
+  > That is what \`read_parquet()\` returns. The scan family deliberately avoids touching the data.
 - The first few rows, as a preview of the file
   > No rows are read at all. Even a preview would require opening and parsing part of the file.
 - [o] A LazyFrame: a query plan whose first step is reading that file

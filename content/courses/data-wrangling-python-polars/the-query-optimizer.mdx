@@ -20,6 +20,7 @@ the default shows what will actually run.
 <Figure
   slug="pl-the-query-optimizer-reading-plan-inline-cutout"
   alt="A folded plan opened out on a bench showing a chain of stations, one station visibly moved earlier than where it was drawn"
+  caption="The optimised plan is not the order you wrote, and reading it shows why."
 />
 
 <CodeBlock
@@ -98,13 +99,13 @@ print(q.head(3).collect())
 />
 
 This is why "repeat the expression rather than splitting into two
-`with_columns` calls" is sound advice in a lazy query: the repetition
+`with_columns()` calls" is sound advice in a lazy query: the repetition
 is free.
 
 ### Filters merge, projections collapse
 
-Two consecutive `filter` calls become one conjunction. Two
-consecutive `select` calls collapse into one. Writing a chain in
+Two consecutive `filter()` calls become one conjunction. Two
+consecutive `select()` calls collapse into one. Writing a chain in
 readable steps costs nothing.
 
 ## Showing the saving
@@ -178,7 +179,7 @@ print(opaque.explain())
 
 Three things block the optimizer, and all three are worth avoiding:
 
-1. **`map_elements` with a Python callable.** Opaque, row-at-a-time,
+1. **`map_elements()` with a Python callable.** Opaque, row-at-a-time,
    and it holds the interpreter lock. Almost always replaceable with
    an expression.
 2. **A `collect()` in the middle of a chain.** Everything after it is
@@ -195,7 +196,7 @@ Three things block the optimizer, and all three are worth avoiding:
   moves filters anyway; writing them early is for the reader.
 - **Prefer Parquet.** Its row-group statistics let predicate pushdown
   skip data without decompressing it, which CSV cannot do.
-- **Select what you need.** Even with pushdown, an explicit `select`
+- **Select what you need.** Even with pushdown, an explicit `select()`
   documents the query's real inputs.
 - **Keep expressions expressions.** Anything expressible with
   `when/then`, `str`, `dt`, or arithmetic will be faster and visible
@@ -204,6 +205,7 @@ Three things block the optimizer, and all three are worth avoiding:
 <Figure
   slug="pl-the-query-optimizer-inline-cutout"
   alt="A tangled route of pipes on the left being redrawn on a planning board in the middle into a short straight run on the right"
+  caption="Keeping the logic in expressions is what lets the planner rearrange it."
 />
 
 <Callout type="info" title="show_graph, when the plan gets big">
@@ -326,7 +328,7 @@ An unread column in a columnar file costs nothing, which is what makes wide tabl
 - The second occurrence is silently dropped from the plan
   > Both occurrences remain in the output; what is shared is the computation behind them.
 - [o] Common subexpression elimination computes it once and reuses the result
-  > Which is why repeating an expression beats splitting a chain into two \`with_columns\` calls.
+  > Which is why repeating an expression beats splitting a chain into two \`with_columns()\` calls.
 - Expressions are lazy, so neither occurrence is ever evaluated
   > They are certainly evaluated; laziness postpones the work rather than avoiding it.
 
@@ -336,13 +338,13 @@ You can write for readability and let the planner remove the duplication.`}
 <MultipleChoice
   markdown={`Which of these stops the optimizer from seeing through your query?
 
-- Chaining five \`with_columns\` calls in a row
+- Chaining five \`with_columns()\` calls in a row
   > Consecutive projections collapse into one, so the chain costs nothing beyond its readability benefit.
-- Writing two \`filter\` calls instead of one \`&\` expression
+- Writing two \`filter()\` calls instead of one \`&\` expression
   > Consecutive filters merge into a single conjunction during optimization.
-- [o] \`map_elements\` with a Python lambda
+- [o] \`map_elements()\` with a Python lambda
   > Opaque to the planner, row-at-a-time, and it holds the interpreter lock.
-- Sorting before a \`group_by\`
+- Sorting before a \`group_by()\`
   > A sort is a normal plan node the optimizer understands and can sometimes even remove.
 
 If a lazy query is unexpectedly slow, look for a Python callable in the plan first.`}

@@ -41,6 +41,7 @@ Pass several names, and a list of booleans if the directions differ.
 <Figure
   slug="pl-sorting-and-top-k-sort-inline-cutout"
   alt="A jumbled row of blocks combed into a rising staircase in one pass"
+  caption="Sorting reorders the whole frame by the columns you name."
 />
 
 <CodeBlock
@@ -126,7 +127,7 @@ first unless you pass `nulls_last`. That surprises people writing a
 ## top_k and bottom_k
 
 "Sort the whole table, then take three rows" does far more work than
-necessary. `top_k` keeps a small heap and never sorts the rest.
+necessary. `top_k()` keeps a small heap and never sorts the rest.
 
 <CodeBlock
   adapter="python"
@@ -156,17 +157,18 @@ print("same rows:", a["price"].to_list() == b["price"].to_list())
 
 On 53,940 rows in a browser the gap is modest. On tens of millions it
 is the difference between a query you wait for and one you do not.
-`top_k` also does not promise the *rest* of the frame is ordered,
+`top_k()` also does not promise the *rest* of the frame is ordered,
 which is precisely why it can be faster.
 
 ## Sorting inside a group
 
-Inside `agg`, `sort_by` orders a group's values before you take from
+Inside `agg()`, `sort_by()` orders a group's values before you take from
 them.
 
 <Figure
   slug="pl-sorting-and-top-k-inline-cutout"
   alt="A rising staircase of blocks with a clamp taking the top three off the end, the rest left where they stand"
+  caption="Top-k takes the few you want without sorting everything first."
 />
 
 <CodeBlock
@@ -212,7 +214,7 @@ print(
   ]}
 />
 
-The tie at 95 shows the difference: `min` gives both rank 1 and skips
+The tie at 95 shows the difference: `min()` gives both rank 1 and skips
 to 3, `dense` gives both rank 1 and continues at 2, `ordinal` breaks
 the tie arbitrarily and never repeats a rank.
 
@@ -303,16 +305,16 @@ assert gentoo["body_mass_g"][0] == 6300, gentoo["body_mass_g"][0]`,
 <MultipleChoice
   markdown={`Why can \`top_k(5, by="price")\` beat \`sort("price", descending=True).head(5)\`?
 
-- \`top_k\` reads only the first rows of the frame and stops early
+- \`top_k()\` reads only the first rows of the frame and stops early
   > Every row still has to be examined; a large value could be anywhere in the frame.
-- \`top_k\` returns an approximation, trading accuracy for speed
+- \`top_k()\` returns an approximation, trading accuracy for speed
   > The result is exact. The saving comes from doing less ordering work, not from approximating.
 - [o] It keeps a small heap instead of ordering all the rows it does not return
-  > Fully ordering rows you are about to discard is the wasted work \`top_k\` avoids.
-- Sorting always materializes a copy of the frame while \`top_k\` works in place
+  > Fully ordering rows you are about to discard is the wasted work \`top_k()\` avoids.
+- Sorting always materializes a copy of the frame while \`top_k()\` works in place
   > Neither mutates the input, and both allocate a result; the difference is in comparisons performed.
 
-The trade is that \`top_k\` says nothing about the order of the rows it did not return.`}
+The trade is that \`top_k()\` says nothing about the order of the rows it did not return.`}
 />
 
 <MultipleChoice
@@ -342,5 +344,5 @@ Null placement is its own argument precisely because it is not implied by the di
 - 2, 2, 3
   > No ranking method starts at 2; the highest value under a descending rank is always 1.
 
-Pick the method by what the gap should mean: \`min\` for competition placings, \`dense\` for tiers.`}
+Pick the method by what the gap should mean: \`min()\` for competition placings, \`dense\` for tiers.`}
 />

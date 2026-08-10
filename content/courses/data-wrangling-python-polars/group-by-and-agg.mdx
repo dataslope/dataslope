@@ -4,7 +4,7 @@ description: "Split-apply-combine in Polars: grouping by one or many keys, the l
 ---
 
 Every "by department", "by month", "by species" question lands here.
-`group_by` splits the frame into groups; `agg` runs expressions
+`group_by()` splits the frame into groups; `agg()` runs expressions
 within each group; the results are stitched back into one frame.
 
 <Figure
@@ -54,6 +54,7 @@ same way expressions are named everywhere else.
 <Figure
   slug="pl-group-by-and-agg-basic-shape-inline-cutout"
   alt="Chips swept into three trays by a comb, each tray tipped into a small press leaving one block on top"
+  caption="Group the rows, then let each group's expressions press it down to one row."
 />
 
 ## Group order is not guaranteed
@@ -65,6 +66,7 @@ cost the parallelism.
 <Figure
   slug="pl-group-by-and-agg-inline-cutout"
   alt="A scatter of coloured chips swept into three trays, each tray tipped into a small press that leaves one summary block on top of it"
+  caption="Groups are built in parallel, so the output order is not guaranteed."
 />
 
 <CodeBlock
@@ -123,6 +125,7 @@ obviously.
 <Figure
   slug="pl-group-by-and-agg-grouping-by-several-inline-cutout"
   alt="Chips sorted first into rows by colour and then into columns by shape, each cell of the resulting grid its own small tray"
+  caption="Several keys make a grid of groups, and the keys stay ordinary columns."
 />
 
 ## Grouping by an expression
@@ -152,7 +155,7 @@ diamonds = pl.read_csv("diamonds.csv")`,
 
 ## The list trap
 
-If an expression inside `agg` does *not* reduce to one value, the
+If an expression inside `agg()` does *not* reduce to one value, the
 group's values are collected into a list. This is a feature and it is
 also the single most common surprise.
 
@@ -339,7 +342,7 @@ assert adelie["pct_heavy"][0] < 5.0, adelie["pct_heavy"][0]`,
 - Hash collisions cause groups to be silently merged and re-split
   > Collisions are handled internally and never change which rows belong to which group.
 - [o] Groups are processed in parallel, and thread completion order is not fixed
-  > Guaranteeing order would cost the parallelism, so it is opt-in via \`maintain_order=True\` or a \`sort\`.
+  > Guaranteeing order would cost the parallelism, so it is opt-in via \`maintain_order=True\` or a \`sort()\`.
 - Polars deliberately shuffles output to discourage relying on row order
   > Nothing is shuffled on purpose; the order is simply whatever the parallel execution produced.
 
@@ -347,13 +350,13 @@ Sort at the end of any chain whose output a person will read.`}
 />
 
 <MultipleChoice
-  markdown={`Inside \`agg\`, \`pl.col("mass")\` with no aggregation produces what?
+  markdown={`Inside \`agg()\`, \`pl.col("mass")\` with no aggregation produces what?
 
 - The first mass value in each group
   > Taking one value requires asking for it, with \`first()\`; the bare column keeps them all.
-- An error, because \`agg\` requires an aggregating expression
+- An error, because \`agg()\` requires an aggregating expression
   > Non-aggregating expressions are allowed and useful; they are how you collect a group's values.
-- The mean of each group, since \`agg\` aggregates by default
+- The mean of each group, since \`agg()\` aggregates by default
   > No default statistic is applied. Polars never guesses which summary you meant.
 - [o] A list column holding every value in the group
   > Useful when you want it, and the usual explanation for a column coming back as \`list[i64]\`.
@@ -364,13 +367,13 @@ Sort at the end of any chain whose output a person will read.`}
 <MultipleChoice
   markdown={`You want only species-island pairs with at least 50 penguins. Where does that condition go?
 
-- In \`group_by\`, as a second argument alongside the keys
-  > \`group_by\` takes keys, not conditions; it has no way to express a constraint on a group's size.
-- In a \`filter\` before the \`group_by\`
+- In \`group_by()\`, as a second argument alongside the keys
+  > \`group_by()\` takes keys, not conditions; it has no way to express a constraint on a group's size.
+- In a \`filter()\` before the \`group_by()\`
   > A pre-group filter chooses which *rows* are counted, so it cannot depend on a count that does not exist yet.
-- [o] In a \`filter\` after the \`agg\`, on the computed count
+- [o] In a \`filter()\` after the \`agg()\`, on the computed count
   > This is SQL's \`HAVING\`: the group must be formed before its size can be tested.
-- Inside \`agg\`, as \`pl.len().filter(pl.len() >= 50)\`
+- Inside \`agg()\`, as \`pl.len().filter(pl.len() >= 50)\`
   > An expression-level filter narrows the rows one aggregation sees; it cannot remove the group itself.
 
 Pre-group filters choose rows; post-group filters choose groups.`}

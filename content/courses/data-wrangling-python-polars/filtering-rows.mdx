@@ -3,7 +3,7 @@ title: Filtering Rows
 description: "Boolean expressions, combining conditions, membership tests, and the null trap that quietly drops rows."
 ---
 
-`filter` keeps the rows where a Boolean expression is true. That
+`filter()` keeps the rows where a Boolean expression is true. That
 sentence hides one detail that causes more bugs than any other in
 this course: a null is not true, and it is not false either.
 
@@ -32,12 +32,13 @@ print(penguins.filter(pl.col("island") != "Biscoe").height)
 
 ## Combining conditions
 
-Several arguments to `filter` are combined with AND. For anything
+Several arguments to `filter()` are combined with AND. For anything
 else, use the operators.
 
 <Figure
   slug="pl-filtering-rows-combining-conditions-inline-cutout"
   alt="Two masks laid one over the other above a stack of rows, only the squares open in both letting a row through"
+  caption="Stacked conditions pass only the rows that satisfy every one of them."
 />
 
 | Logic | Operator |
@@ -123,7 +124,7 @@ print(penguins.filter(pl.col("sex").is_not_null()).height)
 ## The null trap
 
 This is the page's real lesson. Comparing anything with null gives
-null, and `filter` keeps only rows that are *true*. So a null row is
+null, and `filter()` keeps only rows that are *true*. So a null row is
 dropped by a condition **and** by its negation.
 
 <CodeBlock
@@ -180,6 +181,7 @@ The expression can reference aggregations of the same frame.
 <Figure
   slug="pl-filtering-rows-basics-inline-cutout"
   alt="A stack of rows dropping through a mask, only those aligned with open squares getting through"
+  caption="A filter is a mask of one yes or no per row, applied all at once."
 />
 
 <CodeBlock
@@ -215,6 +217,7 @@ Sometimes the unit you want to keep or drop is a whole group.
 <Figure
   slug="pl-filtering-rows-inline-cutout"
   alt="A stack of rows dropping through a mask laid over them, only the rows aligned with open squares getting through"
+  caption="Sometimes the unit you keep is a whole group rather than a single row."
 />
 
 <CodeBlock
@@ -341,9 +344,9 @@ Use \`&\`, \`|\`, and \`~\`, and parenthesise each comparison.`}
   markdown={`What does \`filter(pl.len().over("island") > 100)\` do?
 
 - Keeps the first 100 rows of each island
-  > Taking the first rows per group is \`head\` inside a \`group_by\`; this expression compares group sizes instead.
+  > Taking the first rows per group is \`head()\` inside a \`group_by()\`; this expression compares group sizes instead.
 - [o] Keeps every row belonging to an island that has more than 100 rows
-  > \`over\` computes the group's size and broadcasts it to each of that group's rows, so the filter acts group-wise.
+  > \`over()\` computes the group's size and broadcasts it to each of that group's rows, so the filter acts group-wise.
 - Keeps islands whose name is longer than 100 characters
   > \`pl.len()\` counts rows in the window; string length would be \`str.len_chars()\`.
 - Returns one row per island, with those over 100 rows kept

@@ -62,19 +62,20 @@ print(penguins.sample(3, seed=0))
   ]}
 />
 
-`head` on a file that arrived sorted by date shows you January and
-nothing else. `sample` with a fixed `seed` gives you a reproducible
+`head()` on a file that arrived sorted by date shows you January and
+nothing else. `sample()` with a fixed `seed` gives you a reproducible
 look at the middle.
 
 <Figure
   slug="pl-inspecting-a-dataframe-head-tail-sample-inline-cutout"
   alt="A long board with a small window cut at its top, another at its bottom, and three scattered in between"
+  caption="Top, bottom and a random handful show different things about the same file."
 />
 
 ## glimpse, for wide tables
 
 When a table has forty columns, printing it is useless: the output
-wraps and you see nothing. `glimpse` transposes the problem, one
+wraps and you see nothing. `glimpse()` transposes the problem, one
 column per line.
 
 <CodeBlock
@@ -111,7 +112,7 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
   ]}
 />
 
-Unlike its pandas namesake, Polars' `describe` covers *every* column,
+Unlike its pandas namesake, Polars' `describe()` covers *every* column,
 including strings, and puts `null_count` right there in the table.
 Read down that row first. Two missing bill lengths is a note; two
 hundred is a different analysis.
@@ -157,7 +158,7 @@ print(penguins["island"].unique().to_list())
   ]}
 />
 
-`value_counts` on a categorical column is the fastest way to find
+`value_counts()` on a categorical column is the fastest way to find
 data-entry problems: `"male"`, `"Male"`, and `"M "` show up as three
 categories the moment you look.
 
@@ -169,6 +170,7 @@ key silently multiplies rows in a later join.
 <Figure
   slug="pl-inspecting-a-dataframe-five-second-version-inline-cutout"
   alt="A crate with its lid ajar and a single quick glance card lifted from the top of it"
+  caption="One quick look at a new frame costs seconds and saves hours."
 />
 
 <CodeBlock
@@ -312,12 +314,12 @@ assert vals == sorted(vals), vals`,
 
 - Sampling is faster than reading the first rows of a frame
   > Reading the first three rows is the cheaper operation; sampling has to reach across the frame.
-- \`head\` returns a lazy view while \`sample\` returns real data
+- \`head()\` returns a lazy view while \`sample()\` returns real data
   > Both return an ordinary DataFrame here. The difference is which rows you see, not how they are computed.
 - [o] Files often arrive sorted, so the first rows are unrepresentative
-  > A file sorted by date shows you January in \`head\` and nothing about the rest of the year.
-- \`head\` skips rows containing nulls, which hides missing data
-  > Neither method filters nulls; \`head\` gives the first rows exactly as they are, nulls included.
+  > A file sorted by date shows you January in \`head()\` and nothing about the rest of the year.
+- \`head()\` skips rows containing nulls, which hides missing data
+  > Neither method filters nulls; \`head()\` gives the first rows exactly as they are, nulls included.
 
 The \`seed\` keeps the sample reproducible so a colleague sees the same rows you did.`}
 />

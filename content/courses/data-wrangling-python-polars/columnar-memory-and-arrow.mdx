@@ -78,13 +78,15 @@ all three reward contiguous access:
 2. **Prefetching.** The CPU notices a straight-line access pattern
    and fetches ahead. A predictable stride keeps the pipeline full;
    pointer chasing does not.
-3. **SIMD.** One instruction can add eight `Float64` values at once,
+3. **Single instruction, multiple data (SIMD).** One instruction can add
+   eight `Float64` values at once,
    but only if they are adjacent. A column is adjacent by
    construction.
 
 <Figure
   slug="pl-columnar-memory-and-arrow-cpu-cares-so-inline-cutout"
   alt="A machine reaching along one continuous column of blocks in a single sweep rather than hopping across rows"
+  caption="A column is contiguous in memory, so the processor reads it in one sweep."
 />
 
 A pandas string column is an array of pointers to Python `str`
@@ -103,6 +105,7 @@ across languages.
 <Figure
   slug="pl-columnar-memory-and-arrow-apache-arrow-adds-inline-cutout"
   alt="Two different machines drawing from one shared tray without either repacking it first"
+  caption="Arrow is one agreed layout, so two tools can share memory without repacking."
 />
 
 An Arrow column is a few buffers:
@@ -183,7 +186,7 @@ mysterious. You can usually predict it:
   buffers the new frame points at.
 - **Filtering is proportional to the columns you keep**, which is
   why the optimizer works so hard to drop columns early.
-- **Row-at-a-time work is the slow path.** `map_elements` with a
+- **Row-at-a-time work is the slow path.** `map_elements()` with a
   Python function walks the column one value at a time through the
   Python interpreter, giving up the layout, the parallelism, and the
   SIMD in one move. It is the single most common reason "Polars is
@@ -194,7 +197,7 @@ mysterious. You can usually predict it:
 
 <Callout type="info" title="Parquet is Arrow on disk">
 Parquet is a columnar *file* format: same idea, compressed, with
-per-column statistics. That is why `scan_parquet` can skip whole
+per-column statistics. That is why `scan_parquet()` can skip whole
 chunks of a file when your filter rules them out, and why Parquet
 plus Polars is a much better pairing than CSV plus Polars.
 </Callout>
@@ -246,7 +249,7 @@ The interchange, not the speed, is the point of the standard.`}
   > Grouped aggregation is a vectorized scan over contiguous buffers, exactly the case the layout is designed for.
 - Adding a new column computed from two existing ones
   > This appends one new buffer and leaves the existing ones untouched, so it stays on the fast path.
-- [o] Calling \`map_elements\` with a Python function on every row
+- [o] Calling \`map_elements()\` with a Python function on every row
   > It walks the column value by value through the Python interpreter, losing vectorization, parallelism, and SIMD at once.
 
 If a Polars program is unexpectedly slow, look for a Python callable in the hot path first.`}

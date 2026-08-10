@@ -133,6 +133,7 @@ any turn in the series.
 <Figure
   slug="pl-window-expressions-inline-cutout"
   alt="A long row of blocks with a sliding frame over three of them, a small summary tile appearing beneath the frame as it moves right"
+  caption="A window slides along the rows and leaves one summary at each position."
 />
 
 <Chart slug="rolling-window-lag" />
@@ -176,19 +177,20 @@ restarts at 200. `.over("region")` keeps each region's window
 separate, so the North total never leaks into the South.
 
 <Callout type="warn" title="Sort before an order-dependent window">
-`shift`, `cum_sum`, `rolling_*`, `diff`, `first` and `last` all read
+`shift()`, `cum_sum()`, `rolling_*`, `diff`, `first` and `last` all read
 the rows in their current order. If the frame is not sorted the way
 your question assumes, the answer is wrong and nothing warns you.
 </Callout>
 
 ## mapping_strategy, when the result is not one-per-row
 
-By default `over` broadcasts a group result back to that group's
+By default `over()` broadcasts a group result back to that group's
 rows. Two other strategies exist for cases where it cannot.
 
 <Figure
   slug="pl-window-expressions-one-line-version-inline-cutout"
   alt="A sliding frame moving along a rail of blocks, each position leaving one summary chip beside the block it covered"
+  caption="`over()` computes per group and hands the answer back to every row in it."
 />
 
 <CodeBlock
@@ -228,8 +230,8 @@ and `"join"` is for attaching the whole group to each row.
 | "Average mass per species" | `group_by().agg()` |
 | "Each penguin's mass minus its species average" | `.over()` |
 | "How many penguins per island" | `group_by().agg()` |
-| "Keep only islands with more than 100 penguins" | `.over()` in a `filter` |
-| "The two heaviest per species" | `.over()` plus `filter` |
+| "Keep only islands with more than 100 penguins" | `.over()` in a `filter()` |
+| "The two heaviest per species" | `.over()` plus `filter()` |
 
 The rule: if the answer has one row per group, group. If it has one
 row per original row, window.
@@ -335,14 +337,14 @@ They compute the same numbers and put them in different shapes.`}
 <MultipleChoice
   markdown={`Why sort before \`pl.col("amount").cum_sum().over("region")\`?
 
-- Because \`over\` requires its key column to be sorted before grouping
+- Because \`over()\` requires its key column to be sorted before grouping
   > Grouping is done by hashing the key, which works on any order; the ordering requirement is about the rows within each group.
-- Because an unsorted frame makes \`cum_sum\` raise an error
+- Because an unsorted frame makes \`cum_sum()\` raise an error
   > It runs happily on any order, which is exactly why the wrong answer is silent rather than loud.
 - Because sorting is what makes the running total use the right column
   > Which column is summed is fixed by the expression; sorting decides the sequence the values are summed in.
 - [o] A running total accumulates in row order, so unsorted rows give a meaningless sequence
-  > The same applies to \`shift\`, \`diff\`, \`rolling_*\`, \`first\` and \`last\`.
+  > The same applies to \`shift()\`, \`diff\`, \`rolling_*\`, \`first\` and \`last\`.
 
 Nothing warns you: the numbers are simply wrong.`}
 />

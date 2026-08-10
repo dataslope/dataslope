@@ -3,9 +3,9 @@ title: Aggregating a Column
 description: "Reducing many values to one: the aggregation catalogue, how nulls are treated, and computing several summaries in a single pass."
 ---
 
-An aggregation takes a column and returns one value. In `select` it
-produces a one-row frame; in `agg` it produces one value per group;
-in `with_columns` it broadcasts back across every row. Same
+An aggregation takes a column and returns one value. In `select()` it
+produces a one-row frame; in `agg()` it produces one value per group;
+in `with_columns()` it broadcasts back across every row. Same
 expressions, three uses.
 
 <Figure
@@ -52,6 +52,7 @@ two is a common source of quietly wrong averages.
 <Figure
   slug="pl-aggregations-inline-cutout"
   alt="One column of chips feeding a single gauge, with three more columns queued behind it for the same treatment"
+  caption="An aggregation reduces one column to a single value, whatever the column holds."
 />
 
 ## Nulls are skipped, not treated as zero
@@ -83,6 +84,7 @@ different things, and the library will not choose for you.
 <Figure
   slug="pl-aggregations-nulls-are-skipped-inline-cutout"
   alt="A column of chips with two covers among them tipped into a gauge, the covers set aside rather than counted as empty blocks"
+  caption="Nulls are set aside by an aggregation, not counted as zero."
 />
 
 ## Quantiles and spread
@@ -120,6 +122,7 @@ average up while leaving the middle alone.
 <Figure
   slug="pl-aggregations-quantiles-spread-inline-cutout"
   alt="A rising staircase of blocks with markers planted at the quarter, half and three-quarter points"
+  caption="Quantiles mark where the sorted values sit, which is what the median really is."
 />
 
 ## Boolean aggregations
@@ -212,7 +215,7 @@ print(
 />
 
 Four differently-scoped averages, one scan. Doing this with four
-separate `filter` calls would read the frame four times.
+separate `filter()` calls would read the frame four times.
 
 ## Aggregating many columns at once
 
@@ -250,7 +253,7 @@ print(
 3. \`pct_over_1ct\`, the percentage of diamonds with \`carat\` above 1.0, rounded to 1 decimal
 4. \`ideal_median\`, the median \`price\` of \`Ideal\`-cut diamonds only
 
-Compute all four in a single \`select\` call, so the frame is scanned once.`}
+Compute all four in a single \`select()\` call, so the frame is scanned once.`}
   datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
@@ -321,12 +324,12 @@ assert summary.columns == expected, summary.columns`,
   markdown={`A column has 100 rows, 10 of them null. What do \`pl.len()\` and \`pl.col("x").count()\` return?
 
 - 100 and 100, since both count rows regardless of content
-  > \`count\` is column-aware and deliberately excludes nulls; that is the whole difference between the two.
+  > \`count()\` is column-aware and deliberately excludes nulls; that is the whole difference between the two.
 - 90 and 90, since nulls are excluded from both
   > \`pl.len()\` counts the frame's rows and knows nothing about any particular column's nulls.
 - [o] 100 and 90
   > The gap between them is the missing data, which makes their difference a quick null count.
-- 100 and 10, because \`count\` returns the number of nulls
+- 100 and 10, because \`count()\` returns the number of nulls
   > Counting nulls is \`null_count()\`; \`count()\` reports the values that are present.
 
 Using \`len()\` where you meant \`count()\` produces a mean divided by the wrong denominator.`}
@@ -341,23 +344,23 @@ Using \`len()\` where you meant \`count()\` produces a mean divided by the wrong
   > Averaging a mix of trues and falses lands between the two, which is exactly what makes it useful.
 - [o] The proportion of rows where the condition holds
   > True counts as 1 and false as 0, so their mean is the share. Multiply by 100 for a percentage.
-- An error, because \`mean\` is not defined on a Boolean column
-  > Boolean columns support \`mean\`, \`sum\`, \`any\`, and \`all\`, and each has a natural reading.
+- An error, because \`mean()\` is not defined on a Boolean column
+  > Boolean columns support \`mean()\`, \`sum()\`, \`any\`, and \`all\`, and each has a natural reading.
 
 "What fraction of rows satisfy this?" becomes one short expression.`}
 />
 
 <MultipleChoice
-  markdown={`Why compute four differently-filtered averages inside one \`select\` rather than with four \`filter\` calls?
+  markdown={`Why compute four differently-filtered averages inside one \`select()\` rather than with four \`filter()\` calls?
 
-- \`filter\` cannot be applied to the same frame more than once
+- \`filter()\` cannot be applied to the same frame more than once
   > A frame can be filtered any number of times; the argument is about how many passes the data takes.
 - The results would otherwise have different column names
-  > Naming is under your control either way, through \`alias\` or keyword arguments.
+  > Naming is under your control either way, through \`alias()\` or keyword arguments.
 - [o] Expression-level filters let all four be computed in one pass over the data
-  > Four separate \`filter\` calls scan the frame four times and produce four frames to stitch together.
+  > Four separate \`filter()\` calls scan the frame four times and produce four frames to stitch together.
 - Frame-level filters silently drop rows containing nulls in other columns
-  > \`filter\` only considers the condition you give it; other columns' nulls do not affect which rows survive.
+  > \`filter()\` only considers the condition you give it; other columns' nulls do not affect which rows survive.
 
-An expression-level \`filter\` narrows one aggregation's view without narrowing the frame.`}
+An expression-level \`filter()\` narrows one aggregation's view without narrowing the frame.`}
 />

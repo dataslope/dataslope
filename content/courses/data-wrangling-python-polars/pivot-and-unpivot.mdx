@@ -102,7 +102,7 @@ print(
 />
 
 <Callout type="warn" title="Pivot is eager only">
-`pivot` is a `DataFrame` method, not a `LazyFrame` one, because the
+`pivot()` is a `DataFrame` method, not a `LazyFrame` one, because the
 output *schema* depends on the data: Polars cannot know the column
 names until it has seen the values. In a lazy pipeline, `collect()`
 first, then pivot. This is the one place the lazy API genuinely
@@ -135,12 +135,13 @@ print(
   ]}
 />
 
-`unpivot` *is* available on a `LazyFrame`, because the output schema
+`unpivot()` *is* available on a `LazyFrame`, because the output schema
 is known from the input schema: three columns, whatever the data says.
 
 <Figure
   slug="pl-pivot-and-unpivot-inline-cutout"
   alt="A folded paper fan opened out flat into a wide sheet on the left and pressed back into a narrow column on the right, the same squares visible in both"
+  caption="Unpivot folds many columns into one, and pivot unfolds them again."
 />
 
 ## Selectors make unpivot robust
@@ -213,6 +214,7 @@ presentation table.
 <Figure
   slug="pl-pivot-and-unpivot-pivot-long-wide-inline-cutout"
   alt="A narrow tall board unfolding sideways into a wide flat one, the same squares visible in both"
+  caption="Work in long form and pivot only for the table a human will read."
 />
 
 ## Transposing
@@ -237,7 +239,7 @@ print(df.transpose(include_header=True, header_name="column", column_names="metr
 
 Transposing forces every value into one common type, so a frame with
 mixed dtypes comes back as strings. It is a display tool, not a
-reshaping tool: for real reshaping, `unpivot` is what you want.
+reshaping tool: for real reshaping, `unpivot()` is what you want.
 
 ## Practice
 
@@ -340,7 +342,7 @@ assert probe.height == 15, probe.height`,
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`Why is \`pivot\` unavailable on a \`LazyFrame\` when \`unpivot\` is?
+  markdown={`Why is \`pivot()\` unavailable on a \`LazyFrame\` when \`unpivot()\` is?
 
 - Pivot needs to sort the data, which the lazy engine cannot do
   > The lazy engine sorts perfectly well; sorting appears in lazy plans constantly.
@@ -349,7 +351,7 @@ assert probe.height == 15, probe.height`,
 - [o] Pivot's output column names come from the *data*, so its schema is unknown until it runs
   > Unpivot always produces the index columns plus a variable and a value column, which the input schema already determines.
 - Lazy frames cannot produce more columns than they started with
-  > Adding columns in a lazy plan is routine; \`with_columns\` does it in every lazy query.
+  > Adding columns in a lazy plan is routine; \`with_columns()\` does it in every lazy query.
 
 Collect first, then pivot. It is the one place the lazy API cannot follow.`}
 />
@@ -364,7 +366,7 @@ Collect first, then pivot. It is the one place the lazy API cannot follow.`}
 - [o] In long form the month is a column value, so adding a month needs no code change
   > In wide form, the same computation needs a hand-maintained list of column names.
 - Aggregations in Polars require the input to be sorted by the grouping key
-  > Grouping works on any row order; \`group_by\` hashes the key rather than relying on order.
+  > Grouping works on any row order; \`group_by()\` hashes the key rather than relying on order.
 
 Unpivot on the way in, compute in long form, pivot on the way out for presentation.`}
 />
