@@ -31,9 +31,7 @@ const NAV_SECTIONS: {
   icon: LucideIcon;
   prefetch?: boolean;
 }[] = [
-  // prefetch deliberately NOT set: the Link wrapper defaults to false during
-  // the prefetch-storm mitigation (see app/_components/Link.tsx).
-  { href: "/courses", label: "Courses", icon: GraduationCap },
+  { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
   { href: "/interview-prep", label: "Interview Prep", icon: BriefcaseBusiness },
   { href: "/playground", label: "Playground", icon: SquareTerminal },
   { href: "/pricing", label: "Pricing", icon: Tag },

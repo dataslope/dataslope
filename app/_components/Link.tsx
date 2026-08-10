@@ -28,17 +28,13 @@ import type { ComponentProps } from "react";
 
 export type LinkProps = ComponentProps<typeof NextLink>;
 
-// INCIDENT MITIGATION (2026-08-10): the default is `false` until the prefetch
-// request storm is fully resolved. Deployed builds carry
-// `PrefetchHint.InliningHintsStale` in their prerendered payloads (a poisoned
-// prefetch-hints manifest in the Workers Builds build cache is the suspected
-// source; `prefetchInlining: false` in next.config.ts closes the other setter),
-// and this origin serves the same frozen payload for every prefetch variant —
-// so each prefetching link re-fetched its route forever, ~150 req/s per open
-// tab. No scheduled prefetch, no loop: this default is the client-side
-// guarantee that holds regardless of which build produced the payloads.
-// Restore `prefetch = true` only after a deployed payload shows bit 512 clear
-// (see the next.config.ts comment for the check).
-export default function Link({ prefetch = false, ...props }: LinkProps) {
+// Restored to `true` on 2026-08-10 after the prefetch request storm: a
+// corrupt Workers Builds build cache shipped prerenders stamped
+// `PrefetchHint.InliningHintsStale`, whose client contract (re-fetch until a
+// clean answer arrives) looped forever against this origin. The cache was
+// purged, the deployed payloads verified clean (bit 512 unset, real 825-byte
+// `/_tree` responses), and `scripts/check-prefetch-hints.mjs` now fails any
+// build that would ship the bit again — so prefetching is safe to leave on.
+export default function Link({ prefetch = true, ...props }: LinkProps) {
   return <NextLink prefetch={prefetch} {...props} />;
 }
