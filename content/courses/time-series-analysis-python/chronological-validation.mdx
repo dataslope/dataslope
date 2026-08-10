@@ -128,7 +128,7 @@ you'll never misread them again.
 <Figure
   slug="tsa-chronological-validation-measuring-error-honestly-inline-cutout"
   alt="Short sticks measuring the gap between a forecast ribbon and the actual chips beneath it"
-  caption="Every error metric is a rule for summarizing these sticks. The gaps are the same in each case; the mean absolute error averages their lengths, the root mean squared error squares them first so one long stick dominates, and the percentage error measures each stick against the chip beneath it."
+  caption="Same gaps, three metrics: each is a different rule for summarizing these sticks."
 />
 
 <CodeBlock
@@ -198,7 +198,7 @@ in every fold: **train is always strictly before test.**
 <Figure
   slug="tsa-chronological-validation-cardinal-sin-random-inline-cutout"
   alt="A timeline being shuffled like cards, a large cross drawn over the shuffled pile"
-  caption="Shuffling is the one move a time series forbids, which is why the shuffled pile is crossed out. Every split in this lesson, the single one and the walk-forward one alike, exists to keep the ordering intact."
+  caption="Shuffling is the one move a time series forbids."
 />
 
 | Fold | Train (the past) | Test (the future) |
@@ -699,5 +699,5 @@ honestly. The capstone threads them into one end-to-end pipeline.
 <Figure
   slug="tsa-chronological-validation-inline-cutout"
   alt="A timeline cut once, everything left of the cut used for fitting and everything right of it sealed, with no shuffling anywhere"
-  caption="The discipline of the whole lesson in one picture: cut the timeline once, fit on everything to the left of the cut, and leave everything to the right sealed until the moment you score."
+  caption="Cut the timeline once: fit on the left, and leave the right sealed until you score."
 />

@@ -111,7 +111,7 @@ print("Both recovered the true coefficients closely. The model 'learned the rule
 <Figure
   slug="tsa-arima-models-inline-cutout"
   alt="Three small machines feeding one output, one looking back at past values, one at past errors, one at the trend"
-  caption="The three machines are the three letters. One reads the recent values (the autoregressive part), one reads the recent errors (the moving-average part), and one takes care of the trend by differencing (the integrated part). What they feed jointly is the single number the model predicts."
+  caption="Three machines, three letters: recent values, recent errors, and the trend."
 />
 
 ```mermaid
@@ -160,7 +160,7 @@ horizon.
 <Figure
   slug="tsa-arima-models-fitting-forecasting-inline-cutout"
   alt="A wave running along a rail and continuing past its last sleeper as a lighter dotted extension"
-  caption="Fitting stops where the data stops. The lighter dotted stretch past the last sleeper is the forecast: the same wave continued under the rules the model just learned, drawn differently because nothing out there has been observed."
+  caption="The dotted stretch past the last sleeper is the forecast: same wave, nothing observed."
 />
 
 <Chart slug="forecast-uncertainty-cone" />
@@ -302,7 +302,7 @@ bundles the standard four-panel check.
 <Figure
   slug="tsa-arima-models-two-ingredients-ar-inline-cutout"
   alt="Two machines feeding one output, one looking back at past blocks and one at past mistakes"
-  caption="A fitted model is these two machines working together, one on past values and one on past mistakes. Diagnosing the residuals asks whether anything is left over that a third machine could still have used, and the answer you want is no."
+  caption="Diagnosing residuals asks whether anything is left over that a third machine could have used."
 />
 
 <CodeBlock

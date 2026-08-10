@@ -53,8 +53,13 @@ export interface SqlCardToolsMenuProps {
   ensureExec: () => Promise<SqlExec>;
   /** Disabled while the card is mid-run, so a tool can't race a query. */
   disabled?: boolean;
-  /** Base name for the exported workbook, e.g. the lesson's block title. */
-  exportBaseName?: string;
+  /** Which surface this menu belongs to, the first half of the exported
+   *  workbook's filename. */
+  surface: "sql-code-block" | "sql-challenge";
+  /** Stable per-block id, the second half of that filename. Both cards
+   *  pass the hash out of their `persistKey(...)`, which is already a
+   *  short, deterministic fingerprint of the block. */
+  exportId: string;
   showToast: (message: string, tone?: "info" | "warn") => void;
 }
 
@@ -71,20 +76,27 @@ function toSheetName(table: string, taken: Set<string>): string {
   return name;
 }
 
-function toFileSafeName(title: string): string {
-  return (
-    title
-      .replace(/[/\\:*?"<>|\x00-\x1f]/g, "_")
-      .trim()
-      .slice(0, 80) || "database"
-  );
+/**
+ * Filename for the exported workbook: `sql-code-block-3f9a2c1d-data.xlsx`.
+ *
+ * Deliberately not derived from the card's title. A challenge card's title
+ * is a sentence ("Find the customers with no orders in the last quarter"),
+ * which made for an unwieldy filename and, worse, one whose safe-character
+ * mangling differed from what the learner saw on screen. The id is the hash
+ * out of `persistKey(...)`, so the same block always exports under the same
+ * name and two blocks on one page never collide.
+ */
+function exportFilename(surface: string, id: string): string {
+  const safeId = id.replace(/[^a-z0-9]/gi, "").slice(0, 12) || "0";
+  return `${surface}-${safeId}-data.xlsx`;
 }
 
 export function SqlCardToolsMenu({
   dialect,
   ensureExec,
   disabled = false,
-  exportBaseName = "database",
+  surface,
+  exportId,
   showToast,
 }: SqlCardToolsMenuProps) {
   const isDark = useIsDark();
@@ -157,7 +169,7 @@ export function SqlCardToolsMenu({
         showToast("There are no tables to export yet.", "warn");
         return;
       }
-      const filename = `${toFileSafeName(exportBaseName)}.xlsx`;
+      const filename = exportFilename(surface, exportId);
       triggerDownload(
         new Blob([workbook.saveToBufferSync() as BlobPart], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -173,7 +185,7 @@ export function SqlCardToolsMenu({
     } finally {
       setExporting(false);
     }
-  }, [dialect, ensureExec, exportBaseName, exporting, showToast]);
+  }, [dialect, ensureExec, surface, exportId, exporting, showToast]);
 
   // ── ER diagram / View DDL ──────────────────────────────────────────
   const openDialog = useCallback(

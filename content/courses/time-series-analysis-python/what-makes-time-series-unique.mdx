@@ -129,7 +129,7 @@ the same fixed distribution (same mean, same variance, forever).
 <Figure
   slug="tsa-what-makes-time-series-unique-inline-cutout"
   alt="A row of chips being shuffled on the left and losing its meaning, and kept in order on the right where it forms a shape"
-  caption="Order is the information. Shuffle the rows of a customer table and you lose nothing; shuffle a time series and the shape it was carrying disappears, which is why the usual statistical instincts have to be retrained here."
+  caption="Shuffle a time series and the shape it was carrying disappears."
 />
 
 A time series violates **both** halves, on purpose:
@@ -197,7 +197,7 @@ flowchart LR
 <Figure
   slug="tsa-what-makes-time-series-unique-actually-time-series-inline-cutout"
   alt="A row of chips fixed to evenly spaced sleepers, one chip lifted showing its sleeper cannot be moved"
-  caption="Each observation is pinned to a timestamp, and the timestamp is not free to move. Lifting one chip shows its sleeper staying put, and that immovable spacing is what separates a time series from an ordinary table of numbers."
+  caption="Each value is pinned to a timestamp, and the timestamp cannot move."
 />
 
 <Callout type="warn" title="Seasonal is not the same as cyclic">

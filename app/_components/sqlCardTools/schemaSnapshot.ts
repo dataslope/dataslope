@@ -106,8 +106,15 @@ function columnsSql(dialect: SqlDialect): string {
   if (dialect === "sqlite") {
     // `pragma_table_info` reaches views as well as tables, and carries
     // the pk ordinal the ER node needs for its key glyphs.
+    //
+    // `notnull` is aliased to `not_null`, not to itself: SQLite's parser
+    // rejects `AS notnull` outright ("near \"notnull\": syntax error"),
+    // even though `p."notnull"` on the left is fine. That took the whole
+    // statement down, and since a failed column query degrades to "no
+    // columns" rather than throwing, the diagram drew every table as an
+    // empty box with no hint as to why.
     return `SELECT m.name AS entity, p.cid AS cid, p.name AS col, p.type AS coltype,
-                   p."notnull" AS notnull, p.dflt_value AS dflt, p.pk AS pk
+                   p."notnull" AS not_null, p.dflt_value AS dflt, p.pk AS pk
             FROM sqlite_master m
             JOIN pragma_table_info(m.name) p
             WHERE m.type IN ('table', 'view') AND m.name NOT LIKE 'sqlite_%'
@@ -135,10 +142,19 @@ function columnsSql(dialect: SqlDialect): string {
           ORDER BY c.table_name, c.ordinal_position;`;
 }
 
-// A dialect whose catalog refuses the PK join still has usable columns,
-// so the introspection retries without it before giving up.
+// A catalog that refuses the richer query above still has usable column
+// names and types, so the introspection retries with the smallest query
+// that answers before giving up. For SQLite that means dropping the
+// pragma columns whose names are parser minefields; for the other two,
+// dropping the primary-key join.
 function columnsFallbackSql(dialect: SqlDialect): string | null {
-  if (dialect === "sqlite") return null;
+  if (dialect === "sqlite") {
+    return `SELECT m.name AS entity, p.cid AS cid, p.name AS col, p.type AS coltype, p.pk AS pk
+            FROM sqlite_master m
+            JOIN pragma_table_info(m.name) p
+            WHERE m.type IN ('table', 'view') AND m.name NOT LIKE 'sqlite_%'
+            ORDER BY m.name, p.cid;`;
+  }
   const schema = quoteLiteral(defaultSchemaOf(dialect));
   return `SELECT table_name AS entity, ordinal_position AS cid,
                  column_name AS col, data_type AS coltype,
@@ -224,7 +240,9 @@ export async function readSqlSchemaSnapshot(
       // SQLite reports the constraint directly; information_schema
       // reports the inverse ("YES" when the column *is* nullable).
       notNull:
-        dialect === "sqlite" ? bool(row.notnull) : str(row.nullable).toUpperCase() === "NO",
+        dialect === "sqlite"
+          ? bool(row.not_null)
+          : str(row.nullable).toUpperCase() === "NO",
       defaultValue: row.dflt == null ? null : str(row.dflt),
       pk: num(row.pk),
       generated: null,

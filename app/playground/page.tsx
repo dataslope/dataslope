@@ -88,25 +88,35 @@ export default function PlaygroundPage() {
       >
         <HomeNav />
 
-        <main className="mx-auto w-full max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
-          {/* Centered heading, matching the /courses + /interview-prep title
-              block. */}
-          <div className="mx-auto max-w-2xl text-center">
-            {/* Magic UI sparkles on the title, in the brand palette. */}
-            <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
-              Playground
-            </h1>
-            <p className="mt-6 text-base text-[var(--ds-gray-900)] [text-wrap:pretty] sm:text-lg dark:text-white">
-              Full code editors that run entirely in your browser. Fourteen
-              languages, free, no setup, no sign-up.
-            </p>
+        {/* Two elements, two jobs: <main> clips, the wrapper inside it caps the
+            width. `PlaygroundHero` breaks out of that column with the house
+            `left-1/2` / `w-screen` / `-translate-x-1/2` escape, and `100vw`
+            counts a scrollbar the viewport does not actually offer — so with a
+            classic (non-overlay) scrollbar the band lands ~8px past the content
+            edge and the whole page scrolls sideways. Clipping on the
+            width-capped wrapper would cut the band back to the column and
+            defeat the full-bleed, which is why the clip lives one level up.
+            Same shape as /pricing and the home page. */}
+        <main className="overflow-x-clip">
+          <div className="mx-auto w-full max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
+            {/* Centered heading, matching the /courses + /interview-prep title
+                block. */}
+            <div className="mx-auto max-w-2xl text-center">
+              <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
+                Playground
+              </h1>
+              <p className="mt-6 text-base text-[var(--ds-gray-900)] [text-wrap:pretty] sm:text-lg dark:text-white">
+                Full code editors that run entirely in your browser. Fourteen
+                languages, free, no setup, no sign-up.
+              </p>
+            </div>
+
+            <PlaygroundHero />
+
+            <LanguageCategories />
+
+            <RecentWorkspaces />
           </div>
-
-          <PlaygroundHero />
-
-          <LanguageCategories />
-
-          <RecentWorkspaces />
         </main>
 
         <HomeFooter />

@@ -1,8 +1,8 @@
 # Prepopulated code-block outputs (plan) + telling the learner a Result tab appeared (recommendations)
 
 **Date:** 2026-08-10
-**Status:** §1 is a plan awaiting approval, nothing in it is built yet. §2 is a set of recommendations, nothing in it is built yet.
-**Scope:** §1 answers "can the output be filled in at build time so a learner sees it without pressing Run?" §2 answers "how should a SQL block tell the learner it just added a Result tab?"
+**Status:** **Both are now built.** The plan in §1 and the recommendations in §2 were written first and approved; §3 records what shipped and where the implementation departed from the plan.
+**Scope:** §1 answers "can the output be filled in at build time so a learner sees it without pressing Run?" §2 answers "how should a SQL block tell the learner it just added a Result tab?" §3 is the as-built note.
 
 ---
 
@@ -297,3 +297,108 @@ roughly a dozen lines each, it makes the tab impossible to miss whether or
 not it fits on screen, it handles the repeat-run case that currently has no
 feedback at all, and it covers non-visual users. Items 2 and 4 are polish
 worth adding once the structural fixes are in.
+
+---
+
+## 3. As built
+
+Both sections were implemented after the plan was approved. What follows is
+the delta between the plan and the code, so a reader of §1 and §2 is not
+misled by a design that moved.
+
+### 3.1 Prepopulated outputs — what shipped
+
+| Piece | File |
+| --- | --- |
+| Block key, shared by both sides | `lib/blockOutputKey.ts` |
+| Wire shape + cell conversion, shared by the worker and the generator | `app/_components/runtime/pythonDisplayOutputs.ts` |
+| Python capture shim (re-patches the seams the sweeps stub) | `scripts/lib/python-output-capture.mjs` |
+| Generator | `scripts/build-block-outputs.mjs` |
+| Server-side lookup | `lib/blockOutputs.ts` |
+| Client context | `app/_components/mdx/BlockOutputs.tsx` |
+| Seeding, label, popover | `app/_components/CodeBlock.tsx` |
+| Tests | `__tests__/blockOutputs.test.ts` |
+
+Phases 1–3 of §1.8 are done in one pass, including the non-text cells, on
+the strength of one thing the plan under-weighted: the worker's JS-side
+conversion could be *extracted* rather than reimplemented. `pyodide-worker.ts`
+now imports `toOutputCells()` instead of carrying its own copy, so a
+prepopulated panel and a freshly-run one are rendered from one function. Only
+the Python half is a second implementation, and that is called out in a
+comment at both ends.
+
+### 3.2 Three departures from the plan
+
+**Figures are files, not base64.** §1.5 proposed capping and re-encoding
+inline base64. Measured, that was not enough: the first working run of one
+course produced 1,189 kB of manifest, of which **1,165 kB (98%) was base64
+PNG**, up to 273 kB on a single lesson — all of it inlined into the page
+whether or not the reader ever scrolled to the block. Figures are now written
+to `public/block-outputs/<key>-<n>.webp` and referenced by URL. The same
+course: **25 kB inline** plus 538 kB of WebP that loads lazily and caches
+separately. `OutputCell` grew an optional `src` for this; a *run's* figures
+still arrive inline, because they are already in memory and the reader is
+looking straight at them.
+
+**Per-lesson chunking was unnecessary.** §1.5 proposed emitting one JSON
+chunk per lesson so a page only pays for its own. With the figures gone the
+whole manifest is small, and both MDX routes are server components — so the
+route reads the manifest at build time, hands the client only
+`manifest[page.path]`, and the rest never crosses the wire. No chunk files,
+no extra request.
+
+**The size caps run later than planned.** They apply to what actually goes
+*inline*, which is after the figures have been externalised — an image cell
+costs a short URL there, and is bounded separately by its own on-disk
+ceiling. Checking the caps before externalising (as the first draft did)
+dropped three of one course's 64 blocks for being "too big" when the thing
+that was big had already been moved out of the payload.
+
+### 3.3 Kept from the plan, deliberately
+
+- **"OUTPUT PREVIEW" on every prepopulated panel**, not only the ones
+  suspected of non-determinism, with the info popover as the second layer.
+  The label reverts to "OUTPUT" the moment the reader runs the block.
+- **The double-run `stable` flag** is recorded and reported in the
+  generator's summary. Nothing in the UI branches on it.
+- **Content-addressed keys.** An edited block loses its entry and falls back
+  to the empty panel rather than showing output its code no longer produces.
+- **Every cap is logged.** A dropped block is named in the summary; a silent
+  truncation would read as full coverage.
+- **`<ChallengeCard>` starter output stays out of scope**, for the reason in
+  §1.7: its "output" is a `None` or a failing assertion.
+
+### 3.4 What is still open
+
+- **The other nine adapters.** The generator runs Python today. The manifest,
+  the key, the provider and the component seeding are all adapter-agnostic —
+  the block key already takes an adapter id — so extending to the almostnode
+  languages (JavaScript, TypeScript) is a second runner behind the same
+  interface, and R / C / C++ / Java / C# follow. Phase 4 (SQL) and phase 5
+  (the CI report of newly-unstable blocks) are likewise untouched.
+- **Cost on Cloudflare Workers Builds.** The generator is in the `build`
+  chain and gated by the same stat-signature cache every other generator
+  uses, but a cold deploy pays a full Pyodide boot plus every block. If that
+  proves too slow, the fallback is the `--empty` mode already wired into
+  `postinstall`: ship the manifest from a nightly job instead.
+
+### 3.5 Result-tab feedback — what shipped
+
+The §2.4 minimum set, all four items, in `TableViewer`:
+
+1. **Result tab moved to first position** — it can no longer be created
+   outside the visible strip.
+2. **Row count on the tab** (`Result · 12 rows`), which is the only thing
+   that changes on a repeat run against an already-open tab.
+3. **Scroll-into-view** on arrival, `behavior: auto` under
+   `prefers-reduced-motion`.
+4. **`aria-live` announcement**, derived rather than stored, with an
+   alternating trailing space so a repeat run with an identical row count
+   still announces.
+
+Item 2 of §2.2 (emphasis on the tab rather than the pane) came along with
+them: the tab is re-keyed per run and plays a one-shot accent pulse, which is
+what covers the "already open, already selected" case. Item 4 (a status next
+to the Run button) and the structural rethink in §2.6 were **not** done — the
+first-position move addressed the discovery problem those were hedging
+against.

@@ -93,6 +93,83 @@
   padding: 14px 14px 14px 18px;
 }
 
+/* ─── Output-preview affordance ──────────────────────────────────────
+   The small "i" beside the OUTPUT PREVIEW label, and the popover behind
+   it. Deliberately quiet: the label already carries the claim, and this
+   is only the explanation for a reader who wonders where output came
+   from before they ran anything. */
+
+.previewInfoBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 5px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--cb-text-dim);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.previewInfoBtn:hover,
+.previewInfoBtn[data-popup-open] {
+  color: var(--cb-text);
+  background: var(--cb-bg3);
+}
+
+.previewInfoBtn:focus-visible {
+  outline: 2px solid var(--cb-accent);
+  outline-offset: 1px;
+}
+
+.previewInfoBtn svg {
+  display: block;
+}
+
+.previewInfoPositioner {
+  z-index: 1100;
+  outline: none;
+}
+
+/* Portaled outside the card, so the design tokens defined on
+   `.outputScope` don't reach it. Concrete values, with a dark-mode
+   override, the same approach the toast above takes. */
+.previewInfoPopup {
+  max-width: 320px;
+  padding: 10px 12px;
+  background: var(--ds-white);
+  color: var(--ds-gray-800);
+  border: 1px solid var(--ds-gray-200);
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--ds-black) 10%, transparent),
+    0 8px 24px color-mix(in srgb, var(--ds-black) 16%, transparent);
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  font-size: 12.5px;
+  line-height: 1.55;
+  outline: none;
+}
+
+.previewInfoPopup strong {
+  font-weight: 600;
+  color: var(--ds-gray-900);
+}
+
+:global(html:is(.dark, [data-theme="dark"])) .previewInfoPopup {
+  background: #1a1a1a;
+  color: #d0d0d0;
+  border-color: #333333;
+}
+
+:global(html:is(.dark, [data-theme="dark"])) .previewInfoPopup strong {
+  color: #f0f0f0;
+}
+
 /* The running state now shows a centered brand spinner instead of a
    sine-wave band; the shared `.runSpinner` rule lives in
    ChallengeCard.module.css and is applied here via `challengeStyles`. */

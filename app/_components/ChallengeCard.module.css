@@ -1409,6 +1409,18 @@
   border-top: 1px solid var(--ch-border-light);
 }
 
+/* Code blocks give the label air above it; challenge cards don't.
+   The difference is what sits above the divider: on a challenge card it
+   is the test-results rail, which already ends in its own padding, while
+   on a code block it is the action bar, whose Run button lands hard
+   against the label. The 26px row height stays put, so the accent bar
+   and the label keep their vertical rhythm with the body below. */
+.outputHeaderSpaced {
+  height: auto;
+  padding-top: 12px;
+  padding-bottom: 2px;
+}
+
 .accentBar {
   width: 3px;
   height: 11px;
@@ -2367,6 +2379,66 @@
 .tableViewerSchema {
   color: var(--ch-text-muted);
   font-weight: 400;
+}
+
+/* Row count riding along in the Result tab. Muted and lighter than the
+   label so the tab still reads as "Result" at a glance, but the number
+   is what changes on a second run against the same tab — the one case
+   where nothing else about the strip moves. */
+.tableViewerTabCount {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ch-text-muted);
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--ch-bg-muted);
+  white-space: nowrap;
+}
+
+.tableViewerTabActive .tableViewerTabCount {
+  color: var(--ch-accent);
+  background: color-mix(in srgb, var(--ch-accent) 12%, transparent);
+}
+
+/* One-shot emphasis on the tab itself when a run lands.
+   The pane already washes over (`.resultFlashOverlay`), but the pane is
+   not what changed: the tab bar is. The tab is re-keyed per run so this
+   replays even when the tab was already open, which is the repeat-run
+   case the wash cannot signal at all. */
+.tableViewerTabResult {
+  animation: ch-result-tab-arrive 1.1s ease-out;
+}
+
+@keyframes ch-result-tab-arrive {
+  0% {
+    background: color-mix(in srgb, var(--ch-accent) 26%, transparent);
+  }
+  60% {
+    background: color-mix(in srgb, var(--ch-accent) 14%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tableViewerTabResult {
+    animation: none;
+  }
+}
+
+/* Visually hidden, still announced. Carries the live region that tells a
+   screen-reader user what a run produced. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ─── Table viewer loading skeleton ─────────────────────────────────── */

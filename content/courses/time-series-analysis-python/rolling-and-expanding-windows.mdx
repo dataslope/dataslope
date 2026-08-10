@@ -370,7 +370,7 @@ including now." It's the honest, leakage-free way to say "the typical value
 <Figure
   slug="tsa-rolling-and-expanding-windows-inline-cutout"
   alt="Two rails of daily blocks, the near one with a short frame of fixed width sliding along it, the far one with a frame whose left edge stays pinned so it stretches longer as it moves right"
-  caption="The difference between the two window types is one edge. A rolling window keeps both edges moving, so it always covers the same span; an expanding window pins its left edge at the start, so it grows as it travels and never forgets anything."
+  caption="A rolling window moves both edges; an expanding one pins its left edge at the start."
 />
 
 <CodeBlock
@@ -640,5 +640,5 @@ unseen, and that's next.
 <Figure
   slug="tsa-rolling-and-expanding-windows-first-looking-backward-inline-cutout"
   alt="A rail of blocks with every block slid one sleeper to the right, leaving the first sleeper bare"
-  caption="Shifting is the primitive underneath all of this: move every value one sleeper along so that today can see yesterday. The bare first sleeper is the missing value that necessarily appears at the start, because nothing precedes the first observation."
+  caption="Shifting moves every value one sleeper along, so today can see yesterday."
 />

@@ -16,6 +16,11 @@
  * --text-dim, --primary, --accent1, --font-ui.
  */
 
+/* The two drifting sine layers of the loading overlay animate on the
+   project-wide `ds-run-*` keyframes. Imported here rather than assumed,
+   because the learn-route dialog loads this file on its own. */
+@import "./runOverlayAnimations.css";
+
 /* ─── ER Diagram pane ─── */
 .er-diagram-wrap {
   width: 100%;
@@ -65,6 +70,46 @@
   height: 100%;
   display: block;
   overflow: visible;
+}
+
+/* Paint and motion for the two wave paths.
+ *
+ * `playground.css` carries an identical pair for the run-overlay's own
+ * waves, and per the note at the top of `runOverlayAnimations.css` only
+ * the *keyframes* are shared project-wide while each consumer keeps its
+ * own rule set. This is the ER overlay's set, and it has to live here:
+ * the learn-route dialog loads this file alone, so without it the two
+ * `<path>` elements fall back to the SVG default of solid black fill and
+ * no animation, which is a black wedge across the bottom of the diagram
+ * rather than a loader.
+ *
+ * Scoped under `.er-diagram-loading-wave` so that in the playgrounds,
+ * where `playground.css` is also present, these apply to the ER loader
+ * and nothing else. The values match that pair; both resolve `--primary`
+ * from whichever host is in play, which is what keeps the loader on the
+ * lesson's accent inside the dialog and on the playground's inside the
+ * playground. */
+.er-diagram-loading-wave .dataslope-wave {
+  fill: color-mix(in oklab, var(--primary) 40%, transparent);
+  transform: translateX(0);
+  will-change: transform;
+}
+
+.er-diagram-loading-wave .dataslope-wave--back {
+  fill: color-mix(in oklab, var(--primary) 22%, transparent);
+  animation: ds-run-wave-back 2.4s linear infinite;
+}
+
+.er-diagram-loading-wave .dataslope-wave--front {
+  fill: color-mix(in oklab, var(--primary) 45%, transparent);
+  animation: ds-run-wave-front 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .er-diagram-loading-wave .dataslope-wave--back,
+  .er-diagram-loading-wave .dataslope-wave--front {
+    animation: none;
+  }
 }
 
 /* Selection hint overlay shown in the top-left corner */

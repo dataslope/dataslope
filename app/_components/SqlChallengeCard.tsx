@@ -804,6 +804,9 @@ export default function SqlChallengeCard({
     () => persistKey("sql-challenge", `${dialect}|${title}|${starterCode}`),
     [dialect, title, starterCode],
   );
+  // The hash tail of that key, reused as the card's id in the exported
+  // workbook's filename: already stable per card, already short.
+  const exportId = persistedKey.slice(persistedKey.lastIndexOf(":") + 1);
 
   // Each card owns its own engine instance, sharing across cards would
   // let one challenge's CREATE TABLE leak into another's checks. The
@@ -1694,7 +1697,8 @@ export default function SqlChallengeCard({
               dialect={dialect}
               ensureExec={ensureExec}
               disabled={isBusy}
-              exportBaseName={title}
+              surface="sql-challenge"
+              exportId={exportId}
               showToast={toasts.show}
             />
             <span className={styles.headerRuntimeLabel}>
@@ -2495,6 +2499,7 @@ export function TableViewer({
   const [resultIsActive, setResultIsActive] = useState(false);
   const [flashKey, setFlashKey] = useState(0);
   const prevRunSeqRef = useRef<number>(-1);
+  const resultTabRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (resultTabData == null) {
@@ -2510,6 +2515,47 @@ export function TableViewer({
       setFlashKey((k) => k + 1);
     }
   }, [resultTabData]);
+
+  const resultRowCount = resultTabData?.resultSet?.values.length ?? null;
+
+  // The tab bar scrolls horizontally, and the Result tab is one of its
+  // children — so on a card seeded with several tables the tab can be
+  // created outside the visible strip, where no amount of highlighting
+  // helps. Pull it into view whenever a run produces one.
+  useEffect(() => {
+    if (!resultIsActive) return;
+    const el = resultTabRef.current;
+    if (!el) return;
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({
+      inline: "nearest",
+      block: "nearest",
+      behavior: reduced ? "auto" : "smooth",
+    });
+  }, [resultIsActive, flashKey]);
+
+  // Sentence for the live region, derived rather than stored: the whole of
+  // it is a function of the current result. Empty while a run is in flight,
+  // so the reader hears the row count rather than "loading".
+  //
+  // The trailing marker alternates with the run sequence because a live
+  // region announces on *change*: re-running a query that returns the same
+  // count would otherwise produce the identical string and stay silent,
+  // which is exactly the repeat-run case this is meant to cover. A
+  // no-break space is spoken as nothing.
+  let announcement = "";
+  if (resultTabData != null && !resultTabData.loading) {
+    if (resultTabData.error) {
+      announcement = "The query failed. The error is shown in the Result tab.";
+    } else if (resultRowCount != null) {
+      announcement = `Query returned ${resultRowCount} ${resultRowCount === 1 ? "row" : "rows"}, shown in the Result tab.`;
+    } else if (resultTabData.message) {
+      announcement = `${resultTabData.message} Shown in the Result tab.`;
+    }
+    if (announcement && resultTabData.runSeq % 2 === 1) announcement += " ";
+  }
 
   const resultTabVisible = resultTabData != null && !resultTabDismissed;
   // While the engine cold-boots there are no tables (and any result tab
@@ -2545,38 +2591,35 @@ export function TableViewer({
       ) : (
         <>
           <div className={styles.tableViewerTabs} role="tablist">
-            {entries.map((entry, idx) => (
-              <button
-                key={`${entry.schema ?? ""}.${entry.table}`}
-                type="button"
-                role="tab"
-                aria-selected={idx === activeIdx}
-                className={`${styles.tableViewerTab} ${
-                  idx === activeIdx && !resultIsActive ? styles.tableViewerTabActive : ""
-                }`}
-                onClick={() => { setActiveIdx(idx); setResultIsActive(false); }}
-              >
-                <Table size={12} aria-hidden />
-                {entry.schema && entry.schema !== defaultSchemaFor(dialect) ? (
-                  <>
-                    <span className={styles.tableViewerSchema}>{entry.schema}.</span>
-                    {entry.table}
-                  </>
-                ) : (
-                  entry.table
-                )}
-              </button>
-            ))}
+            {/* The Result tab leads the strip rather than trailing it. The
+                seeded tables are inputs the learner reads; this is the output
+                of the thing they just did, and appending it last put it where
+                a card with several tables scrolls it out of sight entirely.
+                First position is also the one place it can never be scrolled
+                away from. */}
             {resultTabVisible && (
               <button
+                ref={resultTabRef}
                 type="button"
                 role="tab"
                 aria-selected={resultIsActive}
-                className={`${styles.tableViewerTab} ${resultIsActive ? styles.tableViewerTabActive : ""}`}
+                // Re-keyed per run so the highlight animation replays even
+                // when the tab was already open and already selected, which
+                // is the repeat-run case nothing else signals.
+                key={`result-${flashKey}`}
+                className={`${styles.tableViewerTab} ${styles.tableViewerTabResult} ${resultIsActive ? styles.tableViewerTabActive : ""}`}
                 onClick={() => setResultIsActive(true)}
               >
                 <List size={12} aria-hidden />
                 Result
+                {/* The count is the only part of the tab that changes on a
+                    second run, so it carries the "this is new" signal when
+                    the tab itself is already there. */}
+                {!resultTabData?.loading && resultRowCount != null && (
+                  <span className={styles.tableViewerTabCount}>
+                    {resultRowCount} {resultRowCount === 1 ? "row" : "rows"}
+                  </span>
+                )}
                 <span
                   role="button"
                   aria-label="Close result tab"
@@ -2600,7 +2643,35 @@ export function TableViewer({
                 </span>
               </button>
             )}
+            {entries.map((entry, idx) => (
+              <button
+                key={`${entry.schema ?? ""}.${entry.table}`}
+                type="button"
+                role="tab"
+                aria-selected={idx === activeIdx && !resultIsActive}
+                className={`${styles.tableViewerTab} ${
+                  idx === activeIdx && !resultIsActive ? styles.tableViewerTabActive : ""
+                }`}
+                onClick={() => { setActiveIdx(idx); setResultIsActive(false); }}
+              >
+                <Table size={12} aria-hidden />
+                {entry.schema && entry.schema !== defaultSchemaFor(dialect) ? (
+                  <>
+                    <span className={styles.tableViewerSchema}>{entry.schema}.</span>
+                    {entry.table}
+                  </>
+                ) : (
+                  entry.table
+                )}
+              </button>
+            ))}
           </div>
+          {/* Everything above is visual: a tab that slides into view, a count
+              that changes, a pane that flashes. This is the same news in
+              words, for a reader who gets none of it. */}
+          <span className={styles.srOnly} role="status" aria-live="polite">
+            {announcement}
+          </span>
           {resultIsActive && resultTabVisible && resultTabData ? (
             <div
               className={`${styles.resultPane}${resultTabData.loading ? ` ${styles.resultPaneBusy}` : ""}`}

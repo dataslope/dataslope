@@ -792,6 +792,36 @@ Manifests live in `node_modules/.cache/dataslope-build/`, so `npm ci` wipes
 them and the first run after an install regenerates everything — which is when
 it should.
 
+### Prepopulated code-block output
+
+`build-block-outputs` is the one generator in the chain that *executes*
+content rather than parsing it. It boots the same Pyodide-in-Node the content
+sweeps use, runs every Python `<CodeBlock>`, and records what it printed so a
+lesson shows its output before the reader presses Run.
+
+Three things about it are worth knowing before you touch it:
+
+- **It is minutes cold, and cached like everything else.** `postinstall` runs
+  it with `--empty`, which writes the manifest's shape and boots nothing: a
+  fresh clone gets empty output panels, exactly what the blocks did before
+  this existed. `dev` and `build` do the real pass.
+- **Figures are files, not payload.** Base64 PNG was 98% of the first
+  measured manifest. Charts go to `public/block-outputs/<key>-<n>.webp` and
+  the manifest carries a URL, which is why `OutputCell` has an optional
+  `src`. A *run's* own figures still arrive inline.
+- **Entries are keyed by a hash of the block's source** (`lib/blockOutputKey.ts`),
+  never by file and line. An edited block loses its entry and falls back to
+  the empty panel; a positional key would confidently show output the code no
+  longer produces, which is the one failure mode this feature cannot have.
+
+The Python capture shim (`scripts/lib/python-output-capture.mjs`) is a second
+implementation of what `pyodide-worker.ts` does at run time, and it has to
+stay in step with it — including the end-of-run figure auto-flush, without
+which every `sns.histplot(...)` block records nothing while the browser draws
+a chart. The JS half of the conversion is *shared* rather than copied
+(`app/_components/runtime/pythonDisplayOutputs.ts`), so only the Python half
+can drift.
+
 ## Prose style
 
 Enforced by `npm run check:prose` (`scripts/check-prose.mjs`) and by

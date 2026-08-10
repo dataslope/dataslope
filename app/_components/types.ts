@@ -8,6 +8,19 @@ export interface OutputCell {
   /** Plain text for stdout/stderr, HTML string for html, base64 PNG for image,
    *  arbitrary value (e.g. Plotly figure JSON) for plot. */
   content: string;
+  /**
+   * For "image" cells only: a URL to fetch the picture from, instead of
+   * carrying its bytes in `content`.
+   *
+   * Set exclusively by prepopulated output (see
+   * `scripts/build-block-outputs.mjs`). A run's own figures stay inline —
+   * they are already in memory and the reader is looking straight at them —
+   * but a prepopulated figure is paid for on page load by every reader,
+   * including the ones who never scroll to it, and base64 is ~98% of that
+   * weight. Written out as a WebP under `public/block-outputs/` it is a
+   * lazily-loaded, separately-cached file instead.
+   */
+  src?: string;
   /** For "plot" cells, the parsed Plotly figure JSON. */
   plot?: PlotlyFigure;
   elapsed: string;

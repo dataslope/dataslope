@@ -88,7 +88,7 @@ has no trend.
 <Figure
   slug="tsa-differencing-inline-cutout"
   alt="A rising line of blocks on the left, and on the right the gaps between consecutive blocks drawn as short bars around a flat centre"
-  caption="Differencing measures gaps rather than heights. A steadily rising row of blocks has gaps of roughly constant size, so the bars on the right settle around a flat centre: the trend is gone, and what is left is the part worth modelling."
+  caption="Differencing measures gaps, not heights, so a steady rise flattens to a level line."
 />
 
 <CodeBlock
@@ -267,7 +267,7 @@ that went *up* instead of down.
 <Figure
   slug="tsa-differencing-differencing-inline-cutout"
   alt="A rising row of blocks with the gaps between neighbours drawn beneath as short bars around a flat centre"
-  caption="One difference already flattens this row. Differencing again would work on the flat bars themselves, adding noise without any trend left to remove, and that is precisely the over-differencing trap below."
+  caption="One difference already flattens this row; a second would only add noise."
 />
 
 <CodeBlock

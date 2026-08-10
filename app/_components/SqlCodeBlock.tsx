@@ -156,6 +156,9 @@ export default function SqlCodeBlock({
     () => persistKey("sql-codeblock", `${dialect}|${title ?? ""}|${starterCode}`),
     [dialect, title, starterCode],
   );
+  // The hash tail of that key, reused as the block's id in the exported
+  // workbook's filename: already stable per block, already short.
+  const exportId = persistedKey.slice(persistedKey.lastIndexOf(":") + 1);
 
   // Each block owns its own engine instance, sharing across blocks
   // would let one block's CREATE TABLE leak into another's results. The
@@ -619,7 +622,8 @@ export default function SqlCodeBlock({
               dialect={dialect}
               ensureExec={ensureExec}
               disabled={isBusy}
-              exportBaseName={title ?? `${dialect}-tables`}
+              surface="sql-code-block"
+              exportId={exportId}
               showToast={toasts.show}
             />
             <span className={styles.headerRuntimeLabel}>
