@@ -89,6 +89,7 @@ Notice that after pulling `"alpha"` with `next()`, the `for` loop sees only what
 <Figure
   slug="python-iterators-and-generators-manually-driving-iterator-inline-cutout"
   alt="A hand turning a drum's crank one notch at a time, one block leaving per turn"
+  caption="Each next() call turns the crank once and hands back a single item."
 />
 
 ## Custom iterator class
@@ -148,6 +149,7 @@ Each `yield` **pauses** the function and hands a value to the caller. The next `
 <Figure
   slug="python-iterators-and-generators-inline-cutout"
   alt="A dispenser handing out one block at a time on request, with a long roll still coiled inside it rather than laid out on the bench"
+  caption="A generator keeps the sequence coiled up and yields one value at a time."
 />
 
 <Callout type="info" title="Generators are lazy">
@@ -662,4 +664,5 @@ Functions that decorate other functions are next.
 <Figure
   slug="python-iterators-and-generators-really-does-inline-cutout"
   alt="A smooth handle on a drum's outside with its cover lifted to show a crank and pointer within"
+  caption="A for loop is the smooth handle; underneath, it is still iter and next."
 />

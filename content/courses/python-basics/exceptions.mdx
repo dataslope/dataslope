@@ -53,6 +53,7 @@ Exceptions are **not** like Java checked exceptions (which force you to declare 
 <Figure
   slug="python-exceptions-inline-cutout"
   alt="A chute with a side door, a cracked block being routed through the door into a padded tray while the rest continue down"
+  caption="An exception routes the failing case aside so the rest keeps flowing."
 />
 
 Common patterns:
@@ -91,6 +92,7 @@ When an exception is raised, Python **unwinds the stack**, looking for a `try`/`
 <Figure
   slug="python-exceptions-exception-propagation-up-inline-cutout"
   alt="A block falling down a column of trays, each tray refusing it, until one catches"
+  caption="An exception falls up the call stack until some except clause catches it."
 />
 
 ```mermaid
@@ -364,7 +366,7 @@ This silences errors you did not intend to handle and makes debugging miserable.
 **Never write `except:` without a type.** It catches **everything**, including `KeyboardInterrupt`, `SystemExit`, and `MemoryError`. If you truly want to catch all normal errors, use `except Exception:`. But even that is usually too broad; prefer specific types.
 </Callout>
 
-## EAFP vs LBYL philosophy
+## Asking forgiveness vs looking before you leap
 
 Python culture strongly prefers **EAFP** (Easier to Ask for Forgiveness than Permission) over **LBYL** (Look Before You Leap):
 
@@ -702,4 +704,5 @@ Many exceptions come from I/O. Files are next.
 <Figure
   slug="python-exceptions-happens-exceptions-are-inline-cutout"
   alt="A block falling past every basket on a bench and off the end onto the floor"
+  caption="With no matching except anywhere, the exception falls through and stops the program."
 />

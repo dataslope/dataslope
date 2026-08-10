@@ -57,6 +57,7 @@ Python's type system is built on a hierarchy rooted in `object`. Every value in 
 <Figure
   slug="python-data-types-type-hierarchy-inline-cutout"
   alt="A branching frame of sockets, broad at the top and narrowing into specific shapes below"
+  caption="Types form a hierarchy: object at the top, increasingly specific shapes below."
 />
 
 ```mermaid
@@ -95,6 +96,7 @@ This is a quirk of Python's design: `True` and `False` are instances of `bool`, 
 <Figure
   slug="python-data-types-real-world-context-inline-cutout"
   alt="A gate that checks a block as it passes beside another that checks only when the block is used"
+  caption="Python checks a value's type when you use it, not when you name it."
 />
 
 <CodeBlock
@@ -144,6 +146,7 @@ Every built-in type doubles as a converter when you call it as a function.
 <Figure
   slug="python-data-types-inline-cutout"
   alt="Five blocks of different kinds resting in shaped recesses, none able to sit in another's place"
+  caption="Each type has its own shape, so moving between them means an explicit conversion."
 />
 
 <CodeBlock

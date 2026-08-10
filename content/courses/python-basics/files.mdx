@@ -15,6 +15,7 @@ The two core ideas: **`open()` returns a file object**, and **the `with` stateme
 <Figure
   slug="python-files-inline-cutout"
   alt="A drawer opened, a strip of tape drawn out and read, then wound back and the drawer closed"
+  caption="Reading a file is open, read, close, and with handles the closing for you."
 />
 
 ## Why file I/O matters: the real world
@@ -53,6 +54,7 @@ Every snippet on this page runs in your browser, no setup required.
 <Figure
   slug="python-files-opening-file-inline-cutout"
   alt="A drawer being pulled open with a small clasp that must be closed again after"
+  caption="Every file you open holds a resource until it is closed again."
 />
 
 <CodeBlock
@@ -184,6 +186,7 @@ with open("output.txt") as f:
 <Figure
   slug="python-files-file-i-o-inline-cutout"
   alt="A drawer opened, a strip of tape drawn out, and the drawer closed again"
+  caption="Writing follows the same open and close cycle, with the tape running the other way."
 />
 
 <CodeBlock
@@ -229,7 +232,7 @@ with open("log.txt") as f:
 Mode `"a"` opens the file for **appending**. All writes go to the end; the file is created if it doesn't exist.
 
 <Callout type="info" title="Always specify encoding='utf-8' for portability">
-The default encoding is platform-dependent: UTF-8 on macOS/Linux, often CP1252 on Windows. **Explicitly pass `encoding="utf-8"`** to avoid cross-platform bugs, especially when your code runs in CI or Docker containers.
+The default encoding is platform-dependent: UTF-8 on macOS/Linux, often CP1252 on Windows. **Explicitly pass `encoding="utf-8"`** to avoid cross-platform bugs, especially when your code runs in continuous integration or Docker containers.
 </Callout>
 
 ## The context manager protocol (why 'with' works)

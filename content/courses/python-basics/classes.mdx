@@ -25,6 +25,7 @@ Every major Python library uses classes to organize behavior and state. Understa
 <Figure
   slug="python-classes-inline-cutout"
   alt="A template pinned above a bench and three objects stamped from it, each carrying the same handles but a different filling"
+  caption="A class is the template; each instance is stamped from it with its own contents."
 />
 
 <Callout type="info" title="Etymology: why 'class'?">
@@ -57,6 +58,7 @@ print(isinstance(d, Dog))
 <Figure
   slug="python-classes-minimal-class-inline-cutout"
   alt="A bare template pinned above a bench with nothing yet stamped from it"
+  caption="An empty class body still defines a valid type, ready to stamp instances from."
 />
 
 ## The `__init__` method
@@ -66,6 +68,7 @@ print(isinstance(d, Dog))
 <Figure
   slug="python-classes-init-method-inline-cutout"
   alt="A crate having each compartment filled at one station the moment it leaves the press"
+  caption="Every new instance stops at one station where its fields get filled in."
 />
 
 <CodeBlock
@@ -285,7 +288,7 @@ Methods with double underscores ("dunder") define how instances interact with Py
 | Dunder | Purpose | Triggered by |
 | --- | --- | --- |
 | `__init__` | Initialize instance | `MyClass(...)` |
-| `__repr__` | Unambiguous string | `repr(obj)`, REPL display |
+| `__repr__` | Unambiguous string | `repr(obj)`, interactive prompt |
 | `__str__` | User-friendly string | `str(obj)`, `print(obj)` |
 | `__eq__`, `__lt__`, ... | Comparisons | `a == b`, `a < b` |
 | `__len__` | Length | `len(obj)` |

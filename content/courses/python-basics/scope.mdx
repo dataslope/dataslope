@@ -1,6 +1,6 @@
 ---
 title: Scope
-description: How Python looks up names (LEGB) and the global / nonlocal keywords
+description: How Python looks up names, searching outward from local scope to the built-ins, and the global / nonlocal keywords
 ---
 
 When you write `print(x)`, Python has to find the binding for `x`. It does so by walking through four nested namespaces in order, known by the acronym **LEGB**:
@@ -150,6 +150,7 @@ Each call to `make_counter()` returns a fresh `step` with its own private `count
 <Figure
   slug="python-scope-inline-cutout"
   alt="Four frames standing nested one inside another with a block resting in each, and a hand reaching out from the innermost frame through each one in turn until it finds the block it wants"
+  caption="Name lookup works outward: local, enclosing, global, then built-in."
 />
 
 <Callout type="tip" title="Closures vs classes">
@@ -339,6 +340,7 @@ Now each `RequestHandler` instance has its own count, tests are isolated, and co
 <Figure
   slug="python-scope-scope-matters-real-inline-cutout"
   alt="A lamp inside a walled booth lighting only that booth, the corridor outside dark"
+  caption="A name defined inside a function lights up there and nowhere else."
 />
 
 ## Challenges
