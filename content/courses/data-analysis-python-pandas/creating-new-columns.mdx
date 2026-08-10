@@ -49,6 +49,7 @@ which makes it perfect for method chains.
 <Figure
   slug="pandas-creating-new-columns-assign-chainable-column-inline-cutout"
   alt="A board passing through three machines in a row, each adding one more column and handing the board on"
+  caption="Each `.assign()` hands on a new frame, so columns can be added in one chain."
 />
 
 <CodeBlock
@@ -104,7 +105,7 @@ analysts often prefer immutable, even at the cost of an extra
 variable.
 </Callout>
 
-## Conditional columns with `np.where`
+## Conditional columns with `np.where()`
 
 `np.where(condition, value_if_true, value_if_false)` is a vector
 ized ternary.
@@ -112,6 +113,7 @@ ized ternary.
 <Figure
   slug="pandas-creating-new-columns-inline-cutout"
   alt="Two existing columns feeding a small machine that sets a third column down beside them on the same board"
+  caption="A new column is computed from the ones already on the table, row by row."
 />
 
 <CodeBlock
@@ -130,10 +132,10 @@ print(df)
   ]}
 />
 
-## Multi-condition: `np.select`
+## Multi-condition: `np.select()`
 
-For more than two branches, `np.select` is cleaner than nested
-`np.where`s.
+For more than two branches, `np.select()` is cleaner than a nest of
+`np.where()` calls.
 
 <CodeBlock
   adapter="python"
@@ -234,7 +236,7 @@ when you can.
 
 ## Binning continuous values
 
-`pd.cut` slices a continuous column into named buckets:
+`pd.cut()` slices a continuous column into named buckets:
 
 <CodeBlock
   adapter="python"
@@ -256,7 +258,7 @@ print(df)
 />
 
 For equal-frequency buckets (quartiles, quintiles) use
-`pd.qcut`:
+`pd.qcut()`:
 
 <CodeBlock
   adapter="python"
@@ -281,6 +283,7 @@ derived fields, one per technique from this chapter.
 <Figure
   slug="pandas-creating-new-columns-simplest-case-arithmetic-inline-cutout"
   alt="Two standing columns feeding a small adding machine that sets a third column down beside them"
+  caption="Arithmetic between two columns produces a third, aligned row for row."
 />
 
 <CodeBlock
@@ -336,7 +339,7 @@ print("Jumbo fraction:", penguins["jumbo"].mean().round(3))
 - The first is faster
   > Performance is similar for small DataFrames; the meaningful difference is mutability, not speed.
 - \`.assign\` is a method on Series
-  > \`.assign\` is a DataFrame method; Series has no \`assign\` method.
+  > \`.assign\` is a DataFrame method; Series has no \`assign()\` method.
 - Nothing
   > The two differ in whether the original DataFrame is mutated: direct assignment modifies \`df\` in place, while \`.assign\` returns a new DataFrame leaving the original unchanged.
 
@@ -344,18 +347,18 @@ Choose based on whether you want to preserve the original DataFrame.`}
 />
 
 <MultipleChoice
-  markdown={`When would you reach for \`np.select\` instead of \`np.where\`?
+  markdown={`When would you reach for \`np.select()\` instead of \`np.where()\`?
 
 - When you want to filter
-  > Filtering rows uses boolean masks and \`.loc\`; neither \`np.where\` nor \`np.select\` filters a DataFrame.
+  > Filtering rows uses boolean masks and \`.loc\`; neither \`np.where()\` nor \`np.select()\` filters a DataFrame.
 - When you want to sort
-  > Sorting uses \`df.sort_values\`; the choice between \`np.where\` and \`np.select\` is about how many conditional branches you need.
+  > Sorting uses \`df.sort_values()\`; the choice between \`np.where()\` and \`np.select()\` is about how many conditional branches you need.
 - When you want to drop columns
-  > Dropping columns uses \`df.drop(columns=...)\`; this is unrelated to \`np.where\` or \`np.select\`.
+  > Dropping columns uses \`df.drop(columns=...)\`; this is unrelated to \`np.where()\` or \`np.select()\`.
 - [o] When you need to assign one of *more than two* values depending on multiple conditions
-  > \`np.where\` is binary (if/else). \`np.select\` extends to many branches without nesting.
+  > \`np.where()\` is binary (if/else). \`np.select()\` extends to many branches without nesting.
 
-For grade letters, salary bands, customer tiers, etc., \`np.select\` keeps the logic readable.`}
+For grade letters, salary bands, customer tiers, etc., \`np.select()\` keeps the logic readable.`}
 />
 
 <MultipleChoice

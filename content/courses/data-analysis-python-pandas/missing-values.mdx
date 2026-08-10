@@ -22,6 +22,7 @@ Pandas uses two sentinel values:
 <Figure
   slug="pandas-missing-values-missing-looks-like-inline-cutout"
   alt="A board with three cells holding a small cover instead of a chip, the covers clearly not empty chips"
+  caption="A missing cell holds a marker of absence, which is not the same as zero."
 />
 
 Plus Python's **`None`** which Pandas often converts to NaN.
@@ -93,6 +94,7 @@ worst-first.
 <Figure
   slug="pandas-missing-values-inline-cutout"
   alt="A grid where three cells stand empty as holes, a figure at the left holding a patch tile, and a lever at the right that drops the whole row instead"
+  caption="Once you find a gap there are two choices: fill it, or drop the row."
 />
 
 ## A real audit: the penguins
@@ -499,7 +501,7 @@ Understanding *why* values are missing is essential before deciding how to handl
 - Computes the median while ignoring NaNs
   > \`s.median()\` does compute the median, but the outer \`fillna(...)\` call uses that value to replace NaNs, the result is the filled Series, not just the median.
 - Removes NaNs from \`s\`
-  > \`dropna()\` removes rows with NaN; \`fillna\` substitutes a value in their place, the Series retains the same length.
+  > \`dropna()\` removes rows with NaN; \`fillna()\` substitutes a value in their place, the Series retains the same length.
 
 For numeric columns where missingness is moderate and random, median imputation is a sensible default.`}
 />

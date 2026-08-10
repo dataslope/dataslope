@@ -5,7 +5,7 @@ description: pivot_table, Pandas's answer to spreadsheet pivot tables, with aggr
 
 If you've ever made a pivot table in Excel, drag region to
 rows, product to columns, sum of sales to values, Pandas's
-`pivot_table` is the exact same idea, expressed in code.
+`pivot_table()` is the exact same idea, expressed in code.
 
 <Figure
   slug="pandas-pivot-tables-cutout"
@@ -58,11 +58,12 @@ match that row/column".
 <Figure
   slug="pandas-pivot-tables-shape-pivot-inline-cutout"
   alt="A tall narrow stack of records unfolding into a wide flat board, one record landing in each square"
+  caption="A pivot spreads one long column of records across a grid of rows and columns."
 />
 
 ## Pivot vs pivot_table
 
-| Feature | `pivot` | `pivot_table` |
+| Feature | `pivot` | `pivot_table()` |
 | --- | --- | --- |
 | Duplicate (index, columns) allowed | ❌ no | ✅ yes |
 | Aggregation function | n/a | yes (`sum`, `mean`, ...) |
@@ -70,12 +71,13 @@ match that row/column".
 | Margins (row/column totals) | n/a | `margins=True` |
 | Handling NaN cells | n/a | `fill_value=` |
 
-In practice, `pivot_table` is almost always the right choice
+In practice, `pivot_table()` is almost always the right choice
 because it gracefully handles duplicates.
 
 <Figure
   slug="pandas-pivot-tables-inline-cutout"
   alt="A tall narrow stack of records being unfolded into a wide flat board of rows and columns, one record landing in each square"
+  caption="When two records land in the same square, something has to combine them."
 />
 
 ## Multiple aggregation functions
@@ -328,18 +330,18 @@ assert isinstance(report, pd.DataFrame)`,
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What is the key advantage of \`pivot_table\` over plain \`pivot\`?
+  markdown={`What is the key advantage of \`pivot_table()\` over plain \`pivot\`?
 
 - [o] It accepts an aggregation function, so it works even when \`(index, columns)\` combinations have duplicate rows
-  > \`pivot\` errors on duplicates; \`pivot_table\` aggregates them.
+  > \`pivot\` errors on duplicates; \`pivot_table()\` aggregates them.
 - It is newer
-  > Both \`pivot\` and \`pivot_table\` have been in Pandas for many years; novelty is not the distinction, and \`pivot\` is still perfectly valid when there are no duplicates.
+  > Both \`pivot\` and \`pivot_table()\` have been in Pandas for many years; novelty is not the distinction, and \`pivot\` is still perfectly valid when there are no duplicates.
 - It is faster
-  > \`pivot_table\` performs aggregation in addition to reshaping, which typically makes it slightly slower than plain \`pivot\` on clean data; the advantage is robustness, not speed.
+  > \`pivot_table()\` performs aggregation in addition to reshaping, which typically makes it slightly slower than plain \`pivot\` on clean data; the advantage is robustness, not speed.
 - It supports CSV
-  > Both functions operate on in-memory DataFrames regardless of the original file format; CSV support is provided by \`pd.read_csv\`, not by either pivot function.
+  > Both functions operate on in-memory DataFrames regardless of the original file format; CSV support is provided by \`pd.read_csv()\`, not by either pivot function.
 
-That's why \`pivot_table\` is the workhorse in practice.`}
+That's why \`pivot_table()\` is the workhorse in practice.`}
 />
 
 <MultipleChoice
@@ -362,7 +364,7 @@ Margins are a small but valuable feature when producing reports.`}
 
 - Delete the index manually
   > Manually deleting index entries would corrupt the DataFrame; the correct approach is to call \`.reset_index()\` to promote index levels into regular columns.
-- Use \`pivot\` instead of \`pivot_table\`
+- Use \`pivot\` instead of \`pivot_table()\`
   > Switching to \`pivot\` does not remove the hierarchical column name (\`columns.name = "product"\`); the flattening issue is independent of which pivot function you use.
 - [o] Call \`.reset_index()\` (and optionally clear \`columns.name\`) to flatten the pivot back into a regular DataFrame
   > CSV exports work best on flat, name-free DataFrames.

@@ -19,6 +19,7 @@ library returns one or the other.
 <Figure
   slug="pandas-dataframes-and-series-making-them-by-inline-cutout"
   alt="A single column of blocks being clamped upright, then three more clamped beside it to make a board"
+  caption="A DataFrame is several Series clamped side by side and sharing one index."
 />
 
 A DataFrame is essentially a dictionary of Series that all share
@@ -83,6 +84,7 @@ a Series.
 <Figure
   slug="pandas-dataframes-and-series-pulling-column-out-inline-cutout"
   alt="One column lifted straight up out of a clamped board and set down alone"
+  caption="Select one column and what comes back is a Series, not a DataFrame."
 />
 
 <CodeBlock
@@ -266,6 +268,7 @@ The `axis` parameter is your friend: `axis=0` (default) means
 <Figure
   slug="pandas-dataframes-and-series-inline-cutout"
   alt="One tall column of stacked cells standing alone on the left, and on the right several of those columns clamped side by side into a single wide grid"
+  caption="One labelled column is a Series; several side by side make a DataFrame."
 />
 
 ## Quick reference: when do you get back a Series vs a DataFrame?

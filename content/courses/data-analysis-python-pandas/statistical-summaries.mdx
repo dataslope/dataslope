@@ -100,6 +100,7 @@ file sizes are almost always skewed.
 <Figure
   slug="pandas-statistical-summaries-mean-vs-median-inline-cutout"
   alt="A plank on a fulcrum tipped by one very heavy block at its end, and a marker standing calmly at the middle block"
+  caption="One extreme value drags the mean along; the median stays with the middle row."
 />
 
 | Distribution | Mean vs. median | Prefer |
@@ -137,7 +138,7 @@ right-skewed column they are nowhere near evenly spaced:
 
 <Chart slug="quantiles-on-a-distribution" />
 
-## Spread, std and IQR
+## Spread: standard deviation and interquartile range
 
 <CodeBlock
   adapter="python"
@@ -268,7 +269,7 @@ is far less intuitive than people expect:
 
 ## Grouped summaries
 
-The natural extension, `describe` per group:
+The natural extension, `describe()` per group:
 
 <CodeBlock
   adapter="python"
@@ -291,6 +292,7 @@ report the same average and be four completely different distributions.
 <Figure
   slug="pandas-statistical-summaries-inline-cutout"
   alt="One tall column of chips feeding a rack of five small gauges, each showing a different reading"
+  caption="No single number describes a column, which is why summaries come in sets."
 />
 
 <Chart slug="bar-hides-distribution" />

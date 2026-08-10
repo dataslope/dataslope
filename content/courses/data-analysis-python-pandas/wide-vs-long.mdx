@@ -42,6 +42,7 @@ prefers.
 <Figure
   slug="pandas-wide-vs-long-inline-cutout"
   alt="A wide short board and a narrow tall board of the same coloured squares standing side by side, with a folding hinge between them"
+  caption="Wide and long hold the same values; only the folding is different."
 />
 
 ## The tidy data principles
@@ -59,6 +60,7 @@ the tell-tale sign of "untidy" data.
 <Figure
   slug="pandas-wide-vs-long-tidy-data-principles-inline-cutout"
   alt="A clean board where every row is one record and every column one measure, a card beside it stating the shape"
+  caption="Tidy means one row per observation and one column per variable."
 />
 
 ```mermaid
@@ -67,7 +69,7 @@ flowchart TD
   L -->|pivot| W
 ```
 
-`melt` converts wide-to-long. `pivot` (or `pivot_table`) does the
+`melt()` converts wide-to-long. `pivot` (or `pivot_table()`) does the
 reverse.
 
 ## Melt, wide to long
@@ -130,7 +132,7 @@ print(wide)
 
 `pivot` requires the (index, columns) combinations to be
 unique. If you have duplicates that need aggregation, reach
-for `pivot_table` (next page).
+for `pivot_table()` (next page).
 
 ## Why long is usually better for analysis
 
@@ -283,13 +285,13 @@ Recognizing this pattern is most of the battle.`}
   markdown={`Which operation reshapes wide → long?
 
 - merge
-  > \`merge\` joins two DataFrames together on a common key; it does not reshape a single DataFrame from wide to long.
+  > \`merge()\` joins two DataFrames together on a common key; it does not reshape a single DataFrame from wide to long.
 - [o] melt
   > Think "melt the wide table down into a tall one".
 - pivot
-  > \`pivot\` (and \`pivot_table\`) reshapes in the opposite direction, from long to wide; it takes values from rows and spreads them across new columns.
+  > \`pivot\` (and \`pivot_table()\`) reshapes in the opposite direction, from long to wide; it takes values from rows and spreads them across new columns.
 - concat
-  > \`concat\` stacks DataFrames vertically or horizontally; it does not convert column names into row values the way \`melt\` does.
+  > \`concat()\` stacks DataFrames vertically or horizontally; it does not convert column names into row values the way \`melt()\` does.
 
 melt unpivots; pivot pivots.`}
 />

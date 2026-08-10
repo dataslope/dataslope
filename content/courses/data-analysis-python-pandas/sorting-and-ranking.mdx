@@ -11,7 +11,7 @@ you will perform on a DataFrame. Pandas keeps it simple.
   alt="Sorting and ranking, an isometric illustration"
 />
 
-## `sort_values`
+## `sort_values()`
 
 Sort by a single column:
 
@@ -59,14 +59,14 @@ print(df.sort_values(["dept", "salary"], ascending=[True, False]))
   ]}
 />
 
-`sort_values` returns a *new* DataFrame, it does not modify the
+`sort_values()` returns a *new* DataFrame, it does not modify the
 original. If you want to overwrite, reassign:
 
 ```python
 df = df.sort_values("salary", ascending=False)
 ```
 
-## `sort_index`
+## `sort_index()`
 
 Sort by the index instead of a column:
 
@@ -90,6 +90,7 @@ This is especially common with time-series data, `df
 <Figure
   slug="pandas-sorting-and-ranking-sort-values-inline-cutout"
   alt="A jumbled row of blocks combed into a rising staircase by one wide comb"
+  caption="Sorting rearranges the rows themselves into order."
 />
 
 ## Stable sorts and ties
@@ -127,7 +128,7 @@ print(df.sort_values(["team", "score"]))
 The two-call form is occasionally useful, but the single
 multi-column call is usually clearer.
 
-## `nlargest` / `nsmallest`
+## `nlargest()` / `nsmallest()`
 
 A common task: find the top (or bottom) *N* rows by some column.
 These are equivalent to `sort_values(...).head(N)` but more
@@ -189,6 +190,7 @@ representing its position in the sort, leaving row order alone.
 <Figure
   slug="pandas-sorting-and-ranking-inline-cutout"
   alt="A row of blocks of different heights being combed into a rising staircase, with a small pennant planted on each of the tallest three"
+  caption="Ranking records each row's place in that order without moving the rows."
 />
 
 <CodeBlock
@@ -295,14 +297,14 @@ Multi-column sorts give you fine-grained control of tie-breaking.`}
 
 - One returns a Series, one a DataFrame
   > Both \`sort_values(...).head(3)\` and \`nlargest(3, ...)\` return a DataFrame.
-- \`nlargest\` requires the data to be pre-sorted
-  > \`nlargest\` finds the top N values from an unsorted Series or column internally; pre-sorting is not required.
+- \`nlargest()\` requires the data to be pre-sorted
+  > \`nlargest()\` finds the top N values from an unsorted Series or column internally; pre-sorting is not required.
 - They give different rows
   > Both operations select the top 3 rows by the largest values of column \`"x"\`; the result set is identical (ties aside).
-- [o] They give the same rows, but \`nlargest\` is slightly faster and reads more directly
-  > For a top-N query, prefer \`nlargest\`/\`nsmallest\`, the intent is clearer than sort-then-head.
+- [o] They give the same rows, but \`nlargest()\` is slightly faster and reads more directly
+  > For a top-N query, prefer \`nlargest()\`/\`nsmallest()\`, the intent is clearer than sort-then-head.
 
-Either works; \`nlargest\` is the idiomatic choice.`}
+Either works; \`nlargest()\` is the idiomatic choice.`}
 />
 
 <MultipleChoice

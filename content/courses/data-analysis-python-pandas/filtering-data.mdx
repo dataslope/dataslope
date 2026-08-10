@@ -22,6 +22,7 @@ mask is `True`.
 <Figure
   slug="pandas-filtering-data-comparison-operators-inline-cutout"
   alt="A chute with a marked bar across it, blocks taller than the bar stopped and shorter ones passing"
+  caption="A comparison sets the bar, and every row is tested against it separately."
 />
 
 <CodeBlock
@@ -130,7 +131,7 @@ parentheses.
 
 A handful of methods produce boolean masks directly:
 
-### `isin`, membership
+### `isin()`, membership
 
 <CodeBlock
   adapter="python"
@@ -150,7 +151,7 @@ print(df[df["dept"].isin(["Eng", "Sales"])])
   ]}
 />
 
-### `between`, ranges
+### `between()`, ranges
 
 <CodeBlock
   adapter="python"
@@ -169,7 +170,7 @@ df = pd.DataFrame({
   ]}
 />
 
-### `str.contains`, substring matching
+### `str.contains()`, substring matching
 
 <CodeBlock
   adapter="python"
@@ -187,7 +188,7 @@ df = pd.DataFrame({
   ]}
 />
 
-### `isna` / `notna`, missing checks
+### `isna()` / `notna()`, missing checks
 
 <CodeBlock
   adapter="python"
@@ -209,7 +210,7 @@ print(df[df["x"].notna()])
   ]}
 />
 
-## `query`, a string-based DSL
+## `query()`, a string-based DSL
 
 Pandas has an alternative filter syntax that some people find
 more readable, especially for multi-condition filters:
@@ -233,8 +234,8 @@ print(df.query("dept in ['Eng','Sales']"))
   ]}
 />
 
-Whether you prefer `query` or boolean masks is mostly a style
-choice. Most codebases use masks; `query` shows up in notebooks.
+Whether you prefer `query()` or boolean masks is mostly a style
+choice. Most codebases use masks; `query()` shows up in notebooks.
 
 ## A real-world filter
 
@@ -268,11 +269,13 @@ aligning the `&`s makes complex filters readable.
 <Figure
   slug="pandas-filtering-data-basic-shape-inline-cutout"
   alt="A board of rows dropping onto a mask, only the rows aligned with open squares passing through"
+  caption="The boolean mask is one yes or no per row, and only the yes rows come through."
 />
 
 <Figure
   slug="pandas-filtering-data-inline-cutout"
   alt="A board of rows tipping through a grate, the rows that fail the test dropping away and the rest continuing"
+  caption="Combining conditions narrows the grate; a row must pass every one of them."
 />
 
 ## Filter, then assign
@@ -395,15 +398,15 @@ Train your fingers: \`&\`, \`|\`, \`~\`, and parentheses around each condition.`
   markdown={`Which of these is the cleanest way to filter for rows whose \`dept\` column is one of "Eng", "Sales", or "Ops"?
 
 - [o] \`df[df["dept"].isin(["Eng", "Sales", "Ops"])]\`
-  > \`isin\` is the idiomatic Pandas way to express set membership across many values.
+  > \`isin()\` is the idiomatic Pandas way to express set membership across many values.
 - \`df.dept = "Eng" | "Sales" | "Ops"\`
   > This attempts to assign a value to the \`dept\` column rather than filter on it, and \`"Eng" | "Sales"\` is not valid Python for string values.
 - \`df[df["dept"] == "Eng" or df["dept"] == "Sales" or df["dept"] == "Ops"]\`
-  > Using Python's \`or\` keyword with two Series raises the "ambiguous truth value" error; you must use \`|\` for element-wise boolean OR, but \`isin\` is still cleaner for multiple values.
+  > Using Python's \`or\` keyword with two Series raises the "ambiguous truth value" error; you must use \`|\` for element-wise boolean OR, but \`isin()\` is still cleaner for multiple values.
 - \`df[df["dept"] == ["Eng", "Sales", "Ops"]]\`
   > Comparing a Series to a list with \`==\` does an element-wise equality check between the Series and the list by position, not a membership test, producing a different (usually wrong) result.
 
-\`isin\` scales cleanly to long lists and is faster than chaining ORs.`}
+\`isin()\` scales cleanly to long lists and is faster than chaining ORs.`}
 />
 
 <MultipleChoice
