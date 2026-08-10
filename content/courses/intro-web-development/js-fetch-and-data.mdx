@@ -1,6 +1,6 @@
 ---
 title: "JavaScript: Fetching and Showing Data"
-description: Async/await, working with JSON, and building DOM elements from a list of data.
+description: Async/await, working with JSON, and building page elements from a list of data.
 ---
 
 Real apps show data that lives *somewhere else*, a weather service, a
@@ -12,7 +12,7 @@ ask for data, wait for it, and render it into the page.
   alt="JavaScript: fetching and showing data, an isometric illustration"
 />
 
-## `fetch` and `await`
+## `fetch()` and `await`
 
 `fetch(url)` asks the network for something and returns a **promise**,
 a value that isn't ready yet. `await` pauses inside an `async`
@@ -36,7 +36,7 @@ APIs almost always speak **JSON**, text that looks like JavaScript
 objects and arrays. `JSON.parse(text)` turns that text into real
 objects you can loop over. Below, the "data" is already on the page so
 it runs offline, but rendering it is identical whether it came from
-`JSON.parse` or `await response.json()`:
+`JSON.parse()` or `await response.json()`:
 
 <CodeBlock
   adapter="web"
@@ -88,7 +88,7 @@ create an element, set its content, append it.** Swap the hard-coded
 displays live data from an API.
 
 <Callout type="info" title="createElement vs. innerHTML">
-Building elements with `createElement` and `textContent` is safe:
+Building elements with `createElement()` and `textContent` is safe:
 user- or API-provided text can never be interpreted as HTML. Assigning
 untrusted strings to `innerHTML` is how cross-site scripting bugs get
 in. When in doubt, set `textContent`.
@@ -164,4 +164,5 @@ together next in the [Interactive Scoreboard project](/courses/intro-web-develop
 <Figure
   slug="web-js-fetch-and-data-inline-cutout"
   alt="A page panel sending a small folded note along a cord to a drum, and a filled tray coming back along the same cord into one empty slot on the panel"
+  caption="`fetch()` asks for data and the page fills itself in when the answer arrives."
 />
