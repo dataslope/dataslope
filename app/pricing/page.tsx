@@ -107,7 +107,7 @@ export default function PricingPage() {
               <h2 className="text-2xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-3xl dark:text-white">
                 Plan details &amp; fine print
               </h2>
-              <p className="mt-3 text-[15px] leading-relaxed text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-400)]">
+              <p className="mt-3 text-[16px] leading-relaxed text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-400)]">
                 The footnotes below expand on the rows in the table above so
                 there are no surprises about what&apos;s included at each tier.
               </p>

@@ -408,7 +408,7 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
         </div>
 
         {list.map((course) => (
-          <CourseCard key={course.slug} course={course} />
+          <CourseCard key={course.slug} course={course} layout="catalog" />
         ))}
 
         {list.length === 0 &&

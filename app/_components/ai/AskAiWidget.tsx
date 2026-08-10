@@ -14,6 +14,14 @@
  * is a remembered global preference; the Custom per-source toggles reset per
  * page. Answer length lives in Settings and is also remembered.
  *
+ * One source is on before the reader touches anything: "Page you're on", a
+ * ~20-token line naming the page and its course. Without it a question asked
+ * with every switch off reached the model with no indication of the page at
+ * all — `slug` is used server-side only to resolve the Markdown and never
+ * reaches the prompt — so answers came back generic. It is a listed, countable,
+ * toggleable source like any other, which is what keeps the chip's count an
+ * honest description of the request.
+ *
  * The sheet's rows, the chip count, and the send payload are all derived from
  * the same enumeration (`collectPanelSources` + `sourceEnabled`), so what the
  * user sees is what is sent: the widget cap is applied AFTER the per-source
@@ -31,6 +39,18 @@ import {
 } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeHighlight from "rehype-highlight";
+import rehypeKatex from "rehype-katex";
+// Token colours for the code blocks rehype-highlight marks up. The panel floats
+// over lessons (which inline the same theme via docs.css) but also over the
+// playground and the dashboard, which do not — so it brings its own rather than
+// relying on whatever page it happens to be open on. KaTeX's stylesheet is here
+// for the same reason: an answer can contain a formula anywhere the panel opens.
+import "@/app/hljs.css";
+import "katex/dist/katex.min.css";
+import { normalizeMathDelimiters } from "./mathDelimiters";
+import Link from "@/app/_components/Link";
 import { Popover } from "@base-ui/react/popover";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import {
@@ -53,6 +73,7 @@ import {
   ThumbsDown,
   CornerDownRight,
   BookOpen,
+  Compass,
   CodeXml,
   Terminal,
   Hourglass,
@@ -154,7 +175,7 @@ const MODE_LABELS: Record<ContextMode, string> = {
 
 /** A source group, drives its icon, default toggle, and where it maps in the
  *  request payload. */
-type SourceGroup = "lesson" | "code" | "output" | "selection";
+type SourceGroup = "page" | "lesson" | "code" | "output" | "selection";
 
 /** One on-screen context source as shown in the sheet + counted by the chip.
  *  `id` is a STABLE key (group name, `file:<name>`, or `w:<kind>:<label>` for
@@ -173,6 +194,25 @@ interface PanelSource {
  *  reminted on every re-registration, so keying user toggles on them would
  *  silently drop an explicit OFF when the widget remounts. */
 const widgetKey = (kind: string, label: string): string => `w:${kind}:${label}`;
+
+/**
+ * The page's own heading, as the reader sees it.
+ *
+ * The rendered `<h1>` rather than `document.title`, which carries the site
+ * suffix from the root layout's title template ("Variables · DataSlope") and
+ * would put our own brand into the model's context for no reason. Falls back to
+ * the document title with that suffix stripped when a page has no heading.
+ *
+ * The course name is NOT read here: the server resolves it from the slug
+ * against the course catalog, so the collection a path belongs to stays our
+ * claim rather than the page's.
+ */
+function readPageTitle(): string {
+  const heading = document.querySelector("main h1, article h1, h1");
+  const text = heading?.textContent?.trim();
+  if (text) return text.slice(0, 120);
+  return document.title.replace(/\s*·\s*DataSlope\s*$/i, "").trim().slice(0, 120);
+}
 
 /** Group default: everything on screen is in by default; lesson text is the
  *  one opt-in source. Single source of truth for the sheet UI, the payload
@@ -195,14 +235,22 @@ function sourceEnabled(
 const fmtK = (tokens: number): string =>
   `${(Math.max(tokens, 100) / 1000).toFixed(1)}k`;
 
+/** Roughly what `pageIdentityLine` costs: one sentence naming the page, the
+ *  course and the path. Fixed rather than measured, because the client does not
+ *  build that sentence — the server does (lib/ai/context.ts). */
+const PAGE_IDENTITY_TOKENS = 20;
+
 /** Tokens a source contributes to the estimate (its content, or the lesson cap). */
 function sourceTokens(s: PanelSource): number {
   if (s.group === "lesson") return LESSON_TEXT_MAX_TOKENS;
+  if (s.group === "page") return PAGE_IDENTITY_TOKENS;
   return estimateTokensForChars(s.chars ?? 0);
 }
 
 function sourceSubline(s: PanelSource): string {
   switch (s.group) {
+    case "page":
+      return `Which lesson you're on · ~${PAGE_IDENTITY_TOKENS} tokens`;
     case "lesson":
       return `Trimmed to fit · up to ${Math.round(LESSON_TEXT_MAX_TOKENS / 1000)}k tokens`;
     case "output":
@@ -215,6 +263,7 @@ function sourceSubline(s: PanelSource): string {
 }
 
 function sourceIconFor(s: PanelSource): typeof CodeXml {
+  if (s.group === "page") return Compass;
   if (s.group === "lesson") return BookOpen;
   if (s.group === "output") return Terminal;
   if (s.group === "selection") return TextSelect;
@@ -225,7 +274,7 @@ function sourceIconFor(s: PanelSource): typeof CodeXml {
  *  question, built from the sources attached to THAT question. */
 function readingStatusFor(list: PanelSource[]): string {
   const names = list
-    .filter((s) => s.group !== "lesson")
+    .filter((s) => s.group !== "lesson" && s.group !== "page")
     .map((s) =>
       s.group === "output"
         ? "your last output"
@@ -519,10 +568,18 @@ export default function AskAiWidget({
         base.surface === "learn" &&
         LESSON_BASES.has(base.slug?.[0] ?? "") &&
         on("lesson", "lesson");
+      // Where the reader is. On by default, and the only source that is: with
+      // everything off the model otherwise had nothing identifying the page,
+      // because `slug` never reaches the prompt — it only resolves the Markdown
+      // fetch server-side. Toggleable like any other source, so the chip's count
+      // stays the truth about what is sent.
+      const pageOn =
+        base.surface === "learn" && (base.slug?.length ?? 0) > 0 && on("page", "page");
 
       return {
         surface: base.surface,
         ...(base.slug ? { slug: base.slug } : {}),
+        ...(pageOn ? { page: { title: readPageTitle() } } : {}),
         ...(base.adapterId ? { adapterId: base.adapterId } : {}),
         includeLessonText: lessonOn,
         ...(files.length ? { files } : {}),
@@ -537,8 +594,17 @@ export default function AskAiWidget({
 
   const getAnswerLength = useCallback(() => answerLength, [answerLength]);
 
-  const { messages, streaming, error, tier, needsSignIn, send, stop, reset } =
-    useAskAi(buildContext, getAnswerLength);
+  const {
+    messages,
+    queued,
+    streaming,
+    error,
+    tier,
+    needsSignIn,
+    send,
+    stop,
+    reset,
+  } = useAskAi(buildContext, getAnswerLength);
 
   const listRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -571,6 +637,12 @@ export default function AskAiWidget({
       }
     };
     const base = collectContext();
+    // Listed first, because it is the one source that is on before the reader
+    // does anything, and a sheet that did not show it would be describing a
+    // smaller request than the one actually sent.
+    if (base.surface === "learn" && (base.slug?.length ?? 0) > 0) {
+      push({ id: "page", group: "page", label: "Page you're on" });
+    }
     if (routeMeta.hasLessonText) {
       push({ id: "lesson", group: "lesson", label: "Lesson text" });
     }
@@ -726,10 +798,17 @@ export default function AskAiWidget({
     hasAiEditHandler(collectContext().adapterId);
 
   // ── Suggested follow-ups ("Keep going") ────────────────────────────
+  // Keyed on the id of the answer they would follow, not on `messages.length`:
+  // the count repeats across conversations ("New conversation" resets it to
+  // zero), and the hook fetches at most once per key, so every conversation
+  // after the first was silently left without follow-ups. See the hook.
+  const lastTurn = messages[messages.length - 1];
+  const answeredTurnId =
+    lastTurn?.role === "assistant" && lastTurn.content ? lastTurn.id : "";
   const { suggestions, suggestLoading, clearSuggestions } =
     useSuggestedQuestions({
-      active: open && signedIn && !streaming && messages.length > 0,
-      turnKey: messages.length,
+      active: open && signedIn && !streaming,
+      turnKey: answeredTurnId,
       buildContext,
       history: messages,
     });
@@ -784,13 +863,55 @@ export default function AskAiWidget({
       },
     );
   };
+  /**
+   * Rate an answer, and store the exchange it refers to.
+   *
+   * Optimistic: the icon fills immediately and stays filled, because a rating
+   * is the user's own opinion and a network hiccup is no reason to appear to
+   * take it back. The write is best-effort for the same reason — a failed
+   * POST is logged, not surfaced, since there is nothing useful to ask of
+   * someone who just told us an answer was bad.
+   *
+   * Clicking the filled thumb withdraws the rating, which deletes the row: an
+   * answer nobody rated and one whose rating was withdrawn are the same thing.
+   *
+   * Rated turns are the ONLY Ask AI content that leaves the browser for our
+   * storage — see app/api/ai/feedback/route.ts and the notice under each
+   * answer, which says exactly this.
+   */
   const react = (idx: number, kind: "up" | "down") => {
+    const message = messages[idx];
+    if (!message) return;
+    const rating = reactions[idx] === kind ? null : kind;
     setReactions((prev) => {
       const next = { ...prev };
-      if (next[idx] === kind) delete next[idx];
-      else next[idx] = kind;
+      if (rating === null) delete next[idx];
+      else next[idx] = rating;
       return next;
     });
+
+    // The question this answer replied to is the user turn just before it.
+    const question = messages[idx - 1]?.role === "user" ? messages[idx - 1].content : "";
+    const ctx = buildContext();
+    void fetch("/api/ai/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        turnId: message.id,
+        rating,
+        question,
+        answer: message.content,
+        surface: ctx.surface,
+        // `slug` is the lesson's path *segments* (["courses", "python-basics",
+        // "variables"]); joined here so what is stored is the page a reviewer
+        // can open, not an array.
+        slug:
+          ctx.surface === "playground"
+            ? (ctx.adapterId ?? "")
+            : (ctx.slug ?? []).join("/"),
+        model: message.model ?? "",
+      }),
+    }).catch((err) => console.error("Ask AI: rating not saved", err));
   };
 
   // ── Context-sheet interactions ─────────────────────────────────────
@@ -883,12 +1004,38 @@ export default function AskAiWidget({
 
   return (
     <div
-      className={`${styles.panel} ${drag.dragging ? styles.dragging : ""}`}
+      className={`${styles.panel} ${
+        drag.dragging || drag.resizing ? styles.dragging : ""
+      }`}
       style={drag.style}
       role="dialog"
       aria-label="Ask AI"
       ref={panelRef}
     >
+      {/* Resize grips on the two edges that grow away from the docked corner
+          (see useDraggablePanel). Pointer-only affordances — the panel has a
+          sensible default size and every control in it is reachable without
+          resizing — so they are hidden from assistive tech rather than
+          announced as controls that cannot be operated. */}
+      {drag.enabled && (
+        <>
+          <span
+            className={styles.gripLeft}
+            {...drag.resizeProps("left")}
+            aria-hidden
+          />
+          <span
+            className={styles.gripTop}
+            {...drag.resizeProps("top")}
+            aria-hidden
+          />
+          <span
+            className={styles.gripCorner}
+            {...drag.resizeProps("corner")}
+            aria-hidden
+          />
+        </>
+      )}
       <div className={`${styles.chatArea} ${sheetOpen ? styles.dimmed : ""}`}>
         {/* The header doubles as the drag handle on desktop (see
             useDraggablePanel); its own buttons are excluded, so only the
@@ -1029,8 +1176,27 @@ export default function AskAiWidget({
                       </>
                     ) : (
                       <div className={styles.answer}>
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {m.content}
+                        {/* `detect: false` so only fenced blocks that named a
+                            language are highlighted. Auto-detection on a
+                            half-streamed block guesses from whatever few
+                            characters have arrived, and re-guesses per token,
+                            which shows up as code changing colour while it is
+                            still being written. */}
+                        {/* Math before highlighting, matching how the MCQ
+                            renderer orders them: KaTeX claims its nodes first,
+                            so a formula is never handed to the code
+                            highlighter. `normalizeMathDelimiters` runs before
+                            Markdown parses, because Markdown reads a model's
+                            `\[` as an escaped bracket and the delimiter is
+                            gone by the time any plugin could see it. */}
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm, remarkMath]}
+                          rehypePlugins={[
+                            rehypeKatex,
+                            [rehypeHighlight, { detect: false }],
+                          ]}
+                        >
+                          {normalizeMathDelimiters(m.content)}
                         </ReactMarkdown>
                         {streamingHere && <span className={styles.caret} />}
                       </div>
@@ -1070,6 +1236,9 @@ export default function AskAiWidget({
                             <Copy size={13} />
                           )}
                         </button>
+                        {/* `fill` on the selected glyph: colour alone carries
+                            the state otherwise, and a filled vs outlined icon
+                            survives both themes and colour-blindness. */}
                         <button
                           type="button"
                           className={`${styles.actionBtn} ${
@@ -1078,27 +1247,68 @@ export default function AskAiWidget({
                           onClick={() => react(i, "up")}
                           aria-label="Good answer"
                           aria-pressed={reactions[i] === "up"}
-                          title="Good answer"
+                          title={reactions[i] === "up" ? "Rated good" : "Good answer"}
                         >
-                          <ThumbsUp size={13} />
+                          <ThumbsUp
+                            size={13}
+                            fill={reactions[i] === "up" ? "currentColor" : "none"}
+                          />
                         </button>
                         <button
                           type="button"
                           className={`${styles.actionBtn} ${
-                            reactions[i] === "down" ? styles.actionBtnOn : ""
+                            reactions[i] === "down" ? styles.actionBtnOnNegative : ""
                           }`}
                           onClick={() => react(i, "down")}
                           aria-label="Bad answer"
                           aria-pressed={reactions[i] === "down"}
-                          title="Bad answer"
+                          title={reactions[i] === "down" ? "Rated bad" : "Bad answer"}
                         >
-                          <ThumbsDown size={13} />
+                          <ThumbsDown
+                            size={13}
+                            fill={reactions[i] === "down" ? "currentColor" : "none"}
+                          />
                         </button>
                       </div>
+                    )}
+                    {/* The disclaimer belongs to the answer, so it sits with
+                        the answer's own controls rather than pinned to the
+                        composer, where it read as a property of the panel. Once
+                        per conversation, under the newest answer: repeating it
+                        under every one turns it into furniture nobody reads.
+                        The second line is directly about the buttons above it —
+                        rating is what causes an exchange to be stored, so the
+                        sentence saying so belongs where the thumbs are, not
+                        only in the Privacy Policy. */}
+                    {isLast && m.content && !streamingHere && (
+                      <p className={styles.answerNote}>
+                        {disclaimer} Rating an answer saves that exchange so we
+                        can improve the assistant, handled as described in our{" "}
+                        {/* New tab on purpose: the panel floats over a lesson,
+                            and following a link in place would throw away the
+                            conversation the reader is in the middle of. */}
+                        <Link
+                          href="/privacy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.answerNoteLink}
+                        >
+                          Privacy Policy
+                        </Link>
+                        .
+                      </p>
                     )}
                   </div>
                 );
               })}
+              {/* Questions asked while an answer was still streaming. They are
+                  already accepted — showing them as dimmed turns is what makes
+                  that legible, rather than the composer swallowing them. */}
+              {queued.map((q, i) => (
+                <div key={`q${i}`} className={styles.msgQueued}>
+                  {q}
+                </div>
+              ))}
               {/* Follow-ups: hidden once the quota is spent — clicking one
                   could only produce a guaranteed 429. */}
               {!streaming &&
@@ -1130,7 +1340,26 @@ export default function AskAiWidget({
                 )}
             </>
           )}
-          {error && <div className={styles.error}>{error}</div>}
+          {error && (
+            <div
+              className={`${styles.error} ${
+                error.kind === "interrupted" ? styles.errorSoft : ""
+              }`}
+              role="status"
+            >
+              <span>{error.message}</span>
+              {error.retry && !streaming && (
+                <button
+                  type="button"
+                  className={styles.errorRetry}
+                  onClick={() => sendQuestion(error.retry as string)}
+                >
+                  <RotateCcw size={12} aria-hidden />
+                  Retry
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -1242,8 +1471,13 @@ export default function AskAiWidget({
               >
                 <Eye size={12} aria-hidden />
                 <span className={styles.chipLabel}>
+                  {/* Singular at 0 as well as 1: "0 sources" is the usual
+                      English, but the chip is a running count that ticks
+                      0 → 1 → 2 as toggles change, and holding the noun
+                      singular until it genuinely goes plural keeps the label
+                      from flipping its last letter under the pointer. */}
                   {MODE_LABELS[contextMode]} · {enabledCount} source
-                  {enabledCount === 1 ? "" : "s"}
+                  {enabledCount <= 1 ? "" : "s"}
                 </span>
                 <ChevronDown size={11} aria-hidden />
               </button>
@@ -1262,38 +1496,45 @@ export default function AskAiWidget({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={onKeyDown}
-              disabled={streaming || outOfPrompts}
+              // Deliberately NOT disabled while streaming: a question thought
+              // of mid-answer is queued (see useAskAi), so the composer has no
+              // reason to lock the user out of writing it down.
+              disabled={outOfPrompts}
             />
-            {streaming ? (
+            {/* Stop stays reachable while an answer streams, even mid-typing,
+                so Send appears beside it rather than replacing it. */}
+            {streaming && (
               <button
                 type="button"
-                className={styles.sendBtn}
+                className={styles.stopBtn}
                 onClick={stop}
                 aria-label="Stop"
-                title="Stop"
+                title={queued.length ? "Stop and clear the queue" : "Stop"}
               >
                 <StopIcon />
               </button>
-            ) : (
-              <button
-                type="button"
-                className={styles.sendBtn}
-                onClick={submit}
-                disabled={!draft.trim() || outOfPrompts}
-                aria-label="Send"
-                title="Send"
-              >
-                <Send size={15} />
-              </button>
             )}
+            <button
+              type="button"
+              className={styles.sendBtn}
+              onClick={submit}
+              disabled={!draft.trim() || outOfPrompts}
+              aria-label={streaming ? "Send when the answer finishes" : "Send"}
+              title={streaming ? "Send when the answer finishes" : "Send"}
+            >
+              <Send size={15} />
+            </button>
           </div>
           {!sheetOpen && (
             <div className={styles.footerLine}>
-              <span className={styles.disclaimer}>
-                {outOfPrompts && messages.length > 0
-                  ? "Your conversation is saved."
-                  : disclaimer}
-              </span>
+              {/* The "AI can make mistakes" line used to live here; it now sits
+                  under the answer it qualifies (see `.answerNote`). What is
+                  left is composer state, which is the composer's own business. */}
+              {outOfPrompts && messages.length > 0 && (
+                <span className={styles.disclaimer}>
+                  Your conversation is saved.
+                </span>
+              )}
               {usage && isFreeTier && promptsLeft !== null && (
                 <Popover.Root>
                   <Popover.Trigger

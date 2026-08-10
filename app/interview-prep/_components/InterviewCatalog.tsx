@@ -101,13 +101,15 @@ const MIME: Record<string, string> = {
  *
  *  The 3:2 box is kept — six thumbnails the same shape is what makes this read
  *  as a list rather than a scrapbook — but the art no longer fills it exactly.
- *  Every render starts 1536x1024, and then `scripts/trim-cutouts.mjs` crops the
- *  transparent band off its top and bottom, so a banner arrives wider than 3:2
- *  and `object-cover` would answer that by cropping the sides, quietly cutting
+ *  Every render starts 1536x1024, and then `scripts/trim-cutouts.mjs` crops
+ *  away every transparent margin, so a banner arrives at whatever shape its own
+ *  artwork is and `object-cover` would answer that by cropping, quietly cutting
  *  the marmot out of its own frame. `object-contain` keeps the whole artwork
  *  and letterboxes instead — invisibly, the art being transparent — and it
- *  actually paints *larger* than the untrimmed version did, since the blank it
- *  used to carry inside the box is gone. The row's height is set by its three
+ *  paints *larger* than an untrimmed version would, since the blank the frame
+ *  used to carry inside the box is gone. That is the whole point of cropping a
+ *  thumbnail on both axes: the box is fixed, so every margin removed from the
+ *  file is width the subject gets back. The row's height is set by its three
  *  lines of copy either way, so nothing moves.
  *
  *  `sizes` tells the browser it is only ever painted a few hundred CSS pixels
@@ -164,12 +166,12 @@ function TrackRow({ track }: { track: InterviewTrack }) {
         {/* `line-clamp-3` is the guard against a future entry running long and
             pushing one row taller than the rest of its grid line. */}
         {p ? (
-          <span className="mt-1.5 line-clamp-3 text-[14px] leading-[1.55] text-[#8a8a8a] dark:text-[var(--ds-gray-400)]">
+          <span className="mt-1.5 line-clamp-3 text-[15px] leading-[1.6] text-[#8a8a8a] dark:text-[var(--ds-gray-400)]">
             {p.description}
           </span>
         ) : null}
 
-        <span className="mt-2.5 flex items-center gap-2.5 text-[13px]">
+        <span className="mt-2.5 flex items-center gap-2.5 text-[14px]">
           <span className="font-semibold text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]">
             Start track
           </span>
@@ -218,12 +220,12 @@ export function InterviewCatalog({ tracks }: { tracks: InterviewTrack[] }) {
 
       {/* ── Footer line: totals + a pointer to the courses catalog ── */}
       <div className="mt-11 flex flex-col gap-3 pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <span className="text-[13px] text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
+        <span className="text-[15px] text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
           {tracks.length} tracks · {topicCount} topics · all free
         </span>
         <Link
           href="/courses"
-          className="group inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--ds-blue-700)] transition-colors hover:text-[var(--ds-blue-800)] dark:text-[var(--ds-blue-400)] dark:hover:text-[var(--ds-blue-300)]"
+          className="group inline-flex items-center gap-1.5 text-[15px] font-semibold text-[var(--ds-blue-700)] transition-colors hover:text-[var(--ds-blue-800)] dark:text-[var(--ds-blue-400)] dark:hover:text-[var(--ds-blue-300)]"
         >
           Need fundamentals first? Browse courses
           <svg

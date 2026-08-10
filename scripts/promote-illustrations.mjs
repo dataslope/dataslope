@@ -31,8 +31,14 @@
  * median 11% of its height in transparent rows that `<Figure>` still pays
  * layout for. The crop happens before the single encode below, which is what
  * makes it free — a pass over the promoted WebP afterwards would be a second
- * lossy generation. Vertical only, and `scripts/trim-cutouts.mjs` explains why
- * the horizontal margins are kept.
+ * lossy generation.
+ *
+ * How much of the frame goes depends on where the image is painted, and
+ * `trimAxesFor` in `scripts/lib/cutouts.mjs` is the one place that decides:
+ * thumbnails lose their left and right blank as well, everything else is
+ * vertical only. Nothing to pass and nothing to remember — a new course
+ * thumbnail is trimmed on both axes because the prompt corpus says it is a
+ * thumbnail.
  *
  * Deliberately kept separate from build-images.mjs, which is a deterministic,
  * content-hashed build step that must stay a true no-op when nothing changed.
@@ -71,7 +77,7 @@ import { basename, dirname, extname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import sharp from "sharp";
 import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
-import { trimPlan, verticalBounds } from "./lib/cutouts.mjs";
+import { contentBounds, trimAxesFor, trimPlan } from "./lib/cutouts.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 // Promotion writes the *served* file directly. There is deliberately no copy
@@ -132,7 +138,7 @@ export function candidateKey(runId, promptId, variant, kind) {
 }
 
 /**
- * Crop a cut-out's transparent top and bottom away, full width preserved.
+ * Crop a cut-out's transparent margins away, on the axes its id calls for.
  *
  * Returns the input untouched when there is nothing worth taking — a fully
  * transparent image, or one already tight enough that the crop would fall
@@ -141,15 +147,15 @@ export function candidateKey(runId, promptId, variant, kind) {
  *
  * The geometry lives in `scripts/lib/cutouts.mjs`, shared with the sweep in
  * `trim-cutouts.mjs` that backfilled every image promoted before this step
- * existed. The two must agree, so they call the same function rather than
+ * existed. The two must agree, so they call the same functions rather than
  * restating the arithmetic.
  */
-async function trimVertical(buf) {
-  const bounds = await verticalBounds(buf);
-  const plan = trimPlan(bounds);
+async function trimCutout(buf, axes) {
+  const bounds = await contentBounds(buf);
+  const plan = trimPlan(bounds, { axes });
   if (!plan) return buf;
   return sharp(buf)
-    .extract({ left: 0, top: plan.top, width: bounds.width, height: plan.height })
+    .extract({ left: plan.left, top: plan.top, width: plan.width, height: plan.height })
     // Lossless hand-off to the single lossy encode below; leaving the format
     // off would re-encode at sharp's default quality 80.
     .png({ compressionLevel: 0 })
@@ -269,10 +275,13 @@ async function main() {
     // transparent row is vertical space a lesson pays for and nobody sees.
     // Doing it before the one encode below is what makes it free: the crop
     // costs no quality at all, where a later pass over the promoted WebP would
-    // be a second lossy generation. Vertical only — see scripts/trim-cutouts.mjs
-    // for why the left/right margins are deliberately kept, and for the
-    // backfill that trimmed everything promoted before this existed.
-    const trimmed = stem.endsWith(CUTOUT_SUFFIX) ? await trimVertical(raw) : raw;
+    // be a second lossy generation. Which margins go is `trimAxesFor`'s call —
+    // see scripts/trim-cutouts.mjs for why a figure keeps its left/right blank
+    // and a thumbnail does not, and for the backfill that re-trimmed everything
+    // promoted before this existed.
+    const isCutout = stem.endsWith(CUTOUT_SUFFIX);
+    const axes = isCutout ? trimAxesFor(stem.slice(0, -CUTOUT_SUFFIX.length)) : null;
+    const trimmed = isCutout ? await trimCutout(raw, axes) : raw;
     const webp = await toWebpSource(trimmed, opts.quality, opts.maxWidth);
     before += raw.length;
     after += webp.length;
@@ -281,7 +290,7 @@ async function main() {
     promoted++;
     console.log(
       `  ✓ ${stem}.webp  ${(raw.length / 1e6).toFixed(2)}MB → ${(webp.length / 1e6).toFixed(2)}MB` +
-        (trimmed === raw ? "" : "  (vertically trimmed)"),
+        (trimmed === raw ? "" : `  (trimmed ${axes === "both" ? "on both axes" : "vertically"})`),
     );
   }
 

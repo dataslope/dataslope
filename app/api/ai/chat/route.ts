@@ -163,6 +163,27 @@ export async function POST(request: Request): Promise<Response> {
     async start(controller) {
       const emit = (event: AskAiStreamEvent) =>
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+
+      // Keepalive. An answer is not a steady drip of bytes: there is a gap
+      // before the first token while the model is queued and loaded, there can
+      // be a gap before the provider's final usage chunk, and OpenRouter's own
+      // waiting-room heartbeats are SSE *comments*, which the transform below
+      // drops rather than forwards. So this connection can sit idle for tens of
+      // seconds with a perfectly healthy answer on the way, and an idle
+      // connection is exactly what an intermediary reaps — the client sees the
+      // socket close mid-answer and can only report that it lost the
+      // connection. A comment line every ten seconds costs nine bytes and
+      // makes the difference unobservable. `:` is the SSE comment prefix, so
+      // conformant clients (and ours) ignore these by construction.
+      let alive = true;
+      const ping = setInterval(() => {
+        if (!alive) return;
+        try {
+          controller.enqueue(encoder.encode(": ping\n\n"));
+        } catch {
+          alive = false;
+        }
+      }, 10_000);
       const handleLine = (line: string) => {
         if (!line.startsWith("data:")) return;
         const data = line.slice(5).trim();
@@ -209,6 +230,8 @@ export async function POST(request: Request): Promise<Response> {
           // controller already closed (e.g. client disconnected)
         }
       } finally {
+        alive = false;
+        clearInterval(ping);
         reader.releaseLock();
         try {
           controller.close();

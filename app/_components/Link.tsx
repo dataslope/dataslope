@@ -28,6 +28,13 @@ import type { ComponentProps } from "react";
 
 export type LinkProps = ComponentProps<typeof NextLink>;
 
+// Restored to `true` on 2026-08-10 after the prefetch request storm: a
+// corrupt Workers Builds build cache shipped prerenders stamped
+// `PrefetchHint.InliningHintsStale`, whose client contract (re-fetch until a
+// clean answer arrives) looped forever against this origin. The cache was
+// purged, the deployed payloads verified clean (bit 512 unset, real 825-byte
+// `/_tree` responses), and `scripts/check-prefetch-hints.mjs` now fails any
+// build that would ship the bit again — so prefetching is safe to leave on.
 export default function Link({ prefetch = true, ...props }: LinkProps) {
   return <NextLink prefetch={prefetch} {...props} />;
 }
