@@ -44,6 +44,7 @@
     "check:browser": "node scripts/check-browser-blocks.mjs",
     "check:mcq": "node scripts/check-mcq.mjs",
     "check:mdx": "node scripts/check-mdx-blocks.mjs",
+    "check:mdx-tables": "node scripts/check-mdx-tables.mjs",
     "check:prose": "node scripts/check-prose.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",

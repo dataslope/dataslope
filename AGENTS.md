@@ -850,6 +850,11 @@ generator filled a panel, and neither can the site.
   nothing but "the preview didn't finish within the time limit". There is
   nothing to store, so those 72 blocks stay blank by nature.
 
+Between the two generators, 3,290 of the site's 3,374 runnable blocks show
+their output before the reader presses Run. Of the 84 that do not, 72 are web
+and react; the other 12 are blocks that genuinely print nothing, or are marked
+`expectError` so the failure is the lesson.
+
 Two things the capture had to solve, both easy to trip over again. Cells are
 read off `window.__blockCapture` rather than the DOM, because by the time a
 `plot` cell is markup its figure JSON has gone to Plotly and an `image` cell is
