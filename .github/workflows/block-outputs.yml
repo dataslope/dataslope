@@ -1,0 +1,122 @@
+name: Prepopulated block output
+
+# Regenerates the output every Python `<CodeBlock>` shows before the reader
+# presses Run (`scripts/build-block-outputs.mjs`), and commits the result.
+#
+# ── Why this is a workflow and not part of the deploy ──────────────────────
+#
+# Executing 1,689 blocks through Pyodide costs about twelve minutes. Paying
+# that on every Cloudflare deploy took a 20-minute build and returned the same
+# answer each time, because the answer only changes when a lesson changes.
+#
+# So the manifest and its figures are committed, and this workflow is what
+# keeps them current. The generator reuses committed entries key-for-key —
+# keys are content hashes, so an entry that exists is an entry that is still
+# correct — which means:
+#
+#   • a deploy re-verifies the whole manifest in well under a second and
+#     never boots Pyodide at all;
+#   • this workflow only executes the blocks that actually changed;
+#   • an unchanged block's figure file is never rewritten, so the committed
+#     assets do not churn. That matters: matplotlib's PNG bytes are not
+#     reproducible run to run, so a full re-run would rewrite all ~370 files
+#     every time for no visible change.
+#
+# The generator stays in the `build` chain as a safety net rather than being
+# removed from it: if this workflow ever lags behind main, the deploy notices
+# the missing entries and fills them in itself rather than shipping a lesson
+# with holes in it.
+#
+# ── What a pull request sees ──────────────────────────────────────────────
+#
+# Nothing, until it merges. A PR that edits a lesson has no entry for the
+# edited block, so that block shows the empty output panel it showed before
+# any of this existed, and the workflow fills it in on main. Running this on
+# every PR would mean a bot commit on every content branch, which is a worse
+# trade than one lesson previewing empty for the length of a review.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "content/**/*.mdx"
+      - "scripts/build-block-outputs.mjs"
+      - "scripts/lib/python-output-capture.mjs"
+      - "scripts/lib/pyodide-runner.mjs"
+      - "lib/blockOutputKey.ts"
+      - "app/_components/runtime/pythonDisplayOutputs.ts"
+      - "package-lock.json"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Re-execute every block, ignoring the committed manifest"
+        type: boolean
+        default: false
+
+# One at a time: two runs committing to main would race each other, and the
+# loser's regenerated assets would be reverted by the winner's push.
+concurrency:
+  group: block-outputs
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The commit this job pushes must not re-trigger the workflow; a
+          # push made with the default GITHUB_TOKEN does not fire `push`
+          # events, which is exactly the behaviour wanted here.
+          persist-credentials: true
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+
+      # `--ignore-scripts` skips the postinstall codegen, the same as the
+      # content sweeps: this job needs the dependencies, not a second pass
+      # over 900 lessons.
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # Not optional: it rewrites an asset URL inside node_modules, and
+      # package.json runs it outside the gated half of postinstall.
+      - name: Patch almostnode
+        run: node scripts/patch-almostnode.mjs
+
+      # Blocks that read a CSV fetch it from the dataslope/datasets repo. The
+      # sweeps cache these the same way; without it every regeneration
+      # re-downloads the same files.
+      - name: Restore dataset cache
+        uses: actions/cache@v6
+        with:
+          path: .dataset-cache
+          key: dataset-cache-v1-${{ hashFiles('content/**/*.mdx') }}
+          restore-keys: dataset-cache-v1-
+
+      - name: Regenerate
+        run: node scripts/build-block-outputs.mjs ${{ inputs.force && '--force' || '' }}
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/generated/block-outputs.json public/block-outputs
+          if git diff --cached --quiet; then
+            echo "No block output changed."
+            exit 0
+          fi
+          # Say what moved, in the commit itself: a bot commit that only says
+          # "update outputs" tells a reader nothing about which lessons now
+          # show something different.
+          summary=$(git diff --cached --stat | tail -1)
+          git commit -m "Regenerate prepopulated block output" \
+                     -m "$summary" \
+                     -m "Automated by .github/workflows/block-outputs.yml."
+          git push

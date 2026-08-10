@@ -801,10 +801,21 @@ lesson shows its output before the reader presses Run.
 
 Three things about it are worth knowing before you touch it:
 
-- **It is minutes cold, and cached like everything else.** `postinstall` runs
-  it with `--empty`, which writes the manifest's shape and boots nothing: a
-  fresh clone gets empty output panels, exactly what the blocks did before
-  this existed. `dev` and `build` do the real pass.
+- **Its output is committed, and it reuses what is committed.** Executing
+  1,689 blocks costs ~12 minutes, which is the wrong thing to spend on every
+  deploy for an answer that only changes when a lesson does. So
+  `lib/generated/block-outputs.json` and `public/block-outputs/` are in git,
+  kept current by `.github/workflows/block-outputs.yml`, and the generator
+  reuses committed entries key-for-key. Keys are content hashes, so an entry
+  that exists is an entry that is still correct — which means a `build`
+  against a current manifest re-verifies it in under a second and never
+  boots Pyodide at all. It stays in the `build` chain as a safety net: if
+  the workflow lags, the deploy fills the gaps itself rather than shipping a
+  lesson with holes in it.
+- **Reuse is also what keeps the committed assets from churning.**
+  Matplotlib's PNG bytes are not reproducible run to run, so re-executing
+  everything would rewrite all ~370 files on every regeneration for no
+  change in what a reader sees.
 - **Charts are files, not payload.** Between them they were nearly the whole
   weight: base64 PNG was 98% of the first measured manifest, and once the
   images were out, Plotly JSON was 88% of what remained. Both go to

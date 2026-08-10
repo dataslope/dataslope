@@ -67,10 +67,8 @@ run("node", ["scripts/build-created-at.mjs"]);
 run("node", ["scripts/build-course-catalog.mjs"]);
 run("node", ["scripts/build-home-stats.mjs"]);
 run("node", ["scripts/build-images.mjs"]);
-// Booting Pyodide and running every Python block is minutes on a cold
-// cache, which is too much to spend on an install. The generator writes an
-// empty manifest when it is skipped, and `lib/blockOutputs.ts` treats that
-// exactly like a missing entry: blocks show an empty panel until Run, which
-// is how they behaved before prepopulation existed. `npm run build` (and
-// `npm run dev`) do the real pass.
-run("node", ["scripts/build-block-outputs.mjs", "--empty"]);
+// build-block-outputs is deliberately absent. Its manifest and figures are
+// committed (see .github/workflows/block-outputs.yml), so a fresh clone
+// already has them and an install has nothing to generate. `dev` and `build`
+// still run it, where it reuses those committed entries key-for-key and
+// executes only what actually changed.
