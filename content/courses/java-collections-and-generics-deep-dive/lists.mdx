@@ -4,7 +4,8 @@ description: ArrayList, LinkedList, the List interface, and how to choose betwee
 ---
 
 A **list** is an ordered, indexed sequence of elements. It is the
-most-used container in almost any program, the JCF interface
+most-used container in almost any program, the Collections Framework
+interface
 `List<E>` is your default when you need to remember things in the
 order they arrived.
 
@@ -75,12 +76,13 @@ public class Main {
 ## ArrayList: a list backed by an array
 
 `ArrayList` is the workhorse. Internally it holds an `Object[]` and a
-`size` counter. When the array fills up, it allocates a bigger one
+`size()` counter. When the array fills up, it allocates a bigger one
 (typically 1.5× the current capacity) and copies.
 
 <Figure
   slug="jcol-lists-list-interface-inline-cutout"
   alt="A rail of identical unmarked slots, blocks kept in the order they were set down"
+  caption="A list keeps insertion order and lets duplicates through."
 />
 
 ```mermaid
@@ -121,7 +123,7 @@ flowchart TD
 | `add(e)` (append) | `O(1)` | Wire one new node onto the tail |
 | `add(0, e)` (prepend) | `O(1)` | Wire one new node onto the head |
 | `addFirst` / `addLast` (via `Deque`) | `O(1)` | Same |
-| `remove` at a node you already hold | `O(1)` | Re-wire pointers |
+| `remove()` at a node you already hold | `O(1)` | Re-wire pointers |
 | `contains(x)`, `indexOf(x)` | `O(n)` | Linear scan |
 
 So `LinkedList` is `O(1)` at the *ends* and `O(n)` in the *middle*. It
@@ -138,6 +140,7 @@ scattered all over the heap, costing a cache miss on every step.
 <Figure
   slug="jcol-lists-arraylist-list-backed-inline-cutout"
   alt="A growing rail with a fixed strip visible underneath it, the strip replaced by a longer one when full"
+  caption="An `ArrayList` is an array underneath, replaced by a bigger one when full."
 />
 
 The cases where `LinkedList` still wins:
@@ -264,6 +267,7 @@ want for small fixed collections (especially as constants).
 <Figure
   slug="jcol-lists-inline-cutout"
   alt="A rail of slots holding blocks with one being inserted in the middle and the blocks to its right sliding along to make room"
+  caption="Inserting in the middle shifts everything after it along."
 />
 
 ```java
@@ -284,7 +288,7 @@ public class Main {
 ```
 
 <Callout type="info" title="Not runnable in the browser">
-`List.of` is one of the Java 9 factory methods and the playground on these
+`List.of()` is one of the Java 9 factory methods and the playground on these
 pages runs Java 8, so `javac` here cannot resolve it. The Java 8 spelling is
 `Collections.unmodifiableList(Arrays.asList("red", "green", "blue"))`, which
 throws the same `UnsupportedOperationException`, but the point of this section

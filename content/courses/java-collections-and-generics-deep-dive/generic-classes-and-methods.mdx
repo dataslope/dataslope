@@ -61,8 +61,8 @@ Three things to notice in the typed `Box`:
 - The type parameter `<T>` appears immediately after the class name.
   From inside the class, `T` is just a *placeholder type*, wherever
   you would write `String` or `Customer`, you can write `T`.
-- `put` and `get` use `T`. The compiler now enforces that whatever
-  `put` accepts is whatever `get` returns.
+- `put()` and `get()` use `T`. The compiler now enforces that whatever
+  `put()` accepts is whatever `get()` returns.
 - The diamond `<>` on `new Box<>()` lets the compiler infer `String`
   from the variable's declared type.
 
@@ -86,6 +86,7 @@ straying is gratuitous noise.
 <Figure
   slug="jcol-generic-classes-and-methods-naming-conventions-inline-cutout"
   alt="A rack of small blank tags hanging above a row of identical crates, each tag a plain unmarked shape"
+  caption="The type parameter is a blank tag until a caller fills it in."
 />
 
 ## Multiple type parameters
@@ -186,16 +187,18 @@ it.
 <Figure
   slug="jcol-generic-classes-and-methods-inline-cutout"
   alt="One crate design shown holding three different kinds of block, the crate itself identical in each case"
+  caption="One class definition serves every element type without being rewritten."
 />
 
 ## A multi-file generic class: a stack
 
 This is the classic generic class to write next. `Stack<E>` is a
-typed LIFO container, `push`, `pop`, `peek`, `size`.
+typed last-in-first-out container, `push()`, `pop()`, `peek()`, `size()`.
 
 <Figure
   slug="jcol-generic-classes-and-methods-first-generic-class-inline-cutout"
   alt="One crate design shown holding three different kinds of block, the crate itself unchanged"
+  caption="The container is identical; only the type it is asked to hold changes."
 />
 
 <CodeBlock

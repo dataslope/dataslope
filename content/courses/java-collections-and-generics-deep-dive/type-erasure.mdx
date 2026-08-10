@@ -227,6 +227,7 @@ it *keeps*:
 <Figure
   slug="jcol-type-erasure-inline-cutout"
   alt="A box wearing a coloured tag passing through a gate that checks the tag, and the same box continuing past the gate with the tag removed"
+  caption="The type argument is checked at compile time and gone by runtime."
 />
 
 ## When erasure bites you in real life
@@ -245,6 +246,7 @@ Three patterns where erasure most often shows up in working code:
 <Figure
   slug="jcol-type-erasure-erasure-actually-does-inline-cutout"
   alt="A tagged crate passing through a gate and arriving on the far side with its tag gone"
+  caption="Because the tag is gone, a generic type cannot ask what it was made of."
 />
 
 ## Passing a Class&lt;T&gt; token: the standard workaround

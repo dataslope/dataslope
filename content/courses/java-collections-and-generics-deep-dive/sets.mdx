@@ -33,7 +33,7 @@ classDiagram
 
 The three implementations you actually use:
 
-| Class | Backed by | Ordering | Cost of `add`/`contains` |
+| Class | Backed by | Ordering | Cost of `add()`/`contains()` |
 | --- | --- | --- | --- |
 | `HashSet<E>` | `HashMap<E,Object>` | *None* | `O(1)` average |
 | `LinkedHashSet<E>` | hash table + linked list | *Insertion order* | `O(1)` average |
@@ -80,7 +80,7 @@ Notice:
   seen this before?" in one line).
 - The iteration order is *unspecified*. Do not rely on it.
 
-`HashSet` relies entirely on `equals` and `hashCode`, review the
+`HashSet` relies entirely on `equals()` and `hashCode()`, review the
 foundations chapter if you need to put your own classes in a set.
 
 ## LinkedHashSet
@@ -185,6 +185,7 @@ people once and then never again.
 <Figure
   slug="jcol-sets-inline-cutout"
   alt="A bin with a narrow mouth that accepts a block once and rejects an identical second one, which bounces off onto the bench"
+  caption="A set takes each value once and turns the duplicate away."
 />
 
 <CodeBlock
@@ -226,14 +227,15 @@ display, the underlying sets are unordered.
 ## A pitfall: putting mutable objects in a set
 
 We covered this in the foundations chapter, and it's worth saying
-again here in context: a `HashSet` indexes by `hashCode` at insertion
-time. If you mutate a field that participates in `hashCode`, the
+again here in context: a `HashSet` indexes by `hashCode()` at insertion
+time. If you mutate a field that participates in `hashCode()`, the
 element silently becomes unreachable in the set. The same hazard
-exists with `TreeSet` if you mutate a field that affects `compareTo`.
+exists with `TreeSet` if you mutate a field that affects `compareTo()`.
 
 <Figure
   slug="jcol-sets-set-interface-inline-cutout"
   alt="A bin with a narrow mouth that accepts a block once and rejects an identical second"
+  caption="Membership is the only question a set is built to answer quickly."
 />
 
 **Use immutable value types as set elements.**
@@ -378,8 +380,8 @@ public class Distinct {
 
 - The set throws \`IllegalStateException\`
   > It does not.
-- [o] The second \`add\` returns \`false\` and the set is unchanged
-  > \`add\` is the standard "have I seen this before?" primitive.
+- [o] The second \`add()\` returns \`false\` and the set is unchanged
+  > \`add()\` is the standard "have I seen this before?" primitive.
 - The first \`User\` is overwritten
   > \`Set\` does not overwrite, it ignores the duplicate.
 - The size becomes 2
@@ -387,7 +389,7 @@ public class Distinct {
 />
 
 <MultipleChoice
-  markdown={`Why does mutating a field of an element already inside a \`HashSet\` (one that participates in \`hashCode\`) cause bugs?
+  markdown={`Why does mutating a field of an element already inside a \`HashSet\` (one that participates in \`hashCode()\`) cause bugs?
 
 - [o] The element's bucket was chosen from the old hash; after mutation the set looks for it in a different bucket and reports "not present"
   > Treat set elements (and map keys) as immutable for this exact reason.

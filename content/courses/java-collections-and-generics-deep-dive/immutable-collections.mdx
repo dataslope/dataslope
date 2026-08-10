@@ -16,8 +16,8 @@ codebase", mutability becomes a liability.
 
 This chapter is about three intertwined ideas:
 
-- **Truly immutable** collections, created with `List.of`, `Set.of`,
-  `Map.of`.
+- **Truly immutable** collections, created with `List.of()`, `Set.of()`,
+  `Map.of()`.
 - **Unmodifiable views** over a mutable collection
   (`Collections.unmodifiableList`).
 - **Defensive copies**, what you do at the boundaries of your code
@@ -74,6 +74,7 @@ just a wrapper. Mutator methods throw `UnsupportedOperationException`.
 <Figure
   slug="jcol-immutable-collections-immutable-factories-list-inline-cutout"
   alt="Three sealed trays coming off a press already clamped shut, no opening fitted to any of them"
+  caption="`List.of()` comes out already sealed, with no mutator to call."
 />
 
 ### A few rules to know
@@ -86,7 +87,7 @@ just a wrapper. Mutator methods throw `UnsupportedOperationException`.
 
 ### What about more than 10 entries?
 
-`Map.of` has overloads up to 10 entries. For arbitrary numbers, use
+`Map.of()` has overloads up to 10 entries. For arbitrary numbers, use
 `Map.ofEntries(...)` or `Map.copyOf(existingMap)`:
 
 ```java
@@ -104,7 +105,7 @@ public class Main {
 ```
 
 <Callout type="info" title="Not runnable in the browser">
-The `List.of` / `Set.of` / `Map.of` family arrived in Java 9 and `Map.ofEntries`
+The `List.of()` / `Set.of()` / `Map.of()` family arrived in Java 9 and `Map.ofEntries`
 with it; the playground on these pages runs Java 8, so `javac` here cannot
 resolve any of them. Rewriting these two examples in Java 8 would remove the
 very thing they exist to show, so they are shown rather than run. Every other
@@ -155,6 +156,7 @@ controller publishes a live read-only view), and sometimes very wrong
 <Figure
   slug="jcol-immutable-collections-inline-cutout"
   alt="A sealed tray of blocks with a lid clamped down, a hand trying to lift one block and finding it fixed"
+  caption="An unmodifiable view blocks the caller, not whoever owns the backing list."
 />
 
 When you want a snapshot that genuinely cannot change, copy first:
@@ -233,6 +235,7 @@ The further right you go, the safer your API.
 <Figure
   slug="jcol-immutable-collections-immutability-matters-inline-cutout"
   alt="A sealed tray with a clamped lid on a shared bench, two hands unable to alter it"
+  caption="A sealed collection can be shared without anyone worrying who might change it."
 />
 
 ## Multi-file example: a safe `Catalog`
@@ -376,9 +379,9 @@ public final class Roster {
   > They are not.
 - \`Collections.unmodifiableList\` is faster
   > It's a thin wrapper, but mutability semantics are the issue.
-- [o] \`List.of\` is truly immutable (no backing to mutate); \`Collections.unmodifiableList\` is an unmodifiable **view** over a list whose owner can still mutate it
-  > For a snapshot that nobody can change, use \`List.copyOf\` or \`List.of\`.
-- \`List.of\` allows nulls
+- [o] \`List.of()\` is truly immutable (no backing to mutate); \`Collections.unmodifiableList\` is an unmodifiable **view** over a list whose owner can still mutate it
+  > For a snapshot that nobody can change, use \`List.copyOf\` or \`List.of()\`.
+- \`List.of()\` allows nulls
   > It explicitly does not.`}
 />
 
@@ -399,11 +402,11 @@ public final class Roster {
   markdown={`What happens if you call \`Set.of("a", "b", "a")\`?
 
 - [o] It throws \`IllegalArgumentException\` at construction
-  > \`Set.of\` and \`Map.of\` are strict about duplicates.
+  > \`Set.of()\` and \`Map.of()\` are strict about duplicates.
 - It throws \`NullPointerException\`
   > That's for null elements/keys/values.
 - It returns \`{a, b, a}\`
   > Sets cannot contain duplicates.
 - It silently dedups to \`{a, b}\`
-  > That's how \`HashSet\` behaves, not \`Set.of\`.`}
+  > That's how \`HashSet\` behaves, not \`Set.of()\`.`}
 />

@@ -19,11 +19,13 @@ every week, plus the single most common bug each one introduces.
 <Figure
   slug="jcol-iteration-patterns-2-explicit-iterator-inline-cutout"
   alt="A drum with its cover off, a hand on the crank and a second hand lifting one block out mid-turn"
+  caption="Only the explicit iterator lets you remove an element mid-walk safely."
 />
 
 <Figure
   slug="jcol-iteration-patterns-1-enhanced-each-inline-cutout"
   alt="A drum with a single smooth handle, one block leaving per turn with nothing else to operate"
+  caption="The for-each loop offers one handle and nothing else to get wrong."
 />
 
 ## 1. Enhanced for-each
@@ -128,7 +130,7 @@ public class Main {
 `List`s support `listIterator()`, which is `Iterator` with
 superpowers: you can walk backwards (`hasPrevious`, `previous`),
 *replace* the current element (`set`), and *insert* a new element at
-the cursor (`add`):
+the cursor (`add()`):
 
 <CodeBlock
   adapter="java"
@@ -184,21 +186,22 @@ public class Main {
   ]}
 />
 
-`forEach` does not let you stop early, that's a `for` with a
+`forEach()` does not let you stop early, that's a `for` with a
 `break`'s job. And, as with the enhanced for, you cannot modify the
 collection from inside the action.
 
 ## 5. Streams: iteration as a pipeline
 
 Streams are the *declarative* form of iteration. You describe **what**
-should happen to each element (`filter`, `map`, `sorted`,
-`distinct`, `flatMap`, ...) and end with a terminal operation
-(`toList`, `count`, `reduce`, `forEach`, ...). The library decides
+should happen to each element (`filter()`, `map()`, `sorted()`,
+`distinct()`, `flatMap()`, ...) and end with a terminal operation
+(`toList()`, `count()`, `reduce()`, `forEach()`, ...). The library decides
 *how*.
 
 <Figure
   slug="jcol-iteration-patterns-inline-cutout"
   alt="The same rail of blocks walked three ways, by a crank, by a hand counting slots, and by a chute taking them in bulk"
+  caption="Crank it, count it, or hand the whole thing to a pipeline."
 />
 
 <CodeBlock
@@ -479,7 +482,7 @@ for (Integer n : list) if (n % 2 == 0) list.remove(n);
 - [o] \`ListIterator\`
   > \`ListIterator.add(e)\` inserts at the current cursor position.
 - Plain \`Iterator\`
-  > Plain \`Iterator\` only supports \`remove\`, not \`add\`.
+  > Plain \`Iterator\` only supports \`remove()\`, not \`add()\`.
 - \`forEach(Consumer)\`
   > Cannot mutate.
 - Enhanced for-each

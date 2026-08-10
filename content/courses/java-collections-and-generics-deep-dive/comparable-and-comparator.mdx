@@ -4,7 +4,7 @@ description: Natural order vs. external order, how Java models "what does it mea
 ---
 
 A collection cannot sort what it cannot compare. So before any
-`sort`, `TreeSet`, `TreeMap`, or `PriorityQueue` works, *something*
+`sort()`, `TreeSet`, `TreeMap`, or `PriorityQueue` works, *something*
 has to tell Java how two elements relate.
 
 <Figure
@@ -21,6 +21,7 @@ There are two ways to provide that ordering:
 <Figure
   slug="jcol-comparable-and-comparator-comparable-natural-order-inline-cutout"
   alt="Two blocks on a balance built into the blocks themselves, no separate tool needed"
+  caption="`Comparable` builds one natural order into the type itself."
 />
 
 ## Comparable: the natural order
@@ -126,18 +127,19 @@ which silently overflows for very large or very negative values.
 
 ## The equals-consistency advisory
 
-Whenever practical, `compareTo` should be **consistent with
-`equals`**: `a.compareTo(b) == 0` iff `a.equals(b)`.
+Whenever practical, `compareTo()` should be **consistent with
+`equals()`**: `a.compareTo(b) == 0` iff `a.equals(b)`.
 
 <Figure
   slug="jcol-comparable-and-comparator-equals-consistency-advisory-inline-cutout"
   alt="A balance reading level while a separate gauge beside it reads the two blocks as different, a small warning flag between them"
+  caption="When ordering and equality disagree, a sorted collection behaves strangely."
 />
 
 When it is *not* consistent, sorted collections quietly do
 surprising things. For example, a `TreeSet<BigDecimal>` treats
 `new BigDecimal("1.0")` and `new BigDecimal("1.00")` as **the same
-element** (because `compareTo` returns 0 even though `equals`
+element** (because `compareTo()` returns 0 even though `equals()`
 returns false). The Javadoc explicitly warns about this.
 
 If your "natural order" is by, say, a single field, but two objects
@@ -207,13 +209,14 @@ public class Main {
   ]}
 />
 
-`Comparator.comparing` and `comparingInt` are *key extractor*
+`Comparator.comparing()` and `comparingInt()` are *key extractor*
 factories: pass a function from `T` to a sortable key, get a
 `Comparator<T>` back.
 
 <Figure
   slug="jcol-comparable-and-comparator-inline-cutout"
   alt="Two blocks on a balance that decides between them, and beside it a separate hand-held rule that can be swapped to judge them another way"
+  caption="A `Comparator` is an order you pass in, and you can swap it per call."
 />
 
 ## Composing comparators
@@ -282,7 +285,7 @@ public class Main {
   ]}
 />
 
-This is far more readable than a 10-line `compareTo` method that
+This is far more readable than a 10-line `compareTo()` method that
 mixes three fields, and you can construct different orderings for
 different views without touching the entity class.
 
@@ -515,7 +518,7 @@ public final class Leaderboard {
 
 - Always, just in case
   > Many types have no single meaningful order.
-- [o] When there is **one** obvious natural order that is consistent with \`equals\` and serves most callers
+- [o] When there is **one** obvious natural order that is consistent with \`equals()\` and serves most callers
   > Otherwise prefer a \`Comparator\`, which can have many flavors.
 - Whenever the class has numeric fields
   > Numeric fields don't imply a single canonical ordering.
@@ -524,7 +527,7 @@ public final class Leaderboard {
 />
 
 <MultipleChoice
-  markdown={`Why is \`return a - b;\` a bad implementation of \`compareTo\` for \`int\` values?
+  markdown={`Why is \`return a - b;\` a bad implementation of \`compareTo()\` for \`int\` values?
 
 - It returns a value outside \`{-1, 0, 1}\`
   > Returning any negative or positive value is allowed by the contract.
