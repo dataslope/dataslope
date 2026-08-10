@@ -81,24 +81,26 @@ value, no prop plumbing required.
 <Figure
   slug="rx-context-for-shared-state-prop-drilling-problem-inline-cutout"
   alt="A tray handed down through five nested frames, each pair of hands only passing it on"
+  caption="Passing a value down five levels means four components handling what they never use."
 />
 
 ## Context holds state, not just constants
 
 Notice the value above is an **object bundling state and a setter**:
 `{ dark, toggle }`. That's the common pattern, the provider owns the
-state with `useState`, and shares both the current value and the way to
+state with `useState()`, and shares both the current value and the way to
 change it. Any descendant can read *and* update the shared state.
 
 <Figure
   slug="rx-context-for-shared-state-inline-cutout"
   alt="One supply rail running behind three nested panels, each panel drawing from it directly instead of passing a cable down the chain"
+  caption="Context is a supply rail every descendant can read from directly."
 />
 
 <Callout type="info" title="Context isn't a state manager">
 Context solves *distribution*, getting a value to where it's needed. It
 doesn't add caching, batching, or optimized updates. For most apps,
-`useState` (or `useReducer`) in a provider is plenty. Reach for a
+`useState()` (or `useReducer()`) in a provider is plenty. Reach for a
 dedicated library only when you feel real pain: heavy cross-cutting
 state, or re-render performance that context alone can't tame.
 </Callout>

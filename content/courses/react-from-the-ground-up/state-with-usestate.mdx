@@ -6,7 +6,7 @@ description: Giving components memory, the useState hook, re-rendering, updater 
 Props come *in* from a parent and never change from the inside. But
 components often need to remember something that changes over time: a
 counter, whether a menu is open, what's typed in a box. That
-remembered, changeable data is **state**, and `useState` is how a
+remembered, changeable data is **state**, and `useState()` is how a
 component gets some.
 
 <Figure
@@ -14,7 +14,7 @@ component gets some.
   alt="A small memory dial mounted on a panel, a paired setter lever beside it, the panel redrawing along a curved arrow"
 />
 
-## The `useState` hook
+## The `useState()` hook
 
 `useState(initial)` returns a pair: the **current value** and a
 **setter** function. Calling the setter updates the value *and tells
@@ -84,6 +84,7 @@ value React *watches*: change it through the setter and React redraws.
 <Figure
   slug="rx-state-with-usestate-inline-cutout"
   alt="A small dial on a panel being turned one notch, and the display block above it redrawing itself to match"
+  caption="Setting state is what tells React to redraw with the new value."
 />
 
 <Callout type="warn" title="Never assign state directly">
@@ -92,7 +93,7 @@ re-render. Always go through the setter: `setCount(count + 1)`.
 </Callout>
 
 Redrawing means the component *and everything under it*, so where you call
-`useState` decides how much work a keystroke costs:
+`useState()` decides how much work a keystroke costs:
 
 <Chart slug="rerender-subtree-cost" />
 
@@ -149,7 +150,7 @@ state, and everything that reads `color` updates at once:
   title="Build a show/hide toggle"
   instructions={`Finish the \`Toggle\` component so the button shows and hides a secret.
 
-1. Add boolean state \`visible\` starting at \`false\` (use \`useState\`).
+1. Add boolean state \`visible\` starting at \`false\` (use \`useState()\`).
 2. The button's \`onClick\` should flip \`visible\` (set it to \`!visible\`).
 3. When \`visible\` is true, render a \`<p>\` containing the text **Surprise!**. When false, render nothing (or \`null\`).`}
   files={[

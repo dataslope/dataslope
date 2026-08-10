@@ -6,7 +6,7 @@ description: useEffect for side effects, the dependency array, cleanup, and the 
 Rendering should be **pure**: given the same props and state, a
 component returns the same JSX and touches nothing else. But real apps
 need to reach *outside* the component too, fetch data, start a timer,
-subscribe to something. Those are **side effects**, and `useEffect` is
+subscribe to something. Those are **side effects**, and `useEffect()` is
 where they belong.
 
 <Figure
@@ -58,7 +58,7 @@ createRoot(document.getElementById("root")!).render(<Clock />);
 />
 
 The clock below is live and ticking right now. Its effect starts one
-`setInterval` on mount and returns a cleanup that clears it, exactly the
+`setInterval()` on mount and returns a cleanup that clears it, exactly the
 shape above:
 
 <ReactPreview
@@ -112,6 +112,7 @@ first appears. The shape is always the same: a `loading` flag, a
 <Figure
   slug="rx-effects-and-data-fetching-inline-cutout"
   alt="A panel that lights up on the left, sending a cord out to a server drum in the middle, and filling one of its own slots when the parcel returns"
+  caption="An effect reaches outside React, and fills state in when the answer arrives."
 />
 
 ```tsx
@@ -127,7 +128,7 @@ useEffect(() => {
 The `active` flag is a common guard: if the component unmounts (or the
 inputs change) before the request finishes, you skip the now-stale
 `setState`. Below, a stand-in `loadPosts()` resolves local data so it
-runs offline, but the effect is identical to a real `fetch`:
+runs offline, but the effect is identical to a real `fetch()`:
 
 <CodeBlock
   adapter="react"
@@ -210,7 +211,7 @@ array):
   title="Load the user list on mount"
   instructions={`The \`Users\` component shows "Loading…" forever because its effect is empty. Fix it:
 
-1. In the \`useEffect\`, call \`loadUsers()\` and pass its result to \`setUsers\` (\`loadUsers().then(setUsers)\`).
+1. In the \`useEffect()\`, call \`loadUsers()\` and pass its result to \`setUsers\` (\`loadUsers().then(setUsers)\`).
 2. Keep the dependency array \`[]\` so it runs once.
 
 Once loaded, the three names should render as \`<li>\`s and "Loading…" should disappear.`}
@@ -307,4 +308,5 @@ that world more directly, to a real DOM node:
 <Figure
   slug="rx-effects-and-data-fetching-useeffect-basics-inline-cutout"
   alt="A panel lighting up and a cord running from it to a drum, a tray returning along the cord"
+  caption="`useEffect()` runs after the render, not during it."
 />

@@ -4,7 +4,7 @@ description: Extracting reusable stateful logic into your own use-prefixed funct
 ---
 
 Composition reuses *markup*. **Custom hooks** reuse *logic*, the
-`useState` and `useEffect` wiring that would otherwise be copy-pasted
+`useState()` and `useEffect()` wiring that would otherwise be copy-pasted
 between components. A custom hook is just a function whose name starts
 with `use` and that calls other hooks.
 
@@ -16,7 +16,7 @@ with `use` and that calls other hooks.
 ## From duplicated logic to a hook
 
 Say two components both track a boolean that flips, a menu, a modal,
-an accordion. Instead of repeating the `useState` + toggle in each,
+an accordion. Instead of repeating the `useState()` + toggle in each,
 extract it:
 
 <CodeBlock
@@ -73,11 +73,13 @@ The rules that make this work:
 <Figure
   slug="rx-custom-hooks-hooks-can-use-inline-cutout"
   alt="A reusable module clipped into a panel with its own small cord running out to a drum"
+  caption="A custom hook is an ordinary function that calls the built-in hooks."
 />
 
 <Figure
   slug="rx-custom-hooks-inline-cutout"
   alt="A small reusable module unclipped from one panel and clipped into two others, each panel then behaving the same way"
+  caption="Lift the shared logic into a hook and every component gets the same behaviour."
 />
 
 The card below calls `useToggle` *twice*, once for dark mode, once for
@@ -109,7 +111,7 @@ function ThemeCard() {
 
 ## Hooks can use effects too
 
-A custom hook can bundle `useEffect` as well, which is how the
+A custom hook can bundle `useEffect()` as well, which is how the
 ecosystem ships things like `useLocalStorage`, `useFetch`, or
 `useWindowSize`. The component that uses them stays clean:
 
@@ -158,7 +160,7 @@ function Stopwatch() {
 </ReactPreview>
 
 Custom hooks really shine when they bundle a browser API. This
-`useLocalStorageState` behaves like `useState` but *persists*, type
+`useLocalStorageState` behaves like `useState()` but *persists*, type
 your name, reload the page, and it's still there:
 
 <ReactPreview
