@@ -16,7 +16,7 @@ C# splits "things that go wrong" into two camps:
 
 1. **Expected failures** that you can predict and check for, these
    should be handled with **regular control flow** (return values,
-   `TryParse`, `bool` flags).
+   `TryParse()`, `bool` flags).
 2. **Exceptional failures** that you can't easily prevent and
    shouldn't have to write a defensive check for at every call site,
 these use the **exception system**.
@@ -79,6 +79,7 @@ up by stack unwinding plus `finally` blocks.
 <Figure
   slug="mcs-error-handling-flow-exception-inline-cutout"
   alt="A block leaving a belt, falling past two open baskets, and being caught by the third"
+  caption="An exception travels up the stack until some handler catches it."
 />
 
 ## `try` / `catch` / `finally`
@@ -122,6 +123,7 @@ Rules:
 <Figure
   slug="mcs-error-handling-inline-cutout"
   alt="A cracked block dropping off a bench into a padded catch basket, while a small sweeping arm clears the bench behind it whether or not anything fell"
+  caption="`finally` runs whether or not anything was thrown, which is what it is for."
 />
 
 ## Throwing your own exceptions
@@ -180,6 +182,7 @@ returned status.
 <Figure
   slug="mcs-error-handling-exceptions-mechanism-inline-cutout"
   alt="A block falling off a belt into a padded basket held out beneath it"
+  caption="An exception is for the case you cannot handle here, not for ordinary flow."
 />
 
 <Chart slug="exception-vs-return-cost" />
@@ -214,7 +217,7 @@ Console.WriteLine(ParseOrZero("oops"));
 />
 
 It works, but it's wasteful and obscures intent. The whole point
-of `TryParse` is to *not* throw for the perfectly ordinary case
+of `TryParse()` is to *not* throw for the perfectly ordinary case
 "this string isn't a number":
 
 <CodeBlock
@@ -427,7 +430,7 @@ Console.WriteLine(SafeMath.SumNumbers(data));
 - Only when you want to crash the program
   > Exceptions are designed to be *caught*, not just to crash.
 - [o] When the failure is unusual or unexpected, and forcing every call site to check for it would be noisy
-  > Ordinary, expected failures should use return values like \`TryParse\`.`}
+  > Ordinary, expected failures should use return values like \`TryParse()\`.`}
 />
 
 <MultipleChoice

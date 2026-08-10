@@ -108,6 +108,7 @@ it `age`, and writes the number `30` into it.
 <Figure
   slug="mcs-variables-and-memory-inline-cutout"
   alt="A name plate on a stand joined by a short cord to a locker in a row of lockers, the plate moved to a different locker while both lockers stay put"
+  caption="The name can be pointed at a different slot; the slots stay where they are."
 />
 
 | Variable | Value |
@@ -139,6 +140,7 @@ it's set. C# gives you two tools.
 <Figure
   slug="mcs-variables-and-memory-declaring-using-variables-inline-cutout"
   alt="An empty locker with a blank plate, then the same locker holding one block"
+  caption="Declaring reserves the slot; assigning puts something in it."
 />
 
 `const`, set at compile time, never changes:
@@ -293,7 +295,7 @@ this rule matters.
   title="Swap two variables"
   instructions={`Two variables \`a\` and \`b\` are declared and given values \`10\` and \`20\`. Write code so that after your code runs, \`a\` holds the old value of \`b\` (i.e. \`20\`) and \`b\` holds the old value of \`a\` (i.e. \`10\`).
 
-You must **not** change the \`Console.WriteLine\` lines at the bottom. The expected output is exactly:
+You must **not** change the \`Console.WriteLine()\` lines at the bottom. The expected output is exactly:
 
 \`\`\`
 a = 20

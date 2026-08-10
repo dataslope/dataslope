@@ -82,6 +82,7 @@ Forget the jargon for a moment. An **object** is just:
 <Figure
   slug="mcs-rise-of-oop-simula-simulating-real-inline-cutout"
   alt="Small models of a ship, a crane and a lorry set on a bench, each moving as its real counterpart would"
+  caption="Objects began as simulations: each thing on the bench behaving as its real counterpart."
 />
 
 Here is one of the simplest possible objects in C#: a counter that
@@ -281,7 +282,7 @@ simulated in a Norwegian harbor sixty years ago.
 <MultipleChoice
   markdown={`In the \`BankAccount\` example, why is \`balance\` declared \`private\`?
 
-- [o] So no code outside \`BankAccount\` can bypass the rules in \`Deposit\` and \`Withdraw\` and corrupt the balance
+- [o] So no code outside \`BankAccount\` can bypass the rules in \`Deposit()\` and \`Withdraw()\` and corrupt the balance
   > \`private\` is what gives the class authority to enforce its own invariants.
 - C# requires every field to be private
   > It doesn't, \`public\` and other modifiers are also allowed; you choose deliberately.

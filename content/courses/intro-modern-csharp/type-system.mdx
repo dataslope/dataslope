@@ -27,6 +27,7 @@ make sense given the types?*
 <Figure
   slug="mcs-type-system-static-typing-one-inline-cutout"
   alt="A shaped gate that stops a mismatched block before the belt starts moving at all"
+  caption="Static typing checks the fit before the program is ever run."
 />
 
 <CodeBlock
@@ -99,6 +100,7 @@ two flavors of conversion.
 <Figure
   slug="mcs-type-system-inline-cutout"
   alt="A gate with shaped slots, blocks of the wrong shape stopping at the gate and blocks of the right shape passing through onto a rail"
+  caption="A conversion is how a value of one type is made to fit another."
 />
 
 ### Implicit conversions (safe, automatic)
@@ -450,7 +452,7 @@ What is in \`a\`?
 - Convert it to \`double\` first and then to \`int\`
   > Doesn't solve the "what if it's not a number?" problem.
 - [o] \`int.TryParse(userInput, out int n)\` and handle the \`false\` case
-  > \`TryParse\` returns \`false\` instead of throwing, so you can react gracefully.
+  > \`TryParse()\` returns \`false\` instead of throwing, so you can react gracefully.
 - \`(int)userInput\`
   > That's a cast, not a parse; it won't compile for strings.`}
 />

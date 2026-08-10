@@ -19,7 +19,7 @@ CPU instructions, just build the mental model.
 
 ## The big picture
 
-**Source code (`.cs` files) → Compiler (Roslyn) → Intermediate Language (CIL / IL) → Runtime (.NET CLR or WebAssembly) → JIT compiler → CPU + memory → Output to console / files / screen**
+**Source code (`.cs` files) → Compiler (Roslyn) → Intermediate Language (CIL / IL) → Runtime (the .NET common language runtime, or WebAssembly) → just-in-time compiler → CPU + memory → Output to console / files / screen**
 
 There are five real "things" in that pipeline, plus the CPU. Here is
 the whole journey at a glance, before we open up each piece:
@@ -74,6 +74,7 @@ This is what you write.
 <Figure
   slug="mcs-how-programs-execute-1-source-code-inline-cutout"
   alt="A plain written card resting alone on a bench before any machine has touched it"
+  caption="Source is where every program starts, before any machine touches it."
 />
 
 <CodeBlock
@@ -313,6 +314,7 @@ Here is the whole picture, now with the pieces named.
 <Figure
   slug="mcs-how-programs-execute-big-picture-inline-cutout"
   alt="A card feeding a translating machine, whose output drives a second machine on the same bench"
+  caption="Source, intermediate language, runtime, machine code: the whole path."
 />
 
 1. You write `.cs` source.

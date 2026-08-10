@@ -21,6 +21,7 @@ everything?
 <Figure
   slug="mcs-classes-and-objects-inline-cutout"
   alt="One paper template pinned to a board on the left, and three finished crates stamped from it standing on the right, each filled differently"
+  caption="One class, many objects, each filled with its own values."
 />
 
 The answer is the **class**, a way to bundle data and the
@@ -68,6 +69,7 @@ look like and what it should be able to do.
 <Figure
   slug="mcs-classes-and-objects-class-blueprint-inline-cutout"
   alt="A paper template pinned above a bench with three finished crates stamped from it below"
+  caption="The class is the template; every instance is stamped from it."
 />
 
 An **object** is an actual instance built from that blueprint.
@@ -127,10 +129,10 @@ Read it carefully:
 - `public class BankAccount { ... }` declares the blueprint.
 - `Owner` and `Balance` are **fields**, data that every instance
   owns its own copy of.
-- `Deposit` and `Withdraw` are **methods** that work on *this*
+- `Deposit()` and `Withdraw()` are **methods** that work on *this*
   instance's data.
 - `new BankAccount()` creates a fresh object on the heap.
-- `alice.Deposit(100)` runs `Deposit` *on `alice`*, so `Balance`
+- `alice.Deposit(100)` runs `Deposit()` *on `alice`*, so `Balance`
   inside the method refers to *alice's* `Balance`, not bob's.
 
 Two objects, two independent balances, one class.
@@ -276,6 +278,7 @@ grow into many files.
 <Figure
   slug="mcs-classes-and-objects-program-just-variables-inline-cutout"
   alt="A bench strewn with loose tins and loose tools, none of them belonging to each other"
+  caption="Without classes, data and the rules about it lie loose on the same bench."
 />
 
 <CodeBlock
@@ -403,7 +406,7 @@ Console.WriteLine($"perimeter={r.Perimeter()}");
 - [o] It runs once when the object is created, typically to initialize the object's data into a valid state
   > It runs automatically as part of \`new\`, giving the object a chance to set up its fields before any other code uses it.
 - It destroys the object when it's no longer needed
-  > That's the GC's job (and, conceptually, a finalizer).
+  > That's the garbage collector's job (and, conceptually, a finalizer).
 - It runs every time a method on the object is called
   > It runs only at creation time.`}
 />
