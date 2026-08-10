@@ -3717,7 +3717,7 @@
       "style": "risograph",
       "title": "Getting to know the penguins",
       "mascot": true,
-      "subject": "a cloud of measured marks separating into three groups, with a penguin standing at the edge of the field"
+      "subject": "a penguin resting one flipper on a board of measured marks, the marks separating into three clear groups across it"
     },
     {
       "id": "sns-themes-and-context-context-scaling-everything-medium-inline",
@@ -3741,7 +3741,7 @@
       "style": "risograph",
       "title": "Guide the reader's eye",
       "mascot": false,
-      "subject": "a field of marks where all but one group is muted, with a single note pointing at the group left bright"
+      "subject": "one group of marks inked in a strong colour with the groups around it inked flat in a single quieter colour, and an arrow touching the strong group"
     },
     {
       "id": "sql-analytics-duckdb-thumbnail",
