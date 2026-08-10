@@ -78,6 +78,7 @@ Most beginner tables use `INTEGER`, `TEXT`, `REAL`, and sometimes `NUMERIC` as d
 <Figure
   slug="lite-data-types-five-storage-classes-inline-cutout"
   alt="Five sockets of clearly different profiles on one rack"
+  caption="SQLite stores every value as one of five storage classes."
 />
 
 ## Declared types become affinities
@@ -87,6 +88,7 @@ When you write a column type, SQLite maps it to an affinity. Affinity is the col
 <Figure
   slug="lite-data-types-inline-cutout"
   alt="A rack of sockets where a block of the wrong shape is quietly reshaped to fit rather than being refused"
+  caption="Affinity means the column prefers a type rather than demanding it."
 />
 
 ```mermaid
@@ -161,6 +163,7 @@ Think of a rigid system as a locked door and SQLite affinity as a helpful sign.
 <Figure
   slug="lite-data-types-sqlite-odd-one-inline-cutout"
   alt="A rack of sockets where a mismatched block is quietly reshaped to fit rather than refused"
+  caption="Other databases refuse the wrong type; SQLite converts where it reasonably can."
 />
 
 ```mermaid
@@ -302,7 +305,7 @@ SQLite's flexibility is friendly, but it will not always stop messy data. If a c
 <MultipleChoice
   markdown={`Which list contains SQLite's five storage classes?
 
-- \`SERIAL\`, \`DATE\`, \`MONEY\`, \`TEXT\`, \`JSON\`.
+- \`SERIAL\`, \`DATE()\`, \`MONEY\`, \`TEXT\`, \`JSON\`.
   > These are not SQLite's five storage classes.
 - [o] \`NULL\`, \`INTEGER\`, \`REAL\`, \`TEXT\`, \`BLOB\`.
   > These are the five storage classes SQLite uses for values.

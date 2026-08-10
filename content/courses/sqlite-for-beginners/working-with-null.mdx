@@ -36,6 +36,7 @@ entered a blank phone. `NULL` means the phone number is not known.
 <Figure
   slug="lite-working-with-null-null-not-zero-inline-cutout"
   alt="Three sockets in a row, one holding a zero-height block, one holding empty tape, one covered by a small cap"
+  caption="Zero is a value, an empty string is a value, and `NULL` is neither."
 />
 
 <SqlCodeBlock
@@ -147,6 +148,7 @@ what `NULL` means.
 <Figure
   slug="lite-working-with-null-inline-cutout"
   alt="Two sockets side by side, one holding a zero-height block and one holding a small cover, clearly not the same thing"
+  caption="Comparing with `NULL` gives unknown, which is the third truth value in SQL."
 />
 
 Think of a `NULL` as a sealed envelope. There may be a number
@@ -255,7 +257,7 @@ Linus has `NULL` reward points, so adding 5 still gives `NULL`.
 
 ## Use COALESCE for fallback values
 
-`COALESCE` returns the first value in its list that is not `NULL`. It is
+`COALESCE()` returns the first value in its list that is not `NULL`. It is
 one of the most useful tools for displaying or calculating with missing
 values.
 
@@ -312,7 +314,7 @@ query is explicit about it.
 ## IFNULL is a shorter two-value form
 
 SQLite also provides `IFNULL(value, fallback)`. It is similar to
-`COALESCE`, but it takes exactly two arguments. `COALESCE` can take two
+`COALESCE()`, but it takes exactly two arguments. `COALESCE()` can take two
 or more.
 
 <SqlCodeBlock
@@ -336,7 +338,7 @@ FROM
   contacts;`}
 />
 
-For beginners, `COALESCE` is a great default because it is standard SQL
+For beginners, `COALESCE()` is a great default because it is standard SQL
 and can handle more than two choices.
 
 ```mermaid

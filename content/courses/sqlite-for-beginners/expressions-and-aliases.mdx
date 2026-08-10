@@ -23,6 +23,7 @@ SQLite evaluates that calculation for each row in the result.
 <Figure
   slug="lite-expressions-and-aliases-expressions-create-computed-inline-cutout"
   alt="Two upright stacks of blocks feeding a small machine that sets a third stack down beside them"
+  caption="An expression makes a new column out of the columns already in the row."
 />
 
 ```mermaid
@@ -65,6 +66,7 @@ SQLite can use familiar arithmetic operators in expressions.
 <Figure
   slug="lite-expressions-and-aliases-arithmetic-operators-inline-cutout"
   alt="A small machine with four differently shaped input slots on its face"
+  caption="The usual arithmetic works inside a query, one row at a time."
 />
 
 | Operator | Meaning | Example |
@@ -121,6 +123,7 @@ expression. `AS` lets you choose a friendly output name.
 <Figure
   slug="lite-expressions-and-aliases-inline-cutout"
   alt="A plain striped strip of blocks leaving a small machine on a bench and having a blank name plate clipped to its leading end"
+  caption="`AS` clips a readable name onto a column the query just computed."
 />
 
 <SqlCodeBlock

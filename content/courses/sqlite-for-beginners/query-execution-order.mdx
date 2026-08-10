@@ -35,6 +35,7 @@ Read the numbers: `FROM` is first, `SELECT` is near the **end**, and
 <Figure
   slug="lite-query-execution-order-inline-cutout"
   alt="Six stations along a bench with the parcel visibly starting at the fourth station, not the first"
+  caption="SQLite runs `FROM` first and `SELECT` near the end, whatever the writing order."
 />
 
 Seen as row counts, the order also explains where a query spends its time:
@@ -78,6 +79,7 @@ exists. The execution order predicts exactly which works.
 <Figure
   slug="lite-query-execution-order-this-explains-real-inline-cutout"
   alt="A parcel stopped at the fourth station of six with a small warning flag raised there"
+  caption="The execution order predicts exactly which alias errors you will hit."
 />
 
 <Callout type="info" title="A rule you can now derive, not memorize">
@@ -193,15 +195,15 @@ Execution starts with \`FROM\`; \`SELECT\` and \`ORDER BY\` come much later.`}
 <MultipleChoice
   markdown={`Why must you filter on \`SUM(amount) > 50\` using \`HAVING\` rather than \`WHERE\`?
 
-*Hint: think about when the group's \`SUM\` first exists in the execution order.*
+*Hint: think about when the group's \`SUM()\` first exists in the execution order.*
 
 - Because \`HAVING\` is just a faster version of \`WHERE\`.
   > They filter at different stages, rows vs. groups, not at different speeds.
-- Because \`SUM\` cannot be used anywhere except \`HAVING\`.
-  > \`SUM\` also appears in \`SELECT\`; the point is that group filtering happens in \`HAVING\`.
+- Because \`SUM()\` cannot be used anywhere except \`HAVING\`.
+  > \`SUM()\` also appears in \`SELECT\`; the point is that group filtering happens in \`HAVING\`.
 - Because \`WHERE\` cannot contain numbers.
   > \`WHERE\` handles numeric comparisons fine; the issue is when the sum is computed.
-- [o] Because the group's \`SUM\` is only formed at the \`GROUP BY\` step, which runs after \`WHERE\`; \`HAVING\` runs after grouping.
+- [o] Because the group's \`SUM()\` is only formed at the \`GROUP BY\` step, which runs after \`WHERE\`; \`HAVING\` runs after grouping.
   > \`WHERE\` acts before groups exist, so it cannot see a group total; \`HAVING\` filters after grouping.
 
 Group aggregates exist only after \`GROUP BY\`, so filtering on them belongs in \`HAVING\`, not \`WHERE\`.`}
