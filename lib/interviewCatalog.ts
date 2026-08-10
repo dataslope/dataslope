@@ -55,10 +55,13 @@ function pageSlugs(meta: MetaFile): string[] {
 
 /** Every interview role track, in the order declared by the root meta.json. */
 export async function getInterviewTracks(): Promise<InterviewTrack[]> {
-  const dir = path.join(process.cwd(), "content", "interview");
-
+  // Resolved inside the try below for the same reason blockOutputs.ts does:
+  // `process.cwd` is not guaranteed on every runtime, and a throw outside the
+  // fallback is a 500 rather than an empty catalog.
+  let dir: string;
   let root: MetaFile;
   try {
+    dir = path.join(process.cwd(), "content", "interview");
     root = JSON.parse(await readFile(path.join(dir, "meta.json"), "utf-8"));
   } catch {
     return [];

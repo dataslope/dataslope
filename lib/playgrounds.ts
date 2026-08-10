@@ -10,9 +10,13 @@ import { readdirSync, existsSync } from "node:fs";
 import path from "node:path";
 
 export function getPlaygroundPaths(): string[] {
-  const dir = path.join(process.cwd(), "app", "playground");
   const langs: string[] = [];
   try {
+    // Inside the try with the read it feeds: `process.cwd` is not guaranteed
+    // to exist on every runtime this can be bundled into, and computing the
+    // path outside would throw past the fallback rather than into it. See
+    // lib/blockOutputs.ts, where that cost a 500 on every dynamic render.
+    const dir = path.join(process.cwd(), "app", "playground");
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
       const hasPage =
