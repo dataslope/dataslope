@@ -65,6 +65,7 @@ Differences *between* panels are then differences in the *data*.
 <Figure
   slug="gg-small-multiples-with-facets-problem-facets-solve-inline-cutout"
   alt="One crowded board of overlapping ribbons beside four small boards each holding one"
+  caption="Facets split one crowded panel into small panels on shared axes."
 />
 
 ## Why shared scales are the secret
@@ -127,6 +128,7 @@ combinations that do not occur in the data.
 <Figure
   slug="gg-small-multiples-with-facets-inline-cutout"
   alt="A wall of nine small panels in three rows and three columns, one strip of labels running down the left side for the rows and another along the top for the columns"
+  caption="`facet_grid()` crosses two variables into a table of panels."
 />
 
 | | `facet_wrap(~ a)` | `facet_grid(a ~ b)` |
@@ -183,15 +185,15 @@ compare them quickly and fairly.`}
   markdown={`You want a grid of panels crossing *two* categorical variables, drivetrain down the rows and cylinder count across the columns. Which facet function fits best?
 
 - \`facet_wrap(~ drv + cyl)\`.
-  > \`facet_wrap\` wraps panels to fit and does not cleanly assign one variable to rows and another to columns.
+  > \`facet_wrap()\` wraps panels to fit and does not cleanly assign one variable to rows and another to columns.
 - \`facet_grid(~ drv)\`.
   > That uses only one variable and would not cross drivetrain with cylinders.
 - [o] \`facet_grid(drv ~ cyl)\`, which places drivetrain on the rows and cylinders on the columns as a true matrix.
   > \`facet_grid(rows ~ cols)\` is designed for crossing two variables.
 - You cannot facet by two variables.
-  > You can; \`facet_grid\` is built for exactly this.
+  > You can; \`facet_grid()\` is built for exactly this.
 
-\`facet_grid\` builds a rows-by-columns matrix, making it the natural
+\`facet_grid()\` builds a rows-by-columns matrix, making it the natural
 choice for two crossed variables.`}
 />
 

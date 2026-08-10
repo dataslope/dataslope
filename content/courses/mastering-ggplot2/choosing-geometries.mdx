@@ -19,10 +19,10 @@ you want to show:
 
 | Variables | Reach for |
 | --- | --- |
-| 1 continuous | `geom_histogram`, `geom_density` |
-| 1 categorical | `geom_bar` |
-| 2 continuous | `geom_point`, `geom_line` |
-| 1 categorical + 1 continuous | `geom_boxplot`, `geom_col`, `geom_violin` |
+| 1 continuous | `geom_histogram()`, `geom_density` |
+| 1 categorical | `geom_bar()` |
+| 2 continuous | `geom_point()`, `geom_line()` |
+| 1 categorical + 1 continuous | `geom_boxplot()`, `geom_col()`, `geom_violin` |
 
 This is a starting point, not a law, but it resolves most "which geom
 do I use?" questions.
@@ -30,6 +30,7 @@ do I use?" questions.
 <Figure
   slug="gg-choosing-geometries-let-variables-choose-inline-cutout"
   alt="A tray of chips with three drawing heads above it, the head matching the data's shape lowering itself"
+  caption="The kinds of variables you have narrow the choice of geom to a few."
 />
 
 ## One continuous variable: distributions
@@ -150,6 +151,7 @@ is a top-five beginner error:
 <Figure
   slug="gg-choosing-geometries-inline-cutout"
   alt="One tray of chips with three drawing heads above it, each head about to lay down a different kind of mark"
+  caption="Same data, different geom, and the mark on the page changes entirely."
 />
 
 <CodeBlock

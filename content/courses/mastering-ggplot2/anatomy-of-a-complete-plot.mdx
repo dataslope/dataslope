@@ -66,6 +66,7 @@ would do, without running them. Test yourself, then run to confirm.
 <Figure
   slug="gg-anatomy-of-a-complete-plot-plot-inline-cutout"
   alt="One finished plot standing complete on a bench, frame, marks, key and labels all in place"
+  caption="Every finished plot is the same components, all present at once."
 />
 
 <CodeBlock
@@ -137,6 +138,7 @@ the component you just added.
 <Figure
   slug="gg-anatomy-of-a-complete-plot-inline-cutout"
   alt="One finished plot exploded into its separate parts, the frame, the marks, the key and the labels floating apart"
+  caption="Take a plot apart and you find data, marks, scales, key and labels."
 />
 
 <Callout type="success" title="You can now read any ggplot">
@@ -153,7 +155,7 @@ Graphics.
   > Neither styling nor labels affect how many smoother lines appear.
 - [o] The \`color = drv\` mapping (inherited from \`ggplot()\`, so the smoother groups by drivetrain) and \`facet_wrap(~ class)\` (which splits the data into per-class panels).
   > Inherited color grouping multiplies lines by drivetrain; faceting multiplies panels by class.
-- \`scale_color_brewer\` and \`alpha = 0.7\`.
+- \`scale_color_brewer()\` and \`alpha = 0.7\`.
   > The scale only recolors, and alpha only sets transparency; neither creates groups or panels.
 - The data and the coordinate system.
   > The coordinate system is the default Cartesian and is not what splits the lines.

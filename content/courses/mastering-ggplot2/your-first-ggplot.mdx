@@ -27,6 +27,7 @@ What does `ggplot()` with *only* data and mappings produce?
 <Figure
   slug="gg-your-first-ggplot-inline-cutout"
   alt="A bare framed board with one layer of chips laid onto it, the frame otherwise empty"
+  caption="Data and mappings alone give you a frame; the geom is what draws on it."
 />
 
 <CodeBlock
@@ -181,7 +182,7 @@ separate stage from *drawing marks*.`}
 />
 
 <MultipleChoice
-  markdown={`You want a scatter plot where x and y are shared by all layers but a \`geom_point\` layer is colored by \`drv\` and a \`geom_smooth\` layer is **not**. Where should \`color = drv\` go?
+  markdown={`You want a scatter plot where x and y are shared by all layers but a \`geom_point()\` layer is colored by \`drv\` and a \`geom_smooth()\` layer is **not**. Where should \`color = drv\` go?
 
 - In the \`theme()\`.
   > Themes style non-data elements; they cannot map a variable to color.

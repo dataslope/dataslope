@@ -22,6 +22,7 @@ a y.
 <Figure
   slug="gg-every-geom-has-a-stat-inline-cutout"
   alt="A hopper of loose chips feeding a small counting machine, and the counted result leaving it as a row of bars"
+  caption="The bars have heights because a statistic counted the rows first."
 />
 
 <CodeBlock
@@ -39,7 +40,7 @@ ggplot(mpg, aes(x = class)) +
   ]}
 />
 
-The answer: `geom_bar()` has a **statistic** attached, `stat_count`,
+The answer: `geom_bar()` has a **statistic** attached, `stat_count()`,
 that runs first. It groups the rows by `class`, **counts** them, and
 produces a new computed variable, `count`. *That* becomes the bar
 height. The geom draws bars; the stat invented the y-values.
@@ -49,13 +50,14 @@ height. The geom draws bars; the stat invented the y-values.
 Every layer is really **data → stat → geom**. The stat sits between
 your raw data and the drawn marks:
 
-**Raw data (234 rows of `mpg`) → `stat_count` groups by `class` and
-counts → computed data (7 rows: `class` + `count`) → `geom_bar` draws a
+**Raw data (234 rows of `mpg`) → `stat_count()` groups by `class` and
+counts → computed data (7 rows: `class` + `count`) → `geom_bar()` draws a
 bar per row → bar chart.**
 
 <Figure
   slug="gg-every-geom-has-a-stat-layer-pipeline-inline-cutout"
   alt="A hopper of loose chips feeding a counting machine whose output feeds a drawing head"
+  caption="Data goes through a statistic before the geom ever draws anything."
 />
 
 For a scatter plot the stat is `stat_identity`, it passes the data
@@ -107,7 +109,7 @@ ggplot(sales, aes(product, revenue)) +
 
 ## Computed variables: the after-stat values
 
-A stat produces new columns you did not have. `stat_count` produces
+A stat produces new columns you did not have. `stat_count()` produces
 `count` and `prop`; `stat_bin` produces `count` and `density`. You can
 *use* these computed variables in mappings via `after_stat()`. For
 example, to make a histogram show **density** instead of raw counts on
@@ -151,17 +153,17 @@ ggplot2 generalizes so far beyond a fixed menu.
   > Heights are computed deterministically, not random.
 - The heights are always 1.
   > Heights equal the per-category counts, which generally differ.
-- [o] \`geom_bar()\`'s default statistic, \`stat_count\`, counts the rows in each x category and supplies that count as the bar height.
+- [o] \`geom_bar()\`'s default statistic, \`stat_count()\`, counts the rows in each x category and supplies that count as the bar height.
   > The stat computes a new \`count\` variable that becomes y.
 
-Every layer runs a stat before drawing. For \`geom_bar\` that stat is a
+Every layer runs a stat before drawing. For \`geom_bar()\` that stat is a
 count, which manufactures the y-values.`}
 />
 
 <MultipleChoice
   markdown={`What is the relationship between \`geom_col()\` and \`geom_bar(stat = "identity")\`?
 
-- They are unrelated; \`geom_col\` uses a special coordinate system.
+- They are unrelated; \`geom_col()\` uses a special coordinate system.
   > They are essentially the same layer.
 - \`geom_col()\` counts rows while \`geom_bar(stat = "identity")\` does not.
   > Neither counts; both use the supplied y because the stat is \`identity\`.
@@ -170,8 +172,8 @@ count, which manufactures the y-values.`}
 - \`geom_bar(stat = "identity")\` is invalid syntax.
   > It is valid and produces the same result as \`geom_col()\`.
 
-Because stat and geom are separable, overriding \`geom_bar\`'s stat to
-\`identity\` reproduces \`geom_col\` exactly.`}
+Because stat and geom are separable, overriding \`geom_bar()\`'s stat to
+\`identity\` reproduces \`geom_col()\` exactly.`}
 />
 
 <MultipleChoice
@@ -192,7 +194,7 @@ mapping/scale split and is a key reason ggplot2 generalizes so well.`}
 
 ## Quick challenge: be the stat
 
-`geom_bar()` does its counting in `stat_count`. Do that step *by hand*
+`geom_bar()` does its counting in `stat_count()`. Do that step *by hand*
 to prove there is no magic. Using the built-in `mpg`, build a named
 integer vector `class_counts` giving the number of cars in each `class`,
 exactly the heights `geom_bar(aes(x = class))` would draw.
@@ -236,7 +238,7 @@ print(class_counts)
 
 - **Every layer runs a stat before drawing**: `data → stat → geom`.
 - `geom_point()` uses `stat_identity` (no change); `geom_bar()` uses
-  `stat_count`; `geom_histogram()` uses `stat_bin`; and so on.
+  `stat_count()`; `geom_histogram()` uses `stat_bin`; and so on.
 - Stats **create new computed variables** (like `count`, `density`)
   that become aesthetics; reach them with `after_stat()`.
 - Stat and geom are **separable**, overriding the stat is how

@@ -23,8 +23,8 @@ bottom to top:
 They render from the bottom up:
 
 1. **Base**, `ggplot(data, aes)` sets up the coordinate space + scales.
-2. **Layer 1**, `geom_point` draws the raw points.
-3. **Layer 2**, `geom_smooth` draws a trend line on top.
+2. **Layer 1**, `geom_point()` draws the raw points.
+3. **Layer 2**, `geom_smooth()` draws a trend line on top.
 4. The **final composited plot**.
 
 The base `ggplot()` call sets up the shared space; each `+ geom_*()`
@@ -75,6 +75,7 @@ them in whatever order tells your story best.
 <Figure
   slug="gg-thinking-in-layers-inline-cutout"
   alt="Three transparent panels held apart in a stepped stack, one carrying points, one a line, one a band, and the finished plot below where they line up"
+  caption="Layers are independent, and the order you add them is the order they stack."
 />
 
 ## Each layer can have its own data and mappings
@@ -111,7 +112,7 @@ no equivalent of "the chart function" here, you are *composing*.
 Adding detail to a ggplot is *additive*: you append a layer instead of
 rewriting the chart. The base R scatter plot from the first chapter
 would need restructuring to highlight a subset. Here you just `+` a
-second `geom_point` with its own data. Complexity grows by *addition*,
+second `geom_point()` with its own data. Complexity grows by *addition*,
 not *rewriting*.
 </Callout>
 
@@ -161,7 +162,7 @@ replace.`}
 
 - You cannot; all layers must use the same data.
   > Layers may each carry their own data and mappings, a key source of ggplot2's flexibility.
-- Because \`geom_point\` is the only geom that allows it.
+- Because \`geom_point()\` is the only geom that allows it.
   > Per-layer data works for any geom, not just points.
 - [o] Because each layer is independent and may override the base data and mappings, letting one layer draw a different subset on top of the rest.
   > Per-layer data is exactly how highlight-a-subset plots are built.

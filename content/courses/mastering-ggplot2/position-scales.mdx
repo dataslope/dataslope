@@ -99,14 +99,16 @@ transformation** changed, and the chart went from unreadable to clear.
 <Figure
   slug="gg-position-scales-continuous-position-scales-inline-cutout"
   alt="A smooth rule with evenly spaced marks running along one edge of a board"
+  caption="A position scale decides how data values become distances on the page."
 />
 
 <Figure
   slug="gg-position-scales-inline-cutout"
   alt="The same chips shown on an evenly spaced rule and again on a rule whose marks crowd toward one end"
+  caption="A log transformation changes the spacing, not the data or the geom."
 />
 
-**Skewed data (1 ... 100000) → `scale_x_log10` transforms the spacing →
+**Skewed data (1 ... 100000) → `scale_x_log10()` transforms the spacing →
 an evenly spread axis where equal gaps mean 10x steps.**
 
 <Callout type="info" title="Transform the scale, not the data">
@@ -223,7 +225,7 @@ the data and its natural units remain intact.`}
 
 - They are identical in every way.
   > They differ crucially in how they treat out-of-range data.
-- Only \`coord_cartesian\` works on the x-axis.
+- Only \`coord_cartesian()\` works on the x-axis.
   > Both can affect x; the difference is filtering vs. zooming.
 - The scale version zooms; the coord version deletes data.
   > It is the reverse, the scale version is the one that deletes data.
