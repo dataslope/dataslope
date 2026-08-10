@@ -1,5 +1,5 @@
 ---
-title: The JVM, Conceptually
+title: The Java Virtual Machine, Conceptually
 description: A mental model of the Java Virtual Machine, what it is, what it does, and the parts worth understanding early
 ---
 
@@ -47,13 +47,14 @@ services to your program:
    longer reachable.
 3. **An execution engine**, interprets bytecode, and (over time)
    *compiles hot methods* to native CPU instructions for speed
-   (this is the JIT).
+   (this is just-in-time compilation).
 4. **A standard library and runtime**, the classes in `java.lang`,
    `java.util`, `java.io`, etc. that ship with every JVM.
 
 <Figure
   slug="java-jvm-conceptually-inline-cutout"
   alt="One program block on the left feeding a single translating machine in the middle, which drives three different machine cabinets on the right"
+  caption="One bytecode program, one virtual machine, many different machines beneath."
 />
 
 ```mermaid
@@ -116,7 +117,7 @@ For a beginner, three regions are worth knowing:
 - **Method area / metaspace.** Holds loaded classes themselves,
   their fields, methods, bytecode, constants.
 
-A snapshot of what each region holds while `main` is calling `add`:
+A snapshot of what each region holds while `main` is calling `add()`:
 
 - **Stack** (per thread), a pile of frames, newest on top:
   `main thread bottom` → `frame: main(args)` → `frame: add(a=2, b=3)`.
@@ -137,6 +138,7 @@ program crashes.
 <Figure
   slug="java-jvm-conceptually-virtual-machine-really-inline-cutout"
   alt="A machine drawn as a platform that sits on three different benches, the program on top unchanged"
+  caption="The virtual machine is the layer that makes the same program run anywhere."
 />
 
 The JVM does it for you. Its **garbage collector** periodically

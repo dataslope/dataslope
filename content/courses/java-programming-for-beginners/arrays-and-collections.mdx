@@ -85,6 +85,7 @@ operations, and is part of Java's broader **Collections Framework**.
 <Figure
   slug="java-arrays-and-collections-arraylist-growable-generic-inline-cutout"
   alt="A rail that grows a further slot as a seventh block is set on it"
+  caption="An `ArrayList` grows a slot when it needs one; an array cannot."
 />
 
 <CodeBlock
@@ -124,7 +125,7 @@ A few things to notice:
 - `<String>` is a **generic** type parameter that tells the compiler
   this list holds Strings. Trying to `todo.add(42)` would not
   compile.
-- `add`, `remove`, `get`, `size`, `contains`, `isEmpty` are the
+- `add()`, `remove()`, `get()`, `size()`, `contains()`, `isEmpty()` are the
   basic methods you'll use constantly.
 
 ## The shape of the Collections Framework
@@ -247,6 +248,7 @@ bag of values I won't add to or remove from."
 <Figure
   slug="java-arrays-and-collections-arrays-fixed-size-inline-cutout"
   alt="A rigid strip of six slots all filled, a seventh block waiting beside it"
+  caption="An array's length is fixed the moment it is created."
 />
 
 ## Arrays vs ArrayList, when to use which?
@@ -256,7 +258,7 @@ bag of values I won't add to or remove from."
 | Size | Fixed at creation | Grows on demand |
 | Can hold primitives directly | Yes (`int[]`) | No, must use wrapper (`List<Integer>`) |
 | Speed | Slightly faster, less overhead | A little slower, but rarely the bottleneck |
-| API | Tiny (`.length`, indexing) | Rich (`add`, `remove`, `contains`, `sort`, …) |
+| API | Tiny (`.length`, indexing) | Rich (`add()`, `remove()`, `contains()`, `sort()`, …) |
 | When to use | Performance-critical numeric code, or when size is truly fixed | Almost everywhere else |
 
 In modern Java code, you'll see `ArrayList` (or `List`) **far**
@@ -265,6 +267,7 @@ more often than bare arrays.
 <Figure
   slug="java-arrays-and-collections-inline-cutout"
   alt="A fixed rail with exactly six slots on the left and an expandable rail on the right that has grown a seventh slot to take one more block"
+  caption="Fixed size or growable is the choice between an array and a list."
 />
 
 <MultipleChoice

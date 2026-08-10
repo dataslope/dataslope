@@ -18,7 +18,7 @@ answer to *every* category of failure. In Java, that answer is
 
 An exception is an object that represents "something went wrong
 right here." When code encounters a problem it cannot handle
-locally, it **throws** an exception. The JVM walks back up the
+locally, it **throws** an exception. The Java virtual machine walks back up the
 call stack looking for a method that **catches** that kind of
 exception. If no one does, the program crashes with a stack trace.
 
@@ -109,6 +109,7 @@ Three branches matter:
 <Figure
   slug="java-exception-handling-exception-inline-cutout"
   alt="A block leaving a belt mid-run and falling toward a padded basket held beneath"
+  caption="An exception leaves the normal path and looks for something to catch it."
 />
 
 ## Checked vs unchecked, intuitively
@@ -120,6 +121,7 @@ input. Java forces you to acknowledge them.
 <Figure
   slug="java-exception-handling-inline-cutout"
   alt="A parcel with a stamped warning label on its side halted at a closed gate, the gate staying latched until a matching catch basket has been bolted onto the line beyond it"
+  caption="A checked exception will not pass until you have written the catch for it."
 />
 
 **Unchecked** exceptions represent "your program has a bug", null
@@ -187,7 +189,7 @@ class BadInputException extends Exception {
   ]}
 />
 
-Notice the **wrapping** technique: we catch the JDK's
+Notice the **wrapping** technique: we catch the standard library's
 `NumberFormatException` and rethrow our own, more domain-specific
 `BadInputException`. Wrapping helps you avoid leaking internal
 details up to callers.

@@ -68,11 +68,12 @@ step 1.
 <Figure
   slug="java-debugging-and-reasoning-four-step-debugging-inline-cutout"
   alt="Four footplates in a ring around a stopped machine, a figure stepping round them in order"
+  caption="Reproduce, locate, fix, verify, and round again if it is still wrong."
 />
 
 ## Reading a stack trace
 
-When an exception escapes, the JVM prints a **stack trace**,
+When an exception escapes, the Java virtual machine prints a **stack trace**,
 the chain of method calls that was active at the moment of the
 crash. Read it from **top to bottom**.
 
@@ -172,6 +173,7 @@ notice the line that *doesn't* do what you thought.
 <Figure
   slug="java-debugging-and-reasoning-right-mindset-inline-cutout"
   alt="A figure standing back from a stopped machine with hands behind their back, looking before reaching"
+  caption="Read before you reach: the fix comes after you understand the failure."
 />
 
 If you have no duck, write it out as a comment on paper. Same
@@ -241,6 +243,7 @@ see what really happens.
 <Figure
   slug="java-debugging-and-reasoning-inline-cutout"
   alt="A figure at a bench talking through a stalled machine to a small rubber duck standing on the bench beside it"
+  caption="Explaining the code aloud is what makes the wrong assumption audible."
 />
 
 <CodeBlock

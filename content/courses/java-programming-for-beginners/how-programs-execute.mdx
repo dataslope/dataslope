@@ -102,6 +102,7 @@ Let's walk a tiny program through every stage.
 <Figure
   slug="java-how-programs-execute-four-stages-inline-cutout"
   alt="A card passing four machines in a row, leaving each visibly changed"
+  caption="Source, bytecode, virtual machine, machine code: four stages in order."
 />
 
 <CodeBlock
@@ -131,7 +132,7 @@ When you click Run:
 - The runtime then invokes the equivalent of `java Main`, which
   starts a JVM, loads `Main`, and runs `main`.
 - `main` allocates two `int` locals (`x`, `y`) on its **stack
-  frame**, calls `add`, which gets its own frame, returns 5, prints.
+  frame**, calls `add()`, which gets its own frame, returns 5, prints.
 
 The output appears. Behind that one click are *all* the stages
 above.
@@ -164,6 +165,7 @@ you just don't have to type it.
 <Figure
   slug="java-how-programs-execute-inline-cutout"
   alt="A source card going into a translating machine and the result being carried out by a second machine beside it"
+  caption="The compile step still happens even when your editor hides it."
 />
 
 ```mermaid
