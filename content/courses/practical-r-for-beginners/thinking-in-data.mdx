@@ -23,6 +23,7 @@ what is 8 times 9? Seventy-two. Write that down."
 <Figure
   slug="rlang-thinking-in-data-different-way-thinking-inline-cutout"
   alt="A hand moving one chip at a time beside a whole tray lifted in one motion"
+  caption="Working one number at a time does not survive contact with real data."
 />
 
 When you do arithmetic on a computer, you think one **collection**
@@ -152,6 +153,7 @@ fancy. For our purposes it just means cultivating a few habits:
 <Figure
   slug="rlang-thinking-in-data-inline-cutout"
   alt="A hand moving one chip at a time beside a tray being lifted and treated as one thing"
+  caption="The shift is treating a whole column as one thing you act on at once."
 />
 
 These habits are not specific to R. Anyone working with data,
@@ -254,7 +256,7 @@ print(good_months)
 />
 
 That five-line analysis used all three patterns: a summary
-(`mean`), an elementwise combine (`sales > avg_sales`), and a map
+(`mean()`), an elementwise combine (`sales > avg_sales`), and a map
 (`months[above_avg]`). The code reads almost like English: *take
 the mean, mark months above it, pick those names.*
 
@@ -339,7 +341,7 @@ vectorized expression.
 <ChallengeCard
   adapter="r"
   title="Convert Fahrenheit to Celsius (vectorized)"
-  instructions={`Given the vector \`temps_f\` (already loaded), create a vector \`temps_c\` of the same length, where each element is the Celsius equivalent of the corresponding Fahrenheit value. Use a single vectorized expression, no loops, no \`sapply\`.`}
+  instructions={`Given the vector \`temps_f\` (already loaded), create a vector \`temps_c\` of the same length, where each element is the Celsius equivalent of the corresponding Fahrenheit value. Use a single vectorized expression, no loops, no \`sapply()\`.`}
   files={[
     {
       filename: "main.r",

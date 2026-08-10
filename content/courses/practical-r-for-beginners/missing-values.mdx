@@ -25,6 +25,7 @@ know one of the inputs, you don't know the answer either.
 <Figure
   slug="rlang-missing-values-na-propagates-inline-cutout"
   alt="One covered cell entering a machine and the machine's whole output coming out covered"
+  caption="One `NA` going in makes the whole result `NA`, unless you say otherwise."
 />
 
 <CodeBlock
@@ -70,8 +71,8 @@ NA`, it will silently give you all `NA`s.
 
 ## Summary functions and the `na.rm` argument
 
-Most summary functions (`mean`, `sum`, `sd`, `min`, `max`,
-`median`) accept an `na.rm` argument. Setting `na.rm = TRUE`
+Most summary functions (`mean()`, `sum()`, `sd()`, `min()`, `max()`,
+`median()`) accept an `na.rm` argument. Setting `na.rm = TRUE`
 quietly removes `NA`s before computing.
 
 <CodeBlock
@@ -155,6 +156,7 @@ that a value is missing is itself information.**
 <Figure
   slug="rlang-missing-values-inline-cutout"
   alt="A board where three cells hold a small cover instead of a chip, and a switch beside it that decides whether to skip them or stop"
+  caption="Fill it, drop it, or keep it: the fact that a value is missing is information."
 />
 
 If 30% of survey respondents skipped the "income" question, that

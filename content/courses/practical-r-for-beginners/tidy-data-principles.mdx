@@ -100,15 +100,15 @@ each with its own tool:
 
 | Move | Tool |
 | --- | --- |
-| Reshape between wide and long | `pivot_longer` / `pivot_wider` |
-| Split combined columns | `separate` / `unite` |
+| Reshape between wide and long | `pivot_longer()` / `pivot_wider()` |
+| Split combined columns | `separate()` / `unite()` |
 | Separate observational units | `join` / split into multiple tables |
 
-Once the data is tidy, it flows straight into analysis, `ggplot`,
+Once the data is tidy, it flows straight into analysis, `ggplot()`,
 `dplyr`, and models, and from there into insight.
 
-We'll meet the actual reshaping tools (`pivot_longer`,
-`pivot_wider`) on the "Reshaping Data" page later. For now, the
+We'll meet the actual reshaping tools (`pivot_longer()`,
+`pivot_wider()`) on the "Reshaping Data" page later. For now, the
 goal is just to *recognize* tidy versus messy.
 
 ## A side-by-side comparison
@@ -199,6 +199,7 @@ data is tidy.
 <Figure
   slug="rlang-tidy-data-principles-inline-cutout"
   alt="A jumbled sheet on the left being rebuilt into a clean grid on the right where every row is one record and every column one measure"
+  caption="Tidy data means one row per observation and one column per variable."
 />
 
 Want a line chart of population over time, colored by city?
@@ -277,6 +278,7 @@ Assign `tidy_df` to whichever one is tidy.
 <Figure
   slug="rlang-tidy-data-principles-tidy-example-inline-cutout"
   alt="A clean board where every row is one record and every column one measure"
+  caption="Once the data is tidy, every tool in the tidyverse fits it without argument."
 />
 
 <ChallengeCard

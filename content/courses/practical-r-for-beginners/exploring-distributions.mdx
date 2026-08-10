@@ -106,6 +106,7 @@ default usually does a reasonable job.
 <Figure
   slug="rlang-exploring-distributions-density-plots-inline-cutout"
   alt="A row of solid inked bins with a single smooth arched cap of contrasting ink laid over their tops, the bins fully inked beneath it"
+  caption="A density curve is the histogram with the bin edges smoothed away."
 />
 
 ## Boxplots
@@ -122,6 +123,7 @@ for marking outliers.
 <Figure
   slug="rlang-exploring-distributions-inline-cutout"
   alt="A tray of chips poured into a row of bins, the bins filling into a rounded mound with thin tails at both ends"
+  caption="A boxplot is the five-number summary drawn as a box and two whiskers."
 />
 
 <CodeBlock
@@ -145,7 +147,7 @@ boxplot(mtcars$mpg,
 - The **whiskers** extend out to (roughly) the most extreme
   non-outlier values.
 - **Dots** beyond the whiskers are conventional outliers (more
-  than 1.5 × IQR past Q1 or Q3).
+  than 1.5 times the interquartile range past Q1 or Q3).
 
 Boxplots really earn their keep when you want to **compare
 distributions across groups**:
@@ -223,6 +225,7 @@ at low-to-medium values with a long tail of high values.
 <Figure
   slug="rlang-exploring-distributions-histograms-inline-cutout"
   alt="Chips poured into a row of adjacent bins, the bins filling to different heights"
+  caption="A histogram pours the values into bins and lets the shape appear."
 />
 
 <CodeBlock

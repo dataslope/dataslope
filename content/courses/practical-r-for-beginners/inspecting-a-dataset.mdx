@@ -38,6 +38,7 @@ risk asking a meaningless question of a misunderstood dataset.
 <Figure
   slug="rlang-inspecting-a-dataset-five-minute-ritual-inline-cutout"
   alt="A crate opened and five quick checks made along a bench, each leaving a small card"
+  caption="The same few checks, in order, before you ask a dataset anything."
 />
 
 We'll use `airquality`, a built-in dataset of daily air quality
@@ -67,6 +68,7 @@ A million rows × 200 columns is a different problem entirely.
 <Figure
   slug="rlang-inspecting-a-dataset-step-1-shape-inline-cutout"
   alt="A crate measured by a caliper across and down before anything is taken out"
+  caption="Shape first: how many rows and columns decides what is even feasible."
 />
 
 ## Step 2: peek
@@ -325,7 +327,7 @@ report("NAs per column", colSums(is.na(penguins)))
   > Fix it with \`mean(airquality$Ozone, na.rm = TRUE)\`.
 - R refuses to compute means on built-in datasets.
   > R treats built-in datasets like any other data frame; the \`NA\` propagation behavior applies to all numeric vectors, regardless of their source.
-- The \`mean\` function is broken.
+- The \`mean()\` function is broken.
   > \`mean()\` is working correctly; returning \`NA\` when the input contains \`NA\` is its intended, documented behavior.`}
 />
 
@@ -335,4 +337,5 @@ extracting just the parts we *want*.
 <Figure
   slug="rlang-inspecting-a-dataset-inline-cutout"
   alt="A crate opened with its first rows lifted out, a gauge on its side reading how many rows and columns remain"
+  caption="Inspecting tells you what is there before you decide what to keep."
 />

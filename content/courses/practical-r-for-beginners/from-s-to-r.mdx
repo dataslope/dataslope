@@ -141,6 +141,7 @@ statistical computing came with the language for free.
 <Figure
   slug="rlang-from-s-to-r-r-was-always-inline-cutout"
   alt="Two machines side by side built to the same plan, one older and worn, one new"
+  caption="R was built to the same plan as S, so decades of S knowledge carried over."
 />
 
 Compare that to the cost of starting a brand new language: every
@@ -162,6 +163,7 @@ S in 1985 or in R today. The semantics are nearly identical.
 <Figure
   slug="rlang-from-s-to-r-r-inherited-from-inline-cutout"
   alt="An older machine's parts being lifted into a new frame, with two extra fittings added"
+  caption="R kept S's semantics and added the things S lacked, starting with being free."
 />
 
 <CodeBlock
@@ -301,7 +303,7 @@ linear model.
   adapter="r"
   title="Fit a height/weight model"
   instructions={`Using the built-in \`women\` dataset (already loaded):
-1. Assign the women's average weight (\`mean\` of \`women$weight\`) to \`avg_weight\`.
+1. Assign the women's average weight (\`mean()\` of \`women$weight\`) to \`avg_weight\`.
 2. Fit a linear model \`weight ~ height\` and assign it to \`model\`.
 3. Extract the slope coefficient (the "height" coefficient) into a numeric scalar \`slope\`.`}
   files={[

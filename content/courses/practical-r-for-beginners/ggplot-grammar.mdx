@@ -59,6 +59,7 @@ extension of this skeleton.
 <Figure
   slug="rlang-ggplot-grammar-mapping-vs-setting-inline-cutout"
   alt="One dial wired to a data column beside another dial turned by hand with no cord"
+  caption="Mapping wires a dial to a column; setting turns the dial by hand."
 />
 
 ## Geometries: change the chart, not the rest
@@ -83,13 +84,14 @@ p + geom_point() + geom_smooth(method = "lm") # both!
   ]}
 />
 
-You change one word (`geom_point` → `geom_smooth`) and you get a
+You change one word (`geom_point()` → `geom_smooth()`) and you get a
 fundamentally different chart. Same data, same mapping, different
 mark.
 
 <Figure
   slug="rlang-ggplot-grammar-inline-cutout"
   alt="A set of interchangeable parts on a rack, data, marks, scales and frame, assembled into one plot"
+  caption="Data, marks, scales and frame are separate parts you assemble into a plot."
 />
 
 A small map of the most-used geoms:
@@ -112,6 +114,7 @@ This is the single most common confusion for ggplot beginners.
 <Figure
   slug="rlang-ggplot-grammar-first-ggplot-inline-cutout"
   alt="A plain board with one layer of bright chips laid across it and two more layers stacked ready beside it"
+  caption="A ggplot is layers stacked on one set of data and one mapping."
 />
 
 - **Inside `aes()`**: you're saying "let *this column* control
