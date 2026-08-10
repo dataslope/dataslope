@@ -52,12 +52,6 @@ flowchart TD
 A few design choices, taken together, make DuckDB feel made for the
 exploratory loop you learned about.
 
-<Figure
-  slug="duck-why-duckdb-problem-duckdb-solves-inline-cutout"
-  alt="A heavy remote strongroom with a long pipe beside a compact engine sitting on the workbench"
-  caption="DuckDB runs in the same process as your analysis, with no server in between."
-/>
-
 - **Column-oriented and vectorized.** It inherits the column-store,
   batch-processing design from the last page, so summary queries over many
   rows fly.

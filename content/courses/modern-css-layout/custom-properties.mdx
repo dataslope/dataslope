@@ -32,12 +32,6 @@ A custom property starts with `--` and is read with `var()`:
 Defining them on **`:root`** (the `<html>` element) makes them
 available to the whole page, because custom properties **inherit**.
 
-<Figure
-  slug="css-custom-properties-defining-using-inline-cutout"
-  alt="One dial on a panel wired to six blocks, turning it repainting all six"
-  caption="One custom property, read in many rules, so changing it changes all of them."
-/>
-
 One `--brand` value drives every button below, background, border, and
 text color all read from it. Because variables inherit and can be
 **redefined in a scope**, the second card overrides `--brand` locally

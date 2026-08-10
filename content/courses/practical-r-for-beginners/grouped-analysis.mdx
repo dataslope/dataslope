@@ -58,12 +58,6 @@ mtcars |>
 Read it: "Group the data by `cyl`. Within each group, compute the
 mean of `mpg`. Combine."
 
-<Figure
-  slug="rlang-grouped-analysis-basic-pattern-inline-cutout"
-  alt="A board split into three stacks by a comb, each stack pressed into one summary block"
-  caption="Group, then summarise: the rows collapse to one per group."
-/>
-
 Without `group_by()`, `summarise()` returns one row total. With
 `group_by(cyl)`, it returns one row *per cyl* value. That tiny
 change is enormous.

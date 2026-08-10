@@ -362,6 +362,23 @@ async function main() {
     `build-images: ${encoded} encoded, ${adopted} adopted, ${cached} cached, ` +
       `${pruned} pruned (${Object.keys(manifest).length} image(s) total)`,
   );
+
+  // An opaque original sitting beside its own cut-out is git weight nothing
+  // renders: every surface asks for the `-cutout` slug. Two promotions run
+  // before `promote-illustrations` defaulted to cut-out-only left 1,351 of
+  // them, 151 MB. This is the tripwire for the next one — a warning rather
+  // than a failure, because art that is genuinely shown with its background
+  // is a legitimate thing to have, just a deliberate one.
+  const redundant = Object.keys(manifest).filter(
+    (slug) => !slug.endsWith("-cutout") && manifest[`${slug}-cutout`],
+  );
+  if (redundant.length > 0) {
+    console.warn(
+      `build-images: ${redundant.length} image(s) have a cut-out beside them and ` +
+        `are unlikely to be rendered; promote with --cutout-only (the default) ` +
+        `or delete them, e.g. ${redundant.slice(0, 3).join(", ")}`,
+    );
+  }
 }
 
 // Run only when executed directly (`node scripts/build-images.mjs`), so the

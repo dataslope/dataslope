@@ -21,12 +21,6 @@ Every business question hides a filter. "How are sales in the West?" means
 `WHERE region = 'West'`. "What happened in Q1?" means a date range.
 Learning to *hear* the filter inside a question is half of analytical SQL.
 
-<Figure
-  slug="duck-filtering-and-slicing-slice-question-disguise-inline-cutout"
-  alt="A long board with a section cut out by two blades and lifted away on its own"
-  caption="A filter cuts one band out of the data and lifts it away for the question you asked."
-/>
-
 ```mermaid
 flowchart TD
     All[("Whole dataset")] --> F["<code>WHERE</code><br/>(the slice)"]

@@ -20,12 +20,6 @@ gives you *three* variables in one picture: x, y, and bubble size.
 Add `color` and you have *four*. Add `facet_col` and you have
 *five*. This information density is the bubble chart's superpower.
 
-<Figure
-  slug="viz-bubble-charts-pitch-inline-cutout"
-  alt="Chips pinned across a board where each chip's size carries a third measure"
-  caption="Two positions and one size means three variables in a single mark."
-/>
-
 The most famous bubble chart is **Hans Rosling's Gapminder**
 animation, life expectancy vs GDP per capita, with population as
 bubble size and continent as color, animated over time.
@@ -99,7 +93,6 @@ This is the reason the square root is there. Encode the value on the radius
 and the eye, which reads area, sees every ratio squared:
 
 <Chart slug="bubble-area-vs-radius" />
-
 
 By default, Plotly Express scales bubble *area* in proportion to
 the value, which is correct: when a value doubles, the area

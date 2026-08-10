@@ -21,12 +21,6 @@ When both hold, an exponential search collapses to "number of distinct states ×
 
 There are two ways to "remember the answers," and they are mirror images. Top-down **memoization** keeps the recursive code you would naturally write and adds a cache: before computing, check the cache; after computing, fill it. Bottom-up **tabulation** flips the direction, start from the base cases and fill a table forward until the goal state is reached, no recursion at all. Memoization is easier to write (it *is* the recursion, plus three lines) and only computes states actually needed; tabulation avoids recursion depth limits and usually runs faster per state. Both visit each state once; pick whichever lets you think clearly.
 
-<Figure
-  slug="dsa-dynamic-programming-mindset-inline-cutout"
-  alt="A wall of small pigeonholes filled left to right, each built from the two beside it rather than from scratch"
-  caption="Each cell answers one subproblem, built from cells already filled."
-/>
-
 ```mermaid
 flowchart TD
     P[Problem] --> A[Subproblem A]

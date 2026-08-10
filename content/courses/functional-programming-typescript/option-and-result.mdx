@@ -64,12 +64,6 @@ The compiler refuses to let you read `.value` until you've checked
 `.kind === "some"`. That's the safety: every read is *preceded* by
 a check, and the compiler enforces it.
 
-<Figure
-  slug="fp-option-and-result-option-maybe-there-inline-cutout"
-  alt="Two sealed envelopes on a bench, one opened to show a block and one opened to show nothing at all"
-  caption="An option makes the possibility of nothing part of the type itself."
-/>
-
 ### Operations on Option
 
 The whole point of these types is that you don't have to keep

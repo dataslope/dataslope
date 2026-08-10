@@ -68,12 +68,6 @@ createRoot(document.getElementById("root")!).render(<App />);
 around *whatever* you hand it. That's composition: the wrapper owns the
 frame, the caller owns the content.
 
-<Figure
-  slug="rx-composition-and-children-children-prop-inline-cutout"
-  alt="An outer frame with an open slot and three different panels dropped into that same slot in turn"
-  caption="`children` is just a prop, which is why any content fits the same slot."
-/>
-
 The two panels below share one `Panel` wrapper. It owns the header bar
 and padding; each caller supplies completely different `children`, a
 paragraph in one, a bullet list in the other:

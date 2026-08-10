@@ -49,8 +49,11 @@
  *   node scripts/promote-illustrations.mjs <ids...> [options]
  *   node scripts/promote-illustrations.mjs --all --from <dir>
  *
- * Ids are prompt ids (e.g. `python-basics-loops`). A `-cutout` suffix is
- * promoted alongside its original automatically unless --no-cutout is passed.
+ * Ids are prompt ids (e.g. `python-basics-loops`). An id whose background has
+ * been removed promotes the cut-out **and nothing else**: every surface on the
+ * site asks for the `-cutout` slug, so the opaque original beside it is git
+ * weight nothing serves. Two batches were promoted before that was the
+ * default and left 1,351 files, 151 MB, that no page could reach.
  *
  * Options:
  *   --from <dir|r2>   Source of candidates (default: ./generated-illustrations)
@@ -64,10 +67,12 @@
  *                     a 1024px source is ~50 kB of detail no one can see.
  *                     Never upscales.
  *   --no-cutout       Promote only the original, not its background-removed pair
- *   --cutout-only     Promote only the cut-out. For art that is never shown
- *                     with its background (every `<Figure>` references the
- *                     `-cutout` slug), the original is 0.22 MB of git per
- *                     image that nothing serves. The pristine PNG stays in R2.
+ *   --with-original   Also promote the opaque original beside the cut-out.
+ *                     Off by default: nothing on the site renders it. Reach
+ *                     for this only for art that is genuinely shown with its
+ *                     background, and check that something asks for the bare
+ *                     slug before you do. The pristine PNG is in R2 regardless,
+ *                     so a later `--with-original` re-promote brings it back.
  *   --no-build        Skip the build-images run afterwards. **Required when two
  *                     promotions run at once.** build-images prunes every file
  *                     in public/images that is missing from the manifest it
@@ -108,7 +113,7 @@ function parseArgs(argv) {
     quality: 92,
     maxWidth: null,
     cutout: true,
-    cutoutOnly: false,
+    withOriginal: false,
     build: true,
     dryRun: false,
     help: false,
@@ -124,7 +129,10 @@ function parseArgs(argv) {
       case "--quality": opts.quality = Math.min(100, Math.max(1, Number(next()) || 92)); break;
       case "--max-width": opts.maxWidth = Math.max(1, Number(next()) || 0) || null; break;
       case "--no-cutout": opts.cutout = false; break;
-      case "--cutout-only": opts.cutoutOnly = true; break;
+      case "--with-original": opts.withOriginal = true; break;
+      // Kept so an old command line does not silently promote 0.22 MB it
+      // meant to skip; it is what this script does anyway now.
+      case "--cutout-only": break;
       case "--no-build": opts.build = false; break;
       case "--dry-run": opts.dryRun = true; break;
       case "-h":
@@ -255,18 +263,20 @@ async function main() {
     process.exit(1);
   }
 
-  // Each id promotes its original plus, unless suppressed, its cut-out pair.
+  // An id with a cut-out promotes the cut-out alone.
   //
-  // `--cutout-only` drops the original, and for art that is *only* ever shown
-  // cut out that is the honest setting: pages reference `<id>-cutout`, the
-  // review gallery renders the cut-out, and the opaque `<id>.webp` beside it
-  // is 0.22 MB of git per figure serving nothing but a "background removal
-  // ran" flag that `hasOriginal` reads off the manifest. The pristine PNG
-  // stays in R2 either way, so a re-promote can still bring it back.
+  // Every surface reads the `-cutout` slug — `<Figure>` in 2,745 places,
+  // `CourseCard` and `InterviewCatalog` build `…-thumbnail-cutout`,
+  // `AuthGlobe` appends the suffix itself, the home icons and playground hero
+  // are cut-out constants. The one place that touches the bare slug is the
+  // admin gallery's `hasOriginal`, and it only uses it to choose between two
+  // *empty* states. So the opaque `<id>.webp` renders nowhere, and promoting
+  // it costs 0.22 MB of git per figure. The pristine PNG stays in R2, so
+  // `--with-original` can bring it back if a page ever wants one.
   const stems = [];
   for (const id of ids) {
     const hasCutout = opts.cutout && (await source.has(`${id}${CUTOUT_SUFFIX}`));
-    if (!opts.cutoutOnly || !hasCutout) stems.push(id);
+    if (!hasCutout || opts.withOriginal) stems.push(id);
     if (hasCutout) stems.push(`${id}${CUTOUT_SUFFIX}`);
   }
 

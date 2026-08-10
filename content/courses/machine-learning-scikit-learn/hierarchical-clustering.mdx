@@ -82,12 +82,6 @@ recipe is almost embarrassingly simple:
    one) and fuse them.
 4. **Stop** when everything has been merged into one cluster at the top.
 
-<Figure
-  slug="ml-hierarchical-clustering-intuition-start-apart-inline-cutout"
-  alt="Chips joined into pairs, pairs joined into groups, groups joined at the top into one branching frame"
-  caption="Every merge is recorded, so you can cut the tree at any level you like."
-/>
-
 Each merge reduces the cluster count by exactly one, so after `n - 1`
 merges you have gone from `n` singletons to one giant cluster. Along the
 way you recorded *every* intermediate grouping. That recorded sequence of

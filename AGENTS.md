@@ -107,7 +107,13 @@ keepers; only the keepers reach git.
    page serving the old image.
 4. **Promote** — `scripts/promote-illustrations.mjs` encodes the chosen
    candidates to WebP straight into `public/images/`, the files the site
-   serves, and runs `build-images` to record their dimensions.
+   serves, and runs `build-images` to record their dimensions. **An id with a
+   cut-out promotes the cut-out and nothing else.** Every surface asks for the
+   `-cutout` slug, so the opaque `<id>.webp` beside it renders nowhere and is
+   ~0.22 MB of git each; two promotions made before that was the default left
+   1,351 of them, 151 MB, and `build-images` now warns if any come back. Pass
+   `--with-original` only for art genuinely shown with its background, and
+   check something asks for the bare slug first.
 5. **Wire** — `scripts/wire-course-figures.mjs` places one `<Figure>` per page
    across a course, clears retired slugs, and is idempotent. Always `--dry-run`
    first. Pass `--collection interview` for an interview-prep track, which pairs
@@ -261,8 +267,8 @@ All four API keys are already environment variables in Claude Code sessions:
 
 ### Illustrations are encoded once, into `public/images/`
 
-`promote-illustrations.mjs` writes `public/images/<id>.webp` at quality 92 and
-that file **is** what browsers download. Do not commit PNG sources, and do not
+`promote-illustrations.mjs` writes `public/images/<id>-cutout.webp` at quality
+92 and that file **is** what browsers download. Do not commit PNG sources, and do not
 put a copy under `assets/images/`: that directory is reserved for raster that
 does *not* come from this pipeline (a photo, a screenshot, a scanned diagram),
 which `build-images` re-encodes into a `.webp` plus a `.png`/`.jpg` fallback.

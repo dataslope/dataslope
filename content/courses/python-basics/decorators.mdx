@@ -74,12 +74,6 @@ greet = shout(greet)
 
 The decorator `shout` takes the original `greet`, wraps it in a new function that uppercases the result, and replaces `greet` with that wrapper.
 
-<Figure
-  slug="python-decorators-minimal-decorator-inline-cutout"
-  alt="A small machine lifted into a surrounding frame that wraps it and adds one extra stamp"
-  caption="A decorator wraps the original function and adds one step around it."
-/>
-
 ```mermaid
 flowchart TD
     A[Original function] --> B[Decorator]

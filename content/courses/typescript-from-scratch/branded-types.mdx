@@ -72,12 +72,6 @@ type Dollars = number & { readonly __brand: "Dollars" };
 
 Now `Cents` and `Dollars` are no longer compatible, even though they're both `number` at runtime. The `__brand` property is a **phantom**, it doesn't exist on the value, but TypeScript sees it in the type.
 
-<Figure
-  slug="tsx-branded-types-solution-branding-phantom-inline-cutout"
-  alt="Two identical blocks, one carrying a small stamped mark, only the marked one accepted by the slot"
-  caption="A brand exists only in the type, and it is what makes two numbers different."
-/>
-
 Here's how to create branded values:
 
 <CodeBlock

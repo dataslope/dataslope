@@ -182,12 +182,6 @@ This same pattern works whenever the question says "never," "missing," or "no re
 
 `COUNT(column)` ignores `NULL`, which is useful with left joins. It lets you count matching right-side rows while still keeping left-side rows with zero matches.
 
-<Figure
-  slug="lite-outer-joins-left-join-keeps-inline-cutout"
-  alt="Two racks pushed together where every card from the left is kept, unmatched ones paired with a blank"
-  caption="A left join keeps every left-hand row, filling the unmatched ones with `NULL`."
-/>
-
 <SqlCodeBlock
   dialect="sqlite"
   title="Count orders for every customer"
