@@ -48,6 +48,7 @@ Extensions let your custom pipelines chain like built-in LINQ.
 <Figure
   slug="cs-composing-pipelines-inline-cutout"
   alt="Four short pipe sections being clicked together into one continuous line, shapes entering at the left and leaving sorted at the right"
+  caption="Operators clip together, and the sequence flows through all of them in one pass."
 />
 
 <CodeBlock
@@ -97,6 +98,7 @@ lets you implement entirely new ones, and they remain lazy.
 <Figure
   slug="cs-composing-pipelines-building-custom-operators-inline-cutout"
   alt="A hand-built section of pipe being clipped into a run of standard sections, indistinguishable once in place"
+  caption="An operator you write with `yield` chains exactly like a built-in one."
 />
 
 ```mermaid
@@ -160,9 +162,9 @@ flowchart TD
 | Phase | Typical operators | Purpose |
 | --- | --- | --- |
 | Source | array, list, file lines, query | Where data comes from |
-| Filter | `Where`, custom predicates | Discard what doesn't matter |
-| Shape | `Select`, `SelectMany`, `OrderBy`, `GroupBy` | Reshape into the form the consumer wants |
-| Aggregate | `Sum`, `Count`, `Aggregate`, `ToList` | Collapse into a single value or fixed collection |
+| Filter | `Where()`, custom predicates | Discard what doesn't matter |
+| Shape | `Select()`, `SelectMany()`, `OrderBy()`, `GroupBy()` | Reshape into the form the consumer wants |
+| Aggregate | `Sum()`, `Count()`, `Aggregate()`, `ToList()` | Collapse into a single value or fixed collection |
 
 Custom extension methods usually slot into the filter or shape
 phases. Aggregations are usually one-line and don't need wrapping.
@@ -170,6 +172,7 @@ phases. Aggregations are usually one-line and don't need wrapping.
 <Figure
   slug="cs-composing-pipelines-every-pipeline-value-inline-cutout"
   alt="A whole chain of joined machines lifted as one piece and set into a larger machine's slot"
+  caption="A whole pipeline is itself a value you can pass on and reuse."
 />
 
 ## Composing with higher-order helpers

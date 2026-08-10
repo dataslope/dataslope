@@ -11,8 +11,8 @@ data-processing task you'll ever do:
   alt="Filtering and projection, an isometric illustration"
 />
 
-- **`Where`**, keep the elements that satisfy a predicate.
-- **`Select`**, transform each element into something else.
+- **`Where()`**, keep the elements that satisfy a predicate.
+- **`Select()`**, transform each element into something else.
 
 These two are the **filter** and **map** primitives that almost every
 functional language has. In modern C#, they're extension methods on
@@ -29,19 +29,20 @@ flowchart TD
     S[Source: 1,2,3,4,5,6] --> W[Where: keep evens] --> P[Select: square it] --> O[Result: 4,16,36]
 ```
 
-`Where` is a sieve: things either pass through or don't. `Select` is
+`Where()` is a sieve: things either pass through or don't. `Select()` is
 a converter: each thing that comes in becomes something else on the
 way out. The shape of the sequence may change (different element
 type), but the *order* is preserved.
 
-## `Where`, filtering
+## `Where()`, filtering
 
-`Where` takes a predicate (`Func<T, bool>`) and returns a sequence
+`Where()` takes a predicate (`Func<T, bool>`) and returns a sequence
 containing only the elements for which the predicate is true.
 
 <Figure
   slug="cs-filtering-and-projection-inline-cutout"
   alt="A row of mixed parcels passing a grate that drops half of them, and the survivors passing a stamp that reduces each to one small tag"
+  caption="`Where()` drops the elements that fail; `Select()` reshapes the ones that pass."
 />
 
 <CodeBlock
@@ -69,7 +70,7 @@ Console.WriteLine($"negatives count = {negatives.Count()}");
 Important: an "empty result" is an empty sequence, not `null`. You
 can iterate it; you just get zero elements.
 
-There is also a variant of `Where` that gives you the **index** of
+There is also a variant of `Where()` that gives you the **index** of
 each element:
 
 <CodeBlock
@@ -95,9 +96,9 @@ The two-argument lambda `(name, index) => ...` opts into the indexed
 overload. Useful, but use it sparingly, most code is clearer
 without indices.
 
-## `Select`, projecting
+## `Select()`, projecting
 
-`Select` takes a selector (`Func<TSource, TResult>`) and produces a
+`Select()` takes a selector (`Func<TSource, TResult>`) and produces a
 new sequence with the function applied to each element. This is
 sometimes called `map` in other languages.
 
@@ -167,7 +168,7 @@ Use **anonymous types** when the shape is consumed inside the same
 expression. Use **records** when the shape is returned across a
 method boundary or used in many places.
 
-## Composing `Where` and `Select`
+## Composing `Where()` and `Select()`
 
 The real power shows up when you compose. Every pipeline you'll ever
 write is some combination of *filter, then transform*.
@@ -199,7 +200,7 @@ record Order(string Product, decimal Price, int Quantity);
   ]}
 />
 
-Two `Where` clauses chain naturally, they don't have to be combined
+Two `Where()` clauses chain naturally, they don't have to be combined
 into one giant predicate. Each one expresses a *single intent*; the
 pipeline as a whole reads top to bottom.
 
@@ -216,7 +217,7 @@ flowchart TD
     S --> R[Output]
 ```
 
-For an order with `Product = "Gizmo"`, the first `Where` rejects it
+For an order with `Product = "Gizmo"`, the first `Where()` rejects it
 and *neither subsequent operator runs*. This is part of what makes
 LINQ pipelines efficient, the work for "dropped" elements is
 skipped entirely.
@@ -224,9 +225,10 @@ skipped entirely.
 <Figure
   slug="cs-filtering-and-projection-mental-model-inline-cutout"
   alt="A row of parcels passing a grate that drops some, then a press that reduces each survivor to one small tag"
+  caption="A rejected element never reaches the later operators at all."
 />
 
-## `Select` is not a loop
+## `Select()` is not a loop
 
 A common beginner habit is to write code like:
 
@@ -235,15 +237,15 @@ A common beginner habit is to write code like:
 people.Select(p => { Console.WriteLine(p.Name); return p; }).ToList();
 ```
 
-`Select` is for **transforming**, not for *doing*. If you want to
+`Select()` is for **transforming**, not for *doing*. If you want to
 execute a side effect for each element, use a plain `foreach`. The
 LINQ ecosystem leans into the idea that operators are pure and
 side-effect-free.
 
 <Callout type="warn" title="Don't use Select for side effects">
-Using `Select` for side effects can produce surprising results because
+Using `Select()` for side effects can produce surprising results because
 LINQ is lazy: nothing happens until the sequence is enumerated. Pair
-that with a `Select` whose lambda has side effects, and you'll get
+that with a `Select()` whose lambda has side effects, and you'll get
 weird "why did it run twice?" bugs.
 </Callout>
 
@@ -256,7 +258,7 @@ weird "why did it run twice?" bugs.
 \`AdultNamesUpper(IEnumerable<Person> people)\` which returns the
 uppercased \`Name\` of every person whose \`Age >= 18\`.
 
-Use \`Where\` and \`Select\`. Do not use \`foreach\`.
+Use \`Where()\` and \`Select()\`. Do not use \`foreach\`.
 
 \`Program.cs\` will call your method and print the result one per line.`}
   entryFilename="Program.cs"
@@ -311,13 +313,13 @@ public static class PeopleFilter
 <MultipleChoice
   markdown={`Given \`var result = nums.Where(n => n > 10).Select(n => n * 2);\`, which statement is correct?
 
-- The \`Select\` lambda runs for every element of \`nums\`, regardless of the filter.
-  > Pipelined operators only invoke later steps for elements that survive earlier steps; \`Select\` does not run for elements that \`Where\` rejected.
+- The \`Select()\` lambda runs for every element of \`nums\`, regardless of the filter.
+  > Pipelined operators only invoke later steps for elements that survive earlier steps; \`Select()\` does not run for elements that \`Where()\` rejected.
 - The pipeline runs immediately and \`result\` is a \`List<int>\`.
   > LINQ operators are deferred, nothing has been enumerated yet. \`result\` is an \`IEnumerable<int>\`, not a list.
-- \`Where\` and \`Select\` can only be used on \`List<T>\` and arrays.
+- \`Where()\` and \`Select()\` can only be used on \`List<T>\` and arrays.
   > They are extension methods on \`IEnumerable<T>\`, which is implemented by virtually every collection in .NET and by hand-written iterators.
-- [o] \`result\` is a deferred \`IEnumerable<int>\`, neither \`Where\` nor \`Select\` runs until something enumerates it (e.g. \`foreach\`, \`ToList\`, \`Sum\`).
+- [o] \`result\` is a deferred \`IEnumerable<int>\`, neither \`Where()\` nor \`Select()\` runs until something enumerates it (e.g. \`foreach\`, \`ToList()\`, \`Sum()\`).
   > LINQ is *pull-based*: the lambdas execute only when a consumer asks for elements.
 
 LINQ operators describe *what* you want; they don't perform the work

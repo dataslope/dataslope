@@ -16,7 +16,7 @@ one of these two things:
 
 That's the whole definition. It sounds abstract, but you have already
 been using HOFs every time you wrote `.Where(n => n % 2 == 0)`.
-`Where` is a higher-order function: it takes another function (the
+`Where()` is a higher-order function: it takes another function (the
 predicate) as a parameter.
 
 This page is about why that idea is so powerful, and how to wield it
@@ -255,6 +255,7 @@ named functions.
 <Figure
   slug="cs-higher-order-functions-pattern-before-name-inline-cutout"
   alt="A machine with an empty bracket on its side, three different small tools each able to clip into that bracket"
+  caption="The behaviour is a value you clip in, so one machine does many jobs."
 />
 
 <CodeBlock
@@ -292,6 +293,7 @@ Implement a small reusable HOF utility.
 <Figure
   slug="cs-higher-order-functions-inline-cutout"
   alt="A machine on the left with an open slot in its side, a small tool being slid into that slot, and the machine stamping a different shape because of it"
+  caption="A higher-order function takes a function as its argument or returns one."
 />
 
 <ChallengeCard
@@ -357,13 +359,13 @@ public static class Filters
   markdown={`Which of the following is **not** a higher-order function?
 
 - \`Enumerable.Where\`, takes a \`Func<T, bool>\` predicate.
-  > \`Where\` accepts a function as a parameter, so it *is* higher-order.
+  > \`Where()\` accepts a function as a parameter, so it *is* higher-order.
 - [o] \`static int Add(int x, int y) => x + y;\`
   > \`Add\` neither takes a function as a parameter nor returns one, it only operates on values. It is a perfectly ordinary first-order function.
 - A "Multiplier" method that returns \`Func<int, int>\` for a given factor.
   > Returning a function makes a method higher-order, so this *is* higher-order.
 - \`Enumerable.Select\`, takes a \`Func<TSource, TResult>\` selector.
-  > \`Select\` accepts a function, so it *is* higher-order.
+  > \`Select()\` accepts a function, so it *is* higher-order.
 
 A higher-order function must either accept a function as an argument
 or return a function. Plain functions over plain values (like \`Add\`)
