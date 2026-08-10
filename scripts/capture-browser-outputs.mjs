@@ -165,22 +165,34 @@ function withinCaps(cells) {
 }
 
 /** A base64 image or a Plotly figure becomes a file, as on the Python path:
- *  inline they were 98% and then 88% of the manifest's whole weight. */
+ *  inline they were 98% and then 88% of the manifest's whole weight.
+ *
+ *  Images are re-encoded to WebP at the same quality the Python path uses.
+ *  R's graphics device hands over PNG, and 136 of them straight from the
+ *  browser were 10.8 MB against 2.4 MB encoded — committed bytes, fetched by
+ *  every reader who scrolls to the block. */
+const { default: sharp } = await import("sharp");
 let assetsWritten = 0;
 let assetBytes = 0;
 let assetsDropped = 0;
-function externalise(cell, key, index) {
+async function externalise(cell, key, index) {
   if (cell.type === "image" && cell.content) {
     const base64 = cell.content.replace(/^data:[^,]+,/, "");
-    const buf = Buffer.from(base64, "base64");
-    if (buf.length > MAX_IMAGE_BYTES) {
+    const name = `${key}-${index}.webp`;
+    let webp;
+    try {
+      webp = await sharp(Buffer.from(base64, "base64")).webp({ quality: 82 }).toBuffer();
+    } catch {
       assetsDropped++;
       return null;
     }
-    const name = `${key}-${index}.png`;
-    writeFileSync(join(ASSET_DIR, name), buf);
+    if (webp.length > MAX_IMAGE_BYTES) {
+      assetsDropped++;
+      return null;
+    }
+    writeFileSync(join(ASSET_DIR, name), webp);
     assetsWritten++;
-    assetBytes += buf.length;
+    assetBytes += webp.length;
     return { type: "image", content: "", src: `${ASSET_URL_BASE}/${name}` };
   }
   if (cell.type === "plot" && cell.plot) {
@@ -222,9 +234,9 @@ for (const page of pages) {
       stats.errored++;
       continue;
     }
-    const stored = cells
-      .map((c, i) => externalise(c, cap.key, i))
-      .filter(Boolean);
+    const stored = (
+      await Promise.all(cells.map((c, i) => externalise(c, cap.key, i)))
+    ).filter(Boolean);
     if (stored.length === 0) {
       stats.empty++;
       continue;
