@@ -1,6 +1,6 @@
 ---
 title: Composition
-description: The "has-a" relationship, building rich objects out of smaller ones, and why composition is the most important relationship in OOP
+description: The "has-a" relationship, building rich objects out of smaller ones, and why composition is the most important relationship in object-oriented design
 ---
 
 A complete object model is never one giant class. It is a *graph* of
@@ -66,6 +66,7 @@ ownership. The `Engine` is part of the `Car`.
 <Figure
   slug="oopj-composition-first-example-car-inline-cutout"
   alt="A vehicle body with an engine block fitted inside it, the two joined permanently"
+  caption="Composition is strong ownership: the part belongs to the whole."
 />
 
 <CodeBlock
@@ -130,6 +131,7 @@ easy to test. The big one just orchestrates.
 <Figure
   slug="oopj-composition-inline-cutout"
   alt="One machine assembled from four smaller machines bolted into a frame, each smaller one still recognisable inside it"
+  caption="Big objects are assembled from small ones that each hold their own state."
 />
 
 ```mermaid
@@ -224,6 +226,7 @@ will see how often the right move is to reach for composition first.
 <Figure
   slug="oopj-composition-has-relationship-inline-cutout"
   alt="A machine with a smaller machine bolted inside it, still recognisable through an opening"
+  caption="Has-a is composition, and it usually beats reaching for inheritance."
 />
 
 > "**Favor object composition over class inheritance**", Gang of

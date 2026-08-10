@@ -76,7 +76,7 @@ Notice:
 - `class Dog { ... }` is the **blueprint**.
 - `new Dog("Rex", 4)` produces an **instance** (an object).
 - `rex` and `luna` are **two different objects**. They share the
-  blueprint but each has its own `name` and `age`.
+  blueprint but each has its own `name()` and `age`.
 - `rex.haveBirthday()` changes `rex.age`. It does not touch `luna.age`.
 
 That last bullet point is the entire reason classes are useful. Each
@@ -117,6 +117,7 @@ convention from now on. CheerpJ in your browser does the same.
 <Figure
   slug="oopj-objects-and-classes-inline-cutout"
   alt="A metal template hanging on a wall and three finished parts stamped from it standing on the bench below, each finished differently"
+  caption="One class, many objects, each stamped from it and filled differently."
 />
 
 <CodeBlock
@@ -304,6 +305,7 @@ This challenge introduces a second object to drive home that
 <Figure
   slug="oopj-objects-and-classes-class-description-object-inline-cutout"
   alt="A paper template pinned above a bench and one finished crate stamped from it below"
+  caption="The class is the description; the object is one thing made to it."
 />
 
 <ChallengeCard
