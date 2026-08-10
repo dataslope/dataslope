@@ -2,10 +2,14 @@
 
 /**
  * Home page Courses section, reuses the `/courses` catalog's course card
- * verbatim (app/courses/_components/CourseCard.tsx) so the two surfaces stay
- * visually identical. Shows the four most popular courses by default, with
- * topic buttons (the domain tags common enough to carry a filter) that swap
- * in up to four courses per topic, and a browse-all link into the catalog.
+ * (app/courses/_components/CourseCard.tsx) so a course reads the same on both
+ * surfaces. It takes the card's `preview` layout rather than the catalog's:
+ * four rows in two columns inside a page with other things to say want a
+ * denser row and a clamped description, where the catalog — which IS its list —
+ * gets the larger art and the full sentence. Shows the four most popular
+ * courses by default, with topic buttons (the domain tags common enough to
+ * carry a filter) that swap in up to four courses per topic, and a browse-all
+ * link into the catalog.
  */
 import { useMemo, useState } from "react";
 import { Select } from "@base-ui/react/select";

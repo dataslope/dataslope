@@ -77,10 +77,22 @@
   font-family: var(--font-sans, "Inter", system-ui, sans-serif);
   overflow: hidden;
 }
+/* Dark mode: the page behind this is #121212 too, so a black drop shadow —
+   however deep — lands black-on-black and the panel has no edge at all. It is
+   separated the way an unlit surface actually is: lifted a shade above the page
+   it floats over, with a hairline of light along its own rim (an inset
+   highlight, strongest at the top where a light source would catch it) and a
+   soft dark halo underneath to hold it off the background. All of it is
+   `box-shadow`, so no border participates in layout and the corners stay clean.
+   Kept subtle on purpose: enough to read as a separate surface, not so much
+   that it outshines the answer. */
 :global(html.dark) .panel {
-  background: #121212;
+  background: #1c1c1c;
   color: #e8eaed;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 24px 56px rgba(0, 0, 0, 0.66);
 }
 
 .chatArea {
@@ -105,7 +117,44 @@
   user-select: none;
 }
 :global(html.dark) .dragging {
-  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.65);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 32px 72px rgba(0, 0, 0, 0.75);
+}
+
+/* ── Resize grips ─────────────────────────────────────────────────────
+   Invisible until pointed at, because the panel's edge is already the
+   affordance and a permanent handle would be furniture in a small surface.
+   They sit just inside the rounded corners, and are wider than they look
+   (10px) so the target is forgiving without eating the scrollbar. */
+.gripLeft,
+.gripTop,
+.gripCorner {
+  position: absolute;
+  z-index: 3;
+  touch-action: none;
+}
+.gripLeft {
+  top: 14px;
+  bottom: 14px;
+  left: 0;
+  width: 10px;
+  cursor: ew-resize;
+}
+.gripTop {
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 10px;
+  cursor: ns-resize;
+}
+.gripCorner {
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
 }
 
 /* ── Header ───────────────────────────────────────────────────────── */
@@ -328,19 +377,34 @@
   border-radius: 12px 12px 4px 12px;
   background: var(--ds-blue-600, #0878dd);
   color: #fff;
-  font-size: 13.5px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.6;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+/* A question accepted while an answer was still streaming. Same bubble,
+   held back: it reads as "received, not started" without needing a label. */
+.msgQueued {
+  composes: msgUser;
+  background: var(--ds-blue-500, #3d9bff);
+  opacity: 0.62;
+}
+:global(html.dark) .msgQueued {
+  background: var(--ds-blue-700, #0064bd);
+  opacity: 0.72;
+}
+
 .answerBlock {
   align-self: flex-start;
   max-width: 100%;
   display: flex;
   flex-direction: column;
+  font-size: 15px;
+  line-height: 1.6;
 }
 .answer {
-  font-size: 13.5px;
+  font-size: 15px;
   line-height: 1.6;
   color: #374151;
   word-wrap: break-word;
@@ -361,28 +425,65 @@
   background: #f4f6f8;
   color: #24292f;
   overflow-x: auto;
-  font-size: 12.5px;
+  font-size: 13.5px;
   line-height: 1.6;
 }
 :global(html.dark) .answer :where(pre) {
   background: #101215;
   color: #c9d1d9;
 }
+/* JetBrains Mono, the same face the lesson code blocks and the editors use, so
+   a snippet in an answer and the snippet it is about are set in one typeface.
+   `--font-mono` is declared on <html> by the root layout; the stack after it
+   covers the panel being open before the webfont resolves. */
 .answer :where(code) {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.92em;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+}
+/* A block's code inherits the <pre>'s size, so the 13.5px above is the size
+   that actually renders. The 0.92em step is for INLINE code only, where it
+   keeps a `like_this` from towering over the prose around it. */
+.answer :where(pre) > :where(code) {
+  font-size: inherit;
 }
 .answer :where(:not(pre) > code) {
   padding: 1px 5px;
   border-radius: 5px;
   background: #eef0f3;
+  font-size: 0.92em;
 }
 :global(html.dark) .answer :where(:not(pre) > code) {
   background: rgba(255, 255, 255, 0.1);
 }
+/* Markers are set explicitly, not left to the user agent. The panel floats over
+   pages that load Tailwind (every lesson does, via Fumadocs), and its preflight
+   resets `ul, ol` to `list-style: none` — which silently turned every numbered
+   list in an answer into unnumbered indented text, exactly where a model writes
+   "1. … 2. … 3. …" and the order is the content. */
+/* A display formula is one unbreakable line, and this panel is 340px wide at
+   its narrowest, so a long one has to scroll rather than push the answer
+   sideways. `padding-bottom` keeps the scrollbar off the glyphs' descenders. */
+.answer :global(.katex-display) {
+  margin: 10px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 2px;
+}
+
 .answer :where(ul, ol) {
   margin: 0 0 8px;
-  padding-left: 20px;
+  padding-left: 22px;
+}
+.answer :where(ul) {
+  list-style: disc;
+}
+.answer :where(ol) {
+  list-style: decimal;
+}
+.answer :where(li) {
+  margin: 3px 0;
+}
+.answer :where(li) :where(p) {
+  margin: 0;
 }
 .answer :where(a) {
   color: var(--ds-blue-700, #0064bd);
@@ -448,6 +549,34 @@
   color: #7c828a;
 }
 
+/* The "AI can make mistakes" line, under the newest answer's action row.
+   Small and quiet: it has to be present and legible, not competing with the
+   answer it qualifies. It sits a clear step below the icon row rather than
+   tucked under it — the buttons are a control and this is a caption, and at
+   11px they need the gap to stop reading as one crowded block. */
+.answerNote {
+  margin: 8px 0 0 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #9ca3af;
+}
+:global(html.dark) .answerNote {
+  color: #7c828a;
+}
+/* Underlined rather than coloured: at 11px in a grey line, a blue link would
+   be the loudest thing under the answer. */
+.answerNoteLink {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.answerNoteLink:hover {
+  color: var(--ds-blue-700, #0064bd);
+}
+:global(html.dark) .answerNoteLink:hover {
+  color: var(--ds-blue-300, #8abfff);
+}
+
 /* Message action row (copy / thumbs). */
 .answerActions {
   display: flex;
@@ -468,18 +597,46 @@
   cursor: pointer;
   transition: background 0.12s ease, color 0.12s ease;
 }
-.actionBtn:hover,
-.actionBtnOn {
+.actionBtn:hover {
   background: #f3f4f6;
   color: #374151;
 }
 :global(html.dark) .actionBtn {
   color: #8b9096;
 }
-:global(html.dark) .actionBtn:hover,
-:global(html.dark) .actionBtnOn {
+:global(html.dark) .actionBtn:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #c8cdd3;
+}
+
+/* Selected ≠ hover.
+   These used to be the same declaration, so pressing a thumb looked exactly
+   like pointing at one: the icon changed while the cursor sat on it and went
+   back to grey the moment the pointer left, and nothing said the rating had
+   registered. A rating is now a colour, not a shade — blue for the thumbs up,
+   red for the thumbs down, over a tint of the same hue — and the caller fills
+   the glyph, so it reads as pressed from across the panel and, crucially,
+   still reads as pressed with the mouse somewhere else entirely. Hover on an
+   already-selected button deliberately changes nothing. */
+.actionBtnOn,
+.actionBtnOn:hover {
+  background: rgba(8, 120, 221, 0.12);
+  color: var(--ds-blue-700, #0064bd);
+}
+.actionBtnOnNegative,
+.actionBtnOnNegative:hover {
+  background: rgba(212, 47, 47, 0.12);
+  color: var(--ds-red-600, #c62828);
+}
+:global(html.dark) .actionBtnOn,
+:global(html.dark) .actionBtnOn:hover {
+  background: rgba(91, 167, 255, 0.18);
+  color: var(--ds-blue-300, #8abfff);
+}
+:global(html.dark) .actionBtnOnNegative,
+:global(html.dark) .actionBtnOnNegative:hover {
+  background: rgba(255, 128, 127, 0.16);
+  color: var(--ds-red-400, #ff807f);
 }
 
 /* "Keep going" follow-up suggestions. */
@@ -495,7 +652,7 @@
   gap: 5px;
   margin-bottom: 3px;
   padding: 0 2px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--ds-blue-700, #0064bd);
 }
@@ -512,8 +669,8 @@
   background: #f0f7ff;
   color: var(--ds-blue-700, #0064bd);
   font-family: inherit;
-  font-size: 12.5px;
-  line-height: 1.4;
+  font-size: 13px;
+  line-height: 1.6;
   text-align: left;
   cursor: pointer;
   transition: background 0.12s ease;
@@ -556,15 +713,52 @@
 
 .error {
   align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 8px 12px;
   border-radius: 10px;
   background: #fef2f2;
   color: #b42318;
   font-size: 12.5px;
+  line-height: 1.5;
 }
 :global(html.dark) .error {
   background: rgba(255, 79, 89, 0.12);
   color: var(--ds-red-400, #ff807f);
+}
+
+/* A stream that stopped early is a different event from one that never
+   started: an answer IS on screen and most of it is usually usable, so this
+   states what happened without painting the panel red over it. */
+.errorSoft {
+  background: rgba(127, 127, 127, 0.1);
+  color: #6b7280;
+}
+:global(html.dark) .errorSoft {
+  background: rgba(255, 255, 255, 0.06);
+  color: #9aa1a9;
+}
+
+.errorRetry {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 3px 9px;
+  border: none;
+  border-radius: 7px;
+  background: rgba(127, 127, 127, 0.14);
+  color: inherit;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.errorRetry:hover {
+  background: rgba(127, 127, 127, 0.22);
 }
 
 /* "Review changes in the editor" actions (playground surface only). */
@@ -713,14 +907,37 @@
   cursor: default;
 }
 
+/* Stop sits beside Send rather than replacing it (a question can be queued
+   while one is still answering), so it takes the quiet treatment — Send stays
+   the one blue thing in the row. */
+.stopBtn {
+  composes: sendBtn;
+  background: rgba(127, 127, 127, 0.16);
+  color: #4b5563;
+}
+.stopBtn:hover:not(:disabled) {
+  background: rgba(127, 127, 127, 0.26);
+}
+:global(html.dark) .stopBtn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #d3d7dc;
+}
+:global(html.dark) .stopBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Right-aligned rather than space-between: the note to the left of the quota
+   is now conditional, and space-between would leave the quota stranded in the
+   middle of the row whenever it is absent. */
 .footerLine {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 8px;
   margin: 10px 4px 0;
 }
 .disclaimer {
+  margin-right: auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -8,6 +8,7 @@ import {
   clip,
   estimateTokens,
   fetchLessonMarkdown,
+  pageIdentityLine,
 } from "../lib/ai/context";
 import type { AskAiClientContext } from "../lib/ai/types";
 
@@ -271,5 +272,105 @@ describe("fetchLessonMarkdown", () => {
     expect(
       await fetchLessonMarkdown(["courses", "missing"], "https://x.com"),
     ).toBeNull();
+  });
+});
+
+// The always-on minimum. Before this existed, a question asked with every
+// context source switched off reached the model with nothing identifying the
+// page: `slug` is used server-side only to resolve the Markdown fetch and never
+// reaches the prompt, so an answer on a scikit-learn lesson could not know it
+// was one. These pin what that line says and, just as importantly, when it says
+// nothing at all.
+describe("pageIdentityLine", () => {
+  it("names the page and its course", () => {
+    expect(
+      pageIdentityLine({
+        surface: "learn",
+        slug: ["courses", "python-basics", "variables"],
+        page: { title: "Variables" },
+      }),
+    ).toBe(
+      'The user is reading the page "Variables" in Python Basics (/courses/python-basics/variables).',
+    );
+  });
+
+  it("resolves the course title from the catalog, not from the client", () => {
+    // The client sends the heading; the course name is ours to state, so a
+    // tampered payload cannot rename a course in the prompt.
+    const line = pageIdentityLine({
+      surface: "learn",
+      slug: ["courses", "python-basics", "loops"],
+      page: { title: "Loops" },
+    });
+    expect(line).toContain("Python Basics");
+  });
+
+  it("humanizes a collection with no catalog behind it", () => {
+    expect(
+      pageIdentityLine({
+        surface: "learn",
+        slug: ["interview-prep", "data-analyst", "sql-joins"],
+        page: { title: "SQL Joins" },
+      }),
+    ).toBe(
+      'The user is reading the page "SQL Joins" in Data Analyst interview track (/interview-prep/data-analyst/sql-joins).',
+    );
+  });
+
+  it("still names the course when the page sent no heading", () => {
+    expect(
+      pageIdentityLine({
+        surface: "learn",
+        slug: ["courses", "python-basics", "variables"],
+      }),
+    ).toBe(
+      "The user is reading Python Basics (/courses/python-basics/variables).",
+    );
+  });
+
+  it("says nothing without a slug", () => {
+    expect(pageIdentityLine({ surface: "playground", adapterId: "duckdb" })).toBeNull();
+  });
+
+  it("clips an overlong heading", () => {
+    const line = pageIdentityLine({
+      surface: "learn",
+      slug: ["courses", "python-basics", "variables"],
+      page: { title: "x".repeat(500) },
+    });
+    expect(line).not.toBeNull();
+    expect(line!.length).toBeLessThan(260);
+  });
+});
+
+describe("buildMessages page identity", () => {
+  it("puts the page line right after the system prompt", () => {
+    const { messages } = buildMessages({
+      surface: "learn",
+      question: "What is a residual?",
+      lessonMarkdown: null,
+      context: {
+        surface: "learn",
+        slug: ["courses", "machine-learning-scikit-learn", "residuals"],
+        page: { title: "Residuals" },
+      },
+      history: [],
+      contextBudget: 8000,
+    });
+    expect(messages[0].role).toBe("system");
+    expect(messages[1].content).toContain('the page "Residuals"');
+    expect(messages[1].content).toContain("Machine Learning with scikit-learn");
+  });
+
+  it("omits it entirely when there is no page to name", () => {
+    const { messages } = buildMessages({
+      surface: "playground",
+      question: "fix it",
+      lessonMarkdown: null,
+      context: { surface: "playground", adapterId: "duckdb" },
+      history: [],
+      contextBudget: 8000,
+    });
+    expect(messages.some((m) => m.content.startsWith("Page context"))).toBe(false);
   });
 });

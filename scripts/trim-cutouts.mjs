@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Trim the transparent top and bottom off promoted cut-out illustrations.
+ * Trim the transparent margins off promoted cut-out illustrations.
  *
  * Background removal leaves the subject floating in the frame it was generated
  * in, so a 1536x1024 cut-out is typically 1536x1024 of *layout* carrying rather
@@ -10,10 +10,19 @@
  * above and below the artwork is a median 11% of the image's height, and 41 of
  * them are over 30%.
  *
- * **Vertical only, on purpose.** The left/right margins are left exactly as
- * they are: horizontal blank costs nothing in a page that scrolls, and cropping
- * it would make each figure a different width, so a run of lessons would stop
- * sharing an edge. Only the wasted height is taken.
+ * **Which margins go depends on where the image is painted.** `--axes` picks,
+ * and its default, `auto`, asks `trimAxesFor` in `scripts/lib/cutouts.mjs`:
+ *
+ *   - **In-lesson figures: vertical only.** The left/right margins are left
+ *     exactly as they are. Horizontal blank costs nothing in a page that
+ *     scrolls, and cropping it would make each figure a different width, so a
+ *     run of lessons would stop sharing an edge.
+ *   - **Thumbnails: both axes.** A course or interview-prep thumbnail is
+ *     painted ~100px wide inside a fixed box, and there the same reasoning runs
+ *     the other way: a blank column is drawing surface the subject does not
+ *     get, at exactly the size where it can least afford to be small. Nothing
+ *     shares an edge with it — each one sits alone in its own box — so the
+ *     ragged widths that rule out cropping a figure cost nothing here.
  *
  * Where the pixels come from, and why it matters:
  *
@@ -37,14 +46,14 @@
  * files it writes are `public/images/<id>-cutout.webp`, which are committed and
  * therefore revertible with git.
  *
- * How a row is judged blank: a pixel counts as drawn once its alpha clears
- * `--alpha` (16 by default, which ignores the faint halo a background remover
- * leaves), and a row counts as drawn once `--row-frac` of its pixels are (0.2%,
- * so a stray speck of leftover background cannot defeat the trim). `--pad` of
- * the original height is then kept above and below the content so nothing sits
- * flush against the edge. On all 916 cut-outs the speck-tolerant rule and a
- * strict any-drawn-pixel rule pick the same bounds, so the tolerance costs
- * nothing today and guards a future messier cut-out.
+ * How a row or column is judged blank: a pixel counts as drawn once its alpha
+ * clears `--alpha` (16 by default, which ignores the faint halo a background
+ * remover leaves), and a line counts as drawn once `--frac` of its pixels are
+ * (0.2%, so a stray speck of leftover background cannot defeat the trim).
+ * `--pad` of the original width/height is then kept around the content so
+ * nothing sits flush against the edge. On all 916 cut-outs the speck-tolerant
+ * rule and a strict any-drawn-pixel rule pick the same bounds, so the tolerance
+ * costs nothing today and guards a future messier cut-out.
  *
  * Idempotent: a second run finds each image already tight and skips it under
  * `--min-gain`.
@@ -64,11 +73,12 @@
  * Options:
  *   --all            Trim every promoted cut-out
  *   --prefix <s>     Trim every promoted cut-out whose id starts with this
+ *   --axes <mode>    auto | vertical | both (default: auto — per id, see above)
  *   --from r2|local  Pixel source (default: r2, falling back to local per image)
  *   --concurrency <n> Images in flight at once (default: 6)
  *   --alpha <n>      Alpha above which a pixel counts as drawn (default: 16)
- *   --row-frac <n>   Fraction of a row that must be drawn (default: 0.002)
- *   --pad <n>        Padding kept, as a fraction of height (default: 0.02)
+ *   --frac <n>       Fraction of a row/column that must be drawn (default: 0.002)
+ *   --pad <n>        Padding kept, as a fraction of the frame (default: 0.02)
  *   --quality <n>    WebP quality, matching promotion (default: 92)
  *   --min-gain <n>   Skip when the trim removes less than this (default: 0.02)
  *   --no-build       Skip the build-images run afterwards
@@ -85,10 +95,11 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import sharp from "sharp";
 import { toWebpSource } from "./promote-illustrations.mjs";
 import {
+  contentBounds,
   contentSignature,
   createCandidateIndex,
+  trimAxesFor,
   trimPlan,
-  verticalBounds,
 } from "./lib/cutouts.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -101,10 +112,11 @@ function parseArgs(argv) {
     ids: [],
     all: false,
     prefix: null,
+    axes: "auto",
     from: "r2",
     concurrency: 6,
     alpha: 16,
-    rowFrac: 0.002,
+    frac: 0.002,
     pad: 0.02,
     quality: 92,
     minGain: 0.02,
@@ -118,10 +130,11 @@ function parseArgs(argv) {
     switch (a) {
       case "--all": opts.all = true; break;
       case "--prefix": opts.prefix = next(); break;
+      case "--axes": opts.axes = next(); break;
       case "--from": opts.from = next(); break;
       case "--concurrency": opts.concurrency = Math.max(1, Number(next()) || 6); break;
       case "--alpha": opts.alpha = Math.max(0, Number(next()) || 0); break;
-      case "--row-frac": opts.rowFrac = Math.max(0, Number(next()) || 0); break;
+      case "--frac": opts.frac = Math.max(0, Number(next()) || 0); break;
       case "--pad": opts.pad = Math.max(0, Number(next()) || 0); break;
       case "--quality": opts.quality = Math.min(100, Math.max(1, Number(next()) || 92)); break;
       case "--min-gain": opts.minGain = Math.max(0, Number(next()) || 0); break;
@@ -161,6 +174,11 @@ async function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (opts.help || (!opts.ids.length && !opts.prefix && !opts.all)) return printHelp();
 
+  if (!["auto", "vertical", "both"].includes(opts.axes)) {
+    console.error(`--axes must be auto, vertical or both (got ${opts.axes}).`);
+    process.exit(1);
+  }
+
   const slugs = resolveSlugs(opts);
   if (!slugs.length) {
     console.error("No promoted cut-outs matched.");
@@ -170,6 +188,7 @@ async function main() {
   const r2 = opts.from === "r2" ? createCandidateIndex() : null;
   console.log(
     `Trimming ${slugs.length} cut-out(s)` +
+      (opts.axes === "auto" ? "" : `, ${opts.axes === "both" ? "on both axes" : "vertically only"}`) +
       (r2 ? `, preferring pristine PNGs from ${r2.describe}` : ", from the served WebP") +
       (opts.dryRun ? " (dry run)" : "") +
       "\n",
@@ -180,8 +199,8 @@ async function main() {
   let failed = 0;
   let bytesBefore = 0;
   let bytesAfter = 0;
-  let heightBefore = 0;
-  let heightAfter = 0;
+  let areaBefore = 0;
+  let areaAfter = 0;
 
   async function trimOne(slug) {
     const file = join(OUT_DIR, `${slug}.webp`);
@@ -204,8 +223,9 @@ async function main() {
               : `best R2 candidate only ${found.bestDb.toFixed(0)}dB`
           }`;
 
-      const bounds = await verticalBounds(source, { alpha: opts.alpha, rowFrac: opts.rowFrac });
-      const plan = trimPlan(bounds, { pad: opts.pad, minGain: opts.minGain });
+      const axes = opts.axes === "auto" ? trimAxesFor(id) : opts.axes;
+      const bounds = await contentBounds(source, { alpha: opts.alpha, frac: opts.frac });
+      const plan = trimPlan(bounds, { pad: opts.pad, minGain: opts.minGain, axes });
       if (!plan) {
         console.log(`  • skip ${slug} (${bounds.empty ? "fully transparent" : "already tight"})`);
         skipped++;
@@ -218,7 +238,7 @@ async function main() {
       // would re-encode a WebP source at sharp's default quality 80, which is
       // a real loss for the local fallback path.
       const cropped = await sharp(source)
-        .extract({ left: 0, top: plan.top, width: bounds.width, height: plan.height })
+        .extract({ left: plan.left, top: plan.top, width: plan.width, height: plan.height })
         .png({ compressionLevel: 0 })
         .toBuffer();
 
@@ -229,8 +249,14 @@ async function main() {
       // back at full resolution and five times the bytes for detail no one can
       // see. The served file's own width is the record of that decision, so it
       // is what the new encode is held to.
+      //
+      // Held against the *crop's* width, not the source frame's: a thumbnail's
+      // served file is legitimately narrower than the PNG it came from, because
+      // the crop took its side margins, and measuring against the frame would
+      // read that as a downscale and pin every re-trim to the width of the
+      // previous one.
       const servedMeta = await sharp(served).metadata();
-      const keepWidth = servedMeta.width < bounds.width ? servedMeta.width : null;
+      const keepWidth = servedMeta.width < plan.width ? servedMeta.width : null;
       const out = await toWebpSource(cropped, opts.quality, keepWidth);
       const outMeta = await sharp(out).metadata();
 
@@ -238,11 +264,12 @@ async function main() {
       trimmed++;
       bytesBefore += served.length;
       bytesAfter += out.length;
-      heightBefore += servedMeta.height;
-      heightAfter += outMeta.height;
+      areaBefore += servedMeta.width * servedMeta.height;
+      areaAfter += outMeta.width * outMeta.height;
       console.log(
         `  ✓ ${slug.padEnd(44)} ${servedMeta.width}x${servedMeta.height} → ` +
-          `${outMeta.width}x${outMeta.height}  −${(plan.removed * 100).toFixed(0)}% height  ` +
+          `${outMeta.width}x${outMeta.height}  −${(plan.removed * 100).toFixed(0)}% ` +
+          `${axes === "both" ? "box" : "height"}  ` +
           `${(served.length / 1024).toFixed(0)}kB → ${(out.length / 1024).toFixed(0)}kB  [${origin}]`,
       );
     } catch (err) {
@@ -266,8 +293,7 @@ async function main() {
   console.log(
     `\n${trimmed} trimmed · ${skipped} skipped · ${failed} failed` +
       (trimmed
-        ? `\nheight ${heightBefore}px → ${heightAfter}px ` +
-          `(−${(100 * (1 - heightAfter / heightBefore)).toFixed(1)}% across the set) · ` +
+        ? `\nlayout box −${(100 * (1 - areaAfter / areaBefore)).toFixed(1)}% across the set · ` +
           `bytes ${(bytesBefore / 1024).toFixed(0)}kB → ${(bytesAfter / 1024).toFixed(0)}kB`
         : ""),
   );

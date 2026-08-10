@@ -17,6 +17,7 @@ import {
   Shield,
   Sparkle,
   SquareTerminal,
+  ThumbsUp,
   User,
   Users,
   type LucideIcon,
@@ -84,6 +85,13 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
     label: "AI Usage",
     href: "/dashboard/admin/ai-usage",
     icon: Sparkle,
+    band: "data",
+  },
+  {
+    key: "admin-ai-feedback",
+    label: "AI Feedback",
+    href: "/dashboard/admin/ai-feedback",
+    icon: ThumbsUp,
     band: "data",
   },
   {

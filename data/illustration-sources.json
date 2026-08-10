@@ -157,8 +157,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/beginners-javascript-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/beginners-javascript-thumbnail/v1/original.png",
-      "matchDb": 56,
-      "servedSha": "5fd999e3406ad0dfc9c84cbefbb613cee298fa834e63b5ed6c9baa1d1a776d63"
+      "matchDb": 55,
+      "servedSha": "3e84c6357d010bc7a09d5cba95a64d79a61452fa32c5a1685d360b47c5f4ab4f"
     },
     "c-arrays": {
       "run": "2026-08-unify-v1",
@@ -286,7 +286,7 @@
       "cutout": "illustrations/2026-08-animals-v1/c-programming-for-beginners-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/c-programming-for-beginners-thumbnail/v1/original.png",
       "matchDb": 55,
-      "servedSha": "5dff048f4276b7aded27f58acf5cff9bd0a0cdb764abe77905f00f4d7f7f9f61"
+      "servedSha": "509a337c2a300beb2e30a6e197a78d2c348efd14c89fab34431413c057cd6730"
     },
     "c-reading-code": {
       "run": "2026-08-unify-v1",
@@ -734,7 +734,7 @@
       "cutout": "illustrations/2026-08-batch75/csharp-linq-functional-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-batch75/csharp-linq-functional-thumbnail/v1/original.png",
       "matchDb": 54,
-      "servedSha": "22645173e3ba620a6329ed0b33542df9e346fc857f11ab500d68e1a8f216282b"
+      "servedSha": "6bfe13af0723be1098cc9fd9fcd606122705b7189e73e57f8848f16263f633da"
     },
     "css-backgrounds-borders": {
       "run": "2026-08-animals-v3",
@@ -885,8 +885,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/data-analysis-python-pandas-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/data-analysis-python-pandas-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "cc9b7d88073c175830be6d129fa917830cdac987a9e03cd73d9e4672eb19dbbd"
+      "matchDb": 54,
+      "servedSha": "67b1f9a3bc8e98daafe0fe56599438c9c2253d9094d1e9abdeb75ef41aa01799"
     },
     "data-wrangling-python-polars-thumbnail": {
       "run": "2026-08-polars",
@@ -894,15 +894,15 @@
       "cutout": "illustrations/2026-08-polars/data-wrangling-python-polars-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-polars/data-wrangling-python-polars-thumbnail/v1/original.png",
       "matchDb": 54,
-      "servedSha": "ea18482ee30cfa3dbb3ec4a3a26468fbdc09fef4a6cf746b997fac72e903f96a"
+      "servedSha": "49b62d5e8022d5995e07782d0d6fb4ef19f69e2ab8df95bec9f81bb37f8d809e"
     },
     "database-design-postgresql-thumbnail": {
       "run": "2026-07-29-thumbnails-and-backfill",
       "variant": 1,
       "cutout": "illustrations/2026-07-29-thumbnails-and-backfill/database-design-postgresql-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-07-29-thumbnails-and-backfill/database-design-postgresql-thumbnail/v1/original.png",
-      "matchDb": 57,
-      "servedSha": "8f7fccde518b5c9a69b0e821f545e1e855bad5f24bd4ecd668bda38d574190e1"
+      "matchDb": 56,
+      "servedSha": "61293da918292b5131850d308ad1828f2ff8eca37d1a0c966315bed046deead5"
     },
     "db-attributes-and-domains": {
       "run": "2026-08-unify-v1",
@@ -1758,15 +1758,15 @@
       "cutout": "illustrations/2026-08-animals-v1/from-zero-to-cpp-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/from-zero-to-cpp-thumbnail/v1/original.png",
       "matchDb": 54,
-      "servedSha": "164a273575d0b9ab30328f8a7e1b8bfd92e03046a11bd2840874fa8eb971dabd"
+      "servedSha": "ce8f007ee31fd4bdd5f3fa6075c83c529cbb62f1f79bd64ef8fb73e5dd531092"
     },
     "functional-programming-typescript-thumbnail": {
       "run": "2026-08-animals-v1",
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/functional-programming-typescript-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/functional-programming-typescript-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "bcdab0b6b0ed8ae4a6142af7d609485e013910988095edf5789d0d32ede0dee1"
+      "matchDb": 54,
+      "servedSha": "bc65443e1225261434ef9fff882b667d863c3ec3977a7f5414d55a7c6a927c29"
     },
     "gg-aesthetic-mappings": {
       "run": "2026-08-unify-v1",
@@ -2013,8 +2013,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/how-llms-work-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/how-llms-work-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "47fd1b38f90bf71c2740aa4785f81a2ebee06f4ee431cd9489a6157f25d79ad0"
+      "matchDb": 54,
+      "servedSha": "b0a2d14946d1f627b5d4de082d264e616d588b26e2f2348159a7ebc6e5f2da72"
     },
     "interview-analytics-engineer-advanced-sql": {
       "run": "2026-08-animals-v2",
@@ -2077,8 +2077,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v2/interview-analytics-engineer-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v2/interview-analytics-engineer-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "fe73ab737d2f7088e8efcfaa7e7852b5147dfd337f0335b9569f1835ec3680b9"
+      "matchDb": 54,
+      "servedSha": "bd6da3e500c4b2ebaa5701e20d62fa5a6026b18c43d6850334941ddf5ed7b143"
     },
     "interview-backend-engineer-algorithms": {
       "run": "2026-08-animals-v1",
@@ -2150,7 +2150,7 @@
       "cutout": "illustrations/2026-08-unify-v1/interview-backend-engineer-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-unify-v1/interview-backend-engineer-thumbnail/v1/original.png",
       "matchDb": 55,
-      "servedSha": "4902fa057d42eb6a756265b2a887673c6d40348a009ee2b5975cec05ba54502f"
+      "servedSha": "fa3f955b5c1c740ac774e724f3cebd0cb266eaa5b7db52303e0a1a445efb3df0"
     },
     "interview-data-analyst-ab-testing-and-metrics": {
       "run": "2026-08-animals-v1",
@@ -2221,8 +2221,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-unify-v1/interview-data-analyst-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-unify-v1/interview-data-analyst-thumbnail/v1/original.png",
-      "matchDb": 54,
-      "servedSha": "2c79f5e76cb83e8bf6db671a109346c5c027685b3fd612fc63c3ad65936aa21f"
+      "matchDb": 53,
+      "servedSha": "ec049e468157bd1ee87a97d11a71447fd864e825b1fb89ba9568f4aba943e211"
     },
     "interview-data-engineer-data-modeling": {
       "run": "2026-08-animals-v1",
@@ -2301,8 +2301,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-batch32/interview-data-engineer-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-batch32/interview-data-engineer-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "659fe1b24a4b13e91522e215e698950657d50f9ca75779ad302f27397ccf7c46"
+      "matchDb": 54,
+      "servedSha": "04904ef7dc0a9590f0959575be367124a54c93011c5588c228c09d3d426ee4b5"
     },
     "interview-data-scientist-deep-learning": {
       "run": "2026-08-animals-v1",
@@ -2381,8 +2381,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/interview-data-scientist-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/interview-data-scientist-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "776b8903d1322e0f9e3abfcd5ce8a91ee2e672b7c840b716dc889ddf67bfdf36"
+      "matchDb": 54,
+      "servedSha": "7de75657092e3dc0c44dc4a8300d90f8504cf9e794492dcb358099ff87d8c78d"
     },
     "interview-machine-learning-engineer-coding": {
       "run": "2026-08-unify-v1",
@@ -2453,32 +2453,32 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v2/interview-machine-learning-engineer-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v2/interview-machine-learning-engineer-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "e478328234010f57d0fbc3ff5ca42d24c48ef64feb491a41854e60395a76765b"
+      "matchDb": 53,
+      "servedSha": "27f7804ebd203f5dd00d8afe7cf6c23ef11c10048a277b9d6bcfa70dc4ba0e34"
     },
     "intro-data-viz-plotly-thumbnail": {
       "run": "2026-08-animals-v1",
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/intro-data-viz-plotly-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/intro-data-viz-plotly-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "4c5ce6f348646a3a4dc103ff9326516477375f654cad0a4a0aa93413a06e774d"
+      "matchDb": 54,
+      "servedSha": "2fa83e5e106a09cef4a75003e530a4f3581ed6a3b8e8b79ccff9cf98a7db93eb"
     },
     "intro-modern-csharp-thumbnail": {
       "run": "2026-08-declutter-3d-v4",
       "variant": 1,
       "cutout": "illustrations/2026-08-declutter-3d-v4/intro-modern-csharp-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-declutter-3d-v4/intro-modern-csharp-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "26180b5c5a0f3568bf4eea93350d2a9bf49ae872ce0facf1ff371c9b7ba72fa4"
+      "matchDb": 54,
+      "servedSha": "4fe466ec2d30a57690ea376b23dac4c36e469f50f6789998e1548ef612a05afe"
     },
     "intro-sql-postgres-thumbnail": {
       "run": "2026-08-batch32",
       "variant": 1,
       "cutout": "illustrations/2026-08-batch32/intro-sql-postgres-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-batch32/intro-sql-postgres-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "5742115ce59f0aacbc9cdabb15a3ac7ca018cda4ab8375ec76f459f066ff5d9f"
+      "matchDb": 54,
+      "servedSha": "0994e58b9358a0dd70f905235f81f779f714f0da2c4350548e42efc6184325c5"
     },
     "intro-web-development-thumbnail": {
       "run": "2026-08-animals-v1",
@@ -2533,8 +2533,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-regen-01/java-collections-and-generics-deep-dive-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-regen-01/java-collections-and-generics-deep-dive-thumbnail/v1/original.png",
-      "matchDb": 54,
-      "servedSha": "af317ffd6f31314f918dc6671809d783b2b6b8665f0027444a34af3cb93796c7"
+      "matchDb": 53,
+      "servedSha": "f1e9d16b43cac5f862eabf731c481e4bb9335f21a56fae3099b730c97e43f520"
     },
     "java-computational-thinking": {
       "run": "2026-08-animals-v1",
@@ -2685,8 +2685,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/java-programming-for-beginners-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/java-programming-for-beginners-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "bcec0572ef8d0b074d2fb83fcabf2b80c59ca3f804c93e479c30cb80611aec12"
+      "matchDb": 54,
+      "servedSha": "0889b3fe42a8e4d03ff5810a705163794910e2d7ea55a00640e506a252a9b8df"
     },
     "java-software-organization": {
       "run": "2026-08-batch20",
@@ -3525,24 +3525,24 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-unify-v1/machine-learning-scikit-learn-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-unify-v1/machine-learning-scikit-learn-thumbnail/v1/original.png",
-      "matchDb": 54,
-      "servedSha": "a68eda8c65287306a0cedc51f55f3caf8d4fc1181f741bc662b3a82d400bdbc3"
+      "matchDb": 53,
+      "servedSha": "465585d56db085bea4ac7ba2ff6d7369839895b2f196b80b104fe3a80baf5e4d"
     },
     "mastering-dsa-cpp-thumbnail": {
       "run": "2026-08-animals-v2",
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v2/mastering-dsa-cpp-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v2/mastering-dsa-cpp-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "fafb76b27a47bc1b7838d9b2a584ee1ef88fdb517a3dd2fa6e98315a5f048f7b"
+      "matchDb": 54,
+      "servedSha": "dc614ae0d5190d992e6e257cc66b602dcff6d79b9bd08102fc21dda70908581f"
     },
     "mastering-ggplot2-thumbnail": {
       "run": "2026-08-animals-v2",
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v2/mastering-ggplot2-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v2/mastering-ggplot2-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "4369d36dc30fc15345e1fc2ed497249d71acf5a28728977cdf8bb683c266551c"
+      "matchDb": 54,
+      "servedSha": "d8f0704db8b497d9ef1db3076a9e048c1969edf8881693597f53c641d2276c52"
     },
     "mcs-birth-of-csharp": {
       "run": "2026-08-declutter-3d-v4",
@@ -3981,8 +3981,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/modern-css-layout-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/modern-css-layout-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "7544507718de6c0469e45522e1a781297d83d36fde5608b1d3ba9c80b68f25be"
+      "matchDb": 54,
+      "servedSha": "34323646469cd94fd3807e09fb52fb29f6aa5dae1e381d58ea33f95716777c8e"
     },
     "natural-language-processing-python-thumbnail": {
       "run": "2026-08-animals-v1",
@@ -4117,8 +4117,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/oop-blueprint-java-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/oop-blueprint-java-thumbnail/v1/original.png",
-      "matchDb": 56,
-      "servedSha": "cbb3a91e8c9cf5039858ad2e94ef8fa1bda34d7b9569766e73dc8754c6869cf6"
+      "matchDb": 54,
+      "servedSha": "5534be0cc6108f3cd729d05e2f7bc9469bd568130eab2d2fd07a8cacc07dda65"
     },
     "oopj-abstract-classes": {
       "run": "2026-08-animals-v3",
@@ -4870,7 +4870,7 @@
       "cutout": "illustrations/2026-08-animals-v1/practical-r-for-beginners-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/practical-r-for-beginners-thumbnail/v1/original.png",
       "matchDb": 55,
-      "servedSha": "4f9e8e5b1c9273d0bbe9c1f71017fce1c3fa29ef126697f5093367af6ff7cba1"
+      "servedSha": "dcb73e17c7fc60d39bfe3d6f702d629f07b3bd01633f39e253eedea3d081e0a4"
     },
     "pricing-free-member": {
       "run": "2026-08-pricing3c",
@@ -5085,8 +5085,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-batch75/python-basics-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-batch75/python-basics-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "96d8d65813268d313ff883cf10bd428cf5f2612d34c9c16e505f4f937733fa21"
+      "matchDb": 54,
+      "servedSha": "655866a1e935a660c939027b965c3ccefffbcd16e2b3cae3c84cc68accb422d3"
     },
     "python-basics-tuples": {
       "run": "2026-08-unify-v1",
@@ -5118,7 +5118,7 @@
       "cutout": "illustrations/2026-08-animals-v1/react-from-the-ground-up-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/react-from-the-ground-up-thumbnail/v1/original.png",
       "matchDb": 54,
-      "servedSha": "b9cd4fc63a8ed88958331f959a6339ecab698dc5a52ec4d3fd42664f8c9501bf"
+      "servedSha": "2e03eb854f97ee8a53b2fc9a3626520af2d2dc768b8495e6fb133f933722ae0e"
     },
     "rlang-age-of-data": {
       "run": "2026-08-animals-v1",
@@ -5525,8 +5525,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/scientific-computing-python-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/scientific-computing-python-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "a3c7172dd6746f0337baf940da0b1d49f0822e0c8253b665a2d82a9496c362cc"
+      "matchDb": 54,
+      "servedSha": "fa60603edeccb3683bc4f1b4e6dc41da86953c77daebe0f8416b13f1ac61f353"
     },
     "scipy-approximation-error": {
       "run": "2026-08-unify-v1",
@@ -5693,8 +5693,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/seaborn-foundations-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/seaborn-foundations-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "462e229e7e7cb08169b22e70e3bdbf0ef3eddc4bb19c92c169ff2262ff5b0267"
+      "matchDb": 54,
+      "servedSha": "3d9cedd67f370f9f0cb884f286cec78a00d4b301872dff62929590f4e162d8e2"
     },
     "sns-bar-count": {
       "run": "2026-08-animals-v3",
@@ -5925,8 +5925,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-07-29-thumbnails-and-backfill/sql-analytics-duckdb-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-07-29-thumbnails-and-backfill/sql-analytics-duckdb-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "91db8eac7fe1e417acd4ebe12866bb5d1438c0bbb59979fa8f8d360b8abb728f"
+      "matchDb": 53,
+      "servedSha": "d07e09958d9fd4a9ee0b11b72bb64aa0248378244225ca46aace6fdc2a86ea12"
     },
     "sql-creating-tables": {
       "run": "2026-08-creature-colour",
@@ -6173,8 +6173,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/sqlite-for-beginners-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/sqlite-for-beginners-thumbnail/v1/original.png",
-      "matchDb": 55,
-      "servedSha": "651288c9a4bd93b75cac75d11e896762605aa7f722c928956d7b8113cc40ece5"
+      "matchDb": 53,
+      "servedSha": "b1c7b77b53ae9fe5e1b7d7630ece8d64bdd074de336547bd7b24f44c1972862a"
     },
     "stat-ab-testing": {
       "run": "2026-08-unify-v1",
@@ -6438,7 +6438,7 @@
       "cutout": "illustrations/2026-08-animals-v1/statistics-for-data-science-python-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/statistics-for-data-science-python-thumbnail/v1/original.png",
       "matchDb": 54,
-      "servedSha": "8ef7b048c15f896b65fd758c351d5de41103178044c11cd24e3de1b86528a10f"
+      "servedSha": "7899121a562fe41dec7583449f7e195717a1c0498f06f42323461f516bf58e0a"
     },
     "sysc-arrays-pointers": {
       "run": "2026-08-unify-v1",
@@ -6550,7 +6550,7 @@
       "cutout": "illustrations/2026-08-animals-v1/systems-programming-c-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/systems-programming-c-thumbnail/v1/original.png",
       "matchDb": 54,
-      "servedSha": "a9543bffee76d91331340e155cf28c3a3a9f3a850764484320c701d59198eec9"
+      "servedSha": "7ec9f93548896b3a0068fb8e611276404c0e2af9f48a468f917d78e3452402b6"
     },
     "time-series-analysis-python-thumbnail": {
       "run": "2026-08-animals-v1",
@@ -6558,7 +6558,7 @@
       "cutout": "illustrations/2026-08-animals-v1/time-series-analysis-python-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/time-series-analysis-python-thumbnail/v1/original.png",
       "matchDb": 55,
-      "servedSha": "24a2201a10fee3fae4fa4f96cce971977cbebe37d45e05ef6e66b22c91559462"
+      "servedSha": "35d52abc19efa4ab891c2c535ff1cb80ae9a4daa591e237fc77ba0dcdebe31a3"
     },
     "tsa-acf-pacf": {
       "run": "2026-08-animals-v1",
@@ -6877,8 +6877,8 @@
       "variant": 1,
       "cutout": "illustrations/2026-08-animals-v1/typescript-from-scratch-thumbnail/v1/cutout.png",
       "original": "illustrations/2026-08-animals-v1/typescript-from-scratch-thumbnail/v1/original.png",
-      "matchDb": 56,
-      "servedSha": "a7efcbc3e6891b3c80398455cd20a5ec31fbdb85aec85a7fd58a0b1067adcaee"
+      "matchDb": 55,
+      "servedSha": "f2ce5e41613648973ab2538f54fa7c8f9aaf1f79a459f52b3db4e0d978a2d0e0"
     },
     "viz-always-look-at-the-data": {
       "run": "2026-08-animals-v2",
