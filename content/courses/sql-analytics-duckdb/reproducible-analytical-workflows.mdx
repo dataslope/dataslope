@@ -32,6 +32,12 @@ later. Reproducible work means:
 - The logic is **readable**, so the *why* is recoverable, not just the
   *what*.
 
+<Figure
+  slug="duck-reproducible-analytical-workflows-reproducibility-non-negotiable-inline-cutout"
+  alt="One sealed strip of steps run on two benches, both ending with identical blocks"
+  caption="The same query on the same data has to give the same rows, in the same order."
+/>
+
 ```mermaid
 flowchart TD
     Q["A question"] --> SQL["A saved,<br/>readable query"]
@@ -51,12 +57,6 @@ The quietest reproducibility bug is **non-deterministic ordering**. If two
 rows tie on the sort key, SQL may return them in either order, so a
 "top 10" can change between runs even on identical data. Always add a
 **tiebreaker** to make the order total and stable.
-
-<Figure
-  slug="duck-reproducible-analytical-workflows-reproducibility-non-negotiable-inline-cutout"
-  alt="One sealed strip of steps run on two benches, both ending with identical blocks"
-  caption="The same query on the same data has to give the same rows, in the same order."
-/>
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -94,6 +94,12 @@ Reproducible analyses often (re)build their inputs. Setup steps should be
 **idempotent**, running them twice does no harm. DuckDB's `CREATE OR
 REPLACE` and `CREATE ... IF NOT EXISTS` make scripts safe to re-run
 without "already exists" errors.
+
+<Figure
+  slug="duck-reproducible-analytical-workflows-inline-cutout"
+  alt="A sealed strip of instructions run twice on two benches, both benches ending with identical results"
+  caption="The same query, the same data, the same rows, on anyone's machine."
+/>
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -249,9 +255,3 @@ way.`}
 
 That completes the analytical toolkit, from mindset to metrics to
 reproducible workflows. Let us wrap up and look at where to go next.
-
-<Figure
-  slug="duck-reproducible-analytical-workflows-inline-cutout"
-  alt="A sealed strip of instructions run twice on two benches, both benches ending with identical results"
-  caption="The same query, the same data, the same rows, on anyone's machine."
-/>

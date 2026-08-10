@@ -47,6 +47,12 @@ int main() {
 
 A good hash function is **deterministic**, **fast**, and distributes real inputs **uniformly** across buckets. Poor distribution creates long collision chains or probe runs.
 
+<Figure
+  slug="dsa-hash-tables-core-idea-inline-cutout"
+  alt="A key dropped into a mixing machine whose chute swings to one of several bins"
+  caption="The hash turns a key straight into a bucket number, with no searching."
+/>
+
 <Callout type="info" title="Average case is conditional">
 Hash tables are fast because most buckets stay short. If too many keys collide, operations can degrade from O(1) average to O(n) worst case.
 </Callout>
@@ -156,12 +162,6 @@ Open addressing is friendlier to caches (everything lives in one array) but more
 ## Load factor and rehashing
 
 Load factor is `size / bucket_count`, how full the table is. Keep it low and collisions stay rare but memory is wasted; let it climb and chains lengthen or probe runs snake across the array. When the load factor crosses a threshold (libstdc++'s `unordered_map` defaults to 1.0), the table allocates more buckets and **rehashes**: every key's bucket is recomputed against the new capacity. Rehashing is the hash table's version of vector reallocation, and the same amortized argument applies, rare O(n) events paid for by many cheap inserts.
-
-<Figure
-  slug="dsa-hash-tables-core-idea-inline-cutout"
-  alt="A key dropped into a mixing machine whose chute swings to one of several bins"
-  caption="The hash turns a key straight into a bucket number, with no searching."
-/>
 
 ```mermaid
 flowchart TD

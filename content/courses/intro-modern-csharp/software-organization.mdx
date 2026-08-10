@@ -29,6 +29,12 @@ The C# convention is *one public class per file, named after the
 class*. So `BankAccount.cs` contains `class BankAccount`, and so
 on.
 
+<Figure
+  slug="mcs-software-organization-files-inline-cutout"
+  alt="A set of labelled folders in a rack, each holding one kind of card"
+  caption="Namespaces keep related types together and stop names from colliding."
+/>
+
 You *can* put multiple classes in one file (the compiler doesn't
 care), but it's a bad habit: when you want to find `BankAccount`,
 you don't want to grep, you want to open the file with that name.
@@ -52,12 +58,6 @@ mirror namespaces too.
 A **namespace** is a logical label that prefixes a type's name.
 It lets two libraries have a class called `Logger` without
 clashing, and it lets *your* program group related types.
-
-<Figure
-  slug="mcs-software-organization-files-inline-cutout"
-  alt="A set of labelled folders in a rack, each holding one kind of card"
-  caption="Namespaces keep related types together and stop names from colliding."
-/>
 
 ```csharp title="Program.cs"
 using System;

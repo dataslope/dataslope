@@ -307,6 +307,12 @@ of the mean has standard deviation $\sigma / \sqrt{n}$. That $1/\sqrt{n}$ is
 the same diminishing-returns law we keep meeting, and it's worth
 verifying directly.
 
+<Figure
+  slug="stat-central-limit-theorem-inline-cutout"
+  alt="Three lopsided piles of blocks on the left, each producing one average block, and those averages stacking on the right into a smooth symmetric mound"
+  caption="Each pile contributes one average, and the averages are what pile up normally."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -626,9 +632,3 @@ $\sigma / \sqrt{n}$. That spread, the standard deviation of an *estimate*,
 is the **standard error**, the quantity we estimate from a single sample
 and the building block of every confidence interval and test statistic.
 That's next.
-
-<Figure
-  slug="stat-central-limit-theorem-inline-cutout"
-  alt="Three lopsided piles of blocks on the left, each producing one average block, and those averages stacking on the right into a smooth symmetric mound"
-  caption="Each pile contributes one average, and the averages are what pile up normally."
-/>

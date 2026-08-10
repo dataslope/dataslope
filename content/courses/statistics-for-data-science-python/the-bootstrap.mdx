@@ -31,6 +31,12 @@ much a statistic wobbles, you'd want to draw many fresh samples from the
 population and watch the statistic vary. But you can't, you only have
 *one* sample, and the population is hidden.
 
+<Figure
+  slug="stat-the-bootstrap-core-idea-sample-inline-cutout"
+  alt="A small tray of chips being scooped from repeatedly, each scoop poured back before the next"
+  caption="Each chip goes back before the next is drawn, which is what makes it a bootstrap."
+/>
+
 The bootstrap's trick is a bold substitution: **treat your sample as if
 it were the population.** Your sample is your single best picture of the
 population, so drawing new samples *from your sample* mimics drawing new
@@ -561,9 +567,3 @@ formula-based intervals of *Confidence Intervals* when assumptions hold,
 and the assumption-light bootstrap when they don't. Both rest on the
 same foundation, the *Sampling Distributions* and *Standard Error* ideas
 that describe how a statistic varies from sample to sample.
-
-<Figure
-  slug="stat-the-bootstrap-core-idea-sample-inline-cutout"
-  alt="A small tray of chips being scooped from repeatedly, each scoop poured back before the next"
-  caption="Each chip goes back before the next is drawn, which is what makes it a bootstrap."
-/>

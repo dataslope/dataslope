@@ -20,6 +20,12 @@ A `WHERE` clause is a test that SQLite applies to each row. If the test
 is true, the row stays in the result. If the test is false, the row is
 left out.
 
+<Figure
+  slug="lite-filtering-rows-inline-cutout"
+  alt="A board of rows passing a gate that swings open only for rows carrying a matching notch"
+  caption="`WHERE` tests each row on its own and keeps only those that match."
+/>
+
 ```mermaid
 flowchart TD
     A["all rows<br/>in books"] --> W{"WHERE condition<br/>is true?"}
@@ -127,9 +133,9 @@ WHERE
 would both count as matches.
 
 <Figure
-  slug="lite-filtering-rows-inline-cutout"
-  alt="A board of rows passing a gate that swings open only for rows carrying a matching notch"
-  caption="`WHERE` tests each row on its own and keeps only those that match."
+  slug="lite-filtering-rows-where-keeps-matching-inline-cutout"
+  alt="Rows passing a checkpoint with a template held to each, non-matching rows turned aside"
+  caption="Every row is checked against the same condition, and the rest are set aside."
 />
 
 <MultipleChoice
@@ -344,12 +350,6 @@ WHERE
 You have seen every tool this challenge needs: `WHERE`, `AND`, and
 a comparison. The table is already loaded, you only write the
 query.
-
-<Figure
-  slug="lite-filtering-rows-where-keeps-matching-inline-cutout"
-  alt="Rows passing a checkpoint with a template held to each, non-matching rows turned aside"
-  caption="Every row is checked against the same condition, and the rest are set aside."
-/>
 
 <SqlChallengeCard
   dialect="sqlite"

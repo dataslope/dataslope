@@ -37,6 +37,12 @@ similar houses nearby sold for around 400,000, you would guess about
 400,000. KNN formalizes exactly this instinct: **similar inputs tend to
 have similar outputs.**
 
+<Figure
+  slug="ml-k-nearest-neighbors-intuition-are-who-inline-cutout"
+  alt="One new chip on a board taking the colour of the three chips nearest to it"
+  caption="A new point is labelled by a vote among its k nearest neighbours."
+/>
+
 ```mermaid
 flowchart TD
     Q["New point<br/>(species unknown)"] --> M["Measure distance<br/>to every training point"]
@@ -82,12 +88,6 @@ where scaling comes in.
 Let us classify penguins by species. The API is, as always, identical to
 every other scikit-learn estimator. (We will see in a moment that raw KNN is
 held back here by the feature scales, but it is a fine starting point.)
-
-<Figure
-  slug="ml-k-nearest-neighbors-intuition-are-who-inline-cutout"
-  alt="One new chip on a board taking the colour of the three chips nearest to it"
-  caption="A new point is labelled by a vote among its k nearest neighbours."
-/>
 
 <CodeBlock
   adapter="python"

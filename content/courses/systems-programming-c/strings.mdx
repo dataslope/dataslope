@@ -66,17 +66,17 @@ int main(void) {
 characters until it hits `'\0'`. If the terminator is missing, it
 will happily keep walking into unrelated memory.
 
-<Figure
-  slug="sysc-strings-string-literals-inline-cutout"
-  alt="A ribbon of tiles fixed under a clamped bar, unable to be lifted or altered"
-  caption="A string literal lives in read-only memory and cannot be modified."
-/>
-
 ## String literals
 
 `"hello"` in C is a string literal, an *anonymous array* of `char`
 with an automatically appended `'\0'`. The compiler usually places
 literals in read-only memory.
+
+<Figure
+  slug="sysc-strings-string-literals-inline-cutout"
+  alt="A ribbon of tiles fixed under a clamped bar, unable to be lifted or altered"
+  caption="A string literal lives in read-only memory and cannot be modified."
+/>
 
 | Form | What it is | Mutable? |
 | --- | --- | --- |

@@ -25,6 +25,12 @@ When you run `tsc` (the TypeScript compiler), it doesn't just transform `.ts` fi
 
 These proofs eliminate entire classes of bugs. Let's see them in action.
 
+<Figure
+  slug="tsx-static-analysis-in-action-compiler-proves-inline-cutout"
+  alt="A shaped gate stopping a mismatched block before the belt has started moving"
+  caption="Static analysis catches the mismatch while the belt is still stopped."
+/>
+
 What makes that worth the annotations is *when* the proofs happen. A bug is
 never only the cost of its fix; it is the fix plus everything that happened
 between writing it and finding it:
@@ -403,12 +409,6 @@ You've learned:
 - How **refactoring** is safe because the compiler finds every affected usage.
 - The **compiler pipeline**: Scanner → Parser → Binder → Checker → Emitter + Language Service.
 - How the **language service** powers your editor with autocomplete, go-to-definition, and refactoring.
-
-<Figure
-  slug="tsx-static-analysis-in-action-compiler-proves-inline-cutout"
-  alt="A shaped gate stopping a mismatched block before the belt has started moving"
-  caption="Static analysis catches the mismatch while the belt is still stopped."
-/>
 
 Static analysis shifts bugs leftward, from runtime (where they're expensive and dangerous) to compile time (where they're cheap and safe). The TypeScript compiler doesn't just translate your code; it *proves properties* about it. And the editor integration means you get this feedback instantly, as you type.
 

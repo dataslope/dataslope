@@ -22,6 +22,12 @@ items**. Everything flexbox does is described relative to two axes:
   → horizontal; `column` → vertical).
 - The **cross axis**, perpendicular to it.
 
+<Figure
+  slug="css-flexbox-deep-dive-two-axes-inline-cutout"
+  alt="A rail with blocks spaced along it and a second rule crossing it at right angles"
+  caption="Flexbox has a main axis and a cross axis, and every property names one of them."
+/>
+
 `justify-content` aligns along the **main** axis; `align-items` aligns
 along the **cross** axis. Flip `flex-direction` and those two swap
 meaning, which is the single most common source of "why is my
@@ -138,6 +144,12 @@ Each item's `flex` shorthand controls how it resizes:
   (1 = allowed to shrink).
 - **`flex-basis`**, its starting size before grow/shrink.
 
+<Figure
+  slug="css-flexbox-deep-dive-inline-cutout"
+  alt="A rail of blocks with springs between them, one block visibly wider because its own spring is stiffer than the rest"
+  caption="`flex-grow` decides how the spare space is shared between the items."
+/>
+
 Read that first bullet carefully: `flex-grow` divides the *leftover*, not
 the container, which is why three items with grow factors 1, 1 and 2 are
 never in the ratio 1:1:2 at any width unless their bases are zero.
@@ -205,12 +217,6 @@ The two you'll write most:
 By default flex items stay on one line and shrink. `flex-wrap: wrap`
 lets them flow onto new lines when they run out of room, the basis of
 a responsive card row that needs no media query.
-
-<Figure
-  slug="css-flexbox-deep-dive-two-axes-inline-cutout"
-  alt="A rail with blocks spaced along it and a second rule crossing it at right angles"
-  caption="Flexbox has a main axis and a cross axis, and every property names one of them."
-/>
 
 The row below wraps: each card has a `flex-basis` of `140px` and is
 allowed to grow, so they fill the line and spill onto the next when the
@@ -332,9 +338,3 @@ if (parseFloat(s.flexGrow) < 1) {
 
 Flexbox owns one dimension. For rows *and* columns together, you want
 [CSS Grid](/courses/modern-css-layout/css-grid).
-
-<Figure
-  slug="css-flexbox-deep-dive-inline-cutout"
-  alt="A rail of blocks with springs between them, one block visibly wider because its own spring is stiffer than the rest"
-  caption="`flex-grow` decides how the spare space is shared between the items."
-/>

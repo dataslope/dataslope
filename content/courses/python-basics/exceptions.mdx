@@ -205,6 +205,12 @@ parse_int("oops")
 
 Use `raise` to signal an error from your own code. Use a specific built-in type when one fits; otherwise create your own.
 
+<Figure
+  slug="python-exceptions-happens-exceptions-are-inline-cutout"
+  alt="A block falling past every basket on a bench and off the end onto the floor"
+  caption="With no matching `except` anywhere, the exception falls through and stops the program."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -700,9 +706,3 @@ else:
 />
 
 Many exceptions come from I/O. Files are next.
-
-<Figure
-  slug="python-exceptions-happens-exceptions-are-inline-cutout"
-  alt="A block falling past every basket on a bench and off the end onto the floor"
-  caption="With no matching `except` anywhere, the exception falls through and stops the program."
-/>

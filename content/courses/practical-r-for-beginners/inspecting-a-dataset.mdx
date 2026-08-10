@@ -92,6 +92,12 @@ Glance at the first few and last few rows. You're checking:
 - Do the values *look like* what you'd expect?
 - Are there obvious anomalies?
 
+<Figure
+  slug="rlang-inspecting-a-dataset-inline-cutout"
+  alt="A crate opened with its first rows lifted out, a gauge on its side reading how many rows and columns remain"
+  caption="Inspecting tells you what is there before you decide what to keep."
+/>
+
 It is astonishing how often a 10-second `head()` catches a problem
 that would have wasted an hour downstream.
 
@@ -333,9 +339,3 @@ report("NAs per column", colSums(is.na(penguins)))
 
 Inspecting tells us *what's there*. The next page is about
 extracting just the parts we *want*.
-
-<Figure
-  slug="rlang-inspecting-a-dataset-inline-cutout"
-  alt="A crate opened with its first rows lifted out, a gauge on its side reading how many rows and columns remain"
-  caption="Inspecting tells you what is there before you decide what to keep."
-/>

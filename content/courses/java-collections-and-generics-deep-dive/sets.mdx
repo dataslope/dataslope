@@ -20,6 +20,12 @@ the three useful orderings: *no order*, *insertion order*, and
 difference is purely in the *contract*: `add(x)` returns `false` (and
 does nothing) if `x` is already present.
 
+<Figure
+  slug="jcol-sets-set-interface-inline-cutout"
+  alt="A bin with a narrow mouth that accepts a block once and rejects an identical second"
+  caption="Membership is the only question a set is built to answer quickly."
+/>
+
 ```mermaid
 classDiagram
     Collection <|-- Set
@@ -231,12 +237,6 @@ again here in context: a `HashSet` indexes by `hashCode()` at insertion
 time. If you mutate a field that participates in `hashCode()`, the
 element silently becomes unreachable in the set. The same hazard
 exists with `TreeSet` if you mutate a field that affects `compareTo()`.
-
-<Figure
-  slug="jcol-sets-set-interface-inline-cutout"
-  alt="A bin with a narrow mouth that accepts a block once and rejects an identical second"
-  caption="Membership is the only question a set is built to answer quickly."
-/>
 
 **Use immutable value types as set elements.**
 

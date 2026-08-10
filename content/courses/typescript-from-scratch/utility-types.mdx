@@ -336,6 +336,12 @@ Filters out `null` and `undefined` using a distributive conditional.
 
 These types extract information from function types.
 
+<Figure
+  slug="tsx-utility-types-inline-cutout"
+  alt="One crate passing through three small presses that make it partial, then read-only, then narrower, each leaving a visibly changed crate"
+  caption="`Partial`, `Readonly` and `Pick` each hand back a changed version of a type."
+/>
+
 ### `ReturnType<T>`
 
 Extracts the return type of a function type `T`.
@@ -677,12 +683,6 @@ The \`-?\` modifier is the key: it removes the optional modifier from each prope
 />
 
 ---
-
-<Figure
-  slug="tsx-utility-types-inline-cutout"
-  alt="One crate passing through three small presses that make it partial, then read-only, then narrower, each leaving a visibly changed crate"
-  caption="`Partial`, `Readonly` and `Pick` each hand back a changed version of a type."
-/>
 
 ## Multiple Choice: `ReturnType` Inference
 

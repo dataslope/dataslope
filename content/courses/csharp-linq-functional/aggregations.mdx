@@ -16,12 +16,6 @@ This page covers the built-in shortcuts (`Count()`, `Sum()`, `Min()`,
 `Max()`, `Average()`) and then the general-purpose tool that underlies
 all of them: `Aggregate()`.
 
-<Figure
-  slug="cs-aggregations-friendly-built-ins-inline-cutout"
-  alt="One tray of blocks feeding four small gauges in a row, each gauge reading a different single value"
-  caption="Each built-in aggregate reads the same sequence and reports one number."
-/>
-
 ## The friendly built-ins
 
 | Operator | What it returns | Notes |
@@ -71,6 +65,12 @@ record Product(string Name, decimal Price, int Stock);
 The lambda overloads (`Sum(p => p.Price)`, `Count(p =>
 p.Stock > 0)`) are the same as projecting first and then aggregating,
 just a shortcut.
+
+<Figure
+  slug="cs-aggregations-friendly-built-ins-inline-cutout"
+  alt="One tray of blocks feeding four small gauges in a row, each gauge reading a different single value"
+  caption="Each built-in aggregate reads the same sequence and reports one number."
+/>
 
 ## Empty-sequence behavior
 

@@ -16,12 +16,6 @@ library returns one or the other.
 - **`Series`**, a 1-D array of values, with a single set of
   labels (also called an index).
 
-<Figure
-  slug="pandas-dataframes-and-series-making-them-by-inline-cutout"
-  alt="A single column of blocks being clamped upright, then three more clamped beside it to make a board"
-  caption="A DataFrame is several Series clamped side by side and sharing one index."
-/>
-
 A DataFrame is essentially a dictionary of Series that all share
 the same row index.
 
@@ -75,6 +69,12 @@ print("Type:", type(df).__name__)
 
 The Series remembers its values, its index labels, its dtype,
 and its `name`. The DataFrame is the same idea, scaled up.
+
+<Figure
+  slug="pandas-dataframes-and-series-making-them-by-inline-cutout"
+  alt="A single column of blocks being clamped upright, then three more clamped beside it to make a board"
+  caption="A DataFrame is several Series clamped side by side and sharing one index."
+/>
 
 ## Pulling a column out of a DataFrame
 

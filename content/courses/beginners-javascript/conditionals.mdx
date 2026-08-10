@@ -29,6 +29,12 @@ if (condition) {
 The `condition` is any expression. If its value is truthy, the
 block runs; otherwise it is skipped entirely.
 
+<Figure
+  slug="js-conditionals-if-statement-inline-cutout"
+  alt="A single hinged flap over a chute, open for blocks that clear a marked bar and shut for the rest"
+  caption="A bare `if` has one path: the value either passes the test or carries on."
+/>
+
 <CodeBlock
   adapter="javascript"
   files={[
@@ -457,12 +463,6 @@ if (action("") !== "unknown signal") throw new Error("empty string should also b
 />
 
 ---
-
-<Figure
-  slug="js-conditionals-if-statement-inline-cutout"
-  alt="A single hinged flap over a chute, open for blocks that clear a marked bar and shut for the rest"
-  caption="A bare `if` has one path: the value either passes the test or carries on."
-/>
 
 <MultipleChoice
   markdown={`Why do programmers often prefer "guard clauses" (early returns at the top of a function) over deeply nested \`if\` statements?

@@ -25,6 +25,12 @@ just a vector of numbers, which is exactly what an algorithm can work with.
 Bag-of-words turns a whole collection of documents into a table of numbers in
 a fixed sequence of steps.
 
+<Figure
+  slug="nlp-bag-of-words-feature-extraction-process-inline-cutout"
+  alt="A bag of word tiles tipped onto a bench and counted into a tally rack"
+  caption="Counting is what turns text into the numbers a model can take."
+/>
+
 1. **Documents** come in (`doc1`, `doc2`, `doc3`).
 2. **Tokenize and clean** each document.
 3. **Build the vocabulary**, all distinct words across the corpus.
@@ -362,9 +368,3 @@ weakness we met when counting words: the most common words dominate and tell you
 the least. The next page fixes that with **TF-IDF**, a way to weight each word
 by how *distinctive* it is, before we assemble everything into a working
 classifier.
-
-<Figure
-  slug="nlp-bag-of-words-feature-extraction-process-inline-cutout"
-  alt="A bag of word tiles tipped onto a bench and counted into a tally rack"
-  caption="Counting is what turns text into the numbers a model can take."
-/>

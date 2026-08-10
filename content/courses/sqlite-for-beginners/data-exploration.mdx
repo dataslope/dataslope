@@ -22,6 +22,12 @@ You rarely understand a dataset in one look. You **loop**: get the
 shape, peek at rows, then ask sharper questions as the data tells you
 what to ask next.
 
+<Figure
+  slug="lite-data-exploration-exploration-loop-inline-cutout"
+  alt="A ring of benches with a tray travelling round, each pass revealing one more card"
+  caption="Each query answers one question and suggests the next one to ask."
+/>
+
 ```mermaid
 flowchart TD
     A["What tables<br/>exist?"] --> B["What columns<br/>does each have?"]
@@ -246,12 +252,6 @@ database modeling a food-trading company, with customers, orders,
 products, suppliers, and more. Nobody is going to tell you what is
 inside. Run the starter query to list its tables, then work the
 loop yourself.
-
-<Figure
-  slug="lite-data-exploration-exploration-loop-inline-cutout"
-  alt="A ring of benches with a tray travelling round, each pass revealing one more card"
-  caption="Each query answers one question and suggests the next one to ask."
-/>
 
 <SqlCodeBlock
   dialect="sqlite"

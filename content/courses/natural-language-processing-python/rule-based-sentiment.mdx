@@ -28,6 +28,12 @@ word, add up the polarities, and read off the sign of the total. Here is the
 full flow, trace it top to bottom, because it is the entire course in one
 diagram.
 
+<Figure
+  slug="nlp-rule-based-sentiment-idea-score-words-inline-cutout"
+  alt="Word tiles dropped onto a balance, some weighted to one side and some to the other"
+  caption="Scoring each word and adding up the weights is sentiment at its simplest."
+/>
+
 ```mermaid
 flowchart TD
     A["Raw review text"] --> B["Tokenize + lowercase<br/>(keep stopwords AND negation!)"]
@@ -479,9 +485,3 @@ verdict, using only the classic toolkit. That is a real accomplishment. Before
 the closing map of where to go next, the following page steps back from the code
 for a few **stories**, the people and moments that shaped the field you have
 just learned the foundations of.
-
-<Figure
-  slug="nlp-rule-based-sentiment-idea-score-words-inline-cutout"
-  alt="Word tiles dropped onto a balance, some weighted to one side and some to the other"
-  caption="Scoring each word and adding up the weights is sentiment at its simplest."
-/>

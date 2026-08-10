@@ -28,6 +28,12 @@ A function `f` is **pure** if and only if:
    network request, increment a global counter, read the time, or
    read from a random number generator.
 
+<Figure
+  slug="fp-pure-functions-definition-can-hold-inline-cutout"
+  alt="A sealed machine with no hoses, wires or taps anywhere on it, one block in and one block out"
+  caption="Same input, same output, and nothing observable changes on the way."
+/>
+
 ```mermaid
 flowchart LR
     A[Input] --> F["f (pure)"] --> O[Output]
@@ -209,12 +215,6 @@ functional answer is not "no side effects ever". It is:
 
 This is sometimes called the *functional core, imperative shell*
 pattern.
-
-<Figure
-  slug="fp-pure-functions-definition-can-hold-inline-cutout"
-  alt="A sealed machine with no hoses, wires or taps anywhere on it, one block in and one block out"
-  caption="Same input, same output, and nothing observable changes on the way."
-/>
 
 ```mermaid
 flowchart TD

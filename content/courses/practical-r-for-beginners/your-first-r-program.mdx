@@ -55,6 +55,12 @@ The `>` is the **R prompt**. It is R saying "I am ready for an
 instruction." You type one, press Enter, and R either evaluates it
 and shows the result, or prints an error.
 
+<Figure
+  slug="rlang-your-first-r-program-prompt-inline-cutout"
+  alt="A small panel with one waiting slot and a blinking marker beside it"
+  caption="The prompt waits, runs exactly what you type, and reports what happened."
+/>
+
 In WebR, we replace the prompt with a friendly code editor, but
 the semantics are the same. Each time you click **Run**, R reads
 your code, evaluates it top to bottom, and prints the output.
@@ -155,6 +161,12 @@ Anything after a `#` on a line is a **comment**, R ignores it.
 Comments are notes you leave for the next human to read your code
 (often yourself, three months from now).
 
+<Figure
+  slug="rlang-your-first-r-program-inline-cutout"
+  alt="A short strip of instructions clipped to a board and a small printed result pinned beneath it"
+  caption="A program is instructions written down, with the result printed beneath."
+/>
+
 <CodeBlock
   adapter="r"
   files={[
@@ -243,12 +255,6 @@ flowchart TD
 Nothing more, nothing less. There is no "code review fairy" who
 fixes things. There is no AI inferring what you meant. R does
 exactly what you write, and reports exactly what happened.
-
-<Figure
-  slug="rlang-your-first-r-program-prompt-inline-cutout"
-  alt="A small panel with one waiting slot and a blinking marker beside it"
-  caption="The prompt waits, runs exactly what you type, and reports what happened."
-/>
 
 This is **simultaneously the wonderful and the scary thing** about
 programming: the machine is rigorously, mercilessly literal.
@@ -375,12 +381,6 @@ per city in the format:
 
 …where `<temp_f>` is the Fahrenheit equivalent, rounded to 1
 decimal. Use the formula `F = C * 9/5 + 32`.
-
-<Figure
-  slug="rlang-your-first-r-program-inline-cutout"
-  alt="A short strip of instructions clipped to a board and a small printed result pinned beneath it"
-  caption="A program is instructions written down, with the result printed beneath."
-/>
 
 <ChallengeCard
   adapter="r"

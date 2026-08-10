@@ -35,6 +35,12 @@ handed out by the next `malloc()`. Reading or writing through `p` is
 undefined behavior, sometimes it "works", sometimes it returns
 someone else's bytes, sometimes it crashes.
 
+<Figure
+  slug="sysc-memory-bugs-2-double-free-inline-cutout"
+  alt="A crate handed back over a counter twice, the counter clerk holding out empty hands the second time"
+  caption="Freeing the same block twice corrupts the allocator's own bookkeeping."
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -382,12 +388,6 @@ the language:
 | Prefer `snprintf()` / `fgets()` over `strcpy()` / `gets()` | Eliminates trivial overflows |
 
 `gets()` is so dangerous it was *removed* from C11. Never use it.
-
-<Figure
-  slug="sysc-memory-bugs-2-double-free-inline-cutout"
-  alt="A crate handed back over a counter twice, the counter clerk holding out empty hands the second time"
-  caption="Freeing the same block twice corrupts the allocator's own bookkeeping."
-/>
 
 ## Practice: write a leak-free echo
 

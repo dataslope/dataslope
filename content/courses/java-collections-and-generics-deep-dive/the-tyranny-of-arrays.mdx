@@ -25,6 +25,12 @@ might keep a dozen values in a `REAL ARRAY(100)` and that was the
 whole world. Code that small does not need *abstractions* over
 storage. It can just point at memory directly.
 
+<Figure
+  slug="jcol-the-tyranny-of-arrays-short-history-code-inline-cutout"
+  alt="A bench where storage begins as a fixed strip, becomes a growing rail, and ends as a wall of keyed drawers"
+  caption="Every project reinvented the same containers before the library had them."
+/>
+
 ```mermaid
 flowchart TD
     A["1950s<br/>fixed-size arrays<br/>one programmer"]
@@ -169,12 +175,6 @@ you, only a `ClassCastException` at 3 a.m. would.
 
 Here is what a real codebase looked like before reusable containers
 existed. Every module rolled its own.
-
-<Figure
-  slug="jcol-the-tyranny-of-arrays-short-history-code-inline-cutout"
-  alt="A bench where storage begins as a fixed strip, becomes a growing rail, and ends as a wall of keyed drawers"
-  caption="Every project reinvented the same containers before the library had them."
-/>
 
 ```mermaid
 flowchart TB

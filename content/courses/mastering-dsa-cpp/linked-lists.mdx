@@ -18,6 +18,12 @@ The price of this flexibility is the loss of the array's address formula. Nodes 
 
 A minimal node stores data and a pointer to the next node. The last node's `next` is `nullptr`, the "address of nothing" that marks the end of the chain.
 
+<Figure
+  slug="dsa-linked-lists-nodes-links-inline-cutout"
+  alt="Separate blocks on a bench each joined to the next by a short cord"
+  caption="Nodes live anywhere in memory; the links are what put them in order."
+/>
+
 A historical aside about that null: the null reference was introduced by Tony Hoare in 1965, in the type system of ALGOL W, "simply because it was so easy to implement." Speaking at a conference in 2009, Hoare publicly called it his "billion-dollar mistake," estimating that null-related crashes and vulnerabilities have cost roughly that much over the decades. You are about to spend a chapter deliberately handling `nullptr` at every turn, consider it supervised practice with the most dangerous value in programming.
 
 <CodeBlock
@@ -141,6 +147,12 @@ int main() {
 
 Appending without a tail pointer requires walking to the end, O(n) just to find the last node. Deletion is the genuinely tricky one: to unlink a node you must rewrite the pointer that *leads to it*, which means you need access to the previous link, not just the node itself.
 
+<Figure
+  slug="dsa-linked-lists-inline-cutout"
+  alt="Separate blocks on a bench each joined to the next by a short cord, one cord unclipped and rerouted to insert a new block"
+  caption="Inserting means rerouting one link, not shifting everything along."
+/>
+
 The `deleteValue` below uses a technique worth studying closely: instead of tracking a `previous` node, it walks a `Node **link`, a pointer to the pointer currently being followed. At any moment, `*link` is either `head` or some node's `next` field. When the victim is found, `*link = victim->next` rewires whichever pointer led to it, with no special case for deleting the first node. Draw it on paper once; the trick will feel like a magic key afterward.
 
 <CodeBlock
@@ -227,12 +239,6 @@ int main() {
 
 Manual `new` and `delete` are useful for learning pointers, but production C++ should prefer ownership types. A node can own its successor with `std::unique_ptr<Node>`.
 
-<Figure
-  slug="dsa-linked-lists-nodes-links-inline-cutout"
-  alt="Separate blocks on a bench each joined to the next by a short cord"
-  caption="Nodes live anywhere in memory; the links are what put them in order."
-/>
-
 <CodeBlock
   adapter="cpp"
   files={[
@@ -276,12 +282,6 @@ When you reverse or delete nodes, you are rewiring addresses. Draw the links bef
 ## Practice: reverse a linked list
 
 Reversing a singly linked list in place is *the* classic pointer exercise, simple to state, unforgiving of sloppy thinking. The standard solution walks the list once with three pointers: `previous` (the already-reversed part), `current` (the node being flipped), and `next` (a bookmark so the rest of the list isn't lost when `current->next` is overwritten). Trace it by hand on `1->2->3->4` before you code: after one step, `previous` is `1`, `current` is `2`, and `1->next` is null.
-
-<Figure
-  slug="dsa-linked-lists-inline-cutout"
-  alt="Separate blocks on a bench each joined to the next by a short cord, one cord unclipped and rerouted to insert a new block"
-  caption="Inserting means rerouting one link, not shifting everything along."
-/>
 
 <ChallengeCard
   adapter="cpp"

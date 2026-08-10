@@ -31,6 +31,12 @@ The signature says it returns `any`, but it doesn't mention that it can *throw*.
 - When should I catch?
 - Did the maintainer forget to document this?
 
+<Figure
+  slug="tsx-error-handling-with-types-problem-exceptions-inline-cutout"
+  alt="A block thrown clear of the bench entirely, landing out of sight beyond its edge"
+  caption="A thrown error leaves the call entirely, and the type says nothing about it."
+/>
+
 This leads to two failure modes:
 1. **Over-catching**: Wrap everything in `try/catch`, slowing code and hiding real bugs.
 2. **Under-catching**: Forget to catch, and the exception propagates to production.
@@ -516,12 +522,6 @@ Exceptions are invisible in types; \`Result\` makes errors explicit and unignora
 />
 
 ---
-
-<Figure
-  slug="tsx-error-handling-with-types-problem-exceptions-inline-cutout"
-  alt="A block thrown clear of the bench entirely, landing out of sight beyond its edge"
-  caption="A thrown error leaves the call entirely, and the type says nothing about it."
-/>
 
 ## Multiple Choice: Chaining with `andThen()`
 

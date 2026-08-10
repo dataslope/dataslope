@@ -18,6 +18,12 @@ This is how you model state machines, API responses, domain events, parser resul
 
 A discriminated union is a union of object types that share a common property, the **discriminant**, with distinct literal values for each variant.
 
+<Figure
+  slug="tsx-discriminated-unions-discriminant-field-inline-cutout"
+  alt="Three sealed boxes each wearing a differently shaped tag on the same corner"
+  caption="Every variant carries the same tag field in the same place."
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -491,12 +497,6 @@ If you learn one advanced TypeScript pattern, make it discriminated unions. They
 ## Recap
 
 Discriminated unions let you model variants, states, events, commands, results, where each variant has different data and a unique tag. The compiler uses the tag (the **discriminant**) to narrow the union, so you get precise type checking and autocomplete for each variant.
-
-<Figure
-  slug="tsx-discriminated-unions-discriminant-field-inline-cutout"
-  alt="Three sealed boxes each wearing a differently shaped tag on the same corner"
-  caption="Every variant carries the same tag field in the same place."
-/>
 
 **Key takeaways:**
 

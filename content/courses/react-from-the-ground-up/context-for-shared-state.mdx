@@ -30,6 +30,12 @@ forward a `theme` prop it doesn't care about:
 
 Context removes those pass-through props.
 
+<Figure
+  slug="rx-context-for-shared-state-prop-drilling-problem-inline-cutout"
+  alt="A tray handed down through five nested frames, each pair of hands only passing it on"
+  caption="Passing a value down five levels means four components handling what they never use."
+/>
+
 ## Three pieces: create, provide, consume
 
 1. **Create** a context with a default: `createContext(defaultValue)`.
@@ -77,12 +83,6 @@ function App() {
 Everything inside the `Provider` sees the `value`. When that value
 changes (here, on toggle), every consumer re-renders with the new
 value, no prop plumbing required.
-
-<Figure
-  slug="rx-context-for-shared-state-prop-drilling-problem-inline-cutout"
-  alt="A tray handed down through five nested frames, each pair of hands only passing it on"
-  caption="Passing a value down five levels means four components handling what they never use."
-/>
 
 ## Context holds state, not just constants
 

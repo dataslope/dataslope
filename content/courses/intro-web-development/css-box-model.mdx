@@ -58,6 +58,12 @@ model.
 Try setting `padding: 0`, then `margin: 0`, and watch which gap
 disappears. That's the fastest way to internalize the difference.
 
+<Figure
+  slug="web-css-box-model-inline-cutout"
+  alt="One block shown in cross-section as four nested frames of different colours, from the content core outward to the outermost margin"
+  caption="Content, padding, border, margin: four layers out from the middle."
+/>
+
 ## `box-sizing`, one rule to keep
 
 By default, `width` sets only the *content* width, so padding and
@@ -169,9 +175,3 @@ if (s.backgroundColor !== "rgb(219, 234, 254)") {
 />
 
 Boxes sorted, now let's arrange them: [flexbox layout](/courses/intro-web-development/css-flexbox-layout).
-
-<Figure
-  slug="web-css-box-model-inline-cutout"
-  alt="One block shown in cross-section as four nested frames of different colours, from the content core outward to the outermost margin"
-  caption="Content, padding, border, margin: four layers out from the middle."
-/>

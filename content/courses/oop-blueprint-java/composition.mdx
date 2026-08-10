@@ -37,6 +37,12 @@ composition relationship, the *whole* owns the *part*. The part's
 lifetime is tied to the whole's. If the car goes to the junkyard, so
 does the engine.
 
+<Figure
+  slug="oopj-composition-has-relationship-inline-cutout"
+  alt="A machine with a smaller machine bolted inside it, still recognisable through an opening"
+  caption="Has-a is composition, and it usually beats reaching for inheritance."
+/>
+
 In Java, composition looks like one class holding a `private final`
 field of another type, with the part being constructed by the whole
 (or handed in via the constructor) and never shared with anyone else.
@@ -222,12 +228,6 @@ Beginners often reach for inheritance ("a `SportsCar` extends `Car`")
 when composition would serve better ("a `Car` has an `Engine`, which
 might be a sports engine"). We will study inheritance later, and you
 will see how often the right move is to reach for composition first.
-
-<Figure
-  slug="oopj-composition-has-relationship-inline-cutout"
-  alt="A machine with a smaller machine bolted inside it, still recognisable through an opening"
-  caption="Has-a is composition, and it usually beats reaching for inheritance."
-/>
 
 > "**Favor object composition over class inheritance**", Gang of
 > Four

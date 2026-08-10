@@ -186,6 +186,12 @@ Window functions make it one line.
 The one-sentence summary: **`GROUP BY` summarizes *instead of* the rows; a
 window function summarizes *alongside* the rows.**
 
+<Figure
+  slug="duck-why-window-functions-inline-cutout"
+  alt="A pile of blocks collapsing into one summary block on the left, and on the right the same blocks still standing in their original row, each wearing its own small summary tag"
+  caption="`GROUP BY` collapses the rows; a window function leaves them standing."
+/>
+
 ## Anatomy of a window function
 
 ```
@@ -285,9 +291,3 @@ The \`OVER\` clause is what makes an aggregate a window function.`}
 
 Now that the `OVER` clause makes sense, the next pages put it to work:
 ranking rows, then computing running totals and moving averages.
-
-<Figure
-  slug="duck-why-window-functions-inline-cutout"
-  alt="A pile of blocks collapsing into one summary block on the left, and on the right the same blocks still standing in their original row, each wearing its own small summary tag"
-  caption="`GROUP BY` collapses the rows; a window function leaves them standing."
-/>

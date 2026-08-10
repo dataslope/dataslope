@@ -13,12 +13,6 @@ data. An order with status `banana` is not creative; it is invalid.
 
 A **CHECK** constraint lets the schema say those things out loud.
 
-<Figure
-  slug="db-check-constraints-check-encodes-domain-inline-cutout"
-  alt="A gauge fitted across a chute, set to a measured opening, stopping any block that exceeds it"
-  caption="A `CHECK` is a gauge across the chute: values outside it never get stored."
-/>
-
 ## CHECK encodes a domain rule
 
 A CHECK constraint is a boolean expression that must be true for every
@@ -114,6 +108,12 @@ its definition of a valid product.
 
 CHECK constraints can compare columns in the same row. For an event,
 `end_date` should come after `start_date`.
+
+<Figure
+  slug="db-check-constraints-check-encodes-domain-inline-cutout"
+  alt="A gauge fitted across a chute, set to a measured opening, stopping any block that exceeds it"
+  caption="A `CHECK` is a gauge across the chute: values outside it never get stored."
+/>
 
 ```mermaid
 flowchart TD

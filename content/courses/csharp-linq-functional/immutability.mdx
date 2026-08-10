@@ -22,6 +22,12 @@ your code gets *simpler*, not more complex.
 Here is a tiny "shopping cart" written with a mutable list. Look
 at what happens.
 
+<Figure
+  slug="cs-immutability-bug-immutability-prevents-inline-cutout"
+  alt="Two benches sharing one tray, a hand at each bench changing it, and the block on it ending up wrong"
+  caption="Two places holding one mutable object is where the value goes wrong."
+/>
+
 <CodeBlock
   adapter="csharp"
   files={[
@@ -248,12 +254,6 @@ services. Making values immutable is where the biggest win is.
 
 Implement a `Money` record and an `Inventory` *service* that uses it
 without mutating it.
-
-<Figure
-  slug="cs-immutability-bug-immutability-prevents-inline-cutout"
-  alt="Two benches sharing one tray, a hand at each bench changing it, and the block on it ending up wrong"
-  caption="Two places holding one mutable object is where the value goes wrong."
-/>
 
 <ChallengeCard
   adapter="csharp"

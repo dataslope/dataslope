@@ -35,6 +35,12 @@ If an order points to a customer who exists → it appears. If a
 customer has no orders → they do not appear. Only the **overlap**
 survives.
 
+<Figure
+  slug="sql-inner-joins-rule-picture-inline-cutout"
+  alt="Two card racks pushed together with only the pairs whose notches align lifted onto a tray"
+  caption="Rows with no match on the other side simply do not appear."
+/>
+
 ## Seeing what survives and what drops
 
 This data is rigged to show the rule. There is an order with no
@@ -78,12 +84,6 @@ The result shows Ada (two orders) and Grace (one). **Linus is
 absent** (no orders to match), and **order 104 is absent** (its
 customer 7 does not exist). That is the inner join doing its job:
 no match, no row.
-
-<Figure
-  slug="sql-inner-joins-rule-picture-inline-cutout"
-  alt="Two card racks pushed together with only the pairs whose notches align lifted onto a tray"
-  caption="Rows with no match on the other side simply do not appear."
-/>
 
 <Callout type="info" title="INNER is optional">
 `JOIN` and `INNER JOIN` mean exactly the same thing, `INNER` is the

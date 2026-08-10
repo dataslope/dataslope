@@ -321,6 +321,12 @@ cat("mean(1:10)     =", mean(1:10), "\\n") # 5.5
 The shortcut `1:10` creates the sequence `1, 2, 3, ..., 10`. We
 will use ranges constantly later.
 
+<Figure
+  slug="rlang-r-as-a-calculator-inline-cutout"
+  alt="A small machine on a bench taking a short slip and returning a single result on a printed strip"
+  caption="Type an expression, press run, and R prints the value back."
+/>
+
 ```mermaid
 flowchart LR
   N["Numbers"] -->|arithmetic| N2["Numbers"]
@@ -387,12 +393,6 @@ and a tip percentage `tip_pct` (a number like `18` for 18%), compute:
 - `total`, the total bill (bill + tip), rounded to 2 decimals
 
 Both should be plain numeric scalars.
-
-<Figure
-  slug="rlang-r-as-a-calculator-inline-cutout"
-  alt="A small machine on a bench taking a short slip and returning a single result on a printed strip"
-  caption="Type an expression, press run, and R prints the value back."
-/>
 
 <ChallengeCard
   adapter="r"

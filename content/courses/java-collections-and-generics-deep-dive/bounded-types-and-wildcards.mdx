@@ -35,6 +35,12 @@ classDiagram
 
 `Dog` and `Cat` both extend `Animal`. So far, normal OOP.
 
+<Figure
+  slug="jcol-bounded-types-and-wildcards-setup-inline-cutout"
+  alt="A slot cut to accept a family of related shapes, a clearly larger shape waiting beside it"
+  caption="The bound is what decides which types the slot will actually take."
+/>
+
 ## Why List&lt;Dog&gt; is not List&lt;Animal&gt;
 
 Imagine the rule were the other way, that `List<Dog>` *was* a
@@ -259,12 +265,6 @@ permissive bound:
 `? extends T` shrinks toward subtypes (read-only side). `? super T`
 shrinks toward supertypes (write-only side). Plain `T` is the fixed
 point in the middle.
-
-<Figure
-  slug="jcol-bounded-types-and-wildcards-setup-inline-cutout"
-  alt="A slot cut to accept a family of related shapes, a clearly larger shape waiting beside it"
-  caption="The bound is what decides which types the slot will actually take."
-/>
 
 ## A more concrete example: a generic max
 

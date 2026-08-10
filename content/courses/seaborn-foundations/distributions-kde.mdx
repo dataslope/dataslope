@@ -23,12 +23,6 @@ A histogram makes one hard choice for every data point: which **bin** does
 it fall into? Points near a bin edge get sorted into one bar or the other,
 and the result can look jagged or wobble as you nudge the edges.
 
-<Figure
-  slug="sns-distributions-kde-inline-cutout"
-  alt="A row of stacked blocks forming a rough histogram, and a smooth curve laid over them following the same shape"
-  caption="A density curve smooths the bin edges away and keeps the shape."
-/>
-
 A KDE makes a softer choice. Instead of dropping each point into a bin, it
 places a small smooth **bump**, called a *kernel* (usually a tiny Gaussian),
 centered on each data point. Then it **adds all the bumps together**. Where
@@ -241,6 +235,12 @@ sns.displot(
 `,
     },
   ]}
+/>
+
+<Figure
+  slug="sns-distributions-kde-inline-cutout"
+  alt="A row of stacked blocks forming a rough histogram, and a smooth curve laid over them following the same shape"
+  caption="A density curve smooths the bin edges away and keeps the shape."
 />
 
 ## Where KDEs mislead

@@ -19,12 +19,6 @@ look at any table and confidently say "these columns are the features, this
 column is the target," you can frame essentially any supervised problem.
 That framing is the skill this page builds.
 
-<Figure
-  slug="ml-features-and-targets-concrete-example-from-inline-cutout"
-  alt="One board split by a clear gap, its left columns lifted as a group and its right column lifted alone"
-  caption="Splitting a table into X and y is what frames any supervised problem."
-/>
-
 ## The two pieces every model needs
 
 A supervised machine learning model learns to map *inputs* to *outputs*. We
@@ -39,6 +33,12 @@ of this course:
 - **`y`, the target.** A 1-D list of *answers*, one per row of `X`. It is the
   thing you want the model to predict. `y` is lowercase because it is a
   vector (one dimension).
+
+<Figure
+  slug="ml-features-and-targets-two-pieces-every-inline-cutout"
+  alt="A board of input columns separated by a clear gap from one marked answer column"
+  caption="The features are what you know; the target is what you want to predict."
+/>
 
 The single most important alignment rule: **row `i` of `X` and entry `i` of
 `y` describe the same example.** The features in the first row of `X` belong
@@ -77,9 +77,9 @@ number of bedrooms, an age, and a neighborhood; the thing we want to predict
 is its price.
 
 <Figure
-  slug="ml-features-and-targets-two-pieces-every-inline-cutout"
-  alt="A board of input columns separated by a clear gap from one marked answer column"
-  caption="The features are what you know; the target is what you want to predict."
+  slug="ml-features-and-targets-concrete-example-from-inline-cutout"
+  alt="One board split by a clear gap, its left columns lifted as a group and its right column lifted alone"
+  caption="Splitting a table into X and y is what frames any supervised problem."
 />
 
 We will build this table as a small pandas DataFrame and look at it.

@@ -36,6 +36,12 @@ Differentiation in finite precision is *ill-conditioned*, you are
 subtracting nearby numbers. Integration is *well-conditioned*,
 errors average out. This asymmetry shapes every algorithm below.
 
+<Figure
+  slug="scipy-numerical-calculus-big-picture-inline-cutout"
+  alt="A curve with thin rectangles fitted under it and a straight rod resting tangent at one point"
+  caption="An integral is estimated by fitting simple shapes under the curve."
+/>
+
 ## Finite differences
 
 The definition $f'(x) = \lim_{h\to 0} (f(x+h)-f(x))/h$ suggests we
@@ -230,12 +236,6 @@ But cost explodes: a rule that uses $n$ nodes per axis costs $n^d$
 total. Beyond 4-5 dimensions, switch to **Monte Carlo**, whose
 error scales as $1/\sqrt{N}$ regardless of dimension (we devote a
 whole chapter to it later).
-
-<Figure
-  slug="scipy-numerical-calculus-big-picture-inline-cutout"
-  alt="A curve with thin rectangles fitted under it and a straight rod resting tangent at one point"
-  caption="An integral is estimated by fitting simple shapes under the curve."
-/>
 
 ## A multi-file calculus toolkit
 

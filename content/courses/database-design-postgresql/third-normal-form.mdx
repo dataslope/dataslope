@@ -15,16 +15,16 @@ column.
 **Third normal form (3NF)** says non-key columns should depend on the
 key, the whole key, and nothing but the key.
 
+## The transitive dependency problem
+
+A **transitive dependency** happens when a non-key column depends on
+another non-key column instead of depending directly on the key.
+
 <Figure
   slug="db-third-normal-form-transitive-dependency-problem-inline-cutout"
   alt="A chain of three cards where the third hangs off the second rather than off the first, the second being lifted out with it"
   caption="When a column depends on another non-key column, both belong somewhere else."
 />
-
-## The transitive dependency problem
-
-A **transitive dependency** happens when a non-key column depends on
-another non-key column instead of depending directly on the key.
 
 Imagine an `orders` table like this:
 

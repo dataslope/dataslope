@@ -38,6 +38,12 @@ If a field is `public`, anyone can break the invariant by assigning
 to it. Making it `private` and offering controlled methods is how
 you defend the invariant.
 
+<Figure
+  slug="cpp-encapsulation-and-abstraction-invariants-truths-class-inline-cutout"
+  alt="A sealed cabinet with a gauge on its face whose needle never leaves a marked band however the handles are turned"
+  caption="An invariant is a promise the class keeps however its handles are used."
+/>
+
 ```mermaid
 flowchart TD
     O[Outside code] -->|deposit / withdraw| API[Public methods]
@@ -153,12 +159,6 @@ you those pieces:
 - You can test a class in isolation.
 - You can let multiple people work on different classes without
   stepping on each other.
-
-<Figure
-  slug="cpp-encapsulation-and-abstraction-invariants-truths-class-inline-cutout"
-  alt="A sealed cabinet with a gauge on its face whose needle never leaves a marked band however the handles are turned"
-  caption="An invariant is a promise the class keeps however its handles are used."
-/>
 
 This is the difference between programs that grow gracefully and
 programs that calcify under their own weight.

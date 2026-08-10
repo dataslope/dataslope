@@ -20,6 +20,12 @@ gives you *three* variables in one picture: x, y, and bubble size.
 Add `color` and you have *four*. Add `facet_col` and you have
 *five*. This information density is the bubble chart's superpower.
 
+<Figure
+  slug="viz-bubble-charts-pitch-inline-cutout"
+  alt="Chips pinned across a board where each chip's size carries a third measure"
+  caption="Two positions and one size means three variables in a single mark."
+/>
+
 The most famous bubble chart is **Hans Rosling's Gapminder**
 animation, life expectancy vs GDP per capita, with population as
 bubble size and continent as color, animated over time.
@@ -152,18 +158,6 @@ Press the **play button** below the chart. You're watching 50
 years of global development in 30 seconds. This is Hans Rosling's
 chart, in three Python lines.
 
-<Figure
-  slug="viz-bubble-charts-pitch-inline-cutout"
-  alt="Chips pinned across a board where each chip's size carries a third measure"
-  caption="Two positions and one size means three variables in a single mark."
-/>
-
-<Figure
-  slug="viz-bubble-charts-inline-cutout"
-  alt="Chips pinned across a board at different heights, each chip's size varying with a third measure"
-  caption="Add time and the same bubbles become a story that plays out as you watch."
-/>
-
 Two arguments make the animation work:
 
 - `animation_frame="year"`, each year is a frame.
@@ -197,6 +191,12 @@ A bubble chart fails when:
   bubble looks the same).
 - There are *too many* bubbles and they overlap completely.
 - The size variable is *negative* (negative areas don't exist).
+
+<Figure
+  slug="viz-bubble-charts-inline-cutout"
+  alt="Chips pinned across a board at different heights, each chip's size varying with a third measure"
+  caption="Add time and the same bubbles become a story that plays out as you watch."
+/>
 
 In those cases, prefer color or a different encoding.
 

@@ -41,6 +41,12 @@ except StopIteration:
 
 The `for` loop does exactly this, catching `StopIteration` invisibly.
 
+<Figure
+  slug="python-iterators-and-generators-really-does-inline-cutout"
+  alt="A smooth handle on a drum's outside with its cover lifted to show a crank and pointer within"
+  caption="A `for` loop is the smooth handle; underneath it is still `iter()` and `next()`."
+/>
+
 ```mermaid
 sequenceDiagram
     participant C as Caller (for loop)
@@ -660,9 +666,3 @@ Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\
 />
 
 Functions that decorate other functions are next.
-
-<Figure
-  slug="python-iterators-and-generators-really-does-inline-cutout"
-  alt="A smooth handle on a drum's outside with its cover lifted to show a crank and pointer within"
-  caption="A `for` loop is the smooth handle; underneath it is still `iter()` and `next()`."
-/>

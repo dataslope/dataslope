@@ -21,6 +21,12 @@ users", active doing what, over what window? "Conversion rate", converted
 from which step to which, counted by users or by sessions? Most metric
 disputes are definition disputes, not SQL bugs.
 
+<Figure
+  slug="duck-building-business-metrics-metric-definition-first-inline-cutout"
+  alt="A written definition card pinned above a bench with the machine built underneath it to match"
+  caption="Write the definition first, then build the query to match it exactly."
+/>
+
 ```mermaid
 flowchart TD
     Q["Vague question:<br/>how is conversion?"] --> D["Precise definition:<br/>distinct users who purchased<br/>/ distinct users who visited"]
@@ -99,12 +105,6 @@ revenue by *paying* users or by *all* users? They are different metrics,
 revenue per paying user against revenue per user, and answer different
 questions. Being explicit is the
 whole job.
-
-<Figure
-  slug="duck-building-business-metrics-metric-definition-first-inline-cutout"
-  alt="A written definition card pinned above a bench with the machine built underneath it to match"
-  caption="Write the definition first, then build the query to match it exactly."
-/>
 
 <SqlCodeBlock
   dialect="duckdb"

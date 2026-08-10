@@ -50,6 +50,12 @@ Plus one helper: `group_by()`, which makes `summarise()`,
 `mutate()`, and friends operate **per group**. We'll meet that
 properly on the next page.
 
+<Figure
+  slug="rlang-dplyr-verbs-inline-cutout"
+  alt="Five small hand tools hanging in a row above a bench, each one shown taking a different bite out of the same board"
+  caption="Each verb takes one kind of bite: rows, columns, order, new columns, summaries."
+/>
+
 Each verb reshapes the data frame a little:
 **`filter()` (fewer rows) → `select()` (fewer columns) → `mutate()`
 (new columns) → `arrange()` (rows reordered) → `summarise()`
@@ -415,9 +421,3 @@ print(top_eff)
 
 `summarise()` becomes spectacularly useful when paired with
 `group_by()`. That's the next page.
-
-<Figure
-  slug="rlang-dplyr-verbs-inline-cutout"
-  alt="Five small hand tools hanging in a row above a bench, each one shown taking a different bite out of the same board"
-  caption="Each verb takes one kind of bite: rows, columns, order, new columns, summaries."
-/>

@@ -37,6 +37,12 @@ classDiagram
 The hollow arrow `<|--` in UML means **inheritance**, *Dog
 is-an Animal*. In Java, the keyword is `extends`.
 
+<Figure
+  slug="oopj-inheritance-first-family-inline-cutout"
+  alt="One base cabinet with two cabinets behind it built on the same frame"
+  caption="Subclasses share the base frame and each add something of their own."
+/>
+
 <CodeBlock
   adapter="java"
   entryFilename="Main.java"
@@ -226,12 +232,6 @@ flowchart LR
 `final` is a useful design tool. Java's `String` is `final`, for
 good reason; if anyone could subclass `String` and break its rules,
 the entire JVM's security model would collapse.
-
-<Figure
-  slug="oopj-inheritance-first-family-inline-cutout"
-  alt="One base cabinet with two cabinets behind it built on the same frame"
-  caption="Subclasses share the base frame and each add something of their own."
-/>
 
 ## The trap: inheritance is *strong* coupling
 

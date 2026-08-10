@@ -57,6 +57,12 @@ createRoot(document.getElementById("root")!).render(<Clock />);
   ]}
 />
 
+<Figure
+  slug="rx-effects-and-data-fetching-useeffect-basics-inline-cutout"
+  alt="A panel lighting up and a cord running from it to a drum, a tray returning along the cord"
+  caption="`useEffect()` runs after the render, not during it."
+/>
+
 The clock below is live and ticking right now. Its effect starts one
 `setInterval()` on mount and returns a cleanup that clears it, exactly the
 shape above:
@@ -304,9 +310,3 @@ for (const expected of ["Ada", "Grace", "Linus"]) {
 Effects connect React to the outside world. Sometimes you need to reach
 that world more directly, to a real DOM node:
 [Refs and the DOM](/courses/react-from-the-ground-up/refs-and-the-dom).
-
-<Figure
-  slug="rx-effects-and-data-fetching-useeffect-basics-inline-cutout"
-  alt="A panel lighting up and a cord running from it to a drum, a tray returning along the cord"
-  caption="`useEffect()` runs after the render, not during it."
-/>

@@ -16,6 +16,12 @@ This page gives you the vocabulary for talking about those shapes. The notation 
 
 On ten items, almost any correct solution feels instant. On ten million items, an O(n^2) loop can be impossible while an O(n log n) solution still finishes. The program below makes the gap concrete: watch how the `quadratic` column races away from the `linear` one as `n` grows by factors of ten.
 
+<Figure
+  slug="dsa-complexity-analysis-we-care-inline-cutout"
+  alt="Two ramps from one start, a cart near the top of the gentle one and barely moved on the steep one"
+  caption="Complexity is about how the cost grows, not how fast one run is."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -42,12 +48,6 @@ Big-O ignores machine speed and focuses on how work changes as input size grows.
 ## Big-O, Big-Ω, and Big-Θ
 
 Let `f(n)` be the work your algorithm does and `g(n)` be a comparison function such as `n`, `n log n`, or `n^2`.
-
-<Figure
-  slug="dsa-complexity-analysis-we-care-inline-cutout"
-  alt="Two ramps from one start, a cart near the top of the gentle one and barely moved on the steep one"
-  caption="Complexity is about how the cost grows, not how fast one run is."
-/>
 
 | Notation | Meaning | Intuition |
 | --- | --- | --- |

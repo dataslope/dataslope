@@ -25,6 +25,12 @@ you visit a web page. The story has two characters: a **server** and a
    stylesheets and **JavaScript** programs, and the browser fetches
    and applies those too.
 
+<Figure
+  slug="web-how-the-web-works-round-trip-inline-cutout"
+  alt="A folded note carried along a cord to a drum and a filled tray carried back along the same cord"
+  caption="A request goes out and a response comes back, and a page is many of them."
+/>
+
 The crucial insight: a web page isn't a picture that gets downloaded.
 It's a *program-like description* that your browser executes. The
 server sends text; **your machine** does the rendering. That's why the
@@ -43,12 +49,6 @@ three different problems.
 One more thing about that round trip: a page is not one request but a
 chain of them, and the later ones cannot start until the earlier ones
 finish.
-
-<Figure
-  slug="web-how-the-web-works-round-trip-inline-cutout"
-  alt="A folded note carried along a cord to a drum and a filled tray carried back along the same cord"
-  caption="A request goes out and a response comes back, and a page is many of them."
-/>
 
 <Chart slug="request-waterfall-latency" />
 

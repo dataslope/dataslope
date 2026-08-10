@@ -37,6 +37,12 @@ WHERE avg_order > 100;
 The actual steps, *keep paid orders, average per region, keep big
 averages*, are scrambled. A reader has to mentally unwrap it.
 
+<Figure
+  slug="duck-common-table-expressions-problem-queries-nest-inline-cutout"
+  alt="A machine inside a machine inside a machine, the innermost barely reachable"
+  caption="Nesting subqueries inside subqueries is how a query becomes unreadable."
+/>
+
 ## The fix: a pipeline of named steps
 
 A CTE pulls each step out, names it, and stacks the steps **top to
@@ -237,9 +243,3 @@ Named steps let analysts inspect and iterate on each stage of a pipeline.`}
 CTEs are the *named* way to build sub-results. SQL also has unnamed,
 inline ones, **subqueries**, each with its own best use. That contrast
 is the next page.
-
-<Figure
-  slug="duck-common-table-expressions-problem-queries-nest-inline-cutout"
-  alt="A machine inside a machine inside a machine, the innermost barely reachable"
-  caption="Nesting subqueries inside subqueries is how a query becomes unreadable."
-/>

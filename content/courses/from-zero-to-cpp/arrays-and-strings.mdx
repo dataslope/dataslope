@@ -25,6 +25,12 @@ int scores[5] = {90, 85, 72, 95, 88};
 This puts five `int`s in **contiguous** memory. The size is part of
 the type (`int[5]`) and is fixed at compile time.
 
+<Figure
+  slug="cpp-arrays-and-strings-inline-cutout"
+  alt="A fixed strip of cells holding blocks beside a fixed strip of letter tiles ending in a small stop mark"
+  caption="A string is an array of characters that manages its own storage."
+/>
+
 ```mermaid
 flowchart TD
     subgraph "scores[5]"
@@ -386,9 +392,3 @@ int main() {
 
 Next: how to bundle multiple values together into a single named
 type, *structs* and aggregates.
-
-<Figure
-  slug="cpp-arrays-and-strings-inline-cutout"
-  alt="A fixed strip of cells holding blocks beside a fixed strip of letter tiles ending in a small stop mark"
-  caption="A string is an array of characters that manages its own storage."
-/>

@@ -21,6 +21,12 @@ matching: *the compiler refuses to build code that forgets a case*.
 A discriminated union is a sum type where every variant has a
 **literal tag** (called a *discriminant*) on the same property name.
 
+<Figure
+  slug="fp-pattern-matching-setup-discriminated-union-inline-cutout"
+  alt="Three sealed boxes each wearing a differently shaped tag, waiting at the mouth of a sorter"
+  caption="Every variant carries a tag, which is what the match reads first."
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -167,12 +173,6 @@ type-checked.
 Sometimes a variant *contains* another variant. You can pattern
 match through layers by chaining `match` calls, or by destructuring
 inside a case.
-
-<Figure
-  slug="fp-pattern-matching-setup-discriminated-union-inline-cutout"
-  alt="Three sealed boxes each wearing a differently shaped tag, waiting at the mouth of a sorter"
-  caption="Every variant carries a tag, which is what the match reads first."
-/>
 
 <CodeBlock
   adapter="typescript"

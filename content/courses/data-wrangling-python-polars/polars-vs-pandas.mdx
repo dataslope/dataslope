@@ -20,6 +20,12 @@ behaviour. It is powerful and it is the source of most pandas
 surprises, because two frames with different indexes silently align
 rather than fail.
 
+<Figure
+  slug="pl-polars-vs-pandas-1-there-no-inline-cutout"
+  alt="Two boards side by side, the left one carrying a column of tags down its edge and the right one having that column removed entirely, its rows bare at the edge"
+  caption="There is no index in Polars, so a row is identified by its values alone."
+/>
+
 Polars has no index. A DataFrame is columns and rows, and row order
 is just row order. If you want a key, make it a column and join on
 it. If you want a row number, ask for one with `pl.int_range`.
@@ -104,12 +110,6 @@ number") to mean "missing", which forced integer columns holding a
 missing value to become floats. It has since added `pd.NA` and
 nullable dtypes, so there are now several missing-value systems
 coexisting.
-
-<Figure
-  slug="pl-polars-vs-pandas-1-there-no-inline-cutout"
-  alt="Two boards side by side, the left one carrying a column of tags down its edge and the right one having that column removed entirely, its rows bare at the edge"
-  caption="There is no index in Polars, so a row is identified by its values alone."
-/>
 
 Polars has one. Every column has a validity bitmap saying which
 entries are present. A missing integer stays an integer.

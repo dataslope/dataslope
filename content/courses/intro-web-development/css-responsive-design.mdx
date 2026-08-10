@@ -23,6 +23,12 @@ Half of responsiveness is just *not* hard-coding pixel widths:
   together.
 - **`vw`/`vh`** are percentages of the viewport itself.
 
+<Figure
+  slug="web-css-responsive-design-start-fluid-units-inline-cutout"
+  alt="A block that stretches to fill whatever frame it is put in, shown in three frames of different widths"
+  caption="A fluid unit fills whatever space it is given, with no breakpoint needed."
+/>
+
 And one line every responsive page needs, in the HTML `<head>`, so
 phones don't pretend to be desktops:
 
@@ -239,9 +245,3 @@ if (!ok) throw new Error("Inside the media query, set .cards { grid-template-col
 One layout, every screen. You've now covered the full CSS toolkit.
 Time to make the page *respond to the user*, starting with
 [JavaScript and the DOM](/courses/intro-web-development/js-dom-basics).
-
-<Figure
-  slug="web-css-responsive-design-start-fluid-units-inline-cutout"
-  alt="A block that stretches to fill whatever frame it is put in, shown in three frames of different widths"
-  caption="A fluid unit fills whatever space it is given, with no breakpoint needed."
-/>

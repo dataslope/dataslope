@@ -37,6 +37,12 @@ it with `python my_script.py`. Scripts are great for:
 - Anything you want to version-control cleanly (a `.py` is just
   text, git loves it).
 
+<Figure
+  slug="pandas-notebooks-and-environments-inline-cutout"
+  alt="A bench where each step is a separate small card, run in order and leaving its result pinned beneath it"
+  caption="A notebook is only reproducible if the cells still work run in order."
+/>
+
 ### Notebooks (`.ipynb` files)
 
 A document made of *cells*. Each cell holds either prose
@@ -160,6 +166,12 @@ When you open a Jupyter notebook you see:
   variables in memory.
 - **Cells**, blocks of code or Markdown.
 
+<Figure
+  slug="pandas-notebooks-and-environments-scripts-vs-notebooks-inline-cutout"
+  alt="One sealed strip of instructions run end to end beside a bench of separate cards each leaving its own result pinned below"
+  caption="A script runs start to finish; a notebook keeps each step and its output."
+/>
+
 The kernel is the key concept. Every cell you run *modifies the
 state of the kernel*. If you define `df` in cell 5 and then run
 cell 5 a second time after changing the upstream cells, the value
@@ -199,18 +211,6 @@ analysis pins:
    every package version.
 4. **Runtime**, sometimes even the Python version itself
    (`.python-version`) and the OS (Docker).
-
-<Figure
-  slug="pandas-notebooks-and-environments-scripts-vs-notebooks-inline-cutout"
-  alt="One sealed strip of instructions run end to end beside a bench of separate cards each leaving its own result pinned below"
-  caption="A script runs start to finish; a notebook keeps each step and its output."
-/>
-
-<Figure
-  slug="pandas-notebooks-and-environments-inline-cutout"
-  alt="A bench where each step is a separate small card, run in order and leaving its result pinned beneath it"
-  caption="A notebook is only reproducible if the cells still work run in order."
-/>
 
 Most working analysts get layers 1 and 3 right and ignore 2 and
 4. That is good enough for many situations but not for regulated

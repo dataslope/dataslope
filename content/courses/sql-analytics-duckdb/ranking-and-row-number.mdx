@@ -154,6 +154,12 @@ The three ranking functions differ only in how they handle **ties** (rows
 with equal `ORDER BY` values). The difference matters and is a frequent
 source of confusion.
 
+<Figure
+  slug="duck-ranking-and-row-number-numbering-rows-row-inline-cutout"
+  alt="A row of blocks in height order with a pennant planted on each, the pennants shortening along the row"
+  caption="Ranking answers where a row stands relative to the others."
+/>
+
 - **`ROW_NUMBER()`**, always distinct: 1, 2, 3, 4. Ties are broken
   arbitrarily; no two rows share a number.
 - **`RANK()`**, ties share a number, then it **skips**: 1, 1, 3, 4. (Two
@@ -294,9 +300,3 @@ see.`}
 Ranking answers "where does this row stand?" The next page answers a
 different positional question, "how does this row's value accumulate or
 compare over time?", with running totals and moving averages.
-
-<Figure
-  slug="duck-ranking-and-row-number-numbering-rows-row-inline-cutout"
-  alt="A row of blocks in height order with a pennant planted on each, the pennants shortening along the row"
-  caption="Ranking answers where a row stands relative to the others."
-/>

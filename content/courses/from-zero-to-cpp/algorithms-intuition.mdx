@@ -20,6 +20,12 @@ For most everyday code, you care about a simple question: **how many
 operations do I do as the input grows?** That count is the
 algorithm's *time complexity*.
 
+<Figure
+  slug="cpp-algorithms-intuition-working-mental-model-inline-cutout"
+  alt="Three ramps of different steepness rising from one start, a cart on each having travelled very different distances"
+  caption="The steeper cost curve overtakes the gentler one as the input grows."
+/>
+
 <Chart slug="big-o-growth" />
 
 | Notation | Pronounced | Rough feel |
@@ -147,12 +153,6 @@ The fastest is also the easiest to get wrong (hash collisions, edge
 cases). The point of these chapters is not to memorize "the best"
 algorithm, it's to recognize that *multiple* approaches exist and
 that the cost is a deliberate choice.
-
-<Figure
-  slug="cpp-algorithms-intuition-working-mental-model-inline-cutout"
-  alt="Three ramps of different steepness rising from one start, a cart on each having travelled very different distances"
-  caption="The steeper cost curve overtakes the gentler one as the input grows."
-/>
 
 ```mermaid
 flowchart TB

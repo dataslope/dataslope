@@ -20,6 +20,12 @@ Garbage cannot get in if the schema forbids it.
 **Data quality** means the data is accurate, complete, consistent, and
 trustworthy enough for the software that depends on it.
 
+<Figure
+  slug="db-design-and-data-quality-data-quality-designed-inline-cutout"
+  alt="A cabinet whose slots physically refuse a misshapen part, beside an open shelf holding several"
+  caption="A slot shaped to refuse the wrong part is worth more than a rule in a document."
+/>
+
 Schema design affects each part.
 
 ```mermaid
@@ -91,12 +97,6 @@ must be unique.
 
 `NOT NULL` protects required facts. `CHECK` protects allowed values.
 Foreign keys protect relationships.
-
-<Figure
-  slug="db-design-and-data-quality-data-quality-designed-inline-cutout"
-  alt="A cabinet whose slots physically refuse a misshapen part, beside an open shelf holding several"
-  caption="A slot shaped to refuse the wrong part is worth more than a rule in a document."
-/>
 
 A task status should not be any random text. If the design knows the
 allowed states, the schema can enforce them.

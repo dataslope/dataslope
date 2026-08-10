@@ -101,6 +101,12 @@ Selection sort always does O(n²) comparisons, even if the input is already sort
 
 Insertion sort is the other card-player's algorithm, the one people use *while being dealt* cards: keep your hand sorted, and slot each new card into its place by sliding bigger cards over. In code, the sorted prefix grows one element at a time; each new value shifts larger elements right until its position opens.
 
+<Figure
+  slug="dsa-sorting-basic-inline-cutout"
+  alt="Two neighbouring blocks in a row being swapped by a small claw, the row a little more ordered after each pass"
+  caption="After each pass the row is a little more ordered than before."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -163,12 +169,6 @@ The deeper lesson of this page is the **loop invariant**, a statement that is tr
 ## Practice: bubble sort with early exit
 
 Both challenges provide a `printVector` helper in the driver; your job is only the sorting function itself. Output is comma-separated, e.g. `1,2,3,5,5,9`.
-
-<Figure
-  slug="dsa-sorting-basic-inline-cutout"
-  alt="Two neighbouring blocks in a row being swapped by a small claw, the row a little more ordered after each pass"
-  caption="After each pass the row is a little more ordered than before."
-/>
 
 <ChallengeCard
   adapter="cpp"

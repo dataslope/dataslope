@@ -99,6 +99,12 @@ class is a
 record of functions**. You pass the record as an argument; the
 generic function uses it.
 
+<Figure
+  slug="fp-generic-abstractions-and-type-classes-parametric-polymorphism-i-inline-cutout"
+  alt="A sealed pipe carrying blocks of every shape through unchanged, its own opening plain and unshaped"
+  caption="A parametric function cannot inspect its values, so it works for all of them."
+/>
+
 ### `Eq` as a record
 
 <CodeBlock
@@ -254,12 +260,6 @@ A **Semigroup** is the simplest possible algebraic abstraction: an
 associative binary operation. Numbers under addition, strings
 under concatenation, arrays under concatenation, and "last wins"
 on objects are all semigroups.
-
-<Figure
-  slug="fp-generic-abstractions-and-type-classes-parametric-polymorphism-i-inline-cutout"
-  alt="A sealed pipe carrying blocks of every shape through unchanged, its own opening plain and unshaped"
-  caption="A parametric function cannot inspect its values, so it works for all of them."
-/>
 
 <ChallengeCard
   adapter="typescript"

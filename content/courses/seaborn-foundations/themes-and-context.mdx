@@ -51,6 +51,12 @@ reader need to look up numbers, or just see the pattern?** Gridded styles
 point back to the axis. Grid-free styles (`white`, `ticks`) remove that
 scaffolding and put all the visual weight on the data itself.
 
+<Figure
+  slug="sns-themes-and-context-style-canvas-behind-inline-cutout"
+  alt="The same marks shown on three differently finished panels, the marks identical in each"
+  caption="The style changes the canvas, never the marks the data drew."
+/>
+
 Let's draw the *same* simple plot under three styles so the difference is
 about the canvas, not the data. First `whitegrid`, the workhorse for most
 analysis:
@@ -410,9 +416,3 @@ You can now control the overall look in one place: pick a `style` for the
 canvas, a `context` for the medium, and reach for `despine()` to lighten the
 frame. Next we go deep on the one dial we deliberately skipped, **color
 palettes**, and how to choose colors that inform rather than decorate.
-
-<Figure
-  slug="sns-themes-and-context-style-canvas-behind-inline-cutout"
-  alt="The same marks shown on three differently finished panels, the marks identical in each"
-  caption="The style changes the canvas, never the marks the data drew."
-/>

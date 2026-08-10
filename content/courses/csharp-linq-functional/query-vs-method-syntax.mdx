@@ -20,6 +20,12 @@ never feel like separate languages.
 
 The same query, three ways.
 
+<Figure
+  slug="cs-query-vs-method-syntax-side-by-side-inline-cutout"
+  alt="Two differently written instruction cards feeding one machine and producing two identical trays"
+  caption="Query syntax compiles to method calls, so both spell the same thing."
+/>
+
 <CodeBlock
   adapter="csharp"
   files={[
@@ -152,6 +158,12 @@ dance. Query syntax keeps it visually flat, much closer to SQL.
 Method syntax wins almost everywhere else, particularly when the
 query is mostly transformation and aggregation.
 
+<Figure
+  slug="cs-query-vs-method-syntax-inline-cutout"
+  alt="Two differently written instruction cards feeding the same machine and producing identical output trays"
+  caption="Two ways to write it, one pipeline underneath."
+/>
+
 ```csharp
 // method: short and clear
 var topRevenue = orders
@@ -179,18 +191,6 @@ keyword: `Take()`, `Skip()`, `Distinct()`, `Count()`, `First()`, `Aggregate()`,
 ## What the compiler actually does
 
 Let's see a non-trivial example translated by hand.
-
-<Figure
-  slug="cs-query-vs-method-syntax-side-by-side-inline-cutout"
-  alt="Two differently written instruction cards feeding one machine and producing two identical trays"
-  caption="Query syntax compiles to method calls, so both spell the same thing."
-/>
-
-<Figure
-  slug="cs-query-vs-method-syntax-inline-cutout"
-  alt="Two differently written instruction cards feeding the same machine and producing identical output trays"
-  caption="Two ways to write it, one pipeline underneath."
-/>
 
 ```csharp
 // query

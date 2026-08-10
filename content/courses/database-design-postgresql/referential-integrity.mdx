@@ -16,22 +16,16 @@ comment stores `post_id = 20`, then post `20` must exist. The database
 protects those promises so your design cannot quietly drift into broken
 links.
 
+## The orphan-row problem
+
+An **orphan row** is a child row that points to a parent row that does
+not exist.
+
 <Figure
   slug="db-referential-integrity-orphan-row-problem-inline-cutout"
   alt="A crate with a cord leading away to an empty space where another crate used to stand"
   caption="An orphan is a row still pointing at something that is no longer there."
 />
-
-<Figure
-  slug="db-referential-integrity-inline-cutout"
-  alt="A cord running from one crate to another, and a gate refusing to remove the far crate while the cord is still attached"
-  caption="The database refuses the delete while another row still depends on it."
-/>
-
-## The orphan-row problem
-
-An **orphan row** is a child row that points to a parent row that does
-not exist.
 
 ```mermaid
 flowchart TD
@@ -165,6 +159,12 @@ Delete behavior should match the real meaning of the parent-child relationship.`
 
 This block creates two parent-child designs. Deleting a draft cascades to
 its comments. Deleting an account with invoices is restricted.
+
+<Figure
+  slug="db-referential-integrity-inline-cutout"
+  alt="A cord running from one crate to another, and a gate refusing to remove the far crate while the cord is still attached"
+  caption="The database refuses the delete while another row still depends on it."
+/>
 
 <SqlCodeBlock
   expectError

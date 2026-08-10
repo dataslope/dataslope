@@ -228,6 +228,12 @@ public class Point {
 hashcode. It is not the fastest hash in the world, but it is correct
 and clear, which is what almost every domain class needs.
 
+<Figure
+  slug="jcol-equality-and-hashing-inline-cutout"
+  alt="Two identical-looking blocks on a balance that reads level, and beneath them a sorting machine dropping both into the same one of several bins"
+  caption="Equal objects must hash alike, or the set will hold both copies."
+/>
+
 ## Records: the modern shortcut
 
 Java 16+ has **records**, which generate a correct `equals()`,
@@ -333,12 +339,6 @@ a `HashSet` for the same data, almost always a bug. We'll meet
 
 This is one of the most common real uses of `equals()`/`hashCode()`: a
 "have I seen this before?" service.
-
-<Figure
-  slug="jcol-equality-and-hashing-inline-cutout"
-  alt="Two identical-looking blocks on a balance that reads level, and beneath them a sorting machine dropping both into the same one of several bins"
-  caption="Equal objects must hash alike, or the set will hold both copies."
-/>
 
 <ChallengeCard
   adapter="java"

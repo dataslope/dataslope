@@ -18,17 +18,17 @@ There are two ways to provide that ordering:
 - **`Comparator<T>`**, an *external* object defines an order on the
   type, often one of many possible orderings.
 
-<Figure
-  slug="jcol-comparable-and-comparator-comparable-natural-order-inline-cutout"
-  alt="Two blocks on a balance built into the blocks themselves, no separate tool needed"
-  caption="`Comparable` builds one natural order into the type itself."
-/>
-
 ## Comparable: the natural order
 
 `Comparable<T>` has a single method, `int compareTo(T other)`, which
 returns a negative number, zero, or a positive number depending on
 whether `this` is less than, equal to, or greater than `other`.
+
+<Figure
+  slug="jcol-comparable-and-comparator-comparable-natural-order-inline-cutout"
+  alt="Two blocks on a balance built into the blocks themselves, no separate tool needed"
+  caption="`Comparable` builds one natural order into the type itself."
+/>
 
 Many built-in types implement it: `Integer`, `Double`, `String`
 (lexicographic), `LocalDate`, etc.

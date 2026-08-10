@@ -36,6 +36,12 @@ By convention:
   many sources end up in the same program.
 - Folder structure on disk mirrors the package: `src/com/acme/billing/Invoice.java`.
 
+<Figure
+  slug="java-software-organization-packages-physical-organization-inline-cutout"
+  alt="A rack of labelled folders, each holding cards of one kind only"
+  caption="Packages put each kind of class in its own labelled place."
+/>
+
 Packages have two practical benefits:
 
 1. **Naming.** Two different libraries can both have a `Logger`
@@ -132,12 +138,6 @@ src/main/java/
 
 Six classes, four packages, four layers. From the outside, the
 shape is exactly the same as a 200-class enterprise codebase.
-
-<Figure
-  slug="java-software-organization-packages-physical-organization-inline-cutout"
-  alt="A rack of labelled folders, each holding cards of one kind only"
-  caption="Packages put each kind of class in its own labelled place."
-/>
 
 The wiring at startup, creating the infrastructure objects, handing
 them to the service, handing the service to the controller, is

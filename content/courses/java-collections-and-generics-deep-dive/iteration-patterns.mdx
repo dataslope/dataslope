@@ -16,18 +16,6 @@ process the whole thing as a pipeline?
 This chapter is a tour of the five iteration patterns you'll use
 every week, plus the single most common bug each one introduces.
 
-<Figure
-  slug="jcol-iteration-patterns-2-explicit-iterator-inline-cutout"
-  alt="A drum with its cover off, a hand on the crank and a second hand lifting one block out mid-turn"
-  caption="Only the explicit iterator lets you remove an element mid-walk safely."
-/>
-
-<Figure
-  slug="jcol-iteration-patterns-1-enhanced-each-inline-cutout"
-  alt="A drum with a single smooth handle, one block leaving per turn with nothing else to operate"
-  caption="The for-each loop offers one handle and nothing else to get wrong."
-/>
-
 ## 1. Enhanced for-each
 
 The for-each loop is sugar over an `Iterator`. It is the right tool
@@ -67,6 +55,12 @@ while (it.hasNext()) {
 That has one immediate consequence: **you cannot remove elements
 from the collection inside a for-each loop.** Doing so triggers
 `ConcurrentModificationException` on the next `it.hasNext()`.
+
+<Figure
+  slug="jcol-iteration-patterns-1-enhanced-each-inline-cutout"
+  alt="A drum with a single smooth handle, one block leaving per turn with nothing else to operate"
+  caption="The for-each loop offers one handle and nothing else to get wrong."
+/>
 
 ## 2. Explicit Iterator and Iterator.remove()
 
@@ -161,6 +155,12 @@ public class Main {
 
 `ListIterator` is what makes "edit in place" patterns possible on
 list-backed structures.
+
+<Figure
+  slug="jcol-iteration-patterns-2-explicit-iterator-inline-cutout"
+  alt="A drum with its cover off, a hand on the crank and a second hand lifting one block out mid-turn"
+  caption="Only the explicit iterator lets you remove an element mid-walk safely."
+/>
 
 ## 4. forEach with a Consumer
 

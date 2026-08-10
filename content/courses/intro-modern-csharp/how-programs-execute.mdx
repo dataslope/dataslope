@@ -21,6 +21,12 @@ CPU instructions, just build the mental model.
 
 **Source code (`.cs` files) → Compiler (Roslyn) → Intermediate Language (CIL / IL) → Runtime (the .NET common language runtime, or WebAssembly) → just-in-time compiler → CPU + memory → Output to console / files / screen**
 
+<Figure
+  slug="mcs-how-programs-execute-big-picture-inline-cutout"
+  alt="A card feeding a translating machine, whose output drives a second machine on the same bench"
+  caption="Source, intermediate language, runtime, machine code: the whole path."
+/>
+
 There are five real "things" in that pipeline, plus the CPU. Here is
 the whole journey at a glance, before we open up each piece:
 
@@ -310,12 +316,6 @@ Console.WriteLine($"now a list of length {nums.Count}");
 ## 8. The full lifecycle, one more time
 
 Here is the whole picture, now with the pieces named.
-
-<Figure
-  slug="mcs-how-programs-execute-big-picture-inline-cutout"
-  alt="A card feeding a translating machine, whose output drives a second machine on the same bench"
-  caption="Source, intermediate language, runtime, machine code: the whole path."
-/>
 
 1. You write `.cs` source.
 2. Roslyn compiles it to IL (`.dll`).

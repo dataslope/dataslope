@@ -32,6 +32,12 @@ The JCF was built around four goals:
 - **Algorithms** (sort, shuffle, search) that work on any matching
   container.
 
+<Figure
+  slug="jcol-the-collections-framework-two-big-ideas-inline-cutout"
+  alt="One standard fitting and one standard crank shown together on the front of several different containers"
+  caption="Common interfaces plus shared algorithms is the whole design."
+/>
+
 That is it. From those four goals everything else follows: the
 interface hierarchy, the `Collections` static-utility class, the
 `Iterator` interface, the standard implementations, and the way
@@ -207,12 +213,6 @@ separately from data structures**. The class `java.util.Collections`
 holds static helpers, `sort()`, `shuffle()`, `reverse()`,
 `unmodifiableList()`, `frequency()`, `min`, `max`, that work on any
 matching collection.
-
-<Figure
-  slug="jcol-the-collections-framework-two-big-ideas-inline-cutout"
-  alt="One standard fitting and one standard crank shown together on the front of several different containers"
-  caption="Common interfaces plus shared algorithms is the whole design."
-/>
 
 <CodeBlock
   adapter="java"

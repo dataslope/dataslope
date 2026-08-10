@@ -175,6 +175,12 @@ legend and palette, because the *type* changed from continuous to
 discrete. Keep this in mind; it explains a surprising number of "why
 does my plot look wrong?" moments.
 
+<Figure
+  slug="gg-the-data-layer-inline-cutout"
+  alt="A plain board with a tray of chips resting beside it, nothing yet drawn on the board itself"
+  caption="The data comes first; nothing can be mapped until the table is tidy."
+/>
+
 <MultipleChoice
   markdown={`Your sales data has separate columns \`y2019\`, \`y2020\`, \`y2021\`, and you want year on the x-axis. Why must you reshape it first?
 
@@ -213,12 +219,6 @@ The wide table below hides `year` in its column *names*. Reshape it into
 a **long** data frame called `tidy` with three columns, `region`,
 `year`, and `sales`, so that `year` becomes something you could map.
 Six rows in total (two regions × three years).
-
-<Figure
-  slug="gg-the-data-layer-inline-cutout"
-  alt="A plain board with a tray of chips resting beside it, nothing yet drawn on the board itself"
-  caption="The data comes first; nothing can be mapped until the table is tidy."
-/>
 
 <ChallengeCard
   adapter="r"

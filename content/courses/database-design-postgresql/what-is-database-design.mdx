@@ -29,6 +29,12 @@ fixes one of her rows and misses the other. Run the block and look at
 the result: the database now claims, with complete confidence, that
 the same person has two different email addresses.
 
+<Figure
+  slug="db-what-is-database-design-watch-shortcut-go-inline-cutout"
+  alt="A cabinet built without its dividers, its contents slumped into one another"
+  caption="Skip the dividers and everything stored afterwards slumps into everything else."
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="An update anomaly in a flat table"
@@ -220,12 +226,6 @@ reporting script, the analyst with a SQL console. A feature may look
 like a button or a report, but underneath it is always a question
 about stored facts. If the facts are cleanly modeled, the feature is
 small. If they are tangled, the feature becomes a rewrite.
-
-<Figure
-  slug="db-what-is-database-design-watch-shortcut-go-inline-cutout"
-  alt="A cabinet built without its dividers, its contents slumped into one another"
-  caption="Skip the dividers and everything stored afterwards slumps into everything else."
-/>
 
 Here is the cheerful version of that story. A product manager asks:
 *"Which customers bought a notebook?"* In a cleanly designed schema,

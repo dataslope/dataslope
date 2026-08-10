@@ -30,6 +30,12 @@ entire program* until the data arrives. With a single-threaded
 language like JavaScript, that's catastrophic, the interface freezes,
 no other code runs, and your one CPU sits idle waiting.
 
+<Figure
+  slug="js-asynchronous-thinking-async-exists-at-inline-cutout"
+  alt="A single counter where one slow order blocks a long queue behind it, and beside it the same counter with the slow order set aside to one side while the queue moves"
+  caption="One slow job blocks everything behind it unless you set it aside."
+/>
+
 The async philosophy is:
 
 > Start the slow work, *don't wait*, do something else, and
@@ -72,6 +78,12 @@ buzzer is a **callback** or a **promise**.
 
 A **callback** is a function you give to another function so it
 can be called back later. Many older async APIs use this pattern.
+
+<Figure
+  slug="js-asynchronous-thinking-inline-cutout"
+  alt="A single worker at a counter starting a slow kettle, serving two other customers while it boils, and returning to the kettle when it whistles"
+  caption="One worker can keep several jobs in flight without doing two at once."
+/>
 
 <CodeBlock
   adapter="javascript"
@@ -185,12 +197,6 @@ A subtle but important word distinction:
   periods of time. They don't have to *run* simultaneously.
 - **Parallel**: many tasks literally run *at the same time* on
   separate CPU cores.
-
-<Figure
-  slug="js-asynchronous-thinking-async-exists-at-inline-cutout"
-  alt="A single counter where one slow order blocks a long queue behind it, and beside it the same counter with the slow order set aside to one side while the queue moves"
-  caption="One slow job blocks everything behind it unless you set it aside."
-/>
 
 JavaScript gives you *concurrency* on a single thread. While one
 async task is "in flight" (waiting for the host to do something),
@@ -501,12 +507,6 @@ runSequentially(tasks, (err, results) => {
 />
 
 ---
-
-<Figure
-  slug="js-asynchronous-thinking-inline-cutout"
-  alt="A single worker at a counter starting a slow kettle, serving two other customers while it boils, and returning to the kettle when it whistles"
-  caption="One worker can keep several jobs in flight without doing two at once."
-/>
 
 <MultipleChoice
   markdown={`Why does JavaScript provide asynchronous APIs even though it runs on a single thread?

@@ -49,6 +49,12 @@ balance to nonsense. The "rules of being a bank account" don't live
 *inside the class*, they're scattered across every place that
 touches `Balance`. That's the problem encapsulation solves.
 
+<Figure
+  slug="mcs-encapsulation-and-abstraction-properly-encapsulated-version-inline-cutout"
+  alt="A sealed cabinet with a solid back and two handles on its front, the only way in"
+  caption="With the state sealed, the handles are the only way anything changes."
+/>
+
 ## Access modifiers: the basic tools
 
 C# gives you a few keywords to control who can see what.
@@ -186,12 +192,6 @@ That stability is the practical payoff of abstraction.
 
 They work together. Encapsulation makes abstraction safe; abstraction
 makes encapsulation *useful*.
-
-<Figure
-  slug="mcs-encapsulation-and-abstraction-properly-encapsulated-version-inline-cutout"
-  alt="A sealed cabinet with a solid back and two handles on its front, the only way in"
-  caption="With the state sealed, the handles are the only way anything changes."
-/>
 
 ## A larger example: a `Wallet`
 

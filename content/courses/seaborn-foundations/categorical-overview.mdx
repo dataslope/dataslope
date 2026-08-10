@@ -29,6 +29,12 @@ let you see**. Every group of numbers has a full shape, where it clusters,
 how spread out it is, where the outliers sit. A categorical plot makes a
 choice about how much of that shape to draw versus boil away.
 
+<Figure
+  slug="sns-categorical-overview-one-function-many-inline-cutout"
+  alt="One handle on a machine turned to four settings, each producing a different chart on the board"
+  caption="`catplot()` is one function whose `kind` argument picks the chart."
+/>
+
 | `kind` | What it draws | How much it reveals | Needs |
 | ------ | ------------- | ------------------- | ----- |
 | `"strip"` | Every point, with jitter | **All** observations | category + numeric |
@@ -349,9 +355,3 @@ You now have the map of the categorical family and the one decision that
 drives it: *how much of the distribution do you want to see?* Next we start
 at the summary end of that dial with **bar and count plots**, and meet the
 single most common way a categorical chart can mislead.
-
-<Figure
-  slug="sns-categorical-overview-one-function-many-inline-cutout"
-  alt="One handle on a machine turned to four settings, each producing a different chart on the board"
-  caption="`catplot()` is one function whose `kind` argument picks the chart."
-/>

@@ -21,12 +21,6 @@ and points in different groups are far apart. Nobody told it what the
 groups *mean*, it just finds structure that was already sitting in the
 data, waiting to be noticed.
 
-<Figure
-  slug="ml-k-means-clustering-problem-solves-inline-cutout"
-  alt="A scatter of chips with three posts being driven in among them, each chip roped to its nearest post"
-  caption="K-means places k centres and gives every point to its nearest one."
-/>
-
 This is your entry point into **unsupervised learning**, and the ideas
 here, distance, centers, "similar things belong together", echo through
 everything that follows.
@@ -47,6 +41,12 @@ labeled the listeners as "jazz fan" or "workout-music person." All you have
 is behavior: how much each person listens to each genre, time of day,
 session length. You suspect there are natural *types* of listener in
 there, but which ones, and who belongs to which?
+
+<Figure
+  slug="ml-k-means-clustering-problem-solves-inline-cutout"
+  alt="A scatter of chips with three posts being driven in among them, each chip roped to its nearest post"
+  caption="K-means places k centres and gives every point to its nearest one."
+/>
 
 This is the core unsupervised question: **given unlabeled examples, can we
 group them so that members of a group resemble each other?** That grouping

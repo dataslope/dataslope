@@ -33,9 +33,9 @@ error*, a typical sample-to-sample wobble. The point estimate throws
 that information away. The confidence interval keeps it.
 
 <Figure
-  slug="stat-confidence-intervals-building-ci-mean-inline-cutout"
-  alt="One mark on a rail with a band drawn either side of it, the band's width set by a caliper"
-  caption="A point estimate hides its wobble; the interval puts that wobble on the page."
+  slug="stat-confidence-intervals-point-estimate-alone-inline-cutout"
+  alt="A single mark on a rail beside the same mark with a soft band drawn either side"
+  caption="The band's width comes from the standard error and the confidence you want."
 />
 
 ```mermaid
@@ -70,9 +70,9 @@ the t is slightly wider to pay for that extra uncertainty, and the
 difference matters most when $n$ is small.
 
 <Figure
-  slug="stat-confidence-intervals-point-estimate-alone-inline-cutout"
-  alt="A single mark on a rail beside the same mark with a soft band drawn either side"
-  caption="The band's width comes from the standard error and the confidence you want."
+  slug="stat-confidence-intervals-building-ci-mean-inline-cutout"
+  alt="One mark on a rail with a band drawn either side of it, the band's width set by a caliper"
+  caption="The interval's width comes from the standard error and the confidence you ask for."
 />
 
 `scipy.stats` does the arithmetic for you. `stats.t.interval()` takes the

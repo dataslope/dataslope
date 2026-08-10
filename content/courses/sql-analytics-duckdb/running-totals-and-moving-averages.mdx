@@ -22,6 +22,12 @@ before it. The magic is just `SUM(...) OVER (ORDER BY ...)`: once the
 window is *ordered*, the sum grows row by row instead of being one
 constant total.
 
+<Figure
+  slug="duck-running-totals-and-moving-averages-running-total-inline-cutout"
+  alt="A row of blocks with a growing stack beside it, each stack taller than the last by that block"
+  caption="Each row's running total is the previous one plus this row's value."
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Cumulative revenue by day"
@@ -284,9 +290,3 @@ it within each.`}
 You now command the window-function toolkit, ranking, running totals,
 moving averages, and row comparisons. Next we shift from *summarizing*
 data to *transforming* it: conditional logic, dates, and reshaping.
-
-<Figure
-  slug="duck-running-totals-and-moving-averages-running-total-inline-cutout"
-  alt="A row of blocks with a growing stack beside it, each stack taller than the last by that block"
-  caption="Each row's running total is the previous one plus this row's value."
-/>

@@ -37,6 +37,12 @@ ggplot(mpg, aes(displ, hwy)) +
   ]}
 />
 
+<Figure
+  slug="gg-position-scales-continuous-position-scales-inline-cutout"
+  alt="A smooth rule with evenly spaced marks running along one edge of a board"
+  caption="A position scale decides how data values become distances on the page."
+/>
+
 ## Transformations: the log scale
 
 A **transformation** changes the *spacing* of the axis, not the data.
@@ -95,18 +101,6 @@ ggplot(df, aes(size, score)) +
 
 Same data, same mapping, same geom. Only the **scale's
 transformation** changed, and the chart went from unreadable to clear.
-
-<Figure
-  slug="gg-position-scales-continuous-position-scales-inline-cutout"
-  alt="A smooth rule with evenly spaced marks running along one edge of a board"
-  caption="A position scale decides how data values become distances on the page."
-/>
-
-<Figure
-  slug="gg-position-scales-inline-cutout"
-  alt="The same chips shown on an evenly spaced rule and again on a rule whose marks crowd toward one end"
-  caption="A log transformation changes the spacing, not the data or the geom."
-/>
 
 **Skewed data (1 ... 100000) → `scale_x_log10()` transforms the spacing →
 an evenly spread axis where equal gaps mean 10x steps.**
@@ -202,6 +196,12 @@ ggplot(mpg, aes(x = drv)) +
 `,
     },
   ]}
+/>
+
+<Figure
+  slug="gg-position-scales-inline-cutout"
+  alt="The same chips shown on an evenly spaced rule and again on a rule whose marks crowd toward one end"
+  caption="A log transformation changes the spacing, not the data or the geom."
 />
 
 <MultipleChoice

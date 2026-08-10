@@ -30,6 +30,12 @@ Parquet export and query it directly. In this browser course we lean on
 **generated** rows, because they let every example be self-contained and
 reproducible. Both teach the same SQL.
 
+<Figure
+  slug="duck-loading-and-generating-data-four-ways-data-inline-cutout"
+  alt="Four differently shaped cartons feeding one hopper and arriving inside as identical rows"
+  caption="Whatever the file format, it arrives inside DuckDB as ordinary rows."
+/>
+
 ## Literal rows with `VALUES`
 
 The simplest source is data you type yourself. You have seen this in
@@ -63,6 +69,12 @@ DuckDB's `range(start, stop)` produces the integers from `start` up to
 **but not including** `stop`. Combined with arithmetic, it can fabricate
 realistic-looking datasets of any size, perfect for practice and for
 testing a query's behavior at scale.
+
+<Figure
+  slug="duck-loading-and-generating-data-inline-cutout"
+  alt="Three differently shaped cartons feeding one hopper and arriving inside as identical rows"
+  caption="CSV, Parquet or a generated range: all four routes end in a table."
+/>
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -108,12 +120,6 @@ The most important habit in this lesson: **`CREATE TABLE AS SELECT`**
 (often shortened to *CTAS*). It runs a query and stores its result as a
 new table. Analysts use it to "freeze" a cleaned-up or generated dataset
 so later queries can build on it.
-
-<Figure
-  slug="duck-loading-and-generating-data-four-ways-data-inline-cutout"
-  alt="Four differently shaped cartons feeding one hopper and arriving inside as identical rows"
-  caption="Whatever the file format, it arrives inside DuckDB as ordinary rows."
-/>
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -220,9 +226,3 @@ applies unchanged to files and warehouse tables.`}
 You can now bring data into DuckDB and conjure practice datasets at will.
 With data in hand, the real fun begins, let us learn how an analyst
 *profiles* an unfamiliar dataset.
-
-<Figure
-  slug="duck-loading-and-generating-data-inline-cutout"
-  alt="Three differently shaped cartons feeding one hopper and arriving inside as identical rows"
-  caption="CSV, Parquet or a generated range: all four routes end in a table."
-/>

@@ -31,6 +31,12 @@ A dataset can lie to you in quiet ways:
 - The **range** is wrong, dates that stop early, amounts that go
   negative.
 
+<Figure
+  slug="duck-profiling-a-dataset-profile-first-inline-cutout"
+  alt="A crate with a gauge clipped to each of its sides before its lid is opened"
+  caption="Measure the dataset before you query it, not after the answer looks odd."
+/>
+
 Profiling surfaces these before they corrupt a conclusion. Think of it as
 checking the ingredients before you cook.
 
@@ -160,12 +166,6 @@ One line of intent, a complete profile of ten columns. Scan the `min` and
 `clarity`, and the null percentages, in seconds you know more about this
 file than scrolling it for an hour would tell you. `SUMMARIZE()` is the
 first thing many DuckDB analysts type when they meet a new dataset.
-
-<Figure
-  slug="duck-profiling-a-dataset-profile-first-inline-cutout"
-  alt="A crate with a gauge clipped to each of its sides before its lid is opened"
-  caption="Measure the dataset before you query it, not after the answer looks odd."
-/>
 
 ```mermaid
 flowchart TD

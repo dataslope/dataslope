@@ -27,6 +27,12 @@ and runs it through four steps to produce an executable (`a.out` /
 4. **Link**, combine the `.o` files and libraries into one
    executable.
 
+<Figure
+  slug="cpp-compilation-pipeline-inline-cutout"
+  alt="A card passing through four machines and leaving as a running unit, each stage's output visibly different"
+  caption="Source goes in one end and a runnable program comes out the other."
+/>
+
 Each step produces a real artifact you can sometimes inspect. Each
 step has its own kind of error message. Follow the artifact as it
 changes form at each stage:
@@ -428,9 +434,3 @@ void greet(const std::string &name) { std::cout << "Hello, " << name << "!\\n"; 
 
 Next: let's actually look at "Hello, World!" line by line, and see
 which parts of the language each piece is using.
-
-<Figure
-  slug="cpp-compilation-pipeline-inline-cutout"
-  alt="A card passing through four machines and leaving as a running unit, each stage's output visibly different"
-  caption="Source goes in one end and a runnable program comes out the other."
-/>

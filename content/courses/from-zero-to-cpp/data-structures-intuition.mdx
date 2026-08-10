@@ -17,12 +17,6 @@ often a bigger performance win than any micro-optimization.
 This chapter sketches the standard containers and when to reach for
 each, without diving into their implementations.
 
-<Figure
-  slug="cpp-data-structures-intuition-associative-containers-inline-cutout"
-  alt="A wall of small drawers each with a keyhole, a key going straight to one drawer"
-  caption="An associative container goes straight to a value by its key."
-/>
-
 ## A map of the standard containers
 
 | Family | Container | What it is |
@@ -163,6 +157,12 @@ A short checklist:
    vectors, depending).
 7. **Need fast insertion in the middle by iterator?** Maybe
    `std::list`, but profile first.
+
+<Figure
+  slug="cpp-data-structures-intuition-associative-containers-inline-cutout"
+  alt="A wall of small drawers each with a keyhole, a key going straight to one drawer"
+  caption="An associative container goes straight to a value by its key."
+/>
 
 ## A note on iteration cost
 

@@ -129,6 +129,12 @@ print(f"Feed-forward share: {ff_share:.0%} of all parameters")
 * **Depth** (the number of blocks) sets how many rounds of refinement
   that representation goes through.
 
+<Figure
+  slug="llm-the-shape-of-a-transformer-full-path-prompt-inline-cutout"
+  alt="A ribbon entering the bottom of a stack of identical boxed layers and one new chip leaving the top"
+  caption="Tokens go in at the bottom and one new token comes out at the top."
+/>
+
 Neither substitutes for the other. A very wide, shallow model has rich
 representations it cannot refine; a very deep, narrow one refines
 repeatedly but has little room to hold intermediate conclusions.
@@ -142,12 +148,6 @@ Two things people assume are in the architecture and are not:
 * **No fact database.** There is no lookup table. Everything the model
   "knows" is encoded in the same weights that determine its grammar,
   which is why knowledge and style cannot be updated independently.
-
-<Figure
-  slug="llm-the-shape-of-a-transformer-full-path-prompt-inline-cutout"
-  alt="A ribbon entering the bottom of a stack of identical boxed layers and one new chip leaving the top"
-  caption="Tokens go in at the bottom and one new token comes out at the top."
-/>
 
 ## Concept check
 

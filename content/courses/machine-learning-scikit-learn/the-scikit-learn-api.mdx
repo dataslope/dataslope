@@ -21,12 +21,6 @@ library, and they all speak the same small vocabulary. Learn that vocabulary
 once and you can pick up any model in the ecosystem without learning a new
 interface. This page is about that vocabulary: the **estimator API**.
 
-<Figure
-  slug="ml-the-scikit-learn-api-inline-cutout"
-  alt="Four different machines all fitted with the same three-handle front plate, one hand working each the same way"
-  caption="Every estimator wears the same front plate: `fit()`, `predict()`, `score()`."
-/>
-
 <Callout type="info" title="Why a consistent API is a superpower">
 Imagine if every model came with its own bespoke method names, one wanted
 `train()`, another `learn()`, a third `optimize()`. You would spend your life
@@ -398,6 +392,12 @@ learning workflows tractable. Because every estimator shares the interface:
 - **Knowledge compounds.** Every new algorithm you learn, trees, forests,
   gradient boosting, arrives already speaking `fit()`/`predict()`. You learn its
   *ideas*, never a new way to call it.
+
+<Figure
+  slug="ml-the-scikit-learn-api-inline-cutout"
+  alt="Four different machines all fitted with the same three-handle front plate, one hand working each the same way"
+  caption="Every estimator wears the same front plate: `fit()`, `predict()`, `score()`."
+/>
 
 That leverage, learn the interface once, apply it everywhere, is why this
 page sits in the foundations. The rest of the course will introduce many

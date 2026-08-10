@@ -133,6 +133,12 @@ setter (or a callback) as another prop. The child reports events *up*
 by calling the callback; the parent owns the truth. This is the
 standard way sibling components stay in sync.
 
+<Figure
+  slug="rx-handling-events-inline-cutout"
+  alt="A button on a panel being pressed and a short cord carrying the press to a small handler box behind it"
+  caption="An event handler is a prop, and React wires it to the element for you."
+/>
+
 <CodeBlock
   adapter="react"
   files={[
@@ -255,9 +261,3 @@ if (!/count:\\s*-1/i.test(h1.textContent || "")) {
 
 Events drive state changes. The richest source of events is form
 input, up next: [Forms and controlled inputs](/courses/react-from-the-ground-up/forms-and-controlled-inputs).
-
-<Figure
-  slug="rx-handling-events-inline-cutout"
-  alt="A button on a panel being pressed and a short cord carrying the press to a small handler box behind it"
-  caption="An event handler is a prop, and React wires it to the element for you."
-/>

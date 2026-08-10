@@ -18,12 +18,6 @@ which are not.
 A table is two-dimensional. Memory is one-dimensional. Something has
 to give, and there are exactly two reasonable choices.
 
-<Figure
-  slug="pl-arrow-shared-columns-cutout"
-  alt="Three different machine cabinets all reading from one long shared column of stacked cells running between them"
-  caption="Apache Arrow, 2016: one agreed memory layout, so a column can cross a language boundary without being copied."
-/>
-
 **Row-major** stores each record's fields together:
 
 ```
@@ -151,6 +145,12 @@ Polars will show you the buffers behind a Series, which makes the
 validity bitmap concrete. (`_get_buffers` is an internal method, not
 something to build on; it is here because seeing the two buffers side
 by side explains nulls better than any diagram.)
+
+<Figure
+  slug="pl-arrow-shared-columns-cutout"
+  alt="Three different machine cabinets all reading from one long shared column of stacked cells running between them"
+  caption="Apache Arrow, 2016: one agreed memory layout, so a column can cross a language boundary without being copied."
+/>
 
 <CodeBlock
   adapter="python"

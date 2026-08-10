@@ -40,6 +40,12 @@ flowchart TD
   outlive the method that created them, as long as *some* reference
   still points at them.
 
+<Figure
+  slug="java-stack-and-heap-two-regions-side-inline-cutout"
+  alt="A neat column of trays on the left and an open yard of crates on the right, cords between them"
+  caption="The stack holds neat frames, the heap holds objects, and references run between them."
+/>
+
 ## Primitives live on the stack; objects live on the heap
 
 When you write:
@@ -186,12 +192,6 @@ type:
   gets its own arrow pointing at the *same* object. Mutating the
   object affects what the caller sees, but reassigning the
   parameter does *not* change the caller's variable.
-
-<Figure
-  slug="java-stack-and-heap-two-regions-side-inline-cutout"
-  alt="A neat column of trays on the left and an open yard of crates on the right, cords between them"
-  caption="Java always copies the value, and for an object that value is the reference."
-/>
 
 <CodeBlock
   adapter="java"

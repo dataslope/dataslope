@@ -23,6 +23,12 @@ To pick a winner, the browser checks, in order:
 3. **Source order**, if specificity ties, the rule that appears
    **last** wins.
 
+<Figure
+  slug="css-the-cascade-and-specificity-inline-cutout"
+  alt="Three coloured sheets falling onto one block in order, the last and most specific sheet sitting on top and deciding its final colour"
+  caption="When rules conflict, the most specific one wins, and source order breaks ties."
+/>
+
 Most day-to-day conflicts come down to #2 and #3.
 
 ## Specificity, counted
@@ -121,12 +127,6 @@ Two more forces you'll lean on constantly:
   from parent to child automatically. Set `font-family` once on
   `body` and the whole page inherits it. Layout properties (margin,
   padding, border) do *not* inherit.
-
-<Figure
-  slug="css-the-cascade-and-specificity-inline-cutout"
-  alt="Three coloured sheets falling onto one block in order, the last and most specific sheet sitting on top and deciding its final colour"
-  caption="When rules conflict, the most specific one wins, and source order breaks ties."
-/>
 
 The `.parent` below sets `color` and `font-family` once; the nested
 elements pick them up for free. But the border set on `.parent` stays

@@ -19,6 +19,12 @@ That structure is **Union-Find**, also called **Disjoint Set Union (DSU)**. It a
 
 Each set is represented as a tree. Every node points to a parent, and the root points to itself.
 
+<Figure
+  slug="dsa-union-find-parent-trees-inline-cutout"
+  alt="Several small frames each with one block at the top, two frames being joined by pinning one top block under another"
+  caption="Each set is a tree, and union pins one root under the other."
+/>
+
 ```mermaid
 graph TD
     A["0 root"] --> B["1"]
@@ -32,12 +38,6 @@ If `find(2)` reaches root `0`, then `2` belongs to the set represented by `0`.
 ## Naive implementation
 
 A basic DSU stores a parent array. `find()` walks up to the root. Without optimizations, a tree can become a long chain, making `find()` O(n).
-
-<Figure
-  slug="dsa-union-find-parent-trees-inline-cutout"
-  alt="Several small frames each with one block at the top, two frames being joined by pinning one top block under another"
-  caption="Each set is a tree, and union pins one root under the other."
-/>
 
 <CodeBlock
   adapter="cpp"

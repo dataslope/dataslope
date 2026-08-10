@@ -26,6 +26,12 @@ order-service.ts → http-client.ts → logger.ts
 
 Everything depends on everything else. Testing is hard (you need to mock the database, HTTP, and logger). Changing one module breaks others unpredictably. The codebase becomes a **big ball of mud**.
 
+<Figure
+  slug="tsx-scalable-architecture-problem-tangled-dependencies-inline-cutout"
+  alt="A bench where cords run between every pair of machines, crossing everywhere"
+  caption="When everything depends on everything, nothing can change on its own."
+/>
+
 ---
 
 ## Layered Architecture
@@ -37,12 +43,6 @@ A **layered architecture** divides code into three (or more) layers:
 3. **Infrastructure layer**: Concrete implementations of I/O: databases, HTTP clients, file systems, third-party APIs.
 
 Dependencies flow in one direction: Infrastructure → Application → Domain. The domain knows nothing about infrastructure.
-
-<Figure
-  slug="tsx-scalable-architecture-problem-tangled-dependencies-inline-cutout"
-  alt="A bench where cords run between every pair of machines, crossing everywhere"
-  caption="When everything depends on everything, nothing can change on its own."
-/>
 
 ```mermaid
 graph TD

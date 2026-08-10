@@ -21,6 +21,12 @@ so blocks stack vertically. An **inline** box (like `<span>`, `<a>`,
 `<strong>`) sits in the running text and takes only the width of its
 content, so inline boxes flow left to right and wrap like words.
 
+<Figure
+  slug="css-display-and-flow-normal-flow-block-inline-cutout"
+  alt="Blocks stacking down a column beside smaller blocks running along a single line"
+  caption="Normal flow is what the page does before any layout property is set."
+/>
+
 The two `<div>`s below each grab a full line; the three `<span>`s share
 one:
 
@@ -279,9 +285,3 @@ if (link.offsetHeight < 34) {
 
 You now command the default flow. Next, learn the layout engine built on
 top of it: [Flexbox deep dive](/courses/modern-css-layout/flexbox-deep-dive).
-
-<Figure
-  slug="css-display-and-flow-normal-flow-block-inline-cutout"
-  alt="Blocks stacking down a column beside smaller blocks running along a single line"
-  caption="Normal flow is what the page does before any layout property is set."
-/>

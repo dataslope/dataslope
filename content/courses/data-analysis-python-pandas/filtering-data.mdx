@@ -20,9 +20,9 @@ Apply it to a DataFrame and you get back only the rows where the
 mask is `True`.
 
 <Figure
-  slug="pandas-filtering-data-comparison-operators-inline-cutout"
-  alt="A chute with a marked bar across it, blocks taller than the bar stopped and shorter ones passing"
-  caption="A comparison sets the bar, and every row is tested against it separately."
+  slug="pandas-filtering-data-basic-shape-inline-cutout"
+  alt="A board of rows dropping onto a mask, only the rows aligned with open squares passing through"
+  caption="The boolean mask is one yes or no per row, and only the yes rows come through."
 />
 
 <CodeBlock
@@ -88,6 +88,12 @@ print(df[df["dept"] != "Eng"])
 `,
     },
   ]}
+/>
+
+<Figure
+  slug="pandas-filtering-data-comparison-operators-inline-cutout"
+  alt="A chute with a marked bar across it, blocks taller than the bar stopped and shorter ones passing"
+  caption="A comparison sets the bar, and every row is tested against it separately."
 />
 
 ## Combining conditions with `&`, `|`, `~`
@@ -237,6 +243,12 @@ print(df.query("dept in ['Eng','Sales']"))
 Whether you prefer `query()` or boolean masks is mostly a style
 choice. Most codebases use masks; `query()` shows up in notebooks.
 
+<Figure
+  slug="pandas-filtering-data-inline-cutout"
+  alt="A board of rows tipping through a grate, the rows that fail the test dropping away and the rest continuing"
+  caption="Combining conditions narrows the grate; a row must pass every one of them."
+/>
+
 ## A real-world filter
 
 <CodeBlock
@@ -265,18 +277,6 @@ print(big_gentoos[["species", "island", "body_mass_g", "sex"]].head())
 You will write filters like this all day, every day, as an analyst.
 Cosmetic note: breaking each condition onto its own line and
 aligning the `&`s makes complex filters readable.
-
-<Figure
-  slug="pandas-filtering-data-basic-shape-inline-cutout"
-  alt="A board of rows dropping onto a mask, only the rows aligned with open squares passing through"
-  caption="The boolean mask is one yes or no per row, and only the yes rows come through."
-/>
-
-<Figure
-  slug="pandas-filtering-data-inline-cutout"
-  alt="A board of rows tipping through a grate, the rows that fail the test dropping away and the rest continuing"
-  caption="Combining conditions narrows the grate; a row must pass every one of them."
-/>
 
 ## Filter, then assign
 

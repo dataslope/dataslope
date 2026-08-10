@@ -57,9 +57,9 @@ one cell is directly comparable to a point in another. That shared scale is
 what makes small multiples honest.
 
 <Figure
-  slug="sns-facets-and-grids-wrapping-many-categories-inline-cutout"
-  alt="A long row of small panels folded onto a second and third row to fit the bench"
-  caption="`col_wrap` folds a long row of panels into a readable block."
+  slug="sns-facets-and-grids-faceting-just-col-inline-cutout"
+  alt="One board split into a grid of small panels by two dials, one setting columns and one setting rows"
+  caption="Faceting multiplies panels: columns times rows, which is its risk as well."
 />
 
 <Callout type="info" title="hue overlays; col/row separate">
@@ -97,6 +97,12 @@ sns.relplot(
 `,
     },
   ]}
+/>
+
+<Figure
+  slug="sns-facets-and-grids-wrapping-many-categories-inline-cutout"
+  alt="A long row of small panels folded onto a second and third row to fit the bench"
+  caption="`col_wrap` folds a long row of panels into a readable block."
 />
 
 ## The FacetGrid workflow underneath
@@ -187,12 +193,6 @@ deliberately, and flag it for the reader.`}
 
 Faceting multiplies panels: `col` levels **×** `row` levels. That's its
 weakness as well as its strength.
-
-<Figure
-  slug="sns-facets-and-grids-faceting-just-col-inline-cutout"
-  alt="One board split into a grid of small panels by two dials, one setting columns and one setting rows"
-  caption="Faceting multiplies panels: columns times rows, which is its risk as well."
-/>
 
 - **Too many facets.** Twenty tiny panels are as hard to read as one
   overcrowded chart. Keep a facet variable to a handful of levels; use

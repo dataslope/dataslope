@@ -21,6 +21,12 @@ You could count words with a plain `collections.Counter`, and that is exactly
 what is happening under the hood. NLTK wraps it in a `FreqDist()` ("frequency
 distribution") that adds text-specific conveniences.
 
+<Figure
+  slug="nlp-frequency-distributions-counting-words-freqdist-inline-cutout"
+  alt="A rack of word tiles with a bar growing beside each as tiles are dropped in"
+  caption="A frequency distribution tallies each word as the tokens go past."
+/>
+
 ```mermaid
 flowchart TD
     A["Clean tokens:<br/>fox, dog, fox, run, fox, dog"] --> B["FreqDist<br/>(tally each word)"]
@@ -497,9 +503,3 @@ You can now measure *which* words appear and how often. But counts treat every
 word as an isolated atom, they have no idea that "book" can be a noun or a
 verb. To capture that, we need to know each word's role in the sentence:
 **part-of-speech tagging**, next.
-
-<Figure
-  slug="nlp-frequency-distributions-counting-words-freqdist-inline-cutout"
-  alt="A rack of word tiles with a bar growing beside each as tiles are dropped in"
-  caption="A frequency distribution tallies each word as the tokens go past."
-/>

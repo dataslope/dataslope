@@ -20,6 +20,12 @@ order items, and order items point to products.
 Start by looking at the diagram without worrying about SQL syntax.
 Ask: what are the boxes, what are the keys, and what do the lines say?
 
+<Figure
+  slug="db-reading-er-diagrams-full-model-inline-cutout"
+  alt="A pinned board of five plain boxes joined by cords, some cords ending in a single peg and some splitting into prongs"
+  caption="The foreign keys in a diagram predict exactly which joins a query will need."
+/>
+
 ```mermaid
 erDiagram
     customers ||--o{ orders : places
@@ -252,12 +258,6 @@ albums; one album contains zero or many tracks; one genre classifies
 zero or many tracks. The foreign keys predict the joins, and the
 query below follows exactly the path the diagram promises, from
 artist through album to track.
-
-<Figure
-  slug="db-reading-er-diagrams-full-model-inline-cutout"
-  alt="A pinned board of five plain boxes joined by cords, some cords ending in a single peg and some splitting into prongs"
-  caption="The foreign keys in a diagram predict exactly which joins a query will need."
-/>
 
 <SqlCodeBlock
   dialect="postgres"

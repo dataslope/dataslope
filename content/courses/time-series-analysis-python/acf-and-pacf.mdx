@@ -25,18 +25,6 @@ can often *read off a chart*.
   at lag `k` **after removing** the influence of all the shorter lags in
   between. It captures only the **direct** relationship.
 
-<Figure
-  slug="tsa-acf-and-pacf-inline-cutout"
-  alt="One wave laid over a copy of itself shifted along by a few steps, with a gauge reading how well the two still line up"
-  caption="Autocorrelation: slide a copy of the series k steps along, and measure how well the two still line up."
-/>
-
-<Figure
-  slug="tsa-acf-and-pacf-watch-cheat-sheet-inline-cutout"
-  alt="A wave laid over the four reference shapes, one of them matching it exactly"
-  caption="Identifying a model means matching your plot's shape against a small set of known signatures."
-/>
-
 Why does "direct vs total" matter so much? Picture an autoregressive
 series where each value is $0.7 \times$ the previous one. Then $y(t)$ is
 directly tied to $y(t-1)$. But $y(t-1)$ is tied to $y(t-2)$, so $y(t)$ is
@@ -59,6 +47,12 @@ Three series, three signatures. The shaded band is where a bar is
 indistinguishable from noise:
 
 <Chart slug="acf-shapes" />
+
+<Figure
+  slug="tsa-acf-and-pacf-cheat-sheet-inline-cutout"
+  alt="A small card of four shapes pinned above a bench, each shape matched to one of four wave patterns below"
+  caption="We build each wave ourselves, so we already know which shape on the card it should match."
+/>
 
 Here is the single most useful table in classical forecasting. Two
 families of model appear in it, and the next lesson builds both: an
@@ -95,9 +89,9 @@ Let's *manufacture* an AR(1), an AR(2), and an MA(1) with known coefficients,
 then confirm their plots match the table exactly.
 
 <Figure
-  slug="tsa-acf-and-pacf-cheat-sheet-inline-cutout"
-  alt="A small card of four shapes pinned above a bench, each shape matched to one of four wave patterns below"
-  caption="We build each wave ourselves, so we already know which shape on the card it should match."
+  slug="tsa-acf-and-pacf-watch-cheat-sheet-inline-cutout"
+  alt="A wave laid over the four reference shapes, one of them matching it exactly"
+  caption="Identifying a model means matching your plot's shape against a small set of known signatures."
 />
 
 ### AR(1): PACF cuts off at lag 1
@@ -240,6 +234,12 @@ the band are statistically indistinguishable from zero, noise. Spikes
 *poking outside* are "significant." When we say a plot "cuts off after lag
 `p`," we mean the spikes are significant up through lag `p` and then duck
 inside the band.
+
+<Figure
+  slug="tsa-acf-and-pacf-inline-cutout"
+  alt="One wave laid over a copy of itself shifted along by a few steps, with a gauge reading how well the two still line up"
+  caption="Autocorrelation: slide a copy of the series k steps along, and measure how well the two still line up."
+/>
 
 <Callout type="warn" title="Don't over-read the bands">
 With many lags plotted, a few spikes will breach the band *by chance* alone

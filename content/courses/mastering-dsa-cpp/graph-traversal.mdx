@@ -17,9 +17,9 @@ The two strategies have opposite personalities. **Depth-first search (DFS)** is 
 BFS explores level by level from a source. It uses a queue: push the source, pop the oldest vertex, then push each unvisited neighbor.
 
 <Figure
-  slug="dsa-graph-traversal-depth-first-search-inline-cutout"
-  alt="One route followed all the way to a dead end in a network of cords before any other is tried"
-  caption="Depth-first commits to one route until it runs out, then backs up."
+  slug="dsa-graph-traversal-breadth-first-search-inline-cutout"
+  alt="A wave spreading outward from one post through a network of cords, reaching all nearest posts before any further"
+  caption="Breadth-first reaches everything one step away before anything two steps away."
 />
 
 ```text
@@ -98,9 +98,9 @@ The visited check happens *at enqueue time*, not at dequeue time, a vertex is cl
 DFS goes as deep as possible before backtracking, Trémaux's string and chalk. The chalk is the `visited` array; the string is the call stack itself, which remembers the way back automatically. That is why recursive DFS is so short: the language's own function-call machinery does the backtracking.
 
 <Figure
-  slug="dsa-graph-traversal-breadth-first-search-inline-cutout"
-  alt="A wave spreading outward from one post through a network of cords, reaching all nearest posts before any further"
-  caption="Breadth-first reaches everything one step away before anything two steps away."
+  slug="dsa-graph-traversal-depth-first-search-inline-cutout"
+  alt="One route followed all the way to a dead end in a network of cords before any other is tried"
+  caption="Depth-first commits to one route until it runs out, then backs up."
 />
 
 ```text

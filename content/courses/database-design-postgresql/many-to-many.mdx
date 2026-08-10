@@ -15,16 +15,16 @@ That is a **many-to-many relationship**: many rows on the left can
 connect to many rows on the right. It is common, but it cannot be
 stored directly with one foreign key.
 
-<Figure
-  slug="db-many-to-many-seeing-both-sides-inline-cutout"
-  alt="Two rows of crates where each crate on the left has cords to several on the right and each on the right has cords back to several on the left"
-  caption="Many on the left and many on the right is a shape one foreign key cannot hold."
-/>
-
 ## Seeing both sides as many
 
 Start with the real-world picture, before tables. Ada takes Math and
 History. Grace takes Math and Art. Math has both Ada and Grace.
+
+<Figure
+  slug="db-many-to-many-inline-cutout"
+  alt="Two rows of blocks facing each other with a small junction board between them, every cord passing through a slot on that board rather than joining directly"
+  caption="The third table is what turns an impossible shape into two ordinary ones."
+/>
 
 ```mermaid
 flowchart LR
@@ -62,12 +62,6 @@ one value in one row.
 
 Suppose you put `course_id` on `students`. Then each student row has
 room for one course id.
-
-<Figure
-  slug="db-many-to-many-inline-cutout"
-  alt="Two rows of blocks facing each other with a small junction board between them, every cord passing through a slot on that board rather than joining directly"
-  caption="The third table is what turns an impossible shape into two ordinary ones."
-/>
 
 ```mermaid
 flowchart TB
@@ -203,6 +197,12 @@ When you suspect a many-to-many relationship, ask both directions:
 
 If both answers are yes, do not choose one table to hold the foreign
 key. Name the relationship and give it a table.
+
+<Figure
+  slug="db-many-to-many-seeing-both-sides-inline-cutout"
+  alt="Two rows of crates where each crate on the left has cords to several on the right and each on the right has cords back to several on the left"
+  caption="Many on the left and many on the right is a shape one foreign key cannot hold."
+/>
 
 ```mermaid
 flowchart TB

@@ -36,18 +36,6 @@ flowchart TD
 - **Combine**, stitch the per-group results back into one
   result.
 
-<Figure
-  slug="pandas-groupby-operations-multiple-aggregations-at-inline-cutout"
-  alt="One tray of chips feeding four gauges at once, each gauge reading a different single value"
-  caption="One pass over a group can report several different measurements at once."
-/>
-
-<Figure
-  slug="pandas-groupby-operations-inline-cutout"
-  alt="A mixed pile of coloured blocks on the left being sorted into three bins by colour, and each bin producing one summary block on the right"
-  caption="Split the rows into groups, summarise each group, then combine the answers."
-/>
-
 Hadley Wickham named this pattern *split-apply-combine* in 2011,
 and it has been the conceptual backbone of tabular data analysis
 ever since.
@@ -136,6 +124,12 @@ print(result)
 The `(column, function)` tuple syntax produces flat, well-named
 columns. This is the modern recommended style.
 
+<Figure
+  slug="pandas-groupby-operations-multiple-aggregations-at-inline-cutout"
+  alt="One tray of chips feeding four gauges at once, each gauge reading a different single value"
+  caption="One pass over a group can report several different measurements at once."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -221,6 +215,12 @@ print(flat)
 
 Sometimes you do not want a smaller summary table, you want to
 add a column to the *original* rows containing a group statistic.
+
+<Figure
+  slug="pandas-groupby-operations-inline-cutout"
+  alt="A mixed pile of coloured blocks on the left being sorted into three bins by colour, and each bin producing one summary block on the right"
+  caption="Each group reduces to one number, and `transform()` hands that number back to every row."
+/>
 
 <CodeBlock
   adapter="python"

@@ -16,6 +16,12 @@ Every snippet on this page runs in your browser, no setup required.
 
 Under the hood, a dict is a **hash table**: Python computes a hash of your key, uses that to find a bucket, and stores the key-value pair there. Hash collisions are handled with open addressing. This gives O(1) average-case access.
 
+<Figure
+  slug="python-dictionaries-inline-cutout"
+  alt="A wall of small labelled drawers, one key held up to the wall and exactly one drawer sliding open in response"
+  caption="A key opens one drawer directly, with no searching along the wall."
+/>
+
 ```mermaid
 flowchart TD
     A["Key: 'apple'"] --> B["<code>hash('apple')</code>"]
@@ -639,9 +645,3 @@ print(d)
 />
 
 Next up: sets, the close cousin of dictionaries.
-
-<Figure
-  slug="python-dictionaries-inline-cutout"
-  alt="A wall of small labelled drawers, one key held up to the wall and exactly one drawer sliding open in response"
-  caption="A key opens one drawer directly, with no searching along the wall."
-/>

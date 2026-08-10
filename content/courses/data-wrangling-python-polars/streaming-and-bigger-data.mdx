@@ -44,6 +44,12 @@ One argument. Everything else about the query is unchanged, which is
 the point: you do not write a different program for large data, you
 ask for a different engine.
 
+<Figure
+  slug="pl-streaming-and-bigger-data-turning-on-inline-cutout"
+  alt="A single lever thrown on a bench, after which blocks arrive in small trays instead of one overflowing load"
+  caption="Streaming trades one huge load for many small ones through the same steps."
+/>
+
 <Callout type="info" title="Streaming needs a lazy query">
 `engine="streaming"` is an argument to `collect()`, so it only exists
 on a `LazyFrame`. An eager `read_csv()` has already put the whole file
@@ -172,12 +178,6 @@ Three habits help regardless of engine:
   reason to prefer it.
 - **Store Parquet, not CSV.** Smaller on disk, typed, and its
   statistics let whole row groups be skipped.
-
-<Figure
-  slug="pl-streaming-and-bigger-data-turning-on-inline-cutout"
-  alt="A single lever thrown on a bench, after which blocks arrive in small trays instead of one overflowing load"
-  caption="Streaming trades one huge load for many small ones through the same steps."
-/>
 
 <Figure
   slug="pl-streaming-and-bigger-data-inline-cutout"

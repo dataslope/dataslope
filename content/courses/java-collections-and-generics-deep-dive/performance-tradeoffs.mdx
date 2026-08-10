@@ -35,6 +35,12 @@ the entries in it name:
 `*` *amortized*: occasionally an `O(n)` resize/rehash happens, but
 spread over many inserts it averages to `O(1)`.
 
+<Figure
+  slug="jcol-performance-tradeoffs-big-table-inline-cutout"
+  alt="A grid of small gauges, one per container per operation, their needles at visibly different angles"
+  caption="Each container is fast at some operations and slow at others, by construction."
+/>
+
 ## Big-O is not the whole story: cache locality
 
 Modern CPUs are *much* faster than memory. A linear walk over a
@@ -125,12 +131,6 @@ slots each time.
   table. Defaults to 16.
 - **Load factor**, the threshold ratio of `size / capacity` at
   which the table doubles and rehashes. Defaults to 0.75.
-
-<Figure
-  slug="jcol-performance-tradeoffs-big-table-inline-cutout"
-  alt="A grid of small gauges, one per container per operation, their needles at visibly different angles"
-  caption="Each container is fast at some operations and slow at others, by construction."
-/>
 
 Both values matter. A too-small initial capacity causes repeated
 rehashing; a too-large load factor causes more collisions and

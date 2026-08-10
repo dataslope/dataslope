@@ -22,12 +22,6 @@ which are loose, which two clusters are most similar, and how the whole
 dataset nests together at every level of granularity. For many problems
 that picture is worth more than any single set of labels.
 
-<Figure
-  slug="ml-hierarchical-clustering-problem-solves-inline-cutout"
-  alt="A scatter of chips with no bins given, a hand pairing the two closest and then pairing the pairs"
-  caption="Merging the closest pair over and over builds groups without fixing k first."
-/>
-
 This page assumes you have met clustering on the **K-Means Clustering**
 page. We will lean on the same instincts, distance, "similar things belong
 together," standardize before you measure distance, and add a new one:
@@ -51,6 +45,12 @@ carnivores split into cats and dogs. There is no single "correct" number of
 groups, it depends on how closely you want to look. A flat method like
 k-means forces you to pick one zoom level. Hierarchical clustering captures
 *all* of them at once.
+
+<Figure
+  slug="ml-hierarchical-clustering-problem-solves-inline-cutout"
+  alt="A scatter of chips with no bins given, a hand pairing the two closest and then pairing the pairs"
+  caption="Merging the closest pair over and over builds groups without fixing k first."
+/>
 
 So the question hierarchical clustering answers is broader than k-means's:
 not just "what are the `k` groups?" but **"how do these points relate to

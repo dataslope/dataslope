@@ -41,12 +41,6 @@ by pure luck climbs well above 5%.
   caption="Run enough pairwise tests and one fires by luck alone."
 />
 
-<Figure
-  slug="stat-anova-and-chi-square-inline-cutout"
-  alt="Four mounds standing in a row with one gauge measuring the spread between their peaks against the spread within each"
-  caption="ANOVA weighs the spread between group means against the spread inside each group."
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -106,6 +100,12 @@ averages should differ only as much as the noise *inside* the groups
 would predict, so between-spread ≈ within-spread and **F ≈ 1**. But if
 some groups are genuinely shifted, the group means spread out *more* than
 within-group noise alone can explain, pushing **F well above 1**.
+
+<Figure
+  slug="stat-anova-and-chi-square-inline-cutout"
+  alt="Four mounds standing in a row with one gauge measuring the spread between their peaks against the spread within each"
+  caption="ANOVA weighs the spread between group means against the spread inside each group."
+/>
 
 Both panels below carry the identical three group means. Only the noise
 inside the groups changes, and that alone decides whether the gaps are

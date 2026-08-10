@@ -16,6 +16,12 @@ What makes strings worth their own chapter is the toolkit, and one piece of inhe
 
 A string owns its characters and tracks its length. Like `std::vector`, indexing is O(1), and the string can grow as needed.
 
+<Figure
+  slug="dsa-strings-creating-reading-strings-inline-cutout"
+  alt="A ribbon of tiles being clamped at both ends and then read left to right by a marker"
+  caption="`std::string` knows its own length and manages its own storage."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -211,12 +217,6 @@ flowchart TD
 ## Splitting by a delimiter
 
 A simple split helper repeatedly calls `find()` and `substr()`. This is a useful pattern for parsing CSV-like toy inputs and interview strings.
-
-<Figure
-  slug="dsa-strings-creating-reading-strings-inline-cutout"
-  alt="A ribbon of tiles being clamped at both ends and then read left to right by a marker"
-  caption="`std::string` knows its own length and manages its own storage."
-/>
 
 <CodeBlock
   adapter="cpp"

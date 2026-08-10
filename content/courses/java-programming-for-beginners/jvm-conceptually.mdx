@@ -22,6 +22,12 @@ machine, it has its own instruction set (bytecode), its own model
 of memory, and its own rules, and it runs on top of any real
 machine that hosts it.
 
+<Figure
+  slug="java-jvm-conceptually-inline-cutout"
+  alt="One program block on the left feeding a single translating machine in the middle, which drives three different machine cabinets on the right"
+  caption="One bytecode program, one virtual machine, many different machines beneath."
+/>
+
 ```mermaid
 flowchart TB
     A[Your Java Program<br/>.class files / bytecode]
@@ -52,9 +58,9 @@ services to your program:
    `java.util`, `java.io`, etc. that ship with every JVM.
 
 <Figure
-  slug="java-jvm-conceptually-inline-cutout"
-  alt="One program block on the left feeding a single translating machine in the middle, which drives three different machine cabinets on the right"
-  caption="One bytecode program, one virtual machine, many different machines beneath."
+  slug="java-jvm-conceptually-virtual-machine-really-inline-cutout"
+  alt="A machine drawn as a platform that sits on three different benches, the program on top unchanged"
+  caption="The virtual machine is the layer that makes the same program run anywhere."
 />
 
 ```mermaid
@@ -134,12 +140,6 @@ three regions are what matter.
 In C, you have to remember to free every chunk of memory you
 allocate. Forget once, and your program leaks; free twice, and your
 program crashes.
-
-<Figure
-  slug="java-jvm-conceptually-virtual-machine-really-inline-cutout"
-  alt="A machine drawn as a platform that sits on three different benches, the program on top unchanged"
-  caption="The virtual machine is the layer that makes the same program run anywhere."
-/>
 
 The JVM does it for you. Its **garbage collector** periodically
 asks: "starting from the live program state (local variables,

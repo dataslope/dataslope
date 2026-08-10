@@ -15,12 +15,6 @@ facts do we need to remember about each customer?* Those facts are
 Attributes become columns. But good columns are not just names, they
 also have **domains**, the set of values that are allowed to appear.
 
-<Figure
-  slug="db-attributes-and-domains-attributes-describe-entity-inline-cutout"
-  alt="One crate with four blank tags clipped along its side, each tag naming a different face of the same crate"
-  caption="Attributes are the separate facts one entity carries, and each becomes a column."
-/>
-
 ## Attributes describe an entity
 
 An **attribute** is a property of an entity. A customer might have a
@@ -175,6 +169,12 @@ A domain is the allowed meaning-space for a column.`}
 Some facts are simple properties. Others deserve their own table. The
 question is not "is it a noun?" but "does this thing have its own
 identity, attributes, or relationships?"
+
+<Figure
+  slug="db-attributes-and-domains-attributes-describe-entity-inline-cutout"
+  alt="One crate with four blank tags clipped along its side, each tag naming a different face of the same crate"
+  caption="Attributes are the separate facts one entity carries, and each becomes a column."
+/>
 
 ```mermaid
 flowchart TB

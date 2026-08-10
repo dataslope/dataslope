@@ -39,6 +39,12 @@ button.style.background = "tomato";      // set one inline style
 Prefer `classList` over `style` for anything you already have CSS
 for, it keeps the "what it looks like" decision in the stylesheet.
 
+<Figure
+  slug="web-js-dom-basics-inline-cutout"
+  alt="A page panel shown as a branching frame of nested boxes, one box lifted out and altered by a hand"
+  caption="The document is a tree, and scripts reach into it to change one node."
+/>
+
 <CodeBlock
   adapter="web"
   entryFilename="index.html"
@@ -179,9 +185,3 @@ if (!el.classList.contains("featured")) {
 
 The page changes, but only once, when the script runs. Next lesson
 makes it respond to the user: [events](/courses/intro-web-development/js-events).
-
-<Figure
-  slug="web-js-dom-basics-inline-cutout"
-  alt="A page panel shown as a branching frame of nested boxes, one box lifted out and altered by a hand"
-  caption="The document is a tree, and scripts reach into it to change one node."
-/>

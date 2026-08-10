@@ -26,6 +26,12 @@ Every test has an unknowable **truth** (H₀ is really true, or it's
 really false) and a **decision** you make (reject H₀, or fail to
 reject). Cross them and you get four outcomes, two right, two wrong.
 
+<Figure
+  slug="stat-errors-and-power-2x2-decision-matrix-inline-cutout"
+  alt="A two-by-two board of trays, one holding a false alarm and another a missed catch"
+  caption="Two ways to be wrong: a false alarm, and a real effect you missed."
+/>
+
 | | **You fail to reject H₀** | **You reject H₀** |
 | --- | --- | --- |
 | **H₀ is true** | Correct (specificity) | **Type I error**, false positive, rate α |
@@ -58,9 +64,9 @@ Raise the bar and the reverse happens. With a fixed sample, **pushing one
 error rate down pushes the other up.**
 
 <Figure
-  slug="stat-errors-and-power-2x2-decision-matrix-inline-cutout"
-  alt="A two-by-two board of trays, one holding a false alarm and another a missed catch"
-  caption="Two ways to be wrong: a false alarm, and a real effect you missed."
+  slug="stat-errors-and-power-tradeoff-can-t-inline-cutout"
+  alt="A beam on a pivot with a false alarm on one end and a missed catch on the other, pressing one down raising the other"
+  caption="With the sample fixed, pushing one error rate down pushes the other up."
 />
 
 <Chart slug="alpha-power-tradeoff" />
@@ -101,12 +107,6 @@ The escape hatch from the tradeoff is **sample size**. With a fixed `n`
 you trade α against β. But collect more data and you can lower
 *both*, a bigger sample sharpens the test's ability to tell signal from
 noise, so the same α buys you more power. Power has four levers.
-
-<Figure
-  slug="stat-errors-and-power-tradeoff-can-t-inline-cutout"
-  alt="A beam on a pivot with a false alarm on one end and a missed catch on the other, pressing one down raising the other"
-  caption="With the sample fixed, pushing one error rate down pushes the other up."
-/>
 
 ```mermaid
 flowchart TD

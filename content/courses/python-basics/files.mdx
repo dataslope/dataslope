@@ -12,12 +12,6 @@ Every real program touches files, reading config, writing logs, parsing CSV data
 
 The two core ideas: **`open()` returns a file object**, and **the `with` statement closes it for you**.
 
-<Figure
-  slug="python-files-inline-cutout"
-  alt="A drawer opened, a strip of tape drawn out and read, then wound back and the drawer closed"
-  caption="Reading a file is open, read, close, and `with` handles the closing for you."
-/>
-
 ## Why file I/O matters: the real world
 
 File operations are everywhere in production code:
@@ -141,6 +135,12 @@ print("Second:", repr(line2))
 ## Reading line by line
 
 Iterating over a file object yields one line at a time. This is **memory-efficient** for large files because only one line is in memory at a time.
+
+<Figure
+  slug="python-files-inline-cutout"
+  alt="A drawer opened, a strip of tape drawn out and read, then wound back and the drawer closed"
+  caption="Reading a file is open, read, close, and `with` handles the closing for you."
+/>
 
 <CodeBlock
   adapter="python"

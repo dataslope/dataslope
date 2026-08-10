@@ -15,16 +15,16 @@ really three values squeezed together.
 **First normal form (1NF)** is the first cleanup step: every cell holds
 one value, and the table has no repeating groups.
 
-<Figure
-  slug="db-first-normal-form-inline-cutout"
-  alt="A table cell stuffed with three items being emptied so each item gets its own row beneath, the cell left holding exactly one"
-  caption="First normal form means one value per cell, so a crowded cell splits into rows."
-/>
-
 ## What 1NF protects you from
 
 A table violates 1NF when it stores multiple values in one place or
 repeats the same kind of column several times.
+
+<Figure
+  slug="db-first-normal-form-1nf-protects-from-inline-cutout"
+  alt="A cell stuffed with three items being emptied so each takes its own row, the crowded cell left holding one"
+  caption="Repeating values move into rows of their own, often in a child table."
+/>
 
 Common warning signs:
 
@@ -117,12 +117,6 @@ The usual fix is to split the repeating values into rows. When those
 values belong to another entity, place them in a **child table** that
 references the parent.
 
-<Figure
-  slug="db-first-normal-form-1nf-protects-from-inline-cutout"
-  alt="A cell stuffed with three items being emptied so each takes its own row, the crowded cell left holding one"
-  caption="Repeating values move into rows of their own, often in a child table."
-/>
-
 ```mermaid
 erDiagram
     students ||--o{ student_phones : has
@@ -199,6 +193,12 @@ one of the most important tools in your design toolkit.
 
 Reaching 1NF does not mean the design is fully normalized. It only means
 the table no longer has repeating groups or multi-value cells.
+
+<Figure
+  slug="db-first-normal-form-inline-cutout"
+  alt="A table cell stuffed with three items being emptied so each item gets its own row beneath, the cell left holding exactly one"
+  caption="First normal form means one value per cell, so a crowded cell splits into rows."
+/>
 
 ```mermaid
 flowchart TD

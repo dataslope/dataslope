@@ -19,12 +19,6 @@ features for these situations:
 - **Polymorphism** lets a single call site invoke different code
   depending on the actual type of the object at runtime.
 
-<Figure
-  slug="cpp-inheritance-and-polymorphism-first-hierarchy-inline-cutout"
-  alt="One base cabinet with two cabinets standing behind it, each keeping the base frame and adding one part"
-  caption="A derived class keeps the base frame and adds or refines one part."
-/>
-
 Used carefully, this combination is powerful. Used carelessly, it
 produces tangled hierarchies that are hard to change. We'll lean
 toward small examples and clear rules.
@@ -67,6 +61,12 @@ Three new keywords to absorb:
 - `override`, tells the compiler "this is meant to override a
   virtual function." If the signature doesn't match a base virtual,
   you get a compile error instead of a silent mismatch.
+
+<Figure
+  slug="cpp-inheritance-and-polymorphism-first-hierarchy-inline-cutout"
+  alt="One base cabinet with two cabinets standing behind it, each keeping the base frame and adding one part"
+  caption="A derived class keeps the base frame and adds or refines one part."
+/>
 
 ```mermaid
 flowchart TB

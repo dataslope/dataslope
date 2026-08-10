@@ -42,12 +42,6 @@ At first glance, this looks fine. But think about the combinations it allows:
 
 These are **illegal states**: combinations that don't make sense in your domain. The type system isn't helping you, it's allowing garbage in, and you'll have to write defensive code everywhere to check for these contradictions.
 
-<Figure
-  slug="tsx-modeling-domains-with-types-inline-cutout"
-  alt="A set of shaped sockets cut so that an impossible combination physically cannot be assembled"
-  caption="Model the domain so that an impossible state cannot be constructed at all."
-/>
-
 <CodeBlock
   adapter="typescript"
   files={[
@@ -346,6 +340,12 @@ Notice that `shippingAddress` appears in multiple variants. That's okay! Each va
 ## Replacing booleans with variants
 
 Booleans are often a code smell. If you see a boolean flag that changes the meaning of other fields, consider replacing it with a discriminated union.
+
+<Figure
+  slug="tsx-modeling-domains-with-types-inline-cutout"
+  alt="A set of shaped sockets cut so that an impossible combination physically cannot be assembled"
+  caption="Model the domain so that an impossible state cannot be constructed at all."
+/>
 
 **Before:**
 

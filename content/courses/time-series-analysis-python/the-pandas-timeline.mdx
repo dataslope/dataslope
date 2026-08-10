@@ -22,6 +22,12 @@ Dates almost always arrive as **text**. The first job of any time series
 workflow is to parse that text into real timestamps. `pd.to_datetime()` is
 the workhorse.
 
+<Figure
+  slug="tsa-the-pandas-timeline-from-strings-timestamps-inline-cutout"
+  alt="Written slips fed into a machine and leaving as tidy dated cards that clip onto a rail"
+  caption="Date text goes in, uniform timestamps come out, ready to clip onto the timeline."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -195,12 +201,6 @@ fix: append an `E`.
 With a `DatetimeIndex`, you can select by *partial* date strings. pandas
 figures out the range you mean. We'll use the airline series to show it
 off.
-
-<Figure
-  slug="tsa-the-pandas-timeline-from-strings-timestamps-inline-cutout"
-  alt="Written slips fed into a machine and leaving as tidy dated cards that clip onto a rail"
-  caption="Date text goes in, uniform timestamps come out, ready to clip onto the timeline."
-/>
 
 <CodeBlock
   adapter="python"

@@ -105,6 +105,12 @@ DuckDB rarely replaces the cloud warehouse or the app's database. It sits
 - Use it as the engine inside notebooks and data pipelines for
   transformation steps.
 
+<Figure
+  slug="duck-why-duckdb-inline-cutout"
+  alt="A heavy remote strongroom with a long pipe on one bench, and on the next a compact engine sitting right beside the workbench"
+  caption="No connection, no cluster: the engine sits on the bench beside the work."
+/>
+
 ```mermaid
 flowchart TD
     W[("Warehouse /<br/>app database")] -- "export sample" --> F["CSV / Parquet<br/>file"]
@@ -202,9 +208,3 @@ us write your first analytical query. (If you want the analyst's
 [Thinking in Datasets](/courses/sql-analytics-duckdb/thinking-in-datasets)
 deep dive in the *Interesting discussions* section near the end covers it,
 but you can pick it up as you go.)
-
-<Figure
-  slug="duck-why-duckdb-inline-cutout"
-  alt="A heavy remote strongroom with a long pipe on one bench, and on the next a compact engine sitting right beside the workbench"
-  caption="No connection, no cluster: the engine sits on the bench beside the work."
-/>

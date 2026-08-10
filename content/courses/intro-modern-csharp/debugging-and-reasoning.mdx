@@ -27,6 +27,12 @@ A bug is the place where those two diverge. Debugging is the work
 of figuring out which step in your mental story doesn't match
 reality, and then fixing one or the other.
 
+<Figure
+  slug="mcs-debugging-and-reasoning-bug-gap-between-inline-cutout"
+  alt="Two written cards pinned side by side describing the same machine differently, a lamp on the line between them"
+  caption="A bug is the gap between what you believe and what the program does."
+/>
+
 ```mermaid
 flowchart TD
     A["story #1<br/>what I expect"]
@@ -181,12 +187,6 @@ The fix is to initialize `max` from the array itself: `int max = arr[0];`
 An **invariant** is a property of your program that must hold at
 some point: "after `Withdraw()`, `Balance >= 0`", "the list is
 sorted", "this index is between 0 and `length`".
-
-<Figure
-  slug="mcs-debugging-and-reasoning-bug-gap-between-inline-cutout"
-  alt="Two written cards pinned side by side describing the same machine differently, a lamp on the line between them"
-  caption="A bug is the gap between what you believe and what the program does."
-/>
 
 Writing them down (in comments, or as assertions) is one of the
 single most useful debugging habits.

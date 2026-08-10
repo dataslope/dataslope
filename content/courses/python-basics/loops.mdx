@@ -16,6 +16,12 @@ Every snippet on this page runs in your browser, no setup required.
 
 Loops are everywhere in real code. A web server loops over incoming requests. A machine learning library loops over training batches. A file processor loops over lines. A game engine loops 60 times per second. Understanding loops deeply, including when to `break`, when to `continue`, and how to avoid common pitfalls, is essential.
 
+<Figure
+  slug="python-loops-real-world-impact-inline-cutout"
+  alt="A belt circling past a station with a counter clicking each pass"
+  caption="Anything you would otherwise do by hand a thousand times is one loop with a counter."
+/>
+
 ```mermaid
 flowchart TD
     A[Start] --> B[for item in items]
@@ -241,12 +247,6 @@ Iterate a sequence backwards without mutating it.
 
 `while` repeats as long as a condition is true.
 
-<Figure
-  slug="python-loops-real-world-impact-inline-cutout"
-  alt="A belt circling past a station with a counter clicking each pass"
-  caption="A `while` loop keeps circling as long as its condition still holds."
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -339,6 +339,12 @@ while True:
 ## `for ... else` (the weird one)
 
 Both `for` and `while` accept an `else:` block, which runs **only if the loop completed normally** (no `break`). It is most useful for search loops.
+
+<Figure
+  slug="python-loops-inline-cutout"
+  alt="A closed belt carrying blocks past a station one at a time, with a small counter clicking and a gate that opens on the last"
+  caption="Every loop needs something that eventually opens the gate and lets it end."
+/>
 
 <CodeBlock
   adapter="python"
@@ -663,9 +669,3 @@ print(i)
 />
 
 Loops naturally lead into a tighter syntactic form: comprehensions.
-
-<Figure
-  slug="python-loops-inline-cutout"
-  alt="A closed belt carrying blocks past a station one at a time, with a small counter clicking and a gate that opens on the last"
-  caption="Every loop needs something that eventually opens the gate and lets it end."
-/>

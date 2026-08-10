@@ -34,6 +34,12 @@ The compiled machine code of your program. Read-only, the OS marks
 those pages so that trying to write to them crashes the program.
 You don't directly interact with this region.
 
+<Figure
+  slug="cpp-memory-model-four-regions-one-inline-cutout"
+  alt="One long horizontal bar divided end to end into four bands of different colours"
+  caption="One address space, divided into regions with very different rules."
+/>
+
 ### 2. Data segment (globals and statics)
 
 Variables declared outside any function, and variables declared
@@ -183,12 +189,6 @@ In Python or Java, you rarely think about where an object lives.
 Garbage collection takes care of it. That convenience has a price:
 unpredictable pauses, larger memory footprint, less predictable
 performance.
-
-<Figure
-  slug="cpp-memory-model-four-regions-one-inline-cutout"
-  alt="One long horizontal bar divided end to end into four bands of different colours"
-  caption="One address space, divided into regions with very different rules."
-/>
 
 C++ takes the opposite trade-off. The language gives you tools
 (stack, heap, statics, smart pointers, RAII) and trusts you to

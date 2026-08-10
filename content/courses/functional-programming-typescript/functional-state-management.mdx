@@ -81,6 +81,12 @@ Once `reducer` is pure and `history` is just an array of actions,
 you get "time travel" for free: prefix of history → state at any
 point in time.
 
+<Figure
+  slug="fp-functional-state-management-reducer-pattern-inline-cutout"
+  alt="A machine taking a tray and a card together and handing back a new tray, the old tray set aside untouched"
+  caption="A reducer takes the old state and an action and returns a new state."
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -419,12 +425,6 @@ export function reduce(state: State, action: Action): State {
 />
 
 ---
-
-<Figure
-  slug="fp-functional-state-management-reducer-pattern-inline-cutout"
-  alt="A machine taking a tray and a card together and handing back a new tray, the old tray set aside untouched"
-  caption="A reducer takes the old state and an action and returns a new state."
-/>
 
 <MultipleChoice
   markdown={`Why does the reducer pattern (\`(state, action) => newState\`) make state management easier to reason about?

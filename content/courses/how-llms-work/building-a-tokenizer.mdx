@@ -25,18 +25,6 @@ Stop when you have as many merges as you want vocabulary entries. The
 list of merges *is* the tokenizer: to tokenize new text, split it into
 characters and replay the merges in order.
 
-<Figure
-  slug="llm-building-a-tokenizer-counting-pairs-inline-cutout"
-  alt="A ribbon of chips with a tally rack beside it counting how often each neighbouring pair appears"
-  caption="The commonest neighbouring pair is merged, and then the count is taken again."
-/>
-
-<Figure
-  slug="llm-building-a-tokenizer-inline-cutout"
-  alt="A ribbon of text being cut into chips, the most common runs kept whole and the rare ones cut smaller"
-  caption="Common runs of text end up as one token; rare ones get cut smaller."
-/>
-
 The elegance is that frequency does all the work. Common sequences get
 merged early and become single tokens; rare ones never merge and stay
 fragmented. That is exactly the behavior we observed in the previous
@@ -80,6 +68,12 @@ for pair, n in pairs.most_common(5):
 ## The full training loop
 
 Now the merges. Watch the order they come out in.
+
+<Figure
+  slug="llm-building-a-tokenizer-inline-cutout"
+  alt="A ribbon of text being cut into chips, the most common runs kept whole and the rare ones cut smaller"
+  caption="Common runs of text end up as one token; rare ones get cut smaller."
+/>
 
 <CodeBlock
   adapter="python"
@@ -162,6 +156,12 @@ entry.
 
 Change the corpus and watch the vocabulary change with it. Try a
 paragraph of English, then the same volume of Python code.
+
+<Figure
+  slug="llm-building-a-tokenizer-counting-pairs-inline-cutout"
+  alt="A ribbon of chips with a tally rack beside it counting how often each neighbouring pair appears"
+  caption="The commonest neighbouring pair is merged, and then the count is taken again."
+/>
 
 <CodeBlock
   adapter="python"

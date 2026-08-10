@@ -22,6 +22,12 @@ forecast. They discretized the atmosphere over North America into a
 coarse grid, used a simplified set of equations (the *barotropic
 vorticity equation*), and ran a 24-hour forecast.
 
+<Figure
+  slug="scipy-discussions-eniac-forecast-cutout"
+  alt="A room-sized computer hung with patch cables, a coarse grid laid over a map of a continent, a cloud and a wind arrow above it"
+  caption="1950: the first computer weather forecast took about 24 hours to compute 24 hours ahead."
+/>
+
 It took about 24 hours to compute, a forecast that finished just in
 time to be irrelevant. But it was *qualitatively correct*, and it
 launched a research program that, decades later, underlies every
@@ -42,9 +48,9 @@ processors got faster or memory got cheaper, a new class of problem
 became tractable.
 
 <Figure
-  slug="scipy-interesting-discussions-first-computer-weather-inline-cutout"
-  alt="A coarse grid laid over a coastline outline with a large early machine beside it"
-  caption="The first computed forecast was coarse, slow, and still a turning point."
+  slug="scipy-interesting-discussions-hardware-ladder-inline-cutout"
+  alt="A rising set of machines on steps, each smaller and faster than the one below"
+  caption="Each hardware generation made a new class of problem tractable."
 />
 
 | Era | Machine | Peak speed | New problems unlocked |
@@ -72,9 +78,9 @@ own right, the clearest sign that simulation has become a full
 partner to theory and experiment.
 
 <Figure
-  slug="scipy-discussions-eniac-forecast-cutout"
-  alt="A room-sized computer hung with patch cables, a coarse grid laid over a map of a continent, a cloud and a wind arrow above it"
-  caption="1950: the first computer weather forecast took about 24 hours to compute 24 hours ahead."
+  slug="scipy-interesting-discussions-first-computer-weather-inline-cutout"
+  alt="A coarse grid laid over a coastline outline with a large early machine beside it"
+  caption="The first computed forecast was coarse, slow, and still a turning point."
 />
 
 ## William Kahan, the father of floating point
@@ -87,12 +93,6 @@ and is widely called "the father of floating point." Before IEEE 754,
 every manufacturer rounded differently, special values like infinity
 and NaN were handled inconsistently, and a program that ran correctly
 on one machine could silently produce wrong answers on another.
-
-<Figure
-  slug="scipy-interesting-discussions-hardware-ladder-inline-cutout"
-  alt="A rising set of machines on steps, each smaller and faster than the one below"
-  caption="Each hardware generation made a new class of problem tractable."
-/>
 
 The standard you rely on in every code block of this course is the
 quiet reason numerical results are portable at all. The next three

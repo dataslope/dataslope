@@ -16,12 +16,6 @@ character" `\0`.
 This page is about how to think about that, and how not to shoot
 yourself in the foot.
 
-<Figure
-  slug="c-strings-inline-cutout"
-  alt="A strip of single-letter tiles laid end to end along a rail, with one small red cap tile closing the run at the right"
-  caption="A C string is characters followed by a null byte that marks the end."
-/>
-
 ## The null-terminated string
 
 ```c
@@ -167,6 +161,12 @@ if (fgets(line, sizeof(line), stdin) != NULL) {
     // line contains at most 255 chars + '\0' (and possibly a trailing '\n')
 }
 ```
+
+<Figure
+  slug="c-strings-inline-cutout"
+  alt="A strip of single-letter tiles laid end to end along a rail, with one small red cap tile closing the run at the right"
+  caption="A C string is characters followed by a null byte that marks the end."
+/>
 
 To strip the trailing newline:
 

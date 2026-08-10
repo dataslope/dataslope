@@ -79,6 +79,12 @@ the message *"HELLO! Welcome to http://www.worm.com! Hacked by
 Chinese!"*. It also tried to launch a DDoS against the White House
 web server.
 
+<Figure
+  slug="sysc-real-world-disasters-2-code-red-inline-cutout"
+  alt="A request slip far longer than the slot it is being pushed into, spilling past the machine's edge"
+  caption="Input longer than the buffer it was written into is the classic overflow."
+/>
+
 The vulnerability: a *stack buffer overflow* in the `.ida` (Indexing
 Service) ISAPI extension. A specially crafted URL of about 240
 "`N`"s in the ISAPI parameter overran a fixed-size buffer that
@@ -313,12 +319,6 @@ removing safety hardware on the assumption that the code is correct.
 On its maiden flight, the European Space Agency's Ariane 5 rocket
 self-destructed 37 seconds after launch, taking with it four
 scientific satellites and roughly $370 million.
-
-<Figure
-  slug="sysc-real-world-disasters-2-code-red-inline-cutout"
-  alt="A request slip far longer than the slot it is being pushed into, spilling past the machine's edge"
-  caption="Input longer than the buffer it was written into is the classic overflow."
-/>
 
 The cause was not, strictly, a memory bug, but it is a textbook
 example of the kind of UB-adjacent disaster C programmers are

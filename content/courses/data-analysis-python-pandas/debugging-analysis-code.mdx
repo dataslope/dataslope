@@ -28,6 +28,12 @@ flowchart TB
 Loud bugs are *easy*, you see the traceback. The quiet ones
 are what bite you.
 
+<Figure
+  slug="pandas-debugging-analysis-code-taxonomy-analysis-bugs-inline-cutout"
+  alt="Four labelled specimen jars on a shelf, each holding a differently shaped broken part"
+  caption="Analysis bugs come in a handful of recognisable shapes, each with its own tell."
+/>
+
 ## Habit 1, Look at the data after every step
 
 After any non-trivial line, print and check.
@@ -242,12 +248,6 @@ original.
 If your aggregation says revenue is $1.2M, double-check with a
 crude calculation, `df["revenue"].sum()`, to ensure the
 groupby didn't drop or duplicate rows.
-
-<Figure
-  slug="pandas-debugging-analysis-code-taxonomy-analysis-bugs-inline-cutout"
-  alt="Four labelled specimen jars on a shelf, each holding a differently shaped broken part"
-  caption="Analysis bugs come in a handful of recognisable shapes, each with its own tell."
-/>
 
 The act of computing the same number two ways catches an
 astonishing number of bugs.

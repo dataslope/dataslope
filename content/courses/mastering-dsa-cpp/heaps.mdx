@@ -30,6 +30,12 @@ flowchart TD
 
 For index `i`, children are `2*i + 1` and `2*i + 2`. The parent is `(i - 1) / 2`. Read the tree above left to right, level by level, and you get exactly the array below it, completeness means no gaps, so the formulas never miss. Navigation becomes arithmetic: no `left`/`right` pointers, no allocations, and the whole structure enjoys the vector's cache-friendliness.
 
+<Figure
+  slug="dsa-heaps-conceptual-tree-array-inline-cutout"
+  alt="A branching frame drawn above a flat strip of cells, cords showing each branch's place on the strip"
+  caption="The tree is conceptual; the storage underneath is one flat array."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -56,12 +62,6 @@ int main() {
 ## Push: sift up
 
 Both heap operations follow the same playbook: *restore completeness first, then repair the one broken promise.* To push, append the new value at the end of the array, the only spot that keeps the tree complete. The shape is now right, but the newcomer may outrank its parent, so it bubbles upward, swapping with its parent until the heap property holds. The path from any node to the root is at most log n long, so a push is O(log n).
-
-<Figure
-  slug="dsa-heaps-conceptual-tree-array-inline-cutout"
-  alt="A branching frame drawn above a flat strip of cells, cords showing each branch's place on the strip"
-  caption="The tree is conceptual; the storage underneath is one flat array."
-/>
 
 ```mermaid
 flowchart TD

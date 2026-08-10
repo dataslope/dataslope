@@ -19,6 +19,12 @@ object-oriented programming exists at all.
 touch its own data*. Outside code asks the object to do things; it
 does not reach in and edit fields.
 
+<Figure
+  slug="java-encapsulation-and-abstraction-encapsulation-each-object-inline-cutout"
+  alt="Three sealed crates on a bench, each holding its own parts and none reaching into another"
+  caption="Each object guards its own state, and nothing reaches in from outside."
+/>
+
 Mechanically, Java enforces this with **access modifiers**:
 
 | Modifier | Visible to |
@@ -166,12 +172,6 @@ public class Person {
 This skips encapsulation entirely. It is a `struct` masquerading as
 a class. There is no way for `Person` to enforce rules about its own
 state. Whenever you see this, ask: who is allowed to set `age = -5`?
-
-<Figure
-  slug="java-encapsulation-and-abstraction-encapsulation-each-object-inline-cutout"
-  alt="Three sealed crates on a bench, each holding its own parts and none reaching into another"
-  caption="Each object guards its own state, and nothing reaches in from outside."
-/>
 
 ### 2. Getters and setters for every field
 

@@ -49,6 +49,12 @@ one that throws on failure (`add()`, `remove()`, `element`). **Prefer
 the soft versions**, they make queue-emptiness a value, not an
 exception.
 
+<Figure
+  slug="jcol-queues-and-deques-interfaces-inline-cutout"
+  alt="One channel with a gate at each end and another with gates that both open in either direction"
+  caption="A queue admits at one end; a deque opens at both."
+/>
+
 ## ArrayDeque: the modern default
 
 `ArrayDeque` is the default implementation of `Deque`, and the
@@ -167,6 +173,12 @@ API, no inheritance leaks, no unnecessary synchronization.
 Breadth-first search on a graph is the queue's textbook job. Every
 node is *visited* in the order it was discovered, exactly FIFO.
 
+<Figure
+  slug="jcol-queues-and-deques-inline-cutout"
+  alt="A straight channel with a gate at each end, a block entering at the left and leaving at the right, and one block being pushed back in at the end it came from"
+  caption="A deque can push back in at the end an element just came out of."
+/>
+
 <CodeBlock
   adapter="java"
   files={[
@@ -214,18 +226,6 @@ Swap the `Queue` for an `ArrayDeque`-as-stack and you have DFS.
 **smallest** element according to natural order (or a `Comparator`
 you provide). It is backed by a *binary heap*, so `offer()` and
 `poll()` are both `O(log n)`.
-
-<Figure
-  slug="jcol-queues-and-deques-interfaces-inline-cutout"
-  alt="One channel with a gate at each end and another with gates that both open in either direction"
-  caption="A queue admits at one end; a deque opens at both."
-/>
-
-<Figure
-  slug="jcol-queues-and-deques-inline-cutout"
-  alt="A straight channel with a gate at each end, a block entering at the left and leaving at the right, and one block being pushed back in at the end it came from"
-  caption="A deque can push back in at the end an element just came out of."
-/>
 
 <CodeBlock
   adapter="java"

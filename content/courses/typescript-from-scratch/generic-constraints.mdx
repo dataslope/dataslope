@@ -24,12 +24,6 @@ function logLength<T>(item: T): void {
 
 The compiler doesn't know if `T` has a `length` property. For all it knows, `T` could be `number` or `boolean`, which don't have `length`.
 
-<Figure
-  slug="tsx-generic-constraints-inline-cutout"
-  alt="An adjustable slot that widens to take many shapes but stops at a fixed limit, one oversized shape resting outside it"
-  caption="A constraint widens the slot to many types while still ruling some out."
-/>
-
 The solution: **constrain** `T` to types that *do* have a `length` property.
 
 <CodeBlock
@@ -187,6 +181,12 @@ Default type parameters are useful for APIs where most calls use the same type, 
 ## Preserving precise input types
 
 Sometimes you want to preserve the *exact* input type, not just its general category. For example, if the input is a readonly array, you want the output to be readonly too. Or if the input is a literal type, you want to keep it as a literal, not widen it to `string`.
+
+<Figure
+  slug="tsx-generic-constraints-inline-cutout"
+  alt="An adjustable slot that widens to take many shapes but stops at a fixed limit, one oversized shape resting outside it"
+  caption="A constraint widens the slot to many types while still ruling some out."
+/>
 
 The trick: use `extends` to constrain the input, but still bind to the precise type.
 

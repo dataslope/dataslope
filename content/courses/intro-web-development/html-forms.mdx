@@ -29,6 +29,12 @@ they're all built from the same handful of elements.
   input's `id`, which is what links them.
 - `<button type="submit">` submits the form.
 
+<Figure
+  slug="web-html-forms-inline-cutout"
+  alt="A panel with a text slot, a set of round pickers and a push button, a filled slip leaving the panel along a short chute"
+  caption="A form collects what the user types and sends it somewhere."
+/>
+
 <Callout type="info" title="Labels are not optional">
 Clicking a label focuses its input (try it below, great for tiny
 checkboxes), and screen readers announce the label when the input is
@@ -175,9 +181,3 @@ if ((button.getAttribute("type") || "submit").toLowerCase() !== "submit") {
 
 Forms collect input; the last HTML step is making all of this
 *meaningful*: [semantics and accessibility](/courses/intro-web-development/html-semantic-accessibility).
-
-<Figure
-  slug="web-html-forms-inline-cutout"
-  alt="A panel with a text slot, a set of round pickers and a push button, a filled slip leaving the panel along a short chute"
-  caption="A form collects what the user types and sends it somewhere."
-/>

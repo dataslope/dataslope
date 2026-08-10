@@ -28,6 +28,12 @@ It is also a fantastic case study in how generics enable
 That's it. No indexing, no length, no mutation. The minimum
 necessary to *walk* a sequence.
 
+<Figure
+  slug="cs-generic-abstractions-interface-unifies-everything-inline-cutout"
+  alt="One standard fitting shown on the front of five very different containers"
+  caption="One generic interface fits containers that share nothing else."
+/>
+
 ```mermaid
 flowchart TD
     A["<code>IEnumerable&lt;T&gt;</code>"] -->|"<code>GetEnumerator</code>"| B["<code>IEnumerator&lt;T&gt;</code>"]
@@ -321,12 +327,6 @@ Generic abstractions are one of the great inventions of strongly
 typed languages. They let you write each piece of logic *once*,
 preserve type safety at every call site, and grow a library that
 scales as the program grows.
-
-<Figure
-  slug="cs-generic-abstractions-interface-unifies-everything-inline-cutout"
-  alt="One standard fitting shown on the front of five very different containers"
-  caption="One generic interface fits containers that share nothing else."
-/>
 
 LINQ is the showcase: dozens of operators, each generic, each
 working on every sequence type, every projection type, all from a

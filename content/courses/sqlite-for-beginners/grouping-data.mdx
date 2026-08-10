@@ -21,6 +21,12 @@ Aggregate functions can summarize a whole table into one answer. That is useful,
 
 Without `GROUP BY`, an aggregate gives one summary for all rows. With `GROUP BY`, SQLite makes one group for each distinct value, then runs the aggregate once per group.
 
+<Figure
+  slug="lite-grouping-data-big-idea-split-inline-cutout"
+  alt="A scatter of chips raked into three trays and each tray pressed into one block"
+  caption="Grouping collapses the rows in each bucket down to one row each."
+/>
+
 ```mermaid
 flowchart TB
     Rows["All employee rows"] --> Group{"<code>GROUP BY dept</code>"}
@@ -81,12 +87,6 @@ flowchart TD
 ## One result row per group
 
 A group is a bucket of rows that share the same grouped value. If the table has three departments, the grouped query returns three rows.
-
-<Figure
-  slug="lite-grouping-data-big-idea-split-inline-cutout"
-  alt="A scatter of chips raked into three trays and each tray pressed into one block"
-  caption="Grouping collapses the rows in each bucket down to one row each."
-/>
 
 <SqlCodeBlock
   dialect="sqlite"

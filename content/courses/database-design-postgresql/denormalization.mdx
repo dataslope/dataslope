@@ -16,12 +16,6 @@ choose a controlled amount of duplication.
 from normalized tables. The word deliberately matters. This is not a
 shortcut around design; it is a trade-off you make with your eyes open.
 
-<Figure
-  slug="db-denormalization-denormalize-at-all-inline-cutout"
-  alt="A stopwatch beside two benches, the one with a single wide table finishing before the one with four small tables"
-  caption="Denormalising buys read speed, and the price is paid on every write."
-/>
-
 ## Normalize first
 
 Start with the clean design. Give each fact one home. Use keys and
@@ -73,6 +67,12 @@ Denormalization trades some correctness simplicity for read simplicity.
 The normalized side has one source of truth. The denormalized side may
 be easier to read, but now duplicated or derived data must be kept in
 sync.
+
+<Figure
+  slug="db-denormalization-denormalize-at-all-inline-cutout"
+  alt="A stopwatch beside two benches, the one with a single wide table finishing before the one with four small tables"
+  caption="Denormalising buys read speed, and the price is paid on every write."
+/>
 
 ```mermaid
 flowchart TD

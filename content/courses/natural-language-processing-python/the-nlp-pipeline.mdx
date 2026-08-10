@@ -135,6 +135,12 @@ block below runs the standard steps and prints the list after each one, so
 you can watch it shrink and change. Read each printed line against the
 table above.
 
+<Figure
+  slug="nlp-the-nlp-pipeline-standard-text-preprocessing-inline-cutout"
+  alt="A paper ribbon passing five small machines in a row and leaving as a tray of clean chips"
+  caption="Raw text passes through the same handful of stages before any model sees it."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -329,12 +335,6 @@ Time to build the cleaning half yourself. The challenge below asks you to
 write a `preprocess()` function that runs the standard cleaning steps in the
 right order. The tests check the output on a couple of sentences,
 including one where a stopword changes everything.
-
-<Figure
-  slug="nlp-the-nlp-pipeline-standard-text-preprocessing-inline-cutout"
-  alt="A paper ribbon passing five small machines in a row and leaving as a tray of clean chips"
-  caption="Raw text passes through the same handful of stages before any model sees it."
-/>
 
 <ChallengeCard
   adapter="python"

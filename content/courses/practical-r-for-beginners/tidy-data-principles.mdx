@@ -48,6 +48,12 @@ Every column is a variable (city, year, population). Every row is
 an observation (a city in a year). This is the form everything
 downstream wants.
 
+<Figure
+  slug="rlang-tidy-data-principles-tidy-example-inline-cutout"
+  alt="A clean board where every row is one record and every column one measure"
+  caption="Once the data is tidy, every tool in the tidyverse fits it without argument."
+/>
+
 ## What "messy" looks like
 
 Here is the same data, but **wide**, years spread across columns:
@@ -274,12 +280,6 @@ further.
 
 You'll receive two data frames representing the same information.
 Assign `tidy_df` to whichever one is tidy.
-
-<Figure
-  slug="rlang-tidy-data-principles-tidy-example-inline-cutout"
-  alt="A clean board where every row is one record and every column one measure"
-  caption="Once the data is tidy, every tool in the tidyverse fits it without argument."
-/>
 
 <ChallengeCard
   adapter="r"

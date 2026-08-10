@@ -127,6 +127,12 @@ This is the page's real lesson. Comparing anything with null gives
 null, and `filter()` keeps only rows that are *true*. So a null row is
 dropped by a condition **and** by its negation.
 
+<Figure
+  slug="pl-filtering-rows-basics-inline-cutout"
+  alt="A stack of rows dropping through a mask, only those aligned with open squares getting through"
+  caption="A filter is a mask of one yes or no per row, applied all at once."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -177,12 +183,6 @@ it does not conflate null with `NaN` or with zero.
 ## Filtering by a computed value
 
 The expression can reference aggregations of the same frame.
-
-<Figure
-  slug="pl-filtering-rows-basics-inline-cutout"
-  alt="A stack of rows dropping through a mask, only those aligned with open squares getting through"
-  caption="A filter is a mask of one yes or no per row, applied all at once."
-/>
 
 <CodeBlock
   adapter="python"

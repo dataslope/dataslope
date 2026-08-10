@@ -36,6 +36,12 @@ print("Year of each:", parsed.dt.year.tolist())
   ]}
 />
 
+<Figure
+  slug="pandas-dates-and-times-inline-cutout"
+  alt="A calendar strip with a clock face at one end, a marker resting on one square and a caliper measuring to another"
+  caption="Real dates let you measure the distance between two of them, not just print them."
+/>
+
 If a string cannot be parsed, you can choose to fail loudly or
 silently coerce to NaT:
 
@@ -90,24 +96,6 @@ df = pd.read_csv(path, parse_dates=["order_date", "ship_date"])
 This is the cleanest pattern when you know your date columns
 upfront.
 
-<Figure
-  slug="pandas-dates-and-times-dt-accessor-inline-cutout"
-  alt="A dated card opened out to show three separate small cards inside it, one for each part"
-  caption="Once a column is a datetime, `.dt` opens it into year, month and day."
-/>
-
-<Figure
-  slug="pandas-dates-and-times-parsing-dates-inline-cutout"
-  alt="A written slip fed into a small machine and leaving as a tidy dated card with three separate fields"
-  caption="Parsing turns text that looks like a date into a value pandas can compute with."
-/>
-
-<Figure
-  slug="pandas-dates-and-times-inline-cutout"
-  alt="A calendar strip with a clock face at one end, a marker resting on one square and a caliper measuring to another"
-  caption="Real dates let you measure the distance between two of them, not just print them."
-/>
-
 ## The `.dt` accessor
 
 Once a column is a datetime, the `.dt` namespace gives you
@@ -139,6 +127,12 @@ print("quarter: ", s.dt.quarter.tolist())
 `,
     },
   ]}
+/>
+
+<Figure
+  slug="pandas-dates-and-times-dt-accessor-inline-cutout"
+  alt="A dated card opened out to show three separate small cards inside it, one for each part"
+  caption="Once a column is a datetime, `.dt` opens it into year, month and day."
 />
 
 These let you derive useful grouping columns:
@@ -303,6 +297,12 @@ does. Mixing the two often produces errors, pick a convention
 - **Time zone naivete**, assuming local time matches the
   reader's local time. Always store with an explicit zone or
   pick UTC.
+
+<Figure
+  slug="pandas-dates-and-times-parsing-dates-inline-cutout"
+  alt="A written slip fed into a small machine and leaving as a tidy dated card with three separate fields"
+  caption="Parsing turns text that looks like a date into a value pandas can compute with."
+/>
 
 ## Mini challenge
 

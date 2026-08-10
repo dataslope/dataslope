@@ -23,6 +23,12 @@ with software that lets you **store**, **find**, **change**, and
 **protect** that information reliably, even when many people and
 programs use it at the same time.
 
+<Figure
+  slug="sql-what-is-a-database-first-honest-definition-inline-cutout"
+  alt="A strongroom with several benches drawing from it at once, each holding only a small tray"
+  caption="The database holds the facts; the application only borrows them."
+/>
+
 Read that again slowly. There are four verbs hiding in it, and they
 are the whole reason databases exist:
 
@@ -52,6 +58,12 @@ elegant. They were invented because, without them, working with
 data at any real scale becomes a nightmare, five distinct
 nightmares, in fact. Every feature you will learn in this course
 exists to prevent one of them.
+
+<Figure
+  slug="sql-what-is-a-database-inline-cutout"
+  alt="A shared strongroom with several benches drawing from it at once, each bench holding only a small tray"
+  caption="One database, many applications, and one shared version of the truth."
+/>
 
 **Nightmare 1: losing the data.** Imagine a shop that records every
 sale in a notebook. The notebook can be lost, burned, soaked, or
@@ -171,18 +183,6 @@ remembers everything). The application never stores the real data
 itself. Every time it needs to remember or retrieve something, it
 sends the database a request written in SQL. That request is called
 a **query**.
-
-<Figure
-  slug="sql-what-is-a-database-first-honest-definition-inline-cutout"
-  alt="A strongroom with several benches drawing from it at once, each holding only a small tray"
-  caption="The database holds the facts; the application only borrows them."
-/>
-
-<Figure
-  slug="sql-what-is-a-database-inline-cutout"
-  alt="A shared strongroom with several benches drawing from it at once, each bench holding only a small tray"
-  caption="One database, many applications, and one shared version of the truth."
-/>
 
 ```mermaid
 flowchart TD

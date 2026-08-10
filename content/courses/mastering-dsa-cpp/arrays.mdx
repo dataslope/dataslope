@@ -16,6 +16,12 @@ Everything else about arrays follows from that bargain. Indexing is O(1) and ite
 
 A C-style array such as `int a[5]` has a fixed size known at compile time. It is compact and fast, but it carries a famous trap inherited from C: when passed to a function, it **decays to a pointer**, the size information silently falls off. Run the program below and notice that `print_first` receives only an address; inside that function there is no way to ask "how long is this array?"
 
+<Figure
+  slug="dsa-arrays-inline-cutout"
+  alt="One continuous strip of equal cells with a marker landing directly on the fifth, ignoring the four before it"
+  caption="Contiguous cells are what make indexing a single jump rather than a walk."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -179,6 +185,12 @@ int main() {
 
 A vector cannot literally grow in place, the memory just past its last element may belong to something else. So it cheats: it keeps two numbers. `size()` is how many elements are currently stored; `capacity()` is how many fit before the next reallocation. While `size < capacity`, `push_back()` just writes into the spare room. When the room runs out, the vector allocates a larger buffer (typically about double), moves everything across, and frees the old block, the expensive-but-rare event behind the amortized O(1) analysis from the complexity page.
 
+<Figure
+  slug="dsa-arrays-c-style-arrays-inline-cutout"
+  alt="A fixed strip of cells with no guard at either end, a marker resting just past the last"
+  caption="A C-style array has no bounds check, so one step past the end is your problem."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -216,18 +228,6 @@ flat; growing by a constant does not.
 ## Timing one million pushes
 
 Browser timing is noisy, but this shows how to measure a sequence of pushes with `<chrono>`. A million pushes, including all the reallocation copying along the way, typically lands in the low tens of milliseconds, the amortization argument, verified by stopwatch.
-
-<Figure
-  slug="dsa-arrays-c-style-arrays-inline-cutout"
-  alt="A fixed strip of cells with no guard at either end, a marker resting just past the last"
-  caption="A C-style array has no bounds check, so one step past the end is your problem."
-/>
-
-<Figure
-  slug="dsa-arrays-inline-cutout"
-  alt="One continuous strip of equal cells with a marker landing directly on the fifth, ignoring the four before it"
-  caption="Contiguous cells are what make indexing a single jump rather than a walk."
-/>
 
 <CodeBlock
   adapter="cpp"

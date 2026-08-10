@@ -73,6 +73,12 @@ fact, never a pile of several.
 A **column** is one attribute that every row can have. In the
 `pets` table, `name` is a column and `age` is a column.
 
+<Figure
+  slug="lite-tables-rows-columns-inline-cutout"
+  alt="One board ruled into rows and columns with a single row lifted out on the left and a single column lifted out on the right"
+  caption="Rows and columns are the whole structure, and neither has a guaranteed order."
+/>
+
 ```mermaid
 flowchart TB
     COL["Column: species"]:::hdr
@@ -301,9 +307,3 @@ at.
 Next: if two rows can look identical, two customers named John
 Smith in Springfield, how does the database tell them apart? That
 is the job of the **primary key**.
-
-<Figure
-  slug="lite-tables-rows-columns-inline-cutout"
-  alt="One board ruled into rows and columns with a single row lifted out on the left and a single column lifted out on the right"
-  caption="Rows and columns are the whole structure, and neither has a guaranteed order."
-/>
