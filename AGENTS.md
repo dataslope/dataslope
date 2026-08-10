@@ -601,6 +601,22 @@ from `_theme.mjs`. The build fails on any literal `fill`/`stroke` colour that
 survives into the output, because that is the one defect review cannot catch:
 it looks right in whichever theme the author had open.
 
+### Clip anything that runs past the domain
+
+Plot draws a mark whether or not it fits: a domain narrower than the data does
+not clip it, it lets it leave the frame and the SVG both, over whatever the
+page has beside the figure. `bonferroni-vs-fdr` built its threshold line for
+all 100 ranks against an x domain of 30 and drew the other 70 across the
+lesson's table of contents.
+
+So a mark whose data can exceed the domain takes `clip: true` (the dots in
+that same figure already did), and a mark that can *never* be inside it is
+deleted rather than clipped, because clipping it only hides that it draws
+nothing. `npm run check:charts` renders the set and fails on any unclipped
+geometry outside the box; the tolerance is 2px, `<text>` is exempt, and
+ancestor `translate()`s are accumulated so a faceted mark is judged where it
+actually lands.
+
 ### Determinism
 
 The generated module is diffed on every build, so a spec that uses random data

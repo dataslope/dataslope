@@ -10,7 +10,7 @@
  * The percentiles are computed from the drawn sample, so their positions are
  * the distribution's rather than markers placed for effect.
  */
-import { Plot, plot, linspace, mean, rng, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, linspace, mean, rng, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
   "A histogram of request latencies with a long right tail, marked with the mean, median, 95th and 99th percentiles. The p99 is several times the median and far outside the bulk of the distribution.";
@@ -79,7 +79,10 @@ export function render() {
           ...HALO,
         }),
       ),
-      Plot.ruleX([q(0.999)], { stroke: GUIDE, strokeWidth: 1.25, strokeDasharray: "3,3" }),
+      // A dashed rule at the p99.9 used to sit here. The domain is sized to
+      // the p99, and on a tail this heavy the p99.9 is always past it, so the
+      // rule never landed inside the frame: it drew 107px beyond the figure
+      // and across whatever the page had beside it.
       Plot.text([{}], {
         x: DOMAIN[1] - 4,
         frameAnchor: "top",

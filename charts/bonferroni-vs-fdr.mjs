@@ -59,7 +59,10 @@ export function render() {
     y: { label: "p-value", domain: [0, 0.05], ticks: 5 },
     marks: [
       Plot.ruleY([BONF], { stroke: ACCENT, strokeWidth: 2 }),
-      Plot.line(bhLine, { x: "rank", y: "t", stroke: PRIMARY, strokeWidth: 2 }),
+      // `clip` because the line is built for all 100 ranks and the x domain
+      // shows 30: without it Plot draws the remaining 70 straight out of the
+      // frame and across whatever the page has beside the chart.
+      Plot.line(bhLine, { x: "rank", y: "t", stroke: PRIMARY, strokeWidth: 2, clip: true }),
       Plot.dot(rows, { x: "rank", y: "p", fill: MUTED, fillOpacity: 0.65, r: 3.5, clip: true }),
       Plot.dot(
         rows.filter((r) => r.rank <= BH_CUT),
