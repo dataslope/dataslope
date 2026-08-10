@@ -184,11 +184,11 @@ export default function PricingPage() {
 
                 <Footnote n={7} lead="“Ask AI” messages.">
                   “Ask AI” is the in-app assistant available inside playgrounds,
-                  challenges, code blocks, and lessons. Your limit is counted
-                  across all of those surfaces on a rolling 24-hour window,
-                  Guests get 3 and Free Members up to 10. A rolling window means
-                  each message frees up again 24 hours after you send it, rather
-                  than all resetting at a fixed time of day.
+                  challenges, code blocks, and lessons. It needs an account:
+                  guests get none, and Free Members up to 10, counted across all
+                  of those surfaces on a rolling 24-hour window. A rolling
+                  window means each message frees up again 24 hours after you
+                  send it, rather than all resetting at a fixed time of day.
                 </Footnote>
               </ol>
 

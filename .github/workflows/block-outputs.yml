@@ -1,43 +1,47 @@
 name: Prepopulated block output
 
-# Regenerates the output every Python `<CodeBlock>` shows before the reader
-# presses Run (`scripts/build-block-outputs.mjs`), and commits the result.
+# Regenerates the output a `<CodeBlock>` shows before the reader presses Run
+# (`scripts/build-block-outputs.mjs`), and commits the result. Python runs
+# through Pyodide, JavaScript and TypeScript through almostnode, C and C++
+# through the browsercc toolchain — in every case the same runtime the browser
+# would have used, so a prepopulated panel and a pressed Run agree.
 #
 # ── Why this is a workflow and not part of the deploy ──────────────────────
 #
-# Executing 1,689 blocks through Pyodide costs about twelve minutes. Paying
-# that on every Cloudflare deploy took a 20-minute build and returned the same
-# answer each time, because the answer only changes when a lesson changes.
+# Executing 2,600 blocks costs the better part of an hour, most of it Pyodide.
+# Paying that on every Cloudflare deploy took a 20-minute build and returned
+# the same answer each time, because the answer only changes when a lesson
+# changes.
 #
 # So the manifest and its figures are committed, and this workflow is what
 # keeps them current. The generator reuses committed entries key-for-key —
 # keys are content hashes, so an entry that exists is an entry that is still
 # correct — which means:
 #
-#   • a deploy re-verifies the whole manifest in well under a second and
-#     never boots Pyodide at all;
+#   • a deploy reads the committed manifest and executes nothing;
 #   • this workflow only executes the blocks that actually changed;
 #   • an unchanged block's figure file is never rewritten, so the committed
 #     assets do not churn. That matters: matplotlib's PNG bytes are not
 #     reproducible run to run, so a full re-run would rewrite all ~370 files
 #     every time for no visible change.
 #
-# The generator stays in the `build` chain as a safety net rather than being
-# removed from it: if this workflow ever lags behind main, the deploy notices
-# the missing entries and fills them in itself rather than shipping a lesson
-# with holes in it.
+# This workflow is the *only* thing that runs the generator automatically.
+# Neither `build` nor `dev` does: both read the committed manifest and nothing
+# else, so no deploy and no local start ever boots Pyodide or clang. Anyone
+# who wants a block's output sooner runs `npm run build:block-outputs`.
 #
 # ── What a pull request sees ──────────────────────────────────────────────
 #
-# The right output, because the generator is still in the `build` chain. A PR
-# that adds or edits a block has no committed entry for it, so that build
-# boots Pyodide and runs *that block* — seconds, not twelve minutes, because
-# every other block is reused from the manifest. The preview is accurate and
-# the workflow merely saves main from repeating the work.
+# A block that already existed: its committed output, same as production. A
+# block the PR *adds or edits*: an empty output panel, until this workflow
+# regenerates after the merge. That is the same panel the block would show if
+# its entry were missing for any other reason, and the same one every block
+# showed before this feature existed — prepopulated output is a nicety, and
+# every consumer treats a missing entry as "no entry" rather than an error.
+# Pressing Run is unaffected either way.
 #
 # This workflow deliberately does not run on pull requests: it would mean a
-# bot commit on every content branch, for an answer the PR build already
-# computes for itself.
+# bot commit on every content branch.
 
 on:
   push:
@@ -47,6 +51,7 @@ on:
       - "scripts/build-block-outputs.mjs"
       - "scripts/lib/python-output-capture.mjs"
       - "scripts/lib/pyodide-runner.mjs"
+      - "scripts/lib/block-runners.mjs"
       - "lib/blockOutputKey.ts"
       - "app/_components/runtime/pythonDisplayOutputs.ts"
       - "package-lock.json"
@@ -69,7 +74,10 @@ permissions:
 jobs:
   regenerate:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # A normal run only executes the blocks that changed and finishes in
+    # minutes. This is sized for `workflow_dispatch` with `force`, which
+    # re-executes all four runtimes: ~12 min of Pyodide, ~25 of clang.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
         with:
@@ -103,6 +111,16 @@ jobs:
           path: .dataset-cache
           key: dataset-cache-v1-${{ hashFiles('content/**/*.mdx') }}
           restore-keys: dataset-cache-v1-
+
+      # The C and C++ blocks compile against a 114 MB toolchain the generator
+      # downloads from npm on first use. Keyed on the pinned versions inside
+      # block-runners.mjs, so a version bump fetches a fresh one.
+      - name: Restore C/C++ toolchain
+        uses: actions/cache@v6
+        with:
+          path: .browsercc-cache
+          key: browsercc-cache-v1-${{ hashFiles('scripts/lib/block-runners.mjs') }}
+          restore-keys: browsercc-cache-v1-
 
       - name: Regenerate
         run: node scripts/build-block-outputs.mjs ${{ inputs.force && '--force' || '' }}

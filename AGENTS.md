@@ -760,7 +760,9 @@ raw-Markdown mirrors, brand fallbacks, charts, the search corpus and its D1
 seed, creation dates, the course catalog, home stats, the image manifest — and
 `postinstall` runs it too (see `scripts/postinstall-generate.mjs`, which skips
 it only on Cloudflare Workers Builds, where the `build` script re-runs it
-anyway).
+anyway). One generator is in none of them: `build-block-outputs` *executes*
+lesson code, which is not something a `dev` start or a deploy should be doing
+(see below).
 
 Running it that often is the point: no generated file is ever stale, and no
 step is anyone's job to remember. What it must not do is cost anything when
@@ -811,23 +813,70 @@ it should.
 ### Prepopulated code-block output
 
 `build-block-outputs` is the one generator in the chain that *executes*
-content rather than parsing it. It boots the same Pyodide-in-Node the content
-sweeps use, runs every Python `<CodeBlock>`, and records what it printed so a
-lesson shows its output before the reader presses Run.
+content rather than parsing it. It runs every `<CodeBlock>` it has a headless
+runtime for and records what it printed, so a lesson shows its output before
+the reader presses Run.
 
-Three things about it are worth knowing before you touch it:
+**Which languages, and why not the rest.** Python goes through Pyodide-in-Node,
+JavaScript and TypeScript through `AlmostNodeRunner`, and C and C++ through the
+pinned browsercc toolchain (`scripts/lib/block-runners.mjs`). Every one of them
+is the runtime the browser itself uses, which is the point: a prepopulated
+panel that disagrees with what Run produces is worse than an empty one, because
+nothing tells the reader which to believe. That leaves two groups out.
 
-- **Its output is committed, and it reuses what is committed.** Executing
-  1,689 blocks costs ~12 minutes, which is the wrong thing to spend on every
-  deploy for an answer that only changes when a lesson does. So
-  `lib/generated/block-outputs.json` and `public/block-outputs/` are in git,
-  kept current by `.github/workflows/block-outputs.yml`, and the generator
-  reuses committed entries key-for-key. Keys are content hashes, so an entry
-  that exists is an entry that is still correct — which means a `build`
-  against a current manifest re-verifies it in under a second and never
-  boots Pyodide at all. It stays in the `build` chain as a safety net: if
-  the workflow lags, the deploy fills the gaps itself rather than shipping a
-  lesson with holes in it.
+- **R** could run here — webR works under Node, and the R sweep proves it —
+  but its output is not text. `runtime/r.tsx` decides visibility with
+  `withVisible()`, renders a data frame as an HTML table and turns captured
+  graphics into images, and none of that is shared the way
+  `pythonDisplayOutputs.ts` is. A stdout-only runner would record a panel
+  missing every table and every plot, and double-print the visible result
+  besides. Lifting that conversion out of `r.tsx` is the prerequisite.
+- **java, csharp, web, react, php** have no Node runtime at all: CheerpJ,
+  .NET wasm and php-wasm need a browser, which is why `check-browser-blocks`
+  drives Playwright for them.
+
+**What almostnode does to the process**, which a sweep never notices and a
+generator does. It replaces `process.exit` with one that throws on any code,
+including 0, so nothing after a JavaScript block can exit normally;
+`process.cwd()` starts answering `/`, the root of its VFS, which silently
+re-bases every path resolved afterwards, so `eachTag` files lessons under
+`home/user/dataslope/content/…` and keys them to a path the site never looks
+up; and `process` itself is swapped for a shim that does not carry Node's whole
+surface, so a method read off the global after a block has run may simply not
+be there. Everything the runner needs is bound before the first block and
+restored around each run.
+
+**A block is not finished when its top level returns.** `runner.run()` resolves
+when the entry module's top level does, which for an async lesson is before it
+has printed anything — seven of the ten blocks in `promises-and-async-await`
+recorded a blank panel while their real output arrived milliseconds later and
+went to the build log. The runner therefore drains: while the block still holds
+a timer of its own (`process.getActiveResourcesInfo()`, against a baseline
+taken before it started, so the harness's own timers do not count) or is still
+producing cells, it waits, and it gives up after ten seconds because a lesson
+is free to demonstrate an interval that never ends. A synchronous block holds
+nothing and leaves on the first check.
+
+**A narrowed run adds; it never replaces.** `--adapter` and `--filter` both
+start from the manifest on disk and skip the asset prune and the freshness
+stamp, because they only looked at part of the tree. `--force` means "do not
+*reuse* an entry", not "throw the file away" — conflating the two deleted every
+Python entry on the site along with 364 of their figures.
+
+Three more things are worth knowing before you touch it:
+
+- **Its output is committed, and nothing runs it automatically.** Executing
+  2,600 blocks costs the better part of an hour, which is the wrong thing to
+  spend on a deploy — or on a `dev` start — for an answer that only changes
+  when a lesson does. So `lib/generated/block-outputs.json` and
+  `public/block-outputs/` are in git, kept current by
+  `.github/workflows/block-outputs.yml` on pushes to `main`, and every other
+  consumer just reads what is committed. Run it by hand
+  (`npm run build:block-outputs`) when you want a block's output before the
+  workflow gets to it. Until then a new or edited block shows an empty output
+  panel, in `dev` and in a PR preview alike — the same panel it shows if its
+  entry is missing for any other reason, and the one every block showed before
+  this feature existed. Pressing Run always works regardless.
 - **Reuse is also what keeps the committed assets from churning.**
   Matplotlib's PNG bytes are not reproducible run to run, so re-executing
   everything would rewrite all ~370 files on every regeneration for no

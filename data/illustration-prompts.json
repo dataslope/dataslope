@@ -25680,18 +25680,6 @@
       "subject": "one machine handing back a single framed panel and another handing back a whole grid of them"
     },
     {
-      "id": "sns-joint-distributions-minimal-joint-plot-inline",
-      "collection": "courses",
-      "course": "seaborn-foundations",
-      "courseTitle": "Seaborn Foundations",
-      "lesson": "joint-distributions",
-      "category": "course-inline",
-      "style": "risograph",
-      "title": "The minimal joint plot",
-      "mascot": false,
-      "subject": "a board of scattered chips with a small mound built along its top edge and another along its right"
-    },
-    {
       "id": "sns-loading-data-and-themes-loading-built-dataset-inline",
       "collection": "courses",
       "course": "seaborn-foundations",
