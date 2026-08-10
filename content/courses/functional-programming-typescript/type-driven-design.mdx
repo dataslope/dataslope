@@ -25,7 +25,7 @@ The phrase comes from Yaron Minsky of Jane Street, the trading firm
 that famously runs its entire business on OCaml, an environment
 where a software bug can lose millions of dollars before a human
 notices. His advice for surviving that environment became one of
-FP's most quoted design principles.
+functional programming's most quoted design principles.
 
 The idea: if your data model can *express* a state that should never
 exist, sooner or later your program will get into that state. The
@@ -144,6 +144,7 @@ constraint is satisfied because of the type signature.
 <Figure
   slug="fp-type-driven-design-inline-cutout"
   alt="A set of shaped sockets cut first, with the parts made afterwards to fit them"
+  caption="Design the types first and the implementation has fewer ways to be wrong."
 />
 
 <CodeBlock
@@ -267,6 +268,7 @@ compiler refuses to build them.
 <Figure
   slug="fp-type-driven-design-slogan-1-make-inline-cutout"
   alt="A set of shaped sockets cut so that an impossible pairing physically cannot be assembled"
+  caption="Model the domain so that an illegal state cannot be constructed at all."
 />
 
 This is what people mean when they say functional programmers

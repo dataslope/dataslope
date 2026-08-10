@@ -109,8 +109,8 @@ console.log("missing fallback:", getOrElse(missing, "none"));
   ]}
 />
 
-Three operators: **`map`** (transform inside), **`flatMap`** (chain
-operations that also return Option), **`getOrElse`** (escape with a
+Three operators: **`map()`** (transform inside), **`flatMap()`** (chain
+operations that also return Option), **`getOrElse()`** (escape with a
 fallback). With these three, you can compose long chains of "this
 might or might not be there" without a single `if`.
 
@@ -174,6 +174,7 @@ not just its absence.
 <Figure
   slug="fp-option-and-result-inline-cutout"
   alt="Two sealed envelopes on a bench, one opened to show a block inside and one opened to show it empty, with a small tray waiting for each case"
+  caption="`Option` says whether there is a value; `Result` says what went wrong."
 />
 
 <CodeBlock
@@ -290,9 +291,9 @@ Exceptions remain valid for **truly unexpected** situations
 failures: validation, parsing, I/O outcomes, business rule
 violations.
 
-## The diagram of `flatMap`
+## The diagram of `flatMap()`
 
-`flatMap` (also called `chain`, `bind`, or `andThen`) is the operator
+`flatMap()` (also called `chain()`, `bind`, or `andThen`) is the operator
 that turns "a chain of fallible steps" into "one composed
 computation". Every later chapter will use it for some `M<A>`:
 `Option<A>`, `Result<E, A>`, `Task<A>`, `Promise<A>`.
@@ -304,7 +305,7 @@ flowchart TD
     A -->|"if 'some'/'ok' value a"| C["f(a) = <code>M&lt;B&gt;</code>"] --> B
 ```
 
-The diagram captures the idea exactly: `flatMap` *threads* the
+The diagram captures the idea exactly: `flatMap()` *threads* the
 "surrounding context" (failure, asynchrony, nondeterminism) through
 the chain, so each step can pretend it just sees an ordinary `A`.
 
@@ -316,6 +317,7 @@ boundary so the rest of your code only sees `Option`/`Result`.
 <Figure
   slug="fp-option-and-result-option-maybe-there-inline-cutout"
   alt="Two sealed envelopes on a bench, one opened to show a block and one opened to show nothing at all"
+  caption="An option makes the possibility of nothing part of the type itself."
 />
 
 <CodeBlock
@@ -365,7 +367,7 @@ code. From there inward, you work in the type system.
   adapter="typescript"
   title="Find a user's manager's email"
   instructions={`In \`lookups.ts\`, implement \`emailOfManagerOf(id)\`
-using \`flatMap\` and \`map\` on \`Option\`. **Do not use \`if\` or
+using \`flatMap()\` and \`map()\` on \`Option\`. **Do not use \`if\` or
 \`switch\` inside this function**, chain the helpers.
 
 The helpers \`findUser\`, \`managerOf\`, \`emailOf\` are already

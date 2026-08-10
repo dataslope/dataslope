@@ -81,6 +81,7 @@ novel here.
 <Figure
   slug="fp-algebraic-data-types-inline-cutout"
   alt="A rack holding three differently shaped slots where exactly one slot is filled at a time, and a lid that only closes when one is"
+  caption="A sum type holds exactly one of its alternatives at a time."
 />
 
 ## Sums in TypeScript: discriminated unions
@@ -92,6 +93,7 @@ record types, each with a unique tag field.
 <Figure
   slug="fp-algebraic-data-types-sums-typescript-discriminated-inline-cutout"
   alt="Three boxes with differently shaped tags, a sorter reading only the tag to send each down its own chute"
+  caption="The tag is read first, and it decides which shape the rest must have."
 />
 
 <CodeBlock
@@ -376,6 +378,7 @@ Real domain types interleave the two operations.
 <Figure
   slug="fp-algebraic-data-types-two-operations-products-inline-cutout"
   alt="One tray holding three compartments all filled at once, beside another tray with three compartments where exactly one is filled"
+  caption="A product holds every field at once; a sum holds exactly one."
 />
 
 ```mermaid

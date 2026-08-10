@@ -125,7 +125,7 @@ The two styles build a result along very different paths:
 Declarative code:
 
 1. **Describes the answer**, not the procedure that produces it.
-2. **Uses named transformations** (`filter`, `map`, `reduce`,
+2. **Uses named transformations** (`filter()`, `map()`, `reduce()`,
    `groupBy`) instead of generic control flow (`for`, `while`,
    `if`).
 3. **Composes**, each step is a value that flows into the next.
@@ -135,6 +135,7 @@ Declarative code:
 <Figure
   slug="fp-declarative-thinking-inline-cutout"
   alt="A figure at the left holding up a card showing a finished stack, while the machine beside them builds that stack without being told each step"
+  caption="Declarative code says what the result is, not the steps to build it."
 />
 
 You can think of it as moving up one level of abstraction: instead of
@@ -163,14 +164,14 @@ combinators. We'll use them throughout the course.
 
 | Operator | Type sketch | What it does |
 | --- | --- | --- |
-| `map` | `(A => B) => Array<A> => Array<B>` | apply `f` to each element |
-| `filter` | `(A => boolean) => Array<A> => Array<A>` | keep elements that pass |
-| `reduce` | `((acc, A) => acc) => acc => Array<A> => acc` | fold into one value |
-| `flatMap` | `(A => Array<B>) => Array<A> => Array<B>` | map then flatten |
+| `map()` | `(A => B) => Array<A> => Array<B>` | apply `f` to each element |
+| `filter()` | `(A => boolean) => Array<A> => Array<A>` | keep elements that pass |
+| `reduce()` | `((acc, A) => acc) => acc => Array<A> => acc` | fold into one value |
+| `flatMap()` | `(A => Array<B>) => Array<A> => Array<B>` | map then flatten |
 | `find` | `(A => boolean) => Array<A> => A \| undefined` | first match |
 | `some` / `every` | `(A => boolean) => Array<A> => boolean` | existence quantifiers |
 | `group / groupBy` | `(A => K) => Array<A> => Map<K, Array<A>>` | bucket by key |
-| `sort` / `sortBy` | `(A => key) => Array<A> => Array<A>` | order |
+| `sort()` / `sortBy` | `(A => key) => Array<A> => Array<A>` | order |
 | `zip` | `Array<A>, Array<B> => Array<[A, B]>` | pair element-wise |
 
 Notice what's *not* on this list: `for`, `while`, `index`,
@@ -238,6 +239,7 @@ The mental shift applies far beyond list processing.
 <Figure
   slug="fp-declarative-thinking-same-task-both-inline-cutout"
   alt="A figure directing each step of a build on one bench, and on the next a card describing the finished stack with the machine building it"
+  caption="Directing every step, or describing the outcome: two ways to the same result."
 />
 
 ### Configuration: data, not code
@@ -325,8 +327,8 @@ the default.
 that computes the **average value per category** from a list of sales.
 
 Reimplement \`avgPerCategory\` in a **declarative pipeline** style:
-chained \`filter\` / \`reduce\` / \`map\` (no \`for\`, no \`let\`,
-no \`push\`). The output must match exactly.
+chained \`filter()\` / \`reduce()\` / \`map()\` (no \`for\`, no \`let\`,
+no \`push()\`). The output must match exactly.
 
 **Expected output**
 
@@ -417,11 +419,11 @@ export function avgPerCategory(
   markdown={`Which of these best captures the essence of *declarative* code?
 
 - Code that has no \`if\` statements
-  > Conditionals are fine in declarative code (often as ternaries, pattern matches, or \`filter\` predicates).
+  > Conditionals are fine in declarative code (often as ternaries, pattern matches, or \`filter()\` predicates).
 - Code that uses TypeScript classes
   > Classes are orthogonal to the imperative/declarative axis.
 - [o] Code that describes *what* you want as an expression over data, rather than *how* to compute it as a sequence of mutating steps
-  > The defining shift is from "step-by-step procedure mutating state" to "expression that names the answer". Operators like \`map\`, \`filter\`, \`reduce\` give you the vocabulary; immutability and purity make it sound.
+  > The defining shift is from "step-by-step procedure mutating state" to "expression that names the answer". Operators like \`map()\`, \`filter()\`, \`reduce()\` give you the vocabulary; immutability and purity make it sound.
 - Code that uses arrow functions instead of \`function\` keyword
   > Syntax has nothing to do with it. You can write deeply imperative arrow-function code.
 

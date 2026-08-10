@@ -4,7 +4,7 @@ description: Functor, Applicative, and Monad, explained as everyday patterns you
 ---
 
 Category theory has a fearsome reputation. The good news is that
-*every working FP programmer* uses three category-theoretic
+*every working functional programmer* uses three category-theoretic
 patterns daily, usually without naming them. This chapter gives
 you the names and, more importantly, the intuitions.
 
@@ -19,14 +19,14 @@ Greek letters.
 ## A unifying observation
 
 You already know `Array.prototype.map`. And you've just met
-`Option`'s `map` and `Result`'s `map`. And `Promise`'s `.then` is
-basically `map` for asynchronous values.
+`Option`'s `map()` and `Result`'s `map()`. And `Promise`'s `.then` is
+basically `map()` for asynchronous values.
 
 That's not an accident. **The same operation keeps appearing for
 different "container" types.** When a pattern repeats across many
 unrelated types, it's worth giving it a name.
 
-| Type      | Means                            | `map` transforms…         |
+| Type      | Means                            | `map()` transforms…         |
 | --------- | -------------------------------- | ------------------------- |
 | `Array<A>`   | "zero or more `A`"            | every element             |
 | `Option<A>`  | "maybe an `A`"                | the value if present      |
@@ -36,7 +36,7 @@ unrelated types, it's worth giving it a name.
 | `(R) => A`   | "an `A` given a context `R`"  | the produced value        |
 
 All of these are **functors**. A functor is just a type `F<A>`
-together with a lawful `map` operation.
+together with a lawful `map()` operation.
 
 ## Functor
 
@@ -70,7 +70,7 @@ console.log(ArrayFunctor.map([1, 2, 3], (x) => x * 2));
 
 ### Functor laws (intuitions)
 
-A functor's `map` must obey two laws, both perfectly sensible:
+A functor's `map()` must obey two laws, both perfectly sensible:
 
 1. **Identity:** `map(fa, x => x) === fa`, mapping with the
    identity function changes nothing.
@@ -81,9 +81,10 @@ mapping with `f` then `g` is the same as mapping with
 <Figure
   slug="fp-category-theory-intuitions-functor-inline-cutout"
   alt="A sealed box with a block inside, a small tool reaching in through a hatch to change the block without opening the box"
+  caption="A functor lets you change what is inside without opening the container."
 />
 
-These laws guarantee `map` is "structure-preserving": it doesn't
+These laws guarantee `map()` is "structure-preserving": it doesn't
 secretly rearrange the container, drop elements, duplicate things,
 or fail in surprising ways. If you've ever felt that
 `array.map((x) => x)` should equal `array`, that's the functor
@@ -207,20 +208,20 @@ Finally, **Monad** is the pattern for **dependent** chained
 computations: "compute A; then, *using A*, compute B; then, *using
 B*, compute C".
 
-A monad adds `flatMap` (also called `chain`/`bind`/`andThen`) to a
+A monad adds `flatMap()` (also called `chain()`/`bind`/`andThen`) to a
 functor:
 
 ```ts
 flatMap<A, B>(fa: F<A>, f: (a: A) => F<B>): F<B>
 ```
 
-The difference from `map`:
-- `map`     takes `(a: A) => B`, the inner function returns a bare value.
-- `flatMap` takes `(a: A) => F<B>`, the inner function itself returns a container.
+The difference from `map()`:
+- `map()`     takes `(a: A) => B`, the inner function returns a bare value.
+- `flatMap()` takes `(a: A) => F<B>`, the inner function itself returns a container.
 
-`flatMap` *flattens* the resulting `F<F<B>>` back to `F<B>`. That
+`flatMap()` *flattens* the resulting `F<F<B>>` back to `F<B>`. That
 flattening is the whole point: each step contributes its own
-"context" (failure / asynchrony / nondeterminism), and `flatMap`
+"context" (failure / asynchrony / nondeterminism), and `flatMap()`
 merges them into one.
 
 <CodeBlock
@@ -294,6 +295,7 @@ mathematics is real, and it is genuinely abstract.
 <Figure
   slug="fp-category-theory-intuitions-unifying-observation-inline-cutout"
   alt="Four very different machines all wearing the same two fittings, one at the inlet and one at the outlet"
+  caption="Very different structures share the same two fittings, which is the whole point."
 />
 
 The internet's favorite summary of the situation comes from James
@@ -313,7 +315,7 @@ belts) happened to accompany their personal click, which transfers
 nothing. The fix is the approach this chapter took: no metaphors,
 just `Option`, `Array`, and `Promise`, side by side, until you
 notice they share a shape. If the shape *hasn't* clicked yet, that
-is normal, keep writing `flatMap` chains and it will.
+is normal, keep writing `flatMap()` chains and it will.
 
 ## Why this matters
 
@@ -409,16 +411,16 @@ export function map2<A, B, C>(
 ---
 
 <MultipleChoice
-  markdown={`When should you reach for \`flatMap\` (monad) instead of \`map\` (functor)?
+  markdown={`When should you reach for \`flatMap()\` (monad) instead of \`map()\` (functor)?
 
 - [o] When the function you want to apply returns another value of the same container type, for example \`(a: A) => Option<B>\`, and you want a flat \`Option<B>\` instead of \`Option<Option<B>>\`
-  > \`flatMap\` is the operator that *flattens* one layer of container. \`map\` would leave you nested.
+  > \`flatMap()\` is the operator that *flattens* one layer of container. \`map()\` would leave you nested.
 - Whenever the operation might throw an error
   > Errors alone don't decide it; it depends on whether the *next step* itself returns a container.
 - When you want to combine two independent containers
   > That's applicative (\`map2\`/\`ap\`), not monad.
 - When you want to discard the wrapper completely
-  > That's \`getOrElse\` for \`Option\`, not \`flatMap\`.
+  > That's \`getOrElse()\` for \`Option\`, not \`flatMap()\`.
 
 The shape of the inner function, \`A => B\` vs \`A => F<B>\`, is what tells you which operator to use.`}
 />

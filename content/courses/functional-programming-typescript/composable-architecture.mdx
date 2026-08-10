@@ -61,6 +61,7 @@ It's not aesthetics. There are concrete benefits.
 <Figure
   slug="fp-composable-architecture-this-design-wins-inline-cutout"
   alt="One unit unclipped from the middle of a chain and replaced with another, the chain running on unchanged"
+  caption="Replace one unit and the rest of the chain does not notice."
 />
 
 **Testing.** The core is testable without mocks. You feed it
@@ -179,6 +180,7 @@ a REST adapter, etc.).
 <Figure
   slug="fp-composable-architecture-picture-inline-cutout"
   alt="A wall assembled from interchangeable panels, one panel lifted out and a differently shaped one dropped into the gap"
+  caption="Ports are the shaped holes; adapters are the panels that fit them."
 />
 
 ```ts
@@ -214,9 +216,10 @@ output, with thin adapters at the ends.
 <Figure
   slug="fp-composable-architecture-inline-cutout"
   alt="Small units with identical fittings clipping into long chains in several different orders"
+  caption="Identical fittings are what let the same parts chain in any order."
 />
 
-When you internalize that, all the FP techniques you learned
+When you internalize that, all the functional techniques you learned
 become *architectural*, not just micro-stylistic:
 
 - **`Result<E, A>`** carries domain errors through the pipeline.

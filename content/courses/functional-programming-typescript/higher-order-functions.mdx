@@ -1,6 +1,6 @@
 ---
 title: Higher-Order Functions
-description: Functions that take functions, return functions, or both, the universal mechanism for abstraction in FP.
+description: Functions that take functions, return functions, or both, the universal mechanism for abstraction in functional programming.
 ---
 
 A **higher-order function** is a function that does at least one of
@@ -85,7 +85,7 @@ console.log(sum);
   ]}
 />
 
-The key insight: `map`, `filter`, and `reduce` are *one
+The key insight: `map()`, `filter()`, and `reduce()` are *one
 implementation* each. They work for any element type, any
 transformation, any predicate, any accumulator. The behavior comes
 from the *function you pass in*. The combinator provides the
@@ -94,13 +94,14 @@ plumbing.
 <Figure
   slug="fp-higher-order-functions-functions-as-values-inline-cutout"
   alt="A small hand tool resting in a tray alongside blocks, treated as just another item to be picked up and passed on"
+  caption="A function is a value: it can be stored, passed and returned like any other."
 />
 
 Look at how much code you *aren't* writing:
 
-- `map` replaces "make a new array, loop, push transformed elements"
-- `filter` replaces "make a new array, loop, push elements that pass"
-- `reduce` replaces "init an accumulator, loop, update accumulator"
+- `map()` replaces "make a new array, loop, push transformed elements"
+- `filter()` replaces "make a new array, loop, push elements that pass"
+- `reduce()` replaces "init an accumulator, loop, update accumulator"
 
 This is the abstraction higher-order functions provide: **the
 control flow is generic; the behavior is the parameter**.
@@ -276,6 +277,7 @@ These come up so often they're worth memorizing.
 <Figure
   slug="fp-higher-order-functions-inline-cutout"
   alt="A machine handing out a smaller machine from its own hatch, the smaller machine then working on a block further along the bench"
+  caption="A higher-order function takes or returns a function, and that is the whole idea."
 />
 
 <CodeBlock
@@ -486,7 +488,7 @@ export function mapInput<A, B>(f: (a: A) => B, v: Validator<B>): Validator<A> {
 - A function defined at the top level of a module
   > "Top-level" refers to scope, not behavior.
 - [o] A function that takes another function as an argument, returns a function, or both
-  > This is the literal definition. It is what makes \`map\`, \`filter\`, \`reduce\`, decorators, factories, and most FP abstractions possible.
+  > This is the literal definition. It is what makes \`map()\`, \`filter()\`, \`reduce()\`, decorators, factories, and most FP abstractions possible.
 - A function annotated with TypeScript generics
   > Generic and higher-order are different concepts. A function can be one without the other (though they often appear together).
 - A function that runs faster than other functions

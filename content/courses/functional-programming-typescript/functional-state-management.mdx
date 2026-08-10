@@ -69,8 +69,8 @@ console.log(play([{ kind: "inc" }, { kind: "reset" }, { kind: "dec" }]));
   ]}
 />
 
-`reducer` is a pure function. `play` is a `reduce` over actions,
-which means our entire state lifecycle is just a `fold`. That's
+`reducer` is a pure function. `play` is a `reduce()` over actions,
+which means our entire state lifecycle is just a `fold()`. That's
 how you can think of state functionally:
 
 > **The current state = `reduce(reducer, initial, history)`.**
@@ -224,12 +224,13 @@ text editor use internally.
 
 Sometimes you want to **thread** a state through a sequence of pure
 computations without making the state a global. That's modeled in
-FP by `State<S, A> = (s: S) => [A, S]`, "given the current state,
+functional programming by `State<S, A> = (s: S) => [A, S]`, "given the current state,
 produce a value and the next state".
 
 <Figure
   slug="fp-functional-state-management-inline-cutout"
   alt="A shelf of successive trays, each a copy of the last with one slot changed, none of them altered after being set down"
+  caption="Each state is a new value; the previous one is left exactly as it was."
 />
 
 <CodeBlock
@@ -286,7 +287,7 @@ console.log("counter advanced to:", finalCounter);
 The point isn't that you should write a State monad in production
 TypeScript every day, it's to *see* that mutable state isn't
 required. The same effect is achievable with a function that
-returns both an answer and the next state, composed with `chain`.
+returns both an answer and the next state, composed with `chain()`.
 
 ## Why this matters
 
@@ -422,6 +423,7 @@ export function reduce(state: State, action: Action): State {
 <Figure
   slug="fp-functional-state-management-reducer-pattern-inline-cutout"
   alt="A machine taking a tray and a card together and handing back a new tray, the old tray set aside untouched"
+  caption="A reducer takes the old state and an action and returns a new state."
 />
 
 <MultipleChoice
