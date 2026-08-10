@@ -89,19 +89,21 @@ ORDER BY
 
 Every analytical tool from this course is here: conditional aggregation
 (`FILTER`), distinct counting (people not events), and safe division
-(`NULLIF`). The query is the *literal* translation of "distinct buyers
+(`NULLIF()`). The query is the *literal* translation of "distinct buyers
 divided by distinct visitors, per channel."
 
 ## Revenue per user: averages that do not lie
 
 "Average revenue per user" sounds simple but hides a trap: do you divide
-revenue by *paying* users or by *all* users? They are different metrics
-(ARPPU vs. ARPU) and answer different questions. Being explicit is the
+revenue by *paying* users or by *all* users? They are different metrics,
+revenue per paying user against revenue per user, and answer different
+questions. Being explicit is the
 whole job.
 
 <Figure
   slug="duck-building-business-metrics-metric-definition-first-inline-cutout"
   alt="A written definition card pinned above a bench with the machine built underneath it to match"
+  caption="Write the definition first, then build the query to match it exactly."
 />
 
 <SqlCodeBlock
@@ -159,7 +161,7 @@ denominator that matches the decision.
 ## Period-over-period growth
 
 Leaders rarely want a raw number; they want *change*. Growth is this
-period versus the last, which is `LAG` over an ordered, truncated time
+period versus the last, which is `LAG()` over an ordered, truncated time
 series, a direct application of the window-function lessons.
 
 <SqlCodeBlock
@@ -209,8 +211,8 @@ ORDER BY
   month;`}
 />
 
-A CTE to build the monthly series, `LAG` to reach the previous month,
-`NULLIF` to survive the first month's missing prior value. This single
+A common table expression to build the monthly series, `LAG()` to reach the previous month,
+`NULLIF()` to survive the first month's missing prior value. This single
 query is a microcosm of the whole course.
 
 ## Keeping metrics honest
@@ -228,6 +230,7 @@ A few habits that separate trustworthy metrics from misleading ones:
 <Figure
   slug="duck-building-business-metrics-inline-cutout"
   alt="Several raw columns feeding one dial through a small machine, the dial reading a single headline number"
+  caption="A headline metric is several raw columns funnelled into a single number."
 />
 
 ```mermaid
@@ -282,15 +285,15 @@ users, and answer different questions.`}
   markdown={`Why wrap the previous-period value in \`NULLIF(..., 0)\` when computing growth percent?
 
 - To fill missing months with zero.
-  > Filling gaps is a date-spine concern; \`NULLIF\` only handles the zero-divisor case.
+  > Filling gaps is a date-spine concern; \`NULLIF()\` only handles the zero-divisor case.
 - To round the growth to one decimal.
-  > Rounding is done by \`ROUND\`; \`NULLIF\` guards the division.
+  > Rounding is done by \`ROUND\`; \`NULLIF()\` guards the division.
 - [o] To avoid dividing by zero when the previous period's value is 0, returning NULL instead of an error.
-  > If a prior period had zero revenue, dividing by it would fail; \`NULLIF\` turns the 0 into NULL so the query survives.
+  > If a prior period had zero revenue, dividing by it would fail; \`NULLIF()\` turns the 0 into NULL so the query survives.
 - To convert the result to a percentage.
-  > Multiplying by 100 makes it a percentage; \`NULLIF\` only guards the divisor.
+  > Multiplying by 100 makes it a percentage; \`NULLIF()\` only guards the divisor.
 
-\`NULLIF\` on the divisor prevents divide-by-zero in period-over-period
+\`NULLIF()\` on the divisor prevents divide-by-zero in period-over-period
 calculations.`}
 />
 

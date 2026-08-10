@@ -55,6 +55,7 @@ exploratory loop you learned about.
 <Figure
   slug="duck-why-duckdb-problem-duckdb-solves-inline-cutout"
   alt="A heavy remote strongroom with a long pipe beside a compact engine sitting on the workbench"
+  caption="DuckDB runs in the same process as your analysis, with no server in between."
 />
 
 - **Column-oriented and vectorized.** It inherits the column-store,
@@ -70,7 +71,7 @@ exploratory loop you learned about.
   place*, even straight from a URL, without a separate "load" step,
   which suits ad-hoc analysis.
 - **Analyst-friendly SQL.** Conveniences like `GROUP BY ALL`,
-  `SELECT * EXCLUDE (...)`, `SUMMARIZE`, and friendly list/struct types
+  `SELECT * EXCLUDE (...)`, `SUMMARIZE()`, and friendly list/struct types
   cut the ceremony out of common analytical queries.
 
 ```mermaid
@@ -205,4 +206,5 @@ but you can pick it up as you go.)
 <Figure
   slug="duck-why-duckdb-inline-cutout"
   alt="A heavy remote strongroom with a long pipe on one bench, and on the next a compact engine sitting right beside the workbench"
+  caption="No connection, no cluster: the engine sits on the bench beside the work."
 />

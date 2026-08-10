@@ -16,7 +16,7 @@ the end.
   alt="Three podium steps on a platform inside a partitioned lane, small numbered markers resting on each step"
 />
 
-## Numbering rows with `ROW_NUMBER`
+## Numbering rows with `ROW_NUMBER()`
 
 `ROW_NUMBER()` assigns 1, 2, 3, ... to rows in the order you specify. It
 *requires* an `ORDER BY` inside `OVER`, because numbering only makes sense
@@ -61,6 +61,7 @@ how you ask "rank within each region", every region gets its own 1, 2,
 <Figure
   slug="duck-ranking-and-row-number-inline-cutout"
   alt="A row of blocks combed into height order with a pennant planted on each, the pennants shortening along the row and two equal blocks sharing one"
+  caption="`PARTITION BY` restarts the numbering inside each group."
 />
 
 <SqlCodeBlock
@@ -143,21 +144,21 @@ ORDER BY
 />
 
 This is the canonical "best N per category" shape: **partition** by the
-category, **order** by the measure, **rank** with `ROW_NUMBER`, and
+category, **order** by the measure, **rank** with `ROW_NUMBER()`, and
 **keep** ranks ≤ N with `QUALIFY`. Internalize it, you will use it
 constantly.
 
-## `ROW_NUMBER` vs `RANK` vs `DENSE_RANK`
+## `ROW_NUMBER()` vs `RANK()` vs `DENSE_RANK()`
 
 The three ranking functions differ only in how they handle **ties** (rows
 with equal `ORDER BY` values). The difference matters and is a frequent
 source of confusion.
 
-- **`ROW_NUMBER`**, always distinct: 1, 2, 3, 4. Ties are broken
+- **`ROW_NUMBER()`**, always distinct: 1, 2, 3, 4. Ties are broken
   arbitrarily; no two rows share a number.
-- **`RANK`**, ties share a number, then it **skips**: 1, 1, 3, 4. (Two
+- **`RANK()`**, ties share a number, then it **skips**: 1, 1, 3, 4. (Two
   golds, no silver.)
-- **`DENSE_RANK`**, ties share a number, **no skip**: 1, 1, 2, 3.
+- **`DENSE_RANK()`**, ties share a number, **no skip**: 1, 1, 2, 3.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -203,11 +204,11 @@ flowchart TB
 
 Choosing between them:
 
-- Use **`ROW_NUMBER`** when you need a unique number per row (e.g. "exactly
+- Use **`ROW_NUMBER()`** when you need a unique number per row (e.g. "exactly
   one top row per group").
-- Use **`RANK`** when ties should share a place and you want gaps to
+- Use **`RANK()`** when ties should share a place and you want gaps to
   reflect how many tied (competition-style standings).
-- Use **`DENSE_RANK`** when ties share a place but you want consecutive
+- Use **`DENSE_RANK()`** when ties share a place but you want consecutive
   rank numbers (e.g. "the top 3 *distinct* scores").
 
 ## Check your understanding
@@ -215,16 +216,16 @@ Choosing between them:
 <MultipleChoice
   markdown={`Why must a \`ROW_NUMBER() OVER (...)\` include an \`ORDER BY\` inside the \`OVER\`?
 
-- Because \`ROW_NUMBER\` cannot be used with \`PARTITION BY\`.
+- Because \`ROW_NUMBER()\` cannot be used with \`PARTITION BY\`.
   > It works with \`PARTITION BY\`; the requirement is about ordering, which defines the numbering.
 - Because \`ORDER BY\` sorts the final output.
   > The window's \`ORDER BY\` controls the numbering, not the final result order (which is the outer \`ORDER BY\`).
 - [o] Numbering rows 1, 2, 3 only makes sense once an order is defined, so the window needs an \`ORDER BY\`.
-  > Without an order there is no basis for which row is "1", so \`ROW_NUMBER\` needs \`ORDER BY\` in the window.
-- It does not, \`ORDER BY\` is optional for \`ROW_NUMBER\`.
+  > Without an order there is no basis for which row is "1", so \`ROW_NUMBER()\` needs \`ORDER BY\` in the window.
+- It does not, \`ORDER BY\` is optional for \`ROW_NUMBER()\`.
   > A meaningful row number requires an ordering; omitting it makes the numbers arbitrary or invalid.
 
-\`ROW_NUMBER\` numbers rows in a defined order, so the window must specify
+\`ROW_NUMBER()\` numbers rows in a defined order, so the window must specify
 that order.`}
 />
 
@@ -232,30 +233,30 @@ that order.`}
   markdown={`Players score 100, 100, 90. What does \`RANK()\` (ordering by score descending) assign?
 
 - 1, 2, 2
-  > The ties are at the top (the two 100s), not at 90; and \`RANK\` would not produce this.
+  > The ties are at the top (the two 100s), not at 90; and \`RANK()\` would not produce this.
 - 1, 1, 2
-  > That is \`DENSE_RANK\`, which does not skip; \`RANK\` skips to 3.
+  > That is \`DENSE_RANK()\`, which does not skip; \`RANK()\` skips to 3.
 - 1, 2, 3
-  > That is \`ROW_NUMBER\` behavior; \`RANK\` lets the two 100s tie.
+  > That is \`ROW_NUMBER()\` behavior; \`RANK()\` lets the two 100s tie.
 - [o] 1, 1, 3, the tied 100s both get rank 1, and the next rank skips to 3.
-  > \`RANK\` gives equal values the same rank and then skips the consumed positions.
+  > \`RANK()\` gives equal values the same rank and then skips the consumed positions.
 
-\`RANK\` shares the rank for ties and then skips, giving 1, 1, 3.`}
+\`RANK()\` shares the rank for ties and then skips, giving 1, 1, 3.`}
 />
 
 <MultipleChoice
   markdown={`You want the **single highest-paid employee per department**, exactly one row each even if salaries tie. Which function fits best?
 
-- \`DENSE_RANK\`, because it never skips numbers.
-  > \`DENSE_RANK\` also ties, so a salary tie would return more than one rank-1 row.
-- [o] \`ROW_NUMBER\`, because it gives a unique number per row so you can keep just \`= 1\`.
-  > \`ROW_NUMBER\` never ties, so filtering to rank 1 yields exactly one row per department.
-- \`COUNT\`, because it counts employees.
-  > \`COUNT\` does not rank rows and cannot pick the top earner.
-- \`RANK\`, because ties should share the top spot.
-  > \`RANK\` would return *all* tied top earners (multiple rows), not exactly one per department.
+- \`DENSE_RANK()\`, because it never skips numbers.
+  > \`DENSE_RANK()\` also ties, so a salary tie would return more than one rank-1 row.
+- [o] \`ROW_NUMBER()\`, because it gives a unique number per row so you can keep just \`= 1\`.
+  > \`ROW_NUMBER()\` never ties, so filtering to rank 1 yields exactly one row per department.
+- \`COUNT()\`, because it counts employees.
+  > \`COUNT()\` does not rank rows and cannot pick the top earner.
+- \`RANK()\`, because ties should share the top spot.
+  > \`RANK()\` would return *all* tied top earners (multiple rows), not exactly one per department.
 
-When you need exactly one row per group, \`ROW_NUMBER\` is the safe choice
+When you need exactly one row per group, \`ROW_NUMBER()\` is the safe choice
 because it breaks ties.`}
 />
 
@@ -297,4 +298,5 @@ compare over time?", with running totals and moving averages.
 <Figure
   slug="duck-ranking-and-row-number-numbering-rows-row-inline-cutout"
   alt="A row of blocks in height order with a pennant planted on each, the pennants shortening along the row"
+  caption="Ranking answers where a row stands relative to the others."
 />

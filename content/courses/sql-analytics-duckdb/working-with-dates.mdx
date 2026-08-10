@@ -52,20 +52,21 @@ flowchart TD
     R --> G["one group<br/>for March"]
 ```
 
-`date_trunc` is the backbone of every "by week / by month / by quarter"
+`date_trunc()` is the backbone of every "by week / by month / by quarter"
 report. Change the first argument to `'week'`, `'quarter'`, or `'year'`
 and the same query re-buckets accordingly.
 
-## Extract a part with `EXTRACT` / `date_part`
+## Extract a part with `EXTRACT()` / `date_part()`
 
 Sometimes you want a *component*, the year, the month number, the day of
 week, rather than a truncated date. `EXTRACT(part FROM d)` (or
-`date_part`) pulls it out. This is how you answer "which weekday is
+`date_part()`) pulls it out. This is how you answer "which weekday is
 busiest?" by grouping across all weeks.
 
 <Figure
   slug="duck-working-with-dates-core-move-truncate-inline-cutout"
   alt="A calendar strip cut by a guillotine into equal months and the pieces stacked"
+  caption="Truncating a timestamp is what turns rows into days, weeks or months."
 />
 
 <SqlCodeBlock
@@ -134,7 +135,7 @@ ORDER BY
 A subtle analytical trap: if no orders happened on some day, that day is
 simply **missing** from a grouped result, which makes a chart lie by
 skipping the gap. The fix is to generate a complete spine of dates with
-`generate_series` (or `range`) and `LEFT JOIN` the data onto it, so empty
+`generate_series` (or `range()`) and `LEFT JOIN` the data onto it, so empty
 periods show up as zero.
 
 <SqlCodeBlock
@@ -183,9 +184,9 @@ flowchart TD
 
 - Because \`order_date\` cannot be used in \`GROUP BY\`.
   > It can be grouped; the problem is that grouping by the raw date gives one group per *day*, not per month.
-- \`date_trunc\` deletes days with no orders.
+- \`date_trunc()\` deletes days with no orders.
   > It does not delete anything; gap-filling is a separate concern handled by a date spine.
-- \`date_trunc\` sorts the rows.
+- \`date_trunc()\` sorts the rows.
   > It buckets dates to a period start; sorting is still done by \`ORDER BY\`.
 - [o] Grouping by the raw date makes one group per day; truncating to the month collapses all of a month's days into one group.
   > \`date_trunc('month', ...)\` maps every day of a month to the same value, producing one row per month.
@@ -194,14 +195,14 @@ Truncating dates to the month is what makes per-month grouping work.`}
 />
 
 <MultipleChoice
-  markdown={`When would you use \`EXTRACT(dow FROM d)\` (day of week) rather than \`date_trunc\`?
+  markdown={`When would you use \`EXTRACT(dow FROM d)\` (day of week) rather than \`date_trunc()\`?
 
 - To add 7 days to a date.
-  > Adding days uses interval arithmetic, not \`EXTRACT\`.
+  > Adding days uses interval arithmetic, not \`EXTRACT()\`.
 - [o] To compare activity **across** periods, e.g. which weekday is busiest, pooling all weeks together.
-  > \`EXTRACT\` pulls a component so you can group all Mondays, all Tuesdays, etc., regardless of week.
+  > \`EXTRACT()\` pulls a component so you can group all Mondays, all Tuesdays, etc., regardless of week.
 - To produce a continuous monthly trend line.
-  > A trend over time uses \`date_trunc\`; extracting the weekday compares *across* time instead.
+  > A trend over time uses \`date_trunc()\`; extracting the weekday compares *across* time instead.
 - To keep each date unique.
   > \`EXTRACT(dow ...)\` collapses many dates to the same weekday number; it does not keep them unique.
 
@@ -212,13 +213,13 @@ truncate flattens dates for trends over time.`}
 <MultipleChoice
   markdown={`A daily revenue chart skips days that had no sales. What is the standard fix?
 
-- Use \`date_trunc\` to fill the gaps automatically.
-  > \`date_trunc\` buckets existing rows; it cannot invent rows for days that have no data.
+- Use \`date_trunc()\` to fill the gaps automatically.
+  > \`date_trunc()\` buckets existing rows; it cannot invent rows for days that have no data.
 - Insert fake orders into the table.
   > You should not corrupt the data; generate a date spine at query time instead.
-- Switch from \`SUM\` to \`AVG\`.
+- Switch from \`SUM()\` to \`AVG()\`.
   > Changing the aggregate does not create the missing days; the gap remains.
-- [o] Generate a complete series of dates and \`LEFT JOIN\` the data onto it, using \`COALESCE\` to show 0 for empty days.
+- [o] Generate a complete series of dates and \`LEFT JOIN\` the data onto it, using \`COALESCE()\` to show 0 for empty days.
   > A date spine guarantees every period appears; the left join attaches revenue and missing days become 0.
 
 A generated date spine plus a left join produces a gap-free time series.`}
@@ -230,4 +231,5 @@ long data into wide and back. That is the next page.
 <Figure
   slug="duck-working-with-dates-inline-cutout"
   alt="A calendar strip being cut into months by a small guillotine, and the pieces stacked into three labelled trays"
+  caption="Dates are cut into periods, and each period becomes a group."
 />

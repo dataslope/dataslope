@@ -93,6 +93,7 @@ rows stay.
 <Figure
   slug="duck-why-window-functions-problem-group-by-inline-cutout"
   alt="Chips collapsing into one summary block on one bench, and on the next the chips still standing each with its own tag"
+  caption="A window computes a group summary and hands it back to every row in the group."
 />
 
 <SqlCodeBlock
@@ -194,7 +195,7 @@ SUM(amount)  OVER ( PARTITION BY region  ORDER BY order_date )
   compute            a window                the window
 ```
 
-- The **function** (`SUM`, `AVG`, `COUNT`, `ROW_NUMBER`, ...) is what to
+- The **function** (`SUM()`, `AVG()`, `COUNT()`, `ROW_NUMBER()`, ...) is what to
   compute.
 - **`PARTITION BY`** decides which rows belong to the same window
   (optional, omit it for one big window).
@@ -260,7 +261,7 @@ rows.`}
   > Regions group fine; the issue is keeping detail rows alongside the total.
 - [o] It needs the individual order **and** the region total in the same row, but \`GROUP BY\` collapses the orders away.
   > The per-row share requires row-level detail beside the group total, exactly what windows provide and \`GROUP BY\` does not.
-- Because \`GROUP BY\` cannot compute a \`SUM\`.
+- Because \`GROUP BY\` cannot compute a \`SUM()\`.
   > \`GROUP BY\` computes sums fine; the difficulty is combining the sum with each detail row.
 
 The calculation needs row and group-total together, which is the signature
@@ -288,4 +289,5 @@ ranking rows, then computing running totals and moving averages.
 <Figure
   slug="duck-why-window-functions-inline-cutout"
   alt="A pile of blocks collapsing into one summary block on the left, and on the right the same blocks still standing in their original row, each wearing its own small summary tag"
+  caption="`GROUP BY` collapses the rows; a window function leaves them standing."
 />

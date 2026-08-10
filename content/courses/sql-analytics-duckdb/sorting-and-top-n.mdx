@@ -53,6 +53,7 @@ region.
 <Figure
   slug="duck-sorting-and-top-n-sorting-surfaces-extremes-inline-cutout"
   alt="A jumbled row of blocks pushed into a rising staircase, the tallest and the shortest now at the two ends"
+  caption="Sorting puts the extremes at the two ends, which is often the whole question."
 />
 
 <SqlCodeBlock
@@ -125,6 +126,7 @@ Two subtleties that quietly trip up analysts:
 <Figure
   slug="duck-sorting-and-top-n-inline-cutout"
   alt="A staircase of blocks with a bracket clamped over the highest four, the rest of the staircase outside the bracket"
+  caption="Without a tiebreaker, a top-N over ties returns some N, not the same N."
 />
 
 ```mermaid
@@ -210,7 +212,7 @@ reproducible.`}
 
 - It works perfectly for per-region top-N.
   > It does not: \`LIMIT 2\` caps the *entire* result at two rows, not two per region.
-- [o] \`LIMIT\` restricts the whole result to 2 rows total, not 2 per group; you need per-group ranking (e.g. \`ROW_NUMBER\` + \`QUALIFY\`).
+- [o] \`LIMIT\` restricts the whole result to 2 rows total, not 2 per group; you need per-group ranking (e.g. \`ROW_NUMBER()\` + \`QUALIFY\`).
   > Per-group top-N requires ranking within each partition and filtering on that rank, which \`LIMIT\` alone cannot express.
 - Because regions cannot be sorted.
   > Regions sort fine; the problem is the global nature of \`LIMIT\`.

@@ -22,6 +22,7 @@ page nails down.
 <Figure
   slug="duck-filtering-groups-two-filters-two-inline-cutout"
   alt="One grate before a press stopping single chips and another after it stopping whole summary blocks"
+  caption="`WHERE` filters rows going in; `HAVING` filters groups coming out."
 />
 
 - **`WHERE`** runs **before** grouping. It filters individual *rows*, so
@@ -84,6 +85,7 @@ selects which resulting groups *survive*.
 <Figure
   slug="duck-filtering-groups-inline-cutout"
   alt="Four summary blocks standing on trays with a marked line across them, the trays below the line taken away"
+  caption="`HAVING` judges a group by its own summary and drops the ones that fall short."
 />
 
 <SqlCodeBlock
@@ -181,10 +183,10 @@ Ask: *does my condition mention an aggregate?*
 
 - \`WHERE\` cannot compare numbers with \`>\`.
   > \`WHERE\` compares numbers fine; the issue is the aggregate, not the operator.
-- You must always use \`SUM\` in \`WHERE\`.
+- You must always use \`SUM()\` in \`WHERE\`.
   > You must *never* use an aggregate in \`WHERE\`; it goes in \`HAVING\`.
-- \`SUM\` is not a valid function.
-  > \`SUM\` is valid; the problem is *where* it is used.
+- \`SUM()\` is not a valid function.
+  > \`SUM()\` is valid; the problem is *where* it is used.
 - [o] \`WHERE\` runs before grouping, so per-group sums do not exist yet, aggregate conditions belong in \`HAVING\`.
   > At \`WHERE\` time there are only individual rows, no group totals, so \`SUM(amount)\` cannot be evaluated there.
 
@@ -198,7 +200,7 @@ after \`WHERE\`.`}
 - The query is impossible in SQL.
   > Combining \`WHERE\` and \`HAVING\` in one query is common and fully valid.
 - Both conditions go in \`WHERE\`.
-  > \`revenue > 1000\` uses \`SUM\`, an aggregate, which \`WHERE\` cannot evaluate; it must go in \`HAVING\`.
+  > \`revenue > 1000\` uses \`SUM()\`, an aggregate, which \`WHERE\` cannot evaluate; it must go in \`HAVING\`.
 - [o] \`status = 'paid'\` goes in \`WHERE\`; \`SUM(amount) > 1000\` goes in \`HAVING\`.
   > The row-level condition filters rows before grouping; the aggregate condition filters groups after summing.
 - Both conditions go in \`HAVING\`.
