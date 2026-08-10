@@ -34,6 +34,7 @@ objectively *the* answer. So cluster evaluation splits into two situations:
 <Figure
   slug="ml-evaluating-clusters-inline-cutout"
   alt="Two boards of grouped chips, one with tight well-separated groups and one whose groups visibly bleed together"
+  caption="With no labels, all you can judge is how tight and separate the groups are."
 />
 
 <Callout type="info" title="Internal vs external, in a sentence">
@@ -69,6 +70,7 @@ $$
 <Figure
   slug="ml-evaluating-clusters-silhouette-score-inline-cutout"
   alt="One chip measured for its distance to its own group and to the nearest other group, two calipers on it at once"
+  caption="The silhouette compares each point's own group against the nearest rival."
 />
 
 - **What it measures.** Per point, how much better it fits its own cluster
@@ -119,6 +121,7 @@ clusters. Try several values of `k`, score each, and let the data vote.
 <Figure
   slug="ml-evaluating-clusters-using-silhouette-score-inline-cutout"
   alt="Three boards of grouped chips with a gauge beside each, one gauge visibly higher than the others"
+  caption="Score several values of k and let the highest silhouette pick one."
 />
 
 <CodeBlock
@@ -372,7 +375,7 @@ but a human decides whether the structure means anything.
 
 1. For each \`k\` in \`range(2, 8)\`, fit
    \`KMeans(n_clusters=k, n_init=10, random_state=0)\` and compute the
-   \`silhouette_score\` of its labels.
+   \`silhouette_score()\` of its labels.
 2. Collect the scores, in order, into a list called \`sil_scores\`.
 3. Set \`best_k\` to the \`k\` with the highest silhouette score.
 

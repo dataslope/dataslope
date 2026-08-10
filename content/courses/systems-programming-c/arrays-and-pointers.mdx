@@ -106,6 +106,7 @@ called *array-to-pointer decay*.
 <Figure
   slug="sysc-arrays-and-pointers-c-array-contiguous-inline-cutout"
   alt="A single unbroken strip of equal cells laid end to end with no gaps"
+  caption="An array is one unbroken run of cells, which is what pointer arithmetic relies on."
 />
 
 <CodeBlock
@@ -230,11 +231,13 @@ same in memory.
 <Figure
   slug="sysc-arrays-and-pointers-i-i-inline-cutout"
   alt="A hand reaching to the fourth cell of a strip beside a marker walking four cell widths along it, both arriving together"
+  caption="Indexing and pointer arithmetic are the same operation written two ways."
 />
 
 <Figure
   slug="sysc-arrays-and-pointers-inline-cutout"
   alt="A strip of cells with a marker that moves by exact cell widths, the strip's own start marked by a peg"
+  caption="Adding one to a pointer advances it by one element, not one byte."
 />
 
 ```c

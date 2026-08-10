@@ -43,9 +43,9 @@ booleans, variables, functions, loops, arrays, objects, promises and
 `async`/`await`. Each **runtime** then layers its own capabilities on
 top:
 
-- **Browser**: DOM, `fetch`, `localStorage`.
+- **Browser**: the Document Object Model, `fetch()`, `localStorage`.
 - **Node.js**: filesystem, HTTP, child processes.
-- **Deno / Bun**: filesystem, HTTP, native `fetch`.
+- **Deno / Bun**: filesystem, HTTP, native `fetch()`.
 - **Embedded engines**: game scripting, IoT.
 
 The same `if`/`for`/`function` works everywhere. What changes is the
@@ -71,6 +71,7 @@ the **server**. With **Node.js** (and its newer cousins **Deno** and
 <Figure
   slug="js-javascript-beyond-the-browser-server-side-javascript-inline-cutout"
   alt="The same engine running on a plain bench in a back room, cords leading out to several page panels"
+  caption="The same engine runs on a server, with the page nowhere in sight."
 />
 
 Why JavaScript on the server? A few reasons:
@@ -229,6 +230,7 @@ project might break the same logic into two files: one for the
 <Figure
   slug="js-javascript-beyond-the-browser-idea-runtime-inline-cutout"
   alt="The same engine lifted out of a page panel and bolted onto a plain bench, running just the same"
+  caption="A runtime is the engine plus whatever the surroundings hand it."
 />
 
 <CodeBlock

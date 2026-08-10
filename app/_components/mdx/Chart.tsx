@@ -28,6 +28,7 @@
 import type { CSSProperties } from "react";
 import { ChartLine } from "lucide-react";
 import chartManifest from "@/lib/generated/charts";
+import { withInlineCode } from "./inlineCode";
 import ChartExpand from "./ChartExpand";
 import styles from "./Chart.module.css";
 
@@ -42,6 +43,8 @@ interface ChartProps {
   /**
    * Caption shown under the chart. Defaults to the spec's own `caption`
    * export; pass `null` to render none, or a string to override it here.
+   * Backtick spans render as code chips, so a spec that writes
+   * `` `s += piece` `` gets a code element rather than literal backticks.
    */
   caption?: string | null;
   /**
@@ -94,7 +97,11 @@ export function Chart({ slug, caption, maxWidth }: ChartProps) {
           dangerouslySetInnerHTML={{ __html: entry.svg }}
         />
       </ChartExpand>
-      {text ? <figcaption className={styles.caption}>{text}</figcaption> : null}
+      {text ? (
+        <figcaption className={styles.caption}>
+          {withInlineCode(text)}
+        </figcaption>
+      ) : null}
       {SHOW_CHART_ID ? (
         <figcaption className={styles.caption} style={{ opacity: 0.55, fontSize: "0.6875rem" }}>
           <code>charts/{slug}.mjs</code>

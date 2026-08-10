@@ -19,6 +19,7 @@ one of the most valuable habits you can build.
 <Figure
   slug="mcs-collections-inline-cutout"
   alt="Four different containers standing in a row, one a plain rail of slots, one a drawstring bag whose contents lie in no order, one a channel with a gate at each end, one a wall of small drawers each with a keyhole"
+  caption="List, set, queue or dictionary: each is shaped for a different question."
 />
 
 ## The big four
@@ -56,11 +57,12 @@ foreach (var s in scores)
 />
 
 Arrays have a fixed size at creation time. They're fast and
-lightweight, but you can't `Add` or `Remove`.
+lightweight, but you can't `Add()` or `Remove()`.
 
 <Figure
   slug="mcs-collections-arrays-fixed-size-inline-cutout"
   alt="A rail with exactly six slots, all filled, and a seventh block waiting with nowhere to go"
+  caption="An array's size is fixed when it is created, so the seventh item has nowhere to go."
 />
 
 ## `List<T>`: the everyday sequence
@@ -71,6 +73,7 @@ If you don't know exactly how many items you'll have, reach for
 <Figure
   slug="mcs-collections-list-t-everyday-inline-cutout"
   alt="A rail that grows one more slot as a seventh block is set down on it"
+  caption="A `List<T>` grows a slot whenever you add one more item."
 />
 
 <CodeBlock
@@ -168,7 +171,7 @@ Console.WriteLine(visited.Contains("blog")); // False
   ]}
 />
 
-A set's `Contains` is roughly as fast as a dictionary's lookup,
+A set's `Contains()` is roughly as fast as a dictionary's lookup,
 much faster than scanning a list.
 
 ## Picking the right collection
@@ -361,7 +364,7 @@ public static class WordCounter
 - It returns a default value silently
   > It doesn't, \`TryGetValue\` is the safe alternative.
 - [o] It throws a \`KeyNotFoundException\`
-  > Use \`ContainsKey\` or \`TryGetValue\` to look up safely.
+  > Use \`ContainsKey()\` or \`TryGetValue\` to look up safely.
 - It returns \`null\`
   > The indexer doesn't return \`null\` for a missing key, it throws instead.`}
 />

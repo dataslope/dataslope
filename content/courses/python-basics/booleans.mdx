@@ -47,6 +47,7 @@ The term "boolean" comes from **George Boole** (1815–1864), an English mathema
 <Figure
   slug="python-booleans-two-boolean-values-inline-cutout"
   alt="A switch with exactly two positions and no travel between them"
+  caption="A `bool` has exactly two settings, which is why Python can treat them as 1 and 0."
 />
 
 <CodeBlock
@@ -138,6 +139,7 @@ print(True is True)
 <Figure
   slug="python-booleans-comparison-operators-inline-cutout"
   alt="Two blocks on a balance whose needle rests hard against one of two stops"
+  caption="A comparison weighs two values and lands on exactly one of `True` or `False`."
 />
 
 <CodeBlock
@@ -409,7 +411,7 @@ print(abs_x)
 
 <ChallengeCard
   adapter="python"
-  title="XOR without ^"
+  title="Exclusive or without ^"
   instructions={`Define a function \`xor(a, b)\` that returns \`True\` if exactly one of \`a\` or \`b\` is truthy (not both, not neither). Do **not** use the \`^\` operator-use \`and\`, \`or\`, and \`not\`.`}
   files={[
     {
@@ -566,4 +568,5 @@ Booleans tie directly into control flow. Before we get there, let's look at Pyth
 <Figure
   slug="python-booleans-inline-cutout"
   alt="A single two-position switch on a panel with a lamp above it, lit in one position and dark in the other"
+  caption="Every condition your program tests comes down to one switch: `True` or `False`."
 />

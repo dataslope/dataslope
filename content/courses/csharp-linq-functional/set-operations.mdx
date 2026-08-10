@@ -15,12 +15,13 @@ joining them by key.
 
 ## Distinct: removing duplicates
 
-`Distinct` produces a sequence of unique elements, preserving the
+`Distinct()` produces a sequence of unique elements, preserving the
 order of first appearance.
 
 <Figure
   slug="cs-set-operations-distinct-removing-duplicates-inline-cutout"
   alt="A row of blocks where three are identical, two of them lifted out and set aside"
+  caption="`Distinct()` keeps the first of each value and sets the repeats aside."
 />
 
 <CodeBlock
@@ -80,6 +81,7 @@ the operation.
 <Figure
   slug="cs-set-operations-inline-cutout"
   alt="Two overlapping rings of blocks on a bench, the blocks in the overlap lifted onto a small stand between them"
+  caption="Union, intersect and except work on the overlap between two sequences."
 />
 
 <CodeBlock
@@ -115,7 +117,7 @@ key selector), all introduced in .NET 6.
 
 ## Concat, gluing end to end
 
-`Concat` does not deduplicate; it just appends the second sequence
+`Concat()` does not deduplicate; it just appends the second sequence
 to the first.
 
 <CodeBlock
@@ -135,12 +137,12 @@ Console.WriteLine(string.Join(",", a.Concat(b))); // 1,2,3,3,4,5
   ]}
 />
 
-Use `Concat` when order matters and duplicates are okay. Use `Union`
+Use `Concat()` when order matters and duplicates are okay. Use `Union()`
 when you want a set.
 
 ## Zip, pairing two sequences
 
-`Zip` walks two sequences in parallel and combines each pair with a
+`Zip()` walks two sequences in parallel and combines each pair with a
 function.
 
 <CodeBlock
@@ -163,7 +165,7 @@ foreach (var p in pairs)
   ]}
 />
 
-Output: three lines. `Zip` stops at the **shorter** sequence, there
+Output: three lines. `Zip()` stops at the **shorter** sequence, there
 is no `Dmitri(?)`. There's also a no-lambda overload that returns
 tuples:
 
@@ -185,19 +187,19 @@ foreach (var (n, a) in names.Zip(ages))
   ]}
 />
 
-A common use of `Zip`: pair items with their index without using
+A common use of `Zip()`: pair items with their index without using
 `Where((x, i) => ...)`.
 
 ```csharp
 var indexed = items.Zip(Enumerable.Range(0, int.MaxValue));
 ```
 
-(Modern code can use `Select((x, i) => ...)` for this, but `Zip` is
+(Modern code can use `Select((x, i) => ...)` for this, but `Zip()` is
 a useful general tool.)
 
 ## Join, relational join
 
-`Join` matches elements of two sequences by a key, the LINQ
+`Join()` matches elements of two sequences by a key, the LINQ
 equivalent of a SQL `INNER JOIN`.
 
 <CodeBlock
@@ -241,11 +243,11 @@ Customer 3 produces no rows (no matching order). The "Mystery" order
 produces no row (no matching customer). That's *inner join*
 behavior.
 
-### Left outer join with `GroupJoin` + `SelectMany`
+### Left outer join with `GroupJoin` + `SelectMany()`
 
 LINQ has no `LeftJoin` operator. The idiomatic way to do a left
-outer join is `GroupJoin` followed by `SelectMany` with
-`DefaultIfEmpty`.
+outer join is `GroupJoin` followed by `SelectMany()` with
+`DefaultIfEmpty()`.
 
 <CodeBlock
   adapter="csharp"
@@ -323,7 +325,7 @@ lists" kinds of problems.
 that returns the names that are present in \`current\` but not in
 \`last\`, deduplicated, sorted alphabetically (ordinal).
 
-Use \`Except\` and \`OrderBy\`. Don't write a \`foreach\`.`}
+Use \`Except()\` and \`OrderBy()\`. Don't write a \`foreach\`.`}
   entryFilename="Program.cs"
   files={[
     {
@@ -372,16 +374,16 @@ public static class Roster
 <MultipleChoice
   markdown={`What does \`a.Concat(b)\` differ from \`a.Union(b)\` in?
 
-- \`Concat\` only works on arrays; \`Union\` works on any \`IEnumerable<T>\`.
+- \`Concat()\` only works on arrays; \`Union()\` works on any \`IEnumerable<T>\`.
   > Both work on any \`IEnumerable<T>\`; that is not the difference.
-- \`Concat\` requires both sequences to have the same element type; \`Union\` does not.
+- \`Concat()\` requires both sequences to have the same element type; \`Union()\` does not.
   > Both require compatible element types (typically the same type or a common base type).
-- [o] \`Concat\` preserves every element including duplicates between the two sequences; \`Union\` deduplicates so each value appears at most once.
-  > \`Concat\` is purely "append" semantics; \`Union\` is set semantics that removes duplicates across (and within) the inputs.
-- \`Union\` always produces a longer sequence than \`Concat\`.
-  > The opposite is often true, \`Union\` deduplicates and can be shorter than \`Concat\`.
+- [o] \`Concat()\` preserves every element including duplicates between the two sequences; \`Union()\` deduplicates so each value appears at most once.
+  > \`Concat()\` is purely "append" semantics; \`Union()\` is set semantics that removes duplicates across (and within) the inputs.
+- \`Union()\` always produces a longer sequence than \`Concat()\`.
+  > The opposite is often true, \`Union()\` deduplicates and can be shorter than \`Concat()\`.
 
-Use \`Concat\` when you want a stitched-together list and duplicates are
-fine. Use \`Union\` when you want set semantics, each value at most
+Use \`Concat()\` when you want a stitched-together list and duplicates are
+fine. Use \`Union()\` when you want set semantics, each value at most
 once.`}
 />

@@ -27,7 +27,7 @@ import plotly.express as px
 That single line does two things:
 
 1. It loads the `plotly.express` module, which contains all the
-   chart functions: `px.bar`, `px.line`, `px.scatter`, and so on.
+   chart functions: `px.bar()`, `px.line()`, `px.scatter()`, and so on.
 2. It gives the module the short name `px`. By convention, every
    Python data analyst calls Plotly Express `px`. Just like NumPy
    is `np` and pandas is `pd`.
@@ -35,6 +35,7 @@ That single line does two things:
 <Figure
   slug="viz-introducing-plotly-express-standard-import-inline-cutout"
   alt="One short strip clipped to the top of a bench before any tool on it will run"
+  caption="One import line, by convention named `px`, and every chart function is available."
 />
 
 You will also frequently see:
@@ -100,20 +101,20 @@ the ones we'll meet in this course:
 
 | Function | Purpose |
 | --- | --- |
-| `px.scatter` | Two-variable relationships, also bubble charts |
-| `px.line` | Trends over an ordered axis (usually time) |
-| `px.bar` | Compare values across categories |
-| `px.histogram` | Distribution of one variable |
-| `px.box` | Distribution + outliers across categories |
-| `px.violin` | Distribution shape across categories |
-| `px.pie` | Parts of a whole (use sparingly) |
-| `px.density_heatmap` | 2-D density via colored grid |
-| `px.imshow` | Image / matrix / heatmap |
-| `px.choropleth` | Map colored by region |
-| `px.scatter_geo` | Points on a world map |
-| `px.scatter_mapbox` | Points on a tile-based map |
+| `px.scatter()` | Two-variable relationships, also bubble charts |
+| `px.line()` | Trends over an ordered axis (usually time) |
+| `px.bar()` | Compare values across categories |
+| `px.histogram()` | Distribution of one variable |
+| `px.box()` | Distribution + outliers across categories |
+| `px.violin()` | Distribution shape across categories |
+| `px.pie()` | Parts of a whole (use sparingly) |
+| `px.density_heatmap()` | 2-D density via colored grid |
+| `px.imshow()` | Image / matrix / heatmap |
+| `px.choropleth()` | Map colored by region |
+| `px.scatter_geo()` | Points on a world map |
+| `px.scatter_mapbox()` | Points on a tile-based map |
 | `px.timeline` | Gantt-style time intervals |
-| `px.sunburst` / `px.treemap` | Hierarchical compositions |
+| `px.sunburst()` / `px.treemap()` | Hierarchical compositions |
 
 There are more (`px.parallel_coordinates`, `px.scatter_matrix`,
 `px.density_contour`, ...). The cheat sheet on

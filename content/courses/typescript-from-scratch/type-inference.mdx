@@ -105,7 +105,7 @@ onClick((e) => {
   ]}
 />
 
-You didn't write `(n: number)` or `(e: ClickEvent)`, the compiler figured it out from the **signature** of `map` and `onClick`. This is **contextual typing**, also called **type inference from context**. It flows backward from the call site to the callback definition.
+You didn't write `(n: number)` or `(e: ClickEvent)`, the compiler figured it out from the **signature** of `map()` and `onClick`. This is **contextual typing**, also called **type inference from context**. It flows backward from the call site to the callback definition.
 
 <Callout type="success" title="Less noise, same safety">
 Contextual typing is one of the reasons TypeScript code stays readable. You get full type checking on callback parameters without cluttering every arrow function with explicit annotations.
@@ -181,6 +181,7 @@ When you initialize an array with mixed values, the compiler tries to find a **b
 <Figure
   slug="tsx-type-inference-inline-cutout"
   alt="A block dropped into an empty socket, the socket closing around it to take exactly its shape without anyone measuring"
+  caption="From mixed elements the compiler picks the narrowest type that fits them all."
 />
 
 <CodeBlock
@@ -392,6 +393,7 @@ The best practice is to **annotate at module boundaries** (function parameters, 
 <Figure
   slug="tsx-type-inference-variable-initializer-inference-inline-cutout"
   alt="A block dropped into a soft empty socket that closes around it to take exactly its shape"
+  caption="The initialiser is enough: the compiler takes the type from the value."
 />
 
 Next up: [Structural Typing](./structural-typing), where we explore how TypeScript compares types by their *shape*, not their name, and why that matters for reusability and flexibility.

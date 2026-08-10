@@ -166,7 +166,7 @@ int main() {
 This is the bug we promised to revisit in the variables chapter.
 The fix: don't return pointers to locals. Return by value, or
 return something stored on the heap (via `new` or, better, via
-`std::make_unique`).
+`std::make_unique()`).
 
 ## Function arguments are local variables too
 
@@ -194,6 +194,7 @@ with a **stack overflow**.
 <Figure
   slug="cpp-the-call-stack-inline-cutout"
   alt="A vertical column of trays being added one on top of another as a figure climbs, and the same trays being taken off from the top as they climb back down"
+  caption="Frames stack as calls begin and unwind as they return, in strict order."
 />
 
 <CodeBlock
@@ -366,4 +367,5 @@ all three.
 <Figure
   slug="cpp-the-call-stack-stack-frames-inline-cutout"
   alt="A column of trays growing upward as jobs start and coming apart from the top as they finish"
+  caption="Each call gets its own frame, and the frame dies when the call returns."
 />

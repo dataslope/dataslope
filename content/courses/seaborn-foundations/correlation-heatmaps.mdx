@@ -8,7 +8,7 @@ columns has fifteen pairs, far too many scatter plots to scan one at a
 time. A **heatmap** collapses all of those pairwise relationships into a
 single colored grid you can read in one glance.
 
-`sns.heatmap` takes a **2-D matrix** of numbers and draws each cell as a
+`sns.heatmap()` takes a **2-D matrix** of numbers and draws each cell as a
 colored square, with the color encoding the cell's value. Its most common
 job by far is rendering a **correlation matrix**, a square table whose
 cell at row *i*, column *j* is the correlation between variable *i* and
@@ -46,7 +46,7 @@ display(corr.round(2))
 />
 
 The result is square and symmetric, with **1.0 down the diagonal** (every
-variable correlates perfectly with itself). Now hand it to `heatmap` and
+variable correlates perfectly with itself). Now hand it to `heatmap()` and
 turn on `annot=True` to print each number inside its cell:
 
 <CodeBlock
@@ -84,6 +84,7 @@ midpoint** that means "no linear relationship."
 <Figure
   slug="sns-correlation-heatmaps-building-correlation-matrix-inline-cutout"
   alt="A square grid where each cell is shaded by how closely its row and column columns move together"
+  caption="Each cell shades how closely two columns move together."
 />
 
 That demands a **diverging** colormap: two contrasting hues meeting at a
@@ -163,7 +164,7 @@ centered on that midpoint.`}
 
 ## A second use: heatmaps of a pivot table
 
-Correlation is the famous case, but `heatmap` will color *any* 2-D matrix
+Correlation is the famous case, but `heatmap()` will color *any* 2-D matrix
 where both axes are meaningful. A natural source is a **pivot table**:
 reshape a tidy table into a grid and color the cells. The `flights` data,
 monthly airline passengers over a span of years, is perfect:
@@ -195,13 +196,14 @@ numbers.
 <Figure
   slug="sns-correlation-heatmaps-inline-cutout"
   alt="A square grid of tiles in graded colours with a strong diagonal band, and a colour key standing beside it"
+  caption="A heatmap makes two-dimensional structure visible that a table hides."
 />
 
 <Callout type="info" title="Heatmaps want WIDE / matrix data">
 Notice the input shape. Most Seaborn plots want **tidy/long** data, but a
 heatmap is the exception we flagged back on the tidy-data page: it needs a
 **wide matrix**, because its two axes *are* the row and column labels and
-each cell *is* a value. `pivot` (the reverse of `melt`) is how you reshape
+each cell *is* a value. `pivot()` (the reverse of `melt`) is how you reshape
 long data into that grid. Passenger counts here are non-negative magnitudes,
 so the default **sequential** colormap is the correct choice, sequential
 for one-directional magnitudes, diverging only for signed data like
@@ -268,10 +270,10 @@ legible.
   instructions={`Using the \`mpg\` dataset:
 
 1. Compute its correlation matrix with \`mpg.corr(numeric_only=True)\` and
-   store it in \`corr\`.
-2. Draw an **annotated** heatmap of \`corr\` using a **diverging** colormap
+   store it in \`corr()\`.
+2. Draw an **annotated** heatmap of \`corr()\` using a **diverging** colormap
    (e.g. \`cmap="vlag"\`) **centered at 0**.
-3. Assign the Axes that \`sns.heatmap\` returns to a variable named \`ax\`
+3. Assign the Axes that \`sns.heatmap()\` returns to a variable named \`ax\`
    (i.e. \`ax = sns.heatmap(...)\`).`}
   files={[
     {
@@ -381,4 +383,5 @@ which restore the scatter that the heatmap had to leave out.
 <Figure
   slug="sns-correlation-heatmaps-key-lesson-choose-inline-cutout"
   alt="A graded grid shown twice, once in one ink from pale to deep and once running between two inks from a centre"
+  caption="Correlation is signed with a meaningful zero, so it wants a diverging colormap."
 />

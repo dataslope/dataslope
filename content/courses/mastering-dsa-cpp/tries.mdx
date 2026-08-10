@@ -21,6 +21,7 @@ This trie contains `cat`, `car`, `cart`, and `dog`.
 <Figure
   slug="dsa-tries-trie-shape-inline-cutout"
   alt="A branching rack where words sharing a beginning share their first branches before splitting"
+  caption="Words sharing a prefix share the same branches until they differ."
 />
 
 ```mermaid
@@ -286,6 +287,7 @@ The trie's costs are worth restating before you decide to use one: every node ca
 <Figure
   slug="dsa-tries-inline-cutout"
   alt="A branching rack of letter tiles where words that share a beginning share the same first branches before splitting"
+  caption="A trie pays off when the prefixes are shared and the alphabet is small."
 />
 
 ## Practice: Implement a Trie
@@ -293,7 +295,7 @@ The trie's costs are worth restating before you decide to use one: every node ca
 <ChallengeCard
   adapter="cpp"
   title="Implement a Trie"
-  instructions={`Complete the \`Trie\` class with \`insert\`, \`search\`, and \`startsWith\`.`}
+  instructions={`Complete the \`Trie\` class with \`insert()\`, \`search\`, and \`startsWith\`.`}
   files={[
     {
       filename: "main.cpp",

@@ -25,6 +25,7 @@ discipline to know when a new feature is signal and when it is just noise.
 <Figure
   slug="ml-feature-engineering-core-idea-right-inline-cutout"
   alt="The same heap of parts laid out two ways, one jumbled and one sorted, a machine reading the sorted one easily"
+  caption="The same data in a better representation is far easier to learn from."
 />
 
 ## The core idea: the right representation makes learning easy
@@ -47,7 +48,7 @@ flowchart TD
 The mantra: **models can only use patterns that are visible in the
 features.** Feature engineering is how you make the pattern visible.
 
-<Callout type="info" title="Why this matters more in classical ML">
+<Callout type="info" title="Why this matters more in classical machine learning">
 Deep learning is famous for *learning* useful representations from raw
 inputs automatically. The classical scikit-learn models in this course do
 not do that, a linear model sees exactly the columns you give it and
@@ -65,6 +66,7 @@ alone.
 <Figure
   slug="ml-feature-engineering-move-1-ratios-inline-cutout"
   alt="Two columns feeding a small machine that sets down a third built from the pair"
+  caption="A ratio or a product can carry signal that neither column holds alone."
 />
 
 A **ratio** captures "per-unit" relationships: people per room, price per
@@ -98,7 +100,7 @@ print("in raw counts, but people_per_room (2.0 vs 1.0) captures crowding directl
 
 An **interaction** captures "the effect of A depends on B." Two features
 that are each weak on their own can be powerful together. The cleanest
-example is an XOR-like pattern, where the label depends on *whether two
+example is an exclusive-or pattern, where the label depends on *whether two
 features agree*, not on either feature alone. A plain linear model cannot
 express that, but give it the product of the two features (an interaction
 term) and it can.
@@ -300,7 +302,7 @@ print(f"With degree-2 features R2: {r2_score(y_test, curve.predict(X_test)):.3f}
 The straight line explains almost nothing of a curved relationship; the
 degree-2 version explains nearly all of it. Same algorithm, the engineered
 features unlocked the curve. (Recall from the pipelines page why wrapping
-`PolynomialFeatures` and the model in `make_pipeline` keeps the
+`PolynomialFeatures` and the model in `make_pipeline()` keeps the
 transformation leak-free.)
 
 <Callout type="danger" title="High-degree polynomials overfit fast">
@@ -374,6 +376,7 @@ right; some just add noise and dimensions for the model to overfit to.
 <Figure
   slug="ml-feature-engineering-inline-cutout"
   alt="Raw blocks on the left being cut, combined and re-shaped at a bench into a smaller set of cleaner parts that fit the machine at the right"
+  caption="Every engineered feature is a hypothesis, and some only add noise."
 />
 
 It **helps** when:
@@ -426,7 +429,7 @@ A few connections to keep the pages straight in your head:
   common scale. Feature *engineering* goes further: creating *new* columns
   that did not exist, from your understanding of the problem.
 - **Pipelines** (previous page) are where engineered features that involve a
-  `fit` step (like `PolynomialFeatures`, or scaling a ratio) belong, so the
+  `fit()` step (like `PolynomialFeatures`, or scaling a ratio) belong, so the
   transformation is learned on training data only and applied consistently,
   no leak.
 - **Cross-validation and metrics** (their own pages) are how you *judge*
@@ -559,7 +562,7 @@ The recurring idea is that the representation of the data, not just the algorith
 />
 
 <MultipleChoice
-  markdown={`A plain linear model scores near chance on an XOR-like pattern, but jumps to high accuracy once you add the product of the two features. What does this illustrate?
+  markdown={`A plain linear model scores near chance on an exclusive-or pattern, but jumps to high accuracy once you add the product of the two features. What does this illustrate?
 
 - Polynomial features always improve accuracy
   > They help only when the added terms expose real structure; in other cases they add noise and can overfit.

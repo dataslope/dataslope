@@ -57,6 +57,7 @@ changed the *coordinate system*, and the bars rotated. The chart's
 <Figure
   slug="gg-flipping-and-polar-coordinates-inline-cutout"
   alt="A row of bars on a straight rail, the same bars turned on their side, and the same bars again bent round into a ring"
+  caption="Flip or bend the coordinates and the same bars become a new chart."
 />
 
 <Callout type="info" title="A modern alternative">
@@ -98,6 +99,7 @@ circle with `coord_polar(theta = "y")`. **Nothing else changes:**
 <Figure
   slug="gg-flipping-and-polar-coordinates-from-bar-pie-inline-cutout"
   alt="A row of bars on a straight rail bent round until its ends meet in a ring"
+  caption="A pie chart is a stacked bar with its ends joined into a ring."
 />
 
 <CodeBlock
@@ -184,7 +186,7 @@ a stacked bar under a polar coordinate system.`}
 - It changes the data; rows are aggregated differently.
   > The data and aggregation are identical; only the coordinate space differs.
 - It changes the geom; the count becomes a color.
-  > The geom stays \`geom_bar\`; the count does not become color.
+  > The geom stays \`geom_bar()\`; the count does not become color.
 - It changes the statistic; the count is recomputed.
   > The stat (count) is unchanged; the same counts are reused.
 

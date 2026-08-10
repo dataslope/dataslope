@@ -18,6 +18,7 @@ in one file. To grow, you need two skills:
 <Figure
   slug="c-scope-and-modularity-scope-inline-cutout"
   alt="A bench inside a walled booth, its tools reachable from inside and not from the corridor outside"
+  caption="A name is visible inside its block and invisible outside it."
 />
 
 These are the engineering disciplines that turn working code into
@@ -86,6 +87,7 @@ ends.
 <Figure
   slug="c-scope-and-modularity-inline-cutout"
   alt="Two workshops side by side, each with its own bench and tools, and one shared shelf on the wall between them"
+  caption="An inner declaration shadows the outer one until its block ends."
 />
 
 <CodeBlock
@@ -375,5 +377,5 @@ Compare two ideas: \`static\` *inside* a function gives a long lifetime + local 
 - C functions cannot return any kind of pointer.
   > Functions can and regularly do return pointers, to heap memory, globals, or caller-supplied buffers. The restriction is only on returning pointers to the function's own local variables.
 
-Functions can absolutely return pointers, to globals, to data on the heap (\`malloc\`), to memory the caller supplied. They just can't safely return pointers to their own stack-allocated locals.`}
+Functions can absolutely return pointers, to globals, to data on the heap (\`malloc()\`), to memory the caller supplied. They just can't safely return pointers to their own stack-allocated locals.`}
 />

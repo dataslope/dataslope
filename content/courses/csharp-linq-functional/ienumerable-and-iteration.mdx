@@ -44,7 +44,7 @@ That's it. The contract is:
 
 Notice what's *not* there:
 
-- No `Count`. You may not know how many elements there are.
+- No `Count()`. You may not know how many elements there are.
 - No `Indexer`. You can't ask for "element 7".
 - No `Add` or `Remove`. Sequences may be immutable, infinite,
   or computed.
@@ -143,7 +143,7 @@ safer to use with operators that stop early.
 
 ## A custom operator written from scratch
 
-To prove how simple the contract is, let's implement our own `Where`.
+To prove how simple the contract is, let's implement our own `Where()`.
 
 <CodeBlock
   adapter="csharp"
@@ -227,11 +227,13 @@ trips, usually not what you want.
 <Figure
   slug="cs-ienumerable-and-iteration-interface-itself-inline-cutout"
   alt="A sealed drum with one crank and one chute, handing out a single block per turn"
+  caption="`IEnumerable<T>` promises one element at a time and nothing more."
 />
 
 <Figure
   slug="cs-ienumerable-and-iteration-inline-cutout"
   alt="A sealed drum with a crank handing out one block per turn, the drum's remaining contents unknown from outside"
+  caption="You cannot see inside from outside, which is why iterating twice runs it twice."
 />
 
 The fix is to **materialize** the sequence once, into a real
@@ -325,12 +327,12 @@ classDiagram
 ```
 
 - `IEnumerable<T>`, can iterate.
-- `IReadOnlyCollection<T>`, can iterate + has `Count`.
+- `IReadOnlyCollection<T>`, can iterate + has `Count()`.
 - `IReadOnlyList<T>`, adds indexing.
 - `ICollection<T>` / `IList<T>`, add mutation.
 
 If your method only needs to iterate, **accept `IEnumerable<T>`**.
-If you need `Count` but no mutation, accept
+If you need `Count()` but no mutation, accept
 `IReadOnlyCollection<T>`. If you accept `List<T>` "just in case",
 you've locked your caller into one concrete type for no reason.
 
@@ -343,8 +345,8 @@ you've locked your caller into one concrete type for no reason.
   > Indexing isn't part of \`IEnumerable<T>\` at all, that's \`IList<T>\` or arrays. And the elements may be computed on demand rather than stored.
 - [o] You can call \`foreach\` over the result and read elements one at a time.
   > That is exactly what \`IEnumerable<T>\` promises: it gives you an enumerator that produces elements until it signals the end.
-- The returned sequence has a known \`Count\` property you can read cheaply.
-  > \`IEnumerable<T>\` does not expose \`Count\`; calling \`.Count()\` may walk the entire sequence (potentially expensive).
+- The returned sequence has a known \`Count()\` property you can read cheaply.
+  > \`IEnumerable<T>\` does not expose \`Count()\`; calling \`.Count()\` may walk the entire sequence (potentially expensive).
 
 \`IEnumerable<T>\` is intentionally minimal: *"you can ask me for the
 next element until I say I'm done."* Anything beyond that, counting,

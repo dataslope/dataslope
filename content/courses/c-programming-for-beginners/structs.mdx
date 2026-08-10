@@ -68,6 +68,7 @@ in modern C code.
 <Figure
   slug="c-structs-declaring-struct-inline-cutout"
   alt="An empty fitted tray whose compartments are cut to different shapes before anything is placed in them"
+  caption="A struct lays out named compartments before anything is put in them."
 />
 
 <CodeBlock
@@ -240,6 +241,7 @@ up rich data without leaving C's type system.
 <Figure
   slug="c-structs-inline-cutout"
   alt="One wide tray divided into four fitted compartments of different sizes, each holding a different shaped part, the whole tray lifted as one piece"
+  caption="A struct groups related values into one thing you can pass by name."
 />
 
 <CodeBlock
@@ -374,10 +376,10 @@ y.a = 99;
 printf("%d %d\\n", x.a, y.a);
 \`\`\`
 
-*Hint: the \`printf\` prints \`x.a\` first, then \`y.a\`. Decide whether the assignment to \`y\` changes \`x\`.*
+*Hint: the \`printf()\` prints \`x.a\` first, then \`y.a\`. Decide whether the assignment to \`y\` changes \`x\`.*
 
 - \`99 1\`
-  > This has the two values swapped. \`printf\` prints \`x.a\` (still \`1\`) before \`y.a\` (now \`99\`).
+  > This has the two values swapped. \`printf()\` prints \`x.a\` (still \`1\`) before \`y.a\` (now \`99\`).
 - The code is invalid; you can't assign one struct to another.
   > C allows struct assignment with \`=\` as long as both sides have the same type; it copies every field just like assigning a scalar would copy its value.
 - [o] \`1 99\`

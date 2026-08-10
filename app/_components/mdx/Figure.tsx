@@ -31,6 +31,7 @@
  */
 import { ImageIcon } from "lucide-react";
 import imageManifest from "@/lib/generated/images";
+import { withInlineCode } from "./inlineCode";
 import styles from "./Figure.module.css";
 
 const PUBLIC_BASE = "/images";
@@ -55,7 +56,11 @@ interface FigureProps {
   slug: string;
   /** Alt text. Pass "" only for a purely decorative image. */
   alt: string;
-  /** Optional caption shown under the image. */
+  /**
+   * Optional caption shown under the image. Backtick spans in it render as
+   * code chips (see `withInlineCode`), so a caption naming an identifier reads
+   * the way the same spelling does in the lesson body.
+   */
   caption?: string;
   /**
    * Optional cap on display width in px. Omitted by default so the figure
@@ -125,7 +130,11 @@ export function Figure({
           fetchPriority={priority ? "high" : "auto"}
         />
       </picture>
-      {caption ? <figcaption className={styles.caption}>{caption}</figcaption> : null}
+      {caption ? (
+        <figcaption className={styles.caption}>
+          {withInlineCode(caption)}
+        </figcaption>
+      ) : null}
       {/* Regeneration handle. The prompt id is the slug with the `-cutout`
           suffix dropped, which is what `data/illustration-prompts.json` is keyed
           by and what every pipeline script takes as `--only`. Rendered so a

@@ -88,6 +88,7 @@ has to write by hand, every time, in every project.
 <Figure
   slug="jcol-the-tyranny-of-arrays-inline-cutout"
   alt="A rail with exactly eight slots, all filled, and a ninth block waiting on the bench with nowhere to go"
+  caption="An array's length is fixed, so the ninth element has nowhere to go."
 />
 
 ### 1. Resize themselves
@@ -133,7 +134,7 @@ yourself by allocating a bigger array and copying.
   ]}
 />
 
-That little dance, `size`, `capacity`, `grow`, `copy`, is exactly
+That little dance, `size()`, `capacity`, `grow`, `copy`, is exactly
 what `ArrayList` does for you. Every team that didn't have an
 `ArrayList` *wrote one*, slightly differently, with slightly
 different bugs.
@@ -156,7 +157,7 @@ that has nothing to do with your problem.
 ### 4. Enforce uniqueness
 
 If your business rule is "each email address appears at most once,"
-the array does not help. Every `add` has to scan everything else.
+the array does not help. Every `add()` has to scan everything else.
 
 ### 5. Carry their type
 
@@ -172,6 +173,7 @@ existed. Every module rolled its own.
 <Figure
   slug="jcol-the-tyranny-of-arrays-short-history-code-inline-cutout"
   alt="A bench where storage begins as a fixed strip, becomes a growing rail, and ends as a wall of keyed drawers"
+  caption="Every project reinvented the same containers before the library had them."
 />
 
 ```mermaid
@@ -243,7 +245,7 @@ public class Main {
   ]}
 />
 
-No `grow`, no `size` counter, no `for (int i = 0; ...)`, no manual
+No `grow`, no `size()` counter, no `for (int i = 0; ...)`, no manual
 copy. The container *is* the abstraction. And because it is
 `List<String>`, the compiler will refuse to insert anything but a
 string.

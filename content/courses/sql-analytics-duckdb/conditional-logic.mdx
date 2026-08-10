@@ -65,6 +65,7 @@ your toolkit for good.
 <Figure
   slug="duck-conditional-logic-case-if-else-inline-cutout"
   alt="A chute with a three-way sorter, each block dropping into the branch whose gauge it satisfies"
+  caption="`CASE` sorts each row down the branch whose condition it satisfies."
 />
 
 <SqlCodeBlock
@@ -109,6 +110,7 @@ mobile vs. desktop, all side by side.
 <Figure
   slug="duck-conditional-logic-inline-cutout"
   alt="A chute with a three-way sorter, each block dropping into the branch whose condition it satisfies and the rest falling to a default tray"
+  caption="A `CASE` inside an aggregate computes several filtered totals at once."
 />
 
 <SqlCodeBlock
@@ -159,7 +161,7 @@ ORDER BY
 />
 
 How it works: for each row, the inner `CASE` contributes the `amount` only
-when the condition holds (and `0` otherwise), so `SUM` adds up just the
+when the condition holds (and `0` otherwise), so `SUM()` adds up just the
 matching rows. You get one column per condition, effectively pivoting a
 category into columns. The last column uses DuckDB's cleaner **`FILTER`**
 clause, which does the same thing more readably.
@@ -176,7 +178,7 @@ flowchart TD
 
 DuckDB supports the SQL-standard `FILTER (WHERE ...)` clause on aggregates,
 which expresses conditional aggregation more clearly than `CASE` inside
-`SUM`. Prefer it when available.
+`SUM()`. Prefer it when available.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -223,7 +225,7 @@ ORDER BY
 "sum the amount, but only for paid rows." It is the analyst's preferred
 way to build these side-by-side filtered metrics.
 
-## Handling NULLs: `COALESCE` and `NULLIF`
+## Handling NULLs: `COALESCE()` and `NULLIF()`
 
 Two small but constant companions of conditional logic:
 
@@ -286,7 +288,7 @@ specific to general.`}
 - The count of paid rows.
   > It sums \`amount\`, not a count; a count would use \`COUNT(...)\`.
 - [o] The total \`amount\` of only the \`paid\` rows, because non-paid rows contribute 0.
-  > The inner \`CASE\` zeroes out non-matching rows, so \`SUM\` effectively totals just the paid amounts.
+  > The inner \`CASE\` zeroes out non-matching rows, so \`SUM()\` effectively totals just the paid amounts.
 
 Conditional aggregation sums only the rows matching the inner condition,
 producing a filtered total in its own column.`}
@@ -296,12 +298,12 @@ producing a filtered total in its own column.`}
   markdown={`Why is \`amount / NULLIF(quantity, 0)\` safer than \`amount / quantity\`?
 
 - It rounds the result automatically.
-  > \`NULLIF\` does not round; it guards against a specific divisor value.
+  > \`NULLIF()\` does not round; it guards against a specific divisor value.
 - It converts the result to text.
   > The result stays numeric (or NULL); no type change occurs.
 - It makes the division faster.
   > The benefit is safety, not speed.
-- [o] When \`quantity\` is 0, \`NULLIF\` turns it into \`NULL\`, so the division yields \`NULL\` instead of a divide-by-zero error.
+- [o] When \`quantity\` is 0, \`NULLIF()\` turns it into \`NULL\`, so the division yields \`NULL\` instead of a divide-by-zero error.
   > Dividing by NULL produces NULL rather than failing, which keeps the query running on bad rows.
 
 \`NULLIF(quantity, 0)\` converts a zero divisor to NULL, avoiding

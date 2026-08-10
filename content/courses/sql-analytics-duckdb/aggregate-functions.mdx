@@ -108,17 +108,18 @@ FROM
 
 "How many visits?" "How many had a known referrer?" "How many *different*
 people?", three genuinely different business questions, three different
-`COUNT`s. Confusing them is a common analytical error.
+`COUNT()`s. Confusing them is a common analytical error.
 
 ## Aggregates ignore `NULL` (except `COUNT(*)`)
 
-`SUM`, `AVG`, `MIN`, `MAX`, and `COUNT(column)` all **skip NULLs**. This
+`SUM()`, `AVG()`, `MIN()`, `MAX()`, and `COUNT(column)` all **skip NULLs**. This
 is almost always what you want, an unknown value should not be treated as
 zero and drag an average down.
 
 <Figure
   slug="duck-aggregate-functions-inline-cutout"
   alt="One wide tray of chips feeding four gauges at once, each reading a different single number"
+  caption="Several aggregates in one pass read the same rows different ways."
 />
 
 <SqlCodeBlock
@@ -194,7 +195,7 @@ flowchart TD
   markdown={`What is the defining behavior of an **aggregate function**?
 
 - [o] It reduces many rows to a single summary value, such as a total or an average.
-  > "Many rows in, one number out" is exactly what \`SUM\`, \`AVG\`, \`COUNT\`, \`MIN\`, and \`MAX\` do.
+  > "Many rows in, one number out" is exactly what \`SUM()\`, \`AVG()\`, \`COUNT()\`, \`MIN()\`, and \`MAX()\` do.
 - It sorts rows into ascending order.
   > Sorting is \`ORDER BY\`; aggregation summarizes rather than orders.
 - It removes duplicate rows.
@@ -211,14 +212,14 @@ analytical operation.`}
 
 - 2.67, treating the NULL as 0.
   > Aggregates do not treat NULL as 0; that would distort the result.
-- [o] 4.0, because \`AVG\` ignores the NULL and averages only 5 and 3.
-  > \`AVG\` (like \`SUM\`, \`MIN\`, \`MAX\`) skips NULLs, so it averages the two known scores: (5 + 3) / 2 = 4.0.
+- [o] 4.0, because \`AVG()\` ignores the NULL and averages only 5 and 3.
+  > \`AVG()\` (like \`SUM()\`, \`MIN()\`, \`MAX()\`) skips NULLs, so it averages the two known scores: (5 + 3) / 2 = 4.0.
 - NULL, because one value is missing.
   > A single NULL does not nullify the whole average; only the NULL row is skipped.
 - An error.
-  > NULLs do not cause an error in \`AVG\`; they are simply excluded.
+  > NULLs do not cause an error in \`AVG()\`; they are simply excluded.
 
-Aggregates skip NULLs, so \`AVG\` reflects only the present values.`}
+Aggregates skip NULLs, so \`AVG()\` reflects only the present values.`}
 />
 
 <MultipleChoice
@@ -243,4 +244,5 @@ That is `GROUP BY`, and it is next.
 <Figure
   slug="duck-aggregate-functions-aggregation-exists-inline-cutout"
   alt="A bench heaped with chips that no one can count by eye, and one gauge with a single pointer resting at one mark beside it"
+  caption="No one can read a million rows; an aggregate turns them into one number."
 />

@@ -80,6 +80,7 @@ miniature version of what that felt like.
 <Figure
   slug="oopj-software-crisis-was-so-painful-inline-cutout"
   alt="A bench of loose tools and loose tins with cords running everywhere between them"
+  caption="Shared global data and loose procedures is what objects were a reaction to."
 />
 
 <CodeBlock
@@ -129,7 +130,7 @@ procedures, and many programmers. Several painful patterns emerge:
 - **Data has no owner.** Any function in the program can mutate
   `customerBalance`. If a bug puts it in a bad state, the culprit
   could be *anywhere*.
-- **Invariants are not protected.** Nothing prevents `withdraw` from
+- **Invariants are not protected.** Nothing prevents `withdraw()` from
   making the balance negative. The rule "balance must be ≥ 0" is not
   enforced by the data, it has to be remembered by every author of
   every function.

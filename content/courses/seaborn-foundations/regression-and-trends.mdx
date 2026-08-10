@@ -22,8 +22,8 @@ trustworthy than the data really supports. So this page teaches the tools
 
 Seaborn has two functions that draw a scatter **plus** a fitted line:
 
-- **`sns.regplot`**, axes-level. Draws onto a single Axes and returns it.
-- **`sns.lmplot`**, figure-level. Makes its own figure and, crucially,
+- **`sns.regplot()`**, axes-level. Draws onto a single Axes and returns it.
+- **`sns.lmplot()`**, figure-level. Makes its own figure and, crucially,
   supports `hue`, `col`, and `row` to fit lines per group or per panel.
 
 Both draw the same two things: the **points**, and a line that estimates
@@ -40,7 +40,7 @@ fairly sure where the average sits," not "most points fall in here."
 
 ## The minimum
 
-Map two numeric columns and let `lmplot` fit a straight line:
+Map two numeric columns and let `lmplot()` fit a straight line:
 
 <CodeBlock
   adapter="python"
@@ -67,13 +67,14 @@ laid over the evidence*, never a replacement for it.
 
 ## A line per group with `hue`
 
-Because `lmplot` is figure-level, mapping a categorical column to **`hue`**
+Because `lmplot()` is figure-level, mapping a categorical column to **`hue`**
 fits a *separate* line for each group and colors them. This answers a
 sharper question: does the relationship *differ* between groups?
 
 <Figure
   slug="sns-regression-and-trends-regression-line-isn-inline-cutout"
   alt="A straight rod laid through a cloud of chips with a small warning flag where the rod runs past the last chip"
+  caption="The fitted line keeps going where the data stops, which is where it misleads."
 />
 
 <CodeBlock
@@ -169,7 +170,7 @@ sns.lmplot(data=mpg, x="horsepower", y="mpg", lowess=True)
 The polynomial curve hugs the points far better than the straight line did,
 and a LOWESS fit would bend with them even more flexibly. The lesson
 generalizes: **always eyeball the scatter first.** If it bends, a straight
-`lmplot` is the wrong summary, and you reach for `order=` or `lowess=True`.
+`lmplot()` is the wrong summary, and you reach for `order=` or `lowess=True`.
 
 <MultipleChoice
   markdown={`You draw \`sns.lmplot(data=mpg, x="horsepower", y="mpg")\` and the straight
@@ -280,7 +281,7 @@ scatter visible so the summary stays accountable to the evidence.
 <ChallengeCard
   adapter="python"
   title="Fit a line per group"
-  instructions={`Using the \`tips\` dataset, draw a regression plot with **\`sns.lmplot\`**:
+  instructions={`Using the \`tips\` dataset, draw a regression plot with **\`sns.lmplot()\`**:
 
 - \`total_bill\` on the x-axis,
 - \`tip\` on the y-axis,
@@ -339,7 +340,7 @@ g = sns.lmplot(
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What does the line drawn by \`regplot\` / \`lmplot\` represent?
+  markdown={`What does the line drawn by \`regplot()\` / \`lmplot()\` represent?
 
 - [o] An estimate of the average value of y for each value of x.
   > The fit summarizes the central tendency of y given x, your best single guess for y at a given x, drawn over the scatter of individual points.
@@ -354,7 +355,7 @@ The fitted line estimates the conditional average of y as x varies.`}
 />
 
 <MultipleChoice
-  markdown={`The translucent band around an \`lmplot\` line is best described as:
+  markdown={`The translucent band around an \`lmplot()\` line is best described as:
 
 - The range of a future single prediction.
   > That is a prediction interval, which is wider. The default band is about the fitted line, not individual new points.
@@ -379,8 +380,8 @@ gives an honest trend?
   > Both let the fit *bend* to match the data's real shape rather than forcing a straight line through a curve.
 - Drop the points so only the straight line shows.
   > Hiding the points conceals the mismatch instead of addressing it, the opposite of honest.
-- Swap to \`regplot\`; it automatically detects curvature.
-  > \`regplot\` fits a straight line by default just like \`lmplot\`; you must explicitly ask for \`order=\` or \`lowess=\`.
+- Swap to \`regplot()\`; it automatically detects curvature.
+  > \`regplot()\` fits a straight line by default just like \`lmplot()\`; you must explicitly ask for \`order=\` or \`lowess=\`.
 
 When the relationship bends, the fix is to let the fit bend too, via a
 polynomial order or a LOWESS smoother.`}
@@ -410,4 +411,5 @@ at once, with the **correlation heatmap**.
 <Figure
   slug="sns-regression-and-trends-inline-cutout"
   alt="A cloud of chips pinned flat across a board with one straight rod laid through the middle of the cloud, and a soft shaded band following that rod closely on either side"
+  caption="The band around the line is the uncertainty in the fit, not the spread of points."
 />

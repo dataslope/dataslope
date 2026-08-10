@@ -215,7 +215,7 @@ does not, so `melt` is one of the most useful tools in your kit.
 Tidy is the default, but not a law. A few charts genuinely want a **matrix**
 (wide) layout, most importantly the **heatmap**, where rows and columns
 are both meaningful axes and each cell is a value. We'll meet that in the
-correlation-heatmaps chapter. The reverse of `melt` is `pivot`, which
+correlation-heatmaps chapter. The reverse of `melt` is `pivot()`, which
 spreads a long table back into a wide matrix:
 
 <CodeBlock
@@ -312,7 +312,7 @@ tidy = scores.melt(id_vars="student", var_name="subject", value_name="score")
 - **Values trapped in column headers.** `2019`, `2020`, `2021` as separate
   columns means "year" is a variable hiding in the headers, melt it.
 - **One column holding two variables.** A `"London_temp"` column mixes city
-  and measurement. Split it (e.g. with `str.split`) before plotting.
+  and measurement. Split it (e.g. with `str.split()`) before plotting.
 - **Aggregates pasted into the data.** A "Total" row or column is a summary,
   not an observation. Seaborn can compute totals for you, drop it from the
   raw table.
@@ -320,6 +320,7 @@ tidy = scores.melt(id_vars="student", var_name="subject", value_name="score")
 <Figure
   slug="sns-tidy-data-for-seaborn-inline-cutout"
   alt="A jumbled sheet on the left rebuilt into a clean board on the right, one row per record and one column per measure"
+  caption="Seaborn wants tidy data: one row per observation, one column per variable."
 />
 
 <Callout type="warn" title="Tidy first, plot second">
@@ -354,11 +355,11 @@ with one colored line per region. What should you do first?
 
 - [o] \`melt\` the four region columns into a \`region\` column and a \`sales\` column, then map \`hue="region"\`.
   > Melting moves the region names out of the headers into a real \`region\` column, which is exactly what \`hue\` needs.
-- Plot each region with four separate \`relplot\` calls.
+- Plot each region with four separate \`relplot()\` calls.
   > That technically works but throws away everything Seaborn offers, one tidy call gives you all four lines, a shared scale, and a legend automatically.
-- Sort the DataFrame by \`month\` and call \`relplot\` on the wide table.
-  > Sorting doesn't change the shape; \`relplot\` still has no single column to color by.
-- Pass \`hue=["North", "South", "East", "West"]\` to \`relplot\`.
+- Sort the DataFrame by \`month\` and call \`relplot()\` on the wide table.
+  > Sorting doesn't change the shape; \`relplot()\` still has no single column to color by.
+- Pass \`hue=["North", "South", "East", "West"]\` to \`relplot()\`.
   > \`hue\` takes a single column name, not a list of columns. The regions need to live in *one* column first.
 
 Whenever group identity is spread across column *headers*, melting it into a
@@ -370,7 +371,7 @@ column is the unlock for \`hue\`, \`col\`, and friends.`}
 instead of tidy/long?
 
 - [o] You are drawing a **heatmap**, where rows and columns are both axes and each cell is a value.
-  > A heatmap is inherently a matrix view, so a wide row-by-column table (often made with \`pivot\`) is the natural input.
+  > A heatmap is inherently a matrix view, so a wide row-by-column table (often made with \`pivot()\`) is the natural input.
 - You want Seaborn to compute group means automatically.
   > Automatic grouping and aggregation operate over tidy columns, not wide matrices.
 - You want to color a scatter plot by a categorical group.
@@ -407,4 +408,5 @@ distinction drives every chart choice.
 <Figure
   slug="sns-tidy-data-for-seaborn-tidy-means-inline-cutout"
   alt="A board where every row is one record and every column one measure"
+  caption="Once the table is tidy, every Seaborn function takes column names directly."
 />

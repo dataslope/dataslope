@@ -76,7 +76,7 @@ as long, because the cache line stops paying for itself.
 `ArrayList` keeps a backing `Object[]`. When it fills up, it
 allocates a new array that is **1.5×** the size, copies, and
 discards the old one. That copy is what makes the *worst-case*
-`add` `O(n)`, but it happens rarely enough that the *amortized*
+`add()` `O(n)`, but it happens rarely enough that the *amortized*
 cost is `O(1)`.
 
 If you know roughly how many elements you'll add, **pre-size**:
@@ -129,6 +129,7 @@ slots each time.
 <Figure
   slug="jcol-performance-tradeoffs-big-table-inline-cutout"
   alt="A grid of small gauges, one per container per operation, their needles at visibly different angles"
+  caption="Each container is fast at some operations and slow at others, by construction."
 />
 
 Both values matter. A too-small initial capacity causes repeated
@@ -186,6 +187,7 @@ A short, honest list:
 <Figure
   slug="jcol-performance-tradeoffs-inline-cutout"
   alt="Two containers side by side, one quick to reach into and slow to insert, the other the reverse, each with its own gauge"
+  caption="Pick the container from the operation you do most, not the one you do once."
 />
 
 ## The cost of generics: autoboxing
@@ -313,18 +315,18 @@ flowchart TD
 - The number of threads allowed to read it
   > It's not thread-related.
 - The hash function used for keys
-  > That's determined by the key type's \`hashCode\`.`}
+  > That's determined by the key type's \`hashCode()\`.`}
 />
 
 <MultipleChoice
   markdown={`You'll append about 50,000 elements to an \`ArrayList\`. Which construction is best?
 
-- \`new ArrayList<>(10)\`, then call \`add\` 50k times
+- \`new ArrayList<>(10)\`, then call \`add()\` 50k times
   > Worse: even more resizes.
 - \`new LinkedList<>()\`
   > More memory and slower iteration in almost every scenario.
-- \`new ArrayList<>()\`, then call \`add\` 50k times
+- \`new ArrayList<>()\`, then call \`add()\` 50k times
   > Works, but triggers ~17 grow-and-copy events.
-- [o] \`new ArrayList<>(50_000)\`, then call \`add\` 50k times
+- [o] \`new ArrayList<>(50_000)\`, then call \`add()\` 50k times
   > One allocation, zero resizes.`}
 />

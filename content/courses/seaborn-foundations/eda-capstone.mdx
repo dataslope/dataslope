@@ -1,5 +1,5 @@
 ---
-title: "Capstone: A Full EDA"
+title: "Capstone: A Full Exploration"
 description: "Put it all together, explore the penguins dataset end to end, from first glance to a communication-ready figure."
 ---
 
@@ -84,7 +84,7 @@ The data types drive the chart choice, not the other way around.
 ## Step 2, One variable at a time
 
 With the lay of the land clear, start *narrow*: look at a single numeric
-column on its own. A **histogram** (via `displot` with `kind="hist"`)
+column on its own. A **histogram** (via `displot()` with `kind="hist"`)
 turns one column of numbers into a shape, where values pile up, how spread
 out they are, whether there is more than one peak.
 
@@ -124,7 +124,7 @@ so the groups show up in color.
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Histogram of flipper length, colored by species"
   instructions={`Using the \`penguins\` dataset, draw a **histogram** of
-\`flipper_length_mm\` with \`sns.displot\`:
+\`flipper_length_mm\` with \`sns.displot()\`:
 
 - put \`flipper_length_mm\` on the x-axis,
 - use \`kind="hist"\`,
@@ -184,7 +184,7 @@ penguins into kinds.
 
 The histogram suggested the species differ. The natural next question is
 *by how much, and on which measurements?* When one axis is a **category**
-and the other is a **number**, that is a job for `catplot`. A
+and the other is a **number**, that is a job for `catplot()`. A
 **box plot** (`kind="box"`) summarizes each group's spread, the box is the
 middle 50%, the line is the median, the whiskers reach most of the rest,
 so you can line the groups up and compare centers and overlap at a glance.
@@ -231,7 +231,7 @@ vary by *where* a penguin lives, the way it varies by species? Find out.
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Compare body mass across islands"
   instructions={`Using the \`penguins\` dataset, draw a categorical plot with
-\`sns.catplot\` comparing \`body_mass_g\` across islands:
+\`sns.catplot()\` comparing \`body_mass_g\` across islands:
 
 - put \`island\` on the x-axis,
 - put \`body_mass_g\` on the y-axis,
@@ -293,7 +293,7 @@ confounds as about finding patterns.
 
 Single variables and group comparisons are warm-ups. The richest questions
 in this dataset are about how two measurements move *together*. Back to the
-**scatter plot** (`relplot`), now armed with what we know, color by
+**scatter plot** (`relplot()`), now armed with what we know, color by
 species so the structure is unmistakable.
 
 Flipper length against body mass:
@@ -332,7 +332,7 @@ relationship is shared across groups that nonetheless occupy different
 parts of it.
 
 When a relationship looks linear, it is natural to ask for the *line*.
-`lmplot` draws a scatter plus a fitted regression line per group, a quick
+`lmplot()` draws a scatter plus a fitted regression line per group, a quick
 way to compare trends. Try it on the two bill measurements, which (you may
 recall from earlier) hide a surprise when you split by species.
 
@@ -341,7 +341,7 @@ recall from earlier) hide a surprise when you split by species.
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Regression lines for bill shape by species"
   instructions={`Using the \`penguins\` dataset, draw a regression plot with
-\`sns.lmplot\`:
+\`sns.lmplot()\`:
 
 - put \`bill_length_mm\` on the x-axis,
 - put \`bill_depth_mm\` on the y-axis,
@@ -403,7 +403,7 @@ also **deeper**, every line slopes upward. Yet if you erased the colors
 and fitted one line to the whole cloud, the trend would look flat or even
 *downward*, because Gentoo (long, shallow bills) pull the overall picture
 sideways. That reversal, a within-group trend that vanishes or flips when
-groups are pooled, is **Simpson's paradox**, and `lmplot` with `hue` makes
+groups are pooled, is **Simpson's paradox**, and `lmplot()` with `hue` makes
 it visible in a single chart.
 
 ## Step 5, All pairs at once
@@ -475,7 +475,7 @@ different in size. The bright cell between flipper length and body mass
 (near `+0.87`) is the strong relationship you already saw as a scatter, now
 quantified.
 
-That `corr` matrix has structure worth understanding directly, not just
+That `corr()` matrix has structure worth understanding directly, not just
 coloring. Build it yourself and check two facts that are true of *every*
 correlation matrix.
 
@@ -488,13 +488,13 @@ numeric variable) and every variable correlates perfectly with itself, so
 its diagonal is all \`1\`.
 
 Using the \`penguins\` dataset, build the correlation matrix of its numeric
-columns and assign it to a variable named \`corr\`:
+columns and assign it to a variable named \`corr()\`:
 
 \`\`\`
 corr = penguins.corr(numeric_only=True)
 \`\`\`
 
-The tests will confirm that \`corr\` is square and that its top-left entry
+The tests will confirm that \`corr()\` is square and that its top-left entry
 (a variable's correlation with itself) is \`1\`.`}
   files={[
     {

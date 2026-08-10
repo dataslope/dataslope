@@ -86,6 +86,7 @@ handles every line that starts with `#`:
 <Figure
   slug="cpp-compilation-pipeline-step-1-preprocessor-inline-cutout"
   alt="A card passing a first machine that pastes extra strips onto it before it continues"
+  caption="The preprocessor pastes in headers before the compiler sees anything."
 />
 
 ```mermaid
@@ -125,6 +126,7 @@ unit, in order:
 <Figure
   slug="cpp-compilation-pipeline-four-step-pipeline-inline-cutout"
   alt="A card passing through four machines in a row, leaving each visibly changed"
+  caption="Preprocess, compile, assemble, link: four stages, each with its own output."
 />
 
 The result is a `.s` assembly file.
@@ -180,7 +182,7 @@ An object file contains:
 - A table of *symbols* that this file **defines** (functions and
   globals it provides).
 - A table of *symbols* this file **needs** but does not define
-  (calls to `printf`, references to `std::cout`, etc.).
+  (calls to `printf()`, references to `std::cout`, etc.).
 
 Object files are not runnable on their own. They are puzzle pieces.
 
@@ -430,4 +432,5 @@ which parts of the language each piece is using.
 <Figure
   slug="cpp-compilation-pipeline-inline-cutout"
   alt="A card passing through four machines and leaving as a running unit, each stage's output visibly different"
+  caption="Source goes in one end and a runnable program comes out the other."
 />

@@ -1,12 +1,13 @@
 ---
 title: Functional Async Workflows
-description: Tasks, lazy promises, and composing asynchronous computations with `map`, `chain`, and `Result`.
+description: Tasks, lazy promises, and composing asynchronous computations with `map()`, `chain()`, and `Result`.
 ---
 
-JavaScript's `Promise` is a good citizen of the FP world, *almost*.
+JavaScript's `Promise` is a good citizen of the functional world,
+*almost*.
 `Promise<A>` represents "an `A` that will arrive later". Its
-`.then` is roughly `map` (when the callback returns a value) and
-`flatMap` (when the callback returns another `Promise`). Once you
+`.then` is roughly `map()` (when the callback returns a value) and
+`flatMap()` (when the callback returns another `Promise`). Once you
 see that pattern, everything you learned in the [Category Theory
 chapter](./category-theory-intuitions) applies.
 
@@ -75,7 +76,7 @@ const program: Task<string> = chain(of(1), (n) =>
   ]}
 />
 
-The familiar trio appears again: `of`, `map`, `chain`. The exact
+The familiar trio appears again: `of`, `map()`, `chain()`. The exact
 same patterns you used for `Option` and `Result` apply to `Task`.
 
 ## Running tasks in parallel vs sequence
@@ -86,6 +87,7 @@ in parallel, combine their results.
 <Figure
   slug="fp-functional-async-workflows-tasks-their-three-inline-cutout"
   alt="Three kettles started together with three small tools hanging above them, one to start, one to chain, one to gather"
+  caption="Independent tasks can start together and be gathered when they finish."
 />
 
 <CodeBlock
@@ -236,6 +238,7 @@ the structure of the type itself.
 <Figure
   slug="fp-functional-async-workflows-inline-cutout"
   alt="Several slow kettles started at once along a bench, their results collected into one tray as each finishes"
+  caption="Parallel work is collected into one result as each piece completes."
 />
 
 ## A small multi-file challenge

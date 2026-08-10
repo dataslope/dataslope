@@ -65,6 +65,7 @@ eliminates *half* of what is left.
 <Figure
   slug="java-basic-algorithms-and-data-structures-linear-search-inline-cutout"
   alt="A hand walking a row of blocks one at a time from the left until it reaches the marked one"
+  caption="Linear search checks every element until it finds the one you want."
 />
 
 Searching for `17` in `[2, 5, 8, 11, 17, 23, 31, 42]`:
@@ -111,7 +112,7 @@ Look closely at the line `int mid = lo + (hi - lo) / 2;`. The
 "obvious" way to take a midpoint is `(lo + hi) / 2`, and that
 obvious way is a famous bug. In 2006, Joshua Bloch (author of
 *Effective Java*) revealed that the binary search shipped in the
-JDK itself had carried this flaw for nine years: when `lo` and `hi`
+Java standard library itself had carried this flaw for nine years: when `lo` and `hi`
 are both large, their *sum* overflows the `int` range, goes
 negative, and the search crashes or misbehaves. His blog post was
 cheekily titled "Extra, Extra, Read All About It: Nearly All Binary
@@ -168,7 +169,7 @@ public class Main {
 
 Selection sort takes time proportional to the *square* of the list
 length. For 10,000 elements, fine. For 10,000,000 elements, way too
-slow, for that you'd use the JDK's built-in `Arrays.sort`, which
+slow, for that you'd use the built-in `Arrays.sort()`, which
 is `O(n log n)`.
 
 The general rule: **you almost never write a sort in production
@@ -263,8 +264,8 @@ A working programmer's mental table of first-resort tools:
 | "Process items in arrival order" | `Queue` |
 | "Process items in last-in-first-out order" | `Deque` as a stack |
 | "Find an item in a sorted list" | binary search |
-| "Sort a list" | `Collections.sort` |
-| "I'll iterate a million times, does \`contains\` need to be fast?" | use a Set, not a List |
+| "Sort a list" | `Collections.sort()` |
+| "I'll iterate a million times, does \`contains()\` need to be fast?" | use a Set, not a List |
 
 You will, of course, run into problems that don't fit this table.
 But this table covers an *astonishing* fraction of day-to-day code.
@@ -272,6 +273,7 @@ But this table covers an *astonishing* fraction of day-to-day code.
 <Figure
   slug="java-basic-algorithms-and-data-structures-binary-search-inline-cutout"
   alt="A sorted row of blocks with a hand splitting it in half, discarding one half, and splitting again"
+  caption="On sorted data, each comparison throws away half of what is left."
 />
 
 <MultipleChoice
@@ -303,14 +305,14 @@ But this table covers an *astonishing* fraction of day-to-day code.
 <MultipleChoice
   markdown={`A program calls \`list.contains(x)\` inside a tight loop 1,000,000 times on a 1,000,000-element ArrayList. Which change is most likely to fix the resulting slowness?
 
-- [o] Replace the ArrayList with a HashSet so each \`contains\` call runs in roughly constant time
-  > A set looks up by hash instead of scanning, turning each \`contains\` from linear to near-constant.
+- [o] Replace the ArrayList with a HashSet so each \`contains()\` call runs in roughly constant time
+  > A set looks up by hash instead of scanning, turning each \`contains()\` from linear to near-constant.
 - Re-create the list with a smaller capacity
-  > Does not change \`contains\`'s linear cost.
+  > Does not change \`contains()\`'s linear cost.
 - Replace the loop with recursion
   > Won't help and may overflow the stack.
-- Sort the list first and keep using \`contains\`
-  > \`contains\` does not benefit from sorting.`}
+- Sort the list first and keep using \`contains()\`
+  > \`contains()\` does not benefit from sorting.`}
 />
 
 ## A challenge

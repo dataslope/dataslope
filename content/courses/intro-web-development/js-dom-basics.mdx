@@ -25,7 +25,7 @@ var button  = document.querySelector("#save");     // by id
 var items   = document.querySelectorAll("li");     // ALL matches
 ```
 
-`querySelector` takes exactly the selectors you learned in CSS, one
+`querySelector()` takes exactly the selectors you learned in CSS, one
 language, two uses.
 
 ## Changing what you selected
@@ -96,7 +96,7 @@ console.log("First chore:", items[0].textContent);
 Note where the `<script src="script.js">` tag sits: at the **end of
 `<body>`**. Scripts run the moment the parser reaches them, placing
 them last guarantees every element above already exists, so
-`querySelector` finds what it's looking for.
+`querySelector()` finds what it's looking for.
 
 ## Challenge
 
@@ -183,4 +183,5 @@ makes it respond to the user: [events](/courses/intro-web-development/js-events)
 <Figure
   slug="web-js-dom-basics-inline-cutout"
   alt="A page panel shown as a branching frame of nested boxes, one box lifted out and altered by a hand"
+  caption="The document is a tree, and scripts reach into it to change one node."
 />

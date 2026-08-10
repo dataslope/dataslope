@@ -95,6 +95,7 @@ group." You will use it constantly.
 <Figure
   slug="rlang-grouped-analysis-multiple-summaries-at-inline-cutout"
   alt="Three trays of chips each feeding four gauges at once"
+  caption="One pass over each group can report several summaries at once."
 />
 
 ## Multiple grouping variables
@@ -169,6 +170,7 @@ row.
 <Figure
   slug="rlang-grouped-analysis-inline-cutout"
   alt="A board split into three stacks by a comb, each stack pressed into a single summary block on its own tray"
+  caption="Grouped `mutate()` computes within each group but keeps every row."
 />
 
 <CodeBlock
@@ -364,14 +366,14 @@ if (!all(need %in% names(monthly))) stop(sprintf("missing: %s", paste(setdiff(ne
 <MultipleChoice
   markdown={`What's the difference between \`group_by(cyl) |> summarise(avg = mean(mpg))\` and \`group_by(cyl) |> mutate(avg = mean(mpg))\`?
 
-- \`summarise\` is slower than \`mutate\`.
-  > Speed is not the distinction; the fundamental difference is that \`summarise\` collapses rows and \`mutate\` keeps them.
+- \`summarise()\` is slower than \`mutate()\`.
+  > Speed is not the distinction; the fundamental difference is that \`summarise()\` collapses rows and \`mutate()\` keeps them.
 - They're the same.
-  > The two produce different shapes: \`summarise\` collapses to one row per group, while \`mutate\` preserves all original rows.
-- \`mutate\` cannot be used with \`group_by\`.
-  > \`mutate\` works perfectly well after \`group_by\`; it computes each new column value within the group context while retaining all rows.
-- [o] \`summarise\` returns one row per group (collapses); \`mutate\` keeps every row and broadcasts the group statistic into each row.
-  > Use \`summarise\` for a compact group table, \`mutate\` when you want a per-row column that depends on the group.`}
+  > The two produce different shapes: \`summarise()\` collapses to one row per group, while \`mutate()\` preserves all original rows.
+- \`mutate()\` cannot be used with \`group_by()\`.
+  > \`mutate()\` works perfectly well after \`group_by()\`; it computes each new column value within the group context while retaining all rows.
+- [o] \`summarise()\` returns one row per group (collapses); \`mutate()\` keeps every row and broadcasts the group statistic into each row.
+  > Use \`summarise()\` for a compact group table, \`mutate()\` when you want a per-row column that depends on the group.`}
 />
 
 The last page in this section covers *reshaping*, switching
@@ -380,4 +382,5 @@ between wide and long forms when your data isn't yet tidy.
 <Figure
   slug="rlang-grouped-analysis-basic-pattern-inline-cutout"
   alt="A board split into three stacks by a comb, each stack pressed into one summary block"
+  caption="Group, then summarise: the rows collapse to one per group."
 />

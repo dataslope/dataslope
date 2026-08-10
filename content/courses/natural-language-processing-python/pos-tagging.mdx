@@ -88,7 +88,7 @@ Same word, two sentences, two different tags, `NN` (noun) in the first,
 
 ## Reading the tags: the Penn Treebank tagset
 
-`pos_tag` returns a list of `(word, tag)` tuples. The tags come from the
+`pos_tag()` returns a list of `(word, tag)` tuples. The tags come from the
 **Penn Treebank** tagset, which is more fine-grained than "noun/verb", it
 distinguishes singular from plural nouns, verb tenses, and so on. You do not
 need to memorize all ~36 tags, but you should recognize the common families.
@@ -237,6 +237,7 @@ accurate lemmatization recipe.
 <Figure
   slug="nlp-pos-tagging-inline-cutout"
   alt="A line of word tiles with a small coloured flag being clipped to each one, matching flags on matching kinds of word"
+  caption="Tagging attaches a grammatical role to each word in context."
 />
 
 <CodeBlock
@@ -351,7 +352,7 @@ Context-dependence is the whole reason POS tagging is a prediction problem, not 
 **starts with** \`"NN"\` (this covers \`NN\`, \`NNS\`, \`NNP\`, and \`NNPS\`, so both
 common and proper nouns count).
 
-Steps: word-tokenize the text, run \`pos_tag\` on the tokens, then keep the
+Steps: word-tokenize the text, run \`pos_tag()\` on the tokens, then keep the
 words whose tag starts with \`"NN"\`.
 
 For example, \`get_nouns("The hungry cat chased a small mouse.")\` should return
@@ -436,16 +437,16 @@ for w in ["the", "chased", "hungry", "small", "a"]:
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What does \`pos_tag\` return when given a list of tokens?
+  markdown={`What does \`pos_tag()\` return when given a list of tokens?
 
 - [o] A list of \`(word, tag)\` tuples, one per token, where the tag is the word's part of speech in context
-  > \`pos_tag\` pairs each token with a Penn Treebank tag, producing tuples like \`("book", "NN")\`. You typically iterate over these pairs to filter by category or feed POS into lemmatization.
+  > \`pos_tag()\` pairs each token with a Penn Treebank tag, producing tuples like \`("book", "NN")\`. You typically iterate over these pairs to filter by category or feed POS into lemmatization.
 - A list of only the nouns
-  > \`pos_tag\` tags every token in the input, regardless of category; filtering to only nouns is a separate step you apply after receiving the full list of tuples.
+  > \`pos_tag()\` tags every token in the input, regardless of category; filtering to only nouns is a separate step you apply after receiving the full list of tuples.
 - A single string naming the sentence's overall grammar
-  > \`pos_tag\` does not produce a description of the whole sentence's grammar; it returns a list of per-token \`(word, tag)\` tuples covering every token individually.
+  > \`pos_tag()\` does not produce a description of the whole sentence's grammar; it returns a list of per-token \`(word, tag)\` tuples covering every token individually.
 - The lemmatized form of each word
-  > Lemmatization is a distinct operation performed by \`WordNetLemmatizer\`; \`pos_tag\` assigns grammatical category labels and does not alter the word forms.
+  > Lemmatization is a distinct operation performed by \`WordNetLemmatizer\`; \`pos_tag()\` assigns grammatical category labels and does not alter the word forms.
 
 It tags every token with its grammatical category, as (word, tag) pairs.`}
 />
@@ -507,4 +508,5 @@ To capture local word order, we turn to **n-grams**.
 <Figure
   slug="nlp-pos-tagging-problem-pos-tagging-inline-cutout"
   alt="One word tile held up with three differently shaped flags above it, only one able to clip on"
+  caption="The same word takes a different tag depending on how it is used."
 />

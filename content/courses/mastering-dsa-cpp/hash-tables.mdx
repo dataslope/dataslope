@@ -60,6 +60,7 @@ key, at four percent full.
 <Figure
   slug="dsa-hash-tables-collisions-chaining-inline-cutout"
   alt="Two keys whose chutes swing to the same bin, the bin holding a short cord of blocks rather than one"
+  caption="Two keys can land in one bucket, and chaining keeps both there."
 />
 
 <Chart slug="hash-collision-birthday" />
@@ -159,6 +160,7 @@ Load factor is `size / bucket_count`, how full the table is. Keep it low and col
 <Figure
   slug="dsa-hash-tables-core-idea-inline-cutout"
   alt="A key dropped into a mixing machine whose chute swings to one of several bins"
+  caption="The hash turns a key straight into a bucket number, with no searching."
 />
 
 ```mermaid
@@ -203,6 +205,7 @@ The "O(1) average" promise has a dark corollary: if *all* keys land in one bucke
 <Figure
   slug="dsa-hash-tables-inline-cutout"
   alt="A key dropped into a small mixing machine whose chute swings to one of several bins, and the item landing directly in that bin"
+  caption="Average constant time assumes the keys spread out; adversarial keys do not."
 />
 
 At the Chaos Communication Congress in December 2011, researchers Alexander Klink and Julian Wälde showed that the hash functions used by PHP, ASP.NET, Java, Python, Ruby, and others were deterministic and publicly documented, so an attacker could *precompute* tens of thousands of strings that all hash to the same bucket. Send those strings as ordinary HTTP POST parameters, which web frameworks helpfully insert into a hash table, and each insert costs O(n): the server burns minutes of CPU on a single small request. A handful of requests could pin an entire server. Vendors shipped emergency patches; the long-term fix, adopted across language runtimes, was to *randomize* hashing per process, most famously via SipHash, a keyed hash function designed by Jean-Philippe Aumasson and Daniel J. Bernstein in 2012 specifically for hash tables, now used by Python, Ruby, Rust, and others.
@@ -211,7 +214,7 @@ The lesson generalizes beyond security: hash tables are only as good as the spre
 
 ## `std::unordered_map` and `std::unordered_set`
 
-Back to the standard library. `std::unordered_map<K,V>` stores key-value pairs; `std::unordered_set<K>` stores unique keys. Common operations include `operator[]`, `find`, `count`, `insert`, `erase`, and range-for iteration. One sharp edge worth knowing: `ages["nobody"]` does not just *look up*, if the key is absent, `operator[]` **inserts** it with a default value. Use `find` or `count` when you only want to ask.
+Back to the standard library. `std::unordered_map<K,V>` stores key-value pairs; `std::unordered_set<K>` stores unique keys. Common operations include `operator[]`, `find()`, `count()`, `insert()`, `erase()`, and range-for iteration. One sharp edge worth knowing: `ages["nobody"]` does not just *look up*, if the key is absent, `operator[]` **inserts** it with a default value. Use `find()` or `count()` when you only want to ask.
 
 <CodeBlock
   adapter="cpp"

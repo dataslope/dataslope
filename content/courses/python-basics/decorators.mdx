@@ -42,6 +42,7 @@ print(add_five(20))  # 25
 <Figure
   slug="python-decorators-preserve-metadata-functools-inline-cutout"
   alt="A machine wrapped in a frame with its original blank name plate carried through onto the frame's face"
+  caption="`functools.wraps()` carries the original function's name onto the wrapper."
 />
 
 ## The minimal decorator
@@ -82,6 +83,7 @@ The decorator `shout` takes the original `greet`, wraps it in a new function tha
 <Figure
   slug="python-decorators-minimal-decorator-inline-cutout"
   alt="A small machine lifted into a surrounding frame that wraps it and adds one extra stamp"
+  caption="A decorator wraps the original function and adds one step around it."
 />
 
 ```mermaid
@@ -293,6 +295,7 @@ The call stack is: `bracketed wrapper` → `excited wrapper` → original `greet
 <Figure
   slug="python-decorators-inline-cutout"
   alt="A small machine being lifted into a surrounding frame that wraps it, the wrapped unit doing the original job plus one extra stamp"
+  caption="Each decorator adds another layer around the function underneath it."
 />
 
 <Callout type="info" title="Order matters">

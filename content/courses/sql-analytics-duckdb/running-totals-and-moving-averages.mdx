@@ -8,7 +8,7 @@ date", "7-day moving average", "growth versus last month." All of them use
 **ordered windows**, windows where `ORDER BY` inside `OVER` makes the
 calculation accumulate or slide as it moves through the rows. This page
 covers running totals, moving averages, and the row-comparison functions
-`LAG`/`LEAD`, and finally explains the **window frame**.
+`LAG()`/`LEAD()`, and finally explains the **window frame**.
 
 <Figure
   slug="duck-running-totals-cutout"
@@ -70,6 +70,7 @@ Combine `PARTITION BY` with the ordered window to get a running total that
 <Figure
   slug="duck-running-totals-and-moving-averages-inline-cutout"
   alt="A row of daily blocks with a growing stack behind them, and a smooth bar sliding along averaging the last three at a time"
+  caption="A running total accumulates; a moving average slides over a fixed span."
 />
 
 <SqlCodeBlock
@@ -106,7 +107,7 @@ ORDER BY
 The total climbs within West, then **restarts** for East. `PARTITION BY`
 scopes the accumulation; `ORDER BY` drives it.
 
-## Comparing to neighboring rows: `LAG` and `LEAD`
+## Comparing to neighboring rows: `LAG()` and `LEAD()`
 
 To compute change-over-time you need each row to *see* its neighbor.
 `LAG(col)` returns the value from the **previous** row in the window;
@@ -153,7 +154,7 @@ lags further behind a turn:
 
 <Chart slug="rolling-window-lag" />
 
-So far an ordered `SUM` summed *everything up to the current row*. That
+So far an ordered `SUM()` summed *everything up to the current row*. That
 default is called the frame `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT
 ROW`. You can change the frame to a **sliding window**, say, the current
 row plus the two before it, to compute a **moving average** that smooths
@@ -237,19 +238,19 @@ total.`}
   markdown={`What does \`LAG(revenue) OVER (ORDER BY day)\` return for the **first** row?
 
 - [o] \`NULL\`, because there is no previous row to look back to.
-  > The earliest row has no predecessor in the window, so \`LAG\` yields NULL there.
+  > The earliest row has no predecessor in the window, so \`LAG()\` yields NULL there.
 - 0, as a default.
-  > By default \`LAG\` returns NULL (not 0) when there is no previous row.
+  > By default \`LAG()\` returns NULL (not 0) when there is no previous row.
 - The same row's own revenue.
-  > \`LAG\` returns the *previous* row's value, not the current row's.
+  > \`LAG()\` returns the *previous* row's value, not the current row's.
 - The grand total of revenue.
-  > \`LAG\` looks at a single previous row, not a total.
+  > \`LAG()\` looks at a single previous row, not a total.
 
-\`LAG\` returns NULL at the first row because there is nothing before it.`}
+\`LAG()\` returns NULL at the first row because there is nothing before it.`}
 />
 
 <MultipleChoice
-  markdown={`What does the frame \`ROWS BETWEEN 2 PRECEDING AND CURRENT ROW\` compute when paired with \`AVG\`?
+  markdown={`What does the frame \`ROWS BETWEEN 2 PRECEDING AND CURRENT ROW\` compute when paired with \`AVG()\`?
 
 - [o] A moving average of the current row and the two rows immediately before it.
   > The frame defines a sliding 3-row window, so the average smooths over those rows as it moves.
@@ -287,4 +288,5 @@ data to *transforming* it: conditional logic, dates, and reshaping.
 <Figure
   slug="duck-running-totals-and-moving-averages-running-total-inline-cutout"
   alt="A row of blocks with a growing stack beside it, each stack taller than the last by that block"
+  caption="Each row's running total is the previous one plus this row's value."
 />

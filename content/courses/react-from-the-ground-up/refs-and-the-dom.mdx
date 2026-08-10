@@ -6,7 +6,7 @@ description: useRef for reaching real DOM nodes and for holding mutable values t
 Almost everything in React flows through state and props. But sometimes
 you need to step outside that flow, to **focus an input**, measure an
 element, or hold a value that changes without redrawing the screen.
-That's what **`useRef`** is for.
+That's what **`useRef()`** is for.
 
 <Figure
   slug="rx-refs-cutout"
@@ -82,6 +82,7 @@ the time a click handler runs, it's set.
 <Figure
   slug="rx-refs-and-the-dom-inline-cutout"
   alt="A panel with one direct handle reaching past the usual controls to grip an element underneath"
+  caption="A ref reaches past React to the real element underneath."
 />
 
 <Callout type="warn" title="Don't reach for a ref to do what state does">

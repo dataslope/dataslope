@@ -46,6 +46,7 @@ features, a genuine modeling error.
 <Figure
   slug="ml-encoding-categorical-features-problem-models-need-inline-cutout"
   alt="A machine whose inlet accepts only plain blocks, three coloured tags waiting outside it"
+  caption="A model only takes numbers, so categories have to be encoded first."
 />
 
 Watch what it implies:
@@ -82,7 +83,8 @@ things that are simply not true:
 
 A linear model will dutifully fit a single weight to that column and assume
 that moving from red to green to blue is a steady, ordered progression. A
-distance-based model like KNN will think red and green are "close" while
+distance-based model like k-nearest neighbors will think red and green
+are "close" while
 red and blue are "far," purely because of the integers you happened to
 assign. None of that reflects reality. Colors have **no order**.
 
@@ -152,6 +154,7 @@ in its column and `0` everywhere else.
 <Figure
   slug="ml-encoding-categorical-features-inline-cutout"
   alt="Three coloured tags each replaced by a small row of on-off switches, one switch raised in each row"
+  caption="One-hot gives each category its own column, with a single switch on."
 />
 
 ```mermaid
@@ -178,7 +181,7 @@ default, safe choice for nominal categories.
 ### OneHotEncoder in scikit-learn
 
 scikit-learn's `OneHotEncoder` does this, and unlike a one-off pandas
-trick, it **remembers** the categories it saw during `fit` so it can apply
+trick, it **remembers** the categories it saw during `fit()` so it can apply
 the exact same columns at predict time. That memory matters, we will use
 it in a moment.
 
@@ -292,6 +295,7 @@ labels and once with one-hot encoding, and compare.
 <Figure
   slug="ml-encoding-categorical-features-tempting-trap-integer-inline-cutout"
   alt="Three coloured tags replaced by blocks of rising height, the heights implying an order the colours never had"
+  caption="Numbering categories invents an order the model will take seriously."
 />
 
 We will build a dataset where a city's risk is **non-monotonic** in any
@@ -371,7 +375,7 @@ penalty for integer-labeling a nominal feature.
 
 ## handle_unknown="ignore": surviving unseen categories
 
-Here is a problem one-hot encoding must solve. You `fit` the encoder on
+Here is a problem one-hot encoding must solve. You `fit()` the encoder on
 your training data, which contains the cities `Tokyo`, `Paris`, and
 `Berlin`. Months later, a new record arrives with city `London`, a value
 the encoder never saw. What should happen?
@@ -409,18 +413,18 @@ print("London ->", out[1])  # all zeros: 'none of the known cities'
   ]}
 />
 
-`Paris` gets its usual one-hot row. `London`, never seen during `fit`,
+`Paris` gets its usual one-hot row. `London`, never seen during `fit()`,
 becomes all zeros, the encoder does not invent a column or crash; it
 simply records "unknown." Crucially, the *number* of output columns stays
-fixed at what the encoder learned during `fit`, so the shape your model
+fixed at what the encoder learned during `fit()`, so the shape your model
 expects never changes from one batch to the next.
 
 <Callout type="info" title="Why fixed output columns matter">
 A trained model expects an exact number of input columns, in an exact
-order. Because `OneHotEncoder` locks in its columns at `fit` time, every
-later `transform` produces that same set of columns, even when new
+order. Because `OneHotEncoder` locks in its columns at `fit()` time, every
+later `transform()` produces that same set of columns, even when new
 categories show up. Without `handle_unknown="ignore"`, an unseen category
-would otherwise break this contract. This is also why you must `fit` the
+would otherwise break this contract. This is also why you must `fit()` the
 encoder on training data only and reuse it, exactly like the scaler on the
 preprocessing page: the columns are *learned*, and that learning must come
 from the training set.
@@ -643,14 +647,14 @@ By giving each category its own 0/1 column, one-hot encoding represents categori
 />
 
 <MultipleChoice
-  markdown={`A \`OneHotEncoder\` was fit with \`handle_unknown="ignore"\`. At predict time it meets a category it never saw during \`fit\`. What happens?
+  markdown={`A \`OneHotEncoder\` was fit with \`handle_unknown="ignore"\`. At predict time it meets a category it never saw during \`fit()\`. What happens?
 
 - It raises an error because there is no column for the new category
   > That is the *default* behavior; \`handle_unknown="ignore"\` is specifically what prevents the error.
 - [o] It sets all of that feature's one-hot columns to 0 for the unknown value, keeping the output shape fixed
   > Representing the unknown as all-zeros means "none of the known categories" and preserves the exact column layout the model expects.
 - It adds a brand-new column for the unseen category
-  > The set of output columns is fixed at \`fit\` time and never grows, so the model always receives the same columns.
+  > The set of output columns is fixed at \`fit()\` time and never grows, so the model always receives the same columns.
 - It replaces the unknown value with the most common category from training
   > It does not guess a substitute category; it marks the value as none-of-the-known via all-zero columns.
 

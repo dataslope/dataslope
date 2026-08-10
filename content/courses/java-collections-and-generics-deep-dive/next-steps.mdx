@@ -23,7 +23,7 @@ You met streams in the iteration chapter. They reward deeper study:
 - **Collectors**: `Collectors.groupingBy`, `partitioningBy`,
   `toMap`, `joining`, `counting`, `averagingInt`. These collapse the
   most common "for-loop + accumulator" patterns into one line.
-- **`flatMap`**: flatten nested collections (`List<List<T>>` →
+- **`flatMap()`**: flatten nested collections (`List<List<T>>` →
   `Stream<T>`).
 - **Primitive streams**: `IntStream`, `LongStream`, `DoubleStream`
   avoid boxing for numeric pipelines.
@@ -38,7 +38,7 @@ state across threads, `java.util.concurrent` provides
 purpose-built containers:
 
 - **`ConcurrentHashMap`**, high-throughput, scalable hash map. Use
-  `computeIfAbsent`, `compute`, and `merge` for atomic updates.
+  `computeIfAbsent()`, `compute`, and `merge()` for atomic updates.
 - **`CopyOnWriteArrayList` / `CopyOnWriteArraySet`**, for
   read-mostly data with rare writes (listeners, observers).
 - **`BlockingQueue`** family, `ArrayBlockingQueue`,
@@ -52,7 +52,7 @@ directly.
 
 ## 3. Persistent (functional) collections
 
-Java's "immutable" collections (`List.of`, etc.) are immutable but
+Java's "immutable" collections (`List.of()`, etc.) are immutable but
 not *persistent* in the functional-programming sense: you can't
 cheaply derive `list.add(x)` returning a new list that shares
 structure with the old one.
@@ -97,7 +97,7 @@ Most of what's in this course generalizes beyond Java:
 ## A short reading list
 
 - *Effective Java*, Joshua Bloch, Items on collections, generics,
-  `equals`/`hashCode`, immutability. The book the JDK collections
+  `equals()`/`hashCode()`, immutability. The book the JDK collections
   designer wrote.
 - *Java Generics and Collections*, Naftalin & Wadler, Deeper on
   generics and wildcards than anything else in print.

@@ -173,10 +173,10 @@ That matches our guess.
 - The `if (len == 0 && c == EOF)` block handles the "nothing to
   read" case at the end of the file: return `NULL` so the caller
   knows we're done. Otherwise an empty-but-valid line returns `""`.
-- The error path on `realloc` failure carefully `free`s `buf`,
-  important because `realloc` returning `NULL` does *not* free the
+- The error path on `realloc()` failure carefully `free()`s `buf`,
+  important because `realloc()` returning `NULL` does *not* free the
   original.
-- Ownership: the caller must `free` the returned string.
+- Ownership: the caller must `free()` the returned string.
 
 Notice we read three times, once for purpose, once for shape, once
 for detail. We never tried to understand every line on the first
@@ -202,10 +202,10 @@ audience that matters right now.
 
 When reading unknown C, be alert for:
 
-- **Functions without bounds checking on input** (`strcpy`,
+- **Functions without bounds checking on input** (`strcpy()`,
   `gets`, `scanf("%s", ...)`), frequent sources of bugs.
-- **`malloc` without a matching `free`**, possible leak.
-- **`free` of something that wasn't `malloc`'d**, crash waiting
+- **`malloc()` without a matching `free()`**, possible leak.
+- **`free()` of something that wasn't `malloc()`'d**, crash waiting
   to happen.
 - **Comparisons between signed and unsigned types**, often wrong
   in subtle ways.
@@ -256,6 +256,7 @@ does.
 <Figure
   slug="c-reading-code-read-top-down-inline-cutout"
   alt="A figure walking a bench from one end to the other, then walking the same bench again more slowly"
+  caption="Read once for the shape, then again slowly for the details."
 />
 
 ...
@@ -298,14 +299,14 @@ scanf("%s", buf);
 
 What should you immediately suspect?
 
-- That \`scanf\` will read multiple words by mistake.
+- That \`scanf()\` will read multiple words by mistake.
   > Actually, \`%s\` stops at whitespace; reading multiple words is the opposite of what it does.
 - That \`buf\` is too big and wastes memory.
   > 64 bytes is a modest, common buffer size; there is no reason to treat it as wasteful. The danger is the opposite: that it is too small for unbounded input.
 - [o] That an input longer than 63 characters will overflow \`buf\`, \`scanf("%s", ...)\` has no length limit.
   > This is a classic buffer overflow. The fix is \`scanf("%63s", buf)\` (note the explicit length) or, better, \`fgets(buf, sizeof buf, stdin)\`.
 - That \`buf\` should have been declared \`const\`.
-  > \`const\` would make \`buf\` read-only, preventing \`scanf\` from writing into it at all. The real concern is the lack of a length limit.
+  > \`const\` would make \`buf\` read-only, preventing \`scanf()\` from writing into it at all. The real concern is the lack of a length limit.
 
 Memorize this pattern. Any unbounded read into a fixed-size buffer is a security bug waiting for the right input.`}
 />

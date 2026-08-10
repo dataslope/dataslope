@@ -96,6 +96,7 @@ concrete, measurable advantages.
 <Figure
   slug="cs-pure-functions-inline-cutout"
   alt="A sealed machine with one input and one output and no pipes, hoses or wires leaving it anywhere, the same block in giving the same block out twice"
+  caption="Nothing goes in or out except the argument and the return value."
 />
 
 ### 1. They're trivially testable
@@ -206,6 +207,7 @@ ones above it are the ones that bite.
 <Figure
   slug="cs-pure-functions-definition-can-hold-inline-cutout"
   alt="A sealed machine with no hoses, wires or taps anywhere on it, one block in and one block out"
+  caption="Same inputs, same result, and nothing observed outside changes."
 />
 
 ## "But my program *has* to print things"
@@ -228,7 +230,7 @@ flowchart TD
 ```
 
 In a LINQ pipeline, the *operators* (Where, Select, etc.) are pure.
-The materialization at the end (`ToList`, `foreach`, write to file)
+The materialization at the end (`ToList()`, `foreach`, write to file)
 is the impure shell.
 
 ## A multi-file challenge

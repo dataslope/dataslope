@@ -58,7 +58,7 @@ flowchart TD
 
 <Callout type="info" title="GROUP BY ALL is the non-aggregated columns">
 DuckDB inspects your `SELECT` list and groups by exactly the columns that
-are *not* wrapped in an aggregate. Aggregated columns (`SUM`, `COUNT`,
+are *not* wrapped in an aggregate. Aggregated columns (`SUM()`, `COUNT()`,
 etc.) are summarized; everything else becomes a grouping key.
 </Callout>
 
@@ -159,6 +159,7 @@ rows unambiguously.
 <Figure
   slug="duck-group-by-all-and-grouping-sets-inline-cutout"
   alt="One tray of chips summarised three ways at once, by colour, by shape, and by both together, onto three small boards"
+  caption="Grouping sets compute several levels of summary in one pass."
 />
 
 <SqlCodeBlock
@@ -245,4 +246,5 @@ revenue over \$1000"? That needs `HAVING`, which is next.
 <Figure
   slug="duck-group-by-all-and-grouping-sets-group-by-all-inline-cutout"
   alt="A machine with one lever replacing a row of five identical levers that had to be set the same way"
+  caption="`GROUP BY ALL` sets every grouping column for you, from the select list."
 />

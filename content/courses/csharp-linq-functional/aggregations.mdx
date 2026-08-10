@@ -12,13 +12,14 @@ list of orders" into "the total revenue" or "the largest order".
   alt="Aggregations, an isometric illustration"
 />
 
-This page covers the built-in shortcuts (`Count`, `Sum`, `Min`,
-`Max`, `Average`) and then the general-purpose tool that underlies
-all of them: `Aggregate`.
+This page covers the built-in shortcuts (`Count()`, `Sum()`, `Min()`,
+`Max()`, `Average()`) and then the general-purpose tool that underlies
+all of them: `Aggregate()`.
 
 <Figure
   slug="cs-aggregations-friendly-built-ins-inline-cutout"
   alt="One tray of blocks feeding four small gauges in a row, each gauge reading a different single value"
+  caption="Each built-in aggregate reads the same sequence and reports one number."
 />
 
 ## The friendly built-ins
@@ -78,6 +79,7 @@ Aggregations on empty sequences are a famous source of bugs.
 <Figure
   slug="cs-aggregations-empty-sequence-behavior-inline-cutout"
   alt="An empty tray feeding a gauge whose needle sits hard against its stop rather than at zero"
+  caption="On an empty sequence some aggregates return zero and others throw."
 />
 
 | Operator | Empty input |
@@ -126,9 +128,9 @@ Console.WriteLine($"min-or-default: {empty.DefaultIfEmpty().Min()}");
 `DefaultIfEmpty()` yields one default element if the source is empty.
 It's a useful trick for "give me the min, or zero".
 
-## The universal aggregator: `Aggregate`
+## The universal aggregator: `Aggregate()`
 
-`Aggregate` (sometimes called `fold` or `reduce` elsewhere) is the
+`Aggregate()` (sometimes called `fold` or `reduce` elsewhere) is the
 general form. You give it:
 
 1. A **seed**, the starting accumulator value.
@@ -136,7 +138,7 @@ general form. You give it:
 3. Optionally, a **result selector** that turns the final accumulator
    into the answer.
 
-`Sum`, `Count`, `Min`, and `Max` are all special cases.
+`Sum()`, `Count()`, `Min()`, and `Max()` are all special cases.
 
 <CodeBlock
   adapter="csharp"
@@ -169,9 +171,9 @@ Console.WriteLine($"csv     = {csv}");
   ]}
 />
 
-`Aggregate` is the swiss-army knife. Any time you need to *fold*
+`Aggregate()` is the swiss-army knife. Any time you need to *fold*
 a sequence into a single value and there's no specialised operator
-already, reach for `Aggregate`.
+already, reach for `Aggregate()`.
 
 ## Aggregating into a richer accumulator
 
@@ -182,6 +184,7 @@ several things in one pass.
 <Figure
   slug="cs-aggregations-inline-cutout"
   alt="A row of blocks folding into one another left to right until a single block remains at the end of the rail"
+  caption="`Aggregate()` folds the sequence into an accumulator, one element at a time."
 />
 
 <CodeBlock
@@ -214,9 +217,9 @@ separate `Sum/Min/Max/Count/Sum` calls (which would walk the source
 five times), this is potentially much more efficient, though for
 small in-memory collections the difference is negligible.
 
-## `Aggregate` is not always the best choice
+## `Aggregate()` is not always the best choice
 
-It is also worth knowing what the friendly built-ins hide. `Average` is a
+It is also worth knowing what the friendly built-ins hide. `Average()` is a
 single number that a skewed distribution moves a long way from the
 typical value:
 
@@ -232,7 +235,7 @@ int sum = nums.Sum();
 int sum = nums.Aggregate(0, (acc, n) => acc + n);
 ```
 
-Reach for `Aggregate` when:
+Reach for `Aggregate()` when:
 
 - There is no built-in operator for what you want.
 - You need to compute several things in one pass.
@@ -266,7 +269,7 @@ returns a single int defined as:
 > add the element. Return the accumulator.
 
 That formula is a classic polynomial-rolling hash. Implement it
-with \`Aggregate\`, no \`foreach\` allowed.`}
+with \`Aggregate()\`, no \`foreach\` allowed.`}
   entryFilename="Program.cs"
   files={[
     {
@@ -318,13 +321,13 @@ public static class Checksum
 - Returns \`null\`.
   > Returning \`null\` isn't possible for a non-nullable \`int\`, and even for nullable types the empty behavior depends on the overload.
 - Returns 0.
-  > It does not return any value; \`Min\` on an empty non-nullable sequence throws.
+  > It does not return any value; \`Min()\` on an empty non-nullable sequence throws.
 - Returns \`int.MinValue\`.
-  > Same, \`Min\` does not fabricate a value when the sequence is empty.
+  > Same, \`Min()\` does not fabricate a value when the sequence is empty.
 - [o] Throws \`InvalidOperationException\` because the sequence is empty.
-  > \`Min\` on an empty non-nullable \`IEnumerable<int>\` throws. Use \`DefaultIfEmpty\`, \`MinBy\`, or guard with \`Any()\` to handle the empty case.
+  > \`Min()\` on an empty non-nullable \`IEnumerable<int>\` throws. Use \`DefaultIfEmpty()\`, \`MinBy\`, or guard with \`Any()\` to handle the empty case.
 
-\`Sum\` and \`Count\` have natural answers for empty sequences (zero),
-but \`Min\`, \`Max\`, and \`Average\` do not. They throw. Always
+\`Sum()\` and \`Count()\` have natural answers for empty sequences (zero),
+but \`Min()\`, \`Max()\`, and \`Average()\` do not. They throw. Always
 consider the empty-sequence case when you write a pipeline.`}
 />

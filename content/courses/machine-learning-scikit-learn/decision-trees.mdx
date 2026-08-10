@@ -58,6 +58,7 @@ that makes the two resulting groups as *pure* as possible.
 <Figure
   slug="ml-decision-trees-core-idea-split-inline-cutout"
   alt="A mixed heap divided by one cut into two heaps that are each more uniform than the first"
+  caption="A tree picks the split that leaves each side as pure as it can."
 />
 
 "Pure" means homogeneous with respect to the target. For classification, a
@@ -100,6 +101,7 @@ on held-out data.
 <Figure
   slug="ml-decision-trees-problem-tree-solves-inline-cutout"
   alt="A heap of mixed chips that no single straight blade can separate, beside a branching chute that does"
+  caption="A straight boundary cannot separate these; a sequence of questions can."
 />
 
 <CodeBlock
@@ -133,7 +135,7 @@ print(f"Test accuracy:  {tree.score(X_test, y_test):.3f}")
 A shallow tree already classifies most penguins correctly, and the train and
 test scores are close together, a sign it has learned a real pattern
 rather than memorized noise. The API is identical to every other
-scikit-learn model: `fit` to learn, `score` to evaluate, `predict` to make
+scikit-learn model: `fit()` to learn, `score()` to evaluate, `predict()` to make
 predictions. You already know how to drive a tree; the new part is
 understanding what it learned.
 
@@ -142,13 +144,14 @@ Notice we did **not** scale the features, even though they live on wildly
 different ranges (body mass is in the thousands of grams, bill length near
 40 mm). Trees ask threshold questions one feature at a time, "is this value
 above *x*?", so the *units* of each feature are irrelevant. This is a
-genuine convenience that distance-based models like KNN do not enjoy.
+genuine convenience that distance-based models like k-nearest neighbors
+do not enjoy.
 </Callout>
 
 ## Reading the tree as a picture
 
 The best way to build intuition is to *see* a tree. scikit-learn can draw
-one with `plot_tree`. We will use the penguins dataset (only 4 features, so
+one with `plot_tree()`. We will use the penguins dataset (only 4 features, so
 the picture stays small) and cap the depth at 2 so every box is legible.
 
 <CodeBlock
@@ -216,6 +219,7 @@ returning that leaf's average.
 <Figure
   slug="ml-decision-trees-inline-cutout"
   alt="A branching chute where each fork carries a small gauge, a block dropping through three forks in turn and landing in one of eight trays"
+  caption="For regression the leaf holds an average instead of a majority class."
 />
 
 <CodeBlock
@@ -246,7 +250,7 @@ print(f"Test R^2:  {tree.score(X_test, y_test):.3f}")
   ]}
 />
 
-The mechanics are identical to the classifier, `fit`, `score`, `predict`,
+The mechanics are identical to the classifier, `fit()`, `score()`, `predict()`,
 which is exactly the point of scikit-learn's consistent API. One important
 visual consequence: because each leaf outputs a single constant, a
 regression tree's predictions form a **staircase**, not a smooth curve. The
@@ -646,7 +650,7 @@ A tree's prediction is the value attached to whichever leaf the example reaches.
   > Decision trees do not train in epochs, they make a single greedy pass to build the tree, and the result is deterministic for a given training set. Accuracy instability refers to different trees built from different training samples, not repeated runs on the same data.
 - [o] A small change in the training data can produce a substantially different tree structure (e.g. a different feature chosen at the root), because each split is committed to greedily and everything below depends on it
   > Instability refers to sensitivity of the learned *structure* to the training sample. This high variance is exactly what ensembles like random forests reduce by averaging many trees trained on resampled data.
-- They produce different predictions every time you call \`.predict\`, even on the same input
+- They produce different predictions every time you call \`.predict()\`, even on the same input
   > A fitted decision tree is deterministic: given the same input, it always returns the same prediction. Instability refers to sensitivity to the *training data*, a different training sample can produce a very different tree structure.
 - They require a GPU to train reliably
   > Decision trees are CPU-bound algorithms and train efficiently on CPU. GPU acceleration is associated with deep learning workloads, not tree-based models.

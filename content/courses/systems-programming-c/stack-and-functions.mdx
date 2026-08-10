@@ -52,6 +52,7 @@ You can see the call chain by printing addresses of local variables.
 <Figure
   slug="sysc-stack-and-functions-see-stack-addresses-inline-cutout"
   alt="A column of trays with a small plate on the edge of each, the plates stepping evenly down the column"
+  caption="Each nested call sits at a lower address than the one before it."
 />
 
 <CodeBlock
@@ -97,6 +98,7 @@ a *stack size* limit.
 <Figure
   slug="sysc-stack-and-functions-inline-cutout"
   alt="One tray shown open in cross-section with three separate compartments inside it for arguments, local blocks and a return arrow, resting on a column of identical closed trays"
+  caption="Every recursive call takes another frame, so depth is a memory limit."
 />
 
 <CodeBlock
@@ -141,6 +143,7 @@ with a stack overflow.
 <Figure
   slug="sysc-stack-and-functions-anatomy-stack-frame-inline-cutout"
   alt="One tray in cross-section with separate compartments for its arguments, its locals and its return cord"
+  caption="A frame holds the arguments, the locals, and where to return to."
 />
 
 The error is common enough to have a website named after it. When
@@ -157,7 +160,7 @@ trivially easy to write.
 A local declaration like `char buf[16 * 1024 * 1024];` allocates 16 MB
 on the stack. On many platforms the entire stack is only 1 MB, and
 this will crash before `main` runs a single line. Use the heap
-(`malloc`) for large buffers.
+(`malloc()`) for large buffers.
 </Callout>
 
 <CodeBlock
@@ -440,7 +443,7 @@ int main(void) {
 - The OS automatically grows the stack to fit.
   > Most OSes have a fixed stack limit per thread.
 - [o] The program runs out of stack and crashes (stack overflow).
-  > Large buffers belong on the heap (\`malloc\`), not on the stack.
+  > Large buffers belong on the heap (\`malloc()\`), not on the stack.
 - The compiler silently moves the array to the heap.
   > Compilers do not silently change storage class.`}
 />

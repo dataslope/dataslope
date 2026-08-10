@@ -24,6 +24,7 @@ $$p_i = \frac{e^{z_i}}{\sum_j e^{z_j}}$$
 <Figure
   slug="llm-sampling-softmax-turns-scores-inline-cutout"
   alt="A row of chips of different heights fed into a machine that hands back a spinner with wedges of matching sizes"
+  caption="Softmax turns raw scores into probabilities that sum to one."
 />
 
 Exponentiate every score, then divide by the total. The exponential is
@@ -111,6 +112,7 @@ tokens become reachable. Top-p fixes this by truncating the tail first.
 <Figure
   slug="llm-sampling-inline-cutout"
   alt="A hopper of candidate chips of different sizes tipped onto a spinner, the largest chip most often landing in the chute but a smaller one sometimes taking its place"
+  caption="The next token is drawn from that distribution, not simply the top one."
 />
 
 Sort tokens by probability, accumulate until the total reaches *p*

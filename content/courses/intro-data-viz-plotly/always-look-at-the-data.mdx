@@ -28,6 +28,7 @@ line. By every standard summary number, they are identical.
 <Figure
   slug="viz-always-look-at-the-data-anscombe-s-quartet-inline-cutout"
   alt="Four boards of scattered chips of obviously different shapes, one identical gauge standing beside each"
+  caption="Four datasets, identical summary numbers, four completely different pictures."
 />
 
 Let's confirm that with the real data. Each `dataset` (I, II, III,
@@ -111,6 +112,7 @@ looking like stars, lines, circles, and slanted clouds.
 <Figure
   slug="viz-always-look-at-the-data-inline-cutout"
   alt="A summary gauge on the left and, on the right, the raw scatter it came from telling a different story"
+  caption="The summary is what survives; the scatter is what actually happened."
 />
 
 First, confirm the statistics are (almost) identical across all
@@ -196,7 +198,7 @@ data and look at it.** It costs one line of code.
 Show that summary statistics can't tell the four datasets apart, then show that the *shapes* differ.
 
 1. Build a variable \`mean_y\` = the mean of column \`y\` across the **whole** DataFrame, rounded to 2 decimals. (All four datasets share the same mean y, so this equals each group's mean y.)
-2. Build a Plotly figure \`fig\` that draws a **scatter plot faceted by \`dataset\`**, one panel per dataset, using \`px.scatter\` with \`facet_col="dataset"\`.
+2. Build a Plotly figure \`fig\` that draws a **scatter plot faceted by \`dataset\`**, one panel per dataset, using \`px.scatter()\` with \`facet_col="dataset"\`.
 
 The point: one number summarizes all four, but the four pictures are different.`}
   files={[

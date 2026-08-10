@@ -25,6 +25,7 @@ single defaulter. Let us watch this happen on genuinely imbalanced data.
 <Figure
   slug="ml-classification-metrics-accuracy-trap-inline-cutout"
   alt="A gauge reading almost full beside a tray where ninety-nine chips are one colour and one is another"
+  caption="Accuracy looks high when one class is rare, even if the model never finds it."
 />
 
 <CodeBlock
@@ -84,6 +85,7 @@ rare.
 <Figure
   slug="ml-classification-metrics-confusion-matrix-where-inline-cutout"
   alt="A two-by-two board of trays with correct calls in the diagonal and mistakes in the other two"
+  caption="Four counts: correct calls on the diagonal, the two kinds of mistake off it."
 />
 
 <Chart slug="confusion-matrix-grid" />
@@ -164,6 +166,7 @@ fraction really were?*
 <Figure
   slug="ml-classification-metrics-precision-false-alarms-inline-cutout"
   alt="An alarm bell ringing over a tray where most of the flagged chips turn out to be ordinary"
+  caption="Precision asks how many of the flagged cases really were positive."
 />
 
 $$
@@ -256,7 +259,7 @@ a convention, not a law.
 
 Moving the threshold assumes the scores mean something. A model can rank
 perfectly and still be badly calibrated, which matters the moment anyone
-treats `predict_proba` as a probability.
+treats `predict_proba()` as a probability.
 
 <Chart slug="calibration-curve" />
 
@@ -281,15 +284,16 @@ $$
   different costs, the equal weighting in F1 is wrong for you, and you
   should optimize precision or recall directly (or a weighted F-beta score).
 
-## `classification_report`: the whole picture at once
+## `classification_report()`: the whole picture at once
 
-In practice you rarely compute these by hand. `classification_report`
+In practice you rarely compute these by hand. `classification_report()`
 prints precision, recall, and F1 for every class, plus support (how many
 true examples of each class there were).
 
 <Figure
   slug="ml-classification-metrics-inline-cutout"
   alt="A two-by-two board of trays with correct calls piled in the diagonal trays and mistakes in the other two, a small gauge reading each"
+  caption="`classification_report()` reads every metric off the same four counts."
 />
 
 <CodeBlock
@@ -388,7 +392,7 @@ the team actually argues over.
    \`precision = tp / (tp + fp)\` and \`recall = tp / (tp + fn)\`.
 
 The tests confirm your hand-computed precision and recall match
-scikit-learn's \`precision_score\` and \`recall_score\`.`}
+scikit-learn's \`precision_score()\` and \`recall_score()\`.`}
   files={[
     {
       filename: "main.py",

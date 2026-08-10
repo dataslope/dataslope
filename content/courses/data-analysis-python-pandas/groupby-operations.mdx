@@ -4,7 +4,7 @@ description: Split-apply-combine, the most powerful pattern in Pandas, and argua
 ---
 
 If there is one operation that earns Pandas its keep, it is
-`groupby`. Every "by department," "by month," "by user," "by
+`groupby()`. Every "by department," "by month," "by user," "by
 category" question in data analysis ends up here.
 
 <Figure
@@ -39,11 +39,13 @@ flowchart TD
 <Figure
   slug="pandas-groupby-operations-multiple-aggregations-at-inline-cutout"
   alt="One tray of chips feeding four gauges at once, each gauge reading a different single value"
+  caption="One pass over a group can report several different measurements at once."
 />
 
 <Figure
   slug="pandas-groupby-operations-inline-cutout"
   alt="A mixed pile of coloured blocks on the left being sorted into three bins by colour, and each bin producing one summary block on the right"
+  caption="Split the rows into groups, summarise each group, then combine the answers."
 />
 
 Hadley Wickham named this pattern *split-apply-combine* in 2011,
@@ -79,6 +81,7 @@ mean of each group."*
 <Figure
   slug="pandas-groupby-operations-basic-shape-inline-cutout"
   alt="A scatter of chips raked into three trays and each tray pressed into one summary block"
+  caption="The number of groups decides the number of rows in the result."
 />
 
 ## Multiple aggregations at once
@@ -214,7 +217,7 @@ print(flat)
   ]}
 />
 
-## `transform`, broadcast a group statistic back to rows
+## `transform()`, broadcast a group statistic back to rows
 
 Sometimes you do not want a smaller summary table, you want to
 add a column to the *original* rows containing a group statistic.
@@ -276,9 +279,9 @@ Note: `filter` here takes a function that receives the whole
 group as a DataFrame and returns True/False. Different from
 boolean-mask filtering of rows.
 
-## `apply`, for anything else
+## `apply()`, for anything else
 
-`apply` runs an arbitrary function on each group. Slower than
+`apply()` runs an arbitrary function on each group. Slower than
 the named aggregations, but flexible.
 
 <CodeBlock
@@ -304,14 +307,14 @@ print(df.groupby("dept").apply(top_two, include_groups=False))
   ]}
 />
 
-Reach for `apply` only when neither `agg` nor `transform` will
+Reach for `apply()` only when neither `agg()` nor `transform()` will
 do.
 
 ## A realistic example, at scale
 
 Split-apply-combine earns its keep on big tables. The diamonds
 dataset has 53,940 rows, far too many to eyeball, but a single
-`groupby` collapses them into one tidy row per cut. Let us compute,
+`groupby()` collapses them into one tidy row per cut. Let us compute,
 for each quality of `cut`, the count, the mean price, and the
 *median* price.
 
@@ -434,7 +437,7 @@ assert all(vals[i] >= vals[i+1] for i in range(len(vals)-1))`,
 - A coding style for indentation
   > Split-apply-combine is a conceptual framework for grouped computation, not a code formatting convention.
 - A way to import data
-  > Data import is handled by functions like \`pd.read_csv\`; split-apply-combine describes what happens to data after it is already loaded.
+  > Data import is handled by functions like \`pd.read_csv()\`; split-apply-combine describes what happens to data after it is already loaded.
 - A method of sorting
   > Sorting arranges rows in order; split-apply-combine aggregates groups of rows, the two operations have different outputs and purposes.
 - [o] The three steps of a groupby: partition rows into groups, compute something per group, stitch the results together
@@ -462,15 +465,15 @@ If you have ever been confused by MultiIndex columns coming out of groupby, swit
   markdown={`When would you use \`groupby(...).transform(...)\` instead of \`.agg(...)\`?
 
 - When sorting
-  > Sorting is done with \`.sort_values\` or \`.sort_index\`; neither \`agg\` nor \`transform\` performs a sort.
+  > Sorting is done with \`.sort_values\` or \`.sort_index\`; neither \`agg()\` nor \`transform()\` performs a sort.
 - They are equivalent
-  > \`agg\` returns a smaller DataFrame with one row per group; \`transform\` returns a Series or DataFrame with the same number of rows as the original, the outputs are different shapes.
+  > \`agg()\` returns a smaller DataFrame with one row per group; \`transform()\` returns a Series or DataFrame with the same number of rows as the original, the outputs are different shapes.
 - When you want fewer rows
-  > \`agg\` is the operation that reduces rows (one row per group); \`transform\` keeps the same number of rows as the input.
+  > \`agg()\` is the operation that reduces rows (one row per group); \`transform()\` keeps the same number of rows as the input.
 - [o] When you want a column added back to every original row containing its group's statistic, the result has the same shape as the input
-  > \`agg\` collapses to one row per group; \`transform\` broadcasts the group result back to every row in that group.
+  > \`agg()\` collapses to one row per group; \`transform()\` broadcasts the group result back to every row in that group.
 
-\`transform\` is the right hammer for "show me each value alongside its group average."`}
+\`transform()\` is the right hammer for "show me each value alongside its group average."`}
 />
 
 <MultipleChoice

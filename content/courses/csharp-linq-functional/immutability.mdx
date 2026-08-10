@@ -238,6 +238,7 @@ You don't have to make every class a record. A practical rule:
 <Figure
   slug="cs-immutability-inline-cutout"
   alt="A sealed block set aside untouched while a fresh copy with one changed face is placed beside it"
+  caption="An immutable value is never changed; a modified copy is made instead."
 />
 
 Most of the bugs in a typical codebase live in the *values*, not the
@@ -251,6 +252,7 @@ without mutating it.
 <Figure
   slug="cs-immutability-bug-immutability-prevents-inline-cutout"
   alt="Two benches sharing one tray, a hand at each bench changing it, and the block on it ending up wrong"
+  caption="Two places holding one mutable object is where the value goes wrong."
 />
 
 <ChallengeCard

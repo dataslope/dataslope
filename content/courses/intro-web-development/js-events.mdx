@@ -3,8 +3,8 @@ title: "JavaScript: Events"
 description: addEventListener, the event object, reading inputs, and intercepting form submits.
 ---
 
-DOM manipulation gets interesting when it happens *in response to the
-user*. That's **events**: clicks, keypresses, typing, submitting,
+Changing the document gets interesting when it happens *in response to
+the user*. That's **events**: clicks, keypresses, typing, submitting,
 scrolling, the browser fires a named event for each, and your code
 can listen.
 
@@ -109,7 +109,7 @@ takeaways:
   instructions={`Make the button toggle night mode. In \`script.js\`:
 
 1. Select the button with the id \`mode\` and add a \`"click"\` event listener to it.
-2. In the handler, toggle the class \`night\` on \`document.body\` (use \`classList.toggle\`).
+2. In the handler, toggle the class \`night\` on \`document.body\` (use \`classList.toggle()\`).
 3. Also update the button's own text: it should read \`Lights on\` while night mode is active, and \`Lights off\` otherwise.`}
   files={[
     {
@@ -198,4 +198,5 @@ Events make the page react. Next, capturing structured input with
 <Figure
   slug="web-js-events-inline-cutout"
   alt="A button being pressed on the left, a ripple travelling up through three nested frames, and a small listener bell ringing on the outermost one"
+  caption="An event fires at the element and travels up through its ancestors."
 />

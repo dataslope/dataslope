@@ -93,6 +93,7 @@ overlap, but the differences matter.
 <Figure
   slug="java-interfaces-inline-cutout"
   alt="Three different machines each fitted with the identical front plate and handle, so one hand works all three the same way"
+  caption="An interface is a shared front plate: same handles, different machines."
 />
 
 | | abstract class | interface |
@@ -142,7 +143,7 @@ public interface Comparable<T> {
 ```
 
 Any class that implements `Comparable` can be sorted by
-`Collections.sort` or `Arrays.sort`. The library has no idea what
+`Collections.sort()` or `Arrays.sort()`. The library has no idea what
 your class is, it just trusts the contract.
 
 <CodeBlock
@@ -196,7 +197,7 @@ public class Main {
   ]}
 />
 
-`Arrays.sort` was written years before your `Book` class existed.
+`Arrays.sort()` was written years before your `Book` class existed.
 It works because `Book` honors the `Comparable` contract.
 
 ## Default methods
@@ -250,6 +251,7 @@ the right to change your storage later.
 <Figure
   slug="java-interfaces-interface-inline-cutout"
   alt="A standard front plate with two handles, shown detached on a bench beside the machines it fits"
+  caption="Depend on the capability you need, not on the class that happens to provide it."
 />
 
 ```mermaid

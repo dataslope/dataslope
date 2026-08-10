@@ -24,6 +24,7 @@ didn't. The fix is to build a **new** value and pass it to the setter.
 <Figure
   slug="rx-state-and-immutability-inline-cutout"
   alt="An old tray set aside intact while a fresh copy with one changed slot is mounted in its place"
+  caption="React compares identities, so a mutated value looks unchanged to it."
 />
 
 ## Arrays: add, remove, update by copying
@@ -38,7 +39,7 @@ setItems(items.map((it) =>                            // update one item
 ```
 
 Add and remove items in the live list below. "Add" spreads a new array;
-the **×** removes with `filter`, again a new array. The old one is never
+the **×** removes with `filter()`, again a new array. The old one is never
 touched:
 
 <ReactPreview

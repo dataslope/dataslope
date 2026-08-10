@@ -75,6 +75,7 @@ Stage two: memoization. Same recursion, plus a `memo` vector where `-1` means "n
 <Figure
   slug="dsa-dynamic-programming-fibonacci-four-ways-inline-cutout"
   alt="Four benches solving the same stack of blocks, each with visibly fewer repeated parts than the last"
+  caption="The same problem, solved with less repeated work at each stage."
 />
 
 <CodeBlock
@@ -234,11 +235,13 @@ The knapsack is DP's most famous two-dimensional problem: given items with weigh
 <Figure
   slug="dsa-dynamic-programming-mindset-inline-cutout"
   alt="A wall of small pigeonholes filled left to right, each built from the two beside it rather than from scratch"
+  caption="Each cell answers one subproblem, built from cells already filled."
 />
 
 <Figure
   slug="dsa-dynamic-programming-inline-cutout"
   alt="A wall of small pigeonholes being filled left to right, each new hole built from the two beside it rather than from scratch"
+  caption="The table is filled once and read many times, which is the whole saving."
 />
 
 | item | weight | value |
@@ -284,7 +287,7 @@ int main() {
   ]}
 />
 
-## LCS and LIS
+## Longest common subsequence, longest increasing subsequence
 
 String DP runs on the same two-coordinate idea. The **longest common subsequence** (LCS) of two strings is the longest sequence of characters appearing in both, in order but not necessarily adjacent, it is the algorithm under `git diff`, which displays whatever is *not* in the LCS as your changes. State: `dp[i][j]` = LCS length of prefixes `a[0..i)` and `b[0..j)`. If the last characters match, they extend the diagonal answer by one; if not, drop a character from one string or the other and take the better. Example: `ABCBDAB` vs `BDCABC` gives length 4.
 

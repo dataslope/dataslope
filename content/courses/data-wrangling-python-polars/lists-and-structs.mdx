@@ -41,12 +41,13 @@ print(df.schema)
   ]}
 />
 
-They arrive naturally from three places: JSON input, `str.split`, and
+They arrive naturally from three places: JSON input, `str.split()`, and
 a `group_by().agg()` without an aggregation.
 
 <Figure
   slug="pl-lists-and-structs-inline-cutout"
   alt="One cell of a board opened to show a small rail of blocks inside it, and another opened to show labelled compartments"
+  caption="A cell can hold a whole list, or a set of named fields, rather than one value."
 />
 
 ## The .list namespace
@@ -89,6 +90,7 @@ loop and no `apply`.
 <Figure
   slug="pl-lists-and-structs-list-namespace-inline-cutout"
   alt="One cell of a board opened to show a small rail of blocks inside it, a set of small tools hanging above that cell"
+  caption="The `.list` namespace works inside every cell at once, with no Python loop."
 />
 
 ## explode: one row per element
@@ -117,13 +119,14 @@ print(flat.group_by("user").agg(pl.col("scores")).sort("user"))
   ]}
 />
 
-`explode` and `group_by().agg()` are inverses. That round trip is
+`explode()` and `group_by().agg()` are inverses. That round trip is
 worth remembering: it is how you get from a nested layout into the
 flat one every other operation prefers, and back.
 
 <Figure
   slug="pl-lists-and-structs-explode-one-row-inline-cutout"
   alt="One cell holding a small rail of blocks tipped out so each block takes a full row of its own beneath"
+  caption="`explode()` tips each list out so every element takes a row of its own."
 />
 
 ## Struct columns
@@ -222,7 +225,7 @@ print(events.filter(pl.col("tags").list.contains("checkout")))
 <Callout type="warn" title="Nesting is a storage choice, not a computation one">
 Almost every aggregation, join, and window works on flat columns and
 not on nested ones. If you are reaching for `.list` methods to do
-something a `group_by` would do on flat data, explode first. The
+something a `group_by()` would do on flat data, explode first. The
 right use for a list column is data that genuinely *is* a list per
 row: tags, a fixed-size embedding, a set of related IDs.
 </Callout>
@@ -355,16 +358,16 @@ assert tag_counts["n"].to_list() == [2, 2, 1, 1], tag_counts["n"].to_list()`,
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What is the relationship between \`explode\` and \`group_by().agg()\`?
+  markdown={`What is the relationship between \`explode()\` and \`group_by().agg()\`?
 
 - They are unrelated: one reshapes rows, the other summarizes them
-  > \`agg\` without an aggregating expression collects a group's values into a list, which is exactly what \`explode\` undoes.
-- \`explode\` is the lazy version of \`group_by\`
+  > \`agg()\` without an aggregating expression collects a group's values into a list, which is exactly what \`explode()\` undoes.
+- \`explode()\` is the lazy version of \`group_by()\`
   > Both work in eager and lazy contexts; laziness is not what separates them.
 - [o] They are inverses: one flattens a list column into rows, the other gathers rows into a list
   > That round trip is how you move between a nested layout and the flat one most operations prefer.
-- \`explode\` requires a prior \`group_by\` to know which rows belong together
-  > It works on any list column, wherever the lists came from, including JSON input and \`str.split\`.
+- \`explode()\` requires a prior \`group_by()\` to know which rows belong together
+  > It works on any list column, wherever the lists came from, including JSON input and \`str.split()\`.
 
 Reach for the flat form whenever you need a join, a window, or an aggregation.`}
 />
@@ -377,7 +380,7 @@ Reach for the flat form whenever you need a join, a window, or an aggregation.`}
 - Whenever the values are strings rather than numbers
   > Type has nothing to do with it; both list and flat columns hold any type.
 - [o] When the list genuinely *is* one value of the row: tags, an embedding, a set of IDs
-  > If you find yourself using \`.list\` methods to do a \`group_by\`'s job, explode first.
+  > If you find yourself using \`.list\` methods to do a \`group_by()\`'s job, explode first.
 - Whenever the number of elements varies from row to row
   > Varying length chooses \`List\` over \`Array\`; it does not decide nested versus flat.
 

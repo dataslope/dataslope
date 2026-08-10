@@ -65,7 +65,7 @@ are where C actually sinks in.
 Each page mixes prose with three kinds of interactive widgets:
 
 1. **Executable code blocks.** Every C snippet compiles to
-   WebAssembly with `clang` in your browser and runs as a tiny WASI
+   WebAssembly with `clang` in your browser and runs as a tiny WebAssembly System Interface
    binary. No installation, no toolchain setup. Edit any block and
    click *Run*.
 2. **Challenge cards.** Test-backed coding problems. Some are
@@ -87,7 +87,7 @@ The browser runtime is a **WASI** sandbox, not a real Unix process.
 System calls like `fork`, `exec`, `pthread_create`, raw sockets, and
 direct device I/O are unavailable. We will *describe* those topics
 honestly but reserve the runnable examples for things WASI supports:
-arithmetic, pointers, `malloc`/`free`, structs, strings, formatted
+arithmetic, pointers, `malloc()`/`free()`, structs, strings, formatted
 I/O, and tiny in-memory simulations.
 </Callout>
 
@@ -101,7 +101,7 @@ exception" is the worst that usually happens.
 In C, you see the cost of every decision. A string is a `char*` to a
 sequence of bytes that you must remember to null-terminate. An array
 decays into a pointer when you pass it to a function. Memory you
-allocate with `malloc` stays alive until *you* free it, and if you
+allocate with `malloc()` stays alive until *you* free it, and if you
 free it twice, or read from it after, or write past its end, the
 program may crash, leak, or silently corrupt unrelated data.
 
@@ -139,13 +139,13 @@ memory (endianness).
 ### 2. Pointers and arrays
 The pointer is the soul of C. We will start from raw addresses and
 build up to pointer arithmetic, array decay, string literals, and the
-`<string.h>` toolkit (`strlen`, `strcpy`, `memcpy`, `strncpy`'s
+`<string.h>` toolkit (`strlen()`, `strcpy()`, `memcpy()`, `strncpy()`'s
 infamous footgun).
 
 ### 3. Memory layout
 The four segments of a Unix-style process, text, data/bss, heap, and
 stack, what lives in each, how function calls build and tear down
-stack frames, and how `malloc`/`free`/`calloc`/`realloc` interact with
+stack frames, and how `malloc()`/`free()`/`calloc()`/`realloc()` interact with
 the heap.
 
 ### 4. Composite types and bugs

@@ -17,7 +17,7 @@ This chapter is a guided tour of the specific TypeScript features
 that make functional programming practical, and a preview of the
 shape of the rest of the course.
 
-## Why TypeScript is a great FP teaching language
+## Why TypeScript is a great functional teaching language
 
 TypeScript was not designed as a functional language. It was
 designed to add types to JavaScript without breaking the JavaScript
@@ -135,6 +135,7 @@ or a B or a C", with a tag that tells you which.
 <Figure
   slug="fp-typescript-meets-fp-typescript-great-fp-inline-cutout"
   alt="A bench where a shaped gate checks each block and then falls away, the blocks continuing unchanged"
+  caption="The types are checked at compile time and gone by the time it runs."
 />
 
 <CodeBlock
@@ -244,8 +245,8 @@ console.log(y);
   ]}
 />
 
-Generics let us write each FP combinator (`map`, `flatMap`,
-`compose`, `pipe`, `chain`) once, in a way that works for every
+Generics let us write each FP combinator (`map()`, `flatMap()`,
+`compose()`, `pipe()`, `chain()`) once, in a way that works for every
 shape, and the compiler still tracks the types end-to-end.
 
 ## A type-driven "Option" preview
@@ -307,7 +308,7 @@ Notice:
 - There is no `null`, no `undefined`, no exception.
 - The compiler will not let you read `.value` until you've narrowed
   the `kind`.
-- `map` works for *any* inner type without losing precision.
+- `map()` works for *any* inner type without losing precision.
 
 This is the shape of every functional abstraction we will build.
 
@@ -384,11 +385,11 @@ Some quick context-setting before the foundations chapters:
 - We will not bring in a framework. No React, no Next, no Express.
   Every example runs in the browser via almostnode.
 - We will not import unnecessary tools. If we need composition, we
-  write three-line `pipe` and `compose` helpers. If we need a
+  write three-line `pipe()` and `compose()` helpers. If we need a
   `Result`, we define it.
 
 The reason is pedagogical: it is much easier to understand a
-`Functor` once you've written `map` for `Option`, `Result`, `Array`,
+`Functor` once you've written `map()` for `Option`, `Result`, `Array`,
 and `Tree` yourself than to learn it as "the thing this library does
 that has a `Foo.map` method".
 

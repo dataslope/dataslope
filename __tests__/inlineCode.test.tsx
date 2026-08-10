@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { isValidElement } from "react";
-import { withInlineCode } from "../app/_components/mdx/CalloutWithCodeTitle";
+import { withInlineCode } from "../app/_components/mdx/inlineCode";
 
-// A callout's `title` is a JSX attribute, so MDX delivers it as a string and
-// markdown never touches it. Backticks are the one piece of markup worth
-// honouring there; see the module for why emphasis deliberately is not.
+// A callout's `title`, a <Figure>'s `caption` and a chart spec's `caption` are
+// all JSX attributes, so MDX delivers them as strings and markdown never
+// touches them. Backticks are the one piece of markup worth honouring there;
+// see the module for why emphasis deliberately is not.
 
 /** The rendered shape as plain data: strings stay strings, code spans become
  *  `code:<text>`. */
@@ -44,6 +45,17 @@ describe("withInlineCode", () => {
   it("never treats asterisks as emphasis", () => {
     const title = "Why *args, **kwargs?";
     expect(withInlineCode(title)).toBe(title);
+  });
+
+  // Captions go through the same helper, and a caption is where a bare
+  // identifier is most likely to be mistaken for a typo.
+  it("renders a code span in a figure caption", () => {
+    expect(shape(withInlineCode("`melt()` unpivots; `pivot()` pivots."))).toEqual([
+      "code:melt()",
+      " unpivots; ",
+      "code:pivot()",
+      " pivots.",
+    ]);
   });
 
   it("leaves an unpaired backtick literal, as markdown would", () => {

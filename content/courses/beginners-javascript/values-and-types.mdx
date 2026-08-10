@@ -32,8 +32,8 @@ A value, on its own, just *is*. It is the runtime's job to keep
 track of values, and your job as a programmer to decide what to do
 with them.
 
-You can ask the runtime to print a value with `console.log`. The
-runtime hands the value to `console.log`, which converts it to text
+You can ask the runtime to print a value with `console.log()`. The
+runtime hands the value to `console.log()`, which converts it to text
 and displays it.
 
 <CodeBlock
@@ -52,7 +52,7 @@ console.log({ name: "Ada", age: 28 });
   ]}
 />
 
-Each of these calls hands a value to `console.log`, which prints it
+Each of these calls hands a value to `console.log()`, which prints it
 in a sensible way for its kind.
 
 ## A type is "the kind of value"
@@ -100,6 +100,7 @@ meet symbols and bigints much later, if at all.
 <Figure
   slug="js-values-and-types-value-piece-information-inline-cutout"
   alt="One single block resting alone on an otherwise empty bench, a caliper measuring it"
+  caption="A type is the kind of value, and it decides what you may do with it."
 />
 
 <Callout type="info" title={`Why does typeof null say "object"?`}>
@@ -351,6 +352,7 @@ values, the other uses them.
 <Figure
   slug="js-values-and-types-inline-cutout"
   alt="Five blocks of clearly different kinds resting in their own moulded recesses on a tray"
+  caption="Each type has its own shape, and mixing them is where surprises live."
 />
 
 <CodeBlock

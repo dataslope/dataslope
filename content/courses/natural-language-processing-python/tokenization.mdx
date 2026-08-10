@@ -139,6 +139,7 @@ abbreviates "Dr." and "U.S.A.", and it marks the decimal in "2.5".
 <Figure
   slug="nlp-tokenization-inline-cutout"
   alt="A paper ribbon running into a small guillotine that cuts it into separate word tiles, the tiles dropping into a tray in order"
+  caption="Tokenising cuts text into the units everything afterwards works with."
 />
 
 ```mermaid
@@ -211,9 +212,9 @@ method.
 <Callout type="tip" title="The usual order: sentences first, then words">
 When a task cares about sentence boundaries (summarization, sentence-level
 sentiment, or anything that processes one sentence at a time), the common
-pattern is to call `sent_tokenize` first, then `word_tokenize` on each
+pattern is to call `sent_tokenize()` first, then `word_tokenize()` on each
 sentence. When you only need a flat bag of words (counting, search indexing),
-you can skip straight to `word_tokenize` on the whole text. Choose based on
+you can skip straight to `word_tokenize()` on the whole text. Choose based on
 whether sentence structure matters to what you are doing.
 </Callout>
 
@@ -223,7 +224,7 @@ There is rarely one universally correct tokenization, it depends on what the
 text *is*. Consider social media: in the tweet "Loving #NLP @ the
 conference 😀", do you want "#NLP" kept whole as a hashtag, or split into "#"
 and "NLP"? Do you want the emoji preserved as a token? The default
-`word_tokenize` will not treat hashtags or emoji specially; NLTK ships a
+`word_tokenize()` will not treat hashtags or emoji specially; NLTK ships a
 `TweetTokenizer` that does.
 
 <CodeBlock
@@ -281,10 +282,10 @@ choices are task-dependent.
 
 - The sentence has no periods in it
   > The text "Dr. Lee earned 2.5 million." clearly contains periods, the problem is that it has too many, and \`split(".")\` cannot tell which one ends the sentence.
-- \`split\` can only divide a string into two pieces
-  > \`split\` can divide a string into many pieces; with no argument it splits on every whitespace occurrence, and with a delimiter like \`"."\` it splits on every instance of that character.
-- Periods are invisible characters that \`split\` cannot see
-  > Periods are perfectly visible to \`split\`; in fact, \`text.split(".")\` splits on every period it finds, which is exactly the problem, it splits too eagerly, not too little.
+- \`split()\` can only divide a string into two pieces
+  > \`split()\` can divide a string into many pieces; with no argument it splits on every whitespace occurrence, and with a delimiter like \`"."\` it splits on every instance of that character.
+- Periods are invisible characters that \`split()\` cannot see
+  > Periods are perfectly visible to \`split()\`; in fact, \`text.split(".")\` splits on every period it finds, which is exactly the problem, it splits too eagerly, not too little.
 - [o] The period is overloaded, it appears in abbreviations ("Dr.") and decimals ("2.5") as well as at sentence ends, so splitting on every period cuts in the wrong places
   > A sentence tokenizer must distinguish a period that ends a sentence from one that abbreviates a title or marks a decimal. \`split(".")\` treats them all the same and shatters "Dr." and "2.5".
 
@@ -307,6 +308,7 @@ Punkt exists precisely to tell sentence-ending periods apart from the other kind
 <Figure
   slug="nlp-tokenization-word-tokenization-where-inline-cutout"
   alt="A ribbon cut by a simple blade at every gap, one cut falling badly through a joined word"
+  caption="Splitting on spaces alone cuts in the wrong places more often than you expect."
 />
 
 In all of these, tokenization is invisible when it works and catastrophic
@@ -322,8 +324,8 @@ when it does not, a classic piece of infrastructure.
   instructions={`A short paragraph is provided in the variable \`text\`. Using the tokenizers
 loaded for you:
 
-1. Create \`sentences\` by sentence-tokenizing \`text\` with \`sent_tokenize\`.
-2. Create \`tokens\` by word-tokenizing \`text\` with \`word_tokenize\`.
+1. Create \`sentences\` by sentence-tokenizing \`text\` with \`sent_tokenize()\`.
+2. Create \`tokens\` by word-tokenizing \`text\` with \`word_tokenize()\`.
 
 The paragraph contains the abbreviation "Dr.", the decimal "98.6", and the
 contraction "didn't". A correct sentence tokenizer must **not** break on the
@@ -437,7 +439,7 @@ If your unit of analysis is the sentence, you need a sentence tokenizer; if it i
 />
 
 <MultipleChoice
-  markdown={`A teammate tokenizes a set of tweets with the default \`word_tokenize\` and is
+  markdown={`A teammate tokenizes a set of tweets with the default \`word_tokenize()\` and is
 surprised that "#MachineLearning" is split into "#" and "MachineLearning",
 losing the hashtag. What is the best fix?
 

@@ -120,7 +120,7 @@ flowchart LR
 ```
 
 `super(name)` in the `Dog` constructor is what runs the `Animal`
-constructor on the `Dog`-being-built to set up `name`. It must be
+constructor on the `Dog`-being-built to set up `name()`. It must be
 the *first statement* in the subclass constructor.
 
 If you omit `super(...)`, Java silently inserts `super()`, a call to
@@ -230,6 +230,7 @@ the entire JVM's security model would collapse.
 <Figure
   slug="oopj-inheritance-first-family-inline-cutout"
   alt="One base cabinet with two cabinets behind it built on the same frame"
+  caption="Subclasses share the base frame and each add something of their own."
 />
 
 ## The trap: inheritance is *strong* coupling
@@ -244,6 +245,7 @@ subclasses can break in surprising ways. This is sometimes called the
 <Figure
   slug="oopj-inheritance-inline-cutout"
   alt="A base cabinet with three cabinets standing behind it, each keeping the base's frame and adding one part of its own"
+  caption="A subclass depends on its parent's internals, which is why the coupling is strong."
 />
 
 ```mermaid

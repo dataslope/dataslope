@@ -23,6 +23,7 @@ works, because **both sides are "many."**
 <Figure
   slug="sql-many-to-many-foreign-key-not-inline-cutout"
   alt="A crate with only one socket on its side and four cords needing to reach it at once"
+  caption="One column holds one link, which is why both-sides-many needs a third table."
 />
 
 ```mermaid
@@ -48,6 +49,7 @@ keys: one to each side.
 <Figure
   slug="sql-many-to-many-inline-cutout"
   alt="Two rows of crates with every cord between them routed through a small board of pegs standing in the middle"
+  caption="The junction table holds one row per actual pairing, and nothing else."
 />
 
 ```mermaid

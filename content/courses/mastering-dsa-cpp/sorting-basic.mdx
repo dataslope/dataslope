@@ -131,7 +131,7 @@ int main() {
   ]}
 />
 
-Insertion sort is O(n²) in the worst case (input sorted backward, every element shifts all the way), but O(n) on already-sorted or nearly-sorted data, because the inner `while` loop exits immediately when nothing needs shifting. That adaptiveness is why it is not a museum piece: `std::sort` and most production sorts hand small sub-ranges to insertion sort, where its tiny constant factor beats the clever algorithms.
+Insertion sort is O(n²) in the worst case (input sorted backward, every element shifts all the way), but O(n) on already-sorted or nearly-sorted data, because the inner `while` loop exits immediately when nothing needs shifting. That adaptiveness is why it is not a museum piece: `std::sort()` and most production sorts hand small sub-ranges to insertion sort, where its tiny constant factor beats the clever algorithms.
 
 <Callout type="success" title="Stability">
 A stable sort keeps equal elements in their original relative order. Why care? Suppose you sort emails by date, then by sender: with a stable sort, each sender's messages stay date-ordered, the second sort preserves the first one's work on ties. Insertion sort is stable because it shifts only values *strictly greater* than the key. Selection sort is not stable in its typical swap-based form: the long-range swap can leapfrog one equal element over another.
@@ -157,6 +157,7 @@ The deeper lesson of this page is the **loop invariant**, a statement that is tr
 <Figure
   slug="dsa-sorting-basic-bubble-sort-inline-cutout"
   alt="Two neighbouring blocks swapped by a small claw, the claw moving along the row"
+  caption="Each pass compares neighbours and swaps, so the largest ends up at the end."
 />
 
 ## Practice: bubble sort with early exit
@@ -166,6 +167,7 @@ Both challenges provide a `printVector` helper in the driver; your job is only t
 <Figure
   slug="dsa-sorting-basic-inline-cutout"
   alt="Two neighbouring blocks in a row being swapped by a small claw, the row a little more ordered after each pass"
+  caption="After each pass the row is a little more ordered than before."
 />
 
 <ChallengeCard

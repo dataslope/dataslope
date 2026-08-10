@@ -103,6 +103,7 @@ and the format is messier under the hood.
 <Figure
   slug="pandas-exporting-cleaned-data-excel-format-stakeholders-inline-cutout"
   alt="A cleaned board being sealed into a ruled green carton with a familiar handle"
+  caption="Excel is the format most colleagues can open, which often decides it."
 />
 
 ## Parquet, the analyst's favorite
@@ -133,7 +134,7 @@ pandas records whether pyarrow is importable when it is first imported, and
 caches the answer. In this runtime pandas loads with the page and pyarrow is
 fetched later, on the first call that needs it, so pandas has already decided
 Arrow is unavailable. Re-importing pandas to refresh that check changes how
-`read_csv` handles explicit dtypes and broke unrelated lessons, so the block is
+`read_csv()` handles explicit dtypes and broke unrelated lessons, so the block is
 shown rather than run.
 </Callout>
 
@@ -165,6 +166,7 @@ for sharing with humans.**
 <Figure
   slug="pandas-exporting-cleaned-data-csv-universal-lowest-inline-cutout"
   alt="One plain carton fitting equally into four different machines' loading slots"
+  caption="CSV fits everywhere because it carries nothing but the values themselves."
 />
 
 ## Writing checklist
@@ -236,6 +238,7 @@ is "...no, the dtypes changed."
 <Figure
   slug="pandas-exporting-cleaned-data-inline-cutout"
   alt="A cleaned board being sealed into a carton and set on a shelf beside the bench"
+  caption="Exporting seals the cleaned table so the next person starts where you finished."
 />
 
 ## Handling categorical and missing data on export
@@ -334,12 +337,12 @@ assert list(back.columns) == list(clean.columns)`,
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`Why pass \`index=False\` when calling \`to_csv\`?
+  markdown={`Why pass \`index=False\` when calling \`to_csv()\`?
 
 - It is faster
   > Writing performance is unaffected by whether the index is included; the difference is in what gets written to the file, not how fast.
-- It hides PII
-  > The DataFrame's index is typically a numeric RangeIndex with no sensitive data; \`index=False\` avoids an unwanted extra column, not a privacy concern.
+- It hides personal data
+  > The DataFrame's index is typically a numeric RangeIndex with no personal data; \`index=False\` avoids an unwanted extra column, not a privacy concern.
 - It is required
   > \`index=True\` is actually the default; passing \`index=False\` is optional but strongly recommended to avoid the spurious unnamed column on re-read.
 - [o] Otherwise the DataFrame's index becomes a mystery first column ("Unnamed: 0") when someone reads the file back

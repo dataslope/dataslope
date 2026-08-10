@@ -3,7 +3,7 @@ title: Functional Intuition
 description: Why "pure functions", "immutability", and "data in, data out" lead to programs that are easier to think about.
 ---
 
-Now that you've met `map`, `filter`, and `reduce`, you've actually
+Now that you've met `map()`, `filter()`, and `reduce()`, you've actually
 been doing a kind of programming called **functional
 programming** (FP), even if no one used the phrase. This chapter
 makes the underlying ideas explicit. You don't need to become a
@@ -104,6 +104,7 @@ immutable, `"hello".toUpperCase()` returns a new string,
 <Figure
   slug="js-functional-intuition-immutability-inline-cutout"
   alt="A sealed block left untouched on a shelf while a fresh copy with one changed face is set beside it"
+  caption="The original is left where it was, and the change goes into a fresh copy."
 />
 
 Objects and arrays are *mutable* by default. Functional code
@@ -155,9 +156,9 @@ memorising the mutators because they're the ones that bite you.
 
 | Mutating | Non-mutating (returns new) |
 | --- | --- |
-| `push`, `pop`, `shift`, `unshift` | `concat`, `[...arr, x]` |
-| `splice` | `slice`, `toSpliced` |
-| `sort`, `reverse` | `toSorted`, `toReversed` |
+| `push()`, `pop()`, `shift()`, `unshift()` | `concat()`, `[...arr, x]` |
+| `splice()` | `slice()`, `toSpliced` |
+| `sort()`, `reverse()` | `toSorted`, `toReversed` |
 | `arr[i] = x` | `arr.map((v, i) => i === idx ? x : v)` |
 
 When you can, prefer the non-mutating version.
@@ -207,13 +208,14 @@ console.log(triple(7));
   ]}
 />
 
-Treating functions as data is what enables `map`/`filter`/`reduce`,
+Treating functions as data is what enables `map()`/`filter()`/`reduce()`,
 event handlers, callbacks, middleware, promise chains, and dozens
 of other patterns you'll keep meeting.
 
 <Figure
   slug="js-functional-intuition-pure-functions-inline-cutout"
   alt="A sealed press with one inlet and one outlet, the same block fed twice and the same result leaving twice"
+  caption="A pure function returns the same result for the same input, every time."
 />
 
 ## Composition
@@ -262,7 +264,7 @@ A useful pair of words to know:
 - **Imperative** code says *how* to do something, step by step.
 - **Declarative** code says *what* the result should be.
 
-`map`, `filter`, and `reduce` are declarative. SQL is declarative.
+`map()`, `filter()`, and `reduce()` are declarative. SQL is declarative.
 JSX is declarative. A `for` loop is imperative.
 
 Both styles are valid. Use whichever makes the code clearer for

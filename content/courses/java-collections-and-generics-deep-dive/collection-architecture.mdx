@@ -44,6 +44,7 @@ nothing is given up, we only need `size()` and iteration anyway.
 <Figure
   slug="jcol-collection-architecture-principle-1-program-inline-cutout"
   alt="One standard front plate shown on five very different containers, one hand working them all"
+  caption="Take the interface and every caller fits, whatever container they hold."
 />
 
 The same idea on the return side, in reverse:
@@ -92,6 +93,7 @@ snapshot is the right default.
 <Figure
   slug="jcol-collection-architecture-principle-2-never-inline-cutout"
   alt="A sealed tray handed out through a hatch as a copy, the original staying clamped inside the cabinet"
+  caption="Hand out a copy and callers cannot reach back into your state."
 />
 
 ## Principle 3: defensive copy on input
@@ -137,6 +139,7 @@ A few useful conventions:
 <Figure
   slug="jcol-collection-architecture-inline-cutout"
   alt="One set of standard fittings at the top of a board with several different containers below, each carrying those fittings"
+  caption="One set of fittings across every container is what makes them swappable."
 />
 
 ## A worked example: an in-memory `BookRepo`
@@ -388,7 +391,7 @@ public class Inbox {
   > Not by itself.
 - It causes a memory leak
   > It does not.
-- [o] The caller receives a reference to your live mutable state and can \`add\`, \`remove\`, or \`clear\` it, corrupting your invariants
+- [o] The caller receives a reference to your live mutable state and can \`add()\`, \`remove()\`, or \`clear\` it, corrupting your invariants
   > Return an unmodifiable view or an immutable copy instead.`}
 />
 
@@ -402,5 +405,5 @@ public class Inbox {
 - \`List<Item>\`, load them all into memory
   > That guarantees an \`OutOfMemoryError\`.
 - \`Iterator<Item>\` exposed directly
-  > Iterators are poor public API; they support \`remove\` and have no good way to be closed.`}
+  > Iterators are poor public API; they support \`remove()\` and have no good way to be closed.`}
 />

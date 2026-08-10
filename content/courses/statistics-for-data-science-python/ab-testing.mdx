@@ -18,7 +18,7 @@ otherwise-fine tests.
 
 The full arc, start to finish:
 
-**Hypothesis + primary metric → Randomize users to A/B → Pick sample size (power) in advance → Run to plan (no peeking) → Analyze (lift, CI, effect size, p) → Decide: ship? (significance *and* size)**
+**Hypothesis + primary metric → Randomize users to A/B → Pick sample size (power) in advance → Run to plan (no peeking) → Analyze (lift, confidence interval, effect size, p) → Decide: ship? (significance *and* size)**
 
 <Figure
   slug="stat-ab-testing-cutout"
@@ -38,6 +38,7 @@ increases the purchase-conversion rate." Not "the new button is better"
 <Figure
   slug="stat-ab-testing-inline-cutout"
   alt="Two identical benches running side by side with one part changed on the right, and a gauge comparing their outputs"
+  caption="Change one thing between two otherwise identical arms, then compare outcomes."
 />
 
 **2. One primary metric, chosen in advance.** Pick *the* number the
@@ -75,6 +76,7 @@ the confounder's arrow and earns you a causal conclusion.
 <Figure
   slug="stat-ab-testing-randomization-licenses-causal-inline-cutout"
   alt="A mixed heap of chips split by a spinner rather than by hand, the two halves visibly alike"
+  caption="Randomising the split balances the causes you never thought of."
 />
 
 ```mermaid
@@ -104,6 +106,7 @@ detecting* (the minimum detectable effect, MDE).
 <Figure
   slug="stat-ab-testing-power-sample-size-inline-cutout"
   alt="A dial set and locked before two benches begin running, its setting fixing how many chips each will need"
+  caption="The sample size is fixed before the test runs, from the smallest effect worth catching."
 />
 
 The four knobs trade off against each other:

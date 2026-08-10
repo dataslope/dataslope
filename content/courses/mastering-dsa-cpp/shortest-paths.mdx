@@ -19,6 +19,7 @@ BFS minimizes the number of edges. In a weighted graph, fewer edges may cost mor
 <Figure
   slug="dsa-shortest-paths-inline-cutout"
   alt="A network of posts with weighted cords, one route lit from end to end and two longer routes left dark beside it"
+  caption="Fewest edges is not cheapest, which is exactly where breadth-first stops helping."
 />
 
 ```mermaid
@@ -37,6 +38,7 @@ Imagine pouring water into the source vertex and letting it flow along every edg
 <Figure
   slug="dsa-shortest-paths-dijkstra-s-idea-inline-cutout"
   alt="A network of weighted cords with a lamp lighting outward along the cheapest route first"
+  caption="Always settle the nearest unsettled vertex, and its distance is final."
 />
 
 Why is it safe to lock a vertex in? Because when `u` has the smallest tentative distance of all unprocessed vertices, any other route to `u` would have to pass through some vertex that is *farther away already*, and with non-negative edges, going farther first can never come back cheaper. That is the greedy bet, and non-negativity is what makes it a sure thing.

@@ -16,6 +16,7 @@ A **CHECK** constraint lets the schema say those things out loud.
 <Figure
   slug="db-check-constraints-check-encodes-domain-inline-cutout"
   alt="A gauge fitted across a chute, set to a measured opening, stopping any block that exceeds it"
+  caption="A `CHECK` is a gauge across the chute: values outside it never get stored."
 />
 
 ## CHECK encodes a domain rule
@@ -49,6 +50,7 @@ business into a rule the database can enforce.
 <Figure
   slug="db-check-constraints-business-rule-schema-inline-cutout"
   alt="A written rule card at one end of a bench and a fitted metal gauge at the other, the gauge cut to match the card"
+  caption="The design move is turning a sentence about the business into a rule."
 />
 
 ```mermaid
@@ -176,6 +178,7 @@ others.
 <Figure
   slug="db-check-constraints-inline-cutout"
   alt="A chute with a gauge across it, a block that is too tall stopped at the gauge while a block within the limit passes underneath"
+  caption="A constraint refuses the bad value rather than reporting it later."
 />
 
 ```mermaid

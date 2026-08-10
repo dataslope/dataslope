@@ -22,6 +22,7 @@ for a column, and identical aggregates can come from very different columns.
 <Figure
   slug="sql-aggregate-functions-from-many-rows-inline-cutout"
   alt="A tall column of chips tipped into a funnel and leaving as one block on the tray below"
+  caption="An aggregate collapses a whole column into one number."
 />
 
 <Chart slug="bar-hides-distribution" />
@@ -115,13 +116,14 @@ Thousands of rows collapse into three honest numbers. The average
 track runs about four minutes, but look at that maximum. Chinook's
 catalog includes whole TV episodes sold as "tracks," which is
 exactly the kind of surprise a quick aggregate sweep is good at
-surfacing. Try swapping `MAX` for `MIN` to find the shortest track,
+surfacing. Try swapping `MAX()` for `MIN()` to find the shortest track,
 or add `SUM(milliseconds) / 3600000 AS total_hours` to see how long
 the whole catalog would take to listen to.
 
 <Figure
   slug="sql-aggregate-functions-inline-cutout"
   alt="One tray of blocks feeding four small gauges in a row, each gauge showing a different single reading from the same tray"
+  caption="Several aggregates in one query read the same rows several different ways."
 />
 
 ## Aggregates over a filtered set
@@ -156,8 +158,8 @@ flowchart TD
 
 ## Two subtleties to remember
 
-**1. Aggregates ignore NULLs (except `COUNT(*)`).** `AVG`, `SUM`,
-`MIN`, `MAX`, and `COUNT(column)` skip rows where that column is
+**1. Aggregates ignore NULLs (except `COUNT(*)`).** `AVG()`, `SUM()`,
+`MIN()`, `MAX()`, and `COUNT(column)` skip rows where that column is
 `NULL`. Only `COUNT(*)` counts every row regardless. This is usually
 what you want, an unknown salary should not drag an average toward
 zero.
@@ -187,7 +189,7 @@ two missing values at a glance.
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What does an **aggregate function** like \`SUM\` or \`AVG\` do?
+  markdown={`What does an **aggregate function** like \`SUM()\` or \`AVG()\` do?
 
 - It returns one result row for each row in the table.
   > That describes ordinary column selection; aggregates collapse many rows into a summary.
@@ -222,13 +224,13 @@ Aggregate functions reduce many rows to a single summarizing value.`}
 - It returns NULL for the whole query.
   > A single NULL salary does not nullify the result; only the NULL rows are skipped.
 - It raises an error.
-  > NULLs do not cause an error in \`AVG\`; they are simply excluded.
+  > NULLs do not cause an error in \`AVG()\`; they are simply excluded.
 - It counts them as 0, lowering the average.
   > Treating unknown as zero would distort the average; SQL avoids that by ignoring NULLs.
 - [o] It ignores those rows, averaging only the rows that have a salary value.
-  > Aggregates like \`AVG\` skip NULLs, so the average reflects only known salaries.
+  > Aggregates like \`AVG()\` skip NULLs, so the average reflects only known salaries.
 
-\`AVG\` (like \`SUM\`, \`MIN\`, \`MAX\`) ignores NULLs and summarizes only the present values.`}
+\`AVG()\` (like \`SUM()\`, \`MIN()\`, \`MAX()\`) ignores NULLs and summarizes only the present values.`}
 />
 
 ## Practice challenge

@@ -48,6 +48,7 @@ it.
 <Figure
   slug="js-arrays-length-inline-cutout"
   alt="A filled rail of blocks with a measuring rod laid along it, the rod's end stopping exactly where the last block ends"
+  caption="An array knows its own length, and it is one more than the last index."
 />
 
 <CodeBlock
@@ -131,7 +132,7 @@ console.log("shifted:", first, "-> array:", xs);
   ]}
 />
 
-These four methods (`push`, `pop`, `shift`, `unshift`) **mutate**
+These four methods (`push()`, `pop()`, `shift()`, `unshift()`) **mutate**
 the array, they change it in place. That is important to keep in
 mind, especially when an array is shared across functions.
 
@@ -206,8 +207,8 @@ console.log("xs2:", xs2); // ["a","X","Y","Z","d","e"]
 />
 
 When in doubt, **prefer non-destructive operations**. The
-"functional" methods we will see in the next chapter (`map`,
-`filter`, `reduce`) are all non-destructive, which makes them much
+"functional" methods we will see in the next chapter (`map()`,
+`filter()`, `reduce()`) are all non-destructive, which makes them much
 easier to reason about.
 
 ## Useful array methods
@@ -268,6 +269,7 @@ Two pieces of modern syntax that come up everywhere with arrays.
 <Figure
   slug="js-arrays-creating-arrays-inline-cutout"
   alt="An empty tray being filled left to right with blocks, the tray's slots appearing only as each block is set down"
+  caption="An array grows as you add to it; the slots appear when they are filled."
 />
 
 ### Spread: unpack an array
@@ -350,6 +352,7 @@ are sharing the same underlying array.
 <Figure
   slug="js-arrays-inline-cutout"
   alt="A long shelf of six equal slots holding blocks in a fixed order, a hand reaching straight past the first three to lift the fourth out"
+  caption="Position is the whole idea: index 3 goes straight to the fourth slot."
 />
 
 <CodeBlock
@@ -458,7 +461,7 @@ Examples:
 - \`rotate([1, 2, 3, 4, 5], 7)\` → \`[4, 5, 1, 2, 3]\` (k larger than length wraps)
 - \`rotate([], 3)\` → \`[]\`
 
-Hint: use the modulo operator (\`%\`) to handle \`k\` larger than the array length, then combine \`slice\` with the spread operator.`}
+Hint: use the modulo operator (\`%\`) to handle \`k\` larger than the array length, then combine \`slice()\` with the spread operator.`}
   files={[
     {
       filename: "main.js",
@@ -535,13 +538,13 @@ if (JSON.stringify(original) !== "[1,2,3,4,5]") throw new Error("original array 
   markdown={`Two variables point to the same array: \`const a = [1, 2, 3]; const b = a;\`. You then call \`b.push(99)\`. What is \`a\`?
 
 - A \`TypeError\` is thrown
-  > \`push\` is a perfectly legal operation on any array; it never throws a \`TypeError\` simply for being called through an alias.
+  > \`push()\` is a perfectly legal operation on any array; it never throws a \`TypeError\` simply for being called through an alias.
 - \`[1, 2, 3]\`, \`a\` is independent of \`b\`
   > \`b = a\` does not copy the array; both variables refer to the same array in memory, so any mutation through \`b\` is immediately visible through \`a\`.
 - [o] \`[1, 2, 3, 99]\`, \`a\` and \`b\` reference the *same* array, so changes through one are visible through the other
   > Arrays (and all objects) in JavaScript are passed by reference. Assigning \`b = a\` makes \`b\` refer to the same array, not a copy. To get a real copy, use \`[...a]\` or \`a.slice()\`.
 - \`undefined\`, pushing through \`b\` clears \`a\`
-  > \`push\` adds an element to the end of the shared array; it does not clear it or produce \`undefined\`.
+  > \`push()\` adds an element to the end of the shared array; it does not clear it or produce \`undefined\`.
 
 This sharing-by-reference behaviour is the source of many subtle bugs. When you need an independent copy, always make one explicitly.`}
 />

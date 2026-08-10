@@ -72,6 +72,7 @@ Notice four things:
 <Figure
   slug="js-functions-basics-function-inline-cutout"
   alt="A plain box on a bench with one hopper above and one chute below, its workings hidden behind a closed panel"
+  caption="A function hides its workings; the caller sees only what goes in and out."
 />
 
 If a function has no `return` (or `return` with nothing after it),
@@ -87,6 +88,7 @@ small tweaks, you should be writing a function instead.
 <Figure
   slug="js-functions-basics-inline-cutout"
   alt="A boxed machine on a bench with a funnel on top and a spout at the side, a block dropped into the funnel and a different block leaving the spout"
+  caption="One call: arguments in, body runs, a value comes back out."
 />
 
 Functions give you three huge benefits:
@@ -157,6 +159,7 @@ all produce the same kind of value.
 <Figure
   slug="js-functions-basics-declaring-function-inline-cutout"
   alt="A machine being bolted together on a bench but not yet switched on, its hopper still empty"
+  caption="Declaring a function builds it; nothing runs until you call it."
 />
 
 ### Function declaration
@@ -325,7 +328,7 @@ addToTotal(2);
 />
 
 Whenever you can, write pure functions and put the side effects
-on the edges (a single function that calls `console.log`, a
+on the edges (a single function that calls `console.log()`, a
 single place that touches the database). This single discipline
 will, more than almost anything else, make your code
 maintainable.

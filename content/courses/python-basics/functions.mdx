@@ -14,7 +14,7 @@ Functions package code so it can be reused, named, and tested. Every program is 
 
 Functions are **the** fundamental building block of modern programs:
 
-- **Every API**, whether it's a REST endpoint, a library method, or a CLI command, is ultimately a function call with inputs and outputs.
+- **Every API**, whether it's a web endpoint, a library method, or a command-line tool, is ultimately a function call with inputs and outputs.
 - **Testing**, Unit tests verify one function at a time. Your test suite is only as good as your functions are isolated.
 - **Functional programming**, Pure functions (same input → same output, no side effects) make code easier to reason about, parallelize, and debug.
 - **The call stack**, Your entire program is a tree of function calls. When you see a traceback, each line is a function that called the next.
@@ -28,6 +28,7 @@ The term **function** comes from mathematics: **f(x) = y** means "given input x,
 <Figure
   slug="python-functions-inline-cutout"
   alt="A hopper taking blocks, a boxed machine below it, and a chute returning one finished block, the machine's inside hidden"
+  caption="A function maps inputs to an output; the caller does not need to see inside."
 />
 
 In math, functions are **pure**:
@@ -65,6 +66,7 @@ A function is **defined once** with `def`, then **called many times**. Each call
 <Figure
   slug="python-functions-anatomy-function-call-inline-cutout"
   alt="A block entering a machine's hopper, the machine working, and a different block leaving its chute"
+  caption="One call: arguments go in, the body runs, a value comes back out."
 />
 
 ## Defining a function
@@ -89,6 +91,7 @@ A function that does not explicitly `return` returns `None`.
 <Figure
   slug="python-functions-defining-function-inline-cutout"
   alt="A machine assembled on a bench but not yet switched on, its hopper empty"
+  caption="`def` only builds the function; nothing runs until you call it."
 />
 
 <CodeBlock
@@ -383,7 +386,7 @@ cache: dict[str, int] = {}
 ```
 
 <Callout type="info" title="Type hints as documentation">
-Type hints are **living documentation** that stays in sync with the code (unlike a comment, which can drift). They also unlock powerful IDE features: jump-to-definition, find-all-references, refactor-rename, etc.
+Type hints are **living documentation** that stays in sync with the code (unlike a comment, which can drift). They also unlock powerful editor features: jump-to-definition, find-all-references, refactor-rename, etc.
 </Callout>
 
 ## First-class functions

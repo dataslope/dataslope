@@ -8,7 +8,7 @@ stays silent on a second question that often matters just as much: *"how is
 each variable distributed on its own?"* A **joint plot** answers both at
 once.
 
-**`sns.jointplot`** draws two numeric variables as a central **bivariate**
+**`sns.jointplot()`** draws two numeric variables as a central **bivariate**
 plot, and tucks each variable's **univariate** distribution into the
 **margins**, one along the top, one down the right side. The center shows
 the *joint* relationship; the margins show the two *marginals*. You get the
@@ -57,7 +57,7 @@ variable become obvious without leaving the figure. Reach for a joint plot
 </Callout>
 
 <MultipleChoice
-  markdown={`In a \`jointplot\`, what is shown in the **top and right margins**?
+  markdown={`In a \`jointplot()\`, what is shown in the **top and right margins**?
 
 - The residuals from a regression line.
   > Margins always show the marginal distributions; residuals are not what a joint plot puts there.
@@ -205,12 +205,12 @@ clusters, and each margin shows three separate distributions, the same
 group-revealing payoff you saw with pair plots, focused on a single pair.
 
 <Callout type="info" title="Under the hood: JointGrid">
-`jointplot` is a high-level wrapper around **`JointGrid`**, the lower-level
+`jointplot()` is a high-level wrapper around **`JointGrid`**, the lower-level
 engine that lays out the central Axes plus the two marginal Axes. With
 `JointGrid` you draw the center and each margin yourself (via
 `plot_joint(...)` and `plot_marginals(...)`), which is handy when you want a
-combination `jointplot` doesn't offer out of the box. For everyday use,
-`jointplot` and its `kind=` options are all you need.
+combination `jointplot()` doesn't offer out of the box. For everyday use,
+`jointplot()` and its `kind=` options are all you need.
 </Callout>
 
 ## What a joint plot shows, and when to skip it
@@ -221,7 +221,7 @@ combination `jointplot` doesn't offer out of the box. For everyday use,
   each variable's marginal distribution, skew, peaks, and outliers you'd
   miss in a bare scatter.
 - **When to prefer a plain scatter:** when you only care about the
-  relationship and the marginals are noise, a `relplot`/`scatterplot` is
+  relationship and the marginals are noise, a `relplot()`/`scatterplot()` is
   simpler and composes more flexibly (facets, custom Axes).
 - **When it breaks:** large `n` with `kind="scatter"` overplots the center,
   switch to `kind="hex"` or `kind="kde"`.
@@ -229,6 +229,7 @@ combination `jointplot` doesn't offer out of the box. For everyday use,
 <Figure
   slug="sns-joint-distributions-minimal-joint-plot-inline-cutout"
   alt="A board of scattered chips with a small mound built along its top edge and another along its right"
+  caption="A joint plot puts each variable's own distribution along the margins."
 />
 
 ## Your turn
@@ -237,7 +238,7 @@ combination `jointplot` doesn't offer out of the box. For everyday use,
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Build a joint plot with marginals"
-  instructions={`Using the \`penguins\` dataset, build a **joint plot** with \`sns.jointplot\`:
+  instructions={`Using the \`penguins\` dataset, build a **joint plot** with \`sns.jointplot()\`:
 
 - \`bill_length_mm\` on the x-axis,
 - \`bill_depth_mm\` on the y-axis,
@@ -291,7 +292,7 @@ g = sns.jointplot(
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What does \`sns.jointplot\` add compared with a plain scatter plot?
+  markdown={`What does \`sns.jointplot()\` add compared with a plain scatter plot?
 
 - It always fits and reports a regression model.
   > A regression line appears only with \`kind="reg"\`; the default joint plot does not fit one.
@@ -324,14 +325,14 @@ data concentrates.`}
 />
 
 <MultipleChoice
-  markdown={`When is a joint plot a better choice than a plain \`scatterplot\`?
+  markdown={`When is a joint plot a better choice than a plain \`scatterplot()\`?
 
 - When you want one panel per category.
   > Splitting into panels per category is faceting (\`col\`/\`row\`), not what a joint plot does.
 - [o] When the marginal distributions of each variable matter, or you want a quick density view of a single pair.
   > The joint plot's whole value-add is showing each variable's distribution alongside the relationship, so it shines exactly when those marginals (or a density center like hex/kde) are worth seeing.
 - When you need to place the chart on a specific matplotlib Axes alongside other plots.
-  > A joint plot manages its *own* multi-Axes figure, so it's the *harder* choice for composing onto an Axes you control, that favors \`scatterplot\`.
+  > A joint plot manages its *own* multi-Axes figure, so it's the *harder* choice for composing onto an Axes you control, that favors \`scatterplot()\`.
 - Always, a joint plot is strictly superior and should replace every scatter.
   > It's not free: the margins add space and complexity, and a plain scatter composes more flexibly (facets, shared Axes). Use the joint plot when the marginals actually earn their keep.
 
@@ -347,4 +348,5 @@ distribution plots (histograms, KDEs, ECDFs) that power those margins.
 <Figure
   slug="sns-joint-distributions-inline-cutout"
   alt="A flat board of chips scattered across it, with a small mound of the same chips built along its top edge and another built along its right edge"
+  caption="The scatter answers the joint question; the margins answer two separate ones."
 />

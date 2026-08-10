@@ -111,7 +111,7 @@ ORDER BY
   c.name;`}
 />
 
-`COALESCE` is only for display here. The underlying missing value is still `NULL`.
+`COALESCE()` is only for display here. The underlying missing value is still `NULL`.
 
 ## Finding unmatched rows
 
@@ -185,6 +185,7 @@ This same pattern works whenever the question says "never," "missing," or "no re
 <Figure
   slug="lite-outer-joins-left-join-keeps-inline-cutout"
   alt="Two racks pushed together where every card from the left is kept, unmatched ones paired with a blank"
+  caption="A left join keeps every left-hand row, filling the unmatched ones with `NULL`."
 />
 
 <SqlCodeBlock
@@ -216,6 +217,7 @@ For beginners, `LEFT JOIN` is the most important outer join. Recent SQLite versi
 <Figure
   slug="lite-outer-joins-inline-cutout"
   alt="Two racks pushed together where every card from the left rack is kept, unmatched ones paired with a blank"
+  caption="Put the table you want to keep on the left and a left join covers most needs."
 />
 
 ```mermaid

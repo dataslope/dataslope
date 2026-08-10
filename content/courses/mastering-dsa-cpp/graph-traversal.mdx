@@ -1,5 +1,5 @@
 ---
-title: "Graph Traversal: BFS and DFS"
+title: "Graph Traversal: Breadth-First and Depth-First"
 description: Learn breadth-first search, depth-first search, components, cycle detection, topological sort, and grid traversal in C++
 ---
 
@@ -19,6 +19,7 @@ BFS explores level by level from a source. It uses a queue: push the source, pop
 <Figure
   slug="dsa-graph-traversal-depth-first-search-inline-cutout"
   alt="One route followed all the way to a dead end in a network of cords before any other is tried"
+  caption="Depth-first commits to one route until it runs out, then backs up."
 />
 
 ```text
@@ -99,6 +100,7 @@ DFS goes as deep as possible before backtracking, Trémaux's string and chalk. T
 <Figure
   slug="dsa-graph-traversal-breadth-first-search-inline-cutout"
   alt="A wave spreading outward from one post through a network of cords, reaching all nearest posts before any further"
+  caption="Breadth-first reaches everything one step away before anything two steps away."
 />
 
 ```text
@@ -425,6 +427,7 @@ The most common graphs in interviews never declare themselves as graphs, they ar
 <Figure
   slug="dsa-graph-traversal-inline-cutout"
   alt="A network of posts joined by cords, with a wave of colour spreading outward from one post to its neighbours, then to theirs"
+  caption="A grid is a graph: each cell's neighbours are the four beside it."
 />
 
 ```mermaid

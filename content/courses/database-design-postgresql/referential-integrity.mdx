@@ -19,11 +19,13 @@ links.
 <Figure
   slug="db-referential-integrity-orphan-row-problem-inline-cutout"
   alt="A crate with a cord leading away to an empty space where another crate used to stand"
+  caption="An orphan is a row still pointing at something that is no longer there."
 />
 
 <Figure
   slug="db-referential-integrity-inline-cutout"
   alt="A cord running from one crate to another, and a gate refusing to remove the far crate while the cord is still attached"
+  caption="The database refuses the delete while another row still depends on it."
 />
 
 ## The orphan-row problem
@@ -40,7 +42,7 @@ flowchart TD
 ```
 
 Orphans are not just untidy. They break the meaning of the data. A join
-may lose the order. A report may count revenue without a customer. A UI
+may lose the order. A report may count revenue without a customer. A screen
 may try to show details that do not exist.
 
 Referential integrity says: every reference must point to something

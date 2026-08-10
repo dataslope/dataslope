@@ -115,6 +115,7 @@ that comparison.
 <Figure
   slug="gg-cartesian-and-beyond-default-cartesian-inline-cutout"
   alt="A plain grid of straight rules meeting at right angles"
+  caption="The default coordinate system is a plain grid of straight axes."
 />
 
 <Callout type="info" title="Coordinates are a full grammar component">
@@ -144,11 +145,11 @@ marks rather than the data feeding the stats.`}
   markdown={`Why might you add \`coord_fixed()\` to a plot of city MPG vs. highway MPG?
 
 - To filter out cars with low MPG.
-  > \`coord_fixed\` changes the aspect ratio, not the data.
+  > \`coord_fixed()\` changes the aspect ratio, not the data.
 - To add a confidence band to the points.
-  > Bands come from \`geom_smooth\`, not from coordinates.
+  > Bands come from \`geom_smooth()\`, not from coordinates.
 - To convert the axes to a log scale.
-  > That is a scale transformation, unrelated to \`coord_fixed\`.
+  > That is a scale transformation, unrelated to \`coord_fixed()\`.
 - [o] Because both axes are in the same units, so equal data distances should look equal, making a \`y = x\` reference line a true 45-degree diagonal.
   > Fixing the ratio keeps same-unit comparisons visually honest.
 
@@ -170,4 +171,5 @@ from distorting the comparison between them.`}
 <Figure
   slug="gg-cartesian-and-beyond-inline-cutout"
   alt="A grid of straight rules on the left and the same grid bent into concentric rings on the right"
+  caption="Changing the coordinate system bends the same marks into a new frame."
 />

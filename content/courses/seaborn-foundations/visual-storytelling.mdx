@@ -30,12 +30,12 @@ covers the families this course teaches:
 
 | Your question | Chart family | Seaborn entry point |
 | ------------- | ------------ | ------------------- |
-| How do two **numeric** variables relate? | scatter / line | `relplot`, `scatterplot`, `lineplot` |
-| What does **one** distribution look like? | histogram / KDE / ECDF | `displot`, `histplot`, `kdeplot`, `ecdfplot` |
-| How does a **number** compare across categories? | bar / box / violin | `catplot`, `barplot`, `boxplot`, `violinplot` |
-| How **many** are in each category? | count plot | `countplot`, `catplot(kind="count")` |
-| How do **all pairs** of variables relate? | pair plot | `pairplot` |
-| What is the **correlation structure**? | heatmap | `heatmap` |
+| How do two **numeric** variables relate? | scatter / line | `relplot()`, `scatterplot()`, `lineplot()` |
+| What does **one** distribution look like? | histogram / KDE / ECDF | `displot()`, `histplot()`, `kdeplot()`, `ecdfplot()` |
+| How does a **number** compare across categories? | bar / box / violin | `catplot()`, `barplot()`, `boxplot()`, `violinplot()` |
+| How **many** are in each category? | count plot | `countplot()`, `catplot(kind="count")` |
+| How do **all pairs** of variables relate? | pair plot | `pairplot()` |
+| What is the **correlation structure**? | heatmap | `heatmap()` |
 
 Read it as *question → family*. "Relationship between two numbers" almost
 always means a scatter (or a line, if the x-axis is ordered like time). "One
@@ -298,7 +298,7 @@ questions turn an exploratory sketch into a communicative figure.
   instructions={`Build a clear scatter of the \`penguins\` dataset showing the relationship
 between flipper length and body mass, then title it with its *message*.
 
-1. With \`sns.scatterplot\`, put \`flipper_length_mm\` on the x-axis and
+1. With \`sns.scatterplot()\`, put \`flipper_length_mm\` on the x-axis and
    \`body_mass_g\` on the y-axis. Capture the returned \`Axes\` in a variable
    named \`ax\`.
 2. Set the title to exactly \`Heavier penguins have longer flippers\` (a
@@ -424,4 +424,5 @@ whole workflow together on a fresh dataset.
 <Figure
   slug="sns-visual-storytelling-choosing-right-chart-inline-cutout"
   alt="One tray of chips with four chart frames fanned above it and a hand reaching for the fitting one"
+  caption="The chart is chosen to fit the question, not the other way round."
 />

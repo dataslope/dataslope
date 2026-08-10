@@ -32,6 +32,7 @@ test was designed to measure.
 <Figure
   slug="llm-benchmark-pitfalls-inline-cutout"
   alt="A machine scoring perfectly on a test rig whose answer card is visibly already inside the machine"
+  caption="If the answers were in the training data, the score measures memory."
 />
 
 This is rarely deliberate and is very hard to rule out, because
@@ -100,6 +101,7 @@ depends entirely on whether your task resembles it.
 <Figure
   slug="llm-benchmark-pitfalls-1-saturation-inline-cutout"
   alt="A test rig whose gauge is pinned hard at its top stop, three different machines all reading the same"
+  caption="Once every model tops a benchmark, it has stopped telling them apart."
 />
 
 SWE-bench predicts agentic coding reasonably well because the task

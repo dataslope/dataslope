@@ -59,6 +59,7 @@ what makes small multiples honest.
 <Figure
   slug="sns-facets-and-grids-wrapping-many-categories-inline-cutout"
   alt="A long row of small panels folded onto a second and third row to fit the bench"
+  caption="`col_wrap` folds a long row of panels into a readable block."
 />
 
 <Callout type="info" title="hue overlays; col/row separate">
@@ -102,7 +103,7 @@ sns.relplot(
 
 The figure-level functions do their faceting through a class called
 **`FacetGrid`**. You rarely call it directly, but understanding its
-three-step workflow demystifies what `relplot` and friends are doing, and
+three-step workflow demystifies what `relplot()` and friends are doing, and
 lets you build custom grids when you need them.
 
 Starting from the full tidy dataset, the workflow runs:
@@ -163,6 +164,7 @@ similar when they aren't.
 <Figure
   slug="sns-facets-and-grids-inline-cutout"
   alt="Four small panels standing in a row over one continuous axis rule that runs beneath all of them, with a single key block at the right serving every panel"
+  caption="Shared axes are what make one panel comparable with the next."
 />
 
 <MultipleChoice
@@ -189,6 +191,7 @@ weakness as well as its strength.
 <Figure
   slug="sns-facets-and-grids-faceting-just-col-inline-cutout"
   alt="One board split into a grid of small panels by two dials, one setting columns and one setting rows"
+  caption="Faceting multiplies panels: columns times rows, which is its risk as well."
 />
 
 - **Too many facets.** Twenty tiny panels are as hard to read as one
@@ -213,7 +216,7 @@ firehose, a few well-chosen facets beat a wall of thumbnails.
   adapter="python"
   title="Build a 2-by-2 facet grid"
   instructions={`Using \`tips\`, draw a scatter of \`total_bill\` (x) vs \`tip\` (y) with
-\`sns.relplot\`, faceted into a grid with:
+\`sns.relplot()\`, faceted into a grid with:
 
 - one **column** per \`time\` (Lunch, Dinner), and
 - one **row** per \`sex\` (Male, Female).
@@ -312,7 +315,7 @@ can explode if you're not careful.`}
   > That happens when you construct the \`FacetGrid\` object; \`map\` comes afterward.
 
 The workflow is: construct the grid, \`map\` a plot onto each subset, then
-\`add_legend()\`, which is precisely what \`relplot\` automates.`}
+\`add_legend()\`, which is precisely what \`relplot()\` automates.`}
 />
 
 <MultipleChoice

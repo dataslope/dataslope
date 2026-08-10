@@ -5,8 +5,8 @@ description: The two ideas that turn a collection of classes into a maintainable
 
 We have been writing private fields and public methods without
 fully explaining why. Now we explain. The two ideas at work are
-**encapsulation** and **abstraction**, and they are the reason OOP
-exists at all.
+**encapsulation** and **abstraction**, and they are the reason
+object-oriented programming exists at all.
 
 <Figure
   slug="java-encapsulation-cutout"
@@ -170,6 +170,7 @@ state. Whenever you see this, ask: who is allowed to set `age = -5`?
 <Figure
   slug="java-encapsulation-and-abstraction-encapsulation-each-object-inline-cutout"
   alt="Three sealed crates on a bench, each holding its own parts and none reaching into another"
+  caption="Each object guards its own state, and nothing reaches in from outside."
 />
 
 ### 2. Getters and setters for every field
@@ -199,7 +200,7 @@ public List<Item> getItems() {
 Callers can now do `account.getItems().clear()` and silently break
 the class's invariants. Common fixes: return a *defensive copy*, or
 return an unmodifiable view, or expose specific operations like
-`add`, `remove`, `count` instead.
+`add()`, `remove()`, `count` instead.
 
 <MultipleChoice
   markdown={`What is the *single* most important reason to make fields \`private\`?

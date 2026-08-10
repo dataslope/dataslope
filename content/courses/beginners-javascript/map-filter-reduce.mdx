@@ -5,7 +5,7 @@ description: The three verbs that do 80% of modern JavaScript's work on arrays, 
 
 In the *loops* chapter we wrote out the "loop and accumulate"
 pattern by hand: walk an array, build up a result. JavaScript
-gives you three built-in methods, `map`, `filter`, and `reduce`,
+gives you three built-in methods, `map()`, `filter()`, and `reduce()`,
 that express these patterns more clearly. Once they click,
 half the loops you would otherwise write disappear.
 
@@ -31,7 +31,7 @@ A `for` loop says *how* to walk the array. The three methods say
 
 The pattern is: **describe the transformation, not the mechanics**.
 
-## `map`: transform every element
+## `map()`: transform every element
 
 `arr.map(fn)` returns a *new* array of the same length, where each
 element is the result of `fn` applied to the original element.
@@ -39,6 +39,7 @@ element is the result of `fn` applied to the original element.
 <Figure
   slug="js-map-filter-reduce-map-transform-every-inline-cutout"
   alt="A full row of blocks passing under one wide roller that repaints every block in the row in a single pass"
+  caption="`map()` returns a new array of the same length, one result per element."
 />
 
 <CodeBlock
@@ -78,10 +79,10 @@ Three things to notice:
 3. Each element is processed independently. The callback can't see
    the other elements.
 
-If you need to *skip* elements, `map` is the wrong tool. That's
-what `filter` is for.
+If you need to *skip* elements, `map()` is the wrong tool. That's
+what `filter()` is for.
 
-## `filter`: keep only the elements that pass a test
+## `filter()`: keep only the elements that pass a test
 
 `arr.filter(fn)` returns a *new* array containing only the
 elements for which `fn` returns a truthy value.
@@ -89,6 +90,7 @@ elements for which `fn` returns a truthy value.
 <Figure
   slug="js-map-filter-reduce-filter-keep-only-inline-cutout"
   alt="A row of mixed blocks passing over a grate, the ones that fail a test dropping through and the rest carrying on unchanged"
+  caption="`filter()` keeps the elements that pass the test and drops the rest."
 />
 
 <CodeBlock
@@ -122,18 +124,19 @@ console.log(cleaned); // ["hello", "world", 7]
   ]}
 />
 
-Notice the last example: `Boolean` is itself a function, and
+Notice the last example: `Boolean()` is itself a function, and
 `filter(Boolean)` removes every falsy value in one stroke. Tiny
 idioms like this make functional code remarkably compact.
 
-## `reduce`: collapse the array into a single value
+## `reduce()`: collapse the array into a single value
 
-`reduce` is the most general of the three. It walks the array,
+`reduce()` is the most general of the three. It walks the array,
 maintaining an "accumulator", and produces a single final value.
 
 <Figure
   slug="js-map-filter-reduce-inline-cutout"
   alt="A bench of three stations in a row, the first repainting every block, the second dropping some blocks through a grate, the third pressing what remains into one larger block"
+  caption="Transform, keep, collapse: three shapes that cover most array work."
 />
 
 ```javascript
@@ -183,14 +186,14 @@ console.log(byName); // { Ada: 90, Linus: 75, Grace: 100 }
   ]}
 />
 
-`reduce` is *very* general. Anything you can do with a manual
+`reduce()` is *very* general. Anything you can do with a manual
 "start with X, walk the array, update X, return X" loop, you can
-do with `reduce`. In fact, `map` and `filter` are themselves just
-special cases of `reduce`.
+do with `reduce()`. In fact, `map()` and `filter()` are themselves just
+special cases of `reduce()`.
 
-A common piece of advice: *don't reach for `reduce` first*. It can
-do anything, but its generality makes it harder to read than `map`
-or `filter`. Reach for it when you genuinely need to fold the
+A common piece of advice: *don't reach for `reduce()` first*. It can
+do anything, but its generality makes it harder to read than `map()`
+or `filter()`. Reach for it when you genuinely need to fold the
 array into a non-list result.
 
 ## Composing the three
@@ -465,11 +468,11 @@ if (r.length !== 1 || typeof r[0] !== "string") throw new Error("must return an 
 - A \`while\` loop that builds a new array index-by-index
   > A \`while\` loop requires the most manual bookkeeping of all the options, initialising the index, checking the condition, incrementing, and pushing, none of which communicates the intent of "transform every element".
 - [o] \`users.map((u) => ({ ...u, name: u.name.toUpperCase() }))\`
-  > \`map\` precisely expresses "transform every element". The transformation describes the result without spelling out the mechanics of the loop. Using object spread together with \`map\` is the standard idiom for "produce a new array of updated objects".
+  > \`map()\` precisely expresses "transform every element". The transformation describes the result without spelling out the mechanics of the loop. Using object spread together with \`map()\` is the standard idiom for "produce a new array of updated objects".
 - A \`for\` loop that pushes into a new array
-  > A \`for\` loop with \`push\` produces the right result but obscures the intent: the reader must understand the loop mechanics before seeing that the goal is "transform every element".
+  > A \`for\` loop with \`push()\` produces the right result but obscures the intent: the reader must understand the loop mechanics before seeing that the goal is "transform every element".
 - A \`for...of\` loop with manual indexing
-  > A \`for...of\` loop is already cleaner than an index-based \`for\`, but "with manual indexing" adds unnecessary bookkeeping; when the goal is to transform every element, \`map\` expresses that directly.
+  > A \`for...of\` loop is already cleaner than an index-based \`for\`, but "with manual indexing" adds unnecessary bookkeeping; when the goal is to transform every element, \`map()\` expresses that directly.
 
-\`map\` makes the *intent* obvious. Hand-written loops do the same work but force the reader to figure out what you're trying to express.`}
+\`map()\` makes the *intent* obvious. Hand-written loops do the same work but force the reader to figure out what you're trying to express.`}
 />

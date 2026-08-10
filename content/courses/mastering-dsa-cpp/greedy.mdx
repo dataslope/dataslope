@@ -25,7 +25,7 @@ Greedy works when local choices are provably safe. Advanced theory connects this
 A local rule that feels right can still fail, and greedy failures don't crash, they just quietly return suboptimal answers.
 </Callout>
 
-Here is the canonical failure, promised on the DP page. With coins `{1, 3, 4}` and amount `6`, the "obvious" rule, always grab the biggest coin that fits, takes `4+1+1`: three coins. The optimum is `3+3`: two. The greedy rule cannot see that taking the 4 *now* poisons the remainder. (With US denominations `{1, 5, 10, 25}` the same rule happens to be optimal, coin systems with that property are called *canonical*, which makes coin change the perfect cautionary tale: the identical algorithm is correct or incorrect depending on the input universe.)
+Here is the canonical failure, promised on the dynamic programming page. With coins `{1, 3, 4}` and amount `6`, the "obvious" rule, always grab the biggest coin that fits, takes `4+1+1`: three coins. The optimum is `3+3`: two. The greedy rule cannot see that taking the 4 *now* poisons the remainder. (With US denominations `{1, 5, 10, 25}` the same rule happens to be optimal, coin systems with that property are called *canonical*, which makes coin change the perfect cautionary tale: the identical algorithm is correct or incorrect depending on the input universe.)
 
 <CodeBlock
   adapter="cpp"
@@ -114,6 +114,7 @@ A pleasing contrast with the DP chapter: 0/1 knapsack *requires* dynamic program
 <Figure
   slug="dsa-greedy-fractional-knapsack-inline-cutout"
   alt="A sack being filled with the densest blocks first, the last one cut to fit exactly"
+  caption="Taking the densest first works here because the last item can be cut to fit."
 />
 
 <CodeBlock
@@ -190,6 +191,7 @@ The most consequential greedy algorithm ever devised was a homework dodge. In 19
 <Figure
   slug="dsa-greedy-activity-selection-inline-cutout"
   alt="A row of overlapping bars with the earliest-finishing one taken first and the overlaps swept aside"
+  caption="Choosing the earliest finish each time leaves the most room for what follows."
 />
 
 The implementation is a priority-queue loop: repeatedly extract the two smallest frequencies, merge them, and push the sum back. (The full algorithm builds tree nodes; the version below computes just the total encoding cost, each merge's sum is the number of bits that merge contributes.)
@@ -280,6 +282,7 @@ Three challenges, three greedy flavors: the sort-and-scan (activity selection), 
 <Figure
   slug="dsa-greedy-inline-cutout"
   alt="A figure walking a row of coin trays taking the largest from each in turn without looking ahead, and one tray further on holding a much larger prize"
+  caption="A greedy rule takes the best local choice and never looks ahead."
 />
 
 <ChallengeCard

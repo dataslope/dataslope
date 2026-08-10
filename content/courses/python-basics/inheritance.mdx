@@ -23,7 +23,7 @@ Inheritance shows up everywhere in Python:
 Understanding inheritance is essential for working with frameworks and designing extensible systems. But remember: **composition is often better than inheritance**. We'll cover that too.
 
 <Callout type="info" title="Real-world example: Django models">
-Every Django model inherits from \`django.db.models.Model\`. That base class provides the entire ORM machinery: \`save()\`, \`delete()\`, \`objects.filter(...)\`, etc. You just define fields and optionally override methods. This is inheritance done right: the base class provides infrastructure, subclasses provide domain logic.
+Every Django model inherits from \`django.db.models.Model\`. That base class provides the entire object-relational mapping machinery: \`save()\`, \`delete()\`, \`objects.filter(...)\`, etc. You just define fields and optionally override methods. This is inheritance done right: the base class provides infrastructure, subclasses provide domain logic.
 </Callout>
 
 ## Single inheritance
@@ -60,6 +60,7 @@ for animal in [Dog("Rex"), Cat("Luna"), Animal("Thing")]:
 <Figure
   slug="python-inheritance-single-inheritance-inline-cutout"
   alt="One base cabinet with a single cabinet behind it built on the same frame"
+  caption="A subclass is built on the parent's frame and keeps everything already there."
 />
 
 ```mermaid
@@ -79,6 +80,7 @@ When a subclass defines a method with the same name as a parent method, the subc
 <Figure
   slug="python-inheritance-method-overriding-inline-cutout"
   alt="A cabinet built on a base frame with one of the base's panels replaced by a different one"
+  caption="Overriding swaps out one inherited method and leaves the rest untouched."
 />
 
 <CodeBlock
@@ -212,13 +214,14 @@ print(issubclass(Dog, Animal))  # True
 Use \`isinstance(x, int)\` instead of \`type(x) is int\`. The former allows subclasses (e.g., \`bool\` is a subclass of \`int\`); the latter does not. In general, checking types at all is un-Pythonic, prefer duck typing and "ask forgiveness, not permission" (EAFP).
 </Callout>
 
-## Multiple inheritance and the MRO
+## Multiple inheritance and method resolution order
 
 Python allows a class to inherit from **multiple** parents. Method lookup uses the **Method Resolution Order (MRO)**, which is computed with the **C3 linearization** algorithm.
 
 <Figure
   slug="python-inheritance-inline-cutout"
   alt="A base cabinet with two cabinets behind it built on the same frame, each adding one part of its own"
+  caption="With multiple parents, the resolution order decides whose panel is found first."
 />
 
 <CodeBlock
@@ -346,7 +349,7 @@ Otherwise, prefer composition.
 
 ## The Liskov Substitution Principle
 
-Named after Barbara Liskov, the LSP states: **a subclass should be usable anywhere the parent is**. In other words, substituting a `Dog` for an `Animal` should not break code that expects an `Animal`.
+Named after Barbara Liskov, the principle states: **a subclass should be usable anywhere the parent is**. In other words, substituting a `Dog` for an `Animal` should not break code that expects an `Animal`.
 
 ```python
 class Bird:

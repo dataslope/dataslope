@@ -31,6 +31,7 @@ column after the new design is ready.
 <Figure
   slug="db-evolving-schemas-safely-migrations-are-ordered-inline-cutout"
   alt="A row of plain step plates laid down one after another, each resting on the one before it"
+  caption="Migrations are ordered steps, each resting on the one applied before it."
 />
 
 Good migrations are:
@@ -59,6 +60,7 @@ adding a new relationship table.
 <Figure
   slug="db-evolving-schemas-safely-inline-cutout"
   alt="A cabinet gaining a new drawer while the drawers already in use stay open and undisturbed"
+  caption="An additive change leaves everything already in use untouched."
 />
 
 A **destructive** change removes or changes something existing. Dropping
@@ -96,6 +98,7 @@ old rows do not have values yet.
 <Figure
   slug="db-evolving-schemas-safely-add-not-null-inline-cutout"
   alt="A new column being slid into a working board while a standard grey plug fills each of its existing rows"
+  caption="Add the column, backfill a value, and only then require it."
 />
 
 A safer pattern is:

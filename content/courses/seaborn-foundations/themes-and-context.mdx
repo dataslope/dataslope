@@ -10,7 +10,7 @@ matplotlib's defaults so that *every* plot you draw afterward picks up the
 same style, sizing, and colors. Set it once near the top of your work and
 forget about it.
 
-This page is about steering that one call. `set_theme` takes four dials you
+This page is about steering that one call. `set_theme()` takes four dials you
 will use constantly:
 
 ```python
@@ -227,7 +227,7 @@ markers but the *same* overall look. What is the most direct change?
 matching element sizes to where the chart will be seen.`}
 />
 
-## A lighter frame with `despine`
+## A lighter frame with `despine()`
 
 Even after picking a style, plots carry a full rectangular border, a
 **spine** on all four sides. The top and right spines rarely add anything;
@@ -273,7 +273,7 @@ are the 90% case.
 
 ## Styling just one plot, temporarily
 
-`set_theme` is global, which is exactly what you want most of the time, one
+`set_theme()` is global, which is exactly what you want most of the time, one
 consistent look for everything. But occasionally you want **one** plot to
 differ without disturbing the rest of your session. Seaborn gives you two
 context managers for that: `axes_style` (for the style) and
@@ -301,13 +301,13 @@ with sns.axes_style("white"):
 `plotting_context` works the same way for sizing, wrap a single plot in
 `with sns.plotting_context("talk"):` to scale up just that one figure. Reach
 for these only when you genuinely need a one-off; for the look of your whole
-analysis, set it once with `set_theme` and move on.
+analysis, set it once with `set_theme()` and move on.
 
 <Callout type="warn" title="set_theme is global and sticky">
-Because `set_theme` mutates matplotlib's defaults, it affects **every plot
+Because `set_theme()` mutates matplotlib's defaults, it affects **every plot
 drawn after it**, until you call it again. Two consequences: (1) a plot drawn
-*before* `set_theme` keeps the old look, order matters; and (2) in a long
-session, a `set_theme` buried in the middle silently restyles everything
+*before* `set_theme()` keeps the old look, order matters; and (2) in a long
+session, a `set_theme()` buried in the middle silently restyles everything
 below it. Set it once at the very top. (Every block on this page repeats it
 only because each block runs on its own.)
 </Callout>
@@ -321,10 +321,10 @@ only because each block runs on its own.)
 
 1. Call \`sns.set_theme(style="whitegrid")\` to set the global look.
 2. Build **any** figure-level plot on the \`tips\` dataset with
-   \`sns.relplot\` (for example, \`total_bill\` on x and \`tip\` on y) and assign
+   \`sns.relplot()\` (for example, \`total_bill\` on x and \`tip\` on y) and assign
    the result to a variable named \`g\`.
 
-You are not tested on the style itself, just that you called \`set_theme\`
+You are not tested on the style itself, just that you called \`set_theme()\`
 and produced a Seaborn grid.`}
   files={[
     {
@@ -358,7 +358,7 @@ g = sns.relplot(data=tips, x="total_bill", y="tip", height=4)
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`Which \`set_theme\` argument controls the **background and gridlines**, and
+  markdown={`Which \`set_theme()\` argument controls the **background and gridlines**, and
 which controls the **size** of fonts, lines, and markers?
 
 - \`context\` controls the background; \`style\` controls the sizes.
@@ -378,29 +378,29 @@ which controls the **size** of fonts, lines, and markers?
 then draw five charts. Which statement is true?
 
 - Only the first chart picks up the white style; the rest revert to the default.
-  > The change is persistent, not one-shot, it stays in effect until you call \`set_theme\` again.
+  > The change is persistent, not one-shot, it stays in effect until you call \`set_theme()\` again.
 - The call also restyles any charts you drew *before* it.
   > The effect is forward-looking only; plots created before the call keep their previous appearance.
-- [o] All five charts use the white style, because \`set_theme\` changes the global defaults for the rest of the session.
-  > \`set_theme\` mutates matplotlib's global defaults, so every plot drawn afterward inherits the style until it is changed again.
+- [o] All five charts use the white style, because \`set_theme()\` changes the global defaults for the rest of the session.
+  > \`set_theme()\` mutates matplotlib's global defaults, so every plot drawn afterward inherits the style until it is changed again.
 - The charts keep the default style until you also pass a \`context\`.
   > \`style\` takes effect on its own; \`context\` and \`palette\` are independent, optional settings.
 
-\`set_theme\` is global and sticky: set it once, and it shapes every
+\`set_theme()\` is global and sticky: set it once, and it shapes every
 *subsequent* plot in the session.`}
 />
 
 <MultipleChoice
   markdown={`What does \`sns.despine()\` do, and when do you call it?
 
-- It applies a global theme like \`set_theme\`, so you call it once at the top.
-  > \`despine\` is not a global theme setter, it modifies the spines of the figure that already exists.
+- It applies a global theme like \`set_theme()\`, so you call it once at the top.
+  > \`despine()\` is not a global theme setter, it modifies the spines of the figure that already exists.
 - It deletes the legend from the current figure.
-  > Removing a legend is a different operation; \`despine\` acts on the axis spines, not the legend.
+  > Removing a legend is a different operation; \`despine()\` acts on the axis spines, not the legend.
 - [o] It removes the top and right axis spines for a lighter frame, and you call it *after* the plotting command.
-  > \`despine\` strips the two spines that usually just box in the data; because it acts on the current figure, it runs after you have drawn the plot.
+  > \`despine()\` strips the two spines that usually just box in the data; because it acts on the current figure, it runs after you have drawn the plot.
 - It scales the figure up for presentation.
-  > Scaling for a medium is what \`context\` does; \`despine\` only removes spines.
+  > Scaling for a medium is what \`context\` does; \`despine()\` only removes spines.
 
 \`despine()\` is a finishing touch on an already-drawn plot, pairing
 especially well with \`style="ticks"\`.`}
@@ -414,4 +414,5 @@ palettes**, and how to choose colors that inform rather than decorate.
 <Figure
   slug="sns-themes-and-context-style-canvas-behind-inline-cutout"
   alt="The same marks shown on three differently finished panels, the marks identical in each"
+  caption="The style changes the canvas, never the marks the data drew."
 />

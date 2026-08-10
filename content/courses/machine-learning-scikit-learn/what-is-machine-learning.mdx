@@ -79,6 +79,7 @@ algorithm produces the **rules**, a thing we call a **model**.
 <Figure
   slug="ml-what-is-machine-learning-traditional-programming-supply-inline-cutout"
   alt="A figure writing rule cards by hand and feeding them into a machine that follows them"
+  caption="In ordinary programming you write the rules and the machine follows them."
 />
 
 ```mermaid
@@ -238,7 +239,7 @@ print(f"It correctly identified {accuracy:.0%} of brand-new penguins.")
 />
 
 Look at what just happened. You did not write a single rule about bills or
-flippers. You loaded examples, called `fit`, and the model worked out, on
+flippers. You loaded examples, called `fit()`, and the model worked out, on
 its own, how to separate three species from four numbers, then proved it on
 penguins held back from training. That is machine learning in a few lines,
 and the shape is identical to what you saw on the welcome page: **load,
@@ -361,6 +362,7 @@ problems are better solved without it.
 <Figure
   slug="ml-what-is-machine-learning-machine-learning-supply-inline-cutout"
   alt="A tray of worked examples fed into a machine that writes its own rule card"
+  caption="In machine learning you supply the examples and the rules come back out."
 />
 
 - **When a simple rule works.** If "block emails from this exact address"
@@ -424,10 +426,10 @@ not the specific model; it is that the *shape* is always the same.
 \`X\` (four body measurements) and labels \`y\` (species) are prepared for
 you. Walk the same load-split-train-evaluate shape you saw above.
 
-1. Split \`X\` and \`y\` with \`train_test_split\` using \`test_size=0.25\`
+1. Split \`X\` and \`y\` with \`train_test_split()\` using \`test_size=0.25\`
    and \`random_state=0\`. Name the four results
    \`X_train, X_test, y_train, y_test\` (in that order).
-2. Create a \`KNeighborsClassifier(n_neighbors=5)\` and \`fit\` it on the
+2. Create a \`KNeighborsClassifier(n_neighbors=5)\` and \`fit()\` it on the
    **training** set. Store the fitted model in \`model\`.
 3. Measure accuracy on the **test** set with \`model.score(...)\` and store
    the number in \`accuracy\`.
@@ -525,13 +527,13 @@ The defining move is replacing hand-written rules with rules learned from data.`
   markdown={`In scikit-learn, what does \`model.fit(X_train, y_train)\` do?
 
 - It splits the data into training and test sets
-  > Splitting data is done with \`train_test_split\` before training begins. \`model.fit\` operates on the training portion that has already been separated.
+  > Splitting data is done with \`train_test_split()\` before training begins. \`model.fit\` operates on the training portion that has already been separated.
 - It measures the model's accuracy on a test set
-  > Measuring accuracy is done with \`model.score(X_test, y_test)\` after training. The \`fit\` method is the training step, not the evaluation step.
+  > Measuring accuracy is done with \`model.score(X_test, y_test)\` after training. The \`fit()\` method is the training step, not the evaluation step.
 - It makes predictions on new, unseen data
-  > Predictions on new data are made with \`model.predict(X_new)\`, not \`fit\`. The \`fit\` call adjusts the model's internal parameters using labeled training examples.
+  > Predictions on new data are made with \`model.predict(X_new)\`, not \`fit()\`. The \`fit()\` call adjusts the model's internal parameters using labeled training examples.
 - [o] It trains the model, adjusting its internal parameters so it captures the relationship between the features \`X_train\` and the answers \`y_train\`
-  > \`fit\` is the training step. It shows the model the examples and their answers and tunes the model's internal knobs to fit that relationship.
+  > \`fit()\` is the training step. It shows the model the examples and their answers and tunes the model's internal knobs to fit that relationship.
 
 Training (fit) happens first; prediction and scoring come afterward, using the fitted model.`}
 />
@@ -574,11 +576,11 @@ Machine learning shines when rules are too complex to write by hand, not when a 
 - The raw dataset of examples used to train it
   > The dataset is the *input* to the training process, not its output. A model is what the algorithm produces by learning from that data.
 - The Python library, such as scikit-learn, that you import
-  > scikit-learn is the tool you use to build and train models, not a model itself. A model is the learned object produced by calling \`fit\` on a particular algorithm.
+  > scikit-learn is the tool you use to build and train models, not a model itself. A model is the learned object produced by calling \`fit()\` on a particular algorithm.
 - The accuracy score the model achieves on the test set
   > Accuracy is a metric used to *evaluate* a model, not the model itself. A model is the learned function that produces predictions; the accuracy score is how well those predictions match the truth.
 
-A model is what training produces; you then call \`predict\` on it to get answers for new data.`}
+A model is what training produces; you then call \`predict()\` on it to get answers for new data.`}
 />
 
 <MultipleChoice

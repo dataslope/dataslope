@@ -25,7 +25,7 @@ once and for all.
 
 `List.contains(x)`, `List.indexOf(x)`, `List.remove(x)`,
 `Set.contains(x)`, `Set.add(x)`, `Map.containsKey(k)`, `Map.get(k)`,
-all of them, under the hood, call `equals` to compare candidates.
+all of them, under the hood, call `equals()` to compare candidates.
 
 `==` compares **identity** (same object in memory). `.equals` compares
 **value** (logically the same thing). For a sane container,
@@ -62,6 +62,7 @@ fortieth key, at four percent full.
 <Figure
   slug="jcol-equality-and-hashing-hashcode-inline-cutout"
   alt="A block dropped into a mixing machine whose chute swings to one of several bins"
+  caption="`hashCode()` decides the bucket; `equals()` settles who is already in it."
 />
 
 <Chart slug="hash-collision-birthday" />
@@ -91,7 +92,7 @@ So a hash collection's lookup is two steps:
 2. `equals()` → which candidate in that bucket is *actually* the
    target
 
-If `hashCode` lies, say, returns a different value for two objects
+If `hashCode()` lies, say, returns a different value for two objects
 that are `.equals`, the second step never even runs, because the
 collection looks in the wrong bucket and concludes "not present."
 
@@ -107,7 +108,7 @@ internalizing.
 | **Transitive** | If `x.equals(y)` and `y.equals(z)`, then `x.equals(z)` |
 | **Consistent** | Repeated calls return the same answer if neither object changes |
 | **`x.equals(null)` is false** | Never throw, just return `false` |
-| **`equals` implies same `hashCode`** | If `x.equals(y)`, then `x.hashCode() == y.hashCode()` |
+| **`equals()` implies same `hashCode()`** | If `x.equals(y)`, then `x.hashCode() == y.hashCode()` |
 
 That last rule is the one people get wrong, with painful consequences
 inside hash-based collections.
@@ -160,11 +161,11 @@ public class Main {
 
 Run that. The set says `false`. Why? Because `Point` inherited
 `Object.hashCode`, which is essentially the object's memory address.
-Two `Point(1,2)`s are equal by `.equals`, but their `hashCode`s are
+Two `Point(1,2)`s are equal by `.equals`, but their `hashCode()`s are
 different, so the second one lands in a different bucket, and the
 set never even reaches the `.equals` step.
 
-**Whenever you override `equals`, override `hashCode`.** Always.
+**Whenever you override `equals()`, override `hashCode()`.** Always.
 
 ## The fix
 
@@ -229,8 +230,8 @@ and clear, which is what almost every domain class needs.
 
 ## Records: the modern shortcut
 
-Java 16+ has **records**, which generate a correct `equals`,
-`hashCode`, and `toString` for you. For value-like data, prefer them:
+Java 16+ has **records**, which generate a correct `equals()`,
+`hashCode()`, and `toString` for you. For value-like data, prefer them:
 
 ```java
 import java.util.HashSet;
@@ -253,19 +254,19 @@ public class Main {
 <Callout type="info" title="Not runnable in the browser">
 Records arrived in Java 16 and the playground on these pages runs Java 8, so
 `javac` here reports `cannot find symbol: class record`. Writing the class out
-by hand would defeat the example (not writing `equals` and `hashCode` yourself
+by hand would defeat the example (not writing `equals()` and `hashCode()` yourself
 is the entire point of it), so this one is shown rather than run. Compare it
 with the hand-written `Point` further up the page, which does run.
 </Callout>
 
-Records were added partly *because* getting `equals`/`hashCode` right
+Records were added partly *because* getting `equals()`/`hashCode()` right
 by hand is such a constant source of bugs.
 
 ## Mutable keys: the other classic disaster
 
 A hash-based collection assumes that its keys' hashcodes do not
 change while they are in the collection. If you mutate a field that
-participates in `hashCode`, the element becomes "lost", it is still
+participates in `hashCode()`, the element becomes "lost", it is still
 there, but the collection looks for it in the wrong bucket.
 
 <CodeBlock
@@ -308,12 +309,12 @@ public class Main {
 
 **Rule:** anything you put in a `HashSet` or use as a `HashMap` key
 should be **immutable** (or at least, you must not change the fields
-that contribute to `equals` / `hashCode`).
+that contribute to `equals()` / `hashCode()`).
 
 ## The other contract: equals consistency with Comparable
 
-Hash-based collections care about `equals`/`hashCode`. *Sorted*
-collections (`TreeSet`, `TreeMap`) care about `compareTo`. The
+Hash-based collections care about `equals()`/`hashCode()`. *Sorted*
+collections (`TreeSet`, `TreeMap`) care about `compareTo()`. The
 strongly recommended rule is:
 
 > If `x.compareTo(y) == 0`, then `x.equals(y)` should be true.
@@ -325,16 +326,18 @@ a `HashSet` for the same data, almost always a bug. We'll meet
 <Figure
   slug="jcol-equality-and-hashing-collections-actually-do-inline-cutout"
   alt="Two identical-looking blocks held up to a gauge that reads them as the same before either is filed"
+  caption="A collection asks whether two elements are equal before it stores either."
 />
 
 ## A multi-file challenge: a uniqueness service
 
-This is one of the most common real uses of `equals`/`hashCode`: a
+This is one of the most common real uses of `equals()`/`hashCode()`: a
 "have I seen this before?" service.
 
 <Figure
   slug="jcol-equality-and-hashing-inline-cutout"
   alt="Two identical-looking blocks on a balance that reads level, and beneath them a sorting machine dropping both into the same one of several bins"
+  caption="Equal objects must hash alike, or the set will hold both copies."
 />
 
 <ChallengeCard
@@ -343,7 +346,7 @@ This is one of the most common real uses of `equals`/`hashCode`: a
   instructions={`Write a class \`Email\` that wraps a \`String\` address and a \`UniquenessTracker\` that uses a \`Set<Email>\` to detect duplicates.
 
 - \`Email\` is constructed from one \`String\`. Two \`Email\`s are equal if their addresses are equal **case-insensitively** ("Ada@x.com" equals "ada@x.com").
-- The \`hashCode\` must agree, use the *lowercased* address.
+- The \`hashCode()\` must agree, use the *lowercased* address.
 - \`UniquenessTracker\` has \`boolean register(Email e)\` returning \`true\` on the first time the email is seen and \`false\` afterward.
 
 Expected output:
@@ -449,16 +452,16 @@ public class UniquenessTracker {
 ## Test your understanding
 
 <MultipleChoice
-  markdown={`What goes wrong if you override \`equals\` but not \`hashCode\`?
+  markdown={`What goes wrong if you override \`equals()\` but not \`hashCode()\`?
 
 - All collections stop working
   > Most things still work; the bug is specific to hash-based collections.
-- \`equals\` calls go into infinite recursion
+- \`equals()\` calls go into infinite recursion
   > They don't.
 - The code fails to compile
   > It compiles fine.
 - [o] Hash-based collections (\`HashSet\`, \`HashMap\`) can fail to find equal objects because they look in the wrong bucket
-  > The lookup uses \`hashCode\` to choose a bucket, so unequal hashcodes for equal values mean the element is invisible to lookup.`}
+  > The lookup uses \`hashCode()\` to choose a bucket, so unequal hashcodes for equal values mean the element is invisible to lookup.`}
 />
 
 <MultipleChoice
@@ -470,12 +473,12 @@ public class UniquenessTracker {
   > They don't.
 - \`HashMap\` deep-copies keys, so the cost is performance
   > \`HashMap\` does not deep-copy.
-- [o] If a field that participates in \`hashCode\` changes while the object is a key, the entry becomes unreachable
+- [o] If a field that participates in \`hashCode()\` changes while the object is a key, the entry becomes unreachable
   > The map indexed it in a bucket computed from the old hash; after mutation, it looks in a different bucket and reports "not present."`}
 />
 
 <MultipleChoice
-  markdown={`What's the cleanest modern way to get a correct \`equals\` / \`hashCode\` for a small immutable value type?
+  markdown={`What's the cleanest modern way to get a correct \`equals()\` / \`hashCode()\` for a small immutable value type?
 
 - Inherit them from \`Object\`
   > That gives identity equality, which is rarely what you want.
@@ -484,5 +487,5 @@ public class UniquenessTracker {
 - Implement \`Comparable\`
   > \`Comparable\` is about ordering, not value equality.
 - [o] Declare the class as a \`record\`
-  > Records automatically generate \`equals\`, \`hashCode\`, and \`toString\` from the components.`}
+  > Records automatically generate \`equals()\`, \`hashCode()\`, and \`toString\` from the components.`}
 />

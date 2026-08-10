@@ -135,6 +135,7 @@ see the value.
 <Figure
   slug="rlang-variables-and-assignment-inline-cutout"
   alt="A labelled tag being tied to a block on a bench, and the same tag later moved to a different block"
+  caption="Assignment ties a name to a value and prints nothing at all."
 />
 
 <CodeBlock
@@ -182,7 +183,7 @@ print(count)
 Notice the line `count <- count + 1`. This is **not** a math
 equation (which would be nonsense, no number equals itself plus
 one). It is a *command*: "compute `count + 1`, then store the
-result back into `count`." The right side is evaluated first, the
+result back into `count()`." The right side is evaluated first, the
 left side receives the result. This pattern shows up constantly.
 
 ## What a "value" really is
@@ -197,6 +198,7 @@ When you write `x <- c(1, 2, 3)`, R does three things:
 <Figure
   slug="rlang-variables-and-assignment-not-inline-cutout"
   alt="A tag being tied onto a block by a hooked tool that only works in one direction"
+  caption="The arrow points one way: the value on the right, the name on the left."
 />
 
 When you later write `x + 1`, R:
@@ -291,7 +293,7 @@ scripts it can be useful for cleaning up.
 ## Test your understanding
 
 <MultipleChoice
-  markdown={`Which line of R **assigns** the value 7 to a variable called \`count\`?
+  markdown={`Which line of R **assigns** the value 7 to a variable called \`count()\`?
 
 - \`count ~ 7\`
   > \`~\` is used in model formulas, not for assignment.

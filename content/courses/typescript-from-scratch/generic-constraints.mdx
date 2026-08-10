@@ -27,6 +27,7 @@ The compiler doesn't know if `T` has a `length` property. For all it knows, `T` 
 <Figure
   slug="tsx-generic-constraints-inline-cutout"
   alt="An adjustable slot that widens to take many shapes but stops at a fixed limit, one oversized shape resting outside it"
+  caption="A constraint widens the slot to many types while still ruling some out."
 />
 
 The solution: **constrain** `T` to types that *do* have a `length` property.
@@ -76,6 +77,7 @@ One of the most useful constraints is `keyof`, which gives you the union of all 
 <Figure
   slug="tsx-generic-constraints-keyof-operator-inline-cutout"
   alt="A crate's set of compartment tags lifted off as a separate ring of keys"
+  caption="`keyof` lifts a type's property names out as a union you can constrain against."
 />
 
 <CodeBlock
@@ -152,6 +154,7 @@ Sometimes you want a type parameter to have a **default** value if the caller do
 <Figure
   slug="tsx-generic-constraints-default-type-parameters-inline-cutout"
   alt="An adjustable socket resting at a marked default position until it is set otherwise"
+  caption="A default type parameter is used until the caller names a different one."
 />
 
 <CodeBlock

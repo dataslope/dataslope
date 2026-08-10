@@ -80,6 +80,7 @@ loop takes a moment; the quadratic loop is hopeless.
 <Figure
   slug="cpp-algorithms-intuition-counting-code-inline-cutout"
   alt="A belt with a counter dial beside it clicking once for every block that passes"
+  caption="Counting the operations is how you compare two approaches before running them."
 />
 
 ## The standard algorithms
@@ -124,7 +125,7 @@ int main() {
 
 A few rules of thumb:
 
-- `std::sort` is **O(n log n)**, your default sorting tool.
+- `std::sort()` is **O(n log n)**, your default sorting tool.
 - `std::find`, `std::count`, `std::accumulate` are **linear**.
 - `std::lower_bound`, `std::upper_bound`, `std::binary_search`
   require a *sorted* range and are **logarithmic**.
@@ -150,6 +151,7 @@ that the cost is a deliberate choice.
 <Figure
   slug="cpp-algorithms-intuition-working-mental-model-inline-cutout"
   alt="Three ramps of different steepness rising from one start, a cart on each having travelled very different distances"
+  caption="The steeper cost curve overtakes the gentler one as the input grows."
 />
 
 ```mermaid
@@ -179,7 +181,7 @@ The right discipline:
 <ChallengeCard
   adapter="cpp"
   title="Sort and median"
-  instructions={`Given a hard-coded vector of 7 integers, sort it ascending and print the median (middle element). Use \`std::sort\`. Expected output for \`{8, 1, 6, 4, 2, 9, 3}\` is \`4\`.`}
+  instructions={`Given a hard-coded vector of 7 integers, sort it ascending and print the median (middle element). Use \`std::sort()\`. Expected output for \`{8, 1, 6, 4, 2, 9, 3}\` is \`4\`.`}
   files={[
     {
       filename: "main.cpp",

@@ -201,6 +201,7 @@ realistic stress test. At full opacity the cloud is a solid blob; at
 <Figure
   slug="viz-scatter-plots-use-scatter-plot-inline-cutout"
   alt="Two columns of chips pinned against each other on a board, a loose upward drift emerging"
+  caption="A scatter plot is for the relationship between two numeric columns."
 />
 
 <CodeBlock
@@ -248,13 +249,14 @@ is nothing to fit:
 
 Drawing a scatter plot with one *categorical* axis is usually not
 what you want, it produces tall stacks of dots above each category
-label. Use a **strip plot** (`px.strip`), **violin plot**
-(`px.violin`), or **box plot** (`px.box`) instead, we'll cover
+label. Use a **strip plot** (`px.strip()`), **violin plot**
+(`px.violin()`), or **box plot** (`px.box()`) instead, we'll cover
 boxes next.
 
 <Figure
   slug="viz-scatter-plots-inline-cutout"
   alt="A plain board with chips pinned at different heights and distances, forming a loose upward drift from left to right"
+  caption="One dot per row, and the drift between them is the pattern you came for."
 />
 
 The other one is quieter and harder to undo: plotting a
@@ -271,7 +273,7 @@ individuals.
   title="Scatter flipper length vs body mass"
   instructions={`The \`penguins\` DataFrame is loaded. Make a scatter plot that shows the relationship between flipper length and body mass, colored by species.
 
-1. Use \`px.scatter\` with \`x="flipper_length_mm"\` and \`y="body_mass_g"\`.
+1. Use \`px.scatter()\` with \`x="flipper_length_mm"\` and \`y="body_mass_g"\`.
 2. Color the points by \`species\`.
 3. Use \`template="simple_white"\`.
 

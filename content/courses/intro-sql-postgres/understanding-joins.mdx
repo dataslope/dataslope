@@ -75,6 +75,7 @@ states which rows belong together.
 <Figure
   slug="sql-understanding-joins-question-join-answers-inline-cutout"
   alt="Two separate boards on a bench with a single question card held between them"
+  caption="A join answers a question that needs both tables at once."
 />
 
 ## Table aliases keep joins readable
@@ -110,6 +111,7 @@ would be unreadable otherwise.
 <Figure
   slug="sql-understanding-joins-inline-cutout"
   alt="Two overlapping grids on a light table, the overlapping region lit and the outer regions dimmed, with a small selector dial beside them"
+  caption="Aliases keep a join readable once three or four tables are involved."
 />
 
 <Callout type="info" title="Why prefix columns at all?">
@@ -138,7 +140,7 @@ efficient way to perform it. But this "keep the matching pairs"
 picture is exactly what a join means.
 
 Matching is also how joins surprise people. If a key repeats on both
-sides, the result has more rows than either input, and any `SUM` over it
+sides, the result has more rows than either input, and any `SUM()` over it
 is quietly wrong.
 
 <Chart slug="join-fanout-rows" />

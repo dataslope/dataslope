@@ -18,6 +18,7 @@ key, the whole key, and nothing but the key.
 <Figure
   slug="db-third-normal-form-transitive-dependency-problem-inline-cutout"
   alt="A chain of three cards where the third hangs off the second rather than off the first, the second being lifted out with it"
+  caption="When a column depends on another non-key column, both belong somewhere else."
 />
 
 ## The transitive dependency problem
@@ -265,6 +266,7 @@ textbook.
 <Figure
   slug="db-third-normal-form-inline-cutout"
   alt="A table where one column is found to depend on another column rather than on the key, and is lifted out to its own table"
+  caption="The dependent pair moves out to its own table, keyed by what it depends on."
 />
 
 The practical takeaway: if every table you design keeps each non-key

@@ -12,7 +12,7 @@ and responds, all without leaving the page.
   alt="JavaScript: forms and validation, an isometric illustration"
 />
 
-## The submit event and `preventDefault`
+## The submit event and `preventDefault()`
 
 By default, submitting a form reloads the page (a holdover from the
 1990s, when the server did everything). In a modern app you almost
@@ -109,12 +109,13 @@ of form validation.
 
 Attributes like `required`, `type="email"`, `minlength`, and `min`/`max`
 make the browser validate before your JavaScript even runs. Use them
-as the first line of defense, then layer JS on top for custom rules
+as the first line of defense, then layer JavaScript on top for custom rules
 and friendlier messages.
 
 <Figure
   slug="web-js-forms-and-validation-inline-cutout"
   alt="A filled slip passing a gate that stops it and marks one field, the corrected slip passing on the second attempt"
+  caption="Validation stops the submission and says which field needs fixing."
 />
 
 ## Challenge

@@ -1,6 +1,6 @@
 ---
 title: Conditional Rendering
-description: Showing different UI for different state, with if, the ternary, and the && operator, plus rendering nothing.
+description: Showing a different view for different state, with if, the ternary, and the && operator, plus rendering nothing.
 ---
 
 A component often needs to show **different things** depending on its
@@ -135,11 +135,13 @@ everywhere in React, especially in data fetching, where `loading` and
 <Figure
   slug="rx-conditional-rendering-choosing-between-two-inline-cutout"
   alt="A two-position switch with a different prepared panel mounted at each position"
+  caption="A condition decides which of two prepared views is the one rendered."
 />
 
 <Figure
   slug="rx-conditional-rendering-inline-cutout"
   alt="A switch on a panel with two prepared blocks beside it, only the block matching the switch's position mounted in the frame"
+  caption="Only the matching branch is mounted; the other is never put on the page."
 />
 
 ## Challenge

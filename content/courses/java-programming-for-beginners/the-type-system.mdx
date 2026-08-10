@@ -215,6 +215,7 @@ beginners often think of it as primitive. Worth knowing:
 <Figure
   slug="java-the-type-system-java-s-primitive-inline-cutout"
   alt="Eight small blocks of clearly different sizes resting in recesses cut exactly to each"
+  caption="The eight primitives are values themselves, not references to anything."
 />
 
 > **Never** use `==` to compare strings. `==` compares references
@@ -252,6 +253,7 @@ yell at me about types when Python just runs the program?"
 <Figure
   slug="java-the-type-system-inline-cutout"
   alt="A rack of shaped sockets with each block held above the only socket it fits, one block hovering with no socket to match it"
+  caption="Every value has a declared type, and the compiler checks it before you run."
 />
 
 Because Java is doing free debugging on your behalf. Every type
@@ -281,7 +283,7 @@ compiler can see and check it.
   markdown={`Which of these comparisons of two \`String\` values is *correct* for checking that their contents are the same?
 
 - [o] \`a.equals(b)\`
-  > \`equals\` on String compares the actual character contents.
+  > \`equals()\` on String compares the actual character contents.
 - \`a.compareTo(b) == 1\`
   > That is true only for a specific ordering, not equality.
 - \`a + b\`

@@ -20,6 +20,7 @@ and you are holding the result.
 <Figure
   slug="pl-what-is-an-expression-recipe-not-result-inline-cutout"
   alt="A recipe card clipped to a rail above an untouched column, the column exactly as it was"
+  caption="An expression describes a change; nothing has happened to the column yet."
 />
 
 In Polars, `pl.col("a") * 2` does none of that. It builds an object
@@ -91,7 +92,7 @@ print(
   ]}
 />
 
-Notice what happened to `mean`. It produced one value, but the
+Notice what happened to `mean()`. It produced one value, but the
 output has four rows, so Polars *broadcast* it: a length-1 result is
 repeated to match the frame. That rule is worth remembering, because
 it is what makes "compare each row to the column average" a one-liner.
@@ -106,7 +107,7 @@ it is what makes "compare each row to the column average" a one-liner.
 | `pl.lit(3)` | a constant value |
 | `pl.len()` | the number of rows |
 
-`pl.col` is the one you will type most. It also takes a regex or a
+`pl.col()` is the one you will type most. It also takes a regex or a
 dtype:
 
 <CodeBlock
@@ -139,7 +140,7 @@ print(df.select(pl.col(pl.Int64)))
 
 ## One expression, many columns
 
-An expression that starts with `pl.all()` or a multi-column `pl.col`
+An expression that starts with `pl.all()` or a multi-column `pl.col()`
 is applied to each matching column independently. This is where
 Polars starts saving you real typing.
 
@@ -209,6 +210,7 @@ library of them.
 <Figure
   slug="pl-what-is-an-expression-inline-cutout"
   alt="A small recipe card clipped to a rail that describes a change, held above a column it has not yet touched"
+  caption="Because it is an ordinary object, an expression can be stored and reused."
 />
 
 <CodeBlock
@@ -323,12 +325,12 @@ assert out.height == 344, out.height`,
 <MultipleChoice
   markdown={`\`df.select(pl.col("mass").min(), pl.col("mass").max())\` raises an error. Why?
 
-- \`select\` accepts only one expression at a time
-  > \`select\` takes any number of expressions; passing several is the normal way to build a summary row.
-- \`min\` and \`max\` cannot be computed in the same pass over the data
+- \`select()\` accepts only one expression at a time
+  > \`select()\` takes any number of expressions; passing several is the normal way to build a summary row.
+- \`min()\` and \`max()\` cannot be computed in the same pass over the data
   > Both are ordinary aggregations and Polars is happy to compute them together, in parallel.
 - [o] Both expressions inherit the name \`mass\`, and two output columns cannot share a name
-  > Give at least one of them an \`alias\`, or use \`.name.suffix\` to rename them together.
+  > Give at least one of them an \`alias()\`, or use \`.name.suffix\` to rename them together.
 - The frame has only one column, so it cannot produce a two-column result
   > A one-column frame can produce as many output columns as you write expressions for; width in equals width out is not a rule.
 
@@ -341,7 +343,7 @@ An expression keeps its source column's name until you say otherwise.`}
 - It runs faster, because functions returning expressions skip the query planner
   > Every expression goes through the same planner. The value is in reuse and testability, not in bypassing anything.
 - It is the only way to apply a computation to more than one column
-  > Multi-column work is done with \`pl.all()\` or a multi-column \`pl.col\`, with no helper function required.
+  > Multi-column work is done with \`pl.all()\` or a multi-column \`pl.col()\`, with no helper function required.
 - [o] The same rule can be applied to any frame, kept in one place, and tested on its own
   > A function taking and returning frames couples the rule to one table's shape; an expression factory does not.
 - It avoids reading the data twice when the rule is used in two places
@@ -354,7 +356,7 @@ Business rules as expression factories is the pattern that scales a Polars codeb
   markdown={`In \`df.select(pl.col("mass"), pl.col("mass").mean().alias("avg"))\` on a four-row frame, what shape is the result?
 
 - One row, because an aggregation reduces the frame to a single row
-  > Aggregating inside \`select\` alongside a full-length column does not collapse the other column; it broadcasts instead.
+  > Aggregating inside \`select()\` alongside a full-length column does not collapse the other column; it broadcasts instead.
 - An error, because a four-row column and a one-row aggregation cannot be combined
   > Combining them is explicitly supported: a length-1 result is broadcast to the frame's height.
 - Four rows, but \`avg\` holds the value in row 0 and nulls below

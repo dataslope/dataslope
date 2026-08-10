@@ -85,6 +85,7 @@ A group is a bucket of rows that share the same grouped value. If the table has 
 <Figure
   slug="lite-grouping-data-big-idea-split-inline-cutout"
   alt="A scatter of chips raked into three trays and each tray pressed into one block"
+  caption="Grouping collapses the rows in each bucket down to one row each."
 />
 
 <SqlCodeBlock
@@ -168,7 +169,7 @@ Some databases reject ungrouped columns immediately. SQLite may allow them in so
 
 ## Grouping and summing
 
-`GROUP BY` is often paired with `SUM` for category totals.
+`GROUP BY` is often paired with `SUM()` for category totals.
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -204,6 +205,7 @@ You can group by multiple columns. The group becomes each unique combination of 
 <Figure
   slug="lite-grouping-data-inline-cutout"
   alt="Chips raked into three trays by colour, with one small counter standing on each tray"
+  caption="Group by two columns and the buckets become every combination of the pair."
 />
 
 For example, `GROUP BY region, year` means:

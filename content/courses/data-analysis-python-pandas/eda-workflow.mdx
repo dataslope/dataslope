@@ -1,5 +1,5 @@
 ---
-title: The EDA Workflow
+title: The Exploratory Data Analysis Workflow
 description: A repeatable, opinionated approach to getting to know a new dataset, and why every analyst needs one.
 ---
 
@@ -28,7 +28,7 @@ next one trustworthy:
 
 Only *then* can you ask real questions with confidence.
 
-Without this scaffolding, beginners jump straight to `groupby`
+Without this scaffolding, beginners jump straight to `groupby()`
 and chart-making, only to realize halfway through that one
 column was actually full of garbage.
 
@@ -70,6 +70,7 @@ Questions to answer:
 <Figure
   slug="pandas-eda-workflow-step-1-shape-inline-cutout"
   alt="A crate measured by a caliper across and down before anything is taken out of it"
+  caption="Start by measuring the table: how many rows, how many columns, of what type."
 />
 
 ## Step 2, Eyeball the data
@@ -193,11 +194,13 @@ the same thing*.
 <Figure
   slug="pandas-eda-workflow-workflow-inline-cutout"
   alt="A ring of four benches with one tray travelling round it, returning to where it started changed"
+  caption="Exploration is a loop: look, ask, check, and look again at what changed."
 />
 
 <Figure
   slug="pandas-eda-workflow-inline-cutout"
   alt="Four benches arranged in a ring, a tray moving from look to question to check and back to look"
+  caption="Each pass round the loop turns one question into the next one worth asking."
 />
 
 For categorical-vs-numeric relationships, group:
@@ -236,13 +239,13 @@ You'll learn new things about the dataset every time you touch
 it. Your notes should grow over the life of the project.
 </Callout>
 
-## An EDA checklist
+## An exploratory checklist
 
 1. Shape and dtypes
 2. `head` / sample
 3. Missing values
-4. Numeric `describe`
-5. Categorical `value_counts`
+4. Numeric `describe()`
+5. Categorical `value_counts()`
 6. Correlations / group summaries
 7. Write notes
 8. Now ask your real questions
@@ -272,11 +275,11 @@ EDA is what separates a credible analyst from a calculator.`}
 - [o] head shows only the top rows, random sampling reveals issues that may only occur in middle or end of the file
   > Time-series files in particular often have format drift over time.
 - It returns sorted rows
-  > \`df.sample\` returns rows in an unpredictable order by design; \`df.head\` returns rows in their original order. Neither sorts.
+  > \`df.sample()\` returns rows in an unpredictable order by design; \`df.head()\` returns rows in their original order. Neither sorts.
 - It uses less memory
   > Both calls return a small slice of the DataFrame; neither significantly reduces memory use during an EDA session.
 - It is faster
-  > \`df.sample\` and \`df.head\` are both near-instant on most datasets; speed is not a meaningful distinction between them.
+  > \`df.sample()\` and \`df.head()\` are both near-instant on most datasets; speed is not a meaningful distinction between them.
 
 A random peek at the data is a small habit with outsized payoff.`}
 />

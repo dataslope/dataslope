@@ -117,7 +117,7 @@ honest map of the territory ahead.
 
 You have met linear models, trees, nearest neighbors, and random forests.
 The classical toolbox has more, and you can now pick them up quickly because
-they all obey the same `fit`/`predict` shape and the same evaluation
+they all obey the same `fit()`/`predict()` shape and the same evaluation
 discipline you already know.
 
 - **Gradient boosting** (`GradientBoostingClassifier`, and libraries like
@@ -134,7 +134,7 @@ discipline you already know.
 Every model above plugs into exactly the workflow you already know: split,
 baseline, pipeline, cross-validate, tune, test once, interpret. When you
 meet a new algorithm, you are not starting over, you are slotting one new
-\`fit\`/\`predict\` object into machinery you have already mastered. That is
+\`fit()\`/\`predict()\` object into machinery you have already mastered. That is
 the payoff of learning foundations first.
 </Callout>
 
@@ -360,7 +360,7 @@ Generalization is the compass the entire course kept returning to.`}
   > Every flexible model can overfit, and gradient boosting very much can, so the bias-variance tradeoff still applies.
 - It makes baselines and cross-validation unnecessary because it is more advanced
   > A more powerful model does not remove the need for a baseline or cross-validation; those remain essential for judging whether it actually helps.
-- [o] It plugs into the same \`fit\`/\`predict\` shape and the same split-baseline-pipeline-cross-validate-test workflow you already know
+- [o] It plugs into the same \`fit()\`/\`predict()\` shape and the same split-baseline-pipeline-cross-validate-test workflow you already know
   > New classical models share scikit-learn's interface and obey the same evaluation discipline, so learning one is mostly slotting a new estimator into familiar machinery.
 - It requires abandoning the train/test discipline you learned
   > Honest evaluation applies to every supervised model, including gradient boosting; nothing about it suspends the need for a sealed test set.

@@ -51,12 +51,13 @@ print(penguins.select(cs.ends_with("_mm")).columns)
 
 ## They combine with set operations
 
-This is the part `pl.col` cannot do. Selectors support union,
+This is the part `pl.col()` cannot do. Selectors support union,
 intersection, difference, and complement.
 
 <Figure
   slug="pl-selectors-they-combine-set-inline-cutout"
   alt="Two perforated plates laid one on top of the other over a board of blocks, only the blocks visible through holes in both plates being lifted out"
+  caption="Selectors combine like sets, so two rules can be intersected or subtracted."
 />
 
 | Operator | Meaning |
@@ -104,6 +105,7 @@ applies to it. Methods chain onto it and apply to each matched column.
 <Figure
   slug="pl-selectors-inline-cutout"
   alt="A wide board with a template laid over it that picks out every column of one kind at once"
+  caption="A selector picks every column of one kind without you listing them."
 />
 
 <CodeBlock
@@ -277,7 +279,7 @@ assert "mass_kg" in probe.columns, probe.columns`,
 - An error, because selectors cannot be combined with operators
   > Combining is the main reason selectors exist; union, intersection, difference, and complement are all supported.
 - [o] A selector matching every numeric column except \`year\`
-  > The set operators are what \`pl.col\` cannot do, and this difference is the most common of them.
+  > The set operators are what \`pl.col()\` cannot do, and this difference is the most common of them.
 - The columns that are numeric in one frame and named \`year\` in another
   > Selectors describe columns within a single frame; no second frame is involved.
 
@@ -289,7 +291,7 @@ An ID that happens to be numeric is the usual reason you need this.`}
 
 - Selectors are evaluated faster than a list of column names
   > Both resolve to the same set of columns before execution; there is no measurable difference in speed.
-- A list of names cannot be passed to \`select\` at all
+- A list of names cannot be passed to \`select()\` at all
   > Lists of names are perfectly valid; the argument for selectors is about maintenance, not legality.
 - [o] The code stays correct when a column is added, renamed, or retyped
   > A hard-coded list silently omits a new column, which is a wrong answer rather than an error.

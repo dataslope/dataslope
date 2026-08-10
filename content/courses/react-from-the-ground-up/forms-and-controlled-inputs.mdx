@@ -53,8 +53,8 @@ createRoot(document.getElementById("root")!).render(<NameEcho />);
 
 Because `value` is bound to state, the input can never show something
 your state doesn't know about. Want to clear the field? Set the state
-to `""`. Want to pre-fill it? Set the initial state. The UI follows the
-data, exactly as before.
+to `""`. Want to pre-fill it? Set the initial state. The interface follows
+the data, exactly as before.
 
 Type in the live input below: the heading, the echo, and the character
 counter all read the *same* `text` state, so they can never disagree:
@@ -199,6 +199,7 @@ derived from the same two pieces of state:
 <Figure
   slug="rx-forms-and-controlled-inputs-inline-cutout"
   alt="A text slot on a panel joined by a short cord to a small holding box, the block inside the box and the block showing in the slot always the same one"
+  caption="In a controlled input the state and what is on screen are the same value."
 />
 
 ## Challenge

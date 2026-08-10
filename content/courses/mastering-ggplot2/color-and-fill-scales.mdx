@@ -25,6 +25,7 @@ interior:
 <Figure
   slug="gg-color-and-fill-scales-inline-cutout"
   alt="An outline shape with its edge inked one colour and its interior inked another, with two separate legend strips of graded swatches standing beside it"
+  caption="`color` inks the outline and `fill` inks the interior, with a legend for each."
 />
 
 Each has its own family of scales: `scale_color_*()` and
@@ -54,13 +55,14 @@ The single biggest fork: is the mapped variable **categorical** or
 <Figure
   slug="gg-color-and-fill-scales-discrete-vs-continuous-inline-cutout"
   alt="A strip of separate distinct swatches beside a strip grading smoothly from pale to deep"
+  caption="Categorical data wants distinct hues; continuous data wants a gradient."
 />
 
 The type of the variable mapped to color decides the kind of scale:
 
 | Variable mapped to color | Scale to use | Example |
 | --- | --- | --- |
-| Discrete / categorical | Qualitative palette (distinct hues) | `scale_color_brewer` |
+| Discrete / categorical | Qualitative palette (distinct hues) | `scale_color_brewer()` |
 | Continuous / numeric | Gradient (low-to-high lightness) | `scale_color_viridis_c` |
 
 ### Discrete: distinct hues for distinct categories
@@ -233,7 +235,7 @@ without a real midpoint invents a division that is not in the data.`}
   > The issue is the scale family, not mapping vs. setting.
 - [o] The bars use the \`fill\` aesthetic, so they are governed by \`scale_fill_*\`; a \`scale_color_*\` controls the unused outline aesthetic instead.
   > You must match the scale family to the aesthetic you mapped (\`fill\` here).
-- \`scale_color_brewer\` does not exist.
+- \`scale_color_brewer()\` does not exist.
   > It exists; it simply targets the wrong aesthetic here.
 - Brewer palettes do not work on bars.
   > Brewer palettes work on bars, via the *fill* scale.

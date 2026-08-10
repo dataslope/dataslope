@@ -1,6 +1,6 @@
 ---
 title: Binary Search Trees
-description: Learn the BST invariant, search, insertion, deletion, validation, and ordered C++ containers
+description: Learn the binary search tree invariant, search, insertion, deletion, validation, and ordered C++ containers
 ---
 
 Binary search on a sorted array is wonderful, until you need to *insert*. Adding one element to a sorted array means shifting everything after it: O(log n) lookups, O(n) updates. A linked list flips the trade: cheap splicing, but no way to jump to the middle, so no binary search. For decades-old reasons that still bite today, you often need both at once: a phone directory that takes new entries all day, a database index under constant writes.
@@ -35,6 +35,7 @@ At each node, compare the target with the current value and choose one branch.
 <Figure
   slug="dsa-binary-search-trees-search-inline-cutout"
   alt="A hand following one path down a branching frame, taking the left branch for smaller and the right for larger"
+  caption="Each comparison chooses a branch and discards the whole other side."
 />
 
 <CodeBlock
@@ -82,6 +83,7 @@ Insertion follows the same path as search, then attaches the new node at the fir
 <Figure
   slug="dsa-binary-search-trees-insert-inline-cutout"
   alt="A new block walked down a branching frame until it reaches an empty socket and clips in"
+  caption="Insertion follows the search path and clips in at the first empty slot."
 />
 
 ```mermaid
@@ -258,6 +260,7 @@ Every operation follows one root-to-leaf path, so cost is O(h), where `h` is hei
 <Figure
   slug="dsa-binary-search-trees-inline-cutout"
   alt="A branching frame where every left branch carries a smaller block and every right branch a larger one, a hand following one path down"
+  caption="Smaller left, larger right, at every node, is the whole invariant."
 />
 
 | Shape | Height | Operation cost |

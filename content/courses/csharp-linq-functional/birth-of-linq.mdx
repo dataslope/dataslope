@@ -3,8 +3,8 @@ title: Why LINQ Exists
 description: The imperative pain that made LINQ inevitable, the declarative idea behind it, and how Microsoft Research unified querying in C# 3.0
 ---
 
-Before we touch LINQ, we have to understand the *problem* LINQ
-solves. LINQ did not appear because Microsoft thought it would be
+Before we touch LINQ, language-integrated query, we have to understand
+the *problem* it solves. LINQ did not appear because Microsoft thought it would be
 elegant. It appeared because real codebases, millions of lines of
 object-oriented C# and C++ and Java, were drowning in a very
 specific style of bug that had nothing to do with algorithms. The
@@ -171,6 +171,7 @@ version is the same length as the English sentence.
 <Figure
   slug="cs-birth-of-linq-bad-gets-one-inline-cutout"
   alt="One small job buried inside a tall stack of scaffolding, the scaffolding far larger than the job"
+  caption="Written by hand, the plumbing dwarfs the question you were asking."
 />
 
 ## The declarative idea
@@ -189,6 +190,7 @@ declarative systems, possibly without noticing:
 <Figure
   slug="cs-birth-of-linq-shape-problem-inline-cutout"
   alt="The same awkward shape of hand-built machinery repeated on four benches, each built slightly differently"
+  caption="The same query, hand-rolled four times, comes out four different ways."
 />
 
 In both cases you describe *the shape of the answer* and the system
@@ -460,16 +462,16 @@ After that, we build the toolkit from first principles, starting
 with pure functions.
 
 <MultipleChoice
-  markdown={`Which language feature, introduced in C# 3.0 alongside LINQ, allows methods like \`Where\` and \`Select\` to *appear* to be members of \`IEnumerable<T>\` without actually modifying that interface?
+  markdown={`Which language feature, introduced in C# 3.0 alongside LINQ, allows methods like \`Where()\` and \`Select()\` to *appear* to be members of \`IEnumerable<T>\` without actually modifying that interface?
 
 - Expression trees
-  > Expression trees are what let LINQ to Providers translate lambdas into SQL, they are not how \`Where\` is attached to a collection.
+  > Expression trees are what let LINQ to Providers translate lambdas into SQL, they are not how \`Where()\` is attached to a collection.
 - Generics
-  > Generics shipped in C# 2.0 and let \`IEnumerable<T>\` exist, but they don't add \`Where\` to it as a callable method.
+  > Generics shipped in C# 2.0 and let \`IEnumerable<T>\` exist, but they don't add \`Where()\` to it as a callable method.
 - Anonymous types
-  > Anonymous types let you build ad-hoc shapes mid-pipeline, but they have nothing to do with how \`Where\` attaches to \`IEnumerable<T>\`.
+  > Anonymous types let you build ad-hoc shapes mid-pipeline, but they have nothing to do with how \`Where()\` attaches to \`IEnumerable<T>\`.
 - [o] Extension methods
-  > Extension methods let \`Enumerable.Where(this IEnumerable<T> source, …)\` be invoked as if \`Where\` were a member of \`IEnumerable<T>\`, even though the interface itself is untouched.
+  > Extension methods let \`Enumerable.Where(this IEnumerable<T> source, …)\` be invoked as if \`Where()\` were a member of \`IEnumerable<T>\`, even though the interface itself is untouched.
 
 Extension methods are the trick. \`Enumerable.Where\` is a static method
 on the \`Enumerable\` class; the \`this\` modifier on its first parameter

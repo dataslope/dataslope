@@ -37,6 +37,7 @@ It catches the case where last month's export gained a column.
 <Figure
   slug="pl-concatenating-frames-vertical-more-rows-inline-cutout"
   alt="Two boards of equal width stacked one onto the other, the join line barely visible"
+  caption="Vertical concat needs identical schemas, and that strictness catches drift."
 />
 
 <CodeBlock
@@ -116,6 +117,7 @@ not as a way to avoid thinking about them.
 <Figure
   slug="pl-concatenating-frames-relaxed-strategies-inline-cutout"
   alt="Two boards of slightly different column widths brought together, a small collar fitted where they do not match"
+  caption="The relaxed strategies fill the gaps where the two schemas do not line up."
 />
 
 ## Horizontal: more columns
@@ -193,13 +195,14 @@ print("rows:", year.height, "chunks:", year.n_chunks())
   ]}
 />
 
-For files specifically, Polars will do this for you: `scan_csv` and
-`scan_parquet` accept a glob and read every match as one lazy frame,
+For files specifically, Polars will do this for you: `scan_csv()` and
+`scan_parquet()` accept a glob and read every match as one lazy frame,
 which is both shorter and faster than concatenating by hand.
 
 <Figure
   slug="pl-concatenating-frames-inline-cutout"
   alt="Two boards of the same width stacked one directly onto the other so their columns line up into one taller board"
+  caption="Stacking frames adds rows; the columns have to match up first."
 />
 
 ```python
@@ -345,7 +348,7 @@ The silence is the problem: a length mismatch usually means the positional assum
 - The result ends up in the wrong row order
   > Row order comes out correct. The cost is time, not correctness.
 - [o] Each iteration copies everything accumulated so far, so the work grows quadratically
-  > Collect the frames in a list and call \`pl.concat(frames)\` once, or pass a glob to \`scan_parquet\`.
+  > Collect the frames in a list and call \`pl.concat(frames)\` once, or pass a glob to \`scan_parquet()\`.
 - Intermediate frames are never freed, so memory grows without bound
   > Python releases each intermediate as it is replaced; the problem is the repeated copying, not a leak.
 

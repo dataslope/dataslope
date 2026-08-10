@@ -1,6 +1,6 @@
 ---
 title: Bounded Types and Wildcards
-description: Why List<Dog> is not a List<Animal>, what ? extends T and ? super T really mean, and the PECS rule that makes it all click
+description: Why List<Dog> is not a List<Animal>, what ? extends T and ? super T really mean, and the producer-extends, consumer-super rule that makes it all click
 ---
 
 This page is the trickiest one in the course, and the one that most
@@ -17,8 +17,8 @@ It centers on a single fact about Java generics:
 > `Dog` is a subtype of `Animal`.
 
 That looks wrong at first glance. Once you understand *why* Java
-designed it that way, everything else, `? extends T`, `? super T`,
-PECS, falls out naturally.
+designed it that way, everything else, `? extends T`, `? super T`, and
+the rule that ties them together, falls out naturally.
 
 ## The setup
 
@@ -54,6 +54,7 @@ when `X` and `Y` are.
 <Figure
   slug="jcol-bounded-types-and-wildcards-list-lt-dog-inline-cutout"
   alt="A crate of small parts refused at a slot cut for a crate of general parts, the two crates visibly different"
+  caption="A `List<Dog>` is not a `List<Animal>`, because writing into it would break."
 />
 
 <CodeBlock
@@ -127,6 +128,7 @@ That's `List<?>`: maximally general, but read-only.
 <Figure
   slug="jcol-bounded-types-and-wildcards-inline-cutout"
   alt="A slot cut to accept a family of related shapes, wide enough for three of them and clearly too narrow for a fourth waiting beside it"
+  caption="A wildcard widens the slot to a family of types, but not to all of them."
 />
 
 ## Upper-bounded: ? extends T (you can read T)
@@ -219,7 +221,7 @@ public class Main {
 `? super T` is what you use when your method **only produces** values
 (it writes into the collection).
 
-## The PECS rule
+## Producer extends, consumer super
 
 This is the most famous mnemonic in Java generics, coined by Josh
 Bloch:
@@ -261,11 +263,12 @@ point in the middle.
 <Figure
   slug="jcol-bounded-types-and-wildcards-setup-inline-cutout"
   alt="A slot cut to accept a family of related shapes, a clearly larger shape waiting beside it"
+  caption="The bound is what decides which types the slot will actually take."
 />
 
 ## A more concrete example: a generic max
 
-`Collections.max` is a real-world PECS exemplar. Its signature is
+`Collections.max()` is a real-world PECS exemplar. Its signature is
 roughly:
 
 ```

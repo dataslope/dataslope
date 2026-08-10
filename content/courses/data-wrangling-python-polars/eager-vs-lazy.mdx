@@ -53,6 +53,7 @@ works identically on both.
 <Figure
   slug="pl-eager-vs-lazy-two-objects-inline-cutout"
   alt="Two identical looking crates on a bench, one already full and one holding only a folded instruction card"
+  caption="A DataFrame holds the data; a LazyFrame holds only the plan for it."
 />
 
 ## What laziness buys
@@ -85,6 +86,7 @@ filter is applied while parsing rather than afterwards.
 <Figure
   slug="pl-eager-vs-lazy-laziness-buys-inline-cutout"
   alt="A folded instruction card being rearranged on a bench before any block is touched, one station moved to the front"
+  caption="Waiting lets the planner rearrange the work before any row is touched."
 />
 
 Three, not two, is the detail worth noticing. You asked for `carat`
@@ -200,7 +202,7 @@ Lazy is the default recommendation, not a rule. Prefer eager when:
   is the point, and `collect()` on every line is noise.
 - **The next step depends on a value you have to look at.** If a
   Python `if` needs the row count, you have to materialize it.
-- **You need `pivot`.** Its output schema depends on the data, so it
+- **You need `pivot()`.** Its output schema depends on the data, so it
   is eager-only.
 - **The data is small.** Below a few thousand rows the optimizer has
   nothing meaningful to save.
@@ -208,6 +210,7 @@ Lazy is the default recommendation, not a rule. Prefer eager when:
 <Figure
   slug="pl-eager-vs-lazy-inline-cutout"
   alt="Two conveyors side by side, the near one running every station immediately, the far one holding its parcels at the entrance until a single lever at the right releases them"
+  caption="Eager runs each step at once; lazy holds everything until you collect."
 />
 
 <Callout type="info" title="collect() once, at the end">
@@ -245,7 +248,7 @@ print(color_result.sort("color"))
 <ChallengeCard
   adapter="python"
   title="Write it lazily"
-  instructions={`Using \`pl.scan_csv\` (not \`read_csv\`), build a lazy query over \`diamonds.csv\` that:
+  instructions={`Using \`pl.scan_csv\` (not \`read_csv()\`), build a lazy query over \`diamonds.csv\` that:
 
 1. keeps only diamonds with \`carat\` above 1.0,
 2. groups by \`cut\`,
@@ -366,7 +369,7 @@ Everything after the \`collect()\` is planned in isolation from everything befor
   > That is lazy mode's strongest case, especially with the streaming engine.
 - Joining two frames on a key
   > Joins work lazily, and the optimizer can reorder and push filters through them.
-- [o] \`pivot\`, whose output column names come from the data
+- [o] \`pivot()\`, whose output column names come from the data
   > Its schema cannot be known before execution, so it is a \`DataFrame\` method only.
 
 Collect first, then pivot; it is the one operation the lazy API cannot express.`}

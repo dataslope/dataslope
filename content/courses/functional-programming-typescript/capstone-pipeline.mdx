@@ -13,9 +13,9 @@ idea from the course. We'll build a complete program that:
 
 1. **Parses** raw input strings into a typed domain.
 2. **Validates** them with `Result` so all errors are first-class.
-3. **Transforms** the valid records with a `pipe` of pure
+3. **Transforms** the valid records with a `pipe()` of pure
    functions.
-4. **Aggregates** the data using `reduce`.
+4. **Aggregates** the data using `reduce()`.
 5. **Reports** the output through a tiny imperative shell.
 
 There is no library involved; just plain TypeScript.
@@ -255,7 +255,7 @@ of building this way.
   markdown={`Looking at the capstone, what makes the program *as a whole* easy to test and evolve?
 
 - [o] All business logic lives in pure functions that take data and return data, with side effects confined to a tiny shell, so each piece can be tested with plain inputs, and the parts you'll want to change live where you expect them
-  > The architectural choice of "pure core, imperative shell" is what turns a *style* (FP) into a *system property* (maintainability).
+  > The architectural choice of "pure core, imperative shell" is what turns a *style* into a *system property* (maintainability).
 - The program is short
   > Toy programs are easy to test for many reasons; the *real* benefit scales to large programs.
 - Every \`.ts\` file is small

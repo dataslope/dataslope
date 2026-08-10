@@ -25,6 +25,7 @@ These are not row-by-row conditions. They are conditions about **groups after ag
 <Figure
   slug="lite-filtering-groups-where-filters-rows-inline-cutout"
   alt="A grate placed before the press so single chips are stopped while whole trays are still forming"
+  caption="`WHERE` runs before the groups exist, so it cannot test a group total."
 />
 
 ```mermaid
@@ -39,7 +40,7 @@ Think of it like making piles of receipts:
 
 1. `WHERE` decides which receipts are allowed into the piles.
 2. `GROUP BY` makes the piles.
-3. Aggregates like `COUNT` and `SUM` summarize each pile.
+3. Aggregates like `COUNT()` and `SUM()` summarize each pile.
 4. `HAVING` decides which completed piles stay in the result.
 
 ## HAVING filters groups
@@ -49,6 +50,7 @@ Think of it like making piles of receipts:
 <Figure
   slug="lite-filtering-groups-inline-cutout"
   alt="Three summary blocks on their trays, one tray lifted away because its block falls short of a marked line"
+  caption="`HAVING` runs after grouping and can drop a whole group by its summary."
 />
 
 <SqlCodeBlock
@@ -158,7 +160,7 @@ Read it in stages:
 
 ## Filtering by totals
 
-`HAVING` is also common with `SUM`. This query keeps only products whose total sales are at least `30`.
+`HAVING` is also common with `SUM()`. This query keeps only products whose total sales are at least `30`.
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -228,7 +230,7 @@ ORDER BY
 This query first keeps only online sales rows. Then it groups and totals those online rows. Finally, `HAVING` keeps products with at least `20` in online sales.
 
 <Callout type="info" title="Rule of thumb">
-If the condition mentions an aggregate function like `COUNT`, `SUM`, `AVG`, `MIN`, or `MAX`, it usually belongs in `HAVING`. If it checks ordinary row values, it usually belongs in `WHERE`.
+If the condition mentions an aggregate function like `COUNT()`, `SUM()`, `AVG()`, `MIN()`, or `MAX()`, it usually belongs in `HAVING`. If it checks ordinary row values, it usually belongs in `WHERE`.
 </Callout>
 
 ## The clause order so far
@@ -246,7 +248,7 @@ ORDER BY sort_columns;
 
 The logical flow is:
 
-**`FROM` (choose table) → `WHERE` (filter rows) → `GROUP BY` (build groups) → aggregates like `COUNT`, `SUM`, `AVG` → `HAVING` (filter groups) → `SELECT` (choose output) → `ORDER BY` (sort result)**
+**`FROM` (choose table) → `WHERE` (filter rows) → `GROUP BY` (build groups) → aggregates like `COUNT()`, `SUM()`, `AVG()` → `HAVING` (filter groups) → `SELECT` (choose output) → `ORDER BY` (sort result)**
 
 The most important part for this page is:
 
@@ -308,7 +310,7 @@ Aggregate conditions belong in \`HAVING\` because \`HAVING\` runs after aggregat
 - [o] Put the 2025 row filter in \`WHERE\` and the total-spending filter in \`HAVING\`.
   > \`WHERE\` filters individual rows; \`HAVING\` filters grouped totals.
 - Put both conditions in \`WHERE\`.
-  > Total spending uses \`SUM\`, which is not available during \`WHERE\`.
+  > Total spending uses \`SUM()\`, which is not available during \`WHERE\`.
 - Put neither condition in SQL.
   > SQL can express both conditions clearly.
 - Put both conditions in \`HAVING\`.

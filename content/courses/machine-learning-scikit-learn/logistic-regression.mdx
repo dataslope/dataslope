@@ -23,6 +23,7 @@ probably the single most widely deployed classifier in the world.
 <Figure
   slug="ml-logistic-regression-problem-solves-inline-cutout"
   alt="A board of two-coloured chips with a smooth S-shaped ramp laid across it"
+  caption="Logistic regression turns a linear score into a probability between 0 and 1."
 />
 
 <Callout type="danger" title="The one misconception to kill on sight">
@@ -67,6 +68,7 @@ the whole algorithm follows:
 <Figure
   slug="ml-logistic-regression-intuition-linear-score-inline-cutout"
   alt="A straight rod producing a value that is then pressed through an S-shaped ramp into a narrow band"
+  caption="The sigmoid squashes any score into the range a probability can occupy."
 />
 
 **Step 1, a linear score.** Exactly like linear regression, the model
@@ -159,6 +161,7 @@ and predict the species from four numeric measurements.
 <Figure
   slug="ml-logistic-regression-inline-cutout"
   alt="A board of two-coloured chips with a smooth S-shaped ramp laid across it, chips low on the ramp reading one colour and chips high on it the other"
+  caption="Where the ramp crosses your threshold is where the predicted class flips."
 />
 
 <CodeBlock
@@ -248,7 +251,7 @@ for prob, cls, actual in zip(probs, classes, y_test[:5]):
   ]}
 />
 
-A few things to read off that table. `predict_proba` returns **one column
+A few things to read off that table. `predict_proba()` returns **one column
 per class**, in the order shown by `model.classes_` (alphabetical, so Adelie
 then Gentoo), and **each row sums to 1** (the probabilities of all classes
 must add up). The predicted class is simply the column with the higher
@@ -438,8 +441,8 @@ The flip side is that its straight-line boundary is also its ceiling.
   The classic illustration is two interleaving moons or concentric
   circles, logistic regression draws one straight line through them and
   fails. You either engineer nonlinear features or switch to a model that
-  bends, like a decision tree, a random forest, or an SVM with a nonlinear
-  kernel.
+  bends, like a decision tree, a random forest, or a support vector machine
+  with a nonlinear kernel.
 - **Strong feature interactions.** Like linear regression, the basic model
   is additive; effects that depend on combinations of features are not
   captured unless you add interaction terms.
@@ -671,13 +674,13 @@ The sigmoid is the step that turns a raw score into a usable confidence.`}
 <MultipleChoice
   markdown={`For a binary logistic regression, how does \`model.predict(X)\` relate to \`model.predict_proba(X)\`?
 
-- \`predict\` ignores probabilities and uses the raw features
-  > \`predict\` does not bypass the probability step. It calls the same underlying computation as \`predict_proba\` and then applies a 0.5 threshold to the class-1 probability to produce a hard label.
+- \`predict()\` ignores probabilities and uses the raw features
+  > \`predict()\` does not bypass the probability step. It calls the same underlying computation as \`predict_proba()\` and then applies a 0.5 threshold to the class-1 probability to produce a hard label.
 - They are unrelated methods that can disagree
-  > They are directly related: \`predict\` is exactly \`predict_proba\` plus a threshold. They can never disagree, the class returned by \`predict\` is always the class with the highest probability from \`predict_proba\`.
-- \`predict_proba\` rounds the output of \`predict\`
-  > The direction is reversed: \`predict\` is derived from \`predict_proba\`, not the other way around. \`predict_proba\` returns the raw probabilities; \`predict\` applies a threshold to those probabilities to yield hard class labels.
-- [o] \`predict\` applies a threshold (default 0.5) to the class-1 probability from \`predict_proba\`
+  > They are directly related: \`predict()\` is exactly \`predict_proba()\` plus a threshold. They can never disagree, the class returned by \`predict()\` is always the class with the highest probability from \`predict_proba()\`.
+- \`predict_proba()\` rounds the output of \`predict()\`
+  > The direction is reversed: \`predict()\` is derived from \`predict_proba()\`, not the other way around. \`predict_proba()\` returns the raw probabilities; \`predict()\` applies a threshold to those probabilities to yield hard class labels.
+- [o] \`predict()\` applies a threshold (default 0.5) to the class-1 probability from \`predict_proba()\`
   > The class is just the probability after thresholding: predict returns class 1 when the class-1 probability is at least 0.5, and class 0 otherwise.
 
 Because of this, you can move the threshold yourself to trade false positives against false negatives.`}
@@ -693,7 +696,7 @@ Because of this, you can move the threshold yourself to trade false positives ag
 - \`make_moons\` produces continuous targets, not classes
   > \`make_moons\` produces binary class labels (0 and 1), making it a classification problem that logistic regression can handle. The difficulty is geometric: the two classes are not linearly separable.
 - Logistic regression cannot output probabilities
-  > Logistic regression always produces probabilities via \`predict_proba\`, that is one of its core features. The problem here is the shape of the boundary, not the ability to output probabilities.
+  > Logistic regression always produces probabilities via \`predict_proba()\`, that is one of its core features. The problem here is the shape of the boundary, not the ability to output probabilities.
 
 The remedy is engineered nonlinear features or a model that can bend its boundary.`}
 />

@@ -1,6 +1,6 @@
 ---
 title: Designing the Right Preprocessing Pipeline
-description: The most important skill in classic NLP, choosing which preprocessing steps to apply. There is no universal pipeline; each step adds or destroys information, and the right choice depends entirely on the downstream task. A decision framework, a task-by-task table, and how to evaluate choices empirically.
+description: The most important skill in classic natural language processing, choosing which preprocessing steps to apply. There is no universal pipeline; each step adds or destroys information, and the right choice depends entirely on the downstream task. A decision framework, a task-by-task table, and how to evaluate choices empirically.
 ---
 
 If you remember one page from this course, make it this one. Every previous
@@ -52,6 +52,7 @@ Two of the highest-stakes choices can be captured in a small decision tree.
 <Figure
   slug="nlp-choosing-your-pipeline-decision-framework-inline-cutout"
   alt="A branching chute with a small gauge at each fork, a task card dropping through it"
+  caption="Each fork in the pipeline is a decision your task should be making."
 />
 
 ```mermaid
@@ -120,6 +121,7 @@ pipeline and watch them produce deliberately different results.
 <Figure
   slug="nlp-choosing-your-pipeline-pipeline-menu-not-inline-cutout"
   alt="A rack of interchangeable pipe sections with three chosen and clipped together, the rest left hanging"
+  caption="The steps are a menu, and you clip in only the ones your task needs."
 />
 
 <CodeBlock

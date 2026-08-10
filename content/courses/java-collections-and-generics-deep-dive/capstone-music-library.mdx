@@ -45,7 +45,7 @@ A clean implementation will:
 
 - Store `Track`s in the shape that matches each query (not a flat
   list scanned every time).
-- Use `computeIfAbsent` to build per-artist lists and sets lazily.
+- Use `computeIfAbsent()` to build per-artist lists and sets lazily.
 - Use a `LinkedHashSet` where insertion-ordered uniqueness matters.
 - Build `topRated` with a `Comparator.comparingInt(...).reversed().thenComparing(...)` chain.
 - Return read-only / snapshot collections from every getter.
@@ -72,7 +72,7 @@ Debussy albums: [Suite Bergamasque, Reveries, Sea Pieces]
 
 Hints:
 
-- \`computeIfAbsent\` for "map of list" and "map of set" insertion.
+- \`computeIfAbsent()\` for "map of list" and "map of set" insertion.
 - For \`Genres:\` use a \`LinkedHashSet<String>\` so iteration order is deterministic (insertion order).
 - For \`topRated\`, sort a *copy* of the tracks list with \`Comparator.comparingInt(Track::rating).reversed().thenComparing(Track::title)\` and take the first \`n\`.
 - For \`albumsByArtist\`, use \`LinkedHashSet<String>\` per artist.
@@ -251,7 +251,7 @@ That single class touches every major idea in the course:
 
 - **Right shape per query**, one map of lists, one map of sets,
   one set, one list (Data Modeling).
-- **`computeIfAbsent` for "map of \\*"**, concise, race-free against
+- **`computeIfAbsent()` for "map of \\*"**, concise, race-free against
   itself (Maps).
 - **`LinkedHashSet`**, uniqueness *and* insertion order (Sets).
 - **`Comparator` composition**, `reversed().thenComparing(...)`
@@ -259,7 +259,7 @@ That single class touches every major idea in the course:
 - **Safe getters**, every returned collection is an unmodifiable
   view (Immutable Collections + Architecture).
 - **`record`-backed value objects** for `Track`, typed data, free
-  `equals`/`hashCode`/`toString` (Equality and Hashing).
+  `equals()`/`hashCode()`/`toString` (Equality and Hashing).
 
 ## Test your understanding
 

@@ -78,6 +78,7 @@ Lists are implemented as **dynamic arrays**: a contiguous block of memory holdin
 <Figure
   slug="python-lists-inline-cutout"
   alt="A rail of five slots holding blocks in order, one being lifted out of the middle and the rest sliding along to close the gap"
+  caption="Removing from the middle costs O(n) because everything after it shifts along."
 />
 
 ```mermaid
@@ -99,6 +100,7 @@ Lists support zero-based indexing. Negative indices count from the end.
 <Figure
   slug="python-lists-indexing-inline-cutout"
   alt="A hand reaching straight past the first three slots of a rail to lift the fourth"
+  caption="Indexing jumps straight to a position instead of walking there."
 />
 
 <CodeBlock
@@ -504,6 +506,7 @@ Assignment does **not** copy. Both names point to the same list.
 <Figure
   slug="python-lists-creating-list-inline-cutout"
   alt="An empty rail being filled left to right with blocks"
+  caption="A list keeps its items in the order you put them in."
 />
 
 <CodeBlock
@@ -599,7 +602,7 @@ print(stack)
   ]}
 />
 
-For **queues** (FIFO), prefer `collections.deque`, which supports O(1) operations at both ends. Using a list as a queue means O(n) `pop(0)` every time you dequeue.
+For **queues** (first in, first out), prefer `collections.deque`, which supports O(1) operations at both ends. Using a list as a queue means O(n) `pop(0)` every time you dequeue.
 
 <CodeBlock
   adapter="python"

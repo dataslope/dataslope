@@ -51,7 +51,7 @@ label among them. Change `k` and you change how many neighbors get a say.
 
 <Callout type="info" title="Why 'lazy' is a technical term, not an insult">
 KNN is called a *lazy learner* because it defers all the work to prediction
-time. `fit` does almost nothing, it just stores the data (and builds an
+time. `fit()` does almost nothing, it just stores the data (and builds an
 index to find neighbors quickly). Compare this to a *lazy* student who
 crams during the exam rather than studying beforehand. The cost is not
 free: a lazy learner can be slow and memory-hungry when you actually ask it
@@ -69,6 +69,7 @@ features is small.
 <Figure
   slug="ml-k-nearest-neighbors-does-closest-mean-inline-cutout"
   alt="A caliper measuring the straight gap between two chips on a board"
+  caption="Closeness is a straight-line distance, summed across every feature."
 />
 
 This is intuitive, but it hides a trap that we will spend most of this page
@@ -85,6 +86,7 @@ held back here by the feature scales, but it is a fine starting point.)
 <Figure
   slug="ml-k-nearest-neighbors-intuition-are-who-inline-cutout"
   alt="One new chip on a board taking the colour of the three chips nearest to it"
+  caption="A new point is labelled by a vote among its k nearest neighbours."
 />
 
 <CodeBlock
@@ -114,8 +116,8 @@ print(f"Test accuracy with k=5: {knn.score(X_test, y_test):.3f}")
   ]}
 />
 
-Notice that `fit` returns instantly: there is nothing to optimize. All the
-work happens inside `score` (and `predict`), where each test penguin
+Notice that `fit()` returns instantly: there is nothing to optimize. All the
+work happens inside `score()` (and `predict()`), where each test penguin
 searches the training set for its five nearest neighbors and takes their
 majority vote. This works, but it is *not yet as accurate as it could be*,
 and the reason, as the next sections show, is that one feature (body mass,
@@ -371,6 +373,7 @@ KNN's core assumption quietly breaks down.
 <Figure
   slug="ml-k-nearest-neighbors-inline-cutout"
   alt="One new chip placed on a board of coloured chips, with short cords running from it to the three closest chips and taking their colour"
+  caption="Add enough features and every point sits about equally far from every other."
 />
 
 <CodeBlock
@@ -562,8 +565,8 @@ assert scaled_acc > raw_acc, f"Expected scaling to help: scaled {scaled_acc:.3f}
   markdown={`Why is K-nearest neighbors described as a "lazy" or "instance-based" learner?
 
 - It refuses to train on datasets larger than a few hundred rows
-  > KNN can technically fit any size dataset, \`fit\` just stores the data. The practical limitation at large scale is *prediction* speed, not a hard limit on training set size.
-- [o] It does essentially no work during \`fit\`, it just stores the training data, and defers all computation to prediction time, where it searches for the nearest examples
+  > KNN can technically fit any size dataset, \`fit()\` just stores the data. The practical limitation at large scale is *prediction* speed, not a hard limit on training set size.
+- [o] It does essentially no work during \`fit()\`, it just stores the training data, and defers all computation to prediction time, where it searches for the nearest examples
   > A lazy learner builds no compact model; it keeps the training set and consults it at predict time. This makes training trivial but prediction comparatively expensive.
 - It picks a random subset of neighbors to avoid computation
   > KNN does not pick neighbors randomly. It computes distances to all training points and selects the k nearest ones deterministically. Random neighbor selection would be a different, less reliable algorithm.

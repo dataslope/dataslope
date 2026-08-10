@@ -32,7 +32,7 @@ increases?" is the question.
 * **When it breaks:** too many overlapping lines turn into unreadable
   "spaghetti," and an unsorted x makes the line zig-zag back on itself.
 
-In Seaborn you draw one with the same `relplot` you already know, switching
+In Seaborn you draw one with the same `relplot()` you already know, switching
 `kind="scatter"` to **`kind="line"`**.
 
 ## A single line: a clear trend over time
@@ -198,6 +198,7 @@ Here both `region` and `event` are encoded at once.
 <Figure
   slug="sns-relational-line-plots-line-plot-needs-inline-cutout"
   alt="A ribbon rising and dipping over evenly spaced sleepers with markers pinned at each measured point"
+  caption="Colour and dash pattern let one chart carry two groupings at once."
 />
 
 <CodeBlock
@@ -236,6 +237,7 @@ Two mistakes hurt line plots more than any others.
 <Figure
   slug="sns-relational-line-plots-inline-cutout"
   alt="Three ribbons of different inks rising across the same board, each with its own key swatch"
+  caption="Too many lines becomes spaghetti; sorting matters because a line implies order."
 />
 
 **1. Don't draw a line between unordered categories.** A line *asserts*
@@ -281,7 +283,7 @@ unordered categories, a bar or point plot tells the truth.`}
 <ChallengeCard
   adapter="python"
   title="A line plot of brain signal over time"
-  instructions={`Using the \`fmri\` dataset, draw a **line** plot with \`sns.relplot\`:
+  instructions={`Using the \`fmri\` dataset, draw a **line** plot with \`sns.relplot()\`:
 
 - \`timepoint\` on the x-axis,
 - \`signal\` on the y-axis,

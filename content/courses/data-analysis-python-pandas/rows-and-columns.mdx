@@ -87,6 +87,7 @@ Columns share three properties that you will rely on constantly:
 <Figure
   slug="pandas-rows-and-columns-inline-cutout"
   alt="A board where one row is drawn out sideways as a strip and one column is lifted straight up as a stack"
+  caption="A row is one record read across; a column is one measure read down."
 />
 
 The Pandas operation `df["salary"].mean()` reads naturally as
@@ -101,6 +102,7 @@ geometry.
 <Figure
   slug="pandas-rows-and-columns-basic-mental-model-inline-cutout"
   alt="One ruled board with a single row drawn out as a strip and a single column lifted out as a stack"
+  caption="Most pandas operations work down a column rather than across a row."
 />
 
 <CodeBlock

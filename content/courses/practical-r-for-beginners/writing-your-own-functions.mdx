@@ -93,6 +93,7 @@ vector and returns a small named list summarizing it.
 <Figure
   slug="rlang-writing-your-own-functions-anatomy-function-inline-cutout"
   alt="A machine in cross-section with its input opening, inner works and output chute visible"
+  caption="A function has three parts: what goes in, what happens, what comes back."
 />
 
 <CodeBlock
@@ -204,6 +205,7 @@ expression once per column.
 <Figure
   slug="rlang-writing-your-own-functions-inline-cutout"
   alt="A bench where a repeated set of three actions is boxed into a single crank-handled machine used three times over"
+  caption="Write it once as a function and the repeated steps become one call."
 />
 
 ## Function design tips
@@ -342,13 +344,13 @@ stays local.
 
 Write a function called `summarize_group(x)` that takes a
 numeric vector and returns a **named list** with elements
-`n`, `mean`, and `sd`. Use `na.rm = TRUE` for both the mean and
+`n`, `mean()`, and `sd()`. Use `na.rm = TRUE` for both the mean and
 the SD.
 
 <ChallengeCard
   adapter="r"
   title="Build summarize_group()"
-  instructions={`Define \`summarize_group <- function(x) { ... }\` so that calling it on a numeric vector returns a list with elements \`n\` (length), \`mean\` (mean, ignoring NAs), and \`sd\` (sd, ignoring NAs).`}
+  instructions={`Define \`summarize_group <- function(x) { ... }\` so that calling it on a numeric vector returns a list with elements \`n\` (length), \`mean()\` (mean, ignoring NAs), and \`sd()\` (sd, ignoring NAs).`}
   files={[
     {
       filename: "main.r",

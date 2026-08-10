@@ -35,6 +35,7 @@ available to the whole page, because custom properties **inherit**.
 <Figure
   slug="css-custom-properties-defining-using-inline-cutout"
   alt="One dial on a panel wired to six blocks, turning it repainting all six"
+  caption="One custom property, read in many rules, so changing it changes all of them."
 />
 
 One `--brand` value drives every button below, background, border, and
@@ -142,13 +143,14 @@ one on a subtree to re-theme just that part:
 <Figure
   slug="css-custom-properties-inline-cutout"
   alt="One dial on a panel wired to six blocks, turning it repainting all six at once"
+  caption="Custom properties inherit, so a value set once reaches every descendant."
 />
 
 ## Theming and dark mode
 
 Because a variable can be redefined in a scope, theming is just
 swapping values. Toggle a class or attribute on the root, or respond to
-the OS setting with `prefers-color-scheme`, and the whole page
+the operating system setting with `prefers-color-scheme`, and the whole page
 re-themes:
 
 ```css

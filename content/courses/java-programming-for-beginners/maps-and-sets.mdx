@@ -52,7 +52,7 @@ A `HashSet`:
 - Stores each element **at most once**, duplicates are silently
   ignored.
 - Has **no defined order** (don't rely on iteration order).
-- Offers `add`, `remove`, `contains` in (effectively) constant
+- Offers `add()`, `remove()`, `contains()` in (effectively) constant
   time, on average.
 
 Use a `Set` when you need to ask "have I seen this before?" or
@@ -100,7 +100,7 @@ A `HashMap<K, V>`:
 
 - Stores **key → value** pairs.
 - Keys are unique. Putting the same key twice overwrites the value.
-- `get`, `put`, `remove`, `containsKey` are constant time on
+- `get()`, `put()`, `remove()`, `containsKey()` are constant time on
   average.
 - Iteration order is **not** guaranteed.
 
@@ -153,15 +153,15 @@ where the answer would be and looks there directly.
 
 For this to work, two contracts must hold for the key type:
 
-- **`equals`** must correctly compare two keys for "are they the
+- **`equals()`** must correctly compare two keys for "are they the
   same."
-- **`hashCode`** must return the *same* number for any two keys that
-  are `equals`.
+- **`hashCode()`** must return the *same* number for any two keys that
+  are `equals()`.
 
 `String`, `Integer`, `Double`, and most JDK value types already
 implement these correctly. For your *own* classes, if you want to
 use them as map keys or set elements, you must override both
-`equals` and `hashCode` consistently.
+`equals()` and `hashCode()` consistently.
 
 ## A worked example: word counts
 
@@ -172,6 +172,7 @@ trivial.
 <Figure
   slug="java-maps-and-sets-set-uniqueness-membership-inline-cutout"
   alt="A bin that takes each distinct block once, an identical second bouncing off its rim"
+  caption="A set keeps one of each value and drops the duplicates silently."
 />
 
 <CodeBlock
@@ -237,13 +238,14 @@ genuinely don't know in advance.
 <Figure
   slug="java-maps-and-sets-inline-cutout"
   alt="A wall of keyed drawers on the left and a plain bin on the right that will hold only one of each block"
+  caption="A map looks up by key; a set only answers whether something is present."
 />
 
 <MultipleChoice
   markdown={`What happens if you add the same string twice to a HashSet?
 
 - [o] The second add is silently ignored, the set still contains exactly one copy
-  > A \`Set\` stores each element at most once, so a duplicate \`add\` is a no-op.
+  > A \`Set\` stores each element at most once, so a duplicate \`add()\` is a no-op.
 - The first copy is removed
   > It is not removed.
 - The second add throws an exception
@@ -273,7 +275,7 @@ genuinely don't know in advance.
 - [o] HashSet of IDs
   > A set answers "seen before?" in constant time on average, which is exactly the question.
 - ArrayList
-  > \`contains\` on a list is linear time.
+  > \`contains()\` on a list is linear time.
 - HashMap with the ID as the value
   > Keys go in maps, not values.`}
 />

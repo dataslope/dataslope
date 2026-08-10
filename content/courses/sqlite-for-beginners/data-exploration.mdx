@@ -83,6 +83,7 @@ special table called `sqlite_master` (also available as
 <Figure
   slug="lite-data-exploration-step-1-tables-inline-cutout"
   alt="A cabinet opened to show which drawers exist before any drawer is pulled"
+  caption="Ask which tables exist before you open any one of them."
 />
 
 <SqlCodeBlock
@@ -160,11 +161,12 @@ Now ask quantitative questions. Three are almost always useful:
 - **How many rows?** `COUNT(*)`
 - **What distinct values does a column take?** `DISTINCT` or
   `GROUP BY`
-- **What is the range of a number or date?** `MIN` and `MAX`
+- **What is the range of a number or date?** `MIN()` and `MAX()`
 
 <Figure
   slug="lite-data-exploration-inline-cutout"
   alt="A crate opened and its first rows fanned across a bench for a first look"
+  caption="A first look means reading a few real rows, not just the schema."
 />
 
 <SqlCodeBlock
@@ -248,6 +250,7 @@ loop yourself.
 <Figure
   slug="lite-data-exploration-exploration-loop-inline-cutout"
   alt="A ring of benches with a tray travelling round, each pass revealing one more card"
+  caption="Each query answers one question and suggests the next one to ask."
 />
 
 <SqlCodeBlock

@@ -14,7 +14,7 @@ and why that matters.
 />
 
 We'll stay conceptual, no deep internals. The goal is intuition,
-not a reading list of CLR source code.
+not a reading list of runtime source code.
 
 ## What is a runtime, in one paragraph?
 
@@ -65,6 +65,7 @@ language like C. We'll touch on the most important ones.
 <Figure
   slug="mcs-managed-runtimes-inline-cutout"
   alt="A program block resting on a wide platform, with a small tidy-up cart under the platform sweeping discarded blocks away on its own"
+  caption="The runtime handles the memory, so nothing has to be freed by hand."
 />
 
 ### Memory: allocation and garbage collection
@@ -216,6 +217,7 @@ overhead ever will.
 <Figure
   slug="mcs-managed-runtimes-runtime-one-paragraph-inline-cutout"
   alt="A program block resting on a platform with a small tidy-up cart running underneath it"
+  caption="You trade a little control and speed for a whole class of bugs you never write."
 />
 
 ## A picture of where C# code lives

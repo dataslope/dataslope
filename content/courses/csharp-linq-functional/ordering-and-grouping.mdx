@@ -3,8 +3,8 @@ title: Ordering and Grouping
 description: OrderBy, ThenBy, GroupBy, the operators that bring shape to a flat sequence
 ---
 
-So far our operators preserved the order of the input (`Where`,
-`Select`, `SelectMany`). This page is about operators that
+So far our operators preserved the order of the input (`Where()`,
+`Select()`, `SelectMany()`). This page is about operators that
 *reorganize* the sequence: sort it, or partition it into named
 groups.
 
@@ -13,14 +13,15 @@ groups.
   alt="Ordering and grouping, an isometric illustration"
 />
 
-## Ordering: `OrderBy`, `OrderByDescending`, `ThenBy`
+## Ordering: `OrderBy()`, `OrderByDescending()`, `ThenBy()`
 
-`OrderBy` produces a new sequence sorted by a *key* that you extract
+`OrderBy()` produces a new sequence sorted by a *key* that you extract
 from each element with a selector lambda.
 
 <Figure
   slug="cs-ordering-and-grouping-ordering-orderby-orderbydescending-inline-cutout"
   alt="A jumbled tray of blocks combed into a rising staircase, and the same staircase reversed into a falling one"
+  caption="`OrderBy()` sorts by a key you extract from each element."
 />
 
 <CodeBlock
@@ -52,18 +53,18 @@ record Person(string Name, int Age, string City);
 
 A few important details:
 
-- `OrderBy` returns `IOrderedEnumerable<T>`, a special kind of
+- `OrderBy()` returns `IOrderedEnumerable<T>`, a special kind of
   enumerable that *remembers* the sort key, so you can layer more
-  sorting on top with `ThenBy`.
+  sorting on top with `ThenBy()`.
 - It's a **stable sort**: elements with equal keys keep their input
   order.
 - It allocates an internal buffer and sorts. It is **not** lazy in
-  the same way `Where` is, it has to see all the elements before it
+  the same way `Where()` is, it has to see all the elements before it
   can produce the first one in sorted order.
 
-### Multiple sort keys with `ThenBy`
+### Multiple sort keys with `ThenBy()`
 
-When the primary key has ties, `ThenBy` decides them.
+When the primary key has ties, `ThenBy()` decides them.
 
 <CodeBlock
   adapter="csharp"
@@ -91,25 +92,26 @@ record Person(string Name, int Age, string City);
   ]}
 />
 
-`ThenBy` is *only* available on `IOrderedEnumerable<T>`, that is,
-*after* an `OrderBy`. The compiler will stop you from writing
-`xs.ThenBy(...)` without an `OrderBy` first.
+`ThenBy()` is *only* available on `IOrderedEnumerable<T>`, that is,
+*after* an `OrderBy()`. The compiler will stop you from writing
+`xs.ThenBy(...)` without an `OrderBy()` first.
 
-### A common mistake: `OrderBy` followed by `OrderBy`
+### A common mistake: `OrderBy()` followed by `OrderBy()`
 
-If you write `xs.OrderBy(a).OrderBy(b)`, the second `OrderBy`
+If you write `xs.OrderBy(a).OrderBy(b)`, the second `OrderBy()`
 **discards** the first one. The result is sorted by `b`, then by `a`
 only within tied `b` values, almost always the opposite of what you
-wanted. Use `ThenBy` instead.
+wanted. Use `ThenBy()` instead.
 
-## Grouping: `GroupBy`
+## Grouping: `GroupBy()`
 
-`GroupBy` partitions a sequence into groups by a key. Each group is
+`GroupBy()` partitions a sequence into groups by a key. Each group is
 itself an `IEnumerable<T>` (plus a `Key` property).
 
 <Figure
   slug="cs-ordering-and-grouping-inline-cutout"
   alt="A jumbled tray of blocks combed into a rising line by height, then that line cut into three separate trays by colour"
+  caption="Grouping cuts one ordered sequence into a sequence of keyed groups."
 />
 
 <CodeBlock
@@ -140,7 +142,7 @@ record Person(string Name, int Age, string City);
   ]}
 />
 
-The result of `GroupBy` is an `IEnumerable<IGrouping<TKey,
+The result of `GroupBy()` is an `IEnumerable<IGrouping<TKey,
 TElement>>`. `IGrouping<TKey, TElement>` is *just an `IEnumerable<T>`
 that also has a `Key` property*. That's it.
 
@@ -153,7 +155,7 @@ flowchart LR
     G --> R3["Paris  → [Dmitri]"]
 ```
 
-### `GroupBy` with an aggregate
+### `GroupBy()` with an aggregate
 
 In practice, most of the time you don't iterate the groups, you
 project them into summaries.
@@ -220,11 +222,11 @@ record Sale(string Region, string Product, decimal Amount);
 
 Anonymous types implement structural equality, so two anonymous
 keys with the same field values are treated as equal, exactly what
-`GroupBy` needs.
+`GroupBy()` needs.
 
-### `GroupBy` vs `ToLookup`
+### `GroupBy()` vs `ToLookup()`
 
-`ToLookup` is the immediate, eagerly-evaluated cousin of `GroupBy`.
+`ToLookup()` is the immediate, eagerly-evaluated cousin of `GroupBy()`.
 It returns a `Lookup<TKey, TElement>` you can index into.
 
 <CodeBlock
@@ -253,7 +255,7 @@ record Sale(string Region, decimal Amount);
 />
 
 When you need to index into groups (especially repeatedly), prefer
-`ToLookup`. When you're just iterating once, `GroupBy` is fine.
+`ToLookup()`. When you're just iterating once, `GroupBy()` is fine.
 
 ## A multi-file challenge
 
@@ -324,15 +326,15 @@ public static class SalesReport
   markdown={`What does \`xs.OrderBy(x => x.A).OrderBy(x => x.B)\` produce?
 
 - [o] A sequence sorted by B, with ties in B broken by A.
-  > The *second* \`OrderBy\` re-sorts everything by B; the first \`OrderBy\`'s ordering survives only within tied B values (because the sort is stable).
+  > The *second* \`OrderBy()\` re-sorts everything by B; the first \`OrderBy()\`'s ordering survives only within tied B values (because the sort is stable).
 - A sequence sorted by A, with ties in A broken by B.
-  > That's what \`ThenBy\` does. Two consecutive \`OrderBy\` calls behave differently.
+  > That's what \`ThenBy()\` does. Two consecutive \`OrderBy()\` calls behave differently.
 - A sequence in undefined order.
   > The order is well-defined: by B primarily, then by A within equal B's.
-- A compile error, because you can't apply \`OrderBy\` twice.
-  > It compiles fine, every \`IEnumerable<T>\` has \`OrderBy\` available as an extension. But the *behavior* is usually not what people want.
+- A compile error, because you can't apply \`OrderBy()\` twice.
+  > It compiles fine, every \`IEnumerable<T>\` has \`OrderBy()\` available as an extension. But the *behavior* is usually not what people want.
 
-To sort by multiple keys, you must use \`ThenBy\`/\`ThenByDescending\`
-after the first \`OrderBy\`. Stacking \`OrderBy\` calls accidentally
+To sort by multiple keys, you must use \`ThenBy()\`/\`ThenByDescending\`
+after the first \`OrderBy()\`. Stacking \`OrderBy()\` calls accidentally
 inverts the priorities.`}
 />

@@ -35,6 +35,7 @@ is 4 bytes.
 <Figure
   slug="sysc-data-types-and-memory-fundamental-types-inline-cutout"
   alt="Four blocks of visibly different widths resting in recesses cut to each"
+  caption="Each type reserves a fixed number of bytes, and the count is platform dependent."
 />
 
 <CodeBlock
@@ -69,6 +70,7 @@ silently grow a Python `int` can silently *truncate* in C.
 <Figure
   slug="sysc-data-types-and-memory-fixed-size-turns-inline-cutout"
   alt="A block too large for its recess, its edge overhanging into the next recess along"
+  caption="A value too large for its type wraps, quietly, with no error at all."
 />
 
 <CodeBlock
@@ -95,7 +97,7 @@ int main(void) {
   ]}
 />
 
-<Callout type="warn" title="Signed overflow is UB, unsigned overflow is not">
+<Callout type="warn" title="Signed overflow is undefined behavior, unsigned overflow is not">
 For *signed* integers, overflow is undefined behavior, the compiler
 is allowed to assume it never happens. For *unsigned*, overflow is
 well-defined modular arithmetic (it wraps). When you actually *want*
@@ -111,6 +113,7 @@ fixed-width types from `<stdint.h>`.
 <Figure
   slug="sysc-data-types-and-memory-inline-cutout"
   alt="Four blocks of visibly different widths resting on a strip of equal cells, each block covering a different count of cells"
+  caption="Fixed-width types say exactly how many bytes, on every platform."
 />
 
 | Type | Width | Use case |
@@ -149,7 +152,7 @@ int main(void) {
   ]}
 />
 
-The `PRI…` macros from `<inttypes.h>` give you portable `printf`
+The `PRI…` macros from `<inttypes.h>` give you portable `printf()`
 format specifiers no matter what size `int32_t` happens to be.
 
 ## Signedness pitfalls

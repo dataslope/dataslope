@@ -49,6 +49,7 @@ just pick a small $h$. In floating point, two things fight:
 <Figure
   slug="scipy-numerical-calculus-finite-differences-inline-cutout"
   alt="Two points on a curve joined by a straight rod, the rod's slope measured"
+  caption="A derivative is estimated from the slope between two nearby points."
 />
 
 The optimal $h$ is a *balance*. For the forward difference
@@ -130,7 +131,7 @@ and weights $w_i$, multiply, add. The art is in choosing them.
 | Trapezoid | equispaced | $O(h^2)$ |
 | Simpson | equispaced | $O(h^4)$ |
 | Gauss–Legendre ($n$ points) | optimal | exact for polynomials up to degree $2n-1$ |
-| Adaptive (`quad`) | refined where $f$ wiggles | error-controlled |
+| Adaptive (`quad()`) | refined where $f$ wiggles | error-controlled |
 
 <CodeBlock
   adapter="python"
@@ -161,7 +162,7 @@ print(f"Gauss(32) : {val_g:.10f}")
   ]}
 />
 
-Notice `quad` returns both the value *and* an error estimate.
+Notice `quad()` returns both the value *and* an error estimate.
 This is the right tool for general one-dimensional integrals: it
 adaptively refines around peaks and singularities until the
 estimated error is below the requested tolerance.
@@ -194,9 +195,9 @@ print(f"oscillatory : {val2:.6f}   err≤{err2:.1e}")
   ]}
 />
 
-`quad` is robust enough to handle integrable singularities and
+`quad()` is robust enough to handle integrable singularities and
 moderately oscillatory integrands. For truly oscillatory cases,
-SciPy offers specialized routines like `quad` with the `weight`
+SciPy offers specialized routines like `quad()` with the `weight`
 argument set to `"sin"` or `"cos"`.
 
 ## Multidimensional integration
@@ -233,6 +234,7 @@ whole chapter to it later).
 <Figure
   slug="scipy-numerical-calculus-big-picture-inline-cutout"
   alt="A curve with thin rectangles fitted under it and a straight rod resting tangent at one point"
+  caption="An integral is estimated by fitting simple shapes under the curve."
 />
 
 ## A multi-file calculus toolkit
@@ -301,12 +303,13 @@ def adaptive_simpson(f, a, b, tol=1e-8):
 Adaptive Simpson is a beautiful 20-line algorithm: it estimates
 its own error by comparing one Simpson's rule against the sum of
 two half-interval Simpson rules, and recurses only where the
-disagreement exceeds the tolerance. SciPy's `quad` is a much more
+disagreement exceeds the tolerance. SciPy's `quad()` is a much more
 sophisticated relative, but the idea is the same.
 
 <Figure
   slug="scipy-numerical-calculus-inline-cutout"
   alt="A curve with a row of thin rectangles fitted under it, and a straight rod resting tangent against one point of the curve"
+  caption="Differentiate by slopes, integrate by areas: both are approximations."
 />
 
 ## Challenge: estimate $\pi$ by integration
@@ -375,7 +378,7 @@ This V-shaped error curve is the single most important plot to remember about nu
 - [o] It uses an adaptive algorithm that already computes two different approximations on every sub-interval and uses their difference as a built-in error estimator
   > Adaptive quadrature compares two rules of different orders on the same interval; their difference both drives subdivision and serves as a free, reliable error estimate. Returning it lets you decide whether the answer is trustworthy.
 - The error is the variance of the integrand
-  > The variance of the integrand is related to Monte Carlo error, not quadrature error; the error bound returned by \`quad\` is an estimate of the absolute integration error, not a statistical variance.
+  > The variance of the integrand is related to Monte Carlo error, not quadrature error; the error bound returned by \`quad()\` is an estimate of the absolute integration error, not a statistical variance.
 - It needs the error to log it
   > The function returns the error estimate as a value for the caller to inspect, not for internal logging; the page explains that the adaptive algorithm produces it as a byproduct.
 - Returning the error is required by the IEEE standard

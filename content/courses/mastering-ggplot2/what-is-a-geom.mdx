@@ -23,10 +23,10 @@ relationships are drawn*. Swap the geom and you get a different chart
 From the *same* data and mappings, `aes(x = displ, y = hwy)`, each
 geom draws a different chart:
 
-- `geom_point`, a scatter plot.
-- `geom_line`, a connected line.
+- `geom_point()`, a scatter plot.
+- `geom_line()`, a connected line.
 - `geom_bin2d`, a 2-D density.
-- `geom_smooth`, a trend line + band.
+- `geom_smooth()`, a trend line + band.
 
 Watch the geom change while everything else stays fixed:
 
@@ -85,6 +85,7 @@ themselves, via a statistic.
 <Figure
   slug="gg-what-is-a-geom-inline-cutout"
   alt="The same tray of data shown three times, drawn once as pinned chips, once as a ribbon, once as standing bars"
+  caption="The geom is the kind of mark; the same data can be drawn several ways."
 />
 
 ## A line needs an order; a scatter does not
@@ -149,7 +150,7 @@ swapping the geom yields different charts from one description.`}
 - [o] A line connects points in x order, which is meaningful for an ordered variable like \`date\` but produces meaningless zig-zags for an unordered variable like \`displ\`.
   > Lines encode sequence; only ordered x-values justify them.
 
-A geom carries assumptions. Choosing \`geom_line\` asserts that the
+A geom carries assumptions. Choosing \`geom_line()\` asserts that the
 x-values form a meaningful sequence.`}
 />
 

@@ -21,6 +21,7 @@ ritual. Here is a solid one to start with.
 <Figure
   slug="pandas-first-look-at-a-dataset-five-minute-ritual-inline-cutout"
   alt="A crate opened and five quick checks made in turn along a bench, each leaving a small card"
+  caption="The same few checks, every time, before you trust a dataset you just met."
 />
 
 <Steps>
@@ -71,6 +72,7 @@ is it?*
 <Figure
   slug="pandas-first-look-at-a-dataset-step-1-shape-inline-cutout"
   alt="A crate with a caliper measuring its width and depth, and its first few items fanned out beside it"
+  caption="Shape and head answer the first two questions: how big, and what is inside."
 />
 
 <CodeBlock
@@ -142,11 +144,11 @@ Look for:
 - **Object columns that should be categorical** (a small, repeating
   vocabulary like `species` or `island`).
 - **`object` columns that contain dates**, they need
-  `pd.to_datetime`.
+  `pd.to_datetime()`.
 
 ## Step 3, Describe
 
-`describe` gives you summary statistics for each column. By
+`describe()` gives you summary statistics for each column. By
 default it summarizes numeric columns; pass `include="all"` to
 also describe text/categorical columns.
 
@@ -267,6 +269,7 @@ After the five-minute ritual, do a few quick cross-tabulations.
 <Figure
   slug="pandas-first-look-at-a-dataset-inline-cutout"
   alt="A sealed crate opened on a bench with its first few items lifted out and set in a row for inspection"
+  caption="A first look means taking a few rows out and actually reading them."
 />
 
 <CodeBlock
@@ -398,7 +401,7 @@ assert species_list == ["Adelie", "Chinstrap", "Gentoo"], f"Got {species_list}"`
 - It is required by Pandas
   > \`df.describe()\` is a recommended habit, not a mandatory Pandas step; code runs without it.
 - [o] Because it gives a quick read on ranges, central tendency, and spread, and surfaces obviously wrong values (negative ages, impossible maxes) early
-  > A 30-second \`describe\` regularly catches data bugs that would otherwise hide for hours.
+  > A 30-second \`describe()\` regularly catches data bugs that would otherwise hide for hours.
 - It removes missing values
   > \`df.describe()\` skips NaN values when computing statistics but does not drop them from the DataFrame.
 

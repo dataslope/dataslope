@@ -9,7 +9,7 @@ away. That is what **strip** and **swarm** plots do. They put a categorical
 variable on one axis, a numeric variable on the other, and draw **one mark
 per row**. Nothing is hidden, because nothing is summarized.
 
-Both are `catplot` kinds: `kind="strip"` and `kind="swarm"`. They show the
+Both are `catplot()` kinds: `kind="strip"` and `kind="swarm"`. They show the
 same thing, all the points, and differ only in *how they arrange* points
 that would otherwise land on top of each other.
 
@@ -84,6 +84,7 @@ points there. It is a strip plot and a rough distribution in one.
 <Figure
   slug="sns-strip-and-swarm-plots-strip-plot-every-inline-cutout"
   alt="A column of chips nudged slightly sideways at random so each stays visible"
+  caption="A strip plot jitters the points sideways so each one stays visible."
 />
 
 <CodeBlock
@@ -140,7 +141,7 @@ is honest.
 A popular move is to overlay raw points *on top of* a summary, say a strip
 or swarm drawn over a box or violin, so you get the compact summary and the
 honest individual points together. Doing it robustly means using the
-axes-level functions (`stripplot`, `boxplot`, ...) drawn on the *same* Axes,
+axes-level functions (`stripplot()`, `boxplot()`, ...) drawn on the *same* Axes,
 which we build up on the figure-level-vs-axes-level page. For now, know that
 the combination exists and is often the most informative single chart.
 </Callout>
@@ -194,6 +195,7 @@ colors. Try setting `dodge=False` to see why the separation helps.
 <Figure
   slug="sns-strip-and-swarm-plots-inline-cutout"
   alt="One column of chips overlapping in a line, and beside it the same chips nudged sideways so none overlap"
+  caption="A swarm nudges points until none overlap, so its width shows density."
 />
 
 <MultipleChoice
@@ -218,7 +220,7 @@ line, it changes only their horizontal placement, never the value.`}
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Show every penguin"
-  instructions={`Use \`sns.catplot\` on the \`penguins\` dataset to show **every penguin's
+  instructions={`Use \`sns.catplot()\` on the \`penguins\` dataset to show **every penguin's
 body mass**, grouped by species.
 
 - Put \`species\` on the x-axis and \`body_mass_g\` on the y-axis.

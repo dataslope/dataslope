@@ -25,6 +25,7 @@ that picture is worth more than any single set of labels.
 <Figure
   slug="ml-hierarchical-clustering-problem-solves-inline-cutout"
   alt="A scatter of chips with no bins given, a hand pairing the two closest and then pairing the pairs"
+  caption="Merging the closest pair over and over builds groups without fixing k first."
 />
 
 This page assumes you have met clustering on the **K-Means Clustering**
@@ -84,6 +85,7 @@ recipe is almost embarrassingly simple:
 <Figure
   slug="ml-hierarchical-clustering-intuition-start-apart-inline-cutout"
   alt="Chips joined into pairs, pairs joined into groups, groups joined at the top into one branching frame"
+  caption="Every merge is recorded, so you can cut the tree at any level you like."
 />
 
 Each merge reduces the cluster count by exactly one, so after `n - 1`
@@ -403,7 +405,7 @@ up immediately. First, the features live on wildly different scales
 `StandardScaler` the largest-magnitude column would dominate every distance.
 Second, agglomerative clustering is roughly *O(n²)*, so we draw a **random
 sample of 400 districts** rather than all ~20,000, large enough to find
-structure, small enough to stay fast. We fix `random_state` on `.sample` so
+structure, small enough to stay fast. We fix `random_state` on `.sample()` so
 the draw is reproducible; the clustering itself needs no seed.
 
 <CodeBlock
@@ -440,7 +442,7 @@ print("Districts per cluster:", counts)
 
 You get three groups of districts with no labels to check against, that is
 clustering. The clusters tend to track things like income and location, but
-the point here is mechanical: the exact same `fit_predict` you ran on blobs
+the point here is mechanical: the exact same `fit_predict()` you ran on blobs
 works on real, unscaled, differently-sized features, *once you standardize*.
 On a sample this size the tree builds instantly; push the sample toward tens
 of thousands and you would feel the quadratic cost the next section warns
@@ -487,6 +489,7 @@ a dendrogram on a representative *sample* to understand the structure.
 <Figure
   slug="ml-hierarchical-clustering-inline-cutout"
   alt="Chips joined into pairs, pairs joined into groups, and groups joined at the top into one branching frame"
+  caption="The whole nesting is the output, not one fixed set of labels."
 />
 
 - You do not know `k` and want the data to suggest it, slide the cut down
@@ -556,7 +559,7 @@ labels.
    clustering is distance-based, so features must be on a comparable scale.
 2. Fit \`AgglomerativeClustering\` with \`n_clusters=3\` and \`linkage="ward"\`
    on \`X_scaled\`. Store the per-point labels in \`labels\` (use
-   \`fit_predict\`).
+   \`fit_predict()\`).
 3. Store the number of distinct clusters found in \`n_found\`.
 4. Store the size of the LARGEST cluster (its point count) in
    \`largest_cluster\`. Hint: \`np.bincount(labels)\` gives the count per

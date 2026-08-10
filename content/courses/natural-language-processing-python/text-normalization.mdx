@@ -75,6 +75,7 @@ door.
 <Figure
   slug="nlp-text-normalization-case-folding-collapsing-inline-cutout"
   alt="Three tiles of different heights pressed by one plate into three identical tiles"
+  caption="Lowercasing collapses variants, and it is a one-way door."
 />
 
 - **Named entities.** "Apple" the company and "apple" the fruit are different
@@ -134,6 +135,7 @@ common ways to strip it; know more than one.
 <Figure
   slug="nlp-text-normalization-inline-cutout"
   alt="Word tiles of different heights, casings and trims passing through a press that leaves them all the same plain shape"
+  caption="Normalising makes the same word look the same however it was written."
 />
 
 <CodeBlock
@@ -170,10 +172,10 @@ print("string.punctuation =", repr(string.punctuation))
 Compare the three results carefully, they disagree, and the disagreements
 are instructive:
 
-- **Approach 1** (`isalpha` filter) drops "World!" *entirely* because the
+- **Approach 1** (`isalpha()` filter) drops "World!" *entirely* because the
   whole token "World!" is not alphabetic. That is probably not what you
   wanted, you lost the word, not just the punctuation.
-- **Approach 2** (`translate`) removes punctuation *characters*, turning
+- **Approach 2** (`translate()`) removes punctuation *characters*, turning
   "World!" into "world" and "It's" into "its". It keeps the words but glues
   contractions together ("its").
 - **Approach 3** (regex `[a-z]+`) extracts runs of letters, so "isn't"

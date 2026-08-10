@@ -60,6 +60,7 @@ Traversal starts at `head` and follows `next` until `nullptr`.
 <Figure
   slug="dsa-linked-lists-build-traverse-list-inline-cutout"
   alt="Three blocks clipped together by cords in turn, then a finger following the cords from the first to the last"
+  caption="Each node points to the next, so reaching item five means walking five links."
 />
 
 <CodeBlock
@@ -94,7 +95,7 @@ int main() {
 
 A vector jumps directly to `v[i]`. A linked list must walk one link at a time to reach the ith node.
 
-## Prepend with `push_front`
+## Prepend with `push_front()`
 
 Here is the operation that justifies the whole structure. Prepending creates a new node, points it at the old head, then updates the head pointer, two pointer writes, regardless of whether the list holds three nodes or three million. Note the parameter type `Node *&head`: a *reference to a pointer*, so the function can re-aim the caller's own head. The order of the two steps matters; point the new node at the old head *before* overwriting `head`, or the rest of the list is lost.
 
@@ -229,6 +230,7 @@ Manual `new` and `delete` are useful for learning pointers, but production C++ s
 <Figure
   slug="dsa-linked-lists-nodes-links-inline-cutout"
   alt="Separate blocks on a bench each joined to the next by a short cord"
+  caption="Nodes live anywhere in memory; the links are what put them in order."
 />
 
 <CodeBlock
@@ -278,6 +280,7 @@ Reversing a singly linked list in place is *the* classic pointer exercise, simpl
 <Figure
   slug="dsa-linked-lists-inline-cutout"
   alt="Separate blocks on a bench each joined to the next by a short cord, one cord unclipped and rerouted to insert a new block"
+  caption="Inserting means rerouting one link, not shifting everything along."
 />
 
 <ChallengeCard

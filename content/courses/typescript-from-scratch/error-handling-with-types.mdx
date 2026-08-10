@@ -54,6 +54,7 @@ Functions return `Result` instead of throwing. Callers must check `.ok` to acces
 <Figure
   slug="tsx-error-handling-with-types-solution-result-t-inline-cutout"
   alt="One chute splitting into two trays, one for finished blocks and one for marked failure tags"
+  caption="A `Result` puts success and failure in the return type, where callers see them."
 />
 
 <CodeBlock
@@ -136,7 +137,7 @@ if (doubled.ok) {
   ]}
 />
 
-`map` lets you transform success values without manually unpacking and repacking the `Result`.
+`map()` lets you transform success values without manually unpacking and repacking the `Result`.
 
 ---
 
@@ -189,7 +190,7 @@ if (sqrtResult.ok) {
   ]}
 />
 
-`andThen` (also called `flatMap` or `bind` in other languages) flattens nested `Result`s, letting you chain operations cleanly.
+`andThen()` (also called `flatMap()` or `bind` in other languages) flattens nested `Result`s, letting you chain operations cleanly.
 
 ---
 
@@ -287,8 +288,8 @@ console.log(result3); // { ok: false, error: 'Invalid number: "abc"' }
 
 Notice:
 1. Each step is a separate function that returns `Result`.
-2. `andThen` chains steps that might fail.
-3. `map` transforms the final success value.
+2. `andThen()` chains steps that might fail.
+3. `map()` transforms the final success value.
 4. Errors propagate automatically, no manual `if` checks at every step.
 
 ```mermaid
@@ -388,7 +389,7 @@ Here:
 - `parser.ts` uses `Result` to return success or error.
 - `main.ts` handles the result explicitly.
 
-This structure scales: any module can return `Result`, and consumers can compose with `map`/`andThen`.
+This structure scales: any module can return `Result`, and consumers can compose with `map()`/`andThen()`.
 
 ---
 
@@ -397,7 +398,7 @@ This structure scales: any module can return `Result`, and consumers can compose
 <ChallengeCard
   adapter="typescript"
   title="Result.map"
-  instructions={`Complete the implementation of \`map\` in \`result.ts\`, then use it in \`main.ts\` to transform a parsed number by doubling it.
+  instructions={`Complete the implementation of \`map()\` in \`result.ts\`, then use it in \`main.ts\` to transform a parsed number by doubling it.
 
 **Hint**: If \`result.ok\`, apply \`fn\` to \`result.value\` and return a new success \`Result\`. Otherwise, return the error unchanged.`}
   entryFilename="main.ts"
@@ -477,6 +478,7 @@ export function map<T, E, U>(
 <Figure
   slug="tsx-error-handling-with-types-inline-cutout"
   alt="Two chutes leaving one machine, one carrying finished blocks and one carrying marked failure tags, both feeding trays"
+  caption="Both outcomes come out of the same call, and both have to be handled."
 />
 
 Use `Result` for:
@@ -518,9 +520,10 @@ Exceptions are invisible in types; \`Result\` makes errors explicit and unignora
 <Figure
   slug="tsx-error-handling-with-types-problem-exceptions-inline-cutout"
   alt="A block thrown clear of the bench entirely, landing out of sight beyond its edge"
+  caption="A thrown error leaves the call entirely, and the type says nothing about it."
 />
 
-## Multiple Choice: Chaining with `andThen`
+## Multiple Choice: Chaining with `andThen()`
 
 <MultipleChoice
   markdown={`Given:
@@ -531,13 +534,13 @@ const sqrtResult = andThen(result, sqrt);
 What happens if \`parseNumber\` returns an error?
 
 - [o] \`sqrt\` is not called; the error propagates
-  > \`andThen\` checks \`result.ok\`. If false, it returns the error immediately without calling \`sqrt\`.
+  > \`andThen()\` checks \`result.ok\`. If false, it returns the error immediately without calling \`sqrt\`.
 - \`sqrt\` is called with the error
-  > \`andThen\` only calls \`fn\` if the result is \`ok\`. Errors short-circuit.
+  > \`andThen()\` only calls \`fn\` if the result is \`ok\`. Errors short-circuit.
 - The program throws an exception
   > \`Result\` doesn't throw. Errors are returned as values.
 
-\`andThen\` provides automatic error propagation, similar to \`await\` for promises.`}
+\`andThen()\` provides automatic error propagation, similar to \`await\` for promises.`}
 />
 
 ---
@@ -546,7 +549,7 @@ What happens if \`parseNumber\` returns an error?
 
 You've learned how to:
 - Model errors as **values** with `Result<T, E>`.
-- Build **combinators** (`map`, `andThen`, `unwrapOr`) for composable error handling.
+- Build **combinators** (`map()`, `andThen()`, `unwrapOr`) for composable error handling.
 - **Chain operations** without manual error checks at every step.
 - Organize `Result`-based code across modules.
 - Decide when to use `Result` vs. exceptions.

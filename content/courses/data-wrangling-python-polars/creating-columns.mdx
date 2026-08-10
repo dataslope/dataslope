@@ -3,9 +3,9 @@ title: Creating and Transforming Columns
 description: "with_columns, conditional logic with when/then/otherwise, and the difference between adding a column and replacing one."
 ---
 
-`with_columns` keeps the frame you have and adds to it. It is the
+`with_columns()` keeps the frame you have and adds to it. It is the
 workhorse of a cleaning pipeline: read a file, then add a dozen
-derived and corrected columns to it, one `with_columns` at a time.
+derived and corrected columns to it, one `with_columns()` at a time.
 
 <Figure
   slug="pl-with-columns-cutout"
@@ -20,6 +20,7 @@ column; an existing name replaces it.
 <Figure
   slug="pl-creating-columns-add-or-replace-inline-cutout"
   alt="One column being set into an empty slot at the board's edge, and another column being lifted out and swapped for a new one"
+  caption="The output name decides everything: a new name adds, an existing one replaces."
 />
 
 <CodeBlock
@@ -45,12 +46,13 @@ print(replaced)
 ## Everything in one call runs in parallel
 
 This is worth internalizing early, because it changes how you write.
-All the expressions inside one `with_columns` are evaluated against
+All the expressions inside one `with_columns()` are evaluated against
 the *same* input frame, at the same time.
 
 <Figure
   slug="pl-creating-columns-everything-one-call-inline-cutout"
   alt="Four columns being set into a board at once by four arms moving together rather than one after another"
+  caption="Expressions in one `with_columns()` all see the same input frame."
 />
 
 <CodeBlock
@@ -81,7 +83,7 @@ print(
 />
 
 <Callout type="warn" title="A column cannot see its siblings">
-Referring to a column created in the same `with_columns` call raises
+Referring to a column created in the same `with_columns()` call raises
 a "column not found" error. Split into two calls, or repeat the
 expression. Polars will spot the repetition in a lazy plan and
 compute it once anyway (common subexpression elimination).
@@ -89,7 +91,7 @@ compute it once anyway (common subexpression elimination).
 
 ## Keyword form
 
-`with_columns` also takes keyword arguments, where the keyword *is*
+`with_columns()` also takes keyword arguments, where the keyword *is*
 the output name. Shorter, and it removes a whole class of
 alias-related mistakes.
 
@@ -115,7 +117,7 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
 />
 
 The one limitation: a keyword has to be a valid Python identifier, so
-a column named `total sales` or `2024` still needs `alias`.
+a column named `total sales` or `2024` still needs `alias()`.
 
 ## Conditional logic: when / then / otherwise
 
@@ -148,12 +150,12 @@ print(sized["size"].value_counts(sort=True))
 
 Two things to watch:
 
-- **`otherwise` is not optional in practice.** Leave it out and
+- **`otherwise()` is not optional in practice.** Leave it out and
   unmatched rows become null, which is occasionally what you want and
   usually a bug.
 - **Nulls do not match anything.** `pl.col("x") > 5000` is *null*
   where `x` is null, not `False`, so a null row falls through to
-  `otherwise`. If nulls need their own branch, test for them
+  `otherwise()`. If nulls need their own branch, test for them
   explicitly with `pl.col("x").is_null()` first.
 
 <CodeBlock
@@ -190,6 +192,7 @@ An expression that matches many columns applies to each of them.
 <Figure
   slug="pl-creating-columns-inline-cutout"
   alt="A board gaining one more standing column at its right edge, built from two columns already in place"
+  caption="A new column is built from columns already standing in the frame."
 />
 
 <CodeBlock
@@ -334,11 +337,11 @@ assert labelled["shape"].to_list() == ["medium", "long", "stubby"]`,
 
 - Keyword arguments cannot be mixed with expressions in the same call
   > Mixing positional expressions and keyword arguments in one call is supported and common.
-- \`with_columns\` accepts at most one new column per call
+- \`with_columns()\` accepts at most one new column per call
   > Any number of columns can be added at once; adding several is the reason the call is parallel in the first place.
 - [o] Both expressions see the input frame, where \`b\` does not exist yet
-  > Chain a second \`with_columns\` when one new column depends on another.
-- Column \`c\` would need an explicit \`alias\` as well as its keyword
+  > Chain a second \`with_columns()\` when one new column depends on another.
+- Column \`c\` would need an explicit \`alias()\` as well as its keyword
   > The keyword already supplies the name, and adding an alias would be redundant rather than required.
 
 Everything in one call is computed against the same input, which is what lets Polars run them in parallel.`}
@@ -348,10 +351,10 @@ Everything in one call is computed against the same input, which is what lets Po
   markdown={`A row has a null in \`mass\`. What does \`pl.when(pl.col("mass") > 5000).then(...).otherwise("small")\` give it?
 
 - \`null\`, because a null propagates through the whole expression
-  > \`otherwise\` supplies a value for every row the conditions did not match, so the result is not null.
+  > \`otherwise()\` supplies a value for every row the conditions did not match, so the result is not null.
 - An error, since a null cannot be compared with a number
   > The comparison is legal; it simply evaluates to null rather than to true or false.
-- [o] \`"small"\`, because the null comparison is not true, so it falls to \`otherwise\`
+- [o] \`"small"\`, because the null comparison is not true, so it falls to \`otherwise()\`
   > Test \`is_null()\` in its own branch first when missing data deserves its own label.
 - \`"small"\` only if the column has been filled beforehand, otherwise the row is dropped
   > \`when/then\` never drops rows; the frame's height is unchanged whatever the conditions do.

@@ -13,7 +13,7 @@ these are all aggregations.
 />
 
 This chapter covers single-Series aggregations. The next chapter
-introduces `groupby`, which is aggregations *per group*.
+introduces `groupby()`, which is aggregations *per group*.
 
 ## The reduction methods
 
@@ -65,6 +65,7 @@ matters more than you think.
 <Figure
   slug="pandas-aggregation-basics-aggregations-handle-missing-inline-cutout"
   alt="A column of chips with two covers among them tipped into a funnel, the covers falling aside and only chips reaching the gauge"
+  caption="Aggregations drop the missing cells and average only the values that are there."
 />
 
 <CodeBlock
@@ -144,7 +145,7 @@ print(s.describe())
   ]}
 />
 
-On a DataFrame, `describe` does the same per numeric column.
+On a DataFrame, `describe()` does the same per numeric column.
 On a non-numeric column, it returns count / unique / top / freq.
 
 ## `.agg()`, multiple aggregations at once
@@ -206,11 +207,13 @@ like *"average salary of engineers."*
 <Figure
   slug="pandas-aggregation-basics-reduction-methods-inline-cutout"
   alt="One tall column of chips tipped into a funnel and leaving as a single block on the tray below"
+  caption="An aggregation reduces a whole column to a single number."
 />
 
 <Figure
   slug="pandas-aggregation-basics-inline-cutout"
   alt="One column of chips tipped into a funnel and leaving as a single block on the tray below"
+  caption="Filter first, then aggregate, and the answer describes only the rows you kept."
 />
 
 <CodeBlock
@@ -236,9 +239,9 @@ print("Average engineer salary:", eng_mean.round(1))
 />
 
 This works, but if you find yourself doing it for every
-department, you want `groupby`, coming up next chapter.
+department, you want `groupby()`, coming up next chapter.
 
-## `value_counts`, a one-shot category breakdown
+## `value_counts()`, a one-shot category breakdown
 
 For a categorical column, `.value_counts()` gives you both the
 distinct values *and* their counts.

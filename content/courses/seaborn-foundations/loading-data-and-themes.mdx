@@ -58,6 +58,7 @@ guessing. Here are the ones to know.
 <Figure
   slug="sns-loading-data-and-themes-loading-built-dataset-inline-cutout"
   alt="A sealed carton already sitting on the workshop shelf being lifted down and opened"
+  caption="The built-in datasets are already on the shelf, ready to load by name."
 />
 
 **`tips`** (244 rows), one row per restaurant bill. A classic for
@@ -130,7 +131,7 @@ display(flights.head())
 You'll notice the `penguins` block above used
 `pd.read_csv("penguins.csv")` while the `flights` block used
 `sns.load_dataset("flights")`. They reach the *same* kind of object, a
-pandas DataFrame, but by different roads. `sns.load_dataset` downloads
+pandas DataFrame, but by different roads. `sns.load_dataset()` downloads
 from Seaborn's online example repository each time. For the two datasets
 this course leans on most, **penguins** and **diamonds**, we instead stage
 a pinned, cached copy and read it as a local file, so those examples load
@@ -144,7 +145,7 @@ full list. Stick to the small ones above for fast, snappy exercises, a few
 listed datasets are large enough to slow a plot down.
 </Callout>
 
-## One call to make everything look good: `set_theme`
+## One call to make everything look good: `set_theme()`
 
 By default, Seaborn draws on matplotlib's plain look: a white background, no
 gridlines, fairly small text. It is perfectly functional but a little
@@ -283,7 +284,7 @@ shapes. Pick based on whether your audience needs to *look up numbers* or
 just *see the pattern*.
 
 <MultipleChoice
-  markdown={`Which \`set_theme\` **style** gives you a plain white background with **no**
+  markdown={`Which \`set_theme()\` **style** gives you a plain white background with **no**
 gridlines and small tick marks on the axes?
 
 - \`"whitegrid"\`
@@ -352,7 +353,7 @@ will appear in. A figure headed for slides? `context="talk"` or
 `"poster"`. A dense multi-panel figure for a paper? `context="paper"`.
 </Callout>
 
-## `set_theme` is global and sticky
+## `set_theme()` is global and sticky
 
 One subtlety worth internalizing: `set_theme()` does not return a styled
 object or attach to a particular chart. It mutates matplotlib's global
@@ -372,7 +373,7 @@ put `set_theme()` first for exactly this reason.
 <ChallengeCard
   adapter="python"
   title="Inspect the mpg dataset"
-  instructions={`Load the \`mpg\` dataset with \`sns.load_dataset\`, then compute two
+  instructions={`Load the \`mpg\` dataset with \`sns.load_dataset()\`, then compute two
 summary numbers:
 
 1. Store the **number of rows** in a variable named \`n_rows\`.
@@ -430,9 +431,9 @@ mean_mpg = round(mpg["mpg"].mean(), 1)
 - A file path string pointing to a CSV on disk.
   > You get the loaded table itself, ready to use, there is no file to open.
 - A Seaborn-specific chart object that you then display.
-  > \`load_dataset\` loads *data*, not a chart. Nothing is plotted by this call.
+  > \`load_dataset()\` loads *data*, not a chart. Nothing is plotted by this call.
 
-\`load_dataset\` is just a convenient way to get a clean, tidy pandas
+\`load_dataset()\` is just a convenient way to get a clean, tidy pandas
 DataFrame to practice on.`}
 />
 
@@ -442,14 +443,14 @@ Which statement is true?
 
 - Nothing changes until you also pass a \`style\` argument.
   > \`context\` works on its own; \`style\` and \`palette\` are independent, optional settings.
-- [o] All three charts use the larger \`poster\` sizing, because \`set_theme\` changes the global defaults for the rest of the session.
-  > \`set_theme\` mutates matplotlib's global defaults, so every plot drawn afterward inherits the new context until it is changed again.
+- [o] All three charts use the larger \`poster\` sizing, because \`set_theme()\` changes the global defaults for the rest of the session.
+  > \`set_theme()\` mutates matplotlib's global defaults, so every plot drawn afterward inherits the new context until it is changed again.
 - The call resizes charts you already drew before it.
   > The effect is forward-looking only; plots created before the call keep their previous appearance.
 - Only the first chart after the call is affected; later charts revert to the default.
-  > The change is persistent, not one-shot, it stays in effect until you call \`set_theme\` again.
+  > The change is persistent, not one-shot, it stays in effect until you call \`set_theme()\` again.
 
-\`set_theme\` is global and sticky: set it once, and it shapes every
+\`set_theme()\` is global and sticky: set it once, and it shapes every
 *subsequent* plot in the session.`}
 />
 

@@ -71,6 +71,7 @@ frame, the caller owns the content.
 <Figure
   slug="rx-composition-and-children-inline-cutout"
   alt="An outer frame with an open slot, and three different panels each dropped into that same slot in turn"
+  caption="A wrapper owns the frame and the caller owns whatever goes inside it."
 />
 
 The two panels below share one `Panel` wrapper. It owns the header bar
@@ -322,4 +323,5 @@ of reuse is sharing *logic*, which is exactly what
 <Figure
   slug="rx-composition-and-children-children-prop-inline-cutout"
   alt="An outer frame with an open slot and three different panels dropped into that same slot in turn"
+  caption="`children` is just a prop, which is why any content fits the same slot."
 />

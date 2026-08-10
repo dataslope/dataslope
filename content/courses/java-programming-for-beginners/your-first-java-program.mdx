@@ -53,6 +53,7 @@ belongs to some class.
 <Figure
   slug="java-your-first-java-program-program-inline-cutout"
   alt="A plain card entering a machine and one short strip of type leaving its printer"
+  caption="The smallest Java program still needs a class and a `main()` method."
 />
 
 - `public`, this class is visible to any other code.
@@ -93,7 +94,7 @@ This is the only line that *does* anything. It prints text.
   things related to the running program.
 - `out`, a field of `System` that is the standard output (the
   console).
-- `println`, a method on `out` that prints its argument followed by
+- `println()`, a method on `out` that prints its argument followed by
   a newline.
 - `"Hello, Java!"`, a **string literal**, a value of type `String`.
 - `;`, the semicolon that ends every statement in Java.
@@ -119,7 +120,7 @@ sequenceDiagram
 ```
 
 The JVM started, found `Main.main`, called it, and `main` made one
-call into `System.out.println`. Then it ended. That's it.
+call into `System.out.println()`. Then it ended. That's it.
 
 ## Try changing things
 
@@ -127,8 +128,8 @@ Real understanding comes from breaking things on purpose. Try each
 of the following in the code block above, and predict what will
 happen *before* you click Run.
 
-1. Change `println` to `print` (no `ln`). The newline disappears.
-2. Add a second `println` line. Both lines print.
+1. Change `println()` to `print()` (no `ln`). The newline disappears.
+2. Add a second `println()` line. Both lines print.
 3. Add `System.out.println(5 + 3);`, Java prints `8`. You can
    print numbers, not just strings.
 4. Delete the semicolon at the end of any statement. Java will
@@ -208,6 +209,7 @@ few pages.
 <Figure
   slug="java-your-first-java-program-inline-cutout"
   alt="A small block stamped, carried through a translating machine, and set down finished on a plinth"
+  caption="Compiled once, the same class file runs on any machine with a runtime."
 />
 
 ## A small challenge

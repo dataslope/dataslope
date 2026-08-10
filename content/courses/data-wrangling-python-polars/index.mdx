@@ -54,7 +54,7 @@ anything has been computed. That object is called an **expression**,
 and it is the single idea this course is built on.
 
 Change `"body_mass_g"` to `"flipper_length_mm"` and run again. Change
-`"species"` to `"island"`. Add a second line inside `agg` and compute
+`"species"` to `"island"`. Add a second line inside `agg()` and compute
 two things at once. The shape of the code does not change, because
 you are always doing the same thing: handing Polars a description and
 letting it decide how to execute it.
@@ -83,7 +83,7 @@ By the end you will be able to:
 
 - Read data from CSV, Parquet, and JSON, and write it back out.
 - Express any column computation as a Polars expression.
-- Use the four contexts (`select`, `with_columns`, `filter`, and
+- Use the four contexts (`select()`, `with_columns()`, `filter()`, and
   `group_by().agg()`) fluently, and know which one a problem needs.
 - Aggregate, window, sort, join, and reshape real tables.
 - Clean missing values, messy strings, dates, and categories.
@@ -144,5 +144,5 @@ number of methods that almost compose. Learning it well means
 learning those few ideas properly and then recognizing them
 everywhere. That is why this course keeps returning to expressions
 long after you can write them: fluency is not knowing more methods,
-it is seeing that a window function, a `group_by`, and a `filter` are
+it is seeing that a window function, a `group_by()`, and a `filter()` are
 all the same machinery pointed at different problems.

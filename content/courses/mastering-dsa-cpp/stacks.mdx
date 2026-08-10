@@ -1,6 +1,6 @@
 ---
 title: Stacks
-description: Learn the LIFO stack ADT, std::stack, vector-backed stacks, balanced parentheses, call stacks, and stack-based string reversal
+description: Learn the last-in-first-out stack interface, std::stack, vector-backed stacks, balanced parentheses, call stacks, and stack-based string reversal
 ---
 
 Some problems care only about *the most recent thing*. Which bracket needs closing next? The one opened last. Which page does the browser's back button return to? The one visited last. Which function resumes when the current one returns? The one that called it. Whenever "most recent first" is the rule, the right structure is a stack: **last in, first out**, like a stack of cafeteria plates where you only ever touch the top.
@@ -38,6 +38,7 @@ A short trace, where each operation acts on the top:
 <Figure
   slug="dsa-stacks-std-stack-t-inline-cutout"
   alt="A column of trays where only the top one can be lifted or added to"
+  caption="Only the top of a stack is reachable, which is what makes it a stack."
 />
 
 <CodeBlock
@@ -69,7 +70,7 @@ int main() {
 
 ## Implement a stack with `std::vector`
 
-A vector already has the right back operations: `push_back`, `back`, and `pop_back` are efficient.
+A vector already has the right back operations: `push_back()`, `back()`, and `pop_back()` are efficient.
 
 <CodeBlock
   adapter="cpp"
@@ -107,7 +108,7 @@ int main() {
 />
 
 <Callout type="success" title="Stack operation costs">
-For `std::stack` backed by `std::deque`, `push`, `pop`, `top`, and `empty` are O(1). A vector-backed stack also gives amortized O(1) `push`.
+For `std::stack` backed by `std::deque`, `push()`, `pop()`, `top()`, and `empty()` are O(1). A vector-backed stack also gives amortized O(1) `push()`.
 </Callout>
 
 ## Balanced parentheses
@@ -405,7 +406,7 @@ int main() {
 />
 
 <MultipleChoice
-  markdown={`What is the usual time complexity of \`push\` and \`pop\` on \`std::stack\`?
+  markdown={`What is the usual time complexity of \`push()\` and \`pop()\` on \`std::stack\`?
 
 - O(n^2)
   > That would be far too expensive for a stack adapter.
@@ -424,8 +425,8 @@ int main() {
   > A deque can store many element types.
 - It sorts stack values automatically.
   > A stack preserves LIFO order; it does not sort.
-- It makes \`top\` O(n).
-  > \`top\` remains constant time.
+- It makes \`top()\` O(n).
+  > \`top()\` remains constant time.
 - [o] It supports efficient insertion and removal at the back without requiring contiguous reallocation like a vector.
   > It gives stable, efficient end operations.`}
 />

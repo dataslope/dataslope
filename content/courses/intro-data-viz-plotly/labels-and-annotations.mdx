@@ -24,6 +24,7 @@ This page is about three pieces of text:
 <Figure
   slug="viz-labels-and-annotations-titles-subtitles-axis-inline-cutout"
   alt="A finished plot with a blank title plate above it and blank plates along both of its edges"
+  caption="A chart without labels makes the reader guess what they are looking at."
 />
 
 ## Titles, subtitles, axis labels
@@ -86,6 +87,7 @@ outlier, the day something happened, use `fig.add_annotation(...)`.
 <Figure
   slug="viz-labels-and-annotations-inline-cutout"
   alt="A chart board with one small flag planted beside a single mark and a short pointer drawn to it"
+  caption="An annotation points at the one mark you actually want discussed."
 />
 
 <CodeBlock
@@ -141,7 +143,7 @@ a cloud into something you can act on:
 <Chart slug="reference-line-quadrants" />
 
 Often the *interesting* thing in a chart is a value crossing some
-threshold. Use `fig.add_hline` or `fig.add_vline`:
+threshold. Use `fig.add_hline()` or `fig.add_vline()`:
 
 <CodeBlock
   adapter="python"

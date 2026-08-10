@@ -18,8 +18,8 @@ confounder.
 
 - **Expressions.** `pl.col("x").mean()` is a value describing a
   computation, not a result. Everything else follows from that.
-- **The four contexts.** `select` builds a frame, `with_columns`
-  extends one, `filter` chooses rows, `group_by().agg()` computes per
+- **The four contexts.** `select()` builds a frame, `with_columns()`
+  extends one, `filter()` chooses rows, `group_by().agg()` computes per
   group. Same expressions, different meanings.
 - **Selectors.** Choosing columns by type or pattern, combined with
   set operations, so a new column does not break your code.
@@ -37,7 +37,7 @@ Deliberately, to keep it to a readable length:
 
 - **Plugins.** You can write an expression in Rust and register it
   as a Polars expression, which is the escape hatch when the built-in
-  ones genuinely cannot express something and `map_elements` is too
+  ones genuinely cannot express something and `map_elements()` is too
   slow. See the `pyo3-polars` project.
 - **`rolling` and `group_by_dynamic`.** Time-based windowing with
   real gaps: "the sum over the trailing 7 days", where the window is

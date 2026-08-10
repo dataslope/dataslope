@@ -1,5 +1,5 @@
 ---
-title: "OLAP vs. OLTP: a Needle and a Net"
+title: "Analytical vs. Transactional: a Needle and a Net"
 description: The same SQL keywords serve two very different jobs. Why analytical (OLAP) work scans columns while transactional (OLTP) work touches rows, and why that difference rewards a column-oriented, vectorized engine like DuckDB.
 ---
 
@@ -136,6 +136,7 @@ in chunks.
 <Figure
   slug="duck-olap-vs-oltp-two-jobs-one-inline-cutout"
   alt="A counter handling one parcel at a time beside a warehouse aisle being swept end to end"
+  caption="One system fetches single rows; the other sweeps whole columns."
 />
 
 Column storage plus vectorized execution is the lineage of decades of
@@ -210,4 +211,5 @@ DuckDB* in particular.
 <Figure
   slug="duck-olap-vs-oltp-inline-cutout"
   alt="A service counter handling one small parcel at a time on the left, and a warehouse aisle on the right where one wide column is read end to end"
+  caption="Analytics reads few columns of many rows, which is the opposite workload."
 />

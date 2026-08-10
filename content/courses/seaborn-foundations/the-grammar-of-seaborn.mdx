@@ -36,6 +36,7 @@ We want flipper length vs. body mass for the `penguins` dataset, with each
 <Figure
   slug="sns-the-grammar-of-seaborn-imperative-way-matplotlib-inline-cutout"
   alt="A figure adding one mark at a time to a board by hand with a long queue of marks still waiting"
+  caption="Drawing by hand means one call per group; Seaborn takes the column instead."
 />
 
 In raw matplotlib, *you* are responsible for every group, every color, and
@@ -207,15 +208,15 @@ visualization." Seaborn does not just place dots, for many chart types it
 **computes a statistical transform** from your raw rows and plots the result.
 You hand it observations; it hands you back a summary, drawn.
 
-* `countplot` **counts** how many rows fall in each category.
-* `barplot` and `pointplot` compute a **mean** per group and draw an error
+* `countplot()` **counts** how many rows fall in each category.
+* `barplot()` and `pointplot()` compute a **mean** per group and draw an error
   bar, a **confidence interval**, around it by default.
-* `histplot` / `displot` **bin** values to estimate a distribution; add
+* `histplot()` / `displot()` **bin** values to estimate a distribution; add
   `kde=True` for a smooth **density** curve.
-* `lineplot` aggregates repeated y-values at each x into a **mean with a
+* `lineplot()` aggregates repeated y-values at each x into a **mean with a
   confidence band**.
-* `regplot` / `lmplot` fit and draw a **regression** line with its uncertainty.
-* `heatmap` renders a **matrix** of values (often a correlation matrix) as
+* `regplot()` / `lmplot()` fit and draw a **regression** line with its uncertainty.
+* `heatmap()` renders a **matrix** of values (often a correlation matrix) as
   colored cells.
 
 You will meet each of these in its own chapter. The pattern to absorb now:
@@ -235,11 +236,11 @@ Declarative does not mean a locked black box. Because Seaborn draws *on top
 of* matplotlib, every call hands back real matplotlib objects you can keep
 adjusting:
 
-* **Axes-level** functions (`scatterplot`, `histplot`, `boxplot`, `heatmap`,
+* **Axes-level** functions (`scatterplot()`, `histplot()`, `boxplot()`, `heatmap()`,
   ...) draw onto a single matplotlib `Axes` and **return that Axes**. You can
   then call `ax.set_title(...)`, `ax.set_xlabel(...)`, and so on.
-* **Figure-level** functions (`relplot`, `displot`, `catplot`, `lmplot`,
-  `pairplot`, `jointplot`) create and manage their *own* figure and **return a
+* **Figure-level** functions (`relplot()`, `displot()`, `catplot()`, `lmplot()`,
+  `pairplot()`, `jointplot()`) create and manage their *own* figure and **return a
   grid object** (a `FacetGrid` and its relatives). You adjust it with grid
   methods like `g.set_axis_labels(...)`, `g.set_titles(...)`, and
   `g.figure.suptitle(...)`.
@@ -283,9 +284,9 @@ for now, just know the escape hatch is always there.
 That split, functions that build a whole *figure* and return a grid, versus
 functions that draw on one *Axes* and return it, is one of the most useful
 distinctions in Seaborn, and it has its own dedicated page later. The quick
-rule for now: reach for a **figure-level** function (like `relplot`) when you
+rule for now: reach for a **figure-level** function (like `relplot()`) when you
 might want multiple panels via `col`/`row`, and an **axes-level** function
-(like `scatterplot`) when you are placing one chart onto an Axes you control.
+(like `scatterplot()`) when you are placing one chart onto an Axes you control.
 </Callout>
 
 ## A common mistake: titling a figure-level grid
@@ -307,7 +308,7 @@ this disappear.
   adapter="python"
   title="Describe a grouped scatter in one line"
   instructions={`Put the declarative model into practice. Using the \`tips\` dataset and a
-single \`sns.relplot\` call, draw a scatter plot of:
+single \`sns.relplot()\` call, draw a scatter plot of:
 
 - \`total_bill\` on the x-axis,
 - \`tip\` on the y-axis,

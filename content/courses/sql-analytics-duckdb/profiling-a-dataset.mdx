@@ -50,7 +50,7 @@ flowchart LR
 ## Size and range
 
 The first two questions are always *how many rows* and *what does the key
-column span*. `COUNT(*)`, `MIN`, and `MAX` answer both at once.
+column span*. `COUNT(*)`, `MIN()`, and `MAX()` answer both at once.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -134,10 +134,10 @@ FROM
 Knowing *how many* values are missing tells you whether a column is
 trustworthy or needs cleaning before analysis.
 
-## The shortcut: `SUMMARIZE`
+## The shortcut: `SUMMARIZE()`
 
 DuckDB bundles the whole profiling checklist into one keyword:
-**`SUMMARIZE`**. Prefix any table or query with it and DuckDB returns, per
+**`SUMMARIZE()`**. Prefix any table or query with it and DuckDB returns, per
 column, the count, number of distinct values, null percentage, min, max,
 average, and approximate quantiles. Point it at a real 53,940-row file you
 have never seen, straight from the web, and read off the whole shape in
@@ -158,12 +158,13 @@ FROM
 One line of intent, a complete profile of ten columns. Scan the `min` and
 `max` of `price` and `carat`, the distinct counts of `cut` / `color` /
 `clarity`, and the null percentages, in seconds you know more about this
-file than scrolling it for an hour would tell you. `SUMMARIZE` is the
+file than scrolling it for an hour would tell you. `SUMMARIZE()` is the
 first thing many DuckDB analysts type when they meet a new dataset.
 
 <Figure
   slug="duck-profiling-a-dataset-profile-first-inline-cutout"
   alt="A crate with a gauge clipped to each of its sides before its lid is opened"
+  caption="Measure the dataset before you query it, not after the answer looks odd."
 />
 
 ```mermaid
@@ -176,16 +177,17 @@ flowchart TD
 Before analyzing any new dataset, answer:
 
 1. **How many rows?** (`COUNT(*)`)
-2. **What range does the key/date span?** (`MIN`, `MAX`)
+2. **What range does the key/date span?** (`MIN()`, `MAX()`)
 3. **How distinct is each important column?** (`COUNT(DISTINCT ...)`)
 4. **Are there duplicates?** (`COUNT(*)` vs `COUNT(DISTINCT id)`)
 5. **What is missing?** (`COUNT(*) - COUNT(column)`)
 
-Or just run `SUMMARIZE` and read the lot at a glance.
+Or just run `SUMMARIZE()` and read the lot at a glance.
 
 <Figure
   slug="duck-profiling-a-dataset-inline-cutout"
   alt="A board of columns with a small gauge clipped to the head of each, every gauge reading a different property of its column"
+  caption="Types, ranges, distinct counts and nulls: one reading per column."
 />
 
 ## Check your understanding
@@ -213,7 +215,7 @@ Total rows exceeding distinct ids is the classic signature of duplicates.`}
 - It is impossible to count NULLs in SQL.
   > NULLs are easy to count via the \`COUNT(*) - COUNT(col)\` difference (or other null checks).
 - \`SUM(email)\`, which adds up the NULLs.
-  > You cannot \`SUM\` a text column, and NULLs are not summed; this does not count missing values.
+  > You cannot \`SUM()\` a text column, and NULLs are not summed; this does not count missing values.
 - [o] \`COUNT(*) - COUNT(email)\`, because \`COUNT(*)\` counts all rows and \`COUNT(email)\` skips NULLs.
   > The difference between total rows and non-NULL emails is exactly the count of missing emails.
 
@@ -222,18 +224,18 @@ difference is the number of missing values.`}
 />
 
 <MultipleChoice
-  markdown={`What does DuckDB's \`SUMMARIZE\` keyword do?
+  markdown={`What does DuckDB's \`SUMMARIZE()\` keyword do?
 
 - It deletes summary rows from a table.
-  > \`SUMMARIZE\` produces a report; it changes nothing in the table.
+  > \`SUMMARIZE()\` produces a report; it changes nothing in the table.
 - It is an alias for \`GROUP BY\`.
-  > \`SUMMARIZE\` describes columns; \`GROUP BY\` groups rows for aggregation. They are unrelated.
+  > \`SUMMARIZE()\` describes columns; \`GROUP BY\` groups rows for aggregation. They are unrelated.
 - It permanently sorts the table by every column.
   > It neither sorts nor modifies the table; it only reports statistics.
 - [o] It returns a per-column profile, count, distinct values, null percentage, min, max, average, and quantiles, for a table or query.
-  > \`SUMMARIZE\` runs the whole profiling checklist at once, which is why analysts reach for it first on new data.
+  > \`SUMMARIZE()\` runs the whole profiling checklist at once, which is why analysts reach for it first on new data.
 
-\`SUMMARIZE\` is a one-keyword profile of every column in a dataset.`}
+\`SUMMARIZE()\` is a one-keyword profile of every column in a dataset.`}
 />
 
 With a trustworthy mental model in hand, you can start carving the data

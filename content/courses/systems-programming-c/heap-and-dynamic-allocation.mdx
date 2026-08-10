@@ -6,8 +6,8 @@ description: malloc, calloc, realloc, free, how to ask the runtime for memory an
 The stack is fast but rigid: every allocation dies when its function
 returns. To make memory **outlive** the function that created it,
 to build a linked list, a dynamic array, a parsed AST, anything,
-you ask the runtime for a piece of the **heap** with `malloc` and
-return it later with `free`.
+you ask the runtime for a piece of the **heap** with `malloc()` and
+return it later with `free()`.
 
 Manual heap management is C's most distinctive (and most dangerous)
 feature. This page is the long, careful introduction.
@@ -24,23 +24,24 @@ feature. This page is the long, careful introduction.
 | `malloc(n)` | Reserve `n` bytes, contents *uninitialized* | `void *` or `NULL` on failure |
 | `calloc(count, size)` | Reserve `count * size` bytes, zeroed | `void *` or `NULL` |
 | `realloc(p, n)` | Resize an existing block; may move it | `void *` (new ptr) or `NULL` |
-| `free(p)` | Release a block previously returned by `malloc`/`calloc`/`realloc` | `void` |
+| `free(p)` | Release a block previously returned by `malloc()`/`calloc()`/`realloc()` | `void` |
 
 They all live in `<stdlib.h>`.
 
 <Figure
   slug="sysc-heap-and-dynamic-allocation-inline-cutout"
   alt="An open yard of crates of different sizes with gaps between them, a figure fitting one new crate into a gap that just fits"
+  caption="The heap hands out blocks of the size you ask for, wherever one fits."
 />
 
-It is worth pausing on what `malloc` actually *is*: not a syscall,
+It is worth pausing on what `malloc()` actually *is*: not a syscall,
 not magic, just a library function managing a big region of memory
 with ordinary data structures, free lists, size bins, boundary
 tags. Anyone can write one, and one person famously did.
 
 That distinction is worth a number. Crossing into the kernel costs a
 privilege switch and a copy across the boundary, per call, which is why
-the library batches: `malloc` asks the kernel for a large region rarely,
+the library batches: `malloc()` asks the kernel for a large region rarely,
 and `FILE*` buffers writes for exactly the same reason.
 
 <Chart slug="syscall-vs-userspace-cost" />
@@ -50,7 +51,7 @@ computer science professor Doug Lea began writing a general-purpose
 allocator, **dlmalloc**, and placed it in the public domain. It was
 so well engineered that the GNU C library's allocator (ptmalloc2,
 which Linux programs use to this day) was built directly on it. For
-decades, nearly every `malloc` call on a Linux box has been running
+decades, nearly every `malloc()` call on a Linux box has been running
 a descendant of one professor's freely given code, a useful thing
 to remember when the allocator feels like an inscrutable black box.
 Near the end of this course's roadmap you will find "write a toy
@@ -97,8 +98,8 @@ int main(void) {
 
 Three rules visible in that tiny example:
 
-1. **Always check for `NULL`.** `malloc` can fail.
-2. **Initialize before reading.** `malloc` does *not* zero memory;
+1. **Always check for `NULL`.** `malloc()` can fail.
+2. **Initialize before reading.** `malloc()` does *not* zero memory;
    reading uninitialized bytes is undefined behavior.
 3. **Free exactly once.** Not zero times (leak). Not two times
    (double-free, often crash). Exactly once, then stop using the
@@ -107,16 +108,18 @@ Three rules visible in that tiny example:
 <Figure
   slug="sysc-heap-and-dynamic-allocation-first-malloc-inline-cutout"
   alt="A crate handed out over a counter with a tag clipped to the hand that took it"
+  caption="`malloc()` gives you a block and the responsibility for returning it."
 />
 
 ## A growable array of N ints
 
-This is the most common use of `malloc`: you only know the size at
+This is the most common use of `malloc()`: you only know the size at
 runtime.
 
 <Figure
   slug="sysc-heap-and-dynamic-allocation-growable-array-n-inline-cutout"
   alt="A rail being replaced by a longer rail with its blocks carried across, the short one set aside"
+  caption="Growing an array means a bigger block, a copy across, and the old one freed."
 />
 
 <CodeBlock
@@ -152,7 +155,7 @@ means the line stays correct if you ever change `arr`'s element type.
 It is a small habit that prevents large bugs.
 </Callout>
 
-## `calloc`: zeroed and overflow-checked
+## `calloc()`: zeroed and overflow-checked
 
 `calloc(count, size)` does two extra things compared to
 `malloc(count * size)`:
@@ -185,10 +188,10 @@ int main(void) {
   ]}
 />
 
-Prefer `calloc` whenever you would otherwise call `malloc` followed
+Prefer `calloc()` whenever you would otherwise call `malloc()` followed
 by `memset(p, 0, ...)`.
 
-## `realloc`: grow or shrink
+## `realloc()`: grow or shrink
 
 `realloc(p, new_size)` is the resizing primitive. It may:
 
@@ -197,7 +200,7 @@ by `memset(p, 0, ...)`.
 - or return `NULL` (the old block is **still valid** in this case).
 
 <Callout type="warn" title="Never assign realloc's result back over the only pointer">
-`p = realloc(p, n);` leaks the original block if `realloc` fails. The
+`p = realloc(p, n);` leaks the original block if `realloc()` fails. The
 safe pattern is to use a temporary.
 </Callout>
 
@@ -246,7 +249,7 @@ Everything on this page comes together in one small data structure:
 a growable array. The struct and its boilerplate live in the
 read-only setup; the part worth your attention is `vec_push`, which
 contains the whole growth strategy, when the array is full, double
-the capacity with `realloc` (using the safe temporary pattern from
+the capacity with `realloc()` (using the safe temporary pattern from
 above), then append.
 
 <CodeBlock
@@ -311,7 +314,7 @@ exactly how `std::vector<T>` in C++ and `Vec<T>` in Rust grow.
 
 ## Ownership: who frees what?
 
-C has no automatic memory management. *Someone* must call `free` on
+C has no automatic memory management. *Someone* must call `free()` on
 every heap block exactly once. The way to keep this manageable is to
 make **ownership** explicit:
 
@@ -435,7 +438,7 @@ use-after-frees, in the *Memory Bugs* chapter.
 <ChallengeCard
   adapter="c"
   title="Allocate, fill, average, free"
-  instructions={`Allocate a heap array of \`N = 5\` ints, fill it with the values 10, 20, 30, 40, 50 (in that order), print their integer average, then \`free\` the array. The output must be exactly \`30\`.`}
+  instructions={`Allocate a heap array of \`N = 5\` ints, fill it with the values 10, 20, 30, 40, 50 (in that order), print their integer average, then \`free()\` the array. The output must be exactly \`30\`.`}
   files={[
     {
       filename: "main.c",
@@ -543,25 +546,25 @@ int main(void) {
 ## Test your understanding
 
 <MultipleChoice
-  markdown={`What is the safest way to handle a failed \`realloc\`?
+  markdown={`What is the safest way to handle a failed \`realloc()\`?
 
-- Use \`free\` on the original block and then \`malloc\` a new one.
-  > That works but defeats the purpose of \`realloc\` (which can resize in place).
+- Use \`free()\` on the original block and then \`malloc()\` a new one.
+  > That works but defeats the purpose of \`realloc()\` (which can resize in place).
 - Assume it succeeded and keep using the same pointer.
-  > A failed \`realloc\` returns \`NULL\`; using \`NULL\` as if it were the old block is UB.
-- Call \`realloc\` again immediately; the second call usually succeeds.
+  > A failed \`realloc()\` returns \`NULL\`; using \`NULL\` as if it were the old block is undefined behavior.
+- Call \`realloc()\` again immediately; the second call usually succeeds.
   > Failure usually means low memory; retrying without changes does not help.
 - [o] Assign the result to a temporary first; if \`NULL\`, free the old block (which is still valid) and bail out.
   > \`p = realloc(p, n);\` leaks the original on failure; the temporary pattern avoids it.`}
 />
 
 <MultipleChoice
-  markdown={`Why does \`malloc\` not zero-initialize the memory it returns?
+  markdown={`Why does \`malloc()\` not zero-initialize the memory it returns?
 
-- Because \`malloc\` always returns memory that was previously \`free\`d, which is already zeroed.
+- Because \`malloc()\` always returns memory that was previously \`free()\`d, which is already zeroed.
   > Freed memory is **not** guaranteed to be zeroed; it contains the previous user's bytes.
-- [o] Zeroing has a cost; programs that are about to overwrite every byte anyway should not pay it. \`calloc\` exists for when you actually want zeros.
-  > \`malloc\` is the bare-minimum allocator; \`calloc\` is the zeroing variant.
+- [o] Zeroing has a cost; programs that are about to overwrite every byte anyway should not pay it. \`calloc()\` exists for when you actually want zeros.
+  > \`malloc()\` is the bare-minimum allocator; \`calloc()\` is the zeroing variant.
 - Zeroing is impossible without kernel support.
   > The OS does sometimes pre-zero pages, but the standard library is allowed to skip it.
 - The standard requires that it does.
@@ -577,6 +580,6 @@ int main(void) {
   > Even printing the value (as a pointer) is fine, but *dereferencing* it is UB. Most code should simply stop using it.
 - Read it once more to confirm the contents were cleared.
   > Reading freed memory is undefined behavior, use-after-free.
-- Pass it to \`free\` again to be safe.
+- Pass it to \`free()\` again to be safe.
   > That is a *double-free*, which is also undefined and often crashes.`}
 />

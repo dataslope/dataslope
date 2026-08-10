@@ -107,7 +107,7 @@ flowchart TB
     I --> D[Impl: file backed]
 ```
 
-That is abstraction. You name the *what* (`append`, `get`) and hide
+That is abstraction. You name the *what* (`append`, `get()`) and hide
 the *how* (the data structure). Later you can swap implementations
 without changing any caller.
 
@@ -157,6 +157,7 @@ you those pieces:
 <Figure
   slug="cpp-encapsulation-and-abstraction-invariants-truths-class-inline-cutout"
   alt="A sealed cabinet with a gauge on its face whose needle never leaves a marked band however the handles are turned"
+  caption="An invariant is a promise the class keeps however its handles are used."
 />
 
 This is the difference between programs that grow gracefully and

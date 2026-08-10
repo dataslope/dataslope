@@ -76,6 +76,7 @@ The phrase `REFERENCES customers(id)` declares the relationship: each `orders.cu
 <Figure
   slug="lite-foreign-keys-referential-integrity-inline-cutout"
   alt="A gate latched shut across a crate while a cord still runs from that crate to another"
+  caption="A foreign key stops you deleting a row something else still points at."
 />
 
 <MultipleChoice
@@ -159,6 +160,7 @@ The second insert is blocked. SQLite is protecting you from an **orphan row**: a
 <Figure
   slug="lite-foreign-keys-inline-cutout"
   alt="A cord joining a row in one board to a row in another, with a small clasp on the cord that can be left open or closed"
+  caption="In SQLite the check is there but has to be switched on for each connection."
 />
 
 ## Seeing the links

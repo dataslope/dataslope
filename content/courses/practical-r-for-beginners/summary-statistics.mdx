@@ -18,7 +18,8 @@ can carry an enormous amount of information.
 Every summary statistic answers one of two questions:
 
 1. **Where is the center?** (location: mean, median)
-2. **How spread out are the values?** (dispersion: sd, IQR, range)
+2. **How spread out are the values?** (dispersion: standard deviation,
+   interquartile range, range)
 
 Together, these two ideas describe a column with surprising
 faithfulness.
@@ -68,6 +69,7 @@ The mean and the median tell different stories. Both are
 <Figure
   slug="rlang-summary-statistics-measures-center-inline-cutout"
   alt="A plank on a fulcrum with blocks along it and a marker standing at the middle block"
+  caption="The mean balances the plank; the median just marks the middle value."
 />
 
 In our income example, the mean (\$68k) is misleading, it makes
@@ -254,6 +256,7 @@ variation in a single point.
 <Figure
   slug="rlang-summary-statistics-inline-cutout"
   alt="One tray of chips feeding a small gauge that reads a single number, with the emptied tray beside it"
+  caption="A summary is a lossy compression, and different data can compress alike."
 />
 
 The moral: **summary statistics are not a substitute for looking

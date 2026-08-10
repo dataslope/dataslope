@@ -278,6 +278,7 @@ and the result is the same.
 <Figure
   slug="fp-immutability-inline-cutout"
   alt="A sealed block on the left, and beside it a fresh copy with one face changed, the original still sealed and untouched"
+  caption="Nothing is changed in place; a modified copy is made instead."
 />
 
 ```mermaid
@@ -405,10 +406,11 @@ The standard library is full of these traps. As a rule:
 <Figure
   slug="fp-immutability-cost-mutation-one-inline-cutout"
   alt="Two benches sharing one tray, a hand at each altering it, and the block on it ending up wrong for both"
+  caption="Two holders of one mutable object is where the value quietly goes wrong."
 />
 
-When in doubt, prefer the new immutable variants (`toSorted`,
-`toReversed`, etc.) introduced in ES2023.
+When in doubt, prefer the new immutable variants (`toSorted()`,
+`toReversed()`, etc.) introduced in ES2023.
 
 ## A multi-file challenge
 

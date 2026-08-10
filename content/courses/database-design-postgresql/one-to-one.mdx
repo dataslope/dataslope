@@ -19,6 +19,7 @@ separate table makes the design clearer or safer.
 <Figure
   slug="db-one-to-one-split-one-one-inline-cutout"
   alt="One very deep crate cut into two shallower crates joined by a single short bar"
+  caption="A one-to-one split is one entity's facts held in two tables instead of one."
 />
 
 ## Why split a one-to-one?
@@ -114,6 +115,7 @@ Ada has a profile, and Grace does not yet.
 <Figure
   slug="db-one-to-one-inline-cutout"
   alt="Two crates facing each other joined by a single short bar, with no free sockets left on either side"
+  caption="Uniqueness on the joining column is what keeps the pairing exactly one to one."
 />
 
 <SqlCodeBlock

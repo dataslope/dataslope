@@ -45,8 +45,8 @@ flowchart LR
     M --> I
 ```
 
-All access to the balance goes through the methods. Inside `deposit`
-and `withdraw`, the class can enforce its rules, no negative deposits,
+All access to the balance goes through the methods. Inside `deposit()`
+and `withdraw()`, the class can enforce its rules, no negative deposits,
 no overdrafts, once, in one place.
 
 ## The two failure modes
@@ -177,7 +177,7 @@ flowchart TB
 ```
 
 A `BankAccount` should not have `setBalance(double)`. That throws
-away the whole point. It should have `deposit` and `withdraw`,
+away the whole point. It should have `deposit()` and `withdraw()`,
 methods named after *what the world is actually allowed to do.* The
 right question to ask when designing a class is **"what should
 callers be able to do?"**, not **"what fields does it have?"**.
@@ -198,11 +198,13 @@ allowed temperature range and a current setting. Outsiders can
 <Figure
   slug="oopj-encapsulation-hide-state-at-inline-cutout"
   alt="A cabinet with a solid back, hands able to reach it only through two front handles"
+  caption="The state is sealed in; the only way to it is through the methods."
 />
 
 <Figure
   slug="oopj-encapsulation-inline-cutout"
   alt="A sealed cabinet with its working parts hidden inside and two clean handles on its face, a figure using only the handles"
+  caption="Outsiders use the handles, and the object keeps its own rules."
 />
 
 <CodeBlock

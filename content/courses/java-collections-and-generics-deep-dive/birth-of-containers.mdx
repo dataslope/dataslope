@@ -16,7 +16,7 @@ classes and one helper interface in `java.util`:
 />
 
 - `Vector`, a growable array of `Object`
-- `Stack`, a `Vector` with `push` / `pop`
+- `Stack`, a `Vector` with `push()` / `pop()`
 - `Hashtable`, a key-to-value map of `Object`
 - `Properties`, a `Hashtable` for `String` pairs
 - `Enumeration`, an interface for walking through them
@@ -46,12 +46,13 @@ library**, so every program in the world reaches for the same names.
 ## Vector: the first growable list
 
 `Vector` is the great-grandparent of `ArrayList`. It is a growable
-array of `Object`, with `addElement`, `removeElement`,
+array of `Object`, with `addElement()`, `removeElement()`,
 `elementAt(int)`, and a small army of legacy methods.
 
 <Figure
   slug="jcol-birth-of-containers-vector-first-growable-inline-cutout"
   alt="A rail that gains one more slot when a block is set down past its end"
+  caption="`Vector` grew a slot when it needed one, which arrays never could."
 />
 
 <CodeBlock
@@ -115,8 +116,8 @@ were eventually invented to kill.
 
 ## Stack: a Vector with push and pop
 
-`Stack` is a small subclass of `Vector` that adds `push`, `pop`,
-`peek`, and `empty`. It is the textbook example of how the early
+`Stack` is a small subclass of `Vector` that adds `push()`, `pop()`,
+`peek()`, and `empty`. It is the textbook example of how the early
 library used inheritance where it should have used composition (we'll
 return to this, modern code prefers `ArrayDeque` for stack behavior).
 
@@ -187,7 +188,7 @@ public class Main {
 />
 
 Same problems as `Vector`: untyped, and *also* synchronized on every
-method. Every `put` and every `get` took a lock, useful in 1996
+method. Every `put()` and every `get()` took a lock, useful in 1996
 when threading was new, expensive every day after.
 
 ## Enumeration: the original iterator
@@ -247,6 +248,7 @@ Collections Framework, and a *language-level fix* in Java 5 generics.
 <Figure
   slug="jcol-birth-of-containers-containers-had-come-inline-cutout"
   alt="A bench of hand-built crates all slightly different beside one standard crate stamped from a mould"
+  caption="Every project rolled its own container until the framework standardised them."
 />
 
 ## The same idea, rewritten with a hand-rolled container

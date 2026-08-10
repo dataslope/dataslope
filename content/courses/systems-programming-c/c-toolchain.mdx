@@ -91,6 +91,7 @@ between several `.c` files via `#include`.
 <Figure
   slug="sysc-c-toolchain-header-files-include-inline-cutout"
   alt="A strip pasted onto a card with a small clasp that refuses to paste it a second time"
+  caption="An include guard is what stops the same header being pasted in twice."
 />
 
 Because `#include` is just text substitution, including the same
@@ -131,12 +132,13 @@ the linker can resolve.
 <Figure
   slug="sysc-c-toolchain-stage-1-preprocessor-inline-cutout"
   alt="A card passing a first machine that pastes extra strips onto it before it continues"
+  caption="The preprocessor pastes headers in before the compiler sees anything."
 />
 
 ## Stage 4: linking
 
 The linker stitches multiple object files together. It also pulls in
-standard libraries (libc for `printf`, libm for `sqrt`, etc.) and
+standard libraries (libc for `printf()`, libm for `sqrt`, etc.) and
 resolves *undefined symbols*, references that one object file makes
 to functions defined in another.
 
@@ -187,6 +189,7 @@ header / implementation split you would use in a real project.
 <Figure
   slug="sysc-c-toolchain-inline-cutout"
   alt="A source card passing through four machines in a row, emerging as a card, an object block, a linked block, and finally a running machine"
+  caption="Source, assembly, object, executable: each stage hands on a different artefact."
 />
 
 <CodeBlock
@@ -246,7 +249,7 @@ Two flavors of library exist on most systems:
   runtime and resolves the symbols. Smaller binaries; multiple
   programs share one copy in memory; but you must ship the library.
 
-`printf` lives in libc, which is dynamic on virtually every desktop
+`printf()` lives in libc, which is dynamic on virtually every desktop
 system. That is why a "hello world" binary is so small.
 
 ## Common compiler flags worth knowing

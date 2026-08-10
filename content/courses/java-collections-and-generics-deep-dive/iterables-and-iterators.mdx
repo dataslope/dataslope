@@ -37,6 +37,7 @@ That is it. Two interfaces, four methods.
 <Figure
   slug="jcol-iterables-and-iterators-inline-cutout"
   alt="A sealed drum with a crank, one block emerging per turn, and a small pointer on the drum that has moved on by one after each"
+  caption="The iterable hands out an iterator; the iterator remembers where the walk is."
 />
 
 - `Iterable<E>` says "I can produce a fresh `Iterator<E>` on
@@ -44,14 +45,15 @@ That is it. Two interfaces, four methods.
 - `Iterator<E>` says "I am a cursor, ask me if there are more
   elements, then ask me for the next one."
 
-Every `List`, `Set`, `Queue`, and `Deque` in the JCF implements
+Every `List`, `Set`, `Queue`, and `Deque` in the Collections Framework
+implements
 `Iterable`. `Map` does not directly (it isn't a `Collection`), but
 its `keySet()`, `values()`, and `entrySet()` views do.
 
 ## The for-each loop is just sugar
 
 Java's for-each loop (`for (E x : iterable)`) is compiled to a call
-on `iterator()` and a `while` over `hasNext` / `next`. The two
+on `iterator()` and a `while` over `hasNext()` / `next()`. The two
 fragments below produce identical bytecode:
 
 <CodeBlock
@@ -94,6 +96,7 @@ interface.
 <Figure
   slug="jcol-iterables-and-iterators-each-loop-just-inline-cutout"
   alt="A smooth handle on the outside of a drum, its cover lifted to show a crank and a pointer inside"
+  caption="The for-each loop is the smooth handle over that same crank."
 />
 
 ## Writing an Iterable from scratch
@@ -167,6 +170,7 @@ Three observations:
 <Figure
   slug="jcol-iterables-and-iterators-writing-iterable-from-inline-cutout"
   alt="A drum being built on a bench with its crank and pointer fitted by hand before its cover goes on"
+  caption="Implement the two interfaces and the for-each loop works on your own type."
 />
 
 ## Why a separate Iterator object?

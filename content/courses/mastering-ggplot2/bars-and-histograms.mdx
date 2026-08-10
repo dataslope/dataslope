@@ -5,7 +5,7 @@ description: Counting and binning in depth, position adjustments, bin width, and
 
 Bars are everywhere in analytics, and almost every bar chart is really
 a *statistic* made visible. This page goes deep on the two most common
-counting stats, `stat_count` (bars) and `stat_bin` (histograms), and
+counting stats, `stat_count()` (bars) and `stat_bin` (histograms), and
 the **position adjustments** that decide how bars share space.
 
 <Figure
@@ -25,7 +25,7 @@ stat slices the range of x into equal **bins** and counts how many
 values land in each.
 
 **Continuous `hwy` (values 12 to 44) → `stat_bin` cuts the range into
-equal bins → count per bin → `geom_histogram` draws one bar per bin.**
+equal bins → count per bin → `geom_histogram()` draws one bar per bin.**
 
 The single most important knob is the **bin width**, it changes the
 story the histogram tells:
@@ -153,6 +153,7 @@ question.
 <Figure
   slug="gg-bars-and-histograms-inline-cutout"
   alt="A row of bars standing apart over labelled trays, and beside it a row of bars touching over a continuous rule"
+  caption="Bars sit apart over categories; histogram bars touch over a continuous axis."
 />
 
 <Callout type="info" title="Position is its own grammar component">
@@ -229,7 +230,7 @@ directly comparable across categories.`}
 
 - A **histogram** = `stat_bin` (slice x into bins, count) drawn as
   bars; **bin width** is the decisive choice.
-- A **bar chart** = `stat_count` (count rows per category) drawn as
+- A **bar chart** = `stat_count()` (count rows per category) drawn as
   bars.
 - **Position adjustments** decide how overlapping bars share space:
   `stack` (totals + composition), `dodge` (side-by-side), `fill`
@@ -241,4 +242,5 @@ directly comparable across categories.`}
 <Figure
   slug="gg-bars-and-histograms-histogram-binning-counting-inline-cutout"
   alt="Loose chips dropped into a row of adjacent bins and a tally taken of each bin"
+  caption="A histogram bins the values first and then counts what landed in each bin."
 />

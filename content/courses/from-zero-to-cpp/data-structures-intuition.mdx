@@ -20,6 +20,7 @@ each, without diving into their implementations.
 <Figure
   slug="cpp-data-structures-intuition-associative-containers-inline-cutout"
   alt="A wall of small drawers each with a keyhole, a key going straight to one drawer"
+  caption="An associative container goes straight to a value by its key."
 />
 
 ## A map of the standard containers
@@ -41,7 +42,7 @@ each, without diving into their implementations.
 
 - Contiguous in memory.
 - Indexing `v[i]` is O(1).
-- Appending `push_back` is amortized O(1).
+- Appending `push_back()` is amortized O(1).
 - Inserting or erasing in the middle is O(n).
 
 Use it for almost everything. The CPU loves contiguous memory.
@@ -49,6 +50,7 @@ Use it for almost everything. The CPU loves contiguous memory.
 <Figure
   slug="cpp-data-structures-intuition-sequence-containers-inline-cutout"
   alt="Three containers in a row, a fixed strip, a growing rail, and separate blocks joined by cords"
+  caption="Fixed, growable, or linked: the three shapes a sequence can take."
 />
 
 ### `std::array<T, N>`, fixed size

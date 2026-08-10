@@ -1,5 +1,5 @@
 ---
-title: The Anatomy of an NLP Pipeline
+title: The Anatomy of a Text Pipeline
 description: The standard sequence of preprocessing steps text flows through, tokenize, normalize, filter, reduce, analyze, seen as one picture. Why it is a pipeline of transformations, why most steps are optional, and why order matters.
 ---
 
@@ -326,13 +326,14 @@ results look off. Reasoning carefully about order is a real part of the craft.
 ## Your turn: assemble a mini pipeline
 
 Time to build the cleaning half yourself. The challenge below asks you to
-write a `preprocess` function that runs the standard cleaning steps in the
+write a `preprocess()` function that runs the standard cleaning steps in the
 right order. The tests check the output on a couple of sentences,
 including one where a stopword changes everything.
 
 <Figure
   slug="nlp-the-nlp-pipeline-standard-text-preprocessing-inline-cutout"
   alt="A paper ribbon passing five small machines in a row and leaving as a tray of clean chips"
+  caption="Raw text passes through the same handful of stages before any model sees it."
 />
 
 <ChallengeCard
@@ -343,7 +344,7 @@ including one where a stopword changes everything.
   instructions={`Write a function \`preprocess(text)\` that returns a list of clean tokens by
 running these steps **in this order**:
 
-1. Word-tokenize the text with \`word_tokenize\`.
+1. Word-tokenize the text with \`word_tokenize()\`.
 2. Lowercase every token.
 3. Keep only tokens that are fully alphabetic (use \`.isalpha()\` to drop
    punctuation and numbers).
@@ -352,7 +353,7 @@ running these steps **in this order**:
 Return the resulting list. For example, \`preprocess("The quick brown
 foxes!")\` should return \`['quick', 'brown', 'foxes']\`.
 
-The \`word_tokenize\` function and the \`stop\` set are already available from
+The \`word_tokenize()\` function and the \`stop\` set are already available from
 the setup section.`}
   files={[
     {

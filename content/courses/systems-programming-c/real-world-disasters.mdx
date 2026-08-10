@@ -171,6 +171,7 @@ manager hints, hotel booking details.
 <Figure
   slug="sysc-real-world-disasters-5-cloudbleed-2017-inline-cutout"
   alt="A machine whose feed runs past the end of its own tape and draws a neighbour’s tape in with it"
+  caption="Reading one byte past the end is how a neighbour's data ends up in your output."
 />
 
 The cause: an HTML-rewriting parser written in Ragel (which
@@ -316,6 +317,7 @@ scientific satellites and roughly $370 million.
 <Figure
   slug="sysc-real-world-disasters-2-code-red-inline-cutout"
   alt="A request slip far longer than the slot it is being pushed into, spilling past the machine's edge"
+  caption="Input longer than the buffer it was written into is the classic overflow."
 />
 
 The cause was not, strictly, a memory bug, but it is a textbook
@@ -383,7 +385,7 @@ take for granted:
 
 | Defense | Inspired largely by |
 | --- | --- |
-| `gets()` removal, `snprintf`, `fgets` | Morris Worm |
+| `gets()` removal, `snprintf()`, `fgets()` | Morris Worm |
 | Stack canaries (`-fstack-protector`) | Code Red, Slammer |
 | ASLR, non-executable stacks/heaps (NX/DEP), W^X | Code Red, Slammer, EternalBlue |
 | Mandatory monthly security patching (Android, iOS) | Stagefright |
@@ -400,7 +402,7 @@ some C or C-FFI'd code in your career. The right mindset is:
 > attacker.*
 
 If you can hold that thought every time you compute an index, write
-a `memcpy`, or pass a buffer across a trust boundary, you have
+a `memcpy()`, or pass a buffer across a trust boundary, you have
 already absorbed the most important lesson of this chapter.
 
 ## Test your understanding
@@ -410,7 +412,7 @@ already absorbed the most important lesson of this chapter.
 
 - A stack overflow during certificate parsing.
   > Heartbleed was a *read* past a heap buffer; no stack frame was overwritten.
-- [o] A buffer **over-read**: the server trusted an attacker-supplied length field and \`memcpy\`'d that many bytes out of its own memory back to the attacker.
+- [o] A buffer **over-read**: the server trusted an attacker-supplied length field and \`memcpy()\`'d that many bytes out of its own memory back to the attacker.
   > The defensive lesson is "never trust a length field from the network without checking it against what you actually received."
 - A use-after-free in the TLS session cache.
   > That would be a different bug class; Heartbleed was a length-trust problem.
@@ -421,14 +423,14 @@ already absorbed the most important lesson of this chapter.
 <MultipleChoice
   markdown={`The 1988 Morris Worm propagated in part by exploiting a stack buffer overflow in the BSD \`fingerd\` daemon. Which single C standard library function is most directly responsible?
 
-- \`strncpy\`
-  > \`strncpy\` has its own footguns but did not cause this incident.
-- \`printf\`
-  > \`printf\` formatting bugs are dangerous but were not the Morris Worm vector.
-- \`malloc\`
-  > \`malloc\` itself was not the issue.
-- [o] \`gets\`, which reads input into a buffer with no length check at all.
-  > \`gets\` is so dangerous it was deprecated in C99 and removed in C11.`}
+- \`strncpy()\`
+  > \`strncpy()\` has its own footguns but did not cause this incident.
+- \`printf()\`
+  > \`printf()\` formatting bugs are dangerous but were not the Morris Worm vector.
+- \`malloc()\`
+  > \`malloc()\` itself was not the issue.
+- [o] \`gets()\`, which reads input into a buffer with no length check at all.
+  > \`gets()\` is so dangerous it was deprecated in C99 and removed in C11.`}
 />
 
 <MultipleChoice

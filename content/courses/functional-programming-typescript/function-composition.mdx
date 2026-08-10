@@ -3,7 +3,8 @@ title: Function Composition
 description: Plumbing small pure functions into pipelines, the operational heart of declarative code, plus currying and partial application.
 ---
 
-If pure functions are the atoms of FP, **composition** is the
+If pure functions are the atoms of functional programming,
+**composition** is the
 chemistry: the operation that takes two (or many) functions and
 glues them into one. Once your functions are pure, you can build
 entire programs by composing them, *no shared state, no
@@ -16,7 +17,7 @@ intermediate variables, no plumbing*.
 
 This chapter covers function composition, the closely related
 techniques of **currying** and **partial application**, and the two
-helper functions (`compose` and `pipe`) you'll use everywhere.
+helper functions (`compose()` and `pipe()`) you'll use everywhere.
 
 ## What composition means, mathematically
 
@@ -71,13 +72,14 @@ Two things to notice:
 <Figure
   slug="fp-function-composition-inline-cutout"
   alt="Three small machines bolted end to end into one longer machine, a single shape entering the left and leaving transformed at the right"
+  caption="Bolting functions end to end gives one function with one input and one output."
 />
 
-## `pipe`: the left-to-right cousin
+## `pipe()`: the left-to-right cousin
 
 In practice, most TypeScript code reads better when the data *flows
 forward*: input on the left, transformations on the right. That's
-what `pipe` does:
+what `pipe()` does:
 
 <CodeBlock
   adapter="typescript"
@@ -109,12 +111,12 @@ console.log(result); // "#8"
 />
 
 `pipe(value, f, g, h)` evaluates as `h(g(f(value)))`. It is exactly
-`compose` reversed. We will use `pipe` throughout the course because
+`compose()` reversed. We will use `pipe()` throughout the course because
 it reads top-to-bottom, like the data flow it represents.
 
-## Variadic `compose`
+## Variadic `compose()`
 
-A `compose` that takes any number of functions is the symmetric
+A `compose()` that takes any number of functions is the symmetric
 counterpart:
 
 <CodeBlock
@@ -146,7 +148,7 @@ console.log(f(3)); // "#8"
   ]}
 />
 
-For most working code, `pipe` is more readable; `compose` shows up
+For most working code, `pipe()` is more readable; `compose()` shows up
 when you want to *name* a composed function for reuse:
 
 <CodeBlock
@@ -388,7 +390,7 @@ console.log(names);
 Each step has a name and a single job. You can read the pipeline as
 prose. You can lift any step into a separate file. You can test any
 step in isolation. And the *order* of the steps is just the order of
-arguments to `pipe`, no reshuffling of loops.
+arguments to `pipe()`, no reshuffling of loops.
 
 ## A multi-file challenge
 
@@ -396,7 +398,7 @@ arguments to `pipe`, no reshuffling of loops.
   adapter="typescript"
   title="Compose a slugger"
   instructions={`In \`text.ts\`, implement five tiny pure helpers and a
-\`pipe\` of them. Each helper does exactly one thing.
+\`pipe()\` of them. Each helper does exactly one thing.
 
 - \`trim(s)\`, strip surrounding whitespace
 - \`lower(s)\`, lowercase
@@ -405,7 +407,7 @@ arguments to `pipe`, no reshuffling of loops.
 - \`hyphenate(s)\`, replace spaces with hyphens
 - \`slug(s)\`, pipeline of the above, in this order
 
-Use \`pipe\` (already in the file). Do not write \`s.trim().toLowerCase()…\`, compose the named helpers explicitly with \`pipe\`.
+Use \`pipe()\` (already in the file). Do not write \`s.trim().toLowerCase()…\`, compose the named helpers explicitly with \`pipe()\`.
 
 **Expected output**
 
@@ -470,19 +472,20 @@ export const slug = (s: string): string =>
 <Figure
   slug="fp-function-composition-composition-means-mathematically-inline-cutout"
   alt="Two machines bolted mouth to chute so the pair has one inlet and one outlet, a single block passing through both"
+  caption="Composing two functions means feeding the first one's output into the second."
 />
 
 <MultipleChoice
   markdown={`What is the difference between \`compose(f, g)\` and \`pipe(x, g, f)\`?
 
-- \`compose\` is for synchronous functions and \`pipe\` is for asynchronous functions
+- \`compose()\` is for synchronous functions and \`pipe()\` is for asynchronous functions
   > Both work for sync functions. Async variants exist but neither is fundamentally one or the other.
-- \`compose\` can only combine two functions; \`pipe\` works for any number
+- \`compose()\` can only combine two functions; \`pipe()\` works for any number
   > Both can be variadic depending on the implementation.
-- \`compose\` curries its arguments; \`pipe\` does not
+- \`compose()\` curries its arguments; \`pipe()\` does not
   > Currying is independent of composition direction.
 - [o] They express the same idea in different argument orders; \`compose(f, g)(x) = f(g(x))\`, while \`pipe(x, g, f)\` applies \`g\` first then \`f\`
-  > \`compose\` reads right-to-left (the math convention); \`pipe\` reads left-to-right, which usually matches data flow more naturally in TypeScript.
+  > \`compose()\` reads right-to-left (the math convention); \`pipe()\` reads left-to-right, which usually matches data flow more naturally in TypeScript.
 
-The two operators are mirror images. Most TypeScript codebases prefer \`pipe\` for everyday use because the order reads top-to-bottom.`}
+The two operators are mirror images. Most TypeScript codebases prefer \`pipe()\` for everyday use because the order reads top-to-bottom.`}
 />

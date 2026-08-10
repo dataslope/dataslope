@@ -4,7 +4,7 @@ description: Inner, left, right, and outer joins, what they mean, when to use ea
 ---
 
 A *join* asks: given two tables and a shared key, what should
-happen to rows that don't match? Pandas's `merge` answers this
+happen to rows that don't match? Pandas's `merge()` answers this
 with the `how` parameter.
 
 <Figure
@@ -61,6 +61,7 @@ default.
 <Figure
   slug="pandas-merging-and-joining-setting-stage-inline-cutout"
   alt="Two separate boards set on a bench facing each other, one shared column of notches between them"
+  caption="A join needs one column that the two tables have in common."
 />
 
 <CodeBlock
@@ -102,6 +103,7 @@ columns with NaN.
 <Figure
   slug="pandas-merging-and-joining-inner-join-inline-cutout"
   alt="Two boards pushed together with only the rows whose notches align lifted onto a tray between them"
+  caption="An inner join keeps only the rows that matched on both sides."
 />
 
 <CodeBlock
@@ -379,6 +381,7 @@ first check coverage, then narrow down what's missing and why.
 <Figure
   slug="pandas-merging-and-joining-inline-cutout"
   alt="Two grids with a matching column of keys sliding together like a zip, the joined rows emerging as one wider grid on the right"
+  caption="Matching rows zip together, so the result grows wider rather than taller."
 />
 
 ## Mini challenge
@@ -498,7 +501,7 @@ Left joins are the workhorse of enrichment workflows.`}
 
 - Use a SQL database instead
   > SQL can also validate cardinality, but switching tools is not necessary; \`pd.merge(..., validate=)\` provides the same protection inline.
-- [o] Pass \`validate="one_to_one"\` to \`merge\`, Pandas raises an error if the data violates that assumption
+- [o] Pass \`validate="one_to_one"\` to \`merge()\`, Pandas raises an error if the data violates that assumption
   > Encoding your assumptions in the code catches problems immediately, instead of letting silent bugs propagate.
 - Manually count rows after the merge
   > Comparing row counts after the merge can detect a problem but does not prevent it or tell you which key caused it; \`validate=\` raises immediately with details.

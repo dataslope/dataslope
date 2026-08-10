@@ -65,6 +65,7 @@ strongly that feature pushes the prediction.
 <Figure
   slug="ml-model-interpretation-and-importance-coefficients-as-importance-inline-cutout"
   alt="A machine with input pipes of visibly different widths, the widest carrying the most"
+  caption="A coefficient's size and sign say how strongly a feature pushes the answer."
 />
 
 This is the appeal of linear models: their parameters *are* an explanation,
@@ -154,6 +155,7 @@ many high-value splits scores high; one never split on scores zero.
 <Figure
   slug="ml-model-interpretation-and-importance-inline-cutout"
   alt="A machine with several input pipes of different widths, the widest pipes marked as mattering most to the result"
+  caption="A forest can report which features its splits leaned on most."
 />
 
 This works for a single tree and, more reliably, for a whole random forest
@@ -395,6 +397,7 @@ world.
 <Figure
   slug="ml-model-interpretation-and-importance-interpretability-matters-inline-cutout"
   alt="A sealed machine beside the same machine with a glass panel showing which input pipes are widest"
+  caption="Seeing which inputs matter is not the same as knowing what causes what."
 />
 
 A model can lean heavily on a feature for reasons that have nothing to do

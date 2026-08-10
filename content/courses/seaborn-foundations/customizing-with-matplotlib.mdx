@@ -27,8 +27,8 @@ different things:
 
 | Family | Examples | Returns | Polish via |
 | ------ | -------- | ------- | ---------- |
-| **Axes-level** | `scatterplot`, `histplot`, `boxplot`, `heatmap` | a matplotlib `Axes` | `ax.set_title(...)`, `ax.set_xlabel(...)`, ... |
-| **Figure-level** | `relplot`, `displot`, `catplot`, `pairplot` | a Seaborn grid `g` | `g.set_axis_labels(...)`, `g.figure.suptitle(...)`, ... |
+| **Axes-level** | `scatterplot()`, `histplot()`, `boxplot()`, `heatmap()` | a matplotlib `Axes` | `ax.set_title(...)`, `ax.set_xlabel(...)`, ... |
+| **Figure-level** | `relplot()`, `displot()`, `catplot()`, `pairplot()` | a Seaborn grid `g` | `g.set_axis_labels(...)`, `g.figure.suptitle(...)`, ... |
 
 The rule of thumb: an **axes-level** function draws on a single `Axes` and
 gives it back, so you customize that `Axes` directly. A **figure-level**
@@ -74,12 +74,13 @@ line at a time.
 <Figure
   slug="sns-customizing-with-matplotlib-polishing-axes-level-inline-cutout"
   alt="A finished panel on a bench having its frame, key and labels adjusted by small hand tools"
+  caption="A few matplotlib calls turn a plot into a finished figure."
 />
 
 ### Controlling the figure size
 
 Sometimes you want to set the figure *size* before drawing. Create the
-figure and axes yourself with `plt.subplots`, then pass that `ax` into the
+figure and axes yourself with `plt.subplots()`, then pass that `ax` into the
 Seaborn function. This is the one place you reach for
 `import matplotlib.pyplot as plt`:
 
@@ -110,10 +111,10 @@ even put several Seaborn plots onto different axes of the same figure. This
 functions, figure-level functions insist on making their own figure.
 
 <Callout type="warn" title="Never wrap a figure-level plot in plt.subplots">
-A figure-level function (`relplot`, `displot`, `catplot`, ...) creates its
+A figure-level function (`relplot()`, `displot()`, `catplot()`, ...) creates its
 own figure and ignores any `ax=` you pass. If you make a `fig, ax` and then
-call `relplot`, you'll get *two* figures, your empty one and Seaborn's. Use
-`plt.subplots` only with axes-level functions.
+call `relplot()`, you'll get *two* figures, your empty one and Seaborn's. Use
+`plt.subplots()` only with axes-level functions.
 </Callout>
 
 ## Polishing a figure-level grid
@@ -171,6 +172,7 @@ A few things to notice:
 <Figure
   slug="sns-customizing-with-matplotlib-two-kinds-return-inline-cutout"
   alt="A single tile clamped in a small vise being reworked by hand, and a whole tray of tiles clamped in a large vise being reworked at once"
+  caption="An axes-level plot is adjusted panel by panel; a figure-level grid all at once."
 />
 
 When the grid has a legend (from `hue`), you can rename it with
@@ -239,7 +241,7 @@ better to you. (On a figure-level grid you would rotate via
 ## A worked example: from raw to readable
 
 Putting it together on a single axes-level chart. We start with a bare
-`scatterplot` and apply the polish in a few lines: a title that frames the
+`scatterplot()` and apply the polish in a few lines: a title that frames the
 relationship, axis labels with units, and a deliberate y-range starting at
 zero.
 
@@ -281,7 +283,7 @@ the substance, a light touch of matplotlib for the finish.**
   adapter="python"
   title="Title and label a histogram"
   instructions={`Draw a histogram of \`total_bill\` from the \`tips\` dataset with
-\`sns.histplot\`, capturing the returned \`Axes\` in a variable named \`ax\`.
+\`sns.histplot()\`, capturing the returned \`Axes\` in a variable named \`ax\`.
 Then:
 
 1. Set the title to exactly \`Distribution of total bills\`.
@@ -341,11 +343,11 @@ ax.set_xlabel("Total bill (USD)")
 - A pandas DataFrame; add a title by adding a column.
   > A plotting call returns a plot object, not data; titles are not DataFrame columns.
 - A Seaborn \`FacetGrid\`; title it with \`ax.set_titles(...)\`.
-  > \`boxplot\` is axes-level and returns a matplotlib \`Axes\`, not a \`FacetGrid\`; there is no \`set_titles\` on an \`Axes\`.
+  > \`boxplot()\` is axes-level and returns a matplotlib \`Axes\`, not a \`FacetGrid\`; there is no \`set_titles\` on an \`Axes\`.
 - [o] A matplotlib \`Axes\`; title it with \`ax.set_title("...")\`.
-  > Axes-level functions like \`boxplot\` return the \`Axes\` they drew on, and \`set_title\` is the \`Axes\` method for a title.
+  > Axes-level functions like \`boxplot()\` return the \`Axes\` they drew on, and \`set_title\` is the \`Axes\` method for a title.
 - A figure-level grid; title it with \`g.figure.suptitle(...)\`.
-  > \`suptitle\` is for figure-level grids; \`boxplot\` is axes-level and returns an \`Axes\`.
+  > \`suptitle\` is for figure-level grids; \`boxplot()\` is axes-level and returns an \`Axes\`.
 
 Axes-level functions hand back a matplotlib \`Axes\`, which you customize with
 \`set_title\`, \`set_xlabel\`, and friends.`}
@@ -354,18 +356,18 @@ Axes-level functions hand back a matplotlib \`Axes\`, which you customize with
 <MultipleChoice
   markdown={`Why can you write \`fig, ax = plt.subplots(figsize=(7,4))\` and then
 \`sns.scatterplot(..., ax=ax)\`, but the same trick does **not** work with
-\`sns.relplot\`?
+\`sns.relplot()\`?
 
-- Because \`scatterplot\` does not accept an \`ax\` argument.
-  > It is precisely \`scatterplot\` (axes-level) that *does* accept \`ax=\`; the figure-level \`relplot\` is the one that ignores it.
-- Because \`plt.subplots\` only works after \`set_theme\`.
-  > \`plt.subplots\` works regardless of theme; the real distinction is axes-level versus figure-level.
-- Because \`relplot\` cannot draw scatter plots.
-  > \`relplot\` draws scatter and line plots; the difference is about figure management, not chart type.
-- [o] Because \`scatterplot\` is axes-level and draws on the \`Axes\` you pass, while \`relplot\` is figure-level and builds its own figure.
-  > Axes-level functions accept \`ax=\` and draw there; figure-level functions manage their own figure and ignore any \`ax=\`, so passing one would just leave your \`plt.subplots\` figure empty.
+- Because \`scatterplot()\` does not accept an \`ax\` argument.
+  > It is precisely \`scatterplot()\` (axes-level) that *does* accept \`ax=\`; the figure-level \`relplot()\` is the one that ignores it.
+- Because \`plt.subplots()\` only works after \`set_theme()\`.
+  > \`plt.subplots()\` works regardless of theme; the real distinction is axes-level versus figure-level.
+- Because \`relplot()\` cannot draw scatter plots.
+  > \`relplot()\` draws scatter and line plots; the difference is about figure management, not chart type.
+- [o] Because \`scatterplot()\` is axes-level and draws on the \`Axes\` you pass, while \`relplot()\` is figure-level and builds its own figure.
+  > Axes-level functions accept \`ax=\` and draw there; figure-level functions manage their own figure and ignore any \`ax=\`, so passing one would just leave your \`plt.subplots()\` figure empty.
 
-To control size with \`plt.subplots\` and \`ax=\`, use an axes-level function;
+To control size with \`plt.subplots()\` and \`ax=\`, use an axes-level function;
 figure-level functions size themselves with \`height\` and \`aspect\`.`}
 />
 

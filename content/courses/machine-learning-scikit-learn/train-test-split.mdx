@@ -18,6 +18,7 @@ This page is about the simplest way to honor it: the **train/test split**.
 <Figure
   slug="ml-train-test-split-problem-solves-inline-cutout"
   alt="A machine graded on the very blocks it was built from, its gauge reading perfectly and meaning nothing"
+  caption="Graded on its own training rows, any model looks better than it really is."
 />
 
 ## The problem it solves
@@ -50,6 +51,7 @@ unlock the drawer and measure performance on those held-out rows.
 <Figure
   slug="ml-train-test-split-fix-hold-some-inline-cutout"
   alt="A pile divided by a partition with the smaller share sealed under a lid"
+  caption="Lock part of the data away and it stays an honest test to the very end."
 />
 
 ```mermaid
@@ -68,7 +70,7 @@ Because the test rows played no part in training, the model's score on
 them is a fair stand-in for how it will behave on genuinely new data. That
 is the whole trick.
 
-## `train_test_split` in practice
+## `train_test_split()` in practice
 
 scikit-learn gives us one function for this. It shuffles the rows and cuts
 them into two groups.
@@ -76,6 +78,7 @@ them into two groups.
 <Figure
   slug="ml-train-test-split-inline-cutout"
   alt="One pile of blocks being divided by a partition into a large left share and a small sealed right share, the right share kept under a lid"
+  caption="`train_test_split()` shuffles the rows first, then cuts them in two."
 />
 
 <CodeBlock
@@ -164,7 +167,7 @@ that will not repeat on new data. The test score is your reality check.
 
 ## `random_state`: making the split reproducible
 
-`train_test_split` shuffles before cutting, so without a fixed seed you
+`train_test_split()` shuffles before cutting, so without a fixed seed you
 would get a different split every run, and a slightly different score each
 time. Passing `random_state=0` (any fixed integer works) freezes the
 shuffle so your results are reproducible and you can compare models fairly.
@@ -250,7 +253,7 @@ cheats:
   group (scikit-learn has `GroupShuffleSplit` for this).
 
 <Callout type="warn" title="Independence is an assumption, not a guarantee">
-`train_test_split` is correct only when rows are independent. For temporal
+`train_test_split()` is correct only when rows are independent. For temporal
 or grouped data, a naive random split produces an optimistic score that
 collapses in production. Always ask: could a test row share its secret with
 a training row?
@@ -381,7 +384,7 @@ assert train_acc > test_acc, "Expected the unrestricted tree to overfit (train >
 - Because test sets are easier to compute metrics on
   > Metrics are computed in the same way on both training and test data, there is no technical difference in difficulty. The reason to use a held-out test set is to get an honest estimate of generalization, not for computational convenience.
 - Because scikit-learn requires it
-  > scikit-learn does not enforce a train/test split, you can call \`fit\` and \`score\` on the same data and it will work. The split is a best practice for honest evaluation, not a library requirement.
+  > scikit-learn does not enforce a train/test split, you can call \`fit()\` and \`score()\` on the same data and it will work. The split is a best practice for honest evaluation, not a library requirement.
 
 The held-out test set stands in for "data the model will face in the future."`}
 />
@@ -402,7 +405,7 @@ A near-perfect training score next to a lower test score is the classic overfitt
 />
 
 <MultipleChoice
-  markdown={`What does \`stratify=y\` do in \`train_test_split\`, and when does it matter most?
+  markdown={`What does \`stratify=y\` do in \`train_test_split()\`, and when does it matter most?
 
 - It removes the rare class to balance the data
   > \`stratify=y\` preserves the rare class in both halves proportionally, it never removes any rows. Removing classes to balance data is a different technique called undersampling.
@@ -417,12 +420,12 @@ Stratification is about *representation*, not sorting or deleting data.`}
 />
 
 <MultipleChoice
-  markdown={`You are predicting tomorrow's sales from historical daily data. Why is a plain random \`train_test_split\` a poor choice here?
+  markdown={`You are predicting tomorrow's sales from historical daily data. Why is a plain random \`train_test_split()\` a poor choice here?
 
 - You must always use the entire dataset for training with time series
   > Holding out future data for testing is essential with time series, just as with any other data. Using the entire dataset for training would leave no way to evaluate how well the model predicts future values.
 - Random splits are slower on time-series data
-  > Split speed does not depend on whether data has a time component; \`train_test_split\` runs at the same speed regardless. The problem with random splits on time series is correctness, not speed.
+  > Split speed does not depend on whether data has a time component; \`train_test_split()\` runs at the same speed regardless. The problem with random splits on time series is correctness, not speed.
 - Time-series data cannot be used in scikit-learn
   > scikit-learn supports time-series workflows, including \`TimeSeriesSplit\` for time-aware cross-validation. The constraint is that you must respect the temporal ordering when splitting, not that time-series data is unsupported.
 - [o] The rows are ordered in time; a random split lets the model train on future days to predict past ones, which it can never do in reality
@@ -435,7 +438,7 @@ When rows carry a time order, the split must respect that order.`}
   markdown={`Why is fixing \`random_state\` to the same value useful when comparing two models?
 
 - It changes the metric used to score the models
-  > \`random_state\` has no effect on which metric is used to score models. The metric is determined by the \`.score\` method or a separate metric function, not by the split seed.
+  > \`random_state\` has no effect on which metric is used to score models. The metric is determined by the \`.score()\` method or a separate metric function, not by the split seed.
 - It guarantees both models reach 100% accuracy
   > \`random_state\` fixes the split for reproducibility, but it says nothing about the accuracy a model will achieve. Accuracy depends on the model and the data, not on the seed used to divide them.
 - [o] It makes both models see exactly the same train/test rows, so any difference in scores reflects the models, not two different lucky splits

@@ -76,6 +76,7 @@ A **lambda** is an inline literal of a delegate type. It is written
 <Figure
   slug="cs-lambdas-and-delegates-delegates-type-function-inline-cutout"
   alt="A shaped socket on a panel with three small tools above it, only the tool of matching shape able to seat"
+  caption="A delegate is a type for a function, and only a matching shape fits."
 />
 
 <CodeBlock
@@ -237,7 +238,7 @@ var compiled = doubleExpr.Compile();
 Console.WriteLine(compiled(7)); // 14
 ```
 
-Why does this matter? Because LINQ providers, EF Core, MongoDB
+Why does this matter? Because LINQ providers, Entity Framework Core, MongoDB
 LINQ, etc., accept `Expression<Func<T,bool>>`. They don't *call*
 your lambda; they walk its tree and *translate* it into another
 language (SQL, BSON, an HTTP query).
@@ -263,6 +264,7 @@ entirely as data.
 <Figure
   slug="cs-lambdas-and-delegates-inline-cutout"
   alt="A small hand tool being carried across a bench and slotted into a waiting bracket on a larger machine, which starts working the moment it clicks in"
+  caption="A lambda is behaviour written inline and passed like any other value."
 />
 
 <CodeBlock

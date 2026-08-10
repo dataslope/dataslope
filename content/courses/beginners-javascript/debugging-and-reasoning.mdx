@@ -56,17 +56,19 @@ person who slows down at "form a hypothesis" finishes faster.
 <Figure
   slug="js-debugging-and-reasoning-scientific-method-approach-inline-cutout"
   alt="A written guess pinned above a bench, one part changed, and the result checked against the guess"
+  caption="Guess first, change one thing, then check the result against the guess."
 />
 
-## The most useful debugging tool: `console.log`
+## The most useful debugging tool: `console.log()`
 
-It's not glamorous, but `console.log` solves more bugs than any
+It's not glamorous, but `console.log()` solves more bugs than any
 debugger. The trick is to print **what you assumed**, not the
 final answer.
 
 <Figure
   slug="js-debugging-and-reasoning-inline-cutout"
   alt="A chain of linked blocks with one link visibly cracked, a magnifier held over that link alone"
+  caption="Find the one link that is broken rather than rebuilding the whole chain."
 />
 
 <CodeBlock
@@ -115,7 +117,7 @@ console.log("result:", average([1, 2, 3, "4", 5]));
 The third iteration shows `total` becoming the string `"64"`,
 that's the moment something went wrong. Now you know *where*.
 
-### Better than `console.log`: structured logging
+### Better than `console.log()`: structured logging
 
 A few small habits make logs much more useful:
 
@@ -123,7 +125,7 @@ A few small habits make logs much more useful:
   far better than `console.log(user)` when 10 logs appear at once.
 - **Group related logs**: `console.group("processing order", id)`
   + `console.groupEnd()`.
-- **Use `console.table` for arrays of objects**:
+- **Use `console.table()` for arrays of objects**:
 
 <CodeBlock
   adapter="javascript"
@@ -145,7 +147,7 @@ console.table(users, ["name", "role"]);
 
 ## Reading a stack trace
 
-When something throws, JS prints a **stack trace**, a snapshot
+When something throws, JavaScript prints a **stack trace**, a snapshot
 of the call stack at the moment of the error.
 
 <CodeBlock
@@ -290,6 +292,7 @@ catches a huge fraction of bugs.
 <Figure
   slug="js-debugging-and-reasoning-debugging-really-inline-cutout"
   alt="A figure holding a lamp to a machine that has stopped, the lamp lighting one jammed part rather than the whole machine"
+  caption="Saying the code out loud is what makes the wrong assumption audible."
 />
 
 You don't need a duck. You just need to slow down enough to
@@ -328,7 +331,7 @@ slash bug rates:
 
 1. **Small functions.** A 5-line function is easier to verify
    correct than a 50-line one.
-2. **Pure when possible.** As you saw in the FP chapter, side
+2. **Pure when possible.** As you saw in the functional programming chapter, side
    effects make code harder to reason about.
 3. **Name things precisely.** `data` and `result` say nothing.
    `filteredOrders` and `revenueByMonth` say a lot.

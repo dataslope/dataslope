@@ -43,6 +43,7 @@ three functions trying to be one.
 <Figure
   slug="cpp-building-maintainable-software-one-thing-per-inline-cutout"
   alt="One crowded machine doing four jobs beside four small machines each doing one and clipping together"
+  caption="One job per function, and the pieces can be read and tested separately."
 />
 
 A useful self-check: can you explain what the function does in one
@@ -128,6 +129,7 @@ the *what*.
 <Figure
   slug="cpp-building-maintainable-software-names-carry-most-inline-cutout"
   alt="A wall of unlabelled tins beside the same wall with clear blank-shaped tags, a hand reaching straight to one"
+  caption="A good name spares the reader the comment you would otherwise write."
 />
 
 ```cpp
@@ -158,8 +160,8 @@ When reviewing:
 
 When having your code reviewed:
 
-- Keep changes small. A 100-line PR gets thoughtful feedback; a
-  10,000-line PR gets a thumbs-up.
+- Keep changes small. A 100-line pull request gets thoughtful feedback; a
+  10,000-line one gets a thumbs-up.
 - Explain *why* you made each non-obvious choice in the description.
 - Assume the reviewer is trying to help, even when the feedback
   stings.

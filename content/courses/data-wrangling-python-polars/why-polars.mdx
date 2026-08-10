@@ -129,11 +129,11 @@ fast enough forever and you should use whatever you already know.
 
 The reason to learn Polars is that the API is smaller and more
 regular. There is one way to add a column. There is one way to
-aggregate. The thing you write inside `filter` is the same kind of
+aggregate. The thing you write inside `filter()` is the same kind of
 object as the thing you write inside `group_by().agg()`, so learning
 one teaches you the other. pandas has `loc`, `iloc`, `at`, `iat`,
 `ix` (removed), boolean masks, `query`, `where`, `mask`, and
-`filter`, which does something different from what you would guess.
+`filter()`, which does something different from what you would guess.
 
 <Callout type="info" title="You do not have to pick a side">
 Polars converts to and from pandas in one call and shares memory
@@ -163,6 +163,7 @@ Being fair about this saves you time later:
 <Figure
   slug="pl-why-polars-three-things-changed-inline-cutout"
   alt="Three parts fitted to one machine in turn, each making the belt beside it run visibly faster"
+  caption="Columnar memory, real parallelism and lazy planning are what made it fast."
 />
 
 ## Check your understanding

@@ -83,6 +83,7 @@ This is the heart of how data analysts think: you have
 <Figure
   slug="rlang-vectorized-computation-arithmetic-on-whole-inline-cutout"
   alt="A full-width press stamping an entire row of blocks in one stroke"
+  caption="One operation stamps the whole vector, with no loop written by you."
 />
 
 ```mermaid
@@ -238,6 +239,7 @@ internal routine.
 <Figure
   slug="rlang-vectorized-computation-inline-cutout"
   alt="A full-width press coming down on a whole row of blocks at once rather than one stamp moving along the row"
+  caption="The loop still happens, but in fast compiled code rather than in yours."
 />
 
 This means **vectorized R is often 10–100x faster than the
@@ -293,7 +295,7 @@ this?" 95% of the time, there is.
 - [o] Because operations and most built-in functions are *vectorized*, they automatically apply to every element.
   > This is R's signature design choice and is the reason R code for data work is so compact.
 - Because R cannot iterate over vectors.
-  > R can iterate over vectors with \`for\`, \`while\`, and \`lapply\`; the reason to prefer vectorization is clarity and performance, not an inability to iterate.`}
+  > R can iterate over vectors with \`for\`, \`while\`, and \`lapply()\`; the reason to prefer vectorization is clarity and performance, not an inability to iterate.`}
 />
 
 ## Mini challenge: convert Celsius to Fahrenheit

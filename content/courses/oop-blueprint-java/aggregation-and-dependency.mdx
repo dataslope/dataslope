@@ -5,8 +5,8 @@ description: The weaker "has-a" and "uses-a" relationships, borrowed parts and t
 
 Not every relationship between two objects is the strong ownership we
 saw with composition. Often one object simply *uses* another, or
-*holds a reference to* another that exists independently. UML and the
-OOP tradition give these weaker relationships names: **aggregation**
+*holds a reference to* another that exists independently. The modelling
+tradition gives these weaker relationships names: **aggregation**
 and **dependency**.
 
 Knowing the difference is not pedantry, it changes *how you draw
@@ -45,6 +45,7 @@ would just stop being members. That is **aggregation**.
 <Figure
   slug="oopj-aggregation-and-dependency-aggregation-library-has-inline-cutout"
   alt="A large crate holding smaller crates that can be lifted out and still stand on their own"
+  caption="Aggregation means the parts can be lifted out and still exist on their own."
 />
 
 ```mermaid
@@ -212,8 +213,8 @@ classDiagram
 />
 
 `OrderPrinter` has *no* fields. It needs an `Order` and a `Printer`
-only for the duration of `print`. That is a dependency. It's the
-loosest possible coupling: as soon as `print` returns, the two
+only for the duration of `print()`. That is a dependency. It's the
+loosest possible coupling: as soon as `print()` returns, the two
 references go away.
 
 ## Why these distinctions matter in practice
@@ -236,6 +237,7 @@ on* a `Clock` passed in just to stamp due dates.
 <Figure
   slug="oopj-aggregation-and-dependency-spectrum-relationships-inline-cutout"
   alt="Three pairs of parts joined differently, one welded, one clipped, one merely resting side by side"
+  caption="Composed, aggregated or merely depended on: three strengths of relationship."
 />
 
 ## Passing dependencies in: a tiny taste of injection
@@ -294,7 +296,7 @@ your classes loosely coupled and easy to recombine.
   title="Classroom aggregates Students"
   instructions={`Implement two classes:
 
-- \`Student\` with a private final \`name\` and a \`name()\` accessor.
+- \`Student\` with a private final \`name()\` and a \`name()\` accessor.
 - \`Classroom\` with:
   - a \`private final List<Student> students = new ArrayList<>();\`
   - \`enroll(Student s)\` adds the student.

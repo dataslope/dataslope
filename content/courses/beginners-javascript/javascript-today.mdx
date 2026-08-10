@@ -54,6 +54,7 @@ tiles streamed in under your cursor.
 <Figure
   slug="js-javascript-today-ajax-revolution-2004-inline-cutout"
   alt="A page panel that stays in place while one small tray inside it is swapped through a hatch"
+  caption="Swapping one part of a page, without reloading it, changed what a page could be."
 />
 
 The trick underneath both was the same: JavaScript could silently
@@ -223,7 +224,7 @@ The single most useful mental model for a beginner is that
    async. Standardized, portable, slow-changing. *This is what
    this course teaches.*
 2. **The platform APIs**, what your code can *do* depends on
-   where it runs. Browsers add the DOM and `fetch`; Node.js adds
+   where it runs. Browsers add the Document Object Model and `fetch()`; Node.js adds
    files and servers. Same language, different toolbelts.
 3. **The frameworks and tools**, React, Vue, Express, Vite,
    TypeScript, ESLint… an ever-shifting landscape built *on top of*
@@ -252,6 +253,7 @@ kind of program you'll be writing yourself within a few pages.
 <Figure
   slug="js-javascript-today-dark-ages-1995-inline-cutout"
   alt="A cramped workshop of mismatched tools, each bench needing its own adapter before anything fits"
+  caption="Before the standards settled, every browser needed its own adapter."
 />
 
 <CodeBlock
@@ -289,7 +291,7 @@ program?*
   markdown={`What is the most important distinction to keep in mind as you learn JavaScript?
 
 - [o] The difference between the JavaScript *language* (stable, portable, this course's focus) and the *frameworks and tools* built on top of it (which change every few years)
-  > The language itself is the durable, transferable skill. Frameworks like React, build tools like Webpack, and even runtime APIs like \`fetch\` come and go or differ between runtimes, but \`let\`, \`const\`, \`function\`, \`if\`, \`for\`, arrays, objects, closures, and \`async\`/\`await\` will be exactly the same a decade from now.
+  > The language itself is the durable, transferable skill. Frameworks like React, build tools like Webpack, and even runtime APIs like \`fetch()\` come and go or differ between runtimes, but \`let\`, \`const\`, \`function\`, \`if\`, \`for\`, arrays, objects, closures, and \`async\`/\`await\` will be exactly the same a decade from now.
 - The difference between \`==\` and \`===\`
   > Understanding \`==\` vs \`===\` is a useful JavaScript detail, but it is a single language feature rather than the overarching distinction between the stable language core and the ever-changing ecosystem that surrounds it.
 - The difference between Java and JavaScript

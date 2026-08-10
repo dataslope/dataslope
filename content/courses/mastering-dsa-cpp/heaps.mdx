@@ -60,6 +60,7 @@ Both heap operations follow the same playbook: *restore completeness first, then
 <Figure
   slug="dsa-heaps-conceptual-tree-array-inline-cutout"
   alt="A branching frame drawn above a flat strip of cells, cords showing each branch's place on the strip"
+  caption="The tree is conceptual; the storage underneath is one flat array."
 />
 
 ```mermaid
@@ -109,6 +110,7 @@ Pop runs the same playbook in reverse. The root must go, but ripping out index 0
 <Figure
   slug="dsa-heaps-push-sift-up-inline-cutout"
   alt="A block set at the bottom of a pyramid and swapped upward past each larger neighbour until it rests"
+  caption="A new item enters at the bottom and swaps upward until the order holds."
 />
 
 <CodeBlock
@@ -152,7 +154,7 @@ int main() {
   ]}
 />
 
-`push` and `pop` take O(log n), because they move along the height of the tree. `top` is O(1), because the best value is at index 0.
+`push()` and `pop()` take O(log n), because they move along the height of the tree. `top()` is O(1), because the best value is at index 0.
 
 ## Bottom-up heapify
 
@@ -207,11 +209,12 @@ int main() {
 
 ## Heap sort
 
-Williams's original application falls out almost for free. Build a max-heap (O(n), as above); now the maximum is at index 0. Swap it with the last element, the maximum is in its final sorted position, shrink the heap by one, and sift the new root down. Repeat n−1 times: O(n log n) total, in place, no merge buffer. Heapsort is rarely the fastest sort in practice (its memory access pattern jumps around, which caches dislike), but its guaranteed bound is why introsort keeps it as the emergency parachute behind `std::sort`.
+Williams's original application falls out almost for free. Build a max-heap (O(n), as above); now the maximum is at index 0. Swap it with the last element, the maximum is in its final sorted position, shrink the heap by one, and sift the new root down. Repeat n−1 times: O(n log n) total, in place, no merge buffer. Heapsort is rarely the fastest sort in practice (its memory access pattern jumps around, which caches dislike), but its guaranteed bound is why introsort keeps it as the emergency parachute behind `std::sort()`.
 
 <Figure
   slug="dsa-heaps-inline-cutout"
   alt="A pyramid of blocks where every block sits above two smaller ones, the largest at the apex being lifted off by a small crane"
+  caption="Every parent outranks its children, so the top is always the extreme."
 />
 
 ```mermaid

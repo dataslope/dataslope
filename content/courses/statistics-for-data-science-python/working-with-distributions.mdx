@@ -51,6 +51,7 @@ it, learn these once and every distribution behaves the same way.
 <Figure
   slug="stat-working-with-distributions-four-questions-four-inline-cutout"
   alt="Four small tools hanging above one smooth ramp, each shown taking a different reading from it"
+  caption="Four methods cover every distribution: density, cumulative, quantile and draw."
 />
 
 ```mermaid
@@ -63,11 +64,11 @@ flowchart TD
 ```
 
 <Callout type="info" title="cdf and ppf are inverses; sf and isf are their upper-tail twins">
-`cdf` (value → left-tail probability) and `ppf` (probability → value)
+`cdf()` (value → left-tail probability) and `ppf()` (probability → value)
 undo each other. For the *upper* tail, `sf(x) = 1 - cdf(x)` gives
 P(X > x), and `isf(p)` returns the value with upper-tail probability `p`,
 handy for "what threshold leaves only 5% above it?" (`isf(0.05)`).
-Using `sf`/`isf` instead of `1 - cdf` is also more numerically accurate
+Using `sf()`/`isf()` instead of `1 - cdf` is also more numerically accurate
 deep in the tail.
 </Callout>
 
@@ -123,6 +124,7 @@ The *meaning* changes per distribution, but the *interface* is identical.
 <Figure
   slug="stat-working-with-distributions-inline-cutout"
   alt="A smooth ramp over a rail with a shaded slice cut from it and a gauge reading that slice's share"
+  caption="Fixing the shift and the scale freezes a distribution you can then read off."
 />
 
 **Frozen distributions.** Calling `stats.norm(loc=30, scale=6)` once
@@ -515,9 +517,9 @@ heavy-tailed model).
 - [o] \`.isf(0.05)\`
   > The inverse-survival function returns the value whose upper-tail probability equals 0.05, exactly the threshold with 5% of the distribution above it (equivalently \`ppf(0.95)\`).
 - \`.sf(0.05)\`
-  > \`sf\` takes a value and returns its upper-tail probability, not a value at a given tail level.
+  > \`sf()\` takes a value and returns its upper-tail probability, not a value at a given tail level.
 - \`.cdf(0.05)\`
-  > \`cdf\` maps a value to a left-tail probability; passing 0.05 treats it as a value, not a tail level.
+  > \`cdf()\` maps a value to a left-tail probability; passing 0.05 treats it as a value, not a tail level.
 - \`.ppf(0.05)\`
   > \`ppf(0.05)\` returns the value with 5% *below* it (lower tail), the opposite end from what's asked.
 
@@ -557,8 +559,8 @@ Where and how the points leave the line tells you exactly how the model misfits,
 <MultipleChoice
   markdown={`You fit a normal to response times that range from 50 to 130 ms, then use the model to report \`P(X > 400)\`. Why should you be skeptical of that number?
 
-- Because \`sf\` is inaccurate for large values
-  > \`sf\` is actually the numerically *preferred* way to compute far-tail probabilities; precision isn't the issue.
+- Because \`sf()\` is inaccurate for large values
+  > \`sf()\` is actually the numerically *preferred* way to compute far-tail probabilities; precision isn't the issue.
 - [o] Because 400 is far outside the observed data range, so that probability is an extrapolation governed entirely by the assumed normal shape, not by any observations
   > With no data anywhere near 400, the reported probability rests solely on the assumption that the true distribution is normal in a region you never measured, making it unreliable.
 - Because fitted models can only answer questions about the mean
@@ -571,8 +573,8 @@ A fitted model is trustworthy within the data's range; its far tails are assumpt
 
 <Callout type="success" title="Key takeaways">
 - Every distribution answers the same **four questions**: density
-  (`pdf`/`pmf`), accumulation (`cdf`/`sf`), quantile (`ppf`/`isf`), and
-  simulation (`rvs`), plus `.mean`/`.var`/`.std`.
+  (`pdf()`/`pmf()`), accumulation (`cdf()`/`sf()`), quantile (`ppf()`/`isf()`), and
+  simulation (`rvs()`), plus `.mean()`/`.var()`/`.std()`.
 - The **`loc`/`scale`** convention and **frozen distributions** give one
   consistent, tidy interface across all of `scipy.stats`.
 - **`.fit()`** estimates parameters from data; for bounded data, fix the

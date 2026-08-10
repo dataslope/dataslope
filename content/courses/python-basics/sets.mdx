@@ -34,6 +34,7 @@ The literal syntax uses curly braces, but **without** colons.
 <Figure
   slug="python-sets-inline-cutout"
   alt="A bin that takes each distinct block once, an identical second block bouncing off its rim onto the bench"
+  caption="A set keeps one of each value and silently drops the duplicates."
 />
 
 <CodeBlock
@@ -252,6 +253,7 @@ This is where sets shine. Membership testing in a list is O(n); in a set it is O
 <Figure
   slug="python-sets-sets-work-inline-cutout"
   alt="A bin with a narrow mouth accepting a block once and rejecting an identical second"
+  caption="The set checks membership at the rim, in constant time, however full it is."
 />
 
 That gap compounds when the whole *operation* is a set operation. Intersecting

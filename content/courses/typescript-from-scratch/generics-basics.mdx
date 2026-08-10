@@ -40,6 +40,7 @@ Generics give you the best of both worlds: one function, full type safety, and t
 <Figure
   slug="tsx-generics-basics-inline-cutout"
   alt="One crate with an interchangeable insert, three differently shaped inserts standing beside it, each making the same crate hold a different shape"
+  caption="One generic container works for any element type, with the type still checked."
 />
 
 The cost of option 1 is combinatorial, which is easy to miss when the union
@@ -118,6 +119,7 @@ The type parameter `T` flows through the signature: the input is `T`, the output
 <Figure
   slug="tsx-generics-basics-generic-functions-inline-cutout"
   alt="One machine shown working on three different shapes of block without any change to itself"
+  caption="The same function serves every type because the type travels with the value."
 />
 
 ### Multiple type parameters
@@ -184,6 +186,7 @@ Generics aren't limited to functions. You can parameterize interfaces and type a
 <Figure
   slug="tsx-generics-basics-generic-interfaces-type-inline-cutout"
   alt="One contract card held against three crates of different contents, matching all three"
+  caption="One parameterised interface describes many concrete shapes at once."
 />
 
 <CodeBlock
@@ -286,9 +289,9 @@ console.log(\`Top: \${stringStack.peek()}\`); // "world"
 
 The `Stack<T>` class holds items of type `T`. When you instantiate `new Stack<number>()`, all the methods operate on `number`s. When you instantiate `new Stack<string>()`, all the methods operate on `string`s. One class, many types.
 
-## A practical example: `map`
+## A practical example: `map()`
 
-Let's build a generic `map` function (like `Array.prototype.map`). It takes an array of type `T[]` and a function `(T) => U`, and returns an array of type `U[]`.
+Let's build a generic `map()` function (like `Array.prototype.map`). It takes an array of type `T[]` and a function `(T) => U`, and returns an array of type `U[]`.
 
 <CodeBlock
   adapter="typescript"
@@ -372,7 +375,7 @@ Now it's your turn. You'll implement a generic `Container` class that holds a va
 - A \`get()\` method that returns the current value.
 - A \`map<U>(fn: (value: T) => U)\` method that applies \`fn\` to the value and returns a **new** \`Container<U>\` (do not mutate the original).
 
-The tests will verify that \`map\` transforms the value and returns a new container with the correct type.`}
+The tests will verify that \`map()\` transforms the value and returns a new container with the correct type.`}
   entryFilename="main.ts"
   files={[
     {
@@ -501,10 +504,10 @@ The \`| undefined\` is necessary because accessing \`arr[0]\` might return \`und
 
 Generics are the right choice when:
 
-1. **You're writing a utility that works with any type.** Functions like `identity`, `wrap`, `first`, `last`, `map`, `filter`, etc.
+1. **You're writing a utility that works with any type.** Functions like `identity()`, `wrap()`, `first()`, `last()`, `map()`, `filter()`, etc.
 2. **You're defining a container or collection.** `Box<T>`, `Array<T>`, `Set<T>`, `Map<K, V>`, etc.
 3. **You're modeling results, events, or state machines with variable payloads.** `Result<T, E>`, `Event<TPayload>`, `State<TData>`, etc.
-4. **You want to preserve type information through a transformation.** A function that takes `T[]` and returns `U[]` (like `map`), or a class that takes `T` and exposes `T` (like `Promise<T>`).
+4. **You want to preserve type information through a transformation.** A function that takes `T[]` and returns `U[]` (like `map()`), or a class that takes `T` and exposes `T` (like `Promise<T>`).
 
 Don't use generics when:
 

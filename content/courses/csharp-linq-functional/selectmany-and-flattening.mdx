@@ -3,7 +3,7 @@ title: SelectMany and Flattening
 description: How to deal with sequences of sequences, and why SelectMany is the single most useful operator after Where and Select
 ---
 
-`Select` projects each element to *one* thing. `SelectMany` projects
+`Select()` projects each element to *one* thing. `SelectMany()` projects
 each element to a *sequence* of things, and then flattens the result
 into one sequence. It is the answer to a question that comes up
 constantly in real data:
@@ -18,9 +18,9 @@ constantly in real data:
 
 That question is everywhere, orders with line items, blog posts
 with tags, departments with employees, files with lines, paragraphs
-with words. `SelectMany` is the right tool every single time.
+with words. `SelectMany()` is the right tool every single time.
 
-## The problem with `Select` alone
+## The problem with `Select()` alone
 
 Suppose each `Department` has a list of `Employee` objects, and you
 want one flat list of all employees in the company.
@@ -55,10 +55,10 @@ record Department(string Name, List<Employee> Employees);
   ]}
 />
 
-`Select` gave us a sequence of *three* groups, not six employees. We
+`Select()` gave us a sequence of *three* groups, not six employees. We
 need to flatten.
 
-## Enter `SelectMany`
+## Enter `SelectMany()`
 
 <CodeBlock
   adapter="csharp"
@@ -88,13 +88,14 @@ record Department(string Name, List<Employee> Employees);
   ]}
 />
 
-The output is six lines, one employee per line. `SelectMany`
+The output is six lines, one employee per line. `SelectMany()`
 visited each department, asked for its `Employees` list, and merged
 them all into a single sequence.
 
 <Figure
   slug="cs-selectmany-and-flattening-problem-select-alone-inline-cutout"
   alt="Three small boxes each holding three blocks, lifted out still boxed, beside the same boxes tipped onto one rail"
+  caption="`Select()` leaves you a sequence of sequences; `SelectMany()` flattens it."
 />
 
 ## Visual mental model
@@ -118,7 +119,7 @@ a value from the parent side:
 <Chart slug="join-fanout-rows" />
 
 A subtle and common case: you want to flatten, *but you also want to
-know which parent each child came from*. `SelectMany` has a two-arg
+know which parent each child came from*. `SelectMany()` has a two-arg
 overload for exactly this.
 
 <CodeBlock
@@ -151,13 +152,13 @@ record Department(string Name, List<Employee> Employees);
 />
 
 This is the LINQ equivalent of a SQL `JOIN` between a parent table
-and its rows. We will see the same shape again with `Join` and
-`GroupJoin` later, but `SelectMany` covers the common case more
+and its rows. We will see the same shape again with `Join()` and
+`GroupJoin` later, but `SelectMany()` covers the common case more
 naturally.
 
 ## Splitting strings, words, characters
 
-`SelectMany` is also the right operator for flattening strings or
+`SelectMany()` is also the right operator for flattening strings or
 arrays.
 
 <CodeBlock
@@ -194,11 +195,12 @@ implements `IEnumerable<char>`. Strings *are* sequences of chars in
 
 ## Multiple-level flattening
 
-For deeply nested structures, you chain `SelectMany` calls.
+For deeply nested structures, you chain `SelectMany()` calls.
 
 <Figure
   slug="cs-selectmany-and-flattening-inline-cutout"
   alt="Three small boxes each holding three blocks, tipped out in turn onto one long rail so the blocks lie in a single line"
+  caption="Each inner collection is tipped out onto one line in order."
 />
 
 <CodeBlock
@@ -234,14 +236,14 @@ record Customer(string Name, List<Order> Orders);
   ]}
 />
 
-Each `SelectMany` peels off one level of nesting. Two levels of
-nesting → two `SelectMany` calls. Three levels → three. Simple.
+Each `SelectMany()` peels off one level of nesting. Two levels of
+nesting → two `SelectMany()` calls. Three levels → three. Simple.
 
 ## The functional ancestry
 
 In Haskell and Scala, this operator is called `flatMap`. In
 JavaScript, arrays have a `.flatMap()` method that does the same
-thing. In LINQ it's `SelectMany`. The idea is the same in all
+thing. In LINQ it's `SelectMany()`. The idea is the same in all
 languages: **map each thing to a sequence, then flatten by one
 level**.
 
@@ -266,7 +268,7 @@ Example: a customer "Ada" with orders [1, 2] should yield
 Order: customers in input order, orders in input order within each
 customer.
 
-Use \`SelectMany\` with the two-argument overload.`}
+Use \`SelectMany()\` with the two-argument overload.`}
   entryFilename="Program.cs"
   files={[
     {
@@ -319,18 +321,18 @@ public static class Reports
 />
 
 <MultipleChoice
-  markdown={`Which scenario calls for \`SelectMany\` rather than \`Select\`?
+  markdown={`Which scenario calls for \`SelectMany()\` rather than \`Select()\`?
 
 - Counting how many items are in a list.
   > That's an aggregation; \`Count()\` or \`Length\` is the right tool.
 - [o] Producing a flat list of every tag across every blog post in a list of posts.
-  > Each post has *many* tags, and you want one flat sequence. That's exactly the flattening that \`SelectMany\` performs.
+  > Each post has *many* tags, and you want one flat sequence. That's exactly the flattening that \`SelectMany()\` performs.
 - Filtering a list of orders to only those with \`Total > 100\`.
-  > That's a filter, not a flattening, \`Where\` is the right operator.
+  > That's a filter, not a flattening, \`Where()\` is the right operator.
 - Doubling every element of an \`int[]\`.
-  > That's a one-to-one transformation, so \`Select\` is the right operator. No nesting is involved.
+  > That's a one-to-one transformation, so \`Select()\` is the right operator. No nesting is involved.
 
 The rule of thumb: if your lambda returns a single value per element,
-use \`Select\`. If it returns a *sequence* per element and you want
-one flat sequence at the end, use \`SelectMany\`.`}
+use \`Select()\`. If it returns a *sequence* per element and you want
+one flat sequence at the end, use \`SelectMany()\`.`}
 />

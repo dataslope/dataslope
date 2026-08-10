@@ -56,6 +56,7 @@ the *intent* is different. `loc` expresses "I know the label";
 <Figure
   slug="pandas-loc-vs-iloc-side-by-side-inline-cutout"
   alt="One board approached from two sides, a hand on the left holding a name tag and a hand on the right counting rows"
+  caption="`.loc` reaches by label and `.iloc` by position; here both land on the same row."
 />
 
 ## Slicing comparison
@@ -88,6 +89,7 @@ obvious "one past the end", Pandas chose to be inclusive.
 <Figure
   slug="pandas-loc-vs-iloc-slicing-comparison-inline-cutout"
   alt="Two brackets clamped over the same row of blocks, one ending on the marked block and one stopping just before it"
+  caption="Label slices include the last item; position slices stop just before it."
 />
 
 ## Selecting rows *and* columns
@@ -220,6 +222,7 @@ and position becomes very obvious in this case.
 <Figure
   slug="pandas-loc-vs-iloc-inline-cutout"
   alt="One grid approached from two sides, a hand on the left picking a cell by the name tag on its row, a hand on the right counting rows to reach the same cell"
+  caption="When the labels are integers, label and position stop agreeing with each other."
 />
 
 <CodeBlock

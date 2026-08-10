@@ -22,6 +22,7 @@ unhappy paths.
 <Figure
   slug="pandas-loading-datasets-inline-cutout"
   alt="Three differently shaped cartons feeding one hopper and coming out as identical rows on a board"
+  caption="Whatever the file format, loading it produces the same DataFrame on the far side."
 />
 
 Honorable mentions:
@@ -30,7 +31,7 @@ Honorable mentions:
 - `pd.read_parquet`, Parquet files (a fast columnar format).
 - `pd.read_sql`, query results from a SQL database.
 
-For the rest of the course we will lean on `read_csv` because the
+For the rest of the course we will lean on `read_csv()` because the
 data we will use lives on the public internet as CSVs.
 
 ## Meet the penguins
@@ -47,11 +48,12 @@ few genuinely missing values. We will get to know it well.
 <Figure
   slug="pandas-loading-datasets-meet-penguins-inline-cutout"
   alt="A sealed carton opened on a bench with a small measuring caliper and three cards laid beside it"
+  caption="The penguins dataset is small, real, and missing a few values on purpose."
 />
 
 ## Reading from a URL
 
-`pd.read_csv` accepts a URL exactly like a file path. The bytes are
+`pd.read_csv()` accepts a URL exactly like a file path. The bytes are
 fetched over HTTPS in the background and parsed. This is the one
 place in the course where we will read straight from a URL, so you
 can see how it works:
@@ -83,11 +85,13 @@ Two notes:
    version starts with `raw.githubusercontent.com` and returns the
    actual bytes.
 2. **Some hosts don't allow direct browser fetches.** For those you
-   can route through a CORS proxy.
+   can route through a proxy that adds the cross-origin headers
+   a browser insists on.
 
 <Figure
   slug="pandas-loading-datasets-reading-from-url-inline-cutout"
   alt="A cord running from a bench off the edge of the frame, a carton arriving along it onto the bench"
+  caption="The same reader takes a URL as happily as a local path and fetches the file."
 />
 
 For the rest of the course, instead of hardcoding URLs we will
@@ -96,9 +100,9 @@ with `pd.read_csv("penguins.csv")`). That keeps the lesson code
 clean and is closer to how you will work on your own machine,
 where the data is a file on disk, not a URL.
 
-## Common `read_csv` options
+## Common `read_csv()` options
 
-`pd.read_csv` has dozens of parameters, but you will use only a
+`pd.read_csv()` has dozens of parameters, but you will use only a
 handful in real life:
 
 | Parameter        | What it does                                          |
@@ -147,7 +151,7 @@ Two things to notice:
   there are only a handful of distinct values across hundreds of
   rows.
 
-## The first three things to do after `read_csv`
+## The first three things to do after `read_csv()`
 
 Whenever you load a new dataset, run these three commands
 *before* you do anything else.
@@ -376,11 +380,11 @@ assert isinstance(df["island"].dtype, pd.CategoricalDtype)`,
   markdown={`What is the difference between \`https://github.com/.../file.csv\` and \`https://raw.githubusercontent.com/.../file.csv\`?
 
 - [o] The first returns the GitHub HTML page that *displays* the file; the second returns the file's raw bytes
-  > Always use the raw URL for \`pd.read_csv\` so you get the data and not the HTML.
+  > Always use the raw URL for \`pd.read_csv()\` so you get the data and not the HTML.
 - The second requires authentication
   > Public \`raw.githubusercontent.com\` URLs are freely accessible without a token; authentication is only needed for private repositories.
 - The first is faster
-  > The first URL typically returns more data (a full HTML page) than the second (the raw file), so it is not faster, and passing HTML to \`pd.read_csv\` causes a parse error.
+  > The first URL typically returns more data (a full HTML page) than the second (the raw file), so it is not faster, and passing HTML to \`pd.read_csv()\` causes a parse error.
 - They are identical
   > The two URLs serve different content: the first is a GitHub webpage with HTML, JavaScript, and navigation; the second is the raw file bytes.
 
@@ -403,13 +407,13 @@ For columns with millions of rows and only a handful of distinct values, the sav
 />
 
 <MultipleChoice
-  markdown={`A CSV column \`phone\` contains values like \`5551234567\`. After \`pd.read_csv\` you see it has dtype \`int64\`. What is the safest fix?
+  markdown={`A CSV column \`phone\` contains values like \`5551234567\`. After \`pd.read_csv()\` you see it has dtype \`int64\`. What is the safest fix?
 
 - Use \`.astype("int64")\` afterwards
   > Converting to \`int64\` after the fact moves in the wrong direction, phone numbers should be strings, and the column is already an integer at this point.
 - Restart your computer
-  > Restarting the computer does not change how \`pd.read_csv\` infers dtypes; the same file will still be parsed as \`int64\` on the next run.
-- [o] Pass \`dtype={"phone": "string"}\` to \`pd.read_csv\` so the values are read as strings from the start
+  > Restarting the computer does not change how \`pd.read_csv()\` infers dtypes; the same file will still be parsed as \`int64\` on the next run.
+- [o] Pass \`dtype={"phone": "string"}\` to \`pd.read_csv()\` so the values are read as strings from the start
   > Once a leading-zero phone or ZIP code has been parsed as int, the leading zeros are gone. Force the string type at read time.
 - Convert to float
   > Converting to \`float64\` does not preserve phone number strings; it makes the values harder to work with and can introduce scientific notation for long numbers.

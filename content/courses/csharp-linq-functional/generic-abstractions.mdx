@@ -86,7 +86,7 @@ site.
 
 ## Building a generic `MyWhere`
 
-To really see how built-in LINQ works, let's reimplement `Where`.
+To really see how built-in LINQ works, let's reimplement `Where()`.
 
 <CodeBlock
   adapter="csharp"
@@ -127,7 +127,7 @@ public static class Mini
 />
 
 Two short methods, generic over the element type, and they chain.
-This is essentially all built-in `Where` and `Select` do.
+This is essentially all built-in `Where()` and `Select()` do.
 
 The real implementations add micro-optimizations (special cases for
 arrays/lists) but the *shape* is exactly this.
@@ -325,6 +325,7 @@ scales as the program grows.
 <Figure
   slug="cs-generic-abstractions-interface-unifies-everything-inline-cutout"
   alt="One standard fitting shown on the front of five very different containers"
+  caption="One generic interface fits containers that share nothing else."
 />
 
 LINQ is the showcase: dozens of operators, each generic, each

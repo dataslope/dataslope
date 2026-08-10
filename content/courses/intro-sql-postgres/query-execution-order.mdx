@@ -35,6 +35,7 @@ Read the numbers: `FROM` is first, `SELECT` is near the **end**, and
 <Figure
   slug="sql-query-execution-order-written-order-vs-inline-cutout"
   alt="A written list of six stations beside a bench where the parcel visibly starts at the fourth"
+  caption="The order you write the clauses is not the order the database runs them."
 />
 
 Seen as row counts, the order also explains where a query spends its time:
@@ -130,6 +131,7 @@ Trace it in execution order:
 <Figure
   slug="sql-query-execution-order-inline-cutout"
   alt="Six machines standing in a row along a bench with one thick coloured cord threading between them out of order, entering at a machine in the middle, doubling back to the first, and leaving from the last"
+  caption="`FROM` first, `SELECT` late, `LIMIT` last, whatever the query looks like."
 />
 
 This is the **query transformation pipeline**: each stage reshapes a
@@ -191,11 +193,11 @@ Execution starts with \`FROM\`; \`SELECT\` and \`ORDER BY\` come much later.`}
 
 - Because \`HAVING\` is just a faster version of \`WHERE\`.
   > They filter at different stages, rows vs. groups, not at different speeds.
-- Because \`SUM\` cannot be used anywhere except \`HAVING\`.
-  > \`SUM\` also appears in \`SELECT\`; the point is that group filtering happens in \`HAVING\`.
+- Because \`SUM()\` cannot be used anywhere except \`HAVING\`.
+  > \`SUM()\` also appears in \`SELECT\`; the point is that group filtering happens in \`HAVING\`.
 - Because \`WHERE\` cannot contain numbers.
   > \`WHERE\` handles numeric comparisons fine; the issue is when the sum is computed.
-- [o] Because the group's \`SUM\` is only formed at the \`GROUP BY\` step, which runs after \`WHERE\`; \`HAVING\` runs after grouping.
+- [o] Because the group's \`SUM()\` is only formed at the \`GROUP BY\` step, which runs after \`WHERE\`; \`HAVING\` runs after grouping.
   > \`WHERE\` acts before groups exist, so it cannot see a group total; \`HAVING\` filters after grouping.
 
 Group aggregates exist only after \`GROUP BY\`, so filtering on them belongs in \`HAVING\`, not \`WHERE\`.`}

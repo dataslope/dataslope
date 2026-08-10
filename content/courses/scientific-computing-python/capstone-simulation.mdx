@@ -8,7 +8,8 @@ into a single page. We will:
 
 - Build a multi-file simulation of a **Lotka–Volterra**
   predator–prey ecosystem
-- Solve the ODE with `solve_ivp` and detect *extinction events*
+- Solve the differential equation with `solve_ivp()` and detect
+  *extinction events*
 - Run a **parameter sweep** over predation rates
 - **Visualize** with small multiples and a phase portrait
 - Quantify uncertainty by repeating with multiple seeds
@@ -211,7 +212,7 @@ What this little project demonstrates:
 
 - **Modeling.** Translating a biological story into a system of
   ODEs with parameters that have physical meaning.
-- **Stable numerical integration.** Using `solve_ivp` with
+- **Stable numerical integration.** Using `solve_ivp()` with
   `dense_output` and `max_step` to get smooth, controllable
   output.
 - **Event detection.** Catching the extinction moment exactly.
@@ -346,7 +347,7 @@ in the capstone:
 | Technique | Where |
 | --- | --- |
 | Vectorized NumPy | the entire RHS |
-| Adaptive ODE integration | `solve_ivp` with RK45 |
+| Adaptive ODE integration | `solve_ivp()` with RK45 |
 | Event detection | extinction at $y = 0.5$ |
 | Reproducible randomness | `default_rng(seed)` per run |
 | Multi-file project layout | `simulate / aggregate / plot` |
@@ -367,7 +368,7 @@ together by reproducible code.
 - It changes the order of the integrator
   > The order of an integrator (e.g. RK45 is 4th/5th order) is fixed by the method choice, not by \`max_step\`; the parameter only bounds the adaptive step size.
 - It enables GPU acceleration
-  > \`solve_ivp\` runs on the CPU; no argument enables GPU execution.
+  > \`solve_ivp()\` runs on the CPU; no argument enables GPU execution.
 - [o] An adaptive solver may take huge steps over slow dynamics and *miss* short-lived events; capping the step size forces the solver to evaluate the event function frequently enough to detect a fast extinction transient
   > The event detector only checks for a sign change *between* solver steps. If the predator crashes inside a single 5-second step, the event might be missed entirely. \`max_step\` bounds how aggressively the solver can grow its step, trading some performance for guaranteed event resolution.
 - To slow down the simulation for visualization

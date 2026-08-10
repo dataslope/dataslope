@@ -9,7 +9,7 @@ categories but answer very different questions. A **count plot** asks *how
 many* observations are in each group. A **bar plot** asks *what is a
 typical value* of some measurement in each group, by default, its mean.
 
-Both live under `catplot`: a count plot is `kind="count"`, a bar plot is
+Both live under `catplot()`: a count plot is `kind="count"`, a bar plot is
 `kind="bar"`. The crucial difference is what they need and what they put on
 the value axis, and, for the bar plot, a quiet way it can mislead you that
 every analyst should learn to see.
@@ -52,7 +52,7 @@ job.
 grid and can facet with `col`/`row`). The axes-level twin is
 `sns.countplot(...)`, which draws onto a single Axes. Same bars; they differ
 in what they return and how they compose, a distinction we cover on its own
-page. Reach for `catplot` when you might want panels.
+page. Reach for `catplot()` when you might want panels.
 </Callout>
 
 A count plot is the right tool whenever the question is literally "how many?",
@@ -71,6 +71,7 @@ estimate (a 95% confidence interval by default).
 <Figure
   slug="sns-bar-and-count-plots-bar-plot-typical-inline-cutout"
   alt="Three trays of chips with a single standing block beside each showing its typical height"
+  caption="A bar plot draws one summary per category, by default the mean."
 />
 
 <CodeBlock
@@ -300,6 +301,7 @@ spread, skew, clumps, and outliers all vanish. A count hides everything
 <Figure
   slug="sns-bar-and-count-plots-count-plot-many-inline-cutout"
   alt="Chips raked into three trays with a bar rising beside each tray as it fills"
+  caption="A count plot needs no numeric column: the bar height is how many rows there are."
 />
 
 ## Your turn
@@ -307,7 +309,7 @@ spread, skew, clumps, and outliers all vanish. A count hides everything
 <ChallengeCard
   adapter="python"
   title="Count passengers by class"
-  instructions={`Use \`sns.catplot\` on the \`titanic\` dataset to show **how many
+  instructions={`Use \`sns.catplot()\` on the \`titanic\` dataset to show **how many
 passengers were in each travel class**.
 
 - Use \`kind="count"\`.
@@ -360,7 +362,7 @@ comparing a mean across two categorical variables at once.
   instructions={`Using the \`penguins\` DataFrame, draw a **grouped bar plot** of
 average body mass.
 
-- Use \`sns.catplot\` with \`kind="bar"\`.
+- Use \`sns.catplot()\` with \`kind="bar"\`.
 - Put \`species\` on the x-axis and \`body_mass_g\` on the y-axis (Seaborn
   takes the **mean** per group automatically).
 - Split each species into one bar per \`sex\` by mapping \`hue="sex"\`.
@@ -459,7 +461,7 @@ what does \`errorbar="sd"\` make the error bars represent?
 - [o] One standard deviation, a measure of the spread of the data in each group.
   > \`"sd"\` draws ± one standard deviation, so the bars reflect how spread out each group's values are rather than the precision of the mean.
 - The minimum and maximum value in each group.
-  > The full range is neither the default CI nor the \`"sd"\` option; standard deviation summarizes typical spread, not the extremes.
+  > The full range is neither the default confidence interval nor the \`"sd"\` option; standard deviation summarizes typical spread, not the extremes.
 - Nothing; \`"sd"\` turns the error bars off.
   > Turning error bars off is \`errorbar=None\`; \`"sd"\` actively draws standard-deviation bars.
 
@@ -493,4 +495,5 @@ shape a bar leaves out.
 <Figure
   slug="sns-bar-and-count-plots-inline-cutout"
   alt="A row of standing blocks on a base rail beside a row of stacked tally chips of the same heights"
+  caption="One bar per group is the least detail a categorical chart can show."
 />

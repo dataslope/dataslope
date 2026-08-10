@@ -26,6 +26,7 @@ Think of an aggregate as a tiny summarizing machine. Many rows go in. One value 
 <Figure
   slug="lite-aggregate-functions-counting-rows-count-inline-cutout"
   alt="A row of blocks passing a clicking counter, the counter's needle rising with each"
+  caption="An aggregate walks the rows and reports one number about all of them."
 />
 
 ```mermaid
@@ -51,6 +52,7 @@ The five core aggregate functions are:
 <Figure
   slug="lite-aggregate-functions-from-many-rows-inline-cutout"
   alt="A tall column of chips tipped into a funnel and leaving as one block"
+  caption="`COUNT(*)` counts rows, whatever those rows happen to contain."
 />
 
 <SqlCodeBlock
@@ -107,7 +109,7 @@ SQLite reads the `amount` values and adds them into one total.
 
 ## Finding an average with AVG
 
-`AVG(column)` finds the average of the non-`NULL` values in a column. You can use `ROUND` when you want a friendlier number.
+`AVG(column)` finds the average of the non-`NULL` values in a column. You can use `ROUND()` when you want a friendlier number.
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -219,6 +221,7 @@ flowchart LR
 <Figure
   slug="lite-aggregate-functions-inline-cutout"
   alt="One tray of chips feeding a single gauge that reads one number, the tray left empty afterwards"
+  caption="`WHERE` runs first, so the aggregate only sees the rows that survived."
 />
 
 <SqlCodeBlock
@@ -324,11 +327,11 @@ Use `COUNT(*)` when you mean "How many rows?" Use `COUNT(column)` when you mean 
 - [o] \`COUNT(*)\`
   > \`COUNT(*)\` counts rows, including rows that contain missing values.
 - \`MAX(*)\`
-  > \`MAX\` finds the largest value in a column.
+  > \`MAX()\` finds the largest value in a column.
 - \`AVG(*)\`
-  > \`AVG\` averages values from a column, not whole rows.
+  > \`AVG()\` averages values from a column, not whole rows.
 - \`SUM(*)\`
-  > \`SUM\` adds values from a specific column; \`SUM(*)\` is not the row-counting pattern.
+  > \`SUM()\` adds values from a specific column; \`SUM(*)\` is not the row-counting pattern.
 
 Use \`COUNT(*)\` for row counts.`}
 />
@@ -357,8 +360,8 @@ Use \`COUNT(*)\` for row counts.`}
   > SQLite can store \`NULL\`; aggregate functions simply treat it as missing information.
 - [o] Because \`NULL\` means unknown, and unknown values should not be averaged as if they were real numbers.
   > Skipping missing ratings keeps the average based on ratings that actually exist.
-- Because \`AVG\` only works on text.
-  > \`AVG\` is for numeric values.
+- Because \`AVG()\` only works on text.
+  > \`AVG()\` is for numeric values.
 
 Most aggregates skip \`NULL\` so missing data does not distort the summary.`}
 />
@@ -367,13 +370,13 @@ Most aggregates skip \`NULL\` so missing data does not distort the summary.`}
   markdown={`What does this query return: \`SELECT MIN(price), MAX(price) FROM products;\`?
 
 - [o] One row containing the smallest price and the largest price.
-  > \`MIN\` and \`MAX\` each produce one summary value over the table.
+  > \`MIN()\` and \`MAX()\` each produce one summary value over the table.
 - One row for every product.
   > Aggregate functions collapse many rows into summary values.
 - Only products with missing prices.
-  > \`MIN\` and \`MAX\` skip \`NULL\` values and report extremes among known values.
+  > \`MIN()\` and \`MAX()\` skip \`NULL\` values and report extremes among known values.
 - A sorted list of all prices.
-  > Sorting requires \`ORDER BY\`; \`MIN\` and \`MAX\` summarize.
+  > Sorting requires \`ORDER BY\`; \`MIN()\` and \`MAX()\` summarize.
 
-\`MIN\` and \`MAX\` are aggregate functions for finding extremes.`}
+\`MIN()\` and \`MAX()\` are aggregate functions for finding extremes.`}
 />

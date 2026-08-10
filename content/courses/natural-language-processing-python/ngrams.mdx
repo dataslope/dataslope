@@ -46,6 +46,7 @@ returns a generator, so wrap it in `list(...)` to see or reuse the results.
 <Figure
   slug="nlp-ngrams-inline-cutout"
   alt="A strip of word tiles with a two-tile window sliding along it, each pair it frames dropping into its own tray"
+  caption="A sliding window of n words captures the order a bag of words loses."
 />
 
 <CodeBlock
@@ -164,7 +165,7 @@ add bigrams so that negations and key phrases survive.
 
 ## Counting n-grams reveals phrases
 
-Counting n-grams (with `FreqDist` or `Counter`, just like words) surfaces the
+Counting n-grams (with `FreqDist()` or `Counter()`, just like words) surfaces the
 common *phrases* in a text, the building blocks of autocomplete, phrase
 search, and collocation discovery.
 
@@ -322,7 +323,7 @@ N-grams reintroduce the local word order that a bag of single words throws away.
   estimatedTime="~6 min"
   instructions={`Write a function \`get_ngrams(tokens, n)\` that returns a **list** of all
 n-grams of \`tokens\`, where each n-gram is a tuple of \`n\` adjacent tokens. Use
-\`ngrams\` from \`nltk.util\` (already imported) and remember it returns a
+\`ngrams()\` from \`nltk.util\` (already imported) and remember it returns a
 generator, so wrap it in \`list(...)\`.
 
 For example:
@@ -456,4 +457,5 @@ these steps your task actually needs.**
 <Figure
   slug="nlp-ngrams-sliding-window-inline-cutout"
   alt="A two-tile window sliding along a strip of tiles, each pair it frames dropping into a tray"
+  caption="Each window position becomes one n-gram, overlapping the last."
 />

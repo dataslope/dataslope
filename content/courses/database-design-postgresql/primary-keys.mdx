@@ -94,6 +94,7 @@ tries to reuse the same primary key, so PostgreSQL rejects it.
 <Figure
   slug="db-primary-keys-rows-need-identity-inline-cutout"
   alt="A rack of cards where one card carries a punched tab no other card has, a hand lifting it by that tab"
+  caption="The primary key is the tab no other row is allowed to carry."
 />
 
 <SqlCodeBlock
@@ -131,6 +132,7 @@ uses multiple columns together.
 <Figure
   slug="db-primary-keys-inline-cutout"
   alt="A filing drawer of identical folders, each wearing a tab cut to a different silhouette, and a hand pulling exactly one folder out by its tab"
+  caption="A composite key uses several columns whose combination is unique."
 />
 
 This is common when the row represents a relationship. In a class

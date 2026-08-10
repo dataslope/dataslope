@@ -90,6 +90,7 @@ Three big reasons.
 <Figure
   slug="pandas-indexes-and-labels-index-inline-cutout"
   alt="A board whose rows each carry a tag on the left edge, a hand pulling one row out by its tag alone"
+  caption="The index labels every row, and a label lets you pull that row out by name."
 />
 
 ### 1. Alignment
@@ -129,7 +130,7 @@ We will see `loc` in depth in the *loc vs iloc* chapter.
 
 ### 3. Joins
 
-Many `merge` and `join` operations use the index as the key.
+Many `merge()` and `join` operations use the index as the key.
 A well-designed index makes joins trivial.
 
 ## Time series indexes, the killer use case
@@ -141,6 +142,7 @@ features.
 <Figure
   slug="pandas-indexes-and-labels-bother-labeled-index-inline-cutout"
   alt="A hand reaching straight to one tagged row in a tall board, ignoring the rows above and below"
+  caption="A labelled index goes straight to the row you want, however tall the table."
 />
 
 <CodeBlock
@@ -206,7 +208,7 @@ print("Columns are now:", list(flat.columns))
   ]}
 />
 
-You will reach for `reset_index()` constantly after a `groupby`,
+You will reach for `reset_index()` constantly after a `groupby()`,
 because group-by results have the grouping column promoted into
 the index.
 
@@ -258,7 +260,7 @@ A useful rule of thumb:
   attribute to filter, group, or aggregate on.
 
 The right answer often changes throughout an analysis. Promoting
-and demoting via `set_index` / `reset_index` is cheap.
+and demoting via `set_index()` / `reset_index()` is cheap.
 
 ## Check your understanding
 
@@ -296,7 +298,7 @@ Time-series indexing is a great example of the value of *labeled* axes.`}
   markdown={`What does \`reset_index()\` do?
 
 - [o] Promotes the current index back to one or more regular columns and replaces the index with a default RangeIndex
-  > It is the inverse of \`set_index\`. You will use it constantly after groupby.
+  > It is the inverse of \`set_index()\`. You will use it constantly after groupby.
 - Sorts the index
   > \`sort_index()\` sorts by the index; \`reset_index()\` demotes the index to a column and replaces it with a \`RangeIndex\`.
 - Removes all rows

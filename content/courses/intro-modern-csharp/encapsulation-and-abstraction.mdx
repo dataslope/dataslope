@@ -114,13 +114,14 @@ public class BankAccount
   ]}
 />
 
-Now the *only* way the balance can change is by calling `Deposit`
-or `Withdraw`, and those methods enforce the invariants. The class
+Now the *only* way the balance can change is by calling `Deposit()`
+or `Withdraw()`, and those methods enforce the invariants. The class
 owns its rules.
 
 <Figure
   slug="mcs-encapsulation-and-abstraction-class-s-badly-inline-cutout"
   alt="A cabinet with its back panel missing, hands reaching in from behind to move its contents"
+  caption="Public fields leave a way in round the back, and rules cannot be enforced."
 />
 
 ## Encapsulation as a picture
@@ -189,6 +190,7 @@ makes encapsulation *useful*.
 <Figure
   slug="mcs-encapsulation-and-abstraction-properly-encapsulated-version-inline-cutout"
   alt="A sealed cabinet with a solid back and two handles on its front, the only way in"
+  caption="With the state sealed, the handles are the only way anything changes."
 />
 
 ## A larger example: a `Wallet`
@@ -259,7 +261,7 @@ Notice the **invariants** the class guarantees:
 
 1. `Cash >= 0` always, it's impossible to construct or transition
    into a negative balance.
-2. `Add` and `Spend` only accept positive amounts.
+2. `Add()` and `Spend` only accept positive amounts.
 
 These guarantees are local to `Wallet.cs`. You can audit them by
 reading one file.

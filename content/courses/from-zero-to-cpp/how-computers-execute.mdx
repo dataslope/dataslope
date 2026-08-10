@@ -105,6 +105,7 @@ branches, and function calls work under the hood.
 <Figure
   slug="cpp-how-computers-execute-inline-cutout"
   alt="A small unit repeating a three-station cycle, taking a card, reading it, and acting on it before returning for the next"
+  caption="Fetch, decode, execute, and round again: the loop under every program."
 />
 
 The CPU also has a tiny set of very fast storage slots called
@@ -161,7 +162,7 @@ course, so it helps to meet them now:
 - **Data**, global variables, string literals, and other things that
   exist for the entire run of the program.
 - **Heap**, memory you ask for *while the program runs*, often with
-  `new` (or `malloc` in C). It stays alive until you release it.
+  `new` (or `malloc()` in C). It stays alive until you release it.
 - **Stack**, a tidy area used for *function calls* and *local
   variables*. Each time you call a function, the CPU grows the
   stack by a small "frame"; when the function returns, the frame is
@@ -305,4 +306,5 @@ first place.
 <Figure
   slug="cpp-how-computers-execute-simplest-useful-model-inline-cutout"
   alt="One small engine, one wall of slots and one card feeder, joined in a triangle by short cords"
+  caption="A processor, memory and a stream of instructions is the whole model."
 />

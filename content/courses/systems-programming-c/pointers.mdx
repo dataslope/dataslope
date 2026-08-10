@@ -31,11 +31,13 @@ then on the *name* `x` refers to that address.
 <Figure
   slug="sysc-pointers-declaring-dereferencing-pointers-inline-cutout"
   alt="A card with an arrow to a locker, and a hand following that arrow to lift out what the locker holds"
+  caption="Dereferencing follows the address and reads what is stored there."
 />
 
 <Figure
   slug="sysc-pointers-variables-live-at-inline-cutout"
   alt="A row of lockers each with its own small plate, one block resting inside one of them"
+  caption="Every variable has an address, and that address is what a pointer holds."
 />
 
 The `&` operator gives you the address itself. The `%p` format
@@ -270,6 +272,7 @@ Read right-to-left: "p is a const pointer to a const int."
 <Figure
   slug="sysc-pointers-inline-cutout"
   alt="A strip of lockers with a card in one locker whose arrow reaches across to another, and a cord following that arrow"
+  caption="`const` can protect the pointer, the thing it points at, or both."
 />
 
 <Callout type="info" title="Library convention: const pointers for read-only inputs">
@@ -284,8 +287,8 @@ A `void *` is a pointer with no element type. It can hold the address
 of *anything*, but you cannot dereference it directly, the compiler
 does not know how many bytes to read or how to interpret them.
 
-`malloc` returns `void *`. So do many generic library functions like
-`memcpy`. You assign or cast it back to a typed pointer to use it.
+`malloc()` returns `void *`. So do many generic library functions like
+`memcpy()`. You assign or cast it back to a typed pointer to use it.
 
 <CodeBlock
   adapter="c"

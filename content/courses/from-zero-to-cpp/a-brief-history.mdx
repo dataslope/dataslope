@@ -45,6 +45,7 @@ By the 1950s, programmers had become tired of writing literal binary.
 <Figure
   slug="cpp-a-brief-history-assembly-small-step-inline-cutout"
   alt="A board of hand-thrown switches beside a card of short written marks, the card feeding a small translating machine"
+  caption="Assembly replaced bit patterns with names a person could actually read."
 />
 
 ```
@@ -138,6 +139,7 @@ By the 2000s, millions. As programs grew:
 <Figure
   slug="cpp-a-brief-history-first-programs-were-inline-cutout"
   alt="A board of switches thrown by hand and a card punched with holes, both feeding the same machine"
+  caption="The first programs were switches and punched cards, entered by hand."
 />
 
 C, with its tiny standard library and no built-in support for
@@ -248,7 +250,7 @@ Many people say "C/C++" as if they were one language. They are not.
 C++ has grown enormous abstractions on top of C, and although a
 C program will *almost* always compile as C++, the *idiomatic* style
 of the two is now very different. In modern C++ you almost never
-call `malloc` or `free` directly, you use `std::vector`,
+call `malloc()` or `free()` directly, you use `std::vector`,
 `std::string`, and `std::unique_ptr`. The C parts are still there
 under the hood, but you rarely touch them.
 
@@ -302,7 +304,7 @@ syntactic detail, is what this course will teach you.
 - They are two names for the same language.
   > They are different languages, even though they share a lot of syntax.
 - [o] C++ began as an extension of C, and although most C programs still compile as C++, idiomatic modern C++ looks very different from idiomatic C.
-  > C++ grew classes, templates, RAII, and a large standard library on top of C's core model.`}
+  > C++ grew classes, templates, automatic resource management, and a large standard library on top of C's core model.`}
 />
 
 <MultipleChoice

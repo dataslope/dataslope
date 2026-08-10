@@ -19,6 +19,7 @@ maps under the skin.
 <Figure
   slug="jcol-maps-inline-cutout"
   alt="A wall of small pigeonholes, each with a distinct key hanging beside it, and one key opening exactly one hole to reveal the block inside"
+  caption="One key opens exactly one entry, with no searching along the wall."
 />
 
 ## The Map interface
@@ -50,8 +51,8 @@ iterate a map. Of those, `entrySet()` is almost always what you want.
 
 ## HashMap
 
-`HashMap` is the workhorse. Average `O(1)` for `put`, `get`,
-`containsKey`. No order guarantee.
+`HashMap` is the workhorse. Average `O(1)` for `put()`, `get()`,
+`containsKey()`. No order guarantee.
 
 <CodeBlock
   adapter="java"
@@ -99,7 +100,7 @@ flowchart LR
 ```
 
 - Internally there is an `Object[] table` of *buckets*.
-- A key's bucket index is computed from its `hashCode`.
+- A key's bucket index is computed from its `hashCode()`.
 - If two keys hash to the same bucket (a *collision*), they are
   stored in a linked list inside that bucket, or, since Java 8, a
   red-black tree once the chain grows past 8 entries.
@@ -109,9 +110,9 @@ flowchart LR
 
 This explains a lot:
 
-- Why `put` and `get` are `O(1)` *average* but worst-case `O(log n)`
+- Why `put()` and `get()` are `O(1)` *average* but worst-case `O(log n)`
   (post-Java-8) after collisions.
-- Why a bad `hashCode` (constant, or near-constant) destroys
+- Why a bad `hashCode()` (constant, or near-constant) destroys
   performance, every operation falls back to walking a long chain.
 - Why a `HashMap` uses more memory than you'd guess: it has empty
   buckets to keep the load factor low.
@@ -248,13 +249,14 @@ shrinks.
 <Figure
   slug="jcol-maps-map-interface-inline-cutout"
   alt="A wall of small drawers each with its own keyhole and a key hanging beside it"
+  caption="Keys are unique; values are whatever each key was given."
 />
 
 | Method | What it does |
 | --- | --- |
 | `getOrDefault(k, d)` | `get(k)` if present, else `d` |
-| `putIfAbsent(k, v)` | `put` only if no existing entry |
-| `computeIfAbsent(k, fn)` | `put` `fn.apply(k)` if absent; useful for "map of lists" |
+| `putIfAbsent(k, v)` | `put()` only if no existing entry |
+| `computeIfAbsent(k, fn)` | `put()` `fn.apply(k)` if absent; useful for "map of lists" |
 | `computeIfPresent(k, fn)` | Update only if already present |
 | `compute(k, fn)` | Update unconditionally, with current value (or null) |
 | `merge(k, v, fn)` | If absent, put `v`; else put `fn.apply(old, v)` |
@@ -286,17 +288,17 @@ public class Main {
   ]}
 />
 
-Without `computeIfAbsent` that loop would be five lines of "if not
+Without `computeIfAbsent()` that loop would be five lines of "if not
 present, put an empty list, then add."
 
 ## A common pitfall: null keys and null values
 
 `HashMap` allows one `null` key and any number of `null` values.
 `TreeMap` does *not* allow `null` keys (it would crash in
-`compareTo`). The immutable `Map.of(...)` factories do not allow
+`compareTo()`). The immutable `Map.of(...)` factories do not allow
 `null` keys or values at all. Reading `map.get(k)` returns `null`
 both when the key is absent *and* when the key's value is `null`,
-use `containsKey` to distinguish.
+use `containsKey()` to distinguish.
 
 ## Multi-file example: an in-memory cache
 
@@ -340,7 +342,7 @@ public class Cache<K, V> {
 />
 
 A real memoizer in 12 lines of `Cache.java`. The discipline of
-`computeIfAbsent` is what makes it both compact and race-free against
+`computeIfAbsent()` is what makes it both compact and race-free against
 itself (within a single thread).
 
 ## Practice
@@ -418,14 +420,14 @@ public class Grouper {
 <MultipleChoice
   markdown={`Which \`Map\` operation is the modern, one-liner equivalent of "if the key is not present, put an empty list; in any case, add the new value to the list at that key"?
 
-- \`put\`
+- \`put()\`
   > That overwrites; it doesn't help with the "list of values per key" pattern.
-- \`merge\`
+- \`merge()\`
   > Useful, but a bit awkward for the "map of lists" case.
-- \`putIfAbsent\`
+- \`putIfAbsent()\`
   > It returns the *previous* value (or null), so chaining \`.add\` on it fails on first insertion.
 - [o] \`computeIfAbsent(key, k -> new ArrayList<>()).add(value)\`
-  > \`computeIfAbsent\` returns the (newly or previously) inserted list, on which you can immediately call \`add\`.`}
+  > \`computeIfAbsent()\` returns the (newly or previously) inserted list, on which you can immediately call \`add()\`.`}
 />
 
 <MultipleChoice

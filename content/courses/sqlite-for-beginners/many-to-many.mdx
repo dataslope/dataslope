@@ -28,6 +28,7 @@ If you put `course_id` on `students`, each student could store only one course. 
 <Figure
   slug="lite-many-to-many-one-foreign-key-inline-cutout"
   alt="A crate with a single socket and four cords all needing to reach it at once"
+  caption="One column can hold one link, which is why many-to-many needs another table."
 />
 
 ```mermaid
@@ -192,6 +193,7 @@ Because the junction table stores links, you can ask student-focused or course-f
 <Figure
   slug="lite-many-to-many-inline-cutout"
   alt="Two rows of crates with all cords between them routed through a small pegboard standing in the middle"
+  caption="Every link goes through the junction table, so either side can ask questions."
 />
 
 <SqlCodeBlock
@@ -245,7 +247,7 @@ ORDER BY
 ## Junction tables can hold facts about the relationship
 
 One warning before you put a number in a junction table. Aggregating
-across a join that matches each row several times inflates every `SUM` by
+across a join that matches each row several times inflates every `SUM()` by
 the fan-out, and the result set looks perfectly ordinary:
 
 <Chart slug="join-fanout-rows" />

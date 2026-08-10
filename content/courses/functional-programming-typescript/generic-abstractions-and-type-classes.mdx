@@ -94,7 +94,8 @@ class Eq a where
 ```
 
 TypeScript doesn't have type classes, but you can simulate them
-with one of the simplest tricks in FP: **a type class is a
+with one of the simplest tricks in functional programming: **a type
+class is a
 record of functions**. You pass the record as an argument; the
 generic function uses it.
 
@@ -257,6 +258,7 @@ on objects are all semigroups.
 <Figure
   slug="fp-generic-abstractions-and-type-classes-parametric-polymorphism-i-inline-cutout"
   alt="A sealed pipe carrying blocks of every shape through unchanged, its own opening plain and unshaped"
+  caption="A parametric function cannot inspect its values, so it works for all of them."
 />
 
 <ChallengeCard

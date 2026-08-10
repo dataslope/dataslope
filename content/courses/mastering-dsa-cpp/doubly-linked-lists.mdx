@@ -27,6 +27,7 @@ A singly linked list can move forward only. A doubly linked list can walk backwa
 <Figure
   slug="dsa-doubly-linked-lists-inline-cutout"
   alt="A row of blocks joined by cords running both ways between neighbours, a hand able to walk the row from either end"
+  caption="Links both ways mean you can walk the list from either end."
 />
 
 <CodeBlock
@@ -59,11 +60,12 @@ int main() {
 
 ## A tiny implementation
 
-This class keeps both `head` and `tail`, so pushing at either end is O(1). It also frees nodes in the destructor, note how every `push_back` and `push_front` must handle the empty-list case, where one new node becomes both head *and* tail. Doubly linked code always has twice the pointers to keep consistent; the discipline is to update them in pairs.
+This class keeps both `head` and `tail`, so pushing at either end is O(1). It also frees nodes in the destructor, note how every `push_back()` and `push_front()` must handle the empty-list case, where one new node becomes both head *and* tail. Doubly linked code always has twice the pointers to keep consistent; the discipline is to update them in pairs.
 
 <Figure
   slug="dsa-doubly-linked-lists-tiny-implementation-inline-cutout"
   alt="Three blocks joined by cords running both ways, a hand walking the row from the right-hand end"
+  caption="Every insert and erase has two pointers to fix, not one."
 />
 
 <CodeBlock
@@ -145,11 +147,12 @@ If you already have a pointer to a middle node, a doubly linked list can unlink 
 
 ## `std::list`
 
-`std::list<T>` is the STL doubly linked list. It has stable iterators: inserting or erasing elsewhere does not invalidate iterators to other elements. It does **not** support random access with `list[i]`.
+`std::list<T>` is the standard library doubly linked list. It has stable iterators: inserting or erasing elsewhere does not invalidate iterators to other elements. It does **not** support random access with `list[i]`.
 
 <Figure
   slug="dsa-doubly-linked-lists-std-list-inline-cutout"
   alt="A ready-made run of blocks joined both ways, lifted whole off a shelf"
+  caption="`std::list` is the ready-made version, with iterators that stay valid."
 />
 
 <CodeBlock

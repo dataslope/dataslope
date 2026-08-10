@@ -19,6 +19,7 @@ yourself in the foot.
 <Figure
   slug="c-strings-inline-cutout"
   alt="A strip of single-letter tiles laid end to end along a rail, with one small red cap tile closing the run at the right"
+  caption="A C string is characters followed by a null byte that marks the end."
 />
 
 ## The null-terminated string
@@ -110,12 +111,12 @@ int main(void) {
   ]}
 />
 
-`%zu` is the format specifier for `size_t`, the type that `strlen`
+`%zu` is the format specifier for `size_t`, the type that `strlen()`
 returns.
 
 ## The danger: buffer sizes
 
-Each of `strcpy`, `strcat`, and `sprintf` writes into a destination
+Each of `strcpy()`, `strcat()`, and `sprintf` writes into a destination
 buffer **without checking how big it is**. If your destination is
 too small, you trash whatever memory is next to it. This was the
 mechanism behind the **Morris worm** (1988), countless web-server
@@ -224,6 +225,7 @@ We'll see why that pattern is so common in the pointers chapter.
 <Figure
   slug="c-strings-null-terminated-string-inline-cutout"
   alt="A ribbon of tiles ending in one small stop block, and a second ribbon with no stop block running off the bench edge"
+  caption="Without the terminator, nothing tells a function where the string stops."
 />
 
 ## Picture: a `char` array versus a `char *`
@@ -302,15 +304,15 @@ int main(void) {
   markdown={`What value does \`strlen("hello")\` return?
 
 - 6
-  > That would be the array's **storage size** (5 letters + 1 null). \`strlen\` excludes the terminator.
+  > That would be the array's **storage size** (5 letters + 1 null). \`strlen()\` excludes the terminator.
 - [o] 5
-  > \`strlen\` counts the visible characters, **not** the trailing \`\\0\`.
+  > \`strlen()\` counts the visible characters, **not** the trailing \`\\0\`.
 - It depends on the system.
-  > \`strlen\` always counts the characters before the \`\\0\`, which is \`5\` for \`"hello"\` on every system.
+  > \`strlen()\` always counts the characters before the \`\\0\`, which is \`5\` for \`"hello"\` on every system.
 - 4
-  > That undercounts by one, \`"hello"\` has five letters (h-e-l-l-o), and \`strlen\` counts all of them.
+  > That undercounts by one, \`"hello"\` has five letters (h-e-l-l-o), and \`strlen()\` counts all of them.
 
-\`strlen\` walks the string from the start until it finds the null terminator, counting characters along the way. The terminator itself is not counted.`}
+\`strlen()\` walks the string from the start until it finds the null terminator, counting characters along the way. The terminator itself is not counted.`}
 />
 
 <MultipleChoice
@@ -321,14 +323,14 @@ char buf[10];
 strcpy(buf, "This message is much longer than ten bytes.");
 \`\`\`
 
-- [o] \`strcpy\` doesn't check the destination size, so it writes far past the end of \`buf\`, corrupting other memory.
+- [o] \`strcpy()\` doesn't check the destination size, so it writes far past the end of \`buf\`, corrupting other memory.
   > This is the classic *buffer overflow*. The runtime behavior is undefined: the program may crash, silently corrupt unrelated variables, or be exploitable by an attacker.
 - The compiler will refuse to copy a string longer than \`buf\`.
-  > The compiler does not track how big \`buf\` is at the \`strcpy\` call, so it cannot refuse; the overflow happens at runtime.
-- \`strcpy\` is deprecated and the program won't compile.
+  > The compiler does not track how big \`buf\` is at the \`strcpy()\` call, so it cannot refuse; the overflow happens at runtime.
+- \`strcpy()\` is deprecated and the program won't compile.
   > Old C functions are still available in standard C; most compilers compile this without error (sometimes with a warning).
 - It runs but \`buf\` will silently be truncated to 10 bytes.
-  > \`strcpy\` does **not** truncate. It just keeps writing.
+  > \`strcpy()\` does **not** truncate. It just keeps writing.
 
-Safer alternatives: \`strncpy\` (with explicit size, but always null-terminate yourself), or \`snprintf\` (with size limit and truncation reporting). Or use a bigger buffer that you've sized to your data.`}
+Safer alternatives: \`strncpy()\` (with explicit size, but always null-terminate yourself), or \`snprintf\` (with size limit and truncation reporting). Or use a bigger buffer that you've sized to your data.`}
 />

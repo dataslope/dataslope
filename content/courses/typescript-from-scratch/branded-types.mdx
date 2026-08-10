@@ -69,6 +69,7 @@ Now `Cents` and `Dollars` are no longer compatible, even though they're both `nu
 <Figure
   slug="tsx-branded-types-solution-branding-phantom-inline-cutout"
   alt="Two identical blocks, one carrying a small stamped mark, only the marked one accepted by the slot"
+  caption="A brand exists only in the type, and it is what makes two numbers different."
 />
 
 Here's how to create branded values:
@@ -236,6 +237,7 @@ Let's organize branded types and their constructors across multiple files for be
 <Figure
   slug="tsx-branded-types-inline-cutout"
   alt="Two blocks of the same shape, one carrying a small stamped mark, only the marked one accepted by the slot"
+  caption="Only the stamped value is accepted, even though both are numbers at runtime."
 />
 
 <CodeBlock
@@ -488,6 +490,7 @@ You've learned how to:
 <Figure
   slug="tsx-branded-types-problem-structural-typing-inline-cutout"
   alt="Two blocks of exactly the same shape sitting in each other's sockets without complaint"
+  caption="Structural typing means same shape, same type, however different the meaning."
 />
 
 Brands add a thin layer of nominal typing to TypeScript's structural world. They prevent entire classes of bugs (mixing IDs, units, or invalid data) at zero runtime cost. In the next chapter, we'll scale up to **API modeling**, where brands and other type-level contracts ensure correctness across module and service boundaries.

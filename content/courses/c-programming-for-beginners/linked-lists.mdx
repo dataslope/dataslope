@@ -105,6 +105,7 @@ structure you'll write.
 <Figure
   slug="c-linked-lists-shape-node-inline-cutout"
   alt="One block with a small socket on its face and a short cord leaving it, the cord's far end unattached"
+  caption="A node holds a value and a pointer to the next node, or to nothing."
 />
 
 ## Prepending and appending
@@ -164,7 +165,7 @@ order. If you want them in insertion order with O(1) inserts, keep a
 
 ## Freeing a list
 
-Every node was `malloc`'d. Every node must be `free`'d. The
+Every node was `malloc()`'d. Every node must be `free()`'d. The
 canonical loop:
 
 ```c
@@ -215,7 +216,7 @@ There's no way to misunderstand a pointer and still get a working
 linked list. To build one, you must keep two pictures simultaneously
 clear in your head:
 
-1. **Where the boxes live** in memory (each node was `malloc`'d).
+1. **Where the boxes live** in memory (each node was `malloc()`'d).
 2. **Which boxes point at which** (the `next` arrows).
 
 If those two pictures aren't crystal clear, the program crashes or
@@ -226,6 +227,7 @@ have internalized pointers.
 <Figure
   slug="c-linked-lists-inline-cutout"
   alt="Four separate boxes scattered across the frame, each with a short cord running from its side to the next, the last cord ending in a small stop block"
+  caption="The list is only its links, and every operation is rearranging arrows."
 />
 
 ## Multi-file challenge: a complete linked-list module

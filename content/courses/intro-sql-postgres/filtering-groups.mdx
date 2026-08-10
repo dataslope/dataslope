@@ -17,13 +17,14 @@ deep about how queries run.
 ## Why WHERE can't do it
 
 `WHERE` runs **before** grouping. At that moment, the groups, and
-therefore their `COUNT`s and `SUM`s, **do not exist yet.** Asking
+therefore their `COUNT()`s and `SUM()`s, **do not exist yet.** Asking
 `WHERE COUNT(*) > 2` is like asking about a total before anything
 has been added up.
 
 <Figure
   slug="sql-filtering-groups-where-can-t-inline-cutout"
   alt="A grate placed before a press stopping single chips, and the same grate placed after it stopping whole summary blocks"
+  caption="`WHERE` runs before the groups exist; `HAVING` runs after they do."
 />
 
 ```mermaid
@@ -81,6 +82,7 @@ They are not rivals, they work as a team, each at its own stage:
 <Figure
   slug="sql-filtering-groups-inline-cutout"
   alt="Three summary blocks standing on their trays, one tray removed entirely because its block is too short"
+  caption="`HAVING` removes whole groups, judged by their own summary values."
 />
 
 <SqlCodeBlock
@@ -114,8 +116,8 @@ order the database works in. The intern row is removed first, *then*
 groups form, *then* the average-pay filter runs on those groups.
 
 <Callout type="info" title="A quick rule of thumb">
-If your filter mentions an **aggregate** (`COUNT`, `SUM`, `AVG`,
-`MIN`, `MAX`), it belongs in `HAVING`. If it mentions only **plain
+If your filter mentions an **aggregate** (`COUNT()`, `SUM()`, `AVG()`,
+`MIN()`, `MAX()`), it belongs in `HAVING`. If it mentions only **plain
 column values**, it belongs in `WHERE`. Putting row filters in
 `WHERE` is also more efficient, because fewer rows reach the
 grouping step.

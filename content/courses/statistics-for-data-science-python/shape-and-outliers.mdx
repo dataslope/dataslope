@@ -150,6 +150,7 @@ distribution would, so "rare" events aren't actually that rare.
 <Figure
   slug="stat-shape-and-outliers-skewness-which-way-inline-cutout"
   alt="Two mounds side by side, one with a long tail trailing right and one trailing left"
+  caption="Skew is which side the long tail falls on, and it moves the mean toward it."
 />
 
 `scipy.stats.kurtosis` reports **excess** kurtosis by default (it
@@ -199,6 +200,7 @@ move a long way; the median barely notices.
 <Figure
   slug="stat-shape-and-outliers-inline-cutout"
   alt="A lopsided mound of chips with a long tail to one side and two chips sitting far out beyond the tail"
+  caption="An outlier is a point far past the tail, and it may be real or an error."
 />
 
 <Chart slug="outlier-influence" />
@@ -375,8 +377,8 @@ Genuine extremes are kept; you change the *statistics* you report, not the data.
 
 ## Putting it together: an outlier flagger
 
-A reusable IQR-based flagger is something you'll write constantly in
-EDA. The pattern: compute the fences, return which values fall outside,
+A reusable flagger built on the interquartile range is something you'll
+write constantly while exploring. The pattern: compute the fences, return which values fall outside,
 and how many.
 
 <CodeBlock

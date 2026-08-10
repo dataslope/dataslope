@@ -73,14 +73,14 @@ Every query clause has a 1-to-1 method counterpart.
 | Query clause | Method call |
 | --- | --- |
 | `from x in xs` | (source) |
-| `from y in ys` (second `from`) | `SelectMany` |
+| `from y in ys` (second `from`) | `SelectMany()` |
 | `where p` | `Where(x => p)` |
 | `select e` | `Select(x => e)` |
-| `orderby k`, `orderby k descending` | `OrderBy` / `OrderByDescending` |
+| `orderby k`, `orderby k descending` | `OrderBy()` / `OrderByDescending()` |
 | `orderby k1, k2` | `OrderBy(k1).ThenBy(k2)` |
 | `group e by k` | `GroupBy(x => k, x => e)` |
-| `join y in ys on a equals b` | `Join` |
-| `let v = e` | `Select` into anonymous type |
+| `join y in ys on a equals b` | `Join()` |
+| `let v = e` | `Select()` into anonymous type |
 | `into g` (after group/join) | continues the chain |
 
 Knowing the translation lets you read either dialect fluently.
@@ -99,7 +99,7 @@ var pairs =
     select (x, y);
 ```
 
-The method-syntax equivalent uses `SelectMany` with two lambdas and
+The method-syntax equivalent uses `SelectMany()` with two lambdas and
 is genuinely harder to read:
 
 ```csharp
@@ -144,7 +144,7 @@ var labeled =
     select new { order.Id, cust.Name, order.Total };
 ```
 
-`Join` in method form requires four lambdas and a key selector
+`Join()` in method form requires four lambdas and a key selector
 dance. Query syntax keeps it visually flat, much closer to SQL.
 
 ## When method syntax reads better
@@ -167,12 +167,12 @@ var topRevenue2 = (
 ```
 
 Method syntax also wins when you need operators that have no query
-keyword: `Take`, `Skip`, `Distinct`, `Count`, `First`, `Aggregate`,
-`Zip`, `Concat`, `Reverse`, `Chunk`, and many more.
+keyword: `Take()`, `Skip()`, `Distinct()`, `Count()`, `First()`, `Aggregate()`,
+`Zip()`, `Concat()`, `Reverse()`, `Chunk`, and many more.
 
 | Use query syntax when | Use method syntax when |
 | --- | --- |
-| Multiple `from` / cross joins | Mostly `Where` + `Select` pipelines |
+| Multiple `from` / cross joins | Mostly `Where()` + `Select()` pipelines |
 | `let` bindings carry state forward | You need operators query syntax lacks |
 | Visually similar to SQL | The query ends with an aggregation |
 
@@ -183,11 +183,13 @@ Let's see a non-trivial example translated by hand.
 <Figure
   slug="cs-query-vs-method-syntax-side-by-side-inline-cutout"
   alt="Two differently written instruction cards feeding one machine and producing two identical trays"
+  caption="Query syntax compiles to method calls, so both spell the same thing."
 />
 
 <Figure
   slug="cs-query-vs-method-syntax-inline-cutout"
   alt="Two differently written instruction cards feeding the same machine and producing identical output trays"
+  caption="Two ways to write it, one pipeline underneath."
 />
 
 ```csharp
@@ -203,11 +205,11 @@ var q =
 
 The compiler rewrites this in stages:
 
-1. Two `from`s → `SelectMany` with a "carry" tuple.
-2. `where` → `Where`.
-3. `let` → `Select` that adds `tax` to the carry.
-4. `orderby` → `OrderBy`.
-5. Final `select` → `Select` projecting only the wanted fields.
+1. Two `from`s → `SelectMany()` with a "carry" tuple.
+2. `where` → `Where()`.
+3. `let` → `Select()` that adds `tax` to the carry.
+4. `orderby` → `OrderBy()`.
+5. Final `select` → `Select()` projecting only the wanted fields.
 
 The result is a long, deeply-nested method chain. *Nobody writes
 that by hand*. Which is exactly the point: query syntax is the
@@ -350,7 +352,7 @@ There is no winner. They are the same LINQ. Pick whichever makes the
 - Method syntax is faster at runtime because it skips the compiler rewrite step.
   > The rewrite happens at compile time. By runtime, both produce identical IL and identical performance.
 - Query syntax always reads better when more than one operator is involved.
-  > Often false. Short pipelines (\`Where\` + \`Select\` + \`Sum\`) usually read better in method syntax. Query syntax shines specifically for multiple \`from\`s, \`let\`, and \`join\`.
+  > Often false. Short pipelines (\`Where()\` + \`Select()\` + \`Sum()\`) usually read better in method syntax. Query syntax shines specifically for multiple \`from\`s, \`let\`, and \`join\`.
 - [o] They compile to identical method calls; the choice between them is purely about readability.
   > Query syntax is a *sugar* over the same extension methods. Pick whichever conveys intent more clearly for a given query.
 

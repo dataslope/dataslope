@@ -19,6 +19,7 @@ encoding stays perfect long after the chart has stopped being readable.
 <Figure
   slug="viz-bar-charts-inline-cutout"
   alt="A row of standing blocks of different heights on a common base rail, with one flat rule laid across their tops to compare them"
+  caption="Bars share a baseline, so the eye compares their lengths precisely."
 />
 
 <Chart slug="too-many-bars" />
@@ -84,6 +85,7 @@ That's the canonical Plotly Express call. Note:
 <Figure
   slug="viz-bar-charts-simplest-bar-chart-inline-cutout"
   alt="Four standing blocks of different heights on one base rail and nothing else in the frame"
+  caption="One category per bar, one number per height, and nothing else needed."
 />
 
 ## Sort by value, almost always
@@ -275,6 +277,7 @@ And here is that crop, drawn:
 <Figure
   slug="viz-bar-charts-reach-bar-chart-inline-cutout"
   alt="Standing blocks of different heights over labelled trays, a straight rule laid across their tops"
+  caption="The common baseline is the whole point, which is why cutting it misleads."
 />
 
 ## Practice
@@ -285,8 +288,8 @@ And here is that crop, drawn:
   title="Count penguins per island"
   instructions={`The \`penguins\` DataFrame is loaded. Build a bar chart of how many penguins live on each island.
 
-1. Count the penguins per \`island\` and put the result in a DataFrame \`counts\` with two columns: \`island\` and \`n\`. (Hint: \`penguins["island"].value_counts()\` then \`.reset_index()\`, or a \`groupby\`.)
-2. Build a bar chart \`fig\` with \`px.bar\`, \`x="island"\` and \`y="n"\`, using \`template="simple_white"\`.
+1. Count the penguins per \`island\` and put the result in a DataFrame \`counts\` with two columns: \`island\` and \`n\`. (Hint: \`penguins["island"].value_counts()\` then \`.reset_index()\`, or a \`groupby()\`.)
+2. Build a bar chart \`fig\` with \`px.bar()\`, \`x="island"\` and \`y="n"\`, using \`template="simple_white"\`.
 
 The default y-axis already starts at zero, leave it there.`}
   files={[

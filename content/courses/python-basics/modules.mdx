@@ -26,11 +26,13 @@ When you do `import pandas as pd`, you're pulling in hundreds of modules, all or
 <Figure
   slug="python-modules-importing-inline-cutout"
   alt="A tool lifted from a rack on the wall and clipped onto a bench before work begins"
+  caption="Importing brings one tool from the shelf onto the bench you are working at."
 />
 
 <Figure
   slug="python-modules-inline-cutout"
   alt="A workshop of four separate booths, each with its own tools, joined by a short corridor"
+  caption="A package is several modules kept in separate rooms under one name."
 />
 
 ## Importing
@@ -97,6 +99,7 @@ The standard library has modules for **everything**: file I/O, networking, threa
 <Figure
   slug="python-modules-standard-library-inline-cutout"
   alt="A wall of racked tools that came with the workshop, none of them bought in"
+  caption="The standard library ships with Python, so none of it has to be installed."
 />
 
 ## What `import` actually does
@@ -182,7 +185,7 @@ if __name__ == "__main__":
 Running `python greet.py` prints `Hello, World!`; doing `from greet import greet` in another file does **not** run the `if` block.
 
 <Callout type="tip" title="Always use this idiom">
-Put your "script" code (CLI argument parsing, `main()` calls, etc.) inside `if __name__ == "__main__":`. It makes your file importable for testing and reuse.
+Put your "script" code (command-line argument parsing, `main()` calls, etc.) inside `if __name__ == "__main__":`. It makes your file importable for testing and reuse.
 </Callout>
 
 ## Packages

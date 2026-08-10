@@ -47,7 +47,7 @@ being moved, and the cost of a copy is nothing but:
 
 <Chart slug="copy-vs-move-cost" />
 
-## `std::move` is not the operation, it's a *cast*
+## `std::move()` is not the operation, it's a *cast*
 
 The name is a bit misleading. `std::move(x)` does **not** itself
 move anything. It just tells the compiler "treat `x` as if it were
@@ -56,6 +56,7 @@ an rvalue (a temporary, eligible for moving from)."
 <Figure
   slug="cpp-move-semantics-intuition-inline-cutout"
   alt="A heavy crate being copied into a second identical crate on the left, and on the right the same crate simply having its handle passed to another pair of hands"
+  caption="Copying duplicates the contents; moving just hands over the handle."
 />
 
 The actual move happens when something *accepts* an rvalue, like a
@@ -73,7 +74,7 @@ std::vector<int> b = std::move(a);            // a's buffer transferred to b
 
 You don't have to take any of this on faith. The little `Tracer`
 struct below announces every time it is constructed, copied, or
-moved. Read the three `push_back` lines, predict the output, then
+moved. Read the three `push_back()` lines, predict the output, then
 run it:
 
 <CodeBlock
@@ -105,7 +106,7 @@ struct Tracer {
   ]}
 />
 
-The first `push_back` prints `COPY`, `t` has a name, you might
+The first `push_back()` prints `COPY`, `t` has a name, you might
 still use it, so the vector must duplicate it. The second prints
 `move`, because `std::move(t)` granted permission to pillage. The
 third constructs a nameless temporary and moves it in; no cast was
@@ -116,6 +117,7 @@ reallocates its buffer mid-growth.
 <Figure
   slug="cpp-move-semantics-intuition-copy-vs-move-inline-cutout"
   alt="A heavy crate duplicated into a second identical crate on the left, and on the right the same crate simply having its handle passed across"
+  caption="`std::move()` does not move anything; it only permits a move."
 />
 
 `std::unique_ptr` cannot be copied (because then there would be two
@@ -188,10 +190,10 @@ Briefly, because the names matter:
   variable, a member access. You can take `&x`.
 - An **rvalue** (more precisely, an *xvalue* or *prvalue*) is a
   temporary or an expression treated as one, a function result, a
-  literal, the result of `std::move`.
+  literal, the result of `std::move()`.
 
 Move operations are bound to rvalues, so casting an lvalue with
-`std::move` lets you opt-in to moving. Use it when you genuinely
+`std::move()` lets you opt-in to moving. Use it when you genuinely
 want to give up an object's contents, and *don't* use it on
 return values that the compiler can already optimize, or on `const`
 objects (it silently downgrades to a copy).

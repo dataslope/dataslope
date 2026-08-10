@@ -75,12 +75,12 @@ A single C++ statement that does a *lot*.
   `std::cout`, `std::string`, `std::vector`, and so on. Namespaces
   prevent collisions between libraries that happen to pick the same
   short names.
-- `cout` is the name of the standard **output stream object**, a
+- `cout()` is the name of the standard **output stream object**, a
   pre-existing object that represents *the place where text goes
   when you print it*.
 - `<<` is the **stream insertion operator**. Despite the symbol it
   is not really "bit-shift left" here; it is a *function call in
-  disguise* on `cout` that means "send the right-hand thing into
+  disguise* on `cout()` that means "send the right-hand thing into
   this stream."
 - `"Hello, World!\n"` is a **string literal**: a sequence of bytes
   the compiler embedded directly into the data segment of your
@@ -132,6 +132,7 @@ pieces feel new; we'll spend whole chapters on each.
 <Figure
   slug="cpp-your-first-program-inline-cutout"
   alt="A lamp on a bench lighting for the first time as a hand closes the last connection"
+  caption="Variables, input, a function and a loop: a whole program in miniature."
 />
 
 <CodeBlock
@@ -205,8 +206,8 @@ intent or constraints.
 
 | Mistake | What you'll see | Fix |
 | --- | --- | --- |
-| Forgetting `#include <iostream>` | "`cout` was not declared" | Add the include. |
-| Forgetting `std::` | "`cout` was not declared" | Write `std::cout`, or `using std::cout;` once at the top. |
+| Forgetting `#include <iostream>` | "`cout()` was not declared" | Add the include. |
+| Forgetting `std::` | "`cout()` was not declared" | Write `std::cout`, or `using std::cout;` once at the top. |
 | Forgetting `;` at end of a statement | "expected `;`" | Add the semicolon. |
 | Mismatched `{ }` | "expected `}`" | Indent consistently; let your editor highlight matching braces. |
 | Using `=` instead of `==` in `if` | Compiles, but means "assign", not "compare" | Use `==` for comparison. |
@@ -220,6 +221,7 @@ you really need to.
 <Figure
   slug="cpp-your-first-program-line-1-include-inline-cutout"
   alt="A short strip being pasted onto the top of a card before the card enters a machine"
+  caption="`#include` pastes a header in before the compiler reads a single line."
 />
 
 <ChallengeCard
@@ -315,14 +317,14 @@ int main() {
 />
 
 <MultipleChoice
-  markdown={`Why do we write \`std::cout\` instead of just \`cout\`?
+  markdown={`Why do we write \`std::cout\` instead of just \`cout()\`?
 
-- [o] Because \`cout\` lives in the standard-library namespace \`std\`, and \`std::cout\` fully qualifies which \`cout\` we mean.
+- [o] Because \`cout()\` lives in the standard-library namespace \`std\`, and \`std::cout\` fully qualifies which \`cout()\` we mean.
   > Namespaces prevent collisions between libraries that happen to share short names.
 - Because \`std\` makes the program run faster.
   > Namespaces have no runtime cost.
-- Because \`cout\` is a typo.
-  > It is not; \`cout\` is the name. The prefix locates it.
+- Because \`cout()\` is a typo.
+  > It is not; \`cout()\` is the name. The prefix locates it.
 - Because C++ uses dollar signs to indicate variables.
   > C++ does not use dollar signs for that.`}
 />

@@ -24,6 +24,7 @@ data, waiting to be noticed.
 <Figure
   slug="ml-k-means-clustering-problem-solves-inline-cutout"
   alt="A scatter of chips with three posts being driven in among them, each chip roped to its nearest post"
+  caption="K-means places k centres and gives every point to its nearest one."
 />
 
 This is your entry point into **unsupervised learning**, and the ideas
@@ -76,6 +77,7 @@ to your closest center."
 <Figure
   slug="ml-k-means-clustering-intuition-centers-points-inline-cutout"
   alt="Three posts among a scatter of chips, each chip roped to its nearest post and the posts shifting to the middle of their ropes"
+  caption="Assign, move each centre to the middle of what it caught, and repeat."
 />
 
 The clever part is *how* it finds good centers, because at the start it has
@@ -146,8 +148,8 @@ print("Final cluster centers:\\n", np.round(kmeans.cluster_centers_, 2))
   ]}
 />
 
-`fit_predict` does two things at once: it runs the loop to find the centers
-(`fit`) and then returns the cluster label for every point (`predict`).
+`fit_predict()` does two things at once: it runs the loop to find the centers
+(`fit()`) and then returns the cluster label for every point (`predict()`).
 Those labels are just arbitrary integers `0, 1, 2, 3`, they are group
 *names*, not a ranking. Cluster `0` is not "better" than cluster `3`; they
 are simply different buckets.
@@ -498,6 +500,7 @@ fails in a way that looks confident and is completely wrong.
 <Figure
   slug="ml-k-means-clustering-inline-cutout"
   alt="A board of scattered chips with three marker posts, each chip joined by a short cord to its nearest post, the posts standing at the middle of their own group"
+  caption="Nearest centre only works when the true groups are round-ish blobs."
 />
 
 The classic demonstration is `make_moons`: two interleaving crescents that
@@ -620,7 +623,7 @@ plausible, and only then trusts the result or switches methods.
    methods need features on a comparable scale.
 2. Fit \`KMeans\` with \`n_clusters=3\`, \`n_init=10\`, \`random_state=0\` on
    \`X_scaled\`. Store the per-point cluster labels in \`labels\` (use
-   \`fit_predict\`).
+   \`fit_predict()\`).
 3. Store the number of distinct clusters found in \`n_clusters_found\`.
 4. Store the size of each cluster (how many points it contains) as a NumPy
    array \`cluster_sizes\`, sorted ascending. Hint:

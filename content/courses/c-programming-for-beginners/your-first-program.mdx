@@ -40,7 +40,7 @@ You should see `Hello, world!` in the output panel. Eight words of
 code; a complete, real C program.
 
 Now **change the message** to your own name and run it again. Then
-add a second `printf` line below the first to print a second message.
+add a second `printf()` line below the first to print a second message.
 The compiler does not care what you put in the string, as long as the
 quotes match.
 
@@ -51,6 +51,7 @@ Let's dissect it. Every character is there for a reason.
 <Figure
   slug="c-your-first-program-inline-cutout"
   alt="A plain card fed into a machine, and a single short strip of type emerging from its printer"
+  caption="Every character in the smallest C program is there for a reason."
 />
 
 ### `#include <stdio.h>`
@@ -62,9 +63,9 @@ step. `#include <stdio.h>` means:
 > "Paste the contents of the standard header file `stdio.h` here."
 
 `stdio.h` (short for *standard input/output header*) is part of the
-**C standard library**. It tells the compiler what `printf` is, its
+**C standard library**. It tells the compiler what `printf()` is, its
 type, the kinds of arguments it accepts, and so on. Without this
-line, the compiler would not know what `printf` means.
+line, the compiler would not know what `printf()` means.
 
 ### `int main(void) { ... }`
 
@@ -87,7 +88,7 @@ Let's break the signature apart:
 
 ### `printf("Hello, world!\n");`
 
-`printf` is a function from the standard library. It prints formatted
+`printf()` is a function from the standard library. It prints formatted
 output. Here we're passing it a single argument, the string
 `"Hello, world!\n"`.
 
@@ -113,7 +114,7 @@ but explicit is better than implicit.
 2. The compiler produces a **machine-code executable**.
 3. The **operating system** loads that executable into memory.
 4. The **CPU** jumps to the address of `main`.
-5. `printf` executes: it **writes bytes to stdout**.
+5. `printf()` executes: it **writes bytes to stdout**.
 6. The operating system **delivers those bytes to the terminal**.
 7. You see **`Hello, world!`**.
 
@@ -130,6 +131,7 @@ compiler or runtime tells you; then fix it.
 <Figure
   slug="c-your-first-program-hello-world-inline-cutout"
   alt="A plain card fed into a machine and one short strip of type leaving its printer"
+  caption="Break it deliberately and the compiler tells you what each part was for."
 />
 
 ### Experiment 1, remove the semicolon
@@ -160,14 +162,14 @@ printf("Hello, ");
 printf("world!\n");
 ```
 
-Same output as before. Multiple `printf` calls just keep adding to
+Same output as before. Multiple `printf()` calls just keep adding to
 the same line until you print a `\n`.
 
 ## A slightly larger first program
 
 Let's print a few numbers as well. Two new ideas appear:
 
-1. The `%d` placeholder in a `printf` format string, replaced by the
+1. The `%d` placeholder in a `printf()` format string, replaced by the
    value of an integer argument.
 2. A variable declaration: `int year = 1972;`.
 
@@ -189,7 +191,7 @@ int main(void) {
   ]}
 />
 
-The `printf` function fills `%d` with the next integer argument in
+The `printf()` function fills `%d` with the next integer argument in
 order. The second call also shows that the argument can be a whole
 **expression** like `2025 - year`, evaluated before printing.
 
@@ -261,10 +263,10 @@ int main(void) {
 <MultipleChoice
   markdown={`What is the purpose of the line \`#include <stdio.h>\` at the top of a C program?
 
-- [o] It instructs the preprocessor to insert the declarations from \`stdio.h\` so the compiler knows about functions like \`printf\`.
-  > \`#include\` is a textual paste handled before compilation. Without it, the compiler doesn't know what \`printf\` looks like.
+- [o] It instructs the preprocessor to insert the declarations from \`stdio.h\` so the compiler knows about functions like \`printf()\`.
+  > \`#include\` is a textual paste handled before compilation. Without it, the compiler doesn't know what \`printf()\` looks like.
 - It compiles \`stdio.h\` into a separate executable.
-  > \`#include\` only inserts declarations (types and function signatures); the actual implementation of \`printf\` is in a pre-compiled library that the linker attaches later.
+  > \`#include\` only inserts declarations (types and function signatures); the actual implementation of \`printf()\` is in a pre-compiled library that the linker attaches later.
 - It tells the operating system to use the standard input format.
   > The operating system is not involved in \`#include\`. The directive tells the C preprocessor to paste the contents of \`stdio.h\` into the translation unit.
 - It runs first when the program starts.

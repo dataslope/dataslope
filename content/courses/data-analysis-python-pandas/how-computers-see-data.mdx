@@ -24,6 +24,7 @@ booleans, no DataFrames, just bytes.
 <Figure
   slug="pandas-how-computers-see-data-inline-cutout"
   alt="A written record on paper being translated into a strip of coded cells beside it"
+  caption="Anything you store has to become numbers before a computer can hold it."
 />
 
 The trick is **interpretation**. The same eight bits can mean a
@@ -46,12 +47,14 @@ flowchart TD
 
 ## A CSV is plain text with commas
 
-The simplest data format in the world: each line is a row, each
-value is separated by a comma, the first line is often a header.
+The simplest data format in the world, and the one this course leans
+on: a CSV file holds **comma-separated values**. Each line is a row,
+each value is separated by a comma, the first line is often a header.
 
 <Figure
   slug="pandas-how-computers-see-data-csv-plain-text-inline-cutout"
   alt="A long paper ribbon of blank fields separated by small upright dividers"
+  caption="A CSV file is only text plus a separator; the structure is a convention."
 />
 
 ```text
@@ -92,6 +95,7 @@ silent bugs follow.
 <Figure
   slug="pandas-how-computers-see-data-types-byte-inline-cutout"
   alt="One small block shown in cross-section as eight tiny two-position switches"
+  caption="A byte is eight switches, and the type is what tells pandas how to read them."
 />
 
 The main types you will encounter:
@@ -326,7 +330,7 @@ limitation (your dataset must fit).
 - A binary database table
   > Database tables are stored in proprietary binary formats with type metadata; a CSV is plain text with no type information.
 - A proprietary Pandas format
-  > Pandas has no proprietary on-disk format for reading; \`pd.read_csv\` reads the universal plain-text CSV format, not something Pandas invented.
+  > Pandas has no proprietary on-disk format for reading; \`pd.read_csv()\` reads the universal plain-text CSV format, not something Pandas invented.
 
 This is why CSV files are portable across every OS, language, and tool.`}
 />
@@ -341,7 +345,7 @@ This is why CSV files are portable across every OS, language, and tool.`}
 - ZIP codes are not real data
   > ZIP codes are valid data; the chapter uses them as an example precisely because they are real and frequently mishandled by automatic type inference.
 - [o] Pandas inferred the column as \`int64\` (because all values look like integers) and integers cannot have leading zeros, the \`0\` is dropped silently
-  > This is the canonical example of type inference biting you. Fix it by passing \`dtype={"zip": "string"}\` to \`pd.read_csv\`.
+  > This is the canonical example of type inference biting you. Fix it by passing \`dtype={"zip": "string"}\` to \`pd.read_csv()\`.
 
 Always check \`df.dtypes\` after loading; it is the cheapest bug-prevention habit you can build.`}
 />

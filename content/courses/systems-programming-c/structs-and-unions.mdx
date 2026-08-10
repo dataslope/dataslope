@@ -53,6 +53,7 @@ Most modern C codebases `typedef` their structs so callers can write
 <Figure
   slug="sysc-structs-and-unions-defining-using-struct-inline-cutout"
   alt="An empty fitted tray whose compartments are cut to different shapes before anything is placed in them"
+  caption="A struct lays out named compartments, each with its own offset."
 />
 
 <CodeBlock
@@ -181,6 +182,7 @@ Structs compose naturally; the layout rules apply recursively.
 <Figure
   slug="sysc-structs-and-unions-inline-cutout"
   alt="One tray with three separate compartments beside a second tray of the same size with one compartment that three different parts take turns occupying"
+  caption="A union gives every member the same space, one at a time."
 />
 
 <CodeBlock
@@ -466,7 +468,7 @@ formats; use explicit bit masks for those.
 
 A struct may end with a "flexible array member", an array of
 unspecified size that lets you allocate the struct and its data in
-*one* `malloc`.
+*one* `malloc()`.
 
 <CodeBlock
   adapter="c"

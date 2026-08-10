@@ -19,6 +19,7 @@ a Python function ended up in the hot path.
 <Figure
   slug="pl-idiomatic-polars-1-stay-expression-inline-cutout"
   alt="A run of clipped-together pipe sections with one hand-carried bucket set aside beside the bench, unused"
+  caption="Stay in the expression system and the work never leaves the fast path."
 />
 
 <CodeBlock
@@ -55,7 +56,7 @@ timed(
 
 Same answer, one of them an order of magnitude slower even in a
 single-threaded browser. On a real machine the expression version
-also uses every core. Before reaching for `map_elements`, check
+also uses every core. Before reaching for `map_elements()`, check
 whether `when/then`, the `.str`/`.dt`/`.list` namespaces, or plain
 arithmetic already covers it. They almost always do.
 
@@ -97,6 +98,7 @@ readable steps costs nothing, so optimize for the reader.
 <Figure
   slug="pl-idiomatic-polars-2-chain-let-inline-cutout"
   alt="A long chain of clipped-together sections that a planner's hand flattens into a shorter run before anything moves"
+  caption="Write the chain for the reader; the planner flattens it before it runs."
 />
 
 ## 3. Name things with keyword arguments
@@ -196,7 +198,7 @@ column names is a bug waiting for someone to add a column.
 
 ## 7. Scan, do not read
 
-`scan_csv` and `scan_parquet` cost nothing extra and let the
+`scan_csv()` and `scan_parquet()` cost nothing extra and let the
 optimizer push filters and column selection into the reader. Reach
 for `read_*` only when you genuinely want the frame in memory now.
 
@@ -207,7 +209,7 @@ for `read_*` only when you genuinely want the frame in memory now.
 | `map_elements(lambda x: ...)` | an expression |
 | `for` loop over rows | an expression |
 | `df = pl.concat([df, part])` in a loop | `pl.concat(parts)` once, or a glob |
-| `read_csv` then filter | `scan_csv` then filter |
+| `read_csv()` then filter | `scan_csv()` then filter |
 | `collect()` mid-chain | `collect()` once, at the end |
 | `df["a"].to_list()` then Python | keep it in Polars |
 | a hard-coded list of column names | a selector |
@@ -215,7 +217,7 @@ for `read_*` only when you genuinely want the frame in memory now.
 
 ## When to break the rules
 
-- `map_elements` is fine for something Polars genuinely cannot
+- `map_elements()` is fine for something Polars genuinely cannot
   express, on a small frame, once. A parsing library call over 500
   rows is not worth an afternoon of expression golf.
 - `to_pandas()` is right when you need a library that only speaks
@@ -228,9 +230,9 @@ for `read_*` only when you genuinely want the frame in memory now.
 <ChallengeCard
   adapter="python"
   title="Rewrite it idiomatically"
-  instructions={`\`legacy\` below is written the way someone translating pandas would write it: a Python loop, a \`map_elements\`, and a hard-coded column list.
+  instructions={`\`legacy\` below is written the way someone translating pandas would write it: a Python loop, a \`map_elements()\`, and a hard-coded column list.
 
-Write \`idiomatic(df)\` producing the **same result** using expressions only: no Python loop over rows, no \`map_elements\`, and no \`to_list()\`.
+Write \`idiomatic(df)\` producing the **same result** using expressions only: no Python loop over rows, no \`map_elements()\`, and no \`to_list()\`.
 
 The result must have columns \`species\`, \`n\`, \`avg_kg\` (mean \`body_mass_g\` divided by 1000, rounded to 2), for penguins over 4000 g, sorted by \`avg_kg\` descending.`}
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -326,7 +328,7 @@ assert "to_list" not in names, "pulling values into Python defeats the point"`,
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What is the strongest reason to avoid \`map_elements\` with a Python lambda?
+  markdown={`What is the strongest reason to avoid \`map_elements()\` with a Python lambda?
 
 - It produces a different dtype from the equivalent expression
   > The dtype is under your control via \`return_dtype\`; correctness is not the problem.
@@ -345,7 +347,7 @@ It stays reasonable for something Polars genuinely cannot express, on a small fr
 
 - Expressions returned from functions are cached between calls
   > No caching happens across calls; the benefits are about structure rather than speed.
-- It is the only way to use the same logic in \`select\` and \`agg\`
+- It is the only way to use the same logic in \`select()\` and \`agg()\`
   > An inline expression works in both contexts too; a function just saves writing it twice.
 - [o] The rule has one definition, is testable on a small fixture, and works on any frame with those columns
   > A function that takes and returns frames couples the rule to one table's shape.

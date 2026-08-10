@@ -3,7 +3,7 @@ title: Selecting Columns
 description: "Every way to name the columns you want: by name, by position, by pattern, by type, and by exclusion."
 ---
 
-`select` builds a new frame from the expressions you give it.
+`select()` builds a new frame from the expressions you give it.
 Everything you do not mention is dropped, which makes it the tool for
 projecting a wide table down to the handful of columns a question
 needs.
@@ -36,12 +36,13 @@ print(penguins.select(["species", "body_mass_g"]).head(3))
   ]}
 />
 
-Order is yours to choose: `select` emits columns in the order you
+Order is yours to choose: `select()` emits columns in the order you
 name them, regardless of their order in the source.
 
 <Figure
   slug="pl-selecting-columns-inline-cutout"
   alt="A wide board of standing columns with three of them lifted straight up out of the board and set down side by side on a smaller board"
+  caption="`select()` returns the columns you named, in the order you named them."
 />
 
 ## Everything, and everything except
@@ -64,17 +65,18 @@ print(penguins.drop("year", "sex").columns)
   ]}
 />
 
-`pl.exclude` is the one to reach for when a table has forty columns
+`pl.exclude()` is the one to reach for when a table has forty columns
 and you want thirty-eight of them.
 
 <Figure
   slug="pl-selecting-columns-everything-everything-except-inline-cutout"
   alt="A wide board with a full-width frame laid over it, and beside it the same frame with one column cut out of it"
+  caption="Naming what to leave out beats naming thirty-eight columns to keep."
 />
 
 ## By pattern
 
-A `pl.col` argument wrapped in `^` and `$` is treated as a regular
+A `pl.col()` argument wrapped in `^` and `$` is treated as a regular
 expression.
 
 <CodeBlock
@@ -179,7 +181,7 @@ print(penguins.rename({"body_mass_g": "mass_g"}).columns)
 
 ## select is not just for columns
 
-Anything that produces a column belongs in `select`, including
+Anything that produces a column belongs in `select()`, including
 constants and computations that reference no column at all.
 
 <CodeBlock
@@ -300,9 +302,9 @@ The anchors are the switch between "a name" and "a pattern".`}
   markdown={`What is \`pl.int_range(pl.len())\` for?
 
 - Generating a random sample of row positions
-  > Sampling is done with \`sample\`; \`int_range\` produces a deterministic ascending sequence.
+  > Sampling is done with \`sample()\`; \`int_range\` produces a deterministic ascending sequence.
 - Limiting the frame to its first \`n\` rows
-  > Limiting rows is \`head\` or \`limit\`; this expression adds values rather than removing rows.
+  > Limiting rows is \`head()\` or \`limit\`; this expression adds values rather than removing rows.
 - [o] Producing a row-number column, since Polars has no index
   > Row numbers are a column you ask for, not an axis you inherit.
 - Converting a string column into consecutive integer codes
@@ -319,8 +321,8 @@ Making the row number explicit is deliberate: it cannot silently participate in 
 - [o] \`df.select(pl.exclude("internal_id", "_scratch"))\`
   > Or \`df.drop(...)\`, which expresses the same thing from the other direction.
 - \`df.select(pl.all()).drop(pl.col("internal_id"))\`
-  > \`drop\` takes column names rather than expressions, and the \`select(pl.all())\` in front of it does nothing.
-- Listing the other 38 column names explicitly in a \`select\` call
+  > \`drop()\` takes column names rather than expressions, and the \`select(pl.all())\` in front of it does nothing.
+- Listing the other 38 column names explicitly in a \`select()\` call
   > It works, but it breaks the moment a column is added and is painful to review in a diff.
 
 Say what you are removing when that list is shorter than what you are keeping.`}

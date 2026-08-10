@@ -62,8 +62,8 @@ something you can see. A continuous variable is a number measured on a scale
 
 | If the variable is... | Seaborn gives it... | Reach for... |
 | --------------------- | ------------------- | ------------ |
-| **Continuous**        | a continuous axis; a color *gradient* for `hue`; marker *size* | `relplot`, `displot` (scatter, line, histogram, KDE) |
-| **Categorical**       | evenly spaced discrete slots; *distinct* colors for `hue`; one *facet* per level | `catplot` (bar, count, box, violin, strip, swarm) |
+| **Continuous**        | a continuous axis; a color *gradient* for `hue`; marker *size* | `relplot()`, `displot()` (scatter, line, histogram, KDE) |
+| **Categorical**       | evenly spaced discrete slots; *distinct* colors for `hue`; one *facet* per level | `catplot()` (bar, count, box, violin, strip, swarm) |
 
 Not every channel in that table is equally good at carrying a number.
 Position is read most accurately, then length, then angle, then area, and
@@ -78,6 +78,7 @@ two completely different ways depending on the column you give it.
 <Figure
   slug="sns-continuous-vs-categorical-inline-cutout"
   alt="A smooth rule with a slider beside a set of separate labelled trays, a chip belonging to one or the other"
+  caption="A value either sits somewhere on a scale or belongs to one of a few bins."
 />
 
 ### `hue` on a categorical column → distinct colors
@@ -145,7 +146,7 @@ about the column?
 
 - The column contains missing values.
   > Missing values don't switch Seaborn between a legend and a colorbar; the variable's type does.
-- You forgot to call \`set_theme\`.
+- You forgot to call \`set_theme()\`.
   > The theme controls styling, not whether a variable is treated as continuous or categorical.
 - [o] Seaborn is treating it as a continuous (numeric) variable.
   > A colorbar is Seaborn's signal that it read the column as a number on a scale and mapped it to a smooth gradient rather than to distinct groups.
@@ -165,6 +166,7 @@ when it's really a category in disguise.
 <Figure
   slug="sns-continuous-vs-categorical-gotcha-numbers-are-inline-cutout"
   alt="Blocks of rising height standing on labelled trays, a hand lifting them off the rising order into separate bins"
+  caption="Seaborn reads the dtype, so a category stored as numbers is treated as continuous."
 />
 
 A classic example is party `size` in the `tips` dataset: it's stored as an
@@ -219,7 +221,7 @@ sns.catplot(
 Columns like `month` (1–12), `year`, `pclass` (1/2/3), or a `size` code are
 *numbers* to pandas but *categories* to you. If a plot treats one as a
 continuous axis when you wanted discrete groups, either use a categorical
-plot (`catplot`), pass an explicit `order=`, or convert the column with
+plot (`catplot()`), pass an explicit `order=`, or convert the column with
 `df["col"] = df["col"].astype("category")`. The fix is to tell Seaborn the
 *meaning*, since it can only see the dtype.
 </Callout>
@@ -243,12 +245,12 @@ categorical?* That one word per column tells you which family to open.
   adapter="python"
   title="Treat a number as a category"
   instructions={`In \`tips\`, the party \`size\` column is stored as an integer but is
-really an ordered category. Draw a **box plot** with \`sns.catplot\` that
+really an ordered category. Draw a **box plot** with \`sns.catplot()\` that
 shows the distribution of \`total_bill\` for each party \`size\`:
 
 - \`x="size"\`, \`y="total_bill"\`, \`kind="box"\`.
 
-Assign the result to \`g\`. Because \`catplot\` treats \`x\` as categorical,
+Assign the result to \`g\`. Because \`catplot()\` treats \`x\` as categorical,
 you'll get one box per party size.`}
   files={[
     {
@@ -338,7 +340,7 @@ average the labels.`}
 plot and Seaborn spreads it along a smooth continuous axis, but you wanted
 twelve discrete month slots. What's the cleanest fix?
 
-- [o] Use a categorical plot (\`catplot\`), pass an explicit \`order=\`, or convert the column with \`astype("category")\`.
+- [o] Use a categorical plot (\`catplot()\`), pass an explicit \`order=\`, or convert the column with \`astype("category")\`.
   > Each of these tells Seaborn to treat \`month\` as discrete groups rather than a continuous measurement, which is the meaning you intended.
 - Sort the DataFrame by \`month\`.
   > Sorting changes row order, not whether \`month\` is treated as continuous or categorical.
@@ -348,7 +350,7 @@ twelve discrete month slots. What's the cleanest fix?
   > That changes what the chart shows and, since \`month\` is numeric, would give a gradient, not the discrete months you want.
 
 Seaborn reads the dtype, so when a numeric code is really a category you have
-to signal that, via \`catplot\`, \`order=\`, or \`astype("category")\`.`}
+to signal that, via \`catplot()\`, \`order=\`, or \`astype("category")\`.`}
 />
 
 <MultipleChoice
@@ -376,4 +378,5 @@ between figure-level and axes-level functions.
 <Figure
   slug="sns-continuous-vs-categorical-two-kinds-variables-inline-cutout"
   alt="A smooth rule with a slider beside a set of separate labelled trays"
+  caption="Which kind a column is decides every chart choice that follows."
 />

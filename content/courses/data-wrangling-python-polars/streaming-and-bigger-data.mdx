@@ -46,7 +46,7 @@ ask for a different engine.
 
 <Callout type="info" title="Streaming needs a lazy query">
 `engine="streaming"` is an argument to `collect()`, so it only exists
-on a `LazyFrame`. An eager `read_csv` has already put the whole file
+on a `LazyFrame`. An eager `read_csv()` has already put the whole file
 in memory before you could ask for anything else.
 </Callout>
 
@@ -121,12 +121,12 @@ of the plan.
 
 | Streams well | Needs everything |
 | --- | --- |
-| `filter`, `select`, `with_columns` | `pivot` (eager only anyway) |
+| `filter()`, `select()`, `with_columns()` | `pivot()` (eager only anyway) |
 | `group_by().agg()` (partial aggregates merge) | a sort of the whole frame |
 | joins (build side must fit) | `rank` over the whole frame |
 | `sink_*` | anything needing a global order |
 
-A `sort` is the one that catches people: sorting is inherently global,
+A `sort()` is the one that catches people: sorting is inherently global,
 so a full sort of a larger-than-memory frame is expensive whatever the
 engine. Sorting *after* an aggregation is fine, because the
 aggregated result is small.
@@ -176,11 +176,13 @@ Three habits help regardless of engine:
 <Figure
   slug="pl-streaming-and-bigger-data-turning-on-inline-cutout"
   alt="A single lever thrown on a bench, after which blocks arrive in small trays instead of one overflowing load"
+  caption="Streaming trades one huge load for many small ones through the same steps."
 />
 
 <Figure
   slug="pl-streaming-and-bigger-data-inline-cutout"
   alt="A long conveyor carrying a river of blocks past a small machine that handles a few at a time, with a hopper far too large to sit on the bench beside it"
+  caption="Data far larger than memory can still pass through a machine that sips it."
 />
 
 <CodeBlock
@@ -258,11 +260,11 @@ The code is correct on a normal Polars install; it is shown rather than run.
 
 - Streaming supports Parquet input only
   > Streaming reads CSV, Parquet, and NDJSON alike; the input format is not the obstacle.
-- \`read_csv\` uses a different parser that cannot produce batches
+- \`read_csv()\` uses a different parser that cannot produce batches
   > The same reader serves both paths; what differs is when the reading happens.
-- [o] It is an argument to \`collect()\`, and \`read_csv\` has already loaded the file eagerly
+- [o] It is an argument to \`collect()\`, and \`read_csv()\` has already loaded the file eagerly
   > By the time you hold a \`DataFrame\`, the memory has been spent; streaming has to be chosen before the read.
-- Streaming requires the file to be sorted, which \`read_csv\` does not guarantee
+- Streaming requires the file to be sorted, which \`read_csv()\` does not guarantee
   > No ordering requirement exists; batches are processed in whatever order they are read.
 
 Streaming is a property of executing a plan, so you need a plan first.`}
@@ -280,7 +282,7 @@ Streaming is a property of executing a plan, so you need a plan first.`}
 - [o] Sorting the entire frame
   > Ordering is inherently global, so a full sort of a larger-than-memory frame is expensive whatever the engine.
 
-Aggregate first and sort the small result, or use \`top_k\` when you only want the extremes.`}
+Aggregate first and sort the small result, or use \`top_k()\` when you only want the extremes.`}
 />
 
 <MultipleChoice
@@ -293,7 +295,7 @@ Aggregate first and sort the small result, or use \`top_k\` when you only want t
 - [o] It writes in batches, so the full result never has to fit in memory
   > Which is what lets a 200 GB file be filtered and rewritten on a laptop.
 - It skips the query optimizer, making the write faster to start
-  > The plan is optimized exactly as it would be for \`collect\`; the difference is where the output goes.
+  > The plan is optimized exactly as it would be for \`collect()\`; the difference is where the output goes.
 
 \`collect()\` returns a \`DataFrame\`, and a \`DataFrame\` is by definition in memory.`}
 />

@@ -97,6 +97,7 @@ If you still want it, write `Rect() = default;`.
 <Figure
   slug="cpp-constructors-and-destructors-inline-cutout"
   alt="A workbench where a crate is assembled and filled at the left, used in the middle, and emptied and folded flat at the right"
+  caption="Constructed, used, destroyed: an object's whole life in one pass."
 />
 
 ## The destructor releases resources
@@ -109,6 +110,7 @@ heap object, when the program ends for a global.
 <Figure
   slug="cpp-constructors-and-destructors-destructor-releases-resources-inline-cutout"
   alt="A crate being emptied and folded flat as it leaves the bench, its tap closed behind it"
+  caption="The destructor runs on the way out and hands back whatever was held."
 />
 
 <CodeBlock
@@ -143,7 +145,8 @@ int main() {
 
 Watch the output carefully. Destruction happens in **reverse order
 of construction**, on scope exit. This deterministic, automatic
-cleanup is the magic that makes RAII possible.
+cleanup is what makes resource acquisition is initialization, the subject
+of a later chapter, possible.
 
 ## Lifecycle of an object
 
@@ -172,6 +175,7 @@ the invariants hold.
 <Figure
   slug="cpp-constructors-and-destructors-constructors-put-fields-inline-cutout"
   alt="A crate whose compartments are all filled before its lid will close, one empty compartment holding the lid open"
+  caption="The constructor's job is to leave the object in a state its methods can trust."
 />
 
 ## A first taste of the Rule of Three

@@ -16,10 +16,10 @@ Queues were studied mathematically before computers existed to hold them: in 190
 
 | Operation | Meaning |
 | --- | --- |
-| enqueue / `push` | Add an item to the back |
-| dequeue / `pop` | Remove the front item |
-| `front` | Read the next item to leave |
-| `empty` | Check whether the queue has no items |
+| enqueue / `push()` | Add an item to the back |
+| dequeue / `pop()` | Remove the front item |
+| `front()` | Read the next item to leave |
+| `empty()` | Check whether the queue has no items |
 
 ```mermaid
 flowchart TD
@@ -38,6 +38,7 @@ flowchart TD
 <Figure
   slug="dsa-queues-queue-adt-inline-cutout"
   alt="A channel with an entry gate at one end and an exit gate at the other"
+  caption="A queue takes at one end and gives at the other, first in first out."
 />
 
 <CodeBlock
@@ -72,6 +73,7 @@ One part of a program can produce work while another consumes it in the same ord
 <Figure
   slug="dsa-queues-std-queue-t-inline-cutout"
   alt="A ready-made channel lifted off a shelf with its two gates already fitted"
+  caption="`std::queue` is an adapter that exposes only the queue operations."
 />
 
 <CodeBlock
@@ -133,7 +135,7 @@ int main() {
 Unlike `std::vector`, popping from the front of a deque does not shift every remaining element.
 
 <Callout type="success" title="Queue and deque costs">
-`std::queue` backed by `std::deque` gives O(1) `push`, `pop`, `front`, and `empty`. `std::deque` also gives O(1) push/pop at both ends.
+`std::queue` backed by `std::deque` gives O(1) `push()`, `pop()`, `front()`, and `empty()`. `std::deque` also gives O(1) push/pop at both ends.
 </Callout>
 
 ## Vector front-pop versus deque front-pop
@@ -172,6 +174,7 @@ int main() {
 <Figure
   slug="dsa-queues-inline-cutout"
   alt="A channel with an entry gate at one end and an exit gate at the other, blocks leaving strictly in the order they arrived"
+  caption="Order of arrival is the only thing a queue promises."
 />
 
 <CodeBlock

@@ -54,7 +54,7 @@ parameters they govern:
 
 | Model | A hyperparameter (you set it) | A parameter (the model learns it) |
 | --- | --- | --- |
-| `KNeighborsClassifier` | `n_neighbors` | *(none, KNN just stores the data)* |
+| `KNeighborsClassifier` | `n_neighbors` | *(none, k-nearest neighbors just stores the data)* |
 | `DecisionTreeClassifier` | `max_depth`, `min_samples_leaf` | each split's feature and threshold |
 | `LinearRegression` | *(few; it is barely tunable)* | slope(s) and intercept |
 | `LogisticRegression` | `C` (regularization strength) | the coefficients |
@@ -124,6 +124,7 @@ missing feature.
 <Figure
   slug="ml-hyperparameter-tuning-parameters-vs-hyperparameters-inline-cutout"
   alt="A machine with dials on its outside set by hand and gears inside that set themselves as it runs"
+  caption="Parameters are learned during fitting; hyperparameters you set beforehand."
 />
 
 A hyperparameter like `max_depth` decides *how flexible* the model is
@@ -222,6 +223,7 @@ cross-validation for *every combination*, then reports the winner.
 <Figure
   slug="ml-hyperparameter-tuning-exists-models-do-inline-cutout"
   alt="A machine with three dials on its face and no marks on them, a hand turning each in turn"
+  caption="The best setting of one dial depends on the others, so they are searched together."
 />
 
 The "grid" is just the set of all combinations. If you give it 3 values of
@@ -238,7 +240,7 @@ combination of their values:
 | `C=1.0` | `C=1.0, depth=2` | `C=1.0, depth=4` |
 
 `GridSearchCV` runs 5-fold cross-validation for each cell, picks the
-combination with the highest mean CV score, and exposes it as
+combination with the highest mean cross-validation score, and exposes it as
 `best_estimator_`, refit on all of the training data.
 
 Here is the smallest honest example: a tiny grid over a single
@@ -504,6 +506,7 @@ your sanity, and it is not always worth it.
 <Figure
   slug="ml-hyperparameter-tuning-inline-cutout"
   alt="A panel of three dials being turned through a grid of settings, a small gauge recording the best combination"
+  caption="A grid search scores every combination and reports the winner."
 />
 
 - **A simple model with few hyperparameters.** `LinearRegression` has

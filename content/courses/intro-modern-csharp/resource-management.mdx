@@ -25,6 +25,7 @@ C# splits resources into two camps:
 <Figure
   slug="mcs-resource-management-memory-handled-mostly-inline-cutout"
   alt="A yard of crates with a cart moving through collecting the ones nobody is holding"
+  caption="The collector reclaims memory nobody is holding any more."
 />
 
 Understanding this split is the foundation of clean, leak-free C#.
@@ -65,6 +66,7 @@ OS only allows a limited number per process.
 <Figure
   slug="mcs-resource-management-inline-cutout"
   alt="A tap opened over a basin with a timer beside it, and the same tap shown closed with the basin empty and the timer stopped"
+  caption="A file or socket must be closed explicitly; the collector will not do it."
 />
 
 If you open a file, never close it, and let the variable go out of

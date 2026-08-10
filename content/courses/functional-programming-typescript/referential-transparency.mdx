@@ -195,6 +195,7 @@ expression twice in one block, you can compute it once and reuse it.
 <Figure
   slug="fp-referential-transparency-concrete-demonstration-inline-cutout"
   alt="A block and the finished result of that block, either one dropping into the same slot and the machine behaving identically"
+  caption="If an expression can be swapped for its value, the program is unchanged."
 />
 
 <CodeBlock
@@ -250,7 +251,7 @@ sumOfSquares(xs)
 ```
 
 Each `=` is a substitution. The proof writes itself. This is what
-the FP community means when it says "you can *reason about* the code",
+the functional programming community means when it says "you can *reason about* the code",
 not "stare at it harder" but literally *prove* properties of it by
 substitution.
 
@@ -295,6 +296,7 @@ equivalent. That's what "referentially opaque" means in practice.
 <Figure
   slug="fp-referential-transparency-inline-cutout"
   alt="A block on a bench and the finished result of that block, either one dropping into the same slot and the machine behaving identically"
+  caption="Referential transparency is what makes that substitution always safe."
 />
 
 ## A practical refactor

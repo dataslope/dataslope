@@ -32,7 +32,7 @@ gaps, and outliers all at once, in about half a second.
 
 ## The minimum
 
-`relplot` ("relational plot") is Seaborn's figure-level entry point for
+`relplot()` ("relational plot") is Seaborn's figure-level entry point for
 scatter and line charts. With `kind="scatter"` (the default) you get a
 scatter plot:
 
@@ -160,6 +160,7 @@ the structure you came to see. The first and easiest fix is **`alpha`**
 <Figure
   slug="sns-relational-scatter-plots-scatter-plot-needs-inline-cutout"
   alt="Two columns of chips pinned against each other on a board with a loose drift emerging"
+  caption="A scatter needs two numeric columns, and the drift between them is the answer."
 />
 
 The same points at three opacities. Nothing about the data changes; what
@@ -199,7 +200,7 @@ Try editing it to `alpha=1.0` and back to feel the difference. For *truly*
 dense data, you would switch encodings entirely, to a 2-D histogram or a
 density plot, which we'll meet in the distributions chapters.
 
-## `relplot` vs `scatterplot`
+## `relplot()` vs `scatterplot()`
 
 You'll see two ways to draw the same scatter:
 
@@ -211,11 +212,12 @@ You'll see two ways to draw the same scatter:
 <Figure
   slug="sns-relational-scatter-plots-inline-cutout"
   alt="Chips pinned across a board with a second series in another ink laid over them, the two drifting apart to the right"
+  caption="A second series in another colour turns one question into a comparison."
 />
 
 They produce the same dots; they differ in what they *return* and how they
 *compose*. We devote a whole page to that distinction, for now, reach for
-`relplot` when you might want facets, and `scatterplot` when you're placing
+`relplot()` when you might want facets, and `scatterplot()` when you're placing
 one chart on an Axes you control.
 
 ## Your turn
@@ -225,7 +227,7 @@ one chart on an Axes you control.
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Color a scatter by group"
   instructions={`Using the \`penguins\` dataset, draw a **scatter plot** with
-\`sns.relplot\`:
+\`sns.relplot()\`:
 
 - \`bill_length_mm\` on the x-axis,
 - \`bill_depth_mm\` on the y-axis,

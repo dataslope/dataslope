@@ -211,7 +211,7 @@ for (const subject in scores) {
   ]}
 />
 
-For most everyday code, `Object.entries` + `for...of` is the
+For most everyday code, `Object.entries()` + `for...of` is the
 clearest pattern.
 
 ## Destructuring objects
@@ -324,6 +324,7 @@ objects.
 <Figure
   slug="js-objects-creating-objects-inline-cutout"
   alt="An empty compartmented case being filled, each compartment taking one item and gaining a blank tag"
+  caption="An object stores values under names rather than under positions."
 />
 
 <CodeBlock
@@ -355,6 +356,7 @@ considered equal unless they are *literally the same object*.
 <Figure
   slug="js-objects-inline-cutout"
   alt="One crate whose lid is open to show separate labelled compartments inside, each compartment holding a different small item"
+  caption="Each key opens one compartment, and the keys are what you look things up by."
 />
 
 <CodeBlock

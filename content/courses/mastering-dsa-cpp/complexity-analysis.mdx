@@ -46,6 +46,7 @@ Let `f(n)` be the work your algorithm does and `g(n)` be a comparison function s
 <Figure
   slug="dsa-complexity-analysis-we-care-inline-cutout"
   alt="Two ramps from one start, a cart near the top of the gentle one and barely moved on the steep one"
+  caption="Complexity is about how the cost grows, not how fast one run is."
 />
 
 | Notation | Meaning | Intuition |
@@ -142,6 +143,7 @@ With practice you can read growth rates straight from a function's shape. A sing
 <Figure
   slug="dsa-complexity-analysis-inline-cutout"
   alt="Three ramps of different steepness rising across the frame from the same start, a cart on each having travelled very different distances"
+  caption="The steeper curve overtakes the gentler one, whatever the constants."
 />
 
 Two patterns to be suspicious of: a loop that *looks* single but hides an O(n) operation in its body (like `v.erase(v.begin())` or substring copies), and recursion, for recursive functions, count the total number of calls, not the lines of code. Both pitfalls will come up again, by name, in the sorting and recursion chapters.
@@ -153,9 +155,10 @@ Now for the subtlest idea on this page, and one of the most useful, because it e
 <Figure
   slug="dsa-complexity-analysis-big-o-big-inline-cutout"
   alt="Three ramps drawn over one another, one bounding from above, one from below, one hugging the middle"
+  caption="Big-O bounds from above, Big-Omega from below, Big-Theta from both."
 />
 
-Some operations are occasionally expensive but cheap on average over a sequence. `std::vector::push_back` is the classic example: most pushes write one element into spare capacity, but when capacity runs out, the vector must allocate a larger array and move *every existing element* into it. That one push is O(n). So how can anyone call `push_back` "O(1)"?
+Some operations are occasionally expensive but cheap on average over a sequence. `std::vector::push_back` is the classic example: most pushes write one element into spare capacity, but when capacity runs out, the vector must allocate a larger array and move *every existing element* into it. That one push is O(n). So how can anyone call `push_back()` "O(1)"?
 
 Think of it like a savings account. Suppose every push deposits three imaginary coins: one pays for writing the element itself, and two go into savings. When the vector doubles from capacity `k` to `2k`, it must move `k` elements, but the `k/2` pushes since the *last* doubling have saved up `k` coins between them, exactly enough to pay for the move. No push is ever billed more than three coins, so over any sequence of `n` pushes the total work is O(n), and each push is O(1) **amortized**.
 
