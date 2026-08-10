@@ -23,7 +23,7 @@ flowchart TB
 
 The honest way to trust a tool is to feed it data whose answer you already
 know. We'll *construct* a series from a known trend, a known seasonal sine,
-and known noise, then ask `seasonal_decompose` to hand the pieces back.
+and known noise, then ask `seasonal_decompose()` to hand the pieces back.
 
 <Figure
   slug="tsa-decomposition-cutout"
@@ -75,6 +75,7 @@ shapeless noise, exactly as it should be.
 <Figure
   slug="tsa-decomposition-trend-seasonality-log-trick-turn-inline-cutout"
   alt="A wave whose swings widen to the right passing through a press and leaving with swings of even width"
+  caption="The press is the logarithm: widening swings go in, swings of even width come out."
 />
 
 Those four panels each have their own vertical scale, which hides how the
@@ -251,6 +252,7 @@ ones until they're the same size, exactly what an additive model wants.
 <Figure
   slug="tsa-decomposition-trend-seasonality-additive-or-multiplicative-inline-cutout"
   alt="Two waves along a rail, one whose swings stay the same width and one whose swings widen as it rises"
+  caption="Swings of constant width are additive; swings that widen as the series rises are multiplicative."
 />
 
 <CodeBlock
@@ -368,7 +370,7 @@ flagged for moving averages, in a new costume.
 <ChallengeCard
   adapter="python"
   title="Decompose and rebuild (additive reconstruction)"
-  instructions={`An additively-built monthly series \`y\` is loaded. Run an **additive** \`seasonal_decompose\` with \`period=12\` and store it in \`dec\`. Then verify the additive identity by reconstructing the series:
+  instructions={`An additively-built monthly series \`y\` is loaded. Run an **additive** \`seasonal_decompose()\` with \`period=12\` and store it in \`dec\`. Then verify the additive identity by reconstructing the series:
 
 - \`recon\` = \`dec.trend + dec.seasonal + dec.resid\`
 - \`max_err\` = the maximum absolute difference between \`recon\` and \`y\`, computed only where \`recon\` is not \`NaN\` (the trend/residual are \`NaN\` at the ends).
@@ -522,10 +524,10 @@ A well-specified decomposition leaves only patternless noise in the residual; an
 />
 
 <MultipleChoice
-  markdown={`Why does the classical \`seasonal_decompose\` **trend** component have \`NaN\` values at the very start and end of the series?
+  markdown={`Why does the classical \`seasonal_decompose()\` **trend** component have \`NaN\` values at the very start and end of the series?
 
 - Because of a bug in statsmodels
-  > It's expected behavior, not a bug: a centered moving average mathematically cannot reach the edges. (STL and model-based methods handle ends differently.)
+  > It's expected behavior, not a bug: a centered moving average mathematically cannot reach the edges. (seasonal-trend decomposition using loess, and model-based methods, handle ends differently.)
 - Because seasonality cannot be computed at the edges
   > The *seasonal* component is defined everywhere (it's a repeated average shape). It's specifically the moving-average *trend* that runs out of window at the ends.
 - [o] Because the trend is a centered moving average over the seasonal period, and a full window isn't available at the edges
@@ -576,4 +578,5 @@ classical models demand it, and how to test for it.
 <Figure
   slug="tsa-decomposition-trend-seasonality-inline-cutout"
   alt="One wavy line on the left separating into three stacked lines on the right, a rising trend, a repeating wave and a rough remainder"
+  caption="One observed line in; a trend, a seasonal wave and a remainder out."
 />

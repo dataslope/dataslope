@@ -133,7 +133,7 @@ print(
   markdown={`You have **hourly air-temperature** readings and want one value per day. Which resampling aggregation is correct?
 
 - \`resample("D").count()\`
-  > \`count\` returns *how many* readings there were that day (usually 24), not the temperature itself. It answers a question about data completeness, not climate.
+  > \`count()\` returns *how many* readings there were that day (usually 24), not the temperature itself. It answers a question about data completeness, not climate.
 - \`resample("D").sum()\`
   > Summing 24 hourly temperatures produces a meaningless number in the hundreds. Temperature is a *level*, not a flow, adding it up has no physical meaning.
 - It doesn't matter; all aggregations give the same answer
@@ -141,7 +141,7 @@ print(
 - [o] \`resample("D").mean()\`
   > Temperature is a level/rate, so the natural daily summary is the average of the day's hourly readings. (A max/min is also reasonable if you specifically want the day's high or low.)
 
-Levels (temperature, price) call for \`mean\` (or min/max); flows (sales, visits) call for \`sum\`.`}
+Levels (temperature, price) call for \`mean()\` (or min/max); flows (sales, visits) call for \`sum()\`.`}
 />
 
 ### More than one summary at once
@@ -209,7 +209,7 @@ The yearly resample above has *no* sawtooth, averaging a full year folds
 the 12-month seasonal cycle into a single number. Downsampling to the
 seasonal period (or a multiple of it) is a quick, crude way to *see the
 trend* without the seasonality shouting over it. We'll do this far more
-carefully with decomposition soon. (Note we used `mean`, not `sum`: a CO₂
+carefully with decomposition soon. (Note we used `mean()`, not `sum()`: a CO₂
 concentration is a *level*, so summing twelve monthly readings would be
 meaningless.)
 </Callout>
@@ -307,8 +307,8 @@ were measured.
   > Interpolation can't recover values that were never recorded. The smooth daily line is a straight-line *guess* between the two monthly anchors, not measured daily revenue.
 - [o] Upsampling invents the in-between values; the "daily" figures are interpolated assumptions, not measurements, and carry no new information
   > One real number per month, stretched across ~30 slots, is still one number per month of actual information. Presenting the interpolated days as data overstates what is known.
-- They should have used \`sum\` instead of interpolation
-  > \`sum\` is an aggregation for *downsampling*; it doesn't apply when going to a finer grid. The real fix is to stop treating invented values as measurements, not to switch aggregation.
+- They should have used \`sum()\` instead of interpolation
+  > \`sum()\` is an aggregation for *downsampling*; it doesn't apply when going to a finer grid. The real fix is to stop treating invented values as measurements, not to switch aggregation.
 
 Upsampling reshapes the grid and forces an assumption; it never adds information that wasn't measured.`}
 />
@@ -324,6 +324,7 @@ Upsampling reshapes the grid and forces an assumption; it never adds information
 <Figure
   slug="tsa-resampling-and-aggregation-downsampling-summarizing-coarser-inline-cutout"
   alt="A dense row of chips swept into seven-chip trays, each tray leaving one block"
+  caption="Seven daily chips in, one weekly block out; the aggregation decides which block."
 />
 
 <MultipleChoice
@@ -406,7 +407,7 @@ assert isinstance(weekly_total, pd.Series)`,
 - \`"total_rain"\`, June's total rainfall (the correct aggregation for a flow), as a float
 - \`"avg_humidity"\`, June's typical humidity (the correct aggregation for a level), as a float rounded to 1 decimal
 
-Pick \`sum\` vs \`mean\` to match what each quantity *means*.`}
+Pick \`sum()\` vs \`mean()\` to match what each quantity *means*.`}
   files={[
     {
       filename: "main.py",
@@ -470,7 +471,7 @@ Produce:
 - \`annual\`, a Series of each year's **mean** CO₂ (\`co2.resample("YE").mean()\`)
 - \`rise_per_year\`, the average ppm increase per year across the record, computed as \`(annual.iloc[-1] - annual.iloc[0]) / (len(annual) - 1)\` (a float)
 
-CO₂ is a concentration, so the right aggregation is \`mean\`, not \`sum\`. The series rises by a couple of ppm per year, so \`rise_per_year\` should be positive (and comfortably above 1).`}
+CO₂ is a concentration, so the right aggregation is \`mean()\`, not \`sum()\`. The series rises by a couple of ppm per year, so \`rise_per_year\` should be positive (and comfortably above 1).`}
   files={[
     {
       filename: "main.py",
@@ -522,38 +523,38 @@ assert 50 <= len(annual) <= 80, f"Expected ~60+ yearly points, got {len(annual)}
 
 - A method that always returns one row per original row
   > Downsampling returns *fewer* rows (one per bucket) and upsampling returns *more*; it rarely preserves the original row count.
-- [o] A time-aware \`groupby\` that buckets the index into regular periods, awaiting an aggregation to summarize each bucket
-  > \`resample\` groups by fixed time windows the way \`groupby\` groups by a key, then applies a summary (\`.sum()\`, \`.mean()\`, ...) to each window.
+- [o] A time-aware \`groupby()\` that buckets the index into regular periods, awaiting an aggregation to summarize each bucket
+  > \`resample()\` groups by fixed time windows the way \`groupby()\` groups by a key, then applies a summary (\`.sum()\`, \`.mean()\`, ...) to each window.
 - A way to delete rows to make the series shorter
   > Resampling reorganizes the timeline into buckets and aggregates; it isn't row deletion. Downsampling *summarizes* groups of rows rather than dropping them arbitrarily.
 - A plotting function
   > Resampling transforms data; it draws nothing. You might plot the result afterward, but that's a separate step.
 
-\`resample\` is \`groupby\` for the time axis: bucket by period, then aggregate.`}
+\`resample()\` is \`groupby()\` for the time axis: bucket by period, then aggregate.`}
 />
 
 <MultipleChoice
   markdown={`A daily count of **support tickets** is resampled to monthly. Which aggregation gives "how many tickets did we handle that month," and why?
 
-- \`mean\`, because monthly figures should be averages
-  > \`mean\` gives the typical tickets-per-day, not the monthly workload. "How many that month" is a total, not an average.
-- [o] \`sum\`, because ticket counts are a flow that accumulates over the month
-  > Counts of events are flows; the month's volume is the sum of its days. \`sum\` answers "how many in total," which is the question asked.
-- \`max\`, because the busiest day represents the month
-  > \`max\` reports the single worst day, not the monthly total. It's a useful extra statistic but not "how many that month."
-- \`last\`, because only the final day matters
-  > \`last\` keeps a single day's count and discards the rest of the month, it answers nothing about the month's volume.
+- \`mean()\`, because monthly figures should be averages
+  > \`mean()\` gives the typical tickets-per-day, not the monthly workload. "How many that month" is a total, not an average.
+- [o] \`sum()\`, because ticket counts are a flow that accumulates over the month
+  > Counts of events are flows; the month's volume is the sum of its days. \`sum()\` answers "how many in total," which is the question asked.
+- \`max()\`, because the busiest day represents the month
+  > \`max()\` reports the single worst day, not the monthly total. It's a useful extra statistic but not "how many that month."
+- \`last()\`, because only the final day matters
+  > \`last()\` keeps a single day's count and discards the rest of the month, it answers nothing about the month's volume.
 
-Event counts are flows, so the monthly volume is a \`sum\`; \`mean\` would answer a different ("typical day") question.`}
+Event counts are flows, so the monthly volume is a \`sum()\`; \`mean()\` would answer a different ("typical day") question.`}
 />
 
 <Callout type="success" title="Key takeaways">
-- **Resampling changes temporal resolution**; it's `groupby` for the time
+- **Resampling changes temporal resolution**; it's `groupby()` for the time
   axis.
-- **Downsampling** (fine → coarse) **summarizes**: choose **`sum`** for
-  *flows* (sales, visits, rainfall) and **`mean`** (or min/max) for *levels*
+- **Downsampling** (fine → coarse) **summarizes**: choose **`sum()`** for
+  *flows* (sales, visits, rainfall) and **`mean()`** (or min/max) for *levels*
   (temperature, price). Picking the wrong one produces nonsense.
-- **Upsampling** (coarse → fine) **invents** the in-between values. `asfreq`
+- **Upsampling** (coarse → fine) **invents** the in-between values. `asfreq()`
   lays down the grid as `NaN`s; you then fill with an *assumption*.
 - **Upsampling adds no information**, never present interpolated points as
   measurements.
@@ -569,4 +570,5 @@ is exactly the next page.
 <Figure
   slug="tsa-resampling-and-aggregation-inline-cutout"
   alt="A dense row of daily chips being swept into seven-chip trays, each tray leaving one summary block behind"
+  caption="Regroup along the time axis, then summarize each group."
 />

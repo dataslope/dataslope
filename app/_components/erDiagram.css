@@ -1,0 +1,321 @@
+/* ─── ER diagram (schema graph) ───────────────────────────────────────
+ * The visual layer for `ErDiagramPane`, split out of `sqlPlayground.css`
+ * so it can be loaded on its own.
+ *
+ * Two consumers, and they are why this is a separate file:
+ *
+ *   - the SQL playgrounds, which reach it through `sqlPlayground.css`'s
+ *     `@import` and get the tokens below from the playground shell;
+ *   - the learn-route SQL cards' "ER Diagram" dialog, which loads only
+ *     this file (the rest of the playground chrome would collide with
+ *     the docs page) and supplies the same tokens on the dialog's own
+ *     canvas host.
+ *
+ * The rules therefore consume nothing but these custom properties, which
+ * every host has to define: --bg, --bg2, --bg3, --border, --text,
+ * --text-dim, --primary, --accent1, --font-ui.
+ */
+
+/* The two drifting sine layers of the loading overlay animate on the
+   project-wide `ds-run-*` keyframes. Imported here rather than assumed,
+   because the learn-route dialog loads this file on its own. */
+@import "./runOverlayAnimations.css";
+
+/* ─── ER Diagram pane ─── */
+.er-diagram-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Full-pane loading overlay shown while ELK computes the initial layout */
+.er-diagram-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
+  pointer-events: none;
+  /* Fade-out matches the pyodide-style overlay: opacity 0.4s */
+  transition: opacity 0.4s ease;
+}
+
+/* ELK layout is done but the minimum animation duration is still running:
+   clear the background so the diagram is visible behind the wave. */
+.er-diagram-loading-overlay--transparent {
+  background: transparent;
+}
+
+/* Minimum duration elapsed: fade out just like .pyodide-loading.hidden */
+.er-diagram-loading-overlay--hidden {
+  opacity: 0;
+}
+
+.er-diagram-loading-wave {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to top, #000 35%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 35%, transparent 100%);
+}
+
+.er-diagram-loading-wave svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* Paint and motion for the two wave paths.
+ *
+ * `playground.css` carries an identical pair for the run-overlay's own
+ * waves, and per the note at the top of `runOverlayAnimations.css` only
+ * the *keyframes* are shared project-wide while each consumer keeps its
+ * own rule set. This is the ER overlay's set, and it has to live here:
+ * the learn-route dialog loads this file alone, so without it the two
+ * `<path>` elements fall back to the SVG default of solid black fill and
+ * no animation, which is a black wedge across the bottom of the diagram
+ * rather than a loader.
+ *
+ * Scoped under `.er-diagram-loading-wave` so that in the playgrounds,
+ * where `playground.css` is also present, these apply to the ER loader
+ * and nothing else. The values match that pair; both resolve `--primary`
+ * from whichever host is in play, which is what keeps the loader on the
+ * lesson's accent inside the dialog and on the playground's inside the
+ * playground. */
+.er-diagram-loading-wave .dataslope-wave {
+  fill: color-mix(in oklab, var(--primary) 40%, transparent);
+  transform: translateX(0);
+  will-change: transform;
+}
+
+.er-diagram-loading-wave .dataslope-wave--back {
+  fill: color-mix(in oklab, var(--primary) 22%, transparent);
+  animation: ds-run-wave-back 2.4s linear infinite;
+}
+
+.er-diagram-loading-wave .dataslope-wave--front {
+  fill: color-mix(in oklab, var(--primary) 45%, transparent);
+  animation: ds-run-wave-front 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .er-diagram-loading-wave .dataslope-wave--back,
+  .er-diagram-loading-wave .dataslope-wave--front {
+    animation: none;
+  }
+}
+
+/* Selection hint overlay shown in the top-left corner */
+.er-selection-hint {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-family: var(--font-ui);
+  color: var(--text-dim);
+  pointer-events: none;
+  z-index: 10;
+  max-width: 300px;
+  line-height: 1.4;
+}
+
+/* Hide the React Flow attribution badge */
+.er-diagram-wrap .react-flow__attribution {
+  display: none;
+}
+
+/* ER diagram background matches the theme background */
+.er-diagram-wrap .react-flow__background {
+  background: var(--bg);
+}
+
+/* ── Removed: cardinality toggle panel ── */
+
+.er-diagram-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+}
+
+/* ─── ER Table node ─── */
+.er-table-node {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-sizing: border-box;
+  /* Width must stay in sync with NODE_W in ErDiagramPane.tsx so that ELK
+     port positions (placed at x=NODE_W) align with the rendered node edges. */
+  width: 230px;
+  font-family: var(--font-ui);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.er-table-node .react-flow__handle {
+  width: 8px;
+  height: 8px;
+  background: var(--primary);
+  border: 2px solid var(--bg2);
+}
+
+.er-table-header {
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.er-table-header-icon {
+  flex-shrink: 0;
+  color: var(--accent1);
+}
+
+.er-table-header-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.er-table-columns {
+  padding: 4px 0;
+}
+
+.er-table-col-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  height: 25px;
+  padding: 0 10px;
+  font-size: 11px;
+  color: var(--text);
+}
+
+.er-table-col-row:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
+.er-table-col-row.er-table-col-empty {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.er-table-col-row .er-table-col-handle {
+  width: 7px;
+  height: 7px;
+  background: var(--primary);
+  border: 1px solid var(--bg2);
+  opacity: 0.9;
+}
+
+.er-table-col-row .er-table-col-handle-left {
+  left: -4px;
+}
+
+.er-table-col-row .er-table-col-handle-right {
+  right: -4px;
+}
+
+.er-table-col-icons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.er-col-icon {
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.er-pk-icon {
+  color: var(--text-dim);
+}
+
+.er-fk-icon {
+  color: var(--text-dim);
+}
+
+/* Inline trigger wrapper for PK/FK icon popovers inside ER nodes */
+.er-col-icon-trigger {
+  display: inline-flex;
+  align-items: center;
+  cursor: default;
+}
+
+/* Popover for PK/FK icons inside ER nodes */
+.er-icon-popover-positioner {
+  z-index: 10000;
+}
+
+.er-icon-popover {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.er-icon-popover-icon {
+  flex-shrink: 0;
+}
+
+/* Flowing edge animation for selected-table connected edges */
+@keyframes erEdgeFlow {
+  from {
+    stroke-dashoffset: 36;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.er-edge-flowing {
+  animation: erEdgeFlow 0.9s linear infinite;
+  pointer-events: none;
+}
+
+.er-table-col-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.er-table-col-type {
+  font-size: 10px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}

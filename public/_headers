@@ -6,3 +6,12 @@
 # automatically, and keeps repeat asset requests on the CDN edge.
 /_next/static/*
   Cache-Control: public,max-age=31536000,immutable
+
+# Prepopulated code-block output (scripts/build-block-outputs.mjs). Same
+# reasoning as above and the same guarantee: every filename here is a content
+# hash of the block that produced it, so a file's bytes never change and an
+# edited block writes a new name. Without this the browser revalidates each
+# chart on every visit — free, since static assets do not invoke the Worker,
+# but a round trip per chart for an answer that cannot have changed.
+/block-outputs/*
+  Cache-Control: public,max-age=31536000,immutable

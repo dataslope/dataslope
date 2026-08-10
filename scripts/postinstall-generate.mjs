@@ -67,3 +67,8 @@ run("node", ["scripts/build-created-at.mjs"]);
 run("node", ["scripts/build-course-catalog.mjs"]);
 run("node", ["scripts/build-home-stats.mjs"]);
 run("node", ["scripts/build-images.mjs"]);
+// build-block-outputs is deliberately absent. Its manifest and figures are
+// committed (see .github/workflows/block-outputs.yml), so a fresh clone
+// already has them and an install has nothing to generate. `dev` and `build`
+// still run it, where it reuses those committed entries key-for-key and
+// executes only what actually changed.

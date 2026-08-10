@@ -6,8 +6,8 @@ description: Shifting and lagging with shift(), moving averages with rolling(), 
 Raw time series are noisy. Underneath the jitter there's usually a calmer
 story, a trend, a seasonal shape, and **moving-window** statistics are
 how you turn the volume down on the noise to hear it. This page covers
-three closely related tools: **`shift`** (look at the past), **`rolling`**
-(summarize a sliding window of the past), and **`expanding`** (summarize
+three closely related tools: **`shift()`** (look at the past), **`rolling()`**
+(summarize a sliding window of the past), and **`expanding()`** (summarize
 everything so far). It also covers the two ways people quietly cheat with
 them.
 
@@ -16,7 +16,7 @@ them.
   alt="A jagged ribbon across a plane with a small sliding frame travelling along it emitting a smoothed trailing curve"
 />
 
-## First, looking backward: `shift`
+## First, looking backward: `shift()`
 
 Almost every time series operation needs to compare *now* to *then*.
 `shift(k)` moves the data forward by `k` steps, so each row lines up with a
@@ -67,7 +67,7 @@ forecasting feature. Leads are fine for analysis ("what happened next?")
 but must never become an input your model uses to predict the present.
 </Callout>
 
-## The moving average: `rolling`
+## The moving average: `rolling()`
 
 A **rolling** (or *moving*) statistic slides a fixed-size window along the
 series and computes a summary at each stop. The **moving average**,
@@ -166,7 +166,7 @@ print(air.rolling(3, min_periods=1).mean().round(1).head())
 
 ## The trailing-vs-centered trap (a leakage classic)
 
-By default, `rolling` is **trailing**: the window at time *t* ends at *t*
+By default, `rolling()` is **trailing**: the window at time *t* ends at *t*
 and reaches *backward*. That's exactly right for forecasting, at time *t*
 you only know the past and present. But pandas also offers `center=True`,
 which centers the window on *t*, reaching *into the future*. That's fine
@@ -308,7 +308,7 @@ in forecasting.
 
 ## Rolling spread: measuring changing volatility
 
-`rolling` isn't only for means. A rolling **standard deviation** tracks how
+`rolling()` isn't only for means. A rolling **standard deviation** tracks how
 *volatile* the series is over time, and on the airline data it climbs,
 quantifying the "swings get bigger" effect we eyeballed earlier. (That
 growing spread is a non-stationarity we'll learn to fix.)
@@ -361,7 +361,7 @@ print("The spread roughly TRIPLES - the variance is not constant over time.")
 
 ## Expanding windows: everything so far
 
-Where `rolling(N)` looks back a fixed `N` steps, **`expanding`** looks back
+Where `rolling(N)` looks back a fixed `N` steps, **`expanding()`** looks back
 *all the way to the start*, growing as it goes. `expanding().mean()` is the
 running (cumulative) average, "the average of everything up to and
 including now." It's the honest, leakage-free way to say "the typical value
@@ -370,6 +370,7 @@ including now." It's the honest, leakage-free way to say "the typical value
 <Figure
   slug="tsa-rolling-and-expanding-windows-inline-cutout"
   alt="Two rails of daily blocks, the near one with a short frame of fixed width sliding along it, the far one with a frame whose left edge stays pinned so it stretches longer as it moves right"
+  caption="A rolling window moves both edges; an expanding one pins its left edge at the start."
 />
 
 <CodeBlock
@@ -607,7 +608,7 @@ Responsiveness comes from a smaller window; smoothness comes from a larger one, 
 - \`rolling(1)\`
   > A window of 1 contains only the current point, the opposite of "all history."
 - \`shift(1)\`
-  > \`shift\` just lags the series by one step; it computes no window statistic at all.
+  > \`shift()\` just lags the series by one step; it computes no window statistic at all.
 - [o] \`expanding()\`
   > An expanding window grows from the first observation, so at each point it summarizes every value seen so far, the running/cumulative view.
 
@@ -639,4 +640,5 @@ unseen, and that's next.
 <Figure
   slug="tsa-rolling-and-expanding-windows-first-looking-backward-inline-cutout"
   alt="A rail of blocks with every block slid one sleeper to the right, leaving the first sleeper bare"
+  caption="Shifting moves every value one sleeper along, so today can see yesterday."
 />

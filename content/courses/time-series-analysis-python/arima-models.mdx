@@ -1,25 +1,28 @@
 ---
-title: "AR, MA, and ARIMA Models"
-description: Building AR, MA, ARMA, and ARIMA models with statsmodels, what each part means, why an MA model is not a moving average, choosing (p,d,q) from ACF/PACF, fitting and forecasting with widening uncertainty, and reading residual diagnostics.
+title: "Autoregressive, Moving-Average, and ARIMA Models"
+description: Building autoregressive, moving-average and ARIMA models with statsmodels, what each part means, why a moving-average model is not a moving average, choosing (p,d,q) from the autocorrelation plots, fitting and forecasting with widening uncertainty, and reading residual diagnostics.
 ---
 
 Everything so far has been preparation. We learned to make a series
-stationary (differencing) and to read its echoes (ACF/PACF). Now we assemble
-those skills into the workhorses of classical forecasting: **AR**, **MA**,
-**ARMA**, and their union **ARIMA**. By the end you'll fit one, read its
-output, and produce a forecast with honest uncertainty bands.
+stationary (differencing) and to read its echoes (the autocorrelation
+plots). Now we assemble those skills into the workhorses of classical
+forecasting: the **autoregressive** and **moving-average** models, the
+**ARMA** that combines them, and the **ARIMA** that adds differencing on
+top. By the end you'll fit one, read its output, and produce a forecast
+with honest uncertainty bands.
 
 <Figure
   slug="tsa-arima-cutout"
   alt="Three interlocking gear blocks on a platform feeding one forecast ribbon that fans into a widening uncertainty cone"
 />
 
-## The two ingredients: AR and MA
+## The two ingredients: autoregressive and moving-average
 
 An ARIMA model is built from two simple ideas about where the next value
 comes from.
 
-**AR(p), autoregressive.** "Regress the series on its own recent *values*."
+**Autoregressive, written AR(p).** "Regress the series on its own recent
+*values*."
 Each value is a weighted sum of the last $p$ values plus a random shock:
 
 $$
@@ -30,7 +33,8 @@ This captures **momentum / persistence**: a high value tends to be followed
 by another high value. The $\varphi$ weights say how strongly the past pulls the
 present.
 
-**MA(q), moving average.** "Regress the series on its own recent *shocks*."
+**Moving-average, written MA(q).** "Regress the series on its own recent
+*shocks*."
 Each value is the current shock plus a weighted sum of the last $q$ shocks
 (the past forecast errors):
 
@@ -107,6 +111,7 @@ print("Both recovered the true coefficients closely. The model 'learned the rule
 <Figure
   slug="tsa-arima-models-inline-cutout"
   alt="Three small machines feeding one output, one looking back at past values, one at past errors, one at the trend"
+  caption="Three machines, three letters: recent values, recent errors, and the trend."
 />
 
 ```mermaid
@@ -120,23 +125,24 @@ So the three numbers are exactly the three skills from the last pages:
 
 | Parameter | Meaning | How you choose it |
 | --- | --- | --- |
-| **`p`** | AR order (past values) | the **PACF** cut-off lag |
-| **`d`** | differences for stationarity | how many differences make ADF pass |
-| **`q`** | MA order (past shocks) | the **ACF** cut-off lag |
+| **`p`** | autoregressive order (past values) | the **partial autocorrelation** cut-off lag |
+| **`d`** | differences for stationarity | how many differences make the stationarity test pass |
+| **`q`** | moving-average order (past shocks) | the **autocorrelation** cut-off lag |
 
 <Callout type="info" title="The Box-Jenkins workflow">
 The classical recipe for building an ARIMA, named after the statisticians
 who formalized it:
 
 1. **Stationarize**, transform (log) and difference until stationary → `d`.
-2. **Identify**, read the ACF/PACF of the stationary series → `p`, `q`.
+2. **Identify**, read the autocorrelation and partial autocorrelation of
+   the stationary series → `p`, `q`.
 3. **Fit**, estimate the model.
 4. **Diagnose**, check the residuals are white noise; if not, revise.
 5. **Forecast**, project forward with uncertainty.
 
 ```mermaid
 flowchart TD
-    A["Stationarize<br/>(log, difference) → d"] --> B["Identify p and q<br/>from PACF and ACF"]
+    A["Stationarize<br/>(log, difference) → d"] --> B["Identify p and q<br/>from the two autocorrelation plots"]
     B --> C["Fit ARIMA(p, d, q)"]
     C --> D{"Residuals look<br/>like white noise?"}
     D -->|"no: structure remains"| B
@@ -154,6 +160,7 @@ horizon.
 <Figure
   slug="tsa-arima-models-fitting-forecasting-inline-cutout"
   alt="A wave running along a rail and continuing past its last sleeper as a lighter dotted extension"
+  caption="The dotted stretch past the last sleeper is the forecast: same wave, nothing observed."
 />
 
 <Chart slug="forecast-uncertainty-cone" />
@@ -232,10 +239,10 @@ stretching years into the future, is hiding how little it really knows.
 Always look at the bands, not just the central line.
 </Callout>
 
-## Choosing orders with AIC (and its limits)
+## Choosing orders by information criterion (and its limits)
 
-ACF/PACF suggest candidate orders, but often several are plausible. The
-**AIC** (Akaike Information Criterion) scores a fitted model by its fit
+The autocorrelation plots suggest candidate orders, but often several are
+plausible. The **Akaike information criterion** (AIC) scores a fitted model by its fit
 *penalized* for complexity, **lower is better**. It's a fast way to compare
 candidate `(p, d, q)` orders.
 
@@ -295,6 +302,7 @@ bundles the standard four-panel check.
 <Figure
   slug="tsa-arima-models-two-ingredients-ar-inline-cutout"
   alt="Two machines feeding one output, one looking back at past blocks and one at past mistakes"
+  caption="Diagnosing residuals asks whether anything is left over that a third machine could have used."
 />
 
 <CodeBlock
@@ -342,11 +350,13 @@ print("under-fits this series -- a SEASONAL model (SARIMA) is what it's asking f
   ]}
 />
 
-The residual ACF still has a spike near lag 12, the yearly seasonality plain
-ARIMA can't capture. That's the residual diagnostic doing its job: telling
-you the model is incomplete and pointing at *seasonality* as the culprit.
-The fix is a **seasonal** ARIMA (SARIMA), which adds seasonal AR/I/MA terms
-at the period, conceptually just "do the AR/I/MA trick at lag 12 too."
+The residual autocorrelation still has a spike near lag 12, the yearly
+seasonality a plain ARIMA can't capture. That's the residual diagnostic
+doing its job: telling you the model is incomplete and pointing at
+*seasonality* as the culprit.
+The fix is a **seasonal** ARIMA, usually written SARIMA, which repeats each
+of the three parts at the seasonal period, conceptually just "do the same
+trick at lag 12 too."
 
 <MultipleChoice
   markdown={`A teammate says, "I'll use an MA(2) model, that's just a 2-period moving average of the data, right?" What's the correction?
@@ -370,8 +380,8 @@ An MA(q) model is built from past shocks/errors; it is not a rolling average of 
   > PACF -> AR order \`p\`, ACF -> MA order \`q\`, and \`d\` is the number of differences needed for stationarity. That mapping is the heart of order identification.
 - Both \`p\` and \`q\` from the ACF
   > The ACF alone can't separate AR from MA order; that's exactly why the PACF exists. \`p\` comes from the PACF, \`q\` from the ACF.
-- \`d\` from the ACF and \`p\`, \`q\` from AIC only
-  > \`d\` comes from stationarity testing (differencing), not the ACF shape directly; and \`p\`/\`q\` are identified from PACF/ACF (with AIC as a tie-breaker), not AIC alone.
+- \`d\` from the autocorrelation plot and \`p\`, \`q\` from the information criterion only
+  > \`d\` comes from stationarity testing (differencing), not the autocorrelation shape directly; and \`p\`/\`q\` are identified from the two autocorrelation plots, with the information criterion only as a tie-breaker.
 - \`p\` from the ACF, \`q\` from the PACF
   > This is reversed. The PACF cut-off gives the AR order \`p\`; the ACF cut-off gives the MA order \`q\`.
 
@@ -560,13 +570,13 @@ AIC compares in-sample fit-vs-complexity; forecast accuracy requires out-of-samp
   **shocks** (errors). An **MA model is *not* a rolling mean**, same name,
   different thing.
 - **ARIMA(p, d, q)** = AR + `d` differences + MA, integrating forecasts back
-  to the original scale. Read **`p` from the PACF**, **`q` from the ACF**,
-  **`d` from differencing**.
+  to the original scale. Read **`p` from the partial autocorrelation**,
+  **`q` from the autocorrelation**, **`d` from differencing**.
 - Fit with `ARIMA(series, order=(p,d,q)).fit()`; forecast with
   `.forecast(steps)` or `.get_forecast(steps).conf_int()`. Intervals
   **widen** with the horizon, uncertainty compounds.
-- **AIC** (lower is better) shortlists orders but is **in-sample**, never a
-  substitute for out-of-sample testing.
+- The **Akaike information criterion** (lower is better) shortlists orders
+  but is **in-sample**, never a substitute for out-of-sample testing.
 - **Check residuals**: leftover structure (e.g. a lag-12 spike) means the
   model is incomplete, seasonality calls for a **seasonal** ARIMA.
 </Callout>

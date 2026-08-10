@@ -23,6 +23,8 @@ import {
 } from "fumadocs-ui/page";
 import { interviewSource } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
+import { BlockOutputsProvider } from "@/app/_components/mdx/BlockOutputs";
+import { lessonBlockOutputs } from "@/lib/blockOutputs";
 import { OG_IMAGE } from "@/lib/site";
 import { getCourseMeta } from "@/lib/courseMeta";
 import { JsonLd } from "@/app/_components/JsonLd";
@@ -95,7 +97,15 @@ export default async function InterviewPage(props: InterviewPageProps) {
         </DocsDescription>
       ) : null}
       <DocsBody>
-        <MDX components={getMDXComponents()} />
+        {/* Output this lesson's runnable blocks produced when the site was
+            built, so the page reads end to end before anyone presses Run.
+            Only this lesson's slice crosses to the client; the manifest
+            itself stays on the server. */}
+        <BlockOutputsProvider
+          outputs={lessonBlockOutputs(`content/interview/${page.path}`)}
+        >
+          <MDX components={getMDXComponents()} />
+        </BlockOutputsProvider>
       </DocsBody>
     </DocsPage>
   );

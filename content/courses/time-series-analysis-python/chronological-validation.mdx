@@ -1,6 +1,6 @@
 ---
 title: "Chronological Validation"
-description: Why a random train/test split is catastrophic for time series, how to evaluate forecasts honestly with chronological splits and walk-forward backtesting, the MAE/RMSE/MAPE metrics coded by hand, and the many sneaky ways the future leaks into the past.
+description: Why a random train/test split is catastrophic for time series, how to evaluate forecasts honestly with chronological splits and walk-forward backtesting, the three standard error metrics coded by hand, and the many sneaky ways the future leaks into the past.
 ---
 
 This is the most important page in the course. You can fit a flawless ARIMA
@@ -24,7 +24,7 @@ this entire course, make it this.
 
 ## The cardinal sin: a random split
 
-The default split in nearly every ML tutorial, shuffle the rows, take 80%
+The default split in nearly every machine-learning tutorial, shuffle the rows, take 80%
 for training and 20% for testing, is **catastrophic** for time series. When
 you randomly assign rows, a test point from March ends up *surrounded in the
 training set* by February and April. The model gets to peek at both sides of
@@ -117,15 +117,18 @@ split didn't measure forecasting; it measured interpolation.**
 Random folds mix future into training, leaking information; time series needs splits that keep train strictly before test.`}
 />
 
-## Measuring error honestly: MAE, RMSE, MAPE
+## Measuring error honestly: three standard metrics
 
 Once you have an honest chronological forecast, you need a number for "how
-close." Three metrics dominate, and each makes a different trade-off. Code
-them by hand once and you'll never misread them again.
+close." Three metrics dominate, and each makes a different trade-off: the
+**mean absolute error** (MAE), the **root mean squared error** (RMSE), and
+the **mean absolute percentage error** (MAPE). Code them by hand once and
+you'll never misread them again.
 
 <Figure
   slug="tsa-chronological-validation-measuring-error-honestly-inline-cutout"
   alt="Short sticks measuring the gap between a forecast ribbon and the actual chips beneath it"
+  caption="Same gaps, three metrics: each is a different rule for summarizing these sticks."
 />
 
 <CodeBlock
@@ -195,6 +198,7 @@ in every fold: **train is always strictly before test.**
 <Figure
   slug="tsa-chronological-validation-cardinal-sin-random-inline-cutout"
   alt="A timeline being shuffled like cards, a large cross drawn over the shuffled pile"
+  caption="Shuffling is the one move a time series forbids."
 />
 
 | Fold | Train (the past) | Test (the future) |
@@ -297,14 +301,14 @@ it won't have at prediction time:
   min/max) over the *entire* series, including the test portion, leaks the
   future's distribution into training. Fit the scaler on **train only**.
 - **Future-aware feature engineering.** Centered rolling windows, `shift(-k)`
-  leads, `bfill`, and linear interpolation all read *future* values. Safe for
+  leads, `bfill()`, and linear interpolation all read *future* values. Safe for
   retrospective charts, leakage as model inputs.
 - **Imputation or decomposition on the full series.** Filling gaps or
   decomposing using all the data lets test-period values influence training.
 - **Tuning on the test set.** If you pick `(p, d, q)` by trying many options
   and keeping the one with the best *test* score, the test set has trained
-  your choices. You need a separate **validation** set (or nested CV); the
-  final test set is looked at **once**.
+  your choices. You need a separate **validation** set (or a nested
+  cross-validation); the final test set is looked at **once**.
 
 <CodeBlock
   adapter="python"
@@ -689,10 +693,11 @@ Choosing a model by its test-set score lets the test set tune you; use a separat
 
 You now have every piece: shaping a timeline, reshaping its resolution,
 handling gaps, decomposing structure, achieving stationarity, reading
-ACF/PACF, fitting ARIMA, and, above all, validating honestly. The capstone
-threads them into one end-to-end pipeline.
+the autocorrelation plots, fitting an ARIMA, and, above all, validating
+honestly. The capstone threads them into one end-to-end pipeline.
 
 <Figure
   slug="tsa-chronological-validation-inline-cutout"
   alt="A timeline cut once, everything left of the cut used for fitting and everything right of it sealed, with no shuffling anywhere"
+  caption="Cut the timeline once: fit on the left, and leave the right sealed until you score."
 />

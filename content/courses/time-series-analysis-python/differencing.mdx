@@ -88,6 +88,7 @@ has no trend.
 <Figure
   slug="tsa-differencing-inline-cutout"
   alt="A rising line of blocks on the left, and on the right the gaps between consecutive blocks drawn as short bars around a flat centre"
+  caption="Differencing measures gaps, not heights, so a steady rise flattens to a level line."
 />
 
 <CodeBlock
@@ -169,7 +170,8 @@ print("hump survived. First differencing removed the trend, not the season.")
   ]}
 />
 
-The trend is gone after one difference, and the ADF p-value collapses. But
+The trend is gone after one difference, and the stationarity test's p-value
+collapses. But
 look closely: a *seasonal* wobble remains. First differencing removes the
 **trend**, not the **seasonality**, those need a different cut.
 
@@ -245,9 +247,9 @@ print("no yearly cycle, and a stable spread -- ready for an ARIMA-style model.")
   ]}
 />
 
-<Callout type="info" title="This is exactly what SARIMA automates">
+<Callout type="info" title="This is exactly what a seasonal ARIMA automates">
 The recipe "log, then a regular difference, then a seasonal difference" is
-what a *seasonal* ARIMA (SARIMA) encodes in its orders. We'll keep our hands
+what a *seasonal* ARIMA, usually written SARIMA, encodes in its orders. We'll keep our hands
 on the wheel with plain ARIMA and pre-difference manually, but know that the
 `d` (regular differences) and `D` (seasonal differences) parameters are just
 this page, parameterized. Differencing isn't a side-trick, it's half of
@@ -265,6 +267,7 @@ that went *up* instead of down.
 <Figure
   slug="tsa-differencing-differencing-inline-cutout"
   alt="A rising row of blocks with the gaps between neighbours drawn beneath as short bars around a flat centre"
+  caption="One difference already flattens this row; a second would only add noise."
 />
 
 <CodeBlock
@@ -383,7 +386,7 @@ The "I" means the model operates on differenced data and integrates (cumulativel
 <ChallengeCard
   adapter="python"
   title="Difference by hand, the seasonal way"
-  instructions={`The airline \`air\` series is loaded. Without using \`.diff()\`, build the **seasonal difference** at period 12 using \`shift\`: \`seasonal(t) = air(t) - air(t-12)\`. Call it \`manual_sdiff\`.
+  instructions={`The airline \`air\` series is loaded. Without using \`.diff()\`, build the **seasonal difference** at period 12 using \`shift()\`: \`seasonal(t) = air(t) - air(t-12)\`. Call it \`manual_sdiff\`.
 
 Then confirm it equals the built-in \`air.diff(12)\` by setting \`matches\` to \`True\` if they're equal everywhere both are defined (drop NaNs before comparing).`}
   files={[

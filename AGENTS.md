@@ -792,6 +792,50 @@ Manifests live in `node_modules/.cache/dataslope-build/`, so `npm ci` wipes
 them and the first run after an install regenerates everything — which is when
 it should.
 
+### Prepopulated code-block output
+
+`build-block-outputs` is the one generator in the chain that *executes*
+content rather than parsing it. It boots the same Pyodide-in-Node the content
+sweeps use, runs every Python `<CodeBlock>`, and records what it printed so a
+lesson shows its output before the reader presses Run.
+
+Three things about it are worth knowing before you touch it:
+
+- **Its output is committed, and it reuses what is committed.** Executing
+  1,689 blocks costs ~12 minutes, which is the wrong thing to spend on every
+  deploy for an answer that only changes when a lesson does. So
+  `lib/generated/block-outputs.json` and `public/block-outputs/` are in git,
+  kept current by `.github/workflows/block-outputs.yml`, and the generator
+  reuses committed entries key-for-key. Keys are content hashes, so an entry
+  that exists is an entry that is still correct — which means a `build`
+  against a current manifest re-verifies it in under a second and never
+  boots Pyodide at all. It stays in the `build` chain as a safety net: if
+  the workflow lags, the deploy fills the gaps itself rather than shipping a
+  lesson with holes in it.
+- **Reuse is also what keeps the committed assets from churning.**
+  Matplotlib's PNG bytes are not reproducible run to run, so re-executing
+  everything would rewrite all ~370 files on every regeneration for no
+  change in what a reader sees.
+- **Charts are files, not payload.** Between them they were nearly the whole
+  weight: base64 PNG was 98% of the first measured manifest, and once the
+  images were out, Plotly JSON was 88% of what remained. Both go to
+  `public/block-outputs/` and the manifest carries a URL, which is why
+  `OutputCell` has an optional `src`; figures are fetched by an
+  `IntersectionObserver`, so a chart nobody scrolls to costs nothing. A
+  *run's* own charts still arrive inline.
+- **Entries are keyed by a hash of the block's source** (`lib/blockOutputKey.ts`),
+  never by file and line. An edited block loses its entry and falls back to
+  the empty panel; a positional key would confidently show output the code no
+  longer produces, which is the one failure mode this feature cannot have.
+
+The Python capture shim (`scripts/lib/python-output-capture.mjs`) is a second
+implementation of what `pyodide-worker.ts` does at run time, and it has to
+stay in step with it — including the end-of-run figure auto-flush, without
+which every `sns.histplot(...)` block records nothing while the browser draws
+a chart. The JS half of the conversion is *shared* rather than copied
+(`app/_components/runtime/pythonDisplayOutputs.ts`), so only the Python half
+can drift.
+
 ## Prose style
 
 Enforced by `npm run check:prose` (`scripts/check-prose.mjs`) and by

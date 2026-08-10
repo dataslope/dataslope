@@ -19,6 +19,7 @@
 // thread (see message types below).
 
 import type { PyodideInterface } from "pyodide";
+import { toOutputCells } from "./pythonDisplayOutputs";
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -252,23 +253,9 @@ async function ensureMicropipPackages(code: string): Promise<void> {
   }
 }
 
-interface PyDisplayDataframe { type: "dataframe"; html: string }
-interface PyDisplayHtml { type: "html"; html: string }
-interface PyDisplayImage { type: "image"; data: string }
-interface PyDisplayStdout { type: "stdout"; text: string }
-interface PyDisplayStderr { type: "stderr"; text: string }
-interface PyDisplayPlot { type: "plot"; json: string }
-type PyDisplayOutput =
-  | PyDisplayDataframe
-  | PyDisplayHtml
-  | PyDisplayImage
-  | PyDisplayStdout
-  | PyDisplayStderr
-  | PyDisplayPlot;
-
-function isPyDisplayOutputs(v: unknown): v is PyDisplayOutput[] {
-  return Array.isArray(v);
-}
+// The wire shape and its conversion into `OutputCell`s live in
+// `pythonDisplayOutputs.ts`, shared with `scripts/build-block-outputs.mjs`
+// so a prepopulated output panel and a freshly-run one render identically.
 
 async function initPyodide(): Promise<void> {
   post({ kind: "loading", message: "Loading Python runtime…", fraction: 0.06 });
@@ -920,29 +907,11 @@ if _plt is not None:
     if (stdout.trim()) post({ kind: "output", id, cell: { type: "stdout", content: stdout.trim() } });
     if (stderr.trim()) post({ kind: "output", id, cell: { type: "stderr", content: stderr.trim() } });
 
-    if (!isPyDisplayOutputs(displayOutputsRaw)) return;
-    for (const out of displayOutputsRaw) {
-      if (out.type === "dataframe" || out.type === "html") {
-        post({ kind: "output", id, cell: { type: "html", content: out.html } });
-      } else if (out.type === "image") {
-        post({ kind: "output", id, cell: { type: "image", content: out.data } });
-      } else if (out.type === "stdout" || out.type === "stderr") {
-        const text = out.text.trim();
-        if (text) post({ kind: "output", id, cell: { type: out.type, content: text } });
-      } else if (out.type === "plot") {
-        try {
-          const fig = JSON.parse(out.json) as {
-            data: unknown[];
-            layout?: Record<string, unknown>;
-            // `animation_frame=` figures carry their frames here; the
-            // renderer needs them or the play button and slider are inert.
-            frames?: unknown[];
-          };
-          post({ kind: "output", id, cell: { type: "plot", content: out.json, plot: fig } });
-        } catch {
-          /* malformed figure JSON, skip the cell */
-        }
-      }
+    // `animation_frame=` figures carry their frames through the shared
+    // converter; the renderer needs them or the play button and the
+    // slider are inert.
+    for (const cell of toOutputCells(displayOutputsRaw)) {
+      post({ kind: "output", id, cell });
     }
   };
 

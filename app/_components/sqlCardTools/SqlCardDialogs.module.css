@@ -1,0 +1,92 @@
+/* Dialogs opened from the learn-route SQL cards' tools menu (ER diagram,
+   DDL viewer). The shell — backdrop, card, header, icon buttons — is
+   reused from `ChallengeCard.module.css` so these read as the same
+   family as the reference-solution modal; this file only adds the two
+   bodies and the token bridge the ER canvas needs. */
+
+/* Both dialogs are taller than the solution modal: a schema graph and a
+   full CREATE script are both scroll-heavy, and a short box turns either
+   into a keyhole. */
+.toolModalCard {
+  max-width: 960px;
+  height: 80vh;
+  max-height: 80vh;
+}
+
+/* ── ER diagram body ──────────────────────────────────────────────────
+   `ErDiagramPane` is written against the playground's palette variables
+   (--bg, --border, --text, …). It is loaded here without the playground
+   stylesheet that normally defines them, so the canvas host republishes
+   the card's own --ch-* tokens under those names. That is what makes the
+   diagram follow the lesson's light/dark theme instead of the
+   playground's fixed dark one. */
+.erHost {
+  --bg: var(--ch-bg);
+  --bg2: var(--ch-bg-subtle);
+  --bg3: var(--ch-bg-muted);
+  --border: var(--ch-border);
+  --text: var(--ch-text);
+  --text-dim: var(--ch-text-muted);
+  --text-muted: var(--ch-text-secondary);
+  --primary: var(--ch-accent);
+  --accent1: var(--ch-accent);
+  --font-ui: var(--ch-font-ui);
+
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: var(--ch-bg);
+}
+
+/* ── DDL body ─────────────────────────────────────────────────────────
+   `DdlViewer` mounts a read-only CodeMirror into a `.sql-ddl-code-wrap`
+   div it owns, so the frame around it is styled through :global. */
+.ddlBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 18px 18px;
+}
+
+.ddlBody :global(.sql-ddl-code-wrap) {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--ch-border-light);
+  border-radius: 6px;
+  background: var(--ch-bg);
+}
+
+.ddlBody :global(.cm-editor) {
+  height: 100%;
+  background: transparent;
+  font-size: 13px;
+}
+
+.ddlBody :global(.cm-scroller) {
+  font-family: var(--ch-font-mono);
+}
+
+/* ── Shared states ────────────────────────────────────────────────── */
+
+.dialogStatus {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  font-size: 13px;
+  color: var(--ch-text-muted);
+  font-family: var(--ch-font-ui);
+  text-align: center;
+}
+
+.dialogFootnote {
+  padding: 10px 18px;
+  border-top: 1px solid var(--ch-border-light);
+  font-size: 12px;
+  color: var(--ch-text-muted);
+  font-family: var(--ch-font-ui);
+}

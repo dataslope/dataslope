@@ -4,7 +4,8 @@ description: What stationarity means in plain language, why classical models lik
 ---
 
 Stationarity is the gatekeeper concept of classical forecasting. Almost
-every model on the pages ahead, AR, MA, ARMA, ARIMA, *assumes* it, and if
+every model on the pages ahead, the autoregressive and moving-average
+families and the ARIMA that unites them, *assumes* it, and if
 you skip the check, you'll fit a model to conditions that won't hold and get
 a confident, wrong forecast. The good news: the idea is far more intuitive
 than its intimidating name.
@@ -54,6 +55,7 @@ stationary series next to both.
 <Figure
   slug="tsa-stationarity-inline-cutout"
   alt="Two tracks side by side, the near one drifting steadily upward off its rail and the far one wobbling around a fixed centre line"
+  caption="The wobbling track keeps returning to a centre; the drifting one has none to return to."
 />
 
 <CodeBlock
@@ -200,6 +202,7 @@ the 5% critical value → stationary**, agrees with the p-value.
 <Figure
   slug="tsa-stationarity-stationary-actually-means-inline-cutout"
   alt="Two tracks, one drifting steadily upward and one wobbling around a level line"
+  caption="The test answers with a number what your eye already suspects from the chart."
 />
 
 Now the airline series, which we've been calling non-stationary all along:
@@ -303,7 +306,7 @@ airline series' growing, strongly seasonal swing needs more work. Same
 test, same logic, different answers, because the data is different.
 
 <MultipleChoice
-  markdown={`You run \`adfuller\` on a series and get a p-value of **0.78**. What do you conclude?
+  markdown={`You run \`adfuller()\` on a series and get a p-value of **0.78**. What do you conclude?
 
 - The series is definitely a random walk
   > High p is *consistent* with a random walk but doesn't prove that specific model, only that stationarity couldn't be established. "Non-stationary" is the right, careful conclusion.
@@ -344,8 +347,9 @@ statistics, never instead of them:
 - **Failing to reject is not proof of non-stationarity.** Like all such
   tests, ADF has limited *power* on short series, it may simply lack the
   evidence to reject, which is weaker than proving the null.
-- There are companion tests (KPSS flips the hypotheses; running both and
-  cross-checking is common practice). For this course, ADF plus a careful
+- There are companion tests (the Kwiatkowski-Phillips-Schmidt-Shin test
+  flips the hypotheses; running both and cross-checking is common
+  practice). For this course, Augmented Dickey-Fuller plus a careful
   look at the plot and rolling mean/variance is enough.
 
 ```mermaid
@@ -365,7 +369,7 @@ flowchart TD
 <ChallengeCard
   adapter="python"
   title="Run the ADF test and read it correctly"
-  instructions={`Two series are loaded: \`noise\` (white noise) and \`walk\` (a random walk). Use \`adfuller\` to fill a dict \`adf\` with:
+  instructions={`Two series are loaded: \`noise\` (white noise) and \`walk\` (a random walk). Use \`adfuller()\` to fill a dict \`adf\` with:
 
 - \`"noise_p"\`, the ADF p-value for \`noise\` (a float)
 - \`"walk_p"\`, the ADF p-value for \`walk\` (a float)

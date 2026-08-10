@@ -9,7 +9,8 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { ChevronDown, ChevronUp, File, Lock, Play, RotateCcw } from "lucide-react";
+import { ChevronDown, ChevronUp, File, Info, Lock, Play, RotateCcw } from "lucide-react";
+import { Popover } from "@base-ui/react/popover";
 import { Toast } from "@base-ui/react/toast";
 import {
   FormatIcon,
@@ -48,7 +49,12 @@ import { describeCodeBlock } from "./ai/widgetSnapshots";
 import { aiInlineCompletion } from "./ai/inlineCompletion";
 import { languageCompletion } from "./completion/languageCompletion";
 
-import type { LanguageAdapter, LanguageRuntime, OutputCell } from "./types";
+import type {
+  LanguageAdapter,
+  LanguageRuntime,
+  OutputCell,
+  PlotlyFigure,
+} from "./types";
 import {
   getSharedRuntime,
   isRuntimeReady,
@@ -69,6 +75,8 @@ import {
   persistKey,
   savePersistedCode,
 } from "./codePersistence";
+import { usePrepopulatedOutput } from "./mdx/BlockOutputs";
+import { blockOutputKey } from "@/lib/blockOutputKey";
 import styles from "./CodeBlock.module.css";
 import challengeStyles from "./ChallengeCard.module.css";
 
@@ -346,7 +354,37 @@ function CodeBlockInner({
     report: reportPrepare,
     reset: resetPrepare,
   } = useMidRunPreparing();
-  const [outputs, setOutputs] = useState<OutputCell[]>([]);
+  // ─── Prepopulated output ────────────────────────────────────────────
+  // What this block printed when the site was built (see
+  // `scripts/build-block-outputs.mjs`), so the lesson reads end to end
+  // without the reader pressing anything. Seeded once, into the same state
+  // a real run writes, so every downstream consumer — the copy button, the
+  // Ask AI snapshot, the renderer — sees ordinary cells and needs no
+  // knowledge that these arrived early. The first Run clears them.
+  // Keyed on the *entry* file, the one whose code actually runs, mirroring
+  // `resolvedEntryFilename` below (which is computed further down, so the
+  // same fallback is spelled out rather than reused). A multi-file block
+  // with an explicit `entryFilename` would otherwise be keyed on a file the
+  // generator never executed.
+  const entryFile =
+    (entryFilename ? files?.find((f) => f.filename === entryFilename) : null) ??
+    files?.[0];
+  const prepopulated = usePrepopulatedOutput(
+    blockOutputKey(adapter.id, entryFile?.initCode, entryFile?.starterCode ?? ""),
+  );
+  // Negative ids so a prepopulated cell can never collide with a run's own
+  // (which count up from 1).
+  const seedOutputs = useCallback(
+    (): OutputCell[] =>
+      prepopulated
+        ? prepopulated.cells.map((cell, i) => ({ ...cell, id: -(i + 1), elapsed: "" }))
+        : [],
+    [prepopulated],
+  );
+  const [outputs, setOutputs] = useState<OutputCell[]>(seedOutputs);
+  // True until the reader runs the block themselves, which is what the
+  // "preview" label and its explanation hang off.
+  const [showingPreview, setShowingPreview] = useState(prepopulated !== null);
   const [initExpanded, setInitExpanded] = useState(false);
   const [isFormatting, setIsFormatting] = useState(false);
 
@@ -803,7 +841,10 @@ function CodeBlockInner({
     const code = effectiveSourceFor(resolvedEntryFilename, entrySource);
     const mySeq = ++runSeqRef.current;
 
+    // The reader is running it themselves now, so the prepopulated cells go
+    // and the panel stops calling itself a preview.
     setOutputs([]);
+    setShowingPreview(false);
     setBootCold(!isRuntimeReady(RuntimeScope.Fumadocs, adapter.id));
     setBootFraction(null);
     resetPrepare();
@@ -1091,7 +1132,12 @@ function CodeBlockInner({
       window.clearTimeout(persistSaveTimerRef.current);
       persistSaveTimerRef.current = null;
     }
-    setOutputs([]);
+    // Reset puts the block back to how it arrived, which includes its
+    // output: the starter code is restored, and the prepopulated cells are
+    // exactly what that code prints, so showing them again is the honest
+    // state rather than an empty panel.
+    setOutputs(seedOutputs());
+    setShowingPreview(prepopulated !== null);
     // Reset also tears down the live preview, removing the iframe
     // kills its document (scripts, timers, listeners) immediately.
     previewHostRef.current?.replaceChildren();
@@ -1104,6 +1150,8 @@ function CodeBlockInner({
     workspaceFiles,
     persistedKeyForFile,
     toastManager,
+    seedOutputs,
+    prepopulated,
   ]);
 
   const MIN_FORMAT_MS = 300;
@@ -1228,7 +1276,7 @@ function CodeBlockInner({
       data-adapter={adapter.id}
       data-expect-error={expectError ? "true" : undefined}
     >
-      <div className={challengeStyles.header}>
+      <div className={`${challengeStyles.header} ${challengeStyles.headerCompact}`}>
         <div className={challengeStyles.headerRow}>
           <div className={challengeStyles.badge}>
             <Play size={9} aria-hidden /> Code Block
@@ -1539,7 +1587,9 @@ function CodeBlockInner({
               animation) is showing, there's no output yet, just setup.
               It returns the moment user code actually runs. */}
           {!showBootNotice && (
-            <div className={challengeStyles.outputHeader}>
+            <div
+              className={`${challengeStyles.outputHeader} ${challengeStyles.outputHeaderSpaced}`}
+            >
               <div
                 className={challengeStyles.accentBar}
                 data-error={outputs.some((c) => c.type === "stderr")}
@@ -1548,8 +1598,43 @@ function CodeBlockInner({
                 className={challengeStyles.outputLabel}
                 data-error={outputs.some((c) => c.type === "stderr")}
               >
-                Output
+                {showingPreview ? "Output preview" : "Output"}
               </span>
+              {/* The label is where the honesty lives: this output came from
+                  running the code when the page was built, not from the
+                  reader's browser, so a block using randomness or the clock
+                  will print something else when they press Run. Every
+                  prepopulated panel says "preview", not just the ones we
+                  suspect are non-deterministic — sorting one from the other
+                  is a losing game, and one label that is always true beats a
+                  cleverer one that is sometimes wrong. The popover carries
+                  the "why", for whoever wants it. */}
+              {showingPreview && (
+                <Popover.Root>
+                  <Popover.Trigger
+                    className={styles.previewInfoBtn}
+                    aria-label="About this output preview"
+                  >
+                    <Info size={12} strokeWidth={2.2} aria-hidden />
+                  </Popover.Trigger>
+                  <Popover.Portal>
+                    <Popover.Positioner
+                      sideOffset={6}
+                      className={styles.previewInfoPositioner}
+                    >
+                      <Popover.Popup className={styles.previewInfoPopup}>
+                        This output was produced by running the code above when
+                        the page was built, so you can read the result without
+                        running anything yourself. Press <strong>Run</strong> to
+                        execute it in your browser, where you can edit the code
+                        and watch the output change. Code that uses randomness
+                        or the current time will print something different each
+                        run.
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
+              )}
               <span className={styles.outputHeaderRight}>
                 {outputElapsed && (
                   <span className={challengeStyles.outputTime}>
@@ -1649,6 +1734,64 @@ async function copyToClipboard(text: string): Promise<boolean> {
  *  `data-cell-type` attribute the per-cell rendering used to carry, so
  *  tests and tooling can keep counting stdout/stderr/html/image/plot
  *  outputs. */
+/**
+ * A prepopulated Plotly figure, fetched when it nears the viewport.
+ *
+ * Deferring on visibility rather than on mount matters here: the output
+ * panels are server-rendered, so every chart on a lesson would otherwise
+ * fetch its figure the moment the page hydrates, which is the cost this
+ * indirection exists to avoid. `PlotlyChart` then loads plotly.js itself,
+ * so nothing about a chart the reader never reaches is downloaded.
+ */
+function LazyPlotCell({ src }: { src: string }) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const [figure, setFigure] = useState<PlotlyFigure | null>(null);
+
+  useEffect(() => {
+    const el = hostRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      // No observer (older browser, jsdom): fetch straight away rather than
+      // leave the panel permanently blank.
+      void fetch(src)
+        .then((r) => r.json())
+        .then(setFigure)
+        .catch(() => {});
+      return;
+    }
+    let cancelled = false;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        observer.disconnect();
+        void fetch(src)
+          .then((r) => r.json())
+          .then((fig) => {
+            if (!cancelled) setFigure(fig as PlotlyFigure);
+          })
+          // A figure that fails to load leaves an empty slot, which is the
+          // same thing the reader saw before any of this existed.
+          .catch(() => {});
+      },
+      { rootMargin: "400px" },
+    );
+    observer.observe(el);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [src]);
+
+  return (
+    <div
+      ref={hostRef}
+      className={challengeStyles.outCellPlot}
+      data-cell-type="plot"
+    >
+      {figure ? <PlotlyChart figure={figure} /> : null}
+    </div>
+  );
+}
+
 function OutputSegment({ cell }: { cell: OutputCell }) {
   if (cell.type === "html") {
     // Same trust assumption as the main playground: HTML cells are
@@ -1665,23 +1808,38 @@ function OutputSegment({ cell }: { cell: OutputCell }) {
     );
   }
   if (cell.type === "image") {
+    // A run's own figure arrives as base64 and is drawn from memory; a
+    // prepopulated one carries a `src` instead and is fetched lazily, so a
+    // reader who never scrolls this far pays nothing for it.
     return (
       <div className={challengeStyles.outCellImage} data-cell-type="image">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={`data:image/png;base64,${cell.content}`}
+          src={cell.src ?? `data:image/png;base64,${cell.content}`}
           alt="Chart generated by the code above"
           style={{ maxWidth: "100%" }}
+          loading={cell.src ? "lazy" : undefined}
+          decoding={cell.src ? "async" : undefined}
         />
       </div>
     );
   }
-  if (cell.type === "plot" && cell.plot) {
-    return (
-      <div className={challengeStyles.outCellPlot} data-cell-type="plot">
-        <PlotlyChart figure={cell.plot} />
-      </div>
-    );
+  if (cell.type === "plot") {
+    // A run's own figure arrives parsed; a prepopulated one carries a `src`
+    // and is fetched when it scrolls into view. Figure JSON is the single
+    // heaviest thing these panels hold — 88% of the manifest's inline bytes
+    // before this, and 146 kB to 866 kB on the charts that had to be
+    // dropped entirely — so it is kept out of the page the same way the
+    // images are.
+    if (cell.plot) {
+      return (
+        <div className={challengeStyles.outCellPlot} data-cell-type="plot">
+          <PlotlyChart figure={cell.plot} />
+        </div>
+      );
+    }
+    if (cell.src) return <LazyPlotCell src={cell.src} />;
+    return null;
   }
   return (
     <div

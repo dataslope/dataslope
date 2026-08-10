@@ -5,7 +5,7 @@ description: Why you usually fill rather than drop temporal gaps, how to expose 
 
 In an ordinary table, a missing value is often handled by deleting the row.
 In a time series you usually **can't**, drop a row and you punch a hole in
-the regular spacing that `resample`, `rolling`, and every model rely on.
+the regular spacing that `resample()`, `rolling()`, and every model rely on.
 Worse, a single `NaN` poisons any window that touches it. So the temporal
 question is rarely "drop or keep?" but "**what do I believe happened
 during the gap?**", and every fill method is a different answer to that
@@ -26,15 +26,16 @@ question.
 The second is sneakier, because the series *looks* complete. Always check.
 </Callout>
 
-## Step 1: expose the gaps with `reindex`
+## Step 1: expose the gaps with `reindex()`
 
 A series can hide gaps simply by skipping timestamps. The fix is to
-`reindex` onto a *complete* `date_range`, which turns every absent
+`reindex()` onto a *complete* `date_range()`, which turns every absent
 timestamp into an explicit `NaN` you can see and deal with.
 
 <Figure
   slug="tsa-handling-missing-temporal-data-inline-cutout"
   alt="A rail of evenly spaced date sleepers with two sleepers bare and a small bridging piece being fitted over them"
+  caption="Laying the full calendar down first turns a missing row into a visible gap."
 />
 
 <CodeBlock
@@ -124,11 +125,11 @@ print("Three different stories about the same two unknown days.")
 
 ### When each one is right
 
-- **Forward-fill (`ffill`)**, "the last value **held** until it next
+- **Forward-fill (`ffill()`)**, "the last value **held** until it next
   changed." Perfect for *state* / *step* signals: a thermostat setting, a
   posted price, an account balance, a configuration flag. These genuinely
   stay constant until an event changes them.
-- **Backward-fill (`bfill`)**, "the **next** known value applied during the
+- **Backward-fill (`bfill()`)**, "the **next** known value applied during the
   gap." Useful for the *leading edge* (filling `NaN`s before the first real
   reading) or when a value is logged at the *end* of the period it describes.
 - **Linear interpolation**, "the value **glided smoothly** between the two
@@ -138,6 +139,7 @@ print("Three different stories about the same two unknown days.")
 <Figure
   slug="tsa-handling-missing-temporal-data-three-core-fill-inline-cutout"
   alt="A rail with a bare sleeper and three different bridging pieces held above it"
+  caption="Three bridges for one gap: picking one is picking an assumption."
 />
 
 <CodeBlock
@@ -185,10 +187,10 @@ print("continuously varying quantity (but right for a thermostat SETTING).")
 Here is the subtlety that separates a careful analyst from a sloppy one.
 Look again at *what each method reads*:
 
-- **`ffill`** uses only the **past** (the last value before the gap). It is
+- **`ffill()`** uses only the **past** (the last value before the gap). It is
   the **only** method here you can compute *online*, at the moment of the
   gap, without seeing the future.
-- **`bfill`** reads the **next** value, which is in the **future** relative
+- **`bfill()`** reads the **next** value, which is in the **future** relative
   to the gap.
 - **Linear interpolation** reads **both** the value before *and* the value
   after, so it also uses the **future**.
@@ -205,7 +207,7 @@ flowchart LR
 For *historical analysis and charting*, interpolation and back-fill are
 perfectly fine, the whole series already exists, so using both neighbors
 is legitimate. But if you are filling gaps in a **feature that feeds a
-forecast**, `bfill` and `interpolate` smuggle the future into the present,
+forecast**, `bfill()` and `interpolate()` smuggle the future into the present,
 the same leakage sin as a centered rolling window or a random split. In an
 online/forecasting setting, **forward-fill is the safe default**, because it
 only ever looks backward.
@@ -215,15 +217,15 @@ only ever looks backward.
   markdown={`You're building features to forecast tomorrow's value and need to fill an occasional missing sensor reading *as the data streams in*. Which fill method is safe to use, and why?
 
 - [o] Forward-fill, because it uses only the last known (past) value and never reads anything after the gap
-  > \`ffill\` is past-only: it carries the most recent observation forward. That's computable in real time without peeking ahead, which is exactly what an online forecasting feature requires.
+  > \`ffill()\` is past-only: it carries the most recent observation forward. That's computable in real time without peeking ahead, which is exactly what an online forecasting feature requires.
 - Linear interpolation, because it's the most accurate
   > Interpolation reads the value *after* the gap to draw its straight line. At the moment of the gap that future value doesn't exist yet, so using it leaks future information into a live feature.
 - It doesn't matter; all fills use the same information
-  > They use very different information: \`ffill\` looks back, \`bfill\` looks forward, and interpolation looks both ways. Only the backward-looking one is leakage-free for live features.
+  > They use very different information: \`ffill()\` looks back, \`bfill()\` looks forward, and interpolation looks both ways. Only the backward-looking one is leakage-free for live features.
 - Backward-fill, because it carries the correct next value
   > The "next value" is in the future relative to the gap. Pulling it backward into a forecasting feature is leakage, you couldn't actually know it at prediction time.
 
-Online/forecasting features must be computable from the past alone, so \`ffill\` is the safe choice; \`bfill\` and interpolation read the future.`}
+Online/forecasting features must be computable from the past alone, so \`ffill()\` is the safe choice; \`bfill()\` and interpolation read the future.`}
 />
 
 ## The domain question: is "missing" really zero?
@@ -282,7 +284,7 @@ most models, fill rather than drop, so the calendar stays intact.
 - [o] It breaks the regular time spacing the series depends on, so resampling, rolling windows, and models that assume evenly spaced observations misbehave
   > Removing a timestamp leaves an uneven gap. A 7-day rolling window or a model expecting monthly steps will now silently span the wrong real-world interval, corrupting results.
 - It's computationally too expensive
-  > \`dropna\` is cheap. Cost isn't the concern, preserving the timeline is.
+  > \`dropna()\` is cheap. Cost isn't the concern, preserving the timeline is.
 - It always changes the column dtypes
   > Dropping rows doesn't alter dtypes. The real issue is structural, not about types.
 
@@ -450,12 +452,12 @@ Interpolation is appropriate for continuous signals in retrospective analysis; i
 <Callout type="success" title="Key takeaways">
 - In time series you usually **fill** gaps rather than drop rows, to
   preserve the regular spacing tooling depends on.
-- **Expose hidden gaps** by `reindex`-ing onto a complete `date_range`,
+- **Expose hidden gaps** by `reindex()`-ing onto a complete `date_range()`,
   missing *timestamps* are invisible until you do.
-- The three fills are three *assumptions*: **`ffill`** (value held),
-  **`bfill`** (next value applied), **linear interpolation** (smooth glide).
-- **Leakage check:** `ffill` looks only backward (safe for live features);
-  `bfill` and `interpolate` read the **future** (fine for retrospective
+- The three fills are three *assumptions*: **`ffill()`** (value held),
+  **`bfill()`** (next value applied), **linear interpolation** (smooth glide).
+- **Leakage check:** `ffill()` looks only backward (safe for live features);
+  `bfill()` and `interpolate()` read the **future** (fine for retrospective
   analysis, leakage for forecasting features).
 - Ask whether a gap means **"unknown" or "zero"**, a closed shop is a real
   0, not a value to interpolate. Domain knowledge beats any method.
