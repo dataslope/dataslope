@@ -23,7 +23,7 @@ The pipeline runs **`hello.c` → Preprocessor → Compiler → Assembler → Li
 | Preprocessor  | `.c` + `.h` files  | one big `.c` file  | Handle `#include`, `#define`, `#ifdef`, comments     |
 | Compiler      | preprocessed `.c`  | assembly text      | Check syntax and types; emit assembly for the target |
 | Assembler     | assembly text      | object file `.o`   | Translate assembly to machine code                   |
-| Linker        | one or more `.o`   | final executable   | Connect all the pieces; resolve `printf` and friends |
+| Linker        | one or more `.o`   | final executable   | Connect all the pieces; resolve `printf()` and friends |
 
 In real life, you usually invoke all four stages with one command,
 like `clang hello.c -o hello`. The compiler driver runs the rest
@@ -44,6 +44,7 @@ syntax. It only knows three things:
 <Figure
   slug="c-compilation-and-execution-stage-1-preprocessor-inline-cutout"
   alt="A card passing a first machine that pastes extra strips onto it before it goes on"
+  caption="The preprocessor pastes headers in before the compiler reads anything."
 />
 
 It also strips comments.
@@ -128,16 +129,18 @@ something has gone very wrong, probably in the compiler.
 
 The linker stitches all the `.o` files together into one executable.
 It also pulls in the **standard library** (which contains the
-compiled machine code for `printf`, `malloc`, and friends).
+compiled machine code for `printf()`, `malloc()`, and friends).
 
 <Figure
   slug="c-compilation-and-execution-four-stages-inline-cutout"
   alt="A card passing through four machines in a row, leaving each one visibly changed"
+  caption="Preprocess, compile, assemble, link: four stages, each with its own output."
 />
 
 <Figure
   slug="c-compilation-and-execution-inline-cutout"
   alt="A source card fed into a machine, an object block leaving it, and that block driving a second machine"
+  caption="The linker joins your object files with the library into one program."
 />
 
 The linker's job is to resolve every undefined symbol. If it can't,

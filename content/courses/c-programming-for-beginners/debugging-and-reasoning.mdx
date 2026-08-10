@@ -19,6 +19,7 @@ them can be practiced.
 <Figure
   slug="c-debugging-and-reasoning-inline-cutout"
   alt="A long chain folded in half and tested, then folded again, the search closing on one bad link"
+  caption="Halve the search each time and one bad link is found in a few steps."
 />
 
 ## Step 1: read the error message
@@ -66,6 +67,7 @@ unknowns and you lose track of what you were trying to test.
 <Figure
   slug="c-debugging-and-reasoning-step-2-form-inline-cutout"
   alt="A written guess pinned above a stopped machine, a hand held back from the machine until the guess is written"
+  caption="Write the guess down before you change anything, or you lose track of what you tested."
 />
 
 Instead, every time you face a bug, complete this sentence first:
@@ -88,6 +90,7 @@ unglamorous, and effective debugging technique ever invented.
 <Figure
   slug="c-debugging-and-reasoning-step-1-read-inline-cutout"
   alt="A machine stopped with a printed slip hanging from it, a figure reading the slip rather than opening the machine"
+  caption="Read what the program actually reports before opening it up."
 />
 
 Consider this buggy function meant to compute a factorial:
@@ -122,7 +125,7 @@ either. The trace table reveals both within a minute.
 
 ## Step 4: print debugging
 
-The humble `printf` is the workhorse of C debugging. Insert prints
+The humble `printf()` is the workhorse of C debugging. Insert prints
 to show the value of suspicious variables and where execution went:
 
 ```c
@@ -286,10 +289,10 @@ int main(void) {
   markdown={`Your program crashes with a "segmentation fault" on the line \`*p = 5;\`. Which is **least** likely to be the cause?
 
 - \`p\` is \`NULL\`.
-  > Dereferencing \`NULL\` is the most common cause of a segmentation fault; the OS refuses the access and the program is killed.
+  > Dereferencing \`NULL\` is the most common cause of a segmentation fault; the operating system refuses the access and the program is killed.
 - [o] The variable \`p\` is misspelled.
   > A misspelling would be caught by the compiler, not produce a runtime segfault. Segfaults are runtime memory access errors and almost always come from one of the other three causes.
-- \`p\` points to memory that has already been \`free\`'d.
+- \`p\` points to memory that has already been \`free()\`'d.
   > Writing through a freed pointer is a use-after-free bug; the memory no longer belongs to the program and the access typically causes a segfault.
 - \`p\` was never initialized and points at a random address.
   > An uninitialized pointer holds whatever bits happened to be in that memory location, so \`*p = 5\` writes to some arbitrary address, almost certainly triggering a segfault.
@@ -306,7 +309,7 @@ The first instinct on a segfault should be: "I'm dereferencing a pointer that do
   > Without knowing which input triggers the bug, reading all the code is searching an enormous space with no guide; input minimization gives you a target first.
 - Rewrite the program from scratch.
   > Rewriting transfers the same bug into a new file unless you first understand what the bug is; it also destroys the original for comparison.
-- Add \`printf\` statements throughout the code, then re-run with the full input.
+- Add \`printf()\` statements throughout the code, then re-run with the full input.
   > Printing debug output during a 50MB run generates an overwhelming flood of lines; it only becomes useful once you have a small, focused reproducer.
 
 Once you have a tiny failing input, *then* it's worth reading the code carefully or adding prints. Trying to debug with the full input is like trying to find a needle in 50MB of hay.`}

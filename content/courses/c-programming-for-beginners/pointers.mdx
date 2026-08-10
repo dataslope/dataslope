@@ -148,6 +148,7 @@ variable, you pass a **pointer** to it.
 <Figure
   slug="c-pointers-inline-cutout"
   alt="A long row of mail slots, one slot holding a small card whose arrow points at another slot further down the row, and a figure following that arrow"
+  caption="A pointer holds the address of another variable, and following it reaches the value."
 />
 
 <CodeBlock
@@ -176,7 +177,7 @@ parse as `*(x++)`, which is a different (and much more confusing)
 operation.
 
 This pattern, "pass `&variable` so the function can change it", is
-how every `scanf`-style API works.
+how every `scanf()`-style API works.
 
 ### Returning two values from a function
 
@@ -230,6 +231,7 @@ A common idiom is `if (p)` / `if (!p)`, since `NULL` is zero (false).
 <Figure
   slug="c-pointers-pointer-inline-cutout"
   alt="A card in one slot whose arrow reaches across to another slot further along the row"
+  caption="`NULL` is the address that points at nothing, and checking for it is a habit."
 />
 
 ## What happens if you forget to initialize a pointer

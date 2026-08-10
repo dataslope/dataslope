@@ -20,11 +20,12 @@ write is a stream of bytes.
 <Figure
   slug="c-input-and-output-printing-printf-inline-cutout"
   alt="A machine with a printer on its side pushing out one short strip of type"
+  caption="`printf()` writes a formatted line to the output stream."
 />
 
-## Printing with `printf`
+## Printing with `printf()`
 
-You've used `printf` since the first chapter. Time to look at it
+You've used `printf()` since the first chapter. Time to look at it
 properly.
 
 ```c
@@ -102,16 +103,17 @@ int main(void) {
 Tiny formatting tricks like these are how plain-text reports stay
 readable.
 
-## Reading with `scanf`
+## Reading with `scanf()`
 
-`scanf` reads input from the keyboard (or any redirected source).
-Its format string looks similar to `printf`'s but with one critical
+`scanf()` reads input from the keyboard (or any redirected source).
+Its format string looks similar to `printf()`'s but with one critical
 difference: you must pass the **address** of each variable to fill
 (using the `&` operator).
 
 <Figure
   slug="c-input-and-output-inline-cutout"
   alt="A small terminal with a slot at the left taking a punched slip and a printer at the right pushing out a finished strip"
+  caption="Input comes in as bytes and `scanf()` needs the address of where to put them."
 />
 
 ```c
@@ -119,7 +121,7 @@ int n;
 scanf("%d", &n);    // read an int into n
 ```
 
-`&n` means "the memory address of `n`". `scanf` needs the address so
+`&n` means "the memory address of `n`". `scanf()` needs the address so
 it can *write* the new value into your variable. (When we cover
 pointers, this will make even more sense.)
 
@@ -148,15 +150,15 @@ int main(void) {
 />
 
 <Callout type="info" title="Why `if (scanf(...) == 1)`?">
-\`scanf\` returns the **number of items it successfully read**. Always
+\`scanf()\` returns the **number of items it successfully read**. Always
 check it. If the user types \`hello\` when you asked for a number,
-\`scanf\` returns \`0\` and your variable is unchanged (and probably
+\`scanf()\` returns \`0\` and your variable is unchanged (and probably
 uninitialized!).
 </Callout>
 
 ### Reading multiple values
 
-Format specifiers in `scanf` skip whitespace between values (except
+Format specifiers in `scanf()` skip whitespace between values (except
 for `%c`).
 
 <CodeBlock
@@ -181,7 +183,7 @@ int main(void) {
   ]}
 />
 
-### `scanf` and strings
+### `scanf()` and strings
 
 Reading a string with `%s` reads **one whitespace-delimited word**
 and **never reads more characters than fit in your buffer if you use
@@ -192,11 +194,11 @@ char name[32];
 scanf("%31s", name);   // read at most 31 chars + null terminator
 ```
 
-Always specify the maximum width when reading strings with `scanf`,
+Always specify the maximum width when reading strings with `scanf()`,
 or your program is one long input away from a buffer overflow. We'll
 return to strings and buffers in upcoming chapters.
 
-## `getchar` and `putchar`, one character at a time
+## `getchar()` and `putchar()`, one character at a time
 
 For character-by-character I/O, the standard library offers
 `getchar()` and `putchar()`.
@@ -222,7 +224,7 @@ int main(void) {
 />
 
 This is a tiny, classic loop. Why is `c` an `int` rather than a
-`char`? Because `getchar` returns `EOF` (typically `-1`) to signal
+`char`? Because `getchar()` returns `EOF` (typically `-1`) to signal
 "no more input", and `EOF` must be distinguishable from every valid
 character, including `0xFF`. Storing the result in a `char` would
 make that distinction impossible.
@@ -237,17 +239,17 @@ Every C program automatically has three streams open:
 | output  | `stdout` | the terminal          |
 | errors  | `stderr` | also the terminal     |
 
-`printf` writes to `stdout`. `scanf` reads from `stdin`. For error
+`printf()` writes to `stdout`. `scanf()` reads from `stdin`. For error
 messages, use `fprintf(stderr, "oops: %s\n", msg);`. Separating
 errors lets a user redirect them differently from normal output.
 
 ## Formatted vs unformatted I/O
 
-`printf` and `scanf` are **formatted** I/O, they understand types
+`printf()` and `scanf()` are **formatted** I/O, they understand types
 and format specifications. There are also **unformatted** I/O
-functions like `fgets` (read a line into a buffer) and `fputs`
+functions like `fgets()` (read a line into a buffer) and `fputs`
 (write a string) that operate on raw bytes. For real input handling
-in larger programs, `fgets` is usually safer than `scanf`:
+in larger programs, `fgets()` is usually safer than `scanf()`:
 
 ```c
 char line[256];
@@ -257,7 +259,7 @@ if (fgets(line, sizeof(line), stdin) != NULL) {
 }
 ```
 
-We'll see more of `fgets` in the chapter on strings.
+We'll see more of `fgets()` in the chapter on strings.
 
 ## Challenge: print a small invoice
 
@@ -323,20 +325,20 @@ int main(void) {
 - \`%s\`
   > \`%s\` is for strings (\`char *\`), not for printing a \`double\`.
 
-\`printf\`'s format mini-language is small but expressive: you can control width, precision, padding, sign, and base all with a few characters between \`%\` and the conversion letter.`}
+\`printf()\`'s format mini-language is small but expressive: you can control width, precision, padding, sign, and base all with a few characters between \`%\` and the conversion letter.`}
 />
 
 <MultipleChoice
-  markdown={`Why does \`scanf\` require the \`&\` operator in front of integer variables, as in \`scanf("%d", &n);\`?
+  markdown={`Why does \`scanf()\` require the \`&\` operator in front of integer variables, as in \`scanf("%d", &n);\`?
 
 - Because \`%d\` requires a special pointer type.
   > \`%d\` expects a plain \`int *\`, a pointer to an \`int\`, which is exactly what \`&n\` produces. There is no special pointer type involved.
-- [o] Because \`scanf\` needs the *address* of \`n\` to write the parsed value back into it.
-  > C passes arguments by value. To modify the caller's variable, \`scanf\` needs a pointer (an address) so it can write the result into the right memory location.
-- Because the C standard forbids passing values directly to \`scanf\`.
-  > The C standard imposes no such rule. The real reason is that passing a plain value gives \`scanf\` no way to write the result back to your variable.
+- [o] Because \`scanf()\` needs the *address* of \`n\` to write the parsed value back into it.
+  > C passes arguments by value. To modify the caller's variable, \`scanf()\` needs a pointer (an address) so it can write the result into the right memory location.
+- Because the C standard forbids passing values directly to \`scanf()\`.
+  > The C standard imposes no such rule. The real reason is that passing a plain value gives \`scanf()\` no way to write the result back to your variable.
 - Because \`&\` converts \`n\` to a string suitable for parsing.
-  > \`&\` produces a pointer (a memory address), not a string. Parsing is handled by \`scanf\` itself using the \`%d\` specifier.
+  > \`&\` produces a pointer (a memory address), not a string. Parsing is handled by \`scanf()\` itself using the \`%d\` specifier.
 
 When you write \`&n\`, you're saying "here is the address of the box called \`n\`, please put the answer in it". This is one of the most common uses of the \`&\` (address-of) operator in C.`}
 />

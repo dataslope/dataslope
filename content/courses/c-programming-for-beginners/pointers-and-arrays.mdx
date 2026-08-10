@@ -23,6 +23,7 @@ called *array-to-pointer decay*.
 <Figure
   slug="c-pointers-and-arrays-array-name-as-inline-cutout"
   alt="A strip of cells with a marker resting on the first cell, a tag on the marker matching the tag on the strip itself"
+  caption="An array name decays to a pointer to its first element."
 />
 
 ```c
@@ -184,6 +185,7 @@ size. Always.
 <Figure
   slug="c-pointers-and-arrays-inline-cutout"
   alt="A strip of equal cells with a marker resting on the first, and the same marker two cells further along having jumped exactly two cell widths"
+  caption="Adding one to a pointer moves it by one element, not one byte."
 />
 
 ## Pointer subtraction
@@ -389,5 +391,5 @@ void show(int arr[]) {
 - [o] Inside the function, \`arr\` is a pointer, not an array. \`sizeof(arr)\` is the size of a pointer (typically 8), not the array's total size.
   > When an array is passed to a function, it decays to a pointer to its first element, and the size information is lost.
 
-This is why nearly every C function that takes an array also takes a length parameter, and why \`strlen\` is implemented by *scanning for \`\\0\`* rather than by reading a stored length.`}
+This is why nearly every C function that takes an array also takes a length parameter, and why \`strlen()\` is implemented by *scanning for \`\\0\`* rather than by reading a stored length.`}
 />

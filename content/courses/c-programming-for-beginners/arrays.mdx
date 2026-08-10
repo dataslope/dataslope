@@ -74,6 +74,7 @@ arrays are fast: predicting the next address is one addition.
 <Figure
   slug="c-arrays-memory-layout-array-inline-cutout"
   alt="A single unbroken strip of equal cells laid end to end with no gaps between them"
+  caption="An array's cells sit next to each other, which is what makes indexing one addition."
 />
 
 ## The size is fixed at declaration
@@ -86,7 +87,7 @@ int data[10];   // exactly 10 ints, forever
 ```
 
 If you need a list that resizes, you need to **manage memory
-yourself** with `malloc` and `realloc`, the topic of the dynamic
+yourself** with `malloc()` and `realloc()`, the topic of the dynamic
 memory chapter.
 
 ## Walking an array with a loop
@@ -155,6 +156,7 @@ an astonishing fraction of all software security flaws since the
 <Figure
   slug="c-arrays-declaring-indexing-inline-cutout"
   alt="A strip of equal cells cut in one piece, a hand reaching straight past the first three to the fourth"
+  caption="Indexing jumps straight to a cell, and C never checks that the cell exists."
 />
 
 <CodeBlock
@@ -312,6 +314,7 @@ reason about cache performance and pointer arithmetic later.
 <Figure
   slug="c-arrays-inline-cutout"
   alt="A strip of equal cells with a marker resting past the final cell, one step beyond where the strip ends"
+  caption="One step past the last cell is memory that belongs to something else."
 />
 
 ## Passing arrays to functions

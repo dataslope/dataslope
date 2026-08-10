@@ -15,7 +15,7 @@ is already running?
 
 That's what the **heap** is for. The heap is a big pool of memory
 your program can grab chunks from and give back as it sees fit. The
-controls are `malloc` and `free`.
+controls are `malloc()` and `free()`.
 
 ## Stack vs heap
 
@@ -28,13 +28,13 @@ A running program's memory is split into a few regions:
 
 - **Code**, your compiled instructions.
 - **Globals & constants**, values that live for the whole program.
-- **Heap**, a large pool you grab from with `malloc` and return with
-  `free`.
+- **Heap**, a large pool you grab from with `malloc()` and return with
+  `free()`.
 - **Stack**, where function locals live, one frame per call.
 
 | Stack                                | Heap                              |
 |--------------------------------------|-----------------------------------|
-| Automatic, frame per function call  | Manual, `malloc` / `free`        |
+| Automatic, frame per function call  | Manual, `malloc()` / `free()`        |
 | Size fixed at compile time           | Size decided at runtime           |
 | Very fast                            | Fast, but slower than stack       |
 | Freed automatically on return        | Lives until **you** free it       |
@@ -44,7 +44,7 @@ If a value is small and short-lived, put it on the stack. If a value
 must outlive the function that created it, or must be sized at
 runtime, put it on the heap.
 
-## `malloc` and `free`
+## `malloc()` and `free()`
 
 `malloc(n)` asks the operating system for a chunk of `n` bytes and
 returns a pointer to it (or `NULL` if it failed). Always include
@@ -53,6 +53,7 @@ returns a pointer to it (or `NULL` if it failed). Always include
 <Figure
   slug="c-dynamic-memory-malloc-free-inline-cutout"
   alt="A crate handed out over a counter, used at a bench, and handed back over the same counter"
+  caption="`malloc()` hands you a block, and `free()` is how you give it back."
 />
 
 ```c
@@ -102,10 +103,10 @@ int main(void) {
 />
 
 The point is the **runtime-decided size**. You could not have
-written `int nums[n];` at the top of `main` portably; with `malloc`
+written `int nums[n];` at the top of `main` portably; with `malloc()`
 you can ask for exactly as much as you need.
 
-## What `free` does (and doesn't do)
+## What `free()` does (and doesn't do)
 
 `free(p)` returns the chunk `p` points at to the heap, so other
 parts of the program can reuse it. It does **not**:
@@ -120,9 +121,9 @@ been freed, are one of the most dangerous bug types in C. A
 self-discipline that helps: after `free(p)`, immediately do
 `p = NULL;`.
 
-## `calloc` and `realloc`
+## `calloc()` and `realloc()`
 
-Two close cousins of `malloc` are worth knowing:
+Two close cousins of `malloc()` are worth knowing:
 
 - `calloc(count, size)`, like `malloc(count * size)` but
   **zero-initializes** the memory. Useful when you want a clean
@@ -131,13 +132,13 @@ Two close cousins of `malloc` are worth knowing:
   it; always reassign:
   `p = realloc(p, new_size);` and check the result before using.
 
-A classic pattern is a growable buffer: start with a small `malloc`,
-`realloc` to double the capacity when full.
+A classic pattern is a growable buffer: start with a small `malloc()`,
+`realloc()` to double the capacity when full.
 
 ## Lifetimes and ownership
 
-Every chunk of `malloc`-ed memory belongs to *someone*. That someone
-is responsible for eventually calling `free`. C doesn't track this
+Every chunk of `malloc()`-ed memory belongs to *someone*. That someone
+is responsible for eventually calling `free()`. C doesn't track this
 for you; it's a convention your code has to make obvious.
 
 A useful rule: **wherever you create a heap allocation, decide who
@@ -162,6 +163,7 @@ point. The skill is recognizing them quickly.
 <Figure
   slug="c-dynamic-memory-inline-cutout"
   alt="A counter on the left handing out a crate of the exact size asked for, a workbench using it in the middle, and the same crate being returned to the counter on the right"
+  caption="Ask for exactly what you need, and return exactly what you asked for."
 />
 
 ### 1. Memory leak
@@ -199,13 +201,14 @@ automatically. We'll mention them again in the debugging chapter.
 
 ## Returning a heap-allocated array from a function
 
-This is the canonical reason for `malloc`: you can't return a local
+This is the canonical reason for `malloc()`: you can't return a local
 array (it'd die when the function returns), but you *can* return a
 pointer to heap memory.
 
 <Figure
   slug="c-dynamic-memory-stack-vs-heap-inline-cutout"
   alt="A neat column of trays on the left and an open yard of crates on the right, cords running between them"
+  caption="Stack memory dies with the function; heap memory lives until you free it."
 />
 
 <CodeBlock
@@ -244,12 +247,12 @@ int main(void) {
 />
 
 Notice the comment in the source code is doing real work: it tells
-the reader that `main` must `free` what `make_squares` returned.
+the reader that `main` must `free()` what `make_squares` returned.
 
 ## Multi-file challenge: a growable integer buffer
 
 Build a tiny "dynamic array" in two files. The header declares the
-type and operations, the implementation manages a `malloc`-ed
+type and operations, the implementation manages a `malloc()`-ed
 buffer. `main.c` exercises it.
 
 <ChallengeCard
@@ -392,29 +395,29 @@ free(p);
 printf("%d\\n", *p);
 \`\`\`
 
-- The \`malloc\` will fail because 4 bytes is too small.
+- The \`malloc()\` will fail because 4 bytes is too small.
   > \`sizeof(int)\` is typically 4 bytes, which is exactly the right amount to store one \`int\`; size is not the problem here.
-- The \`printf\` requires \`%p\`, not \`%d\`.
+- The \`printf()\` requires \`%p\`, not \`%d\`.
   > \`%d\` is correct for printing the \`int\` value obtained by dereferencing \`p\` with \`*p\`; \`%p\` would be used to print the pointer's address itself.
 - It will fail to compile.
   > The code is syntactically valid; the bug is a runtime memory error that no compiler is required to detect.
 - [o] \`*p\` is a use-after-free; the memory was returned to the heap and may now belong to something else.
-  > Reading or writing through a pointer after \`free\` is undefined behavior. It might appear to work today and crash tomorrow.
+  > Reading or writing through a pointer after \`free()\` is undefined behavior. It might appear to work today and crash tomorrow.
 
-The cure is to either not access the memory after \`free\`, or to set \`p = NULL;\` after the \`free\` so the bug crashes loudly rather than silently corrupting other data.`}
+The cure is to either not access the memory after \`free()\`, or to set \`p = NULL;\` after the \`free()\` so the bug crashes loudly rather than silently corrupting other data.`}
 />
 
 <MultipleChoice
   markdown={`Which of the following allocations leaves you with **zero-initialized** memory without a separate loop?
 
 - [o] \`calloc(n, sizeof(int))\`
-  > \`calloc\` zero-fills the memory it returns. \`malloc\` does not; it gives you whatever happened to be in those bytes.
+  > \`calloc()\` zero-fills the memory it returns. \`malloc()\` does not; it gives you whatever happened to be in those bytes.
 - \`alloca(n * sizeof(int))\`
   > \`alloca\` allocates on the stack rather than the heap, and it never zero-initializes the memory it returns.
 - \`malloc(n * sizeof(int))\`
-  > \`malloc\` allocates raw bytes without initializing them; the contents are indeterminate until you write to each element.
+  > \`malloc()\` allocates raw bytes without initializing them; the contents are indeterminate until you write to each element.
 - \`realloc(NULL, n * sizeof(int))\`
-  > Passing \`NULL\` as the first argument to \`realloc\` is equivalent to \`malloc\`, it allocates but does not zero-initialize the new memory.
+  > Passing \`NULL\` as the first argument to \`realloc()\` is equivalent to \`malloc()\`, it allocates but does not zero-initialize the new memory.
 
-\`calloc\` is also the idiomatic choice when you need an array of structs where every field should start at zero.`}
+\`calloc()\` is also the idiomatic choice when you need an array of structs where every field should start at zero.`}
 />
