@@ -19,6 +19,7 @@ shortcut around design; it is a trade-off you make with your eyes open.
 <Figure
   slug="db-denormalization-denormalize-at-all-inline-cutout"
   alt="A stopwatch beside two benches, the one with a single wide table finishing before the one with four small tables"
+  caption="Denormalising buys read speed, and the price is paid on every write."
 />
 
 ## Normalize first
@@ -55,6 +56,7 @@ particular read path benefits from having them ready.
 <Figure
   slug="db-denormalization-normalize-first-inline-cutout"
   alt="A tidy set of small cabinets built first, and only then a wider copy assembled beside them"
+  caption="Normalise first; the wider copy is added afterwards, on purpose."
 />
 
 ```mermaid
@@ -264,6 +266,7 @@ will be better.
 <Figure
   slug="db-denormalization-inline-cutout"
   alt="Two tidy tables being deliberately copied into one wider table, with a duplicate block visible in two places and a stopwatch resting beside it"
+  caption="A derived copy is a deliberate duplicate you now have to keep in step."
 />
 
 It is a design choice for specific read needs, weighed against the cost

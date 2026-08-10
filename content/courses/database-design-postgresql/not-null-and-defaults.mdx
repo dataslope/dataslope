@@ -99,6 +99,7 @@ rejected because the required email is missing.
 <Figure
   slug="db-not-null-and-defaults-inline-cutout"
   alt="A row of sockets where an empty one is refused and another is quietly filled with a standard grey plug"
+  caption="`NOT NULL` refuses the empty socket; a default quietly fills it instead."
 />
 
 <SqlCodeBlock
@@ -143,6 +144,7 @@ also unknown.
 <Figure
   slug="db-not-null-and-defaults-null-means-unknown-inline-cutout"
   alt="A socket left open with a small cover over it beside a socket holding a zero-height block"
+  caption="NULL is an unknown value, which is not the same as zero or an empty string."
 />
 
 Use `IS NULL` and `IS NOT NULL` when you want to test for missing data.
