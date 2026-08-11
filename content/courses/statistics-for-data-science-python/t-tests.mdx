@@ -527,6 +527,13 @@ like the Mann–Whitney U or Wilcoxon signed-rank test, covered in
 *Correlation and Nonparametric Tests*.
 </Callout>
 
+<Chart slug="welch-vs-student" />
+
+The textbook advice of testing for equal variances first does not rescue
+Student's, for a reason worth knowing: the variance test is itself
+underpowered at small n, which is exactly when the problem bites, so it fails
+to detect the inequality precisely in the cases where detecting it mattered.
+
 ## When to use a t-test, and when not to
 
 **Reach for a t-test when:**
