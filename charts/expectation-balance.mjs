@@ -10,7 +10,7 @@
  * The pmf is the lesson's: values 1 to 6 with probabilities 0.1 each except a
  * 0.5 on the six, so E[X] = 4.5 and the mode is 6.
  */
-import { Plot, plot, ACCENT, HALO, PRIMARY, SERIES } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
 
 export const title =
   "The probability mass function of a weighted die as six bars, five short and one tall at six. A triangular fulcrum sits under the axis at 4.5, between the four and five bars, marking the expected value.";
@@ -33,7 +33,7 @@ export function render() {
     marginBottom: 62,
     ariaLabel: title,
     x: {
-      label: "Value on the die",
+      label: "Face of a weighted die",
       labelAnchor: "center",
       domain: [0.3, 6.7],
       ticks: VALUES,
@@ -49,6 +49,22 @@ export function render() {
         y: "p",
         fill: (d) => (d.v === MODE ? SERIES[1] : PRIMARY),
         fillOpacity: 0.55,
+      }),
+      // Said on the chart, not only in the caption: five bars of one height and
+      // a sixth at five times it is only obviously a *loaded* die to a reader
+      // who was already told. One who was not reads the tall bar as a mistake.
+      Plot.text([{ v: 1, p: Math.max(...PROBS) }], {
+        x: "v",
+        y: "p",
+        text: () =>
+          `this die is loaded: ${MODE} comes up\nhalf the time, each other face a tenth`,
+        fill: MUTED,
+        fontSize: 11,
+        fontWeight: 600,
+        lineHeight: 1.35,
+        textAnchor: "start",
+        dx: -18,
+        ...HALO,
       }),
       Plot.text([{ v: MODE, p: PROBS[MODE - 1] }], {
         x: "v",

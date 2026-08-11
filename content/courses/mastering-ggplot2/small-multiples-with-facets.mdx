@@ -15,11 +15,17 @@ visualization, and ggplot2 makes it a one-line addition.
 
 ## The problem facets solve
 
-Mapping a grouping variable to color works until there are too many
-groups; then the chart becomes an unreadable tangle, and the same lines
-split into panels stop being a tangle at all:
+Mapping a grouping variable to color works while the groups sit in
+different parts of the plot. Once they overlap, hue is the only thing
+left telling them apart, and there is nowhere for it to do that:
 
-<Chart slug="spaghetti-vs-facets" />
+<Chart slug="groups-by-colour-one-panel" />
+
+Now give each group a panel of its own. No point has moved, no color has
+changed, and both scales are the same ones. The grouping variable has
+simply stopped being a color and become a *position*:
+
+<Chart slug="groups-in-a-facet-grid" />
 
 Watch a color mapping struggle:
 

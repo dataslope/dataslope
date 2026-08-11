@@ -47,7 +47,8 @@ export function render() {
       label: "Nodes held in the frontier",
       domain: [1, 3e4],
       ticks: [1, 10, 1e3, 1e4],
-      tickFormat: (d) => (d < 100 ? String(d) : `1e${Math.round(Math.log10(d))}`),
+      tickFormat: (d) =>
+        d >= 1e9 ? `${d / 1e9}B` : d >= 1e6 ? `${d / 1e6}M` : d >= 1e3 ? `${d / 1e3}k` : String(d),
     },
     color: { domain: ["Breadth-first (queue)", "Depth-first (stack)"], range: [ACCENT, PRIMARY] },
     marks: [

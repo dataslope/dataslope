@@ -14,11 +14,29 @@
  * intermediate arrays are the part people do not picture: what makes a chain
  * expensive at scale is rarely the extra passes, it is holding three copies of
  * a large array alive at once.
+ *
+ * ── Why the bars are ratios and not counts ──────────────────────────────────
+ *
+ * The two rows measure different things — element visits in the millions,
+ * array allocations in single digits — and the first version of this figure
+ * put both on one logarithmic axis, with the axis label apologising for it
+ * ("the two rows are in different units"). Two defects came out of that. Plot
+ * facets share every scale, so a single axis was the only option, and the
+ * quantities do not belong on one; and a *bar* on a log axis stops meaning
+ * anything, because the reader measures its length and length is no longer
+ * proportional to the value. Four arrays against one drew as a bar roughly
+ * two-thirds the length of the other rather than four times it.
+ *
+ * Expressing both rows against the single-pass loop fixes both at once. "Times
+ * the loop" is one unit, so the shared scale is honest and linear, bars encode
+ * it correctly, and the ratio was the comparison the figure wanted in the first
+ * place. The absolute counts are still here, printed at the end of each bar,
+ * where they cost nothing and mislead nobody.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
-  "Array elements visited and intermediate arrays allocated, for a four-stage method chain against one hand-written loop over the same million rows.";
+  "Array element visits and intermediate array allocations for a four-stage method chain, each shown as a multiple of what one hand-written loop over the same million rows costs. The chain visits twice as many elements and allocates four times as many arrays.";
 
 const N = 1_000_000;
 const KEEP = 0.4;
@@ -34,47 +52,58 @@ const STAGES = [
 const CHAIN_VISITS = STAGES.reduce((s, d) => s + d.visits, 0);
 const CHAIN_ARRAYS = STAGES.length;
 
+const millions = (v) => `${(v / 1e6).toFixed(1)}M elements`;
+const arrays = (v) => `${v} ${v === 1 ? "array" : "arrays"}`;
+
+const CHAIN = "Chained methods";
+const LOOP = "One for-of loop";
+const VISITS = "Elements visited";
+const ALLOCS = "Arrays allocated";
+
+/** Every bar is a multiple of the loop's own cost, which is what makes one
+ *  shared axis legitimate across two rows measuring different things. */
 const rows = [
-  { key: "Chained methods", part: "Elements visited", value: CHAIN_VISITS, color: SERIES[0] },
-  { key: "Chained methods", part: "Arrays allocated", value: CHAIN_ARRAYS, color: SERIES[1] },
-  { key: "One for-of loop", part: "Elements visited", value: N, color: SERIES[0] },
-  { key: "One for-of loop", part: "Arrays allocated", value: 1, color: SERIES[1] },
+  { part: VISITS, key: CHAIN, times: CHAIN_VISITS / N, note: millions(CHAIN_VISITS) },
+  { part: VISITS, key: LOOP, times: 1, note: millions(N) },
+  { part: ALLOCS, key: CHAIN, times: CHAIN_ARRAYS, note: arrays(CHAIN_ARRAYS) },
+  { part: ALLOCS, key: LOOP, times: 1, note: arrays(1) },
 ];
 
-export const caption = `Each stage of a chain walks its input and allocates a new array, so four stages over ${(N / 1e6).toFixed(0)} million rows is ${(CHAIN_VISITS / 1e6).toFixed(1)} million element visits and ${CHAIN_ARRAYS} arrays against ${(N / 1e6).toFixed(0)} million and one. Both are linear, and on the array sizes most code really handles the difference is microseconds, so this is not an argument against chaining: separable stages are easier to read, test and change than a fused loop. It is an argument about *scale*, and the part to picture is the allocations rather than the passes, because what hurts at a million rows is holding three throwaway copies alive at once.`;
+const XMAX = Math.max(...rows.map((d) => d.times)) + 1.4;
+
+export const caption = `Each stage of a chain walks its input and allocates a new array, so four stages over ${(N / 1e6).toFixed(0)} million rows is ${(CHAIN_VISITS / 1e6).toFixed(1)} million element visits and ${CHAIN_ARRAYS} arrays against ${(N / 1e6).toFixed(0)} million and one: twice the walking and four times the allocating. Both are linear, and on the array sizes most code really handles the difference is microseconds, so this is not an argument against chaining: separable stages are easier to read, test and change than a fused loop. It is an argument about *scale*, and the part to picture is the allocations rather than the passes, because what hurts at a million rows is holding three throwaway copies alive at once.`;
 
 export function render() {
   return plot({
     height: 280,
     marginTop: 30,
-    marginLeft: 140,
-    marginRight: 128,
+    marginLeft: 132,
+    marginRight: 118,
     marginBottom: 46,
     ariaLabel: title,
-    fy: { label: null, domain: ["Elements visited", "Arrays allocated"] },
+    fy: { label: null, domain: [VISITS, ALLOCS] },
     x: {
-      label: "Count (log scale: the two rows are in different units)",
+      label: "Times what the single-pass loop costs",
       labelAnchor: "center",
-      type: "log",
-      domain: [0.8, 5e6],
-      ticks: [1, 100, 10_000, 1e6],
-      tickFormat: (d) => (d >= 1e6 ? `${d / 1e6}M` : d >= 1000 ? `${d / 1000}k` : String(d)),
+      domain: [0, XMAX],
+      ticks: [1, 2, 3, 4],
+      tickFormat: (d) => `${d}×`,
     },
-    y: { label: null, domain: ["Chained methods", "One for-of loop"], padding: 0.26, grid: false },
+    y: { label: null, domain: [CHAIN, LOOP], padding: 0.26, grid: false },
     marks: [
       Plot.barX(rows, {
         fy: "part",
         y: "key",
-        x1: 0.8,
-        x2: "value",
-        fill: (d) => (d.key === "Chained methods" ? ACCENT : PRIMARY),
+        x1: 0,
+        x2: "times",
+        fill: (d) => (d.key === CHAIN ? ACCENT : PRIMARY),
         fillOpacity: 0.7,
       }),
       Plot.text(rows, {
         fy: "part",
         y: "key",
-        x: "value",
-        text: (d) => (d.value >= 1e6 ? `${(d.value / 1e6).toFixed(1)}M` : String(d.value)),
+        x: "times",
+        text: "note",
         fill: MUTED,
         fontSize: 10.5,
         fontWeight: 600,
@@ -82,6 +111,7 @@ export function render() {
         dx: 8,
         ...HALO,
       }),
+      Plot.ruleX([0], { stroke: "currentColor", strokeOpacity: 0.35 }),
     ],
   });
 }

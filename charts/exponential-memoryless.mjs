@@ -58,30 +58,35 @@ export function render() {
       Plot.ruleX(conditionals, { x: "t1", y1: 0, y2: "s1", stroke: GUIDE, strokeOpacity: 0.5 }),
       Plot.dot(conditionals, { x: "t0", y: "s0", fill: PRIMARY, r: 4 }),
       Plot.dot(conditionals, { x: "t1", y: "s1", fill: ACCENT, r: 4 }),
-      // The last pair sits near the right edge, so its label reads leftward;
-      // anchored right it ran off the frame.
+      // Short labels, because the three of them have to fit between a curve
+      // that is falling away and each other. The full sentence used to be
+      // repeated on every one, which made each about 150px wide: the last two
+      // then overlapped in the flat right-hand stretch where there is least
+      // room. The repeated half now sits once, in the corner note below, and
+      // each mark carries only what differs.
       ...conditionals.map((c, i) =>
         Plot.text([c], {
           x: "t1",
           y: "s1",
-          text: (d) => `after ${d.t0} min:\n${(d.p * 100).toFixed(1)}% chance of ${EXTRA} more`,
+          text: (d) => `after ${d.t0} min\n${(d.p * 100).toFixed(1)}%`,
           fill: ACCENT,
           fontSize: 10.5,
           fontWeight: 600,
           lineHeight: 1.3,
-          textAnchor: i === conditionals.length - 1 ? "end" : "start",
-          dx: i === conditionals.length - 1 ? -8 : 8,
-          dy: -14,
+          textAnchor: "start",
+          dx: 8,
+          dy: -16,
           ...HALO,
         }),
       ),
       Plot.text([{}], {
         x: 49,
         y: 0.98,
-        text: () => "the same number, three times",
+        text: () => `each label is the chance of ${EXTRA} more minutes:\nthe same number, three times`,
         fill: MUTED,
         fontSize: 11,
         fontWeight: 600,
+        lineHeight: 1.35,
         textAnchor: "end",
         ...HALO,
       }),

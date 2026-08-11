@@ -25,13 +25,14 @@ Three things make Monte Carlo special:
 
 ## A first example: estimating $\pi$
 
-The convergence you should expect from any Monte Carlo estimate: noisy early,
-settling as the square root of the sample count rather than linearly.
-
-<Chart slug="lln-convergence" />
-
 Drop random points uniformly into the unit square. The fraction
 that lands inside the unit quarter-disk approximates $\pi/4$.
+
+Run that three times and watch the estimates settle. The convergence is
+what you should expect from any Monte Carlo estimate: noisy early, and
+tightening as the *square root* of the sample count rather than linearly:
+
+<Chart slug="monte-carlo-pi-convergence" />
 
 <CodeBlock
   adapter="python"
