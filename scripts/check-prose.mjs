@@ -38,6 +38,16 @@
 //                    dialect. Other British spellings in this repo (behaviour,
 //                    centre, favour) have no such collision and are not
 //                    touched.
+//   7. mermaid-dash, a dash inside a mermaid diagram label that is not a plain
+//                    ASCII hyphen. Diagram labels are prose the reader sees,
+//                    but they sit in a fenced block, so every rule above skips
+//                    them and they drifted: a flowchart shipped with
+//                    "ffill -- safe as a live feature" in a node, where mermaid
+//                    renders label text verbatim and the reader saw a literal
+//                    double hyphen. Two shapes are caught, `--` used the way an
+//                    em dash would be, and any non-ASCII dash glyph. See the
+//                    section below for why labels are held to a stricter
+//                    standard than rule 2 holds prose to.
 //
 // Scope is what a reader actually sees:
 //
@@ -144,6 +154,116 @@ export function hasWrappingQuotes(body) {
   return /^["“]/.test(inner) && /["”]$/.test(inner);
 }
 
+// --- mermaid labels -------------------------------------------------------
+
+/** Any dash that is not a plain ASCII hyphen: em dash, horizontal bar, en
+ *  dash, and the Unicode minus sign.
+ *
+ *  Stricter than rule 2, which keeps unspaced en dashes because they are
+ *  correct in a numeric range. A diagram label is a few words in a box, so
+ *  there is no typographic case to weigh, and one flat "hyphens only" rule
+ *  beats a spaced/unspaced distinction nobody can see at label size. */
+const NON_ASCII_DASH = /[—―–−]/;
+
+/** A run of two or more hyphens used the way an em dash would be, with
+ *  whitespace on at least one side. Mermaid renders label text verbatim, so
+ *  this reaches the reader as the literal characters that were typed.
+ *
+ *  The whitespace is what keeps the rule off real content: `--verbose` names a
+ *  CLI flag, `i--` is a decrement, and `-- comment` opens a SQL line comment.
+ *  All three are things the lessons here legitimately draw in a diagram, and
+ *  none of them is a dash standing in for punctuation. */
+const HYPHEN_RUN_AS_DASH = /(^|\s)-{2,}(\s|$)/;
+
+/** Mermaid's own line kinds whose colon introduces a style declaration or a
+ *  layout keyword rather than label text (`style A fill:#f9f`). */
+const MERMAID_DIRECTIVE = /^\s*(style|classDef|class|click|linkStyle|direction)\b/;
+
+/** The diagram kinds where a colon introduces free text that runs to the end
+ *  of the line: a sequence message, a note, a state description, a timeline
+ *  event. In a flowchart it means nothing of the sort, and reading it that way
+ *  is wrong in a way that bites, `A((a: 1,2,3,4,5)) --- I((4,5))` is a node
+ *  label holding a colon, and taking the rest of the line as its text picks up
+ *  the `---` link that follows. */
+const COLON_LABEL_DIAGRAMS = new Set([
+  "sequenceDiagram",
+  "stateDiagram",
+  "stateDiagram-v2",
+  "timeline",
+  "journey",
+  "erDiagram",
+  "classDiagram",
+  "pie",
+]);
+
+/** Every line inside a ```mermaid fence, as `{ line, text, diagram }`, where
+ *  `diagram` is the block's opening keyword (`flowchart`, `sequenceDiagram`).
+ *
+ *  Mermaid's `%%` comments are dropped: they never reach the rendered diagram,
+ *  so a dash in one is as invisible as a dash in a TS comment (which
+ *  stripComments already exempts). Dropping them first also means the diagram
+ *  keyword is read off the first line that actually declares one, rather than
+ *  off a leading `%%{init: ...}%%` directive. */
+export function mermaidLines(lines) {
+  const found = [];
+  let fence = null;
+  let isMermaid = false;
+  let diagram = null;
+
+  lines.forEach((line, i) => {
+    const fenceMark = line.match(/^\s*(```+|~~~+)\s*(\w*)/);
+    if (fenceMark) {
+      if (fence && fenceMark[1].startsWith(fence)) {
+        fence = null;
+        isMermaid = false;
+      } else if (!fence) {
+        fence = fenceMark[1];
+        isMermaid = fenceMark[2] === "mermaid";
+        diagram = null;
+      }
+      return;
+    }
+    if (!isMermaid || /^\s*%%/.test(line) || !line.trim()) return;
+    diagram ??= line.trim().match(/^[\w-]+/)?.[0] ?? "";
+    found.push({ line: i + 1, text: line, diagram });
+  });
+  return found;
+}
+
+/** The label text on one mermaid line, for the hyphen-run rule.
+ *
+ *  Only the spans where a hyphen run can be *label* rather than *syntax*:
+ *
+ *    - quoted labels, `A["text"]` and `-->|"text"|`. A label holding two
+ *      hyphens has to be quoted, since mermaid would otherwise read them as
+ *      the link they look like, so this is where the rule earns its keep.
+ *    - the free text after the first colon on a sequence message, a note, or a
+ *      timeline event (`Alice->>Bob: text`), which runs to end of line and is
+ *      the one unquoted label that can hold a hyphen run. Only in the diagram
+ *      kinds where a colon means that (COLON_LABEL_DIAGRAMS).
+ *
+ *  Deliberately NOT the unquoted node labels (`A[text]`) or the bare edge
+ *  labels (`A -->|text| B`): a hyphen run inside one is a link, not a label,
+ *  and reading those spans is how you end up flagging `}|--|{` in an ER
+ *  diagram or the `[ A | * ]` pointer boxes in the linked-list lesson.
+ *
+ *  The non-ASCII dash rule needs none of this and runs on the whole line, so
+ *  it catches unquoted labels too: mermaid's syntax is pure ASCII, so any en
+ *  dash on the line is already inside label text wherever it sits. */
+export function mermaidLabelText(line, diagram) {
+  const spans = [];
+  for (const m of line.matchAll(/"([^"]*)"/g)) spans.push(m[1]);
+
+  if (COLON_LABEL_DIAGRAMS.has(diagram) && !MERMAID_DIRECTIVE.test(line)) {
+    // Quoted runs are blanked first so a colon *inside* a label cannot split
+    // it: `A["ratio: x:y"] --> B` must not contribute ` x:y"] --> B`.
+    const blanked = line.replace(/"[^"]*"/g, (m) => " ".repeat(m.length));
+    const colon = blanked.indexOf(":");
+    if (colon !== -1) spans.push(line.slice(colon + 1));
+  }
+  return spans.filter((s) => s.trim());
+}
+
 // --- comment stripping (TS/TSX only) --------------------------------------
 
 /** Blank out //, /* *\/ and {/* *\/} comments, preserving line structure so
@@ -198,6 +318,14 @@ export function lintSource(src, file, kind) {
   if (kind === "mdx") {
     for (const { line, body } of blockquotes(lines)) {
       if (hasWrappingQuotes(body)) add("blockquote-quotes", line, body.slice(0, 90));
+    }
+    // One violation per line: a label can trip both halves of the rule, and
+    // the fix ("write a plain hyphen") is the same either way.
+    for (const { line, text, diagram } of mermaidLines(lines)) {
+      const offender = NON_ASCII_DASH.test(text)
+        ? text
+        : mermaidLabelText(text, diagram).find((label) => HYPHEN_RUN_AS_DASH.test(label));
+      if (offender) add("mermaid-dash", line, text.trim().slice(0, 90));
     }
   }
 
@@ -263,6 +391,12 @@ if (isMain) {
           "quotation marks, so a blockquote that types its own renders doubled.",
       );
     }
+    if (byRule["mermaid-dash"]) {
+      console.error(
+        "\nmermaid labels: write a plain ASCII hyphen. Mermaid renders label\n" +
+          "text verbatim, so a typed `--` reaches the reader as two hyphens.",
+      );
+    }
     if (byRule["colour-spelling"]) {
       console.error(
         "\ncolour: write it \"color\". It is a CSS property, a Plot channel and a\n" +
@@ -272,6 +406,6 @@ if (isMain) {
     process.exit(1);
   }
   console.log(
-    `✓ prose in ${files.length} file(s) is clean (no em dashes, no spaced en dashes, no filler phrases, no one-line display math, no British "colour", no doubled blockquote quotes)`,
+    `✓ prose in ${files.length} file(s) is clean (no em dashes, no spaced en dashes, no filler phrases, no one-line display math, no British "colour", no doubled blockquote quotes, no stray dashes in mermaid labels)`,
   );
 }
