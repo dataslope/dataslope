@@ -1005,6 +1005,33 @@ way. Words that are ordinary technical vocabulary here must stay out of it:
 **underscore** (the `_` character) and **crucial** all have real meanings in
 this material, and a linter that fires on correct prose gets ignored.
 
+### Blockquotes do not type their own quotation marks
+
+**A blockquote that is a quotation must not be wrapped in typed double
+quotes.** The stylesheet already draws them: Fumadocs' bundled typography sets
+`blockquote p:first-of-type::before { content: open-quote }` (and a matching
+`close-quote` on the last paragraph), so a typed pair renders as a *second*
+pair and the reader sees `""like this""`.
+
+```markdown
+<!-- Bad -->
+> "Take `mpg`; map engine displacement to x and highway MPG to y."
+
+<!-- Good -->
+> Take `mpg`; map engine displacement to x and highway MPG to y.
+```
+
+Quoting a *term* inside a blockquote is fine and stays, the rule is about a
+pair that wraps the whole body. `blockquote-quotes` in the checker fires only
+when a blockquote holds exactly two quote characters and they sit at the two
+ends, which is the one arrangement that can only be a wrapper.
+
+Two kinds of `>` line are deliberately out of scope. An **indented** one is a
+`<MultipleChoice>` per-choice explanation, which `parseQuestion.ts` strips the
+`>` from and renders through `MarkdownInline`, so no `<blockquote>` reaches the
+page and no quotes are drawn. One inside a **fenced block** is a sample, a
+prompt or a mermaid edge rather than a quotation.
+
 ---
 
 ## Multiple-choice question explanations
