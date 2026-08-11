@@ -289,6 +289,22 @@ typical growth. For plain additive quantities (heights, temperatures,
 dollars), stick with the arithmetic mean or median.
 </Callout>
 
+One last variation, worth knowing exists even if you never fit one by hand.
+Everything above summarizes a single column. As soon as the center depends on
+something else, "typical pay *for a given amount of experience*", the same
+mean-versus-median choice comes back, and the tool that keeps the median is
+**quantile regression**. Fit it at several quantiles at once and you get a
+picture no single line can give you:
+
+<Chart slug="quantile-vs-mean-regression" />
+
+Two familiar ideas are visible there at the same time. The dashed mean line
+sits above the median line for exactly the reason it did in the income example
+above, a long right tail drags the average and leaves the middle alone. And
+the fan tells you something a center never can: the spread itself changes
+across the range, so "the typical value" and "how much values vary around it"
+are two different questions about every slice of the data.
+
 ## Putting it together: a robust center summary
 
 In real exploratory work you rarely report a single number, you report a small
