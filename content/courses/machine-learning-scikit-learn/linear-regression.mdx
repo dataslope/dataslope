@@ -374,6 +374,13 @@ samples and a flexible model would just overfit. It is almost always the
 right *first* model, beat it before you complicate things.
 </Callout>
 
+<Chart slug="collinearity-inflates-se" />
+
+So the rule is about the question rather than the model. To predict,
+collinearity is not a problem and dropping a variable to fix a VIF is
+superstition that costs information. To interpret one coefficient, it is the
+whole problem, and no amount of data cleaning fixes it.
+
 ## When NOT to use it
 
 The same simplicity that makes linear regression clear also makes it the

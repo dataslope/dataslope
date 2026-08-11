@@ -59,6 +59,16 @@ so that no single feature dominates purely because it happens to be
 measured in large numbers.
 </Callout>
 
+A related problem is worth meeting alongside it, because it also lives in the
+feature column and also has no diagnostic:
+
+<Chart slug="regression-dilution" />
+
+Noise in y costs precision and biases nothing. Noise in *x* biases the slope
+towards zero, systematically, and more rows do not help. Fixes exist and all
+of them need extra information: repeated measurements, an instrumental
+variable, or an errors-in-variables model.
+
 ## StandardScaler: turning features into z-scores
 
 The workhorse of scaling is `StandardScaler`. For each feature (each
