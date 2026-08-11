@@ -153,6 +153,7 @@ import {
   NewWorkspaceControl,
   SaveControl,
   WorkspaceNameControl,
+  useAccountMenuSection,
   type MoreMenuSection,
 } from "./PlaygroundHeaderControls";
 import {
@@ -3593,7 +3594,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ⋯ menu: everything secondary folds into one place — labelled sections
   // whose items either act (Packages dialog, Settings tab, Workspaces
   // manager) or slide to a sub-panel (Examples, Export, Runtime info).
-  const moreMenuSections = useMemo<MoreMenuSection[]>(
+  const playgroundMoreSections = useMemo<MoreMenuSection[]>(
     () => [
       {
         label: "Resources",
@@ -3704,6 +3705,20 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       },
     ],
     [adapter, requestExample, exportCode, openSettingsTab],
+  );
+
+  // Auth had no entry point inside a playground at all. It lands as the ⋯
+  // menu's last group rather than a header control: the header is down to
+  // five controls by design and has no room on a phone, and signing in
+  // isn't something anyone reaches for mid-session. Null while the first
+  // session fetch is in flight, so nothing flashes.
+  const accountSection = useAccountMenuSection();
+  const moreMenuSections = useMemo<MoreMenuSection[]>(
+    () =>
+      accountSection
+        ? [...playgroundMoreSections, accountSection]
+        : playgroundMoreSections,
+    [playgroundMoreSections, accountSection],
   );
 
   // Rotate through the witty loading messages while the runtime is

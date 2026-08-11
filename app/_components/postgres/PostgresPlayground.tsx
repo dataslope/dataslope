@@ -130,6 +130,7 @@ import {
   SaveControl,
   NewWorkspaceControl,
   WorkspaceNameControl,
+  useAccountMenuSection,
   type MoreMenuSection,
 } from "../PlaygroundHeaderControls";
 import { applyEntryFocus } from "../playgroundEntryFocus";
@@ -3732,7 +3733,7 @@ function PostgresPlaygroundInner() {
 
   // One definition drives both the desktop ⋯ menu and the mobile
   // drawer's sectioned rows.
-  const moreSections: MoreMenuSection[] = [
+  const baseMoreSections: MoreMenuSection[] = [
                 {
                   label: "Data",
                   items: [
@@ -3907,6 +3908,16 @@ function PostgresPlaygroundInner() {
                   ],
                 },
               ];
+
+  // Auth had no entry point inside a playground at all. It lands as the ⋯
+  // menu's last group rather than a header control: the header is down to
+  // five controls by design and has no room on a phone, and signing in
+  // isn't something anyone reaches for mid-session. Null while the first
+  // session fetch is in flight, so nothing flashes.
+  const accountSection = useAccountMenuSection();
+  const moreSections: MoreMenuSection[] = accountSection
+    ? [...baseMoreSections, accountSection]
+    : baseMoreSections;
 
   return (
     <SqlPlaygroundShell

@@ -110,6 +110,7 @@ import {
   SaveControl,
   NewWorkspaceControl,
   WorkspaceNameControl,
+  useAccountMenuSection,
   type MoreMenuSection,
 } from "../PlaygroundHeaderControls";
 import { applyEntryFocus } from "../playgroundEntryFocus";
@@ -1997,7 +1998,7 @@ function SqlPlaygroundInner() {
 
   // ⋯ menu (simplified header): Data / Tools / Playground sections with
   // Import & Export sliding to sub-panels, mirroring the design handoff.
-  const sqlMoreSections = useMemo<MoreMenuSection[]>(
+  const sqlBaseSections = useMemo<MoreMenuSection[]>(
     () => [
       {
         label: "Data",
@@ -2204,6 +2205,18 @@ function SqlPlaygroundInner() {
       setImportParquetOpen,
       setImportParquetDragging,
     ],
+  );
+
+  // Auth had no entry point inside a playground at all. It lands as the ⋯
+  // menu's last group rather than a header control: the header is down to
+  // five controls by design and has no room on a phone, and signing in
+  // isn't something anyone reaches for mid-session. Null while the first
+  // session fetch is in flight, so nothing flashes.
+  const accountSection = useAccountMenuSection();
+  const sqlMoreSections = useMemo<MoreMenuSection[]>(
+    () =>
+      accountSection ? [...sqlBaseSections, accountSection] : sqlBaseSections,
+    [sqlBaseSections, accountSection],
   );
 
   // Defined once and rendered in both the sidebar and the mobile drawer

@@ -109,7 +109,7 @@ export function MobileMenuSheet({
         <Drawer.Backdrop className="pkg-overlay mobile-menu-backdrop" />
         <Drawer.Viewport className="mobile-drawer-viewport">
           <Drawer.Popup className="mobile-menu-drawer" aria-label={title}>
-            <Drawer.Content>
+            <Drawer.Content className="mobile-menu-drawer-content">
               <div className="mobile-menu-handle" aria-hidden="true" />
               <div className="mobile-menu-drawer-header">
                 <Drawer.Title className="mobile-menu-drawer-title">
@@ -345,7 +345,7 @@ export function MobileMenuSubSheet({
             className="mobile-menu-drawer mobile-menu-nested-drawer"
             aria-label={ariaLabel ?? (typeof label === "string" ? label : undefined)}
           >
-            <Drawer.Content>
+            <Drawer.Content className="mobile-menu-drawer-content">
               <div className="mobile-menu-handle" aria-hidden="true" />
               <div className="mobile-menu-drawer-header">
                 <Drawer.Title className="mobile-menu-drawer-title">

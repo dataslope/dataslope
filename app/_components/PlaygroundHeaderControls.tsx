@@ -32,6 +32,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
 import { Menu } from "@base-ui/react/menu";
 import { Popover } from "@base-ui/react/popover";
@@ -42,10 +43,12 @@ import {
   Download,
   FilePlus2,
   LogIn,
+  LogOut,
   Pencil,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
-import { useSession } from "@/lib/auth/client";
+import { signOut, useSession } from "@/lib/auth/client";
 import { switchActiveWorkspace } from "./opfs/activeWorkspace";
 import {
   createWorkspace,
@@ -767,6 +770,137 @@ export function MoreMenu({ sections }: { sections: MoreMenuSection[] }) {
       </Popover.Portal>
     </Popover.Root>
   );
+}
+
+// ---------------------------------------------------------------------------
+// Account section (sign in · account · sign out)
+// ---------------------------------------------------------------------------
+
+/**
+ * Body of the "Sign out" sub-panel. Signing out is a one-click, silent
+ * action everywhere else on the site, but in a playground the obvious
+ * thing to fear is that the code goes with it — so this says, before the
+ * fact, that it doesn't. (It really doesn't: workspaces live in OPFS in
+ * this browser. What stops is the cloud backup sync.)
+ *
+ * A panel rather than a Dialog because it works unchanged on both
+ * surfaces: the desktop ⋯ menu slides to it, the mobile drawer opens it
+ * as a nested sheet.
+ */
+function SignOutPanel({
+  email,
+  close,
+}: {
+  email?: string | null;
+  close: () => void;
+}) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+
+  const confirm = useCallback(async () => {
+    setBusy(true);
+    try {
+      await signOut();
+      close();
+      // Re-render everything reading the session (the save menu's cloud
+      // rows, the workspace manager's backup list).
+      router.refresh();
+    } catch {
+      // Network failure: leave the session alone and re-enable the button.
+      setBusy(false);
+    }
+  }, [close, router]);
+
+  return (
+    <div className="ph-signout-panel">
+      <p className="ph-signout-note">
+        {email && (
+          <>
+            Signed in as <strong>{email}</strong>.{" "}
+          </>
+        )}
+        Your workspaces stay in this browser. Signing out only stops backing
+        them up to your account.
+      </p>
+      <div className="confirm-actions">
+        <button
+          type="button"
+          className="confirm-btn confirm-btn-secondary"
+          onClick={close}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="confirm-btn confirm-btn-primary"
+          disabled={busy}
+          onClick={() => void confirm()}
+        >
+          {busy ? "Signing out…" : "Sign out"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The ⋯ menu's Account group, as a `MoreMenuSection` each playground
+ * appends to its own sections. Auth had no entry point in the playgrounds
+ * at all; it goes here rather than in the header because the header is
+ * deliberately down to five controls and has no room on a phone, and
+ * because signing in isn't something anyone reaches for mid-session.
+ *
+ * Returns `null` while the first session fetch is in flight, so a
+ * signed-in visitor never sees "Sign in" flash before their account rows
+ * resolve (same reasoning as the site header's `AuthMenu` skeleton).
+ *
+ * Sign-in links to plain `/sign-in`: the root layout's `ReturnToTracker`
+ * has already recorded the playground URL, so the flow returns here on
+ * its own — a hand-built `?next=` would only lose the query and hash.
+ */
+export function useAccountMenuSection(): MoreMenuSection | null {
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
+  const email = session?.user?.email;
+
+  return useMemo<MoreMenuSection | null>(() => {
+    if (isPending) return null;
+    if (!session) {
+      return {
+        label: "Account",
+        items: [
+          {
+            key: "sign-in",
+            label: "Sign in",
+            icon: LogIn,
+            onSelect: () => router.push("/sign-in"),
+          },
+        ],
+      };
+    }
+    return {
+      label: "Account",
+      items: [
+        {
+          key: "account",
+          label: "Account settings",
+          icon: UserRound,
+          onSelect: () => router.push("/dashboard/account"),
+        },
+        {
+          key: "sign-out",
+          label: "Sign out",
+          icon: LogOut,
+          panel: {
+            title: "Sign out",
+            render: (close: () => void) => (
+              <SignOutPanel email={email} close={close} />
+            ),
+          },
+        },
+      ],
+    };
+  }, [isPending, session, email, router]);
 }
 
 // ---------------------------------------------------------------------------
