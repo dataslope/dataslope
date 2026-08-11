@@ -461,6 +461,15 @@ The rule: if each row is one unit measured under both conditions, pair it
 (`ttest_ind()`).
 </Callout>
 
+<Chart slug="pairing-removes-variance" />
+
+Nothing statistical is smuggled in there. The two piles were never
+independent, and treating them as though they were throws away the fact that
+the same subject appears in both. The warning that comes with it: the pairing
+has to be real. Pairing rows that merely arrived in the same order gives you
+the paired test's smaller degrees of freedom and none of its variance
+reduction.
+
 ## The assumptions, and how much they matter
 
 Every t-test rests on three assumptions. They are not equally fragile.

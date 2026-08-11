@@ -184,6 +184,12 @@ Notice that `user_id` is stored as an integer, so pandas reports its
 dtype as `int64`, but it is **nominal**: the IDs are names that happen
 to look like numbers. The next section is about exactly that trap.
 
+<Chart slug="measurement-scales-ladder" />
+
+The value is all in the empty half of that table. Nearly every statistical
+mistake made with a categorical variable is an operation from a higher rung
+applied to a lower one, and not one of them raises an error.
+
 ## Encoding traps: when numbers aren't quantities
 
 The most dangerous columns are the ones that *look* numerical but
@@ -256,6 +262,12 @@ computer can't tell a quantity from a code, that judgment is yours.
 
 Numeric-looking IDs are nominal; treat them as categories, not quantities.`}
 />
+
+<Chart slug="code-is-not-a-quantity" />
+
+The habit that catches all four: for every numeric column, ask whether doubling
+it means anything. If it does not, the column is a label with digits in it and
+belongs in the dataframe as a category.
 
 ## pandas dtypes vs. statistical type
 
