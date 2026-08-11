@@ -198,19 +198,43 @@ diamonds = pl.read_csv("diamonds.csv")`,
     pl.col("price").cast(pl.UInt32),
 )
 
-print("as read:", round(diamonds.estimated_size("mb"), 2), "MB")
+print("as read :", round(diamonds.estimated_size("mb"), 2), "MB")
 print("narrowed:", round(slim.estimated_size("mb"), 2), "MB")
 
+# The same three columns, before and after
+for col in ("cut", "color", "price"):
+    print(
+        f"{col:>6}: {str(diamonds[col].dtype):>8} -> {str(slim[col].dtype):<12}"
+        f"{round(diamonds[col].estimated_size('mb'), 2):>6} MB ->"
+        f"{round(slim[col].estimated_size('mb'), 2):>6} MB"
+    )
+`,
+    },
+  ]}
+/>
+
+The narrowing is real but modest here, because most of this frame is
+already numeric. On a table that is mostly repeated strings, the
+`Categorical` cast is the one that pays.
+
+The other half of the advice, storing Parquet rather than CSV, cannot
+be measured in the browser:
+
+```python
 diamonds.write_csv("d.csv")
 slim.write_parquet("d.parquet")
 
 import os
 print("csv on disk    :", round(os.path.getsize("d.csv") / 1e6, 2), "MB")
 print("parquet on disk:", round(os.path.getsize("d.parquet") / 1e6, 2), "MB")
-`,
-    },
-  ]}
-/>
+```
+
+<Callout type="info" title="Not runnable in the browser">
+`write_parquet()` is routed through the streaming sink, the same engine
+the callout above is about, so it raises here for the same reason. On a
+normal Polars install this prints roughly 3 MB of CSV against a few
+hundred kilobytes of Parquet.
+</Callout>
 
 ## Practice
 

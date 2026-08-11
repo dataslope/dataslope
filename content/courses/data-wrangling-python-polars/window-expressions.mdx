@@ -24,7 +24,7 @@ so each row can be compared with its own group. That is `.over()`.
 penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
     "species", "body_mass_g"
 )`,
-      starterCode: `print(
+      starterCode: `display(
     penguins.with_columns(
         species_avg=pl.col("body_mass_g").mean().round(0).over("species"),
     )
@@ -65,7 +65,7 @@ flowchart LR
 diamonds = pl.read_csv("diamonds.csv")`,
       starterCode: `price = pl.col("price")
 
-print(
+display(
     diamonds.select(
         "cut",
         "price",
@@ -90,7 +90,7 @@ print(
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(
+      starterCode: `display(
     penguins.select(
         "species",
         "island",
@@ -121,7 +121,7 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
     .over("species")
 )
 
-print(
+display(
     ranked.filter(pl.col("rank") <= 2)
     .select("species", "island", "body_mass_g", "rank")
     .sort("species", "rank")
@@ -161,7 +161,7 @@ sales = pl.DataFrame(
     }
 ).sort("region", "month")
 
-print(
+display(
     sales.with_columns(
         prev=pl.col("amount").shift(1).over("region"),
         running=pl.col("amount").cum_sum().over("region"),
@@ -204,7 +204,7 @@ df = pl.DataFrame(
     {"g": ["a", "a", "a", "b", "b"], "x": [3, 1, 2, 9, 7]}
 )
 
-print(
+display(
     df.with_columns(
         # group_to_rows (default): one value per row
         sorted_in_group=pl.col("x").sort().over("g"),
@@ -258,7 +258,7 @@ Keep every row: this is a windowing exercise, not a grouping one.`}
 diamonds = pl.read_csv("diamonds.csv")`,
       starterCode: `out = None  # TODO
 
-print(out)
+display(out)
 `,
       solutionCode: `out = diamonds.select(
     "cut",
@@ -271,7 +271,7 @@ print(out)
     .over("cut"),
 )
 
-print(out.head())
+display(out.head())
 `,
     },
   ]}

@@ -46,7 +46,7 @@ df = pd.DataFrame(
     }
 )
 
-print(df)
+display(df)
 print()
 print("Columns:", list(df.columns))
 print("Number of rows:", len(df))
@@ -106,7 +106,7 @@ exactly as you would on your own machine.
       starterCode: `# Read a real CSV, just like in your own work.
 penguins = pd.read_csv("penguins.csv")
 
-print(penguins.head())
+display(penguins.head())
 print("Shape:", penguins.shape)
 print("Columns:", list(penguins.columns))
 `,
@@ -130,12 +130,12 @@ df = px.data.gapminder()
 
 # First 5 rows:
 print("HEAD")
-print(df.head())
+display(df.head())
 print()
 
 # Last 3 rows:
 print("TAIL")
-print(df.tail(3))
+display(df.tail(3))
 print()
 
 # Shape: (rows, columns)
@@ -148,7 +148,7 @@ print()
 
 # Quick statistical summary of numeric columns:
 print("DESCRIBE")
-print(df.describe())
+display(df.describe())
 `,
     },
   ]}
@@ -229,7 +229,7 @@ df = px.data.gapminder()
 # Boolean indexing:
 asia_2007 = df[(df["continent"] == "Asia") & (df["year"] == 2007)]
 print("Boolean indexing:", asia_2007.shape)
-print(asia_2007.head())
+display(asia_2007.head())
 print()
 
 # Same result via .query():
@@ -314,7 +314,7 @@ avg = (
     .sort_values("lifeExp", ascending=False)
 )
 
-print(avg)
+display(avg)
 
 fig = px.bar(
     avg,
@@ -386,13 +386,13 @@ wide = pd.DataFrame(
 )
 
 print("WIDE:")
-print(wide)
+display(wide)
 
 # Reshape to long / tidy
 long = wide.melt(id_vars="city", var_name="year", value_name="visitors")
 
 print("\\nLONG:")
-print(long)
+display(long)
 
 fig = px.line(
     long,

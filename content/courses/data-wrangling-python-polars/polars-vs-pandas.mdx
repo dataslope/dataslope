@@ -74,7 +74,7 @@ df = pl.DataFrame(
 # Polars:  describe the new column, hand it to with_columns
 df = df.with_columns((pl.col("temp_c") * 9 / 5 + 32).alias("temp_f"))
 
-print(df)
+display(df)
 `,
     },
   ]}
@@ -97,8 +97,8 @@ print(type(recipe))
 nordics = pl.DataFrame({"temp_c": [-3.0, 1.0, -8.5]})
 iberia = pl.DataFrame({"temp_c": [17.5, 21.0, 33.0]})
 
-print(nordics.with_columns(recipe))
-print(iberia.with_columns(recipe))
+display(nordics.with_columns(recipe))
+display(iberia.with_columns(recipe))
 `,
     },
   ]}
@@ -251,13 +251,13 @@ df = pl.read_csv("penguins.csv", null_values=["NA"]).select(
 )`,
       starterCode: `heavy = None  # TODO
 
-print(heavy)
+display(heavy)
 `,
       solutionCode: `heavy = df.filter(pl.col("body_mass_g") > 5000).select(
     "species", "body_mass_g"
 )
 
-print(heavy)
+display(heavy)
 `,
     },
   ]}

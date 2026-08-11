@@ -137,7 +137,7 @@ penguins = pd.read_csv(
 
 print(penguins.dtypes)
 print()
-print(penguins.head())
+display(penguins.head())
 `,
     },
   ]}
@@ -169,7 +169,7 @@ print("Shape:", penguins.shape)
 print()
 
 # 2. Head, does each column look sensible?
-print(penguins.head())
+display(penguins.head())
 print()
 
 # 3. Dtypes, are the types right?
@@ -252,7 +252,7 @@ json_text = """
 """
 
 df = pd.read_json(io.StringIO(json_text))
-print(df)
+display(df)
 print(df.dtypes)
 `,
     },
@@ -327,7 +327,10 @@ Store the result in a DataFrame called \`df\`.`}
 
 df = None  # TODO: read penguins.csv with usecols and dtype
 
-print(df.head() if df is not None else "df is still None")
+if df is None:
+    print("df is still None")
+else:
+    display(df.head())
 `,
       solutionCode: `import pandas as pd
 
@@ -337,7 +340,7 @@ df = pd.read_csv(
     dtype={"species": "category", "island": "category"},
 )
 
-print(df.head())
+display(df.head())
 `,
     },
   ]}

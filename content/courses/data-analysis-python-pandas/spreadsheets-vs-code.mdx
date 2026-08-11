@@ -199,7 +199,7 @@ clean = clean[~clean["day"].isin(["Sat", "Sun"])]
 rates = {"USD": 1.00, "EUR": 1.08, "GBP": 1.27}
 clean = clean.assign(amount_usd=clean["amount"] * clean["currency"].map(rates))
 
-print(clean)
+display(clean)
 `,
     },
   ]}
@@ -266,7 +266,7 @@ buf = io.BytesIO()
 with pd.ExcelWriter(buf, engine="openpyxl") as writer:
     summary.to_excel(writer, sheet_name="products", index=False)
 print("Wrote", buf.tell(), "bytes of Excel to in-memory buffer.")
-print(summary)
+display(summary)
 `,
     },
   ]}

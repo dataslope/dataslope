@@ -35,7 +35,7 @@ flowchart TD
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(
+      starterCode: `display(
     penguins.group_by("species").agg(
         pl.len().alias("n"),
         pl.col("body_mass_g").mean().round(0).alias("avg_mass"),
@@ -72,13 +72,13 @@ cost the parallelism.
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# Unordered: fine for a further computation, wrong for a report
-print(penguins.group_by("island").agg(pl.len()))
+display(penguins.group_by("island").agg(pl.len()))
 
 # Either sort afterwards...
-print(penguins.group_by("island").agg(pl.len()).sort("island"))
+display(penguins.group_by("island").agg(pl.len()).sort("island"))
 
 # ...or ask for the original appearance order
-print(penguins.group_by("island", maintain_order=True).agg(pl.len()))
+display(penguins.group_by("island", maintain_order=True).agg(pl.len()))
 `,
     },
   ]}
@@ -101,7 +101,7 @@ and states the order you actually want.
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(
+      starterCode: `display(
     penguins.group_by("species", "island").agg(
         pl.len().alias("n"),
         pl.col("body_mass_g").mean().round(0).alias("avg_mass"),
@@ -134,7 +134,7 @@ The key does not have to be a column.
       filename: "main.py",
       initCode: `import polars as pl
 diamonds = pl.read_csv("diamonds.csv")`,
-      starterCode: `print(
+      starterCode: `display(
     diamonds.group_by(
         (pl.col("carat") // 0.5 * 0.5).alias("carat_bucket")
     ).agg(
@@ -163,11 +163,11 @@ also the single most common surprise.
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# No aggregation: every mass in the group, as a list
 lists = penguins.group_by("species").agg(pl.col("body_mass_g")).sort("species")
-print(lists)
+display(lists)
 print(lists.schema)
 
 # Which is genuinely useful when you want it
-print(
+display(
     penguins.group_by("species").agg(
         pl.col("island").unique().sort().alias("islands"),
         pl.col("body_mass_g").sort(descending=True).head(3).alias("top3"),
@@ -195,7 +195,7 @@ in different places.
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# Filter rows BEFORE grouping
-print(
+display(
     penguins.filter(pl.col("sex") == "female")
     .group_by("species")
     .agg(pl.len().alias("n_female"))
@@ -203,7 +203,7 @@ print(
 )
 
 # Filter groups AFTER aggregating (SQL's HAVING)
-print(
+display(
     penguins.group_by("species", "island")
     .agg(pl.len().alias("n"))
     .filter(pl.col("n") >= 50)
@@ -225,7 +225,7 @@ print(
       initCode: `import polars as pl
 import polars.selectors as cs
 diamonds = pl.read_csv("diamonds.csv")`,
-      starterCode: `print(
+      starterCode: `display(
     diamonds.group_by("cut").agg(
         pl.len().alias("n"),
         cs.by_name("carat", "price").mean().round(2).name.suffix("_mean"),
@@ -259,7 +259,7 @@ Sort by \`avg_mass\` descending.`}
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `report = None  # TODO
 
-print(report)
+display(report)
 `,
       solutionCode: `report = (
     penguins.group_by("species")
@@ -274,7 +274,7 @@ print(report)
     .sort("avg_mass", descending=True)
 )
 
-print(report)
+display(report)
 `,
     },
   ]}

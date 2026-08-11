@@ -24,9 +24,14 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 
-/** The plugin list `renderMarkdownInstructions` hands to react-markdown. Kept
- *  in step by hand: react-markdown itself needs a DOM, and these tests run in
- *  the Node environment.
+/** The *math* half of the plugin list `renderMarkdownInstructions` hands to
+ *  react-markdown, mirrored by hand: react-markdown itself needs a DOM, and
+ *  these tests run in the Node environment.
+ *
+ *  `rehypeHighlight` and `labelBareFences` are deliberately absent. They are
+ *  the subject of `challengeInstructionsHighlight.test.tsx`, and neither one
+ *  can affect a math span: highlighting only visits `pre > code`, and the
+ *  fence labeller only rewrites fence lines.
  *
  *  The tree is inspected rather than serialised, so the test needs no HTML
  *  stringifier: `rehype-stringify` is not a dependency of this repo and pulling

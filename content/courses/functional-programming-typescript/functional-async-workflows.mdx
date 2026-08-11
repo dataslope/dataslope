@@ -251,7 +251,7 @@ the structure of the type itself.
 1. Look up the user via \`fetchUser\`.
 2. If found, look up their preferred language via \`fetchLang\`.
 3. Return a \`Result<string, string>\` whose ok value is
-   \`\`\`
+   \`\`\`text
    Hello, <name>! Preferred language: <lang>.
    \`\`\`
 
@@ -260,7 +260,7 @@ errors**. Errors must propagate via the Result channel.
 
 **Expected output**
 
-\`\`\`
+\`\`\`text
 { kind: 'ok', value: 'Hello, Ada! Preferred language: TypeScript.' }
 { kind: 'err', error: 'no such user' }
 { kind: 'err', error: 'no language set' }

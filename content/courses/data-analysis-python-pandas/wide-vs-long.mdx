@@ -84,7 +84,7 @@ wide = pd.DataFrame(
     }
 )
 print("Wide:")
-print(wide)
+display(wide)
 print()
 
 long = wide.melt(
@@ -94,7 +94,7 @@ long = wide.melt(
     value_name="happiness",
 )
 print("Long:")
-print(long)
+display(long)
 `,
     },
   ]}
@@ -118,7 +118,7 @@ long = pd.DataFrame(
 )
 
 wide = long.pivot(index="person", columns="year", values="happiness")
-print(wide)
+display(wide)
 `,
     },
   ]}
@@ -184,14 +184,14 @@ sales = pd.DataFrame(
 
 # Melt month columns into rows
 long = sales.melt(id_vars="store", var_name="month", value_name="sales")
-print(long)
+display(long)
 print()
 
 # Now month is a string. Pull it apart:
 parsed = long["month"].str.split("_", expand=True)
 long["month_name"] = parsed[0]
 long["year"] = parsed[1].astype(int)
-print(long)
+display(long)
 `,
     },
   ]}
@@ -225,12 +225,12 @@ temps = pd.DataFrame({
 })`,
       starterCode: `long = None  # TODO
 
-print(long)
+display(long)
 `,
       solutionCode: `import pandas as pd
 
 long = temps.melt(id_vars="city", var_name="month", value_name="temp")
-print(long)
+display(long)
 `,
     },
   ]}

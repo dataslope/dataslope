@@ -84,7 +84,7 @@ df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
     "salary": [120, 95, 140, 80, 128, 110, 92],
 })`,
-      starterCode: `print(df.groupby("dept")["salary"].agg(["mean", "median", "min", "max", "count"]))
+      starterCode: `display(df.groupby("dept")["salary"].agg(["mean", "median", "min", "max", "count"]))
 `,
     },
   ]}
@@ -113,7 +113,7 @@ result = df.groupby("dept").agg(
         "tenure": ["mean", "min"],
     }
 )
-print(result)
+display(result)
 `,
     },
   ]}
@@ -156,7 +156,7 @@ result = (
     .round(1)
 )
 
-print(result)
+display(result)
 `,
     },
   ]}
@@ -205,7 +205,7 @@ df = pd.DataFrame({
     "salary": [110, 160, 80, 120, 95, 75],
 })`,
       starterCode: `flat = df.groupby(["dept", "level"])["salary"].mean().reset_index()
-print(flat)
+display(flat)
 `,
     },
   ]}
@@ -238,7 +238,7 @@ df = pd.DataFrame(
 
 df["dept_avg"] = df.groupby("dept")["salary"].transform("mean")
 df["vs_dept_avg"] = (df["salary"] - df["dept_avg"]).round(1)
-print(df)
+display(df)
 `,
     },
   ]}
@@ -269,7 +269,7 @@ df = pd.DataFrame(
 
 # Keep only departments with average salary > 100
 big = df.groupby("dept").filter(lambda g: g["salary"].mean() > 100)
-print(big)
+display(big)
 `,
     },
   ]}
@@ -301,7 +301,7 @@ df = pd.DataFrame(
 def top_two(g):
     return g.sort_values("salary", ascending=False).head(2)
 
-print(df.groupby("dept").apply(top_two, include_groups=False))
+display(df.groupby("dept").apply(top_two, include_groups=False))
 `,
     },
   ]}
@@ -336,7 +336,7 @@ diamonds = pd.read_csv("diamonds.csv")`,
     .round({"avg_price": 0})
     .sort_values("avg_price", ascending=False)
 )
-print(summary)
+display(summary)
 `,
     },
   ]}
@@ -372,7 +372,7 @@ Sort the result by \`avg_price\` descending.`}
 diamonds = pd.read_csv("diamonds.csv")`,
       starterCode: `summary = None  # TODO
 
-print(summary)
+display(summary)
 `,
       solutionCode: `summary = (
     diamonds.groupby("cut")
@@ -388,7 +388,7 @@ print(summary)
     .sort_values("avg_price", ascending=False)
 )
 
-print(summary)
+display(summary)
 `,
     },
   ]}

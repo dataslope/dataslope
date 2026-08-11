@@ -62,7 +62,7 @@ frame = pd.DataFrame(
         ".diff()": builtin,
     }
 ).head(6)
-print(frame)
+display(frame)
 print()
 print("They match exactly:", manual.dropna().equals(builtin.dropna()))
 print("The first value is NaN -- there's no earlier month to subtract.")
@@ -355,7 +355,7 @@ reconstructed = pd.concat(
 )
 
 print("Original vs reconstructed (first 6):")
-print(pd.DataFrame({"original": air, "reconstructed": reconstructed}).head(6))
+display(pd.DataFrame({"original": air, "reconstructed": reconstructed}).head(6))
 print()
 print("Perfect recovery:", np.allclose(air.values, reconstructed.values))
 print()

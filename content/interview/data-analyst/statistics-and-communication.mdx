@@ -313,7 +313,7 @@ print(f"Pearson r: {r:.3f}")
 
 # Full correlation matrix
 corr_matrix = df[["price", "sales", "ad_spend"]].corr()
-print(corr_matrix.round(3))
+display(corr_matrix.round(3))
 
 # Spearman (rank-based)
 r_spearman = df["price"].corr(df["sales"], method="spearman")

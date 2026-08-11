@@ -62,7 +62,7 @@ df = pd.DataFrame(
 print("Before filter:", df.shape)
 filtered = df[df["value"] > 25]
 print("After filter:", filtered.shape)
-print(filtered)
+display(filtered)
 `,
     },
   ]}
@@ -158,8 +158,8 @@ df = pd.DataFrame(
     }
 )
 
-print(df[df["age"] > 100])
-print(df[df["age"] < 0])
+display(df[df["age"] > 100])
+display(df[df["age"] < 0])
 `,
     },
   ]}
@@ -234,7 +234,7 @@ sub["y"] = 0  # Risky, may warn or fail silently
 
 # Safer:
 df.loc[df["x"] > 1, "y"] = 0
-print(df)
+display(df)
 `,
     },
   ]}

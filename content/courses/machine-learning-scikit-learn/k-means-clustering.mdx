@@ -471,7 +471,7 @@ from sklearn.preprocessing import StandardScaler
 print("districts:", housing.shape[0], " columns:", list(housing.columns))
 
 # These ranges are nowhere near comparable, scaling is mandatory.
-print(np.round(housing[["Population", "Latitude"]].describe().loc[["min", "max"]], 2))
+display(np.round(housing[["Population", "Latitude"]].describe().loc[["min", "max"]], 2))
 
 # Standardize every column to mean 0, std 1, THEN cluster.
 X_scaled = StandardScaler().fit_transform(housing)
@@ -485,7 +485,7 @@ print("cluster sizes:", sizes)
 
 # Read one cluster back in the ORIGINAL units to see what it captured.
 housing_labeled = housing.assign(cluster=labels)
-print(np.round(housing_labeled.groupby("cluster")[["MedInc", "Latitude", "Longitude"]].mean(), 2))
+display(np.round(housing_labeled.groupby("cluster")[["MedInc", "Latitude", "Longitude"]].mean(), 2))
 `,
     },
   ]}

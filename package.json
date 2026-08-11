@@ -38,6 +38,7 @@
     "check:charts": "node scripts/build-charts.mjs && node scripts/check-chart-overflow.mjs",
     "check:code-blocks": "node scripts/check-code-blocks.mjs",
     "check:js": "node scripts/check-js-blocks.mjs",
+    "check:polars-scan": "node scripts/check-polars-scan.mjs",
     "check:r": "node scripts/check-r-blocks.mjs",
     "check:cpp": "node scripts/check-cpp-blocks.mjs",
     "check:sql": "node scripts/check-sql-blocks.mjs",

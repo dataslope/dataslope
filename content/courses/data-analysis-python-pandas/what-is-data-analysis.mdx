@@ -239,7 +239,7 @@ penguins = pd.read_csv("penguins.csv")`,
 print("Has body_mass_g?", "body_mass_g" in penguins.columns)
 print("Has species?", "species" in penguins.columns)
 print()
-print(penguins[["species", "body_mass_g"]].head())
+display(penguins[["species", "body_mass_g"]].head())
 `,
     },
   ]}
@@ -286,7 +286,7 @@ summary = (
     .describe()[["count", "25%", "50%", "75%"]]
     .round(0)
 )
-print(summary)
+display(summary)
 `,
     },
   ]}

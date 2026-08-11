@@ -90,11 +90,11 @@ df = pd.DataFrame(
 )
 
 # Anyone with "Data" in their title (case-insensitive)
-print(df[df["title"].str.contains("Data", case=False)])
+display(df[df["title"].str.contains("Data", case=False)])
 print()
 
 # Anyone with "Lead" OR "Senior"
-print(df[df["title"].str.contains("Lead|Senior", regex=True)])
+display(df[df["title"].str.contains("Lead|Senior", regex=True)])
 `,
     },
   ]}
@@ -126,7 +126,7 @@ print()
 # Get with expand=True returns a DataFrame
 parts = emails.str.split("@", expand=True)
 parts.columns = ["user", "domain"]
-print(parts)
+display(parts)
 print()
 
 # Or slice characters by position
@@ -162,7 +162,7 @@ logs = pd.Series(
 parsed = logs.str.extract(
     r"(?P<date>\\d{4}-\\d{2}-\\d{2}) (?P<time>\\d{2}:\\d{2}:\\d{2}) (?P<level>\\w+)\\s+(?P<msg>.*)"
 )
-print(parsed)
+display(parsed)
 `,
     },
   ]}

@@ -35,7 +35,7 @@ df = pd.DataFrame(
         "tenure": [3, 6, 7],
     }
 )
-print(df)
+display(df)
 print()
 print("Row index:   ", df.index)
 print("Column index:", df.columns)
@@ -71,9 +71,9 @@ df2 = pd.DataFrame(
     }
 ).set_index("name")
 
-print(df)
+display(df)
 print()
-print(df2)
+display(df2)
 `,
     },
   ]}
@@ -195,12 +195,12 @@ df = pd.DataFrame(
 )
 
 print("Before:")
-print(df)
+display(df)
 print()
 
 flat = df.reset_index()
 print("After reset_index():")
-print(flat)
+display(flat)
 print()
 print("Columns are now:", list(flat.columns))
 `,

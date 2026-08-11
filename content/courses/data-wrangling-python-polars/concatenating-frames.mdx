@@ -23,7 +23,7 @@ each other: vertically (more rows) or horizontally (more columns).
 jan = pl.DataFrame({"day": [1, 2], "sales": [100, 120]})
 feb = pl.DataFrame({"day": [1, 2], "sales": [95, 130]})
 
-print(pl.concat([jan, feb]))                       # vertical is the default
+display(pl.concat([jan, feb]))                       # vertical is the default
 print(pl.concat([jan, feb], how="vertical").height)
 `,
     },
@@ -86,7 +86,7 @@ try:
 except Exception as error:
     print("vertical:", type(error).__name__)
 
-print(pl.concat([a, b], how="vertical_relaxed"))
+display(pl.concat([a, b], how="vertical_relaxed"))
 `,
     },
   ]}
@@ -103,7 +103,7 @@ jan = pl.DataFrame({"day": [1, 2], "sales": [100, 120]})
 feb = pl.DataFrame({"day": [1], "sales": [95], "region": ["N"]})
 
 # diagonal takes the union of columns and fills the gaps with null
-print(pl.concat([jan, feb], how="diagonal"))
+display(pl.concat([jan, feb], how="diagonal"))
 `,
     },
   ]}
@@ -132,7 +132,7 @@ not as a way to avoid thinking about them.
 left = pl.DataFrame({"a": [1, 2, 3]})
 right = pl.DataFrame({"b": ["x", "y"]})
 
-print(pl.concat([left, right], how="horizontal"))
+display(pl.concat([left, right], how="horizontal"))
 `,
     },
   ]}
@@ -156,8 +156,8 @@ horizontal concat assumes it.
 df = pl.DataFrame({"id": [1, 2], "v": [10, 20]})
 new = pl.DataFrame({"id": [3], "v": [30]})
 
-print(df.vstack(new))       # cheap, leaves the frame chunked
-print(df.extend(new))       # appends into the existing buffers
+display(df.vstack(new))       # cheap, leaves the frame chunked
+display(df.extend(new))       # appends into the existing buffers
 
 # A frame in many chunks reads more slowly; rechunk consolidates it
 combined = pl.concat([df, new, new]).rechunk()
@@ -188,7 +188,7 @@ def load_month(month: int) -> pl.DataFrame:
 frames = [load_month(m) for m in range(1, 13)]
 year = pl.concat(frames)
 
-print(year.head(3))
+display(year.head(3))
 print("rows:", year.height, "chunks:", year.n_chunks())
 `,
     },
@@ -224,8 +224,8 @@ b = pl.DataFrame({"id": [3, 4], "v": ["c", "d"]})
 stacked = pl.concat([a, b])
 print("stacked:", stacked.height)
 
-print(stacked.unique())                                   # whole-row duplicates
-print(stacked.unique(subset="id", keep="last").sort("id"))  # by key
+display(stacked.unique())                                   # whole-row duplicates
+display(stacked.unique(subset="id", keep="last").sort("id"))  # by key
 `,
     },
   ]}
@@ -263,12 +263,12 @@ mar = pl.DataFrame({"day": [1], "sales": [88.5]})`,
       starterCode: `year = None              # TODO
 n_missing_region = None  # TODO
 
-print(year)
+display(year)
 `,
       solutionCode: `year = pl.concat([jan, feb, mar], how="diagonal_relaxed")
 n_missing_region = year["region"].null_count()
 
-print(year)
+display(year)
 print("missing region:", n_missing_region)
 `,
     },
