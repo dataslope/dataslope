@@ -34,7 +34,7 @@ df = pl.DataFrame(
     }
 )
 
-print(df)
+display(df)
 print(df.schema)
 `,
     },
@@ -68,7 +68,7 @@ df = pl.DataFrame(
 
 s = pl.col("scores")
 
-print(
+display(
     df.with_columns(
         n=s.list.len(),
         best=s.list.max(),
@@ -110,10 +110,10 @@ df = pl.DataFrame(
 )
 
 flat = df.explode("scores")
-print(flat)
+display(flat)
 
 # And back again
-print(flat.group_by("user").agg(pl.col("scores")).sort("user"))
+display(flat.group_by("user").agg(pl.col("scores")).sort("user"))
 `,
     },
   ]}
@@ -148,17 +148,17 @@ df = pl.DataFrame(
     }
 )
 
-print(df)
+display(df)
 print(df.schema)
 
-print(
+display(
     df.with_columns(
         city=pl.col("address").struct.field("city"),
     )
 )
 
 # unnest promotes every field to a top-level column
-print(df.unnest("address"))
+display(df.unnest("address"))
 `,
     },
   ]}
@@ -177,15 +177,15 @@ Structs are how one expression returns several values at once.
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# value_counts returns a struct of (value, count)
-print(penguins["island"].value_counts(sort=True))
+display(penguins["island"].value_counts(sort=True))
 
 # Packing several columns into one
 packed = penguins.select(
     "species",
     pl.struct("bill_length_mm", "bill_depth_mm").alias("bill"),
 )
-print(packed.head(3))
-print(packed.unnest("bill").head(3))
+display(packed.head(3))
+display(packed.unnest("bill").head(3))
 `,
     },
   ]}
@@ -208,7 +208,7 @@ events = pl.DataFrame(
     }
 )
 
-print(
+display(
     events.with_columns(
         n_tags=pl.col("tags").list.len(),
         is_mobile=pl.col("tags").list.contains("mobile"),
@@ -216,7 +216,7 @@ print(
 )
 
 # Filter on a nested value without exploding
-print(events.filter(pl.col("tags").list.contains("checkout")))
+display(events.filter(pl.col("tags").list.contains("checkout")))
 `,
     },
   ]}
@@ -244,9 +244,9 @@ emb = pl.DataFrame(
     schema={"vec": pl.Array(pl.Float64, 3)},
 )
 
-print(emb)
+display(emb)
 print(emb.schema)
-print(emb.with_columns(norm=pl.col("vec").arr.sum().round(2)))
+display(emb.with_columns(norm=pl.col("vec").arr.sum().round(2)))
 `,
     },
   ]}
@@ -287,7 +287,7 @@ events = pl.DataFrame(
 tag_counts = None  # TODO
 busiest = None     # TODO
 
-print(enriched)
+display(enriched)
 `,
       solutionCode: `enriched = events.with_columns(
     n_tags=pl.col("tags").list.len(),
@@ -304,8 +304,8 @@ tag_counts = (
 
 busiest = enriched.sort("n_tags", descending=True)["session"][0]
 
-print(enriched)
-print(tag_counts)
+display(enriched)
+display(tag_counts)
 print("busiest:", busiest)
 `,
     },

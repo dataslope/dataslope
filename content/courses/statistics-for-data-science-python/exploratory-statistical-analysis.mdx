@@ -161,7 +161,7 @@ print("Shape (rows, cols):", tips.shape)
 print("\\nColumns and dtypes:")
 print(tips.dtypes)
 print("\\nNumeric summary (describe):")
-print(tips.describe().round(2))
+display(tips.describe().round(2))
 `,
     },
   ]}
@@ -392,11 +392,11 @@ tips["tip_pct"] = tips["tip"] / tips["total_bill"] * 100
 # Grouped summaries: does tip percentage differ by day and time?
 by_day = tips.groupby("day")["tip_pct"].agg(["mean", "median", "count"]).round(2)
 print("Tip % by day:")
-print(by_day)
+display(by_day)
 
 by_time = tips.groupby("time")["tip_pct"].agg(["mean", "median", "count"]).round(2)
 print("\\nTip % by time:")
-print(by_time)
+display(by_time)
 
 print("\\nThese gaps are SUGGESTIVE, not conclusive. Small groups (few")
 print("lunches) wobble a lot. Each gap is a hypothesis to test later.")
@@ -421,7 +421,7 @@ tips = px.data.tips()
 num = tips.select_dtypes("number")
 corr = num.corr().round(3)
 print("Correlation matrix:")
-print(corr)
+display(corr)
 
 fig = px.imshow(
     corr,

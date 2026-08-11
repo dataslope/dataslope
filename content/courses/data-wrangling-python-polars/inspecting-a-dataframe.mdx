@@ -58,11 +58,11 @@ assumed `Int64`.
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(penguins.head(3))
-print(penguins.tail(2))
+      starterCode: `display(penguins.head(3))
+display(penguins.tail(2))
 
 # A random sample is the one that catches sorted-by-something files
-print(penguins.sample(3, seed=0))
+display(penguins.sample(3, seed=0))
 `,
     },
   ]}
@@ -80,9 +80,9 @@ look at the middle.
 
 ## glimpse, for wide tables
 
-When a table has forty columns, printing it is useless: the output
-wraps and you see nothing. `glimpse()` transposes the problem, one
-column per line.
+When a table has forty columns, showing it whole is useless: the
+output runs off the side and you see nothing. `glimpse()` transposes
+the problem, one column per line.
 
 <CodeBlock
   adapter="python"
@@ -133,10 +133,10 @@ hundred is a different analysis.
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(penguins.null_count())
+      starterCode: `display(penguins.null_count())
 
 # As a share of rows, which is what you actually want to judge
-print(
+display(
     penguins.select(
         (pl.all().null_count() / pl.len() * 100).round(1)
     )
@@ -156,7 +156,7 @@ print(
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(penguins["species"].value_counts(sort=True))
+      starterCode: `display(penguins["species"].value_counts(sort=True))
 print("distinct islands:", penguins["island"].n_unique())
 print(penguins["island"].unique().to_list())
 `,
@@ -189,7 +189,7 @@ orders = pl.DataFrame(
 
 print("fully duplicated rows:", orders.is_duplicated().sum())
 print("duplicate order_ids  :", orders["order_id"].is_duplicated().sum())
-print(orders.filter(pl.col("order_id").is_duplicated()))
+display(orders.filter(pl.col("order_id").is_duplicated()))
 `,
     },
   ]}
@@ -221,7 +221,7 @@ Put together, the first thing to run on an unfamiliar file:
             "distinct": [df[c].n_unique() for c in df.columns],
         }
     )
-    print(summary)
+    display(summary)
 
 inspect(pl.read_csv("diamonds.csv"), "diamonds")
 `,
@@ -252,7 +252,7 @@ Sort by \`n_distinct\` ascending. There are three string columns: \`cut\`, \`col
 diamonds = pl.read_csv("diamonds.csv")`,
       starterCode: `profile = None  # TODO
 
-print(profile)
+display(profile)
 `,
       solutionCode: `text_cols = [
     name
@@ -267,7 +267,7 @@ profile = pl.DataFrame(
     }
 ).sort("n_distinct")
 
-print(profile)
+display(profile)
 `,
     },
   ]}

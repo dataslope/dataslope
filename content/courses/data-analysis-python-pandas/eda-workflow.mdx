@@ -89,9 +89,9 @@ Questions to answer:
       filename: "main.py",
       initCode: `import pandas as pd
 df = pd.read_csv("diamonds.csv")`,
-      starterCode: `print(df.head())
+      starterCode: `display(df.head())
 print()
-print(df.sample(5, random_state=0))  # random rows often reveal weirdness
+display(df.sample(5, random_state=0))  # random rows often reveal weirdness
 `,
     },
   ]}
@@ -121,7 +121,7 @@ df = pd.read_csv("diamonds.csv")`,
       starterCode: `missing = df.isna().sum()
 pct = (missing / len(df) * 100).round(2)
 report = pd.DataFrame({"missing": missing, "pct": pct})
-print(report[report["missing"] > 0].sort_values("missing", ascending=False))
+display(report[report["missing"] > 0].sort_values("missing", ascending=False))
 print()
 print("(If nothing prints, the dataset has no missing values.)")
 `,
@@ -144,7 +144,7 @@ For numeric columns, look at `describe()`:
       filename: "main.py",
       initCode: `import pandas as pd
 df = pd.read_csv("diamonds.csv")`,
-      starterCode: `print(df.describe().T)
+      starterCode: `display(df.describe().T)
 `,
     },
   ]}
@@ -193,7 +193,7 @@ rather than as a grid of numbers:
 df = pd.read_csv("diamonds.csv")`,
       starterCode: `numeric = df.select_dtypes(include="number")
 print("Correlation matrix:")
-print(numeric.corr().round(2))
+display(numeric.corr().round(2))
 `,
     },
   ]}
@@ -213,7 +213,7 @@ For categorical-vs-numeric relationships, group:
       filename: "main.py",
       initCode: `import pandas as pd
 df = pd.read_csv("diamonds.csv")`,
-      starterCode: `print(df.groupby("cut")["price"].describe().round(0))
+      starterCode: `display(df.groupby("cut")["price"].describe().round(0))
 `,
     },
   ]}

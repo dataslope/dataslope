@@ -69,7 +69,7 @@ df = pd.DataFrame({"color": ["red", "green", "blue", "red", "blue"]})
 # The "obvious" shortcut: map each color to an integer.
 mapping = {"red": 0, "green": 1, "blue": 2}
 df["color_int"] = df["color"].map(mapping)
-print(df)
+display(df)
 
 # But this quietly asserts FALSE numerical relationships:
 print("\\nIs blue (2) > red (0)?  The numbers say yes.")
@@ -125,7 +125,7 @@ df = pd.DataFrame({"size": ["S", "M", "L", "M", "S", "L"]})
 # Size has a REAL order, so an integer encoding is meaningful here.
 order = {"S": 0, "M": 1, "L": 2}
 df["size_ordinal"] = df["size"].map(order)
-print(df)
+display(df)
 
 print("\\nHere the order is genuine: S < M < L, so 0 < 1 < 2 is TRUE.")
 print("The integer gap reflects a real 'how much bigger' relationship.")
@@ -208,7 +208,7 @@ df = pd.DataFrame(
     }
 )
 print("Original:")
-print(df)
+display(df)
 
 # sparse_output=False returns a plain dense array (easy to read).
 encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)

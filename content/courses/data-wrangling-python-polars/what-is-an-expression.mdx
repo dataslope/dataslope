@@ -78,7 +78,7 @@ onto it.
 
 df = pl.DataFrame({"mass": [3750, 5400, 3250, 4100]})
 
-print(
+display(
     df.select(
         pl.col("mass"),                       # a column
         pl.lit(1000).alias("grams_per_kg"),   # a constant
@@ -126,13 +126,13 @@ df = pl.DataFrame(
 )
 
 # By name
-print(df.select(pl.col("score_math")))
+display(df.select(pl.col("score_math")))
 
 # By regex: the ^…$ anchors are what tell Polars it is a pattern
-print(df.select(pl.col("^score_.*$")))
+display(df.select(pl.col("^score_.*$")))
 
 # By dtype: every integer column
-print(df.select(pl.col(pl.Int64)))
+display(df.select(pl.col(pl.Int64)))
 `,
     },
   ]}
@@ -153,10 +153,10 @@ Polars starts saving you real typing.
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# The mean of every numeric column, in one expression
-print(penguins.select(pl.col(pl.Float64, pl.Int64).mean().round(2)))
+display(penguins.select(pl.col(pl.Float64, pl.Int64).mean().round(2)))
 
 # Round every float column to one decimal, keep everything else
-print(
+display(
     penguins.with_columns(pl.col(pl.Float64).round(1)).head(3)
 )
 `,
@@ -186,13 +186,13 @@ except Exception as error:
     print(type(error).__name__, "-", str(error).splitlines()[0])
 
 # alias() names one output
-print(df.select(
+display(df.select(
     pl.col("mass").min().alias("lightest"),
     pl.col("mass").max().alias("heaviest"),
 ))
 
 # name.suffix() names many at once
-print(df.select(pl.all().max().name.suffix("_max")))
+display(df.select(pl.all().max().name.suffix("_max")))
 `,
     },
   ]}
@@ -228,7 +228,7 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
 
 MEASUREMENTS = ["bill_length_mm", "flipper_length_mm", "body_mass_g"]
 
-print(
+display(
     penguins
     .select("species", *[z_score(c) for c in MEASUREMENTS])
     .head(5)
@@ -265,7 +265,7 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
 
 out = None  # TODO
 
-print(out)
+display(out)
 `,
       solutionCode: `def pct_of_max(column: str) -> pl.Expr:
     col = pl.col(column)
@@ -273,7 +273,7 @@ print(out)
 
 out = penguins.select("species", pct_of_max("body_mass_g"))
 
-print(out.head())
+display(out.head())
 `,
     },
   ]}

@@ -29,7 +29,7 @@ cats = text.with_columns(pl.all().cast(pl.Categorical))
 print("as String     :", round(text.estimated_size("mb"), 2), "MB")
 print("as Categorical:", round(cats.estimated_size("mb"), 2), "MB")
 print(cats.dtypes)
-print(cats.head(3))
+display(cats.head(3))
 `,
     },
   ]}
@@ -103,7 +103,7 @@ the order a human would expect, without a lookup table of sort keys.
 sizes = pl.Enum(["small", "medium", "large"])
 
 good = pl.DataFrame({"size": ["small", "large"]})
-print(good.with_columns(pl.col("size").cast(sizes)))
+display(good.with_columns(pl.col("size").cast(sizes)))
 
 typo = pl.DataFrame({"size": ["small", "smal"]})
 try:
@@ -134,8 +134,8 @@ df = pl.DataFrame(
     {"size": ["small", "medium", "large", "medium"], "n": [1, 2, 3, 4]}
 ).with_columns(pl.col("size").cast(sizes))
 
-print(df.filter(pl.col("size") >= "medium"))
-print(df.select(pl.col("size").max()))
+display(df.filter(pl.col("size") >= "medium"))
+display(df.select(pl.col("size").max()))
 `,
     },
   ]}
@@ -159,7 +159,7 @@ df = pl.DataFrame({"size": ["large", "small", "medium"]}).with_columns(
     pl.col("size").cast(pl.Enum(["small", "medium", "large"]))
 )
 
-print(
+display(
     df.with_columns(
         as_text=pl.col("size").cast(pl.String),
         code=pl.col("size").to_physical(),
@@ -222,7 +222,7 @@ Columns, in this order: \`cut\`, \`n\`, \`median_price\`.`}
 diamonds = pl.read_csv("diamonds.csv")`,
       starterCode: `by_cut = None  # TODO
 
-print(by_cut)
+display(by_cut)
 `,
       solutionCode: `grades = pl.Enum(["Fair", "Good", "Very Good", "Premium", "Ideal"])
 
@@ -236,7 +236,7 @@ by_cut = (
     .sort("cut")
 )
 
-print(by_cut)
+display(by_cut)
 `,
     },
   ]}

@@ -83,7 +83,7 @@ data = pd.DataFrame(
 # Within-department admit rates: women win in BOTH.
 within = data.assign(rate=lambda d: d.admitted / d.applicants)
 print("Within each department (women admitted at a HIGHER rate in both):")
-print(within.pivot(index="dept", columns="gender", values="rate").round(3))
+display(within.pivot(index="dept", columns="gender", values="rate").round(3))
 
 # Aggregate admit rates: now MEN look favored. The trend reversed.
 agg = data.groupby("gender")[["applicants", "admitted"]].sum()
@@ -551,7 +551,7 @@ summary["corr"] = dd.groupby("dataset").apply(
     lambda g: g["x"].corr(g["y"])
 ).round(2)
 
-print(summary)
+display(summary)
 print("\\n13 datasets. The summary statistics are essentially identical.")
 `,
     },

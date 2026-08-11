@@ -111,7 +111,7 @@ table = pd.DataFrame(
         "linear": s.interpolate(method="linear"),  # straight line between knowns
     }
 )
-print(table)
+display(table)
 print()
 print("ffill  -> 10, 10  (assumes the value HELD until it next changed)")
 print("bfill  -> 40, 40  (assumes the next value applied retroactively)")

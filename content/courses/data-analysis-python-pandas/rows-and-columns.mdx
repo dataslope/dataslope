@@ -123,7 +123,7 @@ employees = pd.DataFrame(
 
 print("Shape:", employees.shape, "<-- (rows, columns)")
 print()
-print(employees)
+display(employees)
 print()
 print("Columns:", employees.columns.tolist())
 print("Each row represents: one employee")
@@ -149,7 +149,7 @@ employees = pd.DataFrame({
       starterCode: `# Filter: rows where the department attribute equals "Eng"
 eng = employees[employees["department"] == "Eng"]
 print("Engineers:")
-print(eng)
+display(eng)
 print()
 
 # Aggregate: average of the salary column for those rows
@@ -245,7 +245,7 @@ You can pick any names, grades, GPAs, and pass/fail values.`}
 
 students = None  # TODO: replace with a real DataFrame
 
-print(students)
+display(students)
 `,
       solutionCode: `import pandas as pd
 
@@ -258,7 +258,7 @@ students = pd.DataFrame(
     }
 )
 
-print(students)
+display(students)
 `,
     },
   ]}

@@ -35,7 +35,7 @@ print()
 
 # Read it back to verify
 roundtrip = pd.read_csv("scores.csv")
-print(roundtrip)
+display(roundtrip)
 `,
     },
   ]}
@@ -276,9 +276,9 @@ df = pd.DataFrame({
       starterCode: `clean = None  # TODO
 back = None  # TODO
 
-print(clean)
+display(clean)
 print()
-print(back)
+display(back)
 `,
       solutionCode: `import pandas as pd
 
@@ -291,9 +291,9 @@ clean = clean.dropna(subset=["age"]).reset_index(drop=True)
 clean.to_csv("/tmp/clean.csv", index=False)
 back = pd.read_csv("/tmp/clean.csv")
 
-print(clean)
+display(clean)
 print()
-print(back)
+display(back)
 `,
     },
   ]}

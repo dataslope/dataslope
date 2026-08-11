@@ -30,7 +30,7 @@ scores = pl.DataFrame(
 
 for how in ["inner", "left", "right", "full", "semi", "anti"]:
     print(f"── {how}")
-    print(people.join(scores, on="id", how=how).sort("id" if how != "full" else "name"))
+    display(people.join(scores, on="id", how=how).sort("id" if how != "full" else "name"))
 `,
     },
   ]}
@@ -61,10 +61,10 @@ orders = pl.DataFrame({"customer": ["a", "b", "c", "d"], "total": [10, 20, 30, 4
 active = pl.DataFrame({"customer": ["a", "c"]})
 
 print("orders from active customers:")
-print(orders.join(active, on="customer", how="semi"))
+display(orders.join(active, on="customer", how="semi"))
 
 print("orders from everyone else:")
-print(orders.join(active, on="customer", how="anti"))
+display(orders.join(active, on="customer", how="anti"))
 `,
     },
   ]}
@@ -95,7 +95,7 @@ people = pl.DataFrame({"id": [1, 2], "name": ["Ada", "Grace"]})
 scores = pl.DataFrame({"id": [1, 2, 2], "score": [90, 95, 70]})
 
 joined = people.join(scores, on="id", how="left")
-print(joined)
+display(joined)
 print("left rows:", people.height, "-> joined rows:", joined.height)
 `,
     },
@@ -145,12 +145,12 @@ line that caused it.
 left = pl.DataFrame({"user_id": [1, 2], "city": ["Oslo", "Lisbon"]})
 right = pl.DataFrame({"id": [1, 2], "plan": ["pro", "free"]})
 
-print(left.join(right, left_on="user_id", right_on="id", how="left"))
+display(left.join(right, left_on="user_id", right_on="id", how="left"))
 
 # Several keys: every one must match
 a = pl.DataFrame({"y": [2026, 2026], "m": [1, 2], "v": [10, 20]})
 b = pl.DataFrame({"y": [2026, 2026], "m": [1, 3], "w": ["x", "z"]})
-print(a.join(b, on=["y", "m"], how="left"))
+display(a.join(b, on=["y", "m"], how="left"))
 `,
     },
   ]}
@@ -170,8 +170,8 @@ Columns that clash get a suffix rather than silently overwriting.
 a = pl.DataFrame({"id": [1, 2], "value": [10, 20]})
 b = pl.DataFrame({"id": [1, 2], "value": [99, 98]})
 
-print(a.join(b, on="id"))
-print(a.join(b, on="id", suffix="_from_b"))
+display(a.join(b, on="id"))
+display(a.join(b, on="id", suffix="_from_b"))
 `,
     },
   ]}
@@ -205,7 +205,7 @@ print("rows:", penguins.height, "->", joined.height)
 
 # 3. Did anything fail to match?
 print("unmatched:", joined["region"].null_count())
-print(
+display(
     penguins.join(regions, on="island", how="anti")
     .select("island")
     .unique()
@@ -259,7 +259,7 @@ rates = pl.DataFrame(
     }
 ).sort("day")
 
-print(
+display(
     invoices.join_asof(rates, on="day", strategy="backward").with_columns(
         amount_usd=(pl.col("amount_eur") * pl.col("usd_per_eur")).round(2)
     )
@@ -323,9 +323,9 @@ by_region = (
     .sort("region")
 )
 
-print(enriched.head())
+display(enriched.head())
 print(unmatched)
-print(by_region)
+display(by_region)
 `,
     },
   ]}

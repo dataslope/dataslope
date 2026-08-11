@@ -32,7 +32,7 @@ df = pd.DataFrame(
 df["total_comp"] = df["salary"] + df["bonus"]
 df["bonus_pct"] = (df["bonus"] / df["salary"] * 100).round(1)
 
-print(df)
+display(df)
 `,
     },
   ]}
@@ -66,10 +66,10 @@ df = pd.DataFrame({
       starterCode: `new_df = df.assign(total_comp=lambda x: x["salary"] + x["bonus"]).assign(
     bonus_pct=lambda x: (x["bonus"] / x["salary"] * 100).round(1)
 )
-print(new_df)
+display(new_df)
 print()
 print("Original is unchanged:")
-print(df)
+display(df)
 `,
     },
   ]}
@@ -126,7 +126,7 @@ import numpy as np
 
 df = pd.DataFrame({"salary": [120, 95, 140, 80, 128]})
 df["band"] = np.where(df["salary"] >= 130, "high", "standard")
-print(df)
+display(df)
 `,
     },
   ]}
@@ -156,7 +156,7 @@ conditions = [
 choices = ["A", "B", "C", "D"]
 
 df["grade"] = np.select(conditions, choices, default="F")
-print(df)
+display(df)
 `,
     },
   ]}
@@ -182,7 +182,7 @@ df = pd.DataFrame(
 
 rates = {"USD": 1.00, "EUR": 1.08, "GBP": 1.27, "JPY": 0.0067}
 df["amount_usd"] = (df["amount"] * df["currency"].map(rates)).round(2)
-print(df)
+display(df)
 `,
     },
   ]}
@@ -223,7 +223,7 @@ def grade(score):
 
 df = pd.DataFrame({"score": [92, 73, 58, 85, 41, 99]})
 df["grade"] = df["score"].apply(grade)
-print(df)
+display(df)
 `,
     },
   ]}
@@ -251,7 +251,7 @@ df["age_group"] = pd.cut(
     bins=[0, 25, 40, 60, 200],
     labels=["young", "mid", "senior", "veteran"],
 )
-print(df)
+display(df)
 `,
     },
   ]}
@@ -269,7 +269,7 @@ For equal-frequency buckets (quartiles, quintiles) use
 
 df = pd.DataFrame({"income": [25, 35, 45, 60, 80, 110, 150, 200, 400]})
 df["quartile"] = pd.qcut(df["income"], q=4, labels=["Q1", "Q2", "Q3", "Q4"])
-print(df)
+display(df)
 `,
     },
   ]}
@@ -311,7 +311,7 @@ penguins["jumbo"] = np.where(
     False,
 )
 
-print(
+display(
     penguins[
         ["species", "body_mass_kg", "flipper_length_mm", "size_band", "island_code", "jumbo"]
     ].head(10)

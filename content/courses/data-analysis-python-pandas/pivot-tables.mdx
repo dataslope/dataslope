@@ -46,7 +46,7 @@ p = sales.pivot_table(
     values="amount",
     aggfunc="sum",
 )
-print(p)
+display(p)
 `,
     },
   ]}
@@ -97,7 +97,7 @@ p = sales.pivot_table(
     values="amount",
     aggfunc=["sum", "mean", "count"],
 )
-print(p)
+display(p)
 `,
     },
   ]}
@@ -133,7 +133,7 @@ p = sales.pivot_table(
     margins_name="Total",
     fill_value=0,
 )
-print(p)
+display(p)
 `,
     },
   ]}
@@ -167,7 +167,7 @@ p = orders.pivot_table(
     aggfunc="sum",
     fill_value=0,
 )
-print(p)
+display(p)
 `,
     },
   ]}
@@ -198,13 +198,13 @@ sales = pd.DataFrame(
 
 p = sales.pivot_table(index="region", columns="product", values="amount", aggfunc="sum")
 print("Pivoted:")
-print(p)
+display(p)
 print()
 
 flat = p.reset_index()
 flat.columns.name = None  # remove the column-axis name
 print("Flat:")
-print(flat)
+display(flat)
 `,
     },
   ]}
@@ -231,7 +231,7 @@ summary = diamonds.pivot_table(
     aggfunc="mean",
 ).round(0)
 
-print(summary)
+display(summary)
 `,
     },
   ]}
@@ -267,7 +267,7 @@ sales = pd.DataFrame({
 })`,
       starterCode: `report = None  # TODO
 
-print(report)
+display(report)
 `,
       solutionCode: `import pandas as pd
 
@@ -281,7 +281,7 @@ report = sales.pivot_table(
     fill_value=0,
 )
 
-print(report)
+display(report)
 `,
     },
   ]}

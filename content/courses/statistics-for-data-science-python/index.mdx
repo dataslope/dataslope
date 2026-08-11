@@ -125,7 +125,7 @@ summary["corr_xy"] = aq.groupby("dataset").apply(
     lambda g: g["x"].corr(g["y"])
 ).round(3)
 
-print(summary)
+display(summary)
 print()
 print("Same means. Same spreads. Same correlation (~0.82).")
 print("So the four datasets are basically the same... right?")

@@ -37,7 +37,7 @@ df = pd.DataFrame(
     index=["Aiko", "Bilal", "Chen", "Diego", "Eve"],
 )
 
-print(df)
+display(df)
 print()
 print(">>> df.loc['Bilal']")  # label
 print(df.loc["Bilal"])
@@ -66,10 +66,10 @@ df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
 }, index=["Aiko","Bilal","Chen","Diego","Eve"])`,
       starterCode: `print(">>> df.loc['Aiko':'Chen']     # 3 rows, INCLUSIVE of Chen")
-print(df.loc["Aiko":"Chen"])
+display(df.loc["Aiko":"Chen"])
 print()
 print(">>> df.iloc[0:3]              # 3 rows, EXCLUSIVE of position 3")
-print(df.iloc[0:3])
+display(df.iloc[0:3])
 `,
     },
   ]}
@@ -102,19 +102,19 @@ df = pd.DataFrame({
     "tenure": [3, 6, 7, 2, 4],
 }, index=["Aiko","Bilal","Chen","Diego","Eve"])`,
       starterCode: `# loc: labels for rows AND columns
-print(df.loc[["Aiko", "Chen"], ["salary", "tenure"]])
+display(df.loc[["Aiko", "Chen"], ["salary", "tenure"]])
 print()
 
 # iloc: positions for both
-print(df.iloc[[0, 2], [0, 2]])
+display(df.iloc[[0, 2], [0, 2]])
 print()
 
 # All rows, some columns
-print(df.loc[:, ["salary"]])
+display(df.loc[:, ["salary"]])
 print()
 
 # Some rows, all columns
-print(df.iloc[1:4, :])
+display(df.iloc[1:4, :])
 `,
     },
   ]}
@@ -139,11 +139,11 @@ df = pd.DataFrame({
       starterCode: `mask = df["dept"] == "Eng"
 
 print(">>> df.loc[mask]")
-print(df.loc[mask])
+display(df.loc[mask])
 print()
 
 print(">>> df.loc[mask, ['salary','tenure']]")
-print(df.loc[mask, ["salary", "tenure"]])
+display(df.loc[mask, ["salary", "tenure"]])
 `,
     },
   ]}
@@ -170,7 +170,7 @@ df = pd.DataFrame({
 }, index=["Aiko","Bilal","Chen","Diego","Eve"])`,
       starterCode: `# Give every Engineer a 10% raise. Use loc, never chained []:
 df.loc[df["dept"] == "Eng", "salary"] *= 1.10
-print(df)
+display(df)
 `,
     },
   ]}
@@ -227,7 +227,7 @@ and position becomes very obvious in this case.
       starterCode: `import pandas as pd
 
 df = pd.DataFrame({"x": [100, 200, 300]}, index=[10, 20, 30])
-print(df)
+display(df)
 print()
 print("df.loc[10] (label):")
 print(df.loc[10])

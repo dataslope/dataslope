@@ -81,7 +81,15 @@
 .cardShell {
   position: relative;
   isolation: isolate; /* contain the z-index:-1 stripe layer to this subtree */
-  margin: 1rem 0;
+  /* Asymmetric on purpose. The striped elevation below is painted by
+     `::after`, which is absolutely positioned and so contributes nothing to
+     layout: it hangs `--ch-shadow-offset` past the bottom edge and eats that
+     much of the margin, leaving a widget closer to the paragraph beneath it
+     than to the one above. The extra bottom margin pays the offset back and
+     then some, so a run of blocks reads as separated cards rather than a
+     stack. One rule covers every widget that shares this shell — the code
+     block, the challenge card, both SQL variants, and the boot notice. */
+  margin: 1rem 0 2rem;
   --ch-shadow-offset: 6px;
   --ch-shadow-color: color-mix(in srgb, var(--ds-black) 6%, transparent);
   --ch-shadow-stripe: 1px; /* painted band width */

@@ -127,7 +127,7 @@ Chen,35,Shanghai,2023-11-20
 
 # Read from the string as if it were a file
 df = pd.read_csv(io.StringIO(csv_text))
-print(df)
+display(df)
 print()
 print("Inferred types:")
 print(df.dtypes)
@@ -154,7 +154,7 @@ Chen,35,Shanghai,2023-11-20
       starterCode: `df = pd.read_csv(io.StringIO(csv_text), parse_dates=["joined"])
 print(df.dtypes)
 print()
-print(df)
+display(df)
 `,
     },
   ]}
@@ -265,7 +265,7 @@ Carol,02134
 """
 
 df = pd.read_csv(io.StringIO(csv))
-print(df)
+display(df)
 print()
 print("zip dtype:", df["zip"].dtype)
 print("First zip:", df["zip"].iloc[0], "<-- lost the leading 0!")
@@ -288,7 +288,7 @@ Bob,90210
 Carol,02134
 """`,
       starterCode: `df = pd.read_csv(io.StringIO(csv), dtype={"zip": "string"})
-print(df)
+display(df)
 print()
 print("zip dtype:", df["zip"].dtype)
 print("First zip:", df["zip"].iloc[0], "<-- preserved!")

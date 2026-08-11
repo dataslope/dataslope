@@ -167,7 +167,7 @@ visits = pd.Series(
 )`,
       starterCode: `weekly = visits.resample("W").agg(["sum", "mean", "min", "max"]).round(1)
 print("Per-week profile:")
-print(weekly.head())
+display(weekly.head())
 print()
 print("The 'max' and 'min' columns show the best and worst day each week.")
 `,
@@ -286,7 +286,7 @@ glided = daily.interpolate(method="linear")
 
 print("Jan 1 .. Jan 5 under two different ASSUMPTIONS:")
 compare = pd.DataFrame({"forward_fill": held, "interpolate": glided})
-print(compare.head(5))
+display(compare.head(5))
 print()
 print("Same data, different invented values. Upsampling didn't add knowledge;")
 print("it forced us to declare what we believe happened between observations.")

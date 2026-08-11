@@ -24,13 +24,13 @@ needs.
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# Bare strings are shorthand for pl.col(...)
-print(penguins.select("species", "island").head(3))
+display(penguins.select("species", "island").head(3))
 
 # The explicit form, which is what the strings become
-print(penguins.select(pl.col("species"), pl.col("island")).head(3))
+display(penguins.select(pl.col("species"), pl.col("island")).head(3))
 
 # A list works too
-print(penguins.select(["species", "body_mass_g"]).head(3))
+display(penguins.select(["species", "body_mass_g"]).head(3))
 `,
     },
   ]}
@@ -88,7 +88,7 @@ expression.
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# Every column whose name ends in _mm
-print(penguins.select(pl.col("^.*_mm$")).head(3))
+display(penguins.select(pl.col("^.*_mm$")).head(3))
 
 # Every column starting with "bill"
 print(penguins.select(pl.col("^bill_.*$")).columns)
@@ -118,7 +118,7 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
 print(penguins.select(pl.col(pl.Float64, pl.Int64)).columns)
 
 # Which is exactly what you want before a numeric summary
-print(penguins.select(pl.col(pl.Float64).mean().round(2)))
+display(penguins.select(pl.col(pl.Float64).mean().round(2)))
 `,
     },
   ]}
@@ -142,11 +142,11 @@ are not.
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# nth() by position
-print(penguins.select(pl.nth(0), pl.nth(5)).head(3))
+display(penguins.select(pl.nth(0), pl.nth(5)).head(3))
 
 # Or slice the columns list yourself, which reads better
 first_three = penguins.columns[:3]
-print(penguins.select(first_three).head(3))
+display(penguins.select(first_three).head(3))
 `,
     },
   ]}
@@ -163,7 +163,7 @@ print(penguins.select(first_three).head(3))
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# One at a time, with alias
-print(penguins.select(
+display(penguins.select(
     pl.col("species").alias("kind"),
     pl.col("body_mass_g").alias("mass"),
 ).head(2))
@@ -192,7 +192,7 @@ constants and computations that reference no column at all.
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(
+      starterCode: `display(
     penguins.select(
         pl.col("species"),
         pl.lit("palmer-station").alias("source"),
@@ -228,7 +228,7 @@ Do not list the \`_mm\` columns by hand: match them with a pattern, so the code 
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `tidy = None  # TODO
 
-print(tidy)
+display(tidy)
 `,
       solutionCode: `tidy = penguins.select(
     "species",
@@ -236,7 +236,7 @@ print(tidy)
     pl.col("^.*_mm$").name.to_uppercase(),
 )
 
-print(tidy.head())
+display(tidy.head())
 `,
     },
   ]}

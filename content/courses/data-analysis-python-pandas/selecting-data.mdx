@@ -49,7 +49,7 @@ df = pd.DataFrame(
     }
 ).set_index("name")
 
-print(df)
+display(df)
 `,
     },
   ]}
@@ -93,7 +93,7 @@ df = pd.DataFrame({
     "tenure_yrs": [3, 6, 7, 2, 4],
 }).set_index("name")`,
       starterCode: `sub = df[["salary", "tenure_yrs"]]
-print(sub)
+display(sub)
 print("Type:", type(sub).__name__)
 `,
     },
@@ -119,11 +119,11 @@ print(df.loc["Bilal"])
 print()
 
 # A subset of rows × columns
-print(df.loc[["Aiko", "Chen", "Eve"], ["salary", "department"]])
+display(df.loc[["Aiko", "Chen", "Eve"], ["salary", "department"]])
 print()
 
 # A label-based slice (INCLUSIVE on both ends)
-print(df.loc["Aiko":"Chen"])
+display(df.loc["Aiko":"Chen"])
 `,
     },
   ]}
@@ -151,7 +151,7 @@ print(df.iloc[0])
 print()
 
 # Rows 0..2 (exclusive end), columns 0..1 (exclusive end)
-print(df.iloc[0:3, 0:2])
+display(df.iloc[0:3, 0:2])
 print()
 
 # Last row
@@ -189,7 +189,7 @@ print(mask)
 print()
 
 print("Filtered:")
-print(df[mask])
+display(df[mask])
 `,
     },
   ]}

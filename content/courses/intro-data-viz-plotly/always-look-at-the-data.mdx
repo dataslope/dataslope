@@ -52,7 +52,7 @@ summary["corr"] = aq.groupby("dataset").apply(
     lambda g: g["x"].corr(g["y"])
 ).round(2)
 
-print(summary)
+display(summary)
 print("\\nFour datasets. The summary statistics are essentially identical.")
 `,
     },
@@ -136,7 +136,7 @@ summary["corr"] = dd.groupby("dataset").apply(
     lambda g: g["x"].corr(g["y"])
 ).round(2)
 
-print(summary)
+display(summary)
 print("\\n13 datasets. The summaries are essentially the same row, repeated.")
 `,
     },

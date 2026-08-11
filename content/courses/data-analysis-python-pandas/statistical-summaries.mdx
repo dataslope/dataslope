@@ -35,7 +35,7 @@ analyst needs.
       filename: "main.py",
       initCode: `import pandas as pd
 df = pd.read_csv("diamonds.csv")`,
-      starterCode: `print(df.describe().round(2).T)
+      starterCode: `display(df.describe().round(2).T)
 `,
     },
   ]}
@@ -55,7 +55,7 @@ For non-numeric columns:
       filename: "main.py",
       initCode: `import pandas as pd
 df = pd.read_csv("diamonds.csv")`,
-      starterCode: `print(df.describe(include="object"))
+      starterCode: `display(df.describe(include="object"))
 `,
     },
   ]}
@@ -211,7 +211,7 @@ same correlation to two decimal places:
 df = pd.read_csv("diamonds.csv")`,
       starterCode: `numeric = df.select_dtypes(include="number")
 corr = numeric.corr().round(2)
-print(corr)
+display(corr)
 `,
     },
   ]}
@@ -253,7 +253,7 @@ numeric, median income, house age, average rooms, location, so
       filename: "main.py",
       initCode: `import pandas as pd
 housing = pd.read_csv("housing.csv")`,
-      starterCode: `print(housing.corr().round(2))
+      starterCode: `display(housing.corr().round(2))
 `,
     },
   ]}
@@ -286,7 +286,7 @@ The natural extension, `describe()` per group:
       initCode: `import pandas as pd
 df = pd.read_csv("diamonds.csv")`,
       starterCode: `# Price summary per cut
-print(df.groupby("cut")["price"].describe().round(0))
+display(df.groupby("cut")["price"].describe().round(0))
 `,
     },
   ]}

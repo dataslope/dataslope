@@ -108,7 +108,7 @@ pivot["gain"] = pivot[2007] - pivot[1952]
 # Step 4: sort and keep top 10
 top = pivot.sort_values("gain", ascending=False).head(10).reset_index()
 
-print(top[["country", 1952, 2007, "gain"]])
+display(top[["country", 1952, 2007, "gain"]])
 
 # Step 5: chart
 fig = px.bar(

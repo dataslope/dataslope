@@ -19,6 +19,7 @@
 // thread (see message types below).
 
 import type { PyodideInterface } from "pyodide";
+import { POLARS_IMPORT_PATTERN, POLARS_WASM_SHIM } from "./polarsWasm";
 import { toOutputCells } from "./pythonDisplayOutputs";
 
 declare const self: DedicatedWorkerGlobalScope;
@@ -187,6 +188,10 @@ const IMPLICIT_PACKAGES: { pattern: RegExp; pkg: string }[] = [
 
 /** Implied packages already pulled in this session, so each is fetched once. */
 const implicitLoaded = new Set<string>();
+
+/** Whether the polars mmap shim has been installed in this worker. The shim
+ *  is idempotent; this just saves re-running it on every polars block. */
+let polarsShimmed = false;
 
 /*
  * There used to be a `repairPolarsForArrow()` here that dropped polars from
@@ -804,6 +809,14 @@ async function runCode(
     // Pure-Python drawer packages that aren't in the Pyodide lockfile
     // (e.g. openpyxl, seaborn) need an explicit micropip install.
     await ensureMicropipPackages(code);
+    // polars cannot memory-map a file over a megabyte without threads this
+    // worker does not have, so its eager readers are taught to take the bytes
+    // instead. It has to happen before the block's own `import polars`, which
+    // is why it hangs off the source pattern rather than off an import hook.
+    if (!polarsShimmed && POLARS_IMPORT_PATTERN.test(code)) {
+      await pyodide.runPythonAsync(POLARS_WASM_SHIM);
+      polarsShimmed = true;
+    }
   } catch (err) {
     stderr += `Failed to auto-load packages: ${
       err instanceof Error ? err.message : String(err)

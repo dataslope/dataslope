@@ -31,7 +31,7 @@ df = pd.DataFrame({
 })`,
       starterCode: `print(df.loc[3, "amount"])       # row with index label 3, column "amount"
 print(df.iloc[3, 1])            # 4th row, 2nd column, regardless of labels
-print(df.loc[df.region == "North"])  # boolean mask (label-based)`,
+display(df.loc[df.region == "North"])  # boolean mask (label-based)`,
     },
   ]}
 />
@@ -61,7 +61,7 @@ df = pd.DataFrame({
 
 result = df.groupby("region").agg(total=("amount", "sum"),
                                   n=("amount", "size"))
-print(result)   # DataFrame`,
+display(result)   # DataFrame`,
     },
   ]}
 />
@@ -103,9 +103,9 @@ df = pd.DataFrame({
     "amount": [100.0, np.nan, 80.0, np.nan],
 })`,
       starterCode: `print(df.isna().sum())              # count NaNs per column
-print(df.dropna(subset=["amount"])) # drop rows where amount is NaN
+display(df.dropna(subset=["amount"])) # drop rows where amount is NaN
 df["amount"] = df["amount"].fillna(0)
-print(df)                           # NaN replaced with 0`,
+display(df)                           # NaN replaced with 0`,
     },
   ]}
 />
@@ -140,7 +140,7 @@ df = pd.DataFrame({
 })`,
       starterCode: `mask = (df["amount"] > 100) & (df["region"] == "North")
 result = df.loc[mask]
-print(result)`,
+display(result)`,
     },
   ]}
 />
@@ -164,7 +164,7 @@ df = pd.DataFrame({
     "amount": [100, 80, 80, 50, 70, 60],
 })`,
       starterCode: `df["group_mean"] = df.groupby("region")["amount"].transform("mean")
-print(df)`,
+display(df)`,
     },
   ]}
 />
@@ -244,9 +244,9 @@ df = pd.DataFrame({
     "amount": [120, 80, 200, 50],
 })`,
       starterCode: `df_sorted = df.sort_values(by="amount", ascending=False)
-print(df_sorted)
+display(df_sorted)
 df["rank"] = df["amount"].rank(method="dense", ascending=False)
-print(df)`,
+display(df)`,
     },
   ]}
 />
@@ -324,7 +324,7 @@ df = pd.DataFrame({
     .reset_index()
     .rename(columns={"tax": "total_tax"})
 )
-print(result)`,
+display(result)`,
     },
   ]}
 />
@@ -374,7 +374,7 @@ print("df unchanged:", df["amount"].tolist())`,
 
 df = pd.DataFrame({"amount": [80, 120, 50, 200, 90]})`,
       starterCode: `df["discounted"] = df["amount"].apply(lambda x: x * 0.9 if x > 100 else x)
-print(df)`,
+display(df)`,
     },
   ]}
 />
@@ -400,7 +400,7 @@ df["discounted_vec"] = df["amount"] * 0.9
 # apply (slow on large frames)
 df["discounted_apply"] = df["amount"].apply(lambda x: x * 0.9)
 
-print(df)`,
+display(df)`,
     },
   ]}
 />
@@ -424,7 +424,7 @@ df = pd.DataFrame({
 })`,
       starterCode: `print(df.duplicated(subset=["email"]).sum())        # count dupes
 df_clean = df.drop_duplicates(subset=["email"], keep="first")
-print(df_clean)`,
+display(df_clean)`,
     },
   ]}
 />
@@ -501,7 +501,7 @@ df = pd.DataFrame({"amount": [50, 120, 600, 80, 550]})`,
 conditions = [df["amount"] >= 500, df["amount"] >= 100]
 choices    = ["Large", "Medium"]
 df["size"] = np.select(conditions, choices, default="Small")
-print(df)`,
+display(df)`,
     },
   ]}
 />
@@ -538,7 +538,7 @@ df = pd.DataFrame({
       starterCode: `df["pct_of_region"] = (
     df["amount"] / df.groupby("region")["amount"].transform("sum") * 100
 )
-print(df)`,
+display(df)`,
     },
   ]}
 />
@@ -634,7 +634,7 @@ print(df["region_code"].tolist())
 print(df[["q1", "q2"]].apply(lambda col: col.max() - col.min(), axis=0))
 
 # DataFrame.map: element-wise rounding
-print(df[["q1", "q2"]].map(lambda x: round(x, 2)))`,
+display(df[["q1", "q2"]].map(lambda x: round(x, 2)))`,
     },
   ]}
 />

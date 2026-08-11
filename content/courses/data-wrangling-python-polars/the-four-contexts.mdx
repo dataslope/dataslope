@@ -40,7 +40,7 @@ it. Anything you did not mention is gone.
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(
+      starterCode: `display(
     penguins.select(
         "species",
         (pl.col("body_mass_g") / 1000).round(2).alias("kg"),
@@ -48,7 +48,7 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
 )
 
 # Aggregations in select collapse the frame to one row
-print(
+display(
     penguins.select(
         pl.len().alias("n"),
         pl.col("body_mass_g").mean().round(0).alias("avg_mass"),
@@ -79,7 +79,7 @@ implicitly kept.
 penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
     "species", "body_mass_g"
 )`,
-      starterCode: `print(
+      starterCode: `display(
     penguins.with_columns(
         (pl.col("body_mass_g") / 1000).round(2).alias("kg"),
         # An aggregation broadcasts: every row gets the overall mean
@@ -103,7 +103,7 @@ An expression whose output name matches an existing column
 
 df = pl.DataFrame({"name": ["  Ada ", "GRACE", "alan  "]})
 
-print(df.with_columns(pl.col("name").str.strip_chars().str.to_titlecase()))
+display(df.with_columns(pl.col("name").str.strip_chars().str.to_titlecase()))
 `,
     },
   ]}
@@ -165,7 +165,7 @@ whole column.
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(
+      starterCode: `display(
     penguins.group_by("species").agg(
         pl.len().alias("n"),
         pl.col("body_mass_g").mean().round(0).alias("avg_mass"),
@@ -205,16 +205,16 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
       starterCode: `above_average = pl.col("body_mass_g") > pl.col("body_mass_g").mean()
 
 # select: build a frame of just this Boolean
-print(penguins.select(above_average.alias("above")).head(3))
+display(penguins.select(above_average.alias("above")).head(3))
 
 # with_columns: attach it to the existing frame
-print(penguins.with_columns(above_average.alias("above")).head(3))
+display(penguins.with_columns(above_average.alias("above")).head(3))
 
 # filter: keep the rows where it holds
 print("above average:", penguins.filter(above_average).height)
 
 # agg: evaluate it within each species
-print(
+display(
     penguins.group_by("species")
     .agg(above_average.sum().alias("n_above_own_species_mean"))
     .sort("species")
@@ -253,7 +253,7 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
 tagged = None     # TODO
 by_island = None  # TODO
 
-print(summary)
+display(summary)
 `,
       solutionCode: `summary = penguins.select(
     pl.len().alias("n"),
@@ -270,9 +270,9 @@ by_island = (
     .sort("island")
 )
 
-print(summary)
-print(tagged.head(3))
-print(by_island)
+display(summary)
+display(tagged.head(3))
+display(by_island)
 `,
     },
   ]}

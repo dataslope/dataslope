@@ -134,7 +134,7 @@ df = px.data.tips()
 
 # Cross-tab of customer counts by day x time:
 counts = pd.crosstab(df["day"], df["time"])
-print(counts)
+display(counts)
 
 fig = px.imshow(
     counts,

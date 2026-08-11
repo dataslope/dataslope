@@ -47,12 +47,12 @@ print()
 
 # Just the duplicates
 print("Duplicate rows:")
-print(df[df.duplicated()])
+display(df[df.duplicated()])
 print()
 
 # Duplicates based ONLY on customer_id
 print("Duplicate customer_ids:")
-print(df[df.duplicated(subset=["customer_id"])])
+display(df[df.duplicated(subset=["customer_id"])])
 `,
     },
   ]}
@@ -84,11 +84,11 @@ df = pd.DataFrame({
     "spend":       [100, 200, 300, 200, 50, 100],
 })`,
       starterCode: `# Drop full-row duplicates
-print(df.drop_duplicates())
+display(df.drop_duplicates())
 print()
 
 # Drop duplicates based on customer_id only, keeps the first
-print(df.drop_duplicates(subset=["customer_id"]))
+display(df.drop_duplicates(subset=["customer_id"]))
 `,
     },
   ]}
@@ -162,7 +162,7 @@ df["country_clean"] = (
     .str.upper()
     .replace({"U.S.A.": "USA", "U.S.": "USA", "UNITED STATES": "USA"})
 )
-print(df)
+display(df)
 print()
 print(df["country_clean"].value_counts())
 `,
@@ -232,7 +232,7 @@ def normalize(row):
     return row["price"]
 
 df["price_usd"] = df.apply(normalize, axis=1).round(2)
-print(df)
+display(df)
 `,
     },
   ]}
@@ -257,7 +257,7 @@ df = pd.DataFrame({"x": [1, 2, 3]}, index=["a", "b", "a"])  # duplicate "a"
 print("Index unique?", df.index.is_unique)
 print()
 # Lookup returns multiple rows (no longer a single Series)
-print(df.loc["a"])
+display(df.loc["a"])
 `,
     },
   ]}

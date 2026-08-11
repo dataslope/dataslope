@@ -120,11 +120,11 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `measurements = cs.numeric() - cs.by_name("year")
 
 # One summary row across every measurement
-print(penguins.select(measurements.mean().round(1)))
+display(penguins.select(measurements.mean().round(1)))
 
 # Fill every numeric null with that column's median, in one line
 filled = penguins.with_columns(measurements.fill_null(measurements.median()))
-print(filled.null_count())
+display(filled.null_count())
 
 # Standardize them all, keeping the originals
 print(
@@ -166,7 +166,7 @@ clean = messy.with_columns(
     cs.float().round(2).fill_null(0.0),
 )
 
-print(clean)
+display(clean)
 `,
     },
   ]}
@@ -219,13 +219,13 @@ import polars.selectors as cs
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `means = None  # TODO
 
-print(means)
+display(means)
 `,
       solutionCode: `means = penguins.select(
     (cs.numeric() - cs.by_name("year")).mean().round(2)
 )
 
-print(means)
+display(means)
 `,
     },
   ]}

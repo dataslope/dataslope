@@ -30,15 +30,15 @@ a lot of confusion later.
 df = pl.DataFrame({"when": ["2026-03-14", "2026-03-15", "2026-04-01"]})
 
 # ISO 8601 parses with no format string
-print(df.with_columns(pl.col("when").str.to_date()))
+display(df.with_columns(pl.col("when").str.to_date()))
 
 # Anything else needs a chrono format
 odd = pl.DataFrame({"when": ["14/03/2026", "15/03/2026"]})
-print(odd.with_columns(pl.col("when").str.to_date("%d/%m/%Y")))
+display(odd.with_columns(pl.col("when").str.to_date("%d/%m/%Y")))
 
 # Timestamps too
 stamps = pl.DataFrame({"when": ["2026-03-14 09:30:00"]})
-print(stamps.with_columns(pl.col("when").str.to_datetime()))
+display(stamps.with_columns(pl.col("when").str.to_datetime()))
 `,
     },
   ]}
@@ -75,7 +75,7 @@ df = pl.DataFrame(
 
 d = pl.col("when")
 
-print(
+display(
     df.with_columns(
         year=d.dt.year(),
         month=d.dt.month(),
@@ -118,14 +118,14 @@ sales = pl.DataFrame(
     }
 ).with_columns(pl.col("when").str.to_date())
 
-print(
+display(
     sales.with_columns(
         month=pl.col("when").dt.truncate("1mo"),
         week=pl.col("when").dt.truncate("1w"),
     )
 )
 
-print(
+display(
     sales.group_by(pl.col("when").dt.truncate("1mo").alias("month"))
     .agg(pl.col("amount").sum())
     .sort("month")
@@ -160,7 +160,7 @@ df = pl.DataFrame(
     }
 )
 
-print(
+display(
     df.with_columns(
         span=pl.col("end") - pl.col("start"),
         days=(pl.col("end") - pl.col("start")).dt.total_days(),
@@ -266,7 +266,7 @@ df = pl.DataFrame({"t": ["2026-06-15 12:00:00"]}).with_columns(
     pl.col("t").str.to_datetime()
 )
 
-print(df.with_columns(
+display(df.with_columns(
     utc=pl.col("t").dt.replace_time_zone("UTC"),
 ).with_columns(
     oslo=pl.col("utc").dt.convert_time_zone("Europe/Oslo"),
@@ -317,7 +317,7 @@ raw = pl.DataFrame(
 )`,
       starterCode: `monthly = None  # TODO
 
-print(monthly)
+display(monthly)
 `,
       solutionCode: `monthly = (
     raw.with_columns(pl.col("when").str.to_date())
@@ -329,7 +329,7 @@ print(monthly)
     .sort("month")
 )
 
-print(monthly)
+display(monthly)
 `,
     },
   ]}

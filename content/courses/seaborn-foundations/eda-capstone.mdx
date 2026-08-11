@@ -50,7 +50,7 @@ penguins = pd.read_csv("penguins.csv")
 print("shape:", penguins.shape)
 
 # What do the columns and first rows look like?
-print(penguins.head())
+display(penguins.head())
 
 # Where are the missing values?
 print(penguins.isna().sum())
@@ -514,7 +514,7 @@ its diagonal is all \`1\`.
 Using the \`penguins\` dataset, build the correlation matrix of its numeric
 columns and assign it to a variable named \`corr()\`:
 
-\`\`\`
+\`\`\`python
 corr = penguins.corr(numeric_only=True)
 \`\`\`
 

@@ -24,6 +24,7 @@ import {
 } from "react";
 import { X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 
 // ─── Boot progress smoothing ─────────────────────────────────────────
@@ -190,13 +191,63 @@ export function cmThemeNameFor(isDark: boolean): string {
 
 // ─── Instructions: ReactNode | markdown string ───────────────────────
 
-/** Renders an instructions string as Markdown using react-markdown + GFM.
- *  Supports the full CommonMark + GitHub-Flavored Markdown surface
- *  (headings, lists, tables, code, autolinks, …) so authors can write
- *  natural Markdown instead of nested JSX. */
+/**
+ * Label every unlabelled opening fence `text`.
+ *
+ * A safety net, not the mechanism: every fence in `content/` names its own
+ * language, and `__tests__/challengeInstructionsHighlight.test.tsx` fails the
+ * build if a new one does not. `text` is the right default for the one an
+ * author forgets, because forgetting correlates with output rather than with
+ * code: of the 89 fences that once carried no info string, 87 were samples of
+ * what the program prints. Highlighting those is worse than leaving them
+ * plain, since highlight.js finds keywords in ordinary words and paints a
+ * column of `Hello, Grace!` in three colours.
+ *
+ * (An earlier version inherited the card's `adapter` here. It was wrong 87
+ * times out of 89, which is why the label now lives in the source.)
+ *
+ * Done on the markdown text rather than on the syntax tree because the
+ * alternative is a rehype plugin, and that means importing `unist-util-visit`
+ * and `hast`, neither of which is a direct dependency.
+ *
+ * Only *opening* fences are touched: the state flips on every fence line, so a
+ * closing ``` is never mistaken for a new block, and a fence that already
+ * names a language keeps it.
+ */
+export function labelBareFences(source: string): string {
+  if (!source.includes("```") && !source.includes("~~~")) return source;
+  let open = false;
+  return source
+    .split("\n")
+    .map((line) => {
+      const m = /^(\s{0,3})(`{3,}|~{3,})(\s*)(\S*)(.*)$/.exec(line);
+      if (!m) return line;
+      const wasOpen = open;
+      open = !open;
+      if (wasOpen || m[4]) return line;
+      return `${m[1]}${m[2]}text${m[5]}`;
+    })
+    .join("\n");
+}
+
+/** Renders an instructions string as Markdown using react-markdown + GFM,
+ *  with fenced code syntax-highlighted by highlight.js. Supports the full
+ *  CommonMark + GitHub-Flavored Markdown surface (headings, lists, tables,
+ *  code, autolinks, …) so authors can write natural Markdown instead of
+ *  nested JSX.
+ *
+ *  `detect: false`, so the language is always the one the fence names and
+ *  never one highlight.js guessed from a two-line sample. Inline spans are
+ *  untouched: `rehypeHighlight` only visits `pre > code`, and a `` `df` `` in
+ *  a sentence wants to read as an identifier, not as code. */
 export function renderMarkdownInstructions(source: string): ReactNode {
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]}>{source}</ReactMarkdown>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[[rehypeHighlight, { detect: false, ignoreMissing: true }]]}
+    >
+      {labelBareFences(source)}
+    </ReactMarkdown>
   );
 }
 

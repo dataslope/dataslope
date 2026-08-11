@@ -222,6 +222,15 @@ function entryIsIntact(entry) {
   );
 }
 
+/** True when an entry is nothing but diagnostics — the shape a run that
+ *  panicked leaves behind. Recording one is guarded against below; this is
+ *  what retires the ones already committed, since a narrowed run clones the
+ *  manifest on disk and a guard at the write site can never reach them. */
+function isDiagnosticsOnly(entry) {
+  const cells = entry?.cells ?? [];
+  return cells.length > 0 && cells.every((c) => c.type === "stderr");
+}
+
 // An unchanged content tree costs a stat signature and nothing else, the
 // same contract every other generator honours. Without it, a regeneration
 // would re-scan every lesson to discover that none of them moved.
@@ -390,6 +399,7 @@ const stats = {
   recorded: 0,
   empty: 0,
   failed: 0,
+  retired: 0,
   environmental: 0,
   timedOut: 0,
   unstable: 0,
@@ -422,7 +432,12 @@ for (const [i, block] of blocks.entries()) {
   // a hash of the source, so this entry cannot be stale, and reusing it is
   // what keeps an unchanged tree from booting Pyodide at all.
   const reusable = previous[block.file]?.[key];
-  if (reusable && entryIsIntact(reusable)) {
+  if (isDiagnosticsOnly(reusable)) {
+    // Drop it and re-run: if the block still only produces a traceback the
+    // guard below refuses it, and if it has been fixed it records properly.
+    delete manifest[block.file]?.[key];
+    stats.retired++;
+  } else if (reusable && entryIsIntact(reusable)) {
     (manifest[block.file] ??= {})[key] = reusable;
     for (const cell of reusable.cells) if (cell.src) keptAssets.add(basename(cell.src));
     stats.reused++;
@@ -472,6 +487,21 @@ for (const [i, block] of blocks.entries()) {
   const cells = toOutputCells(first);
   if (cells.length === 0) {
     stats.empty++;
+    continue;
+  }
+  // A block that produced nothing but diagnostics ran and failed, and its
+  // panel would teach the reader the wrong thing. `r.error` catches that for
+  // an exception; it does not catch a *panic*, which Pyodide prints to stderr
+  // and does not raise, so `runPythonAsync` resolves and the traceback becomes
+  // the block's recorded output. Polars' thread pool cannot start under Node
+  // and poisons its `LazyLock` for the rest of the process, which is exactly
+  // this shape: 31 polars lessons in the committed manifest previewed a Rust
+  // panic. Anything real leaves a stdout, a table or a figure behind, so the
+  // test is "stderr and nothing else" rather than the text adapters' "no
+  // stdout" — a block whose whole output is one DataFrame has no stdout
+  // either.
+  if (cells.every((c) => c.type === "stderr")) {
+    stats.failed++;
     continue;
   }
 
@@ -711,6 +741,15 @@ console.log(
     `${stats.empty} produced no output, ${stats.failed} failed, ` +
     `${stats.environmental} could not run in Node`,
 );
+// Loud, because it is the only sign that a lesson stopped previewing
+// something: an entry that was nothing but a traceback has been dropped and
+// the block falls back to the empty panel.
+if (stats.retired > 0) {
+  console.log(
+    `build-block-outputs: ${stats.retired} diagnostics-only entr(ies) retired ` +
+      `(a panic recorded as output); those blocks now show an empty panel`,
+  );
+}
 const byAdapter = Object.entries(totals)
   .map(([a, t]) => `${a} ${t.recorded}/${t.total}`)
   .join(", ");
