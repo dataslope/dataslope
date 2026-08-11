@@ -988,8 +988,12 @@ Two places where the surrounding syntax decides the spelling:
 - **Not every prop renders math.** `<MultipleChoice>` does (its own
   ReactMarkdown pipeline carries `remarkMath` + `rehypeKatex`). A challenge
   card's `instructions` does *not*: `renderMarkdownInstructions` in
-  `app/_components/challengeShared.tsx` runs `remarkGfm` alone, so `$…$` there
-  reaches the reader as dollar signs. Leave those as plain text.
+  `app/_components/challengeShared.tsx` runs `remarkGfm` plus
+  `rehypeHighlight` and no math plugins, so `$…$` there reaches the reader as
+  dollar signs. Leave those as plain text. Fenced code *is* highlighted, in the
+  card's own language — `withFenceLanguage` stamps the adapter's language onto
+  any fence the author left unlabelled, because `detect` is off and 89 of the
+  96 fences on the site name no language.
 
 Code is exempt, in both directions: an `O(1)` in a comment inside
 `starterCode` is code, and `` `f(n) = O(g(n))` `` is one span of pseudo-code

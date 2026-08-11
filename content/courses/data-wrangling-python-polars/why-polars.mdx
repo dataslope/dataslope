@@ -97,7 +97,8 @@ import polars as pl`,
       starterCode: `start = time.perf_counter()
 
 result = (
-    pl.scan_csv("diamonds.csv")
+    pl.read_csv("diamonds.csv")
+    .lazy()
     .filter(pl.col("price") > 500)
     .group_by("cut")
     .agg(

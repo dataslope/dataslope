@@ -25,6 +25,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Worker } from "node:worker_threads";
 
+import { POLARS_IMPORT_PATTERN, POLARS_WASM_SHIM } from "../../app/_components/runtime/polarsWasm.ts";
 import { installSyncHttp } from "./sync-http.mjs";
 
 const DATASET_BASE = "https://raw.githubusercontent.com/dataslope/datasets/main/";
@@ -55,9 +56,24 @@ const CAPTURE_LIMIT = 4_000_000;
  * Pyodide-in-Node is close to Pyodide-in-a-browser but not identical, and the
  * gaps are all in the host rather than in the lesson:
  *
- *   • polars ships a Rust thread pool. A browser worker gives it threads; Node
- *     does not, so the first parallel query panics and every later one finds
- *     the poisoned lock.
+ *   • JSPI, below.
+ *
+ * `could not spawn threads` used to be listed here as one of them, on the
+ * belief that "a browser worker gives polars threads; Node does not". That is
+ * wrong, and it hid a real breakage for as long as it stood. The site serves
+ * no COOP/COEP headers, so `crossOriginIsolated` is false and there is no
+ * SharedArrayBuffer in the reader's worker either — `__tests__/syncHttp.test.ts`
+ * pins exactly that. A panic here is a panic the reader gets.
+ *
+ * `app/_components/runtime/polarsWasm.ts` now removes the common cause (the
+ * mmap reader's thread pool, on any file over a megabyte) in both runtimes at
+ * once, so an eager read is no longer affected. What remains is `scan_csv` on
+ * a big file, which cannot be fixed from this side: the Pyodide wheel has no
+ * `new-streaming` feature, so a LazyFrame cannot be built over a buffer. Those
+ * patterns stay below so the sweep is not drowned by the poisoned-lock cascade
+ * that follows the first one, but they are *content* failures, not
+ * environmental ones, and `check-polars-scan.mjs` counts them so they cannot
+ * quietly grow.
  *
  * Reporting these as content failures is worse than not running the block at
  * all: it buries the real breakages (a deprecated argument, a dtype that
@@ -270,6 +286,7 @@ builtins.display = display
 
   const micropipInstalled = new Set(["plotly"]);
   const implicitLoaded = new Set();
+  let polarsShimmed = false;
   const staged = new Set();
 
   /** The two package steps the browser does before every run, mirrored here. */
@@ -295,15 +312,24 @@ builtins.display = display
             (mod === "openpyxl" && /\.(?:to|read)_excel\(/.test(code))),
       )
       .map(([, req]) => req);
-    if (needed.length === 0) return;
-    const micropip = py.pyimport("micropip");
-    try {
-      for (const req of needed) {
-        await micropip.install(req);
-        micropipInstalled.add(req);
+    if (needed.length > 0) {
+      const micropip = py.pyimport("micropip");
+      try {
+        for (const req of needed) {
+          await micropip.install(req);
+          micropipInstalled.add(req);
+        }
+      } finally {
+        micropip.destroy();
       }
-    } finally {
-      micropip.destroy();
+    }
+    // The same polars mmap shim the browser worker installs, for the same
+    // reason and at the same moment: before the block's own `import polars`.
+    // Without it this runner and the reader's browser fail differently, and a
+    // sweep that fails differently from the site is not checking the site.
+    if (!polarsShimmed && POLARS_IMPORT_PATTERN.test(code)) {
+      await py.runPythonAsync(POLARS_WASM_SHIM);
+      polarsShimmed = true;
     }
   }
 

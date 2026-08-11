@@ -53,6 +53,7 @@ import {
   CopyIcon,
   PlayIcon,
   FormatIcon,
+  hljsLanguageFor,
   renderInstructions,
   useChallengeToasts,
   ChallengeToastViewport,
@@ -1740,7 +1741,7 @@ export default function SqlChallengeCard({
         {/* data-askai-instructions lets the Ask AI snapshot read the rendered
             instructions text when `instructions` is JSX rather than a string. */}
         <div className={styles.instructionsBody} data-askai-instructions>
-          {renderInstructions(instructions)}
+          {renderInstructions(instructions, hljsLanguageFor(dialect))}
         </div>
       </div>
 

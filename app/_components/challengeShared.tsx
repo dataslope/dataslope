@@ -24,6 +24,7 @@ import {
 } from "react";
 import { X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 
 // ─── Boot progress smoothing ─────────────────────────────────────────
@@ -190,21 +191,101 @@ export function cmThemeNameFor(isDark: boolean): string {
 
 // ─── Instructions: ReactNode | markdown string ───────────────────────
 
-/** Renders an instructions string as Markdown using react-markdown + GFM.
- *  Supports the full CommonMark + GitHub-Flavored Markdown surface
- *  (headings, lists, tables, code, autolinks, …) so authors can write
- *  natural Markdown instead of nested JSX. */
-export function renderMarkdownInstructions(source: string): ReactNode {
+/**
+ * highlight.js language for a card's adapter id or SQL dialect.
+ *
+ * A card already knows what language its exercise is in, which is a better
+ * answer than highlight.js's auto-detection: these snippets are one or two
+ * lines, and `detect` on a two-line sample guesses from a handful of tokens.
+ * Anything not listed falls through to no highlighting rather than to a guess.
+ */
+const HLJS_LANGUAGE: Record<string, string> = {
+  python: "python",
+  r: "r",
+  javascript: "javascript",
+  typescript: "typescript",
+  php: "php",
+  c: "c",
+  cpp: "cpp",
+  java: "java",
+  csharp: "csharp",
+  // `web` is HTML + CSS + JS in one card; `xml` is highlight.js's HTML mode
+  // and is the best single answer for a fence that does not say otherwise.
+  web: "xml",
+  // Not "jsx": highlight.js has no such grammar, JSX is part of `javascript`.
+  react: "javascript",
+  // Every SQL dialect the SQL cards support.
+  sqlite: "sql",
+  postgres: "sql",
+  duckdb: "sql",
+};
+
+export function hljsLanguageFor(adapter: string | undefined): string | undefined {
+  return adapter ? HLJS_LANGUAGE[adapter] : undefined;
+}
+
+/**
+ * Give every unlabelled opening fence the card's own language.
+ *
+ * 89 of the 96 fenced blocks in card instructions carry no info string, so
+ * without this `rehypeHighlight` would leave almost all of them plain. Done on
+ * the markdown text rather than on the syntax tree because the alternative is
+ * a rehype plugin, and that means importing `unist-util-visit` and `hast`,
+ * neither of which is a direct dependency.
+ *
+ * Only *opening* fences are touched: the state flips on every fence line, so a
+ * closing ``` is never mistaken for a new block, and a fence that already
+ * names a language keeps it.
+ */
+export function withFenceLanguage(source: string, language: string | undefined): string {
+  if (!language || !source.includes("```")) return source;
+  let open = false;
+  return source
+    .split("\n")
+    .map((line) => {
+      const m = /^(\s{0,3})(`{3,}|~{3,})(\s*)(\S*)(.*)$/.exec(line);
+      if (!m) return line;
+      const wasOpen = open;
+      open = !open;
+      if (wasOpen || m[4]) return line;
+      return `${m[1]}${m[2]}${language}${m[5]}`;
+    })
+    .join("\n");
+}
+
+/** Renders an instructions string as Markdown using react-markdown + GFM,
+ *  with fenced code syntax-highlighted by highlight.js. Supports the full
+ *  CommonMark + GitHub-Flavored Markdown surface (headings, lists, tables,
+ *  code, autolinks, …) so authors can write natural Markdown instead of
+ *  nested JSX.
+ *
+ *  `detect: false` because the language comes from the card, never from a
+ *  guess: see `HLJS_LANGUAGE`. A fence in a card with no adapter, or with one
+ *  not in that map, renders plain, which is what it did before. Inline spans
+ *  are untouched either way — `rehypeHighlight` only visits `pre > code`, and
+ *  a `` `df` `` in a sentence wants to read as an identifier, not as code. */
+export function renderMarkdownInstructions(
+  source: string,
+  language?: string,
+): ReactNode {
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]}>{source}</ReactMarkdown>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[[rehypeHighlight, { detect: false, ignoreMissing: true }]]}
+    >
+      {withFenceLanguage(source, language)}
+    </ReactMarkdown>
   );
 }
 
 /** Accepts either a React node or a markdown string. Strings are
  *  rendered with react-markdown; nodes pass through unchanged so
  *  existing JSX-based call sites are unaffected. */
-export function renderInstructions(input: ReactNode | string): ReactNode {
-  if (typeof input === "string") return renderMarkdownInstructions(input);
+export function renderInstructions(
+  input: ReactNode | string,
+  language?: string,
+): ReactNode {
+  if (typeof input === "string") return renderMarkdownInstructions(input, language);
   return input;
 }
 

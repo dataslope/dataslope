@@ -48,7 +48,12 @@
 .cardShell {
   position: relative;
   isolation: isolate;
-  margin: 1rem 0;
+  /* Same asymmetry, and the same reason, as ChallengeCard's `.cardShell`:
+     the striped elevation is absolutely positioned, so it hangs past the
+     bottom edge without taking up layout and swallows part of the margin.
+     Keep the two in step — a question and a code block sitting next to each
+     other in a lesson must not settle at different heights. */
+  margin: 1rem 0 2rem;
   --mc-shadow-offset: 6px;
   --mc-shadow-color: color-mix(in srgb, var(--ds-black) 6%, transparent);
   --mc-shadow-stripe: 1px;
