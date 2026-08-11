@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState, useRef, useCallback } from "react";
-import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { ContextMenu } from "@base-ui/react/context-menu";
 import { Dialog } from "@base-ui/react/dialog";
 import {
@@ -883,19 +882,19 @@ export function FilesPanel({
         </ContextMenu.Portal>
       </ContextMenu.Root>
 
-      <AlertDialog.Root
+      <Dialog.Root
         open={pendingDelete !== null}
         onOpenChange={(next) => {
           if (!next) setPendingDelete(null);
         }}
       >
-        <AlertDialog.Portal>
-          <AlertDialog.Backdrop className="confirm-backdrop" />
-          <AlertDialog.Popup className="confirm-popup">
-            <AlertDialog.Title className="confirm-title">
+        <Dialog.Portal>
+          <Dialog.Backdrop className="confirm-backdrop" />
+          <Dialog.Popup className="confirm-popup" role="alertdialog">
+            <Dialog.Title className="confirm-title">
               Delete {pendingDelete?.isFolder ? "folder" : "file"}?
-            </AlertDialog.Title>
-            <AlertDialog.Description className="confirm-desc">
+            </Dialog.Title>
+            <Dialog.Description className="confirm-desc">
               {pendingDelete?.isFolder ? (
                 <>
                   This will permanently delete <strong>{pendingDelete?.path}</strong>
@@ -917,21 +916,21 @@ export function FilesPanel({
                   can&rsquo;t be undone.
                 </>
               )}
-            </AlertDialog.Description>
+            </Dialog.Description>
             <div className="confirm-actions">
-              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+              <Dialog.Close className="confirm-btn confirm-btn-secondary">
                 Cancel
-              </AlertDialog.Close>
-              <AlertDialog.Close
+              </Dialog.Close>
+              <Dialog.Close
                 className="confirm-btn confirm-btn-danger"
                 onClick={handleConfirmDelete}
               >
                 Delete
-              </AlertDialog.Close>
+              </Dialog.Close>
             </div>
-          </AlertDialog.Popup>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
 
       <Dialog.Root
         open={infoTarget !== null}

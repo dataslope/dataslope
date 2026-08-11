@@ -228,13 +228,9 @@ export function NewWorkspaceControl({
     }
   }, [busy, name, suggested, playgroundId]);
 
-  // A Dialog rather than an AlertDialog, which is what this used to be. Base
-  // UI's alert dialog deliberately ignores a click on its own backdrop — an
-  // alert demands an explicit choice — so the backdrop rendered, dimmed the
-  // page, and did nothing when clicked. Starting a workspace is neither
-  // destructive nor urgent (the current one is kept, and named in the prose
-  // below), so the ordinary dismissible dialog is the right primitive, and it
-  // is the one every other form dialog here already uses.
+  // A Dialog, like every other confirmation in the playgrounds. See the note
+  // on `.confirm-backdrop` in playground.css for why none of them are Base UI
+  // alert dialogs any more.
   return (
     <Dialog.Root
       open={open}

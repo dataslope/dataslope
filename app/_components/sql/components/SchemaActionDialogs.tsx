@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Dialog } from "@base-ui/react/dialog";
 
 export interface SchemaActionDialogsProps {
   dropEntityPending: { kind: string; name: string } | null;
@@ -30,69 +30,69 @@ export function SchemaActionDialogs({
 }: SchemaActionDialogsProps) {
   return (
     <>
-      <AlertDialog.Root
+      <Dialog.Root
         open={dropEntityPending !== null}
         onOpenChange={onDropEntityOpenChange}
       >
-        <AlertDialog.Portal>
-          <AlertDialog.Backdrop className="confirm-backdrop" />
-          <AlertDialog.Popup className="confirm-popup">
-            <AlertDialog.Title className="confirm-title">
+        <Dialog.Portal>
+          <Dialog.Backdrop className="confirm-backdrop" />
+          <Dialog.Popup className="confirm-popup" role="alertdialog">
+            <Dialog.Title className="confirm-title">
               Drop {dropEntityPending?.kind ?? "entity"}?
-            </AlertDialog.Title>
-            <AlertDialog.Description className="confirm-desc">
+            </Dialog.Title>
+            <Dialog.Description className="confirm-desc">
               This will permanently drop{" "}
               <strong>{dropEntityPending?.name ?? ""}</strong> from the
               in-memory database. Reload the page to restore the sample.
-            </AlertDialog.Description>
+            </Dialog.Description>
             {dropDetail && <p className="confirm-desc-note">{dropDetail}</p>}
             <div className="confirm-actions">
-              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+              <Dialog.Close className="confirm-btn confirm-btn-secondary">
                 Cancel
-              </AlertDialog.Close>
-              <AlertDialog.Close
+              </Dialog.Close>
+              <Dialog.Close
                 className="confirm-btn confirm-btn-danger"
                 onClick={onDropEntityConfirm}
               >
                 Drop
-              </AlertDialog.Close>
+              </Dialog.Close>
             </div>
-          </AlertDialog.Popup>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
 
-      <AlertDialog.Root
+      <Dialog.Root
         open={truncatePending !== null}
         onOpenChange={onTruncateOpenChange}
       >
-        <AlertDialog.Portal>
-          <AlertDialog.Backdrop className="confirm-backdrop" />
-          <AlertDialog.Popup className="confirm-popup">
-            <AlertDialog.Title className="confirm-title">
+        <Dialog.Portal>
+          <Dialog.Backdrop className="confirm-backdrop" />
+          <Dialog.Popup className="confirm-popup" role="alertdialog">
+            <Dialog.Title className="confirm-title">
               Truncate table?
-            </AlertDialog.Title>
-            <AlertDialog.Description className="confirm-desc">
+            </Dialog.Title>
+            <Dialog.Description className="confirm-desc">
               Truncate table <strong>{truncatePending}</strong>? This deletes
               every row but keeps the schema. The change is in-memory only and
               will be undone next page load.
-            </AlertDialog.Description>
+            </Dialog.Description>
             {truncateDetail && (
               <p className="confirm-desc-note">{truncateDetail}</p>
             )}
             <div className="confirm-actions">
-              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+              <Dialog.Close className="confirm-btn confirm-btn-secondary">
                 Cancel
-              </AlertDialog.Close>
-              <AlertDialog.Close
+              </Dialog.Close>
+              <Dialog.Close
                 className="confirm-btn confirm-btn-danger"
                 onClick={onTruncateConfirm}
               >
                 Truncate
-              </AlertDialog.Close>
+              </Dialog.Close>
             </div>
-          </AlertDialog.Popup>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   );
 }

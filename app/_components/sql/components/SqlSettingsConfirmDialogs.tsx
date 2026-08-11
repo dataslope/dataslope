@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Dialog } from "@base-ui/react/dialog";
 
 export interface SqlSettingsConfirmDialogsProps {
   dialectDisplayName: string;
@@ -31,23 +31,23 @@ export function SqlSettingsConfirmDialogs({
 }: SqlSettingsConfirmDialogsProps) {
   return (
     <>
-      <AlertDialog.Root open={restoreOpen} onOpenChange={onRestoreOpenChange}>
-        <AlertDialog.Portal>
-          <AlertDialog.Backdrop className="confirm-backdrop" />
-          <AlertDialog.Popup className="confirm-popup">
-            <AlertDialog.Title className="confirm-title">
+      <Dialog.Root open={restoreOpen} onOpenChange={onRestoreOpenChange}>
+        <Dialog.Portal>
+          <Dialog.Backdrop className="confirm-backdrop" />
+          <Dialog.Popup className="confirm-popup" role="alertdialog">
+            <Dialog.Title className="confirm-title">
               Restore default settings?
-            </AlertDialog.Title>
-            <AlertDialog.Description className="confirm-desc">
+            </Dialog.Title>
+            <Dialog.Description className="confirm-desc">
               This will reset {dialectDisplayName}&apos;s editor font size, word
               wrap, run/result preferences, and the shared editor theme to their
               built-in defaults. Your saved queries are not affected.
-            </AlertDialog.Description>
+            </Dialog.Description>
             <div className="confirm-actions">
-              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+              <Dialog.Close className="confirm-btn confirm-btn-secondary">
                 Cancel
-              </AlertDialog.Close>
-              <AlertDialog.Close
+              </Dialog.Close>
+              <Dialog.Close
                 className="confirm-btn confirm-btn-danger"
                 onClick={() => {
                   onRestoreConfirm();
@@ -55,24 +55,24 @@ export function SqlSettingsConfirmDialogs({
                 }}
               >
                 Restore defaults
-              </AlertDialog.Close>
+              </Dialog.Close>
             </div>
-          </AlertDialog.Popup>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
 
       {onClearAllDataConfirm && onClearAllDataOpenChange && (
-        <AlertDialog.Root
+        <Dialog.Root
           open={!!clearAllDataOpen}
           onOpenChange={onClearAllDataOpenChange}
         >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup" role="alertdialog">
+              <Dialog.Title className="confirm-title">
                 Clear all local data?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
                 This will permanently delete every saved setting, query,
                 {" "}<strong>workspace</strong>, persisted{" "}
                 <strong>database</strong>, and uploaded{" "}
@@ -80,52 +80,52 @@ export function SqlSettingsConfirmDialogs({
                 <strong>all Dataslope playgrounds</strong>, including
                 localStorage, OPFS, IndexedDB, and any cached assets. The
                 page will reload immediately. This cannot be undone.
-              </AlertDialog.Description>
+              </Dialog.Description>
               <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
+                </Dialog.Close>
+                <Dialog.Close
                   className="confirm-btn confirm-btn-danger"
                   onClick={onClearAllDataConfirm}
                 >
                   Clear &amp; reload
-                </AlertDialog.Close>
+                </Dialog.Close>
               </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
       )}
 
-      <AlertDialog.Root
+      <Dialog.Root
         open={clearStorageOpen}
         onOpenChange={onClearStorageOpenChange}
       >
-        <AlertDialog.Portal>
-          <AlertDialog.Backdrop className="confirm-backdrop" />
-          <AlertDialog.Popup className="confirm-popup">
-            <AlertDialog.Title className="confirm-title">
+        <Dialog.Portal>
+          <Dialog.Backdrop className="confirm-backdrop" />
+          <Dialog.Popup className="confirm-popup" role="alertdialog">
+            <Dialog.Title className="confirm-title">
               Clear all localStorage data?
-            </AlertDialog.Title>
-            <AlertDialog.Description className="confirm-desc">
+            </Dialog.Title>
+            <Dialog.Description className="confirm-desc">
               Settings, saved queries, and per-database state for every
               Dataslope playground will be erased. This action cannot be undone
 , the page will reload immediately afterwards.
-            </AlertDialog.Description>
+            </Dialog.Description>
             <div className="confirm-actions">
-              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+              <Dialog.Close className="confirm-btn confirm-btn-secondary">
                 Cancel
-              </AlertDialog.Close>
-              <AlertDialog.Close
+              </Dialog.Close>
+              <Dialog.Close
                 className="confirm-btn confirm-btn-danger"
                 onClick={onClearStorageConfirm}
               >
                 Clear &amp; reload
-              </AlertDialog.Close>
+              </Dialog.Close>
             </div>
-          </AlertDialog.Popup>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   );
 }

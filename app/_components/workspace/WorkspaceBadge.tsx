@@ -32,7 +32,6 @@ import {
 } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { Dialog } from "@base-ui/react/dialog";
-import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Menu } from "@base-ui/react/menu";
 import { Drawer } from "@base-ui/react/drawer";
 import {
@@ -1493,25 +1492,25 @@ function RestoreBackupDialog({
   onConfirm: (meta: CloudWorkspaceMeta) => void;
 }) {
   return (
-    <AlertDialog.Root
+    <Dialog.Root
       open={target !== null}
       onOpenChange={(o) => !o && onClose()}
     >
-      <AlertDialog.Portal>
-        <AlertDialog.Backdrop className="confirm-backdrop" />
-        <AlertDialog.Popup className="confirm-popup">
-          <AlertDialog.Title className="confirm-title">
+      <Dialog.Portal>
+        <Dialog.Backdrop className="confirm-backdrop" />
+        <Dialog.Popup className="confirm-popup" role="alertdialog">
+          <Dialog.Title className="confirm-title">
             Restore backup?
-          </AlertDialog.Title>
-          <AlertDialog.Description className="confirm-desc">
+          </Dialog.Title>
+          <Dialog.Description className="confirm-desc">
             The backup of <strong>“{target?.name}”</strong> from{" "}
             {target ? formatRelative(Date.parse(target.updatedAt)) : ""} will
             replace this workspace&rsquo;s current files on this device.
-          </AlertDialog.Description>
+          </Dialog.Description>
           <div className="confirm-actions">
-            <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+            <Dialog.Close className="confirm-btn confirm-btn-secondary">
               Cancel
-            </AlertDialog.Close>
+            </Dialog.Close>
             <button
               type="button"
               className="confirm-btn confirm-btn-danger"
@@ -1520,9 +1519,9 @@ function RestoreBackupDialog({
               Restore backup
             </button>
           </div>
-        </AlertDialog.Popup>
-      </AlertDialog.Portal>
-    </AlertDialog.Root>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 
@@ -1536,24 +1535,24 @@ function DeleteBackupDialog({
   onConfirm: (meta: CloudWorkspaceMeta) => void;
 }) {
   return (
-    <AlertDialog.Root
+    <Dialog.Root
       open={target !== null}
       onOpenChange={(o) => !o && onClose()}
     >
-      <AlertDialog.Portal>
-        <AlertDialog.Backdrop className="confirm-backdrop" />
-        <AlertDialog.Popup className="confirm-popup">
-          <AlertDialog.Title className="confirm-title">
+      <Dialog.Portal>
+        <Dialog.Backdrop className="confirm-backdrop" />
+        <Dialog.Popup className="confirm-popup" role="alertdialog">
+          <Dialog.Title className="confirm-title">
             Delete backup?
-          </AlertDialog.Title>
-          <AlertDialog.Description className="confirm-desc">
+          </Dialog.Title>
+          <Dialog.Description className="confirm-desc">
             The backup of <strong>“{target?.name}”</strong> will be removed
             from your account. Copies on your devices are untouched.
-          </AlertDialog.Description>
+          </Dialog.Description>
           <div className="confirm-actions">
-            <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+            <Dialog.Close className="confirm-btn confirm-btn-secondary">
               Cancel
-            </AlertDialog.Close>
+            </Dialog.Close>
             <button
               type="button"
               className="confirm-btn confirm-btn-danger"
@@ -1562,9 +1561,9 @@ function DeleteBackupDialog({
               Delete backup
             </button>
           </div>
-        </AlertDialog.Popup>
-      </AlertDialog.Portal>
-    </AlertDialog.Root>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 
@@ -1723,17 +1722,17 @@ function DeleteDialog({
   onConfirm: () => void | Promise<void>;
 }) {
   return (
-    <AlertDialog.Root
+    <Dialog.Root
       open={target !== null}
       onOpenChange={(o) => !o && onClose()}
     >
-      <AlertDialog.Portal>
-        <AlertDialog.Backdrop className="confirm-backdrop" />
-        <AlertDialog.Popup className="confirm-popup">
-          <AlertDialog.Title className="confirm-title">
+      <Dialog.Portal>
+        <Dialog.Backdrop className="confirm-backdrop" />
+        <Dialog.Popup className="confirm-popup" role="alertdialog">
+          <Dialog.Title className="confirm-title">
             Delete workspace?
-          </AlertDialog.Title>
-          <AlertDialog.Description className="confirm-desc">
+          </Dialog.Title>
+          <Dialog.Description className="confirm-desc">
             <strong>“{target?.name}”</strong> and all of its files
             {target?.playground === "sqlite" ||
             target?.playground === "postgres" ||
@@ -1748,20 +1747,20 @@ function DeleteDialog({
                 <strong> {siblings[0].name}</strong>.
               </>
             )}
-          </AlertDialog.Description>
+          </Dialog.Description>
           <div className="confirm-actions">
-            <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+            <Dialog.Close className="confirm-btn confirm-btn-secondary">
               Cancel
-            </AlertDialog.Close>
-            <AlertDialog.Close
+            </Dialog.Close>
+            <Dialog.Close
               className="confirm-btn confirm-btn-danger"
               onClick={() => void onConfirm()}
             >
               Delete
-            </AlertDialog.Close>
+            </Dialog.Close>
           </div>
-        </AlertDialog.Popup>
-      </AlertDialog.Portal>
-    </AlertDialog.Root>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
