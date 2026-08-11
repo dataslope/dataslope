@@ -13,6 +13,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
+import { eachTag, propText } from "../scripts/lib/mdx-blocks.mjs";
 import {
   hljsLanguageFor,
   renderMarkdownInstructions,
@@ -135,5 +136,81 @@ heavy = df[df["body_mass_g"] > 5000][["species", "body_mass_g"]]
   it("still renders GFM", () => {
     expect(html("- one\n- two", "python")).toContain("<li>");
     expect(html("**bold**", "python")).toContain("<strong>");
+  });
+
+  it("renders a `text` fence with no tokens at all", () => {
+    // What an expected-output sample is labelled. `text` is a registered
+    // plaintext alias, so this does not lean on `ignoreMissing`.
+    const out = html("```text\nHello, Grace!\n```", "python");
+    expect(out).toContain("Hello, Grace!");
+    expect(out).not.toContain("hljs-");
+  });
+});
+
+/**
+ * Every fence in a card's instructions names its language.
+ *
+ * The adapter fallback exists for the author who forgets, but it should stay a
+ * fallback: 87 of the 89 fences that had no info string were samples of what
+ * the program *prints*, not code, and inheriting the card's language paints
+ * highlight.js grammar over plain output. Labelling them says which is which
+ * in the source, where the author can see it.
+ */
+describe("challenge card instructions name their fence languages", () => {
+  const fences: { file: string; line: number; lang: string }[] = [];
+  for (const tag of ["ChallengeCard", "SqlChallengeCard"]) {
+    for (const { file, line, raw, unterminated } of eachTag(tag)) {
+      if (unterminated) continue;
+      const instructions = propText(raw, "instructions");
+      if (!instructions) continue;
+      let open = false;
+      for (const l of instructions.split("\n")) {
+        const m = /^ {0,3}(?:`{3,}|~{3,})\s*(\S*)/.exec(l);
+        if (!m) continue;
+        if (!open) fences.push({ file, line, lang: m[1] });
+        open = !open;
+      }
+    }
+  }
+
+  it("finds the fenced blocks", () => {
+    expect(fences.length).toBeGreaterThan(80);
+  });
+
+  it("leaves none of them unlabelled", () => {
+    const bare = fences.filter((f) => !f.lang);
+    const report = bare.map((f) => `  ${f.file}:${f.line}`).join("\n");
+    expect(
+      bare,
+      `fenced blocks in card instructions with no language:\n${report}\n\n` +
+        "Use ```text for a sample of what the program prints, or the card's " +
+        "own language for a code snippet.",
+    ).toEqual([]);
+  });
+
+  it("only uses languages the card renderer can highlight", () => {
+    // `text` is plaintext; the rest have to be grammars highlight.js ships.
+    const known = new Set([
+      "text",
+      "python",
+      "r",
+      "javascript",
+      "js",
+      "typescript",
+      "ts",
+      "php",
+      "c",
+      "cpp",
+      "java",
+      "csharp",
+      "sql",
+      "xml",
+      "html",
+      "css",
+      "json",
+      "bash",
+    ]);
+    const unknown = fences.filter((f) => f.lang && !known.has(f.lang));
+    expect(unknown.map((f) => `${f.file}:${f.line} ${f.lang}`)).toEqual([]);
   });
 });

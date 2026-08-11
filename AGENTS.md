@@ -990,10 +990,28 @@ Two places where the surrounding syntax decides the spelling:
   card's `instructions` does *not*: `renderMarkdownInstructions` in
   `app/_components/challengeShared.tsx` runs `remarkGfm` plus
   `rehypeHighlight` and no math plugins, so `$…$` there reaches the reader as
-  dollar signs. Leave those as plain text. Fenced code *is* highlighted, in the
-  card's own language — `withFenceLanguage` stamps the adapter's language onto
-  any fence the author left unlabelled, because `detect` is off and 89 of the
-  96 fences on the site name no language.
+  dollar signs. Leave those as plain text. Fenced code *is* highlighted — see
+  below for the label it needs.
+
+### A fence in a card's instructions names its language
+
+Two kinds of fenced block live in an `instructions` prop, and they want
+opposite things:
+
+- **A sample of what the program prints** takes ```` ```text ````. This is the
+  common case by a distance: of the 89 fences that once carried no info
+  string, 87 were expected output. Highlighting them is worse than leaving
+  them plain, because highlight.js finds keywords in ordinary words and paints
+  a column of `Hello, Grace!` in three colours.
+- **A code snippet** takes the card's own language (```` ```python ````,
+  ```` ```java ````, ```` ```sql ````…).
+
+`detect` is off, so nothing is ever guessed. An unlabelled fence falls back to
+the card's `adapter` (`withFenceLanguage`), which is the right answer only for
+the code case — so `__tests__/challengeInstructionsHighlight.test.tsx` fails
+the build on a fence with no label rather than letting the fallback decide.
+Inline spans are never highlighted: a `` `df` `` in a sentence is an
+identifier, not code.
 
 Code is exempt, in both directions: an `O(1)` in a comment inside
 `starterCode` is code, and `` `f(n) = O(g(n))` `` is one span of pseudo-code

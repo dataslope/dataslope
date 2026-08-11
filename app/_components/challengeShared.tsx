@@ -225,13 +225,20 @@ export function hljsLanguageFor(adapter: string | undefined): string | undefined
 }
 
 /**
- * Give every unlabelled opening fence the card's own language.
+ * Give an unlabelled opening fence the card's own language.
  *
- * 89 of the 96 fenced blocks in card instructions carry no info string, so
- * without this `rehypeHighlight` would leave almost all of them plain. Done on
- * the markdown text rather than on the syntax tree because the alternative is
- * a rehype plugin, and that means importing `unist-util-visit` and `hast`,
- * neither of which is a direct dependency.
+ * A safety net, not the mechanism: every fence in `content/` names its own
+ * language, and `__tests__/challengeInstructionsHighlight.test.tsx` fails the
+ * build if a new one does not. That matters because the right label is often
+ * *not* the card's language — 87 of the 89 fences that used to carry no info
+ * string were samples of what the program prints, and painting Python grammar
+ * over a column of expected output is worse than leaving it plain. So an
+ * author writes ```text for output and the card's language for code, and this
+ * only catches the one they forget.
+ *
+ * Done on the markdown text rather than on the syntax tree because the
+ * alternative is a rehype plugin, and that means importing `unist-util-visit`
+ * and `hast`, neither of which is a direct dependency.
  *
  * Only *opening* fences are touched: the state flips on every fence line, so a
  * closing ``` is never mistaken for a new block, and a fence that already
