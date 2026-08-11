@@ -339,6 +339,14 @@ interval around the *wrong* center. Resampling estimates *precision*
 at the truth). Garbage in, confidently-quantified garbage out.
 </Callout>
 
+<Chart slug="bootstrap-fails-for-max" />
+
+The shape of the failure is worth remembering. Statistics that depend on the
+*interior* of a distribution bootstrap beautifully, because a resample is a
+fair sample of the interior. Statistics that depend on the *edge* do not,
+because the edge of a resample is bounded by the edge of the sample and the
+method can never look past what it has already seen.
+
 ## Practice the bootstrap
 
 <ChallengeCard

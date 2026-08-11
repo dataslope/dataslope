@@ -438,6 +438,15 @@ assert abs(p_more_than_9 - expected_prob) < 1e-9`,
   ]}
 />
 
+<Chart slug="poisson-overdispersion" />
+
+The check is one line: the variance-to-mean ratio, called the dispersion. One
+means Poisson; above one is overdispersion, and that is what nearly all real
+count data does, because Poisson assumes events arrive independently at a
+constant rate and real events cluster. The standard replacement is the
+negative binomial, which changes nothing about the mean and everything about
+the intervals.
+
 ## Geometric: how many trials until the first success?
 
 The **Geometric** distribution answers a different question: *how many
