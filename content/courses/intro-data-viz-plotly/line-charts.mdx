@@ -23,6 +23,12 @@ Use a line chart when:
 - You have **multiple series** to compare over the same axis (one
   line per group).
 
+<Figure
+  slug="viz-line-charts-use-line-chart-inline-cutout"
+  alt="A continuous ribbon rising and dipping across a board over evenly spaced sleepers"
+  caption="Lines are for a continuous run, most often time along the horizontal axis."
+/>
+
 Never use a line chart when the x-axis is a set of *unordered
 categories* like "Apple, Banana, Cherry." Lines drawn between them
 imply a relationship that isn't there.
@@ -142,6 +148,12 @@ The markers help when:
 - The reader needs to know *which* are the measured points.
 - The chart will be exported as a static PNG.
 
+<Figure
+  slug="viz-line-charts-inline-cutout"
+  alt="A continuous ribbon rising and dipping across a board, with small markers pinned at each measured point along it"
+  caption="Markers pin the line back to the measurements. Everything between two markers is the chart's guess about what happened in between."
+/>
+
 If you have **dense** data (thousands of points), omit markers,
 they'll just clutter the line.
 
@@ -154,12 +166,6 @@ all. Leave the overlay alone and change what is loud:
 
 A common failure mode is the **spaghetti chart**, twenty or more
 overlapping lines that no one can read.
-
-<Figure
-  slug="viz-line-charts-inline-cutout"
-  alt="A continuous ribbon rising and dipping across a board, with small markers pinned at each measured point along it"
-  caption="A line implies the points are connected in order, so the order has to be real."
-/>
 
 <CodeBlock
   adapter="python"
@@ -206,12 +212,6 @@ directly comparable, and the smallest is climbing fastest:
 When values span many orders of magnitude (e.g., country GDPs,
 COVID case counts), a **log scale** for y reveals structure that a
 linear scale flattens out.
-
-<Figure
-  slug="viz-line-charts-use-line-chart-inline-cutout"
-  alt="A continuous ribbon rising and dipping across a board over evenly spaced sleepers"
-  caption="Lines are for a continuous run, most often time along the horizontal axis."
-/>
 
 <CodeBlock
   adapter="python"

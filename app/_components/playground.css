@@ -1434,8 +1434,20 @@ body.playground-active {
    Content-width like Jupyter, never stretched; the wrapper scrolls both
    axes for big frames. */
 .dataframe-wrap {
-  overflow: auto;
-  max-height: 480px;
+  /* Horizontal only, and no height cap. `.output-body` is the pane that
+     scrolls; a second scroller nested inside it gives one frame two
+     scrollbars, and because `.output-body` is a column flex container the
+     cells also shrink to fit before it ever scrolls, so several frames in one
+     run came out as several separately-scrolling stubs. Kept in lockstep with
+     `.outCellHtml` in ChallengeCard.module.css, where the same bug was
+     reported.
+
+     `overflow-y: hidden` rather than `visible` because CSS refuses to mix
+     them: set one axis to anything but `visible` and the other computes to
+     `auto`, which puts the inner scrollbar straight back. Nothing is clipped,
+     since without a height cap there is no vertical overflow. */
+  overflow-x: auto;
+  overflow-y: hidden;
   padding: 6px 0;
   /* The merged output body renders text with pre-wrap, the newlines
      between the tags of pandas' HTML must not become blank lines. */
@@ -5561,7 +5573,13 @@ html[data-playground-theme="dark"] {
   display: flex;
   flex-direction: column;
 }
+/* Run cells keep their natural height. `.output-body` is a column flex
+   container with `flex: 1 1 0`, so its children default to `flex-shrink: 1`
+   and are squashed to fit before the pane will scroll. See the note on
+   `.dataframe-wrap` above: squashing plus a cell that scrolls is what turns
+   one tall output into a column of stubs. */
 .run-cell {
+  flex: none;
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid var(--border);

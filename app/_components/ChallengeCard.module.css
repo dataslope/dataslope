@@ -1500,6 +1500,29 @@
   background: var(--ch-scrollbar-thumb-hover);
 }
 
+/* ── Output cells are flex items, and must not shrink ─────────────────────
+   `.outputBody` is a column flex container with a `max-height`, so once the
+   cells add up to more than that every one of them shrinks: `flex-shrink`
+   defaults to 1, and flex distributes the shortfall across all of them rather
+   than letting the container scroll.
+
+   That alone would only squash them. Combined with a cell that has `overflow`
+   of its own it produces the actual bug: three `display(df)` calls in one
+   block came out as three separately-scrolling tables, each a few rows tall,
+   inside a panel that had not scrolled at all. The reader drags one, hits its
+   end, and nothing else has moved. Even the five-row `df.head()` frame had a
+   scrollbar, which is the tell that this was flex and not a height cap.
+
+   `flex: none` keeps every cell at its natural height and hands the overflow
+   back to `.outputBody`, which is the one element here that should scroll. */
+.outCellStdout,
+.outCellStderr,
+.outCellHtml,
+.outCellImage,
+.outCellPlot {
+  flex: none;
+}
+
 .outCellStdout {}
 
 .outCellStderr {
@@ -1512,9 +1535,18 @@
 }
 
 .outCellHtml {
-  /* Big frames scroll inside the cell instead of blowing out the card. */
-  overflow: auto;
-  max-height: 480px;
+  /* Horizontal only. A wide frame has nowhere else to go, because neither the
+     panel nor the page scrolls sideways, so the cell keeps a scroller for that
+     axis. Vertically it takes its natural height and `.outputBody` scrolls,
+     which is why there is no `max-height` here any more: a cap plus `overflow`
+     on a flex item is what gave one panel three vertical scrollbars.
+
+     `overflow-y: hidden` rather than `visible` because CSS will not mix them:
+     setting one axis to anything but `visible` computes the other to `auto`,
+     which would put the inner scrollbar straight back. Nothing is clipped by
+     it, since without a height cap there is no vertical overflow to clip. */
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .outCellHtml :global(img),
