@@ -29,6 +29,15 @@
 //                    typography sets `blockquote p:first-of-type::before {
 //                    content: open-quote }`), so the typed pair renders as a
 //                    second one and the reader sees ""like this"".
+//   6. colour-spelling, "colour" and its family, spelled the British way.
+//                    This one word is held to American spelling while the rest
+//                    of the prose is left alone, and the reason is that it is
+//                    not only a word here. It is a CSS property, a Plot channel
+//                    and a prop name, so a paragraph about `color="country"`
+//                    that calls it a colour reads as a typo rather than as a
+//                    dialect. Other British spellings in this repo (behaviour,
+//                    centre, favour) have no such collision and are not
+//                    touched.
 //
 // Scope is what a reader actually sees:
 //
@@ -57,6 +66,8 @@ const EM_DASH_IN_PHRASE = /(\s[—―])|([—―]\s)/;
 const SPACED_EN_DASH = /\s–\s/;
 /** A whole line that both opens and closes a `$$` block. Renders inline. */
 const ONE_LINE_DISPLAY_MATH = /^\s*\$\$.+\$\$\s*$/;
+/** colour, colours, coloured, colouring, colourful, watercolour, discolour. */
+const BRITISH_COLOUR = /\b[a-z]*colour[a-z]*\b/i;
 
 const AI_FILLER = [
   [/\bdelve[sd]? into\b/i, "delve into"],
@@ -177,6 +188,8 @@ export function lintSource(src, file, kind) {
     const isTableRow = kind === "mdx" && line.trim().startsWith("|");
     if (!isTableRow && SPACED_EN_DASH.test(line)) add("spaced-en-dash", n, snippet);
 
+    if (BRITISH_COLOUR.test(line)) add("colour-spelling", n, snippet);
+
     for (const [re, label] of AI_FILLER) {
       if (re.test(line)) add("ai-filler", n, `"${label}", ${snippet}`);
     }
@@ -250,9 +263,15 @@ if (isMain) {
           "quotation marks, so a blockquote that types its own renders doubled.",
       );
     }
+    if (byRule["colour-spelling"]) {
+      console.error(
+        "\ncolour: write it \"color\". It is a CSS property, a Plot channel and a\n" +
+          "prop name as well as a word, so the two spellings collide on the page.",
+      );
+    }
     process.exit(1);
   }
   console.log(
-    `✓ prose in ${files.length} file(s) is clean (no em dashes, no spaced en dashes, no filler phrases, no one-line display math, no doubled blockquote quotes)`,
+    `✓ prose in ${files.length} file(s) is clean (no em dashes, no spaced en dashes, no filler phrases, no one-line display math, no British "colour", no doubled blockquote quotes)`,
   );
 }

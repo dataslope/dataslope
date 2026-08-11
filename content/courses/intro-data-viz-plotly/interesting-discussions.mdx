@@ -26,7 +26,21 @@ dramatic gesture to the everyday language of business.
   caption="The spreadsheet put chart-making on every desk, for better and for worse."
 />
 
-Statistical graphics spread out of public health and into commerce.
+The first stop on that road is a set of plates almost nobody saw for ninety
+years. For the 1900 Paris Exposition, **W.E.B. Du Bois** and his students at
+Atlanta University hand-drew sixty-odd charts on Black American life. One of
+them runs into a problem every chart of growth runs into, and answers it in a
+way no chart library will offer you:
+
+<Chart slug="du-bois-1900-spiral" />
+
+The last value is sixty-eight times the first. An ordinary bar chart draws
+1875 as a hairline; a log axis stops the growth from looking like growth. Du
+Bois kept the bar linear so that every year is still a length, and wound it up
+so the whole run fits the sheet. That is a design decision with a stated
+trade-off, made on a plate that spent most of a century filed under folk art.
+
+Statistical graphics also spread out of public health and into commerce.
 **Henry Gantt** invented his bar chart for project scheduling around
 1910. **Walter Shewhart**, at Bell Labs in the 1920s, invented the
 **control chart** to keep telephone components within spec, the
@@ -198,6 +212,22 @@ is why, when you make a Plotly chart in Python, you are quietly
 standing on the D3 stack.
 
 ## Linked views and brushing
+
+Before any of this could react to a mouse, there was one other way to let a
+reader ask questions of a picture: encode so much in the geometry that every
+question becomes something you do with your eyes. The purest example ever
+drawn is a railway timetable, published by **Étienne-Jules Marey** in 1878 and
+credited by him to the engineer Charles Ibry.
+
+<Chart slug="marey-train-graph" />
+
+Time across, distance down, one line per train. Slope is speed, so the
+fastest train is the steepest line. A flat stretch is a train standing at a
+platform. A crossing is two trains in the same place at the same moment. The
+vertical gap between two lines going the same way is how much track is between
+them, which is the number the entire signalling system exists to keep above
+zero. A printed timetable holds identical information and answers none of
+those questions without arithmetic. Railways still plan track this way.
 
 A more advanced interactive idea is **linked views** (or **linked
 brushing**): two or three charts side by side where selecting a
