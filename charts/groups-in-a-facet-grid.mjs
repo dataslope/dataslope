@@ -34,7 +34,7 @@ export const title =
   "The same 136 cars as the previous chart, split into a two-by-two grid of panels, one manufacturer each, on the same pair of axes. Each panel holds one point cloud and one fitted line, and the four slopes, steep for the first maker and nearly flat for the fourth, are now readable one at a time.";
 
 export const caption =
-  "The same points, the same colours, the same axes: the only change is that the maker is now a position (which panel) rather than a hue. Because every panel is scaled identically, a difference between panels is a difference in the data: Northwind loses 4.8 mpg per extra litre and Brightside only 1.0, which was in the chart above as well and could not be read there.";
+  "The same 136 cars, the same four invented manufacturers, the same colours and the same axes. The only change is that the manufacturer is now a position, which panel, rather than a hue. Because every panel is scaled identically, a difference between panels is a difference in the data: Northwind gives up 4.8 mpg per extra litre and Brightside only 1.0. That was in the chart above as well and could not be read there.";
 
 const cell = (k) => MAKER_CELL[k];
 const withCell = (rows) => rows.map((d) => ({ ...d, ...cell(d.key) }));

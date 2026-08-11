@@ -33,7 +33,9 @@ The value represented is
   caption="Representable numbers thin out as they grow, so precision is relative."
 />
 
-$$ (-1)^s \cdot (1 + m) \cdot 2^{e - 1023} $$
+$$
+(-1)^s \cdot (1 + m) \cdot 2^{e - 1023}
+$$
 
 for ordinary "normal" numbers. There are also *subnormals*
 (extremely small numbers near zero), *infinities* (`±inf`), and
@@ -317,7 +319,9 @@ The naive answer is `inf`. The stable answer is around $1001.41$.
   title="Stable variance"
   instructions={`The textbook formula for variance,
 
-$$\\mathrm\{Var\}(x) = \\frac\{1\}\{n\} \\sum_i x_i^2 \\; - \\; \\left( \\frac\{1\}\{n\} \\sum_i x_i \\right)^2$$
+$$
+\\mathrm\{Var\}(x) = \\frac\{1\}\{n\} \\sum_i x_i^2 \\; - \\; \\left( \\frac\{1\}\{n\} \\sum_i x_i \\right)^2
+$$
 
 is numerically **disastrous** for data with large mean and small
 spread, because the two terms become nearly equal and cancel.
@@ -325,7 +329,9 @@ spread, because the two terms become nearly equal and cancel.
 Implement \`stable_variance(xs)\` that computes the population
 variance using the two-pass algorithm
 
-$$\\bar\{x\} = \\frac\{1\}\{n\}\\sum_i x_i, \\qquad \\mathrm\{Var\}(x) = \\frac\{1\}\{n\} \\sum_i (x_i - \\bar\{x\})^2$$
+$$
+\\bar\{x\} = \\frac\{1\}\{n\}\\sum_i x_i, \\qquad \\mathrm\{Var\}(x) = \\frac\{1\}\{n\} \\sum_i (x_i - \\bar\{x\})^2
+$$
 
 The naive implementation is provided as \`naive_variance\` so you
 can see what it returns.`}

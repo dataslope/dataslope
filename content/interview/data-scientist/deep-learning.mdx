@@ -22,7 +22,9 @@ runnable here); the one runnable block uses only NumPy.
 A weighted sum of its inputs plus a bias, passed through a non-linear
 activation:
 
-$$a = f\!\left(\sum_i w_i x_i + b\right) = f(\mathbf{w}^\top \mathbf{x} + b)$$
+$$
+a = f\!\left(\sum_i w_i x_i + b\right) = f(\mathbf{w}^\top \mathbf{x} + b)
+$$
 
 Without the activation $f$, the neuron is just linear regression. Stacking
 neurons into layers and layers into a network is what buys expressive power.
@@ -60,7 +62,9 @@ in one sweep, in time proportional to the forward pass.
 
 Gradient descent iteratively steps parameters opposite the loss gradient:
 
-$$\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}$$
+$$
+\theta \leftarrow \theta - \eta \, \nabla_\theta \mathcal{L}
+$$
 
 The **learning rate** $\eta$ sets the step size: too large and training
 oscillates or diverges; too small and it crawls or stalls in a plateau.
@@ -158,7 +162,9 @@ every pair via query-key similarity, softmaxes them into weights, and mixes
 the values accordingly, so each position's new representation is a weighted
 blend of the whole sequence:
 
-$$\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+$$
 
 The $\sqrt{d_k}$ scaling keeps the softmax from saturating. Unlike an RNN, it
 has no sequential bottleneck, every position is computed in parallel.

@@ -2,6 +2,12 @@
  * One scatter of engine size against fuel economy, split four ways, shared by
  * `groups-by-colour-one-panel` and `groups-in-a-facet-grid`.
  *
+ * The four names are invented, and are the same invented companies
+ * `filter-beats-showing-everything` uses, so a reader who meets them twice
+ * meets the same fictional world rather than two unexplained word-lists. The
+ * lesson introduces them as manufacturers before either figure appears; the
+ * captions repeat it, because a chart in the gallery has no lesson around it.
+ *
  * The pair's whole argument is that these are *the same points* — the second
  * chart adds no data and removes none, it only moves each group into its own
  * frame — so the sample lives here rather than being generated twice. If the

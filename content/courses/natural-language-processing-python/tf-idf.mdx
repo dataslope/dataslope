@@ -92,7 +92,9 @@ documents contain the word (its **document frequency**), and take the log of the
 total number of documents divided by that. The logarithm keeps the numbers from
 exploding and is part of the standard definition.
 
-$$\text{idf}(w) = \log\left(\frac{N}{\text{df}(w)}\right)$$
+$$
+\text{idf}(w) = \log\left(\frac{N}{\text{df}(w)}\right)
+$$
 
 where `N` is the number of documents and `df(w)` is how many of them contain `w`.
 The key behavior to internalize: a word in **all** `N` documents gets

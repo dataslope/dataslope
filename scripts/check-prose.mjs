@@ -17,7 +17,13 @@
 //                    NOT include words that are ordinary technical vocabulary
 //                    here (robust, leverage, underscore all have real
 //                    meanings in statistics, regression and Python).
-//   4. blockquote-quotes, a blockquote whose whole body is wrapped in a typed
+//   4. inline-display-math, a `$$…$$` formula written on one line. Both
+//                    delimiters on the same line is TEXT math to
+//                    micromark-extension-math, not flow math, so the formula
+//                    is set inline at text size: a `\frac` collapses into the
+//                    line and its delimiters crowd the fraction bar. Display
+//                    math has to be `$$`, the body, `$$` on three lines.
+//   5. blockquote-quotes, a blockquote whose whole body is wrapped in a typed
 //                    pair of double quotes. The stylesheet already puts
 //                    typographic quotes around one (Fumadocs' bundled
 //                    typography sets `blockquote p:first-of-type::before {
@@ -49,6 +55,8 @@ const EM_DASH = /[—―]/;
 // punctuation. Excludes the standalone glyph in `"<em dash>"` or `<em>-</em>`.
 const EM_DASH_IN_PHRASE = /(\s[—―])|([—―]\s)/;
 const SPACED_EN_DASH = /\s–\s/;
+/** A whole line that both opens and closes a `$$` block. Renders inline. */
+const ONE_LINE_DISPLAY_MATH = /^\s*\$\$.+\$\$\s*$/;
 
 const AI_FILLER = [
   [/\bdelve[sd]? into\b/i, "delve into"],
@@ -143,10 +151,20 @@ export function lintSource(src, file, kind) {
   const add = (rule, line, detail) => violations.push({ file, rule, line, detail });
   const scanned = kind === "code" ? stripComments(src) : src;
   const lines = scanned.split("\n");
+  // Fenced code is prose-exempt for the math rule: a shell snippet can legally
+  // contain `$$` (the shell's own PID variable) and is not a formula.
+  let inFence = false;
 
   lines.forEach((line, i) => {
     const n = i + 1;
     const snippet = line.trim().slice(0, 90);
+
+    if (kind === "mdx") {
+      if (/^\s*```/.test(line)) inFence = !inFence;
+      else if (!inFence && ONE_LINE_DISPLAY_MATH.test(line)) {
+        add("inline-display-math", n, snippet);
+      }
+    }
 
     if (kind === "code") {
       // Only an em dash used as punctuation counts; a lone glyph does not.
@@ -235,6 +253,6 @@ if (isMain) {
     process.exit(1);
   }
   console.log(
-    `✓ prose in ${files.length} file(s) is clean (no em dashes, no spaced en dashes, no filler phrases, no doubled blockquote quotes)`,
+    `✓ prose in ${files.length} file(s) is clean (no em dashes, no spaced en dashes, no filler phrases, no one-line display math, no doubled blockquote quotes)`,
   );
 }

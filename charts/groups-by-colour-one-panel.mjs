@@ -19,7 +19,7 @@ export const title =
   "One scatter of engine size against highway fuel economy for 136 cars from four manufacturers, told apart only by colour. All four clouds occupy the same band and their four fitted lines leave the same corner, so no single manufacturer's trend can be read on its own.";
 
 export const caption =
-  "Four groups, one frame, colour doing all of the separating. That works while the groups sit in different parts of the chart and stops the moment they overlap: each maker here loses a different amount of economy per extra litre, and picking any one of them out means ignoring the other three at the same time.";
+  "Highway fuel economy against engine size for 136 cars from four invented manufacturers, with the manufacturer mapped to colour. That works while the groups sit in different parts of the chart and stops the moment they overlap: each of these four gives up a different amount of economy per extra litre, and picking any one of them out means ignoring the other three at the same time.";
 
 const SPAN = X_DOMAIN[1] - X_DOMAIN[0];
 /** Legend entries laid out as fractions of the x domain rather than at fixed

@@ -116,9 +116,13 @@ two.
 | **Actually positive** | True Positive (TP) | False Negative (FN) |
 | **Actually negative** | False Positive (FP) | True Negative (TN) |
 
-$$\text{Precision} = \frac{TP}{TP + FP} \qquad \text{Recall} = \frac{TP}{TP + FN}$$
+$$
+\text{Precision} = \frac{TP}{TP + FP} \qquad \text{Recall} = \frac{TP}{TP + FN}
+$$
 
-$$F_1 = 2 \cdot \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}$$
+$$
+F_1 = 2 \cdot \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+$$
 
 The code computes `precision_score`, `recall_score`, and `f1_score` on the
 same `y_true`/`y_pred` pair so you can map each number back to the table

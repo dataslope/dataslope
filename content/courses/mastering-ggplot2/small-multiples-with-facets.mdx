@@ -15,17 +15,36 @@ visualization, and ggplot2 makes it a one-line addition.
 
 ## The problem facets solve
 
-Mapping a grouping variable to color works while the groups sit in
-different parts of the plot. Once they overlap, hue is the only thing
-left telling them apart, and there is nowhere for it to do that:
+Start with a question rather than a chart. Four car manufacturers,
+invented for this example and named Northwind, Peartree, Halcyon and
+Brightside, all sell cars across the same range of engine sizes. You have
+the highway fuel economy of 136 of them. Bigger engines drink more, which
+is not news. What you actually want to know is **how much more, per
+manufacturer**: does an extra litre cost the same at every badge, or do
+some of them handle size better than others?
+
+Map the manufacturer to color and the answer is in the picture, but you
+cannot get it out:
 
 <Chart slug="groups-by-colour-one-panel" />
 
-Now give each group a panel of its own. No point has moved, no color has
-changed, and both scales are the same ones. The grouping variable has
-simply stopped being a color and become a *position*:
+All four clouds sit in the same band and all four fitted lines leave the
+same corner, so following any one manufacturer means ignoring three
+others at the same time. Color separates groups while they occupy
+different parts of a plot. Once they overlap, hue is the only thing left
+telling them apart, and there is nowhere for it to do that.
+
+Now give each manufacturer a panel of its own. No point has moved, no
+color has changed, and both scales are the ones from the chart above. The
+grouping variable has simply stopped being a color and become a
+*position*, which panel:
 
 <Chart slug="groups-in-a-facet-grid" />
+
+Now the question has an answer, and you can read it off in one pass:
+Northwind gives up 4.8 mpg for every extra litre and Brightside only 1.0,
+with the other two in between. That fact was in the first chart as well.
+Nothing was added to find it; the tangle was simply taken apart.
 
 Watch a color mapping struggle:
 

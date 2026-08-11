@@ -64,7 +64,9 @@ information it needs. Each token is projected into a **query**, **key**, and
 their query and key, softmax-normalized, and the output is the weighted sum
 of values:
 
-$$\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+$$
 
 The $\sqrt{d_k}$ scaling keeps dot products from saturating the softmax.
 Every pair of positions is one hop apart, so long-range dependencies are

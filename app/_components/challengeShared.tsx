@@ -25,6 +25,8 @@ import {
 import { X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 // ─── Boot progress smoothing ─────────────────────────────────────────
 // Adapters report coarse stage *floors* (0.05, 0.55, 0.85, …) during a
@@ -190,13 +192,38 @@ export function cmThemeNameFor(isDark: boolean): string {
 
 // ─── Instructions: ReactNode | markdown string ───────────────────────
 
-/** Renders an instructions string as Markdown using react-markdown + GFM.
+/** Renders an instructions string as Markdown using react-markdown, with
+ *  GFM and math.
+ *
  *  Supports the full CommonMark + GitHub-Flavored Markdown surface
  *  (headings, lists, tables, code, autolinks, …) so authors can write
- *  natural Markdown instead of nested JSX. */
+ *  natural Markdown instead of nested JSX.
+ *
+ *  **Math is not optional here.** A lesson body gets `remarkMath` +
+ *  `rehypeKatex` from `source.config.ts`, and a `<MultipleChoice>` gets them
+ *  from its own pipeline, but an `instructions` string never reaches either:
+ *  it is a *prop*, so the MDX compiler passes it through as a plain string and
+ *  this component is the only thing that ever parses it. Without the two
+ *  plugins the card printed the source verbatim, so
+ *  `numerical-calculus`'s π challenge read
+ *  `Recall that $\int_{-1}^{1} \sqrt{1 - x^2},dx = \pi/2$` on the page.
+ *  Eighteen challenges across the scientific-computing and statistics courses
+ *  were doing the same thing.
+ *
+ *  The plugin list matches `MultipleChoiceQuestion`'s deliberately: the two
+ *  are the site's markdown-in-a-prop surfaces, and an author should not have
+ *  to remember which of them supports what. KaTeX's stylesheet is already
+ *  loaded on every route that can host a card, by `app/docs.css` for lessons
+ *  and interview pages and by a direct import in `/c/[id]`, `/quiz/[id]` and
+ *  the dashboard authoring pages. */
 export function renderMarkdownInstructions(source: string): ReactNode {
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]}>{source}</ReactMarkdown>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[[rehypeKatex, { throwOnError: false, errorColor: "#ef4444" }]]}
+    >
+      {source}
+    </ReactMarkdown>
   );
 }
 

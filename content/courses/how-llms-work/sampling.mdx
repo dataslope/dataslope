@@ -19,7 +19,9 @@ The raw output is a list of unbounded scores called **logits**. They
 can be negative, they do not sum to anything in particular. Softmax
 converts them:
 
-$$p_i = \frac{e^{z_i}}{\sum_j e^{z_j}}$$
+$$
+p_i = \frac{e^{z_i}}{\sum_j e^{z_j}}
+$$
 
 <Figure
   slug="llm-sampling-softmax-turns-scores-inline-cutout"
