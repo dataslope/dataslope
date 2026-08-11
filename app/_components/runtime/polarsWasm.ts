@@ -35,14 +35,21 @@
  * keep polars' true code path.
  *
  * ── What this does NOT fix ──────────────────────────────────────────────
- * `pl.scan_csv("diamonds.csv")`, deliberately. A LazyFrame cannot be built
- * over a buffer in the Pyodide wheel (`invalid build. Missing feature
- * new-streaming`), so the only way to make a scan run would be to rewrite it
- * as `read_csv(buffer).lazy()` — and that changes the query plan from
- * `Csv SCAN [diamonds.csv] / PROJECT 2/8 COLUMNS / SELECTION: …` to a `DF [...]`
- * source with no `SELECTION` at all. The three lessons that scan a big file
- * are lessons *about* the plan, so a shim that quietly rewrote it would make
- * them teach the wrong thing. Those blocks need a smaller file, not a patch.
+ * `pl.scan_csv(...)`, and not because of the size. The Pyodide wheel is built
+ * without `new-streaming`, and a LazyFrame whose source is a `scan_*` needs
+ * that engine to execute anything at all: `scan_csv(...).select(pl.len())`
+ * collects (the optimizer answers it from CSV metadata), but add a `filter`, a
+ * `head` or a `group_by` and it panics with `invalid build. Missing feature
+ * new-streaming` — on a 15 KB file as readily as on a 2.5 MB one. No `engine=`
+ * argument and no `POLARS_*_NEW_STREAMING` env var changes that, and buffering
+ * cannot help something that never reads the file.
+ *
+ * So a smaller dataset does not rescue those lessons; that was measured, and
+ * it buys back only the `explain()`-only blocks. `read_csv(...).lazy()` runs
+ * the same chain and is what the fixable blocks use, but it prints the source
+ * as `DF [...]` instead of `Csv SCAN [file] / SELECTION: …`, which is the one
+ * thing a lesson about predicate pushdown cannot trade away.
+ * `scripts/check-polars-scan.mjs` counts what is left.
  */
 
 /** Bytes above which a path-based read is buffered. Half the measured 1 MiB

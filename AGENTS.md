@@ -1007,11 +1007,12 @@ opposite things:
   ```` ```java ````, ```` ```sql ````…).
 
 `detect` is off, so nothing is ever guessed. An unlabelled fence falls back to
-the card's `adapter` (`withFenceLanguage`), which is the right answer only for
-the code case — so `__tests__/challengeInstructionsHighlight.test.tsx` fails
-the build on a fence with no label rather than letting the fallback decide.
-Inline spans are never highlighted: a `` `df` `` in a sentence is an
-identifier, not code.
+`text` (`labelBareFences`), which is the safe default rather than the useful
+one: a fallback cannot tell output from code, and the wrong guess in that
+direction is the one that looks broken. `__tests__/challengeInstructionsHighlight.test.tsx`
+fails the build on a fence with no label, so the fallback should never
+actually fire. Inline spans are never highlighted: a `` `df` `` in a sentence
+is an identifier, not code.
 
 Code is exempt, in both directions: an `O(1)` in a comment inside
 `starterCode` is code, and `` `f(n) = O(g(n))` `` is one span of pseudo-code

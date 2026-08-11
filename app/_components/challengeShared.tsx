@@ -192,49 +192,19 @@ export function cmThemeNameFor(isDark: boolean): string {
 // ─── Instructions: ReactNode | markdown string ───────────────────────
 
 /**
- * highlight.js language for a card's adapter id or SQL dialect.
- *
- * A card already knows what language its exercise is in, which is a better
- * answer than highlight.js's auto-detection: these snippets are one or two
- * lines, and `detect` on a two-line sample guesses from a handful of tokens.
- * Anything not listed falls through to no highlighting rather than to a guess.
- */
-const HLJS_LANGUAGE: Record<string, string> = {
-  python: "python",
-  r: "r",
-  javascript: "javascript",
-  typescript: "typescript",
-  php: "php",
-  c: "c",
-  cpp: "cpp",
-  java: "java",
-  csharp: "csharp",
-  // `web` is HTML + CSS + JS in one card; `xml` is highlight.js's HTML mode
-  // and is the best single answer for a fence that does not say otherwise.
-  web: "xml",
-  // Not "jsx": highlight.js has no such grammar, JSX is part of `javascript`.
-  react: "javascript",
-  // Every SQL dialect the SQL cards support.
-  sqlite: "sql",
-  postgres: "sql",
-  duckdb: "sql",
-};
-
-export function hljsLanguageFor(adapter: string | undefined): string | undefined {
-  return adapter ? HLJS_LANGUAGE[adapter] : undefined;
-}
-
-/**
- * Give an unlabelled opening fence the card's own language.
+ * Label every unlabelled opening fence `text`.
  *
  * A safety net, not the mechanism: every fence in `content/` names its own
  * language, and `__tests__/challengeInstructionsHighlight.test.tsx` fails the
- * build if a new one does not. That matters because the right label is often
- * *not* the card's language — 87 of the 89 fences that used to carry no info
- * string were samples of what the program prints, and painting Python grammar
- * over a column of expected output is worse than leaving it plain. So an
- * author writes ```text for output and the card's language for code, and this
- * only catches the one they forget.
+ * build if a new one does not. `text` is the right default for the one an
+ * author forgets, because forgetting correlates with output rather than with
+ * code: of the 89 fences that once carried no info string, 87 were samples of
+ * what the program prints. Highlighting those is worse than leaving them
+ * plain, since highlight.js finds keywords in ordinary words and paints a
+ * column of `Hello, Grace!` in three colours.
+ *
+ * (An earlier version inherited the card's `adapter` here. It was wrong 87
+ * times out of 89, which is why the label now lives in the source.)
  *
  * Done on the markdown text rather than on the syntax tree because the
  * alternative is a rehype plugin, and that means importing `unist-util-visit`
@@ -244,8 +214,8 @@ export function hljsLanguageFor(adapter: string | undefined): string | undefined
  * closing ``` is never mistaken for a new block, and a fence that already
  * names a language keeps it.
  */
-export function withFenceLanguage(source: string, language: string | undefined): string {
-  if (!language || !source.includes("```")) return source;
+export function labelBareFences(source: string): string {
+  if (!source.includes("```") && !source.includes("~~~")) return source;
   let open = false;
   return source
     .split("\n")
@@ -255,7 +225,7 @@ export function withFenceLanguage(source: string, language: string | undefined):
       const wasOpen = open;
       open = !open;
       if (wasOpen || m[4]) return line;
-      return `${m[1]}${m[2]}${language}${m[5]}`;
+      return `${m[1]}${m[2]}text${m[5]}`;
     })
     .join("\n");
 }
@@ -266,21 +236,17 @@ export function withFenceLanguage(source: string, language: string | undefined):
  *  code, autolinks, …) so authors can write natural Markdown instead of
  *  nested JSX.
  *
- *  `detect: false` because the language comes from the card, never from a
- *  guess: see `HLJS_LANGUAGE`. A fence in a card with no adapter, or with one
- *  not in that map, renders plain, which is what it did before. Inline spans
- *  are untouched either way — `rehypeHighlight` only visits `pre > code`, and
- *  a `` `df` `` in a sentence wants to read as an identifier, not as code. */
-export function renderMarkdownInstructions(
-  source: string,
-  language?: string,
-): ReactNode {
+ *  `detect: false`, so the language is always the one the fence names and
+ *  never one highlight.js guessed from a two-line sample. Inline spans are
+ *  untouched: `rehypeHighlight` only visits `pre > code`, and a `` `df` `` in
+ *  a sentence wants to read as an identifier, not as code. */
+export function renderMarkdownInstructions(source: string): ReactNode {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[[rehypeHighlight, { detect: false, ignoreMissing: true }]]}
     >
-      {withFenceLanguage(source, language)}
+      {labelBareFences(source)}
     </ReactMarkdown>
   );
 }
@@ -288,11 +254,8 @@ export function renderMarkdownInstructions(
 /** Accepts either a React node or a markdown string. Strings are
  *  rendered with react-markdown; nodes pass through unchanged so
  *  existing JSX-based call sites are unaffected. */
-export function renderInstructions(
-  input: ReactNode | string,
-  language?: string,
-): ReactNode {
-  if (typeof input === "string") return renderMarkdownInstructions(input, language);
+export function renderInstructions(input: ReactNode | string): ReactNode {
+  if (typeof input === "string") return renderMarkdownInstructions(input);
   return input;
 }
 

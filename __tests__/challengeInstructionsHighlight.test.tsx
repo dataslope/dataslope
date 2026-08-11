@@ -6,91 +6,57 @@
  * same snippet in a multiple-choice question — which has always had
  * `rehypeHighlight` — came out coloured.
  *
- * The half of this that is easy to get wrong is the *language*: 89 of the 96
- * fenced blocks across the site's card instructions carry no info string, and
- * highlight.js's auto-detection on a two-line sample is a coin flip. So the
- * language comes from the card's own adapter, and `detect` stays off.
+ * The half of this that is easy to get wrong is the *language*. `detect` is
+ * off, because auto-detection on a two-line sample is a coin flip, so every
+ * fence names its own language and the tests at the bottom hold the corpus to
+ * that. An author who forgets gets `text`, which is the safe default: of the
+ * 89 fences that once carried no info string, 87 were samples of what the
+ * program prints rather than code.
  */
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { eachTag, propText } from "../scripts/lib/mdx-blocks.mjs";
 import {
-  hljsLanguageFor,
+  labelBareFences,
   renderMarkdownInstructions,
-  withFenceLanguage,
 } from "@/app/_components/challengeShared";
 
-const html = (source: string, lang?: string) =>
-  renderToStaticMarkup(<>{renderMarkdownInstructions(source, lang)}</>);
+const html = (source: string) =>
+  renderToStaticMarkup(<>{renderMarkdownInstructions(source)}</>);
 
-describe("hljsLanguageFor", () => {
-  it("maps every adapter a card can declare", () => {
-    // The adapters that appear on a <ChallengeCard> in content/.
-    for (const id of [
-      "python",
-      "typescript",
-      "cpp",
-      "r",
-      "java",
-      "javascript",
-      "csharp",
-      "c",
-      "web",
-      "react",
-      "php",
-    ]) {
-      expect(hljsLanguageFor(id), id).toBeTruthy();
-    }
-  });
-
-  it("maps every SQL dialect to sql", () => {
-    for (const d of ["sqlite", "postgres", "duckdb"]) {
-      expect(hljsLanguageFor(d)).toBe("sql");
-    }
-  });
-
-  it("never claims `jsx`, which highlight.js has no grammar for", () => {
-    expect(hljsLanguageFor("react")).toBe("javascript");
-  });
-
-  it("returns undefined for an unknown or missing adapter", () => {
-    expect(hljsLanguageFor("klingon")).toBeUndefined();
-    expect(hljsLanguageFor(undefined)).toBeUndefined();
-  });
-});
-
-describe("withFenceLanguage", () => {
-  it("labels an unlabelled opening fence", () => {
-    expect(withFenceLanguage("```\nx = 1\n```", "python")).toBe(
-      "```python\nx = 1\n```",
+describe("labelBareFences", () => {
+  it("labels an unlabelled opening fence `text`", () => {
+    expect(labelBareFences("```\nHello, Grace!\n```")).toBe(
+      "```text\nHello, Grace!\n```",
     );
   });
 
   it("leaves the closing fence alone", () => {
-    const out = withFenceLanguage("```\nx = 1\n```", "python").split("\n");
-    expect(out[2]).toBe("```");
+    expect(labelBareFences("```\nx\n```").split("\n")[2]).toBe("```");
   });
 
   it("keeps a language the author already wrote", () => {
-    const src = "```sql\nSELECT 1\n```";
-    expect(withFenceLanguage(src, "python")).toBe(src);
+    const src = "```python\nheavy = df.head()\n```";
+    expect(labelBareFences(src)).toBe(src);
   });
 
   it("handles two blocks in one instructions string", () => {
-    expect(withFenceLanguage("```\na\n```\n\ntext\n\n```\nb\n```", "r")).toBe(
-      "```r\na\n```\n\ntext\n\n```r\nb\n```",
+    expect(labelBareFences("```\na\n```\n\ntext\n\n```sql\nb\n```")).toBe(
+      "```text\na\n```\n\ntext\n\n```sql\nb\n```",
     );
   });
 
   it("does not touch a fence inside an already-open block", () => {
-    // The middle line closes the first block; the third opens a second one.
-    const out = withFenceLanguage("```\n```\n```\n```", "c").split("\n");
-    expect(out).toEqual(["```c", "```", "```c", "```"]);
+    expect(labelBareFences("```\n```\n```\n```").split("\n")).toEqual([
+      "```text",
+      "```",
+      "```text",
+      "```",
+    ]);
   });
 
-  it("is a no-op with no language, and with no fences", () => {
-    expect(withFenceLanguage("```\nx\n```", undefined)).toBe("```\nx\n```");
-    expect(withFenceLanguage("just `prose`", "python")).toBe("just `prose`");
+  it("is a no-op with no fences", () => {
+    expect(labelBareFences("just `prose`")).toBe("just `prose`");
   });
 });
 
@@ -103,45 +69,39 @@ heavy = df[df["body_mass_g"] > 5000][["species", "body_mass_g"]]
 \`\`\``;
 
   it("highlights a labelled fence", () => {
-    const out = html(pandasCard, "python");
+    const out = html(pandasCard);
     expect(out).toContain("language-python");
     expect(out).toContain("hljs-");
   });
 
-  it("highlights an unlabelled fence using the card's adapter", () => {
-    const out = html("```\nheavy = df.filter(pl.col('x') > 1)\n```", "python");
-    expect(out).toContain("hljs-");
+  it("renders an unlabelled fence plain rather than guessing at it", () => {
+    // `SELECT 1 FROM t` is valid in several grammars. With `detect` off and
+    // the fallback at `text`, nothing is guessed and nothing is coloured.
+    const out = html("```\nSELECT 1 FROM t\n```");
+    expect(out).toContain("language-text");
+    expect(out).not.toContain("hljs-");
   });
 
-  it("picks the language the card declares, not one it guesses", () => {
-    // `SELECT 1` is valid in several grammars; with detection off, the card's
-    // own language decides, so the class is the one we asked for.
-    expect(html("```\nSELECT 1 FROM t\n```", "sql")).toContain("language-sql");
-    expect(html("```\nSELECT 1 FROM t\n```", "python")).toContain(
-      "language-python",
-    );
+  it("uses the language the fence names", () => {
+    expect(html("```sql\nSELECT 1 FROM t\n```")).toContain("language-sql");
+    expect(html("```r\nx <- 1\n```")).toContain("language-r");
   });
 
   it("leaves inline code as an identifier, not a highlighted span", () => {
-    const out = html("The frame `df` is loaded for you.", "python");
+    const out = html("The frame `df` is loaded for you.");
     expect(out).toContain("<code>df</code>");
     expect(out).not.toContain("hljs");
   });
 
-  it("renders plain when the card has no language, as it did before", () => {
-    const out = html("```\nx = 1\n```");
-    expect(out).not.toContain("hljs-");
-  });
-
   it("still renders GFM", () => {
-    expect(html("- one\n- two", "python")).toContain("<li>");
-    expect(html("**bold**", "python")).toContain("<strong>");
+    expect(html("- one\n- two")).toContain("<li>");
+    expect(html("**bold**")).toContain("<strong>");
   });
 
   it("renders a `text` fence with no tokens at all", () => {
     // What an expected-output sample is labelled. `text` is a registered
     // plaintext alias, so this does not lean on `ignoreMissing`.
-    const out = html("```text\nHello, Grace!\n```", "python");
+    const out = html("```text\nHello, Grace!\n```");
     expect(out).toContain("Hello, Grace!");
     expect(out).not.toContain("hljs-");
   });
@@ -150,11 +110,10 @@ heavy = df[df["body_mass_g"] > 5000][["species", "body_mass_g"]]
 /**
  * Every fence in a card's instructions names its language.
  *
- * The adapter fallback exists for the author who forgets, but it should stay a
- * fallback: 87 of the 89 fences that had no info string were samples of what
- * the program *prints*, not code, and inheriting the card's language paints
- * highlight.js grammar over plain output. Labelling them says which is which
- * in the source, where the author can see it.
+ * `labelBareFences` exists for the author who forgets, but it should stay a
+ * fallback: it cannot tell an expected-output sample from a code snippet, and
+ * only the author can. Labelling in the source says which is which where it
+ * can be seen and reviewed.
  */
 describe("challenge card instructions name their fence languages", () => {
   const fences: { file: string; line: number; lang: string }[] = [];
