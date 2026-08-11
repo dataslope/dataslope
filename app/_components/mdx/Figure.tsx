@@ -3,7 +3,7 @@
  * screenshot, anything under `assets/images/`) inside a lesson or landing page:
  *
  * ```mdx
- * <Figure slug="pandas-groupby-cutout" alt="A giant panda directing a stream of mixed cubes into three coloured lanes" priority />
+ * <Figure slug="pandas-groupby-cutout" alt="A giant panda directing a stream of mixed cubes into three colored lanes" priority />
  * ```
  *
  * Whichever way the bytes got there, `scripts/build-images.mjs` records slug →

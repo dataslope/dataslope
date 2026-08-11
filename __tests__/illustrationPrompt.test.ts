@@ -120,7 +120,7 @@ describe("buildIllustrationPrompt", () => {
       // The glossy-sphere ban must stay PROHIBITIVE. Naming a replacement
       // shape ("draw round elements as low solid discs") is a positive
       // instruction, and the model obeyed it everywhere — scenes came back as
-      // rows of coloured coins. Same failure as the old "draw dots as flat 2D
+      // rows of colored coins. Same failure as the old "draw dots as flat 2D
       // circles" line. Never prescribe a shape the subject did not ask for.
       expect(entry.prompt).not.toMatch(/low solid disc/i);
       expect(entry.prompt).not.toMatch(/draw any repeated round elements/i);

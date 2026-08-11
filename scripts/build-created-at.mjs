@@ -232,10 +232,39 @@ function readSnapshot() {
  * clone's horizon, and "created" means the first time, which is the date the
  * snapshot is holding.
  */
-function merge(gitDates, recorded, presentKeys) {
+/**
+ * Slugs that have been renamed, keyed by the name they have now.
+ *
+ * `git log --diff-filter=A` reports a rename as an *addition at the rename
+ * commit*, and `--follow` only accepts one path at a time, which is no use to
+ * a pass that scans two thousand of them at once. Without this map a chart
+ * whose spelling changed comes back dated to the day it was re-spelled, and
+ * the gallery quietly loses its provenance.
+ *
+ * The entry only has to survive one build. `merge` writes the recovered date
+ * into `data/created-at.json` under the new key, and from the next run onward
+ * the snapshot carries it directly.
+ */
+const RENAMED_FROM = {
+  "color-category-limit": "colour-category-limit",
+  "color-scale-families": "colour-scale-families",
+  "emphasis-one-color": "emphasis-one-colour",
+  "groups-by-color-one-panel": "groups-by-colour-one-panel",
+};
+
+/** Earliest date any source can prove for each key. A former name is consulted
+ *  too, because a rename is not a birth. */
+function merge(gitDates, recorded, presentKeys, formerName = () => undefined) {
   const out = {};
   for (const key of presentKeys) {
-    const candidates = [gitDates[key], recorded[key]].filter(Boolean).sort();
+    const former = formerName(key);
+    const candidates = [
+      gitDates[key],
+      recorded[key],
+      former ? recorded[former] : undefined,
+    ]
+      .filter(Boolean)
+      .sort();
     if (candidates.length) out[key] = candidates[0];
   }
   return out;
@@ -266,6 +295,7 @@ const charts = merge(
   chartDates,
   snapshot.charts,
   [...chartFiles].map((f) => f.slice(0, -".mjs".length)),
+  (slug) => RENAMED_FROM[slug],
 );
 const illustrations = merge(
   cutoutDates,

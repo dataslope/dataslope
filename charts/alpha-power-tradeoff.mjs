@@ -10,7 +10,7 @@
  * point: *the same threshold* produces α up top and β below, so moving it
  * trades one for the other.
  *
- * Both error regions are the accent colour and power is the primary series,
+ * Both error regions are the accent color and power is the primary series,
  * because α and β are the same kind of thing (mistakes) and power is not.
  */
 import { Plot, plot, linspace, normalPdf, ACCENT, MUTED, PRIMARY } from "./_theme.mjs";

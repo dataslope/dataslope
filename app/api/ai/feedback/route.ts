@@ -1,7 +1,7 @@
 /**
  * Record (or withdraw) a thumbs up/down on an Ask AI answer.
  *
- * The panel's rating buttons used to be local React state — a click coloured
+ * The panel's rating buttons used to be local React state — a click colored
  * an icon and nothing left the browser. This is the write behind them.
  *
  * **Rated turns only.** A row exists because someone deliberately rated an

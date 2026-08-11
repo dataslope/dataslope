@@ -10,9 +10,9 @@
  * A single distinguishing feature is found in constant time: doubling the
  * number of distractors does not make it slower, because the visual system
  * processes the whole field in parallel. A *conjunction* of two features, the
- * one item that is both this colour and this shape, has to be checked item by
+ * one item that is both this color and this shape, has to be checked item by
  * item, so the cost rises with the count. Flat against sloped is the whole
- * finding, and it is what tells a chart author that colour-coding one series is
+ * finding, and it is what tells a chart author that color-coding one series is
  * free while "find the blue square among blue circles and red squares" is not.
  *
  * The numbers are the shape of Treisman & Gelade (1980) rather than their exact
@@ -36,13 +36,13 @@ const PER_ITEM = 22;
 const SERIESES = [
   {
     key: "One feature",
-    note: "colour alone,\nseen in parallel",
+    note: "color alone,\nseen in parallel",
     color: PRIMARY,
     f: () => BASE + 8,
   },
   {
     key: "Two features",
-    note: "colour and shape,\nchecked one by one",
+    note: "color and shape,\nchecked one by one",
     color: ACCENT,
     f: (n) => BASE + PER_ITEM * (n - 1),
   },
@@ -54,7 +54,7 @@ const at = (key, n) => ROWS.find((r) => r.key === key && r.n === n).ms;
 const BIGGEST = COUNTS[COUNTS.length - 1];
 const GAP = Math.round(at("Two features", BIGGEST) - at("One feature", BIGGEST));
 
-export const caption = `Two ways of asking a reader to find something, and they scale differently. A target that differs by a single feature is found in about the same time whether there are five items on screen or thirty: the visual system takes the whole field at once, so the line is flat. A target defined by a *combination* of two features has to be checked item by item, so each extra item costs, and by ${BIGGEST} items the search is about ${GAP} ms slower. That is the practical rule behind popout: colouring one series differently is free at any size, while "the blue square, among blue circles and red squares" is work that grows with your data. Slopes after Treisman and Gelade's 1980 conjunction-search experiments; the shape is theirs, the exact milliseconds are illustrative.`;
+export const caption = `Two ways of asking a reader to find something, and they scale differently. A target that differs by a single feature is found in about the same time whether there are five items on screen or thirty: the visual system takes the whole field at once, so the line is flat. A target defined by a *combination* of two features has to be checked item by item, so each extra item costs, and by ${BIGGEST} items the search is about ${GAP} ms slower. That is the practical rule behind popout: coloring one series differently is free at any size, while "the blue square, among blue circles and red squares" is work that grows with your data. Slopes after Treisman and Gelade's 1980 conjunction-search experiments; the shape is theirs, the exact milliseconds are illustrative.`;
 
 export function render() {
   return plot({

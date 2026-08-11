@@ -16,20 +16,20 @@
 import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
-  "Five graphical encodings ranked by how accurately people judge them. Position on a common scale is the most accurate; length is close behind; angle, area and colour saturation are progressively worse, with colour about three times the error of position.";
+  "Five graphical encodings ranked by how accurately people judge them. Position on a common scale is the most accurate; length is close behind; angle, area and color saturation are progressively worse, with color about three times the error of position.";
 
 export const caption =
   "How far off people are when judging the same ratio shown five different ways. Position and length are what a bar chart uses; angle is what a pie chart uses. The ranking is measured, not a matter of taste.";
 
 // Relative error from the Cleveland & McGill position-length experiments and
-// the follow-up work that extended the ranking to area and colour. Rounded,
+// the follow-up work that extended the ranking to area and color. Rounded,
 // and normalised so position = 1.
 const ENCODINGS = [
   { key: "Position\non a common scale", error: 1.0, example: "scatter, dot plot" },
   { key: "Length", error: 1.4, example: "bar chart" },
   { key: "Angle", error: 1.8, example: "pie chart" },
   { key: "Area", error: 2.5, example: "bubble chart" },
-  { key: "Colour saturation", error: 3.0, example: "heatmap" },
+  { key: "Color saturation", error: 3.0, example: "heatmap" },
 ];
 
 export function render() {

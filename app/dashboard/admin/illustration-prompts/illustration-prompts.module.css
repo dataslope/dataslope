@@ -136,7 +136,7 @@
  *
  * No card. The old layout put every item in a bordered, tinted box, which on
  * a page whose whole job is judging a transparent cut-out against the page
- * colour meant each image sat on a surface the site never serves it on. The
+ * color meant each image sat on a surface the site never serves it on. The
  * only frame now is the dashed one around the artwork itself, which is also
  * where queue state is shown. */
 .item {
@@ -167,7 +167,7 @@
   position: relative;
 }
 
-/* On the artwork's top-left corner, over an opaque page-coloured pill so it
+/* On the artwork's top-left corner, over an opaque page-colored pill so it
    stays legible whatever the cut-out has underneath it. */
 .stateChip {
   position: absolute;
@@ -231,7 +231,7 @@
   outline-offset: 2px;
 }
 
-/* The cut-out gets no backdrop of its own: the page colour shows through its
+/* The cut-out gets no backdrop of its own: the page color shows through its
    alpha, so the theme toggle is what reveals a halo or a background that never
    actually came off. It is also the only image shown here, because it is the
    one the site serves. */

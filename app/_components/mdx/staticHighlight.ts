@@ -8,7 +8,7 @@
  * to the browser (the editable code blocks load them via `loadLanguage`):
  * we pull the Lezer parser out of the LanguageSupport, parse the snippet, and
  * walk the tree with `@lezer/highlight`'s `classHighlighter` to emit `tok-*`
- * spans. `livePreview.module.css` colours those classes.
+ * spans. `livePreview.module.css` colors those classes.
  *
  * Why not Shiki: MDX highlighting runs Shiki at request time INSIDE the
  * Cloudflare Worker, and adding a client Shiki instance (core + grammars)

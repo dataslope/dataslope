@@ -26,7 +26,7 @@
  *
  * The marked/awaiting state is painted on the figure's own section by
  * `.item:has(...)` in charts.module.css, reading the `data-mark-state` this
- * component sets. That keeps the coloured frame on the server-rendered element
+ * component sets. That keeps the colored frame on the server-rendered element
  * without making it a client component.
  */
 import {

@@ -14,7 +14,7 @@
 // dark: near-black sphere that melts into #121212). The dotted continents are
 // kept faint via a low canvas opacity so the globe reads as a soft backdrop;
 // the stickers stay fully opaque on top. `useIsDark` tracks the live
-// `.dark` class the shared toggle flips; cobe bakes colours in at creation, so
+// `.dark` class the shared toggle flips; cobe bakes colors in at creation, so
 // a theme change tears down and rebuilds the globe.
 //
 // Non-interactive (pointer-events off, aria-hidden): a pure backdrop.
@@ -95,13 +95,13 @@ const SHARED: Omit<
   markers: [],
 };
 
-// cobe colours the whole sphere as `baseColor` scaled by a per-pixel
+// cobe colors the whole sphere as `baseColor` scaled by a per-pixel
 // brightness; the dotted continents are the *same* hue as the ocean, just
 // brighter (when `dark: 1`) or darker (when `dark: 0`) by `mapBrightness`. So
 // the ocean reads as roughly `baseColor × 0.1` and a continent dot as
 // `baseColor × (mapBrightness × facing)`. To keep the dots close to the ocean
-// colour we simply keep `mapBrightness` low, rather than picking a separate dot
-// colour (cobe has no such knob).
+// color we simply keep `mapBrightness` low, rather than picking a separate dot
+// color (cobe has no such knob).
 const DARK_CONFIG: COBEOptions = {
   ...SHARED,
   dark: 1,

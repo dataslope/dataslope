@@ -12,7 +12,7 @@
  * `prefers-color-scheme` match, so a chart referenced as `<img src="…svg">`
  * could never follow it (an <img> can't see page CSS) and a `<picture media>`
  * would desync from the toggle. Charts are therefore *inlined*, and every
- * colour in the SVG is either:
+ * color in the SVG is either:
  *
  *   • `currentColor` — Plot's own default for axis text, ticks and gridlines,
  *     left exactly as it emits them, so they follow the page foreground; or
@@ -60,11 +60,11 @@ export const SERIES = [
 /** The primary series (brand blue), the default for a single-series chart. */
 export const PRIMARY = SERIES[0];
 
-/** A deliberately quiet colour for reference lines, annotations, and the
+/** A deliberately quiet color for reference lines, annotations, and the
  *  "everything else" half of a highlighted comparison. */
 export const MUTED = "var(--ds-chart-muted)";
 
-/** Highlight colour for the one thing a chart is actually about. */
+/** Highlight color for the one thing a chart is actually about. */
 export const ACCENT = "var(--ds-chart-accent)";
 
 /** Guide lines: the dropped verticals, tick marks and construction lines that
@@ -76,7 +76,7 @@ export const GUIDE = "var(--ds-chart-guide)";
 /**
  * Halo options for a text mark sitting over the plot rather than beside it.
  *
- * Spread into a `Plot.text` mark, this strokes the glyphs in the page colour
+ * Spread into a `Plot.text` mark, this strokes the glyphs in the page color
  * underneath the fill (Plot sets `paint-order: stroke`), so a label crossing a
  * curve, a rule or a shaded region reads cleanly without a box around it and
  * without having to be nudged somewhere it no longer points at anything.

@@ -54,7 +54,7 @@ know what it's encoding before you interpret the picture.
 <Figure
   slug="rlang-interpreting-plots-step-2-identify-inline-cutout"
   alt="A hand tracing from a mark on a chart to the key beside it"
-  caption="Find out what each colour and shape encodes before trusting the picture."
+  caption="Find out what each color and shape encodes before trusting the picture."
 />
 
 ## Step 3: look at the shape, then the details
@@ -328,7 +328,7 @@ if (is.null(yl) || yl == "mpg") stop("set an informative y label")`,
     {
       id: "color_mapping",
       name: "Color mapped to cyl",
-      code: `cm <- rlang::as_label(fixed$mapping$colour)
+      code: `cm <- rlang::as_label(fixed$mapping$color)
 if (is.null(cm) || !grepl("cyl", cm)) stop("color should map to cyl")`,
     },
   ]}

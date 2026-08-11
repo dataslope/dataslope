@@ -4,7 +4,7 @@
  *
  * A picture becomes a data visualisation at the moment some visual property is
  * a *function* of a number. That is the entire test, and it is stricter than
- * it sounds. The left panel has icons, labels, colours, a layout and the
+ * it sounds. The left panel has icons, labels, colors, a layout and the
  * numbers themselves, and none of its sizes mean anything: the circles were
  * scaled to fill the space, which is a design decision, so the picture encodes
  * the designer's sense of balance and not the data. A reader who trusts the
@@ -36,7 +36,7 @@ const MIN = Math.min(...ITEMS.map((d) => d.v));
 const RATIO = (MAX / MIN).toFixed(1);
 const BIGGEST = ITEMS.find((d) => d.v === MAX);
 
-export const caption = `A picture becomes a data visualisation at the moment some visual property is a function of a number, and that test is stricter than it sounds. The top row has icons, colours, labels, a layout and the numbers themselves, and not one of its sizes means anything: the circles were scaled to fill the space, so the graphic encodes the designer's sense of balance rather than the data. A reader who trusts the sizes is misled, and the sizes are the first thing anyone trusts. ${BIGGEST.key} is ${RATIO} times the smallest figure here and the top row gives no hint of it. The bottom row changes one thing, area proportional to value, and the picture becomes a claim that can be checked. This is also why printing the numbers does not rescue the top row: if the reader has to read the digits to get the ranking then the graphic contributed nothing, and if they read the sizes instead they get the wrong answer. Decoration is not a lesser chart, it is a different kind of object that happens to have numbers on it.`;
+export const caption = `A picture becomes a data visualisation at the moment some visual property is a function of a number, and that test is stricter than it sounds. The top row has icons, colors, labels, a layout and the numbers themselves, and not one of its sizes means anything: the circles were scaled to fill the space, so the graphic encodes the designer's sense of balance rather than the data. A reader who trusts the sizes is misled, and the sizes are the first thing anyone trusts. ${BIGGEST.key} is ${RATIO} times the smallest figure here and the top row gives no hint of it. The bottom row changes one thing, area proportional to value, and the picture becomes a claim that can be checked. This is also why printing the numbers does not rescue the top row: if the reader has to read the digits to get the ranking then the graphic contributed nothing, and if they read the sizes instead they get the wrong answer. Decoration is not a lesser chart, it is a different kind of object that happens to have numbers on it.`;
 
 const W = 680;
 const H = 320;

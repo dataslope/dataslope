@@ -66,7 +66,7 @@ const PRESENTATION: Record<string, Presentation> = {
     description:
       "SQL and data modeling at depth, then the systems around them: batch pipelines, distributed processing, streaming, warehousing, and orchestration you can rely on.",
     banner: "interview-data-engineer-thumbnail-cutout",
-    bannerAlt: "The Dataslope marmot guiding coloured cubes along an isometric pipeline into a storage silo",
+    bannerAlt: "The Dataslope marmot guiding colored cubes along an isometric pipeline into a storage silo",
   },
   "analytics-engineer": {
     description:

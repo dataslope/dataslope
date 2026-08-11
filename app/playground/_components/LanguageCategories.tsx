@@ -6,7 +6,7 @@
  *
  * Server component, the data is static. Each tile links to its
  * `/playground/<id>` route and, on hover, tints its glyph with the language's
- * brand colour (`LANGUAGE_ICON_COLORS`) via the `--tile-c` custom property so
+ * brand color (`LANGUAGE_ICON_COLORS`) via the `--tile-c` custom property so
  * the whole grid stays in sync with the shared icon registry.
  */
 import type { CSSProperties } from "react";

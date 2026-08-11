@@ -296,10 +296,10 @@ controlled for.
 
 <ChallengeCard
   adapter="python"
-  title="Run the same analysis on colour"
+  title="Run the same analysis on color"
   instructions={`Diamond \`color\` is graded D (best) through J (worst). Run the same diagnostic on it.
 
-Build \`colour_report\`, one row per \`color\`, with these columns in this order:
+Build \`color_report\`, one row per \`color\`, with these columns in this order:
 
 1. \`color\`
 2. \`n\`, the number of diamonds
@@ -319,13 +319,13 @@ Look at the answers before you assume them. The interesting result here is that 
       filename: "main.py",
       initCode: `import polars as pl
 diamonds = pl.read_csv("diamonds.csv")`,
-      starterCode: `colour_report = None       # TODO
+      starterCode: `color_report = None       # TODO
 price_reversed = None      # TODO
 per_carat_fixes_it = None  # TODO
 
-display(colour_report)
+display(color_report)
 `,
-      solutionCode: `colour_report = (
+      solutionCode: `color_report = (
     diamonds.lazy()
     .group_by("color")
     .agg(
@@ -338,13 +338,13 @@ display(colour_report)
     .collect()
 )
 
-best = colour_report.row(0, named=True)
-worst = colour_report.row(-1, named=True)
+best = color_report.row(0, named=True)
+worst = color_report.row(-1, named=True)
 
 price_reversed = best["median_price"] < worst["median_price"]
 per_carat_fixes_it = best["median_per_carat"] > worst["median_per_carat"]
 
-display(colour_report)
+display(color_report)
 print("price_reversed:", price_reversed)
 print("per_carat_fixes_it:", per_carat_fixes_it)
 `,
@@ -354,28 +354,28 @@ print("per_carat_fixes_it:", per_carat_fixes_it)
     {
       id: "shape",
       name: "Seven rows, five columns",
-      description: "Colours D through J",
-      code: `assert colour_report.shape == (7, 5), colour_report.shape`,
+      description: "Colors D through J",
+      code: `assert color_report.shape == (7, 5), color_report.shape`,
     },
     {
       id: "cols",
       name: "The right columns in order",
       description: "color, n, avg_carat, median_price, median_per_carat",
       code: `expected = ["color", "n", "avg_carat", "median_price", "median_per_carat"]
-assert colour_report.columns == expected, colour_report.columns`,
+assert color_report.columns == expected, color_report.columns`,
     },
     {
       id: "sorted",
       name: "Sorted D through J",
       description: "Best grade first",
-      code: `assert colour_report["color"].to_list() == list("DEFGHIJ"), colour_report["color"].to_list()`,
+      code: `assert color_report["color"].to_list() == list("DEFGHIJ"), color_report["color"].to_list()`,
     },
     {
       id: "carat_trend",
-      name: "The confounder is present: better colours are smaller",
+      name: "The confounder is present: better colors are smaller",
       description: "D averages well under J",
-      code: `d = colour_report.row(0, named=True)
-j = colour_report.row(-1, named=True)
+      code: `d = color_report.row(0, named=True)
+j = color_report.row(-1, named=True)
 assert d["avg_carat"] < j["avg_carat"], (d["avg_carat"], j["avg_carat"])`,
     },
     {
@@ -394,12 +394,12 @@ assert d["avg_carat"] < j["avg_carat"], (d["avg_carat"], j["avg_carat"])`,
       id: "counts",
       name: "Every diamond is counted once",
       description: "53,940 across the seven grades",
-      code: `assert colour_report["n"].sum() == 53940, colour_report["n"].sum()`,
+      code: `assert color_report["n"].sum() == 53940, color_report["n"].sum()`,
     },
   ]}
 />
 
-The colour result is the more instructive one. The confounder is
+The color result is the more instructive one. The confounder is
 present and stronger than it was for cut (D averages 0.66 carat, J
 averages 1.16), and it fully explains why the best grade looks
 cheapest. But dividing by carat does *not* flip the ordering back,

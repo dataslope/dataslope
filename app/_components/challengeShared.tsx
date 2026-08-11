@@ -158,7 +158,7 @@ function detectIsDark(): boolean {
   return true;
 }
 
-/** Subscribe to the document's colour-scheme so components can react
+/** Subscribe to the document's color-scheme so components can react
  *  to the Fumadocs theme toggle without polling. SSR-safe: the server
  *  snapshot defaults to `true` (dark) to match the site's dark default. */
 export function useIsDark(): boolean {
@@ -203,7 +203,7 @@ export function cmThemeNameFor(isDark: boolean): string {
  * code: of the 89 fences that once carried no info string, 87 were samples of
  * what the program prints. Highlighting those is worse than leaving them
  * plain, since highlight.js finds keywords in ordinary words and paints a
- * column of `Hello, Grace!` in three colours.
+ * column of `Hello, Grace!` in three colors.
  *
  * (An earlier version inherited the card's `adapter` here. It was wrong 87
  * times out of 89, which is why the label now lives in the source.)
@@ -412,7 +412,7 @@ export function useShortId(prefix: string): string {
 // pass/fail readout. A vertical rail runs down the left; each test is a
 // circle on the rail, green (--ds-green-500) with a white check for a
 // pass, red (--ds-red-500) with a white ✕ for a fail, and the rail
-// segment below each circle is painted in that test's colour. Rows are
+// segment below each circle is painted in that test's color. Rows are
 // just the test name; the description, the test's code/checks, and the
 // exact error message live in a click-popover so the list stays clean.
 

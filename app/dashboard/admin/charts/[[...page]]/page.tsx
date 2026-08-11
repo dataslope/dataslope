@@ -8,7 +8,7 @@
  * how). That is the one property of this pipeline you cannot check while
  * writing a spec, because your editor and your browser are on one theme at a
  * time. Here each figure is drawn twice, in panes pinned to each theme, so a
- * series colour that goes muddy in dark mode is visible immediately rather
+ * series color that goes muddy in dark mode is visible immediately rather
  * than after someone flips the site toggle on the lesson.
  *
  * No cards: a filled panel behind a figure is a third surface competing with
@@ -201,7 +201,7 @@ export default async function AdminChartsPage(props: {
     <ChartReviewProvider>
       <AdminPageHeader
         title="Charts"
-        description="Every figure produced by scripts/build-charts.mjs, drawn on both page surfaces so a colour that only works in one theme has nowhere to hide."
+        description="Every figure produced by scripts/build-charts.mjs, drawn on both page surfaces so a color that only works in one theme has nowhere to hide."
       />
 
       {ALL.length === 0 ? (

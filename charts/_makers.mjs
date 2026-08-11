@@ -1,6 +1,6 @@
 /**
  * One scatter of engine size against fuel economy, split four ways, shared by
- * `groups-by-colour-one-panel` and `groups-in-a-facet-grid`.
+ * `groups-by-color-one-panel` and `groups-in-a-facet-grid`.
  *
  * The four names are invented, and are the same invented companies
  * `filter-beats-showing-everything` uses, so a reader who meets them twice
@@ -18,9 +18,9 @@
  *
  * Vehicle classes were the first draft, and they made the pair prove the wrong
  * thing. Compacts, saloons, SUVs and pickups occupy different parts of *both*
- * axes, so the coloured panel separated them into a tidy staircase and colour
+ * axes, so the colored panel separated them into a tidy staircase and color
  * came out looking fine. Groups that separate in space are exactly the case
- * colour handles well: the eye finds them by position and the hue is
+ * color handles well: the eye finds them by position and the hue is
  * decoration.
  *
  * The case faceting is for is groups that sit on top of each other, where hue
@@ -50,12 +50,12 @@ const HI = 5.4;
 export const MAKER_KEYS = MAKERS.map((m) => m.key);
 
 /** Mpg lost per litre, by maker. The four differ, which is the whole finding:
- *  in the coloured panel it is buried and in the facet grid it is the shape of
+ *  in the colored panel it is buried and in the facet grid it is the shape of
  *  each panel. Read from the same definitions the points are built from, so a
  *  label can never quote a slope the geometry does not have. */
 export const MAKER_SLOPE = Object.fromEntries(MAKERS.map((m) => [m.key, m.slope]));
 
-/** One colour per maker, identical in both charts so a reader can carry a
+/** One color per maker, identical in both charts so a reader can carry a
  *  maker from the tangle into the panel that finally separates it. */
 export const MAKER_COLOR = Object.fromEntries(
   MAKERS.map((m, i) => [m.key, SERIES[i % SERIES.length]]),

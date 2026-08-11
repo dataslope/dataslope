@@ -563,7 +563,7 @@
 :global(html.dark) .answerNote {
   color: #7c828a;
 }
-/* Underlined rather than coloured: at 11px in a grey line, a blue link would
+/* Underlined rather than colored: at 11px in a grey line, a blue link would
    be the loudest thing under the answer. */
 .answerNoteLink {
   color: inherit;
@@ -613,7 +613,7 @@
    These used to be the same declaration, so pressing a thumb looked exactly
    like pointing at one: the icon changed while the cursor sat on it and went
    back to grey the moment the pointer left, and nothing said the rating had
-   registered. A rating is now a colour, not a shade — blue for the thumbs up,
+   registered. A rating is now a color, not a shade — blue for the thumbs up,
    red for the thumbs down, over a tint of the same hue — and the caller fills
    the glyph, so it reads as pressed from across the panel and, crucially,
    still reads as pressed with the mouse somewhere else entirely. Hover on an

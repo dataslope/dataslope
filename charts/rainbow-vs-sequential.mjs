@@ -1,10 +1,10 @@
 /**
- * Why the rainbow colour map is the wrong default: it invents boundaries the
+ * Why the rainbow color map is the wrong default: it invents boundaries the
  * data does not have, and hides ones it does.
  *
  * Both rows encode the same smooth ramp from 0 to 100. The sequential row gets
  * steadily darker, so equal steps in the value look like equal steps in the
- * colour and the reader can rank any two patches. The rainbow row has sharp
+ * color and the reader can rank any two patches. The rainbow row has sharp
  * perceptual edges where the hue turns (cyan into green, yellow into orange)
  * and long flat stretches in between, so a gradual slope reads as a series of
  * bands and two very different values in the green stretch look alike.
@@ -12,29 +12,29 @@
  * The lightness track underneath is the reason. Sequential lightness falls
  * monotonically, which is what makes it orderable; the rainbow's rises and
  * falls, so it carries no order at all and disappears entirely in greyscale or
- * for a reader with a colour vision deficiency.
+ * for a reader with a color vision deficiency.
  */
 import { Plot, plot, linspace, HALO, MUTED } from "./_theme.mjs";
 
 export const literalColorsAllowed =
-  "The two colour maps are the subject of the chart, so their swatches have to " +
+  "The two color maps are the subject of the chart, so their swatches have to " +
   "be the actual sRGB values under discussion rather than theme roles. The " +
   "chrome around them still uses the tokens and follows the page theme.";
 
 export const title =
-  "Two colour ramps for the same values from 0 to 100. The sequential ramp darkens smoothly and evenly. The rainbow ramp has abrupt hue boundaries and flat stretches. Beneath each, a line tracks its lightness: the sequential one falls steadily, the rainbow one rises and falls.";
+  "Two color ramps for the same values from 0 to 100. The sequential ramp darkens smoothly and evenly. The rainbow ramp has abrupt hue boundaries and flat stretches. Beneath each, a line tracks its lightness: the sequential one falls steadily, the rainbow one rises and falls.";
 
 export const caption =
-  "The same values, two colour maps. A sequential ramp's lightness falls steadily, so equal steps in the data look like equal steps in the colour. The rainbow's does not, so it invents edges where the data is smooth and flattens differences where it is not.";
+  "The same values, two color maps. A sequential ramp's lightness falls steadily, so equal steps in the data look like equal steps in the color. The rainbow's does not, so it invents edges where the data is smooth and flattens differences where it is not.";
 
 const N = 120;
 const XS = linspace(0, 100, N);
 
 /** Both ramps are written as explicit stops and interpolated in sRGB, so the
- *  figure is exactly what the two colour maps do rather than an impression of
- *  them. Literal colours would normally be banned here (see the guard in
- *  scripts/build-charts.mjs), but a chart *about* two specific colour maps has
- *  to show those colours; they are the data. */
+ *  figure is exactly what the two color maps do rather than an impression of
+ *  them. Literal colors would normally be banned here (see the guard in
+ *  scripts/build-charts.mjs), but a chart *about* two specific color maps has
+ *  to show those colors; they are the data. */
 const SEQUENTIAL = ["#f7fbff", "#c6dbef", "#6baed6", "#2171b5", "#08306b"];
 const RAINBOW = ["#4400ff", "#00b4ff", "#00e05a", "#e8e000", "#ff7700", "#e00000"];
 
@@ -69,7 +69,7 @@ const patches = RAMPS.flatMap((r, row) =>
   }),
 );
 
-// Layout in row units: a colour band, then its lightness track underneath.
+// Layout in row units: a color band, then its lightness track underneath.
 const BAND_TOP = 0.06;
 const BAND_H = 0.34;
 const TRACK_TOP = 0.52;

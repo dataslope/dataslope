@@ -11,7 +11,7 @@
  *
  * That is the real rule for a heatmap: reach for it when the data is naturally
  * a matrix and the question is about *where the hot regions are* rather than
- * about exact values. Colour is a weak channel, so a heatmap that needs its
+ * about exact values. Color is a weak channel, so a heatmap that needs its
  * reader to compare two similar cells precisely has picked the wrong mark; one
  * that needs them to find the block of dark cells has picked the right one.
  *
@@ -58,7 +58,7 @@ const SHARE = Math.round((weekdayDay / total) * 100);
 
 const hourLabel = (h) => (h === 0 ? "12a" : h === 12 ? "12p" : h > 12 ? `${h - 12}p` : `${h}a`);
 
-export const caption = `One number per cell, which a line chart could also carry as seven daily curves of twenty-four points. Nobody reads seven overlapping curves, and seven small multiples make the reader compare across panels to answer the only two questions anyone asks: when is it busy, and when can we take the system down. The grid answers both at once because the two dimensions of the data are the two dimensions of the page. ${SHARE} percent of the week's tickets land in weekday working hours, the busiest cell is ${PEAK.day} at ${hourLabel(PEAK.h)} with ${PEAK.n}, and the quietest is ${QUIET.day} at ${hourLabel(QUIET.h)} with ${QUIET.n}. That is the rule for a heatmap: use it when the data is naturally a matrix and the question is where the hot regions are, not what the exact values are. Colour is a weak channel, so a heatmap that asks its reader to compare two similar cells precisely has picked the wrong mark. Labelling every cell would turn it into a table, which is a good chart and a different one.`;
+export const caption = `One number per cell, which a line chart could also carry as seven daily curves of twenty-four points. Nobody reads seven overlapping curves, and seven small multiples make the reader compare across panels to answer the only two questions anyone asks: when is it busy, and when can we take the system down. The grid answers both at once because the two dimensions of the data are the two dimensions of the page. ${SHARE} percent of the week's tickets land in weekday working hours, the busiest cell is ${PEAK.day} at ${hourLabel(PEAK.h)} with ${PEAK.n}, and the quietest is ${QUIET.day} at ${hourLabel(QUIET.h)} with ${QUIET.n}. That is the rule for a heatmap: use it when the data is naturally a matrix and the question is where the hot regions are, not what the exact values are. Color is a weak channel, so a heatmap that asks its reader to compare two similar cells precisely has picked the wrong mark. Labelling every cell would turn it into a table, which is a good chart and a different one.`;
 
 export function render() {
   return plot({
@@ -84,7 +84,7 @@ export function render() {
       grid: false,
     },
     marks: [
-      // Intensity as opacity on one token: a two-stop colour scale would need
+      // Intensity as opacity on one token: a two-stop color scale would need
       // a literal for its low end, and only the tokens survive both themes.
       Plot.rect(cells, {
         x1: "h",

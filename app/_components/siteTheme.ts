@@ -1,5 +1,5 @@
 // Canonical site-wide light/dark controller, shared by every surface that
-// needs to read or set the colour scheme: the home page, the playgrounds, and
+// needs to read or set the color scheme: the home page, the playgrounds, and
 // (by virtue of the same contract) the Fumadocs-powered /learn route.
 //
 // Contract, identical to what next-themes/Fumadocs use, so the choice is

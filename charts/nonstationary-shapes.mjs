@@ -108,8 +108,8 @@ export function render() {
       ),
 
       // Row names in the right margin rather than as facet axis labels, which
-      // Plot sets in the axis colour and at the axis size; these need to carry
-      // the row's own colour so "the one that is fine" is visible as such.
+      // Plot sets in the axis color and at the axis size; these need to carry
+      // the row's own color so "the one that is fine" is visible as such.
       Plot.text(PANELS, {
         x: () => N - 1,
         y: () => BASE,

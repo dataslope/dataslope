@@ -14,10 +14,10 @@ import imageManifest from "@/lib/generated/images";
  * left-1/2 / -translate-x-1/2 / w-screen escape, so the pattern runs edge to
  * edge while the artwork stays centered on the page's own axis.
  *
- * Colour follows `FooterPattern`: theme-neutral low-alpha inks, with the
- * palette's first entry left transparent so the page colour shows through.
+ * Color follows `FooterPattern`: theme-neutral low-alpha inks, with the
+ * palette's first entry left transparent so the page color shows through.
  * Grey and blue are joined by brand yellow and green, which is the full
- * four-colour brand set the illustrations use — the band sits directly under
+ * four-color brand set the illustrations use — the band sits directly under
  * the playground artwork, so the two now share a palette. Yellow carries a
  * higher alpha than the others because it is the lightest of the four and
  * washes out against white at the alpha the rest use.

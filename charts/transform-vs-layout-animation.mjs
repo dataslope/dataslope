@@ -100,8 +100,8 @@ export function render() {
         fillOpacity: 0.82,
         order: STEPS,
       }),
-      // `fill` here is a *channel* carrying the step name, not a colour string:
-      // with a colour scale in play, a function returning `var(--ds-chart-N)`
+      // `fill` here is a *channel* carrying the step name, not a color string:
+      // with a color scale in play, a function returning `var(--ds-chart-N)`
       // is looked up in the scale's domain, misses, and paints nothing.
       Plot.dot(LEGEND, {
         x: "x",

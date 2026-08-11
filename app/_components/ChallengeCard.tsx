@@ -727,7 +727,7 @@ export default function ChallengeCard({
   }, [adapter, activeFilename]);
 
   // Sync the CodeMirror theme across all active editors when the docs
-  // colour scheme toggles (Fumadocs dark/light toggle or OS preference).
+  // color scheme toggles (Fumadocs dark/light toggle or OS preference).
   useEffect(() => {
     const reconfigure = (view: EditorView | null, comp: Compartment | null) => {
       if (view && comp) {

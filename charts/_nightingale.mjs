@@ -83,7 +83,7 @@ export const MONTHS = TABLE.map(([ym, army, disease, wounds, other], i) => {
 
 export const PERIODS = ["April 1854 to March 1855", "April 1855 to March 1856"];
 
-/** The three causes in her own colour order: blue for preventable disease, red
+/** The three causes in her own color order: blue for preventable disease, red
  *  for wounds, black (here the muted neutral) for everything else. */
 export const CAUSES = [
   { key: "disease", label: "Preventable disease" },

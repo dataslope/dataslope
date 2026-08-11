@@ -352,7 +352,7 @@ export default function SqlCodeBlock({
     }),
   });
 
-  // Sync the CodeMirror theme whenever the docs colour scheme toggles.
+  // Sync the CodeMirror theme whenever the docs color scheme toggles.
   useEffect(() => {
     const view = editorRef.current;
     const comp = mainThemeCompRef.current;

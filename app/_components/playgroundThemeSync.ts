@@ -11,7 +11,7 @@ import {
  * Keep a playground's editor theme in lockstep with the site-wide light/dark
  * choice (the `theme` localStorage key + `.dark` class shared with the home
  * page and /learn). The editor catalog is just GitHub Light/Dark, so the
- * "editor theme" IS the colour scheme, toggling dark mode anywhere updates
+ * "editor theme" IS the color scheme, toggling dark mode anywhere updates
  * the playground, and the playground's General-tab toggle (which calls
  * `setSiteTheme`) updates everywhere else.
  *

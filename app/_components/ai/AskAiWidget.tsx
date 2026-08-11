@@ -42,7 +42,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
-// Token colours for the code blocks rehype-highlight marks up. The panel floats
+// Token colors for the code blocks rehype-highlight marks up. The panel floats
 // over lessons (which inline the same theme via docs.css) but also over the
 // playground and the dashboard, which do not — so it brings its own rather than
 // relying on whatever page it happens to be open on. KaTeX's stylesheet is here
@@ -1180,7 +1180,7 @@ export default function AskAiWidget({
                             language are highlighted. Auto-detection on a
                             half-streamed block guesses from whatever few
                             characters have arrived, and re-guesses per token,
-                            which shows up as code changing colour while it is
+                            which shows up as code changing color while it is
                             still being written. */}
                         {/* Math before highlighting, matching how the MCQ
                             renderer orders them: KaTeX claims its nodes first,
@@ -1236,9 +1236,9 @@ export default function AskAiWidget({
                             <Copy size={13} />
                           )}
                         </button>
-                        {/* `fill` on the selected glyph: colour alone carries
+                        {/* `fill` on the selected glyph: color alone carries
                             the state otherwise, and a filled vs outlined icon
-                            survives both themes and colour-blindness. */}
+                            survives both themes and color-blindness. */}
                         <button
                           type="button"
                           className={`${styles.actionBtn} ${

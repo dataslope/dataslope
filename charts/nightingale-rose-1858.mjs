@@ -35,7 +35,7 @@ import { MONTHS, PEAK, PERIODS } from "./_nightingale.mjs";
 export const title =
   "Florence Nightingale's 1858 rose diagram, redrawn from her table: two circles of twelve wedges, one per year of the Crimean War. Each wedge's area is the annual death rate per 1,000, blue for preventable disease, red for wounds, grey for other causes. The blue wedges dominate the first year and collapse in the second.";
 
-const CAUSE_COLOUR = { disease: SERIES[0], wounds: ACCENT, other: MUTED };
+const CAUSE_COLOR = { disease: SERIES[0], wounds: ACCENT, other: MUTED };
 const CAUSE_ORDER = ["disease", "other", "wounds"];
 
 const MAX = Math.max(...MONTHS.map((m) => m.disease));
@@ -115,7 +115,7 @@ export function render() {
         x: "x",
         y: "y",
         z: "id",
-        fill: (d) => CAUSE_COLOUR[d.cause],
+        fill: (d) => CAUSE_COLOR[d.cause],
         fillOpacity: 0.78,
         stroke: "var(--ds-chart-surface)",
         strokeWidth: 0.6,
@@ -125,7 +125,7 @@ export function render() {
         fx: "period",
         x: -1.02,
         y: "y",
-        fill: (d) => CAUSE_COLOUR[d.cause],
+        fill: (d) => CAUSE_COLOR[d.cause],
         r: 4,
       }),
       Plot.text(LEGEND, {
@@ -133,7 +133,7 @@ export function render() {
         x: -0.95,
         y: "y",
         text: "label",
-        fill: (d) => CAUSE_COLOUR[d.cause],
+        fill: (d) => CAUSE_COLOR[d.cause],
         fontSize: 10.5,
         fontWeight: 600,
         textAnchor: "start",

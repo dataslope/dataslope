@@ -18,7 +18,7 @@ export const SHARES = [
   { key: "Other", share: 0.049 },
 ];
 
-/** One colour per category, stable across both charts so a reader can carry a
+/** One color per category, stable across both charts so a reader can carry a
  *  category from one to the other. */
 export const SHARE_COLOR = Object.fromEntries(
   SHARES.map((s, i) => [s.key, SERIES[i % SERIES.length]]),

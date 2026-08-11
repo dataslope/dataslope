@@ -22,7 +22,7 @@ const END = 120;
 
 /** Four paths to the same December. Written as explicit series rather than
  *  formulas so each shape is exactly the story its label claims. */
-// Colours picked per shape rather than taken in palette order: the palette is
+// Colors picked per shape rather than taken in palette order: the palette is
 // non-semantic, but a *declining* series drawn in green and a recovery drawn
 // in red is a needless fight with the reader's priors.
 const SHAPES = [

@@ -80,7 +80,7 @@ export function HomeClient({
                   Learn programming and prepare for coding interviews. Access
                   every course and coding playground for free,{" "}
                   <Highlighter action="underline" color="#20C621" isView>
-                    {/* Match the underline colour (#20C621 = --ds-green),
+                    {/* Match the underline color (#20C621 = --ds-green),
                           forced over the shimmer's clipped gradient fill via
                           both color and -webkit-text-fill-color. */}
                     <span

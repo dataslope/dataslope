@@ -398,15 +398,15 @@ appends this to every prompt next to "No text.", because the rule it replaced
 caused the failure it was meant to prevent: "draw dots, markers, and nodes as
 flat 2D circles" named three things to draw in all 879 prompts, and the model
 duly drew them into subjects that had none. A chest of drawers came back with a
-coloured dot on every corner; an elephant resting a foot on a cube came back
+colored dot on every corner; an elephant resting a foot on a cube came back
 ringed by dot-and-line networks. **A named noun is content, even inside a
 negative rule** — so the constraint now names only the *categories of debris* to
 omit (speckled dots, confetti, stray connecting lines) and never a thing to draw.
 
-**One piece, one colour.** Every object is a single solid piece in one flat brand
-colour. The model cannot hold an assembly together: a cube built from cubelets, a
+**One piece, one color.** Every object is a single solid piece in one flat brand
+color. The model cannot hold an assembly together: a cube built from cubelets, a
 bin packed with blocks, or a tower of stacked cubes comes back fused and notched,
-with colours bleeding into shades outside the palette. The failure is the
+with colors bleeding into shades outside the palette. The failure is the
 *assembly*, not the count — three large blocks render perfectly where forty
 cubelets do not — so containers hold a few large items, never a heap.
 
@@ -495,8 +495,8 @@ around it already says what the picture means.
   lesson's own art. "After the opening figure" is not enough on its own: 36 of
   the first hundred landed a paragraph below it, close enough to read as a
   second opinion on the same picture, and on `python-basics/lists` the two were
-  the same idea twice (isometric carts of coloured blocks, then a risograph
-  rail of coloured blocks). Moving each into the section that explains it fixed
+  the same idea twice (isometric carts of colored blocks, then a risograph
+  rail of colored blocks). Moving each into the section that explains it fixed
   the crowding and improved every placement: the pointer band now sits under
   "What a pointer is", the context-window band under "The window is a hard
   boundary".
@@ -519,7 +519,7 @@ only aesthetic: see the transparency constraint below.
 ### Background removal
 
 Recraft `remove-background` via Kie AI. It beat both Replicate's
-`851-labs/background-remover` and a local colour-key: it isolates a subject out
+`851-labs/background-remover` and a local color-key: it isolates a subject out
 of a full-bleed scene rather than dissolving the frame into a ghost matte.
 
 Two API details that will otherwise cost an hour:
@@ -555,7 +555,7 @@ backgrounds — black linework is crisp on `#ffffff` and nearly invisible on
 `#121212`. No background remover can fix this; the fix is upstream.
 
 **So: any illustration meant to run transparent must be drawn in the brand
-colours, never in black, white, or a single hue.** Polychrome subjects survive
+colors, never in black, white, or a single hue.** Polychrome subjects survive
 both themes; monochrome ones do not.
 
 Check both themes with the toggle on
@@ -589,7 +589,7 @@ Course MDX compiles **at request time inside the Worker** (`dynamic: true` in
 by an MDX component would land in that bundle. Rendering here means Plot is a
 devDependency that never ships: the app imports a string.
 
-### Why the SVG is inlined, and never given a literal colour
+### Why the SVG is inlined, and never given a literal color
 
 Dark mode is a `.dark` class toggled at runtime, not a `prefers-color-scheme`
 match, so a generated file referenced as `<img src="…svg">` could never follow
@@ -603,7 +603,7 @@ the toggle. The SVG is therefore inlined and painted with:
   theme (the `600`s on white, the `400`s on the near-black page).
 
 **Never write a hex into a spec.** Use `PRIMARY`, `SERIES`, `ACCENT`, `MUTED`
-from `_theme.mjs`. The build fails on any literal `fill`/`stroke` colour that
+from `_theme.mjs`. The build fails on any literal `fill`/`stroke` color that
 survives into the output, because that is the one defect review cannot catch:
 it looks right in whichever theme the author had open.
 
@@ -1002,7 +1002,7 @@ opposite things:
   common case by a distance: of the 89 fences that once carried no info
   string, 87 were expected output. Highlighting them is worse than leaving
   them plain, because highlight.js finds keywords in ordinary words and paints
-  a column of `Hello, Grace!` in three colours.
+  a column of `Hello, Grace!` in three colors.
 - **A code snippet** takes the card's own language (```` ```python ````,
   ```` ```java ````, ```` ```sql ````…).
 

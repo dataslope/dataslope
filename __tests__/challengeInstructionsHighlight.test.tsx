@@ -4,7 +4,7 @@
  * The instructions pipeline used to run `remarkGfm` alone, so a card that
  * spelled out a pandas one-liner rendered it as an unstyled grey box while the
  * same snippet in a multiple-choice question — which has always had
- * `rehypeHighlight` — came out coloured.
+ * `rehypeHighlight` — came out colored.
  *
  * The half of this that is easy to get wrong is the *language*. `detect` is
  * off, because auto-detection on a two-line sample is a coin flip, so every
@@ -76,7 +76,7 @@ heavy = df[df["body_mass_g"] > 5000][["species", "body_mass_g"]]
 
   it("renders an unlabelled fence plain rather than guessing at it", () => {
     // `SELECT 1 FROM t` is valid in several grammars. With `detect` off and
-    // the fallback at `text`, nothing is guessed and nothing is coloured.
+    // the fallback at `text`, nothing is guessed and nothing is colored.
     const out = html("```\nSELECT 1 FROM t\n```");
     expect(out).toContain("language-text");
     expect(out).not.toContain("hljs-");

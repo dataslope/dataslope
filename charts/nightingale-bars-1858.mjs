@@ -28,7 +28,7 @@ import { COMMISSION_INDEX, MONTHS, PEAK } from "./_nightingale.mjs";
 export const title =
   "The twenty-four months of Nightingale's rose redrawn as stacked bars on a time axis: annual death rate per 1,000, split into preventable disease, wounds and other causes. Disease towers over everything until March 1855, when the Sanitary Commission arrives, and the bars collapse to near nothing within a year.";
 
-const CAUSE_COLOUR = { disease: SERIES[0], wounds: ACCENT, other: MUTED };
+const CAUSE_COLOR = { disease: SERIES[0], wounds: ACCENT, other: MUTED };
 const STACK_ORDER = ["other", "wounds", "disease"];
 
 const rows = MONTHS.flatMap((m) =>
@@ -76,7 +76,7 @@ export function render() {
       Plot.rectY(rows, {
         x: "i",
         y: "rate",
-        fill: (d) => CAUSE_COLOUR[d.cause],
+        fill: (d) => CAUSE_COLOR[d.cause],
         fillOpacity: 0.85,
         order: STACK_ORDER,
         clip: true,
@@ -101,12 +101,12 @@ export function render() {
         dx: 8,
         ...HALO,
       }),
-      Plot.dot(LEGEND, { x: "i", y: "y", fill: (d) => CAUSE_COLOUR[d.cause], r: 4 }),
+      Plot.dot(LEGEND, { x: "i", y: "y", fill: (d) => CAUSE_COLOR[d.cause], r: 4 }),
       Plot.text(LEGEND, {
         x: "i",
         y: "y",
         text: "label",
-        fill: (d) => CAUSE_COLOUR[d.cause],
+        fill: (d) => CAUSE_COLOR[d.cause],
         fontSize: 10.5,
         fontWeight: 600,
         textAnchor: "start",

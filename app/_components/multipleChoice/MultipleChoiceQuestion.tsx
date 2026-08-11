@@ -16,7 +16,7 @@
  *   - All learner-visible Markdown, body, choice labels, per-choice
  *     explanations, overall explanation, is rendered through
  *     react-markdown with GFM + KaTeX + rehype-highlight so authors
- *     can mix prose, lists, code (with syntax colouring), tables, and
+ *     can mix prose, lists, code (with syntax coloring), tables, and
  *     math equations.
  */
 
@@ -45,7 +45,7 @@ function questionChipLabel(body: string, badge: string): string {
 }
 
 /** Choice verdict assigned after the learner picks an answer. Drives the
- *  per-choice colour ring + glyph and is read off `data-verdict` in the
+ *  per-choice color ring + glyph and is read off `data-verdict` in the
  *  stylesheet. */
 type Verdict =
   | "correct-selected"

@@ -138,7 +138,7 @@ function MobileFilterSelect({
 }
 
 /** Sort dropdown, a Base UI Select styled as a borderless chip (subtle
- *  filled background, body-coloured text) with a lucide icon per option. */
+ *  filled background, body-colored text) with a lucide icon per option. */
 function SortSelect({
   value,
   onChange,

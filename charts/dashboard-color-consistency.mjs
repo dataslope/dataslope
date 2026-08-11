@@ -1,17 +1,17 @@
 /**
- * What "same colours mean the same thing" buys, and what breaks without it.
+ * What "same colors mean the same thing" buys, and what breaks without it.
  *
  * The four regions and their numbers are identical in both rows. The only
- * difference is what decides the colour. In the top row it is the ranking
+ * difference is what decides the color. In the top row it is the ranking
  * inside each panel, which is what every plotting library does by default when
  * a chart is sorted before it is drawn: the palette is handed out in drawing
  * order, so the darkest bar means "biggest here" and nothing else. North is
- * one colour in Q1 and another in Q2, and a reader who learned the key on the
+ * one color in Q1 and another in Q2, and a reader who learned the key on the
  * first panel has to unlearn it on the second.
  *
- * In the bottom row the colour is bound to the region, so the key is learned
+ * In the bottom row the color is bound to the region, so the key is learned
  * once and holds everywhere, including on the charts elsewhere on the page.
- * That is the whole of the rule: a colour is a variable, and rebinding a
+ * That is the whole of the rule: a color is a variable, and rebinding a
  * variable between two panels the reader is comparing costs them the
  * comparison.
  *
@@ -21,7 +21,7 @@
 import { Plot, plot, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
-  "Four panels of the same four regions in two quarters. In the top row each panel's colours are handed out by rank, so a region changes colour between quarters; in the bottom row each region keeps one colour across both.";
+  "Four panels of the same four regions in two quarters. In the top row each panel's colors are handed out by rank, so a region changes color between quarters; in the bottom row each region keeps one color across both.";
 
 const REGIONS = ["North", "South", "East", "West"];
 
@@ -30,8 +30,8 @@ const QUARTERS = [
   { key: "Q2", values: { North: 52, South: 78, East: 39, West: 66 } },
 ];
 
-const BY_RANK = "Colour by rank";
-const BY_REGION = "Colour by region";
+const BY_RANK = "Color by rank";
+const BY_REGION = "Color by region";
 
 const rows = QUARTERS.flatMap((q) => {
   const ranked = [...REGIONS].sort((a, b) => q.values[b] - q.values[a]);
@@ -54,7 +54,7 @@ const rows = QUARTERS.flatMap((q) => {
 });
 
 export const caption =
-  "The same eight numbers twice. In the top row the palette is handed out in drawing order, so North is one colour in Q1 and another in Q2 and the legend has to be read again for every panel. In the bottom row colour is bound to the region, and the reader learns the key once. Same axes, same periods, same colours: that is the consistency rule in full.";
+  "The same eight numbers twice. In the top row the palette is handed out in drawing order, so North is one color in Q1 and another in Q2 and the legend has to be read again for every panel. In the bottom row color is bound to the region, and the reader learns the key once. Same axes, same periods, same colors: that is the consistency rule in full.";
 
 export function render() {
   return plot({

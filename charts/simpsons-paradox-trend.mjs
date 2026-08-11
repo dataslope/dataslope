@@ -10,20 +10,20 @@
  * a reader who has only seen the rates version tends to file the paradox under
  * "something that happens to percentages" and misses it in a scatter plot.
  *
- * The confounder is age band, drawn as the group colour, and it is what makes
+ * The confounder is age band, drawn as the group color, and it is what makes
  * the reversal honest rather than constructed: older people in this population
  * both exercise more *and* have higher blood pressure, so the age bands sit on
  * a rising staircase. Within any one of them exercise helps. Pool them and the
  * staircase, not the exercise, is what the single line measures.
  *
- * The pooled line is drawn heavy and in the accent colour, the group lines
- * light and in series colours, because the pooled line is the *wrong* answer
+ * The pooled line is drawn heavy and in the accent color, the group lines
+ * light and in series colors, because the pooled line is the *wrong* answer
  * the chart exists to indict, and it has to be the thing the eye lands on.
  */
 import { Plot, plot, ACCENT, HALO, MUTED, SERIES, rng } from "./_theme.mjs";
 
 export const title =
-  "A scatter of weekly exercise minutes against systolic blood pressure, coloured by age band. Within each of the four age bands the trend falls: more exercise, lower blood pressure. The age bands themselves sit on a rising staircase, so the single line fitted to all the points together rises.";
+  "A scatter of weekly exercise minutes against systolic blood pressure, colored by age band. Within each of the four age bands the trend falls: more exercise, lower blood pressure. The age bands themselves sit on a rising staircase, so the single line fitted to all the points together rises.";
 
 /** Four age bands. Each exercises a little more than the last and starts from a
  *  higher baseline, which is the confounding the chart is about. The within-band
@@ -143,7 +143,7 @@ export function render() {
       }),
 
       // Band labels hang off the right end of each band's own trend line, so
-      // the colour never has to be matched against a legend. The right ends are
+      // the color never has to be matched against a legend. The right ends are
       // staggered across the axis because the bands are, which is the point.
       ...BAND_FITS.map(({ band, line }) =>
         Plot.text([{}], {

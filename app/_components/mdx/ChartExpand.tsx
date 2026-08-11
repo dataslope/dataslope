@@ -32,7 +32,7 @@
  * build-time markup either way.
  *
  * The clone is given the same `.chart` class as the original, which is where
- * the `--ds-chart-*` role tokens live — without it the SVG's `var()` colours
+ * the `--ds-chart-*` role tokens live — without it the SVG's `var()` colors
  * resolve to nothing and the chart opens blank.
  */
 import { useCallback, useEffect, useId, useRef, useState } from "react";

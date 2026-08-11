@@ -180,7 +180,7 @@
    outside the `.card` scope, so CSS custom-property values from the
    surrounding card are not inherited here.  Instead we use the same
    hard-coded token values, with a `:global` light-mode override so the
-   toast reads correctly in both colour schemes. */
+   toast reads correctly in both color schemes. */
 
 .toastViewport {
   position: fixed;
@@ -195,7 +195,7 @@
   /* The viewport is portaled under <body>, outside the `.card` /
      `.outputScope` scope, so the `--cb-*` / `--ch-*` design tokens are not
      inherited here. Re-declare the toast tokens with concrete values so
-     the panel's background, border and text colours actually resolve
+     the panel's background, border and text colors actually resolve
      (previously they were undefined → a background-less toast). */
   --cb-black: #000;
   --cb-slate-200: #e8e8e8;

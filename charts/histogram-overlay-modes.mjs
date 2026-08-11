@@ -8,7 +8,7 @@
  * baseline is the same judgement a stacked bar asks for, and people are bad at
  * it. Grouped puts both on the axis, so shapes are comparable and the total is
  * gone. Overlaid with transparency compares the shapes directly and lets the
- * overlap be seen, at the cost of a muddled colour wherever they meet.
+ * overlap be seen, at the cost of a muddled color wherever they meet.
  *
  * The data is chosen so the choice matters: two groups with the same spread
  * and different centres, which is the case where the stacked version reads as
@@ -83,7 +83,7 @@ for (let i = 0; i < BINS; i++) {
 const PEAK = Math.max(...CA.map((c, i) => c + CB[i]));
 
 export const caption =
-  'Three modes, three questions. Stacked answers "what is the total, and how does it split?", and only the bottom group is measured from zero, so comparing the two shapes means comparing across a moving baseline. Grouped answers "how do the shapes compare?" and gives up the total. Overlaid answers the same question and adds where they overlap, at the cost of a muddy colour where they meet. Two groups with the same spread and different centres, as here, is exactly the case where the stacked version reads as one broad hump and hides that there are two.';
+  'Three modes, three questions. Stacked answers "what is the total, and how does it split?", and only the bottom group is measured from zero, so comparing the two shapes means comparing across a moving baseline. Grouped answers "how do the shapes compare?" and gives up the total. Overlaid answers the same question and adds where they overlap, at the cost of a muddy color where they meet. Two groups with the same spread and different centres, as here, is exactly the case where the stacked version reads as one broad hump and hides that there are two.';
 
 export function render() {
   return plot({

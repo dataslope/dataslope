@@ -8,7 +8,7 @@
  * map falls back to its domain tag's motif, add a bespoke entry when a new
  * course lands.
  *
- * The icon inherits the row's text colour (heading tone by default) so it
+ * The icon inherits the row's text color (heading tone by default) so it
  * reads as part of the title rather than a separate per-language accent.
  */
 import {
@@ -168,7 +168,7 @@ export function motifIcon(kind: string): LucideIcon | null {
 }
 
 /** The course-card glyph: a single lucide line icon that inherits the row's
- *  text colour (defaults to the heading tone) so it matches the title. */
+ *  text color (defaults to the heading tone) so it matches the title. */
 export function CourseGlyph({
   slug,
   tags,

@@ -104,9 +104,9 @@ export function render() {
     },
     y: { label: null, domain: [H, 0], ticks: [], grid: false },
     marks: [
-      // Intensity as opacity on one token rather than a colour scale: a two-stop
+      // Intensity as opacity on one token rather than a color scale: a two-stop
       // linear scale would need a literal low end, and the tokens are the only
-      // colours that survive both themes.
+      // colors that survive both themes.
       Plot.rect(rows, {
         fx: "panel",
         x1: "s",

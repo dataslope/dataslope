@@ -94,7 +94,7 @@ export function render() {
         clip: true,
       }),
       // The curved panel's r is the point of the figure, so it is the one
-      // label in the accent colour.
+      // label in the accent color.
       Plot.text(labels, {
         x: -3.1,
         y: 3.1,

@@ -20,7 +20,7 @@ import { Plot, plot } from "./_theme.mjs";
 export const literalColorsAllowed =
   "A heatmap needs a continuous diverging ramp, and the --ds-chart-* roles are " +
   "a discrete categorical set with no continuous equivalent. The cells are " +
-  "filled areas that carry their own colour on either page background, and the " +
+  "filled areas that carry their own color on either page background, and the " +
   "numbers on them use the surface token so they stay legible in both themes.";
 
 export const title =
@@ -70,7 +70,7 @@ export function render() {
         x: "col",
         y: "row",
         text: (d) => d.r.toFixed(2),
-        // The numbers are the point of a small matrix; the colour is the index
+        // The numbers are the point of a small matrix; the color is the index
         // into them. The surface token on the saturated ends, the page
         // foreground on the pale middle — MUTED here was grey-on-salmon.
         fill: (d) => (Math.abs(d.r) > 0.5 ? "var(--ds-chart-surface)" : "currentColor"),

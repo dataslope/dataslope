@@ -42,7 +42,7 @@ const END = Object.fromEntries(series.map((s) => [s.cause, s.points.at(-1).total
 const AT_COMMISSION = Object.fromEntries(
   series.map((s) => [s.cause, s.points[COMMISSION_INDEX].total]),
 );
-const COLOUR = { disease: SERIES[0], wounds: ACCENT };
+const COLOR = { disease: SERIES[0], wounds: ACCENT };
 const YMAX = Math.ceil(END.disease / 2000) * 2000 + 1000;
 const afterShare = Math.round(((END.disease - AT_COMMISSION.disease) / END.disease) * 100);
 const ratio = (END.disease / END.wounds).toFixed(1);
@@ -90,13 +90,13 @@ export function render() {
         x: "i",
         y: "total",
         z: "cause",
-        stroke: (d) => COLOUR[d.cause],
+        stroke: (d) => COLOR[d.cause],
         strokeWidth: 2.2,
         clip: true,
       }),
       Plot.dot(
         series.map((s) => s.points.at(-1)),
-        { x: "i", y: "total", fill: (d) => COLOUR[d.cause], r: 4 },
+        { x: "i", y: "total", fill: (d) => COLOR[d.cause], r: 4 },
       ),
       Plot.text([series[0].points.at(-1)], {
         x: "i",

@@ -23,7 +23,7 @@ const HEADING = "text-[var(--ds-gray-900)] dark:text-white";
 // title toward the brand blue, and a gentle darkening of the description.
 const HOVER_TEXT =
   "transition-colors group-hover:text-[var(--ds-blue-700)] dark:group-hover:text-[var(--ds-blue-400)]";
-// The glyph both recolours and nudges to the right on hover, so the whole row
+// The glyph both recolors and nudges to the right on hover, so the whole row
 // feels responsive. `transition-[color,transform]` animates both at once.
 const HOVER_GLYPH =
   "transition-[color,translate] duration-200 group-hover:translate-x-0.5 group-hover:text-[var(--ds-blue-700)] dark:group-hover:text-[var(--ds-blue-400)]";

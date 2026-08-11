@@ -181,9 +181,9 @@ export interface SpinnerProps {
   duration?: number;
   /** Accessible label. */
   label?: string;
-  /** Override the brand-blue tint. Any CSS colour, e.g. `"#fff"`,
+  /** Override the brand-blue tint. Any CSS color, e.g. `"#fff"`,
    *  `"var(--ds-green-500)"`. The mark draws with `currentColor`, so this
-   *  sets the colour on the loader wrapper. */
+   *  sets the color on the loader wrapper. */
   color?: string;
 }
 
@@ -448,7 +448,7 @@ function DemoCard({
 
 export type GallerySection = "spinners" | "variants";
 
-/** Brand-palette colour variants. The mark draws with `currentColor`, so each
+/** Brand-palette color variants. The mark draws with `currentColor`, so each
  *  loader just takes a `color`. White needs a dark backdrop to be visible. */
 const COLOR_VARIANTS: {
   title: string;
