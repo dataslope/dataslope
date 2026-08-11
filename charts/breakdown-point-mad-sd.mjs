@@ -90,7 +90,7 @@ const doubling = Object.fromEntries(
   MEASURES.map((m) => [m.key, STEPS.find((s) => s[m.key] >= 2)?.share ?? null]),
 );
 
-export const caption = `A statistic's breakdown point is the fraction of the data somebody has to corrupt before they can move it wherever they like, and it is the cleanest single number for robustness. Watch these three as clean points are replaced by wild ones. The standard deviation moves on the very first, because it is a mean of squared deviations and a mean has a breakdown point of zero: one value taken to infinity takes the answer with it. It has doubled by ${(doubling.sd * 100).toFixed(0)}% corruption and stopped describing anything. The interquartile range holds until a quarter of the data is gone, because that is when the corruption reaches the upper quartile. The median absolute deviation holds until half is, which is the highest breakdown point anything can have: past half the corrupted points are the majority and no statistic can tell which half is the data. This matters because "check for outliers first" is not a substitute. Outlier detection means comparing points to a spread estimate, so a rule built on the standard deviation is already broken by the outliers it is hunting. The name for that is masking, and it is why robust estimates are used to *find* outliers rather than the other way round.`;
+export const caption = `Three spread estimates as clean points are replaced by wild ones. The standard deviation moves on the very first and has doubled by ${(doubling.sd * 100).toFixed(0)}% corruption; the interquartile range holds until a quarter of the data is gone, and the median absolute deviation until half is.`;
 
 export function render() {
   return plot({

@@ -71,7 +71,7 @@ const against = [...TRADE.filter((d) => d.year <= CROSS.year), CROSS];
 const inFavour = [CROSS, ...TRADE.filter((d) => d.year > CROSS.year)];
 const LAST = TRADE.at(-1);
 
-export const caption = `Redrawn from Playfair's plate in the *Commercial and Political Atlas*; the values are read from the engraving and rounded, so the shape is his and the last digit is not. The thing to notice is what the picture contains that no table of the same figures does. The *balance of trade* is not a column anywhere: it is the area between the two lines, and it only becomes a quantity you can see once someone draws them. Playfair shaded it and changed its color where the lines cross, in about ${Math.round(CROSS.year)}, so the reader has nothing to subtract. By ${LAST.year} exports ran at £${LAST.exports},000 against imports of £${LAST.imports},000. He spent most of his preface arguing that this was a legitimate way to know something, because to a reader in 1786 it was not obvious that it was.`;
+export const caption = `Redrawn from Playfair's plate in the *Commercial and Political Atlas*; the values are read from the engraving and rounded, so the shape is his and the last digit is not. By ${LAST.year} exports ran at £${LAST.exports},000 against imports of £${LAST.imports},000.`;
 
 export function render() {
   return plot({

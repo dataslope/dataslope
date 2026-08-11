@@ -287,6 +287,12 @@ while doing that means swinging past the values on either side. Straight
 segments claim linear interpolation, which is also a claim, and is the weakest
 one that still connects the dots.
 
+Where the axis has a hard floor this stops being subtle: smooth a count of
+errors that touches zero, or a percentage that touches 100, and the curve will
+draw negative errors and 104 per cent. If the process really is smooth and you
+want to say so, fit a model and draw it as its own line or band, so the chart
+shows two things and admits which is which.
+
 ## Your turn
 
 <ChallengeCard

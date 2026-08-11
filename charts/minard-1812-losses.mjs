@@ -130,7 +130,7 @@ const NEAREST = CITIES.reduce((a, b) =>
 
 const pct = (n) => Math.round((n / START) * 100);
 
-export const caption = `Minard's plate of 1869, with the map removed and the arithmetic kept. The band is the army and its thickness is how many men are left, so the reader never converts anything: ${START.toLocaleString()} crossed into Russia, ${AT_MOSCOW.toLocaleString()} reached Moscow, ${HOME.toLocaleString()} came back, which is ${pct(HOME)}% of ${pct(START)}%. Notice where the losses actually are. Over half the army was gone before Moscow, on a summer march with no battle to account for it, and the sharpest single drop on the way home is the stretch beside ${NEAREST.name}, where ${WORST.lost.toLocaleString()} men vanish between two of Minard's own readings. The temperature strip below is his, on the Réaumur scale he used, aligned to the same longitudes so that a step in the band and the weather under it can be read with one finger.`;
+export const caption = `Minard's plate of 1869 with the map taken away and the arithmetic kept: ${START.toLocaleString()} men crossed into Russia, ${AT_MOSCOW.toLocaleString()} reached Moscow, ${HOME.toLocaleString()} came back. The strip below is his own temperature record, on the Réaumur scale he used and aligned to the same longitudes.`;
 
 export function render() {
   return plot({

@@ -88,7 +88,7 @@ const bars = (p, values) =>
     .filter((b) => b.share > 0)
     .map((b) => ({ ...b, x1: p.px(b.from), x2: p.px(b.to), y: p.py(b.share) }));
 
-export const caption = `"More data" means two different things and only one of them is precision. Drawing *more samples* fills in the histogram: the shape smooths out, the bars stop being ragged, and the width does not move, because the width of a sampling distribution is the standard error and the standard error depends on the size of *one* sample, not on how many you took. Making *each sample bigger* narrows it, by the square root of the factor. Here ${BIG.n} is twenty times ${MANY.n}, so the theory says √20 ≈ ${THEORY} times tighter and the simulation gives ${NARROWER}. That distinction matters because only the second is available when it counts, and it is the expensive one. Once you have your data you can bootstrap yourself as many resamples as you like and the confidence interval will not shrink by a millimetre, because resampling cannot manufacture information the sample does not contain. Sampling error is a fact about n.`;
+export const caption = `Two sampling distributions of the mean from one population. ${BIG.n} is twenty times ${MANY.n}, so theory says √20 ≈ ${THEORY} times tighter and the simulation gives ${NARROWER}; drawing more samples changes the width not at all.`;
 
 export function render() {
   return plot({

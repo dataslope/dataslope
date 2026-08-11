@@ -86,7 +86,7 @@ const groupedX = (() => {
   });
 })();
 
-export const caption = `Twelve bars, and between the two rows exactly one thing changes: in the lower row the gap at a group boundary is wider than the gap inside a group. No borders, no background bands, no second color, no group name repeated over each cluster. The top row reads as a list of twelve and has to be told in prose that it is four regions of three teams; the bottom row reads as four groups of three and never notices being told. This is proximity, and it is the cheapest encoding on the shelf: it adds no ink, and it leaves color free to carry a second variable instead of being spent on grouping you could have got for nothing. The same principle governs the rest of a chart's furniture. A label nearer its axis than its title belongs to the axis. Distance is already saying something; the only question is whether it is saying what you meant.`;
+export const caption = `Twelve bars, and between the two rows exactly one thing changes: in the lower row the gap at a group boundary is wider than the gap inside a group. The top row reads as a list of twelve, the bottom as four groups of three.`;
 
 export function render() {
   return plot({

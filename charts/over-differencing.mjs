@@ -79,7 +79,7 @@ const rows = [
   D2.map((v, i) => ({ x: PANELS[2].px(i), y: PANELS[2].py(v) })),
 ];
 
-export const caption = `Differencing removes a trend, and one difference removes a linear one, which is what most series need. The temptation is to keep going while a stationarity test is still not quite significant, and a second difference on a series that needed one does something specific. Watch the variance: ${STAGES[0].var.toFixed(0)}, then ${BEST.var.toFixed(1)}, then ${WORST.var.toFixed(1)}. It falls while real structure is being removed and rises the moment noise is, because subtracting two draws of the same noise gives a quantity with twice the variance of one. The turn is the signal, and the rule is to difference until the variance stops falling and then stop. The second tell is at lag one. Over-differencing introduces a large negative correlation there, ${WORST.r1.toFixed(2)} against ${BEST.r1.toFixed(2)}, and it is not a property of the original process: it is the artefact of having subtracted each value from its neighbour twice. A model fitted to this will add a moving-average term to cancel the artefact, which is a parameter spent undoing self-inflicted damage. The cost is real, because the over-differenced series carries ${GROWTH} times the variance and every forecast interval built from it is wider by that much, and the extra width is not uncertainty about the world.`;
+export const caption = `A series differenced once and twice. The variance goes ${STAGES[0].var.toFixed(0)}, then ${BEST.var.toFixed(1)}, then ${WORST.var.toFixed(1)}, and the lag-1 correlation goes from ${BEST.r1.toFixed(2)} to ${WORST.r1.toFixed(2)}.`;
 
 export function render() {
   return plot({

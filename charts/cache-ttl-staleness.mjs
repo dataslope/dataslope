@@ -45,7 +45,7 @@ const CROSS = rows.reduce((best, r) =>
 
 const pct = (v) => `${(v * 100).toFixed(0)}%`;
 
-export const caption = `A key read about once a second and updated about every two minutes, with the cache set to hold it for the TTL on the horizontal axis. Lengthening the TTL saves database trips and gives writes longer to overtake the copy, so the two failures trade directly against each other. The best a single number can do is where they cross, at roughly ${CROSS.ttl.toFixed(0)} seconds, and it still leaves about ${pct(CROSS.miss)} of reads going to the database *and* about ${pct(CROSS.stale)} of them answered with something that is no longer true. That is the difficulty: not that the right TTL is hard to find, but that there is no TTL at which both numbers are small. Write-through pays at write time to move the stale curve down; the rates here are illustrative rather than measured.`;
+export const caption = `Cache misses and stale reads against the TTL, for a key read about once a second and updated about every two minutes. They cross at roughly ${CROSS.ttl.toFixed(0)} seconds, and even there about ${pct(CROSS.miss)} of reads still go to the database and about ${pct(CROSS.stale)} come back out of date.`;
 
 export function render() {
   return plot({

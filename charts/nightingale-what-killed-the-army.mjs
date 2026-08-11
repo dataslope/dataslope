@@ -47,7 +47,7 @@ const YMAX = Math.ceil(END.disease / 2000) * 2000 + 1000;
 const afterShare = Math.round(((END.disease - AT_COMMISSION.disease) / END.disease) * 100);
 const ratio = (END.disease / END.wounds).toFixed(1);
 
-export const caption = `The same table as the rose, adding up rather than averaging. Across the two years ${END.disease.toLocaleString()} men died of the diseases Nightingale called preventable and ${END.wounds.toLocaleString()} of wounds and injuries, a ratio of ${ratio} to one: the war was roughly a tenth as dangerous as the hospital treating it. The elbow matters as much as the gap. By ${MONTHS[COMMISSION_INDEX].label}, when the Sanitary Commission arrived, ${AT_COMMISSION.disease.toLocaleString()} of those deaths had already happened; only ${afterShare}% of the total came afterwards, over a period twice as long and with an army half again as large. The red curve, which is the fighting, carries on at the rate it always had.`;
+export const caption = `The same table as the rose, adding the deaths up rather than averaging them. Across the two years ${END.disease.toLocaleString()} men died of preventable disease and ${END.wounds.toLocaleString()} of wounds and injuries, a ratio of ${ratio} to one.`;
 
 export function render() {
   return plot({

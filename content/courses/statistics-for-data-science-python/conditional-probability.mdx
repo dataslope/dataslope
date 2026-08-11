@@ -165,7 +165,21 @@ the overall 15% rate. That gap is exactly the signal you'd act on. Notice
 the mechanic: pick your condition (the row), then compute the fraction
 *within that row*. We'll formalize this into a challenge shortly.
 
+There is a way to see that gap without computing anything, and it is worth
+knowing because it also shows you what independence looks like:
+
 <Chart slug="mosaic-independence" />
+
+Note that the columns in the left panel are very different widths, because 74%
+of that traffic is desktop, and the split is identical anyway, because group
+size has nothing to do with outcome. On the right the columns are exactly as
+wide and only the split heights differ, a gap of 23 points.
+
+The reason to prefer this over a stacked bar is that it shows both margins at
+once. A 100 per cent stacked bar normalises every column to full height, so it
+shows the conditional distribution and hides how many observations are behind
+each one. A mosaic shows the joint distribution, which is what a contingency
+table is, and the flat divider is a chi-squared test you can run with your eye.
 
 The same rule is what separates two sentences that sound identical and differ
 by four orders of magnitude:
@@ -176,10 +190,14 @@ Same test, same false-positive rate, opposite conclusion, entirely because of
 how the suspect came to be tested. The identical error runs through medical
 screening, fraud detection and every alerting system with a low base rate.
 
-A stacked bar normalises every column to full height, so it shows the
-conditional distribution and hides how many observations are behind each one.
-A mosaic shows the joint distribution, and the flat divider is a chi-squared
-test you can run with your eye.
+The true sentence is that the chance of this match if the defendant is
+innocent is one in ten thousand. The fallacy is reading it backwards, as the
+chance the defendant is innocent *given* the match, and those are different
+conditionals that Bayes's rule exists to separate. In the wide pool that rate
+produces about a hundred innocent matches alongside the one real one, so the
+evidence is genuinely strong, having moved the field from one in a million to
+one in 101, and it is nowhere near proof. What decides which it is is the
+prior, and the prior is the part the courtroom version drops.
 
 ## Bayes' rule: flipping the conditional
 

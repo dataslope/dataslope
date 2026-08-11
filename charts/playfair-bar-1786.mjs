@@ -58,7 +58,7 @@ const rows = PARTNERS.flatMap((d) => [
 const KIND_COLOR = { "Imports into Scotland": SERIES[1], "Exports from Scotland": PRIMARY };
 const TOP = PARTNERS.reduce((a, b) => (b.total > a.total ? b : a));
 
-export const caption = `Redrawn from the one plate in Playfair's *Atlas* that is not a time series; the values are read from the engraving and rounded, so the ranking is his and the last digit is not. He drew it this way because he had no choice: forty-three of his plates show eighty-one years of England's trade as lines, and for Scotland he had a single year, ${TOP.key} at £${TOP.total},000 of trade down to Jersey at £25,000, with nothing to plot against time. Turning the axis into a list of places was a workaround for missing data, and it produced the most-used chart type in the world. Playfair thought it the weakest page in the book and said so, because it showed no progress, which is what he believed a chart was for. Two of his choices are still the rules: the bars start at zero, and they are sorted by size rather than by name.`;
+export const caption = `Redrawn from the one plate in the *Atlas* that is not a time series: Scotland's trade with seventeen partners in a single year, led by ${TOP.key} at £${TOP.total},000.`;
 
 const KINDS = ["Imports into Scotland", "Exports from Scotland"];
 

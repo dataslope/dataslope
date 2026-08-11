@@ -45,7 +45,7 @@ const AREA = SHADED.slice(1).reduce(
   0,
 );
 
-export const caption = `The first thing that goes wrong with continuous distributions is the vertical axis. On a histogram of counts it means how many; on a probability mass function it means how likely; on a density it means neither. A density is probability *per unit of x*, so its height carries units of one-over-x and can be any positive number at all. This curve is a normal with a standard deviation of ${SD}, which packs the whole distribution into a narrow interval, and since all the probability still has to come to one, a narrow distribution has to be tall: this one peaks at ${PEAK.toFixed(2)}. Halve the standard deviation again and the peak doubles again. What a reader actually takes off the chart is the shaded region, because for a continuous variable probability is *area*, and the shading here covers ${AREA.toFixed(2)}. That also explains the fact everybody meets once: the probability of an exact value is zero, because a region of zero width has zero area, and asking for the probability that X is exactly ${MU} is asking for the area of a line. Continuous variables answer questions about intervals and nothing else. In practice: use a density's height only for comparing one region with another, never for reading a probability, and when you want a probability call the CDF twice and subtract.`;
+export const caption = `A normal density with a standard deviation of ${SD}, which packs the distribution into a narrow interval and so has to be tall: it peaks at ${PEAK.toFixed(2)}. What a reader takes off the chart is the shaded area, ${AREA.toFixed(2)}.`;
 
 export function render() {
   return plot({

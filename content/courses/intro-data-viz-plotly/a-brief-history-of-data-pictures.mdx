@@ -87,6 +87,12 @@ The *balance of trade* is not a column in any ledger. It is the area
 between two lines, and it only becomes something you can see once
 somebody draws them. That is the whole case for charts, made in 1786.
 
+He did not leave the subtraction to the reader either: the area is shaded, and
+its color changes at the crossover in about 1745, so the years England was
+losing money and the years it was making money are two different regions
+rather than one line above another. Most of his preface is spent arguing that this counts as
+knowing something, because in 1786 that was not obvious.
+
 The bar chart arrived by accident, on the one plate in the book that
 is not a time series. Playfair had eighty-one years of England's
 trade and drew lines; for Scotland he had a single year and nothing
@@ -97,9 +103,22 @@ instead:
 
 He thought it the weakest page in the *Atlas*, and said so, because
 it showed no *progress*. It is now the most-used chart type in the
-world. Fifteen years later he cut a circle into three:
+world.
+
+Two of the choices he made on that page are still the rules. The bars start at
+zero, so their lengths can be compared directly, and they are sorted by size
+rather than alphabetically, so the ranking is the first thing you see.
+
+Fifteen years later he cut a circle into three:
 
 <Chart slug="playfair-first-pie-1801" />
+
+He was not setting out to invent a chart type. In the *Statistical Breviary*
+every state is a circle whose area is its size, so two empires can be compared
+without reading a number, and the Turkish Empire needed cutting up only
+because it lay across three continents. Notice also that it works. Nearly
+every objection raised against pie charts since is really an objection to what
+happens past three or four slices, which is a different chart and a later page.
 
 ## Florence Nightingale: a chart that changed a war
 
@@ -142,6 +161,12 @@ second number on what the cleaning was worth:
 
 <Chart slug="nightingale-what-killed-the-army" />
 
+The elbow matters as much as the gap. By March 1855, when the Sanitary
+Commission arrived, 11,157 of those disease deaths had already happened; only
+23% of the total came afterwards, over a period twice as long and with an army
+half again as large. The red curve, which is the fighting, carries on at the
+rate it always had.
+
 The chart did its job. The British government created a Sanitary
 Commission, the hospitals were cleaned, and mortality plummeted. In
 1859, Nightingale became the **first woman elected a Fellow of the
@@ -163,6 +188,13 @@ Judge that for yourself. Here are the identical twenty-four numbers on
 a length scale, which is the comparison the eye actually makes well:
 
 <Chart slug="nightingale-bars-1858" />
+
+The change of encoding buys two more things. The peak is now its true height:
+area is proportional to the rate, so a rose's radius is a square root, and the
+worst month reached only about six times as far from the center as an ordinary
+one while being thirty-four times as deadly. And bars sum, so the top of each
+one is the total death rate, which overlapping wedges sharing a vertex can
+never show.
 
 Notice what the rose could not have shown you, whatever its colors: a
 circle has no beginning, so it cannot put the Sanitary Commission
@@ -217,6 +249,11 @@ the point. What makes it work is that almost every variable is carried by
 something that was going on the page anyway.
 
 <Chart slug="minard-1812-losses" />
+
+Look at where the losses actually are. Over half the army was gone before
+Moscow, on a summer march with no battle to account for it, and the sharpest
+single drop on the way home is the stretch beside Smolensk, where 32,000 men
+vanish between two of Minard's own readings.
 
 Position is where the army was. Thickness is how many men were left.
 Color is which direction they were walking. Nothing is a legend entry;

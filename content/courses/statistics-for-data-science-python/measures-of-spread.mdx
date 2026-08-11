@@ -314,7 +314,18 @@ print(f"Std dev for comparison  : {data.std(ddof=1):.1f}  <- outlier-driven")
   ]}
 />
 
+A statistic's **breakdown point** is the fraction of the data somebody has to
+corrupt before they can move it wherever they like, and it is the cleanest
+single number for robustness.
+
 <Chart slug="breakdown-point-mad-sd" />
+
+Those three thresholds are not arbitrary. A mean has a breakdown point of
+zero, because one value taken to infinity takes the answer with it, and the
+standard deviation is a mean of squared deviations. A quarter is where
+corruption reaches the upper quartile. And a half is the highest breakdown
+point anything can have, because past half the corrupted points are the
+majority and no statistic can tell which half is the data.
 
 That is also why "check for outliers first" is not a substitute. Outlier
 detection means comparing points to a spread estimate, so a rule built on the
@@ -383,12 +394,24 @@ near zero or the data can go negative, like temperatures in Celsius.)
 Comparing standard deviations across different price levels is meaningless; the CV is the fix.`}
 />
 
+Here is the comparison drawn, with the standard deviations and the ratios side
+by side:
+
 <Chart slug="coefficient-of-variation" />
 
 Three conditions have to hold before that number means anything, and all three
 are about the mean: a ratio scale with a real zero, a mean far from zero, and
 positive values. Where they hold, the CV is the right way to compare
 variability across quantities that share no units at all.
+
+A standard deviation carries the units of the thing it measures, so comparing
+two of them across different scales is comparing a length in millimetres with
+a length in miles by counting digits. The coefficient of variation is
+dimensionless, which is exactly what a cross-scale comparison needs. The
+caveats bite where the mean gets small: a variable without a real zero changes
+its CV when you change units, which is how you know the number was never a
+property of the thing, and a quantity averaging 0.02 with a spread of 0.05 has
+a CV of 2.5, which is arithmetic rather than information.
 
 ## Putting it together: a spread summary
 

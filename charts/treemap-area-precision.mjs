@@ -140,7 +140,7 @@ const barRows = VALUES.map((d, i) => ({
   y: BARS.py(d.v),
 }));
 
-export const caption = `Try to rank ${MIDDLE.map((d) => d.key).join(", ")} in the treemap. They differ by ${SPREAD}% end to end, which is not subtle, and it is close to impossible, because the four rectangles have four different aspect ratios and comparing a tall thin box with a short wide one is a judgement the eye has no procedure for. Two equal areas look unequal whenever their shapes differ, and which way the error goes depends on which way each is stretched. On the bars every value starts from the same line and differs in one direction, which is the top of the measured accuracy ranking, and the ordering takes no effort. That does not make treemaps useless. They do two things bars cannot: they fit several hundred categories into the space a bar chart gives to twenty, and they show hierarchy, nesting children inside their parent, which a flat bar chart has no way to draw. Given three hundred products in nine families, a treemap answers "which family dominates, and is one product carrying it" and a bar chart does not fit on the page. So use a treemap for structure and scale, where the answer is one or two obviously large boxes, and not when the question is a ranking of similar values, because that is exactly the comparison its geometry cannot support.`;
+export const caption = `Eight values as a treemap and as bars. Try to rank ${MIDDLE.map((d) => d.key).join(", ")} in the treemap: they differ by ${SPREAD}% end to end, which is not subtle, and it is close to impossible.`;
 
 export function render() {
   return plot({

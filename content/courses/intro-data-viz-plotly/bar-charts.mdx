@@ -49,10 +49,21 @@ the comparison and drops four fifths of the ink, and because a dot encodes
 position rather than length, the axis is then free to be cropped to where the
 data actually is.
 
+What the cropped version gives up is absolute size. A dot at 91% on an axis
+running from 65 to 95 no longer shows you that 91% is most of the way to
+everything, so this is the wrong swap when "how big" is the question rather
+than "which, and by how much".
+
 There is also a case where the standard advice, "sort by value", is the wrong
 move:
 
 <Chart slug="sorted-vs-natural-order" />
+
+Sorting by value is the right default, because an arbitrary order wastes
+position, which is the strongest thing a chart has. It stops being right the
+moment the categories already carry an order of their own: shirt sizes, age
+brackets, school years, months, and any scale running from "strongly disagree"
+to "strongly agree".
 
 The test is one question. If two neighbouring categories swapped places, would
 anything be wrong? If yes, the order is data and sorting deletes it.
@@ -67,6 +78,11 @@ instead. When bars fall into groups, the spacing can say so on its own:
 No borders, no background bands, no second color, no group name over each
 cluster. Two spacings. That leaves color free to carry a second variable
 rather than being spent on grouping you could have had for nothing.
+
+Proximity is the cheapest encoding on the shelf, because it adds no ink at
+all, and the same principle governs the rest of a chart's furniture: a label
+nearer its axis than its title belongs to the axis. Distance is already saying
+something. The only question is whether it is saying what you meant.
 
 <CodeBlock
   adapter="python"
@@ -291,9 +307,26 @@ the tell. The fix is not to normalise, which would make the arithmetic *look*
 right while making every number wrong; it is to draw plain bars from a common
 zero.
 
+The axis is the tell, but the eye has done the wrong thing before it gets
+there, because a stack is read as a *composition*: each segment looks like a
+share of the bar, so SQL at 41% of respondents renders as about 22% of the
+total length. The segments are not comparable to each other either. Their
+lengths are right, but drawn end to end each one starts wherever the last
+finished, so equal adoption reads as unequal because only the first segment
+has a baseline.
+
 The second is what normalising to 100% throws away:
 
 <Chart slug="percent-of-what" />
+
+The Government bar has the most dramatic mix on the chart, and that is not a
+finding. At n = 30 the sampling noise on a share is around 9 percentage
+points, so a bar that looks like a different population is roughly what you
+would expect even if every group were identical. Width is one of the two
+standard fixes, and it has a second virtue: the area of each color is now the
+actual count, so the eye adds up instead of averaging five percentages as
+though they weighed the same. The other fix is to print n under each bar and
+let the reader discount the small ones.
 
 Per cent, per capita, per thousand and index-to-100 all discard the
 denominator, and a chart that has discarded its denominator cannot tell you
@@ -312,9 +345,19 @@ And here is that crop, drawn:
 
 
 The rule has an edge worth knowing, because "always start at zero" is often
-repeated as though it applied to every chart. It does not:
+repeated as though it applied to every chart. It does not, and nothing about
+the axis differs between these two panels. The mark does:
 
 <Chart slug="zero-baseline-bars-not-lines" />
+
+A bar says its value with a *length* measured up from the baseline, and that
+is all a bar is, so moving the baseline to 92 means every length is the value
+minus 92 and a reader comparing two bars is comparing two differences while
+believing they are comparing two values. A line says its value with a
+*position*, and invites you to compare it with the next position along, which
+is a slope. A truncated axis exaggerates that slope, which is worth watching,
+but it hands nobody a wrong ratio, because nothing in a line chart is measured
+from the bottom of the frame.
 
 Zero is mandatory when the mark's *length* is the value, and optional when it
 is not. Bars, columns and areas: zero. Lines, dots and slopes: whatever range
@@ -324,14 +367,22 @@ shows the variation, labelled honestly.
   relative to *zero*. Cutting the axis (so bars start at 90
   instead of 0) inflates small differences and is a classic
   misleading-chart move.
-One more, specific to waterfalls, which are bars with a running total:
+
+One more, specific to waterfalls. A waterfall is a bridge from one total to
+another: each bar begins where the last ended, and its direction says whether
+the term added or took away. Direction is half the encoding, which is what
+makes this failure possible.
 
 <Chart slug="waterfall-sign-direction" />
 
 Most misleading charts are wrong about emphasis, and a careful reader can
 recover the truth from them. This one is wrong about *arithmetic*: the closing
-figure is printed on the chart and it is not the right figure. Add the terms up
-yourself and check where you land.
+figure is printed on the chart and it is not the right figure.
+
+An `abs()` somewhere in the pipeline will do it, and so will a costs column
+that arrives positive because that is how the ledger stores it. The check
+takes five seconds: add the terms up yourself and see whether you land where
+the last bar says.
 
 - **Sorting alphabetically when value order would be clearer.**
 - **Using a 3-D bar chart.** Just don't.

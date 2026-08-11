@@ -73,7 +73,7 @@ const SD_1960 = sd(rows.map((d) => d.y1960));
 const SD_2010 = sd(rows.map((d) => d.y2010));
 const BIGGEST = rows.reduce((a, b) => (b.gain > a.gain ? b : a));
 
-export const caption = `The Gapminder bubbles are remembered for the motion, and the motion does real work: it holds a country's identity fixed while time changes, so you watch it move instead of comparing two pictures. It also makes the claim hard to check, because you cannot look at 1960 and 2010 at the same moment. Here both ends sit on one line, so the length of a bar is the gain and the rows are sorted by where each country started. If the world really were permanently split into two kinds of country, the bars would be roughly equal and the order at the right would match the order at the left. Neither holds. The longest bars are at the bottom, where the worst starting points were, and ${BIGGEST.name} alone gains ${BIGGEST.gain} years. The spread across these countries falls from about ${SD_1960.toFixed(0)} years to ${SD_2010.toFixed(0)}. The exceptions are visible without being pointed at, which is the test of an honest chart: ${stalled.map((d) => d.name).join(" and ")} barely move, for reasons (an HIV epidemic, a post-Soviet collapse in male life expectancy) that are the subject of their own charts.`;
+export const caption = `Both ends of the Gapminder story on one line: each bar runs from a country's 1960 life expectancy to its 2010 one, sorted by where it started. ${BIGGEST.name} alone gains ${BIGGEST.gain} years, and the spread falls from about ${SD_1960.toFixed(0)} years to ${SD_2010.toFixed(0)}.`;
 
 export function render() {
   return plot({

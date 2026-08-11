@@ -2,18 +2,18 @@
  * Fumadocs's `<Callout>`, with backticks in its `title` rendered as code.
  *
  * A callout is authored as `<Callout title="`gets()` is so dangerous…">`, and
- * `title` is a JSX *attribute*, which markdown never sees. `withInlineCode`
+ * `title` is a JSX *attribute*, which markdown never sees. `withInlineMarkup`
  * (shared with `<Figure>` and `<Chart>` captions, which have the same problem)
- * is what turns those backticks into code chips; see that module for why it
- * understands code spans and nothing else.
+ * is what turns those backticks into code chips, and what renders `*this*`
+ * as emphasis; see that module for the rules it applies and why.
  */
 import type { ComponentProps } from "react";
 import { Callout } from "fumadocs-ui/components/callout";
-import { withInlineCode } from "./inlineCode";
+import { withInlineMarkup } from "./inlineMarkup";
 
 export function CalloutWithCodeTitle({
   title,
   ...props
 }: ComponentProps<typeof Callout>) {
-  return <Callout title={withInlineCode(title)} {...props} />;
+  return <Callout title={withInlineMarkup(title)} {...props} />;
 }

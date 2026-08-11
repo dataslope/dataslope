@@ -215,11 +215,23 @@ concentration is a *level*, so summing twelve monthly readings would be
 meaningless.)
 </Callout>
 
+There are exactly two kinds of quantity here, and they take different
+aggregations. A flow is measured *over* an interval: orders, rainfall,
+kilowatt-hours, revenue. A stock is measured *at* an instant: inventory,
+balance, headcount, temperature.
+
 <Chart slug="resample-sum-or-mean" />
 
 The rule that covers nearly everything: if the units contain "per", it is a
 flow and you sum; if you could measure it with a snapshot, it is a stock and
 you do not.
+
+Flows add across time, so the month is the sum of the days, and taking a mean
+answers a duller question while making a 28-day month incomparable with a
+31-day one for reasons that have nothing to do with the business. Stocks do
+not add, and a month's value for one is a mean, a last or a max depending on
+what the month is meant to stand for. The mistake survives because both
+operations succeed and both return a plausible series.
 
 ## Upsampling: stretching onto a finer grid
 

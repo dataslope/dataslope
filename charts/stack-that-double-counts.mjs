@@ -81,7 +81,7 @@ const bars = TOOLS.map((d, i) => ({
 const STACK_X = (STACK.left + STACK.right) / 2;
 const STACK_W = (STACK.right - STACK.left) * 0.34;
 
-export const caption = `Stacking segments is a claim about arithmetic, and it is two claims at once: that the parts are mutually exclusive, so nothing is counted twice, and that they are exhaustive, so the bar's length is the whole. Both hold for "how did you get to work today". Neither holds for "which of these do you use", where one respondent ticks four boxes and lands in four segments. The tell is on the axis, which runs to ${TOTAL}%, but the eye has already done the wrong thing by then, because a stack is read as a composition: each segment looks like a share of the bar. ${SECOND.key}, used by ${SECOND.pct}% of respondents, renders as about ${MISREAD}% of the total length. The segments are not comparable to each other either. Their lengths are right, but drawn end to end each one starts from wherever the last finished, so equal adoption reads as unequal because only the first segment has a baseline. The fix is not to normalise: scaling this to 100% would make the arithmetic look correct while making every number wrong. Draw the answers as bars from a common zero, label each with the per cent of *respondents* who picked it, and state that the total exceeds 100 because people picked ${AVG_PICKS} answers each on average.`;
+export const caption = `One multi-select survey question drawn as a stacked bar, whose segments sum to ${TOTAL}%, and as separate bars from a common zero.`;
 
 export function render() {
   return plot({

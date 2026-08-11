@@ -52,7 +52,7 @@ const STEPS = [
 const PANELS = STEPS.map((_, k) => panel(k, { x: [0, N - 1], y: [16, 74] }));
 const BEST = 1;
 
-export const caption = `Five copies of one line chart. The data, the axis, the colors and the range are identical in all five; the only thing that changes is how dark the horizontal rules are. Read left to right and watch where your own answer changes. With no grid you can see the shape and cannot put a number on any point without walking your eye to the axis and losing your place. One step in, the rules are there and you do not notice them, which is where a grid belongs: it is a measuring aid, so it should be exactly as visible as the measuring needs and no more. By the fourth panel the grid is as dark as the data and the chart has two subjects. By the fifth the series is something drawn on graph paper. The template this course uses sits at about the second panel, which is why its charts look empty at first and stop looking empty about a week later.`;
+export const caption = `Five copies of one line chart, identical but for how dark the horizontal rules are. Read left to right and watch where your own answer changes.`;
 
 export function render() {
   return plot({

@@ -67,7 +67,7 @@ const band = CHECKPOINTS.map((n) => ({
 const TEN_K = 10_000;
 const ONE_M = 1_000_000;
 
-export const caption = `Each trace is one run of the code below, replotted as it goes: four times the fraction of random points that land inside the quarter disk. The band is ±1.96 standard errors, and because the estimator is a proportion that error is 4·√(p(1−p)/N), and it shrinks as √N and nothing else. At ${TEN_K.toLocaleString()} points that is about ±${(1.96 * SE(TEN_K)).toFixed(3)}; at ${ONE_M.toLocaleString()}, a hundred times as many, it is about ±${(1.96 * SE(ONE_M)).toFixed(3)}, ten times better for a hundred times the work. Buying one more decimal place costs a hundredfold again, which is the whole economics of Monte Carlo: easy to write, easy to get two digits from, expensive to get six.`;
+export const caption = `Three runs of the estimator, replotted as they go, inside a ±1.96 standard-error band. At ${TEN_K.toLocaleString()} points the band is about ±${(1.96 * SE(TEN_K)).toFixed(3)}; at ${ONE_M.toLocaleString()}, a hundred times as many, it is about ±${(1.96 * SE(ONE_M)).toFixed(3)}.`;
 
 export function render() {
   return plot({

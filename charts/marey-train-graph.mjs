@@ -174,7 +174,7 @@ const NEAREST = STATIONS.reduce((a, b) =>
 const EXPRESS_HOURS = TRAINS[0].arrive - 19;
 const OMNIBUS_HOURS = TRAINS[1].arrive - 18.33;
 
-export const caption = `Marey published this form in 1878, crediting the engineer Charles Ibry, and railways still plan track with it. Time runs across, distance from Paris runs down, one line per train, and every property of the line is a fact you would otherwise have to compute. Slope is speed: the express covers the ${END} km in ${EXPRESS_HOURS.toFixed(1)} hours and the all-stations train takes ${OMNIBUS_HOURS.toFixed(1)}, which is visible before you read either number. A flat segment is a train standing at a platform. A crossing is two trains in the same place at the same time, so the up and down expresses pass near ${NEAREST.name} at about ${clock(MEETING.t)}, a fact no printed timetable states anywhere. The vertical gap between two lines running the same way is how much track is between them, which is the quantity the whole signalling system exists to keep above zero.`;
+export const caption = `Time runs across, distance from Paris runs down, one line per train. Slope is speed, so the express covers the ${END} km in ${EXPRESS_HOURS.toFixed(1)} hours against the all-stations train's ${OMNIBUS_HOURS.toFixed(1)}, visible before you read either number.`;
 
 export function render() {
   return plot({

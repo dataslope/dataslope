@@ -71,7 +71,7 @@ const Q_P = cdf(Q_X);
 const P_TARGET = 0.9;
 const P_X = ppf(P_TARGET);
 
-export const caption = `Two questions come up constantly and people reach for different functions without noticing they are one object. "What fraction of values fall below ${Q_X}?" is the CDF: go up from the value, across to the probability, and the answer here is ${(Q_P * 100).toFixed(0)}%. "What value has ${P_TARGET * 100}% below it?" is the PPF, the quantile function or inverse CDF: go across from the probability, down to the value, which is ${P_X.toFixed(0)}. The right panel is the left one reflected about the diagonal, which is what an inverse function is geometrically, and drawing it that way is the quickest route to never confusing cdf with ppf again. Two details fall out of the reflection. The PPF gets steep at the ends, so near a probability of 0.99 a small change in p moves the value a long way, which is the same fact as the CDF being flat out there, and it is why extreme quantiles are hard to estimate: the data is sparse exactly where the function is most sensitive. And for a discrete distribution the CDF is a staircase and has no true inverse, so every library uses the convention "the smallest value whose CDF is at least p", which makes ppf(cdf(x)) return x while cdf(ppf(p)) usually overshoots p. That asymmetry is behind most off-by-one confusion with binomial and Poisson quantiles.`;
+export const caption = `Two questions that turn out to be one object. "What fraction of values fall below ${Q_X}?" is the CDF, and the answer is ${P_X.toFixed(0)}%; "what value has ${P_TARGET * 100}% below it?" is the PPF, and the answer is ${(Q_P * 100).toFixed(0)}. The right panel is the left one reflected about the diagonal.`;
 
 export function render() {
   return plot({

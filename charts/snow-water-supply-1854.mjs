@@ -63,7 +63,7 @@ const best = rows.at(-1);
 const RATIO = Math.round(worst.rate / best.rate);
 const MAX = Math.max(...rows.map((d) => d.rate));
 
-export const caption = `The Broad Street map is the famous picture, but it is not what settled the argument: a ring of deaths around a pump is equally what you would see if the cause were in the air over that block, which is exactly what Snow's opponents believed. This table is the proof. Two companies had been selling water house by house into the same south London streets for years, in no pattern anyone designed, and in 1852 one of them moved its intake upstream of the city's sewage. Snow went door to door asking who supplied each house. Same neighbourhoods, same trades, same rents, one difference: ${RATIO} times the death rate. It is a randomised experiment that nobody ran, and it is still the reason this story is taught.`;
+export const caption = `Cholera deaths per 10,000 houses over the first seven weeks of the 1854 epidemic, by which company piped the water in. Same streets, same trades, same rents, ${RATIO} times the death rate.`;
 
 export function render() {
   return plot({

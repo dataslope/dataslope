@@ -54,7 +54,7 @@ const COMMISSION = MONTHS[COMMISSION_INDEX];
 const LAST = MONTHS.at(-1);
 const ratio = Math.round(PEAK.disease / (PEAK.wounds || 1));
 
-export const caption = `The same table as the rose above, encoded as length instead of area. Three things arrive with the change. The peak is now its real size: ${Math.round(PEAK.disease).toLocaleString()} per 1,000 per year in ${PEAK.label}, about ${ratio} times the wounds rate in the same month, where the rose could only show it reaching about six times as far. The bars sum, so the top of each one is the total death rate, which overlapping wedges sharing a vertex can never show. And a circle has no beginning, so only a time axis can put the Sanitary Commission's arrival in ${COMMISSION.label} where it belongs: everything to the right of that rule is the argument the chart was made to win. By ${LAST.label} the disease rate was ${LAST.disease.toFixed(1)}.`;
+export const caption = `The identical twenty-four numbers on a length scale. The ${PEAK.label} peak reaches its real size, ${Math.round(PEAK.disease).toLocaleString()} per 1,000 per year and about ${ratio} times the wounds rate in the same month, and by ${LAST.label} the disease rate is ${LAST.disease.toFixed(1)}.`;
 
 export function render() {
   return plot({

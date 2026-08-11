@@ -69,7 +69,7 @@ const HEAVY = CURVES[1];
 const NORMAL = CURVES[0];
 const RATIO = Math.round(HEAVY.mass / NORMAL.mass);
 
-export const caption = `Mean and standard deviation pin a normal distribution down completely, and for anything else they leave the part that matters unspecified. All three of these have a mean of zero and a standard deviation of one. The heavy-tailed one is *narrower* in the middle and much fatter at the edges: more values very close to the mean, more very far from it, fewer in between. The uniform has no tail past its edges at all. The number separating them is kurtosis, the fourth standardised moment, and it is worth knowing what it is not: it is not peakedness, despite decades of textbooks. It is dominated by the fourth power of the distance from the mean, so it is almost entirely a statement about how much probability lives far out. The stake is at the right of the chart. Under a normal, a value beyond three standard deviations happens about once in ${Math.round(1 / NORMAL.mass)}; under this t it happens about ${RATIO} times as often. Every rule built on three sigma is quietly assuming a shape, and finance, insurance, network traffic and queueing all live in distributions that do not have it.`;
+export const caption = `Three distributions with a mean of zero and a standard deviation of one. Beyond three standard deviations a normal lands about once in ${Math.round(1 / NORMAL.mass)}; this t does it about ${RATIO} times as often.`;
 
 export function render() {
   return plot({

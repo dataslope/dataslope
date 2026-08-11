@@ -69,7 +69,7 @@ const MAX = Math.max(...DEPOTS.map((d) => d.rate));
 /** How much of a bar is the stretch every category shares. */
 const SHARED = Math.round((MIN / MAX) * 100);
 
-export const caption = `Twenty depots, all between ${MIN}% and ${MAX}%, which is what a great deal of real data looks like. Drawn as bars from zero, about ${SHARED}% of every bar is the part every depot has in common, so the chart is mostly one rectangle with a ragged right edge and the ragged edge is the data. The right panel puts a dot where each bar ended. Nothing moved: same axis, same positions, same comparison, four fifths less ink. It is a swap rather than a downgrade because of what each mark encodes. A bar means length, so it owes you a zero and you pay for the zero in space. A dot means position, so it owes you nothing, and the honest next step once the ink is gone is to crop the axis to the range the data actually occupies and let the differences fill the frame. A bar chart cannot take that step without lying. What a cropped dot plot gives up is absolute size, so it is the wrong chart when "how big" is the question rather than "which and by how much".`;
+export const caption = `Twenty depots, all between ${MIN}% and ${MAX}%. Drawn as bars from zero, about ${SHARED}% of every bar is the stretch all twenty have in common; the right panel puts a dot where each bar ended and moves nothing else.`;
 
 export function render() {
   return plot({

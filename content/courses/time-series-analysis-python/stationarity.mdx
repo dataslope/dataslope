@@ -372,6 +372,11 @@ different reasons, which means the verdict alone can't tell you what to do
 next. Differencing once fixes the random walk and leaves the seasonal series
 seasonal.
 
+Those p-values are simulated rather than looked up: four thousand random walks
+of the same length were generated and the same statistic computed on each, so
+each number is the share of pure random walks that looked at least this
+mean-reverting.
+
 ```mermaid
 flowchart TD
     A["Raw series"] --> B{"Constant mean,<br/>variance, and<br/>autocorrelation?"}

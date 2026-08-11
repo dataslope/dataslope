@@ -112,7 +112,7 @@ const RANK_COLOR = { high: PRIMARY, middling: MUTED, low: MUTED, "not tested": M
 const quantitative = VARIABLES.filter((d) => d.Quantitative).map((d) => d.name);
 const unordered = VARIABLES.filter((d) => !d.Ordered).map((d) => d.name);
 
-export const caption = `Bertin asked four questions of every visual variable, and none of them is about taste. *Selective*: can the eye grab all the marks of one value at once, without scanning? *Associative*: can the variable be ignored, so groups defined some other way still read as groups across it? *Ordered*: does a reader know which value means more without being told? *Quantitative*: can they say how much more? Read down the last of those columns. Exactly one variable, ${quantitative.join(" and ").toLowerCase()}, answers yes, and ${unordered.length} of the six carry no order at all, which is the whole reason a rainbow scale on a continuous quantity is a mistake rather than a preference. The fifth column is not his: it is roughly where Cleveland and McGill's 1984 experiments, which measured how accurately people actually read each encoding, came out. They largely agree with a man who worked it out at a drawing board in 1967, and where they differ it is about orientation, which he rated more generously than the laboratory did.`;
+export const caption = `Bertin's four questions asked of six visual variables, with a fifth column that is not his: roughly where Cleveland and McGill's 1984 experiments on reading accuracy came out. Only ${quantitative.join(" and ").toLowerCase()} lets a reader say how much more, and ${unordered.length} of the six carry no order at all.`;
 
 export function render() {
   return plot({

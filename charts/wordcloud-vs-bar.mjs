@@ -123,7 +123,7 @@ const bars = WORDS.map((d, i) => ({
   y: BARS.py(d.n),
 }));
 
-export const caption = `The cloud is not bad because it is popular. It is bad because of what it does with the encoding it picked. Frequency is mapped to font size, which the eye reads as area, and area is a weak channel to start with. Then the layout assigns two more visual properties at random, position and rotation, and both look like encodings to anybody who has not been told otherwise: a word near the middle reads as important, a word turned sideways reads as deliberate, and neither is. Font size is worse than a plain area encoding too, because a word's ink goes as size squared *and* as its letter count, so at nearly the same frequency "${LENGTH_PAIR.long.word}" (${LENGTH_PAIR.long.n}) covers far more canvas than "${LENGTH_PAIR.short.word}" (${LENGTH_PAIR.short.n}) and the cloud is partly a chart of word length. The bars are the same twenty numbers, sorted, from one baseline, and they answer which is commonest, by how much, and where the tail begins. One thing the cloud does better is worth admitting: it is inviting, people look at it, and no bar chart of twenty tokens has ever been put on a poster. Use it as an illustration and put the bars beside it when somebody has to decide something.`;
+export const caption = `The same twenty counts as a cloud and as bars. Frequency is mapped to font size, which the eye reads as area, and "${LENGTH_PAIR.long.word}" at ${LENGTH_PAIR.long.n} covers far more canvas than "${LENGTH_PAIR.short.word}" at ${LENGTH_PAIR.short.n}, so the cloud is partly a chart of word length.`;
 
 export function render() {
   return plot({

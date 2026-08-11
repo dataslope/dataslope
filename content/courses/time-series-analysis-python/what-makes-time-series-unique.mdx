@@ -385,6 +385,12 @@ Every summary a pipeline computes agrees that nothing happened, because
 nothing did happen to any of them. The information was in the order, and
 `train_test_split` and `KFold` both remove it by default, without a warning.
 
+Two places this arrives as a default rather than a decision: `train_test_split`
+shuffles unless you pass `shuffle=False`, and `KFold` shuffles unless you
+reach for `TimeSeriesSplit`. Both produce a model that scores well and cannot
+forecast, because the score was earned on interpolating a hole rather than on
+extending the end.
+
 ## Real-world stakes
 
 This isn't academic. Treating temporal data as an unordered table, or
@@ -505,6 +511,10 @@ future was knowable at all. Run the same model against the same baseline on a
 series whose level holds still and the same code posts a much larger number,
 without either model having improved. Report the pair, not the single
 figure, and you have said something a reader can check.
+
+The seasonal-naive baseline is not a straw man. It has no parameters, nothing
+to fit and nothing to overfit, and on a series with a strong weekly or yearly
+cycle a startling number of production models never beat it.
 
 ## Practice
 

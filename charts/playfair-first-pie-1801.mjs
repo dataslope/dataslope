@@ -69,7 +69,7 @@ const labels = SLICES.map((s) => ({
 const pct = (v) => `${Math.round(v * 100)}%`;
 const BIGGEST = SLICES.reduce((a, b) => (b.share > a.share ? b : a));
 
-export const caption = `The first pie chart in print, redrawn with Playfair's own figures for the extent of the Turkish dominions. He was not inventing a chart type: in the *Statistical Breviary* every state is a circle whose area is its size, so that two empires can be compared without reading a number, and the Turkish Empire needed cutting up because it lay across three continents. Notice that this works. Three slices, one at ${pct(BIGGEST.share)} that is plainly the largest, and two the eye can rank without help. Every objection raised against pie charts since is really an objection to what happens past three or four slices, which is a different chart and a later page.`;
+export const caption = `The first pie chart in print, redrawn with Playfair's own figures for the extent of the Turkish dominions. Three slices, one at ${pct(BIGGEST.share)} that is plainly the largest, and two the eye can rank without help.`;
 
 export function render() {
   return plot({

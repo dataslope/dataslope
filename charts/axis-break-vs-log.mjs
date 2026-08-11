@@ -90,7 +90,7 @@ const rows = [
   ...bars(LOG, LOG.py),
 ].map((d) => ({ ...d, big: d.key === BIG.key }));
 
-export const caption = `The same thirteen numbers three times, and the awkward dataset behind them is the most ordinary one there is: one endpoint carries ${RATIO} times the traffic of the next. Drawn linearly, the other twelve are hairlines, which is not dishonest so much as useless. Drawn on a log axis every value is legible, and the axis label is doing real work, because a reader who misses it will read the ratios wrong. The middle panel is the one to watch. Somebody cut the axis at ${BREAK} and squeezed everything above the cut into the top third, and nothing on the chart says so. It looks like the first panel and reads like the third. Note that a broken axis is not the villain here: with a visible break marker it is a respectable old device. The problem is that the break is invisible unless you draw it, and a reader who does not spot it compares bars by length, which is exactly what bars are for.`;
+export const caption = `The same thirteen numbers three times: drawn linearly, cut at ${BREAK} with nothing to say so, and on a log axis. One endpoint carries ${RATIO} times the traffic of the next.`;
 
 export function render() {
   return plot({

@@ -93,7 +93,7 @@ const slopeRows = LINES.flatMap((d) => [
   { key: d.key, x: SLOPE_RIGHT, y: SLOPE.py(d.after), moved: moved(d) },
 ]);
 
-export const caption = `Two measurements per category is the most ordinary comparison there is, and paired bars are the default drawing for it. They are fine at what they do: read the left panel and you can say how big each value is. Now ask the question people actually have, which is who overtook whom. On the bars that is eight separate comparisons held in memory one at a time. On the slopegraph it is a crossing: ${CROSSINGS} pairs swapped order and ${MOVERS.length} lines moved three ranks or more. ${CLIMBER.key} climbed ${R0[CLIMBER.key] - R1[CLIMBER.key]} places, which you can see without reading either number. The general rule is worth more than the example: a chart's job is to turn the reader's question into a shape. Rank change is a crossing, convergence is a narrowing, a runaway is a line leaving the bundle. What the slopegraph gives up is the zero baseline, so absolute size is harder to read, and both ends have to be labelled or nobody knows which is which.`;
+export const caption = `Two measurements per category, drawn as paired bars and as a slopegraph. On the slopegraph ${CROSSINGS} pairs swapped order and ${CLIMBER.key} climbed ${R0[CLIMBER.key] - R1[CLIMBER.key]} places, neither of which needs a number read off an axis.`;
 
 export function render() {
   return plot({

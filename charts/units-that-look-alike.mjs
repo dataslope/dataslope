@@ -56,7 +56,7 @@ const bars = (p, field) =>
 const SHARE_TOTAL = REGIONS.reduce((s, d) => s + d.share, 0);
 const CLASH = REGIONS.find((d) => d.change === 20);
 
-export const caption = `Both axes say per cent and both have a tick at 20, and the two twenties are different animals. On the left, 20 means a fifth of the total, and the five bars add to ${SHARE_TOTAL}. On the right, 20 means twenty percentage *points* of change, which could be a move from 4 to 24 or from 60 to 80, and adds up to nothing in particular. The confusion is common enough to have its own entry in journalism style guides: a drug that takes a risk from 2% to 3% has raised it by one percentage point and by fifty per cent, both figures correct, and the symbol is the same either way. A chart is a worse place for this than a sentence, because a sentence can write "percentage points" and an axis label usually will not, so a reader comparing ${CLASH.key} on the left with ${CLASH.key} on the right sees an 8 and a 20 and draws the wrong conclusion about which is bigger. Three habits fix it. Write pp instead of % on any axis of differences. Give a change axis a visible zero, which a share axis rarely needs, because zero is the reference for a difference and not for a proportion. And let a change axis run negative when the data can, which is the clearest single signal that a reader is looking at a difference.`;
+export const caption = `Two panels of five regions, both with axes labelled in per cent. The first is each region's share of revenue, adding to ${SHARE_TOTAL}; the second is its change in share in percentage points, which can be negative. The same tick value means two unrelated things.`;
 
 export function render() {
   return plot({

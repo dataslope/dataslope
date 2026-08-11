@@ -61,7 +61,7 @@ const strips = MACHINES.flatMap((m, k) => {
   }));
 });
 
-export const caption = `Two filling machines. The first doses ${SACHET.mu} g with a standard deviation of ${SACHET.sd} g; the second doses ${SACK.mu.toLocaleString()} g with a standard deviation of ${SACK.sd} g, which is ${SD_RATIO} times larger. The second machine is ${CV_RATIO} times more consistent. A standard deviation carries the units of the thing it measures, so comparing two of them across different scales is comparing a length in millimetres with a length in miles by counting digits. The coefficient of variation, standard deviation over mean, is dimensionless, which is exactly what a cross-scale comparison needs: ${(SACHET.cv * 100).toFixed(0)}% against ${(SACK.cv * 100).toFixed(1)}%. Three conditions have to hold first, and all three are about the mean. The variable must sit on a ratio scale with a real zero, or the number changes when you change units, which is how you know it was never a property of the thing. The mean must be far from zero, or the ratio explodes: a quantity averaging 0.02 with a spread of 0.05 has a CV of 2.5, which is arithmetic rather than information. And the values should be positive, because a mean pushed near zero by cancelling signs makes the CV meaningless in a way no formula will warn you about.`;
+export const caption = `Two filling machines. The first doses ${SACHET.mu} g with a standard deviation of ${SACHET.sd} g; the second doses ${SACK.mu.toLocaleString()} g with a standard deviation of ${SACK.sd} g, which is ${SD_RATIO} times larger and ${CV_RATIO} times more consistent.`;
 
 export function render() {
   return plot({

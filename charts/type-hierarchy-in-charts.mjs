@@ -68,7 +68,7 @@ const SIZES = {
 
 const line = (p) => CHURN.map((v, i) => ({ x: p.px(i), y: p.py(v) }));
 
-export const caption = `Six pieces of text, twice: a title, a subtitle, an axis label, the tick labels, one annotation and a source note. On the left they are all one size and one weight, so a reader has to read all six to discover which one matters, in whatever order their eye lands. On the right the same six are set in four sizes and the reading order arrives before the reading does. That is the entire job of a type hierarchy. It is an instruction about sequence, delivered ahead of the content, and a chart with flat type has withheld information it already had. Four levels is about the working limit, and they map onto four jobs: the claim, which everyone reads; the qualification, for people who want to know what was measured; the machinery of axis and ticks, read only when somebody is checking a number; and the provenance, read by the one person who intends to argue. Past four it stops being a hierarchy, because the reader can no longer tell which size is larger without comparing them, and not having to compare them was the point.`;
+export const caption = `Six pieces of text, twice: a title, a subtitle, an axis label, the tick labels, one annotation and a source note. On the left they are all one size and one weight; on the right the same six are set in four.`;
 
 export function render() {
   return plot({

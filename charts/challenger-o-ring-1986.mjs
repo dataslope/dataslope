@@ -90,7 +90,7 @@ const warm = FLIGHTS.filter((d) => d.temp >= 65);
 const coldHit = cold.filter((d) => d.damaged > 0).length;
 const warmHit = warm.filter((d) => d.damaged > 0).length;
 
-export const caption = `The engineers who tried to stop this launch were right about the physics and lost the argument anyway. What they faxed to NASA was the left panel: the flights that had suffered O-ring damage, which is the natural thing to send when the subject is damage and is exactly the wrong thing. Selecting on the outcome discards every cold flight that came back clean and every warm one that did, which is where the signal lives, so seven damaged flights spread from ${COLDEST}°F to 75°F look like noise. The right panel is the same table with the other sixteen rows put back. All ${cold.length} launches below 65°F had damage; ${warmHit} of the ${warm.length} above it did. Challenger went up at ${CHALLENGER_TEMP}°F, ${COLDEST - CHALLENGER_TEMP} degrees colder than anything that had ever flown. Nothing about the first chart is mislabelled, distorted or badly drawn. It is wrong about which rows are in it, and that was enough.`;
+export const caption = `The flights NASA was faxed the night before the launch, beside the same table with the other sixteen rows put back. All ${cold.length} launches below 65°F had O-ring damage and ${warmHit} of the ${warm.length} above it did; *Challenger* went up at ${CHALLENGER_TEMP}°F, ${COLDEST - CHALLENGER_TEMP} degrees colder than anything that had flown.`;
 
 export function render() {
   return plot({

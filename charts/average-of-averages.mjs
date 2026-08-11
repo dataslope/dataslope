@@ -50,7 +50,7 @@ const ODD = REGIONS.reduce((a, b) => (b.n < a.n ? b : a));
 const ODD_SHARE = ((ODD.n / TOTAL_N) * 100).toFixed(1);
 
 const MAX = 145;
-export const caption = `Somebody averages orders per region, puts the five results in a column, and averages that column. It looks obviously right and it is wrong, because the five means summarise different numbers of customers and averaging them again gives every region one vote regardless of size. Here ${ODD.key} is ${ODD_SHARE}% of the customer base and gets 20% of the answer, and since it is a boutique operation with an average order more than twice anyone else's, the unweighted figure comes out at ${UNWEIGHTED.toFixed(0)} against a true ${WEIGHTED.toFixed(0)}, which is ${GAP}% high. The right calculation is the weighted mean, weights being the group sizes, and it is identical to ignoring the groups and averaging the raw rows. That equivalence is the quickest way to remember which you want: if grouping first and not grouping at all give different answers, you have made this mistake. It generalises past means. Averaging five conversion rates, five percentage changes, five medians or five R-squareds does not commute with grouping either. A rate is a ratio, and ratios combine by adding numerators and adding denominators, never by averaging the ratios.`;
+export const caption = `Five regional means averaged again, against the same rows averaged once. ${ODD.key} is ${ODD_SHARE}% of the customer base and gets 20% of the answer, so the unweighted figure comes out at ${UNWEIGHTED.toFixed(0)} against a true ${WEIGHTED.toFixed(0)}, ${GAP}% high.`;
 
 export function render() {
   return plot({

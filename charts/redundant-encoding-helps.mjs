@@ -62,7 +62,7 @@ const PANELS = [COLOR_ONLY, COLOR_GONE, BOTH_GONE];
 
 const rows = PANELS.flatMap((panel) => points.map((d) => ({ ...d, panel })));
 
-export const caption = `Color fails for boring reasons and it fails often: a laser printer, a projector with the contrast wrong, a document converted to greyscale, or one of roughly one man in twelve who cannot separate red from green. None of those is an edge case and none of them is visible from where you sit while making the chart. The three panels are the same four groups. The first uses color alone, which is what you get from passing a color argument and nothing else. The second is that chart with the color gone, which is what a reader in any of those situations actually receives: four groups, one cloud, nothing recoverable. The third used color and shape together, and it survives having the color removed because the shape was carrying the same information all along. That is redundant encoding, and "redundant" is doing something unusual here: in most engineering redundancy is waste, and in a chart it is what makes the chart robust, for the same reason a spare tyre is. The costs are small and worth knowing. Shape is a weak channel, so it handles four or five groups and not twelve, telling shapes apart is a search rather than a glance, and the marks have to be big enough to have a shape at all, which rules it out for a dense scatter of thousands of points.`;
+export const caption = `The same four groups encoded by color alone, that chart with the color removed, and the same groups encoded by color and shape together. Only the third survives the removal.`;
 
 export function render() {
   return plot({

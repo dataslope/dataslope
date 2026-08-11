@@ -55,7 +55,7 @@ const CENTRED = roll(true);
 const TRAILING = roll(false);
 const AT = 44;
 
-export const caption = `A centred rolling mean is the right default for *description*: it removes noise without shifting the curve sideways, so a peak in the smoothed series lands where the peak in the raw one is. It is a leak for anything predictive, and the reason is drawn. At the marked instant the centred window reaches ${HALF} days into the future, so every value in that series is partly made of data which had not arrived when its own timestamp occurred. Fit a model on it and the model learns from tomorrow; backtest the model and the backtest agrees, because the leak is in the feature rather than in the split, and no amount of care about train and test boundaries will catch it. The trailing window is the honest version, since its value at any instant is made only of that instant and the ones before. What it costs is a lag of about half a window, which is why the trailing curve turns after the raw series does at every peak. That lag is not a defect to correct: it is the true price of only knowing the past, and a smoother that appears to avoid it has stopped being causal. The working rule is center=True for a chart and center=False for a feature, and when a notebook does both, give them different column names, because the two series look nearly identical and only one can be computed on the day.`;
+export const caption = `A centred rolling mean and a trailing one over the same series. At the marked instant the centred window reaches ${HALF} days into the future, so every value in that series is partly made of data that had not arrived at its own timestamp.`;
 
 export function render() {
   return plot({

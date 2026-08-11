@@ -104,7 +104,7 @@ const rowsFor = (s, p) => {
   );
 };
 
-export const caption = `Resampling needs an aggregation, and the choice follows from what kind of quantity the column is. There are exactly two kinds. A flow is measured *over* an interval: orders, rainfall, kilowatt-hours, revenue. Flows add across time, so the month is the sum of the days, and taking a mean answers a different and usually duller question while making a 28-day month incomparable with a 31-day one for reasons that have nothing to do with the business. A stock is measured *at* an instant: inventory, balance, headcount, temperature. Stocks do not add, and summing one produces a number with no referent, here about ${BLOWUP} times the daily figure, because thirty daily inventory levels added together are not inventory in any unit anyone uses. The month's value for a stock is a mean, or a last, or a max, depending on what the month is meant to stand for. The mistake survives because both operations succeed and both return a plausible series. The tell is the axis: if the monthly numbers are about a month's worth larger than the daily ones, and the quantity is something you could photograph at a moment in time, the aggregation is wrong. The rule that covers nearly everything: if the units contain "per", it is a flow and you sum; if you could measure it with a snapshot, it is a stock and you do not.`;
+export const caption = `The same daily column resampled to months by summing and by averaging. Only one is right, and which depends on the quantity: summing a stock gives a number with no referent, here about ${BLOWUP} times the daily figure.`;
 
 export function render() {
   return plot({

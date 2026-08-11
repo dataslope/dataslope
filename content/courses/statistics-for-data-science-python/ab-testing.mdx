@@ -96,6 +96,11 @@ correlation into a credible cause.
 
 <Chart slug="randomisation-balances-confounders" />
 
+The randomized bars are not zero, and expecting zero is a common misreading,
+because a coin flip on a finite sample does not deliver perfect balance. What
+randomization guarantees is that the imbalance is *random*, with a known
+distribution, which is what lets a p-value mean anything.
+
 Matching, regression and propensity scores can only balance variables you
 have. Randomization balances the ones you have and the ones you have never
 heard of, because the coin does not know what it is balancing. Two honest

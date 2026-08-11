@@ -146,6 +146,15 @@ diagnosis is almost always that two things were pooled. The fix is not a
 fancier distribution: it is to split and report both, because everything
 downstream assumed one population.
 
+The standard deviation is no better, since it is now measuring the distance
+between two groups rather than the spread of anything, and the grouping was in
+the data all along, in a column nobody plotted. Drivers with cyclists, cache
+hits with cache misses, two cohorts, two currencies. The awkward case is when
+the grouping was never recorded: a mixture model can then recover the
+components from the shape alone, which is a real technique and much weaker
+evidence, because a two-component fit will happily split a distribution that
+is merely skewed.
+
 ## Tail heaviness: kurtosis (lightly)
 
 The last shape question is how **heavy the tails** are, how often you
@@ -198,11 +207,22 @@ distribution. Heavy tails are also why a single robust spread (IQR) can
 beat the standard deviation, one fat-tailed draw can dominate the SD.
 </Callout>
 
+Mean and standard deviation pin a normal distribution down completely, and for
+anything else they leave the part that matters unspecified:
+
 <Chart slug="kurtosis-same-sd" />
 
 Every rule built on "three sigma" is quietly assuming a shape. Finance,
 insurance, network traffic and queueing all live in distributions that do not
 have it.
+
+The heavy-tailed one is *narrower* in the middle and much fatter at the edges:
+more values very close to the mean, more very far from it, fewer in between.
+The uniform has no tail past its edges at all. Kurtosis is the number that
+separates them, and it is worth knowing what it is not: despite decades of
+textbooks it is not peakedness. It is dominated by the fourth power of the
+distance from the mean, so it is almost entirely a statement about how much
+probability lives far out.
 
 ## Outliers: what they are (and aren't)
 

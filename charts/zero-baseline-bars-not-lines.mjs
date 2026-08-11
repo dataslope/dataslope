@@ -49,7 +49,7 @@ const HI = SERIES.at(-1);
 const REAL_CHANGE = ((HI.score - LO.score) / LO.score) * 100;
 const APPARENT = (HI.score - FLOOR) / (LO.score - FLOOR);
 
-export const caption = `Both panels are the same twelve numbers with the same axis, floored at ${FLOOR}. Nothing about the axis differs; the mark does. A bar says its value with a *length* measured up from the baseline, and that is all a bar is, so moving the baseline off zero means every length is the value minus ${FLOOR} and a reader comparing two bars is comparing two differences while believing they are comparing two values. Here the score rises ${REAL_CHANGE.toFixed(1)}% across the year and the last bar is ${APPARENT.toFixed(1)} times the height of the February one. A line says its value with a *position*, and invites you to compare a position with the next one along, which is a slope. A truncated axis exaggerates that slope, which is worth watching, but it does not hand anybody a wrong ratio, because nothing in a line chart is measured from the bottom of the frame. So the rule, usefully stated: zero is mandatory when the mark's length is the value, and optional when it is not.`;
+export const caption = `The same twelve numbers with the same axis, floored at ${FLOOR}, once as bars and once as a line. The score rises ${REAL_CHANGE.toFixed(1)}% across the year, and the last bar stands ${APPARENT.toFixed(1)} times the height of the February one.`;
 
 export function render() {
   return plot({

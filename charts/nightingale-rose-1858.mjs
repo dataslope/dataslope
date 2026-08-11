@@ -88,7 +88,7 @@ const LEGEND = [
   { cause: "other", label: "All other causes", y: 0.96 },
 ].map((d) => ({ ...d, period: PERIODS[0] }));
 
-export const caption = `Redrawn from Nightingale's own table. Each wedge is one month, its area the annual death rate per 1,000 men: blue for the diseases she called preventable, red for wounds, grey for everything else. In the first year the blue swamps the red in every single month, and at the peak, ${PEAK.label}, the rate reached ${Math.round(PEAK.disease).toLocaleString()} per 1,000 per year against ${Math.round(PEAK.wounds)} for wounds. The second rose is the same army after the Sanitary Commission cleaned the hospitals. Note what the construction costs her: area is proportional to the rate, so the radius is a square root and the worst month reaches only about six times as far as an ordinary one while being thirty-four times as deadly. The diagram that changed British military medicine understates its own case.`;
+export const caption = `Redrawn from Nightingale's own table. Each wedge is one month and its area is the annual death rate per 1,000 men: blue for the diseases she called preventable, red for wounds, grey for everything else. At the ${PEAK.label} peak the rate reached ${Math.round(PEAK.disease).toLocaleString()} against ${Math.round(PEAK.wounds)} for wounds.`;
 
 export function render() {
   return plot({

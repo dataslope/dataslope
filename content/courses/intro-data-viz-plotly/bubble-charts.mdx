@@ -172,8 +172,14 @@ same time. Standing still, it looks like this:
 Each bar runs from a country's 1960 value to its 2010 one, and the rows are
 sorted by where each started. If the split were permanent, the bars would be
 roughly equal and the order at the right would match the order at the left.
-Neither holds. The two countries that barely move are visible without being
-pointed at, which is the test of whether a chart is being honest with you.
+Neither holds. The two countries that barely move, South Africa and Russia,
+are visible without being pointed at, which is the test of whether a chart is
+being honest with you; each has its own reasons and its own chart.
+
+The motion in the original does real work, holding a country's identity fixed
+while time changes so you watch it move instead of comparing two pictures. It
+also makes the claim hard to check, which is why both ends sit on one line
+here.
 
 ## When animation goes wrong
 
@@ -217,6 +223,14 @@ An overplotted scatter looks like a blob and a truncated axis has numbers on
 it, but a bubble chart that has lost nine of its points looks exactly like a
 bubble chart of the points it has left. Transparency and an outline cost
 nothing and fix it.
+
+The two fixes do different jobs. Transparency turns overlap into density, so
+where discs pile up the fill darkens, which is information rather than an
+accident. An outline preserves each disc's boundary, so a small bubble inside
+a large one stays a countable object. Two more habits when the crowding is
+bad: paint the largest discs first so the small ones end up on top, and cap
+the maximum radius, because past a certain size area stops being a comparison
+anyone can make and becomes territory that hides whatever is behind it.
 
 ## Check your understanding
 

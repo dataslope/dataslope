@@ -324,10 +324,16 @@ Inflated variance plus a ~-0.5 lag-1 autocorrelation is the textbook signature o
 <Chart slug="over-differencing" />
 
 Two tells, and they agree. The variance falls while real structure is being
-removed and rises the moment noise is, so difference until it stops falling
-and then stop. And a large negative correlation at lag one is not a property
-of the process; it is the artefact of having subtracted each value from its
-neighbour twice.
+removed and rises the moment noise is, because subtracting two draws of the
+same noise gives a quantity with twice the variance of one, so difference
+until it stops falling and then stop. And a large negative correlation at lag
+one is not a property of the process; it is the artefact of having subtracted
+each value from its neighbour twice.
+
+Both cost something. A model fitted to the over-differenced series will add a
+moving-average term to cancel the artefact, which is a parameter spent undoing
+self-inflicted damage, and every forecast interval built from it is wider by
+twice over, which is not uncertainty about the world.
 
 ## Undoing it: integration (the 'I' in ARIMA)
 

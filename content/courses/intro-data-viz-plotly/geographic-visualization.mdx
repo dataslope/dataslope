@@ -115,11 +115,23 @@ different projections: `"orthographic"`, `"natural earth"`,
 Before the projections, the decision most people skip: where the class breaks
 go.
 
+A choropleth has to turn a continuous variable into a handful of shades, and
+that is settled in a dialog box whose default most people accept:
+
 <Chart slug="choropleth-class-breaks" />
 
 None of the three schemes is wrong. What is wrong is choosing one because the
 map looks better, which is the usual method, and not saying which was used,
 which is nearly universal.
+
+Equal interval cuts the range into equal widths, which is the only scheme
+whose legend is honest about magnitude, and on a skewed distribution it drops
+most regions into the lightest class and leaves the map looking uniform with
+two outliers. Quantile puts an equal count in each class, so every shade gets
+used and the map looks informative, at the price of arbitrary boundaries: two
+regions a hair apart can land in different classes. Natural breaks looks for
+the gaps in the data and cuts there, which usually gives the most defensible
+map and the least explicable legend.
 
 And the prior question, which is whether the map should exist at all:
 
@@ -127,6 +139,16 @@ And the prior question, which is whether the map should exist at all:
 
 Write the finding out as a sentence. If it contains a direction, a border or a
 distance, keep the map.
+
+The reason is not that maps are bad. A map spends its two strongest channels,
+both dimensions of position, on where things are, and has only color left for
+the quantity, so ranking nine shades is a chore and reading a value off one
+needs the legend. A bar chart spends position on the quantity and gives up
+geography completely. Which side of that trade you want turns on whether the
+answer is geographic: it is when the finding is about adjacency, a boundary, a
+distance, or a spatial pattern a reader would recognise, and no bar chart
+substitutes then. It is not when the finding is a ranking, which is what most
+regional dashboards contain.
 
 ## Map projections, they all lie a little
 

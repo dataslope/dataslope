@@ -140,7 +140,7 @@ const legend = BARS.map((d, i) => ({
 
 const money = (v) => `$${v.toLocaleString()}`;
 
-export const caption = `Du Bois's plate for the Paris Exposition of 1900, redrawn from his figures. The problem is one every chart of growth runs into: the last value is ${RATIO} times the first, so an ordinary bar chart renders ${YEARS[0].year} as a hairline and a log axis stops the growth from looking like growth. His answer was to keep the bar linear and coil it, so every year is still a length, every ratio is still a ratio of lengths, and nothing is truncated or broken. The cost is real and worth saying: two coiled bars cannot be compared at a glance the way two upright ones can. That is a trade he made deliberately, on a plate that spent most of a century being filed as folk art.`;
+export const caption = `Du Bois's plate for the Paris Exposition of 1900, redrawn from his figures. The last value is ${RATIO} times the first, so he kept the bar linear and coiled it: every year is still a length, every ratio is still a ratio of lengths, and nothing is truncated or broken.`;
 
 export function render() {
   return plot({

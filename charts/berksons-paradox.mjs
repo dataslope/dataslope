@@ -71,7 +71,7 @@ const cutLine = (p) =>
     { a: DOM[1], b: BAR - DOM[1] },
   ].map((d) => ({ x: p.px(Math.max(DOM[0], Math.min(DOM[1], d.a))), y: p.py(Math.max(DOM[0], Math.min(DOM[1], d.b))) }));
 
-export const caption = `On the left, ability and interview score are independent: the cloud is round and the correlation is ${R_ALL.toFixed(2)}. That is the truth about this world. The admissions rule adds the two together and takes everyone above a bar, and among the ${ADMITTED.length} people who got in the correlation is ${R_IN.toFixed(2)}. Nothing happened to anybody. The relationship is manufactured by the selection, and the mechanism is plain once said: among those admitted, a weak interview implies strong ability, because otherwise they would not have cleared the bar. Cutting one corner off a round cloud leaves a diagonal band. This is Berkson's paradox, and it is why "among our customers", "among hospital patients", "among people who replied" and "among successful startups" should all make you ask what got somebody into the dataset. The classic medical case is two unrelated diseases appearing correlated among inpatients, because having either is a reason to be admitted. Keep it separate from confounding, because the fixes point opposite ways: a confounder is a common cause and adding it to the model helps, while this is caused by conditioning on a common *effect*, and adding the selection variable makes it worse.`;
+export const caption = `Ability and interview score are independent in this population, at a correlation of ${R_ALL.toFixed(2)}. Among the ${ADMITTED.length} people the admissions rule admitted, the correlation is ${R_IN.toFixed(2)}.`;
 
 export function render() {
   return plot({

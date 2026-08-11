@@ -96,7 +96,7 @@ const PANELS = CASES.map((_, k) => panel(k, { x: D, y: D }));
 const OUT_CASE = CASES[1];
 const WITHOUT = pearson(OUTLIER.slice(0, -1));
 
-export const caption = `Pearson's r measures how close the points are to a straight line. Spearman's rho replaces every value by its rank and computes the same thing on the ranks, so it measures how close the relationship is to *monotone*: does y always move the same way as x, whether or not at a constant rate. Reading them together is more useful than either alone, because the gap is diagnostic. Rho much higher than r, as in the first panel (${CASES[0].rho.toFixed(2)} against ${CASES[0].r.toFixed(2)}), means the relationship is real and curved: every point is in the right order and the line is the wrong shape, so fit a curve or transform a variable rather than reporting a weak correlation. R much higher than rho, as in the second (${OUT_CASE.r.toFixed(2)} against ${OUT_CASE.rho.toFixed(2)}), means something is inflating the linear fit that the ranks cannot see, and it is nearly always one or two extreme points: remove the single corner point here and r falls to ${WITHOUT.toFixed(2)}. Ranks cannot be extreme, which is precisely why rho ignores it. Both high and similar, as in the third, is linear and monotone, which is the case everyone assumes they are in. Neither coefficient says anything about the slope, and neither says anything about cause.`;
+export const caption = `Three scatters with both coefficients. The first is curved and monotone (rho ${CASES[0].rho.toFixed(2)} against r ${CASES[0].r.toFixed(2)}); the second has r ${OUT_CASE.r.toFixed(2)} against rho ${OUT_CASE.rho.toFixed(2)}, and removing its one corner point takes r to ${WITHOUT.toFixed(2)}.`;
 
 export function render() {
   return plot({

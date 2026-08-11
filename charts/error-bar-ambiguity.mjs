@@ -67,7 +67,7 @@ const BARS = [
 const ORDER = BARS.map((d) => d.key);
 const RATIO = (SD / SE).toFixed(1);
 
-export const caption = `All three bars describe the same ${N} numbers, and they are different lengths because they answer different questions. A standard deviation describes the *data*: how spread out the observations are, and it does not shrink when you collect more, because the population is as variable as it is. A standard error describes the *mean*: how much it would move if you ran the study again, and it shrinks like one over the square root of n. A 95% interval is that standard error scaled to a stated coverage, so it runs about twice as long and answers the same kind of question. Here the SD bar is ${RATIO} times the SE bar, and that ratio is the square root of the sample size, so at n = 100 it would be ten. The same data, drawn honestly, can carry error bars that differ by an order of magnitude. It matters because readers use these to eyeball significance, on the rule that non-overlapping bars mean a real difference. That rule is roughly right for confidence intervals, wrong for standard errors, and meaningless for standard deviations, which are not about the mean at all. Nothing in the drawing distinguishes them, so the caption has to: name the interval, and give n.`;
+export const caption = `The same ${N} numbers with three different error bars. The standard deviation bar is ${RATIO} times the standard error bar, and that ratio is the square root of the sample size, so at n = 100 it would be ten.`;
 
 export function render() {
   return plot({

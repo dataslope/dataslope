@@ -52,7 +52,7 @@ const RIGHT = panel(1, { x: [-6, 26], y: [0, 1] });
 
 const ROW = { Control: 0.62, Treatment: 0.36 };
 
-export const caption = `The two groups' intervals overlap by ${OVERLAP.toFixed(1)} units, so the eye says there is nothing here. The interval for the difference is ${D_LO.toFixed(1)} to ${D_HI.toFixed(1)}, which clears zero with room to spare, and the test statistic is ${ZSTAT.toFixed(2)}. Both statements are correct, because comparing two intervals is not the 5% test people think it is: it is a stricter test, at roughly the 1% level. The arithmetic is short. Two intervals stop touching once the means are more than 1.96 times the *sum* of the standard errors apart, which is ${NAIVE_GAP.toFixed(1)} units here. But the standard error of a difference is not the sum, it is the square root of the sum of squares, ${SE_DIFF.toFixed(2)} rather than ${(A.se + B.se).toFixed(2)}, because variances add and standard errors do not. With similar groups that is a factor of about √2, so there is a whole band of separations where the intervals still overlap and the difference is already significant, and this is one of them. The right move is the one that has to be said twice because it feels like cheating: when the question is about a difference, compute an interval for the difference. A chart showing two groups with error bars is showing you the wrong intervals for the question you are asking of it.`;
+export const caption = `Two group intervals that overlap by ${OVERLAP.toFixed(1)} units, and the interval for their difference, which runs ${D_LO.toFixed(1)} to ${D_HI.toFixed(1)} and clears zero with room to spare.`;
 
 export function render() {
   return plot({

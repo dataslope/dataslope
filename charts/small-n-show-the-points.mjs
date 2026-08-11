@@ -66,7 +66,7 @@ const SPREAD = stats.reduce((a, b) => (b.se < a.se ? b : a));
 const BIMODAL = GROUPS.find((g) => g.key === "B");
 const RANGE = Math.max(...BIMODAL.values) - Math.min(...BIMODAL.values);
 
-export const caption = `Four measurements per group, twice. On the left each group is a bar at its mean with a standard error through it, which is the default from most plotting libraries and the commonest figure in the life sciences. On the right, the same sixteen numbers, printed. The bars cannot say that there are four of them, because a bar looks identical whether it summarises four points or four thousand. They cannot say that group B is two low values and two high ones spanning ${RANGE} units with nothing in between, which is a different finding from a cluster around a mean and draws the same bar. They cannot say that C's mean is dragged by a single value. And because the error bar shrinks with the square root of the sample size, the group that looks most precise is often just the one that got a lucky spread. Underneath is a simpler objection: a bar and a whisker have spent two conventions and a rectangle to hide sixteen numbers that fit on the page with room left over. The rule people settle on is roughly this. Under about ten observations, show every point. Ten to fifty, show the points and the summary together. Above that, use a mark that has a shape, a box or a violin or a strip, rather than a bar.`;
+export const caption = `Four measurements per group as bars with error bars, and the same sixteen numbers printed. Group B is two low values and two high ones spanning ${RANGE} units with nothing in between, which draws the same bar as a cluster around a mean.`;
 
 export function render() {
   return plot({

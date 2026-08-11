@@ -106,7 +106,7 @@ const barRows = SHARES.map((d, i) => ({
 const CLOSE = SHARES.slice(1, 3);
 const GAP = CLOSE[0].v - CLOSE[1].v;
 
-export const caption = `A pie gives a reader three cues for one quantity: the angle at the centre, the arc along the rim and the area of the wedge. They are not equal. Angle is the one people use, and it sits in the middle of the measured accuracy ranking, well under length and position but comfortably over area. Cutting a hole deletes it. There is no vertex left to judge, so the reader is down to arc and area with no point of reference, comparing curved ribbons of different lengths without a common baseline. The hole is usually there to hold a total, which is a real use and a clear trade: you have spent the chart's best remaining channel to make room for a number that could have gone above the chart. The third panel is the same five shares as bars, every one starting from the same line, which is the top of that ranking. Notice ${CLOSE[0].key} and ${CLOSE[1].key}, ${GAP} points apart. In the bars the order is obvious. Go back to the donut and try to be sure.`;
+export const caption = `The same five shares as a pie, a donut and bars. ${CLOSE[0].key} and ${CLOSE[1].key} are ${GAP} points apart: obvious in the bars, and worth trying to be sure of in the donut.`;
 
 export function render() {
   return plot({

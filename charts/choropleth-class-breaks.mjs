@@ -120,7 +120,7 @@ const MOVER = REGIONS.map((d) => {
 const shade = (cls) => 0.12 + (cls / (K - 1)) * 0.78;
 const bottomCount = (breaks) => REGIONS.filter((d) => classOf(d.v, breaks) === 0).length;
 
-export const caption = `A choropleth has to turn a continuous variable into a handful of shades, and where the class breaks go is settled in a dialog box whose default most people accept. It is not a formatting choice. Equal interval cuts the range into equal widths, which is the only scheme whose legend is honest about magnitude, and on a skewed distribution like this one it drops ${bottomCount(equalBreaks)} of the ${REGIONS.length} regions into the lightest class and leaves the map looking uniform with two outliers. Quantile puts an equal count in each class, so every shade gets used and the map looks informative, at the price of arbitrary boundaries: two regions a hair apart can land in different classes and two far apart can share one. Natural breaks looks for the gaps in the data and cuts there, which usually gives the most defensible map and the least explicable legend. Region ${MOVER.key}, at ${MOVER.v}, sits in class ${MOVER.classes[0] + 1} on the first map and class ${MOVER.classes[2] + 1} on the third. None of the three is wrong. What is wrong is picking one because the map looks better, which is the usual method, and not saying which was used, which is nearly universal.`;
+export const caption = `The same ${REGIONS.length} regions under three class-break schemes. Region ${MOVER.key}, at ${MOVER.v}, sits in class ${MOVER.classes[0] + 1} on the first map and class ${MOVER.classes[2] + 1} on the third.`;
 
 export function render() {
   return plot({

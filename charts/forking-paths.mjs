@@ -71,7 +71,7 @@ const tiles = PATHS.map((d) => ({
   row: Math.floor(d.i / COLS),
 }));
 
-export const caption = `No test is run twice here. Every branch is one decision an honest analyst makes, in order, without ever thinking of it as a multiple comparison: keep or trim the outliers, raw outcome or log, include the covariate or not, drop the warm-up week or not, median split or the pre-registered cut. Five binary choices give ${N_PATHS} analyses, and ${HITS} of them land under p = 0.05. Each branch has a 5% chance on its own when the null is true, so the chance that *at least one* of the paths you might have taken reaches significance sits far above 5%, and well below the ${INDEPENDENT}% that treating the ${N_PATHS} as independent tests would predict, because they share most of their data. Gelman and Loken called this the garden of forking paths, and it needed a new name because it is not p-hacking. Nobody ran ${N_PATHS} tests and kept one. The analyst ran *one* test, having made five reasonable choices on the way, each of which they would defend, and any of which they might have made differently had the data looked different. The multiplicity lives in the analyses that were never run, which is why it does not appear anywhere in the notebook and cannot be corrected for afterwards. The only real defences are structural: pre-register so the path is fixed before the data is seen, or report the whole tree, which is what a multiverse or specification-curve analysis does.`;
+export const caption = `Five binary analysis choices, each one a call an honest analyst makes without thinking of it as a comparison, give ${N_PATHS} possible analyses. ${HITS} of them land under p = 0.05, and no test here is run twice.`;
 
 export function render() {
   return plot({

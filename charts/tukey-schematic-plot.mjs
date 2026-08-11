@@ -95,7 +95,7 @@ const nFarOut = sorted.filter((v) => classify(v) === "far out").length;
 const BOX_HEIGHT = 0.34;
 const box = (panel) => [{ panel, y0: -BOX_HEIGHT, y1: BOX_HEIGHT }];
 
-export const caption = `The top row is what Tukey drew in 1977 and almost nobody has seen since. Two pairs of fences: the inner at one and a half box-widths outside the box, the outer at three. Two classes of unusual value, *outside* and *far out*, because a point four box-widths away is a different kind of event from one that is two. And whiskers that stop at the most extreme observation still inside the inner fence, which is the detail people misremember: a whisker ends at a real data point, not at the fence, so its length is something the data decided. The bottom row is the same batch from a modern library. Same box, same 1.5 rule, but the outer fence is gone and both classes have been merged into ${nOutside + nFarOut} points labelled outlier. That merge is why the word now sounds like a verdict on a value rather than a statement about how far away it is. Neither chart draws its fences; they are computed, used to classify, and thrown away. They are drawn here only so you can see where they were.`;
+export const caption = `Tukey's 1977 schematic plot above a modern library's box plot of the same batch. His has two pairs of fences and two classes of unusual value; the modern one drops the outer fence and merges both into ${nOutside + nFarOut} points labelled outlier.`;
 
 export function render() {
   return plot({

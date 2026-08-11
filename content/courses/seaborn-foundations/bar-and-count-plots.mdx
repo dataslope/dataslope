@@ -176,6 +176,14 @@ because the summary has become bigger than the thing it summarises:
 
 <Chart slug="small-n-show-the-points" />
 
+A bar looks identical whether it summarises four points or four thousand, so
+it cannot say there are four. It cannot say that C's mean is dragged by a
+single value. And because an error bar shrinks with the square root of the
+sample size, the group that looks most precise is often just the one that got
+a lucky spread. Underneath is a simpler objection: a bar and a whisker have
+spent two conventions and a rectangle to hide sixteen numbers that fit on the
+page with room left over.
+
 The working rule: under about ten observations, show every point; ten to
 fifty, show the points and the summary together; above that, use a mark that
 has a shape, a box or a violin or a strip, rather than a bar.
@@ -194,6 +202,16 @@ drawn?
 All three describe the same numbers, they differ in length by a factor of six,
 and nothing in the drawing distinguishes them. The caption has to: name the
 interval, and give n.
+
+They answer different questions. A standard deviation describes the *data*,
+how spread out the observations are, and it does not shrink when you collect
+more. A standard error describes the *mean*, how much it would move if you ran
+the study again, and it shrinks like one over the square root of n. A 95%
+interval is that standard error scaled to a stated coverage. It matters
+because readers use these to eyeball significance, on the rule that
+non-overlapping bars mean a real difference, and that rule is roughly right
+for confidence intervals, wrong for standard errors, and meaningless for
+standard deviations, which are not about the mean at all.
 
 <Callout type="tip" title="Use the modern errorbar=, not the old ci=">
 Older Seaborn code used `ci=95` or `ci="sd"`. The current, clearer spelling

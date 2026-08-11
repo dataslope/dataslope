@@ -57,7 +57,7 @@ const pRow = ROWS.map((r) => ({ ...r, x: P.px(r.n), y: P.py(r.p) }));
 const dRow = ROWS.map((r) => ({ ...r, x: DP.px(r.n), y: DP.py(r.d) }));
 const N_TICKS = [10, 100, 1000];
 
-export const caption = `The population never changes here: two groups whose means differ by ${D} of a standard deviation, a small but real effect. The only thing varied is how many observations were collected. The p-value falls off a cliff, crossing 0.05 at about n = ${CROSS.n} per group and reaching one in a billion by two thousand. Nothing about the world moved; what moved is how confidently "exactly zero" can be ruled out, and exactly zero was never a serious hypothesis about two real groups. Cohen's d does not move at all, because it is the difference measured in units of the spread and therefore a fact about the populations rather than about the study. More data makes the estimate of it less noisy without shifting where it sits. That is the entire reason effect sizes are reported. A p-value answers "could this be nothing", which stops being interesting at large n because at large n almost nothing is exactly nothing. An effect size answers "how big is it", which is the question that decides whether anybody should act. They are confused constantly, and the confusion runs one way: a significant result from a large sample gets reported as an important one.`;
+export const caption = `One population, two groups whose means differ by 0.2 of a standard deviation, and nothing varied but the sample size. The p-value crosses 0.05 at about n = ${CROSS.n} per group and reaches one in a billion by two thousand; Cohen's d sits at ${D} throughout.`;
 
 export function render() {
   return plot({

@@ -75,7 +75,7 @@ const COLOR = Object.fromEntries(ROLES.map((d, i) => [d.hue, SERIES[i]]));
 const WORST = ROLES.reduce((a, b) => (b.darkOnLight < a.darkOnLight ? b : a));
 const FAILING = ROLES.filter((d) => d.darkOnLight < THRESHOLD).length;
 
-export const caption = `Every chart on this site draws from seven color roles, and each role stores two values: one tuned for white, one for near-black. That looks like duplication until it is measured. The scale here is contrast ratio, the WCAG formula, and the line that matters for a chart is 3 to 1, which is what a graphical object needs to be reliably distinguishable from what is behind it. The left panel is what ships: each theme's own value on its own ground, and all fourteen clear the bar. The right panel is the shortcut of picking one palette for both, and both directions fail. Light colors on a dark ground just get dim; dark colors on white collapse, with all ${FAILING} of the ${ROLES.length} under the threshold and ${WORST.hue} bottoming out at ${WORST.darkOnLight.toFixed(2)} to 1. The asymmetry is the useful part. Contrast against white is limited by how dark a color is and contrast against black by how light it is, so a hue bright enough to glow on black is by construction too pale to sit on white. There is no single value that does both jobs for a saturated hue, which is why brightening a palette for dark mode is not a reversible operation and why a theme needs two.`;
+export const caption = `WCAG contrast ratios for the ${ROLES.length} chart color roles, each theme's own value on its own ground and then swapped. All fourteen clear the 3:1 line; swapped, all ${FAILING} dark-on-white values fail, with ${WORST.hue} bottoming out at ${WORST.darkOnLight.toFixed(2)}:1.`;
 
 export function render() {
   return plot({

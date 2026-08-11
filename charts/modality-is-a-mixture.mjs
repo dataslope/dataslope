@@ -66,7 +66,7 @@ const bars = (p, values) =>
 const MEAN_BIN = POOLED.find((b) => POOLED_MEAN >= b.from && POOLED_MEAN < b.to);
 const TALLEST = Math.max(...POOLED.map((d) => d.c));
 
-export const caption = `The left panel is one column with two humps, and that is the point where a summary stops being useful. The pooled mean is ${POOLED_MEAN.toFixed(0)} ms, which lands in the valley between the peaks, in a bin holding ${MEAN_BIN.c} observations against the tallest bin's ${TALLEST}: the average is less common than either mode. The standard deviation is no better, since it is now measuring the distance between two groups rather than the spread of anything. The right panel is the same numbers with the grouping put back, and it was in the data all along, in a column nobody plotted. That is the reflex worth having. Bimodality is not a property a variable has, it is a symptom, and the diagnosis is almost always that two things were pooled: drivers with cyclists, cache hits with cache misses, two cohorts, two currencies. The fix is not a fancier distribution, it is to split and report both, because everything downstream, the mean, the interval, the test, the model, assumed one population. The awkward case is when the grouping was never recorded. A mixture model can then recover the components from the shape alone, which is a real technique and much weaker evidence, because a two-component fit will happily split a distribution that is merely skewed.`;
+export const caption = `One column with two humps, and the same numbers with the grouping put back. The pooled mean of ${POOLED_MEAN.toFixed(0)} ms lands in the valley, in a bin holding ${MEAN_BIN.c} observations against the tallest bin's ${TALLEST}.`;
 
 export function render() {
   return plot({

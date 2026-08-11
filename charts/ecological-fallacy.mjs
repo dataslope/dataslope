@@ -82,7 +82,7 @@ const YD = [30, 92];
 const AGG = panel(0, { x: XD, y: YD });
 const IND = panel(1, { x: XD, y: YD });
 
-export const caption = `Every point on the left is a district: its mean income against its mean turnout, and the correlation is ${R_GROUP.toFixed(2)}. That is a real fact about districts. On the right the individuals inside those districts are drawn, and the average correlation *within* a district is ${R_WITHIN.toFixed(2)}: knowing a person's income tells you nothing useful about whether they voted. Both statements are true of the same data and they answer different questions, because the unit of analysis is different. The mechanism is that district means differ for reasons unconnected to the individual relationship. A district can be rich and high-turnout because it is older, or because a local campaign has been running for years, and each of those puts a correlation between the two averages without moving any individual's turnout with their own income. This is the ecological fallacy, and it is not Simpson's paradox. Simpson's is a reversal: the same unit of analysis gives opposite signs depending on whether you condition. Nothing reverses here. The two correlations describe different populations, districts and people, and neither is wrong. The rule is to name the unit before quoting a correlation, because "districts with higher average income have higher turnout" is not evidence for "richer people vote more".`;
+export const caption = `District mean income against district mean turnout, correlating at ${R_GROUP.toFixed(2)}, beside the individuals inside those districts, where the average correlation within a district is ${R_WITHIN.toFixed(2)}.`;
 
 export function render() {
   return plot({

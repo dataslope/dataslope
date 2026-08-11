@@ -77,7 +77,7 @@ const cells = SCALES.flatMap((s) =>
   OPS.map((op) => ({ key: s.key, op, allowed: s.ok.includes(op) })),
 );
 
-export const caption = `Stevens's four scales are usually taught as four names, which is the least useful part of them. What matters is that each one licenses a set of operations and forbids the rest, and that a computer will perform the forbidden ones without complaint. Read it as a ladder: each rung keeps everything below and adds one question. Nominal answers only "are these the same", so you may count and take a mode. Ordinal adds "which is more", so a median and a rank become available, but not subtraction: the distance from agree to strongly agree is not a known quantity and is not the same as the distance from neutral to agree. Interval adds "how much more", which makes a mean and a standard deviation meaningful, and stops short of ratios because zero is a convention, so 20 °C is not twice 10 °C. Ratio adds "how many times more", because zero means none of the thing, and that is what makes a geometric mean and a coefficient of variation defined. The value is all in the forbidden column. Nearly every statistical mistake made with a categorical variable is an operation from a higher rung applied to a lower one, and not one of them raises an error.`;
+export const caption = `Stevens's four scales as a ladder: each rung keeps every operation below it and adds one question. Nominal asks only whether two values are the same; ratio asks how many times more.`;
 
 export function render() {
   return plot({

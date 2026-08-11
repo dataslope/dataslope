@@ -367,6 +367,13 @@ deleting it distorts the truth. Investigate first; delete only with a
 documented reason.
 </Callout>
 
+There is a check that works the other way round, asking about the shape of a
+whole column rather than about any row in it. Benford's law holds when values
+span several orders of magnitude and are not bounded or rounded into a narrow
+band: revenues, populations, file sizes, transaction amounts. It is useful for
+fraud work because people inventing numbers do not reproduce it, since asked
+for a plausible amount humans produce leading digits roughly uniformly.
+
 <Chart slug="benfords-first-digit" />
 
 An outlier rule asks whether any single value is unusual. A distributional
@@ -374,6 +381,10 @@ check asks whether the *set* is the sort of set it claims to be, and those are
 different questions with different blind spots. Treat a Benford deviation as a
 screen rather than as evidence: plenty of honest data deviates, particularly
 anything with a natural scale or anything already filtered to a range.
+
+One limit belongs with it: this applies to a whole ledger rather than to a
+subset somebody already chose, because filtering can produce the deviation by
+itself.
 
 ## Step 5: relationships
 

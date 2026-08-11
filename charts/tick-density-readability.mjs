@@ -53,7 +53,7 @@ const VARIANTS = [
 const PANELS = VARIANTS.map((_, k) => panel(k, { x: [0, N - 1], y: DOMAIN }));
 const GOOD = 1;
 
-export const caption = `The same series three times, and the only difference is how many ticks the vertical axis was asked for. Three is enough to make the axis a scale you consult once and then stop thinking about, because every value you read after that is an interpolation, and "a bit above halfway between 60 and 100" is what a reader was going to do anyway. Five is comfortable. Seventeen changes the reader's job in kind rather than degree: the labels are close enough that finding the one you want means landing, reading, deciding, and moving on, which is a search. It is also the density at which labels start to collide, so the renderer overlaps them, rotates them, or silently drops some, and all three are worse than having asked for fewer. The rule worth carrying is four to seven labelled ticks on round numbers, not one per data point and not as many as fit. Round matters as much as few: 0, 25, 50, 75 is a scale a reader can predict, while 0, 23, 46, 69 is four numbers they have to read one at a time.`;
+export const caption = `The same series three times, differing only in how many ticks the vertical axis was asked for: three, five and seventeen.`;
 
 export function render() {
   return plot({

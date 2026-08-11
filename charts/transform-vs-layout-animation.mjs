@@ -58,7 +58,7 @@ const TOTALS = PROPS.map((p) => ({ key: p.key, ms: total(p), note: p.note }));
 const OVER = TOTALS[0];
 const UNDER = TOTALS[1];
 
-export const caption = `Four steps turn a style change into pixels, and which of them run is decided by the property you animated. \`left\` is an input to layout, so all four run every frame: about ${OVER.ms.toFixed(0)} ms here, past the ${FRAME_MS.toFixed(1)} ms a frame gets at 60fps, which is a dropped frame before the page has done anything else. \`transform\` is applied at composite time, so layout and paint never run: about ${UNDER.ms.toFixed(1)} ms, with the rest of the budget left for the page. The numbers are representative of a moderately complex page rather than measured from one; the part that is not an estimate is which segments are there at all, and the two missing ones are exactly the two that grow with how much of the document has to be reconsidered.`;
+export const caption = `Four steps turn a style change into pixels. Animating ` + "`left`" + ` runs all four, about ${OVER.ms.toFixed(0)} ms here and past the ${FRAME_MS.toFixed(1)} ms a frame gets at 60fps; ` + "`transform`" + ` is applied at composite time, so layout and paint never run and the frame costs about ${UNDER.ms.toFixed(1)} ms.`;
 
 /** Legend positions in data units. Plot's own swatch legend is a separate DOM
  *  node beside the figure, and the build inlines the `<svg>` alone, so a legend

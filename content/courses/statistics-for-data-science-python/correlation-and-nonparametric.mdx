@@ -384,6 +384,14 @@ diagnostic. Rho far above r means the relationship is real and curved. R far
 above rho means one or two extreme points are carrying the linear fit, and
 ranks cannot be extreme, which is exactly why rho ignores them.
 
+Pearson's r measures how close the points are to a straight line. Spearman's
+rho replaces every value by its rank and computes the same thing on the ranks,
+so it measures how close the relationship is to *monotone*: does y always move
+the same way as x, whether or not at a constant rate. Both high and similar,
+as in the third panel, is linear and monotone, which is the case everyone
+assumes they are in. Neither coefficient says anything about the slope, and
+neither says anything about cause.
+
 ## Part B, Nonparametric tests: when t-tests are unsafe
 
 t-tests lean on the sampling distribution of the **mean** being roughly
@@ -483,6 +491,11 @@ the outliers land in its denominator: a few huge values inflate the sample
 standard deviation, and the test concludes it can't see through the noise it
 just manufactured. Ranks never see the outlier's size, only its position at
 the end of the queue.
+
+The skewed panel is the widest gap of the three, because most of that
+distribution is packed into a narrow range where a shift swaps a great many
+pairs of values around while barely moving a mean that the long tail
+dominates.
 
 <Callout type="warn" title="What Mann–Whitney actually tests">
 It's tempting to describe it as "the median version of the t-test", and that

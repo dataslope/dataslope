@@ -37,6 +37,17 @@ axis gets:
 Four to seven labelled ticks, on round numbers, is the rule of thumb. Not one
 per data point, and not as many as will fit.
 
+Three is already enough to make the axis a scale you consult once and then
+stop thinking about, because every value read after that is an interpolation,
+and "a bit above halfway between 60 and 100" is what a reader was going to do
+anyway. Seventeen changes their job in kind rather than degree: the labels sit
+close enough that finding the one you want means landing, reading, deciding
+and moving on, which is a search. It is also the density at which labels start
+to collide, so the renderer overlaps them, rotates them, or silently drops
+some, and all three are worse than having asked for fewer. And round matters
+as much as few: 0, 25, 50, 75 is a scale a reader can predict, while
+0, 23, 46, 69 is four numbers they have to read one at a time.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -90,6 +101,14 @@ carrying information of their own:
 A type hierarchy is an instruction about reading order, delivered before the
 reading starts. A chart with flat type has withheld something it already
 knew.
+
+Four levels is about the working limit, and they map onto four jobs: the
+claim, which everyone reads; the qualification, for people who want to know
+what was measured; the machinery of axis and ticks, read only when somebody is
+checking a number; and the provenance, read by the one person who intends to
+argue. Past four it stops being a hierarchy, because the reader can no longer
+tell which size is larger without comparing them, and not having to compare
+them was the point.
 
 ## Annotations on the chart
 
@@ -291,10 +310,28 @@ quietly collapse two ticks into the same string:
 
 <Chart slug="number-formatting-in-charts" />
 
+Nobody defends the first column; the interesting choice is between the other
+three. Separators carry the most information and are the slowest to read,
+because comparing two of them means comparing digit strings from the left, and
+a reader has done that five times before looking at the data. Compact units
+are the fastest, and the precision they cost is precision the axis never had,
+since nobody reads a bar to the nearest pound. The working rule is the fewest
+digits that keep every tick distinct, the unit in the axis title rather than
+on each tick, and full precision saved for the tooltip and the table, where a
+reader has asked for one number instead of being handed five.
+
 One more that a checklist will not catch, because both axes are labelled
 correctly:
 
 <Chart slug="units-that-look-alike" />
+
+The confusion is common enough to have its own entry in journalism style
+guides. A drug that takes a risk from 2% to 3% has raised it by one percentage
+point and by fifty per cent, both figures correct, and the symbol is identical
+either way. A chart is a worse place for this than a sentence, because a
+sentence can write "percentage points" and an axis label usually will not, so
+a reader comparing Islands on the left with Islands on the right sees an 8 and
+a 20 and draws the wrong conclusion about which is bigger.
 
 Write **pp** rather than **%** on any axis of differences, give a change axis a
 visible zero, and let it run negative when the data can.
@@ -307,6 +344,16 @@ the series in:
 
 The best legend is usually no legend: put the name at the end of the line and
 the lookup disappears entirely.
+
+Reading the left panel means finding a name, noting its color, holding the
+color in memory, scanning for it and checking, five times over, with the last
+one hardest because by then several hues look alike. On the right there is
+nothing to look up, because the name is where the line is, and color has
+become redundant. That redundancy is the point rather than a waste: a chart
+that still works with the color removed survives being printed, projected
+badly, or read by somebody who cannot separate two of the hues. When a legend
+really is unavoidable, order it the way the reader will meet the series, and
+never alphabetically unless their question is alphabetical.
 
 Skip any of these and the reader has to work harder. Some of that
 work, they won't bother to do.

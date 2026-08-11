@@ -77,6 +77,12 @@ A broken axis is a respectable old device, but only with a visible break
 marker, and most defaults will not draw you one. Without it the chart looks
 linear and reads logarithmic, which is the worst of both.
 
+The first panel is not dishonest so much as useless, since the other twelve
+values are hairlines and you cannot tell whether they differ. The middle one
+is the one to watch: it looks like the first and reads like the third. A
+reader who misses an invisible break compares bars by length, which is exactly
+what bars are for.
+
 The second is what happens when your x-axis has only *two* points. Before and
 after, last year and this year, control and treatment:
 
@@ -86,6 +92,12 @@ The bars answer "how big is each?" and the slopegraph answers "who overtook
 whom?", and the second question is usually the one people actually have. This
 is the general move worth learning: a chart's job is to turn the reader's
 question into a shape, and a rank change is a crossing.
+
+On the bars, "who overtook whom" is eight separate comparisons held in memory
+one at a time. On the slopegraph it is a crossing, convergence is a narrowing,
+and a runaway is a line leaving the bundle. What you give up is the zero
+baseline, so absolute size gets harder to read, and both ends have to be
+labelled or nobody knows which is which.
 
 ## Multiple series with `color`
 
@@ -243,6 +255,12 @@ exactly the reason to use one. It is also why the axis has to say "log" out
 loud: a gently rising straight line is what slow, dependable growth looks
 like on a linear axis, and the only thing separating the two readings is the
 tick labels.
+
+On the left the first six quarters are pressed flat against the floor, which
+is honest and nearly useless, since you cannot tell from it whether the early
+growth was steady. On the right the straightness is the finding. Drop the axis
+label, or set it in the same grey as the gridlines, and a company that grew
+128-fold reads as a company that grew a bit.
 
 <CodeBlock
   adapter="python"

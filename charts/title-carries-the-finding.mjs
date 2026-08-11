@@ -62,7 +62,7 @@ const bars = (p) =>
     y: p.py(v),
   }));
 
-export const caption = `Everything below the title is identical in the two panels: same bars, same axis, same color, no annotation, no highlight, no arrow. The only edit is the sentence at the top, and it changes what a reader leaves with. "Revenue by month" describes the data and leaves the analysis to them, so most people glance, see bars going roughly sideways, and move on, which is a reasonable response to being handed a dataset instead of a claim. The second title picks one comparison out of the ${PAIRS} pairs of months on offer, states the answer, and makes the chart falsifiable: somebody who disagrees now has something specific to disagree with, which is the reason for showing the data underneath at all. The usual objection is that this is editorialising, and it is. The alternative is not neutrality. A descriptive title still carries a point of view, in what was measured, what was left out, how it was grouped and which axis it went on; putting the claim up front makes that view arguable instead of hiding it in the defaults. If you can say what a chart shows in one sentence, that sentence is the title. If you cannot, the chart is not finished.`;
+export const caption = `Identical bars, identical axis, identical color, no annotation and no highlight. The only edit is the sentence at the top, which picks one comparison out of the ${PAIRS} pairs of months on offer and states the answer.`;
 
 export function render() {
   return plot({

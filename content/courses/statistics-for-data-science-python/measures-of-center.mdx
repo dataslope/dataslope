@@ -213,6 +213,13 @@ arithmetic error in any spreadsheet:
 The quickest way to remember which calculation you want: if grouping first and
 not grouping at all give different answers, you have made this mistake.
 
+The right calculation is the weighted mean, with the group sizes as weights,
+and it is identical to ignoring the groups and averaging the raw rows. It
+generalizes past means, too: averaging five conversion rates, five percentage
+changes, five medians or five R-squareds does not commute with grouping
+either. A rate is a ratio, and ratios combine by adding numerators and adding
+denominators, never by averaging the ratios.
+
 ## Three useful variations (keep these light)
 
 Most of the time, mean/median/mode are all you need. But three relatives

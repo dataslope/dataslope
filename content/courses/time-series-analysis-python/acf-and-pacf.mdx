@@ -52,8 +52,15 @@ correlation is 0.82, and squaring the lag-1 correlation, which is what a
 pure chain through the middleman would give you, accounts for 0.73 of it.
 Only the small remainder is a genuinely direct link, and it is that
 remainder the PACF is reporting. Past lag 2 there is nothing direct left to
-report, so the PACF drops into the noise band while the ACF keeps decaying
-on chain effects alone.
+report, so the PACF drops into the noise band while the ACF keeps decaying on
+chain effects alone: today leans on yesterday, yesterday leaned on the day
+before, and the correlation propagates down the line while shrinking.
+
+That gives the rule people memorise. A PACF cutting off at lag p
+with a decaying ACF means AR(p). An ACF that cuts off at lag q with a decaying
+PACF means MA(q), the mirror image, because a moving-average process has a
+finite memory of shocks. Both decaying means both parts are present and
+neither order is readable by eye.
 
 <Callout type="warn" title="One bar poking out is not a finding">
 The shaded band is a 5% envelope, so on a plot of fourteen lags you should

@@ -107,7 +107,7 @@ const bulletBands = BANDS.map((b, i) => ({
   shade: 0.16 - i * 0.05,
 }));
 
-export const caption = `The gauge is the default KPI widget everywhere, and the objection to it is arithmetic rather than aesthetic. It spends the largest object on the page on one number, and encodes that number as an angle, a mid-ranking channel, when a position on a line was free. The arc, the needle, the tick ring and the shading are furniture: delete them and no information leaves. Then count what a reader of a KPI actually needs, which is usually four things. Where are we (${VALUE}). Where did we say we would be (${TARGET}, so ${TO_TARGET} short). How does that compare with last period (${LAST}, so ${DELTA > 0 ? "up" : "down"} ${Math.abs(DELTA)}). And is this good. The gauge carries the first, gestures at the last with color bands, and cannot carry the middle two at all. Stephen Few's bullet chart carries all four: a bar for the value, a perpendicular tick for the target, shaded bands behind for the qualitative ranges, in about a fifth of the space, with position doing the work. Twenty of them stack in a column without becoming a wall of dials. The third panel is the reminder that a chart is not always the answer. With one number and one comparison, a large figure and a delta beside it reads faster than either and takes a tenth of the room. Use the bullet when there is a target and a range; use the number when there is not.`;
+export const caption = `One KPI as a gauge, as a bullet chart and as a number. The four facts a reader usually needs are the value (${VALUE}), the target (${TARGET}, so ${TO_TARGET} short), last period (${LAST}, so ${DELTA > 0 ? "up" : "down"} ${Math.abs(DELTA)}) and whether that is good.`;
 
 export function render() {
   return plot({

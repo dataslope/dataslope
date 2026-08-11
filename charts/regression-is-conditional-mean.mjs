@@ -71,7 +71,7 @@ const residualSd = Math.sqrt(
   POINTS.reduce((s, d) => s + (d.y - at(d.x)) ** 2, 0) / (POINTS.length - 2),
 );
 
-export const caption = `"The line of best fit" describes the algorithm rather than the answer, and it leaves people believing the line summarises the cloud. It does not. It estimates the conditional mean: for each value of x, the average y among points with that x. The slices make it literal. Each band holds the points in a narrow range of x, the marker is that band's mean, and the fitted line runs through the markers, which is the whole content of the model. Three things follow, and each is a mistake somebody makes. The line is a statement about averages, so it never claimed to predict an individual: a model can have an excellent line and a residual standard deviation of ${residualSd.toFixed(1)}, as this one does, and the two facts are not in tension. The vertical spread inside a slice is what a *prediction* interval is made of, while the confidence interval on the line is about where the markers are, which is a far narrower thing. And fitting minimises vertical distances, so x and y are not symmetric: regressing y on x and x on y give two different lines and neither is "the relationship". It also explains what a bend does. If the true conditional means fall on a curve, a straight line cannot pass through the markers, and the residual plot shows it as structure rather than noise, which is what a residual plot is for.`;
+export const caption = `Each band holds the points in a narrow range of x, and the marker is that band's mean. The fitted line runs through the markers, which is the whole content of the model, and the residual standard deviation around it is ${residualSd.toFixed(1)}.`;
 
 export function render() {
   return plot({

@@ -66,7 +66,7 @@ const bars = (p, list) =>
     y: p.py(d.v),
   }));
 
-export const caption = `Sorting bars by value is the right default, because an arbitrary order wastes position, which is the strongest thing a chart has. It stops being right the moment the categories already have an order of their own. Sorted, this chart answers "which day is busiest" (${BUSIEST.key}) and destroys the answer to everything else, because Monday is no longer beside Tuesday and the run from Monday to Friday is no longer a run. In calendar order the same seven bars answer that question nearly as well and also show the shape: a week that climbs to Friday, a dip on ${DIP.key} you would never have spotted in the sorted version, and a weekend that falls off a cliff. The same holds for shirt sizes, age brackets, school years, months, and any scale from "strongly disagree" to "strongly agree". The test is one question. If two neighbouring categories swapped places, would anything be wrong? If yes, the order is data and sorting deletes it. If no, sort by value.`;
+export const caption = `The same seven bars sorted by value and in calendar order. Sorted, the chart answers "which day is busiest" (${BUSIEST.key}) and destroys the answer to everything else; in calendar order it answers that nearly as well and also shows the shape, including a dip on ${DIP.key}.`;
 
 export function render() {
   return plot({

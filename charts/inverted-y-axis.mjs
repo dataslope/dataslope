@@ -48,7 +48,7 @@ const flipY = (v) => FLIPPED.top + FLIPPED.bottom - FLIPPED.py(v);
 const flippedRow = SERIES.map((d) => ({ ...d, x: FLIPPED.px(d.i), y: flipY(d.v) }));
 const honestRow = SERIES.map((d) => ({ ...d, x: HONEST.px(d.i), y: HONEST.py(d.v) }));
 
-export const caption = `Same eight numbers, both axes correctly labelled, and the two panels say opposite things. On the left the vertical axis runs downwards, so a ${RISE}% rise draws as a line sloping down. A version of this was broadcast in 2014 about Florida's firearm homicides, and the argument that followed is a good test of what "misleading" means, because nothing on the chart is false: the axis is labelled, the numbers are right, and the designer's stated intention, a fill that reads as pooling blood with the baseline at the top, is a real design idea rather than a trick. It is misleading anyway, and the reason is worth saying exactly. Up is more. That is not a rule you can opt out of by labelling an axis, because a reader does not read the axis before forming an impression; they take the shape first and check the axis later, if at all. Any chart that needs its caption to undo the impression its shape just made has already lost. The same holds, more weakly, for every other convention a chart can invert: time running right to left, red on the good side of a diverging scale, small meaning more. None of them is false, and all of them cost a correction the reader will not always make.`;
+export const caption = `The same eight numbers, both axes correctly labelled, saying opposite things. On the left the vertical axis runs downwards, so a ${RISE}% rise draws as a line sloping down.`;
 
 export function render() {
   return plot({

@@ -82,7 +82,7 @@ const bars = sorted.map((d, i) => ({
 
 const shade = (v) => 0.12 + ((v - LO) / (HI - LO)) * 0.78;
 
-export const caption = `Nine regions, one number each, and the question is which are doing badly. The map answers slowly and the bars answer at once, and the reason is not that maps are bad. A map spends its two strongest channels, both dimensions of position, on where things are, and has only color left for the quantity, so ranking nine shades is a chore and reading a value off one needs the legend. A bar chart spends position on the quantity and gives up geography completely. Which side of that trade you want turns on one question: is the answer geographic? It is when the finding is about adjacency, about a boundary, about distance, or about a spatial pattern a reader would recognise, and then no bar chart substitutes. It is not when the finding is a ranking, which is what most regional dashboards contain. The three worst here are ${WORST.map((d) => d.key).join(", ")}, and they ${ADJACENT ? "do happen to touch, which is the one thing the map adds" : "share nothing but their numbers, so the map's entire contribution is telling you they are not neighbours, which a sentence would also have done"}. When you are unsure, write the finding out as a sentence. If it contains a direction, a border or a distance, keep the map.`;
+export const caption = `Nine regions with one number each, as a choropleth and as bars. The three worst are ${WORST.map((d) => d.key).join(", ")}, which the bars answer at once.`;
 
 export function render() {
   return plot({

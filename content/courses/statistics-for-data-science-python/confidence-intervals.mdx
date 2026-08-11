@@ -373,6 +373,11 @@ convention chose. Nudge the convention and the endpoints move with it.
 That is why "the CI excludes 0" and "there is no effect" are different
 sentences.
 
+This interval's right-hand edge sits at 104.7 at 95%, at 103.1 if the
+convention were 80%, and at 106.2 if it were 99%, so whether a value just
+outside is "ruled out" is a question about the standard of evidence rather
+than about the value.
+
 ## What controls the width
 
 The margin of error is $\text{critical value} \times \text{standard error}$, so the width
@@ -751,9 +756,16 @@ is not evidence of absence (a tight interval hugging 0).
 <Chart slug="overlapping-cis-are-not-a-test" />
 
 Comparing two intervals by eye is not the 5% test; it is a stricter one, at
-roughly the 1% level, because the standard error of a difference is the square
-root of the sum of squares rather than the sum. When the question is about a
-difference, compute an interval for the difference.
+roughly the 1% level. When the question is about a difference, compute an
+interval for the difference.
+
+The arithmetic is short. Two intervals stop touching once the means are more
+than 1.96 times the *sum* of the standard errors apart, which is 12.2 units
+here. But the standard error of a difference is not the sum, it is the square
+root of the sum of squares, because variances add and standard errors do not.
+With similar groups that is a factor of about √2, so there is a whole band of
+separations where the intervals still overlap and the difference is already
+significant, and this is one of them.
 
 ## Check your understanding
 

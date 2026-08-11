@@ -115,7 +115,7 @@ const fillFor = (d) => {
   return d.value < 0 ? ACCENT : PRIMARY;
 };
 
-export const caption = `A waterfall is a bridge from one total to another: each bar begins where the last one ended, and its direction says whether the term added or took away. Direction is half the encoding, and the reader's running sum is a sum of signed quantities. In the left panel one term carries its magnitude and not its sign, which is what an `+"`abs()`"+` in a pipeline does, or a costs column that arrives positive because that is how the ledger stores it. Every bar is a correct length. The chart is wrong anyway, because the running total it draws is not the running total of the data, and the bridge closes at ${DRAWN_CLOSE} where the business finished at ${TRUE_CLOSE}, ${Math.abs(ERROR)} out. That is the part worth keeping. Most misleading charts are wrong about emphasis, and a careful reader can recover the truth from them. This one is wrong about arithmetic: the closing figure is printed on the chart, it is not the right figure, and nothing on the drawing contradicts anything else, so care does not help. The check that catches it takes five seconds. Add the terms up yourself and see whether you land where the last bar says.`;
+export const caption = `A waterfall in which one term carries its magnitude but not its sign, beside the same bridge drawn correctly. Every bar is a correct length, and the total closes at ${DRAWN_CLOSE} where the business finished at ${TRUE_CLOSE}.`;
 
 export function render() {
   return plot({

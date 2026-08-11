@@ -67,7 +67,7 @@ const SURVEY = COLUMNS[1];
 const CLEAN = mean(SURVEY.values.filter((v) => v <= 5));
 const SHIFT = (SURVEY.mean - CLEAN).toFixed(1);
 
-export const caption = `Every value here is an integer, so every column will average, sum, correlate and enter a regression without a warning. The arithmetic is valid in the sense that it finishes. Only the column's meaning says whether the answer is nonsense, which is why a type system cannot catch this and a data dictionary can. The four failures differ. A postcode is nominal: 90210 is not more than 10001, it is a different place, and the mean of a set of them is usually the sea. A survey code is ordinal at best, and this one is not even that, because 9 is the code for "prefer not to say" and averaging it in lifts the result by ${SHIFT} of a point, from ${CLEAN.toFixed(1)} to ${SURVEY.mean.toFixed(1)}. A jersey number is a label with a tradition attached, and 23.4 describes nobody. A year is interval, so differences work and the mean is meaningful, while ratios are not, and "2024 is 1.005 times 2014" is a sentence no one should write. The habit that catches all four: for every numeric column, ask whether doubling it means anything. If it does not, the column is a label with digits in it and belongs in the dataframe as a category.`;
+export const caption = `Four integer columns that will average, sum, correlate and enter a regression without a warning. Averaging in the code 9 for "prefer not to say" lifts the survey result by ${SHIFT} of a point, from ${CLEAN.toFixed(1)} to ${SURVEY.mean.toFixed(1)}.`;
 
 export function render() {
   return plot({

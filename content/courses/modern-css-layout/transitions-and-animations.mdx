@@ -132,6 +132,11 @@ layout and paint, and animating `transform` skips both:
 
 <Chart slug="transform-vs-layout-animation" />
 
+The millisecond figures are representative of a moderately complex page rather
+than measured from one. The part that is not an estimate is which segments are
+there at all, and the two missing ones are exactly the two that grow with how
+much of the document has to be reconsidered.
+
 ## Animations: scripted, repeatable motion
 
 For motion that isn't tied to a state change, define keyframes and

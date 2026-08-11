@@ -46,7 +46,7 @@ const logRow = line(LOG);
 
 const k = (v) => (v >= 1000 ? `${Math.round(v / 1000)}k` : String(v));
 
-export const caption = `Both panels are the same eight numbers, an account count that doubles every quarter and ends ${GROWTH} times where it started. On the left the first six quarters are pressed flat against the floor, which is honest and nearly useless: you cannot tell from it whether the early growth was steady. On the right the series is a straight line, and the straightness is the finding, because a straight line on a log axis is a constant growth rate. That is the whole reason to reach for one. It is also the reason the axis label is not optional. A gently rising straight line is exactly what a linear chart of slow, dependable progress looks like, and the only thing separating the two readings is the tick labels and the word "log". Drop it, or set it in the same grey as the gridlines, and a company that grew ${GROWTH}-fold reads as a company that grew a bit.`;
+export const caption = `The same eight numbers on a linear and a log axis: an account count that doubles every quarter and ends ${GROWTH} times where it started.`;
 
 export function render() {
   return plot({

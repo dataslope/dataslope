@@ -339,6 +339,9 @@ interval around the *wrong* center. Resampling estimates *precision*
 at the truth). Garbage in, confidently-quantified garbage out.
 </Callout>
 
+There is also a class of statistic the method cannot handle at all, and it is
+worth seeing beside one it handles beautifully:
+
 <Chart slug="bootstrap-fails-for-max" />
 
 The shape of the failure is worth remembering. Statistics that depend on the
@@ -346,6 +349,13 @@ The shape of the failure is worth remembering. Statistics that depend on the
 fair sample of the interior. Statistics that depend on the *edge* do not,
 because the edge of a resample is bounded by the edge of the sample and the
 method can never look past what it has already seen.
+
+A resample can only contain values the original sample contained, so the
+bootstrapped maximum is always one of the few largest observations. The
+practical test: if drawing one more observation from the population would move
+the statistic more often than resampling does, the bootstrap is understating
+its uncertainty. Extremes are the clear case, and the right tool for them is
+extreme value theory, which models the tail rather than resampling it.
 
 ## Practice the bootstrap
 

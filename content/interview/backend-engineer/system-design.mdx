@@ -108,6 +108,12 @@ small:
 
 <Chart slug="cache-ttl-staleness" />
 
+Lengthening the TTL saves database trips and gives writes longer to overtake
+the copy, so the two failures trade directly against each other and the best a
+single number can do is the crossing point. Write-through pays at write time
+to move the stale curve down. The rates here are illustrative rather than
+measured.
+
 ### What is database replication and what does it buy you?
 
 Replication keeps copies of the data on multiple nodes. In **leader-follower**

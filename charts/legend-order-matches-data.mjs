@@ -64,7 +64,7 @@ const MISMATCHES = alphabetical.filter((s, i) => byEnding[i].key !== s.key).leng
 const rowsFor = (p) =>
   series.flatMap((s) => s.points.map((d) => ({ key: s.key, color: s.color, x: p.px(d.i), y: p.py(d.v) })));
 
-export const caption = `Same five lines, same five names, and one difference. On the left the legend is alphabetical, which is what every library does by default because it is the default sort for strings. Reading it means finding a name, noting its color, holding the color in memory, scanning for it, and checking, five times over, with the last one hardest because by then several hues look alike. Here ${MISMATCHES} of the five entries are in a different place from the line they name. On the right the names sit at the end of the lines, in whatever order the lines finish in, and there is nothing to look up because the name is where the line is. Notice that color has become redundant, which is the point rather than a waste: a chart that still works with the color removed is a chart that survives being printed, projected badly, or read by somebody who cannot separate two of the hues. When a legend really is unavoidable, the weaker version of the rule still holds. Order it the way the reader will meet the series, and never alphabetically unless their question is alphabetical.`;
+export const caption = `The same five lines with an alphabetical legend, then with the names at the end of the lines. In the legend version ${MISMATCHES} of the five entries sit in a different place from the line they name.`;
 
 export function render() {
   return plot({

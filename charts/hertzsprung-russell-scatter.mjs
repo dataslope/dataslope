@@ -109,7 +109,7 @@ const REGIONS = [
   { label: "White dwarfs", teff: 9800, lum: 4e-5, anchor: "start" },
 ];
 
-export const caption = `Hertzsprung and Russell each plotted two quantities astronomers had been tabulating separately for years: how hot a star's surface is, and how much light it gives off. Nobody expected the points to do anything in particular. Instead they fall on one long diagonal with two detached islands, and those regions turned out to be stages of a single life story. The diagonal is where a star spends nearly all of its life; the clump above it is what happens when the hydrogen runs out and the star swells; the scatter at the bottom is the exposed core left behind. The finding is really the empty space, which is exactly what a table cannot show you: a gap between rows of numbers is invisible, and a gap in a scatter is the first thing you see. Both axes run backwards on purpose, temperature to the left because Russell kept the spectral ordering already in use, and luminosity on a log scale because the range is ten orders of magnitude. The named stars here are real and carry their published values; the background population is simulated from the standard relations, so its shape is right and its dots are not individual stars.`;
+export const caption = `Surface temperature against luminosity for a population of stars. Both axes run backwards on purpose: temperature falls to the right, because Russell kept the spectral ordering already in use, and luminosity is logarithmic because the range spans ten orders of magnitude.`;
 
 export function render() {
   return plot({

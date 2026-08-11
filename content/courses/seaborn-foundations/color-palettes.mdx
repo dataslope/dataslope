@@ -90,6 +90,13 @@ just look odd, it makes a claim:
 
 <Chart slug="sequential-scale-on-categories" />
 
+The effect is not subtle, because the eye reads light-to-dark as low-to-high,
+that being what lightness is for, so the chart asserts a ranking that is not
+in the data, in a channel readers trust without checking. Worse, the ranking
+it asserts is the alphabetical order the groupby happened to return. The rule
+is a short table: nominal data takes a qualitative palette, ordinal data takes
+a sequential one, and data with a meaningful middle takes a diverging one.
+
 Picking the palette *family* is the decision. Picking which pretty colors go in
 it is not.
 

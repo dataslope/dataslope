@@ -72,7 +72,7 @@ const BEST = 3;
 const collapses = (style) => new Set(VALUES.map(style.format)).size < VALUES.length;
 const COLLAPSED = STYLES.filter(collapses).map((s) => s.title);
 
-export const caption = `The same five axis values, labelled four ways. Nobody defends the first column; the interesting choice is between the other three. Separators are the most information and the slowest to read, because comparing two of them means comparing digit strings from the left, and a reader has done that five times before they have looked at the data. Compact units are the fastest, and the precision they cost is precision the axis never had: nobody reads a bar to the nearest pound. The failure to watch for is the third column, where rounding to too few significant figures makes ${COLLAPSED.length > 1 ? "several ticks" : "three of the five ticks"} print the same string, and an axis reading 1M, 2M, 2M, 2M, 3M has stopped being a scale. That happens whenever a range is narrow next to its magnitude, which is common with money. The working rule: fewest digits that keep every tick distinct, unit in the axis title rather than on each tick, and full precision saved for the tooltip and the table, where a reader has asked for one number instead of being handed five.`;
+export const caption = `The same five axis values, labelled four ways. In the third column the rounding is aggressive enough that ${COLLAPSED.length > 1 ? "several ticks" : "three of the five ticks"} print the same string, and an axis reading 1M, 2M, 2M, 2M, 3M has stopped being a scale.`;
 
 export function render() {
   return plot({

@@ -74,7 +74,7 @@ const rows = [OPAQUE, CLEAR].flatMap((panel) =>
 const HIDDEN = hidden.size;
 const VISIBLE = N - HIDDEN;
 
-export const caption = `A bubble chart draws a filled disc per row, and once two land near each other the bigger one paints over the smaller. Opaque, that is a total loss: ${HIDDEN} of these ${N} discs are entirely inside a larger one and leave no trace, so the left panel looks like a perfectly good chart of ${VISIBLE} points. That silence is the reason this one is worth knowing. Most chart problems announce themselves, an overplotted scatter looks like a blob and a truncated axis has numbers on it, but there is no visual difference between "${N} points, ${HIDDEN} hidden" and "${VISIBLE} points", so a reader cannot even form the question. Two changes fix it and they do different jobs. Transparency turns overlap into density: where discs pile up the fill darkens, which is information rather than an accident. An outline preserves each disc's boundary, so a small bubble inside a large one stays a countable object. Neither is sufficient alone and together they cost nothing. Two more habits when the crowding is bad: paint the largest discs first so the small ones end up on top, and cap the maximum radius, because past a certain size area stops being a comparison anyone can make and becomes territory that hides whatever is behind it.`;
+export const caption = `${N} discs, of which ${HIDDEN} sits entirely inside a larger one and leaves no trace. Opaque, the left panel is indistinguishable from a perfectly good chart of ${VISIBLE} points.`;
 
 export function render() {
   return plot({

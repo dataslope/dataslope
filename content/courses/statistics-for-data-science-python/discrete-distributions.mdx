@@ -286,6 +286,11 @@ assert abs(p_at_least_25 - wrong) > 1e-12`,
   ]}
 />
 
+Three of the binomial's four assumptions are usually obvious: a fixed number
+of trials, two outcomes, a constant probability. The fourth, independence, is
+the one that quietly fails, because real trials are usually people and people
+come in households, classes, sessions and regions.
+
 <Chart slug="binomial-assumption-breaks" />
 
 The multiplier has a name, the design effect, and it is 1 + (m − 1)ρ for
@@ -293,6 +298,12 @@ clusters of size m. It is worth knowing because it is brutal: a ρ of 0.05 with
 clusters of fifty gives a design effect near 3.5. The fix is to analyse at the
 level randomization happened, and what does not work is ignoring it, which is
 easy to do because the point estimate is fine.
+
+Those 400 rows in 40 clusters carry about as much information as 93
+independent trials, and the consequence lands on every interval. Computed with
+n = 400, a binomial confidence interval is roughly 0.48 of the width it should
+be, so an A/B test on clustered data finds significance about as often as
+running the test several times and keeping the best.
 
 ## Poisson: counting rare events in a fixed interval
 
@@ -446,6 +457,10 @@ assert abs(p_more_than_9 - expected_prob) < 1e-9`,
   ]}
 />
 
+That identity is also the Poisson's whole personality, and its weak point. Fit
+one to any counts and it will match the average exactly, then be wrong about
+the spread by however much the data disagrees.
+
 <Chart slug="poisson-overdispersion" />
 
 The check is one line: the variance-to-mean ratio, called the dispersion. One
@@ -454,6 +469,11 @@ count data does, because Poisson assumes events arrive independently at a
 constant rate and real events cluster. The standard replacement is the
 negative binomial, which changes nothing about the mean and everything about
 the intervals.
+
+The tail is where that costs money, because every capacity plan, alerting
+threshold and staffing model built on the fit is calibrated for a world with
+less variance than the one it runs in. Outages come in storms, sales come in
+campaigns, arrivals come in buses.
 
 ## Geometric: how many trials until the first success?
 
@@ -494,12 +514,23 @@ the geometric as the number of *failures before* the first success
 always check which convention a tool uses before trusting the numbers.
 </Callout>
 
+The shape is the same for every p, and it is worth seeing once, because the
+mean is a poor summary of it. The most likely number of attempts is always
+one, since the highest-probability outcome is that it worked straight away,
+and the curve only decreases from there.
+
 <Chart slug="geometric-waiting-time" />
 
 The property that makes this distribution strange is memorylessness: given
 that the first seven attempts failed, the distribution of how many more you
 need is the same one you started with. Seven failures are not evidence that a
 success is due, and not evidence that it is not.
+
+A retry budget planned around the mean therefore fails often enough to matter.
+Memorylessness is also the assumption worth checking, because real retries are
+usually not independent: whatever made the first attempt fail is often still
+happening, which makes the tail heavier than this and a fixed budget less safe
+still.
 
 ## Choosing the right discrete distribution
 

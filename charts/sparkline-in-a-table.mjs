@@ -107,7 +107,7 @@ const endpoints = table.map((r) => {
 });
 const TROUBLE_ROW = table.find((r) => r.trouble);
 
-export const caption = `A table gives exact values, is searchable and copyable, survives being pasted into an email, and hands a reader who wants one number that number without any measuring. What it cannot give is shape: spotting that ${TROUBLE.key} has slid ${TROUBLE_DROP}% across the year means reading twelve figures and holding eleven differences in your head, and nobody does that. The usual fix is a line chart beside the table, which is twelve lines in one frame and a reader matching colors to row names. Tufte's sparkline does something else: it puts the shape in the row, at about the size of a word, so the value and the trend are taken in with one movement. What makes it work is everything it omits. No axis, no ticks, no gridlines, no labels, no baseline, because a sparkline is a glyph rather than a small chart. You are not meant to read a value off it; the number is right there in the next column. One warning worth keeping: each row is scaled to its own range, so sparklines are comparable to themselves and not to each other. Which region is biggest is a question for the number column. Which region is in trouble is a question for the glyphs, and the answer takes about a second.`;
+export const caption = `The same twelve months as a column of numbers and as a glyph the size of a word. Spotting that ${TROUBLE.key} has slid ${TROUBLE_DROP}% across the year means reading twelve figures in the table and takes about a second in the sparkline.`;
 
 export function render() {
   return plot({

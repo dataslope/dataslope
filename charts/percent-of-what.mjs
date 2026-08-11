@@ -106,7 +106,7 @@ const stack = (slots, p) =>
     });
   });
 
-export const caption = `A 100 per cent stacked bar normalises every group to the same length, which is right when the question is about the *mix* and wrong when the groups are different sizes, because normalising is the operation that deletes the evidence. In the upper row all five bars are the same width and the same visual weight. One of them is ${LARGEST.n.toLocaleString()} responses and one is ${SMALLEST.n}. The ${SMALLEST.key} bar has the most dramatic mix on the chart, and that is not a finding: at n = ${SMALLEST.n} the sampling noise on a share is around ${NOISE} percentage points, so a bar that looks like a different population is roughly what you would expect even if every group were identical. The lower row draws the same numbers with each bar's width proportional to its sample size. That is one of the two standard fixes; the other is to print n under each bar and let the reader discount the small ones. The width version has a second virtue, which is that the area of each color is now the actual count, so the eye adds up instead of averaging five percentages as though they weighed the same. The general form of the mistake is larger than one chart type: per cent, per capita, per thousand and index-to-100 all throw away the denominator, and a chart that has thrown away its denominator cannot tell you which of its numbers to believe.`;
+export const caption = `Five groups as a 100 per cent stacked bar, then the same numbers with each bar's width proportional to its sample size. One of those bars is ${LARGEST.n.toLocaleString()} responses and one is ${SMALLEST.n}.`;
 
 export function render() {
   return plot({

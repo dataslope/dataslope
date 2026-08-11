@@ -104,7 +104,7 @@ const flatBars = VALUES.map((d, i) => {
 const BACK_READS = MAX * ((FAKE.py(VALUES[0].v) + DEPTH_Y - FAKE.bottom) / (FAKE.top - FAKE.bottom));
 const OVERSTATE = Math.round(BACK_READS - VALUES[0].v);
 
-export const caption = `The complaint about 3-D bars is usually that they are ugly, which is the least of it. Perspective is a quantitative distortion laid on top of the encoding, and it is applied unevenly. Look at one bar's top face: it is a parallelogram, so the front edge and the back edge of the same bar meet the axis at two different heights, about ${OVERSTATE} units apart here, and nothing tells the reader which edge is the value. Most people read the front, which is systematically too high. The ink also triples: every bar gains a top face and a side face that encode nothing. And this is the mildest possible case, an isometric extrusion with no perspective in it at all. A real 3-D chart of the kind a spreadsheet will make adds true foreshortening, so an equal ${STEP}-unit step renders as a different step depending on how far back it is, and it lets the front row physically cover the back row. In none of these versions is the third dimension carrying a third variable. It carries nothing, and charges for it in accuracy.`;
+export const caption = `Give a bar depth and its top face becomes a parallelogram, so the front and back edges of one bar meet the axis about ${OVERSTATE} units apart, and nothing says which edge is the value.`;
 
 export function render() {
   return plot({
