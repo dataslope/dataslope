@@ -1,15 +1,26 @@
 /**
- * Runs every Python `<CodeBlock>` in `content/` and records what it printed,
- * so a lesson can show a block's output before the reader presses Run.
+ * Runs every `<CodeBlock>` there is a headless runtime for and records what it
+ * printed, so a lesson can show a block's output before the reader presses Run.
+ *
+ * Python runs here, through Pyodide; JavaScript, TypeScript, C and C++ run
+ * through `scripts/lib/block-runners.mjs`, which explains what is missing and
+ * why. Before those were added this script was Python-only, and the other
+ * 1,685 runnable blocks on the site showed an empty panel until the reader
+ * pressed Run — not one course, but every language that is not Python.
  *
  * ── Why this exists ─────────────────────────────────────────────────────
  * A runnable block that shows nothing until it is run asks the reader to
  * press a button before the page makes its point. That is a fine trade for
  * the reader who wants to experiment and a bad one for the reader who is
  * skimming, and the second reader is most readers. This fills the panel in
- * at build time so the lesson reads end to end, and Run still does exactly
+ * ahead of time so the lesson reads end to end, and Run still does exactly
  * what it always did — the prepopulated cells are replaced the moment the
  * reader executes anything.
+ *
+ * Nothing invokes this automatically except
+ * `.github/workflows/block-outputs.yml`. Neither `build` nor `dev` runs it:
+ * executing lesson code is not something a deploy or a local start should be
+ * doing, and the manifest it writes is committed.
  *
  * ── How it works ────────────────────────────────────────────────────────
  * It boots the same Pyodide-in-Node the content sweeps use
@@ -36,6 +47,7 @@
  *
  * Usage:
  *   node scripts/build-block-outputs.mjs [--filter <substr>[,<substr>…]]
+ *                                        [--adapter <name>[,<name>…]]
  *                                        [--force] [--stats]
  */
 import {
@@ -53,6 +65,7 @@ import { blockOutputKey } from "../lib/blockOutputKey.ts";
 import { toOutputCells } from "../app/_components/runtime/pythonDisplayOutputs.ts";
 import { collectFiles, freshness } from "./lib/build-cache.mjs";
 import { extractBlocks, matchesFilter, parseFilter } from "./lib/mdx-blocks.mjs";
+import { createRunner, TEXT_ADAPTERS } from "./lib/block-runners.mjs";
 import { bootPyodide, isEnvironmental } from "./lib/pyodide-runner.mjs";
 import { captureSetupScript, wrapLastExpression } from "./lib/python-output-capture.mjs";
 
@@ -98,14 +111,14 @@ function writeManifestFile(data) {
 /**
  * Prepopulated output is a nicety; the site is correct without it. So a
  * failure here — a Pyodide boot that cannot reach its packages, a dataset
- * fetch that times out on a deploy runner, an OOM part-way through 1,689
- * blocks — must never take a production build down with it. Anything
- * unhandled writes the empty manifest and exits 0, which every consumer
- * already treats as "no entries": blocks show the panel they showed before
- * this feature existed, and the build carries on.
+ * fetch that times out, an OOM part-way through 2,600 blocks — must never
+ * take the run that invoked it down with it. Anything unhandled leaves the
+ * committed manifest alone and exits 0, which every consumer already treats
+ * as "no entries": blocks show the panel they showed before this feature
+ * existed, and the workflow carries on.
  *
- * Loud on the way out, though. A deploy that silently stopped prepopulating
- * would be indistinguishable from one where no block has any output.
+ * Loud on the way out, though. A regeneration that silently stopped
+ * prepopulating would be indistinguishable from one where nothing changed.
  */
 function failSoft(err) {
   console.error(`build-block-outputs: FAILED (${err?.message ?? err})`);
@@ -144,8 +157,24 @@ const showStats = args.includes("--stats");
 // manifest exactly as it reads a missing entry, so every block falls back to
 // the panel it had before any of this.
 const emptyOnly = args.includes("--empty");
+// `--adapter js,cpp` narrows a run to one language, which is what makes a
+// twenty-minute C++ pass optional while a JavaScript one stays quick.
+const adapterArg = args.includes("--adapter")
+  ? args[args.indexOf("--adapter") + 1]
+  : null;
+const wanted = adapterArg
+  ? adapterArg
+      .split(",")
+      .map((a) => a.trim())
+      .filter(Boolean)
+  : null;
+const doPython = !wanted || wanted.includes("python");
+const textAdapters = TEXT_ADAPTERS.filter((a) => !wanted || wanted.includes(a));
+/** Per-language counts for the summary, so a language that recorded nothing
+ *  is visible rather than averaged away. */
+const totals = {};
 
-const allBlocks = extractBlocks().filter((b) => !b.unparsable);
+const allBlocks = doPython ? extractBlocks().filter((b) => !b.unparsable) : [];
 const blocks = filter
   ? allBlocks.filter((b) => matchesFilter(filter, b.file))
   : allBlocks;
@@ -170,8 +199,7 @@ const blocks = filter
  * so re-running everything would rewrite all 368 files on every regeneration
  * and churn the history for no change in what a reader sees.
  */
-function loadPreviousManifest() {
-  if (force) return {};
+function loadManifestFile() {
   try {
     return JSON.parse(readFileSync(OUT_FILE, "utf8"));
   } catch {
@@ -179,7 +207,11 @@ function loadPreviousManifest() {
   }
 }
 
-const previous = loadPreviousManifest();
+const onDisk = loadManifestFile();
+// `--force` means "do not *reuse* an entry", not "throw the file away": a
+// narrowed run still has to carry the languages it is not looking at, and
+// conflating the two is what deleted every Python entry on the site.
+const previous = force ? {} : onDisk;
 
 /** True when a recorded entry is still usable: every file it points at is
  *  still on disk. A pruned or half-copied asset directory must re-run the
@@ -191,13 +223,14 @@ function entryIsIntact(entry) {
 }
 
 // An unchanged content tree costs a stat signature and nothing else, the
-// same contract every other generator in the build chain honours. Without
-// it, `npm run dev` would re-scan every lesson on every start.
+// same contract every other generator honours. Without it, a regeneration
+// would re-scan every lesson to discover that none of them moved.
 const cache = freshness(ROOT, "block-outputs", {
   inputs: [
     fileURLToPath(import.meta.url),
     join(ROOT, "scripts", "lib", "python-output-capture.mjs"),
     join(ROOT, "scripts", "lib", "pyodide-runner.mjs"),
+    join(ROOT, "scripts", "lib", "block-runners.mjs"),
     join(ROOT, "lib", "blockOutputKey.ts"),
     join(ROOT, "app", "_components", "runtime", "pythonDisplayOutputs.ts"),
     ...collectFiles(join(ROOT, "content"), (f) => f.endsWith(".mdx")).map((rel) =>
@@ -218,8 +251,8 @@ if (emptyOnly) {
   process.exit(0);
 }
 
-if (blocks.length === 0) {
-  console.log("build-block-outputs: no python blocks selected");
+if (blocks.length === 0 && textAdapters.length === 0) {
+  console.log("build-block-outputs: no blocks selected");
   writeManifestFile({});
   process.exit(0);
 }
@@ -341,7 +374,16 @@ function sameOutput(a, b) {
   return a.every((c, i) => normalizeForCompare(c) === normalizeForCompare(b[i]));
 }
 
-const manifest = {}; // lesson path → { key → { cells, stable } }
+/**
+ * Lesson path → { key → { cells, stable } }.
+ *
+ * A narrowed run (`--filter`, `--adapter`) starts from what is already
+ * recorded, because it is only *adding* to it. Starting empty and writing at
+ * the end is what a full run does, and doing it after `--adapter typescript`
+ * deleted every Python entry on the site along with 364 of their figures.
+ */
+const narrowed = Boolean(filter) || Boolean(wanted);
+const manifest = narrowed ? structuredClone(onDisk) : {};
 const stats = {
   ran: 0,
   reused: 0,
@@ -349,11 +391,13 @@ const stats = {
   empty: 0,
   failed: 0,
   environmental: 0,
+  timedOut: 0,
   unstable: 0,
   overCap: { text: 0, cell: 0, block: 0 },
   bytes: 0,
 };
 const unstableExamples = [];
+const timedOutExamples = [];
 const overCapExamples = [];
 let imageBytes = 0;
 let imagesWritten = 0;
@@ -496,11 +540,146 @@ for (const [i, block] of blocks.entries()) {
   }
 }
 
+/**
+ * One block, with a wall clock on it.
+ *
+ * A lesson is free to demonstrate a loop that never ends, and one of them
+ * does; the browser gives the reader a Stop button, and a build has no such
+ * thing. Without this the generator hangs on that block forever rather than
+ * recording the other 529. A block that runs out of time is recorded as
+ * nothing at all, which is the panel it had before.
+ */
+const BLOCK_TIMEOUT_MS = 20_000;
+async function runBounded(runner, block) {
+  let timer;
+  try {
+    return await Promise.race([
+      runner.run(block),
+      new Promise((resolve) => {
+        timer = setTimeout(() => resolve(null), BLOCK_TIMEOUT_MS);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// ─── The languages that are not Python ──────────────────────────────────
+//
+// Everything above is Pyodide and the structured cells it produces. The rest
+// of the site's runnable blocks print text, and until now every one of them
+// showed an empty panel: 1,685 of 3,374 blocks, which is not a course but
+// every language that is not Python.
+//
+// They share all of the machinery below the runtime — the content-hash key,
+// the reuse check, the two-run stability flag, the size caps and the manifest
+// — and differ only in what produces the text. `scripts/lib/block-runners.mjs`
+// owns that part, and each runner is the same runtime the browser uses.
+for (const adapter of textAdapters) {
+  const all = extractBlocks(undefined, adapter).filter((b) => !b.unparsable);
+  const selected = filter
+    ? all.filter((b) => matchesFilter(filter, b.file))
+    : all;
+  if (selected.length === 0) continue;
+
+  totals[adapter] = { total: selected.length, ran: 0, recorded: 0 };
+
+  // Anything already recorded is reused before a runtime is booted, exactly
+  // as on the Python path: a tree whose blocks have not changed pays nothing.
+  const pending = [];
+  for (const block of selected) {
+    if (block.expectError) continue; // the panel would show the error the reader is meant to produce
+    const entry =
+      block.files.find((f) => f.filename === block.entry) ?? block.files[0];
+    const key = blockOutputKey(adapter, entry.initCode, entry.starterCode);
+    const reusable = previous[block.file]?.[key];
+    if (reusable && entryIsIntact(reusable)) {
+      (manifest[block.file] ??= {})[key] = reusable;
+      stats.reused++;
+      stats.recorded++;
+      totals[adapter].recorded++;
+      stats.bytes += cellBytes(reusable.cells);
+      continue;
+    }
+    pending.push({ block, key });
+  }
+  if (pending.length === 0) continue;
+
+  let runner;
+  try {
+    runner = await createRunner(adapter);
+  } catch (err) {
+    // A missing toolchain is a reason to record nothing for this language,
+    // not a reason to fail a build that is otherwise fine.
+    console.log(
+      `build-block-outputs: skipping ${adapter} (${err?.message ?? err})`,
+    );
+    continue;
+  }
+
+  for (const [i, { block, key }] of pending.entries()) {
+    const cells = await runBounded(runner, block);
+    stats.ran++;
+    totals[adapter].ran++;
+
+    if (cells === null) {
+      stats.timedOut++;
+      if (timedOutExamples.length < 5)
+        timedOutExamples.push(`${block.file}:${block.line}`);
+      continue;
+    }
+    if (cells.length === 0) {
+      stats.empty++;
+      continue;
+    }
+    // A block that only produced diagnostics ran and failed. Recording the
+    // error as its preview would teach the reader the wrong thing, and the
+    // Python path drops these for the same reason.
+    if (!cells.some((c) => c.type === "stdout")) {
+      stats.failed++;
+      continue;
+    }
+
+    // Second run, for the determinism flag, the same as Python. A block that
+    // finished once and timed out on the repeat counts as unstable.
+    const again = await runBounded(runner, block);
+    const stable = again !== null && sameOutput(cells, again);
+    if (!stable) {
+      stats.unstable++;
+      if (unstableExamples.length < 5)
+        unstableExamples.push(`${block.file}:${block.line}`);
+    }
+
+    const capped = withinCaps(cells);
+    if (capped) {
+      stats.overCap[capped]++;
+      if (overCapExamples.length < 5) {
+        overCapExamples.push(
+          `${block.file}:${block.line} (${capped}, ${cellBytes(cells)} B)`,
+        );
+      }
+      continue;
+    }
+
+    (manifest[block.file] ??= {})[key] = { cells, stable };
+    stats.recorded++;
+    totals[adapter].recorded++;
+    stats.bytes += cellBytes(cells);
+
+    if (showStats && (i + 1) % 50 === 0) {
+      console.log(
+        `  …${adapter} ${i + 1}/${pending.length}  (${block.file}:${block.line})`,
+      );
+    }
+  }
+  await runner.dispose?.();
+}
+
 // Prune assets no manifest entry points at any more: a deleted block, or an
-// edited one whose new key wrote new files. A filtered run only looked at
+// edited one whose new key wrote new files. A narrowed run only looked at
 // part of the tree, so it must not delete the rest's files.
 let pruned = 0;
-if (!filter) {
+if (!narrowed) {
   for (const name of readdirSync(ASSET_DIR)) {
     if (keptAssets.has(name)) continue;
     try {
@@ -513,20 +692,29 @@ if (!filter) {
 }
 
 writeManifestFile(manifest);
-// A filtered run only covers part of the tree, so it must not stamp the
+// A narrowed run only covers part of the tree, so it must not stamp the
 // cache as if it had covered all of it.
-if (!filter) cache.commit();
+if (!narrowed) cache.commit();
+
+/** Every block this run looked at, across all languages. */
+function selectedTotal() {
+  return blocks.length + Object.values(totals).reduce((n, t) => n + t.total, 0);
+}
 
 const kb = Math.round(stats.bytes / 1024);
 const assetKb = Math.round((imageBytes + plotBytes) / 1024);
 console.log(
-  `build-block-outputs: ${stats.recorded} block(s) recorded of ${blocks.length} ` +
+  `build-block-outputs: ${stats.recorded} block(s) recorded of ${selectedTotal()} ` +
     `(${stats.reused} reused, ${stats.ran} executed), ${kb} kB inline, ` +
     `${imagesWritten} image(s) + ${plotsWritten} figure(s) written (${assetKb} kB)` +
     `${pruned ? `, ${pruned} stale asset(s) pruned` : ""}, ` +
     `${stats.empty} produced no output, ${stats.failed} failed, ` +
     `${stats.environmental} could not run in Node`,
 );
+const byAdapter = Object.entries(totals)
+  .map(([a, t]) => `${a} ${t.recorded}/${t.total}`)
+  .join(", ");
+if (byAdapter) console.log(`build-block-outputs: ${byAdapter}`);
 if (imagesDropped + plotsDropped > 0) {
   console.log(
     `build-block-outputs: ${imagesDropped} image(s) and ${plotsDropped} figure(s) ` +
@@ -543,6 +731,13 @@ if (droppedByCap > 0) {
       (overCapExamples.length ? `, e.g. ${overCapExamples.join(", ")}` : ""),
   );
 }
+if (stats.timedOut > 0) {
+  console.log(
+    `build-block-outputs: ${stats.timedOut} block(s) hit the ${BLOCK_TIMEOUT_MS / 1000}s ` +
+      `timeout and were left empty` +
+      (timedOutExamples.length ? `, e.g. ${timedOutExamples.join(", ")}` : ""),
+  );
+}
 if (stats.unstable > 0) {
   console.log(
     `build-block-outputs: ${stats.unstable} block(s) differed between two runs ` +
@@ -550,3 +745,10 @@ if (stats.unstable > 0) {
       (unstableExamples.length ? `, e.g. ${unstableExamples.join(", ")}` : ""),
   );
 }
+
+// Every byte is written and every stat is printed; what is left is other
+// people's timers. A lesson is free to leave an interval running, and
+// almostnode keeps the handle, so the event loop never drains and a build
+// step that has finished its work sits there until CI kills it. The runners
+// have restored `process.exit` by now, so this is the real one.
+process.exit(0);

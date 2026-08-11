@@ -20,12 +20,6 @@ regression is to predicting numbers, the simple, fast, interpretable
 baseline you reach for first and that everything fancier has to beat. It is
 probably the single most widely deployed classifier in the world.
 
-<Figure
-  slug="ml-logistic-regression-problem-solves-inline-cutout"
-  alt="A board of two-coloured chips with a smooth S-shaped ramp laid across it"
-  caption="Logistic regression turns a linear score into a probability between 0 and 1."
-/>
-
 <Callout type="danger" title="The one misconception to kill on sight">
 **Logistic regression does NOT predict a continuous number, and it is not a
 flavor of linear regression for regression tasks.** It predicts a **class**.
@@ -51,6 +45,12 @@ transaction fraudulent? Is this penguin a Gentoo or an Adelie? Will this
 user click? A bare label ("fraud") is useful, but a **probability**
 ("87% chance of fraud") is far more useful, it lets you rank cases, set
 thresholds, and decide how much to trust each call.
+
+<Figure
+  slug="ml-logistic-regression-problem-solves-inline-cutout"
+  alt="A board of two-coloured chips with a smooth S-shaped ramp laid across it"
+  caption="Logistic regression turns a linear score into a probability between 0 and 1."
+/>
 
 Linear regression cannot do this directly. Its straight line runs off to
 plus and minus infinity, so it happily predicts -0.3 or 1.8, nonsense as a

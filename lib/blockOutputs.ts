@@ -28,14 +28,33 @@ import { join } from "node:path";
 
 import type { LessonBlockOutputs } from "@/app/_components/mdx/BlockOutputs";
 
-const MANIFEST_PATH = join(process.cwd(), "lib", "generated", "block-outputs.json");
-
 let cache: Record<string, LessonBlockOutputs> | null = null;
 
+/**
+ * Read the manifest, or resolve to empty.
+ *
+ * Everything here is inside the `try`, including working out the path, and
+ * that is the whole point. This used to compute
+ * `join(process.cwd(), …)` at module scope, one line above a `try` that only
+ * covered the read — so on a runtime where `process.cwd` is missing, the
+ * module threw while it was being *evaluated*, before any handler could catch
+ * anything, and every render that imported it returned a 500.
+ *
+ * That is exactly the failure this file's fallback exists to prevent, and it
+ * only showed up in the one place the fallback matters. Prerendering runs
+ * under Node with a real filesystem, so a build never notices; a deployed
+ * Worker has no filesystem at all, and on a cache miss it renders the page on
+ * demand. Pages served from the incremental cache were fine, and the same
+ * page was a 500 whenever it was rendered rather than replayed.
+ *
+ * Empty is a correct answer here: the reader gets the panel every block had
+ * before this feature existed, and Run still works.
+ */
 function manifest(): Record<string, LessonBlockOutputs> {
   if (cache) return cache;
   try {
-    cache = JSON.parse(readFileSync(MANIFEST_PATH, "utf8")) as Record<
+    const path = join(process.cwd(), "lib", "generated", "block-outputs.json");
+    cache = JSON.parse(readFileSync(path, "utf8")) as Record<
       string,
       LessonBlockOutputs
     >;

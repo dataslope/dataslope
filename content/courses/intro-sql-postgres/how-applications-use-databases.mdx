@@ -84,6 +84,12 @@ queries. Show a menu? That is a query. Place an order? That is a
 query. View past orders? Another query. The app is, to a
 surprising degree, a friendly face on top of a stream of SQL.
 
+<Figure
+  slug="sql-how-applications-use-databases-inline-cutout"
+  alt="Three small benches all reaching into one strongroom through the same hatch, none of them holding their own copy"
+  caption="Several applications can share one database rather than each keeping a copy."
+/>
+
 ## Why this matters for you
 
 Understanding this picture reframes everything you practiced in
@@ -99,14 +105,8 @@ trivia, you learned the language that powers the software world.
   caption="The application keeps nothing itself; it asks the database for everything."
 />
 
-<Figure
-  slug="sql-how-applications-use-databases-inline-cutout"
-  alt="Three small benches all reaching into one strongroom through the same hatch, none of them holding their own copy"
-  caption="Several applications can share one database rather than each keeping a copy."
-/>
-
 ```mermaid
-flowchart TB
+flowchart LR
     Q["Skills you'll learn"]
     Q --> S1["<code>SELECT</code> / <code>WHERE</code><br/>→ fetch the right rows"]
     Q --> S2["<code>JOIN</code><br/>→ combine related tables"]

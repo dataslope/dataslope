@@ -16,19 +16,19 @@ one-row-to-one-row connection.
 That is a **one-to-one relationship**. It is rarer, but useful when a
 separate table makes the design clearer or safer.
 
+## Why split a one-to-one?
+
+Imagine a `users` table that starts small, then grows a large set of
+profile details. Some users have those details, many do not.
+
 <Figure
   slug="db-one-to-one-split-one-one-inline-cutout"
   alt="One very deep crate cut into two shallower crates joined by a single short bar"
   caption="A one-to-one split is one entity's facts held in two tables instead of one."
 />
 
-## Why split a one-to-one?
-
-Imagine a `users` table that starts small, then grows a large set of
-profile details. Some users have those details, many do not.
-
 ```mermaid
-flowchart TB
+flowchart LR
     Wide["Wide users table<br/>id | email | <code>display_name</code> | bio | <code>avatar_url</code> | timezone | preferences"]
     Wide --> Sparse["Many optional columns are empty"]
     Wide --> Mixed["Login identity mixed with profile details"]

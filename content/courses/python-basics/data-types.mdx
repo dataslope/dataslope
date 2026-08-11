@@ -16,6 +16,12 @@ Every snippet on this page runs in your browser-no setup required.
 
 Python is **dynamically typed**: the type of a value is checked at runtime, not compile time. This is different from statically typed languages like Java, Go, or TypeScript, where you declare types upfront and the compiler enforces them.
 
+<Figure
+  slug="python-data-types-real-world-context-inline-cutout"
+  alt="A gate that checks a block as it passes beside another that checks only when the block is used"
+  caption="Python checks a value's type when you use it, not when you name it."
+/>
+
 **Dynamic typing tradeoffs:**
 - ✅ Faster to write: no boilerplate type declarations.
 - ✅ More flexible: a function can accept any type that supports the operations it uses (duck typing).
@@ -61,7 +67,7 @@ Python's type system is built on a hierarchy rooted in `object`. Every value in 
 />
 
 ```mermaid
-graph TD
+graph LR
     object[object] --> numeric[Numeric types]
     object --> sequence[Sequence types]
     object --> mapping[Mapping types]
@@ -92,12 +98,6 @@ This is a quirk of Python's design: `True` and `False` are instances of `bool`, 
 ## Checking the type
 
 `type(obj)` returns the exact class; `isinstance(obj, T)` checks the class or any of its parent classes.
-
-<Figure
-  slug="python-data-types-real-world-context-inline-cutout"
-  alt="A gate that checks a block as it passes beside another that checks only when the block is used"
-  caption="Python checks a value's type when you use it, not when you name it."
-/>
 
 <CodeBlock
   adapter="python"

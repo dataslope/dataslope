@@ -23,6 +23,12 @@ conceptual unlock for Pandas.
 - The **cell** at row $r$, column $c$ is *that thing's value of
   that attribute*.
 
+<Figure
+  slug="pandas-rows-and-columns-basic-mental-model-inline-cutout"
+  alt="One ruled board with a single row drawn out as a strip and a single column lifted out as a stack"
+  caption="Most pandas operations work down a column rather than across a row."
+/>
+
 A DataFrame of 4 employees (rows) × 3 attributes (columns):
 
 | name  | department | salary |
@@ -98,12 +104,6 @@ operand.
 
 Let us make a small dataset by hand to feel the rows-and-columns
 geometry.
-
-<Figure
-  slug="pandas-rows-and-columns-basic-mental-model-inline-cutout"
-  alt="One ruled board with a single row drawn out as a strip and a single column lifted out as a stack"
-  caption="Most pandas operations work down a column rather than across a row."
-/>
 
 <CodeBlock
   adapter="python"

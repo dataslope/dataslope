@@ -43,6 +43,12 @@ mindmap
 Any one of these can make a number change in the third decimal,
 or change a *conclusion* entirely.
 
+<Figure
+  slug="scipy-reproducible-experiments-can-go-wrong-inline-cutout"
+  alt="Two identical worktables laid out with the same tools, each holding a differently shaped finished piece"
+  caption="Same tools, different result, is the failure reproducibility is meant to prevent."
+/>
+
 ## The four pillars
 
 1. **Pin the environment.** Lock package versions in a manifest.
@@ -58,6 +64,12 @@ The minimum acceptable manifest is a `requirements.txt` produced
 by `pip freeze`. Even better, use a lockfile tool that captures
 *transitive* dependencies exactly, `pip-tools`, `poetry`,
 `uv`, or `conda-lock`.
+
+<Figure
+  slug="scipy-reproducible-experiments-pillar-1-pin-environment-inline-cutout"
+  alt="A set of tools tagged with their exact sizes and locked into a case, so the same case can be opened elsewhere"
+  caption="Record the exact versions, or the same code meets different libraries next month."
+/>
 
 A typical `pyproject.toml` snippet for a scientific project:
 
@@ -99,6 +111,12 @@ Three lessons:
 
 NumPy's `default_rng` makes this clean: create one generator at
 the top of the experiment, thread it through everywhere.
+
+<Figure
+  slug="scipy-reproducible-experiments-pillar-2-seed-everything-inline-cutout"
+  alt="One stamped starting token copied to every bench in a row, each bench then producing the same run every time"
+  caption="Seed every source of randomness and the same run produces the same numbers tomorrow."
+/>
 
 <CodeBlock
   adapter="python"
@@ -165,6 +183,12 @@ A reproducible experiment carries a **manifest**, a small text
 file that says exactly what was run with what parameters and what
 came out. Hash large inputs so you'd notice if they changed.
 
+<Figure
+  slug="scipy-reproducible-experiments-pillar-3-record-inputs-inline-cutout"
+  alt="A finished run leaving a small written manifest tied to its output tray, naming everything that went into it"
+  caption="A run that does not record what went into it cannot be repeated, only re-attempted."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -215,12 +239,6 @@ git tag fig-3-v2
 Record the commit hash in the manifest. This pairs the *exact*
 code with the *exact* outputs forever.
 
-<Figure
-  slug="scipy-reproducible-experiments-can-go-wrong-inline-cutout"
-  alt="Two identical worktables laid out with the same tools, each holding a differently shaped finished piece"
-  caption="Same tools, different result, is the failure reproducibility is meant to prevent."
-/>
-
 ## Parameter sweeps the disciplined way
 
 Most experimental work is a parameter sweep: vary one or two
@@ -228,6 +246,12 @@ inputs, record the outputs, plot. Resist the temptation to do this
 with copy-paste cells in a notebook. Instead, separate
 **configuration** from **code**, and let a small driver loop over
 configs.
+
+<Figure
+  slug="scipy-reproducible-experiments-parameter-sweeps-disciplined-way-inline-cutout"
+  alt="A rack of runs each with one dial set differently, their readings collected onto a single sheet"
+  caption="One dial changed per run, every reading recorded, and nothing copy-pasted between them."
+/>
 
 <CodeBlock
   adapter="python"
@@ -295,6 +319,12 @@ single-threaded version.
 Notebooks are wonderful for *exploration* and terrible for
 *reproducibility*: cell order is implicit, hidden state lurks
 everywhere, and the JSON format is murder to diff in git.
+
+<Figure
+  slug="scipy-reproducible-experiments-notebooks-vs-scripts-inline-cutout"
+  alt="A bench of cards run in whatever order a hand reached for them, beside the same cards fixed into a rail in one settled order"
+  caption="A notebook remembers the order you clicked; a script has only the order it is written in."
+/>
 
 A practical rule:
 

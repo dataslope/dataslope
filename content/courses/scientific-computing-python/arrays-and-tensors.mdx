@@ -35,18 +35,6 @@ flowchart TD
 - A **strides** tuple, how many bytes to skip in the buffer to
   step along each axis.
 
-<Figure
-  slug="scipy-arrays-and-tensors-creating-arrays-inline-cutout"
-  alt="A solid grid of cells filling in one by one from a hopper, each filled cell a block of ink"
-  caption="An array is one flat buffer plus a shape that says how to read it."
-/>
-
-<Figure
-  slug="scipy-arrays-and-tensors-inline-cutout"
-  alt="A single row of cells, a flat grid of them, and a stack of those grids, standing side by side in increasing dimension"
-  caption="The same buffer is a vector, a matrix or a stack, depending on its shape."
-/>
-
 Most array operations, slicing, transposing, reshaping, just
 change the *header*. The underlying bytes are not copied. That is
 what makes NumPy so fast.
@@ -103,6 +91,12 @@ print(np.empty(4))
 `,
     },
   ]}
+/>
+
+<Figure
+  slug="scipy-arrays-and-tensors-inline-cutout"
+  alt="A single row of cells, a flat grid of them, and a stack of those grids, standing side by side in increasing dimension"
+  caption="The same buffer is a vector, a matrix or a stack, depending on its shape."
 />
 
 For random data, prefer the modern `default_rng()` interface (it is
@@ -261,6 +255,12 @@ $\times$ channels), video (frames $\times$ height $\times$ width
 $\times$ channels), time-series ensembles, and partial differential
 equation solution states
 live.
+
+<Figure
+  slug="scipy-arrays-and-tensors-creating-arrays-inline-cutout"
+  alt="A solid grid of cells filling in one by one from a hopper, each filled cell a block of ink"
+  caption="An array is one flat buffer plus a shape that says how to read it."
+/>
 
 The general-purpose tool for tensor contractions is **`np.einsum`**,
 which lets you write Einstein-summation notation directly.

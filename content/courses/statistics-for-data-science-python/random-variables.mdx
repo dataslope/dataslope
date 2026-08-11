@@ -31,6 +31,12 @@ random variable reads off a number from the result. We usually write
 random variables with capital letters like `X`, and specific values they
 take with lowercase `x`.
 
+<Figure
+  slug="stat-random-variables-inline-cutout"
+  alt="A machine that turns each outcome of a spinner into a block of a matching size dropping onto a rail"
+  caption="Once outcomes carry numbers, averages and spread become possible."
+/>
+
 ```mermaid
 flowchart LR
   O1["Outcome: HH"] --> N2["<code>X = 2</code>"]
@@ -93,6 +99,12 @@ A random variable is fully described by how its probability is
 distributed across values. The *form* of that description differs by
 type, and this is a spot where intuition matters more than the formal
 definitions.
+
+<Figure
+  slug="stat-random-variables-pmf-vs-pdf-intuition-inline-cutout"
+  alt="A row of separate chips each with its own height, beside a smooth band where only an area between two marks can be read"
+  caption="Discrete values carry probability each; a continuous one carries it only over an interval."
+/>
 
 For a **discrete** variable, the **probability mass function (pmf)**
 gives the probability of *each individual value*: P(X = 2) = 0.25. The
@@ -548,7 +560,7 @@ Variance lives in squared units; convert to standard deviation before describing
 />
 
 <MultipleChoice
-  markdown={`For a **continuous** random variable like response time, what is $P(X = 2.000\ldots\text{ seconds exactly})$?
+  markdown={`For a **continuous** random variable like response time, what is $P(X = 2.000\\ldots\\text{ seconds exactly})$?
 
 - [o] Exactly 0, for a continuous variable, any single precise value has probability 0; probability lives in intervals (area under the pdf)
   > With infinitely many possible values, no single exact value carries positive probability. Only ranges (areas under the curve) do.
@@ -589,9 +601,3 @@ From here, *Discrete Distributions*, *Continuous Distributions*, and *The
 Normal Distribution* give you named, ready-made random variables, each
 with its own pmf or pdf, mean, and variance, for modeling the patterns
 you'll actually meet in data.
-
-<Figure
-  slug="stat-random-variables-inline-cutout"
-  alt="A machine that turns each outcome of a spinner into a block of a matching size dropping onto a rail"
-  caption="Once outcomes carry numbers, averages and spread become possible."
-/>

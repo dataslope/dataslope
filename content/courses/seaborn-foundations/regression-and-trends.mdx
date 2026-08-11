@@ -113,6 +113,12 @@ line it landed on and a wrong-shaped fit gives itself away:
 The `mpg` dataset shows it on real measurements: fuel efficiency versus
 engine horsepower.
 
+<Figure
+  slug="sns-regression-and-trends-inline-cutout"
+  alt="A cloud of chips pinned flat across a board with one straight rod laid through the middle of the cloud, and a soft shaded band following that rod closely on either side"
+  caption="The band around the line is the uncertainty in the fit, not the spread of points."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -407,9 +413,3 @@ design beyond the plot itself.`}
 You can now lay an honest trend over a scatter, and spot when that trend is
 lying. Next we widen the lens from one pair of variables to *all* of them
 at once, with the **correlation heatmap**.
-
-<Figure
-  slug="sns-regression-and-trends-inline-cutout"
-  alt="A cloud of chips pinned flat across a board with one straight rod laid through the middle of the cloud, and a soft shaded band following that rod closely on either side"
-  caption="The band around the line is the uncertainty in the fit, not the spread of points."
-/>

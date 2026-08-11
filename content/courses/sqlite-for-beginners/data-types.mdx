@@ -56,7 +56,7 @@ A declared type in a regular SQLite table is a strong hint about how values shou
 SQLite stores values using five storage classes:
 
 ```mermaid
-flowchart TB
+flowchart LR
     S["SQLite value storage classes"]
     S --> N["NULL<br/>missing or unknown"]
     S --> I["INTEGER<br/>whole number"]
@@ -92,7 +92,7 @@ When you write a column type, SQLite maps it to an affinity. Affinity is the col
 />
 
 ```mermaid
-flowchart TB
+flowchart LR
     D["Declared column type"] --> A["SQLite affinity"]
     A --> AI["INTEGER affinity"]
     A --> AT["TEXT affinity"]
@@ -159,12 +159,6 @@ A `NUMERIC` affinity column tries to store numeric-looking text as numbers. So `
 ## SQLite compared with rigid type systems
 
 Think of a rigid system as a locked door and SQLite affinity as a helpful sign.
-
-<Figure
-  slug="lite-data-types-sqlite-odd-one-inline-cutout"
-  alt="A rack of sockets where a mismatched block is quietly reshaped to fit rather than refused"
-  caption="Other databases refuse the wrong type; SQLite converts where it reasonably can."
-/>
 
 ```mermaid
 flowchart TB

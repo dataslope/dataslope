@@ -20,6 +20,12 @@ move.
 Worth keeping in view throughout: an aggregate is a number standing in for a
 column, and identical aggregates can come from very different columns.
 
+<Figure
+  slug="duck-aggregate-functions-aggregation-exists-inline-cutout"
+  alt="A bench heaped with chips that no one can count by eye, and one gauge with a single pointer resting at one mark beside it"
+  caption="No one can read a million rows; an aggregate turns them into one number."
+/>
+
 <Chart slug="bar-hides-distribution" />
 
 A human cannot comprehend a million rows. But "the average order was
@@ -240,9 +246,3 @@ Aggregates skip NULLs, so \`AVG()\` reflects only the present values.`}
 A single grand total is useful, but the real power comes from computing
 one summary **per group**, revenue *per region*, average *per category*.
 That is `GROUP BY`, and it is next.
-
-<Figure
-  slug="duck-aggregate-functions-aggregation-exists-inline-cutout"
-  alt="A bench heaped with chips that no one can count by eye, and one gauge with a single pointer resting at one mark beside it"
-  caption="No one can read a million rows; an aggregate turns them into one number."
-/>

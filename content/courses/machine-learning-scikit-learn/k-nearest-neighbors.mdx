@@ -37,6 +37,12 @@ similar houses nearby sold for around 400,000, you would guess about
 400,000. KNN formalizes exactly this instinct: **similar inputs tend to
 have similar outputs.**
 
+<Figure
+  slug="ml-k-nearest-neighbors-intuition-are-who-inline-cutout"
+  alt="One new chip on a board taking the colour of the three chips nearest to it"
+  caption="A new point is labelled by a vote among its k nearest neighbours."
+/>
+
 ```mermaid
 flowchart TD
     Q["New point<br/>(species unknown)"] --> M["Measure distance<br/>to every training point"]
@@ -82,12 +88,6 @@ where scaling comes in.
 Let us classify penguins by species. The API is, as always, identical to
 every other scikit-learn estimator. (We will see in a moment that raw KNN is
 held back here by the feature scales, but it is a fine starting point.)
-
-<Figure
-  slug="ml-k-nearest-neighbors-intuition-are-who-inline-cutout"
-  alt="One new chip on a board taking the colour of the three chips nearest to it"
-  caption="A new point is labelled by a vote among its k nearest neighbours."
-/>
 
 <CodeBlock
   adapter="python"
@@ -204,6 +204,12 @@ features matters enormously.** Euclidean distance sums squared differences
 across features. If one feature ranges over 0–1000 and another over 0–1,
 the large-range feature utterly dominates the distance, and the small one
 is ignored, no matter how informative it actually is.
+
+<Figure
+  slug="ml-k-nearest-neighbors-make-break-issue-feature-inline-cutout"
+  alt="A compass whose one long arm swamps the short one, the pair then trimmed until both arms match"
+  caption="Nearest depends on the units, so an unscaled column decides every neighbour."
+/>
 
 Let us prove it. We will build a dataset with one genuinely useful feature
 measured in *small* units and one pure-noise feature measured in *huge*

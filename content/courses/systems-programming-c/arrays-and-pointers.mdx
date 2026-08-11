@@ -62,6 +62,12 @@ Indexing in C is sugar for pointer arithmetic. The expression `a[i]`
 is defined as `*(a + i)`. The `+ i` part is *typed*, it advances by
 `i * sizeof(*a)` bytes, not by `i` bytes.
 
+<Figure
+  slug="sysc-arrays-and-pointers-i-i-inline-cutout"
+  alt="A hand reaching to the fourth cell of a strip beside a marker walking four cell widths along it, both arriving together"
+  caption="Indexing and pointer arithmetic are the same operation written two ways."
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -227,12 +233,6 @@ Hence we compute `n` in `main` and pass it down, never inside `sum`.
 
 Two ways to represent a matrix. They look similar; they are not the
 same in memory.
-
-<Figure
-  slug="sysc-arrays-and-pointers-i-i-inline-cutout"
-  alt="A hand reaching to the fourth cell of a strip beside a marker walking four cell widths along it, both arriving together"
-  caption="Indexing and pointer arithmetic are the same operation written two ways."
-/>
 
 <Figure
   slug="sysc-arrays-and-pointers-inline-cutout"

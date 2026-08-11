@@ -341,25 +341,25 @@ print("deep    :", deep)      # [[1, 2], [3, 4, 99]]`,
 ### How does Python's list work internally?
 
 `list` is a dynamic array backed by a C array of object pointers. Indexed
-access is O(1). Appending is amortized O(1) due to over-allocation
+access is $O(1)$. Appending is amortized $O(1)$ due to over-allocation
 (capacity roughly doubles on resize). Inserting or deleting at an
-arbitrary position is O(n) because all subsequent pointers shift. Slicing
-creates a new list in O(k) where k is the slice length.
+arbitrary position is $O(n)$ because all subsequent pointers shift. Slicing
+creates a new list in $O(k)$ where k is the slice length.
 
 ### What are the time complexities of dict operations?
 
 Python's `dict` uses open addressing with a hash table. Average-case
-get, set, and delete are all O(1). Worst-case (many hash collisions) is
-O(n), but CPython's perturbation-based probing makes this extremely rare.
-Iterating over all keys is O(n). Since Python 3.7 dict preserves
+get, set, and delete are all $O(1)$. Worst-case (many hash collisions) is
+$O(n)$, but CPython's perturbation-based probing makes this extremely rare.
+Iterating over all keys is $O(n)$. Since Python 3.7 dict preserves
 insertion order.
 
 ### What is a set, and when do you use it over a list?
 
 A `set` is an unordered collection of unique, hashable elements backed by
-a hash table. Membership test (`in`) is O(1) versus O(n) for a list. Use
+a hash table. Membership test (`in`) is $O(1)$ versus $O(n)$ for a list. Use
 a set when you need fast "have I seen this element?" checks, deduplication,
-or set operations (union, intersection, difference), all O(n) or better.
+or set operations (union, intersection, difference), all $O(n)$ or better.
 
 ### What is name mangling in Python?
 

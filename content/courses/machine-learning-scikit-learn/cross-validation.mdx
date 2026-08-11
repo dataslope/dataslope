@@ -86,14 +86,8 @@ divides the data into `k` equal parts ("folds"). It then runs `k` rounds: in
 each round, one fold is the test set and the other `k-1` folds are the
 training set. Every row gets to be in the test set exactly once.
 
-<Figure
-  slug="ml-cross-validation-fix-k-fold-inline-cutout"
-  alt="One pile divided into five trays, with five rows below where a different tray is sealed each time"
-  caption="Each round seals a different fold, so every row is tested exactly once."
-/>
-
 ```mermaid
-flowchart TD
+flowchart LR
     D["Full training data"] --> S["Split into 5 equal folds"]
     S --> R1["Round 1: test on fold 1, train on folds 2-5"]
     S --> R2["Round 2: test on fold 2, train on folds 1,3,4,5"]

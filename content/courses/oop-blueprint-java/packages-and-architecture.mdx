@@ -35,7 +35,7 @@ name*. The class `java.util.ArrayList` lives in the package
 `java.util`. Class names only need to be unique within a package.
 
 ```mermaid
-flowchart TB
+flowchart LR
     P1["package <code>com.bank.account</code>"]
     P1 --> C1[Account]
     P1 --> C2[Transaction]
@@ -149,6 +149,12 @@ The cardinal rule: **dependencies point inward**. The UI may depend
 on application services. Application services may depend on the
 domain model. The domain model, the actual business objects, the
 heart of the system, should depend on *nothing else in your code*.
+
+<Figure
+  slug="oopj-packages-and-architecture-tiny-many-classes-example-inline-cutout"
+  alt="A set of parts kept in one flat tray but grouped by colour into the layers they would otherwise live in"
+  caption="Even flat in one folder, the classes still sort into the layers they belong to."
+/>
 
 This is sometimes called a **hexagonal** or **clean** architecture.
 The headline benefit: you can swap the UI (CLI to web to mobile)

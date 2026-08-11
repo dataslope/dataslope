@@ -26,6 +26,12 @@ from parent to child, following physical pointers. The CODASYL
 network model generalized the tree into a graph, but the principle
 was the same: *the program had to know the route to the data.*
 
+<Figure
+  slug="db-the-relational-revolution-world-before-tables-inline-cutout"
+  alt="A wall of cabinets joined by a nest of fixed pipes, each route welded in place"
+  caption="Before tables, each access path was welded in place when the database was built."
+/>
+
 That had a brutal consequence. If the database's physical structure
 changed, a file reorganized, a pointer chain reshuffled, the
 programs that navigated it broke. Data and code were welded
@@ -58,13 +64,14 @@ they want, not *where to walk*. Every time you have joined two tables
 in this course by matching key values, you have used Codd's idea.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph nav["Navigational, 1960s"]
         P["Program follows pointers<br/>parent to child to sibling"]
     end
     subgraph rel["Relational, 1970"]
         Q["Program states a condition<br/>match rows by value"]
     end
+    nav ~~~ rel
     P -->|"physical layout changes, programs break"| X["Fragile"]
     Q -->|"physical layout changes, queries still work"| Y["Data independence"]
 ```
@@ -112,6 +119,12 @@ ever be fast enough to compete with one that followed pointers
 directly. For years, the relational model lived mostly in research
 papers and academic debate.
 
+<Figure
+  slug="db-the-relational-revolution-ibm-s-lukewarm-reception-inline-cutout"
+  alt="A cautious row of empty committee chairs with one small prototype machine running quietly in the corner behind them"
+  caption="IBM, mid-1970s: a working relational prototype built to settle whether it could be fast."
+/>
+
 To settle the performance question, IBM's San Jose lab launched the
 **System R** project in the mid-1970s: build a real, working
 relational database and see whether it could be made efficient. It
@@ -141,9 +154,9 @@ IBM followed with SQL/DS in 1981 and DB2 in 1983, and SQL went on to
 become one of the longest-lived languages in all of computing.
 
 <Figure
-  slug="db-the-relational-revolution-world-before-tables-inline-cutout"
-  alt="A wall of cabinets joined by a nest of fixed pipes, each route welded in place"
-  caption="Before tables, each access path was welded in place when the database was built."
+  slug="db-the-relational-revolution-race-ibm-lost-inline-cutout"
+  alt="Published drawings pinned openly on one wall while a small workshop across the way builds from them first"
+  caption="The System R papers were published, and a small California company shipped first."
 />
 
 Codd received the Turing Award, computing's highest honor, in

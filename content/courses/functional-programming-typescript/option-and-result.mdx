@@ -314,12 +314,6 @@ the chain, so each step can pretend it just sees an ordinary `A`.
 Many APIs return nullable values or throw. Wrap them at the
 boundary so the rest of your code only sees `Option`/`Result`.
 
-<Figure
-  slug="fp-option-and-result-option-maybe-there-inline-cutout"
-  alt="Two sealed envelopes on a bench, one opened to show a block and one opened to show nothing at all"
-  caption="An option makes the possibility of nothing part of the type itself."
-/>
-
 <CodeBlock
   adapter="typescript"
   files={[

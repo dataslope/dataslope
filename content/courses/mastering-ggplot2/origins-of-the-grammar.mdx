@@ -21,6 +21,12 @@ name by the statistician **Leland Wilkinson**. The book is dense and
 theoretical, but its central idea is simple enough to change how you
 see every chart for the rest of your life.
 
+<Figure
+  slug="gg-origins-layered-grammar-cutout"
+  alt="Three transparent sheets held apart in a stepped stack, each carrying a different mark, a figure lowering the top one"
+  caption="ggplot2, 2007: Wilkinson's grammar rebuilt in R as layers you stack rather than charts you pick."
+/>
+
 Think about natural language. There is no fixed list of "approved
 sentences" you must memorize. Instead there is a **grammar**, a set of
 components (nouns, verbs, objects) and rules for combining them. From a
@@ -72,9 +78,9 @@ turn it into a tool real analysts could use. That someone was **Hadley
 Wickham**.
 
 <Figure
-  slug="gg-origins-layered-grammar-cutout"
-  alt="Three transparent sheets held apart in a stepped stack, each carrying a different mark, a figure lowering the top one"
-  caption="ggplot2, 2007: Wilkinson's grammar rebuilt in R as layers you stack rather than charts you pick."
+  slug="gg-origins-of-the-grammar-grammar-by-analogy-inline-cutout"
+  alt="A rack of interchangeable parts labelled by shape, assembled into several different plots"
+  caption="A grammar means the same interchangeable parts assemble into many plots."
 />
 
 In 2005, as a graduate student, Wickham built **ggplot**, a direct
@@ -148,12 +154,6 @@ manual legend, no axis math. You declared that `cyl` *maps to* color,
 and ggplot2 produced the colored points **and** a matching legend
 automatically. The legend cannot fall out of sync because you never
 built it, it is a *consequence* of the mapping.
-
-<Figure
-  slug="gg-origins-of-the-grammar-grammar-by-analogy-inline-cutout"
-  alt="A rack of interchangeable parts labelled by shape, assembled into several different plots"
-  caption="A grammar means the same interchangeable parts assemble into many plots."
-/>
 
 That habit of mind, state a chart as **data + mappings + layers**, and
 let the drawing follow, is the real skill this course builds. ggplot2

@@ -34,6 +34,12 @@ The `price` column is already numeric, a model can use it directly. But
 `LogisticRegression` or `KNeighborsClassifier`, you get an error, because
 there is no sensible way to compute "red times a weight."
 
+<Figure
+  slug="ml-encoding-categorical-features-problem-models-need-inline-cutout"
+  alt="A machine whose inlet accepts only plain blocks, three coloured tags waiting outside it"
+  caption="A model only takes numbers, so categories have to be encoded first."
+/>
+
 So we must **encode**: replace each category with numbers. The question is
 *which* numbers, and here is where intuition matters more than syntax.
 
@@ -44,9 +50,9 @@ The first idea everyone has is to number the categories: red = 0, green =
 features, a genuine modeling error.
 
 <Figure
-  slug="ml-encoding-categorical-features-problem-models-need-inline-cutout"
-  alt="A machine whose inlet accepts only plain blocks, three coloured tags waiting outside it"
-  caption="A model only takes numbers, so categories have to be encoded first."
+  slug="ml-encoding-categorical-features-tempting-trap-integer-inline-cutout"
+  alt="Three coloured tags replaced by blocks of rising height, the heights implying an order the colours never had"
+  caption="Numbering categories invents an order the model will take seriously."
 />
 
 Watch what it implies:
@@ -291,12 +297,6 @@ The integer-label mistake is not just theoretically untidy, it measurably
 hurts. Let us prove it the way the preprocessing page proved scaling
 matters: train the same model two ways on the same data, once with integer
 labels and once with one-hot encoding, and compare.
-
-<Figure
-  slug="ml-encoding-categorical-features-tempting-trap-integer-inline-cutout"
-  alt="Three coloured tags replaced by blocks of rising height, the heights implying an order the colours never had"
-  caption="Numbering categories invents an order the model will take seriously."
-/>
 
 We will build a dataset where a city's risk is **non-monotonic** in any
 ordering: cities `Alpha` and `Charlie` are high-risk, while `Bravo` and

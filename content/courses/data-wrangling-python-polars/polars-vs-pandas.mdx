@@ -20,6 +20,12 @@ behaviour. It is powerful and it is the source of most pandas
 surprises, because two frames with different indexes silently align
 rather than fail.
 
+<Figure
+  slug="pl-polars-vs-pandas-1-there-no-inline-cutout"
+  alt="Two boards side by side, the left one carrying a column of tags down its edge and the right one having that column removed entirely, its rows bare at the edge"
+  caption="There is no index in Polars, so a row is identified by its values alone."
+/>
+
 Polars has no index. A DataFrame is columns and rows, and row order
 is just row order. If you want a key, make it a column and join on
 it. If you want a row number, ask for one with `pl.int_range`.
@@ -43,6 +49,12 @@ easier to reason about.
 This is the big one. In pandas you reach into a frame and pull out
 data, then operate on what you pulled out. In Polars you hand the
 frame a description of what you want.
+
+<Figure
+  slug="pl-polars-vs-pandas-2-write-expressions-not-inline-cutout"
+  alt="A written instruction card that can be filed, passed on and reused, held up beside the tray it has not touched yet"
+  caption="An expression is a value describing a computation, so it can be built before any data exists."
+/>
 
 <CodeBlock
   adapter="python"
@@ -106,9 +118,9 @@ nullable dtypes, so there are now several missing-value systems
 coexisting.
 
 <Figure
-  slug="pl-polars-vs-pandas-1-there-no-inline-cutout"
-  alt="Two boards side by side, the left one carrying a column of tags down its edge and the right one having that column removed entirely, its rows bare at the edge"
-  caption="There is no index in Polars, so a row is identified by its values alone."
+  slug="pl-polars-vs-pandas-3-null-null-nan-inline-cutout"
+  alt="An empty slot and a slot holding a mark meaning the measurement failed, kept in two clearly different racks"
+  caption="`null` means missing and `NaN` means a failed float, and Polars keeps the two apart."
 />
 
 Polars has one. Every column has a validity bitmap saying which
@@ -146,6 +158,12 @@ strings, and a dictionary. Polars refuses: a column has one type,
 known before the data arrives, and operations that would violate it
 raise instead of silently producing `object`.
 
+<Figure
+  slug="pl-polars-vs-pandas-4-types-strict-feature-inline-cutout"
+  alt="One column of a rack holding a single shape of item, beside a column stuffed with mismatched shapes jammed together"
+  caption="A column has one type, and refusing the mixed column is what makes the rest fast."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -172,6 +190,12 @@ aggregation.
 pandas has `inplace=True`, `SettingWithCopyWarning`, and a genuinely
 hard question ("is this a view or a copy?") that has consumed a
 generation of Stack Overflow answers.
+
+<Figure
+  slug="pl-polars-vs-pandas-5-nothing-mutates-place-inline-cutout"
+  alt="Each station handing on a new tray while the tray it was given stays behind on the bench"
+  caption="Every operation returns a new frame, and the buffers underneath are shared rather than copied."
+/>
 
 Polars operations return new frames. Always. The underlying Arrow
 buffers are shared where possible, so this is cheap rather than a

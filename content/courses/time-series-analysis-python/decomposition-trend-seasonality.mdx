@@ -72,12 +72,6 @@ the repeating **seasonal** wave, and the **residual**, what's left when you
 subtract the other two. For data we built additively, the residual is
 shapeless noise, exactly as it should be.
 
-<Figure
-  slug="tsa-decomposition-trend-seasonality-log-trick-turn-inline-cutout"
-  alt="A wave whose swings widen to the right passing through a press and leaving with swings of even width"
-  caption="The press is the logarithm: widening swings go in, swings of even width come out."
-/>
-
 Those four panels each have their own vertical scale, which hides how the
 pieces relate. Drawn on one axis in the order they are added, "additive" stops
 being a keyword argument:
@@ -107,6 +101,12 @@ The choice between the two models isn't a coin flip, the data tells you:
 - **Multiplicative** (`Observed = Trend x Seasonal x Residual`): use it when
   the seasonal swings **grow with the level**. The summer bump is "+30%", so
   it's small when the series is low and large when it's high.
+
+<Figure
+  slug="tsa-decomposition-trend-seasonality-additive-or-multiplicative-inline-cutout"
+  alt="Two waves along a rail, one whose swings stay the same width and one whose swings widen as it rises"
+  caption="Swings of constant width are additive; swings that widen as the series rises are multiplicative."
+/>
 
 The airline series is the textbook multiplicative case: its summer-to-winter
 swing is tiny in 1949 and huge by 1960. Watch what additive does with that.
@@ -250,9 +250,9 @@ A log compresses the big late-period swings and stretches the small early
 ones until they're the same size, exactly what an additive model wants.
 
 <Figure
-  slug="tsa-decomposition-trend-seasonality-additive-or-multiplicative-inline-cutout"
-  alt="Two waves along a rail, one whose swings stay the same width and one whose swings widen as it rises"
-  caption="Swings of constant width are additive; swings that widen as the series rises are multiplicative."
+  slug="tsa-decomposition-trend-seasonality-log-trick-turn-inline-cutout"
+  alt="A wave whose swings widen to the right passing through a press and leaving with swings of even width"
+  caption="The press is the logarithm: widening swings go in, swings of even width come out."
 />
 
 <CodeBlock
@@ -309,6 +309,12 @@ One of decomposition's most practical payoffs is **seasonal adjustment**,
 removing the seasonal component so the underlying trend isn't drowned out by
 the yearly wave. "Are sales *really* up, or is it just December?" is a
 deseasonalizing question.
+
+<Figure
+  slug="tsa-decomposition-trend-seasonality-inline-cutout"
+  alt="One wavy line on the left separating into three stacked lines on the right, a rising trend, a repeating wave and a rough remainder"
+  caption="One observed line in; a trend, a seasonal wave and a remainder out."
+/>
 
 <CodeBlock
   adapter="python"
@@ -574,9 +580,3 @@ We keep bumping into the same words, the airline series' growing variance
 and persistent trend make it "non-stationary," and we keep promising to fix
 that. It's time to make that idea precise: what stationarity *is*, why
 classical models demand it, and how to test for it.
-
-<Figure
-  slug="tsa-decomposition-trend-seasonality-inline-cutout"
-  alt="One wavy line on the left separating into three stacked lines on the right, a rising trend, a repeating wave and a rough remainder"
-  caption="One observed line in; a trend, a seasonal wave and a remainder out."
-/>

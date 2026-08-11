@@ -119,6 +119,12 @@ running count:
 
 We'll lean on `event.target.value` in the next lesson on forms.
 
+<Figure
+  slug="rx-handling-events-event-object-inline-cutout"
+  alt="A lever pressed, and a small card handed straight back carrying the details of that press"
+  caption="The handler is handed an event object describing what happened, and to what."
+/>
+
 Some events fire far more often than you want to respond to them. Two
 standard fixes exist and they behave differently in a way the names do not
 make obvious.
@@ -132,6 +138,12 @@ When two components need to share state, put the state in their
 setter (or a callback) as another prop. The child reports events *up*
 by calling the callback; the parent owns the truth. This is the
 standard way sibling components stay in sync.
+
+<Figure
+  slug="rx-handling-events-inline-cutout"
+  alt="A button on a panel being pressed and a short cord carrying the press to a small handler box behind it"
+  caption="An event handler is a prop, and React wires it to the element for you."
+/>
 
 <CodeBlock
   adapter="react"
@@ -255,9 +267,3 @@ if (!/count:\\s*-1/i.test(h1.textContent || "")) {
 
 Events drive state changes. The richest source of events is form
 input, up next: [Forms and controlled inputs](/courses/react-from-the-ground-up/forms-and-controlled-inputs).
-
-<Figure
-  slug="rx-handling-events-inline-cutout"
-  alt="A button on a panel being pressed and a short cord carrying the press to a small handler box behind it"
-  caption="An event handler is a prop, and React wires it to the element for you."
-/>

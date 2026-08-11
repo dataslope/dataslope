@@ -20,6 +20,12 @@ and duplication.
 A schema that scales well has clear tables, stable keys, and
 relationships that match the real world.
 
+<Figure
+  slug="db-design-and-scale-designs-scale-meaning-inline-cutout"
+  alt="The same cabinet built small and built very large, its fittings identical at both sizes"
+  caption="A design that scales keeps the same fittings whether it holds thousands or millions."
+/>
+
 ```mermaid
 flowchart TD
     Clear["Clear entity tables"] --> Keys["Stable keys"]
@@ -36,12 +42,6 @@ model instead of working around it.
 A **god-table** tries to store too many kinds of things in one place.
 It often has many nullable columns, repeated groups, and confusing
 rules.
-
-<Figure
-  slug="db-design-and-scale-designs-scale-meaning-inline-cutout"
-  alt="The same cabinet built small and built very large, its fittings identical at both sizes"
-  caption="A design that scales keeps the same fittings whether it holds thousands or millions."
-/>
 
 ```mermaid
 flowchart LR

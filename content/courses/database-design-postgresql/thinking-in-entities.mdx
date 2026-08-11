@@ -186,7 +186,7 @@ Good entity names are ordinary words from the domain. Prefer
 `records`, or `items` unless those are truly the business terms.
 
 ```mermaid
-flowchart TB
+flowchart LR
     Bad["Vague table<br/><code>items</code>"] --> Problem["Could mean products,<br/>order lines, tasks, or anything"]
     Good["Clear tables"] --> A["<code>products</code>"]
     Good --> B["<code>order_items</code>"]

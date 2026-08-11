@@ -30,6 +30,12 @@ Modern C++ has *much* better tools (we'll meet them in the smart
 pointer chapter). But you need to understand the raw mechanism
 first, because every higher-level tool is built on top of it.
 
+<Figure
+  slug="cpp-dynamic-memory-stack-vs-heap-inline-cutout"
+  alt="A neat column of trays beside an open yard of crates, one cord running between them"
+  caption="The stack cleans up after itself; the heap does exactly what you tell it."
+/>
+
 The two are not just different places, they have very different prices. A
 stack allocation moves a pointer; a heap allocation goes and looks for
 somewhere to put the thing.
@@ -395,9 +401,3 @@ int main() {
 Next: aggregates and strings, how to bundle data, and the tools
 the standard library gives you so you almost never need raw arrays
 again.
-
-<Figure
-  slug="cpp-dynamic-memory-stack-vs-heap-inline-cutout"
-  alt="A neat column of trays beside an open yard of crates, one cord running between them"
-  caption="The stack cleans up after itself; the heap does exactly what you tell it."
-/>

@@ -37,12 +37,6 @@ Read it slowly. Three pieces carry all the meaning:
 - **"data"**, summarized by a test statistic. We measure extremeness on
   that one number.
 
-<Figure
-  slug="stat-p-values-one-sentence-definition-inline-cutout"
-  alt="A mound with a shaded tail and one marker standing out in that tail"
-  caption="The p-value is how much of the tail lies beyond what you actually observed."
-/>
-
 Everything else on this page is a consequence of, or a contrast with,
 that sentence.
 
@@ -62,6 +56,12 @@ just from random sampling, the **null distribution**. Your observed
 statistic is one point on that distribution. The p-value is simply **how
 much of the null distribution is at least as extreme as your point**, the
 shaded tail.
+
+<Figure
+  slug="stat-p-values-p-value-not-inline-cutout"
+  alt="One gauge with three different scales held up against its face, only one of the three lining up with the needle"
+  caption="A p-value is one reading on one scale, and most of its famous meanings are a different scale."
+/>
 
 ```mermaid
 flowchart TD
@@ -394,10 +394,10 @@ quantify exactly when real effects go undetected in *Errors and Power*.
   > Neither 3% nor 97% is the probability the effect is real; the p-value is not a probability about the hypothesis in either direction.
 - Nothing, that is a fine way to read a p-value
   > That reading is the prosecutor's fallacy. A p-value is not the probability that an effect is real.
-- [o] A p-value is $P(\text{data} \mid H_0)$, not $P(\text{effect is real} \mid \text{data})$, the two require different information and are not interchangeable
+- [o] A p-value is $P(\\text{data} \\mid H_0)$, not $P(\\text{effect is real} \\mid \\text{data})$, the two require different information and are not interchangeable
   > Getting the probability that the effect is real would require the prior plausibility of the hypotheses, which the p-value never uses; the p-value only describes how extreme the data is under the null.
 
-$P(\text{data} \mid H_0)$ and $P(H_0 \mid \text{data})$ are different quantities, never swap them.`}
+$P(\\text{data} \\mid H_0)$ and $P(H_0 \\mid \\text{data})$ are different quantities, never swap them.`}
 />
 
 ## How to read a p-value, in practice
@@ -641,7 +641,7 @@ assert abs(p_two_sided - 2 * one) < 0.02`,
 - The probability that the study will replicate
   > Replication depends on the true effect and the study's power, neither of which the p-value reports.
 - The probability that the null hypothesis is true given the data
-  > That is $P(H_0 \mid \text{data})$, which the p-value is not. The p-value assumes $H_0$ rather than reporting its probability.
+  > That is $P(H_0 \\mid \\text{data})$, which the p-value is not. The p-value assumes $H_0$ rather than reporting its probability.
 - [o] The probability of obtaining data at least as extreme as observed, assuming the null hypothesis is true
   > This matches the formal definition: it conditions on $H_0$ and measures how far into the tail the observed (or more extreme) data falls.
 
@@ -658,7 +658,7 @@ The defining feature is the condition "assuming $H_0$ is true."`}
 - [o] If $H_0$ were true, data this extreme or more would occur about 2% of the time
   > This restates the definition correctly: it is a statement about how often the null world produces results as extreme as the one seen.
 - There is a 98% chance the alternative hypothesis is true
-  > That is $P(H_1 \mid \text{data})$, which the p-value does not provide; obtaining it would require prior information the p-value never uses.
+  > That is $P(H_1 \\mid \\text{data})$, which the p-value does not provide; obtaining it would require prior information the p-value never uses.
 
 Always phrase it as "if $H_0$ were true, then...".`}
 />
@@ -668,14 +668,14 @@ Always phrase it as "if $H_0$ were true, then...".`}
 
 - Because p-values are always biased upward
   > P-values are not systematically biased upward; under $H_0$ they are uniform. The mismatch is about which conditional probability is being computed.
-- [o] Because the p-value is computed *assuming* $H_0$, so it is $P(\text{data} \mid H_0)$, and reversing the condition to $P(H_0 \mid \text{data})$ requires extra information it never uses
+- [o] Because the p-value is computed *assuming* $H_0$, so it is $P(\\text{data} \\mid H_0)$, and reversing the condition to $P(H_0 \\mid \\text{data})$ requires extra information it never uses
   > A calculation that takes $H_0$ as given cannot output the probability of $H_0$; converting between the two conditionals needs the prior plausibility of the hypotheses.
 - Because $H_0$ is never true in real data
   > Whether $H_0$ is ever exactly true is a separate debate; the reason the p-value is not $P(H_0)$ is structural, not about realism.
 - Because the sample size is usually too small
   > Sample size affects power and precision, not the conceptual fact that conditioning on $H_0$ cannot yield the probability of $H_0$.
 
-This is the prosecutor's fallacy: $P(\text{data} \mid H_0) \neq P(H_0 \mid \text{data})$.`}
+This is the prosecutor's fallacy: $P(\\text{data} \\mid H_0) \\neq P(H_0 \\mid \\text{data})$.`}
 />
 
 <MultipleChoice
@@ -709,7 +709,7 @@ To learn how big an effect is, use an effect size and a confidence interval, not
 />
 
 <MultipleChoice
-  markdown={`A data scientist runs 40 independent A/B comparisons on metrics that truly have no effect, using $\alpha = 0.05$. About how many "significant" results should they expect, and why?
+  markdown={`A data scientist runs 40 independent A/B comparisons on metrics that truly have no effect, using $\\alpha = 0.05$. About how many "significant" results should they expect, and why?
 
 - [o] About 2, because each truly-null test has a 5% chance of a false positive, and 5% of 40 is 2
   > With every null comparison carrying an independent 5% false-positive risk, roughly 5% of 40 tests cross the threshold purely by luck.
@@ -724,7 +724,7 @@ Testing many true nulls guarantees occasional false positives, the multiple-comp
 />
 
 <MultipleChoice
-  markdown={`Which practice **inflates** the real false-positive rate above the stated $\alpha$?
+  markdown={`Which practice **inflates** the real false-positive rate above the stated $\\alpha$?
 
 - Using a two-sided test instead of a one-sided test
   > A two-sided test is generally more conservative about reaching significance, not a source of inflated false positives.

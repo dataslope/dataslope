@@ -70,6 +70,12 @@ Several teams tried to bring types to JavaScript:
 
 **Google's Closure Compiler** (2009) used JSDoc annotations (`/** @type {number} */`) to add optional type checking. It worked for Google's massive internal codebase, but it was clunky, types lived in comments, not the language itself. The annotations were verbose, the error messages cryptic, and adoption outside Google was minimal.
 
+<Figure
+  slug="tsx-birth-of-typescript-early-experiments-inline-cutout"
+  alt="Several part-built gates on a bench, each a different attempt at checking the same block"
+  caption="Several attempts at typing JavaScript came before the one that stuck."
+/>
+
 **Facebook's Flow** (2014) was a true static type checker for JavaScript. You added type annotations (`let x: number = 5`), and Flow checked them. It was fast, pragmatic, and integrated well with React. But it required a build step, the ecosystem was small, and Facebook's internal priorities meant external users often felt like second-class citizens.
 
 Both tools pointed toward the same insight: **JavaScript developers wanted types, but they wanted them to feel like a natural extension of the language, not a bolt-on.** The syntax had to be clean. The tooling had to be excellent. The migration path had to be gradual, you couldn't force a million-line codebase to convert overnight.
@@ -77,12 +83,6 @@ Both tools pointed toward the same insight: **JavaScript developers wanted types
 ## Enter Anders Hejlsberg
 
 In 2010, a small team at Microsoft started sketching a solution. Leading the project was **Anders Hejlsberg**, a legendary language designer. Hejlsberg had created **Turbo Pascal** in the 1980s, a fast, elegant compiler that made programming accessible to a generation of developers. At Borland, he built **Delphi**, a visual development environment beloved for its productivity. At Microsoft, he was the chief architect of **C#**, a statically typed language designed for the .NET platform.
-
-<Figure
-  slug="tsx-birth-of-typescript-early-experiments-inline-cutout"
-  alt="Several part-built gates on a bench, each a different attempt at checking the same block"
-  caption="Several attempts at typing JavaScript came before the one that stuck."
-/>
 
 Hejlsberg understood types deeply. He also understood *pragmatism*. C# had shown that a well-designed type system could catch bugs early, enable powerful tooling, and scale to massive codebases, all without getting in the developer's way.
 

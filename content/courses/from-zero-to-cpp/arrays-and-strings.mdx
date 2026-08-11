@@ -25,8 +25,14 @@ int scores[5] = {90, 85, 72, 95, 88};
 This puts five `int`s in **contiguous** memory. The size is part of
 the type (`int[5]`) and is fixed at compile time.
 
+<Figure
+  slug="cpp-arrays-and-strings-inline-cutout"
+  alt="A fixed strip of cells holding blocks beside a fixed strip of letter tiles ending in a small stop mark"
+  caption="A string is an array of characters that manages its own storage."
+/>
+
 ```mermaid
-flowchart TD
+flowchart LR
     subgraph "scores[5]"
         S0[90] --- S1[85] --- S2[72] --- S3[95] --- S4[88]
     end
@@ -359,15 +365,15 @@ int main() {
 />
 
 <MultipleChoice
-  markdown={`Why is \`push_back()\` on a \`std::vector\` considered O(1) *amortized*?
+  markdown={`Why is \`push_back()\` on a \`std::vector\` considered $O(1)$ *amortized*?
 
-- It is O(log n).
+- It is $O(\\log n)$.
   > Logarithmic growth would make growth too slow; vectors double (or similar).
-- It is always O(1).
-  > Occasionally it triggers a reallocation and copy, which is O(n).
-- [o] Most pushes are O(1); when capacity is exceeded the vector reallocates and copies, but it grows geometrically, so the *average* cost per push is constant.
+- It is always $O(1)$.
+  > Occasionally it triggers a reallocation and copy, which is $O(n)$.
+- [o] Most pushes are $O(1)$; when capacity is exceeded the vector reallocates and copies, but it grows geometrically, so the *average* cost per push is constant.
   > This is the classic amortized-analysis argument.
-- It is O(n) every time.
+- It is $O(n)$ every time.
   > That would make any vector-based algorithm slow; this isn't the case.`}
 />
 
@@ -386,9 +392,3 @@ int main() {
 
 Next: how to bundle multiple values together into a single named
 type, *structs* and aggregates.
-
-<Figure
-  slug="cpp-arrays-and-strings-inline-cutout"
-  alt="A fixed strip of cells holding blocks beside a fixed strip of letter tiles ending in a small stop mark"
-  caption="A string is an array of characters that manages its own storage."
-/>

@@ -35,9 +35,9 @@ The three implementations you actually use:
 
 | Class | Backed by | Ordering | Cost of `add()`/`contains()` |
 | --- | --- | --- | --- |
-| `HashSet<E>` | `HashMap<E,Object>` | *None* | `O(1)` average |
-| `LinkedHashSet<E>` | hash table + linked list | *Insertion order* | `O(1)` average |
-| `TreeSet<E>` | Red-black tree | *Sorted* by natural order or `Comparator` | `O(log n)` |
+| `HashSet<E>` | `HashMap<E,Object>` | *None* | $O(1)$ average |
+| `LinkedHashSet<E>` | hash table + linked list | *Insertion order* | $O(1)$ average |
+| `TreeSet<E>` | Red-black tree | *Sorted* by natural order or `Comparator` | $O(\log n)$ |
 
 ## HashSet
 
@@ -134,7 +134,7 @@ appeared.
 
 `TreeSet` keeps elements in **sorted order**, using either the
 elements' natural order (`Comparable`) or a supplied `Comparator`.
-Backed by a red-black tree, every operation is `O(log n)`.
+Backed by a red-black tree, every operation is $O(\log n)$.
 
 <CodeBlock
   adapter="java"
@@ -231,12 +231,6 @@ again here in context: a `HashSet` indexes by `hashCode()` at insertion
 time. If you mutate a field that participates in `hashCode()`, the
 element silently becomes unreachable in the set. The same hazard
 exists with `TreeSet` if you mutate a field that affects `compareTo()`.
-
-<Figure
-  slug="jcol-sets-set-interface-inline-cutout"
-  alt="A bin with a narrow mouth that accepts a block once and rejects an identical second"
-  caption="Membership is the only question a set is built to answer quickly."
-/>
 
 **Use immutable value types as set elements.**
 

@@ -28,6 +28,12 @@ A function `f` is **pure** if and only if:
    network request, increment a global counter, read the time, or
    read from a random number generator.
 
+<Figure
+  slug="cs-pure-functions-definition-can-hold-inline-cutout"
+  alt="A sealed machine with no hoses, wires or taps anywhere on it, one block in and one block out"
+  caption="Same inputs, same result, and nothing observed outside changes."
+/>
+
 ```mermaid
 flowchart LR
     A[Input] --> F["f (pure)"] --> O[Output]
@@ -203,12 +209,6 @@ The last one is interesting. A function that throws for some inputs
 is *technically* impure (its output is not a return value for those
 inputs), but in practice we tolerate it for argument validation. The
 ones above it are the ones that bite.
-
-<Figure
-  slug="cs-pure-functions-definition-can-hold-inline-cutout"
-  alt="A sealed machine with no hoses, wires or taps anywhere on it, one block in and one block out"
-  caption="Same inputs, same result, and nothing observed outside changes."
-/>
 
 ## "But my program *has* to print things"
 

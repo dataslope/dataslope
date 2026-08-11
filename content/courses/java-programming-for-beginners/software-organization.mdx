@@ -36,6 +36,12 @@ By convention:
   many sources end up in the same program.
 - Folder structure on disk mirrors the package: `src/com/acme/billing/Invoice.java`.
 
+<Figure
+  slug="java-software-organization-packages-physical-organization-inline-cutout"
+  alt="A rack of labelled folders, each holding cards of one kind only"
+  caption="Packages put each kind of class in its own labelled place."
+/>
+
 Packages have two practical benefits:
 
 1. **Naming.** Two different libraries can both have a `Logger`
@@ -51,6 +57,12 @@ Packages have two practical benefits:
 The most common shape for a non-trivial Java application is a
 **layered architecture**. Each layer has a focused job and only
 talks to the layer immediately below it.
+
+<Figure
+  slug="java-software-organization-layered-architecture-inline-cutout"
+  alt="A stack of platforms where every support runs downward, and one support drawn upward struck through"
+  caption="Higher layers may depend on lower ones, and never the other way round."
+/>
 
 ```mermaid
 flowchart TB
@@ -133,12 +145,6 @@ src/main/java/
 Six classes, four packages, four layers. From the outside, the
 shape is exactly the same as a 200-class enterprise codebase.
 
-<Figure
-  slug="java-software-organization-packages-physical-organization-inline-cutout"
-  alt="A rack of labelled folders, each holding cards of one kind only"
-  caption="Packages put each kind of class in its own labelled place."
-/>
-
 The wiring at startup, creating the infrastructure objects, handing
 them to the service, handing the service to the controller, is
 called **composition root**. In small programs it's a few lines of
@@ -161,7 +167,7 @@ two-word summary of *every* opinion about software architecture
 ever written.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph H[High cohesion + Low coupling - good]
         A1[Order] --> A2["<code>OrderRepository</code>"]
         A1 --> A3["<code>PricingService</code>"]
@@ -173,6 +179,7 @@ flowchart LR
         B1 --- B5[HTTP]
         B1 --- B6[Auth]
     end
+    H ~~~ B
 ```
 
 ## Architecture is the *outline* of the code
@@ -182,6 +189,12 @@ from "real coding." It is not. **Architecture is the shape of the
 code.** Every time you decide which class owns a piece of state,
 which package something goes in, which method calls which, you
 are *practicing* architecture.
+
+<Figure
+  slug="java-software-organization-architecture-outline-code-inline-cutout"
+  alt="A plan of rooms and doorways drawn out before a single bench is carried in"
+  caption="Architecture is the shape of the code, decided before there is much code to shape."
+/>
 
 Good architecture is the same thing as good *organization*: when
 something needs to change, only a small part of the system needs to

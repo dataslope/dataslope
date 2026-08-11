@@ -73,12 +73,6 @@ ORDER BY
 
 The phrase `REFERENCES customers(id)` declares the relationship: each `orders.customer_id` is meant to refer to a value in `customers.id`.
 
-<Figure
-  slug="lite-foreign-keys-referential-integrity-inline-cutout"
-  alt="A gate latched shut across a crate while a cord still runs from that crate to another"
-  caption="A foreign key stops you deleting a row something else still points at."
-/>
-
 <MultipleChoice
   markdown={`In the orders table, what does \`customer_id = 1\` mean?
 
@@ -97,6 +91,12 @@ A foreign key value is a reference to a row in another table.`}
 ## Referential integrity
 
 **Referential integrity** means references should not dangle. If an order says `customer_id = 99`, customer `99` should actually exist.
+
+<Figure
+  slug="lite-foreign-keys-referential-integrity-inline-cutout"
+  alt="A gate latched shut across a crate while a cord still runs from that crate to another"
+  caption="A foreign key stops you deleting a row something else still points at."
+/>
 
 ```mermaid
 flowchart TB
@@ -195,7 +195,7 @@ ORDER BY
 The join follows the foreign-key arrows and shows readable customer names next to order facts.
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph C["<code>customers</code>"]
         C1["<code>id = 1</code><br/>Ada"]
         C2["<code>id = 2</code><br/>Grace"]

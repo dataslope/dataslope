@@ -178,6 +178,12 @@ process(null);
 The check `value === null` proves that `value` is `null` in the `if`
 branch, and *not* `null` in the `else` branch (so it must be `string`).
 
+<Figure
+  slug="tsx-type-narrowing-narrowing-problem-inline-cutout"
+  alt="A wide chute carrying three different shapes with a single narrow opening at its end"
+  caption="Narrowing is how a wide union becomes a single type you can act on."
+/>
+
 You can also compare against literal types:
 
 <CodeBlock
@@ -529,12 +535,6 @@ array contains only `string`s.
 Let's solidify these concepts with a challenge. You'll define a
 discriminated union for shapes and implement a function that computes
 area using narrowing.
-
-<Figure
-  slug="tsx-type-narrowing-narrowing-problem-inline-cutout"
-  alt="A wide chute carrying three different shapes with a single narrow opening at its end"
-  caption="Narrowing is how a wide union becomes a single type you can act on."
-/>
 
 <ChallengeCard
   adapter="typescript"

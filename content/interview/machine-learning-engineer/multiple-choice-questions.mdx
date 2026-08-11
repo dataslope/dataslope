@@ -1165,10 +1165,10 @@ reasoning and runnable code.
 - Deduplicate with a set before sorting.
   > Deduplication is a different operation.
 - Loop over the array and take the running maximum k separate times.
-  > O(nk), fine for tiny k and worse as k grows.
+  > $O(nk)$, fine for tiny k and worse as k grows.
 - Sort the whole array and take the first k.
-  > O(n log n) when you do not need the rest ordered.
-- [o] \`np.argpartition\` in O(n), then sort only the k selected, or a size-k heap when streaming.
+  > $O(n \\log n)$ when you do not need the rest ordered.
+- [o] \`np.argpartition\` in $O(n)$, then sort only the k selected, or a size-k heap when streaming.
   > The distinction matters when n is millions and k is ten.`}
 />
 
@@ -1279,13 +1279,13 @@ reasoning and runnable code.
 <MultipleChoice
   markdown={`What is the complexity of a naive kNN prediction, and how does a heap help?
 
-- O(n²) for every single prediction.
+- $O(n^2)$ for every single prediction.
   > That is the cost of all-pairs distances, not one query.
-- [o] O(n log n) sorted, or O(n log k) with a size-k heap.
+- [o] $O(n \\log n)$ sorted, or $O(n \\log k)$ with a size-k heap.
   > A spatial index or approximate search does better still in low dimensions. At high dimensionality exact indexes lose their advantage, which is why approximate nearest neighbour libraries dominate vector search.
-- O(k), independent of the training set size.
+- $O(k)$, independent of the training set size.
   > Cost scales with n.
-- O(1), since it just looks up neighbours.
+- $O(1)$, since it just looks up neighbours.
   > Every training point has to be considered.`}
 />
 

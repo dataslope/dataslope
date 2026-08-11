@@ -39,12 +39,6 @@ print(penguins.select(["species", "body_mass_g"]).head(3))
 Order is yours to choose: `select()` emits columns in the order you
 name them, regardless of their order in the source.
 
-<Figure
-  slug="pl-selecting-columns-inline-cutout"
-  alt="A wide board of standing columns with three of them lifted straight up out of the board and set down side by side on a smaller board"
-  caption="`select()` returns the columns you named, in the order you named them."
-/>
-
 ## Everything, and everything except
 
 <CodeBlock
@@ -78,6 +72,12 @@ and you want thirty-eight of them.
 
 A `pl.col()` argument wrapped in `^` and `$` is treated as a regular
 expression.
+
+<Figure
+  slug="pl-selecting-columns-inline-cutout"
+  alt="A wide board of standing columns with three of them lifted straight up out of the board and set down side by side on a smaller board"
+  caption="`select()` returns the columns you named, in the order you named them."
+/>
 
 <CodeBlock
   adapter="python"

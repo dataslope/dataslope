@@ -24,22 +24,34 @@ the entries in it name:
 
 | Operation | `ArrayList` | `LinkedList` | `ArrayDeque` | `HashSet` / `HashMap` | `LinkedHashSet` / `LinkedHashMap` | `TreeSet` / `TreeMap` |
 | --- | --- | --- | --- | --- | --- | --- |
-| `get(i)` | **O(1)** | O(n) | n/a | n/a | n/a | n/a |
-| `add(e)` at end | **O(1)\*** | O(1) | **O(1)\*** | **O(1)\*** | **O(1)\*** | O(log n) |
-| `add(0, e)` at front | O(n) | **O(1)** | **O(1)** | n/a | n/a | n/a |
-| `remove(i)` at random position | O(n) | O(n) (find) + O(1) (remove) | n/a | n/a | n/a | n/a |
-| `contains(e)` | O(n) | O(n) | O(n) | **O(1)\*** | **O(1)\*** | O(log n) |
-| Iteration | **O(n)**, cache-friendly | O(n), pointer-chasing | **O(n)**, cache-friendly | O(n + capacity) | **O(n)** in insertion order | **O(n)** in sort order |
+| `get(i)` | **$O(1)$** | $O(n)$ | n/a | n/a | n/a | n/a |
+| `add(e)` at end | **$O(1)$\*** | $O(1)$ | **$O(1)$\*** | **$O(1)$\*** | **$O(1)$\*** | $O(\log n)$ |
+| `add(0, e)` at front | $O(n)$ | **$O(1)$** | **$O(1)$** | n/a | n/a | n/a |
+| `remove(i)` at random position | $O(n)$ | $O(n)$ (find) + $O(1)$ (remove) | n/a | n/a | n/a | n/a |
+| `contains(e)` | $O(n)$ | $O(n)$ | $O(n)$ | **$O(1)$\*** | **$O(1)$\*** | $O(\log n)$ |
+| Iteration | **$O(n)$**, cache-friendly | $O(n)$, pointer-chasing | **$O(n)$**, cache-friendly | $O(n + capacity)$ | **$O(n)$** in insertion order | **$O(n)$** in sort order |
 | Memory per element | 1 reference | 3 references | 1 reference | ~3 references + bucket | ~5 references | ~5 references |
 
-`*` *amortized*: occasionally an `O(n)` resize/rehash happens, but
-spread over many inserts it averages to `O(1)`.
+`*` *amortized*: occasionally an $O(n)$ resize/rehash happens, but
+spread over many inserts it averages to $O(1)$.
+
+<Figure
+  slug="jcol-performance-tradeoffs-big-table-inline-cutout"
+  alt="A grid of small gauges, one per container per operation, their needles at visibly different angles"
+  caption="Each container is fast at some operations and slow at others, by construction."
+/>
 
 ## Big-O is not the whole story: cache locality
 
 Modern CPUs are *much* faster than memory. A linear walk over a
 contiguous array hits L1 cache on almost every access; a walk over a
 linked list jumps to random addresses and stalls on cache misses.
+
+<Figure
+  slug="jcol-performance-tradeoffs-big-o-not-whole-inline-cutout"
+  alt="One long unbroken shelf walked end to end, beside the same items scattered across a room joined by cords"
+  caption="A contiguous walk beats pointer-chasing badly enough to overturn the complexity on paper."
+/>
 
 For most workloads, **a slower-on-paper `ArrayList` beats a
 faster-on-paper `LinkedList`.** Real-world middle-insertion has to
@@ -49,7 +61,7 @@ Bloch, the architect of the Collections Framework: *"Does anyone
 actually use LinkedList? I wrote it, and I never use it."*
 
 ```mermaid
-flowchart TD
+flowchart LR
     subgraph AL[ArrayList - contiguous]
       direction LR
       A0[a0] --- A1[a1] --- A2[a2] --- A3[a3] --- A4[a4]
@@ -76,8 +88,8 @@ as long, because the cache line stops paying for itself.
 `ArrayList` keeps a backing `Object[]`. When it fills up, it
 allocates a new array that is **1.5×** the size, copies, and
 discards the old one. That copy is what makes the *worst-case*
-`add()` `O(n)`, but it happens rarely enough that the *amortized*
-cost is `O(1)`.
+`add()` $O(n)$, but it happens rarely enough that the *amortized*
+cost is $O(1)$.
 
 If you know roughly how many elements you'll add, **pre-size**:
 
@@ -125,12 +137,6 @@ slots each time.
   table. Defaults to 16.
 - **Load factor**, the threshold ratio of `size / capacity` at
   which the table doubles and rehashes. Defaults to 0.75.
-
-<Figure
-  slug="jcol-performance-tradeoffs-big-table-inline-cutout"
-  alt="A grid of small gauges, one per container per operation, their needles at visibly different angles"
-  caption="Each container is fast at some operations and slow at others, by construction."
-/>
 
 Both values matter. A too-small initial capacity causes repeated
 rehashing; a too-large load factor causes more collisions and
@@ -181,7 +187,7 @@ A short, honest list:
 - **`HashSet`**, fastest, no order. Default choice for "set of stuff."
 - **`LinkedHashSet`**, keeps insertion order. Tiny extra cost. Use
   it for any output that must be deterministic.
-- **`TreeSet`**, sorted, supports range queries. Worth `O(log n)`
+- **`TreeSet`**, sorted, supports range queries. Worth $O(\log n)$
   when you need sorted iteration or "next element after `x`."
 
 <Figure
@@ -293,14 +299,14 @@ flowchart TD
 ## Test your understanding
 
 <MultipleChoice
-  markdown={`Why does \`ArrayList\` outperform \`LinkedList\` on iteration in practice, even though both are \`O(n)\`?
+  markdown={`Why does \`ArrayList\` outperform \`LinkedList\` on iteration in practice, even though both are $O(n)$?
 
 - \`LinkedList.iterator()\` allocates per element
   > It does not.
 - [o] \`ArrayList\` stores elements in a contiguous backing array, so a sequential walk is extremely cache-friendly; \`LinkedList\` follows pointers to scattered heap nodes
   > Cache behavior dominates Big-O for in-memory walks at modern CPU speeds.
-- \`ArrayList.iterator()\` is \`O(log n)\`
-  > Both are \`O(n)\` per \`next()\`.
+- \`ArrayList.iterator()\` is $O(\\log n)$
+  > Both are $O(n)$ per \`next()\`.
 - \`ArrayList\` parallelizes by default
   > It does not.`}
 />

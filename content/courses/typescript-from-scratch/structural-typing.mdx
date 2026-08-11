@@ -18,6 +18,12 @@ This makes TypeScript remarkably flexible and composable. You can reuse types ac
 
 In TypeScript, a type is compatible with another if it has *at least* the required properties, with the correct types. The name doesn't matter.
 
+<Figure
+  slug="tsx-structural-typing-shape-based-compatibility-inline-cutout"
+  alt="Two plugs with identical pins from different makers, both seating in the same socket"
+  caption="The same shape from a different source still fits, because names do not count."
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -307,12 +313,6 @@ TypeScript's structural typing gives you flexibility by default, but you can lay
 ## Challenge: Structural compatibility
 
 Let's test your understanding. The function below is typed against a small `LogEntry` interface, and, thanks to structural typing, the program feeds it objects that were never declared as `LogEntry` but happen to have the right shape (plus extra fields). Your job is just the body.
-
-<Figure
-  slug="tsx-structural-typing-shape-based-compatibility-inline-cutout"
-  alt="Two plugs with identical pins from different makers, both seating in the same socket"
-  caption="The same shape from a different source still fits, because names do not count."
-/>
 
 <ChallengeCard
   adapter="typescript"

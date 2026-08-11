@@ -99,6 +99,12 @@ class is a
 record of functions**. You pass the record as an argument; the
 generic function uses it.
 
+<Figure
+  slug="fp-generic-abstractions-and-type-classes-parametric-polymorphism-i-inline-cutout"
+  alt="A sealed pipe carrying blocks of every shape through unchanged, its own opening plain and unshaped"
+  caption="A parametric function cannot inspect its values, so it works for all of them."
+/>
+
 ### `Eq` as a record
 
 <CodeBlock
@@ -222,6 +228,12 @@ The arrows mean "extends", every `Ord` instance is also an `Eq`
 (it can decide equality from "neither less nor greater"). Every
 `Monad` is an `Applicative`, etc.
 
+<Figure
+  slug="fp-generic-abstractions-and-type-classes-type-class-hierarchies-briefly-inline-cutout"
+  alt="Three fittings of increasing reach, each one accepting everything the fitting before it accepted"
+  caption="Each abstraction accepts everything the one below it did, and asks for one thing more."
+/>
+
 We'll meet `Functor`, `Applicative`, and `Monad` in the next
 chapter as **patterns** rather than required code structure. For
 now, what matters is: *typical FP abstractions are just bundles of
@@ -235,6 +247,12 @@ sense, a *different data structure* from one that uses
 case-insensitive equality, even though the values are the same.
 Type classes let you write **one** set implementation that works
 with either, by parameterizing it on `Eq<string>`.
+
+<Figure
+  slug="fp-generic-abstractions-and-type-classes-bother-inline-cutout"
+  alt="Two containers built to the same drawing but with different measures fitted, behaving differently on identical contents"
+  caption="Same container, different equality, and it is a different data structure in practice."
+/>
 
 The same pattern shows up everywhere:
 
@@ -254,12 +272,6 @@ A **Semigroup** is the simplest possible algebraic abstraction: an
 associative binary operation. Numbers under addition, strings
 under concatenation, arrays under concatenation, and "last wins"
 on objects are all semigroups.
-
-<Figure
-  slug="fp-generic-abstractions-and-type-classes-parametric-polymorphism-i-inline-cutout"
-  alt="A sealed pipe carrying blocks of every shape through unchanged, its own opening plain and unshaped"
-  caption="A parametric function cannot inspect its values, so it works for all of them."
-/>
 
 <ChallengeCard
   adapter="typescript"

@@ -40,6 +40,12 @@ the *do* list is enormous, the object is doing too much. If the
 someone else. If the *collaborate* list is enormous, the object is
 acting as a central coordinator and should probably be broken up.
 
+<Figure
+  slug="oopj-responsibility-driven-design-three-questions-every-inline-cutout"
+  alt="One crate on a bench with three blank cards propped against it"
+  caption="Ask what each class knows, what it does, and who it works with."
+/>
+
 ## CRC cards: a 5-minute design tool
 
 The classic tool for this style of thinking is the **CRC card**,
@@ -68,6 +74,12 @@ three fields:
 You write one card per candidate class. The card forces brevity. If
 the responsibility list spills off the card, the class is too big.
 
+<Figure
+  slug="oopj-responsibility-driven-design-crc-cards-5-minute-inline-cutout"
+  alt="Three plain cards on a table, each ruled into the same three blank bands and passed between hands"
+  caption="Class, responsibility, collaborator: three questions per card, and the design falls out."
+/>
+
 ## A worked modeling example
 
 Let's design, on cards, before code, a simple **coffee shop order
@@ -81,9 +93,9 @@ does everything. Resist it. Look for *nouns* in the description and
 make a card for each candidate.
 
 <Figure
-  slug="oopj-responsibility-driven-design-three-questions-every-inline-cutout"
-  alt="One crate on a bench with three blank cards propped against it"
-  caption="Ask what each class knows, what it does, and who it works with."
+  slug="oopj-responsibility-driven-design-worked-modeling-example-inline-cutout"
+  alt="One part asking a neighbour for a reading rather than reaching through its casing to take it"
+  caption="No class reaches into another's fields; it asks the object that owns them."
 />
 
 ```mermaid

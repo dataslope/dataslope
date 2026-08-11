@@ -21,12 +21,6 @@ and points in different groups are far apart. Nobody told it what the
 groups *mean*, it just finds structure that was already sitting in the
 data, waiting to be noticed.
 
-<Figure
-  slug="ml-k-means-clustering-problem-solves-inline-cutout"
-  alt="A scatter of chips with three posts being driven in among them, each chip roped to its nearest post"
-  caption="K-means places k centres and gives every point to its nearest one."
-/>
-
 This is your entry point into **unsupervised learning**, and the ideas
 here, distance, centers, "similar things belong together", echo through
 everything that follows.
@@ -47,6 +41,12 @@ labeled the listeners as "jazz fan" or "workout-music person." All you have
 is behavior: how much each person listens to each genre, time of day,
 session length. You suspect there are natural *types* of listener in
 there, but which ones, and who belongs to which?
+
+<Figure
+  slug="ml-k-means-clustering-problem-solves-inline-cutout"
+  alt="A scatter of chips with three posts being driven in among them, each chip roped to its nearest post"
+  caption="K-means places k centres and gives every point to its nearest one."
+/>
 
 This is the core unsupervised question: **given unlabeled examples, can we
 group them so that members of a group resemble each other?** That grouping
@@ -277,6 +277,12 @@ that really has 3, it will happily split one real group in two and report
 back with a straight face. Choosing `k` is the central practical struggle
 of k-means.
 
+<Figure
+  slug="ml-k-means-clustering-inertia-hard-question-choosing-inline-cutout"
+  alt="A falling curve of readings with a clear bend, past which each further step buys almost nothing"
+  caption="Inertia always falls as `k` grows, so the bend matters and the minimum does not."
+/>
+
 A natural instinct is "just minimize inertia." But that instinct fails,
 and understanding *why* is illuminating. Inertia always drops as `k` grows,
 more centers means every point can be closer to one. Push it to the
@@ -365,6 +371,12 @@ spans tens of thousands; age spans tens. When k-means measures distance,
 the income differences are thousands of times larger, so they completely
 dominate. The age feature might as well not exist. K-means would cluster
 purely on income and call it a day.
+
+<Figure
+  slug="ml-k-means-clustering-must-standardize-first-inline-cutout"
+  alt="Two rulers of very different lengths laid against the same row of marks, then both rulers recut to one length"
+  caption="K-means measures distance, so a column with a bigger range quietly decides every cluster."
+/>
 
 The fix is to put every feature on a comparable scale *before* clustering,
 almost always with `StandardScaler`, which rescales each feature to mean 0

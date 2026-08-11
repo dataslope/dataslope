@@ -22,6 +22,12 @@ give one group per *day*. You first **truncate** each date down to the
 first of its month, so every day in March collapses to `2024-03-01`. The
 tool is `date_trunc('month', d)`.
 
+<Figure
+  slug="duck-working-with-dates-core-move-truncate-inline-cutout"
+  alt="A calendar strip cut by a guillotine into equal months and the pieces stacked"
+  caption="Truncating a timestamp is what turns rows into days, weeks or months."
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Revenue per month with date_trunc"
@@ -62,12 +68,6 @@ Sometimes you want a *component*, the year, the month number, the day of
 week, rather than a truncated date. `EXTRACT(part FROM d)` (or
 `date_part()`) pulls it out. This is how you answer "which weekday is
 busiest?" by grouping across all weeks.
-
-<Figure
-  slug="duck-working-with-dates-core-move-truncate-inline-cutout"
-  alt="A calendar strip cut by a guillotine into equal months and the pieces stacked"
-  caption="Truncating a timestamp is what turns rows into days, weeks or months."
-/>
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -137,6 +137,12 @@ simply **missing** from a grouped result, which makes a chart lie by
 skipping the gap. The fix is to generate a complete spine of dates with
 `generate_series` (or `range()`) and `LEFT JOIN` the data onto it, so empty
 periods show up as zero.
+
+<Figure
+  slug="duck-working-with-dates-inline-cutout"
+  alt="A calendar strip being cut into months by a small guillotine, and the pieces stacked into three labelled trays"
+  caption="Dates are cut into periods, and each period becomes a group."
+/>
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -227,9 +233,3 @@ A generated date spine plus a left join produces a gap-free time series.`}
 
 Dates handled, the last transformation skill is **reshaping**, turning
 long data into wide and back. That is the next page.
-
-<Figure
-  slug="duck-working-with-dates-inline-cutout"
-  alt="A calendar strip being cut into months by a small guillotine, and the pieces stacked into three labelled trays"
-  caption="Dates are cut into periods, and each period becomes a group."
-/>

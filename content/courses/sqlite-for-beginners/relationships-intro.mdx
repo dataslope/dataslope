@@ -16,6 +16,12 @@ Instead of storing every fact in one giant table, you store each kind of thing i
 
 Imagine an orders table that repeats the customer's details on every order.
 
+<Figure
+  slug="lite-relationships-intro-not-one-giant-inline-cutout"
+  alt="One crowded crate spilling mixed items beside three tidy crates joined by cords"
+  caption="Several small related tables beat one crate holding everything."
+/>
+
 | order_id | order_date | customer_name | customer_phone | total |
 | --- | --- | --- | --- | --- |
 | 101 | 2026-01-05 | Ada | 555-0101 | 42.00 |
@@ -72,12 +78,6 @@ Read it as: one customer can place many orders, and each order belongs to one cu
 ## Relationship shape 1: one-to-many
 
 **One-to-many** is the most common relationship shape.
-
-<Figure
-  slug="lite-relationships-intro-not-one-giant-inline-cutout"
-  alt="One crowded crate spilling mixed items beside three tidy crates joined by cords"
-  caption="Several small related tables beat one crate holding everything."
-/>
 
 Examples:
 

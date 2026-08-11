@@ -3,7 +3,7 @@ title: Strings
 description: Work with std::string, C-strings, string_view, searching, slicing, splitting, reversing, and palindrome checks in C++
 ---
 
-Most "string problems" are array problems wearing a costume. A `std::string` is, under the hood, a dynamic array of characters, same contiguous storage as a vector, same O(1) indexing, same growth-by-reallocation, plus a toolkit of text operations: concatenation, search, comparison, and slicing. Every technique you learned on the arrays page (two-pointer scans, index loops, amortized appends) transfers here directly, which is why this page comes right after that one.
+Most "string problems" are array problems wearing a costume. A `std::string` is, under the hood, a dynamic array of characters, same contiguous storage as a vector, same $O(1)$ indexing, same growth-by-reallocation, plus a toolkit of text operations: concatenation, search, comparison, and slicing. Every technique you learned on the arrays page (two-pointer scans, index loops, amortized appends) transfers here directly, which is why this page comes right after that one.
 
 What makes strings worth their own chapter is the toolkit, and one piece of inherited history: the C-style string, whose design C++ still has to interoperate with. We will meet both.
 
@@ -14,7 +14,13 @@ What makes strings worth their own chapter is the toolkit, and one piece of inhe
 
 ## Creating and reading strings
 
-A string owns its characters and tracks its length. Like `std::vector`, indexing is O(1), and the string can grow as needed.
+A string owns its characters and tracks its length. Like `std::vector`, indexing is $O(1)$, and the string can grow as needed.
+
+<Figure
+  slug="dsa-strings-creating-reading-strings-inline-cutout"
+  alt="A ribbon of tiles being clamped at both ends and then read left to right by a marker"
+  caption="`std::string` knows its own length and manages its own storage."
+/>
 
 <CodeBlock
   adapter="cpp"
@@ -106,7 +112,7 @@ int main() {
 
 ## Concatenation
 
-`+` creates a brand-new string each time; `+=` appends in place, reusing spare capacity exactly like `push_back()` on a vector. Inside a loop the difference compounds: building an n-character string with repeated `s = s + part` copies the whole prefix every iteration, O(n²), while `s += part` stays amortized O(n). Same output, very different bill.
+`+` creates a brand-new string each time; `+=` appends in place, reusing spare capacity exactly like `push_back()` on a vector. Inside a loop the difference compounds: building an n-character string with repeated `s = s + part` copies the whole prefix every iteration, $O(n^2)$, while `s += part` stays amortized $O(n)$. Same output, very different bill.
 
 <CodeBlock
   adapter="cpp"
@@ -143,7 +149,7 @@ Before `std::string`, there was the C-string: a bare character array with no len
   caption="A C-string ends at the null terminator, and nothing records its length."
 />
 
-`std::string` fixes this by storing its length explicitly, `size()` is O(1), not a scan, but C-strings still surround you: every string literal like `"hello"` is one, and many operating system APIs speak nothing else. So you need the two conversion moves: a literal can initialize a `std::string` directly, and `.c_str()` hands back a null-terminated pointer view for C-style APIs.
+`std::string` fixes this by storing its length explicitly, `size()` is $O(1)$, not a scan, but C-strings still surround you: every string literal like `"hello"` is one, and many operating system APIs speak nothing else. So you need the two conversion moves: a literal can initialize a `std::string` directly, and `.c_str()` hands back a null-terminated pointer view for C-style APIs.
 
 <CodeBlock
   adapter="cpp"
@@ -211,12 +217,6 @@ flowchart TD
 ## Splitting by a delimiter
 
 A simple split helper repeatedly calls `find()` and `substr()`. This is a useful pattern for parsing CSV-like toy inputs and interview strings.
-
-<Figure
-  slug="dsa-strings-creating-reading-strings-inline-cutout"
-  alt="A ribbon of tiles being clamped at both ends and then read left to right by a marker"
-  caption="`std::string` knows its own length and manages its own storage."
-/>
 
 <CodeBlock
   adapter="cpp"
@@ -390,13 +390,13 @@ int main() {
 <MultipleChoice
   markdown={`What is the time complexity of indexing a valid position in a \`std::string\` with \`s[i]\`?
 
-- O(n log n)
+- $O(n \\log n)$
   > Sorting-like complexity is not involved.
-- O(log n)
+- $O(\\log n)$
   > There is no tree search involved.
-- [o] O(1)
+- [o] $O(1)$
   > A string stores characters contiguously and computes the address directly.
-- O(n)
+- $O(n)$
   > Linear scans are used for operations like searching, not direct indexing.`}
 />
 

@@ -107,7 +107,13 @@ keepers; only the keepers reach git.
    page serving the old image.
 4. **Promote** — `scripts/promote-illustrations.mjs` encodes the chosen
    candidates to WebP straight into `public/images/`, the files the site
-   serves, and runs `build-images` to record their dimensions.
+   serves, and runs `build-images` to record their dimensions. **An id with a
+   cut-out promotes the cut-out and nothing else.** Every surface asks for the
+   `-cutout` slug, so the opaque `<id>.webp` beside it renders nowhere and is
+   ~0.22 MB of git each; two promotions made before that was the default left
+   1,351 of them, 151 MB, and `build-images` now warns if any come back. Pass
+   `--with-original` only for art genuinely shown with its background, and
+   check something asks for the bare slug first.
 5. **Wire** — `scripts/wire-course-figures.mjs` places one `<Figure>` per page
    across a course, clears retired slugs, and is idempotent. Always `--dry-run`
    first. Pass `--collection interview` for an interview-prep track, which pairs
@@ -261,8 +267,8 @@ All four API keys are already environment variables in Claude Code sessions:
 
 ### Illustrations are encoded once, into `public/images/`
 
-`promote-illustrations.mjs` writes `public/images/<id>.webp` at quality 92 and
-that file **is** what browsers download. Do not commit PNG sources, and do not
+`promote-illustrations.mjs` writes `public/images/<id>-cutout.webp` at quality
+92 and that file **is** what browsers download. Do not commit PNG sources, and do not
 put a copy under `assets/images/`: that directory is reserved for raster that
 does *not* come from this pipeline (a photo, a screenshot, a scanned diagram),
 which `build-images` re-encodes into a `.webp` plus a `.png`/`.jpg` fallback.
@@ -601,6 +607,22 @@ from `_theme.mjs`. The build fails on any literal `fill`/`stroke` colour that
 survives into the output, because that is the one defect review cannot catch:
 it looks right in whichever theme the author had open.
 
+### Clip anything that runs past the domain
+
+Plot draws a mark whether or not it fits: a domain narrower than the data does
+not clip it, it lets it leave the frame and the SVG both, over whatever the
+page has beside the figure. `bonferroni-vs-fdr` built its threshold line for
+all 100 ranks against an x domain of 30 and drew the other 70 across the
+lesson's table of contents.
+
+So a mark whose data can exceed the domain takes `clip: true` (the dots in
+that same figure already did), and a mark that can *never* be inside it is
+deleted rather than clipped, because clipping it only hides that it draws
+nothing. `npm run check:charts` renders the set and fails on any unclipped
+geometry outside the box; the tolerance is 2px, `<text>` is exempt, and
+ancestor `translate()`s are accumulated so a faceted mark is judged where it
+actually lands.
+
 ### Determinism
 
 The generated module is diffed on every build, so a spec that uses random data
@@ -744,7 +766,9 @@ raw-Markdown mirrors, brand fallbacks, charts, the search corpus and its D1
 seed, creation dates, the course catalog, home stats, the image manifest — and
 `postinstall` runs it too (see `scripts/postinstall-generate.mjs`, which skips
 it only on Cloudflare Workers Builds, where the `build` script re-runs it
-anyway).
+anyway). One generator is in none of them: `build-block-outputs` *executes*
+lesson code, which is not something a `dev` start or a deploy should be doing
+(see below).
 
 Running it that often is the point: no generated file is ever stale, and no
 step is anyone's job to remember. What it must not do is cost anything when
@@ -795,23 +819,96 @@ it should.
 ### Prepopulated code-block output
 
 `build-block-outputs` is the one generator in the chain that *executes*
-content rather than parsing it. It boots the same Pyodide-in-Node the content
-sweeps use, runs every Python `<CodeBlock>`, and records what it printed so a
-lesson shows its output before the reader presses Run.
+content rather than parsing it. It runs every `<CodeBlock>` it has a headless
+runtime for and records what it printed, so a lesson shows its output before
+the reader presses Run.
 
-Three things about it are worth knowing before you touch it:
+**Two generators, one manifest.** Python goes through Pyodide-in-Node,
+JavaScript and TypeScript through `AlmostNodeRunner`, and C and C++ through the
+pinned browsercc toolchain (`scripts/lib/block-runners.mjs`). Every one is the
+runtime the browser itself uses, which is the point: a prepopulated panel that
+disagrees with what Run produces is worse than an empty one, because nothing
+tells the reader which to believe.
 
-- **Its output is committed, and it reuses what is committed.** Executing
-  1,689 blocks costs ~12 minutes, which is the wrong thing to spend on every
-  deploy for an answer that only changes when a lesson does. So
-  `lib/generated/block-outputs.json` and `public/block-outputs/` are in git,
-  kept current by `.github/workflows/block-outputs.yml`, and the generator
-  reuses committed entries key-for-key. Keys are content hashes, so an entry
-  that exists is an entry that is still correct — which means a `build`
-  against a current manifest re-verifies it in under a second and never
-  boots Pyodide at all. It stays in the `build` chain as a safety net: if
-  the workflow lags, the deploy fills the gaps itself rather than shipping a
-  lesson with holes in it.
+The rest cannot run under Node at all, and
+`scripts/capture-browser-outputs.mjs` records them from a real page instead
+(`npm run capture:block-outputs`). It drives Playwright, reads the finished
+`OutputCell[]` off a test-only seam in `CodeBlock`, and writes into the same
+manifest under the same content-hash keys — so a reader cannot tell which
+generator filled a panel, and neither can the site.
+
+- **java, csharp, php** need a browser outright: CheerpJ, the .NET wasm bundle
+  and php-wasm have no Node build.
+- **r** *does* run under Node, and the R sweep proves it, but its output is
+  not text: `runtime/r.tsx` decides visibility with `withVisible()`, renders a
+  data frame as an HTML table and turns captured graphics into images, none of
+  it shared the way `pythonDisplayOutputs.ts` is. A stdout-only runner would
+  record a panel missing every table and every plot. The browser has already
+  done that conversion, which is why R is captured rather than run headlessly.
+- **web and react have no prepopulated output at all, and cannot.** Their
+  output *is* a live sandboxed iframe, not cells; the capture comes back with
+  nothing but "the preview didn't finish within the time limit". There is
+  nothing to store, so those 72 blocks stay blank by nature.
+
+Between the two generators, 3,290 of the site's 3,374 runnable blocks show
+their output before the reader presses Run. Of the 84 that do not, 72 are web
+and react; the other 12 are blocks that genuinely print nothing, or are marked
+`expectError` so the failure is the lesson.
+
+Two things the capture had to solve, both easy to trip over again. Cells are
+read off `window.__blockCapture` rather than the DOM, because by the time a
+`plot` cell is markup its figure JSON has gone to Plotly and an `image` cell is
+a base64 attribute. And `--relay` exists because a sandbox can allow Node's
+egress while blocking the browser's: every runtime downloads itself at run
+time, so without it CheerpJ, webR, php-wasm and the .NET bundle all fail on
+their first request and every block records an error. It is off by default.
+
+The capture does no second run, so its entries are recorded `stable: false` —
+the conservative answer rather than a measured one. Booting CheerpJ and webR
+over again for an hour to set a field nothing reads is not worth it.
+
+**What almostnode does to the process**, which a sweep never notices and a
+generator does. It replaces `process.exit` with one that throws on any code,
+including 0, so nothing after a JavaScript block can exit normally;
+`process.cwd()` starts answering `/`, the root of its VFS, which silently
+re-bases every path resolved afterwards, so `eachTag` files lessons under
+`home/user/dataslope/content/…` and keys them to a path the site never looks
+up; and `process` itself is swapped for a shim that does not carry Node's whole
+surface, so a method read off the global after a block has run may simply not
+be there. Everything the runner needs is bound before the first block and
+restored around each run.
+
+**A block is not finished when its top level returns.** `runner.run()` resolves
+when the entry module's top level does, which for an async lesson is before it
+has printed anything — seven of the ten blocks in `promises-and-async-await`
+recorded a blank panel while their real output arrived milliseconds later and
+went to the build log. The runner therefore drains: while the block still holds
+a timer of its own (`process.getActiveResourcesInfo()`, against a baseline
+taken before it started, so the harness's own timers do not count) or is still
+producing cells, it waits, and it gives up after ten seconds because a lesson
+is free to demonstrate an interval that never ends. A synchronous block holds
+nothing and leaves on the first check.
+
+**A narrowed run adds; it never replaces.** `--adapter` and `--filter` both
+start from the manifest on disk and skip the asset prune and the freshness
+stamp, because they only looked at part of the tree. `--force` means "do not
+*reuse* an entry", not "throw the file away" — conflating the two deleted every
+Python entry on the site along with 364 of their figures.
+
+Three more things are worth knowing before you touch it:
+
+- **Its output is committed, and nothing runs it automatically.** Executing
+  2,600 blocks costs the better part of an hour, which is the wrong thing to
+  spend on a deploy — or on a `dev` start — for an answer that only changes
+  when a lesson does. So `lib/generated/block-outputs.json` and
+  `public/block-outputs/` are in git, kept current by
+  `.github/workflows/block-outputs.yml` on pushes to `main`, and every other
+  consumer just reads what is committed. Run it by hand
+  (`npm run build:block-outputs`) when you want a block's output before the
+  workflow gets to it. Until then a new or edited block shows an empty output
+  panel, in `dev` and in a PR preview alike — the same panel it shows if its
+  entry is missing for any other reason, and the one every block showed before
+  this feature existed. Pressing Run always works regardless.
 - **Reuse is also what keeps the committed assets from churning.**
   Matplotlib's PNG bytes are not reproducible run to run, so re-executing
   everything would rewrite all ~370 files on every regeneration for no
@@ -840,6 +937,33 @@ can drift.
 
 Enforced by `npm run check:prose` (`scripts/check-prose.mjs`) and by
 `__tests__/proseStyle.test.ts`, which runs as part of `npm test`.
+
+### Notation is math, not text
+
+Complexity notation goes in `$…$` and renders through KaTeX, which is already
+wired for MDX bodies (`source.config.ts`). `$O(n \log n)$`, never `O(n log n)`
+and never `` `O(n log n)` ``: a code span sets it in the monospace face used
+for identifiers, so a growth rate reads as something you could type into the
+editor beside it. The same goes for the growth terms themselves, `$n^2$` and
+`$2^n$`, and for `$\Theta$` and `$\Omega$`. The *names* stay prose: a sentence
+about "Big-O" or a table row labelled "Big-Θ" is talking about the notation
+rather than using it.
+
+Two places where the surrounding syntax decides the spelling:
+
+- **Inside a component prop**, the value is a JS template literal, so every
+  LaTeX command needs its backslash doubled: `$O(n \\log n)$`. A single one is
+  eaten by the literal and KaTeX receives `log`, which it sets as three italic
+  variables rather than the operator.
+- **Not every prop renders math.** `<MultipleChoice>` does (its own
+  ReactMarkdown pipeline carries `remarkMath` + `rehypeKatex`). A challenge
+  card's `instructions` does *not*: `renderMarkdownInstructions` in
+  `app/_components/challengeShared.tsx` runs `remarkGfm` alone, so `$…$` there
+  reaches the reader as dollar signs. Leave those as plain text.
+
+Code is exempt, in both directions: an `O(1)` in a comment inside
+`starterCode` is code, and `` `f(n) = O(g(n))` `` is one span of pseudo-code
+rather than a span that happens to end in notation.
 
 ### No em dashes
 

@@ -71,6 +71,12 @@ Operations can *fail*. Throwing an exception conflates control flow
 with failure handling. A `Result<T, TError>` makes success and
 failure *both* first-class.
 
+<Figure
+  slug="cs-functional-design-patterns-pattern-2-result-either-inline-cutout"
+  alt="A load taking one of two chutes at each station, the lower chute carrying the first fault straight to the end untouched"
+  caption="Failure is a value carried along the chain, so nothing has to throw."
+/>
+
 <CodeBlock
   adapter="csharp"
   files={[
@@ -136,6 +142,12 @@ step) or switches to the *failure* track (carries the original error
 straight to the end). `Bind` is the switch operator that performs
 this routing.
 
+<Figure
+  slug="cs-functional-design-patterns-pattern-3-railway-oriented-inline-cutout"
+  alt="Two parallel rails where a load either carries on along the upper one or drops to the lower and runs straight to the end"
+  caption="Each step continues on the success track or switches to failure, carrying the first error."
+/>
+
 The benefits are huge:
 
 - No `try/catch` clutter.
@@ -148,6 +160,12 @@ The benefits are huge:
 A curried function takes one argument at a time. Partial application
 fixes some arguments early and returns a function asking for the
 rest.
+
+<Figure
+  slug="cs-functional-design-patterns-pattern-4-currying-partial-inline-cutout"
+  alt="A machine with two slots, one filled and locked shut, leaving a smaller machine that needs only the second"
+  caption="Fix the first argument and what is left is a smaller function waiting for the rest."
+/>
 
 <CodeBlock
   adapter="csharp"
@@ -179,6 +197,12 @@ build a specialized helper once and reuse it.
 Modeling *states of the world* with a discriminated union (a sealed
 hierarchy of records) replaces brittle bool/enum flags. With C#
 pattern matching, branching on them is exhaustive and clear.
+
+<Figure
+  slug="cs-functional-design-patterns-pattern-5-pipeline-as-inline-cutout"
+  alt="A set of distinctly shaped labelled slots replacing a row of identical toggle switches on the same panel"
+  caption="A discriminated union names each state, where a pair of boolean flags only implies them."
+/>
 
 <CodeBlock
   adapter="csharp"
@@ -216,6 +240,12 @@ safety net inside a C# program.
 A combinator builds a complex thing from simpler ones. We met one in
 the previous page (`And` for predicates). Here's a tiny **validation
 combinator** library.
+
+<Figure
+  slug="cs-functional-design-patterns-pattern-6-combinators-inline-cutout"
+  alt="Two small rules clipped together end to end into one longer rule that still lifts as a single piece"
+  caption="A combinator builds a bigger rule out of smaller ones, each still readable alone."
+/>
 
 <ChallengeCard
   adapter="csharp"

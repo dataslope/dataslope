@@ -274,13 +274,13 @@ generator above relies on.
   markdown={`You need the 5 highest-scoring items out of 10 million. Which approach is best?
 
 - [o] Use \`heapq.nlargest(5, scores)\` or \`np.argpartition\`, which find the top-k without a full sort.
-  > A size-k heap is O(n log k) and argpartition is O(n); both beat a full O(n log n) sort for small k.
+  > A size-k heap is $O(n \\log k)$ and argpartition is $O(n)$; both beat a full $O(n \\log n)$ sort for small k.
 - It doesn't matter; all approaches are equally fast.
   > Complexity differs sharply at 10 million elements; the algorithm you pick determines whether it's fast.
 - Loop and track the single max, repeating 5 times.
-  > That's O(5n) passes and awkward to implement; a heap or argpartition does it in one pass.
+  > That's $O(5n)$ passes and awkward to implement; a heap or argpartition does it in one pass.
 - Sort all 10 million scores descending, then take the first 5.
-  > A full sort is O(n log n) and wasteful when you only need 5 items.`}
+  > A full sort is $O(n \\log n)$ and wasteful when you only need 5 items.`}
 />
 
 <MultipleChoice

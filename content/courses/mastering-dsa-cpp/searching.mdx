@@ -14,7 +14,7 @@ That second idea, binary search, carries a warning label earned over decades. Jo
 
 ## Linear search
 
-Linear search checks each element from left to right until it finds the target or reaches the end. It works on unsorted data and runs in O(n).
+Linear search checks each element from left to right until it finds the target or reaches the end. It works on unsorted data and runs in $O(n)$.
 
 <CodeBlock
   adapter="cpp"
@@ -45,7 +45,7 @@ Linear search is often right for tiny arrays, one-time scans, linked lists, or u
 
 ## Binary search
 
-Binary search only works on sorted data. It maintains an interval `[low, high]` that is guaranteed to contain the target if it exists anywhere. Check the middle element: if it is too small, the target (if present) must be to the right, so move `low`; too big, move `high`; equal, done. Every comparison halves the interval, giving O(log n) time.
+Binary search only works on sorted data. It maintains an interval `[low, high]` that is guaranteed to contain the target if it exists anywhere. Check the middle element: if it is too small, the target (if present) must be to the right, so move `low`; too big, move `high`; equal, done. Every comparison halves the interval, giving $O(\log n)$ time.
 
 <Figure
   slug="dsa-searching-linear-search-inline-cutout"
@@ -53,7 +53,7 @@ Binary search only works on sorted data. It maintains an interval `[low, high]` 
   caption="Linear search checks every element; binary search halves the field each time."
 />
 
-O(n) against O(log n) is a pair of symbols until you put numbers on it. On a
+$O(n)$ against $O(\log n)$ is a pair of symbols until you put numbers on it. On a
 million-element array the difference is half a million comparisons against
 twenty:
 
@@ -141,6 +141,12 @@ If the range is not sorted according to the same comparison used by the search, 
 ## The bug that hid for decades
 
 There is one more trap, and its story is worth telling in full. The obvious way to compute the middle index is `mid = (low + high) / 2`. In 2006, Joshua Bloch, author of Java's collections framework, wrote a now-famous post titled "Extra, Extra, Read All About It: Nearly All Binary Searches and Mergesorts are Broken." A colleague's program had crashed inside `java.util.Arrays.binarySearch`, code Bloch himself had written years earlier, adapted from a version in *Programming Pearls* that had been considered proven correct.
+
+<Figure
+  slug="dsa-searching-bug-hid-decades-inline-cutout"
+  alt="Two large marks added together on a narrow rail that cannot hold the total, the sum wrapping round below zero"
+  caption="`(low + high) / 2` overflows on a large array, which took years to surface."
+/>
 
 The flaw: for very large arrays, `low + high` can exceed the maximum value an `int` can hold. The sum overflows, `mid` comes out negative or nonsensical, and the search reads outside the array. On arrays of fewer than about a billion elements the bug is invisible, which is exactly why it sat unnoticed in textbooks, in the JDK, and in countless production systems for decades, until data got big enough to trip it.
 
@@ -323,13 +329,13 @@ int main() {
 <MultipleChoice
   markdown={`What is the worst-case time complexity of linear search over \`n\` elements?
 
-- O(n log n)
+- $O(n \\log n)$
   > That is common for efficient sorting, not linear search.
-- O(log n)
+- $O(\\log n)$
   > That is binary search on sorted data.
-- [o] O(n)
+- [o] $O(n)$
   > It may inspect every element.
-- O(1)
+- $O(1)$
   > Linear search is not constant time in the worst case.`}
 />
 

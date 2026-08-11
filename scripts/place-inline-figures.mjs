@@ -27,6 +27,20 @@
  *      sentence, and a figure dropped between them reads as the thing being
  *      introduced.
  *
+ *   4. **Only in a section that explains something.** Not "Check your
+ *      understanding", not "Challenge", not "Key takeaways" — see
+ *      `ASSESSMENT`. Those sections score *well* on a band's own vocabulary,
+ *      which is how 100 of the first 1,671 came to sit under a quiz.
+ *
+ *   5. **Never against another band, and never last on the page.** The old
+ *      last-resort scan ignored both, which stacked 77 bands into 38 walls of
+ *      art with no prose between them and left 84 more dangling under a
+ *      multiple-choice block at the foot of a lesson.
+ *
+ * Rules 2, 4 and 5 are what a page *should* offer, and some pages offer none
+ * of it. `anchorFor` gives them up one at a time, in order, rather than all at
+ * once — see the pools there.
+ *
  * Fenced code and JSX blocks are skipped when looking for prose, so a ```mermaid
  * diagram or a `<Callout>` body is never treated as a paragraph.
  *
@@ -144,6 +158,55 @@ export function regions(lines) {
 const isProse = (line) =>
   line.trim() !== "" && !/^\s*(#{1,6}\s|[-*+]\s|\d+\.\s|>\s|\||:)/.test(line);
 
+/**
+ * Headings of sections that test or wrap up rather than explain.
+ *
+ * A band under "Check your understanding" is decoration. The reader is
+ * answering questions there, and the multiple-choice block below it is what
+ * the section is for; nothing in it is being explained, so a picture of the
+ * mechanism has nothing to sit beside. 100 of the first 1,671 bands landed in
+ * one of these, and 84 of those were the last thing on the page — a band
+ * hanging under a quiz with no prose after it at all.
+ *
+ * They are excluded outright rather than scored down, because scoring is
+ * exactly what sends bands here: a takeaways or challenge section restates the
+ * lesson's vocabulary in concentrated form, so it beats the section that does
+ * the actual teaching on the one signal the scorer has.
+ *
+ * Matched against the heading lowercased with its markdown stripped. The
+ * anchors are deliberate: `^summary$` and not `^summary\b`, because
+ * "Summary statistics by group" and "Summary functions and the `na.rm`
+ * argument" are lessons teaching summary functions, not summaries of a lesson.
+ */
+const ASSESSMENT = [
+  /^(check|test) your (understanding|knowledge)\b/,
+  /^(a )?quick check\b/,
+  /^concept check\b/,
+  /^your turn\b/,
+  /^practice\b/,
+  /\bexercises?\b/,
+  /\bchallenges?\b/,
+  /^multiple[- ]choice/,
+  /^try it\b/,
+  /^key takeaways?\b/,
+  /^summary$/,
+  /^recap\b/,
+  /^where to go next\b/,
+  /^course outline\b/,
+  /^what you('ll|'ve| will| can| have| should| just| now)\b/,
+  /^a closing thought\b/,
+];
+
+/** Does this section teach something, or does it only test and summarise? */
+export function explains(heading) {
+  const text = heading.replace(/^#+\s*/, "").replace(/[`*_]/g, "").trim().toLowerCase();
+  return !ASSESSMENT.some((re) => re.test(text));
+}
+
+/** Is a band already sitting in this section? */
+const occupied = (lines, section) =>
+  lines.slice(section.start, section.end).some((l) => /slug="[a-z0-9-]+-cutout"/.test(l));
+
 const altFor = (prompt) => prompt.subject.charAt(0).toUpperCase() + prompt.subject.slice(1);
 
 /** Words too common to say anything about which section a figure belongs to. */
@@ -227,45 +290,110 @@ export function anchorFor(lines, code, prompt) {
   }
 
   const all = sectionsOf(lines, code, floor);
-  const candidates = all.length >= 3 ? all.slice(1) : all;
   const keywords = prompt ? keywordsFor(prompt) : [];
+  // The opening section is held back for the lesson's own art, unless the band
+  // is the thing that section is named after. `The debugging mindset` opens
+  // `from-zero-to-cpp/debugging-and-reasoning`, and holding the band of that
+  // name out of it left it under "Sanitizers", three sections past the
+  // paragraph it belongs to. A heading hit is a strong enough signal to spend
+  // the exception on; a body mention is not.
+  const named = (s) => keywords.some((w) => s.heading.toLowerCase().includes(w));
+  const past = all.length >= 3 && !named(all[0]) ? all.slice(1) : all;
 
-  let best = null;
-  let bestScore = 0;
-  for (const section of candidates) {
-    // A section already holding a band is spoken for. Four figures on one page
-    // should sit in four sections, not stack in whichever scores highest.
-    const occupied = lines
-      .slice(section.start, section.end)
-      .some((l) => /slug="[a-z0-9-]+-cutout"/.test(l));
-    if (occupied) continue;
-    const heading = section.heading.toLowerCase();
-    const body = lines.slice(section.start, section.end).join(" ").toLowerCase();
-    let score = 0;
-    for (const word of keywords) {
-      if (heading.includes(word)) score += 3;
-      const hits = body.split(word).length - 1;
-      if (hits) score += Math.min(hits, 3);
+  // Where a band may go, best first. The first pool is the rule; each one
+  // after it gives up exactly one thing the rule asked for, and is reached
+  // only when every pool above it is full or offers no paragraph. Ordering the
+  // concessions is the whole point: the old single fallback swept the page
+  // from `floor` down and so reached for the worst option first, putting 75
+  // bands above the first heading, in among the lesson's own opening art.
+  const pools = [
+    // The rule: a section that teaches, below the one that opens the lesson.
+    past.filter((s) => explains(s.heading)),
+    // The section that opens the lesson, when nothing below it is free. It
+    // reads as a second opinion on the establishing shot, which is a smaller
+    // problem than a band stranded under the closing challenge.
+    all.filter((s) => explains(s.heading)),
+    // A lesson whose body runs on past the opening figure with no heading of
+    // its own until "Challenge" (the whole of `intro-web-development`) has no
+    // section to offer. Its lower half will do, and starting halfway is what
+    // keeps the band clear of the art at the top.
+    all[0] && all[0].start > floor
+      ? [{ heading: "", start: Math.floor((floor + all[0].start) / 2), end: all[0].start }]
+      : [],
+  ];
+
+  for (const pool of pools) {
+    const free = pool.filter((s) => !occupied(lines, s));
+    if (!free.length) continue;
+
+    let best = null;
+    let bestScore = 0;
+    for (const section of free) {
+      const heading = section.heading.toLowerCase();
+      const body = lines.slice(section.start, section.end).join(" ").toLowerCase();
+      let score = 0;
+      for (const word of keywords) {
+        if (heading.includes(word)) score += 3;
+        const hits = body.split(word).length - 1;
+        if (hits) score += Math.min(hits, 3);
+      }
+      if (score > bestScore) { bestScore = score; best = section; }
     }
-    if (score > bestScore) { bestScore = score; best = section; }
-  }
-  if (!best) best = candidates[Math.floor(candidates.length / 2)] ?? all[0];
+    // Nothing scored: take the middle one rather than the top, so a page whose
+    // headings say nothing about the art still varies where its band lands.
+    if (!best) best = free[Math.floor(free.length / 2)];
 
-  // Inside the chosen section, the first paragraph that is not a lead-in.
-  for (let i = Math.max(best.start, floor); i < best.end; i++) {
+    for (const section of [best, ...free]) {
+      const at = anchorIn(lines, code, section, floor);
+      if (at !== -1) return at;
+    }
+  }
+  return -1;
+}
+
+/**
+ * The line to insert at within one section, or -1 if it offers no paragraph.
+ *
+ * Two paragraphs are refused. One ending in a colon is a lead-in: the list,
+ * code block or table under it belongs to that sentence. And the last
+ * paragraph of the page is refused whatever it says, because a band inserted
+ * after it is the final thing a learner scrolls past, with nothing left for it
+ * to illustrate.
+ */
+function anchorIn(lines, code, section, floor) {
+  const tail = lines.slice(section.end).some((l) => l.trim() !== "");
+  const room = (at) =>
+    lines.slice(at, section.end).some((l) => l.trim() !== "") || tail;
+
+  for (let i = Math.max(section.start, floor); i < section.end; i++) {
     if (code[i] || !isProse(lines[i])) continue;
     let j = i;
     while (j + 1 < lines.length && lines[j + 1].trim() !== "" && !code[j + 1]) j++;
     if (lines[j].trimEnd().endsWith(":")) { i = j; continue; }
+    if (!room(j + 1)) { i = j; continue; }
     return j + 1;
   }
-  // A section of nothing but code or lists: fall back to anywhere below the floor.
-  for (let i = floor; i < lines.length; i++) {
+
+  // Nothing but lead-ins: anchor past the block one of them introduces.
+  //
+  // The colon rule exists to keep the two together, and the far side of the
+  // block does not come between them. Without this, a section written as
+  // "sentence, then code, sentence, then code" — which is most of
+  // `react-from-the-ground-up`, where every paragraph ends in a colon — offers
+  // nowhere at all, and its band ends up under the closing challenge instead.
+  // Second pass rather than a relaxed first one, so a section that does have a
+  // free-standing paragraph still gets it.
+  for (let i = Math.max(section.start, floor); i < section.end; i++) {
     if (code[i] || !isProse(lines[i])) continue;
     let j = i;
     while (j + 1 < lines.length && lines[j + 1].trim() !== "" && !code[j + 1]) j++;
-    if (lines[j].trimEnd().endsWith(":")) { i = j; continue; }
-    return j + 1;
+    i = j;
+    if (!lines[j].trimEnd().endsWith(":")) continue;
+    let k = j + 1;
+    while (k < section.end && lines[k].trim() === "") k++;
+    if (k >= section.end || !code[k]) continue;
+    while (k < section.end && code[k]) k++;
+    if (room(k)) return k;
   }
   return -1;
 }

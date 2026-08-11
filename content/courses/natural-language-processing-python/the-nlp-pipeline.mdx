@@ -135,6 +135,12 @@ block below runs the standard steps and prints the list after each one, so
 you can watch it shrink and change. Read each printed line against the
 table above.
 
+<Figure
+  slug="nlp-the-nlp-pipeline-standard-text-preprocessing-inline-cutout"
+  alt="A paper ribbon passing five small machines in a row and leaving as a tray of clean chips"
+  caption="Raw text passes through the same handful of stages before any model sees it."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -217,6 +223,12 @@ The stopword list is all lowercase, so comparing un-lowercased tokens like
 
 It helps to mentally split the pipeline into two halves.
 
+<Figure
+  slug="nlp-the-nlp-pipeline-two-families-steps-cleaning-inline-cutout"
+  alt="A bench in two halves, the first squaring and cleaning every piece and the second measuring the pieces it is handed"
+  caption="Cleaning turns raw text into comparable units; analysis is what you do to them afterwards."
+/>
+
 **Preprocessing (cleaning)**, a fixed sequence:
 
 1. Tokenize
@@ -259,6 +271,12 @@ You cannot transform a list of tokens you have not produced yet.`}
 We just hinted at it; let us prove it. The block below runs the *same three
 operations*, lowercase, remove stopwords, keep alphabetic, but in two
 different orders, and compares the results.
+
+<Figure
+  slug="nlp-the-nlp-pipeline-order-matters-concrete-example-inline-cutout"
+  alt="The same three steps run in two different orders, one order leaving stray pieces the other had already removed"
+  caption="Lowercase before removing stopwords and all three thes go; reverse it and one survives."
+/>
 
 <CodeBlock
   adapter="python"
@@ -329,12 +347,6 @@ Time to build the cleaning half yourself. The challenge below asks you to
 write a `preprocess()` function that runs the standard cleaning steps in the
 right order. The tests check the output on a couple of sentences,
 including one where a stopword changes everything.
-
-<Figure
-  slug="nlp-the-nlp-pipeline-standard-text-preprocessing-inline-cutout"
-  alt="A paper ribbon passing five small machines in a row and leaving as a tray of clean chips"
-  caption="Raw text passes through the same handful of stages before any model sees it."
-/>
 
 <ChallengeCard
   adapter="python"

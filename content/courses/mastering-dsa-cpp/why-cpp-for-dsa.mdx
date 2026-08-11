@@ -5,7 +5,7 @@ description: Why C++ is a powerful language for data structures, algorithms, int
 
 When a game engine has 16 milliseconds to draw a frame, when a trading system measures its reaction time in microseconds, when a router decides where your packet goes, the code making those decisions is very often C++. That is not an accident of fashion. C++ occupies a peculiar spot in the language landscape: high-level enough to express an algorithm the way a textbook writes it, low-level enough that you can point at any line and say exactly what the memory underneath is doing.
 
-That second property is why this course uses it. C++ is not the easiest first language, but for learning **data structures and algorithms** it is both a practical tool and a microscope: you will solve problems efficiently while *seeing* how arrays, linked structures, heaps, hash tables, trees, and graphs really behave, where the bytes live, what a pointer costs, why two O(n) loops can differ by a factor of fifty.
+That second property is why this course uses it. C++ is not the easiest first language, but for learning **data structures and algorithms** it is both a practical tool and a microscope: you will solve problems efficiently while *seeing* how arrays, linked structures, heaps, hash tables, trees, and graphs really behave, where the bytes live, what a pointer costs, why two $O(n)$ loops can differ by a factor of fifty.
 
 The language has been sharpening this dual nature for a long time. Bjarne Stroustrup began C++ at Bell Labs in 1979 as "C with Classes," wanting Simula's abstractions without giving up C's speed. And the Standard Template Library you will lean on throughout this course has its own origin story: Alexander Stepanov had spent years pursuing the idea of generic programming, algorithms written once, independent of the container they run on, and when his STL design was presented to the C++ standards committee in 1993, it was voted into the standard with unusual speed. Every `std::sort()` and `std::vector` you call is that idea, industrialized.
 
@@ -56,17 +56,23 @@ C++ lets you write very fast code, but speed comes from clear choices: good data
 
 The **Standard Template Library (STL)** gives you production-quality containers and algorithms that are available in every standard C++ environment. Instead of hand-writing a heap or hash table for every problem, you can focus on choosing the right abstraction.
 
+<Figure
+  slug="dsa-why-cpp-for-dsa-stl-algorithm-toolbox-inline-cutout"
+  alt="A drawer of finished tools beside a bench of hand-cut parts, the drawer's tools already the shape of the work"
+  caption="The STL usually already holds the container and the algorithm you were about to write."
+/>
+
 | STL type | Typical use | Key operations |
 | --- | --- | --- |
-| `std::vector` | Dynamic array | index O(1), push back O(1) amortized |
-| `std::list` | Doubly linked list | insert/erase with iterator O(1), search O(n) |
-| `std::deque` | Double-ended queue | push/pop front/back O(1) amortized |
-| `std::map` | Ordered key-value tree | find/insert/erase O(log n) |
-| `std::unordered_map` | Hash table | find/insert/erase O(1) average |
-| `std::set` | Ordered unique values | find/insert/erase O(log n) |
-| `std::priority_queue` | Heap-backed max queue | top O(1), push/pop O(log n) |
-| `std::stack` | LIFO adapter | push/pop/top O(1) |
-| `std::queue` | FIFO adapter | push/pop/front O(1) |
+| `std::vector` | Dynamic array | index $O(1)$, push back $O(1)$ amortized |
+| `std::list` | Doubly linked list | insert/erase with iterator $O(1)$, search $O(n)$ |
+| `std::deque` | Double-ended queue | push/pop front/back $O(1)$ amortized |
+| `std::map` | Ordered key-value tree | find/insert/erase $O(\log n)$ |
+| `std::unordered_map` | Hash table | find/insert/erase $O(1)$ average |
+| `std::set` | Ordered unique values | find/insert/erase $O(\log n)$ |
+| `std::priority_queue` | Heap-backed max queue | top $O(1)$, push/pop $O(\log n)$ |
+| `std::stack` | LIFO adapter | push/pop/top $O(1)$ |
+| `std::queue` | FIFO adapter | push/pop/front $O(1)$ |
 
 Here is what that buys you in practice. Suppose you need to repeatedly grab the most urgent item from a changing pool of scores. With `std::priority_queue`, that is three lines, no heap implementation required (though you *will* implement one later in this course, and it will demystify what `push()` and `top()` actually do):
 
@@ -99,12 +105,18 @@ int main() {
 
 Many data structure tradeoffs are really memory-layout tradeoffs. A `std::vector<int>` stores integers contiguously, so walking through it usually benefits from CPU cache locality. A `std::list<int>` stores nodes separately, so traversal follows pointers from one allocation to the next.
 
+<Figure
+  slug="dsa-why-cpp-for-dsa-closeness-memory-makes-dsa-inline-cutout"
+  alt="A strip of identical cells in a row with a caliper spanning two neighbours and reading the gap between them"
+  caption="Neighbouring elements sit a fixed number of bytes apart, and C++ lets you check it."
+/>
+
 | Container | Memory layout | Consequence |
 | --- | --- | --- |
 | `std::vector<int>` | Contiguous memory | Fast iteration and random access |
 | `std::list<int>` | Separate heap nodes | Cheap splicing, slower traversal |
 
-That is why a vector can beat a list even when both have O(n) traversal: Big-O describes growth, but cache locality changes the constant factor dramatically.
+That is why a vector can beat a list even when both have $O(n)$ traversal: Big-O describes growth, but cache locality changes the constant factor dramatically.
 
 You do not have to take this on faith, C++ lets you *look*. The next program prints the actual memory addresses of two neighboring vector elements. Run it and subtract them in your head: they should differ by exactly `sizeof(int)`, four bytes. The integers really are sitting shoulder to shoulder.
 
@@ -170,6 +182,12 @@ Try calling `bigger("heap", "graph")` without the `std::string` wrappers. It sti
 
 Here is a tiny program that pulls the pieces together: build a vector, sort it with `std::sort()`, print the result, and time the sort with `<chrono>`. Measuring is a habit worth forming early, this course will keep asking you to check claims against the clock.
 
+<Figure
+  slug="dsa-why-cpp-for-dsa-small-end-end-example-inline-cutout"
+  alt="A heap of loose blocks poured into a sorter and leaving in order, a stopwatch resting beside the chute"
+  caption="Build, sort, print, time: the whole toolkit in one short program."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -208,8 +226,14 @@ int main() {
 
 No language is best at everything, and honest comparison beats advocacy. Python lets you sketch an algorithm in half the lines; Java's collections are excellent and garbage collection removes a whole class of bugs. C++ is popular for DSA because it sits near the performance end while still providing a rich standard library, and because what you learn about memory in C++ transfers to every other language you will ever use.
 
+<Figure
+  slug="dsa-why-cpp-for-dsa-language-landscape-inline-cutout"
+  alt="Three benches side by side, each one quickest at a different stage of the same job"
+  caption="No language wins everywhere, and honest comparison beats advocacy."
+/>
+
 ```mermaid
-flowchart TD
+flowchart LR
     A["Language choice for DSA"] --> B["C++"]
     A --> C["Python"]
     A --> D["Java"]
@@ -339,7 +363,7 @@ int main() {
 />
 
 <MultipleChoice
-  markdown={`Why can a \`std::vector<int>\` be faster to iterate than a \`std::list<int>\`, even though both traversals are O(n)?
+  markdown={`Why can a \`std::vector<int>\` be faster to iterate than a \`std::list<int>\`, even though both traversals are $O(n)$?
 
 - [o] Vector stores elements contiguously, which is usually cache-friendly
   > Contiguous memory helps the CPU fetch nearby elements efficiently.
@@ -347,6 +371,6 @@ int main() {
   > Vector is compact, but \"always\" is too strong and not the key reason here.
 - List nodes are sorted automatically
   > A list does not sort itself automatically.
-- List traversal is O(log n)
-  > List traversal is O(n), not O(log n).`}
+- List traversal is $O(\\log n)$
+  > List traversal is $O(n)$, not $O(\\log n)$.`}
 />

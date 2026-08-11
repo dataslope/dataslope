@@ -28,6 +28,12 @@ shipped publicly in 1995, the web was exploding and Java was
 repositioned as the language that would let small programs (called
 *applets*) run safely inside any web browser.
 
+<Figure
+  slug="mcs-java-and-managed-runtimes-java-one-paragraph-inline-cutout"
+  alt="One program block set on a platform that can be carried between three different benches"
+  caption="Compile once to bytecode and the same program runs on any machine with a runtime."
+/>
+
 That positioning, plus an aggressive **"Write Once, Run Anywhere"**
 marketing campaign, made Java one of the fastest-adopted languages
 in history. Within a few years, banks, insurance companies, and
@@ -43,9 +49,9 @@ bytecode**, which ran on a small program called the **Java Virtual
 Machine** (JVM).
 
 <Figure
-  slug="mcs-java-and-managed-runtimes-java-one-paragraph-inline-cutout"
-  alt="One program block set on a platform that can be carried between three different benches"
-  caption="Compile once to bytecode and the same program runs on any machine with a runtime."
+  slug="mcs-java-and-managed-runtimes-killer-idea-virtual-machine-inline-cutout"
+  alt="One set of cards running on three different machines, each machine carrying the same small adapter at its front"
+  caption="Compile once to bytecode and any machine with a runtime can run the same program."
 />
 
 ```mermaid
@@ -79,8 +85,14 @@ A **managed runtime** is a piece of software that sits between your
 program and the hardware, and *manages* the things programmers
 historically got wrong.
 
+<Figure
+  slug="mcs-java-and-managed-runtimes-managed-means-inline-cutout"
+  alt="A workshop where a caretaker clears and re-tools the bench between jobs, the work standing still for a moment each time"
+  caption="The runtime reclaims memory for you, at the cost of pausing occasionally to do it."
+/>
+
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph Unmanaged["Unmanaged (C/C++)"]
         A1[Your program] --> H1[Hardware]
     end
@@ -168,6 +180,12 @@ below creates a list with a million numbers, throws it away, and
 creates another. There is no `free`, no `delete`, no manual
 cleanup. The runtime will reclaim memory whenever it likes.
 
+<Figure
+  slug="mcs-java-and-managed-runtimes-managed-program-feels-like-inline-cutout"
+  alt="A bench where a caretaker clears the offcuts as they fall, the worker never stopping to sweep"
+  caption="You never free anything, and you pay for that in pauses you did not schedule."
+/>
+
 <CodeBlock
   adapter="csharp"
   files={[
@@ -216,6 +234,12 @@ Unity is C#), tools, scripts, these trade-offs are an obviously
 good deal. That is why managed runtimes won, and why every major
 new language since 2000 (C#, Go, Swift, Kotlin, Rust's high-level
 ergonomics) has borrowed ideas from them.
+
+<Figure
+  slug="mcs-java-and-managed-runtimes-terrified-microsoft-inline-cutout"
+  alt="One sealed crate shown fitting three different loading docks, and a fourth dock standing empty beside them"
+  caption="Write once and run anywhere means the operating system stops being the thing that matters."
+/>
 
 ## Test your understanding
 

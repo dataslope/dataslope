@@ -120,6 +120,12 @@ formal logic, planning under constraints, debugging. The common
 property is a **verifiable intermediate structure**, where checking
 your own work is meaningful.
 
+<Figure
+  slug="llm-reasoning-models-where-helps-where-does-inline-cutout"
+  alt="A long working strip that carries a multi-step assembly through, and does nothing at all for a part that was never stocked"
+  caption="Thinking longer helps a multi-step problem and does nothing for a fact it never held."
+/>
+
 **Helps little or not at all:** factual recall (thinking longer about
 a fact you do not have does not produce it), style and tone,
 translation, simple extraction, summarization. Thinking about the
@@ -135,6 +141,12 @@ Thinking tokens are output tokens. They are billed at the output rate,
 which is typically five to six times the input rate, and they are
 usually not shown to you. A reasoning-heavy response can cost several
 times a direct one for the same visible text.
+
+<Figure
+  slug="llm-reasoning-models-costs-inline-cutout"
+  alt="A run that produces a long working strip before its answer, the strip itself piling up on the floor beside it"
+  caption="The reasoning tokens are billed whether or not you ever see them."
+/>
 
 Providers expose a control over this: an *effort* level, a thinking
 budget, or a distinct model tier. The specific parameter names change

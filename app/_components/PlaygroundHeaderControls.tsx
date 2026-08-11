@@ -32,7 +32,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Dialog } from "@base-ui/react/dialog";
 import { Menu } from "@base-ui/react/menu";
 import { Popover } from "@base-ui/react/popover";
 import {
@@ -228,33 +228,36 @@ export function NewWorkspaceControl({
     }
   }, [busy, name, suggested, playgroundId]);
 
+  // A Dialog, like every other confirmation in the playgrounds. See the note
+  // on `.confirm-backdrop` in playground.css for why none of them are Base UI
+  // alert dialogs any more.
   return (
-    <AlertDialog.Root
+    <Dialog.Root
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
         if (next) setName("");
       }}
     >
-      <AlertDialog.Trigger
+      <Dialog.Trigger
         className="ph-rename-btn"
         title="New workspace"
         aria-label="New workspace"
       >
         <FilePlus2 size={11} aria-hidden="true" />
-      </AlertDialog.Trigger>
-      <AlertDialog.Portal>
-        <AlertDialog.Backdrop className="confirm-backdrop" />
-        <AlertDialog.Popup className="confirm-popup ph-new-ws-popup">
-          <AlertDialog.Title className="confirm-title">
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Backdrop className="confirm-backdrop" />
+        <Dialog.Popup className="confirm-popup ph-new-ws-popup">
+          <Dialog.Title className="confirm-title">
             Start a new workspace?
-          </AlertDialog.Title>
-          <AlertDialog.Description className="confirm-desc">
+          </Dialog.Title>
+          <Dialog.Description className="confirm-desc">
             The editor will switch to a fresh set of files.{" "}
             {signedIn
               ? "Your current workspace is kept in this browser and backed up to your account, so you can reopen it from Workspaces at any time."
               : "Your current workspace is kept in this browser, so you can reopen it from Workspaces at any time. Sign in to also back it up to your account."}
-          </AlertDialog.Description>
+          </Dialog.Description>
 
           <form
             className="ph-new-ws-form"
@@ -275,9 +278,9 @@ export function NewWorkspaceControl({
               onChange={(event) => setName(event.target.value)}
             />
             <div className="confirm-actions">
-              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+              <Dialog.Close className="confirm-btn confirm-btn-secondary">
                 Cancel
-              </AlertDialog.Close>
+              </Dialog.Close>
               <button
                 type="submit"
                 className="confirm-btn confirm-btn-primary"
@@ -287,9 +290,9 @@ export function NewWorkspaceControl({
               </button>
             </div>
           </form>
-        </AlertDialog.Popup>
-      </AlertDialog.Portal>
-    </AlertDialog.Root>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 

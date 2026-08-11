@@ -41,6 +41,12 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
 Every row now knows its own species' average and how far it sits from
 it. The frame still has 344 rows.
 
+<Figure
+  slug="pl-window-expressions-one-line-version-inline-cutout"
+  alt="A sliding frame moving along a rail of blocks, each position leaving one summary chip beside the block it covered"
+  caption="`over()` computes per group and hands the answer back to every row in it."
+/>
+
 ```mermaid
 flowchart LR
     A[("344 rows")] -->|"group_by().agg()"| B[("3 rows<br/>one per species")]
@@ -186,12 +192,6 @@ your question assumes, the answer is wrong and nothing warns you.
 
 By default `over()` broadcasts a group result back to that group's
 rows. Two other strategies exist for cases where it cannot.
-
-<Figure
-  slug="pl-window-expressions-one-line-version-inline-cutout"
-  alt="A sliding frame moving along a rail of blocks, each position leaving one summary chip beside the block it covered"
-  caption="`over()` computes per group and hands the answer back to every row in it."
-/>
 
 <CodeBlock
   adapter="python"

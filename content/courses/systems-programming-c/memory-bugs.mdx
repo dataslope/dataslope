@@ -35,6 +35,12 @@ handed out by the next `malloc()`. Reading or writing through `p` is
 undefined behavior, sometimes it "works", sometimes it returns
 someone else's bytes, sometimes it crashes.
 
+<Figure
+  slug="sysc-memory-bugs-2-double-free-inline-cutout"
+  alt="A crate handed back over a counter twice, the counter clerk holding out empty hands the second time"
+  caption="Freeing the same block twice corrupts the allocator's own bookkeeping."
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -176,6 +182,12 @@ Writing past the end of an allocation (stack or heap) is the canonical
 C bug. Depending on the layout it may corrupt neighboring variables,
 allocator metadata, or, historically, before stack protections, the
 function's return address, leading to remote code execution.
+
+<Figure
+  slug="sysc-memory-bugs-4-buffer-overflow-inline-cutout"
+  alt="A tray filled past its last cell, the excess spilling into the tray sitting next to it"
+  caption="Writing past the end of an allocation lands in whatever happened to be next to it."
+/>
 
 <CodeBlock
   adapter="c"
@@ -382,12 +394,6 @@ the language:
 | Prefer `snprintf()` / `fgets()` over `strcpy()` / `gets()` | Eliminates trivial overflows |
 
 `gets()` is so dangerous it was *removed* from C11. Never use it.
-
-<Figure
-  slug="sysc-memory-bugs-2-double-free-inline-cutout"
-  alt="A crate handed back over a counter twice, the counter clerk holding out empty hands the second time"
-  caption="Freeing the same block twice corrupts the allocator's own bookkeeping."
-/>
 
 ## Practice: write a leak-free echo
 

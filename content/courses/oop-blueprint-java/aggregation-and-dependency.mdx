@@ -129,6 +129,12 @@ one, the `Room`s are part of the house (composition). In the other,
 the `Tenant`s are people who happen to live in the house this year
 (aggregation).
 
+<Figure
+  slug="oopj-aggregation-and-dependency-spectrum-relationships-inline-cutout"
+  alt="Three pairs of parts joined differently, one welded, one clipped, one merely resting side by side"
+  caption="Composed, aggregated or merely depended on: three strengths of relationship."
+/>
+
 ```mermaid
 classDiagram
     class House
@@ -233,12 +239,6 @@ In a real design, the same class often participates in all three
 kinds of relationships with different collaborators. A `Library` is
 *composed of* its `Catalog`, *aggregates* `Member`s, and may *depend
 on* a `Clock` passed in just to stamp due dates.
-
-<Figure
-  slug="oopj-aggregation-and-dependency-spectrum-relationships-inline-cutout"
-  alt="Three pairs of parts joined differently, one welded, one clipped, one merely resting side by side"
-  caption="Composed, aggregated or merely depended on: three strengths of relationship."
-/>
 
 ## Passing dependencies in: a tiny taste of injection
 

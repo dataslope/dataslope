@@ -57,6 +57,12 @@ Imagine you have two projects:
 
 Without isolation, both projects share the same `site-packages` directory. Installing one version breaks the other. A virtual environment solves this by creating a **self-contained Python installation** for each project, with its own `site-packages`.
 
+<Figure
+  slug="python-virtual-environments-virtual-environments-inline-cutout"
+  alt="Two workshops each with their own tool rack, and one shared rack between them where a single tool is wanted in two sizes at once"
+  caption="Two projects wanting different versions of one package is what isolation exists to solve."
+/>
+
 ```mermaid
 flowchart TD
     A[System Python] --> B[Project A venv]
@@ -79,6 +85,12 @@ Every Python team uses virtual environments. Whether you're building a web API, 
 # Create the environment in a folder called .venv
 python3 -m venv .venv
 ```
+
+<Figure
+  slug="python-virtual-environments-activating-environment-inline-cutout"
+  alt="A switch on a workshop wall that quietly redirects every tool request to the rack in this room"
+  caption="Activation rewrites `PATH`, so `python` and `pip` mean the ones in this project."
+/>
 
 This creates a `.venv/` directory containing:
 
@@ -211,6 +223,12 @@ The Python packaging ecosystem is rapidly improving. As of 2026, the most popula
 ### `uv` (recommended)
 
 **[uv](https://docs.astral.sh/uv/)** is a Rust-based tool that replaces `pip`, `pip-tools`, and `venv`. It's 10–100× faster and handles Python version management too.
+
+<Figure
+  slug="python-virtual-environments-modern-alternatives-uv-poetry-inline-cutout"
+  alt="Several new tools laid out beside one older one, each doing in a single stroke what the old one took three to do"
+  caption="The newer tools fold install, resolve and isolate into a single fast command."
+/>
 
 ```bash
 # Install uv (from their docs)

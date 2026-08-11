@@ -25,7 +25,7 @@
  * dialog, because the destructive direction is the one worth interrupting.
  */
 import { useState } from "react";
-import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Dialog } from "@base-ui/react/dialog";
 import { Loader2, Trash2, TriangleAlert, Undo2 } from "lucide-react";
 import type { ChartDeletePayload } from "@/app/api/admin/charts/route";
 import styles from "./charts.module.css";
@@ -130,14 +130,14 @@ export function ChartDelete({
         </span>
       ) : null}
 
-      <AlertDialog.Root open={open} onOpenChange={setOpen}>
-        <AlertDialog.Portal>
-          <AlertDialog.Backdrop className={styles.confirmBackdrop} />
-          <AlertDialog.Popup className={styles.confirmPopup}>
-            <AlertDialog.Title className={styles.confirmTitle}>
+      <Dialog.Root open={open} onOpenChange={setOpen}>
+        <Dialog.Portal>
+          <Dialog.Backdrop className={styles.confirmBackdrop} />
+          <Dialog.Popup className={styles.confirmPopup} role="alertdialog">
+            <Dialog.Title className={styles.confirmTitle}>
               Request deletion of <code>{slug}</code>?
-            </AlertDialog.Title>
-            <AlertDialog.Description className={styles.confirmDesc} render={<div />}>
+            </Dialog.Title>
+            <Dialog.Description className={styles.confirmDesc} render={<div />}>
               <p>
                 This does not delete anything. It records the decision in the
                 review database, and <code>charts/{slug}.mjs</code> stays where
@@ -162,16 +162,16 @@ export function ChartDelete({
               <p className={styles.confirmQuiet}>
                 You can withdraw the request from the same button afterwards.
               </p>
-            </AlertDialog.Description>
+            </Dialog.Description>
             <div className={styles.confirmActions}>
-              <AlertDialog.Close className={styles.confirmCancel}>Cancel</AlertDialog.Close>
+              <Dialog.Close className={styles.confirmCancel}>Cancel</Dialog.Close>
               <button type="button" className={styles.confirmDanger} onClick={() => send(true)}>
                 Request deletion
               </button>
             </div>
-          </AlertDialog.Popup>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   );
 }

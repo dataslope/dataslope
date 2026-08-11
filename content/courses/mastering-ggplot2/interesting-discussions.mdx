@@ -23,6 +23,12 @@ Labs that R was designed to be compatible with. R was released as free
 software and grew into the lingua franca of academic statistics, fertile
 ground for an ambitious idea like a grammar of graphics to take root.
 
+<Figure
+  slug="gg-interesting-discussions-where-r-came-inline-cutout"
+  alt="A workbench in a research lab with statistical tools already bolted to it"
+  caption="R came out of a statistics lab, which is why its tools arrive already fitted."
+/>
+
 ## A little more on the "2"
 
 The course page told you that **ggplot2** means *grammar of graphics,
@@ -33,6 +39,12 @@ scratch with the layered `+` syntax you use today. The original
 `ggplot()` is long retired; nobody installs it. When people say "ggplot"
 in conversation, they almost always mean ggplot2, the "2" has faded
 into a quirk of the name.
+
+<Figure
+  slug="gg-interesting-discussions-little-more-on-2-inline-cutout"
+  alt="A second, cleaner plotting arm lifted onto the bench in place of the first"
+  caption="The 2 is a version number: the second implementation of the grammar, not of the package."
+/>
 
 ## The penguins you have been plotting
 
@@ -49,9 +61,9 @@ a far better backstory, which is why the visualization community
 adopted them so quickly.
 
 <Figure
-  slug="gg-interesting-discussions-where-r-came-inline-cutout"
-  alt="A workbench in a research lab with statistical tools already bolted to it"
-  caption="R came out of a statistics lab, which is why its tools arrive already fitted."
+  slug="gg-interesting-discussions-penguins-have-been-plotting-inline-cutout"
+  alt="Three groups of measured cards from a cold field station, each group tagged with a different mark and a penguin standing beside them"
+  caption="Three species measured at a research station, and the data set half this course runs on."
 />
 
 <CodeBlock adapter="r"
@@ -71,6 +83,12 @@ called **Anscombe's quartet**, engineered to share nearly identical
 summary statistics. Each of the four has the *same* mean of x, mean of
 y, variance, correlation, and best-fit regression line, to two decimal
 places. By the numbers, they are indistinguishable.
+
+<Figure
+  slug="gg-interesting-discussions-anscombe-s-quartet-case-inline-cutout"
+  alt="Four small boards of scattered marks whose measuring gauges all read exactly the same"
+  caption="Anscombe, 1973: four data sets with identical statistics and four different pictures."
+/>
 
 Plot them, and they could not be more different.
 
@@ -143,6 +161,12 @@ ggplot2 itself. But in real projects you will usually see data prepared
 with `dplyr`/`tidyr` and then piped straight into `ggplot()`, and the
 [Next Steps](/courses/mastering-ggplot2/next-steps) page shows that
 pattern.
+
+<Figure
+  slug="gg-interesting-discussions-ggplot2-tidyverse-inline-cutout"
+  alt="A family of tools cut to one common fitting, any of them able to hand work straight to the next"
+  caption="Shared conventions are what let the output of one package be the input of the next."
+/>
 
 <MultipleChoice
   markdown={`What is the main lesson of Anscombe's quartet?

@@ -73,7 +73,7 @@ class Library {
 }
 ```
 
-This works, but every query is `O(n)`, every "is this duplicate?"
+This works, but every query is $O(n)$, every "is this duplicate?"
 check is hand-written, and the *intent*, "lookup by artist", "set
 of unique genres", is hidden inside loop bodies.
 
@@ -208,8 +208,8 @@ public class Library {
   ]}
 />
 
-Notice what happened: `tracksByArtist(name)` went from an `O(n)`
-scan to an `O(1)` map lookup, *not* because we changed any
+Notice what happened: `tracksByArtist(name)` went from an $O(n)$
+scan to an $O(1)$ map lookup, *not* because we changed any
 algorithm, but because we **stored the data in the shape we needed
 to query it**.
 
@@ -247,7 +247,7 @@ Map<TagId,     Set<UserId>> usersOfTag  = new HashMap<>();
 Whenever you tag a user, update both. The cost is a tiny bit of
 discipline on every write; the benefit is that *both* questions
 ("what tags does this user have?" and "which users have this tag?")
-become `O(1)`.
+become $O(1)$.
 
 ## Typed value objects beat strings
 
@@ -489,9 +489,9 @@ public final class OrderIndex {
 - A \`Map<UserId, Set<Message>>\`
   > Wrong if order matters; messages aren't naturally unique either.
 - A flat \`List<Message>\` that you scan each time
-  > Works, but every query is \`O(n)\`. Fine for small data, wrong shape for the question.
+  > Works, but every query is $O(n)$. Fine for small data, wrong shape for the question.
 - [o] A \`Map<UserId, List<Message>>\` updated on every arrival
-  > Lookup becomes \`O(1)\` and per-user order is preserved.`}
+  > Lookup becomes $O(1)$ and per-user order is preserved.`}
 />
 
 <MultipleChoice
@@ -500,11 +500,11 @@ public final class OrderIndex {
 - One \`Map<TagId, List<PostId>>\`
   > Symmetric problem.
 - One \`Map<PostId, List<TagId>>\`
-  > Fine for "tags of a post"; "posts of a tag" becomes \`O(n)\`.
+  > Fine for "tags of a post"; "posts of a tag" becomes $O(n)$.
 - [o] Two indices: \`Map<PostId, Set<TagId>>\` and \`Map<TagId, Set<PostId>>\`, kept in sync on every change
-  > Each direction is \`O(1)\`; updates do a tiny bit more work.
+  > Each direction is $O(1)$; updates do a tiny bit more work.
 - A \`List<Pair<PostId, TagId>>\`
-  > Both queries become \`O(n)\`.`}
+  > Both queries become $O(n)$.`}
 />
 
 <MultipleChoice

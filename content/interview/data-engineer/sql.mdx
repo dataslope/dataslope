@@ -350,7 +350,7 @@ A covering index includes **all columns** a query needs, both the filter columns
 
 ### What is partition pruning?
 
-When a table is partitioned (e.g., by `event_date`) and a query filters on that key, the engine skips partitions that cannot match and reads only relevant files. This turns an O(N) full-table scan into a fraction of the work. Pruning works only when the filter column matches the partition key; applying a function to the column (e.g., `YEAR(event_date) = 2024`) often defeats pruning.
+When a table is partitioned (e.g., by `event_date`) and a query filters on that key, the engine skips partitions that cannot match and reads only relevant files. This turns an $O(N)$ full-table scan into a fraction of the work. Pruning works only when the filter column matches the partition key; applying a function to the column (e.g., `YEAR(event_date) = 2024`) often defeats pruning.
 
 ### What are INNER, LEFT, RIGHT, and FULL OUTER JOINs?
 
@@ -392,7 +392,7 @@ Look at (1) **node types**, sequential scan vs index scan vs hash join vs sort, 
 
 ### What is a correlated subquery, and why can it be slow?
 
-A **correlated subquery** references a column from the outer query. The engine re-executes the subquery for each outer row, making it O(N * M). Rewrite as a `JOIN` or a window function when performance matters.
+A **correlated subquery** references a column from the outer query. The engine re-executes the subquery for each outer row, making it $O(N \cdot M)$. Rewrite as a `JOIN` or a window function when performance matters.
 
 The block below computes each employee's `dept_avg` salary first as a
 correlated subquery (re-run per row) and then as a `dept_avgs` CTE joined

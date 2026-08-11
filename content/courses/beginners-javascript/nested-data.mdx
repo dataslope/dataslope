@@ -54,7 +54,7 @@ That single value packs a lot of information. The skill is being
 able to *picture* its shape, to know where things live.
 
 ```mermaid
-flowchart TB
+flowchart LR
     O[order] --> id[id: 101]
     O --> C[customer: object]
     O --> I["items: array of 3 line-items"]
@@ -85,6 +85,12 @@ The hazard is **missing intermediate values**. If `order.customer`
 is `undefined`, then `order.customer.address` will throw a
 `TypeError: Cannot read properties of undefined (reading 'address')`.
 A classic source of beginner crashes.
+
+<Figure
+  slug="js-nested-data-reading-deep-paths-inline-cutout"
+  alt="A chain of hooks reached down one at a time, one hook missing halfway and the reach stopping there"
+  caption="One missing link partway down is what makes a deep path throw."
+/>
 
 ### Optional chaining: `?.`
 

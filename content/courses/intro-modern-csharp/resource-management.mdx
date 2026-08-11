@@ -22,12 +22,6 @@ C# splits resources into two camps:
    which the runtime can *help* you release but can't fully manage
    on its own.
 
-<Figure
-  slug="mcs-resource-management-memory-handled-mostly-inline-cutout"
-  alt="A yard of crates with a cart moving through collecting the ones nobody is holding"
-  caption="The collector reclaims memory nobody is holding any more."
-/>
-
 Understanding this split is the foundation of clean, leak-free C#.
 
 ## Memory: handled (mostly) for you
@@ -35,6 +29,12 @@ Understanding this split is the foundation of clean, leak-free C#.
 In low-level languages like C, you call `malloc` and `free` by
 hand. Forget the `free` and you leak memory; double-free and you
 corrupt memory.
+
+<Figure
+  slug="mcs-resource-management-memory-handled-mostly-inline-cutout"
+  alt="A yard of crates with a cart moving through collecting the ones nobody is holding"
+  caption="The collector reclaims memory nobody is holding any more."
+/>
 
 In C#, when you write `new Person(...)`, the runtime allocates
 memory on the heap. When nothing points to that object anymore,

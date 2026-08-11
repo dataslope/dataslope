@@ -52,7 +52,7 @@ import "katex/dist/katex.min.css";
 import { normalizeMathDelimiters } from "./mathDelimiters";
 import Link from "@/app/_components/Link";
 import { Popover } from "@base-ui/react/popover";
-import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Dialog } from "@base-ui/react/dialog";
 import {
   guestWorkNeedsSignInWarning,
   stashActiveWorkspaceForResume,
@@ -1726,34 +1726,34 @@ export default function AskAiWidget({
           When it *can* be persisted, the CTA stashes + navigates directly and
           this never opens. Uses the shared confirm-dialog styles from
           playground.css (loaded on every playground route). */}
-      <AlertDialog.Root
+      <Dialog.Root
         open={signInConfirmOpen}
         onOpenChange={setSignInConfirmOpen}
       >
-        <AlertDialog.Portal>
-          <AlertDialog.Backdrop className="confirm-backdrop" />
-          <AlertDialog.Popup className="confirm-popup">
-            <AlertDialog.Title className="confirm-title">
+        <Dialog.Portal>
+          <Dialog.Backdrop className="confirm-backdrop" />
+          <Dialog.Popup className="confirm-popup" role="alertdialog">
+            <Dialog.Title className="confirm-title">
               Sign in without saving your work?
-            </AlertDialog.Title>
-            <AlertDialog.Description className="confirm-desc">
+            </Dialog.Title>
+            <Dialog.Description className="confirm-desc">
               This browser can&apos;t save your {subject} work, so it will be
               lost when you sign in. Continue anyway?
-            </AlertDialog.Description>
+            </Dialog.Description>
             <div className="confirm-actions">
-              <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+              <Dialog.Close className="confirm-btn confirm-btn-secondary">
                 Keep working
-              </AlertDialog.Close>
-              <AlertDialog.Close
+              </Dialog.Close>
+              <Dialog.Close
                 className="confirm-btn confirm-btn-danger"
                 onClick={goToSignIn}
               >
                 Sign in anyway
-              </AlertDialog.Close>
+              </Dialog.Close>
             </div>
-          </AlertDialog.Popup>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }

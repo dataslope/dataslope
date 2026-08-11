@@ -121,6 +121,12 @@ const [items, setItems] = useState<string[]>([]);
 setItems([...items, "new item"]);        // new array with one more item
 ```
 
+<Figure
+  slug="rx-state-with-usestate-updating-objects-arrays-without-inline-cutout"
+  alt="A fresh tray built from the old one with a single item changed, the old tray set aside untouched"
+  caption="Build a new object with the one field changed; React compares references to know it moved."
+/>
+
 State can hold anything, and the UI just reflects it. Below, a single
 `color` string drives the preview swatch: clicking a chip sets the
 state, and everything that reads `color` updates at once:

@@ -14,7 +14,7 @@ of knowing Polars.
 />
 
 ```mermaid
-flowchart TD
+flowchart LR
     E["an expression<br/>pl.col('mass').mean()"] --> S["select()<br/>result IS the frame"]
     E --> W["with_columns()<br/>result is ADDED to the frame"]
     E --> F["filter()<br/>result must be Boolean, picks rows"]

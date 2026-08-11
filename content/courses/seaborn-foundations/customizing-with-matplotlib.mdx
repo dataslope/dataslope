@@ -36,6 +36,12 @@ function builds and manages its own figure (possibly with many panels), so
 you customize through the *grid* it returns. Using the wrong one is the most
 common source of "why did my title land on the wrong panel?" confusion.
 
+<Figure
+  slug="sns-customizing-with-matplotlib-two-kinds-return-inline-cutout"
+  alt="A single tile clamped in a small vise being reworked by hand, and a whole tray of tiles clamped in a large vise being reworked at once"
+  caption="An axes-level plot is adjusted panel by panel; a figure-level grid all at once."
+/>
+
 ## Polishing an axes-level plot
 
 Axes-level functions return a matplotlib `Axes`. Capture it in a variable,
@@ -168,12 +174,6 @@ A few things to notice:
   figure. Because it sits above the panels, you usually follow it with
   `g.figure.subplots_adjust(top=0.9)` to make room so it does not overlap
   the panel titles.
-
-<Figure
-  slug="sns-customizing-with-matplotlib-two-kinds-return-inline-cutout"
-  alt="A single tile clamped in a small vise being reworked by hand, and a whole tray of tiles clamped in a large vise being reworked at once"
-  caption="An axes-level plot is adjusted panel by panel; a figure-level grid all at once."
-/>
 
 When the grid has a legend (from `hue`), you can rename it with
 `g.legend.set_title("...")`. To set a shared axis range across all panels,

@@ -13,12 +13,6 @@ A schema can be well designed and still need to change.
 That is not failure. It is what happens when software learns more
 about the real world.
 
-<Figure
-  slug="db-why-schemas-change-requirements-evolve-inline-cutout"
-  alt="A rack of fixed shelves being re-cut, a new taller shelf slotted into the middle while the old ones shift aside"
-  caption="Schemas change because the world they describe does, not because you got it wrong."
-/>
-
 The design challenge is to understand what kinds of changes happen and
 why they carry risk once the database is in use.
 
@@ -38,6 +32,12 @@ erDiagram
 Then users ask for projects, owners, due dates, labels, and audit
 history. Each new requirement asks the schema to represent a new fact
 or rule.
+
+<Figure
+  slug="db-why-schemas-change-requirements-evolve-inline-cutout"
+  alt="A rack of fixed shelves being re-cut, a new taller shelf slotted into the middle while the old ones shift aside"
+  caption="Schemas change because the world they describe does, not because you got it wrong."
+/>
 
 ```mermaid
 flowchart TD
@@ -163,7 +163,7 @@ Once a database has real data and real application code, the schema is
 not just a diagram. Other things depend on it.
 
 ```mermaid
-flowchart TD
+flowchart LR
     Schema["Schema"] --> Data["Existing data"]
     Schema --> App["Application code"]
     Schema --> Queries["Reports and queries"]

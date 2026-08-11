@@ -5,7 +5,7 @@ description: Learn fixed arrays, std::array, std::vector, contiguous memory, ite
 
 How do you find the 7,000th element of a sequence instantly, without looking at the first 6,999? You can't, unless the elements are stored side by side. If element 0 lives at address `A` and every element is `s` bytes wide, then element `i` lives at exactly `A + i*s`. One multiplication, one addition, done. That single formula is the array's superpower, and it only works because of contiguity: the layout *is* the data structure.
 
-Everything else about arrays follows from that bargain. Indexing is O(1) and iteration flies through the CPU cache, but inserting in the middle means physically shoving everything after it, there is no spare room between neighbors. In modern C++, the array you will use most is `std::vector<T>`, which keeps the contiguous layout while adding the one thing raw arrays lack: the ability to grow.
+Everything else about arrays follows from that bargain. Indexing is $O(1)$ and iteration flies through the CPU cache, but inserting in the middle means physically shoving everything after it, there is no spare room between neighbors. In modern C++, the array you will use most is `std::vector<T>`, which keeps the contiguous layout while adding the one thing raw arrays lack: the ability to grow.
 
 <Figure
   slug="dsa-arrays-cutout"
@@ -15,6 +15,12 @@ Everything else about arrays follows from that bargain. Indexing is O(1) and ite
 ## C-style arrays
 
 A C-style array such as `int a[5]` has a fixed size known at compile time. It is compact and fast, but it carries a famous trap inherited from C: when passed to a function, it **decays to a pointer**, the size information silently falls off. Run the program below and notice that `print_first` receives only an address; inside that function there is no way to ask "how long is this array?"
+
+<Figure
+  slug="dsa-arrays-inline-cutout"
+  alt="One continuous strip of equal cells with a marker landing directly on the fifth, ignoring the four before it"
+  caption="Contiguous cells are what make indexing a single jump rather than a walk."
+/>
 
 <CodeBlock
   adapter="cpp"
@@ -177,7 +183,13 @@ int main() {
 
 ## Resizing, capacity, and amortized push
 
-A vector cannot literally grow in place, the memory just past its last element may belong to something else. So it cheats: it keeps two numbers. `size()` is how many elements are currently stored; `capacity()` is how many fit before the next reallocation. While `size < capacity`, `push_back()` just writes into the spare room. When the room runs out, the vector allocates a larger buffer (typically about double), moves everything across, and frees the old block, the expensive-but-rare event behind the amortized O(1) analysis from the complexity page.
+A vector cannot literally grow in place, the memory just past its last element may belong to something else. So it cheats: it keeps two numbers. `size()` is how many elements are currently stored; `capacity()` is how many fit before the next reallocation. While `size < capacity`, `push_back()` just writes into the spare room. When the room runs out, the vector allocates a larger buffer (typically about double), moves everything across, and frees the old block, the expensive-but-rare event behind the amortized $O(1)$ analysis from the complexity page.
+
+<Figure
+  slug="dsa-arrays-c-style-arrays-inline-cutout"
+  alt="A fixed strip of cells with no guard at either end, a marker resting just past the last"
+  caption="A C-style array has no bounds check, so one step past the end is your problem."
+/>
 
 <CodeBlock
   adapter="cpp"
@@ -207,7 +219,7 @@ int main() {
 
 Each printed line marks a reallocation. Note the side effect: a reallocation moves elements to a *new address*, so any pointer or iterator you saved into the old buffer is now dangling. Iterator invalidation on growth is one of the most common real-world vector bugs, if you hold an iterator, do not `push_back()`.
 
-"Amortized O(1)" is a claim about a total, not about any single push.
+"Amortized $O(1)$" is a claim about a total, not about any single push.
 Doubling makes the expensive pushes rare enough that the average stays
 flat; growing by a constant does not.
 
@@ -216,18 +228,6 @@ flat; growing by a constant does not.
 ## Timing one million pushes
 
 Browser timing is noisy, but this shows how to measure a sequence of pushes with `<chrono>`. A million pushes, including all the reallocation copying along the way, typically lands in the low tens of milliseconds, the amortization argument, verified by stopwatch.
-
-<Figure
-  slug="dsa-arrays-c-style-arrays-inline-cutout"
-  alt="A fixed strip of cells with no guard at either end, a marker resting just past the last"
-  caption="A C-style array has no bounds check, so one step past the end is your problem."
-/>
-
-<Figure
-  slug="dsa-arrays-inline-cutout"
-  alt="One continuous strip of equal cells with a marker landing directly on the fifth, ignoring the four before it"
-  caption="Contiguous cells are what make indexing a single jump rather than a walk."
-/>
 
 <CodeBlock
   adapter="cpp"
@@ -289,10 +289,10 @@ int main() {
 
 | Operation | Complexity | Why |
 | --- | --- | --- |
-| `v[i]`, `v.at(i)` | O(1) | Direct address calculation |
-| `push_back()` | O(1) amortized | Rare reallocations are spread over many pushes |
-| insert in middle | O(n) | Elements after the position shift right |
-| erase from middle | O(n) | Elements after the position shift left |
+| `v[i]`, `v.at(i)` | $O(1)$ | Direct address calculation |
+| `push_back()` | $O(1)$ amortized | Rare reallocations are spread over many pushes |
+| insert in middle | $O(n)$ | Elements after the position shift right |
+| erase from middle | $O(n)$ | Elements after the position shift left |
 
 </Callout>
 
@@ -411,8 +411,8 @@ int main() {
   > Nearby values are likely loaded into CPU cache together.
 - A vector never reallocates memory.
   > Vectors can reallocate when they grow beyond capacity.
-- A vector changes every operation to O(log n).
-  > Vector iteration is O(n), but constants are often smaller.
+- A vector changes every operation to $O(\\log n)$.
+  > Vector iteration is $O(n)$, but constants are often smaller.
 - A linked list cannot store integers.
   > Linked lists can store integers; their node layout is the issue.`}
 />
@@ -422,12 +422,12 @@ int main() {
 
 - \`std::vector\` can only store primitive types.
   > It can store objects too.
-- [o] \`std::vector\` has compact storage, O(1) indexing, and excellent iteration performance.
+- [o] \`std::vector\` has compact storage, $O(1)$ indexing, and excellent iteration performance.
   > These properties make it the default sequence container.
-- \`std::list\` has O(1) random access.
+- \`std::list\` has $O(1)$ random access.
   > It does not. Random access in a list requires walking nodes.
 - \`std::list\` is always asymptotically slower for every operation.
-  > Some list operations are O(1), but they are less commonly the bottleneck.`}
+  > Some list operations are $O(1)$, but they are less commonly the bottleneck.`}
 />
 
 <MultipleChoice
@@ -437,7 +437,7 @@ int main() {
   > That describes \`at()\`, not \`operator[]\`.
 - [o] \`v.at(i)\` performs bounds checking and throws an exception when \`i\` is invalid.
   > \`operator[]\` has undefined behavior for an invalid index.
-- \`v.at(i)\` is always O(n), while \`v[i]\` is O(1).
+- \`v.at(i)\` is always $O(n)$, while \`v[i]\` is $O(1)$.
   > Both are constant-time access in normal use.
 - \`v.at(i)\` inserts a new element if \`i\` is too large.
   > It does not insert; it reports an error.`}

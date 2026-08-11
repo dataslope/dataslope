@@ -93,8 +93,14 @@ address that satisfies its alignment requirement. The struct itself
 is also padded to a multiple of its strictest member's alignment, so
 that arrays of the struct stay aligned.
 
+<Figure
+  slug="sysc-structs-and-unions-memory-layout-padding-inline-cutout"
+  alt="Parts seated along a row of recesses with small blank spacers slipped in so each part starts on a ruled line"
+  caption="The compiler inserts blank bytes so each member starts on an address it can be read from."
+/>
+
 ```mermaid
-flowchart TD
+flowchart LR
     subgraph bad["struct Bad <code>{ char c; int i; char d; }</code>"]
         b0["c<br/>1 B"] --> b1["pad<br/>3 B"] --> b2["i<br/>4 B"] --> b3["d<br/>1 B"] --> b4["pad<br/>3 B"]
     end
@@ -329,6 +335,12 @@ A `union` is a value that can hold *any one of* several types, but
 only one at a time. Every member shares the same storage; the
 union's size is the size of its largest member.
 
+<Figure
+  slug="sysc-structs-and-unions-unions-inline-cutout"
+  alt="One recess cut into a bench that holds either of two differently shaped parts, and never both at the same time"
+  caption="A union gives its members one shared space, so only one of them is valid at a time."
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -469,6 +481,12 @@ formats; use explicit bit masks for those.
 A struct may end with a "flexible array member", an array of
 unspecified size that lets you allocate the struct and its data in
 *one* `malloc()`.
+
+<Figure
+  slug="sysc-structs-and-unions-flexible-array-members-inline-cutout"
+  alt="One continuous tray holding a header and its contents in a single piece, beside a header with a cord running off to a tray elsewhere"
+  caption="Header and contents in one allocation: one `malloc()`, one `free()`, one cache-friendly block."
+/>
 
 <CodeBlock
   adapter="c"

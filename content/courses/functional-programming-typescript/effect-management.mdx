@@ -69,6 +69,12 @@ passing it around, returning it from a function, all pure.
 Running it is the impure act, and it happens at *one* place: the
 top of your program.
 
+<Figure
+  slug="fp-effect-management-core-idea-thunk-inline-cutout"
+  alt="A sealed envelope holding a folded instruction card, set on a bench and not yet opened"
+  caption="An effect value is a description of work, not the work itself."
+/>
+
 ## Map and chain over IO
 
 Once you have `IO<A>`, you can build the familiar trio:
@@ -274,12 +280,6 @@ like to happen.
 
 Convince yourself that `IO` really is just three tiny functions by
 writing two of them.
-
-<Figure
-  slug="fp-effect-management-core-idea-thunk-inline-cutout"
-  alt="A sealed envelope holding a folded instruction card, set on a bench and not yet opened"
-  caption="An effect value is a description of work, not the work itself."
-/>
 
 <ChallengeCard
   adapter="typescript"

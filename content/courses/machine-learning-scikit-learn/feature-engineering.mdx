@@ -22,12 +22,6 @@ why the representation matters so much, the everyday moves that help
 (ratios, interactions, binning, date parts, polynomial terms), and the
 discipline to know when a new feature is signal and when it is just noise.
 
-<Figure
-  slug="ml-feature-engineering-core-idea-right-inline-cutout"
-  alt="The same heap of parts laid out two ways, one jumbled and one sorted, a machine reading the sorted one easily"
-  caption="The same data in a better representation is far easier to learn from."
-/>
-
 ## The core idea: the right representation makes learning easy
 
 Imagine predicting whether a household is crowded. You have two columns:
@@ -37,6 +31,12 @@ care about, crowding, is a *ratio*: people per room. Hand the model that
 single engineered feature and the pattern becomes obvious; make it
 reconstruct the ratio from two separate columns and you have made its job
 harder for no reason.
+
+<Figure
+  slug="ml-feature-engineering-core-idea-right-inline-cutout"
+  alt="The same heap of parts laid out two ways, one jumbled and one sorted, a machine reading the sorted one easily"
+  caption="The same data in a better representation is far easier to learn from."
+/>
 
 ```mermaid
 flowchart TD

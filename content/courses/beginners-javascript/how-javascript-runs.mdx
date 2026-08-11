@@ -33,18 +33,18 @@ function takes 5 seconds, *nothing else* in your program runs
 during those 5 seconds. (We'll see why slow blocking code is a
 problem, and how async solves it without adding more threads.)
 
+<Figure
+  slug="js-how-javascript-runs-javascript-single-threaded-inline-cutout"
+  alt="One pair of hands at a bench holding a single block while four more blocks wait in a line beside them, none of the four being touched"
+  caption="JavaScript runs one thing at a time; everything else waits its turn."
+/>
+
 ## The call stack
 
 When a function is called, JS pushes a **stack frame** for it.
 When the function returns, the frame is popped. That's it. The
 "stack" is just the list of "things in progress, most recent on
 top."
-
-<Figure
-  slug="js-how-javascript-runs-javascript-single-threaded-inline-cutout"
-  alt="One pair of hands at a bench holding a single block while four more blocks wait in a line beside them, none of the four being touched"
-  caption="JavaScript runs one thing at a time; everything else waits its turn."
-/>
 
 <CodeBlock
   adapter="javascript"

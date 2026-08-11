@@ -23,6 +23,12 @@ the way each value relates to its recent past (the autocorrelation
 structure) is the same in 1949 as in 1960. The series might wiggle wildly,
 but the **rules generating the wiggles never change**.
 
+<Figure
+  slug="tsa-stationarity-stationary-actually-means-inline-cutout"
+  alt="Two tracks, one drifting steadily upward and one wobbling around a level line"
+  caption="A stationary series wobbles around a level line instead of drifting away from it."
+/>
+
 <Callout type="tip" title="The 'rules of the game' analogy">
 You can only learn the rules of a game by watching it played, *if the rules
 stay the same*. A stationary series is a fair game with fixed rules: what you
@@ -200,9 +206,9 @@ series and near zero for the walk. The rule of thumb, **more negative than
 the 5% critical value → stationary**, agrees with the p-value.
 
 <Figure
-  slug="tsa-stationarity-stationary-actually-means-inline-cutout"
-  alt="Two tracks, one drifting steadily upward and one wobbling around a level line"
-  caption="The test answers with a number what your eye already suspects from the chart."
+  slug="tsa-stationarity-testing-augmented-dickey-fuller-inline-cutout"
+  alt="One gauge held against two tracks in turn, reading low for the level track and high for the drifting one"
+  caption="The test puts a number on what the chart already suggests about drift."
 />
 
 Now the airline series, which we've been calling non-stationary all along:

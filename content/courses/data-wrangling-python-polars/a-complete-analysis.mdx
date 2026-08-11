@@ -70,6 +70,12 @@ cheapest on average. Something is confounded.
 Diamond price is dominated by **carat**, not by cut. If ideal-cut
 stones are systematically smaller, that alone would explain it.
 
+<Figure
+  slug="pl-a-complete-analysis-step-3-form-hypothesis-inline-cutout"
+  alt="A written guess pinned above a bench where two groups of chips are weighed against each other, the pointer settling off the mark"
+  caption="State the guess first, then let the comparison decide it rather than the other way round."
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
@@ -110,6 +116,12 @@ under-corrects for the smallest. It is a hint, not a control.
 
 The honest version compares diamonds of similar size: bucket by
 carat, then look at cut within each bucket.
+
+<Figure
+  slug="pl-a-complete-analysis-step-4-control-confounder-inline-cutout"
+  alt="Chips sorted first into bands of matching size and only then compared within each band, the earlier mixed comparison pushed aside"
+  caption="Compare within bands of equal carat and the reversal in the raw averages disappears."
+/>
 
 <CodeBlock
   adapter="python"
@@ -203,10 +215,22 @@ dollar spread. Set that against the carat effect, where the median
 jumps from roughly 2,300 in the 0.5-to-1 band to 12,700 above 1.5
 carats, and the relative sizes are clear.
 
+<Figure
+  slug="pl-a-complete-analysis-step-5-quantify-inline-cutout"
+  alt="A row of gauges reading the strength of several pairings, one needle swung far over and the rest resting near zero"
+  caption="Carat moves with price and the other measurements barely move at all."
+/>
+
 ## Step 6: write it as one pipeline
 
 The exploratory version was many cells. The version you keep is one
 lazy pipeline that another person can read.
+
+<Figure
+  slug="pl-a-complete-analysis-step-6-write-as-inline-cutout"
+  alt="Eight small stations bolted onto one continuous rail, a single load entering at one end and leaving finished at the other"
+  caption="Eight ideas from the course arrive as one expression, evaluated in a single pass."
+/>
 
 <CodeBlock
   adapter="python"

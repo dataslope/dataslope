@@ -29,12 +29,6 @@ When you write `int x = 42;`, the compiler picks a memory address for
 then on the *name* `x` refers to that address.
 
 <Figure
-  slug="sysc-pointers-declaring-dereferencing-pointers-inline-cutout"
-  alt="A card with an arrow to a locker, and a hand following that arrow to lift out what the locker holds"
-  caption="Dereferencing follows the address and reads what is stored there."
-/>
-
-<Figure
   slug="sysc-pointers-variables-live-at-inline-cutout"
   alt="A row of lockers each with its own small plate, one block resting inside one of them"
   caption="Every variable has an address, and that address is what a pointer holds."
@@ -79,6 +73,12 @@ double *pd;   // pd is a pointer to double
 char   *ps;   // ps is a pointer to char (often the start of a string)
 ```
 
+<Figure
+  slug="sysc-pointers-declaring-dereferencing-pointers-inline-cutout"
+  alt="A card with an arrow to a locker, and a hand following that arrow to lift out what the locker holds"
+  caption="Dereferencing follows the address and reads what is stored there."
+/>
+
 Two operators move between values and addresses:
 
 | Operator | Reads as | Returns |
@@ -120,6 +120,12 @@ int main(void) {
 A pointer that does not point anywhere meaningful should be `NULL`
 (defined in `<stddef.h>`, usually as `((void*)0)`). Dereferencing a
 `NULL` pointer is undefined behavior, usually a crash.
+
+<Figure
+  slug="sysc-pointers-null-points-nothing-pointer-inline-cutout"
+  alt="A signpost pointing at an empty patch of ground, with a figure walking confidently toward it"
+  caption="`NULL` is the pointer that goes nowhere, and following it is the classic C crash."
+/>
 
 The idea of a special "points at nothing" value is older than C, and
 its inventor regrets it. Tony Hoare added the null reference to the

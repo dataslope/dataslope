@@ -17,12 +17,6 @@ often a bigger performance win than any micro-optimization.
 This chapter sketches the standard containers and when to reach for
 each, without diving into their implementations.
 
-<Figure
-  slug="cpp-data-structures-intuition-associative-containers-inline-cutout"
-  alt="A wall of small drawers each with a keyhole, a key going straight to one drawer"
-  caption="An associative container goes straight to a value by its key."
-/>
-
 ## A map of the standard containers
 
 | Family | Container | What it is |
@@ -41,9 +35,9 @@ each, without diving into their implementations.
 ### `std::vector<T>`, the default
 
 - Contiguous in memory.
-- Indexing `v[i]` is O(1).
-- Appending `push_back()` is amortized O(1).
-- Inserting or erasing in the middle is O(n).
+- Indexing `v[i]` is $O(1)$.
+- Appending `push_back()` is amortized $O(1)$.
+- Inserting or erasing in the middle is $O(n)$.
 
 Use it for almost everything. The CPU loves contiguous memory.
 
@@ -61,16 +55,16 @@ Use it for almost everything. The CPU loves contiguous memory.
 
 ### `std::deque<T>`, double-ended
 
-- Push/pop at *both* ends in amortized O(1).
-- Indexing is O(1) but slower than vector (the storage is broken
+- Push/pop at *both* ends in amortized $O(1)$.
+- Indexing is $O(1)$ but slower than vector (the storage is broken
   into chunks).
 - Use when you need a queue or you frequently prepend.
 
 ### `std::list<T>`, doubly linked
 
-- Insert/erase anywhere in O(1) **if** you already have an iterator
+- Insert/erase anywhere in $O(1)$ **if** you already have an iterator
   to the position.
-- Indexing is O(n), there's no `[i]`.
+- Indexing is $O(n)$, there's no `[i]`.
 - Each node lives on the heap; cache-hostile.
 - In practice, used rarely. `std::vector` wins on most workloads.
 
@@ -79,7 +73,7 @@ Use it for almost everything. The CPU loves contiguous memory.
 ### `std::map<K, V>`, sorted dictionary
 
 - Keys are unique, kept in sorted order.
-- Lookup, insert, erase: **O(log n)**.
+- Lookup, insert, erase: **$O(\log n)$**.
 - Iteration visits keys in order.
 - Implemented as a balanced tree.
 
@@ -90,7 +84,7 @@ Use it for almost everything. The CPU loves contiguous memory.
 ### `std::unordered_map<K, V>`, hash dictionary
 
 - Keys are unique; *no* ordering.
-- Average lookup, insert, erase: **O(1)**. Worst case O(n).
+- Average lookup, insert, erase: **$O(1)$**. Worst case $O(n)$.
 - Implemented as a hash table.
 
 ### `std::unordered_set<K>`, hash set
@@ -98,7 +92,7 @@ Use it for almost everything. The CPU loves contiguous memory.
 - Same as `unordered_map` but stores keys only.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Q[Need a key/value lookup?]
     Q -- "Iterate in order?" --> M["<code>std::map</code>"]
     Q -- "Don't care about order?" --> UM["<code>std::unordered_map</code>"]
@@ -163,6 +157,12 @@ A short checklist:
    vectors, depending).
 7. **Need fast insertion in the middle by iterator?** Maybe
    `std::list`, but profile first.
+
+<Figure
+  slug="cpp-data-structures-intuition-associative-containers-inline-cutout"
+  alt="A wall of small drawers each with a keyhole, a key going straight to one drawer"
+  caption="An associative container goes straight to a value by its key."
+/>
 
 ## A note on iteration cost
 
@@ -261,7 +261,7 @@ int main() {
   > Otherwise \`unordered_map\` is usually faster.
 - When the data fits in cache.
   > Both can.
-- When you want average O(1) lookup.
+- When you want average $O(1)$ lookup.
   > That's the hashed container's selling point.
 - Whenever performance matters.
   > \`unordered_map\` is generally faster for plain lookup.`}

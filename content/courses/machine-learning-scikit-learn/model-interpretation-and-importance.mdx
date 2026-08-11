@@ -219,6 +219,12 @@ predictive performance, we need a different idea.
 **Permutation importance** asks the most direct question imaginable: *if I
 destroy the information in this feature, how much worse does the model get?*
 
+<Figure
+  slug="ml-model-interpretation-and-importance-permutation-importance-model-agnostic-inline-cutout"
+  alt="One column of a board shuffled at random while every other column stays put, and a gauge reading how much worse it now does"
+  caption="Shuffle one column and measure the damage: importance without trusting the model's own story."
+/>
+
 The procedure is beautifully simple. Take a trained model and a held-out
 set. Measure its score. Now randomly **shuffle** one feature's column,
 scrambling the link between that feature and the target while keeping its

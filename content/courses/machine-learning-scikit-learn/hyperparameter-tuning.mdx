@@ -27,6 +27,12 @@ tuning process worse than useless.
 The distinction sounds like pedantry, but it is the whole foundation of
 this topic, so let us make it concrete.
 
+<Figure
+  slug="ml-hyperparameter-tuning-parameters-vs-hyperparameters-inline-cutout"
+  alt="A machine with dials on its outside set by hand and gears inside that set themselves as it runs"
+  caption="Parameters are learned during fitting; hyperparameters you set beforehand."
+/>
+
 A **parameter** is a number the model discovers by fitting to data. You
 never set it; `.fit()` computes it. When a `LinearRegression` finds the
 slope and intercept of a line, those coefficients are parameters. When a
@@ -122,9 +128,9 @@ or the best `C` on its own. It cannot, and the reason is fundamental, not a
 missing feature.
 
 <Figure
-  slug="ml-hyperparameter-tuning-parameters-vs-hyperparameters-inline-cutout"
-  alt="A machine with dials on its outside set by hand and gears inside that set themselves as it runs"
-  caption="Parameters are learned during fitting; hyperparameters you set beforehand."
+  slug="ml-hyperparameter-tuning-exists-models-do-inline-cutout"
+  alt="A machine with three dials on its face and no marks on them, a hand turning each in turn"
+  caption="The best setting of one dial depends on the others, so they are searched together."
 />
 
 A hyperparameter like `max_depth` decides *how flexible* the model is
@@ -221,9 +227,9 @@ it a model and a small **grid** of values to try, and it runs
 cross-validation for *every combination*, then reports the winner.
 
 <Figure
-  slug="ml-hyperparameter-tuning-exists-models-do-inline-cutout"
-  alt="A machine with three dials on its face and no marks on them, a hand turning each in turn"
-  caption="The best setting of one dial depends on the others, so they are searched together."
+  slug="ml-hyperparameter-tuning-gridsearchcv-try-every-combination-inline-cutout"
+  alt="A rack of dials worked through every combination of settings in turn, with the best combination marked"
+  caption="Every combination of settings tried under cross-validation, and the winner refitted."
 />
 
 The "grid" is just the set of all combinations. If you give it 3 values of

@@ -134,6 +134,12 @@ Trace it in execution order:
 6. **ORDER BY** `total DESC`, sort the surviving groups.
 7. **LIMIT 2**, keep the top two.
 
+<Figure
+  slug="lite-query-execution-order-tracing-full-query-inline-cutout"
+  alt="A table passing through a line of stations, each one reshaping it and handing it on smaller than before"
+  caption="Each clause reshapes the table and hands it on, in an order that is not the written one."
+/>
+
 This is the **query transformation pipeline**: each stage reshapes a
 table and passes it on. Every query you write, however complex,
 flows through these same steps:

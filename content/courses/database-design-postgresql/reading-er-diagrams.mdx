@@ -20,6 +20,12 @@ order items, and order items point to products.
 Start by looking at the diagram without worrying about SQL syntax.
 Ask: what are the boxes, what are the keys, and what do the lines say?
 
+<Figure
+  slug="db-reading-er-diagrams-full-model-inline-cutout"
+  alt="A pinned board of five plain boxes joined by cords, some cords ending in a single peg and some splitting into prongs"
+  caption="The foreign keys in a diagram predict exactly which joins a query will need."
+/>
+
 ```mermaid
 erDiagram
     customers ||--o{ orders : places
@@ -75,7 +81,7 @@ Inside each box are attributes. For example, `customers` has `id`,
 `placed_on`, and `status`.
 
 ```mermaid
-flowchart TB
+flowchart LR
     Entity["<code>orders</code>"] --> ID["id PK"]
     Entity --> CustomerID["<code>customer_id</code> FK"]
     Entity --> Placed["<code>placed_on</code>"]
@@ -254,9 +260,9 @@ query below follows exactly the path the diagram promises, from
 artist through album to track.
 
 <Figure
-  slug="db-reading-er-diagrams-full-model-inline-cutout"
-  alt="A pinned board of five plain boxes joined by cords, some cords ending in a single peg and some splitting into prongs"
-  caption="The foreign keys in a diagram predict exactly which joins a query will need."
+  slug="db-reading-er-diagrams-read-real-schema-chinook-inline-cutout"
+  alt="Four crates joined in a line by cords, artist to album to track, with a genre tag hanging off the side"
+  caption="One artist, many albums, many tracks: read the crow's feet and the joins follow."
 />
 
 <SqlCodeBlock

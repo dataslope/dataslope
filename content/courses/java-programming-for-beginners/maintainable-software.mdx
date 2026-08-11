@@ -23,6 +23,12 @@ about *taste*.
 The single most reliable maintainability rule is: **each method
 should do one thing, and have a name that says what.**
 
+<Figure
+  slug="java-maintainable-software-small-methods-inline-cutout"
+  alt="One crowded machine beside four small ones that each do a single job and clip together"
+  caption="Small methods that clip together are easier to read than one long one."
+/>
+
 A method that fits on your screen is easier to understand than one
 that doesn't. A method whose name reads like a sentence ("calculate
 discount," "load orders," "validate email") tells the reader what to
@@ -190,12 +196,6 @@ probably shouldn't catch *anything*.
 
 The following code works. It's also a maintenance nightmare. Read
 it; then read the cleaned-up version below.
-
-<Figure
-  slug="java-maintainable-software-small-methods-inline-cutout"
-  alt="One crowded machine beside four small ones that each do a single job and clip together"
-  caption="Small methods that clip together are easier to read than one long one."
-/>
 
 <CodeBlock
   adapter="java"

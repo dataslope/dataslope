@@ -3279,6 +3279,24 @@ input[type="range"].fs-slider:disabled {
 }
 
 /* ─── Confirm dialog (Base UI AlertDialog) ─── */
+/* The dimmed sheet behind every confirmation in the playgrounds.
+ *
+ * Clicking it closes the dialog, which is worth writing down because it did
+ * not always. These were Base UI *alert* dialogs, and an alert dialog
+ * hard-codes `disablePointerDismissal` — it deliberately ignores a click on
+ * its own backdrop so that a destructive choice has to be made explicitly.
+ * The effect in practice was a backdrop that dimmed the page, invited a
+ * click, and swallowed it; Escape and Cancel worked, so it read as a stuck
+ * dialog rather than a deliberate one.
+ *
+ * All twenty are ordinary `Dialog`s now, which dismiss on an outside press,
+ * and each popup carries `role="alertdialog"` so assistive technology still
+ * announces them as the interruptions they are. `DialogPopup` merges the
+ * caller's props last, which is what lets that role win over its own.
+ *
+ * If you add a confirmation here, use `Dialog` and give it that role. Reach
+ * for `AlertDialog` only when a stray click genuinely must not resolve the
+ * question, and expect to explain why. */
 .confirm-backdrop {
   position: fixed;
   inset: 0;

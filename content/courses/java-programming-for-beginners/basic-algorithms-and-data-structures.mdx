@@ -19,6 +19,12 @@ develop intuition for *which idea to reach for* and *why it works*.
 The simplest possible search: look at each element until you find
 what you want, or run out.
 
+<Figure
+  slug="java-basic-algorithms-and-data-structures-linear-search-inline-cutout"
+  alt="A hand walking a row of blocks one at a time from the left until it reaches the marked one"
+  caption="Linear search checks every element until it finds the one you want."
+/>
+
 <CodeBlock
   adapter="java"
   files={[
@@ -63,9 +69,9 @@ smaller, search the left half. Otherwise the right half. Each step
 eliminates *half* of what is left.
 
 <Figure
-  slug="java-basic-algorithms-and-data-structures-linear-search-inline-cutout"
-  alt="A hand walking a row of blocks one at a time from the left until it reaches the marked one"
-  caption="Linear search checks every element until it finds the one you want."
+  slug="java-basic-algorithms-and-data-structures-binary-search-inline-cutout"
+  alt="A sorted row of blocks with a hand splitting it in half, discarding one half, and splitting again"
+  caption="On sorted data, each comparison throws away half of what is left."
 />
 
 Searching for `17` in `[2, 5, 8, 11, 17, 23, 31, 42]`:
@@ -170,7 +176,7 @@ public class Main {
 Selection sort takes time proportional to the *square* of the list
 length. For 10,000 elements, fine. For 10,000,000 elements, way too
 slow, for that you'd use the built-in `Arrays.sort()`, which
-is `O(n log n)`.
+is $O(n \log n)$.
 
 The general rule: **you almost never write a sort in production
 Java.** You call `Collections.sort(list)` or `Arrays.sort(arr)`.
@@ -269,12 +275,6 @@ A working programmer's mental table of first-resort tools:
 
 You will, of course, run into problems that don't fit this table.
 But this table covers an *astonishing* fraction of day-to-day code.
-
-<Figure
-  slug="java-basic-algorithms-and-data-structures-binary-search-inline-cutout"
-  alt="A sorted row of blocks with a hand splitting it in half, discarding one half, and splitting again"
-  caption="On sorted data, each comparison throws away half of what is left."
-/>
 
 <MultipleChoice
   markdown={`Why does binary search require a sorted input?

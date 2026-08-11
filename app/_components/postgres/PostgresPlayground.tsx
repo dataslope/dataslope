@@ -129,6 +129,7 @@ import {
   MobileMoreSections,
   MoreMenu,
   SaveControl,
+  NewWorkspaceControl,
   WorkspaceNameControl,
   type MoreMenuSection,
 } from "../PlaygroundHeaderControls";
@@ -3928,6 +3929,7 @@ function PostgresPlaygroundInner() {
                 setActiveWorkspace({ id: activeWorkspace.id, name })
               }
             />
+            <NewWorkspaceControl playgroundId={PLAYGROUND_ID} />
           </>
         ) : null
       }

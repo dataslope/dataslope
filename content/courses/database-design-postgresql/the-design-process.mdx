@@ -15,12 +15,6 @@ You could start typing `CREATE TABLE`, but that usually means the
 schema will reflect your first guess. A better design starts with a
 repeatable process.
 
-<Figure
-  slug="db-the-design-process-inline-cutout"
-  alt="Four benches in a row, a design moving from loose sketch to ruled frame to fitted parts to a working cabinet"
-  caption="Sketch, model, tables, constraints: the same four steps for every schema."
-/>
-
 The goal is not to make design mechanical. The goal is to make sure
 you ask the important questions every time.
 
@@ -166,7 +160,7 @@ An **attribute** is a fact about one entity. Put each fact where it
 belongs.
 
 ```mermaid
-flowchart TD
+flowchart LR
     Event["<code>events</code>"] --> Title["title"]
     Event --> Starts["<code>starts_at</code>"]
     Event --> VenueId["<code>venue_id</code>"]
@@ -264,6 +258,12 @@ Keys identify rows and constraints protect additional rules.`}
 
 **Constraints** turn design decisions into database rules. They prevent
 bad data from becoming everyone else's problem.
+
+<Figure
+  slug="db-the-design-process-inline-cutout"
+  alt="Four benches in a row, a design moving from loose sketch to ruled frame to fitted parts to a working cabinet"
+  caption="Sketch, model, tables, constraints: the same four steps for every schema."
+/>
 
 Common constraints include:
 

@@ -87,6 +87,12 @@ create an element, set its content, append it.** Swap the hard-coded
 `raw` string for `await response.json()` and the exact same loop
 displays live data from an API.
 
+<Figure
+  slug="web-js-fetch-and-data-inline-cutout"
+  alt="A page panel sending a small folded note along a cord to a drum, and a filled tray coming back along the same cord into one empty slot on the panel"
+  caption="`fetch()` asks for data and the page fills itself in when the answer arrives."
+/>
+
 <Callout type="info" title="createElement vs. innerHTML">
 Building elements with `createElement()` and `textContent` is safe:
 user- or API-provided text can never be interpreted as HTML. Assigning
@@ -160,9 +166,3 @@ for (const expected of ["Espresso", "Latte", "Mocha"]) {
 
 You can now bring data into a page and render it. Everything comes
 together next in the [Interactive Scoreboard project](/courses/intro-web-development/project-interactive-scoreboard).
-
-<Figure
-  slug="web-js-fetch-and-data-inline-cutout"
-  alt="A page panel sending a small folded note along a cord to a drum, and a filled tray coming back along the same cord into one empty slot on the panel"
-  caption="`fetch()` asks for data and the page fills itself in when the answer arrives."
-/>

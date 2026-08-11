@@ -63,6 +63,12 @@ print(shout(""))
 The colon (`:`) at the end of `def`, `if`, `for`, `while`, `try`,
 `class`, and so on signals "the next indented block belongs to me".
 
+<Figure
+  slug="python-syntax-and-indentation-blocks-indentation-inline-cutout"
+  alt="A stack of shelves where the depth of a shelf alone says what belongs on it, with no brackets anywhere in sight"
+  caption="The indentation is the block, so a stray space is a syntax error rather than a style choice."
+/>
+
 <Callout type="info">
 Think of the colon as Python's way of saying "here comes a block". It
 replaces the opening brace `{` in C-like languages. The dedent
@@ -75,6 +81,12 @@ block.
 If indentation is missing where Python expects it, you get an
 `IndentationError`. If it is inconsistent, you get a `TabError` or a
 silently broken program (in older Python 2 codebases).
+
+<Figure
+  slug="python-syntax-and-indentation-semicolons-please-do-not-inline-cutout"
+  alt="Two statements crammed onto a single rail beside the same two given a rail each, the second pair easy to reach"
+  caption="One statement per line is what keeps the indentation readable in the first place."
+/>
 
 <CodeBlock
   adapter="python"
@@ -115,6 +127,12 @@ guide, says:
 - One statement per line. `if x: do(); other()` is legal but frowned
   upon.
 
+<Figure
+  slug="python-syntax-and-indentation-four-space-rule-pep-inline-cutout"
+  alt="A column of lines all starting at the same ruled margin, with a single line beginning a hair short of it and flagged"
+  caption="Four spaces everywhere: the rule matters less than never mixing two conventions in one file."
+/>
+
 Tools that enforce this for you:
 
 - [`black`](https://black.readthedocs.io/) reformats your code in one
@@ -148,6 +166,12 @@ ways to span multiple lines:
 1. **Implicit continuation** inside `()`, `[]`, or `{}`. This is the
    preferred style.
 2. **Explicit continuation** with a backslash `\` at end of line.
+
+<Figure
+  slug="python-syntax-and-indentation-continuation-lines-inline-cutout"
+  alt="A long line folded neatly inside a pair of brackets, beside the same line held together by one fragile trailing hook"
+  caption="Wrap a long line in brackets rather than a trailing backslash, which breaks on a stray space."
+/>
 
 <CodeBlock
   adapter="python"

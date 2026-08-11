@@ -356,6 +356,12 @@ int main() {
 
 Here is where the recursion chapter pays off. Most tree properties are naturally recursive, solve the left subtree, solve the right subtree, combine the answers, and the leap of faith makes each one a three-line function. The height of a tree is 1 plus the taller of its subtrees' heights; its node count is 1 plus the children's counts; its maximum is the largest of the root and the subtree maxima. In every case the base case is the empty tree, and `nullptr` checks do double duty as base cases.
 
+<Figure
+  slug="dsa-trees-calculating-tree-properties-inline-cutout"
+  alt="A branching frame where the same measuring tool is applied to each limb and the readings added at the join"
+  caption="Solve the left subtree, solve the right, combine: most tree properties are that shape."
+/>
+
 The most instructive function below is `checkHeight`, which answers "is this tree balanced?" while computing height, using `-1` as an "already failed" signal that propagates up without extra bookkeeping. This combine-results-while-recursing pattern solves a large share of tree interview problems.
 
 <CodeBlock

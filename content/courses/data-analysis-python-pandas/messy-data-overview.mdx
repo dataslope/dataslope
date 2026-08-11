@@ -36,6 +36,12 @@ Almost every real-world dataset has *several* of these. The
 analyst's job is to detect them, decide what to do, and document
 what you did.
 
+<Figure
+  slug="pandas-messy-data-overview-inline-cutout"
+  alt="A board where some cells hold the wrong shape, some are empty, and two rows are visibly the same"
+  caption="Wrong types, empty cells and repeated rows are the faults you meet most."
+/>
+
 ## A canonical workflow
 
 ```mermaid
@@ -98,12 +104,6 @@ overwrote the raw file, you cannot.
 The following toy dataset has at least one example of nearly
 every problem in the table above. Read it carefully and try to
 spot each issue before reading on.
-
-<Figure
-  slug="pandas-messy-data-overview-inline-cutout"
-  alt="A board where some cells hold the wrong shape, some are empty, and two rows are visibly the same"
-  caption="Wrong types, empty cells and repeated rows are the faults you meet most."
-/>
 
 <CodeBlock
   adapter="python"
@@ -197,12 +197,6 @@ dozen problems.
 
 A taste, we will not fix everything here, just demonstrate the
 pattern.
-
-<Figure
-  slug="pandas-messy-data-overview-messy-actually-means-inline-cutout"
-  alt="A board where one cell holds the wrong shape, one is covered, and two rows carry the same card"
-  caption="Messy means the table breaks its own rules, not that it looks untidy."
-/>
 
 <CodeBlock
   adapter="python"

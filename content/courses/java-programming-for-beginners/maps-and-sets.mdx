@@ -55,6 +55,12 @@ A `HashSet`:
 - Offers `add()`, `remove()`, `contains()` in (effectively) constant
   time, on average.
 
+<Figure
+  slug="java-maps-and-sets-set-uniqueness-membership-inline-cutout"
+  alt="A bin that takes each distinct block once, an identical second bouncing off its rim"
+  caption="A set keeps one of each value and drops the duplicates silently."
+/>
+
 Use a `Set` when you need to ask "have I seen this before?" or
 "what are the *distinct* values?"
 
@@ -169,12 +175,6 @@ A classic small problem: read a list of words, print how many
 times each one appeared. A `Map<String, Integer>` makes this
 trivial.
 
-<Figure
-  slug="java-maps-and-sets-set-uniqueness-membership-inline-cutout"
-  alt="A bin that takes each distinct block once, an identical second bouncing off its rim"
-  caption="A set keeps one of each value and drops the duplicates silently."
-/>
-
 <CodeBlock
   adapter="java"
   entryFilename="Main.java"
@@ -260,11 +260,11 @@ genuinely don't know in advance.
 - [o] It computes the key's hash code, picks a bucket directly, and looks only in that bucket
   > Hashing jumps straight to where the value would be, instead of scanning entries.
 - It linearly scans every entry, but very quickly
-  > That would be O(n).
+  > That would be $O(n)$.
 - It keeps the map sorted by key
   > It does not sort.
 - It uses a binary search across the keys
-  > That's a TreeMap (and it's O(log n), not O(1)).`}
+  > That's a TreeMap (and it's $O(\\log n)$, not $O(1)$).`}
 />
 
 <MultipleChoice

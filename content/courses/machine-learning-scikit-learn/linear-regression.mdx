@@ -35,6 +35,12 @@ want a rule that, given the feature, predicts the number, and ideally a
 rule you can *read*, so you can say "each extra square foot is worth about
 this much."
 
+<Figure
+  slug="ml-linear-regression-problem-solves-inline-cutout"
+  alt="A cloud of chips with a straight rod being laid through their middle"
+  caption="Linear regression draws one straight relationship through the whole cloud."
+/>
+
 Linear regression answers with the simplest possible rule: **draw a
 straight line through the cloud of points and read predictions off the
 line.** Give it a new square footage, find that spot on the line, and the
@@ -233,12 +239,6 @@ stone several ways, and beyond carat we can hand the model the numeric
 columns `carat`, `depth`, `table`, and the three physical dimensions `x`,
 `y`, `z`. The model now fits a flat plane through six-dimensional space,
 impossible to picture, but the math and the code are identical.
-
-<Figure
-  slug="ml-linear-regression-problem-solves-inline-cutout"
-  alt="A cloud of chips with a straight rod being laid through their middle"
-  caption="Linear regression draws one straight relationship through the whole cloud."
-/>
 
 <CodeBlock
   adapter="python"

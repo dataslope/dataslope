@@ -17,7 +17,7 @@ datasets in seconds, no files required.
 ## Four ways data arrives
 
 ```mermaid
-flowchart TB
+flowchart LR
     A["Typed-in rows<br/>(VALUES)"] --> DB[("DuckDB")]
     B["Generated rows<br/>(range, <code>generate_series</code>)"] --> DB
     C["Files<br/>(CSV, Parquet)"] --> DB
@@ -64,6 +64,12 @@ DuckDB's `range(start, stop)` produces the integers from `start` up to
 realistic-looking datasets of any size, perfect for practice and for
 testing a query's behavior at scale.
 
+<Figure
+  slug="duck-loading-and-generating-data-inline-cutout"
+  alt="Three differently shaped cartons feeding one hopper and arriving inside as identical rows"
+  caption="CSV, Parquet or a generated range: all four routes end in a table."
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Fabricate 12 months of fake revenue"
@@ -108,12 +114,6 @@ The most important habit in this lesson: **`CREATE TABLE AS SELECT`**
 (often shortened to *CTAS*). It runs a query and stores its result as a
 new table. Analysts use it to "freeze" a cleaned-up or generated dataset
 so later queries can build on it.
-
-<Figure
-  slug="duck-loading-and-generating-data-four-ways-data-inline-cutout"
-  alt="Four differently shaped cartons feeding one hopper and arriving inside as identical rows"
-  caption="Whatever the file format, it arrives inside DuckDB as ordinary rows."
-/>
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -220,9 +220,3 @@ applies unchanged to files and warehouse tables.`}
 You can now bring data into DuckDB and conjure practice datasets at will.
 With data in hand, the real fun begins, let us learn how an analyst
 *profiles* an unfamiliar dataset.
-
-<Figure
-  slug="duck-loading-and-generating-data-inline-cutout"
-  alt="Three differently shaped cartons feeding one hopper and arriving inside as identical rows"
-  caption="CSV, Parquet or a generated range: all four routes end in a table."
-/>

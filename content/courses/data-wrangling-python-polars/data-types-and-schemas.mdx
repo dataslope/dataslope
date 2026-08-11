@@ -62,12 +62,6 @@ between a table fitting in memory and not.
   caption="The integer types differ only in width, and width is what memory costs."
 />
 
-<Figure
-  slug="pl-data-types-and-schemas-type-list-inline-cutout"
-  alt="A rack of column slots each cut to a different profile, a matching block resting above each"
-  caption="Each column has one type, and every value in it has to fit that profile."
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -96,6 +90,12 @@ cents.
 `cast()` changes a column's type. It is strict by default, which means
 a value that does not fit raises rather than wrapping around or
 silently becoming null.
+
+<Figure
+  slug="pl-data-types-and-schemas-type-list-inline-cutout"
+  alt="A rack of column slots each cut to a different profile, a matching block resting above each"
+  caption="Each column has one type, and every value in it has to fit that profile."
+/>
 
 <CodeBlock
   adapter="python"

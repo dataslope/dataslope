@@ -22,12 +22,6 @@ which are loose, which two clusters are most similar, and how the whole
 dataset nests together at every level of granularity. For many problems
 that picture is worth more than any single set of labels.
 
-<Figure
-  slug="ml-hierarchical-clustering-problem-solves-inline-cutout"
-  alt="A scatter of chips with no bins given, a hand pairing the two closest and then pairing the pairs"
-  caption="Merging the closest pair over and over builds groups without fixing k first."
-/>
-
 This page assumes you have met clustering on the **K-Means Clustering**
 page. We will lean on the same instincts, distance, "similar things belong
 together," standardize before you measure distance, and add a new one:
@@ -51,6 +45,12 @@ carnivores split into cats and dogs. There is no single "correct" number of
 groups, it depends on how closely you want to look. A flat method like
 k-means forces you to pick one zoom level. Hierarchical clustering captures
 *all* of them at once.
+
+<Figure
+  slug="ml-hierarchical-clustering-problem-solves-inline-cutout"
+  alt="A scatter of chips with no bins given, a hand pairing the two closest and then pairing the pairs"
+  caption="Merging the closest pair over and over builds groups without fixing k first."
+/>
 
 So the question hierarchical clustering answers is broader than k-means's:
 not just "what are the `k` groups?" but **"how do these points relate to
@@ -81,12 +81,6 @@ recipe is almost embarrassingly simple:
 3. **Repeat:** again find the two closest clusters (now including the merged
    one) and fuse them.
 4. **Stop** when everything has been merged into one cluster at the top.
-
-<Figure
-  slug="ml-hierarchical-clustering-intuition-start-apart-inline-cutout"
-  alt="Chips joined into pairs, pairs joined into groups, groups joined at the top into one branching frame"
-  caption="Every merge is recorded, so you can cut the tree at any level you like."
-/>
 
 Each merge reduces the cluster count by exactly one, so after `n - 1`
 merges you have gone from `n` singletons to one giant cluster. Along the
@@ -177,6 +171,12 @@ The flat labels are useful, but they hide the structure that makes
 hierarchical clustering special. To *see* the tree we draw a dendrogram,
 and for that we use SciPy, whose `linkage` and `dendrogram` functions are
 the standard tools.
+
+<Figure
+  slug="ml-hierarchical-clustering-seeing-tree-dendrogram-on-inline-cutout"
+  alt="A small set of marks joined into a branching frame, the height of each join showing how late the two came together"
+  caption="The height of each join is how different the two groups were when they merged."
+/>
 
 A dendrogram of 300 points is an unreadable smear, so we plot a **small
 sample**, about 18 points, where every leaf and merge is legible. This is
@@ -403,7 +403,7 @@ numeric attributes, no target, just structure. Two real-world details show
 up immediately. First, the features live on wildly different scales
 (`Population` is in the thousands, `AveRooms` is a single digit), so without
 `StandardScaler` the largest-magnitude column would dominate every distance.
-Second, agglomerative clustering is roughly *O(n²)*, so we draw a **random
+Second, agglomerative clustering is roughly *$O(n^2)$*, so we draw a **random
 sample of 400 districts** rather than all ~20,000, large enough to find
 structure, small enough to stay fast. We fix `random_state` on `.sample()` so
 the draw is reproducible; the clustering itself needs no seed.

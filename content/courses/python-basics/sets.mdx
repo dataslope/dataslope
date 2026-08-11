@@ -3,7 +3,7 @@ title: Sets
 description: Unordered collections of unique, hashable items
 ---
 
-A `set` is an unordered collection of unique, hashable items. Membership testing is O(1) on average, which makes sets the right tool for deduplication, fast lookups, and mathematical set operations. In data work, sets are everywhere: removing duplicate IDs, checking if a user is in an allowed list, finding the intersection of two tag lists, filtering out stop words, and more.
+A `set` is an unordered collection of unique, hashable items. Membership testing is $O(1)$ on average, which makes sets the right tool for deduplication, fast lookups, and mathematical set operations. In data work, sets are everywhere: removing duplicate IDs, checking if a user is in an allowed list, finding the intersection of two tag lists, filtering out stop words, and more.
 
 <Figure
   slug="python-basics-sets-cutout"
@@ -14,7 +14,7 @@ Every snippet on this page runs in your browser, no setup required.
 
 ## How sets work
 
-Like dicts, sets are implemented as **hash tables**. A set is essentially a dict with only keys (no values). This gives O(1) average-case membership testing, insertion, and deletion.
+Like dicts, sets are implemented as **hash tables**. A set is essentially a dict with only keys (no values). This gives $O(1)$ average-case membership testing, insertion, and deletion.
 
 ```mermaid
 flowchart LR
@@ -24,7 +24,7 @@ flowchart LR
 ```
 
 <Callout type="info">
-Sets and dicts share the same underlying implementation: hash tables. A set is like a dict where you only care about the keys. This is why both require hashable elements/keys and both give O(1) average-case lookups.
+Sets and dicts share the same underlying implementation: hash tables. A set is like a dict where you only care about the keys. This is why both require hashable elements/keys and both give $O(1)$ average-case lookups.
 </Callout>
 
 ## Creating sets
@@ -225,7 +225,7 @@ print("disjoint?", a.isdisjoint({99}))
 />
 
 ```mermaid
-graph TD
+graph LR
     A["Set A: <code>{1, 2, 3, 4}</code>"]
     B["Set B: <code>{3, 4, 5, 6}</code>"]
     C["Union: <code>{1, 2, 3, 4, 5, 6}</code>"]
@@ -248,7 +248,7 @@ In data analysis, you constantly ask questions like "which users visited both pa
 
 ## Sets vs lists for lookup
 
-This is where sets shine. Membership testing in a list is O(n); in a set it is O(1).
+This is where sets shine. Membership testing in a list is $O(n)$; in a set it is $O(1)$.
 
 <Figure
   slug="python-sets-sets-work-inline-cutout"
@@ -466,14 +466,14 @@ print(set_of_sets)
 <MultipleChoice
   markdown={`What is the time complexity of \`item in s\` where \`s\` is a set?
 
-- O(log n)
+- $O(\\log n)$
   > Sets use hashing, not binary search.
-- O(n)
+- $O(n)$
   > That would be true for a list, not a set.
-- O(n²)
+- $O(n^2)$
   > Set lookup is much faster than quadratic.
-- [o] O(1) average case
-  > Sets use hash tables, giving O(1) average-case lookup.`}
+- [o] $O(1)$ average case
+  > Sets use hash tables, giving $O(1)$ average-case lookup.`}
 />
 
 We have now seen every major collection. Next: how to direct flow through them with conditionals and loops.

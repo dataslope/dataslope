@@ -20,7 +20,7 @@ Imagine tracking orders in a single flat table. Every row repeats
 the customer's name and email, and even the product's price:
 
 ```mermaid
-flowchart TB
+flowchart LR
     T["<code>orders_flat</code><br/><code>order_id</code> | <code>customer_name</code> | <code>customer_email</code> | product | price"]
     T --> R1["1 | Ada | ada@x.com | Book | 20"]
     T --> R2["2 | Ada | ada@x.com | Pen | 3"]
@@ -31,9 +31,9 @@ Look at the repetition. "Ada / ada@x.com" appears twice; "Book / 20"
 appears twice. This duplication causes three classic problems.
 
 <Figure
-  slug="lite-data-organization-three-problems-duplication-inline-cutout"
-  alt="The same block repeated in three drawers, one of them visibly a different colour from the others"
-  caption="Store a fact twice and one copy will eventually disagree with the other."
+  slug="lite-data-organization-problem-one-big-inline-cutout"
+  alt="One enormously wide board with the same block repeated across several rows"
+  caption="The same customer written out again on every order they ever placed."
 />
 
 ## The three problems duplication causes
@@ -55,9 +55,9 @@ flowchart LR
   the only record of who Ada is.
 
 <Figure
-  slug="lite-data-organization-problem-one-big-inline-cutout"
-  alt="One enormously wide board with the same block repeated across several rows"
-  caption="The same customer written out again on every order they ever placed."
+  slug="lite-data-organization-three-problems-duplication-inline-cutout"
+  alt="The same block repeated in three drawers, one of them visibly a different colour from the others"
+  caption="Store a fact twice and one copy will eventually disagree with the other."
 />
 
 Good organization removes these by giving every fact a single home.

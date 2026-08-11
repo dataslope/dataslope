@@ -93,12 +93,24 @@ mean two unrelated things. Assistive tech builds a navigable outline
 from these, so getting the order right is an accessibility feature,
 not a style choice.
 
+<Figure
+  slug="web-html-semantic-accessibility-headings-outline-not-sizes-inline-cutout"
+  alt="A nested outline pinned to a board, with one entry hanging at a level it does not belong to and flagged"
+  caption="Heading levels are the page's outline, so skipping one breaks the structure, not the size."
+/>
+
 ## Labels make forms usable
 
 Every form control needs a **label** tied to it. The reliable way:
 give the input an `id` and point a `<label for="...">` at it. Now
 clicking the label focuses the input, and screen readers announce the
 two together.
+
+<Figure
+  slug="web-html-semantic-accessibility-inline-cutout"
+  alt="A page whose regions carry distinct shaped tags, header, navigation, main and footer, each unmistakable by shape"
+  caption="Semantic elements say what a region is, which is what assistive tools read."
+/>
 
 ```html
 <label for="email">Email</label>
@@ -198,9 +210,3 @@ if (!input) throw new Error('The input must keep id="q".');`,
 
 Your HTML now carries meaning. Time to make it beautiful, starting
 with [Getting Started with CSS](/courses/intro-web-development/css-getting-started).
-
-<Figure
-  slug="web-html-semantic-accessibility-inline-cutout"
-  alt="A page whose regions carry distinct shaped tags, header, navigation, main and footer, each unmistakable by shape"
-  caption="Semantic elements say what a region is, which is what assistive tools read."
-/>

@@ -79,6 +79,12 @@ identifier. React uses keys to tell items apart between renders, so
 when the list changes it can update, insert, or remove just the items
 that actually changed instead of rebuilding everything.
 
+<Figure
+  slug="rx-rendering-lists-key-matters-inline-cutout"
+  alt="A row of cards each carrying its own tag, one card lifted out and the rest keeping their tags instead of shuffling along"
+  caption="A key lets React tell items apart between renders, so state follows the right one."
+/>
+
 <Callout type="warn" title="Don't use the array index as a key (usually)">
 It's tempting to write `key={index}`. That works only if the list
 never reorders, inserts, or removes items from the middle. As soon as

@@ -42,6 +42,12 @@ The most important rule: **encode your most important variable
 in position**. People read position with near-perfect accuracy
 and color/size only crudely.
 
+<Figure
+  slug="rlang-principles-of-visualization-charts-are-encodings-inline-cutout"
+  alt="A column of plain chips joined by cords to a dial marked for height, size and ink"
+  caption="A chart encodes numbers as position, size or colour, and position wins."
+/>
+
 ```mermaid
 flowchart LR
   data["a variable"] -->|"encoded as"| visual["a visual property"]
@@ -72,12 +78,6 @@ Different questions call for different charts:
 Bar charts are dramatically underrated. Pie charts and 3D charts
 are wildly overrated. The eye is bad at angles and worse at
 volumes.
-
-<Figure
-  slug="rlang-principles-of-visualization-charts-are-encodings-inline-cutout"
-  alt="A column of plain chips joined by cords to a dial marked for height, size and ink"
-  caption="A chart encodes numbers as position, size or colour, and position wins."
-/>
 
 ## Less is more: the data-ink ratio
 
@@ -150,6 +150,12 @@ and only one of them lets you see it:
 - **Use the right aspect ratio** so trends look the way they
   actually are. Stretching a chart wide flattens trends;
   squishing it tall exaggerates them.
+
+<Figure
+  slug="rlang-principles-of-visualization-inline-cutout"
+  alt="Two charts of the same data, one cluttered with ornament and one plain, the plain one obviously easier to read"
+  caption="Strip the ornament and the same data becomes far easier to read."
+/>
 
 ## Title, axis labels, units
 
@@ -284,9 +290,3 @@ The data is the same. The reader's experience is not.
 The principles are language-agnostic. The next page is about
 the *language* that makes them easy to apply in R: the **grammar
 of graphics** as implemented in `ggplot2`.
-
-<Figure
-  slug="rlang-principles-of-visualization-inline-cutout"
-  alt="Two charts of the same data, one cluttered with ornament and one plain, the plain one obviously easier to read"
-  caption="Strip the ornament and the same data becomes far easier to read."
-/>

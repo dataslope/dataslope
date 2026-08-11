@@ -89,6 +89,42 @@ const SANS =
 const MONO =
   'var(--font-mono), "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace';
 
+/**
+ * The same stacks with `var(--font-*)` already resolved to the family names.
+ *
+ * A `var()` in the string handed to Mermaid is a measurement hazard, and the
+ * `List` class diagram on `java-collections-and-generics-deep-dive/lists` is
+ * what it looks like when it fires: the box came out exactly as wide as
+ * `+indexOf(Object) : int` and `+subList(int, int) : List`, three characters
+ * longer, wrapped onto a second line on top of the row above it.
+ *
+ * Mermaid writes `fontFamily` into the SVG's own `<style>` and *also* measures
+ * every label with it. A custom property resolves against the element it is
+ * applied to, so the two steps only agree while the SVG is attached to a
+ * document that carries the variable. Whenever measurement happens off that
+ * document the declaration is invalid, measurement silently falls back to the
+ * inherited proportional face, and the box is sized for a font the label will
+ * not be painted in. In a proportional face those two rows are 176px and
+ * 178px, which is why the shorter one won; in mono they are 194px and 221px.
+ *
+ * Resolving here removes the difference: the string Mermaid measures with and
+ * the string it paints with name the same families, attached or not. The
+ * literal stacks stay as the fallback for a missing variable, which is what
+ * server rendering and the tests see.
+ */
+function resolvedStacks(): { sans: string; mono: string } {
+  if (typeof document === "undefined") return { sans: SANS, mono: MONO };
+  const root = getComputedStyle(document.documentElement);
+  const resolve = (variable: string, stack: string) => {
+    const family = root.getPropertyValue(variable).trim();
+    return family ? stack.replace(`var(${variable})`, family) : stack;
+  };
+  return {
+    sans: resolve("--font-sans", SANS),
+    mono: resolve("--font-mono", MONO),
+  };
+}
+
 // Class diagrams (class names, fields, method signatures) and ER diagrams (tables,
 // typed columns, keys) are entirely code, so they render wholesale in mono. Other
 // types stay sans, flowcharts tag individual code spans with <code> instead, and
@@ -105,10 +141,11 @@ function isCodeDiagram(chart: string): boolean {
 // Mermaid init directive that switches a single diagram to the mono face. It
 // merges over the global brand theme; adaptNodes still owns fills and label
 // colors, so only the font changes.
-const MONO_DIRECTIVE = `%%{init: ${JSON.stringify({
-  fontFamily: MONO,
-  themeVariables: { fontFamily: MONO },
-})}}%%\n`;
+const monoDirective = (mono: string) =>
+  `%%{init: ${JSON.stringify({
+    fontFamily: mono,
+    themeVariables: { fontFamily: mono },
+  })}}%%\n`;
 
 // The seven-hue brand wheel (app/brand.css §1.1) used for categorical diagrams
 // (pie) and for snapping author fills back onto the palette. `dark` marks hues
@@ -152,7 +189,10 @@ function readBrand(): (token: string) => string {
   return (token) => resolved[token] ?? BRAND_FALLBACKS[token];
 }
 
-function brandThemeVariables(isDark: boolean): Record<string, string | boolean> {
+function brandThemeVariables(
+  isDark: boolean,
+  sans: string,
+): Record<string, string | boolean> {
   const c = readBrand();
 
   // ── Shapes, brand fills, identical in light & dark, no borders ──────────
@@ -190,7 +230,7 @@ function brandThemeVariables(isDark: boolean): Record<string, string | boolean> 
   return {
     darkMode: isDark,
     background: surface,
-    fontFamily: SANS,
+    fontFamily: sans,
     // Controls the font-size written into the SVG's inline <style> block.
     // Without this, Mermaid inherits the container's computed size (16px from
     // the 1rem wrapper) and writes that into the SVG, overriding the fontSize
@@ -529,10 +569,12 @@ function MermaidContent({ chart }: { chart: string }) {
     ),
   );
 
+  const stacks = resolvedStacks();
+
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: "strict",
-    fontFamily: SANS,
+    fontFamily: stacks.sans,
     fontSize: 15,
     themeCSS: "margin: 1.5rem auto 0;",
     // Drive diagram colors from the DataSlope brand palette (app/brand.css) via
@@ -540,7 +582,7 @@ function MermaidContent({ chart }: { chart: string }) {
     // dark); adaptNodes snaps author pastels onto the palette, removes borders,
     // and sets per-fill label colors. Replaces Mermaid's stock themes.
     theme: "base",
-    themeVariables: brandThemeVariables(resolvedTheme === "dark"),
+    themeVariables: brandThemeVariables(resolvedTheme === "dark", stacks.sans),
   });
 
   const { svg, bindFunctions } = use(
@@ -554,17 +596,24 @@ function MermaidContent({ chart }: { chart: string }) {
       // suffixed with a generated fallback, depending on the bundler), so
       // resolve the actual family lists from the variables it publishes on
       // <html> rather than hardcoding "Inter"/"JetBrains Mono".
+      //
+      // Only the *first* family of each variable is requested. next/font
+      // publishes the real face followed by a metric-adjusted local fallback
+      // ("JetBrains Mono", "JetBrains Mono Fallback"), and `fonts.load()` on
+      // the pair settles as soon as either matches, which is immediately: the
+      // fallback is a local face and needs no fetch. Asking for the head of
+      // the list is what makes this actually wait for the webfont.
       const rootStyle = getComputedStyle(document.documentElement);
       await Promise.allSettled(
         ["--font-sans", "--font-mono"].flatMap((variable) => {
-          const family = rootStyle.getPropertyValue(variable).trim();
+          const family = rootStyle.getPropertyValue(variable).split(",")[0].trim();
           if (!family) return [];
           return [400, 500, 700].map((weight) =>
             document.fonts.load(`${weight} 15px ${family}`),
           );
         }),
       );
-      const prefix = isCodeDiagram(chart) ? MONO_DIRECTIVE : "";
+      const prefix = isCodeDiagram(chart) ? monoDirective(stacks.mono) : "";
       return mermaid.render(id, prefix + chart.replaceAll("\\n", "\n"));
     }),
   );

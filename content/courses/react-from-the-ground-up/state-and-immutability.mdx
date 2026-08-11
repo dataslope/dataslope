@@ -114,6 +114,12 @@ Each toggle builds a brand-new object with one field flipped. The JSON
 readout proves the state updates, and because it's a *new* object every
 time, React re-renders reliably.
 
+<Figure
+  slug="rx-state-and-immutability-objects-copy-then-override-inline-cutout"
+  alt="A fresh card copied from an old one with a single field restruck, the old card left exactly as it was"
+  caption="Spread the old object, override one field, and hand back something new."
+/>
+
 <Callout type="warn" title="Nested updates copy at each level">
 Spread is shallow. To change `user.address.city`, you must copy every
 level down to the change:

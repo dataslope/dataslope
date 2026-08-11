@@ -33,6 +33,12 @@ there; short bar, few. That count-by-bin picture is the most common way to
   histograms occlude each other into mud. We'll handle that with `multiple=`
   and faceting below.
 
+<Figure
+  slug="sns-distributions-histograms-histogram-needs-shows-inline-cutout"
+  alt="One column of chips going in and a row of filled bins coming out"
+  caption="Values go in, bin counts come out, and the shape appears."
+/>
+
 ## The minimum
 
 `displot()` ("distribution plot") is Seaborn's figure-level entry point for
@@ -287,12 +293,6 @@ The mystery is solved in color: the left peak is mostly **Adelie** and
 **Chinstrap**, the right peak is **Gentoo**. The bimodality was a mix of
 species all along, the same reveal a `hue` gave us on the scatter page,
 now for a single variable.
-
-<Figure
-  slug="sns-distributions-histograms-histogram-needs-shows-inline-cutout"
-  alt="One column of chips going in and a row of filled bins coming out"
-  caption="Values go in, bin counts come out, and the shape appears."
-/>
 
 ### Choosing how the groups stack: `multiple=`
 

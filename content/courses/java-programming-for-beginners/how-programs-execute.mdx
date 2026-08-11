@@ -36,6 +36,12 @@ Every Java program goes through these four stages:
    the bytecode, verifies it, translates it (lazily) into actual
    CPU instructions, and runs them.
 
+<Figure
+  slug="java-how-programs-execute-four-stages-inline-cutout"
+  alt="A card passing four machines in a row, leaving each visibly changed"
+  caption="Source, bytecode, virtual machine, machine code: four stages in order."
+/>
+
 This separation between *compile* and *run* is exactly what makes
 "write once, run anywhere" possible. The compiler doesn't need to
 know what kind of CPU will eventually run the code. The JVM, on
@@ -98,12 +104,6 @@ Three pieces are worth understanding even at a beginner level:
 ## A worked example
 
 Let's walk a tiny program through every stage.
-
-<Figure
-  slug="java-how-programs-execute-four-stages-inline-cutout"
-  alt="A card passing four machines in a row, leaving each visibly changed"
-  caption="Source, bytecode, virtual machine, machine code: four stages in order."
-/>
 
 <CodeBlock
   adapter="java"

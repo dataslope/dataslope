@@ -30,6 +30,12 @@ row into three equal columns. `2fr 1fr` makes the first column twice
 as wide as the second. It's like `flex: 1`, but for the whole grid at
 once.
 
+<Figure
+  slug="web-css-grid-layout-fr-unit-inline-cutout"
+  alt="A frame divided by springs that share out the leftover space between them in fixed proportions"
+  caption="The `fr` unit shares out whatever space is left, in the proportions you set."
+/>
+
 The `repeat()` helper saves typing: `repeat(3, 1fr)` is exactly
 `1fr 1fr 1fr`.
 
@@ -100,24 +106,18 @@ grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 "As many `1fr` columns as fit, each at least `150px` wide." Resize the
 preview and watch the column count change on its own.
 
+<Figure
+  slug="web-css-grid-layout-inline-cutout"
+  alt="A frame ruled into rows and columns with three blocks laid across several cells each, and the unused cells left plainly visible"
+  caption="Grid rules the container into rows and columns, and items span the cells."
+/>
+
 ## Grid vs. Flexbox
 
 - **Flexbox**: content laid out in *one* direction, navbars, button
   rows, a label next to a value.
 - **Grid**: layout defined in *two* directions, page scaffolding,
   card galleries, anything that lines up in rows *and* columns.
-
-<Figure
-  slug="web-css-grid-layout-fr-unit-inline-cutout"
-  alt="A frame divided by springs that share out the leftover space between them in fixed proportions"
-  caption="The `fr` unit shares out whatever space is left, in the proportions you set."
-/>
-
-<Figure
-  slug="web-css-grid-layout-inline-cutout"
-  alt="A frame ruled into rows and columns with three blocks laid across several cells each, and the unused cells left plainly visible"
-  caption="Grid rules the container into rows and columns, and items span the cells."
-/>
 
 They compose happily: a grid of cards where each card is a flex
 column is completely normal.

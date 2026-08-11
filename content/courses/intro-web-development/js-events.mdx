@@ -25,6 +25,12 @@ Read it as: *on this element, when a `"click"` happens, run this
 function.* The function is called an **event handler**, and it runs
 every time the event fires, once per click, forever.
 
+<Figure
+  slug="web-js-events-inline-cutout"
+  alt="A button being pressed on the left, a ripple travelling up through three nested frames, and a small listener bell ringing on the outermost one"
+  caption="An event fires at the element and travels up through its ancestors."
+/>
+
 Handlers receive an **event object** with details: which key was
 pressed, where the pointer was, and, critically for forms,
 `event.preventDefault()`, which cancels the browser's default
@@ -194,9 +200,3 @@ if (!/lights off/i.test(button.textContent || "")) {
 
 Events make the page react. Next, capturing structured input with
 [forms and validation](/courses/intro-web-development/js-forms-and-validation).
-
-<Figure
-  slug="web-js-events-inline-cutout"
-  alt="A button being pressed on the left, a ripple travelling up through three nested frames, and a small listener bell ringing on the outermost one"
-  caption="An event fires at the element and travels up through its ancestors."
-/>

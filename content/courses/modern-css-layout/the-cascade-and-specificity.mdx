@@ -23,6 +23,12 @@ To pick a winner, the browser checks, in order:
 3. **Source order**, if specificity ties, the rule that appears
    **last** wins.
 
+<Figure
+  slug="css-the-cascade-and-specificity-inline-cutout"
+  alt="Three coloured sheets falling onto one block in order, the last and most specific sheet sitting on top and deciding its final colour"
+  caption="When rules conflict, the most specific one wins, and source order breaks ties."
+/>
+
 Most day-to-day conflicts come down to #2 and #3.
 
 ## Specificity, counted
@@ -37,6 +43,12 @@ Specificity is a score with three buckets. Count the selectors:
 
 Compare bucket by bucket, left to right. An ID beats *any* number of
 classes; a class beats any number of element selectors.
+
+<Figure
+  slug="css-the-cascade-and-specificity-specificity-counted-inline-cutout"
+  alt="Three weights of clearly different sizes hung along one beam, the heaviest deciding which way it tips"
+  caption="An id outranks a class, which outranks a tag, whatever the order in the file."
+/>
 
 ```css
 p            { color: black; }   /* 0 ids, 0 classes, 1 element */
@@ -123,9 +135,9 @@ Two more forces you'll lean on constantly:
   padding, border) do *not* inherit.
 
 <Figure
-  slug="css-the-cascade-and-specificity-inline-cutout"
-  alt="Three coloured sheets falling onto one block in order, the last and most specific sheet sitting on top and deciding its final colour"
-  caption="When rules conflict, the most specific one wins, and source order breaks ties."
+  slug="css-the-cascade-and-specificity-source-order-inheritance-inline-cutout"
+  alt="A property set once at the top of a frame and picked up by everything nested inside it, one edge setting stopping at its own box"
+  caption="Inherited properties pass down the tree; a border stops at the box that set it."
 />
 
 The `.parent` below sets `color` and `font-family` once; the nested

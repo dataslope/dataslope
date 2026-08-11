@@ -88,6 +88,12 @@ column on its own. A **histogram** (via `displot()` with `kind="hist"`)
 turns one column of numbers into a shape, where values pile up, how spread
 out they are, whether there is more than one peak.
 
+<Figure
+  slug="sns-eda-capstone-step-2-one-variable-inline-cutout"
+  alt="A single row of marks tipped into a line of bins, settling into two humps rather than one"
+  caption="Two humps rather than one is the first sign that the column holds more than one group."
+/>
+
 Here is `body_mass_g`, the penguins' weight:
 
 <CodeBlock
@@ -188,6 +194,12 @@ and the other is a **number**, that is a job for `catplot()`. A
 **box plot** (`kind="box"`) summarizes each group's spread, the box is the
 middle 50%, the line is the median, the whiskers reach most of the rest,
 so you can line the groups up and compare centers and overlap at a glance.
+
+<Figure
+  slug="sns-eda-capstone-step-3-comparing-groups-inline-cutout"
+  alt="Three columns of marks standing side by side, each with a box drawn round its middle half"
+  caption="A box per category shows the middle half and makes the group differences comparable."
+/>
 
 Body mass by species:
 
@@ -295,6 +307,12 @@ Single variables and group comparisons are warm-ups. The richest questions
 in this dataset are about how two measurements move *together*. Back to the
 **scatter plot** (`relplot()`), now armed with what we know, color by
 species so the structure is unmistakable.
+
+<Figure
+  slug="sns-eda-capstone-step-4-relationships-between-inline-cutout"
+  alt="Three separate runs of marks that each slope upward, with one line drawn across the whole set sloping down"
+  caption="Every species trends upward, and pooling them produces a line that trends the other way."
+/>
 
 Flipper length against body mass:
 
@@ -413,6 +431,12 @@ columns there are not that many pairs, so why not look at *all of them at
 once?* A **pair plot** draws every numeric column against every other in a
 grid, with each variable's own distribution down the diagonal. It is the
 fastest way to scan an entire numeric dataset for structure.
+
+<Figure
+  slug="sns-eda-capstone-step-5-all-pairs-inline-cutout"
+  alt="A square grid of small patches, pale along the diagonal and deepening toward two opposite hues at opposite corners"
+  caption="A diverging palette pinned at zero keeps positive and negative correlations distinct."
+/>
 
 <CodeBlock
   adapter="python"
@@ -542,6 +566,12 @@ Exploration is for *you*; a final figure is for *someone else*. The last
 move of an EDA is to take the single most important thing you found and
 draw it so a reader gets it in seconds, with a **message-style title** that
 states the takeaway, not just the variable names.
+
+<Figure
+  slug="sns-eda-capstone-step-6-communicate-finding-inline-cutout"
+  alt="A plain scatter with one line, one note and one highlight added, the point now visible without hunting for it"
+  caption="The same data, but the reader no longer has to derive the point for themselves."
+/>
 
 Our cleanest finding was that the species separate by **bill shape**. Here
 is that scatter, dressed for an audience: a title that says what the chart

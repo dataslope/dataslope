@@ -24,6 +24,12 @@ Not a character, not a word, something in between:
   different tokens with different ids.
 * Numbers split unpredictably. `2026` might be one token or two.
 
+<Figure
+  slug="llm-tokens-token-inline-cutout"
+  alt="A paper ribbon cut into uneven chips, some holding a whole word and some only a fragment"
+  caption="A token may be a whole word or a fragment, and the model only sees the ids."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -65,9 +71,9 @@ recall facts *about* the spelling, which is a different and less
 reliable operation than looking.
 
 <Figure
-  slug="llm-tokens-token-inline-cutout"
-  alt="A paper ribbon cut into uneven chips, some holding a whole word and some only a fragment"
-  caption="A token may be a whole word or a fragment, and the model only sees the ids."
+  slug="llm-tokens-explains-inline-cutout"
+  alt="The same sentence cut into a few large pieces in one ink and into many small pieces in another"
+  caption="The same sentence costs more tokens in some languages than others, which is why prices differ."
 />
 
 ### Arithmetic being uneven

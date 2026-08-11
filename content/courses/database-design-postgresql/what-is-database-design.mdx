@@ -29,6 +29,12 @@ fixes one of her rows and misses the other. Run the block and look at
 the result: the database now claims, with complete confidence, that
 the same person has two different email addresses.
 
+<Figure
+  slug="db-what-is-database-design-watch-shortcut-go-inline-cutout"
+  alt="A cabinet built without its dividers, its contents slumped into one another"
+  caption="Skip the dividers and everything stored afterwards slumps into everything else."
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="An update anomaly in a flat table"
@@ -186,6 +192,12 @@ A schema can pass the first demo and still create long-term cost.`}
 Designers usually separate the work into three levels, and beginners
 often mix them together, so it is worth naming them once.
 
+<Figure
+  slug="db-what-is-database-design-three-levels-design-inline-cutout"
+  alt="The same store drawn three times, first as ideas on paper, then as a plan of tables, then as a built cabinet"
+  caption="Conceptual, logical, physical: the same store described three times, in three registers."
+/>
+
 **Conceptual design** names the important things in the real world,
 in close-to-plain language: customers place orders; orders contain
 products; borrowers take out loans on copies.
@@ -222,9 +234,9 @@ about stored facts. If the facts are cleanly modeled, the feature is
 small. If they are tangled, the feature becomes a rewrite.
 
 <Figure
-  slug="db-what-is-database-design-watch-shortcut-go-inline-cutout"
-  alt="A cabinet built without its dividers, its contents slumped into one another"
-  caption="Skip the dividers and everything stored afterwards slumps into everything else."
+  slug="db-what-is-database-design-schema-shapes-everything-built-inline-cutout"
+  alt="A base plate of fixed slots with a tall assembly rising from it, every piece above cut to the width of a slot"
+  caption="Application code hardens around the tables, so the schema decides what can be built on it."
 />
 
 Here is the cheerful version of that story. A product manager asks:

@@ -125,6 +125,12 @@ worth of other drivers' tickets**, eventually totaling over
 2019, by which point clearing his record had become a recurring
 chore.
 
+<Figure
+  slug="sql-working-with-null-null-escapes-into-real-inline-cutout"
+  alt="A parcel carrying a blank tag waved through every gate on a line while tagged parcels are stopped and checked"
+  caption="A missing value that every check waves through is how `NULL` reaches production."
+/>
+
 The bug at the heart of it is exactly the distinction this page is
 teaching: *the text `'NULL'`* is a known value, while *`NULL`* is
 the absence of one. Somewhere, a system blurred that line. After
@@ -156,6 +162,12 @@ ORDER BY
 text instead." It is the standard, clean way to handle missing
 values for display or calculation.
 
+<Figure
+  slug="sql-working-with-null-filling-nulls-coalesce-inline-cutout"
+  alt="A chute where an empty slot is topped up from a standby hopper before the run moves on"
+  caption="`COALESCE()` reads as use this, or that instead when the first one is missing."
+/>
+
 ## Why allow NULL at all?
 
 If `NULL` is so tricky, why have it? Because **"unknown" is a real
@@ -164,6 +176,12 @@ forcing in a fake `0` or `''` would *lie* about the data. `NULL`
 lets the database tell the truth: "we do not know." The strange
 behavior is the price of that honesty, and `IS NULL` plus
 `COALESCE()` make it manageable.
+
+<Figure
+  slug="sql-working-with-null-allow-null-at-all-inline-cutout"
+  alt="One slot on a rack left honestly empty beside a slot filled with a stand-in token that reads exactly like the real thing"
+  caption="Unknown is an honest state, and the fake stand-in value is the thing that actually lies."
+/>
 
 ```mermaid
 flowchart TD

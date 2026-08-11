@@ -29,6 +29,12 @@ primes[1]   // 3
 primes[4]   // 11
 ```
 
+<Figure
+  slug="c-arrays-declaring-indexing-inline-cutout"
+  alt="A strip of equal cells cut in one piece, a hand reaching straight past the first three to the fourth"
+  caption="Indexing jumps straight to a cell, and C never checks that the cell exists."
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -152,12 +158,6 @@ program may:
 This is called a **buffer overflow**, and it has been responsible for
 an astonishing fraction of all software security flaws since the
 1980s.
-
-<Figure
-  slug="c-arrays-declaring-indexing-inline-cutout"
-  alt="A strip of equal cells cut in one piece, a hand reaching straight past the first three to the fourth"
-  caption="Indexing jumps straight to a cell, and C never checks that the cell exists."
-/>
 
 <CodeBlock
   adapter="c"

@@ -37,6 +37,12 @@ memory for as long as the variable is alive.
 
 These three words sound similar but mean different things.
 
+<Figure
+  slug="cpp-variables-and-memory-declarations-vs-definitions-inline-cutout"
+  alt="An empty locker with a blank plate, the same locker with a block placed in it, and the block being swapped for another"
+  caption="Declaring names the slot, defining creates it, and assigning puts a value into it."
+/>
+
 | Code | What it does |
 | --- | --- |
 | `int x;` | **Definition.** Reserves memory; the value is *uninitialized* (garbage). |
@@ -85,6 +91,12 @@ Modern C++ tip: write `int x{};` (called **value initialization**)
 when you want a default zero. The empty braces are the safest way
 to ask for a sensible starting value.
 
+<Figure
+  slug="cpp-variables-and-memory-always-initialize-inline-cutout"
+  alt="An empty locker opened and read straight away, handing out whatever the last user happened to leave in it"
+  caption="An uninitialized local holds whatever was there before, and reading it is undefined behaviour."
+/>
+
 ## Types are promises about memory
 
 Every variable in C++ has a **type**. The type is *not* just a
@@ -97,6 +109,12 @@ label; it tells the compiler:
   compiler which interpretation to use.
 - **What operations are allowed.** You can add two `int`s. You
   can index into an `int*`. You cannot multiply two `std::string`s.
+
+<Figure
+  slug="cpp-variables-and-memory-types-promises-about-memory-inline-cutout"
+  alt="A socket cut to one exact profile with a stamped promise fixed beside it, checked before anything is set into it"
+  caption="A type fixes how many bytes, how the bits are read, and what may be done with them."
+/>
 
 ```mermaid
 flowchart LR
@@ -165,6 +183,12 @@ Modern C++ lets you write `auto` instead of spelling the type out,
 and the compiler will fill in the right type by looking at the
 initializer. This is handy for long type names.
 
+<Figure
+  slug="cpp-variables-and-memory-auto-let-compiler-infer-inline-cutout"
+  alt="A slot left unmarked on a bench, its shape taken directly from the part being placed into it"
+  caption="`auto` does not mean untyped; the compiler fills the type in from the initializer."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -197,6 +221,12 @@ A variable's **scope** is the region of source code where its name
 makes sense. The most common rule: a variable's scope starts at its
 declaration and ends at the closing `}` of the smallest enclosing
 block.
+
+<Figure
+  slug="cpp-variables-and-memory-scope-where-variable-visible-inline-cutout"
+  alt="A lamp lighting only the length of bench inside one bay, going dark the moment the bay ends"
+  caption="A name is visible from its declaration to the end of its block, and nowhere else."
+/>
 
 ```mermaid
 flowchart TB
@@ -241,9 +271,9 @@ Closely related to scope is **lifetime**: the period of time during
 *execution* when the variable's memory is valid.
 
 <Figure
-  slug="cpp-variables-and-memory-declarations-vs-definitions-inline-cutout"
-  alt="An empty locker with a blank plate, the same locker with a block placed in it, and the block being swapped for another"
-  caption="A variable is a named slot; its lifetime is how long that slot is valid."
+  slug="cpp-variables-and-memory-lifetime-variable-lives-dies-inline-cutout"
+  alt="A locker that opens as a line is reached and empties itself the moment the closing mark of its block goes past"
+  caption="A local variable is born at its declaration and dies at the closing brace of its block."
 />
 
 ```mermaid
@@ -280,6 +310,12 @@ If a "variable" is never supposed to change, mark it `const`. The
 compiler will enforce that, and you'll never have an accidental
 overwrite.
 
+<Figure
+  slug="cpp-variables-and-memory-const-variables-don-t-inline-cutout"
+  alt="Parts coming off the press already fixed, with only a few of them marked as adjustable"
+  caption="Declare everything `const` and take it off only what genuinely has to change."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -310,6 +346,12 @@ inspect them.
 C++ will sometimes silently convert one type to another. Most are
 harmless (`int` to `double`); some are dangerous (`double` to `int`
 truncates, `signed` to `unsigned` wraps).
+
+<Figure
+  slug="cpp-variables-and-memory-implicit-conversions-famous-footgun-inline-cutout"
+  alt="A wide part quietly shaved to fit a narrower slot, the shaving falling away unnoticed"
+  caption="A narrowing conversion happens quietly, and what falls off is not reported."
+/>
 
 <CodeBlock
   adapter="cpp"

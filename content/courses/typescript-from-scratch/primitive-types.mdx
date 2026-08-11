@@ -228,12 +228,6 @@ insight is this: **TypeScript's type system is more precise than "just a
 number", it can track the exact value when the code makes that
 guarantee.**
 
-<Figure
-  slug="tsx-primitive-types-seven-primitive-types-inline-cutout"
-  alt="Seven small blocks of clearly different kinds resting in their own moulded recesses"
-  caption="Seven primitives, each with its own set of values and its own operations."
-/>
-
 ## BigInt and Symbol
 
 Modern JavaScript (ES2020+) includes two more primitives: `bigint` for
@@ -288,7 +282,7 @@ type that accepts *any* value). At the very bottom sits `never` (the type
 with *no* values). Primitive types occupy the middle:
 
 ```mermaid
-graph TD
+graph LR
     unknown["unknown (top type)"]
     number["number"]
     string["string"]

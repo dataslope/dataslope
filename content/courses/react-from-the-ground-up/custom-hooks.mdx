@@ -71,12 +71,6 @@ The rules that make this work:
   linter) recognizes a hook.
 
 <Figure
-  slug="rx-custom-hooks-hooks-can-use-inline-cutout"
-  alt="A reusable module clipped into a panel with its own small cord running out to a drum"
-  caption="A custom hook is an ordinary function that calls the built-in hooks."
-/>
-
-<Figure
   slug="rx-custom-hooks-inline-cutout"
   alt="A small reusable module unclipped from one panel and clipped into two others, each panel then behaving the same way"
   caption="Lift the shared logic into a hook and every component gets the same behaviour."
@@ -126,6 +120,12 @@ function useNow(): Date {
 }
 // In a component: const now = useNow();
 ```
+
+<Figure
+  slug="rx-custom-hooks-hooks-can-use-inline-cutout"
+  alt="A reusable module clipped into a panel with its own small cord running out to a drum"
+  caption="A custom hook is an ordinary function that calls the built-in hooks."
+/>
 
 Here's a `useInterval` hook powering a live stopwatch. The hook hides
 the interval bookkeeping (and the ref trick that keeps the callback

@@ -3,9 +3,9 @@ title: Complexity Analysis
 description: Understand Big-O, Big-Omega, Big-Theta, amortized analysis, and common performance pitfalls
 ---
 
-Here is an uncomfortable fact: a fast computer cannot save a slow algorithm. Buy a machine ten times faster and an O(n²) program handles only about three times more data in the same time. Meanwhile an O(n log n) program on the *old* machine happily processes inputs the quadratic one will never finish. When inputs grow, the *shape* of the growth curve beats raw hardware every time.
+Here is an uncomfortable fact: a fast computer cannot save a slow algorithm. Buy a machine ten times faster and an $O(n^2)$ program handles only about three times more data in the same time. Meanwhile an $O(n \log n)$ program on the *old* machine happily processes inputs the quadratic one will never finish. When inputs grow, the *shape* of the growth curve beats raw hardware every time.
 
-This page gives you the vocabulary for talking about those shapes. The notation itself is older than computers: the big-O symbol comes from nineteenth-century number theory, Paul Bachmann introduced it in 1894 and Edmund Landau popularized it, and Donald Knuth later championed it as the standard language for analyzing programs. Mathematicians needed a way to say "grows like n², give or take a constant," and it turned out programmers needed exactly the same sentence.
+This page gives you the vocabulary for talking about those shapes. The notation itself is older than computers: the big-O symbol comes from nineteenth-century number theory, Paul Bachmann introduced it in 1894 and Edmund Landau popularized it, and Donald Knuth later championed it as the standard language for analyzing programs. Mathematicians needed a way to say "grows like $n^2$, give or take a constant," and it turned out programmers needed exactly the same sentence.
 
 <Figure
   slug="dsa-complexity-cutout"
@@ -14,7 +14,13 @@ This page gives you the vocabulary for talking about those shapes. The notation 
 
 ## Why we care
 
-On ten items, almost any correct solution feels instant. On ten million items, an O(n^2) loop can be impossible while an O(n log n) solution still finishes. The program below makes the gap concrete: watch how the `quadratic` column races away from the `linear` one as `n` grows by factors of ten.
+On ten items, almost any correct solution feels instant. On ten million items, an $O(n^2)$ loop can be impossible while an $O(n \log n)$ solution still finishes. The program below makes the gap concrete: watch how the `quadratic` column races away from the `linear` one as `n` grows by factors of ten.
+
+<Figure
+  slug="dsa-complexity-analysis-we-care-inline-cutout"
+  alt="Two ramps from one start, a cart near the top of the gentle one and barely moved on the steep one"
+  caption="Complexity is about how the cost grows, not how fast one run is."
+/>
 
 <CodeBlock
   adapter="cpp"
@@ -42,12 +48,6 @@ Big-O ignores machine speed and focuses on how work changes as input size grows.
 ## Big-O, Big-Ω, and Big-Θ
 
 Let `f(n)` be the work your algorithm does and `g(n)` be a comparison function such as `n`, `n log n`, or `n^2`.
-
-<Figure
-  slug="dsa-complexity-analysis-we-care-inline-cutout"
-  alt="Two ramps from one start, a cart near the top of the gentle one and barely moved on the steep one"
-  caption="Complexity is about how the cost grows, not how fast one run is."
-/>
 
 | Notation | Meaning | Intuition |
 | --- | --- | --- |
@@ -84,26 +84,26 @@ int main() {
   ]}
 />
 
-`sum` is Θ(n), not just *at most* linear but *exactly* linear, because it cannot answer without inspecting every element. When you can prove both bounds, Θ is the honest claim; in casual conversation programmers say "O(n)" and usually mean Θ(n).
+`sum` is $\Theta(n)$, not just *at most* linear but *exactly* linear, because it cannot answer without inspecting every element. When you can prove both bounds, Θ is the honest claim; in casual conversation programmers say "$O(n)$" and usually mean $\Theta(n)$.
 
 ## Growth rates hierarchy
 
-From slowest- to fastest-growing: **O(1) → O(log n) → O(sqrt n) → O(n) → O(n log n) → O(n^2) → O(2^n) → O(n!)**.
+From slowest- to fastest-growing: **$O(1)$ → $O(\log n)$ → $O(\sqrt{n})$ → $O(n)$ → $O(n \log n)$ → $O(n^2)$ → $O(2^n)$ → $O(n!)$**.
 
 <Chart slug="big-o-growth" />
 
 | Complexity | Example |
 | --- | --- |
-| O(1) | Read `v[0]` |
-| O(log n) | Binary search |
-| O(sqrt n) | Trial division up to `sqrt(n)` |
-| O(n) | Scan a vector |
-| O(n log n) | Comparison sorting |
-| O(n^2) | Check every pair |
-| O(2^n) | Try every subset |
-| O(n!) | Try every permutation |
+| $O(1)$ | Read `v[0]` |
+| $O(\log n)$ | Binary search |
+| $O(\sqrt{n})$ | Trial division up to `sqrt(n)` |
+| $O(n)$ | Scan a vector |
+| $O(n \log n)$ | Comparison sorting |
+| $O(n^2)$ | Check every pair |
+| $O(2^n)$ | Try every subset |
+| $O(n!)$ | Try every permutation |
 
-The gaps between rows are not gentle. At n = 1,000,000: log n is about 20, n log n is about 20 million (fine), n² is a *trillion* (minutes to hours), and 2^n is a number with more digits than there are atoms in the observable universe. The bottom rows of this table are not "slower", they are walls.
+The gaps between rows are not gentle. At n = 1,000,000: $\log n$ is about 20, $n \log n$ is about 20 million (fine), $n^2$ is a *trillion* (minutes to hours), and $2^n$ is a number with more digits than there are atoms in the observable universe. The bottom rows of this table are not "slower", they are walls.
 
 You can also feel linear growth directly. The timing loop below runs the same simple accumulation at three sizes; each tenfold input increase should cost roughly tenfold time.
 
@@ -138,7 +138,7 @@ Timing small programs is noisy, especially in a browser sandbox, but measurement
 
 ## Reading complexity off the code
 
-With practice you can read growth rates straight from a function's shape. A single loop over `n` items is usually O(n). A nested loop over all pairs is usually O(n²), more precisely, the inner body runs `n(n-1)/2` times, and the constant `1/2` gets absorbed by the notation. A loop whose variable *halves* each iteration (`n`, `n/2`, `n/4`, …) runs O(log n) times; that is exactly why binary search, which discards half of the remaining candidates per comparison, is O(log n).
+With practice you can read growth rates straight from a function's shape. A single loop over `n` items is usually $O(n)$. A nested loop over all pairs is usually $O(n^2)$, more precisely, the inner body runs `n(n-1)/2` times, and the constant `1/2` gets absorbed by the notation. A loop whose variable *halves* each iteration (`n`, `n/2`, `n/4`, …) runs $O(\log n)$ times; that is exactly why binary search, which discards half of the remaining candidates per comparison, is $O(\log n)$.
 
 <Figure
   slug="dsa-complexity-analysis-inline-cutout"
@@ -146,7 +146,7 @@ With practice you can read growth rates straight from a function's shape. A sing
   caption="The steeper curve overtakes the gentler one, whatever the constants."
 />
 
-Two patterns to be suspicious of: a loop that *looks* single but hides an O(n) operation in its body (like `v.erase(v.begin())` or substring copies), and recursion, for recursive functions, count the total number of calls, not the lines of code. Both pitfalls will come up again, by name, in the sorting and recursion chapters.
+Two patterns to be suspicious of: a loop that *looks* single but hides an $O(n)$ operation in its body (like `v.erase(v.begin())` or substring copies), and recursion, for recursive functions, count the total number of calls, not the lines of code. Both pitfalls will come up again, by name, in the sorting and recursion chapters.
 
 ## Amortized analysis
 
@@ -158,11 +158,11 @@ Now for the subtlest idea on this page, and one of the most useful, because it e
   caption="Big-O bounds from above, Big-Omega from below, Big-Theta from both."
 />
 
-Some operations are occasionally expensive but cheap on average over a sequence. `std::vector::push_back` is the classic example: most pushes write one element into spare capacity, but when capacity runs out, the vector must allocate a larger array and move *every existing element* into it. That one push is O(n). So how can anyone call `push_back()` "O(1)"?
+Some operations are occasionally expensive but cheap on average over a sequence. `std::vector::push_back` is the classic example: most pushes write one element into spare capacity, but when capacity runs out, the vector must allocate a larger array and move *every existing element* into it. That one push is $O(n)$. So how can anyone call `push_back()` "$O(1)$"?
 
-Think of it like a savings account. Suppose every push deposits three imaginary coins: one pays for writing the element itself, and two go into savings. When the vector doubles from capacity `k` to `2k`, it must move `k` elements, but the `k/2` pushes since the *last* doubling have saved up `k` coins between them, exactly enough to pay for the move. No push is ever billed more than three coins, so over any sequence of `n` pushes the total work is O(n), and each push is O(1) **amortized**.
+Think of it like a savings account. Suppose every push deposits three imaginary coins: one pays for writing the element itself, and two go into savings. When the vector doubles from capacity `k` to `2k`, it must move `k` elements, but the `k/2` pushes since the *last* doubling have saved up `k` coins between them, exactly enough to pay for the move. No push is ever billed more than three coins, so over any sequence of `n` pushes the total work is $O(n)$, and each push is $O(1)$ **amortized**.
 
-The crucial ingredient is *doubling*. If the vector instead grew by a fixed amount, say, 10 slots at a time, the savings would never keep up, and `n` pushes would cost O(n²) total. Geometric growth is what makes the bill come out constant.
+The crucial ingredient is *doubling*. If the vector instead grew by a fixed amount, say, 10 slots at a time, the savings would never keep up, and `n` pushes would cost $O(n^2)$ total. Geometric growth is what makes the bill come out constant.
 
 ```mermaid
 flowchart TD
@@ -203,11 +203,11 @@ Notice the capacities roughly doubling (the exact sequence is implementation-def
 
 ## Common pitfalls
 
-**Ignoring constants:** O(100n) and O(n) are the same asymptotic class, but constants can matter for realistic inputs.
+**Ignoring constants:** $O(100n)$ and $O(n)$ are the same asymptotic class, but constants can matter for realistic inputs.
 
-**Over-emphasizing constants:** if `n` can become large, an O(n^2) design usually loses to O(n log n), even when the quadratic code is short.
+**Over-emphasizing constants:** if `n` can become large, an $O(n^2)$ design usually loses to $O(n \log n)$, even when the quadratic code is short.
 
-**Confusing worst, average, and best case:** linear search is O(1) in the best case when the first item matches, but O(n) in the worst case when the item is last or missing.
+**Confusing worst, average, and best case:** linear search is $O(1)$ in the best case when the first item matches, but $O(n)$ in the worst case when the item is last or missing.
 
 <Callout type="warn" title="Best case is rarely enough">
 When a problem asks for complexity, state which case you mean. Interviews and algorithm textbooks often default to worst-case unless otherwise specified.
@@ -315,52 +315,52 @@ int main() {
 ## Test your knowledge
 
 <MultipleChoice
-  markdown={`Which complexity grows more slowly for large \`n\`: O(n log n) or O(n^2)?
+  markdown={`Which complexity grows more slowly for large \`n\`: $O(n \\log n)$ or $O(n^2)$?
 
 - It depends only on the programming language
   > Language affects constants, not the asymptotic comparison.
 - They are the same because both contain \`n\`
   > The extra factors matter.
-- O(n^2) is asymptotically faster
+- $O(n^2)$ is asymptotically faster
   > Quadratic growth eventually dominates \`n log n\`.
-- [o] O(n log n) grows more slowly
+- [o] $O(n \\log n)$ grows more slowly
   > \`n log n\` grows more slowly than \`n^2\` as \`n\` becomes large.`}
 />
 
 <MultipleChoice
   markdown={`What is the time complexity of binary search on a sorted array of length \`n\`?
 
-- O(n)
+- $O(n)$
   > That describes a linear scan.
-- O(1)
+- $O(1)$
   > It usually takes more than one comparison.
-- [o] O(log n)
+- [o] $O(\\log n)$
   > Each comparison halves the remaining search space.
-- O(n^2)
+- $O(n^2)$
   > Binary search has no nested scan over pairs.`}
 />
 
 <MultipleChoice
-  markdown={`What does amortized O(1) mean for \`std::vector::push_back\`?
+  markdown={`What does amortized $O(1)$ mean for \`std::vector::push_back\`?
 
-- Every call is worst-case O(1), even when the vector reallocates
-  > Reallocation can move existing elements, so one call can be O(n).
+- Every call is worst-case $O(1)$, even when the vector reallocates
+  > Reallocation can move existing elements, so one call can be $O(n)$.
 - Every single call always performs exactly one machine instruction
   > Individual calls vary, and complexity is not measured in exact instructions.
-- It means pushing is O(log n) but written differently
-  > Amortized O(1) and O(log n) are different claims.
+- It means pushing is $O(\\log n)$ but written differently
+  > Amortized $O(1)$ and $O(\\log n)$ are different claims.
 - [o] A sequence of many pushes has constant average cost per push, even though occasional pushes are expensive
   > Reallocations are spread across many cheap insertions.`}
 />
 
 <MultipleChoice
-  markdown={`For a fixed input size \`n = 10\`, is an O(n!) algorithm always slower than an O(2^n) algorithm?
+  markdown={`For a fixed input size \`n = 10\`, is an $O(n!)$ algorithm always slower than an $O(2^n)$ algorithm?
 
 - [o] No; asymptotic notation describes growth, and constants/implementation details can dominate at one fixed input size
-  > O(n!) grows faster eventually, but Big-O alone does not guarantee runtime for one fixed small input.
+  > $O(n!)$ grows faster eventually, but Big-O alone does not guarantee runtime for one fixed small input.
 - Yes; Big-O rankings give exact runtime order at \`n = 10\`
   > Big-O rankings describe eventual growth, not exact runtime order for one fixed input size.
-- No; O(n!) is always faster than O(2^n)
+- No; $O(n!)$ is always faster than $O(2^n)$
   > Factorial growth eventually exceeds exponential growth.
 - Yes; Big-O gives exact runtimes for every \`n\`
   > Big-O is not an exact stopwatch.`}

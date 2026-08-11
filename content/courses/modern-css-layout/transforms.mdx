@@ -153,6 +153,12 @@ The `transition` here just smooths the transform; animating transforms
 in depth (timing curves, keyframes, reduced motion) is the subject of
 the transitions lesson.
 
+<Figure
+  slug="css-transforms-hover-interaction-inline-cutout"
+  alt="A flat card tilting up on one edge as a hand passes over it, its footprint on the page unchanged"
+  caption="A transform moves the paint, not the layout, so nothing around it shifts."
+/>
+
 <Callout type="info" title="Why transforms feel smooth">
 Changing `top` or `margin` forces the browser to recompute layout for
 the page. A `transform` does not; it only repaints the one element,

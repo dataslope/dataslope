@@ -23,6 +23,12 @@ every line in order. Don't. The author wrote the code that way
 because *that's the order the compiler needs*, not the order a
 reader needs.
 
+<Figure
+  slug="c-reading-code-read-top-down-inline-cutout"
+  alt="A figure walking a bench from one end to the other, then walking the same bench again more slowly"
+  caption="Read once for the shape, then again slowly for the details."
+/>
+
 A better order:
 
 1. **What does the file *do*?** Read the file's top-level comment
@@ -54,6 +60,12 @@ You instantly know: `head` is presumably a `Node *` (a list), and
 the result is a `Node *` (or `NULL`). Half the structure of the
 program is encoded in the types.
 
+<Figure
+  slug="c-reading-code-follow-types-inline-cutout"
+  alt="A trail of shaped tags leading from a part in use back to the bench where that part was first cut"
+  caption="A type leads back to its declaration, and the declaration is where the meaning is."
+/>
+
 Tools like `ctags`, `clangd`-aware editors, and IDE "go to
 definition" let you jump from a use to the declaration. **Use
 them**. Reading C without the ability to jump to definitions is
@@ -63,6 +75,12 @@ reading C with one hand tied.
 
 C is small. The same idioms recur. Recognizing them on sight is
 half of fluent reading.
+
+<Figure
+  slug="c-reading-code-identify-common-patterns-inline-cutout"
+  alt="A reader meeting the same shape of assembly for the fourth time and reaching straight past it"
+  caption="Reading speed is mostly a library of shapes you have already seen."
+/>
 
 ### The traversal loop
 
@@ -188,6 +206,12 @@ When you read unfamiliar code, give yourself permission to rewrite
 it on paper or in comments, to *make* it readable, even if the
 author didn't.
 
+<Figure
+  slug="c-reading-code-make-code-obvious-yourself-inline-cutout"
+  alt="A borrowed drawing gone over in a second ink, the same shapes now readable at a glance by the person holding it"
+  caption="Renaming and reformatting somebody else's code for your own reading is not vandalism."
+/>
+
 - Add explanatory comments as you read. (Remove or keep them
   depending on whether you'll commit your changes.)
 - Rename ambiguous local variables in a copy of the file.
@@ -211,6 +235,12 @@ When reading unknown C, be alert for:
   in subtle ways.
 - **Comments that contradict the code**, believe the code; the
   comment is probably out of date.
+
+<Figure
+  slug="c-reading-code-worked-example-inline-cutout"
+  alt="A shaped card held up beside a sealed machine, the card's cut-outs alone showing which way parts go in and come out"
+  caption="The signature is the part that cannot go stale, unlike the comment above it."
+/>
 
 Train your eye to flag these in passing. They are the C equivalent
 of "spelling mistakes you can't help noticing".
@@ -252,12 +282,6 @@ int main(int argc, char **argv) {
 
 Before reading on, write a one-sentence summary of what this program
 does.
-
-<Figure
-  slug="c-reading-code-read-top-down-inline-cutout"
-  alt="A figure walking a bench from one end to the other, then walking the same bench again more slowly"
-  caption="Read once for the shape, then again slowly for the details."
-/>
 
 ...
 

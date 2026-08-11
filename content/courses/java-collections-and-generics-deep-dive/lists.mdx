@@ -98,11 +98,11 @@ That single picture explains every `ArrayList` performance fact:
 
 | Operation | Cost | Why |
 | --- | --- | --- |
-| `get(i)`, `set(i, e)` | `O(1)` | Pointer arithmetic into the array |
-| `add(e)` (append) | `O(1)` *amortized* | One slot fill; occasionally double-and-copy |
-| `add(i, e)` (insert middle) | `O(n)` | Shift everything after `i` |
-| `remove(i)` | `O(n)` | Shift everything after `i` |
-| `contains(x)`, `indexOf(x)` | `O(n)` | Linear scan |
+| `get(i)`, `set(i, e)` | $O(1)$ | Pointer arithmetic into the array |
+| `add(e)` (append) | $O(1)$ *amortized* | One slot fill; occasionally double-and-copy |
+| `add(i, e)` (insert middle) | $O(n)$ | Shift everything after `i` |
+| `remove(i)` | $O(n)$ | Shift everything after `i` |
+| `contains(x)`, `indexOf(x)` | $O(n)$ | Linear scan |
 
 ## LinkedList: a doubly-linked node chain
 
@@ -119,14 +119,14 @@ flowchart TD
 
 | Operation | Cost | Why |
 | --- | --- | --- |
-| `get(i)`, `set(i, e)` | `O(n)` | Walk from head or tail |
-| `add(e)` (append) | `O(1)` | Wire one new node onto the tail |
-| `add(0, e)` (prepend) | `O(1)` | Wire one new node onto the head |
-| `addFirst` / `addLast` (via `Deque`) | `O(1)` | Same |
-| `remove()` at a node you already hold | `O(1)` | Re-wire pointers |
-| `contains(x)`, `indexOf(x)` | `O(n)` | Linear scan |
+| `get(i)`, `set(i, e)` | $O(n)$ | Walk from head or tail |
+| `add(e)` (append) | $O(1)$ | Wire one new node onto the tail |
+| `add(0, e)` (prepend) | $O(1)$ | Wire one new node onto the head |
+| `addFirst` / `addLast` (via `Deque`) | $O(1)$ | Same |
+| `remove()` at a node you already hold | $O(1)$ | Re-wire pointers |
+| `contains(x)`, `indexOf(x)` | $O(n)$ | Linear scan |
 
-So `LinkedList` is `O(1)` at the *ends* and `O(n)` in the *middle*. It
+So `LinkedList` is $O(1)$ at the *ends* and $O(n)$ in the *middle*. It
 also implements `Deque<E>`, which is where most of its modern use
 comes from.
 
@@ -147,7 +147,7 @@ The cases where `LinkedList` still wins:
 
 - You are doing many `addFirst` / `removeFirst` and need an *equal*
   guarantee, but `ArrayDeque` is almost always better for this.
-- You have an explicit reference to a node and need `O(1)`
+- You have an explicit reference to a node and need $O(1)$
   removal, but Java's `LinkedList` API doesn't expose nodes.
 
 In modern Java code, `LinkedList` shows up much less often than you
@@ -436,16 +436,16 @@ public class RecentHistory<E> {
 ## Test your understanding
 
 <MultipleChoice
-  markdown={`Which operation is \`O(1)\` on \`ArrayList\` but \`O(n)\` on \`LinkedList\`?
+  markdown={`Which operation is $O(1)$ on \`ArrayList\` but $O(n)$ on \`LinkedList\`?
 
 - Appending at the end
-  > Both are \`O(1)\` amortized at the end.
+  > Both are $O(1)$ amortized at the end.
 - \`contains(x)\`
-  > Both are \`O(n)\`, they scan.
+  > Both are $O(n)$, they scan.
 - [o] \`get(i)\` for arbitrary \`i\`
   > An \`ArrayList\` indexes by arithmetic; a \`LinkedList\` must walk.
 - Removing the first element
-  > That's actually faster on \`LinkedList\` (\`O(1)\`) than \`ArrayList\` (\`O(n)\`).`}
+  > That's actually faster on \`LinkedList\` ($O(1)$) than \`ArrayList\` ($O(n)$).`}
 />
 
 <MultipleChoice

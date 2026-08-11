@@ -16,6 +16,12 @@ Every snippet on this page runs in your browser, no setup required.
 
 Conditionals are not just syntax, they are the logical heart of every program. A web server routes requests with `if method == "GET"`. A data pipeline filters invalid rows with `if is_valid(row)`. A game checks `if player.health <= 0`. You write conditionals hundreds of times a day. Mastering them means writing clear, correct, maintainable logic.
 
+<Figure
+  slug="python-control-flow-real-world-impact-inline-cutout"
+  alt="A rail with points and a loop, carts routed differently at each pass"
+  caption="Control flow is points and loops: each value gets routed by the test it meets."
+/>
+
 ```mermaid
 flowchart TD
     A[Start] --> B{"<code>score &gt;= 90</code>?"}
@@ -239,12 +245,6 @@ print(f"Grade: {'pass' if score >= 60 else 'fail'}")
 />
 
 This reads naturally: "pick X if condition, else pick Y." It combines nicely with f-strings and comprehensions.
-
-<Figure
-  slug="python-control-flow-real-world-impact-inline-cutout"
-  alt="A rail with points and a loop, carts routed differently at each pass"
-  caption="Control flow is points and loops: each value gets routed by the test it meets."
-/>
 
 <Callout type="warn">
 The conditional expression requires **both** the `if` and `else` parts. You cannot write `x if condition` without an `else`. If you only need the `if`, write a full `if` statement instead.

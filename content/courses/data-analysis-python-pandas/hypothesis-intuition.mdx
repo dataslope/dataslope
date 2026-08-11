@@ -18,18 +18,6 @@ every analyst eventually faces:
   celebrating?"
 - "Two variables look correlated. Could it be coincidence?"
 
-<Figure
-  slug="pandas-hypothesis-intuition-core-question-noise-inline-cutout"
-  alt="A wavering line with a faint steady rise drawn through it, the rise only visible once the wobble is set aside"
-  caption="The real question is whether a signal survives once the wobble is set aside."
-/>
-
-<Figure
-  slug="pandas-hypothesis-intuition-inline-cutout"
-  alt="A written guess pinned to a board with evidence chips stacking beneath it until the pin bends"
-  caption="A hypothesis stands until enough evidence stacks up against it."
-/>
-
 This page introduces the *intuition* behind hypothesis-style
 reasoning, without diving deep into formal tests. (Those are
 the subject of a dedicated statistics course.)
@@ -48,6 +36,12 @@ flowchart TD
 ```
 
 The whole craft is in answering that "?".
+
+<Figure
+  slug="pandas-hypothesis-intuition-core-question-noise-inline-cutout"
+  alt="A wavering line with a faint steady rise drawn through it, the rise only visible once the wobble is set aside"
+  caption="The real question is whether a signal survives once the wobble is set aside."
+/>
 
 Noise alone produces runs, dips and what look like trends, which is why
 "the line went up" is not evidence of anything on its own:
@@ -203,6 +197,12 @@ for n in [10, 50, 500, 5000]:
 A real-but-tiny difference of 0.5 looks like nothing at small
 sample sizes and becomes statistically significant with enough
 data. **Significance is not the same as importance.**
+
+<Figure
+  slug="pandas-hypothesis-intuition-inline-cutout"
+  alt="A written guess pinned to a board with evidence chips stacking beneath it until the pin bends"
+  caption="A hypothesis stands until enough evidence stacks up against it."
+/>
 
 Precision improves with the square root of n, so the returns fall away fast:
 quadrupling the sample halves the error bar, and the fifth thousand rows buy

@@ -20,12 +20,6 @@ This page is a catalog of those traps. For each one: **what the trap is**,
 to it whenever a result looks too good to be true, because that feeling is
 usually right.
 
-<Figure
-  slug="ml-common-pitfalls-and-misconceptions-data-leakage-inline-cutout"
-  alt="A sealed test crate with a small pipe running into it from the training bench, a chip travelling along the pipe"
-  caption="Leakage is any pipe that carries test information back into training."
-/>
-
 ```mermaid
 flowchart TD
     A["A result that looks<br/>too good to be true"] --> B{"Did you peek<br/>at the test set?"}
@@ -43,6 +37,12 @@ flowchart TD
 sneaks into training, so the model "knows" things it could never really
 know. The two most common forms are *preprocessing before the split* and
 *target leakage*.
+
+<Figure
+  slug="ml-common-pitfalls-and-misconceptions-data-leakage-inline-cutout"
+  alt="A sealed test crate with a small pipe running into it from the training bench, a chip travelling along the pipe"
+  caption="Leakage is any pipe that carries test information back into training."
+/>
 
 **Why it fools people.** Leakage produces spectacular validation and even
 test scores, that is its signature. Everything looks like a triumph. The

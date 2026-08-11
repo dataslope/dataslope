@@ -23,6 +23,12 @@ the time you reach line 400, even you have forgotten what lines
 100-200 do. The fix is to give each chunk a *name*, a method, and
 *call* the method from `main`.
 
+<Figure
+  slug="java-methods-and-modularity-methods-exist-inline-cutout"
+  alt="The same three actions repeated on four benches, then boxed into one machine used four times"
+  caption="Repeated steps become one method you can call wherever you need it."
+/>
+
 A well-designed Java program reads, at the top level, like a
 **story**: short sentences, each delegating to a method whose name
 makes its intent obvious.
@@ -232,12 +238,6 @@ This trips up nearly every Java beginner once. Take it slowly.
 Java lets you have multiple methods with the same name, as long as
 their **parameter lists** differ. The compiler picks the right one
 based on the argument types.
-
-<Figure
-  slug="java-methods-and-modularity-methods-exist-inline-cutout"
-  alt="The same three actions repeated on four benches, then boxed into one machine used four times"
-  caption="Repeated steps become one method you can call wherever you need it."
-/>
 
 <CodeBlock
   adapter="java"

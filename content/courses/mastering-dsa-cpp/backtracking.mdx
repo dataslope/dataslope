@@ -41,6 +41,12 @@ sequenceDiagram
 
 The cleanest first example: print every ordering of `{1, 2, 3}`. The choice at position `idx` is "which remaining element goes here?", implemented as a swap; the un-choose is the swap back. Watch the symmetry in the code, `swap`, recurse, `swap`, that is the template in its purest form. (There are n! permutations, so this is inherently factorial work; backtracking doesn't make exponential spaces small, it just avoids exploring them redundantly.)
 
+<Figure
+  slug="dsa-backtracking-permutations-inline-cutout"
+  alt="A branching frame where every branch orders the same three blocks differently"
+  caption="Each branch fixes one more position, so the leaves are all the orderings."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -73,7 +79,7 @@ int main() {
 
 ## Subsets
 
-For subsets, each element poses a yes/no question, in or out?, giving 2^n subsets. The recursion below makes both choices for each element: recurse without it, then push it, recurse with it, and pop it (the un-choose). The driver prints each subset's size; modify it to print the contents if you want to see the order they appear in.
+For subsets, each element poses a yes/no question, in or out?, giving $2^n$ subsets. The recursion below makes both choices for each element: recurse without it, then push it, recurse with it, and pop it (the un-choose). The driver prints each subset's size; modify it to print the contents if you want to see the order they appear in.
 
 <Figure
   slug="dsa-backtracking-subsets-inline-cutout"
@@ -108,7 +114,7 @@ int main() {
   ]}
 />
 
-For subsets specifically there is also a non-recursive route worth knowing: count from 0 to 2^n − 1 and read each number's bits as the in/out decisions. Mask `5` is binary `101`, elements 0 and 2 in, element 1 out. Deterministic order, no recursion, and a handy trick whenever n ≤ 20 or so.
+For subsets specifically there is also a non-recursive route worth knowing: count from 0 to $2^n$ − 1 and read each number's bits as the in/out decisions. Mask `5` is binary `101`, elements 0 and 2 in, element 1 out. Deterministic order, no recursion, and a handy trick whenever n ≤ 20 or so.
 
 <CodeBlock
   adapter="cpp"
@@ -237,12 +243,6 @@ int main() {
 ## Word search
 
 Backtracking on a grid: does the word `ABCCED` appear as a path of adjacent cells, each cell used at most once? The choose step marks the current cell with a sentinel `'#'` so the path cannot revisit it; the un-choose restores the original letter. That restoration is essential, a cell that failed for *this* path may be exactly what a *different* path needs later.
-
-<Figure
-  slug="dsa-backtracking-permutations-inline-cutout"
-  alt="A branching frame where every branch orders the same three blocks differently"
-  caption="Each branch fixes one more position, so the leaves are all the orderings."
-/>
 
 <CodeBlock
   adapter="cpp"

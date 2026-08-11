@@ -50,6 +50,12 @@ Plus one helper: `group_by()`, which makes `summarise()`,
 `mutate()`, and friends operate **per group**. We'll meet that
 properly on the next page.
 
+<Figure
+  slug="rlang-dplyr-verbs-inline-cutout"
+  alt="Five small hand tools hanging in a row above a bench, each one shown taking a different bite out of the same board"
+  caption="Each verb takes one kind of bite: rows, columns, order, new columns, summaries."
+/>
+
 Each verb reshapes the data frame a little:
 **`filter()` (fewer rows) → `select()` (fewer columns) → `mutate()`
 (new columns) → `arrange()` (rows reordered) → `summarise()`
@@ -305,12 +311,6 @@ cars, compute a power-to-weight ratio, select these five columns,
 sort by power-to-weight descending, and show me the top 10."* Five
 verbs, one sentence.
 
-<Figure
-  slug="rlang-dplyr-verbs-five-core-verbs-inline-cutout"
-  alt="Five hand tools hanging above a bench, each taking a different bite out of the same board"
-  caption="Five verbs, chained by the pipe, read as one sentence about the data."
-/>
-
 ## Test your understanding
 
 <MultipleChoice
@@ -415,9 +415,3 @@ print(top_eff)
 
 `summarise()` becomes spectacularly useful when paired with
 `group_by()`. That's the next page.
-
-<Figure
-  slug="rlang-dplyr-verbs-inline-cutout"
-  alt="Five small hand tools hanging in a row above a bench, each one shown taking a different bite out of the same board"
-  caption="Each verb takes one kind of bite: rows, columns, order, new columns, summaries."
-/>

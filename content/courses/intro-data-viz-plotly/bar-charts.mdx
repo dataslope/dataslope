@@ -16,12 +16,6 @@ accurate encoding the human eye has access to.
 That accuracy holds however many bars you draw, which is exactly the trap: the
 encoding stays perfect long after the chart has stopped being readable.
 
-<Figure
-  slug="viz-bar-charts-inline-cutout"
-  alt="A row of standing blocks of different heights on a common base rail, with one flat rule laid across their tops to compare them"
-  caption="Bars share a baseline, so the eye compares their lengths precisely."
-/>
-
 <Chart slug="too-many-bars" />
 
 ## When to reach for a bar chart
@@ -175,6 +169,12 @@ bottom.
 
 When each "category" also has a *sub-category*, use **grouped bars**
 with `color="..."` and `barmode="group"`.
+
+<Figure
+  slug="viz-bar-charts-inline-cutout"
+  alt="A row of standing blocks of different heights on a common base rail, with one flat rule laid across their tops to compare them"
+  caption="Bars share a baseline, so the eye compares their lengths precisely."
+/>
 
 <CodeBlock
   adapter="python"

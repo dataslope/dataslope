@@ -41,6 +41,12 @@ flowchart LR
 Constants matter: SVD is roughly 6× the cost of LU. Reach for the
 cheapest factorization that solves your problem.
 
+<Figure
+  slug="scipy-matrix-decompositions-five-factorizations-at-inline-cutout"
+  alt="One solid block shown separated five different ways along a bench"
+  caption="Five ways to take a matrix apart, each answering a different question."
+/>
+
 ## LU decomposition
 
 LU factors $A$ into a lower-triangular $L$ and upper-triangular $U$
@@ -191,12 +197,6 @@ SVD writes *any* $m \times n$ matrix as $A = U \Sigma V^T$ where
 $U$ ($m \times m$) and $V$ ($n \times n$) are orthogonal and
 $\Sigma$ is a non-negative diagonal of **singular values**. This
 is the most informative factorization in numerical analysis.
-
-<Figure
-  slug="scipy-matrix-decompositions-five-factorizations-at-inline-cutout"
-  alt="One solid block shown separated five different ways along a bench"
-  caption="Five ways to take a matrix apart, each answering a different question."
-/>
 
 The singular values $\sigma_1 \ge \sigma_2 \ge \cdots$ tell you:
 
@@ -389,7 +389,7 @@ route.
 ## Decision tree: which factorization?
 
 ```mermaid
-flowchart TB
+flowchart LR
     Q["Need to..."]
     Q --> Q1{"Solve A x = b?"}
     Q1 -- "A is SPD" --> CH[Cholesky]

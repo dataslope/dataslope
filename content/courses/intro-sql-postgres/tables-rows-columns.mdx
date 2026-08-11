@@ -33,6 +33,12 @@ The `students` table:
 - **Cell**, the value where a row and column meet. The cell at
   Cara's row and the `gpa` column is `2.9`.
 
+<Figure
+  slug="sql-tables-rows-columns-three-words-inline-cutout"
+  alt="One ruled board with one row drawn out sideways and one column lifted straight up"
+  caption="A row is one record; a column is one fact about every record."
+/>
+
 <Callout type="info" title="Read it as a sentence">
 A handy trick: read each row as a sentence using the column names.
 Row 1 becomes *"Student 1 is named Ana, in grade 9, with a GPA of
@@ -69,6 +75,12 @@ any order unless you explicitly ask for a sort. Ana being "first"
 in the picture is not a property of the data, it is just how we
 happened to print it.
 
+<Figure
+  slug="sql-tables-rows-columns-inline-cutout"
+  alt="One ruled board with a single row highlighted along its width and a single column highlighted down its height"
+  caption="Table, row and column are the three words the rest of SQL is built on."
+/>
+
 ```mermaid
 flowchart TD
     Q["A table is an<br/>unordered bag of rows"] --> S["Want a specific order?<br/>Ask for it with ORDER BY"]
@@ -84,18 +96,6 @@ column has a declared **type**, and the database enforces it. We
 devote the next pages to keys and types, for now, just register
 that a column is not a free-for-all: it is a named slot of a
 specific kind of value.
-
-<Figure
-  slug="sql-tables-rows-columns-three-words-inline-cutout"
-  alt="One ruled board with one row drawn out sideways and one column lifted straight up"
-  caption="A row is one record; a column is one fact about every record."
-/>
-
-<Figure
-  slug="sql-tables-rows-columns-inline-cutout"
-  alt="One ruled board with a single row highlighted along its width and a single column highlighted down its height"
-  caption="Table, row and column are the three words the rest of SQL is built on."
-/>
 
 ## See it live
 

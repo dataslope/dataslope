@@ -38,6 +38,12 @@ That's the whole framework: **decompose, recognize patterns,
 abstract, and design a step-by-step solution**. The rest of this
 page is just examples.
 
+<Figure
+  slug="mcs-computational-thinking-four-habits-inline-cutout"
+  alt="Four small tools hanging above a bench, each shown taking a different bite out of the same awkward slab"
+  caption="Decompose, spot the pattern, abstract, then write the steps down."
+/>
+
 ## Decomposition
 
 **Decomposition** means taking a problem that is too big to think
@@ -58,7 +64,7 @@ do you list them?
 A decomposed view looks more like:
 
 ```mermaid
-flowchart TB
+flowchart LR
     Big["Task tracker"]
     Big --> S1["Represent a single task<br/>(title, status, due date)"]
     Big --> S2["Store many tasks<br/>(in a list)"]
@@ -222,12 +228,6 @@ covers the cases.
 
 Let's put all four habits together. Problem: *"Given a string, tell
 me how many distinct words it contains."*
-
-<Figure
-  slug="mcs-computational-thinking-four-habits-inline-cutout"
-  alt="Four small tools hanging above a bench, each shown taking a different bite out of the same awkward slab"
-  caption="Decompose, spot the pattern, abstract, then write the steps down."
-/>
 
 **Decomposition.** What pieces are involved?
 - Read the string.

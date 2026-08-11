@@ -21,6 +21,12 @@ with honest uncertainty bands.
 An ARIMA model is built from two simple ideas about where the next value
 comes from.
 
+<Figure
+  slug="tsa-arima-models-two-ingredients-ar-inline-cutout"
+  alt="Two machines feeding one output, one looking back at past blocks and one at past mistakes"
+  caption="One part looks back at past values, the other at past errors, and both feed the forecast."
+/>
+
 **Autoregressive, written AR(p).** "Regress the series on its own recent
 *values*."
 Each value is a weighted sum of the last $p$ values plus a random shock:
@@ -298,12 +304,6 @@ A fitted model's residuals (`actual - fitted`) should look like **white
 noise**, no leftover autocorrelation, roughly normal, constant variance. If
 the residuals still have structure, the model missed something. statsmodels
 bundles the standard four-panel check.
-
-<Figure
-  slug="tsa-arima-models-two-ingredients-ar-inline-cutout"
-  alt="Two machines feeding one output, one looking back at past blocks and one at past mistakes"
-  caption="Diagnosing residuals asks whether anything is left over that a third machine could have used."
-/>
 
 <CodeBlock
   adapter="python"

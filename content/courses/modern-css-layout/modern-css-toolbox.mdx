@@ -47,6 +47,12 @@ Both boxes only declare a ratio. Their width comes from the flex layout,
 and the height is computed to match. Change one column's width and its
 height keeps the shape.
 
+<Figure
+  slug="css-modern-css-toolbox-aspect-ratio-size-inline-cutout"
+  alt="Three upright rectangular tiles of the same shape in three sizes, small, medium and large, standing in a row on a shelf"
+  caption="`aspect-ratio` keeps the shape while the size changes."
+/>
+
 ## Native CSS nesting
 
 You can now nest selectors directly in CSS, no preprocessor. Inside a
@@ -80,6 +86,12 @@ That renders identically to writing `.card .title`, `.card .text`, and
 `.card .link` as separate top-level rules, it is the same cascade, just
 grouped by component. Nesting also shines for state and queries: a
 `&:hover` or a nested `@media` sits right next to the base rule.
+
+<Figure
+  slug="css-modern-css-toolbox-native-css-nesting-inline-cutout"
+  alt="Rules written inside the box they apply to rather than on separate sheets, the result identical either way"
+  caption="Nesting is shorthand for the descendant selector, with the same cascade behaviour."
+/>
 
 ## :has(): the parent selector
 
@@ -166,6 +178,12 @@ Both boxes below share one rule. The second sets `dir="rtl"`, and the
 Reach for logical properties by default. They cost nothing in the common
 case and make internationalization almost free.
 
+<Figure
+  slug="css-modern-css-toolbox-logical-properties-inline-cutout"
+  alt="A frame described by the direction its text runs, keeping its shape when the whole flow is mirrored"
+  caption="Describe the box in terms of the text flow and it survives being mirrored."
+/>
+
 ## clamp(): one line of fluid sizing
 
 You met `clamp(min, preferred, max)` in the responsive lesson, it is
@@ -180,12 +198,6 @@ section { padding: clamp(1rem, 5vw, 3rem); }
 One declaration, no breakpoints. See
 [Responsive design](/courses/modern-css-layout/responsive-design) for the
 full treatment.
-
-<Figure
-  slug="css-modern-css-toolbox-aspect-ratio-size-inline-cutout"
-  alt="Three upright rectangular tiles of the same shape in three sizes, small, medium and large, standing in a row on a shelf"
-  caption="`aspect-ratio` keeps the shape while the size changes."
-/>
 
 Mix nesting and `aspect-ratio` in the sandbox below, try changing the
 thumbnail ratio to `1 / 1`:

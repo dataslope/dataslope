@@ -52,12 +52,6 @@ flowchart TD
 A few design choices, taken together, make DuckDB feel made for the
 exploratory loop you learned about.
 
-<Figure
-  slug="duck-why-duckdb-problem-duckdb-solves-inline-cutout"
-  alt="A heavy remote strongroom with a long pipe beside a compact engine sitting on the workbench"
-  caption="DuckDB runs in the same process as your analysis, with no server in between."
-/>
-
 - **Column-oriented and vectorized.** It inherits the column-store,
   batch-processing design from the last page, so summary queries over many
   rows fly.
@@ -75,7 +69,7 @@ exploratory loop you learned about.
   cut the ceremony out of common analytical queries.
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph Why["Why analysts reach for DuckDB"]
         W1["Column store +<br/>vectorized engine"]
         W2["Runs in-process,<br/>zero setup"]
@@ -104,6 +98,12 @@ DuckDB rarely replaces the cloud warehouse or the app's database. It sits
   big warehouse.
 - Use it as the engine inside notebooks and data pipelines for
   transformation steps.
+
+<Figure
+  slug="duck-why-duckdb-inline-cutout"
+  alt="A heavy remote strongroom with a long pipe on one bench, and on the next a compact engine sitting right beside the workbench"
+  caption="No connection, no cluster: the engine sits on the bench beside the work."
+/>
 
 ```mermaid
 flowchart TD
@@ -202,9 +202,3 @@ us write your first analytical query. (If you want the analyst's
 [Thinking in Datasets](/courses/sql-analytics-duckdb/thinking-in-datasets)
 deep dive in the *Interesting discussions* section near the end covers it,
 but you can pick it up as you go.)
-
-<Figure
-  slug="duck-why-duckdb-inline-cutout"
-  alt="A heavy remote strongroom with a long pipe on one bench, and on the next a compact engine sitting right beside the workbench"
-  caption="No connection, no cluster: the engine sits on the bench beside the work."
-/>

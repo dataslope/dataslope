@@ -48,6 +48,12 @@ recent past" property is called **temporal dependence**, and when we
 measure it as a correlation, we call it **autocorrelation**, a series
 correlated *with itself* at an earlier time.
 
+<Figure
+  slug="tsa-what-makes-time-series-unique-defining-property-temporal-dependence-inline-cutout"
+  alt="A run of marks where each one leans on the mark just before it, the lean visible the whole way along"
+  caption="The value now is related to the values just before it, which is the whole subject."
+/>
+
 Let's see it directly. We plot each month's airline-passenger count
 against the *previous* month's count. If there were no temporal
 dependence, this would be a shapeless cloud. Watch what actually happens.
@@ -266,6 +272,12 @@ split does exactly that, and it's the default in almost every
 machine-learning tutorial.
 Here's the trap, made concrete.
 
+<Figure
+  slug="tsa-what-makes-time-series-unique-shuffling-sabotage-where-sneaks-inline-cutout"
+  alt="A strip of dated marks cut into pieces and dealt out in random order, the run that went through them gone"
+  caption="Shuffle a time series and you destroy the one variable that carried the structure."
+/>
+
 When you randomly assign rows to "train" and "test", a test point from
 **March** ends up surrounded in the training set by **February and April**.
 Your model effectively gets to peek at the future on both sides of every
@@ -384,6 +396,12 @@ a notebook and lose money in production:
 - **Public health**, case-count forecasts that leak future data overstate
   confidence, and confident-but-wrong forecasts erode trust fast.
 
+<Figure
+  slug="tsa-what-makes-time-series-unique-real-world-stakes-inline-cutout"
+  alt="A run of dated marks with the dates stripped away, the pattern that mattered gone with them"
+  caption="In every one of these failures, the order of the data was thrown away."
+/>
+
 In every case the failure is the same: the order of the data was the most
 important variable, and it got thrown away, either by shuffling, or by an
 evaluation that pretended the future was available.
@@ -406,6 +424,12 @@ baseline.** Two are classic:
   one full season ago ($\hat{y}_t = y_{t-m}$, with $m = 12$ for monthly data with
   yearly seasonality). For strongly seasonal series, this is the baseline
   to beat.
+
+<Figure
+  slug="tsa-what-makes-time-series-unique-first-honest-forecast-baseline-inline-cutout"
+  alt="A forecast that simply repeats what happened one full cycle ago, drawn over the run it is predicting"
+  caption="Repeating last season is the bar every model has to clear before it is worth anything."
+/>
 
 If your fancy ARIMA can't beat "same as last year," the ARIMA is not
 adding value. Let's compute both baselines so the idea is concrete.

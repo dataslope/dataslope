@@ -73,7 +73,7 @@ print(from_str)
 
 ## How lists work under the hood
 
-Lists are implemented as **dynamic arrays**: a contiguous block of memory holding references to objects. This gives O(1) random access by index but O(n) insertion/deletion in the middle. Think of a list as a row of numbered parking spots, where each spot points to the actual object.
+Lists are implemented as **dynamic arrays**: a contiguous block of memory holding references to objects. This gives $O(1)$ random access by index but $O(n)$ insertion/deletion in the middle. Think of a list as a row of numbered parking spots, where each spot points to the actual object.
 
 <Figure
   slug="python-lists-inline-cutout"
@@ -269,7 +269,7 @@ print(xs)
 />
 
 <Callout type="info">
-`append` and `extend` are O(1) amortized, so they are fast. `insert` at the front or middle is O(n) because it shifts all subsequent elements.
+`append` and `extend` are $O(1)$ amortized, so they are fast. `insert` at the front or middle is $O(n)$ because it shifts all subsequent elements.
 </Callout>
 
 ## Common methods: removing items
@@ -480,8 +480,8 @@ print(99 in xs)
   ]}
 />
 
-<Callout type="warn" title="Membership testing is O(n)">
-`item in list` scans the entire list in the worst case. If you are doing frequent membership checks, consider converting to a `set`, where `in` is O(1).
+<Callout type="warn" title="Membership testing is $O(n)$">
+`item in list` scans the entire list in the worst case. If you are doing frequent membership checks, consider converting to a `set`, where `in` is $O(1)$.
 </Callout>
 
 <CodeBlock
@@ -583,7 +583,7 @@ Changing a list's length during iteration invalidates the iterator and leads to 
 
 ## Stacks and queues
 
-Lists make excellent **stacks** because `append` and `pop` at the end are both O(1).
+Lists make excellent **stacks** because `append` and `pop` at the end are both $O(1)$.
 
 <CodeBlock
   adapter="python"
@@ -602,7 +602,7 @@ print(stack)
   ]}
 />
 
-For **queues** (first in, first out), prefer `collections.deque`, which supports O(1) operations at both ends. Using a list as a queue means O(n) `pop(0)` every time you dequeue.
+For **queues** (first in, first out), prefer `collections.deque`, which supports $O(1)$ operations at both ends. Using a list as a queue means $O(n)$ `pop(0)` every time you dequeue.
 
 <CodeBlock
   adapter="python"
@@ -800,13 +800,13 @@ xs[1:4] = [9]
 <MultipleChoice
   markdown={`What is the time complexity of \`item in xs\` where \`xs\` is a list?
 
-- O(n²)
+- $O(n^2)$
   > Membership testing is linear, not quadratic.
-- [o] O(n)
+- [o] $O(n)$
   > Python scans the list from start to finish in the worst case.
-- O(1)
+- $O(1)$
   > That would be true for a set or dict, not a list.
-- O(log n)
+- $O(\\log n)$
   > Lists are not sorted by default, so binary search does not apply.`}
 />
 

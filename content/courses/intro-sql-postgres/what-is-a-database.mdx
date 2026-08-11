@@ -53,6 +53,12 @@ data at any real scale becomes a nightmare, five distinct
 nightmares, in fact. Every feature you will learn in this course
 exists to prevent one of them.
 
+<Figure
+  slug="sql-what-is-a-database-inline-cutout"
+  alt="A shared strongroom with several benches drawing from it at once, each bench holding only a small tray"
+  caption="One database, many applications, and one shared version of the truth."
+/>
+
 **Nightmare 1: losing the data.** Imagine a shop that records every
 sale in a notebook. The notebook can be lost, burned, soaked, or
 simply run out of pages. If two clerks each keep their own
@@ -93,7 +99,7 @@ happens or does not happen at all, and they **enforce rules** about
 what counts as valid data, refusing values that break them.
 
 ```mermaid
-flowchart TB
+flowchart LR
     N["Naive storage<br/>(files, notebooks, scattered sheets)"]
     N --> P1["Data gets lost"]
     N --> P2["Conflicting edits"]
@@ -116,6 +122,12 @@ answer is almost always illuminating.
 So a database keeps data safe, consistent, and findable. But what
 does the data actually *look like* inside? The relational answer is
 disarmingly simple: **rectangles.**
+
+<Figure
+  slug="sql-what-is-a-database-stored-data-looks-like-inline-cutout"
+  alt="A paragraph of writing beside the same facts ruled into a grid, with a gauge running straight down one column"
+  caption="A grid makes questions answerable mechanically, which a paragraph never can be."
+/>
 
 Almost all useful data is a collection of **facts about things**.
 "This customer is named Ada and lives in Toronto." "This order was
@@ -173,15 +185,9 @@ sends the database a request written in SQL. That request is called
 a **query**.
 
 <Figure
-  slug="sql-what-is-a-database-first-honest-definition-inline-cutout"
-  alt="A strongroom with several benches drawing from it at once, each holding only a small tray"
-  caption="The database holds the facts; the application only borrows them."
-/>
-
-<Figure
-  slug="sql-what-is-a-database-inline-cutout"
-  alt="A shared strongroom with several benches drawing from it at once, each bench holding only a small tray"
-  caption="One database, many applications, and one shared version of the truth."
+  slug="sql-what-is-a-database-where-database-hides-app-inline-cutout"
+  alt="A shopfront with a hatch at the back through which every order and answer quietly passes"
+  caption="Every tap in the app is a query; the database is the part you never see."
 />
 
 ```mermaid
@@ -206,6 +212,12 @@ course.)
 
 For the rest of this course, hold this picture in your head: a
 database is a **trustworthy librarian** for your data.
+
+<Figure
+  slug="sql-what-is-a-database-tiny-mental-model-carry-inline-cutout"
+  alt="A cabinet of ruled drawers standing behind a shopfront, the two speaking through a single hatch"
+  caption="The app is not the database; it talks to one through a narrow, well-defined opening."
+/>
 
 ```mermaid
 flowchart TD

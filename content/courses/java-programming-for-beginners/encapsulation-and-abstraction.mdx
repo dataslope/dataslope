@@ -19,6 +19,12 @@ object-oriented programming exists at all.
 touch its own data*. Outside code asks the object to do things; it
 does not reach in and edit fields.
 
+<Figure
+  slug="java-encapsulation-and-abstraction-encapsulation-each-object-inline-cutout"
+  alt="Three sealed crates on a bench, each holding its own parts and none reaching into another"
+  caption="Each object guards its own state, and nothing reaches in from outside."
+/>
+
 Mechanically, Java enforces this with **access modifiers**:
 
 | Modifier | Visible to |
@@ -129,6 +135,12 @@ If next month we add a "fees" feature, *all* the logic lives in
 **Abstraction** is the design idea behind encapsulation: callers
 care about *what* an object does for them, not *how* it does it.
 
+<Figure
+  slug="java-encapsulation-and-abstraction-does-matter-inline-cutout"
+  alt="A sealed case with two levers on its face, a hand refused at the seam and directed to the levers"
+  caption="With the field private, the class can refuse an operation that would break its rules."
+/>
+
 The `BankAccount` class is, from the outside, just:
 
 - "I have an owner."
@@ -168,9 +180,9 @@ a class. There is no way for `Person` to enforce rules about its own
 state. Whenever you see this, ask: who is allowed to set `age = -5`?
 
 <Figure
-  slug="java-encapsulation-and-abstraction-encapsulation-each-object-inline-cutout"
-  alt="Three sealed crates on a bench, each holding its own parts and none reaching into another"
-  caption="Each object guards its own state, and nothing reaches in from outside."
+  slug="java-encapsulation-and-abstraction-common-mistakes-beginners-make-inline-cutout"
+  alt="A hand reaching straight through an open hatch to the parts inside a sealed box, past the controls on its front"
+  caption="Returning the internal list hands out a hatch straight past the methods that guard it."
 />
 
 ### 2. Getters and setters for every field

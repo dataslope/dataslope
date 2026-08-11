@@ -33,6 +33,12 @@ write `Dog d = new Dog(...)`, two things happen:
 2. The local variable `d` on the **stack** holds a *reference* (an
    address) pointing to that heap object.
 
+<Figure
+  slug="oopj-objects-in-memory-two-regions-stack-inline-cutout"
+  alt="A name plate in a column of trays joined by a cord to a crate in an open yard"
+  caption="The variable lives on the stack; the object it names lives on the heap."
+/>
+
 ```mermaid
 flowchart TD
     subgraph S["Stack (current method)"]
@@ -52,12 +58,6 @@ the stack that says "the dog you want is at this address on the heap."
 This is where most beginners get a surprise. If you copy an object
 variable into another variable, you copy *the reference*, not the
 object itself. Both variables now point at the *same* heap object.
-
-<Figure
-  slug="oopj-objects-in-memory-two-regions-stack-inline-cutout"
-  alt="A name plate in a column of trays joined by a cord to a crate in an open yard"
-  caption="The variable lives on the stack; the object it names lives on the heap."
-/>
 
 <CodeBlock
   adapter="java"
@@ -334,7 +334,7 @@ and a list of `LineItem`s. The whole point of OOP is that the heap
 ends up looking like a small map of your problem domain.
 
 ```mermaid
-flowchart TD
+flowchart LR
     subgraph Heap
       P["Person<br/><code>name='Ada'</code>"]
       A["Address<br/><code>city='Oslo'</code>"]

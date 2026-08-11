@@ -14,12 +14,6 @@ later, especially order history.
 
 This case study builds a store schema from requirements to tables.
 
-<Figure
-  slug="db-case-study-ecommerce-find-entities-relationships-inline-cutout"
-  alt="Four crates set on a bench with cords being run between them one at a time"
-  caption="Entities first, then one relationship at a time between them."
-/>
-
 ## Start with requirements
 
 A small store needs to remember:
@@ -43,6 +37,12 @@ flowchart TD
 The phrase "an order contains products" hides a key design point.
 The relationship itself has attributes: quantity and price charged.
 That means it needs a table.
+
+<Figure
+  slug="db-case-study-ecommerce-start-requirements-inline-cutout"
+  alt="A bench of loose plain cards being grouped into four clusters before any frame is cut"
+  caption="Requirements are grouped into candidate entities before any table is written."
+/>
 
 ## Find the entities and relationships
 
@@ -123,6 +123,12 @@ The model has two many-to-many relationships, but they are different.
 `product_categories` is a pure classification relationship.
 `order_items` is a line-item table because it stores facts about each
 purchased product.
+
+<Figure
+  slug="db-case-study-ecommerce-find-entities-relationships-inline-cutout"
+  alt="Four crates set on a bench with cords being run between them one at a time"
+  caption="Entities first, then one relationship at a time between them."
+/>
 
 ```mermaid
 flowchart TD
@@ -258,12 +264,6 @@ The query uses the relationships exactly as the model describes.
 
 The schema says an order line must have a positive quantity. That is a
 design rule, not just a user-interface rule.
-
-<Figure
-  slug="db-case-study-ecommerce-start-requirements-inline-cutout"
-  alt="A bench of loose plain cards being grouped into four clusters before any frame is cut"
-  caption="Requirements are grouped into candidate entities before any table is written."
-/>
 
 <SqlCodeBlock
   expectError

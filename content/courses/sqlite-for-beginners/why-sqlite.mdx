@@ -33,7 +33,7 @@ install, nothing to configure, nothing to administer, and nothing
 else to blame.
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph CS["Client-server database"]
         A1["Application"] -->|"network connection"| S1[("Database server<br/>separate process")]
     end
@@ -123,7 +123,7 @@ games, phones, and test suites adopt SQLite so readily, and it
 keeps the mental model refreshingly small:
 
 ```mermaid
-flowchart TB
+flowchart LR
     A[("<code>app.db</code>")]
     A --> B["users table"]
     A --> C["orders table"]
@@ -159,6 +159,12 @@ Put the pieces together and you get an unusually good classroom:
 - **Real stakes.** You are learning the actual engine that runs in
   your own pocket, not a teaching simulator.
 
+<Figure
+  slug="lite-why-sqlite-makes-sqlite-ideal-learning-inline-cutout"
+  alt="A single file lifted straight onto the bench and worked on, with no scaffolding raised around it first"
+  caption="No server, no configuration, so the attention goes to tables and queries instead."
+/>
+
 ```mermaid
 flowchart LR
     A["SQL ideas you learn here"] --> S["SQLite"]
@@ -177,6 +183,12 @@ users must write to the same database at the same moment* from
 different machines. A busy social network or a bank's central
 ledger calls for a client-server database, where a dedicated
 process coordinates thousands of simultaneous writers.
+
+<Figure
+  slug="lite-why-sqlite-honest-tradeoff-inline-cutout"
+  alt="One small sealed box that fits in a pocket, set beside a large machine with many hands working on it at once"
+  caption="One file and no server is the strength and the limit in the same sentence."
+/>
 
 ```mermaid
 flowchart TB

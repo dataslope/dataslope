@@ -66,7 +66,7 @@ import Link from "./Link";
 // and natural enter/exit animations out of the box.
 import { Menu } from "@base-ui/react/menu";
 import { Popover } from "@base-ui/react/popover";
-import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Dialog } from "@base-ui/react/dialog";
 import { Toast } from "@base-ui/react/toast";
 import { Select } from "@base-ui/react/select";
 import { Drawer } from "@base-ui/react/drawer";
@@ -661,7 +661,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     null,
   );
   // Confirmations for the two destructive actions in the Settings
-  // panel, using Base UI AlertDialog for both rather than the native
+  // panel, using a Base UI dialog for both rather than the native
   // window.confirm so they look consistent with the rest of the UI.
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
   const [confirmClearStorageOpen, setConfirmClearStorageOpen] =
@@ -1974,8 +1974,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // Clear every localStorage entry (across all playgrounds) and reload
   // so the freshly cleared state takes effect everywhere, including
   // saved editor contents, theme, and any future per-playground keys.
-  // Confirmation is handled by a Base UI AlertDialog rendered below;
-  // by the time this callback fires the user has already opted in.
+  // Confirmation is handled by a Base UI dialog rendered below; by the
+  // time this callback fires the user has already opted in.
   const clearAllLocalStorage = useCallback(() => {
     try {
       localStorage.clear();
@@ -4080,29 +4080,29 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
         {/* Confirm dialog shown when picking an example would discard
             existing editor contents. */}
-        <AlertDialog.Root
+        <Dialog.Root
           open={pendingExample !== null}
           onOpenChange={(next) => {
             if (!next) setPendingExample(null);
           }}
         >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup" role="alertdialog">
+              <Dialog.Title className="confirm-title">
                 Discard current code?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
                 Loading{" "}
                 <strong>“{pendingExample?.title}”</strong>{" "}
                 will overwrite the code currently in the editor. This
                 can&rsquo;t be undone.
-              </AlertDialog.Description>
+              </Dialog.Description>
               <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
+                </Dialog.Close>
+                <Dialog.Close
                   className="confirm-btn confirm-btn-danger"
                   onClick={() => {
                     if (pendingExample) applyExample(pendingExample);
@@ -4110,34 +4110,34 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   }}
                 >
                   Discard &amp; load
-                </AlertDialog.Close>
+                </Dialog.Close>
               </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
 
         {/* Confirm restoring built-in defaults, non-destructive but
             still nukes any custom settings, so confirm first. */}
-        <AlertDialog.Root
+        <Dialog.Root
           open={confirmRestoreOpen}
           onOpenChange={setConfirmRestoreOpen}
         >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup" role="alertdialog">
+              <Dialog.Title className="confirm-title">
                 Restore default settings?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
                 This will reset this playground&apos;s editor font size, word wrap,
                 run/output preferences, and the shared editor theme to their
                 built-in defaults. Your saved code is not affected.
-              </AlertDialog.Description>
+              </Dialog.Description>
               <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
+                </Dialog.Close>
+                <Dialog.Close
                   className="confirm-btn confirm-btn-danger"
                   onClick={() => {
                     restoreDefaultSettings();
@@ -4145,63 +4145,63 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   }}
                 >
                   Restore defaults
-                </AlertDialog.Close>
+                </Dialog.Close>
               </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
 
         {/* Confirm wiping every localStorage entry across all playgrounds,
             this is destructive (saved code, themes, settings, …) so the
-            confirmation lives in a Base UI AlertDialog rather than the
-            native window.confirm to match the rest of the UI. */}
-        <AlertDialog.Root
+            confirmation lives in a Base UI dialog rather than the native
+            window.confirm to match the rest of the UI. */}
+        <Dialog.Root
           open={confirmClearStorageOpen}
           onOpenChange={setConfirmClearStorageOpen}
         >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup" role="alertdialog">
+              <Dialog.Title className="confirm-title">
                 Clear all localStorage data?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
                 This will permanently delete every saved setting and code
                 snippet across <strong>all playgrounds</strong>. The page
                 will reload immediately. This can&rsquo;t be undone.
-              </AlertDialog.Description>
+              </Dialog.Description>
               <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
+                </Dialog.Close>
+                <Dialog.Close
                   className="confirm-btn confirm-btn-danger"
                   onClick={() => {
                     clearAllLocalStorage();
                   }}
                 >
                   Clear &amp; reload
-                </AlertDialog.Close>
+                </Dialog.Close>
               </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
 
         {/* Nuclear wipe: drops localStorage AND OPFS AND IndexedDB AND
             caches. Mirrors the lighter "Clear all localStorage" dialog
             but with stronger language so the user understands they're
             also losing every workspace, database, and uploaded file. */}
-        <AlertDialog.Root
+        <Dialog.Root
           open={confirmClearAllDataOpen}
           onOpenChange={setConfirmClearAllDataOpen}
         >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup" role="alertdialog">
+              <Dialog.Title className="confirm-title">
                 Clear all local data?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
                 This will permanently delete every saved setting, code
                 snippet, <strong>workspace</strong>, persisted{" "}
                 <strong>database</strong>, and uploaded{" "}
@@ -4209,23 +4209,23 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <strong>all playgrounds</strong>, including localStorage,
                 OPFS, IndexedDB, and any cached assets. The page will
                 reload immediately. This can&rsquo;t be undone.
-              </AlertDialog.Description>
+              </Dialog.Description>
               <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
+                </Dialog.Close>
+                <Dialog.Close
                   className="confirm-btn confirm-btn-danger"
                   onClick={() => {
                     clearAllLocalData();
                   }}
                 >
                   Clear &amp; reload
-                </AlertDialog.Close>
+                </Dialog.Close>
               </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
 
         <div className="playground-body">
           {/* The icon rail only hosts the Editor/Files toggle pair, so

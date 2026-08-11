@@ -32,7 +32,7 @@ the region total (a group-level fact). `GROUP BY` can give you one or the
 other, never both in the same row.
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph GB["GROUP BY: rows collapse"]
         G1["5 West orders"] --> G2["1 row: West total"]
     end
@@ -50,6 +50,12 @@ collapsing them. You keep all your detail *and* gain the summary.
 Any aggregate becomes a window function when you add an `OVER (...)`
 clause. `SUM(amount)` collapses; `SUM(amount) OVER (...)` does **not**,
 it computes a sum over a "window" of rows and writes it onto each row.
+
+<Figure
+  slug="duck-why-window-functions-over-clause-makes-window-inline-cutout"
+  alt="An aggregate that leaves every row standing and writes its total alongside, instead of collapsing them into one"
+  caption="`OVER` is what stops an aggregate collapsing the rows it summarises."
+/>
 
 Start with the simplest possible window: `OVER ()` with empty parentheses
 means "the whole result set is one window." Every row gets the grand
@@ -186,6 +192,12 @@ Window functions make it one line.
 The one-sentence summary: **`GROUP BY` summarizes *instead of* the rows; a
 window function summarizes *alongside* the rows.**
 
+<Figure
+  slug="duck-why-window-functions-inline-cutout"
+  alt="A pile of blocks collapsing into one summary block on the left, and on the right the same blocks still standing in their original row, each wearing its own small summary tag"
+  caption="`GROUP BY` collapses the rows; a window function leaves them standing."
+/>
+
 ## Anatomy of a window function
 
 ```
@@ -285,9 +297,3 @@ The \`OVER\` clause is what makes an aggregate a window function.`}
 
 Now that the `OVER` clause makes sense, the next pages put it to work:
 ranking rows, then computing running totals and moving averages.
-
-<Figure
-  slug="duck-why-window-functions-inline-cutout"
-  alt="A pile of blocks collapsing into one summary block on the left, and on the right the same blocks still standing in their original row, each wearing its own small summary tag"
-  caption="`GROUP BY` collapses the rows; a window function leaves them standing."
-/>

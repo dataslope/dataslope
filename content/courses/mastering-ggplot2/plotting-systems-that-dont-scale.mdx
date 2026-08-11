@@ -58,6 +58,12 @@ This works. But look closely at everything *you* had to do:
   points. If you change the colors above, you must remember to change
   them in the legend too.
 
+<Figure
+  slug="gg-plotting-systems-that-dont-scale-draw-one-thing-inline-cutout"
+  alt="A figure setting one solid block at a time onto a deeply inked panel, with a long queue of blocks still waiting in a tray on the bench beside them"
+  caption="Drawing one thing at a time does not scale to a chart with many groups."
+/>
+
 The computer is not helping you. It is taking dictation.
 
 ## Where it breaks down
@@ -66,7 +72,7 @@ A single static scatter plot is fine. The trouble starts when the
 chart needs to *grow*:
 
 ```mermaid
-flowchart TD
+flowchart LR
     A["Add a second variable<br/>as color"] --> P["More manual<br/>bookkeeping"]
     B["Split into one panel<br/>per category"] --> P
     C["Add a trend line<br/>per group"] --> P
@@ -101,9 +107,9 @@ coordinates, those should be *consequences* of the description, not
 things you manage.
 
 <Figure
-  slug="gg-plotting-systems-that-dont-scale-draw-one-thing-inline-cutout"
-  alt="A figure setting one solid block at a time onto a deeply inked panel, with a long queue of blocks still waiting in a tray on the bench beside them"
-  caption="Drawing one thing at a time does not scale to a chart with many groups."
+  slug="gg-plotting-systems-that-dont-scale-we-actually-want-inline-cutout"
+  alt="One written specification naming a tray, a set of mappings and two kinds of mark, with the picture assembling itself beside it"
+  caption="Name the data, the mappings and the marks, and the picture follows from the sentence."
 />
 
 What if you could write the chart the way you describe it, and let the

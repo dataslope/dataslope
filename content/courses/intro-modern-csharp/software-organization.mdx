@@ -29,12 +29,18 @@ The C# convention is *one public class per file, named after the
 class*. So `BankAccount.cs` contains `class BankAccount`, and so
 on.
 
+<Figure
+  slug="mcs-software-organization-files-inline-cutout"
+  alt="A set of labelled folders in a rack, each holding one kind of card"
+  caption="Namespaces keep related types together and stop names from colliding."
+/>
+
 You *can* put multiple classes in one file (the compiler doesn't
 care), but it's a bad habit: when you want to find `BankAccount`,
 you don't want to grep, you want to open the file with that name.
 
 ```mermaid
-flowchart TD
+flowchart LR
     F["src/"]
     F --> A["<code>Program.cs</code>"]
     F --> B["<code>BankAccount.cs</code>"]
@@ -54,9 +60,9 @@ It lets two libraries have a class called `Logger` without
 clashing, and it lets *your* program group related types.
 
 <Figure
-  slug="mcs-software-organization-files-inline-cutout"
-  alt="A set of labelled folders in a rack, each holding one kind of card"
-  caption="Namespaces keep related types together and stop names from colliding."
+  slug="mcs-software-organization-namespaces-inline-cutout"
+  alt="Two identically shaped parts kept apart by the room each hangs in rather than by their shape"
+  caption="Two libraries may each have a `Logger`, because the namespace keeps them apart."
 />
 
 ```csharp title="Program.cs"
@@ -111,6 +117,12 @@ In a real workspace (not a single-file playground like this one),
 your code lives in a **project** described by a `.csproj` file.
 A project compiles to a single output, a console app, a library, a
 web app.
+
+<Figure
+  slug="mcs-software-organization-projects-solutions-inline-cutout"
+  alt="Several small workshops listed on one plan sheet, each with its own bench and shared doors between them"
+  caption="A project is one unit that builds; a solution is the set of them that ships together."
+/>
 
 Multiple projects can be grouped into a **solution** (`.sln`),
 which is just a list of projects that ship together. Typical

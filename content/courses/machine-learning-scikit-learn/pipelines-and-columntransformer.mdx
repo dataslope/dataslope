@@ -22,12 +22,6 @@ different columns. Together they turn a fragile, multi-step ritual into one
 object you `fit()` once. This is not a convenience feature, it is how
 professional scikit-learn code stays correct.
 
-<Figure
-  slug="ml-pipelines-and-columntransformer-problem-preprocessing-modeling-inline-cutout"
-  alt="Two benches worked separately with a chip slipping between them, beside one bench where both are bolted together"
-  caption="Two separate benches are where a step goes missing; one bolted unit cannot."
-/>
-
 ## The problem: preprocessing and modeling are easy to desynchronize
 
 Without pipelines, a realistic workflow looks like a chain of manual steps
@@ -40,6 +34,12 @@ you must perform in the right order, on the right data, every time:
 4. Glue the scaled numbers and encoded categories back together.
 5. Fit the model on the training matrix.
 6. Repeat steps 2–4 *exactly* on any new data before predicting.
+
+<Figure
+  slug="ml-pipelines-and-columntransformer-problem-preprocessing-modeling-inline-cutout"
+  alt="Two benches worked separately with a chip slipping between them, beside one bench where both are bolted together"
+  caption="Two separate benches are where a step goes missing; one bolted unit cannot."
+/>
 
 Every one of those steps is a chance to leak the test set (fit on the wrong
 data), to forget a transform, or to apply transforms in a different order at
@@ -83,7 +83,7 @@ set, because you never touch the steps individually.
 />
 
 ```mermaid
-flowchart TD
+flowchart LR
     subgraph Training ["Training: pipeline.fit(X_train, y_train)"]
         A["<code>X_train</code>"] --> B["StandardScaler<br/>fit + transform"]
         B --> C["LogisticRegression<br/>fit"]
@@ -92,7 +92,7 @@ flowchart TD
 ```
 
 ```mermaid
-flowchart TD
+flowchart LR
     subgraph Prediction ["Prediction: pipeline.predict(X_new)"]
         E["<code>X_new</code>"] --> F["StandardScaler<br/>transform only"]
         F --> G["LogisticRegression<br/>predict"]
@@ -266,6 +266,12 @@ You want to `StandardScaler` the numeric columns and `OneHotEncoder` the
 categorical ones, in the same dataset, at the same time. A single `Pipeline`
 step applies one transform to *all* the columns it receives, which is not
 what you want here.
+
+<Figure
+  slug="ml-pipelines-and-columntransformer-columntransformer-different-transforms-different-inline-cutout"
+  alt="One board's columns sent off to three different machines and returning to a single tray in the order they left"
+  caption="Numeric columns scale, categorical columns encode, and one `fit()` call runs both."
+/>
 
 `ColumnTransformer` solves this. You give it a list of
 `(name, transformer, columns)` triples, and it routes each group of columns

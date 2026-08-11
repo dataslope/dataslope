@@ -20,6 +20,12 @@ fast.
 
 Think of a busy online store.
 
+<Figure
+  slug="duck-olap-vs-oltp-two-jobs-one-inline-cutout"
+  alt="A counter handling one parcel at a time beside a warehouse aisle being swept end to end"
+  caption="One system fetches single rows; the other sweeps whole columns."
+/>
+
 - The **application** asks tiny, sharply targeted questions, millions of
   times a day: *"What is in cart #84213?"*, *"Save this new order."*,
   *"Mark order #91 as shipped."* Each touches a handful of rows and must
@@ -62,6 +68,12 @@ become one average); and it **cares about columns, not rows** ("average
 you rarely know the final query in advance, so you run one, look, and let
 the result suggest the next.
 
+<Figure
+  slug="duck-olap-vs-oltp-analyst-really-doing-inline-cutout"
+  alt="A figure taking readings off a full shelf of crates without moving or opening a single one of them"
+  caption="Analysis reads the data and rarely changes it, which is what the storage is tuned for."
+/>
+
 The query below is deeply analytical: it reads *every* diamond in a remote
 53,940-row file but returns just **one summarizing line per cut**. No
 single diamond is the answer; the *pattern across diamonds* is.
@@ -91,6 +103,12 @@ individual stones to see the shape of the whole.
 
 Here is the idea that ties everything together, and the reason a tool
 like DuckDB feels fast for analysis. A database can store a table two ways.
+
+<Figure
+  slug="duck-olap-vs-oltp-inline-cutout"
+  alt="A service counter handling one small parcel at a time on the left, and a warehouse aisle on the right where one wide column is read end to end"
+  caption="Analytics reads few columns of many rows, which is the opposite workload."
+/>
 
 - **Row storage** keeps all of a row's values together. Perfect for OLTP:
   "give me everything about order #4821" reads one contiguous chunk.
@@ -134,9 +152,9 @@ natural: the values are already lined up together, ready to stream through
 in chunks.
 
 <Figure
-  slug="duck-olap-vs-oltp-two-jobs-one-inline-cutout"
-  alt="A counter handling one parcel at a time beside a warehouse aisle being swept end to end"
-  caption="One system fetches single rows; the other sweeps whole columns."
+  slug="duck-olap-vs-oltp-vectorized-execution-second-half-inline-cutout"
+  alt="One press stamping a whole tray of chips in a single stroke beside a press taking one chip at a time from the same pile"
+  caption="Working a batch of values per step, rather than a row at a time, is the other half of the speed."
 />
 
 Column storage plus vectorized execution is the lineage of decades of
@@ -207,9 +225,3 @@ engines fly through large scans.`}
 You now know *why* analytical SQL is shaped the way it is, and what kind
 of engine answers it fast. Next: meet that engine, and understand *why
 DuckDB* in particular.
-
-<Figure
-  slug="duck-olap-vs-oltp-inline-cutout"
-  alt="A service counter handling one small parcel at a time on the left, and a warehouse aisle on the right where one wide column is read end to end"
-  caption="Analytics reads few columns of many rows, which is the opposite workload."
-/>

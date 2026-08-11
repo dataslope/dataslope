@@ -417,6 +417,12 @@ Here's a battle-tested config for a Node.js or browser project in 2024:
 
 If you're building a browser app, add `"DOM"` and `"DOM.Iterable"` to `lib`. If you're targeting older Node.js (pre-v14), use `"module": "CommonJS"`.
 
+<Figure
+  slug="tsx-setup-and-tsconfig-essential-compiler-options-inline-cutout"
+  alt="A panel of switches where throwing the leftmost one flips several of the switches beside it at the same moment"
+  caption="Turning on `strict` turns on every individual check that it stands for."
+/>
+
 ## Running TypeScript in the browser (this course)
 
 Every code block on this site is a live TypeScript environment. The TypeScript compiler runs in your browser, transpiles your code to JavaScript, and executes it using [almostnode](https://almostnode.dev/), a browser-based Node.js runtime. (Like a production build, the in-page runner erases the types before executing; the red-squiggle, refuse-to-build experience described on this page is what `tsc` and your editor add on a real machine.)
@@ -458,6 +464,12 @@ If you want a longer-lived scratchpad, open the [TypeScript Playground](/playgro
 ## When to use strict mode (always)
 
 If there's one piece of advice to take from this page, it's this: **Always use `"strict": true`** (and add `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes` on top).
+
+<Figure
+  slug="tsx-setup-and-tsconfig-use-strict-mode-always-inline-cutout"
+  alt="A gate that stops a questionable part at the entrance rather than letting it through to be found at the far end"
+  caption="Strict mode costs a few annotations and buys the errors at the entrance instead of at runtime."
+/>
 
 Without strictness, TypeScript is a glorified linter. With strictness, it becomes a powerful static analysis tool that catches real bugs.
 

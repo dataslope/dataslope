@@ -71,6 +71,12 @@ is the only way NumPy can carry a missing value. This is the pandas
 null problem from the comparison chapter, arriving through the back
 door.
 
+<Figure
+  slug="pl-interoperability-pandas-both-directions-inline-cutout"
+  alt="Two benches joined by a short chute that runs equally well in either direction, a tray passing along it"
+  caption="The bridge runs both ways, and what crosses it depends on the dtypes."
+/>
+
 ## NumPy
 
 <CodeBlock
@@ -212,12 +218,6 @@ Try it yourself before reading on. Convert the frame to pandas twice, once
 with the default NumPy-backed conversion and once with
 `use_pyarrow_extension_array=True`, and compare what happened to the integer
 column that contains a null.
-
-<Figure
-  slug="pl-interoperability-pandas-both-directions-inline-cutout"
-  alt="Two benches joined by a short chute that runs equally well in either direction, a tray passing along it"
-  caption="The bridge runs both ways, and what crosses it depends on the dtypes."
-/>
 
 ```python
 import polars as pl

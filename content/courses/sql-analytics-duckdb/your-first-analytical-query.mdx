@@ -19,6 +19,12 @@ Before summarizing anything, an analyst usually takes a quick look at a
 few rows just to learn the columns and their flavor. `LIMIT` makes this
 cheap even on a huge table, you peek, you do not pull everything.
 
+<Figure
+  slug="duck-your-first-analytical-query-reading-table-analyst-inline-cutout"
+  alt="A board of rows with a first small window cut into it, a figure looking through"
+  caption="The first query is a small window: read a few rows before asking anything harder."
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Peek at the shape of the data"
@@ -59,12 +65,6 @@ In an application, `WHERE id = 4` finds one specific row. In analysis,
 `WHERE` usually carves out a **slice** of the data you want to study,
 *Seattle trips*, *long trips*, *this month*. You are not hunting a needle;
 you are choosing a subset to summarize.
-
-<Figure
-  slug="duck-your-first-analytical-query-reading-table-analyst-inline-cutout"
-  alt="A board of rows with a first small window cut into it, a figure looking through"
-  caption="In analysis `WHERE` carves out a slice to study, not a single row to find."
-/>
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -160,6 +160,12 @@ LIMIT
 Analysts constantly invent columns that are not stored. "Fare per
 minute", "price with tax", "is this a long trip?", all computed on the
 fly. This is where `SELECT` stops *retrieving* and starts *deriving*.
+
+<Figure
+  slug="duck-your-first-analytical-query-inline-cutout"
+  alt="A wide board of rows feeding one machine that leaves a single small summary block on the bench"
+  caption="Many rows in, one summary out: the shape of every analytical query."
+/>
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -260,9 +266,3 @@ changing the stored data.`}
 
 You can now *look* like an analyst. Next: how to get data *into* DuckDB,
 and how to conjure test data out of thin air with `range()`.
-
-<Figure
-  slug="duck-your-first-analytical-query-inline-cutout"
-  alt="A wide board of rows feeding one machine that leaves a single small summary block on the bench"
-  caption="Many rows in, one summary out: the shape of every analytical query."
-/>

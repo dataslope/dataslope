@@ -15,18 +15,6 @@ each one solves a slightly different problem.
 This chapter is the overview; the next one (*loc vs iloc*)
 zooms in on the two most important.
 
-<Figure
-  slug="pandas-selecting-data-five-access-methods-inline-cutout"
-  alt="Five differently shaped keys hanging above one board, each fitting a different opening in its edge"
-  caption="Pandas offers several ways in, each suited to a different kind of question."
-/>
-
-<Figure
-  slug="pandas-selecting-data-inline-cutout"
-  alt="A wide board with a small window frame moved over it, only what shows through the window copied to a second board"
-  caption="Selection copies the part of the table you framed and leaves the rest behind."
-/>
-
 ## The five access methods
 
 | Syntax           | Picks by   | Returns   | Use when                        |
@@ -38,6 +26,12 @@ zooms in on the two most important.
 | `df[mask]`       | Boolean Series | DataFrame | Filter rows by a condition  |
 
 Let us see each in action on the same little DataFrame.
+
+<Figure
+  slug="pandas-selecting-data-five-access-methods-inline-cutout"
+  alt="Five differently shaped keys hanging above one board, each fitting a different opening in its edge"
+  caption="Pandas offers several ways in, each suited to a different kind of question."
+/>
 
 <CodeBlock
   adapter="python"
@@ -168,6 +162,12 @@ print(df.iloc[-1])
 />
 
 `iloc` follows normal Python slicing rules: end is **exclusive**.
+
+<Figure
+  slug="pandas-selecting-data-inline-cutout"
+  alt="A wide board with a small window frame moved over it, only what shows through the window copied to a second board"
+  caption="Selection copies the part of the table you framed and leaves the rest behind."
+/>
 
 ## 5. Boolean masks → filter rows
 

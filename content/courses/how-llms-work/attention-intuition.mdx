@@ -168,7 +168,7 @@ whole sequence at once, which is what made models this large trainable.
 ## The cost
 
 Every token attends to every other token, so an input of *n* tokens
-requires roughly *n²* comparisons. Doubling the input quadruples the
+requires roughly *$n^2$* comparisons. Doubling the input quadruples the
 attention work. This is the fundamental reason long context windows
 were hard to build and remain expensive to use, and why a great deal of
 research goes into approximations that avoid the full quadratic cost.

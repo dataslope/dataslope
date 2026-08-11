@@ -47,6 +47,12 @@ The whole `{user ? (...) : (...)}` is one expression that evaluates to
 one of two JSX trees. Click the button and the state flips, so the
 branch flips.
 
+<Figure
+  slug="rx-conditional-rendering-choosing-between-two-inline-cutout"
+  alt="A two-position switch with a different prepared panel mounted at each position"
+  caption="A condition decides which of two prepared views is the one rendered."
+/>
+
 ## Showing something or nothing: `&&`
 
 When you want to render something **only when a condition is true** (and
@@ -75,6 +81,12 @@ React skips) otherwise:
 
 The badge appears only once `count > 0`. Add items and it shows; remove
 them all and it vanishes.
+
+<Figure
+  slug="rx-conditional-rendering-inline-cutout"
+  alt="A switch on a panel with two prepared blocks beside it, only the block matching the switch's position mounted in the frame"
+  caption="Only the matching branch is mounted; the other is never put on the page."
+/>
 
 <Callout type="warn" title="The && number gotcha">
 `&&` returns the *left* value when it's falsy, and React renders some
@@ -133,15 +145,9 @@ everywhere in React, especially in data fetching, where `loading` and
 `error` states return early before the data renders.
 
 <Figure
-  slug="rx-conditional-rendering-choosing-between-two-inline-cutout"
-  alt="A two-position switch with a different prepared panel mounted at each position"
-  caption="A condition decides which of two prepared views is the one rendered."
-/>
-
-<Figure
-  slug="rx-conditional-rendering-inline-cutout"
-  alt="A switch on a panel with two prepared blocks beside it, only the block matching the switch's position mounted in the frame"
-  caption="Only the matching branch is mounted; the other is never put on the page."
+  slug="rx-conditional-rendering-pulling-logic-out-variables-inline-cutout"
+  alt="A run of gates at the entrance turning back the odd cases, leaving one clear path through the middle"
+  caption="Return early on loading and error, and the rest of the component is the happy path."
 />
 
 ## Challenge

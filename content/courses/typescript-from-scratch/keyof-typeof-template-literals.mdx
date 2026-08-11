@@ -152,6 +152,12 @@ console.log(key);
 
 Here, `typeof routes` lifts the object into a type, and `keyof` extracts `"home" | "about" | "contact"`. This pattern is common for configuration objects, enums, and lookup tables.
 
+<Figure
+  slug="tsx-keyof-typeof-template-literals-keyof-t-keys-inline-cutout"
+  alt="A wall of labelled drawers with its labels lifted off as a separate strip of tags"
+  caption="The keys come off as their own union, separate from the values behind them."
+/>
+
 ---
 
 ## Template Literal Types
@@ -440,12 +446,6 @@ This pattern is essential for deriving types from configuration objects.`}
 />
 
 ---
-
-<Figure
-  slug="tsx-keyof-typeof-template-literals-keyof-t-keys-inline-cutout"
-  alt="A wall of labelled drawers with its labels lifted off as a separate strip of tags"
-  caption="The keys come off as their own union, separate from the values behind them."
-/>
 
 ## Multiple Choice: Template Literal Distribution
 

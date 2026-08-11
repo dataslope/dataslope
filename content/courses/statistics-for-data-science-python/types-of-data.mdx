@@ -37,7 +37,7 @@ At the top level, every variable is either **categorical** (it labels
 much* or *how many*). Each splits once more:
 
 ```mermaid
-flowchart TD
+flowchart LR
     V["A variable"] --> CAT["Categorical<br/>(labels / groups)"]
     V --> NUM["Numerical<br/>(quantities)"]
     CAT --> NOM["Nominal<br/>(no order)<br/>e.g. country, color, <code>user_id</code>"]
@@ -60,6 +60,12 @@ flowchart TD
 - **Continuous numerical**, measurements that can take any value in a
   range (limited only by instrument precision): height, temperature,
   price, response time.
+
+<Figure
+  slug="stat-types-of-data-big-split-categorical-inline-cutout"
+  alt="A bench split by a divider, labelled tags on one side and a measuring rule on the other"
+  caption="Labels or measurements: the split that decides every summary you can use."
+/>
 
 <Callout type="tip" title="A fast field test">
 Ask two questions. **(1) Can you order the values?** No → nominal.
@@ -115,12 +121,6 @@ nominal codes.
 
 The payoff of all this taxonomy is a simple lookup: once you know the
 type, the right summary and chart almost pick themselves.
-
-<Figure
-  slug="stat-types-of-data-big-split-categorical-inline-cutout"
-  alt="A bench split by a divider, labelled tags on one side and a measuring rule on the other"
-  caption="Labels or measurements: the split that decides every summary you can use."
-/>
 
 ```mermaid
 flowchart TD

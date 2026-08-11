@@ -25,6 +25,12 @@ might keep a dozen values in a `REAL ARRAY(100)` and that was the
 whole world. Code that small does not need *abstractions* over
 storage. It can just point at memory directly.
 
+<Figure
+  slug="jcol-the-tyranny-of-arrays-short-history-code-inline-cutout"
+  alt="A bench where storage begins as a fixed strip, becomes a growing rail, and ends as a wall of keyed drawers"
+  caption="Every project reinvented the same containers before the library had them."
+/>
+
 ```mermaid
 flowchart TD
     A["1950s<br/>fixed-size arrays<br/>one programmer"]
@@ -49,7 +55,7 @@ element type. Indexing is fast because it is just arithmetic:
 address(arr[i]) = base + i * sizeof(element)
 ```
 
-That is its great strength, `O(1)` random access, and the source
+That is its great strength, $O(1)$ random access, and the source
 of its great weakness: once you allocate `new int[10]`, you have ten
 slots forever.
 
@@ -149,7 +155,7 @@ later, will forget to update.
 
 ### 3. Search efficiently
 
-Looking up a value in an unsorted array is `O(n)`: walk every slot.
+Looking up a value in an unsorted array is $O(n)$: walk every slot.
 If you want fast lookup by key, you have to build a hash table or a
 tree yourself. Possible, but it is a couple hundred lines of code
 that has nothing to do with your problem.
@@ -169,12 +175,6 @@ you, only a `ClassCastException` at 3 a.m. would.
 
 Here is what a real codebase looked like before reusable containers
 existed. Every module rolled its own.
-
-<Figure
-  slug="jcol-the-tyranny-of-arrays-short-history-code-inline-cutout"
-  alt="A bench where storage begins as a fixed strip, becomes a growing rail, and ends as a wall of keyed drawers"
-  caption="Every project reinvented the same containers before the library had them."
-/>
 
 ```mermaid
 flowchart TB
@@ -207,6 +207,12 @@ Stand back and the requirements for *any* fix become clear:
 5. **The container should be programmable to an interface**, so the
    choice of "linked list versus array list" is one line, not a
    refactor.
+
+<Figure
+  slug="jcol-the-tyranny-of-arrays-we-d-need-fix-inline-cutout"
+  alt="A fixed rail of items with a list of missing fittings pinned beside it, each fitting sketched but not yet made"
+  caption="The missing pieces on that list are the Collections Framework and generics."
+/>
 
 That list is the seed of the Java Collections Framework, and items
 4 and 5 are the seed of generics. The next page meets the first
@@ -260,7 +266,7 @@ string.
 - They cannot be iterated
   > Arrays can be iterated; the issue is uniformity, not capability.
 - [o] They have a fixed size and offer no built-in support for resizing, searching, uniqueness, or higher-level access patterns
-  > Arrays solve one job, O(1) indexed storage, and leave every other data-handling concern to the programmer.
+  > Arrays solve one job, $O(1)$ indexed storage, and leave every other data-handling concern to the programmer.
 - The Java compiler doesn't allow them in modern code
   > Arrays are still fully supported in Java and are the substrate of most collections.`}
 />

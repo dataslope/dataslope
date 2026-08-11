@@ -21,6 +21,12 @@ A primary key already guarantees one kind of uniqueness: every row has a
 unique identity. But many tables have other values that must be unique
 too.
 
+<Figure
+  slug="db-unique-constraints-uniqueness-beyond-primary-inline-cutout"
+  alt="A rack whose slots each accept one tag, a second identical tag turned away even though it carries a different punched tab"
+  caption="Uniqueness on a foreign key is what makes a relationship one to one."
+/>
+
 ```mermaid
 flowchart TB
     Account["accounts table"] --> ID["id<br/>PRIMARY KEY"]
@@ -197,12 +203,6 @@ relationship pair.
 Uniqueness also shapes relationships. If `profiles.user_id` is both a
 foreign key and unique, then each user can have at most one profile.
 That is a one-to-one pattern.
-
-<Figure
-  slug="db-unique-constraints-uniqueness-beyond-primary-inline-cutout"
-  alt="A rack whose slots each accept one tag, a second identical tag turned away even though it carries a different punched tab"
-  caption="Uniqueness on a foreign key is what makes a relationship one to one."
-/>
 
 ```mermaid
 erDiagram

@@ -83,24 +83,25 @@ jobs:
     env:
       BUCKET: dataslope-illustrations
       PREFIX: illustrations/
-      # TEMPORARY: 30 days for the illustration development phase, raised from
-      # the standing value of 14 on 2026-08-06 at the reviewer's request.
-      # REVERT TO "14" once the art has settled.
+      # 120 days, raised from 30 on 2026-08-10 at the reviewer's request (and
+      # from a standing 14 before that). One value covers both PNGs a run
+      # writes — `<run>/<id>/v<n>/original.png` and `.../cutout.png` sit under
+      # the same prefix — so this is the window for the pristine art and the
+      # background-removed art alike.
       #
-      # Why it was raised: review rounds have been running long. A single batch
-      # can go generate → review → re-roll → review several times over more
-      # than two weeks, and candidates expiring mid-round means paying to
-      # regenerate a PNG that existed. The standing rationale for 14 still
-      # holds and is why this is temporary — a month of rejected candidates,
-      # at a few thousand PNGs per round, is real storage being billed for art
-      # nobody will promote.
+      # Why it keeps going up: R2 is now the *only* copy of both. The served
+      # WebP is a cut-out that has already been trimmed and re-encoded, and
+      # since promotion stopped writing the opaque original into git there is
+      # no full-frame copy in the repo at all. Re-promoting at a different
+      # quality, re-trimming on different axes, or restoring an original for a
+      # page that wants one all read from here — and once these expire the
+      # only way back is paying to regenerate art that already existed.
       #
-      # Two weeks was chosen as: long enough to generate, review in
-      # /illustration-prompts, promote the keepers, and still re-promote a run
-      # at a different quality after feedback lands — that second pass is free,
-      # and re-generating because the pristine PNG expired is not. Short enough
-      # that a few thousand rejected candidates never sit around being billed.
-      EXPIRE_DAYS: "30"
+      # The cost this trades against is rejected candidates: a few thousand
+      # PNGs per round sitting four months instead of one. That was the right
+      # trade at 14 days when the repo held a second copy; it is the wrong one
+      # now.
+      EXPIRE_DAYS: "120"
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
       # Editing bucket configuration needs an R2 Admin Read & Write token; the
       # object-scoped R2_INC_CACHE_* pair is denied here (see the header).

@@ -30,7 +30,7 @@ A word that scores high on both is exactly what you would highlight if asked
 conditions multiplied together.
 
 ```mermaid
-flowchart LR
+flowchart TD
     TF["Term Frequency (TF)<br/>how often the word<br/>appears in THIS document"] --> M["× multiply"]
     IDF["Inverse Document Frequency (IDF)<br/>how RARE the word is<br/>across ALL documents"] --> M
     M --> S["TF-IDF score<br/>high = frequent here,<br/>rare elsewhere"]
@@ -91,12 +91,6 @@ IDF measures rarity *across the whole corpus*. The recipe: count how many
 documents contain the word (its **document frequency**), and take the log of the
 total number of documents divided by that. The logarithm keeps the numbers from
 exploding and is part of the standard definition.
-
-<Figure
-  slug="nlp-tf-idf-intuition-before-formula-inline-cutout"
-  alt="A balance with a very common tile on one pan barely moving it and a rare tile on the other tipping it"
-  caption="A word in every document tells you nothing; a rare word tells you a lot."
-/>
 
 $$\text{idf}(w) = \log\left(\frac{N}{\text{df}(w)}\right)$$
 

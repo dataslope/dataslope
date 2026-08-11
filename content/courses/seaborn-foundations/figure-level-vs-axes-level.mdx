@@ -23,6 +23,12 @@ argument, draw on it, and return that Axes. Examples: `scatterplot()`,
 `lineplot()`, `histplot()`, `kdeplot()`, `boxplot()`, `violinplot()`, `barplot()`,
 `countplot()`, `regplot()`, `heatmap()`.
 
+<Figure
+  slug="sns-figure-level-vs-axes-level-two-kinds-functions-inline-cutout"
+  alt="One machine handing back a single framed panel and another handing back a whole grid of them"
+  caption="Faceting is the reason the figure-level functions exist at all."
+/>
+
 **Figure-level** functions manage an **entire figure**. They create the
 figure *and* its axes for you, can split the data into a grid of panels
 (*facets*), and return a **grid object** (`FacetGrid`, `JointGrid`, or
@@ -183,12 +189,6 @@ sns.relplot(
 
 Try doing that with `scatterplot()` and you'd be writing the subplot loop
 yourself. Faceting is the reason figure-level functions exist.
-
-<Figure
-  slug="sns-figure-level-vs-axes-level-two-kinds-functions-inline-cutout"
-  alt="One machine handing back a single framed panel and another handing back a whole grid of them"
-  caption="Faceting is the reason the figure-level functions exist at all."
-/>
 
 <MultipleChoice
   markdown={`You want **one panel per category** (small multiples) using a single

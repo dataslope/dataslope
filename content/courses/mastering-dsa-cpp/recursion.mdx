@@ -82,6 +82,12 @@ int main() {
 
 The Fibonacci numbers come with eight centuries of backstory: Leonardo of Pisa, nicknamed Fibonacci, posed the famous rabbit-breeding puzzle in his 1202 book *Liber Abaci*, the same book that introduced Hindu-Arabic numerals to European readers. The sequence is recursive by definition: `fib(n) = fib(n - 1) + fib(n - 2)`, with `fib(0) = 0` and `fib(1) = 1`.
 
+<Figure
+  slug="dsa-recursion-naive-fibonacci-inline-cutout"
+  alt="A branching tree of small jobs where the same job turns up again and again on different branches"
+  caption="The same subproblem is recomputed on branch after branch, which is where the time goes."
+/>
+
 Translating the definition straight into code is honest and correct, and a performance disaster. The version below is exponential, and the reason matters more than the example:
 
 <CodeBlock
@@ -107,7 +113,7 @@ int main() {
 />
 
 ```mermaid
-graph TD
+graph LR
     A["<code>fib(4)</code>"] --> B["<code>fib(3)</code>"]
     A --> C["<code>fib(2)</code>"]
     B --> D["<code>fib(2)</code>"]
@@ -148,7 +154,7 @@ int main() {
 
 ## Power: naive and fast
 
-Naive recursive power multiplies by `a` exactly `n` times, so it is O(n).
+Naive recursive power multiplies by `a` exactly `n` times, so it is $O(n)$.
 
 <CodeBlock
   adapter="cpp"
@@ -170,7 +176,7 @@ int main() {
   ]}
 />
 
-But recursion can also make things *faster*, not just prettier. To compute $a^n$, notice that $a^n = (a^{n/2})^2$ when $n$ is even, one recursive call on half the exponent, then one multiplication. The exponent halves every level, so the recursion is only O(log n) deep: `powerFast(3, 13)` finishes in four recursive steps where the naive version needs thirteen. Halving the problem instead of shrinking it by one is the divide-and-conquer move, and the sorting chapter is built on it.
+But recursion can also make things *faster*, not just prettier. To compute $a^n$, notice that $a^n = (a^{n/2})^2$ when $n$ is even, one recursive call on half the exponent, then one multiplication. The exponent halves every level, so the recursion is only $O(\log n)$ deep: `powerFast(3, 13)` finishes in four recursive steps where the naive version needs thirteen. Halving the problem instead of shrinking it by one is the divide-and-conquer move, and the sorting chapter is built on it.
 
 <CodeBlock
   adapter="cpp"
@@ -316,7 +322,7 @@ int main() {
 <MultipleChoice
   markdown={`Why is a base case necessary in recursion?
 
-- It makes the function run in O(1) time.
+- It makes the function run in $O(1)$ time.
   > A base case does not guarantee constant time; it only defines when recursion stops.
 - [o] It stops recursive calls from continuing forever.
   > Without a reachable base case, calls keep stacking until failure.
@@ -331,14 +337,14 @@ A base case is the smallest input that can be answered directly.`}
 <MultipleChoice
   markdown={`What is the time complexity of naive recursive Fibonacci?
 
-- [o] Exponential, often written as O(2^n)
+- [o] Exponential, often written as $O(2^n)$
   > Each call branches and repeats work.
-- O(n)
+- $O(n)$
   > This fits iterative or memoized Fibonacci, not the naive recursive version.
-- O(n log n)
+- $O(n \\log n)$
   > The branching recurrence is larger than this.
-- O(log n)
-  > O(log n) fits fast exponentiation, not naive Fibonacci.
+- $O(\\log n)$
+  > $O(\\log n)$ fits fast exponentiation, not naive Fibonacci.
 
 Repeated subproblems are what dynamic programming fixes.`}
 />

@@ -48,6 +48,12 @@ length against bill depth. The **top margin** is the distribution of
 two-humped, a clue there are subgroups hiding in this data that a bare
 scatter wouldn't have surfaced as clearly.
 
+<Figure
+  slug="sns-joint-distributions-inline-cutout"
+  alt="A flat board of chips scattered across it, with a small mound of the same chips built along its top edge and another built along its right edge"
+  caption="The scatter answers the joint question; the margins answer two separate ones."
+/>
+
 <Callout type="info" title="Why the margins earn their space">
 A scatter shows the *joint* behaviour but squashes each variable's own shape
 into a thin strip along the edge that your eye can't read. The marginal
@@ -226,12 +232,6 @@ combination `jointplot()` doesn't offer out of the box. For everyday use,
 - **When it breaks:** large `n` with `kind="scatter"` overplots the center,
   switch to `kind="hex"` or `kind="kde"`.
 
-<Figure
-  slug="sns-joint-distributions-minimal-joint-plot-inline-cutout"
-  alt="A board of scattered chips with a small mound built along its top edge and another along its right"
-  caption="A joint plot puts each variable's own distribution along the margins."
-/>
-
 ## Your turn
 
 <ChallengeCard
@@ -344,9 +344,3 @@ You've now zoomed all the way in, from the whole-dataset pair-plot grid to
 a single, richly annotated pair of variables with its marginals. With
 relational and pairwise views in hand, the next chapters turn to the
 distribution plots (histograms, KDEs, ECDFs) that power those margins.
-
-<Figure
-  slug="sns-joint-distributions-inline-cutout"
-  alt="A flat board of chips scattered across it, with a small mound of the same chips built along its top edge and another built along its right edge"
-  caption="The scatter answers the joint question; the margins answer two separate ones."
-/>

@@ -15,12 +15,6 @@ side is connected to several rows on the **many** side.
 That shape is a **one-to-many relationship**, and it is the pattern
 you will use more than any other in relational design.
 
-<Figure
-  slug="db-one-to-many-basic-shape-inline-cutout"
-  alt="One large crate with four smaller crates fanned to its right, a cord from each small crate back to the large one"
-  caption="One parent, many children, and one cord home from each child."
-/>
-
 ## The basic shape
 
 Read the diagram from left to right: one customer may place zero,
@@ -71,7 +65,7 @@ the **many** side.
 />
 
 ```mermaid
-flowchart TD
+flowchart LR
     C["<code>customers.id = 1</code><br/>Ada"] --> O1["<code>orders.id = 101<br/>customer_id = 1</code>"]
     C --> O2["<code>orders.id = 102<br/>customer_id = 1</code>"]
     C --> O3["<code>orders.id = 103<br/>customer_id = 1</code>"]

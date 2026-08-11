@@ -83,6 +83,10 @@ export function render() {
     fx: { label: null, domain: posteriors.map((p) => `after ${p.n} visitors`) },
     x: { label: "Conversion rate", labelAnchor: "center", domain: [0, 0.7], ticks: 3, tickFormat: "%" },
     y: { label: "Density", domain: [0, YMAX * 1.12], ticks: 4 },
+    // The grid runs to 0.999 and the x domain stops at 0.7, so every density
+    // mark has to clip: unclipped, the tail of the last panel is drawn 65px
+    // past the right edge of the figure, and the earlier panels spill into
+    // the panel beside them.
     marks: [
       Plot.line(priorRows, {
         x: "x",
@@ -92,9 +96,10 @@ export function render() {
         strokeOpacity: 0.6,
         strokeWidth: 1.25,
         strokeDasharray: "4,3",
+        clip: true,
       }),
-      Plot.areaY(rows, { x: "x", y: "y", fx: "panel", fill: PRIMARY, fillOpacity: 0.16 }),
-      Plot.line(rows, { x: "x", y: "y", fx: "panel", stroke: PRIMARY, strokeWidth: 2 }),
+      Plot.areaY(rows, { x: "x", y: "y", fx: "panel", fill: PRIMARY, fillOpacity: 0.16, clip: true }),
+      Plot.line(rows, { x: "x", y: "y", fx: "panel", stroke: PRIMARY, strokeWidth: 2, clip: true }),
       Plot.ruleX([TRUE_RATE], { stroke: ACCENT, strokeWidth: 1.5, strokeDasharray: "3,3" }),
       Plot.text([{ panel: `after ${STAGES[0]} visitors` }], {
         x: 0.68,

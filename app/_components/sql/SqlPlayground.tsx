@@ -37,7 +37,6 @@ import {
   makeSqlLangExtension,
 } from "./shared/editorSetup";
 import { Popover } from "@base-ui/react/popover";
-import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Dialog } from "@base-ui/react/dialog";
 import { Tabs } from "@base-ui/react/tabs";
 import { Toast } from "@base-ui/react/toast";
@@ -110,6 +109,7 @@ import {
   MobileMoreSections,
   MoreMenu,
   SaveControl,
+  NewWorkspaceControl,
   WorkspaceNameControl,
   type MoreMenuSection,
 } from "../PlaygroundHeaderControls";
@@ -2272,6 +2272,7 @@ function SqlPlaygroundInner() {
                 setActiveWorkspace({ id: activeWorkspace.id, name })
               }
             />
+            <NewWorkspaceControl playgroundId={PLAYGROUND_ID} />
           </>
         ) : null
       }
@@ -2376,36 +2377,36 @@ function SqlPlaygroundInner() {
           }}
         />
 
-        <AlertDialog.Root
+        <Dialog.Root
           open={confirmCloseTabId !== null}
           onOpenChange={(next) => {
             if (!next) setConfirmCloseTabId(null);
           }}
         >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup" role="alertdialog">
+              <Dialog.Title className="confirm-title">
                 Close this tab?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
                 The query in this tab will be discarded. This can&rsquo;t be
                 undone.
-              </AlertDialog.Description>
+              </Dialog.Description>
               <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
+                </Dialog.Close>
+                <Dialog.Close
                   className="confirm-btn confirm-btn-danger"
                   onClick={confirmCloseTab}
                 >
                   Discard &amp; close
-                </AlertDialog.Close>
+                </Dialog.Close>
               </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
 
         <SqlSettingsConfirmDialogs
           dialectDisplayName="SQLite"
@@ -2420,81 +2421,81 @@ function SqlPlaygroundInner() {
           onClearAllDataConfirm={clearAllLocalData}
         />
 
-        <AlertDialog.Root
+        <Dialog.Root
           open={truncateConfirm !== null}
           onOpenChange={(next) => {
             if (!next) setTruncateConfirm(null);
           }}
         >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup" role="alertdialog">
+              <Dialog.Title className="confirm-title">
                 Truncate table?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
                 Truncate table <strong>{truncateConfirm}</strong>? This deletes
                 every row but keeps the schema. The change is in-memory only and
                 will be undone next page load.
-              </AlertDialog.Description>
+              </Dialog.Description>
               <p className="confirm-desc-note">
                 Runs as a plain <strong>DELETE</strong> (SQLite has no
                 TRUNCATE).
               </p>
               <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
+                </Dialog.Close>
+                <Dialog.Close
                   className="confirm-btn confirm-btn-danger"
                   onClick={confirmTruncate}
                 >
                   Truncate
-                </AlertDialog.Close>
+                </Dialog.Close>
               </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
 
         {/* ── Drop entity confirmation dialog ── */}
-        <AlertDialog.Root
+        <Dialog.Root
           open={pendingDropEntity !== null}
           onOpenChange={(next) => {
             if (!next) setPendingDropEntity(null);
           }}
         >
-          <AlertDialog.Portal>
-            <AlertDialog.Backdrop className="confirm-backdrop" />
-            <AlertDialog.Popup className="confirm-popup">
-              <AlertDialog.Title className="confirm-title">
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup" role="alertdialog">
+              <Dialog.Title className="confirm-title">
                 Drop{" "}
                 {pendingDropEntity
                   ? DROP_KIND_LABELS[pendingDropEntity.kind]
                   : ""}
                 ?
-              </AlertDialog.Title>
-              <AlertDialog.Description className="confirm-desc">
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
                 Drop{" "}
                 {pendingDropEntity
                   ? DROP_KIND_LABELS[pendingDropEntity.kind].toLowerCase()
                   : ""}{" "}
                 <strong>{pendingDropEntity?.name}</strong>? This change is
                 in-memory only and will be undone next page load.
-              </AlertDialog.Description>
+              </Dialog.Description>
               <div className="confirm-actions">
-                <AlertDialog.Close className="confirm-btn confirm-btn-secondary">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
                   Cancel
-                </AlertDialog.Close>
-                <AlertDialog.Close
+                </Dialog.Close>
+                <Dialog.Close
                   className="confirm-btn confirm-btn-danger"
                   onClick={confirmDrop}
                 >
                   Drop
-                </AlertDialog.Close>
+                </Dialog.Close>
               </div>
-            </AlertDialog.Popup>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
 
         <ImportBinaryFileDialog
           open={importSqliteOpen}

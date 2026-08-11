@@ -15,12 +15,6 @@ remember to catch every one of those mistakes, every time?
 A well-designed schema does not merely *suggest* good data. It uses
 **constraints** to make bad data impossible to store.
 
-<Figure
-  slug="db-what-are-constraints-constraints-are-enforced-inline-cutout"
-  alt="A chute with three gauges fitted across it, each stopping a block that fails its measure"
-  caption="Constraints make bad data impossible to store rather than merely discouraged."
-/>
-
 ## Constraints are enforced rules
 
 A **constraint** is a rule the database checks on every write: every
@@ -60,7 +54,7 @@ If the rule exists only in one of those places, another path can forget
 it. If the rule exists in the schema, **every path** must obey it.
 
 ```mermaid
-flowchart TB
+flowchart LR
     Web["Web app"] --> DB["PostgreSQL<br/>schema constraints"]
     Mobile["Mobile app"] --> DB
     Import["Import job"] --> DB

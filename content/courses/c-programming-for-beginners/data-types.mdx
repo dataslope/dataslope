@@ -18,12 +18,6 @@ time. The type controls three things:
 - **What operations are legal** (you can add two `int`s; you can't
   add a function to a string).
 
-<Figure
-  slug="c-data-types-fundamental-types-inline-cutout"
-  alt="Four blocks of clearly different widths, each sitting in a recess cut exactly to its size"
-  caption="A type says how many bytes, how the bits are read, and what you may do."
-/>
-
 ## The fundamental types
 
 | Type      | Typical size | What it stores                                                    |
@@ -88,7 +82,7 @@ A 32-bit signed `int` ranges from roughly −2.1 × 10⁹ to +2.1 × 10⁹.
 A 32-bit unsigned `int` ranges from 0 to about 4.3 × 10⁹.
 
 ```mermaid
-flowchart TD
+flowchart LR
     subgraph "signed int (32 bits)"
       direction LR
       A1["-2,147,483,648"] --- A2["0"] --- A3["+2,147,483,647"]

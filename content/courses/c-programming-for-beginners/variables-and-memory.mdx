@@ -14,12 +14,6 @@ the friendly name is a fixed-size box of bytes at a specific address.
 That mental model, *variable = labelled box in memory*, will guide
 every chapter from now on.
 
-<Figure
-  slug="c-variables-and-memory-declaring-variable-inline-cutout"
-  alt="An empty locker with a blank name plate clipped to its door, its shelf not yet holding anything"
-  caption="A variable is a named box in memory, reserved before anything is stored."
-/>
-
 ## Declaring a variable
 
 The minimum recipe for a variable is:
@@ -59,6 +53,12 @@ Three things happen on the line `int age = 30;`:
    scope refers to those 4 bytes.
 3. **Initialize.** The bit pattern for `30` is written into those
    bytes.
+
+<Figure
+  slug="c-variables-and-memory-declaring-variable-inline-cutout"
+  alt="An empty locker with a blank name plate clipped to its door, its shelf not yet holding anything"
+  caption="A variable is a named box in memory, reserved before anything is stored."
+/>
 
 ## Picture it
 

@@ -25,6 +25,12 @@ sentiment model since has been chasing some slice of that goal. It is worth
 remembering that the *ambition* of NLP predates almost all of its methods by
 decades.
 
+<Figure
+  slug="nlp-interesting-discussions-1950-turing-frames-inline-cutout"
+  alt="Two sealed booths joined by a slot, a written slip passing between them"
+  caption="The imitation game framed the question the whole field grew out of."
+/>
+
 ## 1954, the Georgetown–IBM demo and the hype cycle
 
 In 1954 a collaboration between **Georgetown University and IBM** publicly
@@ -60,7 +66,7 @@ according to those probabilities, producing eerily English-looking nonsense. Tha
 is the conceptual seed that grows, eventually, into modern language modeling.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["previous tokens<br/>'the cat'"] --> B["n-gram model<br/>(counts of what follows)"]
     B --> C["likely next token<br/>'sat', 'ran', 'meowed'…"]
 ```
@@ -161,12 +167,6 @@ frequency** idea. It is hard to overstate how durable this turned out to be: IDF
 sits at the heart of classic information retrieval and still shapes how search
 engines weigh your query words half a century later. A simple, well-chosen idea
 can outlast every machine it was first written for.
-
-<Figure
-  slug="nlp-interesting-discussions-1950-turing-frames-inline-cutout"
-  alt="Two sealed booths joined by a slot, a written slip passing between them"
-  caption="The imitation game framed the question the whole field grew out of."
-/>
 
 ## The quiet law: Zipf
 

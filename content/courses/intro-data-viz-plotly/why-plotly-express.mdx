@@ -31,6 +31,12 @@ libraries, and a notebook, changed that between 2005 and 2014:
 - **Jupyter** (the notebook, 2010) let you write code and prose side
   by side with charts appearing inline.
 
+<Figure
+  slug="viz-why-plotly-express-python-won-analytics-inline-cutout"
+  alt="One bench fitted with every tool already in place, several other benches standing part-equipped"
+  caption="Plotly Express is one line per chart because the defaults are already chosen."
+/>
+
 Python "won" not because it was the *best* at any one thing, but
 because it was *good enough at everything*, pipelines, machine
 learning, web apps, and visualization in one language. Once every
@@ -53,12 +59,6 @@ precise:
 - **plotly.py**, the Python wrapper around Plotly.js.
 - **Plotly Express**, a much simpler, higher-level API on top of
   plotly.py, released in **2019** by Nicolas Kruchten.
-
-<Figure
-  slug="viz-why-plotly-express-python-won-analytics-inline-cutout"
-  alt="One bench fitted with every tool already in place, several other benches standing part-equipped"
-  caption="Plotly Express is one line per chart because the defaults are already chosen."
-/>
 
 ```mermaid
 flowchart TB
@@ -136,6 +136,12 @@ took about nine lines; that history is in the appendix.)
    small-multiple panels? Pass `facet_col="..."`. The *grammar* is
    uniform across every chart type.
 3. **Charts are interactive by default.** You don't opt in.
+
+<Figure
+  slug="viz-why-plotly-express-three-design-choices-make-inline-cutout"
+  alt="A chart that responds when pointed at, beside a printed one that can only be read"
+  caption="A static chart answers the question you asked; an interactive one answers the next."
+/>
 
 That third point is the heart of why interactivity matters for
 *analysis*, not just for showing off. A static chart can only answer

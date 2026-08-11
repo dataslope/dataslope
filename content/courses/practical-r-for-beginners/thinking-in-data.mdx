@@ -20,12 +20,6 @@ When you do arithmetic by hand, you think one **number** at a
 time. "What is 5 times 7? Thirty-five. Write that down. Next:
 what is 8 times 9? Seventy-two. Write that down."
 
-<Figure
-  slug="rlang-thinking-in-data-different-way-thinking-inline-cutout"
-  alt="A hand moving one chip at a time beside a whole tray lifted in one motion"
-  caption="Working one number at a time does not survive contact with real data."
-/>
-
 When you do arithmetic on a computer, you think one **collection**
 at a time. "I have a column of widths and a column of heights, I
 want a column of areas. Compute it."
@@ -35,7 +29,7 @@ time*, is the entire essence of **computational thinking** for
 data analysis.
 
 ```mermaid
-flowchart TD
+flowchart LR
   subgraph Hand["By hand: one number at a time"]
     A1["5 × 4 = 20"] --> A2["7 × 3 = 21"] --> A3["2 × 8 = 16"] --> A4["..."]
   end
@@ -200,7 +194,7 @@ This is the "many in, one out" direction, the basic gesture of
 statistics.
 
 ```mermaid
-flowchart TD
+flowchart LR
   subgraph P1["Pattern 1: Map"]
     C1[collection] --> Op1[operation] --> R1[collection]
   end

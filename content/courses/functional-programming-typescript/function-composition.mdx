@@ -25,6 +25,12 @@ In math, given `f: A → B` and `g: B → C`, the composition `g ∘ f`
 is the function `A → C` defined by `(g ∘ f)(x) = g(f(x))`. You apply
 `f` first, then feed the result into `g`.
 
+<Figure
+  slug="fp-function-composition-composition-means-mathematically-inline-cutout"
+  alt="Two machines bolted mouth to chute so the pair has one inlet and one outlet, a single block passing through both"
+  caption="Composing two functions means feeding the first one's output into the second."
+/>
+
 ```mermaid
 flowchart TD
     A((A)) -- f --> B((B)) -- g --> C((C))
@@ -468,12 +474,6 @@ export const slug = (s: string): string =>
 />
 
 ---
-
-<Figure
-  slug="fp-function-composition-composition-means-mathematically-inline-cutout"
-  alt="Two machines bolted mouth to chute so the pair has one inlet and one outlet, a single block passing through both"
-  caption="Composing two functions means feeding the first one's output into the second."
-/>
 
 <MultipleChoice
   markdown={`What is the difference between \`compose(f, g)\` and \`pipe(x, g, f)\`?

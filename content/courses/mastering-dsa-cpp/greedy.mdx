@@ -100,6 +100,12 @@ int main() {
 
 Why is "earliest end" provably safe? The **exchange argument** goes like this. Take any optimal schedule `O`. Look at its first activity; the greedy choice `g` ends no later than it (greedy picked the earliest ender of all). So swap `g` in for `O`'s first activity: nothing that followed is disturbed, they all started after the old first activity ended, hence after `g` ends too, and the schedule is exactly as large. Therefore *some* optimal schedule starts with the greedy choice; repeat the argument on the rest, and greedy's whole output is optimal. Every greedy proof you will ever write has this shape: "take an optimal solution, exchange one piece for the greedy piece, show it got no worse."
 
+<Figure
+  slug="dsa-greedy-activity-selection-inline-cutout"
+  alt="A row of overlapping bars with the earliest-finishing one taken first and the overlaps swept aside"
+  caption="Choosing the earliest finish each time leaves the most room for what follows."
+/>
+
 ```mermaid
 flowchart TD
     O[Optimal starts with X] --> G[Swap in greedy activity G]
@@ -155,7 +161,13 @@ int main() {
 
 ## Jump game
 
-Some greedy solutions need no sort at all, just the right thing to be greedy *about*. In the jump game, `nums[i]` is the farthest you can jump from index `i`; can you reach the end? Don't track every possible route, track one number: `far`, the farthest index reachable so far. Scan left to right; if the current index ever exceeds `far`, you are standing somewhere unreachable and the answer is no; otherwise extend `far` with `i + nums[i]`. One pass, O(1) space.
+Some greedy solutions need no sort at all, just the right thing to be greedy *about*. In the jump game, `nums[i]` is the farthest you can jump from index `i`; can you reach the end? Don't track every possible route, track one number: `far`, the farthest index reachable so far. Scan left to right; if the current index ever exceeds `far`, you are standing somewhere unreachable and the answer is no; otherwise extend `far` with `i + nums[i]`. One pass, $O(1)$ space.
+
+<Figure
+  slug="dsa-greedy-inline-cutout"
+  alt="A figure walking a row of coin trays taking the largest from each in turn without looking ahead, and one tray further on holding a much larger prize"
+  caption="A greedy rule takes the best local choice and never looks ahead."
+/>
 
 <CodeBlock
   adapter="cpp"
@@ -187,12 +199,6 @@ int main() {
 ## Huffman coding
 
 The most consequential greedy algorithm ever devised was a homework dodge. In 1951, David Huffman was a graduate student in Robert Fano's information theory course at MIT, where students could either take the final exam or solve a term-paper problem: construct the most efficient binary code for a set of symbols with known frequencies. What Huffman didn't know was that Fano himself, with Claude Shannon, had attacked the problem and settled for a suboptimal method. Huffman struggled for months and was about to give up and study for the exam when the insight arrived: build the code tree *bottom-up*, greedily merging the two least frequent symbols, again and again. The result was provably optimal, outdoing his professor, and Huffman coding still runs inside ZIP, JPEG, and MP3 files today.
-
-<Figure
-  slug="dsa-greedy-activity-selection-inline-cutout"
-  alt="A row of overlapping bars with the earliest-finishing one taken first and the overlaps swept aside"
-  caption="Choosing the earliest finish each time leaves the most room for what follows."
-/>
 
 The implementation is a priority-queue loop: repeatedly extract the two smallest frequencies, merge them, and push the sum back. (The full algorithm builds tree nodes; the version below computes just the total encoding cost, each merge's sum is the number of bits that merge contributes.)
 
@@ -278,12 +284,6 @@ int main() {
 ## Practice
 
 Three challenges, three greedy flavors: the sort-and-scan (activity selection), the running-frontier (jump game), and biggest-coin-first on a coin system where it is actually legal.
-
-<Figure
-  slug="dsa-greedy-inline-cutout"
-  alt="A figure walking a row of coin trays taking the largest from each in turn without looking ahead, and one tray further on holding a much larger prize"
-  caption="A greedy rule takes the best local choice and never looks ahead."
-/>
 
 <ChallengeCard
   adapter="cpp"

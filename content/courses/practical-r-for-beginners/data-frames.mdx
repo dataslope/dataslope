@@ -44,9 +44,9 @@ HTML table. Each column has its own type, `name` and `dept` are
 character, `salary` is numeric, `remote` is logical.
 
 <Figure
-  slug="rlang-data-frames-inspecting-data-frame-inline-cutout"
-  alt="A clamped board with a caliper measuring it across and down"
-  caption="A data frame has two sizes worth knowing straight away: rows and columns."
+  slug="rlang-data-frames-creating-data-frame-inline-cutout"
+  alt="Several tall slats of different patterns being clamped side by side into one board"
+  caption="A data frame is columns of different types clamped together at the same length."
 />
 
 Each column is a vector, and the data frame stacks them
@@ -93,9 +93,9 @@ most. `str()` shows the *shape* of the data; `summary()` shows the
 *content*.
 
 <Figure
-  slug="rlang-data-frames-creating-data-frame-inline-cutout"
-  alt="Several tall slats of different patterns being clamped side by side into one board"
-  caption="A data frame is columns of different types clamped together at the same length."
+  slug="rlang-data-frames-inspecting-data-frame-inline-cutout"
+  alt="A clamped board with a caliper measuring it across and down"
+  caption="A data frame has two sizes worth knowing straight away: rows and columns."
 />
 
 ## Accessing columns
@@ -178,6 +178,12 @@ print(employees)
 Vectorized arithmetic works exactly as you'd hope,
 `employees$salary * 0.10` produces a new vector of bonuses, which
 is then stored as a new column.
+
+<Figure
+  slug="rlang-data-frames-inline-cutout"
+  alt="Several columns of different kinds clamped side by side into one board, one column of plain blocks, one of coloured tags, one of small marks"
+  caption="Each column keeps its own type, which is what makes a data frame more than a matrix."
+/>
 
 ## Built-in datasets: your sandbox
 
@@ -269,12 +275,6 @@ is finding them.
 Build a data frame `students` with columns `name` (character),
 `grade` (integer), and `score` (numeric), then compute the
 `avg_score` of all students.
-
-<Figure
-  slug="rlang-data-frames-inline-cutout"
-  alt="Several columns of different kinds clamped side by side into one board, one column of plain blocks, one of coloured tags, one of small marks"
-  caption="Each column keeps its own type, which is what makes a data frame more than a matrix."
-/>
 
 <ChallengeCard
   adapter="r"

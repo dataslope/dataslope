@@ -23,14 +23,8 @@ The answer depends on two independent properties:
   slightly perturbed problem. An *unstable* algorithm produces
   garbage even on well-conditioned problems.
 
-<Figure
-  slug="scipy-numerical-stability-stability-intuitively-inline-cutout"
-  alt="Two chains of steps from the same start, one ending on its mark and one visibly off"
-  caption="Two algorithms for the same answer can end in very different places."
-/>
-
 ```mermaid
-flowchart TB
+flowchart LR
     P{Conditioning<br/>property of the<br/>problem}
     A{Stability<br/>property of the<br/>algorithm}
     P -- well-conditioned --> R1[Stable algorithms<br/>give a good answer]
@@ -47,6 +41,12 @@ If $f$ is a function and you evaluate $f(x + \delta x)$ for small
 $\delta x$, how big is $f(x + \delta x) - f(x)$? The ratio of
 *relative* output change to *relative* input change is the
 **condition number** of $f$ at $x$.
+
+<Figure
+  slug="scipy-numerical-stability-stability-intuitively-inline-cutout"
+  alt="Two chains of steps from the same start, one ending on its mark and one visibly off"
+  caption="Two algorithms for the same answer can end in very different places."
+/>
 
 For evaluating $f$:
 

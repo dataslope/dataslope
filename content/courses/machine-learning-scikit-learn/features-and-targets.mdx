@@ -19,12 +19,6 @@ look at any table and confidently say "these columns are the features, this
 column is the target," you can frame essentially any supervised problem.
 That framing is the skill this page builds.
 
-<Figure
-  slug="ml-features-and-targets-concrete-example-from-inline-cutout"
-  alt="One board split by a clear gap, its left columns lifted as a group and its right column lifted alone"
-  caption="Splitting a table into X and y is what frames any supervised problem."
-/>
-
 ## The two pieces every model needs
 
 A supervised machine learning model learns to map *inputs* to *outputs*. We
@@ -77,9 +71,9 @@ number of bedrooms, an age, and a neighborhood; the thing we want to predict
 is its price.
 
 <Figure
-  slug="ml-features-and-targets-two-pieces-every-inline-cutout"
-  alt="A board of input columns separated by a clear gap from one marked answer column"
-  caption="The features are what you know; the target is what you want to predict."
+  slug="ml-features-and-targets-concrete-example-from-inline-cutout"
+  alt="One board split by a clear gap, its left columns lifted as a group and its right column lifted alone"
+  caption="Splitting a table into X and y is what frames any supervised problem."
 />
 
 We will build this table as a small pandas DataFrame and look at it.
@@ -162,6 +156,12 @@ flavor of *data leakage*, a trap the preprocessing chapters return to.
 `X.shape` is the first thing experienced practitioners check after building a
 feature matrix, because it answers two questions at once: *how many examples
 do I have* (rows) and *how many features describe each one* (columns).
+
+<Figure
+  slug="ml-features-and-targets-reading-x-shape-inline-cutout"
+  alt="A ruled board of rows and columns beside a single narrow strip of exactly the same height"
+  caption="`X` is two-dimensional, samples by features; `y` is one-dimensional, one label per sample."
+/>
 
 <CodeBlock
   adapter="python"

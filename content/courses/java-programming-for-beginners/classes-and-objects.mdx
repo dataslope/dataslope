@@ -21,6 +21,12 @@ You live in *a particular house built from the drawing*. From the
 same drawing you can build many houses, each at its own address,
 each with its own occupants.
 
+<Figure
+  slug="java-classes-and-objects-blueprint-vs-thing-inline-cutout"
+  alt="A paper template pinned to a board and one finished crate stamped from it standing below"
+  caption="The class is the template; each object is one thing stamped from it."
+/>
+
 ```mermaid
 flowchart LR
     BP["Blueprint:<br/>class Dog"] -->|new| O1["Object:<br/>Dog 'Rex'<br/>age 4"]
@@ -220,12 +226,6 @@ which is why constructors so often look like `this.name = name;`.
 A reference variable that does not yet point to any object holds the
 special value `null`. Calling a method on `null` throws a
 `NullPointerException`, Java's most famous error.
-
-<Figure
-  slug="java-classes-and-objects-blueprint-vs-thing-inline-cutout"
-  alt="A paper template pinned to a board and one finished crate stamped from it standing below"
-  caption="The class is the template; each object is one thing stamped from it."
-/>
 
 <CodeBlock
   adapter="java"

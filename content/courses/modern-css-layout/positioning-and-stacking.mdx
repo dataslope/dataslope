@@ -28,6 +28,12 @@ The workhorse combination: a parent set to `position: relative` becomes
 the **positioning context**, and an `absolute` child is placed inside
 it with `top`/`right`/`bottom`/`left`.
 
+<Figure
+  slug="css-positioning-and-stacking-relative-absolute-anchor-pattern-inline-cutout"
+  alt="A small marker pinned to the corner of a card, and the same marker flying to the corner of the whole sheet once the card's pin is pulled"
+  caption="An absolute child is placed against its nearest positioned ancestor, so give it one."
+/>
+
 Here the green "online" dot is an absolutely-positioned child pinned to
 the bottom-right corner of its `relative` avatar. The dot doesn't take
 up space in the flow, it floats over the corner:

@@ -32,6 +32,12 @@ came out astonishingly close to the ox's true weight, closer than the cattle
 experts present. Each person's error was partly random; combining the guesses
 cancelled the random part and left the collective signal.
 
+<Figure
+  slug="ml-ensembles-and-random-forests-intuition-wisdom-crowds-inline-cutout"
+  alt="One gauge alone reading badly beside twenty gauges whose averaged needle sits on the mark"
+  caption="Averaging many noisy trees cancels out their individual mistakes."
+/>
+
 An **ensemble** applies this to models. Take many models that are each
 individually mediocre and somewhat *independent* in their mistakes, then
 combine their predictions. As long as the models are better than random and
@@ -319,12 +325,6 @@ Because a forest is built from trees, it can report which features were most
 useful for splitting, aggregated across all the trees:
 `forest.feature_importances_`. This is a quick way to see what the model
 leaned on.
-
-<Figure
-  slug="ml-ensembles-and-random-forests-intuition-wisdom-crowds-inline-cutout"
-  alt="One gauge alone reading badly beside twenty gauges whose averaged needle sits on the mark"
-  caption="Averaging many noisy trees cancels out their individual mistakes."
-/>
 
 <CodeBlock
   adapter="python"

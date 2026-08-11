@@ -16,17 +16,17 @@ indexes, configuration, frequency counts, lookup tables, JSON
 objects, and the symbol tables of every compiler in the world are
 maps under the skin.
 
-<Figure
-  slug="jcol-maps-inline-cutout"
-  alt="A wall of small pigeonholes, each with a distinct key hanging beside it, and one key opening exactly one hole to reveal the block inside"
-  caption="One key opens exactly one entry, with no searching along the wall."
-/>
-
 ## The Map interface
 
 `Map<K, V>` is its own root, it does not extend `Collection`,
 because its elements are *pairs* (`Map.Entry<K, V>`), not single
 values.
+
+<Figure
+  slug="jcol-maps-map-interface-inline-cutout"
+  alt="A wall of small drawers each with its own keyhole and a key hanging beside it"
+  caption="Keys are unique; values are whatever each key was given."
+/>
 
 ```mermaid
 classDiagram
@@ -51,7 +51,7 @@ iterate a map. Of those, `entrySet()` is almost always what you want.
 
 ## HashMap
 
-`HashMap` is the workhorse. Average `O(1)` for `put()`, `get()`,
+`HashMap` is the workhorse. Average $O(1)$ for `put()`, `get()`,
 `containsKey()`. No order guarantee.
 
 <CodeBlock
@@ -87,6 +87,12 @@ public class Main {
 
 Worth understanding the data structure once.
 
+<Figure
+  slug="jcol-maps-hashmap-actually-works-inline-cutout"
+  alt="A rack of identical bins with every item forced into one of them, the chain inside that bin folding into a small tree"
+  caption="Force every key into one bucket and lookup degrades, which is why the chain became a tree."
+/>
+
 ```mermaid
 flowchart LR
     subgraph HashMap["<code>HashMap</code>"]
@@ -110,7 +116,7 @@ flowchart LR
 
 This explains a lot:
 
-- Why `put()` and `get()` are `O(1)` *average* but worst-case `O(log n)`
+- Why `put()` and `get()` are $O(1)$ *average* but worst-case $O(\log n)$
   (post-Java-8) after collisions.
 - Why a bad `hashCode()` (constant, or near-constant) destroys
   performance, every operation falls back to walking a long chain.
@@ -129,7 +135,7 @@ could pin a CPU core for minutes. PHP, Python, Ruby, ASP.NET, and
 Java servers were all vulnerable, and vendors scrambled out patches.
 Java's deeper fix arrived in Java 8: once a bucket's chain grows past
 eight entries, `HashMap` converts it into a red-black tree, capping
-even an adversarial worst case at `O(log n)`. The data structure you
+even an adversarial worst case at $O(\log n)$. The data structure you
 are studying was hardened by an actual attack.
 
 ## LinkedHashMap
@@ -170,9 +176,15 @@ display or determinism, for example, JSON-like response objects.
 
 ## TreeMap
 
-`TreeMap` keeps keys in sorted order (red-black tree). `O(log n)`
+`TreeMap` keeps keys in sorted order (red-black tree). $O(\log n)$
 everywhere, but in exchange you get range queries, `firstKey`,
 `lastKey`, `floorKey`, `ceilingKey`, and `subMap`.
+
+<Figure
+  slug="jcol-maps-inline-cutout"
+  alt="A wall of small pigeonholes, each with a distinct key hanging beside it, and one key opening exactly one hole to reveal the block inside"
+  caption="One key opens exactly one entry, with no searching along the wall."
+/>
 
 <CodeBlock
   adapter="java"
@@ -245,12 +257,6 @@ public class Main {
 Java 8 added a small set of methods that eliminate a *lot* of "if
 present, update; else insert" boilerplate. Learn them and your code
 shrinks.
-
-<Figure
-  slug="jcol-maps-map-interface-inline-cutout"
-  alt="A wall of small drawers each with its own keyhole and a key hanging beside it"
-  caption="Keys are unique; values are whatever each key was given."
-/>
 
 | Method | What it does |
 | --- | --- |
@@ -440,7 +446,7 @@ public class Grouper {
 - When you need higher throughput
   > \`HashMap\` is faster on average.
 - [o] When you need keys iterated in sorted order, range queries (\`subMap\`), or "next key after \`x\`" (\`ceilingKey\`, \`floorKey\`)
-  > The \`O(log n)\` price buys real ordering operations a hash table cannot provide.`}
+  > The $O(\\log n)$ price buys real ordering operations a hash table cannot provide.`}
 />
 
 <MultipleChoice

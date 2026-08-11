@@ -70,7 +70,7 @@ graph TD
     C --> G["<code>fib(1)</code>"]
 ```
 
-Stage two: memoization. Same recursion, plus a `memo` vector where `-1` means "not yet computed." Each distinct `n` is now computed once, O(n) total. Notice how little the code changed; the cache check and the cache write are the only additions.
+Stage two: memoization. Same recursion, plus a `memo` vector where `-1` means "not yet computed." Each distinct `n` is now computed once, $O(n)$ total. Notice how little the code changed; the cache check and the cache write are the only additions.
 
 <Figure
   slug="dsa-dynamic-programming-fibonacci-four-ways-inline-cutout"
@@ -129,7 +129,7 @@ int main() {
   ]}
 />
 
-Stage four: notice that the table only ever looks back two cells, so keep two variables instead of an array, O(1) space. This "rolling" trick applies to any DP whose transition reaches back a bounded distance.
+Stage four: notice that the table only ever looks back two cells, so keep two variables instead of an array, $O(1)$ space. This "rolling" trick applies to any DP whose transition reaches back a bounded distance.
 
 <CodeBlock
   adapter="cpp"
@@ -232,18 +232,6 @@ int main() {
 
 The knapsack is DP's most famous two-dimensional problem: given items with weights and values and a pack of capacity W, choose items (each at most once, that is the "0/1") to maximize value. The state needs two coordinates because two things constrain you: `dp[i][w]` = best value using only the first `i` items within capacity `w`. Each item presents exactly one binary decision, skip it (`dp[i-1][w]`) or take it (`val[i-1] + dp[i-1][w - wt[i-1]]`, if it fits), and the table tries both.
 
-<Figure
-  slug="dsa-dynamic-programming-mindset-inline-cutout"
-  alt="A wall of small pigeonholes filled left to right, each built from the two beside it rather than from scratch"
-  caption="Each cell answers one subproblem, built from cells already filled."
-/>
-
-<Figure
-  slug="dsa-dynamic-programming-inline-cutout"
-  alt="A wall of small pigeonholes being filled left to right, each new hole built from the two beside it rather than from scratch"
-  caption="The table is filled once and read many times, which is the whole saving."
-/>
-
 | item | weight | value |
 | --- | ---: | ---: |
 | 0 | 2 | 12 |
@@ -291,6 +279,12 @@ int main() {
 
 String DP runs on the same two-coordinate idea. The **longest common subsequence** (LCS) of two strings is the longest sequence of characters appearing in both, in order but not necessarily adjacent, it is the algorithm under `git diff`, which displays whatever is *not* in the LCS as your changes. State: `dp[i][j]` = LCS length of prefixes `a[0..i)` and `b[0..j)`. If the last characters match, they extend the diagonal answer by one; if not, drop a character from one string or the other and take the better. Example: `ABCBDAB` vs `BDCABC` gives length 4.
 
+<Figure
+  slug="dsa-dynamic-programming-inline-cutout"
+  alt="A wall of small pigeonholes being filled left to right, each new hole built from the two beside it rather than from scratch"
+  caption="The table is filled once and read many times, which is the whole saving."
+/>
+
 ```mermaid
 flowchart TD
     R["rows: ABCBDAB"] --> G["DP grid"]
@@ -325,7 +319,7 @@ int main() {
   ]}
 />
 
-The **longest increasing subsequence** (LIS) shows how much the *wording* of a state matters. Defining `dp[i]` as "LIS of the first i elements" leads nowhere, knowing a length doesn't tell you whether the next element can extend it. The state that works is `dp[i]` = "length of the LIS *ending exactly at index i*": now extension is checkable (`nums[j] < nums[i]`), and the global answer is the max over all endings. (An O(n log n) patience-sorting version exists; the O(n²) DP below is the one to understand first.)
+The **longest increasing subsequence** (LIS) shows how much the *wording* of a state matters. Defining `dp[i]` as "LIS of the first i elements" leads nowhere, knowing a length doesn't tell you whether the next element can extend it. The state that works is `dp[i]` = "length of the LIS *ending exactly at index i*": now extension is checkable (`nums[j] < nums[i]`), and the global answer is the max over all endings. (An $O(n \log n)$ patience-sorting version exists; the $O(n^2)$ DP below is the one to understand first.)
 
 <CodeBlock
   adapter="cpp"
@@ -508,16 +502,16 @@ int main() {
 
 <MultipleChoice markdown={`The standard LCS table for lengths n and m costs:
 
-- O(n + m)
+- $O(n + m)$
   > It checks pairs of prefixes.
-- [o] O(nm)
+- [o] $O(nm)$
   > The table has n × m cells and each one is filled in constant time.
-- O(2^n)
+- $O(2^n)$
   > DP avoids the exponential recursion.
-- O(log n)
+- $O(\\log n)$
   > No halving.`} />
 
-<MultipleChoice markdown={`Why can Fibonacci use O(1) extra space?
+<MultipleChoice markdown={`Why can Fibonacci use $O(1)$ extra space?
 
 - [o] Each state needs only the previous two values.
   > Keeping just the last two results lets each new value be computed in place, so no full array is needed.

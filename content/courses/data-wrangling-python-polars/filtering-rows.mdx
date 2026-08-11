@@ -178,12 +178,6 @@ it does not conflate null with `NaN` or with zero.
 
 The expression can reference aggregations of the same frame.
 
-<Figure
-  slug="pl-filtering-rows-basics-inline-cutout"
-  alt="A stack of rows dropping through a mask, only those aligned with open squares getting through"
-  caption="A filter is a mask of one yes or no per row, applied all at once."
-/>
-
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
