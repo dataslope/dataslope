@@ -73,8 +73,6 @@ import { Drawer } from "@base-ui/react/drawer";
 import {
   Library,
   ArrowDownToLine,
-  Cloud,
-  CloudUpload,
   Package,
   Share2,
   Eraser,
@@ -150,10 +148,12 @@ import { ShareControls } from "./cloud/ShareControls";
 import {
   HeaderDivider,
   MobileMoreSections,
+  MobileSaveMenu,
   MoreMenu,
   NewWorkspaceControl,
   SaveControl,
   WorkspaceNameControl,
+  useAccountMenuSection,
   type MoreMenuSection,
 } from "./PlaygroundHeaderControls";
 import {
@@ -3594,7 +3594,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ⋯ menu: everything secondary folds into one place — labelled sections
   // whose items either act (Packages dialog, Settings tab, Workspaces
   // manager) or slide to a sub-panel (Examples, Export, Runtime info).
-  const moreMenuSections = useMemo<MoreMenuSection[]>(
+  const playgroundMoreSections = useMemo<MoreMenuSection[]>(
     () => [
       {
         label: "Resources",
@@ -3705,6 +3705,20 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       },
     ],
     [adapter, requestExample, exportCode, openSettingsTab],
+  );
+
+  // Auth had no entry point inside a playground at all. It lands as the ⋯
+  // menu's last group rather than a header control: the header is down to
+  // five controls by design and has no room on a phone, and signing in
+  // isn't something anyone reaches for mid-session. Null while the first
+  // session fetch is in flight, so nothing flashes.
+  const accountSection = useAccountMenuSection();
+  const moreMenuSections = useMemo<MoreMenuSection[]>(
+    () =>
+      accountSection
+        ? [...playgroundMoreSections, accountSection]
+        : playgroundMoreSections,
+    [playgroundMoreSections, accountSection],
   );
 
   // Rotate through the witty loading messages while the runtime is
@@ -4029,24 +4043,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               same sections the desktop ⋯ menu shows. */}
           <MobileMenuSheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <MobileMenuLabel>Workspace</MobileMenuLabel>
-            {workspaceReady &&
-              (!workspaceSaved && workspaceDirty ? (
-                <MobileMenuAction
-                  icon={CloudUpload}
-                  label="Save"
-                  onClick={() => {
-                    void handleSaveWorkspace(workspaceName || "Workspace");
-                    showToast("Workspace saved");
-                  }}
-                />
-              ) : (
-                <MobileMenuAction
-                  icon={Cloud}
-                  label="Saved"
-                  disabled
-                  onClick={() => {}}
-                />
-              ))}
+            {workspaceReady && (
+              <MobileSaveMenu
+                playgroundId={adapter.id}
+                workspaceId={workspaceId}
+                workspaceName={workspaceName}
+                unsaved={!workspaceSaved && workspaceDirty}
+                onSave={handleSaveWorkspace}
+                buildBundle={buildCloudBundle}
+                onNotify={showToast}
+              />
+            )}
             <MobileMenuAction
               icon={Share2}
               label="Share"

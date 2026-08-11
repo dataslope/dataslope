@@ -35,8 +35,6 @@ import { Toast } from "@base-ui/react/toast";
 import {
   ArrowDownToLine,
   Share2,
-  CloudUpload,
-  Cloud,
   ArrowUpFromLine,
   FolderOpen,
   Info,
@@ -127,10 +125,12 @@ import { ShareControls } from "../cloud/ShareControls";
 import {
   HeaderDivider,
   MobileMoreSections,
+  MobileSaveMenu,
   MoreMenu,
   SaveControl,
   NewWorkspaceControl,
   WorkspaceNameControl,
+  useAccountMenuSection,
   type MoreMenuSection,
 } from "../PlaygroundHeaderControls";
 import { applyEntryFocus } from "../playgroundEntryFocus";
@@ -3733,7 +3733,7 @@ function PostgresPlaygroundInner() {
 
   // One definition drives both the desktop ⋯ menu and the mobile
   // drawer's sectioned rows.
-  const moreSections: MoreMenuSection[] = [
+  const baseMoreSections: MoreMenuSection[] = [
                 {
                   label: "Data",
                   items: [
@@ -3909,6 +3909,16 @@ function PostgresPlaygroundInner() {
                 },
               ];
 
+  // Auth had no entry point inside a playground at all. It lands as the ⋯
+  // menu's last group rather than a header control: the header is down to
+  // five controls by design and has no room on a phone, and signing in
+  // isn't something anyone reaches for mid-session. Null while the first
+  // session fetch is in flight, so nothing flashes.
+  const accountSection = useAccountMenuSection();
+  const moreSections: MoreMenuSection[] = accountSection
+    ? [...baseMoreSections, accountSection]
+    : baseMoreSections;
+
   return (
     <SqlPlaygroundShell
       playgroundId={PLAYGROUND_ID}
@@ -3980,27 +3990,20 @@ function PostgresPlaygroundInner() {
         <>
           <div className="mobile-menu-db-selector">{databaseSelector}</div>
           <MobileMenuLabel>Workspace</MobileMenuLabel>
-          {activeWorkspace &&
-            (!workspaceSaved &&
-            tabs.some((t) => !t.kind && t.code !== t.pristineCode) ? (
-              <MobileMenuAction
-                icon={CloudUpload}
-                label="Save"
-                onClick={() => {
-                  void handleSaveWorkspace(
-                    activeWorkspace.name || "Workspace",
-                  );
-                  showToast("Workspace saved");
-                }}
-              />
-            ) : (
-              <MobileMenuAction
-                icon={Cloud}
-                label="Saved"
-                disabled
-                onClick={() => {}}
-              />
-            ))}
+          {activeWorkspace && (
+            <MobileSaveMenu
+              playgroundId={PLAYGROUND_ID}
+              workspaceId={activeWorkspace.id}
+              workspaceName={activeWorkspace.name}
+              unsaved={
+                !workspaceSaved &&
+                tabs.some((t) => !t.kind && t.code !== t.pristineCode)
+              }
+              onSave={handleSaveWorkspace}
+              buildBundle={buildCloudBundle}
+              onNotify={showToast}
+            />
+          )}
           <MobileMenuAction
             icon={Share2}
             label="Share"

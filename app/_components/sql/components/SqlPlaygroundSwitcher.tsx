@@ -72,7 +72,11 @@ export function SqlPlaygroundSwitcher({
               </span>
             ) : null;
           })()}
-          <Select.Value>
+          {/* The label is hidden below 768px (the icon already identifies
+              the dialect) so the header has room for the logo; the dropdown
+              items keep their icons and labels either way. Same class, and
+              so the same rule, as the language playgrounds' switcher. */}
+          <Select.Value className="playground-switcher-label">
             {PLAYGROUNDS.find((p) => p.id === playgroundId)?.label ??
               playgroundId}
           </Select.Value>

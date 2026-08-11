@@ -64,8 +64,9 @@ const CATEGORIES: Category[] = [
     description:
       "A full SQL workbench in the browser. Load data, run queries, and inspect results against embedded or remote engines.",
     items: [
-      { id: "sqlite", label: "SQLite", version: "3.53" },
+      // Same order as `PLAYGROUNDS`: PostgreSQL · SQLite · DuckDB.
       { id: "postgres", label: "PostgreSQL", version: "17" },
+      { id: "sqlite", label: "SQLite", version: "3.53" },
       { id: "duckdb", label: "DuckDB", version: "1.32" },
     ],
   },

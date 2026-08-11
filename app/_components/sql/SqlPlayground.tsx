@@ -43,8 +43,6 @@ import { Toast } from "@base-ui/react/toast";
 import {
   ArrowDownToLine,
   Share2,
-  CloudUpload,
-  Cloud,
   ArrowUpFromLine,
   CircleHelp,
   FolderOpen,
@@ -107,10 +105,12 @@ import { ShareControls } from "../cloud/ShareControls";
 import {
   HeaderDivider,
   MobileMoreSections,
+  MobileSaveMenu,
   MoreMenu,
   SaveControl,
   NewWorkspaceControl,
   WorkspaceNameControl,
+  useAccountMenuSection,
   type MoreMenuSection,
 } from "../PlaygroundHeaderControls";
 import { applyEntryFocus } from "../playgroundEntryFocus";
@@ -1998,7 +1998,7 @@ function SqlPlaygroundInner() {
 
   // ⋯ menu (simplified header): Data / Tools / Playground sections with
   // Import & Export sliding to sub-panels, mirroring the design handoff.
-  const sqlMoreSections = useMemo<MoreMenuSection[]>(
+  const sqlBaseSections = useMemo<MoreMenuSection[]>(
     () => [
       {
         label: "Data",
@@ -2207,6 +2207,18 @@ function SqlPlaygroundInner() {
     ],
   );
 
+  // Auth had no entry point inside a playground at all. It lands as the ⋯
+  // menu's last group rather than a header control: the header is down to
+  // five controls by design and has no room on a phone, and signing in
+  // isn't something anyone reaches for mid-session. Null while the first
+  // session fetch is in flight, so nothing flashes.
+  const accountSection = useAccountMenuSection();
+  const sqlMoreSections = useMemo<MoreMenuSection[]>(
+    () =>
+      accountSection ? [...sqlBaseSections, accountSection] : sqlBaseSections,
+    [sqlBaseSections, accountSection],
+  );
+
   // Defined once and rendered in both the sidebar and the mobile drawer
   // menu (the latter is an experiment, the sidebar copy may be retired).
   const databaseSelector = (
@@ -2323,27 +2335,20 @@ function SqlPlaygroundInner() {
         <>
           <div className="mobile-menu-db-selector">{databaseSelector}</div>
           <MobileMenuLabel>Workspace</MobileMenuLabel>
-          {activeWorkspace &&
-            (!workspaceSaved &&
-            tabs.some((t) => !t.kind && t.code !== t.pristineCode) ? (
-              <MobileMenuAction
-                icon={CloudUpload}
-                label="Save"
-                onClick={() => {
-                  void handleSaveWorkspace(
-                    activeWorkspace.name || "Workspace",
-                  );
-                  showToast("Workspace saved");
-                }}
-              />
-            ) : (
-              <MobileMenuAction
-                icon={Cloud}
-                label="Saved"
-                disabled
-                onClick={() => {}}
-              />
-            ))}
+          {activeWorkspace && (
+            <MobileSaveMenu
+              playgroundId={PLAYGROUND_ID}
+              workspaceId={activeWorkspace.id}
+              workspaceName={activeWorkspace.name}
+              unsaved={
+                !workspaceSaved &&
+                tabs.some((t) => !t.kind && t.code !== t.pristineCode)
+              }
+              onSave={handleSaveWorkspace}
+              buildBundle={buildCloudBundle}
+              onNotify={showToast}
+            />
+          )}
           <MobileMenuAction
             icon={Share2}
             label="Share"

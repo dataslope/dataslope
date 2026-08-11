@@ -109,7 +109,7 @@ export function MobileMenuSheet({
         <Drawer.Backdrop className="pkg-overlay mobile-menu-backdrop" />
         <Drawer.Viewport className="mobile-drawer-viewport">
           <Drawer.Popup className="mobile-menu-drawer" aria-label={title}>
-            <Drawer.Content>
+            <Drawer.Content className="mobile-menu-drawer-content">
               <div className="mobile-menu-handle" aria-hidden="true" />
               <div className="mobile-menu-drawer-header">
                 <Drawer.Title className="mobile-menu-drawer-title">
@@ -155,21 +155,68 @@ export function useMobileMenuClose() {
   return useContext(MobileMenuContext).closeRoot;
 }
 
-/** Leading icon + label cluster shared by action rows and sub-sheet rows. */
-function RowMain({ icon: Icon, label }: { icon?: LucideIcon; label: ReactNode }) {
+/** True while the `MobileMenuSubSheet` with this id is the open one. Lets a
+ *  row that owns a sub-sheet react to it opening (e.g. refetch the cloud
+ *  backup list) from *outside* the sheet, where the hooks stay mounted. */
+export function useMobileMenuSubSheetOpen(id: string) {
+  return useContext(MobileMenuContext).activeSubmenu === id;
+}
+
+/** Leading icon + label cluster shared by action rows and sub-sheet rows.
+ *  `sub` adds the desktop menus' second, dimmer line under the label. */
+function RowMain({
+  icon: Icon,
+  label,
+  sub,
+}: {
+  icon?: LucideIcon;
+  label: ReactNode;
+  sub?: ReactNode;
+}) {
   return (
     <span className="mobile-menu-main">
       {Icon && <Icon size={15} strokeWidth={1.8} aria-hidden="true" />}
-      <span>{label}</span>
+      {sub === undefined ? (
+        <span>{label}</span>
+      ) : (
+        <span className="mobile-menu-text">
+          <span>{label}</span>
+          <span className="mobile-menu-sub">{sub}</span>
+        </span>
+      )}
     </span>
+  );
+}
+
+/** Non-interactive note row, the drawer counterpart of the desktop save
+ *  menu's "Auto-saves in this browser as you work" strip. */
+export function MobileMenuNote({
+  icon: Icon,
+  children,
+}: {
+  icon?: LucideIcon;
+  children: ReactNode;
+}) {
+  return (
+    <div className="mobile-menu-note">
+      {Icon && <Icon size={13} strokeWidth={2} aria-hidden="true" />}
+      <span>{children}</span>
+    </div>
   );
 }
 
 export interface MobileMenuActionProps {
   label: ReactNode;
-  onClick: () => void;
+  /** Fired on tap. Optional only for `href` rows, which navigate instead. */
+  onClick?: () => void;
+  /** Renders the row as a link to this URL instead of a button (e.g. the
+   *  save menu's "Sign in to back up"). */
+  href?: string;
   /** Leading icon, mirroring the desktop ⋯ menu rows. */
   icon?: LucideIcon;
+  /** Second, dimmer line under the label, mirroring the desktop save
+   *  menu's item subtitles. */
+  sub?: ReactNode;
   /** Small trailing count/status chip (e.g. example counts, "Saved"). */
   hint?: ReactNode;
   disabled?: boolean;
@@ -184,24 +231,18 @@ export interface MobileMenuActionProps {
 export function MobileMenuAction({
   label,
   onClick,
+  href,
   icon,
+  sub,
   hint,
   disabled,
   chevron,
   keepOpen,
 }: MobileMenuActionProps) {
   const { closeRoot } = useContext(MobileMenuContext);
-  return (
-    <button
-      type="button"
-      className="mobile-menu-action"
-      disabled={disabled}
-      onClick={() => {
-        onClick();
-        if (!keepOpen) closeRoot();
-      }}
-    >
-      <RowMain icon={icon} label={label} />
+  const body = (
+    <>
+      <RowMain icon={icon} label={label} sub={sub} />
       <span className="mobile-menu-trailing">
         {hint !== undefined && (
           <span className="mobile-menu-hint">{hint}</span>
@@ -212,6 +253,33 @@ export function MobileMenuAction({
           </span>
         )}
       </span>
+    </>
+  );
+  if (href) {
+    return (
+      <a
+        className="mobile-menu-action"
+        href={href}
+        onClick={() => {
+          onClick?.();
+          closeRoot();
+        }}
+      >
+        {body}
+      </a>
+    );
+  }
+  return (
+    <button
+      type="button"
+      className="mobile-menu-action"
+      disabled={disabled}
+      onClick={() => {
+        onClick?.();
+        if (!keepOpen) closeRoot();
+      }}
+    >
+      {body}
     </button>
   );
 }
@@ -277,7 +345,7 @@ export function MobileMenuSubSheet({
             className="mobile-menu-drawer mobile-menu-nested-drawer"
             aria-label={ariaLabel ?? (typeof label === "string" ? label : undefined)}
           >
-            <Drawer.Content>
+            <Drawer.Content className="mobile-menu-drawer-content">
               <div className="mobile-menu-handle" aria-hidden="true" />
               <div className="mobile-menu-drawer-header">
                 <Drawer.Title className="mobile-menu-drawer-title">
