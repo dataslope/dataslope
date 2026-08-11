@@ -24,7 +24,7 @@ all of them are vectorized.
 
 df = pl.DataFrame({"city": ["  Oslo ", "LISBON", "bergen  ", "Reykjavík"]})
 
-print(
+display(
     df.with_columns(
         stripped=pl.col("city").str.strip_chars(),
         lower=pl.col("city").str.to_lowercase(),
@@ -56,7 +56,7 @@ raw = pl.DataFrame(
     {"category": ["  Books ", "BOOKS", "books", "Book s", "Music", " music"]}
 )
 
-print(
+display(
     raw.with_columns(
         clean=pl.col("category").str.strip_chars().str.to_lowercase()
     )["clean"].value_counts(sort=True)
@@ -88,7 +88,7 @@ decision rather than a lowercase.
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `species = pl.col("species")
 
-print(
+display(
     penguins.select("species")
     .unique()
     .with_columns(
@@ -145,7 +145,7 @@ logs = pl.DataFrame(
     }
 )
 
-print(
+display(
     logs.with_columns(
         date=pl.col("line").str.extract(r"^(\\d{4}-\\d{2}-\\d{2})"),
         level=pl.col("line").str.extract(r"(ERROR|WARN|INFO)"),
@@ -176,10 +176,10 @@ people = pl.DataFrame(
 )
 
 # Into a list column
-print(people.with_columns(parts=pl.col("full_name").str.split(" ")))
+display(people.with_columns(parts=pl.col("full_name").str.split(" ")))
 
 # Into separate columns, via a struct
-print(
+display(
     people.with_columns(
         pl.col("full_name")
         .str.split_exact(" ", 1)
@@ -205,7 +205,7 @@ phones = pl.DataFrame(
     {"phone": ["+47 22 33 44 55", "(+351) 21-123-4567", "+354 555 1234"]}
 )
 
-print(
+display(
     phones.with_columns(
         # replace changes the first match, replace_all changes every match
         first_only=pl.col("phone").str.replace(r"\\s", ""),
@@ -234,7 +234,7 @@ which is worse than output that looks wrong.
 
 df = pl.DataFrame({"code": ["7", "42", "1234"], "word": ["alpha", "beta", "gamma"]})
 
-print(
+display(
     df.with_columns(
         padded=pl.col("code").str.pad_start(5, "0"),
         head=pl.col("word").str.slice(0, 3),
@@ -243,10 +243,10 @@ print(
 )
 
 # Concatenating columns
-print(df.select(pl.concat_str("code", "word", separator=":").alias("joined")))
+display(df.select(pl.concat_str("code", "word", separator=":").alias("joined")))
 
 # Concatenating down a column
-print(df.select(pl.col("word").str.join(", ").alias("all_words")))
+display(df.select(pl.col("word").str.join(", ").alias("all_words")))
 `,
     },
   ]}
@@ -286,7 +286,7 @@ raw = pl.DataFrame(
 )`,
       starterCode: `parsed = None  # TODO
 
-print(parsed)
+display(parsed)
 `,
       solutionCode: `pattern = r"^\\s*([A-Za-z]+)-(\\d+)-(.*?)\\s*$"
 
@@ -296,7 +296,7 @@ parsed = raw.with_columns(
     name=pl.col("code").str.extract(pattern, 3).str.to_titlecase(),
 )
 
-print(parsed)
+display(parsed)
 `,
     },
   ]}

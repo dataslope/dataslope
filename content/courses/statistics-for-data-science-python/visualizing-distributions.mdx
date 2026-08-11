@@ -77,7 +77,7 @@ a different story. Run the summary first:
       filename: "main.py",
       initCode: `import pandas as pd
 aq = pd.read_csv("anscombe.csv")`,
-      starterCode: `print(aq.groupby("dataset")[["x", "y"]].agg(["mean", "std"]).round(2))
+      starterCode: `display(aq.groupby("dataset")[["x", "y"]].agg(["mean", "std"]).round(2))
 print("\\nFour datasets, indistinguishable summaries.")
 `,
     },

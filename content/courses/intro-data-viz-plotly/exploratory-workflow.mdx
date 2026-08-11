@@ -60,10 +60,10 @@ print("Dtypes:")
 print(df.dtypes)
 print()
 print("Head:")
-print(df.head())
+display(df.head())
 print()
 print("Numeric summary:")
-print(df.describe())
+display(df.describe())
 `,
     },
   ]}
@@ -172,7 +172,7 @@ df["pct"] = df["tip"] / df["total_bill"] * 100
 
 # Suspiciously high tip percentages
 suspicious = df[df["pct"] > 30].sort_values("pct", ascending=False)
-print(suspicious)
+display(suspicious)
 `,
     },
   ]}

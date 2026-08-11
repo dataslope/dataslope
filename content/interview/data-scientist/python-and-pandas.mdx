@@ -34,7 +34,7 @@ import pandas as pd
 df = pd.DataFrame({"price": np.arange(1, 6), "qty": np.arange(5, 0, -1)})`,
       starterCode: `# Vectorized: one expression, no Python loop.
 df["revenue"] = df["price"] * df["qty"]
-print(df)`,
+display(df)`,
     },
   ]}
 />
@@ -63,7 +63,7 @@ df = pd.DataFrame({
     n=("amount", "size"),
     avg=("amount", "mean"),
 )
-print(summary)`,
+display(summary)`,
     },
   ]}
 />
@@ -92,7 +92,7 @@ df = pd.DataFrame({
       starterCode: `# transform broadcasts the group total back to each row.
 df["region_total"] = df.groupby("region")["amount"].transform("sum")
 df["share"] = df["amount"] / df["region_total"]
-print(df)`,
+display(df)`,
     },
   ]}
 />
@@ -117,7 +117,7 @@ Use `merge` for "combine on a key," `concat` for "stack these together."
 orders = pd.DataFrame({"customer_id": [1, 2, 2, 3], "amount": [100, 80, 30, 55]})
 customers = pd.DataFrame({"customer_id": [1, 2, 3, 4], "name": ["Ava", "Ben", "Cy", "Di"]})`,
       starterCode: `merged = orders.merge(customers, on="customer_id", how="left")
-print(merged)`,
+display(merged)`,
     },
   ]}
 />
@@ -152,7 +152,7 @@ df = pd.DataFrame({"region": ["North", "South", "East"], "amount": [100, 80, 50]
 df["code"] = df["region"].map({"North": "N", "South": "S", "East": "E"})
 # DataFrame.apply row-wise:
 df["label"] = df.apply(lambda r: f"{r['code']}:{r['amount']}", axis=1)
-print(df)`,
+display(df)`,
     },
   ]}
 />
@@ -177,9 +177,9 @@ wide = pd.DataFrame({
     "q2": [15, 25],
 })`,
       starterCode: `long = wide.melt(id_vars="user", var_name="quarter", value_name="sales")
-print(long)
+display(long)
 print()
-print(long.pivot(index="user", columns="quarter", values="sales"))`,
+display(long.pivot(index="user", columns="quarter", values="sales"))`,
     },
   ]}
 />
@@ -203,7 +203,7 @@ import pandas as pd
 df = pd.DataFrame({"region": ["N", "S", None, "E"], "amount": [100.0, np.nan, 80.0, np.nan]})`,
       starterCode: `print(df.isna().sum())              # NaNs per column
 df["amount"] = df["amount"].fillna(df["amount"].mean())
-print(df)`,
+display(df)`,
     },
   ]}
 />
@@ -232,7 +232,7 @@ df = pd.DataFrame({
     .assign(tax=lambda d: d["amount"] * 0.08)
     .groupby("region", as_index=False)["tax"].sum()
 )
-print(result)`,
+display(result)`,
     },
   ]}
 />
@@ -254,7 +254,7 @@ df = pd.DataFrame({"amount": [50, 120, 600, 80, 550]})`,
       starterCode: `conditions = [df["amount"] >= 500, df["amount"] >= 100]
 choices = ["Large", "Medium"]
 df["size"] = np.select(conditions, choices, default="Small")
-print(df)`,
+display(df)`,
     },
   ]}
 />
@@ -290,7 +290,7 @@ df = pd.DataFrame({
       starterCode: `df["pct_of_region"] = (
     df["amount"] / df.groupby("region")["amount"].transform("sum") * 100
 )
-print(df.round(1))`,
+display(df.round(1))`,
     },
   ]}
 />
@@ -359,13 +359,13 @@ df = pd.DataFrame({
 })`,
       starterCode: `# Build a per-category summary with columns: category, total, n
 summary = None
-print(summary)`,
+display(summary)`,
       solutionCode: `summary = (
     df.groupby("category")
       .agg(total=("amount", "sum"), n=("amount", "size"))
       .reset_index()
 )
-print(summary)`,
+display(summary)`,
     },
   ]}
   tests={[
@@ -395,9 +395,9 @@ df = pd.DataFrame({
 })`,
       starterCode: `# Add a 'share' column: amount divided by the region total.
 df["share"] = None
-print(df)`,
+display(df)`,
       solutionCode: `df["share"] = df["amount"] / df.groupby("region")["amount"].transform("sum")
-print(df)`,
+display(df)`,
     },
   ]}
   tests={[

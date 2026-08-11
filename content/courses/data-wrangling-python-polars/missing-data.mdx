@@ -32,7 +32,7 @@ historically used `NaN` for both; Polars keeps them apart.
 
 df = pl.DataFrame({"x": [1.0, None, float("nan"), 4.0]})
 
-print(df)
+display(df)
 print("is_null:", df["x"].is_null().to_list())
 print("is_nan :", df["x"].is_nan().to_list())
 print("sum    :", df["x"].sum())   # null skipped, NaN poisons the result
@@ -75,15 +75,15 @@ print(cleaned["x"].null_count())
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(penguins.null_count())
+      starterCode: `display(penguins.null_count())
 
 # As a share of rows
-print(penguins.select((pl.all().null_count() / pl.len() * 100).round(2)))
+display(penguins.select((pl.all().null_count() / pl.len() * 100).round(2)))
 
 # The rows with any null at all
 any_null = penguins.filter(pl.any_horizontal(pl.all().is_null()))
 print("rows with at least one null:", any_null.height)
-print(any_null)
+display(any_null)
 `,
     },
   ]}
@@ -140,7 +140,7 @@ rows for a reason you named.
 
 df = pl.DataFrame({"g": ["a", "a", "a", "b", "b"], "x": [1.0, None, 3.0, None, 5.0]})
 
-print(
+display(
     df.with_columns(
         zero=pl.col("x").fill_null(0),
         mean=pl.col("x").fill_null(pl.col("x").mean()),
@@ -187,7 +187,7 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
     .alias("mass_filled")
 )
 
-print(
+display(
     filled.filter(pl.col("body_mass_g").is_null())
     .select("species", "body_mass_g", "mass_filled")
 )
@@ -219,8 +219,8 @@ Two rules to keep in mind, both inherited from SQL:
 a = pl.DataFrame({"k": ["x", None], "left": [1, 2]})
 b = pl.DataFrame({"k": ["x", None], "right": [10, 20]})
 
-print(a.join(b, on="k", how="inner"))
-print(a.join(b, on="k", how="inner", nulls_equal=False))
+display(a.join(b, on="k", how="inner"))
+display(a.join(b, on="k", how="inner", nulls_equal=False))
 `,
     },
   ]}
@@ -250,7 +250,7 @@ Every one of the 344 rows must survive.`}
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `filled = None  # TODO
 
-print(filled)
+display(filled)
 `,
       solutionCode: `bills = pl.col("bill_length_mm", "bill_depth_mm")
 
@@ -260,8 +260,8 @@ filled = penguins.with_columns(
     bills.fill_null(bills.mean().round(1).over("species"))
 )
 
-print(filled.filter(pl.col("imputed")))
-print(filled.null_count())
+display(filled.filter(pl.col("imputed")))
+display(filled.null_count())
 `,
     },
   ]}

@@ -55,7 +55,7 @@ long = pl.DataFrame(
 )
 
 wide = long.pivot(on="month", index="region", values="sales")
-print(wide)
+display(wide)
 `,
     },
   ]}
@@ -81,7 +81,7 @@ same cell, say so with `aggregate_function`.
       filename: "main.py",
       initCode: `import polars as pl
 diamonds = pl.read_csv("diamonds.csv")`,
-      starterCode: `print(
+      starterCode: `display(
     diamonds.pivot(
         on="cut",
         index="color",
@@ -91,7 +91,7 @@ diamonds = pl.read_csv("diamonds.csv")`,
 )
 
 # len counts rather than summarizing, which makes a contingency table
-print(
+display(
     diamonds.pivot(
         on="cut", index="color", values="price", aggregate_function="len"
     ).sort("color")
@@ -122,7 +122,7 @@ wide = pl.DataFrame(
     {"region": ["N", "S"], "Jan": [100, 200], "Feb": [120, 180]}
 )
 
-print(
+display(
     wide.unpivot(
         index="region",
         on=["Jan", "Feb"],
@@ -166,7 +166,7 @@ wide = pl.DataFrame(
 )
 
 # "everything except the identifier columns"
-print(
+display(
     wide.unpivot(
         index=cs.string(),
         on=cs.numeric(),
@@ -198,9 +198,9 @@ long = wide.unpivot(
 )
 
 # In long form these are all ordinary operations
-print(long.group_by("month").agg(pl.col("sales").sum()).sort("month"))
-print(long.filter(pl.col("sales") > 150))
-print(long.group_by("region").agg(pl.col("sales").mean().round(1)).sort("region"))
+display(long.group_by("month").agg(pl.col("sales").sum()).sort("month"))
+display(long.filter(pl.col("sales") > 150))
+display(long.group_by("region").agg(pl.col("sales").mean().round(1)).sort("region"))
 `,
     },
   ]}
@@ -231,7 +231,7 @@ columns wholesale.
 
 df = pl.DataFrame({"metric": ["mean", "max"], "a": [1.5, 3.0], "b": [2.5, 9.0]})
 
-print(df.transpose(include_header=True, header_name="column", column_names="metric"))
+display(df.transpose(include_header=True, header_name="column", column_names="metric"))
 `,
     },
   ]}
@@ -269,7 +269,7 @@ wide = pl.DataFrame(
       starterCode: `long = None     # TODO
 summary = None  # TODO
 
-print(long)
+display(long)
 `,
       solutionCode: `long = wide.unpivot(
     index="region",
@@ -284,8 +284,8 @@ summary = (
     .sort("quarter")
 )
 
-print(long.head())
-print(summary)
+display(long.head())
+display(summary)
 `,
     },
   ]}

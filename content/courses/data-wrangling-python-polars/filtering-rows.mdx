@@ -141,7 +141,7 @@ print("x <= 5     :", df.filter(pl.col("x") <= 5).height)
 print("total rows :", df.height)   # 1 + 1 != 3
 
 # The comparison itself shows why
-print(df.with_columns(gt=pl.col("x") > 5, le=pl.col("x") <= 5))
+display(df.with_columns(gt=pl.col("x") > 5, le=pl.col("x") <= 5))
 `,
     },
   ]}
@@ -223,7 +223,7 @@ Sometimes the unit you want to keep or drop is a whole group.
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# Keep only islands with more than 100 penguins
-print(
+display(
     penguins.filter(pl.len().over("island") > 100)
     .group_by("island")
     .agg(pl.len())

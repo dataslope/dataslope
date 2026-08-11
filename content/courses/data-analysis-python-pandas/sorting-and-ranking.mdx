@@ -32,7 +32,7 @@ df = pd.DataFrame(
 )
 
 print("By salary, descending:")
-print(df.sort_values("salary", ascending=False))
+display(df.sort_values("salary", ascending=False))
 `,
     },
   ]}
@@ -53,7 +53,7 @@ df = pd.DataFrame({
     "tenure": [3, 6, 7, 2, 4],
 })`,
       starterCode: `# By department ascending, then by salary descending within department
-print(df.sort_values(["dept", "salary"], ascending=[True, False]))
+display(df.sort_values(["dept", "salary"], ascending=[True, False]))
 `,
     },
   ]}
@@ -78,7 +78,7 @@ Sort by the index instead of a column:
       starterCode: `import pandas as pd
 
 df = pd.DataFrame({"salary": [120, 95, 140]}, index=["Chen", "Aiko", "Bilal"])
-print(df.sort_index())
+display(df.sort_index())
 `,
     },
   ]}
@@ -115,11 +115,11 @@ df = pd.DataFrame(
 
 # Two stable sorts in reverse priority order = ties broken predictably
 result = df.sort_values("score").sort_values("team")
-print(result)
+display(result)
 print()
 
 # Or do it in one call:
-print(df.sort_values(["team", "score"]))
+display(df.sort_values(["team", "score"]))
 `,
     },
   ]}
@@ -143,13 +143,13 @@ direct and slightly faster.
       initCode: `import pandas as pd
 diamonds = pd.read_csv("diamonds.csv")`,
       starterCode: `# Top 5 most expensive diamonds
-print(
+display(
     diamonds.nlargest(5, "price")[["carat", "cut", "color", "price"]]
 )
 print()
 
 # 5 cheapest diamonds
-print(
+display(
     diamonds.nsmallest(5, "price")[["carat", "cut", "color", "price"]]
 )
 `,
@@ -173,10 +173,10 @@ import numpy as np
 df = pd.DataFrame({"x": [3, 1, np.nan, 2, np.nan, 4]})
 
 print("na_position='last' (default):")
-print(df.sort_values("x"))
+display(df.sort_values("x"))
 print()
 print("na_position='first':")
-print(df.sort_values("x", na_position="first"))
+display(df.sort_values("x", na_position="first"))
 `,
     },
   ]}
@@ -208,7 +208,7 @@ df = pd.DataFrame(
 )
 
 df["rank"] = df["salary"].rank(ascending=False)
-print(df)
+display(df)
 `,
     },
   ]}
@@ -257,7 +257,7 @@ diamonds = pd.read_csv("diamonds.csv")`,
     .groupby("cut")
     .head(3)[["cut", "carat", "color", "price"]]
 )
-print(top3.sort_values("cut"))
+display(top3.sort_values("cut"))
 `,
     },
   ]}

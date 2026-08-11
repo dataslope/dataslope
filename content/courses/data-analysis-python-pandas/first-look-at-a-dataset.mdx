@@ -161,10 +161,10 @@ also describe text/categorical columns.
       initCode: `import pandas as pd
 penguins = pd.read_csv("penguins.csv")`,
       starterCode: `print("Numeric columns:")
-print(penguins.describe().round(1))
+display(penguins.describe().round(1))
 print()
 print("Categorical / object columns:")
-print(penguins.describe(include=["object"]))
+display(penguins.describe(include=["object"]))
 `,
     },
   ]}
@@ -204,7 +204,7 @@ missing = penguins.isna().sum()
 missing_pct = (penguins.isna().mean() * 100).round(1)
 
 summary = pd.DataFrame({"missing": missing, "pct": missing_pct})
-print(summary[summary["missing"] > 0].sort_values("missing", ascending=False))
+display(summary[summary["missing"] > 0].sort_values("missing", ascending=False))
 print()
 print("Columns with no missing values:", (missing == 0).sum())
 `,
@@ -282,7 +282,7 @@ After the five-minute ritual, do a few quick cross-tabulations.
 penguins = pd.read_csv("penguins.csv")`,
       starterCode: `# Which species live on which island?
 print("Species x island counts:")
-print(pd.crosstab(penguins["species"], penguins["island"]))
+display(pd.crosstab(penguins["species"], penguins["island"]))
 print()
 
 # How many distinct islands does each species appear on?

@@ -44,7 +44,7 @@ df = pl.DataFrame(
 )
 
 print(df.schema)
-print(df)
+display(df)
 `,
     },
   ]}
@@ -106,7 +106,7 @@ silently becoming null.
 
 df = pl.DataFrame({"n": [1, 2, 300]})
 
-print(df.with_columns(pl.col("n").cast(pl.Int64)))
+display(df.with_columns(pl.col("n").cast(pl.Int64)))
 
 try:
     df.with_columns(pl.col("n").cast(pl.UInt8))  # 300 does not fit in a byte
@@ -114,7 +114,7 @@ except Exception as error:
     print(type(error).__name__, "-", error)
 
 # strict=False turns the overflow into a null instead of an error
-print(df.with_columns(pl.col("n").cast(pl.UInt8, strict=False)))
+display(df.with_columns(pl.col("n").cast(pl.UInt8, strict=False)))
 `,
     },
   ]}
@@ -141,7 +141,7 @@ except Exception as error:
 parsed = messy.with_columns(
     pl.col("amount").cast(pl.Int64, strict=False).alias("amount_n")
 )
-print(parsed)
+display(parsed)
 print("failed to parse:", parsed["amount_n"].null_count())
 `,
     },
@@ -230,7 +230,7 @@ df = pl.read_csv(
     schema={"sku": pl.String, "units": pl.UInt16, "price": pl.Float64},
 )
 print(df.schema)
-print(df)
+display(df)
 `,
     },
   ]}
@@ -263,7 +263,7 @@ raw = pl.DataFrame(
       starterCode: `out = None  # TODO
 n_bad = None  # TODO
 
-print(out)
+display(out)
 print("bad:", n_bad)
 `,
       solutionCode: `out = raw.with_columns(
@@ -271,7 +271,7 @@ print("bad:", n_bad)
 )
 n_bad = out["value"].null_count()
 
-print(out)
+display(out)
 print("bad:", n_bad)
 `,
     },

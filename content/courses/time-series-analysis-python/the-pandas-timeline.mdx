@@ -123,7 +123,7 @@ df["date"] = pd.to_datetime(df["date"])
 # Step 2: promote that column to the index.
 df = df.set_index("date")
 
-print(df)
+display(df)
 print()
 print("index type:", type(df.index).__name__)  # DatetimeIndex
 print("Now the timeline tools are available.")

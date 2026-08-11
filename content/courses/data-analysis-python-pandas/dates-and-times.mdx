@@ -162,7 +162,7 @@ orders = pd.DataFrame(
 )
 
 orders["fulfilment_days"] = (orders["ship_date"] - orders["order_date"]).dt.days
-print(orders)
+display(orders)
 `,
     },
   ]}
@@ -330,7 +330,7 @@ raw = pd.DataFrame({
 })`,
       starterCode: `daily = None  # TODO
 
-print(daily)
+display(daily)
 `,
       solutionCode: `import pandas as pd
 
@@ -343,7 +343,7 @@ daily = (
     .sort_values("date")
 )
 
-print(daily)
+display(daily)
 `,
     },
   ]}

@@ -71,7 +71,7 @@ df = pd.DataFrame(
 )
 
 print("isna (boolean DataFrame):")
-print(df.isna())
+display(df.isna())
 print()
 print("Counts per column:")
 print(df.isna().sum())
@@ -119,7 +119,7 @@ print()
 # Which rows are missing at least one value?
 incomplete = penguins[penguins.isna().any(axis=1)]
 print(f"{len(incomplete)} of {len(penguins)} penguins have a gap")
-print(incomplete[["species", "island", "body_mass_g", "sex"]])
+display(incomplete[["species", "island", "body_mass_g", "sex"]])
 `,
     },
   ]}
@@ -179,13 +179,13 @@ df = pd.DataFrame(
 )
 
 print("Drop any-NaN rows:")
-print(df.dropna())
+display(df.dropna())
 print()
 print("Drop only rows where 'a' is NaN:")
-print(df.dropna(subset=["a"]))
+display(df.dropna(subset=["a"]))
 print()
 print("Drop rows where ALL values are NaN:")
-print(df.dropna(how="all"))
+display(df.dropna(how="all"))
 `,
     },
   ]}
@@ -224,7 +224,7 @@ df = pd.DataFrame(
 # Drop columns more than 50% missing
 threshold = 0.5
 keep = df.columns[df.isna().mean() <= threshold]
-print(df[keep])
+display(df[keep])
 `,
     },
   ]}
@@ -309,7 +309,7 @@ print("Mean:", df["score"].mean())
 
 # A 'has score' flag can be useful downstream:
 df["has_score"] = df["score"].notna()
-print(df)
+display(df)
 `,
     },
   ]}
@@ -348,7 +348,7 @@ clean = (
     # Keep score's NaNs but add a flag
     .assign(score_missing=lambda x: x["score"].isna())
 )
-print(clean)
+display(clean)
 `,
     },
   ]}

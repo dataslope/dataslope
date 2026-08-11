@@ -60,7 +60,7 @@ df = pd.DataFrame(
     },
     index=["Aiko", "Bilal", "Chen", "Diego"],
 )
-print(df)
+display(df)
 print("Type:", type(df).__name__)
 `,
     },
@@ -109,7 +109,7 @@ print()
 
 # Selecting *multiple* columns gives you a DataFrame (note the double brackets)
 subset = df[["salary"]]
-print(subset)
+display(subset)
 print("Type:", type(subset).__name__)
 `,
     },
@@ -255,7 +255,7 @@ print()
 
 # .sum(axis=1) sums across columns → one per row (handy for totals)
 df["total_comp"] = df["salary"] + df["bonus"]
-print(df)
+display(df)
 `,
     },
   ]}

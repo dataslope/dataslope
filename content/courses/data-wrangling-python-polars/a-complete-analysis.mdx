@@ -26,7 +26,7 @@ the *lowest* average price. Is that real, and if so, why?
 diamonds = pl.read_csv("diamonds.csv")`,
       starterCode: `print(diamonds.shape)
 diamonds.glimpse()
-print(diamonds.null_count())
+display(diamonds.null_count())
 `,
     },
   ]}
@@ -48,7 +48,7 @@ GRADES = pl.Enum(["Fair", "Good", "Very Good", "Premium", "Ideal"])
 diamonds = pl.read_csv("diamonds.csv").with_columns(
     pl.col("cut").cast(GRADES)
 )`,
-      starterCode: `print(
+      starterCode: `display(
     diamonds.group_by("cut")
     .agg(
         pl.len().alias("n"),
@@ -87,7 +87,7 @@ GRADES = pl.Enum(["Fair", "Good", "Very Good", "Premium", "Ideal"])
 diamonds = pl.read_csv("diamonds.csv").with_columns(
     pl.col("cut").cast(GRADES)
 )`,
-      starterCode: `print(
+      starterCode: `display(
     diamonds.group_by("cut")
     .agg(
         pl.len().alias("n"),
@@ -155,7 +155,7 @@ diamonds = pl.read_csv("diamonds.csv").with_columns(
 
 BANDS = ["under 0.5ct", "0.5 to 1ct", "1 to 1.5ct", "1.5ct and up"]
 
-print(
+display(
     banded.pivot(on="cut", index="band", values="median_price")
     # pivot names columns in the order it met them, so restate the order
     .select("band", "Fair", "Good", "Very Good", "Premium", "Ideal")
@@ -185,7 +185,7 @@ reverses direction once you condition on the confounding variable.
       filename: "main.py",
       initCode: `import polars as pl
 diamonds = pl.read_csv("diamonds.csv")`,
-      starterCode: `print(
+      starterCode: `display(
     diamonds.select(
         carat_price=pl.corr("carat", "price").round(3),
         table_price=pl.corr("table", "price").round(3),
@@ -194,7 +194,7 @@ diamonds = pl.read_csv("diamonds.csv")`,
 )
 
 # The premium a better cut earns, holding size roughly constant
-print(
+display(
     diamonds.filter(pl.col("carat").is_between(0.9, 1.1))
     .group_by("cut")
     .agg(
@@ -266,8 +266,8 @@ report = (
     .collect()
 )
 
-print(report)
-print(report.select(pl.col("n").sum()))
+display(report)
+display(report.select(pl.col("n").sum()))
 `,
     },
   ]}
@@ -323,7 +323,7 @@ diamonds = pl.read_csv("diamonds.csv")`,
 price_reversed = None      # TODO
 per_carat_fixes_it = None  # TODO
 
-print(colour_report)
+display(colour_report)
 `,
       solutionCode: `colour_report = (
     diamonds.lazy()
@@ -344,7 +344,7 @@ worst = colour_report.row(-1, named=True)
 price_reversed = best["median_price"] < worst["median_price"]
 per_carat_fixes_it = best["median_per_carat"] > worst["median_per_carat"]
 
-print(colour_report)
+display(colour_report)
 print("price_reversed:", price_reversed)
 print("per_carat_fixes_it:", per_carat_fixes_it)
 `,

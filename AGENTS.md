@@ -933,6 +933,36 @@ a chart. The JS half of the conversion is *shared* rather than copied
 (`app/_components/runtime/pythonDisplayOutputs.ts`), so only the Python half
 can drift.
 
+### A DataFrame goes through `display()`, never `print()`
+
+`display()` is installed into builtins by `pyodide-worker.ts`, and a pandas or
+polars DataFrame handed to it renders as an HTML table — the header, the dtype
+row, the middle-truncation a notebook gives you. `print()` sends the same frame
+through `str()` and the reader gets a monospace text box that has to be read
+character by character and cannot be widened. So in a `<CodeBlock>` or a
+`<ChallengeCard>`, every DataFrame is shown with `display(df)`.
+
+Three edges worth knowing:
+
+- **Only frames.** A Series, a dict, a list, a `.explain()` plan, `.dtypes`,
+  `.shape` — none of these have an HTML repr, so `display()` falls through to
+  `repr(obj)` and prints the same text `print()` already printed. Leave those
+  as `print()`; the call that renders nothing new is just a non-builtin the
+  reader has to look up.
+- **A card's starter is converted too.** `y_stds = None` followed by
+  `display(y_stds)` is the established shape: `display()` skips `None`, so an
+  unsolved card shows nothing there and a solved one shows the table. Leaving
+  the starter on `print()` is worse, because the learner writes their answer
+  into that buffer and the frame comes back as text.
+- **A bare trailing expression does the same thing.** The worker
+  auto-displays a block's last expression, so `df` on the final line and
+  `display(df)` render identically. Both are fine; `display()` is what to
+  reach for when the frame is not the last thing the block does.
+
+`print()` around a frame is still right for everything else a block prints —
+labels, f-strings, scalars — and a bare `print()` between two tables costs
+nothing, since `toOutputCells` drops whitespace-only text segments.
+
 ## Prose style
 
 Enforced by `npm run check:prose` (`scripts/check-prose.mjs`) and by

@@ -93,7 +93,7 @@ print()
 print(orders["amount"].describe())
 print()
 print("Suspicious rows:")
-print(orders[(orders["amount"] <= 0) | (orders["amount"] > 100000)])
+display(orders[(orders["amount"] <= 0) | (orders["amount"] > 100000)])
 `,
     },
   ]}

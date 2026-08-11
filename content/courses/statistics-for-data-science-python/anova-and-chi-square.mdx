@@ -285,7 +285,7 @@ df = pd.DataFrame({"device": device, "churned": churned})
 # Step 1: build the contingency table of COUNTS with crosstab.
 table = pd.crosstab(df["device"], df["churned"])
 print("Observed counts (contingency table):")
-print(table)
+display(table)
 print()
 
 # Step 2: chi-square test of independence.
@@ -518,7 +518,7 @@ associated = None
 chi2, p_value, dof, expected = stats.chi2_contingency(table)
 p_value = float(p_value)
 associated = bool(p_value <= alpha)
-print(table)
+display(table)
 print(p_value, associated)
 `,
     },

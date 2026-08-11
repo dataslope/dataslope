@@ -343,7 +343,7 @@ df = pd.DataFrame({
 agg = (df.groupby("region", as_index=False)["amount"]
          .sum()
          .sort_values("region"))
-print(agg)`,
+display(agg)`,
     },
   ]}
 />
@@ -371,7 +371,7 @@ latest = (df.sort_values("ts")
             .drop_duplicates("id", keep="last")
             .sort_values("id")
             .reset_index(drop=True))
-print(latest)   # id 1 -> 'b' (ts 20), id 2 -> 'c'`,
+display(latest)   # id 1 -> 'b' (ts 20), id 2 -> 'c'`,
     },
   ]}
 />

@@ -164,7 +164,7 @@ messy = pd.DataFrame(
     }
 )
 
-print(messy)
+display(messy)
 print()
 print(messy.dtypes)
 `,
@@ -239,7 +239,7 @@ messy = pd.DataFrame({
     .assign(spend_suspicious=lambda x: (x["spend"] < 0) | (x["spend"] > 1_000_000))
 )
 
-print(clean)
+display(clean)
 print()
 print(clean.dtypes)
 `,

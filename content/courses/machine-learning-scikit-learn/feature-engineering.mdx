@@ -89,7 +89,7 @@ df = pd.DataFrame(
 
 # The concept "crowding" is a ratio, not either column alone.
 df["people_per_room"] = df["people"] / df["rooms"]
-print(df)
+display(df)
 
 print("\\nHouse 1 (3 rooms, 6 people) and house 4 (8 rooms, 8 people) differ a lot")
 print("in raw counts, but people_per_room (2.0 vs 1.0) captures crowding directly.")
@@ -178,7 +178,7 @@ df["age_group"] = pd.cut(
     bins=[0, 17, 64, 120],
     labels=["minor", "adult", "senior"],
 )
-print(df)
+display(df)
 
 print("\\nNow the model can learn a separate effect per group, instead of")
 print("assuming a single straight-line relationship between age and the target.")
@@ -229,7 +229,7 @@ df["month"] = df["date"].dt.month
 df["dayofweek"] = df["date"].dt.dayofweek  # Monday=0 ... Sunday=6
 df["is_weekend"] = (df["date"].dt.dayofweek >= 5).astype(int)
 
-print(df)
+display(df)
 
 print("\\nA raw timestamp is one big number; month/dayofweek/is_weekend expose")
 print("seasonality and weekly patterns the model can actually use.")

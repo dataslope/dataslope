@@ -92,7 +92,7 @@ q = pl.scan_csv("diamonds.csv").select(
 )
 
 print(q.explain())
-print(q.head(3).collect())
+display(q.head(3).collect())
 `,
     },
   ]}

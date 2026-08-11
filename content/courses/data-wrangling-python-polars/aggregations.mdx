@@ -25,7 +25,7 @@ expressions, three uses.
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `mass = pl.col("body_mass_g")
 
-print(
+display(
     penguins.select(
         n=pl.len(),
         count=mass.count(),          # non-null values only
@@ -93,7 +93,7 @@ different things, and the library will not choose for you.
 diamonds = pl.read_csv("diamonds.csv")`,
       starterCode: `price = pl.col("price")
 
-print(
+display(
     diamonds.select(
         p10=price.quantile(0.10),
         q1=price.quantile(0.25),
@@ -139,7 +139,7 @@ A Boolean column aggregates in ways that read naturally.
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `heavy = pl.col("body_mass_g") > 5000
 
-print(
+display(
     penguins.select(
         any_heavy=heavy.any(),
         all_heavy=heavy.all(),
@@ -165,7 +165,7 @@ print(
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(
+      starterCode: `display(
     penguins.select(
         first=pl.col("species").first(),
         last=pl.col("species").last(),
@@ -201,7 +201,7 @@ summaries in a single pass over the data.
 diamonds = pl.read_csv("diamonds.csv")`,
       starterCode: `price = pl.col("price")
 
-print(
+display(
     diamonds.select(
         ideal_mean=price.filter(pl.col("cut") == "Ideal").mean().round(0),
         fair_mean=price.filter(pl.col("cut") == "Fair").mean().round(0),
@@ -230,7 +230,7 @@ import polars.selectors as cs
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `measurements = cs.numeric() - cs.by_name("year")
 
-print(
+display(
     penguins.select(
         measurements.mean().round(1).name.suffix("_mean"),
         measurements.std().round(1).name.suffix("_std"),
@@ -262,7 +262,7 @@ Compute all four in a single \`select()\` call, so the frame is scanned once.`}
 diamonds = pl.read_csv("diamonds.csv")`,
       starterCode: `summary = None  # TODO
 
-print(summary)
+display(summary)
 `,
       solutionCode: `summary = diamonds.select(
     n=pl.len(),
@@ -273,7 +273,7 @@ print(summary)
     .median(),
 )
 
-print(summary)
+display(summary)
 `,
     },
   ]}

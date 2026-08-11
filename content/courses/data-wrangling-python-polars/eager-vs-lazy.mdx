@@ -185,10 +185,10 @@ being decompressed.
 print(q.collect_schema())
 
 # A few rows, without processing the whole file
-print(q.head(3).collect())
+display(q.head(3).collect())
 
 # fetch a bounded number of source rows: quick, and NOT a valid sample
-print(q.limit(2).collect())
+display(q.limit(2).collect())
 `,
     },
   ]}
@@ -236,8 +236,8 @@ by_color = base.group_by("color").agg(pl.col("price").mean().round(0))
 # One call, both plans, shared scan of the source
 cut_result, color_result = pl.collect_all([by_cut, by_color])
 
-print(cut_result.sort("cut"))
-print(color_result.sort("color"))
+display(cut_result.sort("cut"))
+display(color_result.sort("color"))
 `,
     },
   ]}
@@ -264,7 +264,7 @@ Assign the **uncollected** query to \`query\` and its collected result to \`resu
       starterCode: `query = None   # TODO
 result = None  # TODO
 
-print(result)
+display(result)
 `,
       solutionCode: `query = (
     pl.scan_csv("diamonds.csv")
@@ -280,7 +280,7 @@ print(result)
 result = query.collect()
 
 print(query.explain())
-print(result)
+display(result)
 `,
     },
   ]}

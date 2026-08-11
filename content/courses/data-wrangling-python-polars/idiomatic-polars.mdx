@@ -85,7 +85,7 @@ result = (
     .collect()
 )
 
-print(result)
+display(result)
 `,
     },
   ]}
@@ -113,10 +113,10 @@ readable steps costs nothing, so optimize for the reader.
 df = pl.DataFrame({"a": [1, 2, 3], "b": [10, 20, 30]})
 
 # Fine
-print(df.with_columns((pl.col("a") + pl.col("b")).alias("total")))
+display(df.with_columns((pl.col("a") + pl.col("b")).alias("total")))
 
 # Better: the name sits where you read it, and cannot drift from the value
-print(df.with_columns(total=pl.col("a") + pl.col("b")))
+display(df.with_columns(total=pl.col("a") + pl.col("b")))
 `,
     },
   ]}
@@ -142,7 +142,7 @@ diamonds = pl.read_csv("diamonds.csv")`,
         .alias("band")
     )
 
-print(
+display(
     diamonds.with_columns(price_band())
     .group_by("band")
     .agg(pl.len().alias("n"))
@@ -185,7 +185,7 @@ cleaned = (
     .with_columns(cs.float().round(1))
 )
 
-print(cleaned.head(3))
+display(cleaned.head(3))
 `,
     },
   ]}
@@ -262,7 +262,7 @@ def legacy(df: pl.DataFrame) -> pl.DataFrame:
       starterCode: `def idiomatic(df: pl.DataFrame) -> pl.DataFrame:
     ...  # TODO
 
-print(idiomatic(penguins))
+display(idiomatic(penguins))
 `,
       solutionCode: `def idiomatic(df: pl.DataFrame) -> pl.DataFrame:
     return (
@@ -277,8 +277,8 @@ print(idiomatic(penguins))
         .collect()
     )
 
-print(legacy(penguins))
-print(idiomatic(penguins))
+display(legacy(penguins))
+display(idiomatic(penguins))
 `,
     },
   ]}

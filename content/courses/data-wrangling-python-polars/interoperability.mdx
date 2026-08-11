@@ -25,7 +25,7 @@ import pandas as pd
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `pdf = penguins.to_pandas()
 print(type(pdf).__name__, pdf.shape)
-print(pdf.head(3))
+display(pdf.head(3))
 
 back = pl.from_pandas(pdf)
 print(type(back).__name__, back.shape)
@@ -98,7 +98,7 @@ print(X.shape, X.dtype)
 print(np.round(X.mean(axis=0), 2))
 
 # And back
-print(pl.from_numpy(X, schema=["length", "depth"]).head(3))
+display(pl.from_numpy(X, schema=["length", "depth"]).head(3))
 `,
     },
   ]}
@@ -150,7 +150,7 @@ without a serialization step.
       filename: "main.py",
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
-      starterCode: `print(
+      starterCode: `display(
     pl.sql(
         """
         SELECT species, COUNT(*) AS n, ROUND(AVG(body_mass_g)) AS avg_mass
@@ -185,7 +185,7 @@ pdf = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
 
 # Standard protocol: any library implementing it can be consumed with
 # no library-specific import on either side
-print(pl.from_dataframe(pdf))
+display(pl.from_dataframe(pdf))
 `,
     },
   ]}

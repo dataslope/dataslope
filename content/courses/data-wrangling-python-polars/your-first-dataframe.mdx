@@ -69,21 +69,22 @@ df = pl.DataFrame(
     }
 )
 
-print(df)
+display(df)
 `,
     },
   ]}
 />
 
-The printed frame carries the shape, then a name row, then a dtype
-row (`str`, `i64`, `bool`), then the data. Getting a type row for
-free on every print is a small thing that pays off constantly.
+The frame carries the shape, then a name row, then a dtype row
+(`str`, `i64`, `bool`), then the data. Getting a type row for free on
+every frame is a small thing that pays off constantly.
 
 <Callout type="info" title="Printing versus displaying">
-In these code blocks, a bare expression on the last line is
-displayed as a rendered table, the way a notebook would. `print()`
-gives you the text box above. Both are useful; the rendered table is
-easier to scan, the text box is what you will see in a terminal.
+`display()` renders a frame as a table, and a bare expression on the
+last line does the same, the way a notebook would. `print()` gives
+you the plain-text box instead, the one the Series above came back
+in. Both carry the same header; the table is easier to scan, the text
+box is what you will see in a terminal.
 </Callout>
 
 <CodeBlock
@@ -125,7 +126,7 @@ rows = pl.DataFrame(
         {"city": "Lisbon", "temp_c": 17.5},
     ]
 )
-print(rows)
+display(rows)
 
 # 2. From a list of tuples, naming the columns yourself.
 #    orient="row" says each tuple is a row, not a column.
@@ -134,12 +135,12 @@ tuples = pl.DataFrame(
     schema=["city", "temp_c"],
     orient="row",
 )
-print(tuples)
+display(tuples)
 
 # 3. From existing Series
 a = pl.Series("city", ["Oslo", "Lisbon"])
 b = pl.Series("temp_c", [-3.0, 17.5])
-print(pl.DataFrame([a, b]))
+display(pl.DataFrame([a, b]))
 `,
     },
   ]}
@@ -172,7 +173,7 @@ declared = pl.DataFrame(
     schema={"id": pl.UInt32, "score": pl.Float64},
 )
 print(declared.dtypes)
-print(declared)
+display(declared)
 `,
     },
   ]}
@@ -242,7 +243,7 @@ The types are part of the task: declare them rather than letting Polars infer.`}
 
 stock = None  # TODO
 
-print(stock)
+display(stock)
 `,
       solutionCode: `import polars as pl
 
@@ -255,7 +256,7 @@ stock = pl.DataFrame(
     schema={"sku": pl.String, "units": pl.UInt16, "price": pl.Float64},
 )
 
-print(stock)
+display(stock)
 print(stock.dtypes)
 `,
     },

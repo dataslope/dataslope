@@ -47,7 +47,7 @@ print(mask)
 print()
 
 print("Filtered:")
-print(df[mask])
+display(df[mask])
 `,
     },
   ]}
@@ -80,11 +80,11 @@ df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
     "tenure": [3, 6, 7, 2, 4],
 })`,
-      starterCode: `print(df[df["salary"] >= 100])
+      starterCode: `display(df[df["salary"] >= 100])
 print()
-print(df[df["dept"] == "Eng"])
+display(df[df["dept"] == "Eng"])
 print()
-print(df[df["dept"] != "Eng"])
+display(df[df["dept"] != "Eng"])
 `,
     },
   ]}
@@ -115,15 +115,15 @@ df = pd.DataFrame({
     "tenure": [3, 6, 7, 2, 4],
 })`,
       starterCode: `# Engineers AND high earners
-print(df[(df["dept"] == "Eng") & (df["salary"] > 120)])
+display(df[(df["dept"] == "Eng") & (df["salary"] > 120)])
 print()
 
 # Engineers OR Sales
-print(df[(df["dept"] == "Eng") | (df["dept"] == "Sales")])
+display(df[(df["dept"] == "Eng") | (df["dept"] == "Sales")])
 print()
 
 # NOT in Engineering
-print(df[~(df["dept"] == "Eng")])
+display(df[~(df["dept"] == "Eng")])
 `,
     },
   ]}
@@ -151,7 +151,7 @@ df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
 })`,
       starterCode: `# Cleaner than chaining many "or" clauses
-print(df[df["dept"].isin(["Eng", "Sales"])])
+display(df[df["dept"].isin(["Eng", "Sales"])])
 `,
     },
   ]}
@@ -170,7 +170,7 @@ df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "salary": [120, 95, 140, 80, 128],
 })`,
-      starterCode: `print(df[df["salary"].between(90, 130)])
+      starterCode: `display(df[df["salary"].between(90, 130)])
 `,
     },
   ]}
@@ -188,7 +188,7 @@ df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
 })`,
-      starterCode: `print(df[df["name"].str.contains("e", case=False)])
+      starterCode: `display(df[df["name"].str.contains("e", case=False)])
 `,
     },
   ]}
@@ -207,10 +207,10 @@ import numpy as np
 df = pd.DataFrame({"x": [1, 2, np.nan, 4, np.nan]})
 
 print("Missing rows:")
-print(df[df["x"].isna()])
+display(df[df["x"].isna()])
 print()
 print("Non-missing rows:")
-print(df[df["x"].notna()])
+display(df[df["x"].notna()])
 `,
     },
   ]}
@@ -232,9 +232,9 @@ df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "salary": [120, 95, 140, 80, 128],
 })`,
-      starterCode: `print(df.query("dept == 'Eng' and salary > 120"))
+      starterCode: `display(df.query("dept == 'Eng' and salary > 120"))
 print()
-print(df.query("dept in ['Eng','Sales']"))
+display(df.query("dept in ['Eng','Sales']"))
 `,
     },
   ]}
@@ -268,7 +268,7 @@ mask = (
 
 big_gentoos = penguins[mask]
 print(f"{len(big_gentoos)} large Gentoos found")
-print(big_gentoos[["species", "island", "body_mass_g", "sex"]].head())
+display(big_gentoos[["species", "island", "body_mass_g", "sex"]].head())
 `,
     },
   ]}
@@ -302,7 +302,7 @@ df = pd.DataFrame(
 df["flag"] = ""
 df.loc[(df["dept"] == "Eng") & (df["salary"] > 120), "flag"] = "high_eng"
 
-print(df)
+display(df)
 `,
     },
   ]}

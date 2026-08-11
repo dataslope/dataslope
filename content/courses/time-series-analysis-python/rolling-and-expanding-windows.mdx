@@ -49,7 +49,7 @@ frame = pd.DataFrame(
         "lead1 (tomorrow)": s.shift(-1),  # pull the FUTURE back to today
     }
 )
-print(frame)
+display(frame)
 print()
 
 # 'shift' is how you compute change over time:
@@ -216,7 +216,7 @@ frame = pd.DataFrame(
         "centered": s.rolling(3, center=True).mean(),  # straddles t (future-facing)
     }
 )
-print(frame)
+display(frame)
 print()
 print("On 2014-01-02 the centered mean is (10+20+30)/3 = 20.0 -- it used")
 print("2014-01-03, a day that hadn't happened yet at the time of 01-02.")
@@ -405,7 +405,7 @@ cmp = pd.DataFrame(
         "expanding_mean": s.expanding().mean().round(1),  # all days so far
     }
 )
-print(cmp.head(10))
+display(cmp.head(10))
 print()
 print("rolling7 forgets data older than 7 days; expanding never forgets.")
 print("Both use only PAST+present, so both are safe to use as-of each date.")

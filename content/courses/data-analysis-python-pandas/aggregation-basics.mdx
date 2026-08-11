@@ -174,7 +174,7 @@ df = pd.DataFrame(
 )
 
 # A list of agg names → one row per agg
-print(df.agg(["mean", "median", "std", "min", "max"]).round(1))
+display(df.agg(["mean", "median", "std", "min", "max"]).round(1))
 `,
     },
   ]}
@@ -199,7 +199,7 @@ df = pd.DataFrame({
         "tenure": ["min", "max"],
     }
 )
-print(result)
+display(result)
 `,
     },
   ]}

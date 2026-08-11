@@ -24,8 +24,8 @@ to be unnecessary. This page covers how to do it and when not to.
 penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
     "species", "island", "body_mass_g"
 )`,
-      starterCode: `print(penguins.sort("body_mass_g").head(3))
-print(penguins.sort("body_mass_g", descending=True).head(3))
+      starterCode: `display(penguins.sort("body_mass_g").head(3))
+display(penguins.sort("body_mass_g", descending=True).head(3))
 `,
     },
   ]}
@@ -55,7 +55,7 @@ penguins = pl.read_csv("penguins.csv", null_values=["NA"]).select(
     "species", "island", "body_mass_g"
 )`,
       starterCode: `# Species ascending, then mass descending within each species
-print(
+display(
     penguins.sort(
         "species", "body_mass_g", descending=[False, True]
     ).head(6)
@@ -81,7 +81,7 @@ The sort keys do not have to be columns that exist.
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# Sort by a ratio that is never added to the frame
-print(
+display(
     penguins.sort(
         pl.col("bill_length_mm") / pl.col("bill_depth_mm"), descending=True
     )
@@ -90,7 +90,7 @@ print(
 )
 
 # Sort by name length
-print(penguins.sort(pl.col("species").str.len_chars()).head(3))
+display(penguins.sort(pl.col("species").str.len_chars()).head(3))
 `,
     },
   ]}
@@ -146,7 +146,7 @@ start = time.perf_counter()
 b = diamonds.top_k(5, by="price")
 topk_ms = (time.perf_counter() - start) * 1000
 
-print(a.select("carat", "cut", "price"))
+display(a.select("carat", "cut", "price"))
 print(f"sort+head: {sort_ms:.1f} ms")
 print(f"top_k    : {topk_ms:.1f} ms")
 print("same rows:", a["price"].to_list() == b["price"].to_list())
@@ -180,7 +180,7 @@ them.
       initCode: `import polars as pl
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `# The heaviest penguin's island, per species
-print(
+display(
     penguins.group_by("species").agg(
         pl.col("island").sort_by("body_mass_g", descending=True).first(),
         pl.col("body_mass_g").max().alias("max_mass"),
@@ -202,7 +202,7 @@ print(
 
 df = pl.DataFrame({"score": [70, 95, 82, 95, 61]})
 
-print(
+display(
     df.with_columns(
         rank_min=pl.col("score").rank("min", descending=True),
         rank_dense=pl.col("score").rank("dense", descending=True),
@@ -236,7 +236,7 @@ Sort the final result by \`species\` ascending, then \`body_mass_g\` descending.
 penguins = pl.read_csv("penguins.csv", null_values=["NA"])`,
       starterCode: `heaviest = None  # TODO
 
-print(heaviest)
+display(heaviest)
 `,
       solutionCode: `heaviest = (
     penguins.drop_nulls("body_mass_g")
@@ -248,7 +248,7 @@ print(heaviest)
     .sort("species", "body_mass_g", descending=[False, True])
 )
 
-print(heaviest)
+display(heaviest)
 `,
     },
   ]}

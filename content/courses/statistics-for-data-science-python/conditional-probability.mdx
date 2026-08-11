@@ -134,7 +134,7 @@ table = pd.DataFrame(
     {"churned": [30, 120], "stayed": [470, 380]},
     index=["paid", "free"],
 )
-print(table)
+display(table)
 print(f"\\nTotal users: {table.values.sum()}")
 
 # P(churned | paid): zoom into the 'paid' row, take fraction that churned.
