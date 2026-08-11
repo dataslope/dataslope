@@ -392,10 +392,21 @@ If you enable additional Better Auth features (e.g. 2FA, organizations), regener
 Dataslope is available under more than one license:
 
 - **Source code**: [MIT License](./LICENSE). Attribution via the copyright
-  notice, and no warranty/liability.
-- **Learning content** (everything under [`content/`](./content)): [Creative
-  Commons Attribution 4.0 International (CC BY 4.0)](./LICENSE-CONTENT).
-  Attribution required, no warranty/liability.
+  notice, and no warranty/liability. The MIT license covers Dataslope's own
+  code **only** — not the learning content, and not the third-party software,
+  runtimes, datasets, fonts, or artwork the project depends on or loads at
+  runtime, each of which keeps its own terms.
+- **Learning content**: [Creative Commons Attribution-NonCommercial 4.0
+  International (CC BY-NC 4.0)](./LICENSE-CONTENT). Attribution required,
+  non-commercial use only, no warranty/liability. This covers the courses,
+  lessons, exercises, and quizzes under [`content/`](./content) **and** the
+  illustrative teaching materials made for them — the generated lesson and
+  course illustrations in `public/images/`, and the figures, diagrams, and
+  charts that accompany the lessons (including the ones rendered at build time
+  from [`charts/`](./charts)). The chart *scripts* are code under MIT; the
+  drawings they produce are content. See [`LICENSE-CONTENT`](./LICENSE-CONTENT)
+  for the exact boundary, including what is excluded (brand assets,
+  third-party material).
 
 Third-party software and language runtimes retain their own licenses; see
 [`THIRD-PARTY-NOTICES.md`](./THIRD-PARTY-NOTICES.md). In particular, the Java

@@ -8,6 +8,13 @@
 // Dark mode paints the page and the card the same near-black (#121212) and
 // floats a decorative globe (AuthGlobe) at the bottom, behind the card. The
 // shared light/dark toggle sits top-right, mirroring the site header.
+//
+// Mobile is deliberately plainer: no globe (AuthGlobe skips small viewports
+// entirely, so the WebGL sphere is never even created there) and no card —
+// the page paints one flat white/near-black surface and the form sits
+// directly on it. A card inside a 360px viewport is two nested boxes of
+// padding around a column of full-width inputs; dropping it buys back the
+// horizontal room without changing anything about the form itself.
 import "@/app/tailwind.css";
 import type { ReactNode } from "react";
 import Link from "../Link";
@@ -25,8 +32,14 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       {/* `dark:[--ui-card:#121212]` repaints every `bg-card` descendant (the
           card body + the "or continue with" separator) so they match the page,
-          keeping the dark surface seamless. */}
-      <div className="relative isolate flex min-h-svh flex-col items-center justify-center gap-6 overflow-hidden bg-muted p-6 md:p-10 dark:bg-[#121212] dark:[--ui-card:#121212]">
+          keeping the dark surface seamless.
+
+          Light mode does the same thing at mobile widths from the other side:
+          the card is already white, so painting the *page* white (rather than
+          the muted grey) below `md` is what dissolves it. Both themes then
+          have a single flat surface on mobile, and `bg-card` keeps working
+          unchanged for the "or continue with" separator's knockout. */}
+      <div className="relative isolate flex min-h-svh flex-col items-center justify-center gap-6 overflow-hidden bg-white px-5 py-8 md:bg-muted md:p-10 dark:bg-[#121212] dark:[--ui-card:#121212]">
         {/* Shared light/dark toggle, same control as the site header. */}
         <div className="absolute right-4 top-4 z-20">
           <ThemePillToggle />

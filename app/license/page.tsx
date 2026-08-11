@@ -4,7 +4,7 @@ import { LegalShell } from "../_components/legal/LegalShell";
 export const metadata = {
   title: "License, Dataslope",
   description:
-    "How Dataslope is licensed: MIT for the source code, CC BY 4.0 for the learning content, and the third-party runtimes that keep their own terms.",
+    "How Dataslope is licensed: MIT for the source code, CC BY-NC 4.0 for the learning content, and the third-party runtimes that keep their own terms.",
 };
 
 const REPO = "https://github.com/dataslope/dataslope";
@@ -79,19 +79,21 @@ SOFTWARE.`;
 
 export default function LicensePage() {
   return (
-    <LegalShell title="License" updated="August 6, 2026">
+    <LegalShell title="License" updated="August 11, 2026">
       <p>
         Dataslope is made available under more than one license, because the
         site is made of more than one kind of thing. The short version:
       </p>
       <ul>
         <li>
-          <strong>Source code</strong>: MIT License.
+          <strong>Source code</strong>: MIT License. Dataslope&apos;s own code,
+          and nothing else.
         </li>
         <li>
           <strong>Learning content</strong> (courses, lessons, exercises,
-          quizzes): Creative Commons Attribution 4.0 International (CC BY
-          4.0).
+          quizzes, and the illustrations, figures, diagrams, and charts drawn
+          for them): Creative Commons Attribution-NonCommercial 4.0
+          International (CC BY-NC 4.0).
         </li>
         <li>
           <strong>Third-party software and language runtimes</strong>: not
@@ -128,25 +130,57 @@ export default function LicensePage() {
 
       <h2>Source code (MIT)</h2>
       <p>
-        Dataslope&apos;s own source code is open source under the MIT License.
-        You may use, copy, modify, merge, publish, distribute, sublicense, and
-        sell copies of it, provided the copyright notice and permission notice
-        below travel with it.
+        Dataslope&apos;s own source code is open source under the MIT License:
+        the application, its build and tooling scripts, and the other
+        first-party code in the repository. You may use, copy, modify, merge,
+        publish, distribute, sublicense, and sell copies of it, provided the
+        copyright notice and permission notice below travel with it.
       </p>
+      <p>
+        <strong>What MIT does not cover.</strong> It is a license to the code,
+        not to everything the project contains or loads. It grants you no rights
+        to:
+      </p>
+      <ul>
+        <li>
+          the <strong>learning content</strong>, which is CC BY-NC 4.0 (next
+          section); MIT&apos;s permission to &ldquo;sell copies&rdquo; does not
+          reach it, and does not permit commercial use of it;
+        </li>
+        <li>
+          <strong>third-party software, language runtimes, datasets, fonts, or
+          bundled artwork</strong>, each of which keeps its own terms (see
+          below); CheerpJ, the Java runtime, is proprietary and may require a
+          paid license for some uses;
+        </li>
+        <li>
+          the <strong>Dataslope name, logo, and brand assets</strong>: neither
+          license grants trademark rights.
+        </li>
+      </ul>
       <pre>{MIT_TEXT}</pre>
 
-      <h2>Learning content (CC BY 4.0)</h2>
+      <h2>Learning content (CC BY-NC 4.0)</h2>
       <p>
-        The courses, lessons, exercises, quizzes, and other written or
-        illustrative teaching materials are licensed under the{" "}
+        The courses, lessons, exercises, and quizzes are licensed under the{" "}
         <a
-          href="https://creativecommons.org/licenses/by/4.0/"
+          href="https://creativecommons.org/licenses/by-nc/4.0/"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Creative Commons Attribution 4.0 International License
+          Creative Commons Attribution-NonCommercial 4.0 International License
         </a>
         . This is separate from the MIT license on the code above.
+      </p>
+      <p>
+        <strong>Illustrative teaching materials</strong> are covered too, and by
+        that we mean the drawings that teach rather than decorate: the lesson
+        and course illustrations, and the figures, diagrams, and charts that
+        accompany the lessons, including the ones rendered at build time. The
+        script that draws a chart is source code under MIT; the drawing it
+        produces is content under this license. Brand assets and third-party
+        material (datasets, fonts, the bundled emoji artwork) are excluded from
+        both licenses and keep their own terms.
       </p>
       <p>You are free to:</p>
       <ul>
@@ -155,8 +189,7 @@ export default function LicensePage() {
           medium or format.
         </li>
         <li>
-          <strong>Adapt</strong>: remix, transform, and build upon it for any
-          purpose, even commercially.
+          <strong>Adapt</strong>: remix, transform, and build upon it.
         </li>
       </ul>
       <p>Under the following terms:</p>
@@ -176,6 +209,24 @@ export default function LicensePage() {
           Dataslope endorses you or your use.
         </li>
         <li>
+          <strong>NonCommercial</strong>: you may not use the content for
+          commercial purposes, meaning use primarily intended for or directed
+          toward commercial advantage or monetary compensation. That covers
+          reselling the lessons, putting them behind a paid course or
+          subscription, and republishing them on an ad-supported or
+          lead-generating site. Teaching from them in a classroom, study group,
+          or workplace, and sharing or adapting them non-commercially, is fine.
+          For commercial use,{" "}
+          <a
+            href={`${REPO}/discussions`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ask us
+          </a>
+          .
+        </li>
+        <li>
           <strong>No additional restrictions</strong>: you may not apply legal
           terms or technological measures that legally restrict others from
           doing anything the license permits.
@@ -184,11 +235,11 @@ export default function LicensePage() {
       <p>
         The{" "}
         <a
-          href="https://creativecommons.org/licenses/by/4.0/legalcode"
+          href="https://creativecommons.org/licenses/by-nc/4.0/legalcode"
           target="_blank"
           rel="noopener noreferrer"
         >
-          full legal text of CC BY 4.0
+          full legal text of CC BY-NC 4.0
         </a>{" "}
         governs; the summary above is not a substitute for it. Unless otherwise
         stated the content is provided <strong>&ldquo;as is&rdquo;</strong> and{" "}
