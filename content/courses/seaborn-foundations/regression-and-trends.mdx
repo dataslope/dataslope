@@ -38,6 +38,15 @@ prediction interval for a new observation. A narrow band means "we're
 fairly sure where the average sits," not "most points fall in here."
 </Callout>
 
+<Chart slug="regression-is-conditional-mean" />
+
+Three things follow from that, and each is a mistake somebody makes. The line
+is about averages, so it never claimed to predict an individual. The spread
+inside a slice is what a *prediction* interval is made of, while the interval
+on the line itself is much narrower. And fitting minimises vertical distances,
+so regressing y on x and x on y give two different lines, and neither is "the
+relationship".
+
 ## The minimum
 
 Map two numeric columns and let `lmplot()` fit a straight line:
@@ -252,6 +261,13 @@ sns.residplot(data=mpg, x="horsepower", y="mpg")
 The residuals smile (a U-shape) rather than scattering flatly around zero,
 a clear signal that the relationship bent and a straight line could not
 follow it.
+
+<Chart slug="heteroscedastic-residuals" />
+
+The coefficients are unbiased in both panels, so the R-squared is unaffected
+and the fit looks healthy. What fails on the right is constant variance, and
+with it the standard errors, the p-values and the intervals, which are too
+narrow exactly where the model is most confident.
 
 ## The cautions that matter most
 
