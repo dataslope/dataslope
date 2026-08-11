@@ -291,6 +291,12 @@ honest test?**"
 The essential property is temporal: train strictly precedes test in every fold, so the model never sees the future.`}
 />
 
+<Chart slug="timeseries-cv-splits" />
+
+The backtest costs two things worth naming: the earliest folds train on very
+little, and the training size varies across folds, so the fold scores are not
+identically distributed and averaging them is a rougher summary than usual.
+
 ## The other ways the future leaks in
 
 A chronological split is necessary but not *sufficient*. Leakage sneaks in
