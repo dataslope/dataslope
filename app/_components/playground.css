@@ -195,11 +195,20 @@ body.playground-active {
   color: var(--text);
   letter-spacing: -0.01em;
 }
+/* The mark is the one thing in the header that must never give: the group
+   is allowed to shrink on a phone (see the `min-width: 0` in the mobile
+   block), and without this its link would be the flex item that absorbs
+   the squeeze, collapsing the image to nothing. The switcher beside it
+   shrinks instead — it has already dropped its label by then. */
+.logo > a {
+  flex: none;
+}
 
 .brand-logo {
   height: 11px;
   width: auto;
   display: block;
+  flex: none;
 }
 
 .header-sep {
@@ -2783,18 +2792,16 @@ input[type="range"].fs-slider:disabled {
 
   /* The workspace name is the one elastic thing in the row, so it is what
      gives when the name is long: it truncates instead of pushing the
-     Dataslope mark off the left edge (which is what used to happen).
-     The two icon buttons beside it never shrink. */
-  .ph-name {
-    max-width: 40vw;
-  }
+     Dataslope mark off the left edge. The two icon buttons beside it
+     never shrink.
+
+     Its width ceiling is *not* here, it sits beside the desktop `.ph-name`
+     rule further down the sheet. `.ph-name` here is no more specific than
+     the base rule, so a cap written at this point loses to it — which is
+     how the mobile ceiling ended up dead and a long name kept its 220px
+     desktop width on a phone. */
   .ph-name-wrap > button {
     flex-shrink: 0;
-  }
-  /* The rename input needs the same ceiling or editing a long name
-     reflows the header mid-type. */
-  .ph-rename-input {
-    max-width: 44vw;
   }
 
   /* Hide the CodeMirror line-number gutter on mobile so the code takes
@@ -3017,6 +3024,9 @@ input[type="range"].fs-slider:disabled {
   user-select: none;
   text-align: left;
   width: 100%;
+  /* The row is an <a> when it navigates (the save panel's "Sign in to back
+     up"), so it must not pick up link underline/colour. */
+  text-decoration: none;
 }
 .mobile-menu-action:hover,
 .mobile-menu-action:focus-visible {
@@ -3052,6 +3062,43 @@ input[type="range"].fs-slider:disabled {
 }
 .mobile-menu-main > svg {
   color: var(--menu-icon, var(--text-dim));
+  flex: none;
+}
+/* Two-line rows (the save sub-sheet mirrors the desktop menu's title +
+   subtitle), so the icon stays with the title rather than centring
+   against both lines. */
+.mobile-menu-main:has(.mobile-menu-sub) {
+  align-items: flex-start;
+}
+.mobile-menu-main:has(.mobile-menu-sub) > svg {
+  margin-top: 2px;
+}
+.mobile-menu-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.mobile-menu-sub {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-dim);
+  text-wrap: pretty;
+}
+/* Non-interactive note strip at the top of a sub-sheet (the save panel's
+   "Auto-saves in this browser as you work"). */
+.mobile-menu-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+.mobile-menu-note > svg {
+  color: var(--green);
   flex: none;
 }
 .mobile-menu-trailing {
@@ -5153,6 +5200,25 @@ html[data-playground-theme="dark"] {
   padding: 3px 8px;
   width: 200px;
   outline: none;
+}
+
+/* Mobile ceilings for the two rules above. They have to sit *after* those
+   rules (same specificity, last one wins) — the copies in the big mobile
+   block higher up in this file were losing to the desktop widths, which is
+   what let a long name run to 220px on a phone and squeeze the Dataslope
+   mark out of the header. Truncating a good deal earlier than the row
+   strictly needs leaves the mark room to breathe on the narrowest phones. */
+@media (max-width: 768px) {
+  /* `min(…)` so the desktop ceiling still applies on the wide end of the
+     range — a plain 36vw would be *looser* than 220px above ~610px. */
+  .ph-name {
+    max-width: min(36vw, 220px);
+  }
+  /* The rename input needs the same ceiling or editing a long name
+     reflows the header mid-type. */
+  .ph-rename-input {
+    max-width: 40vw;
+  }
 }
 
 /* ─── Header: quiet ghost buttons (Save · Share) ─── */

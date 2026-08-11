@@ -63,8 +63,10 @@ import {
 import {
   MobileMenuAction,
   MobileMenuLabel,
+  MobileMenuNote,
   MobileMenuSubSheet,
   useMobileMenuClose,
+  useMobileMenuSubSheetOpen,
 } from "./MobileMenuSheet";
 
 /** The 9px chevron used by the switcher, save menu and badge in the mock. */
@@ -300,15 +302,7 @@ export function NewWorkspaceControl({
 // Save split button + menu
 // ---------------------------------------------------------------------------
 
-export function SaveControl({
-  playgroundId,
-  workspaceId,
-  workspaceName,
-  unsaved,
-  onSave,
-  buildBundle,
-  onNotify,
-}: {
+export interface SaveControlProps {
   playgroundId: string;
   workspaceId: string | null;
   workspaceName: string;
@@ -319,8 +313,28 @@ export function SaveControl({
   buildBundle?: () => Promise<WorkspaceBundle | null>;
   /** Toast hook so saves/backups flash the host's confirmation. */
   onNotify?: (message: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
+}
+
+/**
+ * The three save actions and the copy that describes them, shared by the
+ * desktop dropdown (`SaveControl`) and the mobile drawer's sub-sheet
+ * (`MobileSaveMenu`) so the two menus can't drift apart.
+ *
+ * `menuOpen` is the "refresh the cloud list now" signal — pass whether the
+ * surface hosting the rows is open.
+ */
+function useSaveMenu(
+  {
+    playgroundId,
+    workspaceId,
+    workspaceName,
+    unsaved,
+    onSave,
+    buildBundle,
+    onNotify,
+  }: SaveControlProps,
+  open: boolean,
+) {
   const cloud = useCloudBackups(playgroundId, open);
   const [backupBusy, setBackupBusy] = useState(false);
 
@@ -387,6 +401,32 @@ export function SaveControl({
   }, [workspaceId, unsaved, onSave, workspaceName, onNotify]);
 
   const showCloudRows = cloud.available && !cloud.signedOut;
+
+  return {
+    doSave,
+    doBackup,
+    doDownload,
+    backupBusy,
+    backupSub,
+    /** Signed in with cloud storage configured: show backup + download. */
+    showCloudRows,
+    /** Cloud storage exists at all (drives the sign-in row for guests). */
+    cloudAvailable: cloud.available,
+  };
+}
+
+export function SaveControl(props: SaveControlProps) {
+  const { unsaved } = props;
+  const [open, setOpen] = useState(false);
+  const {
+    doSave,
+    doBackup,
+    doDownload,
+    backupBusy,
+    backupSub,
+    showCloudRows,
+    cloudAvailable,
+  } = useSaveMenu(props, open);
 
   return (
     <Menu.Root open={open} onOpenChange={setOpen}>
@@ -463,7 +503,7 @@ export function SaveControl({
               </>
             ) : (
               <>
-                {cloud.available && (
+                {cloudAvailable && (
                   <Menu.Item
                     className="ph-save-menu-item"
                     render={<a href="/sign-in" />}
@@ -497,6 +537,92 @@ export function SaveControl({
         </Menu.Positioner>
       </Menu.Portal>
     </Menu.Root>
+  );
+}
+
+/** Sub-sheet identity for the save panel (sub-sheets are mutually
+ *  exclusive and keyed by id). */
+const SAVE_SUBSHEET_ID = "save";
+
+/**
+ * Mobile drawer counterpart of `SaveControl`: the Save/Saved row opens a
+ * sub-sheet holding the very same items as the desktop chevron menu — the
+ * "auto-saves in this browser" note, "Back up to cloud" (or "Sign in to
+ * back up" for guests) and "Download copy" — plus the split button's own
+ * Save action, which on desktop lives in the button half.
+ *
+ * The rows and their copy come from `useSaveMenu`, the same hook the
+ * desktop menu uses. Must render inside a `MobileMenuSheet`.
+ */
+export function MobileSaveMenu(props: SaveControlProps) {
+  const { unsaved } = props;
+  // The whole drawer body only mounts while the hamburger sheet is open, so
+  // this hook's first fetch already happens on open; the sub-sheet's own
+  // open state re-reads the list when the user drills into it.
+  const open = useMobileMenuSubSheetOpen(SAVE_SUBSHEET_ID);
+  const {
+    doSave,
+    doBackup,
+    doDownload,
+    backupBusy,
+    backupSub,
+    showCloudRows,
+    cloudAvailable,
+  } = useSaveMenu(props, open);
+
+  return (
+    <MobileMenuSubSheet
+      id={SAVE_SUBSHEET_ID}
+      icon={unsaved ? CloudUpload : Cloud}
+      label={unsaved ? "Save" : "Saved"}
+      title={unsaved ? "Save" : "Saved"}
+    >
+      <MobileMenuNote icon={Check}>
+        Auto-saves in this browser as you work
+      </MobileMenuNote>
+      {unsaved && (
+        <MobileMenuAction
+          icon={CloudUpload}
+          label="Save workspace"
+          sub="Add it to your saved workspaces"
+          onClick={doSave}
+        />
+      )}
+      {showCloudRows ? (
+        <>
+          <MobileMenuAction
+            icon={CloudUpload}
+            label={backupBusy ? "Backing up…" : "Back up to cloud"}
+            sub={backupSub}
+            disabled={backupBusy}
+            onClick={() => void doBackup()}
+          />
+          <MobileMenuAction
+            icon={Download}
+            label="Download copy"
+            sub="Workspace files as a .zip"
+            onClick={() => void doDownload()}
+          />
+        </>
+      ) : (
+        <>
+          {cloudAvailable && (
+            <MobileMenuAction
+              icon={LogIn}
+              href="/sign-in"
+              label="Sign in to back up"
+              sub="Keep snapshots on your account, free"
+            />
+          )}
+          <MobileMenuAction
+            icon={Download}
+            label="Download copy"
+            sub="Workspace files as a .zip"
+            onClick={() => void doDownload()}
+          />
+        </>
+      )}
+    </MobileMenuSubSheet>
   );
 }
 

@@ -24,7 +24,10 @@ export const PLAYGROUNDS: PlaygroundEntry[] = [
   { id: "cpp", label: "C++", href: "/playground/cpp" },
   { id: "java", label: "Java", href: "/playground/java" },
   { id: "csharp", label: "C#", href: "/playground/csharp" },
-  { id: "sqlite", label: "SQLite", href: "/playground/sqlite" },
+  // Databases, always in this order (PostgreSQL · SQLite · DuckDB) — the
+  // playground index and the dashboard read the same list, so the switcher
+  // and those grids can't drift apart.
   { id: "postgres", label: "PostgreSQL", href: "/playground/postgres" },
+  { id: "sqlite", label: "SQLite", href: "/playground/sqlite" },
   { id: "duckdb", label: "DuckDB", href: "/playground/duckdb" },
 ];
