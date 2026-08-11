@@ -21,15 +21,20 @@ export function AuthCard({
   description: string;
   children: React.ReactNode;
 }) {
+  // Below `md` there is no card: `bg-card` is painted the same colour as the
+  // page (see AuthPageShell), and the padding + corner radius are dropped so
+  // the form sits directly on the page surface. That is worth ~48px of width
+  // on a narrow phone, which the inputs and buttons take up instead. From `md`
+  // the card comes back exactly as before.
   return (
-    <div className="bg-card text-card-foreground rounded-xl">
-      <div className="flex flex-col gap-1.5 p-6 text-center">
+    <div className="bg-card text-card-foreground md:rounded-xl">
+      <div className="flex flex-col gap-1.5 pb-6 text-center md:p-6">
         <h1 className="text-xl font-semibold">{title}</h1>
         <p className="text-muted-foreground text-balance text-sm">
           {description}
         </p>
       </div>
-      <div className="p-6 pt-0">{children}</div>
+      <div className="md:p-6 md:pt-0">{children}</div>
     </div>
   );
 }

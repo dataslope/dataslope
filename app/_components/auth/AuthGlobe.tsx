@@ -17,6 +17,13 @@
 // `.dark` class the shared toggle flips; cobe bakes colours in at creation, so
 // a theme change tears down and rebuilds the globe.
 //
+// Desktop only. On a phone the sphere is mostly off-screen behind the form
+// anyway, and the auth pages there are a flat, card-less surface (see
+// AuthPageShell) that the globe would only clutter. This is a render-time
+// opt-out rather than a `hidden` class on purpose: nothing is created, so a
+// mobile visitor pays for no WebGL context, no rAF loop, and none of the
+// sticker images.
+//
 // Non-interactive (pointer-events off, aria-hidden): a pure backdrop.
 
 import { useEffect, useRef, useState } from "react";
@@ -149,8 +156,24 @@ function useIsDark(): boolean {
   return dark;
 }
 
+/** The `md` breakpoint, read live so a resize across it mounts or tears down
+ *  the globe. Starts `false`, which also keeps the server render and the first
+ *  client render globe-free (it needs a canvas and JS either way). */
+function useIsDesktop(): boolean {
+  const [desktop, setDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const read = () => setDesktop(mq.matches);
+    read();
+    mq.addEventListener("change", read);
+    return () => mq.removeEventListener("change", read);
+  }, []);
+  return desktop;
+}
+
 export function AuthGlobe() {
   const dark = useIsDark();
+  const desktop = useIsDesktop();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const pinRefs = useRef<Array<HTMLSpanElement | null>>([]);
@@ -238,7 +261,11 @@ export function AuthGlobe() {
       globe.destroy();
       window.removeEventListener("resize", onResize);
     };
-  }, [dark]);
+    // `desktop` is in the deps because the canvas it reads only exists while
+    // the globe is rendered; crossing the breakpoint has to re-run this.
+  }, [dark, desktop]);
+
+  if (!desktop) return null;
 
   return (
     <div

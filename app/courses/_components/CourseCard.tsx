@@ -158,8 +158,9 @@ function CourseThumb({ course }: { course: CatalogCourse }) {
  *
  * `catalog` is /courses: one row per line at full width, where the page IS the
  * list and a visitor is reading it to choose. It gets the larger art, the
- * looser rhythm, and a description set at reading size and never truncated —
- * the catalog is the one place the full sentence is the point.
+ * larger title, the looser rhythm, and a description set at reading size and
+ * never truncated — the catalog is the one place the full sentence is the
+ * point.
  *
  * `preview` is the home page's Courses section: four rows in two columns,
  * inside a page that has other things to say. It stays denser, and clamps the
@@ -172,11 +173,16 @@ const LAYOUT = {
   catalog: {
     row: "grid-cols-[86px_1fr] gap-5 py-8 sm:grid-cols-[104px_1fr] sm:gap-6",
     text: "gap-2",
+    // One size at every breakpoint: the catalog row is the same shape on a
+    // phone as on a desktop, so the title has no reason to step down. The
+    // tighter tracking is what keeps 18px from reading loose at this weight.
+    title: "text-[18px] tracking-[-0.02em]",
     desc: "text-[16px] leading-[1.7]",
   },
   preview: {
     row: "grid-cols-[84px_1fr] gap-5 py-6",
     text: "gap-[5px]",
+    title: "text-[17px] tracking-[-0.01em]",
     desc: "line-clamp-2 text-[15px] leading-[1.6]",
   },
 } as const satisfies Record<CourseCardLayout, Record<string, string>>;
@@ -202,7 +208,7 @@ export function CourseCard({
       <CourseThumb course={course} />
       <span className={`flex min-w-0 flex-col ${l.text}`}>
         <span
-          className={`text-[17px] font-semibold tracking-[-0.01em] ${HEADING} ${HOVER_TEXT}`}
+          className={`font-semibold ${l.title} ${HEADING} ${HOVER_TEXT}`}
         >
           {course.title}
         </span>

@@ -1,21 +1,47 @@
 Dataslope Learning Content License
 ==================================
 
-The learning content in this repository, i.e. the courses, lessons, exercises,
-quizzes, and other written or illustrative teaching materials in the `content/`
-directory (the "Content"), is licensed under the
+The learning content in this repository (the "Content") is licensed under the
 
-    Creative Commons Attribution 4.0 International License (CC BY 4.0).
+    Creative Commons Attribution-NonCommercial 4.0 International License
+    (CC BY-NC 4.0).
 
-(This is separate from Dataslope's source code, which is licensed under the MIT
-License; see LICENSE. It also does not cover third-party material; see
-THIRD-PARTY-NOTICES.md.)
+The Content is:
+
+  - The courses, lessons, exercises, challenges, quizzes, and other written
+    teaching material in the `content/` directory, including the MDX prose,
+    the code samples embedded in it, the exercise starter code and reference
+    solutions, and the quiz questions, answers, and explanations.
+
+  - The illustrative teaching materials made for that written material, i.e.
+    the drawings that teach rather than decorate. Concretely: the lesson
+    illustrations and course/interview artwork generated from the prompts in
+    `data/illustration-prompts.json` and served from `public/images/`
+    (including the thumbnails and cut-outs derived from them), and the figures,
+    diagrams, and charts that accompany the lessons, whether they are committed
+    as image files or drawn at build time from the chart definitions in
+    `charts/`. Where such a drawing is produced by a script, the *script* is
+    source code under MIT (see LICENSE) and the *drawing it produces* is
+    Content under this license.
+
+The Content is not:
+
+  - Dataslope's source code, which is licensed under the MIT License; see
+    LICENSE. Being tracked in this repository does not make a file Content, and
+    a file being Content does not put it under MIT.
+
+  - The Dataslope name, logo, and other brand assets (e.g. `public/logo-files/`,
+    `brand-assets/`). No trademark rights are granted here; CC BY-NC 4.0
+    explicitly does not license them.
+
+  - Third-party material: datasets, fonts, language runtimes, and bundled
+    artwork such as the Microsoft Fluent Emoji images, each of which keeps its
+    own license. See THIRD-PARTY-NOTICES.md.
 
 You are free to:
 
   - Share: copy and redistribute the Content in any medium or format.
-  - Adapt: remix, transform, and build upon the Content for any purpose, even
-    commercially.
+  - Adapt: remix, transform, and build upon the Content.
 
 Under the following terms:
 
@@ -23,6 +49,14 @@ Under the following terms:
     (https://dataslope.com), provide a link to this license, and indicate if
     changes were made. You may do so in any reasonable manner, but not in any
     way that suggests Dataslope endorses you or your use.
+  - NonCommercial: You may not use the Content for commercial purposes. A
+    commercial purpose is one primarily intended for, or directed toward,
+    commercial advantage or monetary compensation, for example reselling the
+    lessons, putting them behind a paid course or subscription, or republishing
+    them on an ad-supported or lead-generating site. Teaching from them in a
+    classroom, study group, or workplace, and sharing or adapting them
+    non-commercially, is fine. If you want to use the Content commercially, ask
+    us: https://github.com/dataslope/dataslope/discussions
   - No additional restrictions: You may not apply legal terms or technological
     measures that legally restrict others from doing anything the license
     permits.
@@ -32,13 +66,14 @@ Disclaimer of warranties and liability:
   Unless otherwise stated, the Content is provided "as is" and "as available",
   without warranties or conditions of any kind, either express or implied. To
   the fullest extent permitted by law, Dataslope and its contributors are not
-  liable for any damages or losses arising from the use of the Content. (CC BY
-  4.0 itself disclaims warranties and limits liability; see its full text.)
+  liable for any damages or losses arising from the use of the Content.
+  (CC BY-NC 4.0 itself disclaims warranties and limits liability; see its full
+  text.)
 
-The complete legal text of CC BY 4.0 governs and is available at:
+The complete legal text of CC BY-NC 4.0 governs and is available at:
 
-  https://creativecommons.org/licenses/by/4.0/legalcode
+  https://creativecommons.org/licenses/by-nc/4.0/legalcode
 
 A plain-language summary (not a substitute for the license) is at:
 
-  https://creativecommons.org/licenses/by/4.0/
+  https://creativecommons.org/licenses/by-nc/4.0/

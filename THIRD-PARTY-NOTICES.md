@@ -1,10 +1,12 @@
 # Third-Party Notices
 
 Dataslope's own source code is licensed under the MIT License (see [`LICENSE`](./LICENSE))
-and its learning content under CC BY 4.0 (see [`LICENSE-CONTENT`](./LICENSE-CONTENT)).
+and its learning content under CC BY-NC 4.0 (see [`LICENSE-CONTENT`](./LICENSE-CONTENT)).
 Those licenses do **not** cover the third-party software, language runtimes,
-fonts, or other components that Dataslope depends on or loads at runtime. Each
-of those retains its own license and terms, summarized below.
+fonts, datasets, or other components that Dataslope depends on or loads at
+runtime. Each of those retains its own license and terms, summarized below.
+Nothing in the MIT license grants any rights to the material on this page, and
+nothing here can be relied on to enlarge what a third party has granted you.
 
 Most language runtimes are **downloaded from their providers (or a CDN) in the
 user's browser at runtime** and are not redistributed in this repository.

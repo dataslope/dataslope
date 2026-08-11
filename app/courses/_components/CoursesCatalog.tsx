@@ -323,8 +323,19 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
       </div>
 
       <div className="mt-8 grid grid-cols-1 items-start gap-10 md:mt-10 md:grid-cols-[224px_1fr] md:gap-14">
-        {/* ── Filter sidebar (desktop only) ── */}
-        <aside className="hidden flex-col gap-7 pt-0.5 md:flex">
+        {/* ── Filter sidebar (desktop only) ──
+            Sticks to the top of the viewport once the page scrolls, so the
+            filters stay reachable next to a long course list. Only from `md`
+            up, below that the sidebar is replaced by the dropdown bar above,
+            which has its own `sticky`.
+
+            `top-[68px]` clears the compacted header (48px) plus its 12px fade
+            (see HomeNav). The `max-h` + `overflow-y-auto` keep the tail of the
+            language list reachable on short viewports rather than letting it
+            run off the bottom of a pinned column; `pr-2 -mr-2` gives the rows'
+            `hover:translate-x-0.5` room inside that scroll box (and parks any
+            scrollbar in the column gap) without narrowing the column. */}
+        <aside className="hidden flex-col gap-7 pt-0.5 md:sticky md:top-[68px] md:flex md:max-h-[calc(100svh-84px)] md:-mr-2 md:overflow-y-auto md:pr-2">
         <label
           className={`flex items-center gap-[9px] border-b px-0.5 pb-2.5 pt-1.5 focus-within:border-[var(--ds-blue-400)] dark:focus-within:border-[var(--ds-blue-500)] ${HAIRLINE}`}
         >

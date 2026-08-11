@@ -107,16 +107,33 @@ html.dark .ds-home {
   animation-play-state: paused !important;
 }
 
-/* Footer: one column on mobile, three from sm up. Driven by a scoped rule
- * (rather than Tailwind grid utilities) so a leaked `.grid`/`grid-cols-*`
- * from /learn can't collapse it back to the wrong column count. */
+/* Footer: one column on mobile, two from sm, four from lg — the twelve-column
+ * bed went from 4+4+4 to 3+3+3+3 when the Playgrounds column was added. The
+ * jump to four waits for lg rather than landing at sm because the playground
+ * rows carry the longest labels in the footer ("TypeScript Playground") plus a
+ * leading icon; at sm each of four columns is ~118px and every one of them
+ * wraps.
+ *
+ * `align-items: start` because that fourth column is ~14 rows against the
+ * others' 5: without it the short columns stretch and their content drifts
+ * apart down the row.
+ *
+ * Driven by a scoped rule (rather than Tailwind grid utilities) so a leaked
+ * `.grid`/`grid-cols-*` from /learn can't collapse it back to the wrong
+ * column count. */
 .ds-home .ds-footer-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  align-items: start;
   gap: 2.5rem;
 }
 @media (min-width: 640px) {
   .ds-home .ds-footer-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .ds-home .ds-footer-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }

@@ -1,16 +1,41 @@
 Dataslope is made available under more than one license:
 
   - Source code:      MIT License (the full text below).
-  - Learning content: the courses, lessons, exercises, and other written
-                      materials in the `content/` directory are licensed under
-                      Creative Commons Attribution 4.0 International
-                      (CC BY 4.0). See LICENSE-CONTENT.
+  - Learning content: the courses, lessons, exercises, quizzes, and the
+                      illustrative teaching materials drawn for them are
+                      licensed under Creative Commons
+                      Attribution-NonCommercial 4.0 International
+                      (CC BY-NC 4.0). See LICENSE-CONTENT.
 
-Third-party software and language runtimes that Dataslope depends on or loads
-at runtime are NOT covered by the licenses above and retain their own terms.
-See THIRD-PARTY-NOTICES.md. In particular, the Java runtime (CheerpJ, by
-Leaning Technologies) is distributed under its own, non-MIT license and may
-require a separate commercial license for some uses.
+WHAT THE MIT LICENSE BELOW DOES AND DOES NOT COVER
+
+The MIT license below applies only to Dataslope's own source code: the
+application, its build and tooling scripts, and the other first-party code in
+this repository. It is not a license to anything else in or loaded by this
+project. In particular, it grants you no rights to:
+
+  - The learning content. Everything described as "the Content" in
+    LICENSE-CONTENT is licensed under CC BY-NC 4.0, not MIT. The MIT permission
+    to "use, copy, modify, merge, publish, distribute, sublicense, and/or sell"
+    does not reach it, and in particular does not permit commercial use of it.
+    A file being tracked in this repository does not put it under MIT.
+
+  - Third-party software and language runtimes that Dataslope depends on,
+    bundles, or downloads in the browser at runtime. Each retains its own terms;
+    see THIRD-PARTY-NOTICES.md. In particular, the Java runtime (CheerpJ, by
+    Leaning Technologies) is proprietary, is distributed under its own, non-MIT
+    license, and may require a separate commercial license for some uses.
+
+  - Third-party datasets, fonts, and bundled artwork, which likewise keep their
+    own licenses (see THIRD-PARTY-NOTICES.md).
+
+  - The Dataslope name, logo, and other brand assets, which are not licensed by
+    either the MIT license or CC BY-NC 4.0. Neither license grants trademark
+    rights; you may not use them in a way that suggests Dataslope endorses you.
+
+The last three bullets cut both ways: CC BY-NC 4.0 does not cover third-party
+material either. Nothing Dataslope licenses can enlarge what a third party has
+granted you, so consult each project, dataset, and font for its own terms.
 
 --------------------------------------------------------------------------------
 
