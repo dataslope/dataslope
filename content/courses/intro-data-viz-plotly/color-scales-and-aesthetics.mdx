@@ -256,6 +256,18 @@ provide *context* without competing for attention.
 - **Highlight, don't decorate**, if only one series matters,
   color only that one.
 
+One more, which only bites once a site has a dark mode: a palette is tied to
+the background it was chosen for. The charts on this page are drawn from
+seven color roles, and each role stores two values, one for white and one
+for near-black. Here is why that is not redundant work:
+
+<Chart slug="palette-on-dark-and-light" />
+
+Contrast against white is limited by how *dark* a color is, and contrast
+against black by how *light* it is, so a hue bright enough to glow on black
+is by construction too pale to sit on white. Brightening a palette for dark
+mode is not a reversible operation.
+
 ## Check your understanding
 
 <MultipleChoice

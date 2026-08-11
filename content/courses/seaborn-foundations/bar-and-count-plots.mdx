@@ -171,6 +171,15 @@ sns.catplot(data=tips, x="day", y="total_bill", kind="bar", errorbar="sd", heigh
   ]}
 />
 
+Below a certain sample size, though, no error bar is the right answer,
+because the summary has become bigger than the thing it summarises:
+
+<Chart slug="small-n-show-the-points" />
+
+The working rule: under about ten observations, show every point; ten to
+fifty, show the points and the summary together; above that, use a mark that
+has a shape, a box or a violin or a strip, rather than a bar.
+
 Switching to `errorbar="sd"` is a small but meaningful honesty upgrade: the
 bars now carry a hint of each group's *spread*, partly answering the
 objection above. Try editing it to `errorbar=("ci", 95)` and to

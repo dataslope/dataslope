@@ -38,7 +38,27 @@ prefer a **line chart**. If you are showing a *distribution* of a
 single variable, prefer a **histogram**. Bar charts are for
 **comparing discrete categories**.
 
+There is one common case where the answer is "not a bar chart": many
+categories whose values all sit in a narrow band.
+
+<Chart slug="dot-plot-beats-bar" />
+
+Most of every bar there is the stretch all twenty categories have in common,
+which carries no information. Replacing each bar with a dot at its end keeps
+the comparison and drops four fifths of the ink, and because a dot encodes
+position rather than length, the axis is then free to be cropped to where the
+data actually is.
+
 ## The simplest bar chart
+
+Before the code, one thing bars do for free that is easy to spend money on
+instead. When bars fall into groups, the spacing can say so on its own:
+
+<Chart slug="proximity-groups-bars" />
+
+No borders, no background bands, no second color, no group name over each
+cluster. Two spacings. That leaves color free to carry a second variable
+rather than being spent on grouping you could have had for nothing.
 
 <CodeBlock
   adapter="python"
@@ -264,6 +284,15 @@ And here is that crop, drawn:
 
 <Chart slug="bar-truncation-cropped" />
 
+
+The rule has an edge worth knowing, because "always start at zero" is often
+repeated as though it applied to every chart. It does not:
+
+<Chart slug="zero-baseline-bars-not-lines" />
+
+Zero is mandatory when the mark's *length* is the value, and optional when it
+is not. Bars, columns and areas: zero. Lines, dots and slopes: whatever range
+shows the variation, labelled honestly.
 
 - **Truncating the y-axis baseline.** Bar lengths encode quantity
   relative to *zero*. Cutting the axis (so bars start at 90

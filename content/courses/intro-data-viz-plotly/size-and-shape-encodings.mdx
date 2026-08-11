@@ -123,6 +123,16 @@ chart still works in grayscale and for colorblind viewers.
 - **Colorblind accessibility** as the *primary* encoding.
 - **Very small markers**, where color hue is hard to perceive.
 
+Often the answer is not to choose. Encode the group *twice*, and the chart
+survives losing either one:
+
+<Chart slug="redundant-encoding-helps" />
+
+In most engineering redundancy is waste to be removed. In a chart it is what
+makes the chart robust, for the same reason a spare tyre is: the second copy
+is worthless until the first one fails, and then it is the only thing that
+matters.
+
 ### When shape fails
 
 Shape is a *weak* perceptual channel. Past about **6 categories**,

@@ -29,6 +29,14 @@ The bare minimum on any chart:
 - **Axis labels** with units.
 - A **legend title** (if the chart has a legend).
 
+One setting people leave on the default and should not is how many ticks the
+axis gets:
+
+<Chart slug="tick-density-readability" />
+
+Four to seven labelled ticks, on round numbers, is the rule of thumb. Not one
+per data point, and not as many as will fit.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -73,6 +81,15 @@ A *good* title doesn't just describe, it *summarizes the story*:
 A descriptive title says *what the data is*. A narrative title says
 *what the chart means*. Both are valid; narrative is better when
 the chart is intended to *make a point*.
+
+A title is also the top of a hierarchy, and the sizes underneath it are
+carrying information of their own:
+
+<Chart slug="type-hierarchy-in-charts" />
+
+A type hierarchy is an instruction about reading order, delivered before the
+reading starts. A chart with flat type has withheld something it already
+knew.
 
 ## Annotations on the chart
 
@@ -265,6 +282,23 @@ Every chart you ship should have:
 - [ ] **Reference lines** for important thresholds.
 - [ ] A **caption** with source and method.
 - [ ] A **hover** that fills in details for any data point.
+
+Two of those deserve a closer look, because both have a default that is
+almost always wrong.
+
+Axis numbers, first. The choice is not house style; over-rounding will
+quietly collapse two ticks into the same string:
+
+<Chart slug="number-formatting-in-charts" />
+
+And legends. Every library sorts them alphabetically, because that is the
+default sort for strings, and it is almost never the order the reader meets
+the series in:
+
+<Chart slug="legend-order-matches-data" />
+
+The best legend is usually no legend: put the name at the end of the line and
+the lookup disappears entirely.
 
 Skip any of these and the reader has to work harder. Some of that
 work, they won't bother to do.

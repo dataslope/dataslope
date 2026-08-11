@@ -67,6 +67,26 @@ That's the simplest possible line chart: one x, one y, one line.
 Hover over the line, you'll see Plotly's tooltip pop up showing
 exact dates and values.
 
+Two things go wrong often enough at this stage to be worth meeting early. The
+first is what to do when one value dwarfs the rest, which is the most common
+awkward dataset there is:
+
+<Chart slug="axis-break-vs-log" />
+
+A broken axis is a respectable old device, but only with a visible break
+marker, and most defaults will not draw you one. Without it the chart looks
+linear and reads logarithmic, which is the worst of both.
+
+The second is what happens when your x-axis has only *two* points. Before and
+after, last year and this year, control and treatment:
+
+<Chart slug="slope-graph-two-points" />
+
+The bars answer "how big is each?" and the slopegraph answers "who overtook
+whom?", and the second question is usually the one people actually have. This
+is the general move worth learning: a chart's job is to turn the reader's
+question into a shape, and a rank change is a crossing.
+
 ## Multiple series with `color`
 
 To show several lines, **reshape your data to long form** and use
@@ -212,6 +232,17 @@ directly comparable, and the smallest is climbing fastest:
 When values span many orders of magnitude (e.g., country GDPs,
 COVID case counts), a **log scale** for y reveals structure that a
 linear scale flattens out.
+
+It also carries one obligation, which is easy to forget because the chart
+looks fine without it:
+
+<Chart slug="log-axis-must-be-labelled" />
+
+A straight line on a log axis means a constant growth rate, and that is
+exactly the reason to use one. It is also why the axis has to say "log" out
+loud: a gently rising straight line is what slow, dependable growth looks
+like on a linear axis, and the only thing separating the two readings is the
+tick labels.
 
 <CodeBlock
   adapter="python"
