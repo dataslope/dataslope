@@ -423,6 +423,15 @@ assert abs(d.cdf(cutoff) - 0.90) < 1e-6`,
   ]}
 />
 
+<Chart slug="ppf-inverts-the-cdf" />
+
+Two details fall out of that reflection. The PPF is steep at the ends, which
+is the same fact as the CDF being flat there, and is why extreme quantiles are
+hard to estimate: the data is sparse exactly where the function is most
+sensitive. And a discrete CDF is a staircase with no true inverse, so every
+library takes "the smallest value whose CDF is at least p", which makes
+`ppf(cdf(x))` return x while `cdf(ppf(p))` usually overshoots.
+
 ## Reading a density plot correctly
 
 One more guard against the height-is-probability trap. When you plot a

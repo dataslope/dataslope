@@ -286,6 +286,14 @@ assert abs(p_at_least_25 - wrong) > 1e-12`,
   ]}
 />
 
+<Chart slug="binomial-assumption-breaks" />
+
+The multiplier has a name, the design effect, and it is 1 + (m − 1)ρ for
+clusters of size m. It is worth knowing because it is brutal: a ρ of 0.05 with
+clusters of fifty gives a design effect near 3.5. The fix is to analyse at the
+level randomization happened, and what does not work is ignoring it, which is
+easy to do because the point estimate is fine.
+
 ## Poisson: counting rare events in a fixed interval
 
 
