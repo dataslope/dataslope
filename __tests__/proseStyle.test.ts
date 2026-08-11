@@ -46,4 +46,33 @@ describe("authored prose style", () => {
   it("allows a padded dash as an empty markdown table cell", () => {
     expect(lintSource("| start | – | 0 |", "x.mdx", "mdx")).toEqual([]);
   });
+
+  // The stylesheet draws quotation marks around every blockquote, so a
+  // blockquote that types its own renders them doubled: ""like this"".
+  it("flags a blockquote wrapped in a typed pair of double quotes", () => {
+    const one = lintSource('> "Take `mpg` and draw a point for each row."', "x.mdx", "mdx");
+    expect(one.map((v) => v.rule)).toEqual(["blockquote-quotes"]);
+
+    const many = lintSource('> "Take `mpg`; map displacement to x,\n> and draw a point."', "x.mdx", "mdx");
+    expect(many.map((v) => v.rule)).toEqual(["blockquote-quotes"]);
+    expect(many[0].line).toBe(1);
+  });
+
+  it("flags a wrapped blockquote that also carries emphasis, and curly quotes", () => {
+    expect(lintSource('> *"Always leave the code better than you found it."*', "x.mdx", "mdx")).toHaveLength(1);
+    expect(lintSource("> “Always leave the code better than you found it.”", "x.mdx", "mdx")).toHaveLength(1);
+  });
+
+  it("allows a blockquote that quotes terms rather than wrapping the whole body", () => {
+    expect(lintSource('> "Dense" describes the rank sequence, not "sparse"', "x.mdx", "mdx")).toEqual([]);
+    expect(lintSource("> Take `mpg` and draw a point for each row.", "x.mdx", "mdx")).toEqual([]);
+  });
+
+  it("ignores an indented blockquote, which is an MCQ explanation and gets no styled quotes", () => {
+    expect(lintSource('- [o] A choice.\n  > "The whole explanation, quoted."', "x.mdx", "mdx")).toEqual([]);
+  });
+
+  it("ignores a blockquote inside fenced code, which is a sample rather than a quotation", () => {
+    expect(lintSource('```markdown\n> "A quoted blockquote."\n```', "x.mdx", "mdx")).toEqual([]);
+  });
 });

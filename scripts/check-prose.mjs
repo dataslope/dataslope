@@ -17,6 +17,12 @@
 //                    NOT include words that are ordinary technical vocabulary
 //                    here (robust, leverage, underscore all have real
 //                    meanings in statistics, regression and Python).
+//   4. blockquote-quotes, a blockquote whose whole body is wrapped in a typed
+//                    pair of double quotes. The stylesheet already puts
+//                    typographic quotes around one (Fumadocs' bundled
+//                    typography sets `blockquote p:first-of-type::before {
+//                    content: open-quote }`), so the typed pair renders as a
+//                    second one and the reader sees ""like this"".
 //
 // Scope is what a reader actually sees:
 //
@@ -58,6 +64,67 @@ const AI_FILLER = [
   [/\bwhen it comes to\b/i, "when it comes to"],
 ];
 
+// --- blockquotes ----------------------------------------------------------
+
+const QUOTE_CHAR = /["“”]/g;
+/** A leading emphasis run, `*` or `_`, one or two of them. */
+const LEADING_EMPHASIS = /^[*_]{1,2}/;
+const TRAILING_EMPHASIS = /[*_]{1,2}$/;
+
+/** Every unindented blockquote in an MDX body, as `{ line, body }`, where
+ *  `body` is the `>` markers stripped and the lines joined into one string.
+ *
+ *  Unindented is the whole point: a blockquote indented by two spaces is a
+ *  `<MultipleChoice>` per-choice explanation, which parseQuestion.ts strips
+ *  the `>` from and renders through MarkdownInline. No <blockquote> element
+ *  reaches the page, so no stylesheet quotes are added and a typed pair is
+ *  the only pair there is. Fenced code is skipped, a `>` inside it is a
+ *  sample, a prompt, or a mermaid edge rather than a quotation. */
+function blockquotes(lines) {
+  const found = [];
+  let fence = null;
+  let block = null;
+  const flush = () => {
+    if (block) found.push({ line: block.line, body: block.parts.join(" ").trim() });
+    block = null;
+  };
+
+  lines.forEach((line, i) => {
+    const fenceMark = line.match(/^\s*(```+|~~~+)/);
+    if (fenceMark) {
+      flush();
+      if (fence && fenceMark[1].startsWith(fence)) fence = null;
+      else if (!fence) fence = fenceMark[1];
+      return;
+    }
+    if (fence) return;
+
+    const quoted = line.match(/^>\s?(.*)$/);
+    if (!quoted) {
+      flush();
+      return;
+    }
+    if (!block) block = { line: i + 1, parts: [] };
+    block.parts.push(quoted[1].trim());
+  });
+  flush();
+  return found;
+}
+
+/** True when a blockquote body carries its own wrapping pair of double
+ *  quotes, on top of the pair the stylesheet draws.
+ *
+ *  Requiring the body to hold exactly two quote characters is what keeps
+ *  this from firing on correct prose: `"Dense" describes the rank sequence,
+ *  not "sparse"` also opens and closes on a quote, but its four quotes mark
+ *  two quoted terms rather than one wrapped quotation. Two quotes sitting at
+ *  the two ends can only be a wrapper. */
+export function hasWrappingQuotes(body) {
+  const inner = body.replace(LEADING_EMPHASIS, "").replace(TRAILING_EMPHASIS, "").trim();
+  if ((inner.match(QUOTE_CHAR) || []).length !== 2) return false;
+  return /^["“]/.test(inner) && /["”]$/.test(inner);
+}
+
 // --- comment stripping (TS/TSX only) --------------------------------------
 
 /** Blank out //, /* *\/ and {/* *\/} comments, preserving line structure so
@@ -96,6 +163,12 @@ export function lintSource(src, file, kind) {
       if (re.test(line)) add("ai-filler", n, `"${label}", ${snippet}`);
     }
   });
+
+  if (kind === "mdx") {
+    for (const { line, body } of blockquotes(lines)) {
+      if (hasWrappingQuotes(body)) add("blockquote-quotes", line, body.slice(0, 90));
+    }
+  }
 
   return violations;
 }
@@ -153,7 +226,15 @@ if (isMain) {
       "\nem dashes: use a comma or parentheses for an aside, a colon before an\n" +
         "elaboration, and a semicolon or full stop between two clauses.",
     );
+    if (byRule["blockquote-quotes"]) {
+      console.error(
+        "\nblockquote quotes: drop the typed pair. The stylesheet draws the\n" +
+          "quotation marks, so a blockquote that types its own renders doubled.",
+      );
+    }
     process.exit(1);
   }
-  console.log(`✓ prose in ${files.length} file(s) is clean (no em dashes, no spaced en dashes, no filler phrases)`);
+  console.log(
+    `✓ prose in ${files.length} file(s) is clean (no em dashes, no spaced en dashes, no filler phrases, no doubled blockquote quotes)`,
+  );
 }
