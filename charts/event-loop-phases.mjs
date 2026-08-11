@@ -25,7 +25,7 @@ export const title =
 
 const FRAME_MS = 16.7;
 
-/** The schedule, in order. `kind` picks the lane and the colour. */
+/** The schedule, in order. `kind` picks the lane and the color. */
 const SCHEDULE = [
   { kind: "task", label: "click handler", ms: 4 },
   { kind: "micro", label: "promise callbacks", ms: 1.2 },

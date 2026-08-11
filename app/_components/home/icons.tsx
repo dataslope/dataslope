@@ -14,7 +14,7 @@ export function GitHubIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-/** Google "G" mark, inline (its four-colour brand glyph isn't in lucide). Used
+/** Google "G" mark, inline (its four-color brand glyph isn't in lucide). Used
  *  on the sign-in card and the account page's connected-accounts section. */
 export function GoogleIcon({ size = 18 }: { size?: number }) {
   return (

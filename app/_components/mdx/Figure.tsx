@@ -3,7 +3,7 @@
  * screenshot, anything under `assets/images/`) inside a lesson or landing page:
  *
  * ```mdx
- * <Figure slug="pandas-groupby-cutout" alt="A giant panda directing a stream of mixed cubes into three coloured lanes" priority />
+ * <Figure slug="pandas-groupby-cutout" alt="A giant panda directing a stream of mixed cubes into three colored lanes" priority />
  * ```
  *
  * Whichever way the bytes got there, `scripts/build-images.mjs` records slug →
@@ -31,7 +31,7 @@
  */
 import { ImageIcon } from "lucide-react";
 import imageManifest from "@/lib/generated/images";
-import { withInlineCode } from "./inlineCode";
+import { withInlineMarkup } from "./inlineMarkup";
 import styles from "./Figure.module.css";
 
 const PUBLIC_BASE = "/images";
@@ -57,9 +57,9 @@ interface FigureProps {
   /** Alt text. Pass "" only for a purely decorative image. */
   alt: string;
   /**
-   * Optional caption shown under the image. Backtick spans in it render as
-   * code chips (see `withInlineCode`), so a caption naming an identifier reads
-   * the way the same spelling does in the lesson body.
+   * Optional caption shown under the image. Backtick spans render as code
+   * chips and `*asterisks*` as emphasis (see `withInlineMarkup`), so a caption
+   * naming an identifier reads the way the same spelling does in the body.
    */
   caption?: string;
   /**
@@ -132,7 +132,7 @@ export function Figure({
       </picture>
       {caption ? (
         <figcaption className={styles.caption}>
-          {withInlineCode(caption)}
+          {withInlineMarkup(caption)}
         </figcaption>
       ) : null}
       {/* Regeneration handle. The prompt id is the slug with the `-cutout`

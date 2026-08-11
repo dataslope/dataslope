@@ -292,7 +292,7 @@ async function ensureRuntime() {
  * encode fails or the result is implausibly large.
  *
  * Quality 82 is the same setting `build-images.mjs` uses for illustrations.
- * Charts are flat-colour line art, which is where WebP wins most against
+ * Charts are flat-color line art, which is where WebP wins most against
  * matplotlib's PNG.
  */
 async function writeFigure(base64, key, index) {

@@ -9,11 +9,11 @@ import { glazing } from "tabbied/patterns";
  * `glazing` is the reviewer's pick, replacing the `mixtape` bars it ran with
  * before (and the `bothways` crossings this started as).
  *
- * Colours are theme-neutral on purpose. The palette's first entry is the
- * background, left transparent so the page colour shows through, and the inks
+ * Colors are theme-neutral on purpose. The palette's first entry is the
+ * background, left transparent so the page color shows through, and the inks
  * are low-alpha mid-grey and brand blue — light enough to read as texture on
  * white, and to stay visible without glaring on the dark theme's #121212.
- * Passing theme-specific colours would mean threading the current theme in
+ * Passing theme-specific colors would mean threading the current theme in
  * here and re-rendering the doodle on every toggle.
  *
  * The band is masked at both ends: a long fade-in at the top so it emerges

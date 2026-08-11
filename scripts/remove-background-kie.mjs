@@ -9,7 +9,7 @@
  * beside its original, so `promote-illustrations.mjs` can pick up both.
  *
  * Why this model: Recraft beat both Replicate's `851-labs/background-remover`
- * and a local colour-key on this material. It lifts a subject out of a
+ * and a local color-key on this material. It lifts a subject out of a
  * full-bleed scene instead of dissolving the frame into a translucent ghost,
  * which is what the alternatives did to the busier illustrations.
  *
@@ -332,7 +332,7 @@ export async function keptFraction(originalBuf, cutoutBuf) {
 
   // Derive the background from the original's border rather than assuming
   // white. The house style stages on white, but older art (and the occasional
-  // fresh render) fills the background with a solid colour — and there,
+  // fresh render) fills the background with a solid color — and there,
   // "everything not white" counts the background as content, so a correct
   // removal scores as catastrophic loss. Taking the median border pixel makes
   // the measure mean the same thing either way.
@@ -400,7 +400,7 @@ async function main() {
   // matte) and passing one is no evidence about the other.
   //
   // Known limit: the measure reads the background off the border, so a
-  // background that is one solid colour (white staging, or a flat blue field)
+  // background that is one solid color (white staging, or a flat blue field)
   // is handled exactly, but a TEXTURED one is not — legacy `pandas-messy-data`,
   // a panda on a tiled floor, scores 0.44 for a perfectly good removal. The
   // house style has staged on plain white since 2026-07, so fresh art does not

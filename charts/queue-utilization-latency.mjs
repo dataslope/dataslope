@@ -57,26 +57,33 @@ export function render() {
       Plot.line(curve, { x: "rho", y: "wait", stroke: PRIMARY, strokeWidth: 2, clip: true }),
       Plot.ruleX(MARKS, { x: "rho", y1: 0, y2: "wait", stroke: GUIDE, strokeOpacity: 0.5, clip: true }),
       Plot.dot(MARKS, { x: "rho", y: "wait", fill: ACCENT, r: 4, clip: true }),
-      Plot.text(MARKS, {
-        x: "rho",
-        y: "wait",
-        text: (d) => `${(d.rho * 100).toFixed(0)}% → ${d.wait.toFixed(0)}x`,
-        fill: MUTED,
-        fontSize: 10.5,
-        fontWeight: 600,
-        textAnchor: "end",
-        dx: -8,
-        dy: -8,
-        ...HALO,
-      }),
+      // One mark per reading, because `dy` is a constant option in Plot and the
+      // last reading needs a different one. At 95% the wait is 19x against a
+      // domain of 22, so a label hung above that dot lands in the same corner
+      // as the "and straight up from here" callout and the two printed through
+      // each other. Below-left of the dot is empty — the curve is still under
+      // 10x everywhere left of 90% — so that is where it goes.
+      ...MARKS.map((m) =>
+        Plot.text([m], {
+          x: "rho",
+          y: "wait",
+          text: (d) => `${(d.rho * 100).toFixed(0)}% → ${d.wait.toFixed(0)}x`,
+          fill: MUTED,
+          fontSize: 10.5,
+          fontWeight: 600,
+          textAnchor: "end",
+          dx: -8,
+          dy: m.wait > YMAX * 0.7 ? 16 : -8,
+          ...HALO,
+        }),
+      ),
       Plot.text([{}], {
         x: 0.985,
-        y: YMAX - 3,
-        text: () => "and straight up\nfrom here",
+        y: YMAX - 1.4,
+        text: () => "and straight up from here",
         fill: ACCENT,
         fontSize: 11,
         fontWeight: 600,
-        lineHeight: 1.3,
         textAnchor: "end",
         dx: -6,
         ...HALO,

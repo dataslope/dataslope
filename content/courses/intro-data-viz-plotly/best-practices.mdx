@@ -91,6 +91,23 @@ Run through this in 60 seconds. It catches most problems.
 When in doubt, **start with a bar or a scatter**. They are the
 two most reliably readable chart types ever invented.
 
+And one entry that belongs on the list and rarely makes it: sometimes the
+right chart goes *inside* a table rather than beside it.
+
+<Chart slug="sparkline-in-a-table" />
+
+A table gives exact values and cannot show shape; a line chart shows shape
+and makes you match colors to row names. Tufte's sparkline puts the shape in
+the row at the size of a word, so the value and the trend arrive together. It
+works because of everything it leaves out: no axis, no ticks, no gridlines,
+no labels. It is a glyph, not a small chart, and the number in the next
+column is the value.
+
+One warning worth keeping: each row is scaled to its own range, so sparklines
+are comparable to themselves and not to each other. Which region is biggest is
+a question for the number column. Which region is in trouble is a question for
+the glyphs.
+
 ## Style defaults this course recommends
 
 For everyday work:
@@ -107,6 +124,23 @@ For everyday work:
 
 Consistency matters more than perfection. Pick defaults and
 re-use them.
+
+One of those defaults deserves its reason spelled out, because "3-D bars are
+ugly" is the least of it:
+
+<Chart slug="chartjunk-3d-bars" />
+
+Give a bar depth and its top face becomes a parallelogram, so the front edge
+and the back edge of one bar meet the axis at two different heights and nothing
+says which one is the value.
+
+Most people read the front edge, which is systematically too high. The ink
+also triples, since every bar gains a top face and a side face that encode
+nothing, and this is the mildest possible case: an isometric extrusion with no
+perspective in it at all. A real 3-D chart of the kind a spreadsheet will make
+adds true foreshortening, so an equal step renders differently depending on
+how far back it is, and it lets the front row physically cover the back row.
+In none of these versions is the third dimension carrying a third variable.
 
 ## The "explain it to a stranger" test
 

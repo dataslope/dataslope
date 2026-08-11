@@ -4,7 +4,7 @@
  *
  * Every chart is a choice of channel, and most people meet the choice already
  * made: a bar chart is length, a scatter is position, a pie is angle, a
- * heatmap is colour value. Laying the same five numbers out across all seven
+ * heatmap is color value. Laying the same five numbers out across all seven
  * makes two things visible at once. The first is that they are genuinely
  * interchangeable, in the sense that each row is a complete and correct
  * encoding of the data. The second is that they are nothing like equally good,
@@ -13,14 +13,14 @@
  *
  * Try the same question on each row: which is the third largest? Position and
  * length answer it before the question is finished. Angle and area take a
- * moment and some people get it wrong. Colour value takes longer and gets it
+ * moment and some people get it wrong. Color value takes longer and gets it
  * wrong more often. Hue and shape cannot answer it at all, because neither has
  * an order for a reader to consult, which is not a matter of difficulty.
  */
 import { Plot, plot, ACCENT, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
 
 export const title =
-  "The same five values encoded seven ways in seven rows: position, length, angle, area, colour value, colour hue and shape, ordered from the most accurate channel to the least.";
+  "The same five values encoded seven ways in seven rows: position, length, angle, area, color value, color hue and shape, ordered from the most accurate channel to the least.";
 
 const VALUES = [
   { key: "A", v: 34 },
@@ -42,8 +42,8 @@ const ROWS = [
   { key: "Length", note: "accurate" },
   { key: "Angle", note: "approximate" },
   { key: "Area", note: "approximate" },
-  { key: "Colour value", note: "approximate" },
-  { key: "Colour hue", note: "no order at all" },
+  { key: "Color value", note: "approximate" },
+  { key: "Color hue", note: "no order at all" },
   { key: "Shape", note: "no order at all" },
 ];
 
@@ -75,7 +75,7 @@ const wedge = (c, radius) => {
 
 const SYMBOLS = ["circle", "square", "triangle", "diamond", "star"];
 
-export const caption = `Every chart is a choice of channel, and most people meet the choice already made: a bar chart is length, a scatter is position, a pie is angle, a heatmap is colour value. The same five numbers across all seven show two things at once. They are genuinely interchangeable, in that each row is a complete and correct encoding. They are also nothing like equally good, which is what the Cleveland-McGill ranking measures and what the order of these rows follows. Run one question down the page: which is third largest? Position and length answer before the question is finished. Angle and area take a moment and some readers miss it. Colour value takes longer and misses more often. Hue and shape cannot answer it at all, because neither carries an order for a reader to consult, and that is a property of the channel rather than a matter of difficulty. The answer, for the record, is ${THIRD.key}.`;
+export const caption = `Every chart is a choice of channel, and most people meet the choice already made: a bar chart is length, a scatter is position, a pie is angle, a heatmap is color value. The same five numbers across all seven show two things at once. They are genuinely interchangeable, in that each row is a complete and correct encoding. They are also nothing like equally good, which is what the Cleveland-McGill ranking measures and what the order of these rows follows. Run one question down the page: which is third largest? Position and length answer before the question is finished. Angle and area take a moment and some readers miss it. Color value takes longer and misses more often. Hue and shape cannot answer it at all, because neither carries an order for a reader to consult, and that is a property of the channel rather than a matter of difficulty. The answer, for the record, is ${THIRD.key}.`;
 
 export function render() {
   return plot({
@@ -185,8 +185,8 @@ export function render() {
         fillOpacity: 0.65,
       }),
 
-      // Colour value: one hue, luminance carrying the number.
-      Plot.rect(at("Colour value"), {
+      // Color value: one hue, luminance carrying the number.
+      Plot.rect(at("Color value"), {
         x1: (d) => d.x - 16,
         x2: (d) => d.x + 16,
         y1: (d) => d.y - 11,
@@ -195,8 +195,8 @@ export function render() {
         fillOpacity: (d) => 0.08 + (d.v / MAX) * 0.85,
       }),
 
-      // Colour hue: distinct hues, which encode identity and not magnitude.
-      Plot.rect(at("Colour hue"), {
+      // Color hue: distinct hues, which encode identity and not magnitude.
+      Plot.rect(at("Color hue"), {
         x1: (d) => d.x - 16,
         x2: (d) => d.x + 16,
         y1: (d) => d.y - 11,

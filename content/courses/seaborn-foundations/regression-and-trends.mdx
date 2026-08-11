@@ -38,6 +38,26 @@ prediction interval for a new observation. A narrow band means "we're
 fairly sure where the average sits," not "most points fall in here."
 </Callout>
 
+"The line of best fit" names the algorithm rather than the answer, and it
+leaves people believing the line summarises the cloud. It does not. It
+estimates the *conditional mean*: for each value of x, the average y among
+points with that x. Slicing makes that literal.
+
+<Chart slug="regression-is-conditional-mean" />
+
+Three things follow from that, and each is a mistake somebody makes. The line
+is about averages, so it never claimed to predict an individual. The spread
+inside a slice is what a *prediction* interval is made of, while the interval
+on the line itself is much narrower. And fitting minimises vertical distances,
+so regressing y on x and x on y give two different lines, and neither is "the
+relationship".
+
+A model can have an excellent line and a residual standard deviation of 8.3,
+as this one does, and the two facts are not in tension. It also explains what
+a bend does: if the true conditional means fall on a curve, no straight line
+passes through the markers, and the residual plot shows that as structure
+rather than noise, which is what a residual plot is for.
+
 ## The minimum
 
 Map two numeric columns and let `lmplot()` fit a straight line:
@@ -105,7 +125,7 @@ from the relational plots.)
 A straight fit assumes the relationship *is* a straight line. When it
 isn't, the line is not just imprecise, it is **wrong**, and it will lie to
 you confidently. The tell is not how far the points sit from the line, it is
-whether the misses form a *pattern*. Colour each point by which side of the
+whether the misses form a *pattern*. Color each point by which side of the
 line it landed on and a wrong-shaped fit gives itself away:
 
 <Chart slug="residuals-reveal-curvature" />
@@ -253,6 +273,21 @@ The residuals smile (a U-shape) rather than scattering flatly around zero,
 a clear signal that the relationship bent and a straight line could not
 follow it.
 
+<Chart slug="heteroscedastic-residuals" />
+
+The coefficients are unbiased in both panels, so the R-squared is unaffected
+and the fit looks healthy. What fails on the right is constant variance, and
+with it the standard errors, the p-values and the intervals, which are too
+narrow exactly where the model is most confident.
+
+Three responses, in order of how much they change. Robust standard errors keep
+the fit and recompute the uncertainty without assuming constant variance,
+which is cheapest and usually enough. Transforming the response, normally to
+logs, is right when the spread grows with the level, which is this case and is
+extremely common for money, counts and durations. Modelling the variance
+directly, with weighted least squares or a generalized linear model, is the
+thorough option.
+
 ## The cautions that matter most
 
 A trend line is the easiest plot to over-trust. Three rules keep you
@@ -281,6 +316,26 @@ are. Showing them is what let you catch the curved-fit problem above. A
 lonely line with a shaded band hides whether the fit is any good. Keep the
 scatter visible so the summary stays accountable to the evidence.
 </Callout>
+
+Showing the points is necessary and it is not sufficient, because there is
+one kind of troublemaker a scatter genuinely does not reveal. Everyone spots
+a point sitting far from the line. Almost nobody spots the point sitting
+*close* to the line only because the line went out to meet it:
+
+<Chart slug="leverage-vs-residual" />
+
+The word for how hard a point pulls is **leverage**, and it depends only on
+x: a point far out along the x-axis moves the fit more, per unit of vertical
+displacement, than a point in the crowd. That is why the danger zone is on
+the right of this plot rather than at the top of it. If a single far-out
+point is doing the work, the honest move is to fit twice, with and without
+it, and to report the disagreement, which is a finding about your data
+rather than a blemish to be cleaned off it.
+
+The third marked point has both, at a Cook's distance of 1.4, and is capable
+of changing the conclusion by itself. Note that the habit this argues for is
+not "delete influential points": deleting them is how a dataset ends up
+agreeing with whatever you expected.
 
 ## Your turn
 

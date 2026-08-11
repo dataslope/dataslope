@@ -375,6 +375,21 @@ actually control.
 The size of each sample drives precision; the number of samples is just how clearly you can *see* the sampling distribution in a simulation.`}
 />
 
+Those are two different things people both call "more data", and it is worth
+seeing them side by side:
+
+<Chart slug="more-samples-vs-bigger-samples" />
+
+Only one of those is precision. Once you have your data you can resample
+yourself as many samples as you like and the interval will not shrink by a
+millimetre, because resampling cannot manufacture information the sample does
+not contain.
+
+Drawing more samples fills in the histogram: the shape smooths out, the bars
+stop being ragged, and the width stays put, because the width of a sampling
+distribution is the standard error and the standard error depends on the size
+of *one* sample rather than on how many you took.
+
 ## It works for any statistic, not just the mean
 
 "Sampling distribution" is a general idea: *any* statistic you compute

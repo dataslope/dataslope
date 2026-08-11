@@ -37,7 +37,7 @@ QUARTERS.forEach((q, qi) => {
     rows.push({
       panel: STACKED,
       key: c.key,
-      colour: SERIES[ci],
+      color: SERIES[ci],
       x1: qi - 0.36,
       x2: qi + 0.36,
       y1: base,
@@ -48,7 +48,7 @@ QUARTERS.forEach((q, qi) => {
     rows.push({
       panel: GROUPED,
       key: c.key,
-      colour: SERIES[ci],
+      color: SERIES[ci],
       x1: qi - 0.36 + ci * w,
       x2: qi - 0.36 + (ci + 1) * w,
       y1: 0,
@@ -99,7 +99,7 @@ export function render() {
         x2: "x2",
         y1: "y1",
         y2: "y2",
-        fill: "colour",
+        fill: "color",
         fillOpacity: 0.8,
       }),
       // The total, printed only where the chart actually shows one.

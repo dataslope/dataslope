@@ -377,6 +377,21 @@ effect sizes, see *Effect Sizes*.
 A coefficient near 0 rules out a straight-line trend, not a relationship in general, which is why you plot the data.`}
 />
 
+<Chart slug="pearson-spearman-disagree" />
+
+Reading the two together beats reading either alone, because the gap is
+diagnostic. Rho far above r means the relationship is real and curved. R far
+above rho means one or two extreme points are carrying the linear fit, and
+ranks cannot be extreme, which is exactly why rho ignores them.
+
+Pearson's r measures how close the points are to a straight line. Spearman's
+rho replaces every value by its rank and computes the same thing on the ranks,
+so it measures how close the relationship is to *monotone*: does y always move
+the same way as x, whether or not at a constant rate. Both high and similar,
+as in the third panel, is linear and monotone, which is the case everyone
+assumes they are in. Neither coefficient says anything about the slope, and
+neither says anything about cause.
+
 ## Part B, Nonparametric tests: when t-tests are unsafe
 
 t-tests lean on the sampling distribution of the **mean** being roughly
@@ -460,6 +475,36 @@ A small p-value says one group tends to produce larger values than the
 other. Note it's testing a shift in the *distribution* (often summarized
 via the median), not the mean, which is exactly why it survives outliers
 that would distort a mean.
+
+That example is deliberately extreme. The useful question is what the swap
+costs you when the data is *well behaved*, because that's the price you pay
+for the insurance. Shift the same population against itself and run both
+tests thousands of times, on three different shapes:
+
+<Chart slug="mann-whitney-vs-t" />
+
+The asymmetry is the whole argument for reaching for ranks when you're
+unsure. On normal data, where the t-test is provably the best test
+available, ranks cost a couple of percentage points of power. On
+heavy-tailed data, the t-test throws away most of the power it had, because
+the outliers land in its denominator: a few huge values inflate the sample
+standard deviation, and the test concludes it can't see through the noise it
+just manufactured. Ranks never see the outlier's size, only its position at
+the end of the queue.
+
+The skewed panel is the widest gap of the three, because most of that
+distribution is packed into a narrow range where a shift swaps a great many
+pairs of values around while barely moving a mean that the long tail
+dominates.
+
+<Callout type="warn" title="What Mann–Whitney actually tests">
+It's tempting to describe it as "the median version of the t-test", and that
+shortcut is only safe when the two distributions have the **same shape**.
+Strictly, it asks whether a random value from one group tends to exceed a
+random value from the other. If the groups differ in spread as well as
+location, a significant result tells you they differ, not that their medians
+do. When the medians are the point, say so and compare them directly.
+</Callout>
 
 ### Wilcoxon signed-rank: paired data, robustly
 

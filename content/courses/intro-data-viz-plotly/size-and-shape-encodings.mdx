@@ -123,11 +123,49 @@ chart still works in grayscale and for colorblind viewers.
 - **Colorblind accessibility** as the *primary* encoding.
 - **Very small markers**, where color hue is hard to perceive.
 
+Often the answer is not to choose. Encode the group *twice*, and the chart
+survives losing either one:
+
+<Chart slug="redundant-encoding-helps" />
+
+In most engineering redundancy is waste to be removed. In a chart it is what
+makes the chart robust, for the same reason a spare tyre is: the second copy
+is worthless until the first one fails, and then it is the only thing that
+matters.
+
+Color fails for boring reasons and it fails often: a laser printer, a
+projector with the contrast wrong, a document converted to greyscale, or one
+of roughly one man in twelve who cannot separate red from green. None of those
+is an edge case, and none is visible from where you sit while making the
+chart. The costs of carrying a second encoding are small and worth
+knowing. Shape is a weak channel, so it handles four or five groups and not
+twelve, telling shapes apart is a search rather than a glance, and the marks
+have to be big enough to have a shape at all, which rules it out for a dense
+scatter of thousands of points.
+
 ### When shape fails
 
 Shape is a *weak* perceptual channel. Past about **6 categories**,
 the eye can no longer reliably distinguish ●  ■  ▲  ▼  ◆  ★  ✦
 ✚ in a crowded plot. Stick to a handful.
+
+The chart type that leans hardest on shape is the radar chart, and it has a
+problem that has nothing to do with perception:
+
+<Chart slug="radar-axis-order" />
+
+Readers compare the enclosed polygons, and the enclosed area depends on which
+spoke each variable landed on, which is usually a dataframe's column order.
+
+The geometry is simple enough to check. The polygon is a ring of triangles,
+one per neighbouring pair, and a triangle between adjacent spokes has area
+proportional to the *product* of its two radii, so putting the two highest
+scores side by side multiplies two large numbers while separating them pairs
+each large one with a small one. Two more things to know before reaching for
+one: the axes have to share a scale or the shape means nothing, which forces a
+normalisation that also moves the shape, and the polygon closes, so the last
+variable is adjacent to the first and one arbitrary pair gets extra weight
+nobody notices.
 
 ## Combining size, color, and shape: just because you can…
 

@@ -168,23 +168,23 @@ df <- data.frame(
 )
 df$y <- 2.5 * df$x + rnorm(n, sd = 15) + 30
 
-ggplot(df, aes(x = x, y = y, colour = group)) +
+ggplot(df, aes(x = x, y = y, color = group)) +
   geom_point(size = 3, alpha = 0.8) +
-  geom_smooth(method = "lm", se = FALSE, colour = "white",
+  geom_smooth(method = "lm", se = FALSE, color = "white",
               linetype = "dashed", linewidth = 0.6) +
-  scale_colour_manual(values = c(Alpha = "#4f8ef7",
+  scale_color_manual(values = c(Alpha = "#4f8ef7",
                                  Beta  = "#34d399",
                                  Gamma = "#f59e0b")) +
   labs(title = "Scatter with Trend Line", x = "X", y = "Y") +
   theme_minimal(base_size = 13) +
-  theme(plot.background  = element_rect(fill = "#0f1117", colour = NA),
-        panel.background = element_rect(fill = "#161b27", colour = NA),
-        panel.grid       = element_line(colour = "#2a3347"),
-        axis.text        = element_text(colour = "#94a3b8"),
-        axis.title       = element_text(colour = "#e2e8f0"),
-        plot.title       = element_text(colour = "#e2e8f0"),
-        legend.text      = element_text(colour = "#94a3b8"),
-        legend.title     = element_text(colour = "#e2e8f0"))
+  theme(plot.background  = element_rect(fill = "#0f1117", color = NA),
+        panel.background = element_rect(fill = "#161b27", color = NA),
+        panel.grid       = element_line(color = "#2a3347"),
+        axis.text        = element_text(color = "#94a3b8"),
+        axis.title       = element_text(color = "#e2e8f0"),
+        plot.title       = element_text(color = "#e2e8f0"),
+        legend.text      = element_text(color = "#94a3b8"),
+        legend.title     = element_text(color = "#e2e8f0"))
 `,
   },
   {
@@ -278,15 +278,15 @@ ggplot(df, aes(x = quarter, y = revenue, fill = region)) +
   labs(title = "Regional Revenue by Quarter ($M)",
        x = "Quarter", y = "Revenue ($M)") +
   theme_minimal(base_size = 13) +
-  theme(plot.background  = element_rect(fill = "#0f1117", colour = NA),
-        panel.background = element_rect(fill = "#161b27", colour = NA),
-        panel.grid.major = element_line(colour = "#2a3347"),
+  theme(plot.background  = element_rect(fill = "#0f1117", color = NA),
+        panel.background = element_rect(fill = "#161b27", color = NA),
+        panel.grid.major = element_line(color = "#2a3347"),
         panel.grid.minor = element_blank(),
-        axis.text        = element_text(colour = "#94a3b8"),
-        axis.title       = element_text(colour = "#e2e8f0"),
-        plot.title       = element_text(colour = "#e2e8f0"),
-        legend.text      = element_text(colour = "#94a3b8"),
-        legend.title     = element_text(colour = "#e2e8f0"))
+        axis.text        = element_text(color = "#94a3b8"),
+        axis.title       = element_text(color = "#e2e8f0"),
+        plot.title       = element_text(color = "#e2e8f0"),
+        legend.text      = element_text(color = "#94a3b8"),
+        legend.title     = element_text(color = "#e2e8f0"))
 `,
   },
   {

@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 };
 
 /** Monochrome language glyph for the "Start something new" grid. Renders in
- *  `currentColor` so it tracks the link's text colour (and its hover). */
+ *  `currentColor` so it tracks the link's text color (and its hover). */
 function LanguageIcon({ id }: { id: string }) {
   const Icon = LANGUAGE_ICONS[id];
   if (!Icon) return null;

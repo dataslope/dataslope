@@ -162,6 +162,22 @@ because happy customers were overrepresented. That consistent,
 directional miss is **bias**, and the next demo shows why you can't
 outrun it.
 
+The instinct that more responses is better holds only when the extra responses
+arrive at random. When people opt in, the difference between those who
+answered and those who did not is systematic rather than noisy, and extra
+replies come from the same self-selecting pool.
+
+<Chart slug="nonresponse-bias-curve" />
+
+With mild bias the error falls steadily, because what is left is small and
+sampling noise dominates. With strong bias the curve flattens almost at once,
+so a survey with a 70% response rate and mild bias, at 1.1 points, beats the
+strongly biased one at any size. This is the Literary Digest lesson restated:
+in 1936 they polled 2.4 million people and called the election wrong while
+Gallup polled fifty thousand and called it right, because the 2.4 million came
+from telephone and car-registration lists in a year when owning either
+predicted how you voted. No sample size fixes a frame.
+
 ## The punchline: a bigger biased sample does not help
 
 Here is the idea that separates people who understand sampling from
@@ -387,6 +403,38 @@ probability of selection is *known and controlled*. Grabbing whatever's
 convenient is precisely *not* random, it's a convenience sample, the
 thing that produces bias.
 </Callout>
+
+One more, which is not strictly a sampling *method* problem but produces the
+same kind of wrong answer:
+
+<Chart slug="rates-from-small-denominators" />
+
+That is arithmetic rather than bad luck. The standard error of a proportion is
+the square root of p times one minus p over n, so a region with four visitors
+can only land on 0, 25, 50, 75 or 100 per cent, and two of those five are
+above every large region's rate before anything real has happened.
+
+Drawn against sample size rather than sorted, the whole effect becomes one
+shape:
+
+<Chart slug="law-of-small-numbers" />
+
+A point outside the funnel is interesting. A point at the top of a ranking is
+not, until you know how big it is.
+
+The bottom twenty are just as small, and both facts follow from the funnel
+rather than from anything about the places: a map of the highest-rate counties
+is a map of the smallest ones. The best-known case is the American study of
+school size and performance, which found the highest-scoring schools were
+disproportionately small and launched a programme of breaking up large ones.
+The lowest-scoring schools were also disproportionately small, which was in
+the same data and did not travel. Three fixes, in order of effort: print n and
+let the reader discount it, set a minimum n and say what it was, or shrink
+each rate towards the overall rate in proportion to how little data it rests
+on, which is what a hierarchical model does.
+
+Small groups do not gather at the top of a leaderboard. They gather at *both
+ends*, because they are the only ones with the variance to reach either.
 
 ## Survivorship bias: the most famous trap
 

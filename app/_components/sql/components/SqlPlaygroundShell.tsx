@@ -31,7 +31,7 @@ export type { SqlMobilePane };
 /**
  * Visual + interactive states the loading overlay can be in. Mirrors
  * the per-playground `statusState` machine; the shell only needs the
- * `"error"` flag to colour the overlay red.
+ * `"error"` flag to color the overlay red.
  */
 export type SqlPlaygroundOverlayStatus =
   | "loading"

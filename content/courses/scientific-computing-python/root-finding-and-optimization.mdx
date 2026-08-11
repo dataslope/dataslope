@@ -418,7 +418,9 @@ that converges and one that wanders off into nonsense.
   title="Newton's method for scalar roots"
   instructions={`Implement \`newton_root(f, fprime, x0, tol=1e-10, max_iter=100)\` that returns the root of $f$ found by Newton's iteration
 
-$$x_\{n+1\} = x_n - f(x_n)/f'(x_n)$$
+$$
+x_\{n+1\} = x_n - f(x_n)/f'(x_n)
+$$
 
 starting from \`x0\`. Stop when $|f(x_n)| < \\text\{tol\}$ or when \`max_iter\` is exceeded (raise \`RuntimeError\` in that case).
 

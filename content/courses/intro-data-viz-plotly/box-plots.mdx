@@ -77,6 +77,23 @@ and lists each outlier. That's a lot of summary in one shape.
   caption="The box is the middle half of the data, and the whiskers are its reach."
 />
 
+John Tukey, who invented this shape in 1977, drew more of it than your
+plotting library does. His version has two pairs of fences and two words for
+an unusual point, and it is worth seeing once because the missing half
+explains a habit of speech:
+
+<Chart slug="tukey-schematic-plot" />
+
+The detail almost everyone misremembers is the whisker. It does not end at
+the 1.5 line. It ends at the most extreme observation still *inside* that
+line, so its length is decided by the data rather than by arithmetic. And
+Tukey's two categories, *outside* and *far out*, got merged into one word.
+That merge is why "outlier" now sounds like a verdict on a value rather than
+a statement about how far away it is.
+
+Neither chart normally draws its fences. They are computed, used to classify,
+and thrown away; they are drawn here only so you can see where they were.
+
 ## Comparing groups: side by side
 
 The real power of box plots is *side-by-side comparison*. Add an

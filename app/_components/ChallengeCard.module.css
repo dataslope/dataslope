@@ -75,7 +75,7 @@
    the down-right offset gap, a "designed" elevation rather than a plain
    shadow, while keeping the same hard-offset lift. The opaque `.card` sits
    on top of this shell (negative z-index layer) and covers everything but
-   the offset sliver. Offset + colour reuse the prior shadow tokens so the
+   the offset sliver. Offset + color reuse the prior shadow tokens so the
    dark-mode tint and mobile thinning still apply; stripe width/period are
    their own tokens for easy tuning. */
 .cardShell {
@@ -1500,6 +1500,29 @@
   background: var(--ch-scrollbar-thumb-hover);
 }
 
+/* ── Output cells are flex items, and must not shrink ─────────────────────
+   `.outputBody` is a column flex container with a `max-height`, so once the
+   cells add up to more than that every one of them shrinks: `flex-shrink`
+   defaults to 1, and flex distributes the shortfall across all of them rather
+   than letting the container scroll.
+
+   That alone would only squash them. Combined with a cell that has `overflow`
+   of its own it produces the actual bug: three `display(df)` calls in one
+   block came out as three separately-scrolling tables, each a few rows tall,
+   inside a panel that had not scrolled at all. The reader drags one, hits its
+   end, and nothing else has moved. Even the five-row `df.head()` frame had a
+   scrollbar, which is the tell that this was flex and not a height cap.
+
+   `flex: none` keeps every cell at its natural height and hands the overflow
+   back to `.outputBody`, which is the one element here that should scroll. */
+.outCellStdout,
+.outCellStderr,
+.outCellHtml,
+.outCellImage,
+.outCellPlot {
+  flex: none;
+}
+
 .outCellStdout {}
 
 .outCellStderr {
@@ -1512,9 +1535,18 @@
 }
 
 .outCellHtml {
-  /* Big frames scroll inside the cell instead of blowing out the card. */
-  overflow: auto;
-  max-height: 480px;
+  /* Horizontal only. A wide frame has nowhere else to go, because neither the
+     panel nor the page scrolls sideways, so the cell keeps a scroller for that
+     axis. Vertically it takes its natural height and `.outputBody` scrolls,
+     which is why there is no `max-height` here any more: a cap plus `overflow`
+     on a flex item is what gave one panel three vertical scrollbars.
+
+     `overflow-y: hidden` rather than `visible` because CSS will not mix them:
+     setting one axis to anything but `visible` computes the other to `auto`,
+     which would put the inner scrollbar straight back. Nothing is clipped by
+     it, since without a height cap there is no vertical overflow to clip. */
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .outCellHtml :global(img),
@@ -1582,7 +1614,7 @@
 }
 
 /* Middle-truncation marker cells/columns (R runtime), pandas renders
-   its own "..." cells which inherit the same muted colour. */
+   its own "..." cells which inherit the same muted color. */
 .outCellHtml :global(tr.dataframe-ellipsis-row td),
 .outCellHtml :global(.dataframe-ellipsis-col) {
   text-align: center;
@@ -1683,7 +1715,7 @@
   color: var(--ch-text-muted);
 }
 
-/* The label takes the verdict colour (brand 500 shades) once results
+/* The label takes the verdict color (brand 500 shades) once results
    are in. */
 .testLabel[data-state="pass"] {
   color: var(--ds-green-500);
@@ -1745,7 +1777,7 @@
    circle per test, green with a white check for a pass, red with a
    white ✕ for a fail (500 shades in light mode, 600 in dark, see the
    html.dark overrides near the end of this file), and the rail segment
-   below each circle painted in that test's colour. Rows carry no boxes
+   below each circle painted in that test's color. Rows carry no boxes
    or borders; the description, test code/checks, and the exact error
    message live in a click popover. */
 .testRail {
@@ -1954,7 +1986,7 @@
   flex-shrink: 0;
 }
 
-/* Verdict word takes the state colour (theme-aware via the token block
+/* Verdict word takes the state color (theme-aware via the token block
    on .testPopover above); pending stays muted. */
 .testPopoverState[data-state="pass"] {
   color: var(--ch-green);
@@ -2003,7 +2035,7 @@
 /* ─── Status banner ───────────────────────────────────────────────── */
 
 /* Quiet, centered verdict line on a transparent background, a bare
-   icon + short text in the verdict colour, no band or icon well. */
+   icon + short text in the verdict color, no band or icon well. */
 .banner {
   display: flex;
   align-items: center;
@@ -2291,7 +2323,7 @@
 /* The test pill and test rail use solid green/red fills with white
    text/numerals in both themes, light uses the 500 shades; dark steps
    down to the 600 shades below so the fills sit more comfortably on
-   dark surfaces. (The status banner is transparent with verdict-coloured
+   dark surfaces. (The status banner is transparent with verdict-colored
    text, so it adapts via the --ch-* tokens and needs nothing here.) */
 :global(html:is(.dark, [data-theme="dark"])) .testPill[data-state="pass"] {
   background: var(--ds-green-600);

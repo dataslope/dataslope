@@ -10,11 +10,11 @@
  * samples and the code block use the editor theme's (--bg / --text /
  * --theme-primary …). Mixing them meant a theme whose "muted" is a saturated
  * blue, GitHub Light among them, turned every section heading and label on the
- * page blue, so the furniture kept changing colour with the specimen.
+ * page blue, so the furniture kept changing color with the specimen.
  *
  * No cards. The old layout wrapped each section in a filled panel and each
  * swatch in a centred, variable-width box, which meant the only aligned thing
- * on a page *about colour* was nothing: swatch labels wandered row to row and
+ * on a page *about color* was nothing: swatch labels wandered row to row and
  * every filled rectangle competed with the samples. Here the structure is
  * carried by a hairline under each section label and by a single uniform grid
  * cell, so the swatches are the only filled shapes and the hex column, the
@@ -125,7 +125,7 @@
   white-space: nowrap;
 }
 
-/* ── Colour swatches ──
+/* ── Color swatches ──
    One geometry for every token. `auto-fill` with a fixed minimum keeps the
    columns even at any width, and because every cell is the same shape the
    four text rows beneath the chips form real columns down the page. */
@@ -153,7 +153,7 @@
   cursor: default;
 }
 
-/* The colour itself. A 1px inset ring rather than a border, so a swatch whose
+/* The color itself. A 1px inset ring rather than a border, so a swatch whose
    fill matches the page (--bg, white) still reads as a rectangle without the
    ring changing the cell's size. */
 .chip {
@@ -172,7 +172,7 @@
   inset: 0;
 }
 
-/* Text tokens: "Aa" over the page background, with a solid band of the colour
+/* Text tokens: "Aa" over the page background, with a solid band of the color
    beneath it. Both readings in one cell, so a text token no longer needs the
    wider cell that used to break the grid. */
 .chipSample {

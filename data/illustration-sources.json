@@ -1889,10 +1889,10 @@
       "servedSha": "0bd138c8d548b82c3529135b0bceb678be659b21d14f393576ab6c4da3099d18"
     },
     "gg-next-steps": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/gg-next-steps/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/gg-next-steps/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/gg-next-steps/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/gg-next-steps/v1/original.png",
       "matchDb": 55,
       "servedSha": "45c3dd298f5b67c795f7d9aa8176ee8132928287875dd16ea5788fb3f91ecbfe"
     },
@@ -3833,10 +3833,10 @@
       "servedSha": "0b5d6eab396f0ec38758c4480085c3ae3ac79daebbfa337741b1da81b32d527a"
     },
     "ml-hyperparameter-tuning": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/ml-hyperparameter-tuning/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/ml-hyperparameter-tuning/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/ml-hyperparameter-tuning/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/ml-hyperparameter-tuning/v1/original.png",
       "matchDb": 56,
       "servedSha": "2978b53edcf026146044c3d6d523c2524ee4961c578e7cba833f2f7591d79be4"
     },
@@ -4025,10 +4025,10 @@
       "servedSha": "0afd04fe734216a800c0656ba6900298447c0bc719190f140a192189cfc14661"
     },
     "nlp-next-steps": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/nlp-next-steps/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/nlp-next-steps/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/nlp-next-steps/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/nlp-next-steps/v1/original.png",
       "matchDb": 56,
       "servedSha": "ac5f2c295457252793d7789506e52e706917e922285c215bfb645b26282e079b"
     },
@@ -4969,10 +4969,10 @@
       "servedSha": "c19f383dd59c527db66b8c1fa7a8c0f03f6d0c68dbf8fa7f91ed1277e1415da3"
     },
     "python-basics-functions": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/python-basics-functions/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/python-basics-functions/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/python-basics-functions/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/python-basics-functions/v1/original.png",
       "matchDb": 56,
       "servedSha": "931934a0d29270b73374173b47698fbf2ba32369d6daaceeaef3b1244cb728f7"
     },
@@ -5545,10 +5545,10 @@
       "servedSha": "e2d81926ec5acae34964a45cd2a7c9dbe666ecf4b4b973110af0c67e63db41e1"
     },
     "scipy-capstone": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/scipy-capstone/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/scipy-capstone/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/scipy-capstone/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/scipy-capstone/v1/original.png",
       "matchDb": 56,
       "servedSha": "1ef8a0570f82f127909ce7154f62aa4764b72bc47aff62e365827e1ac95cb4ef"
     },
@@ -5609,10 +5609,10 @@
       "servedSha": "7167ee3d6ad1c90f37b4b81cb56a708bc58fd75fdf7644e5b32338b1c8335ec8"
     },
     "scipy-next-steps": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/scipy-next-steps/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/scipy-next-steps/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/scipy-next-steps/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/scipy-next-steps/v1/original.png",
       "matchDb": 56,
       "servedSha": "42a2332797ff03050047b3658f658d083463cb3bfb6dbf6eb0c25ca0e76f02b9"
     },
@@ -5929,10 +5929,10 @@
       "servedSha": "d07e09958d9fd4a9ee0b11b72bb64aa0248378244225ca46aace6fdc2a86ea12"
     },
     "sql-creating-tables": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/sql-creating-tables/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/sql-creating-tables/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/sql-creating-tables/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/sql-creating-tables/v1/original.png",
       "matchDb": 54,
       "servedSha": "885916e3e6515a807b7e50483732c40ea4182613a811b37b0dc6c02ee1898185"
     },
@@ -6049,10 +6049,10 @@
       "servedSha": "1847f3c697596e52b0c2ec641547e01cd31e68160c8d29a73c2197aa9f1c07a2"
     },
     "sql-normalization": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/sql-normalization/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/sql-normalization/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/sql-normalization/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/sql-normalization/v1/original.png",
       "matchDb": 54,
       "servedSha": "314339f824da871adc03e05a12ac74b90796d8c47e6aed94c3fbd76024cb54cd"
     },
@@ -6409,10 +6409,10 @@
       "servedSha": "f0d9f9ab01c2e2c6da3829456fac83b75644370aeb1b9219c7b3ada5e1d57284"
     },
     "stat-visualizing": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/stat-visualizing/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/stat-visualizing/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/stat-visualizing/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/stat-visualizing/v1/original.png",
       "matchDb": 55,
       "servedSha": "951ca5e42d40751c24ab1ff9565a980ded2a6c99445f00dec30f43802b9630f5"
     },
@@ -6489,10 +6489,10 @@
       "servedSha": "52fa60048de34208e69e58d20a964da44c76a947c3724ff5785af66df0ceaea3"
     },
     "sysc-next-steps": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/sysc-next-steps/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/sysc-next-steps/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/sysc-next-steps/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/sysc-next-steps/v1/original.png",
       "matchDb": 57,
       "servedSha": "e5ca6f22e8d9729e647a2a366ccb29ce58e0c081c52377b130d29acf1dd917df"
     },
@@ -7113,10 +7113,10 @@
       "servedSha": "11083becd3798620a271d6efd5be84bdb183f5fe83692a0a4bbf3a6a7ca87b2c"
     },
     "viz-storytelling": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/viz-storytelling/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/viz-storytelling/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/viz-storytelling/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/viz-storytelling/v1/original.png",
       "matchDb": 55,
       "servedSha": "802dcc7f13a28596407845c641993e3e38977b4a05e2e731283ad297826ef6a2"
     },
@@ -7305,10 +7305,10 @@
       "servedSha": "d4aba4f09a59db8442a8617fcee7e42801fe10191d799de86ea3b5235a22dcff"
     },
     "web-project-scoreboard": {
-      "run": "2026-08-creature-colour",
+      "run": "2026-08-creature-color",
       "variant": 1,
-      "cutout": "illustrations/2026-08-creature-colour/web-project-scoreboard/v1/cutout.png",
-      "original": "illustrations/2026-08-creature-colour/web-project-scoreboard/v1/original.png",
+      "cutout": "illustrations/2026-08-creature-color/web-project-scoreboard/v1/cutout.png",
+      "original": "illustrations/2026-08-creature-color/web-project-scoreboard/v1/original.png",
       "matchDb": 56,
       "servedSha": "b8c085c3fedc2b73e55e395d91f2ca5eed901a11af7f78e7878601cce4f55f50"
     },

@@ -102,11 +102,17 @@ cost; write-behind batches writes for speed but risks data loss on crash.
 The classic quip, "there are only two hard things in computer science: cache
 invalidation and naming things", is about exactly this trade-off.
 
-A related number people underestimate: a request that fans out to many
-backends is as slow as its slowest call, so a one-percent tail per call
-becomes a coin flip for the page.
+What the quip is really about is that the TTL controls both failures at
+once and in opposite directions, so there is no setting at which both are
+small:
 
-<Chart slug="tail-latency-fanout" />
+<Chart slug="cache-ttl-staleness" />
+
+Lengthening the TTL saves database trips and gives writes longer to overtake
+the copy, so the two failures trade directly against each other and the best a
+single number can do is the crossing point. Write-through pays at write time
+to move the stale curve down. The rates here are illustrative rather than
+measured.
 
 ### What is database replication and what does it buy you?
 

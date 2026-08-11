@@ -28,8 +28,8 @@ import { TabbiedPattern } from "tabbied/react";
  * `mask-composite: intersect`, and nesting gets the same result with no
  * compositing-support caveat.
  *
- * Colour follows `FooterPattern`: the palette's first entry is the
- * background and is left transparent so the page colour shows through, and
+ * Color follows `FooterPattern`: the palette's first entry is the
+ * background and is left transparent so the page color shows through, and
  * the inks are low-alpha, light enough to read as texture on white and to
  * stay visible on the dark theme's #121212 without glaring. `inks` overrides
  * the default mid-grey + brand blue; `fadedbar` and the other presets accept
@@ -76,7 +76,7 @@ export function PatternBackdrop({
   fullWidth?: boolean;
   /** Length in px of a fade-out at the pattern's bottom edge. 0 disables it. */
   fadeBottom?: number;
-  /** Ink colours, in palette order after the transparent background. */
+  /** Ink colors, in palette order after the transparent background. */
   inks?: string[];
   cellSize?: number;
   redrawInterval?: number;

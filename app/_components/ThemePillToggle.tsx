@@ -1,7 +1,7 @@
 "use client";
 
 // Shared light/dark pill toggle (sun ↔ moon with a sliding knob), used by
-// every surface that lets the visitor flip the colour scheme: the home
+// every surface that lets the visitor flip the color scheme: the home
 // header, the home mobile drawer, the playground Settings panel, and the
 // Fumadocs docs chrome (via `slots.themeSwitch`).
 //

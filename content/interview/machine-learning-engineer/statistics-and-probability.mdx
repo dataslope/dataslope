@@ -40,7 +40,9 @@ MLE picks the parameters that make the observed data most probable under a
 chosen model. Because products of probabilities underflow, you maximize the
 **log-likelihood**:
 
-$$\hat{\theta}_{\text{MLE}} = \arg\max_\theta \prod_i p(x_i \mid \theta) = \arg\max_\theta \sum_i \log p(x_i \mid \theta)$$
+$$
+\hat{\theta}_{\text{MLE}} = \arg\max_\theta \prod_i p(x_i \mid \theta) = \arg\max_\theta \sum_i \log p(x_i \mid \theta)
+$$
 
 For a Gaussian, the MLE of the mean is just the sample mean; for logistic
 regression, maximizing the log-likelihood of the labels *is* the training
@@ -51,7 +53,9 @@ small samples.
 
 Expected test error splits into three parts:
 
-$$\mathbb{E}\big[(y - \hat{f}(x))^2\big] = \underbrace{\text{Bias}[\hat{f}(x)]^2}_{\text{underfitting}} + \underbrace{\text{Var}[\hat{f}(x)]}_{\text{overfitting}} + \underbrace{\sigma^2}_{\text{irreducible}}$$
+$$
+\mathbb{E}\big[(y - \hat{f}(x))^2\big] = \underbrace{\text{Bias}[\hat{f}(x)]^2}_{\text{underfitting}} + \underbrace{\text{Var}[\hat{f}(x)]}_{\text{overfitting}} + \underbrace{\sigma^2}_{\text{irreducible}}
+$$
 
 **Bias** is error from wrong assumptions (too simple a model); **variance**
 is sensitivity to the particular training sample; $\sigma^2$ is noise you
@@ -64,7 +68,9 @@ complexity and regularization minimizes their sum.
 **Standard error** measures the spread of a *statistic* (usually the mean)
 across hypothetical repeated samples:
 
-$$SE = \frac{\sigma}{\sqrt{n}}$$
+$$
+SE = \frac{\sigma}{\sqrt{n}}
+$$
 
 The SE shrinks as $n$ grows (you estimate the mean more precisely with more
 data); the standard deviation estimates a fixed population property and
@@ -118,7 +124,9 @@ interval means: if you repeated the experiment many times and built an
 interval each time, about 95% of those intervals would contain the true
 parameter. For a mean it's
 
-$$\bar{x} \pm z^{*}\,\frac{s}{\sqrt{n}}$$
+$$
+\bar{x} \pm z^{*}\,\frac{s}{\sqrt{n}}
+$$
 
 with $z^{*} \approx 1.96$ for 95% (a t critical value for small samples).
 It is **not** "a 95% probability the parameter is in *this* interval", the
@@ -240,7 +248,9 @@ fixes.
 
 It updates a prior belief with evidence:
 
-$$P(\theta \mid D) = \frac{P(D \mid \theta)\,P(\theta)}{P(D)}$$
+$$
+P(\theta \mid D) = \frac{P(D \mid \theta)\,P(\theta)}{P(D)}
+$$
 
 It underpins spam filters, medical diagnosis, and Bayesian inference (prior
 → posterior after data). The classic trap: with a rare condition, even a
@@ -253,7 +263,9 @@ Covariance measures whether two variables move together but its magnitude
 depends on their units, so it's hard to interpret. Correlation
 standardizes it to $[-1, 1]$:
 
-$$\rho_{X,Y} = \frac{\text{Cov}(X, Y)}{\sigma_X \, \sigma_Y}$$
+$$
+\rho_{X,Y} = \frac{\text{Cov}(X, Y)}{\sigma_X \, \sigma_Y}
+$$
 
 Correlation captures only **linear** association; a zero correlation can
 still hide a strong non-linear relationship (e.g., $y = x^2$).

@@ -5,7 +5,7 @@
  * An exploratory chart is written for one reader who already knows what the
  * columns mean, will look at it for four seconds, and will then write another
  * one. It should show everything, because the point is to find what is there:
- * every series, default labels, no title, no thought about colour. Time spent
+ * every series, default labels, no title, no thought about color. Time spent
  * making it pretty is time not spent on the next question, and there will be
  * thirty more.
  *
@@ -60,7 +60,7 @@ const MEDIAN_GROWTH = Math.round(
     .sort((a, b) => a - b)[Math.floor(others.length / 2)],
 );
 
-export const caption = `These are two different charts and they should be. The exploratory one is written for a reader who already knows what the columns mean, will look for four seconds, and will then write another one: show everything, default labels, no title, no thought about colour, because time spent making it pretty is time not spent on the next question and there are thirty more. The presentation one is written for someone who was not there. It carries a single finding, the March cohort gaining ${GROWTH} against a median of ${MEDIAN_GROWTH} for the other ${others.length}, names the series on the chart rather than in a legend, and puts the conclusion in the title instead of the subject. The rest of the data stays visible as context so a reader can see that nothing was cropped. The mistake runs both ways: polishing during exploration is slow, and publishing the exploratory chart is what fills reports with fourteen-series line charts called revenue.png.`;
+export const caption = `These are two different charts and they should be. The exploratory one is written for a reader who already knows what the columns mean, will look for four seconds, and will then write another one: show everything, default labels, no title, no thought about color, because time spent making it pretty is time not spent on the next question and there are thirty more. The presentation one is written for someone who was not there. It carries a single finding, the March cohort gaining ${GROWTH} against a median of ${MEDIAN_GROWTH} for the other ${others.length}, names the series on the chart rather than in a legend, and puts the conclusion in the title instead of the subject. The rest of the data stays visible as context so a reader can see that nothing was cropped. The mistake runs both ways: polishing during exploration is slow, and publishing the exploratory chart is what fills reports with fourteen-series line charts called revenue.png.`;
 
 export function render() {
   return plot({

@@ -197,7 +197,7 @@ export function render() {
         ...HALO,
       }),
 
-      // The sentence pairs, on the left, coloured to match their line.
+      // The sentence pairs, on the left, colored to match their line.
       Plot.text(
         ROWS.map((r, i) => ({ ...r, i })),
         {

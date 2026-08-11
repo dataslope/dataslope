@@ -342,7 +342,7 @@
 }
 
 /* Inline code inside a neutral (unselected/distractor) explanation. The
-   verdict variants below override the colours on green/red rows; this is
+   verdict variants below override the colors on green/red rows; this is
    the base chip used on the plain subtle surface. */
 .choiceExplanation code {
   font-family: var(--mc-font-mono);
@@ -365,7 +365,7 @@
 }
 
 /* In light mode, `code` elements inside green/red choice rows need
-   a tinted background so they don't look out of place on the coloured
+   a tinted background so they don't look out of place on the colored
    surface. */
 .choice[data-verdict="correct-selected"] .choiceLabel code,
 .choice[data-verdict="correct-missed"] .choiceLabel code {
@@ -435,7 +435,7 @@
 
 /* ─── Status banner ───────────────────────────────────────────────── */
 
-/* Solid colour band, white text (matches the challenge card's banner),
+/* Solid color band, white text (matches the challenge card's banner),
    green-500 / red-500 in light mode, the 600 shades in dark mode (see
    the html.dark overrides further down). */
 .banner {
@@ -464,7 +464,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  /* Lightened well of the band colour so the white check / ✕ reads. */
+  /* Lightened well of the band color so the white check / ✕ reads. */
   background: rgba(255, 255, 255, 0.22);
 }
 
@@ -517,7 +517,7 @@
   /* Match the Fumadocs page background so the card surface blends with
      the surrounding chrome. Falls back to gray-900 when Fumadocs vars
      are not present (e.g. isolated Storybook / unit-test environments).
-     All surface tokens use black-based colour-mix so they stay neutral
+     All surface tokens use black-based color-mix so they stay neutral
 , no blue-tinted slate values. */
   --mc-bg: var(--color-fd-background, #121212);
   --mc-bg-subtle: color-mix(in srgb, var(--color-fd-background, #121212) 85%, #000000);

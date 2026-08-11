@@ -12,6 +12,17 @@
  * row groups whose statistics cannot match are skipped, and only the named
  * columns are decoded. The saving is not a faster filter; it is a filter that
  * never has to look at most of the rows.
+ *
+ * ── Why lollipops and not bars ──────────────────────────────────────────────
+ *
+ * Two billion cells against twelve million is more than two orders of
+ * magnitude, so the axis has to be logarithmic — and a bar on a log axis stops
+ * encoding its value. A reader measures bar *length*, and on this scale the
+ * eager bar drew about twice the lazy one rather than a hundred and sixty
+ * times it, understating the very saving the figure exists to show. A rule
+ * running from the axis floor to a dot encodes *position* instead, which is
+ * the channel a log scale is legible in, and the floor is drawn rather than
+ * implied so nobody mistakes it for zero.
  */
 import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
@@ -49,6 +60,10 @@ const rows = STAGES.flatMap((s) => [
   { stage: s.key, mode: "Lazy, optimised", n: Math.round(s.lazy) },
 ]);
 
+/** The axis floor, and the baseline every rule is drawn from. Drawn rather
+ *  than implied: on a log scale there is no zero to anchor to. */
+const FLOOR = 1e6;
+
 const EAGER = STAGES.reduce((t, s) => t + s.eager, 0);
 const LAZY = STAGES.reduce((t, s) => t + s.lazy, 0);
 
@@ -64,22 +79,31 @@ export function render() {
     ariaLabel: title,
     fy: { label: null, domain: STAGES.map((s) => s.key) },
     x: {
-      label: "Cells read",
+      label: "Cells read (each gridline is ten times the one before)",
       labelAnchor: "center",
       type: "log",
-      domain: [1e6, 4e9],
+      domain: [FLOOR, 4e9],
       ticks: [1e6, 1e7, 1e8, 1e9],
       tickFormat: (d) => (d >= 1e9 ? `${d / 1e9}B` : `${d / 1e6}M`),
+      grid: true,
     },
     y: { label: null, domain: ["Eager", "Lazy, optimised"], padding: 0.24, grid: false },
     marks: [
-      Plot.barX(rows, {
+      Plot.ruleY(rows, {
         fy: "stage",
         y: "mode",
-        x1: 1e6,
+        x1: FLOOR,
         x2: "n",
+        stroke: (d) => (d.mode === "Eager" ? ACCENT : PRIMARY),
+        strokeWidth: 2,
+        strokeOpacity: 0.4,
+      }),
+      Plot.dot(rows, {
+        fy: "stage",
+        y: "mode",
+        x: "n",
         fill: (d) => (d.mode === "Eager" ? ACCENT : PRIMARY),
-        fillOpacity: 0.7,
+        r: 5,
       }),
       Plot.text(rows, {
         fy: "stage",

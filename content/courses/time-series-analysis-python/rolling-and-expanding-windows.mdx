@@ -241,6 +241,22 @@ print("Great for a smooth trend line; FORBIDDEN as a forecasting feature.")
 Centered rolling features include future observations, which is leakage; forecasting features must use trailing windows only.`}
 />
 
+A centred window is the right default for *description*, because it removes
+noise without shifting the curve sideways, so a peak in the smoothed series
+lands where the peak in the raw one is. Here is what it costs you the moment
+the smoothed series becomes a feature:
+
+<Chart slug="centered-window-leaks" />
+
+The trailing curve's lag is not a defect to correct. It is the price of only
+knowing the past, and a smoother that appears to avoid it has stopped being
+causal. Use `center=True` for a chart and `center=False` for a feature, and
+give them different column names when a notebook does both.
+
+Fit a model on it and the model learns from tomorrow. Backtest that model and
+the backtest agrees, because the leak is in the feature rather than in the
+split, and no amount of care about train and test boundaries will catch it.
+
 ## The biggest misconception: a moving average is **not** a forecast
 
 Both smoothed lines below peak after the series does, and the wider window

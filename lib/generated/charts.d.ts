@@ -43,7 +43,7 @@ export interface GeneratedChart {
   /** Every page that renders this chart. Empty when the spec exists but has
    *  not been placed in a lesson yet. */
   usedBy: ChartUsage[];
-  /** Serialized `<svg>`, coloured entirely with `currentColor` and
+  /** Serialized `<svg>`, colored entirely with `currentColor` and
    *  `var(--ds-chart-*)` so it reads in both themes when inlined. */
   svg: string;
 }

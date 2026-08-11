@@ -30,7 +30,9 @@ about crossing that bridge responsibly.
 observations around the mean. **Standard error** measures the variability
 of a *sample statistic* (such as the mean) around the true parameter:
 
-$$SE = \frac{\sigma}{\sqrt{n}}$$
+$$
+SE = \frac{\sigma}{\sqrt{n}}
+$$
 
 The standard error shrinks as the sample size $n$ grows (you can estimate
 the mean more precisely with more data); the standard deviation does not,
@@ -115,7 +117,9 @@ average settling down, not about the shape of many.
 $P(A \mid B)$ is the probability of event $A$ given that $B$ has already
 occurred:
 
-$$P(A \mid B) = \frac{P(A \cap B)}{P(B)}$$
+$$
+P(A \mid B) = \frac{P(A \cap B)}{P(B)}
+$$
 
 Events $A$ and $B$ are independent if $P(A \mid B) = P(A)$, knowing $B$
 tells you nothing about $A$.
@@ -132,7 +136,9 @@ nearly opposites: mutually exclusive events with non-zero probability are
 
 Bayes' theorem updates a prior belief given new evidence:
 
-$$P(A \mid B) = \frac{P(B \mid A)\,P(A)}{P(B)}$$
+$$
+P(A \mid B) = \frac{P(B \mid A)\,P(A)}{P(B)}
+$$
 
 In data science it powers spam filters, medical diagnosis, and Bayesian
 inference, where you update a prior distribution over parameters into a
@@ -173,7 +179,9 @@ parameterized by mean $\mu$ and variance $\sigma^2$. By the **empirical
 rule**, about 68%, 95%, and 99.7% of the data fall within 1, 2, and 3
 standard deviations of the mean:
 
-$$P(\mu - k\sigma \leq X \leq \mu + k\sigma) \approx 68\%,\ 95\%,\ 99.7\% \quad \text{for } k = 1, 2, 3$$
+$$
+P(\mu - k\sigma \leq X \leq \mu + k\sigma) \approx 68\%,\ 95\%,\ 99.7\% \quad \text{for } k = 1, 2, 3
+$$
 
 It arises naturally via the Central Limit Theorem and is the foundation
 for many statistical tests.
@@ -187,7 +195,9 @@ The three numbers worth knowing cold.
 The Poisson distribution models the number of events in a fixed interval
 when events occur independently at a constant average rate $\lambda$:
 
-$$P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}$$
+$$
+P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}
+$$
 
 Its mean and variance are **both** $\lambda$. Common uses: customer
 arrivals per hour, defects per unit, or server requests per second.
@@ -197,7 +207,9 @@ arrivals per hour, defects per unit, or server requests per second.
 The binomial distribution counts the number of successes in $n$
 independent Bernoulli trials, each with success probability $p$:
 
-$$P(X = k) = \binom{n}{k} p^k (1 - p)^{n-k}$$
+$$
+P(X = k) = \binom{n}{k} p^k (1 - p)^{n-k}
+$$
 
 Its mean is $np$ and its variance is $np(1 - p)$. It is used for click
 rates, conversion rates, and quality control.
@@ -228,7 +240,9 @@ mean. The sample variance with denominator $n - 1$ (Bessel's correction)
 is unbiased; dividing by $n$ gives a biased (but lower-variance)
 estimator. Bias and variance combine into mean squared error:
 
-$$\text{MSE} = \text{Bias}^2 + \text{Variance}$$
+$$
+\text{MSE} = \text{Bias}^2 + \text{Variance}
+$$
 
 The code below computes both variance estimators on the same data so you
 can see the gap: `ddof=1` applies Bessel's correction (unbiased), while
@@ -260,7 +274,9 @@ parameter. It is **not** "a 95% probability the parameter is in *this*
 interval", the parameter is fixed; the interval is what's random. For a
 mean, the interval is
 
-$$\bar{x} \pm t^{*}_{n-1} \cdot \frac{s}{\sqrt{n}}$$
+$$
+\bar{x} \pm t^{*}_{n-1} \cdot \frac{s}{\sqrt{n}}
+$$
 
 where $t^{*}_{n-1}$ is the critical value from the t-distribution.
 
@@ -363,7 +379,9 @@ from expected counts (goodness-of-fit), or whether two categorical
 variables are independent (test of independence). The test statistic sums
 the squared, normalized gaps between observed and expected counts:
 
-$$\chi^2 = \sum_i \frac{(O_i - E_i)^2}{E_i}$$
+$$
+\chi^2 = \sum_i \frac{(O_i - E_i)^2}{E_i}
+$$
 
 Large values indicate the null is implausible. The test requires expected
 cell counts of at least 5 in most cells.
@@ -433,7 +451,9 @@ probability that the null is true, nor the probability your result is a
 fluke. A small p-value means the data would be surprising under the null,
 so you reject it at your chosen significance level $\alpha$:
 
-$$\text{reject } H_0 \quad \text{when} \quad p < \alpha$$
+$$
+\text{reject } H_0 \quad \text{when} \quad p < \alpha
+$$
 
 <Callout type="warning" title="Common misconception">
 A p-value is **not** the probability that the null hypothesis is true, and
@@ -495,7 +515,9 @@ The two error rates on one axis, so the trade between them is visible.
 Power is the probability of correctly rejecting the null when the
 alternative is true:
 
-$$\text{power} = 1 - \beta$$
+$$
+\text{power} = 1 - \beta
+$$
 
 where $\beta$ is the Type II error rate. A power of 0.8 means an 80% chance
 of detecting a true effect if one exists. Power rises with larger sample

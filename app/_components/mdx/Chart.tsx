@@ -28,7 +28,7 @@
 import type { CSSProperties } from "react";
 import { ChartLine } from "lucide-react";
 import chartManifest from "@/lib/generated/charts";
-import { withInlineCode } from "./inlineCode";
+import { withInlineMarkup } from "./inlineMarkup";
 import ChartExpand from "./ChartExpand";
 import styles from "./Chart.module.css";
 
@@ -43,8 +43,10 @@ interface ChartProps {
   /**
    * Caption shown under the chart. Defaults to the spec's own `caption`
    * export; pass `null` to render none, or a string to override it here.
-   * Backtick spans render as code chips, so a spec that writes
-   * `` `s += piece` `` gets a code element rather than literal backticks.
+   * Backtick spans render as code chips and `*asterisks*` as emphasis, so a
+   * spec writing `` `s += piece` `` gets a code element rather than literal
+   * backticks. Keep it to a sentence or two: the detail belongs in the lesson
+   * prose around the chart, where a reader meets it before the figure.
    */
   caption?: string | null;
   /**
@@ -99,7 +101,7 @@ export function Chart({ slug, caption, maxWidth }: ChartProps) {
       </ChartExpand>
       {text ? (
         <figcaption className={styles.caption}>
-          {withInlineCode(text)}
+          {withInlineMarkup(text)}
         </figcaption>
       ) : null}
       {SHOW_CHART_ID ? (

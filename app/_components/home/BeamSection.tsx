@@ -18,7 +18,7 @@ import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { cn } from "@/lib/utils";
 import { LANGUAGE_ICONS, LANGUAGE_ICON_SIZE_FACTOR } from "../languageIcons";
 
-// Brand-coloured beams: blue → green.
+// Brand-colored beams: blue → green.
 const BEAM_START = "#148CFF"; // --ds-blue-500
 const BEAM_STOP = "#20C621"; // --ds-green-500
 const BEAM_PATH = "var(--ds-gray-300)";

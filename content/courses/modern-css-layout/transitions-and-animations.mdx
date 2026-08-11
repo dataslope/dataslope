@@ -125,12 +125,17 @@ transform: scale(1.1);         /* grow to 110% */
 transform: rotate(15deg);      /* tilt */
 ```
 
-The reason `transform` is the recommended property is the frame budget.
-At 60fps there are about 16 milliseconds per frame for everything,
-layout included, and animating a layout-triggering property spends them
-all.
+The reason `transform` is the recommended property is which steps of the
+rendering pipeline it makes the browser redo. At 60fps there are about 16
+milliseconds per frame for everything; animating `left` spends them on
+layout and paint, and animating `transform` skips both:
 
-<Chart slug="frame-budget-long-tasks" />
+<Chart slug="transform-vs-layout-animation" />
+
+The millisecond figures are representative of a moderately complex page rather
+than measured from one. The part that is not an estimate is which segments are
+there at all, and the two missing ones are exactly the two that grow with how
+much of the document has to be reconsidered.
 
 ## Animations: scripted, repeatable motion
 

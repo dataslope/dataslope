@@ -248,9 +248,13 @@ from the confusion matrix:
 | **Actually positive** | True Positive (TP) | False Negative (FN) |
 | **Actually negative** | False Positive (FP) | True Negative (TN) |
 
-$$\text{Precision} = \frac{TP}{TP + FP} \qquad \text{Recall} = \frac{TP}{TP + FN}$$
+$$
+\text{Precision} = \frac{TP}{TP + FP} \qquad \text{Recall} = \frac{TP}{TP + FN}
+$$
 
-$$F_1 = 2 \cdot \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}$$
+$$
+F_1 = 2 \cdot \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+$$
 
 <CodeBlock
   adapter="python"
@@ -409,7 +413,7 @@ print("Encoded:\\n", encoded)
   ]}
 />
 
-Fitting `OneHotEncoder` on the three colour values in `X_cat` turns each
+Fitting `OneHotEncoder` on the three color values in `X_cat` turns each
 row into a binary indicator vector; `handle_unknown="ignore"` makes the
 encoder emit all-zeros for any category unseen at fit time rather than
 erroring at serving.

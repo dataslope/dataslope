@@ -8,8 +8,8 @@
  * That is the whole misreading the lesson is trying to kill ("there is a 95%
  * chance μ is in *this* interval"), and it is much easier to see than to say.
  *
- * The misses are drawn in the accent colour, thicker, *and* labelled, so they
- * are never identified by colour alone.
+ * The misses are drawn in the accent color, thicker, *and* labelled, so they
+ * are never identified by color alone.
  */
 import { Plot, plot, mean, normalSamples, ACCENT, MUTED, PRIMARY } from "./_theme.mjs";
 
@@ -92,7 +92,7 @@ export function render() {
         fill: PRIMARY,
         stroke: null,
       }),
-      // A cross, not just a colour: the misses have to be findable without
+      // A cross, not just a color: the misses have to be findable without
       // relying on hue (and at 100 rows there is no space for row labels).
       Plot.dot(missed, {
         x: "mean",

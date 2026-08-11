@@ -374,6 +374,26 @@ samples and a flexible model would just overfit. It is almost always the
 right *first* model, beat it before you complicate things.
 </Callout>
 
+One diagnostic is worth meeting before you start interpreting coefficients,
+because it is where a good model and a good explanation come apart:
+
+<Chart slug="collinearity-inflates-se" />
+
+So the rule is about the question rather than the model. To predict,
+collinearity is not a problem and dropping a variable to fix a VIF is
+superstition that costs information. To interpret one coefficient, it is the
+whole problem, and no amount of data cleaning fixes it.
+
+Both curves are true. A coefficient in a multiple regression means "the effect
+of moving this predictor while holding the other fixed", and when the two move
+together there are almost no observations where one moved and the other did
+not, so the model is being asked a question the data barely answers and says
+so, honestly, in the standard error. The predictions do not care, because if
+two predictors carry the same information it makes no difference to a fitted
+value which of them gets the credit. The tell most people miss is that with
+collinear predictors, coefficients can flip sign between two samples from the
+same population while accuracy is unchanged in both.
+
 ## When NOT to use it
 
 The same simplicity that makes linear regression clear also makes it the

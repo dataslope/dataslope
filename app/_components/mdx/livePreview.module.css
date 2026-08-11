@@ -22,7 +22,7 @@
   --lp-accent: var(--ds-blue-600);
   --lp-code-bg: var(--ds-gray-50);
   --lp-code-text: var(--ds-gray-800);
-  /* Syntax token colours (GitHub Light), applied to the `tok-*` classes the
+  /* Syntax token colors (GitHub Light), applied to the `tok-*` classes the
      client highlighter emits (see staticHighlight.ts). */
   --tok-keyword: #cf222e;
   --tok-string: #0a3069;
@@ -56,7 +56,7 @@
   --lp-accent: var(--ds-blue-400);
   --lp-code-bg: #0f0f0f;
   --lp-code-text: #d6d6d6;
-  /* Syntax token colours (GitHub Dark). */
+  /* Syntax token colors (GitHub Dark). */
   --tok-keyword: #ff7b72;
   --tok-string: #a5d6ff;
   --tok-comment: #8b949e;

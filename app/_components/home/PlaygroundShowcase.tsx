@@ -127,7 +127,7 @@ export function PlaygroundShowcase() {
       </div>
 
       {/* Connector stemming from the playground's bottom center down to a dot
-          above the link. It tracks the link's colour, and only while the link
+          above the link. It tracks the link's color, and only while the link
           itself is hovered the line extends toward the link, a shorter reach
           than before so the dot keeps more space from the link. State-driven so
           it reacts to the link, not to hovering the connector; both revert on

@@ -26,6 +26,8 @@ import { X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 // ─── Boot progress smoothing ─────────────────────────────────────────
 // Adapters report coarse stage *floors* (0.05, 0.55, 0.85, …) during a
@@ -156,7 +158,7 @@ function detectIsDark(): boolean {
   return true;
 }
 
-/** Subscribe to the document's colour-scheme so components can react
+/** Subscribe to the document's color-scheme so components can react
  *  to the Fumadocs theme toggle without polling. SSR-safe: the server
  *  snapshot defaults to `true` (dark) to match the site's dark default. */
 export function useIsDark(): boolean {
@@ -201,7 +203,7 @@ export function cmThemeNameFor(isDark: boolean): string {
  * code: of the 89 fences that once carried no info string, 87 were samples of
  * what the program prints. Highlighting those is worse than leaving them
  * plain, since highlight.js finds keywords in ordinary words and paints a
- * column of `Hello, Grace!` in three colours.
+ * column of `Hello, Grace!` in three colors.
  *
  * (An earlier version inherited the card's `adapter` here. It was wrong 87
  * times out of 89, which is why the label now lives in the source.)
@@ -230,11 +232,30 @@ export function labelBareFences(source: string): string {
     .join("\n");
 }
 
-/** Renders an instructions string as Markdown using react-markdown + GFM,
- *  with fenced code syntax-highlighted by highlight.js. Supports the full
+/** Renders an instructions string as Markdown using react-markdown, with GFM,
+ *  math, and fenced code syntax-highlighted by highlight.js. Supports the full
  *  CommonMark + GitHub-Flavored Markdown surface (headings, lists, tables,
  *  code, autolinks, …) so authors can write natural Markdown instead of
  *  nested JSX.
+ *
+ *  **Math is not optional here.** A lesson body gets `remarkMath` +
+ *  `rehypeKatex` from `source.config.ts`, and a `<MultipleChoice>` gets them
+ *  from its own pipeline, but an `instructions` string never reaches either:
+ *  it is a *prop*, so the MDX compiler passes it through as a plain string and
+ *  this component is the only thing that ever parses it. Without the two
+ *  plugins the card printed the source verbatim, so `numerical-calculus`'s π
+ *  challenge read `Recall that $\int_{-1}^{1} \sqrt{1 - x^2},dx = \pi/2$` on
+ *  the page. Eighteen challenges across the scientific-computing and
+ *  statistics courses were doing the same thing. KaTeX's stylesheet is already
+ *  loaded on every route that can host a card, by `app/docs.css` for lessons
+ *  and interview pages and by a direct import in `/c/[id]`, `/quiz/[id]` and
+ *  the dashboard authoring pages.
+ *
+ *  `rehypeKatex` runs before `rehypeHighlight`, matching the order
+ *  `source.config.ts` documents for the lesson pipeline. The two do not in
+ *  fact collide here, because `remark-math` turns `$$…$$` into a `math` node
+ *  that becomes a `div` rather than a `pre > code`, but the ordering is the
+ *  one the rest of the codebase asserts and there is no reason to differ.
  *
  *  `detect: false`, so the language is always the one the fence names and
  *  never one highlight.js guessed from a two-line sample. Inline spans are
@@ -243,8 +264,11 @@ export function labelBareFences(source: string): string {
 export function renderMarkdownInstructions(source: string): ReactNode {
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      rehypePlugins={[[rehypeHighlight, { detect: false, ignoreMissing: true }]]}
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[
+        [rehypeKatex, { throwOnError: false, errorColor: "#ef4444" }],
+        [rehypeHighlight, { detect: false, ignoreMissing: true }],
+      ]}
     >
       {labelBareFences(source)}
     </ReactMarkdown>
@@ -388,7 +412,7 @@ export function useShortId(prefix: string): string {
 // pass/fail readout. A vertical rail runs down the left; each test is a
 // circle on the rail, green (--ds-green-500) with a white check for a
 // pass, red (--ds-red-500) with a white ✕ for a fail, and the rail
-// segment below each circle is painted in that test's colour. Rows are
+// segment below each circle is painted in that test's color. Rows are
 // just the test name; the description, the test's code/checks, and the
 // exact error message live in a click-popover so the list stays clean.
 

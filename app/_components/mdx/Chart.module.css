@@ -2,7 +2,7 @@
  * Theme mapping for the build-time Observable Plot charts.
  *
  * The rendered SVG (see charts/_theme.mjs and scripts/build-charts.mjs) never
- * contains a literal colour. Axis text, ticks and gridlines are Plot's own
+ * contains a literal color. Axis text, ticks and gridlines are Plot's own
  * `currentColor`, so they follow the page foreground for free; everything the
  * spec draws references one of the `--ds-chart-*` role tokens defined here.
  *
@@ -19,7 +19,7 @@
  * The page-theme rule below is scoped `:not([data-force])` for that reason.
  * `.dark .chart` and `.chart[data-force="light"]` are the same specificity
  * (0-2-0), so on a dark page the later of the two won and a *light*-forced pane
- * was painted with dark tokens: 400-step series colours, and a #121212 label
+ * was painted with dark tokens: 400-step series colors, and a #121212 label
  * halo that boxed every annotation in black. The gallery exists to compare the
  * two surfaces, so both panes silently agreeing with the page defeated it.
  */
@@ -124,7 +124,7 @@
     /* Edge shadows that appear only on the side there is more chart on.
        Touch scrollbars are overlays that show up once you are already
        scrolling, so without this the chart just looks cropped. The four
-       layers are the standard trick: two page-coloured covers scrolling
+       layers are the standard trick: two page-colored covers scrolling
        *with* the content (`local`), sitting on top of two shadows pinned to
        the frame (`scroll`), so each shadow is masked exactly while that end
        is flush and revealed as soon as it is not. No JavaScript and no
@@ -263,7 +263,7 @@
 
    Both classes are on this element deliberately. `.chart` carries the
    `--ds-chart-*` tokens and the `currentColor` foreground the SVG is painted
-   with, so without it the chart opens colourless — but `.chart` also carries
+   with, so without it the chart opens colorless — but `.chart` also carries
    the narrow-screen scroll rules, which are exactly wrong here. Hence the
    doubled selectors below: two classes deep (0-2-0) beats the media query's
    one (0-1-0) at any source order, so the scroll container, its edge shadows
@@ -317,7 +317,7 @@
    paragraph, and they carry the argument the figure is making. So they are set
    to read like the prose around them: 15px against the body's 16px, and the
    body's own 1.7-ish leading rather than the tight 1.5 a one-line credit
-   wants. The muted colour and the centring keep the hierarchy; the size no
+   wants. The muted color and the centring keep the hierarchy; the size no
    longer punishes anyone for reading it. */
 .caption {
   margin-top: 0.75rem;

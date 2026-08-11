@@ -905,7 +905,7 @@ body.playground-active {
 .kbd {
   font-family: var(--font-mono);
   font-size: 10px;
-  /* Match the colour of the "Editor" / "Output" pane heading
+  /* Match the color of the "Editor" / "Output" pane heading
      (`--text-dim`) so the keyboard hint reads as part of the same
      pane-bar caption row instead of competing with it. */
   color: var(--text-dim);
@@ -971,7 +971,7 @@ body.playground-active {
   width: 10px;
   height: 10px;
   flex-shrink: 0;
-  /* The lucide `Play` icon is stroke-based, so colour both the stroke
+  /* The lucide `Play` icon is stroke-based, so color both the stroke
      and the fill so the triangle reads as a solid white glyph. */
   fill: white;
   stroke: white;
@@ -1252,7 +1252,7 @@ body.playground-active {
 }
 
 /* ─── Subtle selection background for all themes ─── */
-/* Overrides each theme's native selection colour with a low-opacity
+/* Overrides each theme's native selection color with a low-opacity
    accent tint so the highlight is visible but never distracting.
    Two selectors are needed: the non-focused layer (.cm-selectionBackground
    directly on the element) and the focused selection layer rendered by
@@ -1434,8 +1434,20 @@ body.playground-active {
    Content-width like Jupyter, never stretched; the wrapper scrolls both
    axes for big frames. */
 .dataframe-wrap {
-  overflow: auto;
-  max-height: 480px;
+  /* Horizontal only, and no height cap. `.output-body` is the pane that
+     scrolls; a second scroller nested inside it gives one frame two
+     scrollbars, and because `.output-body` is a column flex container the
+     cells also shrink to fit before it ever scrolls, so several frames in one
+     run came out as several separately-scrolling stubs. Kept in lockstep with
+     `.outCellHtml` in ChallengeCard.module.css, where the same bug was
+     reported.
+
+     `overflow-y: hidden` rather than `visible` because CSS refuses to mix
+     them: set one axis to anything but `visible` and the other computes to
+     `auto`, which puts the inner scrollbar straight back. Nothing is clipped,
+     since without a height cap there is no vertical overflow. */
+  overflow-x: auto;
+  overflow-y: hidden;
   padding: 6px 0;
   /* The merged output body renders text with pre-wrap, the newlines
      between the tags of pandas' HTML must not become blank lines. */
@@ -1488,7 +1500,7 @@ body.playground-active {
   background: color-mix(in srgb, var(--text) 8%, transparent);
 }
 /* Middle-truncation marker cells/columns (R runtime), pandas renders
-   its own "..." cells which inherit the same muted colour. */
+   its own "..." cells which inherit the same muted color. */
 .dataframe-wrap .dataframe-ellipsis-row td,
 .dataframe-wrap .dataframe-ellipsis-col {
   text-align: center;
@@ -1513,7 +1525,7 @@ body.playground-active {
 
 /* Clear button, uses a subtle border that blends with the pane bar
    while keeping the label readable across editor themes. The label
-   colour matches the "Editor"/"Output" pane heading so the two
+   color matches the "Editor"/"Output" pane heading so the two
    captions read as part of the same row. */
 .clear-btn {
   display: inline-flex;
@@ -1700,7 +1712,7 @@ body.playground-active {
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  /* Use the primary text colour (white in dark themes, near-black in
+  /* Use the primary text color (white in dark themes, near-black in
      light themes) so the tab labels read clearly even when the tab is
      not selected. */
   color: var(--text);
@@ -1902,7 +1914,7 @@ body.playground-active {
   }
   .settings-tab[data-active] {
     /* No border around the active pill on mobile, the filled background
-       and primary text colour already mark it as selected. */
+       and primary text color already mark it as selected. */
     background: var(--bg3);
     color: var(--primary);
   }
@@ -2886,7 +2898,7 @@ input[type="range"].fs-slider:disabled {
 }
 
 .mobile-menu-backdrop {
-  /* Inherits position/colour from .pkg-overlay; keep it opaque enough
+  /* Inherits position/color from .pkg-overlay; keep it opaque enough
      that the editor underneath fades away on the small mobile screen. */
   z-index: 320;
 }
@@ -3038,7 +3050,7 @@ input[type="range"].fs-slider:disabled {
   text-align: left;
   width: 100%;
   /* The row is an <a> when it navigates (the save panel's "Sign in to back
-     up"), so it must not pick up link underline/colour. */
+     up"), so it must not pick up link underline/color. */
   text-decoration: none;
 }
 .mobile-menu-action:hover,
@@ -5561,7 +5573,13 @@ html[data-playground-theme="dark"] {
   display: flex;
   flex-direction: column;
 }
+/* Run cells keep their natural height. `.output-body` is a column flex
+   container with `flex: 1 1 0`, so its children default to `flex-shrink: 1`
+   and are squashed to fit before the pane will scroll. See the note on
+   `.dataframe-wrap` above: squashing plus a cell that scrolls is what turns
+   one tall output into a column of stubs. */
 .run-cell {
+  flex: none;
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid var(--border);

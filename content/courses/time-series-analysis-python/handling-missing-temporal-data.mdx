@@ -203,6 +203,20 @@ flowchart LR
     Q -->|"PAST and FUTURE values"| IN["interpolate -- leaks the future"]
 ```
 
+Seeing all four drawn across the same gap makes the asymmetry concrete. A
+fourth option gets included here because people reach for it constantly:
+filling with the series mean, which quietly reads *every* value in the
+series, including all the ones that hadn't happened yet.
+
+<Chart slug="fill-strategies-that-peek" />
+
+Notice which question the picture is *not* answering. It says nothing about
+which fill is closest to the truth, and on data like this interpolation
+would win that contest comfortably. That is exactly what makes it dangerous:
+it is the accurate answer that a model in production could never have
+computed, so it flatters your validation score and vanishes when the model
+goes live.
+
 <Callout type="danger" title="bfill and interpolation are future-aware">
 For *historical analysis and charting*, interpolation and back-fill are
 perfectly fine, the whole series already exists, so using both neighbors

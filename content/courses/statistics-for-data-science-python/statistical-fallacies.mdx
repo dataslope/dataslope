@@ -258,6 +258,29 @@ which would have killed every false positive in the simulation above.
 It's conservative, but it's a safe default.
 </Callout>
 
+There is a subtler version of this that no correction can reach, because the
+tests it involves were never run. Gelman and Loken named it the garden of
+forking paths.
+
+<Chart slug="forking-paths" />
+
+It needed a new name because it is not p-hacking. Nobody ran thirty-two tests
+and kept one. The analyst ran *one* test, having made five reasonable choices
+on the way, any of which they might have made differently had the data looked
+different. The multiplicity lives in the analyses that were never run, which
+is why it appears nowhere in the notebook and cannot be corrected for
+afterwards.
+
+The branches here are keep or trim the outliers, raw outcome or log, include
+the covariate or not, drop the warm-up week or not, and median split or the
+pre-registered cut. Each has a 5% chance on its own when the null is true, so
+the chance that *at least one* path you might have taken reaches significance
+sits far above 5%, and well below the 81% that treating the 32 as independent
+tests would predict, because they share most of their data. The only real
+defences are structural: pre-register, so the path is fixed before the data is
+seen, or report the whole tree, which is what a multiverse or
+specification-curve analysis does.
+
 ## Base-rate neglect
 
 **What it is.** Ignoring how *rare* something is when interpreting a
@@ -511,6 +534,49 @@ always the same, decide first, then look, then **confirm on fresh
 data**. That discipline is the heart of *Exploratory Statistical
 Analysis*.
 </Callout>
+
+## Selection that manufactures a relationship
+
+Not every spurious relationship comes from a lurking third variable. Some are
+manufactured by the rule that decided who is in the dataset at all.
+
+<Chart slug="berksons-paradox" />
+
+Keep this separate from confounding, because the fixes point opposite ways. A
+confounder is a common cause and adding it to the model helps. This is caused
+by conditioning on a common *effect*, and adding the selection variable makes
+it worse.
+
+Nothing happened to anybody. The rule adds the two scores and takes everyone
+above a bar, and among those admitted a weak interview implies strong ability,
+because otherwise they would not have cleared it. Cutting one corner off a
+round cloud leaves a diagonal band. That is Berkson's paradox, and it is why
+"among our customers", "among hospital patients", "among people who replied"
+and "among successful startups" should all prompt the question of what got
+somebody into the data. The classic medical case is two unrelated diseases
+appearing correlated among inpatients, because having either one is a reason
+to be admitted.
+
+## The unit of analysis
+
+A correlation is a statement about a population of *somethings*, and changing
+what the something is can change the answer completely.
+
+<Chart slug="ecological-fallacy" />
+
+That is not Simpson's paradox, and the difference matters. Simpson's is a
+reversal: one unit of analysis, opposite signs depending on whether you
+condition. Nothing reverses here. The two correlations describe different
+populations, districts and people, and neither is wrong. Name the unit before
+quoting a correlation.
+
+Both numbers are true of the same data. District means differ for reasons
+unconnected to the individual relationship: a district can be rich and
+high-turnout because it is older, or because a local campaign has been running
+for years, and either puts a correlation between the two averages without
+moving one person's turnout with their own income. So "districts with higher
+average income have higher turnout" is not evidence for "richer people vote
+more".
 
 ## Trusting a summary without looking
 

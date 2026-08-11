@@ -26,7 +26,7 @@
  *
  * The note is optional and has no default. A chart has no single failure mode
  * anyway — a label collides, a caption asserts a number the data does not
- * support, a colour dies in dark mode, a mark silently fails to render — so
+ * support, a color dies in dark mode, a mark silently fails to render — so
  * there was never one sentence worth substituting for a blank. Marking with
  * nothing typed means flagged, no reason given.
  */

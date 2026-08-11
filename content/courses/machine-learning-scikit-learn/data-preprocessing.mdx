@@ -59,6 +59,25 @@ so that no single feature dominates purely because it happens to be
 measured in large numbers.
 </Callout>
 
+A related problem is worth meeting alongside it, because it also lives in the
+feature column and also has no diagnostic:
+
+<Chart slug="regression-dilution" />
+
+Noise in y costs precision and biases nothing. Noise in *x* biases the slope
+towards zero, systematically, and more rows do not help. Fixes exist and all
+of them need extra information: repeated measurements, an instrumental
+variable, or an errors-in-variables model.
+
+The mechanism is one line: least squares divides the covariance of x and y by
+the variance of x, and adding independent noise to x leaves the covariance
+alone while inflating the denominator. The dangerous part is what the
+diagnostics do. R-squared falls, which you would notice, and the residuals get
+*more* evenly spread, because the added noise is homoscedastic by
+construction, so the residual plot looks better rather than worse. This shows
+up wherever a predictor is a proxy: self-reported intake, a survey score, a
+single blood-pressure reading, a noisy sensor.
+
 ## StandardScaler: turning features into z-scores
 
 The workhorse of scaling is `StandardScaler`. For each feature (each

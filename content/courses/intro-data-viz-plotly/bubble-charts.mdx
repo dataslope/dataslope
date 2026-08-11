@@ -160,6 +160,27 @@ Two arguments make the animation work:
 A handful of `range_x` / `range_y` arguments keep the axes fixed
 across frames, so the eye reads change without re-anchoring.
 
+Worth separating the *technique* from the *finding*. Rosling's claim was
+that the world stopped being two worlds: the split into rich long-lived
+countries and poor short-lived ones, which the vocabulary of the 1960s
+treated as permanent, closed. An animation is a poor way to check that
+claim, because you cannot look at the first frame and the last one at the
+same time. Standing still, it looks like this:
+
+<Chart slug="rosling-two-clusters-to-one" />
+
+Each bar runs from a country's 1960 value to its 2010 one, and the rows are
+sorted by where each started. If the split were permanent, the bars would be
+roughly equal and the order at the right would match the order at the left.
+Neither holds. The two countries that barely move, South Africa and Russia,
+are visible without being pointed at, which is the test of whether a chart is
+being honest with you; each has its own reasons and its own chart.
+
+The motion in the original does real work, holding a country's identity fixed
+while time changes so you watch it move instead of comparing two pictures. It
+also makes the claim hard to check, which is why both ends sit on one line
+here.
+
 ## When animation goes wrong
 
 The same six frames laid out at once, which is what the animation was
@@ -192,6 +213,24 @@ A bubble chart fails when:
 />
 
 In those cases, prefer color or a different encoding.
+
+One failure mode is worth seeing on its own, because unlike most it makes no
+noise at all:
+
+<Chart slug="bubble-overlap-hides-points" />
+
+An overplotted scatter looks like a blob and a truncated axis has numbers on
+it, but a bubble chart that has lost nine of its points looks exactly like a
+bubble chart of the points it has left. Transparency and an outline cost
+nothing and fix it.
+
+The two fixes do different jobs. Transparency turns overlap into density, so
+where discs pile up the fill darkens, which is information rather than an
+accident. An outline preserves each disc's boundary, so a small bubble inside
+a large one stays a countable object. Two more habits when the crowding is
+bad: paint the largest discs first so the small ones end up on top, and cap
+the maximum radius, because past a certain size area stops being a comparison
+anyone can make and becomes territory that hides whatever is behind it.
 
 ## Check your understanding
 

@@ -1,5 +1,5 @@
 /**
- * The three families of colour scale, each shown on the data it fits and on
+ * The three families of color scale, each shown on the data it fits and on
  * data it does not, so the choice reads as a claim about the numbers.
  *
  * A palette is not a decoration, it is an assertion about the structure of the
@@ -14,7 +14,7 @@
  * to find out that green comes after orange, which is exactly the work the
  * ramp was supposed to do. Signed values on a sequential ramp lose the sign:
  * zero lands somewhere arbitrary in the middle of the ramp, a small surplus
- * and a small deficit get near-identical colours, and the one thing every
+ * and a small deficit get near-identical colors, and the one thing every
  * reader wants from a variance chart, who is above and who is below, is gone.
  */
 import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
@@ -71,7 +71,7 @@ const labels = ROWS.map((r, y) => ({ row: r.key, y, note: r.note }));
 const wrongNotes = ROWS.map((r, y) => ({ row: r.key, y, note: r.wrongNote }));
 
 export const caption =
-  'A palette is not decoration, it is an assertion about the structure of the variable. A sequential ramp says "these are ordered and darker is more". A diverging ramp says "there is a meaningful middle and the two sides mean opposite things". A qualitative palette says "these have no order at all". Choose the wrong one and the chart makes a claim the data will not support, before anyone has read a label. Both failures look tidy, which is why they survive review: ordered values in a qualitative palette force the reader to the legend to learn that green comes after orange, which is the work the ramp existed to do, and signed values on a sequential ramp put zero at an arbitrary point in the middle, so a small surplus and a small deficit get nearly the same colour and the only question anyone asks of a variance chart is unanswerable.';
+  'A palette is not decoration, it is an assertion about the structure of the variable. A sequential ramp says "these are ordered and darker is more". A diverging ramp says "there is a meaningful middle and the two sides mean opposite things". A qualitative palette says "these have no order at all". Choose the wrong one and the chart makes a claim the data will not support, before anyone has read a label. Both failures look tidy, which is why they survive review: ordered values in a qualitative palette force the reader to the legend to learn that green comes after orange, which is the work the ramp existed to do, and signed values on a sequential ramp put zero at an arbitrary point in the middle, so a small surplus and a small deficit get nearly the same color and the only question anyone asks of a variance chart is unanswerable.';
 
 export function render() {
   return plot({

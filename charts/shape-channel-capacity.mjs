@@ -3,7 +3,7 @@
  * which the shape channel stops working.
  *
  * Shape is a genuinely useful categorical channel: it survives greyscale
- * printing, it survives colour vision deficiency, and it survives a marker
+ * printing, it survives color vision deficiency, and it survives a marker
  * small enough that hue is hard to judge. What it does not survive is a long
  * list. Shape is *nominal only* (no shape is bigger than another) and it has
  * almost no capacity: three or four values read at a glance, five is work, and
@@ -74,7 +74,7 @@ const RANGE = DOMAIN.map((key, i) =>
   i < SPECIES.length ? SYMBOLS[i] : SYMBOLS[(i - SPECIES.length) % SYMBOLS.length],
 );
 
-export const caption = `Identical points, two encodings. Shape is a real categorical channel: it survives greyscale printing, colour vision deficiency, and markers too small for hue to be judged. What it does not survive is a long list. Shape is nominal only, no shape is larger than another, and its capacity is roughly three or four values at a glance, five as work, and after that the reader is doing a legend lookup per point. The left panel is grouped by species; the right is the same chart after someone asked to split by site as well, which turns ${SPECIES.length} shapes into ${PAIRS.length} and destroys the chart while appearing to add information. The answer is almost never a bigger symbol palette. It is faceting: give each of the seven groups a small panel of its own and the shape channel is free again.`;
+export const caption = `Identical points, two encodings. Shape is a real categorical channel: it survives greyscale printing, color vision deficiency, and markers too small for hue to be judged. What it does not survive is a long list. Shape is nominal only, no shape is larger than another, and its capacity is roughly three or four values at a glance, five as work, and after that the reader is doing a legend lookup per point. The left panel is grouped by species; the right is the same chart after someone asked to split by site as well, which turns ${SPECIES.length} shapes into ${PAIRS.length} and destroys the chart while appearing to add information. The answer is almost never a bigger symbol palette. It is faceting: give each of the seven groups a small panel of its own and the shape channel is free again.`;
 
 export function render() {
   return plot({

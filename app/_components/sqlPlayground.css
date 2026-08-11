@@ -1460,7 +1460,7 @@
 /* ─── SQL playground tab bar (uses generic .playground-tab classes via TabBar) ─── */
 /* When the generic TabBar is rendered with className="sql-tabbar" the
    playground-tab DOM is reused unchanged; these rules layer SQL-specific
-   colour/cursor cues over the kind-aware classes. */
+   color/cursor cues over the kind-aware classes. */
 .sql-tabbar .playground-tab {
   cursor: grab;
 }
@@ -2932,7 +2932,7 @@
   transition: color 120ms ease;
 }
 
-/* Active sort chevron inherits the column-name text colour */
+/* Active sort chevron inherits the column-name text color */
 .sql-result-th-chevron-active {
   color: var(--text);
 }

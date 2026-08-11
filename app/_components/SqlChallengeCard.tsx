@@ -1046,7 +1046,7 @@ export default function SqlChallengeCard({
     },
   });
 
-  // Sync the CodeMirror theme whenever the docs colour scheme toggles
+  // Sync the CodeMirror theme whenever the docs color scheme toggles
   // (Fumadocs dark/light toggle or OS preference change).
   useEffect(() => {
     const reconfigure = (view: EditorView | null, comp: Compartment | null) => {

@@ -2,30 +2,30 @@
  * Pre-attentive processing: the difference between a channel you *see* and one
  * you have to *search*.
  *
- * Three panels, the same forty marks, one target in each. Colour and size are
+ * Three panels, the same forty marks, one target in each. Color and size are
  * pre-attentive, so the odd mark arrives before you have decided to look for
  * it and the time to find it does not depend on how many distractors there
  * are. Shape is not: the last panel has to be scanned item by item, and adding
  * marks would make it slower.
  *
- * This is the mechanism under the whole "use colour for the one thing that
+ * This is the mechanism under the whole "use color for the one thing that
  * matters" rule. A channel that pops out can carry an alert; a channel that
  * has to be searched cannot, however carefully it is labelled.
  */
 import { Plot, plot, linspace, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
-  "Three grids of forty marks, each hiding one odd mark. In the first the target is a different colour and in the second a different size, and both jump out immediately. In the third the target differs only in shape, and has to be searched for.";
+  "Three grids of forty marks, each hiding one odd mark. In the first the target is a different color and in the second a different size, and both jump out immediately. In the third the target differs only in shape, and has to be searched for.";
 
 export const caption =
-  "One odd mark in each grid. Colour and size are pre-attentive: the target arrives before you look for it, however many distractors there are. Shape is not, so the third panel has to be scanned. That is why colour is reserved for the one thing that matters.";
+  "One odd mark in each grid. Color and size are pre-attentive: the target arrives before you look for it, however many distractors there are. Shape is not, so the third panel has to be scanned. That is why color is reserved for the one thing that matters.";
 
 const COLS = 8;
 const ROWS = 5;
 const TARGET = 27; // same slot in all three, so the panels differ only in channel
 
 const PANELS = [
-  { key: "Colour: pops out", channel: "colour" },
+  { key: "Color: pops out", channel: "color" },
   { key: "Size: pops out", channel: "size" },
   { key: "Shape: you have to search", channel: "shape" },
 ];
@@ -39,7 +39,7 @@ const marks = PANELS.flatMap((p) =>
       x: i % COLS,
       y: Math.floor(i / COLS),
       odd,
-      fill: p.channel === "colour" && odd ? ACCENT : PRIMARY,
+      fill: p.channel === "color" && odd ? ACCENT : PRIMARY,
       r: p.channel === "size" && odd ? 9.5 : 5,
       symbol: p.channel === "shape" && odd ? "square" : "circle",
     };

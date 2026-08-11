@@ -47,14 +47,16 @@ export function render() {
       labelAnchor: "center",
       domain: [1, 1e6],
       ticks: [1, 100, 1e4, 1e6],
-      tickFormat: (d) => (d === 1 ? "1" : `1e${Math.round(Math.log10(d))}`),
+      tickFormat: (d) =>
+        d >= 1e9 ? `${d / 1e9}B` : d >= 1e6 ? `${d / 1e6}M` : d >= 1e3 ? `${d / 1e3}k` : String(d),
     },
     y: {
       type: "log",
       label: "Comparisons for one lookup",
       domain: [1, 1e6],
       ticks: [1, 10, 1e3, 1e5],
-      tickFormat: (d) => (d < 100 ? String(d) : `1e${Math.round(Math.log10(d))}`),
+      tickFormat: (d) =>
+        d >= 1e9 ? `${d / 1e9}B` : d >= 1e6 ? `${d / 1e6}M` : d >= 1e3 ? `${d / 1e3}k` : String(d),
     },
     color: {
       domain: ["Balanced (AVL, red-black)", "Degenerate (sorted inserts)"],

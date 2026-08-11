@@ -78,6 +78,42 @@ on the cropped axis:
 
 <Chart slug="bar-truncation-cropped" />
 
+Two more that need no false numbers at all. The first inverts an axis:
+
+<Chart slug="inverted-y-axis" />
+
+Up is more. That is not a convention you can opt out of by labelling the axis,
+because a reader takes the shape first and checks the axis later, if ever. Any
+chart that needs its caption to undo the impression its shape just made has
+already lost.
+
+A version of this was broadcast in 2014 about Florida's firearm homicides, and
+the argument that followed is a good test of what "misleading" means, because
+nothing on the chart is false: the axis is labelled, the numbers are right,
+and the designer's stated intention, a fill that reads as pooling blood with
+the baseline at the top, is a real design idea rather than a trick. The same
+holds, more weakly, for every other convention a chart can invert: time
+running right to left, red on the good side of a diverging scale, small
+meaning more. None of them is false, and all of them cost a correction the
+reader will not always make.
+
+The second is usually an accident rather than a trick, which makes it more
+common:
+
+<Chart slug="uneven-axis-spacing" />
+
+After any `groupby`, `pivot` or `value_counts`, check whether the index you got
+back is a number pretending to be a label.
+
+The distortion has a direction worth knowing. Even spacing stretches wherever
+the real values are dense and squashes wherever they are sparse, so the
+crowded low doses get more of the drawing than they have earned and the long
+empty stretch from 10 to 50 gets less. Stretch the climbing part and compress
+the flat part and a curve that obviously saturates becomes a line that
+obviously does not, which is the difference between "we have found the useful
+dose" and "keep increasing it". Nothing looks wrong, because both axes carry
+the right five numbers in the right order.
+
 ### 2. Cherry-picked time ranges
 
 Show only the months that support your story; omit the months that
@@ -179,7 +215,7 @@ no decorative borders. The data carries the chart.
 A great chart can fail *not because it's wrong* but because parts
 of the audience cannot perceive it. The cheapest fix is also the one that
 doesn't depend on the reader at all: put the name where the line is, so
-nobody has to match a colour to a swatch.
+nobody has to match a color to a swatch.
 
 <Chart slug="direct-labels-beat-a-legend" />
 

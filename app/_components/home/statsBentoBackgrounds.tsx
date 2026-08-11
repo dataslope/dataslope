@@ -7,7 +7,7 @@
  * stat that card reports:
  *
  *  1. Runnable code blocks → the brand "diamond assemble + quarter-turn"
- *     loader, large and pinned to the right, recoloured black/white.
+ *     loader, large and pinned to the right, recolored black/white.
  *  2. Code challenges → a recreation of the challenge cards' test-results
  *     rail that cycles from a mixed pass/fail run to an all-green run.
  *  3. Interview prep → Magic UI's typing animation cycling through roles and
@@ -63,7 +63,7 @@ function usePrefersReducedMotion(): boolean {
 export function DiamondBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 flex items-start justify-end overflow-hidden pr-3 pt-3 [mask-image:linear-gradient(to_bottom_left,#000_38%,transparent_85%)]">
-      {/* The loader draws with currentColor; recolour the SVG to black in
+      {/* The loader draws with currentColor; recolor the SVG to black in
           light mode and white in dark mode (overriding its brand-blue tint). */}
       <div className="opacity-90 transition-transform duration-300 ease-out group-hover:scale-105">
         <DiamondAssembleTurnLoader

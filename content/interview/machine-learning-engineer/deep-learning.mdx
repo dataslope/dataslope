@@ -86,7 +86,9 @@ forward pass caches intermediate activations; the backward pass propagates
 $\frac{\partial L}{\partial \cdot}$ from the output layer to the input,
 reusing each layer's local derivative:
 
-$$\frac{\partial L}{\partial w^{(l)}} = \frac{\partial L}{\partial a^{(l)}} \cdot \frac{\partial a^{(l)}}{\partial z^{(l)}} \cdot \frac{\partial z^{(l)}}{\partial w^{(l)}}$$
+$$
+\frac{\partial L}{\partial w^{(l)}} = \frac{\partial L}{\partial a^{(l)}} \cdot \frac{\partial a^{(l)}}{\partial z^{(l)}} \cdot \frac{\partial z^{(l)}}{\partial w^{(l)}}
+$$
 
 It's just the chain rule applied systematically, and it costs about the
 same as one forward pass, which is why training deep nets is feasible.
@@ -100,9 +102,13 @@ parameter's step by a running average of squared gradients, adapting the
 learning rate per parameter. **Adam** combines both, a first-moment
 (momentum) and second-moment (RMSProp) estimate with bias correction:
 
-$$m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t, \qquad v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2$$
+$$
+m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t, \qquad v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2
+$$
 
-$$\theta_t = \theta_{t-1} - \eta \, \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$$
+$$
+\theta_t = \theta_{t-1} - \eta \, \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
+$$
 
 Adam is the common default; well-tuned SGD with momentum often generalizes
 slightly better on vision tasks.
@@ -156,7 +162,9 @@ uses running averages). **Layer norm** normalizes across the features of a
 **single** example instead, so it's batch-size-independent, which is why
 transformers use it.
 
-$$\hat{x} = \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}}, \qquad y = \gamma \hat{x} + \beta$$
+$$
+\hat{x} = \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}}, \qquad y = \gamma \hat{x} + \beta
+$$
 
 ### How does a convolutional neural network (CNN) work?
 
@@ -220,7 +228,9 @@ the attention weight between two tokens is the scaled dot product of their
 query and key, softmax-normalized, and the output is the weighted sum of
 values:
 
-$$\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+$$
 
 The $\sqrt{d_k}$ scaling keeps the dot products from growing large and
 pushing softmax into saturation. Unlike an RNN, every pair of positions is

@@ -30,7 +30,7 @@ Seaborn matches three palette families to three kinds of data:
 
 <Figure
   slug="sns-color-palettes-three-palette-types-inline-cutout"
-  alt="Three swatch strips, one grading in one ink, one grading between two, one of distinct colours"
+  alt="Three swatch strips, one grading in one ink, one grading between two, one of distinct colors"
   caption="Sequential grades one hue, diverging runs through a pale middle, qualitative jumps."
 />
 
@@ -84,6 +84,21 @@ Coloring unordered categories with a *sequential* palette (a light-to-dark
 ramp) implies an order that isn't there, the reader will assume the dark
 category is "more" than the light one. Keep gradients for genuine amounts.
 </Callout>
+
+The failure this prevents is worth seeing, because the wrong palette does not
+just look odd, it makes a claim:
+
+<Chart slug="sequential-scale-on-categories" />
+
+The effect is not subtle, because the eye reads light-to-dark as low-to-high,
+that being what lightness is for, so the chart asserts a ranking that is not
+in the data, in a channel readers trust without checking. Worse, the ranking
+it asserts is the alphabetical order the groupby happened to return. The rule
+is a short table: nominal data takes a qualitative palette, ordinal data takes
+a sequential one, and data with a meaningful middle takes a diverging one.
+
+Picking the palette *family* is the decision. Picking which pretty colors go in
+it is not.
 
 ## Sequential: a ramp for amounts
 
@@ -159,7 +174,7 @@ because the palette has a center.
 
 <Figure
   slug="sns-color-palettes-inline-cutout"
-  alt="Three strips of swatches, one running pale to deep in one hue, one running between two hues, one of separate distinct colours"
+  alt="Three strips of swatches, one running pale to deep in one hue, one running between two hues, one of separate distinct colors"
   caption="Pick the palette family from what the numbers mean, not from taste."
 />
 

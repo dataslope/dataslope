@@ -70,7 +70,7 @@ const BentoCard = ({
       {...props}
     >
       <div>{background}</div>
-      {/* Page-coloured scrim so the animated background reads softly behind the
+      {/* Page-colored scrim so the animated background reads softly behind the
           card copy (white in light mode, #121212 in dark). */}
       <div className="pointer-events-none absolute inset-0 bg-white/60 dark:bg-[#121212]/60" />
       {/* `relative z-10` lifts the copy (and CTA) above the absolute scrim and
@@ -85,7 +85,7 @@ const BentoCard = ({
               iconClassName,
             )}
           />
-          {/* Icon, heading, and paragraph all share the body font colour. */}
+          {/* Icon, heading, and paragraph all share the body font color. */}
           <h3 className="text-xl font-semibold text-[var(--ds-gray-900)] dark:text-white">
             {name}
           </h3>

@@ -2,17 +2,17 @@
  * The same five series twice: once needing a legend round-trip to read, once
  * labelled where the lines actually are.
  *
- * A legend asks the reader to hold a colour in working memory, travel to a
+ * A legend asks the reader to hold a color in working memory, travel to a
  * swatch, match it, and travel back, once per series, every time they look. The
  * cost is invisible to whoever made the chart, because they already know which
- * line is which. It is not invisible to anyone whose colour discrimination is
+ * line is which. It is not invisible to anyone whose color discrimination is
  * worse than the author's, which is roughly one man in twelve, and it is not
  * invisible on a projector, a phone, or a printout.
  *
  * The fix is not a better palette. Palette work makes the swatches easier to
  * match; direct labelling deletes the matching step, and it keeps working when
- * the colours fail completely. That is why this belongs in an accessibility
- * section rather than a colour one: it is the mitigation that does not depend
+ * the colors fail completely. That is why this belongs in an accessibility
+ * section rather than a color one: it is the mitigation that does not depend
  * on the reader's vision at all.
  *
  * The two panels are faceted rather than drawn as two charts because they are
@@ -21,14 +21,14 @@
  * nothing else can differ.
  *
  * The left panel deliberately keeps the house palette rather than a
- * deliberately-bad one. The point is not that these colours are hard to tell
+ * deliberately-bad one. The point is not that these colors are hard to tell
  * apart, it is that *any* legend costs a round-trip, and stacking the deck
  * would let a reader conclude the fix is a nicer palette.
  */
 import { Plot, plot, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
-  "The same five-line chart drawn twice side by side. On the left the lines are told apart only by a colour legend sitting off to one side; on the right each line carries its name at its right-hand end, and no legend is needed.";
+  "The same five-line chart drawn twice side by side. On the left the lines are told apart only by a color legend sitting off to one side; on the right each line carries its name at its right-hand end, and no legend is needed.";
 
 const CHANNELS = [
   { key: "Organic", color: SERIES[0], start: 32, growth: 1.9 },
@@ -83,7 +83,7 @@ const LEGEND = CHANNELS.map((c, ci) => ({
   y: 58,
 }));
 
-export const caption = `Both panels plot the same five series. The left one can only be read by matching a colour to a swatch and carrying it back to the line, once per series, every time. The right one puts the name where the line ends, so the reading is over as soon as the eye lands. Direct labelling is the accessibility fix that does not depend on the reader: a better palette makes the swatches easier to match, but a label removes the match entirely, and it survives a projector, a greyscale printout, and colour vision the author does not share. Use the legend only when a series has nowhere to put a label.`;
+export const caption = `Both panels plot the same five series. The left one can only be read by matching a color to a swatch and carrying it back to the line, once per series, every time. The right one puts the name where the line ends, so the reading is over as soon as the eye lands. Direct labelling is the accessibility fix that does not depend on the reader: a better palette makes the swatches easier to match, but a label removes the match entirely, and it survives a projector, a greyscale printout, and color vision the author does not share. Use the legend only when a series has nowhere to put a label.`;
 
 export function render() {
   return plot({

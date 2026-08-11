@@ -101,6 +101,29 @@ Read the call out loud:
 The function call *is* the chart specification. There is nothing
 hidden.
 
+The idea that a chart *has* a specification, that its marks are a language
+with rules rather than a matter of taste, is Jacques Bertin's. His 1967
+*Sémiologie graphique* asks four questions of every visual channel, and none
+of them is about what looks nice. *Selective*: can the eye grab all the marks of one value at once, without
+scanning? *Associative*: can the variable be ignored, so that groups defined
+some other way still read as groups across it? *Ordered*: does a reader know
+which value means more without being told? *Quantitative*: can they say how
+much more?
+
+<Chart slug="bertin-1967-variables" />
+
+Read down the *Quantitative* column. Exactly one channel lets a reader say
+how much more, which is why almost every serious chart spends its position
+and length on the thing that matters most. Read down *Ordered* and you have
+the reason a rainbow scale on a continuous quantity is a mistake and not a
+preference: hue has no order for a reader to consult.
+
+The last column is the interesting one historically. Cleveland and McGill
+measured, in a laboratory in 1984, how accurately people actually read each
+encoding, and they largely agree with a man who worked it out at a drawing
+board in 1967. Where they differ it is about orientation, which Bertin rated
+more generously than the experiments did.
+
 ## Which channel is right for which kind of data?
 
 Data comes in several flavors, and they suit different channels:
@@ -139,7 +162,7 @@ one in the chart.** The reader's eye will go to it first.
 
 <Figure
   slug="viz-graphical-encodings-inline-cutout"
-  alt="The same four data blocks shown four times across the frame, once as bar heights, once as dot positions, once as sizes and once as colours"
+  alt="The same four data blocks shown four times across the frame, once as bar heights, once as dot positions, once as sizes and once as colors"
   caption="Whichever channel you choose decides how precisely the reader can compare."
 />
 
@@ -179,6 +202,44 @@ exaggerates every difference.
 - **Using `size` for a *negative* meaning** (bigger dot = worse).
   The eye reads "bigger" as "more important" by default; flipping
   this confuses readers.
+
+Two encodings that fail in specific, learnable ways. The first turns a count
+into a row of icons, which lets a reader count exactly, right up until the
+values stop being multiples of the unit:
+
+<Chart slug="pictogram-unit-rounding" />
+
+The form has a genuine advantage over a bar, which is that the reader can
+*count*, and counting is exact in a way that reading a length off an axis is
+not. Ten against six is unarguable and needs no axis at all. The advantage
+lasts exactly as long as the values are multiples of the unit, and there are
+only three ways out when they are not. Round, and the small groups take the
+damage, as above. Clip the last icon to a partial shape, and you are comparing
+areas again, which is what the counting was meant to replace; readers
+reliably read a half-width icon as somewhere between a third and a half. Or
+change the unit until everything divides, and the smallest group needs so many
+icons that the largest will not fit. Neurath knew all of this and designed
+around it, by choosing the unit so the values landed on it, which means the
+data has to suit the chart rather than the other way about.
+
+The second turns quantity into rectangle area, and the rectangles have
+different shapes:
+
+<Chart slug="treemap-area-precision" />
+
+The reason is not simply that people are bad at area. The four rectangles have
+four different aspect ratios, so comparing them means comparing a tall thin
+box with a short wide one, which is a judgement the eye has no procedure for:
+two equal areas look unequal whenever their shapes differ, and which way the
+error runs depends on which way each one is stretched. None of which makes
+treemaps useless. They do two things bars cannot, fitting several hundred
+categories into the space a bar chart gives to twenty, and showing hierarchy
+by nesting children inside their parent. Given three hundred products in nine
+families, a treemap answers "which family dominates, and is one product
+carrying it" and a bar chart does not fit on the page.
+
+Use a treemap for structure and scale, where the answer is one or two obviously
+large boxes, and not when the question is a ranking of similar values.
 
 ## A vocabulary check
 

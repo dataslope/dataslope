@@ -83,6 +83,23 @@ any pre-named exact point is zero. So we ask "within 1mm of here?"
 (an interval) instead.
 </Callout>
 
+The vertical axis is the first thing that goes wrong here. On a histogram of
+counts it means how many, on a probability mass function it means how likely,
+and on a density it means neither: a density is probability *per unit of x*,
+so its height carries units of one-over-x and can be any positive number.
+
+<Chart slug="density-is-area-not-height" />
+
+Use a density's height only for comparing one region with another, never for
+reading a probability off, and when you want a probability call the CDF twice
+and subtract.
+
+Halve that standard deviation again and the peak doubles again, because all
+the probability still has to come to one. It also explains the fact everybody
+meets once: the probability of an exact value is zero, because a region of
+zero width has zero area, and asking for the probability that X is exactly 2.5
+is asking for the area of a line.
+
 ## Uniform: every value equally likely
 
 The **Uniform** distribution spreads probability **evenly** over an
@@ -416,6 +433,15 @@ assert abs(d.cdf(cutoff) - 0.90) < 1e-6`,
     },
   ]}
 />
+
+<Chart slug="ppf-inverts-the-cdf" />
+
+Two details fall out of that reflection. The PPF is steep at the ends, which
+is the same fact as the CDF being flat there, and is why extreme quantiles are
+hard to estimate: the data is sparse exactly where the function is most
+sensitive. And a discrete CDF is a staircase with no true inverse, so every
+library takes "the smallest value whose CDF is at least p", which makes
+`ppf(cdf(x))` return x while `cdf(ppf(p))` usually overshoots.
 
 ## Reading a density plot correctly
 

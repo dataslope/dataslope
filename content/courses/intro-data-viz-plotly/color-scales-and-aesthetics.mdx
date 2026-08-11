@@ -28,7 +28,7 @@ which kind of data is 80% of the battle.
 Each family is a claim about the structure of the variable, so the wrong
 one makes a claim the data will not support:
 
-<Chart slug="colour-scale-families" />
+<Chart slug="color-scale-families" />
 
 ### Qualitative (categorical) palettes
 
@@ -153,7 +153,7 @@ neutral pivot, and the reader instantly sees positive vs negative.
 
 ## The Jet / rainbow trap, revisited
 
-Lightness is what makes a colour scale readable, and it is exactly what the
+Lightness is what makes a color scale readable, and it is exactly what the
 rainbow gets wrong. Watch what each of these does with it:
 
 <Chart slug="rainbow-vs-sequential" />
@@ -197,7 +197,7 @@ or labels.
 A palette spent on categories the axis already names emphasises
 everything, which is the same as emphasising nothing:
 
-<Chart slug="emphasis-one-colour" />
+<Chart slug="emphasis-one-color" />
 
 A common beginner habit: every chart series gets a different
 color, even when only one matters. The result is a noisy "Christmas
@@ -205,7 +205,7 @@ tree" chart.
 
 <Figure
   slug="viz-color-scales-and-aesthetics-three-families-color-inline-cutout"
-  alt="Three swatch strips, one running pale to deep in one ink, one running between two inks, one of separate distinct colours"
+  alt="Three swatch strips, one running pale to deep in one ink, one running between two inks, one of separate distinct colors"
   caption="Pick the family from what the numbers mean, not from what looks lively."
 />
 
@@ -255,6 +255,18 @@ provide *context* without competing for attention.
   used color carefully.
 - **Highlight, don't decorate**, if only one series matters,
   color only that one.
+
+One more, which only bites once a site has a dark mode: a palette is tied to
+the background it was chosen for. The charts on this page are drawn from
+seven color roles, and each role stores two values, one for white and one
+for near-black. Here is why that is not redundant work:
+
+<Chart slug="palette-on-dark-and-light" />
+
+Contrast against white is limited by how *dark* a color is, and contrast
+against black by how *light* it is, so a hue bright enough to glow on black
+is by construction too pale to sit on white. Brightening a palette for dark
+mode is not a reversible operation.
 
 ## Check your understanding
 

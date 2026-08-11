@@ -15,7 +15,7 @@
 import { Plot, plot, rng, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
-  "Twelve small multiples over twenty-four months, each showing one series in colour with all twelve ghosted behind it in grey. The grey tangle is unreadable; in the split panels one series is clearly falling while the rest drift upward.";
+  "Twelve small multiples over twenty-four months, each showing one series in color with all twelve ghosted behind it in grey. The grey tangle is unreadable; in the split panels one series is clearly falling while the rest drift upward.";
 
 export const caption =
   "The grey behind every panel is all twelve series drawn together, which is the tangle small multiples exist to undo. Splitting them costs the direct overlay and buys back the ability to read any single series, and to spot the one that is not behaving like the others.";

@@ -18,11 +18,24 @@
  * Animation also cannot be paused in a PDF, a screenshot, or a printed report,
  * and readers rarely replay. If the finding lives in the motion, it does not
  * survive the first time someone shares the chart.
+ *
+ * ── Why the axes are named ──────────────────────────────────────────────────
+ *
+ * The first version drew this with `x: { label: null, ticks: [] }` and a y axis
+ * labelled only "Outcome". Six panels of dots trailing sideways across nothing
+ * is not a chart a reader can enter: horizontal position was carrying half the
+ * information and there was no way to find out what it meant, so "the one that
+ * moves backwards" was a claim in the caption rather than something visible.
+ *
+ * Both axes now name a quantity and carry ticks, sparse ones, because a panel
+ * here is about a hundred pixels wide and a third tick would collide with its
+ * neighbours. The trails also moved from the blue guide token to the muted one:
+ * at guide blue they read as a fifth series rather than as history.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
-  "Six frames of an animated scatter shown side by side as small multiples, with the trail of each region drawn faintly, so the one region that moves backwards is visible in a single glance.";
+  "Six frames of an animated scatter of spend per customer against retention, shown side by side as small multiples, one panel per year from 2000 to 2020. Each region's path so far is drawn faintly behind it, and the one region whose retention falls while every other rises is visible in a single glance.";
 
 // Strings, not numbers: a numeric facet domain is formatted with a
 // thousands separator, so the panels come out labelled "2,000".
@@ -74,22 +87,30 @@ export function render() {
   return plot({
     height: 300,
     marginTop: 32,
-    marginLeft: 44,
+    marginLeft: 50,
     marginRight: 18,
-    marginBottom: 46,
+    marginBottom: 52,
     ariaLabel: title,
     fx: { label: null, domain: YEARS },
-    x: { label: null, domain: [5, 115], ticks: [] },
-    y: { label: "Outcome", domain: [10, 90], ticks: 3 },
+    // Two ticks, not three: a panel is about a hundred pixels wide here and a
+    // third label runs into the neighbouring panel's first one.
+    x: {
+      label: "Spend per customer (£)",
+      labelAnchor: "center",
+      domain: [5, 115],
+      ticks: [25, 75],
+    },
+    y: { label: "Retention (%)", domain: [10, 90], ticks: 3 },
     marks: [
       Plot.line(trails, {
         fx: "year",
         x: "x",
         y: "y",
         z: (d) => `${d.year}-${d.key}`,
-        stroke: (d) => (d.back ? ACCENT : GUIDE),
+        stroke: (d) => (d.back ? ACCENT : MUTED),
         strokeWidth: 1.1,
-        strokeOpacity: 0.55,
+        strokeOpacity: (d) => (d.back ? 0.55 : 0.4),
+        clip: true,
       }),
       Plot.dot(rows, {
         fx: "year",
@@ -98,6 +119,7 @@ export function render() {
         r: 4.6,
         fill: (d) => (d.back ? ACCENT : PRIMARY),
         fillOpacity: 0.85,
+        clip: true,
       }),
       Plot.text(
         rows.filter((d) => d.back && d.t === YEARS.length - 1),
@@ -114,10 +136,11 @@ export function render() {
           ...HALO,
         },
       ),
+      Plot.frame({ stroke: "currentColor", strokeOpacity: 0.09 }),
       Plot.text([{}], {
         fx: () => YEARS[0],
         frameAnchor: "bottom-left",
-        text: () => "one frame at a time is a memory test",
+        text: () => "in playback you see one of these at a time",
         fill: MUTED,
         fontSize: 10,
         fontWeight: 600,

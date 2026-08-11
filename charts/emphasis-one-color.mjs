@@ -1,8 +1,8 @@
 /**
- * Twelve bars in twelve colours, and the same twelve with one colour spent
+ * Twelve bars in twelve colors, and the same twelve with one color spent
  * where it does some work.
  *
- * Colour applied to a category the axis already names is colour spent on
+ * Color applied to a category the axis already names is color spent on
  * nothing. The labels are right there; the hues repeat the labels and add a
  * legend's worth of lookup on top. Worse, a full palette flattens the chart:
  * everything is emphasised, so nothing is, and the reader's eye has no reason
@@ -20,7 +20,7 @@
 import { Plot, plot, ACCENT, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
-  "The same twelve bars twice: once with a different colour per bar, which emphasises everything and so emphasises nothing, and once in grey with a single bar picked out in the accent colour.";
+  "The same twelve bars twice: once with a different color per bar, which emphasises everything and so emphasises nothing, and once in grey with a single bar picked out in the accent color.";
 
 const BARS = [
   { key: "Berlin", v: 58 },
@@ -39,8 +39,8 @@ const BARS = [
 
 const SUBJECT = "Paris";
 
-const RAINBOW = "A colour per category";
-const FOCUS = "One colour, spent on the point";
+const RAINBOW = "A color per category";
+const FOCUS = "One color, spent on the point";
 
 const rows = [RAINBOW, FOCUS].flatMap((panel) =>
   BARS.map((d, i) => ({ ...d, i, panel })),
@@ -50,7 +50,7 @@ const subject = BARS.find((d) => d.key === SUBJECT);
 const RUNNER = [...BARS].sort((a, b) => b.v - a.v)[1];
 const LEAD = Math.round(((subject.v - RUNNER.v) / RUNNER.v) * 100);
 
-export const caption = `Colour spent on a category the axis already names is colour spent on nothing: the labels are right there, the hues repeat them, and a legend's worth of lookup is added on top. It is worse than wasteful, because a full palette flattens the chart. Everything is emphasised, so nothing is, and the eye has no reason to land anywhere. The right panel spends the same ink differently, eleven bars in one quiet grey and one in the accent, and the chart now has a subject: ${SUBJECT}, ${LEAD} percent clear of ${RUNNER.key}. Nothing was hidden and no bar changed height. The rule generalises past bars: reach for a categorical palette when the categories are the message, and for grey plus one accent whenever the message is about a particular one of them.`;
+export const caption = `Color spent on a category the axis already names is color spent on nothing: the labels are right there, the hues repeat them, and a legend's worth of lookup is added on top. It is worse than wasteful, because a full palette flattens the chart. Everything is emphasised, so nothing is, and the eye has no reason to land anywhere. The right panel spends the same ink differently, eleven bars in one quiet grey and one in the accent, and the chart now has a subject: ${SUBJECT}, ${LEAD} percent clear of ${RUNNER.key}. Nothing was hidden and no bar changed height. The rule generalises past bars: reach for a categorical palette when the categories are the message, and for grey plus one accent whenever the message is about a particular one of them.`;
 
 export function render() {
   return plot({

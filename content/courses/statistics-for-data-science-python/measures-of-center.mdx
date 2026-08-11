@@ -18,7 +18,7 @@ center you're actually asking for, and when each one quietly lies.
 
 <Figure
   slug="stat-measures-of-center-cutout"
-  alt="A skewed mound of blocks on a platform with three differently coloured marker pins standing at three different positions"
+  alt="A skewed mound of blocks on a platform with three differently colored marker pins standing at three different positions"
 />
 
 ## The three centers, and what each one means
@@ -205,6 +205,21 @@ mention the mean only with context. Showing both is often the most
 honest move.
 </Callout>
 
+One trap belongs here rather than anywhere else, because it is the commonest
+arithmetic error in any spreadsheet:
+
+<Chart slug="average-of-averages" />
+
+The quickest way to remember which calculation you want: if grouping first and
+not grouping at all give different answers, you have made this mistake.
+
+The right calculation is the weighted mean, with the group sizes as weights,
+and it is identical to ignoring the groups and averaging the raw rows. It
+generalizes past means, too: averaging five conversion rates, five percentage
+changes, five medians or five R-squareds does not commute with grouping
+either. A rate is a ratio, and ratios combine by adding numerators and adding
+denominators, never by averaging the ratios.
+
 ## Three useful variations (keep these light)
 
 Most of the time, mean/median/mode are all you need. But three relatives
@@ -280,6 +295,22 @@ investment returns, population growth, "our traffic grew 3x then
 typical growth. For plain additive quantities (heights, temperatures,
 dollars), stick with the arithmetic mean or median.
 </Callout>
+
+One last variation, worth knowing exists even if you never fit one by hand.
+Everything above summarizes a single column. As soon as the center depends on
+something else, "typical pay *for a given amount of experience*", the same
+mean-versus-median choice comes back, and the tool that keeps the median is
+**quantile regression**. Fit it at several quantiles at once and you get a
+picture no single line can give you:
+
+<Chart slug="quantile-vs-mean-regression" />
+
+Two familiar ideas are visible there at the same time. The dashed mean line
+sits above the median line for exactly the reason it did in the income example
+above, a long right tail drags the average and leaves the middle alone. And
+the fan tells you something a center never can: the spread itself changes
+across the range, so "the typical value" and "how much values vary around it"
+are two different questions about every slice of the data.
 
 ## Putting it together: a robust center summary
 

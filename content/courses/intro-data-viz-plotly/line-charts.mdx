@@ -23,6 +23,12 @@ Use a line chart when:
 - You have **multiple series** to compare over the same axis (one
   line per group).
 
+<Figure
+  slug="viz-line-charts-use-line-chart-inline-cutout"
+  alt="A continuous ribbon rising and dipping across a board over evenly spaced sleepers"
+  caption="Lines are for a continuous run, most often time along the horizontal axis."
+/>
+
 Never use a line chart when the x-axis is a set of *unordered
 categories* like "Apple, Banana, Cherry." Lines drawn between them
 imply a relationship that isn't there.
@@ -60,6 +66,38 @@ fig.show()
 That's the simplest possible line chart: one x, one y, one line.
 Hover over the line, you'll see Plotly's tooltip pop up showing
 exact dates and values.
+
+Two things go wrong often enough at this stage to be worth meeting early. The
+first is what to do when one value dwarfs the rest, which is the most common
+awkward dataset there is:
+
+<Chart slug="axis-break-vs-log" />
+
+A broken axis is a respectable old device, but only with a visible break
+marker, and most defaults will not draw you one. Without it the chart looks
+linear and reads logarithmic, which is the worst of both.
+
+The first panel is not dishonest so much as useless, since the other twelve
+values are hairlines and you cannot tell whether they differ. The middle one
+is the one to watch: it looks like the first and reads like the third. A
+reader who misses an invisible break compares bars by length, which is exactly
+what bars are for.
+
+The second is what happens when your x-axis has only *two* points. Before and
+after, last year and this year, control and treatment:
+
+<Chart slug="slope-graph-two-points" />
+
+The bars answer "how big is each?" and the slopegraph answers "who overtook
+whom?", and the second question is usually the one people actually have. This
+is the general move worth learning: a chart's job is to turn the reader's
+question into a shape, and a rank change is a crossing.
+
+On the bars, "who overtook whom" is eight separate comparisons held in memory
+one at a time. On the slopegraph it is a crossing, convergence is a narrowing,
+and a runaway is a line leaving the bundle. What you give up is the zero
+baseline, so absolute size gets harder to read, and both ends have to be
+labelled or nobody knows which is which.
 
 ## Multiple series with `color`
 
@@ -142,6 +180,12 @@ The markers help when:
 - The reader needs to know *which* are the measured points.
 - The chart will be exported as a static PNG.
 
+<Figure
+  slug="viz-line-charts-inline-cutout"
+  alt="A continuous ribbon rising and dipping across a board, with small markers pinned at each measured point along it"
+  caption="Markers pin the line back to the measurements. Everything between two markers is the chart's guess about what happened in between."
+/>
+
 If you have **dense** data (thousands of points), omit markers,
 they'll just clutter the line.
 
@@ -154,12 +198,6 @@ all. Leave the overlay alone and change what is loud:
 
 A common failure mode is the **spaghetti chart**, twenty or more
 overlapping lines that no one can read.
-
-<Figure
-  slug="viz-line-charts-inline-cutout"
-  alt="A continuous ribbon rising and dipping across a board, with small markers pinned at each measured point along it"
-  caption="A line implies the points are connected in order, so the order has to be real."
-/>
 
 <CodeBlock
   adapter="python"
@@ -207,11 +245,22 @@ When values span many orders of magnitude (e.g., country GDPs,
 COVID case counts), a **log scale** for y reveals structure that a
 linear scale flattens out.
 
-<Figure
-  slug="viz-line-charts-use-line-chart-inline-cutout"
-  alt="A continuous ribbon rising and dipping across a board over evenly spaced sleepers"
-  caption="Lines are for a continuous run, most often time along the horizontal axis."
-/>
+It also carries one obligation, which is easy to forget because the chart
+looks fine without it:
+
+<Chart slug="log-axis-must-be-labelled" />
+
+A straight line on a log axis means a constant growth rate, and that is
+exactly the reason to use one. It is also why the axis has to say "log" out
+loud: a gently rising straight line is what slow, dependable growth looks
+like on a linear axis, and the only thing separating the two readings is the
+tick labels.
+
+On the left the first six quarters are pressed flat against the floor, which
+is honest and nearly useless, since you cannot tell from it whether the early
+growth was steady. On the right the straightness is the finding. Drop the axis
+label, or set it in the same grey as the gridlines, and a company that grew
+128-fold reads as a company that grew a bit.
 
 <CodeBlock
   adapter="python"

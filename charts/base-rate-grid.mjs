@@ -1,6 +1,6 @@
 /**
  * Why a 99% accurate test is usually wrong: every person who tests positive,
- * drawn as one dot, coloured by whether they are actually sick.
+ * drawn as one dot, colored by whether they are actually sick.
  *
  * The tree in the lesson gets to 9% by arithmetic, which convinces the reader
  * without moving them — the gut answer stays "but it's 99% accurate". Natural
@@ -16,7 +16,7 @@
 import { Plot, plot, ACCENT, HALO, MUTED } from "./_theme.mjs";
 
 export const title =
-  "A grid of 1,098 dots, one for each person who tests positive. A block of 99 at the start is coloured to mark the people who are actually sick; the remaining 999 are false alarms.";
+  "A grid of 1,098 dots, one for each person who tests positive. A block of 99 at the start is colored to mark the people who are actually sick; the remaining 999 are false alarms.";
 
 export const caption =
   "Everyone who tests positive out of 100,000 people, one dot each. Only 99 of the 1,098 are actually sick, so a positive result on a 99% accurate test means about a 9% chance of disease. The test is accurate; the disease is just rare.";

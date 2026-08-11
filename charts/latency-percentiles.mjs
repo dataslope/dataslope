@@ -65,6 +65,13 @@ export function render() {
       Plot.ruleX(MARKS, { x: "ms", stroke: "color", strokeWidth: 2 }),
       // One mark per percentile so each label gets its own vertical offset;
       // the four lines sit close enough that a shared dy stacks them.
+      //
+      // Three rows, not two. The median, the mean and the p95 are all inside
+      // the first sixth of the domain — about 55px apart at this width, against
+      // labels around 60px wide — so alternating between two rows put "median
+      // 24ms" and "p95 53ms" on the same baseline and printed one through the
+      // other. The p99 is far enough right to share the top row with the
+      // median safely.
       ...MARKS.map((m, i) =>
         Plot.text([m], {
           x: "ms",
@@ -75,7 +82,7 @@ export function render() {
           fontWeight: 600,
           textAnchor: "start",
           dx: 6,
-          dy: -30 + (i % 2) * 15,
+          dy: [-32, -19, -6, -32][i],
           ...HALO,
         }),
       ),

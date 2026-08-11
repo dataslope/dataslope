@@ -163,7 +163,7 @@ interface CodeBlockProps {
   tailwind?: boolean;
 }
 
-// Detect the active colour scheme on `<html>`. Fumadocs uses next-themes
+// Detect the active color scheme on `<html>`. Fumadocs uses next-themes
 // with `attribute: "class"`, so light/dark is reflected as the `dark`
 // class (or absence thereof) on the document root. We fall back to the
 // OS-level preference in case the page is rendered outside fumadocs.
@@ -210,7 +210,7 @@ function useIsDark(): boolean {
   );
 }
 
-// Map the document's colour scheme to the matching CodeMirror theme name.
+// Map the document's color scheme to the matching CodeMirror theme name.
 // Light docs → GitHub Light, dark docs → GitHub Dark.
 function cmThemeNameFor(isDark: boolean): string {
   return isDark ? "github-dark" : "github-light";
@@ -218,7 +218,7 @@ function cmThemeNameFor(isDark: boolean): string {
 
 // Small clipboard / "copy to clipboard" glyph reused by the action bar
 // and the output-cell headers. Stroke-only so it inherits the current
-// text colour and reads as part of the surrounding chrome.
+// text color and reads as part of the surrounding chrome.
 function CopyIcon() {
   return (
     <svg
@@ -513,7 +513,7 @@ function CodeBlockInner({
     () => false,
   );
 
-  // Track the active docs colour scheme so the CodeMirror theme can flip
+  // Track the active docs color scheme so the CodeMirror theme can flip
   // between IntelliJ IDEA (light) and Dracula (dark) when the user
   // toggles the docs theme.
   const isDark = useIsDark();
@@ -650,7 +650,7 @@ function CodeBlockInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Sync the CodeMirror theme whenever the docs colour scheme flips.
+  // Sync the CodeMirror theme whenever the docs color scheme flips.
   useEffect(() => {
     if (editorRef.current && themeCompRef.current) {
       editorRef.current.dispatch({

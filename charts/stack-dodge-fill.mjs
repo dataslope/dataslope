@@ -212,7 +212,7 @@ export function render() {
         textAnchor: "middle",
       }),
 
-      // The colour key, drawn once for all three panels.
+      // The color key, drawn once for all three panels.
       ...DRIVES.map((d, i) => [
         Plot.rect([{}], {
           x1: 58 + i * 74,

@@ -33,8 +33,8 @@ const CHANNELS = [
   { key: "Length", fit: ["best", "ok", "no", "no"] },
   { key: "Angle", fit: ["ok", "no", "no", "no"] },
   { key: "Area", fit: ["ok", "no", "no", "no"] },
-  { key: "Colour value", fit: ["ok", "best", "no", "ok"] },
-  { key: "Colour hue", fit: ["no", "no", "best", "no"] },
+  { key: "Color value", fit: ["ok", "best", "no", "ok"] },
+  { key: "Color hue", fit: ["no", "no", "best", "no"] },
   { key: "Shape", fit: ["no", "no", "ok", "no"] },
 ];
 

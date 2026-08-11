@@ -140,6 +140,23 @@ the *index* is a coordinate the library can navigate. When in doubt with
 time series, **put time in the index**.
 </Callout>
 
+This is not a tidiness matter. Here is one series plotted against row order
+and against real dates:
+
+<Chart slug="gaps-in-a-time-axis" />
+
+Row order closes the gaps, which changes the shape, changes every slope (a
+slope is change per unit *time*, and the units are no longer time), and hides
+the outage, which is usually the interesting part.
+
+Losing the gap is usually the expensive part, because missing data is rarely
+missing at random and something happened there. The right panel also shows the
+second decision worth making deliberately: the line is broken rather than
+bridged, because joining the two ends with a straight segment draws nine days
+of readings nobody took. The fix in pandas is `pd.to_datetime`, then
+`set_index`, then usually `asfreq("D")`, which materialises the absent days as
+NaN so they are visibly missing instead of quietly gone.
+
 ## Building a timeline from scratch: `date_range()`
 
 When you need a regular grid of timestamps, for simulated data, for a

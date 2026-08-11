@@ -192,7 +192,7 @@
   }
 }
 
-/* Each pane paints the *site's* page colour, not the dashboard's (#ffffff and
+/* Each pane paints the *site's* page color, not the dashboard's (#ffffff and
    #121212, the two surfaces a chart actually ships on), so what is being
    judged is the real thing. */
 .pane {
@@ -460,7 +460,7 @@
  * non-admin, whose fetch of /api/admin/charts is refused and who therefore gets
  * the gallery exactly as it was before the queue existed.
  *
- * Colours come from the Studio shell's tokens (app/dashboard/_studio/studio.css)
+ * Colors come from the Studio shell's tokens (app/dashboard/_studio/studio.css)
  * rather than the illustration gallery's private palette. That page defines its
  * own --border/--btn-bg/--fg because it predates the shell; this one is inside
  * it, and borrowing names the shell never sets would have left every control
@@ -469,7 +469,7 @@
  * State is carried on the left edge of a figure's section rather than by
  * tinting it. This page's whole argument is that the only filled rectangles
  * should be the two theme panes, since a third surface is a third thing for the
- * eye to compare the figure against; a coloured rule outside the section says
+ * eye to compare the figure against; a colored rule outside the section says
  * the same without adding one.
  */
 

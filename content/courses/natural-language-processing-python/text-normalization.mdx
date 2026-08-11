@@ -120,9 +120,9 @@ print("Has ALL-CAPS word:", any(w.isupper() and len(w) > 1 for w in review.split
 ## Punctuation stripping
 
 Most normalizers reach for a regular expression here, so one warning
-before you write one. A quantifier nested inside another quantifier gives
-a backtracking engine exponentially many ways to fail, and a near-miss
-input turns a fast pattern into a hang:
+before you write one. A repeat (`+` or `*`) placed *inside* another repeat
+gives the engine exponentially many ways to give up, so text that almost
+matches, but does not, turns a fast pattern into a hang:
 
 <Chart slug="regex-backtracking-blowup" />
 

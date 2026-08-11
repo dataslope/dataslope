@@ -13,7 +13,7 @@
  *
  * 2. **A grid of cut-outs.** One card per illustration, several per row, and
  *    the only image shown is the background-removed WebP the site actually
- *    serves. It gets no backdrop of its own, so the page colour shows through
+ *    serves. It gets no backdrop of its own, so the page color shows through
  *    its alpha and the docked theme pill doubles as the judgement tool: a
  *    cut-out that only reads on one background is exactly what this page is
  *    for. Clicking one opens the raw file in a new tab, at full size.
@@ -253,7 +253,7 @@ function PromptCard({
   // worth showing.
   // State is carried on the artwork's own dashed frame rather than by tinting
   // a card, because there is no card any more: the frame is already the one
-  // piece of chrome each item has, and colouring it puts the signal on the
+  // piece of chrome each item has, and coloring it puts the signal on the
   // thing being judged. The chip above it says the same in words.
   const state = mark.marked
     ? styles.itemMarked

@@ -387,7 +387,7 @@ export function HeroInteractive() {
               <Icon size={16} aria-hidden="true" />
               {t.label}
               {/* Active-item underline (a short bar in the label's own
-                  colour), desktop only (on mobile the bold, darker label
+                  color), desktop only (on mobile the bold, darker label
                   already marks the active tab). The shared layoutId slides it
                   between tabs when the selection changes. */}
               {active && (

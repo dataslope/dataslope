@@ -291,6 +291,19 @@ honest test?**"
 The essential property is temporal: train strictly precedes test in every fold, so the model never sees the future.`}
 />
 
+<Chart slug="timeseries-cv-splits" />
+
+The model gets to see the future, and it does not need to be clever to use it:
+any autocorrelated series lets a model interpolate a held-out month from its
+neighbours, which is a far easier problem than forecasting and produces a
+score that will not survive deployment. A rolling window of fixed length is
+the third option, dropping the oldest data rather than accumulating it, and is
+right when the process itself changes.
+
+The backtest costs two things worth naming: the earliest folds train on very
+little, and the training size varies across folds, so the fold scores are not
+identically distributed and averaging them is a rougher summary than usual.
+
 ## The other ways the future leaks in
 
 A chronological split is necessary but not *sufficient*. Leakage sneaks in

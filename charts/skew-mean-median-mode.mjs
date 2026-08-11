@@ -42,7 +42,7 @@ const peak = Math.max(...curve.map((d) => d.y));
 //     so no label starts where another one ends;
 //   • the rules climb in steps (`step` below), so each label has its own band
 //     of height and its own rule to sit at the top of;
-//   • every label carries a page-coloured halo, so where a neighbour's rule
+//   • every label carries a page-colored halo, so where a neighbour's rule
 //     does pass behind the text (the median's label reaches past the mean's
 //     rule at this skew) it is masked instead of striking through.
 //

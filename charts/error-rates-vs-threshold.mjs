@@ -17,8 +17,8 @@
  * different amounts. Marking the conventional α = 0.05 well to the right of
  * the crossing makes that asymmetry visible instead of asserted.
  *
- * The two rates get different colours rather than one colour and two dash
- * patterns. They are the same *kind* of thing, which argues for one colour, but
+ * The two rates get different colors rather than one color and two dash
+ * patterns. They are the same *kind* of thing, which argues for one color, but
  * they are the two things the reader has to hold apart while reading a crossing,
  * and at the widths a line is drawn a dash pattern is not enough to tell them
  * apart at a glance.

@@ -184,6 +184,21 @@ Notice that `user_id` is stored as an integer, so pandas reports its
 dtype as `int64`, but it is **nominal**: the IDs are names that happen
 to look like numbers. The next section is about exactly that trap.
 
+<Chart slug="measurement-scales-ladder" />
+
+The value is all in the empty half of that table. Nearly every statistical
+mistake made with a categorical variable is an operation from a higher rung
+applied to a lower one, and not one of them raises an error.
+
+The rungs are worth reading as questions rather than names. Ordinal adds
+"which is more", so a median and a rank become available but not subtraction,
+because the distance from agree to strongly agree is not a known quantity.
+Interval adds "how much more", which makes a mean and a standard deviation
+meaningful and stops short of ratios, because zero is a convention and 20 °C
+is not twice 10 °C. Ratio adds "how many times more", because zero means none
+of the thing, and that is what makes a geometric mean and a coefficient of
+variation defined at all.
+
 ## Encoding traps: when numbers aren't quantities
 
 The most dangerous columns are the ones that *look* numerical but
@@ -256,6 +271,23 @@ computer can't tell a quantity from a code, that judgment is yours.
 
 Numeric-looking IDs are nominal; treat them as categories, not quantities.`}
 />
+
+The arithmetic is valid in the sense that it finishes. Only the column's
+meaning says whether the answer is nonsense, which is why a type system cannot
+catch this and a data dictionary can.
+
+<Chart slug="code-is-not-a-quantity" />
+
+The habit that catches all four: for every numeric column, ask whether doubling
+it means anything. If it does not, the column is a label with digits in it and
+belongs in the dataframe as a category.
+
+The four fail differently. A postcode is nominal, so 90210 is not more than
+10001, it is a different place, and the mean of a set of them is usually the
+sea. A jersey number is a label with a tradition attached, and 23.4 describes
+nobody. A year is interval, so differences work and the mean is meaningful
+while ratios are not, and "2024 is 1.005 times 2014" is a sentence no one
+should write.
 
 ## pandas dtypes vs. statistical type
 

@@ -296,7 +296,9 @@ between reference and current using a symmetric KL-divergence-like formula.
 PSI below 0.1 is stable; 0.1–0.2 warrants monitoring; above 0.2 signals
 significant shift requiring action. Formally, summing over the buckets:
 
-$$\text{PSI} = \sum_i (\text{cur}_i - \text{ref}_i)\,\ln\frac{\text{cur}_i}{\text{ref}_i}$$
+$$
+\text{PSI} = \sum_i (\text{cur}_i - \text{ref}_i)\,\ln\frac{\text{cur}_i}{\text{ref}_i}
+$$
 
 The `compute_psi` function below implements exactly this: it bins the
 reference (training) distribution into deciles via `np.percentile`,

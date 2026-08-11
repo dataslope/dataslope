@@ -293,10 +293,10 @@ h6 {
    Inlined directly (rather than @import "highlight.js/styles/github.css")
    so light/dark variants can be scoped cleanly. The background on .hljs
    is left transparent, the surrounding <pre> in the CSS module already
-   sets the block background, so we only need token colours here.
+   sets the block background, so we only need token colors here.
    ─────────────────────────────────────────────────────────────────── */
 
-/* ── Light mode token colours ─────────────────────────────────────── */
+/* ── Light mode token colors ─────────────────────────────────────── */
 :root:not(.dark) .hljs {
   color: #24292e;
 }
@@ -374,7 +374,7 @@ h6 {
   background-color: #ffeef0;
 }
 
-/* ── Dark mode token colours ──────────────────────────────────────── */
+/* ── Dark mode token colors ──────────────────────────────────────── */
 .dark .hljs {
   color: #c9d1d9;
 }
@@ -495,7 +495,7 @@ code.hljs {
    - h1–h6                            headings (handled separately)
    font-variation-settings is cleared so no variation axis lingers.
    Letter-spacing is pulled in to −0.011em, matching the tight
-   Inter tracking set on `body`, for a polished editorial colour.
+   Inter tracking set on `body`, for a polished editorial color.
    ─────────────────────────────────────────────────────────────────────── */
 .prose :where(p, li, td, th):not(
   :where([class~="not-prose"], [class~="not-prose"] *),

@@ -114,7 +114,9 @@ it is a quick, classic measure of how repetitive or varied a text is.
   caption="Distinct words over total words is how varied a text is measured."
 />
 
-$$\text{lexical diversity} = \frac{\text{number of distinct words}}{\text{total number of words}}$$
+$$
+\text{lexical diversity} = \frac{\text{number of distinct words}}{\text{total number of words}}
+$$
 
 A value near 1 means almost every word is unique (highly varied); a value
 near 0 means heavy repetition.
@@ -255,6 +257,18 @@ plt.show()
 
 The bar for "the" dwarfs the others, and a pile of words appear only once.
 This shape repeats in essentially every natural-language text.
+
+The chart people reach for when showing a corpus is the one that shows the
+tail worst:
+
+<Chart slug="wordcloud-vs-bar" />
+
+Size carries the count; position and rotation are assigned at random and look
+like encodings anyway. Use the cloud as an illustration, and put the bars beside
+it when somebody has to decide something.
+
+One thing the cloud does better is worth admitting: it is inviting, people
+look at it, and no bar chart of twenty tokens has ever been put on a poster.
 
 ## A catch: raw frequency is dominated by stopwords
 

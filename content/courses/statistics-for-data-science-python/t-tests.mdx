@@ -461,6 +461,25 @@ The rule: if each row is one unit measured under both conditions, pair it
 (`ttest_ind()`).
 </Callout>
 
+The gain from pairing is worth seeing rather than being told, because it looks
+like a trick and is not:
+
+<Chart slug="pairing-removes-variance" />
+
+Nothing statistical is smuggled in there. The two piles were never
+independent, and treating them as though they were throws away the fact that
+the same subject appears in both. The warning that comes with it: the pairing
+has to be real. Pairing rows that merely arrived in the same order gives you
+the paired test's smaller degrees of freedom and none of its variance
+reduction.
+
+Look at what varies on the left. Subjects differ enormously, some resting
+values sitting twenty units above others', and that between-subject spread
+buries the treatment effect. A subject's own before and after move together,
+because a high person stays high, so within one subject the treatment is the
+only thing left changing. Subtracting cancels each personal level and takes
+the between-subject variance with it.
+
 ## The assumptions, and how much they matter
 
 Every t-test rests on three assumptions. They are not equally fragile.
@@ -517,6 +536,19 @@ normal. That's exactly when you reach for a **nonparametric** alternative
 like the Mann–Whitney U or Wilcoxon signed-rank test, covered in
 *Correlation and Nonparametric Tests*.
 </Callout>
+
+<Chart slug="welch-vs-student" />
+
+Student's pools the two variances into one estimate, so when the smaller group
+carries the larger variance the pooled figure is dragged down, the denominator
+is too small, and the test rejects far more often than it promised. The cost
+of using Welch's when the variances really are equal is a few per cent of
+power, which is a trade nobody should hesitate over.
+
+The textbook advice of testing for equal variances first does not rescue
+Student's, for a reason worth knowing: the variance test is itself
+underpowered at small n, which is exactly when the problem bites, so it fails
+to detect the inequality precisely in the cases where detecting it mattered.
 
 ## When to use a t-test, and when not to
 

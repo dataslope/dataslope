@@ -20,7 +20,9 @@ the simulations, then take the concept checks.
 
 $P(A \mid B)$ is the probability of $A$ given that $B$ has occurred:
 
-$$P(A \mid B) = \frac{P(A \cap B)}{P(B)}$$
+$$
+P(A \mid B) = \frac{P(A \cap B)}{P(B)}
+$$
 
 It renormalizes the sample space to the world where $B$ is true. Much of
 applied probability is bookkeeping about which events you are conditioning
@@ -31,7 +33,9 @@ on.
 Bayes' theorem inverts a conditional, turning $P(B \mid A)$ into
 $P(A \mid B)$:
 
-$$P(A \mid B) = \frac{P(B \mid A)\,P(A)}{P(B)}, \qquad P(B) = P(B \mid A)P(A) + P(B \mid \neg A)P(\neg A)$$
+$$
+P(A \mid B) = \frac{P(B \mid A)\,P(A)}{P(B)}, \qquad P(B) = P(B \mid A)P(A) + P(B \mid \neg A)P(\neg A)
+$$
 
 Reach for it whenever you know a likelihood ("given the disease, the test
 is 99% positive") but want a posterior ("given a positive test, how likely

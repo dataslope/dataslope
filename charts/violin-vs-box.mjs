@@ -97,7 +97,7 @@ const boxes = GROUPS.map((grp) => ({
   hi: quantile(grp.values, 0.98),
 }));
 
-const colourOf = (key) => (key === "B" ? ACCENT : PRIMARY);
+const colorOf = (key) => (key === "B" ? ACCENT : PRIMARY);
 
 export const caption = `Three groups, drawn both ways. A box reports five numbers; a violin reports the density, which is the box plus the thing the box throws away. Group B is two populations measured together and its box is unremarkable; group C is heavily right-skewed and its box says only "slightly wider". The trade runs both ways: a violin's width is a kernel estimate with a bandwidth, so on twenty observations it draws a confident smooth curve through noise. Boxes when the samples are small or the groups are many; violins when the shape is the question and there is data enough to see it.`;
 
@@ -124,7 +124,7 @@ export function render() {
         x: "c",
         y1: "lo",
         y2: "hi",
-        stroke: (d) => colourOf(d.key),
+        stroke: (d) => colorOf(d.key),
         strokeWidth: 1.4,
       }),
       Plot.rect(boxes, {
@@ -133,9 +133,9 @@ export function render() {
         x2: (d) => d.c + 0.2,
         y1: "q1",
         y2: "q3",
-        fill: (d) => colourOf(d.key),
+        fill: (d) => colorOf(d.key),
         fillOpacity: 0.25,
-        stroke: (d) => colourOf(d.key),
+        stroke: (d) => colorOf(d.key),
         strokeWidth: 1.4,
       }),
       Plot.ruleY(boxes, {
@@ -143,7 +143,7 @@ export function render() {
         y: "med",
         x1: (d) => d.c - 0.2,
         x2: (d) => d.c + 0.2,
-        stroke: (d) => colourOf(d.key),
+        stroke: (d) => colorOf(d.key),
         strokeWidth: 2.4,
       }),
 
@@ -154,7 +154,7 @@ export function render() {
         x1: "x1",
         x2: "x2",
         z: "key",
-        fill: (d) => colourOf(d.key),
+        fill: (d) => colorOf(d.key),
         fillOpacity: 0.4,
         curve: "basis",
       }),
@@ -163,7 +163,7 @@ export function render() {
         y: "g",
         x: "x1",
         z: "key",
-        stroke: (d) => colourOf(d.key),
+        stroke: (d) => colorOf(d.key),
         strokeWidth: 1.3,
         curve: "basis",
       }),
@@ -172,7 +172,7 @@ export function render() {
         y: "g",
         x: "x2",
         z: "key",
-        stroke: (d) => colourOf(d.key),
+        stroke: (d) => colorOf(d.key),
         strokeWidth: 1.3,
         curve: "basis",
       }),

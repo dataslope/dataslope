@@ -69,6 +69,21 @@ readers about either how variable the population is or how trustworthy
 your estimate is. Always label which one you mean.
 </Callout>
 
+One consequence is worth meeting early, because it decides how much data any
+proportion needs:
+
+<Chart slug="se-of-a-proportion" />
+
+The intuition beats the formula. If the true rate is 2%, nearly every visitor
+does the same thing, so nearly every sample looks the same and the estimate
+hardly moves; if it is 50%, every visitor is a fresh coin flip and the sample
+is as variable as it can get. Both consequences are worth carrying, because
+they point opposite ways: in absolute terms the rare event is easier to pin
+down, and in relative terms it is far harder.
+
+Which is why "how many users do I need" has no answer and "how many users to
+detect a one-point change in a 4% rate" has one.
+
 ## Computing both, and seeing they differ
 
 Let's compute SD and SE on the same sample and watch them diverge. The SD

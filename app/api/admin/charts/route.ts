@@ -7,7 +7,7 @@
  * (see the tools band note in app/dashboard/_studio/nav.ts). Only the *queue*
  * is gated, and it lives here:
  *
- *   GET    → every mark, so the gallery can colour its figures and list what
+ *   GET    → every mark, so the gallery can color its figures and list what
  *            is outstanding.
  *   PUT    → set or clear one chart's mark, with an optional note, or, with
  *            `approve: true`, sign off a redraw so it stops showing as waiting

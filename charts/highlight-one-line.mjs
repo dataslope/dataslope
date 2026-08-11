@@ -8,7 +8,7 @@
  * the reader has to hold one panel in memory while looking at another.
  *
  * When there is a protagonist, the cheaper fix is to leave the overlay alone
- * and change what is loud. Same axes, same data, one series in colour with its
+ * and change what is loud. Same axes, same data, one series in color with its
  * name attached and the rest dropped to a single muted grey. The others do not
  * disappear, which matters: they are the context that makes the highlighted
  * line mean anything, and a chart of one line with no comparison is a different
@@ -16,14 +16,14 @@
  *
  * Drawn as two panels of the identical twelve series so the change is visibly
  * only the emphasis. Both are the same overlay; neither is a small multiple.
- * The greyed lines are one colour rather than twelve desaturated ones, because
+ * The greyed lines are one color rather than twelve desaturated ones, because
  * the moment they carry distinguishable hues the reader starts trying to
  * identify them again and the emphasis is gone.
  */
 import { Plot, plot, ACCENT, HALO, MUTED, SERIES, rng } from "./_theme.mjs";
 
 export const title =
-  "The same twelve-line chart drawn twice. On the left every line is a different colour and none stands out; on the right eleven are a uniform pale grey and one is drawn in a strong colour with its name at the end of it.";
+  "The same twelve-line chart drawn twice. On the left every line is a different color and none stands out; on the right eleven are a uniform pale grey and one is drawn in a strong color with its name at the end of it.";
 
 const MONTHS = 24;
 const SERIES_COUNT = 12;
@@ -60,7 +60,7 @@ const ROWS = PANELS.flatMap((panel) =>
 
 const heroEnd = LINES.find((l) => l.name === HERO).points[MONTHS - 1];
 
-export const caption = `Same twelve series, same axes, both panels. On the left the reader is asked to find one store among twelve competing colours and a legend; on the right eleven lines have been dropped to one flat grey and the twelfth is labelled where it ends. Nothing was removed, which is the part worth keeping: the grey lines are the context that makes the highlighted one mean anything, and a chart showing only the hero would be a weaker claim about it. Reach for this when one series is the story and for small multiples when they all are.`;
+export const caption = `Same twelve series, same axes, both panels. On the left the reader is asked to find one store among twelve competing colors and a legend; on the right eleven lines have been dropped to one flat grey and the twelfth is labelled where it ends. Nothing was removed, which is the part worth keeping: the grey lines are the context that makes the highlighted one mean anything, and a chart showing only the hero would be a weaker claim about it. Reach for this when one series is the story and for small multiples when they all are.`;
 
 export function render() {
   return plot({
@@ -74,7 +74,7 @@ export function render() {
     y: { label: "Weekly sales (£k)", ticks: 5 },
     fx: { domain: PANELS, label: null },
     marks: [
-      // Left: every series in its own colour, which is what a plotting library
+      // Left: every series in its own color, which is what a plotting library
       // does by default and what makes the chart unreadable.
       Plot.line(ROWS.filter((d) => d.panel === PANELS[0]), {
         x: "t",
@@ -118,7 +118,7 @@ export function render() {
     // Plot's own categorical scheme writes literal hex, which the build rejects
     // and which would be wrong in one of the two themes. The role tokens cycle
     // instead: the theme has seven and the left panel has twelve series, so
-    // colours repeat. That is not a defect in the panel, it is the panel's
+    // colors repeat. That is not a defect in the panel, it is the panel's
     // argument, and it is what actually happens when you hand a library twelve
     // categories.
     color: { type: "ordinal", range: SERIES },

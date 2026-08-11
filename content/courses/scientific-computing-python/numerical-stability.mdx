@@ -50,11 +50,15 @@ $\delta x$, how big is $f(x + \delta x) - f(x)$? The ratio of
 
 For evaluating $f$:
 
-$$ \kappa_f(x) \approx \left| \frac{x f'(x)}{f(x)} \right| $$
+$$
+\kappa_f(x) \approx \left| \frac{x f'(x)}{f(x)} \right|
+$$
 
 For a linear system $A x = b$:
 
-$$ \kappa(A) = \|A\| \, \|A^{-1}\| $$
+$$
+\kappa(A) = \|A\| \, \|A^{-1}\|
+$$
 
 A condition number near $1$ is excellent. A condition number near
 $1/\epsilon \approx 10^{16}$ means **no algorithm can give you more
@@ -157,7 +161,9 @@ Consider the integrals
   caption="A stable algorithm keeps the small errors small all the way through."
 />
 
-$$ I_n = \int_0^1 \frac{x^n}{x + 10} \, dx $$
+$$
+I_n = \int_0^1 \frac{x^n}{x + 10} \, dx
+$$
 
 These satisfy a tidy recurrence $I_n = \frac{1}{n} - 10 \, I_{n-1}$
 with $I_0 = \ln(1.1)$. The forward recurrence is *numerically
@@ -227,7 +233,7 @@ most useful identities are:
 | Vector 2-norm | $\lVert v \rVert_2$ | Euclidean length |
 | Matrix induced 2-norm | $\lVert A \rVert_2$ | Largest stretch factor |
 | Frobenius norm | $\lVert A \rVert_F$ | Square root of sum of squares |
-| Condition number | $\kappa(A) = \lVert A \rVert \lVert A^{-1} \rVert$ | Error amplification |
+| Condition number | $\kappa(A) = \lVert A \rVert \, \lVert A^{-1} \rVert$ | Error amplification |
 
 For $A x = b$, the relative error in $x$ is bounded by:
 

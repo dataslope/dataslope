@@ -47,7 +47,7 @@ const rows = [BARE, MARKED].flatMap((panel) => [
   ...sparse.map((d) => ({ ...d, panel })),
 ]);
 
-const colourOf = (key) => (key === "Quarterly" ? ACCENT : PRIMARY);
+const colorOf = (key) => (key === "Quarterly" ? ACCENT : PRIMARY);
 const GAP = SPARSE_T[2] - SPARSE_T[1];
 
 export const caption = `A line asserts something about the space between the points as well as about the points, and a bare line makes that assertion invisibly. Both curves on the left look equally well supported. One has ${dense.length} weekly observations; the other has ${sparse.length} quarterly ones, and its smooth run through the middle of the year is ${GAP} weeks of interpolation drawn by the renderer rather than measured by anyone. Markers cost one keyword and settle it, and they also expose irregular sampling, which a bare line hides completely: evenly spaced and clustered observations draw the same line when the values agree. The trade is clutter and it is real. Past roughly fifty points markers stop informing and start filling the line in, which is why dense series drop them and sparse ones should not.`;
@@ -69,7 +69,7 @@ export function render() {
         x: "t",
         y: "v",
         z: (d) => `${d.panel}-${d.key}`,
-        stroke: (d) => colourOf(d.key),
+        stroke: (d) => colorOf(d.key),
         strokeWidth: 1.9,
       }),
       Plot.dot(
@@ -79,7 +79,7 @@ export function render() {
           x: "t",
           y: "v",
           r: (d) => (d.key === "Quarterly" ? 4.2 : 2.2),
-          fill: (d) => colourOf(d.key),
+          fill: (d) => colorOf(d.key),
         },
       ),
       Plot.text([{ t: SPARSE_T.at(-1), v: sparse.at(-1).v }], {

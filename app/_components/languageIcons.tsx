@@ -3,7 +3,7 @@
  * playground header switcher (`Playground.tsx`), the playground index
  * card list (`/playground/page.tsx`), and the embedded MDX code blocks
  * (`CodeBlock.tsx`). Centralising the lookup means a logo or brand
- * colour change only has to be made in one place and all three surfaces
+ * color change only has to be made in one place and all three surfaces
  * stay visually consistent.
  *
  * Looked up by language adapter `id` (e.g. `"python"`, `"javascript"`).
@@ -84,7 +84,7 @@ export const LANGUAGE_ICON_SIZE_FACTOR: Record<string, number> = {
   csharp: 0.9,
 };
 
-/** Brand colours used to tint the playground language icons across the
+/** Brand colors used to tint the playground language icons across the
  *  switcher dropdown, the /playground card list, and embedded code
  *  blocks. Shared so all three surfaces stay in sync. */
 export const LANGUAGE_ICON_COLORS: Record<string, string> = {

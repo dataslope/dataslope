@@ -79,6 +79,47 @@ in 1786 it was not. Every chart you make in this course descends
 from his argument that pictures of data are a legitimate way to know
 things.
 
+Here is the argument he was making, redrawn:
+
+<Chart slug="playfair-trade-balance-1786" />
+
+The *balance of trade* is not a column in any ledger. It is the area
+between two lines, and it only becomes something you can see once
+somebody draws them. That is the whole case for charts, made in 1786.
+
+He did not leave the subtraction to the reader either: the area is shaded, and
+its color changes at the crossover in about 1745, so the years England was
+losing money and the years it was making money are two different regions
+rather than one line above another. Most of his preface is spent arguing that this counts as
+knowing something, because in 1786 that was not obvious.
+
+The bar chart arrived by accident, on the one plate in the book that
+is not a time series. Playfair had eighty-one years of England's
+trade and drew lines; for Scotland he had a single year and nothing
+to plot against time, so he turned the axis into a list of places
+instead:
+
+<Chart slug="playfair-bar-1786" />
+
+He thought it the weakest page in the *Atlas*, and said so, because
+it showed no *progress*. It is now the most-used chart type in the
+world.
+
+Two of the choices he made on that page are still the rules. The bars start at
+zero, so their lengths can be compared directly, and they are sorted by size
+rather than alphabetically, so the ranking is the first thing you see.
+
+Fifteen years later he cut a circle into three:
+
+<Chart slug="playfair-first-pie-1801" />
+
+He was not setting out to invent a chart type. In the *Statistical Breviary*
+every state is a circle whose area is its size, so two empires can be compared
+without reading a number, and the Turkish Empire needed cutting up only
+because it lay across three continents. Notice also that it works. Nearly
+every objection raised against pie charts since is really an objection to what
+happens past three or four slices, which is a different chart and a later page.
+
 ## Florence Nightingale: a chart that changed a war
 
 The most consequential early chart was not made by a mathematician.
@@ -109,6 +150,23 @@ tiny. Anyone who looked, a politician, a queen, a newspaper editor,
 could see in a single glance that **soldiers were not dying of war;
 they were dying of dirt.**
 
+Here it is, redrawn from her own table:
+
+<Chart slug="nightingale-rose-1858" />
+
+Her claim is the one you cannot unsee once it is drawn: the blue
+outruns the red in *every single month* of the first year. Adding the
+deaths up rather than averaging them puts a number on it, and puts a
+second number on what the cleaning was worth:
+
+<Chart slug="nightingale-what-killed-the-army" />
+
+The elbow matters as much as the gap. By March 1855, when the Sanitary
+Commission arrived, 11,157 of those disease deaths had already happened; only
+23% of the total came afterwards, over a period twice as long and with an army
+half again as large. The red curve, which is the fighting, carries on at the
+rate it always had.
+
 The chart did its job. The British government created a Sanitary
 Commission, the hospitals were cleaned, and mortality plummeted. In
 1859, Nightingale became the **first woman elected a Fellow of the
@@ -125,6 +183,23 @@ and it *traveled*. Sometimes the best chart for *exploration* is not
 the best chart for *advocacy*. We return to this tension throughout
 the course.
 </Callout>
+
+Judge that for yourself. Here are the identical twenty-four numbers on
+a length scale, which is the comparison the eye actually makes well:
+
+<Chart slug="nightingale-bars-1858" />
+
+The change of encoding buys two more things. The peak is now its true height:
+area is proportional to the rate, so a rose's radius is a square root, and the
+worst month reached only about six times as far from the center as an ordinary
+one while being thirty-four times as deadly. And bars sum, so the top of each
+one is the total death rate, which overlapping wedges sharing a vertex can
+never show.
+
+Notice what the rose could not have shown you, whatever its colors: a
+circle has no beginning, so it cannot put the Sanitary Commission
+anywhere. The rule in the middle of this one is the entire causal
+claim, and it is only available because time runs left to right.
 
 Two contemporaries deserve a sentence each, because they round out
 the founding generation. In **1854**, physician **John Snow** mapped
@@ -148,6 +223,42 @@ author, decided was important."* You could look at it, you could not
   alt="A large folded paper chart opened out on a table beside a small glowing panel showing the same shape"
   caption="The same shape that was once a printed foldout is now something you can query."
 />
+
+Two more foldouts from that era get cited more than any others, and both are
+worth a minute, because in each case the chart everybody remembers is not
+quite the chart that did the work.
+
+**John Snow**, London, 1854. The Broad Street map, a dot for every cholera
+death clustered around one water pump, is the most famous picture in public
+health. It is also not what settled the argument, and Snow knew it: a ring of
+deaths around a pump is equally what you would see if the cause were in the
+*air* over that block, which is exactly what his opponents believed. His real
+evidence was a table he built by knocking on doors.
+
+<Chart slug="snow-water-supply-1854" />
+
+Two water companies had spent years selling into the same south London
+streets, house by house, in no pattern anyone had designed, and in 1852 one of
+them moved its intake upstream of the city's sewage. Same neighbourhoods, same
+trades, same rents, one difference. Snow had stumbled onto a randomized
+experiment that nobody ran, and the chart is just the result of it.
+
+**Charles Minard**, Paris, 1869. His plate of Napoleon's 1812 march is usually
+introduced as "six variables in one figure," which is true and slightly beside
+the point. What makes it work is that almost every variable is carried by
+something that was going on the page anyway.
+
+<Chart slug="minard-1812-losses" />
+
+Look at where the losses actually are. Over half the army was gone before
+Moscow, on a summer march with no battle to account for it, and the sharpest
+single drop on the way home is the stretch beside Smolensk, where 32,000 men
+vanish between two of Minard's own readings.
+
+Position is where the army was. Thickness is how many men were left.
+Color is which direction they were walking. Nothing is a legend entry;
+nothing has to be looked up; and the reader is never asked to subtract two
+numbers, because the subtraction is already drawn.
 
 That changed when the chart moved onto the **web**. Two browser
 technologies, **SVG** (shapes that respond to mouse and touch) and

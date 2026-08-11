@@ -13,6 +13,17 @@
  * the cost, so the useful question about any pandas expression is how many
  * times it crosses that boundary. Anything that can be phrased as an operation
  * on whole columns crosses it a handful of times whatever the row count.
+ *
+ * ── Why lollipops and not bars ──────────────────────────────────────────────
+ *
+ * Nine milliseconds against 9.8 seconds is three orders of magnitude, so the
+ * axis has to be logarithmic — and a bar on a log axis stops encoding its
+ * value. A reader measures bar *length*, and on this scale the 9,800 bar was
+ * about four times the 9 bar rather than a thousand times it, which reads as
+ * "somewhat slower" for a difference that is not somewhat anything. A rule
+ * running from the axis floor to a dot encodes *position* instead, which is
+ * the channel a log scale is legible in, and the floor is drawn rather than
+ * implied so nobody mistakes it for zero.
  */
 import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
@@ -32,6 +43,10 @@ const SLOW = METHODS[0].ms;
 const FAST = METHODS.at(-1).ms;
 const RATIO = Math.round(SLOW / FAST);
 
+/** The axis floor, and the baseline every rule is drawn from. Drawn rather
+ *  than implied: on a log scale there is no zero to anchor to. */
+const FLOOR = 5;
+
 export const caption = `Four ways to compute the same column over ${(ROWS / 1e6).toFixed(0)} million rows, with identical output. What separates them is how many times the Python interpreter is entered: once per row for the first two, once per *column* for the last. \`iterrows\` is worst because it also builds a Series object per row, a million short-lived objects for the collector to clean up. That is a factor of ${RATIO.toLocaleString()} between the top and the bottom. The lesson is not "apply is slow" but that the interpreter boundary is the cost, so the question to ask of any pandas expression is how many times it crosses that boundary.`;
 
 export function render() {
@@ -43,21 +58,29 @@ export function render() {
     marginBottom: 46,
     ariaLabel: title,
     x: {
-      label: `Time for ${(ROWS / 1e6).toFixed(0)} million rows`,
+      label: `Time for ${(ROWS / 1e6).toFixed(0)} million rows (each gridline is ten times the one before)`,
       labelAnchor: "center",
       type: "log",
-      domain: [5, 30_000],
+      domain: [FLOOR, 30_000],
       ticks: [10, 100, 1000, 10_000],
       tickFormat: (d) => (d >= 1000 ? `${d / 1000} s` : `${d} ms`),
+      grid: true,
     },
     y: { label: null, domain: METHODS.map((d) => d.key), padding: 0.3, grid: false },
     marks: [
-      Plot.barX(METHODS, {
+      Plot.ruleY(METHODS, {
         y: "key",
-        x1: 5,
+        x1: FLOOR,
         x2: "ms",
+        stroke: (d) => (d.ms === FAST ? PRIMARY : ACCENT),
+        strokeWidth: 2,
+        strokeOpacity: 0.4,
+      }),
+      Plot.dot(METHODS, {
+        y: "key",
+        x: "ms",
         fill: (d) => (d.ms === FAST ? PRIMARY : ACCENT),
-        fillOpacity: (d) => (d.ms === FAST ? 0.75 : 0.25 + 0.4 * (Math.log(d.ms) / Math.log(SLOW))),
+        r: 5,
       }),
       Plot.text(METHODS, {
         y: "key",

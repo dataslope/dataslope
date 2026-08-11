@@ -2,14 +2,14 @@
  * A red/green pair and a blue/orange pair, each shown as they are and as a
  * reader with deuteranopia sees them.
  *
- * Around one man in twelve has some form of red-green colour vision
+ * Around one man in twelve has some form of red-green color vision
  * deficiency, so a chart that distinguishes two series by red against green is
  * unreadable for a substantial slice of any audience. The simulated rows are
- * not an impression: they are the same colours run through the standard
+ * not an impression: they are the same colors run through the standard
  * Viénot-Brettel-Mollon deuteranope transform, which is what the accessibility
  * checkers use.
  *
- * The fix is not to avoid colour. It is to pick pairs that differ in something
+ * The fix is not to avoid color. It is to pick pairs that differ in something
  * the deficiency does not touch: blue against orange survives, because it
  * differs along the blue-yellow axis rather than the red-green one, and it
  * differs in lightness as well.
@@ -17,15 +17,15 @@
 import { Plot, plot, HALO, MUTED } from "./_theme.mjs";
 
 export const literalColorsAllowed =
-  "The chart is a comparison of specific colour pairs and a simulation of how " +
+  "The chart is a comparison of specific color pairs and a simulation of how " +
   "they appear under deuteranopia, so the swatches have to be those exact sRGB " +
   "values. Theme roles would change the very thing being demonstrated.";
 
 export const title =
-  "Two colour pairs shown normally and as simulated for deuteranopia. The red and green pair becomes two nearly identical mustard tones; the blue and orange pair stays clearly distinct.";
+  "Two color pairs shown normally and as simulated for deuteranopia. The red and green pair becomes two nearly identical mustard tones; the blue and orange pair stays clearly distinct.";
 
 export const caption =
-  "The lower row is the upper row seen with the commonest form of colour vision deficiency. Red against green collapses; blue against orange survives, because it differs in lightness and along an axis the deficiency leaves alone.";
+  "The lower row is the upper row seen with the commonest form of color vision deficiency. Red against green collapses; blue against orange survives, because it differs in lightness and along an axis the deficiency leaves alone.";
 
 const PAIRS = [
   { key: "Red / green", colors: ["#d62728", "#2ca02c"] },
@@ -101,7 +101,7 @@ export function render() {
         x: 0.5,
         y: 1.52,
         fx: "panel",
-        text: () => "two series, one colour",
+        text: () => "two series, one color",
         fill: MUTED,
         fontSize: 11.5,
         fontWeight: 600,

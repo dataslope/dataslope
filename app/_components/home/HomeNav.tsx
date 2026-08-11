@@ -63,7 +63,7 @@ function NavLink({
       href={href}
       prefetch={prefetch}
       aria-current={active ? "page" : undefined}
-      // font-size is animated alongside the colour, so the step down happens
+      // font-size is animated alongside the color, so the step down happens
       // with the nav's height rather than snapping a frame ahead of it.
       className={`rounded-lg px-3 py-2 font-medium transition-[color,font-size] duration-200 ${
         compact ? "text-[14.5px]" : "text-[15px]"
@@ -300,7 +300,7 @@ export function HomeNav() {
   }, []);
   return (
     // `transform-gpu` (translateZ(0)) keeps the sticky header on its own
-    // compositing layer, so hover repaints inside it (nav-link colour
+    // compositing layer, so hover repaints inside it (nav-link color
     // transitions, the logo's group-hover transform) stay isolated from the
     // continuously-animating hero marquee below. Combined with the fixed
     // h-14/16 box (see above), it keeps that layer a constant size over the
@@ -361,7 +361,7 @@ export function HomeNav() {
           into the page instead of slicing through content scrolling under it
           (most visible against the hero marquee). It sits at the background's
           bottom edge, not the header box's, so it moves up with the shrink
-          instead of leaving a gap of flat colour behind it. Hidden while the
+          instead of leaving a gap of flat color behind it. Hidden while the
           page is at the top, where the header sits in normal flow above the
           content.
           `will-change-[opacity]` keeps this strip permanently on its own

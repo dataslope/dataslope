@@ -1,9 +1,9 @@
-/* Syntax-highlighting token colours (highlight.js, GitHub theme) for pages
+/* Syntax-highlighting token colors (highlight.js, GitHub theme) for pages
    OUTSIDE the Fumadocs stylesheet: the custom-content viewers (/c/<id>,
    /quiz/<id>) render Markdown with rehype-highlight but don't import
    docs.css. This block is a verbatim copy of the hljs theme inlined in
    app/docs.css (kept inlined there for scoping reasons, see its header
-   comment); if you tweak token colours, change both places.
+   comment); if you tweak token colors, change both places.
 
    Backgrounds stay transparent, the surrounding <pre> owns the block
    background (MultipleChoiceQuestion.module.css / ChallengeCard.module.css). */
@@ -85,7 +85,7 @@
   background-color: #ffeef0;
 }
 
-/* ── Dark mode token colours ──────────────────────────────────────── */
+/* ── Dark mode token colors ──────────────────────────────────────── */
 .dark .hljs {
   color: #c9d1d9;
 }

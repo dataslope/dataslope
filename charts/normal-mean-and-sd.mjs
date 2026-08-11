@@ -4,7 +4,7 @@
  *
  * Three curves on one pair of axes rather than three panels, because the claim
  * is comparative. Labelled in place instead of with a legend: the reader
- * shouldn't have to match colours to a key to read a three-line chart.
+ * shouldn't have to match colors to a key to read a three-line chart.
  */
 import { Plot, plot, normalCurve, normalPdf, HALO, SERIES } from "./_theme.mjs";
 
@@ -21,7 +21,7 @@ export const caption =
 // σ = 1 curve, and out on the left flank (where it points at the width that
 // makes it distinctive) the σ = 1 curve crosses right through the text. So it
 // moves out *and* up, clear of the crossing, and every label additionally
-// carries a page-coloured halo (HALO) so a stray crossing anywhere else is
+// carries a page-colored halo (HALO) so a stray crossing anywhere else is
 // masked rather than left to strike through the words.
 const CURVES = [
   { label: "μ = 0, σ = 1", mean: 0, sd: 1, color: SERIES[0], lift: 0.028 },
@@ -44,7 +44,7 @@ export function render() {
           strokeWidth: 2,
         }),
       ),
-      // Each label sits just above its own peak, so colour is a reinforcement
+      // Each label sits just above its own peak, so color is a reinforcement
       // rather than the only way to tell the curves apart.
       Plot.text(CURVES, {
         x: (d) => d.labelAt ?? d.mean,

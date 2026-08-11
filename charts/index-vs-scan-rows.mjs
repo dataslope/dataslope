@@ -48,14 +48,16 @@ export function render() {
       labelAnchor: "center",
       domain: [1e2, 1e8],
       ticks: [1e2, 1e4, 1e6, 1e8],
-      tickFormat: (d) => `1e${Math.round(Math.log10(d))}`,
+      tickFormat: (d) =>
+        d >= 1e9 ? `${d / 1e9}B` : d >= 1e6 ? `${d / 1e6}M` : d >= 1e3 ? `${d / 1e3}k` : String(d),
     },
     y: {
       type: "log",
       label: "Rows or pages touched",
       domain: [1, 1e8],
       ticks: [1, 1e2, 1e4, 1e6, 1e8],
-      tickFormat: (d) => (d === 1 ? "1" : `1e${Math.round(Math.log10(d))}`),
+      tickFormat: (d) =>
+        d >= 1e9 ? `${d / 1e9}B` : d >= 1e6 ? `${d / 1e6}M` : d >= 1e3 ? `${d / 1e3}k` : String(d),
     },
     color: { domain: ["Sequential scan", "Index lookup"], range: [ACCENT, PRIMARY] },
     marks: [
