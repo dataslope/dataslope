@@ -468,6 +468,31 @@ other. Note it's testing a shift in the *distribution* (often summarized
 via the median), not the mean, which is exactly why it survives outliers
 that would distort a mean.
 
+That example is deliberately extreme. The useful question is what the swap
+costs you when the data is *well behaved*, because that's the price you pay
+for the insurance. Shift the same population against itself and run both
+tests thousands of times, on three different shapes:
+
+<Chart slug="mann-whitney-vs-t" />
+
+The asymmetry is the whole argument for reaching for ranks when you're
+unsure. On normal data, where the t-test is provably the best test
+available, ranks cost a couple of percentage points of power. On
+heavy-tailed data, the t-test throws away most of the power it had, because
+the outliers land in its denominator: a few huge values inflate the sample
+standard deviation, and the test concludes it can't see through the noise it
+just manufactured. Ranks never see the outlier's size, only its position at
+the end of the queue.
+
+<Callout type="warn" title="What Mann–Whitney actually tests">
+It's tempting to describe it as "the median version of the t-test", and that
+shortcut is only safe when the two distributions have the **same shape**.
+Strictly, it asks whether a random value from one group tends to exceed a
+random value from the other. If the groups differ in spread as well as
+location, a significant result tells you they differ, not that their medians
+do. When the medians are the point, say so and compare them directly.
+</Callout>
+
 ### Wilcoxon signed-rank: paired data, robustly
 
 **The question it answers:** for **matched pairs** (same units, two

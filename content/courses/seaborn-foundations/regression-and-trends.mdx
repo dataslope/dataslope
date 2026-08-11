@@ -298,6 +298,21 @@ lonely line with a shaded band hides whether the fit is any good. Keep the
 scatter visible so the summary stays accountable to the evidence.
 </Callout>
 
+Showing the points is necessary and it is not sufficient, because there is
+one kind of troublemaker a scatter genuinely does not reveal. Everyone spots
+a point sitting far from the line. Almost nobody spots the point sitting
+*close* to the line only because the line went out to meet it:
+
+<Chart slug="leverage-vs-residual" />
+
+The word for how hard a point pulls is **leverage**, and it depends only on
+x: a point far out along the x-axis moves the fit more, per unit of vertical
+displacement, than a point in the crowd. That is why the danger zone is on
+the right of this plot rather than at the top of it. If a single far-out
+point is doing the work, the honest move is to fit twice, with and without
+it, and to report the disagreement, which is a finding about your data
+rather than a blemish to be cleaned off it.
+
 ## Your turn
 
 <ChallengeCard
