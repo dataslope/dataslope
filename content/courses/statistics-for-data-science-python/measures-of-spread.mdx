@@ -314,6 +314,13 @@ print(f"Std dev for comparison  : {data.std(ddof=1):.1f}  <- outlier-driven")
   ]}
 />
 
+<Chart slug="breakdown-point-mad-sd" />
+
+That is also why "check for outliers first" is not a substitute. Outlier
+detection means comparing points to a spread estimate, so a rule built on the
+standard deviation is already broken by the outliers it is hunting. Robust
+estimates are used to *find* outliers, not the other way round.
+
 ## The coefficient of variation: comparing spread across scales
 
 Here's a trap. Is a standard deviation of 5 "big"? You can't say, it

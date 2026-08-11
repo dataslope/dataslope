@@ -139,6 +139,13 @@ summarizing before plotting misleads you. When a mean lands where the
 data is sparse, suspect mixed groups.
 </Callout>
 
+<Chart slug="modality-is-a-mixture" />
+
+Bimodality is not a property a variable has, it is a symptom, and the
+diagnosis is almost always that two things were pooled. The fix is not a
+fancier distribution: it is to split and report both, because everything
+downstream assumed one population.
+
 ## Tail heaviness: kurtosis (lightly)
 
 The last shape question is how **heavy the tails** are, how often you
@@ -190,6 +197,12 @@ blindsided by "impossible" extremes that are actually routine for the
 distribution. Heavy tails are also why a single robust spread (IQR) can
 beat the standard deviation, one fat-tailed draw can dominate the SD.
 </Callout>
+
+<Chart slug="kurtosis-same-sd" />
+
+Every rule built on "three sigma" is quietly assuming a shape. Finance,
+insurance, network traffic and queueing all live in distributions that do not
+have it.
 
 ## Outliers: what they are (and aren't)
 
