@@ -49,6 +49,14 @@ the comparison and drops four fifths of the ink, and because a dot encodes
 position rather than length, the axis is then free to be cropped to where the
 data actually is.
 
+There is also a case where the standard advice, "sort by value", is the wrong
+move:
+
+<Chart slug="sorted-vs-natural-order" />
+
+The test is one question. If two neighbouring categories swapped places, would
+anything be wrong? If yes, the order is data and sorting deletes it.
+
 ## The simplest bar chart
 
 Before the code, one thing bars do for free that is easy to spend money on
@@ -273,6 +281,24 @@ at different heights (much harder to compare). If sub-category
 comparison is the main point, use grouped bars instead.
 </Callout>
 
+Two things a stack quietly asserts are worth checking before you draw one. The
+first is that the parts are mutually exclusive and exhaustive:
+
+<Chart slug="stack-that-double-counts" />
+
+Multi-select survey answers satisfy neither, and the axis running to 187% is
+the tell. The fix is not to normalise, which would make the arithmetic *look*
+right while making every number wrong; it is to draw plain bars from a common
+zero.
+
+The second is what normalising to 100% throws away:
+
+<Chart slug="percent-of-what" />
+
+Per cent, per capita, per thousand and index-to-100 all discard the
+denominator, and a chart that has discarded its denominator cannot tell you
+which of its numbers to believe.
+
 ## Common bar chart mistakes
 
 The first one is the axis. A bar's length *is* its value, so the moment the
@@ -298,6 +324,15 @@ shows the variation, labelled honestly.
   relative to *zero*. Cutting the axis (so bars start at 90
   instead of 0) inflates small differences and is a classic
   misleading-chart move.
+One more, specific to waterfalls, which are bars with a running total:
+
+<Chart slug="waterfall-sign-direction" />
+
+Most misleading charts are wrong about emphasis, and a careful reader can
+recover the truth from them. This one is wrong about *arithmetic*: the closing
+figure is printed on the chart and it is not the right figure. Add the terms up
+yourself and check where you land.
+
 - **Sorting alphabetically when value order would be clearer.**
 - **Using a 3-D bar chart.** Just don't.
 - **Drawing 50 bars on one chart** when a horizontal layout, a

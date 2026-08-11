@@ -186,6 +186,15 @@ objection above. Try editing it to `errorbar=("ci", 95)` and to
 `errorbar=None` to feel the difference between "uncertainty of the mean" and
 "spread of the data" and "no error information at all."
 
+Which raises the question the chart itself never answers: which interval is
+drawn?
+
+<Chart slug="error-bar-ambiguity" />
+
+All three describe the same numbers, they differ in length by a factor of six,
+and nothing in the drawing distinguishes them. The caption has to: name the
+interval, and give n.
+
 <Callout type="tip" title="Use the modern errorbar=, not the old ci=">
 Older Seaborn code used `ci=95` or `ci="sd"`. The current, clearer spelling
 is `errorbar=("ci", 95)`, `errorbar="sd"`, or `errorbar=None`. Prefer

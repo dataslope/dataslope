@@ -278,6 +278,15 @@ A line earns its connecting segments only when x is genuinely ordered; for
 unordered categories, a bar or point plot tells the truth.`}
 />
 
+One more pitfall, which arrives as a styling option and is not one:
+
+<Chart slug="smooth-line-invents-data" />
+
+A spline has to match slopes at every knot, and getting through a sharp corner
+while doing that means swinging past the values on either side. Straight
+segments claim linear interpolation, which is also a claim, and is the weakest
+one that still connects the dots.
+
 ## Your turn
 
 <ChallengeCard

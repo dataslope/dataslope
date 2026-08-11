@@ -78,6 +78,23 @@ on the cropped axis:
 
 <Chart slug="bar-truncation-cropped" />
 
+Two more that need no false numbers at all. The first inverts an axis:
+
+<Chart slug="inverted-y-axis" />
+
+Up is more. That is not a convention you can opt out of by labelling the axis,
+because a reader takes the shape first and checks the axis later, if ever. Any
+chart that needs its caption to undo the impression its shape just made has
+already lost.
+
+The second is usually an accident rather than a trick, which makes it more
+common:
+
+<Chart slug="uneven-axis-spacing" />
+
+After any `groupby`, `pivot` or `value_counts`, check whether the index you got
+back is a number pretending to be a label.
+
 ### 2. Cherry-picked time ranges
 
 Show only the months that support your story; omit the months that

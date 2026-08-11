@@ -140,6 +140,15 @@ the *index* is a coordinate the library can navigate. When in doubt with
 time series, **put time in the index**.
 </Callout>
 
+This is not a tidiness matter. Here is one series plotted against row order
+and against real dates:
+
+<Chart slug="gaps-in-a-time-axis" />
+
+Row order closes the gaps, which changes the shape, changes every slope (a
+slope is change per unit *time*, and the units are no longer time), and hides
+the outage, which is usually the interesting part.
+
 ## Building a timeline from scratch: `date_range()`
 
 When you need a regular grid of timestamps, for simulated data, for a

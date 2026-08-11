@@ -208,6 +208,16 @@ A bubble chart fails when:
 
 In those cases, prefer color or a different encoding.
 
+One failure mode is worth seeing on its own, because unlike most it makes no
+noise at all:
+
+<Chart slug="bubble-overlap-hides-points" />
+
+An overplotted scatter looks like a blob and a truncated axis has numbers on
+it, but a bubble chart that has lost nine of its points looks exactly like a
+bubble chart of the points it has left. Transparency and an outline cost
+nothing and fix it.
+
 ## Check your understanding
 
 <MultipleChoice

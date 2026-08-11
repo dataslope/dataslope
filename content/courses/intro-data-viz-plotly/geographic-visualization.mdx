@@ -112,6 +112,22 @@ Each country is a *dot* (centroid) sized by population. Try
 different projections: `"orthographic"`, `"natural earth"`,
 `"mercator"`, `"equirectangular"`.
 
+Before the projections, the decision most people skip: where the class breaks
+go.
+
+<Chart slug="choropleth-class-breaks" />
+
+None of the three schemes is wrong. What is wrong is choosing one because the
+map looks better, which is the usual method, and not saying which was used,
+which is nearly universal.
+
+And the prior question, which is whether the map should exist at all:
+
+<Chart slug="map-when-a-bar-would-do" />
+
+Write the finding out as a sentence. If it contains a direction, a border or a
+distance, keep the map.
+
 ## Map projections, they all lie a little
 
 A **map projection** is the mathematical rule for flattening a
