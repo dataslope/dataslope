@@ -477,6 +477,13 @@ the geometric as the number of *failures before* the first success
 always check which convention a tool uses before trusting the numbers.
 </Callout>
 
+<Chart slug="geometric-waiting-time" />
+
+The property that makes this distribution strange is memorylessness: given
+that the first seven attempts failed, the distribution of how many more you
+need is the same one you started with. Seven failures are not evidence that a
+success is due, and not evidence that it is not.
+
 ## Choosing the right discrete distribution
 
 When you face a counting question, the model usually falls out of three
