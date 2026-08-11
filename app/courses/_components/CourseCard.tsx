@@ -175,8 +175,8 @@ const LAYOUT = {
     text: "gap-2",
     // One size at every breakpoint: the catalog row is the same shape on a
     // phone as on a desktop, so the title has no reason to step down. The
-    // tighter tracking is what keeps 19px from reading loose at this weight.
-    title: "text-[19px] tracking-[-0.02em]",
+    // tighter tracking is what keeps 18px from reading loose at this weight.
+    title: "text-[18px] tracking-[-0.02em]",
     desc: "text-[16px] leading-[1.7]",
   },
   preview: {
