@@ -178,8 +178,8 @@ step 15, the bug is in 1–15. Bisect again.
 ```mermaid
 flowchart LR
   S["Step 1"] --> M["Step 15<br/>(check here)"] --> E["Step 30"]
-  M -- "Right" --> R1["Bug is in 16–30"]
-  M -- "Wrong" --> R2["Bug is in 1–15"]
+  M -- "Right" --> R1["Bug is in 16-30"]
+  M -- "Wrong" --> R2["Bug is in 1-15"]
 ```
 
 This $O(\log n)$ approach beats $O(n)$ re-reading every time.

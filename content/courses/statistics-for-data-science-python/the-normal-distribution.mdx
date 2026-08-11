@@ -267,7 +267,7 @@ arguments.
 
 ```mermaid
 flowchart TD
-  A["raw value x<br/>(score, height, ...)"] -->|"z = (x − mu) / sigma"| B["z-score<br/>(SDs from the mean)"]
+  A["raw value x<br/>(score, height, ...)"] -->|"z = (x - mu) / sigma"| B["z-score<br/>(SDs from the mean)"]
   B -->|"<code>norm.cdf(z)</code>"| C["percentile<br/>(fraction below)"]
   C -->|"<code>norm.ppf(p)</code>"| B
   B -->|"x = mu + z·sigma"| A
