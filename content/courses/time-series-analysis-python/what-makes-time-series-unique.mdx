@@ -379,6 +379,12 @@ unordered set, it's gone.
 The defining sin is leakage of future information into the past, which makes evaluation optimistic and irreproducible.`}
 />
 
+<Chart slug="shuffling-destroys-order" />
+
+Every summary a pipeline computes agrees that nothing happened, because
+nothing did happen to any of them. The information was in the order, and
+`train_test_split` and `KFold` both remove it by default, without a warning.
+
 ## Real-world stakes
 
 This isn't academic. Treating temporal data as an unordered table, or
