@@ -492,6 +492,20 @@ airline series' strongest structure is its *yearly* cycle. This is your
 first lesson in matching the method to the structure, and a benchmark
 we'll hold every fancy model to.
 
+Now put a real model up against it, on a proper time-based holdout, and see
+what the extra machinery actually buys:
+
+<Chart slug="forecast-baseline-naive" />
+
+The margin is the interesting part, in both directions. It is small enough
+to be believable, and that is a feature: a series whose level drifts contains
+a chunk of future that nothing could have forecast from the training window,
+so the gap between any two honest methods on it is bounded by how much of the
+future was knowable at all. Run the same model against the same baseline on a
+series whose level holds still and the same code posts a much larger number,
+without either model having improved. Report the pair, not the single
+figure, and you have said something a reader can check.
+
 ## Practice
 
 <ChallengeCard

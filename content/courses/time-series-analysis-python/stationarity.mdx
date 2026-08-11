@@ -358,6 +358,20 @@ statistics, never instead of them:
   practice). For this course, Augmented Dickey-Fuller plus a careful
   look at the plot and rolling mean/variance is enough.
 
+That first bullet is worth seeing rather than being told. Here are the three
+failure modes again, each with the p-value the test actually returns for it:
+
+<Chart slug="stationarity-three-failures" />
+
+Two things in that picture should change how you read a p-value from this
+test. The middle panel is called stationary and obviously isn't, which is
+the blind spot: no unit root exists there for the test to find, so it
+answers the question it was asked and stays silent about the one you cared
+about. And the first and third panels get the *same* verdict for completely
+different reasons, which means the verdict alone can't tell you what to do
+next. Differencing once fixes the random walk and leaves the seasonal series
+seasonal.
+
 ```mermaid
 flowchart TD
     A["Raw series"] --> B{"Constant mean,<br/>variance, and<br/>autocorrelation?"}

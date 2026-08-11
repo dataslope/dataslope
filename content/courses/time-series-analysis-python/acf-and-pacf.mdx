@@ -41,6 +41,28 @@ questions is exactly what lets us tell an **autoregressive** process from a
 **moving-average** one.
 </Callout>
 
+Both plots for one series, where we know the answer because we built it,
+make the difference concrete. This is an AR(2): every value comes from the
+two before it and nothing else.
+
+<Chart slug="pacf-cuts-acf-decays" />
+
+The lag-2 bar is where you can check the arithmetic yourself. The total
+correlation is 0.82, and squaring the lag-1 correlation, which is what a
+pure chain through the middleman would give you, accounts for 0.73 of it.
+Only the small remainder is a genuinely direct link, and it is that
+remainder the PACF is reporting. Past lag 2 there is nothing direct left to
+report, so the PACF drops into the noise band while the ACF keeps decaying
+on chain effects alone.
+
+<Callout type="warn" title="One bar poking out is not a finding">
+The shaded band is a 5% envelope, so on a plot of fourteen lags you should
+*expect* roughly one bar to escape it by chance, and the PACF above obliges
+at lag 5. Read the plots for the shape (where does it cut, where does it
+decay) rather than for individual bars, and treat an isolated spike far out
+in the lags as arithmetic until something else corroborates it.
+</Callout>
+
 ## The cheat-sheet
 
 Three series, three signatures. The shaded band is where a bar is
