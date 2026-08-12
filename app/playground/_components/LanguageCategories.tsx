@@ -1,8 +1,14 @@
 /**
  * The playground landing page's language chooser: three categories
- * (Languages / Web / Databases), each a two-column row of a label + blurb
- * beside a grid of language tiles. Implements the "Playground Page" handoff
- * mock's category grid.
+ * (Code Editors / Web Sandboxes / SQL Workbench), each a two-column row of a
+ * label + blurb beside a grid of language tiles. Implements the "Playground
+ * Page" handoff mock's category grid.
+ *
+ * The three headings name the *workspace*, not the language, which is the axis
+ * the blurbs were already written on ("editors", "sandbox", "workbench"). The
+ * previous set (Languages / Web / Databases) put one group on a different axis
+ * from the other two and implied the others were not languages, when HTML, CSS
+ * and SQL are languages too.
  *
  * Server component, the data is static. Each tile links to its
  * `/playground/<id>` route and, on hover, tints its glyph with the language's
@@ -35,9 +41,9 @@ interface Category {
 // `/playground/<id>` routes and the shared `LANGUAGE_ICONS` registry.
 const CATEGORIES: Category[] = [
   {
-    name: "Languages",
+    name: "Code Editors",
     description:
-      "General-purpose editors for writing, running, and debugging real programs without leaving the tab.",
+      "General-purpose languages for writing, running, and debugging real programs without leaving the tab.",
     items: [
       { id: "python", label: "Python", version: "3.14" },
       { id: "r", label: "R", version: "4.6" },
@@ -51,18 +57,18 @@ const CATEGORIES: Category[] = [
     ],
   },
   {
-    name: "Web",
+    name: "Web Sandboxes",
     description:
-      "A live HTML, CSS, and JavaScript preview, plus a React sandbox with instant in-browser JSX transpilation.",
+      "A live HTML, CSS, and JavaScript preview, plus React with instant in-browser JSX transpilation.",
     items: [
       { id: "web", label: "HTML", version: "HTML5 · CSS3" },
       { id: "react", label: "React", version: "19.2" },
     ],
   },
   {
-    name: "Databases",
+    name: "SQL Workbench",
     description:
-      "A full SQL workbench in the browser. Load data, run queries, and inspect results against embedded or remote engines.",
+      "Load data, run queries, and inspect results against embedded or remote engines, all in the browser.",
     items: [
       // Same order as `PLAYGROUNDS`: PostgreSQL · SQLite · DuckDB.
       { id: "postgres", label: "PostgreSQL", version: "17" },
