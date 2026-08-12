@@ -143,7 +143,14 @@ function TrackThumb({ slug, alt }: { slug: string; alt: string }) {
         loading="lazy"
         decoding="async"
         sizes="(min-width: 640px) 30vw, 65vw"
-        className="block aspect-[3/2] w-full rounded-xl object-contain"
+        // The row's hover affordance on the artwork itself, matched to the
+        // `/courses` thumbnail so the two catalogs answer a pointer the same
+        // way. A transform rather than a width: the 3:2 box keeps its measured
+        // size, so the art paints slightly larger over the row's padding and
+        // the gap beneath it without moving a single line of copy — which is
+        // the only way six rows on a grid can grow without their neighbours
+        // shifting.
+        className="block aspect-[3/2] w-full rounded-xl object-contain transition-transform duration-200 group-hover:scale-105"
       />
     </picture>
   );
