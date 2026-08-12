@@ -112,19 +112,24 @@ CREATE TABLE enrollments (
   PRIMARY KEY (student_id, course_id)
 );
 INSERT INTO students (id, name) VALUES
-  (1, 'Ada'),
-  (2, 'Grace'),
-  (3, 'Linus');
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
 INSERT INTO courses (id, title) VALUES
-  (10, 'Math'),
-  (11, 'History'),
-  (12, 'Art');
+  (10, 'Math'), (11, 'History'), (12, 'Art'),
+  (13, 'Biology'), (14, 'Physics'), (15, 'Music');
 INSERT INTO enrollments (student_id, course_id, enrolled_on) VALUES
-  (1, 10, '2024-09-01'),
-  (1, 11, '2024-09-02'),
-  (2, 10, '2024-09-01'),
-  (2, 12, '2024-09-03'),
-  (3, 11, '2024-09-02');`}
+  (1, 10, '2024-09-14'), (1, 11, '2024-09-15'), (2, 10, '2024-09-17'), (2, 12, '2024-09-19'), (3, 11, '2024-09-21'), (3, 13, '2024-09-23'),
+  (4, 10, '2024-09-23'), (4, 14, '2024-09-27'), (5, 11, '2024-09-27'), (5, 12, '2024-09-28'), (6, 13, '2024-09-04'), (6, 15, '2024-09-06'),
+  (7, 10, '2024-09-04'), (7, 13, '2024-09-07'), (8, 11, '2024-09-08'), (8, 14, '2024-09-11'), (9, 12, '2024-09-12'), (9, 15, '2024-09-15'),
+  (10, 10, '2024-09-13'), (10, 11, '2024-09-14'), (11, 13, '2024-09-19'), (11, 14, '2024-09-20'), (12, 12, '2024-09-21'), (12, 15, '2024-09-24'),
+  (13, 10, '2024-09-22'), (13, 12, '2024-09-24'), (14, 11, '2024-09-26'), (14, 15, '2024-09-02'), (15, 13, '2024-09-03'), (15, 14, '2024-09-04'),
+  (16, 10, '2024-09-03'), (16, 15, '2024-09-08'), (17, 11, '2024-09-07'), (17, 12, '2024-09-08'), (18, 13, '2024-09-12'), (18, 10, '2024-09-09'),
+  (19, 14, '2024-09-16'), (19, 11, '2024-09-13'), (20, 15, '2024-09-20'), (20, 12, '2024-09-17'), (21, 10, '2024-09-18'), (21, 13, '2024-09-21'),
+  (22, 11, '2024-09-22'), (22, 14, '2024-09-25'), (23, 12, '2024-09-26'), (23, 15, '2024-09-01'), (24, 10, '2024-09-27'), (24, 11, '2024-09-28');`}
   starterCode={`SELECT
   *
 FROM
@@ -157,14 +162,25 @@ CREATE TABLE enrollments (
   enrolled_on TEXT,
   PRIMARY KEY (student_id, course_id)
 );
-INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
-INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
+INSERT INTO students (id, name) VALUES
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
+INSERT INTO courses (id, title) VALUES
+  (10, 'Math'), (11, 'History'), (12, 'Art'),
+  (13, 'Biology'), (14, 'Physics'), (15, 'Music');
 INSERT INTO enrollments (student_id, course_id, enrolled_on) VALUES
-  (1, 10, '2024-09-01'),
-  (1, 11, '2024-09-02'),
-  (2, 10, '2024-09-01'),
-  (2, 12, '2024-09-03'),
-  (3, 11, '2024-09-02');`}
+  (1, 10, '2024-09-14'), (1, 11, '2024-09-15'), (2, 10, '2024-09-17'), (2, 12, '2024-09-19'), (3, 11, '2024-09-21'), (3, 13, '2024-09-23'),
+  (4, 10, '2024-09-23'), (4, 14, '2024-09-27'), (5, 11, '2024-09-27'), (5, 12, '2024-09-28'), (6, 13, '2024-09-04'), (6, 15, '2024-09-06'),
+  (7, 10, '2024-09-04'), (7, 13, '2024-09-07'), (8, 11, '2024-09-08'), (8, 14, '2024-09-11'), (9, 12, '2024-09-12'), (9, 15, '2024-09-15'),
+  (10, 10, '2024-09-13'), (10, 11, '2024-09-14'), (11, 13, '2024-09-19'), (11, 14, '2024-09-20'), (12, 12, '2024-09-21'), (12, 15, '2024-09-24'),
+  (13, 10, '2024-09-22'), (13, 12, '2024-09-24'), (14, 11, '2024-09-26'), (14, 15, '2024-09-02'), (15, 13, '2024-09-03'), (15, 14, '2024-09-04'),
+  (16, 10, '2024-09-03'), (16, 15, '2024-09-08'), (17, 11, '2024-09-07'), (17, 12, '2024-09-08'), (18, 13, '2024-09-12'), (18, 10, '2024-09-09'),
+  (19, 14, '2024-09-16'), (19, 11, '2024-09-13'), (20, 15, '2024-09-20'), (20, 12, '2024-09-17'), (21, 10, '2024-09-18'), (21, 13, '2024-09-21'),
+  (22, 11, '2024-09-22'), (22, 14, '2024-09-25'), (23, 12, '2024-09-26'), (23, 15, '2024-09-01'), (24, 10, '2024-09-27'), (24, 11, '2024-09-28');`}
   starterCode={`SELECT
   s.name,
   c.title,
@@ -202,10 +218,25 @@ Because the junction table stores links, you can ask student-focused or course-f
   initSql={`CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT);
 CREATE TABLE courses (id INTEGER PRIMARY KEY, title TEXT);
 CREATE TABLE enrollments (student_id INTEGER, course_id INTEGER, PRIMARY KEY (student_id, course_id));
-INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
-INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
+INSERT INTO students (id, name) VALUES
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
+INSERT INTO courses (id, title) VALUES
+  (10, 'Math'), (11, 'History'), (12, 'Art'),
+  (13, 'Biology'), (14, 'Physics'), (15, 'Music');
 INSERT INTO enrollments (student_id, course_id) VALUES
-  (1, 10), (1, 11), (2, 10), (2, 12), (3, 11);`}
+  (1, 10), (1, 11), (2, 10), (2, 12), (3, 11), (3, 13),
+  (4, 10), (4, 14), (5, 11), (5, 12), (6, 13), (6, 15),
+  (7, 10), (7, 13), (8, 11), (8, 14), (9, 12), (9, 15),
+  (10, 10), (10, 11), (11, 13), (11, 14), (12, 12), (12, 15),
+  (13, 10), (13, 12), (14, 11), (14, 15), (15, 13), (15, 14),
+  (16, 10), (16, 15), (17, 11), (17, 12), (18, 13), (18, 10),
+  (19, 14), (19, 11), (20, 15), (20, 12), (21, 10), (21, 13),
+  (22, 11), (22, 14), (23, 12), (23, 15), (24, 10), (24, 11);`}
   starterCode={`SELECT
   c.title,
   COUNT(e.student_id) AS student_count
@@ -226,10 +257,25 @@ ORDER BY
   initSql={`CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT);
 CREATE TABLE courses (id INTEGER PRIMARY KEY, title TEXT);
 CREATE TABLE enrollments (student_id INTEGER, course_id INTEGER, PRIMARY KEY (student_id, course_id));
-INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
-INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
+INSERT INTO students (id, name) VALUES
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
+INSERT INTO courses (id, title) VALUES
+  (10, 'Math'), (11, 'History'), (12, 'Art'),
+  (13, 'Biology'), (14, 'Physics'), (15, 'Music');
 INSERT INTO enrollments (student_id, course_id) VALUES
-  (1, 10), (1, 11), (2, 10), (2, 12), (3, 11);`}
+  (1, 10), (1, 11), (2, 10), (2, 12), (3, 11), (3, 13),
+  (4, 10), (4, 14), (5, 11), (5, 12), (6, 13), (6, 15),
+  (7, 10), (7, 13), (8, 11), (8, 14), (9, 12), (9, 15),
+  (10, 10), (10, 11), (11, 13), (11, 14), (12, 12), (12, 15),
+  (13, 10), (13, 12), (14, 11), (14, 15), (15, 13), (15, 14),
+  (16, 10), (16, 15), (17, 11), (17, 12), (18, 13), (18, 10),
+  (19, 14), (19, 11), (20, 15), (20, 12), (21, 10), (21, 13),
+  (22, 11), (22, 14), (23, 12), (23, 15), (24, 10), (24, 11);`}
   starterCode={`SELECT
   s.name,
   COUNT(e.course_id) AS course_count
@@ -271,14 +317,25 @@ CREATE TABLE enrollments (
   grade TEXT,
   PRIMARY KEY (student_id, course_id)
 );
-INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
-INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
+INSERT INTO students (id, name) VALUES
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
+INSERT INTO courses (id, title) VALUES
+  (10, 'Math'), (11, 'History'), (12, 'Art'),
+  (13, 'Biology'), (14, 'Physics'), (15, 'Music');
 INSERT INTO enrollments (student_id, course_id, grade) VALUES
-  (1, 10, 'A'),
-  (1, 11, 'B'),
-  (2, 10, 'A'),
-  (2, 12, 'A'),
-  (3, 11, 'B');`}
+  (1, 10, 'B'), (1, 11, 'C'), (2, 10, 'C'), (2, 12, 'B'), (3, 11, 'B'), (3, 13, 'B'),
+  (4, 10, 'B'), (4, 14, 'A'), (5, 11, 'B'), (5, 12, 'C'), (6, 13, 'B'), (6, 15, 'B'),
+  (7, 10, 'C'), (7, 13, 'A'), (8, 11, 'B'), (8, 14, 'C'), (9, 12, 'B'), (9, 15, 'B'),
+  (10, 10, 'A'), (10, 11, 'B'), (11, 13, 'B'), (11, 14, 'A'), (12, 12, 'B'), (12, 15, 'C'),
+  (13, 10, 'A'), (13, 12, 'A'), (14, 11, 'A'), (14, 15, 'B'), (15, 13, 'A'), (15, 14, 'B'),
+  (16, 10, 'B'), (16, 15, 'B'), (17, 11, 'A'), (17, 12, 'B'), (18, 13, 'B'), (18, 10, 'A'),
+  (19, 14, 'A'), (19, 11, 'A'), (20, 15, 'A'), (20, 12, 'C'), (21, 10, 'B'), (21, 13, 'B'),
+  (22, 11, 'A'), (22, 14, 'B'), (23, 12, 'A'), (23, 15, 'A'), (24, 10, 'B'), (24, 11, 'A');`}
   starterCode={`SELECT
   s.name,
   c.title,

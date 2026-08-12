@@ -40,11 +40,21 @@ CREATE TABLE orders (
   amount NUMERIC
 );
 INSERT INTO customers (id, name) VALUES
-  (1, 'Ada'),
-  (2, 'Grace');
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
 INSERT INTO orders (id, customer_id, amount) VALUES
-  (101, 1, 42),
-  (102, 2, 99);`}
+  (101, 1, 42), (102, 1, 18), (103, 2, 99), (104, 2, 15),
+  (105, 5, 30), (106, 5, 76), (107, 6, 22), (108, 7, 64),
+  (109, 8, 12), (110, 8, 48), (111, 9, 91), (112, 11, 27),
+  (113, 11, 55), (114, 12, 38), (115, 13, 19), (116, 13, 83),
+  (117, 14, 45), (118, 15, 61), (119, 16, 24), (120, 16, 70),
+  (121, 17, 33), (122, 18, 88), (123, 20, 16), (124, 20, 52),
+  (125, 21, 29), (126, 22, 74), (127, 22, 21), (128, 23, 95),
+  (129, 24, 36), (130, 1, 57), (131, 9, 40), (132, 17, 68);`}
   starterCode={`SELECT
   orders.id AS order_id,
   customers.name AS customer,
@@ -84,6 +94,12 @@ You do not write a loop. SQLite chooses an efficient plan. But conceptually, `ON
   alt="Two boards side by side with cords running only between rows whose notches match"
   caption="The `ON` condition decides which pairs of rows become one result row."
 />
+
+The next two blocks shrink the data right down, to three customers and
+two orders. That is on purpose: six pairings is few enough to check
+every one by hand, and checking them by hand once is what makes joins
+stop feeling like magic. The bigger tables come back straight
+afterwards.
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -164,8 +180,22 @@ Aliases are short names you give tables inside one query. They make joined queri
   title="The same join with aliases"
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT);
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
-INSERT INTO customers (id, name) VALUES (1, 'Ada'), (2, 'Grace');
-INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`}
+INSERT INTO customers (id, name) VALUES
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (101, 1, 42), (102, 1, 18), (103, 2, 99), (104, 2, 15),
+  (105, 5, 30), (106, 5, 76), (107, 6, 22), (108, 7, 64),
+  (109, 8, 12), (110, 8, 48), (111, 9, 91), (112, 11, 27),
+  (113, 11, 55), (114, 12, 38), (115, 13, 19), (116, 13, 83),
+  (117, 14, 45), (118, 15, 61), (119, 16, 24), (120, 16, 70),
+  (121, 17, 33), (122, 18, 88), (123, 20, 16), (124, 20, 52),
+  (125, 21, 29), (126, 22, 74), (127, 22, 21), (128, 23, 95),
+  (129, 24, 36), (130, 1, 57), (131, 9, 40), (132, 17, 68);`}
   starterCode={`SELECT
   o.id AS order_id,
   c.name AS customer,
@@ -197,8 +227,22 @@ flowchart TB
   title="A join result is just the answer"
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT);
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
-INSERT INTO customers (id, name) VALUES (1, 'Ada'), (2, 'Grace');
-INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99), (103, 1, 18);`}
+INSERT INTO customers (id, name) VALUES
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (101, 1, 42), (102, 1, 18), (103, 2, 99), (104, 2, 15),
+  (105, 5, 30), (106, 5, 76), (107, 6, 22), (108, 7, 64),
+  (109, 8, 12), (110, 8, 48), (111, 9, 91), (112, 11, 27),
+  (113, 11, 55), (114, 12, 38), (115, 13, 19), (116, 13, 83),
+  (117, 14, 45), (118, 15, 61), (119, 16, 24), (120, 16, 70),
+  (121, 17, 33), (122, 18, 88), (123, 20, 16), (124, 20, 52),
+  (125, 21, 29), (126, 22, 74), (127, 22, 21), (128, 23, 95),
+  (129, 24, 36), (130, 1, 57), (131, 9, 40), (132, 17, 68);`}
   starterCode={`SELECT
   c.name,
   COUNT(o.id) AS order_count

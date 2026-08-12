@@ -98,10 +98,23 @@ special table called `sqlite_master` (also available as
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT);
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC, placed_on TEXT);
 INSERT INTO customers (name, city) VALUES
-  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL);
+  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL),
+  ('Femi','Lagos'),('Nils','Oslo'),('Omar','Cairo'),('Priya','Mumbai'),
+  ('Rosa','Madrid'),('Sam','Oslo'),('Tariq','Cairo'),('Uma','Mumbai'),
+  ('Viktor','Prague'),('Wen','Taipei'),('Xenia','Athens'),('Yusuf',NULL),
+  ('Zara','Lagos'),('Bruno','Madrid'),('Chidi','Lagos'),('Dara','Dublin'),
+  ('Elif','Izmir'),('Farid','Rabat'),('Ivan','oslo'),('Nadia','Cairo ');
 INSERT INTO orders (customer_id, amount, placed_on) VALUES
-  (1,42.00,'2024-01-03'),(1,18.50,'2024-02-10'),
-  (2,99.00,'2024-01-29'),(3,30.00,'2024-03-05'),(3,NULL,'2024-03-06');`}
+  (1,42.00,'2024-01-03'),(1,18.50,'2024-02-10'),(2,99.00,'2024-01-29'),
+  (3,30.00,'2024-03-05'),(3,NULL,'2024-03-06'),(4,12.75,'2024-01-11'),
+  (5,64.20,'2024-02-02'),(5,27.30,'2024-03-18'),(6,8.95,'2024-01-22'),
+  (7,120.00,'2024-02-25'),(8,19.75,'2024-03-01'),(9,47.60,'2024-01-15'),
+  (10,35.15,'2024-02-14'),(11,NULL,'2024-03-09'),(12,71.00,'2024-01-08'),
+  (13,29.40,'2024-02-19'),(14,13.65,'2024-03-22'),(15,38.20,'2024-01-26'),
+  (16,52.30,'2024-02-07'),(17,9.99,'2024-03-14'),(18,26.70,'2024-01-31'),
+  (19,44.55,'2024-02-28'),(20,17.10,'2024-03-27'),(21,60.05,'2024-01-19'),
+  (22,88.40,'2024-02-11'),(23,23.15,'2024-03-03'),(24,55.90,'2024-01-06'),
+  (1,31.00,'2024-03-30'),(2,76.45,'2024-02-16'),(7,14.20,'2024-03-11');`}
   starterCode={`SELECT
   name
 FROM
@@ -129,7 +142,17 @@ column.
   dialect="sqlite"
   title="Inspect a table's columns"
   initSql={`CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC, placed_on TEXT);
-INSERT INTO orders (customer_id, amount, placed_on) VALUES (1,42.0,'2024-01-03');`}
+INSERT INTO orders (customer_id, amount, placed_on) VALUES
+  (1,42.00,'2024-01-03'),(1,18.50,'2024-02-10'),(2,99.00,'2024-01-29'),
+  (3,30.00,'2024-03-05'),(3,NULL,'2024-03-06'),(4,12.75,'2024-01-11'),
+  (5,64.20,'2024-02-02'),(5,27.30,'2024-03-18'),(6,8.95,'2024-01-22'),
+  (7,120.00,'2024-02-25'),(8,19.75,'2024-03-01'),(9,47.60,'2024-01-15'),
+  (10,35.15,'2024-02-14'),(11,NULL,'2024-03-09'),(12,71.00,'2024-01-08'),
+  (13,29.40,'2024-02-19'),(14,13.65,'2024-03-22'),(15,38.20,'2024-01-26'),
+  (16,52.30,'2024-02-07'),(17,9.99,'2024-03-14'),(18,26.70,'2024-01-31'),
+  (19,44.55,'2024-02-28'),(20,17.10,'2024-03-27'),(21,60.05,'2024-01-19'),
+  (22,88.40,'2024-02-11'),(23,23.15,'2024-03-03'),(24,55.90,'2024-01-06'),
+  (1,31.00,'2024-03-30'),(2,76.45,'2024-02-16'),(7,14.20,'2024-03-11');`}
   starterCode={`PRAGMA table_info (orders);`}
 />
 
@@ -147,7 +170,12 @@ Numbers and types only tell you so much. Always look at real rows.
   title="Look at a sample of rows"
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT);
 INSERT INTO customers (name, city) VALUES
-  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL);`}
+  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL),
+  ('Femi','Lagos'),('Nils','Oslo'),('Omar','Cairo'),('Priya','Mumbai'),
+  ('Rosa','Madrid'),('Sam','Oslo'),('Tariq','Cairo'),('Uma','Mumbai'),
+  ('Viktor','Prague'),('Wen','Taipei'),('Xenia','Athens'),('Yusuf',NULL),
+  ('Zara','Lagos'),('Bruno','Madrid'),('Chidi','Lagos'),('Dara','Dublin'),
+  ('Elif','Izmir'),('Farid','Rabat'),('Ivan','oslo'),('Nadia','Cairo ');`}
   starterCode={`SELECT
   *
 FROM
@@ -156,9 +184,14 @@ LIMIT
   5;`}
 />
 
-A five-row peek instantly answers questions a schema cannot: Are
-names capitalized consistently? Is `city` sometimes blank? Do the
-values match what the column *names* promised?
+There are 24 customers here, and the query asked for five of them. A
+peek that small still answers questions a schema cannot: Are names
+capitalized consistently? Is `city` sometimes blank? Do the values
+match what the column *names* promised?
+
+Raise the `LIMIT` to `24` and read the whole table. Something is off in
+the `city` column, and the next two queries will find it without you
+having to spot it by eye.
 
 ## Step 4, How big, and what's in the columns?
 
@@ -180,8 +213,16 @@ Now ask quantitative questions. Three are almost always useful:
   title="Counts, distinct values, and ranges"
   initSql={`CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC, placed_on TEXT);
 INSERT INTO orders (customer_id, amount, placed_on) VALUES
-  (1,42.00,'2024-01-03'),(1,18.50,'2024-02-10'),
-  (2,99.00,'2024-01-29'),(3,30.00,'2024-03-05'),(3,55.00,'2024-03-06');`}
+  (1,42.00,'2024-01-03'),(1,18.50,'2024-02-10'),(2,99.00,'2024-01-29'),
+  (3,30.00,'2024-03-05'),(3,NULL,'2024-03-06'),(4,12.75,'2024-01-11'),
+  (5,64.20,'2024-02-02'),(5,27.30,'2024-03-18'),(6,8.95,'2024-01-22'),
+  (7,120.00,'2024-02-25'),(8,19.75,'2024-03-01'),(9,47.60,'2024-01-15'),
+  (10,35.15,'2024-02-14'),(11,NULL,'2024-03-09'),(12,71.00,'2024-01-08'),
+  (13,29.40,'2024-02-19'),(14,13.65,'2024-03-22'),(15,38.20,'2024-01-26'),
+  (16,52.30,'2024-02-07'),(17,9.99,'2024-03-14'),(18,26.70,'2024-01-31'),
+  (19,44.55,'2024-02-28'),(20,17.10,'2024-03-27'),(21,60.05,'2024-01-19'),
+  (22,88.40,'2024-02-11'),(23,23.15,'2024-03-03'),(24,55.90,'2024-01-06'),
+  (1,31.00,'2024-03-30'),(2,76.45,'2024-02-16'),(7,14.20,'2024-03-11');`}
   starterCode={`SELECT
   COUNT(*) AS row_count,
   MIN(amount) AS smallest,
@@ -201,8 +242,12 @@ categories, or skew:
   title="A frequency table for one column"
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT);
 INSERT INTO customers (name, city) VALUES
-  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),
-  ('Mary','Oslo'),('Femi','Lagos'),('Nils',NULL);`}
+  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL),
+  ('Femi','Lagos'),('Nils','Oslo'),('Omar','Cairo'),('Priya','Mumbai'),
+  ('Rosa','Madrid'),('Sam','Oslo'),('Tariq','Cairo'),('Uma','Mumbai'),
+  ('Viktor','Prague'),('Wen','Taipei'),('Xenia','Athens'),('Yusuf',NULL),
+  ('Zara','Lagos'),('Bruno','Madrid'),('Chidi','Lagos'),('Dara','Dublin'),
+  ('Elif','Izmir'),('Farid','Rabat'),('Ivan','oslo'),('Nadia','Cairo ');`}
   starterCode={`SELECT
   city,
   COUNT(*) AS how_many
@@ -214,6 +259,20 @@ ORDER BY
   how_many DESC;`}
 />
 
+And there it is. `Oslo` appears three times, but so does a lonely
+`oslo` in lowercase, and `Cairo` has a sibling with a trailing space
+that looks identical on screen. SQLite is right to treat them as
+different values, because to a computer they *are* different values.
+Nobody typed those deliberately; they arrived through a form, an
+import, or a copy-paste, which is how almost all messy data arrives.
+
+This is why the frequency table is worth running before you trust a
+column. `GROUP BY city` returns 14 groups here: 11 real cities, one
+group for the rows with no city at all, and two impostors. That gap
+between "groups returned" and "cities the business actually operates
+in" is telling you something important, and it takes one query to hear
+it.
+
 ## Step 5, Hunt for gaps and surprises
 
 Real data is messy. Before trusting a column, check whether it has
@@ -224,7 +283,12 @@ missing values. A single query can count the holes:
   title="How many values are missing?"
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT);
 INSERT INTO customers (name, city) VALUES
-  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL),('Nils',NULL);`}
+  ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL),
+  ('Femi','Lagos'),('Nils','Oslo'),('Omar','Cairo'),('Priya','Mumbai'),
+  ('Rosa','Madrid'),('Sam','Oslo'),('Tariq','Cairo'),('Uma','Mumbai'),
+  ('Viktor','Prague'),('Wen','Taipei'),('Xenia','Athens'),('Yusuf',NULL),
+  ('Zara','Lagos'),('Bruno','Madrid'),('Chidi','Lagos'),('Dara','Dublin'),
+  ('Elif','Izmir'),('Farid','Rabat'),('Ivan','oslo'),('Nadia','Cairo ');`}
   starterCode={`SELECT
   COUNT(*) AS total_rows,
   COUNT(city) AS city_present,

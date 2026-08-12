@@ -36,7 +36,7 @@ Here is a small `pets` table:
 | id | name | species | age |
 | --- | --- | --- | --- |
 | 1 | Mochi | cat | 3 |
-| 2 | Biscuit | dog | 5 |
+| 2 | Pixel | dog | 5 |
 | 3 | Sunny | bird | 1 |
 
 Read one row as a sentence:
@@ -59,13 +59,13 @@ means one pet.
 ```mermaid
 flowchart LR
     ROW["One row"] --> ID["id: 2"]
-    ROW --> NAME["name: Biscuit"]
+    ROW --> NAME["name: Pixel"]
     ROW --> SPECIES["species: dog"]
     ROW --> AGE["age: 5"]
 ```
 
 Rows answer the question: **which one?** Which pet? Mochi. Which
-pet? Biscuit. A row should describe one specific thing, event, or
+pet? Pixel. A row should describe one specific thing, event, or
 fact, never a pile of several.
 
 ## Columns are attributes
@@ -183,7 +183,7 @@ flowchart LR
     S --> S2["name TEXT"]
     S --> S3["age INTEGER"]
     D --> D1["1, Mochi, cat, 3"]
-    D --> D2["2, Biscuit, dog, 5"]
+    D --> D2["2, Pixel, dog, 5"]
 ```
 
 The **schema** says what shape the table has. The **data** is what
@@ -222,9 +222,10 @@ first row you see will always appear first.
 
 ## See it in SQLite
 
-Run this example and connect each result part to the words you
-learned: table, row, column, cell, and notice the grain: each row
-is one pet.
+The three-row table above was a diagram; this one is the real thing,
+with 24 pets in it. Run it and connect each part of the result to the
+words you learned: table, row, column, cell. Notice the grain above
+all: however many rows there are, each one is still exactly one pet.
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -238,8 +239,29 @@ is one pet.
 
 INSERT INTO pets (name, species, age) VALUES
   ('Mochi', 'cat', 3),
+  ('Pixel', 'dog', 5),
+  ('Sunny', 'bird', 1),
+  ('Rex', 'dog', 8),
   ('Biscuit', 'dog', 5),
-  ('Sunny', 'bird', 1);`}
+  ('Luna', 'cat', 2),
+  ('Nori', 'cat', 7),
+  ('Pip', 'bird', 4),
+  ('Suki', 'cat', 1),
+  ('Toby', 'dog', 11),
+  ('Uni', 'rabbit', 2),
+  ('Vera', 'cat', 6),
+  ('Wally', 'dog', 3),
+  ('Yuki', 'cat', 9),
+  ('Zeno', 'bird', 2),
+  ('Ace', 'dog', 6),
+  ('Bean', 'rabbit', 4),
+  ('Cleo', 'cat', 12),
+  ('Dot', 'bird', 3),
+  ('Echo', 'dog', 1),
+  ('Fig', 'cat', 5),
+  ('Gus', 'dog', 7),
+  ('Hazel', 'rabbit', 1),
+  ('Ivy', 'cat', 4);`}
   starterCode={`SELECT
   id,
   name,

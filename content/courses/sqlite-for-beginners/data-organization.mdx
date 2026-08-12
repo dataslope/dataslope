@@ -114,11 +114,18 @@ CREATE TABLE orders (
   product_id  INTEGER REFERENCES products(id)
 );
 INSERT INTO customers (id, name, email) VALUES
-  (1,'Ada','ada@x.com'), (2,'Grace','grace@x.com');
+  (1,'Ada','ada@x.com'), (2,'Grace','grace@x.com'), (3,'Linus','linus@x.com'),
+  (4,'Mae','mae@x.com'), (5,'Rosa','rosa@x.com'), (6,'Ivan','ivan@x.com'),
+  (7,'Nadia','nadia@x.com'), (8,'Omar','omar@x.com'), (9,'Priya','priya@x.com'),
+  (10,'Quinn','quinn@x.com'), (11,'Ruth','ruth@x.com'), (12,'Sam','sam@x.com');
 INSERT INTO products (id, title, price) VALUES
-  (10,'Book',20), (11,'Pen',3);
+  (10,'Book',20), (11,'Pen',3), (12,'Notebook',7), (13,'Backpack',45),
+  (14,'Mug',9), (15,'Desk lamp',22), (16,'Stapler',11), (17,'Poster',14);
 INSERT INTO orders (id, customer_id, product_id) VALUES
-  (1,1,10), (2,1,11), (3,2,10);`}
+  (1,1,10), (2,1,11), (3,2,10), (4,2,13), (5,3,12), (6,3,14),
+  (7,4,10), (8,4,15), (9,5,11), (10,5,16), (11,6,12), (12,6,17),
+  (13,7,13), (14,7,10), (15,8,14), (16,8,11), (17,9,15), (18,9,12),
+  (19,10,16), (20,10,13), (21,11,17), (22,11,14), (23,12,10), (24,12,15);`}
   starterCode={`-- The duplicated, readable view is rebuilt on demand with a join:
 SELECT
   o.id AS order_id,

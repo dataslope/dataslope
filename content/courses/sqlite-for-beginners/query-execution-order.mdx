@@ -58,7 +58,10 @@ yet when `WHERE` is evaluated:
   id     INTEGER PRIMARY KEY,
   amount NUMERIC
 );
-INSERT INTO orders (id, amount) VALUES (1,20),(2,80),(3,60);`}
+INSERT INTO orders (id, amount) VALUES
+  (1,20),(2,80),(3,60),(4,15),(5,95),(6,40),(7,72),(8,28),
+  (9,110),(10,54),(11,33),(12,88),(13,19),(14,66),(15,47),(16,101),
+  (17,25),(18,79),(19,58),(20,36),(21,92),(22,44),(23,63),(24,17);`}
   starterCode={`-- This FAILS: "doubled" does not exist yet when WHERE runs.
 -- SELECT amount * 2 AS doubled FROM orders WHERE doubled > 100;
 -- This works: repeat the expression, since WHERE runs before SELECT.
@@ -103,7 +106,10 @@ result to the next:
   amount      NUMERIC
 );
 INSERT INTO orders (id, customer_id, amount) VALUES
-  (1,1,20),(2,1,80),(3,2,60),(4,2,15),(5,3,95),(6,3,40);`}
+  (1,1,20),(2,1,80),(3,2,60),(4,2,15),(5,3,95),(6,3,40),
+  (7,1,72),(8,4,28),(9,4,110),(10,5,54),(11,5,33),(12,2,88),
+  (13,6,19),(14,6,66),(15,3,47),(16,7,101),(17,7,25),(18,8,79),
+  (19,8,58),(20,4,36),(21,5,92),(22,6,44),(23,7,63),(24,8,17);`}
   starterCode={`SELECT
   customer_id,
   SUM(amount) AS total
