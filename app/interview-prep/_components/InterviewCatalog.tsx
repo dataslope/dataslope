@@ -1,6 +1,6 @@
 /**
  * The `/interview-prep` catalog body: two columns of role-track rows (each a
- * full-width banner, a short description of what the track drills, its topic
+ * centred banner, a short description of what the track drills, its topic
  * count, and a "Start track" link), and a footer line with the totals and a
  * pointer to /courses.
  *
@@ -17,11 +17,12 @@
  * all the talking and the six *sentences* that actually tell a visitor which
  * track is theirs were the quietest thing on the page.
  *
- * Now each track is a borderless row: the banner across the full width of the
- * row with its text beneath, so the artwork is legible at the size it was
- * drawn for while the frames and the second-print shadow stay gone. The glyphs
- * went with the cards — they were a device for straddling the banner edge, and
- * above a banner of the same role they were a second icon for one idea.
+ * Now each track is a borderless row: the banner centred above its text at
+ * two thirds of the row's width, so the artwork is legible at the size it was
+ * drawn for without outweighing the sentence under it, and the frames and the
+ * second-print shadow stay gone. The glyphs went with the cards — they were a
+ * device for straddling the banner edge, and above a banner of the same role
+ * they were a second icon for one idea.
  *
  * The track list (title, topics, links) is content-driven, passed in from
  * `getInterviewTracks` (see `lib/interviewCatalog.ts`). The per-role
@@ -33,6 +34,7 @@
  * No client interactivity, the hover affordances are pure CSS, so this stays a
  * server component (the banners read the build-time image manifest directly).
  */
+import { Layers } from "lucide-react";
 import Link from "@/app/_components/Link";
 import imageManifest from "@/lib/generated/images";
 import type { InterviewTrack } from "@/lib/interviewCatalog";
@@ -96,9 +98,9 @@ const MIME: Record<string, string> = {
   avif: "image/avif",
 };
 
-/** The track's illustration, running the full width of its row. Served
- *  WebP-first with a raster fallback from the build-time image manifest (the
- *  same source `<Figure>` reads).
+/** The track's illustration, centred above its row's copy at two thirds of the
+ *  row width. Served WebP-first with a raster fallback from the build-time
+ *  image manifest (the same source `<Figure>` reads).
  *
  *  The 3:2 box is kept — six thumbnails the same shape is what makes this read
  *  as a list rather than a scrapbook — but the art no longer fills it exactly.
@@ -111,22 +113,27 @@ const MIME: Record<string, string> = {
  *  used to carry inside the box is gone. That is the whole point of cropping a
  *  thumbnail on both axes: the box is fixed, so every margin removed from the
  *  file is width the subject gets back. The fixed 3:2 box is what keeps the
- *  six rows the same height now that the banner is full width and sits above
- *  the copy rather than beside it: without it, six differently-cropped files
- *  would each set their own row height.
+ *  six rows the same height now that the banner sits above the copy rather
+ *  than beside it: without it, six differently-cropped files would each set
+ *  their own row height.
  *
  *  `sizes` describes the painted width so the browser can pick the cheap
- *  decode: the full row on a phone, and half the grid (less the column gap) on
- *  a desktop, where the rows sit two to a line. */
+ *  decode: two thirds of the row, which is two thirds of the screen on a
+ *  phone and a third of the grid on a desktop, where rows sit two to a line. */
 function TrackThumb({ slug, alt }: { slug: string; alt: string }) {
   const entry = imageManifest[slug];
   if (!entry) return null;
   const fallback = entry.formats[entry.formats.length - 1];
   const sources = entry.formats.slice(0, -1);
   return (
-    <picture>
+    // Two thirds of the row rather than all of it: at full width the banner
+    // outweighed the sentence that actually tells a visitor whether the track
+    // is theirs. `block` is stated rather than relied on — a <picture> is
+    // inline by default and is only blockified here because it happens to be a
+    // flex item, which is not a property of this element worth depending on.
+    <picture className="mx-auto block w-[65%]">
       {sources.map((ext) => (
-        <source key={ext} srcSet={`/images/${slug}.${ext}`} type={MIME[ext]} sizes="(min-width: 640px) 45vw, 100vw" />
+        <source key={ext} srcSet={`/images/${slug}.${ext}`} type={MIME[ext]} sizes="(min-width: 640px) 30vw, 65vw" />
       ))}
       <img
         src={`/images/${slug}.${fallback}`}
@@ -135,7 +142,7 @@ function TrackThumb({ slug, alt }: { slug: string; alt: string }) {
         height={entry.height}
         loading="lazy"
         decoding="async"
-        sizes="(min-width: 640px) 45vw, 100vw"
+        sizes="(min-width: 640px) 30vw, 65vw"
         className="block aspect-[3/2] w-full rounded-xl object-contain"
       />
     </picture>
@@ -158,35 +165,38 @@ function TrackRow({ track }: { track: InterviewTrack }) {
       // Six-row index, don't viewport-prefetch every track (same opt-out the
       // courses grid uses).
       prefetch={false}
-      // Stacked, not a thumbnail column: the banner runs the full width of the
-      // row and the copy sits under it. Same shape at every breakpoint, since
-      // the two-column grid below already halves the row on a desktop, so a
-      // full-width banner there is about the width one column of the old
-      // side-by-side layout would have been at its widest.
-      className="group -mx-3 flex flex-col gap-3 rounded-2xl px-3 py-4 transition-colors hover:bg-[var(--ds-gray-50)] dark:hover:bg-white/[0.035]"
+      // Stacked, not a thumbnail column: the banner sits centred above the
+      // copy. Same shape at every breakpoint, and `gap-5` is the space beneath
+      // it — enough that the centred art reads as its own block rather than as
+      // something the title is crowding.
+      className="group -mx-3 flex flex-col gap-5 rounded-2xl px-3 py-4 transition-colors hover:bg-[var(--ds-gray-50)] dark:hover:bg-white/[0.035]"
     >
       {p ? <TrackThumb slug={p.banner} alt={p.bannerAlt} /> : null}
 
-      <span className="flex min-w-0 flex-col">
-        <span className="text-[17px] font-semibold tracking-[-0.01em] text-[var(--ds-gray-900)] transition-colors group-hover:text-[var(--ds-blue-700)] dark:text-white dark:group-hover:text-[var(--ds-blue-400)]">
+      {/* Type matched to a `/courses` catalog row: 18px title, 16px body, and
+          a single 1.7 leading on every line in the row. The two pages are the
+          same kind of list one click apart, and they were set at different
+          sizes and rhythms, which read as two different designs. */}
+      <span className="flex min-w-0 flex-col leading-[1.7]">
+        <span className="text-[18px] font-semibold leading-[1.7] tracking-[-0.02em] text-[var(--ds-gray-900)] transition-colors group-hover:text-[var(--ds-blue-700)] dark:text-white dark:group-hover:text-[var(--ds-blue-400)]">
           {track.title}
         </span>
 
         {/* `line-clamp-3` is the guard against a future entry running long and
             pushing one row taller than the rest of its grid line. */}
         {p ? (
-          <span className="mt-1.5 line-clamp-3 text-[15px] leading-[1.6] text-[#8a8a8a] dark:text-[var(--ds-gray-400)]">
+          <span className="mt-1.5 line-clamp-3 text-[16px] leading-[1.7] text-[#8a8a8a] dark:text-[var(--ds-gray-400)]">
             {p.description}
           </span>
         ) : null}
 
-        <span className="mt-2.5 flex items-center gap-2.5 text-[14px]">
+        <span className="mt-2.5 flex items-center gap-2.5 text-[16px] leading-[1.7]">
           <span className="font-semibold text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]">
             Start track
           </span>
           <svg
-            width="13"
-            height="13"
+            width="15"
+            height="15"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -199,10 +209,14 @@ function TrackRow({ track }: { track: InterviewTrack }) {
             <path d="M5 12h14" />
             <path d="m12 5 7 7-7 7" />
           </svg>
-          <span aria-hidden="true" className="text-[var(--ds-gray-300)] dark:text-[var(--ds-gray-600)]">
-            ·
-          </span>
-          <span className="text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
+          {/* `Layers` for the topic count, in place of the middle dot that used
+              to separate the two halves of this line. A track's topics are a
+              stack of subject areas, which is the sense this glyph already
+              carries elsewhere in the app (the playgrounds use it for a stack
+              of schemas). It reads as a label for the number rather than as
+              punctuation between two unrelated facts. */}
+          <span className="inline-flex items-center gap-1.5 text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
+            <Layers size={15} aria-hidden="true" />
             {track.topics.length} topics
           </span>
         </span>
