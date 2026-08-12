@@ -321,6 +321,11 @@ generic abstraction.
 
 ## Why this matters
 
+Generic abstractions are one of the great inventions of strongly
+typed languages. They let you write each piece of logic *once*,
+preserve type safety at every call site, and grow a library that
+scales as the program grows.
+
 ```mermaid
 flowchart TB
     A[Concrete code] -->|generalize| B[Generic code]
@@ -328,11 +333,6 @@ flowchart TB
     B -->|verified once| D[Fewer bugs]
     B -->|same shape across types| E[Easier to learn]
 ```
-
-Generic abstractions are one of the great inventions of strongly
-typed languages. They let you write each piece of logic *once*,
-preserve type safety at every call site, and grow a library that
-scales as the program grows.
 
 LINQ is the showcase: dozens of operators, each generic, each
 working on every sequence type, every projection type, all from a

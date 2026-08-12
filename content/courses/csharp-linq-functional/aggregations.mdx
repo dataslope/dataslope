@@ -72,6 +72,12 @@ just a shortcut.
   caption="Each built-in aggregate reads the same sequence and reports one number."
 />
 
+One of them is worth a warning. `Average()` is a single number that a
+skewed distribution moves a long way from the typical value, so it answers
+"what is the mean?" and not "what is a normal one like?":
+
+<Chart slug="skew-mean-median-mode" />
+
 ## Empty-sequence behavior
 
 Aggregations on empty sequences are a famous source of bugs.
@@ -218,12 +224,6 @@ five times), this is potentially much more efficient, though for
 small in-memory collections the difference is negligible.
 
 ## `Aggregate()` is not always the best choice
-
-It is also worth knowing what the friendly built-ins hide. `Average()` is a
-single number that a skewed distribution moves a long way from the
-typical value:
-
-<Chart slug="skew-mean-median-mode" />
 
 Built-in operators are usually clearer and equally fast:
 

@@ -37,10 +37,10 @@ never knows where its inputs came from or where its outputs will go.
 
 | Property | Shell (IO) | Core (pure) |
 | --- | --- | --- |
-| Hardest part to test | ✅ | ❌ |
-| Hardest part to read | ❌ | ✅ |
-| Worth most of your engineering attention | ✅ | ✅ |
-| Where bugs hide | ✅ | ✅ |
+| Needs mocks, fixtures or a filesystem to test | ✅ | ❌ |
+| Can be tested by comparing one value to another | ❌ | ✅ |
+| Can behave differently on two identical runs | ✅ | ❌ |
+| Holds the business rules worth arguing about | ❌ | ✅ |
 | Where LINQ shines | ❌ | ✅ |
 
 The trick is to make the *core as large as possible* and the *shell
