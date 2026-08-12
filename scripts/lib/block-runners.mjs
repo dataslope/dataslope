@@ -61,6 +61,18 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 /** Adapters this module can run. Everything else is browser-only or Python. */
 export const TEXT_ADAPTERS = ["javascript", "typescript", "c", "cpp"];
 
+/**
+ * Adapters no Node process can run, recorded by
+ * `scripts/capture-browser-outputs.mjs` from a real page.
+ *
+ * Both generators write the same manifest, so both need to agree on which
+ * entries belong to which — `build-block-outputs.mjs` carries these forward
+ * rather than regenerating them, and deleting one it cannot re-record is a
+ * loss nothing recovers from automatically. Kept beside `TEXT_ADAPTERS` so
+ * the two lists cannot drift into overlapping or leaving a gap between them.
+ */
+export const BROWSER_ADAPTERS = ["r", "java", "csharp", "web", "react", "php"];
+
 /** The bytes a file contributes: the hidden setup, then the visible buffer.
  *  Matches what Run executes, and what the output key is hashed from. */
 export function fileBody(f) {

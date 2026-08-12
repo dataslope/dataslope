@@ -850,10 +850,36 @@ generator filled a panel, and neither can the site.
   nothing but "the preview didn't finish within the time limit". There is
   nothing to store, so those 72 blocks stay blank by nature.
 
-Between the two generators, 3,290 of the site's 3,374 runnable blocks show
-their output before the reader presses Run. Of the 84 that do not, 72 are web
-and react; the other 12 are blocks that genuinely print nothing, or are marked
-`expectError` so the failure is the lesson.
+Between the two generators, 3,280 of the site's 3,374 runnable blocks show
+their output before the reader presses Run. Of the 94 that do not, 72 are web
+and react; the other 22 are blocks that genuinely print nothing, fail to run
+headlessly, or are marked `expectError` so the failure is the lesson.
+
+**The two generators share a manifest, and only one of them runs on its own.**
+`build-block-outputs` is the one the workflow invokes, and a full run of it
+starts from an empty object — that is what retires a deleted block's entry.
+The captured languages are not its to rebuild, so it carries them across by
+name, from `BROWSER_ADAPTERS` in `scripts/lib/block-runners.mjs`. Getting this
+wrong is silent and expensive: before the carry existed, the first automated
+run after the capture landed deleted all 689 r/java/csharp/php entries and
+pruned the 134 figures they pointed at, and nothing put them back — no
+workflow runs the capture, the manifest is one line of JSON so the loss is
+invisible in a diff, and a missing entry renders as the same empty panel a
+never-captured block shows. R, Java and C# previewed nothing for four
+commits. An adapter belongs to exactly one of `TEXT_ADAPTERS`,
+`BROWSER_ADAPTERS`, or python; `__tests__/blockOutputs.test.ts` asserts the
+partition against the adapter registry so a new language cannot join without
+picking a side.
+
+For the same reason, a narrowed run never writes the manifest wholesale —
+including when it selects nothing at all. `--adapter r` picks no headless
+language, and an early "no blocks selected" exit that wrote `{}` there would
+throw the whole site's output away; `--empty` is the flag that means it.
+
+SQL is not part of any of this. `<SqlCodeBlock>` is a separate component with
+its own sweep, and the prepopulated-output pipeline only ever walks
+`<CodeBlock>` — a SQL block runs against DuckDB or Postgres in the reader's
+browser and has no manifest entry by construction.
 
 Two things the capture had to solve, both easy to trip over again. Cells are
 read off `window.__blockCapture` rather than the DOM, because by the time a

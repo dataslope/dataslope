@@ -42,14 +42,17 @@ import { fileURLToPath } from "node:url";
 
 import { blockOutputKey } from "../lib/blockOutputKey.ts";
 import { extractBlocks } from "./lib/mdx-blocks.mjs";
+import { BROWSER_ADAPTERS } from "./lib/block-runners.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_FILE = join(ROOT, "lib", "generated", "block-outputs.json");
 const ASSET_DIR = join(ROOT, "public", "block-outputs");
 const ASSET_URL_BASE = "/block-outputs";
 
-/** The adapters this can reach and the headless generator cannot. */
-const BROWSER_ADAPTERS = ["r", "java", "csharp", "web", "react", "php"];
+// The adapters this can reach and the headless generator cannot live in
+// `block-runners.mjs`, next to the ones it can: the headless generator has to
+// carry these entries rather than regenerate them, so a list only this script
+// knew about would be one the other could not honour.
 
 // Same ceilings as build-block-outputs, for the same reason: every byte is
 // paid by a reader loading the lesson whether or not they look at the block.
