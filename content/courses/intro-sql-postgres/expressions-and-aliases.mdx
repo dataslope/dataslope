@@ -358,3 +358,8 @@ ORDER BY
     },
   ]}
 />
+
+Everything on this page was computed rather than stored. That
+distinction matters more than it first appears: a derived column is
+always correct, where a stored copy of the same number can drift out of
+date.
