@@ -35,9 +35,12 @@ flowchart LR
     S3["Linus"] --- C2
 ```
 
-Ada connects to two courses; Math connects to two students. The
-links cross over each other, you cannot capture that with a single
-column on either table.
+Ada connects to two courses; Math connects to several students. The
+links cross over each other, and that crossing is the whole problem:
+you cannot capture it with a single column on either table. A
+`course_id` on `students` would let each student take one course; a
+`student_id` on `courses` would let each course hold one student.
+Neither is what a school looks like.
 
 ## The junction table
 
@@ -97,12 +100,23 @@ CREATE TABLE enrollments (
   course_id  INTEGER REFERENCES courses(id),
   PRIMARY KEY (student_id, course_id)
 );
-INSERT INTO students (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus');
-INSERT INTO courses (id, title) VALUES (10,'Math'),(11,'History'),(12,'Art');
+INSERT INTO students (id, name) VALUES
+  (1,'Ada'),(2,'Grace'),(3,'Linus'),(4,'Mae'),(5,'Rosa'),(6,'Ivan'),
+  (7,'Nadia'),(8,'Omar'),(9,'Priya'),(10,'Quinn'),(11,'Ruth'),(12,'Sam'),
+  (13,'Tariq'),(14,'Uma'),(15,'Viktor'),(16,'Wen'),(17,'Xenia'),(18,'Yusuf'),
+  (19,'Zara'),(20,'Bruno'),(21,'Chidi'),(22,'Dara'),(23,'Elif'),(24,'Farid');
+INSERT INTO courses (id, title) VALUES
+  (10,'Math'),(11,'History'),(12,'Art'),(13,'Biology'),(14,'Physics'),(15,'Music');
+-- Ada: Math and History. Grace: Math and Art. Linus: History and Biology.
 INSERT INTO enrollments (student_id, course_id) VALUES
-  (1,10), (1,11),   -- Ada: Math, History
-  (2,10), (2,12),   -- Grace: Math, Art
-  (3,11);           -- Linus: History`}
+  (1,10), (1,11), (2,10), (2,12), (3,11), (3,13),
+  (4,10), (4,14), (5,11), (5,12), (6,13), (6,15),
+  (7,10), (7,13), (8,11), (8,14), (9,12), (9,15),
+  (10,10), (10,11), (11,13), (11,14), (12,12), (12,15),
+  (13,10), (13,12), (14,11), (14,15), (15,13), (15,14),
+  (16,10), (16,15), (17,11), (17,12), (18,13), (18,10),
+  (19,14), (19,11), (20,15), (20,12), (21,10), (21,13),
+  (22,11), (22,14), (23,12), (23,15), (24,10), (24,11);`}
   starterCode={`SELECT
   s.name,
   c.title
@@ -142,10 +156,22 @@ CREATE TABLE enrollments (
   student_id INTEGER, course_id INTEGER,
   PRIMARY KEY (student_id, course_id)
 );
-INSERT INTO students (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus');
-INSERT INTO courses (id, title) VALUES (10,'Math'),(11,'History'),(12,'Art');
+INSERT INTO students (id, name) VALUES
+  (1,'Ada'),(2,'Grace'),(3,'Linus'),(4,'Mae'),(5,'Rosa'),(6,'Ivan'),
+  (7,'Nadia'),(8,'Omar'),(9,'Priya'),(10,'Quinn'),(11,'Ruth'),(12,'Sam'),
+  (13,'Tariq'),(14,'Uma'),(15,'Viktor'),(16,'Wen'),(17,'Xenia'),(18,'Yusuf'),
+  (19,'Zara'),(20,'Bruno'),(21,'Chidi'),(22,'Dara'),(23,'Elif'),(24,'Farid');
+INSERT INTO courses (id, title) VALUES
+  (10,'Math'),(11,'History'),(12,'Art'),(13,'Biology'),(14,'Physics'),(15,'Music');
 INSERT INTO enrollments (student_id, course_id) VALUES
-  (1,10),(1,11),(2,10),(2,12),(3,11);`}
+  (1,10), (1,11), (2,10), (2,12), (3,11), (3,13),
+  (4,10), (4,14), (5,11), (5,12), (6,13), (6,15),
+  (7,10), (7,13), (8,11), (8,14), (9,12), (9,15),
+  (10,10), (10,11), (11,13), (11,14), (12,12), (12,15),
+  (13,10), (13,12), (14,11), (14,15), (15,13), (15,14),
+  (16,10), (16,15), (17,11), (17,12), (18,13), (18,10),
+  (19,14), (19,11), (20,15), (20,12), (21,10), (21,13),
+  (22,11), (22,14), (23,12), (23,15), (24,10), (24,11);`}
   starterCode={`SELECT
   c.title,
   COUNT(*) AS student_count
@@ -229,12 +255,16 @@ CREATE TABLE enrollments (
   course_id  INTEGER REFERENCES courses(id),
   PRIMARY KEY (student_id, course_id)
 );
-INSERT INTO students (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus');
-INSERT INTO courses (id, title) VALUES (10,'Math'),(11,'History'),(12,'Art');
+INSERT INTO students (id, name) VALUES
+  (1,'Ada'),(2,'Grace'),(3,'Linus'),(4,'Mae'),(5,'Rosa'),(6,'Ivan'),
+  (7,'Nadia'),(8,'Omar'),(9,'Priya'),(10,'Quinn'),(11,'Ruth'),(12,'Sam');
+INSERT INTO courses (id, title) VALUES
+  (10,'Math'),(11,'History'),(12,'Art'),(13,'Biology'),(14,'Physics');
 INSERT INTO enrollments (student_id, course_id) VALUES
-  (1,10), (1,11),
-  (2,10), (2,12),
-  (3,11);`}
+  (1,10), (1,11), (2,10), (2,12), (3,11), (3,13),
+  (4,10), (4,14), (5,11), (5,12), (6,13), (6,14),
+  (7,10), (7,13), (8,11), (8,14), (9,12), (9,13),
+  (10,10), (10,11), (11,13), (11,14), (12,12), (12,14);`}
   starterCode={`SELECT
   s.name,
   COUNT(*) AS course_count
@@ -264,14 +294,14 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns three students",
+      name: "Returns twelve students",
       description: "Every student is enrolled in at least one course.",
-      expectedRowCount: 3,
+      expectedRowCount: 12,
     },
     {
       id: "matches",
       name: "Matches the reference solution",
-      description: "Ada takes 2 courses, Grace 2, Linus 1.",
+      description: "Every student takes exactly 2 courses, listed alphabetically.",
       matchesSolution: true,
       ordered: true,
     },

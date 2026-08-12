@@ -50,9 +50,13 @@ Keep only departments with more than two employees:
   id SERIAL PRIMARY KEY, name TEXT, dept TEXT
 );
 INSERT INTO employees (name, dept) VALUES
-  ('Alice','Engineering'),('Bob','Engineering'),('Cara','Engineering'),
-  ('Dave','Sales'),('Eve','Sales'),
-  ('Finn','Marketing');`}
+  ('Alice','Engineering'),('Bob','Engineering'),('Carol','Sales'),
+  ('Dave','Sales'),('Eve','Marketing'),('Frank','Engineering'),
+  ('Grace','Engineering'),('Hana','Engineering'),('Ivan','Sales'),
+  ('Jade','Sales'),('Kai','Sales'),('Lena','Marketing'),('Mark','Marketing'),
+  ('Nina','Support'),('Omar','Support'),('Pia','Support'),('Quinn','Support'),
+  ('Rosa','Engineering'),('Sam','Engineering'),('Tara','Sales'),
+  ('Uri','Finance'),('Vera','Finance'),('Wes','Legal'),('Yara','Marketing');`}
   starterCode={`SELECT
   dept,
   COUNT(*) AS headcount
@@ -66,9 +70,10 @@ ORDER BY
   headcount DESC;`}
 />
 
-Only Engineering (3 people) survives. Sales (2) and Marketing (1)
-are filtered out *as groups*. Notice `HAVING` uses an aggregate,
-`COUNT(*)`, which is exactly what `WHERE` could not do.
+Four departments survive: Engineering (7 people), Sales (6),
+Marketing (4) and Support (4). Finance (2) and Legal (1) are filtered
+out *as groups*, after being counted. Notice `HAVING` uses an
+aggregate, `COUNT(*)`, which is exactly what `WHERE` could not do.
 
 ## WHERE and HAVING together
 
@@ -93,9 +98,17 @@ They are not rivals, they work as a team, each at its own stage:
 );
 INSERT INTO employees (name, dept, salary, is_intern) VALUES
   ('Alice','Engineering',120000,false),('Bob','Engineering',100000,false),
-  ('Cara','Engineering',30000,true),
+  ('Cara','Engineering',30000,true),('Frank','Engineering',110000,false),
+  ('Grace','Engineering',132000,false),('Hana','Engineering',88000,false),
+  ('Rosa','Engineering',105000,false),('Sam','Engineering',28000,true),
   ('Dave','Sales',75000,false),('Eve','Sales',72000,false),
-  ('Finn','Marketing',68000,false);`}
+  ('Ivan','Sales',76000,false),('Jade','Sales',91000,false),
+  ('Kai','Sales',26000,true),('Tara','Sales',84000,false),
+  ('Nina','Support',58000,false),('Omar','Support',61000,false),
+  ('Pia','Support',24000,true),('Quinn','Support',63000,false),
+  ('Finn','Marketing',68000,false),('Lena','Marketing',74000,false),
+  ('Mark','Marketing',62000,false),('Uri','Finance',88000,false),
+  ('Vera','Finance',92000,false),('Wes','Legal',115000,false);`}
   starterCode={`SELECT
   dept,
   ROUND(AVG(salary)) AS avg_salary
@@ -194,7 +207,12 @@ Per-row conditions go in \`WHERE\`; conditions on aggregated values go in \`HAVI
 );
 INSERT INTO orders (customer, amount) VALUES
   ('Ada', 20.00), ('Linus', 35.00), ('Ada', 12.00),
-  ('Grace', 50.00), ('Linus', 8.00), ('Ada', 41.00);`}
+  ('Grace', 50.00), ('Linus', 8.00), ('Ada', 41.00),
+  ('Mae', 27.50), ('Grace', 63.00), ('Rosa', 14.25), ('Omar', 88.00),
+  ('Ada', 33.75), ('Linus', 19.00), ('Mae', 45.60), ('Priya', 71.20),
+  ('Grace', 22.40), ('Rosa', 56.80), ('Tariq', 9.99), ('Ada', 38.15),
+  ('Mae', 61.30), ('Linus', 24.70), ('Linus', 47.85), ('Uma', 30.00),
+  ('Ada', 52.40), ('Grace', 16.60);`}
   starterCode={`SELECT
   customer,
   COUNT(*) AS order_count
@@ -224,14 +242,14 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns two customers",
-      description: "Only Ada and Linus ordered more than once.",
-      expectedRowCount: 2,
+      name: "Returns five customers",
+      description: "Four of the nine customers ordered exactly once and are filtered out.",
+      expectedRowCount: 5,
     },
     {
       id: "matches",
       name: "Matches the reference solution",
-      description: "Ada (3 orders), then Linus (2).",
+      description: "Ada (6 orders) down to Rosa (2).",
       matchesSolution: true,
       ordered: true,
     },

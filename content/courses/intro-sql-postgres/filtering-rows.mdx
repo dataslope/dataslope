@@ -43,11 +43,15 @@ flowchart TD
   salary NUMERIC
 );
 INSERT INTO employees (name, dept, salary) VALUES
-  ('Alice', 'Engineering', 120000),
-  ('Bob',   'Engineering',  95000),
-  ('Carol', 'Sales',        80000),
-  ('Dave',  'Sales',        72000),
-  ('Eve',   'Marketing',    68000);`}
+  ('Alice','Engineering',120000),('Bob','Engineering',95000),
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   name,
   dept,
@@ -84,7 +88,14 @@ You can compare with more than just equality:
 );
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
-  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   name,
   salary
@@ -113,7 +124,10 @@ So `'A%'` means "starts with A," `'%son'` means "ends with son," and
   id SERIAL PRIMARY KEY, name TEXT
 );
 INSERT INTO employees (name) VALUES
-  ('Alice'),('Bob'),('Carol'),('Dave'),('Eve');`}
+  ('Alice'),('Bob'),('Carol'),('Dave'),('Eve'),('Frank'),
+  ('Grace'),('Hana'),('Ivan'),('Jade'),('Kai'),('Lena'),
+  ('Mark'),('Nina'),('Omar'),('Pia'),('Quinn'),('Rosa'),
+  ('Sam'),('Tara'),('Uri'),('Vera'),('Wes'),('Yara');`}
   starterCode={`SELECT
   name
 FROM
@@ -137,7 +151,14 @@ Real questions often have several parts. Combine conditions with
 );
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
-  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   name,
   dept,

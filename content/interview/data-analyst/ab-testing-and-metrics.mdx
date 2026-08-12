@@ -215,10 +215,30 @@ separately, then divide.
   instructions={`The table \`funnel\` has columns \`stage\`, \`stage_order\` (1 = top of funnel), and \`users\` (distinct users reaching that stage). Return one row per stage with columns \`stage\`, \`users\`, and \`conversion_rate\`: the fraction of **top-of-funnel** users who reached this stage (this stage's \`users\` divided by the first stage's \`users\`). Sort by \`stage_order\`. Remember to multiply by \`1.0\` to avoid integer division, and \`FIRST_VALUE(users) OVER (ORDER BY stage_order)\` gives the top-of-funnel count on every row.`}
   initSql={`CREATE TABLE funnel AS
 SELECT * FROM (VALUES
-  ('Landing page', 1, 1000),
-  ('Add to cart',  2, 350),
-  ('Checkout',     3, 180),
-  ('Purchase',     4, 90)
+  ('Landing page',     1, 42000),
+  ('Product view',     2, 27500),
+  ('Size selected',    3, 19800),
+  ('Add to cart',      4, 14200),
+  ('Cart viewed',      5, 12600),
+  ('Checkout started', 6,  8900),
+  ('Address entered',  7,  7400),
+  ('Shipping chosen',  8,  6800),
+  ('Payment entered',  9,  5100),
+  ('Payment verified',10,  4600),
+  ('Order reviewed',  11,  4300),
+  ('Purchase',        12,  3900),
+  ('Confirmation',    13,  3850),
+  ('Receipt emailed', 14,  3820),
+  ('Account created', 15,  1650),
+  ('Newsletter opt-in',16, 1180),
+  ('Review prompted', 17,   940),
+  ('Review submitted',18,   310),
+  ('Referral shown',  19,   280),
+  ('Referral sent',   20,    95),
+  ('Repeat visit',    21,  1420),
+  ('Repeat purchase', 22,   610),
+  ('Subscription offer',23,  480),
+  ('Subscribed',      24,   120)
 ) AS t(stage, stage_order, users);`}
   starterCode={`-- Each stage's users as a fraction of the top-of-funnel users.
 SELECT

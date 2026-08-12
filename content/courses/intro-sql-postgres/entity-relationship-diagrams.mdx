@@ -117,12 +117,25 @@ CREATE TABLE orders (
   total       NUMERIC
 );
 INSERT INTO customers (id, name, email) VALUES
-  (1,'Ada','ada@example.com'),
-  (2,'Grace','grace@example.com');
+  (1,'Ada','ada@example.com'), (2,'Grace','grace@example.com'),
+  (3,'Linus','linus@example.com'), (4,'Mae','mae@example.com'),
+  (5,'Rosa','rosa@example.com'), (6,'Ivan','ivan@example.com'),
+  (7,'Nadia','nadia@example.com'), (8,'Omar','omar@example.com'),
+  (9,'Priya','priya@example.com'), (10,'Quinn','quinn@example.com'),
+  (11,'Ruth','ruth@example.com'), (12,'Sam','sam@example.com');
 INSERT INTO orders (id, customer_id, order_date, total) VALUES
-  (101, 1, DATE '2026-05-01', 42),
-  (102, 1, DATE '2026-05-09', 18),
-  (103, 2, DATE '2026-05-10', 99);`}
+  (101, 1, DATE '2026-05-01', 42), (102, 1, DATE '2026-05-09', 18),
+  (103, 2, DATE '2026-05-10', 99), (104, 2, DATE '2026-05-12', 15),
+  (105, 3, DATE '2026-05-02', 30), (106, 3, DATE '2026-05-18', 76),
+  (107, 4, DATE '2026-05-05', 22), (108, 5, DATE '2026-05-21', 64),
+  (109, 5, DATE '2026-05-23', 12), (110, 6, DATE '2026-05-07', 48),
+  (111, 6, DATE '2026-05-26', 91), (112, 7, DATE '2026-05-11', 27),
+  (113, 7, DATE '2026-05-28', 55), (114, 8, DATE '2026-05-14', 38),
+  (115, 8, DATE '2026-05-30', 19), (116, 9, DATE '2026-05-03', 83),
+  (117, 9, DATE '2026-05-16', 45), (118, 10, DATE '2026-05-19', 61),
+  (119, 10, DATE '2026-05-24', 24), (120, 11, DATE '2026-05-08', 70),
+  (121, 11, DATE '2026-05-27', 33), (122, 12, DATE '2026-05-13', 88),
+  (123, 12, DATE '2026-05-22', 16), (124, 1, DATE '2026-05-29', 52);`}
   starterCode={`SELECT
   c.name,
   o.order_date,

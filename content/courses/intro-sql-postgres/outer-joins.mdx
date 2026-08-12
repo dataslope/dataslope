@@ -48,10 +48,23 @@ CREATE TABLE orders (
   customer_id INTEGER,
   amount      NUMERIC
 );
+-- Linus, Mae, Quinn and Zara have no orders.
 INSERT INTO customers (id, name) VALUES
-  (1,'Ada'), (2,'Grace'), (3,'Linus');   -- Linus has no orders
+  (1,'Ada'), (2,'Grace'), (3,'Linus'), (4,'Mae'),
+  (5,'Rosa'), (6,'Ivan'), (7,'Nadia'), (8,'Omar'),
+  (9,'Priya'), (10,'Quinn'), (11,'Ruth'), (12,'Sam'),
+  (13,'Tariq'), (14,'Uma'), (15,'Viktor'), (16,'Wen'),
+  (17,'Xenia'), (18,'Yusuf'), (19,'Zara'), (20,'Bruno'),
+  (21,'Chidi'), (22,'Dara'), (23,'Elif'), (24,'Farid');
 INSERT INTO orders (id, customer_id, amount) VALUES
-  (101,1,42), (102,2,99);`}
+  (101,1,42), (102,1,18), (103,2,99), (104,2,15),
+  (105,5,30), (106,5,76), (107,6,22), (108,7,64),
+  (109,8,12), (110,8,48), (111,9,91), (112,11,27),
+  (113,11,55), (114,12,38), (115,13,19), (116,13,83),
+  (117,14,45), (118,15,61), (119,16,24), (120,16,70),
+  (121,17,33), (122,18,88), (123,20,16), (124,20,52),
+  (125,21,29), (126,22,74), (127,22,21), (128,23,95),
+  (129,24,36), (130,1,57), (131,9,40), (132,17,68);`}
   starterCode={`SELECT
   c.name,
   o.id AS order_id,
@@ -82,8 +95,22 @@ ones whose match came back empty:
 CREATE TABLE orders (
   id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC
 );
-INSERT INTO customers (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus'),(4,'Mae');
-INSERT INTO orders (id, customer_id, amount) VALUES (101,1,42),(102,2,99);`}
+INSERT INTO customers (id, name) VALUES
+  (1,'Ada'), (2,'Grace'), (3,'Linus'), (4,'Mae'),
+  (5,'Rosa'), (6,'Ivan'), (7,'Nadia'), (8,'Omar'),
+  (9,'Priya'), (10,'Quinn'), (11,'Ruth'), (12,'Sam'),
+  (13,'Tariq'), (14,'Uma'), (15,'Viktor'), (16,'Wen'),
+  (17,'Xenia'), (18,'Yusuf'), (19,'Zara'), (20,'Bruno'),
+  (21,'Chidi'), (22,'Dara'), (23,'Elif'), (24,'Farid');
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (101,1,42), (102,1,18), (103,2,99), (104,2,15),
+  (105,5,30), (106,5,76), (107,6,22), (108,7,64),
+  (109,8,12), (110,8,48), (111,9,91), (112,11,27),
+  (113,11,55), (114,12,38), (115,13,19), (116,13,83),
+  (117,14,45), (118,15,61), (119,16,24), (120,16,70),
+  (121,17,33), (122,18,88), (123,20,16), (124,20,52),
+  (125,21,29), (126,22,74), (127,22,21), (128,23,95),
+  (129,24,36), (130,1,57), (131,9,40), (132,17,68);`}
   starterCode={`SELECT
   c.name
 FROM
@@ -95,9 +122,11 @@ ORDER BY
   c.name;`}
 />
 
-Linus and Mae have no orders, so their joined `o.id` is `NULL`, and
-the filter keeps exactly them. This pattern, *outer join, then test
-for `NULL`*, answers a whole family of "who is missing?" questions.
+Four of the 24 customers (Linus, Mae, Quinn and Zara) have no orders,
+so their joined `o.id` is `NULL`, and the filter keeps exactly them.
+This pattern, *outer join, then test for `NULL`*, answers a whole
+family of "who is missing?" questions: products that never sold,
+students who enrolled in nothing, invoices with no payment.
 
 <Figure
   slug="sql-outer-joins-finding-unmatched-rows-inline-cutout"
@@ -221,9 +250,18 @@ CREATE TABLE orders (
   customer_id INTEGER REFERENCES customers(id),
   amount      NUMERIC(8, 2)
 );
-INSERT INTO customers (name) VALUES ('Ada'), ('Grace'), ('Linus'), ('Mae');
+INSERT INTO customers (name) VALUES
+  ('Ada'), ('Grace'), ('Linus'), ('Mae'), ('Rosa'), ('Ivan'),
+  ('Nadia'), ('Omar'), ('Priya'), ('Quinn'), ('Ruth'), ('Sam'),
+  ('Tariq'), ('Uma'), ('Viktor'), ('Wen'), ('Xenia'), ('Yusuf'),
+  ('Zara'), ('Bruno'), ('Chidi'), ('Dara'), ('Elif'), ('Farid');
 INSERT INTO orders (customer_id, amount) VALUES
-  (1, 42.00), (2, 99.00), (2, 15.00);`}
+  (1, 42.00), (2, 99.00), (2, 15.00), (5, 30.00), (5, 76.00),
+  (6, 22.00), (7, 64.00), (8, 12.00), (8, 48.00), (9, 91.00),
+  (11, 27.00), (11, 55.00), (12, 38.00), (13, 19.00), (13, 83.00),
+  (14, 45.00), (15, 61.00), (16, 24.00), (16, 70.00), (17, 33.00),
+  (18, 88.00), (20, 16.00), (20, 52.00), (21, 29.00), (22, 74.00),
+  (23, 95.00), (24, 36.00), (1, 57.00);`}
   starterCode={`SELECT
   c.name
 FROM
@@ -249,14 +287,14 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns two customers",
+      name: "Returns four customers",
       description: "Only the customers with no orders.",
-      expectedRowCount: 2,
+      expectedRowCount: 4,
     },
     {
       id: "matches",
       name: "Matches the reference solution",
-      description: "Linus, then Mae.",
+      description: "Linus, Mae, Quinn, then Zara.",
       matchesSolution: true,
       ordered: true,
     },

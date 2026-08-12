@@ -38,7 +38,13 @@ because the aggregate does not exist yet when `WHERE` runs.
   dialect="duckdb"
   initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
   (1, 'North', 120.0), (2, 'South', 80.0), (3, 'North', 60.0),
-  (4, 'East', 200.0), (5, 'South', 90.0), (6, 'North', 75.0)
+  (4, 'East', 200.0), (5, 'South', 90.0), (6, 'North', 75.0),
+  (7, 'West', 145.0), (8, 'East', 95.0), (9, 'South', 130.0),
+  (10, 'North', 210.0), (11, 'West', 40.0), (12, 'East', 175.0),
+  (13, 'South', 65.0), (14, 'North', 88.0), (15, 'West', 62.0),
+  (16, 'East', 45.0), (17, 'South', 105.0), (18, 'North', 99.0),
+  (19, 'West', 155.0), (20, 'East', 185.0), (21, 'South', 70.0),
+  (22, 'North', 143.0), (23, 'West', 118.0), (24, 'East', 52.0)
 ) AS t(id, region, amount);`}
   starterCode={`SELECT region, COUNT(*) AS n, SUM(amount) AS revenue
 FROM events
@@ -60,7 +66,13 @@ or a running total.
   dialect="duckdb"
   initSql={`CREATE TABLE sales AS SELECT * FROM (VALUES
   ('North', 'Ava', 100), ('North', 'Ben', 140), ('North', 'Cy', 120),
-  ('South', 'Di', 90),   ('South', 'Ed', 130)
+  ('North', 'Dana', 175), ('North', 'Eli', 85), ('North', 'Fay', 210),
+  ('South', 'Di', 90), ('South', 'Ed', 130), ('South', 'Gil', 165),
+  ('South', 'Hana', 75), ('South', 'Ira', 145), ('South', 'Jo', 110),
+  ('East', 'Kim', 200), ('East', 'Lars', 95), ('East', 'Mira', 155),
+  ('East', 'Ned', 130), ('East', 'Ola', 70), ('East', 'Pax', 185),
+  ('West', 'Quin', 115), ('West', 'Rae', 160), ('West', 'Sol', 45),
+  ('West', 'Tao', 195), ('West', 'Uma', 105), ('West', 'Val', 140)
 ) AS t(region, rep, amount);`}
   starterCode={`SELECT
   region, rep, amount,
@@ -89,7 +101,14 @@ division rather than integer truncation.
 <SqlCodeBlock
   dialect="duckdb"
   initSql={`CREATE TABLE funnel AS SELECT * FROM (VALUES
-  ('A', 1000, 120), ('B', 800, 96), ('C', 0, 0)
+  ('A', 1000, 120), ('B', 800, 96), ('C', 0, 0),
+  ('D', 1240, 173), ('E', 640, 51), ('F', 0, 0),
+  ('G', 2100, 315), ('H', 480, 24), ('I', 1560, 218),
+  ('J', 920, 110), ('K', 0, 0), ('L', 1380, 152),
+  ('M', 760, 68), ('N', 1900, 247), ('O', 540, 43),
+  ('P', 1120, 179), ('Q', 860, 60), ('R', 1440, 216),
+  ('S', 700, 35), ('T', 1680, 269), ('U', 0, 0),
+  ('V', 980, 127), ('W', 1260, 88), ('X', 820, 106)
 ) AS t(variant, sessions, conversions);`}
   starterCode={`SELECT
   variant,
@@ -142,9 +161,28 @@ id.
   initSql={`CREATE TABLE hits AS SELECT * FROM (VALUES
   (1, TIMESTAMP '2024-01-01 09:00:00'),
   (1, TIMESTAMP '2024-01-01 09:10:00'),
+  (1, TIMESTAMP '2024-01-01 09:25:00'),
   (1, TIMESTAMP '2024-01-01 11:00:00'),
+  (1, TIMESTAMP '2024-01-01 11:15:00'),
+  (1, TIMESTAMP '2024-01-01 14:40:00'),
   (2, TIMESTAMP '2024-01-01 09:05:00'),
-  (2, TIMESTAMP '2024-01-01 09:20:00')
+  (2, TIMESTAMP '2024-01-01 09:20:00'),
+  (2, TIMESTAMP '2024-01-01 09:45:00'),
+  (2, TIMESTAMP '2024-01-01 13:00:00'),
+  (2, TIMESTAMP '2024-01-01 13:20:00'),
+  (3, TIMESTAMP '2024-01-01 08:30:00'),
+  (3, TIMESTAMP '2024-01-01 08:55:00'),
+  (3, TIMESTAMP '2024-01-01 12:10:00'),
+  (3, TIMESTAMP '2024-01-01 12:35:00'),
+  (3, TIMESTAMP '2024-01-01 18:00:00'),
+  (4, TIMESTAMP '2024-01-01 10:00:00'),
+  (4, TIMESTAMP '2024-01-01 10:20:00'),
+  (4, TIMESTAMP '2024-01-01 10:45:00'),
+  (4, TIMESTAMP '2024-01-01 16:05:00'),
+  (5, TIMESTAMP '2024-01-01 07:15:00'),
+  (5, TIMESTAMP '2024-01-01 07:40:00'),
+  (5, TIMESTAMP '2024-01-01 15:30:00'),
+  (5, TIMESTAMP '2024-01-01 15:50:00')
 ) AS t(user_id, ts);`}
   starterCode={`WITH gaps AS (
   SELECT user_id, ts,
@@ -197,7 +235,17 @@ PRECEDING AND CURRENT ROW`, which accumulates from the start.
   dialect="duckdb"
   initSql={`CREATE TABLE txns AS SELECT * FROM (VALUES
   (DATE '2024-01-01', 100), (DATE '2024-01-02', 250),
-  (DATE '2024-01-03', 75),  (DATE '2024-01-04', 180)
+  (DATE '2024-01-03', 75),  (DATE '2024-01-04', 180),
+  (DATE '2024-01-05', 320), (DATE '2024-01-06', 140),
+  (DATE '2024-01-07', 95),  (DATE '2024-01-08', 210),
+  (DATE '2024-01-09', 60),  (DATE '2024-01-10', 275),
+  (DATE '2024-01-11', 130), (DATE '2024-01-12', 185),
+  (DATE '2024-01-13', 340), (DATE '2024-01-14', 55),
+  (DATE '2024-01-15', 220), (DATE '2024-01-16', 165),
+  (DATE '2024-01-17', 90),  (DATE '2024-01-18', 300),
+  (DATE '2024-01-19', 125), (DATE '2024-01-20', 240),
+  (DATE '2024-01-21', 70),  (DATE '2024-01-22', 195),
+  (DATE '2024-01-23', 155), (DATE '2024-01-24', 280)
 ) AS t(day, amount);`}
   starterCode={`SELECT
   day,
@@ -296,7 +344,11 @@ WHERE b.user_id IS NULL;   -- active in Jan, gone in Feb
   instructions={`Table \`events\` has columns \`user_id\`, \`variant\`, and \`converted\` (\`1\` if the user converted, else \`0\`). Return one row per \`variant\` with columns \`variant\` and \`rate\`, where \`rate\` is conversions divided by the number of users in that variant. Use \`NULLIF\` to guard the denominator. Order by \`variant\`.`}
   initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
   (1, 'A', 1), (2, 'A', 0), (3, 'A', 0), (7, 'A', 0),
-  (4, 'B', 1), (5, 'B', 1), (6, 'B', 0), (8, 'B', 1)
+  (9, 'A', 1), (11, 'A', 0), (13, 'A', 0), (15, 'A', 1),
+  (17, 'A', 0), (19, 'A', 0), (21, 'A', 0), (23, 'A', 1),
+  (4, 'B', 1), (5, 'B', 1), (6, 'B', 0), (8, 'B', 1),
+  (10, 'B', 0), (12, 'B', 1), (14, 'B', 1), (16, 'B', 0),
+  (18, 'B', 1), (20, 'B', 0), (22, 'B', 1), (24, 'B', 1)
 ) AS t(user_id, variant, converted);`}
   starterCode={`-- One row per variant: variant, rate = conversions / users.
 SELECT
@@ -321,12 +373,18 @@ ORDER BY variant;`}
   title="Each customer's first order"
   instructions={`Table \`orders\` has columns \`id\`, \`customer_id\`, \`order_date\`, and \`amount\`. Return **one row per customer**, their **earliest** order, with columns \`customer_id\`, \`order_date\`, and \`amount\`. Use a window function (\`ROW_NUMBER\`) in a CTE. Order by \`customer_id\`.`}
   initSql={`CREATE TABLE orders AS SELECT * FROM (VALUES
-  (1, 10, DATE '2024-01-05', 120.0),
-  (2, 10, DATE '2024-02-01', 60.0),
-  (3, 20, DATE '2024-01-20', 80.0),
-  (4, 30, DATE '2024-01-02', 45.0),
-  (5, 30, DATE '2024-03-10', 90.0),
-  (6, 20, DATE '2024-04-01', 30.0)
+  (1, 10, DATE '2024-01-05', 120.0), (2, 10, DATE '2024-02-01', 60.0),
+  (3, 20, DATE '2024-01-20', 80.0),  (4, 30, DATE '2024-01-02', 45.0),
+  (5, 30, DATE '2024-03-10', 90.0),  (6, 20, DATE '2024-04-01', 30.0),
+  (7, 40, DATE '2024-01-11', 210.0), (8, 40, DATE '2024-02-18', 75.0),
+  (9, 50, DATE '2024-01-27', 165.0), (10, 50, DATE '2024-03-02', 55.0),
+  (11, 60, DATE '2024-01-08', 95.0), (12, 60, DATE '2024-02-25', 140.0),
+  (13, 70, DATE '2024-01-16', 185.0), (14, 70, DATE '2024-04-05', 40.0),
+  (15, 80, DATE '2024-01-23', 130.0), (16, 80, DATE '2024-03-19', 70.0),
+  (17, 90, DATE '2024-01-30', 250.0), (18, 90, DATE '2024-02-12', 85.0),
+  (19, 100, DATE '2024-01-14', 110.0), (20, 100, DATE '2024-03-27', 65.0),
+  (21, 110, DATE '2024-01-19', 175.0), (22, 110, DATE '2024-04-09', 50.0),
+  (23, 120, DATE '2024-01-04', 200.0), (24, 120, DATE '2024-02-29', 35.0)
 ) AS t(id, customer_id, order_date, amount);`}
   starterCode={`-- Keep only each customer's earliest order.
 WITH ranked AS (

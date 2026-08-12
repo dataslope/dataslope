@@ -53,15 +53,25 @@ CREATE TABLE orders (
   customer_id INTEGER,
   amount      NUMERIC
 );
+-- Linus, Mae, Quinn and Zara have no orders.
 INSERT INTO customers (id, name) VALUES
-  (1, 'Ada'),
-  (2, 'Grace'),
-  (3, 'Linus');         -- Linus has no orders
+  (1,'Ada'), (2,'Grace'), (3,'Linus'), (4,'Mae'),
+  (5,'Rosa'), (6,'Ivan'), (7,'Nadia'), (8,'Omar'),
+  (9,'Priya'), (10,'Quinn'), (11,'Ruth'), (12,'Sam'),
+  (13,'Tariq'), (14,'Uma'), (15,'Viktor'), (16,'Wen'),
+  (17,'Xenia'), (18,'Yusuf'), (19,'Zara'), (20,'Bruno'),
+  (21,'Chidi'), (22,'Dara'), (23,'Elif'), (24,'Farid');
+-- Order 199 points at customer 99, who does not exist.
 INSERT INTO orders (id, customer_id, amount) VALUES
-  (101, 1, 42),
-  (102, 1, 18),
-  (103, 2, 99),
-  (104, 7, 55);         -- customer 7 does not exist`}
+  (101,1,42), (102,1,18), (103,2,99), (104,2,15),
+  (105,5,30), (106,5,76), (107,6,22), (108,7,64),
+  (109,8,12), (110,8,48), (111,9,91), (112,11,27),
+  (113,11,55), (114,12,38), (115,13,19), (116,13,83),
+  (117,14,45), (118,15,61), (119,16,24), (120,16,70),
+  (121,17,33), (122,18,88), (123,20,16), (124,20,52),
+  (125,21,29), (126,22,74), (127,22,21), (128,23,95),
+  (129,24,36), (130,1,57), (131,9,40), (132,17,68),
+  (199,99,55);`}
   starterCode={`SELECT
   c.name,
   o.id AS order_id,
@@ -74,10 +84,15 @@ ORDER BY
   o.id;`}
 />
 
-The result shows Ada (two orders) and Grace (one). **Linus is
-absent** (no orders to match), and **order 104 is absent** (its
-customer 7 does not exist). That is the inner join doing its job:
-no match, no row.
+Twenty-four customers and thirty-three orders go in, and thirty-two
+rows come out. **Linus, Mae, Quinn and Zara are absent** (no orders to
+match), and **order 199 is absent** (its customer 99 does not exist).
+That is the inner join doing its job: no match, no row.
+
+It is worth pausing on how quiet that is. Nothing warned you that five
+things were dropped. If you ever open a report and the row count looks
+lower than it should, an inner join silently discarding unmatched rows
+is the first suspect.
 
 <Callout type="info" title="INNER is optional">
 `JOIN` and `INNER JOIN` mean exactly the same thing, `INNER` is the
@@ -125,10 +140,17 @@ CREATE TABLE orders (
   customer_id INTEGER,
   product_id INTEGER
 );
-INSERT INTO customers (id, name) VALUES (1,'Ada'),(2,'Grace');
-INSERT INTO products (id, title, price) VALUES (10,'Book',20),(11,'Pen',3);
+INSERT INTO customers (id, name) VALUES
+  (1,'Ada'), (2,'Grace'), (3,'Linus'), (4,'Mae'), (5,'Rosa'), (6,'Ivan'),
+  (7,'Nadia'), (8,'Omar'), (9,'Priya'), (10,'Quinn'), (11,'Ruth'), (12,'Sam');
+INSERT INTO products (id, title, price) VALUES
+  (10,'Book',20), (11,'Pen',3), (12,'Notebook',7), (13,'Backpack',45),
+  (14,'Mug',9), (15,'Desk lamp',22), (16,'Stapler',11), (17,'Poster',14);
 INSERT INTO orders (id, customer_id, product_id) VALUES
-  (101,1,10),(102,1,11),(103,2,10);`}
+  (101,1,10), (102,1,11), (103,2,10), (104,2,13), (105,3,12), (106,3,14),
+  (107,4,10), (108,4,15), (109,5,11), (110,5,16), (111,6,12), (112,6,17),
+  (113,7,13), (114,7,10), (115,8,14), (116,8,11), (117,9,15), (118,9,12),
+  (119,10,16), (120,10,13), (121,11,17), (122,11,14), (123,12,10), (124,12,15);`}
   starterCode={`SELECT
   c.name,
   p.title,
@@ -252,9 +274,17 @@ CREATE TABLE orders (
   amount      NUMERIC(8, 2) NOT NULL
 );
 INSERT INTO customers (name, city) VALUES
-  ('Ada', 'London'), ('Linus', 'Helsinki'), ('Grace', 'New York');
+  ('Ada', 'London'), ('Linus', 'Helsinki'), ('Grace', 'New York'),
+  ('Mae', 'Toronto'), ('Rosa', 'Madrid'), ('Ivan', 'Sofia'),
+  ('Nadia', 'Tunis'), ('Omar', 'Cairo'), ('Priya', 'Mumbai'),
+  ('Quinn', 'London'), ('Ruth', 'Cape Town'), ('Sam', 'Toronto');
 INSERT INTO orders (customer_id, amount) VALUES
-  (1, 120.00), (2, 80.00), (1, 30.00), (3, 200.00);`}
+  (1, 120.00), (2, 80.00), (1, 30.00), (3, 200.00),
+  (4, 45.50), (5, 165.25), (6, 22.75), (7, 91.00),
+  (8, 133.40), (9, 58.90), (10, 17.30), (11, 204.60),
+  (12, 74.15), (1, 96.80), (2, 149.00), (3, 38.25),
+  (4, 187.50), (5, 63.70), (6, 112.35), (7, 26.40),
+  (8, 175.90), (9, 49.05), (11, 141.20), (12, 85.55);`}
   starterCode={`SELECT
   c.name,
   c.city,
@@ -282,13 +312,13 @@ ORDER BY
     {
       id: "row_count",
       name: "Returns one row per order",
-      description: "Four orders, four rows.",
-      expectedRowCount: 4,
+      description: "Twenty-four orders, twenty-four rows.",
+      expectedRowCount: 24,
     },
     {
       id: "matches",
       name: "Matches the reference solution",
-      description: "Grace's 200.00 first, down to Ada's 30.00.",
+      description: "Ruth's 204.60 first, down to Quinn's 17.30.",
       matchesSolution: true,
       ordered: true,
     },

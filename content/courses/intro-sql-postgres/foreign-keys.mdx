@@ -89,7 +89,11 @@ CREATE TABLE orders (
   customer_id INTEGER REFERENCES customers(id),
   amount      NUMERIC
 );
-INSERT INTO customers (name) VALUES ('Ada'), ('Grace');`}
+INSERT INTO customers (name) VALUES
+  ('Ada'), ('Grace'), ('Linus'), ('Mae'), ('Rosa'), ('Ivan'),
+  ('Nadia'), ('Omar'), ('Priya'), ('Quinn'), ('Ruth'), ('Sam'),
+  ('Tariq'), ('Uma'), ('Viktor'), ('Wen'), ('Xenia'), ('Yusuf'),
+  ('Zara'), ('Bruno'), ('Chidi'), ('Dara'), ('Elif'), ('Farid');`}
   starterCode={`-- Customer 1 (Ada) exists, so this is fine:
 INSERT INTO
   orders (customer_id, amount)

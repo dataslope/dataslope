@@ -70,12 +70,18 @@ that day's rows are scanned, and the trailing comment shows how wrapping
   event_type  VARCHAR
 );
 INSERT INTO events VALUES
-  (DATE '2024-06-01', 1, 'click'),
-  (DATE '2024-06-01', 1, 'click'),
-  (DATE '2024-06-01', 2, 'view'),
-  (DATE '2024-06-02', 1, 'purchase'),
-  (DATE '2024-06-02', 3, 'click'),
-  (DATE '2024-06-03', 2, 'click');`}
+  (DATE '2024-06-01', 1, 'click'), (DATE '2024-06-01', 1, 'click'),
+  (DATE '2024-06-01', 2, 'view'),  (DATE '2024-06-01', 3, 'view'),
+  (DATE '2024-06-01', 3, 'click'), (DATE '2024-06-01', 4, 'purchase'),
+  (DATE '2024-06-01', 5, 'view'),  (DATE '2024-06-01', 2, 'click'),
+  (DATE '2024-06-02', 1, 'purchase'), (DATE '2024-06-02', 3, 'click'),
+  (DATE '2024-06-02', 4, 'view'),  (DATE '2024-06-02', 5, 'click'),
+  (DATE '2024-06-02', 6, 'view'),  (DATE '2024-06-02', 2, 'purchase'),
+  (DATE '2024-06-03', 2, 'click'), (DATE '2024-06-03', 6, 'click'),
+  (DATE '2024-06-03', 7, 'view'),  (DATE '2024-06-03', 1, 'view'),
+  (DATE '2024-06-04', 3, 'purchase'), (DATE '2024-06-04', 7, 'click'),
+  (DATE '2024-06-04', 8, 'view'),  (DATE '2024-06-05', 4, 'click'),
+  (DATE '2024-06-05', 8, 'purchase'), (DATE '2024-06-05', 5, 'view');`}
   starterCode={`-- Only the 2024-06-01 "partition" is read; other dates are skipped.
 SELECT user_id, event_type, COUNT(*) AS cnt
 FROM events

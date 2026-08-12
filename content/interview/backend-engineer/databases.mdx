@@ -135,10 +135,20 @@ tables inline and shows a `LEFT JOIN` keeping a customer who never ordered:
 <SqlCodeBlock
   dialect="duckdb"
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
-  (1, 'Ava'), (2, 'Ben'), (3, 'Cy')
+  (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di'),
+  (5, 'Eve'), (6, 'Finn'), (7, 'Gus'), (8, 'Hana'),
+  (9, 'Iris'), (10, 'Jonas'), (11, 'Kira'), (12, 'Leo'),
+  (13, 'Mona'), (14, 'Nils'), (15, 'Otto'), (16, 'Pia'),
+  (17, 'Quinn'), (18, 'Rui'), (19, 'Sara'), (20, 'Theo'),
+  (21, 'Ulla'), (22, 'Vik'), (23, 'Wanda'), (24, 'Yara')
 ) AS t(id, name);
 CREATE TABLE orders AS SELECT * FROM (VALUES
-  (101, 1, 120.0), (102, 1, 40.0), (103, 2, 80.0)
+  (101, 1, 120.0), (102, 1, 40.0), (103, 2, 80.0), (104, 3, 55.0),
+  (105, 5, 210.0), (106, 6, 75.5), (107, 7, 160.0), (108, 9, 95.25),
+  (109, 10, 130.0), (110, 11, 68.0), (111, 13, 245.0), (112, 14, 52.75),
+  (113, 15, 188.0), (114, 17, 110.5), (115, 18, 84.0), (116, 19, 199.0),
+  (117, 21, 66.25), (118, 22, 142.0), (119, 23, 91.75), (120, 5, 58.0),
+  (121, 13, 77.5), (122, 19, 105.0), (123, 2, 33.0), (124, 3, 175.0)
 ) AS t(order_id, customer_id, amount);`}
   starterCode={`SELECT c.name, o.order_id, o.amount
 FROM customers c
@@ -157,10 +167,20 @@ demonstrates the correct pattern:
 <SqlCodeBlock
   dialect="duckdb"
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
-  (1, 'Ava'), (2, 'Ben')
+  (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di'),
+  (5, 'Eve'), (6, 'Finn'), (7, 'Gus'), (8, 'Hana'),
+  (9, 'Iris'), (10, 'Jonas'), (11, 'Kira'), (12, 'Leo'),
+  (13, 'Mona'), (14, 'Nils'), (15, 'Otto'), (16, 'Pia'),
+  (17, 'Quinn'), (18, 'Rui'), (19, 'Sara'), (20, 'Theo'),
+  (21, 'Ulla'), (22, 'Vik'), (23, 'Wanda'), (24, 'Yara')
 ) AS t(id, name);
 CREATE TABLE orders AS SELECT * FROM (VALUES
-  (101, 1, 120.0), (102, 1, 40.0), (103, 2, 80.0)
+  (101, 1, 120.0), (102, 1, 40.0), (103, 2, 80.0), (104, 3, 55.0),
+  (105, 5, 210.0), (106, 6, 75.5), (107, 7, 160.0), (108, 9, 95.25),
+  (109, 10, 130.0), (110, 11, 68.0), (111, 13, 245.0), (112, 14, 52.75),
+  (113, 15, 188.0), (114, 17, 110.5), (115, 18, 84.0), (116, 19, 199.0),
+  (117, 21, 66.25), (118, 22, 142.0), (119, 23, 91.75), (120, 5, 58.0),
+  (121, 13, 77.5), (122, 19, 105.0), (123, 2, 33.0), (124, 3, 175.0)
 ) AS t(order_id, customer_id, amount);`}
   starterCode={`WITH order_totals AS (
   SELECT customer_id, SUM(amount) AS total

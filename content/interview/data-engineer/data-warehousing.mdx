@@ -258,11 +258,15 @@ warehouse reliability on lake-cost open storage.
   title="Revenue per category"
   instructions={`The table \`sales\` has columns \`id\`, \`category\`, and \`amount\`. Return one row per \`category\` with its total revenue as a column named \`revenue\`. Sort by \`revenue\` descending. This is the kind of columnar-friendly aggregate a warehouse serves cheaply, only \`category\` and \`amount\` are scanned.`}
   initSql={`CREATE TABLE sales AS SELECT * FROM (VALUES
-  (1, 'Electronics', 100.00),
-  (2, 'Electronics', 250.00),
-  (3, 'Books', 30.00),
-  (4, 'Books', 20.00),
-  (5, 'Home', 75.00)
+  (1, 'Electronics', 100.00), (2, 'Electronics', 250.00),
+  (3, 'Books', 30.00), (4, 'Books', 20.00), (5, 'Home', 75.00),
+  (6, 'Electronics', 480.00), (7, 'Books', 45.50), (8, 'Home', 120.00),
+  (9, 'Garden', 65.00), (10, 'Electronics', 315.75), (11, 'Books', 18.25),
+  (12, 'Home', 210.00), (13, 'Garden', 92.50), (14, 'Toys', 35.00),
+  (15, 'Electronics', 199.99), (16, 'Books', 27.00), (17, 'Home', 88.40),
+  (18, 'Garden', 145.00), (19, 'Toys', 62.25), (20, 'Electronics', 550.00),
+  (21, 'Books', 39.75), (22, 'Home', 165.30), (23, 'Toys', 48.00),
+  (24, 'Garden', 73.60)
 ) AS t(id, category, amount);`}
   starterCode={`-- Aggregate amount by category, largest revenue first.
 SELECT

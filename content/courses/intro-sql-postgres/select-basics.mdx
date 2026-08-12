@@ -26,11 +26,15 @@ The simplest read names the columns you want, `FROM` a table:
   salary NUMERIC
 );
 INSERT INTO employees (name, dept, salary) VALUES
-  ('Alice', 'Engineering', 120000),
-  ('Bob',   'Engineering',  95000),
-  ('Carol', 'Sales',        80000),
-  ('Dave',  'Sales',        72000),
-  ('Eve',   'Marketing',    68000);`}
+  ('Alice','Engineering',120000),('Bob','Engineering',95000),
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   name,
   salary
@@ -56,9 +60,15 @@ row in the table. `SELECT` decides the *columns*; by default you get
   salary NUMERIC
 );
 INSERT INTO employees (name, dept, salary) VALUES
-  ('Alice', 'Engineering', 120000),
-  ('Bob',   'Engineering',  95000),
-  ('Carol', 'Sales',        80000);`}
+  ('Alice','Engineering',120000),('Bob','Engineering',95000),
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   *
 FROM
@@ -114,8 +124,15 @@ answer*, not echoing the table:
   salary NUMERIC
 );
 INSERT INTO employees (name, dept, salary) VALUES
-  ('Alice', 'Engineering', 120000),
-  ('Bob',   'Sales',        72000);`}
+  ('Alice','Engineering',120000),('Bob','Engineering',95000),
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`-- salary first, then dept, then name, any order you want
 SELECT
   salary,
@@ -139,11 +156,13 @@ Sometimes you only care about the *distinct* values in a column.
   dept   TEXT
 );
 INSERT INTO employees (name, dept) VALUES
-  ('Alice', 'Engineering'),
-  ('Bob',   'Engineering'),
-  ('Carol', 'Sales'),
-  ('Dave',  'Sales'),
-  ('Eve',   'Marketing');`}
+  ('Alice','Engineering'),('Bob','Engineering'),('Carol','Sales'),
+  ('Dave','Sales'),('Eve','Marketing'),('Frank','Engineering'),
+  ('Grace','Engineering'),('Hana','Engineering'),('Ivan','Sales'),
+  ('Jade','Sales'),('Kai','Sales'),('Lena','Marketing'),('Mark','Marketing'),
+  ('Nina','Support'),('Omar','Support'),('Pia','Support'),('Quinn','Support'),
+  ('Rosa','Engineering'),('Sam','Engineering'),('Tara','Sales'),
+  ('Uri','Finance'),('Vera','Finance'),('Wes','Legal'),('Yara','Marketing');`}
   starterCode={`SELECT DISTINCT
   dept
 FROM

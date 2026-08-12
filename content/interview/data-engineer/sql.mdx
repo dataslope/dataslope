@@ -32,10 +32,12 @@ tied 80-point scores.
   dialect="duckdb"
   initSql={`CREATE TABLE players (name VARCHAR, score INTEGER);
 INSERT INTO players VALUES
-  ('Alice', 95),
-  ('Bob',   80),
-  ('Carol', 80),
-  ('Dave',  70);`}
+  ('Alice', 95), ('Bob', 80), ('Carol', 80), ('Dave', 70),
+  ('Erin', 97), ('Frank', 78), ('Grace', 91), ('Hugo', 80),
+  ('Iris', 72), ('Jonas', 88), ('Kira', 95), ('Leo', 64),
+  ('Mona', 80), ('Nils', 99), ('Otto', 76), ('Pia', 88),
+  ('Quinn', 69), ('Rui', 93), ('Sara', 85), ('Theo', 71),
+  ('Ulla', 82), ('Vik', 96), ('Wanda', 74), ('Yara', 88);`}
   starterCode={`SELECT name, score,
   ROW_NUMBER() OVER (ORDER BY score DESC) AS rn,
   RANK()       OVER (ORDER BY score DESC) AS rnk,
@@ -53,10 +55,28 @@ Number rows within each key by recency, then keep number 1:
 INSERT INTO events VALUES
   (1, TIMESTAMP '2024-01-01 10:00', 'signup'),
   (1, TIMESTAMP '2024-01-03 09:00', 'active'),
+  (1, TIMESTAMP '2024-01-09 14:00', 'active'),
   (2, TIMESTAMP '2024-01-02 12:00', 'signup'),
   (2, TIMESTAMP '2024-01-05 08:00', 'churn'),
   (2, TIMESTAMP '2024-01-04 15:00', 'active'),
-  (3, TIMESTAMP '2024-01-01 11:00', 'signup');`}
+  (3, TIMESTAMP '2024-01-01 11:00', 'signup'),
+  (3, TIMESTAMP '2024-01-06 16:00', 'active'),
+  (3, TIMESTAMP '2024-01-12 10:30', 'churn'),
+  (4, TIMESTAMP '2024-01-03 08:15', 'signup'),
+  (4, TIMESTAMP '2024-01-07 13:45', 'active'),
+  (5, TIMESTAMP '2024-01-04 09:20', 'signup'),
+  (5, TIMESTAMP '2024-01-08 11:10', 'active'),
+  (5, TIMESTAMP '2024-01-15 17:00', 'active'),
+  (6, TIMESTAMP '2024-01-05 10:05', 'signup'),
+  (6, TIMESTAMP '2024-01-11 12:30', 'churn'),
+  (7, TIMESTAMP '2024-01-06 14:40', 'signup'),
+  (7, TIMESTAMP '2024-01-13 09:50', 'active'),
+  (8, TIMESTAMP '2024-01-07 15:25', 'signup'),
+  (8, TIMESTAMP '2024-01-14 08:35', 'active'),
+  (8, TIMESTAMP '2024-01-20 16:15', 'churn'),
+  (9, TIMESTAMP '2024-01-08 11:55', 'signup'),
+  (9, TIMESTAMP '2024-01-16 13:05', 'active'),
+  (10, TIMESTAMP '2024-01-09 10:45', 'signup');`}
   starterCode={`SELECT *
 FROM events
 QUALIFY ROW_NUMBER() OVER (
@@ -148,11 +168,18 @@ Use `SUM` with a window frame that starts at the beginning of the partition and 
   dialect="duckdb"
   initSql={`CREATE TABLE orders (user_id INTEGER, order_date DATE, amount DECIMAL(10,2));
 INSERT INTO orders VALUES
-  (1, DATE '2024-01-01', 100.00),
-  (1, DATE '2024-01-05', 250.00),
-  (1, DATE '2024-01-12', 75.50),
-  (2, DATE '2024-01-03', 200.00),
-  (2, DATE '2024-01-08', 150.00);`}
+  (1, DATE '2024-01-01', 100.00), (1, DATE '2024-01-05', 250.00),
+  (1, DATE '2024-01-12', 75.50),  (1, DATE '2024-01-19', 310.00),
+  (1, DATE '2024-01-26', 45.25),  (2, DATE '2024-01-03', 200.00),
+  (2, DATE '2024-01-08', 150.00), (2, DATE '2024-01-15', 90.75),
+  (2, DATE '2024-01-22', 265.00), (3, DATE '2024-01-02', 120.00),
+  (3, DATE '2024-01-09', 340.50), (3, DATE '2024-01-16', 60.00),
+  (3, DATE '2024-01-23', 175.25), (4, DATE '2024-01-04', 210.00),
+  (4, DATE '2024-01-11', 85.00),  (4, DATE '2024-01-18', 295.75),
+  (5, DATE '2024-01-06', 130.00), (5, DATE '2024-01-13', 240.50),
+  (5, DATE '2024-01-20', 70.00),  (5, DATE '2024-01-27', 190.25),
+  (6, DATE '2024-01-07', 155.00), (6, DATE '2024-01-14', 280.00),
+  (6, DATE '2024-01-21', 110.50), (6, DATE '2024-01-28', 205.00);`}
   starterCode={`SELECT
   user_id,
   order_date,
@@ -270,14 +297,15 @@ It describes finding **consecutive runs** (islands) of rows separated by missing
   dialect="duckdb"
   initSql={`CREATE TABLE daily_logins (user_id INTEGER, login_date DATE);
 INSERT INTO daily_logins VALUES
-  (1, DATE '2024-01-01'),
-  (1, DATE '2024-01-02'),
-  (1, DATE '2024-01-03'),
-  (1, DATE '2024-01-05'),
-  (1, DATE '2024-01-06'),
-  (2, DATE '2024-01-01'),
-  (2, DATE '2024-01-04'),
-  (2, DATE '2024-01-05');`}
+  (1, DATE '2024-01-01'), (1, DATE '2024-01-02'), (1, DATE '2024-01-03'),
+  (1, DATE '2024-01-05'), (1, DATE '2024-01-06'), (1, DATE '2024-01-10'),
+  (1, DATE '2024-01-11'), (1, DATE '2024-01-12'), (1, DATE '2024-01-13'),
+  (2, DATE '2024-01-01'), (2, DATE '2024-01-04'), (2, DATE '2024-01-05'),
+  (2, DATE '2024-01-06'), (2, DATE '2024-01-09'),
+  (3, DATE '2024-01-02'), (3, DATE '2024-01-03'), (3, DATE '2024-01-04'),
+  (3, DATE '2024-01-08'), (3, DATE '2024-01-09'),
+  (4, DATE '2024-01-01'), (4, DATE '2024-01-07'),
+  (5, DATE '2024-01-03'), (5, DATE '2024-01-04'), (5, DATE '2024-01-05');`}
   starterCode={`SELECT
   user_id,
   MIN(login_date) AS island_start,
@@ -502,14 +530,14 @@ A `CROSS JOIN` produces the **Cartesian product** of two tables (every row from 
   instructions={`The table \`orders\` has columns \`id\`, \`region\`, and \`amount\`. For every row, add a column \`rnk\` giving its rank **within its region** by \`amount\` descending (largest = rank 1). Return \`id\`, \`region\`, \`amount\`, \`rnk\`. Sort by \`region\`, then \`rnk\`.`}
   initSql={`CREATE TABLE orders AS
 SELECT * FROM (VALUES
-  (1, 'North', 120.00),
-  (2, 'North',  60.00),
-  (3, 'North',  75.50),
-  (4, 'South',  80.50),
-  (5, 'South',  90.00),
-  (6, 'South',  65.00),
-  (7, 'East',  200.00),
-  (8, 'East',  140.00)
+  (1, 'North', 120.00), (2, 'North', 60.00), (3, 'North', 75.50),
+  (4, 'South', 80.50),  (5, 'South', 90.00), (6, 'South', 65.00),
+  (7, 'East', 200.00),  (8, 'East', 140.00), (9, 'North', 145.75),
+  (10, 'North', 88.00), (11, 'North', 210.00), (12, 'South', 130.25),
+  (13, 'South', 105.00), (14, 'South', 70.75), (15, 'East', 95.00),
+  (16, 'East', 175.50), (17, 'East', 45.25), (18, 'East', 185.00),
+  (19, 'West', 50.25),  (20, 'West', 110.00), (21, 'West', 40.00),
+  (22, 'West', 62.75),  (23, 'West', 155.00), (24, 'West', 99.50)
 ) AS t(id, region, amount);`}
   starterCode={`-- Use a window function partitioned by region.
 SELECT
@@ -539,10 +567,28 @@ ORDER BY region, rnk;`}
   initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
   (1, TIMESTAMP '2024-01-01 10:00', 'signup'),
   (1, TIMESTAMP '2024-01-03 09:00', 'active'),
+  (1, TIMESTAMP '2024-01-09 14:00', 'active'),
   (2, TIMESTAMP '2024-01-02 12:00', 'signup'),
   (2, TIMESTAMP '2024-01-05 08:00', 'churn'),
   (2, TIMESTAMP '2024-01-04 15:00', 'active'),
-  (3, TIMESTAMP '2024-01-01 11:00', 'signup')
+  (3, TIMESTAMP '2024-01-01 11:00', 'signup'),
+  (3, TIMESTAMP '2024-01-06 16:00', 'active'),
+  (3, TIMESTAMP '2024-01-12 10:30', 'churn'),
+  (4, TIMESTAMP '2024-01-03 08:15', 'signup'),
+  (4, TIMESTAMP '2024-01-07 13:45', 'active'),
+  (5, TIMESTAMP '2024-01-04 09:20', 'signup'),
+  (5, TIMESTAMP '2024-01-08 11:10', 'active'),
+  (5, TIMESTAMP '2024-01-15 17:00', 'active'),
+  (6, TIMESTAMP '2024-01-05 10:05', 'signup'),
+  (6, TIMESTAMP '2024-01-11 12:30', 'churn'),
+  (7, TIMESTAMP '2024-01-06 14:40', 'signup'),
+  (7, TIMESTAMP '2024-01-13 09:50', 'active'),
+  (8, TIMESTAMP '2024-01-07 15:25', 'signup'),
+  (8, TIMESTAMP '2024-01-14 08:35', 'active'),
+  (8, TIMESTAMP '2024-01-20 16:15', 'churn'),
+  (9, TIMESTAMP '2024-01-08 11:55', 'signup'),
+  (9, TIMESTAMP '2024-01-16 13:05', 'active'),
+  (10, TIMESTAMP '2024-01-09 10:45', 'signup')
 ) AS t(user_id, event_time, status);`}
   starterCode={`-- Keep only the most recent row per user_id.
 SELECT
