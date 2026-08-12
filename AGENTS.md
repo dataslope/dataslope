@@ -984,11 +984,19 @@ has read the task.
 Four things this rests on, none of them optional:
 
 - **The composed document must be deterministic.** The server and the browser
-  both compose it and React compares the two. That is why the auto-rendered
-  document carries **no console bridge** — the bridge is keyed by a per-run
-  random token, and a random token in SSR output is a hydration mismatch.
-  Nothing is listening for those messages before a run exists anyway, so the
-  output panel stays empty until the reader presses Run, which is honest.
+  both compose it and React compares the two, so anything random or
+  clock-derived in the output is a hydration mismatch. The bridge token is
+  therefore *derived* — a content hash of the block plus React's own `useId`
+  — not drawn from `newPreviewToken()` the way a run's is. The two halves
+  matter: the hash alone would collide between two blocks with identical
+  source on one page, and `useId` alone would not survive an edit.
+
+  A derived token is guessable by anything already on the page, and that is
+  acceptable **only** because this frame carries no harness: the token
+  authenticates "which frame said this", not "did the learner really pass".
+  Challenge cards never auto-render and keep their per-run random tokens, so
+  the sentinel protocol is untouched. Do not reuse this token for a harnessed
+  document.
 - **`composeStaticPreview` must run under Node**, because SSR is where it is
   called first. No `window`, no `document`.
 - **The handover on Run is `flushSync`, and that is load-bearing.** React owns
@@ -1002,10 +1010,47 @@ Four things this rests on, none of them optional:
   starter is what the prepopulated cells show too. Run replaces the frame with
   their version the moment they ask; Reset brings the starter's back.
 
-`__tests__/webPreview.test.ts` pins the part that would rot silently: the
-static composition and a real Run must produce the *same document* modulo the
-bridge. A preview that disagrees with the reader's own Run is worse than no
-preview, because nothing tells them which to believe.
+`__tests__/webPreview.test.ts` pins the part that would rot silently: given
+the same token, the static composition and a real Run must produce the *same
+document*, byte for byte. A preview that disagrees with the reader's own Run
+is worse than no preview, because nothing tells them which to believe.
+
+### The frame's console output belongs to the block, not to devtools
+
+The bridge forwards every `console.*` call to the parent **and** calls the
+original, so a learner who opens devtools sees their own `console.log` where a
+web developer would expect it — which `js-dom-basics` and `js-events` are
+explicitly teaching. That echo is a passthrough, never a channel: every
+adapter's output reaches the block's own panel, and no output anywhere on the
+site is devtools-only. (Java is the case that proves the rule: CheerpJ writes
+`System.out` *through* `console.log` because there is no other sink, and
+`runWithCapture` intercepts and swallows it rather than letting it through.)
+
+Keeping that true for an auto-rendered frame takes two things:
+
+- **The frame is bridged**, with the derived token above, and `<CodeBlock>`
+  subscribes with `subscribeToPreviewConsole`. Without it the frame still
+  printed — to devtools — while the panel below stayed empty, which made the
+  site's own surface the one place the output was missing.
+- **The bridge buffers and replays.** A server-rendered frame runs while the
+  page's JavaScript is still downloading, so by the time React hydrates and
+  subscribes, the block has usually already printed everything it will. The
+  subscriber asks the frame to re-post what it buffered. Replayed and live
+  messages overlap by a few milliseconds, so they are deduped on the bridge's
+  own sequence number — not on text, which would collapse a block that
+  genuinely logs the same line twice, and not on object identity, which
+  `postMessage`'s structured clone destroys.
+
+**The output panel reserves space when it expects to print**, so those cells
+land in a box that already exists rather than making one and pushing the rest
+of the lesson down (~96px, measured). The gate is the source mentioning
+`console.`, because reserving on all 42 web blocks would put an empty box under
+the 39 that never print. It is a heuristic and it is allowed to be: the false
+positive reserves a little space for nothing — which is what the two blocks
+that log from a click handler get, and it reads as "output appears here" — and
+the false negative needs a block that reaches the console without naming it.
+Knowing for certain would mean running the code at build time, which is the
+thing this whole approach exists to avoid.
 
 ### The live preview reserves its height before it has one
 

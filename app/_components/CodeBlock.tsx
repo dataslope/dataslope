@@ -82,6 +82,7 @@ import { previewStageStyle } from "./previewStage";
 import {
   PREVIEW_IFRAME_CLASS,
   PREVIEW_SANDBOX,
+  subscribeToPreviewConsole,
 } from "./runtime/webPreview";
 import styles from "./CodeBlock.module.css";
 import challengeStyles from "./ChallengeCard.module.css";
@@ -458,6 +459,21 @@ function CodeBlockInner({
   const autoPreviewEnabled =
     (autoPreview ?? adapter.outputCapabilities?.autoPreview ?? false) &&
     !expectError;
+  // The frame's bridge token. A run's token is random per run, which is
+  // right for a document composed at click time; this one is composed on
+  // the server and again in the browser, and React compares the two, so
+  // it has to be derived rather than drawn. Both halves are already
+  // deterministic — a content hash of the block and React's own
+  // `useId` — and together they stay distinct between two blocks with
+  // identical source on one page, which a content hash alone would not.
+  //
+  // A derived token is guessable by anything already running on the
+  // page, and that is acceptable *here* only because the frame carries
+  // no harness: the token authenticates "which frame said this", not
+  // "did the learner really pass". Challenge cards never auto-render and
+  // keep their per-run random tokens, so the sentinel protocol is
+  // untouched. Do not reuse this token for a harnessed document.
+  const autoPreviewToken = `${outputKey}-${blockId.replace(/[^a-zA-Z0-9-]/g, "")}`;
   const autoPreviewDoc = useMemo(() => {
     if (!autoPreviewEnabled || !adapter.composeStaticPreview) return null;
     const sources = workspaceFiles.map((f) => {
@@ -472,6 +488,7 @@ function CodeBlockInner({
     try {
       return adapter.composeStaticPreview(sources, {
         entryFilename: resolvedEntryFilename,
+        token: autoPreviewToken,
         tailwind: tailwind || undefined,
       });
     } catch {
@@ -482,12 +499,67 @@ function CodeBlockInner({
   }, [
     adapter,
     autoPreviewEnabled,
+    autoPreviewToken,
     workspaceFiles,
     resolvedEntryFilename,
     tailwind,
   ]);
   // Retired by the first Run (see `run`), restored by Reset.
   const [showAutoPreview, setShowAutoPreview] = useState(true);
+  const autoPreviewFrameRef = useRef<HTMLIFrameElement | null>(null);
+  // True when this block reserves space for its output panel, so the
+  // panel is in the server's HTML at the height it will have once the
+  // auto-preview has printed — otherwise the cells arriving a moment
+  // later would grow the card by ~96px, which is the shift phase 1 spent
+  // its whole diff removing from the panel above.
+  //
+  // Gated on the source mentioning `console.`, because a panel reserved
+  // on all 42 web blocks would put an empty box under the 39 that never
+  // print. It is a heuristic and it is allowed to be: the false positive
+  // (a `console.` call that never executes) reserves a little space for
+  // nothing, and the false negative needs a block that reaches the
+  // console without naming it, which no lesson does. The alternative is
+  // knowing the output in advance, which means running the code at build
+  // time — the thing this whole approach exists to avoid.
+  const reservesOutput = useMemo(() => {
+    if (!autoPreviewEnabled || !autoPreviewDoc) return false;
+    return workspaceFiles.some(
+      (f) => /\bconsole\s*\./.test(f.starterCode) || /\bconsole\s*\./.test(f.initCode ?? ""),
+    );
+  }, [autoPreviewEnabled, autoPreviewDoc, workspaceFiles]);
+
+  // Forward the auto-rendered frame's console output into this block's own
+  // output panel. Without this the frame still prints — into the browser's
+  // devtools, where the bridge echoes it — and the panel below stays empty,
+  // which would make the site's own surface the one place the output *isn't*.
+  //
+  // The frame is in the server's HTML, so it has usually finished printing
+  // before this effect exists; `subscribeToPreviewConsole` asks it to replay
+  // what it buffered, and dedupes against anything still arriving live.
+  useEffect(() => {
+    const frame = autoPreviewFrameRef.current;
+    if (!frame || !showAutoPreview || !autoPreviewDoc) return;
+    return subscribeToPreviewConsole({
+      frame,
+      token: autoPreviewToken,
+      emit: (cell) =>
+        setOutputs((prev) => {
+          // Same collapse the run path applies: one cell per console call
+          // would stack a noisy pile of one-line boxes.
+          const last = prev[prev.length - 1];
+          if (cell.type === "stdout" && last && last.type === "stdout") {
+            const merged: OutputCell = {
+              ...last,
+              content: `${last.content}\n${cell.content}`,
+            };
+            return [...prev.slice(0, -1), merged];
+          }
+          // Negative ids, like the prepopulated cells: a run counts up
+          // from 1, and these have to be distinguishable from its own.
+          return [...prev, { id: -(prev.length + 1), elapsed: "", ...cell }];
+        }),
+    });
+  }, [autoPreviewDoc, autoPreviewToken, showAutoPreview]);
 
   // Remote datasets staged before every run (see the `datasets` prop).
   // Mirrored into a ref so the mount-once warm-up effect can prefetch
@@ -1718,6 +1790,7 @@ function CodeBlockInner({
                 prepopulated charts are fetched. */}
             {showAutoPreview && autoPreviewDoc && (
               <iframe
+                ref={autoPreviewFrameRef}
                 className={PREVIEW_IFRAME_CLASS}
                 sandbox={PREVIEW_SANDBOX}
                 title="Page preview"
@@ -1729,11 +1802,15 @@ function CodeBlockInner({
         </div>
       )}
 
-      {(outputs.length > 0 || isBusy) && (
+      {(outputs.length > 0 || isBusy || reservesOutput) && (
         // Same output panel as the challenge card (its styles are shared
         // through ChallengeCard.module.css): an accent-bar header with the
         // elapsed time, and one clean body that stacks the run's segments
         // in chronological order, no per-segment chrome.
+        //
+        // `reservesOutput` keeps it mounted from the server's HTML for a
+        // block whose auto-preview is about to print, so the cells land in
+        // a box that is already the right size instead of creating one.
         <div
           className={`${challengeStyles.outputPanel}${isBusy ? ` ${styles.outputRunning}` : ""}`}
           aria-live="polite"
@@ -1835,8 +1912,12 @@ function CodeBlockInner({
               />
             </div>
           )}
-          {outputs.length > 0 && (
-            <div className={challengeStyles.outputBody}>
+          {(outputs.length > 0 || reservesOutput) && (
+            <div
+              className={`${challengeStyles.outputBody}${
+                reservesOutput ? ` ${styles.outputBodyReserved}` : ""
+              }`}
+            >
               {outputs.map((cell) => (
                 <OutputSegment key={cell.id} cell={cell} />
               ))}

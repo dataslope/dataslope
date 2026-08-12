@@ -1,9 +1,9 @@
 # Client-side preview rendering for the web and react blocks
 
 **Date:** 2026-08-12
-**Status:** **Phases 1 and 2 are built** (§8 records what shipped and where it
-departed from the plan). Phases 3 and 4 are open. §1–§7 are as written before
-any of it, so the reasoning can be checked against the result.
+**Status:** **Phases 1, 2 and 3 are built** (§8 records what shipped and where
+it departed from the plan). Phase 4 is open. §1–§7 are as written before any of
+it, so the reasoning can be checked against the result.
 **Scope:** The 64 `<CodeBlock adapter="web|react">` instances that
 [`build-block-outputs`](../scripts/build-block-outputs.mjs) cannot prepopulate,
 and what it would take to have them show their result without the reader
@@ -342,13 +342,68 @@ keeps a future change to one from silently diverging from the other.
 before the reader presses anything, at no runtime cost. The 22 react blocks are
 unchanged and wait on phase 4.
 
-### 8.3 Still open
+### 8.3 Phase 3 — the console output belongs to the block (shipped)
 
-- **Phase 3 (§4.3, C3)** — whether the browser capture can record web *console*
-  cells. Untouched. The output panel stays empty until Run, which is honest but
-  is not the whole lesson for the six web blocks whose point is `console.log`.
+**The plan for this phase was wrong, and phase 2 is what made it wrong.** §4.3
+proposed teaching `capture-browser-outputs.mjs` to record web cells at build
+time. That was never necessary once web blocks auto-render: the code is already
+executing in the reader's browser, so the output exists — it simply was not
+being collected, because phase 2 dropped the bridge to keep the document
+deterministic. Phase 3 turned out to be "put the bridge back, deterministically",
+not "build a capture pipeline". No generator, no manifest, no committed asset.
+
+Prompted by a question about whether the browser's devtools console was being
+used as an output channel. It was not — but phase 2 had quietly made it the
+*only* place an auto-preview's output appeared, which is the same complaint one
+step removed. Audited across every adapter: output always reaches the block's
+own panel, and the devtools echo is a passthrough. Java is the case that proves
+it — CheerpJ writes `System.out` *through* `console.log` because there is no
+other sink, and `runWithCapture` swallows it rather than letting it through.
+
+**What shipped:**
+
+- **A derived bridge token** — content hash + `useId`. Both halves matter: the
+  hash alone collides between two identical blocks on a page, `useId` alone
+  does not survive an edit. The security note is in AGENTS.md and in the code:
+  a guessable token is fine for a frame with no harness and is *not* fine for
+  one with a harness, which is why challenge cards keep per-run random tokens.
+- **A replay buffer in the bridge.** This is the part the plan could not have
+  anticipated, because it only exists once the frame is server-rendered: the
+  frame runs while the page's JavaScript is still downloading, so by the time
+  React subscribes the block has already printed. Without a replay those
+  messages are simply lost and the block looks like one that prints nothing.
+  Replayed and live messages are deduped on a per-message sequence number —
+  identity is destroyed by `postMessage`'s structured clone, and text would
+  collapse a block that logs the same line twice.
+- **A reserved output panel**, gated on the source mentioning `console.`.
+
+**Measured**, with Chrome's own `layout-shift` entries rather than before/after
+snapshots:
+
+| page | CLS | output body |
+| --- | --- | --- |
+| `js-dom-basics` (prints at load) | 0.00002 | reserved 58.2px, actual 58px |
+| `html-structure` (prints nothing) | 0.00002 | no panel at all |
+
+Both figures are the page's own baseline; the panel contributes nothing. The
+first reservation was 14px short because `min-height` on a `border-box`
+element has to include the body's padding — caught only because the measurement
+compared the reservation against the actual height rather than trusting CLS,
+which was already under 0.0001 and would have hidden it.
+
+**Scale:** three web blocks contain a `console.` call and reserve a panel. One
+prints at load; the other two print from a click handler, so their reserved
+panel sits empty until the reader interacts — which reads as "output appears
+here", and is the benign direction for the heuristic to be wrong in.
+
+### 8.4 Still open
+
 - **Phase 4 (§4.2, B2)** — precompute the react bundle in Node so react can
   take the same path. Untouched.
 - **§7, the `<LivePreview>` consolidation** — deliberately deferred. Phase 2
   was built beside it, so the site now has both. Revisit with the two visible
   side by side, which is the comparison §7 asked for and could not make before.
+- **The `console.` heuristic** could be replaced by an exact answer if the
+  build ever does run these blocks. It is the one place in this design that
+  guesses, and it guesses about layout rather than about content, so the cost
+  of being wrong is bounded.

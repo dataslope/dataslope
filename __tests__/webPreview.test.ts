@@ -6,6 +6,7 @@
 import { describe, it, expect } from "vitest";
 
 import {
+  PREVIEW_REPLAY_KEY,
   buildPreviewBridge,
   composeReactDocument,
   composeWebDocument,
@@ -278,8 +279,12 @@ describe("webAdapter.composeStaticPreview", () => {
     { filename: "styles.css", source: "h1 { color: red; }" },
     { filename: "extra.js", source: `console.log("side")` },
   ];
-  const compose = () =>
-    webAdapter.composeStaticPreview!(sources, { entryFilename: "index.html" });
+  const TOKEN = "block-1a2b3c4d";
+  const compose = (token = TOKEN) =>
+    webAdapter.composeStaticPreview!(sources, {
+      entryFilename: "index.html",
+      token,
+    });
 
   it("inlines referenced files and appends unreferenced root-level ones", () => {
     const doc = compose()!;
@@ -290,36 +295,50 @@ describe("webAdapter.composeStaticPreview", () => {
 
   it("is deterministic — the property hydration depends on", () => {
     // The server and the browser both compose this document and React
-    // compares the two. Anything random or clock-derived in the output
-    // is a hydration mismatch, which is why the bridge is off.
+    // compares the two, so the same block must compose byte-identically
+    // every time. This is why the token is passed in rather than drawn.
     expect(compose()).toBe(compose());
-    expect(compose()).not.toContain(PREVIEW_MESSAGE_KEY);
   });
 
-  it("agrees with what a real Run composes, bridge aside", () => {
+  it("carries the bridge, so its console output can reach the panel", () => {
+    // Without it the frame still prints — into the browser's devtools,
+    // where the bridge echoes — and the block's own output panel stays
+    // empty, making the site the one place the output is missing.
+    const doc = compose()!;
+    expect(doc).toContain(PREVIEW_MESSAGE_KEY);
+    expect(doc).toContain(TOKEN);
+  });
+
+  it("agrees exactly with what a real Run composes", () => {
     // The anti-drift guard: a preview that disagrees with the reader's
     // own Run is worse than no preview, because nothing tells them which
     // to believe. Both paths reach composeWebDocument with the same file
-    // map, so the only difference must be the bridge.
-    const token = "fixed-token";
+    // map and the same token, so the documents must be identical.
     const textFiles = new Map(sources.map((f) => [f.filename, f.source]));
     const runDoc = composeWebDocument({
       entryHtml: sources[0].source,
-      token,
+      token: TOKEN,
       textFiles,
     });
-    expect(runDoc.replace(buildPreviewBridge(token), "")).toBe(compose());
+    expect(runDoc).toBe(compose());
+    expect(runDoc).toContain(buildPreviewBridge(TOKEN));
   });
 
   it("falls back to the first file when the entry name is unknown", () => {
     expect(
-      webAdapter.composeStaticPreview!(sources, { entryFilename: "nope.html" }),
+      webAdapter.composeStaticPreview!(sources, {
+        entryFilename: "nope.html",
+        token: TOKEN,
+      }),
     ).toBe(compose());
   });
 
   it("returns null for an empty workspace", () => {
     expect(
-      webAdapter.composeStaticPreview!([], { entryFilename: "index.html" }),
+      webAdapter.composeStaticPreview!([], {
+        entryFilename: "index.html",
+        token: TOKEN,
+      }),
     ).toBeNull();
   });
 });
@@ -334,5 +353,31 @@ describe("auto-preview is opt-in per adapter", () => {
     expect(reactAdapter.outputCapabilities?.preview).toBe(true);
     expect(reactAdapter.outputCapabilities?.autoPreview).toBeFalsy();
     expect(reactAdapter.composeStaticPreview).toBeUndefined();
+  });
+});
+
+describe("bridge replay buffer", () => {
+  // The server-rendered frame runs while the page's JavaScript is still
+  // downloading, so by the time React subscribes the block has usually
+  // already printed everything it will. Without a replay those messages
+  // are lost and the block looks like one that prints nothing.
+  it("buffers what it posts and re-posts on request", () => {
+    const js = buildPreviewBridge("tok");
+    expect(js).toContain(PREVIEW_REPLAY_KEY);
+    expect(js).toContain("buffered");
+    // Bounded, so a runaway loop can't grow the frame's memory without limit.
+    expect(js).toMatch(/MAX_BUFFERED\s*=\s*\d+/);
+  });
+
+  it("numbers every message so a replay can be deduped", () => {
+    // postMessage structured-clones, so a replayed message arrives as a
+    // different object with identical contents. Identity can't dedupe it
+    // and text would collapse a block that logs the same line twice.
+    expect(buildPreviewBridge("tok")).toMatch(/msg\.n\s*=\s*seq\+\+/);
+  });
+
+  it("is deterministic for a given token", () => {
+    expect(buildPreviewBridge("tok")).toBe(buildPreviewBridge("tok"));
+    expect(buildPreviewBridge("a")).not.toBe(buildPreviewBridge("b"));
   });
 });

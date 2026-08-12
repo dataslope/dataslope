@@ -430,11 +430,11 @@ export interface LanguageAdapter {
    *  - **It must run under Node**, because SSR is where it is called
    *    first. No `window`, no `document`, no `btoa` without a fallback.
    *  - **It must be deterministic.** The server and the browser both
-   *    compose it and React compares the two; a random token or a
-   *    timestamp anywhere in the output is a hydration mismatch. This
-   *    is why the composed document carries no console bridge — the
-   *    bridge is keyed by a per-run random token, and nothing is
-   *    listening to a document that no run has started.
+   *    compose it and React compares the two; anything random or
+   *    clock-derived in the output is a hydration mismatch. That is why
+   *    `options.token` is *passed in* rather than generated here: the
+   *    caller derives it from the block's own content and identity, so
+   *    the same block composes the same document every time.
    *
    *  `sources` are the files' *effective* sources (each file's init code
    *  already merged into its buffer), so the adapter sees exactly what a
@@ -442,6 +442,6 @@ export interface LanguageAdapter {
    *  render statically. */
   composeStaticPreview?(
     sources: { filename: string; source: string }[],
-    options: { entryFilename: string; tailwind?: boolean },
+    options: { entryFilename: string; token: string; tailwind?: boolean },
   ): string | null;
 }
