@@ -77,6 +77,13 @@ This works, but every query is $O(n)$, every "is this duplicate?"
 check is hand-written, and the *intent*, "lookup by artist", "set
 of unique genres", is hidden inside loop bodies.
 
+<Callout type="info" title="Why the runnable version spells `Track` out">
+Records arrived in Java 16 and the playground on these pages runs Java 8, so
+`javac` here reports `cannot find symbol: class record`. The sketch above uses
+the modern one-line spelling; the runnable blocks below write the same class
+out by hand, which is exactly what a `record` declaration generates for you.
+</Callout>
+
 <Figure
   slug="jcol-data-modeling-with-collections-worked-example-music-inline-cutout"
   alt="A rack of records, a wall of keyed drawers for artists, and cords running between the two"
@@ -165,7 +172,7 @@ public final class Track {
 
   @Override
   public String toString() {
-    return "Track[" + "title=" + title + ", " + "artist=" + artist + ", " + "album=" + album + ", " + "genres=" + genres + ", " + "likes=" + likes + "]";
+    return "Track[title=" + title + ", artist=" + artist + ", album=" + album + ", genres=" + genres + ", likes=" + likes + "]";
   }
 }
 `,
@@ -292,7 +299,7 @@ public class Main {
 
     @Override
     public String toString() {
-      return "CustomerId[" + "value=" + value + "]";
+      return "CustomerId[value=" + value + "]";
     }
   }
   static final class OrderId {
@@ -317,7 +324,7 @@ public class Main {
 
     @Override
     public String toString() {
-      return "OrderId[" + "value=" + value + "]";
+      return "OrderId[value=" + value + "]";
     }
   }
   static final class Order {
@@ -348,7 +355,7 @@ public class Main {
 
     @Override
     public String toString() {
-      return "Order[" + "id=" + id + ", " + "customer=" + customer + ", " + "cents=" + cents + "]";
+      return "Order[id=" + id + ", customer=" + customer + ", cents=" + cents + "]";
     }
   }
 
@@ -433,7 +440,7 @@ public final class Order {
 
   @Override
   public String toString() {
-    return "Order[" + "id=" + id + ", " + "customerId=" + customerId + ", " + "total=" + total + "]";
+    return "Order[id=" + id + ", customerId=" + customerId + ", total=" + total + "]";
   }
 }
 `,
