@@ -17,10 +17,8 @@ people who *copy* ggplot code from people who *write* it.
 
 A layer is, roughly, **one geometry plus the data, mappings, and
 statistic it uses**. When you write `+ geom_point()`, you add a layer.
-When you add `+ geom_smooth()`, you add another. They render in order,
-bottom to top:
-
-They render from the bottom up:
+When you add `+ geom_smooth()`, you add another. They render from the
+bottom up:
 
 1. **Base**, `ggplot(data, aes)` sets up the coordinate space + scales.
 2. **Layer 1**, `geom_point()` draws the raw points.

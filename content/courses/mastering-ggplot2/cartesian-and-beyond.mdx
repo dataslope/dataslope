@@ -35,9 +35,9 @@ ggplot(mpg, aes(displ, hwy)) +
 />
 
 <Figure
-  slug="gg-cartesian-and-beyond-inline-cutout"
-  alt="A grid of straight rules on the left and the same grid bent into concentric rings on the right"
-  caption="Changing the coordinate system bends the same marks into a new frame."
+  slug="gg-cartesian-and-beyond-default-cartesian-inline-cutout"
+  alt="A plain grid of straight rules meeting at right angles"
+  caption="The default coordinate system is a plain grid of straight axes."
 />
 
 <CodeBlock
@@ -66,6 +66,12 @@ stats and scales have run.
 The pipeline runs in this order: **Data → Stat → Scale** (all in data
 space) **→ Coordinate system** (arranges the final space) **→ rendered
 marks**.
+
+<Figure
+  slug="gg-cartesian-and-beyond-inline-cutout"
+  alt="A grid of straight rules on the left and the same grid bent into concentric rings on the right"
+  caption="Changing the coordinate system bends the same marks into a new frame."
+/>
 
 This ordering is exactly why `coord_cartesian(xlim = ...)` *zooms*
 rather than *filters*: the coordinate step happens last, after the
@@ -117,12 +123,6 @@ With `coord_fixed()`, the red `y = x` line is a genuine 45° diagonal,
 so you can read "highway beats city MPG" as *every point above the
 line*. Without it, the plot would stretch to fill the panel and distort
 that comparison.
-
-<Figure
-  slug="gg-cartesian-and-beyond-default-cartesian-inline-cutout"
-  alt="A plain grid of straight rules meeting at right angles"
-  caption="The default coordinate system is a plain grid of straight axes."
-/>
 
 <Callout type="info" title="Coordinates are a full grammar component">
 It is tempting to ignore coordinates because the default is almost
