@@ -225,15 +225,15 @@ made the biggest difference: they gave us names for the shapes.
 Without writing any code, look at this paragraph and decide which
 *objects* might exist and which *responsibilities* each might own.
 
+> A coffee shop has a menu of drinks. A barista takes an order from a
+> customer, the customer pays, and the order is placed on a queue
+> until the barista has time to make it.
+
 <Figure
   slug="oopj-gang-of-four-small-responsibility-puzzle-inline-cutout"
   alt="Seven cards on a table, each holding some of the knowledge and some of the work, being sorted into who does what"
   caption="Deciding who knows what, and who does what, is most of object design."
 />
-
-> A coffee shop has a menu of drinks. A barista takes an order from a
-> customer, the customer pays, and the order is placed on a queue
-> until the barista has time to make it.
 
 There are at least these candidates: `Menu`, `Drink`, `Customer`,
 `Barista`, `Order`, `OrderQueue`, `Payment`. Each one knows *some*
