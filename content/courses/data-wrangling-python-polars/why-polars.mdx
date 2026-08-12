@@ -39,6 +39,12 @@ Polars is parallel by default. Not "parallel if you pass
 aggregation, join, sort, and column computation is split across
 cores because the engine was written that way from the first commit.
 
+<Figure
+  slug="pl-why-polars-one-core-cutout"
+  alt="One figure working alone at a bench beside a tall pile of crates, and four identical benches each taking a quarter of it"
+  caption="pandas, 2008: built when a big dataset was a few hundred thousand rows and a laptop had one useful core."
+/>
+
 ### Memory got cheap, but not free
 
 The other half of the speed story is layout. pandas stores a
@@ -122,12 +128,6 @@ That is 53,940 rows read from disk, filtered, grouped, and
 aggregated. In a browser, in WebAssembly, which is *single-threaded
 and slower than native Python*. On a real machine with real cores it
 is a different order of magnitude again.
-
-<Figure
-  slug="pl-why-polars-one-core-cutout"
-  alt="One figure working alone at a bench beside a tall pile of crates, and four identical benches each taking a quarter of it"
-  caption="pandas, 2008: built when a big dataset was a few hundred thousand rows and a laptop had one useful core."
-/>
 
 ## Speed is not the reason to learn it
 
