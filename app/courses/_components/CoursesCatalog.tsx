@@ -10,7 +10,7 @@
  * server page passes in; the sidebar counts are totals over the whole
  * catalog (not the filtered list), matching the mockup.
  */
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { Select } from "@base-ui/react/select";
 import {
   ArrowDownAZ,
@@ -25,6 +25,7 @@ import {
 import { formatTagLabel } from "@/lib/tagLabels";
 import type { CatalogCourse } from "@/lib/courseCatalog";
 import { CourseCard, LangIcon, LevelBars } from "./CourseCard";
+import { readFilters, writeFilters } from "./catalogFilters";
 
 // Sidebar language order, from the mockup. Languages found in the catalog but
 // missing here (future additions) are appended alphabetically.
@@ -62,6 +63,26 @@ const FAINT = "text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]";
 const MUTED = "text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-400)]";
 const HEADING = "text-[var(--ds-gray-900)] dark:text-white";
 const ACCENT = "text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]";
+
+// The store behind `useSyncExternalStore` below: the page's own query string.
+// `history.replaceState` fires no event, so writes announce themselves with
+// this one; `popstate` covers the browser's back and forward buttons.
+const URL_FILTERS_CHANGED = "courses:filters";
+
+function subscribeToUrl(onChange: () => void) {
+  window.addEventListener("popstate", onChange);
+  window.addEventListener(URL_FILTERS_CHANGED, onChange);
+  return () => {
+    window.removeEventListener("popstate", onChange);
+    window.removeEventListener(URL_FILTERS_CHANGED, onChange);
+  };
+}
+// A string, so React's identity check on the snapshot is a value comparison and
+// an unchanged URL cannot loop.
+const getSearch = () => window.location.search;
+// Prerendering has no URL. Returning "" makes the static HTML the unfiltered
+// catalog, which is what hydration then matches.
+const getServerSearch = () => "";
 
 /** One sidebar filter row: leading glyph, label, trailing count. */
 function SideRow({
@@ -199,8 +220,6 @@ function courseSearchText(c: CatalogCourse): string {
 
 export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
   const [q, setQ] = useState("");
-  const [langs, setLangs] = useState<string[]>([]);
-  const [levels, setLevels] = useState<string[]>([]);
   const [sort, setSort] = useState<Sort>("popular");
 
   // Single-select per category: clicking the active row clears it, clicking
@@ -219,6 +238,47 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
     const extras = [...present].filter((l) => !LANG_ORDER.includes(l)).sort();
     return [...ordered, ...extras];
   }, [courses]);
+
+  // ── Linkable filters ────────────────────────────────────────────────────
+  //
+  // The language and level selection is not React state: the URL holds it, and
+  // this reads it. That makes /courses?lang=python a link, and it removes the
+  // question of which of the two is right when they disagree, because there is
+  // only one of them.
+  //
+  // `useSyncExternalStore` rather than `useSearchParams`: this page is
+  // statically prerendered, and `useSearchParams` opts the whole route out of
+  // that unless it sits behind a Suspense boundary, in which case the fallback
+  // is what gets prerendered. Nothing is gained by either — the query string is
+  // unknown at build time, so the filtering happens on the client whichever API
+  // reads it — and this keeps the catalog's HTML static exactly as before.
+  //
+  // The server snapshot is "", so prerendered HTML is the unfiltered catalog
+  // and hydration matches it; React then re-renders with the real query string.
+  // This is the sanctioned way to read something that only exists on the
+  // client, as opposed to seeding state in an effect, which is a second copy of
+  // the truth that has to be kept in step with the first.
+  const search = useSyncExternalStore(subscribeToUrl, getSearch, getServerSearch);
+  const { langs, levels } = useMemo(
+    () => readFilters(search, languages, LEVELS),
+    [search, languages],
+  );
+
+  // Writing goes through the URL too, so a click and a pasted link take exactly
+  // the same path. `replaceState` rather than a router navigation: nothing needs
+  // re-fetching, and pushing an entry per filter click would bury the page the
+  // visitor arrived from under a stack of filter states. It does not notify
+  // anyone by itself, hence the event that wakes the store above.
+  const setFilters = (nextLangs: string[], nextLevels: string[]) => {
+    const query = writeFilters(window.location.search, nextLangs, nextLevels);
+    const { pathname } = window.location;
+    window.history.replaceState(null, "", query ? `${pathname}?${query}` : pathname);
+    window.dispatchEvent(new Event(URL_FILTERS_CHANGED));
+  };
+  // Same signatures the call sites already used, so the sidebar rows and the
+  // mobile dropdowns are unchanged.
+  const setLangs = (next: string[]) => setFilters(next, levels);
+  const setLevels = (next: string[]) => setFilters(langs, next);
 
   const langCount = (l: string) =>
     courses.filter((c) => c.tags.language?.[0] === l).length;
@@ -261,8 +321,10 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
   const hasFilters = Boolean(q || langs.length || levels.length);
   const reset = () => {
     setQ("");
-    setLangs([]);
-    setLevels([]);
+    // Both at once, not setLangs([]) then setLevels([]): each of those writes
+    // the whole query string from the values this render closed over, so the
+    // second call would put the language back.
+    setFilters([], []);
   };
   const countText = list.length === 1 ? "1 course" : `${list.length} courses`;
 
