@@ -78,6 +78,25 @@ of where people live:
 
 <Chart slug="choropleth-per-capita" />
 
+The other decision most people skip is where the **class breaks** go. A
+choropleth has to turn a continuous variable into a handful of shades, and
+that is settled in a dialog box whose default most people accept:
+
+<Chart slug="choropleth-class-breaks" />
+
+None of the three schemes is wrong. What is wrong is choosing one because the
+map looks better, which is the usual method, and not saying which was used,
+which is nearly universal.
+
+Equal interval cuts the range into equal widths, which is the only scheme
+whose legend is honest about magnitude, and on a skewed distribution it drops
+most regions into the lightest class and leaves the map looking uniform with
+two outliers. Quantile puts an equal count in each class, so every shade gets
+used and the map looks informative, at the price of arbitrary boundaries: two
+regions a hair apart can land in different classes. Natural breaks looks for
+the gaps in the data and cuts there, which usually gives the most defensible
+map and the least explicable legend.
+
 ## Scatter geos: data per point
 
 When your data is *point-based* (cities, observations, individual
@@ -112,28 +131,9 @@ Each country is a *dot* (centroid) sized by population. Try
 different projections: `"orthographic"`, `"natural earth"`,
 `"mercator"`, `"equirectangular"`.
 
-Before the projections, the decision most people skip: where the class breaks
-go.
+## Should this be a map at all?
 
-A choropleth has to turn a continuous variable into a handful of shades, and
-that is settled in a dialog box whose default most people accept:
-
-<Chart slug="choropleth-class-breaks" />
-
-None of the three schemes is wrong. What is wrong is choosing one because the
-map looks better, which is the usual method, and not saying which was used,
-which is nearly universal.
-
-Equal interval cuts the range into equal widths, which is the only scheme
-whose legend is honest about magnitude, and on a skewed distribution it drops
-most regions into the lightest class and leaves the map looking uniform with
-two outliers. Quantile puts an equal count in each class, so every shade gets
-used and the map looks informative, at the price of arbitrary boundaries: two
-regions a hair apart can land in different classes. Natural breaks looks for
-the gaps in the data and cuts there, which usually gives the most defensible
-map and the least explicable legend.
-
-And the prior question, which is whether the map should exist at all:
+Before any of the projection choices, the prior question:
 
 <Chart slug="map-when-a-bar-would-do" />
 

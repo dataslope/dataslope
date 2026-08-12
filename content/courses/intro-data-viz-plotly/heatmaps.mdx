@@ -75,10 +75,10 @@ diamonds fall, small carat, low price.
 
 ## A correlation matrix heatmap
 
-<Chart slug="correlation-matrix" />
-
 A classic use is a **correlation matrix**, every numeric column
 correlated against every other.
+
+<Chart slug="correlation-matrix" />
 
 <CodeBlock
   adapter="python"
@@ -170,12 +170,6 @@ This is the single most important decision when making a heatmap.
 
 ## Pitfalls of heatmaps
 
-There is a fifth pitfall that outranks all of these, and it is the row
-order. A matrix has no natural sequence unless the labels are a time or a
-size, so the default order hands the reader an accident:
-
-<Chart slug="heatmap-row-ordering" />
-
 - **Too many cells** (1000×1000) make individual cells invisible.
   Either aggregate or switch to a density-based representation.
 - **Wrong palette** (rainbow / Jet) introduces false structure.
@@ -183,6 +177,12 @@ size, so the default order hands the reader an accident:
   colors mean nothing to the reader. Always show the legend.
 - **Truncating the color range** can mask outliers, similar to a
   truncated y-axis on a bar chart.
+
+There is a fifth that outranks all of them, and it is the row order. A matrix
+has no natural sequence unless the labels are a time or a size, so the default
+order hands the reader an accident:
+
+<Chart slug="heatmap-row-ordering" />
 
 <Figure
   slug="viz-heatmaps-inline-cutout"

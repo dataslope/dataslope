@@ -25,6 +25,12 @@ which kind of data is 80% of the battle.
 | Ordered low to high, no special midpoint | Sequential | Light to dark of one hue |
 | Diverging from a midpoint (e.g. positive vs. negative) | Diverging | Two hues + white in the middle |
 
+<Figure
+  slug="viz-color-scales-and-aesthetics-inline-cutout"
+  alt="A strip running from pale to deep in one hue on the left, a strip running between two opposite hues in the middle, and separate distinct patches on the right"
+  caption="Sequential, diverging and qualitative scales answer three different questions."
+/>
+
 Each family is a claim about the structure of the variable, so the wrong
 one makes a claim the data will not support:
 
@@ -151,6 +157,12 @@ The centerpiece move: `color_continuous_midpoint=0`. Without it,
 the white anchor floats arbitrarily; with it, "no change" is the
 neutral pivot, and the reader instantly sees positive vs negative.
 
+<Figure
+  slug="viz-color-scales-and-aesthetics-three-families-color-inline-cutout"
+  alt="Three swatch strips, one running pale to deep in one ink, one running between two inks, one of separate distinct colors"
+  caption="Pick the family from what the numbers mean, not from what looks lively."
+/>
+
 ## The Jet / rainbow trap, revisited
 
 Lightness is what makes a color scale readable, and it is exactly what the
@@ -172,11 +184,14 @@ reason, it's specifically designed to be smooth and uniform.
 
 ## Accessibility: colorblind-safe palettes
 
+Roughly **8% of men and 0.5% of women** have some form of color
+vision deficiency, most commonly red-green confusion. Here is what a
+red-green pairing and a colorblind-safe one each look like to a reader with
+the commonest form of it:
+
 <Chart slug="colorblind-safe" />
 
-Roughly **8% of men and 0.5% of women** have some form of color
-vision deficiency, most commonly red-green confusion. Several
-Plotly palettes are colorblind-safe by design:
+Several Plotly palettes are colorblind-safe by design:
 
 - `"Viridis"`, `"Cividis"`, `"Plasma"`, `"Magma"` (sequential)
 - `"BrBG"`, `"PuOr"`, `"PRGn"` (diverging)
@@ -185,12 +200,6 @@ Plotly palettes are colorblind-safe by design:
 If your chart uses red-vs-green to convey "bad vs good," fix it.
 Either use a colorblind-safe palette or double-encode with shape
 or labels.
-
-<Figure
-  slug="viz-color-scales-and-aesthetics-inline-cutout"
-  alt="A strip running from pale to deep in one hue on the left, a strip running between two opposite hues in the middle, and separate distinct patches on the right"
-  caption="Sequential, diverging and qualitative scales answer three different questions."
-/>
 
 ## Don't use color for emphasis if you don't have to
 
@@ -202,12 +211,6 @@ everything, which is the same as emphasising nothing:
 A common beginner habit: every chart series gets a different
 color, even when only one matters. The result is a noisy "Christmas
 tree" chart.
-
-<Figure
-  slug="viz-color-scales-and-aesthetics-three-families-color-inline-cutout"
-  alt="Three swatch strips, one running pale to deep in one ink, one running between two inks, one of separate distinct colors"
-  caption="Pick the family from what the numbers mean, not from what looks lively."
-/>
 
 Better: **gray out everything except the focus**.
 

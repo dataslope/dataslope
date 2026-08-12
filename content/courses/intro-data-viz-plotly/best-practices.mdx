@@ -28,9 +28,12 @@ into one. Split it.
 A reader should be able to look at a chart for 5 seconds and
 state its takeaway. If they can't, the chart is overloaded.
 
-## The hierarchy of clarity
+The principle has teeth: a chart that answers a second question usually
+answers it wrong.
 
-<Chart slug="encoding-accuracy" />
+<Chart slug="dashboard-two-questions" />
+
+## The hierarchy of clarity
 
 When designing any chart, prioritize in this order:
 
@@ -48,10 +51,17 @@ a mistake.
   caption="Get the data right, then the encoding, then the labels, then the polish."
 />
 
-"One chart, one message" has teeth: a chart answering a second question
-usually answers it wrong.
+Correctness and honesty are questions about the numbers. Clarity is mostly a
+question about the **encoding** you pick, and that part is not a matter of
+taste, it has been measured:
 
-<Chart slug="dashboard-two-questions" />
+<Chart slug="encoding-accuracy" />
+
+Position on a common scale wins, length is close behind, and angle, area and
+color trail badly. That single ranking is behind most of the advice on this
+page: it is why a bar chart beats a pie, why bubble size is for "big or
+small" rather than "how many times bigger," and why color is the last channel
+to reach for rather than the first.
 
 ## A pre-publication checklist
 
@@ -72,10 +82,6 @@ Run through this in 60 seconds. It catches most problems.
 
 ## Chart-type quick reference
 
-<Chart slug="share-stacked" />
-
-<Chart slug="share-sorted" />
-
 | You want to show... | Use... |
 |---|---|
 | Comparison across categories | Bar chart |
@@ -90,6 +96,18 @@ Run through this in 60 seconds. It catches most problems.
 
 When in doubt, **start with a bar or a scatter**. They are the
 two most reliably readable chart types ever invented.
+
+The "composition" row is the one people argue about, so it is worth seeing
+settled. Here are six traffic sources as a single stacked bar, the shape a pie
+chart is topologically the same as:
+
+<Chart slug="share-stacked" />
+
+Only the leftmost segment starts at zero, so ranking Social against Email
+means comparing two lengths that share no baseline. Give each its own bar and
+the same six numbers become readable:
+
+<Chart slug="share-sorted" />
 
 And one entry that belongs on the list and rarely makes it: sometimes the
 right chart goes *inside* a table rather than beside it.

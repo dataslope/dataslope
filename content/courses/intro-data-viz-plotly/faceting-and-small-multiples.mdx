@@ -103,12 +103,11 @@ comparison is on the same scale.
 
 ## Spaghetti chart → small multiples
 
-The grey behind each panel is the spaghetti, kept so the comparison to the
-group survives the split:
+The classic use of facets is breaking up a too-busy line chart. The grey
+behind each panel below is the spaghetti, kept so the comparison to the group
+survives the split:
 
 <Chart slug="spaghetti-vs-facets" />
-
-The classic use of facets is breaking up a too-busy line chart.
 
 <Figure
   slug="viz-faceting-and-small-multiples-inline-cutout"
@@ -189,16 +188,16 @@ sophisticated information graphic in major newspapers uses them.
 
 ## When NOT to facet
 
-Faceting divides the evidence, and a panel built from a sixth of the
-data draws a slope that is mostly noise:
-
-<Chart slug="facet-splits-the-data" />
-
 - When you have **2 or 3 series**, overlap them on one chart.
 - When the *interaction between groups* matters more than the
   individual groups, overlapping series let you see crossover.
 - When the categories aren't *comparable*, facets only make sense
   when the panels are "like with like."
+
+There is a quieter reason too. Faceting divides the evidence, and a panel
+built from a sixth of the data draws a slope that is mostly noise:
+
+<Chart slug="facet-splits-the-data" />
 
 ## Check your understanding
 

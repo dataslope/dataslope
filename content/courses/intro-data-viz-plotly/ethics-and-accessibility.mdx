@@ -59,7 +59,7 @@ fig2 = px.bar(
     x="product",
     y="score",
     template="simple_white",
-    title="Misleading: y truncated to make 2% look like 100%",
+    title="Misleading: y truncated so a 2% gap looks like a 3x one",
     range_y=[97, 101],
 )
 fig2.show()
@@ -68,7 +68,8 @@ fig2.show()
   ]}
 />
 
-The data is identical. The second chart screams "B is *twice* A",
+The data is identical, 98 against 100. Cutting the axis at 97 leaves A one
+unit tall and B three, so the second chart screams "B is *three times* A",
 which it manifestly isn't.
 
 The same trick on five values instead of two, drawn honestly and then
@@ -187,10 +188,6 @@ is 1 at the equator and past 10 where Greenland sits.
 
 ## The Tufte "data-ink" principle
 
-The test is deletion. These two panels differ by no data at all:
-
-<Chart slug="data-ink-ratio" />
-
 Edward Tufte's famous principle:
 
 > Above all else, show the data.
@@ -205,6 +202,10 @@ ratio. Strip away chart junk.
   alt="A chart stripped of its frame, grid and ornament until only its marks remain"
   caption="Every mark that is not data is ink competing with the data."
 />
+
+The test is deletion. These two panels differ by no data at all:
+
+<Chart slug="data-ink-ratio" />
 
 The `simple_white` template this course uses is essentially a
 Tufte-style design choice: minimal gridlines, no background fill,
