@@ -104,6 +104,12 @@ console.log(render(r3, (u) => u.name));
 The four "real" states become four constructable shapes. Every
 nonsense combination simply doesn't compile.
 
+<Figure
+  slug="fp-type-driven-design-slogan-1-make-inline-cutout"
+  alt="A set of shaped sockets cut so that an impossible pairing physically cannot be assembled"
+  caption="Model the domain so that an illegal state cannot be constructed at all."
+/>
+
 ### Another example: form state
 
 ```mermaid
@@ -264,12 +270,6 @@ The combination of:
 …means that vast classes of bugs simply cannot exist in your
 program. Not "would be caught by tests", *cannot exist*. The
 compiler refuses to build them.
-
-<Figure
-  slug="fp-type-driven-design-slogan-1-make-inline-cutout"
-  alt="A set of shaped sockets cut so that an impossible pairing physically cannot be assembled"
-  caption="Model the domain so that an illegal state cannot be constructed at all."
-/>
 
 This is what people mean when they say functional programmers
 prefer *types* over *tests*. Tests are still valuable (especially

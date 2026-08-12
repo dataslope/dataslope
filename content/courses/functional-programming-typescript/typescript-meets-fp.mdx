@@ -50,6 +50,12 @@ What TypeScript *doesn't* have natively:
 We can build everything in this course without the missing pieces.
 The missing pieces are mostly conveniences.
 
+<Figure
+  slug="fp-typescript-meets-fp-typescript-great-fp-inline-cutout"
+  alt="A bench where a shaped gate checks each block and then falls away, the blocks continuing unchanged"
+  caption="The types are checked at compile time and gone by the time it runs."
+/>
+
 ## Functions as first-class values
 
 The atom of the language:
@@ -137,12 +143,6 @@ and rules out a vast amount of accidental mutation.
 This is the single most powerful FP-enabling feature TypeScript has.
 A **discriminated union** is a sum type: "this value is either an A
 or a B or a C", with a tag that tells you which.
-
-<Figure
-  slug="fp-typescript-meets-fp-typescript-great-fp-inline-cutout"
-  alt="A bench where a shaped gate checks each block and then falls away, the blocks continuing unchanged"
-  caption="The types are checked at compile time and gone by the time it runs."
-/>
 
 <CodeBlock
   adapter="typescript"
@@ -267,12 +267,6 @@ We'll spend a whole chapter on this later, but here is a tiny preview
 of what type-driven design feels like when all three pieces, sum
 types, generics, exhaustiveness, come together.
 
-<Figure
-  slug="fp-typescript-meets-fp-multi-file-preview-separating-inline-cutout"
-  alt="A clean inner room of sealed parts with every tap and drain fitted on the outer wall"
-  caption="Pure functions in the middle, and everything that touches the world at the edge."
-/>
-
 <CodeBlock
   adapter="typescript"
   files={[
@@ -335,6 +329,12 @@ This is the shape of every functional abstraction we will build.
 Functional code tends to live in three layers: pure values (data),
 pure transformations (functions), and an impure shell that drives
 them. Here is a tiny taste of that shape, spread across three files.
+
+<Figure
+  slug="fp-typescript-meets-fp-multi-file-preview-separating-inline-cutout"
+  alt="A clean inner room of sealed parts with every tap and drain fitted on the outer wall"
+  caption="Pure functions in the middle, and everything that touches the world at the edge."
+/>
 
 <CodeBlock
   adapter="typescript"
