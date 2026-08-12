@@ -119,13 +119,6 @@ print("Has ALL-CAPS word:", any(w.isupper() and len(w) > 1 for w in review.split
 
 ## Punctuation stripping
 
-Most normalizers reach for a regular expression here, so one warning
-before you write one. A repeat (`+` or `*`) placed *inside* another repeat
-gives the engine exponentially many ways to give up, so text that almost
-matches, but does not, turns a fast pattern into a hang:
-
-<Chart slug="regex-backtracking-blowup" />
-
 The second normalization workhorse is removing punctuation. After
 tokenization you often have standalone punctuation tokens (`","`, `"!"`,
 `"."`) and sometimes punctuation still clinging to words. For most
@@ -180,6 +173,18 @@ are instructive:
   contractions together ("its").
 - **Approach 3** (regex `[a-z]+`) extracts runs of letters, so "isn't"
   becomes two tokens, "isn" and "t".
+
+One warning about that third approach, since regexes are where most
+normalizers end up. A repeat (`+` or `*`) placed *inside* another repeat
+gives the engine exponentially many ways to give up, so text that almost
+matches, but does not, turns a fast pattern into a hang:
+
+<Chart slug="regex-backtracking-blowup" />
+
+The patterns in this course are all simple enough to be safe. The habit
+worth carrying is to look at any pattern with a repeat inside a repeat,
+`(a+)+`, `(\w+\s*)*`, and treat it as a performance bug waiting for the
+right input.
 
 There is no single right answer; each approach makes a different trade-off
 about contractions and partial-punctuation tokens. The lesson is to *look at
