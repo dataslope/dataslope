@@ -207,6 +207,13 @@ const PLANS: Plan[] = [
 const SHOW_PRO_PLAN = false;
 const VISIBLE_PLANS = PLANS.filter((p) => SHOW_PRO_PLAN || p.name !== "Pro");
 
+// Shown above the table in place of the billing toggle while Pro is hidden.
+// Three sentences, because a table of $0s raises exactly three suspicions: that
+// a card is wanted up front, that the free run is a trial, and that access
+// lapses. Phrased as the denials a visitor is already half-expecting, rather
+// than as a claim ("Free forever") the price column has made twice already.
+const NO_CATCH = ["No credit card", "No trial period", "No expiry"];
+
 // Explicit column placement keeps each plan in its own column while spanning
 // all of the subgrid's rows.
 const COL_START = ["lg:col-start-1", "lg:col-start-2", "lg:col-start-3"];
@@ -442,8 +449,12 @@ function PlanColumn({
         <span className="text-4xl font-medium tracking-tight text-[var(--ds-gray-900)] dark:text-white">
           {price}
         </span>
-        {/* Billing-period suffix so the monthly/annual toggle visibly changes
-            the table even though every plan is $0. */}
+        {/* Billing-period suffix, moved by the toggle when there is one. With
+            Pro hidden there is no toggle, so this always reads "/ month" above
+            two $0 columns and one of them says "Free forever" underneath —
+            vestigial, and a fair candidate for dropping while nothing is
+            billed. Left alone for now so the price line stays a deliberate
+            copy decision rather than a side effect of removing a control. */}
         <span className="ml-1 text-base font-normal text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
           {annual ? "/ year" : "/ month"}
         </span>
@@ -529,7 +540,26 @@ export function PricingSection({
         </div>
       )}
 
-      {/* Monthly / annual billing toggle, only the paid tier's price reacts. */}
+      {/* The slot above the table: the billing toggle when there is something
+          to bill for, the "no catch" strip when there isn't.
+
+          With Pro hidden the toggle was a dead control. Both remaining columns
+          are $0 with the same sub-line, so the only thing it changed was the
+          "/ month" suffix, and the "Best value" badge on Annual promised a
+          discount that could not exist — a visitor who clicked to find the
+          saving got $0 → $0.
+
+          The strip answers the question the toggle never could. Somebody
+          reading a table where every price is $0 is not working out a billing
+          period, they are looking for the catch, and "No credit card / No
+          trial period / No expiry" names all three catches they are expecting.
+          Each one carries the same green check the feature rows use for an
+          included capability, so the mark that means "you get this" is the
+          same mark on both sides of the table's top edge.
+
+          Restoring Pro is still one flag: flip SHOW_PRO_PLAN and the toggle
+          comes back with its state and checkout wiring untouched. */}
+      {SHOW_PRO_PLAN ? (
       <div className="mb-10 flex items-center justify-center">
         <div className="inline-flex items-center rounded-full border border-[var(--ds-gray-200)] bg-white p-1 dark:border-white/15 dark:bg-[#121212]">
           {(["monthly", "annual"] as const).map((option) => {
@@ -563,6 +593,24 @@ export function PricingSection({
           })}
         </div>
       </div>
+      ) : (
+        <ul className="mb-10 flex flex-wrap items-center justify-center gap-2.5">
+          {NO_CATCH.map((assurance) => (
+            <li
+              key={assurance}
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--ds-gray-200)] bg-white py-1.5 pr-4 pl-2 text-[15px] font-medium text-[var(--ds-gray-900)] dark:border-white/15 dark:bg-[#121212] dark:text-white"
+            >
+              <span
+                className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--ds-green-500)]"
+                aria-hidden="true"
+              >
+                <Check size={12} strokeWidth={2.5} className="text-white" />
+              </span>
+              {assurance}
+            </li>
+          ))}
+        </ul>
+      )}
 
       {/* Comparison: bordered, no gaps between plans, thin dividers between
           them, and feature rows aligned via subgrid. The striped-shell gives
