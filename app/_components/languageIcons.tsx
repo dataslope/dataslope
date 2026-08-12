@@ -7,8 +7,14 @@
  * stay visually consistent.
  *
  * Looked up by language adapter `id` (e.g. `"python"`, `"javascript"`).
+ *
+ * `LangIcon` at the bottom is the rendered form of all this: the registry
+ * lookup, the per-glyph size factor, and a fixed square box, in the one
+ * component every mono-icon surface uses (the /courses catalog cards and
+ * filter sidebar, the footer's Courses and Playgrounds columns).
  */
 
+import type { ReactNode } from "react";
 import type { IconType } from "react-icons";
 import {
   SiPython,
@@ -103,3 +109,52 @@ export const LANGUAGE_ICON_COLORS: Record<string, string> = {
   web: "#e34f26",
   react: "#61dafb",
 };
+
+/** Neutral database glyph for "sql", the registry above only has per-engine
+ *  marks (SQLite/PostgreSQL/DuckDB); path from the mockup.
+ *
+ *  Deliberately not an entry in `LANGUAGE_ICONS`: that map is keyed by
+ *  playground adapter id, no adapter is called "sql", and adding one would
+ *  put this glyph on any code block tagged `sql` — a surface that has never
+ *  asked for it. `LangIcon` handles the content tag instead. */
+function SqlIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
+      <path d="M12 2C7.58 2 4 3.79 4 6s3.58 4 8 4 8-1.79 8-4-3.58-4-8-4zM4 8.5V12c0 2.21 3.58 4 8 4s8-1.79 8-4V8.5c-1.72 1.5-4.7 2.5-8 2.5s-6.28-1-8-2.5zM4 14.5V18c0 2.21 3.58 4 8 4s8-1.79 8-4v-3.5c-1.72 1.5-4.7 2.5-8 2.5s-6.28-1-8-2.5z" />
+    </svg>
+  );
+}
+
+/** Mono (currentColor) language icon at the mockup's optical sizes.
+ *
+ *  Takes a language *or* playground id: the two vocabularies overlap on
+ *  everything except `sql` (a content tag with no playground) and the
+ *  engine/framework ids (`sqlite`, `web`, `react`, …), which no course is
+ *  tagged with. Unknown ids render nothing, so a new tag is a missing glyph
+ *  rather than a crash — callers that need a visible fallback supply their
+ *  own (see `CourseThumb`'s `CourseGlyph`).
+ *
+ *  `currentColor` throughout rather than the brand tint `LANGUAGE_ICON_COLORS`
+ *  carries: every surface using this puts the glyph beside text it should
+ *  travel with, including that text's hover colour. */
+export function LangIcon({ id, size = 16 }: { id: string; size?: number }) {
+  let glyph: ReactNode;
+  if (id === "sql") {
+    // Drawn to fill its box, so it takes no size factor.
+    glyph = <SqlIcon size={size} />;
+  } else {
+    const Icon: IconType | undefined = LANGUAGE_ICONS[id];
+    if (!Icon) return null;
+    const factor = LANGUAGE_ICON_SIZE_FACTOR[id] ?? 1;
+    glyph = <Icon size={Math.round(size * factor)} />;
+  }
+  return (
+    <span
+      className="inline-flex shrink-0 items-center justify-center"
+      style={{ width: size, height: size }}
+      aria-hidden="true"
+    >
+      {glyph}
+    </span>
+  );
+}

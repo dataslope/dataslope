@@ -114,9 +114,10 @@ html.dark .ds-home {
  * leading icon; at sm each of four columns is ~118px and every one of them
  * wraps.
  *
- * `align-items: start` because that fourth column is ~14 rows against the
- * others' 5: without it the short columns stretch and their content drifts
- * apart down the row.
+ * `align-items: start` because the columns are wildly uneven — the logo, then
+ * Explore over Resources, then 11 course rows, then ~14 playground rows:
+ * without it the short columns stretch and their content drifts apart down
+ * the row.
  *
  * Driven by a scoped rule (rather than Tailwind grid utilities) so a leaked
  * `.grid`/`grid-cols-*` from /learn can't collapse it back to the wrong
