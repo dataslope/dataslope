@@ -285,16 +285,22 @@ optimization for hot read paths, at the cost of a wider index to maintain.
   title="Customers with no orders (anti-join)"
   instructions={`Two tables are loaded: \`customers\` (\`id\`, \`name\`) and \`orders\` (\`order_id\`, \`customer_id\`, \`amount\`). Return the \`id\` and \`name\` of every customer who has placed **no** orders. Use a \`LEFT JOIN\` with an \`IS NULL\` filter (or \`NOT EXISTS\`).`}
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
-  (1, 'Ava'),
-  (2, 'Ben'),
-  (3, 'Cy'),
-  (4, 'Di')
+  (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di'),
+  (5, 'Eve'), (6, 'Finn'), (7, 'Gus'), (8, 'Hana'),
+  (9, 'Iris'), (10, 'Jonas'), (11, 'Kira'), (12, 'Leo'),
+  (13, 'Mona'), (14, 'Nils'), (15, 'Otto'), (16, 'Pia'),
+  (17, 'Quinn'), (18, 'Rui'), (19, 'Sara'), (20, 'Theo'),
+  (21, 'Ulla'), (22, 'Vik'), (23, 'Wanda'), (24, 'Yara')
 ) AS t(id, name);
 
+-- Customers 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22 and 24 never ordered.
 CREATE TABLE orders AS SELECT * FROM (VALUES
-  (101, 1, 120.00),
-  (102, 1,  40.00),
-  (103, 3,  80.00)
+  (101, 1, 120.00), (102, 1, 40.00), (103, 3, 80.00), (104, 5, 210.00),
+  (105, 5, 58.00),  (106, 7, 160.00), (107, 9, 95.25), (108, 9, 105.00),
+  (109, 11, 68.00), (110, 13, 245.00), (111, 13, 77.50), (112, 15, 188.00),
+  (113, 17, 110.50), (114, 19, 199.00), (115, 19, 44.00), (116, 21, 66.25),
+  (117, 23, 91.75), (118, 1, 33.00),  (119, 3, 175.00), (120, 7, 52.75),
+  (121, 11, 130.00), (122, 15, 84.00), (123, 17, 142.00), (124, 21, 61.50)
 ) AS t(order_id, customer_id, amount);`}
   starterCode={`-- Return customers (id, name) with no matching orders.
 SELECT c.id, c.name
@@ -306,7 +312,7 @@ LEFT JOIN orders o ON o.customer_id = c.id
 WHERE o.customer_id IS NULL
 ORDER BY c.id;`}
   tests={[
-    { id: "rows", name: "Two customers never ordered", description: "Ben and Di → two rows", expectedRowCount: 2 },
+    { id: "rows", name: "Twelve customers never ordered", description: "Ben and Di → two rows", expectedRowCount: 12 },
     { id: "cols", name: "Has the required columns", description: "id and name", expectedColumnsInclude: ["id", "name"] },
   ]}
 />
@@ -319,17 +325,21 @@ trap. Read the join carefully before you write the `SUM`.
   title="Revenue per customer without double-counting"
   instructions={`Tables \`customers\` (\`id\`, \`name\`) and \`orders\` (\`order_id\`, \`customer_id\`, \`amount\`) are loaded. Return one row per customer who has ordered, with columns \`name\` and \`revenue\` (their total \`amount\`), sorted by \`revenue\` descending. Aggregate so no customer is double-counted.`}
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
-  (1, 'Ava'),
-  (2, 'Ben'),
-  (3, 'Cy')
+  (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di'),
+  (5, 'Eve'), (6, 'Finn'), (7, 'Gus'), (8, 'Hana'),
+  (9, 'Iris'), (10, 'Jonas'), (11, 'Kira'), (12, 'Leo'),
+  (13, 'Mona'), (14, 'Nils'), (15, 'Otto'), (16, 'Pia'),
+  (17, 'Quinn'), (18, 'Rui'), (19, 'Sara'), (20, 'Theo'),
+  (21, 'Ulla'), (22, 'Vik'), (23, 'Wanda'), (24, 'Yara')
 ) AS t(id, name);
 
 CREATE TABLE orders AS SELECT * FROM (VALUES
-  (101, 1, 120.00),
-  (102, 1,  40.00),
-  (103, 2,  80.00),
-  (104, 2,  20.00),
-  (105, 3,  55.00)
+  (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00), (104, 2, 20.00),
+  (105, 3, 55.00),  (106, 4, 210.00), (107, 5, 75.50), (108, 6, 160.00),
+  (109, 7, 95.25),  (110, 8, 130.00), (111, 9, 68.00), (112, 10, 245.00),
+  (113, 11, 52.75), (114, 12, 188.00), (115, 13, 110.50), (116, 14, 84.00),
+  (117, 15, 199.00), (118, 16, 66.25), (119, 17, 142.00), (120, 18, 91.75),
+  (121, 19, 58.00),  (122, 20, 77.50), (123, 21, 105.00), (124, 22, 33.00)
 ) AS t(order_id, customer_id, amount);`}
   starterCode={`-- One row per customer, summed amount as revenue, highest first.
 SELECT c.name
@@ -343,7 +353,7 @@ JOIN orders o ON o.customer_id = c.id
 GROUP BY c.name
 ORDER BY revenue DESC;`}
   tests={[
-    { id: "rows", name: "One row per ordering customer", description: "Three customers ordered → three rows", expectedRowCount: 3 },
+    { id: "rows", name: "One row per ordering customer", description: "Three customers ordered → three rows", expectedRowCount: 22 },
     { id: "cols", name: "Has the required columns", description: "name and revenue", expectedColumnsInclude: ["name", "revenue"] },
   ]}
 />

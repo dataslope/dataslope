@@ -213,7 +213,13 @@ The subquery recomputes the value each run, so the comparison never goes stale.`
 );
 INSERT INTO products (name, price) VALUES
   ('Mouse', 25.00), ('Keyboard', 40.00), ('Headset', 55.00),
-  ('Webcam', 80.00), ('Monitor', 100.00);`}
+  ('Webcam', 80.00), ('Monitor', 100.00), ('Desk lamp', 22.00),
+  ('Laptop stand', 39.99), ('USB hub', 29.95), ('External drive', 109.00),
+  ('Chair', 259.00), ('Footrest', 34.50), ('Monitor arm', 89.99),
+  ('Cable tray', 19.95), ('Desk mat', 27.50), ('Wrist rest', 14.99),
+  ('Graphics tablet', 149.00), ('Label printer', 74.95), ('Router', 119.00),
+  ('Surge protector', 21.99), ('Whiteboard', 54.50), ('Bookshelf', 139.00),
+  ('Docking station', 179.00), ('Microphone', 94.50), ('Headphones', 129.99);`}
   starterCode={`SELECT
   name,
   price
@@ -246,9 +252,9 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns two products",
-      description: "The average price is 60.00; only two products exceed it.",
-      expectedRowCount: 2,
+      name: "Returns eleven products",
+      description: "Only the products priced above the average.",
+      expectedRowCount: 11,
     },
     {
       id: "matches",

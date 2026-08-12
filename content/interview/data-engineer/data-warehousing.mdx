@@ -46,12 +46,30 @@ table, only `amount` and `units` need to be scanned.
   amount    DECIMAL(10,2)
 );
 INSERT INTO sales VALUES
-  (1, DATE '2024-01-01', 'North', 'Electronics', 2, 200.00),
-  (2, DATE '2024-01-01', 'South', 'Electronics', 1, 150.00),
-  (3, DATE '2024-01-02', 'North', 'Books',       5,  60.00),
-  (4, DATE '2024-01-02', 'South', 'Books',       3,  36.00),
-  (5, DATE '2024-01-03', 'North', 'Home',        1,  75.00),
-  (6, DATE '2024-01-03', 'South', 'Electronics', 4, 480.00);`}
+  (1, DATE '2024-01-01', 'North', 'Electronics', 1, 36.00),
+  (2, DATE '2024-01-01', 'South', 'Books', 2, 77.00),
+  (3, DATE '2024-01-01', 'North', 'Home', 3, 118.00),
+  (4, DATE '2024-01-02', 'South', 'Garden', 4, 159.00),
+  (5, DATE '2024-01-02', 'North', 'Electronics', 5, 200.00),
+  (6, DATE '2024-01-02', 'South', 'Books', 1, 241.00),
+  (7, DATE '2024-01-03', 'North', 'Home', 2, 282.00),
+  (8, DATE '2024-01-03', 'South', 'Garden', 3, 323.00),
+  (9, DATE '2024-01-03', 'North', 'Electronics', 4, 364.00),
+  (10, DATE '2024-01-04', 'South', 'Books', 5, 405.00),
+  (11, DATE '2024-01-04', 'North', 'Home', 1, 446.00),
+  (12, DATE '2024-01-04', 'South', 'Garden', 2, 487.00),
+  (13, DATE '2024-01-05', 'North', 'Electronics', 3, 68.00),
+  (14, DATE '2024-01-05', 'South', 'Books', 4, 109.00),
+  (15, DATE '2024-01-05', 'North', 'Home', 5, 150.00),
+  (16, DATE '2024-01-06', 'South', 'Garden', 1, 191.00),
+  (17, DATE '2024-01-06', 'North', 'Electronics', 2, 232.00),
+  (18, DATE '2024-01-06', 'South', 'Books', 3, 273.00),
+  (19, DATE '2024-01-07', 'North', 'Home', 4, 314.00),
+  (20, DATE '2024-01-07', 'South', 'Garden', 5, 355.00),
+  (21, DATE '2024-01-07', 'North', 'Electronics', 1, 396.00),
+  (22, DATE '2024-01-08', 'South', 'Books', 2, 437.00),
+  (23, DATE '2024-01-08', 'North', 'Home', 3, 478.00),
+  (24, DATE '2024-01-08', 'South', 'Garden', 4, 59.00);`}
   starterCode={`-- A columnar engine reads only the columns referenced here
 -- (category, amount, units), not the whole row.
 SELECT category,
@@ -92,12 +110,30 @@ groups are read.
   amount    DECIMAL(10,2)
 );
 INSERT INTO sales VALUES
-  (1, DATE '2024-01-01', 'North', 200.00),
-  (2, DATE '2024-01-01', 'South', 150.00),
-  (3, DATE '2024-01-02', 'North',  60.00),
-  (4, DATE '2024-01-02', 'South',  36.00),
-  (5, DATE '2024-01-03', 'North',  75.00),
-  (6, DATE '2024-01-03', 'South', 480.00);`}
+  (1, DATE '2024-01-01', 'North', 36.00),
+  (2, DATE '2024-01-01', 'South', 77.00),
+  (3, DATE '2024-01-01', 'North', 118.00),
+  (4, DATE '2024-01-02', 'South', 159.00),
+  (5, DATE '2024-01-02', 'North', 200.00),
+  (6, DATE '2024-01-02', 'South', 241.00),
+  (7, DATE '2024-01-03', 'North', 282.00),
+  (8, DATE '2024-01-03', 'South', 323.00),
+  (9, DATE '2024-01-03', 'North', 364.00),
+  (10, DATE '2024-01-04', 'South', 405.00),
+  (11, DATE '2024-01-04', 'North', 446.00),
+  (12, DATE '2024-01-04', 'South', 487.00),
+  (13, DATE '2024-01-05', 'North', 68.00),
+  (14, DATE '2024-01-05', 'South', 109.00),
+  (15, DATE '2024-01-05', 'North', 150.00),
+  (16, DATE '2024-01-06', 'South', 191.00),
+  (17, DATE '2024-01-06', 'North', 232.00),
+  (18, DATE '2024-01-06', 'South', 273.00),
+  (19, DATE '2024-01-07', 'North', 314.00),
+  (20, DATE '2024-01-07', 'South', 355.00),
+  (21, DATE '2024-01-07', 'North', 396.00),
+  (22, DATE '2024-01-08', 'South', 437.00),
+  (23, DATE '2024-01-08', 'North', 478.00),
+  (24, DATE '2024-01-08', 'South', 59.00);`}
   starterCode={`-- Range filter on a clustered/sorted column: min-max stats let the
 -- engine skip row groups outside the range before reading them.
 SELECT region,

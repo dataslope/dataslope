@@ -52,16 +52,18 @@ against zero. `COUNT(DISTINCT ...)` ensures you count *people*, not events.
 INSERT INTO
   events
 VALUES
-  (1, 'ads', 'visit'),
-  (1, 'ads', 'purchase'),
-  (2, 'ads', 'visit'),
-  (3, 'organic', 'visit'),
-  (3, 'organic', 'purchase'),
-  (4, 'organic', 'visit'),
-  (5, 'organic', 'visit'),
-  (5, 'organic', 'purchase'),
-  (6, 'ads', 'visit'),
-  (6, 'ads', 'purchase');`}
+  (1, 'ads', 'visit'), (1, 'ads', 'purchase'),
+  (2, 'ads', 'visit'), (3, 'organic', 'visit'),
+  (3, 'organic', 'purchase'), (4, 'organic', 'visit'),
+  (5, 'organic', 'visit'), (5, 'organic', 'purchase'),
+  (6, 'ads', 'visit'), (6, 'ads', 'purchase'),
+  (7, 'ads', 'visit'), (8, 'ads', 'visit'),
+  (8, 'ads', 'purchase'), (9, 'organic', 'visit'),
+  (10, 'organic', 'visit'), (10, 'organic', 'purchase'),
+  (11, 'email', 'visit'), (11, 'email', 'purchase'),
+  (12, 'email', 'visit'), (13, 'email', 'visit'),
+  (13, 'email', 'purchase'), (14, 'ads', 'visit'),
+  (15, 'organic', 'visit'), (16, 'email', 'visit');`}
   starterCode={`SELECT
   channel,
   COUNT(DISTINCT user_id) FILTER(
@@ -130,10 +132,12 @@ CREATE TABLE payments (user_id INTEGER, amount DECIMAL(8, 2));
 INSERT INTO
   payments
 VALUES
-  (1, 50),
-  (1, 20),
-  (3, 100),
-  (7, 30);
+  (1, 50), (1, 20), (3, 100), (7, 30),
+  (2, 75), (2, 40), (4, 120), (5, 15),
+  (5, 60), (6, 200), (8, 35), (8, 90),
+  (9, 45), (10, 110), (1, 25), (3, 65),
+  (4, 55), (6, 150), (7, 80), (9, 20),
+  (10, 95), (2, 130), (5, 70), (8, 105);
 
 -- only 3 users paid`}
   starterCode={`SELECT

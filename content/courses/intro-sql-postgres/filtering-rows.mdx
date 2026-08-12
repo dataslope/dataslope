@@ -279,7 +279,27 @@ INSERT INTO books (title, author, year) VALUES
   ('The Pragmatic Programmer', 'Hunt & Thomas', 1999),
   ('Clean Code', 'Robert C. Martin', 2008),
   ('Refactoring', 'Martin Fowler', 2018),
-  ('SQL for Smarties', 'Joe Celko', 1995);`}
+  ('SQL for Smarties', 'Joe Celko', 1995),
+  ('The Mythical Man-Month', 'Fred Brooks', 1975),
+  ('Design Patterns', 'Gamma et al.', 1994),
+  ('Code Complete', 'Steve McConnell', 2004),
+  ('Working Effectively with Legacy Code', 'Michael Feathers', 2005),
+  ('Domain-Driven Design', 'Eric Evans', 2003),
+  ('Structure and Interpretation of Computer Programs', 'Abelson & Sussman', 1985),
+  ('The Art of Computer Programming', 'Donald Knuth', 1968),
+  ('Peopleware', 'DeMarco & Lister', 1987),
+  ('Test-Driven Development', 'Kent Beck', 2002),
+  ('Continuous Delivery', 'Humble & Farley', 2010),
+  ('Release It!', 'Michael Nygard', 2007),
+  ('The Phoenix Project', 'Kim et al.', 2013),
+  ('Accelerate', 'Forsgren et al.', 2018),
+  ('Designing Data-Intensive Applications', 'Martin Kleppmann', 2017),
+  ('Database Internals', 'Alex Petrov', 2019),
+  ('Site Reliability Engineering', 'Beyer et al.', 2016),
+  ('A Philosophy of Software Design', 'John Ousterhout', 2018),
+  ('The Unicorn Project', 'Gene Kim', 2019),
+  ('Software Engineering at Google', 'Winters et al.', 2020),
+  ('Fundamentals of Data Engineering', 'Reis & Housley', 2022);`}
   starterCode={`-- Keep only the books from before 2000:
 SELECT
   title,
@@ -305,9 +325,9 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns two books",
+      name: "Returns seven books",
       description: "Only the titles from before 2000.",
-      expectedRowCount: 2,
+      expectedRowCount: 7,
     },
     {
       id: "matches",

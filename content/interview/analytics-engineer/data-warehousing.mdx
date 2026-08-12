@@ -335,11 +335,18 @@ models upstream as the maintainable source.
   title="Idempotent dimension rebuild"
   instructions={`Table \`customer_events\` (\`customer_id\`, \`updated_at\`) is an append-only log with **multiple rows per customer**. Build a \`SELECT\` for an idempotent dimension: exactly **one row per** \`customer_id\` holding that customer's **latest** \`updated_at\`. Rerunning it must always give the same result. Columns: \`customer_id\`, \`last_seen\`. Sort by \`customer_id\`.`}
   initSql={`CREATE TABLE customer_events AS SELECT * FROM (VALUES
-  (1, TIMESTAMP '2024-01-01 00:00:00'),
-  (1, TIMESTAMP '2024-02-01 00:00:00'),
-  (2, TIMESTAMP '2024-01-15 00:00:00'),
-  (3, TIMESTAMP '2024-03-10 00:00:00'),
-  (3, TIMESTAMP '2024-03-01 00:00:00')
+  (1, TIMESTAMP '2024-01-01 00:00:00'), (1, TIMESTAMP '2024-02-01 00:00:00'),
+  (2, TIMESTAMP '2024-01-15 00:00:00'), (3, TIMESTAMP '2024-03-10 00:00:00'),
+  (3, TIMESTAMP '2024-03-01 00:00:00'), (4, TIMESTAMP '2024-01-22 00:00:00'),
+  (4, TIMESTAMP '2024-02-27 00:00:00'), (5, TIMESTAMP '2024-01-03 00:00:00'),
+  (5, TIMESTAMP '2024-03-19 00:00:00'), (6, TIMESTAMP '2024-02-06 00:00:00'),
+  (6, TIMESTAMP '2024-04-02 00:00:00'), (7, TIMESTAMP '2024-01-29 00:00:00'),
+  (7, TIMESTAMP '2024-03-26 00:00:00'), (8, TIMESTAMP '2024-02-13 00:00:00'),
+  (8, TIMESTAMP '2024-04-09 00:00:00'), (9, TIMESTAMP '2024-01-11 00:00:00'),
+  (9, TIMESTAMP '2024-03-05 00:00:00'), (10, TIMESTAMP '2024-02-24 00:00:00'),
+  (10, TIMESTAMP '2024-04-15 00:00:00'), (11, TIMESTAMP '2024-01-17 00:00:00'),
+  (11, TIMESTAMP '2024-03-30 00:00:00'), (12, TIMESTAMP '2024-02-08 00:00:00'),
+  (12, TIMESTAMP '2024-04-21 00:00:00'), (12, TIMESTAMP '2024-01-05 00:00:00')
 ) AS t(customer_id, updated_at);`}
   starterCode={`-- One row per customer with their most recent event time
 SELECT
@@ -355,7 +362,7 @@ FROM customer_events
 GROUP BY customer_id
 ORDER BY customer_id;`}
   tests={[
-    { id: "rows", name: "One row per customer", description: "Three customers collapse to three rows", expectedRowCount: 3 },
+    { id: "rows", name: "One row per customer", description: "Three customers collapse to three rows", expectedRowCount: 12 },
     { id: "cols", name: "Has the required columns", description: "customer_id and last_seen", expectedColumnsInclude: ["customer_id", "last_seen"] },
   ]}
 />

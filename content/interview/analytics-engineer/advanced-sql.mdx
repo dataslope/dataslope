@@ -374,12 +374,17 @@ to see whether you think about the days that *are not* in the data.
   dialect="duckdb"
   title="Daily active users with a date spine"
   instructions={`Table \`logins\` (\`user_id\`, \`login_date\`) records logins over several days, but some days have **no logins at all**. Produce a **complete daily series**: one row for every calendar day from the earliest to the latest \`login_date\`, with the count of **distinct** active users that day (0 for empty days). Columns: \`day\`, \`active_users\`. Sort by \`day\`. Hint: build a spine with \`generate_series(..., INTERVAL 1 DAY)\` and \`LEFT JOIN\`.`}
-  initSql={`CREATE TABLE logins AS SELECT * FROM (VALUES
-  (101, DATE '2024-05-01'),
-  (102, DATE '2024-05-01'),
-  (101, DATE '2024-05-01'),
-  (103, DATE '2024-05-03'),
-  (101, DATE '2024-05-04')
+  initSql={`-- 2024-05-02, 05-06, 05-09, 05-12 and 05-13 have no logins at all: those
+-- are the days a date spine has to invent.
+CREATE TABLE logins AS SELECT * FROM (VALUES
+  (101, DATE '2024-05-01'), (102, DATE '2024-05-01'), (101, DATE '2024-05-01'),
+  (103, DATE '2024-05-03'), (101, DATE '2024-05-04'), (104, DATE '2024-05-03'),
+  (102, DATE '2024-05-04'), (105, DATE '2024-05-05'), (101, DATE '2024-05-05'),
+  (106, DATE '2024-05-07'), (103, DATE '2024-05-07'), (107, DATE '2024-05-08'),
+  (102, DATE '2024-05-08'), (108, DATE '2024-05-08'), (101, DATE '2024-05-10'),
+  (109, DATE '2024-05-10'), (104, DATE '2024-05-11'), (110, DATE '2024-05-11'),
+  (105, DATE '2024-05-14'), (102, DATE '2024-05-14'), (111, DATE '2024-05-14'),
+  (106, DATE '2024-05-15'), (101, DATE '2024-05-15'), (112, DATE '2024-05-15')
 ) AS t(user_id, login_date);`}
   starterCode={`-- Build a per-day spine, then LEFT JOIN logins and count distinct users
 WITH bounds AS (
@@ -405,7 +410,7 @@ LEFT JOIN logins l ON l.login_date = s.day
 GROUP BY s.day
 ORDER BY s.day;`}
   tests={[
-    { id: "rows", name: "One row per calendar day", description: "May 1 through May 4 is four days, including the empty May 2", expectedRowCount: 4 },
+    { id: "rows", name: "One row per calendar day", description: "May 1 through May 4 is four days, including the empty May 2", expectedRowCount: 15 },
     { id: "cols", name: "Has the required columns", description: "day and active_users", expectedColumnsInclude: ["day", "active_users"] },
   ]}
 />

@@ -94,11 +94,15 @@ measure. "Most efficient", "best value", "highest rate" are all
 INSERT INTO
   snacks
 VALUES
-  ('Almonds', 6.00, 200),
-  ('Chips', 3.50, 150),
-  ('Trail Mix', 8.00, 400),
-  ('Pretzels', 2.00, 100),
-  ('Jerky', 9.00, 90);`}
+  ('Almonds', 6.00, 200), ('Chips', 3.50, 150), ('Trail Mix', 8.00, 400),
+  ('Pretzels', 2.00, 100), ('Jerky', 9.00, 90), ('Cashews', 7.25, 180),
+  ('Popcorn', 2.75, 120), ('Granola bar', 1.80, 60), ('Rice cakes', 2.40, 110),
+  ('Peanuts', 4.50, 250), ('Crackers', 3.10, 140), ('Pistachios', 9.50, 175),
+  ('Dried mango', 5.60, 130), ('Walnuts', 8.40, 210), ('Seaweed', 3.90, 40),
+  ('Oat cookies', 4.20, 190), ('Corn nuts', 2.60, 160), ('Beef sticks', 7.80, 85),
+  ('Banana chips', 3.30, 145), ('Sunflower seeds', 2.90, 170),
+  ('Yogurt raisins', 5.10, 155), ('Pumpkin seeds', 6.70, 165),
+  ('Fruit leather', 1.95, 45), ('Wasabi peas', 4.80, 135);`}
   starterCode={`SELECT
   name,
   ROUND(price / grams, 4) AS price_per_gram
