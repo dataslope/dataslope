@@ -180,11 +180,6 @@ corners late by roughly half the window.
 
 ## Common time-series pitfalls
 
-The costliest of them is the quietest. Four missing days, filled with
-zeroes and left as a gap:
-
-<Chart slug="missing-as-zero" />
-
 1. **Non-monotonic x-axis.** If your DataFrame isn't sorted by
    date, the line wiggles backwards through time. Always
    `df.sort_values("date")` before plotting.
@@ -200,6 +195,11 @@ zeroes and left as a gap:
    showing change, starting the y-axis at a non-zero value is
    *sometimes* acceptable, but always label it clearly.
 
+The costliest of them is the quietest. Here are four missing days, filled
+with zeroes and left as a gap:
+
+<Chart slug="missing-as-zero" />
+
 <Figure
   slug="viz-time-series-visualization-inline-cutout"
   alt="A ribbon running left to right over a rail of evenly spaced date sleepers, dipping and rising as it goes"
@@ -207,6 +207,10 @@ zeroes and left as a gap:
 />
 
 ## Skipping non-trading days
+
+Stock prices are the classic case of pitfall 3. Markets are shut at the
+weekend, so a calendar axis draws two flat days a week that no data
+supports. `rangebreaks` removes them:
 
 <CodeBlock
   adapter="python"
@@ -237,20 +241,25 @@ fig.show()
 Notice the x-axis no longer has flat "no movement" stretches over
 weekends.
 
-The commonest pitfall is the window itself. The same series supports
-opposite headlines depending on where you start it:
+## Choosing the window
+
+The pitfall that costs the most is not on the list above, because it is not
+a property of the chart at all. It is where you started it. The same series
+supports opposite headlines depending on the window:
 
 <Chart slug="cherry-picked-window" />
 
+Pick the window from the question, not from the shape it produces, and say
+what it is.
+
 ## Seasonal patterns: faceting by year
 
-The year-over-year version folds the axis so the same month lands in the
-same place, which is what makes December comparable to December:
+To compare years on the same calendar, facet by year (or use a
+*year-over-year* plot where the x-axis is just month/day). The
+year-over-year version folds the axis so the same month lands in the same
+place, which is what makes December comparable to December:
 
 <Chart slug="year-over-year-overlay" />
-
-To compare years on the same calendar, facet by year (or use a
-*year-over-year* plot where the x-axis is just month/day):
 
 <CodeBlock
   adapter="python"
