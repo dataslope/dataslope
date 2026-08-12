@@ -111,8 +111,15 @@ export function LanguageCategories() {
           key={cat.name}
           className="grid gap-x-14 gap-y-6 py-8 sm:py-10 md:grid-cols-[minmax(0,264px)_1fr]"
         >
-          <div>
-            <h2 className="text-sm font-medium text-[#121212] dark:text-white">
+          {/* `md:pt-5` is the tile's own top padding, borrowed. A tile starts
+              its icon 20px down (`pt-5` in LanguageTile), so at the top of a
+              row the heading sat level with the tile's empty padding rather
+              than with the first glyph, and the label column read as floating
+              above the grid it belongs to. Only from `md`, where the two are
+              side by side; stacked on a phone the heading is the row's top
+              edge and has nothing to align to. */}
+          <div className="md:pt-5">
+            <h2 className="text-[18px] font-medium text-[#121212] dark:text-white">
               {cat.name}
             </h2>
             <p className="mt-2.5 text-sm leading-relaxed text-[var(--ds-gray-500)] [text-wrap:pretty] dark:text-[var(--ds-gray-400)]">
