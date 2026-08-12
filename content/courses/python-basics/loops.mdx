@@ -72,6 +72,8 @@ The simplest form: iterate over a sequence.
   ]}
 />
 
+Anything iterable works, including a dictionary, which yields its keys:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -105,6 +107,9 @@ print()
   ]}
 />
 
+Give `range` two arguments and the first is where it starts. The stop
+value is still excluded, which is why this prints 1 through 5:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -118,6 +123,8 @@ print()
   ]}
 />
 
+A third argument is the step:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -130,6 +137,8 @@ print()
     },
   ]}
 />
+
+A negative step counts down, which is the usual way to walk backwards:
 
 <CodeBlock
   adapter="python"
@@ -165,6 +174,9 @@ for i, fruit in enumerate(fruits):
   ]}
 />
 
+`enumerate` counts from 0 by default. Pass `start=1` when the numbers
+are for a human to read:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -197,6 +209,9 @@ for fruit, price in zip(fruits, prices):
     },
   ]}
 />
+
+`zip` is not limited to two sequences, and it stops as soon as the
+shortest one runs out:
 
 <CodeBlock
   adapter="python"
@@ -305,6 +320,9 @@ while True:
   ]}
 />
 
+`continue` is the gentler sibling of `break`. It abandons the current
+iteration and moves to the next one, leaving the loop running:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -318,6 +336,9 @@ while True:
     },
   ]}
 />
+
+The two combine happily. Read the body top to bottom and each guard
+fires in the order it is written:
 
 <CodeBlock
   adapter="python"
@@ -345,6 +366,10 @@ Both `for` and `while` accept an `else:` block, which runs **only if the loop co
   alt="A closed belt carrying blocks past a station one at a time, with a small counter clicking and a gate that opens on the last"
   caption="Every loop needs something that eventually opens the gate and lets it end."
 />
+
+That reads oddly until you see what it is for. `for/else` expresses
+"search, and do something if the search failed" without needing a flag
+variable:
 
 <CodeBlock
   adapter="python"
@@ -414,6 +439,9 @@ else:
     },
   ]}
 />
+
+`break` and `continue` work in a `while` loop exactly as they do in a
+`for` loop:
 
 <CodeBlock
   adapter="python"

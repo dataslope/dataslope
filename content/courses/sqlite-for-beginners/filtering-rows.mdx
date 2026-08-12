@@ -141,6 +141,9 @@ WHERE
   price < 20;`}
 />
 
+Thirteen of the 24 books come back. `BETWEEN` handles the other common
+shape, a range with two ends, in one clause instead of two:
+
 <SqlCodeBlock
   dialect="sqlite"
   title="A page range with BETWEEN"
@@ -269,6 +272,9 @@ WHERE
   genre = 'Technology'
   AND price < 30;`}
 />
+
+`AND` narrows: each condition you add can only remove rows. `OR`
+widens, and a row needs to satisfy just one side to be kept:
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -471,6 +477,10 @@ FROM
 WHERE
   title LIKE 'sql%';`}
 />
+
+Three titles match. Put the `%` at both ends instead and the pattern
+finds the fragment anywhere in the text, which is the closest thing SQL
+has to a plain search box:
 
 <SqlCodeBlock
   dialect="sqlite"

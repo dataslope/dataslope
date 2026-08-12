@@ -38,6 +38,9 @@ print(empty)
   ]}
 />
 
+One or more items, separated by commas. The parentheses are usually
+optional, but they make the intent obvious:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -117,6 +120,8 @@ print(t[-1])
     },
   ]}
 />
+
+Slicing works too, and returns a new tuple:
 
 <CodeBlock
   adapter="python"
@@ -266,6 +271,9 @@ print("last:", last)
   ]}
 />
 
+The starred name does not have to be in the middle. Head-and-tail is
+the most common form of all:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -312,6 +320,10 @@ print("min:", lo, "max:", hi)
   ]}
 />
 
+That function looks like it returns two values. It returns one tuple,
+which unpacking then splits at the call site. Every multi-value return
+in Python works this way:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -336,6 +348,10 @@ print("quotient:", quotient, "remainder:", remainder)
   alt="A sealed strip holding three blocks that cannot be prised out, beside an open rail whose blocks lift freely"
   caption="A tuple is sealed once built, while a list stays open to changes."
 />
+
+Positional tuples get hard to read once there are more than two or
+three fields. `namedtuple` gives the positions names without giving up
+the tuple behaviour:
 
 <CodeBlock
   adapter="python"

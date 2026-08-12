@@ -324,6 +324,10 @@ FROM
   sales;`}
 />
 
+`SUBSTR` goes the other way from `||`: instead of gluing text
+together, it cuts a piece out. The arguments are the starting position
+(counting from 1, not 0) and how many characters to take:
+
 <SqlCodeBlock
   dialect="sqlite"
   title="Take part of a text value"

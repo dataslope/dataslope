@@ -311,6 +311,9 @@ ORDER BY c.id;`}
   ]}
 />
 
+The second challenge looks like a simple aggregate and hides a fan-out
+trap. Read the join carefully before you write the `SUM`.
+
 <SqlChallengeCard
   dialect="duckdb"
   title="Revenue per customer without double-counting"

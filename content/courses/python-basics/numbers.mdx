@@ -65,6 +65,9 @@ print(0xFF)  # hex    -> 255
   ]}
 />
 
+Long literals get hard to read at a glance, so Python lets you group
+the digits with underscores. They are ignored entirely by the parser:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -137,6 +140,9 @@ print(total)
   ]}
 />
 
+It is worth seeing the problem `Decimal` exists to solve. Binary floats
+cannot represent most decimal fractions exactly, and the error compounds:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -193,6 +199,12 @@ Python has built-in support for complex numbers using `j` (not `i`) for the imag
   caption="Exact steps or crowded marks is the difference between an int and a float."
 />
 
+`Fraction` keeps a number as an exact ratio, so a third stays a third
+rather than becoming 0.3333333333333333.
+
+Python also has complex numbers built in, with `j` for the imaginary
+unit:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -205,6 +217,8 @@ print(abs(z))  # magnitude
     },
   ]}
 />
+
+They arithmetic the way you would hope:
 
 <CodeBlock
   adapter="python"
@@ -260,6 +274,9 @@ print(-7 // 2)  # -4, not -3
   ]}
 />
 
+Floor division rounds *down*, not toward zero, which is why `-7 // 2`
+is `-4`. The remainder operator and `**` complete the set:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -306,6 +323,8 @@ print(math.sqrt(2))
   ]}
 />
 
+The trigonometric functions all take radians:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -321,6 +340,9 @@ print(math.gcd(24, 36))
     },
   ]}
 />
+
+And the rounding family, which is more precise about what it does than
+the built-in `round()`:
 
 <CodeBlock
   adapter="python"
@@ -368,6 +390,11 @@ print(random.choice(["a", "b", "c"]))
     },
   ]}
 />
+
+Seeding the generator with the same number gives back the same
+sequence, which is what makes a random simulation reproducible: rerun it
+and you can compare like with like. `sample` is the one to reach for
+when you need several draws without repeats:
 
 <CodeBlock
   adapter="python"

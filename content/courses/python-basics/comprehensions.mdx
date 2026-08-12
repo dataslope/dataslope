@@ -43,6 +43,9 @@ print(squares)
   ]}
 />
 
+Add an `if` at the end and the comprehension becomes a filter as well
+as a transform. Nothing that fails the test reaches the output list:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -54,6 +57,9 @@ print(evens)
     },
   ]}
 />
+
+The expression at the front does not have to be arithmetic. Anything
+you can write about `w` can go there:
 
 <CodeBlock
   adapter="python"
@@ -101,6 +107,8 @@ print(evens)
   ]}
 />
 
+The same shape works on any iterable, not just ranges:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -139,6 +147,9 @@ Multiple `for` clauses behave like nested loops, left to right.
   caption="Nested loops that build a list collapse into a single comprehension."
 />
 
+Two `for` clauses nest, outer first, exactly as they would if you wrote
+them as indented loops. That produces every combination:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -150,6 +161,8 @@ print(pairs)
     },
   ]}
 />
+
+And an `if` after both of them filters the combined result:
 
 <CodeBlock
   adapter="python"
@@ -197,6 +210,9 @@ print(squares_map)
     },
   ]}
 />
+
+Dict comprehensions take the same `if` filter, and iterating
+`.items()` gives you the key and value to work with:
 
 <CodeBlock
   adapter="python"
@@ -258,6 +274,9 @@ print(vowels)
   ]}
 />
 
+Because a set discards duplicates, a set comprehension is also the
+shortest deduplication in the language:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -289,6 +308,10 @@ print("list total:", list_total)
     },
   ]}
 />
+
+That built a list of a million integers just to add them up and throw
+them away. Drop the brackets and you get a **generator expression**,
+which produces one value at a time and never holds the whole sequence:
 
 <CodeBlock
   adapter="python"

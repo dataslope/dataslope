@@ -56,6 +56,9 @@ if x > 0:
   ]}
 />
 
+`elif` chains as many tests as you like, and `else` catches everything
+that reached the bottom without matching:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -194,6 +197,9 @@ else:
   ]}
 />
 
+Truthiness covers most cases, but not all of them. When `None` and an
+empty value mean different things, test for `None` explicitly:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -232,6 +238,9 @@ print(status)
   ]}
 />
 
+Because it is an expression rather than a statement, it can sit inside
+another expression, such as an f-string:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -266,6 +275,9 @@ if 0 < x < 10:
     },
   ]}
 />
+
+Chained comparisons read exactly like the mathematics they came from,
+which makes range checks unusually pleasant in Python:
 
 <CodeBlock
   adapter="python"
@@ -304,6 +316,10 @@ if a < b < c:
   alt="A track with points and a loop, a cart taking the branch while the loop curls back behind it"
   caption="Branching sends a value one way; looping curls it back for another pass."
 />
+
+Structural pattern matching, added in Python 3.10, goes further than a
+chain of `elif`s: it matches on the *shape* of a value and pulls pieces
+out of it in the same step.
 
 <CodeBlock
   adapter="python"
