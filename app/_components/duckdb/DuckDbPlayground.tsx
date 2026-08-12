@@ -41,6 +41,7 @@ import {
   ChevronDown,
   Columns3,
   Database,
+  DatabasePlus,
   FilePlus,
   FileJson,
   FileText,
@@ -4406,14 +4407,19 @@ function DuckDbPlaygroundInner() {
         activeWorkspace ? (
           <>
             <HeaderDivider />
-            <WorkspaceNameControl
-              workspaceId={activeWorkspace.id}
-              name={activeWorkspace.name}
-              onRenamed={(name) =>
-                setActiveWorkspace({ id: activeWorkspace.id, name })
-              }
-            />
-            <NewWorkspaceControl playgroundId={PLAYGROUND_ID} />
+            <span className="ph-name-group">
+              <WorkspaceNameControl
+                workspaceId={activeWorkspace.id}
+                name={activeWorkspace.name}
+                onRenamed={(name) =>
+                  setActiveWorkspace({ id: activeWorkspace.id, name })
+                }
+              />
+              <NewWorkspaceControl
+                playgroundId={PLAYGROUND_ID}
+                icon={DatabasePlus}
+              />
+            </span>
           </>
         ) : null
       }

@@ -3983,14 +3983,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           {workspaceReady && !embedded && (
             <>
               <HeaderDivider />
-              <WorkspaceNameControl
-                workspaceId={workspaceId}
-                name={workspaceName}
-                onRenamed={(name) => {
-                  if (workspaceId) setWorkspace(workspaceId, name);
-                }}
-              />
-              <NewWorkspaceControl playgroundId={adapter.id} />
+              <span className="ph-name-group">
+                <WorkspaceNameControl
+                  workspaceId={workspaceId}
+                  name={workspaceName}
+                  onRenamed={(name) => {
+                    if (workspaceId) setWorkspace(workspaceId, name);
+                  }}
+                />
+                <NewWorkspaceControl playgroundId={adapter.id} />
+              </span>
             </>
           )}
 
