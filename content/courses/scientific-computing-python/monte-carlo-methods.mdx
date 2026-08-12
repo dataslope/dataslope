@@ -28,6 +28,12 @@ Three things make Monte Carlo special:
 Drop random points uniformly into the unit square. The fraction
 that lands inside the unit quarter-disk approximates $\pi/4$.
 
+<Figure
+  slug="scipy-monte-carlo-methods-inline-cutout"
+  alt="A square board with a quarter-circle marked on it and a scatter of chips thrown across it, the ones inside counted"
+  caption="Throw points at random and the fraction that land inside estimates the area."
+/>
+
 Run that three times and watch the estimates settle. The convergence is
 what you should expect from any Monte Carlo estimate: noisy early, and
 tightening as the *square root* of the sample count rather than linearly:
@@ -64,12 +70,6 @@ unaffected by the dimensionality of the problem.
 ## Monte Carlo integration
 
 For any integrable $f$ over a domain $D$ with volume $V$,
-
-<Figure
-  slug="scipy-monte-carlo-methods-inline-cutout"
-  alt="A square board with a quarter-circle marked on it and a scatter of chips thrown across it, the ones inside counted"
-  caption="Throw points at random and the fraction that land inside estimates the area."
-/>
 
 $$
 \int_D f \, dV \approx \frac{V}{N} \sum_{i=1}^{N} f(x_i),

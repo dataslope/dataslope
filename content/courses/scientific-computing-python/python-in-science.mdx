@@ -29,12 +29,6 @@ have used the language, and he was right. It became the first widely
 used high-level language, and programs that once took weeks to
 hand-code could now be written in an afternoon.
 
-<Figure
-  slug="scipy-python-in-science-numpy-cutout"
-  alt="Two small toolboxes emptied into one larger shared toolbox, with a row of tall instruments standing beside it"
-  caption="NumPy, 2005 to 2006: two rival array packages folded into one, which is what the rest could then be built on."
-/>
-
 That choice still reaches into your browser. NumPy's `@` operator
 dispatches to a routine called **DGEMM** in the BLAS library,
 FORTRAN-lineage code, hand-tuned for every generation of CPU since
@@ -144,6 +138,12 @@ Oliphant** unified the earlier Numeric and Numarray packages into
 Travis Oliphant, and Pearu Peterson) wrapped the venerable FORTRAN
 libraries, BLAS, LAPACK, ODEPACK, MINPACK, QUADPACK, behind
 familiar calls like `solve`, `eig()`, `fft()`, and `quad()`.
+
+<Figure
+  slug="scipy-python-in-science-numpy-cutout"
+  alt="Two small toolboxes emptied into one larger shared toolbox, with a row of tall instruments standing beside it"
+  caption="NumPy, 2005 to 2006: two rival array packages folded into one, which is what the rest could then be built on."
+/>
 
 ```mermaid
 flowchart LR

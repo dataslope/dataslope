@@ -43,9 +43,9 @@ $\delta x$, how big is $f(x + \delta x) - f(x)$? The ratio of
 **condition number** of $f$ at $x$.
 
 <Figure
-  slug="scipy-numerical-stability-stability-intuitively-inline-cutout"
-  alt="Two chains of steps from the same start, one ending on its mark and one visibly off"
-  caption="Two algorithms for the same answer can end in very different places."
+  slug="scipy-numerical-stability-conditioning-intuitively-inline-cutout"
+  alt="A lever where a tiny nudge at one end swings the far end wildly"
+  caption="An ill-conditioned problem amplifies a tiny change into a large one."
 />
 
 For evaluating $f$:
@@ -97,9 +97,9 @@ $\|E\| / \|A\| = O(\epsilon)$. That is the best you could possibly
 hope for at finite precision.
 
 <Figure
-  slug="scipy-numerical-stability-conditioning-intuitively-inline-cutout"
-  alt="A lever where a tiny nudge at one end swings the far end wildly"
-  caption="An ill-conditioned problem amplifies a tiny change into a large one."
+  slug="scipy-numerical-stability-stability-intuitively-inline-cutout"
+  alt="Two chains of steps from the same start, one ending on its mark and one visibly off"
+  caption="Two algorithms for the same answer can end in very different places."
 />
 
 An algorithm is **unstable** if it can produce arbitrarily wrong
