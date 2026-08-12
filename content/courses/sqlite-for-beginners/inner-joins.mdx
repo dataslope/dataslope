@@ -48,14 +48,22 @@ CREATE TABLE orders (
   amount NUMERIC
 );
 INSERT INTO customers (id, name) VALUES
-  (1, 'Ada'),
-  (2, 'Grace'),
-  (3, 'Linus');
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
 INSERT INTO orders (id, customer_id, amount) VALUES
-  (101, 1, 42),
-  (102, 1, 18),
-  (103, 2, 99),
-  (104, 7, 55);`}
+  (101, 1, 42), (102, 1, 18), (103, 2, 99), (104, 2, 15),
+  (105, 5, 30), (106, 5, 76), (107, 6, 22), (108, 7, 64),
+  (109, 8, 12), (110, 8, 48), (111, 9, 91), (112, 11, 27),
+  (113, 11, 55), (114, 12, 38), (115, 13, 19), (116, 13, 83),
+  (117, 14, 45), (118, 15, 61), (119, 16, 24), (120, 16, 70),
+  (121, 17, 33), (122, 18, 88), (123, 20, 16), (124, 20, 52),
+  (125, 21, 29), (126, 22, 74), (127, 22, 21), (128, 23, 95),
+  (129, 24, 36), (130, 1, 57), (131, 9, 40), (132, 17, 68),
+  (199, 99, 55);`}
   starterCode={`SELECT
   c.name,
   o.id AS order_id,
@@ -68,7 +76,16 @@ ORDER BY
   o.id;`}
 />
 
-Ada and Grace appear because they have matching orders. Linus disappears because no order matches him. Order `104` disappears because customer `7` does not exist.
+There are 24 customers and 33 orders, but the result has only 32 rows,
+and the two missing pieces are the whole lesson. Four customers (Linus,
+Mae, Quinn, and Zara) never appear, because no order matches them. Order
+`199` never appears either, because its `customer_id` is `99` and no
+such customer exists. An inner join drops the unmatched rows from
+**both** sides, quietly and without complaint.
+
+That silence is worth remembering. If a report comes back with fewer
+rows than you expected, an inner join hiding unmatched data is one of
+the first things to check.
 
 ```mermaid
 flowchart LR
@@ -76,7 +93,7 @@ flowchart LR
     C1 -->|"matches"| O2["order 102<br/><code>customer_id</code> 1"]
     C2["customer 2<br/>Grace"] -->|"matches"| O3["order 103<br/><code>customer_id</code> 2"]
     C3["customer 3<br/>Linus"] -.-> Drop1["dropped<br/>no matching order"]
-    O4["order 104<br/><code>customer_id</code> 7"] -.-> Drop2["dropped<br/>no matching customer"]
+    O4["order 199<br/><code>customer_id</code> 99"] -.-> Drop2["dropped<br/>no matching customer"]
 ```
 
 <MultipleChoice
@@ -109,8 +126,22 @@ Most people write just `JOIN` because inner join is the default.
   title="JOIN is shorthand for INNER JOIN"
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT);
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
-INSERT INTO customers (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
-INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`}
+INSERT INTO customers (id, name) VALUES
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (101, 1, 42), (102, 1, 18), (103, 2, 99), (104, 2, 15),
+  (105, 5, 30), (106, 5, 76), (107, 6, 22), (108, 7, 64),
+  (109, 8, 12), (110, 8, 48), (111, 9, 91), (112, 11, 27),
+  (113, 11, 55), (114, 12, 38), (115, 13, 19), (116, 13, 83),
+  (117, 14, 45), (118, 15, 61), (119, 16, 24), (120, 16, 70),
+  (121, 17, 33), (122, 18, 88), (123, 20, 16), (124, 20, 52),
+  (125, 21, 29), (126, 22, 74), (127, 22, 21), (128, 23, 95),
+  (129, 24, 36), (130, 1, 57), (131, 9, 40), (132, 17, 68);`}
   starterCode={`SELECT
   c.name,
   o.amount
@@ -177,8 +208,22 @@ Aliases make inner joins readable. Prefixing columns with aliases also avoids co
   title="Use aliases to keep the query clear"
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT);
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
-INSERT INTO customers (id, name) VALUES (1, 'Ada'), (2, 'Grace');
-INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 1, 18), (103, 2, 99);`}
+INSERT INTO customers (id, name) VALUES
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (101, 1, 42), (102, 1, 18), (103, 2, 99), (104, 2, 15),
+  (105, 5, 30), (106, 5, 76), (107, 6, 22), (108, 7, 64),
+  (109, 8, 12), (110, 8, 48), (111, 9, 91), (112, 11, 27),
+  (113, 11, 55), (114, 12, 38), (115, 13, 19), (116, 13, 83),
+  (117, 14, 45), (118, 15, 61), (119, 16, 24), (120, 16, 70),
+  (121, 17, 33), (122, 18, 88), (123, 20, 16), (124, 20, 52),
+  (125, 21, 29), (126, 22, 74), (127, 22, 21), (128, 23, 95),
+  (129, 24, 36), (130, 1, 57), (131, 9, 40), (132, 17, 68);`}
   starterCode={`SELECT
   c.id AS customer_id,
   c.name,

@@ -64,17 +64,21 @@ The five core aggregate functions are:
   amount REAL
 );
 INSERT INTO orders (customer, amount) VALUES
-  ('Ada', 24.50),
-  ('Grace', 18.00),
-  ('Linus', 42.75),
-  ('Maya', 16.25);`}
+  ('Ada', 24.50), ('Grace', 18.00), ('Linus', 42.75), ('Maya', 16.25),
+  ('Ada', 31.00), ('Rosa', 12.40), ('Grace', 55.10), ('Omar', 27.30),
+  ('Linus', 8.95), ('Maya', 64.20), ('Rosa', 19.75), ('Ada', 47.60),
+  ('Omar', 35.15), ('Grace', 22.85), ('Priya', 71.00), ('Linus', 29.40),
+  ('Maya', 13.65), ('Priya', 38.20), ('Rosa', 52.30), ('Omar', 9.99),
+  ('Ada', 26.70), ('Priya', 44.55), ('Grace', 17.10), ('Linus', 60.05);`}
   starterCode={`SELECT
   COUNT(*) AS order_count
 FROM
   orders;`}
 />
 
-The table has four order rows, so the answer is one row containing the number `4`.
+The table has 24 order rows, so the answer is one row containing the
+number `24`. That shape is the whole idea of an aggregate: 24 rows go
+in, one row comes out.
 
 ```mermaid
 flowchart TB
@@ -95,10 +99,12 @@ flowchart TB
   amount REAL
 );
 INSERT INTO orders (customer, amount) VALUES
-  ('Ada', 24.50),
-  ('Grace', 18.00),
-  ('Linus', 42.75),
-  ('Maya', 16.25);`}
+  ('Ada', 24.50), ('Grace', 18.00), ('Linus', 42.75), ('Maya', 16.25),
+  ('Ada', 31.00), ('Rosa', 12.40), ('Grace', 55.10), ('Omar', 27.30),
+  ('Linus', 8.95), ('Maya', 64.20), ('Rosa', 19.75), ('Ada', 47.60),
+  ('Omar', 35.15), ('Grace', 22.85), ('Priya', 71.00), ('Linus', 29.40),
+  ('Maya', 13.65), ('Priya', 38.20), ('Rosa', 52.30), ('Omar', 9.99),
+  ('Ada', 26.70), ('Priya', 44.55), ('Grace', 17.10), ('Linus', 60.05);`}
   starterCode={`SELECT
   SUM(amount) AS total_sales
 FROM
@@ -120,10 +126,12 @@ SQLite reads the `amount` values and adds them into one total.
   amount REAL
 );
 INSERT INTO orders (customer, amount) VALUES
-  ('Ada', 24.50),
-  ('Grace', 18.00),
-  ('Linus', 42.75),
-  ('Maya', 16.25);`}
+  ('Ada', 24.50), ('Grace', 18.00), ('Linus', 42.75), ('Maya', 16.25),
+  ('Ada', 31.00), ('Rosa', 12.40), ('Grace', 55.10), ('Omar', 27.30),
+  ('Linus', 8.95), ('Maya', 64.20), ('Rosa', 19.75), ('Ada', 47.60),
+  ('Omar', 35.15), ('Grace', 22.85), ('Priya', 71.00), ('Linus', 29.40),
+  ('Maya', 13.65), ('Priya', 38.20), ('Rosa', 52.30), ('Omar', 9.99),
+  ('Ada', 26.70), ('Priya', 44.55), ('Grace', 17.10), ('Linus', 60.05);`}
   starterCode={`SELECT
   ROUND(AVG(amount), 2) AS average_order
 FROM
@@ -160,10 +168,12 @@ Aggregates are for summary questions, not row-by-row detail questions.`}
   amount REAL
 );
 INSERT INTO orders (customer, amount) VALUES
-  ('Ada', 24.50),
-  ('Grace', 18.00),
-  ('Linus', 42.75),
-  ('Maya', 16.25);`}
+  ('Ada', 24.50), ('Grace', 18.00), ('Linus', 42.75), ('Maya', 16.25),
+  ('Ada', 31.00), ('Rosa', 12.40), ('Grace', 55.10), ('Omar', 27.30),
+  ('Linus', 8.95), ('Maya', 64.20), ('Rosa', 19.75), ('Ada', 47.60),
+  ('Omar', 35.15), ('Grace', 22.85), ('Priya', 71.00), ('Linus', 29.40),
+  ('Maya', 13.65), ('Priya', 38.20), ('Rosa', 52.30), ('Omar', 9.99),
+  ('Ada', 26.70), ('Priya', 44.55), ('Grace', 17.10), ('Linus', 60.05);`}
   starterCode={`SELECT
   MIN(amount) AS smallest_order,
   MAX(amount) AS largest_order
@@ -186,10 +196,12 @@ You can use several aggregates in the same query. Each aggregate looks at the sa
   amount REAL
 );
 INSERT INTO orders (customer, amount) VALUES
-  ('Ada', 24.50),
-  ('Grace', 18.00),
-  ('Linus', 42.75),
-  ('Maya', 16.25);`}
+  ('Ada', 24.50), ('Grace', 18.00), ('Linus', 42.75), ('Maya', 16.25),
+  ('Ada', 31.00), ('Rosa', 12.40), ('Grace', 55.10), ('Omar', 27.30),
+  ('Linus', 8.95), ('Maya', 64.20), ('Rosa', 19.75), ('Ada', 47.60),
+  ('Omar', 35.15), ('Grace', 22.85), ('Priya', 71.00), ('Linus', 29.40),
+  ('Maya', 13.65), ('Priya', 38.20), ('Rosa', 52.30), ('Omar', 9.99),
+  ('Ada', 26.70), ('Priya', 44.55), ('Grace', 17.10), ('Linus', 60.05);`}
   starterCode={`SELECT
   COUNT(*) AS order_count,
   SUM(amount) AS total_sales,
@@ -233,10 +245,12 @@ flowchart LR
   amount REAL
 );
 INSERT INTO orders (customer, amount) VALUES
-  ('Ada', 24.50),
-  ('Grace', 18.00),
-  ('Ada', 42.75),
-  ('Maya', 16.25);`}
+  ('Ada', 24.50), ('Grace', 18.00), ('Linus', 42.75), ('Maya', 16.25),
+  ('Ada', 31.00), ('Rosa', 12.40), ('Grace', 55.10), ('Omar', 27.30),
+  ('Linus', 8.95), ('Maya', 64.20), ('Rosa', 19.75), ('Ada', 47.60),
+  ('Omar', 35.15), ('Grace', 22.85), ('Priya', 71.00), ('Linus', 29.40),
+  ('Maya', 13.65), ('Priya', 38.20), ('Rosa', 52.30), ('Omar', 9.99),
+  ('Ada', 26.70), ('Priya', 44.55), ('Grace', 17.10), ('Linus', 60.05);`}
   starterCode={`SELECT
   SUM(amount) AS ada_total
 FROM
@@ -275,10 +289,12 @@ The big exception is `COUNT(*)`, which counts rows whether they contain `NULL` o
   phone TEXT
 );
 INSERT INTO customers (name, phone) VALUES
-  ('Ada', '555-0101'),
-  ('Grace', NULL),
-  ('Linus', '555-0102'),
-  ('Maya', NULL);`}
+  ('Ada', '555-0101'), ('Grace', NULL), ('Linus', '555-0102'), ('Maya', NULL),
+  ('Rosa', '555-0105'), ('Ivan', NULL), ('Nadia', '555-0107'), ('Omar', '555-0108'),
+  ('Priya', NULL), ('Quinn', '555-0110'), ('Ruth', '555-0111'), ('Sam', NULL),
+  ('Tariq', '555-0113'), ('Uma', '555-0114'), ('Viktor', NULL), ('Wen', '555-0116'),
+  ('Xenia', '555-0117'), ('Yusuf', NULL), ('Zara', '555-0119'), ('Bruno', '555-0120'),
+  ('Chidi', NULL), ('Dara', '555-0122'), ('Elif', '555-0123'), ('Farid', '555-0124');`}
   starterCode={`SELECT
   COUNT(*) AS total_customers,
   COUNT(phone) AS customers_with_phone
@@ -286,7 +302,10 @@ FROM
   customers;`}
 />
 
-There are four customers, but only two have phone numbers. `COUNT(*)` returns `4`; `COUNT(phone)` returns `2`.
+There are 24 customers, but only 16 of them have a phone number on
+file. `COUNT(*)` returns `24`; `COUNT(phone)` returns `16`. The gap
+between those two numbers is a useful thing to measure in its own
+right: it is exactly how much of that column is missing.
 
 ## NULL and averages
 
@@ -301,10 +320,12 @@ Skipping `NULL` usually gives a better answer than treating unknown values as ze
   rating INTEGER
 );
 INSERT INTO reviews (product, rating) VALUES
-  ('Notebook', 5),
-  ('Notebook', 4),
-  ('Notebook', NULL),
-  ('Notebook', 3);`}
+  ('Notebook', 5), ('Notebook', 4), ('Notebook', NULL), ('Notebook', 3),
+  ('Notebook', 5), ('Pencil pack', 4), ('Pencil pack', 2), ('Pencil pack', NULL),
+  ('Pencil pack', 5), ('Coffee mug', 3), ('Coffee mug', 4), ('Coffee mug', 4),
+  ('Coffee mug', NULL), ('Tea towel', 5), ('Tea towel', 1), ('Tea towel', 3),
+  ('Desk lamp', 4), ('Desk lamp', 5), ('Desk lamp', NULL), ('Desk lamp', 2),
+  ('Tote bag', 3), ('Tote bag', 4), ('Tote bag', 5), ('Tote bag', 4);`}
   starterCode={`SELECT
   COUNT(*) AS total_reviews,
   COUNT(rating) AS reviews_with_rating,
@@ -313,7 +334,11 @@ FROM
   reviews;`}
 />
 
-The average is based on the three known ratings: `5`, `4`, and `3`. The missing rating is not counted as zero.
+There are 24 reviews but only 19 ratings, and the average is based on
+those 19. The five missing ratings are skipped, not counted as zero. If
+they *were* counted as zero the average would drop by roughly a fifth,
+which is the difference between "our products score about 3.9" and a
+number that quietly punishes every reviewer who did not leave a score.
 
 <Callout type="info" title="A helpful habit">
 Use `COUNT(*)` when you mean "How many rows?" Use `COUNT(column)` when you mean "How many rows have a value in this column?"

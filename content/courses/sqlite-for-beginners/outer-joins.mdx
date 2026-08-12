@@ -50,12 +50,21 @@ CREATE TABLE orders (
   amount NUMERIC
 );
 INSERT INTO customers (id, name) VALUES
-  (1, 'Ada'),
-  (2, 'Grace'),
-  (3, 'Linus');
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
 INSERT INTO orders (id, customer_id, amount) VALUES
-  (101, 1, 42),
-  (102, 2, 99);`}
+  (101, 1, 42), (102, 1, 18), (103, 2, 99), (104, 2, 15),
+  (105, 5, 30), (106, 5, 76), (107, 6, 22), (108, 7, 64),
+  (109, 8, 12), (110, 8, 48), (111, 9, 91), (112, 11, 27),
+  (113, 11, 55), (114, 12, 38), (115, 13, 19), (116, 13, 83),
+  (117, 14, 45), (118, 15, 61), (119, 16, 24), (120, 16, 70),
+  (121, 17, 33), (122, 18, 88), (123, 20, 16), (124, 20, 52),
+  (125, 21, 29), (126, 22, 74), (127, 22, 21), (128, 23, 95),
+  (129, 24, 36), (130, 1, 57), (131, 9, 40), (132, 17, 68);`}
   starterCode={`SELECT
   c.name,
   o.id AS order_id,
@@ -98,8 +107,22 @@ flowchart TD
   title="Use COALESCE to display a friendly label"
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT);
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
-INSERT INTO customers (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
-INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`}
+INSERT INTO customers (id, name) VALUES
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (101, 1, 42), (102, 1, 18), (103, 2, 99), (104, 2, 15),
+  (105, 5, 30), (106, 5, 76), (107, 6, 22), (108, 7, 64),
+  (109, 8, 12), (110, 8, 48), (111, 9, 91), (112, 11, 27),
+  (113, 11, 55), (114, 12, 38), (115, 13, 19), (116, 13, 83),
+  (117, 14, 45), (118, 15, 61), (119, 16, 24), (120, 16, 70),
+  (121, 17, 33), (122, 18, 88), (123, 20, 16), (124, 20, 52),
+  (125, 21, 29), (126, 22, 74), (127, 22, 21), (128, 23, 95),
+  (129, 24, 36), (130, 1, 57), (131, 9, 40), (132, 17, 68);`}
   starterCode={`SELECT
   c.name,
   COALESCE(CAST(o.id AS TEXT), 'no order') AS order_status,
@@ -131,13 +154,21 @@ flowchart TB
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT);
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
 INSERT INTO customers (id, name) VALUES
-  (1, 'Ada'),
-  (2, 'Grace'),
-  (3, 'Linus'),
-  (4, 'Mae');
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
 INSERT INTO orders (id, customer_id, amount) VALUES
-  (101, 1, 42),
-  (102, 2, 99);`}
+  (101, 1, 42), (102, 1, 18), (103, 2, 99), (104, 2, 15),
+  (105, 5, 30), (106, 5, 76), (107, 6, 22), (108, 7, 64),
+  (109, 8, 12), (110, 8, 48), (111, 9, 91), (112, 11, 27),
+  (113, 11, 55), (114, 12, 38), (115, 13, 19), (116, 13, 83),
+  (117, 14, 45), (118, 15, 61), (119, 16, 24), (120, 16, 70),
+  (121, 17, 33), (122, 18, 88), (123, 20, 16), (124, 20, 52),
+  (125, 21, 29), (126, 22, 74), (127, 22, 21), (128, 23, 95),
+  (129, 24, 36), (130, 1, 57), (131, 9, 40), (132, 17, 68);`}
   starterCode={`SELECT
   c.name
 FROM
@@ -149,7 +180,10 @@ ORDER BY
   c.name;`}
 />
 
-Linus and Mae are returned because their joined order id is `NULL`.
+Four names come back (Linus, Mae, Quinn, and Zara) because those are
+the rows whose joined order id is `NULL`. Notice how little the query
+had to say: no `NOT IN`, no subquery, just "join everything, then keep
+the rows where the match failed."
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -157,14 +191,19 @@ Linus and Mae are returned because their joined order id is `NULL`.
   initSql={`CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT);
 CREATE TABLE order_items (id INTEGER PRIMARY KEY, product_id INTEGER, quantity INTEGER);
 INSERT INTO products (id, name) VALUES
-  (1, 'Notebook'),
-  (2, 'Pencil'),
-  (3, 'Mug'),
-  (4, 'Sticker');
+  (1, 'Notebook'), (2, 'Pencil'), (3, 'Mug'), (4, 'Sticker'),
+  (5, 'Tote bag'), (6, 'Desk lamp'), (7, 'Eraser'), (8, 'Ruler'),
+  (9, 'Wall clock'), (10, 'Coaster'), (11, 'Bookmark'), (12, 'Poster'),
+  (13, 'Keyring'), (14, 'Notepad'), (15, 'Pen refill'), (16, 'Envelope'),
+  (17, 'Gift box'), (18, 'Ink bottle'), (19, 'Stamp set'), (20, 'Paperweight'),
+  (21, 'Chalk'), (22, 'Binder'), (23, 'Label roll'), (24, 'Tape dispenser');
 INSERT INTO order_items (id, product_id, quantity) VALUES
-  (101, 1, 2),
-  (102, 2, 5),
-  (103, 1, 1);`}
+  (101, 1, 2), (102, 2, 5), (103, 1, 1), (104, 5, 3),
+  (105, 6, 1), (106, 8, 4), (107, 9, 2), (108, 11, 6),
+  (109, 12, 1), (110, 14, 2), (111, 14, 5), (112, 16, 3),
+  (113, 17, 1), (114, 18, 2), (115, 20, 4), (116, 21, 1),
+  (117, 22, 3), (118, 22, 2), (119, 24, 5), (120, 5, 1),
+  (121, 8, 2), (122, 12, 7), (123, 17, 1), (124, 1, 4);`}
   starterCode={`SELECT
   p.name
 FROM
@@ -175,6 +214,12 @@ WHERE
 ORDER BY
   p.name;`}
 />
+
+Eight of the 24 products have never appeared in an order. Try deleting
+the `WHERE` line and running the query again: now every product comes
+back, most of them paired with an order item and the unsold ones
+carrying `NULL`. Toggling that one line is the clearest way to see what
+a left join actually produces before the filter narrows it down.
 
 This same pattern works whenever the question says "never," "missing," or "no related row."
 
@@ -187,8 +232,22 @@ This same pattern works whenever the question says "never," "missing," or "no re
   title="Count orders for every customer"
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT);
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
-INSERT INTO customers (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
-INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 1, 18), (103, 2, 99);`}
+INSERT INTO customers (id, name) VALUES
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (101, 1, 42), (102, 1, 18), (103, 2, 99), (104, 2, 15),
+  (105, 5, 30), (106, 5, 76), (107, 6, 22), (108, 7, 64),
+  (109, 8, 12), (110, 8, 48), (111, 9, 91), (112, 11, 27),
+  (113, 11, 55), (114, 12, 38), (115, 13, 19), (116, 13, 83),
+  (117, 14, 45), (118, 15, 61), (119, 16, 24), (120, 16, 70),
+  (121, 17, 33), (122, 18, 88), (123, 20, 16), (124, 20, 52),
+  (125, 21, 29), (126, 22, 74), (127, 22, 21), (128, 23, 95),
+  (129, 24, 36), (130, 1, 57), (131, 9, 40), (132, 17, 68);`}
   starterCode={`SELECT
   c.name,
   COUNT(o.id) AS order_count
@@ -202,7 +261,11 @@ ORDER BY
   c.name;`}
 />
 
-Linus gets `0` because there are no non-NULL order ids to count.
+Linus, Mae, Quinn, and Zara each get `0`, because there are no non-NULL
+order ids to count for them. This is the difference that catches people
+out: `COUNT(*)` would have given them `1`, since the left join still
+produced one row per customer. `COUNT(o.id)` counts actual matches, and
+that is almost always the number you want.
 
 ## A note about RIGHT and FULL OUTER JOIN in SQLite
 
@@ -232,7 +295,7 @@ The classic LEFT JOIN question, end to end: who is missing?
 <SqlChallengeCard
   dialect="sqlite"
   title="Customers who have never ordered"
-  instructions={`The \`customers\` and \`orders\` tables are preloaded. Return a single \`name\` column listing the customers who have **no** orders, sorted by \`name\` ascending. Use a \`LEFT JOIN\` from \`customers\` to \`orders\` on \`orders.customer_id = customers.id\`, then keep the rows where the order id \`IS NULL\`. Exactly 2 customers should appear.`}
+  instructions={`The \`customers\` and \`orders\` tables are preloaded. Return a single \`name\` column listing the customers who have **no** orders, sorted by \`name\` ascending. Use a \`LEFT JOIN\` from \`customers\` to \`orders\` on \`orders.customer_id = customers.id\`, then keep the rows where the order id \`IS NULL\`. Exactly 4 of the 24 customers should appear.`}
   initSql={`CREATE TABLE customers (
   id INTEGER PRIMARY KEY,
   name TEXT
@@ -243,14 +306,21 @@ CREATE TABLE orders (
   amount NUMERIC
 );
 INSERT INTO customers (id, name) VALUES
-  (1, 'Ada'),
-  (2, 'Grace'),
-  (3, 'Linus'),
-  (4, 'Mae');
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus'), (4, 'Mae'),
+  (5, 'Rosa'), (6, 'Ivan'), (7, 'Nadia'), (8, 'Omar'),
+  (9, 'Priya'), (10, 'Quinn'), (11, 'Ruth'), (12, 'Sam'),
+  (13, 'Tariq'), (14, 'Uma'), (15, 'Viktor'), (16, 'Wen'),
+  (17, 'Xenia'), (18, 'Yusuf'), (19, 'Zara'), (20, 'Bruno'),
+  (21, 'Chidi'), (22, 'Dara'), (23, 'Elif'), (24, 'Farid');
 INSERT INTO orders (id, customer_id, amount) VALUES
-  (101, 1, 42),
-  (102, 1, 18),
-  (103, 2, 99);`}
+  (101, 1, 42), (102, 1, 18), (103, 2, 99), (104, 2, 15),
+  (105, 5, 30), (106, 5, 76), (107, 6, 22), (108, 7, 64),
+  (109, 8, 12), (110, 8, 48), (111, 9, 91), (112, 11, 27),
+  (113, 11, 55), (114, 12, 38), (115, 13, 19), (116, 13, 83),
+  (117, 14, 45), (118, 15, 61), (119, 16, 24), (120, 16, 70),
+  (121, 17, 33), (122, 18, 88), (123, 20, 16), (124, 20, 52),
+  (125, 21, 29), (126, 22, 74), (127, 22, 21), (128, 23, 95),
+  (129, 24, 36), (130, 1, 57), (131, 9, 40), (132, 17, 68);`}
   starterCode={`SELECT
   c.name
 FROM
@@ -276,18 +346,18 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns 2 rows",
+      name: "Returns 4 rows",
       description: "Only the customers with no orders",
-      expectedRowCount: 2,
+      expectedRowCount: 4,
     },
     {
       id: "rows",
-      name: "Linus and Mae, alphabetically",
-      description: "The two customers with no matching order",
+      name: "Linus, Mae, Quinn, and Zara, alphabetically",
+      description: "The four customers with no matching order",
       expectedRows: {
         columns: ["name"],
         ordered: true,
-        values: [["Linus"], ["Mae"]],
+        values: [["Linus"], ["Mae"], ["Quinn"], ["Zara"]],
       },
     },
   ]}
