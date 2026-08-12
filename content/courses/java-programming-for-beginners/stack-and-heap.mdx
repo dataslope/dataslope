@@ -130,11 +130,6 @@ flowchart LR
 
 ## What happens during a method call
 
-Each call puts a frame on the stack, and the stack is a fixed allocation,
-so the depth a program survives is that budget divided by the frame size:
-
-<Chart slug="stack-depth-overflow" />
-
 Every method call pushes a fresh frame onto the stack. Every return
 pops it. Watch what happens here:
 
@@ -180,6 +175,21 @@ disappear. This is why recursion works at all.
 If recursion goes too deep, the stack runs out of room and you get
 `StackOverflowError`. Try removing the base case sometime, you'll
 see it instantly.
+
+That limit is not mysterious, it is arithmetic. The stack is a fixed
+allocation handed to each thread when it starts, so the depth a
+program survives is simply that budget divided by the size of one
+frame, and a frame grows with the number of locals the method keeps:
+
+<Chart slug="stack-depth-overflow" />
+
+Two practical readings. A method with a handful of locals recurses
+tens of thousands deep before anything goes wrong, which is why
+`factorial(4)` never worries you. And a recursion that walks a
+*user-supplied* structure, a deeply nested file tree, a hostile JSON
+document, can be pushed off the end of that budget by input alone.
+That is why production code that recurses over untrusted data usually
+gets rewritten as a loop with an explicit stack.
 
 ## Pass-by-value, always
 

@@ -359,7 +359,7 @@ classDiagram
 - **Map for lookup:** the catalog is a `Map<String, Book>` because
   we look books up by title, exactly the case for a Map.
 - **Polymorphism / interfaces:** not used heavily here, on purpose,
-they shine when there's a *choice* of implementations. Adding
+  they shine when there is a *choice* of implementations. Adding
   a `BookRepository` interface with both in-memory and persistent
   versions would be the natural next step.
 
@@ -367,7 +367,7 @@ Once your solution passes the test, take a few minutes to:
 
 - Add a new method `int totalAvailable()` on `Library`.
 - Try restricting members to a maximum of 3 simultaneous loans.
-- Try adding a `LinkedHashMap` instead of `TreeMap` and observe
+- Try using a `LinkedHashMap` instead of `TreeMap` and observe
   what changes in the output. (You will need to also change
   iteration order expectations.)
 
