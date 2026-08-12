@@ -31,6 +31,12 @@ return_type name(parameter_list) {
 
 A complete example:
 
+<Figure
+  slug="c-functions-anatomy-function-inline-cutout"
+  alt="A machine shown in cross-section, its input opening, its inner works and its output chute all visible at once"
+  caption="A function has a signature, a body and a return, and only the body is hidden."
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -107,12 +113,6 @@ and what we'll explore in a few chapters.
 
 If a function does its work via side effects (like printing) and
 has nothing meaningful to return, use `void` as the return type.
-
-<Figure
-  slug="c-functions-anatomy-function-inline-cutout"
-  alt="A machine shown in cross-section, its input opening, its inner works and its output chute all visible at once"
-  caption="A function has a signature, a body and a return, and only the body is hidden."
-/>
 
 <CodeBlock
   adapter="c"
@@ -285,12 +285,6 @@ pattern again in the next chapter.
 
 ## Recursion: a function that calls itself
 
-Recursion is bounded by the stack, and the bound is set by the size of a
-frame rather than by the algorithm: a local buffer can cut the survivable
-depth by a factor of a hundred.
-
-<Chart slug="stack-depth-overflow" />
-
 A function can call itself. This is **recursion**. The classic
 example is factorial:
 
@@ -330,6 +324,19 @@ Forget the base case and the program will recurse forever, until it
 runs out of stack space and crashes with a *stack overflow*. Recursion
 is powerful but also restrained: prefer a loop unless the problem is
 naturally recursive (trees, divide-and-conquer, parsing).
+
+Even *with* a base case there is a ceiling, and it is not set by your
+algorithm. Every call needs a frame on the stack, so the depth you can
+reach is the stack's fixed budget divided by the size of one frame,
+and a frame grows with whatever locals the function keeps:
+
+<Chart slug="stack-depth-overflow" />
+
+A function with a couple of `int` locals gets over 170,000 calls deep
+before the stack runs out. Declare a `char buf[4096]` inside that same
+function and it dies at around 2,000, roughly eighty times shallower,
+without one line of the algorithm changing. Worth remembering the next
+time a recursive function crashes on input that "isn't even that big".
 
 ## Challenge: is it prime?
 

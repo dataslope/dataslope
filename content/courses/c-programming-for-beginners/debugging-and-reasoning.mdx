@@ -27,6 +27,12 @@ they almost always include:
 - A short **description** of the problem.
 - Sometimes a **hint** ("did you mean…").
 
+<Figure
+  slug="c-debugging-and-reasoning-step-1-read-inline-cutout"
+  alt="A machine stopped with a printed slip hanging from it, a figure reading the slip rather than opening the machine"
+  caption="Read what the program actually reports before opening it up."
+/>
+
 ```text
 hello.c:5:9: error: expected ';' before 'return'
     5 |     printf("hi")
@@ -81,12 +87,6 @@ write down the value of every relevant variable after every step.
 This is called a **trace table** and it's the most boring,
 unglamorous, and effective debugging technique ever invented.
 
-<Figure
-  slug="c-debugging-and-reasoning-step-1-read-inline-cutout"
-  alt="A machine stopped with a printed slip hanging from it, a figure reading the slip rather than opening the machine"
-  caption="Read what the program actually reports before opening it up."
-/>
-
 Consider this buggy function meant to compute a factorial:
 
 ```c
@@ -137,12 +137,6 @@ A few tips:
   `fflush(stdout);`, without a flush, your print might never
   appear if the program dies just after.
 
-<Figure
-  slug="c-debugging-and-reasoning-inline-cutout"
-  alt="A long chain folded in half and tested, then folded again, the search closing on one bad link"
-  caption="Halve the search each time and one bad link is found in a few steps."
-/>
-
 Print debugging is sometimes derided as primitive, but it has a huge
 advantage: it works in environments where a debugger doesn't, and it
 makes you write down explicit hypotheses about what should happen.
@@ -157,6 +151,12 @@ This binary-search technique, *minimization*, turns "my program
 crashes mysteriously on this giant input" into "my program crashes
 on the four characters `\n\n\n\0`", at which point the bug usually
 diagnoses itself.
+
+<Figure
+  slug="c-debugging-and-reasoning-inline-cutout"
+  alt="A long chain folded in half and tested, then folded again, the search closing on one bad link"
+  caption="Halve the search each time and one bad link is found in a few steps."
+/>
 
 The same idea works with code: if you can't tell which function is
 the culprit, **comment out** half of them and see if the bug

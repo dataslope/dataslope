@@ -146,8 +146,8 @@ Each pairing is tested against `o.customer_id = c.id`, and only the matches surv
 | Pairing          | Test    | Outcome | Result row          |
 | ---------------- | ------- | ------- | ------------------- |
 | order 101 + Ada  | `1 = 1` | keep    | Ada, 101, 42        |
-| order 101 + Grace | `1 = 2` | discard |, |
-| order 102 + Ada  | `2 = 1` | discard |, |
+| order 101 + Grace | `1 = 2` | discard | none |
+| order 102 + Ada  | `2 = 1` | discard | none |
 | order 102 + Grace | `2 = 2` | keep    | Grace, 102, 99      |
 
 <MultipleChoice
