@@ -259,16 +259,21 @@ split, and no amount of care about train and test boundaries will catch it.
 
 ## The biggest misconception: a moving average is **not** a forecast
 
-Both smoothed lines below peak after the series does, and the wider window
-peaks later:
-
-<Chart slug="rolling-window-lag" />
-
 This one sinks real projects. A rolling mean is a **smoother of data you
 already have**. It describes the *past*. It has no machinery to project
 *beyond* the last observation, the line simply *stops* where your data
 stops. People see a smooth upward moving-average curve and imagine it
 "continuing," but the moving average itself predicts nothing.
+
+Worse, the final point of a trailing mean is the *least* current thing on
+the chart. Both smoothed lines below peak after the raw series does, and the
+wider window peaks later, so the tip of the curve is already reporting an
+average of the recent past rather than the present:
+
+<Chart slug="rolling-window-lag" />
+
+Extending that tip forward would be projecting a number that was out of date
+the moment it was drawn.
 
 <CodeBlock
   adapter="python"
