@@ -179,13 +179,13 @@ throw is not a jump: the runtime captures a stack trace and walks frames
 looking for a handler, which is microseconds against nanoseconds for a
 returned status.
 
+<Chart slug="exception-vs-return-cost" />
+
 <Figure
   slug="mcs-error-handling-exceptions-mechanism-inline-cutout"
   alt="A block falling off a belt into a padded basket held out beneath it"
   caption="An exception is for the case you cannot handle here, not for ordinary flow."
 />
-
-<Chart slug="exception-vs-return-cost" />
 
 Note that this only matters at volume. One exception on a genuinely
 exceptional path costs nothing you will ever measure. A thousand

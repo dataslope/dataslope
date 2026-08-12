@@ -30,13 +30,13 @@ numeric variables into a single number in **[−1, +1]**:
 - **0**, no *(linear)* relationship.
 - **−1**, perfect negative: one up, the other down, exactly.
 
+<Chart slug="correlation-scatters" />
+
 <Figure
   slug="stat-correlation-and-nonparametric-inline-cutout"
   alt="Two boards of chips side by side, one drifting tightly upward and one scattered with no drift at all"
   caption="Correlation measures how tightly two variables drift together, and only linearly."
 />
-
-<Chart slug="correlation-scatters" />
 
 Because it's already on a fixed, unitless scale, the correlation
 coefficient **is an effect size**, it tells you not just *whether* a
@@ -134,6 +134,21 @@ The clearest way to feel the difference: a relationship that is perfectly
 **monotonic** (always increasing) but **curved**. Spearman, working on
 ranks, sees the perfect order and reports ≈ 1. Pearson, demanding a
 *straight* line, reports less.
+
+<Chart slug="pearson-spearman-disagree" />
+
+Reading the two together beats reading either alone, because the gap is
+diagnostic. Rho far above r means the relationship is real and curved. R far
+above rho means one or two extreme points are carrying the linear fit, and
+ranks cannot be extreme, which is exactly why rho ignores them.
+
+Pearson's r measures how close the points are to a straight line. Spearman's
+rho replaces every value by its rank and computes the same thing on the ranks,
+so it measures how close the relationship is to *monotone*: does y always move
+the same way as x, whether or not at a constant rate. Both high and similar,
+as in the third panel, is linear and monotone, which is the case everyone
+assumes they are in. Neither coefficient says anything about the slope, and
+neither says anything about cause.
 
 <CodeBlock
   adapter="python"
@@ -376,21 +391,6 @@ effect sizes, see *Effect Sizes*.
 
 A coefficient near 0 rules out a straight-line trend, not a relationship in general, which is why you plot the data.`}
 />
-
-<Chart slug="pearson-spearman-disagree" />
-
-Reading the two together beats reading either alone, because the gap is
-diagnostic. Rho far above r means the relationship is real and curved. R far
-above rho means one or two extreme points are carrying the linear fit, and
-ranks cannot be extreme, which is exactly why rho ignores them.
-
-Pearson's r measures how close the points are to a straight line. Spearman's
-rho replaces every value by its rank and computes the same thing on the ranks,
-so it measures how close the relationship is to *monotone*: does y always move
-the same way as x, whether or not at a constant rate. Both high and similar,
-as in the third panel, is linear and monotone, which is the case everyone
-assumes they are in. Neither coefficient says anything about the slope, and
-neither says anything about cause.
 
 ## Part B, Nonparametric tests: when t-tests are unsafe
 
