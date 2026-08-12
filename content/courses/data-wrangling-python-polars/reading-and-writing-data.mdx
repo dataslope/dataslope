@@ -48,7 +48,6 @@ The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
 
-
 The rule of thumb: **use `scan_*` unless you have a reason not to.**
 The eager/lazy chapter later explains why in detail; for now, know
 that the lazy version is rarely slower and frequently much faster.
@@ -144,7 +143,6 @@ The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
 
-
 That last pair of lines is the argument for Parquet in miniature.
 CSV stores text, so every read re-guesses your types. Parquet stores
 the schema, the values in columnar form, per-column compression, and
@@ -176,7 +174,6 @@ The Polars build that ships with Pyodide is compiled without JSON support, so
 The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
-
 
 Use NDJSON where you can: it can be read in chunks and appended to,
 neither of which is true of one enormous JSON array.

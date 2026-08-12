@@ -7,15 +7,15 @@ Almost every interesting method on a `Set` or `Map` answers the same
 question: **"have I seen this before?"** That question is answered by
 two methods that every Java object inherits from `Object`:
 
-<Figure
-  slug="jcol-equality-hashing-cutout"
-  alt="Equality and hashing, an isometric illustration"
-/>
-
 ```java
 public boolean equals(Object other);
 public int     hashCode();
 ```
+
+<Figure
+  slug="jcol-equality-hashing-cutout"
+  alt="Equality and hashing, an isometric illustration"
+/>
 
 They are tiny. They are also the single most-bugged corner of the
 whole framework. This page is about why, and how to get them right

@@ -39,7 +39,6 @@ The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
 
-
 One argument. Everything else about the query is unchanged, which is
 the point: you do not write a different program for large data, you
 ask for a different engine.
@@ -83,7 +82,6 @@ The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
 
-
 `sink_parquet`, `sink_csv`, `sink_ndjson`, and `sink_ipc` all read in
 batches and write in batches. A 200 GB file can be filtered and
 rewritten on a laptop, at whatever speed the disk allows.
@@ -111,7 +109,6 @@ ships with Pyodide is compiled without.
 The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
-
 
 This is better than concatenating by hand: the optimizer sees all the
 files as one source, so projection and predicate pushdown apply to
@@ -165,7 +162,6 @@ engine, so `engine="streaming"` raises here.
 The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
-
 
 ## Keeping memory down without streaming
 

@@ -38,7 +38,6 @@ The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
 
-
 | | Eager | Lazy |
 | --- | --- | --- |
 | Built by | `pl.read_csv`, `pl.DataFrame` | `pl.scan_csv`, `df.lazy()` |
@@ -122,7 +121,6 @@ engine, so `engine="streaming"` raises here.
 The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
-
 
 `df.lazy()` is free: it wraps the frame you already have in a plan.
 Worth doing for any chain of more than two or three steps, even when

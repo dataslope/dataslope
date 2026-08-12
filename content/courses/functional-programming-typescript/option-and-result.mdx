@@ -5,13 +5,13 @@ description: Two tiny algebraic types that replace `null`, `undefined`, and exce
 
 The two most common sources of bugs in everyday TypeScript are:
 
+1. **Forgetting** that a value might be missing (`null`, `undefined`).
+2. **Forgetting** that a function might fail (exceptions).
+
 <Figure
   slug="fp-option-and-result-cutout"
   alt="Option and Result, an isometric illustration"
 />
-
-1. **Forgetting** that a value might be missing (`null`, `undefined`).
-2. **Forgetting** that a function might fail (exceptions).
 
 Both are *invisible* in JavaScript: `null` looks like a value, an
 exception flies up the stack invisibly through every function it

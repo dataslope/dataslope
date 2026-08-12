@@ -5,15 +5,15 @@ description: How the CPU keeps track of nested function calls, frames, local var
 
 When one function calls another, *something* has to remember:
 
-<Figure
-  slug="cpp-the-call-stack-cutout"
-  alt="The call stack, an isometric illustration"
-/>
-
 - Where to come back to after the call.
 - The values of the caller's local variables.
 - The values being passed as arguments.
 - The space for the callee's locals.
+
+<Figure
+  slug="cpp-the-call-stack-cutout"
+  alt="The call stack, an isometric illustration"
+/>
 
 That something is the **call stack**. Every running program has one,
 and once you can picture it, almost every "how does this work?"
