@@ -29,6 +29,12 @@ A typical frame contains:
 - the function's **local variables**
 - on some platforms, **padding** to keep alignment
 
+<Figure
+  slug="sysc-stack-and-functions-anatomy-stack-frame-inline-cutout"
+  alt="One tray in cross-section with separate compartments for its arguments, its locals and its return cord"
+  caption="A frame holds the arguments, the locals, and where to return to."
+/>
+
 ```mermaid
 flowchart TB
     A["High addresses"]
@@ -131,20 +137,15 @@ them). The total *work* explodes; the peak *stack depth* is only `n`.
 
 ## Stack overflow
 
-Where it happens is the stack budget divided by the frame size, and the
-frame size is set by the locals rather than by the algorithm:
-
-<Chart slug="stack-depth-overflow" />
-
 When recursion is too deep, or a function declares a huge local
 array, you hit the end of the stack region and the program crashes
 with a stack overflow.
 
-<Figure
-  slug="sysc-stack-and-functions-anatomy-stack-frame-inline-cutout"
-  alt="One tray in cross-section with separate compartments for its arguments, its locals and its return cord"
-  caption="A frame holds the arguments, the locals, and where to return to."
-/>
+Where exactly that happens is the stack budget divided by the frame size,
+and the frame size is set by the locals rather than by the algorithm, so
+one fat array in the recursive function moves the cliff a long way in:
+
+<Chart slug="stack-depth-overflow" />
 
 The error is common enough to have a website named after it. When
 Jeff Atwood and Joel Spolsky launched their programming Q&A site in

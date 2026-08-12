@@ -185,12 +185,6 @@ int main(void) {
 
 Structs compose naturally; the layout rules apply recursively.
 
-<Figure
-  slug="sysc-structs-and-unions-inline-cutout"
-  alt="One tray with three separate compartments beside a second tray of the same size with one compartment that three different parts take turns occupying"
-  caption="A union gives every member the same space, one at a time."
-/>
-
 <CodeBlock
   adapter="c"
   files={[
@@ -336,9 +330,9 @@ only one at a time. Every member shares the same storage; the
 union's size is the size of its largest member.
 
 <Figure
-  slug="sysc-structs-and-unions-unions-inline-cutout"
-  alt="One recess cut into a bench that holds either of two differently shaped parts, and never both at the same time"
-  caption="A union gives its members one shared space, so only one of them is valid at a time."
+  slug="sysc-structs-and-unions-inline-cutout"
+  alt="One tray with three separate compartments beside a second tray of the same size with one compartment that three different parts take turns occupying"
+  caption="A struct gives every member its own compartment; a union gives them all the same one."
 />
 
 <CodeBlock
@@ -384,6 +378,12 @@ it; later sleuthing traced its lineage back through earlier graphics
 companies. The lesson for you: understanding *exactly* how your
 bytes are laid out occasionally lets you do things that look like
 magic.
+
+<Figure
+  slug="sysc-structs-and-unions-unions-inline-cutout"
+  alt="One recess cut into a bench that holds either of two differently shaped parts, and never both at the same time"
+  caption="A union gives its members one shared space, so only one of them is valid at a time."
+/>
 
 A "tagged union", a struct with an enum tag and a
 union of payloads, is how C encodes sum types like `Result<Ok, Err>`.

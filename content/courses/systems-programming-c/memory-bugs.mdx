@@ -36,9 +36,9 @@ undefined behavior, sometimes it "works", sometimes it returns
 someone else's bytes, sometimes it crashes.
 
 <Figure
-  slug="sysc-memory-bugs-2-double-free-inline-cutout"
-  alt="A crate handed back over a counter twice, the counter clerk holding out empty hands the second time"
-  caption="Freeing the same block twice corrupts the allocator's own bookkeeping."
+  slug="sysc-memory-bugs-1-use-after-inline-cutout"
+  alt="A cord leading from a bench to an empty space where a crate stood a moment ago"
+  caption="A pointer to freed memory still looks valid, which is what makes it dangerous."
 />
 
 <CodeBlock
@@ -93,9 +93,9 @@ immediately ("double free or corruption"); on older or simpler
 allocators it can silently corrupt the heap.
 
 <Figure
-  slug="sysc-memory-bugs-1-use-after-inline-cutout"
-  alt="A cord leading from a bench to an empty space where a crate stood a moment ago"
-  caption="A pointer to freed memory still looks valid, which is what makes it dangerous."
+  slug="sysc-memory-bugs-2-double-free-inline-cutout"
+  alt="A crate handed back over a counter twice, the counter clerk holding out empty hands the second time"
+  caption="Freeing the same block twice corrupts the allocator's own bookkeeping."
 />
 
 <CodeBlock

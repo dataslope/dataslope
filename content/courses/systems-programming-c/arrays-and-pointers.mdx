@@ -161,6 +161,12 @@ If `p` is a pointer to a `T`, then:
 | `*++p` | advance `p`, then dereference |
 | `p[n]` | shorthand for `*(p + n)` |
 
+<Figure
+  slug="sysc-arrays-and-pointers-inline-cutout"
+  alt="A strip of cells with a marker that moves by exact cell widths, the strip's own start marked by a peg"
+  caption="Adding one to a pointer advances it by one element, not one byte."
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -233,12 +239,6 @@ Hence we compute `n` in `main` and pass it down, never inside `sum`.
 
 Two ways to represent a matrix. They look similar; they are not the
 same in memory.
-
-<Figure
-  slug="sysc-arrays-and-pointers-inline-cutout"
-  alt="A strip of cells with a marker that moves by exact cell widths, the strip's own start marked by a peg"
-  caption="Adding one to a pointer advances it by one element, not one byte."
-/>
 
 ```c
 int grid[3][4];           // 12 ints in one contiguous block

@@ -13,6 +13,11 @@ This page is a tour of the most instructive incidents. For each one
 we identify *which* bug class from the previous page caused it, and
 what the world learned (or should have learned).
 
+<Figure
+  slug="sysc-disasters-cutout"
+  alt="A toppled satellite model and a cracked server block on a platform, one small overflowing buffer strip between them"
+/>
+
 ```mermaid
 flowchart LR
     A[Memory bug] --> B[Worm / RCE]
@@ -33,11 +38,6 @@ of all computers on the internet, roughly 6,000 machines at the
 time. It was the world's first major internet worm and led directly
 to the creation of CERT/CC, the first computer-emergency response
 team.
-
-<Figure
-  slug="sysc-disasters-cutout"
-  alt="A toppled satellite model and a cracked server block on a platform, one small overflowing buffer strip between them"
-/>
 
 One of its key propagation vectors exploited a *stack buffer
 overflow* in the BSD `fingerd` daemon. `fingerd` read a request into
