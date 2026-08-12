@@ -129,11 +129,13 @@ pick the worst model. This is exactly why we hold data back.
 
 ## The complexity–error curve
 
-Let us quantify what the eye just saw. We will sweep the polynomial degree
-from rigid to flexible and, at each step, measure error on the training
-data and on a held-out test set.
+Let us quantify what the eye just saw. Sweep the polynomial degree from
+rigid to flexible and, at each step, measure error on the training data and
+on a held-out test set, and the two errors part company:
 
 <Chart slug="bias-variance" />
+
+Run it yourself and watch the same two curves appear:
 
 <CodeBlock
   adapter="python"
@@ -276,9 +278,12 @@ both, small gap → you are done.
 
 ## How to fight overfitting
 
-Which of the two you have, read off the curves: a gap still closing
-means more data is the cheapest fix, and two curves that met early and
-levelled off high mean the model is too simple.
+First work out which failure you have. A **learning curve** plots training
+and validation *error* against the amount of training data, and its shape
+tells you what to do: the gap between the curves is variance, and the level
+they settle at is bias. A gap still closing at the right-hand edge means
+more data is the cheapest fix; two curves that met early and levelled off
+high mean the model is too simple, and no amount of data will help.
 
 <Chart slug="learning-curve" />
 

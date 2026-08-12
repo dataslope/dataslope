@@ -41,6 +41,12 @@ question at a time, and that lets it bend around exactly these patterns
 without you specifying them in advance. It does not assume a shape; it
 discovers one.
 
+<Figure
+  slug="ml-decision-trees-problem-tree-solves-inline-cutout"
+  alt="A heap of mixed chips that no single straight blade can separate, beside a branching chute that does"
+  caption="A straight boundary cannot separate these; a sequence of questions can."
+/>
+
 <Callout type="info" title="What 'recursive partitioning' means">
 The formal name for what a tree does is *recursive partitioning*. It splits
 the data into two groups, then splits each of those groups, then splits
@@ -97,12 +103,6 @@ Let us train a `DecisionTreeClassifier` on the penguins dataset: 342 penguins
 (after dropping rows with missing measurements), four body measurements, 3
 species. We will keep it shallow so it stays honest, then read its accuracy
 on held-out data.
-
-<Figure
-  slug="ml-decision-trees-problem-tree-solves-inline-cutout"
-  alt="A heap of mixed chips that no single straight blade can separate, beside a branching chute that does"
-  caption="A straight boundary cannot separate these; a sequence of questions can."
-/>
 
 <CodeBlock
   adapter="python"

@@ -486,12 +486,6 @@ a dendrogram on a representative *sample* to understand the structure.
 
 **Reach for it when:**
 
-<Figure
-  slug="ml-hierarchical-clustering-inline-cutout"
-  alt="Chips joined into pairs, pairs joined into groups, and groups joined at the top into one branching frame"
-  caption="The whole nesting is the output, not one fixed set of labels."
-/>
-
 - You do not know `k` and want the data to suggest it, slide the cut down
   the tree to the biggest gap.
 - The structure is plausibly **nested** (taxonomies, sub-segments,
@@ -500,6 +494,12 @@ a dendrogram on a representative *sample* to understand the structure.
   relationships over raw speed.
 - You want a *deterministic* result you can reproduce exactly, with no seed
   to worry about.
+
+<Figure
+  slug="ml-hierarchical-clustering-inline-cutout"
+  alt="Chips joined into pairs, pairs joined into groups, and groups joined at the top into one branching frame"
+  caption="The whole nesting is the output, not one fixed set of labels."
+/>
 
 **Avoid it when:**
 
