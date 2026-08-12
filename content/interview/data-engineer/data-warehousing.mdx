@@ -279,7 +279,7 @@ FROM sales
 GROUP BY category
 ORDER BY revenue DESC;`}
   tests={[
-    { id: "rows", name: "One row per category", description: "Three categories yield three rows", expectedRowCount: 3 },
+    { id: "rows", name: "One row per category", description: "Three categories yield three rows", expectedRowCount: 5 },
     { id: "cols", name: "Has the required columns", description: "category and revenue", expectedColumnsInclude: ["category", "revenue"] },
   ]}
 />

@@ -37,7 +37,7 @@ print(type(False))
 />
 
 <Callout type="info" title="The origin of 'boolean'">
-The term "boolean" comes from **George Boole** (1815–1864), an English mathematician who developed Boolean algebra-a system of logic with just two values: true and false. His work laid the foundation for digital circuit design and all of computer science.
+The term "boolean" comes from **George Boole** (1815–1864), an English mathematician who developed Boolean algebra, a system of logic with just two values: true and false. His work laid the foundation for digital circuit design and all of computer science.
 </Callout>
 
 ### bool is a subclass of int
@@ -61,6 +61,10 @@ print(isinstance(True, int))
     },
   ]}
 />
+
+That is not a quirk to memorise so much as a fact to exploit. Because
+`True` *is* `1`, summing a list of booleans counts how many of them are
+true, which is the shortest way to answer "how many rows passed?"
 
 <CodeBlock
   adapter="python"
@@ -108,6 +112,12 @@ if items:  # Pythonic truthiness check
   ]}
 />
 
+Most languages would read `3 < 5 <= 5` as `(3 < 5) <= 5`, comparing a
+boolean to a number. Python chains it the way mathematicians write it.
+
+The `in` operator asks a different question, membership rather than
+ordering, and it works on any container:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -119,6 +129,8 @@ print(2 in [1, 2, 3])
     },
   ]}
 />
+
+`is` is different again. It does not compare values at all:
 
 <CodeBlock
   adapter="python"
@@ -155,6 +167,11 @@ print(a is b)  # False, different list objects
     },
   ]}
 />
+
+Two lists with identical contents are equal but not identical. That
+distinction only matters occasionally, but when it matters it matters a
+lot: `None` is a single object that exists exactly once in a running
+program, so identity is the right test for it.
 
 <CodeBlock
   adapter="python"
@@ -203,6 +220,8 @@ if items:
     },
   ]}
 />
+
+The negative form reads just as well:
 
 <CodeBlock
   adapter="python"
@@ -277,6 +296,9 @@ print(False and expensive())  # expensive() is never called
   ]}
 />
 
+`False and anything` is already `False`, so Python never runs the right
+side. `or` short-circuits from the other direction:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -310,6 +332,9 @@ print(False or "default")  # 'default'
     },
   ]}
 />
+
+Chain more than two and the rule still holds, one operand at a time,
+left to right:
 
 <CodeBlock
   adapter="python"
@@ -357,6 +382,9 @@ print(name or "Anonymous")  # "Anonymous"
   ]}
 />
 
+That is the idiom working as intended. Here is the same idiom quietly
+going wrong:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -369,6 +397,9 @@ print(count or 10)  # 10, probably not what you want!
     },
   ]}
 />
+
+A user who really did order zero items gets told they ordered ten. When
+`0` is a legitimate value, test for `None` instead of for truthiness:
 
 <CodeBlock
   adapter="python"
@@ -400,6 +431,11 @@ print(status)
   ]}
 />
 
+Read it left to right as a sentence: *the value `"adult"`, if the age is
+at least 18, otherwise `"minor"`.* It is an expression, not a statement,
+so it can go anywhere a value can go, including inside another
+expression:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -418,7 +454,7 @@ print(abs_x)
 <ChallengeCard
   adapter="python"
   title="Exclusive or without ^"
-  instructions={`Define a function \`xor(a, b)\` that returns \`True\` if exactly one of \`a\` or \`b\` is truthy (not both, not neither). Do **not** use the \`^\` operator-use \`and\`, \`or\`, and \`not\`.`}
+  instructions={`Define a function \`xor(a, b)\` that returns \`True\` if exactly one of \`a\` or \`b\` is truthy (not both, not neither). Do **not** use the \`^\` operator; use \`and\`, \`or\`, and \`not\`.`}
   files={[
     {
       filename: "main.py",

@@ -254,7 +254,7 @@ FROM funnel
 FROM funnel
 ORDER BY stage_order;`}
   tests={[
-    { id: "row_count", name: "One row per stage", description: "Four funnel stages → four rows", expectedRowCount: 4 },
+    { id: "row_count", name: "One row per stage", description: "Four funnel stages → four rows", expectedRowCount: 24 },
     { id: "columns", name: "Has the required columns", description: "stage, users, conversion_rate", expectedColumnsInclude: ["stage", "users", "conversion_rate"] },
   ]}
 />

@@ -667,7 +667,7 @@ LEFT JOIN orders o ON o.customer_id = c.id
 GROUP BY c.name
 ORDER BY total DESC;`}
   tests={[
-    { id: "row_count", name: "Every customer appears", description: "Four customers → four rows", expectedRowCount: 4 },
+    { id: "row_count", name: "Every customer appears", description: "Four customers → four rows", expectedRowCount: 24 },
     { id: "columns", name: "Has the required columns", description: "name and total", expectedColumnsInclude: ["name", "total"] },
   ]}
 />

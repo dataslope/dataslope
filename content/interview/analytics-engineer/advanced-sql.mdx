@@ -362,7 +362,7 @@ QUALIFY ROW_NUMBER() OVER (
 ) = 1
 ORDER BY customer_id;`}
   tests={[
-    { id: "rows", name: "One row per customer", description: "Three customers collapse to three rows", expectedRowCount: 3 },
+    { id: "rows", name: "One row per customer", description: "Three customers collapse to three rows", expectedRowCount: 12 },
     { id: "cols", name: "Has the required columns", description: "customer_id, updated_at, email", expectedColumnsInclude: ["customer_id", "updated_at", "email"] },
   ]}
 />

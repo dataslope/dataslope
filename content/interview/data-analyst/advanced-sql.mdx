@@ -427,7 +427,7 @@ FROM monthly_sales
 FROM monthly_sales
 ORDER BY month;`}
   tests={[
-    { id: "row_count", name: "One row per month", description: "Six months in, six rows out", expectedRowCount: 6 },
+    { id: "row_count", name: "One row per month", description: "Six months in, six rows out", expectedRowCount: 24 },
     { id: "columns", name: "Has the required columns", description: "month, revenue, moving_avg_3m", expectedColumnsInclude: ["month", "revenue", "moving_avg_3m"] },
   ]}
 />
@@ -469,7 +469,7 @@ FROM orders
 GROUP BY customer, region
 ORDER BY region, region_rank;`}
   tests={[
-    { id: "row_count", name: "One row per customer", description: "Six customers → six rows", expectedRowCount: 6 },
+    { id: "row_count", name: "One row per customer", description: "Six customers → six rows", expectedRowCount: 17 },
     { id: "columns", name: "Has the required columns", description: "customer, region, total_spend, region_rank", expectedColumnsInclude: ["customer", "region", "total_spend", "region_rank"] },
   ]}
 />

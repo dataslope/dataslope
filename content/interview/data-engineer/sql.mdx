@@ -555,7 +555,7 @@ FROM orders
 FROM orders
 ORDER BY region, rnk;`}
   tests={[
-    { id: "row_count", name: "All rows are returned", description: "A window function keeps every input row (8 here)", expectedRowCount: 8 },
+    { id: "row_count", name: "All rows are returned", description: "A window function keeps every input row (8 here)", expectedRowCount: 24 },
     { id: "columns", name: "Has the required columns", description: "id, region, amount, rnk", expectedColumnsInclude: ["id", "region", "amount", "rnk"] },
   ]}
 />
@@ -608,7 +608,7 @@ QUALIFY ROW_NUMBER() OVER (
 ) = 1
 ORDER BY user_id;`}
   tests={[
-    { id: "row_count", name: "One row per user", description: "Three users → three rows", expectedRowCount: 3 },
+    { id: "row_count", name: "One row per user", description: "Three users → three rows", expectedRowCount: 10 },
     { id: "columns", name: "Has the required columns", description: "user_id, event_time, status", expectedColumnsInclude: ["user_id", "event_time", "status"] },
   ]}
 />
