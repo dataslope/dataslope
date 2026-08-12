@@ -169,12 +169,6 @@ because the machine code has been cached.
 
 ## 5. Memory: the stack and the heap
 
-Before the two regions, one number that explains why the distinction is
-worth caring about at all. The distances a CPU reaches across span ten
-orders of magnitude:
-
-<Chart slug="memory-latency-ladder" />
-
 While your program runs, it uses memory. The runtime divides that
 memory into two big regions, and you'll hear about both for the
 rest of your career.
@@ -200,6 +194,18 @@ when something surprising happens, "why did changing one variable
 also change another?", the answer almost always traces back to
 this picture. We'll come back to it when we talk about value vs
 reference types.
+
+There is a second reason the distinction matters, and it is physical.
+Not all memory is equally close to the CPU, and the distances span
+something like ten orders of magnitude:
+
+<Chart slug="memory-latency-ladder" />
+
+You will not tune for this as a beginner. But it explains a lot of
+otherwise mysterious advice you will hear later, why contiguous data
+beats scattered data, why an unnecessary allocation is worse than an
+unnecessary arithmetic operation, and why "just add more indirection"
+is rarely free.
 
 ## 6. Method call walkthrough
 

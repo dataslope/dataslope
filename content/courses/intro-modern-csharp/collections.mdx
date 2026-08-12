@@ -176,10 +176,8 @@ much faster than scanning a list.
 
 ## Picking the right collection
 
-The reason this decision matters is that the three lookup strategies grow
-differently, and the difference is invisible until the collection is big:
-
-<Chart slug="collection-lookup-growth" />
+Start from the question you need to answer, and the container usually
+picks itself:
 
 ```mermaid
 flowchart TD
@@ -204,6 +202,17 @@ Rough cost picture:
 | Maintain order         | yes          | no         | no      |
 
 "Slow" here means "time grows with the size of the collection."
+
+That phrase is doing a lot of work, so it is worth seeing. The three
+ways of finding an item, scanning a list, halving a sorted range, and
+hashing straight to a slot, grow at completely different rates:
+
+<Chart slug="collection-lookup-growth" />
+
+Notice where they separate. At ten items all three are the same speed,
+which is exactly why `list.Contains(x)` in a loop feels fine on test
+data and falls over on real data. Reaching for a `HashSet` costs you
+nothing at small sizes and saves you everything at large ones.
 
 ## Iterating with `foreach`
 

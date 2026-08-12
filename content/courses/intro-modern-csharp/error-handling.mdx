@@ -187,6 +187,11 @@ returned status.
 
 <Chart slug="exception-vs-return-cost" />
 
+Note that this only matters at volume. One exception on a genuinely
+exceptional path costs nothing you will ever measure. A thousand
+exceptions a second on a path that is really just "the user typed
+something that isn't a number" is a different story.
+
 The trap in code:
 
 <CodeBlock
