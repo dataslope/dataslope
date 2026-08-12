@@ -65,7 +65,7 @@ import { blockOutputKey } from "../lib/blockOutputKey.ts";
 import { toOutputCells } from "../app/_components/runtime/pythonDisplayOutputs.ts";
 import { collectFiles, freshness } from "./lib/build-cache.mjs";
 import { extractBlocks, matchesFilter, parseFilter } from "./lib/mdx-blocks.mjs";
-import { createRunner, TEXT_ADAPTERS } from "./lib/block-runners.mjs";
+import { BROWSER_ADAPTERS, createRunner, TEXT_ADAPTERS } from "./lib/block-runners.mjs";
 import { bootPyodide, isEnvironmental } from "./lib/pyodide-runner.mjs";
 import { captureSetupScript, wrapLastExpression } from "./lib/python-output-capture.mjs";
 
@@ -170,6 +170,10 @@ const wanted = adapterArg
   : null;
 const doPython = !wanted || wanted.includes("python");
 const textAdapters = TEXT_ADAPTERS.filter((a) => !wanted || wanted.includes(a));
+/** True when this run looked at only part of the tree, and so must add to
+ *  what is recorded rather than replace it. Every write below is guarded on
+ *  it; see the manifest's own comment for what conflating the two cost. */
+const narrowed = Boolean(filter) || Boolean(wanted);
 /** Per-language counts for the summary, so a language that recorded nothing
  *  is visible rather than averaged away. */
 const totals = {};
@@ -261,8 +265,12 @@ if (emptyOnly) {
 }
 
 if (blocks.length === 0 && textAdapters.length === 0) {
+  // Selecting nothing must not mean recording nothing. `--adapter r` picks no
+  // headless language at all, and writing an empty manifest here threw away
+  // every entry on the site — the same accident the clone above exists to
+  // prevent, one exit earlier. An empty manifest is what `--empty` is for.
   console.log("build-block-outputs: no blocks selected");
-  writeManifestFile({});
+  if (!narrowed) writeManifestFile({});
   process.exit(0);
 }
 
@@ -390,8 +398,11 @@ function sameOutput(a, b) {
  * recorded, because it is only *adding* to it. Starting empty and writing at
  * the end is what a full run does, and doing it after `--adapter typescript`
  * deleted every Python entry on the site along with 364 of their figures.
+ *
+ * A full run starting empty is deliberate — it is what retires the entry of a
+ * block that no longer exists — but it only holds for the languages this
+ * generator can re-record. `carryCapturedEntries` below puts the rest back.
  */
-const narrowed = Boolean(filter) || Boolean(wanted);
 const manifest = narrowed ? structuredClone(onDisk) : {};
 const stats = {
   ran: 0,
@@ -418,6 +429,58 @@ let plotsDropped = 0;
 // Asset filenames still referenced by the manifest, so the prune below can
 // delete the ones no block points at any more.
 const keptAssets = new Set();
+
+/**
+ * Carry forward the entries this generator does not produce.
+ *
+ * `capture-browser-outputs.mjs` records r, java, csharp, web, react and php
+ * from a real page and writes them into *this* manifest, under the same keys.
+ * A full run here starts from an empty object — that is what retires a
+ * deleted block's entry — so without this it writes back only the languages
+ * it can execute and silently deletes every captured one.
+ *
+ * That is not a hypothetical. The first automated run after the capture
+ * landed dropped 689 entries and pruned the 134 figures they pointed at,
+ * taking prepopulated output for R, Java, C# and PHP with it; nothing put
+ * them back, because no workflow runs the capture and the loss is invisible
+ * in a diff of a single-line JSON file. Carrying them is what makes the two
+ * generators additive rather than last-writer-wins.
+ *
+ * Only keys that still match a block in `content/` are carried, so an edited
+ * or deleted captured block still loses its entry — the pruning a full run is
+ * meant to do, applied to the entries it cannot regenerate itself. `--force`
+ * does not reach them either: it means "do not *reuse* my entries", and these
+ * are not this generator's to re-execute.
+ */
+function carryCapturedEntries() {
+  let carried = 0;
+  let stale = 0;
+  for (const adapter of BROWSER_ADAPTERS) {
+    for (const block of extractBlocks(undefined, adapter)) {
+      if (block.unparsable || block.expectError) continue;
+      const entry = block.files.find((f) => f.filename === block.entry) ?? block.files[0];
+      if (!entry) continue;
+      const key = blockOutputKey(adapter, entry.initCode, entry.starterCode);
+      const recorded = onDisk[block.file]?.[key];
+      if (!recorded) continue;
+      // A figure this run is about to prune would leave the panel rendering
+      // a 404, and this generator cannot re-run the block to replace it.
+      // Dropping the entry gives the empty panel instead, which is the
+      // fallback every missing entry already gets.
+      if (!entryIsIntact(recorded)) {
+        stale++;
+        continue;
+      }
+      (manifest[block.file] ??= {})[key] = recorded;
+      for (const cell of recorded.cells) if (cell.src) keptAssets.add(basename(cell.src));
+      carried++;
+    }
+  }
+  return { carried, stale };
+}
+
+// A narrowed run already cloned the whole manifest, captured entries and all.
+const captured = narrowed ? { carried: 0, stale: 0 } : carryCapturedEntries();
 
 for (const [i, block] of blocks.entries()) {
   const entry = block.files.find((f) => f.filename === block.entry) ?? block.files[0];
@@ -741,6 +804,17 @@ console.log(
     `${stats.empty} produced no output, ${stats.failed} failed, ` +
     `${stats.environmental} could not run in Node`,
 );
+// Said out loud on every full run, not only when it is zero-worthy: these are
+// the entries this generator is trusted to carry and cannot rebuild, and the
+// last time they went missing the only evidence was a one-line JSON file
+// getting shorter.
+if (!narrowed) {
+  console.log(
+    `build-block-outputs: ${captured.carried} captured entr(ies) carried forward ` +
+      `(${BROWSER_ADAPTERS.join(", ")} — see capture-browser-outputs.mjs)` +
+      `${captured.stale ? `, ${captured.stale} dropped for a missing figure` : ""}`,
+  );
+}
 // Loud, because it is the only sign that a lesson stopped previewing
 // something: an entry that was nothing but a traceback has been dropped and
 // the block falls back to the empty panel.

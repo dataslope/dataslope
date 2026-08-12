@@ -25,6 +25,16 @@ name: Prepopulated block output
 #     reproducible run to run, so a full re-run would rewrite all ~370 files
 #     every time for no visible change.
 #
+# ── What this job does not regenerate ─────────────────────────────────────
+#
+# r, java, csharp, web, react and php have no Node runtime, so their output
+# comes from `scripts/capture-browser-outputs.mjs`, which drives a real
+# browser and is run by hand. This job *carries* those entries forward
+# untouched — it used to delete them, which cost R, Java and C# their
+# previews for four commits — but it cannot create them. A new or edited
+# block in one of those languages shows an empty panel until someone runs
+# `npm run capture:block-outputs`.
+#
 # This workflow is the *only* thing that runs the generator automatically.
 # Neither `build` nor `dev` does: both read the committed manifest and nothing
 # else, so no deploy and no local start ever boots Pyodide or clang. Anyone
