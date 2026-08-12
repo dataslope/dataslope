@@ -125,11 +125,6 @@ in the thousands of grams) dominates the distance.
 
 ## The dial that controls everything: choosing `k`
 
-The same training data at three values of k, with the decision boundary each
-one produces:
-
-<Chart slug="knn-k-boundary" />
-
 `k` (the argument `n_neighbors`) is KNN's single most important knob, and
 it directly controls the **bias-variance tradeoff** you met earlier.
 
@@ -148,6 +143,11 @@ it directly controls the **bias-variance tradeoff** you met earlier.
 | `k = 1` | Jagged, wraps tightly around individual points | Overfit, high variance |
 | `k = 5` to `15` | Local but smooth | Generalizes well |
 | `k` very large | Over-smoothed, ignores local detail | Underfit, high bias |
+
+The same training data at three values of `k`, with the decision boundary
+each one produces:
+
+<Chart slug="knn-k-boundary" />
 
 Let us watch test accuracy respond to `k`.
 
