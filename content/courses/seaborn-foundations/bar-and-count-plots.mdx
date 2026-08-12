@@ -171,6 +171,12 @@ sns.catplot(data=tips, x="day", y="total_bill", kind="bar", errorbar="sd", heigh
   ]}
 />
 
+The block above uses `errorbar="sd"`, a small but meaningful honesty
+upgrade on the default: the bars now carry a hint of each group's *spread*
+rather than only the precision of its mean. Edit it to `errorbar=("ci", 95)`
+and then to `errorbar=None` to feel the difference between "uncertainty of
+the mean", "spread of the data", and "no error information at all."
+
 Below a certain sample size, though, no error bar is the right answer,
 because the summary has become bigger than the thing it summarises:
 
@@ -188,14 +194,8 @@ The working rule: under about ten observations, show every point; ten to
 fifty, show the points and the summary together; above that, use a mark that
 has a shape, a box or a violin or a strip, rather than a bar.
 
-Switching to `errorbar="sd"` is a small but meaningful honesty upgrade: the
-bars now carry a hint of each group's *spread*, partly answering the
-objection above. Try editing it to `errorbar=("ci", 95)` and to
-`errorbar=None` to feel the difference between "uncertainty of the mean" and
-"spread of the data" and "no error information at all."
-
-Which raises the question the chart itself never answers: which interval is
-drawn?
+Error bars raise a second question, and one the chart itself never answers:
+which interval is drawn?
 
 <Chart slug="error-bar-ambiguity" />
 
