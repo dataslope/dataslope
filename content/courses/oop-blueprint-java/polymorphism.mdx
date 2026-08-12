@@ -13,6 +13,11 @@ powerful. When `Main` loops over a list of `Noisy` and sends each
 one `sound()`, the JVM dispatches to the *actual class* of each
 object, not the variable's declared type.
 
+<Figure
+  slug="oopj-polymorphism-cutout"
+  alt="One identical message token entering three differently shaped machines and each producing a visibly different output shape"
+/>
+
 ```mermaid
 sequenceDiagram
     participant Main
@@ -26,11 +31,6 @@ sequenceDiagram
         Var-->>Main: "Ding-dong"
     end
 ```
-
-<Figure
-  slug="oopj-polymorphism-cutout"
-  alt="One identical message token entering three differently shaped machines and each producing a visibly different output shape"
-/>
 
 ## Two-level thinking: compile-time vs. runtime types
 
@@ -299,11 +299,6 @@ each subtype overrides.
 
 ## A bigger payoff: open–closed
 
-Worth being precise about what is bought and what is sold, because this
-trade runs in both directions:
-
-<Chart slug="expression-problem-edits" />
-
 There is a famous design idea called the **open–closed principle**:
 software should be **open for extension** but **closed for
 modification**. The phrase was coined by **Bertrand Meyer** in his
@@ -322,6 +317,11 @@ flowchart TD
 You extend the system by adding *new classes* that implement the
 existing interfaces or abstract classes. The existing code, which
 already worked and was already tested, doesn't have to change.
+
+Worth being precise about what that buys and what it sells, because the
+trade runs in both directions:
+
+<Chart slug="expression-problem-edits" />
 
 ## Practice
 
