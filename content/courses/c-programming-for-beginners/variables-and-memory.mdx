@@ -114,12 +114,14 @@ When `score` appears on the **left** of `=`, you are **writing** to
 it. When it appears on the **right**, or in an expression, you are
 **reading** from it.
 
-```text
-score = score + 5;
-  ^         ^
-  |         +-- read
-  +------------ write
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "score", label: "write" },
+    { text: "=" },
+    { text: "score", label: "read" },
+    { text: "+ 5;" },
+  ]}
+/>
 
 ## Naming variables
 

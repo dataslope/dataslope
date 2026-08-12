@@ -142,13 +142,11 @@ flowchart TD
 
 In a spreadsheet, a column can accidentally become a mixture:
 
-```text
-price
------
-12.99
-free
-$8 maybe
-```
+| price      |
+| ---------- |
+| `12.99`    |
+| `free`     |
+| `$8 maybe` |
 
 A database table can be designed so the `price` column is meant for numeric values. SQLite has flexible typing, so it is more forgiving than some database systems, but column types still communicate the intended shape of the data and help SQLite store and compare values sensibly.
 

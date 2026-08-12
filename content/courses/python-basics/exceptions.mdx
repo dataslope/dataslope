@@ -326,28 +326,38 @@ Every exception inherits from `BaseException`. The ones you usually care about i
 
 `Exception` catches "every normal error". **Do not** catch `BaseException` casually; it includes `KeyboardInterrupt` and `SystemExit`, which you usually want to let through.
 
+```mermaid
+flowchart TD
+    Base["BaseException"] --> KI["KeyboardInterrupt<br/>(Ctrl+C)"]
+    Base --> SE["SystemExit<br/>(sys.exit())"]
+    Base --> Exc["Exception"]
+    Exc --> VE["ValueError"]
+    Exc --> TE["TypeError"]
+    Exc --> KE["KeyError"]
+    Exc --> IE["IndexError"]
+    Exc --> AE["AttributeError"]
+    Exc --> FNF["FileNotFoundError"]
+    Exc --> More["... many more"]
+```
+
+You do not have to memorize the tree. Python will tell you: every class
+has a `__mro__`, the chain of classes it inherits from, and `issubclass`
+answers the question an `except` clause is really asking.
+
 <CodeBlock
   adapter="python"
   files={[
     {
       filename: "main.py",
-      starterCode: `import sys
+      starterCode: `# Walk an exception's ancestry, straight from the interpreter.
+for exc in (ValueError, KeyError, FileNotFoundError, KeyboardInterrupt):
+    chain = " -> ".join(cls.__name__ for cls in exc.__mro__[:-1])
+    print(chain)
 
-# Built-in exception hierarchy (simplified)
-hierarchy = """
-BaseException
-├── KeyboardInterrupt (Ctrl+C)
-├── SystemExit (sys.exit())
-└── Exception
-    ├── ValueError
-    ├── TypeError
-    ├── KeyError
-    ├── IndexError
-    ├── AttributeError
-    ├── FileNotFoundError
-    └── ... (many more)
-"""
-print(hierarchy)
+# This is exactly the question \`except Exception\` asks about an error.
+print()
+print("KeyError is an Exception:", issubclass(KeyError, Exception))
+print("KeyboardInterrupt is an Exception:", issubclass(KeyboardInterrupt, Exception))
 `,
     },
   ]}

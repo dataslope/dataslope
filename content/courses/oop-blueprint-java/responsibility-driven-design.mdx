@@ -59,17 +59,15 @@ class up, wave it around while talking about it, and its small size
 cards a centerpiece of responsibility-driven design. Each card has
 three fields:
 
-```text
-┌────────────────────────────────────────────┐
-│ Class:  Order                              │
-├────────────────────────────────────────────┤
-│ Responsibilities         │ Collaborators   │
-│ ─ track its line items   │  LineItem       │
-│ ─ compute its total      │                 │
-│ ─ know whether it is paid│                 │
-│ ─ mark itself as paid    │  Payment        │
-└────────────────────────────────────────────┘
-```
+<CrcCard
+  name="Order"
+  rows={[
+    { responsibility: "track its line items", collaborator: "LineItem" },
+    { responsibility: "compute its total" },
+    { responsibility: "know whether it is paid" },
+    { responsibility: "mark itself as paid", collaborator: "Payment" },
+  ]}
+/>
 
 You write one card per candidate class. The card forces brevity. If
 the responsibility list spills off the card, the class is too big.

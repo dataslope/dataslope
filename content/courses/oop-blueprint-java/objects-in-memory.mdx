@@ -42,7 +42,7 @@ write `Dog d = new Dog(...)`, two things happen:
 ```mermaid
 flowchart TD
     subgraph S["Stack (current method)"]
-        V1["d : Dog ref ──┐"]
+        V1["<code>d</code> (a Dog reference)"]
     end
     subgraph H["Heap"]
         O1["Dog object<br/><code>name='Rex'</code><br/><code>age=4</code>"]
@@ -257,11 +257,11 @@ sequenceDiagram
     participant Heap
 
     Caller->>Heap: new Dog("Rex")
-    Note over Caller,Heap: mine ── ref ──▶ Dog{name=Rex}
+    Note over Caller,Heap: mine references the Dog named Rex
     Caller->>Callee: rename(mine, "Buddy")
-    Note over Callee,Heap: dog ── ref ──▶ same Dog
+    Note over Callee,Heap: dog references that same Dog
     Callee->>Heap: dog.name = "Buddy"
-    Note over Caller,Heap: mine ── ref ──▶ Dog{name=Buddy}
+    Note over Caller,Heap: mine references the Dog, now named Buddy
 ```
 
 But re-assigning the parameter to a *new* object does **not** affect
