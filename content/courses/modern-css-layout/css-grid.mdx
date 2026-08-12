@@ -30,6 +30,12 @@ The **`fr`** unit means "a fraction of the free space." `repeat(3, 1fr)`
 is shorthand for three equal columns; `2fr 1fr` makes the first twice
 the width of the second.
 
+<Figure
+  slug="css-css-grid-inline-cutout"
+  alt="A rectangular frame ruled into rows and columns, with three blocks placed to span several cells each, the empty cells left visible"
+  caption="Grid rules the container into rows and columns before anything is placed."
+/>
+
 Here the columns are `2fr 1fr 1fr`: the first cell claims half the row,
 the other two split the rest. Change the ratios in your head and you
 can predict every column width:
@@ -186,11 +192,52 @@ layout as text, then assign each element to a named area. It's the most
 readable way to express a classic header/sidebar/content/footer shell,
 and rearranging it in a media query is a one-line change.
 
-<Figure
-  slug="css-css-grid-inline-cutout"
-  alt="A rectangular frame ruled into rows and columns, with three blocks placed to span several cells each, the empty cells left visible"
-  caption="Grid rules the container into rows and columns before anything is placed."
+Each quoted string is one row, and each word in it is one column. Repeat
+a name across cells and that area spans them, so the picture in the CSS
+has the same shape as the layout on screen:
+
+```css
+grid-template-areas:
+  "header  header"
+  "sidebar main"
+  "footer  footer";
+```
+
+Then every child says which area it belongs to with `grid-area`, and
+the order of the elements in the HTML no longer matters:
+
+<LivePreview
+  title="A page shell drawn as text"
+  html={`<div class="page">
+  <header>header</header>
+  <aside>sidebar</aside>
+  <main>main</main>
+  <footer>footer</footer>
+</div>`}
+  css={`.page {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  grid-template-areas:
+    "header  header"
+    "sidebar main"
+    "footer  footer";
+  gap: 10px;
+  font-family: system-ui, sans-serif;
+}
+header { grid-area: header; background: #1e293b; color: white; }
+aside  { grid-area: sidebar; background: #e2e8f0; }
+main   { grid-area: main; background: #dbeafe; min-height: 90px; }
+footer { grid-area: footer; background: #f1f5f9; }
+.page > * {
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}`}
 />
+
+To move the sidebar to the right, flip that row to `"main sidebar"` and
+the tracks to `1fr 120px`. No element moves in the HTML, and nothing
+else in the stylesheet changes.
 
 ## Responsive with no media query
 
