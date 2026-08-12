@@ -198,9 +198,9 @@ Look again at *what each method reads*:
 ```mermaid
 flowchart LR
     G["Gap at time t"] --> Q{"Which neighbors<br/>does the fill read?"}
-    Q -->|"only the PAST value"| FF["ffill -- safe as a live feature"]
-    Q -->|"the FUTURE value"| BF["bfill -- leaks the future"]
-    Q -->|"PAST and FUTURE values"| IN["interpolate -- leaks the future"]
+    Q -->|"only the PAST value"| FF["ffill - safe as a live feature"]
+    Q -->|"the FUTURE value"| BF["bfill - leaks the future"]
+    Q -->|"PAST and FUTURE values"| IN["interpolate - leaks the future"]
 ```
 
 Seeing all four drawn across the same gap makes the asymmetry concrete. A

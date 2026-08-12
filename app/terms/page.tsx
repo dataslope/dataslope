@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalShell title="Terms of Service" updated="July 16, 2026">
+    <LegalShell title="Terms of Service" updated="August 12, 2026">
       <p>
         These terms govern your use of Dataslope (the &ldquo;Service&rdquo;). By
         using the Service, you agree to them. If you don&apos;t agree, please
@@ -53,7 +53,8 @@ export default function TermsPage() {
         we can&apos;t guarantee that any saved work or progress will always be
         retained or remain accessible. In particular, a saved workspace or your
         progress may be removed or become unusable for reasons including
-        inactivity cleanup, reaching a storage limit, scheduled maintenance, and
+        inactivity cleanup, reaching a storage limit,{" "}
+        <strong>capacity constraints</strong>, scheduled maintenance, and
         updates to the language runtimes, databases, or platform that make a
         previously saved workspace incompatible, which can result in its{" "}
         <strong>automatic deletion</strong>. To the fullest extent permitted by
@@ -128,6 +129,19 @@ export default function TermsPage() {
         available today is completely free; we may introduce additional or
         optional paid features in the future, but doing so will not require
         payment to access the content that is currently free.
+      </p>
+      <p>
+        Free plans depend on available capacity, and the account features that
+        come with them are provided on that basis. Where capacity requires it,
+        we may, at any time and without notice, withdraw or restrict features,
+        reduce quotas, including cloud storage and the &ldquo;Ask AI&rdquo;
+        allowance, and remove cloud workspaces or share links, including before
+        the inactivity period described above. This does not change the
+        commitment in the paragraph above: the learning content that is free
+        today, the courses, the interview tracks, and running code in the
+        playgrounds, stays free. Workspaces saved locally in your browser are
+        not affected, and you can export your work from any playground at any
+        time.
       </p>
 
       <h2>Changes to these terms</h2>

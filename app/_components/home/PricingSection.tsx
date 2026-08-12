@@ -207,6 +207,13 @@ const PLANS: Plan[] = [
 const SHOW_PRO_PLAN = false;
 const VISIBLE_PLANS = PLANS.filter((p) => SHOW_PRO_PLAN || p.name !== "Pro");
 
+// Shown above the table in place of the billing toggle while Pro is hidden.
+// Three sentences, because a table of $0s raises exactly three suspicions: that
+// a card is wanted up front, that the free run is a trial, and that access
+// lapses. Phrased as the denials a visitor is already half-expecting, rather
+// than as a claim ("Free forever") the price column has made twice already.
+const NO_CATCH = ["No credit card", "No trial period", "No expiry"];
+
 // Explicit column placement keeps each plan in its own column while spanning
 // all of the subgrid's rows.
 const COL_START = ["lg:col-start-1", "lg:col-start-2", "lg:col-start-3"];
@@ -399,7 +406,34 @@ function PlanColumn({
             reviewer liked the marmot breaking the border rather than sitting
             inside it. -40% rather than -50% drops it a little further into the
             card so it reads as resting on the edge instead of floating over
-            it. `pointer-events-none` keeps it from swallowing clicks. */}
+            it. `pointer-events-none` keeps it from swallowing clicks.
+
+            Below `lg` all three values change, because the same box lands
+            somewhere else once the column becomes a full-width row:
+
+            - `-right-6` instead of `right-0`. Each cut-out carries a wide
+              transparent margin (the free-member art paints across 605 of its
+              1024px canvas), so `right-0` aligns the *box* to the content edge
+              and leaves the marmot itself ~24px short of it, reading as
+              floated left of where it belongs. Pulling the box out by the
+              column's own padding puts the drawing where `right-0` looks like
+              it should have put it, flush with the card edge.
+            - `-translate-y-[60%]` instead of -40%. The desktop header carries
+              `lg:pt-8` and the column has no vertical padding, while a phone
+              row has neither — `top-1/2` is measured against a 28px title row
+              sitting 24px into the card, which dropped the marmot ~10px lower
+              than on desktop and left it resting *inside* the top edge rather
+              than breaking it, hanging down over the price instead.
+            - `size-24` instead of 120px, which is the part a move alone could
+              not fix. A phone row is a third the width of the table it came
+              from, but the art was still drawn at desktop size, so on a 360px
+              screen it reached back across the title line and painted over the
+              "Recommended" badge (~45px of it, enough to cut the word in
+              half). Lifting it makes that worse rather than better: the badge
+              line then crosses the marmot's middle, which is the widest part
+              of the silhouette. At 96px the drawing meets the badge's rounded
+              end and leaves its text clear by ~9px, on the narrowest phone
+              worth designing for. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`/images/${plan.iconSlug}-cutout.webp`}
@@ -407,7 +441,7 @@ function PlanColumn({
           aria-hidden="true"
           loading="lazy"
           decoding="async"
-          className="pointer-events-none absolute right-0 top-1/2 size-[120px] -translate-y-[40%] object-contain"
+          className="pointer-events-none absolute -right-6 top-1/2 size-24 -translate-y-[60%] object-contain lg:right-0 lg:size-[120px] lg:-translate-y-[40%]"
         />
       </div>
 
@@ -415,8 +449,12 @@ function PlanColumn({
         <span className="text-4xl font-medium tracking-tight text-[var(--ds-gray-900)] dark:text-white">
           {price}
         </span>
-        {/* Billing-period suffix so the monthly/annual toggle visibly changes
-            the table even though every plan is $0. */}
+        {/* Billing-period suffix, moved by the toggle when there is one. With
+            Pro hidden there is no toggle, so this always reads "/ month" above
+            two $0 columns and one of them says "Free forever" underneath —
+            vestigial, and a fair candidate for dropping while nothing is
+            billed. Left alone for now so the price line stays a deliberate
+            copy decision rather than a side effect of removing a control. */}
         <span className="ml-1 text-base font-normal text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
           {annual ? "/ year" : "/ month"}
         </span>
@@ -502,7 +540,26 @@ export function PricingSection({
         </div>
       )}
 
-      {/* Monthly / annual billing toggle, only the paid tier's price reacts. */}
+      {/* The slot above the table: the billing toggle when there is something
+          to bill for, the "no catch" strip when there isn't.
+
+          With Pro hidden the toggle was a dead control. Both remaining columns
+          are $0 with the same sub-line, so the only thing it changed was the
+          "/ month" suffix, and the "Best value" badge on Annual promised a
+          discount that could not exist — a visitor who clicked to find the
+          saving got $0 → $0.
+
+          The strip answers the question the toggle never could. Somebody
+          reading a table where every price is $0 is not working out a billing
+          period, they are looking for the catch, and "No credit card / No
+          trial period / No expiry" names all three catches they are expecting.
+          Each one carries the same green check the feature rows use for an
+          included capability, so the mark that means "you get this" is the
+          same mark on both sides of the table's top edge.
+
+          Restoring Pro is still one flag: flip SHOW_PRO_PLAN and the toggle
+          comes back with its state and checkout wiring untouched. */}
+      {SHOW_PRO_PLAN ? (
       <div className="mb-10 flex items-center justify-center">
         <div className="inline-flex items-center rounded-full border border-[var(--ds-gray-200)] bg-white p-1 dark:border-white/15 dark:bg-[#121212]">
           {(["monthly", "annual"] as const).map((option) => {
@@ -536,6 +593,24 @@ export function PricingSection({
           })}
         </div>
       </div>
+      ) : (
+        <ul className="mb-10 flex flex-wrap items-center justify-center gap-2.5">
+          {NO_CATCH.map((assurance) => (
+            <li
+              key={assurance}
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--ds-gray-200)] bg-white py-1.5 pr-4 pl-2 text-[15px] font-medium text-[var(--ds-gray-900)] dark:border-white/15 dark:bg-[#121212] dark:text-white"
+            >
+              <span
+                className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--ds-green-500)]"
+                aria-hidden="true"
+              >
+                <Check size={12} strokeWidth={2.5} className="text-white" />
+              </span>
+              {assurance}
+            </li>
+          ))}
+        </ul>
+      )}
 
       {/* Comparison: bordered, no gaps between plans, thin dividers between
           them, and feature rows aligned via subgrid. The striped-shell gives

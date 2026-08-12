@@ -190,6 +190,28 @@ export default function PricingPage() {
                   window means each message frees up again 24 hours after you
                   send it, rather than all resetting at a fixed time of day.
                 </Footnote>
+
+                <Footnote n={8} lead="Free plans depend on available capacity.">
+                  Everything above is free because it runs on a limited pool of
+                  shared capacity, and it is provided on that basis. Where
+                  capacity requires it we may, at any time and without notice,
+                  withdraw or restrict features, lower quotas, including cloud
+                  storage and the &ldquo;Ask AI&rdquo; allowance, and remove
+                  cloud workspaces or share links, including before the
+                  one-month inactivity window in note 4. The learning content
+                  itself stays free, that commitment is in note 1 and in the
+                  terms. Local saves in your browser aren&apos;t affected, and
+                  you can export your work from any playground at any time, so
+                  keep your own copy of anything you&apos;d be sorry to lose.
+                  The{" "}
+                  <Link
+                    href="/terms"
+                    className="font-medium text-[var(--ds-blue-700)] hover:underline dark:text-[var(--ds-blue-400)]"
+                  >
+                    Terms of Service
+                  </Link>{" "}
+                  set this out in full.
+                </Footnote>
               </ol>
 
               <p className="mt-10 border-t border-[var(--ds-gray-200)] pt-6 text-[15px] leading-relaxed text-[var(--ds-gray-600)] dark:border-white/10 dark:text-[var(--ds-gray-400)]">

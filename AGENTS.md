@@ -1085,6 +1085,44 @@ Two kinds of `>` line are deliberately out of scope. An **indented** one is a
 page and no quotes are drawn. One inside a **fenced block** is a sample, a
 prompt or a mermaid edge rather than a quotation.
 
+### Mermaid labels take a plain hyphen
+
+**Every dash inside a mermaid label is a plain ASCII hyphen.** Mermaid renders
+label text verbatim, so a `--` typed as a dash reaches the reader as two
+hyphens sitting in the node box:
+
+````markdown
+<!-- Bad -->
+```mermaid
+flowchart LR
+    Q -->|"only the PAST value"| FF["ffill -- safe as a live feature"]
+```
+
+<!-- Good -->
+```mermaid
+flowchart LR
+    Q -->|"only the PAST value"| FF["ffill - safe as a live feature"]
+```
+````
+
+This is stricter than the en dash rule above, which keeps `1815–1864`
+unspaced. A label is a few words in a box, so there is no typographic case to
+weigh, and one flat rule beats a distinction nobody can see at label size. The
+`mermaid-dash` check rejects `–`, `—` and the Unicode minus `−` anywhere in a
+diagram, and a whitespace-flanked run of two or more hyphens in a label.
+
+A label is not the same thing as a line, because nearly every mermaid link is
+built from the hyphens the rule looks for. Only two spans are read for hyphen
+runs: **quoted labels** (`A["text"]`, `-->|"text"|`), which is where a label
+holding `--` has to live anyway since mermaid would otherwise parse it as the
+link it resembles, and **the text after a colon** in the diagram kinds where a
+colon introduces free text (`sequenceDiagram`, `timeline`, `stateDiagram`, …),
+which is why `A((a: 1,2,3)) --- I((3))` in a flowchart is left alone. Links
+(`---`, `<-->`), ER cardinality (`}|--|{`), class associations (`Animal -- Dog`)
+and `%%` comments are all out of scope, as is a hyphen run that is code rather
+than punctuation: `--save-dev`, `i--` and `--comment` have no flanking space on
+both sides and pass.
+
 ---
 
 ## Multiple-choice question explanations
