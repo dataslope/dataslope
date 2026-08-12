@@ -55,9 +55,10 @@ would essentially never work.
 
 ## What hashCode is for
 
-And why the contract matters so much: collisions are not rare. With a
-thousand buckets it is already even money that two keys share one by the
-fortieth key, at four percent full.
+Hashing turns an arbitrary object into an `int` "fingerprint." A
+`HashSet` or `HashMap` uses that fingerprint to jump *directly* to
+the bucket where the element should live, instead of scanning all
+buckets.
 
 <Figure
   slug="jcol-equality-and-hashing-hashcode-inline-cutout"
@@ -65,12 +66,11 @@ fortieth key, at four percent full.
   caption="`hashCode()` decides the bucket; `equals()` settles who is already in it."
 />
 
-<Chart slug="hash-collision-birthday" />
+Two objects can land in the same bucket, and that is not the rare
+accident it sounds like. With a thousand buckets it is already even money
+that two keys collide by the fortieth key, at four percent full:
 
-Hashing turns an arbitrary object into an `int` "fingerprint." A
-`HashSet` or `HashMap` uses that fingerprint to jump *directly* to
-the bucket where the element should live, instead of scanning all
-buckets.
+<Chart slug="hash-collision-birthday" />
 
 Collisions are also why the map resizes long before it is full. The
 average chain a lookup walks is the load factor itself, and 0.75 is where
