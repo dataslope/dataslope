@@ -118,6 +118,7 @@ import styles from "./ChallengeCard.module.css";
 // Boot-notice styles are shared with `<CodeBlock>` (which already
 // shares this card's styles for its chrome, the reuse runs both ways).
 import codeBlockStyles from "./CodeBlock.module.css";
+import { previewStageStyle } from "./previewStage";
 
 /** One file in a challenge workspace. Every challenge passes at least
  *  one file (single-file authors pass a one-element `files` array). A
@@ -237,6 +238,15 @@ export interface ChallengeCardProps {
    *  adapters (web / react); see `TAILWIND_BROWSER_CDN` in
    *  runtime/cdn.ts for the pin. */
   tailwind?: boolean;
+  /** Height of the live-preview stage (number → px). Only meaningful for
+   *  preview adapters (web / react).
+   *
+   *  The slot reserves this space from first paint, empty or not, so a Run
+   *  never grows the card under the learner. Leave it alone for a card
+   *  whose answer is a page (300px, the default); set it for one whose
+   *  answer is a single element, where the default reserves a screenful of
+   *  white above the instructions the learner still has to read. */
+  previewHeight?: number | string;
 }
 
 // Pick a line-comment prefix for the language. Used only to prepend a
@@ -276,6 +286,7 @@ export default function ChallengeCard({
   tests,
   packages,
   tailwind = false,
+  previewHeight,
 }: ChallengeCardProps) {
   const blockId = useBlockId(adapter);
   const initPanelId = `${blockId}-init`;
@@ -2111,7 +2122,11 @@ export default function ChallengeCard({
           <div className={styles.previewHeader}>
             <span className={styles.previewLabel}>Preview</span>
           </div>
-          <div className={styles.previewSlot} ref={previewHostRef} />
+          <div
+            className={styles.previewSlot}
+            style={previewStageStyle(previewHeight)}
+            ref={previewHostRef}
+          />
         </div>
       )}
 

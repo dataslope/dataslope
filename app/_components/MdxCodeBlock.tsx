@@ -48,6 +48,9 @@ interface MdxCodeBlockProps {
   /** Marks a block whose lesson is the failure, see
    *  `CodeBlockProps.expectError`. */
   expectError?: boolean;
+  /** Height of the live-preview stage (number → px), see
+   *  `CodeBlockProps.previewHeight`. Preview adapters (web/react) only. */
+  previewHeight?: number | string;
 }
 
 export default function MdxCodeBlock({
@@ -60,6 +63,7 @@ export default function MdxCodeBlock({
   packages,
   tailwind,
   expectError,
+  previewHeight,
 }: MdxCodeBlockProps) {
   const resolved = getAdapterById(adapter);
   if (!resolved) {
@@ -80,6 +84,7 @@ export default function MdxCodeBlock({
       expectError={expectError}
       packages={packages}
       tailwind={tailwind}
+      previewHeight={previewHeight}
     />
   );
 }

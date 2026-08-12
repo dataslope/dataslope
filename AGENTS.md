@@ -848,7 +848,10 @@ generator filled a panel, and neither can the site.
 - **web and react have no prepopulated output at all, and cannot.** Their
   output *is* a live sandboxed iframe, not cells; the capture comes back with
   nothing but "the preview didn't finish within the time limit". There is
-  nothing to store, so those 72 blocks stay blank by nature.
+  nothing to store, so those 72 blocks stay blank by nature. Whether they
+  could instead *render themselves* in the reader's browser is the subject of
+  `agent-outputs/20260812-1830-client-side-preview-rendering.md`; the reserved
+  preview height below is the first phase of that plan, and the only one built.
 
 Between the two generators, 3,280 of the site's 3,374 runnable blocks show
 their output before the reader presses Run. Of the 94 that do not, 72 are web
@@ -958,6 +961,35 @@ which every `sns.histplot(...)` block records nothing while the browser draws
 a chart. The JS half of the conversion is *shared* rather than copied
 (`app/_components/runtime/pythonDisplayOutputs.ts`), so only the Python half
 can drift.
+
+### The live preview reserves its height before it has one
+
+`.previewSlot` (`ChallengeCard.module.css`, shared by `<CodeBlock>` and
+`<ChallengeCard>`) occupies the same box empty or full. It used to shrink to
+120px while empty and snap to 300px when the iframe landed, so **every Run grew
+the card by 180px under the reader** — measured on
+`intro-web-development/html-structure`, the next `<h2>` moved down exactly that
+far on click. That is the bug `<HashScrollFix>` exists to correct, fired by the
+reader's own button, and correcting a shift is always worse than not having
+one: the correction is a race the reader can lose.
+
+Reserving the space is what makes it impossible, and `previewHeight` on the
+block is what keeps the reservation honest — a page demo wants the 300px
+default, a single-element demo wants 120px and would otherwise sit in a
+screenful of held-open white. It arrives as a custom property
+(`app/_components/previewStage.ts`), not an inline `height`, so the stylesheet
+keeps the drag-resize floor and the empty-state rules and the prop only moves
+the number they are written against. A bare number means px, matching
+`<LivePreview height>`.
+
+The empty state is dashed rather than solid for the same reason the height is
+fixed: at full height a solid box reads as a panel that failed to load, and
+dashes are the convention for space held for something not here yet.
+
+`<Playground>`'s own `.web-preview-slot` (`playground.css`) still has the old
+shrink, deliberately — it is a driven IDE where the reader presses Run on
+purpose, not a lesson they are reading through, and inside `.web-preview-body`
+it is a flex child whose height is `auto` anyway.
 
 ### A DataFrame goes through `display()`, never `print()`
 

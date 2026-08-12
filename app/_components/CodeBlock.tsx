@@ -77,6 +77,7 @@ import {
 } from "./codePersistence";
 import { usePrepopulatedOutput } from "./mdx/BlockOutputs";
 import { blockOutputKey } from "@/lib/blockOutputKey";
+import { previewStageStyle } from "./previewStage";
 import styles from "./CodeBlock.module.css";
 import challengeStyles from "./ChallengeCard.module.css";
 
@@ -161,6 +162,16 @@ interface CodeBlockProps {
    *  react); see `TAILWIND_BROWSER_CDN` in runtime/cdn.ts for the pin
    *  and the "development-time compiler" caveat. */
   tailwind?: boolean;
+  /** Height of the live-preview stage (number → px). Only meaningful for
+   *  preview adapters (web / react).
+   *
+   *  The slot reserves this space from first paint, empty or not, so a Run
+   *  never grows the card under the reader. That makes the number the
+   *  author's problem rather than the layout's: leave it alone for a block
+   *  that renders a page (300px, the default), and set it for one that
+   *  renders a 60px box, where the default would reserve a screenful of
+   *  white to show a rule of thumb about margins. */
+  previewHeight?: number | string;
 }
 
 // Detect the active color scheme on `<html>`. Fumadocs uses next-themes
@@ -300,6 +311,7 @@ function CodeBlockInner({
   packages,
   tailwind = false,
   expectError,
+  previewHeight,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
 
@@ -1595,12 +1607,17 @@ function CodeBlockInner({
         // Live page preview for the web/react adapters. Always mounted
         // so the slot element exists before the first run; the runtime
         // swaps a sandboxed iframe into the slot on every run, and CSS
-        // renders a placeholder while the slot is still empty.
+        // renders a placeholder while the slot is still empty — at the
+        // same height it will have once filled, so the swap moves nothing.
         <div className={challengeStyles.previewPanel} data-testid="web-preview">
           <div className={challengeStyles.previewHeader}>
             <span className={challengeStyles.previewLabel}>Preview</span>
           </div>
-          <div className={challengeStyles.previewSlot} ref={previewHostRef} />
+          <div
+            className={challengeStyles.previewSlot}
+            style={previewStageStyle(previewHeight)}
+            ref={previewHostRef}
+          />
         </div>
       )}
 
