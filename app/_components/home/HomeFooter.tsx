@@ -3,10 +3,12 @@ import Link from "../Link";
 import { GitHubIcon } from "./icons";
 import { FooterPattern } from "./FooterPattern";
 import { PLAYGROUNDS } from "../playgrounds";
+import { LangIcon } from "../languageIcons";
 import {
-  LANGUAGE_ICONS,
-  LANGUAGE_ICON_SIZE_FACTOR,
-} from "../languageIcons";
+  COURSE_LANGUAGES,
+  courseLanguageHref,
+} from "@/app/courses/_components/catalogFilters";
+import { formatTagLabel } from "@/lib/tagLabels";
 
 const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 
@@ -45,34 +47,48 @@ const RESOURCE_LINKS = [
   },
 ];
 
+// One row per language the /courses sidebar filters by, in the sidebar's own
+// order, from the list that sidebar orders itself with — so the two agree on
+// what the catalog is sorted into and in what sequence. Each row is the
+// catalog pre-filtered, the same state a visitor reaches by clicking that
+// language in the sidebar.
+//
+// `documentNav` on every one of them, and it is load-bearing rather than a
+// preference. The catalog reads its filter out of the query string with a
+// `useSyncExternalStore` subscribed to `popstate` (see `CoursesCatalog`), and
+// a Next `<Link>` navigates with `pushState`, which fires no `popstate`. From
+// any other page that is invisible — the catalog mounts fresh and reads the
+// URL on the way up — but this footer is *on* `/courses`, where the component
+// is already mounted. A `<Link>` there would swap the address bar to
+// `?lang=r` and leave all 32 courses on screen. A document navigation
+// re-mounts the page, so every row filters from wherever it is clicked.
+//
+// It also settles the prefetch question by construction: these eleven hrefs
+// are one document (the filtering happens in the browser), so viewport-
+// prefetching them would fetch `/courses` — which the Explore column has
+// already prefetched — eleven more times on every page of the site.
+const COURSE_LINKS = COURSE_LANGUAGES.map((lang) => ({
+  id: lang,
+  href: courseLanguageHref(lang),
+  label: `${formatTagLabel(lang)} Courses`,
+  external: false,
+  documentNav: true,
+}));
+
 // Every language playground gets its own row, from the same registry the
 // header switcher and the /playground index read, so a new playground appears
 // here without anyone remembering to add it. Labels are spelled out ("Python
 // Playground") because in a footer the column heading is skimmed past, and a
 // bare "Python" would be ambiguous next to the Courses column.
+//
+// These keep prefetching, unlike the Courses rows above: fourteen distinct
+// pages, one payload each.
 const PLAYGROUND_LINKS = PLAYGROUNDS.map((p) => ({
   id: p.id,
   href: p.href,
   label: `${p.label} Playground`,
   external: false,
 }));
-
-/** The /playground page's language glyph at footer-link size. `currentColor`,
- *  not the brand tint that page uses on its tiles: here the icon is a lead-in
- *  to a text link and should travel with the link's own hover colour. */
-function PlaygroundIcon({ id }: { id: string }) {
-  const Icon = LANGUAGE_ICONS[id];
-  if (!Icon) return null;
-  const factor = LANGUAGE_ICON_SIZE_FACTOR[id] ?? 1;
-  return (
-    <span
-      className="inline-flex size-4 shrink-0 items-center justify-center"
-      aria-hidden="true"
-    >
-      <Icon size={Math.round(16 * factor)} />
-    </span>
-  );
-}
 
 // `inline-flex w-fit` so each link shrinks to its text: as a stretched flex
 // item (`block`) the trailing whitespace across the column was clickable too.
@@ -91,12 +107,17 @@ function FooterLink({
   label,
   external,
   icon,
+  documentNav,
 }: {
   href: string;
   label: string;
   external: boolean;
-  /** Optional lead-in glyph (the playground column's language icons). */
+  /** Optional lead-in glyph (the language columns' icons). */
   icon?: ReactNode;
+  /** Navigate this row as a document load rather than a client-side route
+   *  change — same tab, unlike `external`. Only the Courses rows need it, and
+   *  they need it to work at all; see `COURSE_LINKS` for why. */
+  documentNav?: boolean;
 }) {
   if (external) {
     return (
@@ -106,6 +127,14 @@ function FooterLink({
         rel="noopener noreferrer"
         className={linkClass}
       >
+        {icon}
+        {label}
+      </a>
+    );
+  }
+  if (documentNav) {
+    return (
+      <a href={href} className={linkClass}>
         {icon}
         {label}
       </a>
@@ -176,29 +205,51 @@ export function HomeFooter() {
             </a>
           </div>
 
-          {/* Column 2, where to go next on the site. */}
-          <div className="flex flex-col gap-1">
-            <h3 className={headingClass}>Explore</h3>
-            {EXPLORE_LINKS.map((link) => (
-              <FooterLink key={link.href} {...link} />
-            ))}
+          {/* Column 2, the two short lists: where to go next on the site, then
+              the legal/support rows under it.
+
+              Stacked in one column rather than sitting side by side, because
+              the two lists that follow are eleven and fourteen rows long. Two
+              five-row columns beside them left the footer reading as two
+              full-height columns and two stubs; paired vertically they make
+              one column of comparable weight. `gap-10` between the groups
+              matches the grid's own column gap, so the heading of the second
+              is as clearly separated from the list above it as it would be
+              from a neighbouring column. */}
+          <div className="flex flex-col gap-10">
+            <div className="flex flex-col gap-1">
+              <h3 className={headingClass}>Explore</h3>
+              {EXPLORE_LINKS.map((link) => (
+                <FooterLink key={link.href} {...link} />
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <h3 className={headingClass}>Resources</h3>
+              {RESOURCE_LINKS.map((link) => (
+                <FooterLink key={link.label} {...link} />
+              ))}
+            </div>
           </div>
 
-          {/* Column 3, resources. */}
+          {/* Column 3, one row per language the catalog can be filtered to.
+              Carries the same glyphs as the Playgrounds column beside it, and
+              as the /courses sidebar these rows land in — a language reads as
+              the same thing on all three surfaces. */}
           <div className="flex flex-col gap-1">
-            <h3 className={headingClass}>Resources</h3>
-            {RESOURCE_LINKS.map((link) => (
-              <FooterLink key={link.label} {...link} />
+            <h3 className={headingClass}>Courses</h3>
+            {COURSE_LINKS.map(({ id, ...link }) => (
+              <FooterLink key={id} {...link} icon={<LangIcon id={id} />} />
             ))}
           </div>
 
           {/* Column 4, one row per language playground. The longest column by
-              far, which is why the grid is `align-items: start` — the other
-              three sit at the top of the row rather than spreading down it. */}
+              far, which is why the grid is `align-items: start` — the others
+              sit at the top of the row rather than spreading down it. */}
           <div className="flex flex-col gap-1">
             <h3 className={headingClass}>Playgrounds</h3>
             {PLAYGROUND_LINKS.map(({ id, ...link }) => (
-              <FooterLink key={id} {...link} icon={<PlaygroundIcon id={id} />} />
+              <FooterLink key={id} {...link} icon={<LangIcon id={id} />} />
             ))}
           </div>
         </div>

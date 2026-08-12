@@ -24,22 +24,9 @@ import {
 } from "lucide-react";
 import { formatTagLabel } from "@/lib/tagLabels";
 import type { CatalogCourse } from "@/lib/courseCatalog";
-import { CourseCard, LangIcon, LevelBars } from "./CourseCard";
-import { readFilters, writeFilters } from "./catalogFilters";
-
-// Sidebar language order, from the mockup. Languages found in the catalog but
-// missing here (future additions) are appended alphabetically.
-const LANG_ORDER = [
-  "python",
-  "sql",
-  "javascript",
-  "typescript",
-  "c",
-  "cpp",
-  "csharp",
-  "java",
-  "r",
-];
+import { LangIcon } from "@/app/_components/languageIcons";
+import { CourseCard, LevelBars } from "./CourseCard";
+import { COURSE_LANGUAGES, readFilters, writeFilters } from "./catalogFilters";
 
 const LEVELS = ["beginner", "intermediate", "advanced"] as const;
 type Level = (typeof LEVELS)[number];
@@ -228,14 +215,17 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
   const selectOne = (arr: string[], v: string) =>
     arr[0] === v ? [] : [v];
 
-  // Sidebar rows: fixed mockup order, restricted to languages that actually
-  // occur; unknown future languages append alphabetically.
+  // Sidebar rows: fixed mockup order (`COURSE_LANGUAGES`, shared with the
+  // footer's Courses column), restricted to languages that actually occur;
+  // unknown future languages append alphabetically.
   const languages = useMemo(() => {
     const present = new Set(
       courses.map((c) => c.tags.language?.[0]).filter(Boolean) as string[],
     );
-    const ordered = LANG_ORDER.filter((l) => present.has(l));
-    const extras = [...present].filter((l) => !LANG_ORDER.includes(l)).sort();
+    const ordered = COURSE_LANGUAGES.filter((l) => present.has(l));
+    const extras = [...present]
+      .filter((l) => !COURSE_LANGUAGES.includes(l))
+      .sort();
     return [...ordered, ...extras];
   }, [courses]);
 
