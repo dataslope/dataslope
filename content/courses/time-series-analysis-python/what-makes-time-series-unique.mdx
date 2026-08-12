@@ -379,17 +379,22 @@ unordered set, it's gone.
 The defining sin is leakage of future information into the past, which makes evaluation optimistic and irreproducible.`}
 />
 
+What makes this hard to catch is that shuffling leaves no fingerprint on any
+of the numbers you would normally check. Below, one series and a shuffle of
+it are profiled side by side:
+
 <Chart slug="shuffling-destroys-order" />
 
 Every summary a pipeline computes agrees that nothing happened, because
-nothing did happen to any of them. The information was in the order, and
-`train_test_split` and `KFold` both remove it by default, without a warning.
+nothing did happen to any of them: same mean, same standard deviation, same
+minimum, maximum, median and histogram. Only the autocorrelation plot
+underneath notices, and it is the one plot a generic pipeline never draws.
 
-Two places this arrives as a default rather than a decision: `train_test_split`
-shuffles unless you pass `shuffle=False`, and `KFold` shuffles unless you
-reach for `TimeSeriesSplit`. Both produce a model that scores well and cannot
-forecast, because the score was earned on interpolating a hole rather than on
-extending the end.
+And shuffling arrives as a default rather than a decision in two places:
+`train_test_split` shuffles unless you pass `shuffle=False`, and `KFold`
+shuffles unless you reach for `TimeSeriesSplit`. Both produce a model that
+scores well and cannot forecast, because the score was earned on
+interpolating a hole rather than on extending the end.
 
 ## Real-world stakes
 

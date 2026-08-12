@@ -87,6 +87,12 @@ contiguous blocks of memory using the CPU's vector instructions
 (SSE, AVX, NEON). You get the speed of FORTRAN because the inner
 loop *is* the FORTRAN-equivalent inner loop.
 
+<Figure
+  slug="scipy-vectorized-thinking-inline-cutout"
+  alt="One hand stamping a single block at a time on the left, and a full-width press stamping a whole row in one stroke on the right"
+  caption="One operation over a whole array beats one operation per element."
+/>
+
 The full hierarchy of "things that go fast":
 
 | Layer | What it does | Cost per element |
@@ -224,12 +230,6 @@ of the result.
 
 Vectorization is wonderful but not magical. A few situations call
 for something else.
-
-<Figure
-  slug="scipy-vectorized-thinking-inline-cutout"
-  alt="One hand stamping a single block at a time on the left, and a full-width press stamping a whole row in one stroke on the right"
-  caption="One operation over a whole array beats one operation per element."
-/>
 
 - **The algorithm is fundamentally sequential.** Iterating a
   recurrence one element at a time (`x_{n+1} = f(x_n)`) cannot be

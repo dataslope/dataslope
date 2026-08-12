@@ -26,11 +26,15 @@ The simplest read names the columns you want, `FROM` a table:
   salary NUMERIC
 );
 INSERT INTO employees (name, dept, salary) VALUES
-  ('Alice', 'Engineering', 120000),
-  ('Bob',   'Engineering',  95000),
-  ('Carol', 'Sales',        80000),
-  ('Dave',  'Sales',        72000),
-  ('Eve',   'Marketing',    68000);`}
+  ('Alice','Engineering',120000),('Bob','Engineering',95000),
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   name,
   salary
@@ -56,9 +60,15 @@ row in the table. `SELECT` decides the *columns*; by default you get
   salary NUMERIC
 );
 INSERT INTO employees (name, dept, salary) VALUES
-  ('Alice', 'Engineering', 120000),
-  ('Bob',   'Engineering',  95000),
-  ('Carol', 'Sales',        80000);`}
+  ('Alice','Engineering',120000),('Bob','Engineering',95000),
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   *
 FROM
@@ -114,8 +124,15 @@ answer*, not echoing the table:
   salary NUMERIC
 );
 INSERT INTO employees (name, dept, salary) VALUES
-  ('Alice', 'Engineering', 120000),
-  ('Bob',   'Sales',        72000);`}
+  ('Alice','Engineering',120000),('Bob','Engineering',95000),
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`-- salary first, then dept, then name, any order you want
 SELECT
   salary,
@@ -139,11 +156,13 @@ Sometimes you only care about the *distinct* values in a column.
   dept   TEXT
 );
 INSERT INTO employees (name, dept) VALUES
-  ('Alice', 'Engineering'),
-  ('Bob',   'Engineering'),
-  ('Carol', 'Sales'),
-  ('Dave',  'Sales'),
-  ('Eve',   'Marketing');`}
+  ('Alice','Engineering'),('Bob','Engineering'),('Carol','Sales'),
+  ('Dave','Sales'),('Eve','Marketing'),('Frank','Engineering'),
+  ('Grace','Engineering'),('Hana','Engineering'),('Ivan','Sales'),
+  ('Jade','Sales'),('Kai','Sales'),('Lena','Marketing'),('Mark','Marketing'),
+  ('Nina','Support'),('Omar','Support'),('Pia','Support'),('Quinn','Support'),
+  ('Rosa','Engineering'),('Sam','Engineering'),('Tara','Sales'),
+  ('Uri','Finance'),('Vera','Finance'),('Wes','Legal'),('Yara','Marketing');`}
   starterCode={`SELECT DISTINCT
   dept
 FROM
@@ -218,7 +237,27 @@ INSERT INTO books (title, author, year) VALUES
   ('The Pragmatic Programmer', 'Hunt & Thomas', 1999),
   ('Clean Code', 'Robert C. Martin', 2008),
   ('Refactoring', 'Martin Fowler', 2018),
-  ('SQL for Smarties', 'Joe Celko', 1995);`}
+  ('SQL for Smarties', 'Joe Celko', 1995),
+  ('The Mythical Man-Month', 'Fred Brooks', 1975),
+  ('Design Patterns', 'Gamma et al.', 1994),
+  ('Code Complete', 'Steve McConnell', 2004),
+  ('Working Effectively with Legacy Code', 'Michael Feathers', 2005),
+  ('Domain-Driven Design', 'Eric Evans', 2003),
+  ('Structure and Interpretation of Computer Programs', 'Abelson & Sussman', 1985),
+  ('The Art of Computer Programming', 'Donald Knuth', 1968),
+  ('Peopleware', 'DeMarco & Lister', 1987),
+  ('Test-Driven Development', 'Kent Beck', 2002),
+  ('Continuous Delivery', 'Humble & Farley', 2010),
+  ('Release It!', 'Michael Nygard', 2007),
+  ('The Phoenix Project', 'Kim et al.', 2013),
+  ('Accelerate', 'Forsgren et al.', 2018),
+  ('Designing Data-Intensive Applications', 'Martin Kleppmann', 2017),
+  ('Database Internals', 'Alex Petrov', 2019),
+  ('Site Reliability Engineering', 'Beyer et al.', 2016),
+  ('A Philosophy of Software Design', 'John Ousterhout', 2018),
+  ('The Unicorn Project', 'Gene Kim', 2019),
+  ('Software Engineering at Google', 'Winters et al.', 2020),
+  ('Fundamentals of Data Engineering', 'Reis & Housley', 2022);`}
   starterCode={`-- Return only the title and author columns:
 SELECT
 FROM
@@ -239,9 +278,9 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns all four books",
+      name: "Returns all 24 books",
       description: "One row per book.",
-      expectedRowCount: 4,
+      expectedRowCount: 24,
     },
     {
       id: "matches",
@@ -251,3 +290,8 @@ ORDER BY
     },
   ]}
 />
+
+Once that passes, you have the whole of `SELECT`: which columns, in
+what order, with or without duplicates. The next page adds the other
+half of every query you will ever write, choosing which **rows** come
+back.

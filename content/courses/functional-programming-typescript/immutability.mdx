@@ -49,6 +49,12 @@ This is the entire problem with mutation: **it leaks across
 boundaries that are invisible in the code**. The caller of
 `birthday` cannot tell from its signature that anything has changed.
 
+<Figure
+  slug="fp-immutability-cost-mutation-one-inline-cutout"
+  alt="Two benches sharing one tray, a hand at each altering it, and the block on it ending up wrong for both"
+  caption="Two holders of one mutable object is where the value quietly goes wrong."
+/>
+
 The immutable version is unambiguous:
 
 <CodeBlock
@@ -373,6 +379,9 @@ console.log("sorted2:", sorted2);
   ]}
 />
 
+`sort()` is the famous one, but it is not alone. JavaScript's `Date` is
+mutable too, and it catches people for the same reason:
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -402,12 +411,6 @@ The standard library is full of these traps. As a rule:
 - `Array#map`, `Array#filter`, `Array#slice`, `Array#concat`,
   `Array#flatMap`, `Array#toSorted`, `Array#toReversed`,
   `Array#toSpliced`, `Array#with`, **return new**
-
-<Figure
-  slug="fp-immutability-cost-mutation-one-inline-cutout"
-  alt="Two benches sharing one tray, a hand at each altering it, and the block on it ending up wrong for both"
-  caption="Two holders of one mutable object is where the value quietly goes wrong."
-/>
 
 When in doubt, prefer the new immutable variants (`toSorted()`,
 `toReversed()`, etc.) introduced in ES2023.

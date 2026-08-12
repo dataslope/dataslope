@@ -153,7 +153,7 @@ public final class Track {
 
   @Override
   public String toString() {
-    return "Track[" + "title=" + title + ", " + "artist=" + artist + ", " + "album=" + album + ", " + "genres=" + genres + ", " + "rating=" + rating + "]";
+    return "Track[title=" + title + ", artist=" + artist + ", album=" + album + ", genres=" + genres + ", rating=" + rating + "]";
   }
 }
 `,
@@ -258,8 +258,11 @@ That single class touches every major idea in the course:
   to combine two ordering criteria (Comparable & Comparator).
 - **Safe getters**, every returned collection is an unmodifiable
   view (Immutable Collections + Architecture).
-- **`record`-backed value objects** for `Track`, typed data, free
-  `equals()`/`hashCode()`/`toString` (Equality and Hashing).
+- **A value object** for `Track`, typed data with `equals()`,
+  `hashCode()` and `toString()` that agree with each other (Equality and
+  Hashing). On Java 16+ you would declare it `record Track(...) {}` and get
+  all three generated; the playground's Java 8 `javac` cannot, so it is
+  written out here.
 
 ## Test your understanding
 

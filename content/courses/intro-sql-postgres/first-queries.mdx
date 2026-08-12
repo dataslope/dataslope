@@ -115,9 +115,18 @@ Reading from it is just `SELECT` columns `FROM` the table:
   population INTEGER
 );
 INSERT INTO cities (name, country, population) VALUES
-  ('Tokyo',  'Japan',  37000000),
-  ('Lagos',  'Nigeria', 15000000),
-  ('Lima',   'Peru',    11000000);`}
+  ('Tokyo', 'Japan', 37000000), ('Delhi', 'India', 33000000),
+  ('Shanghai', 'China', 29000000), ('Dhaka', 'Bangladesh', 23000000),
+  ('Sao Paulo', 'Brazil', 22000000), ('Cairo', 'Egypt', 22000000),
+  ('Mexico City', 'Mexico', 22000000), ('Beijing', 'China', 22000000),
+  ('Mumbai', 'India', 21000000), ('Osaka', 'Japan', 19000000),
+  ('Karachi', 'Pakistan', 17000000), ('Lagos', 'Nigeria', 15000000),
+  ('Istanbul', 'Turkey', 15000000), ('Buenos Aires', 'Argentina', 15000000),
+  ('Kolkata', 'India', 15000000), ('Manila', 'Philippines', 14000000),
+  ('Guangzhou', 'China', 14000000), ('Rio de Janeiro', 'Brazil', 13000000),
+  ('Lahore', 'Pakistan', 13000000), ('Moscow', 'Russia', 12000000),
+  ('Kinshasa', 'DR Congo', 12000000), ('Lima', 'Peru', 11000000),
+  ('Bogota', 'Colombia', 11000000), ('Jakarta', 'Indonesia', 11000000);`}
   starterCode={`SELECT
   name,
   population

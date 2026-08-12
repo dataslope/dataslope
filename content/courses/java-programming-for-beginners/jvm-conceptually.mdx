@@ -28,6 +28,9 @@ machine that hosts it.
   caption="One bytecode program, one virtual machine, many different machines beneath."
 />
 
+Stacked up, the whole tower from your code down to the silicon looks
+like this:
+
 ```mermaid
 flowchart TB
     A[Your Java Program<br/>.class files / bytecode]
@@ -60,8 +63,10 @@ services to your program:
 <Figure
   slug="java-jvm-conceptually-virtual-machine-really-inline-cutout"
   alt="A machine drawn as a platform that sits on three different benches, the program on top unchanged"
-  caption="The virtual machine is the layer that makes the same program run anywhere."
+  caption="Four services in one box, and your program only ever talks to the box."
 />
+
+Drawn as a single unit, with your bytecode arriving on one side:
 
 ```mermaid
 flowchart TD

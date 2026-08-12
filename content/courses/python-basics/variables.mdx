@@ -119,6 +119,9 @@ Python names have no fixed type. You can rebind a name to a value of any type at
   caption="A name takes any type, so a mismatch only shows up where the value is used."
 />
 
+Names in Python carry no type of their own. The **value** has the type,
+and you can ask any value what it is:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -130,6 +133,9 @@ print(type(value))
     },
   ]}
 />
+
+Which means rebinding a name to a different kind of value is perfectly
+legal:
 
 <CodeBlock
   adapter="python"
@@ -143,6 +149,11 @@ print(type(value))
     },
   ]}
 />
+
+It is legal for containers too. Legal is not the same as wise: code
+where one name holds three different kinds of thing is hard to follow,
+and discouraging exactly that is what the type annotations below are
+for.
 
 <CodeBlock
   adapter="python"
@@ -167,7 +178,7 @@ user_id: int = 123
 name: str = "Ada"
 ```
 
-These don't affect runtime behavior, but tools like `mypy` can check your code for type errors before you run it. In production codebases, type annotations are increasingly the norm-they catch bugs early and make code easier to understand.
+These don't affect runtime behavior, but tools like `mypy` can check your code for type errors before you run it. In production codebases, type annotations are increasingly the norm; they catch bugs early and make code easier to understand.
 </Callout>
 
 ## Naming rules and conventions
@@ -225,6 +236,9 @@ print(a, b, c)
   ]}
 />
 
+Assignment also comes in a multiple form, which is how a function that
+returns several values gets read apart:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -237,6 +251,9 @@ print(x, y, z)
     },
   ]}
 />
+
+And the trick that unpacking makes possible, familiar to anyone who has
+written a sort by hand in another language:
 
 <CodeBlock
   adapter="python"

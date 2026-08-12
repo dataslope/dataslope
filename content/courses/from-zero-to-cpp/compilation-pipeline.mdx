@@ -129,13 +129,13 @@ unit, in order:
 5. **Optimizer**, fold constants, inline, vectorize.
 6. **Code generator**, IR to assembly.
 
+The result is a `.s` assembly file.
+
 <Figure
   slug="cpp-compilation-pipeline-four-step-pipeline-inline-cutout"
   alt="A card passing through four machines in a row, leaving each visibly changed"
-  caption="Preprocess, compile, assemble, link: four stages, each with its own output."
+  caption="Each pass hands its output to the next, and only the last one emits assembly."
 />
-
-The result is a `.s` assembly file.
 
 This is the stage where almost all of your *type errors* are caught.
 If you write

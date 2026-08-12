@@ -7,16 +7,16 @@ Lists are about *position*. Sets are about *presence*. Maps are about
 *association*. The last collection family is about **insertion and
 removal at the ends**:
 
-<Figure
-  slug="jcol-queues-deques-cutout"
-  alt="Queues and deques, an isometric illustration"
-/>
-
 - A **queue** is a one-ended pipe: things enter at the back, leave
   at the front. Think of a line at a coffee shop. (FIFO.)
 - A **deque** (pronounced *deck*) is a queue with two ends: you can
   add or remove at either side. Think of a deck of cards you can
   draw from either end.
+
+<Figure
+  slug="jcol-queues-deques-cutout"
+  alt="Queues and deques, an isometric illustration"
+/>
 
 ## The interfaces
 
@@ -337,7 +337,7 @@ public final class Task {
 
   @Override
   public String toString() {
-    return "Task[" + "name=" + name + ", " + "deadline=" + deadline + "]";
+    return "Task[name=" + name + ", deadline=" + deadline + "]";
   }
 }
 `,

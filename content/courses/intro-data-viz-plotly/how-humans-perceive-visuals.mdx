@@ -15,16 +15,17 @@ chart design is guesswork. With the theory, it becomes principled.
 
 ## Pre-attentive processing
 
-Three grids, one odd mark in each. Two of them you find without looking:
-
-<Chart slug="preattentive-popout" />
-
 Your visual system processes some properties of an image **before
 your conscious attention gets involved**. These properties are
 called **pre-attentive features**. Detecting them takes about
 *200 milliseconds*, and crucially, it is **independent of how many
 items are on screen**, you can spot one red dot among a thousand
 gray dots as fast as you can spot it among ten.
+
+Three grids below, one odd mark in each. Two of them you find without
+looking:
+
+<Chart slug="preattentive-popout" />
 
 <Figure
   slug="viz-how-humans-perceive-visuals-inline-cutout"
@@ -55,8 +56,6 @@ ones most relevant to data visualization:
 
 ## The Cleveland-McGill ranking
 
-<Chart slug="encoding-accuracy" />
-
 In a famous 1984 study, **William Cleveland and Robert McGill**
 asked: *which visual properties let people compare quantities most
 accurately?* They ran experiments and produced a ranking, from
@@ -72,6 +71,8 @@ most accurate to least accurate, for *quantitative* comparisons:
 
 This ranking has been replicated many times and is the *empirical
 backbone* of modern visualization theory.
+
+<Chart slug="encoding-accuracy" />
 
 Several practical conclusions fall out immediately:
 
@@ -160,12 +161,12 @@ What color is *bad* for:
 - **More than ~7 categorical colors.** After ~7, the eye starts
   confusing similar shades.
 
-## Accessibility: not everyone sees color the same way
-
-Before the question of *which* colors, there is the question of how many. Past
-the size of the palette, a library does not warn you, it starts again:
+That last one has a hard edge worth seeing. Past the size of the palette a
+library does not warn you, it starts the colors again:
 
 <Chart slug="color-category-limit" />
+
+## Accessibility: not everyone sees color the same way
 
 About **8% of men and 0.5% of women** have some form of color
 vision deficiency. The most common is red-green confusion. If your

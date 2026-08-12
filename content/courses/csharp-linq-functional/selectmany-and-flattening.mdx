@@ -8,13 +8,13 @@ each element to a *sequence* of things, and then flattens the result
 into one sequence. It is the answer to a question that comes up
 constantly in real data:
 
+> *I have a list of things, each of which has a list inside it.
+> How do I get one flat list out?*
+
 <Figure
   slug="cs-selectmany-flattening-cutout"
   alt="SelectMany and flattening, an isometric illustration"
 />
-
-> *I have a list of things, each of which has a list inside it.
-> How do I get one flat list out?*
 
 That question is everywhere, orders with line items, blog posts
 with tags, departments with employees, files with lines, paragraphs
@@ -113,11 +113,6 @@ different operator, different shape of result.
 
 ## Keeping the parent context
 
-Flattening multiplies rows, which is fine until something downstream sums
-a value from the parent side:
-
-<Chart slug="join-fanout-rows" />
-
 A subtle and common case: you want to flatten, *but you also want to
 know which parent each child came from*. `SelectMany()` has a two-arg
 overload for exactly this.
@@ -155,6 +150,11 @@ This is the LINQ equivalent of a SQL `JOIN` between a parent table
 and its rows. We will see the same shape again with `Join()` and
 `GroupJoin` later, but `SelectMany()` covers the common case more
 naturally.
+
+It carries one hazard worth knowing. Flattening multiplies rows, which is
+fine until something downstream sums a value from the parent side:
+
+<Chart slug="join-fanout-rows" />
 
 ## Splitting strings, words, characters
 

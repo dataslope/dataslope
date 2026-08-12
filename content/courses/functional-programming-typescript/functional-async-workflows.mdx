@@ -79,16 +79,16 @@ const program: Task<string> = chain(of(1), (n) =>
 The familiar trio appears again: `of`, `map()`, `chain()`. The exact
 same patterns you used for `Option` and `Result` apply to `Task`.
 
+<Figure
+  slug="fp-functional-async-workflows-tasks-their-three-inline-cutout"
+  alt="Three kettles started together with three small tools hanging above them, one to start, one to chain, one to gather"
+  caption="Three operators carry all of it: one to start, one to chain, one to gather."
+/>
+
 ## Running tasks in parallel vs sequence
 
 For independent tasks, you want **applicative** behavior: run them
 in parallel, combine their results.
-
-<Figure
-  slug="fp-functional-async-workflows-tasks-their-three-inline-cutout"
-  alt="Three kettles started together with three small tools hanging above them, one to start, one to chain, one to gather"
-  caption="Independent tasks can start together and be gathered when they finish."
-/>
 
 <CodeBlock
   adapter="typescript"
@@ -139,6 +139,12 @@ saw before, applied to asynchrony. `sequence` corresponds to
 *monadic* chaining (each step waits for the previous);
 `parallel` corresponds to *applicative* combining (independent
 steps in parallel).
+
+<Figure
+  slug="fp-functional-async-workflows-inline-cutout"
+  alt="Several slow kettles started at once along a bench, their results collected into one tray as each finishes"
+  caption="Parallel work is collected into one result as each piece completes."
+/>
 
 ## Tasks that can fail: `TaskResult<E, A>`
 
@@ -234,12 +240,6 @@ const loadDashboard = (uid: string) =>
 The functional version reads as one long sequence of "and then",
 the error handling has been *moved out of the code's body* into
 the structure of the type itself.
-
-<Figure
-  slug="fp-functional-async-workflows-inline-cutout"
-  alt="Several slow kettles started at once along a bench, their results collected into one tray as each finishes"
-  caption="Parallel work is collected into one result as each piece completes."
-/>
 
 ## A small multi-file challenge
 

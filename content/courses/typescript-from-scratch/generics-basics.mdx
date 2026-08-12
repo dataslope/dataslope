@@ -35,6 +35,11 @@ Without generics, you face a painful trade-off:
 1. **Concrete types:** Write `identityNumber(x: number): number` and `identityString(x: string): string`. This is type-safe but not reusable, you need a separate function for every type.
 2. **`any` escape hatch:** Write `identity(x: any): any`. This is reusable but not type-safe, the compiler can't help you anymore.
 
+The cost of option 1 is combinatorial, which is easy to miss when the union
+has two members and impossible to miss when a colleague adds a third:
+
+<Chart slug="types-vs-overloads" />
+
 Generics give you the best of both worlds: one function, full type safety, and the compiler **infers** the type parameter based on what you pass in.
 
 <Figure
@@ -43,10 +48,8 @@ Generics give you the best of both worlds: one function, full type safety, and t
   caption="One generic container works for any element type, with the type still checked."
 />
 
-The cost of option 1 is combinatorial, which is easy to miss when the union
-has two members and impossible to miss when a colleague adds a third:
-
-<Chart slug="types-vs-overloads" />
+Here are both halves side by side, the `any` version that forgets and the
+generic version that remembers:
 
 <CodeBlock
   adapter="typescript"
@@ -477,7 +480,7 @@ console.log(\`String: \${stringContainer.get()}\`);
   ]}
 />
 
-## Multiple choice check
+## Check your understanding
 
 <MultipleChoice
   markdown={`Given this generic function:

@@ -135,10 +135,48 @@ CREATE TABLE user_profiles (
 
 INSERT INTO users (email) VALUES
   ('ada@example.com'),
-  ('grace@example.com');
+  ('grace@example.com'),
+  ('linus@example.com'),
+  ('mae@example.com'),
+  ('rosa@example.com'),
+  ('ivan@example.com'),
+  ('nadia@example.com'),
+  ('omar@example.com'),
+  ('priya@example.com'),
+  ('quinn@example.com'),
+  ('ruth@example.com'),
+  ('sam@example.com'),
+  ('tariq@example.com'),
+  ('uma@example.com'),
+  ('viktor@example.com'),
+  ('wen@example.com'),
+  ('xenia@example.com'),
+  ('yusuf@example.com'),
+  ('zara@example.com'),
+  ('bruno@example.com'),
+  ('chidi@example.com'),
+  ('dara@example.com'),
+  ('elif@example.com'),
+  ('farid@example.com');
 
+-- Only some users have filled in a profile, which is exactly why the
+-- optional side lives in its own table.
 INSERT INTO user_profiles (user_id, display_name, bio) VALUES
-  (1, 'Ada', 'Enjoys careful schema design.');`}
+  (1, 'Ada', 'Profile for Ada.'),
+  (2, 'Grace', 'Profile for Grace.'),
+  (4, 'Mae', 'Profile for Mae.'),
+  (5, 'Rosa', 'Profile for Rosa.'),
+  (7, 'Nadia', 'Profile for Nadia.'),
+  (9, 'Priya', 'Profile for Priya.'),
+  (10, 'Quinn', 'Profile for Quinn.'),
+  (12, 'Sam', 'Profile for Sam.'),
+  (14, 'Uma', 'Profile for Uma.'),
+  (15, 'Viktor', 'Profile for Viktor.'),
+  (17, 'Xenia', 'Profile for Xenia.'),
+  (19, 'Zara', 'Profile for Zara.'),
+  (20, 'Bruno', 'Profile for Bruno.'),
+  (22, 'Dara', 'Profile for Dara.'),
+  (24, 'Farid', 'Profile for Farid.');`}
   starterCode={`SELECT
   u.email,
   p.display_name,

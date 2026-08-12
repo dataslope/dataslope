@@ -39,6 +39,12 @@ that runs first. It groups the rows by `class`, **counts** them, and
 produces a new computed variable, `count`. *That* becomes the bar
 height. The geom draws bars; the stat invented the y-values.
 
+<Figure
+  slug="gg-every-geom-has-a-stat-inline-cutout"
+  alt="A hopper of loose chips feeding a small counting machine, and the counted result leaving it as a row of bars"
+  caption="The bars have heights because a statistic counted the rows first."
+/>
+
 ## The layer pipeline
 
 Every layer is really **data → stat → geom**. The stat sits between
@@ -99,12 +105,6 @@ ggplot(sales, aes(product, revenue)) +
 `,
     },
   ]}
-/>
-
-<Figure
-  slug="gg-every-geom-has-a-stat-inline-cutout"
-  alt="A hopper of loose chips feeding a small counting machine, and the counted result leaving it as a row of bars"
-  caption="The bars have heights because a statistic counted the rows first."
 />
 
 ## Computed variables: the after-stat values

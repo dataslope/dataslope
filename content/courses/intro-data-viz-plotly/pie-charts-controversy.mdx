@@ -150,26 +150,18 @@ the dominant category is clear. A pie works.
 
 ## When are pies *bad*?
 
-Slice count is what kills most of them. The same total, split three
-ways, six ways and eleven:
-
-<Chart slug="pie-slice-count" />
-
 - **Many slices** (more than ~5).
 - **Slices of similar size** (humans can't rank similar angles).
 - **Comparing two pies** (a famously hopeless task).
 - **3-D pies**, **exploded pies**, **donut-with-icon pies**, any
   decoration that makes it harder to read the angles.
 
+Slice count is what kills most of them. Here is the same total, split three
+ways, six ways and eleven:
+
+<Chart slug="pie-slice-count" />
+
 ## Better alternatives
-
-The objection is not aesthetic. A pie asks you to compare angles, and a
-stacked bar asks the same question in a different costume: every segment
-after the first starts somewhere different. Sorted bars share one baseline:
-
-<Chart slug="share-stacked" />
-
-<Chart slug="share-sorted" />
 
 When a pie isn't a good fit, the alternatives are almost always:
 
@@ -177,6 +169,17 @@ When a pie isn't a good fit, the alternatives are almost always:
 - **Stacked bar chart** (single tall bar), for parts-of-a-whole
   with named segments.
 - **Treemap**, for nested hierarchies.
+
+The objection is not aesthetic. A pie asks you to compare angles, and a
+stacked bar asks the same question in a different costume: every segment
+after the first starts somewhere different.
+
+<Chart slug="share-stacked" />
+
+Sorted bars share one baseline, so the same six numbers become a ranking you
+read rather than one you estimate:
+
+<Chart slug="share-sorted" />
 
 <CodeBlock
   adapter="python"

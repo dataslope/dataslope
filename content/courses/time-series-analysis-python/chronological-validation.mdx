@@ -41,6 +41,12 @@ testing is in the future:
 | **Random / k-fold** (wrong) | train | `TEST` | train | `TEST` | train |
 | **Chronological** (right) | train | train | train | `TEST` | `TEST` |
 
+<Figure
+  slug="tsa-chronological-validation-cardinal-sin-random-inline-cutout"
+  alt="A timeline being shuffled like cards, a large cross drawn over the shuffled pile"
+  caption="Shuffling is the one move a time series forbids."
+/>
+
 Let's *measure* the leakage. We'll take a smooth-ish series and "predict"
 held-out points two ways: a random hold-out (where each test point still has
 neighbours on **both** sides inside the training set) versus a chronological
@@ -195,12 +201,6 @@ estimate is noisy. Maybe that particular tail happened to be easy or hard.
 *many* successive cut-off points and averages the skill. The iron rule holds
 in every fold: **train is always strictly before test.**
 
-<Figure
-  slug="tsa-chronological-validation-cardinal-sin-random-inline-cutout"
-  alt="A timeline being shuffled like cards, a large cross drawn over the shuffled pile"
-  caption="Shuffling is the one move a time series forbids."
-/>
-
 | Fold | Train (the past) | Test (the future) |
 | --- | --- | --- |
 | 1 | months 1–60 | months 61–72 |
@@ -293,12 +293,15 @@ The essential property is temporal: train strictly precedes test in every fold, 
 
 <Chart slug="timeseries-cv-splits" />
 
-The model gets to see the future, and it does not need to be clever to use it:
-any autocorrelated series lets a model interpolate a held-out month from its
-neighbours, which is a far easier problem than forecasting and produces a
-score that will not survive deployment. A rolling window of fixed length is
-the third option, dropping the oldest data rather than accumulating it, and is
-right when the process itself changes.
+In the top block, most of each fold's training data lies *after* its own test
+months. The model gets to see the future, and it does not need to be clever to
+use it: any autocorrelated series lets a model interpolate a held-out month
+from its neighbours, which is a far easier problem than forecasting and
+produces a score that will not survive deployment.
+
+The lower block is the expanding window from the table above. A rolling window
+of fixed length is the third option, dropping the oldest data rather than
+accumulating it, and is right when the process itself changes.
 
 The backtest costs two things worth naming: the earliest folds train on very
 little, and the training size varies across folds, so the fold scores are not

@@ -60,6 +60,12 @@ public class Dog : Animal // "Dog : Animal" reads "Dog inherits from Animal"
 `Dog` doesn't have to re-implement `Name` or `Eat`. They come "for
 free" because every `Dog` *is* an `Animal`.
 
+<Figure
+  slug="mcs-inheritance-and-polymorphism-inheritance-basic-mechanics-inline-cutout"
+  alt="A base cabinet with one cabinet behind it built on the same frame with one extra drawer"
+  caption="A derived class keeps the base frame and adds what it needs."
+/>
+
 ## A class hierarchy as a picture
 
 ```mermaid
@@ -257,12 +263,6 @@ relationship. A better rule:
 - Use **inheritance** when the relationship is genuinely "is-a"
   and the subclass extends the base in a substitutable way.
 - Use **composition** ("has-a") when one class merely uses another.
-
-<Figure
-  slug="mcs-inheritance-and-polymorphism-inheritance-basic-mechanics-inline-cutout"
-  alt="A base cabinet with one cabinet behind it built on the same frame with one extra drawer"
-  caption="A derived class keeps the base frame and adds what it needs."
-/>
 
 A `Car` *has* an `Engine`, it isn't *a kind of* `Engine`. So
 `Car` should hold a field of type `Engine`, not inherit from it.

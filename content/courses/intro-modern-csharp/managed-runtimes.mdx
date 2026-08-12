@@ -90,6 +90,11 @@ sweep of the youngest objects costs almost nothing.
 
 <Chart slug="object-lifetime-survival" />
 
+That shape is why .NET's collector is *generational*: it checks the
+newest objects often and cheaply, and only rarely bothers walking the
+survivors. The practical consequence for you is that short-lived
+allocations are far less expensive than they sound.
+
 <CodeBlock
   adapter="csharp"
   files={[

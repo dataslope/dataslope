@@ -57,18 +57,18 @@ A single function call:
 - Produces a legend.
 - Returns an interactive figure.
 
+<Figure
+  slug="pandas-visualization-basics-hello-plotly-express-inline-cutout"
+  alt="A bare board and one short instruction card, a row of bars appearing on the board in a single stroke"
+  caption="One line of Plotly Express turns a column into a chart you can read."
+/>
+
 ## Histograms, see a distribution
 
 The one thing to know before drawing one: the bin width is your choice, and
 it changes the answer:
 
 <Chart slug="histogram-bin-width" />
-
-<Figure
-  slug="pandas-visualization-basics-hello-plotly-express-inline-cutout"
-  alt="A bare board and one short instruction card, a row of bars appearing on the board in a single stroke"
-  caption="One line of Plotly Express turns a column into a chart you can read."
-/>
 
 <CodeBlock
   adapter="python"
@@ -288,17 +288,7 @@ The same trap catches a single column, where the summary is the three numbers
 
 ## How visualizations can mislead
 
-The first one on the list, drawn. Five scores within five points of each
-other, from zero and then on a cropped axis:
-
-<Chart slug="bar-truncation" />
-
-<Chart slug="bar-truncation-cropped" />
-
-And the second: the same data can favour one group in every subgroup and the
-other overall.
-
-<Chart slug="simpsons-paradox" />
+Six ways a chart can tell a story the data does not support:
 
 - **Truncated y-axes** that make 5% changes look like 50%.
 - **Inappropriate aggregation** that hides subgroups (Simpson's
@@ -308,6 +298,18 @@ other overall.
 - **Misleading color scales** (rainbow, non-perceptually
   uniform).
 - **Pie charts with too many slices**.
+
+The first one, drawn. Five scores within five points of each other, from
+zero and then on a cropped axis:
+
+<Chart slug="bar-truncation" />
+
+<Chart slug="bar-truncation-cropped" />
+
+And the second: the same data can favour one group in every subgroup and the
+other overall.
+
+<Chart slug="simpsons-paradox" />
 
 Cherry-picking is the one that is hardest to catch, because nothing on
 the chart is false. Ten years going nowhere, and the four months

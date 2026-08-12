@@ -54,10 +54,8 @@ not doing it wrong. This *is* the job.
 
 ## A four-step debugging loop
 
-The loop is worth running early, because when a bug is found decides most
-of what it costs:
-
-<Chart slug="bug-cost-by-stage" />
+Everything else on this page is a technique. This is the shape those
+techniques fit into:
 
 ```mermaid
 flowchart TD
@@ -76,6 +74,20 @@ step 1.
   alt="Four footplates in a ring around a stopped machine, a figure stepping round them in order"
   caption="Reproduce, locate, fix, verify, and round again if it is still wrong."
 />
+
+It is worth running this loop *early*, because the moment a bug is
+caught decides most of what it costs. The same defect is a few
+seconds of work in your editor and a genuinely expensive incident
+once it is live:
+
+<Chart slug="bug-cost-by-stage" />
+
+Notice the scale on that axis: it is logarithmic, so the rise is far
+steeper than it looks. That single fact is the argument behind almost
+every engineering practice you will be asked to follow later, the
+compiler's fussiness, code review, automated tests, staging
+environments. None of them find bugs *better* than you would in
+production. They find them *sooner*.
 
 ## Reading a stack trace
 

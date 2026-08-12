@@ -26,6 +26,10 @@ function in `<string.h>` becomes a loaded gun.
 
 ## Null-terminated character arrays
 
+C has no string type. It has arrays of `char`, and a convention: the
+string ends at the first zero byte. The five-letter word `Hello`
+therefore occupies six bytes:
+
 ```mermaid
 flowchart TD
     A["'H'"] --> B["'e'"] --> C["'l'"] --> D["'l'"] --> E["'o'"] --> F["'\\0'"]

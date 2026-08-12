@@ -52,7 +52,27 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Ada', '555-0101', 10),
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
-  ('Mae', '555-0104', 25);`}
+  ('Mae', '555-0104', 25),
+  ('Rosa', '555-0105', 40),
+  ('Ivan', NULL, 15),
+  ('Nadia', '555-0107', NULL),
+  ('Omar', '555-0108', 5),
+  ('Priya', NULL, NULL),
+  ('Quinn', '555-0110', 60),
+  ('Ruth', '', 12),
+  ('Sam', '555-0112', 0),
+  ('Tariq', NULL, 30),
+  ('Uma', '555-0114', 18),
+  ('Viktor', '555-0115', NULL),
+  ('Wen', NULL, 22),
+  ('Xenia', '555-0117', 45),
+  ('Yusuf', '555-0118', 8),
+  ('Zara', NULL, 0),
+  ('Bruno', '555-0120', 33),
+  ('Chidi', '555-0121', NULL),
+  ('Dara', '', 27),
+  ('Elif', '555-0123', 50),
+  ('Farid', NULL, 14);`}
   starterCode={`SELECT
   name,
   phone,
@@ -61,8 +81,12 @@ FROM
   contacts;`}
 />
 
-The blank-looking cells may not all mean the same thing. A `NULL` value
-means SQLite does not have a known value for that cell.
+Scroll through the 24 rows and look at the blank-looking cells: they do
+not all mean the same thing. Grace's phone is `NULL`, so SQLite has no
+known value for it. Linus's phone is an empty string, which is a known
+value that happens to contain no characters. On screen they look
+identical, and that is exactly what makes `NULL` worth a lesson of its
+own.
 
 <MultipleChoice
   markdown={`What does NULL mean in SQL?
@@ -95,7 +119,27 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Ada', '555-0101', 10),
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
-  ('Mae', '555-0104', 25);`}
+  ('Mae', '555-0104', 25),
+  ('Rosa', '555-0105', 40),
+  ('Ivan', NULL, 15),
+  ('Nadia', '555-0107', NULL),
+  ('Omar', '555-0108', 5),
+  ('Priya', NULL, NULL),
+  ('Quinn', '555-0110', 60),
+  ('Ruth', '', 12),
+  ('Sam', '555-0112', 0),
+  ('Tariq', NULL, 30),
+  ('Uma', '555-0114', 18),
+  ('Viktor', '555-0115', NULL),
+  ('Wen', NULL, 22),
+  ('Xenia', '555-0117', 45),
+  ('Yusuf', '555-0118', 8),
+  ('Zara', NULL, 0),
+  ('Bruno', '555-0120', 33),
+  ('Chidi', '555-0121', NULL),
+  ('Dara', '', 27),
+  ('Elif', '555-0123', 50),
+  ('Farid', NULL, 14);`}
   starterCode={`SELECT
   name,
   phone
@@ -104,6 +148,10 @@ FROM
 WHERE
   phone IS NULL;`}
 />
+
+Seven contacts come back. Flip the test to `IS NOT NULL` and you get
+the other seventeen, which is the useful sanity check: the two results
+should always add up to the whole table.
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -118,7 +166,27 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Ada', '555-0101', 10),
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
-  ('Mae', '555-0104', 25);`}
+  ('Mae', '555-0104', 25),
+  ('Rosa', '555-0105', 40),
+  ('Ivan', NULL, 15),
+  ('Nadia', '555-0107', NULL),
+  ('Omar', '555-0108', 5),
+  ('Priya', NULL, NULL),
+  ('Quinn', '555-0110', 60),
+  ('Ruth', '', 12),
+  ('Sam', '555-0112', 0),
+  ('Tariq', NULL, 30),
+  ('Uma', '555-0114', 18),
+  ('Viktor', '555-0115', NULL),
+  ('Wen', NULL, 22),
+  ('Xenia', '555-0117', 45),
+  ('Yusuf', '555-0118', 8),
+  ('Zara', NULL, 0),
+  ('Bruno', '555-0120', 33),
+  ('Chidi', '555-0121', NULL),
+  ('Dara', '', 27),
+  ('Elif', '555-0123', 50),
+  ('Farid', NULL, 14);`}
   starterCode={`SELECT
   name,
   phone
@@ -128,8 +196,11 @@ WHERE
   phone IS NOT NULL;`}
 />
 
-Notice that `IS NOT NULL` includes Linus, whose phone is an empty string.
-That cell has a known value, even though the value is blank text.
+Notice that `IS NOT NULL` includes Linus, Ruth, and Dara, whose phones
+are empty strings. Those cells hold a known value, even though the value
+is blank text, so they belong on the "present" side of the split. If you
+wanted to exclude them too, you would need `phone IS NOT NULL AND phone
+<> ''`.
 
 <Callout type="warning" title="Do not write = NULL">
 `WHERE phone = NULL` is a classic mistake. It does not find missing
@@ -244,7 +315,27 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Ada', '555-0101', 10),
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
-  ('Mae', '555-0104', 25);`}
+  ('Mae', '555-0104', 25),
+  ('Rosa', '555-0105', 40),
+  ('Ivan', NULL, 15),
+  ('Nadia', '555-0107', NULL),
+  ('Omar', '555-0108', 5),
+  ('Priya', NULL, NULL),
+  ('Quinn', '555-0110', 60),
+  ('Ruth', '', 12),
+  ('Sam', '555-0112', 0),
+  ('Tariq', NULL, 30),
+  ('Uma', '555-0114', 18),
+  ('Viktor', '555-0115', NULL),
+  ('Wen', NULL, 22),
+  ('Xenia', '555-0117', 45),
+  ('Yusuf', '555-0118', 8),
+  ('Zara', NULL, 0),
+  ('Bruno', '555-0120', 33),
+  ('Chidi', '555-0121', NULL),
+  ('Dara', '', 27),
+  ('Elif', '555-0123', 50),
+  ('Farid', NULL, 14);`}
   starterCode={`SELECT
   name,
   reward_points,
@@ -253,7 +344,11 @@ FROM
   contacts;`}
 />
 
-Linus has `NULL` reward points, so adding 5 still gives `NULL`.
+Five contacts (Linus, Nadia, Priya, Viktor, and Chidi) have `NULL`
+reward points, so adding 5 still gives `NULL` for each of them. Compare
+those rows with Grace and Sam, whose reward points are a genuine `0`:
+their bonus arithmetic works fine and produces 5. That is the whole
+difference between "no points" and "we do not know."
 
 ## Use COALESCE for fallback values
 
@@ -274,7 +369,27 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Ada', '555-0101', 10),
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
-  ('Mae', '555-0104', 25);`}
+  ('Mae', '555-0104', 25),
+  ('Rosa', '555-0105', 40),
+  ('Ivan', NULL, 15),
+  ('Nadia', '555-0107', NULL),
+  ('Omar', '555-0108', 5),
+  ('Priya', NULL, NULL),
+  ('Quinn', '555-0110', 60),
+  ('Ruth', '', 12),
+  ('Sam', '555-0112', 0),
+  ('Tariq', NULL, 30),
+  ('Uma', '555-0114', 18),
+  ('Viktor', '555-0115', NULL),
+  ('Wen', NULL, 22),
+  ('Xenia', '555-0117', 45),
+  ('Yusuf', '555-0118', 8),
+  ('Zara', NULL, 0),
+  ('Bruno', '555-0120', 33),
+  ('Chidi', '555-0121', NULL),
+  ('Dara', '', 27),
+  ('Elif', '555-0123', 50),
+  ('Farid', NULL, 14);`}
   starterCode={`SELECT
   name,
   COALESCE(phone, 'No phone on file') AS phone_display
@@ -298,7 +413,27 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Ada', '555-0101', 10),
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
-  ('Mae', '555-0104', 25);`}
+  ('Mae', '555-0104', 25),
+  ('Rosa', '555-0105', 40),
+  ('Ivan', NULL, 15),
+  ('Nadia', '555-0107', NULL),
+  ('Omar', '555-0108', 5),
+  ('Priya', NULL, NULL),
+  ('Quinn', '555-0110', 60),
+  ('Ruth', '', 12),
+  ('Sam', '555-0112', 0),
+  ('Tariq', NULL, 30),
+  ('Uma', '555-0114', 18),
+  ('Viktor', '555-0115', NULL),
+  ('Wen', NULL, 22),
+  ('Xenia', '555-0117', 45),
+  ('Yusuf', '555-0118', 8),
+  ('Zara', NULL, 0),
+  ('Bruno', '555-0120', 33),
+  ('Chidi', '555-0121', NULL),
+  ('Dara', '', 27),
+  ('Elif', '555-0123', 50),
+  ('Farid', NULL, 14);`}
   starterCode={`SELECT
   name,
   reward_points,
@@ -330,7 +465,27 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Ada', '555-0101', 10),
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
-  ('Mae', '555-0104', 25);`}
+  ('Mae', '555-0104', 25),
+  ('Rosa', '555-0105', 40),
+  ('Ivan', NULL, 15),
+  ('Nadia', '555-0107', NULL),
+  ('Omar', '555-0108', 5),
+  ('Priya', NULL, NULL),
+  ('Quinn', '555-0110', 60),
+  ('Ruth', '', 12),
+  ('Sam', '555-0112', 0),
+  ('Tariq', NULL, 30),
+  ('Uma', '555-0114', 18),
+  ('Viktor', '555-0115', NULL),
+  ('Wen', NULL, 22),
+  ('Xenia', '555-0117', 45),
+  ('Yusuf', '555-0118', 8),
+  ('Zara', NULL, 0),
+  ('Bruno', '555-0120', 33),
+  ('Chidi', '555-0121', NULL),
+  ('Dara', '', 27),
+  ('Elif', '555-0123', 50),
+  ('Farid', NULL, 14);`}
   starterCode={`SELECT
   name,
   IFNULL(phone, 'No phone on file') AS phone_display

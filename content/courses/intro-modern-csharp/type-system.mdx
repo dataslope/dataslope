@@ -92,6 +92,11 @@ the question is always whether the thing you are counting fits under it:
 
 <Chart slug="integer-type-ranges" />
 
+For everyday code the rule that falls out of this is short: use `int`,
+and switch to `long` the moment you are counting something the world
+might have more than two billion of. Money stays the exception to
+both, `decimal`, for the rounding reasons the last chapter showed.
+
 ## Type conversions
 
 Sometimes you really do need to turn one type into another. C# has

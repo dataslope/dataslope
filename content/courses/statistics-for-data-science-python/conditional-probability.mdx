@@ -181,24 +181,6 @@ shows the conditional distribution and hides how many observations are behind
 each one. A mosaic shows the joint distribution, which is what a contingency
 table is, and the flat divider is a chi-squared test you can run with your eye.
 
-The same rule is what separates two sentences that sound identical and differ
-by four orders of magnitude:
-
-<Chart slug="prosecutors-fallacy" />
-
-Same test, same false-positive rate, opposite conclusion, entirely because of
-how the suspect came to be tested. The identical error runs through medical
-screening, fraud detection and every alerting system with a low base rate.
-
-The true sentence is that the chance of this match if the defendant is
-innocent is one in ten thousand. The fallacy is reading it backwards, as the
-chance the defendant is innocent *given* the match, and those are different
-conditionals that Bayes's rule exists to separate. In the wide pool that rate
-produces about a hundred innocent matches alongside the one real one, so the
-evidence is genuinely strong, having moved the field from one in a million to
-one in 101, and it is nowhere near proof. What decides which it is is the
-prior, and the prior is the part the courtroom version drops.
-
 ## Bayes' rule: flipping the conditional
 
 Here's the trap that gives this whole topic its danger. **P(A | B)
@@ -232,6 +214,24 @@ The crucial ingredient is P(A), the **base rate**, how common A is
 *before* you saw any evidence. Ignore the base rate and you'll badly
 overestimate P(A | B). That single oversight is behind most
 real-world probability disasters.
+
+The classic demonstration is a courtroom. Two sentences that sound
+identical, and differ by four orders of magnitude:
+
+<Chart slug="prosecutors-fallacy" />
+
+Same test, same false-positive rate, opposite conclusion, entirely because of
+how the suspect came to be tested. The identical error runs through medical
+screening, fraud detection and every alerting system with a low base rate.
+
+The true sentence is that the chance of this match if the defendant is
+innocent is one in ten thousand. The fallacy is reading it backwards, as the
+chance the defendant is innocent *given* the match, and those are different
+conditionals that Bayes's rule exists to separate. In the wide pool that rate
+produces about a hundred innocent matches alongside the one real one, so the
+evidence is genuinely strong, having moved the field from one in a million to
+one in 101, and it is nowhere near proof. What decides which it is is the
+prior, and the prior is the part the courtroom version drops.
 
 <Callout type="danger" title="Misconception: P(A given B) equals P(B given A)">
 "99% of sick people test positive" does **not** mean "99% of positive
@@ -305,6 +305,10 @@ print("disease here, because the disease is rare. The base rate dominates.")
     },
   ]}
 />
+
+Roughly 9%, from a test that is 99% accurate. That number is surprising
+enough that it is worth checking by brute force rather than trusting the
+algebra: simulate two million people and count.
 
 <CodeBlock
   adapter="python"

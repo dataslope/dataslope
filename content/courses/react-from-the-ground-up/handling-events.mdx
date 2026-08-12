@@ -125,11 +125,28 @@ We'll lean on `event.target.value` in the next lesson on forms.
   caption="The handler is handed an event object describing what happened, and to what."
 />
 
-Some events fire far more often than you want to respond to them. Two
-standard fixes exist and they behave differently in a way the names do not
-make obvious.
+Some events fire far more often than you want to respond to them. A
+`keydown` handler that searches on every keystroke will fire ten times
+while someone types "marmot". Two standard fixes exist, and they behave
+differently in a way their names do not make obvious:
+
+- **Debounce** waits for the stream to go *quiet*, then fires once. Use
+  it for "tell me when they have finished typing." A long enough burst
+  postpones it indefinitely, which is the point and occasionally the
+  problem.
+- **Throttle** fires immediately and then at most once per interval, for
+  as long as events keep arriving. Use it for "keep up, but not too
+  often": scroll position, a drag, a progress bar.
+
+The chart runs both policies over the same two seconds of typing, so you
+can count the calls each one makes:
 
 <Chart slug="debounce-vs-throttle" />
+
+Debounce fires twice, once at the end of each burst. Throttle fires
+steadily throughout. Neither is more correct; they answer different
+questions, and picking the wrong one gives you either a handler that
+never runs during fast typing or one that runs far more than you meant.
 
 ## Lifting state up
 

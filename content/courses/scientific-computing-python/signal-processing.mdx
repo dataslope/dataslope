@@ -41,16 +41,9 @@ flowchart TD
 
 ## The Discrete Fourier Transform (and FFT)
 
-
 First, the constraint that decides whether the transform is telling you
 anything: sample below the Nyquist rate and a fast wave comes back as a
 slow one, fitting every sample exactly.
-
-<Figure
-  slug="scipy-signal-processing-discrete-fourier-transform-fft-inline-cutout"
-  alt="One wavering track fed into a prism and leaving as a row of separate bars, one bar much taller than the rest"
-  caption="The transform splits a signal into the frequencies it is made of, and one stands out."
-/>
 
 <Chart slug="aliasing-nyquist" />
 
@@ -64,6 +57,12 @@ A naive evaluation costs $O(N^2)$ multiplications. The **Fast
 Fourier Transform** computes the same result in $O(N \log N)$, a
 speed-up that turned spectral analysis from a research project
 into a routine operation.
+
+<Figure
+  slug="scipy-signal-processing-discrete-fourier-transform-fft-inline-cutout"
+  alt="One wavering track fed into a prism and leaving as a row of separate bars, one bar much taller than the rest"
+  caption="The transform splits a signal into the frequencies it is made of, and one stands out."
+/>
 
 <CodeBlock
   adapter="python"
@@ -210,6 +209,12 @@ When you want to *remove* unwanted frequencies, you design a
 filter. The most useful workhorse is the **Butterworth IIR
 filter**, applied with `sosfiltfilt` for zero-phase response.
 
+<Figure
+  slug="scipy-signal-processing-inline-cutout"
+  alt="A jagged wave passing through a boxed filter and leaving as a smooth wave of the same overall shape"
+  caption="A filter removes some frequencies and leaves the rest of the shape intact."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -256,12 +261,6 @@ Why **`sosfiltfilt`** instead of `lfilter`?
 Real signals change over time. A single FFT averages the whole
 duration; a **spectrogram** slides a windowed FFT along the signal
 to show how its frequency content evolves.
-
-<Figure
-  slug="scipy-signal-processing-inline-cutout"
-  alt="A jagged wave passing through a boxed filter and leaving as a smooth wave of the same overall shape"
-  caption="A filter removes some frequencies and leaves the rest of the shape intact."
-/>
 
 <CodeBlock
   adapter="python"

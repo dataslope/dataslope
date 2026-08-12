@@ -301,12 +301,8 @@ answer affects everything.
 
 ## Object lifecycle: from `new` to garbage collection
 
-An object is never only its fields. Every one carries a header the JVM
-uses for its identity hash, lock state and garbage-collection bookkeeping,
-which is why a million boxed integers cost several times what a million
-primitive ones do:
-
-<Chart slug="object-header-overhead" />
+Every object passes through the same few states between `new` and the
+moment its memory comes back:
 
 ```mermaid
 stateDiagram-v2
@@ -324,6 +320,13 @@ memory. This is one of Java's defining design choices. It removes a
 huge class of bugs (use-after-free, double-free, memory leaks from
 forgotten `free` calls) at the cost of a small amount of background
 work at runtime.
+
+The bookkeeping that makes this possible is not free. An object is never
+only its fields: each one carries a header the JVM uses for its identity
+hash, lock state and collection bookkeeping, which is why a million boxed
+integers cost several times what a million primitive ones do.
+
+<Chart slug="object-header-overhead" />
 
 ## A picture of an object graph
 

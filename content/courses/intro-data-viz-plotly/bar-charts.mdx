@@ -38,6 +38,12 @@ prefer a **line chart**. If you are showing a *distribution* of a
 single variable, prefer a **histogram**. Bar charts are for
 **comparing discrete categories**.
 
+<Figure
+  slug="viz-bar-charts-inline-cutout"
+  alt="A row of standing blocks of different heights on a common base rail, with one flat rule laid across their tops to compare them"
+  caption="Bars share a baseline, so the eye compares their lengths precisely."
+/>
+
 There is one common case where the answer is "not a bar chart": many
 categories whose values all sit in a narrow band.
 
@@ -214,12 +220,6 @@ bottom.
 When each "category" also has a *sub-category*, use **grouped bars**
 with `color="..."` and `barmode="group"`.
 
-<Figure
-  slug="viz-bar-charts-inline-cutout"
-  alt="A row of standing blocks of different heights on a common base rail, with one flat rule laid across their tops to compare them"
-  caption="Bars share a baseline, so the eye compares their lengths precisely."
-/>
-
 <CodeBlock
   adapter="python"
   files={[
@@ -343,7 +343,6 @@ And here is that crop, drawn:
 
 <Chart slug="bar-truncation-cropped" />
 
-
 The rule has an edge worth knowing, because "always start at zero" is often
 repeated as though it applied to every chart. It does not, and nothing about
 the axis differs between these two panels. The mark does:
@@ -363,10 +362,11 @@ Zero is mandatory when the mark's *length* is the value, and optional when it
 is not. Bars, columns and areas: zero. Lines, dots and slopes: whatever range
 shows the variation, labelled honestly.
 
-- **Truncating the y-axis baseline.** Bar lengths encode quantity
-  relative to *zero*. Cutting the axis (so bars start at 90
-  instead of 0) inflates small differences and is a classic
-  misleading-chart move.
+<Figure
+  slug="viz-bar-charts-reach-bar-chart-inline-cutout"
+  alt="Standing blocks of different heights over labelled trays, a straight rule laid across their tops"
+  caption="The common baseline is the whole point, which is why cutting it misleads."
+/>
 
 One more, specific to waterfalls. A waterfall is a bridge from one total to
 another: each bar begins where the last ended, and its direction says whether
@@ -384,16 +384,12 @@ that arrives positive because that is how the ledger stores it. The check
 takes five seconds: add the terms up yourself and see whether you land where
 the last bar says.
 
+The remaining mistakes are quicker to state:
+
 - **Sorting alphabetically when value order would be clearer.**
 - **Using a 3-D bar chart.** Just don't.
 - **Drawing 50 bars on one chart** when a horizontal layout, a
   filter, or a "top 10" would be more useful.
-
-<Figure
-  slug="viz-bar-charts-reach-bar-chart-inline-cutout"
-  alt="Standing blocks of different heights over labelled trays, a straight rule laid across their tops"
-  caption="The common baseline is the whole point, which is why cutting it misleads."
-/>
 
 ## Practice
 

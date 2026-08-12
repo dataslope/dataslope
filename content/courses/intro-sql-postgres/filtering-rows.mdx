@@ -43,11 +43,15 @@ flowchart TD
   salary NUMERIC
 );
 INSERT INTO employees (name, dept, salary) VALUES
-  ('Alice', 'Engineering', 120000),
-  ('Bob',   'Engineering',  95000),
-  ('Carol', 'Sales',        80000),
-  ('Dave',  'Sales',        72000),
-  ('Eve',   'Marketing',    68000);`}
+  ('Alice','Engineering',120000),('Bob','Engineering',95000),
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   name,
   dept,
@@ -84,7 +88,14 @@ You can compare with more than just equality:
 );
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
-  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   name,
   salary
@@ -113,7 +124,10 @@ So `'A%'` means "starts with A," `'%son'` means "ends with son," and
   id SERIAL PRIMARY KEY, name TEXT
 );
 INSERT INTO employees (name) VALUES
-  ('Alice'),('Bob'),('Carol'),('Dave'),('Eve');`}
+  ('Alice'),('Bob'),('Carol'),('Dave'),('Eve'),('Frank'),
+  ('Grace'),('Hana'),('Ivan'),('Jade'),('Kai'),('Lena'),
+  ('Mark'),('Nina'),('Omar'),('Pia'),('Quinn'),('Rosa'),
+  ('Sam'),('Tara'),('Uri'),('Vera'),('Wes'),('Yara');`}
   starterCode={`SELECT
   name
 FROM
@@ -137,7 +151,14 @@ Real questions often have several parts. Combine conditions with
 );
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
-  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   name,
   dept,
@@ -258,7 +279,27 @@ INSERT INTO books (title, author, year) VALUES
   ('The Pragmatic Programmer', 'Hunt & Thomas', 1999),
   ('Clean Code', 'Robert C. Martin', 2008),
   ('Refactoring', 'Martin Fowler', 2018),
-  ('SQL for Smarties', 'Joe Celko', 1995);`}
+  ('SQL for Smarties', 'Joe Celko', 1995),
+  ('The Mythical Man-Month', 'Fred Brooks', 1975),
+  ('Design Patterns', 'Gamma et al.', 1994),
+  ('Code Complete', 'Steve McConnell', 2004),
+  ('Working Effectively with Legacy Code', 'Michael Feathers', 2005),
+  ('Domain-Driven Design', 'Eric Evans', 2003),
+  ('Structure and Interpretation of Computer Programs', 'Abelson & Sussman', 1985),
+  ('The Art of Computer Programming', 'Donald Knuth', 1968),
+  ('Peopleware', 'DeMarco & Lister', 1987),
+  ('Test-Driven Development', 'Kent Beck', 2002),
+  ('Continuous Delivery', 'Humble & Farley', 2010),
+  ('Release It!', 'Michael Nygard', 2007),
+  ('The Phoenix Project', 'Kim et al.', 2013),
+  ('Accelerate', 'Forsgren et al.', 2018),
+  ('Designing Data-Intensive Applications', 'Martin Kleppmann', 2017),
+  ('Database Internals', 'Alex Petrov', 2019),
+  ('Site Reliability Engineering', 'Beyer et al.', 2016),
+  ('A Philosophy of Software Design', 'John Ousterhout', 2018),
+  ('The Unicorn Project', 'Gene Kim', 2019),
+  ('Software Engineering at Google', 'Winters et al.', 2020),
+  ('Fundamentals of Data Engineering', 'Reis & Housley', 2022);`}
   starterCode={`-- Keep only the books from before 2000:
 SELECT
   title,
@@ -284,9 +325,9 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns two books",
+      name: "Returns seven books",
       description: "Only the titles from before 2000.",
-      expectedRowCount: 2,
+      expectedRowCount: 7,
     },
     {
       id: "matches",
@@ -296,3 +337,8 @@ ORDER BY
     },
   ]}
 />
+
+That is `WHERE` in full: a test per row, combined with `AND`, `OR` and
+`NOT`, with `BETWEEN`, `IN` and `LIKE` as shorthands for the three most
+common shapes. Next you will put the surviving rows in a deliberate
+order.

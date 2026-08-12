@@ -19,13 +19,13 @@ are aggregate questions, and they are the heart of reporting.
 Worth carrying through the whole page: an aggregate is a number standing in
 for a column, and identical aggregates can come from very different columns.
 
+<Chart slug="bar-hides-distribution" />
+
 <Figure
   slug="sql-aggregate-functions-from-many-rows-inline-cutout"
   alt="A tall column of chips tipped into a funnel and leaving as one block on the tray below"
   caption="An aggregate collapses a whole column into one number."
 />
-
-<Chart slug="bar-hides-distribution" />
 
 ```mermaid
 flowchart TD
@@ -56,7 +56,14 @@ with a single number, the whole table collapsed to a count:
 );
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
-  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   COUNT(*) AS employee_count
 FROM
@@ -76,7 +83,14 @@ same set of rows and produces its own summary:
 );
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
-  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   COUNT(*) AS headcount,
   SUM(salary) AS total_payroll,
@@ -140,7 +154,14 @@ Engineering*" is just an average with a filter:
 );
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
-  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   ROUND(AVG(salary)) AS avg_eng_salary
 FROM
@@ -175,7 +196,12 @@ between them tells you how many values are missing:
   id SERIAL PRIMARY KEY, name TEXT, phone TEXT
 );
 INSERT INTO customers (name, phone) VALUES
-  ('Ada','555-0101'),('Grace',NULL),('Linus','555-0102'),('Mae',NULL);`}
+  ('Ada','555-0101'),('Grace',NULL),('Linus','555-0102'),('Mae',NULL),
+  ('Rosa','555-0105'),('Ivan',NULL),('Nadia','555-0107'),('Omar','555-0108'),
+  ('Priya',NULL),('Quinn','555-0110'),('Ruth','555-0111'),('Sam',NULL),
+  ('Tariq','555-0113'),('Uma','555-0114'),('Viktor',NULL),('Wen','555-0116'),
+  ('Xenia','555-0117'),('Yusuf',NULL),('Zara','555-0119'),('Bruno','555-0120'),
+  ('Chidi',NULL),('Dara','555-0122'),('Elif','555-0123'),('Farid','555-0124');`}
   starterCode={`SELECT
   COUNT(*) AS total_rows,
   COUNT(phone) AS rows_with_phone
@@ -243,7 +269,11 @@ Aggregate functions reduce many rows to a single summarizing value.`}
   id     SERIAL PRIMARY KEY,
   amount NUMERIC(8, 2) NOT NULL
 );
-INSERT INTO payments (amount) VALUES (50.00), (20.00), (30.00), (100.00);`}
+INSERT INTO payments (amount) VALUES
+  (50.00), (20.00), (30.00), (100.00), (75.50), (12.25),
+  (240.00), (18.75), (66.00), (91.40), (5.99), (150.00),
+  (33.10), (48.60), (120.75), (27.30), (84.20), (9.50),
+  (199.99), (61.15), (42.80), (7.25), (310.00), (55.45);`}
   starterCode={`-- One row with three aggregate columns:
 SELECT
 FROM
@@ -275,3 +305,7 @@ FROM
     },
   ]}
 />
+
+Aggregates collapse many rows into one. The obvious next question is
+what happens when you want one answer *per category* rather than one
+for the whole table, which is exactly what `GROUP BY` is for.

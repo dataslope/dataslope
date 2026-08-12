@@ -35,7 +35,7 @@ that information away. The confidence interval keeps it.
 <Figure
   slug="stat-confidence-intervals-point-estimate-alone-inline-cutout"
   alt="A single mark on a rail beside the same mark with a soft band drawn either side"
-  caption="The band's width comes from the standard error and the confidence you want."
+  caption="A point estimate is one mark; an interval carries its own uncertainty with it."
 />
 
 ```mermaid
@@ -752,6 +752,10 @@ consistent with anything from a small decrease to a sizable increase;
 we need more data." Absence of evidence (a wide interval straddling 0)
 is not evidence of absence (a tight interval hugging 0).
 </Callout>
+
+That same care applies to comparing two intervals against each other.
+Below, two group intervals overlap, and yet the interval for their
+*difference* clears zero comfortably:
 
 <Chart slug="overlapping-cis-are-not-a-test" />
 

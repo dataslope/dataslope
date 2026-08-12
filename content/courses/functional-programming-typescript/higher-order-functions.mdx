@@ -6,13 +6,13 @@ description: Functions that take functions, return functions, or both, the unive
 A **higher-order function** is a function that does at least one of
 two things:
 
+1. **Takes a function** as one of its arguments.
+2. **Returns a function** as its result.
+
 <Figure
   slug="fp-higher-order-functions-cutout"
   alt="Higher-order functions, an isometric illustration"
 />
-
-1. **Takes a function** as one of its arguments.
-2. **Returns a function** as its result.
 
 That's the entire definition. The reason it's such a central
 concept is that *passing behavior as a value* is the most powerful
@@ -57,6 +57,12 @@ The fact that `(x: number) => number` is a *type* you can use
 anywhere, as an array element, a record value, a parameter, is
 what makes everything else in this chapter possible.
 
+<Figure
+  slug="fp-higher-order-functions-functions-as-values-inline-cutout"
+  alt="A small hand tool resting in a tray alongside blocks, treated as just another item to be picked up and passed on"
+  caption="A function is a value: it can be stored, passed and returned like any other."
+/>
+
 ## Functions that take functions: the classic combinators
 
 The three you already know:
@@ -90,12 +96,6 @@ implementation* each. They work for any element type, any
 transformation, any predicate, any accumulator. The behavior comes
 from the *function you pass in*. The combinator provides the
 plumbing.
-
-<Figure
-  slug="fp-higher-order-functions-functions-as-values-inline-cutout"
-  alt="A small hand tool resting in a tray alongside blocks, treated as just another item to be picked up and passed on"
-  caption="A function is a value: it can be stored, passed and returned like any other."
-/>
 
 Look at how much code you *aren't* writing:
 

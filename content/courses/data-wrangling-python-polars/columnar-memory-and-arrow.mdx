@@ -120,6 +120,12 @@ Polars, DuckDB, PyArrow, and a Parquet file all agree on the bytes,
 handing a table from one to another is passing a pointer rather than
 serializing and reparsing.
 
+<Figure
+  slug="pl-arrow-shared-columns-cutout"
+  alt="Three different machine cabinets all reading from one long shared column of stacked cells running between them"
+  caption="Apache Arrow, 2016: one agreed memory layout, so a column can cross a language boundary without being copied."
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -146,12 +152,6 @@ Polars will show you the buffers behind a Series, which makes the
 validity bitmap concrete. (`_get_buffers` is an internal method, not
 something to build on; it is here because seeing the two buffers side
 by side explains nulls better than any diagram.)
-
-<Figure
-  slug="pl-arrow-shared-columns-cutout"
-  alt="Three different machine cabinets all reading from one long shared column of stacked cells running between them"
-  caption="Apache Arrow, 2016: one agreed memory layout, so a column can cross a language boundary without being copied."
-/>
 
 <CodeBlock
   adapter="python"

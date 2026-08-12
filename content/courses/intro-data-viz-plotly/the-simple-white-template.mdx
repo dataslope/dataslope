@@ -6,14 +6,14 @@ description: Why this course uses a specific Plotly template, and how to pick a 
 You've seen the same argument appear in every chart on every page
 of this course:
 
+```python
+template="simple_white"
+```
+
 <Figure
   slug="viz-simple-white-template-cutout"
   alt="The simple_white template, an isometric illustration"
 />
-
-```python
-template="simple_white"
-```
 
 Now is a good time to stop and explain *why*, and to introduce
 the larger idea of Plotly **templates**.
@@ -177,11 +177,6 @@ and then forget about it.
 
 ## What a template *doesn't* fix
 
-The same misleading bars before and after the cleanup, and then with the
-one edit that mattered:
-
-<Chart slug="template-doesnt-fix-encoding" />
-
 Templates only handle *style*. They don't:
 
 - Choose the right chart type for your data.
@@ -190,7 +185,11 @@ Templates only handle *style*. They don't:
 - Decide which encodings best convey your story.
 
 A bad chart in `simple_white` is still a bad chart. A good chart
-in *any* template still communicates the story.
+in *any* template still communicates the story. Here are the same
+misleading bars before and after the cleanup, and then with the one edit
+that actually mattered:
+
+<Chart slug="template-doesnt-fix-encoding" />
 
 ## Composing your own template (optional, advanced)
 

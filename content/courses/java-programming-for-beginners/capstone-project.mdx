@@ -7,17 +7,17 @@ You have now seen everything you need to build a small but
 *honestly designed* Java program. This capstone is a tiny library
 checkout system that exercises:
 
-<Figure
-  slug="java-capstone-library-cutout"
-  alt="Mini library system, an isometric illustration"
-/>
-
 - Classes and constructors
 - Encapsulation and immutability
 - Collections (`List`, `Map`)
 - Polymorphism through an interface
 - Exception handling with a custom exception
 - Layered organization (domain + service)
+
+<Figure
+  slug="java-capstone-library-cutout"
+  alt="Mini library system, an isometric illustration"
+/>
 
 Take your time. There is intentionally more than one valid
 implementation. Use the provided `Main.java` to drive your design.
@@ -359,7 +359,7 @@ classDiagram
 - **Map for lookup:** the catalog is a `Map<String, Book>` because
   we look books up by title, exactly the case for a Map.
 - **Polymorphism / interfaces:** not used heavily here, on purpose,
-they shine when there's a *choice* of implementations. Adding
+  they shine when there is a *choice* of implementations. Adding
   a `BookRepository` interface with both in-memory and persistent
   versions would be the natural next step.
 
@@ -367,7 +367,7 @@ Once your solution passes the test, take a few minutes to:
 
 - Add a new method `int totalAvailable()` on `Library`.
 - Try restricting members to a maximum of 3 simultaneous loans.
-- Try adding a `LinkedHashMap` instead of `TreeMap` and observe
+- Try using a `LinkedHashMap` instead of `TreeMap` and observe
   what changes in the output. (You will need to also change
   iteration order expectations.)
 

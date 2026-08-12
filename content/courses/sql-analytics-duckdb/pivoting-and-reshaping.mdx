@@ -76,12 +76,30 @@ makes the mechanics visible.
 INSERT INTO
   sales
 VALUES
-  ('West', 'Q1', 100),
-  ('West', 'Q2', 140),
-  ('West', 'Q1', 20),
-  ('East', 'Q1', 200),
-  ('East', 'Q2', 90),
-  ('North', 'Q2', 75);`}
+  ('West', 'Q1', 120),
+  ('East', 'Q1', 80),
+  ('North', 'Q1', 45),
+  ('South', 'Q1', 200),
+  ('West', 'Q2', 60),
+  ('East', 'Q2', 95),
+  ('North', 'Q2', 30),
+  ('South', 'Q2', 250),
+  ('West', 'Q3', 175),
+  ('East', 'Q3', 55),
+  ('North', 'Q3', 310),
+  ('South', 'Q3', 70),
+  ('West', 'Q4', 140),
+  ('East', 'Q4', 220),
+  ('North', 'Q4', 35),
+  ('South', 'Q4', 165),
+  ('West', 'Q1', 90),
+  ('East', 'Q1', 285),
+  ('North', 'Q1', 110),
+  ('South', 'Q1', 40),
+  ('West', 'Q2', 195),
+  ('East', 'Q2', 65),
+  ('North', 'Q2', 240),
+  ('South', 'Q2', 150);`}
   starterCode={`SELECT
   region,
   SUM(amount) FILTER(
@@ -118,12 +136,30 @@ the aggregate, and DuckDB discovers the distinct values for you.
 INSERT INTO
   sales
 VALUES
-  ('West', 'Q1', 100),
-  ('West', 'Q2', 140),
-  ('West', 'Q1', 20),
-  ('East', 'Q1', 200),
-  ('East', 'Q2', 90),
-  ('North', 'Q2', 75);`}
+  ('West', 'Q1', 120),
+  ('East', 'Q1', 80),
+  ('North', 'Q1', 45),
+  ('South', 'Q1', 200),
+  ('West', 'Q2', 60),
+  ('East', 'Q2', 95),
+  ('North', 'Q2', 30),
+  ('South', 'Q2', 250),
+  ('West', 'Q3', 175),
+  ('East', 'Q3', 55),
+  ('North', 'Q3', 310),
+  ('South', 'Q3', 70),
+  ('West', 'Q4', 140),
+  ('East', 'Q4', 220),
+  ('North', 'Q4', 35),
+  ('South', 'Q4', 165),
+  ('West', 'Q1', 90),
+  ('East', 'Q1', 285),
+  ('North', 'Q1', 110),
+  ('South', 'Q1', 40),
+  ('West', 'Q2', 195),
+  ('East', 'Q2', 65),
+  ('North', 'Q2', 240),
+  ('South', 'Q2', 150);`}
   starterCode={`PIVOT sales ON quarter -- values of this column become columns
 USING SUM(amount) -- aggregate that fills each cell
 GROUP BY
@@ -157,7 +193,29 @@ INSERT INTO
   wide_sales
 VALUES
   ('West', 100, 140, 90),
-  ('East', 200, 60, 120);`}
+  ('East', 200, 60, 120),
+  ('North', 75, 110, 145),
+  ('South', 160, 85, 70),
+  ('Midwest', 130, 175, 95),
+  ('Northeast', 205, 65, 150),
+  ('Southwest', 90, 120, 185),
+  ('Southeast', 145, 100, 55),
+  ('Central', 115, 190, 80),
+  ('Pacific', 240, 70, 135),
+  ('Mountain', 60, 155, 200),
+  ('Atlantic', 180, 95, 105),
+  ('Prairie', 125, 165, 45),
+  ('Coastal', 195, 50, 170),
+  ('Highland', 85, 210, 115),
+  ('Lowland', 150, 130, 65),
+  ('Northern', 105, 75, 225),
+  ('Southern', 220, 140, 90),
+  ('Eastern', 70, 185, 160),
+  ('Western', 175, 110, 50),
+  ('Inland', 95, 235, 125),
+  ('Offshore', 210, 60, 145),
+  ('Border', 135, 170, 85),
+  ('Delta', 55, 125, 195);`}
   starterCode={`UNPIVOT wide_sales ON jan,
 feb,
 mar -- these columns become rows

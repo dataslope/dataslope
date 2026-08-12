@@ -295,13 +295,13 @@ display(df.groupby("cut")["price"].describe().round(0))
 A grouped mean has the same blind spot a single mean does: four groups can
 report the same average and be four completely different distributions.
 
+<Chart slug="bar-hides-distribution" />
+
 <Figure
   slug="pandas-statistical-summaries-inline-cutout"
   alt="One tall column of chips feeding a rack of five small gauges, each showing a different reading"
   caption="No single number describes a column, which is why summaries come in sets."
 />
-
-<Chart slug="bar-hides-distribution" />
 
 ## Outlier flags via the 1.5×IQR rule
 

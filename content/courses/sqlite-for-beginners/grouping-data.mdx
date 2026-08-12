@@ -60,11 +60,18 @@ Start with a small employee table. The query below counts employees and computes
   salary REAL
 );
 INSERT INTO employees (name, dept, salary) VALUES
-  ('Alice', 'Engineering', 120000),
-  ('Bob', 'Engineering', 95000),
-  ('Carol', 'Sales', 80000),
-  ('Dave', 'Sales', 72000),
-  ('Eve', 'Marketing', 68000);`}
+  ('Alice', 'Engineering', 120000), ('Bob', 'Engineering', 100000),
+  ('Cara', 'Engineering', 30000), ('Gina', 'Engineering', 115000),
+  ('Hugo', 'Engineering', 98000), ('Mona', 'Engineering', 132000),
+  ('Theo', 'Engineering', 28000), ('Yara', 'Engineering', 105000),
+  ('Dave', 'Sales', 75000), ('Eve', 'Sales', 72000),
+  ('Iris', 'Sales', 81000), ('Nils', 'Sales', 26000),
+  ('Rui', 'Sales', 69000), ('Vik', 'Sales', 77000),
+  ('Jonas', 'Support', 58000), ('Kira', 'Support', 61000),
+  ('Otto', 'Support', 24000), ('Sara', 'Support', 55000),
+  ('Wanda', 'Support', 63000), ('Finn', 'Marketing', 68000),
+  ('Leo', 'Marketing', 71000), ('Pia', 'Finance', 88000),
+  ('Ulla', 'Finance', 92000), ('Quinn', 'Legal', 110000);`}
   starterCode={`SELECT
   dept,
   COUNT(*) AS headcount,
@@ -92,7 +99,7 @@ flowchart TD
 
 ## One result row per group
 
-A group is a bucket of rows that share the same grouped value. If the table has three departments, the grouped query returns three rows.
+A group is a bucket of rows that share the same grouped value. If the table has six departments, the grouped query returns six rows, however many employees are spread across them.
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -102,12 +109,10 @@ A group is a bucket of rows that share the same grouped value. If the table has 
   priority TEXT
 );
 INSERT INTO tickets (priority) VALUES
-  ('High'),
-  ('Low'),
-  ('High'),
-  ('Medium'),
-  ('Low'),
-  ('Low');`}
+  ('High'), ('Low'), ('High'), ('Medium'), ('Low'), ('Low'),
+  ('Medium'), ('High'), ('Low'), ('Medium'), ('Low'), ('High'),
+  ('Low'), ('Medium'), ('Low'), ('High'), ('Medium'), ('Low'),
+  ('Low'), ('High'), ('Medium'), ('Low'), ('Medium'), ('Low');`}
   starterCode={`SELECT
   priority,
   COUNT(*) AS ticket_count
@@ -119,23 +124,26 @@ ORDER BY
   ticket_count DESC;`}
 />
 
-There are six ticket rows, but only three priority groups: `High`, `Medium`, and `Low`.
+There are 24 ticket rows, but only three priority groups: `High`,
+`Medium`, and `Low`.
 
 It is worth tracing this once by hand, because it is the mental
 model you will use for every grouped query you ever write. SQLite
-conceptually sorts the six rows into labeled buckets, then runs
+conceptually sorts all 24 rows into labeled buckets, then runs
 `COUNT(*)` once *inside each bucket*:
 
 ```text
-bucket "High":    High, High            -> COUNT(*) = 2
-bucket "Medium":  Medium                -> COUNT(*) = 1
-bucket "Low":     Low, Low, Low         -> COUNT(*) = 3
+bucket "High":    High, High, High, …    -> COUNT(*) = 6
+bucket "Medium":  Medium, Medium, …      -> COUNT(*) = 7
+bucket "Low":     Low, Low, Low, …       -> COUNT(*) = 11
 ```
 
 Each bucket then contributes exactly one row to the result: its
-label and its summary. Six rows in, three rows out. When a grouped
-query ever surprises you, redraw the buckets on paper, the
-confusion almost always dissolves.
+label and its summary. 24 rows in, three rows out. Notice that the
+number of result rows has nothing to do with the size of the table
+and everything to do with how many distinct values the grouped
+column holds. When a grouped query ever surprises you, redraw the
+buckets on paper, the confusion almost always dissolves.
 
 <MultipleChoice
   markdown={`What does \`GROUP BY priority\` do before \`COUNT(*)\` runs?
@@ -186,11 +194,12 @@ Some databases reject ungrouped columns immediately. SQLite may allow them in so
   amount REAL
 );
 INSERT INTO sales (product, amount) VALUES
-  ('Notebook', 12.00),
-  ('Pencil', 3.00),
-  ('Notebook', 18.00),
-  ('Backpack', 45.00),
-  ('Pencil', 2.50);`}
+  ('Notebook', 12.00), ('Pencil', 3.00), ('Notebook', 18.00), ('Backpack', 45.00),
+  ('Pencil', 2.50), ('Notebook', 9.00), ('Backpack', 38.50), ('Mug', 7.25),
+  ('Pencil', 4.10), ('Notebook', 15.75), ('Mug', 6.80), ('Backpack', 52.00),
+  ('Eraser', 1.20), ('Notebook', 11.40), ('Mug', 8.90), ('Pencil', 3.75),
+  ('Backpack', 41.25), ('Eraser', 0.95), ('Notebook', 13.60), ('Mug', 5.50),
+  ('Pencil', 2.80), ('Backpack', 47.80), ('Eraser', 1.45), ('Notebook', 16.20);`}
   starterCode={`SELECT
   product,
   SUM(amount) AS total_sales
@@ -228,12 +237,15 @@ For example, `GROUP BY region, year` means:
   amount REAL
 );
 INSERT INTO sales (region, year, amount) VALUES
-  ('West', 2025, 100.00),
-  ('West', 2025, 50.00),
-  ('West', 2026, 200.00),
-  ('East', 2025, 80.00),
-  ('East', 2026, 120.00),
-  ('East', 2026, 60.00);`}
+  ('West', 2025, 100.00), ('West', 2025, 50.00), ('West', 2025, 75.00),
+  ('West', 2025, 120.00), ('West', 2026, 200.00), ('West', 2026, 90.00),
+  ('West', 2026, 145.00), ('West', 2026, 60.00),
+  ('East', 2025, 80.00), ('East', 2025, 110.00), ('East', 2025, 45.00),
+  ('East', 2025, 95.00), ('East', 2026, 120.00), ('East', 2026, 60.00),
+  ('East', 2026, 175.00), ('East', 2026, 85.00),
+  ('North', 2025, 65.00), ('North', 2025, 130.00), ('North', 2025, 40.00),
+  ('North', 2026, 155.00), ('North', 2026, 70.00), ('North', 2026, 110.00),
+  ('North', 2026, 95.00), ('North', 2025, 88.00);`}
   starterCode={`SELECT
   region,
   year,
@@ -295,11 +307,18 @@ In SQLite, use `INTEGER` values like `1` and `0` for true/false flags.
   is_intern INTEGER
 );
 INSERT INTO employees (name, dept, salary, is_intern) VALUES
-  ('Alice', 'Engineering', 120000, 0),
-  ('Bob', 'Engineering', 95000, 0),
-  ('Cara', 'Engineering', 30000, 1),
-  ('Dave', 'Sales', 80000, 0),
-  ('Eve', 'Sales', 72000, 0);`}
+  ('Alice', 'Engineering', 120000, 0), ('Bob', 'Engineering', 100000, 0),
+  ('Cara', 'Engineering', 30000, 1), ('Gina', 'Engineering', 115000, 0),
+  ('Hugo', 'Engineering', 98000, 0), ('Mona', 'Engineering', 132000, 0),
+  ('Theo', 'Engineering', 28000, 1), ('Yara', 'Engineering', 105000, 0),
+  ('Dave', 'Sales', 75000, 0), ('Eve', 'Sales', 72000, 0),
+  ('Iris', 'Sales', 81000, 0), ('Nils', 'Sales', 26000, 1),
+  ('Rui', 'Sales', 69000, 0), ('Vik', 'Sales', 77000, 0),
+  ('Jonas', 'Support', 58000, 0), ('Kira', 'Support', 61000, 0),
+  ('Otto', 'Support', 24000, 1), ('Sara', 'Support', 55000, 0),
+  ('Wanda', 'Support', 63000, 0), ('Finn', 'Marketing', 68000, 0),
+  ('Leo', 'Marketing', 71000, 0), ('Pia', 'Finance', 88000, 0),
+  ('Ulla', 'Finance', 92000, 0), ('Quinn', 'Legal', 110000, 0);`}
   starterCode={`SELECT
   dept,
   ROUND(AVG(salary), 0) AS average_salary
@@ -340,11 +359,12 @@ That mental shift is the tricky part: the output rows are no longer individual o
   species TEXT
 );
 INSERT INTO pets (name, species) VALUES
-  ('Luna', 'Cat'),
-  ('Milo', 'Dog'),
-  ('Nori', 'Cat'),
-  ('Pip', 'Bird'),
-  ('Rex', 'Dog');`}
+  ('Luna', 'Cat'), ('Milo', 'Dog'), ('Nori', 'Cat'), ('Pip', 'Bird'),
+  ('Rex', 'Dog'), ('Suki', 'Cat'), ('Toby', 'Dog'), ('Uni', 'Rabbit'),
+  ('Vera', 'Cat'), ('Wally', 'Dog'), ('Yuki', 'Cat'), ('Zeno', 'Bird'),
+  ('Ace', 'Dog'), ('Bean', 'Rabbit'), ('Cleo', 'Cat'), ('Dot', 'Bird'),
+  ('Echo', 'Dog'), ('Fig', 'Cat'), ('Gus', 'Dog'), ('Hazel', 'Rabbit'),
+  ('Ivy', 'Cat'), ('Jax', 'Dog'), ('Kip', 'Bird'), ('Lolly', 'Cat');`}
   starterCode={`SELECT
   species,
   COUNT(*) AS pet_count
@@ -356,7 +376,10 @@ ORDER BY
   species;`}
 />
 
-The result does not show Luna, Milo, or Nori as separate rows. It shows one row per species.
+The result does not show Luna, Milo, or Nori as separate rows. Twenty-four
+pets collapse into four rows, one per species. Individual names are not
+lost, they are simply not what this question asked for; run the query
+without the `GROUP BY` and the detail is right there again.
 
 ## Practice challenge
 
@@ -373,12 +396,12 @@ bucket.
   species TEXT
 );
 INSERT INTO pets (name, species) VALUES
-  ('Luna', 'Cat'),
-  ('Milo', 'Dog'),
-  ('Nori', 'Cat'),
-  ('Pip', 'Bird'),
-  ('Rex', 'Dog'),
-  ('Suki', 'Cat');`}
+  ('Luna', 'Cat'), ('Milo', 'Dog'), ('Nori', 'Cat'), ('Pip', 'Bird'),
+  ('Rex', 'Dog'), ('Suki', 'Cat'), ('Toby', 'Dog'), ('Uni', 'Rabbit'),
+  ('Vera', 'Cat'), ('Wally', 'Dog'), ('Yuki', 'Cat'), ('Zeno', 'Bird'),
+  ('Ace', 'Dog'), ('Bean', 'Rabbit'), ('Cleo', 'Cat'), ('Dot', 'Bird'),
+  ('Echo', 'Dog'), ('Fig', 'Cat'), ('Gus', 'Dog'), ('Hazel', 'Rabbit'),
+  ('Ivy', 'Cat'), ('Jax', 'Dog'), ('Kip', 'Bird'), ('Lolly', 'Cat');`}
   starterCode={`SELECT
   species
 FROM
@@ -402,21 +425,22 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns 3 rows",
-      description: "One per species: Cat, Dog, Bird",
-      expectedRowCount: 3,
+      name: "Returns 4 rows",
+      description: "One per species: Cat, Dog, Bird, Rabbit",
+      expectedRowCount: 4,
     },
     {
       id: "rows",
       name: "Largest group first",
-      description: "Cat (3), Dog (2), Bird (1)",
+      description: "Cat (9), Dog (8), Bird (4), Rabbit (3)",
       expectedRows: {
         columns: ["species", "pet_count"],
         ordered: true,
         values: [
-          ["Cat", 3],
-          ["Dog", 2],
-          ["Bird", 1],
+          ["Cat", 9],
+          ["Dog", 8],
+          ["Bird", 4],
+          ["Rabbit", 3],
         ],
       },
     },

@@ -110,8 +110,6 @@ from the source until ten survive the filter, and stops.
   caption="A deferred pipeline holds a description, not a result, and no data yet."
 />
 
-<Chart slug="pipeline-laziness" />
-
 ```mermaid
 flowchart TD
     F[1 million-row file] --> W[Where] --> S[Select] --> T[Take 10]
@@ -122,6 +120,10 @@ If `Take(10)` is lazy, only ten reads from the file ever happen
 (plus the rejects from `Where()` before reaching ten). The rest of the
 file is never touched. The pipeline never holds more than a single
 element at a time.
+
+Put a number on that and the gap is not subtle:
+
+<Chart slug="pipeline-laziness" />
 
 ### 2. Composition
 

@@ -149,6 +149,9 @@ Every built-in type doubles as a converter when you call it as a function.
   caption="Each type has its own shape, so moving between them means an explicit conversion."
 />
 
+Converting between types is explicit in Python. The type name is the
+conversion function:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -161,6 +164,9 @@ print(float("3.14"))
     },
   ]}
 />
+
+Going the other way, `str()` gives the decimal form and the base
+functions give the rest:
 
 <CodeBlock
   adapter="python"
@@ -175,6 +181,9 @@ print(hex(255), bin(255), oct(255))
   ]}
 />
 
+Watch what `int()` does to a float: it truncates toward zero rather
+than rounding, so `3.9` becomes `3` and `-3.9` becomes `-3`:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -187,6 +196,9 @@ print(int(-3.9))
     },
   ]}
 />
+
+The container types convert into each other the same way, which is how
+you deduplicate a list in one step:
 
 <CodeBlock
   adapter="python"
@@ -223,6 +235,9 @@ print("s is still", s)
   ]}
 />
 
+The method returned a new string and `s` never moved. To keep the
+result you have to point the name at it:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -235,6 +250,9 @@ print("now s is", s)
     },
   ]}
 />
+
+A mutable object behaves the opposite way. `append` changes the list
+itself, and every name bound to that list sees the change:
 
 <CodeBlock
   adapter="python"
@@ -265,6 +283,10 @@ if result is None:
     },
   ]}
 />
+
+`None` also turns up where you did not put it. A function that never
+returns anything returns `None`, which is why forgetting a `return` is
+such a quiet bug:
 
 <CodeBlock
   adapter="python"
@@ -394,7 +416,7 @@ print(safe_int("", -1))
 - \`set\`
   > Sets are mutable: \`s.add(x)\` changes them in place.
 - [o] \`tuple\`
-  > Tuples are immutable sequences-you can't change their contents after creation.
+  > Tuples are immutable sequences: you can't change their contents after creation.
 - \`dict\`
   > Dicts are mutable: \`d["key"] = value\` changes them in place.`}
 />

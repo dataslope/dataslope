@@ -24,6 +24,12 @@ size is fixed at creation time and cannot change later.
   caption="An array's length is fixed the moment it is created."
 />
 
+Two arrays below, built the two ways you will see in real code: one
+sized up front and filled slot by slot, one written out as a literal.
+Run it, then try asking for `scores[5]` and read the exception you
+get, that off-by-one is the most common array mistake in Java and it
+is worth meeting once on purpose:
+
 <CodeBlock
   adapter="java"
   files={[
@@ -93,6 +99,10 @@ operations, and is part of Java's broader **Collections Framework**.
   alt="A rail that grows a further slot as a seventh block is set on it"
   caption="An `ArrayList` grows a slot when it needs one; an array cannot."
 />
+
+A short to-do list, grown one item at a time. Notice what is missing
+compared to the array above: nothing anywhere declares a size, and
+the `remove` call shrinks the list without any copying on your part:
 
 <CodeBlock
   adapter="java"

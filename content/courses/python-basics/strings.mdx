@@ -3,7 +3,7 @@ title: Strings
 description: Literals, indexing, slicing, methods, and f-strings
 ---
 
-A `str` in Python 3 is an immutable sequence of Unicode code points. Strings are one of the most-used types in the language-text is everywhere-and Python gives you a rich toolkit for working with them.
+A `str` in Python 3 is an immutable sequence of Unicode code points. Strings are one of the most-used types in the language. Text is everywhere, and Python gives you a rich toolkit for working with it.
 
 <Figure
   slug="python-basics-strings-cutout"
@@ -46,6 +46,9 @@ print(b)
   ]}
 />
 
+Single and double quotes are interchangeable. Triple quotes add one
+thing the others cannot do: they keep the line breaks you type.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -59,6 +62,10 @@ print(c)
     },
   ]}
 />
+
+Nothing forces a triple-quoted string to span lines, though. It is
+simply a literal that *may*, which makes it the easiest way to hold a
+string containing both kinds of quote:
 
 <CodeBlock
   adapter="python"
@@ -112,6 +119,10 @@ print(r"C:\\nope")  # raw, the backslash is literal
   ]}
 />
 
+Raw strings earn their keep in regular expressions, where backslashes
+are part of the pattern language and escaping each one twice gets
+unreadable fast:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -144,6 +155,10 @@ print(s[-1])  # 'n'
   ]}
 />
 
+A slice takes a range instead of a single position. Read `s[1:4]` as
+"from index 1 up to but not including index 4", and the two shorthand
+forms as "from the start" and "to the end":
+
 <CodeBlock
   adapter="python"
   files={[
@@ -157,6 +172,9 @@ print(s[2:])  # 'thon'
     },
   ]}
 />
+
+The third slot is the step. A step of `-1` walks backwards, which is
+the shortest string reversal in Python:
 
 <CodeBlock
   adapter="python"
@@ -229,6 +247,10 @@ except TypeError as e:
   ]}
 />
 
+Assigning into a string is a `TypeError`, and the message says so
+plainly. What *does* work is calling a method, which hands you a new
+string and leaves the original alone:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -241,6 +263,9 @@ print(s)  # unchanged
     },
   ]}
 />
+
+So how do you "change" a string? You do not. You point the name at the
+new one the method gave you:
 
 <CodeBlock
   adapter="python"
@@ -294,6 +319,10 @@ print(s.upper())
   ]}
 />
 
+`replace()` and `split()` are the next two you will reach for, and they
+follow the same rule as everything above: they return something new
+rather than editing `s`.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -307,6 +336,10 @@ print(s.split(","))
   ]}
 />
 
+`join()` runs the other way from `split()`, turning a list back into a
+string. Note that the separator is the string you call it *on*, which
+surprises almost everyone the first time:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -319,6 +352,9 @@ print("hello".endswith("lo"))
     },
   ]}
 />
+
+And a handful that answer questions about a string rather than
+transforming it:
 
 <CodeBlock
   adapter="python"
@@ -352,6 +388,9 @@ print(f"{name} scored {score}")
   ]}
 />
 
+That prints every digit the float happens to carry. Add a **format
+spec** after a colon to say how you want the value rendered:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -365,6 +404,9 @@ print(f"{name} scored {score:.1f}")  # one decimal place
     },
   ]}
 />
+
+The same slot also controls width and alignment, which is how you build
+a readable column of output without reaching for a library:
 
 <CodeBlock
   adapter="python"
@@ -381,6 +423,10 @@ print(f"{score:,.2f}")  # thousands separator
   ]}
 />
 
+One small feature repays learning immediately. An `=` at the end of the
+expression prints the expression *and* its value, which is a faster
+debugging print than anything you would type by hand:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -393,6 +439,9 @@ print(f"{score=}")  # debug form (Python 3.8+)
     },
   ]}
 />
+
+And the braces hold expressions, not just names, so a calculation can
+live inline instead of on a line of its own:
 
 <CodeBlock
   adapter="python"
@@ -473,6 +522,12 @@ print(b, len(b), len(s))
     },
   ]}
 />
+
+Note the two lengths: four characters, five bytes. The `é` needs two
+bytes in UTF-8, which is precisely why "how long is this string?" has
+two different right answers depending on who is asking.
+
+Decoding takes you back the other way:
 
 <CodeBlock
   adapter="python"

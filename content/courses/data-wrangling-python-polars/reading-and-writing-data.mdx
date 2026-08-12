@@ -48,22 +48,21 @@ The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
 
-
 The rule of thumb: **use `scan_*` unless you have a reason not to.**
 The eager/lazy chapter later explains why in detail; for now, know
 that the lazy version is rarely slower and frequently much faster.
+
+<Figure
+  slug="pl-reading-and-writing-data-read-versus-scan-inline-cutout"
+  alt="One carton tipped fully onto a bench beside another carton with only a thin peephole cut in its side"
+  caption="`read_*()` loads the whole file; `scan_*()` peers in and reads what it needs."
+/>
 
 ## CSV, and the arguments worth knowing
 
 CSV is a bad format that everyone uses. It has no types, no schema,
 and no agreement on how to spell "missing". Polars gives you the
 knobs to cope.
-
-<Figure
-  slug="pl-reading-and-writing-data-writing-files-back-out-inline-cutout"
-  alt="A stack of plain slips reread and re-guessed every time, beside a sealed carton whose contents are already labelled"
-  caption="CSV re-guesses your types on every read; Parquet already knows them."
-/>
 
 <CodeBlock
   adapter="python"
@@ -144,12 +143,17 @@ The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
 
-
 That last pair of lines is the argument for Parquet in miniature.
 CSV stores text, so every read re-guesses your types. Parquet stores
 the schema, the values in columnar form, per-column compression, and
 per-chunk statistics. It is smaller, faster, and does not lose
 information.
+
+<Figure
+  slug="pl-reading-and-writing-data-writing-files-back-out-inline-cutout"
+  alt="A stack of plain slips reread and re-guessed every time, beside a sealed carton whose contents are already labelled"
+  caption="CSV re-guesses your types on every read; Parquet already knows them."
+/>
 
 ## JSON, and its two shapes
 
@@ -177,7 +181,6 @@ The code is correct and works on a normal Polars install; it is shown
 here rather than run.
 </Callout>
 
-
 Use NDJSON where you can: it can be read in chunks and appended to,
 neither of which is true of one enormous JSON array.
 
@@ -185,12 +188,6 @@ neither of which is true of one enormous JSON array.
 
 Polars can read a remote file directly, which is handy for public
 datasets.
-
-<Figure
-  slug="pl-reading-and-writing-data-read-versus-scan-inline-cutout"
-  alt="One carton tipped fully onto a bench beside another carton with only a thin peephole cut in its side"
-  caption="`read_*()` loads the whole file; `scan_*()` peers in and reads what it needs."
-/>
 
 ```python
 url = "https://example.com/data/measurements.parquet"

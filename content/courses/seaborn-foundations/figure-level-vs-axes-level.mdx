@@ -55,7 +55,7 @@ functions (right) according to its `kind` argument:
 | `catplot()` | `"violin"` | `violinplot()` |
 | `catplot()` | `"bar"` | `barplot()` |
 | `catplot()` | `"count"` | `countplot()` |
-| `lmplot()` |, | `regplot()` |
+| `lmplot()` | no `kind`, only one plot | `regplot()` |
 
 So `sns.relplot(..., kind="scatter")` ends up calling `scatterplot()` under
 the hood, and `sns.catplot(..., kind="box")` calls `boxplot()`. The
@@ -211,8 +211,8 @@ figure-level capability.`}
 
 | Question | Use figure-level | Use axes-level |
 | --- | --- | --- |
-| Do I want facets (`col`/`row`)? | Yes → `relplot()`/`displot()`/`catplot()` |, |
-| Do I need to place this next to other plots on one figure? |, | Yes → `scatterplot()`, `boxplot()`, ... with `ax=` |
+| Do I want facets (`col`/`row`)? | Yes → `relplot()`/`displot()`/`catplot()` | No, axes-level cannot facet |
+| Do I need to place this next to other plots on one figure? | No, it owns its whole figure | Yes → `scatterplot()`, `boxplot()`, ... with `ax=` |
 | Do I want a clean legend placed outside automatically? | Figure-level does this | Legend goes inside the Axes |
 | How do I set the size? | `height` + `aspect` (per facet) | `figsize` via `plt.subplots()` |
 

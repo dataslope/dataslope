@@ -136,11 +136,39 @@ CREATE TABLE loans (
   borrowed_on DATE,
   due_on      DATE
 );
-INSERT INTO members (id, name) VALUES (1,'Ada'),(2,'Grace');
-INSERT INTO books (id, title) VALUES (10,'SQL Basics'),(11,'Databases 101');
+INSERT INTO members (id, name) VALUES
+  (1,'Ada'),(2,'Grace'),(3,'Linus'),(4,'Mae'),(5,'Rosa'),(6,'Ivan'),
+  (7,'Nadia'),(8,'Omar'),(9,'Priya'),(10,'Quinn'),(11,'Ruth'),(12,'Sam');
+INSERT INTO books (id, title) VALUES
+  (10,'SQL Basics'), (11,'Databases 101'), (12,'The Relational Model'),
+  (13,'Query Planning'), (14,'Indexes in Practice'), (15,'Data Modelling'),
+  (16,'Normal Forms'), (17,'Transactions'), (18,'Backup and Recovery'),
+  (19,'Postgres Internals'), (20,'Schema Migrations'), (21,'Window Functions');
 INSERT INTO loans (id, member_id, book_id, borrowed_on, due_on) VALUES
   (100, 1, 10, DATE '2026-05-01', DATE '2026-05-15'),
-  (101, 2, 11, DATE '2026-05-03', DATE '2026-05-17');`}
+  (101, 2, 11, DATE '2026-05-03', DATE '2026-05-17'),
+  (102, 1, 12, DATE '2026-05-04', DATE '2026-05-18'),
+  (103, 3, 13, DATE '2026-05-05', DATE '2026-05-19'),
+  (104, 4, 14, DATE '2026-05-06', DATE '2026-05-20'),
+  (105, 5, 15, DATE '2026-05-07', DATE '2026-05-21'),
+  (106, 2, 16, DATE '2026-05-08', DATE '2026-05-22'),
+  (107, 6, 17, DATE '2026-05-09', DATE '2026-05-23'),
+  (108, 7, 18, DATE '2026-05-10', DATE '2026-05-24'),
+  (109, 8, 19, DATE '2026-05-11', DATE '2026-05-25'),
+  (110, 9, 20, DATE '2026-05-12', DATE '2026-05-26'),
+  (111, 10, 21, DATE '2026-05-13', DATE '2026-05-27'),
+  (112, 3, 10, DATE '2026-05-14', DATE '2026-05-28'),
+  (113, 11, 11, DATE '2026-05-15', DATE '2026-05-29'),
+  (114, 12, 12, DATE '2026-05-16', DATE '2026-05-30'),
+  (115, 4, 13, DATE '2026-05-17', DATE '2026-05-31'),
+  (116, 5, 14, DATE '2026-05-18', DATE '2026-06-01'),
+  (117, 6, 15, DATE '2026-05-19', DATE '2026-06-02'),
+  (118, 7, 16, DATE '2026-05-20', DATE '2026-06-03'),
+  (119, 8, 17, DATE '2026-05-21', DATE '2026-06-04'),
+  (120, 9, 18, DATE '2026-05-22', DATE '2026-06-05'),
+  (121, 10, 19, DATE '2026-05-23', DATE '2026-06-06'),
+  (122, 11, 20, DATE '2026-05-24', DATE '2026-06-07'),
+  (123, 12, 21, DATE '2026-05-25', DATE '2026-06-08');`}
   starterCode={`SELECT
   m.name,
   b.title,

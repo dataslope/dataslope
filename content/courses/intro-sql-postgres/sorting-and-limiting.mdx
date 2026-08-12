@@ -27,7 +27,14 @@ ascending (the default) or `DESC` for descending:
 );
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
-  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   name,
   salary
@@ -54,7 +61,14 @@ each grade:
 );
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
-  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   dept,
   name,
@@ -93,8 +107,12 @@ flowchart TD
   id SERIAL PRIMARY KEY, name TEXT, salary NUMERIC
 );
 INSERT INTO employees (name, salary) VALUES
-  ('Alice',120000),('Bob',95000),('Carol',80000),
-  ('Dave',72000),('Eve',68000);`}
+  ('Alice',120000),('Bob',95000),('Carol',80000),('Dave',72000),
+  ('Eve',68000),('Frank',110000),('Grace',132000),('Hana',88000),
+  ('Ivan',76000),('Jade',91000),('Kai',67000),('Lena',74000),
+  ('Mark',62000),('Nina',58000),('Omar',61000),('Pia',55000),
+  ('Quinn',63000),('Rosa',105000),('Sam',99000),('Tara',84000),
+  ('Uri',88000),('Vera',92000),('Wes',115000),('Yara',70000);`}
   starterCode={`SELECT
   name,
   salary
@@ -128,8 +146,12 @@ so on:
   id SERIAL PRIMARY KEY, name TEXT, salary NUMERIC
 );
 INSERT INTO employees (name, salary) VALUES
-  ('Alice',120000),('Bob',95000),('Carol',80000),
-  ('Dave',72000),('Eve',68000);`}
+  ('Alice',120000),('Bob',95000),('Carol',80000),('Dave',72000),
+  ('Eve',68000),('Frank',110000),('Grace',132000),('Hana',88000),
+  ('Ivan',76000),('Jade',91000),('Kai',67000),('Lena',74000),
+  ('Mark',62000),('Nina',58000),('Omar',61000),('Pia',55000),
+  ('Quinn',63000),('Rosa',105000),('Sam',99000),('Tara',84000),
+  ('Uri',88000),('Vera',92000),('Wes',115000),('Yara',70000);`}
   starterCode={`SELECT
   name,
   salary
@@ -143,9 +165,10 @@ OFFSET
   2;`}
 />
 
-The query orders everyone, skips the top 2, and returns the next 2,
-Carol and Dave. This is the engine behind "Next page" buttons across
-the web.
+The query orders all 24 employees by salary, skips the top 2, and
+returns the next 2. Change the `OFFSET` to `4`, then `6`, and you are
+paging through the list two rows at a time. This is the engine behind
+"Next page" buttons across the web.
 
 ## Putting the clauses in order
 
@@ -247,7 +270,27 @@ INSERT INTO books (title, author, year) VALUES
   ('The Pragmatic Programmer', 'Hunt & Thomas', 1999),
   ('Clean Code', 'Robert C. Martin', 2008),
   ('Refactoring', 'Martin Fowler', 2018),
-  ('SQL for Smarties', 'Joe Celko', 1995);`}
+  ('SQL for Smarties', 'Joe Celko', 1995),
+  ('The Mythical Man-Month', 'Fred Brooks', 1975),
+  ('Design Patterns', 'Gamma et al.', 1994),
+  ('Code Complete', 'Steve McConnell', 2004),
+  ('Working Effectively with Legacy Code', 'Michael Feathers', 2005),
+  ('Domain-Driven Design', 'Eric Evans', 2003),
+  ('Structure and Interpretation of Computer Programs', 'Abelson & Sussman', 1985),
+  ('The Art of Computer Programming', 'Donald Knuth', 1968),
+  ('Peopleware', 'DeMarco & Lister', 1987),
+  ('Test-Driven Development', 'Kent Beck', 2002),
+  ('Continuous Delivery', 'Humble & Farley', 2010),
+  ('Release It!', 'Michael Nygard', 2007),
+  ('The Phoenix Project', 'Kim et al.', 2013),
+  ('Accelerate', 'Forsgren et al.', 2018),
+  ('Designing Data-Intensive Applications', 'Martin Kleppmann', 2017),
+  ('Database Internals', 'Alex Petrov', 2019),
+  ('Site Reliability Engineering', 'Beyer et al.', 2016),
+  ('A Philosophy of Software Design', 'John Ousterhout', 2018),
+  ('The Unicorn Project', 'Gene Kim', 2019),
+  ('Software Engineering at Google', 'Winters et al.', 2020),
+  ('Fundamentals of Data Engineering', 'Reis & Housley', 2022);`}
   starterCode={`-- Newest first, then keep only the top two:
 SELECT
   title,
@@ -279,9 +322,13 @@ LIMIT
     {
       id: "matches",
       name: "Matches the reference solution",
-      description: "Refactoring (2018) then Clean Code (2008).",
+      description: "Fundamentals of Data Engineering (2022) then Software Engineering at Google (2020).",
       matchesSolution: true,
       ordered: true,
     },
   ]}
 />
+
+`ORDER BY` and `LIMIT` are the last two clauses you need before results
+stop being a wall of rows and start being answers. From here the course
+turns from picking rows to summarising them.

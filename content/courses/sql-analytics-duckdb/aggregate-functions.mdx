@@ -20,13 +20,13 @@ move.
 Worth keeping in view throughout: an aggregate is a number standing in for a
 column, and identical aggregates can come from very different columns.
 
+<Chart slug="bar-hides-distribution" />
+
 <Figure
   slug="duck-aggregate-functions-aggregation-exists-inline-cutout"
   alt="A bench heaped with chips that no one can count by eye, and one gauge with a single pointer resting at one mark beside it"
   caption="No one can read a million rows; an aggregate turns them into one number."
 />
-
-<Chart slug="bar-hides-distribution" />
 
 A human cannot comprehend a million rows. But "the average order was
 \$48" or "we had 1.2 million orders" fits in a sentence. Aggregation is
@@ -98,12 +98,14 @@ remember every value it has seen. When approximate is good enough,
 INSERT INTO
   visits
 VALUES
-  (1, 10, 'google'),
-  (2, 10, NULL),
-  (3, 11, 'google'),
-  (4, 12, 'twitter'),
-  (5, 11, NULL),
-  (6, 10, 'twitter');`}
+  (1, 10, 'google'), (2, 10, NULL), (3, 11, 'google'),
+  (4, 12, 'twitter'), (5, 11, NULL), (6, 10, 'twitter'),
+  (7, 13, 'google'), (8, 13, 'reddit'), (9, 14, NULL),
+  (10, 12, 'google'), (11, 15, 'twitter'), (12, 11, 'reddit'),
+  (13, 16, NULL), (14, 14, 'google'), (15, 15, 'google'),
+  (16, 17, 'twitter'), (17, 13, NULL), (18, 18, 'reddit'),
+  (19, 16, 'google'), (20, 17, 'google'), (21, 19, NULL),
+  (22, 18, 'twitter'), (23, 20, 'reddit'), (24, 19, 'google');`}
   starterCode={`SELECT
   COUNT(*) AS total_visits,
   COUNT(referrer) AS visits_with_referrer,
@@ -136,11 +138,11 @@ zero and drag an average down.
 INSERT INTO
   ratings
 VALUES
-  ('A', 5),
-  ('A', 3),
-  ('A', NULL),
-  ('B', 4),
-  ('B', NULL);`}
+  ('A', 5), ('A', 3), ('A', NULL), ('B', 4), ('B', NULL),
+  ('A', 4), ('A', 2), ('B', 5), ('B', 3), ('B', 4),
+  ('C', 5), ('C', NULL), ('C', 4), ('C', 3), ('C', 5),
+  ('D', 2), ('D', 1), ('D', NULL), ('D', 3), ('D', 2),
+  ('E', 5), ('E', 4), ('E', 5), ('E', NULL);`}
   starterCode={`SELECT
   product,
   COUNT(*) AS rows,
@@ -173,12 +175,30 @@ average with a filter.
 INSERT INTO
   orders
 VALUES
-  (1, 120),
-  (2, 30),
-  (3, 200),
-  (4, 45),
-  (5, 95),
-  (6, 15);`}
+  (1, 15),
+  (2, 120),
+  (3, 45),
+  (4, 250),
+  (5, 8),
+  (6, 95),
+  (7, 500),
+  (8, 60),
+  (9, 180),
+  (10, 32),
+  (11, 275),
+  (12, 70),
+  (13, 140),
+  (14, 22),
+  (15, 330),
+  (16, 88),
+  (17, 55),
+  (18, 410),
+  (19, 105),
+  (20, 18),
+  (21, 205),
+  (22, 66),
+  (23, 295),
+  (24, 130);`}
   starterCode={`SELECT
   COUNT(*) AS big_orders,
   ROUND(AVG(amount), 2) AS avg_big_order

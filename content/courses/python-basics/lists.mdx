@@ -28,6 +28,9 @@ print(empty)
   ]}
 />
 
+An empty list is a fine starting point when you plan to fill it later.
+More often you write the items straight into the brackets:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -115,6 +118,10 @@ print(xs[0])
   ]}
 />
 
+Counting from the other end is where Python is unusually pleasant. A
+negative index means "this far back from the end", so `-1` is the last
+item and you never have to write `xs[len(xs) - 1]`:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -160,6 +167,9 @@ print(xs[1:4])
     },
   ]}
 />
+
+Leave either end off and Python fills it in for you, which is how most
+slices are actually written:
 
 <CodeBlock
   adapter="python"
@@ -208,6 +218,9 @@ print(xs)
 
 Slice assignment can change the list's length.
 
+A slice on the left of `=` replaces a whole run of items at once, and
+the replacement does not have to be the same length:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -242,6 +255,10 @@ print(xs)
   ]}
 />
 
+`append` adds one item, however list-shaped that item happens to be.
+`extend` unpacks its argument and adds each element separately, and
+mixing the two up is the single most common list bug:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -254,6 +271,9 @@ print(xs)
     },
   ]}
 />
+
+Both of those add to the end. `insert` puts an item at a position you
+choose and shuffles everything after it along:
 
 <CodeBlock
   adapter="python"
@@ -289,6 +309,9 @@ print(xs)
 
 `remove` deletes the **first** occurrence and raises `ValueError` if the item is missing.
 
+`pop()` is the other way to take an item out, and unlike `remove()` it
+hands the item back to you. With no argument it takes the last one:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -303,6 +326,8 @@ print("remaining:", xs)
   ]}
 />
 
+Give `pop` an index and it takes that item instead of the last one:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -316,6 +341,10 @@ print("remaining:", xs)
     },
   ]}
 />
+
+And when you want the whole thing gone, `clear()` empties the list in
+place, which is not the same as rebinding the name to a fresh `[]`, as
+the aliasing section below explains:
 
 <CodeBlock
   adapter="python"
@@ -343,6 +372,8 @@ print(xs.index(4))
     },
   ]}
 />
+
+`count()` answers the companion question, how many rather than where:
 
 <CodeBlock
   adapter="python"
@@ -372,6 +403,8 @@ print(nums)
     },
   ]}
 />
+
+`reverse()` works the same way, in place and returning `None`:
 
 <CodeBlock
   adapter="python"

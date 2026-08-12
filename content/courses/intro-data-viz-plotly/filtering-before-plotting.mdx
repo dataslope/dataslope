@@ -142,12 +142,6 @@ the normal ratio.
   `df[df["continent"].isin(["Europe", "Asia"])]`, not chained
   ORs.
 
-<Figure
-  slug="viz-filtering-before-plotting-filter-at-all-inline-cutout"
-  alt="A board so crowded its marks merge into a single mass, beside the same board thinned to a readable few"
-  caption="Past a certain density every mark overlaps and the chart stops saying anything."
-/>
-
 ## The `.query()` style
 
 `.query("...")` is often more readable for simple filters:
@@ -165,6 +159,12 @@ df[(df["year"] == 2007) & (df["continent"] == "Europe") & (df["lifeExp"] > 80)]
 Use whichever reads better in your context.
 
 ## Why "show less" usually beats "show more"
+
+<Figure
+  slug="viz-filtering-before-plotting-filter-at-all-inline-cutout"
+  alt="A board so crowded its marks merge into a single mass, beside the same board thinned to a readable few"
+  caption="Past a certain density every mark overlaps and the chart stops saying anything."
+/>
 
 Forty-two series in full, and the same forty-two under a stated rule:
 

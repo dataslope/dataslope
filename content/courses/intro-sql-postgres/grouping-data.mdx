@@ -50,7 +50,14 @@ department*, a far more useful answer.
 );
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
-  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
+  ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000),
+  ('Frank','Engineering',110000),('Grace','Engineering',132000),
+  ('Hana','Engineering',88000),('Ivan','Sales',76000),('Jade','Sales',91000),
+  ('Kai','Sales',67000),('Lena','Marketing',74000),('Mark','Marketing',62000),
+  ('Nina','Support',58000),('Omar','Support',61000),('Pia','Support',55000),
+  ('Quinn','Support',63000),('Rosa','Engineering',105000),
+  ('Sam','Engineering',99000),('Tara','Sales',84000),('Uri','Finance',88000),
+  ('Vera','Finance',92000),('Wes','Legal',115000),('Yara','Marketing',70000);`}
   starterCode={`SELECT
   dept,
   COUNT(*) AS headcount,
@@ -111,8 +118,15 @@ by both region and year:
   id SERIAL PRIMARY KEY, region TEXT, year INTEGER, amount NUMERIC
 );
 INSERT INTO sales (region, year, amount) VALUES
-  ('West', 2025, 100), ('West', 2025, 50), ('West', 2026, 200),
-  ('East', 2025, 80),  ('East', 2026, 120), ('East', 2026, 60);`}
+  ('West', 2025, 100), ('West', 2025, 50), ('West', 2025, 75),
+  ('West', 2025, 120), ('West', 2026, 200), ('West', 2026, 90),
+  ('West', 2026, 145), ('West', 2026, 60),
+  ('East', 2025, 80), ('East', 2025, 110), ('East', 2025, 45),
+  ('East', 2025, 95), ('East', 2026, 120), ('East', 2026, 60),
+  ('East', 2026, 175), ('East', 2026, 85),
+  ('North', 2025, 65), ('North', 2025, 130), ('North', 2025, 40),
+  ('North', 2025, 88), ('North', 2026, 155), ('North', 2026, 70),
+  ('North', 2026, 110), ('North', 2026, 95);`}
   starterCode={`SELECT
   region,
   year,
@@ -148,8 +162,18 @@ restrict which rows enter the groups:
   id SERIAL PRIMARY KEY, name TEXT, dept TEXT, salary NUMERIC, is_intern BOOLEAN
 );
 INSERT INTO employees (name, dept, salary, is_intern) VALUES
-  ('Alice','Engineering',120000,false),('Bob','Engineering',95000,false),
-  ('Carol','Sales',80000,false),('Dave','Sales',40000,true),('Eve','Sales',72000,false);`}
+  ('Alice','Engineering',120000,false),('Bob','Engineering',100000,false),
+  ('Cara','Engineering',30000,true),('Frank','Engineering',110000,false),
+  ('Grace','Engineering',132000,false),('Hana','Engineering',88000,false),
+  ('Rosa','Engineering',105000,false),('Sam','Engineering',28000,true),
+  ('Dave','Sales',75000,false),('Eve','Sales',72000,false),
+  ('Ivan','Sales',76000,false),('Jade','Sales',91000,false),
+  ('Kai','Sales',26000,true),('Tara','Sales',84000,false),
+  ('Nina','Support',58000,false),('Omar','Support',61000,false),
+  ('Pia','Support',24000,true),('Quinn','Support',63000,false),
+  ('Finn','Marketing',68000,false),('Lena','Marketing',74000,false),
+  ('Mark','Marketing',62000,false),('Uri','Finance',88000,false),
+  ('Vera','Finance',92000,false),('Wes','Legal',115000,false);`}
   starterCode={`SELECT
   dept,
   ROUND(AVG(salary)) AS avg_salary
@@ -248,7 +272,12 @@ Grouping by multiple columns produces one summary row per distinct combination o
 );
 INSERT INTO orders (customer, amount) VALUES
   ('Ada', 120.00), ('Linus', 80.00), ('Ada', 30.00),
-  ('Grace', 200.00), ('Linus', 15.00), ('Ada', 25.00);`}
+  ('Grace', 200.00), ('Linus', 15.00), ('Ada', 25.00),
+  ('Mae', 42.00), ('Rosa', 18.50), ('Omar', 95.00), ('Priya', 12.75),
+  ('Grace', 60.00), ('Mae', 33.25), ('Rosa', 27.00), ('Omar', 44.00),
+  ('Priya', 8.90), ('Tariq', 76.40), ('Uma', 21.60), ('Tariq', 55.10),
+  ('Wen', 14.30), ('Uma', 9.45), ('Wen', 6.20), ('Mae', 19.80),
+  ('Rosa', 31.15), ('Omar', 7.65);`}
   starterCode={`-- Total per customer, then keep only the big spenders:
 SELECT
   customer,
@@ -275,16 +304,20 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns two customers",
-      description: "Only Ada and Grace clear the 100 threshold.",
-      expectedRowCount: 2,
+      name: "Returns four customers",
+      description: "Only four of the ten customers clear the 100 threshold.",
+      expectedRowCount: 4,
     },
     {
       id: "matches",
       name: "Matches the reference solution",
-      description: "Grace (200.00) then Ada (175.00).",
+      description: "Grace (260.00) at the top, down to Tariq (131.50).",
       matchesSolution: true,
       ordered: true,
     },
   ]}
 />
+
+Grouping is the point where SQL starts doing analysis rather than
+lookup. The next page adds the missing piece: filtering the groups
+themselves, after they have been summarised.

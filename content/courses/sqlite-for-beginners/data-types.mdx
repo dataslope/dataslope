@@ -127,10 +127,18 @@ SQLite has a helpful function named `typeof()` that reports how a value is actua
 );
 
 INSERT INTO examples (label, value) VALUES
-  ('whole number text', '42'),
-  ('decimal text', '3.14'),
-  ('word text', 'banana'),
-  ('missing value', NULL);`}
+  ('whole number text', '42'), ('decimal text', '3.14'),
+  ('word text', 'banana'), ('missing value', NULL),
+  ('negative whole number', '-7'), ('zero as text', '0'),
+  ('padded whole number', ' 8 '), ('large whole number', '9007199254740993'),
+  ('leading plus', '+12'), ('scientific notation', '1e3'),
+  ('trailing decimal point', '5.'), ('leading decimal point', '.5'),
+  ('currency symbol', '$19.99'), ('thousands separator', '1,000'),
+  ('percentage', '85%'), ('hexadecimal-looking', '0x1F'),
+  ('true as text', 'true'), ('empty string', ''),
+  ('whitespace only', '   '), ('date-looking', '2026-03-14'),
+  ('number then letters', '12abc'), ('letters then number', 'abc12'),
+  ('negative decimal', '-3.5'), ('another missing value', NULL);`}
   starterCode={`SELECT
   label,
   value,
@@ -256,7 +264,29 @@ This example stores values in columns with different affinities and uses `typeof
 
 INSERT INTO type_demo (as_integer, as_text, as_real, as_numeric, is_active, created_on) VALUES
   ('42', 42, '3.5', '19.99', 1, '2026-03-14'),
-  ('not a number', 99, '8', 'banana', 0, NULL);`}
+  ('not a number', 99, '8', 'banana', 0, NULL),
+  ('7', 7, '2', '3.00', 1, '2026-03-15'),
+  ('-1', -1, '-0.5', '-2', 0, '2026-03-16'),
+  ('0', 0, '0', '0', 1, '2026-03-17'),
+  (' 5 ', '  5  ', ' 5 ', ' 5 ', 1, '2026-03-18'),
+  ('1e3', '1e3', '1e3', '1e3', 0, '2026-03-19'),
+  ('3.0', 3.0, '3.0', '3.0', 1, '2026-03-20'),
+  ('009', '009', '009', '009', 0, '2026-03-21'),
+  ('12abc', '12abc', '12abc', '12abc', 1, NULL),
+  ('', '', '', '', 0, '2026-03-23'),
+  (NULL, NULL, NULL, NULL, 1, '2026-03-24'),
+  ('2147483648', 2147483648, '2147483648', '2147483648', 0, '2026-03-25'),
+  ('.5', '.5', '.5', '.5', 1, '2026-03-26'),
+  ('5.', '5.', '5.', '5.', 0, '2026-03-27'),
+  ('+8', '+8', '+8', '+8', 1, '2026-03-28'),
+  ('true', 'true', 'true', 'true', 0, '2026-03-29'),
+  ('19.990', 19.990, '19.990', '19.990', 1, '2026-03-30'),
+  ('0x1F', '0x1F', '0x1F', '0x1F', 0, '2026-03-31'),
+  ('1,000', '1,000', '1,000', '1,000', 1, '2026-04-01'),
+  ('-0', '-0', '-0', '-0', 0, '2026-04-02'),
+  ('100', 100, '100', '100', 1, '2026-04-03'),
+  ('banana', 'banana', 'banana', 'banana', 0, NULL),
+  ('3.14159', 3.14159, '3.14159', '3.14159', 1, '2026-04-05');`}
   starterCode={`SELECT
   id,
   as_integer,

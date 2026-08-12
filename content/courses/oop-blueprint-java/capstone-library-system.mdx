@@ -50,7 +50,7 @@ Using the cards format from *Responsibility-Driven Design*:
 
 | Class | Responsibilities | Collaborators |
 | --- | --- | --- |
-| `Book` | Know its title, author, and ISBN |, |
+| `Book` | Know its title, author, and ISBN | none |
 | `Member` | Know its name and id; know its current loans; count them | `Loan` |
 | `Loan` | Know the borrowed book, the member, and the due date; know if overdue | `Book`, `Member` |
 | `BorrowingPolicy` | Decide if a given member may borrow another book | `Member` |

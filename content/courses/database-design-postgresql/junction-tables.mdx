@@ -149,15 +149,88 @@ CREATE TABLE enrollments (
 );
 
 INSERT INTO students (id, name) VALUES
-  (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
+  (1, 'Ada'),
+  (2, 'Grace'),
+  (3, 'Linus'),
+  (4, 'Mae'),
+  (5, 'Rosa'),
+  (6, 'Ivan'),
+  (7, 'Nadia'),
+  (8, 'Omar'),
+  (9, 'Priya'),
+  (10, 'Quinn'),
+  (11, 'Ruth'),
+  (12, 'Sam'),
+  (13, 'Tariq'),
+  (14, 'Uma'),
+  (15, 'Viktor'),
+  (16, 'Wen'),
+  (17, 'Xenia'),
+  (18, 'Yusuf'),
+  (19, 'Zara'),
+  (20, 'Bruno'),
+  (21, 'Chidi'),
+  (22, 'Dara'),
+  (23, 'Elif'),
+  (24, 'Farid');
 
 INSERT INTO courses (id, title) VALUES
-  (10, 'Math'), (11, 'History');
+  (10, 'Math'),
+  (11, 'History'),
+  (12, 'Art'),
+  (13, 'Biology'),
+  (14, 'Physics'),
+  (15, 'Music');
 
 INSERT INTO enrollments (student_id, course_id, enrolled_on, grade) VALUES
-  (1, 10, DATE '2025-01-15', 'A'),
-  (1, 11, DATE '2025-01-16', 'B'),
-  (2, 10, DATE '2025-01-18', 'A');`}
+  (1, 10, DATE '2025-01-01', 'B'),
+  (1, 11, DATE '2025-01-02', 'C'),
+  (2, 10, DATE '2025-01-03', 'C'),
+  (2, 12, DATE '2025-01-04', 'B'),
+  (3, 11, DATE '2025-01-05', 'B'),
+  (3, 13, DATE '2025-01-06', 'B'),
+  (4, 10, DATE '2025-01-07', 'B'),
+  (4, 14, DATE '2025-01-08', 'A'),
+  (5, 11, DATE '2025-01-09', 'B'),
+  (5, 15, DATE '2025-01-10', 'A'),
+  (6, 10, DATE '2025-01-11', 'B'),
+  (6, 12, DATE '2025-01-12', 'A'),
+  (7, 11, DATE '2025-01-13', 'A'),
+  (7, 13, DATE '2025-01-14', 'A'),
+  (8, 12, DATE '2025-01-15', 'A'),
+  (8, 14, DATE '2025-01-16', 'C'),
+  (9, 13, DATE '2025-01-17', 'C'),
+  (9, 15, DATE '2025-01-18', 'B'),
+  (10, 10, DATE '2025-01-19', 'A'),
+  (10, 14, DATE '2025-01-20', 'B'),
+  (11, 11, DATE '2025-01-21', 'C'),
+  (11, 15, DATE '2025-01-22', 'B'),
+  (12, 10, DATE '2025-01-23', 'C'),
+  (12, 12, DATE '2025-01-24', 'B'),
+  (13, 11, DATE '2025-01-25', 'B'),
+  (13, 13, DATE '2025-01-26', 'B'),
+  (14, 12, DATE '2025-01-27', 'B'),
+  (14, 14, DATE '2025-01-28', 'A'),
+  (15, 13, DATE '2025-01-01', 'A'),
+  (15, 15, DATE '2025-01-02', 'A'),
+  (16, 10, DATE '2025-01-03', 'B'),
+  (16, 14, DATE '2025-01-04', 'A'),
+  (17, 11, DATE '2025-01-05', 'A'),
+  (17, 15, DATE '2025-01-06', 'C'),
+  (18, 10, DATE '2025-01-07', 'A'),
+  (18, 12, DATE '2025-01-08', 'A'),
+  (19, 11, DATE '2025-01-09', 'A'),
+  (19, 13, DATE '2025-01-10', 'C'),
+  (20, 12, DATE '2025-01-11', 'C'),
+  (20, 14, DATE '2025-01-12', 'B'),
+  (21, 13, DATE '2025-01-13', 'B'),
+  (21, 15, DATE '2025-01-14', 'B'),
+  (22, 10, DATE '2025-01-15', 'C'),
+  (22, 14, DATE '2025-01-16', 'B'),
+  (23, 11, DATE '2025-01-17', 'B'),
+  (23, 15, DATE '2025-01-18', 'A'),
+  (24, 10, DATE '2025-01-19', 'B'),
+  (24, 12, DATE '2025-01-20', 'B');`}
   starterCode={`SELECT
   s.name,
   c.title,
@@ -209,7 +282,7 @@ work. Prove it to yourself with the schema from above.
 <SqlChallengeCard
   dialect="postgres"
   title="Enroll Linus in Math"
-  instructions={`Linus (\`student_id = 3\`) wants to join Math (\`course_id = 10\`). Insert **one row** into \`enrollments\` with those two ids, \`enrolled_on = DATE '2026-02-01'\`, and \`grade = NULL\` (you can simply omit the grade column). Ada's and Grace's existing enrollments must be left alone.`}
+  instructions={`Linus (\`student_id = 3\`) wants to join Math (\`course_id = 10\`). Insert **one row** into \`enrollments\` with those two ids, \`enrolled_on = DATE '2026-02-01'\`, and \`grade = NULL\` (you can simply omit the grade column). The 48 enrollments already loaded must be left alone.`}
   initSql={`CREATE TABLE students (
   id   INTEGER PRIMARY KEY,
   name TEXT NOT NULL
@@ -229,15 +302,88 @@ CREATE TABLE enrollments (
 );
 
 INSERT INTO students (id, name) VALUES
-  (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
+  (1, 'Ada'),
+  (2, 'Grace'),
+  (3, 'Linus'),
+  (4, 'Mae'),
+  (5, 'Rosa'),
+  (6, 'Ivan'),
+  (7, 'Nadia'),
+  (8, 'Omar'),
+  (9, 'Priya'),
+  (10, 'Quinn'),
+  (11, 'Ruth'),
+  (12, 'Sam'),
+  (13, 'Tariq'),
+  (14, 'Uma'),
+  (15, 'Viktor'),
+  (16, 'Wen'),
+  (17, 'Xenia'),
+  (18, 'Yusuf'),
+  (19, 'Zara'),
+  (20, 'Bruno'),
+  (21, 'Chidi'),
+  (22, 'Dara'),
+  (23, 'Elif'),
+  (24, 'Farid');
 
 INSERT INTO courses (id, title) VALUES
-  (10, 'Math'), (11, 'History');
+  (10, 'Math'),
+  (11, 'History'),
+  (12, 'Art'),
+  (13, 'Biology'),
+  (14, 'Physics'),
+  (15, 'Music');
 
 INSERT INTO enrollments (student_id, course_id, enrolled_on, grade) VALUES
-  (1, 10, DATE '2025-01-15', 'A'),
-  (1, 11, DATE '2025-01-16', 'B'),
-  (2, 10, DATE '2025-01-18', 'A');`}
+  (1, 10, DATE '2025-01-01', 'B'),
+  (1, 11, DATE '2025-01-02', 'C'),
+  (2, 10, DATE '2025-01-03', 'C'),
+  (2, 12, DATE '2025-01-04', 'B'),
+  (3, 11, DATE '2025-01-05', 'B'),
+  (3, 13, DATE '2025-01-06', 'B'),
+  (4, 10, DATE '2025-01-07', 'B'),
+  (4, 14, DATE '2025-01-08', 'A'),
+  (5, 11, DATE '2025-01-09', 'B'),
+  (5, 15, DATE '2025-01-10', 'A'),
+  (6, 10, DATE '2025-01-11', 'B'),
+  (6, 12, DATE '2025-01-12', 'A'),
+  (7, 11, DATE '2025-01-13', 'A'),
+  (7, 13, DATE '2025-01-14', 'A'),
+  (8, 12, DATE '2025-01-15', 'A'),
+  (8, 14, DATE '2025-01-16', 'C'),
+  (9, 13, DATE '2025-01-17', 'C'),
+  (9, 15, DATE '2025-01-18', 'B'),
+  (10, 10, DATE '2025-01-19', 'A'),
+  (10, 14, DATE '2025-01-20', 'B'),
+  (11, 11, DATE '2025-01-21', 'C'),
+  (11, 15, DATE '2025-01-22', 'B'),
+  (12, 10, DATE '2025-01-23', 'C'),
+  (12, 12, DATE '2025-01-24', 'B'),
+  (13, 11, DATE '2025-01-25', 'B'),
+  (13, 13, DATE '2025-01-26', 'B'),
+  (14, 12, DATE '2025-01-27', 'B'),
+  (14, 14, DATE '2025-01-28', 'A'),
+  (15, 13, DATE '2025-01-01', 'A'),
+  (15, 15, DATE '2025-01-02', 'A'),
+  (16, 10, DATE '2025-01-03', 'B'),
+  (16, 14, DATE '2025-01-04', 'A'),
+  (17, 11, DATE '2025-01-05', 'A'),
+  (17, 15, DATE '2025-01-06', 'C'),
+  (18, 10, DATE '2025-01-07', 'A'),
+  (18, 12, DATE '2025-01-08', 'A'),
+  (19, 11, DATE '2025-01-09', 'A'),
+  (19, 13, DATE '2025-01-10', 'C'),
+  (20, 12, DATE '2025-01-11', 'C'),
+  (20, 14, DATE '2025-01-12', 'B'),
+  (21, 13, DATE '2025-01-13', 'B'),
+  (21, 15, DATE '2025-01-14', 'B'),
+  (22, 10, DATE '2025-01-15', 'C'),
+  (22, 14, DATE '2025-01-16', 'B'),
+  (23, 11, DATE '2025-01-17', 'B'),
+  (23, 15, DATE '2025-01-18', 'A'),
+  (24, 10, DATE '2025-01-19', 'B'),
+  (24, 12, DATE '2025-01-20', 'B');`}
   starterCode={`-- INSERT one enrollment row: Linus (3) into Math (10), enrolled 2026-02-01.`}
   solutionSql={`INSERT INTO
   enrollments (student_id, course_id, enrolled_on)
@@ -255,9 +401,9 @@ VALUES
     {
       id: "total_rows",
       name: "Exactly one new row",
-      description: "Four enrollments in total",
+      description: "49 enrollments in total, the 48 that were loaded plus yours",
       runAfterSql: "SELECT COUNT(*) FROM enrollments;",
-      runAfterEquals: 4,
+      runAfterEquals: 49,
     },
   ]}
 />

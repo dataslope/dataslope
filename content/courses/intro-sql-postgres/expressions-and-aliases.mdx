@@ -32,7 +32,28 @@ each row:
 INSERT INTO sales (product, price, qty) VALUES
   ('Latte', 4.50, 3),
   ('Mocha', 5.00, 2),
-  ('Tea',   3.00, 5);`}
+  ('Tea', 3.00, 5),
+  ('Water', 1.00, 1),
+  ('Espresso', 2.75, 4),
+  ('Cappuccino', 4.25, 3),
+  ('Flat white', 4.75, 2),
+  ('Hot chocolate', 4.00, 6),
+  ('Iced latte', 5.25, 2),
+  ('Cold brew', 4.80, 3),
+  ('Chai', 3.90, 4),
+  ('Matcha', 5.50, 1),
+  ('Americano', 3.25, 7),
+  ('Macchiato', 3.75, 2),
+  ('Croissant', 3.10, 5),
+  ('Muffin', 2.95, 4),
+  ('Bagel', 2.60, 3),
+  ('Scone', 3.40, 2),
+  ('Brownie', 3.80, 6),
+  ('Cookie', 1.95, 9),
+  ('Orange juice', 3.50, 3),
+  ('Lemonade', 3.20, 4),
+  ('Sparkling water', 1.80, 5),
+  ('Smoothie', 6.00, 2);`}
   starterCode={`SELECT
   product,
   price,
@@ -94,8 +115,14 @@ and `LENGTH()` transform it:
   last  TEXT
 );
 INSERT INTO people (first, last) VALUES
-  ('Ada', 'Lovelace'),
-  ('Alan', 'Turing');`}
+  ('Ada', 'Lovelace'), ('Alan', 'Turing'), ('Grace', 'Hopper'),
+  ('Edsger', 'Dijkstra'), ('Barbara', 'Liskov'), ('Donald', 'Knuth'),
+  ('Frances', 'Allen'), ('John', 'McCarthy'), ('Katherine', 'Johnson'),
+  ('Dennis', 'Ritchie'), ('Radia', 'Perlman'), ('Ken', 'Thompson'),
+  ('Adele', 'Goldberg'), ('Tony', 'Hoare'), ('Jean', 'Bartik'),
+  ('Vint', 'Cerf'), ('Shafi', 'Goldwasser'), ('Leslie', 'Lamport'),
+  ('Karen', 'Sparck Jones'), ('Peter', 'Naur'), ('Mary', 'Wilkes'),
+  ('Niklaus', 'Wirth'), ('Sophie', 'Wilson'), ('Alan', 'Kay');`}
   starterCode={`SELECT
   first || ' ' || last AS full_name,
   UPPER(last) AS last_upper,
@@ -127,7 +154,30 @@ on:
   id SERIAL PRIMARY KEY, product TEXT, price NUMERIC, qty INTEGER
 );
 INSERT INTO sales (product, price, qty) VALUES
-  ('Latte',4.50,3),('Mocha',5.00,2),('Tea',3.00,5);`}
+  ('Latte',4.50,3),
+  ('Mocha',5.00,2),
+  ('Tea',3.00,5),
+  ('Water',1.00,1),
+  ('Espresso',2.75,4),
+  ('Cappuccino',4.25,3),
+  ('Flat white',4.75,2),
+  ('Hot chocolate',4.00,6),
+  ('Iced latte',5.25,2),
+  ('Cold brew',4.80,3),
+  ('Chai',3.90,4),
+  ('Matcha',5.50,1),
+  ('Americano',3.25,7),
+  ('Macchiato',3.75,2),
+  ('Croissant',3.10,5),
+  ('Muffin',2.95,4),
+  ('Bagel',2.60,3),
+  ('Scone',3.40,2),
+  ('Brownie',3.80,6),
+  ('Cookie',1.95,9),
+  ('Orange juice',3.50,3),
+  ('Lemonade',3.20,4),
+  ('Sparkling water',1.80,5),
+  ('Smoothie',6.00,2);`}
   starterCode={`SELECT
   product,
   ROUND(price * qty * 1.08, 2) AS total_with_tax
@@ -151,7 +201,30 @@ them as well:
   id SERIAL PRIMARY KEY, product TEXT, price NUMERIC, qty INTEGER
 );
 INSERT INTO sales (product, price, qty) VALUES
-  ('Latte',4.50,3),('Mocha',5.00,2),('Tea',3.00,5),('Water',1.00,1);`}
+  ('Latte',4.50,3),
+  ('Mocha',5.00,2),
+  ('Tea',3.00,5),
+  ('Water',1.00,1),
+  ('Espresso',2.75,4),
+  ('Cappuccino',4.25,3),
+  ('Flat white',4.75,2),
+  ('Hot chocolate',4.00,6),
+  ('Iced latte',5.25,2),
+  ('Cold brew',4.80,3),
+  ('Chai',3.90,4),
+  ('Matcha',5.50,1),
+  ('Americano',3.25,7),
+  ('Macchiato',3.75,2),
+  ('Croissant',3.10,5),
+  ('Muffin',2.95,4),
+  ('Bagel',2.60,3),
+  ('Scone',3.40,2),
+  ('Brownie',3.80,6),
+  ('Cookie',1.95,9),
+  ('Orange juice',3.50,3),
+  ('Lemonade',3.20,4),
+  ('Sparkling water',1.80,5),
+  ('Smoothie',6.00,2);`}
   starterCode={`SELECT
   product,
   price * qty AS line_total
@@ -229,8 +302,28 @@ An alias names a result column for readability without changing stored data.`}
 INSERT INTO sales (product, price, qty) VALUES
   ('Latte', 4.50, 3),
   ('Mocha', 5.00, 2),
-  ('Tea',   3.00, 5),
-  ('Water', 1.00, 1);`}
+  ('Tea', 3.00, 5),
+  ('Water', 1.00, 1),
+  ('Espresso', 2.75, 4),
+  ('Cappuccino', 4.25, 3),
+  ('Flat white', 4.75, 2),
+  ('Hot chocolate', 4.00, 6),
+  ('Iced latte', 5.25, 2),
+  ('Cold brew', 4.80, 3),
+  ('Chai', 3.90, 4),
+  ('Matcha', 5.50, 1),
+  ('Americano', 3.25, 7),
+  ('Macchiato', 3.75, 2),
+  ('Croissant', 3.10, 5),
+  ('Muffin', 2.95, 4),
+  ('Bagel', 2.60, 3),
+  ('Scone', 3.40, 2),
+  ('Brownie', 3.80, 6),
+  ('Cookie', 1.95, 9),
+  ('Orange juice', 3.50, 3),
+  ('Lemonade', 3.20, 4),
+  ('Sparkling water', 1.80, 5),
+  ('Smoothie', 6.00, 2);`}
   starterCode={`SELECT
   product
   -- add a computed line_total column, then sort by it
@@ -252,16 +345,21 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns all four sales",
+      name: "Returns all 24 sales",
       description: "One row per sale.",
-      expectedRowCount: 4,
+      expectedRowCount: 24,
     },
     {
       id: "matches",
       name: "Matches the reference solution",
-      description: "Tea (15.00) first, down to Water (1.00).",
+      description: "Hot chocolate (24.00) first, down to Water (1.00).",
       matchesSolution: true,
       ordered: true,
     },
   ]}
 />
+
+Everything on this page was computed rather than stored. That
+distinction matters more than it first appears: a derived column is
+always correct, where a stored copy of the same number can drift out of
+date.

@@ -22,6 +22,12 @@ Formally, a tree is a connected acyclic graph. In a rooted tree, one node is the
 * **Height** measures the longest downward path. Many coding problems define maximum depth as a number of nodes.
 * A **level** contains all nodes at the same depth.
 
+<Figure
+  slug="dsa-trees-tree-vocabulary-inline-cutout"
+  alt="A branching frame with small blank plates hanging at its root, a fork and a leaf"
+  caption="Root, node, leaf: the three words the rest of the vocabulary hangs off."
+/>
+
 ```mermaid
 flowchart TD
     A["root: 10<br/>depth 0"] --> B["5<br/>depth 1"]
@@ -105,12 +111,6 @@ int main() {
 ## Binary tree representations
 
 A linked representation is flexible and works well for sparse trees.
-
-<Figure
-  slug="dsa-trees-tree-vocabulary-inline-cutout"
-  alt="A branching frame with small blank plates hanging at its root, a fork and a leaf"
-  caption="Root, node, leaf: the three words the rest of the vocabulary hangs off."
-/>
 
 <CodeBlock
   adapter="cpp"

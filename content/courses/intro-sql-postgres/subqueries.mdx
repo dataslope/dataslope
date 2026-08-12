@@ -41,7 +41,9 @@ which you compare against in a `WHERE` clause:
   amount NUMERIC
 );
 INSERT INTO orders (id, amount) VALUES
-  (1, 20), (2, 5), (3, 80), (4, 35), (5, 60);`}
+  (1,20),(2,5),(3,80),(4,35),(5,60),(6,12),(7,97),(8,44),
+  (9,73),(10,26),(11,58),(12,110),(13,31),(14,85),(15,17),(16,64),
+  (17,49),(18,92),(19,23),(20,71),(21,38),(22,105),(23,55),(24,8);`}
   starterCode={`SELECT
   id,
   amount
@@ -89,8 +91,18 @@ who have ordered, and the outer query selects those customers:
 CREATE TABLE orders (
   id INTEGER PRIMARY KEY, customer_id INTEGER
 );
-INSERT INTO customers (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus');
-INSERT INTO orders (id, customer_id) VALUES (101,1),(102,1),(103,2);`}
+INSERT INTO customers (id, name) VALUES
+  (1,'Ada'), (2,'Grace'), (3,'Linus'), (4,'Mae'),
+  (5,'Rosa'), (6,'Ivan'), (7,'Nadia'), (8,'Omar'),
+  (9,'Priya'), (10,'Quinn'), (11,'Ruth'), (12,'Sam'),
+  (13,'Tariq'), (14,'Uma'), (15,'Viktor'), (16,'Wen'),
+  (17,'Xenia'), (18,'Yusuf'), (19,'Zara'), (20,'Bruno'),
+  (21,'Chidi'), (22,'Dara'), (23,'Elif'), (24,'Farid');
+INSERT INTO orders (id, customer_id) VALUES
+  (101,1),(102,1),(103,2),(104,2),(105,5),(106,5),(107,6),(108,7),
+  (109,8),(110,8),(111,9),(112,11),(113,11),(114,12),(115,13),(116,13),
+  (117,14),(118,15),(119,16),(120,16),(121,17),(122,18),(123,20),(124,20),
+  (125,21),(126,22),(127,22),(128,23),(129,24),(130,1),(131,9),(132,17);`}
   starterCode={`SELECT
   name
 FROM
@@ -106,10 +118,12 @@ ORDER BY
   name;`}
 />
 
-The inner query produces the set `{1, 2}`; the outer query keeps
-customers whose `id` is in that set, Ada and Grace. Linus, absent
-from the list, is excluded. (This is one of several ways to express
-the question; a join could do it too.)
+The inner query produces the set of customer ids that appear in
+`orders`; the outer query keeps the customers whose `id` is in that
+set. Twenty of the 24 customers come back. Linus, Mae, Quinn and Zara
+are absent from the inner set, so they are excluded. (This is one of
+several ways to express the question; a join could do it too, and so
+could `EXISTS`.)
 
 ## Subqueries in different places
 
@@ -199,7 +213,13 @@ The subquery recomputes the value each run, so the comparison never goes stale.`
 );
 INSERT INTO products (name, price) VALUES
   ('Mouse', 25.00), ('Keyboard', 40.00), ('Headset', 55.00),
-  ('Webcam', 80.00), ('Monitor', 100.00);`}
+  ('Webcam', 80.00), ('Monitor', 100.00), ('Desk lamp', 22.00),
+  ('Laptop stand', 39.99), ('USB hub', 29.95), ('External drive', 109.00),
+  ('Chair', 259.00), ('Footrest', 34.50), ('Monitor arm', 89.99),
+  ('Cable tray', 19.95), ('Desk mat', 27.50), ('Wrist rest', 14.99),
+  ('Graphics tablet', 149.00), ('Label printer', 74.95), ('Router', 119.00),
+  ('Surge protector', 21.99), ('Whiteboard', 54.50), ('Bookshelf', 139.00),
+  ('Docking station', 179.00), ('Microphone', 94.50), ('Headphones', 129.99);`}
   starterCode={`SELECT
   name,
   price
@@ -232,9 +252,9 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns two products",
-      description: "The average price is 60.00; only two products exceed it.",
-      expectedRowCount: 2,
+      name: "Returns eleven products",
+      description: "Only the products priced above the average.",
+      expectedRowCount: 11,
     },
     {
       id: "matches",
@@ -245,3 +265,8 @@ ORDER BY
     },
   ]}
 />
+
+Subqueries let one query answer a question that depends on another
+query's answer. A join can often express the same thing, and reaching
+for whichever reads more clearly is a better habit than picking a
+favourite.

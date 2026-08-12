@@ -43,7 +43,7 @@ The buffer is unchanged. `a` is left in a valid but empty state
 copying a few pointers and integers. Done.
 
 Which means the cost of a move does not depend on the size of what is
-being moved, and the cost of a copy is nothing but:
+being moved, while the cost of a copy is almost entirely that size:
 
 <Chart slug="copy-vs-move-cost" />
 

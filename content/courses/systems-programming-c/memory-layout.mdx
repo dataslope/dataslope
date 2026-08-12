@@ -46,6 +46,12 @@ rather than your laptop's physical RAM.
 You can roughly identify which region a variable lives in by printing
 its address.
 
+<Figure
+  slug="sysc-memory-layout-seeing-regions-inline-cutout"
+  alt="One long horizontal bar divided end to end into four bands of different colors"
+  caption="Text, data, heap and stack, each with its own rules and direction of growth."
+/>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -113,12 +119,6 @@ C splits globals into two pieces purely as a file-size optimization:
 - `.bss` ("Block Started by Symbol") holds globals initialized to
   zero. They take *no space in the executable file*, the OS just
   zeroes a region of memory at load time.
-
-<Figure
-  slug="sysc-memory-layout-inline-cutout"
-  alt="One long horizontal bar running the full width of the frame, divided end to end into four bands of different colors, a small arrow above the third band pointing right and a small arrow above the fourth pointing left so the two grow toward each other, and three loose crates resting inside the third band"
-  caption="The stack grows down and the heap grows up, toward each other."
-/>
 
 <CodeBlock
   adapter="c"
@@ -201,12 +201,6 @@ to zero on every call.
 Worth having in view before either: what it costs to reach each level of the
 hierarchy the program is laid out across.
 
-<Figure
-  slug="sysc-memory-layout-seeing-regions-inline-cutout"
-  alt="One long horizontal bar divided end to end into four bands of different colors"
-  caption="Text, data, heap and stack, each with its own rules and direction of growth."
-/>
-
 <Chart slug="memory-latency-ladder" />
 
 The two regions you will think about most are the **stack** and the
@@ -217,6 +211,12 @@ flowchart TB
     S["Stack frame for current call"] --> S1["caller's frame"] --> S2["main's frame"]
     H["Heap chunk A"] --- H2["chunk B"] --- H3["free hole"] --- H4["chunk C"]
 ```
+
+<Figure
+  slug="sysc-memory-layout-inline-cutout"
+  alt="One long horizontal bar running the full width of the frame, divided end to end into four bands of different colors, a small arrow above the third band pointing right and a small arrow above the fourth pointing left so the two grow toward each other, and three loose crates resting inside the third band"
+  caption="The stack grows down and the heap grows up, toward each other."
+/>
 
 | | Stack | Heap |
 | --- | --- | --- |

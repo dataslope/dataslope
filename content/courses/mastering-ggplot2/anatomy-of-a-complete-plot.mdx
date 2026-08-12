@@ -14,6 +14,12 @@ uses. Let us dissect it and prove the grammar has become second nature.
 
 ## The plot
 
+<Figure
+  slug="gg-anatomy-of-a-complete-plot-plot-inline-cutout"
+  alt="One finished plot standing complete on a bench, frame, marks, key and labels all in place"
+  caption="Every finished plot is the same components, all present at once."
+/>
+
 <CodeBlock
   adapter="r"
   files={[
@@ -69,12 +75,6 @@ doing one job.
 Because you understand the components, you can *predict* what edits
 would do, without running them. Test yourself, then run to confirm.
 
-<Figure
-  slug="gg-anatomy-of-a-complete-plot-plot-inline-cutout"
-  alt="One finished plot standing complete on a bench, frame, marks, key and labels all in place"
-  caption="Every finished plot is the same components, all present at once."
-/>
-
 <CodeBlock
   adapter="r"
   files={[
@@ -119,6 +119,11 @@ p # check: do the points and colors look right?
     },
   ]}
 />
+
+Points and colors look right, so that layer is done. Add the next
+component and check again. Building a plot one addition at a time is
+slower to type and much faster to debug, because a plot that breaks tells
+you exactly which line broke it:
 
 <CodeBlock
   adapter="r"
@@ -188,4 +193,4 @@ component by component and check as you go.`}
 - Understanding components lets you **predict** the effect of an edit
   (e.g. moving a mapping into one layer) before running it.
 - Build complex plots **incrementally**, add a component, view, repeat,
-which mirrors the grammar and makes debugging easy.
+  which mirrors the grammar and makes debugging easy.

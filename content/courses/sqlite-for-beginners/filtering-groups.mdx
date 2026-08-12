@@ -62,12 +62,16 @@ Think of it like making piles of receipts:
   dept TEXT
 );
 INSERT INTO employees (name, dept) VALUES
-  ('Alice', 'Engineering'),
-  ('Bob', 'Engineering'),
-  ('Cara', 'Engineering'),
-  ('Dave', 'Sales'),
-  ('Eve', 'Sales'),
-  ('Finn', 'Marketing');`}
+  ('Alice', 'Engineering'), ('Bob', 'Engineering'), ('Cara', 'Engineering'),
+  ('Gina', 'Engineering'), ('Hugo', 'Engineering'), ('Mona', 'Engineering'),
+  ('Theo', 'Engineering'), ('Yara', 'Engineering'),
+  ('Dave', 'Sales'), ('Eve', 'Sales'), ('Iris', 'Sales'),
+  ('Nils', 'Sales'), ('Rui', 'Sales'), ('Vik', 'Sales'),
+  ('Jonas', 'Support'), ('Kira', 'Support'), ('Otto', 'Support'),
+  ('Sara', 'Support'), ('Wanda', 'Support'),
+  ('Finn', 'Marketing'), ('Leo', 'Marketing'),
+  ('Pia', 'Finance'), ('Ulla', 'Finance'),
+  ('Quinn', 'Legal');`}
   starterCode={`SELECT
   dept,
   COUNT(*) AS headcount
@@ -81,16 +85,25 @@ ORDER BY
   headcount DESC;`}
 />
 
-Only Engineering survives because it has 3 employees. Sales has 2 and Marketing has 1, so those groups are filtered out.
+Three departments survive. Engineering has 8 employees, Sales has 6 and
+Support has 5, so all three clear the bar. Marketing and Finance have 2
+each and Legal has 1, so those groups are filtered out after being
+counted. Note the order of events: every department was grouped and
+counted first, and only then did `HAVING` throw three of the answers
+away.
 
 ```mermaid
 flowchart TB
-    Groups["Department groups"] --> Eng["Engineering<br/><code>COUNT = 3</code>"]
-    Groups --> Sales["Sales<br/><code>COUNT = 2</code>"]
-    Groups --> Mkt["Marketing<br/><code>COUNT = 1</code>"]
+    Groups["Department groups"] --> Eng["Engineering<br/><code>COUNT = 8</code>"]
+    Groups --> Sales["Sales<br/><code>COUNT = 6</code>"]
+    Groups --> Sup["Support<br/><code>COUNT = 5</code>"]
+    Groups --> Mkt["Marketing<br/><code>COUNT = 2</code>"]
+    Groups --> Leg["Legal<br/><code>COUNT = 1</code>"]
     Eng --> Keep["<code>HAVING COUNT(*) &gt; 2</code><br/>keep"]
-    Sales --> Drop["drop"]
-    Mkt --> Drop
+    Sales --> Keep
+    Sup --> Keep
+    Mkt --> Drop["drop"]
+    Leg --> Drop
 ```
 
 <MultipleChoice
@@ -130,12 +143,18 @@ Use both when you need both jobs.
   is_intern INTEGER
 );
 INSERT INTO employees (name, dept, salary, is_intern) VALUES
-  ('Alice', 'Engineering', 120000, 0),
-  ('Bob', 'Engineering', 100000, 0),
-  ('Cara', 'Engineering', 30000, 1),
-  ('Dave', 'Sales', 75000, 0),
-  ('Eve', 'Sales', 72000, 0),
-  ('Finn', 'Marketing', 68000, 0);`}
+  ('Alice', 'Engineering', 120000, 0), ('Bob', 'Engineering', 100000, 0),
+  ('Cara', 'Engineering', 30000, 1), ('Gina', 'Engineering', 115000, 0),
+  ('Hugo', 'Engineering', 98000, 0), ('Mona', 'Engineering', 132000, 0),
+  ('Theo', 'Engineering', 28000, 1), ('Yara', 'Engineering', 105000, 0),
+  ('Dave', 'Sales', 75000, 0), ('Eve', 'Sales', 72000, 0),
+  ('Iris', 'Sales', 81000, 0), ('Nils', 'Sales', 26000, 1),
+  ('Rui', 'Sales', 69000, 0), ('Vik', 'Sales', 77000, 0),
+  ('Jonas', 'Support', 58000, 0), ('Kira', 'Support', 61000, 0),
+  ('Otto', 'Support', 24000, 1), ('Sara', 'Support', 55000, 0),
+  ('Wanda', 'Support', 63000, 0), ('Finn', 'Marketing', 68000, 0),
+  ('Leo', 'Marketing', 71000, 0), ('Pia', 'Finance', 88000, 0),
+  ('Ulla', 'Finance', 92000, 0), ('Quinn', 'Legal', 110000, 0);`}
   starterCode={`SELECT
   dept,
   ROUND(AVG(salary), 0) AS average_salary
@@ -171,12 +190,12 @@ Read it in stages:
   amount REAL
 );
 INSERT INTO sales (product, amount) VALUES
-  ('Notebook', 12.00),
-  ('Pencil', 3.00),
-  ('Notebook', 18.00),
-  ('Backpack', 45.00),
-  ('Pencil', 2.50),
-  ('Notebook', 9.00);`}
+  ('Notebook', 12.00), ('Pencil', 3.00), ('Notebook', 18.00), ('Backpack', 45.00),
+  ('Pencil', 2.50), ('Notebook', 9.00), ('Backpack', 38.50), ('Mug', 7.25),
+  ('Pencil', 4.10), ('Notebook', 15.75), ('Mug', 6.80), ('Backpack', 52.00),
+  ('Eraser', 1.20), ('Notebook', 11.40), ('Mug', 8.90), ('Pencil', 3.75),
+  ('Backpack', 41.25), ('Eraser', 0.95), ('Notebook', 13.60), ('Mug', 5.50),
+  ('Pencil', 2.80), ('Backpack', 47.80), ('Eraser', 1.45), ('Notebook', 16.20);`}
   starterCode={`SELECT
   product,
   SUM(amount) AS total_sales
@@ -206,12 +225,18 @@ Because `WHERE` happens before grouping, it can change the totals that `HAVING` 
   channel TEXT
 );
 INSERT INTO sales (product, amount, channel) VALUES
-  ('Notebook', 12.00, 'Online'),
-  ('Notebook', 18.00, 'Store'),
-  ('Notebook', 9.00, 'Online'),
-  ('Backpack', 45.00, 'Store'),
-  ('Backpack', 20.00, 'Online'),
-  ('Pencil', 3.00, 'Online');`}
+  ('Notebook', 12.00, 'Online'), ('Notebook', 18.00, 'Store'),
+  ('Notebook', 9.00, 'Online'), ('Backpack', 45.00, 'Store'),
+  ('Backpack', 20.00, 'Online'), ('Pencil', 3.00, 'Online'),
+  ('Notebook', 15.75, 'Online'), ('Notebook', 11.40, 'Store'),
+  ('Backpack', 38.50, 'Online'), ('Backpack', 52.00, 'Store'),
+  ('Mug', 7.25, 'Online'), ('Mug', 6.80, 'Store'),
+  ('Pencil', 4.10, 'Store'), ('Pencil', 2.50, 'Online'),
+  ('Eraser', 1.20, 'Online'), ('Eraser', 0.95, 'Store'),
+  ('Notebook', 13.60, 'Online'), ('Mug', 8.90, 'Online'),
+  ('Backpack', 41.25, 'Online'), ('Pencil', 3.75, 'Online'),
+  ('Mug', 5.50, 'Store'), ('Eraser', 1.45, 'Online'),
+  ('Notebook', 16.20, 'Store'), ('Backpack', 47.80, 'Store');`}
   starterCode={`SELECT
   product,
   SUM(amount) AS online_sales
@@ -267,12 +292,12 @@ The aggregate in `HAVING` does not have to appear in the final output, though sh
   amount REAL
 );
 INSERT INTO orders (customer, amount) VALUES
-  ('Ada', 24.00),
-  ('Ada', 18.00),
-  ('Grace', 10.00),
-  ('Linus', 12.00),
-  ('Linus', 9.00),
-  ('Linus', 6.00);`}
+  ('Ada', 24.50), ('Grace', 18.00), ('Linus', 42.75), ('Maya', 16.25),
+  ('Ada', 31.00), ('Rosa', 12.40), ('Grace', 55.10), ('Omar', 27.30),
+  ('Linus', 8.95), ('Maya', 64.20), ('Rosa', 19.75), ('Ada', 47.60),
+  ('Omar', 35.15), ('Grace', 22.85), ('Priya', 71.00), ('Linus', 29.40),
+  ('Maya', 13.65), ('Priya', 38.20), ('Rosa', 52.30), ('Omar', 9.99),
+  ('Ada', 26.70), ('Priya', 44.55), ('Grace', 17.10), ('Linus', 60.05);`}
   starterCode={`SELECT
   customer
 FROM

@@ -60,11 +60,11 @@ rows tie on the sort key, SQL may return them in either order, so a
 INSERT INTO
   products
 VALUES
-  (1, 'A', 100),
-  (2, 'B', 100),
-  (3, 'C', 100),
-  (4, 'D', 90),
-  (5, 'E', 80);`}
+  (1, 'A', 100), (2, 'B', 100), (3, 'C', 100), (4, 'D', 90), (5, 'E', 80),
+  (6, 'F', 95), (7, 'G', 90), (8, 'H', 75), (9, 'I', 85), (10, 'J', 70),
+  (11, 'K', 85), (12, 'L', 60), (13, 'M', 95), (14, 'N', 55), (15, 'O', 80),
+  (16, 'P', 65), (17, 'Q', 75), (18, 'R', 50), (19, 'S', 70), (20, 'T', 45),
+  (21, 'U', 65), (22, 'V', 40), (23, 'W', 60), (24, 'X', 35);`}
   starterCode={`SELECT
   id,
   name,
@@ -145,11 +145,29 @@ INSERT INTO
   orders
 VALUES
   (1, 'West', 'paid', 120),
-  (2, 'West', 'refunded', 45),
-  (3, 'East', 'paid', 200),
-  (4, 'East', 'paid', 50),
-  (5, 'North', 'paid', 60),
-  (6, 'West', 'paid', 95);`}
+  (2, 'East', 'refunded', 80),
+  (3, 'North', 'paid', 45),
+  (4, 'South', 'paid', 200),
+  (5, 'West', 'paid', 60),
+  (6, 'East', 'refunded', 95),
+  (7, 'North', 'paid', 30),
+  (8, 'South', 'paid', 250),
+  (9, 'West', 'paid', 175),
+  (10, 'East', 'refunded', 55),
+  (11, 'North', 'paid', 310),
+  (12, 'South', 'paid', 70),
+  (13, 'West', 'paid', 140),
+  (14, 'East', 'refunded', 220),
+  (15, 'North', 'paid', 35),
+  (16, 'South', 'paid', 165),
+  (17, 'West', 'paid', 90),
+  (18, 'East', 'refunded', 285),
+  (19, 'North', 'paid', 110),
+  (20, 'South', 'paid', 40),
+  (21, 'West', 'paid', 195),
+  (22, 'East', 'refunded', 65),
+  (23, 'North', 'paid', 240),
+  (24, 'South', 'paid', 150);`}
   starterCode={`CREATE OR REPLACE VIEW paid_revenue_by_region AS
 SELECT
   region,

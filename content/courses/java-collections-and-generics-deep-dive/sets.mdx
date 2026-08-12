@@ -226,7 +226,7 @@ display, the underlying sets are unordered.
 
 ## A pitfall: putting mutable objects in a set
 
-We covered this in the foundations chapter, and it's worth saying
+We covered this in *Equality and Hashing*, and it's worth saying
 again here in context: a `HashSet` indexes by `hashCode()` at insertion
 time. If you mutate a field that participates in `hashCode()`, the
 element silently becomes unreachable in the set. The same hazard

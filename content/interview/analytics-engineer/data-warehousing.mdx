@@ -60,11 +60,18 @@ storage optimizes for:
 <SqlCodeBlock
   dialect="duckdb"
   initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
-  (1, DATE '2024-01-01', 'click',    120),
-  (2, DATE '2024-01-01', 'view',      45),
-  (3, DATE '2024-01-02', 'click',     90),
-  (4, DATE '2024-01-02', 'purchase', 300),
-  (5, DATE '2024-01-03', 'view',      10)
+  (1, DATE '2024-01-01', 'click', 120),    (2, DATE '2024-01-01', 'view', 45),
+  (3, DATE '2024-01-02', 'click', 90),     (4, DATE '2024-01-02', 'purchase', 300),
+  (5, DATE '2024-01-03', 'view', 10),      (6, DATE '2024-01-03', 'click', 75),
+  (7, DATE '2024-01-03', 'purchase', 480), (8, DATE '2024-01-04', 'view', 30),
+  (9, DATE '2024-01-04', 'click', 145),    (10, DATE '2024-01-04', 'purchase', 220),
+  (11, DATE '2024-01-05', 'view', 55),     (12, DATE '2024-01-05', 'click', 95),
+  (13, DATE '2024-01-05', 'purchase', 610), (14, DATE '2024-01-06', 'view', 20),
+  (15, DATE '2024-01-06', 'click', 110),   (16, DATE '2024-01-06', 'purchase', 175),
+  (17, DATE '2024-01-07', 'view', 65),     (18, DATE '2024-01-07', 'click', 130),
+  (19, DATE '2024-01-07', 'purchase', 395), (20, DATE '2024-01-08', 'view', 40),
+  (21, DATE '2024-01-08', 'click', 85),    (22, DATE '2024-01-08', 'purchase', 250),
+  (23, DATE '2024-01-09', 'view', 15),     (24, DATE '2024-01-09', 'click', 160)
 ) AS t(event_id, event_date, event_type, value_cents);`}
   starterCode={`-- Analytical scan: read one measure column across many rows
 SELECT event_type, SUM(value_cents) AS total_cents
@@ -129,16 +136,31 @@ the target already holds:
 
 <SqlCodeBlock
   dialect="duckdb"
-  initSql={`CREATE TABLE fct_events AS SELECT * FROM (VALUES
-  (1, TIMESTAMP '2024-01-01 00:00:00'),
-  (2, TIMESTAMP '2024-01-02 00:00:00')
+  initSql={`-- fct_events is the table as it stood after the last successful run;
+-- raw_events has since gained ten more rows.
+CREATE TABLE fct_events AS SELECT * FROM (VALUES
+  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),
+  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),
+  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),
+  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),
+  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),
+  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),
+  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00')
 ) AS t(event_id, event_at);
 
 CREATE TABLE raw_events AS SELECT * FROM (VALUES
-  (1, TIMESTAMP '2024-01-01 00:00:00'),
-  (2, TIMESTAMP '2024-01-02 00:00:00'),
-  (3, TIMESTAMP '2024-01-03 00:00:00'),
-  (4, TIMESTAMP '2024-01-04 00:00:00')
+  (1, TIMESTAMP '2024-01-01 00:00:00'), (2, TIMESTAMP '2024-01-02 00:00:00'),
+  (3, TIMESTAMP '2024-01-03 00:00:00'), (4, TIMESTAMP '2024-01-04 00:00:00'),
+  (5, TIMESTAMP '2024-01-05 00:00:00'), (6, TIMESTAMP '2024-01-06 00:00:00'),
+  (7, TIMESTAMP '2024-01-07 00:00:00'), (8, TIMESTAMP '2024-01-08 00:00:00'),
+  (9, TIMESTAMP '2024-01-09 00:00:00'), (10, TIMESTAMP '2024-01-10 00:00:00'),
+  (11, TIMESTAMP '2024-01-11 00:00:00'), (12, TIMESTAMP '2024-01-12 00:00:00'),
+  (13, TIMESTAMP '2024-01-13 00:00:00'), (14, TIMESTAMP '2024-01-14 00:00:00'),
+  (15, TIMESTAMP '2024-01-15 00:00:00'), (16, TIMESTAMP '2024-01-16 00:00:00'),
+  (17, TIMESTAMP '2024-01-17 00:00:00'), (18, TIMESTAMP '2024-01-18 00:00:00'),
+  (19, TIMESTAMP '2024-01-19 00:00:00'), (20, TIMESTAMP '2024-01-20 00:00:00'),
+  (21, TIMESTAMP '2024-01-21 00:00:00'), (22, TIMESTAMP '2024-01-22 00:00:00'),
+  (23, TIMESTAMP '2024-01-23 00:00:00'), (24, TIMESTAMP '2024-01-24 00:00:00')
 ) AS t(event_id, event_at);`}
   starterCode={`-- Only rows newer than the current high-water mark are loaded
 SELECT event_id, event_at
@@ -159,9 +181,18 @@ its event log; rerun it any number of times and the output is identical:
 <SqlCodeBlock
   dialect="duckdb"
   initSql={`CREATE TABLE customer_events AS SELECT * FROM (VALUES
-  (1, TIMESTAMP '2024-01-01 00:00:00'),
-  (1, TIMESTAMP '2024-02-01 00:00:00'),
-  (2, TIMESTAMP '2024-01-15 00:00:00')
+  (1, TIMESTAMP '2024-01-01 00:00:00'), (1, TIMESTAMP '2024-02-01 00:00:00'),
+  (1, TIMESTAMP '2024-03-05 00:00:00'), (2, TIMESTAMP '2024-01-15 00:00:00'),
+  (2, TIMESTAMP '2024-02-20 00:00:00'), (3, TIMESTAMP '2024-01-08 00:00:00'),
+  (3, TIMESTAMP '2024-03-12 00:00:00'), (3, TIMESTAMP '2024-04-18 00:00:00'),
+  (4, TIMESTAMP '2024-01-22 00:00:00'), (4, TIMESTAMP '2024-02-27 00:00:00'),
+  (5, TIMESTAMP '2024-01-03 00:00:00'), (5, TIMESTAMP '2024-03-19 00:00:00'),
+  (6, TIMESTAMP '2024-02-06 00:00:00'), (6, TIMESTAMP '2024-04-02 00:00:00'),
+  (7, TIMESTAMP '2024-01-29 00:00:00'), (7, TIMESTAMP '2024-03-26 00:00:00'),
+  (8, TIMESTAMP '2024-02-13 00:00:00'), (8, TIMESTAMP '2024-04-09 00:00:00'),
+  (9, TIMESTAMP '2024-01-11 00:00:00'), (9, TIMESTAMP '2024-03-01 00:00:00'),
+  (10, TIMESTAMP '2024-02-24 00:00:00'), (10, TIMESTAMP '2024-04-15 00:00:00'),
+  (11, TIMESTAMP '2024-01-17 00:00:00'), (12, TIMESTAMP '2024-03-08 00:00:00')
 ) AS t(customer_id, updated_at);`}
   starterCode={`-- Deterministic rebuild: same input always yields the same table
 CREATE OR REPLACE TABLE dim_customer AS
@@ -304,11 +335,18 @@ models upstream as the maintainable source.
   title="Idempotent dimension rebuild"
   instructions={`Table \`customer_events\` (\`customer_id\`, \`updated_at\`) is an append-only log with **multiple rows per customer**. Build a \`SELECT\` for an idempotent dimension: exactly **one row per** \`customer_id\` holding that customer's **latest** \`updated_at\`. Rerunning it must always give the same result. Columns: \`customer_id\`, \`last_seen\`. Sort by \`customer_id\`.`}
   initSql={`CREATE TABLE customer_events AS SELECT * FROM (VALUES
-  (1, TIMESTAMP '2024-01-01 00:00:00'),
-  (1, TIMESTAMP '2024-02-01 00:00:00'),
-  (2, TIMESTAMP '2024-01-15 00:00:00'),
-  (3, TIMESTAMP '2024-03-10 00:00:00'),
-  (3, TIMESTAMP '2024-03-01 00:00:00')
+  (1, TIMESTAMP '2024-01-01 00:00:00'), (1, TIMESTAMP '2024-02-01 00:00:00'),
+  (2, TIMESTAMP '2024-01-15 00:00:00'), (3, TIMESTAMP '2024-03-10 00:00:00'),
+  (3, TIMESTAMP '2024-03-01 00:00:00'), (4, TIMESTAMP '2024-01-22 00:00:00'),
+  (4, TIMESTAMP '2024-02-27 00:00:00'), (5, TIMESTAMP '2024-01-03 00:00:00'),
+  (5, TIMESTAMP '2024-03-19 00:00:00'), (6, TIMESTAMP '2024-02-06 00:00:00'),
+  (6, TIMESTAMP '2024-04-02 00:00:00'), (7, TIMESTAMP '2024-01-29 00:00:00'),
+  (7, TIMESTAMP '2024-03-26 00:00:00'), (8, TIMESTAMP '2024-02-13 00:00:00'),
+  (8, TIMESTAMP '2024-04-09 00:00:00'), (9, TIMESTAMP '2024-01-11 00:00:00'),
+  (9, TIMESTAMP '2024-03-05 00:00:00'), (10, TIMESTAMP '2024-02-24 00:00:00'),
+  (10, TIMESTAMP '2024-04-15 00:00:00'), (11, TIMESTAMP '2024-01-17 00:00:00'),
+  (11, TIMESTAMP '2024-03-30 00:00:00'), (12, TIMESTAMP '2024-02-08 00:00:00'),
+  (12, TIMESTAMP '2024-04-21 00:00:00'), (12, TIMESTAMP '2024-01-05 00:00:00')
 ) AS t(customer_id, updated_at);`}
   starterCode={`-- One row per customer with their most recent event time
 SELECT
@@ -324,7 +362,7 @@ FROM customer_events
 GROUP BY customer_id
 ORDER BY customer_id;`}
   tests={[
-    { id: "rows", name: "One row per customer", description: "Three customers collapse to three rows", expectedRowCount: 3 },
+    { id: "rows", name: "One row per customer", description: "Three customers collapse to three rows", expectedRowCount: 12 },
     { id: "cols", name: "Has the required columns", description: "customer_id and last_seen", expectedColumnsInclude: ["customer_id", "last_seen"] },
   ]}
 />

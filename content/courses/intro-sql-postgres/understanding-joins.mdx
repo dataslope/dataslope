@@ -56,8 +56,20 @@ and the **matching condition** with `ON`:
 CREATE TABLE orders (
   id SERIAL PRIMARY KEY, customer_id INTEGER REFERENCES customers(id), amount NUMERIC
 );
-INSERT INTO customers (name) VALUES ('Ada'), ('Grace');
-INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`}
+INSERT INTO customers (name) VALUES
+  ('Ada'), ('Grace'), ('Linus'), ('Mae'), ('Rosa'), ('Ivan'),
+  ('Nadia'), ('Omar'), ('Priya'), ('Quinn'), ('Ruth'), ('Sam'),
+  ('Tariq'), ('Uma'), ('Viktor'), ('Wen'), ('Xenia'), ('Yusuf'),
+  ('Zara'), ('Bruno'), ('Chidi'), ('Dara'), ('Elif'), ('Farid');
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (101,1,42), (102,1,18), (103,2,99), (104,2,15),
+  (105,5,30), (106,5,76), (107,6,22), (108,7,64),
+  (109,8,12), (110,8,48), (111,9,91), (112,11,27),
+  (113,11,55), (114,12,38), (115,13,19), (116,13,83),
+  (117,14,45), (118,15,61), (119,16,24), (120,16,70),
+  (121,17,33), (122,18,88), (123,20,16), (124,20,52),
+  (125,21,29), (126,22,74), (127,22,21), (128,23,95),
+  (129,24,36), (130,1,57), (131,9,40), (132,17,68);`}
   starterCode={`SELECT
   orders.id AS order_id,
   customers.name AS customer,
@@ -93,8 +105,20 @@ the alias as a prefix:
 CREATE TABLE orders (
   id SERIAL PRIMARY KEY, customer_id INTEGER REFERENCES customers(id), amount NUMERIC
 );
-INSERT INTO customers (name) VALUES ('Ada'), ('Grace');
-INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`}
+INSERT INTO customers (name) VALUES
+  ('Ada'), ('Grace'), ('Linus'), ('Mae'), ('Rosa'), ('Ivan'),
+  ('Nadia'), ('Omar'), ('Priya'), ('Quinn'), ('Ruth'), ('Sam'),
+  ('Tariq'), ('Uma'), ('Viktor'), ('Wen'), ('Xenia'), ('Yusuf'),
+  ('Zara'), ('Bruno'), ('Chidi'), ('Dara'), ('Elif'), ('Farid');
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (101,1,42), (102,1,18), (103,2,99), (104,2,15),
+  (105,5,30), (106,5,76), (107,6,22), (108,7,64),
+  (109,8,12), (110,8,48), (111,9,91), (112,11,27),
+  (113,11,55), (114,12,38), (115,13,19), (116,13,83),
+  (117,14,45), (118,15,61), (119,16,24), (120,16,70),
+  (121,17,33), (122,18,88), (123,20,16), (124,20,52),
+  (125,21,29), (126,22,74), (127,22,21), (128,23,95),
+  (129,24,36), (130,1,57), (131,9,40), (132,17,68);`}
   starterCode={`SELECT
   o.id AS order_id,
   c.name AS customer,

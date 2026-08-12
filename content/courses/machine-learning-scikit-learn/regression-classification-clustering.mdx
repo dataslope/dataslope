@@ -9,14 +9,14 @@ my target?* (number vs. category). Combine those two questions and you land
 on one of three task types that cover the overwhelming majority of classical
 machine learning:
 
+- **Regression**, predict a *number*.
+- **Classification**, predict a *category*.
+- **Clustering**, discover *groups*, with no labels at all.
+
 <Figure
   slug="ml-three-task-types-cutout"
   alt="Regression, classification, and clustering, an isometric illustration"
 />
-
-- **Regression**, predict a *number*.
-- **Classification**, predict a *category*.
-- **Clustering**, discover *groups*, with no labels at all.
 
 The fastest way to tell them apart is also the most reliable: **look at what
 the model outputs.** Out comes a number on a continuous scale? Regression.
@@ -48,6 +48,12 @@ Regression predicts a **continuous quantity**, a value on a scale where
 in-between answers make sense. House prices, temperatures, a patient's blood
 pressure, tomorrow's demand: all numbers that could land anywhere in a range,
 not just on a few fixed options.
+
+<Figure
+  slug="ml-regression-classification-clustering-regression-predicting-number-inline-cutout"
+  alt="A cloud of chips with a rod through it and a marker sliding along the rod to a new position"
+  caption="Regression predicts where on a continuous scale the answer falls."
+/>
 
 The mental image is a **line (or curve) through a cloud of points.** The
 model learns the trend relating the input to the output, and to predict, it
@@ -118,12 +124,6 @@ Spam or not spam (two classes); the species of a penguin (three classes);
 which of five products a customer will buy (five classes). The output is not a
 quantity but a *choice among options*, and "in-between" answers do not exist:
 an email is spam or it is not.
-
-<Figure
-  slug="ml-regression-classification-clustering-regression-predicting-number-inline-cutout"
-  alt="A cloud of chips with a rod through it and a marker sliding along the rod to a new position"
-  caption="Regression predicts where on a continuous scale the answer falls."
-/>
 
 The mental image is a **boundary that carves up the feature space into
 regions**, one region per class. To classify a new point, the model sees

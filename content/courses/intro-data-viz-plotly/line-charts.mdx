@@ -141,13 +141,12 @@ and dips that look exactly like trends.
 
 ## Markers: show the actual data points
 
-Two series that look equally well supported until the markers arrive:
-
-<Chart slug="markers-show-observations" />
-
 Lines are great for showing the *shape* of a trend, but sometimes
 you want to also see exactly where each measurement was taken.
-Add `markers=True`:
+Add `markers=True`. Here are two series that look equally well supported
+until the markers arrive:
+
+<Chart slug="markers-show-observations" />
 
 <CodeBlock
   adapter="python"
@@ -191,13 +190,13 @@ they'll just clutter the line.
 
 ## Many lines? Avoid the spaghetti
 
-When one of the lines is the story, you do not have to split the chart up at
-all. Leave the overlay alone and change what is loud:
-
-<Chart slug="highlight-one-line" />
-
 A common failure mode is the **spaghetti chart**, twenty or more
 overlapping lines that no one can read.
+
+When one of those lines is the story, you do not have to split the chart up
+at all. Leave the overlay alone and change what is loud:
+
+<Chart slug="highlight-one-line" />
 
 <CodeBlock
   adapter="python"
@@ -236,14 +235,13 @@ you have more than ~7 lines, plan how you'll keep them readable.**
 
 ## Linear and log scales
 
-Three products with very different sizes. On a log axis the slopes are
-directly comparable, and the smallest is climbing fastest:
-
-<Chart slug="log-vs-linear-growth" />
-
 When values span many orders of magnitude (e.g., country GDPs,
 COVID case counts), a **log scale** for y reveals structure that a
-linear scale flattens out.
+linear scale flattens out. Below are three products with very different
+sizes: on the log axis the slopes are directly comparable, and the smallest
+is climbing fastest.
+
+<Chart slug="log-vs-linear-growth" />
 
 It also carries one obligation, which is easy to forget because the chart
 looks fine without it:
@@ -309,11 +307,11 @@ Log scales are powerful but require *labeling*, always say
 
 ## A common subtle mistake
 
-<Chart slug="aspect-ratio-banking" />
-
 Plotly Express orders line points by their order in the DataFrame,
 not by the x-axis value. If your data isn't sorted by x, you'll
 get a tangled chart:
+
+<Chart slug="aspect-ratio-banking" />
 
 ```python
 # Suspicious! Sort before plotting:

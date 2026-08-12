@@ -24,17 +24,17 @@ $$
 \frac{dy}{dt} = f(t, y), \qquad y(t_0) = y_0
 $$
 
-<Figure
-  slug="scipy-ordinary-differential-equations-inline-cutout"
-  alt="A smooth curve drawn on a board with a walker crossing it in short straight steps, the steps drifting slightly off the curve as they go"
-  caption="A solver walks the solution in steps, and each step drifts a little."
-/>
-
 Given the law $f$ and a starting state $y_0$, find $y(t)$ for
 $t > t_0$. Every solver does the same dance: it takes a step from
 $t_n$ to $t_{n+1} = t_n + h$, predicting $y_{n+1}$ from $y_n$. The
 differences are *how* the prediction is made and *how* the step
 size $h$ is chosen.
+
+<Figure
+  slug="scipy-ordinary-differential-equations-inline-cutout"
+  alt="A smooth curve drawn on a board with a walker crossing it in short straight steps, the steps drifting slightly off the curve as they go"
+  caption="A solver walks the solution in steps, and each step drifts a little."
+/>
 
 ```mermaid
 flowchart TD

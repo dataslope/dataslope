@@ -58,6 +58,9 @@ Console.WriteLine(F(70, 1.75));
   ]}
 />
 
+`F`, `a` and `b` tell you nothing. The compiler does not care, but the
+next reader does, and the next reader is usually you:
+
 <CodeBlock
   adapter="csharp"
   files={[
@@ -126,6 +129,11 @@ ProcessOrders(new List<int> { 50, 120, 30, 200 });
     },
   ]}
 />
+
+One method doing validation, arithmetic and reporting is hard to test
+and harder to change: you cannot reuse the validation without dragging
+the printing along with it. Split it by concern and each piece becomes
+something you can name, test and call on its own:
 
 <CodeBlock
   adapter="csharp"

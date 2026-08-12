@@ -17,12 +17,6 @@ try them in.
 The spread between tiers is roughly 25x. No amount of prompt trimming
 competes with that.
 
-<Figure
-  slug="llm-controlling-cost-inline-cutout"
-  alt="A hopper with an adjustable gate limiting how many chips reach the machine per pass"
-  caption="Sending fewer tokens per request is the lever with the most travel."
-/>
-
 The mistake is choosing one model for everything, usually the best one,
 because it is the one that passed the hardest test case. Most
 production traffic is not the hardest test case.
@@ -125,6 +119,12 @@ output side is worth five or six saved on the input side.
   wrapping fields.
 * Cap `max_tokens` at what you actually need. This also bounds the
   worst case when something goes wrong.
+
+<Figure
+  slug="llm-controlling-cost-inline-cutout"
+  alt="A hopper with an adjustable gate limiting how many chips reach the machine per pass"
+  caption="Every token you do not ask for is one you do not pay for, and an output token costs five or six times an input one."
+/>
 
 ## 4. Lower the reasoning effort
 

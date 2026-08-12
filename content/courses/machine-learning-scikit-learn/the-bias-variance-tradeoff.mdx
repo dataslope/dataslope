@@ -62,6 +62,12 @@ bias; overfitting is mostly variance.
 The classic way to feel bias and variance is to imagine throwing darts at a
 bullseye. Each dart is the model's prediction; the bullseye is the truth.
 
+<Figure
+  slug="ml-the-bias-variance-tradeoff-inline-cutout"
+  alt="Two dartboards on a wall, one with a tight cluster far off centre and the other with a wide scatter around the centre"
+  caption="The tight cluster is consistent but wrong; the spread is right on average."
+/>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -117,12 +123,6 @@ Let us make that literal: draw many different small training sets from the
 same true function, fit a model on each, and overlay all the fitted curves.
 A high-variance model produces a chaotic spaghetti of curves; a
 low-variance model produces nearly the same curve every time.
-
-<Figure
-  slug="ml-the-bias-variance-tradeoff-inline-cutout"
-  alt="Two dartboards on a wall, one with a tight cluster far off centre and the other with a wide scatter around the centre"
-  caption="The tight cluster is consistent but wrong; the spread is right on average."
-/>
 
 This demonstration only works with synthetic data: measuring bias and
 variance requires drawing *many* fresh training sets from a *known* true

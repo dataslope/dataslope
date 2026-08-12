@@ -317,6 +317,10 @@ console.log(pickWinner(["A", "B", "C"])); // ??? depends on RNG
   ]}
 />
 
+Call it twice with the same argument and you can get different answers,
+so the call cannot be replaced by its result. Moving the randomness into
+a parameter fixes that without making the function less useful:
+
 <CodeBlock
   adapter="typescript"
   files={[

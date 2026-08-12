@@ -20,7 +20,7 @@ Greek letters.
 
 You already know `Array.prototype.map`. And you've just met
 `Option`'s `map()` and `Result`'s `map()`. And `Promise`'s `.then` is
-basically `map()` for asynchronous values.
+`map()` for asynchronous values, under a different name.
 
 <Figure
   slug="fp-category-theory-intuitions-unifying-observation-inline-cutout"
@@ -81,7 +81,7 @@ A functor's `map()` must obey two laws, both perfectly sensible:
 1. **Identity:** `map(fa, x => x) === fa`, mapping with the
    identity function changes nothing.
 2. **Composition:** `map(map(fa, f), g) === map(fa, x => g(f(x)))`,
-mapping with `f` then `g` is the same as mapping with
+   mapping with `f` then `g` is the same as mapping with
    `g ∘ f`.
 
 <Figure

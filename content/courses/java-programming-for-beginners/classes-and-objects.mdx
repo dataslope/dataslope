@@ -142,7 +142,12 @@ A class declaration typically has three sections:
 | **Constructor(s)** | How to bring a valid new instance into existence |
 | **Methods** | The behavior, what every instance can do |
 
-We will meet *static* members in a future page; ignore them for now.
+You have already met one `static` member: `main`, plus every helper
+method we wrote beside it in the last chapter. `static` means "belongs
+to the class itself, not to any one instance," which is why those
+methods could run before a single object existed. Everything on this
+page is the *other* kind: fields and methods that belong to an
+instance, and that therefore need a `new` before they mean anything.
 
 ## Multi-file convention: one public class per file
 
@@ -204,7 +209,7 @@ A few things to notice:
   constructor finishes. We are saying: a `Book`'s title, author,
   and year are *part of its identity* and must not change.
 - `title()`, `author()`, `year()` are **accessor methods** (getters),
-they answer questions about state without exposing the fields
+  they answer questions about state without exposing the fields
   themselves.
 - `olderThan(Book other)` takes another `Book` as a parameter.
   Because the comparison happens *inside* `Book` itself, it can

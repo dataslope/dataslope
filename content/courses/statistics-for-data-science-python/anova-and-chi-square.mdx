@@ -213,10 +213,10 @@ ANOVA is the smoke alarm: it signals a difference exists somewhere, then post-ho
 
 ## Part B, Chi-square: tests for categorical data
 
-
-The family the statistic is compared against. The critical value moves
-with the degrees of freedom, which is why there is a table rather than a
-number.
+ANOVA and t-tests need **numbers** (heights, times, dollars). But masses
+of real data are **categorical**: device type, subscription tier,
+yes/no churn, survey response. Chi-square (χ²) tests are built
+for exactly this. They come in two main flavors.
 
 <Figure
   slug="stat-anova-and-chi-square-part-b-chi-inline-cutout"
@@ -224,12 +224,12 @@ number.
   caption="Chi-square compares the counts you saw against the counts you expected."
 />
 
-<Chart slug="chi-square-shapes" />
+The chi-square statistic is compared against a family of distributions
+rather than a single one. Its shape moves with the degrees of freedom,
+which is why a chi-square critical value comes from a table instead of
+being one number:
 
-ANOVA and t-tests need **numbers** (heights, times, dollars). But masses
-of real data are **categorical**: device type, subscription tier,
-yes/no churn, survey response. Chi-square (χ²) tests are built
-for exactly this. They come in two main flavors.
+<Chart slug="chi-square-shapes" />
 
 ```mermaid
 flowchart TD

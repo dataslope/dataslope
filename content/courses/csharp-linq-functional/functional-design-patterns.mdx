@@ -24,6 +24,12 @@ nullable value types (`int?`) since C# 2. Combined with the null
 operators, these give you most of what an `Option<T>` provides
 elsewhere.
 
+<Figure
+  slug="cs-functional-design-patterns-pattern-1-option-inline-cutout"
+  alt="Two sealed envelopes on a bench, one opened to show a block and one opened to show nothing"
+  caption="One envelope holds a value and one holds nothing, and both are opened alike."
+/>
+
 <CodeBlock
   adapter="csharp"
   files={[
@@ -361,12 +367,6 @@ These patterns are *tools*, not laws. In real C# code:
   happen" cases, exceptions are still appropriate.
 - Use discriminated unions when you have a *closed* set of states.
 - Use combinators when you're writing a small DSL.
-
-<Figure
-  slug="cs-functional-design-patterns-pattern-1-option-inline-cutout"
-  alt="Two sealed envelopes on a bench, one opened to show a block and one opened to show nothing"
-  caption="One envelope holds a value and one holds nothing, and both are opened alike."
-/>
 
 | Need to model… | Reach for |
 | --- | --- |

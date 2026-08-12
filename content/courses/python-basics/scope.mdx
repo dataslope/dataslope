@@ -5,17 +5,17 @@ description: How Python looks up names, searching outward from local scope to th
 
 When you write `print(x)`, Python has to find the binding for `x`. It does so by walking through four nested namespaces in order, known by the acronym **LEGB**:
 
-<Figure
-  slug="python-basics-scope-cutout"
-  alt="Nested open-topped glass boxes with a single glowing token resting inside the innermost one"
-/>
-
 | Letter | Scope |
 | --- | --- |
 | **L** | Local (inside the current function) |
 | **E** | Enclosing (any enclosing function for nested defs) |
 | **G** | Global (the module level) |
 | **B** | Built-in (`len`, `print`, etc.) |
+
+<Figure
+  slug="python-basics-scope-cutout"
+  alt="Nested open-topped glass boxes with a single glowing token resting inside the innermost one"
+/>
 
 The first name found wins. If nothing matches, Python raises `NameError`.
 

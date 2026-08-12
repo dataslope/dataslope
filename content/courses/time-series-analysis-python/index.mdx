@@ -21,6 +21,7 @@ a **spine**: each row is glued to the rows before and after it by the
 passage of time. Reorder the rows of an ordinary table and you lose
 nothing. Reorder the rows of a time series and you have **destroyed the
 data**, because in a time series, the *order is the information*.
+
 <Callout type="info" title="What we assume you already know">
 You can write basic Python (slicing, list comprehensions), use pandas
 (`DataFrame`, `Series`, filtering), make a simple line chart, and you
@@ -255,7 +256,7 @@ Real time series teaching needs data with *visible* structure. We use a
 small, hand-picked cast that runs instantly in your browser:
 
 - **The Keeling Curve** (atmospheric CO₂ at Mauna Loa, monthly since 1959),
-our real-world hero series, loaded straight from a public dataset. It
+  our real-world hero series, loaded straight from a public dataset. It
   has a textbook **trend** plus a clean **12-month seasonal** cycle, and is
   strongly non-stationary. We return to it again and again: resampling,
   rolling means, decomposition, differencing, ACF/PACF, and forecasting.

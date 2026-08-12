@@ -15,6 +15,12 @@ expressions, three uses.
 
 ## The catalogue
 
+<Figure
+  slug="pl-aggregations-inline-cutout"
+  alt="One column of chips feeding a single gauge, with three more columns queued behind it for the same treatment"
+  caption="An aggregation reduces one column to a single value, whatever the column holds."
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -122,12 +128,6 @@ average up while leaving the middle alone.
 ## Boolean aggregations
 
 A Boolean column aggregates in ways that read naturally.
-
-<Figure
-  slug="pl-aggregations-inline-cutout"
-  alt="One column of chips feeding a single gauge, with three more columns queued behind it for the same treatment"
-  caption="An aggregation reduces one column to a single value, whatever the column holds."
-/>
 
 <CodeBlock
   adapter="python"

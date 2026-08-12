@@ -214,9 +214,14 @@ The query can run again and again on fresh data.
   paid INTEGER
 );
 INSERT INTO invoices (customer, amount, paid) VALUES
-  ('Maya', 42.50, 0),
-  ('Jordan', 19.99, 1),
-  ('Riley', 75.00, 0);`}
+  ('Maya', 42.50, 0), ('Jordan', 19.99, 1), ('Riley', 75.00, 0),
+  ('Ada', 120.00, 1), ('Grace', 64.25, 0), ('Linus', 33.10, 1),
+  ('Omar', 210.75, 0), ('Priya', 15.40, 1), ('Rosa', 88.90, 1),
+  ('Sam', 47.60, 0), ('Tariq', 156.00, 1), ('Uma', 29.35, 0),
+  ('Viktor', 73.20, 1), ('Wen', 195.50, 0), ('Xenia', 12.99, 1),
+  ('Yusuf', 58.40, 1), ('Zara', 101.10, 0), ('Bruno', 24.75, 1),
+  ('Chidi', 143.60, 0), ('Dara', 39.99, 1), ('Elif', 82.30, 1),
+  ('Farid', 67.45, 0), ('Ivan', 178.20, 1), ('Nadia', 51.05, 0);`}
   starterCode={`SELECT
   customer,
   amount

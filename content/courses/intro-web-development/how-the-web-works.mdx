@@ -38,25 +38,33 @@ same page can adapt to a phone screen, why you can zoom text, and why
 a page can keep working interactively without talking to the server
 again.
 
-How long that round trip takes is something browsers now measure in
+One more thing about that round trip: a page is rarely one request. It
+is a chain of them, and the later ones cannot start until the earlier
+ones finish. The browser has to read the HTML before it knows which
+stylesheet to ask for, and it has to have the stylesheet before it can
+draw anything.
+
+<Chart slug="request-waterfall-latency" />
+
+How long the whole chain takes is something browsers now measure in
 specific, named ways, because "the page feels slow" turned out to mean
-three different problems.
+three different problems: slow to show anything, slow to become
+clickable, and jumping around while it loads.
 
 <Chart slug="core-web-vitals" />
 
 ## The three languages, one page
 
-One more thing about that round trip: a page is not one request but a
-chain of them, and the later ones cannot start until the earlier ones
-finish.
+Step 5 above mentioned CSS and JavaScript in passing. They are worth
+naming properly, because every page you will ever build is those three
+languages doing three separate jobs: HTML says what things **are**, CSS
+says what they **look like**, and JavaScript says what they **do**.
 
 <Figure
   slug="web-how-the-web-works-three-languages-one-page-inline-cutout"
   alt="Three inks laid over one another on a single sheet, structure, styling and behaviour each in its own color"
   caption="Structure, presentation and behaviour, layered over the same page."
 />
-
-<Chart slug="request-waterfall-latency" />
 
 Here's a complete, self-contained page that uses all three languages
 at once. Don't worry about understanding every line, the next ten

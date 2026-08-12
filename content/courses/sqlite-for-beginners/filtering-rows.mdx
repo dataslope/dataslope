@@ -49,7 +49,26 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
-  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title,
   genre,
@@ -93,7 +112,26 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
-  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title,
   price
@@ -102,6 +140,9 @@ FROM
 WHERE
   price < 20;`}
 />
+
+Thirteen of the 24 books come back. `BETWEEN` handles the other common
+shape, a range with two ends, in one clause instead of two:
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -119,7 +160,26 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
-  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title,
   pages
@@ -182,7 +242,26 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
-  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title,
   genre,
@@ -193,6 +272,9 @@ WHERE
   genre = 'Technology'
   AND price < 30;`}
 />
+
+`AND` narrows: each condition you add can only remove rows. `OR`
+widens, and a row needs to satisfy just one side to be kept:
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -210,7 +292,26 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
-  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title,
   genre
@@ -239,7 +340,26 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
-  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title,
   genre,
@@ -275,7 +395,26 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
-  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title,
   genre
@@ -311,7 +450,26 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
-  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title
 FROM
@@ -319,6 +477,10 @@ FROM
 WHERE
   title LIKE 'sql%';`}
 />
+
+Three titles match. Put the `%` at both ends instead and the pattern
+finds the fragment anywhere in the text, which is the closest thing SQL
+has to a plain search box:
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -336,7 +498,26 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
-  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title
 FROM
@@ -354,7 +535,7 @@ query.
 <SqlChallengeCard
   dialect="sqlite"
   title="Affordable fiction"
-  instructions={`The \`books\` table is preloaded. Return the \`title\` and \`price\` columns (in that order) for books whose \`genre\` is \`'Fiction'\` **and** whose \`price\` is under \`20\`. Sort the result by \`price\` ascending. Two books should match.`}
+  instructions={`The \`books\` table is preloaded with 24 books. Return the \`title\` and \`price\` columns (in that order) for books whose \`genre\` is \`'Fiction'\` **and** whose \`price\` is under \`20\`. Sort the result by \`price\` ascending. Five books should match.`}
   initSql={`CREATE TABLE books (
   id INTEGER PRIMARY KEY,
   title TEXT,
@@ -368,7 +549,26 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
-  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title,
   price
@@ -393,19 +593,22 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns 2 rows",
-      description: "Only the two fiction books under 20",
-      expectedRowCount: 2,
+      name: "Returns 5 rows",
+      description: "Only the fiction books priced under 20",
+      expectedRowCount: 5,
     },
     {
       id: "rows",
       name: "Cheapest fiction first",
-      description: "The Solar Bakery (12.99), then Cloud Recipes (18.25)",
+      description: "Quiet Harbors (11.75) through Cloud Recipes (18.25)",
       expectedRows: {
         columns: ["title", "price"],
         ordered: true,
         values: [
+          ["Quiet Harbors", 11.75],
           ["The Solar Bakery", 12.99],
+          ["Index of Small Birds", 13.4],
+          ["Ferry to Alder Bay", 17.1],
           ["Cloud Recipes", 18.25],
         ],
       },

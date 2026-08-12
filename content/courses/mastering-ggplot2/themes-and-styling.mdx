@@ -48,6 +48,9 @@ p + theme_gray() # the default: grey panel, white gridlines
   ]}
 />
 
+That grey panel is ggplot2's signature, and also the thing people most
+often want to change. `theme_minimal()` strips it out:
+
 <CodeBlock
   adapter="r"
   files={[
@@ -63,6 +66,9 @@ p + theme_minimal() # no panel background, light grid
     },
   ]}
 />
+
+Lighter, and the data now sits on white rather than grey. If you want
+something closer to a printed journal figure, drop the grid as well:
 
 <CodeBlock
   adapter="r"

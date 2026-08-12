@@ -11,6 +11,10 @@ to add `foo.c` to the link command.
 
 ## The four stages
 
+What looks like one command is really four programs handing work to each
+other. Each stage takes a file and produces a different one, and you
+can stop the chain at any point to see what came out:
+
 ```mermaid
 flowchart TD
     A["<code>hello.c</code><br/>(source)"] --> B[Preprocessor]

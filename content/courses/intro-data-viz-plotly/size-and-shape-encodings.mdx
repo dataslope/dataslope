@@ -15,11 +15,6 @@ has narrow rules for when it's worth using.
 
 ## Size: a continuous third (or fourth) variable
 
-Scale it on area, not radius, and the channel is *correct*. It is still a
-narrow channel: both ends of the range fail, for different reasons.
-
-<Chart slug="size-dynamic-range" />
-
 We met `size=` in the chapter on bubble charts. The summary:
 
 - Use `size` for a **continuous** variable.
@@ -27,6 +22,11 @@ We met `size=` in the chapter on bubble charts. The summary:
   *precise* comparison matters.
 - Combine with `color` and `size_max` to keep huge values from
   swallowing the chart.
+
+Scale it on area, not radius, and the channel is *correct*. It is still a
+narrow one: both ends of the range fail, for different reasons.
+
+<Chart slug="size-dynamic-range" />
 
 <CodeBlock
   adapter="python"
@@ -72,13 +72,13 @@ flippers, without needing to read any individual value.
 
 ## Shape (symbol): a categorical third variable
 
-Shape has almost no capacity. Three or four values read at a glance, and
-after that the reader is doing a lookup per point:
-
-<Chart slug="shape-channel-capacity" />
-
 `symbol="..."` gives each value of a categorical column its own
 marker shape: circle, square, triangle, diamond, cross, etc.
+
+Shape has almost no capacity, though. Three or four values read at a glance,
+and after that the reader is doing a lookup per point:
+
+<Chart slug="shape-channel-capacity" />
 
 <Figure
   slug="viz-size-and-shape-encodings-size-continuous-third-inline-cutout"

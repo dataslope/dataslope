@@ -140,12 +140,6 @@ let count: number = 42;
 let boxed: Number = new Number(42);
 ```
 
-Worth knowing what the primitive itself is: every `number` in JavaScript is
-a 64-bit float, so the gap between representable values grows with their
-magnitude, and past 2⁵³ consecutive integers stop being distinguishable.
-
-<Chart slug="float-precision-gaps" />
-
 The same rule applies to `string` vs `String` and `boolean` vs `Boolean`.
 Always use the lowercase primitive types. The capitalized versions exist
 only for edge cases (like when you need to call `String.fromCharCode`
@@ -156,6 +150,12 @@ objects behave differently. `typeof (new Number(42))` is `"object"`, not
 `"number"`. Mixing them leads to subtle bugs. The compiler steers you
 toward the primitive types by making the wrappers a lint warning in most
 configurations.
+
+Worth knowing what the primitive itself is: every `number` in JavaScript is
+a 64-bit float, so the gap between representable values grows with their
+magnitude, and past 2⁵³ consecutive integers stop being distinguishable.
+
+<Chart slug="float-precision-gaps" />
 
 ## The `null` and `undefined` divide
 

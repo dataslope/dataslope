@@ -180,19 +180,24 @@ pattern:
 
 <Chart slug="trendline-wrong-shape" />
 
+A trend line is a summary, and it hides as much as any other summary. The
+worst case is not a line of the wrong shape, it is a line fitted where there
+is nothing to fit:
+
+<Chart slug="trendline-through-empty-space" />
+
 ## Overplotting: when there are too many points
-
-Opacity is the cheapest fix and usually the only one you need. Same points,
-same axes, one parameter changed:
-
-<Chart slug="overplotting-alpha" />
-
 
 Scatter plots can break down when you have **many thousands** of
 points, they pile on top of each other and the dense regions all
 look equally black. Two fixes:
 
 ### Opacity
+
+The cheaper one, and usually the only one you need. Same points, same axes,
+one parameter changed:
+
+<Chart slug="overplotting-alpha" />
 
 The **diamonds** dataset, 53,940 rows of carat, cut, and price, is a
 realistic stress test. At full opacity the cloud is a solid blob; at
@@ -238,12 +243,6 @@ Each dot is now semi-transparent, so dense regions become visibly
 For really dense data, switch to a **density heatmap** (which we'll
 meet in its own chapter), where the chart shows *how many points*
 are in each region of the plane.
-
-A trend line is a summary, and it hides as much as any other summary. The
-worst case is not a line of the wrong shape, it is a line fitted where there
-is nothing to fit:
-
-<Chart slug="trendline-through-empty-space" />
 
 ## A typical scatter-plot mistake
 

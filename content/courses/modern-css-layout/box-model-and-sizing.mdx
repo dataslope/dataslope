@@ -57,6 +57,10 @@ the space *between* the two boxes is margin:
 }`}
 />
 
+Now the same boxes as a project you can edit. Change one `padding`,
+`border` or `margin` value at a time and watch which of the four
+layers moves:
+
 <CodeBlock
   adapter="web"
   entryFilename="index.html"
@@ -151,6 +155,10 @@ second uses `border-box` and stays exactly 220px. The gridlines are
 .content { box-sizing: content-box; }   /* width + padding + border = 268px */
 .border  { box-sizing: border-box; }    /* total stays 220px */`}
 />
+
+Here is that comparison as editable source. The interesting
+experiment is to delete the `box-sizing` line and see the second box
+jump to the first one's width:
 
 <CodeBlock
   adapter="web"

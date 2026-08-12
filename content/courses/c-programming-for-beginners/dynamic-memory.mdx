@@ -19,11 +19,6 @@ controls are `malloc()` and `free()`.
 
 ## Stack vs heap
 
-The two are not only different in lifetime. They differ in what a single
-allocation costs:
-
-<Chart slug="heap-vs-stack-cost" />
-
 A running program's memory is split into a few regions:
 
 - **Code**, your compiled instructions.
@@ -43,6 +38,18 @@ A running program's memory is split into a few regions:
 If a value is small and short-lived, put it on the stack. If a value
 must outlive the function that created it, or must be sized at
 runtime, put it on the heap.
+
+The row that surprises people is the speed one, because "slower" hides
+how much slower. A stack allocation is one instruction that moves a
+pointer. A heap allocation has to go and *find* a free block big
+enough, which is real bookkeeping:
+
+<Chart slug="heap-vs-stack-cost" />
+
+This is not an argument against the heap. It is an argument against
+reaching for it when a local would do, and it explains why a program
+that allocates inside a hot loop is so often fixed by allocating once
+outside it instead.
 
 ## `malloc()` and `free()`
 

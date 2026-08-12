@@ -128,11 +128,6 @@ it got.
 
 ## Implicit widening, explicit narrowing
 
-Widening and narrowing are about the ceilings each width carries, so it is
-worth seeing them against the quantities people overflow them with:
-
-<Chart slug="integer-type-ranges" />
-
 Sometimes Java will quietly convert one number type to another *if
 no information would be lost*. This is called **widening**.
 
@@ -168,6 +163,18 @@ the rocket was lost. Java's insistence that narrowing conversions be
 explicit, visible, greppable, reviewable, exists precisely so that
 this kind of silent information loss cannot hide in a million-line
 codebase.
+
+The ceilings themselves are worth seeing once, because they explain
+which conversions are safe. Each width has a largest value it can
+hold, and the chart marks real quantities against those ceilings:
+
+<Chart slug="integer-type-ranges" />
+
+Read off where the marks fall and the rule of thumb writes itself. An
+`int` comfortably counts the rows in a database table or the seconds
+in a year, and just as comfortably fails to count the world's people
+or the milliseconds in a century. Whenever a quantity might cross one
+of those lines, reach for `long` and stop thinking about it.
 
 <CodeBlock
   adapter="java"

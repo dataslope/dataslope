@@ -53,7 +53,26 @@ subquery. The block below keeps only the most recent row per `customer_id`:
   (1, TIMESTAMP '2024-03-01 09:00:00', 'a2@x.com'),
   (2, TIMESTAMP '2024-02-01 08:00:00', 'b@x.com'),
   (2, TIMESTAMP '2024-02-15 08:00:00', 'b2@x.com'),
-  (3, TIMESTAMP '2024-01-20 12:00:00', 'c@x.com')
+  (3, TIMESTAMP '2024-01-20 12:00:00', 'c@x.com'),
+  (3, TIMESTAMP '2024-04-02 07:30:00', 'c2@x.com'),
+  (3, TIMESTAMP '2024-05-18 16:45:00', 'c3@x.com'),
+  (4, TIMESTAMP '2024-01-09 11:15:00', 'd@x.com'),
+  (4, TIMESTAMP '2024-03-22 14:20:00', 'd2@x.com'),
+  (5, TIMESTAMP '2024-02-07 09:40:00', 'e@x.com'),
+  (5, TIMESTAMP '2024-04-11 13:05:00', 'e2@x.com'),
+  (5, TIMESTAMP '2024-06-01 08:55:00', 'e3@x.com'),
+  (6, TIMESTAMP '2024-01-14 15:30:00', 'f@x.com'),
+  (7, TIMESTAMP '2024-02-23 10:10:00', 'g@x.com'),
+  (7, TIMESTAMP '2024-05-04 12:25:00', 'g2@x.com'),
+  (8, TIMESTAMP '2024-03-08 07:45:00', 'h@x.com'),
+  (8, TIMESTAMP '2024-04-27 17:00:00', 'h2@x.com'),
+  (9, TIMESTAMP '2024-01-31 09:20:00', 'i@x.com'),
+  (9, TIMESTAMP '2024-03-15 11:35:00', 'i2@x.com'),
+  (9, TIMESTAMP '2024-06-09 14:50:00', 'i3@x.com'),
+  (10, TIMESTAMP '2024-02-12 08:05:00', 'j@x.com'),
+  (10, TIMESTAMP '2024-05-26 16:15:00', 'j2@x.com'),
+  (11, TIMESTAMP '2024-04-03 13:40:00', 'k@x.com'),
+  (12, TIMESTAMP '2024-05-11 10:55:00', 'l@x.com')
 ) AS t(customer_id, updated_at, email);`}
   starterCode={`-- One row per customer: the latest update wins
 SELECT customer_id, updated_at, email
@@ -107,10 +126,14 @@ partition through this one." Change the frame to get a moving window, e.g.
 <SqlCodeBlock
   dialect="duckdb"
   initSql={`CREATE TABLE daily AS SELECT * FROM (VALUES
-  (DATE '2024-01-01', 10),
-  (DATE '2024-01-02', 20),
-  (DATE '2024-01-03', 5),
-  (DATE '2024-01-04', 15)
+  (DATE '2024-01-01', 10), (DATE '2024-01-02', 20), (DATE '2024-01-03', 5),
+  (DATE '2024-01-04', 15), (DATE '2024-01-05', 32), (DATE '2024-01-06', 14),
+  (DATE '2024-01-07', 9),  (DATE '2024-01-08', 21), (DATE '2024-01-09', 6),
+  (DATE '2024-01-10', 27), (DATE '2024-01-11', 13), (DATE '2024-01-12', 18),
+  (DATE '2024-01-13', 34), (DATE '2024-01-14', 5),  (DATE '2024-01-15', 22),
+  (DATE '2024-01-16', 16), (DATE '2024-01-17', 9),  (DATE '2024-01-18', 30),
+  (DATE '2024-01-19', 12), (DATE '2024-01-20', 24), (DATE '2024-01-21', 7),
+  (DATE '2024-01-22', 19), (DATE '2024-01-23', 15), (DATE '2024-01-24', 28)
 ) AS t(day, amt);`}
   starterCode={`SELECT
   day,
@@ -147,9 +170,14 @@ because there is no prior row:
 <SqlCodeBlock
   dialect="duckdb"
   initSql={`CREATE TABLE monthly AS SELECT * FROM (VALUES
-  (DATE '2024-01-01', 100),
-  (DATE '2024-02-01', 130),
-  (DATE '2024-03-01', 120)
+  (DATE '2022-07-01', 180), (DATE '2022-08-01', 155), (DATE '2022-09-01', 210),
+  (DATE '2022-10-01', 195), (DATE '2022-11-01', 240), (DATE '2022-12-01', 330),
+  (DATE '2023-01-01', 145), (DATE '2023-02-01', 165), (DATE '2023-03-01', 220),
+  (DATE '2023-04-01', 205), (DATE '2023-05-01', 275), (DATE '2023-06-01', 250),
+  (DATE '2023-07-01', 190), (DATE '2023-08-01', 175), (DATE '2023-09-01', 235),
+  (DATE '2023-10-01', 260), (DATE '2023-11-01', 290), (DATE '2023-12-01', 385),
+  (DATE '2024-01-01', 100), (DATE '2024-02-01', 130), (DATE '2024-03-01', 120),
+  (DATE '2024-04-01', 165), (DATE '2024-05-01', 205), (DATE '2024-06-01', 185)
 ) AS t(month, revenue);`}
   starterCode={`SELECT
   month,
@@ -300,7 +328,26 @@ recompute from the base grain rather than rolling up.
   (1, TIMESTAMP '2024-03-01 09:00:00', 'a2@x.com'),
   (2, TIMESTAMP '2024-02-01 08:00:00', 'b@x.com'),
   (2, TIMESTAMP '2024-02-15 08:00:00', 'b2@x.com'),
-  (3, TIMESTAMP '2024-01-20 12:00:00', 'c@x.com')
+  (3, TIMESTAMP '2024-01-20 12:00:00', 'c@x.com'),
+  (3, TIMESTAMP '2024-04-02 07:30:00', 'c2@x.com'),
+  (3, TIMESTAMP '2024-05-18 16:45:00', 'c3@x.com'),
+  (4, TIMESTAMP '2024-01-09 11:15:00', 'd@x.com'),
+  (4, TIMESTAMP '2024-03-22 14:20:00', 'd2@x.com'),
+  (5, TIMESTAMP '2024-02-07 09:40:00', 'e@x.com'),
+  (5, TIMESTAMP '2024-04-11 13:05:00', 'e2@x.com'),
+  (5, TIMESTAMP '2024-06-01 08:55:00', 'e3@x.com'),
+  (6, TIMESTAMP '2024-01-14 15:30:00', 'f@x.com'),
+  (7, TIMESTAMP '2024-02-23 10:10:00', 'g@x.com'),
+  (7, TIMESTAMP '2024-05-04 12:25:00', 'g2@x.com'),
+  (8, TIMESTAMP '2024-03-08 07:45:00', 'h@x.com'),
+  (8, TIMESTAMP '2024-04-27 17:00:00', 'h2@x.com'),
+  (9, TIMESTAMP '2024-01-31 09:20:00', 'i@x.com'),
+  (9, TIMESTAMP '2024-03-15 11:35:00', 'i2@x.com'),
+  (9, TIMESTAMP '2024-06-09 14:50:00', 'i3@x.com'),
+  (10, TIMESTAMP '2024-02-12 08:05:00', 'j@x.com'),
+  (10, TIMESTAMP '2024-05-26 16:15:00', 'j2@x.com'),
+  (11, TIMESTAMP '2024-04-03 13:40:00', 'k@x.com'),
+  (12, TIMESTAMP '2024-05-11 10:55:00', 'l@x.com')
 ) AS t(customer_id, updated_at, email);`}
   starterCode={`-- Keep only the newest row per customer_id
 SELECT customer_id, updated_at, email
@@ -315,21 +362,29 @@ QUALIFY ROW_NUMBER() OVER (
 ) = 1
 ORDER BY customer_id;`}
   tests={[
-    { id: "rows", name: "One row per customer", description: "Three customers collapse to three rows", expectedRowCount: 3 },
+    { id: "rows", name: "One row per customer", description: "Three customers collapse to three rows", expectedRowCount: 12 },
     { id: "cols", name: "Has the required columns", description: "customer_id, updated_at, email", expectedColumnsInclude: ["customer_id", "updated_at", "email"] },
   ]}
 />
+
+The second challenge is the one interviewers reach for when they want
+to see whether you think about the days that *are not* in the data.
 
 <SqlChallengeCard
   dialect="duckdb"
   title="Daily active users with a date spine"
   instructions={`Table \`logins\` (\`user_id\`, \`login_date\`) records logins over several days, but some days have **no logins at all**. Produce a **complete daily series**: one row for every calendar day from the earliest to the latest \`login_date\`, with the count of **distinct** active users that day (0 for empty days). Columns: \`day\`, \`active_users\`. Sort by \`day\`. Hint: build a spine with \`generate_series(..., INTERVAL 1 DAY)\` and \`LEFT JOIN\`.`}
-  initSql={`CREATE TABLE logins AS SELECT * FROM (VALUES
-  (101, DATE '2024-05-01'),
-  (102, DATE '2024-05-01'),
-  (101, DATE '2024-05-01'),
-  (103, DATE '2024-05-03'),
-  (101, DATE '2024-05-04')
+  initSql={`-- 2024-05-02, 05-06, 05-09, 05-12 and 05-13 have no logins at all: those
+-- are the days a date spine has to invent.
+CREATE TABLE logins AS SELECT * FROM (VALUES
+  (101, DATE '2024-05-01'), (102, DATE '2024-05-01'), (101, DATE '2024-05-01'),
+  (103, DATE '2024-05-03'), (101, DATE '2024-05-04'), (104, DATE '2024-05-03'),
+  (102, DATE '2024-05-04'), (105, DATE '2024-05-05'), (101, DATE '2024-05-05'),
+  (106, DATE '2024-05-07'), (103, DATE '2024-05-07'), (107, DATE '2024-05-08'),
+  (102, DATE '2024-05-08'), (108, DATE '2024-05-08'), (101, DATE '2024-05-10'),
+  (109, DATE '2024-05-10'), (104, DATE '2024-05-11'), (110, DATE '2024-05-11'),
+  (105, DATE '2024-05-14'), (102, DATE '2024-05-14'), (111, DATE '2024-05-14'),
+  (106, DATE '2024-05-15'), (101, DATE '2024-05-15'), (112, DATE '2024-05-15')
 ) AS t(user_id, login_date);`}
   starterCode={`-- Build a per-day spine, then LEFT JOIN logins and count distinct users
 WITH bounds AS (
@@ -355,7 +410,7 @@ LEFT JOIN logins l ON l.login_date = s.day
 GROUP BY s.day
 ORDER BY s.day;`}
   tests={[
-    { id: "rows", name: "One row per calendar day", description: "May 1 through May 4 is four days, including the empty May 2", expectedRowCount: 4 },
+    { id: "rows", name: "One row per calendar day", description: "May 1 through May 4 is four days, including the empty May 2", expectedRowCount: 15 },
     { id: "cols", name: "Has the required columns", description: "day and active_users", expectedColumnsInclude: ["day", "active_users"] },
   ]}
 />

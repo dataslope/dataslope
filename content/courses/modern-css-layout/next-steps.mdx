@@ -32,17 +32,28 @@ Project ideas that stretch these skills:
 
 ## Go deeper on modern CSS
 
-The core is covered; here's what to explore next:
+You already have the modern kit: container queries, `:has()`, nesting,
+logical properties, `aspect-ratio`, and `grid-template-areas` all
+appeared in the lessons. Here's what sits just past the edge of this
+course:
 
-- **`grid-template-areas`** for drawing whole page layouts as text.
-- **Container queries** (`@container`), styling a component by *its
-  own* width instead of the viewport's, the newest piece of the
-  responsive puzzle.
-- **Logical properties** (`margin-inline`, `padding-block`) that adapt
-  to writing direction.
-- **`:has()`**, the "parent selector", style an element based on what
-  it contains.
-- **Nesting**, native CSS nesting now works in every modern browser.
+- **Cascade layers** (`@layer`), declare a priority order for whole
+  groups of rules, so a reset can never accidentally out-specify a
+  component. It is the cascade lesson applied at codebase scale.
+- **`subgrid`**, let a nested grid inherit its parent's tracks so that
+  cards in a row line their headings and footers up with each other, no
+  matter how much text each one holds.
+- **`@property`**, give a custom property a real type. A variable
+  declared as `<angle>` or `<color>` can be *transitioned*, which is how
+  you animate a gradient's angle rather than cross-fading two images.
+- **Scroll-driven animations** (`animation-timeline: scroll()` and
+  `view()`), tie a keyframe animation to scroll position instead of
+  time. Progress bars and reveal-on-scroll effects, no JavaScript.
+- **View transitions**, animate between two states, or two whole pages,
+  by letting the browser cross-fade the before and after for you.
+- **`color-mix()` and `oklch()`**, build a palette by mixing and
+  lightening one brand color instead of hand-picking ten hex codes.
+  Pairs directly with the custom-properties lesson.
 
 ## Companion courses
 

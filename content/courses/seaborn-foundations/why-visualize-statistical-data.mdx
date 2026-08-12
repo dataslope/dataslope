@@ -296,52 +296,6 @@ subtle: *for any* set of summary statistics there are endlessly many datasets
 that produce them. Summaries narrow the possibilities; only a picture pins
 down which one you actually have.
 
-<ChallengeCard
-  adapter="python"
-  title="Even the spread is identical"
-  instructions={`The means coincide, but so does the *spread*. Prove it with your
-own code. Using the \`datasaurus\` DataFrame (columns \`dataset\`, \`x\`, \`y\`):
-
-1. Group by \`dataset\` and compute the **standard deviation of \`y\`** for each
-   shape.
-2. Round each value to **1 decimal place**.
-3. Store the result in a Series named \`y_stds\` (indexed by shape name).
-
-If the dozen really are statistically twins, all thirteen standard
-deviations should collapse to the **same** number.`}
-  datasets={[{ path: "datasaurus_dozen.csv", stageAs: "datasaurus.csv" }]}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import pandas as pd
-datasaurus = pd.read_csv("datasaurus.csv")`,
-      starterCode: `# Per-shape standard deviation of y, rounded to 1 decimal, into y_stds:
-y_stds = None
-
-display(y_stds)
-`,
-      solutionCode: `y_stds = datasaurus.groupby("dataset")["y"].std().round(1)
-
-display(y_stds)
-`,
-    },
-  ]}
-  tests={[
-    {
-      id: "thirteen_shapes",
-      name: "One std per shape",
-      description: "y_stds covers all thirteen shapes",
-      code: "assert y_stds is not None, 'Assign the per-shape standard deviations to y_stds'\nassert len(y_stds) == 13, f'Expected 13 shapes, got {len(y_stds)}'",
-    },
-    {
-      id: "all_equal",
-      name: "Every shape shares the same spread in y",
-      description: "All thirteen rounded standard deviations are identical",
-      code: "vals = set(round(float(v), 1) for v in y_stds)\nassert len(vals) == 1, f'Expected one shared value; got {sorted(vals)}'",
-    },
-  ]}
-/>
-
 ## Your turn
 
 Let's make the "the numbers agree" half of the lesson concrete with your own
@@ -404,6 +358,56 @@ display(y_means)
 Four groups, four identical means, and yet, as you saw above, four utterly
 different pictures. Holding both of those facts in your head at once is the
 whole point of this page.
+
+The means are the easy half. Now do the same for the *spread*, this time on
+the thirteen Datasaurus shapes, where a dinosaur and a bullseye somehow report
+the same standard deviation.
+
+<ChallengeCard
+  adapter="python"
+  title="Even the spread is identical"
+  instructions={`The means coincide, but so does the *spread*. Prove it with your
+own code. Using the \`datasaurus\` DataFrame (columns \`dataset\`, \`x\`, \`y\`):
+
+1. Group by \`dataset\` and compute the **standard deviation of \`y\`** for each
+   shape.
+2. Round each value to **1 decimal place**.
+3. Store the result in a Series named \`y_stds\` (indexed by shape name).
+
+If the dozen really are statistically twins, all thirteen standard
+deviations should collapse to the **same** number.`}
+  datasets={[{ path: "datasaurus_dozen.csv", stageAs: "datasaurus.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+datasaurus = pd.read_csv("datasaurus.csv")`,
+      starterCode: `# Per-shape standard deviation of y, rounded to 1 decimal, into y_stds:
+y_stds = None
+
+display(y_stds)
+`,
+      solutionCode: `y_stds = datasaurus.groupby("dataset")["y"].std().round(1)
+
+display(y_stds)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "thirteen_shapes",
+      name: "One std per shape",
+      description: "y_stds covers all thirteen shapes",
+      code: "assert y_stds is not None, 'Assign the per-shape standard deviations to y_stds'\nassert len(y_stds) == 13, f'Expected 13 shapes, got {len(y_stds)}'",
+    },
+    {
+      id: "all_equal",
+      name: "Every shape shares the same spread in y",
+      description: "All thirteen rounded standard deviations are identical",
+      code: "vals = set(round(float(v), 1) for v in y_stds)\nassert len(vals) == 1, f'Expected one shared value; got {sorted(vals)}'",
+    },
+  ]}
+/>
 
 ## Check your understanding
 

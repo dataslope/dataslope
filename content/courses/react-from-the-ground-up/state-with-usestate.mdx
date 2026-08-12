@@ -45,6 +45,10 @@ touch the DOM:
   <CounterDemo />
 </ReactPreview>
 
+That was the component on its own. Here it is as a full project you
+can edit. Try changing the initial value in `useState(0)`, or adding
+a reset button that calls `setCount(0)`:
+
 <CodeBlock
   adapter="react"
   files={[
@@ -71,9 +75,10 @@ createRoot(document.getElementById("root")!).render(<Counter />);
   ]}
 />
 
-Each click calls `setCount`, React re-runs `Counter` with the new
-`count`, and the heading reflects it. You never touched the DOM;
-you changed *state*, and the UI followed.
+Read the source and notice what is *not* there: no `getElementById`, no
+`textContent =`, nothing that finds the heading and edits it. The
+heading is the expression `{count}`, and `setCount` is the only line
+that does anything. Everything else is React's job.
 
 ## Setting state triggers a re-render
 

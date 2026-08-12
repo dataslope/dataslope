@@ -94,9 +94,9 @@ print(np.empty(4))
 />
 
 <Figure
-  slug="scipy-arrays-and-tensors-inline-cutout"
-  alt="A single row of cells, a flat grid of them, and a stack of those grids, standing side by side in increasing dimension"
-  caption="The same buffer is a vector, a matrix or a stack, depending on its shape."
+  slug="scipy-arrays-and-tensors-creating-arrays-inline-cutout"
+  alt="A solid grid of cells filling in one by one from a hopper, each filled cell a block of ink"
+  caption="An array is one flat buffer plus a shape that says how to read it."
 />
 
 For random data, prefer the modern `default_rng()` interface (it is
@@ -158,6 +158,10 @@ print(A)
     },
   ]}
 />
+
+Basic slicing gives you a **view**: no data is copied, and writing
+through it changes the original. Fancy indexing is the opposite, and the
+distinction is one of the most common sources of NumPy surprises:
 
 <CodeBlock
   adapter="python"
@@ -257,9 +261,9 @@ equation solution states
 live.
 
 <Figure
-  slug="scipy-arrays-and-tensors-creating-arrays-inline-cutout"
-  alt="A solid grid of cells filling in one by one from a hopper, each filled cell a block of ink"
-  caption="An array is one flat buffer plus a shape that says how to read it."
+  slug="scipy-arrays-and-tensors-inline-cutout"
+  alt="A single row of cells, a flat grid of them, and a stack of those grids, standing side by side in increasing dimension"
+  caption="The same buffer is a vector, a matrix or a stack, depending on its shape."
 />
 
 The general-purpose tool for tensor contractions is **`np.einsum`**,

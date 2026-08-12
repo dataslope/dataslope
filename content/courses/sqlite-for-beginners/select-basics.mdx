@@ -36,13 +36,34 @@ flowchart TD
   title TEXT,
   author TEXT,
   genre TEXT,
-  price NUMERIC
+  price NUMERIC,
+  pages INTEGER
 );
-INSERT INTO books (title, author, genre, price) VALUES
-  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
-  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
-  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00),
-  ('SQL Street', 'Mina Park', 'Technology', 24.00);`}
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title,
   author
@@ -73,12 +94,34 @@ you are exploring a table for the first time.
   title TEXT,
   author TEXT,
   genre TEXT,
-  price NUMERIC
+  price NUMERIC,
+  pages INTEGER
 );
-INSERT INTO books (title, author, genre, price) VALUES
-  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
-  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
-  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00);`}
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   *
 FROM
@@ -114,12 +157,34 @@ to follow the table's original column order.
   title TEXT,
   author TEXT,
   genre TEXT,
-  price NUMERIC
+  price NUMERIC,
+  pages INTEGER
 );
-INSERT INTO books (title, author, genre, price) VALUES
-  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
-  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
-  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00);`}
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   price,
   title,
@@ -155,13 +220,34 @@ You can select just one column when that is all you need.
   title TEXT,
   author TEXT,
   genre TEXT,
-  price NUMERIC
+  price NUMERIC,
+  pages INTEGER
 );
-INSERT INTO books (title, author, genre, price) VALUES
-  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
-  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
-  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00),
-  ('SQL Street', 'Mina Park', 'Technology', 24.00);`}
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT
   title
 FROM
@@ -182,22 +268,44 @@ rows.
   title TEXT,
   author TEXT,
   genre TEXT,
-  price NUMERIC
+  price NUMERIC,
+  pages INTEGER
 );
-INSERT INTO books (title, author, genre, price) VALUES
-  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
-  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
-  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00),
-  ('SQL Street', 'Mina Park', 'Technology', 24.00),
-  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25);`}
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT DISTINCT
   genre
 FROM
   books;`}
 />
 
-There are five books, but only three genres. `DISTINCT` is perfect for
-questions like "what categories exist?"
+There are 24 books, but only five genres. That gap is the point:
+`DISTINCT` answers "what categories exist?" without making you read
+every row and keep a tally in your head. The bigger the table, the more
+work it saves you.
 
 `DISTINCT` works on the whole selected row. If you select two columns,
 SQLite keeps each unique combination of those two columns.
@@ -210,13 +318,34 @@ SQLite keeps each unique combination of those two columns.
   title TEXT,
   author TEXT,
   genre TEXT,
-  price NUMERIC
+  price NUMERIC,
+  pages INTEGER
 );
-INSERT INTO books (title, author, genre, price) VALUES
-  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
-  ('Data Garden', 'Owen Lee', 'Technology', 29.50),
-  ('SQL Street', 'Mina Park', 'Technology', 24.00),
-  ('Cloud Recipes', 'Mina Park', 'Fiction', 18.25);`}
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275),
+  ('The Paper Compass', 'Lena Ortiz', 'Travel', 14.50, 210),
+  ('Quiet Harbors', 'Ava Stone', 'Fiction', 11.75, 195),
+  ('SQL for Gardeners', 'Owen Lee', 'Technology', 34.00, 480),
+  ('Marble and Ash', 'Tomas Vega', 'History', 22.40, 365),
+  ('The Salt Road', 'Lena Ortiz', 'Travel', 19.99, 288),
+  ('Night Market Notes', 'Ava Stone', 'Cooking', 15.60, 200),
+  ('Index of Small Birds', 'Mina Park', 'Fiction', 13.40, 168),
+  ('Hard Drive Blues', 'Owen Lee', 'Technology', 27.75, 352),
+  ('The Copper Atlas', 'Tomas Vega', 'History', 31.20, 445),
+  ('Slow Dough', 'Priya Raman', 'Cooking', 9.99, 150),
+  ('Ferry to Alder Bay', 'Lena Ortiz', 'Fiction', 17.10, 262),
+  ('Query of the Day', 'Owen Lee', 'Technology', 21.35, 298),
+  ('Cartography for Cats', 'Tomas Vega', 'Travel', 26.80, 330),
+  ('The Winter Larder', 'Priya Raman', 'Cooking', 23.15, 312),
+  ('Letters from Harbin', 'Mina Park', 'History', 28.90, 398),
+  ('Sugar and Smoke', 'Priya Raman', 'Cooking', 12.25, 176),
+  ('The Glass Meridian', 'Ava Stone', 'Fiction', 35.50, 512),
+  ('SQL at Midnight', 'Owen Lee', 'Technology', 16.90, 232),
+  ('Rain on the Steppe', 'Tomas Vega', 'Travel', 10.40, 158);`}
   starterCode={`SELECT DISTINCT
   author,
   genre

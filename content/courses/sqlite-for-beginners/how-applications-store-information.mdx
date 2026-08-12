@@ -79,9 +79,18 @@ Later, the app can ask for your unfinished tasks and show them again.
   due_date TEXT
 );
 INSERT INTO tasks (title, done, due_date) VALUES
-  ('Buy milk', 0, '2026-04-15'),
-  ('Submit form', 1, '2026-04-10'),
-  ('Water plants', 0, '2026-04-11');`}
+  ('Buy milk', 0, '2026-04-15'), ('Submit form', 1, '2026-04-10'),
+  ('Water plants', 0, '2026-04-11'), ('Book dentist', 0, '2026-04-18'),
+  ('Renew passport', 1, '2026-04-02'), ('Pay rent', 1, '2026-04-01'),
+  ('Call plumber', 0, '2026-04-13'), ('Return library books', 1, '2026-04-08'),
+  ('Fix bike tyre', 0, '2026-04-20'), ('Send invoice', 1, '2026-04-05'),
+  ('Order printer ink', 0, '2026-04-22'), ('Clean gutters', 0, '2026-04-25'),
+  ('File tax return', 1, '2026-04-06'), ('Buy birthday card', 0, '2026-04-17'),
+  ('Cancel free trial', 0, '2026-04-09'), ('Update CV', 1, '2026-04-03'),
+  ('Back up laptop', 0, '2026-04-19'), ('Post parcel', 1, '2026-04-07'),
+  ('Book train tickets', 0, '2026-04-21'), ('Replace smoke alarm', 0, '2026-04-24'),
+  ('Email landlord', 1, '2026-04-04'), ('Sort recycling', 0, '2026-04-12'),
+  ('Photograph receipts', 0, '2026-04-16'), ('Defrost freezer', 0, '2026-04-26');`}
   starterCode={`SELECT
   title,
   due_date

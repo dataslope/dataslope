@@ -55,6 +55,9 @@ print(empty)
   ]}
 />
 
+More usefully, write the pairs straight into the braces, each key
+separated from its value by a colon:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -80,6 +83,9 @@ print(also_person)
     },
   ]}
 />
+
+`dict()` also accepts a sequence of key-value pairs, which is what you
+reach for when the keys are computed rather than typed:
 
 <CodeBlock
   adapter="python"
@@ -140,6 +146,9 @@ print(person.get("email"))
   ]}
 />
 
+`get()` returned `None` for the missing key. Give it a second argument
+and it returns that instead, which is usually what you actually want:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -172,6 +181,10 @@ print(person)
     },
   ]}
 />
+
+The same syntax updates an existing key. Assignment does not care
+whether the key was already there, which is worth remembering the first
+time you overwrite something by accident:
 
 <CodeBlock
   adapter="python"
@@ -215,6 +228,9 @@ print(person)
     },
   ]}
 />
+
+`del` discards the value. `pop()` removes the key and hands the value
+back, so you can use it on the way out:
 
 <CodeBlock
   adapter="python"
@@ -316,6 +332,10 @@ print(good)
   ]}
 />
 
+A list cannot be a key, because a list can change and a dictionary
+needs its keys to stay put. Python says so rather than letting you find
+out later:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -403,6 +423,10 @@ print(freq.most_common(3))
   ]}
 />
 
+`defaultdict` solves the neighbouring problem: it creates the missing
+value for you the first time you touch a key, so grouping items needs no
+"is this key here yet?" check:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -430,6 +454,9 @@ Dicts and JSON objects share syntax for a reason. The `json` module converts bot
   caption="Hashing turns a key into the address of exactly one drawer."
 />
 
+Dictionaries are also the shape JSON arrives in, which is most of why
+you will meet them constantly. `json.dumps()` turns one into text:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -444,6 +471,8 @@ print(text)
     },
   ]}
 />
+
+And `json.loads()` turns text back into a dictionary:
 
 <CodeBlock
   adapter="python"

@@ -44,12 +44,6 @@ A **layered architecture** divides code into three (or more) layers:
 
 Dependencies flow in one direction: Infrastructure → Application → Domain. The domain knows nothing about infrastructure.
 
-<Figure
-  slug="tsx-scalable-architecture-monorepo-type-sharing-teaser-inline-cutout"
-  alt="One shared drawer of shapes drawn on by three separate workshops in the same building"
-  caption="Shared types are how separate packages keep speaking the same language across layers."
-/>
-
 ```mermaid
 graph TD
     A[Infrastructure Layer<br/>Database, HTTP, File System] --> B[Application Layer<br/>Use Cases, Orchestration]
@@ -596,11 +590,17 @@ In a **monorepo** (multiple packages in one repo), you can share types across pa
 
 This ensures the frontend and backend agree on data shapes at compile time. Tools like npm workspaces, Yarn workspaces, or pnpm workspaces make this seamless.
 
+<Figure
+  slug="tsx-scalable-architecture-monorepo-type-sharing-teaser-inline-cutout"
+  alt="One shared drawer of shapes drawn on by three separate workshops in the same building"
+  caption="Shared types are how separate packages keep speaking the same language across layers."
+/>
+
 We won't dive into monorepo tooling here, but know that TypeScript's type system scales to multi-package architectures.
 
 ---
 
-## Multiple Choice: Dependency Direction
+## Check your understanding
 
 <MultipleChoice
   markdown={`In a layered architecture, which layer should the domain layer depend on?
@@ -614,10 +614,6 @@ We won't dive into monorepo tooling here, but know that TypeScript's type system
 
 Keeping the domain pure makes it testable, reusable, and easy to reason about.`}
 />
-
----
-
-## Multiple Choice: Dependency Inversion
 
 <MultipleChoice
   markdown={`What does "dependency inversion" mean in this context?

@@ -42,6 +42,11 @@ somewhere to put the thing.
 
 <Chart slug="heap-vs-stack-cost" />
 
+Two things follow from that gap. Allocating in a tight loop is worth
+avoiding, and allocating *once* outside the loop usually fixes it. And
+a "slow" program is often not doing slow work at all, it is asking the
+allocator for memory far more often than it needs to.
+
 ## `new` and `delete`
 
 The `new` expression does two things:

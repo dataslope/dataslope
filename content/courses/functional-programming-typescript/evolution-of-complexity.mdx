@@ -58,6 +58,12 @@ touching a database, a cache, a queue, a third-party API. The
 *surface area* of a typical program has grown by orders of magnitude
 in fifty years.
 
+<Figure
+  slug="fp-evolution-of-complexity-from-scripts-systems-inline-cutout"
+  alt="One short strip of instructions on a bench beside a wall of interlocking frames built from many such strips"
+  caption="Software grew from single scripts into systems of interacting parts."
+/>
+
 ## The hidden enemy: mutable state
 
 The single largest source of complexity in software is **mutable
@@ -178,12 +184,6 @@ requests arrive in the wrong order. A `setTimeout` fires after the
 component it was for has unmounted. A `Promise` resolves into a
 closure that captured a stale variable. A database write races
 against a read.
-
-<Figure
-  slug="fp-evolution-of-complexity-from-scripts-systems-inline-cutout"
-  alt="One short strip of instructions on a bench beside a wall of interlocking frames built from many such strips"
-  caption="Software grew from single scripts into systems of interacting parts."
-/>
 
 Imperative programs handle time by *mutating state*: the request
 handler updates a session, the timer fires and re-reads it, the

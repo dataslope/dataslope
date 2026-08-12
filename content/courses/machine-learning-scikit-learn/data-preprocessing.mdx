@@ -22,12 +22,6 @@ rule that separates an honest pipeline from a leaky one.
 
 ## The problem scaling solves
 
-
-The problem, measured. Two features that matter equally, in units that
-do not, and the share of distance each ends up contributing.
-
-<Chart slug="feature-scaling-distance" />
-
 Suppose you are predicting whether a loan will default, and two of your
 features are the applicant's **age** (say, 18–80) and their **annual
 income** (say, 20,000–500,000). To a human these are obviously different
@@ -46,6 +40,11 @@ Why does that happen? It comes down to how the model measures things.
   in tiny units needs a large weight to have any effect, and a feature in
   huge units needs a tiny one. That imbalance makes the optimizer's job
   harder and makes a one-size-fits-all penalty unfair across features.
+
+Two features that matter equally, in units that do not, and the share of
+the distance between two rows that each one ends up contributing:
+
+<Chart slug="feature-scaling-distance" />
 
 Scaling fixes both problems by putting every feature on a comparable
 footing, so the model judges features by their *information*, not their

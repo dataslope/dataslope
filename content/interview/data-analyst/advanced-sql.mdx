@@ -39,7 +39,12 @@ differently:
   dialect="duckdb"
   initSql={`CREATE TABLE results (name TEXT, score INTEGER);
 INSERT INTO results VALUES
-  ('Alice', 90), ('Bob', 85), ('Carol', 85), ('Dave', 80);`}
+  ('Alice', 90), ('Bob', 85), ('Carol', 85), ('Dave', 80),
+  ('Erin', 97), ('Frank', 78), ('Grace', 91), ('Hugo', 85),
+  ('Iris', 72), ('Jonas', 88), ('Kira', 95), ('Leo', 64),
+  ('Mona', 80), ('Nils', 99), ('Otto', 76), ('Pia', 88),
+  ('Quinn', 69), ('Rui', 93), ('Sara', 85), ('Theo', 71),
+  ('Ulla', 82), ('Vik', 96), ('Wanda', 74), ('Yara', 88);`}
   starterCode={`SELECT name, score,
   ROW_NUMBER() OVER (ORDER BY score DESC) AS rn,
   RANK()       OVER (ORDER BY score DESC) AS rnk,
@@ -95,8 +100,30 @@ running frame:
   dialect="duckdb"
   initSql={`CREATE TABLE txns (day DATE, amount DECIMAL(8,2));
 INSERT INTO txns VALUES
-  ('2024-01-01', 100), ('2024-01-02', 250),
-  ('2024-01-03', 75),  ('2024-01-04', 180), ('2024-01-05', 320);`}
+  ('2024-01-01', 100.00),
+  ('2024-01-02', 250.00),
+  ('2024-01-03', 75.00),
+  ('2024-01-04', 180.00),
+  ('2024-01-05', 320.00),
+  ('2024-01-06', 140.00),
+  ('2024-01-07', 95.00),
+  ('2024-01-08', 210.00),
+  ('2024-01-09', 60.00),
+  ('2024-01-10', 275.00),
+  ('2024-01-11', 130.00),
+  ('2024-01-12', 185.00),
+  ('2024-01-13', 340.00),
+  ('2024-01-14', 55.00),
+  ('2024-01-15', 220.00),
+  ('2024-01-16', 165.00),
+  ('2024-01-17', 90.00),
+  ('2024-01-18', 300.00),
+  ('2024-01-19', 125.00),
+  ('2024-01-20', 240.00),
+  ('2024-01-21', 70.00),
+  ('2024-01-22', 195.00),
+  ('2024-01-23', 155.00),
+  ('2024-01-24', 280.00);`}
   starterCode={`SELECT day, amount,
   SUM(amount) OVER (ORDER BY day) AS running_total,
   AVG(amount) OVER (ORDER BY day ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg_3
@@ -140,7 +167,11 @@ earlier buckets get one extra row.
   initSql={`CREATE TABLE customers (name TEXT, spend DECIMAL(8,2));
 INSERT INTO customers VALUES
   ('Ava', 900), ('Ben', 720), ('Cy', 540), ('Di', 480),
-  ('Eve', 300), ('Finn', 260), ('Gus', 150), ('Hana', 90);`}
+  ('Eve', 300), ('Finn', 260), ('Gus', 150), ('Hana', 90),
+  ('Iris', 1450), ('Jonas', 1120), ('Kira', 880), ('Leo', 815),
+  ('Mona', 640), ('Nils', 605), ('Otto', 570), ('Pia', 505),
+  ('Quinn', 430), ('Rui', 375), ('Sara', 340), ('Theo', 285),
+  ('Ulla', 230), ('Vik', 195), ('Wanda', 130), ('Yara', 45);`}
   starterCode={`SELECT name, spend,
   NTILE(4) OVER (ORDER BY spend DESC) AS spend_quartile
 FROM customers
@@ -193,8 +224,16 @@ It has an **anchor** member (the starting rows) `UNION ALL` a
   dialect="duckdb"
   initSql={`CREATE TABLE emp (id INT, name TEXT, manager_id INT);
 INSERT INTO emp VALUES
-  (1,'CEO',NULL), (2,'VP Eng',1), (3,'VP Sales',1),
-  (4,'Eng Mgr',2), (5,'Engineer',4);`}
+  (1,'CEO',NULL),
+  (2,'VP Eng',1), (3,'VP Sales',1), (4,'VP Finance',1),
+  (5,'Eng Mgr Platform',2), (6,'Eng Mgr Product',2), (7,'Eng Mgr Data',2),
+  (8,'Sales Dir East',3), (9,'Sales Dir West',3),
+  (10,'Controller',4),
+  (11,'Engineer A',5), (12,'Engineer B',5), (13,'Engineer C',6),
+  (14,'Engineer D',6), (15,'Engineer E',7), (16,'Engineer F',7),
+  (17,'AE East 1',8), (18,'AE East 2',8), (19,'AE West 1',9),
+  (20,'AE West 2',9), (21,'Accountant',10),
+  (22,'Intern Platform',11), (23,'Intern Data',15), (24,'Intern Product',13);`}
   starterCode={`WITH RECURSIVE org AS (
   SELECT id, name, manager_id, 1 AS depth
   FROM emp
@@ -235,7 +274,14 @@ days show up as zero instead of vanishing. DuckDB and Postgres have
   dialect="duckdb"
   initSql={`CREATE TABLE sales (day DATE, amount INTEGER);
 INSERT INTO sales VALUES
-  ('2024-03-01', 100), ('2024-03-03', 250), ('2024-03-04', 75);`}
+  ('2024-03-01', 100), ('2024-03-03', 250), ('2024-03-04', 75),
+  ('2024-03-06', 190), ('2024-03-07', 145), ('2024-03-10', 220),
+  ('2024-03-11', 80),  ('2024-03-12', 310), ('2024-03-15', 125),
+  ('2024-03-17', 265), ('2024-03-18', 95),  ('2024-03-20', 175),
+  ('2024-03-21', 240), ('2024-03-24', 60),  ('2024-03-25', 205),
+  ('2024-03-26', 130), ('2024-03-28', 285), ('2024-03-29', 110),
+  ('2024-03-31', 160), ('2024-04-02', 195), ('2024-04-03', 70),
+  ('2024-04-05', 250), ('2024-04-06', 140), ('2024-04-08', 300);`}
   starterCode={`WITH spine AS (
   SELECT unnest(generate_series(DATE '2024-03-01', DATE '2024-03-05', INTERVAL 1 DAY)) AS day
 )
@@ -256,7 +302,13 @@ runs everywhere.
   initSql={`CREATE TABLE sales (region TEXT, quarter TEXT, amount INTEGER);
 INSERT INTO sales VALUES
   ('North','Q1',100), ('North','Q2',140), ('South','Q1',80),
-  ('South','Q2',120), ('North','Q1',60),  ('South','Q2',30);`}
+  ('South','Q2',120), ('North','Q1',60),  ('South','Q2',30),
+  ('East','Q1',95),   ('East','Q2',175),  ('West','Q1',110),
+  ('West','Q2',65),   ('North','Q2',85),  ('South','Q1',145),
+  ('East','Q1',40),   ('West','Q2',200),  ('North','Q1',75),
+  ('South','Q2',55),  ('East','Q2',130),  ('West','Q1',90),
+  ('North','Q2',115), ('South','Q1',35),  ('East','Q1',160),
+  ('West','Q2',105),  ('North','Q1',50),  ('South','Q2',185);`}
   starterCode={`SELECT
   region,
   SUM(CASE WHEN quarter = 'Q1' THEN amount ELSE 0 END) AS q1,
@@ -348,12 +400,18 @@ SELECT * FROM ranked WHERE rn = 1;
   instructions={`The table \`monthly_sales\` has columns \`month\` (a \`DATE\`, the first of each month) and \`revenue\`. Return every row with a trailing **3-month moving average** of \`revenue\`: columns \`month\`, \`revenue\`, and \`moving_avg_3m\` (the average of the current month and the two months before it). Sort by \`month\` ascending. Hint: use \`AVG(...) OVER (ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)\`.`}
   initSql={`CREATE TABLE monthly_sales AS
 SELECT * FROM (VALUES
-  (DATE '2024-01-01', 100.0),
-  (DATE '2024-02-01', 200.0),
-  (DATE '2024-03-01', 300.0),
-  (DATE '2024-04-01', 260.0),
-  (DATE '2024-05-01', 400.0),
-  (DATE '2024-06-01', 340.0)
+  (DATE '2022-07-01', 180.0), (DATE '2022-08-01', 155.0),
+  (DATE '2022-09-01', 210.0), (DATE '2022-10-01', 195.0),
+  (DATE '2022-11-01', 240.0), (DATE '2022-12-01', 330.0),
+  (DATE '2023-01-01', 145.0), (DATE '2023-02-01', 165.0),
+  (DATE '2023-03-01', 220.0), (DATE '2023-04-01', 205.0),
+  (DATE '2023-05-01', 275.0), (DATE '2023-06-01', 250.0),
+  (DATE '2023-07-01', 190.0), (DATE '2023-08-01', 175.0),
+  (DATE '2023-09-01', 235.0), (DATE '2023-10-01', 260.0),
+  (DATE '2023-11-01', 290.0), (DATE '2023-12-01', 385.0),
+  (DATE '2024-01-01', 100.0), (DATE '2024-02-01', 200.0),
+  (DATE '2024-03-01', 300.0), (DATE '2024-04-01', 260.0),
+  (DATE '2024-05-01', 400.0), (DATE '2024-06-01', 340.0)
 ) AS t(month, revenue);`}
   starterCode={`-- Trailing 3-month average of revenue, oldest month first.
 SELECT
@@ -369,10 +427,13 @@ FROM monthly_sales
 FROM monthly_sales
 ORDER BY month;`}
   tests={[
-    { id: "row_count", name: "One row per month", description: "Six months in, six rows out", expectedRowCount: 6 },
+    { id: "row_count", name: "One row per month", description: "Six months in, six rows out", expectedRowCount: 24 },
     { id: "columns", name: "Has the required columns", description: "month, revenue, moving_avg_3m", expectedColumnsInclude: ["month", "revenue", "moving_avg_3m"] },
   ]}
 />
+
+The second challenge combines the two ideas from this page: aggregate
+first, then rank the aggregates within a partition.
 
 <SqlChallengeCard
   dialect="duckdb"
@@ -380,14 +441,18 @@ ORDER BY month;`}
   instructions={`The table \`orders\` has columns \`customer\`, \`region\`, and \`amount\` (one row per order). For each customer, total their \`amount\`, then **rank customers within their region** by that total, highest first. Return columns \`customer\`, \`region\`, \`total_spend\`, and \`region_rank\` (1 = top spender in the region). Use \`RANK() OVER (PARTITION BY region ORDER BY SUM(amount) DESC)\`, window functions run after \`GROUP BY\`, so aggregates are allowed inside \`OVER\`.`}
   initSql={`CREATE TABLE orders AS
 SELECT * FROM (VALUES
-  ('Ava',  'North', 300.0),
-  ('Ava',  'North', 200.0),
-  ('Ben',  'North', 150.0),
-  ('Cy',   'South', 400.0),
-  ('Di',   'South', 250.0),
-  ('Di',   'South', 100.0),
-  ('Eve',  'East',  600.0),
-  ('Finn', 'East',  450.0)
+  ('Ava',  'North', 300.0), ('Ava',  'North', 200.0),
+  ('Ben',  'North', 150.0), ('Gus',  'North', 275.0),
+  ('Gus',  'North', 190.0), ('Hana', 'North', 120.0),
+  ('Cy',   'South', 400.0), ('Di',   'South', 250.0),
+  ('Di',   'South', 100.0), ('Iris', 'South', 330.0),
+  ('Jonas','South', 145.0), ('Jonas','South',  95.0),
+  ('Eve',  'East',  600.0), ('Finn', 'East',  450.0),
+  ('Kira', 'East',  210.0), ('Kira', 'East',  185.0),
+  ('Leo',  'East',  520.0), ('Mona', 'East',  160.0),
+  ('Nils', 'West',  380.0), ('Nils', 'West',  240.0),
+  ('Otto', 'West',  175.0), ('Pia',  'West',  460.0),
+  ('Rui',  'West',  130.0), ('Rui',  'West',   85.0)
 ) AS t(customer, region, amount);`}
   starterCode={`-- Total each customer's spend, then rank within region.
 SELECT
@@ -407,7 +472,7 @@ FROM orders
 GROUP BY customer, region
 ORDER BY region, region_rank;`}
   tests={[
-    { id: "row_count", name: "One row per customer", description: "Six customers → six rows", expectedRowCount: 6 },
+    { id: "row_count", name: "One row per customer", description: "Six customers → six rows", expectedRowCount: 17 },
     { id: "columns", name: "Has the required columns", description: "customer, region, total_spend, region_rank", expectedColumnsInclude: ["customer", "region", "total_spend", "region_rank"] },
   ]}
 />

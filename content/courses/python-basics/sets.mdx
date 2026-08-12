@@ -83,6 +83,8 @@ print(unique)
   ]}
 />
 
+`set()` accepts any iterable, and a string is a sequence of characters:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -210,6 +212,9 @@ print("symmetric:    ", a ^ b)
   ]}
 />
 
+Alongside the four operators there are the containment tests, which
+ask about the relationship between two sets rather than combining them:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -263,6 +268,10 @@ per element, and the tables pay for themselves immediately:
 
 <Chart slug="set-ops-vs-nested-loops" />
 
+All of that is convenient. The reason sets matter in practice is
+speed: membership testing is roughly constant time, where a list has to
+walk itself. Over a million items the difference is not subtle:
+
 <CodeBlock
   adapter="python"
   files={[
@@ -303,6 +312,9 @@ print(good)
     },
   ]}
 />
+
+Set members must be hashable for the same reason dictionary keys must
+be, so a list cannot go in one:
 
 <CodeBlock
   adapter="python"
@@ -352,6 +364,8 @@ print(lookup[frozenset({"tutorial", "python"})])
     },
   ]}
 />
+
+Which is also what lets you build a set of sets:
 
 <CodeBlock
   adapter="python"

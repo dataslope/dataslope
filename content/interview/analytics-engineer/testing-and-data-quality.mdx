@@ -76,11 +76,15 @@ more than once. An empty result passes; the returned rows are what you fix:
 
 <SqlCodeBlock
   dialect="duckdb"
-  initSql={`CREATE TABLE fct_orders AS SELECT * FROM (VALUES
-  (1, 100.00),
-  (2,  50.00),
-  (2,  50.00),
-  (3,  75.00)
+  initSql={`-- Orders 2, 11 and 19 each appear twice: the duplicates a uniqueness
+-- test is meant to catch.
+CREATE TABLE fct_orders AS SELECT * FROM (VALUES
+  (1, 100.00), (2, 50.00), (2, 50.00), (3, 75.00),
+  (4, 210.00), (5, 45.50), (6, 320.00), (7, 88.25),
+  (8, 165.00), (9, 92.75), (10, 275.00), (11, 130.00),
+  (11, 130.00), (12, 58.00), (13, 405.00), (14, 71.50),
+  (15, 190.00), (16, 112.25), (17, 245.00), (18, 63.75),
+  (19, 155.00), (19, 155.00), (20, 298.50), (21, 84.00)
 ) AS t(order_id, amount);`}
   starterCode={`-- What a dbt 'unique' test on order_id checks: return duplicate keys
 SELECT order_id, COUNT(*) AS n

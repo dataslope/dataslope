@@ -90,10 +90,12 @@ Since `= NULL` does not work, SQL gives you special tests:
   phone TEXT
 );
 INSERT INTO customers (name, phone) VALUES
-  ('Ada', '555-0101'),
-  ('Grace', NULL),
-  ('Linus', '555-0102'),
-  ('Mae', NULL);`}
+  ('Ada','555-0101'),('Grace',NULL),('Linus','555-0102'),('Mae',NULL),
+  ('Rosa','555-0105'),('Ivan',NULL),('Nadia','555-0107'),('Omar','555-0108'),
+  ('Priya',NULL),('Quinn','555-0110'),('Ruth','555-0111'),('Sam',NULL),
+  ('Tariq','555-0113'),('Uma','555-0114'),('Viktor',NULL),('Wen','555-0116'),
+  ('Xenia','555-0117'),('Yusuf',NULL),('Zara','555-0119'),('Bruno','555-0120'),
+  ('Chidi',NULL),('Dara','555-0122'),('Elif','555-0123'),('Farid','555-0124');`}
   starterCode={`-- Customers we cannot phone:
 SELECT
   name
@@ -148,7 +150,12 @@ Often you want to display a friendly fallback instead of a blank.
   id SERIAL PRIMARY KEY, name TEXT, phone TEXT
 );
 INSERT INTO customers (name, phone) VALUES
-  ('Ada','555-0101'),('Grace',NULL),('Linus','555-0102'),('Mae',NULL);`}
+  ('Ada','555-0101'),('Grace',NULL),('Linus','555-0102'),('Mae',NULL),
+  ('Rosa','555-0105'),('Ivan',NULL),('Nadia','555-0107'),('Omar','555-0108'),
+  ('Priya',NULL),('Quinn','555-0110'),('Ruth','555-0111'),('Sam',NULL),
+  ('Tariq','555-0113'),('Uma','555-0114'),('Viktor',NULL),('Wen','555-0116'),
+  ('Xenia','555-0117'),('Yusuf',NULL),('Zara','555-0119'),('Bruno','555-0120'),
+  ('Chidi',NULL),('Dara','555-0122'),('Elif','555-0123'),('Farid','555-0124');`}
   starterCode={`SELECT
   name,
   COALESCE(phone, 'No phone on file') AS phone_display
@@ -279,10 +286,18 @@ Use \`IS NULL\` (never \`= NULL\`) to test for missing values.`}
   email TEXT
 );
 INSERT INTO customers (name, email) VALUES
-  ('Ada', 'ada@example.com'),
-  ('Grace', NULL),
-  ('Linus', 'linus@example.com'),
-  ('Mae', NULL);`}
+  ('Ada', 'ada@example.com'), ('Grace', NULL),
+  ('Linus', 'linus@example.com'), ('Mae', NULL),
+  ('Rosa', 'rosa@example.com'), ('Ivan', NULL),
+  ('Nadia', 'nadia@example.com'), ('Omar', 'omar@example.com'),
+  ('Priya', NULL), ('Quinn', 'quinn@example.com'),
+  ('Ruth', 'ruth@example.com'), ('Sam', NULL),
+  ('Tariq', 'tariq@example.com'), ('Uma', 'uma@example.com'),
+  ('Viktor', NULL), ('Wen', 'wen@example.com'),
+  ('Xenia', 'xenia@example.com'), ('Yusuf', NULL),
+  ('Zara', 'zara@example.com'), ('Bruno', 'bruno@example.com'),
+  ('Chidi', NULL), ('Dara', 'dara@example.com'),
+  ('Elif', 'elif@example.com'), ('Farid', 'farid@example.com');`}
   starterCode={`SELECT
   name,
   email AS email_display -- wrap this in COALESCE with a fallback
@@ -306,16 +321,20 @@ ORDER BY
     },
     {
       id: "row_count",
-      name: "Returns all four customers",
+      name: "Returns all 24 customers",
       description: "Nobody is filtered out, missing emails get a fallback instead.",
-      expectedRowCount: 4,
+      expectedRowCount: 24,
     },
     {
       id: "matches",
       name: "Matches the reference solution",
-      description: "Grace and Mae show 'no email'; Ada and Linus show their addresses.",
+      description: "The eight customers with no email show 'no email'; the rest show their addresses.",
       matchesSolution: true,
       ordered: true,
     },
   ]}
 />
+
+`NULL` is the part of SQL that most often surprises people months into
+using it, so it is worth over-learning now. Whenever a result has fewer
+rows than you expected, ask what happened to the unknown values.

@@ -25,12 +25,6 @@ int scores[5] = {90, 85, 72, 95, 88};
 This puts five `int`s in **contiguous** memory. The size is part of
 the type (`int[5]`) and is fixed at compile time.
 
-<Figure
-  slug="cpp-arrays-and-strings-inline-cutout"
-  alt="A fixed strip of cells holding blocks beside a fixed strip of letter tiles ending in a small stop mark"
-  caption="A string is an array of characters that manages its own storage."
-/>
-
 ```mermaid
 flowchart LR
     subgraph "scores[5]"
@@ -69,6 +63,12 @@ Raw arrays have two well-known weaknesses:
 
 These two problems together cause a huge fraction of all C/C++ bugs.
 For new code, prefer the standard library containers.
+
+<Figure
+  slug="cpp-arrays-and-strings-raw-c-arrays-inline-cutout"
+  alt="A fixed strip of cells with no guard at either end, a marker resting just past the final cell"
+  caption="A raw array has no guard at either end, so overrunning it is silent."
+/>
 
 ## `std::array<T, N>`: a safer fixed array
 
@@ -163,6 +163,12 @@ cost per element stays constant.
 A `std::string` is to `char` what `std::vector` is to `int`. It owns
 its character storage, knows its length, and resizes as needed.
 
+<Figure
+  slug="cpp-arrays-and-strings-inline-cutout"
+  alt="A fixed strip of cells holding blocks beside a fixed strip of letter tiles ending in a small stop mark"
+  caption="A string is an array of characters that manages its own storage."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -216,12 +222,6 @@ for (int& x : v) {
 
 Prefer #2 and #3 when you don't actually need the index, they're
 shorter and harder to get wrong.
-
-<Figure
-  slug="cpp-arrays-and-strings-raw-c-arrays-inline-cutout"
-  alt="A fixed strip of cells with no guard at either end, a marker resting just past the final cell"
-  caption="A raw array has no guard at either end, so overrunning it is silent."
-/>
 
 > **Indexing safety.** `v[i]` does *not* bounds-check. `v.at(i)`
 > throws `std::out_of_range` if `i` is invalid. In tight loops use

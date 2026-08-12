@@ -92,12 +92,6 @@ A first naive impulse is to make one giant `CoffeeShop` class that
 does everything. Resist it. Look for *nouns* in the description and
 make a card for each candidate.
 
-<Figure
-  slug="oopj-responsibility-driven-design-worked-modeling-example-inline-cutout"
-  alt="One part asking a neighbour for a reading rather than reaching through its casing to take it"
-  caption="No class reaches into another's fields; it asks the object that owns them."
-/>
-
 ```mermaid
 flowchart TB
     M["Menu"] -. lists .-> D["Drink"]
@@ -113,7 +107,7 @@ A reasonable set of cards might look like:
 
 | Class | Responsibilities | Collaborators |
 | --- | --- | --- |
-| `Drink` | Know its name and price |, |
+| `Drink` | Know its name and price | none |
 | `Menu` | Know which drinks are offered; look one up by name | `Drink` |
 | `LineItem` | Know a drink and a quantity; compute its subtotal | `Drink` |
 | `Order` | Hold a list of line items; compute total; know if paid | `LineItem` |
@@ -266,6 +260,12 @@ Notice how *no* class reaches into another class's fields. `Receipt`
 asks `Order` for its items and total. `Payment` asks `Order` whether
 it's paid. `LineItem` asks `Drink` for its price. *Every interaction
 is a message.* That is responsibility-driven design.
+
+<Figure
+  slug="oopj-responsibility-driven-design-worked-modeling-example-inline-cutout"
+  alt="One part asking a neighbour for a reading rather than reaching through its casing to take it"
+  caption="No class reaches into another's fields; it asks the object that owns them."
+/>
 
 ## Smells that point at responsibility problems
 

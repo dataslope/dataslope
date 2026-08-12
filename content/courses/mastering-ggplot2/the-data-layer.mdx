@@ -155,6 +155,10 @@ ggplot(mpg, aes(displ, hwy, color = cyl)) +
   ]}
 />
 
+ggplot2 chose a continuous gradient because `cyl` is stored as a number.
+But cylinder counts are categories, not a quantity that varies smoothly.
+Tell ggplot2 that and the legend changes to match:
+
 <CodeBlock
   adapter="r"
   files={[

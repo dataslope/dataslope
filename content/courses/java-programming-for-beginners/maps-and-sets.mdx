@@ -7,15 +7,15 @@ description: Two collections that make lookup almost free, and the mental model 
 But not every problem fits that shape. Two of the most useful
 collections in any language are:
 
-<Figure
-  slug="java-maps-and-sets-cutout"
-  alt="Maps and sets, an isometric illustration"
-/>
-
 - **`Set`**, a bag of *unique* items, with very fast "is this in
   here?" checks.
 - **`Map`**, a collection of **key → value** pairs, with very
   fast "what value goes with this key?" lookups.
+
+<Figure
+  slug="java-maps-and-sets-cutout"
+  alt="Maps and sets, an isometric illustration"
+/>
 
 Once you have these two in your toolbox, a huge fraction of
 "messy data wrangling" problems become easy.
@@ -135,11 +135,6 @@ questions.
 
 ## How does "fast lookup" actually work?
 
-The three strategies grow differently, and the gap only opens at a size no
-test ever uses:
-
-<Chart slug="collection-lookup-growth" />
-
 Both `HashSet` and `HashMap` use **hashing**. When you add an
 element (or key), Java calls its `hashCode()` method to compute a
 number, then uses that number to pick a bucket. Looking the
@@ -156,6 +151,19 @@ flowchart TD
 This is why an unsorted `HashSet` of 10 million strings can answer
 "is X in here?" in microseconds: it doesn't *search*, it *computes*
 where the answer would be and looks there directly.
+
+Set that against the two other ways of finding something. A plain
+`List` has to walk its elements one at a time, so the work grows with
+the collection. A *sorted* list can halve the candidates on every
+comparison. Hashing does neither: it goes straight to the bucket.
+
+<Chart slug="collection-lookup-growth" />
+
+The lesson of this chart is not that hashing wins. It is *where*
+hashing starts winning. At a handful of elements all three lines sit
+on top of each other, which is exactly why a `List` feels fine in
+testing and falls over in production: the gap only opens at a size no
+small test ever reaches.
 
 For this to work, two contracts must hold for the key type:
 

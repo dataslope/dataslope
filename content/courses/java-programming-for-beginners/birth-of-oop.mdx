@@ -45,8 +45,16 @@ manipulated data, calling one another until a result emerged.
 The mental model of that whole era was simple: a program is a
 **recipe**. Write down the steps, in order. Run the recipe. Get a
 result. Sixty years later, that model still holds inside every
-method you will ever write, including in Java. Here is a recipe,
-as a real Java program. Run it, and read the output top to bottom:
+method you will ever write, including in Java.
+
+<Figure
+  slug="java-birth-of-oop-program-recipe-see-inline-cutout"
+  alt="A card of plain pictogram steps in a row with an arrow between each, beside a machine carrying out those same actions in the same order"
+  caption="A procedural program is a list of steps carried out in order."
+/>
+
+Here is such a recipe, as a real Java program. Run it, and read the
+output top to bottom:
 
 <CodeBlock
   adapter="java"
@@ -121,12 +129,6 @@ flowchart TD
 
 What exactly went wrong when recipes grew huge? Two patterns of pain
 showed up over and over.
-
-<Figure
-  slug="java-birth-of-oop-program-recipe-see-inline-cutout"
-  alt="A card of plain pictogram steps in a row with an arrow between each, beside a machine carrying out those same actions in the same order"
-  caption="A procedural program is a list of steps carried out in order."
-/>
 
 **Global state.** Many procedural programs kept their data in
 **global variables**, variables that any procedure anywhere could

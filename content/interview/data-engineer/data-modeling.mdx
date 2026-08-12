@@ -102,7 +102,28 @@ placed.
 INSERT INTO dim_customer VALUES
   (1001, 42, 'Boston', DATE '2022-01-01', DATE '2024-03-14', false),
   (1087, 42, 'Austin', DATE '2024-03-15', DATE '9999-12-31', true),
-  (2001, 99, 'Denver', DATE '2023-06-01', DATE '9999-12-31', true);
+  (2001, 99, 'Denver', DATE '2023-06-01', DATE '9999-12-31', true),
+  (3001, 17, 'Seattle', DATE '2021-04-01', DATE '2023-08-31', false),
+  (3062, 17, 'Portland', DATE '2023-09-01', DATE '9999-12-31', true),
+  (4001, 23, 'Chicago', DATE '2020-06-15', DATE '2022-12-31', false),
+  (4055, 23, 'Detroit', DATE '2023-01-01', DATE '9999-12-31', true),
+  (5001, 31, 'Miami', DATE '2022-02-01', DATE '9999-12-31', true),
+  (6001, 55, 'Phoenix', DATE '2019-03-01', DATE '2021-11-30', false),
+  (6044, 55, 'Tucson', DATE '2021-12-01', DATE '2023-09-30', false),
+  (6099, 55, 'Reno', DATE '2023-10-01', DATE '9999-12-31', true),
+  (7001, 68, 'Boise', DATE '2021-01-01', DATE '9999-12-31', true),
+  (8001, 74, 'Dallas', DATE '2020-09-01', DATE '2022-04-30', false),
+  (8033, 74, 'Houston', DATE '2022-05-01', DATE '9999-12-31', true),
+  (9001, 86, 'Atlanta', DATE '2022-07-01', DATE '9999-12-31', true),
+  (9501, 91, 'Nashville', DATE '2021-10-01', DATE '2023-03-31', false),
+  (9577, 91, 'Memphis', DATE '2023-04-01', DATE '9999-12-31', true),
+  (9801, 12, 'Denver', DATE '2020-01-01', DATE '9999-12-31', true),
+  (9901, 28, 'Omaha', DATE '2021-05-01', DATE '2022-12-31', false),
+  (9955, 28, 'Wichita', DATE '2023-01-01', DATE '9999-12-31', true),
+  (9971, 39, 'Austin', DATE '2020-08-01', DATE '9999-12-31', true),
+  (9982, 47, 'Tampa', DATE '2019-11-01', DATE '2021-06-30', false),
+  (9988, 47, 'Orlando', DATE '2021-07-01', DATE '9999-12-31', true),
+  (9994, 63, 'Raleigh', DATE '2022-03-01', DATE '9999-12-31', true);
 
 CREATE TABLE fact_orders (
   order_id    INTEGER,
@@ -111,9 +132,18 @@ CREATE TABLE fact_orders (
   amount      DECIMAL(10,2)
 );
 INSERT INTO fact_orders VALUES
-  (101, 42, DATE '2023-05-10', 350.00),
-  (102, 42, DATE '2024-06-01', 200.00),
-  (103, 99, DATE '2024-01-15', 500.00);`}
+  (101, 42, DATE '2023-05-10', 350.00), (102, 42, DATE '2024-06-01', 200.00),
+  (103, 99, DATE '2024-01-15', 500.00), (104, 17, DATE '2022-07-14', 640.00),
+  (105, 17, DATE '2024-03-08', 415.00), (106, 23, DATE '2021-04-19', 980.00),
+  (107, 23, DATE '2023-08-22', 275.00), (108, 31, DATE '2023-10-05', 1530.00),
+  (109, 55, DATE '2020-06-11', 720.00), (110, 55, DATE '2022-09-27', 460.00),
+  (111, 55, DATE '2024-01-16', 1105.00), (112, 68, DATE '2023-05-30', 385.00),
+  (113, 74, DATE '2021-03-24', 890.00), (114, 74, DATE '2023-12-09', 540.00),
+  (115, 86, DATE '2023-11-18', 1250.00), (116, 91, DATE '2022-12-02', 305.00),
+  (117, 91, DATE '2024-03-15', 770.00), (118, 12, DATE '2022-06-07', 1420.00),
+  (119, 28, DATE '2022-03-21', 195.00), (120, 28, DATE '2023-09-13', 660.00),
+  (121, 39, DATE '2023-02-26', 1080.00), (122, 47, DATE '2020-09-04', 425.00),
+  (123, 47, DATE '2023-06-17', 935.00), (124, 63, DATE '2023-10-28', 580.00);`}
   starterCode={`-- Point-in-time join: each order sees the city that was current when placed.
 SELECT f.order_id, f.order_date, d.city, f.amount
 FROM fact_orders f
@@ -248,11 +278,30 @@ The example below has transaction-grain `fact_sales` and daily-grain
   amount    DECIMAL(10,2)
 );
 INSERT INTO fact_sales VALUES
-  (DATE '2024-01-01', 'North', 120.00),
-  (DATE '2024-01-01', 'North',  80.00),
-  (DATE '2024-01-01', 'South', 200.00),
-  (DATE '2024-01-02', 'North', 150.00),
-  (DATE '2024-01-02', 'South',  90.00);
+  (DATE '2024-01-01', 'North', 60.00),
+  (DATE '2024-01-01', 'South', 97.00),
+  (DATE '2024-01-02', 'North', 134.00),
+  (DATE '2024-01-02', 'South', 171.00),
+  (DATE '2024-01-03', 'North', 208.00),
+  (DATE '2024-01-03', 'South', 65.00),
+  (DATE '2024-01-04', 'North', 102.00),
+  (DATE '2024-01-04', 'South', 139.00),
+  (DATE '2024-01-05', 'North', 176.00),
+  (DATE '2024-01-05', 'South', 213.00),
+  (DATE '2024-01-06', 'North', 70.00),
+  (DATE '2024-01-06', 'South', 107.00),
+  (DATE '2024-01-07', 'North', 144.00),
+  (DATE '2024-01-07', 'South', 181.00),
+  (DATE '2024-01-08', 'North', 218.00),
+  (DATE '2024-01-08', 'South', 75.00),
+  (DATE '2024-01-09', 'North', 112.00),
+  (DATE '2024-01-09', 'South', 149.00),
+  (DATE '2024-01-10', 'North', 186.00),
+  (DATE '2024-01-10', 'South', 223.00),
+  (DATE '2024-01-11', 'North', 80.00),
+  (DATE '2024-01-11', 'South', 117.00),
+  (DATE '2024-01-12', 'North', 154.00),
+  (DATE '2024-01-12', 'South', 191.00);
 
 CREATE TABLE fact_budget (
   sale_date DATE,
@@ -260,10 +309,30 @@ CREATE TABLE fact_budget (
   budget    DECIMAL(10,2)
 );
 INSERT INTO fact_budget VALUES
-  (DATE '2024-01-01', 'North', 250.00),
-  (DATE '2024-01-01', 'South', 180.00),
-  (DATE '2024-01-02', 'North', 160.00),
-  (DATE '2024-01-02', 'South', 100.00);`}
+  (DATE '2024-01-01', 'North', 150.00),
+  (DATE '2024-01-01', 'South', 173.00),
+  (DATE '2024-01-02', 'North', 196.00),
+  (DATE '2024-01-02', 'South', 219.00),
+  (DATE '2024-01-03', 'North', 242.00),
+  (DATE '2024-01-03', 'South', 265.00),
+  (DATE '2024-01-04', 'North', 288.00),
+  (DATE '2024-01-04', 'South', 311.00),
+  (DATE '2024-01-05', 'North', 334.00),
+  (DATE '2024-01-05', 'South', 157.00),
+  (DATE '2024-01-06', 'North', 180.00),
+  (DATE '2024-01-06', 'South', 203.00),
+  (DATE '2024-01-07', 'North', 226.00),
+  (DATE '2024-01-07', 'South', 249.00),
+  (DATE '2024-01-08', 'North', 272.00),
+  (DATE '2024-01-08', 'South', 295.00),
+  (DATE '2024-01-09', 'North', 318.00),
+  (DATE '2024-01-09', 'South', 341.00),
+  (DATE '2024-01-10', 'North', 164.00),
+  (DATE '2024-01-10', 'South', 187.00),
+  (DATE '2024-01-11', 'North', 210.00),
+  (DATE '2024-01-11', 'South', 233.00),
+  (DATE '2024-01-12', 'North', 256.00),
+  (DATE '2024-01-12', 'South', 279.00);`}
   starterCode={`-- Correct: pre-aggregate sales to the same daily grain, then join.
 WITH daily_sales AS (
   SELECT sale_date, region, SUM(amount) AS total_sales
@@ -321,9 +390,28 @@ pre-computed `fiscal_quarter` while filtering out holidays with
 INSERT INTO dim_date VALUES
   (20240101, DATE '2024-01-01', 'Q1', true,  'Monday'),
   (20240102, DATE '2024-01-02', 'Q1', false, 'Tuesday'),
+  (20240103, DATE '2024-01-03', 'Q1', false, 'Wednesday'),
   (20240115, DATE '2024-01-15', 'Q1', false, 'Monday'),
+  (20240116, DATE '2024-01-16', 'Q1', false, 'Tuesday'),
+  (20240201, DATE '2024-02-01', 'Q1', false, 'Thursday'),
+  (20240214, DATE '2024-02-14', 'Q1', false, 'Wednesday'),
+  (20240219, DATE '2024-02-19', 'Q1', true,  'Monday'),
+  (20240301, DATE '2024-03-01', 'Q1', false, 'Friday'),
+  (20240315, DATE '2024-03-15', 'Q1', false, 'Friday'),
+  (20240329, DATE '2024-03-29', 'Q1', true,  'Friday'),
   (20240401, DATE '2024-04-01', 'Q2', false, 'Monday'),
-  (20240415, DATE '2024-04-15', 'Q2', false, 'Monday');
+  (20240415, DATE '2024-04-15', 'Q2', false, 'Monday'),
+  (20240430, DATE '2024-04-30', 'Q2', false, 'Tuesday'),
+  (20240501, DATE '2024-05-01', 'Q2', false, 'Wednesday'),
+  (20240527, DATE '2024-05-27', 'Q2', true,  'Monday'),
+  (20240603, DATE '2024-06-03', 'Q2', false, 'Monday'),
+  (20240619, DATE '2024-06-19', 'Q2', true,  'Wednesday'),
+  (20240701, DATE '2024-07-01', 'Q3', false, 'Monday'),
+  (20240704, DATE '2024-07-04', 'Q3', true,  'Thursday'),
+  (20240815, DATE '2024-08-15', 'Q3', false, 'Thursday'),
+  (20240902, DATE '2024-09-02', 'Q3', true,  'Monday'),
+  (20241001, DATE '2024-10-01', 'Q4', false, 'Tuesday'),
+  (20241128, DATE '2024-11-28', 'Q4', true,  'Thursday');
 
 CREATE TABLE fact_orders (
   order_id       INTEGER,
@@ -331,11 +419,14 @@ CREATE TABLE fact_orders (
   amount         DECIMAL(10,2)
 );
 INSERT INTO fact_orders VALUES
-  (1, 20240101,  50.00),
-  (2, 20240102, 200.00),
-  (3, 20240115, 175.00),
-  (4, 20240401, 300.00),
-  (5, 20240415,  90.00);`}
+  (1, 20240101, 50.00),   (2, 20240102, 200.00),  (3, 20240103, 120.00),
+  (4, 20240115, 175.00),  (5, 20240116, 65.00),   (6, 20240201, 240.00),
+  (7, 20240214, 95.00),   (8, 20240219, 310.00),  (9, 20240301, 145.00),
+  (10, 20240315, 220.00), (11, 20240329, 80.00),  (12, 20240401, 300.00),
+  (13, 20240415, 90.00),  (14, 20240430, 265.00), (15, 20240501, 130.00),
+  (16, 20240527, 185.00), (17, 20240603, 55.00),  (18, 20240619, 275.00),
+  (19, 20240701, 160.00), (20, 20240704, 340.00), (21, 20240815, 105.00),
+  (22, 20240902, 195.00), (23, 20241001, 250.00), (24, 20241128, 415.00);`}
   starterCode={`SELECT d.fiscal_quarter, SUM(f.amount) AS revenue
 FROM fact_orders f
 JOIN dim_date d ON d.date_key = f.order_date_key

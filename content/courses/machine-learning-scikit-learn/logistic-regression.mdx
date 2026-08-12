@@ -88,6 +88,12 @@ apply a **threshold**, by default 0.5: if `p >= 0.5` predict class 1,
 otherwise class 0. That is the difference between `.predict_proba()` (gives
 you `p`) and `.predict()` (gives you the class after thresholding).
 
+<Figure
+  slug="ml-logistic-regression-inline-cutout"
+  alt="A board of two-colored chips with a smooth S-shaped ramp laid across it, chips low on the ramp reading one color and chips high on it the other"
+  caption="Where the ramp crosses your threshold is where the predicted class flips."
+/>
+
 <Callout type="tip" title="Meet the sigmoid">
 The sigmoid is the heart of the model: an S-curve that turns an unbounded
 score into a 0-to-1 probability. It is steep in the middle (small changes in
@@ -158,12 +164,6 @@ species separate almost perfectly on their body measurements, which makes
 them an ideal first classification target. We keep only those two species
 and predict the species from four numeric measurements.
 
-<Figure
-  slug="ml-logistic-regression-inline-cutout"
-  alt="A board of two-colored chips with a smooth S-shaped ramp laid across it, chips low on the ramp reading one color and chips high on it the other"
-  caption="Where the ramp crosses your threshold is where the predicted class flips."
-/>
-
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
@@ -204,7 +204,7 @@ Logistic regression finds its coefficients by iterative optimization. On
 some datasets the default iteration budget is too small and you get a
 "failed to converge" warning. Passing `max_iter=1000` simply gives the
 optimizer more steps. It does not change the model, it just lets the fit
-finish settling. (Scaling the features, covered in the data-prep chapter,
+finish settling. (Scaling the features, covered in *Data Preprocessing*,
 also helps it converge faster.)
 </Callout>
 

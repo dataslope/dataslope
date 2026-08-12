@@ -63,6 +63,12 @@ change. The class is the *single place* where decisions about its
 own data live. If the balance is wrong, you know exactly where to
 look.
 
+<Figure
+  slug="java-encapsulation-and-abstraction-does-matter-inline-cutout"
+  alt="A sealed case with two levers on its face, a hand refused at the seam and directed to the levers"
+  caption="With the field private, the class can refuse an operation that would break its rules."
+/>
+
 This is the technical foundation that made it possible to write
 million-line software systems without going insane.
 
@@ -135,12 +141,6 @@ If next month we add a "fees" feature, *all* the logic lives in
 **Abstraction** is the design idea behind encapsulation: callers
 care about *what* an object does for them, not *how* it does it.
 
-<Figure
-  slug="java-encapsulation-and-abstraction-does-matter-inline-cutout"
-  alt="A sealed case with two levers on its face, a hand refused at the seam and directed to the levers"
-  caption="With the field private, the class can refuse an operation that would break its rules."
-/>
-
 The `BankAccount` class is, from the outside, just:
 
 - "I have an owner."
@@ -179,12 +179,6 @@ This skips encapsulation entirely. It is a `struct` masquerading as
 a class. There is no way for `Person` to enforce rules about its own
 state. Whenever you see this, ask: who is allowed to set `age = -5`?
 
-<Figure
-  slug="java-encapsulation-and-abstraction-common-mistakes-beginners-make-inline-cutout"
-  alt="A hand reaching straight through an open hatch to the parts inside a sealed box, past the controls on its front"
-  caption="Returning the internal list hands out a hatch straight past the methods that guard it."
-/>
-
 ### 2. Getters and setters for every field
 
 The opposite extreme is *almost* as bad. If you write
@@ -213,6 +207,12 @@ Callers can now do `account.getItems().clear()` and silently break
 the class's invariants. Common fixes: return a *defensive copy*, or
 return an unmodifiable view, or expose specific operations like
 `add()`, `remove()`, `count` instead.
+
+<Figure
+  slug="java-encapsulation-and-abstraction-common-mistakes-beginners-make-inline-cutout"
+  alt="A hand reaching straight through an open hatch to the parts inside a sealed box, past the controls on its front"
+  caption="Returning the internal list hands out a hatch straight past the methods that guard it."
+/>
 
 <MultipleChoice
   markdown={`What is the *single* most important reason to make fields \`private\`?

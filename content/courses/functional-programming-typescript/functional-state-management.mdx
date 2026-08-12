@@ -7,17 +7,17 @@ description: Reducers, immutable transitions, the State monad sketch, and how to
 functional approach to state is actually one of the field's
 greatest hits. Two ideas underpin it:
 
-<Figure
-  slug="fp-functional-state-cutout"
-  alt="Functional state management, an isometric illustration"
-/>
-
 1. **State is just a value.** A "state" is whatever data you
    currently have. It is not a hidden, mutable box; it is a plain
    object that flows through the program.
 2. **Transitions are pure functions.** Instead of `state.change()`
    you write `next = transition(state, event)`. The old state and
    the new state coexist; nothing was mutated.
+
+<Figure
+  slug="fp-functional-state-cutout"
+  alt="Functional state management, an isometric illustration"
+/>
 
 If those two ideas sound familiar, they're the foundation of
 Redux, React's `useReducer`, Elm's update function, and pretty
