@@ -15,9 +15,18 @@
   // makes the worker's own fetch() calls go out over the public internet
   // rather than looping back into the worker, the OpenNext-recommended flag.
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  // Prerendered pages and /_next/static/* are uploaded as free static assets
-  // (unlimited bandwidth, no per-request meter) and served before the worker
-  // ever runs, so a cold hit on a prerendered page costs nothing at all.
+  // /_next/static/* and public/ are uploaded as free static assets (unlimited
+  // bandwidth, no per-request meter) and served by this binding before the
+  // worker ever runs, so they cost nothing and they do land in Cloudflare's CDN
+  // (`cf-cache-status: HIT`, measured 2026-08-09).
+  //
+  // Prerendered page HTML is NOT here: OpenNext writes it to the incremental
+  // cache (the R2 bucket below) instead, and the worker runs ahead of the CDN
+  // cache, so every page view costs one worker invocation — page responses come
+  // back with no `cf-cache-status` header at all. `withRegionalCache` in
+  // open-next.config.ts keeps that from also costing an R2 read per visitor;
+  // skipping the invocation itself needs an origin Cache Rule (see
+  // "Recommended: a Cache Rule for lesson HTML" in README.md).
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
