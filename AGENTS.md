@@ -850,10 +850,36 @@ generator filled a panel, and neither can the site.
   nothing but "the preview didn't finish within the time limit". There is
   nothing to store, so those 72 blocks stay blank by nature.
 
-Between the two generators, 3,290 of the site's 3,374 runnable blocks show
-their output before the reader presses Run. Of the 84 that do not, 72 are web
-and react; the other 12 are blocks that genuinely print nothing, or are marked
-`expectError` so the failure is the lesson.
+Between the two generators, 3,280 of the site's 3,374 runnable blocks show
+their output before the reader presses Run. Of the 94 that do not, 72 are web
+and react; the other 22 are blocks that genuinely print nothing, fail to run
+headlessly, or are marked `expectError` so the failure is the lesson.
+
+**The two generators share a manifest, and only one of them runs on its own.**
+`build-block-outputs` is the one the workflow invokes, and a full run of it
+starts from an empty object — that is what retires a deleted block's entry.
+The captured languages are not its to rebuild, so it carries them across by
+name, from `BROWSER_ADAPTERS` in `scripts/lib/block-runners.mjs`. Getting this
+wrong is silent and expensive: before the carry existed, the first automated
+run after the capture landed deleted all 689 r/java/csharp/php entries and
+pruned the 134 figures they pointed at, and nothing put them back — no
+workflow runs the capture, the manifest is one line of JSON so the loss is
+invisible in a diff, and a missing entry renders as the same empty panel a
+never-captured block shows. R, Java and C# previewed nothing for four
+commits. An adapter belongs to exactly one of `TEXT_ADAPTERS`,
+`BROWSER_ADAPTERS`, or python; `__tests__/blockOutputs.test.ts` asserts the
+partition against the adapter registry so a new language cannot join without
+picking a side.
+
+For the same reason, a narrowed run never writes the manifest wholesale —
+including when it selects nothing at all. `--adapter r` picks no headless
+language, and an early "no blocks selected" exit that wrote `{}` there would
+throw the whole site's output away; `--empty` is the flag that means it.
+
+SQL is not part of any of this. `<SqlCodeBlock>` is a separate component with
+its own sweep, and the prepopulated-output pipeline only ever walks
+`<CodeBlock>` — a SQL block runs against DuckDB or Postgres in the reader's
+browser and has no manifest entry by construction.
 
 Two things the capture had to solve, both easy to trip over again. Cells are
 read off `window.__blockCapture` rather than the DOM, because by the time a
@@ -1084,6 +1110,44 @@ Two kinds of `>` line are deliberately out of scope. An **indented** one is a
 `>` from and renders through `MarkdownInline`, so no `<blockquote>` reaches the
 page and no quotes are drawn. One inside a **fenced block** is a sample, a
 prompt or a mermaid edge rather than a quotation.
+
+### Mermaid labels take a plain hyphen
+
+**Every dash inside a mermaid label is a plain ASCII hyphen.** Mermaid renders
+label text verbatim, so a `--` typed as a dash reaches the reader as two
+hyphens sitting in the node box:
+
+````markdown
+<!-- Bad -->
+```mermaid
+flowchart LR
+    Q -->|"only the PAST value"| FF["ffill -- safe as a live feature"]
+```
+
+<!-- Good -->
+```mermaid
+flowchart LR
+    Q -->|"only the PAST value"| FF["ffill - safe as a live feature"]
+```
+````
+
+This is stricter than the en dash rule above, which keeps `1815–1864`
+unspaced. A label is a few words in a box, so there is no typographic case to
+weigh, and one flat rule beats a distinction nobody can see at label size. The
+`mermaid-dash` check rejects `–`, `—` and the Unicode minus `−` anywhere in a
+diagram, and a whitespace-flanked run of two or more hyphens in a label.
+
+A label is not the same thing as a line, because nearly every mermaid link is
+built from the hyphens the rule looks for. Only two spans are read for hyphen
+runs: **quoted labels** (`A["text"]`, `-->|"text"|`), which is where a label
+holding `--` has to live anyway since mermaid would otherwise parse it as the
+link it resembles, and **the text after a colon** in the diagram kinds where a
+colon introduces free text (`sequenceDiagram`, `timeline`, `stateDiagram`, …),
+which is why `A((a: 1,2,3)) --- I((3))` in a flowchart is left alone. Links
+(`---`, `<-->`), ER cardinality (`}|--|{`), class associations (`Animal -- Dog`)
+and `%%` comments are all out of scope, as is a hyphen run that is code rather
+than punctuation: `--save-dev`, `i--` and `--comment` have no flanking space on
+both sides and pass.
 
 ---
 

@@ -119,7 +119,13 @@ const THUMB_MIME: Record<string, string> = {
  * The column's width comes from `LAYOUT` above — the art is sized by the
  * surface, not by the image.
  */
-function CourseThumb({ course }: { course: CatalogCourse }) {
+function CourseThumb({
+  course,
+  thumbClass,
+}: {
+  course: CatalogCourse;
+  thumbClass: string;
+}) {
   const slug = `${course.slug}-thumbnail-cutout`;
   const entry = imageManifest[slug];
   if (!entry) {
@@ -135,7 +141,11 @@ function CourseThumb({ course }: { course: CatalogCourse }) {
   const fallback = entry.formats[entry.formats.length - 1];
   const sources = entry.formats.slice(0, -1);
   return (
-    <picture>
+    // `block` is stated rather than relied on: a <picture> is inline by
+    // default and is only blockified here because it happens to be a grid
+    // item, which is not a property worth depending on for the width and auto
+    // margins `thumbClass` sets.
+    <picture className={`block ${thumbClass}`}>
       {sources.map((ext) => (
         <source key={ext} srcSet={`/images/${slug}.${ext}`} type={THUMB_MIME[ext]} />
       ))}
@@ -158,30 +168,49 @@ function CourseThumb({ course }: { course: CatalogCourse }) {
  *
  * `catalog` is /courses: one row per line at full width, where the page IS the
  * list and a visitor is reading it to choose. It gets the larger art, the
- * larger title, the looser rhythm, and a description set at reading size and
- * never truncated — the catalog is the one place the full sentence is the
- * point.
+ * larger title and the looser rhythm.
+ *
+ * On a phone it also changes *shape*. A thumbnail column beside the copy costs
+ * the same 86px on a 390px screen that it costs on a 1200px one, and what it
+ * takes comes out of the text: the title wraps to two lines, and a description
+ * that reads as one sentence on a desktop runs to six lines on a phone. So
+ * below `sm` the row stacks, and the art gets the full width instead of a
+ * sliver of it. The description is clamped there and only there — the catalog
+ * is still the place the full sentence is the point, but a phone cannot spend
+ * six lines on it and stay a list you can scan.
  *
  * `preview` is the home page's Courses section: four rows in two columns,
  * inside a page that has other things to say. It stays denser, and clamps the
- * description, so four of them still read as a taste of the catalog rather
- * than as the catalog.
+ * description at every width, so four of them still read as a taste of the
+ * catalog rather than as the catalog.
  */
 export type CourseCardLayout = "catalog" | "preview";
 
 const LAYOUT = {
   catalog: {
-    row: "grid-cols-[86px_1fr] gap-5 py-8 sm:grid-cols-[104px_1fr] sm:gap-6",
+    // `gap-5` rather than `gap-4` is the space under the stacked thumbnail;
+    // once the art is centred and no longer touches either edge, the old gap
+    // read as the title crowding it.
+    row: "grid-cols-1 gap-5 py-8 sm:grid-cols-[104px_1fr] sm:gap-6",
     text: "gap-2",
+    // Two thirds of the row, centred, once the row stacks on a phone. Full
+    // width is more art than a title and two lines of description can carry,
+    // and it pushed the meta line off the bottom of the screen. On a desktop
+    // the thumbnail is back in its own 104px column, where `w-full` *is* the
+    // column and the auto margins do nothing.
+    thumb: "w-[65%] mx-auto sm:w-full",
     // One size at every breakpoint: the catalog row is the same shape on a
     // phone as on a desktop, so the title has no reason to step down. The
-    // tighter tracking is what keeps 18px from reading loose at this weight.
-    title: "text-[18px] tracking-[-0.02em]",
-    desc: "text-[16px] leading-[1.7]",
+    // tighter tracking is what keeps 18px from reading loose at this weight,
+    // and the leading matches the description's so the two blocks share a
+    // rhythm instead of the title sitting tight above looser copy.
+    title: "text-[18px] leading-[1.7] tracking-[-0.02em]",
+    desc: "line-clamp-2 text-[16px] leading-[1.7] sm:line-clamp-none",
   },
   preview: {
     row: "grid-cols-[84px_1fr] gap-5 py-6",
     text: "gap-[5px]",
+    thumb: "w-full",
     title: "text-[17px] tracking-[-0.01em]",
     desc: "line-clamp-2 text-[15px] leading-[1.6]",
   },
@@ -205,7 +234,7 @@ export function CourseCard({
       prefetch={false}
       className={`group -mx-3 grid items-start px-3 ${l.row}`}
     >
-      <CourseThumb course={course} />
+      <CourseThumb course={course} thumbClass={l.thumb} />
       <span className={`flex min-w-0 flex-col ${l.text}`}>
         <span
           className={`font-semibold ${l.title} ${HEADING} ${HOVER_TEXT}`}

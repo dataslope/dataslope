@@ -75,4 +75,71 @@ describe("authored prose style", () => {
   it("ignores a blockquote inside fenced code, which is a sample rather than a quotation", () => {
     expect(lintSource('```markdown\n> "A quoted blockquote."\n```', "x.mdx", "mdx")).toEqual([]);
   });
+
+  // Mermaid labels are prose the reader sees, but they live in a fenced block,
+  // so every rule above skips them. This rule reaches inside the fence, which
+  // means it has to tell a label from mermaid's own link syntax: nearly every
+  // way of drawing a link is made of the same hyphens the rule is looking for.
+  describe("mermaid labels", () => {
+    const mermaid = (...body: string[]) => ["```mermaid", ...body, "```"].join("\n");
+    const rules = (src: string) => lintSource(src, "x.mdx", "mdx").map((v) => v.rule);
+
+    it("flags `--` used as a dash in a label, which mermaid renders verbatim", () => {
+      const src = mermaid("flowchart LR", '  Q -->|"the PAST"| FF["ffill -- safe as a live feature"]');
+      expect(rules(src)).toEqual(["mermaid-dash"]);
+    });
+
+    it("flags any non-ASCII dash in a label, quoted or not", () => {
+      expect(rules(mermaid("flowchart LR", '  NF[".NET (2002–2019)"] --> W[Windows]'))).toEqual(["mermaid-dash"]);
+      expect(rules(mermaid("flowchart LR", "  R1[Bug is in 16–30] --> E[done]"))).toEqual(["mermaid-dash"]);
+      expect(rules(mermaid("flowchart TD", '  A["x"] -->|"z = (x − mu) / s"| B["z"]'))).toEqual(["mermaid-dash"]);
+    });
+
+    // A label can trip both halves of the rule at once. The fix is the same
+    // either way, so it is reported once, against the line it sits on.
+    it("reports one violation per line and points at the source line", () => {
+      const src = mermaid("flowchart LR", "  A --> B", '  B --> C["16–30 -- see below"]');
+      const found = lintSource(src, "x.mdx", "mdx");
+      expect(found.map((v: { rule: string }) => v.rule)).toEqual(["mermaid-dash"]);
+      expect(found[0].line).toBe(4);
+    });
+
+    // Everything below is a link, a cardinality marker or a code sample. Each
+    // one held real hyphen runs in the corpus before the rule existed.
+    it("allows mermaid's own link syntax, which is made of the same hyphens", () => {
+      expect(rules(mermaid("flowchart TD", '  P["prev"] -- "before" --> A["[ A | * ]"] --> B["[ B | * ]"]'))).toEqual([]);
+      expect(rules(mermaid("flowchart LR", "  A ----> B ---- C", "  D <--> E"))).toEqual([]);
+      expect(rules(mermaid("erDiagram", "  CUSTOMER }|--|{ ORDER : places"))).toEqual([]);
+      expect(rules(mermaid("classDiagram", "  Animal -- Dog", "  Duck --|> Animal"))).toEqual([]);
+      expect(rules(mermaid("stateDiagram-v2", "  [*] --> Still", "  Still --> [*]"))).toEqual([]);
+    });
+
+    it("allows a hyphen run that is code rather than punctuation", () => {
+      expect(rules(mermaid("flowchart LR", '  A["npm i --save-dev vitest"] --> B["done"]'))).toEqual([]);
+      expect(rules(mermaid("flowchart LR", '  A["SELECT 1 --comment"] --> B["ok"]'))).toEqual([]);
+      expect(rules(mermaid("flowchart LR", '  A["i--"] --> B["loop"]'))).toEqual([]);
+    });
+
+    // A colon runs to end-of-line as label text in a sequence diagram, but in a
+    // flowchart it is just a character inside a node, and reading the rest of
+    // the line as its label picks up the link that follows it.
+    it("reads text after a colon only where a colon introduces a label", () => {
+      expect(rules(mermaid("sequenceDiagram", "  Alice->>Bob: parse it -- then render"))).toEqual(["mermaid-dash"]);
+      expect(rules(mermaid("flowchart LR", "  A((a: 1,2,3)) --- I((3)) --- B((b: 3,4))"))).toEqual([]);
+      expect(rules(mermaid("flowchart LR", '  A["ratio: x:y"] --> B["ok"]'))).toEqual([]);
+    });
+
+    it("ignores mermaid comments and non-mermaid fences", () => {
+      // A `%%` comment never reaches the rendered diagram. (An em dash would
+      // still trip rule 1, which reads the whole file; an unspaced en dash is
+      // the dash those rules allow, so it isolates this rule.)
+      expect(rules(mermaid("flowchart LR", "  %% spans 2002–2019, not drawn", "  A --> B"))).toEqual([]);
+      expect(rules("```python\nx = 1 -- 2  # not a diagram\n```")).toEqual([]);
+      expect(rules("```\nffill -- safe\n```")).toEqual([]);
+    });
+
+    it("leaves the same dash alone outside a fence, where other rules own it", () => {
+      expect(rules("The fill reads only the past -- so it is safe.")).toEqual([]);
+    });
+  });
 });

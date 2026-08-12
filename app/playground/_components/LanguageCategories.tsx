@@ -1,8 +1,14 @@
 /**
  * The playground landing page's language chooser: three categories
- * (Languages / Web / Databases), each a two-column row of a label + blurb
- * beside a grid of language tiles. Implements the "Playground Page" handoff
- * mock's category grid.
+ * (Code Editors / Web Sandboxes / SQL Workbench), each a two-column row of a
+ * label + blurb beside a grid of language tiles. Implements the "Playground
+ * Page" handoff mock's category grid.
+ *
+ * The three headings name the *workspace*, not the language, which is the axis
+ * the blurbs were already written on ("editors", "sandbox", "workbench"). The
+ * previous set (Languages / Web / Databases) put one group on a different axis
+ * from the other two and implied the others were not languages, when HTML, CSS
+ * and SQL are languages too.
  *
  * Server component, the data is static. Each tile links to its
  * `/playground/<id>` route and, on hover, tints its glyph with the language's
@@ -35,9 +41,9 @@ interface Category {
 // `/playground/<id>` routes and the shared `LANGUAGE_ICONS` registry.
 const CATEGORIES: Category[] = [
   {
-    name: "Languages",
+    name: "Code Editors",
     description:
-      "General-purpose editors for writing, running, and debugging real programs without leaving the tab.",
+      "General-purpose languages for writing, running, and debugging real programs without leaving the tab.",
     items: [
       { id: "python", label: "Python", version: "3.14" },
       { id: "r", label: "R", version: "4.6" },
@@ -51,18 +57,18 @@ const CATEGORIES: Category[] = [
     ],
   },
   {
-    name: "Web",
+    name: "Web Sandboxes",
     description:
-      "A live HTML, CSS, and JavaScript preview, plus a React sandbox with instant in-browser JSX transpilation.",
+      "A live HTML, CSS, and JavaScript preview, plus React with instant in-browser JSX transpilation.",
     items: [
       { id: "web", label: "HTML", version: "HTML5 · CSS3" },
       { id: "react", label: "React", version: "19.2" },
     ],
   },
   {
-    name: "Databases",
+    name: "SQL Workbench",
     description:
-      "A full SQL workbench in the browser. Load data, run queries, and inspect results against embedded or remote engines.",
+      "Load data, run queries, and inspect results against embedded or remote engines, all in the browser.",
     items: [
       // Same order as `PLAYGROUNDS`: PostgreSQL · SQLite · DuckDB.
       { id: "postgres", label: "PostgreSQL", version: "17" },
@@ -111,8 +117,15 @@ export function LanguageCategories() {
           key={cat.name}
           className="grid gap-x-14 gap-y-6 py-8 sm:py-10 md:grid-cols-[minmax(0,264px)_1fr]"
         >
-          <div>
-            <h2 className="text-sm font-medium text-[#121212] dark:text-white">
+          {/* `md:pt-5` is the tile's own top padding, borrowed. A tile starts
+              its icon 20px down (`pt-5` in LanguageTile), so at the top of a
+              row the heading sat level with the tile's empty padding rather
+              than with the first glyph, and the label column read as floating
+              above the grid it belongs to. Only from `md`, where the two are
+              side by side; stacked on a phone the heading is the row's top
+              edge and has nothing to align to. */}
+          <div className="md:pt-5">
+            <h2 className="text-[18px] font-medium text-[#121212] dark:text-white">
               {cat.name}
             </h2>
             <p className="mt-2.5 text-sm leading-relaxed text-[var(--ds-gray-500)] [text-wrap:pretty] dark:text-[var(--ds-gray-400)]">
