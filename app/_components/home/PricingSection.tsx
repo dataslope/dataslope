@@ -399,7 +399,34 @@ function PlanColumn({
             reviewer liked the marmot breaking the border rather than sitting
             inside it. -40% rather than -50% drops it a little further into the
             card so it reads as resting on the edge instead of floating over
-            it. `pointer-events-none` keeps it from swallowing clicks. */}
+            it. `pointer-events-none` keeps it from swallowing clicks.
+
+            Below `lg` all three values change, because the same box lands
+            somewhere else once the column becomes a full-width row:
+
+            - `-right-6` instead of `right-0`. Each cut-out carries a wide
+              transparent margin (the free-member art paints across 605 of its
+              1024px canvas), so `right-0` aligns the *box* to the content edge
+              and leaves the marmot itself ~24px short of it, reading as
+              floated left of where it belongs. Pulling the box out by the
+              column's own padding puts the drawing where `right-0` looks like
+              it should have put it, flush with the card edge.
+            - `-translate-y-[60%]` instead of -40%. The desktop header carries
+              `lg:pt-8` and the column has no vertical padding, while a phone
+              row has neither — `top-1/2` is measured against a 28px title row
+              sitting 24px into the card, which dropped the marmot ~10px lower
+              than on desktop and left it resting *inside* the top edge rather
+              than breaking it, hanging down over the price instead.
+            - `size-24` instead of 120px, which is the part a move alone could
+              not fix. A phone row is a third the width of the table it came
+              from, but the art was still drawn at desktop size, so on a 360px
+              screen it reached back across the title line and painted over the
+              "Recommended" badge (~45px of it, enough to cut the word in
+              half). Lifting it makes that worse rather than better: the badge
+              line then crosses the marmot's middle, which is the widest part
+              of the silhouette. At 96px the drawing meets the badge's rounded
+              end and leaves its text clear by ~9px, on the narrowest phone
+              worth designing for. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`/images/${plan.iconSlug}-cutout.webp`}
@@ -407,7 +434,7 @@ function PlanColumn({
           aria-hidden="true"
           loading="lazy"
           decoding="async"
-          className="pointer-events-none absolute right-0 top-1/2 size-[120px] -translate-y-[40%] object-contain"
+          className="pointer-events-none absolute -right-6 top-1/2 size-24 -translate-y-[60%] object-contain lg:right-0 lg:size-[120px] lg:-translate-y-[40%]"
         />
       </div>
 
