@@ -34,6 +34,10 @@ ggplot(mpg, aes(x = class)) +
   ]}
 />
 
+Seven class names competing for horizontal space, and ggplot2 will
+happily overlap them. Swapping the axes solves it without changing a
+single thing about the data:
+
 <CodeBlock
   adapter="r"
   files={[

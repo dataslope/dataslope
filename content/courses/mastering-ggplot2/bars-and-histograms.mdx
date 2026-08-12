@@ -51,6 +51,9 @@ ggplot(mpg, aes(hwy)) +
   ]}
 />
 
+Five bins smooth the distribution into a shape that is barely a
+distribution at all. Now go too far the other way:
+
 <CodeBlock
   adapter="r"
   files={[
@@ -116,6 +119,10 @@ ggplot(mpg, aes(x = class, fill = drv)) +
   ]}
 />
 
+Stacking answers "how many in total?" well and "how do the parts
+compare?" badly, because only the bottom segment starts from a common
+baseline. Dodging trades one for the other:
+
 <CodeBlock
   adapter="r"
   files={[
@@ -130,6 +137,10 @@ ggplot(mpg, aes(x = class, fill = drv)) +
     },
   ]}
 />
+
+Now the sub-bars are comparable, but the class totals are harder to read
+off. The third option gives up the totals entirely in exchange for clean
+proportions:
 
 <CodeBlock
   adapter="r"

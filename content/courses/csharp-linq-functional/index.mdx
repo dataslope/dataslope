@@ -145,6 +145,10 @@ Console.WriteLine($"Imperative sum of squares of evens: {sum}");
   ]}
 />
 
+That loop works, and every C# programmer can read it. But notice how
+much of it is bookkeeping: a running total, an index, a conditional. The
+LINQ version says the same thing without any of that:
+
 <CodeBlock
   adapter="csharp"
   files={[

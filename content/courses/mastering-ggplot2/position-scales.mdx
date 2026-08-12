@@ -77,6 +77,10 @@ ggplot(df, aes(size, score)) +
   ]}
 />
 
+Almost every point is crushed into the left edge, because a handful of
+large values set the scale for all 200. A log scale gives each order of
+magnitude the same amount of room:
+
 <CodeBlock
   adapter="r"
   files={[

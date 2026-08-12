@@ -251,6 +251,10 @@ recordPurchase("u-2", 49.0);
   ]}
 />
 
+That function cannot be tested without stubbing the clock, the random
+number generator and the console. Here is the same behaviour with the
+effects pushed to the edges:
+
 <CodeBlock
   adapter="typescript"
   files={[

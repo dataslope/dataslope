@@ -68,6 +68,10 @@ ggplot(mpg, aes(displ, hwy)) +
   ]}
 />
 
+There is no `scale_` line in that plot, and yet the x axis has a range,
+breaks and labels. ggplot2 added a scale for you. Writing it out changes
+nothing about the output, which is the point:
+
 <CodeBlock
   adapter="r"
   files={[

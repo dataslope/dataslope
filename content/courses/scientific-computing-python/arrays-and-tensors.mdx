@@ -159,6 +159,10 @@ print(A)
   ]}
 />
 
+Basic slicing gives you a **view**: no data is copied, and writing
+through it changes the original. Fancy indexing is the opposite, and the
+distinction is one of the most common sources of NumPy surprises:
+
 <CodeBlock
   adapter="python"
   files={[

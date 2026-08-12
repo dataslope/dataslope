@@ -296,6 +296,9 @@ console.log("imperative:", sum);
   ]}
 />
 
+Three variables to track, and the *what* is buried in the *how*. Lisp's
+answer, twenty years earlier, was to let the call stack do the counting:
+
 <CodeBlock
   adapter="typescript"
   files={[
@@ -316,6 +319,10 @@ console.log("recursive:", sumSquaresOfEvens(xs));
     },
   ]}
 />
+
+No index, but now there is a base case and a recursive case to hold in
+your head. The ML tradition went one step further and named the three
+operations, so the shape of the computation is the code:
 
 <CodeBlock
   adapter="typescript"

@@ -52,6 +52,9 @@ ggplot(mpg, aes(displ, hwy)) +
   ]}
 />
 
+Layers are drawn in the order you add them, so the trend line sits over
+the points. Swap the two lines and the points win:
+
 <CodeBlock
   adapter="r"
   files={[

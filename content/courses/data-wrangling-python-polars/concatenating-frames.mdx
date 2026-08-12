@@ -92,6 +92,9 @@ display(pl.concat([a, b], how="vertical_relaxed"))
   ]}
 />
 
+Mismatched dtypes are one way a concat goes wrong. Mismatched *columns*
+are the other, and `how="diagonal"` is the answer to it:
+
 <CodeBlock
   adapter="python"
   files={[

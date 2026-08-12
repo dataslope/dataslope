@@ -52,6 +52,10 @@ ggplot(mpg, aes(x = hwy)) +
   ]}
 />
 
+A histogram bins the values and counts them, so its shape depends on the
+bin width you chose. A density plot smooths instead of binning, which
+trades that choice for a different one, the smoothing bandwidth:
+
 <CodeBlock
   adapter="r"
   files={[
@@ -123,6 +127,10 @@ ggplot(mpg, aes(x = class, y = hwy)) +
     },
   ]}
 />
+
+A boxplot reduces each group to five numbers. That is often exactly
+right, and occasionally hides something important, such as a distribution
+with two peaks. A violin shows the whole shape:
 
 <CodeBlock
   adapter="r"
