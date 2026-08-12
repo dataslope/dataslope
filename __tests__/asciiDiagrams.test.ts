@@ -114,4 +114,52 @@ describe("lesson diagrams", () => {
     const src = "The pipeline runs FROM → WHERE → GROUP BY → SELECT.\nAnd again → here.";
     expect(lintSource(src, "x.mdx")).toEqual([]);
   });
+
+  // A table typed into a fence is pure ASCII, so rules 1 and 2 never see it.
+  it("flags a table drawn with a dashed column rule", () => {
+    const src = [
+      "```text",
+      "Address      Variable          Value (decimal)",
+      "----------   ---------------   --------------",
+      "0x7ffc...0   age               30",
+      "```",
+    ].join("\n");
+    expect(lintSource(src, "x.mdx").map((v) => v.rule)).toEqual(["fake-table"]);
+  });
+
+  it("flags a markdown table typed inside a fence", () => {
+    const src = [
+      "```text",
+      "id | title        | done",
+      "-- | ------------ | ----",
+      "1  | Buy milk     | 0",
+      "```",
+    ].join("\n");
+    expect(lintSource(src, "x.mdx").map((v) => v.rule)).toEqual(["fake-table"]);
+  });
+
+  it("flags a single-column list under a dashed rule", () => {
+    const src = ["```text", "price", "-----", "12.99", "free", "```"].join("\n");
+    expect(lintSource(src, "x.mdx").map((v) => v.rule)).toEqual(["fake-table"]);
+  });
+
+  // A fence tagged with a real language holds a listing, where a row of
+  // dashes is ordinary rather than a column rule.
+  it("leaves a dashed rule inside a source listing alone", () => {
+    const src = ["```python", "header = 'price'", "print('-----')", "print(12.99)", "```"].join(
+      "\n",
+    );
+    expect(lintSource(src, "x.mdx")).toEqual([]);
+  });
+
+  // A rule needs a header above it and a row below it to be a column rule.
+  it("leaves a horizontal rule that opens or closes a block alone", () => {
+    const src = ["```text", "--------", "Build finished", "--------", "```"].join("\n");
+    expect(lintSource(src, "x.mdx")).toEqual([]);
+  });
+
+  it("leaves an ordinary markdown table alone", () => {
+    const src = ["| a | b |", "| - | - |", "| 1 | 2 |"].join("\n");
+    expect(lintSource(src, "x.mdx")).toEqual([]);
+  });
 });

@@ -134,7 +134,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem 0;
+  gap: 0.5rem 0.4rem;
 }
 
 .cellGroup {
@@ -142,15 +142,36 @@
   align-items: center;
 }
 
+.cellStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
 .cell {
   display: flex;
   flex-direction: column;
-  min-width: 5.25rem;
+  min-width: 3.5rem;
   border: 1px solid var(--ds-gray-300);
   border-radius: 0.375rem;
   overflow: hidden;
   font-family: var(--font-mono, ui-monospace, monospace);
   text-align: center;
+}
+
+/* The address, or what the byte spells. Fixed height and always rendered, so
+   boxes in a row keep one baseline whether or not they carry a note, and so
+   the arrow's offset below can be a constant rather than a guess. */
+.cellNote {
+  display: block;
+  height: 1.15rem;
+  margin-top: 0.3rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.6875rem;
+  line-height: 1.15rem;
+  white-space: nowrap;
+  color: var(--color-fd-muted-foreground);
 }
 
 /* The name strip and the value cell are one box split by a rule, which is what
@@ -175,6 +196,9 @@
   flex: 0 0 auto;
   width: 3.5rem;
   height: 0.75rem;
+  /* Lifted by the note strip's height so it points at the middle of the
+     boxes rather than the middle of box-plus-note. */
+  margin-bottom: 1.45rem;
   fill: var(--ds-gray-500);
   stroke: var(--ds-gray-500);
   stroke-width: 1.25;
@@ -196,6 +220,10 @@
 
 :global(html:is(.dark, [data-theme="dark"])) .cellValue {
   color: var(--ds-blue-300);
+}
+
+:global(html:is(.dark, [data-theme="dark"])) .cellNote {
+  color: #9a9a9a;
 }
 
 :global(html:is(.dark, [data-theme="dark"])) .arrow {

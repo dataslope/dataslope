@@ -1,7 +1,8 @@
-// Lints lesson content for diagrams "drawn" out of characters: a figure built
-// from `┌─┐│└┘`, from `+-----+` and `---->`, or from `└──┬──┘` underbraces.
+// Lints lesson content for figures "drawn" out of characters: a diagram built
+// from `┌─┐│└┘`, from `+-----+` and `---->`, or from `└──┬──┘` underbraces, and
+// a table built out of a dashed rule and space-padded columns.
 //
-// Three rules, all scoped to content/**/*.mdx:
+// Four rules, all scoped to content/**/*.mdx:
 //
 //   1. drawn-diagram, two or more consecutive lines each carrying two or more
 //                    box-drawing characters, where at least one of them is not
@@ -16,6 +17,16 @@
 //                    labels across the two Java courses read `s = ●─`, a
 //                    reference dot with a wire, in a node that had a real
 //                    arrow leaving it.
+//   4. fake-table,   a ```text (or unlabelled) fence that is really a table:
+//                    header, a rule of dashes, rows. Rules 1 and 2 miss these
+//                    entirely because the drawing is pure ASCII, which is how
+//                    an `Address / Variable / Value` block on
+//                    `c-programming-for-beginners/variables-and-memory`
+//                    survived the first pass. A table typed into a fence gets
+//                    none of what a markdown table gets: it will not reflow on
+//                    a phone, its columns are held apart by literal spaces
+//                    rather than by cells, and it is a `<pre>` to a screen
+//                    reader rather than a `<table>` with headers.
 //
 // ── Why a drawn figure is a bug and not a style preference ─────────────────
 //
@@ -95,6 +106,76 @@ const UNDERBRACE = /^\s*[└┘┬─\s]*[└┘][└┘┬─\s]*$/u;
 /** Authors opt one figure out with this on the line above it. */
 const ALLOW = /allow-drawn-diagram/;
 
+/** Fence languages that mean "this is not source code". A fence tagged `py`
+ *  or `java` holds a listing, where aligned comments and a row of dashes are
+ *  ordinary; a `text` fence holds something the author drew. */
+const PROSE_FENCE = new Set(["", "text", "txt", "plain", "plaintext", "output", "console"]);
+
+/** A rule of dashes and spaces only, with at least two separate dash runs:
+ *  the column rule under a header row (`------   --------   -----`). */
+const COLUMN_RULE = /^\s*-{2,}(?:\s+-{2,})+\s*$/;
+
+/** A single run of dashes on its own line, which is a column rule when it has
+ *  a header above it and rows below. */
+const SINGLE_RULE = /^\s*-{3,}\s*$/;
+
+/** A markdown delimiter row typed inside a fence (`-- | ---- | ---`). */
+const PIPE_RULE = /^\s*\|?\s*:?-{2,}:?\s*(?:\|\s*:?-{2,}:?\s*)+\|?\s*$/;
+
+/**
+ * Every ```fence in an MDX source, as `{ line, lang, body }` where `line` is
+ * the 1-based line of the opening fence and `body` is its lines.
+ */
+function fences(lines) {
+  const found = [];
+  let open = null;
+  lines.forEach((line, i) => {
+    const mark = line.match(/^\s*(```+|~~~+)\s*(\S*)/);
+    if (!mark) {
+      if (open) open.body.push(line);
+      return;
+    }
+    if (open && mark[1].startsWith(open.mark)) {
+      found.push(open);
+      open = null;
+    } else if (!open) {
+      open = { mark: mark[1], lang: (mark[2] || "").toLowerCase(), line: i + 1, body: [] };
+    } else {
+      open.body.push(line);
+    }
+  });
+  if (open) found.push(open);
+  return found;
+}
+
+/**
+ * True when a fence body is a table wearing a code block: a rule of dashes
+ * with a header line above it and at least one row below.
+ *
+ * The header/rows requirement is what keeps this off the shapes that
+ * legitimately contain a dashed line — a `---` separator printed by a program,
+ * or a horizontal rule at the top or bottom of a block of output — and the
+ * fence language check above keeps it off source listings entirely. Columns
+ * held apart by spaces with *no* rule at all are not detected: the test that
+ * finds them also finds aligned trailing comments in a code listing, and a
+ * linter that cries wolf on those gets switched off. Those were swept by hand
+ * (see the pull request) and the ones that remain are code, program output, or
+ * a directory tree.
+ */
+function fakeTableRule(body) {
+  for (let i = 0; i < body.length; i++) {
+    const line = body[i];
+    const isRule = COLUMN_RULE.test(line) || PIPE_RULE.test(line) || SINGLE_RULE.test(line);
+    if (!isRule) continue;
+    const header = body[i - 1];
+    const row = body[i + 1];
+    if (header?.trim() && row?.trim() && !COLUMN_RULE.test(header) && !SINGLE_RULE.test(header)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 /**
  * Lint one MDX source. Returns `{ file, rule, line, detail }` violations.
  *
@@ -150,6 +231,15 @@ export function lintSource(src, file) {
   for (const { line, text } of mermaidLines(lines)) {
     if (!allowed.has(line - 1) && drawCount(text) >= 1) {
       add("mermaid-glyph", line, text.trim().slice(0, 80));
+    }
+  }
+
+  // Rule 4: a table typed into a prose fence.
+  for (const fence of fences(lines)) {
+    if (!PROSE_FENCE.has(fence.lang) || allowed.has(fence.line - 1)) continue;
+    const at = fakeTableRule(fence.body);
+    if (at !== -1) {
+      add("fake-table", fence.line + at, fence.body[at].trim().slice(0, 80));
     }
   }
 
@@ -210,7 +300,7 @@ if (isMain) {
     process.exit(1);
   }
   console.log(
-    `✓ ${files.length} lesson file(s) draw no diagrams out of characters ` +
-      "(directory trees excepted)",
+    `✓ ${files.length} lesson file(s) draw no diagrams or tables out of ` +
+      "characters (directory trees excepted)",
   );
 }

@@ -187,15 +187,15 @@ is common and pragmatic.
 
 Model the nouns and let HTTP verbs do the actions:
 
-```text
-GET    /articles              # list (paginated, filterable)
-POST   /articles              # create
-GET    /articles/42           # read one
-PATCH  /articles/42           # partial update
-DELETE /articles/42           # delete
-GET    /articles/42/comments  # sub-collection
-POST   /articles/42/comments  # add a comment
-```
+| Verb     | Path                   | What it does                 |
+| -------- | ---------------------- | ---------------------------- |
+| `GET`    | `/articles`            | list (paginated, filterable) |
+| `POST`   | `/articles`            | create                       |
+| `GET`    | `/articles/42`         | read one                     |
+| `PATCH`  | `/articles/42`         | partial update               |
+| `DELETE` | `/articles/42`         | delete                       |
+| `GET`    | `/articles/42/comments`| sub-collection               |
+| `POST`   | `/articles/42/comments`| add a comment                |
 
 Filtering and sorting go in the query string (`?status=published&sort=-created_at`),
 not new endpoints. Return `201 Created` with a `Location` header on create, and

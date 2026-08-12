@@ -103,17 +103,21 @@ export function BoxModel({ caption }: { caption?: string }) {
 /* ── <MemoryCells> ───────────────────────────────────────────────────────── */
 
 export interface MemoryCell {
-  /** The variable's name, shown in the cell's header strip. */
+  /** The label on the cell's header strip: a variable name, or an address. */
   name: string;
   /** What the cell holds: a value, or an address for a pointer. */
   value: string;
+  /** A small annotation under the box, e.g. the slot's address or what the
+   *  byte means as a character. */
+  note?: string;
   /** Draw an arrow from this cell to the next one (a pointer's referent). */
   pointsToNext?: boolean;
 }
 
 /**
  * Named memory cells in a row, optionally joined by a "points at" arrow. The
- * shape the C course used to draw with `+-----+` and `---->`:
+ * shape the C and C++ courses used to draw with `+-----+` and `---->`, or as
+ * columns of space-padded text:
  *
  * ```mdx
  * <MemoryCells
@@ -127,7 +131,9 @@ export interface MemoryCell {
  *
  * The arrow is an inline SVG rather than a glyph so it cannot depend on the
  * reader's fonts, and it is `aria-hidden`: the relationship it draws is
- * already in the figure's label and in the caption underneath.
+ * already in the figure's label and in the caption underneath. Cells wrap
+ * when a row of them outgrows the column, so a byte-by-byte layout can run to
+ * eight boxes without being scaled down to nothing.
  */
 export function MemoryCells({
   cells,
@@ -138,10 +144,10 @@ export function MemoryCells({
 }) {
   const label = cells
     .map((cell, i) => {
-      const points = cell.pointsToNext && cells[i + 1];
-      return points
-        ? `${cell.name} holds ${cell.value}, pointing at ${cells[i + 1].name}`
-        : `${cell.name} holds ${cell.value}`;
+      const where = cell.note ? ` at ${cell.note}` : "";
+      return cell.pointsToNext && cells[i + 1]
+        ? `${cell.name} holds ${cell.value}${where}, pointing at ${cells[i + 1].name}`
+        : `${cell.name} holds ${cell.value}${where}`;
     })
     .join("; ");
 
@@ -150,9 +156,14 @@ export function MemoryCells({
       <div className={styles.cells}>
         {cells.map((cell, i) => (
           <div className={styles.cellGroup} key={`${cell.name}-${i}`}>
-            <div className={styles.cell}>
-              <span className={styles.cellName}>{cell.name}</span>
-              <span className={styles.cellValue}>{cell.value}</span>
+            <div className={styles.cellStack}>
+              <div className={styles.cell}>
+                <span className={styles.cellName}>{cell.name}</span>
+                <span className={styles.cellValue}>{cell.value}</span>
+              </div>
+              {/* Always rendered, so a row where only some cells carry a note
+                  keeps every box the same height and on the same baseline. */}
+              <span className={styles.cellNote}>{cell.note ?? " "}</span>
             </div>
             {cell.pointsToNext && i < cells.length - 1 ? (
               <svg

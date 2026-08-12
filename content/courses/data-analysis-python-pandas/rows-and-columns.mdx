@@ -170,27 +170,25 @@ products:
 
 **Long form** (also called *tidy*):
 
-```text
-product  month  sales
-Latte    Jan    1200
-Latte    Feb    1100
-Latte    Mar    1500
-Mocha    Jan     800
-Mocha    Feb     950
-Mocha    Mar     900
-Espresso Jan     400
-Espresso Feb     450
-Espresso Mar     500
-```
+| `product` | `month` | `sales` |
+| --------- | ------- | ------- |
+| Latte     | Jan     | 1200    |
+| Latte     | Feb     | 1100    |
+| Latte     | Mar     | 1500    |
+| Mocha     | Jan     | 800     |
+| Mocha     | Feb     | 950     |
+| Mocha     | Mar     | 900     |
+| Espresso  | Jan     | 400     |
+| Espresso  | Feb     | 450     |
+| Espresso  | Mar     | 500     |
 
 **Wide form** (more spreadsheet-like):
 
-```text
-product   Jan   Feb   Mar
-Latte    1200  1100  1500
-Mocha     800   950   900
-Espresso  400   450   500
-```
+| `product` | `Jan` | `Feb` | `Mar` |
+| --------- | ----- | ----- | ----- |
+| Latte     | 1200  | 1100  | 1500  |
+| Mocha     | 800   | 950   | 900   |
+| Espresso  | 400   | 450   | 500   |
 
 Both contain the same information. But the row in long form is
 *one (product, month) measurement*; in wide form it is *one

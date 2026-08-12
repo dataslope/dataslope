@@ -132,11 +132,11 @@ model you will use for every grouped query you ever write. SQLite
 conceptually sorts all 24 rows into labeled buckets, then runs
 `COUNT(*)` once *inside each bucket*:
 
-```text
-bucket "High":    High, High, High, …    -> COUNT(*) = 6
-bucket "Medium":  Medium, Medium, …      -> COUNT(*) = 7
-bucket "Low":     Low, Low, Low, …       -> COUNT(*) = 11
-```
+| Bucket     | Rows that landed in it | `COUNT(*)` |
+| ---------- | ---------------------- | ---------- |
+| `High`     | High, High, High, …    | 6          |
+| `Medium`   | Medium, Medium, …      | 7          |
+| `Low`      | Low, Low, Low, …       | 11         |
 
 Each bucket then contributes exactly one row to the result: its
 label and its summary. 24 rows in, three rows out. Notice that the

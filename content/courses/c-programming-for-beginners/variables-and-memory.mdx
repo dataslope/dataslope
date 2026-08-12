@@ -64,12 +64,13 @@ Three things happen on the line `int age = 30;`:
 
 After the two declarations above, memory might look like:
 
-```text
-Address      Variable          Value (decimal)
-----------   ---------------   --------------
-0x7ffc...0   age               30
-0x7ffc...4   year_of_birth     1995
-```
+<MemoryCells
+  cells={[
+    { name: "age", value: "30", note: "0x7ffc...0" },
+    { name: "year_of_birth", value: "1995", note: "0x7ffc...4" },
+  ]}
+  caption="Two `int` boxes at consecutive addresses, four bytes apart."
+/>
 
 Each box is 4 bytes. The actual addresses are not predictable across
 runs, they depend on the OS, the architecture, and security

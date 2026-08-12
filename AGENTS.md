@@ -762,8 +762,9 @@ and search still indexes it.
 ## Diagrams are drawn with elements, never with characters
 
 **Never build a figure out of `┌─┐│└┘`, out of `+-----+` and `---->`, or out of
-`└──┬──┘` underbraces.** `npm run check:diagrams` rejects them and
-`__tests__/asciiDiagrams.test.ts` runs the same linter under `npm test`.
+`└──┬──┘` underbraces, and never type a table into a ` ```text ` fence.**
+`npm run check:diagrams` rejects all four and `__tests__/asciiDiagrams.test.ts`
+runs the same linter under `npm test`.
 
 The reason is not taste. Code is set in JetBrains Mono, loaded by
 `next/font/google` with `subsets: ["latin"]` (`app/layout.tsx`), and that subset
@@ -777,6 +778,13 @@ disconnected fragments. Widening the subset would not fix the rest of it. A
 drawn figure is an image made of text, so a screen reader spells the corner
 glyphs out one at a time, nothing reflows on a phone, and the drawing cannot
 take the page's colors or its theme.
+
+A table typed into a fence fails for its own reasons, on top of that one. Its
+columns are held apart by literal spaces rather than by cells, so it will not
+reflow on a phone and a longer value in one row shifts every column after it;
+and it reaches a screen reader as a `<pre>`, not a `<table>` with headers. Five
+lessons had one, including a SQLite page whose fenced pipes-and-dashes block was
+teaching the reader what a table is.
 
 Reach for whichever of these fits:
 
@@ -795,14 +803,17 @@ arrow, so a node labelled `s = ●─` ships a reference dot and a wire as liter
 text inside a box that already has a real arrow leaving it. The linter rejects
 any drawn glyph inside a ` ```mermaid ` fence for that reason.
 
-**Two shapes are allowed to stay drawn.** A directory tree, because it is the
+**Some shapes are allowed to stay drawn.** A directory tree, because it is the
 literal output format of `tree`, universal in READMEs and terminals, and the
 one drawn shape the font fallback does not break: every row at a given depth
 carries the same prefix, so siblings still line up at a different advance
-width. And a caret annotation inside a code comment (`//   ^value  ^setter`),
-which is ASCII, is how a developer would write it in their own editor, and is
-not a figure. Anything else that genuinely has to keep its frame, such as
-verbatim `mysql` client output, opts out explicitly:
+width. A caret annotation inside a code comment (`//   ^value  ^setter`), which
+is ASCII, is how a developer would write it in their own editor, and is not a
+figure. Verbatim program and compiler output, which is a quotation. And a
+notation the lesson itself defines, such as the linked-list course's
+`head -> [10 | *] -> [20 | NULL]`, where each line stands alone and nothing
+depends on two lines lining up. Anything else that genuinely has to keep its
+frame, such as verbatim `mysql` client output, opts out explicitly:
 
 ```mdx
 {/* allow-drawn-diagram: verbatim mysql client output */}
