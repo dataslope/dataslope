@@ -21,6 +21,12 @@ Queues were studied mathematically before computers existed to hold them: in 190
 | `front()` | Read the next item to leave |
 | `empty()` | Check whether the queue has no items |
 
+<Figure
+  slug="dsa-queues-queue-adt-inline-cutout"
+  alt="A channel with an entry gate at one end and an exit gate at the other"
+  caption="A queue takes at one end and gives at the other, first in first out."
+/>
+
 ```mermaid
 flowchart TD
     A["enqueue 10"] --> Q1["10"]
@@ -36,9 +42,9 @@ flowchart TD
 `std::queue` is an adapter. By default it uses `std::deque`, exposing only FIFO operations.
 
 <Figure
-  slug="dsa-queues-queue-adt-inline-cutout"
-  alt="A channel with an entry gate at one end and an exit gate at the other"
-  caption="A queue takes at one end and gives at the other, first in first out."
+  slug="dsa-queues-std-queue-t-inline-cutout"
+  alt="A ready-made channel lifted off a shelf with its two gates already fitted"
+  caption="`std::queue` is an adapter that exposes only the queue operations."
 />
 
 <CodeBlock
@@ -69,12 +75,6 @@ int main() {
 ## Producer-consumer style
 
 One part of a program can produce work while another consumes it in the same order.
-
-<Figure
-  slug="dsa-queues-std-queue-t-inline-cutout"
-  alt="A ready-made channel lifted off a shelf with its two gates already fitted"
-  caption="`std::queue` is an adapter that exposes only the queue operations."
-/>
 
 <CodeBlock
   adapter="cpp"

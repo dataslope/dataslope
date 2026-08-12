@@ -71,6 +71,12 @@ flowchart TD
 
 Use `low <= high` when both endpoints are inclusive. The `mid` calculation below is written as `low + (high - low) / 2` rather than the more obvious `(low + high) / 2`, that is deliberate, and the story behind it gets its own section further down.
 
+<Figure
+  slug="dsa-searching-bug-hid-decades-inline-cutout"
+  alt="Two large marks added together on a narrow rail that cannot hold the total, the sum wrapping round below zero"
+  caption="`(low + high) / 2` overflows on a large array, which took years to surface."
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -143,9 +149,9 @@ If the range is not sorted according to the same comparison used by the search, 
 There is one more trap, and its story is worth telling in full. The obvious way to compute the middle index is `mid = (low + high) / 2`. In 2006, Joshua Bloch, author of Java's collections framework, wrote a now-famous post titled "Extra, Extra, Read All About It: Nearly All Binary Searches and Mergesorts are Broken." A colleague's program had crashed inside `java.util.Arrays.binarySearch`, code Bloch himself had written years earlier, adapted from a version in *Programming Pearls* that had been considered proven correct.
 
 <Figure
-  slug="dsa-searching-bug-hid-decades-inline-cutout"
-  alt="Two large marks added together on a narrow rail that cannot hold the total, the sum wrapping round below zero"
-  caption="`(low + high) / 2` overflows on a large array, which took years to surface."
+  slug="dsa-searching-overflow-cutout"
+  alt="A long measuring beam with a marker at its midpoint, its ends pressed inward by heavy blocks until a crack opens at the marker"
+  caption="2006: low plus high overflowed, and the bug sat in textbooks and the JDK until arrays got big enough to reach it."
 />
 
 The flaw: for very large arrays, `low + high` can exceed the maximum value an `int` can hold. The sum overflows, `mid` comes out negative or nonsensical, and the search reads outside the array. On arrays of fewer than about a billion elements the bug is invisible, which is exactly why it sat unnoticed in textbooks, in the JDK, and in countless production systems for decades, until data got big enough to trip it.
@@ -155,12 +161,6 @@ The fix costs nothing: compute `mid = low + (high - low) / 2`. The subtraction c
 ## Variants
 
 Real problems rarely ask plain "is it there?", they ask *where does it start*, *where would it go*, *how many are there*. All are small mutations of the same loop. When duplicates exist, ordinary binary search may return any matching index; to find the *first* occurrence, record a match but keep searching left instead of stopping.
-
-<Figure
-  slug="dsa-searching-overflow-cutout"
-  alt="A long measuring beam with a marker at its midpoint, its ends pressed inward by heavy blocks until a crack opens at the marker"
-  caption="2006: low plus high overflowed, and the bug sat in textbooks and the JDK until arrays got big enough to reach it."
-/>
 
 <CodeBlock
   adapter="cpp"
