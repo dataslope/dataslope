@@ -71,9 +71,10 @@ createRoot(document.getElementById("root")!).render(<Counter />);
   ]}
 />
 
-Each click calls `setCount`, React re-runs `Counter` with the new
-`count`, and the heading reflects it. You never touched the DOM;
-you changed *state*, and the UI followed.
+Read the source and notice what is *not* there: no `getElementById`, no
+`textContent =`, nothing that finds the heading and edits it. The
+heading is the expression `{count}`, and `setCount` is the only line
+that does anything. Everything else is React's job.
 
 ## Setting state triggers a re-render
 
