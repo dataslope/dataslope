@@ -449,6 +449,42 @@ function findHtmlEntryFiles(
     .map((f) => ({ filename: f.filename, kind: "main" as const }));
 }
 
+/**
+ * The document this workspace renders, composed from its sources alone
+ * (see `LanguageAdapter.composeStaticPreview`). Pure, Node-safe and
+ * deterministic, which is what lets `<CodeBlock>` put the result in the
+ * page's HTML instead of waiting for a Run.
+ *
+ * It reaches the same `composeWebDocument` a real Run does, with the
+ * same file map `prepareFileSystem` would have staged — the only
+ * difference is the missing console bridge, which nothing is listening
+ * for before a run exists. So a block's preview and its first Run agree
+ * about the page by construction, not by two implementations staying in
+ * step; `__tests__/webPreview.test.ts` pins that.
+ */
+function composeStaticWebPreview(
+  sources: { filename: string; source: string }[],
+  options: { entryFilename: string; tailwind?: boolean },
+): string | null {
+  const entry =
+    sources.find((f) => f.filename === options.entryFilename) ?? sources[0];
+  if (!entry) return null;
+  // Mirrors the run path: `prepareFileSystem` stages every workspace
+  // file, entry included, and sorts them into text and binary by
+  // extension. Authored blocks carry no uploads, so the binary half is
+  // empty here and `<img src>` references stay as written.
+  const textFiles = new Map<string, string>();
+  for (const f of sources) {
+    if (TEXT_FILE_RE.test(f.filename)) textFiles.set(f.filename, f.source);
+  }
+  return composeWebDocument({
+    entryHtml: entry.source,
+    bridge: false,
+    textFiles,
+    tailwind: options.tailwind,
+  });
+}
+
 export const webAdapter: LanguageAdapter = {
   id: "web",
   displayName: "Web Playground",
@@ -478,7 +514,8 @@ export const webAdapter: LanguageAdapter = {
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
-  outputCapabilities: { preview: true },
+  outputCapabilities: { preview: true, autoPreview: true },
+  composeStaticPreview: composeStaticWebPreview,
   exportFormats: [
     { extension: "html", label: "HTML (.html)", mimeType: "text/html" },
   ],

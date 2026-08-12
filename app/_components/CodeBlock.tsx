@@ -9,6 +9,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { flushSync } from "react-dom";
 import { ChevronDown, ChevronUp, File, Info, Lock, Play, RotateCcw } from "lucide-react";
 import { Popover } from "@base-ui/react/popover";
 import { Toast } from "@base-ui/react/toast";
@@ -78,6 +79,10 @@ import {
 import { usePrepopulatedOutput } from "./mdx/BlockOutputs";
 import { blockOutputKey } from "@/lib/blockOutputKey";
 import { previewStageStyle } from "./previewStage";
+import {
+  PREVIEW_IFRAME_CLASS,
+  PREVIEW_SANDBOX,
+} from "./runtime/webPreview";
 import styles from "./CodeBlock.module.css";
 import challengeStyles from "./ChallengeCard.module.css";
 
@@ -172,6 +177,20 @@ interface CodeBlockProps {
    *  renders a 60px box, where the default would reserve a screenful of
    *  white to show a rule of thumb about margins. */
   previewHeight?: number | string;
+  /** Render the preview before the reader presses Run, when the adapter
+   *  can compose it without a runtime (`composeStaticPreview`).
+   *
+   *  Defaults to the adapter's `outputCapabilities.autoPreview`, which is
+   *  on for `web` and off for `react` — 42 of the site's 42 web blocks
+   *  want this, and a prop that has to be remembered on every one of them
+   *  is a prop the next block will be missing, with a blank panel for a
+   *  symptom and nothing to distinguish it from a block that never had a
+   *  preview. So this exists to say *no* (or to say yes for an adapter
+   *  that doesn't default to it), not to turn the feature on.
+   *
+   *  Forced off for `expectError` blocks: their lesson is the failure,
+   *  and rendering it unasked spoils the reveal. */
+  autoPreview?: boolean;
 }
 
 // Detect the active color scheme on `<html>`. Fumadocs uses next-themes
@@ -312,6 +331,7 @@ function CodeBlockInner({
   tailwind = false,
   expectError,
   previewHeight,
+  autoPreview,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
 
@@ -422,6 +442,52 @@ function CodeBlockInner({
     (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
       ? entryFilename
       : workspaceFiles[0].filename) ?? workspaceFiles[0].filename;
+
+  // ─── Auto-rendered preview ──────────────────────────────────────────
+  // The page this block's *starter* renders, composed without a runtime
+  // and without a browser (see `LanguageAdapter.composeStaticPreview`),
+  // so it is in the server's HTML and on screen at first paint rather
+  // than one Run behind. Same posture as the prepopulated output panel:
+  // the lesson reads end to end without pressing anything.
+  //
+  // The starter, deliberately, not the reader's restored buffer. Their
+  // edits are on screen in the editor either way, the buffer is restored
+  // after hydration so composing from it would mean rendering twice and
+  // shifting between, and Run replaces this frame with their version the
+  // moment they ask. It is the same rule the prepopulated cells follow.
+  const autoPreviewEnabled =
+    (autoPreview ?? adapter.outputCapabilities?.autoPreview ?? false) &&
+    !expectError;
+  const autoPreviewDoc = useMemo(() => {
+    if (!autoPreviewEnabled || !adapter.composeStaticPreview) return null;
+    const sources = workspaceFiles.map((f) => {
+      const init = f.initCode?.trimEnd() ?? "";
+      return {
+        filename: f.filename,
+        source: init
+          ? mergeInitAndEntry(adapter.id, init, f.starterCode)
+          : f.starterCode,
+      };
+    });
+    try {
+      return adapter.composeStaticPreview(sources, {
+        entryFilename: resolvedEntryFilename,
+        tailwind: tailwind || undefined,
+      });
+    } catch {
+      // A block that can't be composed falls back to the empty slot it
+      // has always had; a thrown error here would take the lesson with it.
+      return null;
+    }
+  }, [
+    adapter,
+    autoPreviewEnabled,
+    workspaceFiles,
+    resolvedEntryFilename,
+    tailwind,
+  ]);
+  // Retired by the first Run (see `run`), restored by Reset.
+  const [showAutoPreview, setShowAutoPreview] = useState(true);
 
   // Remote datasets staged before every run (see the `datasets` prop).
   // Mirrored into a ref so the mount-once warm-up effect can prefetch
@@ -856,6 +922,22 @@ function CodeBlockInner({
     const code = effectiveSourceFor(resolvedEntryFilename, entrySource);
     const mySeq = ++runSeqRef.current;
 
+    // Hand the preview slot back to the runtime before anything can await.
+    //
+    // React owns the auto-rendered frame; `runPreviewDocument` owns the
+    // slot's children imperatively (`host.replaceChildren`). Both are
+    // fine on their own, and a disaster interleaved: if React's removal
+    // lands after the runtime's insertion it deletes the run's frame, and
+    // if it lands after React has lost track of the node it throws. So
+    // the unmount is flushed synchronously here, while we still hold the
+    // event's call stack and the runtime has not been touched — after
+    // this line the slot is empty and imperative, which is what every
+    // adapter has always assumed. `flushSync` is the point, not an
+    // optimisation; a plain setState is a race.
+    if (showAutoPreview && autoPreviewDoc) {
+      flushSync(() => setShowAutoPreview(false));
+    }
+
     // The reader is running it themselves now, so the prepopulated cells go
     // and the panel stops calling itself a preview.
     setOutputs([]);
@@ -1045,10 +1127,12 @@ function CodeBlockInner({
     }
   }, [
     adapter,
+    autoPreviewDoc,
     blockDatasets,
     hasPreview,
     isMultiFile,
     resolvedEntryFilename,
+    showAutoPreview,
     snapshotAllFiles,
     effectiveSourceFor,
     reportPrepare,
@@ -1155,7 +1239,14 @@ function CodeBlockInner({
     setShowingPreview(prepopulated !== null);
     // Reset also tears down the live preview, removing the iframe
     // kills its document (scripts, timers, listeners) immediately.
+    // Clearing the host first and re-showing after is what keeps the two
+    // owners from overlapping: the DOM is empty when React re-inserts
+    // its frame, which is the same handover the Run path makes in
+    // reverse. The auto-preview renders the starter, and the starter is
+    // what Reset just restored, so bringing it back is the honest state
+    // for the same reason the prepopulated cells come back with it.
     previewHostRef.current?.replaceChildren();
+    setShowAutoPreview(true);
     setStatus("idle");
     setStatusMessage("");
     startTransition(() => {
@@ -1617,7 +1708,24 @@ function CodeBlockInner({
             className={challengeStyles.previewSlot}
             style={previewStageStyle(previewHeight)}
             ref={previewHostRef}
-          />
+          >
+            {/* The auto-rendered starter, present in the server's HTML so
+                it paints with the page. React owns this frame until the
+                first Run, which flushes it out and hands the slot to the
+                runtime — see `run`. `srcDoc` (not innerHTML) so React
+                does the attribute escaping; `loading="lazy"` so a block
+                nobody scrolls to costs nothing, matching how the
+                prepopulated charts are fetched. */}
+            {showAutoPreview && autoPreviewDoc && (
+              <iframe
+                className={PREVIEW_IFRAME_CLASS}
+                sandbox={PREVIEW_SANDBOX}
+                title="Page preview"
+                loading="lazy"
+                srcDoc={autoPreviewDoc}
+              />
+            )}
+          </div>
         </div>
       )}
 

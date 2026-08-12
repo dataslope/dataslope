@@ -17,6 +17,8 @@ import {
 } from "../app/_components/runtime/webPreview";
 import { buildHarness, HARNESS_BEGIN } from "../app/_components/challengeHarness";
 import { TAILWIND_BROWSER_CDN } from "../app/_components/runtime/cdn";
+import { webAdapter } from "../app/_components/runtime/web";
+import { reactAdapter } from "../app/_components/runtime/react";
 
 describe("injectAtDocumentStart", () => {
   it("injects right after <head> when present", () => {
@@ -235,5 +237,102 @@ describe("hasHarnessMarker", () => {
     expect(hasHarnessMarker(buildHarness("react", tests))).toBe(true);
     expect(hasHarnessMarker("<h1>plain page</h1>")).toBe(false);
     expect(HARNESS_BEGIN.length).toBeGreaterThan(0);
+  });
+});
+
+describe("composeWebDocument bridge opt-out", () => {
+  it("omits the bridge (and its token) when asked", () => {
+    const doc = composeWebDocument({
+      entryHtml: "<h1>hi</h1>",
+      bridge: false,
+    });
+    expect(doc).not.toContain(PREVIEW_MESSAGE_KEY);
+    expect(doc).toContain("<h1>hi</h1>");
+  });
+
+  it("still injects Tailwind with the bridge off", () => {
+    const doc = composeWebDocument({
+      entryHtml: "<h1>hi</h1>",
+      bridge: false,
+      tailwind: true,
+    });
+    expect(doc).toContain(TAILWIND_BROWSER_CDN);
+    expect(doc).not.toContain(PREVIEW_MESSAGE_KEY);
+  });
+
+  it("refuses to compose a bridged document with no token", () => {
+    // Composing one silently would send a run's console output nowhere
+    // and render as a block that prints nothing.
+    expect(() => composeWebDocument({ entryHtml: "<h1>hi</h1>" })).toThrow(
+      /token/,
+    );
+  });
+});
+
+describe("webAdapter.composeStaticPreview", () => {
+  const sources = [
+    {
+      filename: "index.html",
+      source: `<link rel="stylesheet" href="styles.css"><h1>Hi</h1>`,
+    },
+    { filename: "styles.css", source: "h1 { color: red; }" },
+    { filename: "extra.js", source: `console.log("side")` },
+  ];
+  const compose = () =>
+    webAdapter.composeStaticPreview!(sources, { entryFilename: "index.html" });
+
+  it("inlines referenced files and appends unreferenced root-level ones", () => {
+    const doc = compose()!;
+    expect(doc).toContain("h1 { color: red; }");
+    expect(doc).toContain(`data-inlined-from="styles.css"`);
+    expect(doc).toContain(`data-injected-from="extra.js"`);
+  });
+
+  it("is deterministic — the property hydration depends on", () => {
+    // The server and the browser both compose this document and React
+    // compares the two. Anything random or clock-derived in the output
+    // is a hydration mismatch, which is why the bridge is off.
+    expect(compose()).toBe(compose());
+    expect(compose()).not.toContain(PREVIEW_MESSAGE_KEY);
+  });
+
+  it("agrees with what a real Run composes, bridge aside", () => {
+    // The anti-drift guard: a preview that disagrees with the reader's
+    // own Run is worse than no preview, because nothing tells them which
+    // to believe. Both paths reach composeWebDocument with the same file
+    // map, so the only difference must be the bridge.
+    const token = "fixed-token";
+    const textFiles = new Map(sources.map((f) => [f.filename, f.source]));
+    const runDoc = composeWebDocument({
+      entryHtml: sources[0].source,
+      token,
+      textFiles,
+    });
+    expect(runDoc.replace(buildPreviewBridge(token), "")).toBe(compose());
+  });
+
+  it("falls back to the first file when the entry name is unknown", () => {
+    expect(
+      webAdapter.composeStaticPreview!(sources, { entryFilename: "nope.html" }),
+    ).toBe(compose());
+  });
+
+  it("returns null for an empty workspace", () => {
+    expect(
+      webAdapter.composeStaticPreview!([], { entryFilename: "index.html" }),
+    ).toBeNull();
+  });
+});
+
+describe("auto-preview is opt-in per adapter", () => {
+  it("web renders itself; react does not", () => {
+    // react boots esbuild-wasm and pulls React from esm.sh, which is not
+    // something a page load should spend on the reader's behalf. Wiring
+    // it up is a build-time bundle away, not a flag.
+    expect(webAdapter.outputCapabilities?.autoPreview).toBe(true);
+    expect(typeof webAdapter.composeStaticPreview).toBe("function");
+    expect(reactAdapter.outputCapabilities?.preview).toBe(true);
+    expect(reactAdapter.outputCapabilities?.autoPreview).toBeFalsy();
+    expect(reactAdapter.composeStaticPreview).toBeUndefined();
   });
 });

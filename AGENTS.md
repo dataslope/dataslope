@@ -848,10 +848,10 @@ generator filled a panel, and neither can the site.
 - **web and react have no prepopulated output at all, and cannot.** Their
   output *is* a live sandboxed iframe, not cells; the capture comes back with
   nothing but "the preview didn't finish within the time limit". There is
-  nothing to store, so those 72 blocks stay blank by nature. Whether they
-  could instead *render themselves* in the reader's browser is the subject of
-  `agent-outputs/20260812-1830-client-side-preview-rendering.md`; the reserved
-  preview height below is the first phase of that plan, and the only one built.
+  nothing to store, so those blocks have no manifest entry by nature. **web
+  no longer needs one** — it renders itself instead, see below. react still
+  does not, and its 22 blocks stay blank until its bundle is precomputed
+  (`agent-outputs/20260812-1830-client-side-preview-rendering.md`, phase 4).
 
 Between the two generators, 3,280 of the site's 3,374 runnable blocks show
 their output before the reader presses Run. Of the 94 that do not, 72 are web
@@ -961,6 +961,51 @@ which every `sns.histplot(...)` block records nothing while the browser draws
 a chart. The JS half of the conversion is *shared* rather than copied
 (`app/_components/runtime/pythonDisplayOutputs.ts`), so only the Python half
 can drift.
+
+### A web block renders itself, without a manifest and without a Run
+
+Every other language shows its result because a generator ran the code at build
+time and filed the cells. `web` needs none of that: `composeWebDocument` is a
+pure string operation and the browser is the runtime, so the *document* a block
+renders can be composed during SSR and shipped inside the page's HTML. The
+preview is on screen at first paint — no manifest entry, no runtime download,
+no Run, and nothing to go stale, because the composition is derived from the
+source rather than recorded against it.
+
+The adapter opts in with two fields: `outputCapabilities.autoPreview` and
+`composeStaticPreview` (`runtime/web.tsx`). `<CodeBlock>` reads the first to
+decide and calls the second to compose. `react` sets neither, deliberately —
+it boots esbuild-wasm and pulls React from esm.sh, which is not something a
+page load spends on a reader's behalf. `<ChallengeCard>` doesn't implement any
+of this at all: its buffer is an *unsolved* starter with a test harness
+appended, and auto-rendering would print failing assertions before the learner
+has read the task.
+
+Four things this rests on, none of them optional:
+
+- **The composed document must be deterministic.** The server and the browser
+  both compose it and React compares the two. That is why the auto-rendered
+  document carries **no console bridge** — the bridge is keyed by a per-run
+  random token, and a random token in SSR output is a hydration mismatch.
+  Nothing is listening for those messages before a run exists anyway, so the
+  output panel stays empty until the reader presses Run, which is honest.
+- **`composeStaticPreview` must run under Node**, because SSR is where it is
+  called first. No `window`, no `document`.
+- **The handover on Run is `flushSync`, and that is load-bearing.** React owns
+  the auto-rendered frame; `runPreviewDocument` owns the slot's children
+  imperatively (`host.replaceChildren`). Interleaved, they corrupt each other:
+  React's removal landing after the runtime's insertion deletes the run's
+  frame. `run()` therefore flushes the unmount synchronously before it awaits
+  anything. A plain `setState` there is a race, not a style choice.
+- **It renders the starter, not the reader's restored buffer.** Composing from
+  `localStorage` would mean rendering twice and shifting between, and the
+  starter is what the prepopulated cells show too. Run replaces the frame with
+  their version the moment they ask; Reset brings the starter's back.
+
+`__tests__/webPreview.test.ts` pins the part that would rot silently: the
+static composition and a real Run must produce the *same document* modulo the
+bridge. A preview that disagrees with the reader's own Run is worse than no
+preview, because nothing tells them which to believe.
 
 ### The live preview reserves its height before it has one
 

@@ -51,6 +51,10 @@ interface MdxCodeBlockProps {
   /** Height of the live-preview stage (number → px), see
    *  `CodeBlockProps.previewHeight`. Preview adapters (web/react) only. */
   previewHeight?: number | string;
+  /** Render the preview before the reader presses Run, see
+   *  `CodeBlockProps.autoPreview`. Defaults to the adapter's own answer
+   *  (on for web, off for react); pass `false` to opt a block out. */
+  autoPreview?: boolean;
 }
 
 export default function MdxCodeBlock({
@@ -64,6 +68,7 @@ export default function MdxCodeBlock({
   tailwind,
   expectError,
   previewHeight,
+  autoPreview,
 }: MdxCodeBlockProps) {
   const resolved = getAdapterById(adapter);
   if (!resolved) {
@@ -85,6 +90,7 @@ export default function MdxCodeBlock({
       packages={packages}
       tailwind={tailwind}
       previewHeight={previewHeight}
+      autoPreview={autoPreview}
     />
   );
 }

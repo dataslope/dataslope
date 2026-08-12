@@ -272,8 +272,17 @@ export interface WebComposeInput {
    *  already carry a challenge harness `<script>` appended by
    *  `ChallengeCard`. */
   entryHtml: string;
-  /** Per-run bridge token (see `newPreviewToken`). */
-  token: string;
+  /** Per-run bridge token (see `newPreviewToken`). Required unless
+   *  `bridge` is false, which is the only case with nothing to key. */
+  token?: string;
+  /** Inject the console bridge. Default true.
+   *
+   *  The server-rendered auto-preview passes false: no run is listening
+   *  for its messages, and the token baked into the bridge is random
+   *  per call, which would make the composed document differ between
+   *  the server's render and the browser's — a hydration mismatch, and
+   *  the one thing that document cannot be. */
+  bridge?: boolean;
   /** Text files from the workspace, keyed by workspace-relative path,
    *  `<link rel="stylesheet" href>` / `<script src>` references to
    *  these are inlined so the sandboxed document is self-contained. */
@@ -398,8 +407,20 @@ export function composeWebDocument(input: WebComposeInput): string {
     }
   }
 
-  let prelude = buildPreviewBridge(input.token);
+  let prelude = "";
+  if (input.bridge !== false) {
+    if (input.token === undefined) {
+      // Silently composing a bridgeless document would send a run's
+      // console output nowhere and look like a block that prints
+      // nothing, which is indistinguishable from a block that does.
+      throw new Error(
+        "composeWebDocument: `token` is required unless `bridge: false`.",
+      );
+    }
+    prelude += buildPreviewBridge(input.token);
+  }
   if (input.tailwind) prelude += tailwindScriptTag();
+  if (!prelude) return html;
   return injectAtDocumentStart(html, prelude);
 }
 

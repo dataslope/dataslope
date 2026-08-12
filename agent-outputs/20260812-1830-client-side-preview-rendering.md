@@ -1,8 +1,9 @@
 # Client-side preview rendering for the web and react blocks
 
 **Date:** 2026-08-12
-**Status:** Plan. Nothing here is built yet; §6 is the sequencing, and each
-phase is meant to be shippable on its own.
+**Status:** **Phases 1 and 2 are built** (§8 records what shipped and where it
+departed from the plan). Phases 3 and 4 are open. §1–§7 are as written before
+any of it, so the reasoning can be checked against the result.
 **Scope:** The 64 `<CodeBlock adapter="web|react">` instances that
 [`build-block-outputs`](../scripts/build-block-outputs.mjs) cannot prepopulate,
 and what it would take to have them show their result without the reader
@@ -256,3 +257,98 @@ rather than sit beside it. The consolidation may be worth more than the
 feature: two widgets that both mean "here is the result" but disagree about
 isolation, about whether the code is editable, and about where the source
 appears is a choice every future author has to make and can get wrong.
+
+---
+
+## 8. As built
+
+### 8.1 Phase 1 — reserved height (shipped)
+
+C1 and C2 as planned. `.previewSlot` reads its height from
+`--ch-preview-height` (default 300px) and no longer shrinks while empty;
+`previewHeight` on `<CodeBlock>`, `<MdxCodeBlock>` and `<ChallengeCard>` moves
+the number, through `app/_components/previewStage.ts` so the number → px
+convention has one implementation.
+
+The shift §3 predicted was real and measurable. On
+`intro-web-development/html-structure`, with the old rule temporarily restored:
+
+```
+empty:     slot 120  card 153  doc 4012  heading-top 2866.6
+rendered:  slot 300  card 333  doc 4192  heading-top 3046.6
+deltas:    slot 180  card 180  doc  180  heading    +180
+```
+
+After: every delta 0.
+
+**Departure from the plan:** the empty state also went **dashed**. At 120px a
+solid box read as a small panel that happened to be blank; at full height it
+read as a broken one. The plan did not anticipate that reserving the space
+would change what the empty state *means* visually.
+
+`min-height` became `min(100px, var(--ch-preview-height, 300px))` rather than a
+flat 100px: the floor exists for the user's drag handle, and clamping the
+author's declared height would have put back the space `previewHeight` exists
+to remove.
+
+### 8.2 Phase 2 — web renders itself (shipped)
+
+A1 as planned, with the bridge omitted rather than its token derived. The
+adapter opts in with `outputCapabilities.autoPreview` and
+`composeStaticPreview` (`runtime/web.tsx`); `<CodeBlock>` composes during
+render, so the frame is in the server's HTML. Verified by `curl` against a
+lesson route with no JavaScript involved:
+
+```
+<iframe class="ds-web-preview-frame" sandbox="allow-scripts allow-modals allow-forms"
+        title="Page preview" loading="lazy" srcDoc="&lt;!DOCTYPE html&gt;…
+```
+
+Measured across the interaction on the same page — auto-render, Run, Reset —
+every delta 0, exactly one frame at each step, no hydration warnings. Verified
+on five pages: multi-file CSS inlines, JS executes (`js-dom-basics` paints
+"Chore list (3 items)", which only its script can produce), react blocks show
+**0** framed panels, and ChallengeCard panels show **0** framed on every page
+that has one.
+
+**Three things the plan got wrong or left out:**
+
+1. **The bridge-token question had a third answer.** §4.1 offered "derive it
+   deterministically" or "let the client adopt the frame". The right answer was
+   neither: *omit the bridge entirely*. Nothing is listening for its messages
+   before a run exists, so the token was solving a problem that only existed
+   because the bridge was assumed. `composeWebDocument` grew a `bridge?: boolean`,
+   and throws if a bridged document is composed without a token — composing one
+   silently would send a run's console output nowhere and render as a block
+   that prints nothing.
+2. **The React/imperative-DOM handover is the real hazard, and §4.1 missed it.**
+   React owns the auto-rendered frame; `runPreviewDocument` owns the slot's
+   children through `replaceChildren`. Interleaved they corrupt each other —
+   React's removal landing after the runtime's insertion deletes the run's
+   frame. `run()` now flushes the unmount with `flushSync` before it awaits
+   anything. This is the one line in the change that a later edit could quietly
+   break, which is why it carries the longest comment in the file.
+3. **The persisted-buffer case needed no code.** §4.1 treated it as a wrinkle
+   to handle. It resolves by policy: the auto-preview renders the *starter*,
+   which is exactly what the prepopulated cells do, so the two surfaces already
+   agreed and nothing had to reconcile them.
+
+**Anti-drift.** `__tests__/webPreview.test.ts` asserts the static composition
+and a real Run produce the same document modulo the bridge. That is the test
+that matters: both paths reach `composeWebDocument`, and the assertion is what
+keeps a future change to one from silently diverging from the other.
+
+**Scale delivered.** 42 of the site's 42 web `<CodeBlock>`s now show their page
+before the reader presses anything, at no runtime cost. The 22 react blocks are
+unchanged and wait on phase 4.
+
+### 8.3 Still open
+
+- **Phase 3 (§4.3, C3)** — whether the browser capture can record web *console*
+  cells. Untouched. The output panel stays empty until Run, which is honest but
+  is not the whole lesson for the six web blocks whose point is `console.log`.
+- **Phase 4 (§4.2, B2)** — precompute the react bundle in Node so react can
+  take the same path. Untouched.
+- **§7, the `<LivePreview>` consolidation** — deliberately deferred. Phase 2
+  was built beside it, so the site now has both. Revisit with the two visible
+  side by side, which is the comparison §7 asked for and could not make before.
