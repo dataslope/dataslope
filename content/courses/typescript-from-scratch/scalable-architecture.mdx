@@ -44,12 +44,6 @@ A **layered architecture** divides code into three (or more) layers:
 
 Dependencies flow in one direction: Infrastructure → Application → Domain. The domain knows nothing about infrastructure.
 
-<Figure
-  slug="tsx-scalable-architecture-monorepo-type-sharing-teaser-inline-cutout"
-  alt="One shared drawer of shapes drawn on by three separate workshops in the same building"
-  caption="Shared types are how separate packages keep speaking the same language across layers."
-/>
-
 ```mermaid
 graph TD
     A[Infrastructure Layer<br/>Database, HTTP, File System] --> B[Application Layer<br/>Use Cases, Orchestration]
@@ -595,6 +589,12 @@ This makes imports consistent and easier to refactor. (Details vary by build too
 In a **monorepo** (multiple packages in one repo), you can share types across packages. For example, a `@myapp/types` package exports domain types, and both `@myapp/server` and `@myapp/client` depend on it.
 
 This ensures the frontend and backend agree on data shapes at compile time. Tools like npm workspaces, Yarn workspaces, or pnpm workspaces make this seamless.
+
+<Figure
+  slug="tsx-scalable-architecture-monorepo-type-sharing-teaser-inline-cutout"
+  alt="One shared drawer of shapes drawn on by three separate workshops in the same building"
+  caption="Shared types are how separate packages keep speaking the same language across layers."
+/>
 
 We won't dive into monorepo tooling here, but know that TypeScript's type system scales to multi-package architectures.
 

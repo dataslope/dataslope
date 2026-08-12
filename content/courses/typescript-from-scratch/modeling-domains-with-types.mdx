@@ -28,12 +28,6 @@ type User = {
 };
 ```
 
-Four independent flags is sixteen representable users, and a real product
-has about four kinds. The gap between those two numbers is where the bugs
-live, because nothing in the type says which combinations are impossible:
-
-<Chart slug="illegal-states-explosion" />
-
 At first glance, this looks fine. But think about the combinations it allows:
 
 - `isActive: true, isSuspended: true`, Is the user active or suspended? Both?
@@ -41,6 +35,12 @@ At first glance, this looks fine. But think about the combinations it allows:
 - `isAdmin: true, isActive: false`, An inactive admin? Does that mean they still have admin privileges?
 
 These are **illegal states**: combinations that don't make sense in your domain. The type system isn't helping you, it's allowing garbage in, and you'll have to write defensive code everywhere to check for these contradictions.
+
+Four independent flags is sixteen representable users, and a real product
+has about four kinds. The gap between those two numbers is where the bugs
+live, because nothing in the type says which combinations are impossible:
+
+<Chart slug="illegal-states-explosion" />
 
 <CodeBlock
   adapter="typescript"

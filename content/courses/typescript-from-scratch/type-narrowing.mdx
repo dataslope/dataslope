@@ -251,11 +251,7 @@ property, so it must be a `Circle`.
 ## Truthiness narrowing
 
 TypeScript can narrow based on **truthiness checks**, if a value is
-truthy or falsy. It is also the guard most often used to mean something
-it does not mean, so it is worth putting all the guards side by side
-first:
-
-<Chart slug="narrowing-guards-grid" />
+truthy or falsy:
 
 <CodeBlock
   adapter="typescript"
@@ -293,6 +289,12 @@ values.
 is falsy, so `if (value)` will treat it the same as `null`. If you need
 to distinguish `""` from `null`, use an explicit check: `if (value !==
 null && value !== undefined)`.
+
+That caveat is why this is the guard most often used to mean something it
+does not mean. Here are all the guards so far side by side, against one wide
+union, with the two rows that cost people an afternoon marked:
+
+<Chart slug="narrowing-guards-grid" />
 
 ## Control flow with `switch`
 

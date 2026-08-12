@@ -94,6 +94,12 @@ console.log(getLength(null)); // 0
 
 The compiler tracks the control flow and **narrows** `s` from `string | null` to `string` after the `null` check. This is called **control flow analysis**.
 
+<Figure
+  slug="tsx-static-analysis-in-action-null-safety-strictnullchecks-inline-cutout"
+  alt="A part of two possible shapes passing a gate that admits only one of them, and leaving as that single shape"
+  caption="After the null check the compiler knows the type is narrower, and lets you use it."
+/>
+
 ---
 
 ## Exhaustiveness Checking
@@ -284,12 +290,6 @@ console.log(user1, user2);
 />
 
 The compiler tells you exactly which call sites need updating. No manual search, no chance of missing one. This scales to codebases with hundreds of thousands of lines.
-
-<Figure
-  slug="tsx-static-analysis-in-action-null-safety-strictnullchecks-inline-cutout"
-  alt="A part of two possible shapes passing a gate that admits only one of them, and leaving as that single shape"
-  caption="After the null check the compiler knows the type is narrower, and lets you use it."
-/>
 
 ---
 
