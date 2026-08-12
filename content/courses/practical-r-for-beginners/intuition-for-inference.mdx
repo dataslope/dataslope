@@ -118,16 +118,16 @@ for (i in 1:n_studies) {
 Most lines cross the red truth-line. A few miss. That's
 sampling variability made visible.
 
-## A p-value, plainly
-
-The p-value is the shaded area: how much of the null's distribution sits at
-least as far out as what you saw.
-
 <Figure
   slug="rlang-intuition-for-inference-confidence-interval-plainly-inline-cutout"
   alt="One measured mark on a rail with a soft band drawn either side of it"
   caption="A confidence interval reports the estimate together with its own wobble."
 />
+
+## A p-value, plainly
+
+The p-value is the shaded area: how much of the null's distribution sits at
+least as far out as what you saw.
 
 <Chart slug="p-value-tail-area" />
 
@@ -142,6 +142,12 @@ Large p-value → your observed result is unsurprising under "no
 effect" → you have no strong evidence of an effect (but also no
 strong evidence *against* one, absence of evidence is not
 evidence of absence).
+
+<Figure
+  slug="rlang-intuition-for-inference-p-value-plainly-inline-cutout"
+  alt="A mound with a shaded tail and one marker standing out in that tail"
+  caption="The p-value is how much of the null's distribution lies past what you saw."
+/>
 
 Let's run a quick test:
 
@@ -185,12 +191,6 @@ abused.
 A p-value answers exactly one question: *given a specific
 skeptical assumption (the null), how surprising is what we
 saw?* That's it.
-
-<Figure
-  slug="rlang-intuition-for-inference-p-value-plainly-inline-cutout"
-  alt="A mound with a shaded tail and one marker standing out in that tail"
-  caption="The p-value is how much of the null's distribution lies past what you saw."
-/>
 
 ## Effect size: significance ≠ importance
 
