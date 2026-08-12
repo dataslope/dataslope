@@ -26,7 +26,15 @@ algorithm's *time complexity*.
   caption="The steeper cost curve overtakes the gentler one as the input grows."
 />
 
+Plotted for real, with the input size on one axis and the work on the
+other, the families separate hard. Note where they cross: at small
+inputs they are almost indistinguishable, which is exactly why a bad
+choice survives testing and fails in production.
+
 <Chart slug="big-o-growth" />
+
+Those families have names, and the names are the vocabulary every
+programmer uses to talk about cost:
 
 | Notation | Pronounced | Rough feel |
 | --- | --- | --- |
