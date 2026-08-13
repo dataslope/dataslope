@@ -1100,6 +1100,44 @@ Four things hold this together:
   still warms, deliberately: it cannot auto-preview, and the learner is
   expected to attempt it.
 
+### `<LivePreview>` reserves its stage, and why that is only half the story
+
+`<LivePreview>` fills its shadow root in an effect, so the server's HTML has a
+**zero-height box** where the demo will be. Unreserved, `colors-gradients-shadows`
+grew its five stages from 0 to 1,191px the moment its JavaScript ran — the
+deep-link bug again, with `<HashScrollFix>` given three seconds to paper over it.
+
+So every usage now passes `height`, measured rather than guessed: the natural
+heights across the course run from **83px to 613px**, a 10× spread with no
+default worth having. `height` is applied as `min-height`, not `height`: a
+narrow viewport wraps a demo taller than it was measured at, and a demo that
+outgrows its box should push the page down a little rather than have its own
+point cropped off. The committed numbers are `max(desktop, mobile)` for that
+reason. If you change a demo's CSS, re-measure it — a stale number costs a
+small shift, never a broken example.
+
+**Two things this does not fix, both worth knowing before you chase them:**
+
+- **The widget's stylesheet arrives after first paint.** `LivePreview` is
+  `next/dynamic`-loaded (see `mdx/lazyWidgets.ts`), so its CSS module ships in
+  an async chunk: measured on a production build, the page has 6 stylesheets at
+  `DOMContentLoaded` and 10 once settled, and the source panels below the stage
+  go from an unstyled `16px`/no-padding to `12.5px`/`12px 14px` — **+2,345px on
+  that page**, dwarfing the stage's 1,191px. The stage holds anyway because its
+  reservation is an *inline* style, which is the only reason this fix works at
+  all. Making the widget's CSS eager would fix the rest and would undo a
+  bundle split the repo made deliberately and measured; that is a real
+  trade-off, not an oversight.
+- **CLS does not see any of it.** All of these pages measure **0.00002**,
+  because the growth is below the fold and CLS only counts what is in the
+  viewport. Do not use CLS to decide whether this class of bug exists here;
+  compare `document.scrollHeight` before and after hydration instead.
+
+`<ReactPreview>` has none of this: its demo is a real React component passed as
+`children`, so it is server-rendered and its stage has its height from the
+start. Its `height` prop stays a *fixed* height — same name, different meaning,
+because only one of the two widgets has something to reserve for.
+
 ### The live preview reserves its height before it has one
 
 `.previewSlot` (`ChallengeCard.module.css`, shared by `<CodeBlock>` and

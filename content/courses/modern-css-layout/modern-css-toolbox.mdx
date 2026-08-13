@@ -19,6 +19,7 @@ follows the ratio automatically, no padding-hack, no fixed pixel
 height. Perfect for video frames, thumbnails, and map tiles:
 
 <LivePreview
+  height={353}
   title="aspect-ratio derives height from width"
   background="#f8fafc"
   html={`<div class="row">
@@ -60,6 +61,7 @@ rule, `&` stands for the parent selector, so a component's styles live
 together in one block instead of being scattered as flat selectors:
 
 <LivePreview
+  height={204}
   title="Nesting keeps a component's rules in one block"
   background="#f8fafc"
   html={`<div class="card">
@@ -104,6 +106,7 @@ Toggle the checkboxes below. Each label restyles itself the instant its
 own checkbox is checked, using `.option:has(input:checked)`:
 
 <LivePreview
+  height={172}
   title="A label that restyles when the checkbox inside it is checked"
   background="#f8fafc"
   html={`<label class="option">
@@ -157,6 +160,7 @@ Both boxes below share one rule. The second sets `dir="rtl"`, and the
 `inline-start` accent border jumps to the other side on its own:
 
 <LivePreview
+  height={230}
   title="Logical properties adapt to writing direction"
   background="#f8fafc"
   html={`<div class="note">margin-inline: auto centers me; the accent sits at inline-start.</div>

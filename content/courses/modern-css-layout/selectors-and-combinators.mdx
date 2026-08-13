@@ -39,6 +39,7 @@ Below, the comma groups the three headings under a single serif rule, while the
 `.lead` class targets just one paragraph:
 
 <LivePreview
+  height={273}
   title="Grouping with commas vs. a single class"
   background="#ffffff"
   html={`<h1>Heading one</h1>
@@ -73,6 +74,7 @@ This is how you style all external links green, or flag every password field,
 without adding a single extra class:
 
 <LivePreview
+  height={283}
   title="Matching on attributes"
   background="#ffffff"
   html={`<p><a href="https://example.com">External link (https)</a></p>
@@ -120,6 +122,7 @@ The descendant vs. child distinction is the one to burn in. `.menu li` reaches
 **direct** children. Same markup, two different results:
 
 <LivePreview
+  height={432}
   title="Child combinator (top level) vs. descendant (all levels)"
   background="#ffffff"
   html={`<div class="col">
@@ -178,6 +181,7 @@ The sibling combinators work sideways instead of down. `+` grabs the single
 next sibling; `~` grabs all following siblings:
 
 <LivePreview
+  height={266}
   title="Next sibling (+) vs. subsequent siblings (~)"
   background="#ffffff"
   html={`<h3>Section title</h3>

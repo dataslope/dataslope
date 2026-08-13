@@ -33,7 +33,23 @@ interface LivePreviewProps {
   html: string;
   /** CSS applied inside the shadow root. Scoped, never leaks to the page. */
   css: string;
-  /** Fixed stage height (number → px). Omit to size to content. */
+  /** Space the stage holds for the demo (number → px).
+   *
+   *  A floor, not a cap: the demo still grows past it (a narrow viewport
+   *  wraps the markup and makes it taller), so a number that is a little
+   *  small costs a small shift rather than clipping the lesson's own
+   *  example.
+   *
+   *  Worth setting on every demo, because the stage is **empty until
+   *  hydration** — the shadow root is filled in an effect, so the server's
+   *  HTML has a zero-height box where the demo will be. Unreserved, a page
+   *  of these grows by thousands of pixels the moment its JavaScript runs,
+   *  which is the "deep link lands screens away from the heading" bug that
+   *  `<HashScrollFix>` then has three seconds to paper over. Reserving the
+   *  space means there is nothing to paper over.
+   *
+   *  Measure rather than guess: the natural heights across the course range
+   *  from 83px to 613px, so there is no default worth having. */
   height?: number | string;
   /** Inline background for the stage, overriding the default canvas texture
    *  (e.g. `"#fff"` for a demo that draws on white). */
@@ -76,7 +92,11 @@ export function LivePreview({
 
   const stageStyle: React.CSSProperties = {};
   if (height !== undefined) {
-    stageStyle.height = typeof height === "number" ? `${height}px` : height;
+    // `minHeight`, not `height`: the reservation has to survive a viewport
+    // narrow enough to wrap the demo taller than it was measured at, and a
+    // demo that outgrows its box should push the page down a little rather
+    // than get its own point cropped off.
+    stageStyle.minHeight = typeof height === "number" ? `${height}px` : height;
   }
   if (background) stageStyle.background = background;
 

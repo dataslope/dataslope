@@ -31,6 +31,7 @@ the scaled box overlaps its footprint without shoving its siblings,
 because transforms never disturb layout:
 
 <LivePreview
+  height={160}
   title="translate, scale, rotate, skew: layout stays put"
   background="#ffffff"
   html={`<div class="row">
@@ -82,6 +83,7 @@ all rotate `40deg`; only their origin differs. The dashed outline marks
 where each box sat before rotating:
 
 <LivePreview
+  height={200}
   title="Same rotation, three different origins"
   background="#ffffff"
   html={`<div class="row">
@@ -123,6 +125,7 @@ Transforms shine on hover, because moving a card with `translate` and
 below (it's live) to watch it lift and grow:
 
 <LivePreview
+  height={144}
   title="Hover to lift and scale: combined transform + transition"
   background="#ffffff"
   html={`<div class="card">

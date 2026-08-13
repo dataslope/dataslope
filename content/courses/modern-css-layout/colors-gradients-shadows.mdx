@@ -41,6 +41,7 @@ color: hsl(225 73% 57%);   /* hsl()    */
 />
 
 <LivePreview
+  height={200}
   title="One blue, four notations"
   html={`<div class="row">
   <div class="sw named">named<br><code>royalblue</code></div>
@@ -81,6 +82,7 @@ Where translucent circles overlap, their colors mix and the shared area
 darkens, that is the alpha at work:
 
 <LivePreview
+  height={230}
   title="Translucent circles overlapping"
   background="#ffffff"
   html={`<div class="stage">
@@ -113,6 +115,7 @@ wherever an image can, most often `background`.
 - **`radial-gradient(...)`** blends outward from a point in rings.
 
 <LivePreview
+  height={332}
   title="Linear, multi-stop, and radial"
   html={`<div class="grid">
   <div class="panel linear">linear 135deg</div>
@@ -166,6 +169,7 @@ box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
 />
 
 <LivePreview
+  height={276}
   title="Soft, hard, inset, and layered"
   background="#f8fafc"
   html={`<div class="row">
@@ -210,6 +214,7 @@ values, no spread. A subtle offset adds depth; a blurred copy in the
 text color reads as a glow:
 
 <LivePreview
+  height={153}
   title="text-shadow"
   background="#ffffff"
   html={`<h2 class="title">Depth in one line</h2>`}
