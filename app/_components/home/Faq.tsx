@@ -59,7 +59,11 @@ export function Faq() {
             className="border-b border-[var(--ds-gray-200)] dark:border-white/10"
           >
             <Accordion.Header>
-              <Accordion.Trigger className="group flex w-full cursor-pointer items-center justify-between gap-4 py-4 text-left text-base font-medium text-[var(--ds-gray-900)] outline-none dark:text-white">
+              {/* Neutral near-black rather than --ds-gray-900 (#111827, which
+                  carries a blue cast), matching the page's own foreground and
+                  the header lockup. `tracking-tight` tightens it past the
+                  -0.011em globals.css gives all sans text. */}
+              <Accordion.Trigger className="group flex w-full cursor-pointer items-center justify-between gap-4 py-4 text-left text-[17px] font-medium tracking-tight text-[#121212] outline-none dark:text-white">
                 {item.q}
                 <ChevronDown
                   size={18}

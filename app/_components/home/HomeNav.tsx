@@ -25,6 +25,12 @@ const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 
 /** The primary sections the header links to, with their lucide glyphs (shared
  *  by the desktop menu and the mobile drawer). */
+/** Colour a nav item takes on the section being viewed. The default is the
+ *  brand blue; Pricing goes green so its label and its "Free" badge read as
+ *  one green unit. */
+const ACTIVE_BLUE = "text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]";
+const ACTIVE_GREEN = "text-[var(--ds-green-500)]";
+
 const NAV_SECTIONS: {
   href: string;
   label: string;
@@ -32,13 +38,21 @@ const NAV_SECTIONS: {
   prefetch?: boolean;
   /** Pill rendered after the label (see `NavBadge`). */
   badge?: string;
+  /** Overrides {@link ACTIVE_BLUE} for the active item. */
+  activeClass?: string;
 }[] = [
   { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
   { href: "/interview-prep", label: "Interview Prep", icon: BriefcaseBusiness },
   { href: "/playground", label: "Playground", icon: SquareTerminal },
   // The pricing page's own headline is that everything is free; saying so in
   // the nav is what stops "Pricing" reading as a paywall.
-  { href: "/pricing", label: "Pricing", icon: Tag, badge: "Free" },
+  {
+    href: "/pricing",
+    label: "Pricing",
+    icon: Tag,
+    badge: "Free",
+    activeClass: ACTIVE_GREEN,
+  },
 ];
 
 /**
@@ -46,19 +60,12 @@ const NAV_SECTIONS: {
  * style (green fill, white semibold caps-height text, fully rounded) a step
  * smaller so it sits under a 15px nav item rather than an 18px heading.
  *
- * On the section being viewed it turns the same blue as the active label, so
- * the item still reads as one highlighted unit instead of a blue word with a
- * green sticker on it.
+ * Green in both appearances and in every state: the label it belongs to turns
+ * green when active, so the badge has nothing to switch to.
  */
-function NavBadge({ children, active }: { children: string; active?: boolean }) {
+function NavBadge({ children }: { children: string }) {
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold leading-normal text-white transition-colors duration-200 ${
-        active
-          ? "bg-[var(--ds-blue-700)] dark:bg-[var(--ds-blue-400)]"
-          : "bg-[var(--ds-green-500)]"
-      }`}
-    >
+    <span className="inline-flex items-center rounded-full bg-[var(--ds-green-500)] px-2 py-0.5 text-[11px] font-semibold leading-normal text-white">
       {children}
     </span>
   );
@@ -69,11 +76,18 @@ function NavBadge({ children, active }: { children: string; active?: boolean }) 
  *  on hover; the item for the section being viewed renders in the brand
  *  accent (matching the courses-page mockup), derived from the current
  *  pathname, so `/courses/python-basics` still lights up "Courses". */
+/** True when `pathname` is `href` or a page under it, so
+ *  `/courses/python-basics` still lights up "Courses". */
+function isActiveSection(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 function NavLink({
   href,
   prefetch,
   compact,
   badge,
+  activeClass = ACTIVE_BLUE,
   children,
 }: {
   href: string;
@@ -83,10 +97,11 @@ function NavLink({
    *  getting tighter, not as the type changing size. */
   compact?: boolean;
   badge?: string;
+  activeClass?: string;
   children: React.ReactNode;
 }) {
   const pathname = usePathname() ?? "";
-  const active = pathname === href || pathname.startsWith(`${href}/`);
+  const active = isActiveSection(pathname, href);
   return (
     <Link
       href={href}
@@ -94,16 +109,21 @@ function NavLink({
       aria-current={active ? "page" : undefined}
       // font-size is animated alongside the color, so the step down happens
       // with the nav's height rather than snapping a frame ahead of it.
-      className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 font-medium transition-[color,font-size] duration-200 ${
-        compact ? "text-[14.5px]" : "text-[15px]"
+      //
+      // The base size is the one for the tightest desktop band (md up to lg),
+      // where five menu items, the brand, the icons and the auth button share
+      // a ~770px bar; from lg the type steps back up. Below md this menu isn't
+      // rendered at all, so the base size only ever applies in that band.
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 font-medium transition-[color,font-size] duration-200 ${
+        compact ? "text-[13px] lg:text-[14.5px]" : "text-[13px] lg:text-[15px]"
       } ${
         active
-          ? "text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]"
+          ? activeClass
           : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
       }`}
     >
       {children}
-      {badge && <NavBadge active={active}>{badge}</NavBadge>}
+      {badge && <NavBadge>{badge}</NavBadge>}
     </Link>
   );
 }
@@ -159,8 +179,13 @@ function BrandLogo({ compact }: { compact?: boolean }) {
         }`}
         aria-hidden="true"
       />
+      {/* Hidden in the tightest desktop band only (md up to lg): there the
+          menu, the icons and the auth button already fill the bar, and the
+          wordmark is what pushes "Sign in" into wrapping. The mark alone still
+          identifies the site, and below md the drawer frees the room back up
+          so the full lockup returns. */}
       <span
-        className={`font-semibold tracking-tight text-[#121212] transition-[transform,font-size] duration-200 will-change-transform group-hover:translate-x-0.5 dark:text-white ${
+        className={`font-semibold tracking-tight text-[#121212] transition-[transform,font-size] duration-200 will-change-transform group-hover:translate-x-0.5 md:hidden lg:inline dark:text-white ${
           compact ? "text-[17px]" : "text-lg"
         }`}
       >
@@ -234,6 +259,7 @@ function MobileAuthSection() {
 /** Mobile slide-in drawer (a Base UI Dialog presented as a right-edge
  *  drawer) holding the same navigation the desktop bar exposes inline. */
 function MobileDrawer() {
+  const pathname = usePathname() ?? "";
   return (
     <Dialog.Root>
       <Dialog.Trigger
@@ -263,19 +289,28 @@ function MobileDrawer() {
               scrollbar on just the playground list). The header above and the
               footer below stay pinned. */}
           <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
-            {NAV_SECTIONS.map(({ href, label, icon: Icon, badge }) => (
-              <Dialog.Close
-                key={href}
-                render={<Link href={href} prefetch={false} />}
-                className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] dark:hover:text-white"
-              >
-                <Icon size={16} aria-hidden="true" />
-                {label}
-                {/* Always green here: drawer rows carry no active state to
-                    match, so there is no blue to pick up. */}
-                {badge && <NavBadge>{badge}</NavBadge>}
-              </Dialog.Close>
-            ))}
+            {NAV_SECTIONS.map(({ href, label, icon: Icon, badge, activeClass }) => {
+              const active = isActiveSection(pathname, href);
+              return (
+                <Dialog.Close
+                  key={href}
+                  render={<Link href={href} prefetch={false} />}
+                  aria-current={active ? "page" : undefined}
+                  // Same active colour as the desktop menu (blue, green on
+                  // Pricing); idle rows keep the drawer's own neutral, which
+                  // is a step darker than the desktop menu's.
+                  className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] ${
+                    active
+                      ? (activeClass ?? ACTIVE_BLUE)
+                      : "text-[var(--ds-gray-800)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:text-white"
+                  }`}
+                >
+                  <Icon size={16} aria-hidden="true" />
+                  {label}
+                  {badge && <NavBadge>{badge}</NavBadge>}
+                </Dialog.Close>
+              );
+            })}
           </div>
 
           <div className="mt-3 flex items-center justify-between border-t border-[var(--ds-gray-200)] pt-3 dark:border-white/10">
@@ -367,13 +402,14 @@ export function HomeNav() {
             hardened `.ds-nav-menu` rule in home.css so a leaked `.hidden`
             from a docs route can't keep it collapsed after a back-navigation). */}
         <div className="ds-nav-menu items-center justify-center gap-4 lg:gap-6">
-          {NAV_SECTIONS.map(({ href, label, prefetch, badge }) => (
+          {NAV_SECTIONS.map(({ href, label, prefetch, badge, activeClass }) => (
             <NavLink
               key={href}
               href={href}
               prefetch={prefetch}
               compact={scrolled}
               badge={badge}
+              activeClass={activeClass}
             >
               {label}
             </NavLink>

@@ -27,7 +27,10 @@ const TRIGGER_CLASS =
  *  on dark. Split out so the header can tighten the box when it compacts
  *  without an `!important` fighting the padding baked into one string. */
 const SIGN_IN_BUTTON_BASE =
-  "inline-flex items-center gap-2 rounded-lg bg-[#121212] px-3 text-sm font-medium tracking-tight text-white transition-colors hover:bg-[#2a2a2a] dark:bg-white dark:text-[#121212] dark:hover:bg-[var(--ds-gray-200)]";
+  // `whitespace-nowrap`: in the header's tightest band the flex row would
+  // otherwise break "Sign in" across two lines rather than let the button keep
+  // its width.
+  "inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-[#121212] px-3 text-sm font-medium tracking-tight text-white transition-colors hover:bg-[#2a2a2a] dark:bg-white dark:text-[#121212] dark:hover:bg-[var(--ds-gray-200)]";
 
 /** The button at its normal size. Shared with the mobile drawer's sign-in row
  *  so the two match. */
