@@ -510,35 +510,50 @@ CDN dynamic imports carrying `/* webpackIgnore */ /* turbopackIgnore */`
 
 ### 8.3 Measured breakdown
 
-Attribution from esbuild's metafile
-(`.open-next/server-functions/default/handler.mjs.meta.json`, 41.44 MB raw
-across 1058 inputs), with gzip measured per contributing chunk. Turbopack
-chunk names are opaque hashes, so chunks were fingerprinted by counting
-library signatures inside them.
+**Method.** Turbopack chunk names are opaque hashes, so a first pass that
+fingerprinted chunks by counting library-name substrings produced a wrong
+answer: it reported a large "plotly + duckdb + arrow" bucket that does not
+exist. Those hits were *prose* — `lib/generated/images.js` holds illustration
+prompts whose text mentions those tools. The numbers below come from a
+sounder method: esbuild's metafile
+(`.open-next/server-functions/default/handler.mjs.meta.json`) gives exact raw
+bytes per input, then **each Turbopack chunk's own sourcemap** splits those
+bytes across real module paths, scaled by the chunk's measured gzip ratio.
+36.69 MB of 41.44 MB (88.5%) attributes this way; the estimated total lands at
+~9884 KiB against the deployed 9973 KiB.
 
-| Raw MB | Share | GZ KiB | Component |
+| GZ KiB | Share | Raw MB | Component |
 | ---: | ---: | ---: | --- |
-| 10.48 | 25.3% | **1761** | **Generated chart specs** (`lib/generated/charts.js`) — **2 copies** |
-| 6.18 | 14.9% | 1357 | Playground runtime graph (plotly + duckdb + arrow), 4 chunks |
-| 5.11 | 12.3% | 796 | Shiki highlighting (63 lang files + oniguruma wasm) |
-| 2.89 | 7.0% | 829 | App chunk, arrow-heavy (11 files) |
-| 2.94 | 7.1% | 712 | `npm: next` (302 files) |
-| 1.80 | 4.3% | 479 | App chunk `_0it6b2w._.js` |
-| 1.05 | 2.5% | 181 | App chunk `[root-of-the-server]__1bfhsun` |
-| 0.85 | 2.0% | 288 | CodeMirror (14 files) |
-| 0.84 | 2.0% | 280 | Generated image manifest (`lib/generated/images.js`) — 2 copies |
+| **1758** | 17.8% | 10.47 | **`lib/generated/charts.js` — 2 copies** |
+| 1623 | 16.4% | 5.77 | React + Next runtime |
+| 990 | 10.0% | 3.54 | Our app code (`app/`, `lib/`) |
+| 750 | 7.6% | 4.95 | Shiki (`@shikijs/*` grammars + oniguruma) |
+| **487** | 4.9% | 1.59 | **`elkjs`** (ER-diagram layout) |
+| 365 | 3.7% | 1.25 | `lib/generated/images.js` |
+| 330 | 3.3% | 0.93 | CodeMirror + `@lezer` language modes |
+| 316 | 3.2% | 1.13 | `lucide-react` |
+| 294 | 3.0% | 1.05 | `katex` |
+| 223 | 2.3% | 0.84 | `.source/dynamic.ts` (Fumadocs content index) |
+| 201 | 2.0% | 0.61 | `@base-ui/react` |
+| 185 | 1.9% | 0.71 | `zod` |
+| 166 | 1.7% | 0.51 | Fumadocs |
+| 154 | 1.6% | 0.52 | `parse5` |
+| 143 | 1.4% | 0.48 | `acorn` |
+| 114 | 1.1% | 0.61 | `@polar-sh/sdk` |
+| 98 | 1.0% | 0.33 | `highlight.js` |
+| 55 | 0.6% | 0.24 | `apache-arrow` |
+
+**Good news first: the CDN strategy is working.** Plotly, Pyodide and
+duckdb-wasm are **absent** from the Worker entirely — the
+`webpackIgnore`/`turbopackIgnore` CDN imports and the prebuilt
+`public/_workers/` bundles do exactly what they were built to do. Only a
+55 KiB `apache-arrow` remnant survives.
 
 **The single biggest occupant is our own generated chart data.**
-`lib/generated/charts.js` is 5,980,287 bytes on disk and lands in the Worker
-**twice** — once in the server graph (`chunks/_13l8iog._.js`, 5.24 MB) and
-once in the SSR graph (`chunks/ssr/lib_generated_charts_0-dabtn.js`,
-5.23 MB). Identical library fingerprints, verified independently. Together
-that is **~1.76 MiB gzipped, ≈18% of the entire Worker** — and it is *data*,
-not code. `lib/generated/images.js` is duplicated the same way at ~280 KiB.
-
-Second is the **playground runtime graph** (plotly + duckdb + arrow, ~1.36 MiB
-gz across four chunks). That is client-only code being pulled in for SSR —
-exactly the `ssr: false` candidate the deploy runbook named.
+`lib/generated/charts.js` is 5,980,287 bytes on disk and is in the Worker
+**twice**, ~1.72 MiB gzipped, ≈18% of the whole thing — and it is *data*, not
+code. The two copies are not a server/SSR split as first assumed; they map to
+two separate compilation graphs (§8.6.1).
 
 ### 8.4 Rules that keep git's Worker cost at ~0
 
@@ -573,28 +588,111 @@ So Git is affordable. The rules matter not because Git is heavy but because
 the margin is thin enough that a careless import is a meaningful fraction of
 it.
 
-### 8.6 The bigger finding: headroom is available, and it is not Git's fault
+### 8.6 What can be moved out of the Worker
 
-Two items dwarf anything Git would add, and both look recoverable:
+#### 8.6.1 `charts.js` — two copies, two different fixes
 
-1. **De-duplicate / externalize `lib/generated/charts.js` (~1.76 MiB gz).**
-   It is build-time *data* imported by a Server Component, duplicated across
-   the server and SSR graphs. If `Chart` resolved specs from a generated
-   static asset (served via the `ASSETS` binding) instead of a static import,
-   both copies leave the Worker. **This needs its own spike**: the
-   `open-next.config.ts` notes explain that on-demand re-renders run in
-   workerd with no `node:fs`, so the loading path has to work at request time,
-   not just at build time. Potential win is ~6× everything Git needs.
-2. **`ssr: false` on the playground runtime graph (~1.36 MiB gz).** The
-   runbook already recommends this and `CustomItemRendererLazy` is the
-   in-repo precedent. Note `lazyWidgets.ts` does **not** achieve it (§8.2).
+The duplication is not a server/SSR split. Each copy belongs to a distinct
+compilation graph:
 
-Trimming Shiki's 63 bundled language grammars (796 KiB gz) is a third,
-smaller lever.
+| Copy | Chunk | GZ | Referenced by |
+| --- | --- | ---: | --- |
+| A | `chunks/ssr/lib_generated_charts_0-dabtn.js` | ~887 KiB | `courses/[...slug]`, `interview-prep/[...slug]`, `fumadocs-dev/[[...slug]]`, `dashboard/admin/charts/[[...page]]` |
+| B | `chunks/_13l8iog._.js` | ~891 KiB | **only** `api/admin/charts/route.js` |
 
-**Recommendation:** Git does not need to wait for this work. But the Worker
-should not be allowed to drift below ~250 KiB headroom, and item 1 is worth
-doing on its own merits regardless of the Git playground.
+Both verified to contain the manifest (the `ab-test-peeking` slug appears in
+each). API routes compile as their own graph, so they get their own copy.
+
+**Copy B is nearly free to remove — the best item in this audit.**
+`app/api/admin/charts/route.ts` imports the entire manifest, every chart's
+serialized `svg` included, and uses it in exactly two places
+(`route.ts:146`, `route.ts:194`):
+
+```ts
+if (!slug || !chartManifest[slug]) {
+  return json({ error: "Unknown chart slug." }, 400);
+}
+```
+
+It is a slug existence check. Have `build-charts.mjs` also emit
+`lib/generated/chart-slugs.js` (a string array, a few KB) and import that
+instead: **~891 KiB gz — 8.9% of the Worker — for a near-trivial change.**
+
+**Copy A is a real job.** `Chart.tsx` inlines `entry.svg` into the HTML, and
+the slug lookup is dynamic so nothing tree-shakes. The fix is to split the
+manifest: keep metadata (`title`, `caption`, `width`, `height`, `minWidth`,
+`usedBy`) in the JS module and move the `svg` bodies — the overwhelming bulk —
+to per-chart static assets, fetched through the `ASSETS` binding at render
+time. `Chart` becomes an async Server Component. Prerendered pages already
+carry the markup, so the fetch only happens on cache-miss re-renders.
+
+**Spike it before committing:** `open-next.config.ts` documents that
+on-demand re-renders run in workerd with no `node:fs`, so the load path must
+be `env.ASSETS.fetch()` (or equivalent), not a file read. jsDelivr via
+`cdn-assets/` also works but is operationally worse here — charts change
+often and that route needs a git tag bump per change.
+
+#### 8.6.2 `elkjs` (487 KiB gz) — wrong kind of lazy
+
+`ErDiagramPane.tsx:20` imports `elkjs/lib/elk.bundled.js`. It reaches the
+Worker through `sqlCardTools/SqlCardDialogs.tsx`, which `SqlCardToolsMenu`
+loads with a bare `import("./SqlCardDialogs")`. That splits the *client*
+bundle — which is what the comment there intends — but leaves the module in
+the route's server graph, so the Worker still pays.
+
+`SqlPlayground.tsx:132` and `PostgresPlayground.tsx:73` already use
+`dynamic(…, { ssr: false })` for the same pane. Applying that to the card
+path should drop `elkjs`, `@xyflow/react`, and the second CodeMirror
+configuration: **~487 KiB gz plus part of the 330 KiB CodeMirror bucket.**
+These dialogs only ever open from a click, so they are never server-rendered
+— nothing is lost.
+
+This is the same trap as §8.2 in a third form: a bare `import()` splits the
+client bundle, `next/dynamic` with SSR on splits the client bundle, and only
+`ssr: false` removes Worker weight.
+
+#### 8.6.3 `images.js` (365 KiB gz)
+
+Same shape as charts — a generated data module with eight importers,
+including `api/admin/illustration-prompts/route.ts`, which again gets its own
+copy. Same fix family: split ids/metadata from payload, or give the API route
+a slim index.
+
+#### 8.6.4 Shiki (750 KiB gz)
+
+`lib/shiki-slim.ts` already lazy-imports grammars per language, but the full
+`@shikijs/langs` set still lands in the Worker (`cpp` alone is 0.76 MB, and
+it appears twice). Trimming the language table to what the corpus actually
+uses is a plausible 300–500 KiB. Worth also asking why `highlight.js`
+(98 KiB) is present alongside it.
+
+#### 8.6.5 Not movable
+
+React + Next runtime (1623 KiB), Fumadocs plus `.source/dynamic.ts`
+(389 KiB combined), and the server-rendering dependencies (`zod`,
+`@base-ui/react`, `parse5`, `acorn`) are the framework and the content index.
+Treat these as fixed cost.
+
+Smaller items worth a look: `lucide-react` at 316 KiB despite
+`optimizePackageImports`, `katex` at 294 KiB (needed only on math lessons),
+and `@polar-sh/sdk` at 114 KiB (billing routes only).
+
+#### 8.6.6 Recovery summary
+
+| Fix | GZ KiB | Effort | Risk |
+| --- | ---: | --- | --- |
+| `chart-slugs.js` for the admin API route | ~891 | trivial | very low |
+| `ssr: false` on `SqlCardDialogs` | ~487+ | small | low |
+| Chart SVG bodies → `ASSETS` | ~887 | medium | medium — spike first |
+| Same treatment for `images.js` | ~365 | medium | medium |
+| Trim Shiki grammars | 300–500 | medium | low |
+
+Plausible total ≈ **2.9–3.1 MiB**, which would take the Worker from 9.74 MiB
+to roughly 6.7 MiB — near the "~5–6 MiB" the June runbook projected.
+
+**Recommendation:** Git does not need to wait for any of this. But the first
+two rows are cheap enough to be worth doing regardless, and together they
+recover ~1.4 MiB — about five times the current total headroom.
 
 ---
 
