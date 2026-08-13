@@ -2418,14 +2418,25 @@ input[type="range"].fs-slider:disabled {
    matching the embedded code-block / challenge-card boot notice. ── */
 .pyodide-loading.playground-boot-overlay {
   align-items: center;
-  /* Fade in on mount. The playground pages are ssr:false with no loading
-     fallback (see app/playground/<id>/page.tsx), so the overlay is the
-     first thing painted after the page background; easing it in makes the
-     blank → loading-screen hop read as a transition rather than a pop.
-     0.4s mirrors the fade-OUT (`transition: opacity 0.4s` + `.hidden`
-     above), so entry and exit feel like one motion. The animation ends at
-     opacity 1 and the transition takes over from there, so the two never
-     fight. */
+}
+.playground-boot-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  padding: 32px;
+  width: min(620px, calc(100vw - 48px));
+  text-align: center;
+  /* Fade in the card on mount — the CARD, never the overlay root. The
+     playground pages are ssr:false with no loading fallback (see
+     app/playground/<id>/page.tsx), so easing the loader in makes the blank →
+     loading-screen hop read as a transition rather than a pop. The root must
+     stay opaque from its first frame: its `background: var(--bg)` is what
+     hides the mounting playground UI (and the inline results-pane boot
+     notice) underneath, and animating opacity there let all of it bleed
+     through for 400ms — two loading screens at once. 0.4s mirrors the
+     overlay's fade-OUT (`transition: opacity 0.4s` + `.hidden`), so entry
+     and exit feel like one motion. */
   animation: playground-boot-fade-in 0.4s ease-out;
 }
 @keyframes playground-boot-fade-in {
@@ -2437,18 +2448,9 @@ input[type="range"].fs-slider:disabled {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pyodide-loading.playground-boot-overlay {
+  .playground-boot-card {
     animation: none;
   }
-}
-.playground-boot-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 40px;
-  padding: 32px;
-  width: min(620px, calc(100vw - 48px));
-  text-align: center;
 }
 .playground-boot-loader {
   display: inline-flex;
