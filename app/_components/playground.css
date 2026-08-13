@@ -2418,6 +2418,28 @@ input[type="range"].fs-slider:disabled {
    matching the embedded code-block / challenge-card boot notice. ── */
 .pyodide-loading.playground-boot-overlay {
   align-items: center;
+  /* Fade in on mount. The playground pages are ssr:false with no loading
+     fallback (see app/playground/<id>/page.tsx), so the overlay is the
+     first thing painted after the page background; easing it in makes the
+     blank → loading-screen hop read as a transition rather than a pop.
+     0.4s mirrors the fade-OUT (`transition: opacity 0.4s` + `.hidden`
+     above), so entry and exit feel like one motion. The animation ends at
+     opacity 1 and the transition takes over from there, so the two never
+     fight. */
+  animation: playground-boot-fade-in 0.4s ease-out;
+}
+@keyframes playground-boot-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pyodide-loading.playground-boot-overlay {
+    animation: none;
+  }
 }
 .playground-boot-card {
   display: flex;
