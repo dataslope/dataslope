@@ -63,7 +63,7 @@ water pump. These were not just numbers; they were *analyses with a
 conclusion* that changed policy.
 
 One more lineage matters. In 1970 an IBM researcher named **Edgar
-F. Codd** proposed the **relational model**: store data as
+F. Codd** proposed the **relational model**:[^codd] store data as
 relations, sets of rows, each a tuple of typed values, and query
 them with a mathematical algebra. That model underlies every SQL
 database today, and Pandas quietly borrows its vocabulary. When we
@@ -333,3 +333,10 @@ Knowing the origin explains why pandas takes labeled, multi-dimensional data so 
 
 The continuity between databases and DataFrames is why the same words keep reappearing in this course.`}
 />
+
+[^codd]:
+    E. F. Codd,
+    ["A Relational Model of Data for Large Shared Data Banks"](https://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf),
+    *Communications of the ACM* 13(6), June 1970. Fourteen pages, and
+    the ancestor of both the SQL you will meet later and the vocabulary
+    Pandas borrows for joins and group-bys.

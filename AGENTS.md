@@ -574,8 +574,9 @@ chart library shipped to the browser.
 ### The pipeline
 
 1. **Author** a spec at `charts/<slug>.mjs`. It exports `title` (the figure's
-   accessible name, required), an optional `caption`, and `render()` returning
-   `plot({...})` from `charts/_theme.mjs`.
+   accessible name, required), an optional `caption`, an optional `sources`
+   (see [Citations and sources](#citations-and-sources)), and `render()`
+   returning `plot({...})` from `charts/_theme.mjs`.
 2. **Build** — `npm run build:charts` renders every spec into
    `lib/generated/charts.js` (gitignored; its committed `.d.ts` types it). Runs
    from `dev`, `build`, and `postinstall`.
@@ -739,6 +740,67 @@ Academic-minimal, in the spirit of ggplot2's `theme_minimal()`: transparent
 panel, no frame, no tick marks, faint horizontal rules only, labels placed in
 the plot rather than in a legend, and the page's own Inter tracked slightly
 tight. Chart junk is the enemy; the data is the ink.
+
+
+## Citations and sources
+
+A lesson that reports someone else's measurement says whose. There are two
+places for that, and which one applies depends on whether the claim is made in
+prose or in a figure.
+
+### A claim in prose takes a footnote
+
+`remark-gfm` is the first plugin in fumadocs-mdx's preset (our own
+`remarkPlugins` in `source.config.ts` are appended to it), so GFM footnote
+syntax works in a lesson body with no configuration:
+
+```mdx
+The multipliers vary by an order of magnitude between studies.[^boehm]
+
+[^boehm]: Boehm, *Software Engineering Economics* (Prentice Hall, 1981).
+```
+
+It reaches the page as a superscript link and a references section at the foot
+of the lesson, styled in `app/docs.css` (fumadocs renders the section's
+"Footnotes" heading `sr-only`, which leaves the definitions looking like an
+orphaned numbered list; the stylesheet puts the heading back and rules the
+section off).
+
+### A figure takes a credit line
+
+A caption is a JSX string prop, so markdown never touches it and a `[^1]`
+written in one arrives on the page as those four characters. A figure also
+wants its credit *in place* rather than at the foot of the page: the source of
+a chart is part of reading it. Both take a `sources` list, rendered under the
+caption by `<FigureSources>`:
+
+```mdx
+<Figure slug="…" alt="…" sources={[{ text: "…", href: "https://…" }]} />
+```
+
+For a chart, put it on the **spec**, not the tag, so the credit follows the
+chart to every lesson that places it (`bug-cost-by-stage` is on three):
+
+```js
+// charts/bug-cost-by-stage.mjs
+export const sources = [
+  {
+    text: "Boehm, *Software Engineering Economics* (Prentice Hall, 1981)",
+    href: "https://openlibrary.org/works/OL6034830W",
+  },
+];
+```
+
+`text` takes the same inline markup a caption does, so a title goes in
+`*asterisks*`. `href` is optional and checked by `npm run build:charts`: prefer
+a landing page for the work itself (a publisher, Open Library, a DOI) over a
+copy that can move, and leave it off rather than link something that will rot.
+
+Cite the disagreement too where there is one. `bug-cost-by-stage` lists
+Bossavit's *The Leprechauns of Software Engineering* next to Boehm and the NIST
+report, because the most-reproduced version of that chart traces back to no
+published study anyone can find — which is exactly what the caption's "vary by
+an order of magnitude" is standing on.
 
 
 ## Registering a new MDX widget
@@ -1633,6 +1695,51 @@ subgraph Hand[ "By hand" ]
 subgraph Hand["By hand"]
 ```
 
+### 8. Code inside a label is wrapped in `<code>`
+
+Code in a diagram label is set in JetBrains Mono, the same face it has in the
+code block on the same page, by wrapping that span of the label in a `<code>`
+tag. Without one it arrives in Inter, which is how `System.out` came to sit in
+an actor box in the prose face three paragraphs below the same name in a code
+block.
+
+```
+<!-- Bad -->
+flowchart LR
+    Doc[report.qmd] --> Render[quarto render]
+
+<!-- Good -->
+flowchart LR
+    Doc["<code>report.qmd</code>"] --> Render[quarto render]
+```
+
+A bracketed label that holds no quotes needs them the moment it holds a tag
+(rule 1): mermaid reads an unquoted `<` as syntax. Labels that are not
+bracketed take the tag as they are:
+
+```
+sequenceDiagram
+    participant SO as <code>System.out</code>
+    JVM->>Main: call <code>main(args)</code>
+```
+
+Class and ER diagrams need none of this: they are code end to end, so the
+renderer sets the whole diagram in mono. Everything else marks its code spans,
+including the kinds whose labels mermaid paints as SVG text rather than HTML
+(sequence, pie, gantt, journey) — those cannot carry the tag through mermaid,
+so `app/_components/mdx/mermaid.tsx` strips it before the render and puts the
+face back on the rendered text afterwards. The authoring rule is the same
+either way.
+
+Mathematical notation is not code and stays in the prose face: mermaid cannot
+typeset it, so `P(A given B)`, `y(t-1)` and `ARIMA(p, d, q)` are prose written
+in symbols.
+
+Enforced by `npm run check:mermaid-code` (`scripts/check-mermaid-code.mjs`) and
+by `__tests__/mermaidCode.test.ts`, which flag a call, a dotted name and a
+snake_case identifier left unmarked. A label that really wants the prose face
+opts out with `{/* allow-unmarked-code: why */}` on a line above the fence.
+
 ### Quick checklist before committing a Mermaid block
 
 - [ ] Every node label with special chars is quoted
@@ -1642,6 +1749,7 @@ subgraph Hand["By hand"]
 - [ ] Participant aliases contain only plain words
 - [ ] Dotted edge labels have spaces: `-. label .->`
 - [ ] `subgraph` labels have no extra spaces inside the brackets
+- [ ] Every code span in a label is wrapped in `<code>`
 
 <!-- BEGIN:nextjs-agent-rules -->
 

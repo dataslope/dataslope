@@ -323,6 +323,40 @@ function undersizedType(svg) {
     .filter((n) => n < MIN_AUTHORED_PX);
 }
 
+/**
+ * Check a spec's optional `sources` export, the credit line under the chart.
+ * Returns the problem to report, or null when it is fine (including absent).
+ *
+ * ```js
+ * export const sources = [
+ *   { text: "Boehm, *Software Engineering Economics* (1981)", href: "https://…" },
+ * ];
+ * ```
+ *
+ * Checked here rather than trusted at render time because the manifest is
+ * generated: a typo in the shape would otherwise surface as a blank credit on
+ * every lesson that places the chart, which is exactly the kind of thing
+ * nobody notices. `href` is optional (not every reference has a stable public
+ * home) but must be `http(s)` when given, since it renders as a link out.
+ */
+function badSources(sources) {
+  if (sources === undefined) return null;
+  if (!Array.isArray(sources)) {
+    return "sources must be an array of { text, href? } entries";
+  }
+  for (const [i, source] of sources.entries()) {
+    const at = `sources[${i}]`;
+    if (!source || typeof source !== "object") return `${at} must be an object`;
+    if (typeof source.text !== "string" || source.text.trim() === "") {
+      return `${at}.text must be a non-empty string (the reference as it reads on the page)`;
+    }
+    if (source.href !== undefined && !/^https?:\/\//.test(source.href)) {
+      return `${at}.href must be an http(s) URL, or be left off`;
+    }
+  }
+  return null;
+}
+
 const MIN_LEGIBLE_PX = 8.5;
 
 /** Below this the floor is not worth publishing: the chart already fits the
@@ -387,6 +421,15 @@ for (const file of specs) {
   }
   if (!mod.title) {
     problems.push(`${file}: no exported title (it becomes the chart's aria-label)`);
+    continue;
+  }
+
+  // Where the numbers came from, rendered as a credit line under the caption
+  // (<FigureSources>). It lives on the spec rather than on the `<Chart>` tag
+  // so it travels with the chart to every lesson that places it.
+  const sourceProblem = badSources(mod.sources);
+  if (sourceProblem) {
+    problems.push(`${file}: ${sourceProblem}`);
     continue;
   }
 
@@ -463,6 +506,7 @@ for (const file of specs) {
   charts[slug] = {
     title: mod.title,
     ...(mod.caption ? { caption: mod.caption } : {}),
+    ...(mod.sources?.length ? { sources: mod.sources } : {}),
     width,
     height: Number(el.getAttribute("height")),
     // Omitted when the chart can shrink to any width without a label falling

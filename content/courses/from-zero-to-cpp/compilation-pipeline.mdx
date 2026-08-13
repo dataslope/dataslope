@@ -205,7 +205,7 @@ flowchart LR
     M["<code>main.o</code><br/>defines: main<br/>needs: greet"] --> L[Linker]
     G["<code>greet.o</code><br/>defines: greet<br/>needs: printf"] --> L
     S["libc / libc++<br/>defines: printf,<br/><code>std::cout</code>, ..."] --> L
-    L --> E[a.out / .exe<br/>complete, runnable]
+    L --> E["<code>a.out</code> / .exe<br/>complete, runnable"]
 ```
 
 When you forget to compile a `.cpp` file, or you misspell a function

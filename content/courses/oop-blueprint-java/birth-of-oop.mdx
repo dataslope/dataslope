@@ -100,10 +100,10 @@ sequenceDiagram
     participant Cart
     participant Item
 
-    Order->>Cart: total()
-    Cart->>Item: price()
+    Order->>Cart: <code>total()</code>
+    Cart->>Item: <code>price()</code>
     Item-->>Cart: 9.99
-    Cart->>Item: price()
+    Cart->>Item: <code>price()</code>
     Item-->>Cart: 4.50
     Cart-->>Order: 14.49
 ```

@@ -45,7 +45,7 @@ relational model's practical limits, among them, that commercial
 systems of the day handled only a fixed menu of simple types. In 1986
 he launched a new Berkeley project to build a database that could be
 *extended*: user-defined types, rules, smarter handling of complex
-data. He named it **POSTGRES**, literally "after Ingres."
+data. He named it **POSTGRES**, literally "after Ingres."[^postgres]
 
 <Figure
   slug="db-ingres-to-postgresql-postgres95-cutout"
@@ -125,3 +125,12 @@ rejected a bad row in this course.
 Tools shape habits. It is easier to design carefully on a database
 that takes your declared rules seriously, and now you know why this
 one does.
+
+[^postgres]:
+    Michael Stonebraker and Lawrence A. Rowe,
+    ["The Design of POSTGRES"](https://dsf.berkeley.edu/papers/ERL-M85-95.pdf)
+    (UC Berkeley ERL memo M85/95, 1986). The opening section is a list
+    of what the authors thought Ingres and the commercial relational
+    systems had got wrong, which makes it the clearest statement of why
+    the project existed at all. Stonebraker received the ACM Turing
+    Award in 2014 for this line of work.

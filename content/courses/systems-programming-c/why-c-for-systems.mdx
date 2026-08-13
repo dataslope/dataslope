@@ -26,7 +26,8 @@ word-addressed PDP-7, but the new PDP-11 the Unix group acquired in
 or "a structure." So Ritchie extended B with types and structs, and
 the extended language needed a name. After B came **C**, the joke
 writes itself, and yes, people immediately began asking whether the
-successor would be called D or P (the next letter in "BCPL").
+successor would be called D or P (the next letter in
+"BCPL").[^ritchie]
 
 The payoff came in 1973, when Thompson and Ritchie rewrote the Unix
 kernel itself in C. This was a radical act: operating systems were
@@ -35,7 +36,7 @@ enough. A kernel in a high-level language meant the *operating
 system itself* became portable, and when Unix spread to new
 machines in the late 1970s, C went everywhere with it. Twenty years
 later, Ritchie summed up his creation with characteristic dryness:
-*"C is quirky, flawed, and an enormous success."*
+*"C is quirky, flawed, and an enormous success."*[^ritchie]
 
 ## C runs the world
 
@@ -260,3 +261,13 @@ constantly.
 - Because every C statement maps to exactly one CPU instruction.
   > Many C statements compile to several instructions, and the optimizer can collapse or reorder them.`}
 />
+
+[^ritchie]:
+    Dennis M. Ritchie,
+    [*The Development of the C Language*](https://csapp.cs.cmu.edu/3e/docs/chistory.html),
+    presented at the second History of Programming Languages conference
+    (ACM, 1993). The account of BCPL, B, the PDP-7 and the byte-addressed
+    PDP-11 in this section is his, and so is the closing quotation. It
+    is worth reading in full: the man who made the language is unusually
+    frank about which of its decisions were considered and which were
+    accidents of the machine in front of him.

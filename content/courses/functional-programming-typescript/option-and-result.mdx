@@ -311,7 +311,7 @@ computation". Every later chapter will use it for some `M<A>`:
 
 ```mermaid
 flowchart TD
-    A["<code>M&lt;A&gt;</code>"] -- "flatMap(f)" --> B["<code>M&lt;B&gt;</code>"]
+    A["<code>M&lt;A&gt;</code>"] -- "<code>flatMap(f)</code>" --> B["<code>M&lt;B&gt;</code>"]
     A -.->|"if 'none'/'err' or empty"| B
     A -->|"if 'some'/'ok' value a"| C["f(a) = <code>M&lt;B&gt;</code>"] --> B
 ```

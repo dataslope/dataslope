@@ -402,10 +402,10 @@ A typical slice of that graph, raw sources flowing through staging models into m
 
 ```mermaid
 flowchart TD
-  s1["source: raw.orders"] --> stg1["stg_orders"]
-  s2["source: raw.customers"] --> stg2["stg_customers"]
-  stg1 --> fct["fct_orders"]
-  stg2 --> dim["dim_customer"]
+  s1["source: <code>raw.orders</code>"] --> stg1["<code>stg_orders</code>"]
+  s2["source: <code>raw.customers</code>"] --> stg2["<code>stg_customers</code>"]
+  stg1 --> fct["<code>fct_orders</code>"]
+  stg2 --> dim["<code>dim_customer</code>"]
   dim --> fct
 ```
 

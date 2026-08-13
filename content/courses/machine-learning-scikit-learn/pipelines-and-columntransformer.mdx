@@ -84,7 +84,7 @@ set, because you never touch the steps individually.
 
 ```mermaid
 flowchart LR
-    subgraph Training ["Training: pipeline.fit(X_train, y_train)"]
+    subgraph Training ["Training: <code>pipeline.fit(X_train, y_train)</code>"]
         A["<code>X_train</code>"] --> B["StandardScaler<br/>fit + transform"]
         B --> C["LogisticRegression<br/>fit"]
         C --> D["fitted pipeline"]
@@ -93,7 +93,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    subgraph Prediction ["Prediction: pipeline.predict(X_new)"]
+    subgraph Prediction ["Prediction: <code>pipeline.predict(X_new)</code>"]
         E["<code>X_new</code>"] --> F["StandardScaler<br/>transform only"]
         F --> G["LogisticRegression<br/>predict"]
         G --> H["predictions"]

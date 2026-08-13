@@ -17,7 +17,7 @@ flowchart TD
     A[("one frame")] -->|split by key| B[("group: Adelie")]
     A --> C[("group: Gentoo")]
     A --> D[("group: Chinstrap")]
-    B -->|"apply: mean(mass)"| B2["one value"]
+    B -->|"apply: <code>mean(mass)</code>"| B2["one value"]
     C --> C2["one value"]
     D --> D2["one value"]
     B2 -->|combine| R[("one row per group")]

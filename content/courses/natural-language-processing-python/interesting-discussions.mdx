@@ -17,8 +17,9 @@ knowing, each tied to something you now understand.
 ## 1950, Turing frames the goal
 
 Before there were any tools, there was a target. In 1950 **Alan Turing** posed
-the "imitation game", now called the **Turing test**, asking whether a machine
-could hold a text conversation indistinguishable from a human's. It reframed the
+the "imitation game", now called the **Turing test**,[^turing] asking
+whether a machine could hold a text conversation indistinguishable from
+a human's. It reframed the
 vague question "can machines think?" into something concrete and language-shaped:
 can a program *use language* convincingly? Every chatbot, assistant, and
 sentiment model since has been chasing some slice of that goal. It is worth
@@ -38,8 +39,8 @@ demonstrated machine translation, converting a few dozen Russian sentences into
 English. The demo was small and carefully chosen, but it ignited enormous
 optimism, some believed general-purpose translation was just a few years away.
 It was not. Useful translation proved far harder than the demo suggested, and
-after the sobering **ALPAC report in 1966**, much U.S. funding for machine
-translation dried up.
+after the sobering **ALPAC report in 1966**,[^alpac] much U.S. funding
+for machine translation dried up.
 
 <Figure
   slug="nlp-discussions-georgetown-ibm-cutout"
@@ -58,8 +59,8 @@ just the clean example.
 ## 1948, Shannon and the n-gram
 
 In 1948 **Claude Shannon** published "A Mathematical Theory of Communication",
-the paper that founded information theory. Tucked inside was an idea you met on
-the n-grams page: model language by the probability of the next symbol given the
+the paper that founded information theory.[^shannon] Tucked inside was
+an idea you met on the n-grams page: model language by the probability of the next symbol given the
 previous ones. Shannon even generated text by sampling letters and words
 according to those probabilities, producing eerily English-looking nonsense. That
 "predict the next token from the previous ones" framing, the **n-gram model**,
@@ -105,8 +106,8 @@ ran.
 
 ## 1966, ELIZA and the effect named after it
 
-At MIT in 1966, **Joseph Weizenbaum** wrote **ELIZA**, a program that imitated a
-Rogerian psychotherapist using nothing but simple pattern-matching and canned
+At MIT in 1966, **Joseph Weizenbaum** wrote **ELIZA**,[^eliza] a
+program that imitated a Rogerian psychotherapist using nothing but simple pattern-matching and canned
 responses, spotting a keyword and reflecting it back as a question. It had no
 understanding of anything. And yet people confided in it, attributed empathy to
 it, and asked to be left alone with it, even while knowing it was a program.
@@ -161,8 +162,9 @@ the first for the second.
 ## 1972, Spärck Jones and IDF
 
 When you ran the TF-IDF page, you used a weighting introduced by **Karen Spärck
-Jones** in 1972. Her paper argued that a term's value for retrieval should grow
-as the term becomes *rarer* across a collection, the **inverse document
+Jones** in 1972.[^sparck-jones] Her paper argued that a term's value
+for retrieval should grow as the term becomes *rarer* across a
+collection, the **inverse document
 frequency** idea. It is hard to overstate how durable this turned out to be: IDF
 sits at the heart of classic information retrieval and still shapes how search
 engines weigh your query words half a century later. A simple, well-chosen idea
@@ -291,3 +293,36 @@ Next-token prediction from prior context is the n-gram idea, traceable to Shanno
 
 This is the lineage your foundations sit in. The final page maps where you can
 take them next.
+
+[^turing]:
+    A. M. Turing, "Computing Machinery and Intelligence", *Mind* 59(236),
+    October 1950. Turing spends most of the paper answering objections
+    rather than describing the test, which takes up barely two pages.
+
+[^alpac]:
+    Automatic Language Processing Advisory Committee,
+    *Language and Machines: Computers in Translation and Linguistics*
+    (National Academy of Sciences, 1966). Its conclusion, that machine
+    translation was slower and more expensive than human translation and
+    showed no near-term prospect of improving, is the document usually
+    credited with ending the first wave of funding.
+
+[^shannon]:
+    Claude E. Shannon, "A Mathematical Theory of Communication", *Bell
+    System Technical Journal* 27, July and October 1948. The n-gram
+    text-generation experiments are in Part I, section 3, and Shannon
+    generated them by opening a book at random and copying letters,
+    which is worth picturing.
+
+[^eliza]:
+    Joseph Weizenbaum, "ELIZA: A Computer Program For the Study of
+    Natural Language Communication Between Man And Machine",
+    *Communications of the ACM* 9(1), 1966. Weizenbaum wrote his 1976
+    book *Computer Power and Human Reason* largely because he was
+    alarmed by how people reacted to it.
+
+[^sparck-jones]:
+    Karen Sparck Jones, "A Statistical Interpretation of Term Specificity
+    and Its Application in Retrieval", *Journal of Documentation* 28(1),
+    1972. Eleven pages, and the weighting is still in the default
+    configuration of every search engine you use.

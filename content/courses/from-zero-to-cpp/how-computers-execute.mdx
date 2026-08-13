@@ -148,7 +148,7 @@ sequenceDiagram
     participant Disk as Disk
     participant Mem as RAM
     participant CPU
-    U->>OS: Run hello.exe
+    U->>OS: Run <code>hello.exe</code>
     OS->>Disk: Read the program file
     Disk-->>OS: Bytes of the program
     OS->>Mem: Copy program into a fresh region of memory

@@ -29,7 +29,7 @@ have to restructure everything.
 Then, in June 1970, a British-born mathematician at IBM's San Jose
 research lab named **Edgar F. Codd** published a paper with the
 unglamorous title *"A Relational Model of Data for Large Shared
-Data Banks."* Its idea was radical in its simplicity: store all
+Data Banks."*[^codd70] Its idea was radical in its simplicity: store all
 data in plain tables, what mathematicians call **relations**, and
 let people ask *any* question later, in a logical language, without
 knowing or caring how the data is physically stored.
@@ -89,7 +89,7 @@ could actually work. Two researchers on the project, **Donald
 Chamberlin** and **Raymond Boyce**, designed a query language for
 it that ordinary people, not just programmers, might read and
 write. They called it **SEQUEL**: *Structured English Query
-Language*.
+Language*.[^sequel]
 
 <Figure
   slug="sql-why-sql-exists-sequel-trademark-race-ibm-inline-cutout"
@@ -339,3 +339,17 @@ A shared standard means your SQL knowledge carries over from one relational data
 
 PostgreSQL is the relational database management system this course uses to store data and run SQL.`}
 />
+
+[^codd70]:
+    E. F. Codd,
+    ["A Relational Model of Data for Large Shared Data Banks"](https://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf),
+    *Communications of the ACM* 13(6), June 1970. Fourteen pages, and
+    the ancestor of every query you will write in this course.
+
+[^sequel]:
+    Donald D. Chamberlin and Raymond F. Boyce, "SEQUEL: A Structured
+    English Query Language", ACM SIGFIDET Workshop, 1974. The team's
+    own retrospective,
+    ["A History and Evaluation of System R"](https://people.eecs.berkeley.edu/~brewer/cs262/SystemR.pdf)
+    (*Communications of the ACM* 24(10), 1981), is the paper Ellison's
+    company could read, because IBM published it.

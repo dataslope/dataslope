@@ -139,11 +139,11 @@ function call is a *miniature lifecycle* on the stack.
 ```mermaid
 sequenceDiagram
     participant M as main
-    participant A as add_then_triple
+    participant A as <code>add_then_triple</code>
     participant T as triple
-    M->>A: call(a=4, b=5)
+    M->>A: <code>call(a=4, b=5)</code>
     activate A
-    A->>T: call(n=9)
+    A->>T: <code>call(n=9)</code>
     activate T
     T-->>A: return 27
     deactivate T

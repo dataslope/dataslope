@@ -229,7 +229,7 @@ pipeline above:
 
 ```mermaid
 flowchart TD
-    O1["Order(Widget, 9.99, 3)"] --> W1{"Where: <code>Product == 'Widget'</code>"}
+    O1["<code>Order(Widget, 9.99, 3)</code>"] --> W1{"Where: <code>Product == 'Widget'</code>"}
     W1 -->|"pass"| W2{"Where: <code>Quantity &gt; 0</code>"}
     W2 -->|"pass"| S["Select: new <code>{ Price=9.99, Total=29.97 }</code>"]
     S --> R[Output]

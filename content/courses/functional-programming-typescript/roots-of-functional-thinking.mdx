@@ -21,8 +21,8 @@ This chapter is the cliff-notes version of that history.
 ## Lambda calculus: the math underneath
 
 In 1936, the logician **Alonzo Church** introduced the **lambda
-calculus**: a tiny formal system in which the only things that exist
-are *functions* and *applications of functions*.
+calculus**:[^church] a tiny formal system in which the only things
+that exist are *functions* and *applications of functions*.
 
 <Figure
   slug="fp-roots-lambda-calculus-cutout"
@@ -84,8 +84,8 @@ seriously.
 
 ## Lisp: functions become a programming language (1958)
 
-In 1958, **John McCarthy** designed **Lisp** at MIT. Lisp took the
-lambda calculus and turned it into a programmable language. Lists
+In 1958, **John McCarthy** designed **Lisp** at MIT.[^mccarthy] Lisp
+took the lambda calculus and turned it into a programmable language. Lists
 were the universal data structure. Code was data (you could pass
 functions around, build them at runtime, and even evaluate strings as
 programs). Recursion replaced loops.
@@ -121,7 +121,7 @@ but it became *usable* with Lisp.
 
 In 1973, **Robin Milner** designed **ML** to write proofs about
 programs. ML introduced the world to **Hindley–Milner type
-inference**, the idea that a compiler can figure out the types of
+inference**,[^milner] the idea that a compiler can figure out the types of
 your program *automatically*, even without annotations, and reject
 any program that doesn't type-check.
 
@@ -156,9 +156,10 @@ console.log(unwrapOr(none<number>(), 0));
   ]}
 />
 
-In 1990, **Haskell** went further. It is a pure, lazy, statically
-typed functional language. *Pure* means it has no side effects in
-the language itself, every function returns a value and that's it.
+In 1990, **Haskell** went further.[^haskell] It is a pure, lazy,
+statically typed functional language. *Pure* means it has no side
+effects in the language itself, every function returns a value and
+that's it.
 Effects (I/O, randomness, mutation) are modeled as *data* and
 sequenced by a special abstraction called a `Monad`. We will explore
 this idea, gently, much later.
@@ -370,3 +371,32 @@ third is the style we will spend the rest of the course mastering.
 
 The lambda calculus is the conceptual root of functional programming: it shows that "function as a value" is sufficient on its own to express all computation.`}
 />
+
+[^church]:
+    Alonzo Church, "An Unsolvable Problem of Elementary Number
+    Theory", *American Journal of Mathematics* 58(2), 1936. The lambda
+    calculus is introduced here as machinery for a proof about
+    decidability, not as a programming idea; the programming came
+    twenty years later.
+
+[^mccarthy]:
+    John McCarthy,
+    ["Recursive Functions of Symbolic Expressions and Their
+    Computation by Machine, Part I"](http://www-formal.stanford.edu/jmc/recursive.pdf),
+    *Communications of the ACM* 3(4), 1960. The language dates from
+    1958; this is the paper that describes it, and the `eval` in
+    section 4 is the one a student later hand-compiled into the first
+    Lisp interpreter.
+
+[^milner]:
+    Robin Milner,
+    ["A Theory of Type Polymorphism in Programming"](https://homepages.inf.ed.ac.uk/wadler/papers/papers-we-love/milner-type-polymorphism.pdf),
+    *Journal of Computer and System Sciences* 17(3), 1978. ML grew out
+    of Edinburgh's LCF proof assistant in the early 1970s; the
+    inference algorithm was written down formally in this paper.
+
+[^haskell]:
+    Paul Hudak, John Hughes, Simon Peyton Jones and Philip Wadler,
+    [*A History of Haskell: Being Lazy With Class*](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/07/history.pdf)
+    (HOPL III, 2007), by four of the people in the room. The committee
+    convened in 1987 and the first report is dated 1990.

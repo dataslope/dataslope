@@ -48,9 +48,9 @@ single-table dimensions:
 
 ```mermaid
 flowchart TB
-  d["dim_date"] --> f["fact_orders"]
-  p["dim_product"] --> f
-  c["dim_customer"] --> f
+  d["<code>dim_date</code>"] --> f["<code>fact_orders</code>"]
+  p["<code>dim_product</code>"] --> f
+  c["<code>dim_customer</code>"] --> f
 ```
 
 The query below is a textbook star-schema read: the central `fact_orders`

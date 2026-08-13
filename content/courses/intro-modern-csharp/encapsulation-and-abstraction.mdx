@@ -145,7 +145,7 @@ owns its rules.
 
 ```mermaid
 flowchart TD
-    Out["outside code"] -->|"Deposit(50)"| API["public methods<br/>(Deposit / Withdraw)"]
+    Out["outside code"] -->|"<code>Deposit(50)</code>"| API["public methods<br/>(Deposit / Withdraw)"]
     API --> State["private state<br/>(Balance)"]
     Out -. "cannot reach" .-> State
 ```

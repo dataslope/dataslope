@@ -28,8 +28,8 @@ Mastering file I/O means you can build scripts that process data, integrate with
 flowchart TD
     A[Call open] --> B[File object created]
     B --> C{Read or Write?}
-    C -->|Read| D[f.read / f.readline / iterate]
-    C -->|Write| E[f.write / print to file]
+    C -->|Read| D["<code>f.read</code> / <code>f.readline</code> / iterate"]
+    C -->|Write| E["<code>f.write</code> / print to file"]
     D --> F[Close file]
     E --> F
     F --> G[Done]

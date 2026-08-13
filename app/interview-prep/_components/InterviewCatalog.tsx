@@ -207,9 +207,18 @@ function TrackRow({ track }: { track: InterviewTrack }) {
             subject areas, which is the sense this glyph already carries
             elsewhere in the app (the playgrounds use it for a stack of
             schemas). On its own line above the link, so the row reads as
-            "what's in it", then "go". */}
-        <span className="mt-2 flex items-center gap-1.5 text-[16px] leading-[1.7] text-[var(--ds-gray-400)] transition-colors group-hover:text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-500)] dark:group-hover:text-[var(--ds-gray-400)]">
-          <Layers size={15} aria-hidden="true" />
+            "what's in it", then "go".
+
+            The glyph carries its own green rather than inheriting the line's
+            grey, so the count reads as a labelled quantity instead of one
+            undifferentiated grey run; it steps a notch on hover in the
+            direction that gains contrast against each appearance mode. */}
+        <span className="mt-2 flex items-center gap-1.5 text-[14px] leading-[1.7] text-[var(--ds-gray-400)] transition-colors group-hover:text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-500)] dark:group-hover:text-[var(--ds-gray-400)]">
+          <Layers
+            size={14}
+            aria-hidden="true"
+            className="text-[var(--ds-green-500)] transition-colors group-hover:text-[var(--ds-green-600)] dark:group-hover:text-[var(--ds-green-400)]"
+          />
           {track.topics.length} topics
         </span>
 
