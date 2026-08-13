@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useEffect, useRef, useState, type ReactNode } from "react";
-import { Database, Code2, Table2 } from "lucide-react";
+import {
+  Database,
+  Code2,
+  Table2,
+  Copy,
+  DatabasePlus,
+  RotateCw,
+} from "lucide-react";
 import "../../playground.css";
 import "../../sqlPlayground.css";
 import { SqlPlaygroundSwitcher } from "./SqlPlaygroundSwitcher";
@@ -368,6 +375,7 @@ export function SqlPlaygroundShell({
                     onClick={onOpenCopy}
                     disabled={copyBusy}
                   >
+                    <Copy size={15} aria-hidden="true" />
                     {copyBusy ? "Copying…" : "Open a copy"}
                   </button>
                 )}
@@ -378,6 +386,8 @@ export function SqlPlaygroundShell({
                     onClick={onOpenNewWorkspace}
                     disabled={copyBusy}
                   >
+                    {/* The same icon the header's new-workspace control uses. */}
+                    <DatabasePlus size={15} aria-hidden="true" />
                     Open a new workspace
                   </button>
                 )}
@@ -387,6 +397,7 @@ export function SqlPlaygroundShell({
                   onClick={() => window.location.reload()}
                   disabled={copyBusy}
                 >
+                  <RotateCw size={15} aria-hidden="true" />
                   Try again
                 </button>
               </div>

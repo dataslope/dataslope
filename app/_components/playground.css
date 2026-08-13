@@ -2500,6 +2500,11 @@ input[type="range"].fs-slider:disabled {
   font-size: 15px;
   color: var(--text-muted, #9aa4b2);
   line-height: 1.6;
+  /* Slightly tighter than the playground's `normal`, which `.playground-root`
+     sets so monospace surfaces keep their natural spacing. This is UI prose in
+     the sans face, where that reset leaves it looser than the rest of the site
+     (globals.css runs body text at -0.011em). */
+  letter-spacing: -0.01em;
 }
 /* Workspace-conflict overlay, reuses the boot-overlay chrome but offers
    actions instead of a progress bar (shown when the workspace is already
@@ -2512,6 +2517,9 @@ input[type="range"].fs-slider:disabled {
   margin-top: 8px;
 }
 .playground-conflict-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 500;
@@ -2527,6 +2535,11 @@ input[type="range"].fs-slider:disabled {
 }
 .playground-conflict-btn:hover {
   background: var(--bg3);
+}
+/* The icon rides at the label's weight rather than competing with it. */
+.playground-conflict-btn svg {
+  flex: none;
+  opacity: 0.85;
 }
 .playground-conflict-btn-primary {
   background: var(--primary);
