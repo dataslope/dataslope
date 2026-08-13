@@ -4120,7 +4120,12 @@ html[data-playground-theme="dark"] .welcome h3 {
 }
 
 .playground-tab-close:hover {
-  background: var(--border);
+  /* A tint rather than the solid --border chip this used to be: at 16px the
+     border color read as a filled button sitting inside the tab. Close to
+     --menu-item-hover (6%), a little stronger because this is a small target
+     that has to show it is hoverable, where a menu row has its whole width to
+     do that. Most of the feedback is the ✕ itself darkening to --text. */
+  background: color-mix(in srgb, var(--text) 10%, transparent);
   color: var(--text);
 }
 
