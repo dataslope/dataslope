@@ -181,7 +181,9 @@ before and/or after the call. It is syntactic sugar for
     { text: "@timer", label: "the decorator, applied last-in first-out" },
     { text: "def slow(n):", label: "the function it replaces" },
   ]}
-/> A correct decorator preserves the wrapped
+/>
+
+A correct decorator preserves the wrapped
 function's metadata using `functools.wraps`. The `timer` decorator below
 wraps `fn`, records the elapsed time around the call, and returns the
 original result unchanged.

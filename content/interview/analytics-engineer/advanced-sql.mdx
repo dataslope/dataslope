@@ -124,7 +124,9 @@ you reference later in the same statement.
     { text: "AS (SELECT ... )", label: "the query it stands for" },
     { text: "SELECT * FROM recent", label: "referenced like a table" },
   ]}
-/> Prefer CTEs when logic is reused,
+/>
+
+Prefer CTEs when logic is reused,
 deeply nested, or benefits from being read top-to-bottom as named steps. A
 scalar or one-off filter is often clearer as a plain subquery. CTEs improve
 readability; they do not guarantee materialization or a performance change.
