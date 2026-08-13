@@ -5165,20 +5165,25 @@ html[data-playground-theme="dark"] {
   flex: none;
 }
 /* The name, its rename pencil and the new-workspace button read as one
-   cluster, so they share a wrapper with its own tight gap: sitting
-   directly in the header they'd be spread apart by its 12px
-   inter-control gap, which put the new-workspace button closer to the
-   Save group than to the name it belongs to. */
+   cluster, so they share a wrapper: sitting directly in the header they'd
+   be spread apart by its 12px inter-control gap, which put the
+   new-workspace button closer to the Save group than to the name it
+   belongs to.
+
+   The two icon buttons butt up against each other (no gap) so they read
+   as one pair of actions on the name; their 20px boxes already hold the
+   glyphs apart. The gap that does exist sits between the name and the
+   pencil, in `.ph-name-wrap` below. */
 .ph-name-group {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0;
   min-width: 0;
 }
 .ph-name-wrap {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 .ph-name {
