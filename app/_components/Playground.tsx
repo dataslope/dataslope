@@ -114,10 +114,6 @@ import {
   PlaygroundBootOverlay,
   useBootOverlayVisibility,
 } from "./PlaygroundBootOverlay";
-import {
-  hasRuntimeBootedBefore,
-  markRuntimeBooted,
-} from "./runtime/bootHistory";
 import { TabBar } from "./tabs/TabBar";
 import type { TabContextMenuItem, TabDescriptor } from "./tabs/tabTypes";
 import {
@@ -703,16 +699,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     "Initializing runtime…",
   );
   const [loaded, setLoaded] = useState(false);
-  // First-ever cold boot vs warm revisit. The WASM payload is served from
-  // the browser's HTTP cache after the first boot, so only a genuine
-  // first-ever boot in this browser shows the "Downloading … this happens
-  // once" reassurance, later visits just show the status line + bar.
-  const [isColdBoot] = useState(
-    () => adapter.coldDownloadMB != null && !hasRuntimeBootedBefore(adapter.id),
-  );
-  useEffect(() => {
-    if (loaded) markRuntimeBooted(adapter.id);
-  }, [loaded, adapter.id]);
   // Latest stage-floor fraction reported by the adapter's boot (null
   // until one arrives); smoothed below to drive a determinate loading
   // bar instead of the indeterminate sweep.
@@ -3884,9 +3870,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               ? loadingMessage
               : loadingMessage || LOADING_QUIPS[quipIndex]
           }
-          cold={isColdBoot}
-          downloadMB={adapter.coldDownloadMB}
-          compiled={adapter.compiled}
           fraction={bootDisplayFraction}
           error={statusState === "error"}
           className={loadingFading ? "hidden" : ""}

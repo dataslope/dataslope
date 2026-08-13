@@ -4883,7 +4883,7 @@ function PostgresPlaygroundInner() {
               )}
               <div className="sql-tree">
               <SchemaSection
-                label="TABLES"
+                label="Tables"
                 count={tables.length}
                 expanded={tablesExpanded}
                 onToggle={() => setTablesExpanded((v) => !v)}
@@ -4926,7 +4926,7 @@ function PostgresPlaygroundInner() {
                 ))}
               </SchemaSection>
               <SchemaSection
-                label="VIEWS"
+                label="Views"
                 count={views.length}
                 expanded={viewsExpanded}
                 onToggle={() => setViewsExpanded((v) => !v)}
@@ -4979,7 +4979,7 @@ function PostgresPlaygroundInner() {
                 ))}
               </SchemaSection>
               <SchemaSection
-                label="INDEXES"
+                label="Indexes"
                 count={indexes.length}
                 expanded={indexesExpanded}
                 onToggle={() => setIndexesExpanded((v) => !v)}
@@ -4998,7 +4998,7 @@ function PostgresPlaygroundInner() {
                 ))}
               </SchemaSection>
               <SchemaSection
-                label="TRIGGERS"
+                label="Triggers"
                 count={triggers.length}
                 expanded={triggersExpanded}
                 onToggle={() => setTriggersExpanded((v) => !v)}

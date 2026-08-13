@@ -3,10 +3,14 @@
 // Full-screen boot overlay shared by every playground (the language
 // playgrounds via <Playground>, the SQL playgrounds via
 // <SqlPlaygroundShell>). It mirrors the <RuntimeBootNotice> used by the
-// embedded code blocks / challenge cards, the brand "assemble + quarter
-// turn" diamond, a status line, a first-run download hint, and a
-// determinate progress bar, so a multi-second cold start reads the same
-// everywhere. Styling lives in playground.css (`.playground-boot-*`).
+// embedded code blocks / challenge cards: the brand "assemble + quarter
+// turn" diamond, a status line and a determinate progress bar, so a
+// multi-second cold start reads the same everywhere. Deliberately just
+// those three — a cold boot used to add "this can take a moment" /
+// "downloading … happens once" lines under the status, which made the
+// loading screen read differently depending on the runtime and on whether
+// it had booted here before. Styling lives in playground.css
+// (`.playground-boot-*`).
 
 import { useEffect, useState, type ReactNode } from "react";
 import { DiamondAssembleTurnLoader } from "./mdx/loadingAnimations";
@@ -91,14 +95,6 @@ export interface PlaygroundBootOverlayProps {
   title: string;
   /** Current stage line (the playground's loading caption). */
   statusMessage: ReactNode;
-  /** Show the "downloads once" reassurance + size hint (first cold boot). */
-  cold?: boolean;
-  /** Approximate cold download size in MB. */
-  downloadMB?: number;
-  /** Compiled languages (Java, C, C++, C#). No longer changes the boot
-   *  copy, every runtime now reads "much faster", but kept so existing
-   *  call sites still type-check. */
-  compiled?: boolean;
   /** Smoothed boot fraction in 0..1, or null for no bar. */
   fraction?: number | null;
   /** Render the error state (red, no spinner/bar, just the message). */
@@ -109,8 +105,6 @@ export interface PlaygroundBootOverlayProps {
 
 export function PlaygroundBootOverlay({
   statusMessage,
-  cold = false,
-  downloadMB,
   fraction = null,
   error = false,
   className,
@@ -138,17 +132,6 @@ export function PlaygroundBootOverlay({
           <span className="playground-boot-title">
             <BootTitle message={statusMessage} />
           </span>
-          {!error && cold && (
-            <div className="playground-boot-hints">
-              <span className="playground-boot-hint">
-                This can take a moment on first load
-              </span>
-              <span className="playground-boot-hint playground-boot-hint-sub">
-                {downloadMB ? `Downloading (~${downloadMB} MB), ` : ""}This
-                happens once. Later runs are much faster.
-              </span>
-            </div>
-          )}
           {!error && pct != null && (
             <div className="playground-boot-progress">
               <div

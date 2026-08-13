@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  createContext,
   memo,
+  useContext,
   useState,
   useCallback,
   useEffect,
@@ -276,6 +278,146 @@ function DataTypeIcon({ type }: { type: string }) {
   if (t.includes("DATE")) return <Calendar size={10} aria-hidden="true" />;
   if (t.includes("TIME")) return <Clock size={10} aria-hidden="true" />;
   return null;
+}
+
+// ─── Result grid column header ───────────────────────────────────────────
+// The header is one big hover trigger for the "Click to sort…" tip, and the
+// PK/FK markers inside it are hover triggers of their own — so pointing at a
+// key icon used to pop both tips, overlapping each other. The marker tells
+// the header it's being hovered and the header keeps its own tip shut for as
+// long as that's true, so only the key tip shows.
+
+/** Set by `ColumnHeaderButton` for the key markers nested inside it. */
+const SuppressSortTipContext = createContext<
+  ((hovered: boolean) => void) | null
+>(null);
+
+/** Minimal shape of the react-icons components used as key markers. */
+type KeyIconComponent = React.ComponentType<{
+  size?: number;
+  className?: string;
+  "aria-label"?: string;
+  "aria-hidden"?: boolean;
+}>;
+
+/** A PK/FK marker in a column header: the icon plus its own hover tip. */
+function ColumnKeyTip({
+  icon: Icon,
+  iconClassName,
+  ariaLabel,
+  label,
+  popupIconSize = 11,
+}: {
+  icon: KeyIconComponent;
+  iconClassName: string;
+  /** Description for assistive tech (the FK one names the target column). */
+  ariaLabel: string;
+  /** Tip text. */
+  label: string;
+  popupIconSize?: number;
+}) {
+  const suppressSortTip = useContext(SuppressSortTipContext);
+  return (
+    <span
+      className="sql-result-th-key"
+      onPointerEnter={() => suppressSortTip?.(true)}
+      onPointerLeave={() => suppressSortTip?.(false)}
+    >
+      <Popover.Root>
+        <Popover.Trigger
+          openOnHover
+          delay={150}
+          closeDelay={100}
+          nativeButton={false}
+          render={(triggerProps) => (
+            <span {...triggerProps} className="sql-result-th-key-trigger">
+              <Icon size={12} className={iconClassName} aria-label={ariaLabel} />
+            </span>
+          )}
+        />
+        <Popover.Portal>
+          <Popover.Positioner
+            sideOffset={6}
+            side="top"
+            className="sql-key-icon-popover-positioner"
+          >
+            <Popover.Popup className="bui-popup sql-key-icon-popover">
+              <Icon
+                size={popupIconSize}
+                className="sql-key-icon-popover-icon"
+                aria-hidden={true}
+              />
+              <span>{label}</span>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>
+    </span>
+  );
+}
+
+/** The clickable column header and its "Click to sort…" hover tip. */
+function ColumnHeaderButton({
+  sortTitle,
+  onClick,
+  children,
+}: {
+  sortTitle: string;
+  onClick: ((event: unknown) => void) | undefined;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  // A ref, not state: this gates the *next* open request rather than being
+  // rendered, and the marker below sets it during a pointer event that must
+  // not wait for a re-render to take effect.
+  const keyHovered = useRef(false);
+  const setKeyHovered = useCallback((hovered: boolean) => {
+    keyHovered.current = hovered;
+    // Pointing at a marker while the sort tip is already up hides it.
+    if (hovered) setOpen(false);
+  }, []);
+
+  return (
+    <SuppressSortTipContext.Provider value={setKeyHovered}>
+      <Popover.Root
+        open={open}
+        // Requests to *open* are dropped while a marker is hovered; requests
+        // to close always go through, so the tip can't be left stuck open.
+        onOpenChange={(next) => {
+          if (next && keyHovered.current) return;
+          setOpen(next);
+        }}
+      >
+        <Popover.Trigger
+          openOnHover
+          delay={150}
+          closeDelay={100}
+          render={(triggerProps) => (
+            <button
+              {...triggerProps}
+              type="button"
+              className="sql-result-th-btn"
+              onClick={onClick}
+              aria-label={sortTitle}
+            >
+              {children}
+            </button>
+          )}
+        />
+        <Popover.Portal>
+          <Popover.Positioner
+            sideOffset={6}
+            side="top"
+            className="sql-result-th-btn-positioner"
+          >
+            <Popover.Popup className="bui-popup sql-result-th-btn-popover">
+              {sortTitle}
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>
+    </SuppressSortTipContext.Provider>
+  );
 }
 
 const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
@@ -2533,143 +2675,59 @@ export function ResultTableBody({
                   : null;
 
               const headerContent = (
-                <Popover.Root>
-                  <Popover.Trigger
-                    openOnHover
-                    delay={150}
-                    closeDelay={100}
-                    render={(triggerProps) => (
-                      <button
-                        {...triggerProps}
-                        type="button"
-                        className="sql-result-th-btn"
-                        onClick={column.getToggleSortingHandler()}
-                        aria-label={sortTitle}
-                      >
-                        <span className="sql-result-th-top">
-                          <span className="sql-result-th-label">
-                            {isPk && (
-                              <Popover.Root>
-                                <Popover.Trigger
-                                  openOnHover
-                                  delay={150}
-                                  closeDelay={100}
-                                  nativeButton={false}
-                                  render={(triggerProps) => (
-                                    <span
-                                      {...triggerProps}
-                                      className="sql-result-th-key-trigger"
-                                    >
-                                      <MdOutlineKey
-                                        size={12}
-                                        className="sql-result-th-pk"
-                                        aria-label="Primary key"
-                                      />
-                                    </span>
-                                  )}
-                                />
-                                <Popover.Portal>
-                                  <Popover.Positioner
-                                    sideOffset={6}
-                                    side="top"
-                                    className="sql-key-icon-popover-positioner"
-                                  >
-                                    <Popover.Popup className="bui-popup sql-key-icon-popover">
-                                      <MdOutlineKey
-                                        size={11}
-                                        className="sql-key-icon-popover-icon"
-                                        aria-hidden="true"
-                                      />
-                                      <span>Primary key</span>
-                                    </Popover.Popup>
-                                  </Popover.Positioner>
-                                </Popover.Portal>
-                              </Popover.Root>
-                            )}
-                            {fk && (
-                              <Popover.Root>
-                                <Popover.Trigger
-                                  openOnHover
-                                  delay={150}
-                                  closeDelay={100}
-                                  nativeButton={false}
-                                  render={(triggerProps) => (
-                                    <span
-                                      {...triggerProps}
-                                      className="sql-result-th-key-trigger"
-                                    >
-                                      <IoLink
-                                        size={12}
-                                        className="sql-result-th-fk"
-                                        aria-label={`Foreign key → ${fk.table}.${fk.to}`}
-                                      />
-                                    </span>
-                                  )}
-                                />
-                                <Popover.Portal>
-                                  <Popover.Positioner
-                                    sideOffset={6}
-                                    side="top"
-                                    className="sql-key-icon-popover-positioner"
-                                  >
-                                    <Popover.Popup className="bui-popup sql-key-icon-popover">
-                                      <IoLink
-                                        size={12}
-                                        className="sql-key-icon-popover-icon"
-                                        aria-hidden="true"
-                                      />
-                                      <span>Foreign key</span>
-                                    </Popover.Popup>
-                                  </Popover.Positioner>
-                                </Popover.Portal>
-                              </Popover.Root>
-                            )}
-                            <span className="sql-result-th-name">
-                              {displayName}
-                            </span>
-                            {isReadOnly && (
-                              <span
-                                className="sql-result-th-readonly"
-                                title="Read-only, generated column"
-                              >
-                                <Lock size={10} aria-label="Read-only column" />
-                              </span>
-                            )}
-                          </span>
-                          <span
-                            className={
-                              sorted
-                                ? "sql-result-th-chevron sql-result-th-chevron-active"
-                                : "sql-result-th-chevron"
-                            }
-                            aria-hidden="true"
-                          >
-                            {sorted === "asc" ? (
-                              <ChevronUp size={11} />
-                            ) : (
-                              <ChevronDown size={11} />
-                            )}
-                          </span>
+                <ColumnHeaderButton
+                  sortTitle={sortTitle}
+                  onClick={column.getToggleSortingHandler()}
+                >
+                  <span className="sql-result-th-top">
+                    <span className="sql-result-th-label">
+                      {isPk && (
+                        <ColumnKeyTip
+                          icon={MdOutlineKey}
+                          iconClassName="sql-result-th-pk"
+                          ariaLabel="Primary key"
+                          label="Primary key"
+                        />
+                      )}
+                      {fk && (
+                        <ColumnKeyTip
+                          icon={IoLink}
+                          iconClassName="sql-result-th-fk"
+                          ariaLabel={`Foreign key → ${fk.table}.${fk.to}`}
+                          label="Foreign key"
+                          popupIconSize={12}
+                        />
+                      )}
+                      <span className="sql-result-th-name">{displayName}</span>
+                      {isReadOnly && (
+                        <span
+                          className="sql-result-th-readonly"
+                          title="Read-only, generated column"
+                        >
+                          <Lock size={10} aria-label="Read-only column" />
                         </span>
-                        <span className="sql-result-th-type">
-                          <DataTypeIcon type={colType} />
-                          {colType}
-                        </span>
-                      </button>
-                    )}
-                  />
-                  <Popover.Portal>
-                    <Popover.Positioner
-                      sideOffset={6}
-                      side="top"
-                      className="sql-result-th-btn-positioner"
+                      )}
+                    </span>
+                    <span
+                      className={
+                        sorted
+                          ? "sql-result-th-chevron sql-result-th-chevron-active"
+                          : "sql-result-th-chevron"
+                      }
+                      aria-hidden="true"
                     >
-                      <Popover.Popup className="bui-popup sql-result-th-btn-popover">
-                        {sortTitle}
-                      </Popover.Popup>
-                    </Popover.Positioner>
-                  </Popover.Portal>
-                </Popover.Root>
+                      {sorted === "asc" ? (
+                        <ChevronUp size={11} />
+                      ) : (
+                        <ChevronDown size={11} />
+                      )}
+                    </span>
+                  </span>
+                  <span className="sql-result-th-type">
+                    <DataTypeIcon type={colType} />
+                    {colType}
+                  </span>
+                </ColumnHeaderButton>
               );
 
               return (

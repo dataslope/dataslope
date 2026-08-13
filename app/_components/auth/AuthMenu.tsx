@@ -27,7 +27,10 @@ const TRIGGER_CLASS =
  *  on dark. Split out so the header can tighten the box when it compacts
  *  without an `!important` fighting the padding baked into one string. */
 const SIGN_IN_BUTTON_BASE =
-  "inline-flex items-center gap-2 rounded-lg bg-[#121212] px-3 text-sm font-medium tracking-tight text-white transition-colors hover:bg-[#2a2a2a] dark:bg-white dark:text-[#121212] dark:hover:bg-[var(--ds-gray-200)]";
+  // `whitespace-nowrap`: in the header's tightest band the flex row would
+  // otherwise break "Sign in" across two lines rather than let the button keep
+  // its width.
+  "inline-flex items-center gap-2 whitespace-nowrap rounded-sm bg-[#121212] px-3 text-sm font-medium tracking-tight text-white transition-colors hover:bg-[#2a2a2a] dark:bg-white dark:text-[#121212] dark:hover:bg-[var(--ds-gray-200)]";
 
 /** The button at its normal size. Shared with the mobile drawer's sign-in row
  *  so the two match. */
@@ -87,13 +90,23 @@ export function AuthMenu({ compact }: { compact?: boolean } = {}) {
   // Signed out: a solid, subtly filled button linking to /sign-in.
   if (!session) {
     return (
+      // The md-to-lg band is where the header is tightest (see the wordmark
+      // and menu-size notes in HomeNav), so the button steps down with the
+      // menu beside it and back up from lg. The drawer's copy of this button
+      // renders below md, where these variants don't apply.
       <Link
         href="/sign-in"
-        className={`${SIGN_IN_BUTTON_BASE} transition-[padding] duration-200 ${
+        className={`${SIGN_IN_BUTTON_BASE} transition-[padding] duration-200 md:text-[13px] lg:text-sm ${
           compact ? "py-[5px]" : "py-1.5"
         }`}
       >
-        <LogIn size={14} aria-hidden="true" />
+        {/* Sized in CSS rather than by the `size` prop so it can follow the
+            label; the attribute below is the base the variants override. */}
+        <LogIn
+          size={14}
+          aria-hidden="true"
+          className="md:size-[13px] lg:size-[14px]"
+        />
         Sign in
       </Link>
     );

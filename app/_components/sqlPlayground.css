@@ -265,13 +265,14 @@
   flex-direction: column;
 }
 
+/* Sentence case with normal tracking: the section names are written out in
+   full ("Tables (4)"), so the small-caps treatment was working against the
+   thing it labelled. */
 .sql-tree-label {
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.08em;
   color: var(--text-dim);
   padding: 4px 12px;
-  text-transform: uppercase;
 }
 
 .sql-tree-entity {
@@ -550,6 +551,17 @@
   display: inline-flex;
   align-items: center;
   cursor: default;
+}
+
+/* Hover-tracking wrapper around a result-table PK/FK marker: while the
+   pointer is inside it, the header's own "Click to sort…" tip stays shut so
+   the two don't stack on top of each other. */
+.sql-result-th-key {
+  display: inline-flex;
+  align-items: center;
+  /* Never squashed when a narrow column ellipsizes the name (the icons
+     themselves carried `flex-shrink: 0` before this wrapper existed). */
+  flex: none;
 }
 
 /* Context menu table/view name header */
@@ -961,6 +973,9 @@
   border-collapse: collapse;
   font-family: var(--font-ui);
   font-size: 13px;
+  /* Cell rule (see `tbody td` below). Mixed from --text so it retints with
+     the theme and stays a hair of contrast on any background. */
+  --sql-grid-line: color-mix(in srgb, var(--text) 6%, transparent);
 }
 
 .sql-result-table-sized {
@@ -989,7 +1004,7 @@
 }
 
 .sql-result-table tbody td {
-  padding: 5px 10px;
+  padding: 4px 8px;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
@@ -997,6 +1012,17 @@
   /* Containing block for the absolutely-positioned inline cell editor
      (.sql-cell-input), so editing never resizes the column/row. */
   position: relative;
+  /* Faint cell grid. Only right + bottom: the table's collapsed borders
+     then draw one line per boundary, and the first row doesn't stack a
+     second line under the header's own separator. */
+  border-right: 1px solid var(--sql-grid-line);
+  border-bottom: 1px solid var(--sql-grid-line);
+}
+
+/* Nothing sits to the right of the filler column, so its rule would just
+   paint a line down the pane's edge. */
+.sql-result-table td.sql-result-td-filler {
+  border-right: none;
 }
 
 /* Cap each column's *measured* contribution during the auto-layout pass
@@ -1057,8 +1083,11 @@
   background: color-mix(in srgb, var(--text) 2%, transparent);
 }
 
+/* A tint rather than the heavier --bg3 step, so hovering a row reads as a
+   light highlight instead of a band. It sits between the zebra stripe (2%)
+   and the selected-row fill (8%). */
 .sql-result-table tbody tr:hover td {
-  background: var(--bg3);
+  background: color-mix(in srgb, var(--text) 4%, transparent);
 }
 
 /* ─── Result row checkboxes & selection action bar ─── */
@@ -1070,11 +1099,16 @@
   vertical-align: middle;
 }
 
+/* Unchecked, the box is just an outline: a --bg2 fill was near-invisible
+   against the row it sits on (and against the zebra stripe), so the empty
+   state reads as a border on the row's own background instead. Checked, the
+   accent fill carries it and the outline would only muddy the edge. */
 .sql-result-row-checkbox {
   width: 14px;
   height: 14px;
   border-radius: 3px;
-  background: var(--bg2);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--text) 28%, transparent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1083,9 +1117,14 @@
   vertical-align: middle;
 }
 
+.sql-result-row-checkbox:hover {
+  border-color: color-mix(in srgb, var(--text) 45%, transparent);
+}
+
 .sql-result-row-checkbox[data-checked],
 .sql-result-row-checkbox[data-indeterminate] {
   background: var(--accent1);
+  border-color: transparent;
 }
 
 .sql-result-row-checkbox-ind {
@@ -1171,9 +1210,14 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  flex: 0 1 220px;
-  min-width: 120px;
-  max-width: 280px;
+  /* Sized for the placeholder plus a short term, not for the longest thing
+     anyone might filter on; the row count and the pager beside it are what
+     the footer's width is really for. The basis matches the cap, so the
+     field is 140px wherever the footer has the room and only the min-width
+     (a narrow pane, where flex-shrink takes over) moves it. */
+  flex: 0 1 140px;
+  min-width: 110px;
+  max-width: 140px;
   height: 22px;
   padding: 0 4px 0 6px;
   background: var(--bg3);
@@ -1257,11 +1301,11 @@
 }
 
 .sql-result-pager-page-input {
-  width: 3.2em;
+  width: 2.4em;
   padding: 2px 4px;
   text-align: center;
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text);
   background: var(--bg3);
   border: none;
@@ -1469,10 +1513,17 @@
   cursor: grabbing;
 }
 
-.playground-tab--kind-view-data .playground-tab-icon,
-.playground-tab--kind-er-diagram .playground-tab-icon,
-.playground-tab--kind-query-history .playground-tab-icon {
-  color: color-mix(in srgb, var(--primary) 70%, var(--text-dim));
+/* Icons track the tab's own state, dim while inactive and full-strength on
+   the active tab, exactly like the label beside them. The special tabs
+   (view data, ER diagram, query history) used to tint their icon toward
+   --primary regardless of state, which read as a second, competing kind of
+   "selected" in the strip. */
+.sql-tabbar .playground-tab .playground-tab-icon {
+  color: var(--text-dim);
+}
+
+.sql-tabbar .playground-tab.active .playground-tab-icon {
+  color: var(--text);
 }
 
 .playground-tab-name-positioner {
@@ -1569,24 +1620,28 @@
 }
 
 /* ─── Elapsed-time label shown next to "Rows X–Y of Z" ───
-   Sits inline inside .sql-result-pager-info so it reads as a
-   continuation of the row count, not a separate pill. */
+   Sits inline inside .sql-result-pager-info so it reads as a continuation of
+   the row count, not a separate pill. Plain inline, NOT inline-flex: an
+   inline-flex box takes its baseline from its first flex item, here the clock
+   icon, whose baseline is its bottom edge, which sat the whole group a notch
+   above the row count beside it. Inline keeps this text on the footer's own
+   baseline, and the icon is nudged to sit centred on it. */
 .sql-pager-elapsed {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
   margin-left: 8px;
   color: var(--text-dim);
   font-family: var(--font-ui);
   font-size: 11px;
-  line-height: 1;
   white-space: nowrap;
   pointer-events: none;
 }
 
 .sql-pager-elapsed svg {
   color: var(--text-dim);
-  flex-shrink: 0;
+  margin-right: 4px;
+  /* Centres the 11px clock on the 11px label beside it: an inline SVG's
+     baseline is its bottom edge, so it has to drop by half the gap between
+     the glyph box and the baseline. */
+  vertical-align: -1.5px;
 }
 
 .sql-pager-elapsed-err,
@@ -2881,7 +2936,7 @@
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 2px;
   background: transparent;
   border: none;
   padding: 0;
@@ -2944,10 +2999,10 @@
 
 /* Column data-type label rendered below the column name */
 .sql-result-th-type {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 400;
-  color: color-mix(in srgb, var(--text-dim) 85%, var(--text));
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-dim);
   text-transform: lowercase;
   display: inline-flex;
   align-items: center;

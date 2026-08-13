@@ -2485,6 +2485,10 @@ input[type="range"].fs-slider:disabled {
   }
 }
 
+/* Explanatory line under a boot-overlay title. The loading screen itself is
+   just diamond + status + bar; this is what the workspace-conflict overlay
+   uses to explain itself, since it asks the user to choose rather than to
+   wait. */
 .playground-boot-hints {
   display: flex;
   flex-direction: column;
@@ -2496,10 +2500,6 @@ input[type="range"].fs-slider:disabled {
   font-size: 15px;
   color: var(--text-muted, #9aa4b2);
   line-height: 1.6;
-}
-.playground-boot-hint-sub {
-  font-size: 13px;
-  opacity: 0.85;
 }
 /* Workspace-conflict overlay, reuses the boot-overlay chrome but offers
    actions instead of a progress bar (shown when the workspace is already
@@ -4089,7 +4089,9 @@ html[data-playground-theme="dark"] .welcome h3 {
   color: var(--text);
   width: 28px;
   height: 28px;
-  margin: auto 4px -1px 4px;
+  /* No left margin: the strip's own 2px gap is enough to separate it, and a
+     wider gap made the button read as detached from the tabs it adds to. */
+  margin: auto 4px -1px 0;
   border-radius: 6px 6px 0 0;
   cursor: pointer;
   flex-shrink: 0;
@@ -4097,6 +4099,33 @@ html[data-playground-theme="dark"] .welcome h3 {
 
 .playground-tab-add:hover {
   background: color-mix(in srgb, var(--bg) 90%, transparent);
+}
+
+/* A plus is symmetric under a quarter turn, so the rotation reads purely as
+   motion: the glyph spins on hover and lands exactly where it started. */
+.playground-tab-add svg {
+  transition: transform 200ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.playground-tab-add:hover svg {
+  transform: rotate(90deg);
+}
+
+/* Optical compensation, not a different icon: the glyph is one SVG at one
+   stroke width, but dark-on-light ink reads heavier than light-on-dark, so
+   the plus looked chunky in light mode and right in dark. Light mode takes
+   the stroke down a notch to land in the same place. */
+html[data-playground-theme="light"] .playground-tab-add svg {
+  stroke-width: 2.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playground-tab-add svg {
+    transition: none;
+  }
+  .playground-tab-add:hover svg {
+    transform: none;
+  }
 }
 
 /* ───────────────────────────────────────────────────────────────────────
@@ -5195,7 +5224,11 @@ html[data-playground-theme="dark"] {
   text-overflow: ellipsis;
   max-width: 220px;
 }
-.ph-rename-btn {
+/* The small ghost icon buttons docked after the workspace name: rename
+   (pencil) and new workspace. Named for the group they belong to, since they
+   share nothing but their shape, and calling the new-workspace button
+   `.ph-rename-btn` read as a second rename control. */
+.ph-name-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -5204,7 +5237,7 @@ html[data-playground-theme="dark"] {
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: var(--text-dim);
+  color: var(--text);
   cursor: pointer;
   padding: 0;
 }
@@ -5228,8 +5261,7 @@ html[data-playground-theme="dark"] {
 .ph-new-ws-form .confirm-actions {
   margin-top: 14px;
 }
-.ph-rename-btn:hover {
-  color: var(--text);
+.ph-name-action:hover {
   background: var(--menu-item-hover);
 }
 .ph-rename-input {
@@ -5292,11 +5324,25 @@ html[data-playground-theme="dark"] {
   gap: 5px;
   padding: 4px 4px 4px 8px;
 }
-.ph-save-main.ph-saved {
-  cursor: default;
+/* The "Saved" state has no action of its own, so the whole control — cloud,
+   label and chevron — is one menu trigger with one hover/click region,
+   matching Share beside it. (The "Save" state stays a split button: its left
+   half saves, so only `.ph-save-chev` opens the menu.) */
+.ph-save-trigger {
+  gap: 5px;
+  padding: 4px 6px 4px 8px;
 }
-.ph-save-main.ph-saved:hover {
-  background: transparent;
+.ph-save-trigger[data-popup-open] {
+  background: var(--menu-item-hover);
+}
+.ph-save-trigger-chev {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-dim);
+}
+.ph-save-trigger:hover .ph-save-trigger-chev,
+.ph-save-trigger[data-popup-open] .ph-save-trigger-chev {
+  color: var(--text);
 }
 .ph-saved-cloud {
   position: relative;
@@ -5419,9 +5465,15 @@ html[data-playground-theme="dark"] {
   padding: 0;
   overflow: hidden;
 }
+/* Scroll only when the menu genuinely runs out of room. Base UI publishes the
+   space between the trigger and the viewport edge on the positioner as
+   --available-height; a flat 360px cap was putting a scrollbar on menus with
+   several hundred pixels to spare. The subtraction leaves the popup's border
+   and a little air at the bottom; the fallback keeps the old cap if the
+   variable is ever missing. */
 .ph-more-root {
   padding: 6px;
-  max-height: 360px;
+  max-height: calc(var(--available-height, 372px) - 12px);
   overflow-y: auto;
 }
 .ph-more-sep {
@@ -5507,10 +5559,11 @@ html[data-playground-theme="dark"] {
   color: var(--text-dim);
 }
 .ph-more-panel-body {
-  /* 280px cut the Runtime info notes mid-sentence once the panel moved to
-     13px text (the longest, the web adapter's, needs ~370px). It still
-     scrolls for the genuinely long panels like Examples. */
-  max-height: 380px;
+  /* Same available-height budget as the root list, less the sticky back
+     header above it, so a sub-panel only scrolls once it truly runs out of
+     room. (The old flat 380px was itself a fix for a 280px cap that cut the
+     Runtime info notes mid-sentence.) */
+  max-height: calc(var(--available-height, 428px) - 48px);
   overflow-y: auto;
 }
 /* Sub-panel list rows reuse the examples-dropdown metrics from the mock:

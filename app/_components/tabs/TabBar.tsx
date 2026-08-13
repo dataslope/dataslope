@@ -113,7 +113,9 @@ export function TabBar({
           onClick={onAddTab}
           aria-label="New tab"
         >
-          <Plus size={12} aria-hidden="true" />
+          {/* Heavier than the lucide default so a 12px glyph still reads as
+              a control rather than a hairline. */}
+          <Plus size={12} strokeWidth={2.75} aria-hidden="true" />
         </button>
       )}
     </div>
