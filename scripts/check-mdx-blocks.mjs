@@ -132,6 +132,33 @@ for (const file of files) {
   }
 }
 
+// A fence with no language is not highlighted, and nothing says so: it renders
+// as a code block in the right font at the right size, just grey. Four Java
+// snippets in the generics course shipped that way. `text` is always an
+// available answer, so there is no case where leaving it off is what the author
+// meant. Fences carrying meta (```csharp title="x") are openers too, and a
+// closing fence is backticks alone, which is what separates them.
+for (const file of files) {
+  const lines = readFileSync(file, "utf8").split("\n");
+  let open = null;
+  lines.forEach((line, i) => {
+    const close = line.match(/^\s{0,3}(`{3,})\s*$/);
+    const mark = line.match(/^\s{0,3}(`{3,})[ \t]*([^\s`]*)/);
+    if (open) {
+      if (close && close[1].length >= open.ticks) open = null;
+      return;
+    }
+    if (!mark) return;
+    open = { ticks: mark[1].length };
+    if (!mark[2]) {
+      problems.push(
+        `${relative(ROOT, file)}:${i + 1}: fenced block has no language, so it ` +
+          `renders unhighlighted (use \`text\` if it is not code)`,
+      );
+    }
+  });
+}
+
 // The authoritative pass: does the file parse as MDX at all? `remarkMath` is
 // here because `source.config.ts` has it and `$…$` would otherwise be read as
 // ordinary text; `remarkGfm` because tables are, and a table row is where one
@@ -166,5 +193,6 @@ if (problems.length > 0) {
 
 console.log(
   `✓ ${files.length} MDX file(s): component tags all at the top level, ` +
-    `attribute values all closed, every file parses as MDX`,
+    `attribute values all closed, every fence declares a language, ` +
+    `every file parses as MDX`,
 );

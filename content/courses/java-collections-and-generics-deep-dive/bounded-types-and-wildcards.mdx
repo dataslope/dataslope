@@ -46,7 +46,7 @@ classDiagram
 Imagine the rule were the other way, that `List<Dog>` *was* a
 `List<Animal>`. Then this code would compile and crash:
 
-```
+```java
 List<Dog> dogs = new ArrayList<>();
 List<Animal> animals = dogs;     // pretend this were legal
 animals.add(new Cat());          // adding a Cat to a List<Dog>!
@@ -242,7 +242,7 @@ Bloch:
 
 The classic illustration is `Collections.copy(dest, src)`:
 
-```
+```java
 public static <T> void copy(List<? super T> dest, List<? extends T> src)
 ```
 
@@ -271,7 +271,7 @@ point in the middle.
 `Collections.max()` is a real-world PECS exemplar. Its signature is
 roughly:
 
-```
+```java
 public static <T extends Comparable<? super T>> T max(Collection<? extends T> coll)
 ```
 
@@ -365,7 +365,7 @@ Wildcards are for *method parameters*. They are almost never the
 right thing for *return types* or *fields*, because they push the
 "I don't know the type" problem onto every caller.
 
-```
+```java
 // Bad return type, caller has nothing useful to do with it
 public List<? extends Number> getNumbers() { ... }
 

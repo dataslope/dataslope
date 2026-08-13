@@ -172,6 +172,19 @@ flowchart LR
 
 ## `for`
 
+A classic `for` loop puts three separate jobs on one line, separated by
+semicolons:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "for (" },
+    { text: "int i = 0;", label: "runs once, before the loop" },
+    { text: "i < 5;", label: "checked before every pass" },
+    { text: "i++", label: "runs after every pass" },
+    { text: ")" },
+  ]}
+/>
+
 `for` is the workhorse of loops. It packages three things on one line:
 
 1. **Initialization**, runs once at the start.

@@ -119,7 +119,7 @@ source .venv/bin/activate
 
 Your prompt will change to show the active environment:
 
-```
+```text
 (.venv) user@host:~/project$
 ```
 
@@ -175,7 +175,7 @@ pip freeze > requirements.txt
 
 This writes every installed package with an exact version:
 
-```
+```text
 certifi==2024.8.30
 charset-normalizer==3.4.0
 idna==3.10
@@ -194,7 +194,7 @@ pip install -r requirements.txt
 <Callout type="info" title="requirements.in vs requirements.txt">
 `pip freeze` lists **every** dependency, including transitive ones (dependencies of dependencies). Many teams maintain a shorter `requirements.in` with only top-level packages:
 
-```
+```text
 requests>=2.31
 flask>=3.0
 ```
@@ -208,7 +208,7 @@ Then use `pip-tools` (`pip-compile requirements.in`) or `uv pip compile requirem
 
 Add to `.gitignore`:
 
-```
+```text
 .venv/
 venv/
 env/
@@ -317,7 +317,7 @@ You may see advice to run `pip install --user`. Skip it. The `--user` flag insta
 
 After creating and activating a venv, your project might look like:
 
-```
+```text
 my-project/
 ├── .venv/                  # virtual environment (in .gitignore)
 │   ├── bin/                # activation scripts, python, pip

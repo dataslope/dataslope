@@ -24,7 +24,7 @@ LINQ is *the* idiomatic way to do this kind of work in C#.
 
 A small SaaS sells two products. Each transaction is a line of CSV:
 
-```
+```text
 2026-05-01,A,2,19.99,paid
 2026-05-01,B,1,49.00,paid
 2026-05-02,A,1,19.99,refund
@@ -35,7 +35,7 @@ Columns: `date, productCode, quantity, unitPrice, status`.
 
 The desired report:
 
-```
+```text
 === Product A ===
   units sold:   17
   gross:        339.83

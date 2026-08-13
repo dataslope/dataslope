@@ -183,6 +183,15 @@ average values? The groups contain **different units**, different users,
 different customers, different machines, with no natural pairing between
 them.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "ttest_ind(" },
+    { text: "group_a, group_b,", label: "the two independent samples" },
+    { text: "equal_var=False", label: "Welch's test, the safer default" },
+    { text: ")" },
+  ]}
+/>
+
 <Figure
   slug="stat-t-tests-two-sample-t-test-inline-cutout"
   alt="Two groups of chips on separate pans, the gap between their averages measured against the spread inside each group"

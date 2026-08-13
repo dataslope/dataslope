@@ -94,6 +94,16 @@ Iterating a dict yields **keys** by default. Use `.items()` for key-value pairs,
 
 `range(stop)`, `range(start, stop)`, and `range(start, stop, step)` produce arithmetic progressions lazily. They are the canonical way to loop "N times".
 
+<SyntaxBreakdown
+  parts={[
+    { text: "range(" },
+    { text: "2,", label: "start here, included" },
+    { text: "10,", label: "stop before here, excluded" },
+    { text: "3", label: "add this each time" },
+    { text: ")" },
+  ]}
+/>
+
 <CodeBlock
   adapter="python"
   files={[

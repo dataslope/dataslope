@@ -22,7 +22,7 @@ crash.
 When `javac` compiles a generic class, it **erases** the type
 parameter to its erasure (the most specific bound, usually `Object`):
 
-```
+```java
 // You write:
 public class Box<T> {
     private T value;
@@ -41,7 +41,7 @@ public class Box {
 At the *use sites*, the compiler inserts casts to recover the
 declared type:
 
-```
+```java
 Box<String> b = new Box<>();
 b.put("hi");
 String s = b.get();        // compiler inserts: (String) b.get();
@@ -126,7 +126,7 @@ In practice you almost never want a generic array, you want a
 Because both forms erase to the same bytecode signature, the
 following is forbidden:
 
-```
+```java
 // Not allowed, both erase to printer(List)
 public void printer(List<String>  xs) { ... }
 public void printer(List<Integer> xs) { ... }
