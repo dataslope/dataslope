@@ -93,7 +93,7 @@ html[data-playground-theme="light"] .pyodide-loading {
   scrollbar-color: var(--border) transparent;
 }
 
-/* The sitewide default body letter-spacing (app/globals.css: -0.011em, for
+/* The sitewide default body letter-spacing (app/globals.css: -0.015em, for
    Inter/sans text) would also tighten every monospace surface in this IDE, the
    editor, terminal, output cells and gutters, whose columns should keep their
    natural spacing. Default the whole playground back to `normal`; the chrome's
@@ -2503,7 +2503,7 @@ input[type="range"].fs-slider:disabled {
   /* Slightly tighter than the playground's `normal`, which `.playground-root`
      sets so monospace surfaces keep their natural spacing. This is UI prose in
      the sans face, where that reset leaves it looser than the rest of the site
-     (globals.css runs body text at -0.011em). */
+     (globals.css runs body text at -0.015em, which this now matches). */
   letter-spacing: -0.015em;
 }
 /* Workspace-conflict overlay, reuses the boot-overlay chrome but offers
