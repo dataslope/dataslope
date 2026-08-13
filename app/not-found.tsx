@@ -5,6 +5,8 @@ import "@/app/tailwind.css";
 import "@/app/home.css";
 import Link from "next/link";
 
+import { GraduationCap, House, SquareTerminal } from "lucide-react";
+
 import imageManifest from "@/lib/generated/images";
 import { HomeNav } from "@/app/_components/home/HomeNav";
 import { HomeFooter } from "@/app/_components/home/HomeFooter";
@@ -61,20 +63,25 @@ export default function NotFound() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/courses"
-                  className="inline-flex items-center rounded-lg bg-[var(--ds-green-600)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-green-700)]"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[var(--ds-green-600)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-green-700)]"
                 >
+                  {/* The icons the home page already uses for these three
+                      destinations, so the same journey looks the same here. */}
+                  <GraduationCap size={16} aria-hidden="true" />
                   Browse courses
                 </Link>
                 <Link
                   href="/playground"
-                  className="inline-flex items-center rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5"
                 >
+                  <SquareTerminal size={16} aria-hidden="true" />
                   Open a playground
                 </Link>
                 <Link
                   href="/"
-                  className="inline-flex items-center rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5"
                 >
+                  <House size={16} aria-hidden="true" />
                   Home
                 </Link>
               </div>
