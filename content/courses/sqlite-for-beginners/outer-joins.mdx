@@ -20,6 +20,15 @@ For those questions, beginners should reach first for **LEFT JOIN**.
 
 A `LEFT JOIN` keeps all rows from the first table you name. If a matching row exists on the right, SQLite includes it. If not, the right-side columns become `NULL`.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "FROM customers", label: "the left table, every row survives" },
+    { text: "LEFT JOIN" },
+    { text: "orders", label: "the right table, optional" },
+    { text: "ON customers.id = orders.customer_id", label: "no match here means NULLs" },
+  ]}
+/>
+
 ```mermaid
 flowchart TB
     subgraph L["left table<br/>customers"]

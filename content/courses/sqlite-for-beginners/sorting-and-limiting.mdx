@@ -22,6 +22,14 @@ are cheapest?" and "show the next page."
 (low to high, A to Z) or `DESC` for descending order (high to low, Z to
 A). `ASC` is the default.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "ORDER BY" },
+    { text: "price", label: "sort on this column" },
+    { text: "ASC", label: "low to high; DESC reverses it" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="sqlite"
   title="Cheapest books first"
@@ -243,6 +251,14 @@ the main sort. Later columns break ties.
 
 `LIMIT n` keeps only the first `n` rows. When you use it with
 `ORDER BY`, you can ask for "top N" or "bottom N" lists.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "ORDER BY price DESC", label: "decide what first means" },
+    { text: "LIMIT" },
+    { text: "3;", label: "then keep only that many rows" },
+  ]}
+/>
 
 <Figure
   slug="lite-sorting-and-limiting-order-by-sorts-inline-cutout"

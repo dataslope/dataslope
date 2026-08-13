@@ -42,6 +42,19 @@ department*, a far more useful answer.
 
 ## Your first GROUP BY
 
+A grouped query names the column that defines a group, and the
+aggregates it wants computed once per group:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT" },
+    { text: "dept,", label: "one output row per value here" },
+    { text: "COUNT(*)", label: "computed once inside each group" },
+    { text: "FROM employees" },
+    { text: "GROUP BY dept;", label: "what makes two rows the same group" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="Headcount and average pay per department"

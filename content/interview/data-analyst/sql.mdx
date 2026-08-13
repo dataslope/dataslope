@@ -164,6 +164,15 @@ multiple times**, making complex logic easier to read and debug. Recursive
 CTEs (with `RECURSIVE`) can also traverse hierarchical data, which
 subqueries cannot.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "WITH" },
+    { text: "active_users", label: "the name you choose" },
+    { text: "AS (SELECT ... )", label: "the query it stands for" },
+    { text: "SELECT * FROM active_users", label: "referenced like a table, as often as you like" },
+  ]}
+/>
+
 ```sql
 WITH active_users AS (
   SELECT id, name FROM users WHERE status = 'active'

@@ -30,7 +30,20 @@ The order you type is for human readability. The order the database
 
 Read the numbers: `FROM` is first, `SELECT` is near the **end**, and
 `LIMIT` is last. The clause you *write* first (`SELECT`) is among the
-*last* to actually run.
+*last* to actually run. Written left to right, with when each one
+actually runs:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT ...", label: "runs 5th" },
+    { text: "FROM ...", label: "runs 1st" },
+    { text: "WHERE ...", label: "runs 2nd" },
+    { text: "GROUP BY ...", label: "runs 3rd" },
+    { text: "HAVING ...", label: "runs 4th" },
+    { text: "ORDER BY ...", label: "runs 7th" },
+    { text: "LIMIT ...;", label: "runs 8th" },
+  ]}
+/>
 
 <Figure
   slug="sql-query-execution-order-written-order-vs-inline-cutout"

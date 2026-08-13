@@ -374,6 +374,16 @@ print("Hello".isalpha())
 
 **f-strings** (Python 3.6+) are the modern, recommended way to build strings. Put any expression inside `{ ... }`.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "f", label: "marks the string as a format string" },
+    { text: '"Score: {' },
+    { text: "score", label: "any expression" },
+    { text: ":.2f", label: "how to format it, after the colon" },
+    { text: '}"' },
+  ]}
+/>
+
 <CodeBlock
   adapter="python"
   files={[

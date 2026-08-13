@@ -223,6 +223,16 @@ ROW`. You can change the frame to a **sliding window**, say, the current
 row plus the two before it, to compute a **moving average** that smooths
 out noise.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "AVG(amount)", label: "what to average" },
+    { text: "OVER (ORDER BY day" },
+    { text: "ROWS BETWEEN 2 PRECEDING", label: "start of the window" },
+    { text: "AND CURRENT ROW", label: "end of the window" },
+    { text: ")" },
+  ]}
+/>
+
 <Figure
   slug="duck-running-totals-and-moving-averages-window-frame-moving-averages-inline-cutout"
   alt="A hooded scoop passing along a row of marks, holding only a fixed number of them at any one moment"

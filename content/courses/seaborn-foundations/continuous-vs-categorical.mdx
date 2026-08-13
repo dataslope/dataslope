@@ -72,6 +72,19 @@ axis and not in a hue:
 
 <Chart slug="encoding-accuracy" />
 
+Every Seaborn call has the same shape, and the columns you name are what
+its type rules act on:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "sns.scatterplot(" },
+    { text: "data=penguins,", label: "the frame" },
+    { text: "x=bill_length_mm,", label: "continuous, so a continuous axis" },
+    { text: "hue=species", label: "categorical, so distinct colors" },
+    { text: ")" },
+  ]}
+/>
+
 The clearest place to *feel* this is the `hue` parameter, which behaves in
 two completely different ways depending on the column you give it.
 

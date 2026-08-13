@@ -16,6 +16,16 @@ comment stores `post_id = 20`, then post `20` must exist. The database
 protects those promises so your design cannot quietly drift into broken
 links.
 
+The whole promise is declared on the child column:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "post_id INTEGER NOT NULL", label: "the pointer itself" },
+    { text: "REFERENCES posts(id)", label: "what it must point at" },
+    { text: "ON DELETE CASCADE", label: "what happens when the parent goes" },
+  ]}
+/>
+
 ## The orphan-row problem
 
 An **orphan row** is a child row that points to a parent row that does

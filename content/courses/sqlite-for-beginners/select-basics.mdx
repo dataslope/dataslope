@@ -260,6 +260,15 @@ Sometimes you do not want every row. You want the list of different
 values that appear in a column. `DISTINCT` removes duplicate result
 rows.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT" },
+    { text: "DISTINCT", label: "collapse repeats into one" },
+    { text: "genre", label: "the column whose different values you want" },
+    { text: "FROM books;" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="sqlite"
   title="Unique genres"

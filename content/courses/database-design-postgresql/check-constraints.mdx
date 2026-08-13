@@ -18,6 +18,14 @@ A **CHECK** constraint lets the schema say those things out loud.
 A CHECK constraint is a boolean expression that must be true for every
 row. If the expression is false, PostgreSQL rejects the write.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "price NUMERIC", label: "the column it guards" },
+    { text: "CONSTRAINT price_non_negative", label: "a name, so the error message says which rule broke" },
+    { text: "CHECK (price >= 0)", label: "the expression every row must satisfy" },
+  ]}
+/>
+
 ```mermaid
 flowchart TD
     Row["Incoming row"] --> Check{"CHECK expression<br/>is true?"}

@@ -22,6 +22,15 @@ the end.
 *requires* an `ORDER BY` inside `OVER`, because numbering only makes sense
 once you have decided the order.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "ROW_NUMBER()", label: "takes no arguments; the OVER clause does the work" },
+    { text: "OVER (" },
+    { text: "ORDER BY amount DESC", label: "what number 1 means" },
+    { text: ") AS rn" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Number orders from biggest to smallest"

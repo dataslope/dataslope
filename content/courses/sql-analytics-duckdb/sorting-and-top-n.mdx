@@ -148,6 +148,14 @@ question analysts actually ask, and a plain `LIMIT` cannot do it, because
 pairs a window function (which you will meet properly soon) with
 **`QUALIFY`**, a filter on the window result.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "QUALIFY" },
+    { text: "ROW_NUMBER() OVER (PARTITION BY region ORDER BY amount DESC)", label: "number the rows inside each region" },
+    { text: "<= 2", label: "keep the first two of each" },
+  ]}
+/>
+
 <Figure
   slug="duck-sorting-and-top-n-per-group-top-n-inline-cutout"
   alt="Three separate shelves each having its own top two items lifted off, rather than the top two of the whole room"

@@ -27,6 +27,16 @@ flowchart LR
 `INSERT` puts new rows into a table. You name the columns, then
 supply matching values:
 
+<SyntaxBreakdown
+  parts={[
+    { text: "INSERT INTO" },
+    { text: "tasks", label: "the table to add to" },
+    { text: "(title, done)", label: "which columns you are filling" },
+    { text: "VALUES" },
+    { text: "('Buy milk', false);", label: "one row, in that same order" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="Insert one row and several rows"
@@ -72,6 +82,15 @@ A few things to absorb:
 `UPDATE` changes values in rows that already exist. You set new
 values with `SET`, and, crucially, you say *which* rows with
 `WHERE`:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "UPDATE" },
+    { text: "tasks", label: "the table to change" },
+    { text: "SET done = true", label: "the new value" },
+    { text: "WHERE id = 1;", label: "which rows; leave this off and every row changes" },
+  ]}
+/>
 
 <SqlCodeBlock
   dialect="postgres"
@@ -132,6 +151,14 @@ selected exactly that row.
 ## DELETE: removing rows
 
 `DELETE` removes rows. Again, `WHERE` decides which ones:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "DELETE FROM" },
+    { text: "tasks", label: "the table to remove from" },
+    { text: "WHERE done = true;", label: "which rows; leave this off and the table empties" },
+  ]}
+/>
 
 <SqlCodeBlock
   dialect="postgres"

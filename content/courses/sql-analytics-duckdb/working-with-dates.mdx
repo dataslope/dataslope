@@ -22,6 +22,15 @@ give one group per *day*. You first **truncate** each date down to the
 first of its month, so every day in March collapses to `2024-03-01`. The
 tool is `date_trunc('month', d)`.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "date_trunc(" },
+    { text: "'month',", label: "the period to snap down to" },
+    { text: "order_date", label: "the date column" },
+    { text: ") AS month", label: "one value per month to group on" },
+  ]}
+/>
+
 <Figure
   slug="duck-working-with-dates-core-move-truncate-inline-cutout"
   alt="A calendar strip cut by a guillotine into equal months and the pieces stacked"

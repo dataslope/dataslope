@@ -35,6 +35,17 @@ window. `BETWEEN` reads naturally and is **inclusive** on both ends. Here
 we slice the real diamonds file down to a specific shopping bracket:
 one-carat stones priced between \$4,000 and \$5,000.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE" },
+    { text: "price", label: "the column to bracket" },
+    { text: "BETWEEN" },
+    { text: "4000", label: "low end, included" },
+    { text: "AND" },
+    { text: "5000", label: "high end, also included" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Slice a price band and a carat band out of 53,940 diamonds"

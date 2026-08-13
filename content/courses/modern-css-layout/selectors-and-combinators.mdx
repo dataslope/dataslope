@@ -115,6 +115,18 @@ and mixing them up is one of the most common CSS bugs:
 | Next sibling | `+` | the **one** element immediately after |
 | Subsequent sibling | `~` | **every** later sibling |
 
+A selector with combinators reads right to left: the last part is what
+actually gets styled, everything before it is a condition on where it sits.
+
+<SyntaxBreakdown
+  parts={[
+    { text: ".menu", label: "an ancestor that must exist" },
+    { text: ">", label: "direct child only" },
+    { text: "li", label: "must be a direct child of .menu" },
+    { text: "a", label: "the element that is actually styled" },
+  ]}
+/>
+
 The descendant vs. child distinction is the one to burn in. `.menu li` reaches
 *every* list item in the subtree, however deep. `.menu > li` reaches only the
 **direct** children. Same markup, two different results:

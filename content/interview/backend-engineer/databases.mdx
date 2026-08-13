@@ -52,8 +52,18 @@ thumb: index columns you filter and join on, not every column.
 
 ### What is a composite index and why does column order matter?
 
-A composite index covers multiple columns in a defined order, say
-`(last_name, first_name)`. It serves queries that filter on a **left prefix**:
+A composite index covers multiple columns in a defined order:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "CREATE INDEX idx_name ON people (" },
+    { text: "last_name,", label: "usable on its own" },
+    { text: "first_name", label: "only usable alongside the one before it" },
+    { text: ")" },
+  ]}
+/>
+
+It serves queries that filter on a **left prefix**:
 `last_name` alone, or `last_name` **and** `first_name`, but not `first_name`
 alone. This is the **leftmost-prefix rule**. Order the columns by how you
 query them, most-selective and always-present columns first.

@@ -75,6 +75,17 @@ is the whole trick.
 scikit-learn gives us one function for this. It shuffles the rows and cuts
 them into two groups.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "train_test_split(" },
+    { text: "X, y,", label: "features and labels, split together" },
+    { text: "test_size=0.2,", label: "share held back" },
+    { text: "random_state=42,", label: "makes the shuffle repeatable" },
+    { text: "stratify=y", label: "keeps the class balance in both halves" },
+    { text: ")" },
+  ]}
+/>
+
 <Figure
   slug="ml-train-test-split-inline-cutout"
   alt="One pile of blocks being divided by a partition into a large left share and a small sealed right share, the right share kept under a lid"

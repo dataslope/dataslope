@@ -44,6 +44,16 @@ The `with` statement is Python's **context manager** protocol. For files, it gua
 ## Opening a file
 
 Every snippet on this page runs in your browser, no setup required.
+Nearly every file you open is written as one line with four parts:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "with", label: "close it again, whatever happens" },
+    { text: 'open("poem.txt",', label: "which file" },
+    { text: '"w")', label: "what for: read, write or append" },
+    { text: "as f:", label: "the name you use inside the block" },
+  ]}
+/>
 
 <Figure
   slug="python-files-opening-file-inline-cutout"

@@ -23,6 +23,15 @@ error-prone, add a dimension to `SELECT` and forget to add it to `GROUP
 BY`, and you get an error (or worse, a wrong result in databases that
 allow it).
 
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT region, quarter,", label: "the non-aggregated columns" },
+    { text: "SUM(amount)", label: "the aggregate" },
+    { text: "FROM sales" },
+    { text: "GROUP BY ALL;", label: "group by every column that is not an aggregate" },
+  ]}
+/>
+
 <Figure
   slug="duck-group-by-all-and-grouping-sets-group-by-all-inline-cutout"
   alt="A machine with one lever replacing a row of five identical levers that had to be set the same way"

@@ -58,6 +58,14 @@ stage. Watch two things: use `COUNT(DISTINCT user_id)` so repeat events
 don't inflate the numerator, and cast to float (`* 1.0`) so integer
 division doesn't truncate to 0.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "COUNT(DISTINCT CASE WHEN stage = 'purchase' THEN user_id END)", label: "users who converted" },
+    { text: "* 1.0", label: "force float division" },
+    { text: "/ COUNT(DISTINCT user_id)", label: "users at the reference stage" },
+  ]}
+/>
+
 ```sql
 SELECT
   COUNT(DISTINCT CASE WHEN stage = 'purchase' THEN user_id END) * 1.0

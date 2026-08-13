@@ -49,6 +49,16 @@ The five core aggregate functions are:
 
 `COUNT(*)` counts rows. It does not care what values are inside those rows. It simply answers: "How many rows are in this result?"
 
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT" },
+    { text: "COUNT", label: "which aggregate" },
+    { text: "(*)", label: "over what; * means the rows themselves" },
+    { text: "AS n_books", label: "name the single number" },
+    { text: "FROM books;" },
+  ]}
+/>
+
 <Figure
   slug="lite-aggregate-functions-counting-rows-count-inline-cutout"
   alt="A row of blocks passing a clicking counter, the counter's needle rising with each"

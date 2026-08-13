@@ -27,6 +27,17 @@ In Polars, `pl.col("a") * 2` does none of that. It builds an object
 that *means* "take the column called a and double it". No frame was
 consulted. No arithmetic was done.
 
+<SyntaxBreakdown
+  parts={[
+    { text: 'pl.col("a")', label: "name a column, do not fetch it" },
+    { text: ".sum()", label: "describe a computation over it" },
+    { text: '.alias("total")', label: "name the column this will produce" },
+  ]}
+/>
+
+Every expression has that shape: pick something, describe what to do to
+it, and say what to call the result.
+
 <CodeBlock
   adapter="python"
   files={[

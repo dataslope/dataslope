@@ -128,6 +128,16 @@ Writing a `FILTER` per column is tedious when there are many categories.
 DuckDB's `PIVOT` does it declaratively, you name the column to spread and
 the aggregate, and DuckDB discovers the distinct values for you.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "PIVOT" },
+    { text: "sales", label: "the table to reshape" },
+    { text: "ON quarter", label: "the column whose values become new columns" },
+    { text: "USING SUM(amount)", label: "what fills each cell" },
+    { text: "GROUP BY region", label: "what stays as rows" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="The same pivot with PIVOT syntax"

@@ -106,6 +106,14 @@ own.
 Because `NULL` means unknown, you do not test for it with `=`. Use the
 special tests `IS NULL` and `IS NOT NULL`.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE" },
+    { text: "phone", label: "the column that may be missing" },
+    { text: "IS NULL", label: "the only test that works on NULL" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="sqlite"
   title="Find missing phone numbers"

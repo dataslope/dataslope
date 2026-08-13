@@ -102,6 +102,18 @@ print("Type:", type(sub).__name__)
 
 ## 3. `loc`, by label
 
+`loc` takes two things inside one pair of brackets, separated by a comma:
+which rows, then which columns.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "df.loc[" },
+    { text: '"Chen",', label: "which rows, by label" },
+    { text: '"salary"', label: "which columns, by label" },
+    { text: "]" },
+  ]}
+/>
+
 <CodeBlock
   adapter="python"
   files={[

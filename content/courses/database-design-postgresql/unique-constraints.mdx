@@ -76,6 +76,14 @@ to one account."
 ## Single-column UNIQUE
 
 A **single-column UNIQUE** constraint protects one column by itself.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "email TEXT", label: "the column" },
+    { text: "NOT NULL", label: "it must be provided" },
+    { text: "UNIQUE", label: "and no two rows may share it" },
+  ]}
+/>
 Common examples include:
 
 - account email

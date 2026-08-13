@@ -81,6 +81,14 @@ Since `= NULL` does not work, SQL gives you special tests:
 - `IS NULL`, true when the value is missing.
 - `IS NOT NULL`, true when the value is present.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE" },
+    { text: "phone", label: "the column that may be missing" },
+    { text: "IS NULL", label: "the only test that works on NULL" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="Find the rows with missing data"
@@ -142,6 +150,15 @@ this page, you will not.
 
 Often you want to display a friendly fallback instead of a blank.
 `COALESCE(a, b)` returns the first argument that is not `NULL`:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "COALESCE(" },
+    { text: "phone,", label: "try this first" },
+    { text: "'no phone on file'", label: "fall back to this when it is NULL" },
+    { text: ") AS phone" },
+  ]}
+/>
 
 <SqlCodeBlock
   dialect="postgres"

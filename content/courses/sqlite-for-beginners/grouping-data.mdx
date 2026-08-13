@@ -44,6 +44,16 @@ The result is not one average salary. It is one average salary **per department*
 
 Start with a small employee table. The query below counts employees and computes average salary for each department.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT" },
+    { text: "dept,", label: "one output row per value here" },
+    { text: "COUNT(*)", label: "computed once inside each group" },
+    { text: "FROM employees" },
+    { text: "GROUP BY dept;", label: "what makes two rows the same group" },
+  ]}
+/>
+
 <Figure
   slug="lite-grouping-data-one-result-row-per-inline-cutout"
   alt="Three bins filled from a single pile, each bin handing one summary card up to the rail above it"

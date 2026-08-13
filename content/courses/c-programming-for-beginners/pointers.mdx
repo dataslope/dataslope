@@ -92,6 +92,17 @@ things:
 | `&n`           | expression: *the address of `n`*                                |
 | `int *p = &n;` | declare `p`, initialize it with the address of `n`              |
 
+One line contains both readings, and they are not the same `*`:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "int *", label: "declaration: p is a pointer to int" },
+    { text: "p", label: "the variable being created" },
+    { text: "=" },
+    { text: "&n;", label: "expression: the address of n" },
+  ]}
+/>
+
 Once you internalize that, half of pointer confusion vanishes.
 
 ## Pictures, always pictures

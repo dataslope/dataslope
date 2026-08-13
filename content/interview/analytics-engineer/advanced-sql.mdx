@@ -104,10 +104,27 @@ filters raw rows and `HAVING` filters aggregated groups. Logical order is
 `WHERE` → `GROUP BY`/`HAVING` → window functions → `QUALIFY`. Without it you must
 wrap the window function in a subquery or CTE and filter in an outer query.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE status = 'paid'", label: "filters raw rows" },
+    { text: "HAVING SUM(amount) > 0", label: "filters aggregated groups" },
+    { text: "QUALIFY rn = 1", label: "filters on the window result" },
+  ]}
+/>
+
 ### What is a CTE, and when do you prefer it over a subquery?
 
 A Common Table Expression (`WITH name AS (...)`) is a named, inline result set
-you reference later in the same statement. Prefer CTEs when logic is reused,
+you reference later in the same statement.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "WITH" },
+    { text: "recent", label: "the name you choose" },
+    { text: "AS (SELECT ... )", label: "the query it stands for" },
+    { text: "SELECT * FROM recent", label: "referenced like a table" },
+  ]}
+/> Prefer CTEs when logic is reused,
 deeply nested, or benefits from being read top-to-bottom as named steps. A
 scalar or one-off filter is often clearer as a plain subquery. CTEs improve
 readability; they do not guarantee materialization or a performance change.

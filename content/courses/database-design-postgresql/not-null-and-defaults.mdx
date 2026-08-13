@@ -59,6 +59,17 @@ NULL when the business rule says the value is required.
 
 ## DEFAULT fills in an omitted value
 
+In a column definition the two sit side by side, and each answers a
+different question:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "status TEXT", label: "name and type" },
+    { text: "NOT NULL", label: "may this be missing?" },
+    { text: "DEFAULT 'draft'", label: "what to use when the insert omits it" },
+  ]}
+/>
+
 A **DEFAULT** is the value PostgreSQL uses when an insert leaves a
 column out. Defaults are useful when there is a safe, honest value the
 schema can choose.

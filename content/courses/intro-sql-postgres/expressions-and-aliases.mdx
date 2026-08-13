@@ -87,10 +87,13 @@ value by name.
   caption="`AS` clips a readable name onto a column the query has just made up."
 />
 
-```mermaid
-flowchart TD
-    E["price * qty"] -->|"AS <code>line_total</code>"| C["a clearly<br/>named column"]
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "price * qty", label: "the expression to compute" },
+    { text: "AS" },
+    { text: "line_total", label: "the name the new column gets" },
+  ]}
+/>
 
 <Callout type="info" title="The word AS is optional, but be kind">
 PostgreSQL lets you write the alias without `AS`,

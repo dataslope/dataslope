@@ -82,6 +82,15 @@ A subquery can also return a **column of values**, which pairs
 naturally with `IN`. Here the inner query lists the ids of customers
 who have ordered, and the outer query selects those customers:
 
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE" },
+    { text: "id", label: "the outer column to test" },
+    { text: "IN", label: "true if it appears anywhere in the list" },
+    { text: "(SELECT customer_id FROM orders)", label: "the inner query supplies the list" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="Customers who have placed an order"
