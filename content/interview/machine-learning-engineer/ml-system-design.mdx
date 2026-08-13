@@ -115,6 +115,12 @@ capture the full environment.
 A reproducible run should regenerate the same model artifact from the same
 code, data, and config.
 
+What pinning costs and what it buys back, since the image is rebuilt on
+every commit: layer order decides whether a one-line code change reinstalls
+the dependencies.
+
+<Chart slug="docker-layer-cache" />
+
 ### What is data validation and why does it matter before training?
 
 Data validation checks that incoming data matches expected schema, ranges,

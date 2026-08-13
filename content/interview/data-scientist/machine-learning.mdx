@@ -187,11 +187,22 @@ What the curve traces, and what chance looks like on it.
 **Learning rate** controls step size: too large and it overshoots or diverges; too small and training is slow.
 **Stochastic gradient descent (SGD)** uses one example per step (noisy but fast per iteration); **mini-batch SGD** uses small batches; **Adam** adapts the learning rate per parameter using momentum and root-mean-square scaling.
 
+The same quadratic at three learning rates. There is a band that works,
+and both ways out of it fail differently.
+
+<Chart slug="gradient-descent-lr" />
+
 ### What is the difference between bagging and boosting?
 
 **Bagging** trains multiple models in parallel on bootstrap samples and averages their predictions (reduces variance). Random Forest is the canonical example.
 **Boosting** trains models sequentially, with each model focusing on the errors of the previous one (reduces bias). Gradient Boosted Trees (GBM, XGBoost, LightGBM) are the most popular implementations.
 Bagging is more robust to noise; boosting often achieves higher accuracy but is prone to overfitting on noisy data.
+
+What averaging can and cannot buy: variance falls with the number of
+models, onto a floor set by how correlated their errors are. Bagging
+works on the variance; correlated models are why it stops working.
+
+<Chart slug="ensemble-variance" />
 
 ### How does a Random Forest work?
 
@@ -405,6 +416,12 @@ print(f"Test accuracy: {accuracy_score(y_test, model.predict(X_test)):.3f}")
   ]}
 />
 
+Why the model works in log-odds and reports probability: the two carry
+the same information, and only one of them is unbounded enough to be
+linear in the features.
+
+<Chart slug="odds-vs-probability" />
+
 ### What is the difference between a generative and a discriminative model?
 
 A **discriminative model** learns $P(y \mid x)$ directly, the conditional probability of the label given input (logistic regression, SVM, neural nets).
@@ -417,12 +434,23 @@ A decision tree greedily selects the feature and threshold at each node that max
 Splits continue until a stopping criterion is met (max depth, min samples per leaf, minimum impurity decrease).
 Trees are interpretable but high-variance; ensembles (random forest, GBM) fix the variance.
 
+And where the splitting has to stop. Training accuracy climbs to a
+hundred per cent and stays there, which is exactly why it cannot be the
+signal you tune depth against.
+
+<Chart slug="decision-tree-depth" />
+
 ### How does k-Nearest Neighbors (kNN) make predictions?
 
 kNN stores all training examples and, at inference, finds the `k` closest examples by a distance metric (usually Euclidean).
 For classification, it returns the majority class among the k neighbors; for regression, it returns their mean.
 It has no explicit training phase but is slow at prediction for large datasets.
 Choosing k involves a bias-variance trade-off: small k is low-bias/high-variance; large k is high-bias/low-variance.
+
+What k does to the decision boundary: jagged enough to encircle single
+points at k = 1, nearly a straight line at k = 75.
+
+<Chart slug="knn-k-boundary" />
 
 ### What is k-means clustering?
 
@@ -452,6 +480,12 @@ print("Silhouette:", round(silhouette_score(X, km.labels_), 3))
     },
   ]}
 />
+
+How the k gets picked in practice, and how much judgement is left in it:
+the within-cluster sum of squares always falls, so the elbow is a bend
+rather than a minimum.
+
+<Chart slug="kmeans-elbow" />
 
 ### What is elastic net regularization?
 
@@ -501,6 +535,11 @@ Calibration is assessed with reliability diagrams or Brier score.
 Common calibration methods: Platt scaling (logistic regression on outputs) and isotonic regression.
 Calibration matters whenever model probabilities are used for downstream decisions (e.g., expected value calculations).
 
+Calibration as a picture: predicted probability against observed
+frequency, with the diagonal marking a model whose 0.7 means 0.7.
+
+<Chart slug="calibration-curve" />
+
 ### How would you select between two models?
 
 Compare on a held-out test set (never tuned on) using the metric aligned with the business goal.
@@ -532,6 +571,12 @@ A **learning curve** plots training and validation performance as a function of 
 If both curves plateau at a high error, the model has high bias (add features, use a more flexible model).
 If there is a large gap between train and validation, the model has high variance (add data, regularize).
 Learning curves guide whether more data or a better model is the right next step.
+
+The two shapes worth recognising. A gap still open at the right-hand edge
+is variance, and more data will help; two curves that met early and
+flattened high is bias, and more data will not.
+
+<Chart slug="learning-curve" />
 
 ### What is the difference between bagged feature importance and SHAP values?
 

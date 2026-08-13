@@ -71,6 +71,12 @@ oscillates or diverges; too small and it crawls or stalls in a plateau.
 Learning-rate schedules (warmup, decay) and adaptive optimizers ease the
 tuning.
 
+The same quadratic at three learning rates. There is a band that works,
+and the two ways out of it fail differently: too small barely moves, too
+large climbs away by orders of magnitude.
+
+<Chart slug="gradient-descent-lr" />
+
 ### Compare SGD, momentum, RMSProp, and Adam.
 
 - **Batch GD** uses the whole dataset per step, accurate but slow.
@@ -104,6 +110,12 @@ plateaus and then rises, the network is memorizing. Countermeasures:
 - **Weight decay (L2)**, penalizing large weights.
 - **Early stopping** at the validation-loss minimum.
 - **Reducing capacity** (fewer/smaller layers).
+
+What it looks like on the curves, and the reason the fix depends on the
+shape: a gap still open at the right-hand edge is variance, and two
+curves that met early and flattened high is bias.
+
+<Chart slug="learning-curve" />
 
 ### What does dropout do, and why does it help?
 

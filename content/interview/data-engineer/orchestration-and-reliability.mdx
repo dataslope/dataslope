@@ -93,11 +93,11 @@ sensible `start_date` schedules the historical runs; partitioned assets do
 this in Dagster. Backfilling years of data often needs **throttling** so
 you don't overwhelm source systems or the warehouse.
 
-Backfills are also where image build time starts to matter, and layer
-ordering is the whole game: a dependency install placed after a source
-copy is re-run on every commit.
+The cost that decides the design. A run that reprocesses everything grows
+with the table; one that reprocesses a partition does not, which is what
+makes a backfill a loop over date ranges rather than one enormous job.
 
-<Chart slug="docker-layer-cache" />
+<Chart slug="incremental-vs-full-refresh" />
 
 ### How should you configure retries, and what shouldn't you retry?
 

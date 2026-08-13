@@ -170,6 +170,12 @@ triggered by one action and may contain several stages run in dependency
 order. Reading the stage graph in the Spark UI tells you where shuffles
 and skew are.
 
+Why a stage costs its slowest task rather than its average one: a small
+per-task chance of being slow becomes near-certainty once there are
+enough tasks to wait for.
+
+<Chart slug="tail-latency-fanout" />
+
 ### How does Spark achieve fault tolerance?
 
 Through **lineage**: an RDD/DataFrame records the sequence of
@@ -196,12 +202,6 @@ will OOM the driver and defeats the point of distributing the work. Use it
 only for small results. To inspect data use `show(n)` or `take(n)`; to
 persist results, `write` them out in parallel from the executors rather
 than collecting to the driver first.
-
-A related tail effect: a stage waits for its slowest task, so a small
-per-task chance of being slow becomes near-certainty across enough
-partitions.
-
-<Chart slug="tail-latency-fanout" />
 
 ### What is `groupByKey` vs `reduceByKey`, and why does it matter?
 
