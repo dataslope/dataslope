@@ -31,6 +31,7 @@ The two `<div>`s below each grab a full line; the three `<span>`s share
 one:
 
 <LivePreview
+  height={177}
   title="Blocks stack and fill width; inline boxes share a line"
   background="#ffffff"
   html={`<div class="block">block A (fills the width)</div>
@@ -81,6 +82,7 @@ neighbors instead of reserving space. The `inline-block` one honors
 every value:
 
 <LivePreview
+  height={98}
   title="inline ignores width and vertical spacing; inline-block respects both"
   background="#ffffff"
   html={`<span class="tag as-inline">inline</span>
@@ -104,6 +106,7 @@ hides the element but **keeps its space reserved**. Watch what happens
 to box 2 in each row:
 
 <LivePreview
+  height={152}
   title="display:none collapses the gap; visibility:hidden keeps it"
   background="#ffffff"
   html={`<div class="row">

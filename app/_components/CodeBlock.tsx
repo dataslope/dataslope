@@ -9,6 +9,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { flushSync } from "react-dom";
 import { ChevronDown, ChevronUp, File, Info, Lock, Play, RotateCcw } from "lucide-react";
 import { Popover } from "@base-ui/react/popover";
 import { Toast } from "@base-ui/react/toast";
@@ -76,7 +77,14 @@ import {
   savePersistedCode,
 } from "./codePersistence";
 import { usePrepopulatedOutput } from "./mdx/BlockOutputs";
+import { usePrecompiledBundle } from "./mdx/ReactBundles";
 import { blockOutputKey } from "@/lib/blockOutputKey";
+import { previewStageStyle } from "./previewStage";
+import {
+  PREVIEW_IFRAME_CLASS,
+  PREVIEW_SANDBOX,
+  subscribeToPreviewConsole,
+} from "./runtime/webPreview";
 import styles from "./CodeBlock.module.css";
 import challengeStyles from "./ChallengeCard.module.css";
 
@@ -161,6 +169,30 @@ interface CodeBlockProps {
    *  react); see `TAILWIND_BROWSER_CDN` in runtime/cdn.ts for the pin
    *  and the "development-time compiler" caveat. */
   tailwind?: boolean;
+  /** Height of the live-preview stage (number → px). Only meaningful for
+   *  preview adapters (web / react).
+   *
+   *  The slot reserves this space from first paint, empty or not, so a Run
+   *  never grows the card under the reader. That makes the number the
+   *  author's problem rather than the layout's: leave it alone for a block
+   *  that renders a page (300px, the default), and set it for one that
+   *  renders a 60px box, where the default would reserve a screenful of
+   *  white to show a rule of thumb about margins. */
+  previewHeight?: number | string;
+  /** Render the preview before the reader presses Run, when the adapter
+   *  can compose it without a runtime (`composeStaticPreview`).
+   *
+   *  Defaults to the adapter's `outputCapabilities.autoPreview`, which is
+   *  on for `web` and off for `react` — 42 of the site's 42 web blocks
+   *  want this, and a prop that has to be remembered on every one of them
+   *  is a prop the next block will be missing, with a blank panel for a
+   *  symptom and nothing to distinguish it from a block that never had a
+   *  preview. So this exists to say *no* (or to say yes for an adapter
+   *  that doesn't default to it), not to turn the feature on.
+   *
+   *  Forced off for `expectError` blocks: their lesson is the failure,
+   *  and rendering it unasked spoils the reveal. */
+  autoPreview?: boolean;
 }
 
 // Detect the active color scheme on `<html>`. Fumadocs uses next-themes
@@ -300,6 +332,8 @@ function CodeBlockInner({
   packages,
   tailwind = false,
   expectError,
+  previewHeight,
+  autoPreview,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
 
@@ -410,6 +444,131 @@ function CodeBlockInner({
     (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
       ? entryFilename
       : workspaceFiles[0].filename) ?? workspaceFiles[0].filename;
+
+  // ─── Auto-rendered preview ──────────────────────────────────────────
+  // The page this block's *starter* renders, composed without a runtime
+  // and without a browser (see `LanguageAdapter.composeStaticPreview`),
+  // so it is in the server's HTML and on screen at first paint rather
+  // than one Run behind. Same posture as the prepopulated output panel:
+  // the lesson reads end to end without pressing anything.
+  //
+  // The starter, deliberately, not the reader's restored buffer. Their
+  // edits are on screen in the editor either way, the buffer is restored
+  // after hydration so composing from it would mean rendering twice and
+  // shifting between, and Run replaces this frame with their version the
+  // moment they ask. It is the same rule the prepopulated cells follow.
+  const autoPreviewEnabled =
+    (autoPreview ?? adapter.outputCapabilities?.autoPreview ?? false) &&
+    !expectError;
+  // The frame's bridge token. A run's token is random per run, which is
+  // right for a document composed at click time; this one is composed on
+  // the server and again in the browser, and React compares the two, so
+  // it has to be derived rather than drawn. Both halves are already
+  // deterministic — a content hash of the block and React's own
+  // `useId` — and together they stay distinct between two blocks with
+  // identical source on one page, which a content hash alone would not.
+  //
+  // A derived token is guessable by anything already running on the
+  // page, and that is acceptable *here* only because the frame carries
+  // no harness: the token authenticates "which frame said this", not
+  // "did the learner really pass". Challenge cards never auto-render and
+  // keep their per-run random tokens, so the sentinel protocol is
+  // untouched. Do not reuse this token for a harnessed document.
+  const autoPreviewToken = `${outputKey}-${blockId.replace(/[^a-zA-Z0-9-]/g, "")}`;
+  // A build-time artifact for adapters that cannot compose from source
+  // alone. `web` ignores it; `react` renders nothing without it, because
+  // translating TSX in the reader's browser is the ~3 MB download this
+  // exists to avoid. Keyed by the same content hash as everything else, so
+  // an edited block simply has no bundle until the workflow runs again.
+  const precompiled = usePrecompiledBundle(outputKey);
+  const autoPreviewDoc = useMemo(() => {
+    if (!autoPreviewEnabled || !adapter.composeStaticPreview) return null;
+    const sources = workspaceFiles.map((f) => {
+      const init = f.initCode?.trimEnd() ?? "";
+      return {
+        filename: f.filename,
+        source: init
+          ? mergeInitAndEntry(adapter.id, init, f.starterCode)
+          : f.starterCode,
+      };
+    });
+    try {
+      return adapter.composeStaticPreview(sources, {
+        entryFilename: resolvedEntryFilename,
+        token: autoPreviewToken,
+        tailwind: tailwind || undefined,
+        bundle: precompiled ?? undefined,
+      });
+    } catch {
+      // A block that can't be composed falls back to the empty slot it
+      // has always had; a thrown error here would take the lesson with it.
+      return null;
+    }
+  }, [
+    adapter,
+    autoPreviewEnabled,
+    autoPreviewToken,
+    precompiled,
+    workspaceFiles,
+    resolvedEntryFilename,
+    tailwind,
+  ]);
+  // Retired by the first Run (see `run`), restored by Reset.
+  const [showAutoPreview, setShowAutoPreview] = useState(true);
+  const autoPreviewFrameRef = useRef<HTMLIFrameElement | null>(null);
+  // True when this block reserves space for its output panel, so the
+  // panel is in the server's HTML at the height it will have once the
+  // auto-preview has printed — otherwise the cells arriving a moment
+  // later would grow the card by ~96px, which is the shift phase 1 spent
+  // its whole diff removing from the panel above.
+  //
+  // Gated on the source mentioning `console.`, because a panel reserved
+  // on all 42 web blocks would put an empty box under the 39 that never
+  // print. It is a heuristic and it is allowed to be: the false positive
+  // (a `console.` call that never executes) reserves a little space for
+  // nothing, and the false negative needs a block that reaches the
+  // console without naming it, which no lesson does. The alternative is
+  // knowing the output in advance, which means running the code at build
+  // time — the thing this whole approach exists to avoid.
+  const reservesOutput = useMemo(() => {
+    if (!autoPreviewEnabled || !autoPreviewDoc) return false;
+    return workspaceFiles.some(
+      (f) => /\bconsole\s*\./.test(f.starterCode) || /\bconsole\s*\./.test(f.initCode ?? ""),
+    );
+  }, [autoPreviewEnabled, autoPreviewDoc, workspaceFiles]);
+
+  // Forward the auto-rendered frame's console output into this block's own
+  // output panel. Without this the frame still prints — into the browser's
+  // devtools, where the bridge echoes it — and the panel below stays empty,
+  // which would make the site's own surface the one place the output *isn't*.
+  //
+  // The frame is in the server's HTML, so it has usually finished printing
+  // before this effect exists; `subscribeToPreviewConsole` asks it to replay
+  // what it buffered, and dedupes against anything still arriving live.
+  useEffect(() => {
+    const frame = autoPreviewFrameRef.current;
+    if (!frame || !showAutoPreview || !autoPreviewDoc) return;
+    return subscribeToPreviewConsole({
+      frame,
+      token: autoPreviewToken,
+      emit: (cell) =>
+        setOutputs((prev) => {
+          // Same collapse the run path applies: one cell per console call
+          // would stack a noisy pile of one-line boxes.
+          const last = prev[prev.length - 1];
+          if (cell.type === "stdout" && last && last.type === "stdout") {
+            const merged: OutputCell = {
+              ...last,
+              content: `${last.content}\n${cell.content}`,
+            };
+            return [...prev.slice(0, -1), merged];
+          }
+          // Negative ids, like the prepopulated cells: a run counts up
+          // from 1, and these have to be distinguishable from its own.
+          return [...prev, { id: -(prev.length + 1), elapsed: "", ...cell }];
+        }),
+    });
+  }, [autoPreviewDoc, autoPreviewToken, showAutoPreview]);
 
   // Remote datasets staged before every run (see the `datasets` prop).
   // Mirrored into a ref so the mount-once warm-up effect can prefetch
@@ -844,6 +1003,22 @@ function CodeBlockInner({
     const code = effectiveSourceFor(resolvedEntryFilename, entrySource);
     const mySeq = ++runSeqRef.current;
 
+    // Hand the preview slot back to the runtime before anything can await.
+    //
+    // React owns the auto-rendered frame; `runPreviewDocument` owns the
+    // slot's children imperatively (`host.replaceChildren`). Both are
+    // fine on their own, and a disaster interleaved: if React's removal
+    // lands after the runtime's insertion it deletes the run's frame, and
+    // if it lands after React has lost track of the node it throws. So
+    // the unmount is flushed synchronously here, while we still hold the
+    // event's call stack and the runtime has not been touched — after
+    // this line the slot is empty and imperative, which is what every
+    // adapter has always assumed. `flushSync` is the point, not an
+    // optimisation; a plain setState is a race.
+    if (showAutoPreview && autoPreviewDoc) {
+      flushSync(() => setShowAutoPreview(false));
+    }
+
     // The reader is running it themselves now, so the prepopulated cells go
     // and the panel stops calling itself a preview.
     setOutputs([]);
@@ -1033,10 +1208,12 @@ function CodeBlockInner({
     }
   }, [
     adapter,
+    autoPreviewDoc,
     blockDatasets,
     hasPreview,
     isMultiFile,
     resolvedEntryFilename,
+    showAutoPreview,
     snapshotAllFiles,
     effectiveSourceFor,
     reportPrepare,
@@ -1059,13 +1236,28 @@ function CodeBlockInner({
     [adapter.id],
   );
 
+  // A block that is already showing its result has nothing to warm *for*.
+  //
+  // The warm-ups below exist to move a runtime download off the Run click
+  // and into the time a reader spends on the prose. That trade is only
+  // worth making when the download is the difference between seeing the
+  // result and not. Once the preview is on screen, it inverts: react's
+  // runtime is a ~3 MB esbuild-wasm fetch, and speculatively spending it on
+  // a reader who can already see the answer — and may never press
+  // anything — is precisely the cost the precompiled bundle was built to
+  // remove. It would have quietly cancelled out the whole of phase 4.
+  //
+  // Pressing Run still boots it, on demand, behind the boot notice.
+  const skipSpeculativeWarmup = autoPreviewDoc !== null;
+
   // Warm the shared runtime as soon as the page lands (idle-scheduled,
   // Save-Data-guarded, one boot at a time, see runtime/warmup.ts), so
   // the time a reader spends on the page's prose pays for the runtime
   // download instead of the first Run click.
   useEffect(() => {
+    if (skipSpeculativeWarmup) return;
     warmRuntimeOnRouteLand(RuntimeScope.Fumadocs, adapter);
-  }, [adapter]);
+  }, [adapter, skipSpeculativeWarmup]);
 
   // Warm the shared runtime when the block first scrolls into view, so the
   // learner's first Run reuses an already-initialised runtime instead of
@@ -1076,7 +1268,7 @@ function CodeBlockInner({
   // any failure here is swallowed so an actual Run can retry and report it.
   useEffect(() => {
     const card = cardRef.current;
-    if (!card || warmedRef.current) return;
+    if (!card || warmedRef.current || skipSpeculativeWarmup) return;
     if (typeof IntersectionObserver === "undefined") return;
     const io = new IntersectionObserver(
       (entries) => {
@@ -1108,7 +1300,7 @@ function CodeBlockInner({
     );
     io.observe(card);
     return () => io.disconnect();
-  }, [adapter]);
+  }, [adapter, skipSpeculativeWarmup]);
 
   const reset = useCallback(() => {
     runSeqRef.current++;
@@ -1143,7 +1335,14 @@ function CodeBlockInner({
     setShowingPreview(prepopulated !== null);
     // Reset also tears down the live preview, removing the iframe
     // kills its document (scripts, timers, listeners) immediately.
+    // Clearing the host first and re-showing after is what keeps the two
+    // owners from overlapping: the DOM is empty when React re-inserts
+    // its frame, which is the same handover the Run path makes in
+    // reverse. The auto-preview renders the starter, and the starter is
+    // what Reset just restored, so bringing it back is the honest state
+    // for the same reason the prepopulated cells come back with it.
     previewHostRef.current?.replaceChildren();
+    setShowAutoPreview(true);
     setStatus("idle");
     setStatusMessage("");
     startTransition(() => {
@@ -1595,20 +1794,47 @@ function CodeBlockInner({
         // Live page preview for the web/react adapters. Always mounted
         // so the slot element exists before the first run; the runtime
         // swaps a sandboxed iframe into the slot on every run, and CSS
-        // renders a placeholder while the slot is still empty.
+        // renders a placeholder while the slot is still empty — at the
+        // same height it will have once filled, so the swap moves nothing.
         <div className={challengeStyles.previewPanel} data-testid="web-preview">
           <div className={challengeStyles.previewHeader}>
             <span className={challengeStyles.previewLabel}>Preview</span>
           </div>
-          <div className={challengeStyles.previewSlot} ref={previewHostRef} />
+          <div
+            className={challengeStyles.previewSlot}
+            style={previewStageStyle(previewHeight)}
+            ref={previewHostRef}
+          >
+            {/* The auto-rendered starter, present in the server's HTML so
+                it paints with the page. React owns this frame until the
+                first Run, which flushes it out and hands the slot to the
+                runtime — see `run`. `srcDoc` (not innerHTML) so React
+                does the attribute escaping; `loading="lazy"` so a block
+                nobody scrolls to costs nothing, matching how the
+                prepopulated charts are fetched. */}
+            {showAutoPreview && autoPreviewDoc && (
+              <iframe
+                ref={autoPreviewFrameRef}
+                className={PREVIEW_IFRAME_CLASS}
+                sandbox={PREVIEW_SANDBOX}
+                title="Page preview"
+                loading="lazy"
+                srcDoc={autoPreviewDoc}
+              />
+            )}
+          </div>
         </div>
       )}
 
-      {(outputs.length > 0 || isBusy) && (
+      {(outputs.length > 0 || isBusy || reservesOutput) && (
         // Same output panel as the challenge card (its styles are shared
         // through ChallengeCard.module.css): an accent-bar header with the
         // elapsed time, and one clean body that stacks the run's segments
         // in chronological order, no per-segment chrome.
+        //
+        // `reservesOutput` keeps it mounted from the server's HTML for a
+        // block whose auto-preview is about to print, so the cells land in
+        // a box that is already the right size instead of creating one.
         <div
           className={`${challengeStyles.outputPanel}${isBusy ? ` ${styles.outputRunning}` : ""}`}
           aria-live="polite"
@@ -1710,8 +1936,12 @@ function CodeBlockInner({
               />
             </div>
           )}
-          {outputs.length > 0 && (
-            <div className={challengeStyles.outputBody}>
+          {(outputs.length > 0 || reservesOutput) && (
+            <div
+              className={`${challengeStyles.outputBody}${
+                reservesOutput ? ` ${styles.outputBodyReserved}` : ""
+              }`}
+            >
               {outputs.map((cell) => (
                 <OutputSegment key={cell.id} cell={cell} />
               ))}

@@ -61,6 +61,7 @@ Every rule below sets `color` on the same element, and the browser
 picks the most specific, the ID:
 
 <LivePreview
+  height={141}
   title="One element, three competing rules"
   background="#ffffff"
   html={`<p id="intro" class="note">The ID rule wins, so I am green.</p>`}
@@ -146,6 +147,7 @@ elements pick them up for free. But the border set on `.parent` stays
 on the parent alone, layout properties don't inherit:
 
 <LivePreview
+  height={212}
   title="Color and font inherit; borders don't"
   background="#ffffff"
   html={`<div class="parent">

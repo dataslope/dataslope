@@ -25,7 +25,9 @@ import {
 import { courseSource } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
 import { BlockOutputsProvider } from "@/app/_components/mdx/BlockOutputs";
+import { ReactBundlesProvider } from "@/app/_components/mdx/ReactBundles";
 import { lessonBlockOutputs } from "@/lib/blockOutputs";
+import { lessonReactBundles } from "@/lib/reactBundles";
 import { OG_IMAGE } from "@/lib/site";
 import { getCourseMeta } from "@/lib/courseMeta";
 import { JsonLd } from "@/app/_components/JsonLd";
@@ -141,7 +143,14 @@ export default async function CoursePage(props: CoursePageProps) {
         <BlockOutputsProvider
           outputs={lessonBlockOutputs(`content/courses/${page.path}`)}
         >
-          <MDX components={getMDXComponents()} />
+          {/* React blocks render their result the same way web blocks do,
+              but their bundle is compiled by a workflow rather than derived
+              at render time — see lib/reactBundles.ts. */}
+          <ReactBundlesProvider
+            bundles={lessonReactBundles(`content/courses/${page.path}`)}
+          >
+            <MDX components={getMDXComponents()} />
+          </ReactBundlesProvider>
         </BlockOutputsProvider>
       </DocsBody>
     </DocsPage>

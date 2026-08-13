@@ -36,6 +36,7 @@ The same four layers, rendered for real. The tinted area is padding
 the space *between* the two boxes is margin:
 
 <LivePreview
+  height={300}
   title="Content, padding, border, margin"
   background="#f8fafc"
   html={`<div class="box">First box, padded and bordered.</div>
@@ -124,6 +125,7 @@ second uses `border-box` and stays exactly 220px. The gridlines are
 `20px` apart so you can measure the difference:
 
 <LivePreview
+  height={268}
   title="content-box vs border-box, same width declared"
   html={`<div class="ruler">
   <div class="box content">content-box → 268px wide</div>

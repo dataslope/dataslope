@@ -305,6 +305,16 @@ export interface LanguageAdapter {
      *  use this to mount their preview slot and mention the preview
      *  in the empty-state blurb. */
     preview?: boolean;
+    /** Rendering that preview is cheap enough to do without the reader
+     *  asking for it, so `<CodeBlock>` may show the result before the
+     *  first Run (see `composeStaticPreview`).
+     *
+     *  `web`: yes. There is no runtime download at all — composition is
+     *  a pure string operation and the browser does the rest.
+     *  `react`: no. It boots esbuild-wasm and pulls React from esm.sh,
+     *  which is not something a page should spend on a reader's behalf.
+     *  Precomputing the bundle at build time is what would change that. */
+    autoPreview?: boolean;
   };
   /** Formats offered by the "Export" dropdown. The editor's current contents
    *  are written to a client-side download with the chosen extension. */
@@ -408,4 +418,41 @@ export interface LanguageAdapter {
    *  workspaces mix languages (web: .html/.css/.js) can pick the right
    *  formatter dialect; single-language adapters may ignore it. */
   formatCode?: (code: string, filename?: string) => Promise<string>;
+  /** Optional: compose the document this workspace would render, from
+   *  its sources alone — no runtime, no network, no browser, no DOM.
+   *  Implemented only by adapters whose preview is a pure function of
+   *  the source, which today means `web`.
+   *
+   *  This is what lets `<CodeBlock>` server-render the preview into the
+   *  page's HTML instead of waiting for a Run, so the result is there at
+   *  first paint. Two constraints follow from that and are not optional:
+   *
+   *  - **It must run under Node**, because SSR is where it is called
+   *    first. No `window`, no `document`, no `btoa` without a fallback.
+   *  - **It must be deterministic.** The server and the browser both
+   *    compose it and React compares the two; anything random or
+   *    clock-derived in the output is a hydration mismatch. That is why
+   *    `options.token` is *passed in* rather than generated here: the
+   *    caller derives it from the block's own content and identity, so
+   *    the same block composes the same document every time.
+   *
+   *  `sources` are the files' *effective* sources (each file's init code
+   *  already merged into its buffer), so the adapter sees exactly what a
+   *  Run would give it. Return `null` when this workspace has nothing to
+   *  render statically. */
+  composeStaticPreview?(
+    sources: { filename: string; source: string }[],
+    options: {
+      entryFilename: string;
+      token: string;
+      tailwind?: boolean;
+      /** A build-time-compiled artifact for this block, when the adapter
+       *  needs one. `web` composes from `sources` alone; `react` cannot —
+       *  TSX has to be translated first, and doing that in the reader's
+       *  browser costs a ~3 MB download, so the bundle is precompiled by
+       *  `scripts/build-react-bundles.mjs` and looked up by content hash.
+       *  An adapter that needs a bundle and doesn't get one returns null. */
+      bundle?: { js: string; css?: string };
+    },
+  ): string | null;
 }

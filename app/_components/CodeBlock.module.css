@@ -65,6 +65,20 @@
   padding-bottom: 48px;
 }
 
+/* Space held for what a block's auto-rendered preview is about to print,
+   so the cells land in a box that already exists instead of creating one
+   and pushing the rest of the lesson down (~96px, measured). Two lines at
+   the body's own 13px/1.7, which is what the console-logging blocks on the
+   site actually print; a chattier block still grows, once, early. Only
+   applied where `reservesOutput` is true — a reservation on every web
+   block would put an empty box under the 39 that never print. */
+.outputBodyReserved {
+  /* Two lines at the body's own 13px/1.7, plus its 2px/12px padding —
+     the box is `border-box`, so a min-height that forgets the padding
+     reserves 14px too little and the panel still grows on arrival. */
+  min-height: calc(2 * 13px * 1.7 + 14px);
+}
+
 /* Right side of the shared output-panel header: elapsed time + copy.
    The wrapper carries the margin-left:auto so the copy button stays on
    the right edge whether or not the time is present. */

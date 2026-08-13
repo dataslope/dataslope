@@ -34,6 +34,13 @@ import { TAILWIND_BROWSER_CDN } from "./cdn";
  *  to the run that spawned the iframe. */
 export const PREVIEW_MESSAGE_KEY = "__dsWebPreview__";
 
+/** Property a parent stamps on a message *into* the frame to ask the
+ *  bridge to re-post everything it has sent so far. See the buffer in
+ *  `buildPreviewBridge`: a server-rendered frame runs before the page's
+ *  JavaScript does, so the only way for a late subscriber to see its
+ *  early output is to ask for it. */
+export const PREVIEW_REPLAY_KEY = "__dsWebPreviewReplay__";
+
 /** Class applied to preview iframes so surfaces can style them from
  *  their stylesheet of choice. */
 export const PREVIEW_IFRAME_CLASS = "ds-web-preview-frame";
@@ -99,10 +106,35 @@ export function buildPreviewBridge(token: string): string {
   "use strict";
   var KEY = ${JSON.stringify(PREVIEW_MESSAGE_KEY)};
   var TOKEN = ${JSON.stringify(token)};
+  var REPLAY = ${JSON.stringify(PREVIEW_REPLAY_KEY)};
+  // Everything posted so far, so a parent that starts listening late can
+  // ask for it. A run attaches its listener before the frame exists and
+  // never needs this; the server-rendered auto-preview is the opposite —
+  // its frame is in the initial HTML and starts running while the page's
+  // JavaScript is still downloading, so by the time React hydrates and
+  // subscribes, the block has usually already logged everything it will.
+  // Without the replay those messages are simply lost, and the block
+  // looks like one that prints nothing.
+  var buffered = [];
+  var MAX_BUFFERED = 200;
+  var seq = 0;
   function post(msg) {
     msg[KEY] = TOKEN;
+    // Sequence number so a subscriber can tell a replayed message from a
+    // live one. postMessage structured-clones, so the replay arrives as
+    // a different object with the same contents — identity can't dedupe
+    // it, and comparing text would collapse a block that genuinely logs
+    // the same line twice.
+    msg.n = seq++;
+    if (buffered.length < MAX_BUFFERED) buffered.push(msg);
     try { window.parent.postMessage(msg, "*"); } catch (e) { /* detached */ }
   }
+  window.addEventListener("message", function (ev) {
+    if (!ev.data || ev.data[REPLAY] !== TOKEN) return;
+    for (var i = 0; i < buffered.length; i++) {
+      try { window.parent.postMessage(buffered[i], "*"); } catch (e) { /* detached */ }
+    }
+  });
   var MAX_DEPTH = 3;
   var MAX_ITEMS = 20;
   function describe(v, depth, seen) {
@@ -272,8 +304,17 @@ export interface WebComposeInput {
    *  already carry a challenge harness `<script>` appended by
    *  `ChallengeCard`. */
   entryHtml: string;
-  /** Per-run bridge token (see `newPreviewToken`). */
-  token: string;
+  /** Per-run bridge token (see `newPreviewToken`). Required unless
+   *  `bridge` is false, which is the only case with nothing to key. */
+  token?: string;
+  /** Inject the console bridge. Default true.
+   *
+   *  The server-rendered auto-preview passes false: no run is listening
+   *  for its messages, and the token baked into the bridge is random
+   *  per call, which would make the composed document differ between
+   *  the server's render and the browser's — a hydration mismatch, and
+   *  the one thing that document cannot be. */
+  bridge?: boolean;
   /** Text files from the workspace, keyed by workspace-relative path,
    *  `<link rel="stylesheet" href>` / `<script src>` references to
    *  these are inlined so the sandboxed document is self-contained. */
@@ -398,8 +439,20 @@ export function composeWebDocument(input: WebComposeInput): string {
     }
   }
 
-  let prelude = buildPreviewBridge(input.token);
+  let prelude = "";
+  if (input.bridge !== false) {
+    if (input.token === undefined) {
+      // Silently composing a bridgeless document would send a run's
+      // console output nowhere and look like a block that prints
+      // nothing, which is indistinguishable from a block that does.
+      throw new Error(
+        "composeWebDocument: `token` is required unless `bridge: false`.",
+      );
+    }
+    prelude += buildPreviewBridge(input.token);
+  }
   if (input.tailwind) prelude += tailwindScriptTag();
+  if (!prelude) return html;
   return injectAtDocumentStart(html, prelude);
 }
 
@@ -442,6 +495,61 @@ ${escapeInlineScriptContent(input.js)}
 
 function cellTypeFor(level: PreviewConsoleLevel): "stdout" | "stderr" {
   return level === "warn" || level === "error" ? "stderr" : "stdout";
+}
+
+/**
+ * Forward one preview frame's console output to `emit` for as long as the
+ * returned function hasn't been called.
+ *
+ * The auto-rendered preview uses this instead of `runPreviewDocument`:
+ * there is no run to wait for, no deadline to trip and no document to
+ * mount — the frame is already in the page's HTML. What it still needs is
+ * the half `runPreviewDocument` also does, turning bridge messages into
+ * output cells, which lives here so the two cannot disagree about what a
+ * `console.warn` is.
+ *
+ * `frame` is asked to replay whatever it printed before we subscribed,
+ * which for a server-rendered frame is normally everything (see the
+ * buffer in `buildPreviewBridge`). Replayed and live messages overlap by
+ * a few milliseconds, so they are deduped on the bridge's own sequence
+ * number — not on text, which would collapse a block that genuinely
+ * logs the same line twice.
+ */
+export function subscribeToPreviewConsole(options: {
+  frame: HTMLIFrameElement;
+  token: string;
+  emit: EmitOutput;
+}): () => void {
+  const seen = new Set<number>();
+  const onMessage = (ev: MessageEvent) => {
+    const data = ev.data as
+      | (PreviewMessage & Record<string, unknown>)
+      | null
+      | undefined;
+    if (!data || typeof data !== "object") return;
+    if (data[PREVIEW_MESSAGE_KEY] !== options.token) return;
+    const n = data.n;
+    if (typeof n === "number") {
+      if (seen.has(n)) return;
+      seen.add(n);
+    }
+    if (data.t === "console") {
+      options.emit({ type: cellTypeFor(data.level), content: data.text });
+    } else if (data.t === "error") {
+      options.emit({ type: "stderr", content: data.text });
+    }
+  };
+  window.addEventListener("message", onMessage);
+  try {
+    options.frame.contentWindow?.postMessage(
+      { [PREVIEW_REPLAY_KEY]: options.token },
+      "*",
+    );
+  } catch {
+    // A frame that isn't ready yet will still post live; the replay is
+    // the catch-up path, not the only one.
+  }
+  return () => window.removeEventListener("message", onMessage);
 }
 
 // The live preview stays interactive after a run resolves (its iframe is

@@ -449,6 +449,47 @@ function findHtmlEntryFiles(
     .map((f) => ({ filename: f.filename, kind: "main" as const }));
 }
 
+/**
+ * The document this workspace renders, composed from its sources alone
+ * (see `LanguageAdapter.composeStaticPreview`). Pure, Node-safe and
+ * deterministic, which is what lets `<CodeBlock>` put the result in the
+ * page's HTML instead of waiting for a Run.
+ *
+ * It reaches the same `composeWebDocument` a real Run does, with the
+ * same file map `prepareFileSystem` would have staged, so a block's
+ * preview and its first Run agree about the page by construction rather
+ * than by two implementations staying in step;
+ * `__tests__/webPreview.test.ts` pins that.
+ *
+ * The bridge is included, so the frame's console output reaches the
+ * block's own output panel rather than only the browser's devtools — but
+ * its token is supplied by the caller and derived from the block, never
+ * generated here. A random token would differ between the server's
+ * render and the browser's, and this document has to hydrate.
+ */
+function composeStaticWebPreview(
+  sources: { filename: string; source: string }[],
+  options: { entryFilename: string; token: string; tailwind?: boolean },
+): string | null {
+  const entry =
+    sources.find((f) => f.filename === options.entryFilename) ?? sources[0];
+  if (!entry) return null;
+  // Mirrors the run path: `prepareFileSystem` stages every workspace
+  // file, entry included, and sorts them into text and binary by
+  // extension. Authored blocks carry no uploads, so the binary half is
+  // empty here and `<img src>` references stay as written.
+  const textFiles = new Map<string, string>();
+  for (const f of sources) {
+    if (TEXT_FILE_RE.test(f.filename)) textFiles.set(f.filename, f.source);
+  }
+  return composeWebDocument({
+    entryHtml: entry.source,
+    token: options.token,
+    textFiles,
+    tailwind: options.tailwind,
+  });
+}
+
 export const webAdapter: LanguageAdapter = {
   id: "web",
   displayName: "Web Playground",
@@ -478,7 +519,8 @@ export const webAdapter: LanguageAdapter = {
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
-  outputCapabilities: { preview: true },
+  outputCapabilities: { preview: true, autoPreview: true },
+  composeStaticPreview: composeStaticWebPreview,
   exportFormats: [
     { extension: "html", label: "HTML (.html)", mimeType: "text/html" },
   ],

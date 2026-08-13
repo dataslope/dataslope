@@ -6,6 +6,7 @@
 import { describe, it, expect } from "vitest";
 
 import {
+  PREVIEW_REPLAY_KEY,
   buildPreviewBridge,
   composeReactDocument,
   composeWebDocument,
@@ -17,6 +18,8 @@ import {
 } from "../app/_components/runtime/webPreview";
 import { buildHarness, HARNESS_BEGIN } from "../app/_components/challengeHarness";
 import { TAILWIND_BROWSER_CDN } from "../app/_components/runtime/cdn";
+import { webAdapter } from "../app/_components/runtime/web";
+import { reactAdapter } from "../app/_components/runtime/react";
 
 describe("injectAtDocumentStart", () => {
   it("injects right after <head> when present", () => {
@@ -235,5 +238,175 @@ describe("hasHarnessMarker", () => {
     expect(hasHarnessMarker(buildHarness("react", tests))).toBe(true);
     expect(hasHarnessMarker("<h1>plain page</h1>")).toBe(false);
     expect(HARNESS_BEGIN.length).toBeGreaterThan(0);
+  });
+});
+
+describe("composeWebDocument bridge opt-out", () => {
+  it("omits the bridge (and its token) when asked", () => {
+    const doc = composeWebDocument({
+      entryHtml: "<h1>hi</h1>",
+      bridge: false,
+    });
+    expect(doc).not.toContain(PREVIEW_MESSAGE_KEY);
+    expect(doc).toContain("<h1>hi</h1>");
+  });
+
+  it("still injects Tailwind with the bridge off", () => {
+    const doc = composeWebDocument({
+      entryHtml: "<h1>hi</h1>",
+      bridge: false,
+      tailwind: true,
+    });
+    expect(doc).toContain(TAILWIND_BROWSER_CDN);
+    expect(doc).not.toContain(PREVIEW_MESSAGE_KEY);
+  });
+
+  it("refuses to compose a bridged document with no token", () => {
+    // Composing one silently would send a run's console output nowhere
+    // and render as a block that prints nothing.
+    expect(() => composeWebDocument({ entryHtml: "<h1>hi</h1>" })).toThrow(
+      /token/,
+    );
+  });
+});
+
+describe("webAdapter.composeStaticPreview", () => {
+  const sources = [
+    {
+      filename: "index.html",
+      source: `<link rel="stylesheet" href="styles.css"><h1>Hi</h1>`,
+    },
+    { filename: "styles.css", source: "h1 { color: red; }" },
+    { filename: "extra.js", source: `console.log("side")` },
+  ];
+  const TOKEN = "block-1a2b3c4d";
+  const compose = (token = TOKEN) =>
+    webAdapter.composeStaticPreview!(sources, {
+      entryFilename: "index.html",
+      token,
+    });
+
+  it("inlines referenced files and appends unreferenced root-level ones", () => {
+    const doc = compose()!;
+    expect(doc).toContain("h1 { color: red; }");
+    expect(doc).toContain(`data-inlined-from="styles.css"`);
+    expect(doc).toContain(`data-injected-from="extra.js"`);
+  });
+
+  it("is deterministic — the property hydration depends on", () => {
+    // The server and the browser both compose this document and React
+    // compares the two, so the same block must compose byte-identically
+    // every time. This is why the token is passed in rather than drawn.
+    expect(compose()).toBe(compose());
+  });
+
+  it("carries the bridge, so its console output can reach the panel", () => {
+    // Without it the frame still prints — into the browser's devtools,
+    // where the bridge echoes — and the block's own output panel stays
+    // empty, making the site the one place the output is missing.
+    const doc = compose()!;
+    expect(doc).toContain(PREVIEW_MESSAGE_KEY);
+    expect(doc).toContain(TOKEN);
+  });
+
+  it("agrees exactly with what a real Run composes", () => {
+    // The anti-drift guard: a preview that disagrees with the reader's
+    // own Run is worse than no preview, because nothing tells them which
+    // to believe. Both paths reach composeWebDocument with the same file
+    // map and the same token, so the documents must be identical.
+    const textFiles = new Map(sources.map((f) => [f.filename, f.source]));
+    const runDoc = composeWebDocument({
+      entryHtml: sources[0].source,
+      token: TOKEN,
+      textFiles,
+    });
+    expect(runDoc).toBe(compose());
+    expect(runDoc).toContain(buildPreviewBridge(TOKEN));
+  });
+
+  it("falls back to the first file when the entry name is unknown", () => {
+    expect(
+      webAdapter.composeStaticPreview!(sources, {
+        entryFilename: "nope.html",
+        token: TOKEN,
+      }),
+    ).toBe(compose());
+  });
+
+  it("returns null for an empty workspace", () => {
+    expect(
+      webAdapter.composeStaticPreview!([], {
+        entryFilename: "index.html",
+        token: TOKEN,
+      }),
+    ).toBeNull();
+  });
+});
+
+describe("auto-preview is opt-in per adapter", () => {
+  it("both preview adapters render themselves", () => {
+    for (const adapter of [webAdapter, reactAdapter]) {
+      expect(adapter.outputCapabilities?.preview).toBe(true);
+      expect(adapter.outputCapabilities?.autoPreview).toBe(true);
+      expect(typeof adapter.composeStaticPreview).toBe("function");
+    }
+  });
+
+  it("react composes from a precompiled bundle, never from source", () => {
+    // Deriving a second answer from the sources in the browser is exactly
+    // the ~3 MB esbuild-wasm download the build-time bundle exists to
+    // avoid — and a second implementation of the bundler is the drift this
+    // whole design is arranged to prevent. No bundle, no preview.
+    const sources = [{ filename: "main.tsx", source: "export {}" }];
+    expect(
+      reactAdapter.composeStaticPreview!(sources, {
+        entryFilename: "main.tsx",
+        token: "tok",
+      }),
+    ).toBeNull();
+
+    const doc = reactAdapter.composeStaticPreview!(sources, {
+      entryFilename: "main.tsx",
+      token: "tok",
+      bundle: { js: "console.log('compiled')", css: "body{margin:0}" },
+    })!;
+    expect(doc).toContain("console.log('compiled')");
+    expect(doc).toContain("body{margin:0}");
+    expect(doc).toContain(`<div id="root"></div>`);
+    // Bridged and deterministic, exactly like the web one.
+    expect(doc).toContain(PREVIEW_MESSAGE_KEY);
+    expect(doc).toBe(
+      reactAdapter.composeStaticPreview!(sources, {
+        entryFilename: "main.tsx",
+        token: "tok",
+        bundle: { js: "console.log('compiled')", css: "body{margin:0}" },
+      }),
+    );
+  });
+});
+
+describe("bridge replay buffer", () => {
+  // The server-rendered frame runs while the page's JavaScript is still
+  // downloading, so by the time React subscribes the block has usually
+  // already printed everything it will. Without a replay those messages
+  // are lost and the block looks like one that prints nothing.
+  it("buffers what it posts and re-posts on request", () => {
+    const js = buildPreviewBridge("tok");
+    expect(js).toContain(PREVIEW_REPLAY_KEY);
+    expect(js).toContain("buffered");
+    // Bounded, so a runaway loop can't grow the frame's memory without limit.
+    expect(js).toMatch(/MAX_BUFFERED\s*=\s*\d+/);
+  });
+
+  it("numbers every message so a replay can be deduped", () => {
+    // postMessage structured-clones, so a replayed message arrives as a
+    // different object with identical contents. Identity can't dedupe it
+    // and text would collapse a block that logs the same line twice.
+    expect(buildPreviewBridge("tok")).toMatch(/msg\.n\s*=\s*seq\+\+/);
+  });
+
+  it("is deterministic for a given token", () => {
+    expect(buildPreviewBridge("tok")).toBe(buildPreviewBridge("tok"));
+    expect(buildPreviewBridge("a")).not.toBe(buildPreviewBridge("b"));
   });
 });

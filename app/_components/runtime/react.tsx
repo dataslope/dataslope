@@ -546,6 +546,42 @@ class ReactPreviewRuntime implements LanguageRuntime {
  *  component-only file as the entry would bundle fine but render
  *  nothing, so the Run button resolves to the mounting file even while
  *  the user is editing `App.tsx`. */
+/**
+ * The document this workspace renders, composed from a bundle that was
+ * compiled at build time (see `LanguageAdapter.composeStaticPreview`).
+ *
+ * Unlike the web adapter's version, this one cannot do the work itself: TSX
+ * has to be translated before a browser will take it, and the translator is
+ * a ~3 MB esbuild-wasm download that a reader should not pay for scrolling
+ * past a lesson. So `scripts/build-react-bundles.mjs` does it on a build
+ * machine, `<CodeBlock>` looks the result up by the block's content hash and
+ * passes it in, and this function only assembles the document around it.
+ *
+ * No bundle, no preview — a block whose entry is missing (a lesson edited
+ * since the workflow last ran, a route that provides no bundles) falls back
+ * to the empty panel react blocks have always shown. `sources` is unused for
+ * exactly that reason: the compiled artifact is the input here, and deriving
+ * a *second* answer from the sources would be the drift this design exists
+ * to avoid.
+ */
+function composeStaticReactPreview(
+  _sources: { filename: string; source: string }[],
+  options: {
+    entryFilename: string;
+    token: string;
+    tailwind?: boolean;
+    bundle?: { js: string; css?: string };
+  },
+): string | null {
+  if (!options.bundle) return null;
+  return composeReactDocument({
+    js: options.bundle.js,
+    css: options.bundle.css || undefined,
+    token: options.token,
+    tailwind: options.tailwind,
+  });
+}
+
 function findReactEntryFiles(
   files: { filename: string; content: string }[],
 ): EntryFileInfo[] {
@@ -594,7 +630,8 @@ export const reactAdapter: LanguageAdapter = {
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
-  outputCapabilities: { preview: true },
+  outputCapabilities: { preview: true, autoPreview: true },
+  composeStaticPreview: composeStaticReactPreview,
   exportFormats: [
     { extension: "tsx", label: "React TSX (.tsx)", mimeType: "text/plain" },
     { extension: "jsx", label: "React JSX (.jsx)", mimeType: "text/plain" },

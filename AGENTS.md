@@ -927,7 +927,8 @@ generator filled a panel, and neither can the site.
 - **web and react have no prepopulated output at all, and cannot.** Their
   output *is* a live sandboxed iframe, not cells; the capture comes back with
   nothing but "the preview didn't finish within the time limit". There is
-  nothing to store, so those 72 blocks stay blank by nature.
+  nothing to store, so those blocks have no entry in *this* manifest by
+  nature — and neither needs one any more. Both render themselves; see below.
 
 Between the two generators, 3,280 of the site's 3,374 runnable blocks show
 their output before the reader presses Run. Of the 94 that do not, 72 are web
@@ -1037,6 +1038,213 @@ which every `sns.histplot(...)` block records nothing while the browser draws
 a chart. The JS half of the conversion is *shared* rather than copied
 (`app/_components/runtime/pythonDisplayOutputs.ts`), so only the Python half
 can drift.
+
+### A web block renders itself, without a manifest and without a Run
+
+Every other language shows its result because a generator ran the code at build
+time and filed the cells. `web` needs none of that: `composeWebDocument` is a
+pure string operation and the browser is the runtime, so the *document* a block
+renders can be composed during SSR and shipped inside the page's HTML. The
+preview is on screen at first paint — no manifest entry, no runtime download,
+no Run, and nothing to go stale, because the composition is derived from the
+source rather than recorded against it.
+
+The adapter opts in with two fields: `outputCapabilities.autoPreview` and
+`composeStaticPreview` (`runtime/web.tsx`). `<CodeBlock>` reads the first to
+decide and calls the second to compose. `react` sets both too, but composes
+from a **precompiled bundle** rather than from source — see the section after
+next. `<ChallengeCard>` doesn't implement any of this at all: its buffer is an
+*unsolved* starter with a test harness appended, and auto-rendering would
+print failing assertions before the learner has read the task.
+
+Four things this rests on, none of them optional:
+
+- **The composed document must be deterministic.** The server and the browser
+  both compose it and React compares the two, so anything random or
+  clock-derived in the output is a hydration mismatch. The bridge token is
+  therefore *derived* — a content hash of the block plus React's own `useId`
+  — not drawn from `newPreviewToken()` the way a run's is. The two halves
+  matter: the hash alone would collide between two blocks with identical
+  source on one page, and `useId` alone would not survive an edit.
+
+  A derived token is guessable by anything already on the page, and that is
+  acceptable **only** because this frame carries no harness: the token
+  authenticates "which frame said this", not "did the learner really pass".
+  Challenge cards never auto-render and keep their per-run random tokens, so
+  the sentinel protocol is untouched. Do not reuse this token for a harnessed
+  document.
+- **`composeStaticPreview` must run under Node**, because SSR is where it is
+  called first. No `window`, no `document`.
+- **The handover on Run is `flushSync`, and that is load-bearing.** React owns
+  the auto-rendered frame; `runPreviewDocument` owns the slot's children
+  imperatively (`host.replaceChildren`). Interleaved, they corrupt each other:
+  React's removal landing after the runtime's insertion deletes the run's
+  frame. `run()` therefore flushes the unmount synchronously before it awaits
+  anything. A plain `setState` there is a race, not a style choice.
+- **It renders the starter, not the reader's restored buffer.** Composing from
+  `localStorage` would mean rendering twice and shifting between, and the
+  starter is what the prepopulated cells show too. Run replaces the frame with
+  their version the moment they ask; Reset brings the starter's back.
+
+`__tests__/webPreview.test.ts` pins the part that would rot silently: given
+the same token, the static composition and a real Run must produce the *same
+document*, byte for byte. A preview that disagrees with the reader's own Run
+is worse than no preview, because nothing tells them which to believe.
+
+### The frame's console output belongs to the block, not to devtools
+
+The bridge forwards every `console.*` call to the parent **and** calls the
+original, so a learner who opens devtools sees their own `console.log` where a
+web developer would expect it — which `js-dom-basics` and `js-events` are
+explicitly teaching. That echo is a passthrough, never a channel: every
+adapter's output reaches the block's own panel, and no output anywhere on the
+site is devtools-only. (Java is the case that proves the rule: CheerpJ writes
+`System.out` *through* `console.log` because there is no other sink, and
+`runWithCapture` intercepts and swallows it rather than letting it through.)
+
+Keeping that true for an auto-rendered frame takes two things:
+
+- **The frame is bridged**, with the derived token above, and `<CodeBlock>`
+  subscribes with `subscribeToPreviewConsole`. Without it the frame still
+  printed — to devtools — while the panel below stayed empty, which made the
+  site's own surface the one place the output was missing.
+- **The bridge buffers and replays.** A server-rendered frame runs while the
+  page's JavaScript is still downloading, so by the time React hydrates and
+  subscribes, the block has usually already printed everything it will. The
+  subscriber asks the frame to re-post what it buffered. Replayed and live
+  messages overlap by a few milliseconds, so they are deduped on the bridge's
+  own sequence number — not on text, which would collapse a block that
+  genuinely logs the same line twice, and not on object identity, which
+  `postMessage`'s structured clone destroys.
+
+**The output panel reserves space when it expects to print**, so those cells
+land in a box that already exists rather than making one and pushing the rest
+of the lesson down (~96px, measured). The gate is the source mentioning
+`console.`, because reserving on all 42 web blocks would put an empty box under
+the 39 that never print. It is a heuristic and it is allowed to be: the false
+positive reserves a little space for nothing — which is what the two blocks
+that log from a click handler get, and it reads as "output appears here" — and
+the false negative needs a block that reaches the console without naming it.
+Knowing for certain would mean running the code at build time, which is the
+thing this whole approach exists to avoid.
+
+### A react block's bundle is compiled by a workflow, not by the reader
+
+`web` renders itself for free — composing its document is a pure string
+operation, about 8µs a block, 0.36ms for all 47 on the site, which is why it
+happens during SSR and has no generator at all. `react` cannot: TSX has to be
+translated before a browser will take it, and doing that in the reader's
+browser is a **~3 MB esbuild-wasm download** paid by anyone who scrolls past a
+lesson.
+
+So the translation moved to a build machine.
+`scripts/build-react-bundles.mjs` compiles every react block into the ES
+module its preview renders, `.github/workflows/react-bundles.yml` keeps
+`lib/generated/react-bundles.json` current on pushes to `main`, and **neither
+`build` nor `dev` ever runs esbuild**. `<CodeBlock>` looks the bundle up by the
+block's content hash (`ReactBundles.tsx` → `lib/reactBundles.ts`) and hands it
+to `composeStaticPreview`, which only assembles the document around it. No
+bundle, no preview — the block falls back to the empty panel, and Run still
+bundles in the browser as it always has, because the reader can edit the code.
+
+Why the bundles are small enough to commit: the plugin rewrites every bare
+import to a pinned esm.sh URL and marks it **external**, so a bundle carries
+the block's own code and not a copy of React. All 25 together are 73 kB. The
+reader's browser fetches React once and caches it across the course.
+
+Four things hold this together:
+
+- **One bundling contract, two callers.** The resolution rules, loader table
+  and build options live in `runtime/reactBundle.ts`, which the browser worker
+  *and* the Node generator both import — the generator reaching TypeScript
+  through the resolver hook in `scripts/lib/ts-resolve.mjs`. A block's preview
+  and its Run must produce the same bundle, and this is what makes that
+  structural rather than something two files have to remember.
+- **The esbuild version is pinned twice and asserted once.** The worker loads
+  `ESBUILD_WASM_VERSION` from jsDelivr; the generator uses the `esbuild-wasm`
+  devDependency. The generator exits non-zero if they disagree, and
+  `__tests__/reactBundles.test.ts` additionally requires the devDependency to
+  be an **exact** version, not a caret range — `^0.28.1` would let `npm ci`
+  install 0.28.9 on a runner and silently change every bundle on the site.
+  (That test caught exactly that, the first time it ran.)
+- **The generator's app imports must be dynamic.** A static `import`
+  declaration is hoisted and resolved before any statement runs, so the
+  resolver hook would not be installed yet. `await import()` after
+  `enableTsResolution()` is not a style choice there.
+- **A block with an auto-preview does not warm its runtime.** The warm-ups in
+  `<CodeBlock>` exist to move a runtime download off the Run click; once the
+  reader can already see the result, that trade inverts, and for react it
+  would have re-spent the whole 3 MB the precompiled bundle just saved —
+  cancelling out the feature while every test still passed. `<ChallengeCard>`
+  still warms, deliberately: it cannot auto-preview, and the learner is
+  expected to attempt it.
+
+### `<LivePreview>` reserves its stage, and why that is only half the story
+
+`<LivePreview>` fills its shadow root in an effect, so the server's HTML has a
+**zero-height box** where the demo will be. Unreserved, `colors-gradients-shadows`
+grew its five stages from 0 to 1,191px the moment its JavaScript ran — the
+deep-link bug again, with `<HashScrollFix>` given three seconds to paper over it.
+
+So every usage now passes `height`, measured rather than guessed: the natural
+heights across the course run from **83px to 613px**, a 10× spread with no
+default worth having. `height` is applied as `min-height`, not `height`: a
+narrow viewport wraps a demo taller than it was measured at, and a demo that
+outgrows its box should push the page down a little rather than have its own
+point cropped off. The committed numbers are `max(desktop, mobile)` for that
+reason. If you change a demo's CSS, re-measure it — a stale number costs a
+small shift, never a broken example.
+
+**Two things this does not fix, both worth knowing before you chase them:**
+
+- **The widget's stylesheet arrives after first paint.** `LivePreview` is
+  `next/dynamic`-loaded (see `mdx/lazyWidgets.ts`), so its CSS module ships in
+  an async chunk: measured on a production build, the page has 6 stylesheets at
+  `DOMContentLoaded` and 10 once settled, and the source panels below the stage
+  go from an unstyled `16px`/no-padding to `12.5px`/`12px 14px` — **+2,345px on
+  that page**, dwarfing the stage's 1,191px. The stage holds anyway because its
+  reservation is an *inline* style, which is the only reason this fix works at
+  all. Making the widget's CSS eager would fix the rest and would undo a
+  bundle split the repo made deliberately and measured; that is a real
+  trade-off, not an oversight.
+- **CLS does not see any of it.** All of these pages measure **0.00002**,
+  because the growth is below the fold and CLS only counts what is in the
+  viewport. Do not use CLS to decide whether this class of bug exists here;
+  compare `document.scrollHeight` before and after hydration instead.
+
+`<ReactPreview>` has none of this: its demo is a real React component passed as
+`children`, so it is server-rendered and its stage has its height from the
+start. Its `height` prop stays a *fixed* height — same name, different meaning,
+because only one of the two widgets has something to reserve for.
+
+### The live preview reserves its height before it has one
+
+`.previewSlot` (`ChallengeCard.module.css`, shared by `<CodeBlock>` and
+`<ChallengeCard>`) occupies the same box empty or full. It used to shrink to
+120px while empty and snap to 300px when the iframe landed, so **every Run grew
+the card by 180px under the reader** — measured on
+`intro-web-development/html-structure`, the next `<h2>` moved down exactly that
+far on click. That is the bug `<HashScrollFix>` exists to correct, fired by the
+reader's own button, and correcting a shift is always worse than not having
+one: the correction is a race the reader can lose.
+
+Reserving the space is what makes it impossible, and `previewHeight` on the
+block is what keeps the reservation honest — a page demo wants the 300px
+default, a single-element demo wants 120px and would otherwise sit in a
+screenful of held-open white. It arrives as a custom property
+(`app/_components/previewStage.ts`), not an inline `height`, so the stylesheet
+keeps the drag-resize floor and the empty-state rules and the prop only moves
+the number they are written against. A bare number means px, matching
+`<LivePreview height>`.
+
+The empty state is dashed rather than solid for the same reason the height is
+fixed: at full height a solid box reads as a panel that failed to load, and
+dashes are the convention for space held for something not here yet.
+
+`<Playground>`'s own `.web-preview-slot` (`playground.css`) still has the old
+shrink, deliberately — it is a driven IDE where the reader presses Run on
+purpose, not a lesson they are reading through, and inside `.web-preview-body`
+it is a flex child whose height is `auto` anyway.
 
 ### A DataFrame goes through `display()`, never `print()`
 
