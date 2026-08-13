@@ -279,6 +279,18 @@ $$
 
 ## `classification_report()`: the whole picture at once
 
+Two arrays in, one table out. The order matters: truth first, predictions second.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "classification_report(" },
+    { text: "y_true,", label: "the labels" },
+    { text: "y_pred,", label: "what the model said" },
+    { text: "target_names=classes", label: "so the rows are readable" },
+    { text: ")" },
+  ]}
+/>
+
 In practice you rarely compute these by hand. `classification_report()`
 prints precision, recall, and F1 for every class, plus support (how many
 true examples of each class there were).

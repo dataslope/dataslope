@@ -66,6 +66,16 @@ disappears. That's the fastest way to internalize the difference.
 
 ## `box-sizing`, one rule to keep
 
+The value decides what `width` measures, and `border-box` is the one everyone switches to:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "*, *::before, *::after {", label: "every element, including pseudo-elements" },
+    { text: "box-sizing: border-box;", label: "width now includes padding and border" },
+    { text: "}" },
+  ]}
+/>
+
 By default, `width` sets only the *content* width, so padding and
 border make the box bigger than the number you wrote. Nearly every
 real stylesheet opts out of that surprise:

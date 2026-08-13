@@ -160,6 +160,17 @@ codebase from turning into a pile of one-off transformations.
 
 ## 5. Use `pipe` for frame-level steps
 
+`pipe` passes the frame as the first argument, so your own function joins a chain without breaking it:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "df.pipe(" },
+    { text: "add_features,", label: "your function; df becomes its first argument" },
+    { text: "window=7", label: "any extra arguments follow" },
+    { text: ")" },
+  ]}
+/>
+
 `pipe` does the same thing one level up, for reusable steps that take
 and return a frame.
 

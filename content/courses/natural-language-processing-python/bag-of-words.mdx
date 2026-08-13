@@ -133,6 +133,16 @@ each document against it.
 
 ## Counts vs. presence (binary bag-of-words)
 
+One argument switches the vectorizer between "how often" and "at all":
+
+<SyntaxBreakdown
+  parts={[
+    { text: "CountVectorizer(" },
+    { text: "binary=True", label: "presence, 0 or 1, instead of a count" },
+    { text: ")" },
+  ]}
+/>
+
 Sometimes you care only *whether* a word appears, not how often, for short
 texts or spam-style signals, presence is enough and is less swayed by length.
 That variant is **binary** bag-of-words: each cell is 1 or 0 instead of a

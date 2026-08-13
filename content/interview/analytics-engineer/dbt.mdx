@@ -85,6 +85,16 @@ design rather than an admission of failure.
 
 ### How does an incremental model actually filter new rows?
 
+The guard is what makes the model incremental: on a full refresh the branch is skipped entirely.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "{% if is_incremental() %}", label: "only on an incremental run" },
+    { text: "WHERE updated_at >", label: "the watermark comparison" },
+    { text: "(SELECT max(updated_at) FROM this)", label: "the model as it already exists" },
+  ]}
+/>
+
 The `is_incremental()` macro returns `true` only when the model already exists in the warehouse and the run is not a full refresh. You use it in a `WHERE` clause to limit rows to those newer than the max value already loaded.
 
 Below, the `config()` marks the model `incremental`, and the

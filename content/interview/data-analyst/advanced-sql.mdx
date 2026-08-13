@@ -113,6 +113,17 @@ FOLLOWING`.
 
 ### How do you compute a running total?
 
+An ordered `SUM` with no explicit frame already means "everything up to this row":
+
+<SyntaxBreakdown
+  parts={[
+    { text: "SUM(amount)" },
+    { text: "OVER (", label: "makes it a window function" },
+    { text: "ORDER BY day", label: "what running means" },
+    { text: ")", label: "the default frame runs to the current row" },
+  ]}
+/>
+
 `SUM` as a window function with `ORDER BY` and the default
 running frame:
 

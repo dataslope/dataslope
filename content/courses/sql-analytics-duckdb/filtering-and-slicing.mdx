@@ -75,6 +75,17 @@ everything in between. If you need to exclude an endpoint, use explicit
 
 ## Membership with `IN`
 
+`IN` is a shorter `OR`, and the parentheses hold a list rather than a subquery here:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE" },
+    { text: "cut", label: "the column to test" },
+    { text: "IN", label: "true if it equals any of them" },
+    { text: "('Ideal', 'Premium')", label: "the list of accepted values" },
+  ]}
+/>
+
 When a column must match one of several values, `IN` is cleaner than a
 chain of `OR`s.
 

@@ -224,6 +224,17 @@ turn("east");
 
 ## `in` operator narrowing
 
+The `in` check is real JavaScript, and TypeScript uses it to pick the union member that has that property:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "if (" },
+    { text: "\"radius\"", label: "the property name, as a string" },
+    { text: "in shape", label: "a runtime check the compiler also reads" },
+    { text: ")", label: "inside, shape is the circle variant" },
+  ]}
+/>
+
 The **`in`** operator checks if a property exists on an object. TypeScript
 uses this to narrow object unions:
 

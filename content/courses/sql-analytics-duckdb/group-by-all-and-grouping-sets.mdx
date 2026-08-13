@@ -94,6 +94,17 @@ flowchart TB
 
 ## `ROLLUP`, hierarchical subtotals
 
+`ROLLUP` adds subtotal rows by dropping grouping columns from the right, one at a time:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "GROUP BY ROLLUP(" },
+    { text: "region,", label: "kept longest" },
+    { text: "quarter", label: "dropped first, giving a per-region subtotal" },
+    { text: ")", label: "and finally a grand total row" },
+  ]}
+/>
+
 `ROLLUP(region, product)` produces the detailed rows **plus** a subtotal
 per region **plus** a grand total. It is perfect for hierarchies where
 each level rolls up into the one above (product → region → everything).

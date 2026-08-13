@@ -58,6 +58,16 @@ for.
 
 ## `a[i]` *is* `*(a + i)`
 
+Indexing is not a primitive in C. It is defined as pointer arithmetic, which is why `a[i]` and `i[a]` both compile:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "a[i]", label: "what you write" },
+    { text: "is" },
+    { text: "*(a + i)", label: "what it means: advance i elements, then read" },
+  ]}
+/>
+
 Indexing in C is sugar for pointer arithmetic. The expression `a[i]`
 is defined as `*(a + i)`. The `+ i` part is *typed*, it advances by
 `i * sizeof(*a)` bytes, not by `i` bytes.

@@ -106,6 +106,16 @@ wrap-around (e.g. a hash function), use unsigned.
 
 ## Fixed-width types: `<stdint.h>`
 
+The name is the specification: signedness, width, and nothing left to the platform.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "u", label: "unsigned" },
+    { text: "int32", label: "exactly 32 bits, on every platform" },
+    { text: "_t x;", label: "the _t suffix marks it a typedef" },
+  ]}
+/>
+
 Because `int`, `long`, etc. vary across platforms, anything you write
 to disk, send over a network, or talk to hardware with should use the
 fixed-width types from `<stdint.h>`.

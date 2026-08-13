@@ -152,6 +152,16 @@ patient, every Java programmer eventually internalizes it.
 
 ## What `final` means
 
+`final` means "assigned once", and what that buys depends on what is being held:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "final", label: "the reference cannot be reassigned" },
+    { text: "List<String> xs", label: "but the list it points at can still change" },
+    { text: "= new ArrayList<>();" },
+  ]}
+/>
+
 A variable declared with `final` cannot be reassigned after its
 first assignment. It is a *commitment*.
 

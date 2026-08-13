@@ -97,6 +97,17 @@ The analysis unit must match or be nested within the randomization unit to keep 
 
 ### How do you calculate sample size for an A/B test?
 
+Four inputs are the whole calculation, and three of them are choices made before any data is seen:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "baseline rate,", label: "measured from history" },
+    { text: "MDE,", label: "the smallest lift worth detecting" },
+    { text: "alpha = 0.05,", label: "false-positive rate you accept" },
+    { text: "power = 0.8", label: "chance of catching a real effect" },
+  ]}
+/>
+
 You need four inputs: baseline conversion rate, minimum detectable effect (MDE), `alpha` (commonly 0.05), and desired power (commonly 0.8).
 The formula for a two-proportion z-test is derived from the pooled standard error; most practitioners use a sample size calculator.
 Sample size scales inversely with the square of the MDE, $n \propto \dfrac{1}{\text{MDE}^2}$: halving the MDE you want to detect quadruples the required sample.

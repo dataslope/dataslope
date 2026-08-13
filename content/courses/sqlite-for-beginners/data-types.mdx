@@ -115,6 +115,16 @@ SQLite's full mapping rules look at words inside the declared type. For beginner
 
 ## `typeof()` shows the storage class
 
+SQLite stores a value's own type, not the column's, and `typeof()` is how you see which one it actually used:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "typeof(", label: "the storage class of this value" },
+    { text: "price", label: "not the column's declared type" },
+    { text: ")", label: "one of null, integer, real, text, blob" },
+  ]}
+/>
+
 SQLite has a helpful function named `typeof()` that reports how a value is actually stored.
 
 <SqlCodeBlock

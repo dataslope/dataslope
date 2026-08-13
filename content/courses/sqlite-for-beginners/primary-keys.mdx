@@ -100,6 +100,16 @@ Surrogate keys are very common because they are simple and stable. The number do
 
 ## SQLite's special `INTEGER PRIMARY KEY`
 
+Spelled exactly this way, the column becomes an alias for the hidden `rowid`, which is what makes it fill itself in:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "id", label: "the column" },
+    { text: "INTEGER", label: "exactly INTEGER; INT would not do it" },
+    { text: "PRIMARY KEY", label: "now an alias for the rowid, auto-assigned" },
+  ]}
+/>
+
 In SQLite, this declaration is special:
 
 ```sql

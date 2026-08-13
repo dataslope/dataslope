@@ -55,6 +55,16 @@ branch flips.
 
 ## Showing something or nothing: `&&`
 
+`&&` returns its right side only when the left is truthy, which is why a `0` on the left renders a literal zero:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "{items.length > 0", label: "a boolean, not a number" },
+    { text: "&&" },
+    { text: "<List />}", label: "rendered only when the left side is true" },
+  ]}
+/>
+
 When you want to render something **only when a condition is true** (and
 nothing otherwise), reach for `&&`. In JavaScript, `cond && value`
 evaluates to `value` when `cond` is truthy and to `cond` (a falsy value

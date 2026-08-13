@@ -98,6 +98,16 @@ upfront.
 
 ## The `.dt` accessor
 
+`.dt` is the gate to the datetime parts of a Series, exactly as `.str` is for text:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "df[\"day\"]", label: "a datetime Series" },
+    { text: ".dt", label: "the accessor; without it there is no .month" },
+    { text: ".month", label: "one integer per row" },
+  ]}
+/>
+
 Once a column is a datetime, the `.dt` namespace gives you
 date-component extraction:
 

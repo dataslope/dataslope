@@ -185,6 +185,17 @@ quarters in advance.
 
 ## Going the other way: `UNPIVOT`
 
+`UNPIVOT` turns columns back into rows, so it names the two columns it will create:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "UNPIVOT sales" },
+    { text: "ON q1, q2, q3, q4", label: "the columns to fold away" },
+    { text: "INTO NAME quarter", label: "a column holding the old column names" },
+    { text: "VALUE amount", label: "and one holding their values" },
+  ]}
+/>
+
 Sometimes data arrives wide, a spreadsheet with a column per month, but
 you need it long to compute on it. `UNPIVOT` collapses those columns back
 into rows.

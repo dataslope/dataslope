@@ -20,6 +20,16 @@ Together, these tools let you derive types from your code's structure, ensuring 
 
 ## `keyof T`: The Keys of a Type
 
+`keyof` produces a union of the property *names*, as literal types, which is what makes a key argument checkable:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "keyof", label: "the operator" },
+    { text: "User", label: "the type to read" },
+    { text: "// \"name\" | \"age\"", label: "a union of literal string types" },
+  ]}
+/>
+
 The **`keyof`** operator takes an object type and produces a union of its keys (as string or number literal types).
 
 <CodeBlock

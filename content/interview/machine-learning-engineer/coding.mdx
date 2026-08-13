@@ -166,6 +166,17 @@ into a full cosine-similarity matrix in one vectorized operation.
 
 ### How do you implement mini-batching for training?
 
+A batch is a slice, and the two numbers that define it are the only state you need:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "for i in range(0, n," },
+    { text: "bs", label: "the step, which is the batch size" },
+    { text: "):" },
+    { text: "X[i : i + bs]", label: "one slice; the last may be short" },
+  ]}
+/>
+
 Shuffle the row indices once per epoch, then slice fixed-size chunks and
 index the data with them. Shuffling by index (not by copying rows) keeps
 features and labels aligned and avoids materializing shuffled copies. A
@@ -236,6 +247,16 @@ where each count is a boolean-mask sum: `TP = ((y_pred == 1) & (y_true == 1)).su
 Vectorizing the masks keeps it $O(n)$ with no Python loop.
 
 ### How do you decode class predictions from a probability matrix?
+
+`argmax` over the class axis, and getting the axis right is the whole job:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "probs.argmax(" },
+    { text: "axis=1", label: "reduce across classes, one answer per row" },
+    { text: ")", label: "shape (n, k) becomes (n,)" },
+  ]}
+/>
 
 For an `(n_samples, n_classes)` matrix of probabilities, `np.argmax(P, axis=1)`
 returns the predicted class index per row in $O(nk)$. `np.max(P, axis=1)`

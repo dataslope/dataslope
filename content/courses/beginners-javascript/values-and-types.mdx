@@ -246,6 +246,16 @@ real argument for reaching for `===` by default.
 
 ## `null` vs `undefined`
 
+Two different absences, and `??` is the operator that treats them alike while leaving `0` and `""` alone:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "value", label: "used unless it is null or undefined" },
+    { text: "??", label: "nullish coalescing, not ||" },
+    { text: "fallback", label: "so 0 and empty string survive" },
+  ]}
+/>
+
 These two look similar but have slightly different intent:
 
 - `undefined` means *"no value has been assigned"*. JavaScript itself

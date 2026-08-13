@@ -19,6 +19,18 @@ runnable here); the one runnable block uses only NumPy.
 
 ### What does a single artificial neuron compute?
 
+One line, and each piece is a separate design decision:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "a =" },
+    { text: "f(", label: "the activation, the only non-linear part" },
+    { text: "w · x", label: "a weighted sum of the inputs" },
+    { text: "+ b", label: "the bias, which shifts the threshold" },
+    { text: ")" },
+  ]}
+/>
+
 A weighted sum of its inputs plus a bias, passed through a non-linear
 activation:
 

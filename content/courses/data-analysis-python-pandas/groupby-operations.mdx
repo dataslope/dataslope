@@ -281,6 +281,17 @@ boolean-mask filtering of rows.
 
 ## `apply()`, for anything else
 
+`apply` runs Python per row or per column, and `axis` is what decides which. It is the slow escape hatch, not the first tool.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "df.apply(" },
+    { text: "fn,", label: "called once per row or column" },
+    { text: "axis=1", label: "1 means a row is passed in, 0 means a column" },
+    { text: ")" },
+  ]}
+/>
+
 `apply()` runs an arbitrary function on each group. Slower than
 the named aggregations, but flexible.
 

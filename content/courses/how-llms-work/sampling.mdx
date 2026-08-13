@@ -119,6 +119,15 @@ print("High T gives the long tail a real chance.")
 
 ## Top-p (nucleus) sampling
 
+Top-p is a cutoff on cumulative probability, not on a count, which is what makes the candidate set shrink and grow with the model's confidence:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "top_p=0.9", label: "keep tokens until their probabilities sum to 0.9" },
+    { text: "temperature=0.7", label: "applied first, reshaping the distribution" },
+  ]}
+/>
+
 Temperature alone has a problem: at high temperature, genuinely absurd
 tokens become reachable. Top-p fixes this by truncating the tail first.
 

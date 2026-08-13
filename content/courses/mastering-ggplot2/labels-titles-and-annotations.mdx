@@ -16,6 +16,18 @@ effect.
 
 ## labs(): one place for all the text
 
+Every visible string on a ggplot has a name in `labs()`, and the aesthetic names double as the legend titles:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "labs(" },
+    { text: "title = \"...\",", label: "the headline" },
+    { text: "x = \"...\",", label: "the axis title" },
+    { text: "color = \"...\"", label: "the legend title, named by its aesthetic" },
+    { text: ")" },
+  ]}
+/>
+
 `labs()` sets every text label on the plot, axis titles, the legend
 title, the plot title, subtitle, and caption. Notice that the legend
 title comes from the *aesthetic name*, so you label it by naming the

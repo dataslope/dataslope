@@ -15,6 +15,16 @@ doing most of the work.
 
 ## The `children` prop
 
+`children` is not passed as an attribute. Whatever sits between the tags arrives under that name:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "<Card>", label: "the opening tag carries the other props" },
+    { text: "Hello", label: "this becomes props.children" },
+    { text: "</Card>" },
+  ]}
+/>
+
 Whatever you put *between* a component's tags arrives as its
 `children` prop. That lets you build **wrapper** components, a `Card`,
 a `Modal`, a `Panel`, that style or arrange whatever you place inside:

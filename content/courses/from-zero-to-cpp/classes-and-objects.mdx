@@ -137,6 +137,16 @@ they were called on.
 
 ## The hidden `this` pointer
 
+Every non-static member function receives one extra argument you never wrote:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "obj.area()", label: "what you write" },
+    { text: "becomes" },
+    { text: "area(&obj)", label: "what the compiler passes: this" },
+  ]}
+/>
+
 When you call `a.deposit(50.0)`, the compiler passes `a`'s address
 as a hidden first argument. Inside the method, the implicit pointer
 `this` refers to the object:

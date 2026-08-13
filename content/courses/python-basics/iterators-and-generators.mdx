@@ -293,6 +293,15 @@ In production, you might chain generators to process log files too large for RAM
 
 ## `yield from`
 
+`yield from` delegates the whole of another iterable, which is what saves writing a loop that just re-yields:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "yield from", label: "delegate to another iterable" },
+    { text: "inner()", label: "every value it yields comes out of here" },
+  ]}
+/>
+
 `yield from iterable` is shorthand for "yield every item from that iterable":
 
 <CodeBlock
