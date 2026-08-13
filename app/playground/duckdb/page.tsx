@@ -2,6 +2,8 @@
 
 import dynamic from "next/dynamic";
 
+import PlaygroundLoading from "../_components/PlaygroundLoading";
+
 // Client-only: the playground reads persisted state (tabs, active database)
 // from localStorage and generates per-session tab ids in render-time
 // initializers, so an SSR pass would always hydrate against different
@@ -9,7 +11,9 @@ import dynamic from "next/dynamic";
 // client paint instead of flashing defaults and re-rendering.
 const DuckDbPlayground = dynamic(
   () => import("../../_components/duckdb/DuckDbPlayground"),
-  { ssr: false },
+  // The loading fallback is server-rendered (loading components are included
+  // even under ssr: false), so first paint shows the boot screen, not a blank.
+  { ssr: false, loading: PlaygroundLoading },
 );
 
 export default function DuckDbPage() {
