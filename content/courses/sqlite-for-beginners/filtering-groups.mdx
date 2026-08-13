@@ -260,18 +260,20 @@ If the condition mentions an aggregate function like `COUNT()`, `SUM()`, `AVG()`
 
 ## The clause order so far
 
-The written order of a grouped query is fixed:
+The written order of a grouped query is fixed, and each clause has one job:
 
-```sql
-SELECT columns_and_aggregates
-FROM table_name
-WHERE row_condition
-GROUP BY group_columns
-HAVING group_condition
-ORDER BY sort_columns;
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT ...", label: "choose the output" },
+    { text: "FROM ...", label: "choose the table" },
+    { text: "WHERE ...", label: "filter rows" },
+    { text: "GROUP BY ...", label: "build the groups" },
+    { text: "HAVING ...", label: "filter the groups" },
+    { text: "ORDER BY ...;", label: "sort the result" },
+  ]}
+/>
 
-The logical flow is:
+That is the order you *write*. The order SQLite *runs* them in is different:
 
 **`FROM` (choose table) → `WHERE` (filter rows) → `GROUP BY` (build groups) → aggregates like `COUNT()`, `SUM()`, `AVG()` → `HAVING` (filter groups) → `SELECT` (choose output) → `ORDER BY` (sort result)**
 

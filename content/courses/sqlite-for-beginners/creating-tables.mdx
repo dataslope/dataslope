@@ -37,14 +37,13 @@ The `SELECT` returns no rows because the table is empty. That is still useful: i
 
 Read the statement as: *create a table called `books` with an integer `id`, text `title`, text `author`, and integer `year`.*
 
-```mermaid
-flowchart LR
-    S["<code>CREATE TABLE books</code>"] --> P["column list"]
-    P --> C1["id INTEGER"]
-    P --> C2["title TEXT"]
-    P --> C3["author TEXT"]
-    P --> C4["year INTEGER"]
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "CREATE TABLE", label: "make a new table" },
+    { text: "books", label: "its name" },
+    { text: "(id INTEGER, title TEXT, ...);", label: "one name and one type per column" },
+  ]}
+/>
 
 ## From statement to grid
 

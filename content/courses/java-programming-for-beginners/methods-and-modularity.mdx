@@ -48,24 +48,23 @@ thing.
 
 ## Anatomy of a method
 
-```java
-returnType methodName(paramType paramName, ...) {
-    // body
-    return someValue;     // unless returnType is void
-}
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "int", label: "the kind of value it gives back" },
+    { text: "square", label: "the name callers use" },
+    { text: "(int n)", label: "locals filled from the caller's arguments" },
+    { text: "{ return n * n; }", label: "the body, and what it returns" },
+  ]}
+/>
 
-A few rules:
+A few rules on top of that shape:
 
-- The **return type** says what kind of value the method gives back.
-  Use `void` if it returns nothing.
+- Use `void` as the return type if the method returns nothing.
 - The **name** should be a verb or short verb phrase: `add()`,
   `printReport`, `findLargest`. Lower-case first letter, camelCase
   for multi-word names.
-- The **parameters** are local variables that are initialized from
-  the caller's arguments.
-- `return` immediately ends the method and gives its argument back
-  to the caller.
+- `return` immediately ends the method, wherever it appears in the
+  body, and gives its argument back to the caller.
 
 ## A first example
 

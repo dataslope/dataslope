@@ -23,7 +23,7 @@ Inheritance shows up everywhere in Python:
 Understanding inheritance is essential for working with frameworks and designing extensible systems. But remember: **composition is often better than inheritance**. We'll cover that too.
 
 <Callout type="info" title="Real-world example: Django models">
-Every Django model inherits from \`django.db.models.Model\`. That base class provides the entire object-relational mapping machinery: \`save()\`, \`delete()\`, \`objects.filter(...)\`, etc. You just define fields and optionally override methods. This is inheritance done right: the base class provides infrastructure, subclasses provide domain logic.
+Every Django model inherits from `django.db.models.Model`. That base class provides the entire object-relational mapping machinery: `save()`, `delete()`, `objects.filter(...)`, etc. You just define fields and optionally override methods. This is inheritance done right: the base class provides infrastructure, subclasses provide domain logic.
 </Callout>
 
 ## Single inheritance
@@ -104,7 +104,7 @@ print(d.speak())  # calls Dog.speak, not Animal.speak
 />
 
 <Callout type="tip" title="When to override">
-Override a method when you need **different behavior** for the subclass. If you want to **extend** the parent's behavior (call the parent's version first, then add more), use \`super()\` (next section).
+Override a method when you need **different behavior** for the subclass. If you want to **extend** the parent's behavior (call the parent's version first, then add more), use `super()` (next section).
 </Callout>
 
 ## `super()`: calling parent methods
@@ -145,7 +145,7 @@ When you write `Dog("Rex", "Labrador")`, initialization runs in order:
 5. The fully initialized `Dog` instance is returned.
 
 <Callout type="info" title="super() in multiple inheritance">
-In single inheritance, \`super()\` just calls the parent. In multiple inheritance, \`super()\` follows the **Method Resolution Order (MRO)**, which is computed by the C3 linearization algorithm. This ensures every class is called exactly once in a consistent order. See the MRO section below.
+In single inheritance, `super()` just calls the parent. In multiple inheritance, `super()` follows the **Method Resolution Order (MRO)**, which is computed by the C3 linearization algorithm. This ensures every class is called exactly once in a consistent order. See the MRO section below.
 </Callout>
 
 ## Polymorphism: same interface, different behavior
@@ -180,7 +180,7 @@ for animal in animals:
 None of these classes inherit from a common base, but they all work with `for animal in animals: animal.speak()` because they all implement `speak()`. This is **duck typing**.
 
 <Callout type="tip" title="Duck typing: 'If it walks like a duck...'">
-"If it walks like a duck and quacks like a duck, it's a duck." In Python, you don't need inheritance for polymorphism. Two unrelated classes are **substitutable** if they expose the same methods. This is why Python's \`open()\` works with files, sockets, and in-memory buffers: they all have \`.read()\` and \`.write()\`.
+"If it walks like a duck and quacks like a duck, it's a duck." In Python, you don't need inheritance for polymorphism. Two unrelated classes are **substitutable** if they expose the same methods. This is why Python's `open()` works with files, sockets, and in-memory buffers: they all have `.read()` and `.write()`.
 </Callout>
 
 ## `isinstance` and `issubclass`
@@ -211,7 +211,7 @@ print(issubclass(Dog, Animal))  # True
 `isinstance(obj, Class)` returns `True` if `obj` is an instance of `Class` **or any subclass**. `type(obj) is Class` only returns `True` for exact type matches.
 
 <Callout type="warn" title="Prefer isinstance over type checks">
-Use \`isinstance(x, int)\` instead of \`type(x) is int\`. The former allows subclasses (e.g., \`bool\` is a subclass of \`int\`); the latter does not. In general, checking types at all is un-Pythonic, prefer duck typing and "ask forgiveness, not permission" (EAFP).
+Use `isinstance(x, int)` instead of `type(x) is int`. The former allows subclasses (e.g., `bool` is a subclass of `int`); the latter does not. In general, checking types at all is un-Pythonic, prefer duck typing and "ask forgiveness, not permission" (EAFP).
 </Callout>
 
 ## Multiple inheritance and method resolution order
@@ -268,7 +268,7 @@ classDiagram
 ```
 
 <Callout type="warn" title="Multiple inheritance is powerful but tricky">
-Most well-designed codebases either **avoid multiple inheritance** or restrict it to **mixins**, small classes that add a single piece of behavior (e.g., \`LoggingMixin\`, \`JSONSerializableMixin\`). Deep multiple-inheritance hierarchies are hard to reason about and debug.
+Most well-designed codebases either **avoid multiple inheritance** or restrict it to **mixins**, small classes that add a single piece of behavior (e.g., `LoggingMixin`, `JSONSerializableMixin`). Deep multiple-inheritance hierarchies are hard to reason about and debug.
 </Callout>
 
 ## Abstract base classes
@@ -307,7 +307,7 @@ except TypeError as e:
 Use ABCs when you want to **enforce a contract**: "any subclass must implement these methods". This is common in framework design.
 
 <Callout type="info" title="ABCs in the standard library">
-Python's \`collections.abc\` module defines many useful ABCs: \`Iterable\`, \`Sequence\`, \`Mapping\`, \`Set\`, etc. If you want to check "does this object behave like a list?", use \`isinstance(obj, collections.abc.Sequence)\` instead of \`isinstance(obj, list)\`, it allows any list-like object, not just \`list\`.
+Python's `collections.abc` module defines many useful ABCs: `Iterable`, `Sequence`, `Mapping`, `Set`, etc. If you want to check "does this object behave like a list?", use `isinstance(obj, collections.abc.Sequence)` instead of `isinstance(obj, list)`, it allows any list-like object, not just `list`.
 </Callout>
 
 ## Composition over inheritance

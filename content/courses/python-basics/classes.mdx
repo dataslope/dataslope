@@ -139,7 +139,7 @@ print(a.species, b.species)  # change is reflected in all instances
 <Callout type="warn" title="Mutable class attributes are a gotcha">
 If a class attribute is a **mutable** object (list, dict, set), all instances share that single object. Modifying it in one instance affects all others. This is almost never what you want.
 
-\`\`\`python
+```python
 class Bad:
     items = []  # shared by all instances!
 
@@ -147,9 +147,9 @@ a = Bad()
 b = Bad()
 a.items.append(1)
 print(b.items)  # [1], oops!
-\`\`\`
+```
 
-**Always** initialize mutable per-instance data in \`__init__\`.
+**Always** initialize mutable per-instance data in `__init__`.
 </Callout>
 
 ```mermaid

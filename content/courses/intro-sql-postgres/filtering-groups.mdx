@@ -39,6 +39,18 @@ flowchart TD
 aggregates have been computed. Think of it as "`WHERE`, but for
 groups."
 
+In a finished query the two sit either side of `GROUP BY`, and each
+can only see what exists by the time it runs:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT dept, COUNT(*) FROM employees" },
+    { text: "WHERE active", label: "filters rows, before any group exists" },
+    { text: "GROUP BY dept", label: "the groups are built here" },
+    { text: "HAVING COUNT(*) > 2", label: "filters groups, once the counts exist" },
+  ]}
+/>
+
 ## HAVING in action
 
 Keep only departments with more than two employees:

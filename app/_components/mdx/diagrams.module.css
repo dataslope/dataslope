@@ -233,6 +233,10 @@
 
 /* ── <SyntaxBreakdown> ───────────────────────────────────────────────────── */
 
+/* No frame of its own. The braces and their labels already read as one
+   figure, and a panel around them made the breakdown look like a sibling of
+   the runnable code blocks it usually sits next to, which it is not: nothing
+   here can be pressed. Padding stays, so the figure keeps its air. */
 .syntax {
   display: flex;
   flex-wrap: wrap;
@@ -240,10 +244,10 @@
   justify-content: center;
   gap: 0.35rem 0.5rem;
   max-width: 100%;
-  padding: 1.25rem 1rem 1rem;
-  border: 1px solid var(--ds-gray-200);
-  border-radius: 0.625rem;
-  background: var(--ds-gray-50);
+  padding: 0.5rem 0 0.25rem;
+  /* A single span never wraps (it is one token of code), so a long one on a
+     narrow screen scrolls here rather than pushing the article sideways. */
+  overflow-x: auto;
 }
 
 /* Every span is only as wide as its own code, which is what lets each brace
@@ -261,7 +265,7 @@
 /* The lesson stylesheet gives every inline <code> a chip: a tinted background,
    padding and a radius. That is right in a sentence and wrong here, where the
    spans are consecutive pieces of one statement and a chip each would read as
-   several. Reset to bare text; the row's own panel is the frame. */
+   several. Reset to bare text, so the row reads as one line of code. */
 .partText {
   padding: 0;
   border: none;
@@ -312,11 +316,6 @@
   text-align: center;
   text-wrap: balance;
   color: var(--color-fd-muted-foreground);
-}
-
-:global(html:is(.dark, [data-theme="dark"])) .syntax {
-  border-color: #2e2e2e;
-  background: color-mix(in srgb, var(--color-fd-background, #121212) 82%, #000);
 }
 
 :global(html:is(.dark, [data-theme="dark"])) .partText {

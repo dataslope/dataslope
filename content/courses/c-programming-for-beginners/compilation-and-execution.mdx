@@ -93,9 +93,9 @@ int main(void) {
 `GREETING` and `TIMES` are simply gone, they were replaced.
 
 <Callout type="warn" title="Macros are textual">
-\`#define DOUBLE(x) x * 2\` looks fine, but \`DOUBLE(1 + 1)\` expands
-to \`1 + 1 * 2\`, which is \`3\`, not \`4\`. Always wrap macro arguments
-and the macro body in parentheses: \`#define DOUBLE(x) ((x) * 2)\`.
+`#define DOUBLE(x) x * 2` looks fine, but `DOUBLE(1 + 1)` expands
+to `1 + 1 * 2`, which is `3`, not `4`. Always wrap macro arguments
+and the macro body in parentheses: `#define DOUBLE(x) ((x) * 2)`.
 </Callout>
 
 ## Stage 2: the compiler

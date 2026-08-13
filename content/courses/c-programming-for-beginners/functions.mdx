@@ -22,14 +22,19 @@ Now let's write our own.
 
 ## Anatomy of a function
 
-```c
-return_type name(parameter_list) {
-    // body
-    return some_value;   // (omit for void)
-}
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "int", label: "the type it gives back" },
+    { text: "square", label: "the name callers use" },
+    { text: "(int n)", label: "typed slots for the inputs" },
+    { text: "{ return n * n; }", label: "the body, and what it returns" },
+  ]}
+/>
 
-A complete example:
+Use `void` as the return type when a function gives nothing back, and
+leave out its `return` value.
+
+The same function, complete and runnable:
 
 <CodeBlock
   adapter="c"

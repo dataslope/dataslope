@@ -25,11 +25,15 @@ table.
   caption="A `WITH` clause names a result so the query below can read it like a table."
 />
 
-```mermaid
-flowchart TB
-    CTE["WITH <code>big_orders</code> AS (<br/>SELECT ... FROM orders WHERE amount > 50<br/>)"] -->|"named result"| Main["SELECT ... FROM <code>big_orders</code>"]
-    Main --> Result["Final rows"]
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "WITH" },
+    { text: "big_orders", label: "the name you choose" },
+    { text: "AS (SELECT ... )", label: "the query it stands for" },
+    { text: "SELECT ... FROM" },
+    { text: "big_orders", label: "read like any other table" },
+  ]}
+/>
 
 The CTE runs first and produces a temporary, named result; the main
 query then reads from that name. It is the same idea as a subquery,

@@ -28,9 +28,22 @@ same result set.
 
 `PARTITION BY` splits rows into independent groups, `ORDER BY` sequences rows
 inside each partition, and the **frame** (`ROWS`/`RANGE BETWEEN ...`) bounds
-which rows feed the calculation. Omit `PARTITION BY` and the whole result is one
-partition; omit the frame and ranking functions still work, but running
-aggregates default to the partition-so-far.
+which rows feed the calculation:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "SUM(amount)" },
+    { text: "OVER (" },
+    { text: "PARTITION BY region", label: "independent groups" },
+    { text: "ORDER BY day", label: "sequence inside each group" },
+    { text: "ROWS 6 PRECEDING", label: "the frame that bounds the calculation" },
+    { text: ")" },
+  ]}
+/>
+
+Omit `PARTITION BY` and the whole result is one partition; omit the frame and
+ranking functions still work, but running aggregates default to the
+partition-so-far.
 
 ### Explain `ROW_NUMBER` vs `RANK` vs `DENSE_RANK`.
 

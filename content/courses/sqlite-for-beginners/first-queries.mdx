@@ -70,20 +70,16 @@ Column aliases name what you see in the result table; they do not store data any
 
 A SQL statement is one complete instruction. We end statements with a semicolon `;` so SQLite knows the instruction is finished.
 
-```mermaid
-flowchart TB
-    A["<code>SELECT</code>"] --> B["what you want back"]
-    B --> C["AS <code>optional_name</code>"]
-    C --> D["semicolon<br/>end of statement"]
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT" },
+    { text: "'Ada'", label: "what you want back" },
+    { text: "AS first_name", label: "the name it gets in the result" },
+    { text: ";", label: "end of statement" },
+  ]}
+/>
 
-For now, the most common shape is:
-
-```sql
-SELECT value_or_column AS output_name;
-```
-
-Later, when you read stored data, you add `FROM table_name` to say where the rows come from.
+Later, when you read stored data, you add `FROM table_name` between the value and the semicolon to say where the rows come from.
 
 <SqlCodeBlock
   dialect="sqlite"

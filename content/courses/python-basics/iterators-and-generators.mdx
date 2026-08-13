@@ -63,7 +63,7 @@ sequenceDiagram
 ```
 
 <Callout type="warn" title="Iterables vs Iterators">
-An **iterable** is anything with an \`__iter__\` method: lists, tuples, strings, dicts, files, generators, your own classes. An **iterator** is what \`iter()\` returns, it has both \`__iter__\` (returning self) and \`__next__\`. Many beginners confuse the two. A list is iterable but not an iterator. Calling \`iter(list)\` gives you an iterator.
+An **iterable** is anything with an `__iter__` method: lists, tuples, strings, dicts, files, generators, your own classes. An **iterator** is what `iter()` returns, it has both `__iter__` (returning self) and `__next__`. Many beginners confuse the two. A list is iterable but not an iterator. Calling `iter(list)` gives you an iterator.
 </Callout>
 
 ## Manually driving an iterator
@@ -214,7 +214,7 @@ print(list(islice(naturals(), 10)))
 Calling `list(naturals())` would hang forever. The `islice` adapter takes a finite slice, so it's safe. Infinite generators power `itertools.count`, `itertools.cycle`, and many streaming pipelines.
 
 <Callout type="error" title="Never materialize an infinite generator">
-Writing \`list(infinite_gen())\` or \`sum(infinite_gen())\` without a limit will run until you kill the process or run out of memory. Always consume infinite generators with tools that know when to stop: \`islice\`, \`takewhile\`, or manual \`next()\` calls.
+Writing `list(infinite_gen())` or `sum(infinite_gen())` without a limit will run until you kill the process or run out of memory. Always consume infinite generators with tools that know when to stop: `islice`, `takewhile`, or manual `next()` calls.
 </Callout>
 
 ## Generator expressions
@@ -368,7 +368,7 @@ print(list(product("ab", "12")))  # [('a','1'), ('a','2'), ...]
 />
 
 <Callout type="info" title="itertools is your friend">
-Before writing a generator from scratch, check if \`itertools\` already has what you need. \`itertools.groupby\`, \`itertools.compress\`, \`itertools.pairwise\` (3.10+), and others save you from reinventing the wheel.
+Before writing a generator from scratch, check if `itertools` already has what you need. `itertools.groupby`, `itertools.compress`, `itertools.pairwise` (3.10+), and others save you from reinventing the wheel.
 </Callout>
 
 ## Generators are one-shot

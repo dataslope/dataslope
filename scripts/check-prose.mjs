@@ -48,6 +48,18 @@
 //                    em dash would be, and any non-ASCII dash glyph. See the
 //                    section below for why labels are held to a stricter
 //                    standard than rule 2 holds prose to.
+//   8. escaped-backtick, a `\`` in the *body* of a `<Callout>`. Inside a JS
+//                    template literal that escape is required, and nearly
+//                    every long string in these lessons is one, so the habit
+//                    travels: 285 of them reached readers across 22 files as
+//                    the literal character, `\`@app.route\`` printed with its
+//                    backticks showing instead of set as code. A callout body
+//                    is markdown, not a template literal, and markdown reads
+//                    the backslash as "print this backtick". Callout bodies
+//                    only, because that is where a line-based rule can be
+//                    certain: a template literal never starts a line with
+//                    `<Callout`. The same mistake in a table cell is real but
+//                    not detectable this cheaply.
 //
 // Scope is what a reader actually sees:
 //
@@ -316,6 +328,21 @@ export function lintSource(src, file, kind) {
   });
 
   if (kind === "mdx") {
+    // A backslash-escaped backtick in a callout body. The tags are matched at
+    // column 0, which is where MDX requires a block element's own tags to sit
+    // and where a template literal's contents never begin.
+    let inCallout = false;
+    let calloutFence = false;
+    lines.forEach((line, i) => {
+      if (/^<Callout\b/.test(line)) inCallout = true;
+      else if (/^<\/Callout>/.test(line)) inCallout = false;
+      else if (inCallout && /^\s*(```+|~~~+)/.test(line)) calloutFence = !calloutFence;
+      else if (inCallout && !calloutFence && line.includes("\\`")) {
+        add("escaped-backtick", i + 1, line.trim().slice(0, 90));
+      }
+      if (!inCallout) calloutFence = false;
+    });
+
     for (const { line, body } of blockquotes(lines)) {
       if (hasWrappingQuotes(body)) add("blockquote-quotes", line, body.slice(0, 90));
     }
@@ -397,6 +424,13 @@ if (isMain) {
           "text verbatim, so a typed `--` reaches the reader as two hyphens.",
       );
     }
+    if (byRule["escaped-backtick"]) {
+      console.error(
+        "\ncallout backticks: write a plain backtick. A callout body is\n" +
+          "markdown, not a template literal, so `\\`` reaches the reader as the\n" +
+          "character rather than as a code span.",
+      );
+    }
     if (byRule["colour-spelling"]) {
       console.error(
         "\ncolour: write it \"color\". It is a CSS property, a Plot channel and a\n" +
@@ -406,6 +440,6 @@ if (isMain) {
     process.exit(1);
   }
   console.log(
-    `✓ prose in ${files.length} file(s) is clean (no em dashes, no spaced en dashes, no filler phrases, no one-line display math, no British "colour", no doubled blockquote quotes, no stray dashes in mermaid labels)`,
+    `✓ prose in ${files.length} file(s) is clean (no em dashes, no spaced en dashes, no filler phrases, no one-line display math, no British "colour", no doubled blockquote quotes, no stray dashes in mermaid labels, no escaped backticks in callouts)`,
   );
 }

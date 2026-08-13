@@ -47,6 +47,19 @@ wide row.
 A join lives in the `FROM` part of a query. It names a second table
 and the **matching condition** with `ON`:
 
+<SyntaxBreakdown
+  parts={[
+    { text: "FROM orders" },
+    { text: "JOIN" },
+    { text: "customers", label: "the second table" },
+    { text: "ON" },
+    { text: "orders.customer_id = customers.id", label: "which rows count as a match" },
+  ]}
+/>
+
+Everything else about the query is unchanged. Here it is whole, and
+runnable:
+
 <SqlCodeBlock
   dialect="postgres"
   title="Your first join, narrated"

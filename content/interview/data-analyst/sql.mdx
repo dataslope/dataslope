@@ -210,6 +210,16 @@ window calculation for each partition. It is analogous to `GROUP BY` for
 the window frame: rows in different partitions are computed independently.
 Omitting `PARTITION BY` makes the entire result set one window.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "RANK()", label: "the window function" },
+    { text: "OVER (" },
+    { text: "PARTITION BY department", label: "restart the ranking per department" },
+    { text: "ORDER BY salary DESC", label: "what rank 1 means" },
+    { text: ")" },
+  ]}
+/>
+
 ```sql
 SELECT
   name,

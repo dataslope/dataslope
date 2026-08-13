@@ -30,14 +30,20 @@ flowchart TD
   ret --> out["Returned value flows back to caller"]
 ```
 
-A function in R has four parts:
+A function in R has four parts, and three of them are visible on the
+line that creates it:
 
-- A **name** (the variable you assign it to).
-- A list of **parameters** (the names the function uses
-  internally for its inputs).
-- A **body** (the R code that runs).
-- A **return value** (by default, the value of the last
-  expression, or whatever you wrap in `return()`).
+<SyntaxBreakdown
+  parts={[
+    { text: "square", label: "the variable you assign it to" },
+    { text: "<- function" },
+    { text: "(x)", label: "the names it uses for its inputs" },
+    { text: "{ x * x }", label: "the body that runs" },
+  ]}
+/>
+
+The fourth is the **return value**: by default the value of the last
+expression in the body, or whatever you wrap in `return()`.
 
 The simplest possible function:
 
