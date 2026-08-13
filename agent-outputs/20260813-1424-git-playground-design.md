@@ -555,6 +555,31 @@ duckdb-wasm are **absent** from the Worker entirely — the
 code. The two copies are not a server/SSR split as first assumed; they map to
 two separate compilation graphs (§8.6.1).
 
+#### Verification (direct measurements, independent of the attribution script)
+
+The GZ column above is an estimate (each module's raw bytes × its chunk's
+measured gzip ratio). The rows that drive decisions were re-checked directly:
+
+- **charts.js**: standalone gz is 897 KiB; the two chunk copies measure
+  891 + 887 = **1778 KiB gz direct** — the table's 1758 slightly
+  *under*states it. `_13l8iog._.js`'s sourcemap lists exactly four sources
+  (`app/api/admin/charts/route.ts`, `lib/generated/charts.js`,
+  `lib/charts/regenMarks.ts`, Next's route template), confirming both that
+  the chunk is ~pure manifest and that it exists solely for the API route.
+- **elkjs**: exact VLQ decode of `ssr/_0it6b2w._.js` puts
+  `elk.bundled.js` at 1416 KiB of the chunk's 1570 KiB mapped (~90%), with
+  `@xyflow/react` + `@xyflow/system` (118 KiB) and `ErDiagramPane.tsx`
+  most of the rest — i.e. the chunk *is* the SqlCardDialogs subtree. The
+  chunk's direct gz is **479 KiB** (elk.bundled.js standalone: 456 KiB),
+  so read the table's 487 as "the dialogs chunk, ~479 measured".
+- **images.js**: 579,247 raw / 150 KiB gz standalone; two copies =
+  **~300 KiB gz**, so the table's 365 modestly overstates it (prose-heavy
+  JSON gzips better than its chunks' average ratio).
+- **Absences**: zero chunks in the Worker input tree contain plotly's
+  `_fullLayout` or `loadPyodide`. The one `AsyncDuckDB` hit is
+  `app__components_runtime_duckdb_ts` — our own 30 KB adapter glue that
+  performs the CDN import, not the library.
+
 ### 8.4 Rules that keep git's Worker cost at ~0
 
 1. **isomorphic-git must never be statically imported from any module
@@ -642,10 +667,11 @@ the route's server graph, so the Worker still pays.
 
 `SqlPlayground.tsx:132` and `PostgresPlayground.tsx:73` already use
 `dynamic(…, { ssr: false })` for the same pane. Applying that to the card
-path should drop `elkjs`, `@xyflow/react`, and the second CodeMirror
-configuration: **~487 KiB gz plus part of the 330 KiB CodeMirror bucket.**
-These dialogs only ever open from a click, so they are never server-rendered
-— nothing is lost.
+path drops the whole dialogs chunk — **479 KiB gz, directly measured**
+(elkjs is ~90% of it, `@xyflow/react` most of the rest) — plus whatever of
+the second CodeMirror configuration lives in adjacent chunks. These dialogs
+only ever open from a click, so they are never server-rendered — nothing is
+lost.
 
 This is the same trap as §8.2 in a third form: a bare `import()` splits the
 client bundle, `next/dynamic` with SSR on splits the client bundle, and only
@@ -679,16 +705,16 @@ and `@polar-sh/sdk` at 114 KiB (billing routes only).
 
 #### 8.6.6 Recovery summary
 
-| Fix | GZ KiB | Effort | Risk |
-| --- | ---: | --- | --- |
-| `chart-slugs.js` for the admin API route | ~891 | trivial | very low |
-| `ssr: false` on `SqlCardDialogs` | ~487+ | small | low |
-| Chart SVG bodies → `ASSETS` | ~887 | medium | medium — spike first |
-| Same treatment for `images.js` | ~365 | medium | medium |
-| Trim Shiki grammars | 300–500 | medium | low |
+| Fix | GZ KiB | Basis | Effort | Risk |
+| --- | ---: | --- | --- | --- |
+| `chart-slugs.js` for the admin API route | ~891 | direct | trivial | very low |
+| `ssr: false` on `SqlCardDialogs` | ~479 | direct | small | low |
+| Chart SVG bodies → `ASSETS` | ~887 | direct | medium | medium — spike first |
+| Same treatment for `images.js` | ~300 | direct | medium | medium |
+| Trim Shiki grammars | 300–500 | estimate | medium | low |
 
-Plausible total ≈ **2.9–3.1 MiB**, which would take the Worker from 9.74 MiB
-to roughly 6.7 MiB — near the "~5–6 MiB" the June runbook projected.
+Plausible total ≈ **2.8–3.0 MiB**, which would take the Worker from 9.74 MiB
+to roughly 6.8 MiB — near the "~5–6 MiB" the June runbook projected.
 
 **Recommendation:** Git does not need to wait for any of this. But the first
 two rows are cheap enough to be worth doing regardless, and together they
