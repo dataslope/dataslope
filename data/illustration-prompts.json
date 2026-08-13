@@ -18,7 +18,8 @@
       "home-icon": "1024x1024",
       "auth-globe-pin": "1024x1024",
       "pricing-plan": "1024x1024",
-      "playground-hero": "1536x1024"
+      "playground-hero": "1536x1024",
+      "playground-mark": "1024x1024"
     },
     "postgresElephant": "a friendly blue elephant (the PostgreSQL mascot)"
   },
@@ -33286,6 +33287,18 @@
       "title": "Playgrounds hero band",
       "mascot": true,
       "subject": "a marmot, a red fox and a penguin playing together in a small playground on a wide pale platform, with one thick blue slide, one solid green seesaw, and one chunky yellow climbing block"
+    },
+    {
+      "id": "playground-workspace-conflict",
+      "collection": "playground",
+      "course": "playground",
+      "courseTitle": "Browser Playgrounds",
+      "lesson": "index",
+      "category": "playground-mark",
+      "style": "isometric illustration",
+      "title": "Workspace open in another tab",
+      "mascot": true,
+      "subject": "a surprised polar bear sitting upright on a thick pale blue ice block, both front paws raised and eyes wide, ears perked, a solid blue laptop closed on the ice beside it"
     }
   ]
 }

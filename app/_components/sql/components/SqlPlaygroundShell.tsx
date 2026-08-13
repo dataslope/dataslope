@@ -12,6 +12,34 @@ import {
   useBootOverlayVisibility,
 } from "../../PlaygroundBootOverlay";
 import { DiamondMark } from "../../mdx/loadingAnimations";
+import imageManifest from "@/lib/generated/images";
+
+/** Illustration shown on the conflict overlay, authored through the same
+ *  pipeline as the course art (`data/illustration-prompts.json`, see the
+ *  Illustrations section of AGENTS.md) and promoted into `public/images/`.
+ *  Every surface asks for the `-cutout` slug. */
+const CONFLICT_MARK_SLUG = "playground-workspace-conflict-cutout";
+
+/** The mark above the conflict message. Falls back to the brand diamond when
+ *  the illustration isn't in the manifest, so a tree without the promoted
+ *  asset shows the old mark rather than an empty space. */
+function ConflictMark() {
+  const entry = imageManifest[CONFLICT_MARK_SLUG];
+  if (!entry) return <DiamondMark size={88} />;
+  const src = `/images/${CONFLICT_MARK_SLUG}.${entry.formats[entry.formats.length - 1]}`;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      width={entry.width}
+      height={entry.height}
+      alt=""
+      aria-hidden="true"
+      decoding="async"
+      className="playground-conflict-mark"
+    />
+  );
+}
 
 /**
  * Re-exported from the pure helper module (`../utils/mobilePane`) so existing
@@ -311,7 +339,7 @@ export function SqlPlaygroundShell({
         >
           <div className="playground-boot-card">
             <span className="playground-boot-loader" aria-hidden="true">
-              <DiamondMark size={88} />
+              <ConflictMark />
             </span>
             <div className="playground-boot-text">
               <span className="playground-boot-title">

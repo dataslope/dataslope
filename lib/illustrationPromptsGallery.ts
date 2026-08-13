@@ -64,6 +64,9 @@ export type Category =
   | "home-icon"
   | "pricing-plan"
   | "playground-hero"
+  /** A small mark painted into the playground chrome (square, and rendered at
+   *  ~88 CSS px), rather than a band across the top of the index page. */
+  | "playground-mark"
   | "auth-globe-pin";
 
 const CATEGORY_LABEL: Record<Category, string> = {
@@ -75,6 +78,7 @@ const CATEGORY_LABEL: Record<Category, string> = {
   "home-icon": "Home page bento icons",
   "pricing-plan": "Pricing plan icons",
   "playground-hero": "Playground hero band",
+  "playground-mark": "Playground chrome marks",
   "auth-globe-pin": "Auth globe pins",
 };
 
@@ -87,6 +91,7 @@ const CATEGORY_ORDER: Category[] = [
   "home-icon",
   "pricing-plan",
   "playground-hero",
+  "playground-mark",
   "auth-globe-pin",
 ];
 

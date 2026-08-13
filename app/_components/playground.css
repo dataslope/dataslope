@@ -2551,6 +2551,13 @@ input[type="range"].fs-slider:disabled {
 .playground-conflict-error {
   color: var(--danger, #e35a5a);
 }
+/* The conflict illustration. Width-constrained with height auto so the
+   promoted art keeps its own aspect ratio (a cut-out is trimmed to its
+   subject, so it is not square even when generated square). */
+.playground-conflict-mark {
+  width: 120px;
+  height: auto;
+}
 .playground-boot-progress {
   display: flex;
   align-items: center;
