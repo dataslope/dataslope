@@ -5224,7 +5224,11 @@ html[data-playground-theme="dark"] {
   text-overflow: ellipsis;
   max-width: 220px;
 }
-.ph-rename-btn {
+/* The small ghost icon buttons docked after the workspace name: rename
+   (pencil) and new workspace. Named for the group they belong to, since they
+   share nothing but their shape, and calling the new-workspace button
+   `.ph-rename-btn` read as a second rename control. */
+.ph-name-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -5233,7 +5237,7 @@ html[data-playground-theme="dark"] {
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: var(--text-dim);
+  color: var(--text);
   cursor: pointer;
   padding: 0;
 }
@@ -5257,8 +5261,7 @@ html[data-playground-theme="dark"] {
 .ph-new-ws-form .confirm-actions {
   margin-top: 14px;
 }
-.ph-rename-btn:hover {
-  color: var(--text);
+.ph-name-action:hover {
   background: var(--menu-item-hover);
 }
 .ph-rename-input {

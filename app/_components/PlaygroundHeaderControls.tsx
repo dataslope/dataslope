@@ -176,7 +176,7 @@ export function WorkspaceNameControl({
       </span>
       <button
         type="button"
-        className="ph-rename-btn"
+        className="ph-name-action"
         title="Rename workspace"
         aria-label="Rename workspace"
         onClick={startEdit}
@@ -253,7 +253,7 @@ export function NewWorkspaceControl({
       }}
     >
       <Dialog.Trigger
-        className="ph-rename-btn"
+        className="ph-name-action"
         title="New workspace"
         aria-label="New workspace"
       >

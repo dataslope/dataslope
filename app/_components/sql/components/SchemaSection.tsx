@@ -66,78 +66,38 @@ function SchemaSectionImpl({
 
   const header = (
     <div className="sql-tree-section-header">
-      <Popover.Root>
-        <Popover.Trigger
-          openOnHover
-          delay={120}
-          closeDelay={80}
-          render={(props) => (
-            <button
-              type="button"
-              {...props}
-              className="sql-tree-section-toggle"
-              onClick={onToggle}
-              aria-expanded={expanded}
-            >
-              <span className="sql-tree-chevron" aria-hidden="true">
-                {expanded ? (
-                  <ChevronDown size={12} />
-                ) : (
-                  <ChevronRight size={12} />
-                )}
-              </span>
-              <span className="sql-tree-label">
-                {label} ({count})
-              </span>
-            </button>
-          )}
-        />
-        <Popover.Portal>
-          <Popover.Positioner
-            className="sql-tree-popover-positioner"
-            sideOffset={6}
-            align="start"
-          >
-            <Popover.Popup className="bui-popup sql-tree-popover">
-              {toggleHint}
-            </Popover.Popup>
-          </Popover.Positioner>
-        </Popover.Portal>
-      </Popover.Root>
+      {/* Both collapse/expand controls hint through the native `title`
+          tooltip. The row is a stack of section headers the user runs down
+          quickly, and a popover that follows the pointer along it was more
+          movement than the hint is worth. */}
+      <button
+        type="button"
+        className="sql-tree-section-toggle"
+        onClick={onToggle}
+        title={toggleHint}
+        aria-expanded={expanded}
+      >
+        <span className="sql-tree-chevron" aria-hidden="true">
+          {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+        </span>
+        <span className="sql-tree-label">
+          {label} ({count})
+        </span>
+      </button>
       {showExpandCollapse && (
-        <Popover.Root>
-          <Popover.Trigger
-            openOnHover
-            delay={120}
-            closeDelay={80}
-            render={(props) => (
-              <button
-                type="button"
-                {...props}
-                className="sql-tree-section-expand-toggle"
-                onClick={allExpanded ? onCollapseAll : onExpandAll}
-                aria-label={expandCollapseHint}
-              >
-                {allExpanded ? (
-                  <ChevronsUp size={12} aria-hidden="true" />
-                ) : (
-                  <ChevronsDown size={12} aria-hidden="true" />
-                )}
-              </button>
-            )}
-          />
-          <Popover.Portal>
-            <Popover.Positioner
-              className="sql-tree-popover-positioner"
-              sideOffset={6}
-              align="start"
-            >
-              <Popover.Popup className="bui-popup sql-tree-popover">
-                {expandCollapseHint}
-              </Popover.Popup>
-            </Popover.Positioner>
-          </Popover.Portal>
-        </Popover.Root>
+        <button
+          type="button"
+          className="sql-tree-section-expand-toggle"
+          onClick={allExpanded ? onCollapseAll : onExpandAll}
+          title={expandCollapseHint}
+          aria-label={expandCollapseHint}
+        >
+          {allExpanded ? (
+            <ChevronsUp size={12} aria-hidden="true" />
+          ) : (
+            <ChevronsDown size={12} aria-hidden="true" />
+          )}
+        </button>
       )}
       {onAdd && (
         <Popover.Root>
