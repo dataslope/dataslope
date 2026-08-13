@@ -1,0 +1,64 @@
+/* ============================================================================
+ * footer.css, the rules the shared site footer (`HomeFooter`) needs wherever
+ * it renders.
+ * ----------------------------------------------------------------------------
+ * The footer is authored in Tailwind, and the shared @source list
+ * (app/tailwind.shared.css) scans `_components/home`, so BOTH Tailwind roots
+ * already emit its utilities, nothing here has to restate them.
+ *
+ * What does belong here is the handful of rules that must beat a *stylesheet*
+ * rather than a utility. Tailwind's utilities live in `@layer utilities`, and
+ * every unlayered rule outranks a layered one no matter which sheet the App
+ * Router ordered last (the cascade problem app/tailwind.shared.css and
+ * app/docs.css both open with). app/docs.css carries several such unlayered
+ * element rules, and on the Fumadocs routes the footer now renders *under*
+ * them; on the Tailwind routes the same sheet can leak in after a client-side
+ * navigation out of a lesson. So these are written unlayered too.
+ *
+ * Imported by app/home.css (the footer's home on the Tailwind routes) and by
+ * app/docs.css (the Fumadocs routes, see app/_components/DocsFooter.tsx), so
+ * the two surfaces lay the footer out identically.
+ * ==========================================================================*/
+
+/* Footer columns: one on mobile, two from sm, four from lg, the twelve-column
+ * bed went from 4+4+4 to 3+3+3+3 when the Playgrounds column was added. The
+ * jump to four waits for lg rather than landing at sm because the playground
+ * rows carry the longest labels in the footer ("TypeScript Playground") plus a
+ * leading icon; at sm each of four columns is ~118px and every one of them
+ * wraps.
+ *
+ * `align-items: start` because the columns are wildly uneven, the logo, then
+ * Explore over Resources, then 11 course rows, then ~14 playground rows:
+ * without it the short columns stretch and their content drifts apart down
+ * the row.
+ *
+ * Driven by this rule rather than by Tailwind grid utilities so a leaked
+ * `.grid`/`grid-cols-*` from another sheet can't collapse it to the wrong
+ * column count. */
+.ds-footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 2.5rem;
+}
+@media (min-width: 640px) {
+  .ds-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .ds-footer-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Column headings ("Explore", "Resources", …). They ask for Tailwind's
+ * `tracking-wide`, which app/docs.css's global `h1..h6 { letter-spacing:
+ * -0.02em }` would otherwise win against, it's unlayered and the utility
+ * isn't. Uppercase 12px labels are exactly the text that needs the extra
+ * tracking rather than the display tracking, so restate it here (same
+ * 0.025em `tracking-wide` compiles to) where being unlayered makes it hold on
+ * the docs routes and on any Tailwind route that sheet leaked into. */
+.ds-footer-grid :is(h1, h2, h3, h4, h5, h6) {
+  letter-spacing: 0.025em;
+}

@@ -35,6 +35,14 @@
    definition (byte-identical to the one Fumadocs registers) is the one in
    effect, keeping `dark:*` utilities identical across both Tailwind roots. */
 @import "./tailwind.shared.css";
+/* The shared site footer's layout rules. These routes render the same footer
+   the rest of the site does, below the Fumadocs layout, see
+   app/_components/DocsFooter.tsx. The Tailwind utilities the footer authors
+   already compile into this root (the @source list above scans
+   `_components/home`); this adds the few rules that have to be unlayered to
+   survive, including one that counteracts the global heading rule further
+   down this file. Shared with app/home.css so both surfaces agree. */
+@import "./footer.css";
 
 /* ── Tailwind v4 border-color default hardening (intermittent black borders) ──
    Tailwind v4's preflight resets every element to `border: 0 solid`, which

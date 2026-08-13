@@ -21,6 +21,7 @@ import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { courseSource } from "@/lib/source";
 import { ThemePillToggleSlot } from "@/app/_components/ThemePillToggle";
 import { DocsRootProvider } from "@/app/_components/DocsRootProvider";
+import { DocsFooter } from "@/app/_components/DocsFooter";
 
 export default function CourseLessonLayout({
   children,
@@ -84,6 +85,10 @@ export default function CourseLessonLayout({
       >
         {children}
       </DocsLayout>
+      {/* Outside <DocsLayout>, deliberately: the footer sits below the docs
+          grid so the sidebar (and the TOC) stay pinned until the lesson runs
+          out and then release into it. See DocsFooter. */}
+      <DocsFooter />
     </DocsRootProvider>
   );
 }

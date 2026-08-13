@@ -24,6 +24,12 @@
  * `body`/`h1..h6` typography) still relies on them.
  * ========================================================================== */
 
+/* The shared footer's own layout rules. They used to live at the bottom of
+ * this file, scoped under `.ds-home`; they moved to their own stylesheet when
+ * the Fumadocs routes started rendering the same footer (app/docs.css imports
+ * it too), so both surfaces lay it out from one source. */
+@import "./footer.css";
+
 /* Keep the whole page, and every heading in it, on the home page's own
  * Inter styling, immune to learn.css's global `h1..h6` heading rule. */
 .ds-home,
@@ -105,36 +111,4 @@ html.dark .ds-home {
 .ds-home [data-anims="paused"],
 .ds-home [data-anims="paused"] * {
   animation-play-state: paused !important;
-}
-
-/* Footer: one column on mobile, two from sm, four from lg — the twelve-column
- * bed went from 4+4+4 to 3+3+3+3 when the Playgrounds column was added. The
- * jump to four waits for lg rather than landing at sm because the playground
- * rows carry the longest labels in the footer ("TypeScript Playground") plus a
- * leading icon; at sm each of four columns is ~118px and every one of them
- * wraps.
- *
- * `align-items: start` because the columns are wildly uneven — the logo, then
- * Explore over Resources, then 11 course rows, then ~14 playground rows:
- * without it the short columns stretch and their content drifts apart down
- * the row.
- *
- * Driven by a scoped rule (rather than Tailwind grid utilities) so a leaked
- * `.grid`/`grid-cols-*` from /learn can't collapse it back to the wrong
- * column count. */
-.ds-home .ds-footer-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: start;
-  gap: 2.5rem;
-}
-@media (min-width: 640px) {
-  .ds-home .ds-footer-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (min-width: 1024px) {
-  .ds-home .ds-footer-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
 }
