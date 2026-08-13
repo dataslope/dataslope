@@ -42,6 +42,12 @@ is 99% positive") but want a posterior ("given a positive test, how likely
 is the disease?"). The denominator (the total probability of the evidence)
 is where the base rate sneaks in and where most people's intuition breaks.
 
+The cost of inverting the conditional in your head instead: a forensic
+test with a one-in-ten-thousand false-positive rate, and what a match is
+actually worth in a pool of a million and in a pool of twenty.
+
+<Chart slug="prosecutors-fallacy" />
+
 ### Why does a 99%-accurate test for a rare disease still produce mostly false positives?
 
 Because the base rate dominates. With 1% prevalence, 99% sensitivity, and a
@@ -66,6 +72,11 @@ print(f"P(disease | positive) = {posterior:.3f}")
   ]}
 />
 
+The arithmetic counted out one dot at a time: everyone who tests positive
+out of 100,000 people, with the genuinely sick shaded.
+
+<Chart slug="base-rate-grid" />
+
 ### What does it mean for two events to be independent?
 
 $A$ and $B$ are independent when knowing one tells you nothing about the
@@ -73,6 +84,12 @@ other: $P(A \mid B) = P(A)$, equivalently $P(A \cap B) = P(A)\,P(B)$.
 Independence is an assumption you should justify, not assume; correlated
 failures, repeated measurements on the same user, and network effects all
 break it.
+
+Independence has a shape. Two contingency tables with identical margins,
+drawn as area: under independence every column splits at the same height,
+and the step in the other one is the association.
+
+<Chart slug="mosaic-independence" />
 
 ### Independent vs. mutually exclusive, what's the difference?
 
@@ -109,6 +126,11 @@ print(f"Var[X] = {var:.3f}")
   ]}
 />
 
+Expectation as the point where the distribution balances, which is why it
+need not be a value the variable can take.
+
+<Chart slug="expectation-balance" />
+
 ### What is linearity of expectation, and why is it so useful?
 
 $E[X + Y] = E[X] + E[Y]$ **for any** $X$ and $Y$, even when they are
@@ -131,6 +153,11 @@ uncorrelated) variables.
 - **Exponential($\lambda$)**, the waiting time between Poisson events; mean
   $1/\lambda$, and memoryless.
 
+Three of the continuous ones on one pair of axes, all with the same mean.
+The mean does not tell you which one you are holding.
+
+<Chart slug="continuous-families" />
+
 ### What does "the exponential distribution is memoryless" mean?
 
 The future is independent of the past: $P(X > s + t \mid X > s) = P(X > t)$.
@@ -138,6 +165,11 @@ A component that has already survived $s$ hours has the same remaining-life
 distribution as a brand-new one. The geometric distribution is its discrete
 analogue, and the exponential is the *only* continuous distribution with
 this property.
+
+The property, checked at three starting points: the chance of another ten
+minutes is the same whether you have already waited zero, ten or thirty.
+
+<Chart slug="exponential-memoryless" />
 
 ### When would you model something as Poisson vs. Binomial?
 
@@ -147,6 +179,16 @@ click probability). Use **Poisson** when you are counting events over a
 continuous interval with no natural upper bound and a constant rate,
 arrivals per minute, defects per wafer. The Poisson is the limit of the
 Binomial as $n \to \infty$, $p \to 0$ with $np = \lambda$ fixed.
+
+The Poisson at three rates. Rare-event counts pile up at zero, and by a
+rate of about ten the shape is hard to tell from a normal curve.
+
+<Chart slug="poisson-shapes" />
+
+And the binomial, where n sets how many trials there are to count and p
+sets where the mass piles up.
+
+<Chart slug="binomial-shapes" />
 
 ### What is the Law of Large Numbers?
 
@@ -173,6 +215,11 @@ print("True mean is 3.5")
     },
   ]}
 />
+
+Five runs of the same fair coin. The proportion converges, slowly, and
+from wherever the early flips left it.
+
+<Chart slug="lln-convergence" />
 
 ### What is the Central Limit Theorem, and how does it differ from the LLN?
 
@@ -202,6 +249,11 @@ print(f"sample-mean std (formula):   {population.std() / 60**0.5:.3f}")
     },
   ]}
 />
+
+Simulated rather than asserted. The population is a heavily skewed
+exponential, and its sample means straighten onto the bell anyway.
+
+<Chart slug="clt-convergence" />
 
 ### Explain the Monty Hall problem.
 
@@ -234,6 +286,12 @@ print(f"Switch wins: {switch_win:.3f}  (~2/3)")
   ]}
 />
 
+Ten thousand games of each strategy, with the running win rate. Note how
+long the lines take to settle: a probability is not a promise about one
+game.
+
+<Chart slug="monty-hall-simulation" />
+
 ### Explain the birthday problem.
 
 In a room of just 23 people, the probability that two share a birthday
@@ -262,6 +320,12 @@ print("Exact answer is about 0.507")
   ]}
 />
 
+Why 23 is not the number to be surprised by. The comparison intuition
+makes is 23 against 365; the arithmetic is about the 253 pairs those 23
+people make.
+
+<Chart slug="birthday-problem-curve" />
+
 ### What is the difference between covariance and correlation?
 
 **Covariance** measures how two variables move together,
@@ -270,6 +334,12 @@ on the variables' units. **Correlation** normalizes it to
 $[-1, 1]$: $\rho = \frac{\text{Cov}(X, Y)}{\sigma_X \sigma_Y}$, making it
 scale-free and comparable across variable pairs. Zero correlation means no
 *linear* relationship, not independence.
+
+What correlation buys by standardising, and the limit of it: four
+relationships with r printed on each, including one that is perfectly
+predictable and reports nearly zero.
+
+<Chart slug="correlation-scatters" />
 
 ### How do you compute the expected value of a simple bet?
 

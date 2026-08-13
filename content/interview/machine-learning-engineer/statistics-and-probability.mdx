@@ -24,6 +24,12 @@ probability is the *area under* the curve over an interval, and $P(X = x) = 0$
 for any single point. Both integrate/sum to 1, and expectation is the
 probability-weighted average of the values.
 
+The consequence of "probability is the area, not the height": a density
+is free to go above 1, and does whenever it is packed into a narrow
+interval.
+
+<Chart slug="density-is-area-not-height" />
+
 ### Describe the distributions an ML engineer should know.
 
 **Bernoulli/Binomial** for binary outcomes and counts of successes;
@@ -33,6 +39,11 @@ sample means; **Poisson** for counts of rare events at a constant rate
 probability outcomes; **Exponential** for waiting times between Poisson
 events. Knowing each one's support, parameters, and mean/variance lets you
 pick a sensible likelihood or prior.
+
+Three of the continuous ones drawn on one pair of axes, all with the same
+mean. Knowing the mean tells you nothing about which you are holding.
+
+<Chart slug="continuous-families" />
 
 ### What is Maximum Likelihood Estimation (MLE)?
 
@@ -49,6 +60,12 @@ regression, maximizing the log-likelihood of the labels *is* the training
 objective. MLE is consistent and asymptotically efficient but can overfit
 small samples.
 
+The likelihood of the data you saw, over every parameter it might have
+come from. The peak is the estimate; the width is how much the data
+pins it down.
+
+<Chart slug="mle-likelihood-curve" />
+
 ### Explain the bias–variance decomposition.
 
 Expected test error splits into three parts:
@@ -61,6 +78,11 @@ $$
 is sensitivity to the particular training sample; $\sigma^2$ is noise you
 can't remove. More capacity lowers bias but raises variance, tuning
 complexity and regularization minimizes their sum.
+
+The decomposition as a picture: two curves moving in opposite directions
+and a minimum in their sum that is not where training error is lowest.
+
+<Chart slug="bias-variance" />
 
 ### What is the difference between standard deviation and standard error?
 
@@ -75,6 +97,12 @@ $$
 The SE shrinks as $n$ grows (you estimate the mean more precisely with more
 data); the standard deviation estimates a fixed population property and
 doesn't. Confusing the two is a classic interview slip.
+
+The part of that formula worth internalising. Precision is bought at a
+square-root rate, so each halving of the standard error costs four times
+the data.
+
+<Chart slug="standard-error-vs-n" />
 
 ### What does the Central Limit Theorem say, and why does it matter?
 
@@ -109,6 +137,11 @@ The mean of the sample means lands on the population mean, and the two SE
 figures nearly coincide, the CLT holding even though the raw data is far
 from normal.
 
+The same experiment drawn rather than printed: sample means from a
+heavily skewed population, standardized so only the shape varies.
+
+<Chart slug="clt-convergence" />
+
 ### What is the Law of Large Numbers, and how is it different from the CLT?
 
 The Law of Large Numbers says the sample mean converges to the population
@@ -116,6 +149,11 @@ mean as $n$ grows, it tells you *where* the estimate ends up. The CLT tells
 you *what shape* the estimate's uncertainty takes (normal) along the way.
 Together they justify using large samples: the estimate homes in on the
 truth, and its error is normally distributed.
+
+The LLN half, on its own: five runs of one fair coin, each settling toward
+a half from wherever its early flips left it.
+
+<Chart slug="lln-convergence" />
 
 ### What is a confidence interval, really?
 
@@ -131,6 +169,16 @@ $$
 with $z^{*} \approx 1.96$ for 95% (a t critical value for small samples).
 It is **not** "a 95% probability the parameter is in *this* interval", the
 parameter is fixed; the interval is what's random.
+
+"A procedure, not a probability about one interval", drawn: a hundred
+samples, a hundred intervals, one fixed truth, and the handful that miss.
+
+<Chart slug="ci-coverage" />
+
+And each common misreading beside the interval it would actually require,
+which is a different width every time.
+
+<Chart slug="ci-four-misreadings" />
 
 ### What is bootstrapping, and when do you use it?
 
@@ -167,6 +215,11 @@ Each resample is the same size as the original with replacement, so some
 rows repeat and others drop out; the 2.5th and 97.5th percentiles of the
 5,000 resampled means bracket the true mean with 95% coverage.
 
+What the resampling produces: five thousand bootstrap medians, with the
+95% interval read straight off as two percentiles.
+
+<Chart slug="bootstrap-distribution" />
+
 ### What exactly is a p-value?
 
 The probability of observing data **at least as extreme** as yours,
@@ -174,6 +227,11 @@ The probability of observing data **at least as extreme** as yours,
 would be surprising under the null, so you reject it at your significance
 level $\alpha$. It is **not** the probability the null is true, nor the
 probability your result is a fluke, both are computed *given* the null.
+
+The definition as an area. The p-value is the shaded tail under the null,
+not the height of the curve where your observation landed.
+
+<Chart slug="p-value-tail-area" />
 
 ### What is hypothesis testing, and what are its steps?
 
@@ -227,6 +285,16 @@ a true effect. Power rises with larger sample size, larger effect size,
 lower variance, and higher $\alpha$, lowering $\alpha$ trades fewer false
 positives for more false negatives.
 
+One threshold, two worlds. Moving the critical value trades one error
+rate against the other; only a bigger sample shrinks both.
+
+<Chart slug="alpha-power-tradeoff" />
+
+And what 80% power costs, which is the number that decides how long an
+experiment runs.
+
+<Chart slug="power-vs-n" />
+
 ### What sampling methods should you know?
 
 **Simple random** gives every unit equal probability. **Stratified**
@@ -234,6 +302,12 @@ samples within subgroups to guarantee representation (and reduce variance).
 **Cluster** samples whole groups to cut cost. **Reservoir** sampling draws
 a uniform sample from a stream of unknown length in one pass. The method
 shapes both bias and variance of every downstream estimate.
+
+Why the method matters more than the count: both of these estimates get
+more precise at the same rate, and only one of them is getting closer to
+the truth.
+
+<Chart slug="bigger-biased-sample" />
 
 ### What is selection (sampling) bias?
 
@@ -243,6 +317,11 @@ you collect. Survivorship bias (only analyzing what survived) and
 non-response bias are common forms. In ML it shows up as training on a
 population that differs from serving traffic, which no amount of modeling
 fixes.
+
+The most expensive version of it, because the missing rows are missing for
+a reason connected to the thing being measured.
+
+<Chart slug="survivorship-bias" />
 
 ### What is Bayes' theorem?
 
@@ -257,6 +336,11 @@ It underpins spam filters, medical diagnosis, and Bayesian inference (prior
 very accurate test yields a low posterior probability of being positive,
 because base rates dominate.
 
+The classic interview application, counted out one dot at a time: everyone
+who tests positive out of 100,000 people.
+
+<Chart slug="base-rate-grid" />
+
 ### Covariance vs correlation, what's the difference?
 
 Covariance measures whether two variables move together but its magnitude
@@ -270,6 +354,11 @@ $$
 Correlation captures only **linear** association; a zero correlation can
 still hide a strong non-linear relationship (e.g., $y = x^2$).
 
+What standardising buys, and where it stops: four relationships with r on
+each, including a perfectly predictable one that reports nearly zero.
+
+<Chart slug="correlation-scatters" />
+
 ### Why does correlation not imply causation?
 
 Two variables can correlate because one causes the other, because a third
@@ -278,6 +367,11 @@ a randomized controlled experiment or a causal-inference method
 (instrumental variables, difference-in-differences) that rules out
 confounders. Ice-cream sales and drownings correlate, but temperature
 causes both.
+
+The sharpest version of the problem: a confounder strong enough to flip
+the sign between the subgroups and the pooled data.
+
+<Chart slug="simpsons-paradox" />
 
 ## Concept checks
 
