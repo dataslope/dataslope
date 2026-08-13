@@ -23,6 +23,7 @@ import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { interviewSource } from "@/lib/source";
 import { ThemePillToggleSlot } from "@/app/_components/ThemePillToggle";
 import { DocsRootProvider } from "@/app/_components/DocsRootProvider";
+import { DocsFooter } from "@/app/_components/DocsFooter";
 
 export default function InterviewLayout({ children }: { children: ReactNode }) {
   return (
@@ -70,6 +71,10 @@ export default function InterviewLayout({ children }: { children: ReactNode }) {
       >
         {children}
       </DocsLayout>
+      {/* Outside <DocsLayout>, deliberately: the footer sits below the docs
+          grid so the sidebar (and the TOC) stay pinned until the page runs out
+          and then release into it. See DocsFooter. */}
+      <DocsFooter />
     </DocsRootProvider>
   );
 }

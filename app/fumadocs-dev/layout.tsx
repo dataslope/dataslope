@@ -18,6 +18,7 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { devSource } from "@/lib/source";
 import { ThemePillToggleSlot } from "@/app/_components/ThemePillToggle";
+import { DocsFooter } from "@/app/_components/DocsFooter";
 
 export default function FumadocsDevLayout({
   children,
@@ -73,6 +74,10 @@ export default function FumadocsDevLayout({
       >
         {children}
       </DocsLayout>
+      {/* Outside <DocsLayout>, deliberately: the footer sits below the docs
+          grid so the sidebar (and the TOC) stay pinned until the page runs out
+          and then release into it. See DocsFooter. */}
+      <DocsFooter />
     </RootProvider>
   );
 }
