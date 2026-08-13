@@ -176,7 +176,7 @@ flowchart TD
     B --> C[VariableDeclaration]
     C --> D["Identifier: x"]
     C --> E["TypeAnnotation: NumberKeyword"]
-    C --> F["Initializer: NumericLiteral(42)"]
+    C --> F["Initializer: <code>NumericLiteral(42)</code>"]
 ```
 
 The AST captures the *structure* of the code: "This is a variable declaration named `x`, with type `number`, initialized to `42`." The parser checks syntax (no missing semicolons or braces), but it doesn't check *types* yet.
@@ -278,21 +278,21 @@ sequenceDiagram
     participant Checker as Type Checker
     
     User->>Editor: Types code in .ts file
-    Editor->>LS: getCompletionsAtPosition()
+    Editor->>LS: <code>getCompletionsAtPosition()</code>
     LS->>Checker: Analyze symbol at cursor
     Checker->>LS: Return type info & available members
     LS->>Editor: Completion list
     Editor->>User: Show autocomplete dropdown
     
     User->>Editor: Saves file
-    Editor->>LS: getSemanticDiagnostics()
+    Editor->>LS: <code>getSemanticDiagnostics()</code>
     LS->>Checker: Type-check updated file
     Checker->>LS: Return errors/warnings
     LS->>Editor: Diagnostic messages
     Editor->>User: Red squiggles under errors
     
     User->>Editor: Right-click → Rename Symbol
-    Editor->>LS: findRenameLocations()
+    Editor->>LS: <code>findRenameLocations()</code>
     LS->>Checker: Find all references across files
     Checker->>LS: List of locations
     LS->>Editor: Multi-file edit plan

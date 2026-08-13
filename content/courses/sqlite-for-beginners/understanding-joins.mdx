@@ -82,7 +82,7 @@ A useful beginner mental model is **cartesian then filter**:
 ```mermaid
 flowchart TB
     A["Start with one order row"] --> B["Try pairing it with each customer row"]
-    B --> C{"Does<br/>order.<code>customer_id</code> = customer.id?"}
+    B --> C{"Does<br/><code>order.customer_id</code> = <code>customer.id</code>?"}
     C -->|"yes"| D["keep this pair"]
     C -->|"no"| E["discard this pair"]
 ```

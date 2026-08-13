@@ -43,7 +43,7 @@ program, and only programmers could ask questions at all.
 Edgar F. "Ted" Codd was a British-born mathematician working at
 IBM's San Jose research laboratory. In June 1970 he published
 "A Relational Model of Data for Large Shared Data Banks" in
-*Communications of the ACM*. Its core proposal sounds almost too
+*Communications of the ACM*.[^codd70] Its core proposal sounds almost too
 plain to be revolutionary: store all data in **relations**, what we
 now call tables, and connect records not with pointers but with
 *values*. An order finds its customer not by following a physical
@@ -179,11 +179,11 @@ papers and academic debate.
 To settle the performance question, IBM's San Jose lab launched the
 **System R** project in the mid-1970s: build a real, working
 relational database and see whether it could be made efficient. It
-could. System R pioneered much of the machinery production databases
-still use, and along the way two of its researchers, Donald
+could.[^systemr] System R pioneered much of the machinery production
+databases still use, and along the way two of its researchers, Donald
 Chamberlin and Raymond Boyce, designed a query language meant to be
 readable by non-programmers. They called it **SEQUEL**, Structured
-English Query Language. The name turned out to collide with a
+English Query Language.[^sequel] The name turned out to collide with a
 trademark held by an aircraft company, so the vowels were dropped,
 and the language became **SQL**.
 
@@ -213,10 +213,10 @@ become one of the longest-lived languages in all of computing.
 Codd received the Turing Award, computing's highest honor, in
 1981, cited for his fundamental contributions to database theory and
 practice. He spent much of his later career as the relational
-model's sternest defender, famously publishing twelve rules (1985)
-for what a database must do before it deserves to be called
-relational, largely because so many products had started using the
-word as a marketing label.
+model's sternest defender, famously publishing twelve rules
+(1985)[^codd-rules] for what a database must do before it deserves to
+be called relational, largely because so many products had started
+using the word as a marketing label.
 
 ## Why this matters to your designs
 
@@ -239,3 +239,30 @@ people said the same thing about the model itself.
 The next page follows the other thread of this history, the one
 that starts at Berkeley, passes through a system called Ingres, and
 ends with the engine executing your queries on this very page.
+
+[^codd70]:
+    E. F. Codd,
+    ["A Relational Model of Data for Large Shared Data Banks"](https://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf),
+    *Communications of the ACM* 13(6), June 1970. Fourteen pages, and
+    worth reading once: the argument for data independence is made in
+    the first two, before any algebra appears.
+
+[^systemr]:
+    Donald D. Chamberlin et al.,
+    ["A History and Evaluation of System R"](https://people.eecs.berkeley.edu/~brewer/cs262/SystemR.pdf),
+    *Communications of the ACM* 24(10), 1981. Written by the team
+    itself, and candid about what did not work; this is also the open
+    publication that competitors read.
+
+[^sequel]:
+    Donald D. Chamberlin and Raymond F. Boyce,
+    ["SEQUEL: A Structured English Query Language"](https://www.sigmod.org/publications/dblp/db/conf/sigmod/ChamberlinB74.html),
+    ACM SIGFIDET Workshop, 1974. Boyce died later that year; the
+    trademark collision that cost the language its vowels is recounted
+    in Chamberlin's later retrospectives rather than in the paper.
+
+[^codd-rules]:
+    E. F. Codd, "Is Your DBMS Really Relational?" and "Does Your DBMS
+    Run By the Rules?", *Computerworld*, 14 and 21 October 1985. He
+    published them in a trade weekly rather than a journal on purpose:
+    the audience he wanted was the buyers being sold the word.

@@ -83,19 +83,38 @@ export function parseMermaidTimeline(chart: string): ParsedTimeline {
   return { title, entries };
 }
 
+/** A `<code>` span, the marker lesson authors use for code inside a diagram
+ *  label (see `applyCodeFont` in mermaid.tsx for the Mermaid-rendered side of
+ *  the same convention). Everything else in a label is plain author prose. */
+const CODE_TAG = /<code>([\s\S]*?)<\/code>/gi;
+
 /**
- * Render Mermaid `<br>` separators inside event text as real line breaks.
- * Event text is plain author prose (no HTML), so this is the only inline
- * markup we need to honour.
+ * Render one label: Mermaid's `<br>` separators become real line breaks, and a
+ * `<code>` span becomes a real `<code>` element, which `app/docs.css` sets in
+ * JetBrains Mono. Those two are the only markup a timeline label carries.
  */
-function renderEventText(text: string): ReactNode {
-  const parts = text.split(/<br\s*\/?>/i);
-  return parts.map((part, i) => (
-    <Fragment key={i}>
-      {i > 0 && <br />}
-      {part}
-    </Fragment>
-  ));
+function renderLabel(text: string): ReactNode {
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+  const pushProse = (run: string, at: number) => {
+    if (!run) return;
+    run.split(/<br\s*\/?>/i).forEach((line, i) => {
+      parts.push(
+        <Fragment key={`p${at}-${i}`}>
+          {i > 0 && <br />}
+          {line}
+        </Fragment>,
+      );
+    });
+  };
+
+  for (const match of text.matchAll(CODE_TAG)) {
+    pushProse(text.slice(cursor, match.index), cursor);
+    parts.push(<code key={`c${match.index}`}>{match[1]}</code>);
+    cursor = match.index + match[0].length;
+  }
+  pushProse(text.slice(cursor), cursor);
+  return parts;
 }
 
 /**
@@ -113,7 +132,9 @@ export function Timeline({ chart }: { chart: string }) {
 
   return (
     <figure className={styles.timeline}>
-      {title && <figcaption className={styles.title}>{title}</figcaption>}
+      {title && (
+        <figcaption className={styles.title}>{renderLabel(title)}</figcaption>
+      )}
       <ol className={styles.track}>
         {entries.map((entry, i) => (
           <li
@@ -122,10 +143,10 @@ export function Timeline({ chart }: { chart: string }) {
           >
             <span className={styles.marker} aria-hidden="true" />
             <div className={styles.card}>
-              <p className={styles.period}>{entry.period}</p>
+              <p className={styles.period}>{renderLabel(entry.period)}</p>
               {entry.events.map((event, j) => (
                 <p key={j} className={styles.event}>
-                  {renderEventText(event)}
+                  {renderLabel(event)}
                 </p>
               ))}
             </div>

@@ -172,8 +172,8 @@ You can't create a user who is both active and suspended. You can't forget the s
 stateDiagram-v2
     [*] --> Active
     [*] --> Inactive
-    Active --> Suspended: violate_terms
-    Suspended --> Active: appeal_approved
+    Active --> Suspended: <code>violate_terms</code>
+    Suspended --> Active: <code>appeal_approved</code>
     Inactive --> Active: reactivate
     Active --> Inactive: deactivate
 

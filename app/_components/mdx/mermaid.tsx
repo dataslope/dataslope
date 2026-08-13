@@ -6,6 +6,7 @@ import {
   useEffect,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -125,17 +126,70 @@ function resolvedStacks(): { sans: string; mono: string } {
   };
 }
 
-// Class diagrams (class names, fields, method signatures) and ER diagrams (tables,
-// typed columns, keys) are entirely code, so they render wholesale in mono. Other
-// types stay sans, flowcharts tag individual code spans with <code> instead, and
-// state/sequence/mindmap/timeline labels are prose. Detected from the first line.
-function isCodeDiagram(chart: string): boolean {
+/** The keyword the chart opens with (`flowchart`, `sequenceDiagram`, …), read
+ *  off the first line that is neither blank nor a `%%` comment. */
+function diagramKeyword(chart: string): string {
   const first = chart
     .replace(/\\n/g, "\n")
     .split("\n")
     .map((l) => l.trim())
-    .find(Boolean);
-  return first != null && /^(classDiagram(?:-v2)?|erDiagram)\b/.test(first);
+    .find((l) => l && !l.startsWith("%%"));
+  return first ?? "";
+}
+
+// Class diagrams (class names, fields, method signatures) and ER diagrams (tables,
+// typed columns, keys) are entirely code, so they render wholesale in mono. Other
+// types stay sans and tag individual code spans with <code> instead.
+function isCodeDiagram(chart: string): boolean {
+  return /^(classDiagram(?:-v2)?|erDiagram)\b/.test(diagramKeyword(chart));
+}
+
+/**
+ * Diagram kinds whose labels Mermaid paints as SVG `<text>` rather than as
+ * HTML in a `<foreignObject>`.
+ *
+ * A flowchart, class, state, ER or mindmap label goes through Mermaid's HTML
+ * label path, so an author's `<code>` tag survives into the DOM as an element
+ * and mermaid.module.css sets it in the mono face. These kinds instead hand
+ * the label to d3's `.text()`, which writes it as a text node: by the time it
+ * reaches the page the tag is not markup, it is the literal characters
+ * `<code>System.out</code>` sitting inside the actor box. That is how the
+ * sequence diagram on `java-programming-for-beginners/your-first-java-program`
+ * came to show `System.out` in Inter — there was no way to ask for anything
+ * else. (Checked against mermaid 11.16.1, including `sequence.textPlacement:
+ * "fo"`, whose foreignObject path calls `.text()` too, so it escapes the tag
+ * just the same.)
+ *
+ * For these, `stripCodeTags` takes the tags out before Mermaid measures the
+ * label, and `applyCodeFont` puts the mono face back on the rendered text.
+ */
+const SVG_TEXT_LABELS =
+  /^(sequenceDiagram|pie\b|gantt|journey|quadrantChart|xychart|sankey|gitGraph)/;
+
+function hasSvgTextLabels(chart: string): boolean {
+  return SVG_TEXT_LABELS.test(diagramKeyword(chart));
+}
+
+/**
+ * Remove the `<code>` markers from a chart, returning the plain chart Mermaid
+ * should measure and render plus the text of every span that was marked.
+ *
+ * The spans are matched back against the rendered text by value rather than by
+ * position: Mermaid rewrites labels on the way through (it splits on `<br/>`,
+ * wraps long text, drops the participant alias) and there is no id on the
+ * output to carry an index. Matching on the string is what survives all of
+ * that, and a code span is a distinctive enough run (`System.out`,
+ * `println("Hello, Java!")`) that a chance collision would have to be a label
+ * quoting the identifier it is naming, which is the same face either way.
+ */
+function stripCodeTags(chart: string): { chart: string; spans: string[] } {
+  const spans: string[] = [];
+  const plain = chart.replace(/<code>([\s\S]*?)<\/code>/gi, (_, inner: string) => {
+    const text = inner.trim();
+    if (text) spans.push(text);
+    return inner;
+  });
+  return { chart: plain, spans };
 }
 
 // Mermaid init directive that switches a single diagram to the mono face. It
@@ -555,6 +609,122 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
   });
 }
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+/**
+ * Put the mono face back on the code spans of a diagram whose labels are SVG
+ * text (see SVG_TEXT_LABELS), by splitting each rendered text node into
+ * `<tspan>`s and marking the runs the author wrapped in `<code>`.
+ *
+ * A `<tspan>` with no `x` of its own continues the text chunk it sits in, so
+ * the runs stay on one line and a `text-anchor: middle` label stays centered
+ * on the same point it was centered on before, which is what keeps a message
+ * over its arrow and an actor's name inside its box.
+ *
+ * Mermaid measured the label in the sans face, so a code run is painted a
+ * little wider than the width the layout reserved for it (JetBrains Mono's
+ * advance is roughly a sixth wider than Inter's at the same size). Sequence
+ * diagrams absorb that on their own: an actor box is at least 150px wide
+ * against names that measure well under 100, and a message label is
+ * free-floating text centered over its arrow, so the growth is split evenly to
+ * either side rather than pushing anything. What it can do is push a label
+ * past the edge of the SVG, which is a hard clip, so `growToFitText` widens
+ * the viewport afterwards. Nothing here moves a shape, for the same reason
+ * `adaptNodes` does not: the layout is Mermaid's and re-deriving it from the
+ * outside goes wrong in more ways than it fixes.
+ *
+ * Idempotent: a run split by an earlier pass is already inside a marked
+ * `<tspan>`, and those are skipped.
+ */
+function applyCodeFont(root: Element | null, spans: readonly string[]): void {
+  if (!root || spans.length === 0) return;
+  const doc = root.ownerDocument;
+  let split = false;
+
+  // Longest first, so `println("Hello, Java!")` claims its characters before a
+  // shorter span that happens to sit inside it.
+  const wanted = [...new Set(spans)].sort((a, b) => b.length - a.length);
+
+  const walker = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const texts: Text[] = [];
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) texts.push(n as Text);
+
+  for (const node of texts) {
+    const text = node.nodeValue ?? "";
+    if (!text.trim()) continue;
+    const parent = node.parentElement;
+    if (!parent) continue;
+    // An HTML label already carries the author's real <code> element, which the
+    // stylesheet handles; only SVG text needs splitting.
+    if (parent.closest("foreignObject")) continue;
+    if (styles.codeSpan && parent.closest(`.${styles.codeSpan}`)) continue;
+
+    const claimed: Array<[number, number]> = [];
+    for (const span of wanted) {
+      for (let at = text.indexOf(span); at !== -1; at = text.indexOf(span, at + span.length)) {
+        const end = at + span.length;
+        if (claimed.some(([from, to]) => at < to && from < end)) continue;
+        claimed.push([at, end]);
+      }
+    }
+    if (claimed.length === 0) continue;
+    claimed.sort((a, b) => a[0] - b[0]);
+
+    const rebuilt = doc.createDocumentFragment();
+    let cursor = 0;
+    for (const [from, to] of claimed) {
+      if (from > cursor) rebuilt.appendChild(doc.createTextNode(text.slice(cursor, from)));
+      const run = doc.createElementNS(SVG_NS, "tspan");
+      run.setAttribute("class", styles.codeSpan);
+      run.textContent = text.slice(from, to);
+      rebuilt.appendChild(run);
+      cursor = to;
+    }
+    if (cursor < text.length) rebuilt.appendChild(doc.createTextNode(text.slice(cursor)));
+    node.replaceWith(rebuilt);
+    split = true;
+  }
+
+  if (split) growToFitText(root);
+}
+
+/**
+ * Widen the SVG's viewport until every label fits inside it.
+ *
+ * An SVG clips at its viewport, so a label that Mermaid sized in the sans face
+ * and `applyCodeFont` then repainted wider can lose its last characters. The
+ * gantt chart on `from-zero-to-cpp/memory-model` is the one in the lessons
+ * that does: `global_counter` runs 6px past the left edge.
+ *
+ * The `max-width` cap Mermaid writes inline grows by the same number of user
+ * units as the viewBox, so the diagram keeps its scale and only the frame
+ * around it gets bigger.
+ */
+function growToFitText(root: Element): void {
+  root.querySelectorAll("svg").forEach((svg) => {
+    const box = svg.viewBox.baseVal;
+    if (!box || box.width <= 0) return;
+
+    let left = box.x;
+    let right = box.x + box.width;
+    svg.querySelectorAll<SVGGraphicsElement>("text").forEach((text) => {
+      const bounds = text.getBBox();
+      if (bounds.width <= 0) return;
+      left = Math.min(left, bounds.x);
+      right = Math.max(right, bounds.x + bounds.width);
+    });
+
+    const grown = right - left;
+    const extra = grown - box.width;
+    if (extra <= 0.5) return;
+
+    const capped = Number.parseFloat(svg.style.maxWidth);
+    box.x = left;
+    box.width = grown;
+    if (Number.isFinite(capped)) svg.style.maxWidth = `${capped + extra}px`;
+  });
+}
+
 function MermaidContent({ chart }: { chart: string }) {
   const id = useId();
   const { resolvedTheme } = useTheme();
@@ -570,6 +740,19 @@ function MermaidContent({ chart }: { chart: string }) {
   );
 
   const stacks = resolvedStacks();
+
+  // Diagrams whose labels are SVG text cannot carry the author's <code> tag
+  // through Mermaid, so it comes out before the render and the mono face goes
+  // back on afterwards (see SVG_TEXT_LABELS / applyCodeFont). Memoised because
+  // `codeSpans` is a dependency of the fullscreen stage's callback ref, which
+  // re-injects the SVG whenever it changes identity.
+  const { chart: renderedChart, spans: codeSpans } = useMemo(
+    () =>
+      hasSvgTextLabels(chart)
+        ? stripCodeTags(chart)
+        : { chart, spans: [] as string[] },
+    [chart],
+  );
 
   mermaid.initialize({
     startOnLoad: false,
@@ -614,7 +797,7 @@ function MermaidContent({ chart }: { chart: string }) {
         }),
       );
       const prefix = isCodeDiagram(chart) ? monoDirective(stacks.mono) : "";
-      return mermaid.render(id, prefix + chart.replaceAll("\\n", "\n"));
+      return mermaid.render(id, prefix + renderedChart.replaceAll("\\n", "\n"));
     }),
   );
 
@@ -628,6 +811,7 @@ function MermaidContent({ chart }: { chart: string }) {
           if (container) {
             bindFunctions?.(container);
             adaptNodes(container, resolvedTheme === "dark");
+            applyCodeFont(container, codeSpans);
           }
         }}
         dangerouslySetInnerHTML={{ __html: svg }}
@@ -645,6 +829,7 @@ function MermaidContent({ chart }: { chart: string }) {
         <MermaidFullscreen
           svg={svg}
           isDark={resolvedTheme === "dark"}
+          codeSpans={codeSpans}
           onClose={() => setFullscreen(false)}
         />
       )}
@@ -665,10 +850,12 @@ function clamp(value: number, min: number, max: number): number {
 function MermaidFullscreen({
   svg,
   isDark,
+  codeSpans,
   onClose,
 }: {
   svg: string;
   isDark: boolean;
+  codeSpans: readonly string[];
   onClose: () => void;
 }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -690,8 +877,9 @@ function MermaidFullscreen({
       if (!node) return;
       node.innerHTML = svg;
       adaptNodes(node, isDark);
+      applyCodeFont(node, codeSpans);
     },
-    [svg, isDark],
+    [svg, isDark, codeSpans],
   );
 
   const [scale, setScale] = useState(1);

@@ -37,12 +37,12 @@ sequenceDiagram
     participant Caller
     participant JVM
     participant Heap
-    participant Constructor as "Person(...)"
+    participant Constructor as "<code>Person(...)</code>"
 
-    Caller->>JVM: new Person(Ada, 30)
+    Caller->>JVM: <code>new Person(Ada, 30)</code>
     JVM->>Heap: allocate Person
     JVM->>Constructor: run with this = newly-allocated Person
-    Constructor->>Heap: this.name = Ada, this.age = 30
+    Constructor->>Heap: <code>this.name = Ada</code>, <code>this.age = 30</code>
     Constructor-->>JVM: done
     JVM-->>Caller: reference to the initialized Person
 ```
@@ -173,8 +173,8 @@ shorter one that fills in defaults by calling the real one with
 
 ```mermaid
 flowchart TD
-    A["new Point()"] -->|delegates| C["new Point(0,0)"]
-    B["new Point(5)"] -->|delegates| C
+    A["<code>new Point()</code>"] -->|delegates| C["<code>new Point(0,0)</code>"]
+    B["<code>new Point(5)</code>"] -->|delegates| C
     C --> S["sets <code>this.x</code> and <code>this.y</code>"]
 ```
 
@@ -276,7 +276,7 @@ work.
 flowchart LR
     P["price : Money<br/><code>cents=1999</code><br/><code>currency='USD'</code>"]
     T["taxed : Money<br/><code>cents=2159</code><br/><code>currency='USD'</code>"]
-    O["new Money(160,'USD')"]
+    O["<code>new Money(160,'USD')</code>"]
 
     P -. unchanged .-> P
     O --> T

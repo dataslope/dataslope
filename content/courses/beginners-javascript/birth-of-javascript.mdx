@@ -4,8 +4,8 @@ description: Why programming languages exist, why the early web desperately need
 ---
 
 In May 1995, a programmer named Brendan Eich wrote a programming
-language in **ten days**. Today that language runs on every phone,
-laptop, server farm, and smart television on Earth. It is, by most
+language in **ten days**.[^hopl-js] Today that language runs on every
+phone, laptop, server farm, and smart television on Earth. It is, by most
 measures, the most widely used programming language ever created,
 and it was built in less time than most teams spend naming a
 project.
@@ -114,8 +114,9 @@ computing, in miniature. Now: why did a language like this end up
 
 ## The web before JavaScript
 
-In the late 1980s, a researcher at CERN named **Tim Berners-Lee**
-designed a system for sharing scientific documents. It had three
+In the late 1980s, a researcher at CERN named **Tim
+Berners-Lee**[^proposal] designed a system for sharing scientific
+documents. It had three
 pieces we still use today: **HTML** (documents with links),
 **HTTP** (a way to ask another computer for a document), and
 **URLs** (a way to name any document anywhere). That is *all* the
@@ -293,8 +294,8 @@ Microsoft noticed. In 1996 they reverse-engineered the language and
 shipped their own version, **JScript**, in Internet Explorer 3. Two
 similar-but-not-identical implementations in two warring browsers
 was a nightmare for developers, so the language was submitted to a
-standards body, **Ecma International**. The standardized language
-was named **ECMAScript**, "JavaScript" was trademarked, and
+standards body, **Ecma International**.[^ecma] The standardized
+language was named **ECMAScript**, "JavaScript" was trademarked, and
 politics demanded a different word. To this day the specification
 says ECMAScript and everyone on Earth says JavaScript.
 
@@ -362,3 +363,24 @@ tours the surprising places JavaScript runs today.
 
 Knowing this history makes JavaScript's mix of Java-flavoured syntax and Scheme-style flexibility much easier to understand.`}
 />
+
+[^hopl-js]:
+    Allen Wirfs-Brock and Brendan Eich,
+    [*JavaScript: The First 20 Years*](https://zenodo.org/records/3707008)
+    (HOPL IV, 2020). A 190-page history co-written by the language's
+    designer, and the source to prefer over any retelling: it is
+    careful about what "ten days" covers (a working prototype, not the
+    finished language) and about which decisions were his rather than
+    Netscape's.
+
+[^proposal]:
+    Tim Berners-Lee,
+    [*Information Management: A Proposal*](https://www.w3.org/History/1989/proposal.html)
+    (CERN, March 1989). His manager's note on the front page reads
+    "Vague but exciting."
+
+[^ecma]:
+    [ECMA-262](https://ecma-international.org/publications-and-standards/standards/ecma-262/),
+    first edition June 1997. Ecma publishes every edition free, so the
+    specification behind the language is one click away, which is not
+    true of most standards a working programmer relies on.

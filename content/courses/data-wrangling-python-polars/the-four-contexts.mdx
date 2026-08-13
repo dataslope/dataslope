@@ -15,10 +15,10 @@ of knowing Polars.
 
 ```mermaid
 flowchart LR
-    E["an expression<br/>pl.col('mass').mean()"] --> S["select()<br/>result IS the frame"]
-    E --> W["with_columns()<br/>result is ADDED to the frame"]
-    E --> F["filter()<br/>result must be Boolean, picks rows"]
-    E --> G["group_by().agg()<br/>result is computed per group"]
+    E["an expression<br/><code>pl.col('mass').mean()</code>"] --> S["<code>select()</code><br/>result IS the frame"]
+    E --> W["<code>with_columns()</code><br/>result is ADDED to the frame"]
+    E --> F["<code>filter()</code><br/>result must be Boolean, picks rows"]
+    E --> G["<code>group_by().agg()</code><br/>result is computed per group"]
 ```
 
 ## select: the result is the whole frame

@@ -34,8 +34,8 @@ changes.
 ```mermaid
 stateDiagram-v2
     [*] --> pending
-    pending --> fulfilled: resolve(value)
-    pending --> rejected: reject(error)
+    pending --> fulfilled: <code>resolve(value)</code>
+    pending --> rejected: <code>reject(error)</code>
     fulfilled --> [*]
     rejected --> [*]
 ```
@@ -427,7 +427,7 @@ sequenceDiagram
     participant Caller
     participant AsyncFn as async function
     participant Promise
-    Caller->>AsyncFn: call()
+    Caller->>AsyncFn: <code>call()</code>
     AsyncFn->>Promise: await ...
     AsyncFn-->>Caller: returns a pending Promise
     Promise-->>AsyncFn: settles → resume as microtask

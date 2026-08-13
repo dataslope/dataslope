@@ -26,7 +26,7 @@ flowchart TD
     G --> H[Linker]
     I["<code>libc.a</code>"] --> H
     J["other .o files"] --> H
-    H --> K["a.out<br/>(executable)"]
+    H --> K["<code>a.out</code><br/>(executable)"]
 ```
 
 In one `clang hello.c -o hello` command, the driver actually runs all

@@ -22,12 +22,12 @@ object, not the variable's declared type.
 sequenceDiagram
     participant Main
     participant Var as n : Noisy
-    Main->>Var: n.sound()
+    Main->>Var: <code>n.sound()</code>
     alt n is Dog
-        Note over Var: dispatches to Dog.sound()
+        Note over Var: dispatches to <code>Dog.sound()</code>
         Var-->>Main: "Woof!"
     else n is Doorbell
-        Note over Var: dispatches to Doorbell.sound()
+        Note over Var: dispatches to <code>Doorbell.sound()</code>
         Var-->>Main: "Ding-dong"
     end
 ```
@@ -62,7 +62,7 @@ at any moment:
 
 ```mermaid
 flowchart LR
-    V["Noisy n = new Dog()"] --> CT["compile-time type:<br/>Noisy"]
+    V["Noisy n = <code>new Dog()</code>"] --> CT["compile-time type:<br/>Noisy"]
     V --> RT["runtime type:<br/>Dog"]
 ```
 

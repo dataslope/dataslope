@@ -698,3 +698,74 @@ code.hljs {
 .dark ::highlight(ds-search-match) {
   background-color: color-mix(in srgb, var(--ds-yellow-500) 28%, transparent);
 }
+
+/* ── Footnotes ───────────────────────────────────────────────────────────
+   `remark-gfm` is the first plugin in fumadocs-mdx's preset (our own
+   remarkPlugins in source.config.ts are appended to it), so GFM footnote
+   syntax works in a lesson body with no configuration:
+
+     The multipliers vary by an order of magnitude.[^boehm]
+
+     [^boehm]: Boehm, *Software Engineering Economics* (1981).
+
+   It reaches the page as a `<sup>` link and a `<section data-footnotes>` of
+   definitions at the end, which is the right shape. What it does not reach
+   the page with is a visible heading: fumadocs renders the "Footnotes" <h2>
+   with `sr-only`, so the definitions arrive as an unexplained numbered list
+   hanging off the bottom of the lesson. Undo that and give the section a
+   rule above it, so a reader can see where the lesson ends and its
+   references begin. The id beats `sr-only` on specificity.
+
+   A figure's credit line is a different thing and does not come through here:
+   a caption is a JSX string prop that markdown never touches, and the source
+   of a chart is part of reading it rather than an aside. That is
+   <FigureSources> (app/_components/mdx/FigureSources.tsx).
+   ─────────────────────────────────────────────────────────────────────── */
+.prose .footnotes {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-fd-border);
+  color: var(--color-fd-muted-foreground);
+}
+
+/* References are not body copy: set them a step below it so the lesson keeps
+   the last word. Has to name <p> and <li> rather than sit on the section,
+   because the prose rule above pins those at 1rem. */
+.prose .footnotes :where(p, li) {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+.prose .footnotes #footnote-label {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0 0 1rem;
+  padding: 0;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  white-space: normal;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-fd-muted-foreground);
+}
+
+/* The reference marker in the running text. Superscripts inherit the
+   paragraph's line-height by default, which opens the leading of the line
+   they sit on; `line-height: 0` takes the marker out of that calculation so
+   a cited sentence keeps the rhythm of the paragraph around it. */
+.prose [data-footnote-ref] {
+  padding-left: 0.1em;
+  font-size: 0.75em;
+  line-height: 0;
+  text-decoration: none;
+}
+
+/* The ↩ that jumps back to the sentence. */
+.prose [data-footnote-backref] {
+  margin-left: 0.4em;
+  text-decoration: none;
+}

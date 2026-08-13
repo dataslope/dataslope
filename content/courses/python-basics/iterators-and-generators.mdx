@@ -50,12 +50,12 @@ The `for` loop does exactly this, catching `StopIteration` invisibly.
 ```mermaid
 sequenceDiagram
     participant C as Caller (for loop)
-    participant I as iter(obj)
+    participant I as <code>iter(obj)</code>
     participant IT as Iterator
-    C->>I: iter(obj)
+    C->>I: <code>iter(obj)</code>
     I-->>C: returns iterator
     loop Until StopIteration
-        C->>IT: next(iterator)
+        C->>IT: <code>next(iterator)</code>
         IT-->>C: yields item
     end
     IT-->>C: raises StopIteration

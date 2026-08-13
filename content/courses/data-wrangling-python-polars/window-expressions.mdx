@@ -49,7 +49,7 @@ it. The frame still has 344 rows.
 
 ```mermaid
 flowchart LR
-    A[("344 rows")] -->|"group_by().agg()"| B[("3 rows<br/>one per species")]
+    A[("344 rows")] -->|"<code>group_by().agg()</code>"| B[("3 rows<br/>one per species")]
     A -->|".over('species')"| C[("344 rows<br/>each carrying its group value")]
 ```
 

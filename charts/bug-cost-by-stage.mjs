@@ -12,6 +12,13 @@
  * study's numbers, which vary by an order of magnitude depending on what is
  * counted. What is not in dispute is that the axis is logarithmic, and that
  * the first two bars are the ones a type system moves work into.
+ *
+ * Bossavit is in the sources deliberately. The single most-reproduced version
+ * of this chart, a table of 1x/6.5x/15x/100x attributed to an "IBM Systems
+ * Sciences Institute", is one of the leprechauns his book chases: it is cited
+ * everywhere and traces back to no published study anyone can find. Citing the
+ * critique next to the measurements is what earns the caption's hedge, and it
+ * is why the bars here are drawn as a shape rather than as four decimals.
  */
 import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
@@ -30,6 +37,21 @@ const STAGES = [
 const MAX = STAGES.at(-1).cost;
 
 export const caption = `The cost of a defect is the fix plus everything that happened between writing it and finding it, which is why the axis is logarithmic. A static type checker does not catch every bug; what it does is move a whole class of them from the right-hand end of this chart to the left-hand end, where a fix costs a keystroke and no one else's day. The multipliers vary by an order of magnitude between studies; the shape does not.`;
+
+export const sources = [
+  {
+    text: "Boehm, *Software Engineering Economics* (Prentice Hall, 1981)",
+    href: "https://openlibrary.org/works/OL6034830W",
+  },
+  {
+    text: "RTI for NIST, *The Economic Impacts of Inadequate Infrastructure for Software Testing*, Planning Report 02-3 (2002)",
+    href: "https://www.nist.gov/document/report02-3pdf",
+  },
+  {
+    text: "Bossavit, *The Leprechauns of Software Engineering* (2015), on their provenance",
+    href: "https://leanpub.com/leprechauns",
+  },
+];
 
 export function render() {
   return plot({

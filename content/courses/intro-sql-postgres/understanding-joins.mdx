@@ -166,7 +166,7 @@ keeping the ones where the `ON` condition is true:
 
 ```mermaid
 flowchart TB
-    P["Consider pairings of<br/>(order, customer)"] --> T{"ON condition true?<br/>order.<code>customer_id</code> = customer.id"}
+    P["Consider pairings of<br/>(order, customer)"] --> T{"ON condition true?<br/><code>order.customer_id</code> = <code>customer.id</code>"}
     T -->|"yes"| K["Combine into<br/>one wide row"]
     T -->|"no"| D["Discard pairing"]
 ```

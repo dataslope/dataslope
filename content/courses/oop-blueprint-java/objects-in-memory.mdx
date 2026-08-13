@@ -256,11 +256,11 @@ sequenceDiagram
     participant Callee as rename (stack frame)
     participant Heap
 
-    Caller->>Heap: new Dog("Rex")
+    Caller->>Heap: <code>new Dog("Rex")</code>
     Note over Caller,Heap: mine references the Dog named Rex
-    Caller->>Callee: rename(mine, "Buddy")
+    Caller->>Callee: <code>rename(mine, "Buddy")</code>
     Note over Callee,Heap: dog references that same Dog
-    Callee->>Heap: dog.name = "Buddy"
+    Callee->>Heap: <code>dog.name = "Buddy"</code>
     Note over Caller,Heap: mine references the Dog, now named Buddy
 ```
 
@@ -306,7 +306,7 @@ moment its memory comes back:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Allocated: new Dog(...)
+    [*] --> Allocated: <code>new Dog(...)</code>
     Allocated --> Reachable: assigned to a variable
     Reachable --> Reachable: passed/copied to other refs
     Reachable --> Unreachable: all refs go out of scope or set to null

@@ -103,12 +103,12 @@ sequenceDiagram
     participant JIT
     participant Native as Native code cache
     Note over Code,Native: Method first runs in interpreter
-    Code->>Interp: run method()
+    Code->>Interp: run <code>method()</code>
     Interp->>Prof: counts: this method is now "hot"
-    Prof->>JIT: please compile method()
+    Prof->>JIT: please compile <code>method()</code>
     JIT->>Native: deposit native version
     Note over Code,Native: Next call uses the native version
-    Code->>Native: run method() (fast)
+    Code->>Native: run <code>method()</code> (fast)
 ```
 
 You don't have to do anything to get this. The JVM watches your

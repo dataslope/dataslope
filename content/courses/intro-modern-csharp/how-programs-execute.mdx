@@ -155,7 +155,7 @@ sequenceDiagram
     participant CLR as NET runtime
     participant JIT as JIT compiler
     participant CPU as CPU
-    U->>CLR: run Program.dll
+    U->>CLR: run <code>Program.dll</code>
     CLR->>CLR: load DLL, type check
     CLR->>JIT: please compile Main to native
     JIT-->>CLR: returns machine code
@@ -238,14 +238,14 @@ Here is what happens in the stack while this runs:
 sequenceDiagram
     participant Stack as Stack
     Note right of Stack: top-level statements run
-    Stack->>Stack: push frame: main_local=5
-    Note right of Stack: call Square(5)
+    Stack->>Stack: push frame: <code>main_local=5</code>
+    Note right of Stack: call <code>Square(5)</code>
     Stack->>Stack: push frame: x=5
     Stack->>Stack: compute result = 5 * 5 = 25
     Stack-->>Stack: pop Square's frame, return 25
     Note right of Stack: back in caller
     Stack->>Stack: answer = 25
-    Stack->>Stack: call Console.WriteLine with square=25
+    Stack->>Stack: call <code>Console.WriteLine</code> with <code>square=25</code>
 ```
 
 Two things to notice:

@@ -36,6 +36,18 @@
   white-space: inherit;
 }
 
+/* Code runs inside an SVG <text> label. Sequence, pie and gantt diagrams paint
+   their labels as SVG text rather than as HTML, so an author's <code> tag
+   cannot reach the DOM as an element (Mermaid writes it out as literal
+   characters). mermaid.tsx strips the tag before the render and splits the
+   rendered text node back into <tspan>s afterwards; this is the class it puts
+   on the code runs, and it names the same face as the <code> rule above.
+   Applies to both the inline diagram and the fullscreen stage. */
+.codeSpan {
+  font-family: var(--font-mono), "JetBrains Mono", "Fira Code", ui-monospace,
+    SFMono-Regular, Menlo, monospace;
+}
+
 /* Render the diagram at its natural (intrinsic) size, centered in the column.
    Mermaid emits the SVG with width="100%" plus an inline `max-width:<W>px`
    cap equal to the diagram's intrinsic width. Leaving that cap intact keeps

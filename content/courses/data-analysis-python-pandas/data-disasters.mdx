@@ -25,8 +25,8 @@ situation?", at exactly the moment it can save them.
 
 ## The Vancouver Stock Exchange index that melted (1982)
 
-When the Vancouver Stock Exchange launched a new index in 1982, it
-started, as indices do, at a round 1000.00 points. Over the next 22
+When the Vancouver Stock Exchange launched a new index in 1982,[^vse]
+it started, as indices do, at a round 1000.00 points. Over the next 22
 months the market broadly rose, and yet the index drifted
 steadily *downward*, reaching about 520. The exchange was, by its
 own published number, losing nearly half its value while the
@@ -56,7 +56,7 @@ miniature whenever floating-point arithmetic surprises us.)
 
 NASA's Mars Climate Orbiter, a spacecraft that cost roughly $327
 million, reached Mars in September 1999 and was never heard from
-again. The investigation found a heartbreakingly simple cause: one
+again.[^mco] The investigation found a heartbreakingly simple cause: one
 piece of ground software produced a thrust figure in **pound-force
 seconds** (imperial units), while the spacecraft's navigation
 software expected **newton-seconds** (metric). Nobody converted
@@ -84,7 +84,7 @@ helpful, auto-converts text that *looks* like a date into an actual
 date. Several human gene symbols look exactly like dates, the gene
 `SEPT2` becomes "2-Sep," `MARCH1` becomes "1-Mar," and so on. A
 2016 study found this corruption in roughly **one in five** genetics
-papers with Excel supplementary files. The problem was so
+papers with Excel supplementary files.[^gene-names] The problem was so
 persistent and so hard to stamp out that in 2020 the body that names
 human genes officially **renamed the affected genes**, it was
 easier to rename the biology than to fix the spreadsheets.
@@ -103,8 +103,8 @@ load, and why we read ZIP codes and IDs as strings on purpose.
 ## The London Whale and the copy-paste model (2012)
 
 In 2012 JPMorgan lost billions of dollars in the trading episode
-nicknamed the "London Whale." The post-mortem revealed that a key
-risk model ran on a chain of spreadsheets in which data was
+nicknamed the "London Whale."[^whale] The post-mortem revealed that a
+key risk model ran on a chain of spreadsheets in which data was
 **manually copied and pasted** from one sheet to another, and at
 least one formula divided by a *sum* where it should have divided by
 an *average*, understating the apparent risk. No single villain;
@@ -177,3 +177,36 @@ A "negligible" per-operation error stops being negligible when you repeat it a f
 
 Penguins' \`body_mass_g\` and \`flipper_length_mm\` are good examples of units traveling with the data.`}
 />
+
+[^vse]:
+    Reported at the time in the Canadian press and recounted since in
+    the numerical-computing literature, including Nicholas J. Higham,
+    *Accuracy and Stability of Numerical Algorithms* (SIAM, 2nd ed.
+    2002), which collects this kind of arithmetic failure. The index was
+    recomputed from scratch and reopened at roughly double its published
+    value, which is the part that makes the error legible.
+
+[^mco]:
+    *Mars Climate Orbiter Mishap Investigation Board Phase I Report*
+    (NASA, 10 November 1999). The board's finding is narrower than the
+    usual telling: the units mismatch was the proximate cause, but the
+    report spends most of its pages on the navigation-team processes
+    that let a known trajectory anomaly go unresolved for weeks. The
+    $327.6 million figure is the cost of the whole mission, orbiter and
+    lander together.
+
+[^gene-names]:
+    Mark Ziemann, Yotam Eren and Assam El-Osta,
+    ["Gene name errors are widespread in the scientific literature"](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1044-7),
+    *Genome Biology* 17:177 (2016). The 2020 renaming was carried out by
+    the HUGO Gene Nomenclature Committee, which is the body that assigns
+    human gene symbols; `SEPT1` became `SEPTIN1` and `MARCH1` became
+    `MARCHF1` for exactly the reason the page gives.
+
+[^whale]:
+    *Report of JPMorgan Chase & Co. Management Task Force Regarding 2012
+    CIO Losses* (January 2013), the bank's own account, and the US
+    Senate Permanent Subcommittee on Investigations report
+    *JPMorgan Chase Whale Trades: A Case History of Derivatives Risks
+    and Abuses* (March 2013). The spreadsheet detail, including the
+    divide-by-sum, is in both.

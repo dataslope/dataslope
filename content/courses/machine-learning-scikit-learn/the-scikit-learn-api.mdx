@@ -59,7 +59,7 @@ flowchart TD
     A["Raw training data<br/>(<code>X_train</code>, <code>y_train</code>)"] -->|"<code>fit(X_train, y_train)</code>"| B["Fitted estimator<br/>(holds what it learned)"]
     C["New data<br/>(<code>X_new</code>)"] -->|"<code>predict(X_new)</code>"| B
     B --> D["Predictions<br/>(numbers, labels, or groups)"]
-    B -. "score(X_test, y_test)" .-> E["A quality number"]
+    B -. "<code>score(X_test, y_test)</code>" .-> E["A quality number"]
 ```
 
 <Callout type="tip" title="The lifecycle never changes">

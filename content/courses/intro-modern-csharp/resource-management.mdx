@@ -42,7 +42,7 @@ the GC eventually reclaims the space:
 
 ```mermaid
 flowchart TD
-    A["new Person()"] --> H["heap allocation"]
+    A["<code>new Person()</code>"] --> H["heap allocation"]
     H --> R["program holds reference"]
     R -->|reference dropped| O["object becomes unreachable"]
     O --> G["GC reclaims memory at some later point"]
@@ -221,7 +221,7 @@ impossible to forget. Reach for it every time.
 flowchart TD
     R["resource"] --> M{"managed by GC?"}
     M -- "memory" --> GC["yes, just let the<br/>object become unreachable"]
-    M -- "file / socket / handle / lock" --> D["no, wrap usage in 'using'<br/>so Dispose() runs deterministically"]
+    M -- "file / socket / handle / lock" --> D["no, wrap usage in 'using'<br/>so <code>Dispose()</code> runs deterministically"]
 ```
 
 Beginners often misremember this and think the GC handles

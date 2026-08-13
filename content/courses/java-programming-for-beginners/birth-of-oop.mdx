@@ -106,14 +106,14 @@ The most famous casualty was IBM's **OS/360**, the operating system
 for its System/360 mainframes. It consumed thousands of
 programmer-years and shipped late anyway. Its manager, **Fred
 Brooks**, distilled the experience into the 1975 classic *The
-Mythical Man-Month*, including the observation now known as
+Mythical Man-Month*,[^brooks] including the observation now known as
 **Brooks's law**: *adding manpower to a late software project makes
 it later*, because every new person multiplies the communication
 overhead among everyone else.
 
-In October 1968, NATO sponsored a conference in Garmisch, Germany,
-to confront the problem head-on. The attendees put a name to it,
-the **software crisis**, and proposed, half as aspiration, a new
+In October 1968, NATO sponsored a conference in Garmisch,
+Germany,[^nato] to confront the problem head-on. The attendees put a
+name to it, the **software crisis**, and proposed, half as aspiration, a new
 discipline to fix it: *software engineering*. The profession you are
 now entering was invented, in real time, in response to a disaster.
 
@@ -189,8 +189,9 @@ procedures. It came from a totally different way of thinking about
 what a program *is*.
 
 In 1960s Oslo, two Norwegian researchers, **Ole-Johan Dahl** and
-**Kristen Nygaard**, were building software to *simulate* physical
-systems: ships moving through a harbor, customers queuing at a bank.
+**Kristen Nygaard**,[^simula] were building software to *simulate*
+physical systems: ships moving through a harbor, customers queuing at
+a bank.
 They noticed something. The most natural way to write a simulation
 is to model each *thing in the world* as a *thing in the program*: a
 ship in the harbor becomes a `Ship` in the code, carrying its own
@@ -222,7 +223,7 @@ In the 1970s, at Xerox PARC in California, **Alan Kay** and his team
 pushed the idea to its limit in a language called **Smalltalk**:
 *everything* is an object, even numbers, even `true` and `false`,
 and objects interact only by sending each other messages. Kay coined
-the very phrase "object-oriented programming." (He later quipped, at
+the very phrase "object-oriented programming."[^kay] (He later quipped, at
 the 1997 OOPSLA conference, "I made up the term 'object-oriented',
 and I can tell you I did not have C++ in mind.") The same PARC group
 invented overlapping windows, the bitmapped graphical interface, and
@@ -255,8 +256,8 @@ flowchart TB
         M2[deposit / withdraw]
         M2 --- D2
     end
-    User[Outside code] -- "deposit(20)" --> M1
-    User -- "withdraw(10)" --> M2
+    User[Outside code] -- "<code>deposit(20)</code>" --> M1
+    User -- "<code>withdraw(10)</code>" --> M2
 ```
 
 Outside code can *ask* an account to deposit or withdraw, but it
@@ -316,3 +317,32 @@ In the early 1990s, all three conditions were met at once, by a
 secret project at Sun Microsystems whose actual goal was to program
 *television set-top boxes and smart appliances*. That gloriously
 sideways origin story is the next page.
+
+[^brooks]:
+    Frederick P. Brooks Jr.,
+    [*The Mythical Man-Month*](https://openlibrary.org/works/OL3510570W)
+    (Addison-Wesley, 1975). Brooks managed OS/360, so the book is a
+    participant's account rather than an outsider's diagnosis, which is
+    why it is still quoted fifty years on.
+
+[^nato]:
+    Peter Naur and Brian Randell (eds.),
+    [*Software Engineering: Report on a Conference Sponsored by the
+    NATO Science Committee*](http://homepages.cs.ncl.ac.uk/brian.randell/NATO/nato1968.PDF),
+    Garmisch, October 1968. Randell has kept the scanned proceedings
+    online ever since. The transcripts are unusually frank, and the
+    phrase "software crisis" is used in them as a description of the
+    present, not a slogan.
+
+[^simula]:
+    Ole-Johan Dahl and Kristen Nygaard, "SIMULA: an ALGOL-based
+    simulation language", *Communications of the ACM* 9(9), 1966, and
+    their own retrospective "The development of the SIMULA languages"
+    (HOPL, 1978). Both men received the ACM Turing Award in 2001 for
+    the ideas in this section.
+
+[^kay]:
+    Alan C. Kay,
+    [*The Early History of Smalltalk*](http://worrydream.com/EarlyHistoryOfSmalltalk/)
+    (HOPL II, 1993). Kay's own account of where the term came from, and
+    of how much of it he thinks the industry then got wrong.

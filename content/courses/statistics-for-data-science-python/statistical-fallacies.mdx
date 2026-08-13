@@ -48,10 +48,11 @@ groups you're comparing.
   caption="A trend inside every group can reverse once the groups are pooled together."
 />
 
-**Concrete example.** A classic real case: the 1973 UC Berkeley graduate
-admissions. Overall, men were admitted at a higher rate than women,
-which looked like bias against women. But department by department, women
-were admitted at *equal or higher* rates than men. The catch: women
+**Concrete example.** A classic real case: the 1973 UC Berkeley
+graduate admissions.[^berkeley] Overall, men were admitted at a higher
+rate than women, which looked like bias against women. But department
+by department, women were admitted at *equal or higher* rates than
+men. The catch: women
 applied disproportionately to the most competitive departments (low
 admit rates for everyone), while men applied to easier ones. The
 department was the lurking variable.
@@ -195,10 +196,10 @@ chance of a false positive when nothing is real. But if you run *twenty*
 such tests, you'd *expect* about one "significant" result by pure chance.
 Hunting through many comparisons (or many model specifications, or many
 subgroups) and reporting only the ones that "worked" is **p-hacking**.
-The "**garden of forking paths**" is the subtler cousin: even without
-consciously fishing, the many small analysis choices you'd have made
-*differently* had the data looked different inflate your false-positive
-rate.
+The "**garden of forking paths**" is the subtler cousin:[^forking] even
+without consciously fishing, the many small analysis choices you'd have
+made *differently* had the data looked different inflate your
+false-positive rate.
 
 **Concrete example.** Test whether each of 20 unrelated variables
 predicts churn. Even if none truly does, roughly one will come back
@@ -362,7 +363,8 @@ silently dropped from your data. The survivors are a biased sample, so
 any pattern you find in them may be an artifact of *what got filtered
 out*, not a real effect.
 
-**Concrete example.** In WWII, analysts examined returning bombers to
+**Concrete example.**[^wald] In WWII, analysts examined returning
+bombers to
 decide where to add armor, and found bullet holes concentrated on the
 wings and tail. The instinct was to armor those spots. The
 statistician Abraham Wald pointed out the opposite: armor the
@@ -903,3 +905,27 @@ Patterns found by searching must be confirmed on fresh, independent data before 
 - **Regression to the mean:** extremes drift back on their own, you need a control group to credit an intervention.
 - **Cherry-picking / Texas sharpshooter:** decide the hypothesis *before* you look, report everything, and confirm on new data.
 </Callout>
+
+[^berkeley]:
+    P. J. Bickel, E. A. Hammel and J. W. O'Connell, "Sex Bias in
+    Graduate Admissions: Data from Berkeley",
+    [*Science* 187(4175)](https://archive.org/details/sim_science_1975-02-07_187_4175),
+    7 February 1975. Worth reading rather than repeating: the authors
+    are careful that the disaggregated data does not prove the absence
+    of bias either, only that the aggregate number cannot show its
+    presence.
+
+[^forking]:
+    Andrew Gelman and Eric Loken,
+    [*The garden of forking paths*](http://www.stat.columbia.edu/~gelman/research/unpublished/forking.pdf)
+    (2013), the paper that named it. Their point is the uncomfortable
+    one: the researcher need not have run multiple tests, or intended
+    anything, for the error rate to be inflated.
+
+[^wald]:
+    Abraham Wald, *A Method of Estimating Plane Vulnerability Based on
+    Damage of Survivors Returning*, Statistical Research Group,
+    Columbia University (1943). Worth knowing that the memoranda are
+    dry estimation work: the vivid "armour where the holes are not"
+    telling, including the anecdote's usual dialogue, is a later
+    retelling rather than anything Wald wrote.

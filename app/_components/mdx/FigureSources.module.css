@@ -1,0 +1,53 @@
+/* The credit line under a figure. Rendered inside the figure's own
+   <figcaption> (a <figure> may hold only one), so it inherits the caption's
+   centering and muted color and only has to set what differs: a size below the
+   caption's, and a little air between the two. */
+.sources {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-fd-muted-foreground);
+}
+
+/* A figure may carry a credit and no caption, and then this is the only line
+   in the figcaption and the air above it would be dead space. */
+.sources:only-child {
+  margin-top: 0;
+}
+
+/* "Source" / "Sources". Set apart from the references themselves so the eye
+   can skip the whole line, which is what a reader who is not chasing a
+   citation wants to do. */
+.label {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.label::after {
+  content: ":";
+  margin-right: 0.35em;
+}
+
+/* References run on rather than stacking: two or three short ones are a line
+   of text, and a list would give the credit more weight on the page than the
+   figure it credits. The separator is a middot on every entry but the first,
+   and it is decorative, so it is drawn rather than typed. */
+.entry + .entry::before {
+  content: "·";
+  margin: 0 0.45em;
+  opacity: 0.6;
+}
+
+.sources a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-underline-offset: 0.2em;
+  transition: color 0.12s, text-decoration-color 0.12s;
+}
+
+.sources a:hover {
+  color: var(--color-fd-primary);
+  text-decoration-color: currentColor;
+}
