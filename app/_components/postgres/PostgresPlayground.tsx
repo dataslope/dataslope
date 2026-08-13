@@ -142,7 +142,7 @@ import {
 } from "../cloud/materialize";
 import {
   sqlTabsForBundle,
-  type WorkspaceBundle,
+  type BuildBundle,
 } from "@/lib/workspaces/types";
 import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
 import { type PostgresEngine } from "../runtime/postgres";
@@ -156,6 +156,8 @@ import { newTabId } from "../sqlitePlaygroundTabs";
 import {
   createTabStorage,
 } from "../sql/shared/tabStorageUtils";
+import { tabsForAdoptedScope } from "../sql/shared/tabScope";
+import { readQueryLog, restoreQueryLog } from "../sql/utils/queryLogBundle";
 import { SqlTabBar } from "../sql/components/SqlTabBar";
 import { SETTINGS_TAB_ID } from "../playgroundTabs";
 import type { TabDescriptor } from "../tabs/tabTypes";
@@ -239,7 +241,8 @@ import { computeVisibleTypeGroups } from "../sql/utils/columnTypeSelector";
 
 const PLAYGROUND_ID = postgresAdapter.playgroundId;
 const STORAGE_PREFIX = postgresAdapter.storagePrefix;
-const { dbScopedKey, loadTabs, saveTabs } = createTabStorage(STORAGE_PREFIX);
+const { dbScopedKey, loadTabs, saveTabs, setWorkspaceScope } =
+  createTabStorage(STORAGE_PREFIX, PLAYGROUND_ID);
 
 const POSTGRES_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
   {
@@ -1060,7 +1063,17 @@ function PostgresPlaygroundInner() {
     history: queryHistory,
     addHistoryEntry,
     clearHistory,
+    replaceHistory,
   } = useQueryHistory(storageKey("query_history"));
+
+  // The query log travels with a cloud save, never with a share link.
+  const queryLogKeys = useMemo(
+    () => ({
+      history: storageKey("query_history"),
+      saved: storageKey("saved_queries"),
+    }),
+    [],
+  );
 
   // ─── Dialog state ─────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -1322,6 +1335,34 @@ function PostgresPlaygroundInner() {
       saveTabs(dbId, nextTabs);
     },
     [],
+  );
+
+  // Tabs are read in a `useState` initializer, before the workspace bootstrap
+  // has resolved, so they can come from the wrong workspace's keys. Once the
+  // real one is known, move onto its keys and re-read if it moved.
+  const adoptWorkspaceTabScope = useCallback(
+    (workspaceId: string) => {
+      const dbId = activeDbIdRef.current;
+      const adopted = tabsForAdoptedScope({
+        setWorkspaceScope,
+        workspaceId,
+        readTabs: () =>
+          loadTabs(dbId, findPostgresSampleDatabase(dbId).defaultTabs),
+        readActiveTabId: () => {
+          try {
+            return localStorage.getItem(dbScopedKey(dbId, "active_tab"));
+          } catch {
+            return null;
+          }
+        },
+      });
+      if (!adopted) return;
+      persistTabs(adopted.tabs, dbId);
+      tabHistoryRef.current = [];
+      setActiveTabId(adopted.activeTabId);
+      setResultsByTab({});
+    },
+    [persistTabs],
   );
 
   const refreshSchema = useCallback(async () => {
@@ -1890,6 +1931,7 @@ function PostgresPlaygroundInner() {
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
           setWorkspaceSaved(workspace.saved);
+          adoptWorkspaceTabScope(workspace.id);
           try {
             const hasLock = await acquireWorkspaceLock(workspace.id, {
               signal: lockController.signal,
@@ -3380,8 +3422,8 @@ function PostgresPlaygroundInner() {
   // sequences, functions, and other non-table objects a handwritten dump
   // would miss — and reopening boots straight from the tarball.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const buildCloudBundle =
-    useCallback(async (): Promise<WorkspaceBundle | null> => {
+  const buildCloudBundle = useCallback<BuildBundle>(
+    async (opts) => {
       const engine = engineRef.current;
       if (!engine) return null;
       const tarball = await engine.dumpDataDir();
@@ -3390,6 +3432,10 @@ function PostgresPlaygroundInner() {
         tabsRef.current,
         activeTabIdRef.current,
       );
+      // Only the cloud-backup path asks for this; a share must not carry it.
+      const personal = opts?.includePersonal
+        ? readQueryLog(queryLogKeys)
+        : undefined;
       return {
         version: 2,
         kind: "sql",
@@ -3403,10 +3449,13 @@ function PostgresPlaygroundInner() {
           tabs: bundleTabs,
           activeTabIndex,
           databaseLabel: displayFilename,
+          personal,
         },
         database: image,
       };
-    }, [activeWorkspace?.name, displayFilename]);
+    },
+    [activeWorkspace?.name, displayFilename, queryLogKeys],
+  );
 
   // Apply a pending share/cloud bundle once the engine is up. The bundle's
   // queries are pre-seeded into the blank database's stored tabs because
@@ -3450,6 +3499,13 @@ function PostgresPlaygroundInner() {
           bundle.database,
           bundle.sql.databaseLabel ?? bundle.name,
         );
+        // A cloud save is the owner's own; a share is someone else's copy,
+        // whose `personal` section (if a future client ever sends one) is not
+        // ours to absorb.
+        if (pendingRef.source === "cloud") {
+          const restored = restoreQueryLog(bundle.sql.personal, queryLogKeys);
+          if (restored) replaceHistory(restored.history);
+        }
       } catch (err) {
         showToast(
           `Couldn't open the playground: ${err instanceof Error ? err.message : String(err)}`,
@@ -3457,7 +3513,7 @@ function PostgresPlaygroundInner() {
         );
       }
     })();
-  }, [loaded, performImportPgDataDir, showToast]);
+  }, [loaded, performImportPgDataDir, showToast, queryLogKeys, replaceHistory]);
 
   const exportPostgresDatabaseToXlsx = useCallback(async () => {
     const engine = engineRef.current;

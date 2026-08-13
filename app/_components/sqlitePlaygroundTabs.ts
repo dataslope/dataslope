@@ -1,6 +1,7 @@
 "use client";
 
 import type { QueryTabSeed } from "./runtime/sqliteSamples";
+import { createTabScope } from "./sql/shared/tabScope";
 
 const STORAGE_PREFIX = "playground_sqlite_";
 
@@ -8,8 +9,14 @@ const STORAGE_PREFIX = "playground_sqlite_";
 // neither with the language playgrounds nor with the upcoming Postgres
 // playground.
 export const storageKey = (k: string) => `${STORAGE_PREFIX}${k}`;
+
+// Per-database keys are scoped to the active workspace as well, so two
+// workspaces built from the same sample database keep their own tabs. See
+// `createTabScope` for how the scope is resolved and migrated.
+const tabScope = createTabScope(STORAGE_PREFIX, "sqlite");
 export const dbScopedKey = (dbId: string, k: string) =>
-  `${STORAGE_PREFIX}db_${dbId}_${k}`;
+  tabScope.scopedKey(dbId, k);
+export const setTabWorkspaceScope = tabScope.setWorkspaceScope;
 
 export interface QueryTab {
   /** Stable id used as the React key, generated client-side because

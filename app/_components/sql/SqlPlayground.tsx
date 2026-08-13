@@ -122,7 +122,7 @@ import {
 } from "../cloud/materialize";
 import {
   sqlTabsForBundle,
-  type WorkspaceBundle,
+  type BuildBundle,
 } from "@/lib/workspaces/types";
 import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
 import {
@@ -189,9 +189,12 @@ import {
   loadActiveTabId,
   loadTabs,
   saveTabs,
+  setTabWorkspaceScope,
   storageKey,
   type QueryTab,
 } from "../sqlitePlaygroundTabs";
+import { tabsForAdoptedScope } from "./shared/tabScope";
+import { readQueryLog, restoreQueryLog } from "./utils/queryLogBundle";
 import { themeFor } from "../cmExtensions";
 
 const PLAYGROUND_ID = sqliteAdapter.playgroundId;
@@ -875,7 +878,17 @@ function SqlPlaygroundInner() {
     history: queryHistory,
     addHistoryEntry,
     clearHistory,
+    replaceHistory,
   } = useQueryHistory(storageKey("query_history"));
+
+  // The query log travels with a cloud save, never with a share link.
+  const queryLogKeys = useMemo(
+    () => ({
+      history: storageKey("query_history"),
+      saved: storageKey("saved_queries"),
+    }),
+    [],
+  );
   const queryRunnerRefs = {
     engineRef,
     editorRef,
@@ -913,6 +926,35 @@ function SqlPlaygroundInner() {
     if (stmt) runSelection(stmt.text);
     else runActiveTab();
   }, [runActiveTab, runSelection]);
+
+  // Tabs are read on mount, before the workspace bootstrap has resolved, so
+  // they can come from the wrong workspace's keys. Once the real one is known,
+  // move onto its keys and re-read if it moved.
+  const adoptWorkspaceTabScope = useCallback(
+    (workspaceId: string) => {
+      const dbId = activeDbIdRef.current;
+      const adopted = tabsForAdoptedScope({
+        setWorkspaceScope: setTabWorkspaceScope,
+        workspaceId,
+        readTabs: () => loadTabs(dbId, findSampleDatabase(dbId).defaultTabs),
+        readActiveTabId: () => {
+          try {
+            return localStorage.getItem(dbScopedKey(dbId, "active_tab"));
+          } catch {
+            return null;
+          }
+        },
+      });
+      if (!adopted) return;
+      tabsRef.current = adopted.tabs;
+      setTabs(adopted.tabs);
+      saveTabs(dbId, adopted.tabs);
+      activeTabIdRef.current = adopted.activeTabId;
+      setActiveTabId(adopted.activeTabId);
+      setResultsByTab({});
+    },
+    [setTabs, setActiveTabId, setResultsByTab],
+  );
 
   // Table tabs restored from a previous session have no result until they are
   // re-queried; this puts their rows back when the tab is shown.
@@ -1040,8 +1082,8 @@ function SqlPlaygroundInner() {
   // (the codec gzips it) plus the query tabs; reopening loads the image
   // directly instead of replaying a dump.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const buildCloudBundle =
-    useCallback(async (): Promise<WorkspaceBundle | null> => {
+  const buildCloudBundle = useCallback<BuildBundle>(
+    async (opts) => {
       const image = await buildDatabaseImage();
       if (image === null) return null;
       const label = await activeDatabaseLabel();
@@ -1049,6 +1091,10 @@ function SqlPlaygroundInner() {
         tabsRef.current,
         activeTabIdRef.current,
       );
+      // Only the cloud-backup path asks for this; a share must not carry it.
+      const personal = opts?.includePersonal
+        ? readQueryLog(queryLogKeys)
+        : undefined;
       return {
         version: 2,
         kind: "sql",
@@ -1062,10 +1108,18 @@ function SqlPlaygroundInner() {
           tabs: bundleTabs,
           activeTabIndex,
           databaseLabel: label,
+          personal,
         },
         database: image,
       };
-    }, [activeDatabaseLabel, buildDatabaseImage, activeWorkspace?.name]);
+    },
+    [
+      activeDatabaseLabel,
+      buildDatabaseImage,
+      activeWorkspace?.name,
+      queryLogKeys,
+    ],
+  );
 
   // Apply a pending share/cloud bundle once the engine is up (the /s/<id>
   // page and the Cloud dialog leave a ref in sessionStorage and navigate
@@ -1093,6 +1147,13 @@ function SqlPlaygroundInner() {
           bundle.sql.databaseLabel ?? bundle.name,
           bundleTabSeeds(bundle),
         );
+        // A cloud save is the owner's own; a share is someone else's copy,
+        // whose `personal` section (if a future client ever sends one) is not
+        // ours to absorb.
+        if (pendingRef.source === "cloud") {
+          const restored = restoreQueryLog(bundle.sql.personal, queryLogKeys);
+          if (restored) replaceHistory(restored.history);
+        }
         showToast(
           pendingRef.source === "share"
             ? `Opened a copy of “${bundle.name}”.`
@@ -1105,7 +1166,7 @@ function SqlPlaygroundInner() {
         );
       }
     })();
-  }, [loaded, applySqlBundle, showToast]);
+  }, [loaded, applySqlBundle, showToast, queryLogKeys, replaceHistory]);
 
   // ─── Settings setters (persist to localStorage) ──────────────────────
   const setFontSize = useCallback(
@@ -1420,6 +1481,7 @@ function SqlPlaygroundInner() {
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
           setWorkspaceSaved(workspace.saved);
+          adoptWorkspaceTabScope(workspace.id);
           try {
             const hasLock = await acquireWorkspaceLock(workspace.id, {
               signal: lockController.signal,

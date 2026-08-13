@@ -33,7 +33,13 @@ import { createShare, isCloudSupported } from "./cloudApi";
 export interface ShareControlsProps {
   workspaceName: string;
   /** Serializes the CURRENT playground state into a bundle. Returning null
-   *  means there's nothing to share yet (e.g. engine still booting). */
+   *  means there's nothing to share yet (e.g. engine still booting).
+   *
+   *  Deliberately typed as taking no arguments, even though the hosts pass a
+   *  `BuildBundle` that accepts options. A share is a copy handed to whoever
+   *  holds the link, and one of those options asks for the author's query
+   *  history and starred queries; with this signature, nothing under this
+   *  component can request them, and widening it would be the mistake. */
   buildBundle: () => Promise<WorkspaceBundle | null>;
   /** Controlled-optional dialog state (mobile menus open the dialog). */
   shareOpen?: boolean;

@@ -22,7 +22,7 @@ import {
   isSqlPlayground,
   type CloudUsage,
   type CloudWorkspaceMeta,
-  type WorkspaceBundle,
+  type BuildBundle,
 } from "@/lib/workspaces/types";
 import {
   CloudApiError,
@@ -142,9 +142,12 @@ export function isBackupStale(
  *  backup. Throws on failure (callers surface the message inline). */
 export async function backUpWorkspace(
   workspaceId: string,
-  buildBundle: () => Promise<WorkspaceBundle | null>,
+  buildBundle: BuildBundle,
 ): Promise<CloudWorkspaceMeta> {
-  const bundle = await buildBundle();
+  // A backup is the owner's own copy, so it carries their query history and
+  // starred queries; `createShare` builds without this and hands a stranger a
+  // workspace, never a log of what its author has run.
+  const bundle = await buildBundle({ includePersonal: true });
   if (!bundle) {
     throw new Error("The playground is still loading, try again in a moment.");
   }

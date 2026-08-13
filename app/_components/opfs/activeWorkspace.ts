@@ -179,6 +179,19 @@ export function getActiveWorkspaceId(playgroundId: string): string | null {
   }
 }
 
+/**
+ * The workspace `ensureActiveWorkspace` will resolve to, as far as can be told
+ * synchronously: this tab's pointer, else the one this device last opened.
+ *
+ * For callers that need a workspace id before the async bootstrap has run, and
+ * can correct themselves afterwards if it lands elsewhere (see
+ * `createTabScope`). Returns null when there is nothing to resume, in which
+ * case the bootstrap will create a workspace.
+ */
+export function peekActiveWorkspaceId(playgroundId: string): string | null {
+  return getActiveWorkspaceId(playgroundId) ?? readLastWorkspaceId(playgroundId);
+}
+
 /** Persists the active workspace ID for the given playground into
  *  `sessionStorage`, and durably into `localStorage` so the next session can
  *  resume it. Silently no-ops outside the browser. */

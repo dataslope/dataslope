@@ -18,7 +18,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import type { WorkspaceBundle } from "@/lib/workspaces/types";
+import type { BuildBundle } from "@/lib/workspaces/types";
 import { CloudApiError, saveCloudWorkspace } from "../cloud/cloudApi";
 import { subscribeWorkspaceChanged } from "./workspaceChanges";
 import {
@@ -42,7 +42,7 @@ export interface AutoSyncOptions {
   playgroundId: string;
   /** Serializes the live playground into a portable bundle (the host's
    *  `buildCloudBundle`). Undefined until the playground is ready. */
-  buildBundle?: () => Promise<WorkspaceBundle | null>;
+  buildBundle?: BuildBundle;
   /** Registers the draft in the saved list (the host's save handler). Called
    *  once, on the first synced change, when `isDraft` is true. */
   promoteDraft?: (name?: string) => void | Promise<void>;
@@ -93,7 +93,7 @@ export function useWorkspaceAutoSync(opts: AutoSyncOptions): AutoSyncStatus {
       sync: async () => {
         const o = optsRef.current;
         if (!o.enabled || !o.activeWorkspaceId || !o.buildBundle) return;
-        const bundle = await o.buildBundle();
+        const bundle = await o.buildBundle({ includePersonal: true });
         // A null bundle means the playground hasn't finished booting; tell
         // the engine to retry after another debounce instead of erroring.
         if (!bundle) return false;

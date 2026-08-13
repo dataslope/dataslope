@@ -59,7 +59,7 @@ import {
 } from "./opfs/workspace";
 import { defaultWorkspaceName } from "./workspace/WorkspaceBadge";
 import { downloadWorkspaceZip } from "./opfs/workspaceArchive";
-import type { WorkspaceBundle } from "@/lib/workspaces/types";
+import type { BuildBundle } from "@/lib/workspaces/types";
 import {
   backUpWorkspace,
   isBackupStale,
@@ -321,7 +321,7 @@ export interface SaveControlProps {
    *  reads "Save" and promotes it; otherwise it reads "Saved". */
   unsaved: boolean;
   onSave?: (name: string) => void | Promise<void>;
-  buildBundle?: () => Promise<WorkspaceBundle | null>;
+  buildBundle?: BuildBundle;
   /** Toast hook so saves/backups flash the host's confirmation. */
   onNotify?: (message: string) => void;
 }

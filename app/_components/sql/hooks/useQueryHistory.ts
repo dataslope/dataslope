@@ -41,6 +41,10 @@ export interface UseQueryHistoryResult {
   history: QueryHistoryEntry[];
   addHistoryEntry: (entry: Omit<QueryHistoryEntry, "id">) => void;
   clearHistory: () => void;
+  /** Swap in a history built elsewhere, used when a cloud save's log is
+   *  merged into this device's (see `restoreQueryLog`). The merge has already
+   *  written localStorage, so this only brings the live pane in line. */
+  replaceHistory: (entries: QueryHistoryEntry[]) => void;
 }
 
 /**
@@ -81,5 +85,9 @@ export function useQueryHistory(storageKey?: string): UseQueryHistoryResult {
     if (storageKey) persistAsync(storageKey, "[]");
   }, [storageKey]);
 
-  return { history, addHistoryEntry, clearHistory };
+  const replaceHistory = useCallback((entries: QueryHistoryEntry[]) => {
+    setHistory(entries.slice(0, MAX_IN_MEMORY));
+  }, []);
+
+  return { history, addHistoryEntry, clearHistory, replaceHistory };
 }
