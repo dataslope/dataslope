@@ -207,6 +207,7 @@ import {
 import { pushTabHistory } from "../sql/utils/tabUtils";
 import { enumHintsFromColumns } from "../sql/utils/cellEditing";
 import { useSqlTabManagement } from "../sql/hooks/useSqlTabManagement";
+import { useViewDataTabAutoRun } from "../sql/hooks/useViewDataTabAutoRun";
 import { useSchemaTree } from "../sql/hooks/useSchemaTree";
 import type {
   AddRowDialogState,
@@ -1701,6 +1702,17 @@ function PostgresPlaygroundInner() {
     };
     runSqlForTabRef.current = runSqlForTab;
   }, [runActiveTab, runSqlForTab]);
+
+  // Table tabs restored from a previous session have no result until they are
+  // re-queried; this puts their rows back when the tab is shown.
+  useViewDataTabAutoRun({
+    tabs,
+    activeTabId,
+    resultsByTab,
+    statusState,
+    activeDbId,
+    run: runSqlForTab,
+  });
 
   // Focus the newly added column's name input in the View/Edit Structure drawer.
   useEffect(() => {

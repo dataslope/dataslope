@@ -157,6 +157,7 @@ import { useTabStore } from "./stores/useTabStore";
 import { useDialogStore } from "./stores/useDialogStore";
 import { useQueryRunner } from "./hooks/useQueryRunner";
 import { useTabManagement } from "./hooks/useTabManagement";
+import { useViewDataTabAutoRun } from "./hooks/useViewDataTabAutoRun";
 import { pushTabHistory } from "./utils/tabUtils";
 import {
   ensurePersistUnloadFlush,
@@ -881,6 +882,7 @@ function SqlPlaygroundInner() {
     addHistoryEntry,
   };
   const {
+    runSqlForTab,
     handleLoadPage,
     handleLoadMorePage,
     runActiveTab,
@@ -908,6 +910,17 @@ function SqlPlaygroundInner() {
     if (stmt) runSelection(stmt.text);
     else runActiveTab();
   }, [runActiveTab, runSelection]);
+
+  // Table tabs restored from a previous session have no result until they are
+  // re-queried; this puts their rows back when the tab is shown.
+  useViewDataTabAutoRun({
+    tabs,
+    activeTabId,
+    resultsByTab,
+    statusState,
+    activeDbId,
+    run: runSqlForTab,
+  });
 
   const {
     createSchemaObject,
