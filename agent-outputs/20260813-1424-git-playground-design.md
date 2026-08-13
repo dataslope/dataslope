@@ -750,6 +750,76 @@ What changed:
   (a second bare `import()` for preload would put the module straight back
   into the Worker); the fallback backdrop covers the wait.
 
+### 8.8 Remaining levers, traced to their importers
+
+A second pass over what is left (post-fix Worker: 8423.84 KiB, headroom
+1816 KiB), answering "can X leave?" per component rather than by size alone.
+
+**KaTeX (294 KiB) — not removable, and a CDN does not help.** Three import
+paths, three different situations:
+
+1. `source.config.ts` → `rehype-katex` in the fumadocs-mdx pipeline. Courses
+   run in dynamic mode, so a cache-miss re-render compiles MDX *in the
+   Worker*; math lessons need KaTeX server-side. workerd cannot import
+   modules from URLs at runtime, so "load from CDN" is not expressible for
+   server code at all — the CDN trick the playground runtimes use works
+   because they run in the *browser*.
+2. `challengeShared.tsx` / `MultipleChoiceQuestion.tsx` render card
+   instructions through react-markdown + rehype-katex. These are SSR'd
+   deliberately (the `lazyWidgets` rationale: prerendered HTML keeps every
+   widget for SEO and zero layout shift), and hydration needs the same
+   plugin synchronously, so it cannot be deferred client-side either.
+3. `AskAiWidget` — already behind `dynamic(…, {ssr:false})` (`AskAi.tsx:23`);
+   its copy never reaches the Worker.
+
+**highlight.js (98 KiB)** — same verdict as KaTeX path 2 (`rehype-highlight`
+in the SSR'd instruction renderer). It is not redundant with Shiki: Shiki
+highlights MDX code blocks in the compile pipeline; highlight.js highlights
+learner-authored markdown at render time.
+
+**Shiki (750 KiB)** — mostly already optimized, estimate revised down. The
+big win was taken previously: `next.config.ts:34-44` aliases the bare
+`shiki` specifier to `lib/shiki-slim.ts`, whose 21-language registry
+replaced the full bundled set ("~1.3 MiB of the Worker" per its comment).
+Checked against the corpus fence census: every registered language is used
+except `haskell` (0 fences; `rust`/`sas`/`toml` have 1 each) — dropping
+haskell saves single-digit KiB. The remaining cost is that every grammar
+appears **twice** (`chunks/` and `chunks/ssr/` graphs, 4.1 MB raw total),
+which is a bundler-graph artifact, not a language-list problem. The earlier
+"trim 300–500 KiB" estimate was wrong; treat Shiki as near-fixed cost.
+
+**images.js (365 KiB) — not the charts pattern.** Its entries are already
+small metadata (`{hash, width, height, formats}`) and the illustrations
+route *reads* them (`cutoutFor` needs formats + dimensions), so no free
+slug-index swap. A subset manifest (illustration ids only, emitted by
+`build-images.mjs`) would remove most of the API route's copy: **~150 KiB
+gz, medium-small effort.**
+
+**Playground pages (~200–400 KiB, estimate) — the same `ssr: false` lever,
+one level up.** Every `app/playground/<id>/page.tsx` statically imports its
+playground component, so the `Playground.tsx` graph (5,100 lines), the
+SQL playground graph, `sql-formatter` (72 KiB), and part of the CodeMirror
+bucket (330 KiB) sit in the Worker for pages whose body cannot function
+without a browser anyway. `metadata` lives in each route's `layout.tsx` and
+stays server-rendered; the body becomes a skeleton until hydration. This is
+exactly the pattern §8.4.2 already prescribes for the Git playground page —
+applying it to the existing 14 is the same change, with the same trade.
+
+**@polar-sh/sdk (114 KiB)** — replaceable with direct REST calls from the
+billing routes; medium effort, touches money paths, low urgency at current
+headroom.
+
+**Left alone deliberately:** `lucide-react` (icons in actual use;
+`optimizePackageImports` already scopes it), `zod`/`@base-ui`/`parse5`/
+`acorn`/fumadocs/`.source/dynamic.ts` (the request-time MDX compile
+machinery — the only lever over that family is eliminating request-time
+compilation entirely, i.e. the static-export question, which is an
+architecture decision rather than a bundle fix).
+
+Ranked, what remains actionable: charts copy A → `ASSETS` (~887, needs the
+workerd spike) > playground pages `ssr: false` (~200–400) > images.js subset
+(~150) > polar REST (~114). Everything else is framework or load-bearing.
+
 ---
 
 ## 9. Spikes and open questions
