@@ -74,17 +74,30 @@ Violating any of these has already been tried and rejected. Don't re-litigate.
 The marmot is the house mascot. Domain mascots where they fit: panda (pandas), penguin
 (seaborn), duck (DuckDB), **elephant (PostgreSQL — explicitly requested)**. The
 `mascot: true` field means "features a creature", matching how the pandas prompts use
-it.
+it. Courses have since picked up their own: otter, beaver, capybara, chipmunk, raccoon,
+koala, quokka, hamster, hedgehog, rabbit, squirrel, bear, fox, owl, canary, parrot,
+peacock, cat, mouse, frog, dolphin. Add new ones to the checker's `CREATURES` list in
+[Verification](#verification) in the same commit that introduces them, or it goes quiet
+about that species forever.
 
 **Keep the flag consistent with the subject text.** It drives a badge in the
 `/illustration-prompts` review gallery
 (`app/illustration-prompts/IllustrationPromptsClient.tsx`), and it drifted once already:
 14 prompts gained an elephant or duck in the subject without the flag being set, and one
 carried the flag with no creature. All 15 were corrected on 2026-07-30, and the checker
-in [Verification](#verification) now returns 0 on a clean tree — if it returns anything,
+in [Verification](#verification) returns 0 on a clean tree — if it returns anything,
 you introduced it.
 
-**182 of 810** prompts (22%) feature a creature. Use them for welcome pages, capstones,
+That claim went stale once and is worth guarding: the checker only knew six species while
+the corpus grew to twenty-odd, so it sat at **526 mismatches** and nobody read it. Two
+things to keep in mind when extending it. It needs **word boundaries** — the unanchored
+version matched `owl` inside "sl*owl*y" and called a dial a creature. And a **machine or
+a toy named after an animal is not a creature**: the corpus has lifting `crane`s, a
+London `whale` that is a trading loss, and a `rubber duck` that is a debugging prop, so
+`crane` and `whale` are deliberately absent from the list and the rubber duck is stripped
+before the test.
+
+**900 of 2,773** prompts (32%) feature a creature. Use them for welcome pages, capstones,
 and next-steps; keep technical concept pages as clean diagrams. Site *chrome* is the
 exception to that restraint and is deliberately creature-heavy: the interview thumbnails,
 the home bento icons, and the auth globe pins are all mascot art by request.
@@ -569,8 +582,13 @@ console.log(k.length+" entries, "+k.filter(s=>e[s].formats.length===1).length+" 
 # mascot flag consistent with subject text
 node -e '
 const j=require("./data/illustration-prompts.json");
-const re=/marmot|panda|penguin|duck|elephant|predator/i;
-const bad=j.prompts.filter(p=>p.mascot!==re.test(p.subject));
+const CREATURES=["marmot","panda","penguin","duck","duckling","elephant","otter","beaver",
+  "capybara","chipmunk","raccoon","koala","hamster","quokka","hedgehog","rabbit","squirrel",
+  "bear","fox","foxes","owl","bird","canary","canaries","parrot","peacock","cat","kitten",
+  "mouse","mice","frog","dolphin","predator"];
+const re=new RegExp("\\b(?:"+CREATURES.join("|")+")s?\\b","i");
+const TOYS=/rubber ducks?/gi;   // a desk toy, not a creature
+const bad=j.prompts.filter(p=>p.mascot!==re.test(p.subject.replace(TOYS,"")));
 console.log(bad.length+" mascot-flag mismatches");bad.slice(0,10).forEach(p=>console.log("  ",p.id,p.mascot));'
 
 # prompts are 1:1 with lesson files for a course

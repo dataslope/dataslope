@@ -3237,7 +3237,7 @@
       "category": "course-inline",
       "style": "risograph",
       "title": "A responsibility puzzle",
-      "mascot": true,
+      "mascot": false,
       "subject": "seven cards on a table, each holding some of the knowledge and some of the work, being sorted into who does what"
     },
     {
@@ -3513,7 +3513,7 @@
       "category": "course-inline",
       "style": "risograph",
       "title": "Where the threshold sits",
-      "mascot": true,
+      "mascot": false,
       "subject": "a dial turned slowly past a row of marks while a gate stays shut, then swings wide open at one particular mark"
     },
     {
