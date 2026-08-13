@@ -61,12 +61,22 @@ compare to the same period last year; (4) look for a denominator change
 (did traffic drop, inflating a rate?). Conclude with the most likely
 driver **and** what you'd verify next.
 
+Before explaining a movement, it is worth knowing what pure noise looks
+like. None of these four series has a trend in it.
+
+<Chart slug="noise-looks-like-a-trend" />
+
 ### How do you present a finding to a non-technical stakeholder?
 
 Lead with the **answer and its business impact**, not the method. One
 clear chart over a table; label the axes and the takeaway. State
 assumptions and caveats plainly ("this excludes refunds"), and end with a
 recommended action. Save methodology for an appendix or backup slide.
+
+The cheapest version of "lead with the takeaway": same bars, same axis,
+same color, one different sentence at the top.
+
+<Chart slug="title-carries-the-finding" />
 
 ### What are variance and standard deviation, and what do they measure?
 
@@ -107,6 +117,11 @@ The **mode** is the most frequently occurring value. It is most useful
 for **categorical** or discrete data (e.g., the most common product
 category purchased, the most frequent support ticket type) where mean
 and median have no clear meaning.
+
+When a distribution has two modes, that is usually the finding: it is two
+populations in one column, and no measure of center describes either.
+
+<Chart slug="modality-is-a-mixture" />
 
 ### What is a normal distribution and why does it matter for analysts?
 
@@ -161,6 +176,12 @@ print(f"Q1={q1}, Q3={q3}, IQR={iqr}, 90th pct={p90}")`,
   ]}
 />
 
+Every quantile is a cut through the same shape. On a skewed distribution
+the low cuts bunch together and the high ones stretch away, which is why
+an SLA quotes p95 rather than the median.
+
+<Chart slug="quantiles-on-a-distribution" />
+
 ### How do you identify outliers?
 
 Common methods:
@@ -198,6 +219,13 @@ print("Z-score outliers:", outliers_z["amount"].tolist())`,
   ]}
 />
 
+Where the 1.5 comes from, and what the rule actually promises. On a
+normal distribution the fences land at 2.7 standard deviations, so they
+flag about one row in a hundred and fifty whether or not anything is
+wrong with it.
+
+<Chart slug="iqr-fence-rule" />
+
 A caution on the usual tool: the box plot's rule finds outliers and is
 blind to shape, so three very different samples produce the same box.
 
@@ -211,10 +239,11 @@ effect of a change (e.g., a new button color) on a metric. Randomization
 ensures the groups are comparable, so any difference in outcomes can be
 attributed to the treatment.
 
-And what it costs to detect a smaller effect: each halving of the lift
-you want to catch roughly quadruples the users you need.
+What "randomization ensures the groups are comparable" buys, measured:
+ten covariates and the gap between the arms on each, when users pick
+their own group and when a coin does.
 
-<Chart slug="power-vs-n" />
+<Chart slug="randomisation-balances-confounders" />
 
 ### What is a p-value in the context of an A/B test?
 
@@ -224,6 +253,11 @@ A small p-value (commonly below 0.05) suggests the result is unlikely
 under the null, providing evidence to reject it. It does **not** measure
 the probability that the null is true or the effect's practical size.
 
+The definition as an area under the null, which is the thing most
+misstatements of it get wrong.
+
+<Chart slug="p-value-tail-area" />
+
 ### What is statistical significance vs. practical significance?
 
 **Statistical significance** means the observed effect is unlikely to be
@@ -231,6 +265,11 @@ due to chance (low p-value). **Practical significance** means the effect
 is large enough to matter in the real world. A very large sample can make
 a tiny, meaningless difference statistically significant. Always report
 effect size alongside p-values.
+
+One fixed population difference with nothing varied but the sample size.
+The p-value collapses toward zero; the effect size does not move.
+
+<Chart slug="effect-size-independent-of-n" />
 
 ### What is a Type I and a Type II error?
 
@@ -246,6 +285,11 @@ effect size alongside p-values.
 | **Reject $H_0$**         | Type I error (false positive), rate $\alpha$ | Correct decision, power $= 1 - \beta$       |
 | **Fail to reject $H_0$** | Correct decision, rate $1 - \alpha$          | Type II error (false negative), rate $\beta$ |
 
+The two errors are two areas either side of one threshold. Sliding it
+trades them against each other; only more data shrinks both.
+
+<Chart slug="alpha-power-tradeoff" />
+
 ### What is statistical power?
 
 Power is the probability of correctly detecting a real effect (rejecting
@@ -253,6 +297,11 @@ the null when it is false), defined as $1 - \beta$ where $\beta$ is the
 Type II error rate. Power increases with larger sample sizes, larger
 effect sizes, and higher significance levels. A common target is 80%
 power. Low-powered tests risk missing real improvements.
+
+And what 80% power costs. Each halving of the lift you want to catch
+roughly quadruples the users you need.
+
+<Chart slug="power-vs-n" />
 
 ### How do you choose the right sample size for an A/B test?
 
@@ -281,6 +330,12 @@ print(f"Required n per group: {n:.0f}")`,
     },
   ]}
 />
+
+The square root in that formula is the part worth internalising: halving
+the margin of error costs four times the sample, and the curve flattens
+long before most people expect it to.
+
+<Chart slug="sample-size-margin-of-error" />
 
 ### What is the difference between correlation and the correlation coefficient?
 
@@ -322,6 +377,11 @@ print(f"Spearman r: {r_spearman:.3f}")`,
   ]}
 />
 
+Four relationships with the coefficient printed on each. The fourth is
+the limit of the number: an obvious pattern reporting nearly zero.
+
+<Chart slug="correlation-scatters" />
+
 ### What chart type would you choose for each scenario?
 
 - **Trend over time**, line chart.
@@ -331,6 +391,11 @@ print(f"Spearman r: {r_spearman:.3f}")`,
 - **Relationship between two continuous variables**, scatter plot.
 - **Heatmap**, correlation matrix or pivot-style table with color encoding.
 
+The grid underneath that list: seven visual channels against four kinds
+of data, and which combinations are accurate, workable or wrong.
+
+<Chart slug="channel-by-data-type" />
+
 ### How do you choose which metric to track for a product change?
 
 Define a **primary metric** that directly captures the goal (e.g.,
@@ -339,6 +404,11 @@ must not degrade (e.g., refund rate, session duration). Avoid vanity
 metrics that look good but don't tie to business outcomes. Make sure the
 metric is measurable, attributable to the change, and sensitive enough to
 detect the expected effect size.
+
+And a reason to write the definition down rather than the metric's name:
+three defensible definitions of "active users" over one events table.
+
+<Chart slug="metric-definition-drift" />
 
 ### What is the difference between a dashboard and a report?
 
@@ -356,6 +426,11 @@ performance indicators (KPIs).
 Use consistent scales and color conventions. Add clear titles and data
 freshness labels. Avoid clutter: every element should earn its place.
 Design for the audience, an executive view differs from an ops team view.
+
+Why the most important number goes top-left, and what the bottom-right
+slot is actually worth.
+
+<Chart slug="dashboard-reading-order" />
 
 ### How do you explain a complex statistical finding in plain language?
 
@@ -404,6 +479,12 @@ quantify how sensitive the conclusion is to those assumptions. Avoid
 false precision, rounding "12.37% lift" to "about 12%" is often more
 honest when the confidence interval is wide.
 
+One thing to be explicit about when the range is drawn rather than
+stated: the same forty numbers carry three error bars that differ by a
+factor of six, and a chart rarely says which one it drew.
+
+<Chart slug="error-bar-ambiguity" />
+
 ### What is the difference between a histogram and a bar chart?
 
 A **bar chart** compares discrete categories (each bar is one category).
@@ -411,6 +492,11 @@ A **histogram** shows the distribution of a **continuous** variable by
 dividing the range into bins and counting how many observations fall in
 each bin. The x-axis of a histogram is numeric and ordered; bar chart
 categories can be in any order.
+
+One table of support tickets answering two questions. Everything that
+differs between the two charts follows from what sits on the x-axis.
+
+<Chart slug="histogram-vs-bar-chart" />
 
 ### What is Simpson's Paradox?
 
@@ -421,6 +507,12 @@ in every demographic subgroup, because sicker (harder-to-treat) patients
 were disproportionately assigned to the treatment group. It is a reminder
 to always segment data before drawing conclusions.
 
+The continuous version of the same reversal: within every age band more
+exercise goes with lower blood pressure, and one line fitted to all the
+points slopes the other way.
+
+<Chart slug="simpsons-paradox-trend" />
+
 ### What is a cohort analysis?
 
 A cohort analysis tracks a group of users who share a common starting
@@ -428,6 +520,12 @@ event (e.g., sign-up date) over time. It isolates behavioral patterns
 from the changing composition of the user base, making it the standard
 tool for measuring retention, churn, and lifetime value by acquisition
 cohort.
+
+Five signup cohorts, each retaining better than the one before. A single
+blended retention number cannot show this, because it moves when
+acquisition moves whether or not the product changed.
+
+<Chart slug="cohort-retention" />
 
 ## Concept checks
 
