@@ -22,6 +22,17 @@ This chapter covers: **union types**, **intersection types**,
 
 ## Union types: "this or that"
 
+The `|` is read as "or", and the important consequence is on the *methods*: you may only call what every member has.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "type Id =" },
+    { text: "string", label: "either this..." },
+    { text: "|", label: "or" },
+    { text: "number", label: "...or this, never both" },
+  ]}
+/>
+
 A **union type** `A | B` represents a value that is *either* type `A`
 *or* type `B` (or both, if they overlap):
 
@@ -242,6 +253,17 @@ both a string and a number. This is a compile-time error, the compiler
 knows the type is uninhabited.
 
 ## Discriminated unions: tagged unions for type-safe variants
+
+One shared literal field is what makes the union checkable. It is the tag:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "type Shape =" },
+    { text: "{ kind: \"circle\";", label: "the discriminant, a literal type" },
+    { text: "radius: number }", label: "the data only this variant has" },
+    { text: "| { kind: \"square\"; side: number }" },
+  ]}
+/>
 
 A **discriminated union** (also called a "tagged union") is a union of
 object types, each with a *discriminator* field (a literal type) that

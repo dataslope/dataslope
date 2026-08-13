@@ -220,6 +220,18 @@ flowchart TD
 
 ## `GridSearchCV`: try every combination, automatically
 
+The grid is a dict of parameter name to values, and the search is a full cross-validation run per combination:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "GridSearchCV(" },
+    { text: "pipe,", label: "the estimator to tune" },
+    { text: "{\"clf__C\": [0.1, 1, 10]},", label: "step name, two underscores, parameter" },
+    { text: "cv=5", label: "folds per combination" },
+    { text: ")" },
+  ]}
+/>
+
 Sweeping one hyperparameter by hand, as we did with `n_neighbors` above, is
 fine for one knob. But models often have several knobs, and the best value
 of one can depend on another. `GridSearchCV` automates the search: you hand

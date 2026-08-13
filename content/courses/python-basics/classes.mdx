@@ -63,6 +63,18 @@ print(isinstance(d, Dog))
 
 ## The `__init__` method
 
+`__init__` is not a constructor: the object already exists by the time it runs. Its job is to fill it in.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "def __init__(" },
+    { text: "self,", label: "the object already created for you" },
+    { text: "name,", label: "required" },
+    { text: "age=0", label: "optional, with a default" },
+    { text: "):" },
+  ]}
+/>
+
 `__init__` is the **initializer** (not "constructor", the object already exists when `__init__` runs). It sets up a new instance.
 
 <Figure
@@ -213,6 +225,16 @@ print(c.value)
 />
 
 ## `@classmethod` and `@staticmethod`
+
+The decorator decides what Python passes in as the first argument, and that is the whole distinction:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "@classmethod", label: "first argument is the class" },
+    { text: "def from_json(cls, s):", label: "so it can call cls(...) to build one" },
+    { text: "@staticmethod", label: "no implicit first argument at all" },
+  ]}
+/>
 
 Sometimes you want a method that operates on the **class** itself, or a utility function that logically belongs to the class but doesn't need access to instances.
 

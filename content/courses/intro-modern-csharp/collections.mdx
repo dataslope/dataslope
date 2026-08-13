@@ -61,6 +61,16 @@ lightweight, but you can't `Add()` or `Remove()`.
 
 ## `List<T>`: the everyday sequence
 
+The type argument is the whole difference from an untyped list: it is what lets the compiler reject a wrong element.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "List", label: "a growable sequence" },
+    { text: "<string>", label: "what it is a sequence of" },
+    { text: "names = new();", label: "the type on the left is enough for new()" },
+  ]}
+/>
+
 If you don't know exactly how many items you'll have, reach for
 `List<T>`.
 
@@ -101,6 +111,17 @@ Mental model: a `List<T>` is "an array that grows for you." It
 it allocates a bigger one and copies the old contents.
 
 ## `Dictionary<TKey, TValue>`: a phone book
+
+A dictionary needs two type arguments, and their order is the lookup direction:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "Dictionary<" },
+    { text: "string,", label: "the key you look up by" },
+    { text: "int", label: "the value you get back" },
+    { text: "> ages = new();" },
+  ]}
+/>
 
 A dictionary maps **keys** to **values**. Lookup by key is fast,
 even for a dictionary with millions of entries.

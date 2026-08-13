@@ -111,6 +111,17 @@ int main() {
 
 ## STL search helpers
 
+The two halves of a range, then what to look for. The range must already be sorted, and that precondition is the whole reason it is O(log n):
+
+<SyntaxBreakdown
+  parts={[
+    { text: "std::lower_bound(" },
+    { text: "v.begin(), v.end(),", label: "the sorted range" },
+    { text: "x", label: "returns the first element not less than x" },
+    { text: ")" },
+  ]}
+/>
+
 C++ already includes binary-search algorithms for sorted ranges.
 
 <CodeBlock

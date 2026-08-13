@@ -42,6 +42,18 @@ type), but the *order* is preserved.
 
 ## `Where()`, filtering
 
+`Where` takes a predicate: a function from element to `bool`. Nothing runs until the result is enumerated.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "xs.Where(" },
+    { text: "p", label: "one element" },
+    { text: "=>", label: "goes to" },
+    { text: "p.Age > 40", label: "a bool: keep it, or drop it" },
+    { text: ")" },
+  ]}
+/>
+
 `Where()` takes a predicate (`Func<T, bool>`) and returns a sequence
 containing only the elements for which the predicate is true.
 

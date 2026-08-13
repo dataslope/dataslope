@@ -99,6 +99,15 @@ both, `decimal`, for the rounding reasons the last chapter showed.
 
 ## Type conversions
 
+Two different operations, and the syntax is what tells them apart:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "(int) price", label: "a cast: I know this is safe" },
+    { text: "int.Parse(text)", label: "a parse: text in, number out, may throw" },
+  ]}
+/>
+
 Sometimes you really do need to turn one type into another. C# has
 two flavors of conversion.
 

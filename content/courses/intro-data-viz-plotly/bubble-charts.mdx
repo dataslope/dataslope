@@ -26,6 +26,18 @@ bubble size and continent as color, animated over time.
 
 ## Your first bubble chart
 
+A bubble chart is a scatter plot with two more channels bound to columns, which is why the call grows by exactly two arguments:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "px.scatter(df," },
+    { text: "x=\"gdp\", y=\"life\",", label: "position, read most accurately" },
+    { text: "size=\"pop\",", label: "area, read least accurately" },
+    { text: "color=\"continent\"", label: "hue, for categories" },
+    { text: ")" },
+  ]}
+/>
+
 <CodeBlock
   adapter="python"
   files={[

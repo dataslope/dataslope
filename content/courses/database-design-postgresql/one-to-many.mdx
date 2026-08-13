@@ -54,6 +54,17 @@ stores a reference to its parent.
 
 ## The foreign key lives on the many side
 
+Written out, the whole relationship is two lines on the child table:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "CREATE TABLE orders (", label: "the many side" },
+    { text: "customer_id INTEGER", label: "the pointer lives here" },
+    { text: "REFERENCES customers(id)", label: "aimed at the one side" },
+    { text: ")" },
+  ]}
+/>
+
 A **foreign key** is the column that stores the primary key of the
 related row. In a one-to-many relationship, that foreign key belongs on
 the **many** side.

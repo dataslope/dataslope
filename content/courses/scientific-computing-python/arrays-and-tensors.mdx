@@ -121,6 +121,17 @@ print("choice :", rng.choice(["a", "b", "c"], size=4))
 
 ## Indexing: views, fancy, and boolean
 
+A two-dimensional index is one bracket holding two slices, separated by a comma: rows first, then columns.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "a[" },
+    { text: "1:3,", label: "which rows" },
+    { text: ":2", label: "which columns" },
+    { text: "]", label: "a view, not a copy" },
+  ]}
+/>
+
 There are three indexing modes, and they behave very differently in
 terms of memory.
 

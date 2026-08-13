@@ -254,6 +254,17 @@ public class Main {
 
 ## The handful of Map methods worth memorizing
 
+`computeIfAbsent` replaces the get-check-put dance, and its second argument is a *function*, not a value, so the default is built only when it is needed:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "map.computeIfAbsent(" },
+    { text: "key,", label: "what to look up" },
+    { text: "k -> new ArrayList<>()", label: "built only if the key is absent" },
+    { text: ")", label: "returns the existing or the new value, never null" },
+  ]}
+/>
+
 Java 8 added a small set of methods that eliminate a *lot* of "if
 present, update; else insert" boilerplate. Learn them and your code
 shrinks.

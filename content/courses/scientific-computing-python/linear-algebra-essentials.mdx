@@ -42,6 +42,17 @@ chapter is about *using* them.
 
 ## Solving linear systems
 
+Never invert the matrix to do this. `solve` takes the two halves of the system directly:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "np.linalg.solve(" },
+    { text: "A,", label: "the coefficient matrix" },
+    { text: "b", label: "the right-hand side" },
+    { text: ")", label: "returns x, without ever forming the inverse" },
+  ]}
+/>
+
 The single most-used routine in scientific Python is
 `numpy.linalg.solve(A, b)`. It solves $A x = b$ where $A$ is square
 and (numerically) non-singular. It calls LAPACK's `dgesv`, which

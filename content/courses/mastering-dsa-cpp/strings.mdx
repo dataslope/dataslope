@@ -180,6 +180,16 @@ A pointer returned by `.c_str()` is only valid while the string object is alive 
 
 ## `std::string_view`
 
+A view is a pointer and a length, which is why it must not outlive what it points at:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "std::string_view", label: "borrows, never owns" },
+    { text: "sv", label: "the view" },
+    { text: "= s;", label: "no copy, no allocation" },
+  ]}
+/>
+
 `std::string_view` is a non-owning view into characters. It is great for read-only function parameters when you want to accept `std::string`, string literals, and slices without copying.
 
 <CodeBlock

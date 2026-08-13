@@ -18,6 +18,15 @@ yourself in the foot.
 
 ## The null-terminated string
 
+No length is stored anywhere. The terminator *is* the length, which is why the array must have room for it:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "char s[6]", label: "five characters..." },
+    { text: "= \"hello\";", label: "...plus the terminator the compiler adds" },
+  ]}
+/>
+
 ```c
 char greeting[] = "hello";
 ```

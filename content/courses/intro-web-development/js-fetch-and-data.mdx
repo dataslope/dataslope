@@ -14,6 +14,17 @@ ask for data, wait for it, and render it into the page.
 
 ## `fetch()` and `await`
 
+Two awaits, because two separate things are asynchronous: the response arriving, and its body being read.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "const res =" },
+    { text: "await fetch(url);", label: "headers have arrived, body has not" },
+    { text: "const data =" },
+    { text: "await res.json();", label: "now read and parse the body" },
+  ]}
+/>
+
 `fetch(url)` asks the network for something and returns a **promise**,
 a value that isn't ready yet. `await` pauses inside an `async`
 function until it arrives:

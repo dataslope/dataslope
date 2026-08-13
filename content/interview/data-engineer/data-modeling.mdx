@@ -76,6 +76,16 @@ grain.
 
 ### How do you preserve history when a dimension attribute changes (SCD)?
 
+A Type 2 dimension answers "what was true then?" by adding rows rather than updating them, which needs three bookkeeping columns:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "customer_key,", label: "the surrogate key, new per version" },
+    { text: "valid_from, valid_to,", label: "the window this version was true" },
+    { text: "is_current", label: "the flag that finds today's row cheaply" },
+  ]}
+/>
+
 Use a **Slowly Changing Dimension (SCD)**:
 
 - **Type 1**, overwrite (no history).

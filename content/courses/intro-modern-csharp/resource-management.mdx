@@ -80,6 +80,16 @@ it *now*, deterministically": the **`IDisposable`** pattern.
 
 ## `IDisposable` and `using`
 
+`using` is what guarantees the release happens, whatever the block does next:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "using", label: "dispose it when the block ends" },
+    { text: "var reader =", label: "the variable you actually use" },
+    { text: "new StreamReader(path);", label: "the resource being held" },
+  ]}
+/>
+
 Any class that owns an unmanaged resource implements
 `IDisposable` with a `Dispose()` method. You can call `Dispose()`
 yourself, but the language has a better tool: the `using`

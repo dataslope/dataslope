@@ -108,6 +108,19 @@ small dataset than a single split allows.
 
 ## `cross_val_score()`: one line to do it all
 
+It clones the estimator for each fold, so nothing leaks between them. Four arguments say what to fit, on what, how many times, and what to measure.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "cross_val_score(" },
+    { text: "model,", label: "cloned fresh for every fold" },
+    { text: "X, y,", label: "the whole training set" },
+    { text: "cv=5,", label: "how many folds" },
+    { text: "scoring=\"f1\"", label: "which number comes back" },
+    { text: ")" },
+  ]}
+/>
+
 scikit-learn wraps the whole procedure in a single function.
 
 <CodeBlock

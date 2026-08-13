@@ -67,6 +67,17 @@ everything into a safe range and leaves the result unchanged.
 
 ## Temperature reshapes the distribution
 
+Temperature divides the scores before the softmax, which is why it changes the *shape* of the distribution rather than its order:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "softmax(" },
+    { text: "logits", label: "the raw scores" },
+    { text: "/ temperature", label: "below 1 sharpens, above 1 flattens" },
+    { text: ")" },
+  ]}
+/>
+
 Temperature divides the logits before the softmax.
 
 * **Low temperature** (below 1) spreads the logits apart, making the

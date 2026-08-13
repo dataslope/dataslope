@@ -216,6 +216,18 @@ clearest pattern.
 
 ## Destructuring objects
 
+Destructuring reads right to left: the shape on the left names what you want out of the object on the right.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "const {" },
+    { text: "name,", label: "pull out the property of that name" },
+    { text: "age = 0", label: "with a fallback when it is missing" },
+    { text: "} =" },
+    { text: "person;", label: "the object being taken apart" },
+  ]}
+/>
+
 Just like with arrays, we can pull properties out by name in one
 line. This is one of modern JavaScript's most-loved features.
 
@@ -280,6 +292,15 @@ console.log(describe2(u));
 />
 
 ## Spread, rest, and copying
+
+The same three dots mean opposite things depending on which side of the `=` they sit on:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "const { id, ...rest } = obj;", label: "rest: collect what is left" },
+    { text: "const copy = { ...obj, id: 2 };", label: "spread: expand, then override" },
+  ]}
+/>
 
 The `...` syntax works for objects too.
 

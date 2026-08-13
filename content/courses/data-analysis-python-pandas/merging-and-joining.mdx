@@ -55,6 +55,18 @@ display(departments)
 
 ## Inner join
 
+Every merge is the same four decisions: the two frames, what counts as a match, and which side's rows survive.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "pd.merge(" },
+    { text: "left, right,", label: "the two frames" },
+    { text: "on=\"id\",", label: "the key that defines a match" },
+    { text: "how=\"inner\"", label: "which unmatched rows to drop" },
+    { text: ")" },
+  ]}
+/>
+
 Only rows where the key is present in both. This is the
 default.
 

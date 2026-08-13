@@ -156,6 +156,17 @@ You can write `INNER JOIN` when you want to be extra clear, especially near oute
 
 ## Choosing the matching columns
 
+The `ON` clause is where a join is usually got wrong: it must pair the foreign key with the key it references.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "JOIN customers", label: "the second table" },
+    { text: "ON", label: "how rows are paired" },
+    { text: "orders.customer_id", label: "the foreign key" },
+    { text: "= customers.id", label: "the key it points at" },
+  ]}
+/>
+
 The most common inner join condition is:
 
 ```sql

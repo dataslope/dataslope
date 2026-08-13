@@ -141,6 +141,15 @@ headers stay visible with a single line of CSS, no JavaScript.
 
 ## `z-index` and stacking
 
+`z-index` does nothing on an unpositioned element, and it only competes inside its own stacking context:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "position: relative;", label: "without this, z-index is ignored" },
+    { text: "z-index: 10;", label: "ordering, but only among siblings in this context" },
+  ]}
+/>
+
 When positioned elements overlap, **`z-index`** decides who's on top,
 higher numbers sit in front. Two things trip people up:
 

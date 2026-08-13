@@ -20,6 +20,16 @@ around as a unit.
 
 ## Declaring a struct
 
+A struct declaration defines a *type*, not a variable. Those are two separate steps in C:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "struct", label: "define a new type" },
+    { text: "Point", label: "its tag, written struct Point later" },
+    { text: "{ int x; int y; };", label: "the members, laid out in this order" },
+  ]}
+/>
+
 ```c
 struct Point {
     int x;

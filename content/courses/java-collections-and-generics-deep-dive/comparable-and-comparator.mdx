@@ -20,6 +20,17 @@ There are two ways to provide that ordering:
 
 ## Comparable: the natural order
 
+The contract is the *sign* of the return value, not the number itself:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "int compareTo(T other)", label: "the one method Comparable requires" },
+    { text: "negative", label: "this sorts before other" },
+    { text: "0", label: "they tie" },
+    { text: "positive", label: "this sorts after other" },
+  ]}
+/>
+
 `Comparable<T>` has a single method, `int compareTo(T other)`, which
 returns a negative number, zero, or a positive number depending on
 whether `this` is less than, equal to, or greater than `other`.

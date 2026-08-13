@@ -136,6 +136,18 @@ It's a useful trick for "give me the min, or zero".
 
 ## The universal aggregator: `Aggregate()`
 
+`Aggregate` is `reduce` under another name, and its three-argument form is the one worth learning:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "xs.Aggregate(" },
+    { text: "0,", label: "the seed, which also fixes the result type" },
+    { text: "(acc, x) => acc + x,", label: "how to fold one element in" },
+    { text: "acc => acc / n", label: "an optional final projection" },
+    { text: ")" },
+  ]}
+/>
+
 `Aggregate()` (sometimes called `fold` or `reduce` elsewhere) is the
 general form. You give it:
 

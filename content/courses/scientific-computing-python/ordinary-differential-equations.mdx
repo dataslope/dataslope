@@ -152,6 +152,19 @@ Euler with the same step size would have produced garbage.
 
 ## `scipy.integrate.solve_ivp`, what you should actually use
 
+Four arguments cover almost every use, and each answers a different question:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "solve_ivp(" },
+    { text: "f,", label: "the derivative, f(t, y)" },
+    { text: "(0, 10),", label: "the time span to integrate over" },
+    { text: "y0,", label: "the initial state" },
+    { text: "t_eval=ts", label: "where you want the answer sampled" },
+    { text: ")" },
+  ]}
+/>
+
 In production, never hand-roll RK4. SciPy gives you
 **adaptive-step** solvers that monitor their own error and adjust
 $h$ on the fly. The default is `RK45` (Dormand–Prince), which is

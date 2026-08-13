@@ -177,6 +177,17 @@ fruits.forEach((f) => console.log("got:", f));
 
 ## Slicing and copying
 
+`slice` never changes the original. Its two arguments are indices, and the second is not included:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "xs.slice(" },
+    { text: "1,", label: "start here, included" },
+    { text: "4", label: "stop here, excluded" },
+    { text: ")", label: "a new array; xs is untouched" },
+  ]}
+/>
+
 Two methods that look similar but are completely different:
 
 - `slice(start, end)` returns a **new** array with a portion of

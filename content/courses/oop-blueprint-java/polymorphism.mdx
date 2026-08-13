@@ -34,6 +34,16 @@ sequenceDiagram
 
 ## Two-level thinking: compile-time vs. runtime types
 
+One line carries both types at once, and they are not the same type:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "Animal", label: "compile-time type: what the compiler lets you call" },
+    { text: "a =" },
+    { text: "new Dog();", label: "runtime type: whose code actually runs" },
+  ]}
+/>
+
 Every reference variable in Java has *two* types associated with it
 at any moment:
 

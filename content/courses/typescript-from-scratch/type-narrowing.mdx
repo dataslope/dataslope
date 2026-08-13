@@ -47,6 +47,17 @@ a `string`. That's where narrowing comes in.
 
 ## `typeof` guards
 
+The check is ordinary JavaScript; the narrowing is the compiler reading it:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "if (" },
+    { text: "typeof id", label: "a real runtime check" },
+    { text: "=== \"string\"", label: "which the compiler also reads" },
+    { text: ")", label: "inside, id is a string" },
+  ]}
+/>
+
 The **`typeof`** operator checks the primitive type at runtime. TypeScript
 recognizes `typeof` checks and narrows the type accordingly:
 

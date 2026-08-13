@@ -264,6 +264,16 @@ int main(void) {
 
 ## `const` pointers vs pointers to `const`
 
+Read it right to left. Which side of the `*` the `const` sits on decides which half is frozen:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "const char", label: "the characters are const" },
+    { text: "*", label: "pointer to" },
+    { text: "p;", label: "the pointer itself may still move" },
+  ]}
+/>
+
 Two `const` positions, two meanings:
 
 | Declaration | Can you change the pointer? | Can you change what it points to? |

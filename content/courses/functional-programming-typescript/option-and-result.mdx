@@ -167,6 +167,17 @@ fallback kicks in.
 
 ## Result: "an A or an error E"
 
+Two type parameters, and their order is a convention worth knowing: the error comes first.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "Result<" },
+    { text: "E,", label: "the failure type" },
+    { text: "A", label: "the success type" },
+    { text: ">" },
+  ]}
+/>
+
 `Option` answers "is there a value?" `Result` answers "what went
 wrong?". You use it when you need *information* about the failure,
 not just its absence.

@@ -17,6 +17,17 @@ analytics".
 
 ## Counting words with `FreqDist()`
 
+`FreqDist` is a `Counter` that knows about text, and the call you will reach for most takes one number:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "FreqDist(tokens)", label: "count every token" },
+    { text: ".most_common(", label: "sorted, highest first" },
+    { text: "10", label: "how many to return; omit for all of them" },
+    { text: ")" },
+  ]}
+/>
+
 You could count words with a plain `collections.Counter`, and that is exactly
 what is happening under the hood. NLTK wraps it in a `FreqDist()` ("frequency
 distribution") that adds text-specific conveniences.

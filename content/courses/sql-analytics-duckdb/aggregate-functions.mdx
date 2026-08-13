@@ -44,6 +44,16 @@ else in this section is a variation on it.
 
 ## The five core aggregates
 
+Every aggregate has the same shape: a name, and the column it collapses.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "SUM", label: "which aggregate" },
+    { text: "(amount)", label: "the column it collapses; NULLs are skipped" },
+    { text: "AS total", label: "the name the result column gets" },
+  ]}
+/>
+
 | Function | Answers | Example |
 | --- | --- | --- |
 | `COUNT(*)` | How many rows? | number of orders |

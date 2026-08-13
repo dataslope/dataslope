@@ -182,6 +182,17 @@ ergonomic.
 
 ## `mutate()`, add or change columns
 
+Every dplyr verb takes the data first, which is what lets the pipe read as a sentence:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "df |>", label: "the data, piped in as the first argument" },
+    { text: "mutate(", label: "add or replace columns" },
+    { text: "bmi = kg / m^2", label: "new name on the left, expression on the right" },
+    { text: ")" },
+  ]}
+/>
+
 <CodeBlock
   adapter="r"
   files={[

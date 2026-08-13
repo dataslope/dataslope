@@ -84,6 +84,16 @@ up by stack unwinding plus `finally` blocks.
 
 ## `try` / `catch` / `finally`
 
+Three blocks, and each one answers a different question:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "try", label: "the code that might fail" },
+    { text: "catch (IOException ex)", label: "which failures you can handle" },
+    { text: "finally", label: "runs either way, failure or not" },
+  ]}
+/>
+
 <CodeBlock
   adapter="csharp"
   files={[

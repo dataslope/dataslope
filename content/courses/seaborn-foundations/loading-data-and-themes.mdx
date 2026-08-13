@@ -151,6 +151,17 @@ listed datasets are large enough to slow a plot down.
 
 ## One call to make everything look good: `set_theme()`
 
+Set once at the top of a notebook, it changes every plot afterwards:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "sns.set_theme(" },
+    { text: "style=\"whitegrid\",", label: "the background and gridlines" },
+    { text: "context=\"talk\"", label: "the scale of every text and line element" },
+    { text: ")" },
+  ]}
+/>
+
 By default, Seaborn draws on matplotlib's plain look: a white background, no
 gridlines, fairly small text. It is perfectly functional but a little
 spartan. Watch what a bare plot looks like with no theme applied.

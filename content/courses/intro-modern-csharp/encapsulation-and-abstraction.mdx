@@ -57,6 +57,17 @@ touches `Balance`. That's the problem encapsulation solves.
 
 ## Access modifiers: the basic tools
 
+Every member declaration opens by answering "who can see this?":
+
+<SyntaxBreakdown
+  parts={[
+    { text: "private", label: "who may touch it" },
+    { text: "readonly", label: "assigned once, in the constructor" },
+    { text: "decimal", label: "its type" },
+    { text: "_balance;", label: "its name" },
+  ]}
+/>
+
 C# gives you a few keywords to control who can see what.
 
 | Modifier              | Visible to                                       |

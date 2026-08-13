@@ -104,6 +104,18 @@ The lamp owns its response.
 
 ## The signature of a method
 
+Four pieces in a fixed order, and only two of them are the signature
+Java uses to tell overloads apart:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "public", label: "who may call it" },
+    { text: "double", label: "what it hands back" },
+    { text: "area", label: "the name, part of the signature" },
+    { text: "(int w, int h)", label: "the parameter types, the rest of it" },
+  ]}
+/>
+
 A method's **signature** is its name plus the *types* (and order) of
 its parameters. The return type is *not* part of the signature.
 

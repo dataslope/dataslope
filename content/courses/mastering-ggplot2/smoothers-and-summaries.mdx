@@ -40,6 +40,17 @@ interval**, the stat computed it for you.
 
 ## Choosing the model with `method`
 
+`geom_smooth` fits a model per group and draws it. Two arguments decide which model, and whether to show its uncertainty:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "geom_smooth(" },
+    { text: "method = \"lm\",", label: "which model to fit" },
+    { text: "se = FALSE", label: "draw the confidence band, or not" },
+    { text: ")" },
+  ]}
+/>
+
 The same geom can fit different models. `method = "lm"` fits a straight
 line (linear model); the default follows the data's curves:
 

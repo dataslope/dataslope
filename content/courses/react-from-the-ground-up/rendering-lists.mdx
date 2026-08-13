@@ -74,6 +74,17 @@ function LanguageList() {
 
 ## Why `key` matters
 
+The key is not a prop the component receives. It is how React matches this render's elements to the previous one's:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "todos.map((t) => (" },
+    { text: "<Todo", label: "one element per item" },
+    { text: "key={t.id}", label: "stable identity across renders, never the index" },
+    { text: "{...t} />))" },
+  ]}
+/>
+
 Each element in a mapped list needs a **`key`**, a stable, unique
 identifier. React uses keys to tell items apart between renders, so
 when the list changes it can update, insert, or remove just the items

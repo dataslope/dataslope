@@ -209,6 +209,18 @@ by `memset(p, 0, ...)`.
 
 ## `realloc()`: grow or shrink
 
+Never assign `realloc` straight back onto the pointer you passed in: if it fails it returns `NULL` and the original block is still yours to free.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "void *tmp =", label: "a temporary, always" },
+    { text: "realloc(" },
+    { text: "p,", label: "the existing block" },
+    { text: "n * sizeof *p", label: "the new total size, not the delta" },
+    { text: ");" },
+  ]}
+/>
+
 `realloc(p, new_size)` is the resizing primitive. It may:
 
 - expand the existing block in place (best case), or

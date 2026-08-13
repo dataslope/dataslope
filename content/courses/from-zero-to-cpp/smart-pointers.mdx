@@ -24,6 +24,17 @@ There are three to know:
 
 ## `std::unique_ptr`: one owner, no overhead
 
+`make_unique` is the form to use: it allocates and takes ownership in one step, so there is no window where the memory is unowned.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "auto p =" },
+    { text: "std::make_unique", label: "allocate and own in one step" },
+    { text: "<Widget>", label: "what is being created" },
+    { text: "(args...)", label: "forwarded to its constructor" },
+  ]}
+/>
+
 <CodeBlock
   adapter="cpp"
   files={[

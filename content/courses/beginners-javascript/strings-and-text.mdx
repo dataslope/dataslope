@@ -72,6 +72,17 @@ console.log("col1\\tcol2\\tcol3");
 
 ## Template literals: the modern default
 
+Backticks turn on two things at once: interpolation, and newlines that survive.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "`Hello, ", label: "backticks, not quotes" },
+    { text: "${", label: "start an expression" },
+    { text: "name.toUpperCase()", label: "any expression, not just a variable" },
+    { text: "}`" },
+  ]}
+/>
+
 Backtick strings, called **template literals**, let you do two
 things that ordinary strings cannot:
 
