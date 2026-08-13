@@ -2504,7 +2504,7 @@ input[type="range"].fs-slider:disabled {
      sets so monospace surfaces keep their natural spacing. This is UI prose in
      the sans face, where that reset leaves it looser than the rest of the site
      (globals.css runs body text at -0.011em). */
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 /* Workspace-conflict overlay, reuses the boot-overlay chrome but offers
    actions instead of a progress bar (shown when the workspace is already
@@ -2523,18 +2523,24 @@ input[type="range"].fs-slider:disabled {
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 500;
+  letter-spacing: -0.015em;
   padding: 9px 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--bg2);
+  /* 6px rather than the playground-wide --radius (8px): without a border the
+     fill reads a touch rounder than it measures, and these sit under a card
+     whose other corners are the larger radius. */
+  border-radius: 6px;
+  border: none;
+  background: var(--bg3);
   color: var(--text);
   cursor: pointer;
-  transition:
-    background 0.15s,
-    border-color 0.15s;
+  transition: background 0.15s;
 }
+/* The secondary fill *is* --bg3, so hover can't be --bg3 as it was when these
+   had borders and sat on --bg2. Mixing the text color in shifts the surface
+   away from the card in whichever direction the palette runs: darker on
+   light, lighter on dark. Same move as `--menu-item-hover`. */
 .playground-conflict-btn:hover {
-  background: var(--bg3);
+  background: color-mix(in srgb, var(--text) 8%, var(--bg3));
 }
 /* The icon rides at the label's weight rather than competing with it. */
 .playground-conflict-btn svg {
@@ -2543,7 +2549,6 @@ input[type="range"].fs-slider:disabled {
 }
 .playground-conflict-btn-primary {
   background: var(--primary);
-  border-color: var(--primary);
   color: #fff;
 }
 .playground-conflict-btn-primary:hover {
@@ -2556,7 +2561,7 @@ input[type="range"].fs-slider:disabled {
   cursor: default;
 }
 .playground-conflict-btn:disabled:hover {
-  background: var(--bg2);
+  background: var(--bg3);
 }
 .playground-conflict-btn-primary:disabled:hover {
   background: var(--primary);
