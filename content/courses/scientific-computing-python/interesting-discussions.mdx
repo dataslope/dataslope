@@ -18,8 +18,8 @@ several connect directly to the numerical ideas you have already met.
 
 In 1950, a small team led by John von Neumann and the meteorologist
 Jule Charney used ENIAC to produce the first computer weather
-forecast. They discretized the atmosphere over North America into a
-coarse grid, used a simplified set of equations (the *barotropic
+forecast.[^eniac] They discretized the atmosphere over North America
+into a coarse grid, used a simplified set of equations (the *barotropic
 vorticity equation*), and ran a 24-hour forecast.
 
 <Figure
@@ -68,8 +68,8 @@ and each unlocked a research program that ran for a decade or two.
 
 ## A Nobel Prize for simulation
 
-The 2013 Nobel Prize in Chemistry went to Martin Karplus, Michael
-Levitt, and Arieh Warshel "for the development of multiscale models
+The 2013 Nobel Prize in Chemistry[^nobel] went to Martin Karplus,
+Michael Levitt, and Arieh Warshel "for the development of multiscale models
 for complex chemical systems." The award was not for a new chemical
 discovery, it was for the *numerical methods* that let chemists
 simulate enzymes on a computer. Computational chemistry and
@@ -125,7 +125,8 @@ in its deadliest form.
 <Callout type="warn" title="The Pentium FDIV bug, 1994">
 Intel's Pentium processor shipped with a flaw in the lookup table
 used by its floating-point division unit. For certain divisions it
-returned wrong results, a famous example being $4195835 / 3145727$,
+returned wrong results, a famous example being $4195835 /
+3145727$,[^fdiv]
 which came out wrong in about the fifth significant digit. Once the
 bug became public, Intel was forced to offer replacements, at a cost
 of about **$475 million**. The lesson: even the *hardware* that
@@ -160,3 +161,24 @@ freely available, and all far more detailed than these summaries.
 The point of this page is not completeness but motivation: the
 numerical care this course teaches is not pedantry. People have died
 for the lack of it.
+
+[^eniac]:
+    Jule G. Charney, Ragnar Fjortoft and John von Neumann, "Numerical
+    Integration of the Barotropic Vorticity Equation", *Tellus* 2(4),
+    1950. The 24-hour forecast took about 24 hours of ENIAC time, so the
+    first numerical weather prediction ran exactly as fast as the
+    weather.
+
+[^nobel]:
+    "The Nobel Prize in Chemistry 2013", awarded to Martin Karplus,
+    Michael Levitt and Arieh Warshel "for the development of multiscale
+    models for complex chemical systems". The Nobel Foundation's own
+    scientific background document is the readable account of what the
+    methods actually do.
+
+[^fdiv]:
+    Alan Edelman, "The Mathematics of the Pentium Division Bug", *SIAM
+    Review* 39(1), 1997, which works out exactly which divisors the
+    missing lookup-table entries could affect and how rare a wrong
+    answer was. The rarity is why the bug shipped, and the recall charge
+    is why rarity was not a defence.
