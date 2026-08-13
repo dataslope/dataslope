@@ -32,6 +32,7 @@
 import { ImageIcon } from "lucide-react";
 import imageManifest from "@/lib/generated/images";
 import { withInlineMarkup } from "./inlineMarkup";
+import { FigureSources, type FigureSource } from "./FigureSources";
 import styles from "./Figure.module.css";
 
 const PUBLIC_BASE = "/images";
@@ -63,6 +64,13 @@ interface FigureProps {
    */
   caption?: string;
   /**
+   * Where the image or the data behind it came from, rendered as a credit
+   * line under the caption. The pipeline illustrations are the site's own, so
+   * most figures need none; a photograph, a screenshot of someone else's
+   * software, or a redrawn figure does.
+   */
+  sources?: readonly FigureSource[];
+  /**
    * Optional cap on display width in px. Omitted by default so the figure
    * fills the full content width; pass a value only to deliberately hold a
    * single figure narrower than the column.
@@ -76,6 +84,7 @@ export function Figure({
   slug,
   alt,
   caption,
+  sources = [],
   maxWidth,
   priority = false,
 }: FigureProps) {
@@ -104,7 +113,7 @@ export function Figure({
 
   // The last format is the <img> fallback; any earlier ones are <source>s.
   const fallback = entry.formats[entry.formats.length - 1];
-  const sources = entry.formats.slice(0, -1);
+  const altFormats = entry.formats.slice(0, -1);
 
   return (
     <figure
@@ -112,7 +121,7 @@ export function Figure({
       style={maxWidth ? { maxWidth: `${maxWidth}px` } : undefined}
     >
       <picture>
-        {sources.map((ext) => (
+        {altFormats.map((ext) => (
           <source
             key={ext}
             srcSet={`${PUBLIC_BASE}/${slug}.${ext}`}
@@ -130,9 +139,12 @@ export function Figure({
           fetchPriority={priority ? "high" : "auto"}
         />
       </picture>
-      {caption ? (
+      {/* One <figcaption> per <figure>: the credit line renders inside it
+          rather than as a second one. */}
+      {caption || sources.length > 0 ? (
         <figcaption className={styles.caption}>
-          {withInlineMarkup(caption)}
+          {caption ? withInlineMarkup(caption) : null}
+          <FigureSources sources={sources} />
         </figcaption>
       ) : null}
       {/* Regeneration handle. The prompt id is the slug with the `-cutout`

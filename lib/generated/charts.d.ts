@@ -20,11 +20,23 @@ export interface ChartUsage {
   section?: string;
 }
 
+/** One reference in a chart's credit line (the spec's `sources` export). */
+export interface ChartSource {
+  /** The reference as it reads on the page: author, title, publisher, year. */
+  text: string;
+  /** Where it lives, when it has a stable public home. */
+  href?: string;
+}
+
 export interface GeneratedChart {
   /** Accessible name for the whole figure (the spec's `title` export). */
   title: string;
   /** Default caption, when the spec exports one. */
   caption?: string;
+  /** Where the chart's numbers came from, when the spec exports them. Carried
+   *  in the manifest so the credit follows the chart to every lesson that
+   *  places it, rather than being re-typed on each `<Chart>` tag. */
+  sources?: ChartSource[];
   /** Intrinsic size the SVG was laid out at, in px. */
   width: number;
   height: number;

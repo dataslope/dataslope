@@ -29,6 +29,7 @@ import type { CSSProperties } from "react";
 import { ChartLine } from "lucide-react";
 import chartManifest from "@/lib/generated/charts";
 import { withInlineMarkup } from "./inlineMarkup";
+import { FigureSources, type FigureSource } from "./FigureSources";
 import ChartExpand from "./ChartExpand";
 import styles from "./Chart.module.css";
 
@@ -50,13 +51,20 @@ interface ChartProps {
    */
   caption?: string | null;
   /**
+   * Where the chart's numbers came from, rendered as a credit line under the
+   * caption. Defaults to the spec's own `sources` export, which is where it
+   * belongs when the same chart is placed on several lessons; pass `null` to
+   * render none, or a list here to override.
+   */
+  sources?: readonly FigureSource[] | null;
+  /**
    * Optional cap on display width in px. Omitted by default so the chart
    * fills the content column.
    */
   maxWidth?: number;
 }
 
-export function Chart({ slug, caption, maxWidth }: ChartProps) {
+export function Chart({ slug, caption, sources, maxWidth }: ChartProps) {
   const entry = chartManifest[slug];
 
   if (!entry) {
@@ -73,6 +81,7 @@ export function Chart({ slug, caption, maxWidth }: ChartProps) {
   }
 
   const text = caption === undefined ? entry.caption : caption;
+  const credits = (sources === undefined ? entry.sources : sources) ?? [];
 
   return (
     <figure
@@ -99,9 +108,12 @@ export function Chart({ slug, caption, maxWidth }: ChartProps) {
           dangerouslySetInnerHTML={{ __html: entry.svg }}
         />
       </ChartExpand>
-      {text ? (
+      {/* One <figcaption> per <figure>: the credit line renders inside it
+          rather than as a second one. */}
+      {text || credits.length > 0 ? (
         <figcaption className={styles.caption}>
-          {withInlineMarkup(text)}
+          {text ? withInlineMarkup(text) : null}
+          <FigureSources sources={credits} />
         </figcaption>
       ) : null}
       {SHOW_CHART_ID ? (
